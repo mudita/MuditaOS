@@ -3,11 +3,8 @@
 
 #pragma once
 
-#include "SimCardResult.hpp"
-
 #include "CellularCall.hpp"
 #include "CellularMessage.hpp"
-#include "State.hpp"
 #include "USSD.hpp"
 #include "PacketData.hpp"
 #include "PacketDataCellularMessage.hpp"
@@ -60,6 +57,11 @@ namespace constants
 } // namespace constants
 
 class ConnectionManager;
+
+namespace internal
+{
+    class ServiceCellularPriv;
+}
 
 class ServiceCellular : public sys::Service
 {
@@ -154,7 +156,7 @@ class ServiceCellular : public sys::Service
      * \param res
      * \return
      */
-    bool sendChangePinResult(SimCardResult res);
+    //    bool sendChangePinResult(cellular::service::sim::Result res);
 
     /// sim functionality
 
@@ -198,7 +200,6 @@ class ServiceCellular : public sys::Service
     std::unique_ptr<packet_data::PacketData> packetData;
     std::unique_ptr<sys::phone_modes::Observer> phoneModeObserver;
     std::unique_ptr<ConnectionManager> connectionManager;
-    cellular::State state;
     bsp::Board board = bsp::Board::none;
 
     /// URC GSM notification handler
@@ -220,7 +221,6 @@ class ServiceCellular : public sys::Service
     bool resetCellularModule(ResetType type);
     bool isAfterForceReboot                    = false;
     bool nextPowerStateChangeAwaiting          = false;
-    cellular::State::PowerState nextPowerState = cellular::State::PowerState::Off;
 
     /// one point of state change handling
     void change_state(cellular::StateChange *msg);
@@ -305,7 +305,7 @@ class ServiceCellular : public sys::Service
     bool handleUSSDURC();
     void handleUSSDTimer();
 
-    bool handleSimState(at::SimState state, const std::string message);
+    bool handleSimState(at::SimState state, const std::string &message);
     auto handleSimPinMessage(sys::Message *msgl) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleSimPukMessage(sys::Message *msgl) -> std::shared_ptr<sys::ResponseMessage>;
 
@@ -392,6 +392,9 @@ class ServiceCellular : public sys::Service
     auto isIncommingCallAllowed() -> bool;
 
     auto hangUpCall() -> bool;
+
+  private:
+    std::unique_ptr<internal::ServiceCellularPriv> priv;
 };
 
 namespace sys

@@ -264,10 +264,10 @@ bool DeveloperModeHelper::requestCellularPowerStateChange(const int cellularStat
 {
     bool res = false;
     if (cellularState == 1) {
-        res = CellularServiceAPI::ChangeModulePowerState(owner, cellular::State::PowerState::Off);
+        res = CellularServiceAPI::ChangeModulePowerState(owner, cellular::service::State::PowerState::Off);
     }
     else if (cellularState == 2) {
-        res = CellularServiceAPI::ChangeModulePowerState(owner, cellular::State::PowerState::On);
+        res = CellularServiceAPI::ChangeModulePowerState(owner, cellular::service::State::PowerState::On);
     }
     else if (cellularState == 3) {
         auto event = std::make_unique<sdesktop::developerMode::CellularHotStartEvent>();

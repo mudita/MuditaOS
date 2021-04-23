@@ -99,7 +99,7 @@ namespace CellularServiceAPI
     bool RequestSimCardPinLockState(sys::Service *serv);
     bool SetSimCardLock(sys::Service *serv,
                         Store::GSM::SIM sim,
-                        CellularSimCardLockDataMessage::SimCardLock lock,
+                        cellular::api::SimCardLock lock,
                         const std::vector<unsigned int> &pin);
     bool SetSimCard(sys::Service *serv, Store::GSM::SIM sim);
     /**
@@ -144,7 +144,7 @@ namespace CellularServiceAPI
     bool GetDataTransfer(sys::Service *serv);
     bool SetVoLTE(sys::Service *serv, bool value);
 
-    bool ChangeModulePowerState(sys::Service *serv, cellular::State::PowerState newState);
+    bool ChangeModulePowerState(sys::Service *serv, cellular::service::State::PowerState newState);
 
     bool SetFlightMode(sys::Service *serv, bool flightModeOn);
 

@@ -122,7 +122,7 @@ sys::MessagePointer ServiceAntenna::DataReceivedHandler(sys::DataMessage *msgl, 
         case CellularMessage::Type::StateRequest: {
             auto msg = dynamic_cast<cellular::StateChange *>(msgl);
             if (msg != nullptr) {
-                if (msg->request == cellular::State::ST::Ready) {
+                if (msg->request == cellular::service::State::ST::Ready) {
                     state->set(antenna::State::init);
                 }
             }

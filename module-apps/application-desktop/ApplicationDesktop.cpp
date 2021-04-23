@@ -73,13 +73,12 @@ namespace app
 
         addActionReceiver(app::manager::actions::RequestPinDisable, [this](auto &&data) {
             lockHandler.handlePinEnableRequest(std::forward<decltype(data)>(data),
-                                               CellularSimCardLockDataMessage::SimCardLock::Unlocked);
+                                               cellular::api::SimCardLock::Unlocked);
             return actionHandled();
         });
 
         addActionReceiver(app::manager::actions::RequestPinEnable, [this](auto &&data) {
-            lockHandler.handlePinEnableRequest(std::forward<decltype(data)>(data),
-                                               CellularSimCardLockDataMessage::SimCardLock::Locked);
+            lockHandler.handlePinEnableRequest(std::forward<decltype(data)>(data), cellular::api::SimCardLock::Locked);
             return actionHandled();
         });
 
@@ -228,7 +227,7 @@ namespace app
     auto ApplicationDesktop::handle(cellular::StateChange *msg) -> bool
     {
         assert(msg);
-        if (msg->request == cellular::State::ST::URCReady) {
+        if (msg->request == cellular::service::State::ST::URCReady) {
             if (need_sim_select && !lockHandler.isScreenLocked()) {
                 manager::Controller::sendAction(this, manager::actions::SelectSimCard);
                 return true;
@@ -237,7 +236,7 @@ namespace app
                 bus.sendUnicast(std::make_shared<CellularSimProcedureMessage>(), ServiceCellular::serviceName);
             }
         }
-        if (msg->request == cellular::State::ST::ModemFatalFailure) {
+        if (msg->request == cellular::service::State::ST::ModemFatalFailure) {
             switchWindow(app::window::name::desktop_reboot);
         }
         return false;
@@ -318,17 +317,17 @@ namespace app
         connect(typeid(CellularSimCardLockResponseMessage), [&](sys::Message *request) -> sys::MessagePointer {
             auto response = dynamic_cast<CellularSimCardLockResponseMessage *>(request);
             if (response->retCode) {
-                auto metaData = std::make_unique<gui::DialogMetadataMessage>(gui::DialogMetadata{
-                    "",
-                    "success_icon_W_G",
-                    response->getSimCardLock() == CellularSimCardLockDataMessage::SimCardLock::Unlocked
-                        ? utils::translate("app_desktop_sim_card_unlocked")
-                        : utils::translate("app_desktop_sim_card_locked"),
-                    "",
-                    [this]() {
-                        switchWindow(app::window::name::desktop_main_window);
-                        return true;
-                    }});
+                auto metaData = std::make_unique<gui::DialogMetadataMessage>(
+                    gui::DialogMetadata{"",
+                                        "success_icon_W_G",
+                                        response->getSimCardLock() == cellular::api::SimCardLock::Unlocked
+                                            ? utils::translate("app_desktop_sim_card_unlocked")
+                                            : utils::translate("app_desktop_sim_card_locked"),
+                                        "",
+                                        [this]() {
+                                            switchWindow(app::window::name::desktop_main_window);
+                                            return true;
+                                        }});
                 switchWindow(gui::window::name::dialog_confirm, gui::ShowMode::GUI_SHOW_INIT, std::move(metaData));
             }
             else {

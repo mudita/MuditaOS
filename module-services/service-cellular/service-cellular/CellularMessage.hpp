@@ -4,9 +4,8 @@
 #pragma once
 
 #include "SignalStrength.hpp"
-#include "State.hpp"
+#include <service-cellular/State.hpp>
 
-#include <MessageType.hpp>
 #include <modem/mux/CellularMux.h>
 #include <PhoneNumber.hpp>
 #include <Service/Message.hpp>
@@ -24,24 +23,13 @@
 #include <service-appmgr/service-appmgr/data/SimActionsParams.hpp>
 #include <service-appmgr/service-appmgr/data/MmiActionsParams.hpp>
 
-namespace cellular
-{
-    namespace api
-    {
-        enum class CallMode
-        {
-            Regular,
-            Emergency
-        };
-    }
-    namespace msg::request
-    {}
-} // namespace cellular
+#include <service-cellular/api/request.hpp>
 
 // ugly temporary tweak
 namespace api
 {
     using CallMode = cellular::api::CallMode;
+    using SimCardLock = cellular::api::SimCardLock;
 }
 
 class CellularMessage : public sys::DataMessage
@@ -237,17 +225,17 @@ class CellularSetOperatorMessage : public sys::DataMessage
 class CellularPowerStateChange : public CellularMessage
 {
   public:
-    explicit CellularPowerStateChange(cellular::State::PowerState new_state)
+    explicit CellularPowerStateChange(cellular::service::State::PowerState new_state)
         : CellularMessage(Type::PowerStateChange), newState(new_state)
     {}
 
-    cellular::State::PowerState getNewState() const noexcept
+    cellular::service::State::PowerState getNewState() const noexcept
     {
         return newState;
     }
 
   private:
-    cellular::State::PowerState newState;
+    cellular::service::State::PowerState newState;
 };
 
 class CellularStartOperatorsScanMessage : public CellularMessage
@@ -605,16 +593,11 @@ class CellularSimCardLockDataMessage : public CellularSimDataMessage
 {
 
   public:
-    enum class SimCardLock
-    {
-        Locked,
-        Unlocked
-    };
-    CellularSimCardLockDataMessage(Store::GSM::SIM _sim, SimCardLock _simCardLock, std::vector<unsigned int> _pin)
+    CellularSimCardLockDataMessage(Store::GSM::SIM _sim, api::SimCardLock _simCardLock, std::vector<unsigned int> _pin)
         : CellularSimDataMessage{_sim}, simCardLock{_simCardLock}, pin{std::move(_pin)}
     {}
 
-    [[nodiscard]] SimCardLock getLock() const noexcept
+    [[nodiscard]] auto getLock() const noexcept
     {
         return simCardLock;
     }
@@ -624,7 +607,7 @@ class CellularSimCardLockDataMessage : public CellularSimDataMessage
     }
 
   private:
-    SimCardLock simCardLock;
+    api::SimCardLock simCardLock;
     std::vector<unsigned int> pin;
 };
 
@@ -707,14 +690,14 @@ class CellularSimPukResponseMessage : public CellularResponseMessage
 
 class CellularSimCardLockResponseMessage : public CellularResponseMessage
 {
-    CellularSimCardLockDataMessage::SimCardLock cardLock;
+    api::SimCardLock cardLock;
 
   public:
-    CellularSimCardLockResponseMessage(bool retCode, CellularSimCardLockDataMessage::SimCardLock cardLock)
+    CellularSimCardLockResponseMessage(bool retCode, api::SimCardLock cardLock)
         : CellularResponseMessage(retCode), cardLock(cardLock)
     {}
 
-    [[nodiscard]] auto getSimCardLock() const noexcept -> CellularSimCardLockDataMessage::SimCardLock
+    [[nodiscard]] auto getSimCardLock() const noexcept
     {
         return cardLock;
     }
@@ -1204,8 +1187,9 @@ namespace cellular
     class StateChange : public CellularMessage
     {
       public:
-        const State::ST request;
-        StateChange(const State::ST request = State::ST::Failed) : CellularMessage(Type::StateRequest), request(request)
+        const service::State::ST request;
+        StateChange(const service::State::ST request = service::State::ST::Failed)
+            : CellularMessage(Type::StateRequest), request(request)
         {}
     };
 

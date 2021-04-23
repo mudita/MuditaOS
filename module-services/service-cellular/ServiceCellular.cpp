@@ -95,83 +95,20 @@
 #include <gsl/gsl_util>
 #include <ticks.hpp>
 
+#include "ServiceCellularPriv.hpp"
+#include <service-cellular/api/request.hpp>
+#include "utils.hpp"
+
 const char *ServiceCellular::serviceName = "ServiceCellular";
 
 inline constexpr auto cellularStack = 8000;
 
 using namespace cellular;
-
-const char *State::c_str(State::ST state)
-{
-    switch (state) {
-    case ST::Idle:
-        return "Idle";
-    case ST::WaitForStartPermission:
-        return "WaitForStartPermission";
-    case ST::PowerUpRequest:
-        return "PowerUpRequest";
-    case ST::StatusCheck:
-        return "StatusCheck";
-    case ST::PowerUpInProgress:
-        return "PowerUpInProgress";
-    case ST::PowerUpProcedure:
-        return "PowerUpProcedure";
-    case ST::BaudDetect:
-        return "BaudDetect";
-    case ST::AudioConfigurationProcedure:
-        return "AudioConfigurationProcedure";
-    case ST::APNConfProcedure:
-        return "APNConfProcedure";
-    case ST::ModemOn:
-        return "ModemOn";
-    case ST::URCReady:
-        return "URCReady";
-    case ST::SimSelect:
-        return "SimSelect";
-    case ST::Failed:
-        return "Failed";
-    case ST::SanityCheck:
-        return "SanityCheck";
-    case ST::SimInit:
-        return "SimInit";
-    case ST::ModemFatalFailure:
-        return "ModemFatalFailure";
-    case ST::CellularConfProcedure:
-        return "CellularStartConfProcedure";
-    case ST::Ready:
-        return "Ready";
-    case ST::PowerDownStarted:
-        return "PowerDownStarted";
-    case ST::PowerDownWaiting:
-        return "PowerDownWaiting";
-    case ST::PowerDown:
-        return "PowerDown";
-    }
-    return "";
-}
-
-const char *State::c_str()
-{
-    return State::c_str(state);
-}
-
-void State::set(ServiceCellular *owner, ST state)
-{
-    assert(owner);
-    LOG_DEBUG("GSM state: (%s) -> (%s)", c_str(this->state), c_str(state));
-    this->state = state;
-    auto msg    = std::make_shared<StateChange>(state);
-    owner->bus.sendMulticast(msg, sys::BusChannel::ServiceCellularNotifications);
-}
-
-State::ST State::get() const
-{
-    return this->state;
-}
+using cellular::service::State;
 
 ServiceCellular::ServiceCellular()
     : sys::Service(serviceName, "", cellularStack, sys::ServicePriority::Idle),
-      phoneModeObserver{std::make_unique<sys::phone_modes::Observer>()}
+      phoneModeObserver{std::make_unique<sys::phone_modes::Observer>()}, priv(new internal::ServiceCellularPriv(this))
 {
     LOG_INFO("[ServiceCellular] Initializing");
 
@@ -183,9 +120,9 @@ ServiceCellular::ServiceCellular()
     settings = std::make_unique<settings::Settings>(this);
 
     connectionManager = std::make_unique<ConnectionManager>(
-        utils::getNumericValue<bool>(
+        ::utils::getNumericValue<bool>(
             settings->getValue(settings::Cellular::offlineMode, settings::SettingsScope::Global)),
-        static_cast<std::chrono::minutes>(utils::getNumericValue<int>(settings->getValue(
+        static_cast<std::chrono::minutes>(::utils::getNumericValue<int>(settings->getValue(
             settings->getValue(settings::Offline::connectionFrequency, settings::SettingsScope::Global)))),
         std::make_shared<ConnectionManagerCellularCommands>(*this));
 
@@ -225,7 +162,7 @@ ServiceCellular::ServiceCellular()
     notificationCallback = [this](std::string &data) {
         LOG_DEBUG("Notifications callback called with %u data bytes", static_cast<unsigned int>(data.size()));
 
-        std::string logStr = utils::removeNewLines(data);
+        std::string logStr = ::utils::removeNewLines(data);
         LOG_DEBUG("Data: %s", logStr.c_str());
         atURCStream.write(data);
         auto vUrc = atURCStream.getURCList();
@@ -266,7 +203,7 @@ void ServiceCellular::SleepTimerHandler()
                                 ? currentTime - lastCommunicationTimestamp
                                 : std::numeric_limits<TickType_t>::max() - lastCommunicationTimestamp + currentTime;
 
-    if (!ongoingCall.isValid() && state.get() == cellular::State::ST::Ready &&
+    if (!ongoingCall.isValid() && priv->state->get() == State::ST::Ready &&
         timeOfInactivity >= constants::enterSleepModeTime.count()) {
         cmux->enterSleepMode();
         cpuSentinel->ReleaseMinimumFrequency();
@@ -284,7 +221,7 @@ sys::ReturnCodes ServiceCellular::InitHandler()
 {
     board = EventManagerServiceAPI::GetBoard(this);
 
-    state.set(this, State::ST::WaitForStartPermission);
+    priv->state->set(State::ST::WaitForStartPermission);
     settings->registerValueChange(
         settings::Cellular::volte_on,
         [this](const std::string &value) { volteChanged(value); },
@@ -298,7 +235,7 @@ sys::ReturnCodes ServiceCellular::InitHandler()
     ongoingCall.setCpuSentinel(cpuSentinel);
 
     auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuSentinel);
-    bus.sendUnicast(sentinelRegistrationMsg, service::name::system_manager);
+    bus.sendUnicast(sentinelRegistrationMsg, ::service::name::system_manager);
 
     cmux->registerCellularDevice();
 
@@ -356,14 +293,14 @@ void ServiceCellular::registerMessageHandlers()
     connect(typeid(CellularSimNewPinDataMessage), [&](sys::Message *request) -> sys::MessagePointer {
         auto msg = static_cast<CellularSimNewPinDataMessage *>(request);
         return std::make_shared<CellularSimNewPinResponseMessage>(
-            changePin(SimCard::pinToString(msg->getOldPin()), SimCard::pinToString(msg->getNewPin())));
+            changePin(cellular::utils::pinToString(msg->getOldPin()), cellular::utils::pinToString(msg->getNewPin())));
     });
 
     connect(typeid(CellularSimCardLockDataMessage), [&](sys::Message *request) -> sys::MessagePointer {
         auto msg = static_cast<CellularSimCardLockDataMessage *>(request);
         return std::make_shared<CellularSimCardLockResponseMessage>(
-            setPinLock(msg->getLock() == CellularSimCardLockDataMessage::SimCardLock::Locked,
-                       SimCard::pinToString(msg->getPin())),
+            setPinLock(msg->getLock() == cellular::api::SimCardLock::Locked,
+                       cellular::utils::pinToString(msg->getPin())),
             msg->getLock());
     });
 
@@ -449,7 +386,7 @@ void ServiceCellular::registerMessageHandlers()
 
     connect(typeid(CellularPowerStateChange), [&](sys::Message *request) -> sys::MessagePointer {
         auto msg       = static_cast<CellularPowerStateChange *>(request);
-        nextPowerState = msg->getNewState();
+        priv->nextPowerState = msg->getNewState();
         handle_power_state_change();
         return sys::MessageNone{};
     });
@@ -457,20 +394,21 @@ void ServiceCellular::registerMessageHandlers()
     connect(typeid(sdesktop::developerMode::DeveloperModeRequest), [&](sys::Message *request) -> sys::MessagePointer {
         auto msg = static_cast<sdesktop::developerMode::DeveloperModeRequest *>(request);
         if (typeid(*msg->event.get()) == typeid(sdesktop::developerMode::CellularHotStartEvent)) {
+            priv->simCard->resetChannel();
             cmux->closeChannels();
             ///> change state - simulate hot start
             handle_power_up_request();
         }
         if (typeid(*msg->event.get()) == typeid(sdesktop::developerMode::CellularStateInfoRequestEvent)) {
-            auto event   = std::make_unique<sdesktop::developerMode::CellularStateInfoRequestEvent>(state.c_str());
+            auto event = std::make_unique<sdesktop::developerMode::CellularStateInfoRequestEvent>(priv->state->c_str());
             auto message = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
-            bus.sendUnicast(std::move(message), service::name::service_desktop);
+            bus.sendUnicast(std::move(message), ::service::name::service_desktop);
         }
         if (typeid(*msg->event.get()) == typeid(sdesktop::developerMode::CellularSleepModeInfoRequestEvent)) {
             auto event = std::make_unique<sdesktop::developerMode::CellularSleepModeInfoRequestEvent>(
                 cmux->isCellularInSleepMode());
             auto message = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
-            bus.sendUnicast(std::move(message), service::name::service_desktop);
+            bus.sendUnicast(std::move(message), ::service::name::service_desktop);
         }
         if (typeid(*msg->event.get()) == typeid(sdesktop::developerMode::ATResponseEvent)) {
             auto channel = cmux->get(CellularMux::Channel::Commands);
@@ -769,7 +707,7 @@ bool ServiceCellular::handle_idle()
 bool ServiceCellular::handle_wait_for_start_permission()
 {
     auto msg = std::make_shared<CellularCheckIfStartAllowedMessage>();
-    bus.sendUnicast(msg, service::name::system_manager);
+    bus.sendUnicast(msg, ::service::name::system_manager);
 
     return true;
 }
@@ -779,13 +717,13 @@ bool ServiceCellular::handle_power_up_request()
     cmux->selectAntenna(bsp::cellular::antenna::lowBand);
     switch (board) {
     case bsp::Board::T4:
-        state.set(this, State::ST::StatusCheck);
+        priv->state->set(State::ST::StatusCheck);
         break;
     case bsp::Board::T3:
-        state.set(this, State::ST::PowerUpProcedure);
+        priv->state->set(State::ST::PowerUpProcedure);
         break;
     case bsp::Board::Linux:
-        state.set(this, State::ST::PowerUpProcedure);
+        priv->state->set(State::ST::PowerUpProcedure);
         break;
     case bsp::Board::none:
         return false;
@@ -809,7 +747,7 @@ bool ServiceCellular::handle_power_up_procedure()
         if (ret == CellularMux::ConfState::Success) {
             // it's on aka hot start.
             LOG_DEBUG("T3 - hot start");
-            state.set(this, State::ST::CellularConfProcedure);
+            priv->state->set(State::ST::CellularConfProcedure);
             break;
         }
         else {
@@ -818,7 +756,7 @@ bool ServiceCellular::handle_power_up_procedure()
             cmux->turnOnModem();
             // if it's T3, then wait for status pin to become active, to align its starting position with T4
             vTaskDelay(pdMS_TO_TICKS(8000));
-            state.set(this, State::ST::PowerUpInProgress);
+            priv->state->set(State::ST::PowerUpInProgress);
             break;
         }
     }
@@ -829,7 +767,7 @@ bool ServiceCellular::handle_power_up_procedure()
         if (ret == CellularMux::ConfState::Success) {
             // it's on aka hot start.
             LOG_DEBUG("Linux - hot start");
-            state.set(this, State::ST::CellularConfProcedure);
+            priv->state->set(State::ST::CellularConfProcedure);
             break;
         }
         else {
@@ -839,7 +777,7 @@ bool ServiceCellular::handle_power_up_procedure()
             vTaskDelay(pdMS_TO_TICKS(2000)); // give some 2 secs more for user input
             // if it's Linux (T3), then wait for status pin to become active, to align its starting position with T4
             vTaskDelay(pdMS_TO_TICKS(8000));
-            state.set(this, State::ST::PowerUpInProgress);
+            priv->state->set(State::ST::PowerUpInProgress);
             break;
         }
     }
@@ -860,7 +798,7 @@ bool ServiceCellular::handle_power_up_in_progress_procedure(void)
         isAfterForceReboot = false;
     }
 
-    state.set(this, cellular::State::ST::BaudDetect);
+    priv->state->set(State::ST::BaudDetect);
     return true;
 }
 
@@ -868,11 +806,11 @@ bool ServiceCellular::handle_baud_detect()
 {
     auto ret = cmux->baudDetectProcedure();
     if (ret == CellularMux::ConfState::Success) {
-        state.set(this, cellular::State::ST::CellularConfProcedure);
+        priv->state->set(State::ST::CellularConfProcedure);
         return true;
     }
     else {
-        state.set(this, cellular::State::ST::ModemFatalFailure);
+        priv->state->set(State::ST::ModemFatalFailure);
         return false;
     }
 }
@@ -893,7 +831,7 @@ bool ServiceCellular::handle_power_down_waiting()
     case bsp::Board::T3:
         // if it's T3, then wait for status pin to become inactive, to align with T4
         vTaskDelay(pdMS_TO_TICKS(17000)); // according to docs this shouldn't be needed, but better be safe than Quectel
-        state.set(this, cellular::State::ST::PowerDown);
+        priv->state->set(State::ST::PowerDown);
         break;
     default:
         LOG_ERROR("Powering 'down an unknown device not handled");
@@ -918,10 +856,10 @@ bool ServiceCellular::handle_start_conf_procedure()
     // Start configuration procedure, if it's first run modem will be restarted
     auto confRet = cmux->confProcedure();
     if (confRet == CellularMux::ConfState::Success) {
-        state.set(this, State::ST::AudioConfigurationProcedure);
+        priv->state->set(State::ST::AudioConfigurationProcedure);
         return true;
     }
-    state.set(this, State::ST::Failed);
+    priv->state->set(State::ST::Failed);
     return false;
 }
 
@@ -933,7 +871,7 @@ bool ServiceCellular::handle_audio_conf_procedure()
         LOG_DEBUG("Setting baudrate %i baud", ATPortSpeeds_text[cmux->getStartParams().PortSpeed]);
         if (!cmux->getParser()->cmd(cmd)) {
             LOG_ERROR("Baudrate setup error");
-            state.set(this, State::ST::Failed);
+            priv->state->set(State::ST::Failed);
             return false;
         }
         cmux->getCellular()->setSpeed(ATPortSpeeds_text[cmux->getStartParams().PortSpeed]);
@@ -942,6 +880,8 @@ bool ServiceCellular::handle_audio_conf_procedure()
         if (cmux->startMultiplexer() == CellularMux::ConfState::Success) {
 
             LOG_DEBUG("[ServiceCellular] Modem is fully operational");
+
+            priv->simCard->resetChannel(cmux->get(CellularMux::Channel::Commands));
 
             // open channel - notifications
             DLCChannel *notificationsChannel = cmux->get(CellularMux::Channel::Notifications);
@@ -954,32 +894,32 @@ bool ServiceCellular::handle_audio_conf_procedure()
                                                                                                             : false;
             connectionManager->setFlightMode(flightMode);
             auto interval = 0;
-            if (utils::toNumeric(
+            if (::utils::toNumeric(
                     settings->getValue(settings::Offline::connectionFrequency, settings::SettingsScope::Global),
                     interval)) {
                 connectionManager->setInterval(std::chrono::minutes{interval});
             }
             if (!connectionManager->onPhoneModeChange(phoneModeObserver->getCurrentPhoneMode())) {
-                state.set(this, State::ST::Failed);
+                priv->state->set(State::ST::Failed);
                 LOG_ERROR("Failed to handle phone mode");
                 return false;
             }
 
-            state.set(this, State::ST::APNConfProcedure);
+            priv->state->set(State::ST::APNConfProcedure);
             return true;
         }
         else {
-            state.set(this, State::ST::Failed);
+            priv->state->set(State::ST::Failed);
             return false;
         }
     }
     else if (audioRet == CellularMux::ConfState::Failure) {
         /// restart
-        state.set(this, State::ST::AudioConfigurationProcedure);
+        priv->state->set(State::ST::AudioConfigurationProcedure);
         return true;
     }
     // Reset procedure started, do nothing here
-    state.set(this, State::ST::Idle);
+    priv->state->set(State::ST::Idle);
     return true;
 }
 
@@ -1025,7 +965,7 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
 
     std::string str(data.begin(), data.end());
 
-    std::string logStr = utils::removeNewLines(str);
+    std::string logStr = ::utils::removeNewLines(str);
     LOG_DEBUG("Notification:: %s", logStr.c_str());
 
     auto urc = at::urc::UrcFactory::Create(str);
@@ -1081,10 +1021,8 @@ bool ServiceCellular::sendUnhandledCME(unsigned int cme_error)
 bool ServiceCellular::sendBadPin()
 {
     LOG_DEBUG("SEND BAD PIN");
-    SimCard simCard(*this);
-    std::string msg;
-    if (auto state = simCard.simStateWithMessage(msg); state) {
-        return handleSimState(*state, msg);
+    if (auto state = priv->simCard->simState(); state) {
+        return handleSimState(*state, std::string());
     }
     return false;
 }
@@ -1092,54 +1030,47 @@ bool ServiceCellular::sendBadPin()
 bool ServiceCellular::sendBadPuk()
 {
     LOG_DEBUG("SEND BAD PUK");
-    SimCard simCard(*this);
-    std::string msg;
-    if (auto state = simCard.simStateWithMessage(msg); state) {
-        return handleSimState(*state, msg);
+    if (auto state = priv->simCard->simState(); state) {
+        return handleSimState(*state, std::string());
     }
     return false;
 }
-
-bool ServiceCellular::sendChangePinResult(SimCardResult res)
+/*
+bool ServiceCellular::sendChangePinResult(cellular::service::sim::Result res)
 {
     LOG_DEBUG("SEND CHANGE PIN RESULT");
     return true;
 }
-
+*/
 bool ServiceCellular::isPinLocked()
 {
-    SimCard simCard(*this);
-    return simCard.isPinLocked();
+    return priv->simCard->isPinLocked();
 }
 
 bool ServiceCellular::changePin(const std::string oldPin, const std::string newPin)
 {
-    SimCard simCard(*this);
-    auto result = simCard.changePin(oldPin, newPin);
-    sendChangePinResult(result);
-    return result == SimCardResult::OK;
+    auto result = priv->simCard->changePin(oldPin, newPin);
+    //    sendChangePinResult(result);
+    return result == cellular::service::sim::Result::OK;
 }
 
 bool ServiceCellular::setPinLock(bool lock, const std::string pin)
 {
-    SimCard simCard(*this);
-    auto result = simCard.setPinLock(lock, pin);
-    return result == SimCardResult::OK;
+    auto result = priv->simCard->setPinLock(lock, pin);
+    return result == cellular::service::sim::Result::OK;
 }
 
 bool ServiceCellular::unlockSimPin(std::string pin)
 {
     LOG_ERROR("Unlock pin %s", pin.c_str());
-    SimCard simCard(*this);
-    SimCardResult sime;
-    sime = simCard.supplyPin(pin);
+    auto sime = priv->simCard->supplyPin(pin);
 
-    if (sime == SimCardResult::IncorrectPassword) {
+    if (sime == cellular::service::sim::Result::IncorrectPassword) {
         sendBadPin();
         return false;
     }
 
-    if (sime == SimCardResult::OK) {
+    if (sime == cellular::service::sim::Result::OK) {
         return true;
     }
     else {
@@ -1150,17 +1081,15 @@ bool ServiceCellular::unlockSimPin(std::string pin)
 
 bool ServiceCellular::unlockSimPuk(std::string puk, std::string pin)
 {
-    SimCard simCard(*this);
-    SimCardResult sime;
     LOG_DEBUG("PUK:  %s  %s", puk.c_str(), pin.c_str());
-    sime = simCard.supplyPuk(puk, pin);
+    auto sime = priv->simCard->supplyPuk(puk, pin);
 
-    if (sime == SimCardResult::IncorrectPassword) {
+    if (sime == cellular::service::sim::Result::IncorrectPassword) {
         sendBadPuk();
         return false;
     }
 
-    if (sime == SimCardResult::OK) {
+    if (sime == cellular::service::sim::Result::OK) {
         return true;
     }
     sendUnhandledCME(static_cast<unsigned int>(sime));
@@ -1169,11 +1098,11 @@ bool ServiceCellular::unlockSimPuk(std::string puk, std::string pin)
 
 auto ServiceCellular::handleSimPinMessage(sys::Message *msgl) -> std::shared_ptr<sys::ResponseMessage>
 {
-
     auto msgSimPin = dynamic_cast<CellularSimPinDataMessage *>(msgl);
     if (msgSimPin != nullptr) {
         LOG_DEBUG("Unlocking sim");
-        return std::make_shared<CellularResponseMessage>(unlockSimPin(SimCard::pinToString(msgSimPin->getPin())));
+        return std::make_shared<CellularResponseMessage>(
+            unlockSimPin(cellular::utils::pinToString(msgSimPin->getPin())));
     }
     LOG_ERROR("Request message is not CellularSimPinDataMessage!");
     return std::make_shared<CellularResponseMessage>(false);
@@ -1184,22 +1113,21 @@ auto ServiceCellular::handleSimPukMessage(sys::Message *msgl) -> std::shared_ptr
     auto msgSimPuk = dynamic_cast<CellularSimPukDataMessage *>(msgl);
     if (msgSimPuk != nullptr) {
         LOG_DEBUG("Unlocking puk");
-        return std::make_shared<CellularSimPukResponseMessage>(
-            unlockSimPuk(SimCard::pinToString(msgSimPuk->getPuk()), SimCard::pinToString(msgSimPuk->getNewPin())));
+        return std::make_shared<CellularSimPukResponseMessage>(unlockSimPuk(
+            cellular::utils::pinToString(msgSimPuk->getPuk()), cellular::utils::pinToString(msgSimPuk->getNewPin())));
     }
     LOG_ERROR("Request message is not CellularSimPukDataMessage!");
     return std::make_shared<CellularResponseMessage>(false);
 }
 
-bool ServiceCellular::handleSimState(at::SimState state, const std::string message)
+bool ServiceCellular::handleSimState(at::SimState state, const std::string &message)
 {
-
     std::shared_ptr<CellularMessage> response;
     switch (state) {
     case at::SimState::Ready:
         Store::GSM::get()->sim = Store::GSM::get()->selected;
         settings->setValue(settings::SystemProperties::activeSim,
-                           utils::enumToString(Store::GSM::get()->selected),
+                           ::utils::enumToString(Store::GSM::get()->selected),
                            settings::SettingsScope::Global);
         // SIM causes SIM INIT, only on ready
         response = std::move(std::make_unique<CellularSimReadyNotification>());
@@ -1213,8 +1141,7 @@ bool ServiceCellular::handleSimState(at::SimState state, const std::string messa
         bus.sendMulticast(response, sys::BusChannel::ServiceCellularNotifications);
         break;
     case at::SimState::SimPin: {
-        SimCard simCard(*this);
-        if (auto pc = simCard.getAttemptsCounters(); pc) {
+        if (auto pc = priv->simCard->getAttemptsCounters(); pc) {
             if (pc.value().PukCounter != 0) {
                 requestPin(pc.value().PinCounter, message);
                 break;
@@ -1224,8 +1151,7 @@ bool ServiceCellular::handleSimState(at::SimState state, const std::string messa
         break;
     }
     case at::SimState::SimPuk: {
-        SimCard simCard(*this);
-        if (auto pc = simCard.getAttemptsCounters(); pc) {
+        if (auto pc = priv->simCard->getAttemptsCounters(); pc) {
             if (pc.value().PukCounter != 0) {
                 requestPuk(pc.value().PukCounter, message);
                 break;
@@ -1235,8 +1161,7 @@ bool ServiceCellular::handleSimState(at::SimState state, const std::string messa
         break;
     }
     case at::SimState::SimPin2: {
-        SimCard simCard(*this);
-        if (auto pc = simCard.getAttemptsCounters(SimPinType::SimPin2); pc) {
+        if (auto pc = priv->simCard->getAttemptsCounters(cellular::service::sim::Pin::PIN2); pc) {
             if (pc.value().PukCounter != 0) {
                 requestPin(pc.value().PinCounter, message);
                 break;
@@ -1246,8 +1171,7 @@ bool ServiceCellular::handleSimState(at::SimState state, const std::string messa
         break;
     }
     case at::SimState::SimPuk2: {
-        SimCard simCard(*this);
-        if (auto pc = simCard.getAttemptsCounters(SimPinType::SimPin2); pc) {
+        if (auto pc = priv->simCard->getAttemptsCounters(cellular::service::sim::Pin::PIN2); pc) {
             if (pc.value().PukCounter != 0) {
                 requestPuk(pc.value().PukCounter, message);
                 break;
@@ -1284,7 +1208,7 @@ bool ServiceCellular::handleSimState(at::SimState state, const std::string messa
         break;
     }
     auto simMessage = std::make_shared<sevm::SIMMessage>();
-    bus.sendUnicast(simMessage, service::name::evt_manager);
+    bus.sendUnicast(simMessage, ::service::name::evt_manager);
 
     return true;
 }
@@ -1466,7 +1390,7 @@ auto ServiceCellular::receiveSMS(std::string messageNumber) -> bool
                 // parse date
                 tokens[3].erase(std::remove(tokens[3].begin(), tokens[3].end(), '\"'), tokens[3].end());
 
-                utils::time::Timestamp time;
+                ::utils::time::Timestamp time;
                 auto messageDate = time.getTime();
 
                 if (tokens.size() == 5) {
@@ -1711,12 +1635,12 @@ bool ServiceCellular::handle_sim_sanity_check()
 {
     auto ret = sim_check_hot_swap(cmux->get(CellularMux::Channel::Commands));
     if (ret) {
-        state.set(this, State::ST::ModemOn);
+        priv->state->set(State::ST::ModemOn);
         bsp::cellular::sim::simSelect();
     }
     else {
         LOG_ERROR("Sanity check failure - user will be promped about full shutdown");
-        state.set(this, State::ST::ModemFatalFailure);
+        priv->state->set(State::ST::ModemFatalFailure);
     }
     return ret;
 }
@@ -1751,7 +1675,7 @@ bool ServiceCellular::handle_select_sim()
                 }
             }
         }
-        state.set(this, cellular::State::ST::SimInit);
+        priv->state->set(State::ST::SimInit);
     }
 #endif
     return true;
@@ -1763,7 +1687,7 @@ bool ServiceCellular::handle_modem_on()
     channel->cmd("AT+CCLK?");
     // inform host ap ready
     cmux->informModemHostWakeup();
-    state.set(this, State::ST::URCReady);
+    priv->state->set(State::ST::URCReady);
     LOG_DEBUG("AP ready");
     return true;
 }
@@ -1778,7 +1702,7 @@ bool ServiceCellular::handle_URCReady()
     }
     ret = ret && channel->cmd(at::AT::ENABLE_NETWORK_REGISTRATION_URC);
 
-    LOG_DEBUG("%s", state.c_str());
+    LOG_DEBUG("%s", priv->state->c_str());
     return ret;
 }
 
@@ -1787,7 +1711,7 @@ bool ServiceCellular::handle_sim_init()
     auto channel = cmux->get(CellularMux::Channel::Commands);
     if (channel == nullptr) {
         LOG_ERROR("Cant configure sim! no Commands channel!");
-        state.set(this, State::ST::Failed);
+        priv->state->set(State::ST::Failed);
         return false;
     }
     bool success  = true;
@@ -1800,7 +1724,7 @@ bool ServiceCellular::handle_sim_init()
         }
     }
 
-    state.set(this, State::ST::Ready);
+    priv->state->set(State::ST::Ready);
     return success;
 }
 
@@ -1833,7 +1757,7 @@ SMSRecord ServiceCellular::createSMSRecord(const UTF8 &decodedMessage,
 {
     SMSRecord record{};
     record.body   = decodedMessage;
-    record.number = utils::PhoneNumber::getReceivedNumberView(receivedNumber);
+    record.number = ::utils::PhoneNumber::getReceivedNumberView(receivedNumber);
     record.type   = SMSType::INBOX;
     record.date   = messageDate;
     return record;
@@ -1852,7 +1776,7 @@ bool ServiceCellular::dbAddSMSRecord(const SMSRecord &record)
         }));
 }
 
-void ServiceCellular::onSMSReceived(const utils::PhoneNumber::View &number)
+void ServiceCellular::onSMSReceived(const ::utils::PhoneNumber::View &number)
 {
     DBServiceAPI::GetQuery(
         this,
@@ -1894,7 +1818,7 @@ bool ServiceCellular::receiveAllMessages()
 
 bool ServiceCellular::handle_failure()
 {
-    state.set(this, State::ST::Idle);
+    priv->state->set(State::ST::Idle);
     return true;
 }
 
@@ -1909,7 +1833,7 @@ bool ServiceCellular::handle_fatal_failure()
 
 bool ServiceCellular::handle_ready()
 {
-    LOG_DEBUG("%s", state.c_str());
+    LOG_DEBUG("%s", priv->state->c_str());
     sleepTimer.start();
     return true;
 }
@@ -1984,10 +1908,10 @@ bool ServiceCellular::handle_status_check(void)
         // modem is already turned on, call configutarion procedure
         LOG_INFO("Modem is already turned on.");
         LOG_DEBUG("T4 - hot start");
-        state.set(this, cellular::State::ST::PowerUpInProgress);
+        priv->state->set(State::ST::PowerUpInProgress);
     }
     else {
-        state.set(this, cellular::State::ST::PowerUpProcedure);
+        priv->state->set(State::ST::PowerUpProcedure);
     }
     return true;
 }
@@ -2009,8 +1933,8 @@ void ServiceCellular::handleStateTimer(void)
     stateTimeout--;
     if (stateTimeout == 0) {
         stopStateTimer();
-        LOG_FATAL("State %s timeout occured!", state.c_str(state.get()));
-        state.set(this, cellular::State::ST::ModemFatalFailure);
+        LOG_FATAL("State %s timeout occured!", priv->state->c_str());
+        priv->state->set(State::ST::ModemFatalFailure);
     }
 }
 
@@ -2019,41 +1943,43 @@ void ServiceCellular::handle_power_state_change()
     nextPowerStateChangeAwaiting = false;
     auto modemActive             = cmux->isModemActive();
 
-    if (nextPowerState == State::PowerState::On) {
-        if (state.get() == State::ST::PowerDownWaiting) {
+    if (priv->nextPowerState == State::PowerState::On) {
+        if (priv->state->get() == State::ST::PowerDownWaiting) {
             LOG_DEBUG("Powerdown in progress. Powerup request queued.");
             nextPowerStateChangeAwaiting = true;
         }
-        else if (state.get() == State::ST::PowerUpProcedure || state.get() == State::ST::PowerUpInProgress) {
+        else if (priv->state->get() == State::ST::PowerUpProcedure ||
+                 priv->state->get() == State::ST::PowerUpInProgress) {
             LOG_DEBUG("Powerup already in progress");
         }
-        else if (state.get() == State::ST::PowerDown || state.get() == State::ST::WaitForStartPermission) {
+        else if (priv->state->get() == State::ST::PowerDown ||
+                 priv->state->get() == State::ST::WaitForStartPermission) {
             LOG_INFO("Modem Power UP.");
-            state.set(this, State::ST::PowerUpRequest);
+            priv->state->set(State::ST::PowerUpRequest);
         }
         else {
             LOG_DEBUG("Modem already powered up.");
         }
     }
     else {
-        if (state.get() == State::ST::PowerUpProcedure || state.get() == State::ST::PowerUpInProgress) {
+        if (priv->state->get() == State::ST::PowerUpProcedure || priv->state->get() == State::ST::PowerUpInProgress) {
             LOG_DEBUG("Powerup in progress. Powerdown request queued.");
             nextPowerStateChangeAwaiting = true;
         }
-        else if (state.get() == State::ST::PowerDownWaiting) {
+        else if (priv->state->get() == State::ST::PowerDownWaiting) {
             LOG_DEBUG("Powerdown already in progress.");
         }
-        else if (state.get() == State::ST::PowerDown) {
+        else if (priv->state->get() == State::ST::PowerDown) {
             LOG_DEBUG("Modem already powered down.");
         }
-        else if (state.get() == State::ST::WaitForStartPermission && !modemActive) {
+        else if (priv->state->get() == State::ST::WaitForStartPermission && !modemActive) {
             LOG_DEBUG("Modem already powered down.");
-            state.set(this, State::ST::PowerDown);
+            priv->state->set(State::ST::PowerDown);
         }
         else {
             LOG_INFO("Modem Power DOWN.");
             cmux->turnOffModem();
-            state.set(this, State::ST::PowerDownWaiting);
+            priv->state->set(State::ST::PowerDownWaiting);
         }
     }
 }
@@ -2143,7 +2069,7 @@ bool ServiceCellular::handle_apn_conf_procedure()
 {
     LOG_DEBUG("APN on modem configuration");
     packetData->setupAPNSettings();
-    state.set(this, State::ST::SanityCheck);
+    priv->state->set(State::ST::SanityCheck);
     return true;
 }
 
@@ -2246,7 +2172,7 @@ std::shared_ptr<CellularSetOperatorResponse> ServiceCellular::handleCellularSetO
 void ServiceCellular::volteChanged(const std::string &value)
 {
     if (!value.empty()) {
-        volteOn = utils::getNumericValue<bool>(value);
+        volteOn = ::utils::getNumericValue<bool>(value);
     }
 }
 
@@ -2399,7 +2325,7 @@ auto ServiceCellular::handleCellularCallerIdMessage(sys::Message *msg) -> std::s
 
 auto ServiceCellular::handleCellularSimProcedureMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
-    state.set(this, State::ST::SimSelect);
+    priv->state->set(State::ST::SimSelect);
     return std::make_shared<CellularResponseMessage>(true);
 }
 
@@ -2484,17 +2410,17 @@ auto ServiceCellular::handleEVMStatusMessage(sys::Message *msg) -> std::shared_p
     if (board == bsp::Board::T4) {
         auto status_pin = message->state;
         if (status_pin == value::ACTIVE) {
-            if (state.get() == State::ST::PowerUpProcedure) {
-                state.set(this, State::ST::PowerUpInProgress); // and go to baud detect as usual
+            if (priv->state->get() == State::ST::PowerUpProcedure) {
+                priv->state->set(State::ST::PowerUpInProgress); // and go to baud detect as usual
             }
             else {
                 // asynchronous power toggle should fall back to PowerDown regardless the state
-                state.set(this, State::ST::PowerDown);
+                priv->state->set(State::ST::PowerDown);
             }
         }
         else if (status_pin == value::INACTIVE) {
-            if (isAfterForceReboot == true || state.get() == State::ST::PowerDownWaiting) {
-                state.set(this, State::ST::PowerDown);
+            if (isAfterForceReboot == true || priv->state->get() == State::ST::PowerDownWaiting) {
+                priv->state->set(State::ST::PowerDown);
             }
         }
     }
@@ -2580,15 +2506,15 @@ auto ServiceCellular::handlePowerUpProcedureCompleteNotification(sys::Message *m
     -> std::shared_ptr<sys::ResponseMessage>
 {
     if (board == bsp::Board::T3 || board == bsp::Board::Linux) {
-        state.set(this, State::ST::CellularConfProcedure);
+        priv->state->set(State::ST::CellularConfProcedure);
     }
     return std::make_shared<CellularResponseMessage>(true);
 }
 auto ServiceCellular::handlePowerDownDeregisteringNotification(sys::Message *msg)
     -> std::shared_ptr<sys::ResponseMessage>
 {
-    if (state.get() != State::ST::PowerDownWaiting) {
-        state.set(this, State::ST::PowerDownStarted);
+    if (priv->state->get() != State::ST::PowerDownWaiting) {
+        priv->state->set(State::ST::PowerDownStarted);
         return std::make_shared<CellularResponseMessage>(true);
     }
     return std::make_shared<CellularResponseMessage>(false);
@@ -2596,7 +2522,7 @@ auto ServiceCellular::handlePowerDownDeregisteringNotification(sys::Message *msg
 auto ServiceCellular::handlePowerDownDeregisteredNotification(sys::Message *msg)
     -> std::shared_ptr<sys::ResponseMessage>
 {
-    state.set(this, State::ST::PowerDownWaiting);
+    priv->state->set(State::ST::PowerDownWaiting);
     return std::make_shared<CellularResponseMessage>(true);
 }
 auto ServiceCellular::handleNewIncomingSMSNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
@@ -2610,7 +2536,7 @@ auto ServiceCellular::handleNewIncomingSMSNotification(sys::Message *msg) -> std
 auto ServiceCellular::handleSimReadyNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
     if (Store::GSM::get()->tray == Store::GSM::Tray::IN) {
-        state.set(this, cellular::State::ST::SimInit);
+        priv->state->set(State::ST::SimInit);
     }
     return std::make_shared<CellularResponseMessage>(true);
 }

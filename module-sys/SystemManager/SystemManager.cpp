@@ -436,7 +436,7 @@ namespace sys
     void SystemManager::batteryCriticalLevelAction(bool charging)
     {
         LOG_INFO("Battery Critical Level reached!");
-        CellularServiceAPI::ChangeModulePowerState(this, cellular::State::PowerState::Off);
+        CellularServiceAPI::ChangeModulePowerState(this, cellular::service::State::PowerState::Off);
         auto msg = std::make_shared<CriticalBatteryLevelNotification>(true, charging);
         bus.sendUnicast(std::move(msg), app::manager::ApplicationManager::ServiceName);
     }
@@ -450,7 +450,7 @@ namespace sys
     void SystemManager::batteryNormalLevelAction()
     {
         LOG_INFO("Battery level normal.");
-        CellularServiceAPI::ChangeModulePowerState(this, cellular::State::PowerState::On);
+        CellularServiceAPI::ChangeModulePowerState(this, cellular::service::State::PowerState::On);
         auto battNormalMsg = std::make_shared<CriticalBatteryLevelNotification>(false);
         bus.sendUnicast(std::move(battNormalMsg), app::manager::ApplicationManager::ServiceName);
     }
@@ -535,12 +535,12 @@ namespace sys
         connect(CellularCheckIfStartAllowedMessage(), [&](Message *) {
             switch (Store::Battery::get().levelState) {
             case Store::Battery::LevelState::Normal:
-                CellularServiceAPI::ChangeModulePowerState(this, cellular::State::PowerState::On);
+                CellularServiceAPI::ChangeModulePowerState(this, cellular::service::State::PowerState::On);
                 break;
             case Store::Battery::LevelState::CriticalCharging:
                 [[fallthrough]];
             case Store::Battery::LevelState::CriticalNotCharging:
-                CellularServiceAPI::ChangeModulePowerState(this, cellular::State::PowerState::Off);
+                CellularServiceAPI::ChangeModulePowerState(this, cellular::service::State::PowerState::Off);
                 break;
             case Store::Battery::LevelState::Shutdown:
                 break;

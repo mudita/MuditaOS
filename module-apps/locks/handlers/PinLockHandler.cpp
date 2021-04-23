@@ -10,6 +10,8 @@
 #include <service-appmgr/service-appmgr/data/SimActionsParams.hpp>
 #include <service-desktop/Constants.hpp>
 
+#include <service-cellular/CellularMessage.hpp>
+
 namespace gui
 {
     namespace
@@ -91,7 +93,7 @@ namespace gui
     }
 
     void PinLockHandler::handlePinEnableRequest(app::manager::actions::ActionParamsPtr &&data,
-                                                CellularSimCardLockDataMessage::SimCardLock simCardLock)
+                                                cellular::api::SimCardLock simCardLock)
     {
         LOG_DEBUG("Handling PinEnableRequest action, simCardLock = %d", static_cast<int>(simCardLock));
         handlePasscodeParams(Lock::LockType::SimPin, Lock::LockState::InputRequired, std::move(data));
@@ -104,7 +106,7 @@ namespace gui
         switchToPinLockWindow(onActivatedCallback);
     }
 
-    void PinLockHandler::handlePinEnableRequestFailed(CellularSimCardLockDataMessage::SimCardLock simCardLock)
+    void PinLockHandler::handlePinEnableRequestFailed(cellular::api::SimCardLock simCardLock)
     {
         LOG_DEBUG("Handling PinEnableRequestFailed action, simCardLock = %d, simLock.value = %u",
                   static_cast<int>(simCardLock),

@@ -280,7 +280,7 @@ bool CellularServiceAPI::RequestSimCardPinLockState(sys::Service *serv)
 
 bool CellularServiceAPI::SetSimCardLock(sys::Service *serv,
                                         Store::GSM::SIM sim,
-                                        CellularSimCardLockDataMessage::SimCardLock lock,
+                                        cellular::api::SimCardLock lock,
                                         const std::vector<unsigned int> &pin)
 {
     return serv->bus.sendUnicast(std::make_shared<CellularSimCardLockDataMessage>(sim, lock, pin),
@@ -341,7 +341,7 @@ bool CellularServiceAPI::SetVoLTE(sys::Service *serv, bool voLTE)
     return serv->bus.sendUnicast(std::make_shared<CellularChangeVoLTEDataMessage>(voLTE), ServiceCellular::serviceName);
 }
 
-bool CellularServiceAPI::ChangeModulePowerState(sys::Service *serv, cellular::State::PowerState newState)
+bool CellularServiceAPI::ChangeModulePowerState(sys::Service *serv, cellular::service::State::PowerState newState)
 {
     return serv->bus.sendUnicast(std::make_shared<CellularPowerStateChange>(newState), ServiceCellular::serviceName);
 }

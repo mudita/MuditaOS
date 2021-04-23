@@ -5,7 +5,7 @@
 
 class ServiceCellular;
 
-namespace cellular
+namespace cellular::service
 {
     class State
     {
@@ -43,17 +43,20 @@ namespace cellular
 
       private:
         enum ST state = ST::Idle;
+        ServiceCellular *owner;
 
       public:
+        explicit State(ServiceCellular *owner);
+
         [[nodiscard]] static const char *c_str(ST state);
-        [[nodiscard]] const char *c_str();
+        [[nodiscard]] const char *c_str() const;
 
         /// 1. sets state of ServiceCellular
         /// 2. sends Multicast notification of ServiceCellular state
         ///
         /// \note This is for service cellular only it could be private and friend
-        void set(ServiceCellular *owner, ST state);
+        void set(ST state);
 
         ST get() const;
     };
-} // namespace cellular
+} // namespace cellular::service
