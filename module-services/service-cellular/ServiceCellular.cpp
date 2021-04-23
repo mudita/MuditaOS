@@ -2285,11 +2285,8 @@ auto ServiceCellular::handleCellularCallRequestMessage(CellularCallRequestMessag
         return std::make_shared<CellularResponseMessage>(false);
     }
 
-    cellular::RequestFactory factory(msg->number.getEntered(),
-                                     *channel,
-                                     msg->callMode,
-                                     Store::GSM::get()->simCardInserted() ? RequestFactory::SimStatus::SimInserted
-                                                                          : RequestFactory::SimStatus::SimSlotEmpty);
+    cellular::RequestFactory factory(
+        msg->number.getEntered(), *channel, msg->callMode, Store::GSM::get()->simCardInserted());
 
     auto request = factory.create();
 
