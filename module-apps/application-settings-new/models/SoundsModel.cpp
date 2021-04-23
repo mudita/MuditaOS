@@ -94,10 +94,17 @@ void SoundsModel::applyItems(const std::vector<std::filesystem::path> &sounds,
             isSelected = true;
         }
 
-        std::string fileName         = sound.filename();
-        std::string fileRelativePath = sound.lexically_relative(purefs::dir::getCurrentOSPath());
+        std::string itemTitle;
+        auto fileTags = AudioServiceAPI::GetFileTags(app, sound);
+        if (fileTags) {
+            itemTitle = fileTags->title;
+        }
 
-        auto item = new gui::SettingsSoundItem(fileName, isSelected);
+        if (itemTitle.empty()) {
+            itemTitle = sound.filename();
+        }
+
+        auto item = new gui::SettingsSoundItem(itemTitle, isSelected);
 
         switch (model->getPlaybackType()) {
 
@@ -105,6 +112,7 @@ void SoundsModel::applyItems(const std::vector<std::filesystem::path> &sounds,
         case audio::PlaybackType::TextMessageRingtone:
         case audio::PlaybackType::Notifications:
             item->activatedCallback = [=](gui::Item &) {
+                auto fileRelativePath = sound.lexically_relative(purefs::dir::getCurrentOSPath());
                 LOG_INFO("Setting sound to %s", fileRelativePath.c_str());
                 model->setSound(fileRelativePath);
                 app->returnToPreviousWindow();
