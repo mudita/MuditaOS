@@ -607,6 +607,12 @@ namespace app::manager
         connect(typeid(sys::TetheringQuestionAbort), convertibleToActionHandler);
         connect(typeid(sys::TetheringPhoneModeChangeProhibitedMessage), convertibleToActionHandler);
         connect(typeid(VolumeChanged), convertibleToActionHandler);
+        connect(typeid(CellularCallAbortedNotification), convertibleToActionHandler);
+        connect(typeid(CellularRingingMessage), convertibleToActionHandler);
+        connect(typeid(CellularIncominCallMessage), convertibleToActionHandler);
+        connect(typeid(CellularCallerIdMessage), convertibleToActionHandler);
+        connect(typeid(CellularCallActiveNotification), convertibleToActionHandler);
+        connect(typeid(CellularHangupCallMessage), convertibleToActionHandler);
     }
 
     sys::ReturnCodes ApplicationManager::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
