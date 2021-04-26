@@ -1,6 +1,79 @@
 # MuditaOS changelog
 
-## [0.62.2 2020-04-09]
+To install the new version of MuditaOS please follow the steps described in this guide:
+- [Linux](https://github.com/mudita/MuditaOS/blob/master/doc/boot_and_update.md#creating-a-storage-partition)
+- [Windows and macOS](https://github.com/mudita/MuditaOS/blob/master/doc/flashing_win_macos.md)
+
+## [0.63.1 2021-04-26]
+
+### Added
+
+* Add "On when active" keypad light setting handling.
+* Add `clang-tidy` to the CI process.
+* Add answering or rejecting phone calls with wired headset controls.
+* Add API for controlling disks' power usage.
+* Add audio format checking before audio playback.
+* Add clearing user input in the calculator on the `#` key press.
+* Add code coverage reporting.
+* Add connecting to GSM network in user-defined intervals.
+* Add controlling charge current depending on the temperature of the battery.
+* Add current value selection depending on the USB connection type.
+* Add EEPROM emulation in the Linux simulator.
+* Add HSP ringing on a call with the ability to reject or answer the call with headset controls.
+* Add keypad backlight turning on during a call.
+* Add logic to change SIM PIN.
+* Add low power mode to magnetometer handling.
+* Add low-power handling during Bluetooth communication.
+* Add mechanism to automount the `mfgconf` partition.
+* Add per-module unit testing.
+* Add ringtone selection UI.
+* Add support for eMMC system partitions.
+* Add windows for setting passcode during the onboarding process.
+
+### Changed
+
+* Add only last project changes during project release creation by the CI.
+* Change all `emulator` references in the documentation to `simulator`.
+* Cleanup database API.
+* Cleanup localization files.
+* Disable phone mode changes when tethering is enabled.
+* Don't allow to edit exponent output in the calculator.
+* Limit calculator decimals to 6 digits.
+* Refactor audio settings API.
+* Refactor handling of phone modes in applications.
+* Turn audio on only when the user is using audio to save energy.
+* Unify localization API.
+* Update audio assets.
+* Update tests in the tests harness.
+* Update tethering icon.
+
+### Fixed
+
+* Fix assets copying issues during the build process.
+* Fix building Linux simulator with `glibc` older than `2.28`. 
+* Fix building SystemView.
+* Fix calculator operations on empty input.
+* Fix crash when navigating left on search results in the phonebook.
+* Fix crashes in list view related to options handling.
+* Fix crashing on single char removal in the text input widget.
+* Fix device unresponsiveness when opening settings window.
+* Fix display backlight settings not being persistent.
+* Fix displaying complete contact list after ICE call.
+* Fix displaying wrong contact info in the call log.
+* Fix ghosting in the meditation application.
+* Fix handling unit tests in IDEs by removing unnecessary messages from `libiosyscalls`.
+* Fix inability to find a contact with its full name.
+* Fix inability to unlock the phone with proper PIN due to race mode with settings.
+* Fix invalid initialization of Bluetooth profiles.
+* Fix issues with displaying grey colors.
+* Fix phone mode discovery in the tethering mode.
+* Fix race between focus gain and the user pressing asterisk button in the SMS thread view.
+* Fix several typos in shell scripts.
+* Fix SIM card not being detected.
+* Fix turning off the phone.
+* Fix unnecessary displaying applications' main windows on user actions.
+
+## [0.62.2 2021-04-09]
 
 ### Added
 
@@ -20,7 +93,7 @@
 * Fix database initialization's unit test.
 * Fix phone call muting.
 
-## [0.62.1 2020-04-07]
+## [0.62.1 2021-04-07]
 
 ### Added
 
@@ -60,7 +133,7 @@
 * Fix text addition and deletion for the text line widget.
 * Fix USB disconnect time.
 
-## [0.61.1 2020-03-26]
+## [0.61.1 2021-03-26]
 
 ### Added
 
@@ -105,7 +178,7 @@
 * Fix transmission errors on communication with the Bluetooth modem.
 * Fix wording for English localization.
 
-## [0.60.1 2020-03-19]
+## [0.60.1 2021-03-19]
 
 ### Added
 
@@ -157,7 +230,7 @@
 * Fix text formatting in retry windows.
 * Fix UI issues caused by consuming too much data by spin boxes.
 
-## [0.59.1 2020-03-09]
+## [0.59.1 2021-03-09]
 
 ### Added
 
@@ -223,7 +296,7 @@
 * Several tests added.
 * Update GCC to version 10.
 
-## [0.58.1 2020-02-19]
+## [0.58.1 2021-02-19]
 
 ### Added
 
@@ -266,7 +339,7 @@
 * Update i18n documentation related to font rendering.
 * Update test harness for Bluetooth.
 
-## [0.57.1 2020-02-11]
+## [0.57.1 2021-02-11]
 
 ### Added
 
@@ -309,7 +382,7 @@
 * Switch CI build to ninja to improve performance.
 * Update documentation of test harness.
 
-## [0.56.1 2020-02-03]
+## [0.56.1 2021-02-03]
 
 ### Added
 
@@ -344,7 +417,7 @@
 * Fix logs mocking in unit tests.
 * Fix unit tests not always running on `check` operation.
 
-## [0.55.1 2020-01-28]
+## [0.55.1 2021-01-28]
 
 ### Added
 
@@ -373,7 +446,7 @@
 * Add backend for multi-day events in the calendar application.
 * Add call forwarding and MMI status parsers.
 
-## [0.54.3 2020-01-22]
+## [0.54.3 2021-01-22]
 
 ### Added
 
@@ -408,7 +481,7 @@
 * Add integration with `clang-tidy`.
 * Add assets uploading to Github on release.
 
-## [0.54.2 2020-01-19]
+## [0.54.2 2021-01-19]
 
 ### Added
 
@@ -426,13 +499,13 @@
 * Enable timers enhanced debug.
 * Fix licensing information.
 
-## [0.54.1 2020-01-18]
+## [0.54.1 2021-01-18]
 
 ### Fixed
 
 * Fix settings broken by the accidentally removed script.
 
-## [0.53.2 2020-01-15]
+## [0.53.2 2021-01-15]
 
 ### Added
 
@@ -462,7 +535,7 @@
 * Fix query-callback synchronization mechanism.
 * Remove the requirement to start a commit message with the "Change" verb.
 
-## [0.53.1 2020-01-11]
+## [0.53.1 2021-01-11]
 
 ### Added
 
