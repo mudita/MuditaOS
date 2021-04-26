@@ -5,7 +5,7 @@
 
 #include "data/CallState.hpp"
 
-#include <Application.hpp>
+#include <apps-common/Application.hpp>
 #include <Service/Message.hpp>
 #include <module-sys/Timers/TimerHandle.hpp>
 #include <SystemManager/SystemManager.hpp>
@@ -66,12 +66,6 @@ namespace app
     class ApplicationCall : public Application, public CallWindowInterface, public EnterNumberWindowInterface
     {
       private:
-        void CallAbortHandler();
-        void CallActiveHandler();
-        void IncomingCallHandler(const CellularIncominCallMessage *const msg);
-        void CallerIdHandler(const CellularCallerIdMessage *const msg);
-        void RingingHandler(const CellularRingingMessage *const msg);
-
         sys::TimerHandle callerIdTimer;
 
       protected:
@@ -141,8 +135,13 @@ namespace app
                      manager::actions::NotAnEmergencyNotification,
                      manager::actions::NoSimNotification,
                      manager::actions::CallRejectedByOfflineNotification,
-                     manager::actions::PhoneModeChanged},
-                    locks::AutoLockPolicy::PreventPermanently};
+                     manager::actions::PhoneModeChanged,
+                     manager::actions::ActivateCall,
+                     manager::actions::AbortCall,
+                     manager::actions::HandleOutgoingCall,
+                     manager::actions::HandleIncomingCall,
+                     manager::actions::HandleCallerId,
+                     manager::actions::EndCall}, locks::AutoLockPolicy::PreventPermanently};
         }
     };
 } /* namespace app */

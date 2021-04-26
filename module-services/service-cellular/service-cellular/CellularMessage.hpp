@@ -21,6 +21,7 @@
 #include <service-appmgr/service-appmgr/messages/ActionRequest.hpp>
 #include <service-appmgr/service-appmgr/Actions.hpp>
 #include <service-appmgr/service-appmgr/data/MmiActionsParams.hpp>
+#include <service-appmgr/service-appmgr/data/CallActionsParams.hpp>
 
 #include <service-cellular/api/common.hpp>
 
@@ -80,7 +81,7 @@ class CellularMessage : public sys::DataMessage
     const Type type;
 };
 
-class CellularRingingMessage : public CellularMessage
+class CellularRingingMessage : public CellularMessage, public app::manager::actions::ConvertibleToAction
 {
   public:
     CellularRingingMessage(const utils::PhoneNumber::View &number) : CellularMessage(Type::Ringing), number(number)
@@ -91,10 +92,18 @@ class CellularRingingMessage : public CellularMessage
         : CellularMessage(Type::Ringing), number(utils::PhoneNumber::parse(e164number))
     {}
 
+    [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
+    {
+        return std::make_unique<app::manager::ActionRequest>(
+            sender,
+            app::manager::actions::HandleOutgoingCall,
+            std::make_unique<app::manager::actions::CallParams>(number));
+    }
+
     utils::PhoneNumber::View number;
 };
 
-class CellularIncominCallMessage : public CellularMessage
+class CellularIncominCallMessage : public CellularMessage, public app::manager::actions::ConvertibleToAction
 {
   public:
     CellularIncominCallMessage(const utils::PhoneNumber::View &number)
@@ -107,10 +116,18 @@ class CellularIncominCallMessage : public CellularMessage
         : CellularMessage(Type::IncomingCall), number(utils::PhoneNumber::parse(e164number))
     {}
 
+    [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
+    {
+        return std::make_unique<app::manager::ActionRequest>(
+            sender,
+            app::manager::actions::HandleIncomingCall,
+            std::make_unique<app::manager::actions::CallParams>(number));
+    }
+
     utils::PhoneNumber::View number;
 };
 
-class CellularCallerIdMessage : public CellularMessage
+class CellularCallerIdMessage : public CellularMessage, public app::manager::actions::ConvertibleToAction
 {
   public:
     CellularCallerIdMessage(const utils::PhoneNumber::View &number) : CellularMessage(Type::CallerId), number(number)
@@ -121,6 +138,12 @@ class CellularCallerIdMessage : public CellularMessage
     CellularCallerIdMessage(const std::string &e164number)
         : CellularMessage(Type::CallerId), number(utils::PhoneNumber::parse(e164number))
     {}
+
+    [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
+    {
+        return std::make_unique<app::manager::ActionRequest>(
+            sender, app::manager::actions::HandleCallerId, std::make_unique<app::manager::actions::CallParams>(number));
+    }
 
     utils::PhoneNumber::View number;
 };
@@ -555,11 +578,17 @@ class CellularAnswerIncomingCallMessage : public CellularMessage
     {}
 };
 
-class CellularHangupCallMessage : public CellularMessage
+class CellularHangupCallMessage : public CellularMessage, public app::manager::actions::ConvertibleToAction
 {
   public:
     CellularHangupCallMessage() : CellularMessage(Type::HangupCall)
     {}
+
+    [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
+    {
+        return std::make_unique<app::manager::ActionRequest>(
+            sender, app::manager::actions::EndCall, std::make_unique<app::manager::actions::ActionParams>());
+    }
 };
 
 class CellularListCallsMessage : public CellularMessage
@@ -664,20 +693,34 @@ class CellularSetConnectionFrequencyMessage : public CellularMessage
     uint8_t connectionFrequency;
 };
 
-class CellularCallActiveNotification : public CellularNotificationMessage
+class CellularCallActiveNotification : public CellularNotificationMessage,
+                                       public app::manager::actions::ConvertibleToAction
 {
   public:
     explicit CellularCallActiveNotification(const std::string &data = "")
         : CellularNotificationMessage(CellularNotificationMessage::Content::CallActive, data)
     {}
+
+    [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
+    {
+        return std::make_unique<app::manager::ActionRequest>(
+            sender, app::manager::actions::ActivateCall, std::make_unique<app::manager::actions::CallParams>());
+    }
 };
 
-class CellularCallAbortedNotification : public CellularNotificationMessage
+class CellularCallAbortedNotification : public CellularNotificationMessage,
+                                        public app::manager::actions::ConvertibleToAction
 {
   public:
     explicit CellularCallAbortedNotification(const std::string &data = "")
         : CellularNotificationMessage(CellularNotificationMessage::Content::CallAborted, data)
     {}
+
+    [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
+    {
+        return std::make_unique<app::manager::ActionRequest>(
+            sender, app::manager::actions::AbortCall, std::make_unique<app::manager::actions::CallParams>());
+    }
 };
 
 class CellularPowerUpProcedureCompleteNotification : public CellularNotificationMessage

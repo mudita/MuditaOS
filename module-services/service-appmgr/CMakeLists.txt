@@ -6,6 +6,7 @@ set(SOURCES
     Controller.cpp
     data/MmiActionsParams.cpp
     data/NotificationsChangedActionsParams.cpp
+    data/CallActionsParams.cpp
     model/ApplicationManager.cpp
     model/ApplicationHandle.cpp
     model/ApplicationsRegistry.cpp
