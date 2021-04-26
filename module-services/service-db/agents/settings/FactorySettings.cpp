@@ -26,8 +26,9 @@ namespace settings
 
                 settings::EntryPath variablePath{"",
                                                  "",
-                                                 settings::factory::entry_key,
-                                                 (*factoryData)[0].getString(),
+                                                 "",
+                                                 settings::factory::entry_key + std::string("/") +
+                                                     (*factoryData)[0].getString(),
                                                  settings::SettingsScope::Global};
                 auto value = (*factoryData)[1].getString();
 

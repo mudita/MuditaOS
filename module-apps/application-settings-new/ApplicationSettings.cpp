@@ -459,8 +459,10 @@ namespace app
         windowsFactory.attach(gui::window::name::certification, [](Application *app, const std::string &name) {
             return std::make_unique<gui::CertificationWindow>(app);
         });
-        windowsFactory.attach(gui::window::name::technical_information, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::TechnicalInformationWindow>(app);
+        windowsFactory.attach(gui::window::name::technical_information, [&](Application *app, const std::string &name) {
+            auto factoryData = std::make_unique<FactoryData>(std::make_unique<::settings::Settings>(this));
+            auto presenter   = std::make_unique<TechnicalWindowPresenter>(std::move(factoryData));
+            return std::make_unique<gui::TechnicalInformationWindow>(app, std::move(presenter));
         });
         windowsFactory.attach(gui::window::name::sar, [&](Application *app, const std::string &name) {
             auto sarInfoRepository = std::make_unique<SARInfoRepository>("assets/certification_info", "sar.txt");

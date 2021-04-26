@@ -237,65 +237,7 @@ namespace style
 
     namespace techinfo
     {
-        namespace textmodel
-        {
-            inline constexpr auto x      = 30;
-            inline constexpr auto y      = 117;
-            inline constexpr auto width  = 400;
-            inline constexpr auto height = 30;
-        } // namespace textmodel
-        namespace valuemodel
-        {
-            inline constexpr auto x      = 30;
-            inline constexpr auto y      = 150;
-            inline constexpr auto width  = 400;
-            inline constexpr auto height = 30;
-        } // namespace valuemodel
-
-        namespace textserialnumber
-        {
-            inline constexpr auto x      = 30;
-            inline constexpr auto y      = 192;
-            inline constexpr auto width  = 400;
-            inline constexpr auto height = 30;
-        } // namespace textserialnumber
-        namespace valueserialnumber
-        {
-            inline constexpr auto x      = 30;
-            inline constexpr auto y      = 225;
-            inline constexpr auto width  = 400;
-            inline constexpr auto height = 30;
-        } // namespace valueserialnumber
-
-        namespace textosversion
-        {
-            inline constexpr auto x      = 30;
-            inline constexpr auto y      = 267;
-            inline constexpr auto width  = 400;
-            inline constexpr auto height = 30;
-        } // namespace textosversion
-        namespace valueosversion
-        {
-            inline constexpr auto x      = 30;
-            inline constexpr auto y      = 300;
-            inline constexpr auto width  = 400;
-            inline constexpr auto height = 30;
-        } // namespace valueosversion
-
-        namespace textimea
-        {
-            inline constexpr auto x      = 30;
-            inline constexpr auto y      = 342;
-            inline constexpr auto width  = 400;
-            inline constexpr auto height = 30;
-        } // namespace textimea
-        namespace valueimea
-        {
-            inline constexpr auto x      = 30;
-            inline constexpr auto y      = 375;
-            inline constexpr auto width  = 400;
-            inline constexpr auto height = 30;
-        } // namespace valueimea
-
+        inline constexpr auto width  = 400;
+        inline constexpr auto height = 30;
     } // namespace techinfo
 } // namespace style
