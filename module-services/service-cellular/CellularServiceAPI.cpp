@@ -10,7 +10,7 @@
 #include <PhoneNumber.hpp>
 #include <Service/Common.hpp>
 #include <bsp/cellular/bsp_cellular.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 
 #include <memory>
 #include <string>
@@ -43,8 +43,8 @@ bool CellularServiceAPI::AnswerIncomingCall(sys::Service *serv)
 bool CellularServiceAPI::HangupCall(sys::Service *serv)
 {
     auto msg = std::make_shared<CellularHangupCallMessage>();
-
-    return serv->bus.sendUnicast(msg, ServiceCellular::serviceName);
+    serv->bus.sendMulticast(std::move(msg), sys::BusChannel::ServiceCellularNotifications);
+    return true;
 }
 
 std::string CellularServiceAPI::GetIMSI(sys::Service *serv, bool getFullIMSINumber)
