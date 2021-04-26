@@ -91,18 +91,18 @@ namespace gui
         auto contactRec = DBServiceAPI::ContactGetByID(this->application, contact->ID);
         auto cont       = !contactRec->empty() ? contactRec->front() : ContactRecord{};
 
-        auto metaData = std::make_unique<gui::DialogMetadataMessage>(gui::DialogMetadata{
-            cont.getFormattedName(), "phonebook_contact_delete_trashcan", dialogText, "", [=]() -> bool {
-                contact->addToBlocked(shouldBeBlocked);
-                DBServiceAPI::ContactUpdate(this->application, *contact);
-                if (shouldBeBlocked) {
-                    showNotification(NotificationType::Block);
-                }
-                else {
-                    showNotification(NotificationType::Unblock);
-                }
-                return true;
-            }});
+        auto metaData = std::make_unique<gui::DialogMetadataMessage>(
+            gui::DialogMetadata{cont.getFormattedName(), "block_W_G", dialogText, "", [=]() -> bool {
+                                    contact->addToBlocked(shouldBeBlocked);
+                                    DBServiceAPI::ContactUpdate(this->application, *contact);
+                                    if (shouldBeBlocked) {
+                                        showNotification(NotificationType::Block);
+                                    }
+                                    else {
+                                        showNotification(NotificationType::Unblock);
+                                    }
+                                    return true;
+                                }});
 
         application->switchWindow(gui::window::name::dialog_yes_no, std::move(metaData));
         return true;
