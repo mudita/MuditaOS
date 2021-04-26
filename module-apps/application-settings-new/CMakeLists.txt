@@ -23,9 +23,11 @@ target_sources( ${PROJECT_NAME}
         models/QuotesModel.cpp
         models/CategoriesModel.cpp
         models/SARInfoRepository.cpp
+        models/FactoryData.cpp
         models/AudioSettingsModel.cpp
         models/SoundsModel.cpp
         presenter/SARInfoWindowPresenter.cpp
+        presenter/TechnicalWindowPresenter.cpp
         widgets/ChangePasscodeLockHandler.cpp
         widgets/QuoteWidget.cpp
         widgets/CategoryWidget.cpp

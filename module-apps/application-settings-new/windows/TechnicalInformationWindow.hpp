@@ -4,19 +4,24 @@
 #pragma once
 
 #include "BaseSettingsWindow.hpp"
+#include <module-apps/application-settings-new/ApplicationSettings.hpp>
+#include <module-apps/application-settings-new/presenter/TechnicalWindowPresenter.hpp>
 
 namespace gui
 {
-    class TechnicalInformationWindow : public AppWindow
+    class TechnicalInformationWindow : public AppWindow, public TechnicalWindowContract::View
     {
+        static constexpr auto imei = "AA-BBBBBB-CCCCC-D";
+
       public:
-        TechnicalInformationWindow(app::Application *app);
+        TechnicalInformationWindow(app::Application *app,
+                                   std::unique_ptr<TechnicalWindowContract::Presenter> presenter);
         ~TechnicalInformationWindow() override;
+
         void destroyInterface() override;
 
       private:
         void buildInterface() override;
-        void onBeforeShow(ShowMode mode, SwitchData *data) override;
 
         gui::Text *modelText  = nullptr;
         gui::Text *modelValue = nullptr;
@@ -29,6 +34,23 @@ namespace gui
 
         gui::Text *imeiText  = nullptr;
         gui::Text *imeiValue = nullptr;
+
+        gui::Text *batteryText  = nullptr;
+        gui::Text *batteryValue = nullptr;
+
+        gui::Text *pcbMbText  = nullptr;
+        gui::Text *pcbMbValue = nullptr;
+
+        gui::Text *pcbAmText  = nullptr;
+        gui::Text *pcbAmValue = nullptr;
+
+        gui::Text *pcbUmText  = nullptr;
+        gui::Text *pcbUmValue = nullptr;
+
+        gui::Text *pcbLmText  = nullptr;
+        gui::Text *pcbLmValue = nullptr;
+
+        std::unique_ptr<TechnicalWindowContract::Presenter> presenter;
     };
 
 } // namespace gui
