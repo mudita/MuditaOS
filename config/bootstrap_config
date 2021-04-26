@@ -58,5 +58,6 @@ INSTALL_PACKAGES="
         vim \
         wget \
         zip \
+        gdb \
 "
 
