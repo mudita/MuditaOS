@@ -35,10 +35,11 @@ INSTALL_PACKAGES="
         doxygen \
         g++-10 \
         gcc-10 \
+        gdb \
         git \
         gnupg2 \
         graphviz \
-        gtkmm-3.0 \
+        libgtkmm-3.0-dev \
         libblkid-dev 
         libfdisk-dev \
         libfuse-dev \
@@ -58,6 +59,5 @@ INSTALL_PACKAGES="
         vim \
         wget \
         zip \
-        gdb \
 "
 
