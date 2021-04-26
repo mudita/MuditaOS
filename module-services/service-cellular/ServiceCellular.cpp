@@ -278,7 +278,6 @@ sys::ReturnCodes ServiceCellular::InitHandler()
 {
     board = EventManagerServiceAPI::GetBoard(this);
 
-    settings = std::make_unique<settings::Settings>();
     settings->init(service::Interface(shared_from_this()));
 
     connectionManager = std::make_unique<ConnectionManager>(

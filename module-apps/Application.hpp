@@ -395,7 +395,7 @@ namespace app
         std::unique_ptr<TopBarManager> topBarManager;
 
         /// application's settings
-        std::unique_ptr<settings::Settings> settings;
+        std::unique_ptr<settings::Settings> settings = std::make_unique<settings::Settings>();
         sys::phone_modes::PhoneMode phoneMode;
 
       public:

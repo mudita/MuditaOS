@@ -94,7 +94,6 @@ ServiceAudio::ServiceAudio()
       audioMux([this](auto... params) { return this->AudioServicesCallback(params...); })
 {
     LOG_INFO("[ServiceAudio] Initializing");
-    settingsProvider = std::make_unique<settings::Settings>();
     bus.channels.push_back(sys::BusChannel::ServiceAudioNotifications);
 
     connect(typeid(BluetoothDeviceVolumeChanged),
@@ -108,7 +107,6 @@ ServiceAudio::~ServiceAudio()
 
 sys::ReturnCodes ServiceAudio::InitHandler()
 {
-    settingsProvider = std::make_unique<settings::Settings>();
     settingsProvider->init(service::Interface(shared_from_this()));
     std::transform(std::begin(cacheInitializer),
                    std::end(cacheInitializer),

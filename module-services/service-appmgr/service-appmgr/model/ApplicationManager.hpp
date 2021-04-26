@@ -178,7 +178,7 @@ namespace app::manager
                                         // If it reaches time defined in settings database application
                                         // manager is sending signal to Application Desktop in order to
                                         // lock screen.
-        std::unique_ptr<settings::Settings> settings;
+        std::unique_ptr<settings::Settings> settings = std::make_unique<settings::Settings>();
         std::unique_ptr<sys::phone_modes::Observer> phoneModeObserver;
         void displayLanguageChanged(std::string value);
         void lockTimeChanged(std::string value);

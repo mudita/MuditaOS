@@ -77,7 +77,6 @@ ServiceDesktop::~ServiceDesktop()
 sys::ReturnCodes ServiceDesktop::InitHandler()
 {
 
-    settings = std::make_unique<settings::Settings>();
     settings->init(service::Interface(shared_from_this()));
     usbSecurityModel = std::make_unique<sdesktop::USBSecurityModel>(this, settings.get());
     desktopWorker = std::make_unique<WorkerDesktop>(this, *usbSecurityModel.get());

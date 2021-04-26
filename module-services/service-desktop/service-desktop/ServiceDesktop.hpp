@@ -114,7 +114,7 @@ class ServiceDesktop : public sys::Service
 
   private:
     std::unique_ptr<sdesktop::USBSecurityModel> usbSecurityModel;
-    std::unique_ptr<settings::Settings> settings;
+    std::unique_ptr<settings::Settings> settings = std::make_unique<settings::Settings>();
     sys::TimerHandle transferTimer;
     std::unique_ptr<sdesktop::bluetooth::BluetoothMessagesHandler> btMsgHandler;
 };

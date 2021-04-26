@@ -595,7 +595,6 @@ namespace app
     {
         setState(State::INITIALIZING);
 
-        settings = std::make_unique<settings::Settings>();
         settings->init(service::Interface(shared_from_this()));
 
         app::manager::Controller::applicationInitialised(this, StartupStatus::Success, startInBackground);

@@ -145,7 +145,6 @@ namespace app::manager
 
     sys::ReturnCodes ApplicationManager::InitHandler()
     {
-        settings = std::make_unique<settings::Settings>();
         settings->init(service::Interface(shared_from_this()));
 
         utils::setDisplayLanguage(

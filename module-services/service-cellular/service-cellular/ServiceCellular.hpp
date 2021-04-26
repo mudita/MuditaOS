@@ -194,7 +194,7 @@ class ServiceCellular : public sys::Service
     // used to manage network connection in Messages only mode
     sys::TimerHandle connectionTimer;
 
-    std::unique_ptr<settings::Settings> settings;
+    std::unique_ptr<settings::Settings> settings = std::make_unique<settings::Settings>();
 
     void SleepTimerHandler();
     void CallStateTimerHandler();

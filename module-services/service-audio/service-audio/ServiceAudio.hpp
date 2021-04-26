@@ -55,7 +55,7 @@ class ServiceAudio : public sys::Service
 
     audio::AudioMux audioMux;
     audio::AudioMux::VibrationStatus vibrationMotorStatus = audio::AudioMux::VibrationStatus::Off;
-    std::unique_ptr<settings::Settings> settingsProvider;
+    std::unique_ptr<settings::Settings> settingsProvider  = std::make_unique<settings::Settings>();
     std::map<std::string, std::string> settingsCache;
     bool bluetoothConnected = false;
 
