@@ -67,8 +67,6 @@ ServiceDesktop::ServiceDesktop()
     LOG_INFO("[ServiceDesktop] Initializing");
 
     updateOS         = std::make_unique<UpdateMuditaOS>(this);
-    settings         = std::make_unique<settings::Settings>(this);
-    usbSecurityModel = std::make_unique<sdesktop::USBSecurityModel>(this, settings.get());
 }
 
 ServiceDesktop::~ServiceDesktop()
@@ -78,6 +76,10 @@ ServiceDesktop::~ServiceDesktop()
 
 sys::ReturnCodes ServiceDesktop::InitHandler()
 {
+
+    settings = std::make_unique<settings::Settings>();
+    settings->init(service::Interface(shared_from_this()));
+    usbSecurityModel = std::make_unique<sdesktop::USBSecurityModel>(this, settings.get());
     desktopWorker = std::make_unique<WorkerDesktop>(this, *usbSecurityModel.get());
     const bool ret =
         desktopWorker->init({{sdesktop::RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_len},
@@ -294,6 +296,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
 
 sys::ReturnCodes ServiceDesktop::DeinitHandler()
 {
+    settings->deinit();
     desktopWorker->deinit();
     return sys::ReturnCodes::Success;
 }

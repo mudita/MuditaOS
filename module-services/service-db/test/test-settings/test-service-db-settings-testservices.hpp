@@ -1,5 +1,7 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
+#include <memory>
 
 namespace settings
 {
@@ -8,7 +10,6 @@ namespace settings
       public:
         MyService(const std::string &name) : sys::Service(name)
         {
-            mySettings = std::make_shared<settings::Settings>(this);
         }
         std::shared_ptr<settings::Settings> mySettings;
         std::vector<std::string> valChanged;
@@ -59,17 +60,26 @@ namespace settings
         }
         sys::ReturnCodes InitHandler() override
         {
-            std::cout << "inithandler thr_id: " << std::this_thread::get_id() << std::endl << std::flush;
+            std::cout << "InitHandler thr_id: " << std::this_thread::get_id() << "name: " << GetName() << std::endl
+                      << std::flush;
+            mySettings = std::make_shared<settings::Settings>();
+            mySettings->init(service::Interface(shared_from_this()));
             return sys::ReturnCodes::Success;
         }
         sys::ReturnCodes DeinitHandler() override
         {
+            mySettings->deinit();
             std::cout << "deinithandler thr_id: " << std::this_thread::get_id() << std::endl << std::flush;
             return sys::ReturnCodes::Success;
         }
         sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override
         {
             return sys::ReturnCodes::Success;
+        }
+
+        std::shared_ptr<settings::Settings> getSettings()
+        {
+            return mySettings;
         }
     };
 

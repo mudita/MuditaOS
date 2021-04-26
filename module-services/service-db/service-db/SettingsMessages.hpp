@@ -12,15 +12,14 @@
 #include <set>
 #include <utility>
 #include <variant>
-#include <module-utils/Utils.hpp>
 
 namespace settings
 {
     struct EntryPath
     {
-        std::string mode;
+        std::string mode = "undefined";
         std::string service;
-        std::string profile;
+        std::string profile = "undefined";
         std::string variable;
         SettingsScope scope;
 
@@ -32,21 +31,7 @@ namespace settings
             return mode + sep + service + sep + profile + sep + variable;
         }
 
-        void parse(const std::string &dbPath)
-        {
-            auto parts = utils::split(dbPath, "\\", false);
-            if (1 == parts.size()) {
-                variable = dbPath;
-                scope    = SettingsScope::Global;
-            }
-            else {
-                mode     = parts[0];
-                service  = parts[1];
-                profile  = parts[2];
-                variable = parts[3];
-                scope    = SettingsScope::AppLocal;
-            }
-        }
+        void parse(const std::string &dbPath);
     };
 
     bool operator<(const EntryPath &lhs, const EntryPath &rhs) noexcept;

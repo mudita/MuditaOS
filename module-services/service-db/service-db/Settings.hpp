@@ -1,12 +1,11 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include <module-sys/Service/Message.hpp>
-#include <service-db/DBServiceName.hpp>
+#include "DBServiceName.hpp"
 #include "SettingsScope.hpp"
-#include "SettingsMessages.hpp"
+#include "SettingsInterface.hpp"
 
 #include <cstdint>
 #include <functional>
@@ -15,10 +14,10 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <exception>
 
 namespace settings
 {
-    class SettingsCache;
     class Settings
     {
       public:
@@ -31,7 +30,11 @@ namespace settings
         using OnAllProfilesRetrievedCallback = std::function<void(const ListOfProfiles &)>;
         using OnAllModesRetrievedCallback    = std::function<void(const ListOfModes &)>;
 
-        Settings(sys::Service *app, const std::string &dbAgentName = service::name::db, SettingsCache *cache = nullptr);
+        Settings() = default;
+        virtual ~Settings();
+
+        void init(const service::Interface &interface);
+        void deinit();
 
         void setValue(const std::string &variableName,
                       const std::string &variableValue,
@@ -60,14 +63,11 @@ namespace settings
         void unregisterModeChange();
 
       private:
-        std::string dbAgentName;
-
-        std::shared_ptr<sys::Service> app;
+        Interface interface;
         std::string serviceName;
         std::string phoneMode;
         std::string profile;
 
-        SettingsCache *cache;
 
         using ValueCb = std::map<EntryPath, std::pair<ValueChangedCallback, ValueChangedCallbackWithName>>;
         ValueCb cbValues;
@@ -75,8 +75,13 @@ namespace settings
         OnAllModesRetrievedCallback cbAllModes;
         ProfileChangedCallback cbProfile;
         OnAllProfilesRetrievedCallback cbAllProfiles;
-        void sendMsg(std::shared_ptr<settings::Messages::SettingsMessage> &&msg);
-        void registerHandlers();
+
+        /// using owner service either
+        /// - to register handlers
+        /// - to unregister handlers
+        /// handlers are called per service if for some reason service will stop
+        /// existing - handlers shouldn't be called
+        void changeHandlers(enum Interface::Change change);
         auto handleVariableChanged(sys::Message *req) -> sys::MessagePointer;
         auto handleCurrentProfileChanged(sys::Message *req) -> sys::MessagePointer;
         auto handleCurrentModeChanged(sys::Message *req) -> sys::MessagePointer;

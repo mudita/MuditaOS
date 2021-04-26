@@ -38,7 +38,7 @@ class EventManager : public sys::Service
     void toggleTorchOnOff();
     void toggleTorchColor();
 
-    std::shared_ptr<settings::Settings> settings;
+    std::shared_ptr<settings::Settings> settings = std::make_shared<settings::Settings>();
     sys::TimerHandle loggerTimer;
     sys::TimerHandle keypadLightTimer;
     bsp::keypad_backlight::State keypadLightState{bsp::keypad_backlight::State::off};

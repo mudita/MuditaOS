@@ -15,8 +15,10 @@ set(SOURCES
     messages/QueryMessage.cpp
     agents/settings/SettingsAgent.cpp
     agents/settings/Settings.cpp
+    agents/settings/SettingsInterface.cpp
     agents/settings/SettingsCache.cpp
     agents/settings/FactorySettings.cpp
+    agents/settings/SettingsMessages.cpp
     agents/file_indexer/FileIndexerAgent.cpp
     agents/quotes/QuotesAgent.cpp
 )

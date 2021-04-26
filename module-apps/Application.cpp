@@ -90,10 +90,10 @@ namespace app
                              uint32_t stackDepth,
                              sys::ServicePriority priority)
         : Service(std::move(name), std::move(parent), stackDepth, priority),
-          default_window(gui::name::window::main_window), windowsStack(this),
-          keyTranslator{std::make_unique<gui::KeyInputSimpleTranslation>()}, startInBackground{startInBackground},
-          callbackStorage{std::make_unique<CallbackStorage>()}, topBarManager{std::make_unique<TopBarManager>()},
-          settings(std::make_unique<settings::Settings>(this)), phoneMode{mode}
+          default_window(gui::name::window::main_window),
+          windowsStack(this), keyTranslator{std::make_unique<gui::KeyInputSimpleTranslation>()},
+          startInBackground{startInBackground}, callbackStorage{std::make_unique<CallbackStorage>()},
+          topBarManager{std::make_unique<TopBarManager>()}, phoneMode{mode}
     {
         topBarManager->enableIndicators({gui::top_bar::Indicator::Time});
         topBarManager->set(utils::dateAndTimeSettings.isTimeFormat12() ? gui::top_bar::TimeMode::Time12h
@@ -595,6 +595,9 @@ namespace app
     {
         setState(State::INITIALIZING);
 
+        settings = std::make_unique<settings::Settings>();
+        settings->init(service::Interface(shared_from_this()));
+
         app::manager::Controller::applicationInitialised(this, StartupStatus::Success, startInBackground);
 
         if (startInBackground) {
@@ -612,6 +615,7 @@ namespace app
 
     sys::ReturnCodes Application::DeinitHandler()
     {
+        settings->deinit();
         LOG_INFO("Closing an application: %s", GetName().c_str());
 
         for (const auto &[windowName, window] : windowsStack) {

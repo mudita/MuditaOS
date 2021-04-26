@@ -1,15 +1,17 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include <memory>
 #include <service-db/Settings.hpp>
 #include <service-db/SettingsMessages.hpp>
 #include <service-db/SettingsCache.hpp>
 
 #include <Service/Common.hpp>
 #include <Service/Message.hpp>
-#include <Service/Service.hpp>
-#include <log/log.hpp>
+//#include <Service/Service.hpp>
+// #include <log/log.hpp>
 
+#include <stdexcept>
 #include <utility>
 #include <vector>
 
@@ -21,37 +23,49 @@
 
 namespace settings
 {
-    Settings::Settings(sys::Service *app, const std::string &dbAgentName, SettingsCache *cache)
-        : dbAgentName(dbAgentName), cache(cache)
+    Settings::~Settings()
     {
-        this->app =
-            std::shared_ptr<sys::Service>(app, [](sys::Service *service) {}); /// with deleter that doesn't delete.
-        this->app->bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
-        if (nullptr == cache) {
-            this->cache = SettingsCache::getInstance();
+        deinit();
+    }
+
+    void Settings::init(const service::Interface &interface)
+    {
+        this->interface = Interface(interface);
+        if (this->interface) {
+            changeHandlers(Interface::Change::Register);
         }
-        registerHandlers();
+        else {
+            throw std::runtime_error("need the interface!");
+        }
     }
 
-    void Settings::sendMsg(std::shared_ptr<settings::Messages::SettingsMessage> &&msg)
+    void Settings::deinit()
     {
-        app->bus.sendUnicast(std::move(msg), dbAgentName);
+        if (interface) {
+            changeHandlers(Interface::Change::Deregister);
+        }
     }
 
-    void Settings::registerHandlers()
+    void Settings::changeHandlers(enum Interface::Change change)
     {
         using std::placeholders::_1;
         using std::placeholders::_2;
-        log_debug("Settings::registerHandlers for %s", app->GetName().c_str());
-        app->connect(settings::Messages::VariableChanged(), std::bind(&Settings::handleVariableChanged, this, _1));
-        app->connect(settings::Messages::CurrentProfileChanged(),
-                     std::bind(&Settings::handleCurrentProfileChanged, this, _1));
-        app->connect(settings::Messages::CurrentModeChanged(),
-                     std::bind(&Settings::handleCurrentModeChanged, this, _1));
-        app->connect(settings::Messages::ProfileListResponse(),
-                     std::bind(&Settings::handleProfileListResponse, this, _1));
-        app->connect(settings::Messages::ModeListResponse(), std::bind(&Settings::handleModeListResponse, this, _1));
+        interface.changeHandler(
+            typeid(settings::Messages::VariableChanged), change, std::bind(&Settings::handleVariableChanged, this, _1));
+        interface.changeHandler(typeid(settings::Messages::CurrentProfileChanged),
+                                change,
+                                std::bind(&Settings::handleCurrentProfileChanged, this, _1));
+        interface.changeHandler(typeid(settings::Messages::CurrentModeChanged),
+                                change,
+                                std::bind(&Settings::handleCurrentModeChanged, this, _1));
+        interface.changeHandler(typeid(settings::Messages::ProfileListResponse),
+                                change,
+                                std::bind(&Settings::handleProfileListResponse, this, _1));
+        interface.changeHandler(typeid(settings::Messages::ModeListResponse),
+                                change,
+                                std::bind(&Settings::handleModeListResponse, this, _1));
     }
+
     auto Settings::handleVariableChanged(sys::Message *req) -> sys::MessagePointer
     {
         log_debug("handleVariableChanged");
@@ -121,50 +135,41 @@ namespace settings
 
     void Settings::registerValueChange(const std::string &variableName, ValueChangedCallback cb, SettingsScope scope)
     {
-        EntryPath path;
-        path.variable = variableName;
-        path.service  = app->GetName();
-        path.scope    = scope;
+        auto path = EntryPath{.service = interface.ownerName(), .variable = variableName, .scope = scope};
 
         auto it_cb = cbValues.find(path);
         if (cbValues.end() != it_cb && nullptr != it_cb->second.first) {
-            LOG_INFO("Callback function on value change (%s) already exists, rewriting", path.to_string().c_str());
+            // LOG_INFO("Callback function on value change (%s) already exists, rewriting", path.to_string().c_str());
         }
         cbValues[path].first = std::move(cb);
 
         auto msg = std::make_shared<settings::Messages::RegisterOnVariableChange>(path);
-        sendMsg(std::move(msg));
+        interface.sendMsg(std::move(msg));
     }
 
     void Settings::registerValueChange(const std::string &variableName,
                                        ValueChangedCallbackWithName cb,
                                        SettingsScope scope)
     {
-        EntryPath path;
-        path.variable = variableName;
-        path.service  = app->GetName();
-        path.scope    = scope;
+        auto path = EntryPath{.service = interface.ownerName(), .variable = variableName, .scope = scope};
 
         auto it_cb = cbValues.find(path);
         if (cbValues.end() != it_cb && nullptr != it_cb->second.second) {
-            LOG_INFO("Callback function on value change (%s) already exists, rewriting", path.to_string().c_str());
+            // LOG_INFO("Callback function on value change (%s) already exists, rewriting", path.to_string().c_str());
         }
         cbValues[path].second = std::move(cb);
 
         auto msg = std::make_shared<settings::Messages::RegisterOnVariableChange>(path);
-        sendMsg(std::move(msg));
+        interface.sendMsg(std::move(msg));
     }
 
     void Settings::unregisterValueChange(const std::string &variableName, SettingsScope scope)
     {
-        EntryPath path;
-        path.variable = variableName;
-        path.service  = app->GetName();
-        path.scope    = scope;
+        auto path = EntryPath{.service = interface.ownerName(), .variable = variableName, .scope = scope};
 
         auto it_cb = cbValues.find(path);
         if (cbValues.end() == it_cb) {
-            LOG_INFO("Callback function on value change (%s) does not exist", path.to_string().c_str());
+            // LOG_INFO("Callback function on value change (%s) does not exist", path.to_string().c_str());
         }
         else {
             log_debug("[Settings::unregisterValueChange] %s", path.to_string().c_str());
@@ -172,7 +177,7 @@ namespace settings
         }
 
         auto msg = std::make_shared<settings::Messages::UnregisterOnVariableChange>(path);
-        sendMsg(std::move(msg));
+        interface.sendMsg(std::move(msg));
     }
 
     void Settings::unregisterValueChange()
@@ -180,48 +185,41 @@ namespace settings
         for (const auto &it_cb : cbValues) {
             log_debug("[Settings::unregisterValueChange] %s", it_cb.first.to_string().c_str());
             auto msg = std::make_shared<settings::Messages::UnregisterOnVariableChange>(it_cb.first);
-            sendMsg(std::move(msg));
+            interface.sendMsg(std::move(msg));
         }
         cbValues.clear();
-        LOG_INFO("Unregistered all settings variable change on application (%s)", app->GetName().c_str());
+        // LOG_INFO("Unregistered all settings variable change on service (%s)", interface.ownerName().c_str());
     }
 
     void Settings::setValue(const std::string &variableName, const std::string &variableValue, SettingsScope scope)
     {
-        EntryPath path;
-        path.variable = variableName;
-        path.service  = app->GetName();
-        path.scope    = scope;
-        auto msg      = std::make_shared<settings::Messages::SetVariable>(path, variableValue);
-        sendMsg(std::move(msg));
-        cache->setValue(path, variableValue);
+        auto path = EntryPath{.service = interface.ownerName(), .variable = variableName, .scope = scope};
+        interface.sendMsg(std::make_shared<settings::Messages::SetVariable>(path, variableValue));
+        interface.getCache()->setValue(path, variableValue);
     }
 
     std::string Settings::getValue(const std::string &variableName, SettingsScope scope)
     {
-        EntryPath path;
-        path.variable = variableName;
-        path.service  = app->GetName();
-        path.scope    = scope;
-        return cache->getValue(path);
+        return interface.getCache()->getValue(
+            {.service = interface.ownerName(), .variable = variableName, .scope = scope});
     }
 
     void Settings::getAllProfiles(OnAllProfilesRetrievedCallback cb)
     {
         if (nullptr == cbAllProfiles) {
-            sendMsg(std::make_shared<settings::Messages::ListProfiles>());
+            interface.sendMsg(std::make_shared<settings::Messages::ListProfiles>());
         }
         cbAllProfiles = std::move(cb);
     }
 
     void Settings::setCurrentProfile(const std::string &profile)
     {
-        sendMsg(std::make_shared<settings::Messages::SetCurrentProfile>(profile));
+        interface.sendMsg(std::make_shared<settings::Messages::SetCurrentProfile>(profile));
     }
 
     void Settings::addProfile(const std::string &profile)
     {
-        sendMsg(std::make_shared<settings::Messages::AddProfile>(profile));
+        interface.sendMsg(std::make_shared<settings::Messages::AddProfile>(profile));
     }
 
     void Settings::registerProfileChange(ProfileChangedCallback cb)
@@ -230,7 +228,7 @@ namespace settings
             log_debug("Profile change callback already exists, overwritting");
         }
         else {
-            sendMsg(std::make_shared<settings::Messages::RegisterOnProfileChange>());
+            interface.sendMsg(std::make_shared<settings::Messages::RegisterOnProfileChange>());
         }
 
         cbProfile = std::move(cb);
@@ -239,25 +237,25 @@ namespace settings
     void Settings::unregisterProfileChange()
     {
         cbProfile = nullptr;
-        sendMsg(std::make_shared<settings::Messages::UnregisterOnProfileChange>());
+        interface.sendMsg(std::make_shared<settings::Messages::UnregisterOnProfileChange>());
     }
 
     void Settings::getAllModes(OnAllModesRetrievedCallback cb)
     {
         if (nullptr == cbAllModes) {
-            sendMsg(std::make_shared<settings::Messages::ListModes>());
+            interface.sendMsg(std::make_shared<settings::Messages::ListModes>());
         }
         cbAllModes = std::move(cb);
     }
 
     void Settings::setCurrentMode(const std::string &mode)
     {
-        sendMsg(std::make_shared<settings::Messages::SetCurrentMode>(mode));
+        interface.sendMsg(std::make_shared<settings::Messages::SetCurrentMode>(mode));
     }
 
     void Settings::addMode(const std::string &mode)
     {
-        sendMsg(std::make_shared<settings::Messages::AddMode>(mode));
+        interface.sendMsg(std::make_shared<settings::Messages::AddMode>(mode));
     }
 
     void Settings::registerModeChange(ModeChangedCallback cb)
@@ -266,7 +264,7 @@ namespace settings
             log_debug("ModeChange callback allready set overwriting");
         }
         else {
-            sendMsg(std::make_shared<settings::Messages::RegisterOnModeChange>());
+            interface.sendMsg(std::make_shared<settings::Messages::RegisterOnModeChange>());
         }
         cbMode = std::move(cb);
     }
@@ -274,6 +272,6 @@ namespace settings
     void Settings::unregisterModeChange()
     {
         cbMode = nullptr;
-        sendMsg(std::make_shared<settings::Messages::UnregisterOnModeChange>());
+        interface.sendMsg(std::make_shared<settings::Messages::UnregisterOnModeChange>());
     }
 } // namespace settings
