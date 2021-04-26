@@ -320,6 +320,8 @@ class ServiceCellular : public sys::Service
 
   private:
     std::unique_ptr<cellular::internal::ServiceCellularPriv> priv;
+    bool ringSent = false;
+    bool clipSent = false;
 };
 
 namespace sys

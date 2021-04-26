@@ -3,24 +3,24 @@
 
 #include "ApplicationCall.hpp"
 
-#include "DialogMetadata.hpp"
-#include "DialogMetadataMessage.hpp"
+#include "apps-common/windows/DialogMetadata.hpp"
+#include "apps-common/messages/DialogMetadataMessage.hpp"
 #include "data/CallSwitchData.hpp"
 #include "windows/CallWindow.hpp"
 #include "windows/EmergencyCallWindow.hpp"
 #include "windows/EnterNumberWindow.hpp"
 
-#include <Application.hpp>
 #include <MessageType.hpp>
 #include <PhoneNumber.hpp>
-#include <Dialog.hpp>
-#include <log.hpp>
+#include <apps-common/windows/Dialog.hpp>
+#include <log/log.hpp>
 #include <memory>
 #include <service-cellular/ServiceCellular.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
 #include <service-audio/AudioServiceAPI.hpp>
 #include <service-appmgr/Controller.hpp>
-#include <time/time_conversion.hpp>
+#include <service-appmgr/data/MmiActionsParams.hpp>
+#include <time/time/time_conversion.hpp>
 #include <ticks.hpp>
 
 #include <cassert>
@@ -82,6 +82,49 @@ namespace app
             showNotification(buttonAction, icon, textOffline);
             return actionHandled();
         });
+        addActionReceiver(manager::actions::AbortCall, [this](auto &&data) {
+            callerIdTimer.reset();
+            switchWindow(window::name_call, std::make_unique<app::CallAbortData>());
+            return actionHandled();
+        });
+        addActionReceiver(manager::actions::ActivateCall, [this](auto &&data) {
+            switchWindow(window::name_call, std::make_unique<app::CallActiveData>());
+            return actionHandled();
+        });
+        addActionReceiver(manager::actions::HandleOutgoingCall, [this](auto &&data) {
+            auto callParams = static_cast<app::manager::actions::CallParams *>(data.get());
+            switchWindow(window::name_call, std::make_unique<app::ExecuteCallData>(callParams->getNumber()));
+            return actionHandled();
+        });
+
+        addActionReceiver(manager::actions::HandleIncomingCall, [this](auto &&data) {
+            if (getState() == call::State::IDLE) {
+                constexpr auto callerIdTimeout = std::chrono::milliseconds{1000};
+                callerIdTimer =
+                    sys::TimerFactory::createSingleShotTimer(this, "CallerIdTimer", callerIdTimeout, [=](sys::Timer &) {
+                        switchWindow(window::name_call,
+                                     std::make_unique<app::IncomingCallData>(utils::PhoneNumber().getView()));
+                    });
+                callerIdTimer.start();
+            }
+            return actionHandled();
+        });
+        addActionReceiver(manager::actions::HandleCallerId, [this](auto &&data) {
+            if (getState() == call::State::IDLE) {
+                if (callerIdTimer.isValid()) {
+                    callerIdTimer.stop();
+                    callerIdTimer.reset();
+                }
+                auto callParams = static_cast<app::manager::actions::CallParams *>(data.get());
+                switchWindow(window::name_call, std::make_unique<app::IncomingCallData>(callParams->getNumber()));
+            }
+            return actionHandled();
+        });
+        addActionReceiver(manager::actions::EndCall, [this](auto &&data) {
+            callerIdTimer.reset();
+            switchWindow(window::name_call, std::make_unique<app::CallAbortData>());
+            return actionHandled();
+        });
     }
 
     bool ApplicationCall::isPopupPermitted(gui::popup::ID popupId) const
@@ -92,53 +135,9 @@ namespace app
         return getState() == call::State::IDLE;
     }
 
-    void ApplicationCall::CallAbortHandler()
-    {
-        manager::Controller::sendAction(this, manager::actions::Call, std::make_unique<app::CallAbortData>());
-    }
-
-    void ApplicationCall::CallActiveHandler()
-    {
-        manager::Controller::sendAction(this, manager::actions::Call, std::make_unique<app::CallActiveData>());
-    }
-
-    void ApplicationCall::CallerIdHandler(const CellularCallerIdMessage *const msg)
-    {
-        if (getState() == call::State::IDLE) {
-            if (callerIdTimer.isValid()) {
-                callerIdTimer.stop();
-                callerIdTimer.reset();
-            }
-            manager::Controller::sendAction(
-                this, manager::actions::Call, std::make_unique<app::IncomingCallData>(msg->number));
-        }
-    }
-
-    void ApplicationCall::IncomingCallHandler(const CellularIncominCallMessage *const msg)
-    {
-        if (getState() == call::State::IDLE) {
-            constexpr auto callerIdTimeout = std::chrono::milliseconds{1000};
-            callerIdTimer =
-                sys::TimerFactory::createSingleShotTimer(this, "CallerIdTimer", callerIdTimeout, [=](sys::Timer &) {
-                    manager::Controller::sendAction(
-                        this,
-                        manager::actions::Call,
-                        std::make_unique<app::IncomingCallData>(utils::PhoneNumber().getView()));
-                });
-            callerIdTimer.start();
-        }
-    }
-
-    void ApplicationCall::RingingHandler(const CellularRingingMessage *const msg)
-    {
-        manager::Controller::sendAction(
-            this, manager::actions::Call, std::make_unique<app::ExecuteCallData>(msg->number));
-    }
-
     // Invoked upon receiving data message
     sys::MessagePointer ApplicationCall::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
     {
-
         auto retMsg = Application::DataReceivedHandler(msgl);
         // if message was handled by application's template there is no need to process further.
         auto response = dynamic_cast<sys::ResponseMessage *>(retMsg.get());
@@ -147,48 +146,7 @@ namespace app
             return retMsg;
         }
 
-        if (auto msg = dynamic_cast<CellularMessage *>(msgl)) {
-            if (msg->type == CellularMessage::Type::Notification) {
-                auto *msg = dynamic_cast<CellularNotificationMessage *>(msgl);
-                assert(msg != nullptr);
-
-                switch (msg->content) {
-                case CellularNotificationMessage::Content::CallAborted: {
-                    callerIdTimer.reset();
-                    CallAbortHandler();
-                } break;
-                case CellularNotificationMessage::Content::CallActive: {
-                    CallActiveHandler();
-                } break;
-                default:
-                    break;
-                }
-
-                return std::make_shared<sys::ResponseMessage>();
-            }
-            else if (msg->type == CellularMessage::Type::Ringing) {
-                auto msg = dynamic_cast<CellularRingingMessage *>(msgl);
-                assert(msg != nullptr);
-                RingingHandler(msg);
-            }
-            else if (msg->type == CellularMessage::Type::IncomingCall) {
-                auto msg = dynamic_cast<CellularIncominCallMessage *>(msgl);
-                assert(msg != nullptr);
-                IncomingCallHandler(msg);
-            }
-            else if (msg->type == CellularMessage::Type::CallerId) {
-                auto msg = dynamic_cast<CellularCallerIdMessage *>(msgl);
-                assert(msg != nullptr);
-                CallerIdHandler(msg);
-            }
-        }
-
-        if (auto msg = dynamic_cast<CellularResponseMessage *>(resp)) {
-            if (msg->cellResponse == CellularMessage::Type::HangupCall) {
-                if (resp->retCode == sys::ReturnCodes::Success) {
-                    CallAbortHandler();
-                }
-            }
+        if (resp != nullptr) {
             return std::make_shared<sys::ResponseMessage>();
         }
 
