@@ -7,15 +7,14 @@
 #include <application-settings-new/widgets/SettingsStyle.hpp>
 #include <source/version.hpp>
 
-static constexpr auto model        = "1.0";
-static constexpr auto serialNumber = "XXXXXXXXXXXXXXX";
-static constexpr auto imei         = "AA-BBBBBB-CCCCCC-D";
-
 namespace gui
 {
-    TechnicalInformationWindow::TechnicalInformationWindow(app::Application *app)
-        : AppWindow(app, gui::window::name::certification)
+
+    TechnicalInformationWindow::TechnicalInformationWindow(
+        app::Application *app, std::unique_ptr<TechnicalWindowContract::Presenter> technicalPresenter)
+        : AppWindow(app, gui::window::name::certification), presenter(std::move(technicalPresenter))
     {
+        presenter->attach(this);
         buildInterface();
     }
 
@@ -25,64 +24,68 @@ namespace gui
 
         setTitle(utils::translate("app_settings_technical_information"));
 
-        modelText  = new gui::Text(this,
-                                  style::techinfo::textmodel::x,
-                                  style::techinfo::textmodel::y,
-                                  style::techinfo::textmodel::width,
-                                  style::techinfo::textmodel::height);
-        modelValue = new gui::Text(this,
-                                   style::techinfo::valuemodel::x,
-                                   style::techinfo::valuemodel::y,
-                                   style::techinfo::valuemodel::width,
-                                   style::techinfo::valuemodel::height);
+        auto vBox = new VBox(this,
+                             style::window::default_left_margin,
+                             style::header::height + style::margins::very_big,
+                             style::window::default_body_width,
+                             style::window::default_body_height);
+        vBox->setEdges(RectangleEdge::None);
 
-        serialNumberText  = new gui::Text(this,
-                                         style::techinfo::textserialnumber::x,
-                                         style::techinfo::textserialnumber::y,
-                                         style::techinfo::textserialnumber::width,
-                                         style::techinfo::textserialnumber::height);
-        serialNumberValue = new gui::Text(this,
-                                          style::techinfo::valueserialnumber::x,
-                                          style::techinfo::valueserialnumber::y,
-                                          style::techinfo::valueserialnumber::width,
-                                          style::techinfo::valueserialnumber::height);
+        modelText = new gui::Text(vBox, 0, 0, style::techinfo::width, style::techinfo::height);
+        modelText->setText(utils::translate("app_settings_tech_info_model"));
+        modelText->setFont(style::window::font::smallbold);
+        modelValue = new gui::Text(vBox, 0, 0, style::techinfo::width, style::techinfo::height);
+        modelValue->setText(presenter->getModel());
 
-        osVersionText  = new gui::Text(this,
-                                      style::techinfo::textosversion::x,
-                                      style::techinfo::textosversion::y,
-                                      style::techinfo::textosversion::width,
-                                      style::techinfo::textosversion::height);
-        osVersionValue = new gui::Text(this,
-                                       style::techinfo::valueosversion::x,
-                                       style::techinfo::valueosversion::y,
-                                       style::techinfo::valueosversion::width,
-                                       style::techinfo::valueosversion::height);
+        serialNumberText = new gui::Text(vBox, 0, 0, style::techinfo::width, style::techinfo::height);
+        serialNumberText->setFont(style::window::font::smallbold);
+        serialNumberText->setText(utils::translate("app_settings_tech_info_serial_number"));
+        serialNumberValue = new gui::Text(vBox, 0, 0, style::techinfo::width, style::techinfo::height);
+        serialNumberValue->setText(presenter->getSerial());
 
-        imeiText  = new gui::Text(this,
-                                 style::techinfo::textimea::x,
-                                 style::techinfo::textimea::y + 10,
-                                 style::techinfo::textimea::width,
-                                 style::techinfo::textimea::height);
-        imeiValue = new gui::Text(this,
-                                  style::techinfo::valueimea::x,
-                                  style::techinfo::valueimea::y + 20,
-                                  style::techinfo::valueimea::width,
-                                  style::techinfo::valueimea::height);
+        osVersionText = new gui::Text(vBox, 0, 0, style::techinfo::width, style::techinfo::height);
+        osVersionText->setFont(style::window::font::smallbold);
+        osVersionText->setText(utils::translate("app_settings_tech_info_os_version"));
+        osVersionValue = new gui::Text(vBox, 0, 0, style::techinfo::width, style::techinfo::height);
+        osVersionValue->setText(std::string(VERSION));
+
+        imeiText = new gui::Text(vBox, 0, 0, style::techinfo::width, style::techinfo::height);
+        imeiText->setFont(style::window::font::smallbold);
+        imeiText->setText(utils::translate("app_settings_tech_info_imei"));
+        imeiValue = new gui::Text(vBox, 0, 0, style::techinfo::width, style::techinfo::height);
+        imeiValue->setText(imei);
+
+        batteryText = new gui::Text(vBox, 0, 0, style::techinfo::width, style::techinfo::height);
+        batteryText->setFont(style::window::font::smallbold);
+        batteryText->setText(utils::translate("app_settings_tech_info_battery"));
+        batteryValue = new gui::Text(vBox, 0, 0, style::techinfo::width, style::techinfo::height);
+        batteryValue->setText(presenter->getBatteryRev());
+
+        pcbMbText = new gui::Text(vBox, 0, 0, style::techinfo::width, style::techinfo::height);
+        pcbMbText->setText(utils::translate("app_settings_tech_info_pcb_mb"));
+        pcbMbText->setFont(style::window::font::smallbold);
+        pcbMbValue = new gui::Text(vBox, 0, 0, style::techinfo::width, style::techinfo::height);
+        pcbMbValue->setText(presenter->getPcb(TechnicalWindowPresenter::PCB_MB));
+
+        pcbLmText = new gui::Text(vBox, 0, 0, style::techinfo::width, style::techinfo::height);
+        pcbLmText->setFont(style::window::font::smallbold);
+        pcbLmText->setText(utils::translate("app_settings_tech_info_pcb_lm"));
+        pcbLmValue = new gui::Text(vBox, 0, 0, style::techinfo::width, style::techinfo::height);
+        pcbLmValue->setText(presenter->getPcb(TechnicalWindowPresenter::PCB_LM));
+
+        pcbAmText = new gui::Text(vBox, 0, 0, style::techinfo::width, style::techinfo::height);
+        pcbAmText->setFont(style::window::font::smallbold);
+        pcbAmText->setText(utils::translate("app_settings_tech_info_pcb_am"));
+        pcbAmValue = new gui::Text(vBox, 0, 0, style::techinfo::width, style::techinfo::height);
+        pcbAmValue->setText(presenter->getPcb(TechnicalWindowPresenter::PCB_AM));
+
+        pcbUmText = new gui::Text(vBox, 0, 0, style::techinfo::width, style::techinfo::height);
+        pcbUmText->setFont(style::window::font::smallbold);
+        pcbUmText->setText(utils::translate("app_settings_tech_info_pcb_um"));
+        pcbUmValue = new gui::Text(vBox, 0, 0, style::techinfo::width, style::techinfo::height);
+        pcbUmValue->setText(presenter->getPcb(TechnicalWindowPresenter::PCB_UM));
 
         bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
-    }
-
-    void TechnicalInformationWindow::onBeforeShow(ShowMode mode, SwitchData *data)
-    {
-        // dummy data for now
-        modelText->setText(utils::translate("app_settings_tech_info_model"));
-        modelValue->setText(model);
-        serialNumberText->setText(utils::translate("app_settings_tech_info_serial_number"));
-        serialNumberValue->setText(serialNumber);
-        osVersionText->setText(utils::translate("app_settings_tech_info_os_version"));
-        osVersionValue->setText(std::string(VERSION));
-        imeiText->setText(utils::translate("app_settings_tech_info_imei"));
-        imeiValue->setText(imei);
     }
 
     void TechnicalInformationWindow::destroyInterface()

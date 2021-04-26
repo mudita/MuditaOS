@@ -163,6 +163,7 @@ namespace app
             virtual auto isFlightMode() const noexcept -> bool     = 0;
             virtual void setFlightMode(bool flightModeOn) noexcept = 0;
         };
+
     }; // namespace settingsInterface
 
     class ApplicationSettingsNew : public app::Application,
