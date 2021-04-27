@@ -505,7 +505,6 @@ namespace app
             return std::make_unique<gui::ConnectionFrequencyWindow>(app, static_cast<ApplicationSettingsNew *>(app));
         });
         attachPopups({gui::popup::ID::Volume,
-                      gui::popup::ID::TetheringPhoneModeChangeProhibited,
                       gui::popup::ID::Tethering,
                       gui::popup::ID::PhoneModes});
     }

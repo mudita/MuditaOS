@@ -11,7 +11,6 @@
 #include "module-sys/Timers/TimerFactory.hpp" // for Timer
 #include "TopBar.hpp"
 #include "TopBar/Time.hpp"
-#include "popups/TetheringConfirmationPopup.hpp"
 #include "Translator.hpp"                // for KeyInputSim...
 #include "common_data/EventStore.hpp"    // for Battery
 #include "common_data/RawKey.hpp"        // for RawKey, key...
@@ -40,9 +39,7 @@
 #include <module-utils/Utils.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
 #include <module-utils/time/DateAndTimeSettings.hpp>
-
 #include <service-audio/AudioServiceAPI.hpp> // for GetOutputVolume
-#include <popups/TetheringPhoneModePopup.hpp>
 #include "popups/data/PopupData.hpp"
 
 namespace gui
@@ -723,37 +720,7 @@ namespace app
 
     void Application::attachPopups(const std::vector<gui::popup::ID> &popupsList)
     {
-        using namespace gui::popup;
-        for (auto popup : popupsList) {
-            switch (popup) {
-            case ID::Volume:
-                windowsFactory.attach(window::volume_window, [](Application *app, const std::string &name) {
-                    return std::make_unique<gui::VolumeWindow>(app, window::volume_window);
-                });
-                break;
-            case ID::Tethering:
-                windowsFactory.attach(window::tethering_confirmation_window,
-                                      [](Application *app, const std::string &name) {
-                                          return std::make_unique<gui::TetheringConfirmationPopup>(
-                                              app, window::tethering_confirmation_window);
-                                      });
-                break;
-            case ID::TetheringPhoneModeChangeProhibited:
-                windowsFactory.attach(window::tethering_phonemode_change_window,
-                                      [](Application *app, const std::string &name) {
-                                          return std::make_unique<gui::TetheringPhoneModePopup>(
-                                              app, window::tethering_phonemode_change_window);
-                                      });
-                break;
-            case ID::PhoneModes:
-                windowsFactory.attach(window::phone_modes_window, [](Application *app, const std::string &name) {
-                    return std::make_unique<gui::HomeModesWindow>(app, window::phone_modes_window);
-                });
-                break;
-            case ID::Brightness:
-                break;
-            }
-        }
+        windowsFactory.attachPopups(popupsList);
     }
 
     void Application::showPopup(gui::popup::ID id, const gui::PopupRequestParams *params)

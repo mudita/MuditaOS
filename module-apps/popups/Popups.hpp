@@ -3,9 +3,6 @@
 
 #pragma once
 
-#include <module-apps/popups/VolumeWindow.hpp>
-#include <module-apps/popups/HomeModesWindow.hpp>
-
 #include <string>
 
 namespace gui

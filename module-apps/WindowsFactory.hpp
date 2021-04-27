@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -7,6 +7,8 @@
 #include <functional>
 #include <map>
 #include <string>
+
+#include <popups/Popups.hpp>
 
 namespace app
 {
@@ -37,6 +39,7 @@ namespace app
         WindowsFactory &operator=(WindowsFactory &&) = delete;
 
         void attach(const std::string &name, builder builder);
+        void attachPopups(const std::vector<gui::popup::ID> &popupsList);
         [[nodiscard]] auto isRegistered(const std::string &name) const -> bool;
         auto build(Application *app, const std::string &name) -> handle;
     };

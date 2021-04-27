@@ -30,7 +30,6 @@
 #include "TopBarManager.hpp"
 #include "WindowsFactory.hpp"
 #include "WindowsStack.hpp"
-#include "popups/Popups.hpp"
 
 namespace app
 {
