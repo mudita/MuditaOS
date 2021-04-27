@@ -130,7 +130,8 @@ namespace gui
         sendSmsIcon                       = new gui::SendSmsIcon(this, sendMessageIcon::x, sendMessageIcon::y);
         sendSmsIcon->focusChangedCallback = [=](gui::Item &item) {
             LOG_DEBUG("Send message get/lost focus");
-            bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(strings::message), false);
+            bottomBar->setText(
+                gui::BottomBar::Side::CENTER, utils::translate(style::strings::common::send), item.focus);
             return true;
         };
         sendSmsIcon->activatedCallback = [=](gui::Item &item) {
