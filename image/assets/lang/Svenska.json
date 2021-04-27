@@ -269,6 +269,7 @@
   "app_call_is_calling": "ringer",
   "app_call_calling": "ringer...",
   "app_call_call_ended": "samtalet avslutat",
+  "app_call_call_rejected": "samtalet avvisad",
   "app_call_contact": "KONTAKT",
   "app_call_mute": "MUTE",
   "app_call_muted": "MIC. AV",
