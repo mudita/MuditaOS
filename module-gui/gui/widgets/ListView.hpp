@@ -194,7 +194,7 @@ namespace gui
         // virtual methods from Item
         bool onInput(const InputEvent &inputEvent) override;
         bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
-        auto handleRequestResize(const Item *, unsigned short request_w, unsigned short request_h) -> Size override;
+        auto handleRequestResize(const Item *, Length request_w, Length request_h) -> Size override;
     };
 
 } /* namespace gui */

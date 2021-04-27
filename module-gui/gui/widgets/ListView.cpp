@@ -634,9 +634,7 @@ namespace gui
         return true;
     }
 
-    auto ListView::handleRequestResize([[maybe_unused]] const Item *child,
-                                       unsigned short request_w,
-                                       unsigned short request_h) -> Size
+    auto ListView::handleRequestResize([[maybe_unused]] const Item *child, Length request_w, Length request_h) -> Size
     {
 
         return Size(request_w, request_h);

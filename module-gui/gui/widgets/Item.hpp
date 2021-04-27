@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "Alignment.hpp"        // for Alignment
-#include "Axes.hpp"             // for Axis
+#include "Alignment.hpp" // for Alignment
+#include "Axes.hpp"      // for Axis
 #include <module-gui/gui/Common.hpp>
 #include "Layout.hpp"           // for LayoutHorizontalPolicy, LayoutVertic...
 #include "Margins.hpp"          // for Padding, Margins
@@ -231,8 +231,8 @@ namespace gui
         /// sets position of element - this is sets area().x and area().y of item
         /// @note calls onDimensionChanged callback & updateDrawArea for item
         /// @attention should be bind to area
-        virtual void setPosition(const short &x, const short &y);
-        virtual void setPosition(const short &val, Axis axis);
+        virtual void setPosition(const Position &x, const Position &y);
+        virtual void setPosition(const Position &val, Axis axis);
         [[nodiscard]] uint16_t getSize(Axis axis) const;
         [[nodiscard]] uint16_t getPosition(Axis axis) const;
         virtual void setMargins(const Margins &value);
@@ -268,7 +268,7 @@ namespace gui
         /// requests bigger size from parent if parent available
         /// if no parent available - sets size
         /// @return true if handled positively
-        virtual auto requestSize(unsigned short request_w, unsigned short request_h) -> Size final;
+        virtual auto requestSize(Length request_w, Length request_h) -> Size final;
         /// handle for layouts to implement to resize on demand ( i.e. when it needs to expand after
         /// addition/removal of chars )
         ///
@@ -282,7 +282,7 @@ namespace gui
         /// should be handled without infinite loop on resize ( item->setSize -> notify Layout -> layout: item->setSize
         /// )
         /// @return bool requested size granted {w,h}
-        virtual auto handleRequestResize(const Item *, unsigned short request_w, unsigned short request_h) -> Size;
+        virtual auto handleRequestResize(const Item *, Length request_w, Length request_h) -> Size;
 
         virtual void setSize(const unsigned short w, const unsigned short h);
         void setSize(uint32_t val, Axis axis);
@@ -301,7 +301,7 @@ namespace gui
         /// pre hook function, if set it is executed before building draw command
         /// at Item::buildDrawListImplementation()
         /// @param `commandlist` : commands list of commands for renderer to draw elements on screen
-        std::function<void(std::list<Command> &)> preBuildDrawListHook  = nullptr;
+        std::function<void(std::list<Command> &)> preBuildDrawListHook = nullptr;
         /// post hook function, if set it is executed after building draw command
         /// at Item::buildDrawListImplementation()
         /// @param `commandlist` : commands list of commands for renderer to draw elements on screen
@@ -333,13 +333,13 @@ namespace gui
         /// all these elements should be checked for naming/use consistency
         /// possibly all of that should be handled via area() (and area should have callback pinned from Item on resize
         /// @{
-        void setX(const int32_t x);
-        void setY(const int32_t y);
-        [[nodiscard]] int32_t getX() const
+        void setX(const gui::Position x);
+        void setY(const gui::Position y);
+        [[nodiscard]] gui::Position getX() const
         {
             return (widgetArea.x);
         }
-        [[nodiscard]] int32_t getY() const
+        [[nodiscard]] gui::Position getY() const
         {
             return (widgetArea.y);
         }
@@ -353,13 +353,13 @@ namespace gui
         }
         /// helper function to show where widget ends in x axis
         /// @return item ends position in X axis
-        [[nodiscard]] int32_t offset_w() const
+        [[nodiscard]] gui::Position offset_w() const
         {
             return getWidth() + widgetArea.x;
         }
         /// helper function to show where widget ends in y axis
         /// @return item ends position in Y axis
-        [[nodiscard]] int32_t offset_h() const
+        [[nodiscard]] gui::Position offset_h() const
         {
             return getHeight() + widgetArea.y;
         }
