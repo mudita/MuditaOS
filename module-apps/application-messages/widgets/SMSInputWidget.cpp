@@ -30,7 +30,7 @@ namespace gui
         body->setMaximumSize(style::window::default_body_width, style::messages::smsInput::max_input_h);
 
         deleteByList = false;
-        inputText = new gui::Text(body, 0, 0, 0, 0, "", ExpandMode::Up);
+        inputText    = new gui::Text(body, 0, 0, 0, 0, "", ExpandMode::Up);
         inputText->setMaximumSize(style::messages::smsInput::default_input_w, style::messages::smsInput::max_input_h);
         inputText->setMinimumSize(style::messages::smsInput::default_input_w,
                                   style::messages::smsInput::default_input_h);
@@ -166,9 +166,8 @@ namespace gui
         }
     }
 
-    auto SMSInputWidget::handleRequestResize([[maybe_unused]] const Item *child,
-                                             unsigned short request_w,
-                                             unsigned short request_h) -> Size
+    auto SMSInputWidget::handleRequestResize([[maybe_unused]] const Item *child, Length request_w, Length request_h)
+        -> Size
     {
         request_h =
             std::clamp((Length)request_h, style::messages::smsInput::min_h, style::messages::smsInput::max_input_h);

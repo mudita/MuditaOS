@@ -86,9 +86,8 @@ namespace gui
         onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { multilineText->setText(contact->note); };
     }
 
-    auto OutputLinesTextWithLabelWidget::handleRequestResize(const Item *child,
-                                                             unsigned short request_w,
-                                                             unsigned short request_h) -> Size
+    auto OutputLinesTextWithLabelWidget::handleRequestResize(const Item *child, Length request_w, Length request_h)
+        -> Size
     {
         setMinimumHeight(phonebookStyle::outputLinesTextWithLabelWidget::title_label_h +
                          phonebookStyle::outputLinesTextWithLabelWidget::span_size + request_h);

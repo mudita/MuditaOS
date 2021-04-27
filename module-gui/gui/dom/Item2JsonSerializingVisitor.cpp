@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Item2JsonSerializingVisitor.hpp"
@@ -104,7 +104,7 @@ void Item2JsonSerializingVisitor::visit(gui::ListItem &item)
 
 auto Item2JsonSerializingVisitor::serialize(gui::BoundingBox &box) -> json11::Json::array
 {
-    return {box.x, box.y, box.w, box.h};
+    return {static_cast<int>(box.x), static_cast<int>(box.y), static_cast<int>(box.w), static_cast<int>(box.h)};
 }
 
 auto Item2JsonSerializingVisitor::serialize(gui::Color &color) -> json11::Json::array
