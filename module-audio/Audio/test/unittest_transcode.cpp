@@ -13,6 +13,8 @@
 #include <Audio/transcode/Transform.hpp>
 #include <Audio/transcode/MonoToStereo.hpp>
 #include <Audio/transcode/TransformComposite.hpp>
+#include <Audio/transcode/BasicInterpolator.hpp>
+#include <Audio/transcode/BasicDecimator.hpp>
 
 #include <cstdlib>
 
@@ -263,4 +265,65 @@ TEST(Transform, Composite)
     EXPECT_EQ(outputFormat, audio::AudioFormat(44100, 16, 2));
     auto outputBlockSize = composite.transformBlockSize(sizeof(inputBuffer));
     EXPECT_EQ(outputBlockSize, 2 * sizeof(inputBuffer));
+}
+
+TEST(Transform, BasicInterpolator)
+{
+    audio::transcode::BasicInterpolator<std::uint16_t, 2, 2> interp2;
+    audio::transcode::BasicInterpolator<std::uint32_t, 1, 3> interp3;
+
+    EXPECT_EQ(interp2.transformBlockSize(128), 256);
+    EXPECT_EQ(interp3.transformBlockSize(100), 300);
+
+    auto format        = audio::AudioFormat{8000, 16, 2};
+    auto outputFormat2 = interp2.transformFormat(format);
+    auto outputFormat3 = interp3.transformFormat(format);
+
+    EXPECT_EQ(outputFormat2.getSampleRate(), 16000);
+    EXPECT_EQ(outputFormat3.getSampleRate(), 24000);
+
+    EXPECT_EQ(outputFormat2.getBitWidth(), 16);
+    EXPECT_EQ(outputFormat3.getBitWidth(), 16);
+
+    EXPECT_EQ(outputFormat2.getChannels(), 2);
+    EXPECT_EQ(outputFormat3.getChannels(), 2);
+
+    EXPECT_TRUE(interp2.validateInputFormat(format));
+    EXPECT_FALSE(interp3.validateInputFormat(format));
+
+    std::uint16_t inputBuffer[8]          = {1, 2, 3, 4, 0, 0, 0, 0};
+    static const uint16_t expectBuffer[8] = {1, 2, 1, 2, 3, 4, 3, 4};
+    auto inputSpan  = ::audio::AbstractStream::Span{.data     = reinterpret_cast<uint8_t *>(inputBuffer),
+                                                   .dataSize = 4 * sizeof(std::uint16_t)};
+    auto outputSpan = interp2.transform(inputSpan, inputSpan);
+
+    EXPECT_EQ(outputSpan.dataSize, sizeof(uint16_t) * 8);
+    EXPECT_EQ(memcmp(outputSpan.data, expectBuffer, outputSpan.dataSize), 0);
+}
+
+TEST(Transform, BasicDecimator)
+{
+    audio::transcode::BasicDecimator<std::uint16_t, 2, 2> decim2;
+
+    EXPECT_EQ(decim2.transformBlockSize(128), 64);
+
+    auto format        = audio::AudioFormat{16000, 16, 2};
+    auto outputFormat2 = decim2.transformFormat(format);
+
+    EXPECT_EQ(outputFormat2.getSampleRate(), 8000);
+    EXPECT_EQ(outputFormat2.getBitWidth(), 16);
+    EXPECT_EQ(outputFormat2.getChannels(), 2);
+
+    auto invalidFormat = audio::AudioFormat{16000, 8, 2};
+    EXPECT_TRUE(decim2.validateInputFormat(format));
+    EXPECT_FALSE(decim2.validateInputFormat(invalidFormat));
+
+    std::uint16_t inputBuffer[8]          = {1, 2, 1, 2, 3, 4, 3, 4};
+    static const uint16_t expectBuffer[8] = {1, 2, 3, 4, 0, 0, 0, 0};
+    auto inputSpan  = ::audio::AbstractStream::Span{.data     = reinterpret_cast<uint8_t *>(inputBuffer),
+                                                   .dataSize = 8 * sizeof(std::uint16_t)};
+    auto outputSpan = decim2.transform(inputSpan, inputSpan);
+
+    EXPECT_EQ(outputSpan.dataSize, sizeof(uint16_t) * 4);
+    EXPECT_EQ(memcmp(outputSpan.data, expectBuffer, outputSpan.dataSize), 0);
 }
