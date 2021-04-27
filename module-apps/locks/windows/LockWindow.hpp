@@ -7,9 +7,9 @@
 #include "RichTextParser.hpp"
 #include "Text.hpp"
 
-namespace gui
+namespace locks
 {
-    class PinLock;
+    class Lock;
 }
 
 namespace gui
@@ -50,11 +50,11 @@ namespace gui
                      text::RichTextParser::TokenMap tokens = text::RichTextParser::TokenMap{});
         void setTitleBar(bool isVisible);
 
-        std::unique_ptr<PinLock> lock = nullptr;
-        gui::HBox *pinLabelsBox       = nullptr;
-        gui::Text *primaryText        = nullptr;
-        gui::Text *secondaryText      = nullptr;
-        gui::Text *title              = nullptr;
+        std::unique_ptr<locks::Lock> lock = nullptr;
+        gui::HBox *pinLabelsBox          = nullptr;
+        gui::Text *primaryText           = nullptr;
+        gui::Text *secondaryText         = nullptr;
+        gui::Text *title                 = nullptr;
 
       protected:
         virtual void buildBottomBar();

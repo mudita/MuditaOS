@@ -9,7 +9,8 @@
 #include "RichTextParser.hpp"
 #include "FontManager.hpp"
 
-#include "application-desktop/data/AppDesktopStyle.hpp"
+#include "application-desktop/data/DesktopStyle.hpp"
+#include "locks/data/LockStyle.hpp"
 #include "Names.hpp"
 
 #include <application-phonebook/ApplicationPhonebook.hpp>

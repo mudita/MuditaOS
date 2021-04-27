@@ -42,7 +42,7 @@
 #include <module-utils/time/DateAndTimeSettings.hpp>
 
 #include <service-audio/AudioServiceAPI.hpp> // for GetOutputVolume
-#include <TetheringPhoneModePopup.hpp>
+#include <popups/TetheringPhoneModePopup.hpp>
 #include "popups/data/PopupData.hpp"
 
 namespace gui

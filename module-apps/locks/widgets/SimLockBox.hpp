@@ -1,9 +1,9 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include "PinLockBox.hpp"
+#include "LockBox.hpp"
 
 namespace gui
 {
@@ -12,7 +12,7 @@ namespace gui
 
 namespace gui
 {
-    class SimLockBox : public PinLockBox
+    class SimLockBox : public LockBox
     {
       public:
         SimLockBox(PinLockBaseWindow *LockBaseWindow) : LockWindow(LockBaseWindow)
@@ -24,12 +24,12 @@ namespace gui
         void putChar(unsigned int charNum) final;
         void clear() final;
 
-        void setVisibleStateEnterPin(EnterPasscodeType type) final;
-        void setVisibleStateInvalidPin(PasscodeErrorType type, unsigned int value) final;
+        void setVisibleStateInputRequired(InputActionType type) final;
+        void setVisibleStateInputInvalid(InputErrorType type, unsigned int value) final;
         void setVisibleStateBlocked() final;
 
-        void buildLockBox(unsigned int pinSize) final;
-        void buildPinLabels(unsigned int pinSize);
-        void rebuildPinLabels(unsigned int pinSize);
+        void buildLockBox(unsigned int inputSize) final;
+        void buildInputLabels(unsigned int inputSize);
+        void rebuildInputLabels(unsigned int inputSize);
     };
 } // namespace gui

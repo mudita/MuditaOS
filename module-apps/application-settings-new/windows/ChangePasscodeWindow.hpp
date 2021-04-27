@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "application-desktop/windows/LockWindow.hpp"
-#include "application-desktop/windows/ScreenLockBaseBox.hpp"
+#include "locks/windows/LockWindow.hpp"
+#include "locks/widgets/PhoneLockBaseBox.hpp"
 #include "application-settings-new/data/ChangePasscodeData.hpp"
 #include "application-settings-new/widgets/ChangePasscodeLockHandler.hpp"
 
@@ -28,9 +28,9 @@ namespace gui
         virtual void setVisibleState();
 
         ChangePasscodeAction changePasscodeAction;
-        std::unique_ptr<ScreenLockBaseBox> lockBox = nullptr;
+        std::unique_ptr<PhoneLockBaseBox> lockBox  = nullptr;
         gui::Image *lockImage                      = nullptr;
-        PinLock::LockState lockState{PinLock::LockState::PasscodeRequired};
+        Lock::LockState lockState{Lock::LockState::InputRequired};
         ChangePasscodeLockHandler lockHandler;
 
         std::string textForEnterCurrentPassword = "app_settings_security_type_current_passcode";
