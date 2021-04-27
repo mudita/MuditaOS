@@ -1,12 +1,13 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include <vector>
-#include "AppWindow.hpp"
+#include <AppWindow.hpp>
 #include <Text.hpp>
-#include "../presenter/PowerOffPresenter.hpp"
+#include <popups/presenter/PowerOffPresenter.hpp>
+
+#include <vector>
 
 namespace gui
 {

@@ -3,21 +3,10 @@
 
 #include "PostUpdateWindow.hpp"
 
-#include "service-appmgr/Controller.hpp"
-#include "gui/widgets/BottomBar.hpp"
-#include "gui/widgets/TopBar.hpp"
-#include "FontManager.hpp"
-
-#include <module-gui/gui/widgets/BottomBar.hpp>
-#include <module-gui/gui/widgets/TopBar.hpp>
-#include <module-gui/gui/core/FontManager.hpp>
-
-#include <module-apps/application-desktop/data/DesktopStyle.hpp>
-#include <module-apps/application-desktop/data/DesktopData.hpp>
 #include <locks/data/LockStyle.hpp>
-#include <module-apps/application-desktop/windows/Names.hpp>
+#include <application-desktop/data/DesktopData.hpp>
+#include <application-desktop/windows/Names.hpp>
 
-#include <application-phonebook/ApplicationPhonebook.hpp>
 #include <i18n/i18n.hpp>
 
 using namespace gui;

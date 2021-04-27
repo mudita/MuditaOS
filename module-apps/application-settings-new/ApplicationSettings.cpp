@@ -77,10 +77,10 @@
 #include <module-services/service-evtmgr/service-evtmgr/EVMessages.hpp>
 #include <module-services/service-appmgr/service-appmgr/messages/Message.hpp>
 #include <module-services/service-appmgr/service-appmgr/model/ApplicationManager.hpp>
-#include <locks/windows/PinLockWindow.hpp>
 #include <module-apps/application-desktop/windows/Names.hpp>
 #include <module-apps/messages/DialogMetadataMessage.hpp>
 #include <module-apps/windows/Dialog.hpp>
+#include <locks/windows/PinLockWindow.hpp>
 
 #include <i18n/i18n.hpp>
 
@@ -504,10 +504,8 @@ namespace app
         windowsFactory.attach(gui::window::name::connection_frequency, [](Application *app, const std::string &name) {
             return std::make_unique<gui::ConnectionFrequencyWindow>(app, static_cast<ApplicationSettingsNew *>(app));
         });
-        attachPopups({gui::popup::ID::Volume,
-                      gui::popup::ID::TetheringPhoneModeChangeProhibited,
-                      gui::popup::ID::Tethering,
-                      gui::popup::ID::PhoneModes});
+        attachPopups(
+            {gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes, gui::popup::ID::PhoneLock});
     }
 
     void ApplicationSettingsNew::destroyUserInterface()

@@ -3,27 +3,17 @@
 
 #include <memory>
 
-#include "Alignment.hpp"
-#include "BottomBar.hpp"
 #include "DesktopMainWindow.hpp"
-#include "GuiTimer.hpp"
-#include "application-desktop/ApplicationDesktop.hpp"
-#include "locks/data/LockData.hpp"
-#include "application-desktop/data/DesktopStyle.hpp"
-#include "application-desktop/data/DesktopData.hpp"
-#include "application-messages/ApplicationMessages.hpp"
-#include "gui/widgets/Image.hpp"
+#include <application-desktop/ApplicationDesktop.hpp>
+#include <application-desktop/data/DesktopStyle.hpp>
+#include <application-desktop/data/DesktopData.hpp>
+#include <application-call/data/CallSwitchData.hpp>
+
 #include <service-appmgr/Controller.hpp>
 #include <service-time/ServiceTime.hpp>
 #include <service-time/TimeMessage.hpp>
 
-#include <i18n/i18n.hpp>
-#include "log/log.hpp"
-
-#include <application-settings/ApplicationSettings.hpp>
-#include <cassert>
-#include <time/time_conversion.hpp>
-#include <module-apps/application-call/data/CallSwitchData.hpp>
+#include <log/log.hpp>
 
 namespace gui
 {
@@ -87,9 +77,6 @@ namespace gui
 
     top_bar::Configuration DesktopMainWindow::configureTopBar(top_bar::Configuration appConfiguration)
     {
-        auto app            = getAppDesktop();
-        const auto isLocked = app->lockHandler.isScreenLocked();
-        appConfiguration.setIndicator(top_bar::Indicator::Lock, isLocked);
         appConfiguration.disable(top_bar::Indicator::NetworkAccessTechnology);
         appConfiguration.enable(top_bar::Indicator::PhoneMode);
         return appConfiguration;
@@ -115,37 +102,23 @@ namespace gui
 
     void DesktopMainWindow::setVisibleState()
     {
-        applyToTopBar(
-            [this](top_bar::Configuration configuration) { return configureTopBar(std::move(configuration)); });
-        if (auto app = getAppDesktop(); app->lockHandler.isScreenLocked()) {
-            bottomBar->setText(BottomBar::Side::CENTER, utils::translate("app_desktop_unlock"));
-            bottomBar->setActive(BottomBar::Side::RIGHT, false);
-            bottomBar->setText(
-                BottomBar::Side::LEFT, utils::translate("app_desktop_emergency"), app->lockHandler.isScreenBlocked());
+        auto app = getAppDesktop();
 
-            inputCallback = nullptr;
-            setFocusItem(nullptr);
+        setActiveState();
 
-            application->bus.sendUnicast(std::make_shared<TimersProcessingStopMessage>(), service::name::service_time);
+        if (osUpdateVer == osCurrentVer && osUpdateVer != updateos::initSysVer &&
+            osCurrentVer != updateos::initSysVer) {
+            auto data = std::make_unique<CurrentOsVersion>();
+            data->setData(osCurrentVer);
+            application->switchWindow(app::window::name::desktop_post_update_window, std::move(data));
+            getAppDesktop()->setOsUpdateVersion(updateos::initSysVer);
         }
-        else {
-            setActiveState();
 
-            if (osUpdateVer == osCurrentVer && osUpdateVer != updateos::initSysVer &&
-                osCurrentVer != updateos::initSysVer) {
-                auto data = std::make_unique<CurrentOsVersion>();
-                data->setData(osCurrentVer);
-                application->switchWindow(app::window::name::desktop_post_update_window, std::move(data));
-                getAppDesktop()->setOsUpdateVersion(updateos::initSysVer);
-            }
-
-            if (app->need_sim_select && Store::GSM::get()->sim == Store::GSM::SIM::SIM_UNKNOWN) {
-                app::manager::Controller::sendAction(application, app::manager::actions::SelectSimCard);
-            }
-
-            application->bus.sendUnicast(std::make_shared<TimersProcessingStartMessage>(), service::name::service_time);
+        if (app->need_sim_select && Store::GSM::get()->sim == Store::GSM::SIM::SIM_UNKNOWN) {
+            app::manager::Controller::sendAction(application, app::manager::actions::SelectSimCard);
         }
-        application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+
+        application->bus.sendUnicast(std::make_shared<TimersProcessingStartMessage>(), service::name::service_time);
     }
 
     void DesktopMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
@@ -154,25 +127,16 @@ namespace gui
         setVisibleState();
     }
 
-    bool DesktopMainWindow::processLongPressEvent(const InputEvent &inputEvent)
+    bool DesktopMainWindow::processLongReleaseEvent(const InputEvent &inputEvent)
     {
-        auto app = getAppDesktop();
-
-        if (!app->lockHandler.isScreenLocked()) {
-            if (inputEvent.is(KeyCode::KEY_PND)) {
-                app->lockHandler.lockScreen();
-                setVisibleState();
-                return true;
-            }
-            // long press of '0' key is translated to '+'
-            else if (inputEvent.is(KeyCode::KEY_0)) {
-                return app::manager::Controller::sendAction(
-                    application, app::manager::actions::Dial, std::make_unique<app::EnterNumberData>("+"));
-            }
+        // long press of '0' key is translated to '+'
+        if (inputEvent.is(KeyCode::KEY_0)) {
+            return app::manager::Controller::sendAction(
+                application, app::manager::actions::Dial, std::make_unique<app::EnterNumberData>("+"));
         }
 
         if (inputEvent.is(KeyCode::KEY_RF)) {
-            application->switchWindow(app::window::name::desktop_poweroff);
+            application->switchWindow(popup::window::power_off_window);
             return true;
         }
         // check if any of the lower inheritance onInput methods catch the event
@@ -185,7 +149,7 @@ namespace gui
         constexpr auto pageLastNotificationIdx  = style::notifications::model::maxNotificationsPerPage - 1;
     } // namespace
 
-    bool DesktopMainWindow::processShortPressEventOnUnlocked(const InputEvent &inputEvent)
+    bool DesktopMainWindow::processShortReleaseEvent(const InputEvent &inputEvent)
     {
         auto code = translator.handle(inputEvent.getRawKey(), InputMode({InputMode::phone}).get());
         // if numeric key was pressed record that key and send it to call application
@@ -220,45 +184,13 @@ namespace gui
         return false;
     }
 
-    bool DesktopMainWindow::processShortPressEventOnLocked(const InputEvent &inputEvent)
-    {
-        // if enter was pressed
-        if (enter_cache.cached() && inputEvent.is(KeyCode::KEY_PND)) {
-            // if interval between enter and pnd keys is less than time defined for unlocking
-            // display pin lock screen or simply refresh current window to update labels
-
-            getAppDesktop()->lockHandler.unlockScreen();
-            return true;
-        }
-        else if (inputEvent.is(KeyCode::KEY_LF) && bottomBar->isActive(BottomBar::Side::LEFT)) {
-            app::manager::Controller::sendAction(application, app::manager::actions::ShowEmergencyContacts);
-            return true;
-        }
-        else if (enter_cache.storeEnter(inputEvent)) {
-            return true;
-        }
-        // check if any of the lower inheritance onInput methods catch the event
-        else if (AppWindow::onInput(inputEvent)) {
-            return true;
-        }
-        application->switchWindow(app::window::name::desktop_locked);
-        return true;
-    }
-
     bool DesktopMainWindow::onInput(const InputEvent &inputEvent)
     {
-        auto *app = getAppDesktop();
-
         if (inputEvent.isLongRelease()) {
-            return processLongPressEvent(inputEvent);
+            return processLongReleaseEvent(inputEvent);
         }
         else if (inputEvent.isShortRelease()) {
-            if (app->lockHandler.isScreenLocked()) {
-                return processShortPressEventOnLocked(inputEvent);
-            }
-            else {
-                return processShortPressEventOnUnlocked(inputEvent);
-            }
+            return processShortReleaseEvent(inputEvent);
         }
         return AppWindow::onInput(inputEvent);
     }

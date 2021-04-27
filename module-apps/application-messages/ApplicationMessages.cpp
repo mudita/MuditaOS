@@ -163,10 +163,8 @@ namespace app
             return std::make_unique<gui::SearchResults>(app);
         });
 
-        attachPopups({gui::popup::ID::Volume,
-                      gui::popup::ID::Tethering,
-                      gui::popup::ID::TetheringPhoneModeChangeProhibited,
-                      gui::popup::ID::PhoneModes});
+        attachPopups(
+            {gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes, gui::popup::ID::PhoneLock});
     }
 
     void ApplicationMessages::destroyUserInterface()
