@@ -39,6 +39,7 @@ namespace message::bluetooth
     class RequestStatus;
     class SetStatus;
     class Unpair;
+    class RequestDeviceName;
     class SetDeviceName;
     class Connect;
     class ConnectResult;
@@ -84,6 +85,7 @@ class ServiceBluetooth : public sys::Service
     [[nodiscard]] auto handle(message::bluetooth::SetStatus *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(BluetoothPairMessage *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(message::bluetooth::Unpair *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(message::bluetooth::RequestDeviceName *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(message::bluetooth::SetDeviceName *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(message::bluetooth::Connect *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(message::bluetooth::ConnectResult *msg) -> std::shared_ptr<sys::Message>;
