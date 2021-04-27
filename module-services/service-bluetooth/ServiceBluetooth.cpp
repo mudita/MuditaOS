@@ -13,6 +13,7 @@
 #include "service-bluetooth/messages/AudioVolume.hpp"
 #include "service-bluetooth/messages/AudioRouting.hpp"
 #include "service-bluetooth/messages/Connect.hpp"
+#include <service-bluetooth/messages/DeviceName.hpp>
 #include "service-bluetooth/messages/Disconnect.hpp"
 #include "service-bluetooth/messages/Status.hpp"
 #include "service-bluetooth/messages/SetStatus.hpp"
@@ -85,6 +86,7 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
     connectHandler<message::bluetooth::Disconnect>();
     connectHandler<message::bluetooth::DisconnectResult>();
     connectHandler<message::bluetooth::RequestBondedDevices>();
+    connectHandler<message::bluetooth::RequestDeviceName>();
     connectHandler<message::bluetooth::RequestStatus>();
     connectHandler<message::bluetooth::SetDeviceName>();
     connectHandler<message::bluetooth::SetStatus>();
@@ -194,6 +196,15 @@ auto ServiceBluetooth::handle(message::bluetooth::Unpair *msg) -> std::shared_pt
     sscanf_bd_addr(addrString.c_str(), addr);
     sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::Unpair, addr));
     return sys::MessageNone{};
+}
+
+auto ServiceBluetooth::handle([[maybe_unused]] message::bluetooth::RequestDeviceName *msg)
+    -> std::shared_ptr<sys::Message>
+{
+    auto deviceNameString =
+        std::visit(bluetooth::StringVisitor(), this->settingsHolder->getValue(bluetooth::Settings::DeviceName));
+
+    return std::make_shared<message::bluetooth::ResponseDeviceName>(std::move(deviceNameString));
 }
 
 auto ServiceBluetooth::handle(message::bluetooth::SetDeviceName *msg) -> std::shared_ptr<sys::Message>
