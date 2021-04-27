@@ -272,12 +272,6 @@ bool CellularServiceAPI::ChangeSimPin(sys::Service *serv,
                                  ServiceCellular::serviceName);
 }
 
-bool CellularServiceAPI::RequestSimCardPinLockState(sys::Service *serv)
-{
-    return serv->bus.sendUnicast(std::make_shared<CellularSimCardPinLockStateRequestDataMessage>(),
-                                 ServiceCellular::serviceName);
-}
-
 bool CellularServiceAPI::SetSimCardLock(sys::Service *serv,
                                         Store::GSM::SIM sim,
                                         cellular::api::SimCardLock lock,

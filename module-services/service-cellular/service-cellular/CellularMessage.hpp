@@ -571,24 +571,6 @@ class CellularSimNewPinDataMessage : public CellularSimDataMessage
     }
 };
 
-class CellularSimCardPinLockStateRequestDataMessage : public sys::DataMessage
-{};
-
-class CellularSimCardPinLockStateResponseDataMessage : public sys::DataMessage
-{
-  public:
-    explicit CellularSimCardPinLockStateResponseDataMessage(bool state) : simCardPinLockState(state)
-    {}
-
-    [[nodiscard]] bool getSimCardPinLockState() const noexcept
-    {
-        return simCardPinLockState;
-    }
-
-  private:
-    const bool simCardPinLockState;
-};
-
 class CellularSimCardLockDataMessage : public CellularSimDataMessage
 {
 

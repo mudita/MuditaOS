@@ -272,13 +272,11 @@ namespace app
             return sys::MessageNone{};
         });
 
-        connect(typeid(CellularSimCardPinLockStateResponseDataMessage), [&](sys::Message *msg) {
-            auto simCardPinLockState = dynamic_cast<CellularSimCardPinLockStateResponseDataMessage *>(msg);
-            if (simCardPinLockState != nullptr) {
-                auto pinSettingsLockStateData =
-                    std::make_unique<gui::PINSettingsLockStateData>(simCardPinLockState->getSimCardPinLockState());
-                updateWindow(gui::window::name::pin_settings, std::move(pinSettingsLockStateData));
-            }
+        connect(typeid(cellular::msg::request::sim::GetLockState::Response), [&](sys::Message *msg) {
+            auto simCardPinLockState = static_cast<cellular::msg::request::sim::GetLockState::Response *>(msg);
+            auto pinSettingsLockStateData =
+                std::make_unique<gui::PINSettingsLockStateData>(simCardPinLockState->locked);
+            updateWindow(gui::window::name::pin_settings, std::move(pinSettingsLockStateData));
             return sys::MessageNone{};
         });
 

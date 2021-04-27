@@ -5,6 +5,11 @@
 
 namespace cellular
 {
+    namespace service
+    {
+        constexpr const char *name = "ServiceCellular";
+    }
+
     namespace api
     {
         enum class CallMode

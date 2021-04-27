@@ -96,7 +96,6 @@ namespace CellularServiceAPI
                       Store::GSM::SIM sim,
                       const std::vector<unsigned int> &passcode,
                       const std::vector<unsigned int> &pin);
-    bool RequestSimCardPinLockState(sys::Service *serv);
     bool SetSimCardLock(sys::Service *serv,
                         Store::GSM::SIM sim,
                         cellular::api::SimCardLock lock,

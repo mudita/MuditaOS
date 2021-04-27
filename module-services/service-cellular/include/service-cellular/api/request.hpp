@@ -7,8 +7,29 @@
 
 #include <service-cellular/api/common.hpp>
 
-namespace cellular
+namespace cellular::msg
 {
-    namespace msg::request
-    {}
-} // namespace cellular
+    struct Request : public sys::DataMessage
+    {
+        static constexpr const char *target = cellular::service::name;
+    };
+    struct Response : public sys::DataMessage
+    {};
+
+    namespace request
+    {
+        namespace sim
+        {
+            struct GetLockState : public cellular::msg::Request
+            {
+                struct Response : public cellular::msg::Response
+                {
+                    Response(bool locked) : locked(locked)
+                    {}
+                    bool locked;
+                };
+            };
+        } // namespace sim
+
+    } // namespace request
+} // namespace cellular::msg

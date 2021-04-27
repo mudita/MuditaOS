@@ -99,11 +99,12 @@
 #include <service-cellular/api/request.hpp>
 #include "utils.hpp"
 
-const char *ServiceCellular::serviceName = "ServiceCellular";
+const char *ServiceCellular::serviceName = cellular::service::name;
 
 inline constexpr auto cellularStack = 8000;
 
 using namespace cellular;
+using namespace cellular::msg;
 using cellular::service::State;
 
 ServiceCellular::ServiceCellular()
@@ -285,9 +286,9 @@ void ServiceCellular::registerMessageHandlers()
                                                                     : PassthroughState::DISABLED);
     });
 
-    connect(typeid(CellularSimCardPinLockStateRequestDataMessage),
+    connect(typeid(request::sim::GetLockState),
             [&](sys::Message * /*request*/) -> sys::MessagePointer {
-                return std::make_shared<CellularSimCardPinLockStateResponseDataMessage>(isPinLocked());
+                return std::make_shared<request::sim::GetLockState::Response>(isPinLocked());
             });
 
     connect(typeid(CellularSimNewPinDataMessage), [&](sys::Message *request) -> sys::MessagePointer {
@@ -385,7 +386,7 @@ void ServiceCellular::registerMessageHandlers()
     });
 
     connect(typeid(CellularPowerStateChange), [&](sys::Message *request) -> sys::MessagePointer {
-        auto msg       = static_cast<CellularPowerStateChange *>(request);
+        auto msg             = static_cast<CellularPowerStateChange *>(request);
         priv->nextPowerState = msg->getNewState();
         handle_power_state_change();
         return sys::MessageNone{};
