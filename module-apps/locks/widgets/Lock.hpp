@@ -17,6 +17,8 @@ namespace gui
 
 namespace locks
 {
+    class PhoneLockHandler;
+
     class Lock
     {
       public:
@@ -139,6 +141,7 @@ namespace locks
             maxInputSize = _maxInputSize;
         }
 
+        friend class PhoneLockHandler;
         friend class gui::PinLockHandler;
         friend class gui::ChangePasscodeLockHandler;
     };

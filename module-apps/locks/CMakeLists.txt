@@ -15,6 +15,8 @@ target_sources( ${PROJECT_NAME}
 
 	PRIVATE
 		"${CMAKE_CURRENT_LIST_DIR}/handlers/PinLockHandler.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/handlers/PhoneLockHandler.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/handlers/PhoneLockSubject.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/LockWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/PinLockBaseWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/PinLockWindow.cpp"
@@ -27,7 +29,10 @@ target_sources( ${PROJECT_NAME}
 	PRIVATE
 		"${CMAKE_CURRENT_LIST_DIR}/data/LockData.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/data/LockStyle.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/data/LockMessages.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/handlers/PinLockHandler.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/handlers/PhoneLockHandler.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/handlers/PhoneLockSubject.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/LockWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/PinLockBaseWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/PinLockWindow.hpp"

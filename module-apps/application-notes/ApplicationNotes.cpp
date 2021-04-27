@@ -124,10 +124,8 @@ namespace app
             utils::translate("app_phonebook_options_title"),
             [](Application *app, const std::string &name) { return std::make_unique<gui::OptionWindow>(app, name); });
 
-        attachPopups({gui::popup::ID::Volume,
-                      gui::popup::ID::Tethering,
-                      gui::popup::ID::TetheringPhoneModeChangeProhibited,
-                      gui::popup::ID::PhoneModes});
+        attachPopups(
+            {gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes, gui::popup::ID::PhoneLock});
     }
 
     void ApplicationNotes::destroyUserInterface()

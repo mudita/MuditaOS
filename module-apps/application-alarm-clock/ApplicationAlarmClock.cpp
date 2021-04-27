@@ -108,10 +108,8 @@ namespace app
             style::alarmClock::window::name::dialogYesNo,
             [](Application *app, const std::string &name) { return std::make_unique<gui::DialogYesNo>(app, name); });
 
-        attachPopups({gui::popup::ID::Volume,
-                      gui::popup::ID::Tethering,
-                      gui::popup::ID::TetheringPhoneModeChangeProhibited,
-                      gui::popup::ID::PhoneModes});
+        attachPopups(
+            {gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes, gui::popup::ID::PhoneLock});
     }
 
     void ApplicationAlarmClock::destroyUserInterface()

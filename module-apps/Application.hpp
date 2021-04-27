@@ -27,10 +27,11 @@
 #include <string>   // for string
 #include <utility>  // for move, pair
 #include <vector>   // for vector
-#include "TopBarManager.hpp"
+#include <TopBarManager.hpp>
+#include <popups/Popups.hpp>
+#include <locks/handlers/PhoneLockSubject.hpp>
 #include "WindowsFactory.hpp"
 #include "WindowsStack.hpp"
-#include "popups/Popups.hpp"
 
 namespace app
 {
@@ -397,7 +398,13 @@ namespace app
         std::unique_ptr<settings::Settings> settings;
         sys::phone_modes::PhoneMode phoneMode;
 
+        lock::PhoneLockSubject phoneLockSubject;
+
       public:
+        void handlePhoneLock();
+        void handlePhoneUnLock();
+        void verifyPhoneLockInput(const std::vector<unsigned int> &inputData);
+
         void setLockScreenPasscodeOn(bool screenPasscodeOn) noexcept;
         bool isLockScreenPasscodeOn() const noexcept;
         const gui::top_bar::Configuration &getTopBarConfiguration() const noexcept;
