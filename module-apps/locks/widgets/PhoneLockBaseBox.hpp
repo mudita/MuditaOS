@@ -4,15 +4,15 @@
 #pragma once
 
 #include "Image.hpp"
-#include "PinLockBox.hpp"
-#include "LockWindow.hpp"
+#include "LockBox.hpp"
+#include "locks/windows/LockWindow.hpp"
 
 namespace gui
 {
-    class ScreenLockBaseBox : public PinLockBox
+    class PhoneLockBaseBox : public LockBox
     {
       public:
-        ScreenLockBaseBox(LockWindow *lockBaseWindow) : lockWindow(lockBaseWindow)
+        explicit PhoneLockBaseBox(LockWindow *lockBaseWindow) : lockWindow(lockBaseWindow)
         {}
 
         void buildLockBox(unsigned int pinSize) override;
@@ -22,22 +22,22 @@ namespace gui
 
       private:
         void buildPinLabels(unsigned int pinSize);
-        void setVisibleStateBlocked()
+        void setVisibleStateBlocked() override
         {}
-        void setVisibleStateEnterPin(EnterPasscodeType type)
+        void setVisibleStateInputRequired(InputActionType type) override
         {}
-        void setVisibleStateInvalidPin(PasscodeErrorType type, unsigned int value)
+        void setVisibleStateInputInvalid(InputErrorType type, unsigned int value) override
         {}
 
-        struct PinLabel : public HBox
+        struct InputLabel : public HBox
         {
-            PinLabel(Item *parent, uint32_t w, uint32_t h);
+            InputLabel(Item *parent, uint32_t w, uint32_t h);
             void setVisibleState(bool isImageVisible);
 
             gui::Image *image = nullptr;
         };
 
         LockWindow *lockWindow;
-        std::vector<PinLabel *> pinLabels;
+        std::vector<InputLabel *> inputLabels;
     };
 } // namespace gui

@@ -6,7 +6,7 @@
 #include "MessageType.hpp"
 #include "windows/DesktopMainWindow.hpp"
 #include "windows/MenuWindow.hpp"
-#include "windows/PinLockWindow.hpp"
+#include "locks/windows/PinLockWindow.hpp"
 #include "windows/PowerOffWindow.hpp"
 #include "windows/DeadBatteryWindow.hpp"
 #include "windows/LogoWindow.hpp"
@@ -25,7 +25,8 @@
 #include <messages/DialogMetadataMessage.hpp>
 
 #include "AppWindow.hpp"
-#include "data/LockPhoneData.hpp"
+#include "locks/data/LockData.hpp"
+#include "data/DesktopData.hpp"
 #include "models/ActiveNotificationsModel.hpp"
 
 #include <service-db/DBServiceAPI.hpp>
@@ -86,7 +87,7 @@ namespace app
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
 
         addActionReceiver(app::manager::actions::RequestPin, [this](auto &&data) {
-            lockHandler.handlePasscodeRequest(gui::PinLock::LockType::SimPin, std::move(data));
+            lockHandler.handlePasscodeRequest(locks::Lock::LockType::SimPin, std::move(data));
             return actionHandled();
         });
 
@@ -96,7 +97,7 @@ namespace app
         });
 
         addActionReceiver(app::manager::actions::RequestPuk, [this](auto &&data) {
-            lockHandler.handlePasscodeRequest(gui::PinLock::LockType::SimPuk, std::move(data));
+            lockHandler.handlePasscodeRequest(locks::Lock::LockType::SimPuk, std::move(data));
             return actionHandled();
         });
 

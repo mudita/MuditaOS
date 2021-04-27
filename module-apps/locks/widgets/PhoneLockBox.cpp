@@ -1,27 +1,27 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "application-desktop/widgets/PinLock.hpp"
-#include "ScreenLockBox.hpp"
+#include "Lock.hpp"
+#include "PhoneLockBox.hpp"
 
 namespace gui
 {
     constexpr auto timeToUnlock = 10;
 
-    void ScreenLockBox::buildLockBox(unsigned int pinSize)
+    void PhoneLockBox::buildLockBox(unsigned int pinSize)
     {
         LockWindow->buildImages("pin_lock", "pin_lock_info");
-        ScreenLockBaseBox::buildLockBox(pinSize);
+        PhoneLockBaseBox::buildLockBox(pinSize);
     }
 
-    void ScreenLockBox::setVisibleStateBlocked()
+    void PhoneLockBox::setVisibleStateBlocked()
     {
         LockWindow->setText("app_desktop_screen_blocked_info", LockWindow::TextType::Primary);
         LockWindow->setImagesVisible(false, true);
         LockWindow->setBottomBarWidgetsActive(false, true, false);
     }
 
-    void ScreenLockBox::setVisibleStateEnterPin(EnterPasscodeType type)
+    void PhoneLockBox::setVisibleStateInputRequired(InputActionType type)
     {
         LockWindow->pinLabelsBox->setVisible(true);
         LockWindow->setText("app_desktop_screen_enter_passcode_to_unlock", LockWindow::TextType::Primary, true);
@@ -29,10 +29,10 @@ namespace gui
         LockWindow->setBottomBarWidgetsActive(false, false, true);
     }
 
-    void ScreenLockBox::setVisibleStateInvalidPin(PasscodeErrorType type, unsigned int value)
+    void PhoneLockBox::setVisibleStateInputInvalid(InputErrorType type, unsigned int value)
     {
         switch (type) {
-        case PinLockBox::PasscodeErrorType::InvalidPasscode:
+        case LockBox::InputErrorType::InvalidInput:
             LockWindow->setTitleBar(false, false);
             if (value == 1) {
                 LockWindow->setText(
@@ -50,10 +50,10 @@ namespace gui
             }
             break;
 
-        case PinLockBox::PasscodeErrorType::NewPasscodeConfirmFailed:
+        case LockBox::InputErrorType::NewInputConfirmFailed:
             LOG_ERROR("No use case for NewPasscodeConfirmFailed");
             break;
-        case PinLockBox::PasscodeErrorType::UnhandledError:
+        case LockBox::InputErrorType::UnhandledError:
             LOG_ERROR("No use case for UnhandledError");
             break;
         }

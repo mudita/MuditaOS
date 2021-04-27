@@ -2,53 +2,53 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ChangePasscodeLockHandler.hpp"
-#include "application-desktop/widgets/PinHash.hpp"
+#include "locks/widgets/LockHash.hpp"
 
 namespace gui
 {
     ChangePasscodeLockHandler::ChangePasscodeLockHandler()
-        : lock(Store::GSM::SIM::NONE, PinLock::LockState::PasscodeRequired, PinLock::LockType::Screen)
+        : lock(Store::GSM::SIM::NONE, Lock::LockState::InputRequired, Lock::LockType::Screen)
     {}
 
-    PinLock::LockState ChangePasscodeLockHandler::checkPasscode(unsigned int currentLockPassHash)
+    Lock::LockState ChangePasscodeLockHandler::checkPasscode(unsigned int currentLockPassHash)
     {
-        return activateLock([this, currentLockPassHash](PinLock::LockType, const std::vector<unsigned int> &pin) {
-            const auto hash = GetPinHash(pin);
+        return activateLock([this, currentLockPassHash](Lock::LockType, const std::vector<unsigned int> &pin) {
+            const auto hash = getHash(pin);
             if (hash == currentLockPassHash) {
-                lock.lockState = PinLock::LockState::NewPasscodeRequired;
+                lock.lockState = Lock::LockState::NewInputRequired;
             }
             else {
-                lock.lockState = PinLock::LockState::PasscodeInvalidRetryRequired;
+                lock.lockState = Lock::LockState::InputInvalidRetryRequired;
             }
         });
     }
 
-    PinLock::LockState ChangePasscodeLockHandler::newPasscodeConfirmed()
+    Lock::LockState ChangePasscodeLockHandler::newPasscodeConfirmed()
     {
-        return activateLock([this](PinLock::LockType, const std::vector<unsigned int> &pin) {
-            const auto newPasscodeConfirmedHash = GetPinHash(pin);
+        return activateLock([this](Lock::LockType, const std::vector<unsigned int> &pin) {
+            const auto newPasscodeConfirmedHash = getHash(pin);
             if (newPasscodeHash == newPasscodeConfirmedHash) {
-                lock.lockState = PinLock::LockState::Unlocked;
+                lock.lockState = Lock::LockState::Unlocked;
             }
             else {
-                lock.lockState = PinLock::LockState::NewPasscodeInvalid;
+                lock.lockState = Lock::LockState::NewInputInvalid;
             }
         });
     }
 
-    PinLock::LockState ChangePasscodeLockHandler::newPasscodeProvided()
+    Lock::LockState ChangePasscodeLockHandler::newPasscodeProvided()
     {
-        return activateLock([this](PinLock::LockType, const std::vector<unsigned int> &pin) {
-            if (pin.size() < lock.getMaxPinSize()) {
-                lock.lockState = PinLock::LockState::NewPasscodeInvalidRetryRequired;
+        return activateLock([this](Lock::LockType, const std::vector<unsigned int> &pin) {
+            if (pin.size() < lock.getMaxInputSize()) {
+                lock.lockState = Lock::LockState::NewInputInvalidRetryRequired;
                 return;
             }
-            newPasscodeHash = GetPinHash(pin);
-            lock.lockState  = PinLock::LockState::NewPasscodeConfirmRequired;
+            newPasscodeHash = getHash(pin);
+            lock.lockState  = Lock::LockState::NewInputConfirmRequired;
         });
     }
 
-    PinLock::LockState ChangePasscodeLockHandler::activateLock(OnActivatedCallback onActivatedCallback)
+    Lock::LockState ChangePasscodeLockHandler::activateLock(OnActivatedCallback onActivatedCallback)
     {
         lock.onActivatedCallback = onActivatedCallback;
         lock.activate();
