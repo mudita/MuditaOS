@@ -162,8 +162,8 @@ namespace gui
             case DBServiceAPI::ContactVerificationResult::temporaryContactExists:
                 std::unique_ptr<ContactRecord> tempContact;
                 assert(!contact->numbers.empty());
-                for (auto number : contact->numbers) {
-                    if (number.number.getEntered().size() > 0) {
+                for (const auto &number : contact->numbers) {
+                    if (!number.number.getEntered().empty()) {
                         tempContact = DBServiceAPI::MatchContactByPhoneNumber(application, number.number);
                         if (tempContact != nullptr) {
                             contact->ID   = tempContact->ID;
@@ -181,7 +181,7 @@ namespace gui
 
         // perform actual add/update operation
         if (contactAction == ContactAction::Add) {
-            if (DBServiceAPI::ContactAdd(application, *contact) == false) {
+            if (!DBServiceAPI::ContactAdd(application, *contact)) {
                 LOG_ERROR("verifyAndSave failed to ADD contact");
                 return false;
             }
@@ -192,10 +192,12 @@ namespace gui
 
             contact->groups.erase(ContactsDB::temporaryGroupId());
 
-            if (DBServiceAPI::ContactUpdate(application, *contact) == false) {
+            if (!DBServiceAPI::ContactUpdate(application, *contact)) {
                 LOG_ERROR("verifyAndSave failed to UPDATE contact");
                 return false;
             }
+            application->switchWindow(gui::window::name::contact, std::move(data));
+            return true;
         }
 
         application->switchWindow(gui::name::window::main_window);
