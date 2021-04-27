@@ -28,10 +28,9 @@
 #include <utility>  // for move, pair
 #include <vector>   // for vector
 #include "TopBarManager.hpp"
-#include "popups/Popups.hpp"
 #include "WindowsFactory.hpp"
 #include "WindowsStack.hpp"
-#include "Popups.hpp"
+#include "popups/Popups.hpp"
 
 namespace app
 {

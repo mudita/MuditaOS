@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include "Style.hpp"
+
 namespace style::desktop
 {
     namespace timeLabel

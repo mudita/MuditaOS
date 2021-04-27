@@ -10,10 +10,10 @@
 #include "PinLockWindow.hpp"
 
 #include "application-desktop/ApplicationDesktop.hpp"
-#include "application-desktop/data/LockPhoneData.hpp"
-#include "ScreenLockBox.hpp"
-#include "SimLockBox.hpp"
-#include "PukLockBox.hpp"
+#include "locks/data/LockData.hpp"
+#include "locks/widgets/PhoneLockBox.hpp"
+#include "locks/widgets/SimLockBox.hpp"
+#include "locks/widgets/PukLockBox.hpp"
 #include <application-phonebook/ApplicationPhonebook.hpp>
 
 namespace gui
@@ -47,47 +47,45 @@ namespace gui
     void PinLockWindow::setVisibleState()
     {
         restore();
-        if (lock->isState(PinLock::LockState::PasscodeRequired)) {
-            LockBox->setVisibleStateEnterPin(PinLockBox::EnterPasscodeType::ProvidePasscode);
+        if (lock->isState(Lock::LockState::InputRequired)) {
+            lockBox->setVisibleStateInputRequired(LockBox::InputActionType::ProvideInput);
         }
-        else if (lock->isState(PinLock::LockState::PasscodeInvalidRetryRequired)) {
-            LockBox->setVisibleStateInvalidPin(PinLockBox::PasscodeErrorType::InvalidPasscode, lock->getValue());
+        else if (lock->isState(Lock::LockState::InputInvalidRetryRequired)) {
+            lockBox->setVisibleStateInputInvalid(LockBox::InputErrorType::InvalidInput, lock->getAttemptsLeft());
         }
-        else if (lock->isState(PinLock::LockState::Blocked)) {
-            LockBox->setVisibleStateBlocked();
+        else if (lock->isState(Lock::LockState::Blocked)) {
+            lockBox->setVisibleStateBlocked();
         }
-        else if (lock->isState(PinLock::LockState::NewPasscodeRequired)) {
-            LockBox->setVisibleStateEnterPin(PinLockBox::EnterPasscodeType::ProvideNewPasscode);
+        else if (lock->isState(Lock::LockState::NewInputRequired)) {
+            lockBox->setVisibleStateInputRequired(LockBox::InputActionType::ProvideNewInput);
         }
-        else if (lock->isState(PinLock::LockState::NewPasscodeConfirmRequired)) {
-            LockBox->setVisibleStateEnterPin(PinLockBox::EnterPasscodeType::ConfirmNewPasscode);
+        else if (lock->isState(Lock::LockState::NewInputConfirmRequired)) {
+            lockBox->setVisibleStateInputRequired(LockBox::InputActionType::ConfirmNewInput);
         }
-        else if (lock->isState(PinLock::LockState::NewPasscodeInvalid)) {
-            LockBox->setVisibleStateInvalidPin(PinLockBox::PasscodeErrorType::NewPasscodeConfirmFailed,
-                                               lock->getValue());
+        else if (lock->isState(Lock::LockState::NewInputInvalid)) {
+            lockBox->setVisibleStateInputInvalid(LockBox::InputErrorType::NewInputConfirmFailed,
+                                                 lock->getAttemptsLeft());
         }
-        else if (lock->isState(PinLock::LockState::ErrorOccurred)) {
-            LockBox->setVisibleStateInvalidPin(PinLockBox::PasscodeErrorType::UnhandledError, lock->getValue());
+        else if (lock->isState(Lock::LockState::ErrorOccurred)) {
+            lockBox->setVisibleStateInputInvalid(LockBox::InputErrorType::UnhandledError, lock->getAttemptsLeft());
         }
         application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
     }
 
     void PinLockWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        if (auto lockData = dynamic_cast<LockPhoneData *>(data)) {
+        if (auto lockData = dynamic_cast<LockData *>(data)) {
             rebuild();
-            lockTimeoutApplication = lockData->getPreviousApplication();
-            lock                   = lockData->getLock();
-            assert(lock);
+            lock = std::make_unique<locks::Lock>(lockData->getLock());
 
             buildPinLockBox();
-            LockBox->buildLockBox(lock->getMaxPinSize());
+            lockBox->buildLockBox(lock->getMaxInputSize());
 
-            if (lock->isState(PinLock::LockState::PasscodeRequired)) {
-                currentPasscodeType = PinLockBox::EnterPasscodeType::ProvidePasscode;
+            if (lock->isState(Lock::LockState::InputRequired)) {
+                currentPasscodeType = LockBox::InputActionType::ProvideInput;
             }
-            else if (lock->isState(PinLock::LockState::NewPasscodeRequired)) {
-                currentPasscodeType = PinLockBox::EnterPasscodeType::ProvideNewPasscode;
+            else if (lock->isState(Lock::LockState::NewInputRequired)) {
+                currentPasscodeType = LockBox::InputActionType::ProvideNewInput;
             }
             setVisibleState();
         }
@@ -107,7 +105,7 @@ namespace gui
             if (usesNumericKeys()) {
                 lock->clearAttempt();
             }
-            else if (lock->isState(PinLock::LockState::PasscodeInvalidRetryRequired)) {
+            else if (lock->isState(Lock::LockState::InputInvalidRetryRequired)) {
                 lock->consumeState();
             }
             application->switchWindow(gui::name::window::main_window);
@@ -116,14 +114,14 @@ namespace gui
         else if (inputEvent.is(KeyCode::KEY_PND)) {
             if (usesNumericKeys()) {
                 lock->popChar();
-                LockBox->popChar(lock->getCharCount());
+                lockBox->popChar(lock->getCharCount());
                 bottomBar->setActive(BottomBar::Side::CENTER, lock->canVerify());
                 return true;
             }
         }
         else if (0 <= gui::toNumeric(inputEvent.keyCode) && gui::toNumeric(inputEvent.keyCode) <= 9) {
             if (usesNumericKeys() && lock->canPut()) {
-                LockBox->putChar(lock->getCharCount());
+                lockBox->putChar(lock->getCharCount());
                 lock->putNextChar(gui::toNumeric(inputEvent.keyCode));
                 bottomBar->setActive(BottomBar::Side::CENTER, lock->canVerify());
                 return true;
@@ -141,32 +139,32 @@ namespace gui
     void PinLockWindow::buildPinLockBox()
     {
         auto lockType = lock->getLockType();
-        if (lockType == PinLock::LockType::Screen) {
-            LockBox = std::make_unique<ScreenLockBox>(this);
+        if (lockType == Lock::LockType::Screen) {
+            lockBox = std::make_unique<PhoneLockBox>(this);
         }
-        else if (lockType == PinLock::LockType::SimPuk) {
-            LockBox = std::make_unique<PukLockBox>(this);
+        else if (lockType == Lock::LockType::SimPuk) {
+            lockBox = std::make_unique<PukLockBox>(this);
             setTitleBar(true, true);
             setText("app_desktop_header_sim_setup",
                     TextType::Title,
                     true,
                     {{getToken(Token::Sim), utils::enumToString(lock->getSim())}});
         }
-        else if (lockType == PinLock::LockType::SimPin) {
-            LockBox = std::make_unique<SimLockBox>(this);
+        else if (lockType == Lock::LockType::SimPin) {
+            lockBox = std::make_unique<SimLockBox>(this);
             setTitleBar(true, false);
             setText("app_desktop_header_sim_setup",
                     TextType::Title,
                     true,
                     {{getToken(Token::Sim), utils::enumToString(lock->getSim())}});
         }
-        assert(LockBox != nullptr);
+        assert(lockBox != nullptr);
     }
 
     auto PinLockWindow::usesNumericKeys() const noexcept -> bool
     {
-        return lock && (lock->isState(PinLock::LockState::PasscodeRequired) ||
-                        lock->isState(PinLock::LockState::NewPasscodeRequired) ||
-                        lock->isState(PinLock::LockState::NewPasscodeConfirmRequired));
+        return lock &&
+               (lock->isState(Lock::LockState::InputRequired) || lock->isState(Lock::LockState::NewInputRequired) ||
+                lock->isState(Lock::LockState::NewInputConfirmRequired));
     }
 } /* namespace gui */

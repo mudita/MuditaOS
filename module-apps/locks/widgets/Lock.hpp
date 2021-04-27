@@ -12,8 +12,12 @@
 namespace gui
 {
     class PinLockHandler;
+    class ChangePasscodeLockHandler;
+} // namespace gui
 
-    class PinLock
+namespace locks
+{
+    class Lock
     {
       public:
         enum class LockType
@@ -22,18 +26,17 @@ namespace gui
             SimPuk,
             Screen
         };
+
         enum class LockState
         {
             Unlocked,
-            PasscodeRequired,
-            PasscodeInvalidRetryRequired,
+            InputRequired,
+            InputInvalidRetryRequired,
             Blocked,
-            NewPasscodeRequired,
-            NewPasscodeInvalidRetryRequired,
-            NewPasscodeConfirmRequired,
-            NewPasscodeInvalid,
-            PinLockDisableRequired,
-            PinLockEnableRequired,
+            NewInputRequired,
+            NewInputInvalidRetryRequired,
+            NewInputConfirmRequired,
+            NewInputInvalid,
             ErrorOccurred
         };
 
@@ -45,30 +48,30 @@ namespace gui
         {
             return lockType;
         }
-        [[nodiscard]] unsigned int getMaxPinSize() const noexcept
+        [[nodiscard]] unsigned int getMaxInputSize() const noexcept
         {
-            return maxPinSize;
+            return maxInputSize;
         }
-        /// returns current position of a PIN character to be inserted
+        /// returns current position of a Input character to be inserted
         [[nodiscard]] unsigned int getCharCount() const noexcept
         {
-            return pinValue.size();
+            return inputValue.size();
         }
         [[nodiscard]] bool canPut() const noexcept
         {
-            return getCharCount() < getMaxPinSize();
+            return getCharCount() < getMaxInputSize();
         }
         [[nodiscard]] bool canVerify() const noexcept
         {
-            return getCharCount() >= minPinSize;
+            return getCharCount() >= minInputSize;
         }
-        [[nodiscard]] std::vector<unsigned int> getPin() const
+        [[nodiscard]] std::vector<unsigned int> getInput() const
         {
-            return pinValue;
+            return inputValue;
         }
-        [[nodiscard]] unsigned int getValue() const noexcept
+        [[nodiscard]] unsigned int getAttemptsLeft() const noexcept
         {
-            return value;
+            return attemptsLeft;
         }
         [[nodiscard]] bool isSim(Store::GSM::SIM _sim) const noexcept
         {
@@ -82,9 +85,9 @@ namespace gui
         {
             return lockType == type;
         }
-        [[nodiscard]] const std::string &getPasscodeName() const noexcept
+        [[nodiscard]] const std::string &getLockName() const noexcept
         {
-            return passcodeName;
+            return lockName;
         }
         [[nodiscard]] Store::GSM::SIM getSim() const noexcept
         {
@@ -98,44 +101,46 @@ namespace gui
         void clearAttempt() noexcept;
         /// consumes LockState::PasscodeInvalidRetryRequired state and LockState::NewPasscodeInvalid)
         void consumeState() noexcept;
-        void setNewPasscodeInvalidState() noexcept;
         /// calls
         void activate();
 
-        PinLock(Store::GSM::SIM sim, LockState state, LockType type, unsigned int value = unlimitedNumOfAttempts)
-            : sim{sim}, lockState{state}, lockType{type}, value{value}
+        Lock(Store::GSM::SIM sim, LockState state, LockType type, unsigned int attemptsLeft = unlimitedNumOfAttempts)
+            : sim{sim}, lockState{state}, lockType{type}, attemptsLeft{attemptsLeft}
         {}
-        PinLock(const PinLock &other) = default;
+
+        Lock(LockState state, unsigned int attemptsLeft = unlimitedNumOfAttempts)
+            : lockState{state}, attemptsLeft{attemptsLeft}
+        {}
 
         std::function<void(LockType type, const std::vector<unsigned int> &)> onActivatedCallback = nullptr;
 
       private:
-        std::string passcodeName;
-        Store::GSM::SIM sim = Store::GSM::SIM::NONE;
-        LockState lockState = LockState::Unlocked;
-        LockType lockType   = LockType::Screen;
-        unsigned int value  = 0;
+        std::string lockName;
+        Store::GSM::SIM sim       = Store::GSM::SIM::NONE;
+        LockState lockState       = LockState::Unlocked;
+        LockType lockType         = LockType::Screen;
+        unsigned int attemptsLeft = 0;
 
-        std::vector<unsigned int> pinValue;
-        unsigned int maxPinSize = defaultPasscodeSize;
-        unsigned int minPinSize = defaultPasscodeSize;
-        bool autoActivate       = false;
+        std::vector<unsigned int> inputValue;
+        unsigned int maxInputSize = defaultInputSize;
+        unsigned int minInputSize = defaultInputSize;
+        bool autoActivate         = false;
 
-        static constexpr unsigned int defaultPasscodeSize = 4;
+        static constexpr unsigned int defaultInputSize       = 4;
         static constexpr unsigned int unlimitedNumOfAttempts = std::numeric_limits<unsigned int>::max();
 
         void setAutoActivate(bool _autoActivate)
         {
             autoActivate = _autoActivate;
         }
-        void setPinSizeBounds(unsigned int _minPinSize, unsigned int _maxPinSize)
+        void setInputSizeBounds(unsigned int _minInputSize, unsigned int _maxInputSize)
         {
-            minPinSize = _minPinSize;
-            maxPinSize = _maxPinSize;
+            minInputSize = _minInputSize;
+            maxInputSize = _maxInputSize;
         }
 
-        friend class PinLockHandler;
-        friend class ChangePasscodeLockHandler;
+        friend class gui::PinLockHandler;
+        friend class gui::ChangePasscodeLockHandler;
     };
 
-} // namespace gui
+} // namespace lock
