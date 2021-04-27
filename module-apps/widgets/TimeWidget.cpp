@@ -79,10 +79,10 @@ namespace gui
     {
         inputCallback = [&](Item &item, const InputEvent &event) {
             auto focusedItem = getFocusItem();
-            if (event.state != gui::InputEvent::State::keyReleasedShort) {
+            if (!event.isShortRelease()) {
                 return false;
             }
-            if (event.keyCode == gui::KeyCode::KEY_ENTER || event.keyCode == gui::KeyCode::KEY_RF) {
+            if (event.is(gui::KeyCode::KEY_ENTER) || event.is(gui::KeyCode::KEY_RF)) {
                 return false;
             }
 
@@ -171,10 +171,10 @@ namespace gui
         mode12hInput->setPenWidth(style::window::default_border_rect_no_focus);
         mode12hInput->setText(timeConstants::before_noon);
         mode12hInput->inputCallback = [&](Item &item, const InputEvent &event) {
-            if (event.state != gui::InputEvent::State::keyReleasedShort) {
+            if (!event.isShortRelease()) {
                 return false;
             }
-            if (event.keyCode == gui::KeyCode::KEY_LF) {
+            if (event.is(gui::KeyCode::KEY_LF)) {
                 if (mode12hInput->getText() == timeConstants::before_noon) {
                     mode12hInput->setText(timeConstants::after_noon);
                 }
@@ -349,10 +349,10 @@ namespace gui
     void TimeWidget::onInputCallback(gui::Label &timeInput)
     {
         timeInput.inputCallback = [&](Item &item, const InputEvent &event) {
-            if (event.state != gui::InputEvent::State::keyReleasedShort) {
+            if (!event.isShortRelease()) {
                 return false;
             }
-            if (auto value = gui::toNumeric(event.keyCode); value >= 0) {
+            if (auto value = event.numericValue(); value >= 0) {
                 setTime(value, timeInput);
                 return true;
             }

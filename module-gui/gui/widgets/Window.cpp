@@ -56,8 +56,7 @@ namespace gui
         if (handleNavigation(inputEvent)) {
             return true;
         }
-        return inputEvent.state == InputEvent::State::keyReleasedShort &&
-               inputEvent.keyCode == gui::KeyCode::KEY_ENTER && onActivated(nullptr);
+        return inputEvent.isShortRelease(gui::KeyCode::KEY_ENTER) && onActivated(nullptr);
     }
 
     void Window::accept(GuiVisitor &visitor)

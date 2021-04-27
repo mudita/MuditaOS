@@ -39,7 +39,7 @@ namespace app::onBoarding
 
     bool OnBoardingMainWindow::onInput(const gui::InputEvent &inputEvent)
     {
-        if (inputEvent.isShortPress() && inputEvent.is(gui::KeyCode::KEY_ENTER)) {
+        if (inputEvent.isShortRelease(gui::KeyCode::KEY_ENTER)) {
             application->switchWindow(gui::window::name::onBoarding_languages,
                                       gui::ShowMode::GUI_SHOW_INIT,
                                       std::make_unique<OnBoardingSwitchData>());

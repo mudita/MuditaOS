@@ -209,11 +209,11 @@ namespace gui
         }
 
         // process only short press, consume rest
-        if (inputEvent.state != gui::InputEvent::State::keyReleasedShort)
+        if (!inputEvent.isShortRelease())
             return true;
 
         // if enter was pressed check state and power down or return to main desktop's window
-        if (inputEvent.keyCode == KeyCode::KEY_ENTER) {
+        if (inputEvent.is(KeyCode::KEY_ENTER)) {
             if (state == State::Return) {
                 application->switchWindow(app::window::name::desktop_main_window);
             }

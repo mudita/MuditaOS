@@ -67,9 +67,9 @@ bool TimerProperty::onFocus(bool isFocused)
 bool TimerProperty::onInput(const InputEvent &inputEvent)
 {
     bool handled = false;
-    if (inputEvent.isShortPress()) {
-        if (0 <= gui::toNumeric(inputEvent.keyCode) && gui::toNumeric(inputEvent.keyCode) <= 9) {
-            state.putNumericValue(gui::toNumeric(inputEvent.keyCode));
+    if (inputEvent.isShortRelease()) {
+        if (inputEvent.isDigit()) {
+            state.putNumericValue(inputEvent.numericValue());
             handled = true;
         }
         else if (inputEvent.is(KeyCode::KEY_LEFT)) {

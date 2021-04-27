@@ -39,12 +39,12 @@ void LockedInfoWindow::setVisibleState()
 
 bool LockedInfoWindow::onInput(const InputEvent &inputEvent)
 {
-    if (inputEvent.isShortPress()) {
-        if (inputEvent.keyCode == KeyCode::KEY_LF && bottomBar->isActive(BottomBar::Side::LEFT)) {
+    if (inputEvent.isShortRelease()) {
+        if (inputEvent.is(KeyCode::KEY_LF) && bottomBar->isActive(BottomBar::Side::LEFT)) {
             app::manager::Controller::sendAction(application, app::manager::actions::EmergencyDial);
             return true;
         }
-        else if (inputEvent.keyCode == KeyCode::KEY_RF && bottomBar->isActive(BottomBar::Side::RIGHT)) {
+        else if (inputEvent.is(KeyCode::KEY_RF) && bottomBar->isActive(BottomBar::Side::RIGHT)) {
             application->switchWindow(gui::name::window::main_window);
             return true;
         }

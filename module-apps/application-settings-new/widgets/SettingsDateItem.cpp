@@ -26,7 +26,7 @@ namespace gui
         };
 
         inputCallback = [&](Item &item, const InputEvent &event) {
-            if (event.state != InputEvent::State::keyReleasedShort) {
+            if (!event.isShortRelease()) {
                 return false;
             }
             return vBox->onInput(event);

@@ -68,7 +68,7 @@ namespace gui
     {
         inputCallback = [&](Item &item, const InputEvent &event) {
             auto focusedItem = getFocusItem();
-            if (!event.isShortPress()) {
+            if (!event.isShortRelease()) {
                 return false;
             }
             if (event.is(gui::KeyCode::KEY_ENTER) || event.is(gui::KeyCode::KEY_RF)) {
@@ -133,7 +133,7 @@ namespace gui
     void AlarmTimeItem::onInputCallback(gui::Text &textItem)
     {
         textItem.inputCallback = [&](Item &item, const InputEvent &event) {
-            if (!event.isShortPress()) {
+            if (!event.isShortRelease()) {
                 return false;
             }
             if (textItem.getText().length() > 1 && !event.is(gui::KeyCode::KEY_LEFT) &&
@@ -157,10 +157,10 @@ namespace gui
             mode12hInput->setPenWidth(style::window::default_border_rect_no_focus);
             mode12hInput->setText(utils::translate(utils::time::Locale::getAM()));
             mode12hInput->inputCallback = [&](Item &item, const InputEvent &event) {
-                if (event.state != gui::InputEvent::State::keyReleasedShort) {
+                if (!event.isShortRelease()) {
                     return false;
                 }
-                if (event.keyCode == gui::KeyCode::KEY_LF) {
+                if (event.is(gui::KeyCode::KEY_LF)) {
                     if (mode12hInput->getText() == utils::translate(utils::time::Locale::getAM())) {
                         mode12hInput->setText(utils::translate(utils::time::Locale::getPM()));
                     }

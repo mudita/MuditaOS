@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <module-gui/gui/input/InputEvent.hpp>
@@ -62,16 +62,16 @@ namespace gui
 
     bool BrightnessWindow::onInput(const gui::InputEvent &inputEvent)
     {
-        if (!inputEvent.isShortPress()) {
+        if (!inputEvent.isShortRelease()) {
             return false;
         }
 
         int update = brightnessBar->getValue();
-        if (inputEvent.keyCode == gui::KeyCode::KEY_VOLUP) {
+        if (inputEvent.is(gui::KeyCode::KEY_VOLUP)) {
             update++;
         }
 
-        if (inputEvent.keyCode == gui::KeyCode::KEY_VOLDN) {
+        if (inputEvent.is(gui::KeyCode::KEY_VOLDN)) {
             update--;
         }
 

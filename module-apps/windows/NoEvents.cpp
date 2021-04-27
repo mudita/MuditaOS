@@ -51,7 +51,7 @@ void NoEvents::onBeforeShow(ShowMode mode, SwitchData *data)
     if (metadata != nullptr) {
         auto foo      = metadata->get().action;
         inputCallback = [foo](Item &, const InputEvent &inputEvent) -> bool {
-            if (foo && inputEvent.isShortPress() && inputEvent.is(KeyCode::KEY_LEFT)) {
+            if (foo && inputEvent.isShortRelease(KeyCode::KEY_LEFT)) {
                 return foo();
             }
             return false;
@@ -66,7 +66,7 @@ void NoEvents::onBeforeShow(ShowMode mode, SwitchData *data)
 
 bool NoEvents::onInput(const gui::InputEvent &inputEvent)
 {
-    if (inputEvent.isShortPress() && inputEvent.is(gui::KeyCode::KEY_RF) &&
+    if (inputEvent.isShortRelease(gui::KeyCode::KEY_RF) &&
         title->getText() == utils::translate("app_calendar_title_main")) {
         app::manager::Controller::switchBack(application);
         return true;
@@ -76,7 +76,7 @@ bool NoEvents::onInput(const gui::InputEvent &inputEvent)
         return true;
     }
 
-    if (inputEvent.isShortPress() && inputEvent.is(gui::KeyCode::KEY_LF) &&
+    if (inputEvent.isShortRelease(gui::KeyCode::KEY_LF) &&
         title->getText() == utils::translate("app_calendar_title_main")) {
         application->switchWindow(gui::name::window::main_window);
         return true;

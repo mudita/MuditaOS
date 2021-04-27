@@ -48,11 +48,7 @@ namespace gui
             return true;
         }
 
-        if (!inputEvent.isShortPress()) {
-            return false;
-        }
-
-        if (inputEvent.is(gui::KeyCode::KEY_ENTER)) {
+        if (inputEvent.isShortRelease(gui::KeyCode::KEY_ENTER)) {
             timeModel->saveData(fromTillDate);
             LOG_DEBUG("Date from: %s", TimePointToLocalizedHourMinString(fromTillDate->from).c_str());
             LOG_DEBUG("Date to: %s", TimePointToLocalizedHourMinString(fromTillDate->till).c_str());

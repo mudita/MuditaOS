@@ -42,7 +42,7 @@ namespace gui
     {
         bool handled = false;
 
-        if (inputEvent.isShortPress()) {
+        if (inputEvent.isShortRelease()) {
             if (inputEvent.is(KeyCode::KEY_LEFT)) {
                 if (auto color = vBox->fillColor; color.intensity != ::gui::ColorFullBlack.intensity) {
                     color.intensity--;

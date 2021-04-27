@@ -26,7 +26,7 @@ namespace gui
     void NewEventCheckBoxWithLabel::applyCallbacks()
     {
         inputCallback = [this](gui::Item &item, const gui::InputEvent &event) {
-            if (event.is(gui::KeyCode::KEY_LF) && event.isShortPress()) {
+            if (event.isShortRelease(gui::KeyCode::KEY_LF)) {
                 onCheck(checkBox->isChecked());
             }
             return checkBox->onInput(event);

@@ -55,10 +55,8 @@ namespace gui
 
     bool PhonebookIceContacts::onInput(const InputEvent &inputEvent)
     {
-        if (inputEvent.isShortPress()) {
-            if (inputEvent.is(KeyCode::KEY_ENTER)) {
-                return true;
-            }
+        if (inputEvent.isShortRelease(KeyCode::KEY_ENTER)) {
+            return true;
         }
         // check if any of the lower inheritance onInput methods catch the event
         return AppWindow::onInput(inputEvent);

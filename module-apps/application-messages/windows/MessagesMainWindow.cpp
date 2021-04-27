@@ -143,8 +143,8 @@ namespace gui
         if (AppWindow::onInput(inputEvent)) {
             return true;
         }
-        if (inputEvent.state == InputEvent::State::keyReleasedShort) {
-            switch (inputEvent.keyCode) {
+        if (inputEvent.isShortRelease()) {
+            switch (inputEvent.getKeyCode()) {
             case gui::KeyCode::KEY_LEFT:
                 application->switchWindow(gui::name::window::new_sms, nullptr);
                 return true;
@@ -152,7 +152,7 @@ namespace gui
                 app->switchWindow(gui::name::window::thread_sms_search, nullptr);
                 return true;
             default:
-                LOG_DEBUG("SMS main window not handled key: %d", static_cast<int>(inputEvent.keyCode));
+                LOG_DEBUG("SMS main window not handled key: %s", c_str(inputEvent.getKeyCode()));
                 break;
             }
         }

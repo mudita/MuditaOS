@@ -60,7 +60,7 @@ namespace gui
             [=]() { application->getCurrentWindow()->selectSpecialCharacter(); }));
 
         inputText->inputCallback = [this, application]([[maybe_unused]] Item &, const InputEvent &event) {
-            if (event.state == InputEvent::State::keyReleasedShort && event.keyCode == KeyCode::KEY_LF) {
+            if (event.isShortRelease(KeyCode::KEY_LF)) {
                 auto app = dynamic_cast<app::ApplicationMessages *>(application);
                 assert(app != nullptr);
                 return app->newMessageOptions(application->getCurrentWindow()->getName(), inputText);

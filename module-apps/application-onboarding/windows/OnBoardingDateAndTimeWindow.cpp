@@ -31,17 +31,17 @@ namespace app::onBoarding
 
     bool OnBoardingDateAndTimeWindow::onInput(const gui::InputEvent &inputEvent)
     {
-        if (inputEvent.isShortPress() && inputEvent.is(gui::KeyCode::KEY_RF)) {
+        if (inputEvent.isShortRelease(gui::KeyCode::KEY_RF)) {
             application->switchWindow(
                 gui::window::name::onBoarding_configure_passcode,
                 gui::ShowMode::GUI_SHOW_INIT,
                 std::make_unique<ChangePasscodeData>(ChangePasscodeAction::OnlyProvideNewPasscode));
             return true;
         }
-        else if (inputEvent.isShortPress() && inputEvent.is(gui::KeyCode::KEY_LF)) {
+        else if (inputEvent.isShortRelease(gui::KeyCode::KEY_LF)) {
             return getFocusItem()->onActivated(nullptr);
         }
-        else if (inputEvent.isShortPress() && inputEvent.is(gui::KeyCode::KEY_ENTER)) {
+        else if (inputEvent.isShortRelease(gui::KeyCode::KEY_ENTER)) {
             auto metaData = std::make_unique<gui::DialogMetadataMessage>(
                 gui::DialogMetadata{utils::translate("app_onboarding_title_configuration"),
                                     "success_icon_W_G",

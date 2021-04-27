@@ -233,11 +233,9 @@ namespace gui
             return true;
         }
         else {
-            if (inputEvent.state == gui::InputEvent::State::keyReleasedShort) {
-                auto key   = std::to_string(gui::toNumeric(inputEvent.keyCode));
-                auto value = gui::toNumeric(inputEvent.keyCode);
+            if (inputEvent.isShortRelease()) {
                 // handle numeric keys
-                if (value >= 0) {
+                if (const auto value = inputEvent.numericValue(); value >= 0) {
                     if (focusItem == dateBody) {
                         setDate(value);
                     }
@@ -246,7 +244,7 @@ namespace gui
                     }
                     ret = true;
                 }
-                else if (inputEvent.keyCode == gui::KeyCode::KEY_PND) {
+                else if (inputEvent.is(gui::KeyCode::KEY_PND)) {
                     if (focusItem == dateBody || focusItem == timeBody) {
                         auto item = dynamic_cast<gui::Label *>(focusItem->focusItem);
                         if (item != nullptr) {

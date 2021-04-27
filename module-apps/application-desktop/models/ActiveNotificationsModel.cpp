@@ -32,18 +32,17 @@ auto ActiveNotificationsModel::create(const notifications::NotSeenSMSNotificatio
                                                     app::manager::actions::Launch,
                                                     std::make_unique<app::ApplicationLaunchData>(app::name_messages));
     };
-    item->inputCallback = [this]([[maybe_unused]] Item &item, const InputEvent &inputEvent) {
-        if (inputEvent.isShortPress()) {
-            if (inputEvent.is(KeyCode::KEY_RF)) {
+    item->inputCallback =
+        [this]([[maybe_unused]] Item &item, const InputEvent &inputEvent) {
+            if (inputEvent.isShortRelease(KeyCode::KEY_RF)) {
                 DBServiceAPI::GetQuery(
                     parent->getApplication(),
                     db::Interface::Name::Notifications,
                     std::make_unique<db::query::notifications::Clear>(NotificationsRecord::Key::Sms));
                 return true;
             }
-        }
-        return false;
-    };
+            return false;
+        };
     item->setDismissible(true);
     return item;
 }
@@ -74,7 +73,7 @@ auto ActiveNotificationsModel::create(const notifications::NotSeenCallNotificati
     item->inputCallback = [keyRightFunctionalCb = std::move(onRightFunctionalCallback),
                            keyLeftFunctionalCb  = std::move(onKeyLeftFunctionalCallback)]([[maybe_unused]] Item &item,
                                                                                          const InputEvent &inputEvent) {
-        if (inputEvent.isShortPress()) {
+        if (inputEvent.isShortRelease()) {
             if (inputEvent.is(KeyCode::KEY_RF)) {
                 keyRightFunctionalCb();
                 return true;

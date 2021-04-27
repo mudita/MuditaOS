@@ -144,10 +144,7 @@ auto PhonebookModel::getItem(gui::Order order) -> gui::ListItem *
         if (messagesSelectCallback) {
             return false;
         }
-        if (event.state != gui::InputEvent::State::keyReleasedShort) {
-            return false;
-        }
-        if (event.keyCode == gui::KeyCode::KEY_LF) {
+        if (event.isShortRelease(gui::KeyCode::KEY_LF)) {
             if (item->contact && !item->contact->numbers.empty()) {
                 const auto phoneNumber = item->contact->numbers.front().number;
                 return app::manager::Controller::sendAction(application,

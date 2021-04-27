@@ -298,8 +298,7 @@ namespace gui
 
     bool MenuWindow::onInput(const InputEvent &inputEvent)
     {
-        if ((inputEvent.state == InputEvent::State::keyReleasedShort) && (inputEvent.keyCode == KeyCode::KEY_RF) &&
-            (toolsMenu->visible)) {
+        if (inputEvent.isShortRelease(KeyCode::KEY_RF) && toolsMenu->visible) {
             switchMenu(mainMenu);
             return true;
         }

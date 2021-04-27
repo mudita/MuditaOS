@@ -95,7 +95,7 @@ void MeditationTimerWindow::onBeforeShow(ShowMode mode, SwitchData *data)
 
 auto MeditationTimerWindow::onInput(const InputEvent &inputEvent) -> bool
 {
-    if (inputEvent.isShortPress()) {
+    if (inputEvent.isShortRelease()) {
         if (finished) {
             endScreenTimeout.stop();
             application->switchWindow(app::window::name::meditation_main_window);

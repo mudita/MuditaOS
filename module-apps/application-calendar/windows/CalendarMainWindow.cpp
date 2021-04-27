@@ -64,10 +64,10 @@ namespace gui
         addWidget(monthBox);
 
         monthBox->borderCallback = [this](const InputEvent &inputEvent) -> bool {
-            if (inputEvent.state != InputEvent::State::keyReleasedShort) {
+            if (!inputEvent.isShortRelease()) {
                 return false;
             }
-            switch (inputEvent.keyCode) {
+            switch (inputEvent.getKeyCode()) {
             case KeyCode::KEY_UP: {
                 LOG_DEBUG("change month prev");
                 if (actualDate.month() != date::January) {
@@ -177,11 +177,7 @@ namespace gui
             return true;
         }
 
-        if (!inputEvent.isShortPress()) {
-            return false;
-        }
-
-        if (inputEvent.keyCode == gui::KeyCode::KEY_LF) {
+        if (inputEvent.isShortRelease(gui::KeyCode::KEY_LF)) {
             auto app = dynamic_cast<app::ApplicationCalendar *>(application);
             assert(application != nullptr);
             app->setEquivalentToEmptyWindow(EquivalentWindow::AllEventsWindow);

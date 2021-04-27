@@ -261,17 +261,14 @@ namespace gui
         // check if any of the lower inheritance onInput methods catch the event
         if (AppWindow::onInput(inputEvent)) {
             // refresh window only when key is other than enter
-            if (inputEvent.keyCode != KeyCode::KEY_ENTER) {
+            if (!inputEvent.is(KeyCode::KEY_ENTER)) {
                 application->render(RefreshModes::GUI_REFRESH_FAST);
             }
 
             return true;
         }
 
-        // process only if key is released
-        if (((inputEvent.state == InputEvent::State::keyReleasedShort) ||
-             ((inputEvent.state == InputEvent::State::keyReleasedLong))) &&
-            (inputEvent.keyCode == KeyCode::KEY_LF)) {
+        if (inputEvent.isShortRelease(KeyCode::KEY_LF)) {
             auto app = dynamic_cast<app::ApplicationCallLog *>(application);
             assert(app != nullptr);
             app->switchWindow(utils::translate("app_phonebook_options_title"),

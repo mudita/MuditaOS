@@ -95,7 +95,7 @@ namespace Quotes
             [app = app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); });
 
         item->inputCallback = [app = app, item](gui::Item &, const gui::InputEvent &event) {
-            if (event.isShortPress() && event.is(gui::KeyCode::KEY_LF)) {
+            if (event.isShortRelease(gui::KeyCode::KEY_LF)) {
                 app->switchWindow(gui::window::name::options_quote,
                                   std::make_unique<gui::QuoteSwitchData>(gui::QuoteAction::None, item->getQuoteData()));
             }

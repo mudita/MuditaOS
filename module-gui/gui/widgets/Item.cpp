@@ -14,7 +14,7 @@ namespace gui
 
     NavigationDirection inputToNavigation(const InputEvent &evt)
     {
-        switch (evt.keyCode) {
+        switch (evt.getKeyCode()) {
         case gui::KeyCode::KEY_LEFT:
             return gui::NavigationDirection::LEFT;
         case gui::KeyCode::KEY_RIGHT:
@@ -437,11 +437,11 @@ namespace gui
     bool Item::handleNavigation(const InputEvent inputEvent)
     {
         gui::Item *newFocusItem = nullptr;
-        if ((focusItem != nullptr) && (inputEvent.state == InputEvent::State::keyReleasedShort)) {
+        if ((focusItem != nullptr) && (inputEvent.isShortRelease())) {
             if (itemNavigation != nullptr && itemNavigation(inputEvent)) {
                 return true;
             }
-            if (inputEvent.keyCode == gui::KeyCode::KEY_ENTER && focusItem != nullptr) {
+            if (inputEvent.is(gui::KeyCode::KEY_ENTER) && focusItem != nullptr) {
                 return focusItem->onActivated(nullptr);
             }
             newFocusItem = focusItem->getNavigationItem(inputToNavigation(inputEvent));

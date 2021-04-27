@@ -66,19 +66,19 @@ namespace gui
             return true;
         }
 
-        if (inputEvent.is(gui::KeyCode::KEY_LF) && inputEvent.isShortPress()) {
+        if (inputEvent.isShortRelease(gui::KeyCode::KEY_LF)) {
             application->switchWindow(gui::name::window::all_songs_window);
             return true;
         }
 
         if (inputEvent.is(gui::KeyCode::KEY_ENTER) || inputEvent.is(gui::KeyCode::HEADSET_OK)) {
-            if (inputEvent.isLongPress()) {
+            if (inputEvent.isLongRelease()) {
                 auto app = dynamic_cast<app::ApplicationMusicPlayer *>(application);
                 assert(app);
                 app->stop();
                 return true;
             }
-            else if (inputEvent.isShortPress()) {
+            else if (inputEvent.isShortRelease()) {
                 auto app = dynamic_cast<app::ApplicationMusicPlayer *>(application);
                 assert(app);
                 app->togglePlaying();

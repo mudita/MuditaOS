@@ -55,8 +55,8 @@ void SpecialInputMainWindow::destroyInterface()
 bool SpecialInputMainWindow::onInput(const InputEvent &inputEvent)
 {
     auto ret = AppWindow::onInput(inputEvent);
-    if (inputEvent.state == InputEvent::State::keyReleasedShort) {
-        switch (inputEvent.keyCode) {
+    if (inputEvent.isShortRelease()) {
+        switch (inputEvent.getKeyCode()) {
         case KeyCode::KEY_LF: {
             switchPage();
             return true;
