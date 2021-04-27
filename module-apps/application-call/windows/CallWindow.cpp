@@ -186,7 +186,7 @@ namespace gui
             bottomBar->setActive(gui::BottomBar::Side::CENTER, false);
             bottomBar->setActive(gui::BottomBar::Side::RIGHT, false);
             durationLabel->setVisible(true);
-            durationLabel->setText(utils::translate(strings::callended));
+            setCallEndMessage();
             sendSmsIcon->setVisible(false);
             speakerIcon->setVisible(false);
             microphoneIcon->setVisible(false);
@@ -325,8 +325,12 @@ namespace gui
     {
         switch (getState()) {
         case State::INCOMING_CALL:
+            callEndType = CallEndType::Rejected;
+            interface->hangupCall();
+            return true;
         case State::OUTGOING_CALL:
         case State::CALL_IN_PROGRESS:
+            callEndType = CallEndType::Ended;
             interface->hangupCall();
             return true;
         case State::IDLE:
@@ -435,6 +439,20 @@ namespace gui
         callDuration = std::chrono::seconds().zero();
         if (callTimer.isActive()) {
             callTimer.stop();
+        }
+    }
+
+    void CallWindow::setCallEndMessage()
+    {
+        switch (callEndType) {
+        case CallEndType::Ended:
+            durationLabel->setText(utils::translate(strings::callended));
+            break;
+        case CallEndType::Rejected:
+            durationLabel->setText(utils::translate(strings::callrejected));
+            break;
+        case CallEndType::None:
+            break;
         }
     }
 } /* namespace gui */

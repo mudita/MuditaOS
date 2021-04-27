@@ -9,22 +9,23 @@ namespace callAppStyle
 {
     namespace strings
     {
-        inline constexpr auto call      = "app_call_call";
-        inline constexpr auto clear     = "app_call_clear";
-        inline constexpr auto reject    = "app_call_reject";
-        inline constexpr auto answer    = "app_call_answer";
-        inline constexpr auto message   = "app_call_message";
-        inline constexpr auto endcall   = "app_call_end_call";
-        inline constexpr auto emergency = "app_call_emergency";
-        inline constexpr auto iscalling = "app_call_is_calling";
-        inline constexpr auto calling   = "app_call_calling";
-        inline constexpr auto callended = "app_call_call_ended";
-        inline constexpr auto contact   = "app_call_contact";
-        inline constexpr auto mute      = "app_call_mute";
-        inline constexpr auto MUTED     = "app_call_muted";
-        inline constexpr auto speaker   = "app_call_speaker";
-        inline constexpr auto speakeron = "app_call_speaker_on";
-        inline constexpr auto bluetooth = "app_call_bluetooth";
+        inline constexpr auto call          = "app_call_call";
+        inline constexpr auto clear         = "app_call_clear";
+        inline constexpr auto reject        = "app_call_reject";
+        inline constexpr auto answer        = "app_call_answer";
+        inline constexpr auto message       = "app_call_message";
+        inline constexpr auto endcall       = "app_call_end_call";
+        inline constexpr auto emergency     = "app_call_emergency";
+        inline constexpr auto iscalling     = "app_call_is_calling";
+        inline constexpr auto calling       = "app_call_calling";
+        inline constexpr auto callended     = "app_call_call_ended";
+        inline constexpr auto callrejected  = "app_call_call_rejected";
+        inline constexpr auto contact       = "app_call_contact";
+        inline constexpr auto mute          = "app_call_mute";
+        inline constexpr auto MUTED         = "app_call_muted";
+        inline constexpr auto speaker       = "app_call_speaker";
+        inline constexpr auto speakeron     = "app_call_speaker_on";
+        inline constexpr auto bluetooth     = "app_call_bluetooth";
         inline constexpr auto privateNumber = "app_call_private_number";
     } // namespace strings
 

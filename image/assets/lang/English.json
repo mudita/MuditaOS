@@ -287,6 +287,7 @@
   "app_call_is_calling": "is calling",
   "app_call_calling": "calling...",
   "app_call_call_ended": "call ended",
+  "app_call_call_rejected": "call rejected",
   "app_call_contact": "CONTACT",
   "app_call_mute": "MUTE",
   "app_call_muted": "MUTED",

@@ -17,6 +17,13 @@ namespace gui
     class CallWindow : public AppWindow
     {
       private:
+        enum class CallEndType
+        {
+            None,
+            Ended,
+            Rejected,
+        } callEndType = CallEndType::None;
+
         gui::KeyInputMappedTranslation translator;
         sys::TimerHandle callTimer;
         sys::TimerHandle delayedExitTimer;
@@ -27,6 +34,7 @@ namespace gui
         {
             return callDelayedStopTime;
         }
+        void setCallEndMessage();
 
       protected:
         app::CallWindowInterface *interface = nullptr;
