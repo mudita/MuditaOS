@@ -81,8 +81,8 @@ namespace gui
 
     bool NumberWindow::onInput(const InputEvent &inputEvent)
     {
-        auto code = translator.handle(inputEvent.key, InputMode({InputMode::phone}).get());
-        if (inputEvent.isShortPress()) {
+        auto code = translator.handle(inputEvent.getRawKey(), InputMode({InputMode::phone}).get());
+        if (inputEvent.isShortRelease()) {
             // Call function
             if (inputEvent.is(KeyCode::KEY_LF)) {
                 interface->handleCallEvent(enteredNumber);
@@ -114,7 +114,7 @@ namespace gui
                 return true;
             }
         }
-        else if (inputEvent.isLongPress()) {
+        else if (inputEvent.isLongRelease()) {
             // erase all characters from phone number
             if (inputEvent.is(KeyCode::KEY_RF)) {
                 // if there isn't any char in phone number field return to previous application

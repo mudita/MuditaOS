@@ -22,17 +22,16 @@ namespace gui
     auto ChangePasscodeWindow::onInput(const InputEvent &inputEvent) -> bool
     {
         auto &lock = lockHandler.getLock();
-        if (lock.isState(Lock::LockState::Unlocked) && inputEvent.isShortPress()) {
+        if (lock.isState(Lock::LockState::Unlocked) && inputEvent.isShortRelease()) {
             application->returnToPreviousWindow();
         }
-        if (!inputEvent.isShortPress()) {
+        if (!inputEvent.isShortRelease()) {
             return AppWindow::onInput(inputEvent);
         }
 
-        auto keyCodeNum = gui::toNumeric(inputEvent.keyCode);
-        if (0 <= keyCodeNum && keyCodeNum <= 9 && lock.canPut()) {
+        if (inputEvent.isDigit() && lock.canPut()) {
             lockBox->putChar(lock.getCharCount());
-            lock.putNextChar(keyCodeNum);
+            lock.putNextChar(inputEvent.numericValue());
             return true;
         }
         else if (inputEvent.is(KeyCode::KEY_PND)) {

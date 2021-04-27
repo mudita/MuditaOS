@@ -120,7 +120,7 @@ namespace app::notes
 
     bool NoteEditWindow::onInput(const gui::InputEvent &inputEvent)
     {
-        if (inputEvent.isShortPress()) {
+        if (inputEvent.isShortRelease()) {
             if (inputEvent.is(gui::KeyCode::KEY_ENTER)) {
                 saveNote();
                 auto switchData                        = std::make_unique<NoteSwitchData>(*notesRecord);

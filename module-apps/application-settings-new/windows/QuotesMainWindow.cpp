@@ -68,16 +68,12 @@ namespace gui
             return true;
         }
 
-        if (inputEvent.isShortPress()) {
-            switch (inputEvent.keyCode) {
-            case gui::KeyCode::KEY_LEFT:
-                application->switchWindow(gui::window::name::new_quote,
-                                          std::make_unique<QuoteSwitchData>(QuoteAction::Add));
-                return true;
-            default:
-                break;
-            }
+        if (inputEvent.isShortRelease(gui::KeyCode::KEY_LEFT)) {
+            application->switchWindow(gui::window::name::new_quote,
+                                      std::make_unique<QuoteSwitchData>(QuoteAction::Add));
+            return true;
         }
+
         return false;
     }
 

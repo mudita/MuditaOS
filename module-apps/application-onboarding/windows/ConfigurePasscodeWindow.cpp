@@ -29,7 +29,7 @@ namespace gui
 
     auto ConfigurePasscodeWindow::onInput(const InputEvent &inputEvent) -> bool
     {
-        if (inputEvent.isShortPress() && inputEvent.is(KeyCode::KEY_LF)) {
+        if (inputEvent.isShortRelease(KeyCode::KEY_LF)) {
             application->setLockScreenPasscodeOn(false);
             application->switchWindow(gui::window::name::onBoarding_date_and_time,
                                       gui::ShowMode::GUI_SHOW_INIT,

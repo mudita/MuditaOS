@@ -70,7 +70,7 @@ namespace gui
 
     auto MeditationWindow::onInput(const InputEvent &inputEvent) -> bool
     {
-        if (inputEvent.isShortPress()) {
+        if (inputEvent.isShortRelease()) {
             if (inputEvent.is(KeyCode::KEY_LF) && bottomBar->isActive(BottomBar::Side::LEFT)) {
                 application->switchWindow(app::window::name::meditation_options);
                 return true;

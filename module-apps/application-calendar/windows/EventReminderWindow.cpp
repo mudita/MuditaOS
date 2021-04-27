@@ -143,11 +143,7 @@ namespace gui
             return true;
         }
 
-        if (!inputEvent.isShortPress()) {
-            return false;
-        }
-
-        if (inputEvent.keyCode == gui::KeyCode::KEY_ENTER) {
+        if (inputEvent.isShortRelease(gui::KeyCode::KEY_ENTER)) {
             closeReminder();
             return true;
         }

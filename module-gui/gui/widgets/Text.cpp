@@ -457,7 +457,7 @@ namespace gui
 
     auto Text::handleRotateInputMode(const InputEvent &inputEvent) -> bool
     {
-        if (mode != nullptr && inputEvent.isShortPress() && inputEvent.keyCode == gui::KeyCode::KEY_AST) {
+        if (mode != nullptr && inputEvent.isShortRelease(gui::KeyCode::KEY_AST)) {
             mode->next();
             return true;
         }
@@ -474,7 +474,7 @@ namespace gui
 
     auto Text::handleSelectSpecialChar(const InputEvent &inputEvent) -> bool
     {
-        if (mode != nullptr && inputEvent.isLongPress() && inputEvent.keyCode == gui::KeyCode::KEY_AST) {
+        if (mode != nullptr && inputEvent.isLongRelease() && inputEvent.is(gui::KeyCode::KEY_AST)) {
             mode->select_special_char();
             return true;
         }
@@ -483,12 +483,12 @@ namespace gui
 
     auto Text::handleActivation(const InputEvent &inputEvent) -> bool
     {
-        return inputEvent.isShortPress() && inputEvent.is(KeyCode::KEY_AST) && Rect::onActivated(nullptr);
+        return inputEvent.isShortRelease(KeyCode::KEY_AST) && Rect::onActivated(nullptr);
     }
 
     auto Text::handleNavigation(const InputEvent &inputEvent) -> bool
     {
-        if (!inputEvent.isShortPress()) {
+        if (!inputEvent.isShortRelease()) {
             return false;
         }
 
@@ -532,7 +532,7 @@ namespace gui
         if (!isMode(EditMode::Edit)) {
             return false;
         }
-        if (inputEvent.isShortPress() && inputEvent.is(key_signs_remove)) {
+        if (inputEvent.isShortRelease(key_signs_remove)) {
 
             setCursorStartPosition(CursorStartPosition::Offset);
 
@@ -546,11 +546,11 @@ namespace gui
 
     bool Text::handleAddChar(const InputEvent &inputEvent)
     {
-        if (!inputEvent.isShortPress() || !isMode(EditMode::Edit)) {
+        if (!inputEvent.isShortRelease() || !isMode(EditMode::Edit)) {
             return false;
         }
 
-        auto code = translator.handle(inputEvent.key, mode ? mode->get() : "");
+        auto code = translator.handle(inputEvent.getRawKey(), mode ? mode->get() : "");
 
         if (code != Profile::none_key && checkAdditionBounds(code) == AdditionBound::CanAddAll) {
 
@@ -576,13 +576,12 @@ namespace gui
 
     bool Text::handleDigitLongPress(const InputEvent &inputEvent)
     {
-        if (!inputEvent.isLongPress()) {
+        if (!inputEvent.isLongRelease()) {
             return false;
         }
 
-        auto val = toNumeric(inputEvent.keyCode);
-
-        if (val != InvalidNumericKeyCode && checkAdditionBounds(val) == AdditionBound::CanAddAll) {
+        if (const auto val = inputEvent.numericValue();
+            inputEvent.isDigit() && checkAdditionBounds(val) == AdditionBound::CanAddAll) {
 
             setCursorStartPosition(CursorStartPosition::Offset);
             addChar(intToAscii(val));

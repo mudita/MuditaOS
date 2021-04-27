@@ -122,11 +122,7 @@ namespace gui
             return true;
         }
 
-        if (inputEvent.state != InputEvent::State::keyReleasedShort) {
-            return false;
-        }
-
-        if (inputEvent.keyCode == KeyCode::KEY_LF) {
+        if (inputEvent.isShortRelease(KeyCode::KEY_LF)) {
             std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
             application->switchWindow(
                 gui::window::name::contact_options, gui::ShowMode::GUI_SHOW_INIT, std::move(data));

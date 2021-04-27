@@ -147,13 +147,13 @@ namespace gui
         body->setEdges(RectangleEdge::None);
 
         body->borderCallback = [this](const InputEvent &inputEvent) -> bool {
-            if (inputEvent.state != InputEvent::State::keyReleasedShort) {
+            if (!inputEvent.isShortRelease()) {
                 return false;
             }
-            if (inputEvent.keyCode == KeyCode::KEY_UP && pageLoaded) {
+            if (inputEvent.is(KeyCode::KEY_UP) && pageLoaded) {
                 return this->requestPreviousPage();
             }
-            else if (inputEvent.keyCode == KeyCode::KEY_DOWN && pageLoaded) {
+            else if (inputEvent.is(KeyCode::KEY_DOWN) && pageLoaded) {
                 return this->requestNextPage();
             }
             else {

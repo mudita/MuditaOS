@@ -21,14 +21,14 @@ namespace app::onBoarding
 
     bool UpdateDialogWindow::onInput(const gui::InputEvent &inputEvent)
     {
-        if (inputEvent.isShortPress()) {
+        if (inputEvent.isShortRelease()) {
             if (inputEvent.is(gui::KeyCode::KEY_ENTER)) {
                 application->switchWindow(gui::window::name::onBoarding_start_configuration,
                                           gui::ShowMode::GUI_SHOW_INIT,
                                           std::make_unique<OnBoardingSwitchData>());
                 return true;
             }
-            if (inputEvent.isShortPress() && inputEvent.is(gui::KeyCode::KEY_RF)) {
+            if (inputEvent.is(gui::KeyCode::KEY_RF)) {
                 return true;
             }
         }

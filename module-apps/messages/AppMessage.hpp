@@ -200,11 +200,12 @@ namespace app
 
         operator std::string() const override
         {
+            const auto &rawKey = event.getRawKey();
             std::stringstream ss;
             ss << "{ ";
-            ss << "state:   " << c_str(event.state) << ", ";
-            ss << "RawKey:  " << c_str(event.key.key_code) << "}";
-            ss << "t0: " << event.key.time_press << ", t1: " << event.key.time_release;
+            ss << "state:   " << c_str(event.getState()) << ", ";
+            ss << "RawKey:  " << c_str(rawKey.key_code) << "}";
+            ss << "t0: " << rawKey.time_press << ", t1: " << rawKey.time_release;
             ss << " }";
             return ss.str().c_str();
         }

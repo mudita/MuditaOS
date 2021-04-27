@@ -51,7 +51,7 @@ namespace app::notes
             return true;
         };
         item->inputCallback = [this, note = note.get()](gui::Item &, const gui::InputEvent &event) {
-            if (event.isShortPress() && event.is(gui::KeyCode::KEY_LF)) {
+            if (event.isShortRelease(gui::KeyCode::KEY_LF)) {
                 application->switchWindow(
                     utils::translate("app_phonebook_options_title"),
                     std::make_unique<gui::OptionsWindowOptions>(noteListOptions(application, *note, *notesRepository)));

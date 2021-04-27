@@ -212,11 +212,11 @@ namespace gui
         };
         recipient->inputCallback = [this]([[maybe_unused]] Item &, const InputEvent &inputEvent) -> bool {
             if (contact != nullptr) {
-                if (inputEvent.isShortPress() && inputEvent.is(KeyCode::KEY_PND)) {
+                if (inputEvent.isShortRelease(KeyCode::KEY_PND)) {
                     recipient->clear();
                     return true;
                 }
-                if (0 <= gui::toNumeric(inputEvent.keyCode) && gui::toNumeric(inputEvent.keyCode) <= 9) {
+                if (inputEvent.isDigit()) {
                     return true;
                 }
             }
@@ -265,7 +265,7 @@ namespace gui
             return true;
         };
         message->inputCallback = [=](Item &, const InputEvent &event) {
-            if (event.state == InputEvent::State::keyReleasedShort && event.keyCode == KeyCode::KEY_LF) {
+            if (event.isShortRelease(KeyCode::KEY_LF)) {
                 auto app = dynamic_cast<app::ApplicationMessages *>(application);
                 assert(app != nullptr);
                 memento->setState(message);

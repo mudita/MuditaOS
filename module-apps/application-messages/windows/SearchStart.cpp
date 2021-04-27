@@ -31,10 +31,7 @@ namespace gui
         inputCallback = [=](Item &, const InputEvent &inputEvent) -> bool {
             auto app = dynamic_cast<app::ApplicationMessages *>(application);
             assert(app);
-            if (inputEvent.state != InputEvent::State::keyReleasedShort) {
-                return false;
-            }
-            if (inputEvent.keyCode == KeyCode::KEY_ENTER) {
+            if (inputEvent.isShortRelease(KeyCode::KEY_ENTER)) {
                 auto search_text = text->getText();
                 app->showSearchResults(utils::translate("common_search_results") + ": " + std::string(search_text),
                                        search_text);

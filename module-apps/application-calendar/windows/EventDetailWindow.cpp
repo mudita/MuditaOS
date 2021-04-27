@@ -79,11 +79,7 @@ namespace gui
             return true;
         }
 
-        if (!inputEvent.isShortPress()) {
-            return false;
-        }
-
-        if (inputEvent.keyCode == gui::KeyCode::KEY_LF) {
+        if (inputEvent.isShortRelease(gui::KeyCode::KEY_LF)) {
             LOG_DEBUG("Switch to option window");
             auto rec  = std::make_unique<EventsRecord>(*eventRecord);
             auto data = std::make_unique<EventRecordData>(std::move(rec));

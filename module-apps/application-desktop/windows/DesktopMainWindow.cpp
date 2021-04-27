@@ -187,7 +187,7 @@ namespace gui
 
     bool DesktopMainWindow::processShortPressEventOnUnlocked(const InputEvent &inputEvent)
     {
-        auto code = translator.handle(inputEvent.key, InputMode({InputMode::phone}).get());
+        auto code = translator.handle(inputEvent.getRawKey(), InputMode({InputMode::phone}).get());
         // if numeric key was pressed record that key and send it to call application
         if (code != 0) {
             const auto &number = std::string(1, static_cast<char>(code));
@@ -249,10 +249,10 @@ namespace gui
     {
         auto *app = getAppDesktop();
 
-        if (inputEvent.isLongPress()) {
+        if (inputEvent.isLongRelease()) {
             return processLongPressEvent(inputEvent);
         }
-        else if (inputEvent.isShortPress()) {
+        else if (inputEvent.isShortRelease()) {
             if (app->lockHandler.isScreenLocked()) {
                 return processShortPressEventOnLocked(inputEvent);
             }
@@ -280,7 +280,7 @@ namespace gui
         auto app      = getAppDesktop();
         inputCallback = [this, app, hasDismissibleNotification]([[maybe_unused]] Item &item,
                                                                 const InputEvent &inputEvent) -> bool {
-            if (!inputEvent.isShortPress() || notificationsList->focus) {
+            if (!inputEvent.isShortRelease() || notificationsList->focus) {
                 return false;
             }
             if (inputEvent.is(KeyCode::KEY_RF) && hasDismissibleNotification) {

@@ -81,10 +81,7 @@ gui::ListItem *CalllogModel::getItem(gui::Order order)
     auto item = new gui::CalllogItem(this, !(utils::dateAndTimeSettings.isTimeFormat12()));
 
     auto callCallback = [this, item](gui::Item & /*item*/, const gui::InputEvent &event) {
-        if (event.state != gui::InputEvent::State::keyReleasedShort) {
-            return false;
-        }
-        if (event.keyCode == gui::KeyCode::KEY_LF) {
+        if (event.isShortRelease(gui::KeyCode::KEY_LF)) {
             return app::manager::Controller::sendAction(
                 application,
                 app::manager::actions::Dial,

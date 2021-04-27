@@ -9,14 +9,6 @@
 #include <i18n/i18n.hpp>
 #include <module-utils/gsl/gsl_assert>
 
-namespace
-{
-    bool isDigit(gui::KeyCode code)
-    {
-        return gui::toNumeric(code) != gui::InvalidNumericKeyCode;
-    }
-} // namespace
-
 calc::InputProcessorText::InputProcessorText(gsl::strict_not_null<gui::Text *> inputField) : inputField{inputField}
 {}
 
@@ -26,12 +18,12 @@ bool calc::InputProcessorText::handle(const gui::InputEvent &event)
         clear();
     }
 
-    if (event.isLongPress() && event.is(gui::KeyCode::KEY_PND)) {
+    if (event.isLongRelease() && event.is(gui::KeyCode::KEY_PND)) {
         clear();
         return true;
     }
 
-    if (!event.isShortPress()) {
+    if (!event.isShortRelease()) {
         return false;
     }
 
@@ -208,7 +200,7 @@ bool calc::InputProcessorText::shouldHideInput(const gui::InputEvent &event) con
         return false;
     }
 
-    if (!isDigit(event.keyCode) && !event.is(gui::KeyCode::KEY_DOWN)) {
+    if (!event.isDigit() && !event.is(gui::KeyCode::KEY_DOWN)) {
         return false;
     }
 
@@ -279,7 +271,7 @@ bool calc::InputProcessorText::inputContainsExponent() const
 
 bool calc::InputProcessorText::prohibidInput(const gui::InputEvent &event) const
 {
-    if (!isDigit(event.keyCode)) {
+    if (!event.isDigit()) {
         return false;
     }
 

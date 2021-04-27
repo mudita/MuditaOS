@@ -53,8 +53,8 @@ void MmiPushWindow::onBeforeShow(ShowMode mode, SwitchData *data)
 
 bool MmiPushWindow::onInput(const InputEvent &inputEvent)
 {
-    if (inputEvent.isShortPress()) {
-        switch (inputEvent.keyCode) {
+    if (inputEvent.isShortRelease()) {
+        switch (inputEvent.getKeyCode()) {
         case KeyCode::KEY_ENTER: {
             application->returnToPreviousWindow();
             return true;

@@ -17,7 +17,7 @@ namespace gui
         };
 
         parent->inputCallback = [=](Item &, const InputEvent &event) {
-            if (event.state != InputEvent::State::keyReleasedShort) {
+            if (!event.isShortRelease()) {
                 return false;
             }
             return child->onInput(event);

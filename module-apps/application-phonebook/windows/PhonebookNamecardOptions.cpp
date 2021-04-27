@@ -32,14 +32,14 @@ namespace gui
 
     auto PhonebookNamecardOptions::onInput(const InputEvent &inputEvent) -> bool
     {
-        if (inputEvent.keyCode == KeyCode::KEY_RF && (inputEvent.state == InputEvent::State::keyReleasedShort)) {
+        if (inputEvent.isShortRelease(KeyCode::KEY_RF)) {
             std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
             application->switchWindow(
                 gui::window::name::contact_options, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
             return true;
         }
 
-        return (AppWindow::onInput(inputEvent));
+        return AppWindow::onInput(inputEvent);
     }
 
     auto PhonebookNamecardOptions::sendViaSms() -> bool

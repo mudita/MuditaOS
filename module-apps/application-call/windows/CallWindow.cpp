@@ -370,17 +370,16 @@ namespace gui
     bool CallWindow::onInput(const InputEvent &inputEvent)
     {
         LOG_INFO("key code: %" PRIu32 ", state: %" PRIu32,
-                 static_cast<uint32_t>(inputEvent.keyCode),
-                 static_cast<uint32_t>(inputEvent.state));
+                 static_cast<uint32_t>(inputEvent.getKeyCode()),
+                 static_cast<uint32_t>(inputEvent.getState()));
 
         bool handled = false;
 
         // process only if key is released
         // InputEvent::State::keyReleasedLong is necessary for KeyCode::KEY_RF to properly abort the active call
-        if (inputEvent.state == InputEvent::State::keyReleasedShort ||
-            inputEvent.state == InputEvent::State::keyReleasedLong) {
-            auto code = translator.handle(inputEvent.key, InputMode({InputMode::phone}).get());
-            switch (inputEvent.keyCode) {
+        if (inputEvent.isKeyRelease()) {
+            auto code = translator.handle(inputEvent.getRawKey(), InputMode({InputMode::phone}).get());
+            switch (inputEvent.getKeyCode()) {
             case KeyCode::KEY_LF:
                 handled = handleLeftButton();
                 break;

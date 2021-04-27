@@ -42,11 +42,10 @@ namespace gui
 
     bool HomeModesWindow::onInput(const gui::InputEvent &inputEvent)
     {
-        if ((inputEvent.isShortPress())) {
-            if (inputEvent.keyCode == KeyCode::KEY_RF) {
-                return false;
-            }
+        if (inputEvent.isShortRelease(KeyCode::KEY_RF)) {
+            return false;
         }
+
         return AppWindow::onInput(inputEvent);
     }
 } // namespace gui

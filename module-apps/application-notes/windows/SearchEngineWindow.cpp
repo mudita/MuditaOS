@@ -46,7 +46,7 @@ namespace app::notes
 
     bool SearchEngineWindow::onInput(const gui::InputEvent &inputEvent)
     {
-        if (inputEvent.isShortPress() && inputEvent.is(gui::KeyCode::KEY_ENTER)) {
+        if (inputEvent.isShortRelease(gui::KeyCode::KEY_ENTER)) {
             presenter->searchFor(input->getText());
             return true;
         }

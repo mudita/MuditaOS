@@ -93,10 +93,10 @@ namespace gui
 
         inputCallback = [&](Item &item, const InputEvent &event) {
             auto focusedItem = getFocusItem();
-            if (event.state != InputEvent::State::keyReleasedShort) {
+            if (!event.isShortRelease()) {
                 return false;
             }
-            if (event.keyCode == KeyCode::KEY_ENTER || event.keyCode == KeyCode::KEY_RF) {
+            if (event.is(KeyCode::KEY_ENTER) || event.is(KeyCode::KEY_RF)) {
                 return false;
             }
             if (focusedItem->onInput(event)) {
@@ -202,10 +202,10 @@ namespace gui
     void DateWidget::setOnInputCallback(Label &dateInput)
     {
         dateInput.inputCallback = [&](Item &item, const InputEvent &event) {
-            if (event.state != InputEvent::State::keyReleasedShort) {
+            if (!event.isShortRelease()) {
                 return false;
             }
-            if (auto value = toNumeric(event.keyCode); value >= 0) {
+            if (auto value = event.numericValue(); value >= 0) {
                 setDate(value, dateInput);
                 return true;
             }

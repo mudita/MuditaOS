@@ -75,7 +75,7 @@ namespace gui
 
     auto AllDevicesWindow::onInput(const InputEvent &inputEvent) -> bool
     {
-        if (!inputEvent.isShortPress()) {
+        if (!inputEvent.isShortRelease()) {
             return AppWindow::onInput(inputEvent);
         }
         if (inputEvent.is(KeyCode::KEY_LEFT)) {

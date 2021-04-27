@@ -110,14 +110,14 @@ namespace gui
         };
 
         inputCallback = [&](gui::Item &item, const gui::InputEvent &event) {
-            if (event.state != gui::InputEvent::State::keyReleasedShort) {
+            if (!event.isShortRelease()) {
                 return false;
             }
-            if (toNumeric(event.keyCode) != -1) {
-                inputBoxLabel->setText(std::to_string(toNumeric(event.keyCode)));
+            if (event.isDigit()) {
+                inputBoxLabel->setText(std::to_string(event.numericValue()));
                 return true;
             }
-            if (event.keyCode == KeyCode::KEY_PND) {
+            if (event.is(KeyCode::KEY_PND)) {
                 inputBoxLabel->clear();
                 return true;
             }
@@ -152,10 +152,7 @@ namespace gui
         };
 
         inputCallback = [&](gui::Item &item, const gui::InputEvent &event) {
-            if (event.state != gui::InputEvent::State::keyReleasedShort) {
-                return false;
-            }
-            if (event.keyCode == gui::KeyCode::KEY_LF) {
+            if (event.isShortRelease(gui::KeyCode::KEY_LF)) {
                 tickImage->setVisible(!tickImage->visible);
                 if (tickImage->visible) {
                     bottomBarTemporaryMode(utils::translate("app_phonebook_uncheck"));
@@ -198,11 +195,7 @@ namespace gui
         };
 
         inputCallback = [&](gui::Item &item, const gui::InputEvent &event) {
-            if (event.state != gui::InputEvent::State::keyReleasedShort) {
-                return false;
-            }
-
-            if (event.keyCode == gui::KeyCode::KEY_LF) {
+            if (event.isShortRelease(gui::KeyCode::KEY_LF)) {
                 tickImage->setVisible(!tickImage->visible);
                 if (tickImage->visible) {
                     bottomBarTemporaryMode(utils::translate("app_phonebook_uncheck"));

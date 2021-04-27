@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -82,7 +82,7 @@ TEST_CASE("gui::Window on input flow test")
         };
 
         l1->inputCallback = [&l1_input_handled](gui::Item &, const gui::InputEvent &inputEvent) -> bool {
-            if (inputEvent.keyCode == gui::KeyCode::KEY_TORCH) {
+            if (inputEvent.is(gui::KeyCode::KEY_TORCH)) {
                 l1_input_handled = true;
                 return true;
             }

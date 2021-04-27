@@ -67,7 +67,7 @@ namespace gui
             return true;
         }
         // process only if key is released
-        if (inputEvent.isShortPress() && inputEvent.is(gui::KeyCode::KEY_ENTER)) {
+        if (inputEvent.isShortRelease(gui::KeyCode::KEY_ENTER)) {
             if (weekDaysOptData != nullptr) {
                 auto isCheckedData = customRepeatModel->getIsCheckedData();
                 uint32_t i         = 0;

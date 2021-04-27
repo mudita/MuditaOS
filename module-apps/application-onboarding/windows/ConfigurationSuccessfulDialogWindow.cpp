@@ -21,7 +21,7 @@ namespace app::onBoarding
 
     bool ConfigurationSuccessfulDialogWindow::onInput(const gui::InputEvent &inputEvent)
     {
-        if (inputEvent.isShortPress()) {
+        if (inputEvent.isShortRelease()) {
             if (inputEvent.is(gui::KeyCode::KEY_ENTER)) {
                 auto metaData = std::make_unique<gui::DialogMetadataMessage>(
                     gui::DialogMetadata{utils::translate("app_onboarding_title_update_info"),
@@ -34,7 +34,7 @@ namespace app::onBoarding
                 return true;
             }
 
-            if (inputEvent.isShortPress() && inputEvent.is(gui::KeyCode::KEY_RF)) {
+            if (inputEvent.is(gui::KeyCode::KEY_RF)) {
                 return true;
             }
         }

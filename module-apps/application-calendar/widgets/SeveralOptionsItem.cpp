@@ -123,10 +123,10 @@ namespace gui
         };
 
         inputCallback = [&](gui::Item &item, const gui::InputEvent &event) {
-            if (event.state != gui::InputEvent::State::keyReleasedShort) {
+            if (!event.isShortRelease()) {
                 return false;
             }
-            if (event.keyCode == gui::KeyCode::KEY_LEFT) {
+            if (event.is(gui::KeyCode::KEY_LEFT)) {
                 actualVectorIndex--;
                 if (actualVectorIndex >= optionsNames.size()) {
                     actualVectorIndex = optionsNames.size() - 1;
@@ -140,7 +140,7 @@ namespace gui
                 optionLabel->setText(optionsNames[actualVectorIndex]);
                 return true;
             }
-            if (event.keyCode == gui::KeyCode::KEY_RIGHT) {
+            if (event.is(gui::KeyCode::KEY_RIGHT)) {
                 actualVectorIndex++;
                 if (actualVectorIndex >= optionsNames.size()) {
                     actualVectorIndex = 0;
@@ -155,7 +155,7 @@ namespace gui
                 }
                 return true;
             }
-            if (event.keyCode == gui::KeyCode::KEY_LF && actualVectorIndex == optionsNames.size() - 1 &&
+            if (event.is(gui::KeyCode::KEY_LF) && actualVectorIndex == optionsNames.size() - 1 &&
                 descriptionLabel->getText() == utils::translate("app_calendar_event_detail_repeat")) {
                 OptionParser parser;
                 auto weekDayRepeatData = std::make_unique<WeekDaysRepeatData>();

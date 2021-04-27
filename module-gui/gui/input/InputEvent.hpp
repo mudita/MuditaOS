@@ -5,6 +5,8 @@
 
 #include <sstream>
 #include <cstdint>
+#include <type_traits>
+#include <gsl_assert>
 #include "bsp/keyboard/key_codes.hpp"
 #include "common_data/RawKey.hpp"
 
@@ -89,29 +91,98 @@ namespace gui
             keyReleasedLong  = 0x04,
         };
 
-        RawKey key      = {};                     /// RawKey data
-        State state     = State::keyPressed;      /// initial translated key state
-        KeyCode keyCode = KeyCode::KEY_UNDEFINED; /// initial translated key code
-
         InputEvent(RawKey key, State state = State::Undefined, KeyCode keyCode = KeyCode::KEY_UNDEFINED);
-        [[nodiscard]] auto isShortPress() const -> bool
+
+        [[nodiscard]] auto getRawKey() const -> RawKey
+        {
+            return rawKey;
+        }
+
+        [[nodiscard]] auto getState() const -> State
+        {
+            return state;
+        }
+
+        void setState(State s)
+        {
+            state = s;
+        }
+
+        [[nodiscard]] auto getKeyCode() const -> KeyCode
+        {
+            return keyCode;
+        }
+
+        void setKeyCode(KeyCode code)
+        {
+            keyCode = code;
+        }
+
+        [[nodiscard]] auto isKeyPress() const -> bool
+        {
+            return state == State::keyPressed;
+        }
+
+        [[nodiscard]] auto isKeyPress(KeyCode code) const -> bool
+        {
+            return isKeyPress() && is(code);
+        }
+
+        [[nodiscard]] auto isShortRelease() const -> bool
         {
             return state == State::keyReleasedShort;
         }
-        [[nodiscard]] auto isKeyRelease() const -> bool
+
+        [[nodiscard]] auto isShortRelease(KeyCode code) const -> bool
         {
-            return state == State::keyReleasedShort || state == State::keyReleasedLong;
+            return isShortRelease() && is(code);
         }
-        [[nodiscard]] auto isLongPress() const -> bool
+
+        [[nodiscard]] auto isLongRelease() const -> bool
         {
             return state == State::keyReleasedLong;
         }
+
+        [[nodiscard]] auto isLongRelease(KeyCode code) const -> bool
+        {
+            return isLongRelease() && is(code);
+        }
+
+        [[nodiscard]] auto isKeyRelease() const -> bool
+        {
+            return isShortRelease() || isLongRelease();
+        }
+
+        [[nodiscard]] auto isKeyRelease(KeyCode code) const -> bool
+        {
+            return isKeyRelease() && is(code);
+        }
+
         [[nodiscard]] auto is(KeyCode code) const -> bool
         {
             return keyCode == code;
         }
+
+        [[nodiscard]] auto isDigit() const -> bool
+        {
+            return toNumeric(keyCode) != InvalidNumericKeyCode;
+        }
+
+        [[nodiscard]] auto numericValue() const -> int
+        {
+            Expects(isDigit());
+            return toNumeric(keyCode);
+        }
+
         [[nodiscard]] auto str() const -> std::string;
+
+      private:
+        RawKey rawKey   = {};                     /// RawKey data
+        State state     = State::keyPressed;      /// initial translated key state
+        KeyCode keyCode = KeyCode::KEY_UNDEFINED; /// initial translated key code
     };
+
+    static_assert(std::is_trivially_copyable_v<InputEvent>);
 
 } // namespace gui
 

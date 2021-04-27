@@ -55,11 +55,7 @@ namespace gui
             return true;
         }
 
-        if (!inputEvent.isShortPress()) {
-            return false;
-        }
-
-        if (inputEvent.is(gui::KeyCode::KEY_ENTER) && !inputField->isEmpty()) {
+        if (inputEvent.isShortRelease(gui::KeyCode::KEY_ENTER) && !inputField->isEmpty()) {
             bluetoothSettingsModel->setDeviceName(inputField->getText());
             return true;
         }
