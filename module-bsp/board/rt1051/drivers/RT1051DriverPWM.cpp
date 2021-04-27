@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RT1051DriverPWM.hpp"
@@ -75,7 +75,7 @@ namespace drivers
 
         std::uint8_t dutyCycle =
             std::clamp(dutyCyclePercent, static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(100));
-
+        pwmSignalConfig.dutyCyclePercent = dutyCycle;
         PWM_UpdatePwmDutycycle(base, pwmModule, pwmSignalConfig.pwmChannel, pwmMode, dutyCycle);
         PWM_SetPwmLdok(base, 1 << pwmModule, true);
     }
@@ -141,7 +141,10 @@ namespace drivers
     void RT1051DriverPWM::UpdateClockFrequency(std::uint32_t newFrequency)
     {
         cpp_freertos::LockGuard lock(frequencyChangeMutex);
+        Stop();
         SetupPWMInstance(newFrequency);
+        SetDutyCycle(pwmSignalConfig.dutyCyclePercent);
+        Start();
     }
 
 } // namespace drivers
