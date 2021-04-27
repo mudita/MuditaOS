@@ -21,7 +21,7 @@ namespace gui
         if (key.state == RawKey::State::Released && prev_key_press.key_code == key.key_code) {
             // determine long press
             if (key.time_release - prev_key_press.time_press >= key_time_longpress_ms) {
-                evt.state = InputEvent::State::keyReleasedLong;
+                evt.setState(InputEvent::State::keyReleasedLong);
             }
         }
     }
@@ -30,10 +30,10 @@ namespace gui
     {
         gui::InputEvent evt(key);
         if (key.state == RawKey::State::Pressed) {
-            evt.state = InputEvent::State::keyPressed;
+            evt.setState(InputEvent::State::keyPressed);
         }
         else if (key.state == RawKey::State::Released) {
-            evt.state = InputEvent::State::keyReleasedShort;
+            evt.setState(InputEvent::State::keyReleasedShort);
         }
         recon_long_press(evt, key, prev_key_press, key_time_longpress_ms);
         // store last key press/release
@@ -157,24 +157,17 @@ namespace gui
         auto evt = KeyBaseTranslation::set(key);
         // when last action timed out we don't want to handle key release
         if (prev_key_timedout && key.state == RawKey::State::Released) {
-            evt.state         = InputEvent::State::Undefined;
+            evt.setState(InputEvent::State::Undefined);
             prev_key_timedout = false;
         }
-        evt.keyCode = getKeyCode(key.key_code);
+        evt.setKeyCode(getKeyCode(key.key_code));
         return evt;
     }
 
     InputEvent KeyInputSimpleTranslation::translate(uint32_t timeout)
     {
-        RawKey key;
-        key.state        = RawKey::State::Released;
-        key.key_code     = prev_key_press.key_code;
-        key.time_press   = 0;
-        key.time_release = timeout;
-        InputEvent evt(key);
-        evt.state   = InputEvent::State::keyReleasedLong;
-        evt.keyCode = getKeyCode(key.key_code);
-        return evt;
+        RawKey key{RawKey::State::Released, prev_key_press.key_code, 0, timeout};
+        return InputEvent{key, InputEvent::State::keyReleasedLong, getKeyCode(key.key_code)};
     }
 
     uint32_t KeyInputMappedTranslation::handle(RawKey key, const std::string &keymap)

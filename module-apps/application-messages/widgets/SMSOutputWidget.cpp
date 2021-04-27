@@ -83,7 +83,7 @@ namespace gui
         inputCallback = [&]([[maybe_unused]] Item &item, const InputEvent &event) { return smsBubble->onInput(event); };
 
         smsBubble->inputCallback = [application, record](Item &, const InputEvent &event) {
-            if (event.state == InputEvent::State::keyReleasedShort && event.keyCode == KeyCode::KEY_LF) {
+            if (event.isShortRelease(KeyCode::KEY_LF)) {
                 LOG_INFO("Message activated!");
                 auto app = dynamic_cast<app::ApplicationMessages *>(application);
                 assert(app != nullptr);

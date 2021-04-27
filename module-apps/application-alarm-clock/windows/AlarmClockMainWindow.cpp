@@ -97,7 +97,7 @@ namespace app::alarmClock
             return true;
         }
 
-        if (inputEvent.isShortPress() && inputEvent.is(gui::KeyCode::KEY_LEFT)) {
+        if (inputEvent.isShortRelease(gui::KeyCode::KEY_LEFT)) {
             auto rec                              = new AlarmsRecord();
             rec->time                             = TimePointNow();
             auto event                            = std::make_shared<AlarmsRecord>(*rec);

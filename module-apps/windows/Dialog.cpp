@@ -43,7 +43,7 @@ DialogConfirm::DialogConfirm(app::Application *app, const std::string &name) : D
     bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::ok));
     setFocusItem(icon);
     icon->inputCallback = [=](Item &, const InputEvent &inputEvent) -> bool {
-        if (inputEvent.state == InputEvent::State::keyReleasedShort && inputEvent.keyCode == gui::KeyCode::KEY_RF) {
+        if (inputEvent.isShortRelease(gui::KeyCode::KEY_RF)) {
             return true;
         }
         return false;

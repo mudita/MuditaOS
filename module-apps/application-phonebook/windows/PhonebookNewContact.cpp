@@ -120,11 +120,11 @@ namespace gui
             return true;
         }
 
-        if (inputEvent.state != InputEvent::State::keyReleasedShort) {
+        if (!inputEvent.isShortRelease()) {
             return false;
         }
 
-        if (inputEvent.keyCode == gui::KeyCode::KEY_ENTER) {
+        if (inputEvent.is(gui::KeyCode::KEY_ENTER)) {
             auto tmpId  = contact->ID;
             contact     = std::make_shared<ContactRecord>();
             contact->ID = tmpId;

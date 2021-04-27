@@ -91,7 +91,7 @@ bool IntervalBox::onFocus(bool state)
 
 bool IntervalBox::onInput(const InputEvent &inputEvent)
 {
-    if (inputEvent.isShortPress()) {
+    if (inputEvent.isShortRelease()) {
         if (inputEvent.is(KeyCode::KEY_LEFT)) {
             updateIntervals(ChimeIntervalList::Direction::Previous);
             return true;

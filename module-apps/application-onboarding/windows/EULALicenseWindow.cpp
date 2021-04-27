@@ -71,15 +71,12 @@ namespace app::onBoarding
 
     bool EULALicenseWindow::onInput(const gui::InputEvent &inputEvent)
     {
-        if (inputEvent.isShortPress()) {
-            if (inputEvent.is(gui::KeyCode::KEY_ENTER)) {
+        if (inputEvent.isShortRelease(gui::KeyCode::KEY_ENTER)) {
+            presenter->acceptEULA();
 
-                presenter->acceptEULA();
-
-                application->switchWindow(gui::window::name::onBoarding_start_configuration,
-                                          gui::ShowMode::GUI_SHOW_INIT,
-                                          std::make_unique<OnBoardingSwitchData>());
-            }
+            application->switchWindow(gui::window::name::onBoarding_start_configuration,
+                                      gui::ShowMode::GUI_SHOW_INIT,
+                                      std::make_unique<OnBoardingSwitchData>());
         }
         return AppWindow::onInput(inputEvent);
     }

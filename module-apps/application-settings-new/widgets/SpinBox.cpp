@@ -36,7 +36,7 @@ namespace gui
 
         inputCallback = [this](gui::Item &item, const gui::InputEvent &event) {
             auto ret = false;
-            if (!event.isShortPress()) {
+            if (!event.isShortRelease()) {
                 return false;
             }
 

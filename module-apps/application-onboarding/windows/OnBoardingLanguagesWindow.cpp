@@ -20,7 +20,7 @@ namespace app::onBoarding
 
     bool OnBoardingLanguagesWindow::onInput(const gui::InputEvent &inputEvent)
     {
-        if (inputEvent.isShortPress() && inputEvent.is(gui::KeyCode::KEY_RF)) {
+        if (inputEvent.isShortRelease(gui::KeyCode::KEY_RF)) {
             return true;
         }
         else {

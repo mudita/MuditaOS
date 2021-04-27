@@ -59,8 +59,7 @@ namespace gui
     auto BluetoothCheckPasskeyWindow::onInput(const InputEvent &inputEvent) -> bool
     {
         auto passkey = text->getText();
-        if (passkey.length() >= minPasskeyCharactersCount && inputEvent.isShortPress() &&
-            inputEvent.is(KeyCode::KEY_ENTER)) {
+        if (passkey.length() >= minPasskeyCharactersCount && inputEvent.isShortRelease(KeyCode::KEY_ENTER)) {
             bluetoothSettingsModel->responsePasskey(passkey);
             return true;
         }

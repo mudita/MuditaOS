@@ -51,7 +51,7 @@ namespace app::alarmClock
             return true;
         }
 
-        if (inputEvent.isShortPress() && inputEvent.is(gui::KeyCode::KEY_ENTER)) {
+        if (inputEvent.isShortRelease(gui::KeyCode::KEY_ENTER)) {
             weekDaysOptData = presenter->getWeekDaysRepeatData();
             application->switchWindow(style::alarmClock::window::name::newEditAlarm,
                                       gui::ShowMode::GUI_SHOW_RETURN,

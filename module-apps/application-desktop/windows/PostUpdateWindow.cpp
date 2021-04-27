@@ -53,11 +53,9 @@ void PostUpdateWindow::setVisibleState()
 
 bool PostUpdateWindow::onInput(const InputEvent &inputEvent)
 {
-    if (inputEvent.isShortPress()) {
-        if (inputEvent.is(KeyCode::KEY_ENTER) && bottomBar->isActive(BottomBar::Side::CENTER)) {
-            application->switchWindow(gui::name::window::main_window);
-            return true;
-        }
+    if (inputEvent.isShortRelease(KeyCode::KEY_ENTER) && bottomBar->isActive(BottomBar::Side::CENTER)) {
+        application->switchWindow(gui::name::window::main_window);
+        return true;
     }
     return AppWindow::onInput(inputEvent);
 }

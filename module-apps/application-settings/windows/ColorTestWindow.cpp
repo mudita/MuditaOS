@@ -53,7 +53,7 @@ namespace gui
     void ColorTestWindow::applyInputCallback()
     {
         this->inputCallback = [&](Item &item, const InputEvent &event) -> bool {
-            if (event.isShortPress()) {
+            if (event.isShortRelease()) {
                 if (event.is(KeyCode::KEY_ENTER)) {
                     setGlobalColorScheme(colorTestModel->getColorScheme());
                     return true;

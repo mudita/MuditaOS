@@ -61,7 +61,7 @@ namespace gui
         if (AppWindow::onInput(inputEvent)) {
             return true;
         }
-        if (!inputEvent.isShortPress()) {
+        if (!inputEvent.isShortRelease()) {
             return false;
         }
         if (!inputEvent.is(gui::KeyCode::KEY_ENTER)) {

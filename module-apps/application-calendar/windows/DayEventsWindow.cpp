@@ -91,11 +91,7 @@ namespace gui
             return true;
         }
 
-        if (!inputEvent.isShortPress()) {
-            return false;
-        }
-
-        if (inputEvent.is(gui::KeyCode::KEY_LEFT)) {
+        if (inputEvent.isShortRelease(gui::KeyCode::KEY_LEFT)) {
             LOG_DEBUG("Switch to new window - edit window");
             auto event       = std::make_shared<EventsRecord>();
             event->date_from = filterFrom;

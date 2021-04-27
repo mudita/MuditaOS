@@ -51,11 +51,11 @@ namespace gui
         };
 
         inputCallback = [&](gui::Item &item, const gui::InputEvent &event) {
-            if (event.state != gui::InputEvent::State::keyReleasedShort) {
+            if (!event.isShortRelease()) {
                 return false;
             }
             if (textOnLeft) {
-                if (event.keyCode == gui::KeyCode::KEY_LF) {
+                if (event.is(gui::KeyCode::KEY_LF)) {
                     image->setVisible(!image->visible);
                     if (image->visible) {
                         bottomBarTemporaryMode(utils::translate("common_uncheck"));
@@ -67,7 +67,7 @@ namespace gui
                 }
             }
             else {
-                if (event.keyCode == gui::KeyCode::KEY_ENTER) {
+                if (event.is(gui::KeyCode::KEY_ENTER)) {
                     image->setVisible(!image->visible);
                     if (image->visible) {
                         bottomBarTemporaryMode(utils::translate("common_uncheck"));

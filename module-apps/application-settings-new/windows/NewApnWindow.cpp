@@ -94,7 +94,7 @@ namespace gui
 
     auto NewApnWindow::onInput(const InputEvent &inputEvent) -> bool
     {
-        if (!inputEvent.isShortPress()) {
+        if (!inputEvent.isShortRelease()) {
             return false;
         }
         if (inputEvent.is(gui::KeyCode::KEY_ENTER)) {

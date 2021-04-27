@@ -332,10 +332,10 @@ namespace app
     sys::MessagePointer Application::handleInputEvent(sys::Message *msgl)
     {
         AppInputEventMessage *msg = reinterpret_cast<AppInputEventMessage *>(msgl);
-        if (msg->getEvent().state == gui::InputEvent::State::keyPressed) {
+        if (msg->getEvent().isKeyPress()) {
             longPressTimer.start();
         }
-        else if (msg->getEvent().state == gui::InputEvent::State::keyReleasedShort) {
+        else if (msg->getEvent().isShortRelease()) {
             longPressTimer.stop();
         }
         if (not windowsStack.isEmpty() && getCurrentWindow()->onInput(msg->getEvent())) {
@@ -351,7 +351,7 @@ namespace app
         }
         sevm::KbdMessage *msg = static_cast<sevm::KbdMessage *>(msgl);
         gui::InputEvent iev   = keyTranslator->translate(msg->key);
-        if (iev.keyCode != gui::KeyCode::KEY_UNDEFINED) {
+        if (!iev.is(gui::KeyCode::KEY_UNDEFINED)) {
             messageInputEventApplication(this, this->GetName(), iev);
         }
         return sys::msgHandled();

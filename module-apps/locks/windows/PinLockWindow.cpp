@@ -93,7 +93,7 @@ namespace gui
 
     bool PinLockWindow::onInput(const InputEvent &inputEvent)
     {
-        if (!inputEvent.isShortPress()) {
+        if (!inputEvent.isShortRelease()) {
             return AppWindow::onInput(inputEvent);
         }
         // accept only LF, enter, RF, #, and numeric values;
@@ -119,10 +119,10 @@ namespace gui
                 return true;
             }
         }
-        else if (0 <= gui::toNumeric(inputEvent.keyCode) && gui::toNumeric(inputEvent.keyCode) <= 9) {
+        else if (inputEvent.isDigit()) {
             if (usesNumericKeys() && lock->canPut()) {
                 lockBox->putChar(lock->getCharCount());
-                lock->putNextChar(gui::toNumeric(inputEvent.keyCode));
+                lock->putNextChar(inputEvent.numericValue());
                 bottomBar->setActive(BottomBar::Side::CENTER, lock->canVerify());
                 return true;
             }

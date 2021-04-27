@@ -146,7 +146,7 @@ namespace app::notes
 
     bool NoteMainWindow::onInput(const gui::InputEvent &inputEvent)
     {
-        if (inputEvent.isShortPress()) {
+        if (inputEvent.isShortRelease()) {
             if (inputEvent.is(gui::KeyCode::KEY_LEFT)) {
                 application->switchWindow(gui::name::window::note_edit,
                                           std::make_unique<NoteSwitchData>(NotesRecord{}));

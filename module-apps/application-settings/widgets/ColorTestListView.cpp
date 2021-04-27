@@ -17,15 +17,15 @@ namespace gui
         : ListView(parent, x, y, w, h, prov, scrollBarType), app{application}
     {
         body->borderCallback = [this](const InputEvent &inputEvent) -> bool {
-            if (inputEvent.state != InputEvent::State::keyReleasedShort) {
+            if (!inputEvent.isShortRelease()) {
                 return false;
             }
-            if (inputEvent.keyCode == KeyCode::KEY_UP && pageLoaded) {
+            if (inputEvent.is(KeyCode::KEY_UP) && pageLoaded) {
                 auto result = this->requestPreviousPage();
                 app->refreshWindow(RefreshModes::GUI_REFRESH_DEEP);
                 return result;
             }
-            else if (inputEvent.keyCode == KeyCode::KEY_DOWN && pageLoaded) {
+            else if (inputEvent.is(KeyCode::KEY_DOWN) && pageLoaded) {
                 auto result = this->requestNextPage();
                 app->refreshWindow(RefreshModes::GUI_REFRESH_DEEP);
                 return result;

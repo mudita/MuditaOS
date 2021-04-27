@@ -36,7 +36,7 @@ namespace gui
 
     bool EmergencyCallWindow::onInput(const InputEvent &inputEvent)
     {
-        if (inputEvent.isShortPress()) {
+        if (inputEvent.isShortRelease()) {
             // Call function
             if (inputEvent.is(KeyCode::KEY_LF)) {
                 interface->handleEmergencyCallEvent(enteredNumber);

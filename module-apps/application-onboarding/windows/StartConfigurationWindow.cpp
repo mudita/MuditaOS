@@ -44,7 +44,7 @@ namespace app::onBoarding
 
     bool StartConfigurationWindow::onInput(const gui::InputEvent &inputEvent)
     {
-        if (inputEvent.isShortPress()) {
+        if (inputEvent.isShortRelease()) {
             if (inputEvent.is(gui::KeyCode::KEY_RF)) {
                 application->switchWindow(gui::window::name::onBoarding_eula,
                                           gui::ShowMode::GUI_SHOW_INIT,

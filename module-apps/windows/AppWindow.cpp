@@ -152,13 +152,13 @@ namespace gui
             return true;
         }
 
-        if (inputEvent.state == InputEvent::State::keyReleasedLong && inputEvent.keyCode == gui::KeyCode::KEY_RF) {
+        if (inputEvent.isLongRelease() && inputEvent.is(gui::KeyCode::KEY_RF)) {
             LOG_INFO("exit to main menu");
             app::manager::Controller::sendAction(application, app::manager::actions::Home);
         }
 
-        if ((inputEvent.isShortPress())) {
-            switch (inputEvent.keyCode) {
+        if ((inputEvent.isShortRelease())) {
+            switch (inputEvent.getKeyCode()) {
             case KeyCode::HEADSET_VOLUP:
                 [[fallthrough]];
             case KeyCode::KEY_VOLUP: {
@@ -178,12 +178,12 @@ namespace gui
             }
         }
 
-        if (inputEvent.keyCode == KeyCode::KEY_TORCH) {
-            if (inputEvent.isLongPress()) {
+        if (inputEvent.is(KeyCode::KEY_TORCH)) {
+            if (inputEvent.isLongRelease()) {
                 application->toggleTorchOnOff();
                 return true;
             }
-            else if (inputEvent.isShortPress()) {
+            else if (inputEvent.isShortRelease()) {
                 application->toggleTorchColor();
                 return true;
             }
