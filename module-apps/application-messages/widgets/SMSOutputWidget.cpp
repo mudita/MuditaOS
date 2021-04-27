@@ -145,9 +145,8 @@ namespace gui
         body->addWidget(errorIcon);
     }
 
-    auto SMSOutputWidget::handleRequestResize([[maybe_unused]] const Item *child,
-                                              unsigned short request_w,
-                                              unsigned short request_h) -> Size
+    auto SMSOutputWidget::handleRequestResize([[maybe_unused]] const Item *child, Length request_w, Length request_h)
+        -> Size
     {
         setMinimumHeight(request_h);
         return Size(request_w, request_h);

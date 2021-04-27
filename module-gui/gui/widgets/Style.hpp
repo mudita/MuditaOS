@@ -103,7 +103,7 @@ namespace style
             inline constexpr auto width = 280U;
             inline constexpr auto h     = 50U;
         }; // namespace progressBar
-    };    // namespace window
+    };     // namespace window
 
     namespace settings
     {

@@ -5,8 +5,8 @@
 #include "BoundingBox.hpp" // for BoundingBox, BoundingBox::(anonymous)
 #include "InputEvent.hpp"  // for InputEvent, KeyCode, InputEvent::State
 #include "Navigation.hpp"  // for Navigation
-#include <algorithm> // for find
-#include <list>      // for list<>::iterator, list, operator!=, _List...
+#include <algorithm>       // for find
+#include <list>            // for list<>::iterator, list, operator!=, _List...
 #include <memory>
 #include <DrawCommand.hpp>
 namespace gui
@@ -141,7 +141,7 @@ namespace gui
         onDimensionChanged(oldArea, widgetArea);
     }
 
-    void Item::setPosition(const short &x, const short &y)
+    void Item::setPosition(const Position &x, const Position &y)
     {
         setArea({x, y, widgetArea.w, widgetArea.h});
     }
@@ -156,7 +156,7 @@ namespace gui
         setArea({widgetArea.x, y, widgetArea.w, widgetArea.h});
     }
 
-    auto Item::requestSize(unsigned short request_w, unsigned short request_h) -> Size
+    auto Item::requestSize(Length request_w, Length request_h) -> Size
     {
         if (parent == nullptr) {
             setSize(request_w, request_h);
@@ -165,7 +165,7 @@ namespace gui
         return parent->handleRequestResize(this, request_w, request_h);
     }
 
-    auto Item::handleRequestResize(const Item *it, unsigned short request_w, unsigned short request_h) -> Size
+    auto Item::handleRequestResize(const Item *it, Length request_w, Length request_h) -> Size
     {
         if (it == nullptr) {
             return {0, 0};
@@ -300,7 +300,7 @@ namespace gui
         return widgetArea.pos(axis);
     }
 
-    void Item::setPosition(const short &val, Axis axis)
+    void Item::setPosition(const Position &val, Axis axis)
     {
         int16_t x = getX();
         int16_t y = getY();
@@ -380,9 +380,7 @@ namespace gui
 
     void Item::setRadius(int value)
     {
-        if (value < 0)
-            value = 0;
-        radius = value;
+        radius = std::abs(value);
     }
 
     void Item::updateDrawArea()

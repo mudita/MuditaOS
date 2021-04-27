@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -119,8 +119,7 @@ namespace gui
         // set focus on specified box element
         bool setFocusOnElement(unsigned int elementNumber);
         void setFocusOnLastElement();
-        template <Axis axis>
-        auto handleRequestResize(const Item *, unsigned short request_w, unsigned short request_h) -> Size;
+        template <Axis axis> auto handleRequestResize(const Item *, Length request_w, Length request_h) -> Size;
         auto onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool override;
     };
 
@@ -132,7 +131,7 @@ namespace gui
         HBox(Item *parent, const uint32_t &x = 0, const uint32_t &y = 0, const uint32_t &w = 0, const uint32_t &h = 0);
         virtual ~HBox() = default;
         virtual void addWidget(Item *item) override;
-        auto handleRequestResize(const Item *, unsigned short request_w, unsigned short request_h) -> Size override;
+        auto handleRequestResize(const Item *, Length request_w, Length request_h) -> Size override;
         Length getSizeLeft();
     };
 
@@ -144,7 +143,7 @@ namespace gui
         VBox(Item *parent, const uint32_t &x = 0, const uint32_t &y = 0, const uint32_t &w = 0, const uint32_t &h = 0);
         virtual ~VBox() = default;
         virtual void addWidget(Item *item) override;
-        auto handleRequestResize(const Item *, unsigned short request_w, unsigned short request_h) -> Size override;
+        auto handleRequestResize(const Item *, Length request_w, Length request_h) -> Size override;
         Length getSizeLeft();
     };
 

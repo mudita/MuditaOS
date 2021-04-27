@@ -314,7 +314,7 @@ namespace gui
 
     auto Text::getSizeMinusPadding(Axis axis, Area val) -> Length
     {
-        auto size = area(val).size(axis);
+        int size = area(val).size(axis);
 
         if (size <= padding.getSumInAxis(axis)) {
             size = 0;

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BoxLayout.hpp"
@@ -265,7 +265,8 @@ namespace gui
     {
         // Get maximum size that element in orthogonal axis can occupy in current layout size.
         Length maxOrthogonalItemInParentSize =
-            this->area(Area::Normal).size(orthogonal(axis)) <= el->getMargins().getSumInAxis(orthogonal(axis))
+            static_cast<Position>(this->area(Area::Normal).size(orthogonal(axis))) <=
+                    el->getMargins().getSumInAxis(orthogonal(axis))
                 ? 0
                 : this->area(Area::Normal).size(orthogonal(axis)) - el->getMargins().getSumInAxis(orthogonal(axis));
 
@@ -288,7 +289,7 @@ namespace gui
         auto axisItemPosition = 0;
 
         // Check if elements in axis can fit with margins in layout free space.
-        if (((Position)axisItemSize + el->getMargins().getSumInAxis(axis)) <= leftPosition) {
+        if (((Position)(axisItemSize + el->getMargins().getSumInAxis(axis))) <= leftPosition) {
 
             if (reverseOrder) {
                 startingPosition -= el->getMargins().getMarginInAxis(axis, MarginInAxis::Second);
@@ -433,7 +434,7 @@ namespace gui
     }
 
     template <Axis axis>
-    auto BoxLayout::handleRequestResize(const Item *child, unsigned short request_w, unsigned short request_h) -> Size
+    auto BoxLayout::handleRequestResize(const Item *child, Length request_w, Length request_h) -> Size
     {
         if (parent != nullptr) {
             auto [w, h] = requestSize(request_w, request_h);
@@ -568,7 +569,7 @@ namespace gui
         BoxLayout::addWidget<Axis::X>(item);
     }
 
-    auto HBox::handleRequestResize(const Item *child, unsigned short request_w, unsigned short request_h) -> Size
+    auto HBox::handleRequestResize(const Item *child, Length request_w, Length request_h) -> Size
     {
         return BoxLayout::handleRequestResize<Axis::X>(child, request_w, request_h);
     }
@@ -599,7 +600,7 @@ namespace gui
         BoxLayout::addWidget<Axis::Y>(item);
     }
 
-    auto VBox::handleRequestResize(const Item *child, unsigned short request_w, unsigned short request_h) -> Size
+    auto VBox::handleRequestResize(const Item *child, Length request_w, Length request_h) -> Size
     {
         return BoxLayout::handleRequestResize<Axis::Y>(child, request_w, request_h);
     }
