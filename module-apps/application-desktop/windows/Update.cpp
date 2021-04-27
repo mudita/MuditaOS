@@ -22,7 +22,7 @@
 namespace gui
 {
 
-    UpdateWindow::UpdateWindow(app::Application *app) : AppWindow(app, app::window::name::desktop_poweroff)
+    UpdateWindow::UpdateWindow(app::Application *app) : AppWindow(app, app::window::name::desktop_update)
     {
         buildInterface();
     }

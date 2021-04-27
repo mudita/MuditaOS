@@ -134,7 +134,8 @@ namespace app::manager
           ApplicationManagerBase(std::move(launchers)), rootApplicationName{_rootApplicationName},
           actionsRegistry{[this](ActionEntry &action) { return handleAction(action); }}, notificationProvider(this),
           autoLockEnabled(false), settings(std::make_unique<settings::Settings>(this)),
-          phoneModeObserver(std::make_unique<sys::phone_modes::Observer>())
+          phoneModeObserver(std::make_unique<sys::phone_modes::Observer>()),
+          phoneLockHandler(locks::PhoneLockHandler(this))
     {
         autoLockTimer = sys::TimerFactory::createSingleShotTimer(
             this, timerBlock, sys::timer::InfiniteTimeout, [this](sys::Timer &) { onPhoneLocked(); });
@@ -148,6 +149,22 @@ namespace app::manager
     {
         utils::setDisplayLanguage(
             settings->getValue(settings::SystemProperties::displayLanguage, settings::SettingsScope::Global));
+
+        phoneLockHandler.enablePhoneLock((utils::getNumericValue<bool>(
+            settings->getValue(settings::SystemProperties::lockScreenPasscodeIsOn, settings::SettingsScope::Global))));
+
+        phoneLockHandler.setPhoneLockHash(
+            settings->getValue(settings::SystemProperties::lockPassHash, settings::SettingsScope::Global));
+
+        settings->registerValueChange(
+            settings::SystemProperties::lockScreenPasscodeIsOn,
+            [this](const std::string &value) { phoneLockHandler.enablePhoneLock(utils::getNumericValue<bool>(value)); },
+            settings::SettingsScope::Global);
+
+        settings->registerValueChange(
+            settings::SystemProperties::lockPassHash,
+            [this](const std::string &value) { phoneLockHandler.setPhoneLockHash(value); },
+            settings::SettingsScope::Global);
 
         settings->registerValueChange(
             settings::SystemProperties::displayLanguage,
@@ -402,6 +419,14 @@ namespace app::manager
             handleDBResponse(response);
             return sys::msgHandled();
         });
+        connect(typeid(lock::LockPhone),
+                [&](sys::Message *request) -> sys::MessagePointer { return phoneLockHandler.handleLockRequest(); });
+        connect(typeid(lock::UnlockPhone),
+                [&](sys::Message *request) -> sys::MessagePointer { return phoneLockHandler.handleUnlockRequest(); });
+        connect(typeid(lock::LockPhoneInput), [&](sys::Message *request) -> sys::MessagePointer {
+            auto msg = static_cast<lock::LockPhoneInput *>(request);
+            return phoneLockHandler.verifyPhoneLockInput(msg->getInputData());
+        });
 
         connect(typeid(app::manager::DOMRequest), [&](sys::Message *request) { return handleDOMRequest(request); });
 
@@ -614,8 +639,15 @@ namespace app::manager
     auto ApplicationManager::handleHomeAction(ActionEntry &action) -> ActionProcessStatus
     {
         action.setTargetApplication(rootApplicationName);
-        SwitchRequest switchRequest(ServiceName, rootApplicationName, gui::name::window::main_window, nullptr);
+
+        SwitchRequest switchRequest(ServiceName, rootApplicationName, resolveHomeWindow(), nullptr);
         return handleSwitchApplication(&switchRequest) ? ActionProcessStatus::Accepted : ActionProcessStatus::Dropped;
+    }
+
+    auto ApplicationManager::resolveHomeWindow() -> std::string
+    {
+        return phoneLockHandler.isPhoneLocked() ? gui::popup::window::phone_lock_window
+                                                : gui::name::window::main_window;
     }
 
     auto ApplicationManager::handleLaunchAction(ActionEntry &action) -> ActionProcessStatus

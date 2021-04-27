@@ -152,9 +152,15 @@ namespace gui
             return true;
         }
 
-        if (inputEvent.isLongRelease() && inputEvent.is(gui::KeyCode::KEY_RF)) {
+        if (inputEvent.isLongRelease(gui::KeyCode::KEY_RF)) {
             LOG_INFO("exit to main menu");
             app::manager::Controller::sendAction(application, app::manager::actions::Home);
+        }
+
+        if (inputEvent.isLongRelease(gui::KeyCode::KEY_PND)) {
+            LOG_INFO("Locking phone");
+
+            application->handlePhoneLock();
         }
 
         if ((inputEvent.isShortRelease())) {

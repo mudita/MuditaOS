@@ -1,29 +1,15 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "InputEvent.hpp"
-#include "gui/widgets/BottomBar.hpp"
-#include "gui/widgets/TopBar.hpp"
-#include "log/log.hpp"
-
-// module-utils
-#include <i18n/i18n.hpp>
-
 #include "PowerOffWindow.hpp"
 
-// services
-#include <service-appmgr/model/ApplicationManager.hpp>
-#include <service-appmgr/Controller.hpp>
-
-#include "service-cellular/ServiceCellular.hpp"
-#include <Style.hpp>
-#include <application-desktop/windows/Names.hpp>
-#include <module-apps/messages/DialogMetadataMessage.hpp>
+#include <log/log.hpp>
+#include <messages/DialogMetadataMessage.hpp>
 
 namespace gui
 {
     PowerOffWindow::PowerOffWindow(app::Application *app, std::unique_ptr<PowerOffPresenter> &&presenter)
-        : DialogYesNo(app, app::window::name::desktop_poweroff), presenter(std::move(presenter))
+        : DialogYesNo(app, popup::window::power_off_window), presenter(std::move(presenter))
     {
         topBar->configure(std::move(configureTopBar(application->getTopBarConfiguration())));
     }
@@ -52,6 +38,9 @@ namespace gui
         metadata.icon  = "turn_off_W_G";
         auto msg       = std::make_unique<DialogMetadataMessage>(std::move(metadata));
         DialogYesNo::onBeforeShow(mode, msg.get());
+
+        bottomBar->setActive(BottomBar::Side::CENTER, false);
+        bottomBar->setActive(BottomBar::Side::RIGHT, false);
     }
 
 } /* namespace gui */

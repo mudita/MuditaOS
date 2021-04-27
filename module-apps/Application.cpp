@@ -6,12 +6,9 @@
 #include "GuiTimer.hpp"    // for GuiTimer
 #include "Item.hpp"        // for Item
 #include "MessageType.hpp" // for MessageType
-#include "module-apps/popups/data/PopupRequestParams.hpp"
-#include "module-apps/popups/data/PhoneModeParams.hpp"
 #include "module-sys/Timers/TimerFactory.hpp" // for Timer
 #include "TopBar.hpp"
 #include "TopBar/Time.hpp"
-#include "popups/TetheringConfirmationPopup.hpp"
 #include "Translator.hpp"                // for KeyInputSim...
 #include "common_data/EventStore.hpp"    // for Battery
 #include "common_data/RawKey.hpp"        // for RawKey, key...
@@ -40,10 +37,21 @@
 #include <module-utils/Utils.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
 #include <module-utils/time/DateAndTimeSettings.hpp>
-
 #include <service-audio/AudioServiceAPI.hpp> // for GetOutputVolume
+
+#include <popups/VolumeWindow.hpp>
+#include <popups/HomeModesWindow.hpp>
 #include <popups/TetheringPhoneModePopup.hpp>
-#include "popups/data/PopupData.hpp"
+#include <popups/TetheringConfirmationPopup.hpp>
+#include <popups/PowerOffWindow.hpp>
+#include <popups/presenter/PowerOffPresenter.hpp>
+#include <popups/lock-popups/PhoneLockedWindow.hpp>
+#include <popups/lock-popups/PhoneLockedInfoWindow.hpp>
+#include <popups/lock-popups/PhoneUnLockWindow.hpp>
+#include <popups/data/PopupData.hpp>
+#include <popups/data/PopupRequestParams.hpp>
+#include <popups/data/PhoneModeParams.hpp>
+#include <locks/data/LockData.hpp>
 
 namespace gui
 {
@@ -94,7 +102,7 @@ namespace app
           default_window(gui::name::window::main_window), windowsStack(this),
           keyTranslator{std::make_unique<gui::KeyInputSimpleTranslation>()}, startInBackground{startInBackground},
           callbackStorage{std::make_unique<CallbackStorage>()}, topBarManager{std::make_unique<TopBarManager>()},
-          settings(std::make_unique<settings::Settings>(this)), phoneMode{mode}
+          settings(std::make_unique<settings::Settings>(this)), phoneMode{mode}, phoneLockSubject(this)
     {
         topBarManager->enableIndicators({gui::top_bar::Indicator::Time});
         using TimeMode = gui::top_bar::TimeConfiguration::TimeMode;
@@ -732,13 +740,12 @@ namespace app
                 });
                 break;
             case ID::Tethering:
+            case ID::TetheringPhoneModeChangeProhibited:
                 windowsFactory.attach(window::tethering_confirmation_window,
                                       [](Application *app, const std::string &name) {
                                           return std::make_unique<gui::TetheringConfirmationPopup>(
                                               app, window::tethering_confirmation_window);
                                       });
-                break;
-            case ID::TetheringPhoneModeChangeProhibited:
                 windowsFactory.attach(window::tethering_phonemode_change_window,
                                       [](Application *app, const std::string &name) {
                                           return std::make_unique<gui::TetheringPhoneModePopup>(
@@ -751,6 +758,22 @@ namespace app
                 });
                 break;
             case ID::Brightness:
+                break;
+            case ID::PhoneLock:
+            case ID::InputLock:
+                windowsFactory.attach(window::phone_lock_window, [](Application *app, const std::string &name) {
+                    return std::make_unique<gui::PhoneLockedWindow>(app, window::phone_lock_window);
+                });
+                windowsFactory.attach(window::phone_lock_info_window, [](Application *app, const std::string &name) {
+                    return std::make_unique<gui::PhoneLockedInfoWindow>(app, window::phone_lock_info_window);
+                });
+                windowsFactory.attach(window::input_lock_window, [](Application *app, const std::string &name) {
+                    return std::make_unique<gui::PhoneUnlockWindow>(app, window::input_lock_window);
+                });
+                windowsFactory.attach(window::power_off_window, [](Application *app, const std::string &name) {
+                    auto presenter = std::make_unique<gui::PowerOffPresenter>(app);
+                    return std::make_unique<gui::PowerOffWindow>(app, std::move(presenter));
+                });
                 break;
             }
         }
@@ -770,6 +793,11 @@ namespace app
                      std::to_string(volumeParams->getVolume()).c_str());
             handleVolumeChanged(volumeParams->getVolume(), volumeParams->getAudioContext());
         }
+        else if (id == ID::InputLock) {
+            auto popupParams = static_cast<const gui::PhoneUnlockInputRequestParams *>(params);
+
+            switchWindow(gui::popup::resolveWindowName(id), std::make_unique<locks::LockData>(popupParams->getLock()));
+        }
         else {
             switchWindow(gui::popup::resolveWindowName(id));
         }
@@ -778,6 +806,7 @@ namespace app
     void Application::abortPopup(gui::popup::ID id)
     {
         const auto popupName = gui::popup::resolveWindowName(id);
+
         if (getCurrentWindow()->getName() == popupName) {
             returnToPreviousWindow();
         }
@@ -882,6 +911,21 @@ namespace app
     void Application::cancelCallbacks(AsyncCallbackReceiver::Ptr receiver)
     {
         callbackStorage->removeAll(receiver);
+    }
+
+    void Application::handlePhoneLock()
+    {
+        phoneLockSubject.lock();
+    }
+
+    void Application::handlePhoneUnLock()
+    {
+        phoneLockSubject.unlock();
+    }
+
+    void Application::verifyPhoneLockInput(const std::vector<unsigned int> &inputData)
+    {
+        phoneLockSubject.verifyInput(inputData);
     }
 
     void Application::setLockScreenPasscodeOn(bool screenPasscodeOn) noexcept

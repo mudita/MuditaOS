@@ -7,11 +7,9 @@
 #include "windows/DesktopMainWindow.hpp"
 #include "windows/MenuWindow.hpp"
 #include "locks/windows/PinLockWindow.hpp"
-#include "windows/PowerOffWindow.hpp"
 #include "windows/DeadBatteryWindow.hpp"
 #include "windows/LogoWindow.hpp"
 #include "windows/ChargingBatteryWindow.hpp"
-#include "windows/LockedInfoWindow.hpp"
 #include "windows/Reboot.hpp"
 #include "windows/Update.hpp"
 #include "windows/UpdateProgress.hpp"
@@ -19,13 +17,12 @@
 #include "windows/MmiPullWindow.hpp"
 #include "windows/MmiPushWindow.hpp"
 #include "windows/MmiInternalMsgWindow.hpp"
-#include "presenter/PowerOffPresenter.hpp"
+#include <popups/presenter/PowerOffPresenter.hpp>
 #include <windows/Dialog.hpp>
 #include <windows/DialogMetadata.hpp>
 #include <messages/DialogMetadataMessage.hpp>
 
 #include "AppWindow.hpp"
-#include "locks/data/LockData.hpp"
 #include "data/DesktopData.hpp"
 #include "models/ActiveNotificationsModel.hpp"
 
@@ -470,10 +467,6 @@ namespace app
         windowsFactory.attach(desktop_menu, [](Application *app, const std::string newname) {
             return std::make_unique<gui::MenuWindow>(app);
         });
-        windowsFactory.attach(desktop_poweroff, [](Application *app, const std::string newname) {
-            auto presenter = std::make_unique<gui::PowerOffPresenter>(app);
-            return std::make_unique<gui::PowerOffWindow>(app, std::move(presenter));
-        });
         windowsFactory.attach(dead_battery, [](Application *app, const std::string newname) {
             return std::make_unique<gui::DeadBatteryWindow>(app);
         });
@@ -482,9 +475,6 @@ namespace app
         });
         windowsFactory.attach(charging_battery, [](Application *app, const std::string newname) {
             return std::make_unique<gui::ChargingBatteryWindow>(app);
-        });
-        windowsFactory.attach(desktop_locked, [](Application *app, const std::string newname) {
-            return std::make_unique<gui::LockedInfoWindow>(app);
         });
         windowsFactory.attach(desktop_reboot, [](Application *app, const std::string newname) {
             auto presenter = std::make_unique<gui::PowerOffPresenter>(app);
@@ -512,10 +502,8 @@ namespace app
             return std::make_unique<gui::DialogConfirm>(app, name);
         });
 
-        attachPopups({gui::popup::ID::Volume,
-                      gui::popup::ID::Tethering,
-                      gui::popup::ID::TetheringPhoneModeChangeProhibited,
-                      gui::popup::ID::PhoneModes});
+        attachPopups(
+            {gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes, gui::popup::ID::PhoneLock});
     }
 
     void ApplicationDesktop::destroyUserInterface()

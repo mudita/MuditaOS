@@ -31,6 +31,7 @@
 #include <service-eink/Common.hpp>
 
 #include <notifications/NotificationProvider.hpp>
+#include <locks/handlers/PhoneLockHandler.hpp>
 
 namespace app
 {
@@ -124,6 +125,7 @@ namespace app::manager
         auto handleAction(ActionEntry &action) -> ActionProcessStatus;
         void handleActionRequest(ActionRequest *actionMsg);
         auto handleHomeAction(ActionEntry &action) -> ActionProcessStatus;
+        auto resolveHomeWindow() -> std::string;
         auto handleLaunchAction(ActionEntry &action) -> ActionProcessStatus;
         auto handleActionOnFocusedApp(ActionEntry &action) -> ActionProcessStatus;
         auto handlePhoneModeChangedAction(ActionEntry &action) -> ActionProcessStatus;
@@ -180,6 +182,9 @@ namespace app::manager
                                         // lock screen.
         std::unique_ptr<settings::Settings> settings;
         std::unique_ptr<sys::phone_modes::Observer> phoneModeObserver;
+
+        locks::PhoneLockHandler phoneLockHandler;
+
         void displayLanguageChanged(std::string value);
         void lockTimeChanged(std::string value);
         void inputLanguageChanged(std::string value);
