@@ -8,6 +8,7 @@
 #include "application-meditation/data/MeditationTimerData.hpp"
 #include "Names.hpp"
 
+#include <Timers/TimerFactory.hpp>
 #include <cassert>
 #include <i18n/i18n.hpp>
 
@@ -16,7 +17,17 @@
 
 using namespace gui;
 
-MeditationTimerWindow::MeditationTimerWindow(app::Application *app) : AppWindow{app, name::window::main_window}
+namespace
+{
+    constexpr std::chrono::seconds endScreenTimeoutTime{5};
+} // namespace
+
+MeditationTimerWindow::MeditationTimerWindow(app::Application *app)
+    : AppWindow{app, name::window::main_window},
+      endScreenTimeout{sys::TimerFactory::createSingleShotTimer(
+          app, "MeditationEndScreenTimeout", endScreenTimeoutTime, [this](sys::Timer &) {
+              application->switchWindow(app::window::name::meditation_main_window);
+          })}
 {
     MeditationTimerWindow::buildInterface();
 }
@@ -86,6 +97,7 @@ auto MeditationTimerWindow::onInput(const InputEvent &inputEvent) -> bool
 {
     if (inputEvent.isShortPress()) {
         if (finished) {
+            endScreenTimeout.stop();
             application->switchWindow(app::window::name::meditation_main_window);
             return true;
         }
@@ -158,6 +170,7 @@ void MeditationTimerWindow::setVisibleMeditationEnd()
     meditationInfo->setText(std::move(textParsed));
     meditationInfo->setVisible(true);
     bottomBar->setVisible(false);
+    endScreenTimeout.start();
 }
 
 void MeditationTimerWindow::invalidate() noexcept
