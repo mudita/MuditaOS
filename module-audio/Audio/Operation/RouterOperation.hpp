@@ -34,6 +34,12 @@ namespace audio
             Disabled
         };
 
+        enum class JackState : bool
+        {
+            Plugged,
+            Unplugged
+        };
+
       public:
         RouterOperation(const char *file, AudioServiceMessage::Callback callback);
         ~RouterOperation();
@@ -55,6 +61,7 @@ namespace audio
         static constexpr Endpoint::Capabilities routerCapabilities{.minBlockSize = minimumBlockSize,
                                                                    .maxBlockSize = maximumBlockSize};
         Mute mute = Mute::Disabled;
+        JackState jackState = JackState::Unplugged;
 
         void Mute();
         void Unmute();
