@@ -147,7 +147,8 @@ declare -A results
 EXIT_CODE=0
 for file in ${FILES}; do
     if [[ ${file} =~ ^.*\.(cpp|hpp|c|h|cxx|gcc|cc)$ ]] && shouldnt_ignore ${file}; then
-+       check_file "${file}" ${LAST} || RESULT=$?
+        check_file "${file}" ${LAST}
+        RESULT=$?
         if [[ ${RESULT} -eq 1 ]]; then
             EXIT_CODE=1
         fi
