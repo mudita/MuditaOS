@@ -44,8 +44,18 @@ class NewEditEventModel : public app::InternalModel<gui::CalendarListItem *>, pu
     void loadRepeat(const std::shared_ptr<EventsRecord> &record);
     void saveData(std::shared_ptr<EventsRecord> event, EventAction action);
 
+    /// Check if the event data is correct.
+    /// @param event event to be checked
+    /// @param message string to write the error message in case event data is incorrect
+    /// @return true if event data is correct or false elseway
+    bool isDataCorrect(std::shared_ptr<EventsRecord> event, std::string &message);
+
     [[nodiscard]] unsigned int getMinimalItemHeight() const override;
     [[nodiscard]] unsigned int requestRecordsCount() override;
     gui::ListItem *getItem(gui::Order order) override;
     void requestRecords(const uint32_t offset, const uint32_t limit) override;
+
+  protected:
+    void saveNewData(std::shared_ptr<EventsRecord> event);
+    void saveEditData(std::shared_ptr<EventsRecord> event);
 };
