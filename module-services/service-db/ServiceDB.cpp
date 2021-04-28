@@ -263,7 +263,8 @@ sys::ReturnCodes ServiceDB::InitHandler()
     notesRecordInterface         = std::make_unique<NotesRecordInterface>(notesDB.get());
     calllogRecordInterface       = std::make_unique<CalllogRecordInterface>(calllogDB.get(), contactsDB.get());
     countryCodeRecordInterface   = std::make_unique<CountryCodeRecordInterface>(countryCodesDB.get());
-    notificationsRecordInterface = std::make_unique<NotificationsRecordInterface>(notificationsDB.get());
+    notificationsRecordInterface =
+        std::make_unique<NotificationsRecordInterface>(notificationsDB.get(), contactRecordInterface.get());
     eventsRecordInterface        = std::make_unique<EventsRecordInterface>(eventsDB.get());
     quotesRecordInterface        = std::make_unique<Quotes::QuotesAgent>(quotesDB.get());
 

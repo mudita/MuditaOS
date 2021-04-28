@@ -22,8 +22,8 @@ add_catch2_executable(
         #EventsTable_tests.cpp
         NotesRecord_tests.cpp
         NotesTable_tests.cpp
-        #NotificationsRecord_tests.cpp
-        #NotificationsTable_tests.cpp
+        NotificationsRecord_tests.cpp
+        NotificationsTable_tests.cpp
         QueryInterface.cpp
         SMSRecord_tests.cpp
         SMSTable_tests.cpp

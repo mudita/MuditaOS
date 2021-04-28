@@ -279,7 +279,7 @@ class ServiceCellular : public sys::Service
                                             const time_t messageDate,
                                             const SMSType &smsType = SMSType::INBOX) const noexcept;
     bool dbAddSMSRecord(const SMSRecord &record);
-    void onSMSReceived();
+    void onSMSReceived(const utils::PhoneNumber::View &number);
     [[nodiscard]] bool receiveAllMessages();
     /// @}
 

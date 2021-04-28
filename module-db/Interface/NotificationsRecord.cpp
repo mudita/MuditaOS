@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NotificationsRecord.hpp"
@@ -6,15 +6,17 @@
 #include "module-db/queries/notifications/QueryNotificationsIncrement.hpp"
 #include "module-db/queries/notifications/QueryNotificationsClear.hpp"
 #include "module-db/queries/notifications/QueryNotificationsGetAll.hpp"
+#include "Databases/NotificationsDB.hpp"
 
 #include <log/log.hpp>
 #include <Utils.hpp>
 
 #include <cassert>
 #include <vector>
+#include <gsl_assert>
 
-NotificationsRecord::NotificationsRecord(const NotificationsTableRow &tableRow)
-    : Record{tableRow.ID}, value{tableRow.value}
+NotificationsRecord::NotificationsRecord(const NotificationsTableRow &tableRow, std::optional<ContactRecord> record)
+    : Record{tableRow.ID}, value{tableRow.value}, contactRecord{std::move(record)}
 {
     if (tableRow.key > static_cast<uint32_t>(Key::NotValidKey) &&
         tableRow.key < static_cast<uint32_t>(Key::NumberOfKeys)) {
@@ -26,16 +28,6 @@ NotificationsRecord::NotificationsRecord(const NotificationsTableRow &tableRow)
     ID  = DB_ID_NONE;
 }
 
-bool NotificationsRecord::isValidRecord() const
-{
-    return isValid() && gotValidKey();
-}
-
-bool NotificationsRecord::gotValidKey() const
-{
-    return isValidKey(key);
-}
-
 bool NotificationsRecord::isValidKey(Key key)
 {
     return key != Key::NotValidKey && key != Key::NumberOfKeys;
@@ -44,13 +36,18 @@ bool NotificationsRecord::isValidKey(Key key)
 std::ostream &operator<<(std::ostream &out, const NotificationsRecord &rec)
 {
     out << " <id> " << rec.ID << " <key> " << static_cast<int>(rec.key) << " <value> " << rec.value;
-
+    if (rec.contactRecord.has_value()) {
+        out << " <contact_id> " << rec.contactRecord.value().ID;
+    }
     return out;
 }
 
-NotificationsRecordInterface::NotificationsRecordInterface(NotificationsDB *notificationsDb)
-    : notificationsDb(notificationsDb)
-{}
+NotificationsRecordInterface::NotificationsRecordInterface(NotificationsDB *notificationsDb,
+                                                           ContactRecordInterface *contactsDb)
+    : notificationsDb(notificationsDb), contactsDb(contactsDb)
+{
+    Expects(contactsDb != nullptr);
+}
 
 bool NotificationsRecordInterface::Add(const NotificationsRecord &rec)
 {
@@ -79,7 +76,7 @@ std::unique_ptr<std::vector<NotificationsRecord>> NotificationsRecordInterface::
     auto records = std::make_unique<std::vector<NotificationsRecord>>();
 
     for (auto &r : rows) {
-        records->push_back(NotificationsRecord{r});
+        records->push_back(NotificationsRecord{r, getContactRecord(r.contactID)});
     }
 
     return records;
@@ -92,8 +89,10 @@ bool NotificationsRecordInterface::Update(const NotificationsRecord &rec)
         return false;
     }
 
-    return notificationsDb->notifications.update(
-        NotificationsTableRow{{.ID = rec.ID}, .key = static_cast<uint32_t>(rec.key), .value = rec.value});
+    uint32_t contactId = rec.contactRecord.has_value() ? rec.contactRecord.value().ID : DB_ID_NONE;
+
+    return notificationsDb->notifications.update(NotificationsTableRow{
+        {.ID = rec.ID}, .key = static_cast<uint32_t>(rec.key), .value = rec.value, .contactID = contactId});
 }
 
 bool NotificationsRecordInterface::RemoveByID(uint32_t id)
@@ -109,10 +108,20 @@ bool NotificationsRecordInterface::RemoveByField(NotificationsRecordField field,
 
     return false;
 }
+std::optional<ContactRecord> NotificationsRecordInterface::getContactRecord(uint32_t id) const
+{
+    if (id != DB_ID_NONE) {
+        if (auto contactRecord = contactsDb->GetByIdWithTemporary(id); contactRecord.isValid()) {
+            return std::make_optional(std::move(contactRecord));
+        }
+    }
+    return std::nullopt;
+}
 
 NotificationsRecord NotificationsRecordInterface::GetByID(uint32_t id)
 {
-    return NotificationsRecord{notificationsDb->notifications.getById(id)};
+    auto tableRow = notificationsDb->notifications.getById(id);
+    return NotificationsRecord{tableRow, getContactRecord(tableRow.contactID)};
 }
 
 uint32_t NotificationsRecordInterface::GetCount()
@@ -126,8 +135,8 @@ NotificationsRecord NotificationsRecordInterface::GetByKey(NotificationsRecord::
         return NotificationsRecord();
     }
 
-    NotificationsTableRow notificationsTableRow = notificationsDb->notifications.GetByKey(static_cast<uint32_t>(key));
-    return NotificationsRecord{notificationsTableRow};
+    auto tableRow = notificationsDb->notifications.getByKey(static_cast<uint32_t>(key));
+    return NotificationsRecord{tableRow, getContactRecord(tableRow.contactID)};
 }
 
 std::unique_ptr<db::QueryResult> NotificationsRecordInterface::runQuery(std::shared_ptr<db::Query> query)
@@ -150,17 +159,28 @@ std::unique_ptr<db::QueryResult> NotificationsRecordInterface::runQuery(std::sha
 std::unique_ptr<db::query::notifications::GetResult> NotificationsRecordInterface::runQueryImpl(
     const db::query::notifications::Get *query)
 {
-    auto value = GetByKey(query->key);
-    return std::make_unique<db::query::notifications::GetResult>(value);
+    auto value = GetByKey(query->getKey());
+    return std::make_unique<db::query::notifications::GetResult>(std::move(value));
 }
 
 std::unique_ptr<db::query::notifications::IncrementResult> NotificationsRecordInterface::runQueryImpl(
     const db::query::notifications::Increment *query)
 {
     auto ret = false;
-
-    auto record = GetByKey(query->key);
-    if (record.isValid() && record.key == query->key) {
+    if (auto record = GetByKey(query->getKey()); record.isValid()) {
+        auto &currentContactRecord = record.contactRecord;
+        if (auto numberMatch = contactsDb->MatchByNumber(query->getNumber()); numberMatch.has_value()) {
+            if (record.value == 0) {
+                currentContactRecord = std::move(numberMatch.value().contact);
+            }
+            else if (currentContactRecord.has_value() &&
+                     numberMatch.value().contactId != currentContactRecord.value().ID) {
+                currentContactRecord.reset();
+            }
+        }
+        else {
+            currentContactRecord.reset();
+        }
         record.value++;
         ret = Update(record);
     }
@@ -171,11 +191,10 @@ std::unique_ptr<db::query::notifications::ClearResult> NotificationsRecordInterf
     const db::query::notifications::Clear *query)
 {
     auto ret = false;
-
-    auto record = GetByKey(query->key);
-    if (record.isValid() && record.key == query->key) {
+    if (auto record = GetByKey(query->getKey()); record.isValid()) {
         record.value = 0;
-        ret          = Update(record);
+        record.contactRecord.reset();
+        ret = Update(record);
     }
     return std::make_unique<db::query::notifications::ClearResult>(ret);
 }

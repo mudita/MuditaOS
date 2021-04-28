@@ -19,7 +19,6 @@
 #include <Interface/CountryCodeRecord.hpp>
 #include <Interface/EventsRecord.hpp>
 #include <Interface/NotesRecord.hpp>
-#include <Interface/NotificationsRecord.hpp>
 #include <Interface/SMSRecord.hpp>
 #include <Interface/SMSTemplateRecord.hpp>
 #include <Interface/ThreadRecord.hpp>

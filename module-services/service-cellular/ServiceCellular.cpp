@@ -214,10 +214,10 @@ ServiceCellular::ServiceCellular()
 
     ongoingCall.setEndCallAction([=](const CalllogRecord &rec) {
         if (DBServiceAPI::CalllogUpdate(this, rec) && rec.type == CallType::CT_MISSED) {
-            DBServiceAPI::GetQuery(
-                this,
-                db::Interface::Name::Notifications,
-                std::make_unique<db::query::notifications::Increment>(NotificationsRecord::Key::Calls));
+            DBServiceAPI::GetQuery(this,
+                                   db::Interface::Name::Notifications,
+                                   std::make_unique<db::query::notifications::Increment>(
+                                       NotificationsRecord::Key::Calls, rec.phoneNumber));
         }
         return true;
     });
@@ -1841,21 +1841,23 @@ SMSRecord ServiceCellular::createSMSRecord(const UTF8 &decodedMessage,
 
 bool ServiceCellular::dbAddSMSRecord(const SMSRecord &record)
 {
-    return DBServiceAPI::AddSMS(this, record, db::QueryCallback::fromFunction([this](auto response) {
-                                    auto result = dynamic_cast<db::query::SMSAddResult *>(response);
-                                    if (result == nullptr || !result->result) {
-                                        return false;
-                                    }
-                                    onSMSReceived();
-                                    return true;
-                                }));
+    return DBServiceAPI::AddSMS(
+        this, record, db::QueryCallback::fromFunction([this, number = record.number](auto response) {
+            auto result = dynamic_cast<db::query::SMSAddResult *>(response);
+            if (result == nullptr || !result->result) {
+                return false;
+            }
+            onSMSReceived(number);
+            return true;
+        }));
 }
 
-void ServiceCellular::onSMSReceived()
+void ServiceCellular::onSMSReceived(const utils::PhoneNumber::View &number)
 {
-    DBServiceAPI::GetQuery(this,
-                           db::Interface::Name::Notifications,
-                           std::make_unique<db::query::notifications::Increment>(NotificationsRecord::Key::Sms));
+    DBServiceAPI::GetQuery(
+        this,
+        db::Interface::Name::Notifications,
+        std::make_unique<db::query::notifications::Increment>(NotificationsRecord::Key::Sms, number));
 
     const auto guard = [&]() { return !phoneModeObserver->isInMode(sys::phone_modes::PhoneMode::DoNotDisturb); };
     auto filePath    = AudioServiceAPI::GetSound(this, audio::PlaybackType::TextMessageRingtone);
