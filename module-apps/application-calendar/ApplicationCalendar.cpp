@@ -3,22 +3,24 @@
 
 #include "ApplicationCalendar.hpp"
 #include "DialogMetadataMessage.hpp"
-#include "windows/CalendarMainWindow.hpp"
-#include "windows/DayEventsWindow.hpp"
-#include "windows/CalendarEventsOptionsWindow.hpp"
-#include "windows/AllEventsWindow.hpp"
-#include "windows/EventDetailWindow.hpp"
-#include "windows/NewEditEventWindow.hpp"
-#include "windows/CustomRepeatWindow.hpp"
-#include "windows/EventReminderWindow.hpp"
 #include "NoEvents.hpp"
 #include "Dialog.hpp"
-#include <time/time_conversion.hpp>
-#include <module-db/queries/calendar/QueryEventsAdd.hpp>
 
+#include <application-calendar/windows/CalendarMainWindow.hpp>
+#include <application-calendar/windows/DayEventsWindow.hpp>
+#include <application-calendar/windows/CalendarEventsOptionsWindow.hpp>
+#include <application-calendar/windows/AllEventsWindow.hpp>
+#include <application-calendar/windows/EventDetailWindow.hpp>
+#include <application-calendar/windows/NewEditEventWindow.hpp>
+#include <application-calendar/windows/CustomRepeatWindow.hpp>
+#include <application-calendar/windows/EventReminderWindow.hpp>
+#include <module-apps/messages/DialogMetadataMessage.hpp>
+#include <module-db/queries/calendar/QueryEventsAdd.hpp>
 #include <service-db/DBServiceAPI.hpp>
 #include <service-db/QueryMessage.hpp>
 #include <service-db/DBNotificationMessage.hpp>
+
+#include <time/time_conversion.hpp>
 
 namespace app
 {
@@ -142,6 +144,9 @@ namespace app
         });
         windowsFactory.attach(event_reminder_window, [](Application *app, const std::string &name) {
             return std::make_unique<gui::EventReminderWindow>(app, event_reminder_window);
+        });
+        windowsFactory.attach(gui::window::name::dialog_confirm, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::DialogConfirm>(app, name);
         });
 
         attachPopups(
