@@ -9,6 +9,8 @@
 #include "fsl_common.h"
 #include "log/log.hpp"
 
+// generic i2c read() & write() doesn't provide correct i2c frame sequence for eeprom. i2c HAL API should be modified.
+
 namespace bsp::eeprom
 {
     namespace
@@ -16,7 +18,7 @@ namespace bsp::eeprom
         std::shared_ptr<drivers::DriverI2C> i2c;
 
         drivers::I2CAddress addr = {
-            .deviceAddress = static_cast<uint32_t>(M24256_MEM_DEVICE_ADDR), .subAddress = 0, .subAddressSize = 1};
+            .deviceAddress = static_cast<uint32_t>(M24256_MEM_DEVICE_ADDR), .subAddress = 0, .subAddressSize = 2};
 
     } // namespace
 
@@ -26,7 +28,7 @@ namespace bsp::eeprom
         i2cParams.baudrate = static_cast<std::uint32_t>(BoardDefinitions::EEPROM_I2C_BAUDRATE);
         i2c = drivers::DriverI2C::Create(static_cast<drivers::I2CInstances>(BoardDefinitions::EEPROM_I2C), i2cParams);
 
-        return isPresent() ? kStatus_Success : kStatus_Fail;
+        return isPresent(0) ? kStatus_Success : kStatus_Fail;
     }
 
     bool isPresent(int busid)
@@ -47,17 +49,26 @@ namespace bsp::eeprom
         
         size_t bl_len = static_cast<size_t>(eeprom_block_size(busid));
         size_t chunks = len / bl_len;
+        size_t reminder = static_cast<size_t>(len % bl_len);
+
+        LOG_DEBUG("[EEPROM - R] chunks: %d, rem: %d", chunks, reminder);
 
         if (chunks > 0)
         {
             for (size_t i = 0; i < chunks; i++)
             {
+                LOG_DEBUG("[EEPROM - W] writing chunk %d of %d", i, chunks);
                 written += i2c->Write(addr, reinterpret_cast<uint8_t *>(ptr), static_cast<size_t>(bl_len));
                 ptr += bl_len;
+                addr.subAddress += bl_len;
             }
         }
         //reminder
-        written += i2c->Write(addr, reinterpret_cast<uint8_t *>(ptr), static_cast<size_t>(len % bl_len));
+        if (reminder > 0)
+        {
+            LOG_DEBUG("[EEPROM - W] writing remaining %d bytes", reminder);
+            written += i2c->Write(addr, reinterpret_cast<uint8_t *>(ptr), reminder);
+        }
 
         return static_cast<int>(written);
     }
@@ -72,17 +83,26 @@ namespace bsp::eeprom
         
         size_t bl_len = static_cast<size_t>(eeprom_block_size(busid));
         size_t chunks = len / bl_len;
+        size_t reminder = static_cast<size_t>(len % bl_len);
+
+        LOG_DEBUG("[EEPROM - R] chunks: %d, rem: %d", chunks, reminder);
 
         if (chunks > 0)
         {
             for (size_t i = 0; i < chunks; i++)
             {
+                LOG_DEBUG("[EEPROM - R] reading chunk %d of %d", i, chunks);
                 read += i2c->Read(addr, reinterpret_cast<uint8_t *>(ptr), static_cast<size_t>(bl_len));
                 ptr += bl_len;
+                addr.subAddress += bl_len;
             }
         }
         //reminder
-        read += i2c->Read(addr, reinterpret_cast<uint8_t *>(ptr), static_cast<size_t>(len % bl_len));
+        if (reminder > 0)
+        {
+            LOG_DEBUG("[EEPROM - R] reading remaining %d bytes", reminder);
+            read += i2c->Read(addr, reinterpret_cast<uint8_t *>(ptr), reminder);
+        }
 
         return static_cast<int>(read);
     }
