@@ -139,6 +139,7 @@ namespace audio
         switch (evt->getType()) {
         case EventType::JackState:
             SetProfileAvailability({Profile::Type::RoutingHeadphones}, isAvailable);
+            jackState = isAvailable ? JackState::Plugged : JackState::Unplugged;
             SwitchToPriorityProfile();
             break;
         case EventType::BlutoothHSPDeviceState:
@@ -147,10 +148,14 @@ namespace audio
             break;
         case EventType::CallLoudspeakerOn:
             SetProfileAvailability({Profile::Type::RoutingEarspeaker}, false);
+            SetProfileAvailability({Profile::Type::RoutingHeadphones}, false);
             SwitchProfile(Profile::Type::RoutingLoudspeaker);
             break;
         case EventType::CallLoudspeakerOff:
             SetProfileAvailability({Profile::Type::RoutingEarspeaker}, true);
+            if (jackState == JackState::Plugged) {
+                SetProfileAvailability({Profile::Type::RoutingHeadphones}, true);
+            }
             SwitchToPriorityProfile();
             break;
         case EventType::CallMute:
