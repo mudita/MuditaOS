@@ -1,10 +1,11 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include "AppWindow.hpp"
 
+#include <module-sys/Timers/TimerHandle.hpp>
 #include <chrono>
 
 namespace gui
@@ -19,6 +20,7 @@ namespace gui
         bool finished          = false;
         std::chrono::seconds meditationTime{0};
         std::chrono::seconds meditationIntervalPeriod{0};
+        sys::TimerHandle endScreenTimeout;
 
         void setWidgetVisible(bool topBar, bool bottomBar, bool counter);
         void setVisibleRunning();
