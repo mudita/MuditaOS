@@ -18,7 +18,7 @@ namespace bsp::eeprom
 
     int init();
 
-    bool isPresent();
+    bool isPresent(int busid);
 
     int eeprom_write( int busid, addr_t mem_addr, const char *buf, size_t len );
 
