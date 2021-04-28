@@ -66,13 +66,13 @@ namespace callAppStyle
     {
         namespace imageCircleTop
         {
-            inline constexpr auto x    = 116U; // TODO: should be 104 with final image
+            inline constexpr auto x    = 111U;
             inline constexpr auto y    = 59U;
             inline constexpr auto name = "circle_top";
         } // namespace imageCircleTop
         namespace imageCircleBottom
         {
-            inline constexpr auto x    = 106U; // TODO: should be 104 with final image
+            inline constexpr auto x    = 104U;
             inline constexpr auto y    = 240U;
             inline constexpr auto name = "circle_bottom";
         } // namespace imageCircleBottom
