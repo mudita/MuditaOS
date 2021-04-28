@@ -286,10 +286,7 @@ void ServiceCellular::registerMessageHandlers()
                                                                     : PassthroughState::DISABLED);
     });
 
-    connect(typeid(request::sim::GetLockState),
-            [&](sys::Message * /*request*/) -> sys::MessagePointer {
-                return std::make_shared<request::sim::GetLockState::Response>(isPinLocked());
-            });
+    priv->simCard->registerMessages(this);
 
     connect(typeid(CellularSimNewPinDataMessage), [&](sys::Message *request) -> sys::MessagePointer {
         auto msg = static_cast<CellularSimNewPinDataMessage *>(request);
@@ -1043,10 +1040,6 @@ bool ServiceCellular::sendChangePinResult(cellular::service::sim::Result res)
     return true;
 }
 */
-bool ServiceCellular::isPinLocked()
-{
-    return priv->simCard->isPinLocked();
-}
 
 bool ServiceCellular::changePin(const std::string oldPin, const std::string newPin)
 {

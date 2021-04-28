@@ -34,6 +34,15 @@ namespace
 
 namespace cellular::service
 {
+
+    void SimCard::registerMessages(ServiceCellular *owner)
+    {
+        using namespace ::cellular::msg;
+        owner->connect(typeid(request::sim::GetLockState), [&](sys::Message *) -> sys::MessagePointer {
+            return std::make_shared<request::sim::GetLockState::Response>(isPinLocked());
+        });
+    }
+
     bool SimCard::ready() const
     {
         return channel;

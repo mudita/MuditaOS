@@ -12,14 +12,16 @@ namespace at
     class Cmd;
     class Channel;
 }
+class ServiceCellular;
 
 namespace cellular::service
 {
     namespace sim
     {
-        enum class Pin {
-          PIN1 = 0,
-          PIN2 = 1
+        enum class Pin
+        {
+            PIN1 = 0,
+            PIN2 = 1
         };
 
         enum class Result
@@ -50,6 +52,13 @@ namespace cellular::service
     class SimCard
     {
       public:
+        SimCard()
+        {}
+
+        /** Connect request::sim Messages directly to their handlers
+         */
+        void registerMessages(ServiceCellular *owner);
+
         /** Check if sim card slot has been selected and cmd channel is set
          * @return true if ready to communicate
          */
@@ -84,11 +93,6 @@ namespace cellular::service
          * \return return OK on success in other case see details in SimCardResult
          */
         sim::Result supplyPuk(const std::string puk, const std::string pin) const;
-
-        /** return whether the pin needs to be provided, only for standard pin.
-         * \return true if need pin to unlock SIM card functionality
-         */
-        bool isPinLocked() const;
 
         /** Set whether to provide pin. Always need to provide actual pin for sim card, only for standard PIN
          * \param lock true for lock SIM card
