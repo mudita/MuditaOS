@@ -1,7 +1,7 @@
 pipeline {
   agent {
     node {
-      label 'jenkins-slave'
+      label 'jenkins-slave-ccache'
     }
 
   }
@@ -38,13 +38,15 @@ popd'''
         stage('Build RT1051') {
             agent {
                 node {
-                    label 'jenkins-slave'
+                    label 'jenkins-slave-ccache'
                 }         
             }
             steps {
                 sh '''#!/bin/bash -e
 PATH="/usr/local/cmake-3.19.5-Linux-x86_64/bin:/usr/local/gcc-arm-none-eabi-10-2020-q4-major/bin:$PATH"
 export JOBS=${JOBS:-6}
+export CCACHE_DIR=/ccache/RT1051
+
 echo "JOBS=${JOBS}"
 echo "\'workspace dir:${WORKSPACE}\'"
 
@@ -57,13 +59,17 @@ pushd build-rt1051-Release
 ninja -j ${JOBS}
 popd
 popd'''
+                echo "CCache stats"
+                sh '''#!/bin/bash
+export CCACHE_DIR=/ccache/RT1051
+ccache --show-stats'''
             }
         }
 
         stage('Build Linux') {
             agent {
                 node {
-                    label 'jenkins-slave'
+                    label 'jenkins-slave-ccache'
                 }         
             }
 
@@ -72,6 +78,8 @@ popd'''
                 sh '''#!/bin/bash -e
 PATH="/usr/local/cmake-3.19.5-Linux-x86_64/bin:/usr/local/gcc-arm-none-eabi-10-2020-q4-major/bin:$PATH"
 export JOBS=${JOBS:-6}
+export CCACHE_DIR=/ccache/Linux
+
 echo "JOBS=${JOBS}"
 echo "\'workspace dir:${WORKSPACE}\'"
 
@@ -85,6 +93,10 @@ ninja -j ${JOBS}
 ninja -j ${JOBS} unittests
 popd
 popd'''
+                echo "CCache stats"
+                sh '''#!/bin/bash
+export CCACHE_DIR=/ccache/Linux
+ccache --show-stats'''
                 echo "Check for Statics"
                 sh '''#!/bin/bash -e
 pushd "${WORKSPACE}"
@@ -94,6 +106,7 @@ popd'''
                 sh '''#!/bin/bash -e
 PATH="/usr/local/cmake-3.19.5-Linux-x86_64/bin:/usr/local/gcc-arm-none-eabi-10-2020-q4-major/bin:$PATH"
 export JOBS=${JOBS:-6}
+export CCACHE_DIR=/ccache/Linux
 echo "JOBS=${JOBS}"
 echo "\'workspace dir:${WORKSPACE}\'"
 
@@ -104,6 +117,10 @@ pushd build-linux-Debug
 ./googletest-gui
 popd
 popd'''
+                echo "CCache stats"
+                sh '''#!/bin/bash
+export CCACHE_DIR=/ccache/Linux
+ccache --show-stats'''
             }
         }
         }
