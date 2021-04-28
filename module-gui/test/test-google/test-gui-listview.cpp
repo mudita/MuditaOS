@@ -55,6 +55,7 @@ class ListViewTesting : public ::testing::Test
 
         testListView->setProvider(testProvider);
         testListView->rebuildList();
+        testListView->focus = true;
     }
 
     void TearDown() override

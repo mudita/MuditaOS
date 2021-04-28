@@ -6,7 +6,7 @@ pipeline {
 
   }
   environment {
-    JOBS=15
+    JOBS=5
   }
   stages {
 
@@ -100,6 +100,9 @@ echo "\'workspace dir:${WORKSPACE}\'"
 pushd "${WORKSPACE}"
 ./tools/run_unittests.sh enabled_unittests
 ./tools/check_unittests.sh
+pushd build-linux-Debug
+./googletest-gui
+popd
 popd'''
             }
         }
