@@ -44,26 +44,30 @@ namespace notifications
         virtual ~Notification() = default;
     };
 
-    class NotSeenSMSNotification : public Notification
+    class NotificationWithContact : public Notification
     {
         unsigned value = 0;
+        std::optional<ContactRecord> record;
+
+      protected:
+        NotificationWithContact(NotificationType type, unsigned value, std::optional<ContactRecord> record);
 
       public:
-        explicit NotSeenSMSNotification(unsigned value);
+        [[nodiscard]] auto hasRecord() const noexcept -> bool;
+        [[nodiscard]] auto getRecord() const noexcept -> const ContactRecord &;
         [[nodiscard]] auto getValue() const noexcept -> unsigned;
     };
 
-    class NotSeenCallNotification : public Notification
+    class NotSeenSMSNotification : public NotificationWithContact
     {
-        unsigned value = 0;
-        std::unique_ptr<ContactRecord> record;
-
       public:
-        explicit NotSeenCallNotification(unsigned value, std::unique_ptr<ContactRecord> record = nullptr);
+        NotSeenSMSNotification(unsigned value, std::optional<ContactRecord> record);
+    };
 
-        [[nodiscard]] bool hasRecord() const noexcept;
-        [[nodiscard]] auto getRecord() const noexcept -> const std::unique_ptr<ContactRecord> &;
-        [[nodiscard]] auto getValue() const noexcept -> unsigned;
+    class NotSeenCallNotification : public NotificationWithContact
+    {
+      public:
+        NotSeenCallNotification(unsigned value, std::optional<ContactRecord> record);
     };
 
     class TetheringNotification : public Notification

@@ -65,7 +65,7 @@ auto NotificationsModel::create(const notifications::NotSeenCallNotification *no
                                                  utils::to_string(notification->getValue()));
     if (notification->hasRecord()) {
         const auto &record = notification->getRecord();
-        item->setName(record->getFormattedName());
+        item->setName(record.getFormattedName());
     }
     else {
         item->setName(utils::translate("app_desktop_missed_calls"), true);

@@ -11,6 +11,8 @@ namespace sys
     class Service;
 }
 
+class NotificationsRecord;
+
 namespace db
 {
     class NotificationMessage;
@@ -25,7 +27,7 @@ namespace notifications
 
     class NotificationProvider
     {
-        template <NotificationType type, typename T> bool handleNotSeenWithCounter(unsigned int value);
+        template <NotificationType type, typename T> bool handleNotSeenWithCounter(NotificationsRecord &&record);
 
       public:
         explicit NotificationProvider(sys::Service *ownerService);

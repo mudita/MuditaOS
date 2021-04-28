@@ -12,6 +12,7 @@
 #include <service-appmgr/Controller.hpp>
 #include <service-time/ServiceTime.hpp>
 #include <service-time/TimeMessage.hpp>
+#include <notifications/NotificationsModel.hpp>
 
 #include <log/log.hpp>
 
@@ -136,7 +137,6 @@ namespace gui
             return app::manager::Controller::sendAction(
                 application, app::manager::actions::Dial, std::make_unique<app::EnterNumberData>("+"));
         }
-
         if (inputEvent.is(KeyCode::KEY_RF)) {
             application->switchWindow(popup::window::power_off_window);
             return true;

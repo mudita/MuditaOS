@@ -17,6 +17,8 @@ namespace app
 
 namespace gui
 {
+    class NotificationsModel;
+
     class DesktopMainWindow : public AppWindow
     {
       protected:

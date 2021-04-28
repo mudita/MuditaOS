@@ -12,7 +12,6 @@
 #include <map>
 
 using namespace gui;
-// using namespace style::desktop;
 
 namespace
 {
@@ -36,14 +35,15 @@ namespace
     auto buildNotificationNameLabel(uint32_t width) -> gui::TextFixedSize *
     {
         auto text =
-            new gui::TextFixedSize(nullptr, 0, 0, style::notifications::textMaxWidth, style::notifications::itemHeight);
-        text->setMaximumSize(width, Axis::X);
+            new gui::TextFixedSize(nullptr, 0, 0, style::notifications::textMinWidth, style::notifications::itemHeight);
 
+        text->setMaximumSize(style::notifications::textMaxWidth, Axis::X);
         text->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
         text->setPenWidth(style::window::default_border_no_focus_w);
         text->setUnderline(false);
         text->setFont(style::window::font::medium);
         text->activeItem = false;
+        text->setTextLimitType(TextLimitType::MaxLines, 1);
         return text;
     }
 
@@ -135,6 +135,7 @@ NotificationWithEventCounter::NotificationWithEventCounter(notifications::Notifi
 {
     box->addWidget(buildImageInactive("dot_12px_hard_alpha_W_G"));
     box->addWidget(buildNotificationCountText(indicator));
+    text->setMaximumSize(text->getSize(Axis::X), Axis::X);
 }
 
 NotificationWithOnOffButton::NotificationWithOnOffButton(notifications::NotificationType type, gui::ButtonState state)
