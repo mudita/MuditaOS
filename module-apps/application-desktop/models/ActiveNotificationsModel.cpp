@@ -63,8 +63,8 @@ auto ActiveNotificationsModel::create(const notifications::NotSeenCallNotificati
     std::function<void()> onKeyLeftFunctionalCallback = nullptr;
 
     if (notification->hasRecord()) {
-        if (const auto &record = notification->getRecord(); !record->numbers.empty()) {
-            onKeyLeftFunctionalCallback = [this, number = record->numbers[0].number]() {
+        if (const auto &record = notification->getRecord(); !record.numbers.empty()) {
+            onKeyLeftFunctionalCallback = [this, number = record.numbers[0].number]() {
                 app::manager::Controller::sendAction(parent->getApplication(),
                                                      app::manager::actions::Dial,
                                                      std::make_unique<app::ExecuteCallData>(number));

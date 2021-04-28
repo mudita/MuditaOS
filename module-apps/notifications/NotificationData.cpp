@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NotificationData.hpp"
-
+#include <gsl_assert>
 uint32_t notifications::Notification::priorityPool = 0;
 
 using namespace notifications;
@@ -35,33 +35,35 @@ auto Notification::getPriority() const noexcept -> uint32_t
     return priority;
 }
 
-NotSeenSMSNotification::NotSeenSMSNotification(unsigned value)
-    : Notification(NotificationType::NotSeenSms), value{value}
+NotificationWithContact::NotificationWithContact(NotificationType type,
+                                                 unsigned value,
+                                                 std::optional<ContactRecord> record)
+    : Notification(type), value{value}, record{std::move(record)}
 {}
 
-auto NotSeenSMSNotification::getValue() const noexcept -> unsigned
+auto NotificationWithContact::hasRecord() const noexcept -> bool
+{
+    return record.has_value();
+}
+
+auto NotificationWithContact::getRecord() const noexcept -> const ContactRecord &
+{
+    Expects(hasRecord());
+    return record.value();
+}
+
+auto NotificationWithContact::getValue() const noexcept -> unsigned
 {
     return value;
 }
 
-NotSeenCallNotification::NotSeenCallNotification(unsigned value, std::unique_ptr<ContactRecord> record)
-    : Notification(NotificationType::NotSeenCall), value{value}, record{std::move(record)}
+NotSeenSMSNotification::NotSeenSMSNotification(unsigned value, std::optional<ContactRecord> record)
+    : NotificationWithContact(NotificationType::NotSeenSms, value, std::move(record))
 {}
 
-bool NotSeenCallNotification::hasRecord() const noexcept
-{
-    return record != nullptr;
-}
-
-auto NotSeenCallNotification::getRecord() const noexcept -> const std::unique_ptr<ContactRecord> &
-{
-    return record;
-}
-
-auto NotSeenCallNotification::getValue() const noexcept -> unsigned
-{
-    return value;
-}
+NotSeenCallNotification::NotSeenCallNotification(unsigned value, std::optional<ContactRecord> record)
+    : NotificationWithContact(NotificationType::NotSeenCall, value, std::move(record))
+{}
 
 TetheringNotification::TetheringNotification() : Notification(NotificationType::Tethering)
 {}

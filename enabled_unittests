@@ -130,6 +130,8 @@ TESTS_LIST["catch2-db"]="
     SMS Templates Table tests;
     Thread Record tests;
     Threads Table tests;
+    Notifications Table tests;
+    Notifications Record tests;
 "
 #---------
 TESTS_LIST["catch2-db-initializer"]="

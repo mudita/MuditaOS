@@ -7,26 +7,29 @@
 #include <service-appmgr/Controller.hpp>
 #include <service-appmgr/data/NotificationsChangedActionsParams.hpp>
 #include <service-db/DBNotificationMessage.hpp>
+#include <NotificationsRecord.hpp>
 
 using namespace notifications;
 
 NotificationProvider::NotificationProvider(sys::Service *ownerService) : ownerService{ownerService}
 {}
 
-template <NotificationType type, typename T> bool NotificationProvider::handleNotSeenWithCounter(unsigned int value)
+template <NotificationType type, typename T>
+bool NotificationProvider::handleNotSeenWithCounter(NotificationsRecord &&record)
 {
+    auto value = record.value;
     if (notifications.count(type) > 0) {
         if (value == 0) {
             notifications.erase(type);
             return true;
         }
         if (auto notification = static_cast<T *>(notifications[type].get()); value > notification->getValue()) {
-            notifications[type] = std::make_shared<T>(value);
+            notifications[type] = std::make_shared<T>(value, std::move(record.contactRecord));
             return true;
         }
     }
     else if (value > 0) {
-        notifications[type] = std::make_shared<T>(value);
+        notifications[type] = std::make_shared<T>(value, std::move(record.contactRecord));
         return true;
     }
     return false;
@@ -38,15 +41,15 @@ void NotificationProvider::handle(db::query::notifications::GetAllResult *msg)
     auto records = *msg->getResult();
 
     bool notificationsChanged = false;
-    for (auto record : records) {
+    for (auto &&record : records) {
         switch (record.key) {
         case NotificationsRecord::Key::Calls:
             notificationsChanged |=
-                handleNotSeenWithCounter<NotificationType::NotSeenCall, NotSeenCallNotification>(record.value);
+                handleNotSeenWithCounter<NotificationType::NotSeenCall, NotSeenCallNotification>(std::move(record));
             break;
         case NotificationsRecord::Key::Sms:
             notificationsChanged |=
-                handleNotSeenWithCounter<NotificationType::NotSeenSms, NotSeenSMSNotification>(record.value);
+                handleNotSeenWithCounter<NotificationType::NotSeenSms, NotSeenSMSNotification>(std::move(record));
             break;
         default:
             break;
