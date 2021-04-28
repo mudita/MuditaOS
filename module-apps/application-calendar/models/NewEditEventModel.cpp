@@ -2,20 +2,22 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NewEditEventModel.hpp"
-#include "application-calendar/widgets/NewEventCheckBoxWithLabel.hpp"
-#include "application-calendar/widgets/TextWithLabelItem.hpp"
-#include "application-calendar/widgets/CalendarStyle.hpp"
+#include "AppWindow.hpp"
+#include <application-calendar/widgets/NewEventCheckBoxWithLabel.hpp>
+#include <application-calendar/widgets/TextWithLabelItem.hpp>
+#include <application-calendar/widgets/CalendarStyle.hpp>
 #include <application-calendar/widgets/CalendarDateItem.hpp>
 #include <application-calendar/widgets/CalendarTimeItem.hpp>
 #include <application-calendar/widgets/SeveralOptionsItem.hpp>
-#include "application-calendar/data/CalendarData.hpp"
-#include "application-calendar/ApplicationCalendar.hpp"
-#include "AppWindow.hpp"
-#include <ListView.hpp>
+#include <application-calendar/data/CalendarData.hpp>
+#include <application-calendar/ApplicationCalendar.hpp>
 #include <module-db/queries/calendar/QueryEventsAdd.hpp>
 #include <module-db/queries/calendar/QueryEventsEdit.hpp>
+#include <module-apps/messages/DialogMetadataMessage.hpp>
+
 #include <service-db/DBServiceAPI.hpp>
 #include <time/time_conversion.hpp>
+#include <ListView.hpp>
 
 NewEditEventModel::NewEditEventModel(app::Application *app) : application(app)
 {}
@@ -126,55 +128,91 @@ void NewEditEventModel::saveData(std::shared_ptr<EventsRecord> event, EventActio
         }
     }
 
+    std::string errorMessage;
+    if (!isDataCorrect(event, errorMessage)) {
+
+        std::string windowTitle = (action == EventAction::Edit) ? utils::translate("app_calendar_edit_event_title")
+                                                                : utils::translate("app_calendar_new_event_title");
+
+        application->switchWindow(
+            gui::window::name::dialog_confirm,
+            gui::ShowMode::GUI_SHOW_INIT,
+            std::make_unique<gui::DialogMetadataMessage>(gui::DialogMetadata{
+                std::move(windowTitle), "emergency_W_G", std::move(errorMessage), "", [=]() -> bool {
+                    application->returnToPreviousWindow();
+                    return true;
+                }}));
+
+        return;
+    }
+
     if (action == EventAction::Edit) {
-        auto record = event.get();
-        record->reminder_fired = TIME_POINT_INVALID;
-        if (!record->title.empty()) {
-            DBServiceAPI::GetQuery(
-                application, db::Interface::Name::Events, std::make_unique<db::query::events::Edit>(*record));
-        }
-        auto rec  = std::make_unique<EventsRecord>(*record);
-        auto data = std::make_unique<EventRecordData>(std::move(rec));
-        application->switchWindow(style::window::calendar::name::details_window, std::move(data));
+        saveEditData(event);
     }
     else {
-        auto record = event.get();
-        if (!record->title.empty()) {
-            DBServiceAPI::GetQuery(
-                application, db::Interface::Name::Events, std::make_unique<db::query::events::Add>(*record));
+        saveNewData(event);
+    }
 
-            auto data       = std::make_unique<DayMonthData>();
-            auto startDate  = TimePointToYearMonthDay(record->date_from);
-            auto filterDate = TimePointFromYearMonthDay(startDate);
-            std::string monthStr =
-                utils::time::Locale::get_month(utils::time::Locale::Month(unsigned(startDate.month()) - 1));
-            data->setData(std::to_string(unsigned(startDate.day())) + " " + monthStr, filterDate);
+    clearData();
+}
 
-            if (application->getPrevWindow() == style::window::calendar::name::no_events_window) {
-                auto app = dynamic_cast<app::ApplicationCalendar *>(application);
-                assert(app != nullptr);
-                if (app->getEquivalentToEmptyWindow() == EquivalentWindow::DayEventsWindow) {
-                    app->popToWindow(gui::name::window::main_window);
-                    app->switchWindow(style::window::calendar::name::day_events_window, std::move(data));
-                }
-                else if (app->getEquivalentToEmptyWindow() == EquivalentWindow::AllEventsWindow) {
-                    app->popToWindow(gui::name::window::main_window);
-                    app->switchWindow(style::window::calendar::name::all_events_window, std::move(data));
-                }
-            }
-            else {
-                if (application->getPrevWindow() == style::window::calendar::name::day_events_window) {
-                    application->switchWindow(style::window::calendar::name::day_events_window, std::move(data));
-                }
-                application->returnToPreviousWindow();
-            }
+void NewEditEventModel::saveNewData(std::shared_ptr<EventsRecord> event)
+{
+    DBServiceAPI::GetQuery(application, db::Interface::Name::Events, std::make_unique<db::query::events::Add>(*event));
+
+    auto data            = std::make_unique<DayMonthData>();
+    auto startDate       = TimePointToYearMonthDay(event->date_from);
+    auto filterDate      = TimePointFromYearMonthDay(startDate);
+    std::string monthStr = utils::time::Locale::get_month(utils::time::Locale::Month(unsigned(startDate.month()) - 1));
+    data->setData(std::to_string(unsigned(startDate.day())) + " " + monthStr, filterDate);
+
+    if (application->getPrevWindow() == style::window::calendar::name::no_events_window) {
+        auto app = dynamic_cast<app::ApplicationCalendar *>(application);
+        assert(app != nullptr);
+        if (app->getEquivalentToEmptyWindow() == EquivalentWindow::DayEventsWindow) {
+            app->popToWindow(gui::name::window::main_window);
+            app->switchWindow(style::window::calendar::name::day_events_window, std::move(data));
         }
-        else {
-            LOG_WARN("Title event is empty! Returning to previous window.");
-            application->returnToPreviousWindow();
+        else if (app->getEquivalentToEmptyWindow() == EquivalentWindow::AllEventsWindow) {
+            app->popToWindow(gui::name::window::main_window);
+            app->switchWindow(style::window::calendar::name::all_events_window, std::move(data));
         }
     }
-    clearData();
+    else {
+        if (application->getPrevWindow() == style::window::calendar::name::day_events_window) {
+            application->switchWindow(style::window::calendar::name::day_events_window, std::move(data));
+        }
+        application->returnToPreviousWindow();
+    }
+}
+
+void NewEditEventModel::saveEditData(std::shared_ptr<EventsRecord> event)
+{
+    event->reminder_fired = TIME_POINT_INVALID;
+    if (!event->title.empty()) {
+        DBServiceAPI::GetQuery(
+            application, db::Interface::Name::Events, std::make_unique<db::query::events::Edit>(*event));
+    }
+    auto rec  = std::make_unique<EventsRecord>(*event);
+    auto data = std::make_unique<EventRecordData>(std::move(rec));
+    application->switchWindow(style::window::calendar::name::details_window, std::move(data));
+}
+
+bool NewEditEventModel::isDataCorrect(std::shared_ptr<EventsRecord> event, std::string &message)
+{
+    if (event->title.empty()) {
+        LOG_WARN("Event data has empty title!");
+        message = utils::translate("app_calendar_event_error_empty_name");
+        return false;
+    }
+
+    if (event->date_from > event->date_till) {
+        LOG_WARN("Event data has wrong dates!");
+        message = utils::translate("app_calendar_event_error_dates");
+        return false;
+    }
+
+    return true;
 }
 
 void NewEditEventModel::createTimeItems()
