@@ -36,12 +36,11 @@ while [[ $# -gt 0 ]]; do
 done
 CMD="JLinkGDBServerCLExe -if SWD -device MCIMXRT1051                     \
     -jlinkscriptfile evkbimxrt1050_sdram_init.jlinkscript -strict -ir    \
-    -rtos GDBServer/RTOSPlugin_FreeRTOS                                  \
     ${OPTS[@]}"
 
 echo "RUN: ${CMD}"
 
-if [ "${OPTS['continous']}" == " " ]; then 
+if [ "${OPTS['continous']}" == " " ]; then
 
 notify-send 'DEBUG WARNING!' "
 When using continous mode, after full reset please remember to set PS_EN pin high. GDB command:

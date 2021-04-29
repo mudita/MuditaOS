@@ -67,6 +67,8 @@ target_include_directories(
 
 )
 
+target_compile_options(${PROJECT_NAME} PRIVATE -O0)
+
 target_link_libraries(${PROJECT_NAME}
     service-evtmgr
     module-bsp

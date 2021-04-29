@@ -72,6 +72,8 @@ target_link_libraries(${PROJECT_NAME}
     tag
 )
 
+target_compile_options(${PROJECT_NAME} PRIVATE -O0)
+
 if (${ENABLE_TESTS})
     add_subdirectory(Audio/test)
 endif ()
