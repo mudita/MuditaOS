@@ -32,6 +32,7 @@ add_catch2_executable(
         ThreadRecord_tests.cpp
         ThreadsTable_tests.cpp
         tests-main.cpp
+        common.cpp
         
     LIBS
         module-db
