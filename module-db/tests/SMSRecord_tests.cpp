@@ -1,8 +1,7 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <catch2/catch.hpp>
-
+#include "common.hpp"
 #include <Database/Database.hpp>
 #include <Databases/ContactsDB.hpp>
 #include <Databases/SmsDB.hpp>
@@ -12,6 +11,8 @@
 
 #include <country.hpp>
 #include <PhoneNumber.hpp>
+
+#include <catch2/catch.hpp>
 
 #include <algorithm>
 #include <filesystem>
@@ -32,12 +33,8 @@ TEST_CASE("SMS Record tests")
 
     const auto contactsPath = (std::filesystem::path{"sys/user"} / "contacts.db");
     const auto smsPath      = (std::filesystem::path{"sys/user"} / "sms.db");
-    if (std::filesystem::exists(contactsPath)) {
-        REQUIRE(std::filesystem::remove(contactsPath));
-    }
-    if (std::filesystem::exists(smsPath)) {
-        REQUIRE(std::filesystem::remove(smsPath));
-    }
+    RemoveDbFiles(contactsPath.stem());
+    RemoveDbFiles(smsPath.stem());
 
     ContactsDB contactsDB(contactsPath.c_str());
     SmsDB smsDB(smsPath.c_str());
