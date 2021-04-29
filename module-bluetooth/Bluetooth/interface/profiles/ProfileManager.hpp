@@ -6,6 +6,7 @@
 #include <Service/Service.hpp>
 #include <Error.hpp>
 #include "Profile.hpp"
+#include "AudioProfile.hpp"
 #include "interface/profiles/A2DP/A2DP.hpp"
 #include "interface/profiles/HSP/HSP.hpp"
 #include "audio/BluetoothAudioDevice.hpp"
@@ -20,14 +21,6 @@ extern "C"
 
 namespace bluetooth
 {
-
-    enum class AudioProfile
-    {
-        A2DP,
-        HSP,
-        HFP,
-        None
-    };
 
     using ProfileList = std::map<AudioProfile, std::shared_ptr<bluetooth::Profile>>;
 
