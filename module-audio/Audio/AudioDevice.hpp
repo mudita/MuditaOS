@@ -27,7 +27,8 @@ namespace audio
             None,
             Audiocodec,
             Cellular,
-            Bluetooth
+            BluetoothA2DP,
+            BluetoothHSP
         };
 
         virtual ~AudioDevice() = default;

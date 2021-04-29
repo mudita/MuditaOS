@@ -32,7 +32,6 @@ namespace bluetooth
         auto getStreamData() -> std::shared_ptr<BluetoothStreamData>;
 
       private:
-        static constexpr auto CVSD_SAMPLE_RATE    = 8000;
         static constexpr auto BYTES_PER_FRAME     = 2;
         static constexpr auto ALL_GOOD_MASK       = 0x30;
         static constexpr auto AUDIO_BUFFER_LENGTH = 128;
