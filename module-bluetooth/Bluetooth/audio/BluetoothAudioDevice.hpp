@@ -3,8 +3,10 @@
 
 #pragma once
 
+#include <Audio/Endpoint.hpp>
 #include <Audio/AudioDevice.hpp>
 #include <interface/profiles/A2DP/MediaContext.hpp>
+#include <interface/profiles/AudioProfile.hpp>
 
 namespace bluetooth
 {
@@ -12,11 +14,10 @@ namespace bluetooth
     class BluetoothAudioDevice : public audio::AudioDevice
     {
       public:
-        BluetoothAudioDevice() = default;
-        explicit BluetoothAudioDevice(MediaContext *mediaContext);
+        explicit BluetoothAudioDevice(AudioProfile audioProfile);
         virtual ~BluetoothAudioDevice();
 
-        void setMediaContext(MediaContext *MediaContext);
+        virtual auto getProfileType() const -> AudioProfile;
 
         auto Start(const Configuration &format) -> audio::AudioDevice::RetCode override;
         auto Stop() -> audio::AudioDevice::RetCode override;
@@ -26,23 +27,46 @@ namespace bluetooth
         auto OutputPathCtrl(OutputPath outputPath) -> audio::AudioDevice::RetCode override;
         auto InputPathCtrl(InputPath inputPath) -> audio::AudioDevice::RetCode override;
         auto IsFormatSupported(const Configuration &format) -> bool override;
-        auto getSupportedFormats() -> const std::vector<audio::AudioFormat> & override;
-        auto getTraits() const -> Traits override;
 
         // Endpoint control methods
-        void onDataSend() override;
-        void onDataReceive() override;
         void enableInput() override;
         void enableOutput() override;
         void disableInput() override;
         void disableOutput() override;
 
-      private:
-        auto fillSbcAudioBuffer(MediaContext *context) -> int;
+      protected:
+        auto isInputEnabled() const -> bool;
+        auto isOutputEnabled() const -> bool;
+        auto fillSbcAudioBuffer() -> int;
 
-        MediaContext *ctx  = nullptr;
-        bool outputEnabled = false;
-        std::vector<audio::AudioFormat> formats;
+      private:
+        bool outputEnabled   = false;
+        bool inputEnabled    = false;
+        AudioProfile profile = AudioProfile::None;
+    };
+
+    class A2DPAudioDevice : public BluetoothAudioDevice
+    {
+      public:
+        explicit A2DPAudioDevice() : BluetoothAudioDevice(AudioProfile::A2DP)
+        {}
+
+        void onDataSend() override;
+        void onDataReceive() override;
+        auto getSupportedFormats() -> std::vector<audio::AudioFormat> override;
+        auto getTraits() const -> Traits override;
+    };
+
+    class HSPAudioDevice : public BluetoothAudioDevice
+    {
+      public:
+        explicit HSPAudioDevice() : BluetoothAudioDevice(AudioProfile::HSP)
+        {}
+
+        void onDataSend() override;
+        void onDataReceive() override;
+        auto getSupportedFormats() -> std::vector<audio::AudioFormat> override;
+        auto getTraits() const -> Traits override;
     };
 
 } // namespace bluetooth

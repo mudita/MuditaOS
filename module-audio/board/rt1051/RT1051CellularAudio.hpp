@@ -42,7 +42,7 @@ namespace audio
         AudioDevice::RetCode OutputPathCtrl(OutputPath outputPath) override final;
         AudioDevice::RetCode InputPathCtrl(InputPath inputPath) override final;
         bool IsFormatSupported(const Configuration &format) override final;
-        auto getSupportedFormats() -> const std::vector<AudioFormat> & override final;
+        auto getSupportedFormats() -> std::vector<AudioFormat> override final;
         auto getTraits() const -> Traits override final;
 
         cpp_freertos::MutexStandard mutex;

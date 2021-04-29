@@ -108,7 +108,7 @@ namespace audio
         void disableInput() override;
 
         auto getSourceFormat() -> AudioFormat override;
-        auto getSupportedFormats() -> const std::vector<AudioFormat> & override;
+        auto getSupportedFormats() -> std::vector<AudioFormat> override;
 
         auto getTraits() const -> Endpoint::Traits override;
 
@@ -142,7 +142,6 @@ namespace audio
         // decoding worker
         std::unique_ptr<DecoderWorker> audioWorker;
         DecoderWorker::EndOfFileCallback _endOfFileCallback;
-        std::vector<AudioFormat> formats;
     };
 
 } // namespace audio

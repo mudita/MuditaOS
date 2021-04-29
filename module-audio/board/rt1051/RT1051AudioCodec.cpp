@@ -280,7 +280,7 @@ namespace audio
         memset(&rxHandle, 0, sizeof(rxHandle));
     }
 
-    auto RT1051AudioCodec::getSupportedFormats() -> const std::vector<AudioFormat> &
+    auto RT1051AudioCodec::getSupportedFormats() -> std::vector<AudioFormat>
     {
         return formats;
     }

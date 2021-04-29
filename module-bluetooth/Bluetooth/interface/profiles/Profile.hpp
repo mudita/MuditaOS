@@ -12,6 +12,7 @@
 
 namespace bluetooth
 {
+
     class Profile
     {
       public:

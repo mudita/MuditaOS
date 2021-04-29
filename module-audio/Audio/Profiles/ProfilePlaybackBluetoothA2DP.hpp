@@ -21,7 +21,7 @@ namespace audio
                                                  .inputGain     = 0,
                                                  .inputPath     = AudioDevice::InputPath::None,
                                                  .outputPath    = AudioDevice::OutputPath::None},
-                      AudioDevice::Type::Bluetooth)
+                      AudioDevice::Type::BluetoothA2DP)
         {}
     };
 

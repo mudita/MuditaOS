@@ -629,7 +629,6 @@ namespace bluetooth
 
     void A2DP::A2DPImpl::setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> newAudioDevice)
     {
-        newAudioDevice->setMediaContext(&AVRCP::mediaTracker);
         A2DP::A2DPImpl::audioDevice = std::move(newAudioDevice);
     }
 

@@ -23,7 +23,7 @@ namespace audio
                           .inputGain    = static_cast<float>(gain),
                           .inputPath    = AudioDevice::InputPath::None,
                           .outputPath   = AudioDevice::OutputPath::None},
-                      AudioDevice::Type::Bluetooth)
+                      AudioDevice::Type::BluetoothHSP)
         {}
     };
 

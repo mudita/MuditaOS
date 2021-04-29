@@ -249,7 +249,7 @@ namespace audio
         memset(&rxHandle, 0, sizeof(rxHandle));
     }
 
-    auto RT1051CellularAudio::getSupportedFormats() -> const std::vector<AudioFormat> &
+    auto RT1051CellularAudio::getSupportedFormats() -> std::vector<AudioFormat>
     {
         return formats;
     }

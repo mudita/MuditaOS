@@ -35,7 +35,7 @@ namespace audio
         [[nodiscard]] virtual auto getTraits() const -> Traits = 0;
 
         auto isFormatSupported(const AudioFormat &format) -> bool;
-        virtual auto getSupportedFormats() -> const std::vector<AudioFormat> & = 0;
+        virtual auto getSupportedFormats() -> std::vector<AudioFormat> = 0;
 
       protected:
         AbstractStream *_stream = nullptr;

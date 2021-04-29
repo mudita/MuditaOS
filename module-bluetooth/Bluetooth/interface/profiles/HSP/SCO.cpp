@@ -32,7 +32,6 @@ namespace bluetooth
         auto getStreamData() -> std::shared_ptr<BluetoothStreamData>;
 
       private:
-        static constexpr auto CVSD_SAMPLE_RATE    = 8000;
         static constexpr auto BYTES_PER_FRAME     = 2;
         static constexpr auto ALL_GOOD_MASK       = 0x30;
         static constexpr auto AUDIO_BUFFER_LENGTH = 128;
@@ -92,7 +91,7 @@ namespace bluetooth
     }
 
     SCO::~SCO() = default;
-} // namespace Bt
+} // namespace bluetooth
 
 using namespace bluetooth;
 
@@ -104,8 +103,8 @@ DeviceMetadata_t SCO::SCOImpl::metadata;
 
 void SCO::SCOImpl::sendEvent(audio::EventType event, audio::Event::DeviceState state)
 {
-    auto evt = std::make_shared<audio::Event>(event, state);
-    auto msg = std::make_shared<AudioEventRequest>(std::move(evt));
+    auto evt       = std::make_shared<audio::Event>(event, state);
+    auto msg       = std::make_shared<AudioEventRequest>(std::move(evt));
     auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
     busProxy.sendUnicast(std::move(msg), service::name::evt_manager);
 }
@@ -151,6 +150,8 @@ void SCO::SCOImpl::receiveCvsd(uint8_t *packet, uint16_t size)
 {
 
     std::array<int16_t, AUDIO_BUFFER_LENGTH> audioFrameOut;
+
+    LOG_DEBUG("CVSD RX: %u", size);
 
     if (size > audioFrameOut.size()) {
         LOG_WARN("SCO packet larger than local output buffer - dropping data.");
@@ -203,6 +204,8 @@ void SCO::SCOImpl::send(hci_con_handle_t scoHandle)
         return;
     }
     assert(sourceQueue != nullptr);
+
+    LOG_DEBUG("CVSD SEND");
 
     int scoPacketLength  = hci_get_sco_packet_length();
     int scoPayloadLength = scoPacketLength - PACKET_DATA_OFFSET;
