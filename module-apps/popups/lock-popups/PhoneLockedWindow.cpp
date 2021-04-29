@@ -30,7 +30,8 @@ namespace gui
         return enterPressed;
     }
 
-    PhoneLockedWindow::PhoneLockedWindow(app::Application *app, const std::string &name) : AppWindow(app, name)
+    PhoneLockedWindow::PhoneLockedWindow(app::Application *app, const std::string &name)
+        : AppWindow(app, name), notificationsModel(std::make_shared<NotificationsModel>())
     {
         buildInterface();
 
@@ -54,6 +55,14 @@ namespace gui
         dayText->setBorderColor(gui::ColorNoColor);
         dayText->setFont(style::window::font::biglight);
         dayText->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
+
+        notificationsList = new ListView(this,
+                                         style::notifications::model::x,
+                                         style::notifications::model::y,
+                                         style::notifications::model::w,
+                                         style::notifications::model::h,
+                                         notificationsModel,
+                                         listview::ScrollBarType::None);
     }
 
     top_bar::Configuration PhoneLockedWindow::configureTopBar(top_bar::Configuration appConfiguration)
@@ -70,14 +79,18 @@ namespace gui
 
     void PhoneLockedWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
+        if (auto notificationData = dynamic_cast<app::manager::actions::NotificationsChangedParams *>(data)) {
+            notificationsModel->updateData(notificationData);
+        }
+        else {
+            app::manager::Controller::requestNotifications(application);
+        }
+
         bottomBar->setActive(BottomBar::Side::RIGHT, false);
         bottomBar->setText(BottomBar::Side::CENTER, utils::translate("app_desktop_unlock"));
         bottomBar->setActive(BottomBar::Side::LEFT, false);
 
         application->bus.sendUnicast(std::make_shared<TimersProcessingStopMessage>(), service::name::service_time);
-
-        // To be added
-        // buildNotifications(app);
     }
 
     bool PhoneLockedWindow::processLongReleaseEvent(const InputEvent &inputEvent)

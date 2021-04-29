@@ -6,8 +6,6 @@
 #include <module-gui/gui/widgets/ListItemProvider.hpp>
 #include <vector>
 
-#include "Application.hpp"
-
 namespace app
 {
 

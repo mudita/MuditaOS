@@ -1,16 +1,13 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include <cstdint>
-#include <vector>
-
+#include <application-notes/widgets/NotesItem.hpp>
 #include <module-db/Interface/NotesRecord.hpp>
-
-#include <module-apps/InternalModel.hpp>
-#include "module-apps/application-notes/widgets/NotesItem.hpp"
-#include <module-gui/gui/widgets/ListItemProvider.hpp>
+#include <ListItemProvider.hpp>
+#include <InternalModel.hpp>
+#include <Application.hpp>
 
 namespace app::notes
 {

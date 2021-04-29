@@ -3,10 +3,11 @@
 
 #pragma once
 
+#include <application-desktop/models/ActiveNotificationsModel.hpp>
+
 #include <AppWindow.hpp>
 #include <gui/widgets/Label.hpp>
 #include <Translator.hpp>
-#include <notifications/NotificationsModel.hpp>
 #include <ListView.hpp>
 
 namespace app
@@ -19,11 +20,11 @@ namespace gui
     class DesktopMainWindow : public AppWindow
     {
       protected:
-        gui::Label *time          = nullptr;
-        gui::Label *dayText       = nullptr;
+        gui::Label *time    = nullptr;
+        gui::Label *dayText = nullptr;
 
-        gui::ListView *notificationsList                            = nullptr;
-        std::shared_ptr<gui::NotificationsModel> notificationsModel = nullptr;
+        gui::ListView *notificationsList                                  = nullptr;
+        std::shared_ptr<gui::ActiveNotificationsModel> notificationsModel = nullptr;
 
         // method hides or show widgets and sets bars according to provided state
         void setVisibleState();
@@ -33,8 +34,7 @@ namespace gui
         app::ApplicationDesktop *getAppDesktop() const;
 
       public:
-        DesktopMainWindow(app::Application *app, std::shared_ptr<NotificationsModel> model);
-        ~DesktopMainWindow();
+        explicit DesktopMainWindow(app::Application *app);
 
         // virtual methods gui::Window
         bool onInput(const InputEvent &inputEvent) override;

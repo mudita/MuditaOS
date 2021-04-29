@@ -37,10 +37,6 @@ namespace app
 {
     class WindowsStack;
 
-    namespace manager::actions
-    {
-        class NotificationsChangedParams;
-    }
 } // namespace app
 namespace gui
 {
@@ -390,7 +386,7 @@ namespace app
                                                  const gui::InputEvent &event);
 
         void addActionReceiver(manager::actions::ActionId actionId, OnActionReceived &&callback);
-        virtual void handle(manager::actions::NotificationsChangedParams *params);
+        virtual void handleNotificationsChanged(std::unique_ptr<gui::SwitchData> notificationsParams);
 
         std::unique_ptr<TopBarManager> topBarManager;
 
