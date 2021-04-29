@@ -1,6 +1,7 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "common.hpp"
 #include <catch2/catch.hpp>
 
 #include "Interface/ContactRecord.hpp"
@@ -12,9 +13,7 @@ TEST_CASE("Contact Record db tests")
     Database::initialize();
 
     const auto contactsPath = (std::filesystem::path{"sys/user"} / "contacts.db");
-    if (std::filesystem::exists(contactsPath)) {
-        REQUIRE(std::filesystem::remove(contactsPath));
-    }
+    RemoveDbFiles(contactsPath.stem());
 
     ContactsDB contactDB(contactsPath.c_str());
     REQUIRE(contactDB.isInitialized());
@@ -263,9 +262,7 @@ TEST_CASE("Contact record numbers update")
 {
     Database::initialize();
     const auto contactsPath = (std::filesystem::path{"sys/user"} / "contacts.db");
-    if (std::filesystem::exists(contactsPath)) {
-        REQUIRE(std::filesystem::remove(contactsPath));
-    }
+    RemoveDbFiles(contactsPath.stem());
 
     ContactsDB contactDB(contactsPath.c_str());
     REQUIRE(contactDB.isInitialized());
