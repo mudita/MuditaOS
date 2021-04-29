@@ -71,8 +71,8 @@ namespace gui
 
     void DesktopMainWindow::invalidate() noexcept
     {
-        time          = nullptr;
-        dayText       = nullptr;
+        time    = nullptr;
+        dayText = nullptr;
     }
 
     top_bar::Configuration DesktopMainWindow::configureTopBar(top_bar::Configuration appConfiguration)
@@ -82,22 +82,16 @@ namespace gui
         return appConfiguration;
     }
 
-    DesktopMainWindow::DesktopMainWindow(app::Application *app, std::shared_ptr<NotificationsModel> model)
-        : AppWindow(app, app::window::name::desktop_main_window), notificationsModel(std::move(model))
+    DesktopMainWindow::DesktopMainWindow(app::Application *app)
+        : AppWindow(app, app::window::name::desktop_main_window),
+          notificationsModel(std::make_shared<ActiveNotificationsModel>(this))
     {
-        notificationsModel->setParentWindow(this);
         osUpdateVer  = getAppDesktop()->getOsUpdateVersion();
         osCurrentVer = getAppDesktop()->getOsCurrentVersion();
 
         buildInterface();
 
         preBuildDrawListHook = [this](std::list<Command> &cmd) { updateTime(); };
-    }
-
-    DesktopMainWindow::~DesktopMainWindow()
-    {
-        notificationsModel->clearAll();
-        notificationsModel->list = nullptr;
     }
 
     void DesktopMainWindow::setVisibleState()
@@ -123,7 +117,13 @@ namespace gui
 
     void DesktopMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        app::manager::Controller::requestNotifications(application);
+        if (auto notificationData = dynamic_cast<app::manager::actions::NotificationsChangedParams *>(data)) {
+            notificationsModel->updateData(notificationData);
+        }
+        else {
+            app::manager::Controller::requestNotifications(application);
+        }
+
         setVisibleState();
     }
 

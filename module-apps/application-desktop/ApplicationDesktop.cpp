@@ -24,7 +24,6 @@
 
 #include "AppWindow.hpp"
 #include "data/DesktopData.hpp"
-#include "models/ActiveNotificationsModel.hpp"
 
 #include <service-db/DBServiceAPI.hpp>
 #include <application-settings-new/ApplicationSettings.hpp>
@@ -70,8 +69,7 @@ namespace app
                                            std::string parent,
                                            sys::phone_modes::PhoneMode mode,
                                            StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), mode, startInBackground),
-          lockHandler(this), notificationsModel{std::make_shared<gui::ActiveNotificationsModel>()}
+        : Application(std::move(name), std::move(parent), mode, startInBackground), lockHandler(this)
     {
         using namespace gui::top_bar;
         topBarManager->enableIndicators({Indicator::Signal,
@@ -253,11 +251,12 @@ namespace app
         return true;
     }
 
-    void ApplicationDesktop::handle(manager::actions::NotificationsChangedParams *params)
+    void ApplicationDesktop::handleNotificationsChanged(std::unique_ptr<gui::SwitchData> notificationsParams)
     {
-        if (getCurrentWindow()->getName() == app::window::name::desktop_main_window) {
-            notificationsModel->updateData(params);
-            refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+        if (auto window = getCurrentWindow()->getName();
+            window == app::window::name::desktop_main_window || window == gui::popup::window::phone_lock_window) {
+
+            updateWindow(window, std::move(notificationsParams));
         }
     }
 
@@ -458,8 +457,8 @@ namespace app
     void ApplicationDesktop::createUserInterface()
     {
         using namespace app::window::name;
-        windowsFactory.attach(desktop_main_window, [this](Application *app, const std::string &name) {
-            return std::make_unique<gui::DesktopMainWindow>(app, notificationsModel);
+        windowsFactory.attach(desktop_main_window, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::DesktopMainWindow>(app);
         });
         windowsFactory.attach(desktop_pin_lock, [&](Application *app, const std::string newname) {
             return std::make_unique<gui::PinLockWindow>(app, desktop_pin_lock);

@@ -14,7 +14,6 @@
 #include <endpoints/update/UpdateMuditaOS.hpp>
 #include <service-desktop/ServiceDesktop.hpp>
 #include <service-desktop/DesktopMessages.hpp>
-#include <notifications/NotificationListItem.hpp>
 
 namespace cellular
 {
@@ -82,7 +81,7 @@ namespace app
         auto handle(db::query::CalllogGetCountResult *msg) -> bool;
         auto handle(sdesktop::UpdateOsMessage *msg) -> bool;
         auto handle(sdesktop::developerMode::ScreenlockCheckEvent *event) -> bool;
-        void handle(manager::actions::NotificationsChangedParams *params) override;
+        void handleNotificationsChanged(std::unique_ptr<gui::SwitchData> notificationsParams) override;
         /**
          * This static method will be used to lock the phone
          */
@@ -113,7 +112,6 @@ namespace app
         void osCurrentVersionChanged(const std::string &value);
         std::string osUpdateVersion{updateos::initSysVer};
         std::string osCurrentVersion{updateos::initSysVer};
-        std::shared_ptr<gui::NotificationsModel> notificationsModel;
     };
 
     template <> struct ManifestTraits<ApplicationDesktop>
