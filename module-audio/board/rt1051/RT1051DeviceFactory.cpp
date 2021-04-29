@@ -21,8 +21,12 @@ std::shared_ptr<AudioDevice> RT1051DeviceFactory::getDevice(const audio::Profile
         device = std::make_shared<RT1051AudioCodec>(profile.GetAudioConfiguration());
     } break;
 
-    case AudioDevice::Type::Bluetooth: {
-        device = std::make_shared<bluetooth::BluetoothAudioDevice>();
+    case AudioDevice::Type::BluetoothA2DP: {
+        device = std::make_shared<bluetooth::A2DPAudioDevice>();
+    } break;
+
+    case AudioDevice::Type::BluetoothHSP: {
+        device = std::make_shared<bluetooth::HSPAudioDevice>();
     } break;
 
     case AudioDevice::Type::Cellular: {
