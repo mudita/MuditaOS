@@ -1,22 +1,24 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <catch2/catch.hpp>
+#include "common.hpp"
 
-#include "Database/Database.hpp"
-#include "Databases/ContactsDB.hpp"
-#include "Databases/SmsDB.hpp"
-#include "Interface/ContactRecord.hpp"
-#include "Interface/SMSRecord.hpp"
-#include "Interface/ThreadRecord.hpp"
-#include "queries/messages/threads/QueryThreadMarkAsRead.hpp"
-#include "queries/messages/threads/QueryThreadsSearchForList.hpp"
-#include "queries/messages/threads/QueryThreadGetByID.hpp"
-#include "queries/messages/threads/QueryThreadGetByContactID.hpp"
-#include "queries/messages/threads/QueryThreadGetByNumber.hpp"
-#include "queries/messages/threads/QueryThreadRemove.hpp"
-#include "queries/messages/threads/QueryThreadsGet.hpp"
-#include "queries/messages/sms/QuerySMSGetLastByThreadID.hpp"
+#include <Database/Database.hpp>
+#include <Databases/ContactsDB.hpp>
+#include <Databases/SmsDB.hpp>
+#include <Interface/ContactRecord.hpp>
+#include <Interface/SMSRecord.hpp>
+#include <Interface/ThreadRecord.hpp>
+#include <queries/messages/threads/QueryThreadMarkAsRead.hpp>
+#include <queries/messages/threads/QueryThreadsSearchForList.hpp>
+#include <queries/messages/threads/QueryThreadGetByID.hpp>
+#include <queries/messages/threads/QueryThreadGetByContactID.hpp>
+#include <queries/messages/threads/QueryThreadGetByNumber.hpp>
+#include <queries/messages/threads/QueryThreadRemove.hpp>
+#include <queries/messages/threads/QueryThreadsGet.hpp>
+#include <queries/messages/sms/QuerySMSGetLastByThreadID.hpp>
+
+#include <catch2/catch.hpp>
 
 #include <algorithm>
 #include <cstdint>
@@ -30,12 +32,8 @@ TEST_CASE("Thread Record tests")
 
     const auto contactsPath = (std::filesystem::path{"sys/user"} / "contacts.db");
     const auto smsPath      = (std::filesystem::path{"sys/user"} / "sms.db");
-    if (std::filesystem::exists(contactsPath)) {
-        REQUIRE(std::filesystem::remove(contactsPath));
-    }
-    if (std::filesystem::exists(smsPath)) {
-        REQUIRE(std::filesystem::remove(smsPath));
-    }
+    RemoveDbFiles(contactsPath.stem());
+    RemoveDbFiles(smsPath.stem());
 
     SmsDB smsDB(smsPath.c_str());
     REQUIRE(smsDB.isInitialized());
@@ -96,6 +94,7 @@ TEST_CASE("Thread Record tests")
             REQUIRE(w.contactID == contactIDTest);
         }
     }
+
     SECTION("Get all available records with query")
     {
         auto query  = std::make_shared<db::query::ThreadsGet>(0, 100);
