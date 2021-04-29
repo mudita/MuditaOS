@@ -22,7 +22,6 @@ namespace gui
         void requestRecords(uint32_t offset, uint32_t limit) final;
 
       protected:
-        AppWindow *parent = nullptr;
         [[nodiscard]] virtual auto create(const notifications::NotSeenSMSNotification *notification)
             -> NotificationListItem *;
         [[nodiscard]] virtual auto create(const notifications::NotSeenCallNotification *notification)
@@ -37,7 +36,6 @@ namespace gui
         void updateData(app::manager::actions::NotificationsChangedParams *params);
         void dismissAll(const InputEvent &event);
         void clearAll();
-        void setParentWindow(AppWindow *parentWindow) noexcept;
     };
 
 } // namespace gui

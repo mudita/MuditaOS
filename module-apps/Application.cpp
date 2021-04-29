@@ -2,10 +2,10 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Application.hpp"
-#include "Common.hpp"      // for RefreshModes
-#include "GuiTimer.hpp"    // for GuiTimer
-#include "Item.hpp"        // for Item
-#include "MessageType.hpp" // for MessageType
+#include "Common.hpp"                         // for RefreshModes
+#include "GuiTimer.hpp"                       // for GuiTimer
+#include "Item.hpp"                           // for Item
+#include "MessageType.hpp"                    // for MessageType
 #include "module-sys/Timers/TimerFactory.hpp" // for Timer
 #include "TopBar.hpp"
 #include "TopBar/Time.hpp"
@@ -146,8 +146,7 @@ namespace app
             return actionHandled();
         });
         addActionReceiver(app::manager::actions::NotificationsChanged, [this](auto &&params) {
-            auto notificationParams = static_cast<manager::actions::NotificationsChangedParams *>(params.get());
-            handle(notificationParams);
+            handleNotificationsChanged(std::move(params));
             return actionHandled();
         });
     }
@@ -903,9 +902,12 @@ namespace app
         receivers.insert_or_assign(actionId, std::move(callback));
     }
 
-    void Application::handle(manager::actions::NotificationsChangedParams *params)
+    void Application::handleNotificationsChanged(std::unique_ptr<gui::SwitchData> notificationsParams)
     {
-        LOG_DEBUG("To be implemented by Pop-up based Locked-Screen [EGD-5884]");
+        if (auto window = getCurrentWindow()->getName(); window == gui::popup::window::phone_lock_window) {
+
+            updateWindow(window, std::move(notificationsParams));
+        }
     }
 
     void Application::cancelCallbacks(AsyncCallbackReceiver::Ptr receiver)

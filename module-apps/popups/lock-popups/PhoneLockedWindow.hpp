@@ -6,6 +6,8 @@
 #include <AppWindow.hpp>
 #include <gui/widgets/Label.hpp>
 #include <Translator.hpp>
+#include <notifications/NotificationsModel.hpp>
+#include <ListView.hpp>
 
 namespace app
 {
@@ -17,8 +19,10 @@ namespace gui
     class PhoneLockedWindow : public AppWindow
     {
       protected:
-        gui::Label *time    = nullptr;
-        gui::Label *dayText = nullptr;
+        gui::Label *time                                            = nullptr;
+        gui::Label *dayText                                         = nullptr;
+        gui::ListView *notificationsList                            = nullptr;
+        std::shared_ptr<gui::NotificationsModel> notificationsModel = nullptr;
 
         /// Locking timer on pressing enter
         class LockingTimer

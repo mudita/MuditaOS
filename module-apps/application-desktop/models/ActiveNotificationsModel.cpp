@@ -10,6 +10,9 @@
 
 using namespace gui;
 
+ActiveNotificationsModel::ActiveNotificationsModel(AppWindow *parent) : parent(parent)
+{}
+
 void ActiveNotificationsModel::setParentBottomBar(const UTF8 &left, const UTF8 &center, const UTF8 &right)
 {
     parent->setBottomBarText(left, BottomBar::Side::LEFT);
@@ -32,17 +35,15 @@ auto ActiveNotificationsModel::create(const notifications::NotSeenSMSNotificatio
                                                     app::manager::actions::Launch,
                                                     std::make_unique<app::ApplicationLaunchData>(app::name_messages));
     };
-    item->inputCallback =
-        [this]([[maybe_unused]] Item &item, const InputEvent &inputEvent) {
-            if (inputEvent.isShortRelease(KeyCode::KEY_RF)) {
-                DBServiceAPI::GetQuery(
-                    parent->getApplication(),
-                    db::Interface::Name::Notifications,
-                    std::make_unique<db::query::notifications::Clear>(NotificationsRecord::Key::Sms));
-                return true;
-            }
-            return false;
-        };
+    item->inputCallback = [this]([[maybe_unused]] Item &item, const InputEvent &inputEvent) {
+        if (inputEvent.isShortRelease(KeyCode::KEY_RF)) {
+            DBServiceAPI::GetQuery(parent->getApplication(),
+                                   db::Interface::Name::Notifications,
+                                   std::make_unique<db::query::notifications::Clear>(NotificationsRecord::Key::Sms));
+            return true;
+        }
+        return false;
+    };
     item->setDismissible(true);
     return item;
 }

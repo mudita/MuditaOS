@@ -118,8 +118,3 @@ void NotificationsModel::clearAll()
     list->reset();
     eraseInternalData();
 }
-
-void NotificationsModel::setParentWindow(AppWindow *parentWindow) noexcept
-{
-    parent = parentWindow;
-}
