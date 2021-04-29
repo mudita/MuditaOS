@@ -76,6 +76,7 @@ class WorkerDesktop : public sys::Worker, public bsp::USBDeviceListener
     sys::Service *ownerService = nullptr;
     parserFSM::StateMachine parser;
     sys::TimerHandle usbSuspendTimer;
+    bsp::USBDeviceStatus usbStatus = bsp::USBDeviceStatus::Disconnected;
 
     std::shared_ptr<sys::CpuSentinel> cpuSentinel;
 };

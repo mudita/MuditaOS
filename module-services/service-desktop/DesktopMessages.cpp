@@ -40,4 +40,16 @@ namespace sdesktop
         }
     } // namespace developerMode
 
+    namespace usb
+    {
+        USBConfigured::USBConfigured(USBConfigurationType configurationType)
+            : sys::DataMessage(MessageType::USBConfigured), configurationType(configurationType)
+        {}
+
+        USBConfigurationType USBConfigured::getConfigurationType() const noexcept
+        {
+            return configurationType;
+        }
+    } // namespace usb
+
 } // namespace sdesktop
