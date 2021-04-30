@@ -13,6 +13,10 @@ namespace at
     class Channel;
 }
 class ServiceCellular;
+namespace at
+{
+    class Cmd;
+}
 
 namespace cellular::service
 {
@@ -70,9 +74,9 @@ namespace cellular::service
         void selectSim(api::Sim slot);
 
         /** Set cmd channel
-         * \param cmd channel (or nullptr to reset)
+         * \param channel channel (or nullptr to block communication)
          */
-        void resetChannel(at::Channel *cmd = nullptr);
+        void resetChannel(at::Channel *channel = nullptr);
 
         /** Get information about attempts of PIN and PUK for standard sim card (optionally PIN2/PUK2)
          * @return  As optional SimCard::AttemptsCounters, in case of error nullopt. Should be noted that in some case
@@ -85,14 +89,14 @@ namespace cellular::service
          * \param pin digits as a string from 4-8 digits
          * \return return OK on success in other case see details in SimCardResult
          */
-        sim::Result supplyPin(const std::string pin) const;
+        sim::Result supplyPin(const std::string &pin) const;
 
         /** Supply pin for modem
          * \param puk puk as standard 8 digits
          * \param pin, new pin digits as a string from 4-8 digits
          * \return return OK on success in other case see details in SimCardResult
          */
-        sim::Result supplyPuk(const std::string puk, const std::string pin) const;
+        sim::Result supplyPuk(const std::string &puk, const std::string &pin) const;
 
         /** Set whether to provide pin. Always need to provide actual pin for sim card, only for standard PIN
          * \param lock true for lock SIM card
@@ -107,13 +111,20 @@ namespace cellular::service
          * \param newPin
          * \return return OK on success, else see SimCardResult
          */
-        sim::Result changePin(const std::string oldPin, const std::string newPin) const;
+        sim::Result changePin(const std::string &oldPin, const std::string &newPin) const;
 
         /** Return SIM state based on CPIN AT commands
          */
         std::optional<at::SimState> simState() const;
 
       private:
+        /** return whether the pin needs to be provided, only for standard pin.
+         * \return true if need pin to unlock SIM card functionality
+         */
+        bool isPinLocked() const;
+
+        sim::Result sendCommand(api::PassCodeType check, const at::Cmd &cmd) const;
+
         at::Channel *channel        = nullptr;
         std::optional<api::Sim> sim = std::nullopt;
     };
