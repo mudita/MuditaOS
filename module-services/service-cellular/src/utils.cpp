@@ -7,7 +7,7 @@
 
 namespace cellular::utils
 {
-    std::string pinToString(const std::vector<unsigned int> &v)
+    std::string pinToString(const cellular::api::PassCode &v)
     {
         std::string buf;
         std::transform(v.begin(), v.end(), std::back_inserter(buf), [](auto &&c) { return '0' + c; });

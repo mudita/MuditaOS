@@ -109,7 +109,8 @@ using cellular::service::State;
 
 ServiceCellular::ServiceCellular()
     : sys::Service(serviceName, "", cellularStack, sys::ServicePriority::Idle),
-      phoneModeObserver{std::make_unique<sys::phone_modes::Observer>()}, priv(new internal::ServiceCellularPriv(this))
+      phoneModeObserver{std::make_unique<sys::phone_modes::Observer>()},
+      priv{std::make_unique<internal::ServiceCellularPriv>(this)}
 {
     LOG_INFO("[ServiceCellular] Initializing");
 
@@ -270,9 +271,6 @@ sys::ReturnCodes ServiceCellular::SwitchPowerModeHandler(const sys::ServicePower
 
     return sys::ReturnCodes::Success;
 }
-
-void handleCellularSimNewPinDataMessage(CellularSimNewPinDataMessage *msg)
-{}
 
 void ServiceCellular::registerMessageHandlers()
 {

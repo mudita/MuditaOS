@@ -25,23 +25,22 @@ namespace gui
         Lock simLock;
         bool promptSimLockWindow = true;
 
-        void handleScreenPin(const std::vector<unsigned int> &pin);
-        void handlePasscode(Lock::LockType type, const std::vector<unsigned int> passcode);
-        void handlePasscodeChange(const std::vector<unsigned int> passcode);
-        void handleNewPasscodeUnconfirmed(const std::vector<unsigned int> &passcode,
-                                          const std::vector<unsigned int> &pin);
+        void handleScreenPin(const cellular::api::PassCode &pin);
+        void handlePasscode(Lock::LockType type, const cellular::api::PassCode &passcode);
+        void handlePasscodeChange(const cellular::api::PassCode &passcode);
+        void handleNewPasscodeUnconfirmed(const cellular::api::PassCode &passcode, const cellular::api::PassCode &pin);
         void handleNewPasscodeConfirmed(Lock::LockType type,
-                                        const std::vector<unsigned int> &passcode,
-                                        const std::vector<unsigned int> &pin);
-        void handleNewPasscodeInvalid(const std::vector<unsigned int> &passcode);
+                                        const cellular::api::PassCode &passcode,
+                                        const cellular::api::PassCode &pin);
+        void handleNewPasscodeInvalid(const cellular::api::PassCode &passcode);
         void handlePasscodeParams(Lock::LockType type,
                                   Lock::LockState state,
                                   app::manager::actions::ActionParamsPtr &&data);
         void switchToPinLockWindow(
-            std::function<void(Lock::LockType, const std::vector<unsigned int> &)> onLockActivatedCallback);
+            std::function<void(Lock::LockType, const cellular::api::PassCode &)> onLockActivatedCallback);
         void switchToPinLockWindow(
             Lock::LockState type,
-            std::function<void(Lock::LockType, const std::vector<unsigned int> &)> onLockActivatedCallback);
+            std::function<void(Lock::LockType, const cellular::api::PassCode &)> onLockActivatedCallback);
 
         auto getStrongestLock() noexcept -> gui::Lock &;
         void unlock();

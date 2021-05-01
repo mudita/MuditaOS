@@ -28,9 +28,9 @@
 // ugly temporary tweak
 namespace api
 {
-    using CallMode = cellular::api::CallMode;
+    using CallMode    = cellular::api::CallMode;
     using SimCardLock = cellular::api::SimCardLock;
-}
+} // namespace api
 
 class CellularMessage : public sys::DataMessage
 {
@@ -49,9 +49,8 @@ class CellularMessage : public sys::DataMessage
         PowerStateChange, ///< Change power state of the module
 
         ListCurrentCalls,
-        SimProcedure,        // Broadcast on sim state changed
-        SimResponse,         // Send to PIN window (show, error state, hide)
-        SimVerifyPinRequest, // Send from PIN window with PIN, PUK, ... number
+        SimProcedure, // Broadcast on sim state changed
+        SimResponse,  // Send to PIN window (show, error state, hide)
         SetVoLTE,
         SetFlightMode,
 
@@ -396,34 +395,6 @@ class CellularSimMessage : public CellularMessage
   private:
     Store::GSM::SIM sim                         = defaultSimCard;
     static const Store::GSM::SIM defaultSimCard = Store::GSM::SIM::SIM1;
-};
-
-/// Message use only for mockup GUI purposes
-class CellularSimVerifyPinRequestMessage : public CellularSimMessage
-{
-  public:
-    CellularSimVerifyPinRequestMessage(Store::GSM::SIM sim, std::vector<unsigned int> pinValue)
-        : CellularSimMessage(Type::SimVerifyPinRequest, sim), pinValue(std::move(pinValue))
-    {}
-    CellularSimVerifyPinRequestMessage(Store::GSM::SIM sim,
-                                       std::vector<unsigned int> pinValue,
-                                       std::vector<unsigned int> pukValue)
-        : CellularSimMessage(Type::SimVerifyPinRequest, sim), pinValue(std::move(pinValue)),
-          pukValue(std::move(pukValue))
-    {}
-
-    std::vector<unsigned int> getPinValue() const
-    {
-        return pinValue;
-    }
-    std::vector<unsigned int> getPukValue() const
-    {
-        return pukValue;
-    }
-
-  private:
-    std::vector<unsigned int> pinValue;
-    std::vector<unsigned int> pukValue;
 };
 
 class CellularSimPasscodeRequest : public CellularMessage

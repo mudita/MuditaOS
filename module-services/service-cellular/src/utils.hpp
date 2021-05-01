@@ -3,10 +3,11 @@
 
 #pragma once
 
+#include <service-cellular/api/common.hpp>
+
 #include <string>
-#include <vector>
 
 namespace cellular::utils
 {
-    std::string pinToString(const std::vector<unsigned int> &v);
+    std::string pinToString(const cellular::api::PassCode &v);
 }
