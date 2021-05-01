@@ -3,7 +3,7 @@
 
 #include "SimCard.hpp"
 #include "utils.hpp"
-#include <service-cellular/api/request.hpp>
+#include <service-cellular/api/request/sim.hpp>
 
 #include <Service/Service.hpp>
 
@@ -56,6 +56,12 @@ namespace cellular::service
             }
             return std::make_shared<request::sim::SetPin::Response>(false);
         });
+        owner->connect(typeid(request::sim::SetPinLock), [&](sys::Message *request) -> sys::MessagePointer {
+            auto msg       = static_cast<request::sim::SetPinLock *>(request);
+            const auto pin = cellular::utils::pinToString(msg->pin);
+            return std::make_shared<request::sim::SetPinLock::Response>(
+                setPinLock(msg->lock == cellular::api::SimCardLock::Locked, pin) == sim::Result::OK, msg->lock);
+        });
     }
 
     bool SimCard::ready() const
@@ -79,7 +85,7 @@ namespace cellular::service
             return std::nullopt;
         }
 
-        auto resp = channel->cmd(at::factory(at::AT::QPINC) + "\"" + pinString[int(pin)] + "\"");
+        auto resp = channel->cmd(at::factory(at::AT::QPINC) + "\"" + pinString[static_cast<int>(pin)] + "\"");
         at::response::qpinc::AttemptsCounters ret;
         if (at::response::parseQPINC(resp, ret)) {
             return ret;

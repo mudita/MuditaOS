@@ -28,6 +28,7 @@
 #include <service-appmgr/Controller.hpp>
 #include <service-cellular/ServiceCellular.hpp>
 #include <service-cellular/CellularMessage.hpp>
+#include <service-cellular-api>
 #include <service-db/QueryMessage.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <module-utils/magic_enum/include/magic_enum.hpp>
@@ -306,27 +307,29 @@ namespace app
                 return sys::MessageNone{};
             });
 
-        connect(typeid(CellularSimCardLockResponseMessage), [&](sys::Message *request) -> sys::MessagePointer {
-            auto response = dynamic_cast<CellularSimCardLockResponseMessage *>(request);
-            if (response->retCode) {
-                auto metaData = std::make_unique<gui::DialogMetadataMessage>(
-                    gui::DialogMetadata{"",
-                                        "success_icon_W_G",
-                                        response->getSimCardLock() == cellular::api::SimCardLock::Unlocked
-                                            ? utils::translate("app_desktop_sim_card_unlocked")
-                                            : utils::translate("app_desktop_sim_card_locked"),
-                                        "",
-                                        [this]() {
-                                            switchWindow(app::window::name::desktop_main_window);
-                                            return true;
-                                        }});
-                switchWindow(gui::window::name::dialog_confirm, gui::ShowMode::GUI_SHOW_INIT, std::move(metaData));
-            }
-            else {
-                lockHandler.handlePinEnableRequestFailed(response->getSimCardLock());
-            }
-            return sys::MessageNone{};
-        });
+        connect(typeid(cellular::msg::request::sim::SetPinLock::Response),
+                [&](sys::Message *request) -> sys::MessagePointer {
+                    auto response = dynamic_cast<cellular::msg::request::sim::SetPinLock::Response *>(request);
+                    if (response->retCode) {
+                        auto metaData = std::make_unique<gui::DialogMetadataMessage>(
+                            gui::DialogMetadata{"",
+                                                "success_icon_W_G",
+                                                response->lock == cellular::api::SimCardLock::Unlocked
+                                                    ? utils::translate("app_desktop_sim_card_unlocked")
+                                                    : utils::translate("app_desktop_sim_card_locked"),
+                                                "",
+                                                [this]() {
+                                                    switchWindow(app::window::name::desktop_main_window);
+                                                    return true;
+                                                }});
+                        switchWindow(
+                            gui::window::name::dialog_confirm, gui::ShowMode::GUI_SHOW_INIT, std::move(metaData));
+                    }
+                    else {
+                        lockHandler.handlePinEnableRequestFailed(response->lock);
+                    }
+                    return sys::MessageNone{};
+                });
 
         connect(typeid(db::NotificationMessage), [&](sys::Message *request) {
             auto notificationMessage = static_cast<db::NotificationMessage *>(request);

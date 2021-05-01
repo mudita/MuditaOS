@@ -11,7 +11,7 @@
 #include <service-desktop/Constants.hpp>
 
 #include <service-cellular/CellularMessage.hpp>
-#include <service-cellular/api/request.hpp>
+#include <service-cellular-api>
 
 namespace gui
 {
@@ -96,13 +96,13 @@ namespace gui
     void PinLockHandler::handlePinEnableRequest(app::manager::actions::ActionParamsPtr &&data,
                                                 cellular::api::SimCardLock simCardLock)
     {
+        using namespace cellular::msg;
+        using namespace cellular::api;
         LOG_DEBUG("Handling PinEnableRequest action, simCardLock = %d", static_cast<int>(simCardLock));
         handlePasscodeParams(Lock::LockType::SimPin, Lock::LockState::InputRequired, std::move(data));
         promptSimLockWindow      = true;
-        auto onActivatedCallback = [this, simCardLock](Lock::LockType type, const cellular::api::PassCode &data) {
-            app->bus.sendUnicast(
-                std::make_shared<CellularSimCardLockDataMessage>(Store::GSM::get()->selected, simCardLock, data),
-                serviceCellular);
+        auto onActivatedCallback = [this, simCardLock](Lock::LockType, const cellular::api::PassCode &data) {
+            app->bus.sendUnicast<request::sim::SetPinLock>(simCardLock, data);
         };
         switchToPinLockWindow(onActivatedCallback);
     }

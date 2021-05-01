@@ -152,12 +152,6 @@ class ServiceCellular : public sys::Service
      */
     bool sendBadPuk();
 
-    /** Place to send action notifying eg. GUI
-     * \param res
-     * \return
-     */
-    //    bool sendChangePinResult(cellular::service::sim::Result res);
-
     /// sim functionality
 
     /** Function ready for change pin action send to Service Cellular form eg. GUI
@@ -165,10 +159,8 @@ class ServiceCellular : public sys::Service
      * \param newPin
      * \return
      */
-    bool changePin(const std::string oldPin, const std::string newPin);
     bool unlockSimPin(std::string pin);
     bool unlockSimPuk(std::string puk, std::string pin);
-    bool setPinLock(bool lock, const std::string pin);
 
   private:
     at::ATURCStream atURCStream;

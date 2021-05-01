@@ -96,7 +96,7 @@
 #include <ticks.hpp>
 
 #include "ServiceCellularPriv.hpp"
-#include <service-cellular/api/request.hpp>
+#include <service-cellular/api/request/sim.hpp>
 #include "utils.hpp"
 
 const char *ServiceCellular::serviceName = cellular::service::name;
@@ -285,14 +285,6 @@ void ServiceCellular::registerMessageHandlers()
     });
 
     priv->simCard->registerMessages(this);
-
-    connect(typeid(CellularSimCardLockDataMessage), [&](sys::Message *request) -> sys::MessagePointer {
-        auto msg = static_cast<CellularSimCardLockDataMessage *>(request);
-        return std::make_shared<CellularSimCardLockResponseMessage>(
-            setPinLock(msg->getLock() == cellular::api::SimCardLock::Locked,
-                       cellular::utils::pinToString(msg->getPin())),
-            msg->getLock());
-    });
 
     connect(typeid(CellularChangeSimDataMessage), [&](sys::Message *request) -> sys::MessagePointer {
         auto msg                    = static_cast<CellularChangeSimDataMessage *>(request);
@@ -1021,12 +1013,6 @@ bool ServiceCellular::sendBadPuk()
         return handleSimState(*state, std::string());
     }
     return false;
-}
-
-bool ServiceCellular::setPinLock(bool lock, const std::string pin)
-{
-    auto result = priv->simCard->setPinLock(lock, pin);
-    return result == cellular::service::sim::Result::OK;
 }
 
 bool ServiceCellular::unlockSimPin(std::string pin)

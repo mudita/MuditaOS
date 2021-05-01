@@ -23,7 +23,7 @@
 #include <service-appmgr/service-appmgr/data/SimActionsParams.hpp>
 #include <service-appmgr/service-appmgr/data/MmiActionsParams.hpp>
 
-#include <service-cellular/api/request.hpp>
+#include <service-cellular/api/common.hpp>
 
 // ugly temporary tweak
 namespace api
@@ -520,28 +520,6 @@ class CellularSimPinDataMessage : public CellularSimDataMessage
     }
 };
 
-class CellularSimCardLockDataMessage : public CellularSimDataMessage
-{
-
-  public:
-    CellularSimCardLockDataMessage(Store::GSM::SIM _sim, api::SimCardLock _simCardLock, std::vector<unsigned int> _pin)
-        : CellularSimDataMessage{_sim}, simCardLock{_simCardLock}, pin{std::move(_pin)}
-    {}
-
-    [[nodiscard]] auto getLock() const noexcept
-    {
-        return simCardLock;
-    }
-    [[nodiscard]] const std::vector<unsigned int> &getPin() const noexcept
-    {
-        return pin;
-    }
-
-  private:
-    api::SimCardLock simCardLock;
-    std::vector<unsigned int> pin;
-};
-
 class CellularSimAbortMessage : public CellularSimDataMessage
 {
   public:
@@ -583,21 +561,6 @@ class CellularResponseMessage : public sys::ResponseMessage
     bool retCode;
     std::string data;
     CellularMessage::Type cellResponse;
-};
-
-class CellularSimCardLockResponseMessage : public CellularResponseMessage
-{
-    api::SimCardLock cardLock;
-
-  public:
-    CellularSimCardLockResponseMessage(bool retCode, api::SimCardLock cardLock)
-        : CellularResponseMessage(retCode), cardLock(cardLock)
-    {}
-
-    [[nodiscard]] auto getSimCardLock() const noexcept
-    {
-        return cardLock;
-    }
 };
 
 class CellularGetOwnNumberResponseMessage : public CellularResponseMessage

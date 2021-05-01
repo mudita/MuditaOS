@@ -3,10 +3,4 @@
 
 #pragma once
 
-#include <Service/Message.hpp>
-
-namespace cellular::msg
-{
-    namespace notification
-    {}
-} // namespace cellular::msg
+#include "service-cellular/api/request/sim.hpp"
