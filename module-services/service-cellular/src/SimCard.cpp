@@ -2,7 +2,10 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SimCard.hpp"
-#include <service-cellular/ServiceCellular.hpp>
+#include "utils.hpp"
+#include <service-cellular/api/request.hpp>
+
+#include <Service/Service.hpp>
 
 #include <common_data/EventStore.hpp>
 #include <bsp/cellular/bsp_cellular.hpp>
@@ -35,11 +38,23 @@ namespace
 namespace cellular::service
 {
 
-    void SimCard::registerMessages(ServiceCellular *owner)
+    void SimCard::registerMessages(sys::Service *owner)
     {
         using namespace ::cellular::msg;
         owner->connect(typeid(request::sim::GetLockState), [&](sys::Message *) -> sys::MessagePointer {
             return std::make_shared<request::sim::GetLockState::Response>(isPinLocked());
+        });
+        owner->connect(typeid(request::sim::SetPin), [&](sys::Message *request) -> sys::MessagePointer {
+            auto msg            = static_cast<request::sim::SetPin *>(request);
+            const auto passCode = cellular::utils::pinToString(msg->passCode);
+            const auto pin      = cellular::utils::pinToString(msg->pin);
+            switch (msg->passCodeType) {
+            case api::PassCodeType::PIN:
+                return std::make_shared<request::sim::SetPin::Response>(changePin(passCode, pin) == sim::Result::OK);
+            case api::PassCodeType::PUK:
+                return std::make_shared<request::sim::SetPin::Response>(supplyPuk(passCode, pin) == sim::Result::OK);
+            }
+            return std::make_shared<request::sim::SetPin::Response>(false);
         });
     }
 

@@ -12,10 +12,9 @@ namespace at
     class Cmd;
     class Channel;
 }
-class ServiceCellular;
-namespace at
+namespace sys
 {
-    class Cmd;
+    class Service;
 }
 
 namespace cellular::service
@@ -61,7 +60,7 @@ namespace cellular::service
 
         /** Connect request::sim Messages directly to their handlers
          */
-        void registerMessages(ServiceCellular *owner);
+        void registerMessages(sys::Service *owner);
 
         /** Check if sim card slot has been selected and cmd channel is set
          * @return true if ready to communicate

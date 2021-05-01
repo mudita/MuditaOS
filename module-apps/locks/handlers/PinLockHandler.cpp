@@ -11,6 +11,7 @@
 #include <service-desktop/Constants.hpp>
 
 #include <service-cellular/CellularMessage.hpp>
+#include <service-cellular/api/request.hpp>
 
 namespace gui
 {
@@ -276,13 +277,13 @@ namespace gui
                                                     const cellular::api::PassCode &passcode,
                                                     const cellular::api::PassCode &pin)
     {
+        using namespace cellular::msg;
+        using namespace cellular::api;
         if (type == Lock::LockType::SimPin) {
-            app->bus.sendUnicast(std::make_shared<CellularSimNewPinDataMessage>(simLock.sim, passcode, pin),
-                                 serviceCellular);
+            app->bus.sendUnicast<request::sim::SetPin>(PassCodeType::PIN, passcode, pin);
         }
         else if (type == Lock::LockType::SimPuk) {
-            app->bus.sendUnicast(std::make_shared<CellularSimPukDataMessage>(simLock.sim, passcode, pin),
-                                 serviceCellular);
+            app->bus.sendUnicast<request::sim::SetPin>(PassCodeType::PUK, passcode, pin);
         }
     }
 

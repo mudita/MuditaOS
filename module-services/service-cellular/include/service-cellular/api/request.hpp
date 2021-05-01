@@ -9,24 +9,46 @@
 
 namespace cellular::msg
 {
-    struct Request : public sys::DataMessage
+    struct Request : public sys::Message
     {
+        Request() : Message(Type::Data)
+        {}
         static constexpr const char *target = cellular::service::name;
     };
-    struct Response : public sys::DataMessage
-    {};
+    struct Response : public sys::Message
+    {
+        Response(bool retCode = true) : Message(Type::Data), retCode(retCode)
+        {}
+        bool retCode;
+    };
 
     namespace request
     {
         namespace sim
         {
-            struct GetLockState : public cellular::msg::Request
+            struct GetLockState : public msg::Request
             {
-                struct Response : public cellular::msg::Response
+                struct Response : public msg::Response
                 {
                     Response(bool locked) : locked(locked)
                     {}
                     bool locked;
+                };
+            };
+
+            struct SetPin : msg::Request
+            {
+                SetPin(api::PassCodeType pcType, api::PassCode pc, api::PassCode pin)
+                    : passCodeType(pcType), passCode(pc), pin(pin)
+                {}
+                api::PassCodeType passCodeType;
+                api::PassCode passCode;
+                api::PassCode pin;
+
+                struct Response : msg::Response
+                {
+                    Response(bool retCode) : msg::Response(retCode)
+                    {}
                 };
             };
         } // namespace sim

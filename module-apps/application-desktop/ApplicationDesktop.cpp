@@ -293,26 +293,18 @@ namespace app
                                     }});
         };
 
-        connect(typeid(CellularSimNewPinResponseMessage), [&](sys::Message *request) -> sys::MessagePointer {
-            auto response = dynamic_cast<CellularSimNewPinResponseMessage *>(request);
-            if (response->retCode) {
-                auto metaData = createPinChangedSuccessfullyDialog(this);
-                switchWindow(gui::window::name::dialog_confirm, gui::ShowMode::GUI_SHOW_INIT, std::move(metaData));
-            }
-            else {
-                lockHandler.handlePinChangeRequestFailed();
-            }
-            return sys::MessageNone{};
-        });
-
-        connect(typeid(CellularSimPukResponseMessage), [&](sys::Message *request) -> sys::MessagePointer {
-            auto response = dynamic_cast<CellularSimPukResponseMessage *>(request);
-            if (response->retCode) {
-                auto metaData = createPinChangedSuccessfullyDialog(this);
-                switchWindow(gui::window::name::dialog_confirm, gui::ShowMode::GUI_SHOW_INIT, std::move(metaData));
-            }
-            return sys::MessageNone{};
-        });
+        connect(
+            typeid(cellular::msg::request::sim::SetPin::Response), [&](sys::Message *request) -> sys::MessagePointer {
+                auto response = dynamic_cast<cellular::msg::request::sim::SetPin::Response *>(request);
+                if (response->retCode) {
+                    auto metaData = createPinChangedSuccessfullyDialog(this);
+                    switchWindow(gui::window::name::dialog_confirm, gui::ShowMode::GUI_SHOW_INIT, std::move(metaData));
+                }
+                else {
+                    lockHandler.handlePinChangeRequestFailed();
+                }
+                return sys::MessageNone{};
+            });
 
         connect(typeid(CellularSimCardLockResponseMessage), [&](sys::Message *request) -> sys::MessagePointer {
             auto response = dynamic_cast<CellularSimCardLockResponseMessage *>(request);

@@ -520,28 +520,6 @@ class CellularSimPinDataMessage : public CellularSimDataMessage
     }
 };
 
-class CellularSimNewPinDataMessage : public CellularSimDataMessage
-{
-    std::vector<unsigned int> oldPin;
-    std::vector<unsigned int> newPin;
-
-  public:
-    CellularSimNewPinDataMessage(Store::GSM::SIM _sim,
-                                 std::vector<unsigned int> _oldPin,
-                                 std::vector<unsigned int> _newPin)
-        : CellularSimDataMessage{_sim}, oldPin{std::move(_oldPin)}, newPin{std::move(_newPin)}
-    {}
-
-    [[nodiscard]] const std::vector<unsigned int> &getOldPin() const noexcept
-    {
-        return oldPin;
-    }
-    [[nodiscard]] const std::vector<unsigned int> &getNewPin() const noexcept
-    {
-        return newPin;
-    }
-};
-
 class CellularSimCardLockDataMessage : public CellularSimDataMessage
 {
 
@@ -562,26 +540,6 @@ class CellularSimCardLockDataMessage : public CellularSimDataMessage
   private:
     api::SimCardLock simCardLock;
     std::vector<unsigned int> pin;
-};
-
-class CellularSimPukDataMessage : public CellularSimDataMessage
-{
-    std::vector<unsigned int> puk;
-    std::vector<unsigned int> newPin;
-
-  public:
-    CellularSimPukDataMessage(Store::GSM::SIM _sim, std::vector<unsigned int> _puk, std::vector<unsigned int> _newPin)
-        : CellularSimDataMessage{_sim}, puk{std::move(_puk)}, newPin{std::move(_newPin)}
-    {}
-
-    [[nodiscard]] const std::vector<unsigned int> &getPuk() const noexcept
-    {
-        return puk;
-    }
-    [[nodiscard]] const std::vector<unsigned int> &getNewPin() const noexcept
-    {
-        return newPin;
-    }
 };
 
 class CellularSimAbortMessage : public CellularSimDataMessage
@@ -625,20 +583,6 @@ class CellularResponseMessage : public sys::ResponseMessage
     bool retCode;
     std::string data;
     CellularMessage::Type cellResponse;
-};
-
-class CellularSimNewPinResponseMessage : public CellularResponseMessage
-{
-  public:
-    explicit CellularSimNewPinResponseMessage(bool retCode) : CellularResponseMessage(retCode)
-    {}
-};
-
-class CellularSimPukResponseMessage : public CellularResponseMessage
-{
-  public:
-    explicit CellularSimPukResponseMessage(bool retCode) : CellularResponseMessage(retCode)
-    {}
 };
 
 class CellularSimCardLockResponseMessage : public CellularResponseMessage
