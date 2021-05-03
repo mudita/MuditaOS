@@ -487,13 +487,6 @@ class CellularChangeSimDataMessage : public CellularSimDataMessage
     {}
 };
 
-class CellularSimAbortMessage : public CellularSimDataMessage
-{
-  public:
-    explicit CellularSimAbortMessage(Store::GSM::SIM _sim) : CellularSimDataMessage{_sim}
-    {}
-};
-
 class CellularGetChannelMessage : public CellularMessage
 {
   public:
