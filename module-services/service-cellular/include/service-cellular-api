@@ -4,3 +4,4 @@
 #pragma once
 
 #include "service-cellular/api/request/sim.hpp"
+#include "service-cellular/api/notification/notification.hpp"

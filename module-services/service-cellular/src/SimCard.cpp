@@ -4,6 +4,7 @@
 #include "SimCard.hpp"
 #include "utils.hpp"
 #include <service-cellular/api/request/sim.hpp>
+#include <service-cellular/api/notification/notification.hpp>
 
 #include <Service/Service.hpp>
 
@@ -38,7 +39,7 @@ namespace
 namespace cellular::service
 {
 
-    void SimCard::registerMessages(sys::Service *owner)
+    void SimCard::registerMessages()
     {
         using namespace ::cellular::msg;
         owner->connect(typeid(request::sim::GetLockState), [&](sys::Message *) -> sys::MessagePointer {
@@ -101,13 +102,32 @@ namespace cellular::service
 
     sim::Result SimCard::changePin(const std::string &oldPin, const std::string &newPin) const
     {
-        return sendCommand(api::PassCodeType::PIN,
-                           at::factory(at::AT::CPWD) + "\"SC\", \"" + oldPin + "\",\"" + newPin + "\"");
+        auto result = sendCommand(api::PassCodeType::PIN,
+                                  at::factory(at::AT::CPWD) + "\"SC\", \"" + oldPin + "\",\"" + newPin + "\"");
+        if (result == sim::Result::IncorrectPassword) {
+            /* ServiceCellular::handleSimState(simState(), std::string()); */
+        }
+        else if (result != sim::Result::OK) {
+            owner->bus.sendMulticast(
+                std::make_shared<msg::notification::UnhandledCME>(*sim, static_cast<unsigned int>(result)),
+                sys::BusChannel::ServiceCellularNotifications);
+        }
+        return result;
     }
 
     sim::Result SimCard::supplyPuk(const std::string &puk, const std::string &pin) const
     {
-        return sendCommand(api::PassCodeType::PUK, at::factory(at::AT::CPIN) + "\"" + puk + "\"" + ",\"" + pin + "\"");
+        auto result =
+            sendCommand(api::PassCodeType::PUK, at::factory(at::AT::CPIN) + "\"" + puk + "\"" + ",\"" + pin + "\"");
+        if (result == sim::Result::IncorrectPassword) {
+            /* ServiceCellular::handleSimState(simState(), std::string()); */
+        }
+        else if (result != sim::Result::OK) {
+            owner->bus.sendMulticast(
+                std::make_shared<msg::notification::UnhandledCME>(*sim, static_cast<unsigned int>(result)),
+                sys::BusChannel::ServiceCellularNotifications);
+        }
+        return result;
     }
 
     sim::Result SimCard::setPinLock(bool lock, const std::string &pin) const

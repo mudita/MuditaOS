@@ -55,12 +55,12 @@ namespace cellular::service
     class SimCard
     {
       public:
-        SimCard()
+        SimCard(sys::Service *owner) : owner(owner)
         {}
 
         /** Connect request::sim Messages directly to their handlers
          */
-        void registerMessages(sys::Service *owner);
+        void registerMessages();
 
         /** Check if sim card slot has been selected and cmd channel is set
          * @return true if ready to communicate

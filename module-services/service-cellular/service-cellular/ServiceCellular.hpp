@@ -133,25 +133,6 @@ class ServiceCellular : public sys::Service
      */
     bool sendSimBlocked();
 
-    /** From this point should be send message/action call interaction in other layers eg. GUI
-     * \param cme_error
-     * \return
-     */
-    bool sendUnhandledCME(unsigned int cme_error);
-
-    /** Similar to sendBadPin
-     * \return
-     */
-    bool sendBadPin();
-
-    /** Message send, when modem return incorrect password for PIN message.
-     * Probably modem firmware depend. On current version last bad message (attempts=1) return PUK request
-     * and generate PUK URC, so finally action on puk request will be call. This implementation allow to
-     * rethrow URC (so achive similar behavior in all cases).
-     * \return
-     */
-    bool sendBadPuk();
-
     /// sim functionality
 
     /** Function ready for change pin action send to Service Cellular form eg. GUI

@@ -5,11 +5,24 @@
 
 #include <Service/Message.hpp>
 
+#include <service-cellular/api/common.hpp>
+
 namespace cellular::msg
 {
-    struct Notification
-    {};
+    struct Notification : public sys::Message
+    {
+        Notification() : Message(Type::Data)
+        {}
+    };
 
     namespace notification
-    {}
+    {
+        struct UnhandledCME : public msg::Notification
+        {
+            UnhandledCME(api::Sim sim, unsigned int code) : sim(sim), code(code)
+            {}
+            api::Sim sim;
+            unsigned int code;
+        };
+    } // namespace notification
 } // namespace cellular::msg

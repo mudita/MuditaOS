@@ -6,5 +6,5 @@
 namespace internal
 {
     ServiceCellularPriv::ServiceCellularPriv(ServiceCellular *owner)
-        : owner(owner), simCard(new SimCard), state(new State(owner)){};
+        : owner{owner}, simCard{new SimCard(owner)}, state{new State(owner)} {};
 } // namespace internal

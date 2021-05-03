@@ -284,7 +284,7 @@ void ServiceCellular::registerMessageHandlers()
                                                                     : PassthroughState::DISABLED);
     });
 
-    priv->simCard->registerMessages(this);
+    priv->simCard->registerMessages();
 
     connect(typeid(CellularChangeSimDataMessage), [&](sys::Message *request) -> sys::MessagePointer {
         auto msg                    = static_cast<CellularChangeSimDataMessage *>(request);
@@ -989,39 +989,15 @@ bool ServiceCellular::sendSimBlocked()
     return true;
 }
 
-bool ServiceCellular::sendUnhandledCME(unsigned int cme_error)
-{
-    auto message = std::make_shared<CellularDisplayCMEMessage>(Store::GSM::get()->selected, cme_error);
-    bus.sendUnicast(message, app::manager::ApplicationManager::ServiceName);
-    LOG_ERROR("UNHANDLED CME %d", cme_error);
-    return true;
-}
-
-bool ServiceCellular::sendBadPin()
-{
-    LOG_DEBUG("SEND BAD PIN");
-    if (auto state = priv->simCard->simState(); state) {
-        return handleSimState(*state, std::string());
-    }
-    return false;
-}
-
-bool ServiceCellular::sendBadPuk()
-{
-    LOG_DEBUG("SEND BAD PUK");
-    if (auto state = priv->simCard->simState(); state) {
-        return handleSimState(*state, std::string());
-    }
-    return false;
-}
-
 bool ServiceCellular::unlockSimPin(std::string pin)
 {
     LOG_ERROR("Unlock pin %s", pin.c_str());
     auto sime = priv->simCard->supplyPin(pin);
 
     if (sime == cellular::service::sim::Result::IncorrectPassword) {
-        sendBadPin();
+        if (auto state = priv->simCard->simState(); state) {
+            handleSimState(*state, std::string());
+        }
         return false;
     }
 
@@ -1029,26 +1005,9 @@ bool ServiceCellular::unlockSimPin(std::string pin)
         return true;
     }
     else {
-        sendUnhandledCME(static_cast<unsigned int>(sime));
+        //        sendUnhandledCME(static_cast<unsigned int>(sime));
         return false;
     }
-}
-
-bool ServiceCellular::unlockSimPuk(std::string puk, std::string pin)
-{
-    LOG_DEBUG("PUK:  %s  %s", puk.c_str(), pin.c_str());
-    auto sime = priv->simCard->supplyPuk(puk, pin);
-
-    if (sime == cellular::service::sim::Result::IncorrectPassword) {
-        sendBadPuk();
-        return false;
-    }
-
-    if (sime == cellular::service::sim::Result::OK) {
-        return true;
-    }
-    sendUnhandledCME(static_cast<unsigned int>(sime));
-    return false;
 }
 
 auto ServiceCellular::handleSimPinMessage(sys::Message *msgl) -> std::shared_ptr<sys::ResponseMessage>

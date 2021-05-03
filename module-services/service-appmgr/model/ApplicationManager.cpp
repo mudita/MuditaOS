@@ -39,6 +39,7 @@
 #include <service-appmgr/messages/GetAllNotificationsRequest.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <module-db/queries/notifications/QueryNotificationsGetAll.hpp>
+#include <service-cellular-api>
 
 #include "module-services/service-appmgr/service-appmgr/messages/ApplicationStatus.hpp"
 
@@ -440,7 +441,6 @@ namespace app::manager
         connect(typeid(CellularSimRequestPukMessage), convertibleToActionHandler);
         connect(typeid(CellularUnlockSimMessage), convertibleToActionHandler);
         connect(typeid(CellularBlockSimMessage), convertibleToActionHandler);
-        connect(typeid(CellularDisplayCMEMessage), convertibleToActionHandler);
         connect(typeid(CellularMMIResultMessage), convertibleToActionHandler);
         connect(typeid(CellularMMIResponseMessage), convertibleToActionHandler);
         connect(typeid(CellularMMIPushMessage), convertibleToActionHandler);
@@ -454,6 +454,18 @@ namespace app::manager
         connect(typeid(sys::TetheringQuestionAbort), convertibleToActionHandler);
         connect(typeid(sys::TetheringPhoneModeChangeProhibitedMessage), convertibleToActionHandler);
         connect(typeid(VolumeChanged), convertibleToActionHandler);
+
+        /* Notification from sys::BusChannel::ServiceCellularNotifications, probably not subscribed */
+        connect(typeid(cellular::msg::notification::UnhandledCME), [&](sys::Message *request) {
+            auto msg    = static_cast<cellular::msg::notification::UnhandledCME *>(request);
+            auto action = std::make_unique<app::manager::ActionRequest>(
+                msg->sender,
+                app::manager::actions::DisplayCMEError,
+                std::make_unique<app::manager::actions::UnhandledCMEParams>(static_cast<Store::GSM::SIM>(msg->sim),
+                                                                            msg->code));
+            handleActionRequest(action.get());
+            return std::make_shared<sys::ResponseMessage>();
+        });
     }
 
     sys::ReturnCodes ApplicationManager::SwitchPowerModeHandler(const sys::ServicePowerMode mode)

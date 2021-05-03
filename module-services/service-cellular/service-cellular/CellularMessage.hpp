@@ -467,24 +467,6 @@ class CellularBlockSimMessage : public CellularMessage, public app::manager::act
     }
 };
 
-class CellularDisplayCMEMessage : public CellularMessage, public app::manager::actions::ConvertibleToAction
-{
-    app::manager::actions::UnhandledCMEParams params;
-
-  public:
-    CellularDisplayCMEMessage(Store::GSM::SIM _sim, unsigned int _cmeCode)
-        : CellularMessage(Type::SimResponse), params(_sim, _cmeCode)
-    {}
-
-    [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
-    {
-        return std::make_unique<app::manager::ActionRequest>(
-            sender,
-            app::manager::actions::DisplayCMEError,
-            std::make_unique<app::manager::actions::UnhandledCMEParams>(params));
-    }
-};
-
 class CellularSimDataMessage : public CellularMessage
 {
     Store::GSM::SIM sim = Store::GSM::SIM::NONE;
