@@ -506,9 +506,6 @@ void ServiceCellular::registerMessageHandlers()
     connect(typeid(CellularSimStateMessage),
             [&](sys::Message *request) -> sys::MessagePointer { return handleSimStateMessage(request); });
 
-    connect(typeid(CellularSimPinDataMessage),
-            [&](sys::Message *request) -> sys::MessagePointer { return handleSimPinMessage(request); });
-
     connect(typeid(cellular::StateChange),
             [&](sys::Message *request) -> sys::MessagePointer { return handleStateRequestMessage(request); });
 
@@ -987,39 +984,6 @@ bool ServiceCellular::sendSimBlocked()
     bus.sendUnicast(message, app::manager::ApplicationManager::ServiceName);
     LOG_ERROR("SIM BLOCKED");
     return true;
-}
-
-bool ServiceCellular::unlockSimPin(std::string pin)
-{
-    LOG_ERROR("Unlock pin %s", pin.c_str());
-    auto sime = priv->simCard->supplyPin(pin);
-
-    if (sime == cellular::service::sim::Result::IncorrectPassword) {
-        if (auto state = priv->simCard->simState(); state) {
-            handleSimState(*state, std::string());
-        }
-        return false;
-    }
-
-    if (sime == cellular::service::sim::Result::OK) {
-        return true;
-    }
-    else {
-        //        sendUnhandledCME(static_cast<unsigned int>(sime));
-        return false;
-    }
-}
-
-auto ServiceCellular::handleSimPinMessage(sys::Message *msgl) -> std::shared_ptr<sys::ResponseMessage>
-{
-    auto msgSimPin = dynamic_cast<CellularSimPinDataMessage *>(msgl);
-    if (msgSimPin != nullptr) {
-        LOG_DEBUG("Unlocking sim");
-        return std::make_shared<CellularResponseMessage>(
-            unlockSimPin(cellular::utils::pinToString(msgSimPin->getPin())));
-    }
-    LOG_ERROR("Request message is not CellularSimPinDataMessage!");
-    return std::make_shared<CellularResponseMessage>(false);
 }
 
 bool ServiceCellular::handleSimState(at::SimState state, const std::string &message)

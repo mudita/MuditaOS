@@ -133,16 +133,6 @@ class ServiceCellular : public sys::Service
      */
     bool sendSimBlocked();
 
-    /// sim functionality
-
-    /** Function ready for change pin action send to Service Cellular form eg. GUI
-     * \param oldPin
-     * \param newPin
-     * \return
-     */
-    bool unlockSimPin(std::string pin);
-    bool unlockSimPuk(std::string puk, std::string pin);
-
   private:
     at::ATURCStream atURCStream;
     std::unique_ptr<CellularMux> cmux = std::make_unique<CellularMux>(PortSpeed_e::PS460800, this);
@@ -274,7 +264,6 @@ class ServiceCellular : public sys::Service
     void handleUSSDTimer();
 
     bool handleSimState(at::SimState state, const std::string &message);
-    auto handleSimPinMessage(sys::Message *msgl) -> std::shared_ptr<sys::ResponseMessage>;
 
     std::shared_ptr<cellular::RawCommandRespAsync> handleCellularStartOperatorsScan(
         CellularStartOperatorsScanMessage *msg);

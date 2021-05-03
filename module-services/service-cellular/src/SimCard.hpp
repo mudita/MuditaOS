@@ -122,6 +122,12 @@ namespace cellular::service
          */
         bool isPinLocked() const;
 
+        /** Process sim::Result from PIN lock/unlock operations
+         * \param result result from operation (`sendCommand()`)
+         * \result return true on success
+         */
+        bool processPinResult(sim::Result result);
+
         sim::Result sendCommand(api::PassCodeType check, const at::Cmd &cmd) const;
 
         at::Channel *channel        = nullptr;

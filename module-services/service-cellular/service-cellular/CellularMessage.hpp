@@ -487,21 +487,6 @@ class CellularChangeSimDataMessage : public CellularSimDataMessage
     {}
 };
 
-class CellularSimPinDataMessage : public CellularSimDataMessage
-{
-    std::vector<unsigned int> pinValue;
-
-  public:
-    CellularSimPinDataMessage(Store::GSM::SIM _sim, std::vector<unsigned int> _pinValue)
-        : CellularSimDataMessage{_sim}, pinValue{std::move(_pinValue)}
-    {}
-
-    [[nodiscard]] const std::vector<unsigned int> &getPin() const noexcept
-    {
-        return pinValue;
-    }
-};
-
 class CellularSimAbortMessage : public CellularSimDataMessage
 {
   public:

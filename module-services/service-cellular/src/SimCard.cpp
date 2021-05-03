@@ -51,9 +51,9 @@ namespace cellular::service
             const auto pin      = cellular::utils::pinToString(msg->pin);
             switch (msg->passCodeType) {
             case api::PassCodeType::PIN:
-                return std::make_shared<request::sim::SetPin::Response>(changePin(passCode, pin) == sim::Result::OK);
+                return std::make_shared<request::sim::SetPin::Response>(processPinResult(changePin(passCode, pin)));
             case api::PassCodeType::PUK:
-                return std::make_shared<request::sim::SetPin::Response>(supplyPuk(passCode, pin) == sim::Result::OK);
+                return std::make_shared<request::sim::SetPin::Response>(processPinResult(supplyPuk(passCode, pin)));
             }
             return std::make_shared<request::sim::SetPin::Response>(false);
         });
@@ -61,7 +61,12 @@ namespace cellular::service
             auto msg       = static_cast<request::sim::SetPinLock *>(request);
             const auto pin = cellular::utils::pinToString(msg->pin);
             return std::make_shared<request::sim::SetPinLock::Response>(
-                setPinLock(msg->lock == cellular::api::SimCardLock::Locked, pin) == sim::Result::OK, msg->lock);
+                processPinResult(setPinLock(msg->lock == cellular::api::SimCardLock::Locked, pin)), msg->lock);
+        });
+        owner->connect(typeid(request::sim::PinUnlock), [&](sys::Message *request) -> sys::MessagePointer {
+            auto msg       = static_cast<request::sim::PinUnlock *>(request);
+            const auto pin = cellular::utils::pinToString(msg->pin);
+            return std::make_shared<request::sim::PinUnlock::Response>(processPinResult(supplyPin(pin)));
         });
     }
 
@@ -95,6 +100,19 @@ namespace cellular::service
         return std::nullopt;
     }
 
+    bool SimCard::processPinResult(sim::Result result)
+    {
+        if (result == sim::Result::IncorrectPassword) {
+            /* ServiceCellular::handleSimState(simState(), std::string()); */
+        }
+        else if (result != sim::Result::OK) {
+            owner->bus.sendMulticast(
+                std::make_shared<msg::notification::UnhandledCME>(*sim, static_cast<unsigned int>(result)),
+                sys::BusChannel::ServiceCellularNotifications);
+        }
+        return result == sim::Result::OK;
+    }
+
     sim::Result SimCard::supplyPin(const std::string &pin) const
     {
         return sendCommand(api::PassCodeType::PIN, at::factory(at::AT::CPIN) + "\"" + pin + "\"");
@@ -102,32 +120,13 @@ namespace cellular::service
 
     sim::Result SimCard::changePin(const std::string &oldPin, const std::string &newPin) const
     {
-        auto result = sendCommand(api::PassCodeType::PIN,
-                                  at::factory(at::AT::CPWD) + "\"SC\", \"" + oldPin + "\",\"" + newPin + "\"");
-        if (result == sim::Result::IncorrectPassword) {
-            /* ServiceCellular::handleSimState(simState(), std::string()); */
-        }
-        else if (result != sim::Result::OK) {
-            owner->bus.sendMulticast(
-                std::make_shared<msg::notification::UnhandledCME>(*sim, static_cast<unsigned int>(result)),
-                sys::BusChannel::ServiceCellularNotifications);
-        }
-        return result;
+        return sendCommand(api::PassCodeType::PIN,
+                           at::factory(at::AT::CPWD) + "\"SC\", \"" + oldPin + "\",\"" + newPin + "\"");
     }
 
     sim::Result SimCard::supplyPuk(const std::string &puk, const std::string &pin) const
     {
-        auto result =
-            sendCommand(api::PassCodeType::PUK, at::factory(at::AT::CPIN) + "\"" + puk + "\"" + ",\"" + pin + "\"");
-        if (result == sim::Result::IncorrectPassword) {
-            /* ServiceCellular::handleSimState(simState(), std::string()); */
-        }
-        else if (result != sim::Result::OK) {
-            owner->bus.sendMulticast(
-                std::make_shared<msg::notification::UnhandledCME>(*sim, static_cast<unsigned int>(result)),
-                sys::BusChannel::ServiceCellularNotifications);
-        }
-        return result;
+        return sendCommand(api::PassCodeType::PUK, at::factory(at::AT::CPIN) + "\"" + puk + "\"" + ",\"" + pin + "\"");
     }
 
     sim::Result SimCard::setPinLock(bool lock, const std::string &pin) const

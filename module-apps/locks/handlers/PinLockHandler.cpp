@@ -240,7 +240,7 @@ namespace gui
     {
         if (type == Lock::LockType::SimPin) {
             setSimLockHandled();
-            app->bus.sendUnicast(std::make_shared<CellularSimPinDataMessage>(simLock.sim, passcode), serviceCellular);
+            app->bus.sendUnicast<cellular::msg::request::sim::PinUnlock>(passcode);
         }
         else if (type == Lock::LockType::SimPuk) {
             handlePasscodeChange(passcode);

@@ -7,6 +7,8 @@
 
 namespace cellular::msg::request::sim
 {
+    /** Get current state of PIN lock
+     */
     struct GetLockState : public msg::Request
     {
         struct Response : public msg::Response
@@ -17,6 +19,23 @@ namespace cellular::msg::request::sim
         };
     };
 
+    /** Unlock SIM using PIN
+     */
+    struct PinUnlock : msg::Request
+    {
+        PinUnlock(const api::PassCode &pin) : pin(pin)
+        {}
+        api::PassCode pin;
+
+        struct Response : msg::Response
+        {
+            Response(bool retCode) : msg::Response(retCode)
+            {}
+        };
+    };
+
+    /** Change PIN using old PIN or PUK
+     */
     struct SetPin : msg::Request
     {
         SetPin(api::PassCodeType pcType, const api::PassCode &pc, const api::PassCode &pin)
@@ -33,6 +52,8 @@ namespace cellular::msg::request::sim
         };
     };
 
+    /** Enable or disable PIN lock on SIM
+     */
     struct SetPinLock : msg::Request
     {
         SetPinLock(api::SimCardLock lock, const api::PassCode &pin) : lock(lock), pin(pin)
