@@ -42,6 +42,14 @@ namespace cellular::service
     void SimCard::registerMessages()
     {
         using namespace ::cellular::msg;
+        owner->connect(typeid(request::sim::SetActiveSim), [&](sys::Message *request) -> sys::MessagePointer {
+            auto msg = static_cast<request::sim::SetActiveSim *>(request);
+            /* That's EVIL !! */
+            Store::GSM::get()->selected = static_cast<Store::GSM::SIM>(msg->sim);
+            bsp::cellular::sim::simSelect();
+            bsp::cellular::sim::hotSwapTrigger();
+            return std::make_shared<request::sim::SetActiveSim::Response>(true);
+        });
         owner->connect(typeid(request::sim::GetLockState), [&](sys::Message *) -> sys::MessagePointer {
             return std::make_shared<request::sim::GetLockState::Response>(isPinLocked());
         });

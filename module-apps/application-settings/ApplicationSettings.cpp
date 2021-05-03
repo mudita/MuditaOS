@@ -21,7 +21,7 @@
 #include "ApplicationSettings.hpp"
 
 #include "service-cellular/ServiceCellular.hpp"
-#include <service-cellular/CellularServiceAPI.hpp>
+#include <service-cellular-api>
 #include "windows/SettingsMainWindow.hpp"
 #include "windows/SimSelectWindow.hpp"
 #include "windows/CellularPassthroughWindow.hpp"
@@ -173,7 +173,8 @@ namespace app
 
     void ApplicationSettings::setSim(Store::GSM::SIM sim)
     {
-        CellularServiceAPI::SetSimCard(this, sim);
+        auto arg = (sim == Store::GSM::SIM::SIM2) ? cellular::api::Sim::SIM2 : cellular::api::Sim::SIM1;
+        bus.sendUnicast<cellular::msg::request::sim::SetActiveSim>(arg);
     }
 
     void ApplicationSettings::setPin(unsigned int value)

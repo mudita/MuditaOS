@@ -263,11 +263,6 @@ bool CellularServiceAPI::USSDRequest(sys::Service *serv, CellularUSSDMessage::Re
     ;
 }
 
-bool CellularServiceAPI::SetSimCard(sys::Service *serv, Store::GSM::SIM sim)
-{
-    return serv->bus.sendUnicast(std::make_shared<CellularChangeSimDataMessage>(sim), ServiceCellular::serviceName);
-}
-
 bool CellularServiceAPI::GetAPN(sys::Service *serv)
 {
     return serv->bus.sendUnicast(std::make_shared<CellularGetAPNMessage>(), ServiceCellular::serviceName);

@@ -92,7 +92,6 @@ namespace CellularServiceAPI
 
     bool USSDRequest(sys::Service *serv, CellularUSSDMessage::RequestType type, std::string data = "");
 
-    bool SetSimCard(sys::Service *serv, Store::GSM::SIM sim);
     /**
      * @brief get all APNs from phone configuration
      */

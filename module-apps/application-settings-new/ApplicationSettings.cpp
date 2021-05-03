@@ -519,7 +519,8 @@ namespace app
 
     void ApplicationSettingsNew::setSim(Store::GSM::SIM sim)
     {
-        CellularServiceAPI::SetSimCard(this, sim);
+        auto arg = (sim == Store::GSM::SIM::SIM2) ? cellular::api::Sim::SIM2 : cellular::api::Sim::SIM1;
+        bus.sendUnicast<cellular::msg::request::sim::SetActiveSim>(arg);
     }
 
     Store::GSM::SIM ApplicationSettingsNew::getSim()

@@ -10,6 +10,7 @@
 #include <service-cellular/ServiceCellular.hpp>
 #include <service-bluetooth/messages/Status.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
+#include <service-cellular-api>
 
 #include <gui/Common.hpp>
 #include <service-appmgr/Actions.hpp>
@@ -253,11 +254,9 @@ bool DeveloperModeHelper::sendKeypress(bsp::KeyCodes keyCode, gui::InputEvent::S
 
 void DeveloperModeHelper::requestSimChange(const int simSelected)
 {
-    Store::GSM::SIM sim = Store::GSM::SIM::SIM1;
-    if (simSelected == static_cast<int>(Store::GSM::SIM::SIM2)) {
-        sim = Store::GSM::SIM::SIM2;
-    }
-    CellularServiceAPI::SetSimCard(owner, sim);
+    auto arg = (simSelected == static_cast<int>(cellular::api::Sim::SIM2)) ? cellular::api::Sim::SIM2
+                                                                           : cellular::api::Sim::SIM1;
+    owner->bus.sendUnicast<cellular::msg::request::sim::SetActiveSim>(arg);
 }
 
 bool DeveloperModeHelper::requestCellularPowerStateChange(const int cellularState)

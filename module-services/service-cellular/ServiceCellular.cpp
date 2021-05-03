@@ -286,14 +286,6 @@ void ServiceCellular::registerMessageHandlers()
 
     priv->simCard->registerMessages();
 
-    connect(typeid(CellularChangeSimDataMessage), [&](sys::Message *request) -> sys::MessagePointer {
-        auto msg                    = static_cast<CellularChangeSimDataMessage *>(request);
-        Store::GSM::get()->selected = msg->getSim();
-        bsp::cellular::sim::simSelect();
-        bsp::cellular::sim::hotSwapTrigger();
-        return std::make_shared<CellularResponseMessage>(true);
-    });
-
     connect(typeid(CellularStartOperatorsScanMessage), [&](sys::Message *request) -> sys::MessagePointer {
         auto msg = static_cast<CellularStartOperatorsScanMessage *>(request);
         return handleCellularStartOperatorsScan(msg);

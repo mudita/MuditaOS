@@ -467,26 +467,6 @@ class CellularBlockSimMessage : public CellularMessage, public app::manager::act
     }
 };
 
-class CellularSimDataMessage : public CellularMessage
-{
-    Store::GSM::SIM sim = Store::GSM::SIM::NONE;
-
-  public:
-    explicit CellularSimDataMessage(Store::GSM::SIM _sim) : CellularMessage{Type::SimResponse}, sim{_sim}
-    {}
-    [[nodiscard]] Store::GSM::SIM getSim() const noexcept
-    {
-        return sim;
-    }
-};
-
-class CellularChangeSimDataMessage : public CellularSimDataMessage
-{
-  public:
-    CellularChangeSimDataMessage(Store::GSM::SIM _sim) : CellularSimDataMessage{_sim}
-    {}
-};
-
 class CellularGetChannelMessage : public CellularMessage
 {
   public:
