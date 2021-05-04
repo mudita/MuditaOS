@@ -580,9 +580,11 @@ namespace gui
             return false;
         }
 
-        if (const auto val = inputEvent.numericValue();
-            inputEvent.isDigit() && checkAdditionBounds(val) == AdditionBound::CanAddAll) {
+        if (!inputEvent.isDigit()) {
+            return false;
+        }
 
+        if (const auto val = inputEvent.numericValue(); checkAdditionBounds(val) == AdditionBound::CanAddAll) {
             setCursorStartPosition(CursorStartPosition::Offset);
             addChar(intToAscii(val));
             onTextChanged();
