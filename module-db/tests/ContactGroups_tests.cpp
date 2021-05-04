@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "common.hpp"
 #include <catch2/catch.hpp>
 
 #include <Databases/ContactsDB.hpp>
@@ -27,9 +28,7 @@ TEST_CASE("Contact Groups tests")
     INFO("sqlite Init");
     Database::initialize();
     const auto contactsPath = (std::filesystem::path{"sys/user"} / "contacts.db");
-    if (std::filesystem::exists(contactsPath)) {
-        REQUIRE(std::filesystem::remove(contactsPath));
-    }
+    RemoveDbFiles(contactsPath.stem());
 
     ContactsDB contactDb{contactsPath.c_str()};
     INFO("contactDB init");
