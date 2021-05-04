@@ -40,7 +40,7 @@ namespace locks
                                              std::make_unique<gui::PopupRequestParams>(gui::popup::ID::PhoneLock));
     }
 
-    void PhoneLockHandler::PhoneUnlockAction()
+    void PhoneLockHandler::PhoneUnlockPopupsCloseAction()
     {
         app::manager::Controller::sendAction(owner,
                                              app::manager::actions::AbortPopup,
@@ -48,6 +48,12 @@ namespace locks
         app::manager::Controller::sendAction(owner,
                                              app::manager::actions::AbortPopup,
                                              std::make_unique<gui::PopupRequestParams>(gui::popup::ID::PhoneLock));
+    }
+
+    void PhoneLockHandler::PhoneUnlockAction()
+    {
+        PhoneUnlockPopupsCloseAction();
+        owner->bus.sendMulticast(std::make_shared<locks::UnlockedPhone>(), sys::BusChannel::PhoneLockChanges);
     }
 
     void PhoneLockHandler::PhoneInputRequiredAction()
@@ -112,9 +118,14 @@ namespace locks
         return sys::msgHandled();
     }
 
+    sys::MessagePointer PhoneLockHandler::handleUnlockCancelRequest()
+    {
+        PhoneUnlockPopupsCloseAction();
+        return sys::msgHandled();
+    }
+
     bool PhoneLockHandler::isPhoneLocked() const noexcept
     {
         return !lock.isState(Lock::LockState::Unlocked);
     }
-
 } // namespace locks
