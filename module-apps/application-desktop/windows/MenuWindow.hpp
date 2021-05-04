@@ -1,17 +1,19 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include <vector>
 
-#include "AppWindow.hpp"
-#include "GridLayout.hpp"
-#include "widgets/BottomBar.hpp"
-#include "widgets/Label.hpp"
-#include "widgets/Rect.hpp"
+#include <AppWindow.hpp>
+#include <GridLayout.hpp>
+#include <widgets/Rect.hpp>
+#include <utf8/UTF8.hpp>
 
-#include "utf8/UTF8.hpp"
+namespace app
+{
+    class DBNotificationsBaseHandler;
+}
 
 namespace gui
 {
@@ -53,7 +55,7 @@ namespace gui
         MenuPage *toolsMenu = nullptr;
 
       public:
-        MenuWindow(app::Application *app);
+        MenuWindow(app::Application *app, const app::DBNotificationsBaseHandler &accessor);
 
         bool onInput(const InputEvent &inputEvent) override;
 
@@ -65,6 +67,7 @@ namespace gui
         void refresh();
 
       private:
+        const app::DBNotificationsBaseHandler &dbNotifications;
         void invalidate() noexcept;
     };
 

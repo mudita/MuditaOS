@@ -5,26 +5,16 @@
 
 #include "windows/Names.hpp"
 #include "locks/handlers/PinLockHandler.hpp"
-
+#include "widgets/DBNotificationsHandler.hpp"
+#include "Constants.hpp"
 #include <Application.hpp>
 #include <Service/Message.hpp>
-#include <service-cellular/CellularMessage.hpp>
-#include <service-db/DBNotificationMessage.hpp>
-#include <module-db/queries/notifications/QueryNotificationsGetAll.hpp>
-#include <endpoints/update/UpdateMuditaOS.hpp>
-#include <service-desktop/ServiceDesktop.hpp>
 #include <service-desktop/DesktopMessages.hpp>
 
 namespace cellular
 {
     class StateChange;
 }
-
-namespace db::query
-{
-    class ThreadGetCountResult;
-    class CalllogGetCountResult;
-} // namespace db::query
 
 namespace gui
 {
@@ -33,28 +23,10 @@ namespace gui
 
 namespace app
 {
-    inline constexpr auto name_desktop = "ApplicationDesktop";
-
     class ApplicationDesktop : public Application
     {
       public:
         bool need_sim_select = false;
-        struct Notifications
-        {
-            struct Counters
-            {
-                unsigned int SMS   = 0;
-                unsigned int Calls = 0;
-
-                auto areEmpty()
-                {
-                    return Calls == 0 && SMS == 0;
-                }
-            };
-
-            Counters notRead;
-
-        } notifications;
 
         gui::PinLockHandler lockHandler;
 
@@ -75,19 +47,11 @@ namespace app
         void destroyUserInterface() override;
         // if there is modem notification and there is no default SIM selected, then we need to select if when unlock is
         // done
-        bool handle(db::NotificationMessage *msg);
         bool handle(cellular::StateChange *msg);
-        auto handle(db::query::ThreadGetCountResult *msg) -> bool;
-        auto handle(db::query::CalllogGetCountResult *msg) -> bool;
         auto handle(sdesktop::UpdateOsMessage *msg) -> bool;
         auto handle(sdesktop::developerMode::ScreenlockCheckEvent *event) -> bool;
         void handleNotificationsChanged(std::unique_ptr<gui::SwitchData> notificationsParams) override;
-        /**
-         * This static method will be used to lock the phone
-         */
-        //	static bool messageLockPhone( sys::Service* sender, std::string application , const gui::InputEvent& event
-        //);
-        bool showCalls();
+
         unsigned int getLockPassHash() const noexcept
         {
             return lockPassHash;
@@ -112,6 +76,7 @@ namespace app
         void osCurrentVersionChanged(const std::string &value);
         std::string osUpdateVersion{updateos::initSysVer};
         std::string osCurrentVersion{updateos::initSysVer};
+        DBNotificationsHandler dbNotificationHandler;
     };
 
     template <> struct ManifestTraits<ApplicationDesktop>

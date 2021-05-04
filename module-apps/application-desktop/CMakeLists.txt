@@ -16,6 +16,7 @@ target_sources( ${PROJECT_NAME}
 	PRIVATE
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationDesktop.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/DesktopInputWidget.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/widgets/DBNotificationsHandler.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/DesktopMainWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/MenuWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/DeadBatteryWindow.cpp"
@@ -31,10 +32,12 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/models/ActiveNotificationsModel.cpp"
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationDesktop.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/Constants.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/data/DesktopData.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/data/DesktopStyle.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/data/Mmi.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/DesktopInputWidget.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/widgets/DBNotificationsHandler.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/DesktopMainWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/MenuWindow.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/windows/Reboot.hpp"

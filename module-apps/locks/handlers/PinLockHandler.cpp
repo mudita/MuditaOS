@@ -8,6 +8,7 @@
 #include "application-desktop/windows/Names.hpp"
 #include <module-utils/common_data/EventStore.hpp>
 #include <service-appmgr/service-appmgr/data/SimActionsParams.hpp>
+#include <service-desktop/Constants.hpp>
 
 namespace gui
 {
