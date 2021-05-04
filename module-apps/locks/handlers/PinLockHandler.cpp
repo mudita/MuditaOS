@@ -339,10 +339,9 @@ namespace gui
 
     void PinLockHandler::unlockScreen()
     {
-        if (getStrongestLock().isType(Lock::LockType::Screen) && !app->isLockScreenPasscodeOn()) {
+        if (getStrongestLock().isType(Lock::LockType::Screen)) {
             screenLock.lockState = gui::Lock::LockState::Unlocked;
         }
-        unlock();
     }
 
     void PinLockHandler::setSimLockHandled() noexcept
