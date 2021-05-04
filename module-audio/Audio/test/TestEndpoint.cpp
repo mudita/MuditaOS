@@ -26,6 +26,11 @@ void TestSink::enableOutput()
 void TestSink::disableOutput()
 {}
 
+auto TestSink::getTraits() const -> ::audio::Endpoint::Traits
+{
+    return testTraits;
+}
+
 TestSource::TestSource(std::vector<AudioFormat> supportedFormats, AudioFormat sourceFormat)
     : formats(std::move(supportedFormats)), sourceFormat(std::move(sourceFormat))
 {}
@@ -51,4 +56,9 @@ void TestSource::disableInput()
 auto TestSource::getSupportedFormats() -> const std::vector<AudioFormat> &
 {
     return formats;
+}
+
+auto TestSource::getTraits() const -> ::audio::Endpoint::Traits
+{
+    return testTraits;
 }

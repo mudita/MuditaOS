@@ -11,19 +11,19 @@ namespace audio
     {
       public:
         ProfileRoutingLoudspeaker(Volume volume, Gain gain)
-            : Profile(
-                  "Routing Speakerphone",
-                  Type::RoutingLoudspeaker,
-                  AudioDevice::Format{.sampleRate_Hz = 16000,
-                                      .bitWidth      = 16,
-                                      .flags         = static_cast<uint32_t>(
-                                                   AudioDevice::Flags::InputLeft) | // microphone use left audio channel
-                                               static_cast<uint32_t>(AudioDevice::Flags::OutputMono),
-                                      .outputVolume = static_cast<float>(volume),
-                                      .inputGain    = static_cast<float>(gain),
-                                      .inputPath    = AudioDevice::InputPath::Microphone,
-                                      .outputPath   = AudioDevice::OutputPath::Loudspeaker},
-                  AudioDevice::Type::Audiocodec)
+            : Profile("Routing Speakerphone",
+                      Type::RoutingLoudspeaker,
+                      AudioDevice::Configuration{
+                          .sampleRate_Hz = 16000,
+                          .bitWidth      = 16,
+                          .flags         = static_cast<uint32_t>(
+                                       AudioDevice::Flags::InputLeft) | // microphone use left audio channel
+                                   static_cast<uint32_t>(AudioDevice::Flags::OutputMono),
+                          .outputVolume = static_cast<float>(volume),
+                          .inputGain    = static_cast<float>(gain),
+                          .inputPath    = AudioDevice::InputPath::Microphone,
+                          .outputPath   = AudioDevice::OutputPath::Loudspeaker},
+                      AudioDevice::Type::Audiocodec)
         {}
     };
 

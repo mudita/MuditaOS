@@ -60,32 +60,32 @@ namespace audio
 
         Volume GetOutputVolume() const
         {
-            return audioFormat.outputVolume;
+            return audioConfiguration.outputVolume;
         }
 
         Gain GetInputGain() const
         {
-            return audioFormat.inputGain;
+            return audioConfiguration.inputGain;
         }
 
         uint32_t GetSampleRate()
         {
-            return audioFormat.sampleRate_Hz;
+            return audioConfiguration.sampleRate_Hz;
         }
 
         uint32_t GetInOutFlags()
         {
-            return audioFormat.flags;
+            return audioConfiguration.flags;
         }
 
         AudioDevice::OutputPath GetOutputPath() const
         {
-            return audioFormat.outputPath;
+            return audioConfiguration.outputPath;
         }
 
         AudioDevice::InputPath GetInputPath() const
         {
-            return audioFormat.inputPath;
+            return audioConfiguration.inputPath;
         }
 
         AudioDevice::Type GetAudioDeviceType() const
@@ -93,9 +93,17 @@ namespace audio
             return audioDeviceType;
         }
 
-        AudioDevice::Format GetAudioFormat()
+        [[deprecated]] AudioDevice::Configuration GetAudioConfiguration()
         {
-            return audioFormat;
+            return audioConfiguration;
+        }
+
+        auto getAudioFormat() const noexcept
+        {
+            auto isStereo = (audioConfiguration.flags & static_cast<uint32_t>(AudioDevice::Flags::OutputStereo)) != 0 ||
+                            (audioConfiguration.flags & static_cast<uint32_t>(AudioDevice::Flags::InputStereo)) != 0;
+            auto channels = isStereo ? 2U : 1U;
+            return AudioFormat(audioConfiguration.sampleRate_Hz, audioConfiguration.bitWidth, channels);
         }
 
         const std::string &GetName() const
@@ -109,9 +117,12 @@ namespace audio
         }
 
       protected:
-        Profile(const std::string &name, const Type type, const AudioDevice::Format &fmt, AudioDevice::Type devType);
+        Profile(const std::string &name,
+                const Type type,
+                const AudioDevice::Configuration &fmt,
+                AudioDevice::Type devType);
 
-        AudioDevice::Format audioFormat{};
+        AudioDevice::Configuration audioConfiguration{};
         AudioDevice::Type audioDeviceType = AudioDevice::Type::Audiocodec;
 
         std::string name;

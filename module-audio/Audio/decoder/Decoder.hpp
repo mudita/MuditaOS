@@ -110,6 +110,8 @@ namespace audio
         auto getSourceFormat() -> AudioFormat override;
         auto getSupportedFormats() -> const std::vector<AudioFormat> & override;
 
+        auto getTraits() const -> Endpoint::Traits override;
+
         void startDecodingWorker(DecoderWorker::EndOfFileCallback endOfFileCallback);
         void stopDecodingWorker();
 
@@ -122,8 +124,8 @@ namespace audio
 
         void convertmono2stereo(int16_t *pcm, uint32_t samplecount);
 
-        static constexpr auto workerBufferSize              = 1024 * 8;
-        static constexpr Endpoint::Capabilities decoderCaps = {.usesDMA = false};
+        static constexpr auto workerBufferSize        = 1024 * 8;
+        static constexpr Endpoint::Traits decoderCaps = {.usesDMA = false};
 
         uint32_t sampleRate = 0;
         uint32_t chanNumber = 0;

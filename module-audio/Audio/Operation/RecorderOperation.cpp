@@ -85,8 +85,8 @@ namespace audio
         operationToken = token;
         state          = State::Active;
 
-        if (audioDevice->IsFormatSupported(currentProfile->GetAudioFormat())) {
-            auto ret = audioDevice->Start(currentProfile->GetAudioFormat());
+        if (audioDevice->IsFormatSupported(currentProfile->GetAudioConfiguration())) {
+            auto ret = audioDevice->Start(currentProfile->GetAudioConfiguration());
             return GetDeviceError(ret);
         }
         else {
@@ -124,7 +124,7 @@ namespace audio
         }
 
         state    = State::Active;
-        auto ret = audioDevice->Start(currentProfile->GetAudioFormat());
+        auto ret = audioDevice->Start(currentProfile->GetAudioConfiguration());
         return GetDeviceError(ret);
     }
 

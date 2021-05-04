@@ -51,28 +51,37 @@ namespace audio
         state          = State::Active;
 
         // check if audio devices support desired audio format
-        if (!audioDevice->IsFormatSupported(currentProfile->GetAudioFormat())) {
+        if (!audioDevice->IsFormatSupported(currentProfile->GetAudioConfiguration())) {
             return RetCode::InvalidFormat;
         }
 
-        if (!audioDeviceCellular->IsFormatSupported(currentProfile->GetAudioFormat())) {
+        if (!audioDeviceCellular->IsFormatSupported(currentProfile->GetAudioConfiguration())) {
             return RetCode::InvalidFormat;
         }
 
         // try to run devices with the format
-        if (auto ret = audioDevice->Start(currentProfile->GetAudioFormat()); ret != AudioDevice::RetCode::Success) {
+        if (auto ret = audioDevice->Start(currentProfile->GetAudioConfiguration());
+            ret != AudioDevice::RetCode::Success) {
             return GetDeviceError(ret);
         }
 
-        if (auto ret = audioDeviceCellular->Start(currentProfile->GetAudioFormat());
+        if (auto ret = audioDeviceCellular->Start(currentProfile->GetAudioConfiguration());
             ret != AudioDevice::RetCode::Success) {
             return GetDeviceError(ret);
         }
 
         // create streams
-        StreamFactory streamFactory(routerCapabilities);
-        dataStreamIn  = streamFactory.makeStream(*audioDevice.get(), *audioDeviceCellular.get());
-        dataStreamOut = streamFactory.makeStream(*audioDevice.get(), *audioDeviceCellular.get());
+        StreamFactory streamFactory(callTimeConstraint);
+        try {
+            dataStreamIn =
+                streamFactory.makeStream(*audioDevice, *audioDeviceCellular, currentProfile->getAudioFormat());
+            dataStreamOut =
+                streamFactory.makeStream(*audioDevice, *audioDeviceCellular, currentProfile->getAudioFormat());
+        }
+        catch (std::invalid_argument &e) {
+            LOG_FATAL("Cannot create audio stream: %s", e.what());
+            return audio::RetCode::Failed;
+        }
 
         // create audio connections
         inputConnection =

@@ -6,8 +6,9 @@
 #include "Endpoint.hpp"
 #include "Stream.hpp"
 
+#include <initializer_list>
+#include <optional>
 #include <memory>
-#include <vector>
 
 namespace audio
 {
@@ -15,18 +16,24 @@ namespace audio
     class StreamFactory
     {
       public:
-        explicit StreamFactory(Endpoint::Capabilities factoryCaps,
-                               unsigned int bufferingSize = Stream::defaultBufferingSize);
-        auto makeStream(Source &source, Sink &sink) -> std::unique_ptr<Stream>;
+        StreamFactory() = default;
+        explicit StreamFactory(std::chrono::milliseconds operationPeriodRequirement);
+        auto makeStream(Source &source, Sink &sink, AudioFormat streamFormat) -> std::unique_ptr<Stream>;
 
       private:
-        auto negotiateCaps(std::vector<std::reference_wrapper<const Endpoint>> v) -> Endpoint::Capabilities;
-        auto getAllocator(bool usesDMA) -> Stream::Allocator &;
+        static constexpr auto defaultBuffering = 2U;
 
-        Endpoint::Capabilities caps;
+        auto getBlockSizeConstraint(std::initializer_list<audio::Endpoint::Traits> traitsList) const
+            -> std::optional<std::size_t>;
+        auto getTimingConstraints(std::initializer_list<std::optional<std::chrono::milliseconds>> timingConstraints)
+            const -> std::chrono::milliseconds;
+        auto negotiateAllocator(std::initializer_list<audio::Endpoint::Traits> traitsList) noexcept
+            -> Stream::Allocator &;
+
+        std::optional<std::chrono::milliseconds> periodRequirement = std::nullopt;
+
         StandardStreamAllocator stdAlloc;
         NonCacheableStreamAllocator nonCacheableAlloc;
-        unsigned int bufferingSize;
     };
 
 } // namespace audio

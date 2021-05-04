@@ -14,12 +14,15 @@
 
 #include <mutex.hpp>
 
-#include <memory>
+#include <chrono>
 #include <functional>
+#include <memory>
 #include <string>
 #include <vector>
 
 #include <cstdint>
+
+using namespace std::chrono_literals;
 
 namespace audio
 {
@@ -56,11 +59,9 @@ namespace audio
         Position GetPosition() final;
 
       private:
-        static constexpr auto minimumBlockSize = 64U;
-        static constexpr auto maximumBlockSize = 64U;
-        static constexpr Endpoint::Capabilities routerCapabilities{.minBlockSize = minimumBlockSize,
-                                                                   .maxBlockSize = maximumBlockSize};
-        Mute mute = Mute::Disabled;
+        static constexpr auto callTimeConstraint = 2ms;
+
+        Mute mute           = Mute::Disabled;
         JackState jackState = JackState::Unplugged;
 
         void Mute();

@@ -30,7 +30,7 @@ namespace audio
         Deinit();
     }
 
-    AudioDevice::RetCode RT1051CellularAudio::Start(const AudioDevice::Format &format)
+    AudioDevice::RetCode RT1051CellularAudio::Start(const AudioDevice::Configuration &format)
     {
         cpp_freertos::LockGuard lock(mutex);
 
@@ -118,7 +118,7 @@ namespace audio
         return AudioDevice::RetCode::Success;
     }
 
-    bool RT1051CellularAudio::IsFormatSupported(const AudioDevice::Format &format)
+    bool RT1051CellularAudio::IsFormatSupported(const AudioDevice::Configuration &format)
     {
         return true;
     }
@@ -252,6 +252,11 @@ namespace audio
     auto RT1051CellularAudio::getSupportedFormats() -> const std::vector<AudioFormat> &
     {
         return formats;
+    }
+
+    auto RT1051CellularAudio::getTraits() const -> Traits
+    {
+        return Traits{.usesDMA = true};
     }
 
     void rxCellularCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData)

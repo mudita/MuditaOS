@@ -10,6 +10,8 @@
 
 namespace audio::test
 {
+    constexpr inline auto testTraits = ::audio::Endpoint::Traits{};
+
     class TestSink : public audio::Sink
     {
       public:
@@ -19,6 +21,7 @@ namespace audio::test
         void enableOutput() override;
         void disableOutput() override;
         auto getSupportedFormats() -> const std::vector<AudioFormat> & override;
+        auto getTraits() const -> ::audio::Endpoint::Traits override;
 
       private:
         std::vector<AudioFormat> formats;
@@ -35,6 +38,7 @@ namespace audio::test
         void enableInput() override;
         void disableInput() override;
         auto getSupportedFormats() -> const std::vector<AudioFormat> & override;
+        auto getTraits() const -> ::audio::Endpoint::Traits override;
 
       private:
         std::vector<AudioFormat> formats;

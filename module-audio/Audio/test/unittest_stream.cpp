@@ -7,7 +7,9 @@
 #include <Audio/Stream.hpp>
 #include <Audio/AudioFormat.hpp>
 #include <Audio/StreamProxy.hpp>
+#include <Audio/StreamFactory.hpp>
 
+#include "MockEndpoint.hpp"
 #include "MockStream.hpp"
 
 #include <cstdint>
@@ -16,9 +18,12 @@
 using audio::NonCacheableStreamAllocator;
 using audio::StandardStreamAllocator;
 using audio::Stream;
+using audio::StreamFactory;
 using testing::Return;
 using testing::audio::MockStream;
 using testing::audio::MockStreamEventListener;
+
+using namespace std::chrono_literals;
 
 constexpr std::size_t defaultBlockSize = 64U;
 constexpr std::size_t defaultBuffering = 4U;
@@ -404,6 +409,113 @@ TEST(Proxy, Misc)
     proxy.reset();
     EXPECT_TRUE(proxy.isEmpty());
     EXPECT_FALSE(proxy.isFull());
+}
+
+TEST(Factory, BlockSizeConstraints)
+{
+    testing::audio::MockSink mockSink;
+    testing::audio::MockSource mockSource;
+    ::audio::StreamFactory factory(2ms);
+
+    EXPECT_CALL(mockSink, getTraits).WillRepeatedly(Return(::audio::Endpoint::Traits{.blockSizeConstraint = 512U}));
+    EXPECT_CALL(mockSource, getTraits).WillRepeatedly(Return(::audio::Endpoint::Traits{}));
+
+    auto stream = factory.makeStream(mockSource, mockSink, format);
+
+    EXPECT_EQ(stream->getOutputTraits().blockSize, 512U);
+    EXPECT_EQ(stream->getInputTraits().blockSize, 512U);
+
+    EXPECT_CALL(mockSink, getTraits).WillRepeatedly(Return(::audio::Endpoint::Traits{.blockSizeConstraint = 512U}));
+    EXPECT_CALL(mockSource, getTraits).WillRepeatedly(Return(::audio::Endpoint::Traits{.blockSizeConstraint = 512U}));
+
+    stream = factory.makeStream(mockSource, mockSink, format);
+
+    EXPECT_EQ(stream->getOutputTraits().blockSize, 512U);
+    EXPECT_EQ(stream->getInputTraits().blockSize, 512U);
+}
+
+TEST(Factory, BlockSizeErrors)
+{
+    testing::audio::MockSink mockSink;
+    testing::audio::MockSource mockSource;
+    ::audio::StreamFactory factory(2ms);
+
+    EXPECT_CALL(mockSource, getTraits).WillRepeatedly(Return(::audio::Endpoint::Traits{.blockSizeConstraint = 128U}));
+    EXPECT_CALL(mockSink, getTraits).WillRepeatedly(Return(::audio::Endpoint::Traits{.blockSizeConstraint = 300U}));
+    EXPECT_THROW(factory.makeStream(mockSource, mockSink, format), std::invalid_argument);
+
+    EXPECT_CALL(mockSource, getTraits).WillRepeatedly(Return(::audio::Endpoint::Traits{.blockSizeConstraint = 128U}));
+    EXPECT_CALL(mockSink, getTraits).WillRepeatedly(Return(::audio::Endpoint::Traits{.blockSizeConstraint = 0}));
+    EXPECT_THROW(factory.makeStream(mockSource, mockSink, format), std::invalid_argument);
+}
+
+TEST(Factory, TimeContraintsError)
+{
+    testing::audio::MockSink mockSink;
+    testing::audio::MockSource mockSource;
+    ::audio::StreamFactory factory;
+
+    EXPECT_CALL(mockSource, getTraits).WillRepeatedly(Return(::audio::Endpoint::Traits{}));
+    EXPECT_CALL(mockSink, getTraits).WillRepeatedly(Return(::audio::Endpoint::Traits{}));
+
+    EXPECT_THROW(factory.makeStream(mockSource, mockSink, format), std::invalid_argument);
+}
+
+TEST(Factory, NoSourceFormat)
+{
+    testing::audio::MockSink mockSink;
+    testing::audio::MockSource mockSource;
+    ::audio::StreamFactory factory;
+
+    EXPECT_CALL(mockSource, getTraits).WillRepeatedly(Return(::audio::Endpoint::Traits{}));
+    EXPECT_CALL(mockSink, getTraits).WillRepeatedly(Return(::audio::Endpoint::Traits{}));
+    EXPECT_THROW(factory.makeStream(mockSource, mockSink, ::audio::nullFormat), std::invalid_argument);
+}
+
+TEST(Factory, TimeConstraints)
+{
+    testing::audio::MockSink mockSink;
+    testing::audio::MockSource mockSource;
+    ::audio::StreamFactory factory(10ms);
+
+    EXPECT_CALL(mockSource, getTraits).WillRepeatedly(Return(::audio::Endpoint::Traits{}));
+    EXPECT_CALL(mockSink, getTraits)
+        .WillRepeatedly(Return(::audio::Endpoint::Traits{.blockSizeConstraint = 512U, .timeConstraint = 10ms}));
+
+    auto stream = factory.makeStream(mockSource, mockSink, ::audio::AudioFormat(44100, 16, 2));
+
+    EXPECT_EQ(stream->getBlockCount(), 8);
+    EXPECT_EQ(stream->getOutputTraits().blockSize, 512);
+}
+
+TEST(Factory, TimeBlockConstraints)
+{
+    testing::audio::MockSink mockSink;
+    testing::audio::MockSource mockSource;
+    ::audio::StreamFactory factory(2ms);
+
+    EXPECT_CALL(mockSource, getTraits).WillRepeatedly(Return(::audio::Endpoint::Traits{}));
+    EXPECT_CALL(mockSink, getTraits).WillRepeatedly(Return(::audio::Endpoint::Traits{.blockSizeConstraint = 60U}));
+
+    auto stream = factory.makeStream(mockSource, mockSink, ::audio::AudioFormat(8000, 16, 1));
+
+    EXPECT_EQ(stream->getBlockCount(), 2);
+    EXPECT_EQ(stream->getOutputTraits().blockSize, 60);
+}
+
+TEST(Factory, NoConstraints)
+{
+    testing::audio::MockSink mockSink;
+    testing::audio::MockSource mockSource;
+    ::audio::StreamFactory factory(2ms);
+
+    EXPECT_CALL(mockSource, getTraits).WillRepeatedly(Return(::audio::Endpoint::Traits{}));
+    EXPECT_CALL(mockSink, getTraits).WillRepeatedly(Return(::audio::Endpoint::Traits{}));
+
+    auto stream = factory.makeStream(mockSource, mockSink, ::audio::AudioFormat(16000, 16, 1));
+
+    EXPECT_EQ(stream->getBlockCount(), 2);
+    EXPECT_EQ(stream->getOutputTraits().blockSize, 64);
 }
 
 int main(int argc, char **argv)

@@ -53,8 +53,14 @@ namespace audio
         }
 
         // create stream
-        StreamFactory streamFactory(playbackCapabilities, playbackBufferingSize);
-        dataStreamOut = streamFactory.makeStream(*dec.get(), *audioDevice.get());
+        StreamFactory streamFactory(playbackTimeConstraint);
+        try {
+            dataStreamOut = streamFactory.makeStream(*dec, *audioDevice, currentProfile->getAudioFormat());
+        }
+        catch (std::invalid_argument &e) {
+            LOG_FATAL("Cannot create audio stream: %s", e.what());
+            return audio::RetCode::Failed;
+        }
 
         // create audio connection
         outputConnection = std::make_unique<StreamConnection>(dec.get(), audioDevice.get(), dataStreamOut.get());
@@ -63,7 +69,7 @@ namespace audio
         dec->startDecodingWorker(endOfFileCallback);
 
         // start output device and enable audio connection
-        auto ret = audioDevice->Start(currentProfile->GetAudioFormat());
+        auto ret = audioDevice->Start(currentProfile->GetAudioConfiguration());
         outputConnection->enable();
 
         // update state and token

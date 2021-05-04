@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <chrono>
 #include <set>
 #include <string>
 #include <vector>
@@ -29,6 +30,9 @@ namespace audio
 
         auto getBitrate() const noexcept -> unsigned long int;
         auto toString() const -> std::string;
+
+        auto bytesToMicroseconds(unsigned int bytes) const noexcept -> std::chrono::microseconds;
+        auto microsecondsToBytes(std::chrono::microseconds duration) const noexcept -> unsigned int;
 
         auto operator==(const AudioFormat &other) const -> bool;
         auto operator!=(const AudioFormat &other) const -> bool;
