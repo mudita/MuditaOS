@@ -205,8 +205,8 @@ namespace gui
             if (!event.isShortRelease()) {
                 return false;
             }
-            if (auto value = event.numericValue(); value >= 0) {
-                setDate(value, dateInput);
+            if (event.isDigit()) {
+                setDate(event.numericValue(), dateInput);
                 return true;
             }
             else if (event.is(KeyCode::KEY_PND)) {
