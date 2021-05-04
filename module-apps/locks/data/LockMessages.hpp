@@ -5,30 +5,43 @@
 
 #include <Service/Message.hpp>
 
-namespace lock
+namespace locks
 {
     class UnlockPhone : public sys::DataMessage
     {
       public:
-        UnlockPhone() : DataMessage{MessageType::MessageTypeUninitialized}
+        UnlockPhone() : DataMessage{}
+        {}
+    };
+
+    class CancelUnlockPhone : public sys::DataMessage
+    {
+      public:
+        CancelUnlockPhone() : DataMessage{}
+        {}
+    };
+
+    class UnlockedPhone : public sys::DataMessage
+    {
+      public:
+        UnlockedPhone() : DataMessage{}
         {}
     };
 
     class LockPhone : public sys::DataMessage
     {
       public:
-        LockPhone() : DataMessage{MessageType::MessageTypeUninitialized}
+        LockPhone() : DataMessage{}
         {}
     };
 
-    class LockPhoneInput : public sys::DataMessage
+    class UnLockPhoneInput : public sys::DataMessage
     {
       private:
         std::vector<unsigned int> inputData;
 
       public:
-        explicit LockPhoneInput(std::vector<unsigned int> inputData)
-            : DataMessage{MessageType::MessageTypeUninitialized}, inputData(std::move(inputData))
+        explicit UnLockPhoneInput(std::vector<unsigned int> inputData) : DataMessage{}, inputData(std::move(inputData))
         {}
 
         [[nodiscard]] auto getInputData() const noexcept

@@ -86,11 +86,6 @@ namespace app
             return actionHandled();
         });
 
-        addActionReceiver(app::manager::actions::RequestScreenPasscode, [this](auto &&data) {
-            lockHandler.handleScreenPasscodeRequest(std::move(data));
-            return actionHandled();
-        });
-
         addActionReceiver(app::manager::actions::RequestPuk, [this](auto &&data) {
             lockHandler.handlePasscodeRequest(locks::Lock::LockType::SimPuk, std::move(data));
             return actionHandled();

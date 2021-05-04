@@ -58,7 +58,6 @@ namespace gui
         void handleSimBlocked(app::manager::actions::ActionParamsPtr &&data);
         void handleUnlockSim(app::manager::actions::ActionParamsPtr &&data);
         void handleCMEError(app::manager::actions::ActionParamsPtr &&data) const;
-        void handleScreenPasscodeRequest(app::manager::actions::ActionParamsPtr &&data) const;
         void handlePinChangeRequestFailed();
 
         [[nodiscard]] auto isScreenLocked() const noexcept -> bool

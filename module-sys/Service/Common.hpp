@@ -25,6 +25,7 @@ namespace sys
         ServiceEvtmgrNotifications,
         CalendarNotifications,
         PhoneModeChanges,
+        PhoneLockChanges,
     };
 
     enum class ServicePriority
@@ -114,6 +115,8 @@ inline const char *c_str(sys::BusChannel channel)
         return "CalendarNotifications";
     case sys::BusChannel::PhoneModeChanges:
         return "PhoneModeChanges";
+    case sys::BusChannel::PhoneLockChanges:
+        return "PhoneLockChanges";
     }
     return "";
 }

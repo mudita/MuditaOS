@@ -419,12 +419,15 @@ namespace app::manager
             handleDBResponse(response);
             return sys::msgHandled();
         });
-        connect(typeid(lock::LockPhone),
+        connect(typeid(locks::LockPhone),
                 [&](sys::Message *request) -> sys::MessagePointer { return phoneLockHandler.handleLockRequest(); });
-        connect(typeid(lock::UnlockPhone),
+        connect(typeid(locks::UnlockPhone),
                 [&](sys::Message *request) -> sys::MessagePointer { return phoneLockHandler.handleUnlockRequest(); });
-        connect(typeid(lock::LockPhoneInput), [&](sys::Message *request) -> sys::MessagePointer {
-            auto msg = static_cast<lock::LockPhoneInput *>(request);
+        connect(typeid(locks::CancelUnlockPhone), [&](sys::Message *request) -> sys::MessagePointer {
+            return phoneLockHandler.handleUnlockCancelRequest();
+        });
+        connect(typeid(locks::UnLockPhoneInput), [&](sys::Message *request) -> sys::MessagePointer {
+            auto msg = static_cast<locks::UnLockPhoneInput *>(request);
             return phoneLockHandler.verifyPhoneLockInput(msg->getInputData());
         });
 
@@ -443,7 +446,6 @@ namespace app::manager
         connect(typeid(CellularNotAnEmergencyNotification), convertibleToActionHandler);
         connect(typeid(sys::CriticalBatteryLevelNotification), convertibleToActionHandler);
         connect(typeid(CellularSmsNoSimRequestMessage), convertibleToActionHandler);
-        connect(typeid(sdesktop::passcode::ScreenPasscodeRequest), convertibleToActionHandler);
         connect(typeid(CellularSMSRejectedByOfflineNotification), convertibleToActionHandler);
         connect(typeid(CellularCallRejectedByOfflineNotification), convertibleToActionHandler);
         connect(typeid(sys::TetheringQuestionRequest), convertibleToActionHandler);

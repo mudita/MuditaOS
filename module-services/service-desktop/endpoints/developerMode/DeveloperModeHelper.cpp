@@ -115,7 +115,7 @@ auto DeveloperModeHelper::processPut(Context &context) -> ProcessResult
     else if (body[json::developerMode::usbSecurityStatus].is_string()) {
         std::shared_ptr<sys::DataMessage> msg = std::make_shared<sdesktop::usb::USBConfigured>();
         if (body[json::developerMode::usbSecurityStatus].string_value() == json::developerMode::usbUnlocked) {
-            msg = std::make_shared<sdesktop::passcode::ScreenPasscodeUnlocked>();
+            msg = std::make_shared<locks::UnlockedPhone>();
         }
         code = toCode(owner->bus.sendUnicast(std::move(msg), "ServiceDesktop"));
     }

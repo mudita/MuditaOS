@@ -21,12 +21,14 @@ namespace locks
         void PhoneLockAction();
         void PhoneUnlockAction();
         void PhoneInputRequiredAction();
+        void PhoneUnlockPopupsCloseAction();
 
       public:
         explicit PhoneLockHandler(sys::Service *owner);
 
         sys::MessagePointer handleLockRequest();
         sys::MessagePointer handleUnlockRequest();
+        sys::MessagePointer handleUnlockCancelRequest();
         sys::MessagePointer verifyPhoneLockInput(const std::vector<unsigned int> &inputData);
 
         void enablePhoneLock(bool _phoneLockEnabled);

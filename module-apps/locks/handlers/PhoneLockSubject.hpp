@@ -5,7 +5,7 @@
 
 #include <module-sys/Service/Service.hpp>
 
-namespace lock
+namespace locks
 {
     class PhoneLockSubject
     {

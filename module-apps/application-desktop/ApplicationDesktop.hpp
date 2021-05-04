@@ -125,7 +125,6 @@ namespace app
                      manager::actions::RequestPinChange,
                      manager::actions::RequestPinDisable,
                      manager::actions::RequestPinEnable,
-                     manager::actions::RequestScreenPasscode,
                      manager::actions::UnlockSim,
                      manager::actions::BlockSim,
                      manager::actions::ShowMMIResponse,

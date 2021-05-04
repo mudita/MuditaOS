@@ -56,7 +56,6 @@ namespace app::manager
             DisplayCMEError,
             DisplayLowBatteryScreen,
             SystemBrownout,
-            RequestScreenPasscode,
             DisplayLogoAtExit,
             SMSRejectedByOfflineNotification,
             CallRejectedByOfflineNotification,
