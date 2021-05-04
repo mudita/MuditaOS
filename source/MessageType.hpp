@@ -127,9 +127,6 @@ enum class MessageType
     USBSecurityOff,
     USBHandshake,
 
-    ScreenPasscodeRequest,
-    ScreenPasscodeUnlocked,
-
     // FOTA messages
     HttpRequest,
     HttpResponse,

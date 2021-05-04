@@ -9,7 +9,6 @@
 #include <service-appmgr/Actions.hpp>
 #include <service-appmgr/messages/ActionRequest.hpp>
 #include <service-appmgr/data/SimActionsParams.hpp>
-#include <service-appmgr/data/UsbActionsParams.hpp>
 #include <Service/Message.hpp>
 #include <MessageType.hpp>
 #include <service-desktop/DeveloperModeMessage.hpp>
@@ -147,37 +146,6 @@ namespace sdesktop
         }; // namespace usb
 
     } // namespace usb
-
-    namespace passcode
-    {
-        class ScreenPasscodeRequest : public sys::DataMessage, public app::manager::actions::ConvertibleToAction
-        {
-            static constexpr auto passcodeName = "ScreenPasscode";
-
-          public:
-            explicit ScreenPasscodeRequest(bool cancel = false)
-                : sys::DataMessage(MessageType::ScreenPasscodeRequest), cancel(cancel)
-            {}
-
-            [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
-            {
-                return std::make_unique<app::manager::ActionRequest>(
-                    sender,
-                    app::manager::actions::RequestScreenPasscode,
-                    std::make_unique<app::manager::actions::ScreenPasscodeParams>(cancel));
-            }
-
-          private:
-            bool cancel = false;
-        };
-
-        class ScreenPasscodeUnlocked : public sys::DataMessage
-        {
-          public:
-            explicit ScreenPasscodeUnlocked() : sys::DataMessage(MessageType::ScreenPasscodeUnlocked)
-            {}
-        }; // namespace sdesktop
-    }      // namespace passcode
 
     namespace developerMode
     {

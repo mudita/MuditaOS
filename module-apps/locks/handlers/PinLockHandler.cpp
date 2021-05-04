@@ -78,29 +78,6 @@ namespace gui
         }
     }
 
-    void PinLockHandler::handleScreenPasscodeRequest(app::manager::actions::ActionParamsPtr &&data) const
-    {
-        auto params = static_cast<app::manager::actions::ScreenPasscodeParams *>(data.get());
-        auto lock =
-            std::make_unique<gui::Lock>(Store::GSM::SIM::NONE, Lock::LockState::InputRequired, Lock::LockType::Screen);
-
-        if (params->isCancel()) {
-            if (app->getCurrentWindow()->getName() == app::window::name::desktop_pin_lock) {
-                app->returnToPreviousWindow();
-            }
-            return;
-        }
-
-        lock->onActivatedCallback = [this](Lock::LockType type, const std::vector<unsigned int> &data) {
-            app->bus.sendUnicast(std::make_shared<sdesktop::passcode::ScreenPasscodeUnlocked>(),
-                                 service::name::service_desktop);
-            app->switchWindow(app::window::name::desktop_main_window);
-        };
-
-        app->switchWindow(
-            app::window::name::desktop_pin_lock, gui::ShowMode::GUI_SHOW_INIT, std::make_unique<gui::LockData>(*lock));
-    }
-
     void PinLockHandler::handlePinChangeRequest(app::manager::actions::ActionParamsPtr &&data)
     {
         LOG_DEBUG("Handling RequestPinChange action");

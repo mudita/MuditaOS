@@ -4,7 +4,6 @@ message( "${PROJECT_NAME}  ${CMAKE_CURRENT_LIST_DIR}" )
 set(SOURCES
     ApplicationManifest.cpp
     Controller.cpp
-    data/UsbActionsParams.cpp
     data/SimActionsParams.cpp
     data/MmiActionsParams.cpp
     data/NotificationsChangedActionsParams.cpp

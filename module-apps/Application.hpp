@@ -394,7 +394,7 @@ namespace app
         std::unique_ptr<settings::Settings> settings;
         sys::phone_modes::PhoneMode phoneMode;
 
-        lock::PhoneLockSubject phoneLockSubject;
+        locks::PhoneLockSubject phoneLockSubject;
 
       public:
         void handlePhoneLock();

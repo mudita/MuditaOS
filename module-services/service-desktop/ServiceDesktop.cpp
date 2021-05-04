@@ -65,6 +65,7 @@ ServiceDesktop::ServiceDesktop()
       btMsgHandler(std::make_unique<sdesktop::bluetooth::BluetoothMessagesHandler>(this))
 {
     LOG_INFO("[ServiceDesktop] Initializing");
+    bus.channels.push_back(sys::BusChannel::PhoneLockChanges);
 
     updateOS         = std::make_unique<UpdateMuditaOS>(this);
     settings         = std::make_unique<settings::Settings>(this);
@@ -224,8 +225,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
 
         LOG_INFO("USB connected with endpoint security enabled. Requesting passcode.");
         usbSecurityModel->setEndpointSecurity(EndpointSecurity::Block);
-        bus.sendUnicast(std::make_shared<sdesktop::passcode::ScreenPasscodeRequest>(),
-                        app::manager::ApplicationManager::ServiceName);
+        bus.sendUnicast(std::make_shared<locks::UnlockPhone>(), app::manager::ApplicationManager::ServiceName);
 
         return sys::MessageNone{};
     });
@@ -234,7 +234,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
         LOG_INFO("USB disconnected");
         if (usbSecurityModel->isSecurityEnabled()) {
             LOG_INFO("Enabling secured endpoints.");
-            bus.sendUnicast(std::make_shared<sdesktop::passcode::ScreenPasscodeRequest>(true),
+            bus.sendUnicast(std::make_shared<locks::CancelUnlockPhone>(),
                             app::manager::ApplicationManager::ServiceName);
         }
         bus.sendUnicast(std::make_shared<sys::TetheringStateRequest>(sys::phone_modes::Tethering::Off),
@@ -258,10 +258,8 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
         return sys::MessageNone{};
     });
 
-    connect(sdesktop::passcode::ScreenPasscodeUnlocked(), [&](sys::Message *msg) {
+    connect(typeid(locks::UnlockedPhone), [&](sys::Message *msg) {
         LOG_INFO("Passcode accepted. Enabling endpoints.");
-        bus.sendUnicast(std::make_shared<sdesktop::passcode::ScreenPasscodeRequest>(true),
-                        app::manager::ApplicationManager::ServiceName);
         usbSecurityModel->setEndpointSecurity(EndpointSecurity::Allow);
         return sys::MessageNone{};
     });
@@ -355,7 +353,7 @@ void ServiceDesktop::processUSBHandshake(sdesktop::usb::USBHandshake *msg)
 
     if (usbSecurityModel->processHandshake(msg)) {
         LOG_DEBUG("Handshake ok. Unlocking.");
-        bus.sendUnicast(std::make_shared<sdesktop::passcode::ScreenPasscodeUnlocked>(), service::name::service_desktop);
+        bus.sendUnicast(std::make_shared<locks::UnlockedPhone>(), service::name::service_desktop);
         responseContext.setResponseStatus(parserFSM::http::Code::OK);
     }
 

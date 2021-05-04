@@ -6,7 +6,7 @@
 #include <service-appmgr/service-appmgr/model/ApplicationManager.hpp>
 #include <locks/data/LockMessages.hpp>
 
-namespace lock
+namespace locks
 {
     PhoneLockSubject::PhoneLockSubject(sys::Service *owner) : owner{owner}
     {
@@ -27,7 +27,7 @@ namespace lock
 
     void PhoneLockSubject::verifyInput(const std::vector<unsigned int> &inputData)
     {
-        owner->bus.sendUnicast(std::make_shared<LockPhoneInput>(inputData),
+        owner->bus.sendUnicast(std::make_shared<UnLockPhoneInput>(inputData),
                                app::manager::ApplicationManager::ServiceName);
     }
 } // namespace lock
