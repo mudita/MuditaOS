@@ -37,6 +37,8 @@
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <service-appmgr/messages/DOMRequest.hpp>
 #include <service-appmgr/messages/GetAllNotificationsRequest.hpp>
+#include <service-db/DBNotificationMessage.hpp>
+#include <module-db/queries/notifications/QueryNotificationsGetAll.hpp>
 
 #include "module-services/service-appmgr/service-appmgr/messages/ApplicationStatus.hpp"
 

@@ -36,6 +36,7 @@
 #include <module-services/service-eink/ServiceEink.hpp>
 #include <service-fileindexer/Constants.hpp>
 #include <service-fileindexer/ServiceFileIndexer.hpp>
+#include <service-desktop/ServiceDesktop.hpp>
 
 #if ENABLE_GSM == 1
 #include <service-fota/ServiceFota.hpp>

@@ -211,9 +211,8 @@ namespace gui
         bottomBar->setText(
             BottomBar::Side::RIGHT, utils::translate("app_desktop_clear_all"), hasDismissibleNotification);
 
-        auto app      = getAppDesktop();
-        inputCallback = [this, app, hasDismissibleNotification]([[maybe_unused]] Item &item,
-                                                                const InputEvent &inputEvent) -> bool {
+        inputCallback = [this, hasDismissibleNotification]([[maybe_unused]] Item &item,
+                                                           const InputEvent &inputEvent) -> bool {
             if (!inputEvent.isShortRelease() || notificationsList->focus) {
                 return false;
             }
@@ -224,7 +223,7 @@ namespace gui
             }
             if (inputEvent.is(gui::KeyCode::KEY_LF)) {
                 LOG_DEBUG("KEY_LF pressed to navigate to calls");
-                return app->showCalls();
+                return app::manager::Controller::sendAction(application, app::manager::actions::ShowCallLog);
             }
             return false;
         };

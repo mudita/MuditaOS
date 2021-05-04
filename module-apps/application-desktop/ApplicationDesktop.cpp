@@ -25,51 +25,26 @@
 #include "AppWindow.hpp"
 #include "data/DesktopData.hpp"
 
-#include <service-db/DBServiceAPI.hpp>
-#include <application-settings-new/ApplicationSettings.hpp>
-#include <application-settings/ApplicationSettings.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <service-cellular/ServiceCellular.hpp>
 #include <service-cellular/CellularMessage.hpp>
-#include <application-calllog/ApplicationCallLog.hpp>
 #include <service-db/QueryMessage.hpp>
-#include <module-db/queries/notifications/QueryNotificationsClear.hpp>
-#include <module-db/queries/messages/threads/QueryThreadsGetCount.hpp>
-#include <module-db/queries/calllog/QueryCalllogGetCount.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <module-utils/magic_enum/include/magic_enum.hpp>
 #include <module-apps/messages/AppMessage.hpp>
 #include <SystemManager/messages/SystemManagerMessage.hpp>
-#include <service-db/DBCalllogMessage.hpp>
 #include <module-gui/gui/widgets/TopBar/SIM.hpp>
+#include <service-db/DBNotificationMessage.hpp>
 
 #include <cassert>
 namespace app
 {
-
-    namespace
-    {
-
-        bool requestUnreadThreadsCount(app::Application *app)
-        {
-            const auto [succeed, _] = DBServiceAPI::GetQuery(
-                app, db::Interface::Name::SMSThread, std::make_unique<db::query::ThreadGetCount>(EntryState::UNREAD));
-            return succeed;
-        }
-
-        bool requestUnreadCallsCount(app::Application *app)
-        {
-            const auto [succeed, _] = DBServiceAPI::GetQuery(
-                app, db::Interface::Name::Calllog, std::make_unique<db::query::CalllogGetCount>(EntryState::UNREAD));
-            return succeed;
-        }
-    } // namespace
-
     ApplicationDesktop::ApplicationDesktop(std::string name,
                                            std::string parent,
                                            sys::phone_modes::PhoneMode mode,
                                            StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), mode, startInBackground), lockHandler(this)
+        : Application(std::move(name), std::move(parent), mode, startInBackground), lockHandler(this),
+          dbNotificationHandler(this)
     {
         using namespace gui::top_bar;
         topBarManager->enableIndicators({Indicator::Signal,
@@ -187,10 +162,7 @@ namespace app
         }
 
         bool handled = false;
-        if (auto msg = dynamic_cast<db::NotificationMessage *>(msgl)) {
-            handled = handle(msg);
-        }
-        else if (auto msg = dynamic_cast<cellular::StateChange *>(msgl)) {
+        if (auto msg = dynamic_cast<cellular::StateChange *>(msgl)) {
             handled = handle(msg);
         }
         else if (auto msg = dynamic_cast<sdesktop::developerMode::DeveloperModeRequest *>(msgl)) {
@@ -206,11 +178,9 @@ namespace app
         if (resp != nullptr) {
             if (auto msg = dynamic_cast<db::QueryResponse *>(resp)) {
                 auto result = msg->getResult();
-                if (auto response = dynamic_cast<db::query::ThreadGetCountResult *>(result.get())) {
-                    handled = handle(response);
-                }
-                if (auto response = dynamic_cast<db::query::CalllogGetCountResult *>(result.get())) {
-                    handled = handle(response);
+                if (dbNotificationHandler.handle(result.get())) {
+                    handled = true;
+                    refreshMenuWindow();
                 }
             }
         }
@@ -255,37 +225,6 @@ namespace app
         }
     }
 
-    auto ApplicationDesktop::handle(db::NotificationMessage *msg) -> bool
-    {
-        assert(msg);
-        if (msg->interface == db::Interface::Name::Calllog && msg->type != db::Query::Type::Read) {
-            return requestUnreadCallsCount(this);
-        }
-
-        if ((msg->interface == db::Interface::Name::SMSThread || msg->interface == db::Interface::Name::SMS) &&
-            msg->type != db::Query::Type::Read) {
-            return requestUnreadThreadsCount(this);
-        }
-
-        return false;
-    }
-
-    auto ApplicationDesktop::handle(db::query::ThreadGetCountResult *msg) -> bool
-    {
-        if (msg->getState() == EntryState::UNREAD) {
-            notifications.notRead.SMS = msg->getCount();
-        }
-        return refreshMenuWindow();
-    }
-
-    auto ApplicationDesktop::handle(db::query::CalllogGetCountResult *msg) -> bool
-    {
-        if (msg->getState() == EntryState::UNREAD) {
-            notifications.notRead.Calls = msg->getCount();
-        }
-        return refreshMenuWindow();
-    }
-
     auto ApplicationDesktop::handle(cellular::StateChange *msg) -> bool
     {
         assert(msg);
@@ -304,12 +243,6 @@ namespace app
         return false;
     }
 
-    bool ApplicationDesktop::showCalls()
-    {
-        LOG_DEBUG("show calls!");
-        return manager::Controller::sendAction(this, manager::actions::ShowCallLog);
-    }
-
     // Invoked during initialization
     sys::ReturnCodes ApplicationDesktop::InitHandler()
     {
@@ -322,8 +255,6 @@ namespace app
         lockPassHashChanged(
             settings->getValue(settings::SystemProperties::lockPassHash, settings::SettingsScope::Global));
 
-        requestUnreadThreadsCount(this);
-        requestUnreadCallsCount(this);
         createUserInterface();
 
         connect(sdesktop::UpdateOsMessage(), [&](sys::Message *msg) {
@@ -406,6 +337,12 @@ namespace app
             return sys::MessageNone{};
         });
 
+        connect(typeid(db::NotificationMessage), [&](sys::Message *request) {
+            auto notificationMessage = static_cast<db::NotificationMessage *>(request);
+            dbNotificationHandler.handle(notificationMessage);
+            return sys::MessageNone{};
+        });
+
         auto msgToSend =
             std::make_shared<sdesktop::UpdateOsMessage>(updateos::UpdateMessageType::UpdateCheckForUpdateOnce);
         bus.sendUnicast(msgToSend, service::name::service_desktop);
@@ -439,6 +376,8 @@ namespace app
             [this](const std::string &value) { osUpdateVersionChanged(value); },
             settings::SettingsScope::Global);
 
+        dbNotificationHandler.initHandler();
+
         return sys::ReturnCodes::Success;
     }
 
@@ -458,8 +397,8 @@ namespace app
         windowsFactory.attach(desktop_pin_lock, [&](Application *app, const std::string newname) {
             return std::make_unique<gui::PinLockWindow>(app, desktop_pin_lock);
         });
-        windowsFactory.attach(desktop_menu, [](Application *app, const std::string newname) {
-            return std::make_unique<gui::MenuWindow>(app);
+        windowsFactory.attach(desktop_menu, [this](Application *app, const std::string newname) {
+            return std::make_unique<gui::MenuWindow>(app, dbNotificationHandler);
         });
         windowsFactory.attach(dead_battery, [](Application *app, const std::string newname) {
             return std::make_unique<gui::DeadBatteryWindow>(app);

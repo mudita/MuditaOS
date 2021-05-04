@@ -2,15 +2,15 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MenuWindow.hpp"
-#include "../ApplicationDesktop.hpp"
 #include "InputEvent.hpp"
 #include "Item.hpp"
 #include "Navigation.hpp"
 #include "service-appmgr/Controller.hpp"
+#include <application-desktop/widgets/DBNotificationsHandler.hpp>
+#include "Names.hpp"
 
 #include <tools/Common.hpp>
 #include <Style.hpp>
-#include <cassert>
 #include <i18n/i18n.hpp>
 #include <Image.hpp>
 
@@ -83,7 +83,7 @@ namespace gui
             onNotificationsChangeCallback(gui::RefreshModes::GUI_REFRESH_DEEP);
         }
 
-        this->activatedCallback = activatedCallback;
+        this->activatedCallback = std::move(activatedCallback);
         this->setPenWidth(style::window::default_border_no_focus_w);
         this->setPenFocusWidth(style::window::default_border_focus_w);
         this->setEdges(RectangleEdge::Top | RectangleEdge::Bottom);
@@ -130,7 +130,8 @@ namespace gui
         return visibleStateChanged;
     }
 
-    MenuWindow::MenuWindow(app::Application *app) : AppWindow(app, app::window::name::desktop_menu)
+    MenuWindow::MenuWindow(app::Application *app, const app::DBNotificationsBaseHandler &accessor)
+        : AppWindow(app, app::window::name::desktop_menu), dbNotifications(accessor)
     {
         buildInterface();
     }
@@ -149,9 +150,6 @@ namespace gui
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
         bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::open));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
-
-        auto app = dynamic_cast<app::ApplicationDesktop *>(application);
-        assert(app);
 
         mainMenu = new MenuPage(
             this,
@@ -194,7 +192,10 @@ namespace gui
                                       app::manager::actions::Launch,
                                       std::make_unique<app::ApplicationLaunchData>("ApplicationCallLog"));
                               },
-                              [=]() { return app->notifications.notRead.Calls > 0; }},
+                              [=]() {
+                                  return dbNotifications.hasNotification(
+                                      app::DBNotificationsBaseHandler::Type::notReadCall);
+                              }},
 
                 new gui::Tile("menu_contacts_W_G",
                               "app_desktop_menu_contacts",
@@ -213,7 +214,10 @@ namespace gui
                                       app::manager::actions::Launch,
                                       std::make_unique<app::ApplicationLaunchData>("ApplicationMessages"));
                               },
-                              [=]() { return app->notifications.notRead.SMS > 0; }},
+                              [=]() {
+                                  return dbNotifications.hasNotification(
+                                      app::DBNotificationsBaseHandler::Type::notReadSMS);
+                              }},
                 new gui::Tile{"menu_music_player_W_G",
                               "app_desktop_menu_music",
                               [=](gui::Item &item) {
