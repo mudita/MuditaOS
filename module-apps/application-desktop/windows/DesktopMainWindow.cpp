@@ -98,6 +98,8 @@ namespace gui
     {
         auto app = getAppDesktop();
 
+        app->lockHandler.unlockScreen();
+
         setActiveState();
 
         if (osUpdateVer == osCurrentVer && osUpdateVer != updateos::initSysVer &&
