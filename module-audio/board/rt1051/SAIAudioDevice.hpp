@@ -30,8 +30,6 @@ namespace audio
         sai_edma_handle_t *tx = nullptr;
         bool txEnabled        = false;
         bool rxEnabled        = false;
-
-        static constexpr Capabilities saiCapabilities = {.usesDMA = true};
     };
 
 } // namespace audio

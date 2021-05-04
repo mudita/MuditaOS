@@ -30,7 +30,7 @@ namespace audio
         DeinitBsp();
     }
 
-    CodecParamsMAX98090::InputPath RT1051AudioCodec::getCodecInputPath(const AudioDevice::Format &format)
+    CodecParamsMAX98090::InputPath RT1051AudioCodec::getCodecInputPath(const AudioDevice::Configuration &format)
     {
         switch (format.inputPath) {
         case AudioDevice::InputPath::Headphones:
@@ -44,7 +44,7 @@ namespace audio
         };
     }
 
-    CodecParamsMAX98090::OutputPath RT1051AudioCodec::getCodecOutputPath(const AudioDevice::Format &format)
+    CodecParamsMAX98090::OutputPath RT1051AudioCodec::getCodecOutputPath(const AudioDevice::Configuration &format)
     {
         auto mono = (format.flags & static_cast<std::uint32_t>(AudioDevice::Flags::OutputMono)) != 0;
 
@@ -64,7 +64,7 @@ namespace audio
         }
     }
 
-    AudioDevice::RetCode RT1051AudioCodec::Start(const AudioDevice::Format &format)
+    AudioDevice::RetCode RT1051AudioCodec::Start(const AudioDevice::Configuration &format)
     {
         cpp_freertos::LockGuard lock(mutex);
 
@@ -180,7 +180,7 @@ namespace audio
         return AudioDevice::RetCode::Success;
     }
 
-    bool RT1051AudioCodec::IsFormatSupported(const AudioDevice::Format &format)
+    bool RT1051AudioCodec::IsFormatSupported(const AudioDevice::Configuration &format)
     {
 
         if (CodecParamsMAX98090::ValToSampleRate(format.sampleRate_Hz) == CodecParamsMAX98090::SampleRate::Invalid) {
@@ -283,6 +283,11 @@ namespace audio
     auto RT1051AudioCodec::getSupportedFormats() -> const std::vector<AudioFormat> &
     {
         return formats;
+    }
+
+    auto RT1051AudioCodec::getTraits() const -> Traits
+    {
+        return Traits{.usesDMA = true};
     }
 
     void rxAudioCodecCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData)

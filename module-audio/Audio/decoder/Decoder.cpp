@@ -14,10 +14,8 @@
 
 namespace audio
 {
-
     Decoder::Decoder(const char *fileName)
-        : Source(Endpoint::Capabilities{.maxBlockSize = workerBufferSize * sizeof(int16_t)}), filePath(fileName),
-          workerBuffer(std::make_unique<int16_t[]>(workerBufferSize)), tag(std::make_unique<Tags>())
+        : filePath(fileName), workerBuffer(std::make_unique<int16_t[]>(workerBufferSize)), tag(std::make_unique<Tags>())
     {
 
         fd = std::fopen(fileName, "r");
@@ -181,6 +179,11 @@ namespace audio
         }
 
         return formats;
+    }
+
+    auto Decoder::getTraits() const -> Endpoint::Traits
+    {
+        return Endpoint::Traits{};
     }
 
 } // namespace audio

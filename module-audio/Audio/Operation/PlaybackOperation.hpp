@@ -10,6 +10,9 @@
 #include "Audio/StreamQueuedEventsListener.hpp"
 #include "Audio/decoder/Decoder.hpp"
 
+#include <chrono>
+using namespace std::chrono_literals;
+
 namespace audio::playbackDefaults
 {
     constexpr audio::Volume defaultLoudspeakerVolume = 10;
@@ -39,12 +42,7 @@ namespace audio
         Position GetPosition() final;
 
       private:
-        // these values are tightly connected to the Bluetooth A2DP update interval
-        static constexpr auto playbackBufferingSize = 8U;
-        static constexpr auto minimumBlockSize      = 512U;
-        static constexpr auto maximumBlockSize      = 512U;
-        static constexpr Endpoint::Capabilities playbackCapabilities{.minBlockSize = minimumBlockSize,
-                                                                     .maxBlockSize = maximumBlockSize};
+        static constexpr auto playbackTimeConstraint = 10ms;
 
         std::unique_ptr<Stream> dataStreamOut;
         std::unique_ptr<Decoder> dec;

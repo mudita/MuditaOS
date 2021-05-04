@@ -54,7 +54,7 @@ namespace audio
             None
         };
 
-        using Format = struct
+        using Configuration = struct
         {
             uint32_t sampleRate_Hz = 0; /*!< Sample rate of audio data */
             uint32_t bitWidth      = 0; /*!< Data length of audio data, usually 8/16/24/32 bits */
@@ -65,22 +65,16 @@ namespace audio
             OutputPath outputPath  = OutputPath::None;
         };
 
-        AudioDevice() = default;
-        explicit AudioDevice(const audio::Endpoint::Capabilities &sourceCaps,
-                             const audio::Endpoint::Capabilities &sinkCaps)
-            : IOProxy(sourceCaps, sinkCaps)
-        {}
-
         virtual ~AudioDevice() = default;
 
-        virtual RetCode Start(const Format &format) = 0;
-        virtual RetCode Stop()                      = 0;
+        virtual RetCode Start(const Configuration &format) = 0;
+        virtual RetCode Stop()                             = 0;
 
-        virtual RetCode OutputVolumeCtrl(float vol)           = 0;
-        virtual RetCode InputGainCtrl(float gain)             = 0;
-        virtual RetCode OutputPathCtrl(OutputPath outputPath) = 0;
-        virtual RetCode InputPathCtrl(InputPath inputPath)    = 0;
-        virtual bool IsFormatSupported(const Format &format)  = 0;
+        virtual RetCode OutputVolumeCtrl(float vol)                 = 0;
+        virtual RetCode InputGainCtrl(float gain)                   = 0;
+        virtual RetCode OutputPathCtrl(OutputPath outputPath)       = 0;
+        virtual RetCode InputPathCtrl(InputPath inputPath)          = 0;
+        virtual bool IsFormatSupported(const Configuration &format) = 0;
 
         float GetOutputVolume() const noexcept
         {
@@ -102,13 +96,13 @@ namespace audio
             return currentFormat.inputPath;
         }
 
-        Format GetCurrentFormat() const noexcept
+        Configuration GetCurrentFormat() const noexcept
         {
             return currentFormat;
         }
 
       protected:
-        Format currentFormat;
+        Configuration currentFormat;
 
         bool isInitialized = false;
     };
