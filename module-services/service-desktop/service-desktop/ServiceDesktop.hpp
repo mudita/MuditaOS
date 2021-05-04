@@ -12,7 +12,6 @@
 #include "Service/Service.hpp" // for Service
 #include "Timers/TimerHandle.hpp"
 #include "Constants.hpp"
-#include "WorkerDesktop.hpp"
 #include "USBSecurityModel.hpp"
 #include <endpoints/update/UpdateMuditaOS.hpp>
 #include <service-db/DBServiceName.hpp>

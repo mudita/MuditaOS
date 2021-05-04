@@ -7,10 +7,10 @@
 #include "TopBar.hpp"
 #include "TopBar/Time.hpp"
 #include <Style.hpp>
-#include <application-desktop/ApplicationDesktop.hpp>
 #include <i18n/i18n.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <service-audio/AudioServiceAPI.hpp>
+#include <time/DateAndTimeSettings.hpp>
 
 using namespace style::header;
 
