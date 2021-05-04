@@ -48,7 +48,7 @@ namespace gui
                                          phonebookStyle::mainWindow::newContactImage::y,
                                          phonebookStyle::mainWindow::newContactImage::w,
                                          phonebookStyle::mainWindow::newContactImage::h,
-                                         "cross");
+                                         "plus");
         searchImage     = new gui::Image(this,
                                      phonebookStyle::mainWindow::searchImage::x,
                                      phonebookStyle::mainWindow::searchImage::y,

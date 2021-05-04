@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -7,6 +7,41 @@ namespace style
 {
     namespace messages
     {
+        namespace mainWindow
+        {
+            namespace leftArrowImage
+            {
+                inline constexpr uint32_t x = style::window::default_left_margin;
+                inline constexpr uint32_t y = 62;
+                inline constexpr uint32_t w = 11;
+                inline constexpr uint32_t h = 13;
+            } // namespace leftArrowImage
+            namespace rightArrowImage
+            {
+                inline constexpr uint32_t w = 11;
+                inline constexpr uint32_t h = 13;
+                inline constexpr uint32_t x = style::window_width - style::window::default_right_margin - w;
+                inline constexpr uint32_t y = 62;
+            } // namespace rightArrowImage
+            namespace newMessageImage
+            {
+                inline constexpr uint32_t distance_to_arrow = 6;
+                inline constexpr uint32_t x =
+                    style::window::default_left_margin + leftArrowImage::w + distance_to_arrow;
+                inline constexpr uint32_t y = 52;
+                inline constexpr uint32_t w = 24;
+                inline constexpr uint32_t h = 24;
+            } // namespace newMessageImage
+            namespace searchImage
+            {
+                inline constexpr uint32_t w                 = 26;
+                inline constexpr uint32_t h                 = 26;
+                inline constexpr uint32_t distance_to_arrow = 11;
+                inline constexpr uint32_t x = style::window_width - style::window::default_right_margin -
+                                              rightArrowImage::w - w - distance_to_arrow;
+                inline constexpr uint32_t y = 55;
+            } // namespace searchImage
+        }     // namespace mainWindow
         namespace threads
         {
             inline constexpr uint32_t listPositionX = style::window::default_left_margin;

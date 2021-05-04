@@ -43,6 +43,7 @@ namespace gui
     void MessagesMainWindow::buildInterface()
     {
         namespace msgThreadStyle = style::messages::threads;
+        namespace mainWindowStyle = style::messages::mainWindow;
 
         AppWindow::buildInterface();
 
@@ -67,10 +68,30 @@ namespace gui
 
         setTitle(utils::translate("app_messages_title_main"));
 
-        leftArrowImage  = new gui::Image(this, 30, 62, 0, 0, "arrow_left");
-        rightArrowImage = new gui::Image(this, 480 - 30 - 13, 62, 0, 0, "arrow_right");
-        newMessageImage = new gui::Image(this, 48, 55, 0, 0, "cross");
-        searchImage     = new gui::Image(this, 480 - 48 - 26, 55, 0, 0, "search");
+        leftArrowImage  = new gui::Image(this,
+                                        mainWindowStyle::leftArrowImage::x,
+                                        mainWindowStyle::leftArrowImage::y,
+                                        mainWindowStyle::leftArrowImage::w,
+                                        mainWindowStyle::leftArrowImage::h,
+                                        "arrow_left");
+        rightArrowImage = new gui::Image(this,
+                                         mainWindowStyle::rightArrowImage::x,
+                                         mainWindowStyle::rightArrowImage::y,
+                                         mainWindowStyle::rightArrowImage::w,
+                                         mainWindowStyle::rightArrowImage::h,
+                                         "arrow_right");
+        newMessageImage = new gui::Image(this,
+                                         mainWindowStyle::newMessageImage::x,
+                                         mainWindowStyle::newMessageImage::y,
+                                         mainWindowStyle::newMessageImage::w,
+                                         mainWindowStyle::newMessageImage::h,
+                                         "plus");
+        searchImage     = new gui::Image(this,
+                                     mainWindowStyle::searchImage::x,
+                                     mainWindowStyle::searchImage::y,
+                                     mainWindowStyle::searchImage::w,
+                                     mainWindowStyle::searchImage::h,
+                                     "search");
 
         emptyListIcon = new Icon(this,
                                  0,

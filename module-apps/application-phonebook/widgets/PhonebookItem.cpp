@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhonebookItem.hpp"
@@ -20,6 +20,12 @@ namespace gui
         hBox->setEdges(gui::RectangleEdge::None);
         hBox->setPenFocusWidth(style::window::default_border_focus_w);
         hBox->setPenWidth(style::window::default_border_rect_no_focus);
+
+        square = new gui::Image();
+        square->set("Rectangle");
+        square->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
+        square->setVisible(false);
+        hBox->addWidget(square);
 
         contactName = new gui::Label(hBox, 0, 0, 0, 0);
         contactName->setPenFocusWidth(0);
@@ -48,8 +54,8 @@ namespace gui
 
     void PhonebookItem::setMarkerItem(UTF8 text)
     {
+        square->setVisible(true);
         contactName->setText(text);
-        contactName->setLineMode(true);
         activeItem = false;
         setEdges(RectangleEdge::None);
     }
