@@ -9,13 +9,14 @@
 
 #include <Audio/Stream.hpp>
 
+#include <chrono>
 #include <cassert>
 
 using audio::AudioFormat;
 using namespace bluetooth;
+using namespace std::chrono_literals;
 
-BluetoothAudioDevice::BluetoothAudioDevice(MediaContext *mediaContext)
-    : AudioDevice(btCapabilities, btCapabilities), ctx(mediaContext)
+BluetoothAudioDevice::BluetoothAudioDevice(MediaContext *mediaContext) : ctx(mediaContext)
 {
     LOG_DEBUG("Bluetooth audio device created");
 }
@@ -34,7 +35,7 @@ void BluetoothAudioDevice::setMediaContext(MediaContext *mediaContext)
                                                    static_cast<unsigned>(AVDTP::sbcConfig.numChannels)}};
 }
 
-auto BluetoothAudioDevice::Start(const Format &format) -> audio::AudioDevice::RetCode
+auto BluetoothAudioDevice::Start(const Configuration &format) -> audio::AudioDevice::RetCode
 {
     return audio::AudioDevice::RetCode::Success;
 }
@@ -71,7 +72,7 @@ auto BluetoothAudioDevice::InputPathCtrl(InputPath inputPath) -> audio::AudioDev
     return audio::AudioDevice::RetCode::Success;
 }
 
-auto BluetoothAudioDevice::IsFormatSupported(const Format &format) -> bool
+auto BluetoothAudioDevice::IsFormatSupported(const Configuration &format) -> bool
 {
     return true;
 }
@@ -135,4 +136,9 @@ auto BluetoothAudioDevice::fillSbcAudioBuffer(MediaContext *context) -> int
 auto BluetoothAudioDevice::getSupportedFormats() -> const std::vector<AudioFormat> &
 {
     return formats;
+}
+
+auto BluetoothAudioDevice::getTraits() const -> Traits
+{
+    return Traits{.usesDMA = false, .blockSizeConstraint = 512U, .timeConstraint = 10ms};
 }

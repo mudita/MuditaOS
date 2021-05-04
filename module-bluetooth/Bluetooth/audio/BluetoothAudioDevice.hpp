@@ -18,15 +18,16 @@ namespace bluetooth
 
         void setMediaContext(MediaContext *MediaContext);
 
-        auto Start(const Format &format) -> audio::AudioDevice::RetCode override;
+        auto Start(const Configuration &format) -> audio::AudioDevice::RetCode override;
         auto Stop() -> audio::AudioDevice::RetCode override;
 
         auto OutputVolumeCtrl(float vol) -> audio::AudioDevice::RetCode override;
         auto InputGainCtrl(float gain) -> audio::AudioDevice::RetCode override;
         auto OutputPathCtrl(OutputPath outputPath) -> audio::AudioDevice::RetCode override;
         auto InputPathCtrl(InputPath inputPath) -> audio::AudioDevice::RetCode override;
-        auto IsFormatSupported(const Format &format) -> bool override;
+        auto IsFormatSupported(const Configuration &format) -> bool override;
         auto getSupportedFormats() -> const std::vector<audio::AudioFormat> & override;
+        auto getTraits() const -> Traits override;
 
         // Endpoint control methods
         void onDataSend() override;
@@ -42,8 +43,6 @@ namespace bluetooth
         MediaContext *ctx  = nullptr;
         bool outputEnabled = false;
         std::vector<audio::AudioFormat> formats;
-
-        static constexpr Capabilities btCapabilities = {.usesDMA = false, .minBlockSize = 512U, .maxBlockSize = 512U};
     };
 
 } // namespace bluetooth

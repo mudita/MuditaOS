@@ -14,14 +14,15 @@ namespace audio
         ProfileRecordingBluetoothHSP(Gain gain)
             : Profile("Recording Bluetooth HSP",
                       Type::RecordingHeadphones,
-                      AudioDevice::Format{.sampleRate_Hz = 8000,
-                                          .bitWidth      = 16,
-                                          .flags         = static_cast<uint32_t>(
-                                              AudioDevice::Flags::InputLeft), // microphone use left audio channel
-                                          .outputVolume = 0,
-                                          .inputGain    = static_cast<float>(gain),
-                                          .inputPath    = AudioDevice::InputPath::None,
-                                          .outputPath   = AudioDevice::OutputPath::None},
+                      AudioDevice::Configuration{
+                          .sampleRate_Hz = 8000,
+                          .bitWidth      = 16,
+                          .flags =
+                              static_cast<uint32_t>(AudioDevice::Flags::InputLeft), // microphone use left audio channel
+                          .outputVolume = 0,
+                          .inputGain    = static_cast<float>(gain),
+                          .inputPath    = AudioDevice::InputPath::None,
+                          .outputPath   = AudioDevice::OutputPath::None},
                       AudioDevice::Type::Bluetooth)
         {}
     };

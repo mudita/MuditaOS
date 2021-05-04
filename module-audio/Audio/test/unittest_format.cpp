@@ -79,3 +79,19 @@ TEST(AudioFormat, Null)
     EXPECT_FALSE(AudioFormat(44100, 16, 0).isNull());
     EXPECT_FALSE(AudioFormat(44100, 16, 2).isNull());
 }
+
+TEST(AudioFormat, DurationToBytes)
+{
+    auto format = AudioFormat(44100, 16, 2);
+
+    EXPECT_EQ(format.microsecondsToBytes(std::chrono::microseconds(0)), 0);
+    EXPECT_EQ(format.microsecondsToBytes(std::chrono::seconds(1)), 176400);
+}
+
+TEST(AudioFormat, BytesToDuration)
+{
+    auto format = AudioFormat(8000, 8, 1);
+
+    EXPECT_EQ(format.bytesToMicroseconds(0).count(), 0);
+    EXPECT_EQ(format.bytesToMicroseconds(1).count(), 125);
+}

@@ -35,14 +35,15 @@ namespace audio
         RT1051CellularAudio();
         virtual ~RT1051CellularAudio();
 
-        AudioDevice::RetCode Start(const Format &format) override final;
+        AudioDevice::RetCode Start(const Configuration &format) override final;
         AudioDevice::RetCode Stop() override final;
         AudioDevice::RetCode OutputVolumeCtrl(float vol) override final;
         AudioDevice::RetCode InputGainCtrl(float gain) override final;
         AudioDevice::RetCode OutputPathCtrl(OutputPath outputPath) override final;
         AudioDevice::RetCode InputPathCtrl(InputPath inputPath) override final;
-        bool IsFormatSupported(const Format &format) override final;
+        bool IsFormatSupported(const Configuration &format) override final;
         auto getSupportedFormats() -> const std::vector<AudioFormat> & override final;
+        auto getTraits() const -> Traits override final;
 
         cpp_freertos::MutexStandard mutex;
 

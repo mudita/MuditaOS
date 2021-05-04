@@ -3,6 +3,8 @@
 
 #include "AudioFormat.hpp"
 
+#include <integer.hpp>
+
 using audio::AudioFormat;
 
 auto AudioFormat::getSampleRate() const noexcept -> unsigned int
@@ -86,4 +88,19 @@ auto AudioFormat::makeMatrix(std::set<unsigned int> sampleRates,
 auto AudioFormat::isNull() const noexcept -> bool
 {
     return operator==(audio::nullFormat);
+}
+
+auto AudioFormat::bytesToMicroseconds(unsigned int bytes) const noexcept -> std::chrono::microseconds
+{
+    auto bytesPerSecond = getBitrate() / utils::integer::BitsInByte;
+    auto duration       = std::chrono::duration<double>(static_cast<double>(bytes) / bytesPerSecond);
+
+    return std::chrono::duration_cast<std::chrono::microseconds>(duration);
+}
+
+auto AudioFormat::microsecondsToBytes(std::chrono::microseconds duration) const noexcept -> unsigned int
+{
+    auto bytesPerSecond = getBitrate() / utils::integer::BitsInByte;
+    auto seconds        = std::chrono::duration<double>(duration).count();
+    return static_cast<unsigned int>(seconds * bytesPerSecond);
 }
