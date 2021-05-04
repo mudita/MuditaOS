@@ -235,12 +235,12 @@ namespace gui
         else {
             if (inputEvent.isShortRelease()) {
                 // handle numeric keys
-                if (const auto value = inputEvent.numericValue(); value >= 0) {
+                if (inputEvent.isDigit()) {
                     if (focusItem == dateBody) {
-                        setDate(value);
+                        setDate(inputEvent.numericValue());
                     }
                     else if (focusItem == timeBody) {
-                        setTime(value);
+                        setTime(inputEvent.numericValue());
                     }
                     ret = true;
                 }
