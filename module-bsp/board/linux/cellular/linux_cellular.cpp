@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "linux_cellular.hpp"
+#include <module-bsp/bsp/cellular/CellularResult.hpp>
 
 #include <iostream>
 #include <algorithm>
@@ -101,17 +102,22 @@ namespace bsp
 
         cpp_freertos::LockGuard lock(serOutMutex);
 
+        auto buffer = static_cast<bsp::cellular::CellularDMAResultStruct *>(buf);
+
         int ret;
         for (;;) {
-            ret = ::read(fd, buf, nbytes);
+            ret = ::read(fd, buffer->data, nbytes);
             if (ret != -1 || errno != EINTR)
                 break;
         }
-
+        if (ret > 0) {
+            buffer->resultCode = bsp::cellular::CellularResultCode::ReceivedAndIdle;
+            buffer->dataSize   = ret;
+        }
 #if _LINUX_UART_DEBUG
         if (ret > 0) {
             LOG_PRINTF("[RX] ");
-            uint8_t *ptr = (uint8_t *)buf;
+            uint8_t *ptr = (uint8_t *)buffer->data;
             for (size_t i = 0; i < ret; i++)
                 LOG_PRINTF("%02X ", (uint8_t)*ptr++);
             LOG_PRINTF("\n");
