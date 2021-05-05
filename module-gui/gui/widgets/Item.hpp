@@ -113,9 +113,9 @@ namespace gui
         /// policy for changing horizontal size if Item is placed inside layout.
         LayoutHorizontalPolicy horizontalPolicy;
         /// Maximum height to which Layout base widget can scale current widget.
-        uint16_t maxHeight;
+        Length maxHeight;
         /// Maximum width to which Layout base widget can scale current widget.
-        uint16_t maxWidth;
+        Length maxWidth;
 
         /// @defgroup callbacks     Item callback functions
         /// callback functors are meant to emulate signal <-> slot actions where you bind element instance to in code
@@ -224,17 +224,17 @@ namespace gui
         /// @param sizeOnAxis : new size for selected axis
         /// @param sizeOnOrthogonalAxis : new size for orthogonal axis to selected
         void setAreaInAxis(Axis axis,
-                           uint32_t posOnAxis,
-                           uint32_t posOnOrthogonalAxis,
-                           uint32_t sizeOnAxis,
-                           uint32_t sizeOnOrthogonalAxis);
+                           Position posOnAxis,
+                           Position posOnOrthogonalAxis,
+                           Length sizeOnAxis,
+                           Length sizeOnOrthogonalAxis);
         /// sets position of element - this is sets area().x and area().y of item
         /// @note calls onDimensionChanged callback & updateDrawArea for item
         /// @attention should be bind to area
         virtual void setPosition(const Position &x, const Position &y);
         virtual void setPosition(const Position &val, Axis axis);
-        [[nodiscard]] uint16_t getSize(Axis axis) const;
-        [[nodiscard]] uint16_t getPosition(Axis axis) const;
+        [[nodiscard]] Length getSize(Axis axis) const;
+        [[nodiscard]] Position getPosition(Axis axis) const;
         virtual void setMargins(const Margins &value);
         [[nodiscard]] Margins getMargins();
         virtual void setPadding(const Padding &value);
@@ -246,7 +246,7 @@ namespace gui
         /// @param axis : selected axis (X or Y)
         /// @param itemSize : size of item on selected axis for this calculation
         /// @return alignment for selected axis.
-        [[nodiscard]] virtual uint16_t getAxisAlignmentValue(Axis axis, uint16_t itemSize);
+        [[nodiscard]] virtual Length getAxisAlignmentValue(Axis axis, Length itemSize);
 
         /// @defgroup size_range_setters Named the same way that are in QT minimum/maximum sizes setters
         ///
@@ -255,14 +255,14 @@ namespace gui
         /// 2. doesn't trigger any callbacks
         /// @note we can consider calling callback when setMinimum/Maximum exceeds normal size
         /// @{
-        void setMaximumSize(uint32_t val, Axis axis);
-        void setMaximumWidth(uint32_t w);
-        void setMaximumHeight(uint32_t h);
-        void setMaximumSize(uint32_t w, uint32_t h);
-        void setMinimumSize(uint32_t val, Axis axis);
-        void setMinimumSize(uint32_t w, uint32_t h);
-        void setMinimumWidth(uint32_t w);
-        void setMinimumHeight(uint32_t h);
+        void setMaximumSize(Length val, Axis axis);
+        void setMaximumWidth(Length w);
+        void setMaximumHeight(Length h);
+        void setMaximumSize(Length w, Length h);
+        void setMinimumSize(Length val, Axis axis);
+        void setMinimumSize(Length w, Length h);
+        void setMinimumWidth(Length w);
+        void setMinimumHeight(Length h);
         /// @}
 
         /// requests bigger size from parent if parent available
@@ -284,8 +284,8 @@ namespace gui
         /// @return bool requested size granted {w,h}
         virtual auto handleRequestResize(const Item *, Length request_w, Length request_h) -> Size;
 
-        virtual void setSize(const unsigned short w, const unsigned short h);
-        void setSize(uint32_t val, Axis axis);
+        virtual void setSize(Length w, Length h);
+        void setSize(Length val, Axis axis);
         virtual void setBoundingBox(const BoundingBox &new_box);
         /// entry function to create commands to execute in renderer to draw on screen
         /// @note we should consider lazy evaluation prior to drawing on screen, rather than on each resize of elements
@@ -333,39 +333,39 @@ namespace gui
         /// all these elements should be checked for naming/use consistency
         /// possibly all of that should be handled via area() (and area should have callback pinned from Item on resize
         /// @{
-        void setX(const gui::Position x);
-        void setY(const gui::Position y);
-        [[nodiscard]] gui::Position getX() const
+        void setX(const Position x);
+        void setY(const Position y);
+        [[nodiscard]] Position getX() const
         {
             return (widgetArea.x);
         }
-        [[nodiscard]] gui::Position getY() const
+        [[nodiscard]] Position getY() const
         {
             return (widgetArea.y);
         }
-        [[nodiscard]] uint32_t getWidth() const
+        [[nodiscard]] gui::Length getWidth() const
         {
             return (widgetArea.w);
         }
-        [[nodiscard]] uint32_t getHeight() const
+        [[nodiscard]] gui::Length getHeight() const
         {
             return (widgetArea.h);
         }
         /// helper function to show where widget ends in x axis
         /// @return item ends position in X axis
-        [[nodiscard]] gui::Position offset_w() const
+        [[nodiscard]] Position offset_w() const
         {
             return getWidth() + widgetArea.x;
         }
         /// helper function to show where widget ends in y axis
         /// @return item ends position in Y axis
-        [[nodiscard]] gui::Position offset_h() const
+        [[nodiscard]] Position offset_h() const
         {
             return getHeight() + widgetArea.y;
         }
         /// helper function to show where widget ends in selected axis
         /// @return item ends position in selected axis
-        [[nodiscard]] int32_t getOffset(Axis axis) const
+        [[nodiscard]] Position getOffset(Axis axis) const
         {
             return this->widgetArea.size(axis) + this->widgetArea.pos(axis);
         };
