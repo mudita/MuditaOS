@@ -7,7 +7,7 @@ namespace style::window::date_and_time
 {
     inline constexpr auto leftMargin       = 10;
     inline constexpr auto height           = 107;
-    inline constexpr auto topMargin        = 20;
+    inline constexpr auto topMargin        = 26;
     inline constexpr auto separator        = 30;
     inline constexpr auto time_input_12h_w = 120;
     inline constexpr auto time_input_24h_w = 195;

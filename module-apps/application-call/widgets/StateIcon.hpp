@@ -22,7 +22,7 @@ namespace gui
             constexpr uint32_t x = 0;
             constexpr uint32_t y = 58;
             constexpr uint32_t w = icon::w;
-            constexpr uint32_t h = 20;
+            constexpr uint32_t h = 22;
         } // namespace label
         namespace img
         {

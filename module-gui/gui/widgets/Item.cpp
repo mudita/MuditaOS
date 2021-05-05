@@ -146,12 +146,12 @@ namespace gui
         setArea({x, y, widgetArea.w, widgetArea.h});
     }
 
-    void Item::setX(const int32_t x)
+    void Item::setX(const Position x)
     {
         setArea({x, widgetArea.y, widgetArea.w, widgetArea.h});
     }
 
-    void Item::setY(const int32_t y)
+    void Item::setY(const Position y)
     {
         setArea({widgetArea.x, y, widgetArea.w, widgetArea.h});
     }
@@ -173,12 +173,12 @@ namespace gui
         return {it->getWidth(), it->getHeight()};
     }
 
-    void Item::setSize(const unsigned short w, const unsigned short h)
+    void Item::setSize(Length w, Length h)
     {
         setArea({widgetArea.x, widgetArea.y, w, h});
     }
 
-    void Item::setSize(uint32_t val, Axis axis)
+    void Item::setSize(Length val, Axis axis)
     {
         uint16_t w = getWidth();
         uint16_t h = getHeight();
@@ -202,7 +202,7 @@ namespace gui
     }
 
     void Item::setAreaInAxis(
-        Axis axis, uint32_t posOnAxis, uint32_t posOnOrthogonalAxis, uint32_t sizeOnAxis, uint32_t sizeOnOrthogonalAxis)
+        Axis axis, Position posOnAxis, Position posOnOrthogonalAxis, Length sizeOnAxis, Length sizeOnOrthogonalAxis)
     {
         if (axis == Axis::X) {
 
@@ -221,22 +221,22 @@ namespace gui
     }
 
     /// set maximum
-    void Item::setMaximumSize(uint32_t val, Axis axis)
+    void Item::setMaximumSize(Length val, Axis axis)
     {
         setAreaSizeInAxis(area(Area::Max), axis, val);
     }
 
-    void Item::setMaximumWidth(uint32_t w)
+    void Item::setMaximumWidth(Length w)
     {
         setMaximumSize(w, Axis::X);
     }
 
-    void Item::setMaximumHeight(uint32_t h)
+    void Item::setMaximumHeight(Length h)
     {
         setMaximumSize(h, Axis::Y);
     }
 
-    void Item::setMaximumSize(uint32_t w, uint32_t h)
+    void Item::setMaximumSize(Length w, Length h)
     {
         setMaximumHeight(h);
         setMaximumWidth(w);
@@ -244,22 +244,22 @@ namespace gui
 
     /// set minimum
 
-    void Item::setMinimumSize(uint32_t val, Axis axis)
+    void Item::setMinimumSize(Length val, Axis axis)
     {
         setAreaSizeInAxis(area(Area::Min), axis, val);
     }
 
-    void Item::setMinimumWidth(uint32_t w)
+    void Item::setMinimumWidth(Length w)
     {
         setMinimumSize(w, Axis::X);
     }
 
-    void Item::setMinimumHeight(uint32_t h)
+    void Item::setMinimumHeight(Length h)
     {
         setMinimumSize(h, Axis::Y);
     }
 
-    void Item::setMinimumSize(uint32_t w, uint32_t h)
+    void Item::setMinimumSize(Length w, Length h)
     {
         setMinimumWidth(w);
         setMinimumHeight(h);
@@ -290,12 +290,12 @@ namespace gui
         return padding;
     }
 
-    uint16_t Item::getSize(Axis axis) const
+    Length Item::getSize(Axis axis) const
     {
         return widgetArea.size(axis);
     }
 
-    uint16_t Item::getPosition(Axis axis) const
+    Position Item::getPosition(Axis axis) const
     {
         return widgetArea.pos(axis);
     }
@@ -335,7 +335,7 @@ namespace gui
         return alignment;
     }
 
-    uint16_t Item::getAxisAlignmentValue(Axis axis, uint16_t itemSize)
+    Length Item::getAxisAlignmentValue(Axis axis, Length itemSize)
     {
         auto tempAlignment = getAlignment(axis);
 

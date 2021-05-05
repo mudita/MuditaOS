@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -113,7 +113,7 @@ namespace phonebookStyle
     namespace informationWidget
     {
         inline constexpr uint32_t w             = style::window::default_body_width;
-        inline constexpr uint32_t title_label_h = 20;
+        inline constexpr uint32_t title_label_h = 22;
         inline constexpr uint32_t email_text_h  = 35;
     } // namespace informationWidget
 
@@ -149,7 +149,7 @@ namespace phonebookStyle
     {
         inline constexpr uint32_t w             = style::window::default_body_width;
         inline constexpr uint32_t h             = 75;
-        inline constexpr uint32_t title_label_h = 20;
+        inline constexpr uint32_t title_label_h = 22;
         inline constexpr uint32_t input_text_h  = 33;
         inline constexpr uint32_t span_size     = style::margins::huge;
     } // namespace outputLinesTextWithLabelWidget
