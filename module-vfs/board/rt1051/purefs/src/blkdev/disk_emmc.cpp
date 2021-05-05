@@ -40,22 +40,6 @@ namespace purefs::blkdev
             initStatus = err;
             return initStatus;
         }
-        //EEPROM test
-        auto isEEPPresent = bsp::eeprom::init();
-        LOG_DEBUG("EEPROM init %s", isEEPPresent ? "SUCCESS" : "FAIL");
-        char buf[256] = {0};
-        LOG_DEBUG("EEPROM: writing 16 B");
-        auto written = bsp::eeprom::eeprom_write(0, 0x0000, reinterpret_cast<const char*>(const_cast<const char*>(buf)), 16);
-        auto read = bsp::eeprom::eeprom_write(0, 0x0000, buf, 16);
-        LOG_DEBUG("... w=%d, r=%d %s", written, read, (written == read) ? "SUCCESS" : "FAIL");
-        LOG_DEBUG("EEPROM: writing 64 B");
-        written = bsp::eeprom::eeprom_write(0, 0x0000, reinterpret_cast<const char*>(const_cast<const char*>(buf)), 64);
-        read = bsp::eeprom::eeprom_write(0, 0x0000, buf, 64);
-        LOG_DEBUG("... w=%d, r=%d %s", written, read, (written == read) ? "SUCCESS" : "FAIL");
-        LOG_DEBUG("EEPROM: writing 256 B");
-        written = bsp::eeprom::eeprom_write(0, 0x0000, reinterpret_cast<const char*>(const_cast<const char*>(buf)), 256);
-        read = bsp::eeprom::eeprom_write(0, 0x0000, buf, 256);
-        LOG_DEBUG("... w=%d, r=%d %s", written, read, (written == read) ? "SUCCESS" : "FAIL");
 
         return statusBlkDevSuccess;
     }

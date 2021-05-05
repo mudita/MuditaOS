@@ -34,8 +34,8 @@ namespace bsp::eeprom
     bool isPresent(int busid)
     {
         std::uint8_t readout;
-        addr.deviceAddress |= static_cast<uint32_t>(busid) & 0x7;
-        addr.subAddress = 0x00;
+        addr.deviceAddress |= static_cast<uint32_t>(busid) & M24256_DEV_ID_MASK;
+        addr.subAddress = 0x0000;
         return i2c->Read(addr, &readout, 1) > 0;
     }
 
@@ -44,7 +44,7 @@ namespace bsp::eeprom
         size_t written = 0;
         char* ptr = const_cast<char *>(buf);
 
-        addr.deviceAddress |= static_cast<uint32_t>(busid) & 0x7;
+        addr.deviceAddress |= static_cast<uint32_t>(busid) & M24256_DEV_ID_MASK;
         addr.subAddress = mem_addr;
         
         size_t bl_len = static_cast<size_t>(eeprom_block_size(busid));
@@ -59,6 +59,7 @@ namespace bsp::eeprom
             {
                 LOG_DEBUG("[EEPROM - W] writing chunk %d of %d", i, chunks);
                 written += i2c->Write(addr, reinterpret_cast<uint8_t *>(ptr), static_cast<size_t>(bl_len));
+                vTaskDelay(10 / portTICK_PERIOD_MS);
                 ptr += bl_len;
                 addr.subAddress += bl_len;
             }
@@ -68,6 +69,7 @@ namespace bsp::eeprom
         {
             LOG_DEBUG("[EEPROM - W] writing remaining %d bytes", reminder);
             written += i2c->Write(addr, reinterpret_cast<uint8_t *>(ptr), reminder);
+            vTaskDelay(10 / portTICK_PERIOD_MS);
         }
 
         return static_cast<int>(written);
@@ -78,7 +80,7 @@ namespace bsp::eeprom
         size_t read = 0;
         char* ptr = const_cast<char *>(buf);
 
-        addr.deviceAddress |= static_cast<uint32_t>(busid) & 0x7;
+        addr.deviceAddress |= static_cast<uint32_t>(busid) & M24256_DEV_ID_MASK;
         addr.subAddress = mem_addr;
         
         size_t bl_len = static_cast<size_t>(eeprom_block_size(busid));
