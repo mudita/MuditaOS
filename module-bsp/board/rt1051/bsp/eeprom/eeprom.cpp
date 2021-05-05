@@ -42,21 +42,19 @@ namespace bsp::eeprom
     int eeprom_write(int busid, addr_t mem_addr, const char *buf, size_t len)
     {
         size_t written = 0;
-        char* ptr = const_cast<char *>(buf);
+        char *ptr      = const_cast<char *>(buf);
 
         addr.deviceAddress |= static_cast<uint32_t>(busid) & M24256_DEV_ID_MASK;
         addr.subAddress = mem_addr;
-        
-        size_t bl_len = static_cast<size_t>(eeprom_block_size(busid));
-        size_t chunks = len / bl_len;
+
+        size_t bl_len   = static_cast<size_t>(eeprom_block_size(busid));
+        size_t chunks   = len / bl_len;
         size_t reminder = static_cast<size_t>(len % bl_len);
 
         LOG_DEBUG("[EEPROM - R] chunks: %d, rem: %d", chunks, reminder);
 
-        if (chunks > 0)
-        {
-            for (size_t i = 0; i < chunks; i++)
-            {
+        if (chunks > 0) {
+            for (size_t i = 0; i < chunks; i++) {
                 LOG_DEBUG("[EEPROM - W] writing chunk %d of %d", i, chunks);
                 written += i2c->Write(addr, reinterpret_cast<uint8_t *>(ptr), static_cast<size_t>(bl_len));
                 vTaskDelay(10 / portTICK_PERIOD_MS);
@@ -64,9 +62,8 @@ namespace bsp::eeprom
                 addr.subAddress += bl_len;
             }
         }
-        //reminder
-        if (reminder > 0)
-        {
+        // reminder
+        if (reminder > 0) {
             LOG_DEBUG("[EEPROM - W] writing remaining %d bytes", reminder);
             written += i2c->Write(addr, reinterpret_cast<uint8_t *>(ptr), reminder);
             vTaskDelay(10 / portTICK_PERIOD_MS);
@@ -78,30 +75,27 @@ namespace bsp::eeprom
     int eeprom_read(int busid, addr_t mem_addr, char *buf, size_t len)
     {
         size_t read = 0;
-        char* ptr = const_cast<char *>(buf);
+        char *ptr   = const_cast<char *>(buf);
 
         addr.deviceAddress |= static_cast<uint32_t>(busid) & M24256_DEV_ID_MASK;
         addr.subAddress = mem_addr;
-        
-        size_t bl_len = static_cast<size_t>(eeprom_block_size(busid));
-        size_t chunks = len / bl_len;
+
+        size_t bl_len   = static_cast<size_t>(eeprom_block_size(busid));
+        size_t chunks   = len / bl_len;
         size_t reminder = static_cast<size_t>(len % bl_len);
 
         LOG_DEBUG("[EEPROM - R] chunks: %d, rem: %d", chunks, reminder);
 
-        if (chunks > 0)
-        {
-            for (size_t i = 0; i < chunks; i++)
-            {
+        if (chunks > 0) {
+            for (size_t i = 0; i < chunks; i++) {
                 LOG_DEBUG("[EEPROM - R] reading chunk %d of %d", i, chunks);
                 read += i2c->Read(addr, reinterpret_cast<uint8_t *>(ptr), static_cast<size_t>(bl_len));
                 ptr += bl_len;
                 addr.subAddress += bl_len;
             }
         }
-        //reminder
-        if (reminder > 0)
-        {
+        // reminder
+        if (reminder > 0) {
             LOG_DEBUG("[EEPROM - R] reading remaining %d bytes", reminder);
             read += i2c->Read(addr, reinterpret_cast<uint8_t *>(ptr), reminder);
         }
