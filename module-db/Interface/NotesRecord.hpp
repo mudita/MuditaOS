@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -47,7 +47,9 @@ class NotesRecordInterface : public RecordInterface<NotesRecord, NotesRecordFiel
 
   private:
     std::vector<NotesRecord> getNotes(std::uint32_t offset, std::uint32_t limit) const;
-    std::vector<NotesRecord> getNotesByText(const std::string &text) const;
+    std::pair<std::vector<NotesRecord>, unsigned int> getNotesByText(const std::string &text,
+                                                                     unsigned int offset,
+                                                                     unsigned int limit) const;
 
     std::unique_ptr<db::QueryResult> getQuery(const std::shared_ptr<db::Query> &query);
     std::unique_ptr<db::QueryResult> getByTextQuery(const std::shared_ptr<db::Query> &query);
