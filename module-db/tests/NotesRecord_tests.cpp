@@ -46,7 +46,7 @@ TEST_CASE("Notes Record tests")
     SECTION("Get notes by text query")
     {
         constexpr auto testSearch = "TEST";
-        auto query                = std::make_unique<db::query::QueryNotesGetByText>(testSearch);
+        auto query                = std::make_unique<db::query::QueryNotesGetByText>(testSearch, 0, 3);
         auto response             = notesRecordInterface.runQuery(std::move(query));
         auto getResult            = static_cast<db::query::NotesGetByTextResult *>(response.get());
 

@@ -107,12 +107,14 @@ namespace app
             return std::make_unique<notes::NoteEditWindow>(app, std::move(presenter));
         });
         windowsFactory.attach(gui::name::window::notes_search, [](Application *app, const std::string &name) {
-            auto notesRepository = std::make_unique<notes::NotesDBRepository>(app);
-            auto presenter       = std::make_unique<notes::SearchEngineWindowPresenter>(std::move(notesRepository));
-            return std::make_unique<notes::SearchEngineWindow>(app, std::move(presenter));
+            return std::make_unique<notes::SearchEngineWindow>(app,
+                                                               std::make_unique<notes::SearchEngineWindowPresenter>());
         });
-        windowsFactory.attach(gui::name::window::notes_search_result, [](Application *app, const std::string &name) {
-            return std::make_unique<notes::SearchResultsWindow>(app);
+        windowsFactory.attach(gui::name::window::notes_search_result, [](Application *app, const std::string &) {
+            auto notesRepository = std::make_unique<notes::NotesDBRepository>(app);
+            auto notesProvider   = std::make_shared<notes::NotesSearchListModel>(app, std::move(notesRepository));
+            auto presenter       = std::make_unique<notes::NotesSearchWindowPresenter>(notesProvider);
+            return std::make_unique<notes::SearchResultsWindow>(app, std::move(presenter));
         });
         windowsFactory.attach(gui::name::window::note_dialog, [](Application *app, const std::string &name) {
             return std::make_unique<gui::Dialog>(app, name);
