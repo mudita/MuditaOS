@@ -116,18 +116,21 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
         message->key = msg->key;
 
         if (message->key.state == RawKey::State::Pressed) {
-            const auto code = message->key.key_code;
-            if (code == bsp::KeyCodes::FnRight) {
+            if (message->key.key_code == bsp::KeyCodes::FnRight) {
                 bus.sendUnicast(message, service::name::system_manager);
-            }
-            else if (code == bsp::KeyCodes::SSwitchUp || code == bsp::KeyCodes::SSwitchMid ||
-                     code == bsp::KeyCodes::SSwitchDown) {
-                const auto mode = sys::SystemManager::translateSliderState(message->key);
-                bus.sendUnicast(std::make_shared<sys::PhoneModeRequest>(mode), service::name::system_manager);
             }
             if (keypadLightState == bsp::keypad_backlight::State::activeMode && !isKeypadLightInCallMode) {
                 bsp::keypad_backlight::turnOnAll();
                 startKeypadLightTimer();
+            }
+        }
+
+        if (message->key.state == RawKey::State::Toggled) {
+            const auto code = message->key.key_code;
+            if (code == bsp::KeyCodes::SSwitchUp || code == bsp::KeyCodes::SSwitchMid ||
+                code == bsp::KeyCodes::SSwitchDown) {
+                const auto mode = sys::SystemManager::translateSliderState(message->key);
+                bus.sendUnicast(std::make_shared<sys::PhoneModeRequest>(mode), service::name::system_manager);
             }
         }
 

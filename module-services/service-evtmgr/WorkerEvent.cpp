@@ -184,7 +184,7 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
         if (!queue->Dequeue(&notification, 0)) {
             return false;
         }
-        processKeyEvent(bsp::KeyEvents::Pressed, bsp::magnetometer::getCurrentSliderPosition());
+        processKeyEvent(bsp::KeyEvents::Toggled, bsp::magnetometer::getCurrentSliderPosition());
     }
 
     if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueMagnetometerIRQ)) {
@@ -289,12 +289,11 @@ void WorkerEvent::processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code)
         message->key.state      = RawKey::State::Pressed;
         message->key.time_press = xTaskGetTickCount();
 
-        // Slider sends only press, not release state so it would block the entire keyboard
-        if ((code != bsp::KeyCodes::SSwitchUp) && (code != bsp::KeyCodes::SSwitchMid) &&
-            (code != bsp::KeyCodes::SSwitchDown)) {
-            lastPressed = code;
-            lastState   = event;
-        }
+        lastPressed = code;
+        lastState   = event;
+    }
+    else if (event == bsp::KeyEvents::Toggled) {
+        message->key.state = RawKey::State::Toggled;
     }
     else {
         if (lastState != bsp::KeyEvents::Pressed) {
@@ -323,7 +322,7 @@ void WorkerEvent::handleMagnetometerEvent()
 {
     if (const auto &key = bsp::magnetometer::WorkerEventHandler(); key.has_value()) {
         LOG_DEBUG("magneto IRQ handler: %s", c_str(*key));
-        processKeyEvent(bsp::KeyEvents::Pressed, *key);
+        processKeyEvent(bsp::KeyEvents::Toggled, *key);
     }
 }
 
