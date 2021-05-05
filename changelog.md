@@ -4,6 +4,42 @@ To install the new version of MuditaOS please follow the steps described in this
 - [Linux](https://github.com/mudita/MuditaOS/blob/master/doc/boot_and_update.md#creating-a-storage-partition)
 - [Windows and macOS](https://github.com/mudita/MuditaOS/blob/master/doc/flashing_win_macos.md)
 
+## [0.63.2 2021-05-05]
+
+### Added
+
+* Add "connecting" and "pairing" statuses to the Bluetooth connectivity settings window.
+* Add audio transcoding framework with basic sample rate transcoding.
+* Add handling of Pause/Resume/Stop headset controls while in the music player application.
+* Add Out-of-Memory hooks to the system for better protection against failures related to memory handling.
+* Add settings initialization from factory data.
+* Add tethering notification.
+* Add tool to generate EEPROM image with factory data.
+* Add volume level feedback for Bluetooth audio devices.
+
+### Changed
+
+* Add a distinction between rejected and ended the call when presenting finished call status to the user.
+* Adjust OS to be used with Secure Boot.
+* Change calculator behavior to finish the existing equation before starting the next one.
+* Enable cyclic database writes.
+* Enable power saving for filesystem operations.
+* Enable power saving for the USB peripheral.
+* Limit digits to 7 in the calculator.
+* Remake cellular flow for better error handling.
+* Switch CI process from Github actions to Jenkins server.
+
+### Fixed
+
+* Fix audio assets' tags not being displayed in the list view.
+* Fix invalid "block contact" icon.
+* Fix keypad backlight random state changes when on battery power.
+* Fix meditation start sound.
+* Fix no "send" text on the bottom bar while receiving a call.
+* Fix phone crashes after playing ringtone in the new alarm window.
+* Fix several issues with APN settings.
+* Fix the SIM card icon in the top bar.
+
 ## [0.63.1 2021-04-26]
 
 ### Added
