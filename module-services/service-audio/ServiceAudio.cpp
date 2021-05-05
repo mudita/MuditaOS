@@ -364,6 +364,12 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleSendEvent(std::shared_
         if (newState != bluetoothConnected) {
             LOG_DEBUG("Bluetooth connection status changed: %s", newState ? "connected" : "disconnected");
             bluetoothConnected = newState;
+            HandleStop({audio::PlaybackType::Alarm,
+                        audio::PlaybackType::CallRingtone,
+                        audio::PlaybackType::Meditation,
+                        audio::PlaybackType::Notifications,
+                        audio::PlaybackType::TextMessageRingtone},
+                       audio::Token());
         }
     }
 
