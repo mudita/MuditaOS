@@ -48,9 +48,9 @@ namespace bsp::cellular
         CellularResultCode resultCode = CellularResultCode::Uninitialized;
         std::vector<uint8_t> data;
 
-        [[nodiscard]] auto serialize() const -> std::unique_ptr<uint8_t>
+        [[nodiscard]] auto serialize() const -> std::unique_ptr<uint8_t[]>
         {
-            auto serialized     = std::unique_ptr<uint8_t>(new uint8_t[data.size() + sizeof(resultCode)]);
+            auto serialized     = std::make_unique< uint8_t[]>(data.size() + sizeof(resultCode));
             serialized.get()[0] = static_cast<unsigned char>(resultCode);
 
             if (data.size() > 0) {
@@ -126,7 +126,7 @@ namespace bsp::cellular
             return &result;
         }
 
-        auto getSerialized() const -> std::unique_ptr<uint8_t>
+        auto getSerialized() const -> std::unique_ptr<uint8_t[]>
         {
             return result.serialize();
         }
