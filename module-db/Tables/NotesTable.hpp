@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -41,8 +41,11 @@ class NotesTable : public Table<NotesTableRow, NotesTableFields>
                                                      std::uint32_t limit,
                                                      NotesTableFields field,
                                                      const char *str) override;
-    std::vector<NotesTableRow> getByText(const std::string &text);
+    std::pair<std::vector<NotesTableRow>, int> getByText(const std::string &text,
+                                                         unsigned int offset,
+                                                         unsigned int limit);
 
     std::uint32_t count() override;
+    std::uint32_t countByText();
     std::uint32_t countByFieldId(const char *field, std::uint32_t id) override;
 };

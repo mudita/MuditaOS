@@ -53,9 +53,13 @@ namespace app::notes
         return AppWindow::onInput(inputEvent);
     }
 
-    void SearchEngineWindow::notesFound(const std::vector<NotesRecord> &notes, const std::string &searchText)
+    void SearchEngineWindow::emptySearch()
     {
-        application->switchWindow(gui::name::window::notes_search_result,
-                                  std::make_unique<NotesFoundData>(searchText, notes));
+        application->switchWindow(gui::name::window::notes_search_result, std::make_unique<NotesFoundData>(""));
+    }
+
+    void SearchEngineWindow::processValidSearch(const std::string &searchText)
+    {
+        application->switchWindow(gui::name::window::notes_search_result, std::make_unique<NotesFoundData>(searchText));
     }
 } // namespace app::notes

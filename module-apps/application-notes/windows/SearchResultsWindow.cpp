@@ -11,10 +11,9 @@
 
 namespace app::notes
 {
-    SearchResultsWindow::SearchResultsWindow(Application *application)
-        : AppWindow(application, gui::name::window::notes_search_result), listModel{
-                                                                              std::make_shared<SearchResultsListModel>(
-                                                                                  application)}
+    SearchResultsWindow::SearchResultsWindow(Application *application,
+                                             std::unique_ptr<NotesSearchWindowContract::Presenter> &&windowPresenter)
+        : AppWindow(application, gui::name::window::notes_search_result), presenter(std::move(windowPresenter))
     {
         buildInterface();
     }
@@ -39,9 +38,10 @@ namespace app::notes
                                  style::list::Y,
                                  style::list::Width,
                                  style::list::Height,
-                                 listModel,
+                                 presenter->getNotesItemProvider(),
                                  gui::listview::ScrollBarType::Fixed);
         list->setScrollTopMargin(::style::margins::small);
+        list->emptyListCallback = [&]() { onNothingFound(presenter->getSearchText()); };
         setFocusItem(list);
     }
 
@@ -53,19 +53,9 @@ namespace app::notes
 
     void SearchResultsWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
     {
-        auto foundNotesData = dynamic_cast<NotesFoundData *>(data);
-        if (foundNotesData == nullptr) {
-            onNothingFound();
-            return;
-        }
-
-        if (const auto &records = foundNotesData->getFoundRecords(); !records.empty()) {
-            listModel->setResults(records);
+        if (auto foundNotesData = dynamic_cast<NotesFoundData *>(data); foundNotesData != nullptr) {
+            presenter->setSearchText(foundNotesData->getSearchText());
             list->rebuildList();
-            setFocusItem(list);
-        }
-        else {
-            onNothingFound(foundNotesData->getSearchText());
         }
     }
 
@@ -77,5 +67,19 @@ namespace app::notes
         auto data                        = std::make_unique<gui::DialogMetadataMessage>(meta);
         data->ignoreCurrentWindowOnStack = true;
         application->switchWindow(gui::name::window::note_dialog, std::move(data));
+    }
+
+    void SearchResultsWindow::onResultsFilled()
+    {
+        list->rebuildList(gui::listview::RebuildType::InPlace);
+    }
+
+    bool SearchResultsWindow::onDatabaseMessage(sys::Message *msg)
+    {
+        if (auto *message = dynamic_cast<db::NotificationMessage *>(msg);
+            message != nullptr && message->interface == db::Interface::Name::Notes) {
+            presenter->handleSearchResults(message);
+        }
+        return false;
     }
 } // namespace app::notes
