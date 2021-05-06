@@ -8,6 +8,7 @@
 #include <Audio/AudioFormat.hpp>
 #include <Audio/StreamProxy.hpp>
 #include <Audio/StreamFactory.hpp>
+#include <Audio/transcode/BasicDecimator.hpp>
 
 #include "MockEndpoint.hpp"
 #include "MockStream.hpp"
@@ -518,6 +519,52 @@ TEST(Factory, NoConstraints)
 
     EXPECT_EQ(stream->getBlockCount(), 2);
     EXPECT_EQ(stream->getOutputTraits().blockSize, 64);
+}
+
+TEST(Factory, TranscodingStreamSinkTraits)
+{
+    testing::audio::MockSink mockSink;
+    testing::audio::MockSource mockSource;
+    ::audio::StreamFactory factory(2ms);
+    auto format = ::audio::AudioFormat(8000, 16, 1);
+
+    EXPECT_CALL(mockSource, getTraits).WillRepeatedly(Return(::audio::Endpoint::Traits{}));
+    EXPECT_CALL(mockSink, getTraits).WillRepeatedly(Return(::audio::Endpoint::Traits{.blockSizeConstraint = 60U}));
+
+    auto stream = factory.makeStream(mockSource, mockSink, format);
+
+    EXPECT_EQ(stream->getBlockCount(), 2);
+    EXPECT_EQ(stream->getOutputTraits().blockSize, 60);
+
+    auto decimatorTransform = std::make_shared<::audio::transcode::BasicDecimator<std::uint16_t, 1, 2>>();
+    auto transcodingStream  = factory.makeInputTranscodingStream(
+        mockSource, mockSink, format, std::static_pointer_cast<::audio::transcode::Transform>(decimatorTransform));
+
+    EXPECT_EQ(transcodingStream->getInputTraits().blockSize, 120);
+    EXPECT_EQ(transcodingStream->getOutputTraits().blockSize, 60);
+}
+
+TEST(Factory, TranscodingStreamSourceTraits)
+{
+    testing::audio::MockSink mockSink;
+    testing::audio::MockSource mockSource;
+    ::audio::StreamFactory factory(2ms);
+    auto format = ::audio::AudioFormat(8000, 16, 1);
+
+    EXPECT_CALL(mockSource, getTraits).WillRepeatedly(Return(::audio::Endpoint::Traits{.blockSizeConstraint = 60U}));
+    EXPECT_CALL(mockSink, getTraits).WillRepeatedly(Return(::audio::Endpoint::Traits{}));
+
+    auto stream = factory.makeStream(mockSource, mockSink, format);
+
+    EXPECT_EQ(stream->getBlockCount(), 2);
+    EXPECT_EQ(stream->getOutputTraits().blockSize, 60);
+
+    auto decimatorTransform = std::make_shared<::audio::transcode::BasicDecimator<std::uint16_t, 1, 2>>();
+    auto transcodingStream  = factory.makeInputTranscodingStream(
+        mockSource, mockSink, format, std::static_pointer_cast<::audio::transcode::Transform>(decimatorTransform));
+
+    EXPECT_EQ(transcodingStream->getInputTraits().blockSize, 60);
+    EXPECT_EQ(transcodingStream->getOutputTraits().blockSize, 30);
 }
 
 int main(int argc, char **argv)

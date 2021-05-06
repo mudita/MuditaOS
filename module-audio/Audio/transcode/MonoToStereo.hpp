@@ -17,6 +17,7 @@ namespace audio::transcode
         auto validateInputFormat(const audio::AudioFormat &inputFormat) const noexcept -> bool override;
         auto transformFormat(const audio::AudioFormat &inputFormat) const noexcept -> audio::AudioFormat override;
         auto transformBlockSize(std::size_t blockSize) const noexcept -> std::size_t override;
+        auto transformBlockSizeInversed(std::size_t blockSize) const noexcept -> std::size_t override;
     };
 
 } // namespace audio::transcode

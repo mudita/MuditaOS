@@ -45,7 +45,7 @@ auto InputTranscodeProxy::getInputTraits() const noexcept -> Traits
 {
     auto originalTraits      = StreamProxy::getInputTraits();
     auto transcodedFormat    = transform->transformFormat(originalTraits.format);
-    auto transcodedBlockSize = transform->transformBlockSize(originalTraits.blockSize);
+    auto transcodedBlockSize = transform->transformBlockSizeInversed(originalTraits.blockSize);
 
     return Traits{.blockSize = transcodedBlockSize, .format = transcodedFormat};
 }

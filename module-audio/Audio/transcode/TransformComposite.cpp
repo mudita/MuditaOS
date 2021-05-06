@@ -73,3 +73,14 @@ auto TransformComposite::transformBlockSize(std::size_t blockSize) const noexcep
 
     return transformedBlockSize;
 }
+
+auto TransformComposite::transformBlockSizeInversed(std::size_t blockSize) const noexcept -> std::size_t
+{
+    std::size_t transformedBlockSize = blockSize;
+
+    for (auto t : children) {
+        transformedBlockSize = t->transformBlockSizeInversed(transformedBlockSize);
+    }
+
+    return transformedBlockSize;
+}

@@ -42,6 +42,11 @@ namespace audio::transcode
             return blockSize * Ratio;
         }
 
+        auto transformBlockSizeInversed(std::size_t blockSize) const noexcept -> std::size_t override
+        {
+            return blockSize / Ratio;
+        }
+
         auto transformFormat(const audio::AudioFormat &inputFormat) const noexcept -> audio::AudioFormat override
         {
             return audio::AudioFormat{

@@ -54,6 +54,15 @@ namespace audio::transcode
         virtual auto transformBlockSize(std::size_t blockSize) const noexcept -> std::size_t = 0;
 
         /**
+         * @brief Calculates required size of an input data to get transformed data of size equal
+         * outputBlockSize
+         *
+         * @param outputBlockSize - size of an output block
+         * @return std::size_t
+         */
+        virtual auto transformBlockSizeInversed(std::size_t outputBlockSize) const noexcept -> std::size_t = 0;
+
+        /**
          * @brief Get the overall space size required for transformation. Some transforms
          * may need to use more space than the size of an output data, e.g. resampling
          * where there is a signal interpolation before the final decimation.

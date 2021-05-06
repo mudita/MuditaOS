@@ -40,6 +40,11 @@ class InverseTransform : public audio::transcode::Transform
         return inputBufferSize;
     }
 
+    auto transformBlockSizeInversed(std::size_t outputBufferSize) const noexcept -> std::size_t override
+    {
+        return outputBufferSize;
+    }
+
     auto validateInputFormat(const audio::AudioFormat &inputFormat) const noexcept -> bool override
     {
         return true;
@@ -72,6 +77,11 @@ class NullTransform : public audio::transcode::Transform
     auto transformBlockSize(std::size_t inputBufferSize) const noexcept -> std::size_t override
     {
         return inputBufferSize;
+    }
+
+    auto transformBlockSizeInversed(std::size_t outputBufferSize) const noexcept -> std::size_t override
+    {
+        return outputBufferSize;
     }
 };
 
@@ -162,7 +172,7 @@ TEST(Transcode, Traits)
 
     auto proxyInputTraits = proxy.getInputTraits();
 
-    EXPECT_EQ(proxyInputTraits.blockSize, 256);
+    EXPECT_EQ(proxyInputTraits.blockSize, 64);
     EXPECT_EQ(proxyInputTraits.format.getChannels(), 2);
     EXPECT_EQ(proxyInputTraits.format.getSampleRate(), 44100);
     EXPECT_EQ(proxyInputTraits.format.getBitWidth(), 16);

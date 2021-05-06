@@ -25,6 +25,11 @@ auto MonoToStereo::transformBlockSize(std::size_t inputBufferSize) const noexcep
     return 2 * inputBufferSize;
 }
 
+auto MonoToStereo::transformBlockSizeInversed(std::size_t outputBufferSize) const noexcept -> std::size_t
+{
+    return outputBufferSize / 2;
+}
+
 auto MonoToStereo::validateInputFormat(const audio::AudioFormat &inputFormat) const noexcept -> bool
 {
     return inputFormat.getChannels() == 1;
