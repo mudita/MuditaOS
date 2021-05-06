@@ -38,7 +38,6 @@ namespace gui
             -> bool;
         void storeMessageDraft(const utils::PhoneNumber::View &number, const UTF8 &text);
         void storeMessageDraft(SMSRecord &sms, const UTF8 &text);
-        static inline constexpr std::chrono::milliseconds getThreadTimeout{1000};
         gui::Text *recipient = nullptr;
         gui::Text *message   = nullptr;
         gui::VBox *body      = nullptr;
