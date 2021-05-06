@@ -8,10 +8,10 @@
 
 using audio::transcode::InputTranscodeProxy;
 
-InputTranscodeProxy::InputTranscodeProxy(AbstractStream &wrappedStream, Transform &transform) noexcept
+InputTranscodeProxy::InputTranscodeProxy(std::shared_ptr<AbstractStream> wrappedStream, Transform &transform) noexcept
     : StreamProxy(wrappedStream), transform(transform),
-      transcodingSpaceSize(transform.getTransformSize(wrappedStream.getInputTraits().blockSize)),
-      transcodingSpace(std::make_unique<std::uint8_t[]>(transcodingSpaceSize)), transcodingSpaceSpan{
+      transcodingSpaceSize(transform.getTransformSize(wrappedStream->getInputTraits().blockSize)),
+      transcodingSpace(std::make_shared<std::uint8_t[]>(transcodingSpaceSize)), transcodingSpaceSpan{
                                                                                     .data     = transcodingSpace.get(),
                                                                                     .dataSize = transcodingSpaceSize}
 {}

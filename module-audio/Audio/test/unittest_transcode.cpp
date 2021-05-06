@@ -77,13 +77,13 @@ class NullTransform : public audio::transcode::Transform
 
 TEST(Transcode, Reset)
 {
-    MockStream mock;
+    auto mock = std::make_shared<MockStream>();
     NullTransform nullTransform;
 
-    EXPECT_CALL(mock, getInputTraits);
-    audio::transcode::InputTranscodeProxy proxy(mock, nullTransform);
+    EXPECT_CALL(*mock, getInputTraits);
+    audio::transcode::InputTranscodeProxy proxy(std::static_pointer_cast<::audio::AbstractStream>(mock), nullTransform);
 
-    EXPECT_CALL(mock, reset()).Times(1);
+    EXPECT_CALL(*mock, reset()).Times(1);
 
     proxy.reset();
 }
@@ -93,23 +93,24 @@ TEST(Transcode, Push)
     static std::uint8_t testData[testStreamSize]     = {0, 1, 2, 3, 4, 5, 6, 7};
     static std::uint8_t invertedData[testStreamSize] = {255, 254, 253, 252, 251, 250, 249, 248};
     InverseTransform inv;
-    ::testing::audio::TestStream stream(testStreamSize);
-    ::audio::transcode::InputTranscodeProxy transform(stream, inv);
+    auto stream = std::make_shared<::testing::audio::TestStream>(testStreamSize);
+    ::audio::transcode::InputTranscodeProxy transform(std::static_pointer_cast<::audio::AbstractStream>(stream), inv);
 
     transform.push(::audio::AbstractStream::Span{testData, testStreamSize});
-    EXPECT_TRUE(stream.checkData(::audio::AbstractStream::Span{invertedData, testStreamSize}));
+    EXPECT_TRUE(stream->checkData(::audio::AbstractStream::Span{invertedData, testStreamSize}));
 }
 
 TEST(Transcode, FailedPeek)
 {
     NullTransform nullTransform;
-    MockStream mockStream;
+    auto mockStream = std::make_shared<MockStream>();
 
-    EXPECT_CALL(mockStream, getInputTraits);
-    ::audio::transcode::InputTranscodeProxy transform(mockStream, nullTransform);
+    EXPECT_CALL(*mockStream, getInputTraits);
+    ::audio::transcode::InputTranscodeProxy transform(std::static_pointer_cast<::audio::AbstractStream>(mockStream),
+                                                      nullTransform);
     ::audio::AbstractStream::Span dataSpan;
 
-    EXPECT_CALL(mockStream, peek).Times(1).WillOnce(Return(false));
+    EXPECT_CALL(*mockStream, peek).Times(1).WillOnce(Return(false));
     EXPECT_EQ(transform.peek(dataSpan), false);
 }
 
@@ -117,11 +118,11 @@ TEST(Transcode, Commit)
 {
     static std::uint8_t invertedData[testStreamSize] = {255, 254, 253, 252, 251, 250, 249, 248};
     InverseTransform inv;
-    ::testing::audio::TestStream stream(testStreamSize);
-    ::audio::transcode::InputTranscodeProxy transform(stream, inv);
+    auto stream = std::make_shared<::testing::audio::TestStream>(testStreamSize);
+    ::audio::transcode::InputTranscodeProxy transform(std::static_pointer_cast<::audio::AbstractStream>(stream), inv);
     ::audio::AbstractStream::Span span;
 
-    stream.setData(0);
+    stream->setData(0);
 
     ASSERT_TRUE(transform.peek(span));
     ASSERT_TRUE(span.data != nullptr);
@@ -132,30 +133,30 @@ TEST(Transcode, Commit)
     }
 
     transform.commit();
-    EXPECT_TRUE(stream.checkData(::audio::AbstractStream::Span{invertedData, testStreamSize}));
+    EXPECT_TRUE(stream->checkData(::audio::AbstractStream::Span{invertedData, testStreamSize}));
 
     // no conversion on commit with no peek
-    stream.commit();
-    EXPECT_TRUE(stream.checkData(::audio::AbstractStream::Span{invertedData, testStreamSize}));
+    stream->commit();
+    EXPECT_TRUE(stream->checkData(::audio::AbstractStream::Span{invertedData, testStreamSize}));
 }
 
 TEST(Transcode, Traits)
 {
     auto testFormat = ::audio::AudioFormat(44100, 16, 1);
     ::audio::transcode::MonoToStereo m2s;
-    MockStream mockStream;
+    auto mockStream = std::make_shared<MockStream>();
 
-    EXPECT_CALL(mockStream, getInputTraits)
+    EXPECT_CALL(*mockStream, getInputTraits)
         .Times(1)
         .WillOnce(Return(::audio::AbstractStream::Traits{.blockSize = 128, .format = testFormat}));
 
-    ::audio::transcode::InputTranscodeProxy proxy(mockStream, m2s);
+    ::audio::transcode::InputTranscodeProxy proxy(std::static_pointer_cast<::audio::AbstractStream>(mockStream), m2s);
 
-    EXPECT_CALL(mockStream, getInputTraits)
+    EXPECT_CALL(*mockStream, getInputTraits)
         .Times(1)
         .WillOnce(Return(::audio::AbstractStream::Traits{.blockSize = 128, .format = testFormat}));
 
-    EXPECT_CALL(mockStream, getOutputTraits)
+    EXPECT_CALL(*mockStream, getOutputTraits)
         .Times(1)
         .WillOnce(Return(::audio::AbstractStream::Traits{.blockSize = 128, .format = testFormat}));
 
@@ -176,18 +177,18 @@ TEST(Transcode, Traits)
 
 TEST(Transcode, ListenersWrap)
 {
-    MockStream mock;
+    auto mock = std::make_shared<MockStream>();
     MockStreamEventListener listener;
     NullTransform nullTransform;
 
-    EXPECT_CALL(mock, getInputTraits);
-    audio::transcode::InputTranscodeProxy proxy(mock, nullTransform);
+    EXPECT_CALL(*mock, getInputTraits);
+    audio::transcode::InputTranscodeProxy proxy(std::static_pointer_cast<::audio::AbstractStream>(mock), nullTransform);
 
-    EXPECT_CALL(mock, registerListener(&listener)).Times(1);
+    EXPECT_CALL(*mock, registerListener(&listener)).Times(1);
 
     proxy.registerListener(&listener);
 
-    EXPECT_CALL(mock, unregisterListeners(&listener)).Times(1);
+    EXPECT_CALL(*mock, unregisterListeners(&listener)).Times(1);
 
     proxy.unregisterListeners(&listener);
 }

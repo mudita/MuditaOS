@@ -12,6 +12,8 @@
 #include "MockEndpoint.hpp"
 #include "MockStream.hpp"
 
+#include <memory>
+
 #include <cstdint>
 #include <cstring>
 
@@ -356,21 +358,21 @@ TEST(Stream, spanEquality)
 
 TEST(Proxy, Write)
 {
-    MockStream mock;
-    auto proxy = ::audio::StreamProxy(mock);
+    auto mock  = std::make_shared<MockStream>();
+    auto proxy = ::audio::StreamProxy(std::static_pointer_cast<::audio::AbstractStream>(mock));
     ::audio::AbstractStream::Span span{.data = reinterpret_cast<uint8_t *>(0xdeadbeef), .dataSize = 0xc00f33b4d};
 
-    EXPECT_CALL(mock, push(span)).Times(1).WillOnce(Return(true));
-    EXPECT_CALL(mock, push(nullptr, 128)).WillOnce(Return(false));
-    EXPECT_CALL(mock, push()).WillOnce(Return(true));
+    EXPECT_CALL(*mock, push(span)).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*mock, push(nullptr, 128)).WillOnce(Return(false));
+    EXPECT_CALL(*mock, push()).WillOnce(Return(true));
 
     EXPECT_TRUE(proxy.push(span));
     EXPECT_FALSE(proxy.push(nullptr, 128));
     EXPECT_TRUE(proxy.push());
 
-    EXPECT_CALL(mock, reserve).Times(1);
-    EXPECT_CALL(mock, commit).Times(1);
-    EXPECT_CALL(mock, release).Times(1);
+    EXPECT_CALL(*mock, reserve).Times(1);
+    EXPECT_CALL(*mock, commit).Times(1);
+    EXPECT_CALL(*mock, release).Times(1);
 
     proxy.reserve(span);
     proxy.commit();
@@ -379,16 +381,16 @@ TEST(Proxy, Write)
 
 TEST(Proxy, Read)
 {
-    MockStream mock;
-    auto proxy = ::audio::StreamProxy(mock);
+    auto mock  = std::make_shared<MockStream>();
+    auto proxy = ::audio::StreamProxy(std::static_pointer_cast<::audio::AbstractStream>(mock));
     ::audio::AbstractStream::Span span{.data = reinterpret_cast<uint8_t *>(0xdeadbeef), .dataSize = 0xc00f33b4d};
 
-    EXPECT_CALL(mock, pop(span)).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*mock, pop(span)).Times(1).WillOnce(Return(true));
     EXPECT_TRUE(proxy.pop(span));
 
-    EXPECT_CALL(mock, peek(span)).Times(2).WillOnce(Return(true)).WillOnce(Return(false));
-    EXPECT_CALL(mock, consume());
-    EXPECT_CALL(mock, unpeek());
+    EXPECT_CALL(*mock, peek(span)).Times(2).WillOnce(Return(true)).WillOnce(Return(false));
+    EXPECT_CALL(*mock, consume());
+    EXPECT_CALL(*mock, unpeek());
 
     EXPECT_TRUE(proxy.peek(span));
     EXPECT_FALSE(proxy.peek(span));
@@ -399,12 +401,12 @@ TEST(Proxy, Read)
 
 TEST(Proxy, Misc)
 {
-    MockStream mock;
-    auto proxy = ::audio::StreamProxy(mock);
+    auto mock  = std::make_shared<MockStream>();
+    auto proxy = ::audio::StreamProxy(std::static_pointer_cast<::audio::AbstractStream>(mock));
 
-    EXPECT_CALL(mock, reset).Times(1);
-    EXPECT_CALL(mock, isEmpty).Times(1).WillOnce(Return(true));
-    EXPECT_CALL(mock, isFull).Times(1).WillOnce(Return(false));
+    EXPECT_CALL(*mock, reset).Times(1);
+    EXPECT_CALL(*mock, isEmpty).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*mock, isFull).Times(1).WillOnce(Return(false));
 
     proxy.reset();
     EXPECT_TRUE(proxy.isEmpty());
