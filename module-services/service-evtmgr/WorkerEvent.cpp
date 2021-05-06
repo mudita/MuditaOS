@@ -143,8 +143,8 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
         }
 
         time_t timestamp;
-        bsp::rtc_GetCurrentTimestamp(&timestamp);
-        bsp::rtc_SetMinuteAlarm(timestamp);
+        bsp::rtc::getCurrentTimestamp(&timestamp);
+        bsp::rtc::setMinuteAlarm(timestamp);
 
         auto message       = std::make_shared<sevm::RtcMinuteAlarmMessage>(MessageType::EVMMinuteUpdated);
         message->timestamp = timestamp;
@@ -225,7 +225,7 @@ bool WorkerEvent::init(std::list<sys::WorkerQueueInfo> queuesList)
     auto queueBatteryHandle = queues[static_cast<int32_t>(WorkerEventQueues::queueBattery)]->GetQueueHandle();
     auto queueChargerDetect = queues[static_cast<int32_t>(WorkerEventQueues::queueChargerDetect)]->GetQueueHandle();
     bsp::battery_charger::init(queueBatteryHandle, queueChargerDetect);
-    bsp::rtc_Init(queues[static_cast<int32_t>(WorkerEventQueues::queueRTC)]->GetQueueHandle());
+    bsp::rtc::init(queues[static_cast<int32_t>(WorkerEventQueues::queueRTC)]->GetQueueHandle());
     bsp::cellular::init(queues[static_cast<int32_t>(WorkerEventQueues::queueCellular)]->GetQueueHandle());
     bsp::magnetometer::init(queues[static_cast<int32_t>(WorkerEventQueues::queueMagnetometerIRQ)]->GetQueueHandle());
     bsp::torch::init(queues[static_cast<int32_t>(WorkerEventQueues::queueTorch)]->GetQueueHandle());
@@ -234,8 +234,8 @@ bool WorkerEvent::init(std::list<sys::WorkerQueueInfo> queuesList)
     bsp::light_sensor::init(queues[static_cast<int32_t>(WorkerEventQueues::queueLightSensor)]->GetQueueHandle());
 
     time_t timestamp;
-    bsp::rtc_GetCurrentTimestamp(&timestamp);
-    bsp::rtc_SetMinuteAlarm(timestamp);
+    bsp::rtc::getCurrentTimestamp(&timestamp);
+    bsp::rtc::setMinuteAlarm(timestamp);
 
     cpuSentinel = std::make_shared<sys::CpuSentinel>(
         service::name::evt_manager, service, [this](bsp::CpuFrequencyHz newFrequency) {

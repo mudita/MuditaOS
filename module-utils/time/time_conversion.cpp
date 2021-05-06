@@ -82,10 +82,10 @@ namespace utils::time
 
     Timestamp::Timestamp()
     {
-        auto err     = bsp::rtc_GetCurrentTimestamp(&time);
+        auto err = bsp::rtc::getCurrentTimestamp(&time);
         time += utils::time::Time::getTimeZoneOffset();
-        if (err) {
-            LOG_ERROR("rtc_GetCurrentTimestamp failure!");
+        if (err != bsp::rtc::ErrorCode::OK) {
+            LOG_ERROR("rtc::getCurrentTimestamp failure!");
         }
         timeinfo = *localtime(&time);
     }

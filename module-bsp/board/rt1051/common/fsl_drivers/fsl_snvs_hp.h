@@ -176,6 +176,28 @@ void SNVS_HP_RTC_GetDefaultConfig(snvs_hp_rtc_config_t *config);
  */
 
 /*!
+ * @brief Returns RTC time in seconds.
+ *
+ * This function is used internally to get actual RTC time in seconds.
+ *
+ * @param base SNVS peripheral base address
+ *
+ * @return RTC time in seconds
+ */
+uint32_t SNVS_HP_RTC_GetSeconds(SNVS_Type *base);
+
+/*!
+ * @brief Sets the SNVS SRTC date and time provided in seconds.
+ *
+ * @param base     SNVS peripheral base address
+ * @param seconds  Date and time in seconds.
+ *
+ * @return kStatus_Success: Success in setting the time and starting the SNVS SRTC
+ *         kStatus_InvalidArgument: Error because the datetime format is incorrect
+ */
+status_t SNVS_LP_SRTC_SetSeconds(SNVS_Type *base, uint32_t seconds);
+
+/*!
  * @brief Sets the SNVS RTC date and time according to the given time structure.
  *
  * @param base     SNVS peripheral base address
@@ -193,6 +215,28 @@ status_t SNVS_HP_RTC_SetDatetime(SNVS_Type *base, const snvs_hp_rtc_datetime_t *
  * @param datetime Pointer to the structure where the date and time details are stored.
  */
 void SNVS_HP_RTC_GetDatetime(SNVS_Type *base, snvs_hp_rtc_datetime_t *datetime);
+
+/*!
+ * @brief Returns the SNVS RTC alarm time in seconds.
+ *
+ * @param base     SNVS peripheral base address
+ */
+uint32_t SNVS_HP_RTC_GetAlarmSeconds(SNVS_Type *base);
+
+/*!
+ * @brief Sets the SNVS RTC alarm time in seconds.
+ *
+ * The function sets the RTC alarm. It also checks whether the specified alarm time
+ * is greater than the present time. If not, the function does not set the alarm
+ * and returns an error.
+ *
+ * @param base      SNVS peripheral base address
+ * @param alarmTime Alarm time in seconds
+ *
+ * @return kStatus_Success: success in setting the SNVS RTC alarm
+ *         kStatus_Fail: Error because the alarm time has already passed
+ */
+status_t SNVS_HP_RTC_SetAlarmSeconds(SNVS_Type *base, uint32_t alarmSeconds);
 
 /*!
  * @brief Sets the SNVS RTC alarm time.

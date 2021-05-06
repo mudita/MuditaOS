@@ -60,16 +60,6 @@ static uint32_t SNVS_HP_ConvertDatetimeToSeconds(const snvs_hp_rtc_datetime_t *d
  */
 static void SNVS_HP_ConvertSecondsToDatetime(uint32_t seconds, snvs_hp_rtc_datetime_t *datetime);
 
-/*!
- * @brief Returns RTC time in seconds.
- *
- * This function is used internally to get actual RTC time in seconds.
- *
- * @param base SNVS peripheral base address
- *
- * @return RTC time in seconds
- */
-static uint32_t SNVS_HP_RTC_GetSeconds(SNVS_Type *base);
 
 #if (!(defined(FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL) && FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL) && \
      defined(SNVS_HP_CLOCKS))
@@ -334,7 +324,16 @@ void SNVS_HP_RTC_GetDefaultConfig(snvs_hp_rtc_config_t *config)
     config->periodicInterruptFreq = 0U;
 }
 
-static uint32_t SNVS_HP_RTC_GetSeconds(SNVS_Type *base)
+/*!
+ * brief Returns RTC time in seconds.
+ *
+ * This function is used internally to get actual RTC time in seconds.
+ *
+ * param base SNVS peripheral base address
+ *
+ * return RTC time in seconds
+ */
+uint32_t SNVS_HP_RTC_GetSeconds(SNVS_Type *base)
 {
     uint32_t seconds = 0;
     uint32_t tmp     = 0;
@@ -404,6 +403,50 @@ void SNVS_HP_RTC_GetDatetime(SNVS_Type *base, snvs_hp_rtc_datetime_t *datetime)
 }
 
 /*!
+ * brief Sets the SNVS RTC alarm time in seconds.
+ *
+ * The function sets the RTC alarm. It also checks whether the specified alarm time
+ * is greater than the present time. If not, the function does not set the alarm
+ * and returns an error.
+ *
+ * param base      SNVS peripheral base address
+ * param alarmTime Alarm time in seconds
+ *
+ * return kStatus_Success: success in setting the SNVS RTC alarm
+ *         kStatus_Fail: Error because the alarm time has already passed
+ */
+status_t SNVS_HP_RTC_SetAlarmSeconds(SNVS_Type *base, uint32_t alarmSeconds)
+{
+    assert(alarmTime != NULL);
+
+    uint32_t currSeconds  = 0U;
+    uint32_t tmp          = base->HPCR;
+
+    currSeconds  = SNVS_HP_RTC_GetSeconds(base);
+
+    /* Return error if the alarm time has passed */
+    if (alarmSeconds < currSeconds)
+    {
+        return kStatus_Fail;
+    }
+
+    /* disable RTC alarm interrupt */
+    base->HPCR &= ~SNVS_HPCR_HPTA_EN_MASK;
+    while ((base->HPCR & SNVS_HPCR_HPTA_EN_MASK) != 0U)
+    {
+    }
+
+    /* Set alarm in seconds*/
+    base->HPTAMR = (uint32_t)(alarmSeconds >> 17U);
+    base->HPTALR = (uint32_t)(alarmSeconds << 15U);
+
+    /* reenable RTC alarm interrupt in case that it was enabled before */
+    base->HPCR = tmp;
+
+    return kStatus_Success;
+}
+
+/*!
  * brief Sets the SNVS RTC alarm time.
  *
  * The function sets the RTC alarm. It also checks whether the specified alarm time
@@ -457,6 +500,21 @@ status_t SNVS_HP_RTC_SetAlarm(SNVS_Type *base, const snvs_hp_rtc_datetime_t *ala
 }
 
 /*!
+ * brief Returns the SNVS RTC alarm time in seconds.
+ *
+ * param base     SNVS peripheral base address
+ */
+uint32_t SNVS_HP_RTC_GetAlarmSeconds(SNVS_Type *base)
+{
+    uint32_t alarmSeconds = 0U;
+
+    alarmSeconds = (base->HPTAMR << 17U);
+    alarmSeconds |= (base->HPTALR >> 15U);
+
+    return alarmSeconds;
+}
+
+/*!
  * brief Returns the SNVS RTC alarm time.
  *
  * param base     SNVS peripheral base address
@@ -466,13 +524,7 @@ void SNVS_HP_RTC_GetAlarm(SNVS_Type *base, snvs_hp_rtc_datetime_t *datetime)
 {
     assert(datetime != NULL);
 
-    uint32_t alarmSeconds = 0U;
-
-    /* Get alarm in seconds  */
-    alarmSeconds = (base->HPTAMR << 17U);
-    alarmSeconds |= (base->HPTALR >> 15U);
-
-    SNVS_HP_ConvertSecondsToDatetime(alarmSeconds, datetime);
+    SNVS_HP_ConvertSecondsToDatetime(SNVS_HP_RTC_GetAlarmSeconds(SNVS), datetime);
 }
 
 #if (defined(FSL_FEATURE_SNVS_HAS_SRTC) && (FSL_FEATURE_SNVS_HAS_SRTC > 0))
