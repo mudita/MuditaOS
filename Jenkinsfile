@@ -1,3 +1,20 @@
+def cancelPreviousBuilds() {
+
+    def jobName = env.JOB_NAME
+    def buildNumber = env.BUILD_NUMBER.toInteger()
+    def currentJob = Jenkins.instance.getItemByFullName(jobName)
+
+    for (def build : currentJob.builds) {
+        def exec = build.getExecutor()
+
+        /* Kill older jobs */
+        if (build.isBuilding() && build.number.toInteger() < buildNumber && exec != null) { 
+            def cause = { "Job stoped by #${buildNumber}" as String} as CauseOfInterruption
+            exec.interrupt(Result.ABORTED, cause)
+            println("Aborting previous build:#${build.number}")
+        }
+    }
+}
 pipeline {
   agent {
     node {
@@ -6,9 +23,16 @@ pipeline {
 
   }
   environment {
-    JOBS=5
+    JOBS=10
   }
   stages {
+    stage('Check for previous running builds') {
+        steps {
+            script {
+                cancelPreviousBuilds()
+            }
+        }
+    }
 
     stage('Initial checks') {
         environment {
@@ -73,16 +97,15 @@ ccache --show-stats'''
                 }         
             }
 
+            environment {
+                PATH="/usr/local/cmake-3.19.5-Linux-x86_64/bin:/usr/local/gcc-arm-none-eabi-10-2020-q4-major/bin:$PATH"
+                CCACHE_DIR="/ccache/Linux"
+            }
+
             steps {
                 echo "Build"
                 sh '''#!/bin/bash -e
-PATH="/usr/local/cmake-3.19.5-Linux-x86_64/bin:/usr/local/gcc-arm-none-eabi-10-2020-q4-major/bin:$PATH"
-export JOBS=${JOBS:-6}
-export CCACHE_DIR=/ccache/Linux
-
 echo "JOBS=${JOBS}"
-echo "\'workspace dir:${WORKSPACE}\'"
-
 pushd "${WORKSPACE}"
 echo "./configure.sh linux Debug -G Ninja"
 
@@ -90,6 +113,11 @@ echo "./configure.sh linux Debug -G Ninja"
 
 pushd build-linux-Debug
 ninja -j ${JOBS}
+popd'''
+                echo "Build Unit Tests"
+                sh '''#!/bin/bash -e
+pushd "${WORKSPACE}"
+pushd build-linux-Debug
 ninja -j ${JOBS} unittests
 popd
 popd'''
@@ -104,12 +132,8 @@ pushd "${WORKSPACE}"
 popd'''
                 echo "Run Unit Tests"
                 sh '''#!/bin/bash -e
-PATH="/usr/local/cmake-3.19.5-Linux-x86_64/bin:/usr/local/gcc-arm-none-eabi-10-2020-q4-major/bin:$PATH"
 export JOBS=${JOBS:-6}
-export CCACHE_DIR=/ccache/Linux
 echo "JOBS=${JOBS}"
-echo "\'workspace dir:${WORKSPACE}\'"
-
 pushd "${WORKSPACE}"
 ./tools/run_unittests.sh enabled_unittests
 ./tools/check_unittests.sh
@@ -117,10 +141,6 @@ pushd build-linux-Debug
 ./googletest-gui
 popd
 popd'''
-                echo "CCache stats"
-                sh '''#!/bin/bash
-export CCACHE_DIR=/ccache/Linux
-ccache --show-stats'''
             }
         }
         }
