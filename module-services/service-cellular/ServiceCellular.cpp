@@ -986,7 +986,7 @@ bool ServiceCellular::handle_audio_conf_procedure()
 auto ServiceCellular::handle(db::query::SMSSearchByTypeResult *response) -> bool
 {
     if (response->getResults().size() > 0) {
-        LOG_DEBUG("sending %ud last queued message(s)", static_cast<unsigned int>(response->getResults().size()));
+        LOG_DEBUG("sending %u last queued message(s)", static_cast<unsigned int>(response->getResults().size()));
         if (Store::GSM::get()->simCardInserted() == false) {
             auto message = std::make_shared<CellularSmsNoSimRequestMessage>();
             bus.sendUnicast(std::move(message), app::manager::ApplicationManager::ServiceName);
@@ -1378,10 +1378,10 @@ auto ServiceCellular::sendSMS(SMSRecord record) -> bool
         record.type = SMSType::OUTBOX;
     }
     else {
-        LOG_INFO("SMS sending failed.");
+        LOG_ERROR("SMS sending failed.");
         record.type = SMSType::FAILED;
-        if (checkSmsCenter(*channel)) {
-            LOG_ERROR("SMS center check");
+        if (!checkSmsCenter(*channel)) {
+            LOG_ERROR("SMS center check failed");
         }
     }
     DBServiceAPI::GetQuery(this, db::Interface::Name::SMS, std::make_unique<db::query::SMSUpdate>(std::move(record)));

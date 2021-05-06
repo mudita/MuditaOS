@@ -35,12 +35,6 @@ std::pair<bool, std::uint64_t> DBServiceAPI::GetQuery(sys::Service *serv,
 
     return std::make_pair(true, 0);
 }
-auto DBServiceAPI::ThreadGetByNumber(sys::Service *serv,
-                                     const utils::PhoneNumber::View &phoneNumber,
-                                     std::uint32_t timeout) -> std::unique_ptr<ThreadRecord>
-{
-    return nullptr;
-}
 
 auto DBServiceAPI::GetQueryWithReply(sys::Service *serv,
                                      db::Interface::Name database,

@@ -26,27 +26,6 @@
 
 struct NotesRecord;
 
-auto DBServiceAPI::ThreadGetByNumber(sys::Service *serv,
-                                     const utils::PhoneNumber::View &phoneNumber,
-                                     std::uint32_t timeout) -> std::unique_ptr<ThreadRecord>
-{
-    auto [code, msg] = DBServiceAPI::GetQueryWithReply(
-        serv, db::Interface::Name::SMSThread, std::make_unique<db::query::ThreadGetByNumber>(phoneNumber), timeout);
-
-    if (code == sys::ReturnCodes::Success && msg != nullptr) {
-        auto queryResponse = dynamic_cast<db::QueryResponse *>(msg.get());
-        assert(queryResponse != nullptr);
-
-        auto threadResponse = queryResponse->getResult();
-        auto threadResult   = dynamic_cast<db::query::ThreadGetByNumberResult *>(threadResponse.get());
-        assert(threadResult != nullptr);
-
-        return std::make_unique<ThreadRecord>(threadResult->getThread());
-    }
-
-    return nullptr;
-}
-
 auto DBServiceAPI::ContactGetByID(sys::Service *serv, uint32_t contactID) -> std::unique_ptr<std::vector<ContactRecord>>
 {
     ContactRecord rec;
