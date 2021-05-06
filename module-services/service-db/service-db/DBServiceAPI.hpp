@@ -47,11 +47,6 @@ class DBServiceAPI
         success
     };
 
-    [[deprecated]] static auto ThreadGetByNumber(sys::Service *serv,
-                                                 const utils::PhoneNumber::View &phoneNumber,
-                                                 std::uint32_t timeout = DefaultTimeoutInMs)
-        -> std::unique_ptr<ThreadRecord>;
-
     /**
      * Queries the database.
      * @param serv      Sender service.

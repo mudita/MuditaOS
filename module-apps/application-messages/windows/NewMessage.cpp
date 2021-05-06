@@ -126,6 +126,7 @@ namespace gui
             LOG_ERROR("Failed to send the SMS.");
             return false;
         }
+        setFocusItem(nullptr); // to make sure it is not possible to send text message multiple times
         return switchToThreadWindow(number.getView());
     }
 
@@ -142,22 +143,28 @@ namespace gui
 
     bool NewMessageWindow::switchToThreadWindow(const utils::PhoneNumber::View &number)
     {
-        auto thread = DBServiceAPI::ThreadGetByNumber(application, number, getThreadTimeout.count());
-        if (!thread) {
-            LOG_FATAL("No thread and thread not created!");
-            return false;
-        }
+        auto query = std::make_unique<db::query::ThreadGetByNumber>(number);
+        auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::SMSThread);
+        task->setCallback([this](auto response) {
+            const auto result = dynamic_cast<db::query::ThreadGetByNumberResult *>(response);
+            if (result == nullptr) {
+                return false;
+            }
+            // clear data only when message is sent
+            contact = nullptr;
+            phoneNumber.clear();
+            recipient->clear();
+            message->clear();
+            setFocusItem(body);
 
-        // clear data only when message is sent
-        contact = nullptr;
-        phoneNumber.clear();
-        recipient->clear();
-        message->clear();
-        setFocusItem(body);
+            const auto &thread = result->getThread();
+            auto switchData    = std::make_unique<SMSThreadData>(std::make_unique<ThreadRecord>(thread));
+            switchData->ignoreCurrentWindowOnStack = true;
+            application->switchWindow(gui::name::window::thread_view, std::move(switchData));
+            return true;
+        });
+        task->execute(application, this);
 
-        auto switchData                        = std::make_unique<SMSThreadData>(std::move(thread));
-        switchData->ignoreCurrentWindowOnStack = true;
-        application->switchWindow(gui::name::window::thread_view, std::move(switchData));
         return true;
     }
 
