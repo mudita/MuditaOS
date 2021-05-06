@@ -212,6 +212,8 @@ auto ServiceBluetooth::handle(message::bluetooth::SetDeviceName *msg) -> std::sh
     auto newName = msg->getName();
     bluetooth::set_name(newName);
     settingsHolder->setValue(bluetooth::Settings::DeviceName, newName);
+    sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::PowerOff));
+    sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::PowerOn));
     return sys::MessageNone{};
 }
 
