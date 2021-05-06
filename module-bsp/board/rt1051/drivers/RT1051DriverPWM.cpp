@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RT1051DriverPWM.hpp"
+#include "RT1051DriverPWMhelper.hpp"
 #include "log/log.hpp"
 #include "../board.h"
 #include <algorithm>
@@ -92,6 +93,16 @@ namespace drivers
         ForceLowOutput();
     }
 
+    RT1051DriverPWM::PwmState RT1051DriverPWM::GetPwmState()
+    {
+        if (PWM_GetPwmGeneratorState(base, 1 << pwmModule)) {
+            return PwmState::On;
+        }
+        else {
+            return PwmState::Off;
+        }
+    }
+
     void RT1051DriverPWM::SetupPWMChannel(PWMChannel channel)
     {
         switch (parameters.channel) {
@@ -141,10 +152,13 @@ namespace drivers
     void RT1051DriverPWM::UpdateClockFrequency(std::uint32_t newFrequency)
     {
         cpp_freertos::LockGuard lock(frequencyChangeMutex);
-        Stop();
+
         SetupPWMInstance(newFrequency);
-        SetDutyCycle(pwmSignalConfig.dutyCyclePercent);
-        Start();
+        if (GetPwmState() == PwmState::On) {
+            Stop();
+            SetDutyCycle(pwmSignalConfig.dutyCyclePercent);
+            Start();
+        }
     }
 
 } // namespace drivers
