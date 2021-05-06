@@ -25,7 +25,7 @@ namespace audio
         auto makeInputTranscodingStream(Source &source,
                                         Sink &sink,
                                         AudioFormat streamFormat,
-                                        transcode::Transform &transform)
+                                        std::shared_ptr<transcode::Transform>(transform))
             -> std::unique_ptr<transcode::InputTranscodeProxy>;
 
       private:

@@ -77,8 +77,8 @@ class NullTransform : public audio::transcode::Transform
 
 TEST(Transcode, Reset)
 {
-    auto mock = std::make_shared<MockStream>();
-    NullTransform nullTransform;
+    auto mock          = std::make_shared<MockStream>();
+    auto nullTransform = std::make_shared<NullTransform>();
 
     EXPECT_CALL(*mock, getInputTraits);
     audio::transcode::InputTranscodeProxy proxy(std::static_pointer_cast<::audio::AbstractStream>(mock), nullTransform);
@@ -92,8 +92,8 @@ TEST(Transcode, Push)
 {
     static std::uint8_t testData[testStreamSize]     = {0, 1, 2, 3, 4, 5, 6, 7};
     static std::uint8_t invertedData[testStreamSize] = {255, 254, 253, 252, 251, 250, 249, 248};
-    InverseTransform inv;
-    auto stream = std::make_shared<::testing::audio::TestStream>(testStreamSize);
+    auto inv                                         = std::make_shared<InverseTransform>();
+    auto stream                                      = std::make_shared<::testing::audio::TestStream>(testStreamSize);
     ::audio::transcode::InputTranscodeProxy transform(std::static_pointer_cast<::audio::AbstractStream>(stream), inv);
 
     transform.push(::audio::AbstractStream::Span{testData, testStreamSize});
@@ -102,8 +102,8 @@ TEST(Transcode, Push)
 
 TEST(Transcode, FailedPeek)
 {
-    NullTransform nullTransform;
-    auto mockStream = std::make_shared<MockStream>();
+    auto nullTransform = std::make_shared<NullTransform>();
+    auto mockStream    = std::make_shared<MockStream>();
 
     EXPECT_CALL(*mockStream, getInputTraits);
     ::audio::transcode::InputTranscodeProxy transform(std::static_pointer_cast<::audio::AbstractStream>(mockStream),
@@ -117,8 +117,8 @@ TEST(Transcode, FailedPeek)
 TEST(Transcode, Commit)
 {
     static std::uint8_t invertedData[testStreamSize] = {255, 254, 253, 252, 251, 250, 249, 248};
-    InverseTransform inv;
-    auto stream = std::make_shared<::testing::audio::TestStream>(testStreamSize);
+    auto inv                                         = std::make_shared<InverseTransform>();
+    auto stream                                      = std::make_shared<::testing::audio::TestStream>(testStreamSize);
     ::audio::transcode::InputTranscodeProxy transform(std::static_pointer_cast<::audio::AbstractStream>(stream), inv);
     ::audio::AbstractStream::Span span;
 
@@ -143,7 +143,7 @@ TEST(Transcode, Commit)
 TEST(Transcode, Traits)
 {
     auto testFormat = ::audio::AudioFormat(44100, 16, 1);
-    ::audio::transcode::MonoToStereo m2s;
+    auto m2s        = std::make_shared<::audio::transcode::MonoToStereo>();
     auto mockStream = std::make_shared<MockStream>();
 
     EXPECT_CALL(*mockStream, getInputTraits)
@@ -177,9 +177,9 @@ TEST(Transcode, Traits)
 
 TEST(Transcode, ListenersWrap)
 {
-    auto mock = std::make_shared<MockStream>();
+    auto mock          = std::make_shared<MockStream>();
+    auto nullTransform = std::make_shared<NullTransform>();
     MockStreamEventListener listener;
-    NullTransform nullTransform;
 
     EXPECT_CALL(*mock, getInputTraits);
     audio::transcode::InputTranscodeProxy proxy(std::static_pointer_cast<::audio::AbstractStream>(mock), nullTransform);

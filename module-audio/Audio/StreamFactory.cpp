@@ -62,19 +62,22 @@ auto StreamFactory::makeStream(Source &source, Sink &sink, AudioFormat streamFor
     return makeStream(source.getTraits(), sink.getTraits(), streamFormat);
 }
 
-auto makeInputTranscodingStream(Source &source, Sink &sink, AudioFormat streamFormat, Transform &transform)
+auto StreamFactory::makeInputTranscodingStream(Source &source,
+                                               Sink &sink,
+                                               AudioFormat streamFormat,
+                                               std::shared_ptr<Transform>(transform))
     -> std::unique_ptr<InputTranscodeProxy>
 {
-#if 0
     auto sourceTraits = source.getTraits();
 
     if (sourceTraits.blockSizeConstraint.has_value()) {
-        sourceTraits.blockSizeConstraint = transform.transformBlockSize(sourceTraits.blockSizeConstraint.value());
+        sourceTraits.blockSizeConstraint = transform->transformBlockSize(sourceTraits.blockSizeConstraint.value());
     }
 
-    auto stream = makeStream(sourceTraits, sink.getTraits(), streamFormat);
-#endif
-    return nullptr;
+    auto stream            = makeStream(sourceTraits, sink.getTraits(), streamFormat);
+    auto transcodingStream = std::make_unique<InputTranscodeProxy>(std::move(stream), transform);
+
+    return transcodingStream;
 }
 
 auto StreamFactory::getBlockSizeConstraint(std::initializer_list<audio::Endpoint::Traits> traitsList) const

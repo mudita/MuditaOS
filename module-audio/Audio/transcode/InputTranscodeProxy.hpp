@@ -23,7 +23,8 @@ namespace audio::transcode
          * @param wrappedStream
          * @param transform to apply on the input
          */
-        explicit InputTranscodeProxy(std::shared_ptr<AbstractStream> wrappedStream, Transform &transform) noexcept;
+        explicit InputTranscodeProxy(std::shared_ptr<AbstractStream> wrappedStream,
+                                     std::shared_ptr<Transform> transform) noexcept;
 
         bool push(const Span &span) override;
         void commit() override;
@@ -31,7 +32,7 @@ namespace audio::transcode
         [[nodiscard]] auto getInputTraits() const noexcept -> Traits override;
 
       private:
-        Transform &transform;
+        std::shared_ptr<Transform> transform;
         Span peekedSpan;
         std::size_t transcodingSpaceSize;
         std::shared_ptr<std::uint8_t[]> transcodingSpace;
