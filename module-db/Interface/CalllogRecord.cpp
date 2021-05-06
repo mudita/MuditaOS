@@ -41,6 +41,13 @@ std::ostream &operator<<(std::ostream &out, const CalllogRecord &rec)
     return out;
 }
 
+[[nodiscard]] std::string CalllogRecord::str() const
+{
+    std::ostringstream ss;
+    ss << *this;
+    return ss.str();
+}
+
 CalllogRecordInterface::CalllogRecordInterface(CalllogDB *calllogDb, ContactsDB *contactsDb)
     : calllogDB(calllogDb), contactsDB(contactsDb)
 {}
@@ -63,7 +70,7 @@ bool CalllogRecordInterface::Add(const CalllogRecord &rec)
         if (localRec.presentation == PresentationType::PR_UNKNOWN) {
             localRec.presentation = PresentationType::PR_ALLOWED;
         }
-        LOG_DEBUG("Adding call log record %s", utils::to_string(localRec).c_str());
+        LOG_DEBUG("Adding call log record %s", localRec.str().c_str());
     }
     else {
         // private number so do not add contact just call log entry

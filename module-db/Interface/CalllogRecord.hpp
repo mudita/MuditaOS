@@ -27,6 +27,7 @@ struct CalllogRecord : public Record
     bool isRead                          = true;
 
     friend std::ostream &operator<<(std::ostream &out, const CalllogRecord &point);
+    [[nodiscard]] std::string str() const;
 
     CalllogRecord()  = default;
     CalllogRecord(const CalllogTableRow &tableRow);
