@@ -5,6 +5,8 @@
 
 #include "Endpoint.hpp"
 #include "Stream.hpp"
+#include "transcode/Transform.hpp"
+#include "transcode/InputTranscodeProxy.hpp"
 
 #include <initializer_list>
 #include <optional>
@@ -18,17 +20,25 @@ namespace audio
       public:
         StreamFactory() = default;
         explicit StreamFactory(std::chrono::milliseconds operationPeriodRequirement);
+
         auto makeStream(Source &source, Sink &sink, AudioFormat streamFormat) -> std::unique_ptr<Stream>;
+        auto makeInputTranscodingStream(Source &source,
+                                        Sink &sink,
+                                        AudioFormat streamFormat,
+                                        transcode::Transform &transform)
+            -> std::unique_ptr<transcode::InputTranscodeProxy>;
 
       private:
+        using Traits = audio::Endpoint::Traits;
+
         static constexpr auto defaultBuffering = 2U;
 
-        auto getBlockSizeConstraint(std::initializer_list<audio::Endpoint::Traits> traitsList) const
-            -> std::optional<std::size_t>;
+        auto makeStream(Traits sourceTraits, Traits sinkTraits, AudioFormat streamFormat) -> std::unique_ptr<Stream>;
+
+        auto getBlockSizeConstraint(std::initializer_list<Traits> traitsList) const -> std::optional<std::size_t>;
         auto getTimingConstraints(std::initializer_list<std::optional<std::chrono::milliseconds>> timingConstraints)
             const -> std::chrono::milliseconds;
-        auto negotiateAllocator(std::initializer_list<audio::Endpoint::Traits> traitsList) noexcept
-            -> Stream::Allocator &;
+        auto negotiateAllocator(std::initializer_list<Traits> traitsList) noexcept -> Stream::Allocator &;
 
         std::optional<std::chrono::milliseconds> periodRequirement = std::nullopt;
 
