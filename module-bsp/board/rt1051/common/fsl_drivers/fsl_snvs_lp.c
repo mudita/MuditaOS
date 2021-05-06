@@ -55,17 +55,6 @@ static uint32_t SNVS_LP_ConvertDatetimeToSeconds(const snvs_lp_srtc_datetime_t *
  */
 static void SNVS_LP_ConvertSecondsToDatetime(uint32_t seconds, snvs_lp_srtc_datetime_t *datetime);
 
-/*!
- * @brief Returns SRTC time in seconds.
- *
- * This function is used internally to get actual SRTC time in seconds.
- *
- * @param base SNVS peripheral base address
- *
- * @return SRTC time in seconds
- */
-static uint32_t SNVS_LP_SRTC_GetSeconds(SNVS_Type *base);
-
 #if (!(defined(FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL) && FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL) && \
      defined(SNVS_LP_CLOCKS))
 /*!
@@ -336,7 +325,14 @@ void SNVS_LP_SRTC_GetDefaultConfig(snvs_lp_srtc_config_t *config)
     config->srtcCalValue  = 0U;
 }
 
-static uint32_t SNVS_LP_SRTC_GetSeconds(SNVS_Type *base)
+/*!
+ * brief Gets the SNVS SRTC actual date and time in seconds.
+ *
+ * param base     SNVS peripheral base address
+ *
+ * return SRTC actual date and time in seconds.
+ */
+uint32_t SNVS_LP_SRTC_GetSeconds(SNVS_Type *base)
 {
     uint32_t seconds = 0;
     uint32_t tmp     = 0;
@@ -350,6 +346,33 @@ static uint32_t SNVS_LP_SRTC_GetSeconds(SNVS_Type *base)
     } while (tmp != seconds);
 
     return seconds;
+}
+
+/*!
+ * brief Sets the SNVS SRTC date and time provided in seconds.
+ *
+ * param base     SNVS peripheral base address
+ * param seconds  Date and time in seconds.
+ *
+ * return kStatus_Success: Success in setting the time and starting the SNVS SRTC
+ */
+status_t SNVS_LP_SRTC_SetSeconds(SNVS_Type *base, uint32_t seconds)
+{
+    uint32_t tmp = base->LPCR;
+
+    /* disable RTC */
+    SNVS_LP_SRTC_StopTimer(base);
+
+    base->LPSRTCMR = (uint32_t)(seconds >> 17U);
+    base->LPSRTCLR = (uint32_t)(seconds << 15U);
+
+    /* reenable SRTC in case that it was enabled before */
+    if ((tmp & SNVS_LPCR_SRTC_ENV_MASK) != 0U)
+    {
+        SNVS_LP_SRTC_StartTimer(base);
+    }
+
+    return kStatus_Success;
 }
 
 /*!

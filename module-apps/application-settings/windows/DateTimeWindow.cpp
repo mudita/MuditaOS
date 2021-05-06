@@ -177,8 +177,7 @@ namespace gui
     }
 
     void DateTimeWindow::onBeforeShow(ShowMode mode, SwitchData *data)
-    {
-    }
+    {}
 
     gui::Label *DateTimeWindow::addSpacer(const UTF8 &text)
     {
@@ -372,7 +371,7 @@ namespace gui
             LOG_ERROR("DateTimeWindow::setRTC: %s", e.what());
         }
 
-        bsp::rtc_SetDateTime(&timeinfo);
+        bsp::rtc::setDateTime(&timeinfo);
         application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
     }
 

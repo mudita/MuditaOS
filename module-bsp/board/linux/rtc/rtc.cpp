@@ -1,197 +1,141 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-/*
- * rtc.cpp
- *
- *  Created on: Jun 26, 2019
- *      Author: kuba
- */
-
-#include "bsp/rtc/rtc.hpp"
+#include <bsp/rtc/rtc.hpp>
+#include <FreeRTOS.h>
+#include <task.h>
+#include <queue.h>
 #include <time.h>
 
-extern "C"
+namespace
 {
-#include "FreeRTOS.h"
-#include "task.h"
-#include "queue.h"
-}
+    time_t timestampOffset;
+    time_t timestampAlarm;
+    time_t localOffset;
+    xQueueHandle qHandleRtcIrq   = NULL;
+    TaskHandle_t rtcWorkerHandle = NULL;
 
-static time_t timestampOffset;
-static time_t timestampAlarm;
-time_t localOffset;
-static xQueueHandle qHandleRtcIrq   = NULL;
-static TaskHandle_t rtcWorkerHandle = NULL;
+    void rtcWorker(void *pvp)
+    {
+        while (true) {
+            time_t current;
+            bsp::rtc::getCurrentTimestamp(&current);
 
-static void rtc_worker(void *pvp);
+            std::uint8_t notification;
+            if (current == timestampAlarm) {
+                notification = static_cast<std::uint8_t>(bsp::rtc::IrqNotification::AlarmOccurred);
+                xQueueSend(qHandleRtcIrq, &notification, 100);
+            }
+            vTaskDelay(1000);
+        }
+    }
+} // namespace
 
-namespace bsp
+namespace bsp::rtc
 {
-
-    RtcBspError_e rtc_Init(xQueueHandle qHandle)
+    ErrorCode init(xQueueHandle qHandle)
     {
         qHandleRtcIrq   = qHandle;
         timestampOffset = 0;
         timestampAlarm  = 0;
 
-        xTaskCreate(rtc_worker, "rtc_worker", 512, qHandle, 0, &rtcWorkerHandle);
-        return RtcBspOK;
+        xTaskCreate(rtcWorker, "rtc_worker", 512, qHandle, 0, &rtcWorkerHandle);
+        return ErrorCode::OK;
     }
 
-    RtcBspError_e rtc_SetDateTimeFromTimestamp(time_t timestamp)
+    ErrorCode setDateTimeFromTimestamp(time_t timestamp)
     {
-
         time_t current   = time(NULL);
         struct tm *local = localtime(&current);
 
         localOffset = local->tm_gmtoff;
 
         timestampOffset = timestamp - current;
-        return RtcBspOK;
+        return ErrorCode::OK;
     }
 
-    RtcBspError_e rtc_SetDateTime(struct tm *tim)
+    ErrorCode setDateTime(struct tm *tim)
     {
 
         time_t current   = time(NULL);
         time_t timestamp = mktime(tim);
 
         timestampOffset = timestamp - current;
-        return RtcBspOK;
+        return ErrorCode::OK;
     }
 
-    RtcBspError_e rtc_GetCurrentDateTime(struct tm *datetime)
+    ErrorCode getCurrentDateTime(struct tm *datetime)
     {
         time_t t = time(NULL);
         t += timestampOffset;
         *datetime = *gmtime(&t);
 
-        return RtcBspOK;
+        return ErrorCode::OK;
     }
 
-    RtcBspError_e rtc_GetCurrentTimestamp(time_t *timestamp)
+    ErrorCode getCurrentTimestamp(time_t *timestamp)
     {
         *timestamp = time(NULL) + timestampOffset;
 
-        return RtcBspOK;
+        return ErrorCode::OK;
     }
 
-    RtcBspError_e rtc_SetAlarmOnDate(struct tm *datetime)
+    ErrorCode setAlarmOnDate(struct tm *datetime)
     {
         if (datetime == NULL) {
-            return RtcBspError;
+            return ErrorCode::Error;
         }
 
-        return RtcBspOK;
+        return ErrorCode::OK;
     }
 
-    RtcBspError_e rtc_SetAlarmOnTimestamp(uint32_t secs)
+    ErrorCode setAlarmOnTimestamp(std::uint32_t secs)
     {
         timestampAlarm = secs;
-        return RtcBspOK;
+        return ErrorCode::OK;
     }
 
-    RtcBspError_e rtc_SetAlarmInSecondsFromNow(uint32_t secs)
+    ErrorCode setAlarmInSecondsFromNow(std::uint32_t secs)
     {
         time_t current;
-        if (rtc_GetCurrentTimestamp(&current) != RtcBspOK)
-            return RtcBspError;
+        if (getCurrentTimestamp(&current) != ErrorCode::OK)
+            return ErrorCode::Error;
 
         current += secs;
 
-        if (rtc_SetAlarmOnTimestamp(current) != RtcBspOK)
-            return RtcBspError;
+        if (setAlarmOnTimestamp(current) != ErrorCode::OK)
+            return ErrorCode::Error;
 
-        return RtcBspOK;
+        return ErrorCode::OK;
     }
 
-    RtcBspError_e rtc_GetAlarmTimestamp(uint32_t *secs)
+    ErrorCode getAlarmTimestamp(std::uint32_t *secs)
     {
         if (secs == NULL) {
-            return RtcBspError;
+            return ErrorCode::Error;
         }
 
-        return RtcBspOK;
+        return ErrorCode::OK;
     }
 
-    RtcBspError_e rtc_EnableAlarmIrq()
+    ErrorCode enableAlarmIrq()
     {
-        uint32_t cnt = 100000;
+        std::uint32_t cnt = 100000;
 
         if (cnt == 0) {
-            return RtcBspError;
+            return ErrorCode::Error;
         }
 
-        return RtcBspOK;
-    }
-    // TODO delete function if it will not be used in service
-    RtcBspError_e rtc_DisableAlarmIrq()
-    {
-        return RtcBspOK;
-    }
-    // TODO delete function if it will not be used in service
-    RtcBspError_e zrtc_MaskAlarmIrq()
-    {
-        return RtcBspOK;
-    }
-    // TODO delete function if it will not be used in service
-    RtcBspError_e rtc_UnmaskAlarmIrq()
-    {
-        return RtcBspOK;
+        return ErrorCode::OK;
     }
 
-    time_t rtc_GetSecondCounter()
+    ErrorCode setMinuteAlarm(time_t timestamp)
     {
-        time_t seconds = 0;
-        time_t tmp     = 0;
-        do {
-
-        } while (tmp != seconds);
-
-        return seconds;
-    }
-
-    RtcBspError_e rtc_SetMinuteAlarm(time_t timestamp)
-    {
-        uint32_t secondsToMinute = 60 - (timestamp % 60);
+        std::uint32_t secondsToMinute = 60 - (timestamp % 60);
 
         struct tm date;
-        rtc_GetCurrentDateTime(&date);
+        getCurrentDateTime(&date);
 
-        return rtc_SetAlarmInSecondsFromNow(secondsToMinute);
+        return setAlarmInSecondsFromNow(secondsToMinute);
     }
-} // namespace bsp
-
-static void rtc_worker(void *pvp)
-{
-    while (1) {
-        time_t current;
-        bsp::rtc_GetCurrentTimestamp(&current);
-
-        uint8_t notification;
-        if (current == timestampAlarm) {
-            notification = static_cast<uint8_t>(bsp::rtcIrqNotifications::alarmOcured);
-            xQueueSend(qHandleRtcIrq, &notification, 100);
-        }
-        vTaskDelay(1000);
-    }
-}
-
-// TODO delete function if it will not be used in service
-void SNVS_HP_WRAPPER_IRQHandler()
-{
-    /// HERE on TICK set_time timer monotonic
-    /// gmtime    <- based on timer monotonic
-    /// localtime <- based on timer monotonic
-    /// timezone  <- can be based on offset between two if one super wishes... (+1, +2 etc... )
-}
-/*
- *  **********************************************************************************************************************
- *  * *
- *  * *
- *  *                             SNVS RTC DRIVER STATIC FUNCTIONS COPIED FOR OUR USE *
- *  * *
- *  * *
- *  **********************************************************************************************************************
- */
+} // namespace bsp::rtc
