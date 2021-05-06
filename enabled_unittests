@@ -299,6 +299,7 @@ TESTS_LIST["catch2-utils"]="
     Get value from string;
     Swap endianness;
     Floating point to string;
+    Integer types to string;
     Fill leading digit in string;
     Hex to bytes;
     Bytes to hex;

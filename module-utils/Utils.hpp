@@ -22,7 +22,7 @@ namespace utils
 
     std::string bytesToHex(const std::vector<std::uint8_t> &bytes);
     std::vector<std::uint8_t> hexToBytes(const std::string &hex);
-    // template <typename T> std::string numToHex(T c);
+
     template <typename T> std::string numToHex(T c)
     {
         std::stringstream s;
@@ -72,14 +72,12 @@ namespace utils
         return base;
     }
 
-    template <typename T> std::string to_string(T t)
+    template <typename T>[[nodiscard]] std::string to_string(T t)
     {
-        std::ostringstream ss;
-        ss << t;
-        return ss.str();
+        return std::to_string(t);
     }
 
-    template <> inline std::string to_string<long double>(long double t)
+    template <>[[nodiscard]] inline std::string to_string<long double>(long double t)
     {
         uint32_t precision = 6;
         int base           = static_cast<int>(t);
@@ -115,14 +113,28 @@ namespace utils
         return baseAsStr + "." + fractionalAsStr;
     }
 
-    template <> inline std::string to_string<float>(float t)
+    template <>[[nodiscard]] inline std::string to_string<float>(float t)
     {
-        return to_string((long double)(t));
+        return to_string(static_cast<long double>(t));
     }
 
-    template <> inline std::string to_string<double>(double t)
+    template <>[[nodiscard]] inline std::string to_string<double>(double t)
     {
-        return to_string((long double)(t));
+        return to_string(static_cast<long double>(t));
+    }
+
+    template <>[[nodiscard]] inline std::string to_string<std::int64_t>(std::int64_t value)
+    {
+        std::ostringstream ss;
+        ss << value;
+        return ss.str();
+    }
+
+    template <>[[nodiscard]] inline std::string to_string<std::uint64_t>(std::uint64_t value)
+    {
+        std::ostringstream ss;
+        ss << value;
+        return ss.str();
     }
 
     template <typename T>[[nodiscard]] const std::string enumToString(const T &t)

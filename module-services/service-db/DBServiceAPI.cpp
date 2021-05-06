@@ -180,7 +180,7 @@ auto DBServiceAPI::CalllogAdd(sys::Service *serv, const CalllogRecord &rec) -> C
 {
     std::shared_ptr<DBCalllogMessage> msg = std::make_shared<DBCalllogMessage>(MessageType::DBCalllogAdd, rec);
 
-    LOG_DEBUG("CalllogAdd %s", utils::to_string(rec).c_str());
+    LOG_DEBUG("CalllogAdd %s", rec.str().c_str());
 
     auto ret             = serv->bus.sendUnicastSync(msg, service::name::db, DefaultTimeoutInMs);
     auto calllogResponse = dynamic_cast<DBCalllogResponseMessage *>(ret.second.get());
@@ -219,7 +219,7 @@ auto DBServiceAPI::CalllogUpdate(sys::Service *serv, const CalllogRecord &rec) -
 {
     std::shared_ptr<DBCalllogMessage> msg = std::make_shared<DBCalllogMessage>(MessageType::DBCalllogUpdate, rec);
 
-    LOG_DEBUG("CalllogUpdate %s", utils::to_string(rec).c_str());
+    LOG_DEBUG("CalllogUpdate %s", rec.str().c_str());
 
     auto ret             = serv->bus.sendUnicastSync(msg, service::name::db, DefaultTimeoutInMs);
     auto calllogResponse = dynamic_cast<DBCalllogResponseMessage *>(ret.second.get());

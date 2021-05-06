@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <cstring>
@@ -261,6 +261,90 @@ TEST_CASE("Floating point to string")
     }
 }
 
+TEST_CASE("Integer types to string")
+{
+    GIVEN("Uint8 equals to zero")
+    {
+        constexpr std::uint8_t value = 0;
+        REQUIRE(utils::to_string(value) == "0");
+    }
+    GIVEN("Uint8 equals to max")
+    {
+        constexpr std::uint8_t value = std::numeric_limits<std::uint8_t>::max();
+        REQUIRE(utils::to_string(value) == "255");
+    }
+    GIVEN("Int8 equals to zero")
+    {
+        constexpr std::int8_t value = 0;
+        REQUIRE(utils::to_string(value) == "0");
+    }
+    GIVEN("Int8 equals to max")
+    {
+        constexpr std::int8_t value = std::numeric_limits<std::int8_t>::max();
+        REQUIRE(utils::to_string(value) == "127");
+    }
+    GIVEN("Uint16t equals to zero")
+    {
+        constexpr std::uint16_t value = 0;
+        REQUIRE(utils::to_string(value) == "0");
+    }
+    GIVEN("Uint16t equals to max")
+    {
+        constexpr std::uint16_t value = std::numeric_limits<std::uint16_t>::max();
+        REQUIRE(utils::to_string(value) == "65535");
+    }
+    GIVEN("Int16t equals to zero")
+    {
+        constexpr std::int16_t value = 0;
+        REQUIRE(utils::to_string(value) == "0");
+    }
+    GIVEN("Int16t equals to max")
+    {
+        constexpr std::int16_t value = std::numeric_limits<std::int16_t>::max();
+        REQUIRE(utils::to_string(value) == "32767");
+    }
+    GIVEN("Uint32t equals to zero")
+    {
+        constexpr std::uint32_t value = 0;
+        REQUIRE(utils::to_string(value) == "0");
+    }
+    GIVEN("Uint32 equals to max")
+    {
+        constexpr std::uint32_t value = std::numeric_limits<std::uint32_t>::max();
+        REQUIRE(utils::to_string(value) == "4294967295");
+    }
+    GIVEN("Int32t equals to zero")
+    {
+        constexpr std::int32_t value = 0;
+        REQUIRE(utils::to_string(value) == "0");
+    }
+    GIVEN("Int32 equals to max")
+    {
+        constexpr std::int32_t value = std::numeric_limits<std::int32_t>::max();
+        REQUIRE(utils::to_string(value) == "2147483647");
+    }
+    GIVEN("Int64 equals to zero")
+    {
+        constexpr std::int64_t value = 0;
+        REQUIRE(utils::to_string(value) == "0");
+    }
+    GIVEN("Int64 equals to max")
+    {
+        constexpr std::int64_t value = std::numeric_limits<std::int64_t>::max();
+        REQUIRE(utils::to_string(value) == "9223372036854775807");
+    }
+    GIVEN("Uint64 equals to zero")
+    {
+        constexpr std::uint64_t value = 0;
+        REQUIRE(utils::to_string(value) == "0");
+    }
+    GIVEN("Uint64 equals to max")
+    {
+        constexpr std::uint64_t value = std::numeric_limits<std::uint64_t>::max();
+        REQUIRE(utils::to_string(value) == "18446744073709551615");
+    }
+}
+
 TEST_CASE("Fill leading digit in string")
 {
     std::string test = "45";
@@ -328,15 +412,7 @@ TEST_CASE("Hex to bytes")
 
     SECTION("Out of hex")
     {
-
-        bool isthrow = false;
-        try {
-            auto b = utils::hexToBytes("deAdbEZZ");
-        }
-        catch (const std::invalid_argument &ia) {
-            isthrow = true;
-        }
-        REQUIRE(isthrow);
+        REQUIRE_THROWS_AS(utils::hexToBytes("deAdbEZZ"), std::invalid_argument);
     }
 }
 
