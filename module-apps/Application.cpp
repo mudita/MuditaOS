@@ -268,6 +268,13 @@ namespace app
         }
     }
 
+    void Application::popCurrentWindow()
+    {
+        if (!windowsStack.stack.empty()) {
+            windowsStack.stack.pop_back();
+        }
+    }
+
     void Application::refreshWindow(gui::RefreshModes mode)
     {
         if (not windowsStack.isEmpty()) {
