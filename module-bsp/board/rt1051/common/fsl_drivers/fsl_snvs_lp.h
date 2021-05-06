@@ -192,6 +192,25 @@ void SNVS_LP_SRTC_GetDefaultConfig(snvs_lp_srtc_config_t *config);
  */
 
 /*!
+ * @brief Gets the SNVS SRTC actual date and time in seconds.
+ *
+ * @param base     SNVS peripheral base address
+ *
+ * @return SRTC actual date and time in seconds.
+ */
+uint32_t SNVS_LP_SRTC_GetSeconds(SNVS_Type *base);
+
+/*!
+ * @brief Sets the SNVS SRTC date and time provided in seconds.
+ *
+ * @param base     SNVS peripheral base address
+ * @param seconds  Date and time in seconds.
+ *
+ * @return kStatus_Success: Success in setting the time and starting the SNVS SRTC
+ */
+status_t SNVS_LP_SRTC_SetSeconds(SNVS_Type *base, uint32_t seconds);
+
+/*!
  * @brief Sets the SNVS SRTC date and time according to the given time structure.
  *
  * @param base     SNVS peripheral base address

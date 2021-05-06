@@ -21,8 +21,8 @@ namespace utils::internal::syscalls
             return -1;
         }
         time_t curtime;
-        auto err = bsp::rtc_GetCurrentTimestamp(&curtime);
-        if (err != RtcBspOK) {
+        auto err = bsp::rtc::getCurrentTimestamp(&curtime);
+        if (err != bsp::rtc::ErrorCode::OK) {
             _errno_ = EIO;
             return -1;
         }

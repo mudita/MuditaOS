@@ -176,7 +176,7 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
             if (auto msg = dynamic_cast<CellularTimeNotificationMessage *>(msgl)) {
                 if (auto time = msg->getTime(); time) {
                     LOG_INFO("RTC set by network time.");
-                    bsp::rtc_SetDateTime(&time.value());
+                    bsp::rtc::setDateTime(&time.value());
                 }
                 if (auto timeZoneOffset = msg->getTimeZoneOffset(); timeZoneOffset) {
                     setSettingsTimeZone(msg->getTimeZoneString().value());
@@ -263,8 +263,8 @@ sys::ReturnCodes EventManager::InitHandler()
     });
     connect(sevm::RtcUpdateTimeMessage(0), [&](sys::Message *msgl) {
         auto msg = static_cast<sevm::RtcUpdateTimeMessage *>(msgl);
-        bsp::rtc_SetDateTimeFromTimestamp(msg->getTime());
-        bsp::rtc_SetMinuteAlarm(msg->getTime());
+        bsp::rtc::setDateTimeFromTimestamp(msg->getTime());
+        bsp::rtc::setMinuteAlarm(msg->getTime());
         handleMinuteUpdate(msg->getTime());
         return sys::msgHandled();
     });
