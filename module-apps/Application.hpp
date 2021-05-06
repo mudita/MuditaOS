@@ -236,6 +236,9 @@ namespace app
         ///@param ignoredWindowsNumber: defines how many windows will be skipped while going back on stack
         void returnToPreviousWindow(const uint32_t times = 1);
 
+        /// Pops the current window from the windows stack
+        void popCurrentWindow();
+
         /// Method refreshing active window
         void refreshWindow(gui::RefreshModes mode);
 

@@ -148,7 +148,7 @@ auto PhonebookModel::getItem(gui::Order order) -> gui::ListItem *
             if (item->contact && !item->contact->numbers.empty()) {
                 const auto phoneNumber = item->contact->numbers.front().number;
                 return app::manager::Controller::sendAction(application,
-                                                            app::manager::actions::Dial,
+                                                            app::manager::actions::Call,
                                                             std::make_unique<app::ExecuteCallData>(phoneNumber),
                                                             app::manager::OnSwitchBehaviour::RunInBackground);
             }

@@ -412,6 +412,7 @@ namespace gui
             LOG_DEBUG("Delayed exit timer callback");
             setState(State::IDLE);
             app::manager::Controller::switchBack(application);
+            application->popCurrentWindow();
             return true;
         };
         delayedExitTimer =
