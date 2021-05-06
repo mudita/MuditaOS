@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "OptionWindow.hpp"
+#include "BaseSettingsWindow.hpp"
 #include "Application.hpp"
 
 namespace app::settingsInterface
@@ -20,10 +20,10 @@ namespace gui
         inline constexpr auto network_window = "Network";
     };
 
-    class NetworkWindow : public OptionWindow
+    class NetworkWindow : public BaseSettingsWindow
     {
       private:
-        auto netOptList() -> std::list<gui::Option>;
+        auto buildOptionsList() -> std::list<Option>;
         app::settingsInterface::SimParams *simParams;
         app::settingsInterface::OperatorsSettings *operatorsSettings;
 

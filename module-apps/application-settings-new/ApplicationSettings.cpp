@@ -131,7 +131,7 @@ namespace app
             }
             auto currentWindow = getCurrentWindow();
             if (gui::window::name::network == currentWindow->getName()) {
-                currentWindow->rebuild();
+                updateWindow(gui::window::name::network, nullptr);
             }
         }
 

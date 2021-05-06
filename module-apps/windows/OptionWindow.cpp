@@ -98,6 +98,17 @@ namespace gui
         setFocusItem(optionsList);
     }
 
+    top_bar::Configuration OptionWindow::configureTopBar(top_bar::Configuration appConfiguration)
+    {
+        appConfiguration.enable(top_bar::Indicator::NetworkAccessTechnology);
+        appConfiguration.enable(top_bar::Indicator::Time);
+        appConfiguration.enable(top_bar::Indicator::PhoneMode);
+        appConfiguration.enable(top_bar::Indicator::Battery);
+        appConfiguration.enable(top_bar::Indicator::Signal);
+        appConfiguration.enable(top_bar::Indicator::SimCard);
+        return appConfiguration;
+    }
+
     void OptionWindow::onClose()
     {
         optionsList->onClose();
