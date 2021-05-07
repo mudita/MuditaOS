@@ -234,9 +234,10 @@ TEST(Transform, MonoToStereo)
 
 TEST(Transform, Composite)
 {
-    audio::transcode::MonoToStereo m2s;
-    InverseTransform inv;
-    audio::transcode::TransformComposite composite{&inv, &m2s};
+    auto m2s = std::make_shared<audio::transcode::MonoToStereo>();
+    auto inv = std::make_shared<InverseTransform>();
+    audio::transcode::TransformComposite composite(
+        std::vector<std::shared_ptr<::audio::transcode::Transform>>{m2s, inv});
     static std::uint16_t inputBuffer[8] = {0, 1, 2, 3, 4, 5, 6, 7};
     static std::uint16_t outputBuffer[16];
     static std::uint16_t expectedResult[] = {
