@@ -7,7 +7,7 @@
 
 #include <Audio/AudioFormat.hpp>
 
-#include <initializer_list>
+#include <memory>
 #include <vector>
 
 namespace audio::transcode
@@ -24,7 +24,7 @@ namespace audio::transcode
          *
          * @param children - transforms to be executed on each transform call.
          */
-        TransformComposite(std::initializer_list<Transform *> children);
+        TransformComposite(std::vector<std::shared_ptr<Transform>> children);
 
         auto transform(const Span &span, const Span &transformSpace) const -> Span override;
         auto getTransformSize(std::size_t inputBufferSize) const noexcept -> std::size_t override;
@@ -34,7 +34,7 @@ namespace audio::transcode
         auto transformBlockSizeInversed(std::size_t blockSize) const noexcept -> std::size_t override;
 
       private:
-        std::vector<Transform *> children;
+        std::vector<std::shared_ptr<Transform>> children;
     };
 
 } // namespace audio::transcode

@@ -7,12 +7,13 @@
 #include <Audio/AudioFormat.hpp>
 
 #include <algorithm>
+#include <memory>
 #include <initializer_list>
 
 using audio::transcode::Transform;
 using audio::transcode::TransformComposite;
 
-TransformComposite::TransformComposite(std::initializer_list<Transform *> transforms) : children(transforms)
+TransformComposite::TransformComposite(std::vector<std::shared_ptr<Transform>> transforms) : children(transforms)
 {}
 
 auto TransformComposite::transform(const Span &input, const Span &conversionSpace) const -> Span

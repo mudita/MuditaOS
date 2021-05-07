@@ -6,6 +6,7 @@
 #include "MonoToStereo.hpp"
 #include "BasicDecimator.hpp"
 #include "BasicInterpolator.hpp"
+#include "TransformComposite.hpp"
 
 #include <algorithm>
 #include <memory>
@@ -38,11 +39,14 @@ auto TransformFactory::makeTransform(AudioFormat sourceFormat, AudioFormat sinkF
     }
 
     // create composite
-    if (transforms.size() != 1) {
-        return nullptr;
+    if (transforms.size() == 1) {
+        return std::move(transforms[0]);
     }
-
-    return std::move(transforms[0]);
+    else {
+        auto transformsListForComposite = std::vector<std::shared_ptr<Transform>>{};
+        std::move(std::begin(transforms), std::end(transforms), std::back_inserter(transformsListForComposite));
+        return std::make_unique<audio::transcode::TransformComposite>(transformsListForComposite);
+    }
 }
 
 auto TransformFactory::getSamplerateTransform(AudioFormat sourceFormat, AudioFormat sinkFormat) const
@@ -67,6 +71,16 @@ auto TransformFactory::getSamplerateTransform(AudioFormat sourceFormat, AudioFor
         throw std::invalid_argument("Sample rate conversion with bit width other than 16 is not supported");
     }
 
+    if (sourceFormat.getChannels() != 1) {
+        throw std::invalid_argument("Sample rate conversion supported with mono only");
+    }
+
+    if (sourceRate > sinkRate) {
+        return std::make_unique<audio::transcode::BasicDecimator<uint16_t, 1, 2>>();
+    }
+    else {
+        return std::make_unique<audio::transcode::BasicInterpolator<uint16_t, 1, 2>>();
+    }
 }
 
 auto TransformFactory::getChannelsTransform(AudioFormat sourceFormat, AudioFormat sinkFormat) const
