@@ -40,6 +40,7 @@ target_sources( ${PROJECT_NAME}
 
     PUBLIC
         "ApplicationMessages.hpp"
+        "Constants.hpp"
         "data/MessagesStyle.hpp"
         "models/ThreadsModel.hpp"
         "models/SMSThreadModel.hpp"

@@ -30,7 +30,7 @@ namespace gui
 
         // method hides or show widgets and sets bars according to provided state
         void setVisibleState();
-        auto setActiveState() -> bool;
+        void setActiveState();
         bool processLongReleaseEvent(const InputEvent &inputEvent);
         bool processShortReleaseEvent(const InputEvent &inputEvent);
         app::ApplicationDesktop *getAppDesktop() const;

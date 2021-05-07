@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "QueryThreadGetByNumber.hpp"
@@ -10,8 +10,8 @@
 
 namespace db::query
 {
-    ThreadGetByNumber::ThreadGetByNumber(utils::PhoneNumber::View number)
-        : Query(Query::Type::Read), number(std::move(number))
+    ThreadGetByNumber::ThreadGetByNumber(const utils::PhoneNumber::View &number)
+        : Query(Query::Type::Read), number(number)
     {}
 
     auto ThreadGetByNumber::getNumber() const -> const utils::PhoneNumber::View &

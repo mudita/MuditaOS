@@ -43,8 +43,8 @@ namespace app
                                            std::string parent,
                                            sys::phone_modes::PhoneMode mode,
                                            StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), mode, startInBackground), lockHandler(this),
-          dbNotificationHandler(this)
+        : Application(std::move(name), std::move(parent), mode, startInBackground), AsyncCallbackReceiver(this),
+          lockHandler(this), dbNotificationHandler(this)
     {
         using namespace gui::top_bar;
         topBarManager->enableIndicators({Indicator::Signal,
@@ -171,7 +171,10 @@ namespace app
 
         // handle database response
         if (resp != nullptr) {
-            if (auto msg = dynamic_cast<db::QueryResponse *>(resp)) {
+            if (auto command = callbackStorage->getCallback(resp); command->execute()) {
+                handled = true;
+            }
+            else if (auto msg = dynamic_cast<db::QueryResponse *>(resp)) {
                 auto result = msg->getResult();
                 if (dbNotificationHandler.handle(result.get())) {
                     handled = true;
