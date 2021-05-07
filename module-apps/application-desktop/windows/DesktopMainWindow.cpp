@@ -53,14 +53,9 @@ namespace gui
                                          listview::ScrollBarType::Fixed);
         notificationsList->emptyListCallback = [this]() {
             setFocusItem(nullptr);
-            setVisibleState();
+            setActiveState();
         };
-        notificationsList->notEmptyListCallback = [this]() {
-            if (focusItem == nullptr) {
-                setVisibleState();
-            }
-        };
-
+        notificationsList->notEmptyListCallback = [this]() { setActiveState(); };
         setVisibleState();
     }
 
@@ -203,8 +198,11 @@ namespace gui
         buildInterface();
     }
 
-    auto DesktopMainWindow::setActiveState() -> bool
+    void DesktopMainWindow::setActiveState()
     {
+        if (focusItem != nullptr) {
+            return;
+        }
         bottomBar->setText(BottomBar::Side::CENTER, utils::translate("app_desktop_menu"));
         bottomBar->setText(BottomBar::Side::LEFT, utils::translate("app_desktop_calls"));
         const auto hasDismissibleNotification = notificationsModel->hasDismissibleNotification();
@@ -227,7 +225,6 @@ namespace gui
             }
             return false;
         };
-        return true;
     }
 
     app::ApplicationDesktop *DesktopMainWindow::getAppDesktop() const

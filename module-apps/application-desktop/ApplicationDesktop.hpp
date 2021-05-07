@@ -23,7 +23,7 @@ namespace gui
 
 namespace app
 {
-    class ApplicationDesktop : public Application
+    class ApplicationDesktop : public Application, public AsyncCallbackReceiver
     {
       public:
         bool need_sim_select = false;

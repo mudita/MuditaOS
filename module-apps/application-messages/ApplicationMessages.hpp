@@ -8,40 +8,25 @@
 #include <Interface/SMSTemplateRecord.hpp>
 #include <Interface/SMSRecord.hpp>
 #include <PhoneNumber.hpp>
+#include "Constants.hpp"
 
 namespace gui
 {
     // fw declarations
     class OptionWindow;
     class Text;
-    namespace name
-    {
-        namespace window
-        {
-            inline constexpr auto dialog_yes_no     = "DialogYesNo";
-            inline constexpr auto dialog_confirm    = "DialogConfirm";
-            inline constexpr auto dialog            = "Dialog";
-            inline constexpr auto new_sms           = "NewSMS";
-            inline constexpr auto thread_sms_search = "SMSSearch";
-            inline constexpr auto sms_templates     = "SMSTemplates";
-            inline constexpr auto thread_view       = "ThreadViewWindow";
-
-        }; // namespace window
-    };     // namespace name
-};         // namespace gui
+} // namespace gui
 
 namespace app
 {
 
-    inline constexpr auto name_messages = "ApplicationMessages";
-
     class ApplicationMessages : public app::Application, public app::AsyncCallbackReceiver
     {
       public:
-        ApplicationMessages(std::string name                    = name_messages,
-                            std::string parent                  = {},
-                            sys::phone_modes::PhoneMode mode    = sys::phone_modes::PhoneMode::Connected,
-                            StartInBackground startInBackground = {false});
+        explicit ApplicationMessages(std::string name                    = name_messages,
+                                     std::string parent                  = {},
+                                     sys::phone_modes::PhoneMode mode    = sys::phone_modes::PhoneMode::Connected,
+                                     StartInBackground startInBackground = {false});
 
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
