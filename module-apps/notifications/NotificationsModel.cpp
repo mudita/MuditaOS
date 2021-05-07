@@ -6,6 +6,22 @@
 
 using namespace gui;
 
+namespace
+{
+    void setNotificationText(NotificationListItem *item,
+                             const notifications::NotificationWithContact *notification,
+                             const std::string &text)
+    {
+        if (notification->hasRecord()) {
+            const auto &record = notification->getRecord();
+            item->setName(record.getFormattedName());
+        }
+        else {
+            item->setName(utils::translate(text), true);
+        }
+    }
+} // namespace
+
 unsigned int NotificationsModel::requestRecordsCount()
 {
     return internalData.size();
@@ -55,7 +71,7 @@ auto NotificationsModel::create(const notifications::NotSeenSMSNotification *not
 {
     auto item = new NotificationWithEventCounter(notifications::NotificationType::NotSeenSms,
                                                  utils::to_string(notification->getValue()));
-    item->setName(utils::translate("app_desktop_unread_messages"), true);
+    setNotificationText(item, notification, "app_desktop_unread_messages");
     item->deleteByList = false;
     return item;
 }
@@ -63,13 +79,7 @@ auto NotificationsModel::create(const notifications::NotSeenCallNotification *no
 {
     auto item = new NotificationWithEventCounter(notifications::NotificationType::NotSeenCall,
                                                  utils::to_string(notification->getValue()));
-    if (notification->hasRecord()) {
-        const auto &record = notification->getRecord();
-        item->setName(record.getFormattedName());
-    }
-    else {
-        item->setName(utils::translate("app_desktop_missed_calls"), true);
-    }
+    setNotificationText(item, notification, "app_desktop_missed_calls");
     item->deleteByList = false;
     return item;
 }

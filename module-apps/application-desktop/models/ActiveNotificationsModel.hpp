@@ -11,7 +11,6 @@ namespace gui
     {
       private:
         AppWindow *parent = nullptr;
-
       public:
         explicit ActiveNotificationsModel(AppWindow *parent);
         void setParentBottomBar(const UTF8 &left, const UTF8 &center, const UTF8 &right);

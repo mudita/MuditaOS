@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -17,8 +17,8 @@ namespace db::query
         utils::PhoneNumber::View number;
 
       public:
-        ThreadGetByNumber(utils::PhoneNumber::View number);
-        auto getNumber() const -> const utils::PhoneNumber::View &;
+        explicit ThreadGetByNumber(const utils::PhoneNumber::View &number);
+        [[nodiscard]] auto getNumber() const -> const utils::PhoneNumber::View &;
 
         [[nodiscard]] auto debugInfo() const -> std::string override;
     };
@@ -28,7 +28,7 @@ namespace db::query
         ThreadRecord thread;
 
       public:
-        ThreadGetByNumberResult(ThreadRecord record);
+        explicit ThreadGetByNumberResult(ThreadRecord record);
         [[nodiscard]] auto getThread() -> ThreadRecord;
         [[nodiscard]] auto debugInfo() const -> std::string override;
     };
