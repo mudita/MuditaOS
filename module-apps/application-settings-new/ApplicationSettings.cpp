@@ -300,12 +300,10 @@ namespace app
             ::settings::Cellular::volte_on,
             [this](const std::string &value) { volteChanged(value); },
             ::settings::SettingsScope::Global);
-        /*
         settings->registerValueChange(
             ::settings::SystemProperties::usbSecurity,
-            [this](std::string value) { usbSecured = utils::getNumericValue<bool>(value); },
+            [this](const std::string &value) { usbSecured = utils::getNumericValue<bool>(value); },
             ::settings::SettingsScope::Global);
-        */
         settings->registerValueChange(
             ::settings::Cellular::offlineMode,
             [this](const std::string &value) { flightModeOn = utils::getNumericValue<bool>(value); },

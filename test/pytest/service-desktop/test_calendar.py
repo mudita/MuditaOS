@@ -4,6 +4,7 @@ import pytest
 from harness.interface.defs import status
 import copy
 
+
 @pytest.mark.rt1051
 @pytest.mark.service_desktop_test
 @pytest.mark.usefixtures("usb_unlocked")
