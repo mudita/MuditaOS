@@ -10,6 +10,7 @@ from module_apps.call_utils import get_calllog_count, select_call_button
 @pytest.mark.usefixtures("phone_ends_test_in_desktop")
 @pytest.mark.usefixtures("phone_in_desktop")
 @pytest.mark.usefixtures("phone_unlocked")
+@pytest.mark.usefixtures("usb_unlocked")
 def test_call(harness, call_duration):
     count_before = get_calllog_count(harness)
 
