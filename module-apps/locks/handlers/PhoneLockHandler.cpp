@@ -38,6 +38,7 @@ namespace locks
         app::manager::Controller::sendAction(owner,
                                              app::manager::actions::ShowPopup,
                                              std::make_unique<gui::PopupRequestParams>(gui::popup::ID::PhoneLock));
+        owner->bus.sendMulticast(std::make_shared<locks::LockedPhone>(), sys::BusChannel::PhoneLockChanges);
     }
 
     void PhoneLockHandler::PhoneUnlockPopupsCloseAction()
@@ -45,9 +46,11 @@ namespace locks
         app::manager::Controller::sendAction(owner,
                                              app::manager::actions::AbortPopup,
                                              std::make_unique<gui::PopupRequestParams>(gui::popup::ID::InputLock));
-        app::manager::Controller::sendAction(owner,
-                                             app::manager::actions::AbortPopup,
-                                             std::make_unique<gui::PopupRequestParams>(gui::popup::ID::PhoneLock));
+        if (!isPhoneLocked()) {
+            app::manager::Controller::sendAction(owner,
+                                                 app::manager::actions::AbortPopup,
+                                                 std::make_unique<gui::PopupRequestParams>(gui::popup::ID::PhoneLock));
+        }
     }
 
     void PhoneLockHandler::PhoneUnlockAction()

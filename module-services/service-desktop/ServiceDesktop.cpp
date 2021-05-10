@@ -353,7 +353,7 @@ void ServiceDesktop::processUSBHandshake(sdesktop::usb::USBHandshake *msg)
 
     if (usbSecurityModel->processHandshake(msg)) {
         LOG_DEBUG("Handshake ok. Unlocking.");
-        bus.sendUnicast(std::make_shared<locks::UnlockedPhone>(), service::name::service_desktop);
+        bus.sendUnicast(std::make_shared<locks::UnlockPhone>(), service::name::service_desktop);
         responseContext.setResponseStatus(parserFSM::http::Code::OK);
     }
 

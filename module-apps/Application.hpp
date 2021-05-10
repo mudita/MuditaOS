@@ -334,6 +334,9 @@ namespace app
         WindowsStack windowsStack;
         WindowsFactory windowsFactory;
 
+        /// Find and pop window from stack by window name
+        void popWindow(const std::string &window);
+
         /// Method used to attach popups windows to application
         void attachPopups(const std::vector<gui::popup::ID> &popupsList);
         void showPopup(gui::popup::ID id, const gui::PopupRequestParams *params);

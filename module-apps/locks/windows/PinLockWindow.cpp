@@ -108,7 +108,7 @@ namespace gui
             else if (lock->isState(Lock::LockState::InputInvalidRetryRequired)) {
                 lock->consumeState();
             }
-            application->switchWindow(gui::name::window::main_window);
+            application->returnToPreviousWindow();
             return true;
         }
         else if (inputEvent.is(KeyCode::KEY_PND)) {

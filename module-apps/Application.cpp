@@ -275,6 +275,14 @@ namespace app
         }
     }
 
+    void Application::popWindow(const std::string &window)
+    {
+        auto popWindow = std::find(windowsStack.stack.begin(), windowsStack.stack.end(), window);
+        if (popWindow != windowsStack.stack.end()) {
+            windowsStack.stack.erase(popWindow);
+        }
+    }
+
     void Application::refreshWindow(gui::RefreshModes mode)
     {
         if (not windowsStack.isEmpty()) {
@@ -815,6 +823,9 @@ namespace app
 
         if (getCurrentWindow()->getName() == popupName) {
             returnToPreviousWindow();
+        }
+        else {
+            popWindow(popupName);
         }
     }
 
