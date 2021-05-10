@@ -8,13 +8,11 @@
 extern "C"
 {
 #include "FreeRTOS.h"
-#include "task.h"
-#include "queue.h"
 }
 
 namespace bsp::eeprom
 {
-    typedef uint32_t addr_t;
+    typedef std::uint32_t addr_t;
 
     int init();
 
