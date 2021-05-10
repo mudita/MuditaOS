@@ -259,8 +259,18 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
     });
 
     connect(typeid(locks::UnlockedPhone), [&](sys::Message *msg) {
-        LOG_INFO("Passcode accepted. Enabling endpoints.");
-        usbSecurityModel->setEndpointSecurity(EndpointSecurity::Allow);
+        if (usbSecurityModel->isSecurityEnabled()) {
+            LOG_INFO("Phone unlocked. Enabling endpoints.");
+            usbSecurityModel->setEndpointSecurity(EndpointSecurity::Allow);
+        }
+        return sys::MessageNone{};
+    });
+
+    connect(typeid(locks::LockedPhone), [&](sys::Message *msg) {
+        if (usbSecurityModel->isSecurityEnabled()) {
+            LOG_INFO("Phone locked. Securing endpoints.");
+            usbSecurityModel->setEndpointSecurity(EndpointSecurity::Block);
+        }
         return sys::MessageNone{};
     });
 
@@ -284,8 +294,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
     settings->registerValueChange(
         ::settings::SystemProperties::usbSecurity,
         [this](std::string value) {
-            bool securityEnabled = usbSecurityModel->isSecurityEnabled();
-            usbSecurityModel->enableEndpointSecurity(securityEnabled);
+            bool securityEnabled = utils::getNumericValue<bool>(value);
             usbSecurityModel->setEndpointSecurity(securityEnabled ? EndpointSecurity::Block : EndpointSecurity::Allow);
         },
         settings::SettingsScope::Global);

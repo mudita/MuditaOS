@@ -305,13 +305,10 @@ namespace app
             ::settings::SystemProperties::lockPassHash,
             [this](const std::string &value) { lockPassHash = utils::getNumericValue<unsigned int>(value); },
             ::settings::SettingsScope::Global);
-
-        /*
         settings->registerValueChange(
             ::settings::SystemProperties::usbSecurity,
             [this](std::string value) { usbSecured = utils::getNumericValue<bool>(value); },
             ::settings::SettingsScope::Global);
-        */
         settings->registerValueChange(
             ::settings::Cellular::offlineMode,
             [this](const std::string &value) { flightModeOn = utils::getNumericValue<bool>(value); },
