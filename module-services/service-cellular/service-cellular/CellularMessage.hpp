@@ -28,8 +28,8 @@
 // ugly temporary tweak
 namespace api
 {
-    using CallMode    = cellular::api::CallMode;
-    using SimCardLock = cellular::api::SimCardLock;
+    using CallMode     = cellular::api::CallMode;
+    using SimLockState = cellular::api::SimLockState;
 } // namespace api
 
 class CellularMessage : public sys::DataMessage

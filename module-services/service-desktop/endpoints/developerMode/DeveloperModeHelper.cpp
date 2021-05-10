@@ -254,8 +254,8 @@ bool DeveloperModeHelper::sendKeypress(bsp::KeyCodes keyCode, gui::InputEvent::S
 
 void DeveloperModeHelper::requestSimChange(const int simSelected)
 {
-    auto arg = (simSelected == static_cast<int>(cellular::api::Sim::SIM2)) ? cellular::api::Sim::SIM2
-                                                                           : cellular::api::Sim::SIM1;
+    auto arg = (simSelected == static_cast<int>(cellular::api::SimSlot::SIM2)) ? cellular::api::SimSlot::SIM2
+                                                                               : cellular::api::SimSlot::SIM1;
     owner->bus.sendUnicast<cellular::msg::request::sim::SetActiveSim>(arg);
 }
 

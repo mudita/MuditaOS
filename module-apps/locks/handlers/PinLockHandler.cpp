@@ -94,7 +94,7 @@ namespace gui
     }
 
     void PinLockHandler::handlePinEnableRequest(app::manager::actions::ActionParamsPtr &&data,
-                                                cellular::api::SimCardLock simCardLock)
+                                                cellular::api::SimLockState simCardLock)
     {
         using namespace cellular::msg;
         using namespace cellular::api;
@@ -107,7 +107,7 @@ namespace gui
         switchToPinLockWindow(onActivatedCallback);
     }
 
-    void PinLockHandler::handlePinEnableRequestFailed(cellular::api::SimCardLock simCardLock)
+    void PinLockHandler::handlePinEnableRequestFailed(cellular::api::SimLockState simCardLock)
     {
         LOG_DEBUG("Handling PinEnableRequestFailed action, simCardLock = %d, simLock.value = %u",
                   static_cast<int>(simCardLock),
@@ -278,12 +278,11 @@ namespace gui
                                                     const cellular::api::PassCode &pin)
     {
         using namespace cellular::msg;
-        using namespace cellular::api;
         if (type == Lock::LockType::SimPin) {
-            app->bus.sendUnicast<request::sim::SetPin>(PassCodeType::PIN, passcode, pin);
+            app->bus.sendUnicast<request::sim::ChangePin>(passcode, pin);
         }
         else if (type == Lock::LockType::SimPuk) {
-            app->bus.sendUnicast<request::sim::SetPin>(PassCodeType::PUK, passcode, pin);
+            app->bus.sendUnicast<request::sim::UnblockWithPuk>(passcode, pin);
         }
     }
 

@@ -11,9 +11,9 @@ namespace cellular::msg::request::sim
      */
     struct SetActiveSim : public msg::Request
     {
-        SetActiveSim(api::Sim sim) : sim(sim)
+        SetActiveSim(api::SimSlot sim) : sim(sim)
         {}
-        api::Sim sim;
+        api::SimSlot sim;
 
         using Response = msg::Response;
     };
@@ -41,15 +41,25 @@ namespace cellular::msg::request::sim
         using Response = msg::Response;
     };
 
-    /** Change PIN using old PIN or PUK
+    /** Change current PIN
      */
-    struct SetPin : msg::Request
+    struct ChangePin : msg::Request
     {
-        SetPin(api::PassCodeType pcType, const api::PassCode &pc, const api::PassCode &pin)
-            : passCodeType(pcType), passCode(pc), pin(pin)
+        ChangePin(const api::PassCode &oldPin, const api::PassCode &pin) : oldPin(oldPin), pin(pin)
         {}
-        api::PassCodeType passCodeType;
-        api::PassCode passCode;
+        api::PassCode oldPin;
+        api::PassCode pin;
+
+        using Response = msg::Response;
+    };
+
+    /** Reset PIN using PUK
+     */
+    struct UnblockWithPuk : msg::Request
+    {
+        UnblockWithPuk(const api::PassCode &puk, const api::PassCode &pin) : puk(puk), pin(pin)
+        {}
+        api::PassCode puk;
         api::PassCode pin;
 
         using Response = msg::Response;
@@ -59,16 +69,16 @@ namespace cellular::msg::request::sim
      */
     struct SetPinLock : msg::Request
     {
-        SetPinLock(api::SimCardLock lock, const api::PassCode &pin) : lock(lock), pin(pin)
+        SetPinLock(api::SimLockState lock, const api::PassCode &pin) : lock(lock), pin(pin)
         {}
-        api::SimCardLock lock;
+        api::SimLockState lock;
         api::PassCode pin;
 
         struct Response : msg::Response
         {
-            Response(bool retCode, api::SimCardLock lock) : msg::Response(retCode), lock(lock)
+            Response(bool retCode, api::SimLockState lock) : msg::Response(retCode), lock(lock)
             {}
-            api::SimCardLock lock;
+            api::SimLockState lock;
         };
     };
 } // namespace cellular::msg::request::sim

@@ -108,8 +108,8 @@ namespace Store
         /// selected - tray selection settings settable sim tray
         enum class SIM
         {
-            SIM1 = static_cast<int>(cellular::api::Sim::SIM1),
-            SIM2 = static_cast<int>(cellular::api::Sim::SIM2),
+            SIM1 = static_cast<int>(cellular::api::SimSlot::SIM1),
+            SIM2 = static_cast<int>(cellular::api::SimSlot::SIM2),
             SIM_FAIL,
             SIM_UNKNOWN,
             NONE,

@@ -53,23 +53,23 @@ namespace cellular::service
         owner->connect(typeid(request::sim::GetLockState), [&](sys::Message *) -> sys::MessagePointer {
             return std::make_shared<request::sim::GetLockState::Response>(isPinLocked());
         });
-        owner->connect(typeid(request::sim::SetPin), [&](sys::Message *request) -> sys::MessagePointer {
-            auto msg            = static_cast<request::sim::SetPin *>(request);
-            const auto passCode = cellular::utils::pinToString(msg->passCode);
-            const auto pin      = cellular::utils::pinToString(msg->pin);
-            switch (msg->passCodeType) {
-            case api::PassCodeType::PIN:
-                return std::make_shared<request::sim::SetPin::Response>(processPinResult(changePin(passCode, pin)));
-            case api::PassCodeType::PUK:
-                return std::make_shared<request::sim::SetPin::Response>(processPinResult(supplyPuk(passCode, pin)));
-            }
-            return std::make_shared<request::sim::SetPin::Response>(false);
+        owner->connect(typeid(request::sim::ChangePin), [&](sys::Message *request) -> sys::MessagePointer {
+            auto msg          = static_cast<request::sim::ChangePin *>(request);
+            const auto oldPin = cellular::utils::pinToString(msg->oldPin);
+            const auto pin    = cellular::utils::pinToString(msg->pin);
+            return std::make_shared<request::sim::ChangePin::Response>(processPinResult(changePin(oldPin, pin)));
+        });
+        owner->connect(typeid(request::sim::UnblockWithPuk), [&](sys::Message *request) -> sys::MessagePointer {
+            auto msg       = static_cast<request::sim::UnblockWithPuk *>(request);
+            const auto puk = cellular::utils::pinToString(msg->puk);
+            const auto pin = cellular::utils::pinToString(msg->pin);
+            return std::make_shared<request::sim::UnblockWithPuk::Response>(processPinResult(supplyPuk(puk, pin)));
         });
         owner->connect(typeid(request::sim::SetPinLock), [&](sys::Message *request) -> sys::MessagePointer {
             auto msg       = static_cast<request::sim::SetPinLock *>(request);
             const auto pin = cellular::utils::pinToString(msg->pin);
             return std::make_shared<request::sim::SetPinLock::Response>(
-                processPinResult(setPinLock(msg->lock == cellular::api::SimCardLock::Locked, pin)), msg->lock);
+                processPinResult(setPinLock(msg->lock == cellular::api::SimLockState::Locked, pin)), msg->lock);
         });
         owner->connect(typeid(request::sim::PinUnlock), [&](sys::Message *request) -> sys::MessagePointer {
             auto msg       = static_cast<request::sim::PinUnlock *>(request);
@@ -83,7 +83,7 @@ namespace cellular::service
         return channel;
     }
 
-    void SimCard::selectSim(api::Sim slot)
+    void SimCard::selectSim(api::SimSlot slot)
     {
         sim = slot;
     }
@@ -123,23 +123,23 @@ namespace cellular::service
 
     sim::Result SimCard::supplyPin(const std::string &pin) const
     {
-        return sendCommand(api::PassCodeType::PIN, at::factory(at::AT::CPIN) + "\"" + pin + "\"");
+        return sendCommand(sim::LockType::PIN, at::factory(at::AT::CPIN) + "\"" + pin + "\"");
     }
 
     sim::Result SimCard::changePin(const std::string &oldPin, const std::string &newPin) const
     {
-        return sendCommand(api::PassCodeType::PIN,
+        return sendCommand(sim::LockType::PIN,
                            at::factory(at::AT::CPWD) + "\"SC\", \"" + oldPin + "\",\"" + newPin + "\"");
     }
 
     sim::Result SimCard::supplyPuk(const std::string &puk, const std::string &pin) const
     {
-        return sendCommand(api::PassCodeType::PUK, at::factory(at::AT::CPIN) + "\"" + puk + "\"" + ",\"" + pin + "\"");
+        return sendCommand(sim::LockType::PUK, at::factory(at::AT::CPIN) + "\"" + puk + "\"" + ",\"" + pin + "\"");
     }
 
     sim::Result SimCard::setPinLock(bool lock, const std::string &pin) const
     {
-        return sendCommand(api::PassCodeType::PIN,
+        return sendCommand(sim::LockType::PIN,
                            at::factory(at::AT::CLCK) + "\"SC\"," + (lock ? "1" : "0") + ",\"" + pin + "\"");
     }
 
@@ -169,15 +169,15 @@ namespace cellular::service
         return at::SimState::Unknown;
     }
 
-    sim::Result SimCard::sendCommand(api::PassCodeType check, const at::Cmd &cmd) const
+    sim::Result SimCard::sendCommand(sim::LockType check, const at::Cmd &cmd) const
     {
         if (auto pc = getAttemptsCounters(); pc) {
             switch (check) {
-            case api::PassCodeType::PIN:
+            case sim::LockType::PIN:
                 if (pc.value().PinCounter == 0)
                     return sim::Result::Locked;
                 break;
-            case api::PassCodeType::PUK:
+            case sim::LockType::PUK:
                 if (pc.value().PukCounter == 0)
                     return sim::Result::Locked;
                 break;

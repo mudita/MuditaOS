@@ -50,6 +50,12 @@ namespace cellular::service
                                       supply good pin, second AT commend return ERROR */
 
         };
+
+        enum class LockType
+        {
+            PIN,
+            PUK
+        };
     } // namespace sim
 
     class SimCard
@@ -70,7 +76,7 @@ namespace cellular::service
         /** Select active SIM slot
          * \param sim slot to communicate with
          */
-        void selectSim(api::Sim slot);
+        void selectSim(api::SimSlot slot);
 
         /** Set cmd channel
          * \param channel channel (or nullptr to block communication)
@@ -128,10 +134,11 @@ namespace cellular::service
          */
         bool processPinResult(sim::Result result);
 
-        sim::Result sendCommand(api::PassCodeType check, const at::Cmd &cmd) const;
+        sim::Result sendCommand(sim::LockType check, const at::Cmd &cmd) const;
 
-        at::Channel *channel        = nullptr;
-        std::optional<api::Sim> sim = std::nullopt;
+        sys::Service *owner; // bus owner
+        at::Channel *channel            = nullptr;
+        std::optional<api::SimSlot> sim = std::nullopt;
     };
 
 } // namespace cellular::service

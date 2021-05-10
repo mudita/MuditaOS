@@ -20,23 +20,18 @@ namespace cellular
             Emergency
         };
 
-        enum class SimCardLock
+        enum class SimLockState
         {
             Locked,
             Unlocked
         };
 
-        enum class Sim
+        enum class SimSlot
         {
             SIM1 = 0,
             SIM2 = 1
         };
 
-        enum class PassCodeType
-        {
-            PIN,
-            PUK
-        };
         using PassCode = std::vector<unsigned int>;
     } // namespace api
 } // namespace cellular

@@ -52,8 +52,8 @@ namespace gui
         void handlePasscodeRequest(Lock::LockType type, app::manager::actions::ActionParamsPtr &&data);
         void handlePinChangeRequest(app::manager::actions::ActionParamsPtr &&data);
         void handlePinEnableRequest(app::manager::actions::ActionParamsPtr &&data,
-                                    cellular::api::SimCardLock simCardLock);
-        void handlePinEnableRequestFailed(cellular::api::SimCardLock simCardLock);
+                                    cellular::api::SimLockState simCardLock);
+        void handlePinEnableRequestFailed(cellular::api::SimLockState simCardLock);
         void handleSimBlocked(app::manager::actions::ActionParamsPtr &&data);
         void handleUnlockSim(app::manager::actions::ActionParamsPtr &&data);
         void handleCMEError(app::manager::actions::ActionParamsPtr &&data) const;
