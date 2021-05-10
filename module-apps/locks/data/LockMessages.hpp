@@ -8,32 +8,19 @@
 namespace locks
 {
     class UnlockPhone : public sys::DataMessage
-    {
-      public:
-        UnlockPhone() : DataMessage{}
-        {}
-    };
+    {};
 
     class CancelUnlockPhone : public sys::DataMessage
-    {
-      public:
-        CancelUnlockPhone() : DataMessage{}
-        {}
-    };
+    {};
 
     class UnlockedPhone : public sys::DataMessage
-    {
-      public:
-        UnlockedPhone() : DataMessage{}
-        {}
-    };
+    {};
 
     class LockPhone : public sys::DataMessage
-    {
-      public:
-        LockPhone() : DataMessage{}
-        {}
-    };
+    {};
+
+    class LockedPhone : public sys::DataMessage
+    {};
 
     class UnLockPhoneInput : public sys::DataMessage
     {
@@ -49,4 +36,4 @@ namespace locks
             return inputData;
         }
     };
-} // namespace lock
+} // namespace locks
