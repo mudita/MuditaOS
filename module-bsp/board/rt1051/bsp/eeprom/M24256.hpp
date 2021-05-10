@@ -15,4 +15,6 @@ namespace bsp::eeprom
     constexpr inline auto M24256_PAGE_SIZE  = 64;
     constexpr inline auto M24256_TOTAL_SIZE = (32 * 1024); // bytes
 
+    constexpr inline auto M24256_SLAVE_ADDR = 0x00;
+
 } // namespace bsp::eeprom
