@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <service-appmgr/model/ApplicationHandle.hpp>
+#include <module-apps/ApplicationLauncher.hpp>
 
 namespace app::manager
 {
@@ -37,7 +38,7 @@ namespace app::manager
 
     auto ApplicationHandle::preventsAutoLocking() const noexcept -> bool
     {
-        return launcher->isPreventAutoLockingOn();
+        return launcher->preventsAutoLocking();
     }
 
     auto ApplicationHandle::closeable() const noexcept -> bool

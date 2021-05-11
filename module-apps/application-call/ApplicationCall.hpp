@@ -142,7 +142,8 @@ namespace app
                      manager::actions::NotAnEmergencyNotification,
                      manager::actions::NoSimNotification,
                      manager::actions::CallRejectedByOfflineNotification,
-                     manager::actions::PhoneModeChanged}};
+                     manager::actions::PhoneModeChanged},
+                    locks::AutoLockPolicy::PreventPermanently};
         }
     };
 } /* namespace app */

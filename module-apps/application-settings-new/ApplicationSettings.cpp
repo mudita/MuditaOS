@@ -56,6 +56,7 @@
 #include <application-settings-new/data/PhoneNameData.hpp>
 #include <application-settings-new/data/PINSettingsLockStateData.hpp>
 #include <application-settings-new/windows/BluetoothCheckPasskeyWindow.hpp>
+#include <application-settings-new/data/AutoLockData.hpp>
 
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
@@ -300,6 +301,12 @@ namespace app
             return sys::MessageNone{};
         });
 
+        connect(typeid(manager::GetAutoLockTimeoutResponse), [&](sys::Message *msg) {
+            auto response = static_cast<manager::GetAutoLockTimeoutResponse *>(msg);
+            auto data     = std::make_unique<gui::AutoLockData>(response->getValue());
+            updateWindow(gui::window::name::autolock, std::move(data));
+            return sys::MessageNone{};
+        });
         createUserInterface();
 
         settings->registerValueChange(settings::operators_on,
@@ -694,17 +701,16 @@ namespace app
         CellularServiceAPI::SetConnectionFrequency(this, val);
     }
 
-    auto ApplicationSettingsNew::getAutoLockTime() const noexcept -> std::chrono::milliseconds
+    void ApplicationSettingsNew::getAutoLockTime()
     {
-        return std::chrono::milliseconds{utils::getNumericValue<unsigned int>(
-            settings->getValue(::settings::SystemProperties::lockTime, ::settings::SettingsScope::Global))};
+        bus.sendUnicast(std::make_shared<app::manager::GetAutoLockTimeoutRequest>(),
+                        app::manager::ApplicationManager::ServiceName);
     }
 
-    void ApplicationSettingsNew::setAutoLockTime(std::chrono::milliseconds lockTime) noexcept
+    void ApplicationSettingsNew::setAutoLockTime(std::chrono::seconds lockTime)
     {
-        settings->setValue(::settings::SystemProperties::lockTime,
-                           std::to_string(lockTime.count()),
-                           ::settings::SettingsScope::Global);
+        bus.sendUnicast(std::make_shared<app::manager::SetAutoLockTimeoutRequest>(lockTime),
+                        app::manager::ApplicationManager::ServiceName);
     }
 
     void ApplicationSettingsNew::switchToAllDevicesViaBtErrorPrompt(std::shared_ptr<sys::DataMessage> msg,

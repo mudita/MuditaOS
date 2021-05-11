@@ -37,6 +37,7 @@
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <service-appmgr/messages/DOMRequest.hpp>
 #include <service-appmgr/messages/GetAllNotificationsRequest.hpp>
+#include <service-appmgr/messages/AutoLockRequests.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <module-db/queries/notifications/QueryNotificationsGetAll.hpp>
 
@@ -47,7 +48,7 @@ namespace app::manager
     namespace
     {
         constexpr auto ApplicationManagerStackDepth = 3072;
-        constexpr auto timerBlock                   = "BlockTimer";
+        constexpr auto autoLockTimerName            = "AutoLockTimer";
     } // namespace
 
     ApplicationManagerBase::ApplicationManagerBase(std::vector<std::unique_ptr<app::ApplicationLauncher>> &&launchers)
@@ -135,15 +136,16 @@ namespace app::manager
         : Service{serviceName, {}, ApplicationManagerStackDepth},
           ApplicationManagerBase(std::move(launchers)), rootApplicationName{_rootApplicationName},
           actionsRegistry{[this](ActionEntry &action) { return handleAction(action); }}, notificationProvider(this),
-          autoLockEnabled(false), settings(std::make_unique<settings::Settings>()),
+          settings(std::make_unique<settings::Settings>()),
           phoneModeObserver(std::make_unique<sys::phone_modes::Observer>()),
           phoneLockHandler(locks::PhoneLockHandler(this, settings))
     {
         autoLockTimer = sys::TimerFactory::createSingleShotTimer(
-            this, timerBlock, sys::timer::InfiniteTimeout, [this](sys::Timer &) { onPhoneLocked(); });
+            this, autoLockTimerName, sys::timer::InfiniteTimeout, [this](sys::Timer &) { onPhoneLocked(); });
         bus.channels.push_back(sys::BusChannel::PhoneModeChanges);
         bus.channels.push_back(sys::BusChannel::ServiceAudioNotifications);
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
+        bus.channels.push_back(sys::BusChannel::PhoneLockChanges);
         bus.channels.push_back(sys::BusChannel::ServiceCellularNotifications);
         registerMessageHandlers();
     }
@@ -172,15 +174,15 @@ namespace app::manager
 
         settings->registerValueChange(
             settings::SystemProperties::displayLanguage,
-            [this](std::string value) { displayLanguageChanged(value); },
+            [this](std::string value) { displayLanguageChanged(std::move(value)); },
             settings::SettingsScope::Global);
         settings->registerValueChange(
             settings::SystemProperties::inputLanguage,
-            [this](std::string value) { inputLanguageChanged(value); },
+            [this](std::string value) { inputLanguageChanged(std::move(value)); },
             settings::SettingsScope::Global);
         settings->registerValueChange(
-            settings::SystemProperties::lockTime,
-            [this](std::string value) { lockTimeChanged(value); },
+            settings::SystemProperties::autoLockTimeInSec,
+            [this](std::string value) { lockTimeChanged(std::move(value)); },
             settings::SettingsScope::Global);
         settings->registerValueChange(
             ::settings::SystemProperties::automaticDateAndTimeIsOn,
@@ -313,12 +315,12 @@ namespace app::manager
             return std::make_shared<ApplicationStatusResponse>(msg->checkAppName,
                                                                getApplication(msg->checkAppName) != nullptr);
         });
-        connect(typeid(PowerSaveModeInitRequest), [this](sys::Message *) {
+        connect(typeid(PowerSaveModeInitRequest), [this]([[maybe_unused]] sys::Message *msg) {
             handlePowerSavingModeInit();
             return std::make_shared<sys::ResponseMessage>();
         });
-        connect(typeid(PreventBlockingRequest), [this](sys::Message *) {
-            if (autoLockEnabled) {
+        connect(typeid(PreventBlockingRequest), [this]([[maybe_unused]] sys::Message *msg) {
+            if (!phoneLockHandler.isPhoneLocked()) {
                 autoLockTimer.start();
             }
             return std::make_shared<sys::ResponseMessage>();
@@ -423,7 +425,6 @@ namespace app::manager
             handleDBResponse(response);
             return sys::msgHandled();
         });
-
         connect(typeid(locks::LockPhone),
                 [&](sys::Message *request) -> sys::MessagePointer { return phoneLockHandler.handleLockRequest(); });
         connect(typeid(locks::UnlockPhone),
@@ -440,12 +441,24 @@ namespace app::manager
         connect(typeid(locks::DisablePhoneLock), [&](sys::Message *request) -> sys::MessagePointer {
             return phoneLockHandler.handleDisablePhoneLock();
         });
+        connect(typeid(locks::UnlockedPhone), [&](sys::Message *request) -> sys::MessagePointer {
+            autoLockTimer.start();
+            return sys::msgHandled();
+        });
         connect(typeid(locks::ChangePhoneLock),
                 [&](sys::Message *request) -> sys::MessagePointer { return phoneLockHandler.handleChangePhoneLock(); });
         connect(typeid(locks::SetPhoneLock),
                 [&](sys::Message *request) -> sys::MessagePointer { return phoneLockHandler.handleSetPhoneLock(); });
         connect(typeid(locks::SkipSetPhoneLock), [&](sys::Message *request) -> sys::MessagePointer {
             return phoneLockHandler.handleSkipSetPhoneLock();
+        });
+        connect(typeid(GetAutoLockTimeoutRequest), [&](sys::Message *request) -> sys::MessagePointer {
+            auto req = static_cast<GetAutoLockTimeoutRequest *>(request);
+            return handleAutoLockGetRequest(req);
+        });
+        connect(typeid(SetAutoLockTimeoutRequest), [&](sys::Message *request) -> sys::MessagePointer {
+            auto req = static_cast<SetAutoLockTimeoutRequest *>(request);
+            return handleAutoLockSetRequest(req);
         });
 
         connect(typeid(sdesktop::developerMode::DeveloperModeRequest),
@@ -1125,10 +1138,10 @@ namespace app::manager
 
     void ApplicationManager::onPhoneLocked()
     {
-        if (!autoLockEnabled) {
+        if (phoneLockHandler.isPhoneLocked()) {
+            autoLockTimer.stop();
             return;
         }
-
         auto focusedApp = getFocusedApplication();
         if (focusedApp == nullptr || focusedApp->preventsAutoLocking()) {
             autoLockTimer.start();
@@ -1138,11 +1151,7 @@ namespace app::manager
             autoLockTimer.start();
             return;
         }
-        std::unique_ptr<gui::SwitchData> appSwitchData = std::make_unique<gui::SwitchData>("AutoLock");
-        std::unique_ptr<ActionRequest> actionRequest =
-            std::make_unique<ActionRequest>(rootApplicationName, actions::AutoLock, std::move(appSwitchData));
-        handleActionRequest(actionRequest.get());
-        autoLockTimer.start();
+        phoneLockHandler.handleLockRequest();
     }
 
     void ApplicationManager::displayLanguageChanged(std::string value)
@@ -1154,22 +1163,35 @@ namespace app::manager
 
     void ApplicationManager::lockTimeChanged(std::string value)
     {
-        autoLockTimer.stop();
-        /// It should not be allowed to set this timeout to less then 1s.
-        if (utils::getNumericValue<unsigned int>(value) < 1000) {
-            autoLockEnabled = false;
-            LOG_ERROR("Auto-locking is disabled due to lock time setting %s\n", value.c_str());
-            return;
-        }
-        ///> Something went wrong - reload timer
         if (value.empty()) {
-            autoLockTimer.start();
+            LOG_ERROR("No value for auto-locking time period, request ignored");
             return;
         }
-        autoLockEnabled     = true;
-        const auto interval = std::chrono::milliseconds{utils::getNumericValue<unsigned int>(value)};
+        const auto interval = std::chrono::seconds{utils::getNumericValue<unsigned int>(value)};
+        if (interval.count() == 0) {
+            LOG_ERROR("Invalid auto-locking time period of 0s, request ignored");
+            return;
+        }
         autoLockTimer.restart(interval);
-        //?any additional action needed here?
+    }
+
+    auto ApplicationManager::handleAutoLockGetRequest([[maybe_unused]] GetAutoLockTimeoutRequest *request)
+        -> std::shared_ptr<sys::ResponseMessage>
+    {
+        auto intervalValue =
+            settings->getValue(settings::SystemProperties::autoLockTimeInSec, settings::SettingsScope::Global);
+        const auto interval = std::chrono::seconds{utils::getNumericValue<unsigned int>(intervalValue)};
+        return std::make_shared<GetAutoLockTimeoutResponse>(interval);
+    }
+    auto ApplicationManager::handleAutoLockSetRequest(SetAutoLockTimeoutRequest *request)
+        -> std::shared_ptr<sys::ResponseMessage>
+    {
+        auto interval = request->getValue();
+        settings->setValue(settings::SystemProperties::autoLockTimeInSec,
+                           utils::to_string(interval.count()),
+                           settings::SettingsScope::Global);
+        autoLockTimer.restart(interval);
+        return std::make_shared<sys::ResponseMessage>();
     }
 
     void ApplicationManager::inputLanguageChanged(std::string value)

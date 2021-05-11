@@ -26,7 +26,6 @@
 #include <service-audio/ServiceAudio.hpp>
 #include <service-bluetooth/ServiceBluetooth.hpp>
 #include <service-db/ServiceDB.hpp>
-#include <service-evtmgr/Constants.hpp>
 #include <service-evtmgr/EventManager.hpp>
 #include <service-lwip/ServiceLwIP.hpp>
 #include <service-time/ServiceTime.hpp>
@@ -127,8 +126,7 @@ int main()
                 app::CreateLauncher<app::ApplicationDesktop>(app::name_desktop, app::Closeable::False));
 #endif
 #ifdef ENABLE_APP_CALL
-            applications.push_back(app::CreateLauncher<app::ApplicationCall>(
-                app::name_call, app::Closeable::False, app::PreventAutoLocking::True));
+            applications.push_back(app::CreateLauncher<app::ApplicationCall>(app::name_call, app::Closeable::False));
 #endif
 #ifdef ENABLE_APP_SETTINGS
             applications.push_back(app::CreateLauncher<app::ApplicationSettings>(app::name_settings));
@@ -162,8 +160,8 @@ int main()
             applications.push_back(app::CreateLauncher<app::ApplicationMusicPlayer>(app::name_music_player));
 #endif
 #ifdef ENABLE_APP_MEDITATION
-            applications.push_back(app::CreateLauncher<app::ApplicationMeditation>(
-                app::name_meditation, app::Closeable::True, app::PreventAutoLocking::True));
+            applications.push_back(
+                app::CreateLauncher<app::ApplicationMeditation>(app::name_meditation, app::Closeable::True));
 #endif
 #ifdef ENABLE_APP_CALCULATOR
             applications.push_back(app::CreateLauncher<app::ApplicationCalculator>(app::name_calculator));

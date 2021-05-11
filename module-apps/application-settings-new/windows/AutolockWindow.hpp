@@ -13,10 +13,11 @@ namespace gui
     {
       public:
         AutolockWindow(app::Application *app, app::settingsInterface::AutoLockSettings *autoLockSettings);
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
 
       private:
         auto buildOptionsList() -> std::list<Option> override;
-
+        std::chrono::seconds currentAutoLockTimeout{0};
         app::settingsInterface::AutoLockSettings *autoLockSettings;
     };
 } // namespace gui

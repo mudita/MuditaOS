@@ -114,6 +114,11 @@ namespace gui
         applyToTopBar(std::move(fn));
     }
 
+    bool AppWindow::preventsAutoLocking() const noexcept
+    {
+        return preventsAutoLock;
+    }
+
     bool AppWindow::updateTime()
     {
         applyToTopBar([](top_bar::Configuration configuration) {

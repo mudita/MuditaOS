@@ -11,7 +11,7 @@ namespace gui
     PowerOffWindow::PowerOffWindow(app::Application *app, std::unique_ptr<PowerOffPresenter> &&presenter)
         : DialogYesNo(app, popup::window::power_off_window), presenter(std::move(presenter))
     {
-        topBar->configure(std::move(configureTopBar(application->getTopBarConfiguration())));
+        topBar->configure(configureTopBar(application->getTopBarConfiguration()));
     }
 
     top_bar::Configuration PowerOffWindow::configureTopBar(top_bar::Configuration appConfiguration)
@@ -29,6 +29,7 @@ namespace gui
         DialogMetadata metadata;
         metadata.action = [=]() -> bool {
             LOG_INFO("User call close system");
+            preventsAutoLock = true;
             presenter->powerOff();
             return true;
         };

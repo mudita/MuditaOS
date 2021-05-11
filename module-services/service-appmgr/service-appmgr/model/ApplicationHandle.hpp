@@ -4,7 +4,6 @@
 #pragma once
 
 #include <module-apps/Application.hpp>
-#include <module-apps/ApplicationLauncher.hpp>
 
 #include <memory>
 #include <string>
