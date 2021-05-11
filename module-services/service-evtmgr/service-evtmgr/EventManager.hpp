@@ -5,17 +5,14 @@
 
 #include "Constants.hpp"
 
+#include <backlight-handler/BacklightHandler.hpp>
+#include <bsp/vibrator/vibrator.hpp>
 #include <MessageType.hpp>
 #include <Service/Common.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
 #include <Timers/TimerHandle.hpp>
 #include <Service/Worker.hpp>
-#include <bsp/common.hpp>
-#include <bsp/keyboard/key_codes.hpp>
-#include <bsp/keypad_backlight/keypad_backlight.hpp>
-#include <screen-light-control/ScreenLightControl.hpp>
-#include <vibra/Vibra.hpp>
 #include <service-db/DBServiceName.hpp>
 
 #include <cstdint>
@@ -25,14 +22,16 @@
 
 class WorkerEvent;
 
+namespace vibra_handle
+{
+    class Vibra;
+} // namespace vibra_handle
+
 class EventManager : public sys::Service
 {
   private:
     static constexpr auto stackDepth = 4096;
     void handleMinuteUpdate(time_t timestamp);
-    bool processKeypadBacklightRequest(bsp::keypad_backlight::Action action);
-    void startKeypadLightTimer();
-    void restoreKeypadLightState();
     bool processVibraRequest(bsp::vibrator::Action act,
                              std::chrono::milliseconds RepetitionTime = std::chrono::milliseconds{1000});
     void toggleTorchOnOff();
@@ -40,12 +39,6 @@ class EventManager : public sys::Service
 
     std::shared_ptr<settings::Settings> settings;
     sys::TimerHandle loggerTimer;
-    sys::TimerHandle keypadLightTimer;
-    bsp::keypad_backlight::State keypadLightState{bsp::keypad_backlight::State::off};
-    bool isKeypadLightInCallMode = false;
-
-    static constexpr auto keypadLightTimerName    = "KeypadLightTimer";
-    static constexpr auto keypadLightTimerTimeout = std::chrono::seconds(5);
 
   protected:
     std::unique_ptr<WorkerEvent> EventWorker;
@@ -61,8 +54,8 @@ class EventManager : public sys::Service
     // flag set when there is alarm to handle
     bool alarmIsValid = false;
 
-    std::unique_ptr<screen_light_control::ScreenLightControl> screenLightControl;
     std::unique_ptr<vibra_handle::Vibra> Vibra;
+    backlight::Handler backlightHandler;
 
   public:
     explicit EventManager(const std::string &name = service::name::evt_manager);

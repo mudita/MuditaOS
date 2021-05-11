@@ -6,6 +6,7 @@ set(SOURCES
         WorkerEvent.cpp
         api/EventManagerServiceAPI.cpp
         battery-level-check/BatteryLevelCheck.cpp
+        backlight-handler/BacklightHandler.cpp
         screen-light-control/ControlFunctions.cpp
         screen-light-control/ScreenLightControl.cpp
         vibra/Vibra.cpp

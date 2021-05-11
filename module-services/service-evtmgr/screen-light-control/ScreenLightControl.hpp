@@ -3,10 +3,19 @@
 
 #pragma once
 
-#include <module-sys/Timers/TimerHandle.hpp>
-#include <service-db/service-db/Settings.hpp>
 #include "ControlFunctions.hpp"
-#include <Utils.hpp>
+#include <memory>
+#include <module-sys/Timers/TimerHandle.hpp>
+
+namespace settings
+{
+    class Settings;
+} // namespace settings
+
+namespace sys
+{
+    class Service;
+} // namespace sys
 
 /// Screen light control algorithm. Automatic/Manual mode of operation.
 /// Processing of ambient light sensor input to screen brightness output.
@@ -22,13 +31,17 @@ namespace screen_light_control
     /// Set of actions to control the screen light
     enum class Action
     {
-        turnOff,                    ///< Turn off screen frontlight
-        turnOn,                     ///< Turn on screen frontlight
-        enableAutomaticMode,        ///< Enable automatic mode of screen frontlight
-        disableAutomaticMode,       ///< Disable automatic mode of screen frontlight
-        setManualModeBrightness,    ///< Set screen brightness in manual mode control
-        setGammaCorrectionFactor,   ///< Set gamma factor for screen frontlight correction
-        setAutomaticModeParameters, ///< Set parameters for automatic mode of screen frontlight
+        turnOff,             ///< Turn off screen frontlight
+        turnOn,              ///< Turn on screen frontlight
+        enableAutomaticMode, ///< Enable automatic mode of screen frontlight
+        disableAutomaticMode ///< Disable automatic mode of screen frontlight
+    };
+
+    /// Set of actions to control the screen light using specified parameters
+    enum class ParameterizedAction
+    {
+        setManualModeBrightness,   ///< Set screen brightness in manual mode control
+        setAutomaticModeParameters ///< Set parameters for automatic mode of screen frontlight
     };
 
     struct Parameters
@@ -55,7 +68,8 @@ namespace screen_light_control
         explicit ScreenLightControl(std::shared_ptr<settings::Settings> settings, sys::Service *parent);
         ~ScreenLightControl();
 
-        void processRequest(Action action, const Parameters &params);
+        void processRequest(Action action);
+        void processRequest(ParameterizedAction action, Parameters params);
 
         [[nodiscard]] auto getLightState() const noexcept -> bool;
         [[nodiscard]] auto getAutoModeState() const noexcept -> ScreenLightMode;
@@ -70,7 +84,6 @@ namespace screen_light_control
 
         void setAutomaticModeParameters(const Parameters &params);
         void setBrightnessLevel(bsp::eink_frontlight::BrightnessPercentage brightnessPercentage);
-        void setGammaFactor(float gammaFactor);
 
         void turnOff();
         void turnOn();
@@ -78,10 +91,6 @@ namespace screen_light_control
         void enableAutomaticMode();
         void disableAutomaticMode();
 
-        template <class T> void setScreenLightSettings(const std::string &varName, T value)
-        {
-            settings->setValue(varName, utils::to_string(value), settings::SettingsScope::Global);
-        }
         void initFromSettings();
 
         static constexpr inline auto CONTROL_TIMER_MS = 25;

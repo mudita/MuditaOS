@@ -45,7 +45,7 @@ namespace settings
         void unregisterValueChange(const std::string &variableName, SettingsScope scope = SettingsScope::AppLocal);
         /// unregisters all registered variables (both global and local)
         void unregisterValueChange();
-        std::string getValue(const std::string &variableName, SettingsScope scope = SettingsScope::AppLocal);
+        std::string getValue(const std::string &variableName, SettingsScope scope = SettingsScope::AppLocal) const;
 
         void getAllProfiles(OnAllProfilesRetrievedCallback cb);
         void setCurrentProfile(const std::string &profile);

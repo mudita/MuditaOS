@@ -52,7 +52,6 @@ namespace gui
     void DisplayLightWindow::switchHandler(bool &onOffSwitch)
     {
         onOffSwitch = !onOffSwitch;
-
         screenLightSettings->setStatus(isDisplayLightSwitchOn);
         screenLightSettings->setMode(isAutoLightSwitchOn);
 
