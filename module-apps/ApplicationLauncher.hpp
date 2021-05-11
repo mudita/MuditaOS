@@ -9,11 +9,6 @@ namespace app
 {
     using ApplicationManifest = app::manager::ApplicationManifest;
 
-    enum class PreventAutoLocking : bool
-    {
-        False,
-        True
-    };
     enum class Closeable : bool
     {
         False,
@@ -33,16 +28,17 @@ namespace app
         Closeable closeable = Closeable::False;
         /// defines whether application should be run without gaining focus, it will remian in the BACKGROUND state
         bool startBackground = false;
-        /// flag defines whether this application can prevent auto-locking mechanism
-        PreventAutoLocking preventAutoLocking = PreventAutoLocking::False;
+
+        void setAutoLockPolicy() noexcept
+        {
+            if (handle != nullptr) {
+                handle->getLockPolicyHandler().set(manifest.getAutoLockPolicy());
+            }
+        }
 
       public:
-        ApplicationLauncher(std::string name,
-                            ApplicationManifest &&manifest,
-                            Closeable isCloseable,
-                            PreventAutoLocking preventAutoLocking = PreventAutoLocking::False)
-            : name{std::move(name)}, manifest{std::move(manifest)}, closeable{isCloseable}, preventAutoLocking{
-                                                                                                preventAutoLocking} {};
+        ApplicationLauncher(std::string name, ApplicationManifest &&manifest, Closeable isCloseable)
+            : name{std::move(name)}, manifest{std::move(manifest)}, closeable{isCloseable} {};
         virtual ~ApplicationLauncher() = default;
 
         [[nodiscard]] std::string getName() const noexcept
@@ -60,9 +56,9 @@ namespace app
             return (closeable == Closeable::True);
         }
 
-        [[nodiscard]] bool isPreventAutoLockingOn() const noexcept
+        [[nodiscard]] bool preventsAutoLocking() const noexcept
         {
-            return (preventAutoLocking == PreventAutoLocking::True);
+            return (handle == nullptr || handle->getLockPolicyHandler().preventsAutoLocking());
         }
 
         virtual bool run(sys::phone_modes::PhoneMode mode, sys::Service *caller = nullptr)
@@ -82,17 +78,15 @@ namespace app
     template <class T> class ApplicationLauncherT : public ApplicationLauncher
     {
       public:
-        ApplicationLauncherT(std::string name,
-                             ApplicationManifest &&manifest,
-                             Closeable isCloseable              = Closeable::True,
-                             PreventAutoLocking preventBlocking = PreventAutoLocking::True)
-            : ApplicationLauncher(name, std::move(manifest), isCloseable, preventBlocking)
+        ApplicationLauncherT(std::string name, ApplicationManifest &&manifest, Closeable isCloseable = Closeable::True)
+            : ApplicationLauncher(std::move(name), std::move(manifest), isCloseable)
         {}
 
         bool run(sys::phone_modes::PhoneMode mode, sys::Service *caller) override
         {
             parent = (caller == nullptr ? "" : caller->GetName());
             handle = std::make_shared<T>(name, parent, mode);
+            setAutoLockPolicy();
             return sys::SystemManager::RunApplication(handle, caller);
         }
 
@@ -100,18 +94,16 @@ namespace app
         {
             parent = (caller == nullptr ? "" : caller->GetName());
             handle = std::make_shared<T>(name, parent, mode, true);
+            setAutoLockPolicy();
             return sys::SystemManager::RunApplication(handle, caller);
         }
     };
 
     /// creates application launcher per class provided
     template <class T>
-    std::unique_ptr<ApplicationLauncherT<T>> CreateLauncher(
-        std::string name,
-        Closeable isCloseable                 = Closeable::True,
-        PreventAutoLocking preventAutoLocking = PreventAutoLocking::False)
+    std::unique_ptr<ApplicationLauncherT<T>> CreateLauncher(std::string name, Closeable isCloseable = Closeable::True)
     {
         return std::unique_ptr<ApplicationLauncherT<T>>(
-            new ApplicationLauncherT<T>(name, ManifestOf<T>(), isCloseable, preventAutoLocking));
+            new ApplicationLauncherT<T>(name, ManifestOf<T>(), isCloseable));
     }
 } // namespace app

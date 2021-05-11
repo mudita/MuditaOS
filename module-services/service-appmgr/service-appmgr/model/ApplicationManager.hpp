@@ -46,6 +46,8 @@ namespace app
         class APMRegister;
         class APMSwitch;
         class APMSwitchPrevApp;
+        class GetAutoLockTimeoutRequest;
+        class SetAutoLockTimeoutRequest;
     } // namespace manager
 } // namespace app
 
@@ -158,6 +160,8 @@ namespace app::manager
         /// handles dom request by passing this request to application which should provide the dom
         auto handleDOMRequest(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>;
         void handleStart(StartAllowedMessage *msg);
+        auto handleAutoLockGetRequest(GetAutoLockTimeoutRequest *request) -> std::shared_ptr<sys::ResponseMessage>;
+        auto handleAutoLockSetRequest(SetAutoLockTimeoutRequest *request) -> std::shared_ptr<sys::ResponseMessage>;
 
         void requestApplicationClose(ApplicationHandle &app, bool isCloseable);
         void onApplicationSwitch(ApplicationHandle &app,
@@ -180,9 +184,6 @@ namespace app::manager
         ActionsRegistry actionsRegistry;
         notifications::NotificationProvider notificationProvider;
 
-        bool autoLockEnabled; ///< a flag which indicates whether the autoLockTimer should be armed.
-                              /// @note: The flag value depends on database settings "gs_lock_time". If the
-                              /// "gs_lock_time" is set to less than 1000 ms, it will be false, otherwise true.
         sys::TimerHandle autoLockTimer; //< auto-lock timer to count time from last user's activity.
                                         // If it reaches time defined in settings database application
                                         // manager is sending signal to Application Desktop in order to

@@ -30,6 +30,7 @@
 #include <TopBarManager.hpp>
 #include <popups/Popups.hpp>
 #include <locks/handlers/PhoneLockSubject.hpp>
+#include <locks/handlers/LockPolicyHandler.hpp>
 #include "WindowsFactory.hpp"
 #include "WindowsStack.hpp"
 
@@ -125,7 +126,7 @@ namespace app
             NONE,
             /// Application: Object has been created and underlying service is waiting to execute init handler method.
             /// Application Manager: Launcher for the application has been provided. Application can be started using
-            /// provided launcher. The other possibility is that Appication Manager received CLOSING_FINISHED message.
+            /// provided launcher. The other possibility is that Application Manager received CLOSING_FINISHED message.
             DEACTIVATED,
             /// Application: Set after entering the init handler of the application. In this state application will
             /// request in a blocking way the db configuration of the phone. Before exiting the init handler application
@@ -186,12 +187,12 @@ namespace app
         sys::TimerHandle longPressTimer;
         void clearLongPressTimeout();
 
-        Application(std::string name,
-                    std::string parent                  = "",
-                    sys::phone_modes::PhoneMode mode    = sys::phone_modes::PhoneMode::Connected,
-                    StartInBackground startInBackground = {false},
-                    uint32_t stackDepth                 = 4096,
-                    sys::ServicePriority priority       = sys::ServicePriority::Idle);
+        explicit Application(std::string name,
+                             std::string parent                  = "",
+                             sys::phone_modes::PhoneMode mode    = sys::phone_modes::PhoneMode::Connected,
+                             StartInBackground startInBackground = {false},
+                             uint32_t stackDepth                 = 4096,
+                             sys::ServicePriority priority       = sys::ServicePriority::Idle);
 
         virtual ~Application() noexcept;
 
@@ -400,11 +401,15 @@ namespace app
         sys::phone_modes::PhoneMode phoneMode;
 
         locks::PhoneLockSubject phoneLockSubject;
+        locks::LockPolicyHandler lockPolicyHandler;
 
       public:
         [[nodiscard]] auto getPhoneLockSubject() noexcept -> locks::PhoneLockSubject &;
 
         [[nodiscard]] bool isPhoneLockEnabled() const noexcept;
+
+        [[nodiscard]] auto getLockPolicyHandler() noexcept -> locks::LockPolicyHandlerInterface &;
+
         const gui::top_bar::Configuration &getTopBarConfiguration() const noexcept;
     };
 

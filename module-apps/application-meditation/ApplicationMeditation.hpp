@@ -33,7 +33,8 @@ namespace app
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {
-            return {{manager::actions::Launch, manager::actions::PhoneModeChanged}};
+            return {{manager::actions::Launch, manager::actions::PhoneModeChanged},
+                    locks::AutoLockPolicy::PreventPermanently};
         }
     };
 } // namespace app

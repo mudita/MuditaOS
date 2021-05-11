@@ -127,26 +127,6 @@ namespace app
             switchWindow(app::window::name::logo_window, std::move(data));
             return actionHandled();
         });
-
-        addActionReceiver(app::manager::actions::AutoLock, [this](auto &&data) {
-            if (lockHandler.isScreenLocked()) {
-                return actionHandled();
-            }
-            if (this->getState() == app::Application::State::ACTIVE_FORGROUND) {
-                ///> we cannot block on all windows
-                if (getCurrentWindow()->getName() == gui::name::window::main_window ||
-                    getCurrentWindow()->getName() == app::window::name::desktop_menu) {
-                    lockHandler.lockScreen();
-                    switchWindow(app::window::name::desktop_main_window, std::move(data));
-                }
-            }
-            else {
-                lockHandler.lockScreen();
-                switchWindow(app::window::name::desktop_main_window, std::move(data));
-            }
-
-            return actionHandled();
-        });
     }
 
     // Invoked upon receiving data message

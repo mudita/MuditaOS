@@ -2,22 +2,22 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AutolockWindow.hpp"
-#include "OptionSetting.hpp"
-
+#include <application-settings-new/data/AutoLockData.hpp>
+#include <OptionSetting.hpp>
 #include <i18n/i18n.hpp>
 
 namespace gui
 {
     namespace
     {
-        const std::vector<std::pair<std::string, std::chrono::milliseconds>> autoLockTimes = {
-            {"15s", std::chrono::milliseconds{15000}},
-            {"30s", std::chrono::milliseconds{30000}},
-            {"1m", std::chrono::milliseconds{60000}},
-            {"2m", std::chrono::milliseconds{120000}},
-            {"5m", std::chrono::milliseconds{300000}},
-            {"10m", std::chrono::milliseconds{600000}},
-            {"20m", std::chrono::milliseconds{1200000}}};
+        const std::vector<std::pair<std::string, std::chrono::seconds>> autoLockTimes = {
+            {"15s", std::chrono::seconds{15}},
+            {"30s", std::chrono::seconds{30}},
+            {"1m", std::chrono::minutes{1}},
+            {"2m", std::chrono::minutes{2}},
+            {"5m", std::chrono::minutes{5}},
+            {"10m", std::chrono::minutes{10}},
+            {"20m", std::chrono::minutes{20}}};
     } // namespace
 
     AutolockWindow::AutolockWindow(app::Application *app, app::settingsInterface::AutoLockSettings *autoLockSettings)
@@ -34,6 +34,7 @@ namespace gui
                 timeString,
                 [=](gui::Item &item) {
                     autoLockSettings->setAutoLockTime(time);
+                    currentAutoLockTimeout = time;
                     refreshOptionsList();
                     return true;
                 },
@@ -45,11 +46,22 @@ namespace gui
                     return true;
                 },
                 this,
-                autoLockSettings->getAutoLockTime() == time ? gui::option::SettingRightItem::Checked
-                                                            : gui::option::SettingRightItem::Disabled));
+                currentAutoLockTimeout == time ? gui::option::SettingRightItem::Checked
+                                               : gui::option::SettingRightItem::Disabled));
         }
 
         return optionsList;
+    }
+
+    void AutolockWindow::onBeforeShow(ShowMode mode, SwitchData *data)
+    {
+        if (auto autoLockData = dynamic_cast<const AutoLockData *>(data); data != nullptr) {
+            currentAutoLockTimeout = autoLockData->getValue();
+        }
+        else if (mode == ShowMode::GUI_SHOW_INIT) {
+            autoLockSettings->getAutoLockTime();
+        }
+        BaseSettingsWindow::onBeforeShow(mode, data);
     }
 
 } // namespace gui

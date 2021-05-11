@@ -51,6 +51,11 @@ namespace gui
          */
         using TopBarConfigurationChangeFunction = std::function<top_bar::Configuration(top_bar::Configuration)>;
 
+        /**
+         * A flag that is set if current window state requires the phone to stay unlocked
+         */
+        bool preventsAutoLock = false;
+
       public:
         AppWindow() = delete;
         AppWindow(app::Application *app, std::string name);
@@ -67,6 +72,7 @@ namespace gui
         bool updateSignalStrength();
         bool updateNetworkAccessTechnology();
         void updatePhoneMode(sys::phone_modes::PhoneMode mode);
+        [[nodiscard]] bool preventsAutoLocking() const noexcept;
         virtual bool updateTime();
         void setTitle(const UTF8 &text);
 

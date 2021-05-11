@@ -17,7 +17,7 @@ def change_auto_lock_timer(harness, value: str):
 @pytest.fixture(scope='function')
 def phone_ends_with_default_auto_lock(harness):
     yield
-    timeout = str(30000)
+    timeout = str(180)
     log.info("Setting back default timeout to {}ms".format(timeout))
     change_auto_lock_timer(harness, timeout)
 
@@ -83,13 +83,14 @@ def get_dom(harness):
     assert 'Window' in result['body']['dom']
     return result
 
-@pytest.mark.skip("not fully implemented - should work after EGD-5884")
 @pytest.mark.rt1051
+@pytest.mark.usefixtures("phone_ends_test_in_desktop")
+@pytest.mark.usefixtures("phone_in_desktop")
 @pytest.mark.usefixtures("phone_ends_with_default_auto_lock")
 @pytest.mark.usefixtures("phone_unlocked")
 def test_auto_lock(harness):
     # change timer lock value
-    change_auto_lock_timer(harness, str(5000))
+    change_auto_lock_timer(harness, str(5))
     assert harness.get_application_name() == "ApplicationDesktop"
 
     time.sleep(6)
@@ -103,22 +104,14 @@ def test_auto_lock(harness):
     # we should go back to previously chosen application
     assert harness.get_application_name() == app
 
-    # go back
-    harness.connection.send_key_code(key_codes["fnRight"])
-    time.sleep(1)
-    res = get_dom(harness)
-    assert contains_value_recursively(res, 'WindowName', 'MenuWindow') is True
-
-    # go back to main screen
-    harness.connection.send_key_code(key_codes["fnRight"], Keytype.long_press)
-
 
 @pytest.mark.rt1051
+@pytest.mark.usefixtures("phone_ends_test_in_desktop")
 @pytest.mark.usefixtures("phone_ends_with_default_auto_lock")
 @pytest.mark.usefixtures("phone_unlocked")
 def test_no_auto_lock_for_meditation_app(harness):
     # change timer lock value
-    change_auto_lock_timer(harness, str(5000))
+    change_auto_lock_timer(harness, str(5))
     assert harness.get_application_name() == "ApplicationDesktop"
 
     time.sleep(6)
