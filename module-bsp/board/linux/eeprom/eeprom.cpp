@@ -6,9 +6,8 @@
 
 namespace bsp::eeprom
 {
-    int init()
+    void init()
     {
-        return true;
     }
 
     bool isPresent(int busid)

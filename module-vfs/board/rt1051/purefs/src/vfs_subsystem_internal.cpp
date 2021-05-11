@@ -5,13 +5,10 @@
 #include <purefs/blkdev/disk_manager.hpp>
 #include <purefs/blkdev/disk_emmc.hpp>
 #include <purefs/blkdev/disk_eeprom.hpp>
+#include "board/rt1051/bsp/eeprom/M24256.hpp"
 
 namespace purefs::subsystem::internal
 {
-    namespace
-    {
-        constexpr auto eeprom_bus_address = 0xA0 >> 1;
-    }
     auto create_default_block_device() -> std::shared_ptr<blkdev::disk>
     {
         return std::make_shared<purefs::blkdev::disk_emmc>();
@@ -19,6 +16,6 @@ namespace purefs::subsystem::internal
 
     auto create_default_nvm_device() -> std::shared_ptr<blkdev::disk>
     {
-        return std::make_shared<purefs::blkdev::disk_eeprom>(eeprom_bus_address);
+        return std::make_shared<purefs::blkdev::disk_eeprom>(bsp::eeprom::M24256_MEM_DEVICE_ADDR);
     }
 } // namespace purefs::subsystem::internal

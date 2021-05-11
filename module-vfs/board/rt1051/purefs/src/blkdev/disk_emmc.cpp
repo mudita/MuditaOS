@@ -75,12 +75,6 @@ namespace purefs::blkdev
         return statusBlkDevSuccess;
     }
 
-    auto disk_emmc::erase(sector_t lba, std::size_t count, hwpart_t hwpart) -> int
-    {
-        // erase group size is 512kB so it has been deliberately disallowed
-        // group of this size would make the solution inefficient in this case
-        return statusBlkDevSuccess;
-    }
     auto disk_emmc::read(void *buf, sector_t lba, std::size_t count, hwpart_t hwpart) -> int
     {
         cpp_freertos::LockGuard lock(mutex);
