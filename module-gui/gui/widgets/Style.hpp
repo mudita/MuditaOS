@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "screen.hpp"
 #include <limits>
 #include <gui/core/Color.hpp>
 #include <gui/Common.hpp>
@@ -18,15 +19,16 @@ namespace gui
 /// one place to gather all common magical numbers from design
 namespace style
 {
-    inline constexpr auto window_height = 600U;
-    inline constexpr auto window_width  = 480U;
+    inline constexpr auto window_height = getScreenResolutionY();
+    inline constexpr auto window_width  = getScreenResolutionX();
     namespace header
     {
         inline constexpr auto height = 105U;
         namespace status_bar
         {
-            inline constexpr auto height = 46U;
-            inline constexpr auto width  = 440U;
+            inline constexpr unsigned status_bar_margin_w = 40U;
+            inline constexpr auto height                  = 46U;
+            inline constexpr auto width                   = window_width - status_bar_margin_w;
         }; // namespace status_bar
         namespace font
         {

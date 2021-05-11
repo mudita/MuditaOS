@@ -23,7 +23,7 @@ namespace service::eink
     class EinkDisplay
     {
       public:
-        explicit EinkDisplay(::gui::Size screenSize = {DefaultScreenWidth, DefaultScreenHeight});
+        explicit EinkDisplay(::gui::Size screenSize);
         ~EinkDisplay() noexcept;
 
         EinkStatus_e resetAndInit();
