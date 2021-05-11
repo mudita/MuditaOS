@@ -40,8 +40,6 @@
 #include <fstream>
 #include <filesystem>
 #include <list>
-#include <tuple>
-#include <vector>
 #include <module-apps/messages/AppMessage.hpp>
 #include <SystemManager/messages/CpuFrequencyMessage.hpp>
 #include <common_data/EventStore.hpp>
@@ -61,8 +59,7 @@ EventManager::EventManager(const std::string &name)
                                                                 loggerTimerName,
                                                                 std::chrono::milliseconds{loggerDelayMs},
                                                                 [this](sys::Timer & /*timer*/) { dumpLogsToFile(); })},
-      screenLightControl(std::make_unique<screen_light_control::ScreenLightControl>(settings, this)),
-      Vibra(std::make_unique<vibra_handle::Vibra>(this))
+      Vibra(std::make_unique<vibra_handle::Vibra>(this)), backlightHandler(settings, this)
 {
     LOG_INFO("[%s] Initializing", name.c_str());
     alarmTimestamp = 0;
@@ -125,10 +122,7 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
                 const auto mode = sys::SystemManager::translateSliderState(message->key);
                 bus.sendUnicast(std::make_shared<sys::PhoneModeRequest>(mode), service::name::system_manager);
             }
-            if (keypadLightState == bsp::keypad_backlight::State::activeMode && !isKeypadLightInCallMode) {
-                bsp::keypad_backlight::turnOnAll();
-                startKeypadLightTimer();
-            }
+            backlightHandler.handleKeyPressed();
         }
 
         // send key to focused application
@@ -173,7 +167,7 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
         if (auto msg = dynamic_cast<sevm::StatusStateMessage *>(msgl)) {
             auto message   = std::make_shared<sevm::StatusStateMessage>(MessageType::EVMModemStatus);
             message->state = msg->state;
-            bus.sendUnicast(message, "ServiceCellular");
+            bus.sendUnicast(message, ServiceCellular::serviceName);
         }
         handled = true;
     }
@@ -237,26 +231,32 @@ sys::ReturnCodes EventManager::InitHandler()
     connect(sevm::KeypadBacklightMessage(bsp::keypad_backlight::Action::turnOff), [&](sys::Message *msgl) {
         auto request      = static_cast<sevm::KeypadBacklightMessage *>(msgl);
         auto response     = std::make_shared<sevm::KeypadBacklightResponseMessage>();
-        response->success = processKeypadBacklightRequest(request->action);
+        response->success = backlightHandler.processKeypadRequest(request->action);
         return response;
     });
 
     connect(sevm::BatterySetCriticalLevel(0), [&](sys::Message *msgl) {
         auto request = static_cast<sevm::BatterySetCriticalLevel *>(msgl);
         battery_level_check::setBatteryCriticalLevel(request->criticalLevel);
-        return std::make_shared<sys::ResponseMessage>();
+        return sys::msgHandled();
     });
 
-    connect(sevm::ScreenLightControlMessage(), [&](sys::Message *msgl) {
+    connect(typeid(sevm::ScreenLightControlMessage), [&](sys::Message *msgl) {
         auto *m = dynamic_cast<sevm::ScreenLightControlMessage *>(msgl);
-        screenLightControl->processRequest(m->action, m->parameters);
-        return std::make_shared<sys::ResponseMessage>();
+        backlightHandler.processScreenRequest(m->action);
+        return sys::msgHandled();
+    });
+
+    connect(typeid(sevm::ScreenLightSetParameters), [&](sys::Message *msgl) {
+        auto *m = dynamic_cast<sevm::ScreenLightSetParameters *>(msgl);
+        backlightHandler.processScreenRequest(m->action, std::move(m->parameters));
+        return sys::msgHandled();
     });
 
     connect(sevm::ScreenLightControlRequestParameters(), [&](sys::Message *msgl) {
-        screen_light_control::Parameters params = {screenLightControl->getBrightnessValue()};
+        screen_light_control::Parameters params = {backlightHandler.getScreenBrightnessValue()};
         auto msg                                = std::make_shared<sevm::ScreenLightControlParametersResponse>(
-            screenLightControl->getLightState(), screenLightControl->getAutoModeState(), params);
+            backlightHandler.getScreenLightState(), backlightHandler.getScreenAutoModeState(), params);
         return msg;
     });
     connect(sevm::RtcUpdateTimeMessage(0), [&](sys::Message *msgl) {
@@ -281,13 +281,13 @@ sys::ReturnCodes EventManager::InitHandler()
                 bus.sendUnicast(std::make_shared<sevm::BatteryStatusChangeMessage>(), targetApplication);
             }
         }
-        return std::make_shared<sys::ResponseMessage>();
+        return sys::msgHandled();
     });
 
     connect(sevm::VibraMessage(bsp::vibrator::Action::stop), [&](sys::Message *msgl) {
         auto request = static_cast<sevm::VibraMessage *>(msgl);
         processVibraRequest(request->action, request->repetitionTime);
-        return std::make_shared<sys::ResponseMessage>();
+        return sys::msgHandled();
     });
 
     connect(sevm::ToggleTorchOnOffMessage(), [&]([[maybe_unused]] sys::Message *msg) {
@@ -381,71 +381,6 @@ void EventManager::handleMinuteUpdate(time_t timestamp)
         message->timestamp = timestamp;
         bus.sendUnicast(message, targetApplication);
     }
-}
-
-bool EventManager::processKeypadBacklightRequest(bsp::keypad_backlight::Action action)
-{
-    bool response = false;
-    switch (action) {
-    case bsp::keypad_backlight::Action::turnOn:
-        if (keypadLightState == bsp::keypad_backlight::State::activeMode) {
-            keypadLightTimer.stop();
-        }
-        keypadLightState = bsp::keypad_backlight::State::on;
-        response         = bsp::keypad_backlight::turnOnAll();
-        break;
-    case bsp::keypad_backlight::Action::turnOff:
-        if (keypadLightState == bsp::keypad_backlight::State::activeMode) {
-            keypadLightTimer.stop();
-        }
-        keypadLightState = bsp::keypad_backlight::State::off;
-        response         = bsp::keypad_backlight::shutdown();
-        break;
-    case bsp::keypad_backlight::Action::checkState:
-        response = bsp::keypad_backlight::checkState();
-        break;
-    case bsp::keypad_backlight::Action::turnOnActiveMode:
-        keypadLightState = bsp::keypad_backlight::State::activeMode;
-        response         = bsp::keypad_backlight::turnOnAll();
-        startKeypadLightTimer();
-        break;
-    case bsp::keypad_backlight::Action::turnOnCallMode:
-        if (keypadLightTimer.isActive()) {
-            keypadLightTimer.stop();
-        }
-        isKeypadLightInCallMode = true;
-        response                = bsp::keypad_backlight::turnOnFunctionKeysBacklight();
-        break;
-    case bsp::keypad_backlight::Action::turnOffCallMode:
-        isKeypadLightInCallMode = false;
-        restoreKeypadLightState();
-        break;
-    }
-    return response;
-}
-
-void EventManager::restoreKeypadLightState()
-{
-    switch (keypadLightState) {
-    case bsp::keypad_backlight::State::off:
-        processKeypadBacklightRequest(bsp::keypad_backlight::Action::turnOff);
-        break;
-    case bsp::keypad_backlight::State::on:
-        processKeypadBacklightRequest(bsp::keypad_backlight::Action::turnOn);
-        break;
-    case bsp::keypad_backlight::State::activeMode:
-        processKeypadBacklightRequest(bsp::keypad_backlight::Action::turnOnActiveMode);
-        break;
-    }
-}
-
-void EventManager::startKeypadLightTimer()
-{
-    keypadLightTimer = sys::TimerFactory::createSingleShotTimer(
-        this, keypadLightTimerName, keypadLightTimerTimeout, [this](sys::Timer &) {
-            bsp::keypad_backlight::shutdown();
-        });
-    keypadLightTimer.start();
 }
 
 bool EventManager::processVibraRequest(bsp::vibrator::Action act, std::chrono::milliseconds RepetitionTime)

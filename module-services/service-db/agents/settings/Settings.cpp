@@ -197,7 +197,7 @@ namespace settings
         cache->setValue(path, variableValue);
     }
 
-    std::string Settings::getValue(const std::string &variableName, SettingsScope scope)
+    std::string Settings::getValue(const std::string &variableName, SettingsScope scope) const
     {
         EntryPath path;
         path.variable = variableName;

@@ -1,9 +1,6 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
-// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
-
 #pragma once
 
 #include "module-services/service-evtmgr/screen-light-control/ScreenLightControl.hpp"
@@ -17,15 +14,22 @@ namespace sevm
     class ScreenLightControlMessage : public sys::DataMessage
     {
       public:
-        ScreenLightControlMessage() : sys::DataMessage(MessageType::ScreenLightControlAction)
+        explicit ScreenLightControlMessage(screen_light_control::Action act)
+            : sys::DataMessage(MessageType::ScreenLightControlAction), action(act)
         {}
-        ScreenLightControlMessage(screen_light_control::Action act,
-                                  screen_light_control::Parameters params = screen_light_control::Parameters())
+
+        const screen_light_control::Action action;
+    };
+
+    class ScreenLightSetParameters : public sys::DataMessage
+    {
+      public:
+        ScreenLightSetParameters(screen_light_control::ParameterizedAction act, screen_light_control::Parameters params)
             : sys::DataMessage(MessageType::ScreenLightControlAction), action(act), parameters(std::move(params))
         {}
 
-        screen_light_control::Action action;
-        screen_light_control::Parameters parameters;
+        const screen_light_control::ParameterizedAction action;
+        const screen_light_control::Parameters parameters;
     };
 
     class ScreenLightControlRequestParameters : public sys::DataMessage
