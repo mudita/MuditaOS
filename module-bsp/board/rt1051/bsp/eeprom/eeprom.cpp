@@ -22,12 +22,11 @@ namespace bsp::eeprom
 
     } // namespace
 
-    int init()
+    void init()
     {
         drivers::DriverI2CParams i2cParams;
         i2cParams.baudrate = static_cast<std::uint32_t>(BoardDefinitions::EEPROM_I2C_BAUDRATE);
         i2c = drivers::DriverI2C::Create(static_cast<drivers::I2CInstances>(BoardDefinitions::EEPROM_I2C), i2cParams);
-        return 0;
     }
 
     bool isPresent(int busid)
@@ -58,7 +57,8 @@ namespace bsp::eeprom
                 written += i2c->Write(addr, reinterpret_cast<std::uint8_t *>(ptr), static_cast<size_t>(bl_len));
                 vTaskDelay(pdMS_TO_TICKS(10));
                 ptr += bl_len;
-                addr.subAddress += bl_len;
+                mem_addr += bl_len;
+                addr.subAddress = __builtin_bswap16(mem_addr);
             }
         }
         // reminder
@@ -90,7 +90,8 @@ namespace bsp::eeprom
                 LOG_DEBUG("[EEPROM - R] reading chunk %d of %d", i, chunks);
                 read += i2c->Read(addr, reinterpret_cast<std::uint8_t *>(ptr), static_cast<size_t>(bl_len));
                 ptr += bl_len;
-                addr.subAddress += bl_len;
+                mem_addr += bl_len;
+                addr.subAddress = __builtin_bswap16(mem_addr);
             }
         }
         // reminder

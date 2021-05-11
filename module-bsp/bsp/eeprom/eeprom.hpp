@@ -12,9 +12,9 @@ extern "C"
 
 namespace bsp::eeprom
 {
-    typedef std::uint32_t addr_t;
+    typedef std::uint16_t addr_t;
 
-    int init();
+    void init();
 
     bool isPresent(int busid);
 
