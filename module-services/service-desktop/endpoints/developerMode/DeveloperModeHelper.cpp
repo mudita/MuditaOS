@@ -71,7 +71,7 @@ auto DeveloperModeHelper::processPut(Context &context) -> ProcessResult
     else if (body[json::developerMode::isLocked].bool_value()) {
         auto event = std::make_unique<sdesktop::developerMode::ScreenlockCheckEvent>();
         auto msg   = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
-        code       = toCode(owner->bus.sendUnicast(std::move(msg), "ApplicationDesktop"));
+        code       = toCode(owner->bus.sendUnicast(std::move(msg), "ApplicationManager"));
         return {sent::delayed, std::nullopt};
     }
     else if (body[json::developerMode::changeAutoLockTimeout].is_string()) {

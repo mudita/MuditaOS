@@ -28,7 +28,6 @@ target_sources( ${PROJECT_NAME}
         models/SoundsModel.cpp
         presenter/SARInfoWindowPresenter.cpp
         presenter/TechnicalWindowPresenter.cpp
-        widgets/ChangePasscodeLockHandler.cpp
         widgets/QuoteWidget.cpp
         widgets/CategoryWidget.cpp
         widgets/ApnInputWidget.cpp
@@ -66,7 +65,6 @@ target_sources( ${PROJECT_NAME}
         windows/QuotesOptionsWindow.cpp
         windows/SARInfoWindow.cpp
         windows/SecurityMainWindow.cpp
-        windows/ChangePasscodeWindow.cpp
         windows/NewApnWindow.cpp
         widgets/SpinBox.cpp
         widgets/SpinBoxOptionSettings.cpp
@@ -89,7 +87,6 @@ target_sources( ${PROJECT_NAME}
 
     PUBLIC
         ApplicationSettings.hpp
-        widgets/ChangePasscodeLockHandler.hpp
         widgets/ApnInputWidget.hpp
         widgets/CategoryWidget.hpp
         windows/NewApnWindow.hpp
@@ -106,7 +103,6 @@ target_sources( ${PROJECT_NAME}
         widgets/SettingsStyle.hpp
         windows/AutolockWindow.hpp
         windows/WallpaperWindow.hpp
-        windows/ChangePasscodeWindow.hpp
         windows/SystemMainWindow.hpp
         windows/LanguagesWindow.hpp
         windows/DateAndTimeMainWindow.hpp

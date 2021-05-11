@@ -48,7 +48,7 @@ namespace gui
         LockWindow->pinLabelsBox->setVisible(true);
         switch (type) {
         case LockBox::InputActionType::ProvideInput: {
-            LockWindow->setText("app_desktop_sim_setup_enter_puk", PinLockBaseWindow::TextType::Primary, true);
+            LockWindow->setText("app_desktop_sim_setup_enter_puk", PinLockBaseWindow::TextType::Primary);
             break;
         }
         case LockBox::InputActionType::ProvideNewInput: {
@@ -71,15 +71,13 @@ namespace gui
                 LockWindow->setText(
                     "app_desktop_sim_setup_wrong_puk",
                     PinLockBaseWindow::TextType::Primary,
-                    true,
                     {{LockWindow->getToken(PinLockBaseWindow::Token::Attempts), static_cast<int>(value)}});
             }
             else {
-                LockWindow->setText(
-                    "app_desktop_sim_setup_wrong_puk_last_attempt", PinLockBaseWindow::TextType::Primary, true);
+                LockWindow->setText("app_desktop_sim_setup_wrong_puk_last_attempt",
+                                    PinLockBaseWindow::TextType::Primary);
                 LockWindow->setText("app_desktop_sim_setup_wrong_puk_last_attempt_warning",
-                                    PinLockBaseWindow::TextType::Secondary,
-                                    true);
+                                    PinLockBaseWindow::TextType::Secondary);
             }
             break;
         case LockBox::InputErrorType::NewInputConfirmFailed: {
@@ -95,7 +93,7 @@ namespace gui
     }
     void PukLockBox::setVisibleStateBlocked()
     {
-        LockWindow->setText("app_desktop_sim_puk_blocked", PinLockBaseWindow::TextType::Primary, true);
+        LockWindow->setText("app_desktop_sim_puk_blocked", PinLockBaseWindow::TextType::Primary);
         LockWindow->setImagesVisible(false, true);
         LockWindow->setBottomBarWidgetsActive(true, false, false);
     }

@@ -50,7 +50,7 @@ namespace gui
         if (lock->isState(Lock::LockState::InputRequired)) {
             lockBox->setVisibleStateInputRequired(LockBox::InputActionType::ProvideInput);
         }
-        else if (lock->isState(Lock::LockState::InputInvalidRetryRequired)) {
+        else if (lock->isState(Lock::LockState::InputInvalid)) {
             lockBox->setVisibleStateInputInvalid(LockBox::InputErrorType::InvalidInput, lock->getAttemptsLeft());
         }
         else if (lock->isState(Lock::LockState::Blocked)) {
@@ -105,7 +105,7 @@ namespace gui
             if (usesNumericKeys()) {
                 lock->clearAttempt();
             }
-            else if (lock->isState(Lock::LockState::InputInvalidRetryRequired)) {
+            else if (lock->isState(Lock::LockState::InputInvalid)) {
                 lock->consumeState();
             }
             application->returnToPreviousWindow();
@@ -147,7 +147,6 @@ namespace gui
             setTitleBar(true, true);
             setText("app_desktop_header_sim_setup",
                     TextType::Title,
-                    true,
                     {{getToken(Token::Sim), utils::enumToString(lock->getSim())}});
         }
         else if (lockType == Lock::LockType::SimPin) {
@@ -155,7 +154,6 @@ namespace gui
             setTitleBar(true, false);
             setText("app_desktop_header_sim_setup",
                     TextType::Title,
-                    true,
                     {{getToken(Token::Sim), utils::enumToString(lock->getSim())}});
         }
         assert(lockBox != nullptr);

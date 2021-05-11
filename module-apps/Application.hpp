@@ -157,7 +157,6 @@ namespace app
       private:
         std::string default_window;
         State state = State::DEACTIVATED;
-        bool lockScreenPasscodeIsOn;
 
         sys::MessagePointer handleSignalStrengthUpdate(sys::Message *msgl);
         sys::MessagePointer handleNetworkAccessTechnologyUpdate(sys::Message *msgl);
@@ -403,12 +402,9 @@ namespace app
         locks::PhoneLockSubject phoneLockSubject;
 
       public:
-        void handlePhoneLock();
-        void handlePhoneUnLock();
-        void verifyPhoneLockInput(const std::vector<unsigned int> &inputData);
+        [[nodiscard]] auto getPhoneLockSubject() noexcept -> locks::PhoneLockSubject &;
 
-        void setLockScreenPasscodeOn(bool screenPasscodeOn) noexcept;
-        bool isLockScreenPasscodeOn() const noexcept;
+        [[nodiscard]] bool isPhoneLockEnabled() const noexcept;
         const gui::top_bar::Configuration &getTopBarConfiguration() const noexcept;
     };
 

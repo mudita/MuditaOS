@@ -14,7 +14,6 @@ namespace gui
     PhonebookNamecardOptions::PhonebookNamecardOptions(app::Application *app)
         : OptionWindow(app, gui::window::name::namecard_options)
     {
-        buildInterface();
         addOptions(namecardOptionsList());
     }
 

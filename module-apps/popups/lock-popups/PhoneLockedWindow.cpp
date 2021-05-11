@@ -111,7 +111,7 @@ namespace gui
             // if interval between enter and pnd keys is less than time defined for unlocking
             // display pin lock screen or simply refresh current window to update labels
 
-            application->handlePhoneUnLock();
+            application->getPhoneLockSubject().unlock();
             return true;
         }
         else if (lockingTimer.storeEnter(inputEvent)) {

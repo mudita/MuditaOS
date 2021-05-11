@@ -49,13 +49,8 @@ namespace app
         // done
         bool handle(cellular::StateChange *msg);
         auto handle(sdesktop::UpdateOsMessage *msg) -> bool;
-        auto handle(sdesktop::developerMode::ScreenlockCheckEvent *event) -> bool;
         void handleNotificationsChanged(std::unique_ptr<gui::SwitchData> notificationsParams) override;
 
-        unsigned int getLockPassHash() const noexcept
-        {
-            return lockPassHash;
-        }
         std::string getOsUpdateVersion() const
         {
             return osUpdateVersion;
@@ -69,9 +64,7 @@ namespace app
       private:
         bool refreshMenuWindow();
         void activeSimChanged(std::string value);
-        void lockPassHashChanged(std::string value);
         void handleLowBatteryNotification(manager::actions::ActionParamsPtr &&data);
-        unsigned int lockPassHash = 0;
         void osUpdateVersionChanged(const std::string &value);
         void osCurrentVersionChanged(const std::string &value);
         std::string osUpdateVersion{updateos::initSysVer};

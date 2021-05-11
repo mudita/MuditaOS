@@ -17,7 +17,8 @@ namespace gui
             Tethering,
             TetheringPhoneModeChangeProhibited,
             PhoneLock,
-            InputLock
+            PhoneLockInput,
+            PhoneLockChangeInfo,
         };
 
         namespace window
@@ -29,7 +30,8 @@ namespace gui
             inline constexpr auto tethering_phonemode_change_window = "TetheringPhoneModeChangeProhibitedPopup";
             inline constexpr auto phone_lock_window                 = "PhoneLockPopup";
             inline constexpr auto phone_lock_info_window            = "PhoneLockInfoPopup";
-            inline constexpr auto input_lock_window                 = "InputLockPopup";
+            inline constexpr auto phone_lock_input_window           = "PhoneLockInputPopup";
+            inline constexpr auto phone_lock_change_info_window     = "PhoneLockChangeInfoPopup";
             inline constexpr auto power_off_window                  = "PowerOffPopup";
 
         } // namespace window

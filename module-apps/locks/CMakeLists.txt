@@ -29,7 +29,7 @@ target_sources( ${PROJECT_NAME}
 	PRIVATE
 		"${CMAKE_CURRENT_LIST_DIR}/data/LockData.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/data/LockStyle.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/data/LockMessages.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/data/PhoneLockMessages.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/handlers/PinLockHandler.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/handlers/PhoneLockHandler.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/handlers/PhoneLockSubject.hpp"

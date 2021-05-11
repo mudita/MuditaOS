@@ -20,7 +20,7 @@
 #include <module-apps/application-settings-new/data/LanguagesData.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <module-apps/application-settings-new/windows/ChangeTimeZone.hpp>
-#include <module-apps/application-onboarding/windows/ConfigurePasscodeWindow.hpp>
+#include <module-apps/locks/data/PhoneLockMessages.hpp>
 
 namespace app
 {
@@ -43,6 +43,7 @@ namespace app
                                          Indicator::NetworkAccessTechnology});
 
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
+        bus.channels.push_back(sys::BusChannel::PhoneLockChanges);
     }
 
     // Invoked upon receiving data message
@@ -76,24 +77,22 @@ namespace app
             }
         });
 
+        connect(typeid(locks::SetConfirmedPhoneLock), [&](sys::Message *msg) {
+            switchWindow(gui::window::name::onBoarding_date_and_time);
+            return sys::msgHandled();
+        });
+
+        connect(typeid(locks::SkippedSetPhoneLock), [&](sys::Message *msg) {
+            switchWindow(gui::window::name::onBoarding_date_and_time);
+            return sys::msgHandled();
+        });
+
         return ret;
     }
 
     void ApplicationOnBoarding::acceptEULA()
     {
         settings->setValue(settings::SystemProperties::eulaAccepted, "1", settings::SettingsScope::Global);
-    }
-
-    void ApplicationOnBoarding::setLockPassHash(unsigned int value)
-    {
-        lockPassHash = value;
-        settings->setValue(
-            ::settings::SystemProperties::lockPassHash, std::to_string(value), ::settings::SettingsScope::Global);
-    }
-
-    auto ApplicationOnBoarding::getLockPassHash() const noexcept -> unsigned int
-    {
-        return lockPassHash;
     }
 
     sys::ReturnCodes ApplicationOnBoarding::DeinitHandler()
@@ -150,10 +149,6 @@ namespace app
         windowsFactory.attach(gui::window::name::change_time_zone, [](Application *app, const std::string &name) {
             return std::make_unique<gui::ChangeTimeZone>(app);
         });
-        windowsFactory.attach(gui::window::name::onBoarding_configure_passcode,
-                              [](Application *app, const std::string &name) {
-                                  return std::make_unique<gui::ConfigurePasscodeWindow>(app);
-                              });
         windowsFactory.attach(gui::window::name::dialog_confirm, [](Application *app, const std::string &name) {
             return std::make_unique<gui::DialogConfirm>(app, gui::window::name::dialog_confirm);
         });

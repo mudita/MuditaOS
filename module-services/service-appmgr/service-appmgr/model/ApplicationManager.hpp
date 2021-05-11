@@ -148,6 +148,7 @@ namespace app::manager
         auto handleDBResponse(db::QueryResponse *msg) -> bool;
         auto handlePowerSavingModeInit() -> bool;
         auto handleMessageAsAction(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>;
+        auto handleDeveloperModeRequest(sys::Message *request) -> sys::MessagePointer;
         /// handles dom request by passing this request to application which should provide the dom
         auto handleDOMRequest(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>;
         void handleStart(StartAllowedMessage *msg);
@@ -180,7 +181,7 @@ namespace app::manager
                                         // If it reaches time defined in settings database application
                                         // manager is sending signal to Application Desktop in order to
                                         // lock screen.
-        std::unique_ptr<settings::Settings> settings;
+        std::shared_ptr<settings::Settings> settings;
         std::unique_ptr<sys::phone_modes::Observer> phoneModeObserver;
 
         locks::PhoneLockHandler phoneLockHandler;

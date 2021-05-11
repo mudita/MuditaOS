@@ -8,10 +8,13 @@ namespace locks
 {
     void Lock::consumeState() noexcept
     {
-        if (lockState == LockState::InputInvalidRetryRequired) {
+        if (lockState == LockState::InputInvalid) {
             lockState = LockState::InputRequired;
         }
         else if (lockState == LockState::NewInputInvalid) {
+            lockState = LockState::NewInputRequired;
+        }
+        else if (lockState == LockState::NewInputConfirmRequired) {
             lockState = LockState::NewInputRequired;
         }
     }
@@ -47,4 +50,4 @@ namespace locks
         onActivatedCallback(lockType, inputValue);
         clearAttempt();
     }
-} // namespace lock
+} // namespace locks

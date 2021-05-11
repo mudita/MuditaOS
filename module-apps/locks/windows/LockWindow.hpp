@@ -37,7 +37,7 @@ namespace gui
         {}
         void build();
         void buildInfoTexts();
-        void buildPinLabels(std::function<Rect *()> itemBuilder,
+        void buildPinLabels(const std::function<Rect *()> &itemBuilder,
                             unsigned int pinSize,
                             unsigned int offsetX,
                             unsigned int offsetY,
@@ -46,7 +46,6 @@ namespace gui
         void setBottomBarWidgetsActive(bool left, bool center, bool right);
         void setText(const std::string &value,
                      TextType type,
-                     bool isReach                          = false,
                      text::RichTextParser::TokenMap tokens = text::RichTextParser::TokenMap{});
         void setTitleBar(bool isVisible);
 
@@ -54,13 +53,9 @@ namespace gui
         gui::HBox *pinLabelsBox          = nullptr;
         gui::Text *primaryText           = nullptr;
         gui::Text *secondaryText         = nullptr;
-        gui::Text *title                 = nullptr;
 
       protected:
         virtual void buildBottomBar();
         virtual void buildTitleBar() = 0;
-
-      private:
-        [[nodiscard]] auto getText(TextType type) noexcept -> gui::Text *;
     };
 } // namespace gui

@@ -12,7 +12,6 @@
 namespace gui
 {
     class PinLockHandler;
-    class ChangePasscodeLockHandler;
 } // namespace gui
 
 namespace locks
@@ -33,10 +32,9 @@ namespace locks
         {
             Unlocked,
             InputRequired,
-            InputInvalidRetryRequired,
+            InputInvalid,
             Blocked,
             NewInputRequired,
-            NewInputInvalidRetryRequired,
             NewInputConfirmRequired,
             NewInputInvalid,
             ErrorOccurred
@@ -101,7 +99,7 @@ namespace locks
         void popChar();
         /// clear all characters passed to the Lock
         void clearAttempt() noexcept;
-        /// consumes LockState::PasscodeInvalidRetryRequired state and LockState::NewPasscodeInvalid)
+        /// consumes LockState::InputInvalid state and LockState::NewInputInvalid
         void consumeState() noexcept;
         /// calls
         void activate();
@@ -143,7 +141,6 @@ namespace locks
 
         friend class PhoneLockHandler;
         friend class gui::PinLockHandler;
-        friend class gui::ChangePasscodeLockHandler;
     };
 
 } // namespace lock

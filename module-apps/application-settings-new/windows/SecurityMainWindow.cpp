@@ -12,23 +12,24 @@
 namespace gui
 {
     SecurityMainWindow::SecurityMainWindow(app::Application *app, app::settingsInterface::SecuritySettings *settings)
-        : BaseSettingsWindow(app, window::name::security), lockScreenPasscodeIsOn(app->isLockScreenPasscodeOn()),
-          securitySettings(settings)
+        : BaseSettingsWindow(app, window::name::security), securitySettings(settings)
     {}
+
+    void SecurityMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
+    {
+        isPhoneLockEnabled = application->isPhoneLockEnabled();
+        BaseSettingsWindow::onBeforeShow(mode, data);
+    }
 
     auto SecurityMainWindow::buildOptionsList() -> std::list<Option>
     {
         std::list<Option> optionList;
 
         optionList.emplace_back(std::make_unique<option::OptionSettings>(
-            utils::translate("app_settings_security_lock_screen_passcode"),
+            utils::translate("app_settings_security_phone_lock"),
             [=](Item &item) {
-                lockScreenPasscodeIsOn = !lockScreenPasscodeIsOn;
-                LOG_INFO("switching to %s page", window::name::change_passcode);
-                auto data = lockScreenPasscodeIsOn
-                                ? std::make_unique<ChangePasscodeData>(ChangePasscodeAction::OnlyProvideNewPasscode)
-                                : std::make_unique<ChangePasscodeData>(ChangePasscodeAction::OnlyCheckCurrentPasscode);
-                application->switchWindow(window::name::change_passcode, std::move(data));
+                isPhoneLockEnabled ? application->getPhoneLockSubject().disablePhoneLock()
+                                   : application->getPhoneLockSubject().enablePhoneLock();
                 return true;
             },
             [=](Item &item) {
@@ -41,7 +42,7 @@ namespace gui
                 return true;
             },
             nullptr,
-            lockScreenPasscodeIsOn ? option::SettingRightItem::On : option::SettingRightItem::Off));
+            isPhoneLockEnabled ? option::SettingRightItem::On : option::SettingRightItem::Off));
 
         optionList.emplace_back(std::make_unique<option::OptionSettings>(
             utils::translate("app_settings_security_usb_passcode"),
@@ -52,9 +53,10 @@ namespace gui
                     securitySettings->setUSBSecurity(!securitySettings->isUSBSecured());
                     application->returnToPreviousWindow();
                 };
-                application->switchWindow(app::window::name::desktop_pin_lock,
-                                          gui::ShowMode::GUI_SHOW_INIT,
-                                          std::make_unique<locks::LockData>(*lock));
+                application->switchWindow(
+                    app::window::name::desktop_pin_lock,
+                    gui::ShowMode::GUI_SHOW_INIT,
+                    std::make_unique<locks::LockData>(*lock, locks::PhoneLockInputTypeAction::Change));
                 return true;
             },
             [=](Item &item) {
@@ -69,14 +71,11 @@ namespace gui
             nullptr,
             securitySettings->isUSBSecured() ? option::SettingRightItem::On : option::SettingRightItem::Off));
 
-        if (lockScreenPasscodeIsOn) {
+        if (isPhoneLockEnabled) {
             optionList.emplace_back(std::make_unique<option::OptionSettings>(
-                utils::translate("app_settings_security_change_passcode"),
+                utils::translate("app_settings_security_change_phone_lock"),
                 [=](Item &item) {
-                    LOG_INFO("switching to %s page", window::name::change_passcode);
-                    application->switchWindow(
-                        window::name::change_passcode,
-                        std::make_unique<ChangePasscodeData>(ChangePasscodeAction::ChangeCurrentPasscode));
+                    application->getPhoneLockSubject().changePhoneLock();
                     return true;
                 },
                 nullptr,

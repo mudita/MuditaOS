@@ -31,7 +31,7 @@ namespace gui
         secondaryText->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
     }
 
-    void LockWindow::buildPinLabels(std::function<Rect *()> itemBuilder,
+    void LockWindow::buildPinLabels(const std::function<Rect *()> &itemBuilder,
                                     unsigned int pinSize,
                                     unsigned int offsetX,
                                     unsigned int offsetY,
@@ -70,50 +70,42 @@ namespace gui
         bottomBar->setActive(BottomBar::Side::RIGHT, right);
     }
 
-    void LockWindow::setText(const std::string &value,
-                             TextType type,
-                             bool isReach,
-                             text::RichTextParser::TokenMap tokens)
+    void LockWindow::setText(const std::string &value, TextType type, text::RichTextParser::TokenMap tokens)
     {
-        auto text = getText(type);
-        text->setVisible(true);
-        if (isReach) {
-            TextFormat format(FontManager::getInstance().getFont(style::window::font::medium));
-            text::RichTextParser rtParser;
-            auto parsedText = rtParser.parse(utils::translate(value), &format, std::move(tokens));
-            text->setText(std::move(parsedText));
+        switch (type) {
+        case TextType::Title: {
+            title->setVisible(true);
+            if (!tokens.empty()) {
+                TextFormat format(FontManager::getInstance().getFont(style::window::font::medium));
+                title->setText(
+                    text::RichTextParser().parse(utils::translate(value), &format, std::move(tokens))->getText());
+            }
+            else {
+                title->setText(utils::translate(value));
+            }
+            break;
         }
-        else {
-            text->setText(utils::translate(value));
+        case TextType::Primary:
+            primaryText->setVisible(true);
+            primaryText->setRichText(utils::translate(value), std::move(tokens));
+            break;
+        case TextType::Secondary:
+            secondaryText->setVisible(true);
+            secondaryText->setRichText(utils::translate(value), std::move(tokens));
+            break;
         }
     }
 
     void LockWindow::setTitleBar(bool isVisible)
     {
         title->setVisible(isVisible);
-        if (isVisible) {
-            title->setEdges(RectangleEdge::Bottom);
-        }
-        else {
-            title->clear();
-            title->setEdges(RectangleEdge::None);
-        }
     }
 
     void LockWindow::buildBottomBar()
     {
+        bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::skip));
         bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::confirm));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
     }
 
-    auto LockWindow::getText(TextType type) noexcept -> gui::Text *
-    {
-        if (type == TextType::Title) {
-            return title;
-        }
-        else if (type == TextType::Primary) {
-            return primaryText;
-        }
-        return secondaryText;
-    }
 } // namespace gui

@@ -14,8 +14,9 @@ namespace gui
 
       private:
         auto buildOptionsList() -> std::list<Option> override;
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
 
-        bool lockScreenPasscodeIsOn;
+        bool isPhoneLockEnabled;
         app::settingsInterface::SecuritySettings *securitySettings;
     };
 } // namespace gui

@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "PhoneUnLockWindow.hpp"
+#include "PhoneLockInputWindow.hpp"
 
 #include <service-appmgr/Controller.hpp>
 #include <locks/data/LockData.hpp>
@@ -10,87 +10,86 @@
 
 namespace gui
 {
-    PhoneUnlockWindow::PhoneUnlockWindow(app::Application *app, const std::string &window_name)
+    PhoneLockInputWindow::PhoneLockInputWindow(app::Application *app, const std::string &window_name)
         : PinLockBaseWindow(app, window_name)
     {
         buildInterface();
     }
 
-    void PhoneUnlockWindow::rebuild()
+    void PhoneLockInputWindow::rebuild()
     {
         destroyInterface();
         buildInterface();
     }
-    void PhoneUnlockWindow::buildInterface()
+    void PhoneLockInputWindow::buildInterface()
     {
         AppWindow::buildInterface();
         LockWindow::build();
     }
 
-    void PhoneUnlockWindow::destroyInterface()
+    void PhoneLockInputWindow::destroyInterface()
     {
         erase();
     }
 
-    void PhoneUnlockWindow::setVisibleState()
+    void PhoneLockInputWindow::setVisibleState()
     {
         restore();
         if (lock->isState(locks::Lock::LockState::InputRequired)) {
             lockBox->setVisibleStateInputRequired(LockBox::InputActionType::ProvideInput);
         }
-        else if (lock->isState(locks::Lock::LockState::InputInvalidRetryRequired)) {
+        else if (lock->isState(locks::Lock::LockState::InputInvalid)) {
             lockBox->setVisibleStateInputInvalid(LockBox::InputErrorType::InvalidInput, lock->getAttemptsLeft());
         }
         else if (lock->isState(locks::Lock::LockState::Blocked)) {
             lockBox->setVisibleStateBlocked();
         }
+        else if (lock->isState(locks::Lock::LockState::NewInputRequired)) {
+            lockBox->setVisibleStateInputRequired(LockBox::InputActionType::ProvideNewInput);
+        }
+        else if (lock->isState(locks::Lock::LockState::NewInputConfirmRequired)) {
+            lockBox->setVisibleStateInputRequired(LockBox::InputActionType::ConfirmNewInput);
+        }
+        else if (lock->isState(locks::Lock::LockState::NewInputInvalid)) {
+            lockBox->setVisibleStateInputInvalid(LockBox::InputErrorType::NewInputConfirmFailed,
+                                                 lock->getAttemptsLeft());
+        }
     }
 
-    top_bar::Configuration PhoneUnlockWindow::configureTopBar(top_bar::Configuration appConfiguration)
-    {
-        appConfiguration.disable(top_bar::Indicator::NetworkAccessTechnology);
-        appConfiguration.disable(top_bar::Indicator::Time);
-        appConfiguration.enable(top_bar::Indicator::PhoneMode);
-        appConfiguration.enable(top_bar::Indicator::Lock);
-        appConfiguration.enable(top_bar::Indicator::Battery);
-        appConfiguration.enable(top_bar::Indicator::Signal);
-        appConfiguration.enable(top_bar::Indicator::SimCard);
-        return appConfiguration;
-    }
-
-    void PhoneUnlockWindow::onBeforeShow(ShowMode mode, SwitchData *data)
+    void PhoneLockInputWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         if (auto lockData = dynamic_cast<locks::LockData *>(data)) {
-
-            rebuild();
-
-            lock    = std::make_unique<locks::Lock>(lockData->getLock());
-            lockBox = std::make_unique<PhoneLockBox>(this);
-            lockBox->buildLockBox(lock->getMaxInputSize());
-            setVisibleState();
+            lock                     = std::make_unique<locks::Lock>(lockData->getLock());
+            phoneLockInputTypeAction = lockData->getPhoneLockInputTypeAction();
         }
 
         // Lock need to exist in that window flow
         assert(lock);
+
+        rebuild();
+        lockBox = std::make_unique<PhoneLockBox>(this, phoneLockInputTypeAction);
+        lockBox->buildLockBox(lock->getMaxInputSize());
+
+        setVisibleState();
     }
 
-    bool PhoneUnlockWindow::onInput(const InputEvent &inputEvent)
+    bool PhoneLockInputWindow::onInput(const InputEvent &inputEvent)
     {
         if (!inputEvent.isShortRelease()) {
             return AppWindow::onInput(inputEvent);
         }
         else if (inputEvent.is(KeyCode::KEY_RF) && bottomBar->isActive(BottomBar::Side::RIGHT)) {
-            if (usesNumericKeys()) {
+            if (isInInputState()) {
                 lock->clearAttempt();
             }
-            else if (lock->isState(locks::Lock::LockState::InputInvalidRetryRequired)) {
+            else if (lock->isState(locks::Lock::LockState::InputInvalid)) {
                 lock->consumeState();
             }
             application->returnToPreviousWindow();
             return true;
         }
         else if (inputEvent.is(KeyCode::KEY_PND)) {
-            if (usesNumericKeys()) {
+            if (isInInputState()) {
                 lock->popChar();
                 lockBox->popChar(lock->getCharCount());
                 bottomBar->setActive(BottomBar::Side::CENTER, lock->canVerify());
@@ -99,13 +98,15 @@ namespace gui
         }
         else if (inputEvent.isDigit()) {
 
-            if (usesNumericKeys() && lock->canPut()) {
+            if (isInInputState() && lock->canPut()) {
 
                 lockBox->putChar(lock->getCharCount());
                 lock->putNextChar(inputEvent.numericValue());
 
                 if (lock->canVerify()) {
-                    application->verifyPhoneLockInput(lock->getInput());
+                    application->getPhoneLockSubject().verifyInput(lock->getInput());
+                    lock->consumeState();
+                    lock->clearAttempt();
                 }
 
                 return true;
@@ -123,13 +124,22 @@ namespace gui
             }
             return true;
         }
+        else if (inputEvent.is(KeyCode::KEY_LF) && bottomBar->isActive(BottomBar::Side::LEFT)) {
+            application->getPhoneLockSubject().skipSetPhoneLock();
+            lock->consumeState();
+            lock->clearAttempt();
+            return true;
+        }
 
         // check if any of the lower inheritance onInput methods catch the event
         return AppWindow::onInput(inputEvent);
     }
 
-    auto PhoneUnlockWindow::usesNumericKeys() const noexcept -> bool
+    auto PhoneLockInputWindow::isInInputState() const noexcept -> bool
     {
-        return lock && (lock->isState(locks::Lock::LockState::InputRequired));
+        return lock && (lock->isState(locks::Lock::LockState::InputRequired) ||
+                        lock->isState(locks::Lock::LockState::NewInputRequired) ||
+                        lock->isState(locks::Lock::LockState::NewInputConfirmRequired));
     }
+
 } /* namespace gui */
