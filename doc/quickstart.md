@@ -3,6 +3,7 @@
 You can quickstart the project by going through one of the following guides:
 
 - [Introduction](#introduction)
+- [CMake options](#CMake-options)
 - [Quickstart on Linux](#quickstart-on-linux)
 - [Quickstart with unit tests](#quickstart-with-unit-tests)
 - [Quickstart on the phone](#quickstart-on-the-phone)
@@ -43,7 +44,27 @@ git pull --recurse-submodules
 cd build-[rt1051|linux]-[release|debug|relwithdebinfo]
 make
 ```
+### CMake options
+Before configuring the project with `./configure.sh` you can tune it by enabling/disabling options to suite your needs.
+This can be done manually, by editing the `.cmake` files (not recommended though) or by CLI/GUI tool like `ccmake`.
 
+| Option                        | Description                                                               | Default value |
+| ------------------------------|:-------------------------------------------------------------------------:|:-------------:|
+| `COVERAGE_ENABLE`             | Enable code coverage report generation                                    | OFF           |
+| `COLOR_OUTPUT`                | Use colored output in RTT logs and compiler diagnostics                   | ON            |
+| `SYSTEMVIEW`                  | Enable usage of Segger's SystemView                                       | OFF           |
+| `USBCDC_ECHO`                 | Enable echoing through USB-CDC                                            | OFF           |
+| `MUDITA_USB_ID`               | Enable using Mudita registered USB Vendor ID and Pure Phone USB Product ID| OFF           |
+| `ENABLE_APP_X`                | Build and enable application X                                            | ON            |
+| `OPTIMIZE_APP_X`              | Optimize application X in debug build                                     | ON            |
+| `LINUX_ENABLE_SANITIZER`      | Enable address sanitizer for Linux                                        | ON            |
+| `ENABLE_SECURE_BOOT`          | Build signed binary for Secure Boot                                       | OFF           |
+| `THIRD_PARTY_DEBUG_OPTIMIZE`  | Optimize third party in debug                                             | ON            |
+| `ENABLE_TEST_LOGS`            | Enable logs in unit tests                                                 | OFF           |
+| `GENERATE_STACK_USAGE`        | Generate stack usage report                                               | OFF           |
+| `BUILD_DOC_WITH_ALL`          | Build documentation with `all` target                                     | OFF           |
+
+By using `ENABLE_APP_X` (where `X` is the name of the application) you can enable/disable any application.
 ### Quickstart on Linux
 
 Here's the bare minimum that will enable you to bootstrap the environment on Linux.
