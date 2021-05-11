@@ -37,12 +37,12 @@ namespace gui
 
     void AppWindow::buildInterface()
     {
-        bottomBar = new gui::BottomBar(this, 0, 599 - 50, 480, 50);
+        bottomBar = new gui::BottomBar(this, 0, style::window_height - 51, style::window_width, 50);
         bottomBar->setActive(BottomBar::Side::LEFT, false);
         bottomBar->setActive(BottomBar::Side::CENTER, false);
         bottomBar->setActive(BottomBar::Side::RIGHT, false);
 
-        title = new gui::Label(this, 0, 52, 480, 52);
+        title = new gui::Label(this, 0, 52, style::window_width, 52);
         title->setFilled(false);
         title->setFont(font::title);
         title->clear();
