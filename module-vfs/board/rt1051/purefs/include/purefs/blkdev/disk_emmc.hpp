@@ -33,7 +33,6 @@ namespace purefs::blkdev
         auto sync() -> int override;
         auto status() const -> media_status override;
         auto get_info(info_type what, hwpart_t hwpart) const -> scount_t override;
-        auto erase(sector_t lba, std::size_t count, hwpart_t hwpart) -> int override;
         auto pm_control(pm_state target_state) -> int override;
         auto pm_read(pm_state &current_state) -> int override;
 

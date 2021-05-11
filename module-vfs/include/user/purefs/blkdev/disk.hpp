@@ -25,7 +25,7 @@ namespace purefs::blkdev
         /** Disk cleanup just before unregistering
          * @return  zero on success otherwise error
          */
-        virtual auto cleanup() -> int = 0;
+        virtual auto cleanup() -> int;
 
         /** Write a data onto block device or partition
          * @param[in] buf Data buffer to write
@@ -56,7 +56,7 @@ namespace purefs::blkdev
         /** Flush buffers and write all data into the physical device
          * @return zero or success otherwise error
          */
-        virtual auto sync() -> int = 0;
+        virtual auto sync() -> int;
 
         /** Set block device power state
          * @param[in] target_state Set the target power state

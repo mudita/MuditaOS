@@ -12,10 +12,20 @@ namespace purefs::blkdev
     }
     auto disk::pm_control(pm_state target_state) -> int
     {
-        return -ENOTSUP;
+        return 0;
     }
     auto disk::pm_read(pm_state &current_state) -> int
     {
-        return -ENOTSUP;
+        current_state = pm_state::active;
+        return 0;
     }
+    auto disk::sync() -> int
+    {
+        return 0;
+    }
+    auto disk::cleanup() -> int
+    {
+        return 0;
+    }
+
 } // namespace purefs::blkdev
