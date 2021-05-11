@@ -167,8 +167,8 @@ namespace app
         class AutoLockSettings
         {
           public:
-            virtual auto getAutoLockTime() const noexcept -> std::chrono::milliseconds = 0;
-            virtual void setAutoLockTime(std::chrono::milliseconds lockTime) noexcept  = 0;
+            virtual void getAutoLockTime()                              = 0;
+            virtual void setAutoLockTime(std::chrono::seconds lockTime) = 0;
         };
 
     }; // namespace settingsInterface
@@ -236,8 +236,8 @@ namespace app
         auto getConnectionFrequency() const noexcept -> uint8_t override;
         void setConnectionFrequency(uint8_t val) noexcept override;
 
-        auto getAutoLockTime() const noexcept -> std::chrono::milliseconds override;
-        void setAutoLockTime(std::chrono::milliseconds lockTime) noexcept override;
+        void getAutoLockTime() override;
+        void setAutoLockTime(std::chrono::seconds lockTime) override;
 
       private:
         void attachQuotesWindows();

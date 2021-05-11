@@ -103,7 +103,8 @@ namespace app
           default_window(gui::name::window::main_window), windowsStack(this),
           keyTranslator{std::make_unique<gui::KeyInputSimpleTranslation>()}, startInBackground{startInBackground},
           callbackStorage{std::make_unique<CallbackStorage>()}, topBarManager{std::make_unique<TopBarManager>()},
-          settings(std::make_unique<settings::Settings>()), phoneMode{mode}, phoneLockSubject(this)
+          settings(std::make_unique<settings::Settings>()), phoneMode{mode}, phoneLockSubject(this),
+          lockPolicyHandler(this)
     {
         topBarManager->enableIndicators({gui::top_bar::Indicator::Time});
         using TimeMode = gui::top_bar::TimeConfiguration::TimeMode;
@@ -945,5 +946,10 @@ namespace app
     {
         return (utils::getNumericValue<bool>(
             settings->getValue(settings::SystemProperties::lockScreenPasscodeIsOn, settings::SettingsScope::Global)));
+    }
+
+    auto Application::getLockPolicyHandler() noexcept -> locks::LockPolicyHandlerInterface &
+    {
+        return lockPolicyHandler;
     }
 } /* namespace app */

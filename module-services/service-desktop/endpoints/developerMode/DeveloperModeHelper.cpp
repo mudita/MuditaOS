@@ -79,7 +79,7 @@ auto DeveloperModeHelper::processPut(Context &context) -> ProcessResult
     else if (body[json::developerMode::changeAutoLockTimeout].is_string()) {
         auto value = body[json::developerMode::changeAutoLockTimeout].string_value();
         settings::EntryPath path;
-        path.variable = settings::SystemProperties::lockTime;
+        path.variable = settings::SystemProperties::autoLockTimeInSec;
         path.service  = service::name::db;
         path.scope    = settings::SettingsScope::Global;
         auto msg      = std::make_shared<settings::Messages::SetVariable>(std::move(path), std::move(value));

@@ -18,10 +18,16 @@ The message is used as a trigger to restart the auto-lock timer, as shown on the
 
 In some situations the phone cannot be locked automatically and thus the auto-locking mechanism provides the ability to detect
 such cases. It is determined by a state of the currently focused application. There are three auto-lock policies that 
-manage the state an application:
-* `AllowAutoLocking` - the default value allowing an application to be locked automatically 
-* `PreventTemporarily` - a non-permanent (usually tied to same window) state in which an application cannot be locked automatically
-* `PreventPermanently` - a permanent state (usually tied to application's manifest) in which an application cannot be locked automatically. Once set, it cannot be changed.
+manage the state an application, that should be stated in the Application's manifest:
+* `DetermineByWindow` - the default value causing an application to be locked automatically if currently displayed window does not prevent it.
+* `DetermineByAppState` - a policy that checks if both window and current application state allows for autolock.
+* `PreventPermanently` - a permanent state in which an application cannot be locked automatically. Once set it cannot be unset.
+
+Each Application has the `LockPolicyHandler` class that manages and enforces policies. In case of `DetermineByAppState` policy, 
+an application should provide its own implementation of  the `preventsAutoLockByStateCallback` to the `LockPolicyHandler`. 
+The policy, determined in the manifest, is set by `app::ApplicationLauncher` using `LockPolicyHandlerInterface`.
+
+![](auto_lock_policy_handler_interface.svg)
 
 ## Locked-Phone interactions
 
