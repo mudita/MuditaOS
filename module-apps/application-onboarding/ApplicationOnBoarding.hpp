@@ -16,7 +16,6 @@ namespace gui::window::name
     inline constexpr auto onBoarding_skip                     = "OnBoardingSkipConfirm";
     inline constexpr auto onBoarding_date_and_time            = "OnBoardingDateAndTime";
     inline constexpr auto onBoarding_change_date_and_time     = "OnBoardingChangeDateAndTime";
-    inline constexpr auto onBoarding_configure_passcode       = "OnBoardingConfigurePasscode";
 } // namespace gui::window::name
 
 namespace app
@@ -40,12 +39,6 @@ namespace app
 
         void createUserInterface() override;
         void destroyUserInterface() override;
-
-        void setLockPassHash(unsigned int value);
-        [[nodiscard]] auto getLockPassHash() const noexcept -> unsigned int;
-
-      private:
-        unsigned int lockPassHash = 0;
     };
 
     template <> struct ManifestTraits<ApplicationOnBoarding>

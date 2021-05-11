@@ -25,7 +25,8 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/presenter/PowerOffPresenter.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/lock-popups/PhoneLockedInfoWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/lock-popups/PhoneLockedWindow.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/lock-popups/PhoneUnLockWindow.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/lock-popups/PhoneLockInputWindow.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/lock-popups/PhoneLockChangeInfoWindow.cpp"
 
 	PRIVATE
 		"${CMAKE_CURRENT_LIST_DIR}/Popups.hpp"
@@ -40,5 +41,6 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/data/PopupData.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/lock-popups/PhoneLockedInfoWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/lock-popups/PhoneLockedWindow.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/lock-popups/PhoneUnLockWindow.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/lock-popups/PhoneLockInputWindow.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/lock-popups/PhoneLockChangeInfoWindow.hpp"
 )

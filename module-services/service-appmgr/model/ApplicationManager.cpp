@@ -25,6 +25,7 @@
 #include <service-gui/ServiceGUI.hpp>
 #include <service-eink/ServiceEink.hpp>
 #include <service-desktop/DesktopMessages.hpp>
+#include <service-desktop/Constants.hpp>
 #include <service-appmgr/StartupType.hpp>
 #include <module-services/service-audio/service-audio/AudioMessage.hpp>
 
@@ -134,9 +135,9 @@ namespace app::manager
         : Service{serviceName, {}, ApplicationManagerStackDepth},
           ApplicationManagerBase(std::move(launchers)), rootApplicationName{_rootApplicationName},
           actionsRegistry{[this](ActionEntry &action) { return handleAction(action); }}, notificationProvider(this),
-          autoLockEnabled(false), settings(std::make_unique<settings::Settings>(this)),
+          autoLockEnabled(false), settings(std::make_shared<settings::Settings>(this)),
           phoneModeObserver(std::make_unique<sys::phone_modes::Observer>()),
-          phoneLockHandler(locks::PhoneLockHandler(this))
+          phoneLockHandler(locks::PhoneLockHandler(this, settings))
     {
         autoLockTimer = sys::TimerFactory::createSingleShotTimer(
             this, timerBlock, sys::timer::InfiniteTimeout, [this](sys::Timer &) { onPhoneLocked(); });
@@ -420,6 +421,7 @@ namespace app::manager
             handleDBResponse(response);
             return sys::msgHandled();
         });
+
         connect(typeid(locks::LockPhone),
                 [&](sys::Message *request) -> sys::MessagePointer { return phoneLockHandler.handleLockRequest(); });
         connect(typeid(locks::UnlockPhone),
@@ -428,9 +430,24 @@ namespace app::manager
             return phoneLockHandler.handleUnlockCancelRequest();
         });
         connect(typeid(locks::UnLockPhoneInput), [&](sys::Message *request) -> sys::MessagePointer {
-            auto msg = static_cast<locks::UnLockPhoneInput *>(request);
-            return phoneLockHandler.verifyPhoneLockInput(msg->getInputData());
+            auto data = dynamic_cast<locks::UnLockPhoneInput *>(request);
+            return phoneLockHandler.verifyPhoneLockInput(data->getInputData());
         });
+        connect(typeid(locks::EnablePhoneLock),
+                [&](sys::Message *request) -> sys::MessagePointer { return phoneLockHandler.handleEnablePhoneLock(); });
+        connect(typeid(locks::DisablePhoneLock), [&](sys::Message *request) -> sys::MessagePointer {
+            return phoneLockHandler.handleDisablePhoneLock();
+        });
+        connect(typeid(locks::ChangePhoneLock),
+                [&](sys::Message *request) -> sys::MessagePointer { return phoneLockHandler.handleChangePhoneLock(); });
+        connect(typeid(locks::SetPhoneLock),
+                [&](sys::Message *request) -> sys::MessagePointer { return phoneLockHandler.handleSetPhoneLock(); });
+        connect(typeid(locks::SkipSetPhoneLock), [&](sys::Message *request) -> sys::MessagePointer {
+            return phoneLockHandler.handleSkipSetPhoneLock();
+        });
+
+        connect(typeid(sdesktop::developerMode::DeveloperModeRequest),
+                [&](sys::Message *request) -> sys::MessagePointer { return handleDeveloperModeRequest(request); });
 
         connect(typeid(app::manager::DOMRequest), [&](sys::Message *request) { return handleDOMRequest(request); });
 
@@ -1097,6 +1114,19 @@ namespace app::manager
             return sys::MessageNone{};
         }
         return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
+    }
+
+    auto ApplicationManager::handleDeveloperModeRequest(sys::Message *request) -> sys::MessagePointer
+    {
+        if (auto msg = dynamic_cast<sdesktop::developerMode::DeveloperModeRequest *>(request)) {
+            if (dynamic_cast<sdesktop::developerMode::ScreenlockCheckEvent *>(msg->event.get())) {
+                auto response = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(
+                    std::make_unique<sdesktop::developerMode::ScreenlockCheckEvent>(phoneLockHandler.isPhoneLocked()));
+                bus.sendUnicast(std::move(response), service::name::service_desktop);
+                return sys::msgHandled();
+            }
+        }
+        return sys::msgNotHandled();
     }
 
     void ApplicationManager::processKeypadBacklightState(bsp::keypad_backlight::State keypadLightState)

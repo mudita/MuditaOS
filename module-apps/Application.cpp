@@ -47,7 +47,8 @@
 #include <popups/presenter/PowerOffPresenter.hpp>
 #include <popups/lock-popups/PhoneLockedWindow.hpp>
 #include <popups/lock-popups/PhoneLockedInfoWindow.hpp>
-#include <popups/lock-popups/PhoneUnLockWindow.hpp>
+#include <popups/lock-popups/PhoneLockInputWindow.hpp>
+#include <popups/lock-popups/PhoneLockChangeInfoWindow.hpp>
 #include <popups/data/PopupData.hpp>
 #include <popups/data/PopupRequestParams.hpp>
 #include <popups/data/PhoneModeParams.hpp>
@@ -627,12 +628,6 @@ namespace app
             setState(State::ACTIVE_BACKGROUND);
         }
 
-        lockScreenPasscodeIsOn = utils::getNumericValue<bool>(
-            settings->getValue(settings::SystemProperties::lockScreenPasscodeIsOn, settings::SettingsScope::Global));
-        settings->registerValueChange(
-            settings::SystemProperties::lockScreenPasscodeIsOn,
-            [this](const std::string &value) { lockScreenPasscodeIsOn = utils::getNumericValue<bool>(value); },
-            settings::SettingsScope::Global);
         return sys::ReturnCodes::Success;
     }
 
@@ -774,16 +769,22 @@ namespace app
             case ID::Brightness:
                 break;
             case ID::PhoneLock:
-            case ID::InputLock:
+            case ID::PhoneLockInput:
+            case ID::PhoneLockChangeInfo:
                 windowsFactory.attach(window::phone_lock_window, [](Application *app, const std::string &name) {
                     return std::make_unique<gui::PhoneLockedWindow>(app, window::phone_lock_window);
                 });
                 windowsFactory.attach(window::phone_lock_info_window, [](Application *app, const std::string &name) {
                     return std::make_unique<gui::PhoneLockedInfoWindow>(app, window::phone_lock_info_window);
                 });
-                windowsFactory.attach(window::input_lock_window, [](Application *app, const std::string &name) {
-                    return std::make_unique<gui::PhoneUnlockWindow>(app, window::input_lock_window);
+                windowsFactory.attach(window::phone_lock_input_window, [](Application *app, const std::string &name) {
+                    return std::make_unique<gui::PhoneLockInputWindow>(app, window::phone_lock_input_window);
                 });
+                windowsFactory.attach(window::phone_lock_change_info_window,
+                                      [](Application *app, const std::string &name) {
+                                          return std::make_unique<gui::PhoneLockChangeInfoWindow>(
+                                              app, window::phone_lock_change_info_window);
+                                      });
                 windowsFactory.attach(window::power_off_window, [](Application *app, const std::string &name) {
                     auto presenter = std::make_unique<gui::PowerOffPresenter>(app);
                     return std::make_unique<gui::PowerOffWindow>(app, std::move(presenter));
@@ -807,10 +808,12 @@ namespace app
                      std::to_string(volumeParams->getVolume()).c_str());
             handleVolumeChanged(volumeParams->getVolume(), volumeParams->getAudioContext());
         }
-        else if (id == ID::InputLock) {
+        else if (id == ID::PhoneLockInput || id == ID::PhoneLockChangeInfo) {
             auto popupParams = static_cast<const gui::PhoneUnlockInputRequestParams *>(params);
 
-            switchWindow(gui::popup::resolveWindowName(id), std::make_unique<locks::LockData>(popupParams->getLock()));
+            switchWindow(
+                gui::popup::resolveWindowName(id),
+                std::make_unique<locks::LockData>(popupParams->getLock(), popupParams->getPhoneLockInputTypeAction()));
         }
         else {
             switchWindow(gui::popup::resolveWindowName(id));
@@ -933,31 +936,14 @@ namespace app
         callbackStorage->removeAll(receiver);
     }
 
-    void Application::handlePhoneLock()
+    auto Application::getPhoneLockSubject() noexcept -> locks::PhoneLockSubject &
     {
-        phoneLockSubject.lock();
+        return phoneLockSubject;
     }
 
-    void Application::handlePhoneUnLock()
+    bool Application::isPhoneLockEnabled() const noexcept
     {
-        phoneLockSubject.unlock();
-    }
-
-    void Application::verifyPhoneLockInput(const std::vector<unsigned int> &inputData)
-    {
-        phoneLockSubject.verifyInput(inputData);
-    }
-
-    void Application::setLockScreenPasscodeOn(bool screenPasscodeOn) noexcept
-    {
-        lockScreenPasscodeIsOn = screenPasscodeOn;
-        settings->setValue(settings::SystemProperties::lockScreenPasscodeIsOn,
-                           std::to_string(lockScreenPasscodeIsOn),
-                           settings::SettingsScope::Global);
-    }
-
-    bool Application::isLockScreenPasscodeOn() const noexcept
-    {
-        return lockScreenPasscodeIsOn;
+        return (utils::getNumericValue<bool>(
+            settings->getValue(settings::SystemProperties::lockScreenPasscodeIsOn, settings::SettingsScope::Global)));
     }
 } /* namespace app */

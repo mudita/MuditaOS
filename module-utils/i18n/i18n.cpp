@@ -124,6 +124,10 @@ namespace utils
 
     bool i18n::setDisplayLanguage(const Language &lang)
     {
+        if (fallbackLanguage == json11::Json()) {
+            loadFallbackLanguage();
+        }
+
         if ((lang.empty() || lang == currentDisplayLanguage) && !currentDisplayLanguage.empty()) {
 
             return false;
@@ -135,12 +139,6 @@ namespace utils
 
             return true;
         }
-        else if (fallbackLanguage == json11::Json()) {
-
-            loadFallbackLanguage();
-            return true;
-        }
-
         return false;
     }
 

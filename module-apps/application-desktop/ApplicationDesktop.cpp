@@ -165,11 +165,6 @@ namespace app
         if (auto msg = dynamic_cast<cellular::StateChange *>(msgl)) {
             handled = handle(msg);
         }
-        else if (auto msg = dynamic_cast<sdesktop::developerMode::DeveloperModeRequest *>(msgl)) {
-            if (auto event = dynamic_cast<sdesktop::developerMode::ScreenlockCheckEvent *>(msg->event.get())) {
-                handled = handle(event);
-            }
-        }
         else if (auto msg = dynamic_cast<sdesktop::UpdateOsMessage *>(msgl)) {
             handled = handle(msg);
         }
@@ -200,17 +195,6 @@ namespace app
             if (msg->updateStats.updateFile.has_filename()) {
                 LOG_DEBUG("handle pending update found: %s", msg->updateStats.updateFile.c_str());
             }
-        }
-
-        return true;
-    }
-
-    auto ApplicationDesktop::handle(sdesktop::developerMode::ScreenlockCheckEvent *event) -> bool
-    {
-        if (event != nullptr) {
-            auto event = std::make_unique<sdesktop::developerMode::ScreenlockCheckEvent>(lockHandler.isScreenLocked());
-            auto msg   = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
-            bus.sendUnicast(std::move(msg), service::name::service_desktop);
         }
 
         return true;
@@ -251,9 +235,6 @@ namespace app
         if (ret != sys::ReturnCodes::Success) {
             return ret;
         }
-
-        lockPassHashChanged(
-            settings->getValue(settings::SystemProperties::lockPassHash, settings::SettingsScope::Global));
 
         createUserInterface();
 
@@ -362,11 +343,6 @@ namespace app
             settings::SettingsScope::Global);
 
         settings->registerValueChange(
-            settings::SystemProperties::lockPassHash,
-            [this](const std::string &value) { lockPassHashChanged(value); },
-            settings::SettingsScope::Global);
-
-        settings->registerValueChange(
             settings::SystemProperties::osCurrentVersion,
             [this](const std::string &value) { osCurrentVersionChanged(value); },
             settings::SettingsScope::Global);
@@ -464,16 +440,6 @@ namespace app
 
         if (Store::GSM::SIM::NONE == sim) {
             need_sim_select = true;
-        }
-    }
-
-    void ApplicationDesktop::lockPassHashChanged(std::string value)
-    {
-        if (!value.empty()) {
-            lockPassHash = utils::getNumericValue<unsigned int>(value);
-        }
-        else {
-            lockPassHash = 0;
         }
     }
 

@@ -17,7 +17,12 @@ namespace locks
 
         void unlock();
         void lock();
+        void enablePhoneLock();
+        void disablePhoneLock();
+        void changePhoneLock();
+        void setPhoneLock();
+        void skipSetPhoneLock();
         void verifyInput(const std::vector<unsigned int> &inputData);
     };
 
-} // namespace lock
+} // namespace locks

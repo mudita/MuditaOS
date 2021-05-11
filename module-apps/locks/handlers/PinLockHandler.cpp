@@ -34,23 +34,6 @@ namespace gui
         screenLock.setAutoActivate(true);
     }
 
-    void PinLockHandler::handleScreenPin(const std::vector<unsigned int> &pin)
-    {
-        const uint32_t hash = getHash(pin);
-        screenLock.attemptsLeft--;
-        if (hash == app->getLockPassHash()) {
-            screenLock.lockState    = gui::Lock::LockState::Unlocked;
-            screenLock.attemptsLeft = default_attempts;
-        }
-        else if (screenLock.attemptsLeft > 0) {
-            screenLock.lockState = gui::Lock::LockState::InputInvalidRetryRequired;
-        }
-        else {
-            screenLock.lockState = gui::Lock::LockState::Blocked;
-        }
-        unlock();
-    }
-
     void PinLockHandler::handlePasscodeParams(Lock::LockType type,
                                               Lock::LockState state,
                                               app::manager::actions::ActionParamsPtr &&data)
@@ -58,7 +41,7 @@ namespace gui
         auto passcodeData = static_cast<app::manager::actions::PasscodeParams *>(data.get());
         if (simLock.isSim(passcodeData->getSim()) && simLock.isType(type) && simLock.isState(state) &&
             simLock.getAttemptsLeft() > passcodeData->getAttempts()) {
-            simLock.lockState = Lock::LockState::InputInvalidRetryRequired;
+            simLock.lockState = Lock::LockState::InputInvalid;
         }
         else {
             simLock.lockState = state;
@@ -117,13 +100,13 @@ namespace gui
             LOG_ERROR("Number of attempts left is equal to zero before decrementation!");
         }
         if (simLock.attemptsLeft > 0) {
-            simLock.lockState        = Lock::LockState::InputInvalidRetryRequired;
+            simLock.lockState        = Lock::LockState::InputInvalid;
             auto onActivatedCallback = [this, simCardLock](Lock::LockType type, const std::vector<unsigned int> &data) {
                 auto params = std::make_unique<PasscodeParams>(
                     Store::GSM::get()->selected, simLock.attemptsLeft, PasscodeParams::pinName);
                 handlePinEnableRequest(std::move(params), simCardLock);
             };
-            switchToPinLockWindow(Lock::LockState::InputInvalidRetryRequired, onActivatedCallback);
+            switchToPinLockWindow(Lock::LockState::InputInvalid, onActivatedCallback);
         }
         else {
             auto params = std::make_unique<PasscodeParams>(
@@ -143,13 +126,13 @@ namespace gui
             LOG_ERROR("Number of attempts left is equal to zero before decrementation!");
         }
         if (simLock.attemptsLeft > 0) {
-            simLock.lockState        = Lock::LockState::InputInvalidRetryRequired;
+            simLock.lockState        = Lock::LockState::InputInvalid;
             auto onActivatedCallback = [this](Lock::LockType type, const std::vector<unsigned int> &data) {
                 auto params = std::make_unique<PasscodeParams>(
                     Store::GSM::get()->selected, simLock.attemptsLeft, PasscodeParams::pinName);
                 handlePinChangeRequest(std::move(params));
             };
-            switchToPinLockWindow(Lock::LockState::InputInvalidRetryRequired, onActivatedCallback);
+            switchToPinLockWindow(Lock::LockState::InputInvalid, onActivatedCallback);
         }
         else {
             auto params = std::make_unique<PasscodeParams>(
@@ -197,7 +180,7 @@ namespace gui
         std::function<void(Lock::LockType, const std::vector<unsigned int> &)> onLockActivatedCallback)
     {
         auto lock = std::make_unique<gui::Lock>(getStrongestLock());
-        if (lock->isState(Lock::LockState::InputInvalidRetryRequired)) {
+        if (lock->isState(Lock::LockState::InputInvalid)) {
             getStrongestLock().consumeState();
             lock->onActivatedCallback = [this, onLockActivatedCallback](Lock::LockType,
                                                                         const std::vector<unsigned int> &) {
@@ -241,9 +224,6 @@ namespace gui
         }
         else if (type == Lock::LockType::SimPuk) {
             handlePasscodeChange(passcode);
-        }
-        else if (type == Lock::LockType::Screen) {
-            handleScreenPin(passcode);
         }
     }
 

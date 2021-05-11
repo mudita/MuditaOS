@@ -9,13 +9,14 @@
 #include <memory>
 
 #include <module-apps/popups/data/PopupRequestParams.hpp>
+#include <module-services/service-db/agents/settings/SystemSettings.hpp>
 
 namespace locks
 {
     constexpr unsigned int default_attempts = 4;
 
-    PhoneLockHandler::PhoneLockHandler(sys::Service *owner)
-        : owner(owner), lock(Lock::LockState::InputRequired, default_attempts)
+    PhoneLockHandler::PhoneLockHandler(sys::Service *owner, std::shared_ptr<settings::Settings> settings)
+        : owner(owner), lock(Lock::LockState::InputRequired, default_attempts), settings(std::move(settings))
     {}
 
     void PhoneLockHandler::enablePhoneLock(bool _phoneLockEnabled)
@@ -33,19 +34,34 @@ namespace locks
         }
     }
 
-    void PhoneLockHandler::PhoneLockAction()
+    void PhoneLockHandler::setPhoneLockInputTypeAction(PhoneLockInputTypeAction _phoneLockInputTypeAction)
     {
+        if (phoneLockInputTypeAction != _phoneLockInputTypeAction) {
+            phoneLockInputTypeAction = _phoneLockInputTypeAction;
+            lock.attemptsLeft        = default_attempts;
+            storedInputData.clear();
+        }
+    }
+
+    bool PhoneLockHandler::checkPhoneLockInputTypeAction(PhoneLockInputTypeAction _phoneLockInputTypeAction)
+    {
+        return phoneLockInputTypeAction == _phoneLockInputTypeAction;
+    }
+
+    void PhoneLockHandler::phoneLockAction()
+    {
+        phoneState = PhoneState::Locked;
         app::manager::Controller::sendAction(owner,
                                              app::manager::actions::ShowPopup,
                                              std::make_unique<gui::PopupRequestParams>(gui::popup::ID::PhoneLock));
         owner->bus.sendMulticast(std::make_shared<locks::LockedPhone>(), sys::BusChannel::PhoneLockChanges);
     }
 
-    void PhoneLockHandler::PhoneUnlockPopupsCloseAction()
+    void PhoneLockHandler::phoneUnlockPopupsCloseAction()
     {
         app::manager::Controller::sendAction(owner,
                                              app::manager::actions::AbortPopup,
-                                             std::make_unique<gui::PopupRequestParams>(gui::popup::ID::InputLock));
+                                             std::make_unique<gui::PopupRequestParams>(gui::popup::ID::PhoneLockInput));
         if (!isPhoneLocked()) {
             app::manager::Controller::sendAction(owner,
                                                  app::manager::actions::AbortPopup,
@@ -53,38 +69,89 @@ namespace locks
         }
     }
 
-    void PhoneLockHandler::PhoneUnlockAction()
+    void PhoneLockHandler::phoneUnlockAction()
     {
-        PhoneUnlockPopupsCloseAction();
+        phoneState = PhoneState::Unlocked;
+        phoneUnlockPopupsCloseAction();
         owner->bus.sendMulticast(std::make_shared<locks::UnlockedPhone>(), sys::BusChannel::PhoneLockChanges);
     }
 
-    void PhoneLockHandler::PhoneInputRequiredAction()
+    void PhoneLockHandler::phoneInputRequiredAction()
     {
-        app::manager::Controller::sendAction(
-            owner,
-            app::manager::actions::ShowPopup,
-            std::make_unique<gui::PhoneUnlockInputRequestParams>(gui::popup::ID::InputLock, lock));
+        app::manager::Controller::sendAction(owner,
+                                             app::manager::actions::ShowPopup,
+                                             std::make_unique<gui::PhoneUnlockInputRequestParams>(
+                                                 gui::popup::ID::PhoneLockInput, lock, phoneLockInputTypeAction));
+    }
+
+    void PhoneLockHandler::phoneLockEnableAction()
+    {
+        setPhoneLockAvailabilityInSettings(true);
+        phoneLockChangeAction();
+    }
+
+    void PhoneLockHandler::phoneLockDisableAction()
+    {
+        setPhoneLockAvailabilityInSettings(false);
+        phoneLockChangeInfoAction();
+        phoneUnlockPopupsCloseAction();
+    }
+
+    void PhoneLockHandler::phoneLockChangeAction()
+    {
+        setPhoneLockInSettings();
+        phoneLockChangeInfoAction();
+        phoneUnlockPopupsCloseAction();
+    }
+
+    void PhoneLockHandler::phoneLockSetAction()
+    {
+        setPhoneLockAvailabilityInSettings(true);
+        setPhoneLockInSettings();
+
+        lock.lockState = Lock::LockState::NewInputRequired;
+        owner->bus.sendMulticast(std::make_shared<locks::SetConfirmedPhoneLock>(), sys::BusChannel::PhoneLockChanges);
+    }
+
+    void PhoneLockHandler::phoneLockChangeInfoAction()
+    {
+        app::manager::Controller::sendAction(owner,
+                                             app::manager::actions::ShowPopup,
+                                             std::make_unique<gui::PhoneUnlockInputRequestParams>(
+                                                 gui::popup::ID::PhoneLockChangeInfo, lock, phoneLockInputTypeAction));
+    }
+
+    void PhoneLockHandler::setPhoneLockInSettings()
+    {
+        phoneLockHash = getHash(storedInputData);
+        settings->setValue(::settings::SystemProperties::lockPassHash,
+                           std::to_string(phoneLockHash),
+                           ::settings::SettingsScope::Global);
+    }
+
+    void PhoneLockHandler::setPhoneLockAvailabilityInSettings(bool value)
+    {
+        phoneLockEnabled = value;
+        settings->setValue(settings::SystemProperties::lockScreenPasscodeIsOn,
+                           std::to_string(phoneLockEnabled),
+                           settings::SettingsScope::Global);
     }
 
     sys::MessagePointer PhoneLockHandler::handleUnlockRequest()
     {
+        setPhoneLockInputTypeAction(PhoneLockInputTypeAction::Unlock);
+
         // Check if phoneLock has not been disabled by setting
         if (!phoneLockEnabled) {
-            PhoneUnlockAction();
+            phoneUnlockAction();
             return sys::msgHandled();
         }
-
-        if (lock.isState(Lock::LockState::Unlocked)) {
-            PhoneUnlockAction();
-        }
-        else if (lock.isState(Lock::LockState::Blocked)) {
-            PhoneInputRequiredAction();
+        if (lock.isState(Lock::LockState::Blocked)) {
+            phoneInputRequiredAction();
         }
         else if (!lock.isState(Lock::LockState::Unlocked)) {
-
             lock.lockState = Lock::LockState::InputRequired;
-            PhoneInputRequiredAction();
+            phoneInputRequiredAction();
         }
 
         return sys::msgHandled();
@@ -93,12 +160,93 @@ namespace locks
     sys::MessagePointer PhoneLockHandler::handleLockRequest()
     {
         lock.lockState = Lock::LockState::InputRequired;
-        PhoneLockAction();
+        phoneLockAction();
 
         return sys::msgHandled();
     }
 
+    sys::MessagePointer PhoneLockHandler::handleEnablePhoneLock()
+    {
+        setPhoneLockInputTypeAction(PhoneLockInputTypeAction::Enable);
+
+        lock.lockState    = Lock::LockState::NewInputRequired;
+        lock.attemptsLeft = Lock::unlimitedNumOfAttempts;
+
+        phoneInputRequiredAction();
+
+        return sys::msgHandled();
+    }
+
+    sys::MessagePointer PhoneLockHandler::handleDisablePhoneLock()
+    {
+        setPhoneLockInputTypeAction(PhoneLockInputTypeAction::Disable);
+
+        lock.lockState    = Lock::LockState::InputRequired;
+        lock.attemptsLeft = Lock::unlimitedNumOfAttempts;
+
+        phoneInputRequiredAction();
+
+        return sys::msgHandled();
+    }
+
+    sys::MessagePointer PhoneLockHandler::handleChangePhoneLock()
+    {
+        setPhoneLockInputTypeAction(PhoneLockInputTypeAction::ConfirmCurrent);
+
+        lock.lockState    = Lock::LockState::InputRequired;
+        lock.attemptsLeft = Lock::unlimitedNumOfAttempts;
+
+        phoneInputRequiredAction();
+
+        return sys::msgHandled();
+    }
+
+    sys::MessagePointer PhoneLockHandler::handleSetPhoneLock()
+    {
+        setPhoneLockInputTypeAction(PhoneLockInputTypeAction::Set);
+
+        lock.lockState    = Lock::LockState::NewInputRequired;
+        lock.attemptsLeft = Lock::unlimitedNumOfAttempts;
+
+        phoneInputRequiredAction();
+
+        return sys::msgHandled();
+    }
+
+    sys::MessagePointer PhoneLockHandler::handleSkipSetPhoneLock()
+    {
+        setPhoneLockInputTypeAction(PhoneLockInputTypeAction::Set);
+
+        lock.lockState    = Lock::LockState::NewInputRequired;
+        lock.attemptsLeft = Lock::unlimitedNumOfAttempts;
+
+        owner->bus.sendMulticast(std::make_shared<locks::SkippedSetPhoneLock>(), sys::BusChannel::PhoneLockChanges);
+        return sys::msgHandled();
+    }
+
+    void PhoneLockHandler::checkNewPhoneLock()
+    {
+        setPhoneLockInputTypeAction(PhoneLockInputTypeAction::Change);
+
+        lock.lockState    = Lock::LockState::NewInputRequired;
+        lock.attemptsLeft = Lock::unlimitedNumOfAttempts;
+
+        phoneInputRequiredAction();
+    }
+
     sys::MessagePointer PhoneLockHandler::verifyPhoneLockInput(const std::vector<unsigned int> &inputData)
+    {
+        if (checkPhoneLockInputTypeAction(PhoneLockInputTypeAction::Enable) ||
+            checkPhoneLockInputTypeAction(PhoneLockInputTypeAction::Change) ||
+            checkPhoneLockInputTypeAction(PhoneLockInputTypeAction::Set)) {
+            return verifyPhoneLockChangeInput(inputData);
+        }
+        else {
+            return verifyPhoneUnlockInput(inputData);
+        }
+    }
+
+    sys::MessagePointer PhoneLockHandler::verifyPhoneUnlockInput(const std::vector<unsigned int> &inputData)
     {
         const uint32_t hash = getHash(inputData);
         lock.attemptsLeft--;
@@ -106,29 +254,70 @@ namespace locks
         if (phoneLockHash == hash) {
             lock.lockState    = Lock::LockState::Unlocked;
             lock.attemptsLeft = default_attempts;
-            PhoneUnlockAction();
+            resolvePhoneLockAction();
             return sys::msgHandled();
         }
         else if (lock.attemptsLeft > 0) {
-            lock.lockState = Lock::LockState::InputInvalidRetryRequired;
+            lock.lockState = Lock::LockState::InputInvalid;
         }
         else {
             lock.lockState = Lock::LockState::Blocked;
         }
 
-        PhoneInputRequiredAction();
+        phoneInputRequiredAction();
 
         return sys::msgHandled();
     }
 
+    sys::MessagePointer PhoneLockHandler::verifyPhoneLockChangeInput(const std::vector<unsigned int> &inputData)
+    {
+        if (lock.isState(Lock::LockState::NewInputRequired) || lock.isState(Lock::LockState::NewInputInvalid)) {
+            storedInputData = inputData;
+            lock.lockState  = Lock::LockState::NewInputConfirmRequired;
+        }
+        else if (lock.isState(Lock::LockState::NewInputConfirmRequired)) {
+            if (storedInputData == inputData) {
+                resolvePhoneLockAction();
+                return sys::msgHandled();
+            }
+            else {
+                lock.lockState = Lock::LockState::NewInputInvalid;
+            }
+        }
+
+        phoneInputRequiredAction();
+
+        return sys::MessagePointer();
+    }
+
+    void PhoneLockHandler::resolvePhoneLockAction()
+    {
+        switch (phoneLockInputTypeAction) {
+        case PhoneLockInputTypeAction::Unlock:
+            return phoneUnlockAction();
+        case PhoneLockInputTypeAction::Enable:
+            return phoneLockEnableAction();
+        case PhoneLockInputTypeAction::Disable:
+            return phoneLockDisableAction();
+        case PhoneLockInputTypeAction::ConfirmCurrent:
+            return checkNewPhoneLock();
+        case PhoneLockInputTypeAction::Change:
+            return phoneLockChangeAction();
+        case PhoneLockInputTypeAction::Set:
+            return phoneLockSetAction();
+        default:
+            return;
+        }
+    }
+
     sys::MessagePointer PhoneLockHandler::handleUnlockCancelRequest()
     {
-        PhoneUnlockPopupsCloseAction();
+        phoneUnlockPopupsCloseAction();
         return sys::msgHandled();
     }
 
     bool PhoneLockHandler::isPhoneLocked() const noexcept
     {
-        return !lock.isState(Lock::LockState::Unlocked);
+        return phoneState == PhoneState::Locked;
     }
 } // namespace locks

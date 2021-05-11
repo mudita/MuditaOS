@@ -15,9 +15,7 @@ namespace gui
 
     CalendarEventsOptions::CalendarEventsOptions(app::Application *app)
         : OptionWindow(app, style::window::calendar::name::events_options)
-    {
-        buildInterface();
-    }
+    {}
 
     auto CalendarEventsOptions::eventsOptionsList() -> std::list<gui::Option>
     {

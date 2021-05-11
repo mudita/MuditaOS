@@ -22,6 +22,7 @@
 #include "TextLine.hpp"
 #include "Translator.hpp"
 #include "TextLineCursor.hpp"
+#include "RichTextParser.hpp"
 
 namespace gui
 {
@@ -146,9 +147,9 @@ namespace gui
         /// @defgroup richtext can be virtualized by parametrized RichTextParser virtual api ( as second param )
         /// @{
         /// set rich text with default RichTextParser - please see RichTextParser documentation on how to use format
-        void setRichText(const UTF8 &text);
+        void setRichText(const UTF8 &text, text::RichTextParser::TokenMap &&tokens = text::RichTextParser::TokenMap{});
         /// add rich text with default RichTextParser - please see RichTextParser documentation on how to use format
-        void addRichText(const UTF8 &text);
+        void addRichText(const UTF8 &text, text::RichTextParser::TokenMap &&tokens = text::RichTextParser::TokenMap{});
         /// @}
         virtual void clear();
         bool isEmpty();

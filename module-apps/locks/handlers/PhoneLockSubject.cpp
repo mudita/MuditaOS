@@ -4,7 +4,7 @@
 #include "PhoneLockSubject.hpp"
 
 #include <service-appmgr/service-appmgr/model/ApplicationManager.hpp>
-#include <locks/data/LockMessages.hpp>
+#include <locks/data/PhoneLockMessages.hpp>
 
 namespace locks
 {
@@ -23,6 +23,31 @@ namespace locks
     void PhoneLockSubject::lock()
     {
         owner->bus.sendUnicast(std::make_shared<LockPhone>(), app::manager::ApplicationManager::ServiceName);
+    }
+
+    void PhoneLockSubject::enablePhoneLock()
+    {
+        owner->bus.sendUnicast(std::make_shared<EnablePhoneLock>(), app::manager::ApplicationManager::ServiceName);
+    }
+
+    void PhoneLockSubject::disablePhoneLock()
+    {
+        owner->bus.sendUnicast(std::make_shared<DisablePhoneLock>(), app::manager::ApplicationManager::ServiceName);
+    }
+
+    void PhoneLockSubject::changePhoneLock()
+    {
+        owner->bus.sendUnicast(std::make_shared<ChangePhoneLock>(), app::manager::ApplicationManager::ServiceName);
+    }
+
+    void PhoneLockSubject::setPhoneLock()
+    {
+        owner->bus.sendUnicast(std::make_shared<SetPhoneLock>(), app::manager::ApplicationManager::ServiceName);
+    }
+
+    void PhoneLockSubject::skipSetPhoneLock()
+    {
+        owner->bus.sendUnicast(std::make_shared<SkipSetPhoneLock>(), app::manager::ApplicationManager::ServiceName);
     }
 
     void PhoneLockSubject::verifyInput(const std::vector<unsigned int> &inputData)

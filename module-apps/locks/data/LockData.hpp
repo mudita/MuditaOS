@@ -4,27 +4,45 @@
 #pragma once
 
 #include <memory>
+#include <utility>
 #include "gui/SwitchData.hpp"
 #include "locks/widgets/Lock.hpp"
 
 namespace locks
 {
+    enum class PhoneLockInputTypeAction
+    {
+        Unlock,
+        Enable,
+        Disable,
+        ConfirmCurrent,
+        Change,
+        Set
+    };
 
     // class template that stores information that was sent along with switch message
     class LockData : public gui::SwitchData
     {
         Lock lock;
+        PhoneLockInputTypeAction phoneLockInputTypeAction;
 
       public:
-        explicit LockData(Lock lock) : SwitchData(), lock(std::move(lock))
+        explicit LockData(Lock lock,
+                          PhoneLockInputTypeAction phoneLockInputTypeAction = PhoneLockInputTypeAction::Unlock)
+            : SwitchData(), lock(std::move(lock)), phoneLockInputTypeAction(phoneLockInputTypeAction)
         {
             description = "LockPhoneData";
         }
 
-        [[nodiscard]] const Lock &getLock() const noexcept
+        [[nodiscard]] auto getLock() const noexcept
         {
             return lock;
         }
+
+        [[nodiscard]] auto getPhoneLockInputTypeAction() const noexcept
+        {
+            return phoneLockInputTypeAction;
+        }
     };
 
-} // namespace lock
+} // namespace locks

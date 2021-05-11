@@ -25,7 +25,6 @@ namespace gui
         Lock simLock;
         bool promptSimLockWindow = true;
 
-        void handleScreenPin(const std::vector<unsigned int> &pin);
         void handlePasscode(Lock::LockType type, const std::vector<unsigned int> passcode);
         void handlePasscodeChange(const std::vector<unsigned int> passcode);
         void handleNewPasscodeUnconfirmed(const std::vector<unsigned int> &passcode,

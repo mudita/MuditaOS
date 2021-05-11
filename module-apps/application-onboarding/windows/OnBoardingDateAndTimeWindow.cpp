@@ -31,14 +31,7 @@ namespace app::onBoarding
 
     bool OnBoardingDateAndTimeWindow::onInput(const gui::InputEvent &inputEvent)
     {
-        if (inputEvent.isShortRelease(gui::KeyCode::KEY_RF)) {
-            application->switchWindow(
-                gui::window::name::onBoarding_configure_passcode,
-                gui::ShowMode::GUI_SHOW_INIT,
-                std::make_unique<ChangePasscodeData>(ChangePasscodeAction::OnlyProvideNewPasscode));
-            return true;
-        }
-        else if (inputEvent.isShortRelease(gui::KeyCode::KEY_LF)) {
+        if (inputEvent.isShortRelease(gui::KeyCode::KEY_LF)) {
             return getFocusItem()->onActivated(nullptr);
         }
         else if (inputEvent.isShortRelease(gui::KeyCode::KEY_ENTER)) {

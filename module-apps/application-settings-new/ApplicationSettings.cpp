@@ -34,7 +34,6 @@
 #include <application-settings-new/windows/SecurityMainWindow.hpp>
 #include <application-settings-new/windows/QuotesOptionsWindow.hpp>
 #include <application-settings-new/windows/SARInfoWindow.hpp>
-#include <application-settings-new/windows/ChangePasscodeWindow.hpp>
 #include <application-settings-new/windows/SystemMainWindow.hpp>
 #include <application-settings-new/windows/NewApnWindow.hpp>
 #include <application-settings-new/windows/LanguagesWindow.hpp>
@@ -301,11 +300,6 @@ namespace app
             ::settings::Cellular::volte_on,
             [this](const std::string &value) { volteChanged(value); },
             ::settings::SettingsScope::Global);
-        settings->registerValueChange(
-            ::settings::SystemProperties::lockPassHash,
-            [this](const std::string &value) { lockPassHash = utils::getNumericValue<unsigned int>(value); },
-            ::settings::SettingsScope::Global);
-
         /*
         settings->registerValueChange(
             ::settings::SystemProperties::usbSecurity,
@@ -428,9 +422,6 @@ namespace app
         });
         windowsFactory.attach(app::window::name::desktop_pin_lock, [&](Application *app, const std::string newname) {
             return std::make_unique<gui::PinLockWindow>(app, app::window::name::desktop_pin_lock);
-        });
-        windowsFactory.attach(gui::window::name::change_passcode, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::ChangePasscodeWindow>(app);
         });
         windowsFactory.attach(gui::window::name::dialog_confirm, [](Application *app, const std::string &name) {
             return std::make_unique<gui::DialogConfirm>(app, gui::window::name::dialog_confirm);
@@ -569,13 +560,6 @@ namespace app
     {
         LOG_DEBUG("[ApplicationSettingsNew::setOsUpdateVersion] to value=%s", value.c_str());
         settings->setValue(::settings::SystemProperties::osUpdateVersion, value, ::settings::SettingsScope::Global);
-    }
-
-    void ApplicationSettingsNew::setLockPassHash(unsigned int value)
-    {
-        lockPassHash = value;
-        settings->setValue(
-            ::settings::SystemProperties::lockPassHash, std::to_string(value), ::settings::SettingsScope::Global);
     }
 
     auto ApplicationSettingsNew::getCurrentValues() -> settingsInterface::ScreenLightSettings::Values
