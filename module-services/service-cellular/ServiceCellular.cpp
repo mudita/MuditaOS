@@ -97,6 +97,7 @@
 
 #include "ServiceCellularPriv.hpp"
 #include <service-cellular/api/request/sim.hpp>
+#include <service-cellular/api/notification/notification.hpp>
 #include "utils.hpp"
 
 const char *ServiceCellular::serviceName = cellular::service::name;
@@ -522,9 +523,6 @@ void ServiceCellular::registerMessageHandlers()
     connect(typeid(CellularNewIncomingSMSNotification),
             [&](sys::Message *request) -> sys::MessagePointer { return handleNewIncomingSMSNotification(request); });
 
-    connect(typeid(CellularSimReadyNotification),
-            [&](sys::Message *request) -> sys::MessagePointer { return handleSimReadyNotification(request); });
-
     connect(typeid(CellularSmsDoneNotification),
             [&](sys::Message *request) -> sys::MessagePointer { return handleSmsDoneNotification(request); });
 
@@ -535,9 +533,6 @@ void ServiceCellular::registerMessageHandlers()
     connect(typeid(CellularNetworkStatusUpdateNotification), [&](sys::Message *request) -> sys::MessagePointer {
         return handleNetworkStatusUpdateNotification(request);
     });
-
-    connect(typeid(CellularSimNotReadyNotification),
-            [&](sys::Message *request) -> sys::MessagePointer { return handleSimNotReadyNotification(request); });
 
     connect(typeid(CellularUrcIncomingNotification),
             [&](sys::Message *request) -> sys::MessagePointer { return handleUrcIncomingNotification(request); });
@@ -980,7 +975,6 @@ bool ServiceCellular::sendSimBlocked()
 
 bool ServiceCellular::handleSimState(at::SimState state, const std::string &message)
 {
-    std::shared_ptr<CellularMessage> response;
     switch (state) {
     case at::SimState::Ready:
         Store::GSM::get()->sim = Store::GSM::get()->selected;
@@ -988,15 +982,18 @@ bool ServiceCellular::handleSimState(at::SimState state, const std::string &mess
                            ::utils::enumToString(Store::GSM::get()->selected),
                            settings::SettingsScope::Global);
         // SIM causes SIM INIT, only on ready
-        response = std::move(std::make_unique<CellularSimReadyNotification>());
-        bus.sendMulticast(response, sys::BusChannel::ServiceCellularNotifications);
+        if (Store::GSM::get()->tray == Store::GSM::Tray::IN) {
+            priv->state->set(State::ST::SimInit);
+        }
+        bus.sendMulticast(std::make_shared<cellular::msg::notification::SimReady>(true),
+                          sys::BusChannel::ServiceCellularNotifications);
         sendSimUnlocked();
         break;
     case at::SimState::NotReady:
         LOG_DEBUG("Not ready");
         Store::GSM::get()->sim = Store::GSM::SIM::SIM_FAIL;
-        response               = std::move(std::make_unique<CellularSimNotReadyNotification>());
-        bus.sendMulticast(response, sys::BusChannel::ServiceCellularNotifications);
+        bus.sendMulticast(std::make_shared<cellular::msg::notification::SimReady>(false),
+                          sys::BusChannel::ServiceCellularNotifications);
         break;
     case at::SimState::SimPin: {
         if (auto pc = priv->simCard->getAttemptsCounters(); pc) {
@@ -2391,14 +2388,6 @@ auto ServiceCellular::handleNewIncomingSMSNotification(sys::Message *msg) -> std
     return std::make_shared<CellularResponseMessage>(true);
 }
 
-auto ServiceCellular::handleSimReadyNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
-{
-    if (Store::GSM::get()->tray == Store::GSM::Tray::IN) {
-        priv->state->set(State::ST::SimInit);
-    }
-    return std::make_shared<CellularResponseMessage>(true);
-}
-
 auto ServiceCellular::handleSmsDoneNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
     auto resp = handleTextMessagesInit();
@@ -2409,11 +2398,6 @@ auto ServiceCellular::handleSignalStrengthUpdateNotification(sys::Message *msg) 
     return std::make_shared<CellularResponseMessage>(false);
 }
 auto ServiceCellular::handleNetworkStatusUpdateNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
-{
-    return std::make_shared<CellularResponseMessage>(false);
-}
-
-auto ServiceCellular::handleSimNotReadyNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
     return std::make_shared<CellularResponseMessage>(false);
 }

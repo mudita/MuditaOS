@@ -17,6 +17,13 @@ namespace cellular::msg
 
     namespace notification
     {
+        struct SimReady : public msg::Notification
+        {
+            SimReady(bool ready) : ready(ready)
+            {}
+            bool ready;
+        };
+
         struct UnhandledCME : public msg::Notification
         {
             UnhandledCME(api::SimSlot sim, unsigned int code) : sim(sim), code(code)

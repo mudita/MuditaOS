@@ -146,8 +146,6 @@ class CellularNotificationMessage : public CellularMessage
         NetworkStatusUpdate,      // update of the status of the network
         PowerUpProcedureComplete, // modem without cmux on initialization complete (cold start || reset modem -> and
         // cold start)
-        SIM_READY,              // change on SIM from URC
-        SIM_NOT_READY,          // change to not existing/not valid SIM
         PowerDownDeregistering, // modem informed it has started to disconnect from network
         PowerDownDeregistered,  // modem informed it has disconnected from network
         SMSDone,                // SMS initialization finished
@@ -837,14 +835,6 @@ class CellularNewIncomingSMSNotification : public CellularNotificationMessage
     {}
 };
 
-class CellularSimReadyNotification : public CellularNotificationMessage
-{
-  public:
-    explicit CellularSimReadyNotification(const std::string &data = "")
-        : CellularNotificationMessage(CellularNotificationMessage::Content::SIM_READY, data)
-    {}
-};
-
 class CellularSmsDoneNotification : public CellularNotificationMessage
 {
   public:
@@ -866,14 +856,6 @@ class CellularNetworkStatusUpdateNotification : public CellularNotificationMessa
   public:
     explicit CellularNetworkStatusUpdateNotification(const std::string &data = "")
         : CellularNotificationMessage(CellularNotificationMessage::Content::NetworkStatusUpdate, data)
-    {}
-};
-
-class CellularSimNotReadyNotification : public CellularNotificationMessage
-{
-  public:
-    explicit CellularSimNotReadyNotification(const std::string &data = "")
-        : CellularNotificationMessage(CellularNotificationMessage::Content::SIM_NOT_READY, data)
     {}
 };
 

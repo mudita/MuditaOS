@@ -332,11 +332,9 @@ class ServiceCellular : public sys::Service
     auto handlePowerDownDeregisteredNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleNewIncomingSMSNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleRawCommandNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
-    auto handleSimReadyNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleSmsDoneNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleSignalStrengthUpdateNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleNetworkStatusUpdateNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
-    auto handleSimNotReadyNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleUrcIncomingNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularSetFlightModeMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularSetRadioOnOffMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;

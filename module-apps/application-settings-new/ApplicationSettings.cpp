@@ -123,13 +123,6 @@ namespace app
         }
 
         if (auto phoneMsg = dynamic_cast<CellularNotificationMessage *>(msgl); nullptr != phoneMsg) {
-            selectedSim = Store::GSM::get()->selected;
-            if (CellularNotificationMessage::Content::SIM_READY == phoneMsg->content) {
-                CellularServiceAPI::RequestForOwnNumber(this);
-            }
-            else if (CellularNotificationMessage::Content::SIM_NOT_READY == phoneMsg->content) {
-                selectedSimNumber = {};
-            }
             auto currentWindow = getCurrentWindow();
             if (gui::window::name::network == currentWindow->getName()) {
                 updateWindow(gui::window::name::network, nullptr);
@@ -155,6 +148,21 @@ namespace app
         if (ret != sys::ReturnCodes::Success) {
             return ret;
         }
+        connect(typeid(cellular::msg::notification::SimReady), [&](sys::Message *msg) {
+            auto simReadyMsg = static_cast<cellular::msg::notification::SimReady *>(msg);
+            selectedSim      = Store::GSM::get()->selected;
+            if (simReadyMsg->ready) {
+                CellularServiceAPI::RequestForOwnNumber(this);
+            }
+            else {
+                selectedSimNumber = {};
+            }
+            auto currentWindow = getCurrentWindow();
+            if (gui::window::name::network == currentWindow->getName()) {
+                updateWindow(gui::window::name::network, nullptr);
+            }
+            return sys::MessageNone{};
+        });
 
         connect(typeid(::message::bluetooth::ResponseStatus), [&](sys::Message *msg) {
             auto responseStatusMsg = static_cast<::message::bluetooth::ResponseStatus *>(msg);
