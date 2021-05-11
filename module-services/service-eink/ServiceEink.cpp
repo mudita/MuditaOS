@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include <board.h>
 #include "ServiceEink.hpp"
 #include "messages/EinkModeMessage.hpp"
 #include "messages/PrepareDisplayEarlyRequest.hpp"
@@ -28,7 +29,8 @@ namespace service::eink
     } // namespace
 
     ServiceEink::ServiceEink(const std::string &name, std::string parent)
-        : sys::Service(name, std::move(parent), ServceEinkStackDepth), currentState{State::Running}
+        : sys::Service(name, std::move(parent), ServceEinkStackDepth),
+          display{{BOARD_EINK_DISPLAY_RES_X, BOARD_EINK_DISPLAY_RES_Y}}, currentState{State::Running}
     {
         displayPowerOffTimer = sys::TimerFactory::createSingleShotTimer(
             this, "einkDisplayPowerOff", displayPowerOffTimeout, [this](sys::Timer &) { display.powerOff(); });

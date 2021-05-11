@@ -1,7 +1,8 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RWindow.hpp"
+#include <module-bsp/board/linux/board.h>
 
 #include <glibmm/refptr.h>
 #include <fcntl.h>
@@ -19,8 +20,8 @@
 
 using namespace std;
 
-static const int FrameBufferWidth  = 480;
-static const int FrameBufferHeight = 600;
+static const int FrameBufferWidth  = BOARD_EINK_DISPLAY_RES_X;
+static const int FrameBufferHeight = BOARD_EINK_DISPLAY_RES_Y;
 static const int FrameBufferSize   = FrameBufferWidth * FrameBufferHeight;
 
 typedef struct

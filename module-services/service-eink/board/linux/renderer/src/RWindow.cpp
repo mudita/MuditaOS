@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RWindow.hpp"
+#include <module-bsp/board/linux/board.h>
 
 #include <module-bsp/bsp/common.hpp>
 #include <module-bsp/bsp/keyboard/key_codes.hpp>
@@ -142,7 +143,7 @@ RWindow::RWindow(char *shmMemory, int fifoKbd, int fifoBatt, int w, int h)
     drawArea.setDrawData(rgbMemPtr);
 
     set_title("GUI RENDERER");
-    set_default_size(480, 600);
+    set_default_size(BOARD_EINK_DISPLAY_RES_X, BOARD_EINK_DISPLAY_RES_Y);
 
     add(drawArea);
     show_all_children();
