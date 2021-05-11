@@ -27,8 +27,7 @@ namespace bsp::eeprom
         drivers::DriverI2CParams i2cParams;
         i2cParams.baudrate = static_cast<std::uint32_t>(BoardDefinitions::EEPROM_I2C_BAUDRATE);
         i2c = drivers::DriverI2C::Create(static_cast<drivers::I2CInstances>(BoardDefinitions::EEPROM_I2C), i2cParams);
-
-        return isPresent(0) ? kStatus_Success : kStatus_Fail;
+        return 0;
     }
 
     bool isPresent(int busid)
@@ -45,7 +44,7 @@ namespace bsp::eeprom
         char *ptr      = const_cast<char *>(buf);
 
         addr.deviceAddress |= static_cast<std::uint32_t>(busid) & M24256_DEV_ID_MASK;
-        addr.subAddress = mem_addr;
+        addr.subAddress = __builtin_bswap16(mem_addr);
 
         size_t bl_len   = static_cast<size_t>(eeprom_block_size(busid));
         size_t chunks   = len / bl_len;
@@ -78,7 +77,7 @@ namespace bsp::eeprom
         char *ptr   = const_cast<char *>(buf);
 
         addr.deviceAddress |= static_cast<std::uint32_t>(busid) & M24256_DEV_ID_MASK;
-        addr.subAddress = mem_addr;
+        addr.subAddress = __builtin_bswap16(mem_addr);
 
         size_t bl_len   = static_cast<size_t>(eeprom_block_size(busid));
         size_t chunks   = len / bl_len;

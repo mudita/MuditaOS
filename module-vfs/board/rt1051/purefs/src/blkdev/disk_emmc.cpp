@@ -9,8 +9,6 @@
 #include <bsp/common.hpp>
 #include "board/rt1051/bsp/eMMC/fsl_mmc.h"
 #include "bsp/BoardDefinitions.hpp"
-#include "bsp/eeprom/eeprom.hpp"
-#include "board/rt1051/bsp/eeprom/M24256.hpp"
 
 namespace purefs::blkdev
 {
