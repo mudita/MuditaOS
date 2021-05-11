@@ -3,10 +3,12 @@
 
 #include "ScreenLightControl.hpp"
 
+#include <agents/settings/SystemSettings.hpp>
+#include <module-sys/Timers/TimerFactory.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
-#include <module-sys/Timers/TimerFactory.hpp>
-#include <agents/settings/SystemSettings.hpp>
+#include <service-db/service-db/Settings.hpp>
+#include <Utils.hpp>
 
 namespace screen_light_control
 {
@@ -32,63 +34,54 @@ namespace screen_light_control
 
     void ScreenLightControl::initFromSettings()
     {
-        settings->registerValueChange(
-            settings::Brightness::brightnessLevel,
-            [&](const std::string &value) { setBrightnessLevel(utils::getNumericValue<float>(value)); },
-            settings::SettingsScope::Global);
+        settings->registerValueChange(settings::Brightness::brightnessLevel, [&](const std::string &value) {
+            setBrightnessLevel(utils::getNumericValue<float>(value));
+        });
 
-        settings->registerValueChange(
-            settings::Brightness::autoMode,
-            [&](const std::string &value) {
-                if (utils::getNumericValue<bool>(value)) {
-                    enableAutomaticMode();
-                }
-                else {
-                    disableAutomaticMode();
-                }
-            },
-            settings::SettingsScope::Global);
+        settings->registerValueChange(settings::Brightness::autoMode, [&](const std::string &value) {
+            if (utils::getNumericValue<bool>(value)) {
+                enableAutomaticMode();
+            }
+            else {
+                disableAutomaticMode();
+            }
+        });
 
-        settings->registerValueChange(
-            settings::Brightness::state,
-            [&](const std::string &value) {
-                if (utils::getNumericValue<bool>(value)) {
-                    turnOn();
-                }
-                else {
-                    turnOff();
-                }
-            },
-            settings::SettingsScope::Global);
+        settings->registerValueChange(settings::Brightness::state, [&](const std::string &value) {
+            if (utils::getNumericValue<bool>(value)) {
+                turnOn();
+            }
+            else {
+                turnOff();
+            }
+        });
     }
 
-    void ScreenLightControl::processRequest(Action action, const Parameters &params)
+    void ScreenLightControl::processRequest(Action action)
     {
         switch (action) {
         case Action::turnOff:
             turnOff();
-            setScreenLightSettings(settings::Brightness::state, lightOn);
             break;
         case Action::turnOn:
             turnOn();
-            setScreenLightSettings(settings::Brightness::state, lightOn);
             break;
         case Action::enableAutomaticMode:
             enableAutomaticMode();
-            setScreenLightSettings(settings::Brightness::autoMode, automaticMode == ScreenLightMode::Automatic);
             break;
         case Action::disableAutomaticMode:
             disableAutomaticMode();
-            setScreenLightSettings(settings::Brightness::autoMode, automaticMode == ScreenLightMode::Automatic);
             break;
-        case Action::setManualModeBrightness:
+        }
+    }
+
+    void ScreenLightControl::processRequest(ParameterizedAction action, Parameters params)
+    {
+        switch (action) {
+        case ParameterizedAction::setManualModeBrightness:
             setBrightnessLevel(params.manualModeBrightness);
-            setScreenLightSettings(settings::Brightness::brightnessLevel, params.manualModeBrightness);
             break;
-        case Action::setGammaCorrectionFactor:
-            setGammaFactor(params.gammaFactor);
-            break;
-        case Action::setAutomaticModeParameters:
+        case ParameterizedAction::setAutomaticModeParameters:
             setAutomaticModeParameters(params);
             break;
         }
@@ -174,12 +167,6 @@ namespace screen_light_control
     {
         bsp::eink_frontlight::setBrightness(brightnessPercentage);
         brightnessValue = brightnessPercentage;
-    }
-
-    void ScreenLightControl::setGammaFactor(float gammaFactor)
-    {
-        bsp::eink_frontlight::setGammaFactor(gammaFactor);
-        setScreenLightSettings(settings::Brightness::gammaFactor, gammaFactor);
     }
 
     void ScreenLightControl::turnOff()

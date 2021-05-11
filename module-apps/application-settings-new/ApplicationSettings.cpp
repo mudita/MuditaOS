@@ -600,8 +600,8 @@ namespace app
     void ApplicationSettingsNew::setBrightness(bsp::eink_frontlight::BrightnessPercentage value)
     {
         screen_light_control::Parameters parameters{value};
-        bus.sendUnicast(std::make_shared<sevm::ScreenLightControlMessage>(
-                            screen_light_control::Action::setManualModeBrightness, parameters),
+        bus.sendUnicast(std::make_shared<sevm::ScreenLightSetParameters>(
+                            screen_light_control::ParameterizedAction::setManualModeBrightness, parameters),
                         service::name::evt_manager);
     }
 
@@ -625,8 +625,8 @@ namespace app
         screen_light_control::Parameters parameters;
         parameters.functionPoints =
             screen_light_control::functions::BrightnessFunction({{0.0f, 0.0f}, {1000.0f, 100.0f}});
-        bus.sendUnicast(std::make_shared<sevm::ScreenLightControlMessage>(
-                            screen_light_control::Action::setAutomaticModeParameters, parameters),
+        bus.sendUnicast(std::make_shared<sevm::ScreenLightSetParameters>(
+                            screen_light_control::ParameterizedAction::setAutomaticModeParameters, parameters),
                         service::name::evt_manager);
     }
 
