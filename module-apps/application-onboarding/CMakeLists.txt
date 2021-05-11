@@ -10,7 +10,7 @@ include_directories( ${PROJECT_NAME}
 
 target_sources(${PROJECT_NAME}
 
-		PRIVATE
+	PRIVATE
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationOnBoarding.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/OnBoardingMainWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/StartConfigurationWindow.cpp"
@@ -24,8 +24,7 @@ target_sources(${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/windows/SkipDialogWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/OnBoardingDateAndTimeWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/OnBoardingChangeDateAndTimeWindow.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/ConfigurePasscodeWindow.cpp"
-		PUBLIC
+    PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationOnBoarding.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/OnBoardingMainWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/StartConfigurationWindow.hpp"

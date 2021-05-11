@@ -204,11 +204,6 @@ namespace app
         bool getVoLTEOn() const noexcept override;
         void volteChanged(const std::string &value);
         void setOsUpdateVersion(const std::string &value);
-        [[nodiscard]] auto getLockPassHash() const noexcept -> unsigned int
-        {
-            return lockPassHash;
-        }
-        void setLockPassHash(unsigned int value);
 
         ScreenLightSettings::Values getCurrentValues() override;
         void setBrightness(float brigtnessValue) override;
@@ -221,9 +216,6 @@ namespace app
 
         auto isUSBSecured() const -> bool override;
         void setUSBSecurity(bool security) override;
-
-        void setLockScreenPasscodeOn(bool passcodeOn);
-        auto isLockScreenPasscodeOn() const -> bool;
 
         auto getNotificationsWhenLocked() const noexcept -> bool override;
         void setNotificationsWhenLocked(bool on) noexcept override;
@@ -246,8 +238,6 @@ namespace app
         bool operatorsOn              = false;
         bool voLteStateOn             = false;
         bool usbSecured               = true;
-        bool lockScreenPasscodeOn     = true;
-        unsigned int lockPassHash     = 0;
         bool notificationsWhenLocked  = true;
         bool callsFromFavorites       = false;
         int connectionFrequency       = 0;

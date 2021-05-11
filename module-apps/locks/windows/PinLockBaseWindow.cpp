@@ -36,12 +36,17 @@ namespace gui
         }
         return std::string{};
     }
+
     top_bar::Configuration PinLockBaseWindow::configureTopBar(top_bar::Configuration appConfiguration)
     {
-        appConfiguration.enable(top_bar::Indicator::Lock);
-        appConfiguration.disable(top_bar::Indicator::Time);
+        appConfiguration.disable(top_bar::Indicator::NetworkAccessTechnology);
+        appConfiguration.enable(top_bar::Indicator::PhoneMode);
+        appConfiguration.enable(top_bar::Indicator::Battery);
+        appConfiguration.enable(top_bar::Indicator::Signal);
+        appConfiguration.enable(top_bar::Indicator::SimCard);
         return appConfiguration;
     }
+
     void PinLockBaseWindow::restore() noexcept
     {
         LockWindow::restore();
@@ -88,14 +93,6 @@ namespace gui
         iceText->setFont(style::window::font::verysmall);
         iceText->setText(utils::translate("app_desktop_emergency"));
         iceBox->addWidget(iceText);
-
-        title = new gui::Text(this, title::x, title::y, title::w, title::h);
-        title->setFilled(false);
-        title->setBorderColor(gui::ColorFullBlack);
-        title->setFont(style::header::font::title);
-        title->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-        title->setVisible(false);
-        title->setPenWidth(2);
     }
 
 } // namespace gui

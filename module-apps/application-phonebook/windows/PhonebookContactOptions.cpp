@@ -16,9 +16,7 @@ namespace gui
 
     PhonebookContactOptions::PhonebookContactOptions(app::Application *app)
         : OptionWindow(app, gui::window::name::contact_options)
-    {
-        buildInterface();
-    }
+    {}
 
     auto PhonebookContactOptions::handleSwitchData(SwitchData *data) -> bool
     {

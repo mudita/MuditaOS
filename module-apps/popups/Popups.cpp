@@ -20,8 +20,10 @@ namespace gui::popup
             return gui::popup::window::tethering_phonemode_change_window;
         case ID::PhoneLock:
             return gui::popup::window::phone_lock_window;
-        case ID::InputLock:
-            return gui::popup::window::input_lock_window;
+        case ID::PhoneLockInput:
+            return gui::popup::window::phone_lock_input_window;
+        case ID::PhoneLockChangeInfo:
+            return gui::popup::window::phone_lock_change_info_window;
         }
         return {};
     }

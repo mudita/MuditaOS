@@ -160,7 +160,7 @@ namespace gui
         if (inputEvent.isLongRelease(gui::KeyCode::KEY_PND)) {
             LOG_INFO("Locking phone");
 
-            application->handlePhoneLock();
+            application->getPhoneLockSubject().lock();
         }
 
         if ((inputEvent.isShortRelease())) {

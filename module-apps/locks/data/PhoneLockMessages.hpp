@@ -22,6 +22,27 @@ namespace locks
     class LockedPhone : public sys::DataMessage
     {};
 
+    class EnablePhoneLock : public sys::DataMessage
+    {};
+
+    class DisablePhoneLock : public sys::DataMessage
+    {};
+
+    class ChangePhoneLock : public sys::DataMessage
+    {};
+
+    class SetPhoneLock : public sys::DataMessage
+    {};
+
+    class SetConfirmedPhoneLock : public sys::DataMessage
+    {};
+
+    class SkipSetPhoneLock : public sys::DataMessage
+    {};
+
+    class SkippedSetPhoneLock : public sys::DataMessage
+    {};
+
     class UnLockPhoneInput : public sys::DataMessage
     {
       private:

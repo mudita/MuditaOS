@@ -155,15 +155,15 @@ namespace gui
         drawLines();
     }
 
-    void Text::setRichText(const UTF8 &text)
+    void Text::setRichText(const UTF8 &text, text::RichTextParser::TokenMap &&tokenMap)
     {
         setText("");
-        addRichText(text);
+        addRichText(text, std::move(tokenMap));
     }
 
-    void Text::addRichText(const UTF8 &text)
+    void Text::addRichText(const UTF8 &text, text::RichTextParser::TokenMap &&tokenMap)
     {
-        auto tmp_document = text::RichTextParser().parse(text, &format);
+        auto tmp_document = text::RichTextParser().parse(text, &format, std::move(tokenMap));
 
         if (!tmp_document || tmp_document->isEmpty()) {
 
