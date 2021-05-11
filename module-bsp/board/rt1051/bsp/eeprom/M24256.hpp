@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -15,6 +15,6 @@ namespace bsp::eeprom
     constexpr inline auto M24256_PAGE_SIZE  = 64;
     constexpr inline auto M24256_TOTAL_SIZE = (32 * 1024); // bytes
 
-    constexpr inline auto M24256_SLAVE_ADDR = 0x00;
+    constexpr inline auto M24256_SLAVE_ADDR = (0xA0 >> 1);
 
 } // namespace bsp::eeprom
