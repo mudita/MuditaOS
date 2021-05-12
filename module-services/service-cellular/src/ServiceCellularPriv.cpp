@@ -3,8 +3,23 @@
 
 #include "ServiceCellularPriv.hpp"
 
-namespace internal
+#include <service-cellular-api>
+
+namespace cellular::internal
 {
     ServiceCellularPriv::ServiceCellularPriv(ServiceCellular *owner)
-        : owner{owner}, simCard{new SimCard(owner)}, state{new State(owner)} {};
-} // namespace internal
+        : owner{owner}, simCard{new SimCard(owner)}, state{new State(owner)}
+    {
+        initSimCard();
+    }
+
+    void ServiceCellularPriv::initSimCard()
+    {
+        simCard->onSimReady     = [this]() { state->set(State::ST::SimInit); };
+        simCard->onUnhandledCME = [this](unsigned int code) {
+            owner->bus.sendMulticast(std::make_shared<msg::notification::UnhandledCME>(code),
+                                     sys::BusChannel::ServiceCellularNotifications);
+        };
+    }
+
+} // namespace cellular::internal

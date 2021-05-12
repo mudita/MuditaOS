@@ -122,6 +122,11 @@ namespace cellular::service
          */
         std::optional<at::SimState> simState() const;
 
+        /** Internal events
+         */
+        std::function<void()> onSimReady;
+        std::function<void(unsigned int code)> onUnhandledCME;
+
       private:
         /** return whether the pin needs to be provided, only for standard pin.
          * \return true if need pin to unlock SIM card functionality

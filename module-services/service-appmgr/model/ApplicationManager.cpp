@@ -461,8 +461,7 @@ namespace app::manager
             auto action = std::make_unique<app::manager::ActionRequest>(
                 msg->sender,
                 app::manager::actions::DisplayCMEError,
-                std::make_unique<app::manager::actions::UnhandledCMEParams>(static_cast<Store::GSM::SIM>(msg->sim),
-                                                                            msg->code));
+                std::make_unique<app::manager::actions::UnhandledCMEParams>(Store::GSM::get()->selected, msg->code));
             handleActionRequest(action.get());
             return std::make_shared<sys::ResponseMessage>();
         });

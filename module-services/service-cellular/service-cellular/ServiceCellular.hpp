@@ -58,7 +58,7 @@ namespace constants
 
 class ConnectionManager;
 
-namespace internal
+namespace cellular::internal
 {
     class ServiceCellularPriv;
 }
@@ -348,7 +348,7 @@ class ServiceCellular : public sys::Service
     auto hangUpCall() -> bool;
 
   private:
-    std::unique_ptr<internal::ServiceCellularPriv> priv;
+    std::unique_ptr<cellular::internal::ServiceCellularPriv> priv;
 };
 
 namespace sys

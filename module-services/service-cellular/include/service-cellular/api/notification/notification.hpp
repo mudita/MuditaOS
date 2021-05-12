@@ -26,9 +26,8 @@ namespace cellular::msg
 
         struct UnhandledCME : public msg::Notification
         {
-            UnhandledCME(api::SimSlot sim, unsigned int code) : sim(sim), code(code)
+            UnhandledCME(unsigned int code) : code(code)
             {}
-            api::SimSlot sim;
             unsigned int code;
         };
     } // namespace notification

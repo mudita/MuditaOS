@@ -8,10 +8,10 @@
 
 #include "SimCard.hpp"
 
-namespace internal
+namespace cellular::internal
 {
-    using cellular::service::SimCard;
-    using cellular::service::State;
+    using service::SimCard;
+    using service::State;
 
     class ServiceCellularPriv
     {
@@ -25,5 +25,8 @@ namespace internal
       public:
         ServiceCellularPriv(ServiceCellular *owner);
         friend class ::ServiceCellular;
+
+      private:
+        void initSimCard();
     };
 } // namespace internal

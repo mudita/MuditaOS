@@ -114,9 +114,8 @@ namespace cellular::service
             /* ServiceCellular::handleSimState(simState(), std::string()); */
         }
         else if (result != sim::Result::OK) {
-            owner->bus.sendMulticast(
-                std::make_shared<msg::notification::UnhandledCME>(*sim, static_cast<unsigned int>(result)),
-                sys::BusChannel::ServiceCellularNotifications);
+            if (onUnhandledCME)
+                onUnhandledCME(static_cast<unsigned int>(result));
         }
         return result == sim::Result::OK;
     }
