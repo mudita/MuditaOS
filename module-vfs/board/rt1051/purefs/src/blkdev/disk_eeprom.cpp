@@ -19,6 +19,7 @@ namespace purefs::blkdev
 
     auto disk_eeprom::status() const -> media_status
     {
+        cpp_freertos::LockGuard lock(mutex);
         return (bsp::eeprom::isPresent(bus_id)) ? (media_status::healthly) : (media_status::error);
     }
 
