@@ -115,6 +115,13 @@ namespace gui
             }
             return true;
         }
+        else if (inputEvent.is(KeyCode::KEY_LEFT) && isIceVisible()) {
+            app::manager::Controller::sendAction(application,
+                                                 app::manager::actions::EmergencyDial,
+                                                 std::make_unique<gui::SwitchData>(),
+                                                 app::manager::OnSwitchBehaviour::RunInBackground);
+            return true;
+        }
 
         // check if any of the lower inheritance onInput methods catch the event
         return AppWindow::onInput(inputEvent);

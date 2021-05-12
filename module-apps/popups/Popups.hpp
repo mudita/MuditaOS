@@ -18,9 +18,11 @@ namespace gui
             TetheringPhoneModeChangeProhibited,
             PhoneLock,
             PhoneLockInput,
+            PhoneLockInfo,
             PhoneLockChangeInfo,
             SimLock,
             SimInfo,
+            SimNotReady,
         };
 
         namespace window
@@ -38,7 +40,7 @@ namespace gui
             inline constexpr auto power_off_window                  = "PowerOffPopup";
             inline constexpr auto sim_unlock_window                 = "SimUnlockPopup";
             inline constexpr auto sim_info_window                   = "SimInfoPopup";
-
+            inline constexpr auto sim_not_ready_window              = "SimNotReadyPopup";
         } // namespace window
 
         std::string resolveWindowName(ID id);

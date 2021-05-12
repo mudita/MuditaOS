@@ -5,7 +5,6 @@
 
 #include <service-appmgr/Controller.hpp>
 #include <application-desktop/data/DesktopStyle.hpp>
-#include <locks/data/LockStyle.hpp>
 
 #include <i18n/i18n.hpp>
 
@@ -49,7 +48,6 @@ top_bar::Configuration PhoneLockedInfoWindow::configureTopBar(top_bar::Configura
 
 void PhoneLockedInfoWindow::buildInterface()
 {
-    namespace lock_style = style::window::lock_input;
     AppWindow::buildInterface();
 
     bottomBar->setText(BottomBar::Side::LEFT, utils::translate("app_desktop_emergency"));

@@ -72,25 +72,7 @@ namespace gui
 
     void LockInputWindow::buildIceBox()
     {
-        using namespace style::window::lock_input;
-
-        iceBox = new gui::HBox(this, ice::x, ice::y, ice::w, ice::h);
-        iceBox->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Center));
-        iceBox->setEdges(RectangleEdge::None);
-        iceBox->setVisible(false);
-
-        auto arrow        = new gui::Image("left_label_arrow");
-        arrow->activeItem = false;
-        arrow->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Center));
-        arrow->setMargins(Margins(0, 0, ice::margin, 0));
-        iceBox->addWidget(arrow);
-
-        auto iceText        = new gui::Text(nullptr, 0, 0, ice::text::w, ice::h);
-        iceText->activeItem = false;
-        iceText->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Center));
-        iceText->setFont(style::window::font::verysmall);
-        iceText->setText(utils::translate("app_desktop_emergency"));
-        iceBox->addWidget(iceText);
+        iceBox = new gui::IceBox(this);
     }
 
     void LockInputWindow::buildPinBody()
@@ -232,6 +214,11 @@ namespace gui
         }
     }
 
+    auto LockInputWindow::isIceVisible() const noexcept -> bool
+    {
+        return iceBox->visible;
+    }
+
     auto LockInputWindow::isInInputState() const noexcept -> bool
     {
         return lock && (lock->isState(locks::Lock::LockState::InputRequired) ||
@@ -244,4 +231,5 @@ namespace gui
         return lock && (lock->isState(locks::Lock::LockState::InputInvalid) ||
                         lock->isState(locks::Lock::LockState::NewInputInvalid));
     }
+
 } // namespace gui
