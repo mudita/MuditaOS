@@ -18,6 +18,12 @@ namespace gui
           operatorsSettings(operatorsSettings)
     {}
 
+    void NetworkWindow::onBeforeShow(ShowMode mode, SwitchData *data)
+    {
+        simParams->updateSim();
+        BaseSettingsWindow::onBeforeShow(mode, data);
+    }
+
     auto NetworkWindow::buildOptionsList() -> std::list<gui::Option>
     {
         std::list<gui::Option> optList;

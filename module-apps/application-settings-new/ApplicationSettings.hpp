@@ -90,6 +90,7 @@ namespace app
           public:
             virtual ~SimParams()                     = default;
             virtual void setSim(Store::GSM::SIM sim) = 0;
+            virtual void updateSim()                 = 0;
             virtual Store::GSM::SIM getSim()         = 0;
             virtual std::string getNumber()          = 0;
         };
@@ -201,6 +202,7 @@ namespace app
         void createUserInterface() override;
         void destroyUserInterface() override;
         void setSim(Store::GSM::SIM sim) override;
+        void updateSim() override;
         Store::GSM::SIM getSim() override;
         std::string getNumber() override;
 

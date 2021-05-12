@@ -8,10 +8,12 @@
 #include <locks/data/LockData.hpp>
 
 #include <module-sys/Service/Service.hpp>
+#include <Timers/TimerHandle.hpp>
 
 namespace locks
 {
-    using StoredLockInput = std::vector<unsigned int>;
+    using StoredLockInput               = std::vector<unsigned int>;
+    constexpr auto simResponseTimerName = "SimResponseTimer";
 
     class SimLockHandler
     {
@@ -22,8 +24,11 @@ namespace locks
         SimInputTypeAction simInputTypeAction = SimInputTypeAction::UnlockWithPin;
         unsigned int storedErrorCode          = 0;
         bool simUnlockBlockOnLockedPhone      = false;
+        bool simReady                         = false;
         StoredLockInput storedFirstInput;
         StoredLockInput storedSecondInput;
+
+        sys::TimerHandle simResponseTimer;
 
         void clearStoredInputs();
         void setSimInputTypeAction(SimInputTypeAction _simInputTypeAction);
@@ -32,6 +37,8 @@ namespace locks
         void simErrorAction(unsigned int errorCode);
         void simUnlockAction();
         void simInfoAction();
+        void simNotReadyAction();
+        void simReadyAction();
 
         sys::MessagePointer unlockSimWithPin(LockInput pinInputData);
         sys::MessagePointer processLockWithNewInput(LockInput inputData);
@@ -45,6 +52,8 @@ namespace locks
         explicit SimLockHandler(sys::Service *owner);
 
         void setSimUnlockBlockOnLockedPhone();
+        void setSimReady();
+
         sys::MessagePointer releaseSimUnlockBlockOnLockedPhone();
 
         sys::MessagePointer verifySimLockInput(LockInput inputData);
@@ -58,8 +67,10 @@ namespace locks
         sys::MessagePointer handleSimBlockedRequest();
         sys::MessagePointer handleCMEErrorRequest(unsigned int errorCode);
         sys::MessagePointer handleSimUnlockedMessage();
-        sys::MessagePointer handleSimChangedMessage();
+        sys::MessagePointer handleSimPinChangedMessage();
         sys::MessagePointer handleSimAvailabilityMessage();
+        sys::MessagePointer handleSimReadyMessage();
+        sys::MessagePointer handleSimNotRespondingMessage();
 
         void getSettingsSimSelect(const std::string &settingsSim);
         void setSim(cellular::api::SimSlot simSlot);
