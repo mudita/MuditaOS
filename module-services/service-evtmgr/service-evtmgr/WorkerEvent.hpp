@@ -12,6 +12,7 @@
 #include <bsp/keyboard/key_codes.hpp>
 #include <bsp/keyboard/key_codes.hpp>
 #include <Service/CpuSentinel.hpp>
+#include <module-services/service-evtmgr/battery-brownout-detector/BatteryBrownoutDetector.hpp>
 
 #include <cstdint>
 #include <list>
@@ -73,9 +74,10 @@ class WorkerEvent : public sys::Worker
     bsp::KeyCodes lastPressed = static_cast<bsp::KeyCodes>(0);
     sys::Service *service     = nullptr;
     std::shared_ptr<sys::CpuSentinel> cpuSentinel;
+    BatteryBrownoutDetector batteryBrownoutDetector;
 
   public:
-    WorkerEvent(sys::Service *service) : sys::Worker(service, stackDepthBytes), service(service){};
+    WorkerEvent(sys::Service *service);
     /**
      * This function is responsible for creating all queues provided in the constructor.
      * When all queues are created this method creates set of queues.
@@ -92,4 +94,5 @@ class WorkerEvent : public sys::Worker
     bool handleMessage(uint32_t queueID) override final;
     void requestSliderPositionRead();
     void handleMagnetometerEvent();
+    void checkBatteryChargerInterrupts();
 };

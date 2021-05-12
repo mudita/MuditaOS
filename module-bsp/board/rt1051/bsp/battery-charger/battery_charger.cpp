@@ -592,6 +592,9 @@ namespace bsp::battery_charger
         enableChargerIRQs();
         IRQPinsInit();
 
+        // Check IRQ status register
+        INTB_IRQHandler();
+
         return 0;
     }
 
@@ -738,6 +741,13 @@ namespace bsp::battery_charger
         if (Store::Battery::get().state == Store::Battery::State::Discharging) {
             resetUSBCurrrentLimit();
         }
+    }
+
+    int getVoltageFilteredMeasurement()
+    {
+        auto [retCode, value] = fuelGaugeRead(Registers::AvgVCELL_REG);
+        int voltage           = value * voltageSenseGain;
+        return voltage;
     }
 
     BaseType_t INTB_IRQHandler()
