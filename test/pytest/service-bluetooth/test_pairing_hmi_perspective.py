@@ -14,6 +14,7 @@ from bt_fixtures import *
 @pytest.mark.usefixtures("bt_main_window")
 @pytest.mark.usefixtures("phone_in_desktop")
 @pytest.mark.usefixtures("phone_unlocked")
+@pytest.mark.usefixtures("usb_unlocked")
 @pytest.mark.skipif("not config.getvalue('--bt_device')", reason='--bt_device was not specified')
 def test_bt_pairing_hmi(harness, bt_device):
     if not bt_device:

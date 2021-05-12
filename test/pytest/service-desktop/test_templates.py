@@ -149,7 +149,7 @@ def test_get_template_by_id(harness):
 
 @pytest.mark.service_desktop_test
 @pytest.mark.usefixtures("usb_unlocked")
-def test_get_templates_without_paggination(harness):
+def test_get_templates_without_pagination(harness):
     templates_tester = TemplatesTester(harness)
     templates_tester.test_getting_templates_without_pagination()
 
