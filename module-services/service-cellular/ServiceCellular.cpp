@@ -496,9 +496,6 @@ void ServiceCellular::registerMessageHandlers()
     connect(typeid(CellularUSSDMessage),
             [&](sys::Message *request) -> sys::MessagePointer { return handleCellularUSSDMessage(request); });
 
-    connect(typeid(CellularSimStateMessage),
-            [&](sys::Message *request) -> sys::MessagePointer { return handleSimStateMessage(request); });
-
     connect(typeid(cellular::StateChange),
             [&](sys::Message *request) -> sys::MessagePointer { return handleStateRequestMessage(request); });
 
@@ -921,7 +918,7 @@ auto ServiceCellular::handle(db::query::SMSSearchByTypeResult *response) -> bool
  * any AT commands is not allowed here (also in URC handlers and other functions called from here)
  * @return
  */
-std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotification(const std::string &data)
+std::optional<std::shared_ptr<sys::Message>> ServiceCellular::identifyNotification(const std::string &data)
 {
 
     CellularUrcHandler urcHandler(*this);
@@ -939,133 +936,6 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
     }
 
     return urcHandler.getResponse();
-}
-
-bool ServiceCellular::requestPin(unsigned int attempts, const std::string msg)
-{
-    auto message = std::make_shared<CellularSimRequestPinMessage>(Store::GSM::get()->selected, attempts, msg);
-    bus.sendUnicast(message, app::manager::ApplicationManager::ServiceName);
-    LOG_DEBUG("REQUEST PIN");
-    return true;
-}
-
-bool ServiceCellular::requestPuk(unsigned int attempts, const std::string msg)
-{
-    auto message = std::make_shared<CellularSimRequestPukMessage>(Store::GSM::get()->selected, attempts, msg);
-    bus.sendUnicast(message, app::manager::ApplicationManager::ServiceName);
-    LOG_DEBUG("REQUEST PUK");
-    return true;
-}
-
-bool ServiceCellular::sendSimUnlocked()
-{
-    auto message = std::make_shared<CellularUnlockSimMessage>(Store::GSM::get()->selected);
-    bus.sendUnicast(message, app::manager::ApplicationManager::ServiceName);
-    LOG_DEBUG("SIM UNLOCKED");
-    return true;
-}
-
-bool ServiceCellular::sendSimBlocked()
-{
-    auto message = std::make_shared<CellularBlockSimMessage>(Store::GSM::get()->selected);
-    bus.sendUnicast(message, app::manager::ApplicationManager::ServiceName);
-    LOG_ERROR("SIM BLOCKED");
-    return true;
-}
-
-bool ServiceCellular::handleSimState(at::SimState state, const std::string &message)
-{
-    switch (state) {
-    case at::SimState::Ready:
-        Store::GSM::get()->sim = Store::GSM::get()->selected;
-        settings->setValue(settings::SystemProperties::activeSim,
-                           ::utils::enumToString(Store::GSM::get()->selected),
-                           settings::SettingsScope::Global);
-        // SIM causes SIM INIT, only on ready
-        if (Store::GSM::get()->tray == Store::GSM::Tray::IN) {
-            priv->state->set(State::ST::SimInit);
-        }
-        bus.sendMulticast(std::make_shared<cellular::msg::notification::SimReady>(true),
-                          sys::BusChannel::ServiceCellularNotifications);
-        sendSimUnlocked();
-        break;
-    case at::SimState::NotReady:
-        LOG_DEBUG("Not ready");
-        Store::GSM::get()->sim = Store::GSM::SIM::SIM_FAIL;
-        bus.sendMulticast(std::make_shared<cellular::msg::notification::SimReady>(false),
-                          sys::BusChannel::ServiceCellularNotifications);
-        break;
-    case at::SimState::SimPin: {
-        if (auto pc = priv->simCard->getAttemptsCounters(); pc) {
-            if (pc.value().PukCounter != 0) {
-                requestPin(pc.value().PinCounter, message);
-                break;
-            }
-        }
-        sendSimBlocked();
-        break;
-    }
-    case at::SimState::SimPuk: {
-        if (auto pc = priv->simCard->getAttemptsCounters(); pc) {
-            if (pc.value().PukCounter != 0) {
-                requestPuk(pc.value().PukCounter, message);
-                break;
-            }
-        }
-        sendSimBlocked();
-        break;
-    }
-    case at::SimState::SimPin2: {
-        if (auto pc = priv->simCard->getAttemptsCounters(cellular::service::sim::Pin::PIN2); pc) {
-            if (pc.value().PukCounter != 0) {
-                requestPin(pc.value().PinCounter, message);
-                break;
-            }
-        }
-        sendSimBlocked();
-        break;
-    }
-    case at::SimState::SimPuk2: {
-        if (auto pc = priv->simCard->getAttemptsCounters(cellular::service::sim::Pin::PIN2); pc) {
-            if (pc.value().PukCounter != 0) {
-                requestPuk(pc.value().PukCounter, message);
-                break;
-            }
-        }
-        sendSimBlocked();
-        break;
-    }
-    case at::SimState::PhNetPin:
-        [[fallthrough]];
-    case at::SimState::PhNetPuk:
-        [[fallthrough]];
-    case at::SimState::PhNetSPin:
-        [[fallthrough]];
-    case at::SimState::PhNetSPuk:
-        [[fallthrough]];
-    case at::SimState::PhSpPin:
-        [[fallthrough]];
-    case at::SimState::PhSpPuk:
-        [[fallthrough]];
-    case at::SimState::PhCorpPin:
-        [[fallthrough]];
-    case at::SimState::PhCorpPuk:
-        Store::GSM::get()->sim = Store::GSM::SIM::SIM_UNKNOWN;
-        LOG_ERROR("SimState not supported");
-        break;
-    case at::SimState::Locked:
-        Store::GSM::get()->sim = Store::GSM::SIM::SIM_FAIL;
-        sendSimBlocked();
-        break;
-    case at::SimState::Unknown:
-        LOG_ERROR("SimState not supported");
-        Store::GSM::get()->sim = Store::GSM::SIM::SIM_UNKNOWN;
-        break;
-    }
-    auto simMessage = std::make_shared<sevm::SIMMessage>();
-    bus.sendUnicast(simMessage, ::service::name::evt_manager);
-
-    return true;
 }
 
 auto ServiceCellular::sendSMS(SMSRecord record) -> bool
@@ -2333,12 +2203,6 @@ auto ServiceCellular::handleCellularUSSDMessage(sys::Message *msg) -> std::share
 {
     auto message = static_cast<CellularUSSDMessage *>(msg);
     return std::make_shared<CellularResponseMessage>(handleUSSDRequest(message->type, message->data));
-}
-
-auto ServiceCellular::handleSimStateMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
-{
-    auto message = static_cast<CellularSimStateMessage *>(msg);
-    return std::make_shared<CellularResponseMessage>(handleSimState(message->getState(), message->getMessage()));
 }
 
 auto ServiceCellular::handleStateRequestMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>

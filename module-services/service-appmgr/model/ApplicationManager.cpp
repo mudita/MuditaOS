@@ -439,7 +439,6 @@ namespace app::manager
         auto convertibleToActionHandler = [this](sys::Message *request) { return handleMessageAsAction(request); };
         connect(typeid(CellularSimRequestPinMessage), convertibleToActionHandler);
         connect(typeid(CellularSimRequestPukMessage), convertibleToActionHandler);
-        connect(typeid(CellularUnlockSimMessage), convertibleToActionHandler);
         connect(typeid(CellularBlockSimMessage), convertibleToActionHandler);
         connect(typeid(CellularMMIResultMessage), convertibleToActionHandler);
         connect(typeid(CellularMMIResponseMessage), convertibleToActionHandler);
@@ -455,7 +454,18 @@ namespace app::manager
         connect(typeid(sys::TetheringPhoneModeChangeProhibitedMessage), convertibleToActionHandler);
         connect(typeid(VolumeChanged), convertibleToActionHandler);
 
-        /* Notification from sys::BusChannel::ServiceCellularNotifications, probably not subscribed */
+        /* Notifications from sys::BusChannel::ServiceCellularNotifications, probably not subscribed */
+        connect(typeid(cellular::msg::notification::SimReady), [&](sys::Message *request) {
+            auto msg = static_cast<cellular::msg::notification::SimReady *>(request);
+            if (msg->ready) {
+                auto action = std::make_unique<app::manager::ActionRequest>(
+                    msg->sender,
+                    app::manager::actions::UnlockSim,
+                    std::make_unique<app::manager::actions::SimStateParams>(Store::GSM::get()->selected));
+                handleActionRequest(action.get());
+            }
+            return std::make_shared<sys::ResponseMessage>();
+        });
         connect(typeid(cellular::msg::notification::UnhandledCME), [&](sys::Message *request) {
             auto msg    = static_cast<cellular::msg::notification::UnhandledCME *>(request);
             auto action = std::make_unique<app::manager::ActionRequest>(

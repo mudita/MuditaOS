@@ -3,7 +3,15 @@
 
 #pragma once
 
-#include <Service/Message.hpp>
+#include <service-cellular/api/request/request.hpp>
+#include <at/SimState.hpp>
 
-namespace internal::msg
-{}
+namespace cellular::internal::msg
+{
+    struct SimStateChanged : public cellular::msg::Request
+    {
+        SimStateChanged(at::SimState state) : state(state)
+        {}
+        at::SimState state;
+    };
+} // namespace cellular::internal::msg

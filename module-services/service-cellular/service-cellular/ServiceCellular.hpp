@@ -106,33 +106,6 @@ class ServiceCellular : public sys::Service
     bool getIMSI(std::string &destination, bool fullNumber = false);
     std::vector<std::string> getNetworkInfo();
 
-    /** group of action/messages send "outside" eg. GUI
-     * requestPin is call anytime modem need pin, here should be called any action
-     * which allow user input (or mockup) pin. Then send appropriate action to notify the modem
-     * \param attempts Attempts counter for current action
-     * \param msg Literal name of action eg. SIM PIN
-     * \return
-     */
-    bool requestPin(unsigned int attempts, const std::string msg);
-
-    /** requestPuk is call anytime modem need puk, here should be called any action
-     * which allow user input (or mockup) puk and new pin. Then send appropriate action to notify the modem
-     * \param attempts Attempts counter for current action
-     * \param msg Literal name of action eg. SIM PUK
-     * \return
-     */
-    bool requestPuk(unsigned int attempts, const std::string msg);
-
-    /** Call in case of SIM card unlocked, MT ready. Place for sending message/action inform rest
-     * \return
-     */
-    bool sendSimUnlocked();
-
-    /** Call in case of SIM card locked (card fail, eg. to many bad PUK). Place for sending message/action inform rest
-     * \return
-     */
-    bool sendSimBlocked();
-
   private:
     at::ATURCStream atURCStream;
     std::unique_ptr<CellularMux> cmux = std::make_unique<CellularMux>(PortSpeed_e::PS460800, this);
@@ -161,7 +134,7 @@ class ServiceCellular : public sys::Service
     bsp::Board board = bsp::Board::none;
 
     /// URC GSM notification handler
-    std::optional<std::shared_ptr<CellularMessage>> identifyNotification(const std::string &data);
+    std::optional<std::shared_ptr<sys::Message>> identifyNotification(const std::string &data);
 
     std::vector<std::string> messageParts;
 
@@ -262,8 +235,6 @@ class ServiceCellular : public sys::Service
     bool handleUSSDRequest(CellularUSSDMessage::RequestType requestType, const std::string &request = "");
     bool handleUSSDURC();
     void handleUSSDTimer();
-
-    bool handleSimState(at::SimState state, const std::string &message);
 
     std::shared_ptr<cellular::RawCommandRespAsync> handleCellularStartOperatorsScan(
         CellularStartOperatorsScanMessage *msg);

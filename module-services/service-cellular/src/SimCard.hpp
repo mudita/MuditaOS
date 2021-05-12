@@ -11,7 +11,7 @@ namespace at
 {
     class Cmd;
     class Channel;
-}
+} // namespace at
 namespace sys
 {
     class Service;
@@ -118,13 +118,13 @@ namespace cellular::service
          */
         sim::Result changePin(const std::string &oldPin, const std::string &newPin) const;
 
-        /** Return SIM state based on CPIN AT commands
-         */
-        std::optional<at::SimState> simState() const;
-
         /** Internal events
          */
-        std::function<void()> onSimReady;
+        std::function<void(bool ready)> onSimReady;
+        std::function<void(unsigned int attempts)> onNeedPin;
+        std::function<void(unsigned int attempts)> onNeedPuk;
+        std::function<void()> onSimBlocked;
+        std::function<void()> onSimEvent;
         std::function<void(unsigned int code)> onUnhandledCME;
 
       private:
@@ -133,6 +133,10 @@ namespace cellular::service
          */
         bool isPinLocked() const;
 
+        /** Read internal SIM state using CPIN AT commands
+         */
+        std::optional<at::SimState> simState() const;
+
         /** Process sim::Result from PIN lock/unlock operations
          * \param result result from operation (`sendCommand()`)
          * \result return true on success
@@ -140,6 +144,8 @@ namespace cellular::service
         bool processPinResult(sim::Result result);
 
         sim::Result sendCommand(sim::LockType check, const at::Cmd &cmd) const;
+
+        void handleSimState(at::SimState state);
 
         sys::Service *owner; // bus owner
         at::Channel *channel            = nullptr;

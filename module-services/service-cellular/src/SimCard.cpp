@@ -3,6 +3,7 @@
 
 #include "SimCard.hpp"
 #include "utils.hpp"
+#include "messages.hpp"
 #include <service-cellular/api/request/sim.hpp>
 #include <service-cellular/api/notification/notification.hpp>
 
@@ -15,29 +16,26 @@
 #include <at/UrcFactory.hpp>
 #include <at/UrcCpin.hpp>
 
-namespace
-{
-    using namespace cellular::service;
-
-    constexpr const char *pinString[] = {"SC", "P2"};
-
-    sim::Result convertErrorFromATResult(const at::Result atres)
-    {
-        if (std::holds_alternative<at::EquipmentErrorCode>(atres.errorCode)) {
-
-            auto err = static_cast<int>(std::get<at::EquipmentErrorCode>(atres.errorCode));
-            if ((err > static_cast<int>(sim::Result::AT_ERROR_Begin)) &&
-                (err < static_cast<int>(sim::Result::AT_ERROR_End))) {
-                return static_cast<sim::Result>(err);
-            }
-        }
-        return sim::Result::Unknown;
-    }
-
-} // namespace
-
 namespace cellular::service
 {
+    namespace
+    {
+        constexpr const char *pinString[] = {"SC", "P2"};
+
+        sim::Result convertErrorFromATResult(const at::Result atres)
+        {
+            if (std::holds_alternative<at::EquipmentErrorCode>(atres.errorCode)) {
+
+                auto err = static_cast<int>(std::get<at::EquipmentErrorCode>(atres.errorCode));
+                if ((err > static_cast<int>(sim::Result::AT_ERROR_Begin)) &&
+                    (err < static_cast<int>(sim::Result::AT_ERROR_End))) {
+                    return static_cast<sim::Result>(err);
+                }
+            }
+            return sim::Result::Unknown;
+        }
+
+    } // namespace
 
     void SimCard::registerMessages()
     {
@@ -48,7 +46,8 @@ namespace cellular::service
             Store::GSM::get()->selected = static_cast<Store::GSM::SIM>(msg->sim);
             bsp::cellular::sim::simSelect();
             bsp::cellular::sim::hotSwapTrigger();
-            return std::make_shared<request::sim::SetActiveSim::Response>(true);
+            //!!!!            sim = msg->sim;
+            return std::make_shared<msg::Response>(true);
         });
         owner->connect(typeid(request::sim::GetLockState), [&](sys::Message *) -> sys::MessagePointer {
             return std::make_shared<request::sim::GetLockState::Response>(isPinLocked());
@@ -76,6 +75,11 @@ namespace cellular::service
             const auto pin = cellular::utils::pinToString(msg->pin);
             return std::make_shared<request::sim::PinUnlock::Response>(processPinResult(supplyPin(pin)));
         });
+        owner->connect(typeid(internal::msg::SimStateChanged), [&](sys::Message *request) -> sys::MessagePointer {
+            auto msg = static_cast<internal::msg::SimStateChanged *>(request);
+            handleSimState(msg->state);
+            return sys::MessageNone{};
+        });
     }
 
     bool SimCard::ready() const
@@ -91,6 +95,77 @@ namespace cellular::service
     void SimCard::resetChannel(at::Channel *channel)
     {
         this->channel = channel;
+    }
+
+    void SimCard::handleSimState(at::SimState state)
+    {
+        switch (state) {
+        case at::SimState::Ready:
+            Store::GSM::get()->sim = Store::GSM::get()->selected;
+            if (onSimReady)
+                onSimReady(true);
+            break;
+        case at::SimState::NotReady:
+            Store::GSM::get()->sim = Store::GSM::SIM::SIM_FAIL;
+            if (onSimReady)
+                onSimReady(false);
+            break;
+        case at::SimState::SimPin:
+            [[fallthrough]];
+        case at::SimState::SimPin2: {
+            if (auto pc = getAttemptsCounters(state == at::SimState::SimPin ? sim::Pin::PIN1 : sim::Pin::PIN2); pc) {
+                if (pc.value().PukCounter != 0) {
+                    if (onNeedPin)
+                        onNeedPin(pc.value().PinCounter);
+                    break;
+                }
+            }
+            if (onSimBlocked)
+                onSimBlocked();
+            break;
+        }
+        case at::SimState::SimPuk:
+            [[fallthrough]];
+        case at::SimState::SimPuk2: {
+            if (auto pc = getAttemptsCounters(state == at::SimState::SimPuk ? sim::Pin::PIN1 : sim::Pin::PIN2); pc) {
+                if (pc.value().PukCounter != 0) {
+                    if (onNeedPuk)
+                        onNeedPuk(pc.value().PukCounter);
+                    break;
+                }
+            }
+            if (onSimBlocked)
+                onSimBlocked();
+            break;
+        }
+        case at::SimState::Locked:
+            Store::GSM::get()->sim = Store::GSM::SIM::SIM_FAIL;
+            if (onSimBlocked)
+                onSimBlocked();
+            break;
+        case at::SimState::PhNetPin:
+            [[fallthrough]];
+        case at::SimState::PhNetPuk:
+            [[fallthrough]];
+        case at::SimState::PhNetSPin:
+            [[fallthrough]];
+        case at::SimState::PhNetSPuk:
+            [[fallthrough]];
+        case at::SimState::PhSpPin:
+            [[fallthrough]];
+        case at::SimState::PhSpPuk:
+            [[fallthrough]];
+        case at::SimState::PhCorpPin:
+            [[fallthrough]];
+        case at::SimState::PhCorpPuk:
+            [[fallthrough]];
+        case at::SimState::Unknown:
+            LOG_ERROR("SimState not supported");
+            Store::GSM::get()->sim = Store::GSM::SIM::SIM_UNKNOWN;
+            break;
+        }
+        if (onSimEvent)
+            onSimEvent();
     }
 
     std::optional<at::response::qpinc::AttemptsCounters> SimCard::getAttemptsCounters(sim::Pin pin) const
@@ -111,7 +186,9 @@ namespace cellular::service
     bool SimCard::processPinResult(sim::Result result)
     {
         if (result == sim::Result::IncorrectPassword) {
-            /* ServiceCellular::handleSimState(simState(), std::string()); */
+            if (auto state = simState(); state) {
+                handleSimState(*state);
+            }
         }
         else if (result != sim::Result::OK) {
             if (onUnhandledCME)

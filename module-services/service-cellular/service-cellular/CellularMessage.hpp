@@ -435,21 +435,6 @@ class CellularSimRequestPukMessage : public CellularSimPasscodeRequest,
     }
 };
 
-class CellularUnlockSimMessage : public CellularMessage, public app::manager::actions::ConvertibleToAction
-{
-    app::manager::actions::SimStateParams params;
-
-  public:
-    CellularUnlockSimMessage(Store::GSM::SIM _sim) : CellularMessage(Type::SimResponse), params(_sim)
-    {}
-
-    [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
-    {
-        return std::make_unique<app::manager::ActionRequest>(
-            sender, app::manager::actions::UnlockSim, std::make_unique<app::manager::actions::SimStateParams>(params));
-    }
-};
-
 class CellularBlockSimMessage : public CellularMessage, public app::manager::actions::ConvertibleToAction
 {
     app::manager::actions::SimStateParams params;

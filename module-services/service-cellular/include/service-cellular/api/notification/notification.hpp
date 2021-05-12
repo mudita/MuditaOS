@@ -24,6 +24,23 @@ namespace cellular::msg
             bool ready;
         };
 
+        struct SimNeedPin : public msg::Notification
+        {
+            SimNeedPin(unsigned int attempts) : attempts(attempts)
+            {}
+            unsigned int attempts;
+        };
+
+        struct SimNeedPuk : public msg::Notification
+        {
+            SimNeedPuk(unsigned int attempts) : attempts(attempts)
+            {}
+            unsigned int attempts;
+        };
+
+        struct SimBlocked : public msg::Notification
+        {};
+
         struct UnhandledCME : public msg::Notification
         {
             UnhandledCME(unsigned int code) : code(code)
