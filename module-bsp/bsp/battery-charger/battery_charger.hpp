@@ -75,6 +75,8 @@ namespace bsp::battery_charger
 
 	void actionIfChargerUnplugged();
 
+	int getVoltageFilteredMeasurement();
+
 	BaseType_t INTB_IRQHandler();
 
 	extern "C"
