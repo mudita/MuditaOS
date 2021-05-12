@@ -4,6 +4,37 @@ To install the new version of MuditaOS please follow the steps described in this
 - [Linux](https://github.com/mudita/MuditaOS/blob/master/doc/boot_and_update.md#creating-a-storage-partition)
 - [Windows and macOS](https://github.com/mudita/MuditaOS/blob/master/doc/flashing_win_macos.md)
 
+## [0.64.1 2021-05-12]
+
+### Added
+
+* Add a warning when adding a calendar event is invalid, e.g., has an empty title.
+* Add Bluetooth notifications playback when Bluetooth audio device is connected.
+* Add compilation caching to the Jenkins CI.
+* Add displaying factory data in the technical information window.
+* Add documentation for home notifications.
+* Add minimum documentation on filesystem support.
+* Add timeout on meditation end screen to automatically return to the main window of meditation application.
+
+### Changed
+
+* Improve audio block size calculation algorithm to reduce voice latency in a phone call.
+* Remove excessive logs from the USB stack.
+* Tweak call window alignment.
+
+### Fixed
+
+* Fix Bluetooth default entries not being loaded at startup.
+* Fix crash when searching for notes.
+* Fix crash when trying to set a new calendar event and change its date or time.
+* Fix database and GUI unit tests.
+* Fix displaying Bluetooth name in the Bluetooth settings window.
+* Fix labels in Calls and Meditation applications.
+* Fix numeric inputs.
+* Fix repeated tethering notification.
+* Fix switching to a loudspeaker with headphones plugged in.
+* Fix switching window after editing a contact.
+
 ## [0.63.2 2021-05-05]
 
 ### Added
