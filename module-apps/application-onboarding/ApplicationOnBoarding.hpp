@@ -38,6 +38,7 @@ namespace app
         sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override;
 
         void acceptEULA();
+        void finalizeOnBoarding();
 
         void createUserInterface() override;
         void destroyUserInterface() override;

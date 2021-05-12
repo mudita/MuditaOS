@@ -51,6 +51,7 @@
 #include <popups/lock-popups/PhoneLockChangeInfoWindow.hpp>
 #include <popups/lock-popups/SimLockInputWindow.hpp>
 #include <popups/lock-popups/SimInfoWindow.hpp>
+#include <popups/lock-popups/SimNotReadyWindow.hpp>
 #include <popups/data/PopupData.hpp>
 #include <popups/data/PopupRequestParams.hpp>
 #include <popups/data/PhoneModeParams.hpp>
@@ -774,6 +775,7 @@ namespace app
                 break;
             case ID::PhoneLock:
             case ID::PhoneLockInput:
+            case ID::PhoneLockInfo:
             case ID::PhoneLockChangeInfo:
                 windowsFactory.attach(window::phone_lock_window, [](Application *app, const std::string &name) {
                     return std::make_unique<gui::PhoneLockedWindow>(app, window::phone_lock_window);
@@ -796,11 +798,15 @@ namespace app
                 break;
             case ID::SimLock:
             case ID::SimInfo:
+            case ID::SimNotReady:
                 windowsFactory.attach(window::sim_unlock_window, [](Application *app, const std::string &name) {
                     return std::make_unique<gui::SimLockInputWindow>(app, window::sim_unlock_window);
                 });
                 windowsFactory.attach(window::sim_info_window, [](Application *app, const std::string &name) {
                     return std::make_unique<gui::SimInfoWindow>(app, window::sim_info_window);
+                });
+                windowsFactory.attach(window::sim_not_ready_window, [](Application *app, const std::string &name) {
+                    return std::make_unique<gui::SimNotReadyWindow>(app, window::sim_not_ready_window);
                 });
                 break;
             }

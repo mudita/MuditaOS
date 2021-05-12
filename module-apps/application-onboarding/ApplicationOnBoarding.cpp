@@ -5,7 +5,7 @@
 
 #include "ApplicationOnBoarding.hpp"
 
-#include "windows/OnBoardingMainWindow.hpp"
+#include "data/OnBoardingMessages.hpp"
 #include "windows/StartConfigurationWindow.hpp"
 #include "windows/OnBoardingLanguagesWindow.hpp"
 #include "windows/EULALicenseWindow.hpp"
@@ -23,6 +23,8 @@
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <module-apps/application-settings-new/windows/ChangeTimeZone.hpp>
 #include <module-apps/locks/data/PhoneLockMessages.hpp>
+#include <module-apps/locks/data/SimLockMessages.hpp>
+#include <service-appmgr/service-appmgr/model/ApplicationManager.hpp>
 
 namespace app
 {
@@ -42,6 +44,7 @@ namespace app
 
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         bus.channels.push_back(sys::BusChannel::PhoneLockChanges);
+        bus.channels.push_back(sys::BusChannel::ServiceCellularNotifications);
     }
 
     // Invoked upon receiving data message
@@ -85,12 +88,27 @@ namespace app
             return sys::msgHandled();
         });
 
+        connect(typeid(cellular::msg::notification::SimReady), [&](sys::Message *msg) {
+            if (getCurrentWindow()->getName() == gui::window::name::onBoarding_sim_select) {
+                phoneLockSubject.setPhoneLock();
+                return sys::msgHandled();
+            }
+            return sys::msgNotHandled();
+        });
+
         return ret;
     }
 
     void ApplicationOnBoarding::acceptEULA()
     {
-        settings->setValue(settings::SystemProperties::eulaAccepted, "1", settings::SettingsScope::Global);
+        settings->setValue(
+            settings::SystemProperties::eulaAccepted, utils::to_string(true), settings::SettingsScope::Global);
+    }
+
+    void ApplicationOnBoarding::finalizeOnBoarding()
+    {
+        bus.sendUnicast(std::make_shared<onBoarding::FinalizeOnBoarding>(),
+                        app::manager::ApplicationManager::ServiceName);
     }
 
     sys::ReturnCodes ApplicationOnBoarding::DeinitHandler()
@@ -106,9 +124,6 @@ namespace app
     void ApplicationOnBoarding::createUserInterface()
     {
         windowsFactory.attach(gui::name::window::main_window, [](Application *app, const std::string &name) {
-            return std::make_unique<app::onBoarding::OnBoardingMainWindow>(app);
-        });
-        windowsFactory.attach(gui::window::name::onBoarding_languages, [](Application *app, const std::string &name) {
             return std::make_unique<app::onBoarding::OnBoardingLanguagesWindow>(app);
         });
         windowsFactory.attach(gui::window::name::onBoarding_start_configuration,
@@ -122,7 +137,8 @@ namespace app
             return std::make_unique<app::onBoarding::EULALicenseWindow>(app, std::move(presenter));
         });
         windowsFactory.attach(gui::window::name::onBoarding_sim_select, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::OnBoardingSimSelectWindow>(app, gui::window::name::onBoarding_sim_select);
+            return std::make_unique<app::onBoarding::OnBoardingSimSelectWindow>(
+                app, gui::window::name::onBoarding_sim_select);
         });
         windowsFactory.attach(gui::window::name::onBoarding_no_sim_selected,
                               [](Application *app, const std::string &name) {
@@ -136,8 +152,10 @@ namespace app
                               [](Application *app, const std::string &name) {
                                   return std::make_unique<app::onBoarding::NoConfigurationDialogWindow>(app);
                               });
-        windowsFactory.attach(gui::window::name::onBoarding_update, [](Application *app, const std::string &name) {
-            return std::make_unique<app::onBoarding::UpdateDialogWindow>(app);
+        windowsFactory.attach(gui::window::name::onBoarding_update, [&](Application *app, const std::string &name) {
+            auto presenter =
+                std::make_unique<app::onBoarding::OnBoardingFinalizeWindowPresenter>([&]() { finalizeOnBoarding(); });
+            return std::make_unique<app::onBoarding::UpdateDialogWindow>(app, std::move(presenter));
         });
         windowsFactory.attach(gui::window::name::onBoarding_skip, [](Application *app, const std::string &name) {
             return std::make_unique<app::onBoarding::SkipDialogWindow>(app);
@@ -148,7 +166,7 @@ namespace app
                               });
         windowsFactory.attach(gui::window::name::onBoarding_change_date_and_time,
                               [](Application *app, const std::string &name) {
-                                  return std::make_unique<gui::OnBoardingChangeDateAndTimeWindow>(app);
+                                  return std::make_unique<app::onBoarding::OnBoardingChangeDateAndTimeWindow>(app);
                               });
         windowsFactory.attach(gui::window::name::change_time_zone, [](Application *app, const std::string &name) {
             return std::make_unique<gui::ChangeTimeZone>(app);
@@ -157,8 +175,11 @@ namespace app
             return std::make_unique<gui::DialogConfirm>(app, gui::window::name::dialog_confirm);
         });
 
-        attachPopups(
-            {gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes, gui::popup::ID::PhoneLock});
+        attachPopups({gui::popup::ID::Volume,
+                      gui::popup::ID::Tethering,
+                      gui::popup::ID::PhoneModes,
+                      gui::popup::ID::PhoneLock,
+                      gui::popup::ID::SimLock});
     }
 
     void ApplicationOnBoarding::destroyUserInterface()

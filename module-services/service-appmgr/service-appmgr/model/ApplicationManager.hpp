@@ -129,6 +129,9 @@ namespace app::manager
         void handleActionRequest(ActionRequest *actionMsg);
         auto handleHomeAction(ActionEntry &action) -> ActionProcessStatus;
         auto resolveHomeWindow() -> std::string;
+        auto handleOnBoardingFinalize() -> sys::MessagePointer;
+        auto checkOnBoarding() -> bool;
+        auto resolveHomeApplication() -> std::string;
         auto handleLaunchAction(ActionEntry &action) -> ActionProcessStatus;
         auto handleActionOnFocusedApp(ActionEntry &action) -> ActionProcessStatus;
         auto handlePhoneModeChangedAction(ActionEntry &action) -> ActionProcessStatus;

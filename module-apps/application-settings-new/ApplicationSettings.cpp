@@ -147,7 +147,7 @@ namespace app
             return ret;
         }
         connect(typeid(cellular::msg::notification::SimReady), [&](sys::Message *) {
-            selectedSim      = Store::GSM::get()->selected;
+            selectedSim = Store::GSM::get()->selected;
             CellularServiceAPI::RequestForOwnNumber(this);
             auto currentWindow = getCurrentWindow();
             if (gui::window::name::network == currentWindow->getName()) {
@@ -440,7 +440,7 @@ namespace app
             return std::make_unique<gui::LanguagesWindow>(app);
         });
         windowsFactory.attach(gui::window::name::date_and_time, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::DateAndTimeMainWindow>(app);
+            return std::make_unique<gui::DateAndTimeMainWindow>(app, gui::window::name::date_and_time);
         });
         windowsFactory.attach(gui::window::name::about_your_pure, [](Application *app, const std::string &name) {
             return std::make_unique<gui::AboutYourPureWindow>(app);
@@ -522,6 +522,11 @@ namespace app
     {
         auto arg = (sim == Store::GSM::SIM::SIM2) ? cellular::api::SimSlot::SIM2 : cellular::api::SimSlot::SIM1;
         getSimLockSubject().setSim(arg);
+    }
+
+    void ApplicationSettingsNew::updateSim()
+    {
+        selectedSim = Store::GSM::get()->selected;
     }
 
     Store::GSM::SIM ApplicationSettingsNew::getSim()
