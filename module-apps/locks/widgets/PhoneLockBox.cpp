@@ -36,7 +36,7 @@ namespace gui
             leftBottomBarState     = false;
             break;
         case locks::PhoneLockInputTypeAction::Set:
-            LockWindow->setTitleBar(true, false);
+            LockWindow->setTitleBar(true, true);
             LockWindow->setText("phone_lock_configure", LockInputWindow::TextType::Title);
 
             textForInputRequired   = "phone_lock_current";

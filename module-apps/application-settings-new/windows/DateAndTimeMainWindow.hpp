@@ -11,7 +11,7 @@ namespace gui
     class DateAndTimeMainWindow : public BaseSettingsWindow
     {
       public:
-        explicit DateAndTimeMainWindow(app::Application *app);
+        DateAndTimeMainWindow(app::Application *app, std::string name);
 
       protected:
         auto buildOptionsList() -> std::list<Option> override;

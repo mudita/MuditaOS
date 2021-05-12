@@ -101,7 +101,6 @@ namespace gui
                 return true;
             }
         }
-
         else if (inputEvent.is(KeyCode::KEY_ENTER) && bottomBar->isActive(BottomBar::Side::CENTER)) {
             if (lock->isState(locks::Lock::LockState::Blocked)) {
                 application->returnToPreviousWindow();
@@ -117,6 +116,13 @@ namespace gui
             application->getPhoneLockSubject().skipSetPhoneLock();
             lock->consumeState();
             lock->clearAttempt();
+            return true;
+        }
+        else if (inputEvent.is(KeyCode::KEY_LEFT) && isIceVisible()) {
+            app::manager::Controller::sendAction(application,
+                                                 app::manager::actions::EmergencyDial,
+                                                 std::make_unique<gui::SwitchData>(),
+                                                 app::manager::OnSwitchBehaviour::RunInBackground);
             return true;
         }
 

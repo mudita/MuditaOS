@@ -66,6 +66,10 @@ namespace locks
             app::manager::Controller::sendAction(owner,
                                                  app::manager::actions::AbortPopup,
                                                  std::make_unique<gui::PopupRequestParams>(gui::popup::ID::PhoneLock));
+            app::manager::Controller::sendAction(
+                owner,
+                app::manager::actions::AbortPopup,
+                std::make_unique<gui::PopupRequestParams>(gui::popup::ID::PhoneLockInfo));
         }
     }
 

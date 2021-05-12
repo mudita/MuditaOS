@@ -23,7 +23,7 @@ namespace gui
     class NetworkWindow : public BaseSettingsWindow
     {
       private:
-        auto buildOptionsList() -> std::list<Option>;
+        auto buildOptionsList() -> std::list<Option> override;
         app::settingsInterface::SimParams *simParams;
         app::settingsInterface::OperatorsSettings *operatorsSettings;
 
@@ -31,5 +31,7 @@ namespace gui
         NetworkWindow(app::Application *app,
                       app::settingsInterface::SimParams *simParams,
                       app::settingsInterface::OperatorsSettings *operatorsSettings);
+
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
     };
 } // namespace gui

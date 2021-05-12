@@ -6,9 +6,9 @@
 #include <application-settings-new/windows/BaseSettingsWindow.hpp>
 #include <Text.hpp>
 
-namespace gui
+namespace app::onBoarding
 {
-    class OnBoardingSimSelectWindow : public BaseSettingsWindow
+    class OnBoardingSimSelectWindow : public gui::BaseSettingsWindow
     {
       public:
         explicit OnBoardingSimSelectWindow(app::Application *app, std::string name);
@@ -17,8 +17,7 @@ namespace gui
       private:
         gui::Text *descriptionText = nullptr;
 
-        auto buildOptionsList() -> std::list<Option> override;
-        void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        auto buildOptionsList() -> std::list<gui::Option> override;
         bool onInput(const gui::InputEvent &inputEvent) override;
     };
-} /* namespace gui */
+} // namespace app::onBoarding
