@@ -27,7 +27,7 @@
 
 #include <service-db/DBServiceName.hpp>
 #include <service-db/Settings.hpp>
-#include <service-gui/Common.hpp>
+#include <service-guiName.hpp>
 #include <service-eink/Common.hpp>
 
 #include <notifications/NotificationProvider.hpp>

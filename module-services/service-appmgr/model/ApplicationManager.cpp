@@ -24,7 +24,6 @@
 #include <service-evtmgr/EVMessages.hpp>
 #include <service-gui/ServiceGUI.hpp>
 #include <service-eink/ServiceEink.hpp>
-#include <service-gui/Common.hpp>
 #include <service-desktop/DesktopMessages.hpp>
 #include <service-appmgr/StartupType.hpp>
 #include <module-services/service-audio/service-audio/AudioMessage.hpp>
