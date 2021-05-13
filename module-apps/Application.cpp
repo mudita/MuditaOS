@@ -33,7 +33,7 @@
 #include <iterator>    // for distance, next
 #include <type_traits> // for add_const<>...
 #include <WindowsFactory.hpp>
-#include <service-gui/Common.hpp>
+#include <service-guiName.hpp>
 #include <module-utils/Utils.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
 #include <module-utils/time/DateAndTimeSettings.hpp>
