@@ -12,7 +12,7 @@
 #include "EinkDisplay.hpp"
 
 #include <service-db/DBServiceName.hpp>
-#include <service-guiName.hpp>
+#include <service-gui/Common.hpp>
 
 #include <chrono>
 #include <cstdint>
