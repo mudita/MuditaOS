@@ -32,7 +32,7 @@
 #include <service-time/ServiceTime.hpp>
 #include <Service/ServiceCreator.hpp>
 #include <module-services/service-gui/ServiceGUI.hpp>
-#include <module-services/service-gui/Common.hpp>
+#include <service-guiName.hpp>
 #include <module-services/service-eink/ServiceEink.hpp>
 #include <service-fileindexer/Constants.hpp>
 #include <service-fileindexer/ServiceFileIndexer.hpp>

@@ -4,7 +4,7 @@
 #include <memory>
 
 #include <service-appmgr/Controller.hpp>
-#include <service-gui/Common.hpp>
+#include <service-guiName.hpp>
 #include <Style.hpp>
 #include <ChangeColorScheme.hpp>
 

@@ -3,20 +3,18 @@
 
 #pragma once
 
-#include <Common.hpp>
+#include "ContextPool.hpp"
+#include "DrawCommandsQueue.hpp"
+#include "RenderCache.hpp"
+#include "messages/RenderingFinished.hpp"
+#include "service-guiName.hpp"
+
 #include <Service/Common.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
 #include <Timers/TimerHandle.hpp>
 
 #include <service-db/DBServiceName.hpp>
-
-#include "messages/RenderingFinished.hpp"
-
-#include "ContextPool.hpp"
-#include "DrawCommandsQueue.hpp"
-#include "Common.hpp"
-#include "RenderCache.hpp"
 
 #include <cstdint>
 #include <memory>

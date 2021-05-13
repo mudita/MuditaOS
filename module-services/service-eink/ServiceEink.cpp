@@ -5,7 +5,6 @@
 #include "messages/EinkModeMessage.hpp"
 #include "messages/PrepareDisplayEarlyRequest.hpp"
 #include <service-gui/messages/EinkInitialized.hpp>
-#include <service-gui/Common.hpp>
 #include <time/ScopedTime.hpp>
 #include <Timers/TimerFactory.hpp>
 
