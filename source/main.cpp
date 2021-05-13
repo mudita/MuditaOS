@@ -31,8 +31,8 @@
 #include <service-lwip/ServiceLwIP.hpp>
 #include <service-time/ServiceTime.hpp>
 #include <Service/ServiceCreator.hpp>
-#include <module-services/service-gui/ServiceGUI.hpp>
-#include <service-guiName.hpp>
+#include <service-gui/ServiceGUI.hpp>
+#include <service-gui/Common.hpp>
 #include <module-services/service-eink/ServiceEink.hpp>
 #include <service-fileindexer/Constants.hpp>
 #include <service-fileindexer/ServiceFileIndexer.hpp>

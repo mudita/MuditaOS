@@ -10,18 +10,19 @@ target_sources(service-gui
         WorkerGUI.cpp
         messages/DrawMessage.cpp
     INTERFACE
-        service-guiName.hpp
+        service-gui/Common.hpp
+        service-gui/ServiceGUI.hpp
+        service-gui/messages/ChangeColorScheme.hpp
+        service-gui/messages/DrawMessage.hpp
+        service-gui/messages/EinkInitialized.hpp
+        service-gui/messages/GUIMessage.hpp
+        service-gui/messages/RenderingFinished.hpp
+    PRIVATE
         ContextPool.hpp
         DrawCommandsQueue.hpp
         RenderCache.hpp
-        ServiceGUI.hpp
         SynchronizationMechanism.hpp
         WorkerGUI.hpp
-        messages/ChangeColorScheme.hpp
-        messages/DrawMessage.hpp
-        messages/EinkInitialized.hpp
-        messages/GUIMessage.hpp
-        messages/RenderingFinished.hpp
 )
 
 
@@ -34,7 +35,8 @@ target_link_libraries(service-gui
 target_include_directories(service-gui
     PUBLIC
         ${CMAKE_CURRENT_LIST_DIR}
-        ${CMAKE_CURRENT_LIST_DIR}/messages
+    PRIVATE
+        service-gui
 )
 
 if (${ENABLE_TESTS})

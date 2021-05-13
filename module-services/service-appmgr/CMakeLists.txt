@@ -35,6 +35,7 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE
         service-cellular
         service-db
+        service-gui
         module-apps
         module-audio
 )
