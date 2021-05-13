@@ -32,6 +32,6 @@ namespace cellular
             SIM2 = 1
         };
 
-        using PassCode = std::vector<unsigned int>;
+        using SimCode = std::vector<unsigned int>;
     } // namespace api
 } // namespace cellular

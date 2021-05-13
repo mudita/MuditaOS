@@ -37,7 +37,7 @@ namespace gui
         screenLock.setAutoActivate(true);
     }
 
-    void PinLockHandler::handleScreenPin(const cellular::api::PassCode &pin)
+    void PinLockHandler::handleScreenPin(const cellular::api::SimCode &pin)
     {
         const uint32_t hash = getHash(pin);
         screenLock.attemptsLeft--;
@@ -87,7 +87,7 @@ namespace gui
         LOG_DEBUG("Handling RequestPinChange action");
         handlePasscodeParams(Lock::LockType::SimPin, Lock::LockState::InputRequired, std::move(data));
         promptSimLockWindow      = true;
-        auto onActivatedCallback = [this](Lock::LockType type, const cellular::api::PassCode &data) {
+        auto onActivatedCallback = [this](Lock::LockType type, const cellular::api::SimCode &data) {
             handlePasscodeChange(data);
         };
         switchToPinLockWindow(onActivatedCallback);
@@ -101,7 +101,7 @@ namespace gui
         LOG_DEBUG("Handling PinEnableRequest action, simCardLock = %d", static_cast<int>(simCardLock));
         handlePasscodeParams(Lock::LockType::SimPin, Lock::LockState::InputRequired, std::move(data));
         promptSimLockWindow      = true;
-        auto onActivatedCallback = [this, simCardLock](Lock::LockType, const cellular::api::PassCode &data) {
+        auto onActivatedCallback = [this, simCardLock](Lock::LockType, const cellular::api::SimCode &data) {
             app->bus.sendUnicast<request::sim::SetPinLock>(simCardLock, data);
         };
         switchToPinLockWindow(onActivatedCallback);
@@ -121,7 +121,7 @@ namespace gui
         }
         if (simLock.attemptsLeft > 0) {
             simLock.lockState        = Lock::LockState::InputInvalidRetryRequired;
-            auto onActivatedCallback = [this, simCardLock](Lock::LockType type, const cellular::api::PassCode &data) {
+            auto onActivatedCallback = [this, simCardLock](Lock::LockType type, const cellular::api::SimCode &data) {
                 auto params = std::make_unique<PasscodeParams>(
                     Store::GSM::get()->selected, simLock.attemptsLeft, PasscodeParams::pinName);
                 handlePinEnableRequest(std::move(params), simCardLock);
@@ -147,7 +147,7 @@ namespace gui
         }
         if (simLock.attemptsLeft > 0) {
             simLock.lockState        = Lock::LockState::InputInvalidRetryRequired;
-            auto onActivatedCallback = [this](Lock::LockType type, const cellular::api::PassCode &data) {
+            auto onActivatedCallback = [this](Lock::LockType type, const cellular::api::SimCode &data) {
                 auto params = std::make_unique<PasscodeParams>(
                     Store::GSM::get()->selected, simLock.attemptsLeft, PasscodeParams::pinName);
                 handlePinChangeRequest(std::move(params));
@@ -189,7 +189,7 @@ namespace gui
         auto params = static_cast<app::manager::actions::UnhandledCMEParams *>(data.get());
         auto lock   = std::make_unique<gui::Lock>(
             params->getSim(), Lock::LockState::ErrorOccurred, Lock::LockType::SimPin, params->getCMECode());
-        lock->onActivatedCallback = [this](Lock::LockType type, const cellular::api::PassCode &data) {
+        lock->onActivatedCallback = [this](Lock::LockType type, const cellular::api::SimCode &data) {
             app->switchWindow(app::window::name::desktop_main_window);
         };
         app->switchWindow(
@@ -197,18 +197,18 @@ namespace gui
     }
 
     void PinLockHandler::switchToPinLockWindow(
-        std::function<void(Lock::LockType, const cellular::api::PassCode &)> onLockActivatedCallback)
+        std::function<void(Lock::LockType, const cellular::api::SimCode &)> onLockActivatedCallback)
     {
         auto lock = std::make_unique<gui::Lock>(getStrongestLock());
         if (lock->isState(Lock::LockState::InputInvalidRetryRequired)) {
             getStrongestLock().consumeState();
             lock->onActivatedCallback = [this, onLockActivatedCallback](Lock::LockType,
-                                                                        const cellular::api::PassCode &) {
+                                                                        const cellular::api::SimCode &) {
                 switchToPinLockWindow(onLockActivatedCallback);
             };
         }
         else if (lock->isState(gui::Lock::LockState::Blocked)) {
-            lock->onActivatedCallback = [this](Lock::LockType type, const cellular::api::PassCode &data) {
+            lock->onActivatedCallback = [this](Lock::LockType type, const cellular::api::SimCode &data) {
                 setSimLockHandled();
                 app->switchWindow(app::window::name::desktop_main_window);
             };
@@ -227,7 +227,7 @@ namespace gui
 
     void PinLockHandler::switchToPinLockWindow(
         Lock::LockState state,
-        std::function<void(Lock::LockType, const cellular::api::PassCode &)> onLockActivatedCallback)
+        std::function<void(Lock::LockType, const cellular::api::SimCode &)> onLockActivatedCallback)
     {
         auto lock                 = std::make_unique<gui::Lock>(getStrongestLock());
         lock->lockState           = state;
@@ -236,7 +236,7 @@ namespace gui
             app::window::name::desktop_pin_lock, gui::ShowMode::GUI_SHOW_INIT, std::make_unique<gui::LockData>(*lock));
     }
 
-    void PinLockHandler::handlePasscode(Lock::LockType type, const cellular::api::PassCode &passcode)
+    void PinLockHandler::handlePasscode(Lock::LockType type, const cellular::api::SimCode &passcode)
     {
         if (type == Lock::LockType::SimPin) {
             setSimLockHandled();
@@ -250,19 +250,19 @@ namespace gui
         }
     }
 
-    void PinLockHandler::handlePasscodeChange(const cellular::api::PassCode &passcode)
+    void PinLockHandler::handlePasscodeChange(const cellular::api::SimCode &passcode)
     {
-        auto onActivatedCallback = [this, passcode](Lock::LockType, const cellular::api::PassCode &pin) {
+        auto onActivatedCallback = [this, passcode](Lock::LockType, const cellular::api::SimCode &pin) {
             handleNewPasscodeUnconfirmed(passcode, pin);
         };
         switchToPinLockWindow(Lock::LockState::NewInputRequired, onActivatedCallback);
     }
 
-    void PinLockHandler::handleNewPasscodeUnconfirmed(const cellular::api::PassCode &passcode,
-                                                      const cellular::api::PassCode &pin)
+    void PinLockHandler::handleNewPasscodeUnconfirmed(const cellular::api::SimCode &passcode,
+                                                      const cellular::api::SimCode &pin)
     {
         auto onActivatedCallback = [this, passcode, pin](Lock::LockType type,
-                                                         const cellular::api::PassCode &pinConfirmed) {
+                                                         const cellular::api::SimCode &pinConfirmed) {
             if (pin == pinConfirmed) {
                 handleNewPasscodeConfirmed(type, passcode, pin);
             }
@@ -274,8 +274,8 @@ namespace gui
     }
 
     void PinLockHandler::handleNewPasscodeConfirmed(Lock::LockType type,
-                                                    const cellular::api::PassCode &passcode,
-                                                    const cellular::api::PassCode &pin)
+                                                    const cellular::api::SimCode &passcode,
+                                                    const cellular::api::SimCode &pin)
     {
         using namespace cellular::msg;
         if (type == Lock::LockType::SimPin) {
@@ -286,16 +286,16 @@ namespace gui
         }
     }
 
-    void PinLockHandler::handleNewPasscodeInvalid(const cellular::api::PassCode &passcode)
+    void PinLockHandler::handleNewPasscodeInvalid(const cellular::api::SimCode &passcode)
     {
-        auto onActivatedCallback = [this, passcode](Lock::LockType type, const cellular::api::PassCode &pin) {
+        auto onActivatedCallback = [this, passcode](Lock::LockType type, const cellular::api::SimCode &pin) {
             handlePasscodeChange(passcode);
         };
         switchToPinLockWindow(Lock::LockState::NewInputInvalid, onActivatedCallback);
     }
     void PinLockHandler::unlock()
     {
-        auto onActivatedCallback = [this](Lock::LockType type, const cellular::api::PassCode &data) {
+        auto onActivatedCallback = [this](Lock::LockType type, const cellular::api::SimCode &data) {
             handlePasscode(type, data);
         };
         switchToPinLockWindow(onActivatedCallback);

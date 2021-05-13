@@ -9,5 +9,5 @@
 
 namespace cellular::utils
 {
-    std::string pinToString(const cellular::api::PassCode &v);
+    std::string pinToString(const cellular::api::SimCode &v);
 }

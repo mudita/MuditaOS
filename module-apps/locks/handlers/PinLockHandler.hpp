@@ -25,22 +25,22 @@ namespace gui
         Lock simLock;
         bool promptSimLockWindow = true;
 
-        void handleScreenPin(const cellular::api::PassCode &pin);
-        void handlePasscode(Lock::LockType type, const cellular::api::PassCode &passcode);
-        void handlePasscodeChange(const cellular::api::PassCode &passcode);
-        void handleNewPasscodeUnconfirmed(const cellular::api::PassCode &passcode, const cellular::api::PassCode &pin);
+        void handleScreenPin(const cellular::api::SimCode &pin);
+        void handlePasscode(Lock::LockType type, const cellular::api::SimCode &passcode);
+        void handlePasscodeChange(const cellular::api::SimCode &passcode);
+        void handleNewPasscodeUnconfirmed(const cellular::api::SimCode &passcode, const cellular::api::SimCode &pin);
         void handleNewPasscodeConfirmed(Lock::LockType type,
-                                        const cellular::api::PassCode &passcode,
-                                        const cellular::api::PassCode &pin);
-        void handleNewPasscodeInvalid(const cellular::api::PassCode &passcode);
+                                        const cellular::api::SimCode &passcode,
+                                        const cellular::api::SimCode &pin);
+        void handleNewPasscodeInvalid(const cellular::api::SimCode &passcode);
         void handlePasscodeParams(Lock::LockType type,
                                   Lock::LockState state,
                                   app::manager::actions::ActionParamsPtr &&data);
         void switchToPinLockWindow(
-            std::function<void(Lock::LockType, const cellular::api::PassCode &)> onLockActivatedCallback);
+            std::function<void(Lock::LockType, const cellular::api::SimCode &)> onLockActivatedCallback);
         void switchToPinLockWindow(
             Lock::LockState type,
-            std::function<void(Lock::LockType, const cellular::api::PassCode &)> onLockActivatedCallback);
+            std::function<void(Lock::LockType, const cellular::api::SimCode &)> onLockActivatedCallback);
 
         auto getStrongestLock() noexcept -> gui::Lock &;
         void unlock();

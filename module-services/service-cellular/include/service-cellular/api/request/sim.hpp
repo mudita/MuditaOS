@@ -34,9 +34,9 @@ namespace cellular::msg::request::sim
      */
     struct PinUnlock : msg::Request
     {
-        PinUnlock(const api::PassCode &pin) : pin(pin)
+        PinUnlock(const api::SimCode &pin) : pin(pin)
         {}
-        api::PassCode pin;
+        api::SimCode pin;
 
         using Response = msg::Response;
     };
@@ -45,10 +45,10 @@ namespace cellular::msg::request::sim
      */
     struct ChangePin : msg::Request
     {
-        ChangePin(const api::PassCode &oldPin, const api::PassCode &pin) : oldPin(oldPin), pin(pin)
+        ChangePin(const api::SimCode &oldPin, const api::SimCode &pin) : oldPin(oldPin), pin(pin)
         {}
-        api::PassCode oldPin;
-        api::PassCode pin;
+        api::SimCode oldPin;
+        api::SimCode pin;
 
         using Response = msg::Response;
     };
@@ -57,10 +57,10 @@ namespace cellular::msg::request::sim
      */
     struct UnblockWithPuk : msg::Request
     {
-        UnblockWithPuk(const api::PassCode &puk, const api::PassCode &pin) : puk(puk), pin(pin)
+        UnblockWithPuk(const api::SimCode &puk, const api::SimCode &pin) : puk(puk), pin(pin)
         {}
-        api::PassCode puk;
-        api::PassCode pin;
+        api::SimCode puk;
+        api::SimCode pin;
 
         using Response = msg::Response;
     };
@@ -69,10 +69,10 @@ namespace cellular::msg::request::sim
      */
     struct SetPinLock : msg::Request
     {
-        SetPinLock(api::SimLockState lock, const api::PassCode &pin) : lock(lock), pin(pin)
+        SetPinLock(api::SimLockState lock, const api::SimCode &pin) : lock(lock), pin(pin)
         {}
         api::SimLockState lock;
-        api::PassCode pin;
+        api::SimCode pin;
 
         struct Response : msg::Response
         {
