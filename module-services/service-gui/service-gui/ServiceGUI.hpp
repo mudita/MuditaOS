@@ -7,7 +7,7 @@
 #include "DrawCommandsQueue.hpp"
 #include "RenderCache.hpp"
 #include "messages/RenderingFinished.hpp"
-#include "service-guiName.hpp"
+#include "Common.hpp"
 
 #include <Service/Common.hpp>
 #include <Service/Message.hpp>
