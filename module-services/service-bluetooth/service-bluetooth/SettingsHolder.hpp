@@ -84,7 +84,6 @@ namespace bluetooth
         void setValue(const Settings &newSetting, const SettingEntry &value);
         std::function<void()> onStateChange;
         std::function<void(const std::string &)> onLinkKeyAdded;
-        void deinit();
 
       private:
         static std::map<Settings, std::string> settingString;

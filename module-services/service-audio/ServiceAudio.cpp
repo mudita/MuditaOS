@@ -94,7 +94,7 @@ static constexpr std::initializer_list<std::pair<audio::DbPathElement, const cha
 ServiceAudio::ServiceAudio()
     : sys::Service(service::name::audio, "", audioServiceStackSize, sys::ServicePriority::Idle),
       audioMux([this](auto... params) { return this->AudioServicesCallback(params...); }),
-      settingsProvider(std::make_unique<settings::Settings>())
+      settingsProvider(std::make_unique<settings::Settings>(this))
 {
     LOG_INFO("[ServiceAudio] Initializing");
     bus.channels.push_back(sys::BusChannel::ServiceAudioNotifications);
@@ -110,7 +110,6 @@ ServiceAudio::~ServiceAudio()
 
 sys::ReturnCodes ServiceAudio::InitHandler()
 {
-    settingsProvider->init(service::ServiceProxy(shared_from_this()));
     std::transform(std::begin(cacheInitializer),
                    std::end(cacheInitializer),
                    std::inserter(settingsCache, std::end(settingsCache)),
@@ -126,7 +125,6 @@ sys::ReturnCodes ServiceAudio::InitHandler()
 
 sys::ReturnCodes ServiceAudio::DeinitHandler()
 {
-    settingsProvider->deinit();
     return sys::ReturnCodes::Success;
 }
 
