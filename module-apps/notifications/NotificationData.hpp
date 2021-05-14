@@ -12,7 +12,6 @@ namespace notifications
 {
     enum class NotificationType
     {
-        Unknown,
         NotSeenSms,
         NotSeenCall,
         Tethering

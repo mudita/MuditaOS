@@ -927,8 +927,7 @@ namespace app
     void Application::handleNotificationsChanged(std::unique_ptr<gui::SwitchData> notificationsParams)
     {
         if (auto window = getCurrentWindow()->getName(); window == gui::popup::window::phone_lock_window) {
-
-            updateWindow(window, std::move(notificationsParams));
+            switchWindow(window, std::move(notificationsParams));
         }
     }
 

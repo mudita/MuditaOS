@@ -41,7 +41,7 @@ auto ActiveIconFactory::makeCustomIcon(const UTF8 &image,
 auto ActiveIconFactory::makeSMSIcon(const utils::PhoneNumber::View &number) -> ImageBox *
 {
     return makeCustomIcon(
-        "mail",
+        "messages_notification_icon",
         [application = app, number](gui::Item &item) {
             auto data                        = std::make_unique<SMSSendRequest>(number, std::string{});
             data->ignoreCurrentWindowOnStack = true;
