@@ -71,15 +71,15 @@ namespace audio
         }
 
         // create audio connections
-        inputConnection =
-            std::make_unique<audio::StreamConnection>(audioDeviceCellular.get(), audioDevice.get(), dataStreamIn.get());
-        outputConnection = std::make_unique<audio::StreamConnection>(
+        inputConnection = std::make_unique<audio::StreamConnection>(
             audioDevice.get(), audioDeviceCellular.get(), dataStreamOut.get());
+        outputConnection =
+            std::make_unique<audio::StreamConnection>(audioDeviceCellular.get(), audioDevice.get(), dataStreamIn.get());
 
         // enable audio connections
-        inputConnection->enable();
+        outputConnection->enable();
         if (!IsMuted()) {
-            outputConnection->enable();
+            inputConnection->enable();
         }
 
         return audio::RetCode::Success;
