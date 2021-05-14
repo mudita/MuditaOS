@@ -1,5 +1,3 @@
-![alt text](./Images/mudita_logo.png "MUDITA")
-
 # Channel implementation
 
 ## Table of contents

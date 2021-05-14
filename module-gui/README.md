@@ -186,3 +186,7 @@ in a sequence flow analogous to the one presented above. Please find an exemplar
     "YapSize": 10, "Yaps": 0}
 }
 ```
+
+## Widgets
+
+- [Text](./gui/widgets/text/HowDoesTextWork.md)

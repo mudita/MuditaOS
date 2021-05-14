@@ -1,5 +1,3 @@
-![alt text](./doc/Images/mudita_logo.png "MUDITA")
-
 # Cellular Multiplexer
 
 ## Table of contents
@@ -26,6 +24,8 @@ Data flow for both CMUX and CMUX setup in current implementation is identical.
 
 ![alt text](./doc/Images/mux_mode.svg "Flow diagram for mux mode")
 
+For more details, see [channel implementation](./doc/ATStream.md).
+
 ## Single command data flow <a name="singlecmd"></a>
 ![alt text](./doc/Images/single_cmd_transmission.png "Single command sequence")
 
@@ -51,7 +51,7 @@ result code. This struct has variable size.
 ## Error codes <a name="errors"></a>
 
 
-![alt text](./Images/class_channel.png "Class diagram for channel")
+![alt text](./doc/Images/class_channel.png "Class diagram for channel")
 
 Currently there are different errors/results codes for different layers.
 

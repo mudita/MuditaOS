@@ -1,5 +1,3 @@
-![alt text](./Images/mudita_logo.png "MUDITA")
-
 # SDD-0005-OS-User-Database
 
 ## Table of contents
