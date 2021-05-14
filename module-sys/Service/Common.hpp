@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "FreeRTOSConfig.h"
 #include "SystemReturnCodes.hpp"
 
 namespace sys

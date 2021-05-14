@@ -2,7 +2,6 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DeveloperModeHelper.hpp"
-#include "service-db/SettingsMessages.hpp"
 #include <service-desktop/DesktopMessages.hpp>
 #include <parser/ParserUtils.hpp>
 

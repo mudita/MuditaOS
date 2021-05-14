@@ -479,15 +479,5 @@ TESTS_LIST["catch2-unittest_CellularResult"]="
     CellularResult;
 "
 #---------
-TESTS_LIST["catch2-settings-Settings"]="
-    Settings - not initialized;
-    Settings - initialized;
-    Interface - not initialized;
-    Interface - initialized;
-    Interface - expired;
-    Interface - copied;
-"
-#---------
-
 
 

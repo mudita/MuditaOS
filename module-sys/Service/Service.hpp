@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include "ServiceForward.hpp"
 #include "BusProxy.hpp"
 #include "Common.hpp"  // for ReturnCodes, ServicePriority, BusChannels
 #include "Mailbox.hpp" // for Mailbox
@@ -26,6 +25,19 @@
 
 namespace sys
 {
+    struct Proxy;
+    class Timer;
+
+    namespace timer
+    {
+        class SystemTimer;
+    } // namespace timer
+} // namespace sys
+
+namespace sys
+{
+    using MessageHandler = std::function<MessagePointer(Message *)>;
+
     class Service : public cpp_freertos::Thread, public std::enable_shared_from_this<Service>
     {
       public:

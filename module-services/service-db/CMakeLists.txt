@@ -15,7 +15,6 @@ set(SOURCES
     messages/QueryMessage.cpp
     agents/settings/SettingsAgent.cpp
     agents/settings/Settings.cpp
-    agents/settings/SettingsProxy.cpp
     agents/settings/SettingsCache.cpp
     agents/settings/FactorySettings.cpp
     agents/file_indexer/FileIndexerAgent.cpp

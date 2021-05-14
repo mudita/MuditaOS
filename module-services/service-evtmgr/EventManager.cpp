@@ -55,11 +55,13 @@ namespace
 } // namespace
 
 EventManager::EventManager(const std::string &name)
-    : sys::Service(name, "", stackDepth), loggerTimer{sys::TimerFactory::createPeriodicTimer(
-                                              this,
-                                              loggerTimerName,
-                                              std::chrono::milliseconds{loggerDelayMs},
-                                              [this](sys::Timer & /*timer*/) { dumpLogsToFile(); })},
+    : sys::Service(name, "", stackDepth),
+      settings(std::make_shared<settings::Settings>(this)), loggerTimer{sys::TimerFactory::createPeriodicTimer(
+                                                                this,
+                                                                loggerTimerName,
+                                                                std::chrono::milliseconds{loggerDelayMs},
+                                                                [this](sys::Timer & /*timer*/) { dumpLogsToFile(); })},
+      screenLightControl(std::make_unique<screen_light_control::ScreenLightControl>(settings, this)),
       Vibra(std::make_unique<vibra_handle::Vibra>(this))
 {
     LOG_INFO("[%s] Initializing", name.c_str());
@@ -207,8 +209,6 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
 // Invoked during initialization
 sys::ReturnCodes EventManager::InitHandler()
 {
-    settings->init(service::ServiceProxy(shared_from_this()));
-    screenLightControl = std::make_unique<screen_light_control::ScreenLightControl>(settings, this);
 
     connect(sdesktop::developerMode::DeveloperModeRequest(), [&](sys::Message *msg) {
         using namespace sdesktop::developerMode;
@@ -329,8 +329,6 @@ sys::ReturnCodes EventManager::InitHandler()
 
 sys::ReturnCodes EventManager::DeinitHandler()
 {
-    settings->deinit();
-
     EventWorker->close();
     EventWorker.reset();
     EventWorker = nullptr;
