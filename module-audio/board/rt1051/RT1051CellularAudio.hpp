@@ -65,7 +65,6 @@ namespace audio
         SAIFormat saiOutFormat;
         uint32_t mclkSourceClockHz = 0;
         sai_config_t config;
-        std::vector<AudioFormat> formats;
 
         // M.P: It is important to destroy these drivers in specific order
         std::shared_ptr<drivers::DriverPLL> pll;
