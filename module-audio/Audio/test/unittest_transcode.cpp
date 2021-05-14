@@ -21,7 +21,9 @@
 #include <cstdlib>
 
 using ::audio::transcode::NullTransform;
+using ::testing::_;
 using ::testing::Return;
+using ::testing::SetArgReferee;
 using ::testing::audio::MockStream;
 using ::testing::audio::MockStreamEventListener;
 
@@ -122,6 +124,72 @@ TEST(Transcode, Commit)
     // no conversion on commit with no peek
     stream->commit();
     EXPECT_TRUE(stream->checkData(::audio::AbstractStream::Span{invertedData, testStreamSize}));
+}
+
+TEST(Transcode, PeekShrinking)
+{
+    static std::uint16_t streamData[8];
+    auto streamDataSpan = ::audio::AbstractStream::Span{.data     = reinterpret_cast<std::uint8_t *>(streamData),
+                                                        .dataSize = sizeof(streamData)};
+
+    auto decimatorTransform = std::make_shared<::audio::transcode::BasicDecimator<std::uint16_t, 1, 2>>();
+    auto mockStream         = std::make_shared<MockStream>();
+
+    EXPECT_CALL(*mockStream, getInputTraits);
+
+    auto transcodingProxy = ::audio::transcode::InputTranscodeProxy(mockStream, decimatorTransform);
+
+    EXPECT_CALL(*mockStream, peek(_)).WillOnce(DoAll(SetArgReferee<0>(streamDataSpan), Return(true)));
+
+    ::audio::AbstractStream::Span span;
+    transcodingProxy.peek(span);
+
+    EXPECT_EQ(span.dataSize, 16 * sizeof(std::uint16_t));
+
+    auto buf = reinterpret_cast<std::uint16_t *>(span.data);
+    for (unsigned int i = 0; i < 16; i++) {
+        buf[i] = i;
+    }
+
+    EXPECT_CALL(*mockStream, commit);
+
+    transcodingProxy.commit();
+
+    static std::uint16_t expectedData[8] = {0, 2, 4, 6, 8, 10, 12, 14};
+    EXPECT_TRUE(memcmp(expectedData, streamData, sizeof(expectedData)) == 0);
+}
+
+TEST(Transcode, PeekBloating)
+{
+    static std::uint16_t streamData[8];
+    auto streamDataSpan = ::audio::AbstractStream::Span{.data     = reinterpret_cast<std::uint8_t *>(streamData),
+                                                        .dataSize = sizeof(streamData)};
+
+    auto interpolatorTransform = std::make_shared<::audio::transcode::BasicInterpolator<std::uint16_t, 1, 2>>();
+    auto mockStream            = std::make_shared<MockStream>();
+
+    EXPECT_CALL(*mockStream, getInputTraits);
+
+    auto transcodingProxy = ::audio::transcode::InputTranscodeProxy(mockStream, interpolatorTransform);
+
+    EXPECT_CALL(*mockStream, peek(_)).WillOnce(DoAll(SetArgReferee<0>(streamDataSpan), Return(true)));
+
+    ::audio::AbstractStream::Span span;
+    transcodingProxy.peek(span);
+
+    EXPECT_EQ(span.dataSize, 4 * sizeof(std::uint16_t));
+
+    auto buf = reinterpret_cast<std::uint16_t *>(span.data);
+    for (unsigned int i = 0; i < 4; i++) {
+        buf[i] = i;
+    }
+
+    EXPECT_CALL(*mockStream, commit);
+
+    transcodingProxy.commit();
+
+    static std::uint16_t expectedData[8] = {0, 0, 1, 1, 2, 2, 3, 3};
+    EXPECT_TRUE(memcmp(expectedData, streamData, sizeof(expectedData)) == 0);
 }
 
 TEST(Transcode, Traits)

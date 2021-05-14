@@ -35,7 +35,8 @@ bool InputTranscodeProxy::peek(Span &span)
     auto result = getWrappedStream().peek(span);
 
     if (result) {
-        peekedSpan = span;
+        span.dataSize = transform->transformBlockSizeInversed(span.dataSize);
+        peekedSpan    = span;
     }
 
     return result;
