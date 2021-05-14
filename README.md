@@ -79,7 +79,7 @@ When contributing code or documentation changes please follow the guidleines ins
 
 ## Documentation
 
-For everything that you need to kickstart your development environment please go to the [Documentation](./doc/) folder on Github.
+For everything you need to kickstart your development environment please go to the [Documentation](./doc/README.md) on GitHub.
 
 A fully detailed documentation can be build locally using [Doxygen](https://www.doxygen.nl/index.html).
 
