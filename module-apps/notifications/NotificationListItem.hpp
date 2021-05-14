@@ -19,7 +19,7 @@ namespace gui
     class NotificationListItem : public ListItem
     {
         using NotificationType      = notifications::NotificationType;
-        const NotificationType type = NotificationType::Unknown;
+        const NotificationType type = NotificationType::NotSeenSms;
         bool dismissible            = false;
 
       protected:

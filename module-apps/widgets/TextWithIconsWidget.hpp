@@ -26,4 +26,12 @@ namespace gui
         std::vector<ImageBox *> icons;
     };
 
+    class TextWithSnippet : public HBox
+    {
+        constexpr static auto defaultSnippet = "Rectangle";
+
+      public:
+        TextWithSnippet(const std::string &text, const UTF8 &font, const UTF8 &snippet = defaultSnippet);
+    };
+
 } /* namespace gui */
