@@ -207,8 +207,7 @@ namespace app
     {
         if (auto window = getCurrentWindow()->getName();
             window == app::window::name::desktop_main_window || window == gui::popup::window::phone_lock_window) {
-
-            updateWindow(window, std::move(notificationsParams));
+            switchWindow(window, std::move(notificationsParams));
         }
     }
 
