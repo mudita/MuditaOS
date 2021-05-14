@@ -200,13 +200,13 @@ namespace audio
             Stop();
         }
 
-        audioDevice = CreateDevice(newProfile->GetAudioDeviceType());
+        audioDevice = CreateDevice(*newProfile);
         if (audioDevice == nullptr) {
             LOG_ERROR("Error creating AudioDevice");
             return RetCode::Failed;
         }
 
-        audioDeviceCellular = CreateDevice(AudioDevice::Type::Cellular);
+        audioDeviceCellular = createCellularAudioDevice();
         if (audioDeviceCellular == nullptr) {
             LOG_ERROR("Error creating AudioDeviceCellular");
             return RetCode::Failed;

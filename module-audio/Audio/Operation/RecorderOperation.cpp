@@ -158,7 +158,7 @@ namespace audio
             return RetCode::UnsupportedProfile;
         }
 
-        audioDevice = CreateDevice(currentProfile->GetAudioDeviceType());
+        audioDevice = CreateDevice(*currentProfile);
         if (audioDevice == nullptr) {
             LOG_ERROR("Error creating AudioDevice");
             return RetCode::Failed;

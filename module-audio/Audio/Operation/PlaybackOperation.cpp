@@ -169,7 +169,7 @@ namespace audio
         dec->stopDecodingWorker();
         audioDevice.reset();
         dataStreamOut.reset();
-        audioDevice = CreateDevice(newProfile->GetAudioDeviceType());
+        audioDevice = CreateDevice(*newProfile);
         if (audioDevice == nullptr) {
             LOG_ERROR("Error creating AudioDevice");
             return RetCode::Failed;
