@@ -406,7 +406,7 @@ namespace app
             return std::make_unique<gui::PhoneNameWindow>(app);
         });
         windowsFactory.attach(gui::window::name::autolock, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::AutolockWindow>(app);
+            return std::make_unique<gui::AutolockWindow>(app, static_cast<ApplicationSettingsNew *>(app));
         });
         windowsFactory.attach(gui::window::name::torch, [](Application *app, const std::string &name) {
             return std::make_unique<gui::TorchWindow>(app);
@@ -681,6 +681,19 @@ namespace app
     {
         connectionFrequency = val;
         CellularServiceAPI::SetConnectionFrequency(this, val);
+    }
+
+    auto ApplicationSettingsNew::getAutoLockTime() const noexcept -> std::chrono::milliseconds
+    {
+        return std::chrono::milliseconds{utils::getNumericValue<unsigned int>(
+            settings->getValue(::settings::SystemProperties::lockTime, ::settings::SettingsScope::Global))};
+    }
+
+    void ApplicationSettingsNew::setAutoLockTime(std::chrono::milliseconds lockTime) noexcept
+    {
+        settings->setValue(::settings::SystemProperties::lockTime,
+                           std::to_string(lockTime.count()),
+                           ::settings::SettingsScope::Global);
     }
 
     void ApplicationSettingsNew::switchToAllDevicesViaBtErrorPrompt(std::shared_ptr<sys::DataMessage> msg,

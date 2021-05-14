@@ -164,6 +164,13 @@ namespace app
             virtual void setFlightMode(bool flightModeOn) noexcept = 0;
         };
 
+        class AutoLockSettings
+        {
+          public:
+            virtual auto getAutoLockTime() const noexcept -> std::chrono::milliseconds = 0;
+            virtual void setAutoLockTime(std::chrono::milliseconds lockTime) noexcept  = 0;
+        };
+
     }; // namespace settingsInterface
 
     class ApplicationSettingsNew : public app::Application,
@@ -175,6 +182,7 @@ namespace app
                                    public settingsInterface::DndSettings,
                                    public settingsInterface::OfflineSettings,
                                    public settingsInterface::ConnectionSettings,
+                                   public settingsInterface::AutoLockSettings,
                                    public AsyncCallbackReceiver
     {
       public:
@@ -227,6 +235,9 @@ namespace app
 
         auto getConnectionFrequency() const noexcept -> uint8_t override;
         void setConnectionFrequency(uint8_t val) noexcept override;
+
+        auto getAutoLockTime() const noexcept -> std::chrono::milliseconds override;
+        void setAutoLockTime(std::chrono::milliseconds lockTime) noexcept override;
 
       private:
         void attachQuotesWindows();

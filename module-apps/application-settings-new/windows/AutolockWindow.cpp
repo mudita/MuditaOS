@@ -2,15 +2,26 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AutolockWindow.hpp"
-#include "application-settings-new/ApplicationSettings.hpp"
 #include "OptionSetting.hpp"
 
 #include <i18n/i18n.hpp>
 
 namespace gui
 {
+    namespace
+    {
+        const std::vector<std::pair<std::string, std::chrono::milliseconds>> autoLockTimes = {
+            {"15s", std::chrono::milliseconds{15000}},
+            {"30s", std::chrono::milliseconds{30000}},
+            {"1m", std::chrono::milliseconds{60000}},
+            {"2m", std::chrono::milliseconds{120000}},
+            {"5m", std::chrono::milliseconds{300000}},
+            {"10m", std::chrono::milliseconds{600000}},
+            {"20m", std::chrono::milliseconds{1200000}}};
+    } // namespace
 
-    AutolockWindow::AutolockWindow(app::Application *app) : BaseSettingsWindow(app, window::name::autolock)
+    AutolockWindow::AutolockWindow(app::Application *app, app::settingsInterface::AutoLockSettings *autoLockSettings)
+        : BaseSettingsWindow(app, window::name::autolock), autoLockSettings(autoLockSettings)
     {
         setTitle(utils::translate("app_settings_display_locked_screen_autolock"));
     }
@@ -18,13 +29,11 @@ namespace gui
     auto AutolockWindow::buildOptionsList() -> std::list<gui::Option>
     {
         std::list<gui::Option> optionsList;
-        std::vector<std::string> autoLockTimes = {"15s", "30s", "1m", "2m", "5m", "10m", "20m"};
-
-        for (auto time : autoLockTimes) {
+        for (const auto &[timeString, time] : autoLockTimes) {
             optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
-                time,
+                timeString,
                 [=](gui::Item &item) {
-                    selectedTime = time;
+                    autoLockSettings->setAutoLockTime(time);
                     refreshOptionsList();
                     return true;
                 },
@@ -36,8 +45,8 @@ namespace gui
                     return true;
                 },
                 this,
-                selectedTime == time ? gui::option::SettingRightItem::Checked
-                                     : gui::option::SettingRightItem::Disabled));
+                autoLockSettings->getAutoLockTime() == time ? gui::option::SettingRightItem::Checked
+                                                            : gui::option::SettingRightItem::Disabled));
         }
 
         return optionsList;
