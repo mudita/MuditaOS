@@ -244,10 +244,15 @@ namespace audio
 
     auto RT1051CellularAudio::getSupportedFormats() -> std::vector<AudioFormat>
     {
+        return std::vector<AudioFormat>{getSourceFormat()};
+    }
+
+    auto RT1051CellularAudio::getSourceFormat() -> AudioFormat
+    {
         constexpr auto supportedSampleRate = 16000U;
         constexpr auto supportedBitWidth   = 16U;
-        constexpr auto supportedChannels   = 2U;
-        return std::vector<AudioFormat>{AudioFormat(supportedSampleRate, supportedBitWidth, supportedChannels)};
+        constexpr auto supportedChannels   = 1U;
+        return AudioFormat(supportedSampleRate, supportedBitWidth, supportedChannels);
     }
 
     auto RT1051CellularAudio::getTraits() const -> Traits

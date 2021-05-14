@@ -96,9 +96,3 @@ void SAIAudioDevice::disableOutput()
 {
     txEnabled = false;
 }
-
-auto SAIAudioDevice::getSourceFormat() -> audio::AudioFormat
-{
-    auto isMono = (currentFormat.flags & static_cast<unsigned int>(Flags::InputStereo)) == 0;
-    return audio::AudioFormat{currentFormat.sampleRate_Hz, currentFormat.bitWidth, isMono ? 1U : 2U};
-}

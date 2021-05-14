@@ -281,6 +281,16 @@ namespace audio
         return Traits{.usesDMA = true};
     }
 
+    auto RT1051AudioCodec::getSourceFormat() -> audio::AudioFormat
+    {
+        if (currentFormat.flags == 0) {
+            return audio::nullFormat;
+        }
+
+        auto isMono = (currentFormat.flags & static_cast<unsigned int>(Flags::InputStereo)) == 0;
+        return audio::AudioFormat{currentFormat.sampleRate_Hz, currentFormat.bitWidth, isMono ? 1U : 2U};
+    }
+
     void rxAudioCodecCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData)
     {
         auto self = static_cast<RT1051AudioCodec *>(userData);

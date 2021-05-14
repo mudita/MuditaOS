@@ -45,6 +45,7 @@ namespace audio
         AudioDevice::RetCode InputPathCtrl(InputPath inputPath) override final;
         auto getSupportedFormats() -> std::vector<AudioFormat> override final;
         auto getTraits() const -> Traits override final;
+        auto getSourceFormat() -> AudioFormat override final;
 
         cpp_freertos::MutexStandard mutex;
 
