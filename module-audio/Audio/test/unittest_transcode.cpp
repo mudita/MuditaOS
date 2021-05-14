@@ -314,7 +314,6 @@ TEST(Transform, BasicDecimator)
     EXPECT_EQ(memcmp(outputSpan.data, expectBuffer, outputSpan.dataSize), 0);
 }
 
-#include <iostream>
 TEST(Transform, FactorySampleRateInterpolator)
 {
     auto factory      = ::audio::transcode::TransformFactory();
@@ -324,4 +323,15 @@ TEST(Transform, FactorySampleRateInterpolator)
     auto transform = factory.makeTransform(sourceFormat, sinkFormat);
 
     EXPECT_STREQ(typeid(*transform).name(), typeid(::audio::transcode::BasicInterpolator<std::uint16_t, 1, 2>).name());
+}
+
+TEST(Transform, FactorySampleRateDecimator)
+{
+    auto factory      = ::audio::transcode::TransformFactory();
+    auto sourceFormat = ::audio::AudioFormat{16000, 16, 1};
+    auto sinkFormat   = ::audio::AudioFormat{8000, 16, 1};
+
+    auto transform = factory.makeTransform(sourceFormat, sinkFormat);
+
+    EXPECT_STREQ(typeid(*transform).name(), typeid(::audio::transcode::BasicDecimator<std::uint16_t, 1, 2>).name());
 }
