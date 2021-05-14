@@ -52,10 +52,10 @@ namespace audio
     class Source : public Endpoint
     {
       public:
-        virtual auto getSourceFormat() -> AudioFormat;
-        virtual void onDataReceive() = 0;
-        virtual void enableInput()   = 0;
-        virtual void disableInput()  = 0;
+        virtual auto getSourceFormat() -> AudioFormat = 0;
+        virtual void onDataReceive()                  = 0;
+        virtual void enableInput()                    = 0;
+        virtual void disableInput()                   = 0;
     };
 
     class IOProxy : public Source, public Sink

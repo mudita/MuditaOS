@@ -51,16 +51,6 @@ namespace audio
         operationToken = token;
         state          = State::Active;
 
-        // check if audio devices support desired audio format
-        if (!audioDevice->IsFormatSupported(currentProfile->GetAudioConfiguration())) {
-            return RetCode::InvalidFormat;
-        }
-
-        if (!audioDeviceCellular->IsFormatSupported(currentProfile->GetAudioConfiguration())) {
-            return RetCode::InvalidFormat;
-        }
-
-        // try to run devices with the format
         if (auto ret = audioDevice->Start(currentProfile->GetAudioConfiguration());
             ret != AudioDevice::RetCode::Success) {
             return GetDeviceError(ret);

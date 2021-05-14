@@ -118,13 +118,6 @@ namespace audio
         return AudioDevice::RetCode::Success;
     }
 
-    bool RT1051CellularAudio::IsFormatSupported(const AudioDevice::Configuration &format)
-    {
-        return true;
-    }
-
-    // INTERNALS
-
     void RT1051CellularAudio::Init()
     {
 

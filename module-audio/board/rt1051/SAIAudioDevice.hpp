@@ -21,6 +21,7 @@ namespace audio
         void enableOutput() override;
         void disableInput() override;
         void disableOutput() override;
+        auto getSourceFormat() -> AudioFormat override;
 
       protected:
         void initiateRxTransfer();

@@ -85,7 +85,7 @@ namespace audio
         operationToken = token;
         state          = State::Active;
 
-        if (audioDevice->IsFormatSupported(currentProfile->GetAudioConfiguration())) {
+        if (audioDevice->isFormatSupportedBySource(currentProfile->getAudioFormat())) {
             auto ret = audioDevice->Start(currentProfile->GetAudioConfiguration());
             return GetDeviceError(ret);
         }

@@ -26,7 +26,6 @@ namespace bluetooth
         auto InputGainCtrl(float gain) -> audio::AudioDevice::RetCode override;
         auto OutputPathCtrl(OutputPath outputPath) -> audio::AudioDevice::RetCode override;
         auto InputPathCtrl(InputPath inputPath) -> audio::AudioDevice::RetCode override;
-        auto IsFormatSupported(const Configuration &format) -> bool override;
 
         // Endpoint control methods
         void enableInput() override;
@@ -55,6 +54,7 @@ namespace bluetooth
         void onDataReceive() override;
         auto getSupportedFormats() -> std::vector<audio::AudioFormat> override;
         auto getTraits() const -> Traits override;
+        auto getSourceFormat() -> ::audio::AudioFormat override;
     };
 
     class HSPAudioDevice : public BluetoothAudioDevice
@@ -67,6 +67,7 @@ namespace bluetooth
         void onDataReceive() override;
         auto getSupportedFormats() -> std::vector<audio::AudioFormat> override;
         auto getTraits() const -> Traits override;
+        auto getSourceFormat() -> ::audio::AudioFormat override;
     };
 
 } // namespace bluetooth

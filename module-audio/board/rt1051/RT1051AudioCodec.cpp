@@ -180,15 +180,6 @@ namespace audio
         return AudioDevice::RetCode::Success;
     }
 
-    bool RT1051AudioCodec::IsFormatSupported(const AudioDevice::Configuration &format)
-    {
-
-        if (CodecParamsMAX98090::ValToSampleRate(format.sampleRate_Hz) == CodecParamsMAX98090::SampleRate::Invalid) {
-            return false;
-        }
-        return true;
-    }
-
     void RT1051AudioCodec::InitBsp()
     {
         bsp::audioInit();

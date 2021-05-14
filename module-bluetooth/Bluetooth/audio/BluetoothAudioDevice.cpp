@@ -71,11 +71,6 @@ auto BluetoothAudioDevice::InputPathCtrl(InputPath inputPath) -> audio::AudioDev
     return audio::AudioDevice::RetCode::Success;
 }
 
-auto BluetoothAudioDevice::IsFormatSupported(const Configuration &format) -> bool
-{
-    return true;
-}
-
 auto BluetoothAudioDevice::isInputEnabled() const -> bool
 {
     return inputEnabled;
@@ -163,10 +158,7 @@ auto A2DPAudioDevice::getSupportedFormats() -> std::vector<audio::AudioFormat>
 
 auto HSPAudioDevice::getSupportedFormats() -> std::vector<audio::AudioFormat>
 {
-    constexpr static auto supportedBitWidth = 16U;
-    constexpr static auto supportedChannels = 1;
-    return std::vector<AudioFormat>{
-        AudioFormat{bluetooth::SCO::CVSD_SAMPLE_RATE, supportedBitWidth, supportedChannels}};
+    return std::vector<AudioFormat>{getSourceFormat()};
 }
 
 auto A2DPAudioDevice::getTraits() const -> ::audio::Endpoint::Traits
@@ -177,4 +169,16 @@ auto A2DPAudioDevice::getTraits() const -> ::audio::Endpoint::Traits
 auto HSPAudioDevice::getTraits() const -> ::audio::Endpoint::Traits
 {
     return Traits{.usesDMA = false, .blockSizeConstraint = 60U};
+}
+
+auto A2DPAudioDevice::getSourceFormat() -> ::audio::AudioFormat
+{
+    return audio::nullFormat;
+}
+
+auto HSPAudioDevice::getSourceFormat() -> ::audio::AudioFormat
+{
+    constexpr static auto supportedBitWidth = 16U;
+    constexpr static auto supportedChannels = 1;
+    return AudioFormat{bluetooth::SCO::CVSD_SAMPLE_RATE, supportedBitWidth, supportedChannels};
 }
