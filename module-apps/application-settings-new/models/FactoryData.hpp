@@ -20,7 +20,7 @@ class AbstractFactoryData
 class FactoryData : public AbstractFactoryData
 {
   public:
-    explicit FactoryData(settings::Settings &settings);
+    explicit FactoryData(std::unique_ptr<settings::Settings> settings);
 
     auto getModel() -> std::string override;
     auto getCase() -> std::string override;
@@ -29,5 +29,5 @@ class FactoryData : public AbstractFactoryData
     auto getPcb(std::string type) -> std::string override;
 
   private:
-    settings::Settings &settings;
+    std::unique_ptr<settings::Settings> settings;
 };

@@ -102,7 +102,7 @@ namespace app
           default_window(gui::name::window::main_window), windowsStack(this),
           keyTranslator{std::make_unique<gui::KeyInputSimpleTranslation>()}, startInBackground{startInBackground},
           callbackStorage{std::make_unique<CallbackStorage>()}, topBarManager{std::make_unique<TopBarManager>()},
-          settings(std::make_unique<settings::Settings>()), phoneMode{mode}, phoneLockSubject(this)
+          settings(std::make_unique<settings::Settings>(this)), phoneMode{mode}, phoneLockSubject(this)
     {
         topBarManager->enableIndicators({gui::top_bar::Indicator::Time});
         using TimeMode = gui::top_bar::TimeConfiguration::TimeMode;
@@ -154,6 +154,7 @@ namespace app
     Application::~Application() noexcept
     {
         windowsStack.windows.clear();
+        settings->unregisterValueChange();
     }
 
     Application::State Application::getState()
@@ -620,7 +621,6 @@ namespace app
     {
         setState(State::INITIALIZING);
 
-        settings->init(service::ServiceProxy(shared_from_this()));
         app::manager::Controller::applicationInitialised(this, StartupStatus::Success, startInBackground);
 
         if (startInBackground) {
@@ -638,7 +638,6 @@ namespace app
 
     sys::ReturnCodes Application::DeinitHandler()
     {
-        settings->deinit();
         LOG_INFO("Closing an application: %s", GetName().c_str());
 
         for (const auto &[windowName, window] : windowsStack) {
