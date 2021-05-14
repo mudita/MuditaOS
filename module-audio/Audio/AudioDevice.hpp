@@ -80,5 +80,10 @@ namespace audio
 
         virtual RetCode setOutputVolume(float vol) = 0;
         virtual RetCode setInputGain(float gain)   = 0;
+
+        auto getSinkFormat() -> AudioFormat override
+        {
+            return getSourceFormat();
+        }
     };
 } // namespace audio

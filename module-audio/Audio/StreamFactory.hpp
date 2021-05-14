@@ -21,6 +21,7 @@ namespace audio
         StreamFactory() = default;
         explicit StreamFactory(std::chrono::milliseconds operationPeriodRequirement);
 
+        auto makeStream(Source &source, Sink &sink) -> std::unique_ptr<AbstractStream>;
         auto makeStream(Source &source, Sink &sink, AudioFormat streamFormat) -> std::unique_ptr<Stream>;
         auto makeInputTranscodingStream(Source &source,
                                         Sink &sink,

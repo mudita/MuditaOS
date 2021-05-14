@@ -4,6 +4,8 @@
 #include "StreamFactory.hpp"
 #include "Endpoint.hpp"
 
+#include "transcode/TransformFactory.hpp"
+
 #include <math/Math.hpp>
 
 #include <algorithm>
@@ -22,11 +24,28 @@ using audio::Stream;
 using audio::StreamFactory;
 using audio::transcode::InputTranscodeProxy;
 using audio::transcode::Transform;
+using audio::transcode::TransformFactory;
 using namespace std::chrono_literals;
 
 StreamFactory::StreamFactory(std::chrono::milliseconds operationPeriodRequirement)
     : periodRequirement(operationPeriodRequirement)
 {}
+
+auto StreamFactory::makeStream(Source &source, Sink &sink) -> std::unique_ptr<AbstractStream>
+{
+    auto sourceFormat = source.getSourceFormat();
+    auto sinkFormat   = sink.getSinkFormat();
+
+    if (sourceFormat == sinkFormat) {
+        return makeStream(source.getTraits(), sink.getTraits(), sourceFormat);
+    }
+    else {
+        auto transformFactory = TransformFactory();
+        auto transform        = transformFactory.makeTransform(sourceFormat, sinkFormat);
+
+        return makeInputTranscodingStream(source, sink, sinkFormat, std::move(transform));
+    }
+}
 
 auto StreamFactory::makeStream(Traits sourceTraits, Traits sinkTraits, AudioFormat streamFormat)
     -> std::unique_ptr<Stream>

@@ -44,9 +44,10 @@ namespace audio
     class Sink : public Endpoint
     {
       public:
-        virtual void onDataSend()    = 0;
-        virtual void enableOutput()  = 0;
-        virtual void disableOutput() = 0;
+        virtual auto getSinkFormat() -> AudioFormat = 0;
+        virtual void onDataSend()                   = 0;
+        virtual void enableOutput()                 = 0;
+        virtual void disableOutput()                = 0;
     };
 
     class Source : public Endpoint

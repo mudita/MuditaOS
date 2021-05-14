@@ -60,24 +60,10 @@ namespace audio
         }
 
         // create streams
+        StreamFactory streamFactory;
         try {
-            auto deviceFormat        = audioDevice->getSourceFormat();
-            auto currentAudioProfile = currentProfile->getAudioFormat();
-            auto streamFactory       = StreamFactory(callTimeConstraint);
-
-            if (deviceFormat == currentAudioProfile) {
-                dataStreamIn  = streamFactory.makeStream(*audioDevice, *audioDeviceCellular, currentAudioProfile);
-                dataStreamOut = streamFactory.makeStream(*audioDeviceCellular, *audioDevice, currentAudioProfile);
-            }
-            else {
-                auto transformFactory = transcode::TransformFactory();
-                auto inputTransform   = transformFactory.makeTransform(deviceFormat, currentAudioProfile);
-                auto outputTransform  = transformFactory.makeTransform(currentAudioProfile, deviceFormat);
-                dataStreamIn          = streamFactory.makeInputTranscodingStream(
-                    *audioDevice, *audioDeviceCellular, currentAudioProfile, std::move(inputTransform));
-                dataStreamOut = streamFactory.makeInputTranscodingStream(
-                    *audioDeviceCellular, *audioDevice, currentAudioProfile, std::move(outputTransform));
-            }
+            dataStreamIn  = streamFactory.makeStream(*audioDevice, *audioDeviceCellular);
+            dataStreamOut = streamFactory.makeStream(*audioDeviceCellular, *audioDevice);
         }
         catch (std::exception &e) {
             LOG_FATAL("Cannot create audio stream: %s", e.what());
