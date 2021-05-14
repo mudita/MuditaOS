@@ -19,9 +19,6 @@ namespace bluetooth
 
         virtual auto getProfileType() const -> AudioProfile;
 
-        auto Start(const Configuration &format) -> audio::AudioDevice::RetCode override;
-        auto Stop() -> audio::AudioDevice::RetCode override;
-
         auto setOutputVolume(float vol) -> audio::AudioDevice::RetCode override;
         auto setInputGain(float gain) -> audio::AudioDevice::RetCode override;
 

@@ -69,7 +69,7 @@ namespace audio
         dec->startDecodingWorker(endOfFileCallback);
 
         // start output device and enable audio connection
-        auto ret = audioDevice->Start(currentProfile->GetAudioConfiguration());
+        auto ret = audioDevice->Start();
         outputConnection->enable();
 
         // update state and token
@@ -163,6 +163,10 @@ namespace audio
             return RetCode::Success;
         }
 
+        // adjust new profile with information from file's tags
+        newProfile->SetSampleRate(tags->sample_rate);
+        newProfile->SetInOutFlags(static_cast<uint32_t>(AudioDevice::Flags::OutputStereo));
+
         /// profile change - (re)create output device; stop audio first by
         /// killing audio connection
         outputConnection.reset();
@@ -180,10 +184,6 @@ namespace audio
             LOG_ERROR("Format unsupported by the audio device: %s", format.toString().c_str());
             return RetCode::Failed;
         }
-
-        // adjust new profile with information from file's tags
-        newProfile->SetSampleRate(tags->sample_rate);
-        newProfile->SetInOutFlags(static_cast<uint32_t>(AudioDevice::Flags::OutputStereo));
 
         // store profile
         currentProfile = newProfile;

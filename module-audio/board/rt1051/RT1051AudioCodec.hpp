@@ -16,8 +16,6 @@
 #include "drivers/dmamux/DriverDMAMux.hpp"
 #include "drivers/dma/DriverDMA.hpp"
 
-#include <mutex.hpp>
-
 #include <initializer_list>
 #include <vector>
 
@@ -34,10 +32,10 @@ namespace audio
         friend void txAudioCodecCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData);
         friend void rxAudioCodecCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData);
 
-        RT1051AudioCodec();
+        RT1051AudioCodec(const Configuration &format);
         virtual ~RT1051AudioCodec();
 
-        AudioDevice::RetCode Start(const Configuration &format) override final;
+        AudioDevice::RetCode Start() override final;
         AudioDevice::RetCode Stop() override final;
         AudioDevice::RetCode setOutputVolume(float vol) override final;
         AudioDevice::RetCode setInputGain(float gain) override final;
@@ -47,8 +45,6 @@ namespace audio
 
         AudioDevice::RetCode OutputPathCtrl(OutputPath outputPath);
         AudioDevice::RetCode InputPathCtrl(InputPath inputPath);
-
-        cpp_freertos::MutexStandard mutex;
 
       private:
         constexpr static TickType_t codecSettleTime                               = 20 * portTICK_PERIOD_MS;
@@ -77,7 +73,6 @@ namespace audio
         CodecMAX98090 codec;
         std::vector<audio::AudioFormat> formats;
         Configuration currentFormat;
-        bool isInitialized = false;
 
         static AT_NONCACHEABLE_SECTION_INIT(sai_edma_handle_t txHandle);
         static AT_NONCACHEABLE_SECTION_INIT(sai_edma_handle_t rxHandle);

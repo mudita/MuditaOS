@@ -34,16 +34,6 @@ auto BluetoothAudioDevice::getProfileType() const -> AudioProfile
     return profile;
 }
 
-auto BluetoothAudioDevice::Start(const Configuration &format) -> audio::AudioDevice::RetCode
-{
-    return audio::AudioDevice::RetCode::Success;
-}
-
-auto BluetoothAudioDevice::Stop() -> audio::AudioDevice::RetCode
-{
-    return audio::AudioDevice::RetCode::Success;
-}
-
 auto BluetoothAudioDevice::setOutputVolume(float vol) -> audio::AudioDevice::RetCode
 {
     const auto volumeToSet = audio::volume::scaler::toAvrcpVolume(vol);

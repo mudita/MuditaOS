@@ -51,13 +51,11 @@ namespace audio
         operationToken = token;
         state          = State::Active;
 
-        if (auto ret = audioDevice->Start(currentProfile->GetAudioConfiguration());
-            ret != AudioDevice::RetCode::Success) {
+        if (auto ret = audioDevice->Start(); ret != AudioDevice::RetCode::Success) {
             return GetDeviceError(ret);
         }
 
-        if (auto ret = audioDeviceCellular->Start(currentProfile->GetAudioConfiguration());
-            ret != AudioDevice::RetCode::Success) {
+        if (auto ret = audioDeviceCellular->Start(); ret != AudioDevice::RetCode::Success) {
             return GetDeviceError(ret);
         }
 

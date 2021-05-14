@@ -9,20 +9,17 @@
 #include "bsp/BoardDefinitions.hpp"
 #include "board/rt1051/common/audio.hpp"
 
-#include <mutex.hpp>
-
 namespace audio
 {
     sai_edma_handle_t RT1051AudioCodec::txHandle = {};
     sai_edma_handle_t RT1051AudioCodec::rxHandle = {};
 
-    RT1051AudioCodec::RT1051AudioCodec()
+    RT1051AudioCodec::RT1051AudioCodec(const Configuration &format)
         : SAIAudioDevice(BOARD_AUDIOCODEC_SAIx, &rxHandle, &txHandle), saiInFormat{}, saiOutFormat{},
           codecParams{}, codec{},
-          formats(audio::AudioFormat::makeMatrix(supportedSampleRates, supportedBitWidths, supportedChannelModes))
-    {
-        isInitialized = true;
-    }
+          formats(audio::AudioFormat::makeMatrix(supportedSampleRates, supportedBitWidths, supportedChannelModes)),
+          currentFormat(format)
+    {}
 
     RT1051AudioCodec::~RT1051AudioCodec()
     {
@@ -64,57 +61,52 @@ namespace audio
         }
     }
 
-    AudioDevice::RetCode RT1051AudioCodec::Start(const AudioDevice::Configuration &format)
+    AudioDevice::RetCode RT1051AudioCodec::Start()
     {
-        cpp_freertos::LockGuard lock(mutex);
-
         if (state == State::Running) {
             return AudioDevice::RetCode::Failure;
         }
 
         InitBsp();
 
-        saiInFormat.bitWidth      = format.bitWidth;
-        saiInFormat.sampleRate_Hz = format.sampleRate_Hz;
+        saiInFormat.bitWidth      = currentFormat.bitWidth;
+        saiInFormat.sampleRate_Hz = currentFormat.sampleRate_Hz;
 
-        saiOutFormat.bitWidth      = format.bitWidth;
-        saiOutFormat.sampleRate_Hz = format.sampleRate_Hz;
+        saiOutFormat.bitWidth      = currentFormat.bitWidth;
+        saiOutFormat.sampleRate_Hz = currentFormat.sampleRate_Hz;
 
-        if (format.flags & static_cast<uint32_t>(AudioDevice::Flags::InputLeft)) {
+        if (currentFormat.flags & static_cast<uint32_t>(AudioDevice::Flags::InputLeft)) {
             saiInFormat.stereo = kSAI_MonoLeft;
             InStart();
         }
-        else if (format.flags & static_cast<uint32_t>(AudioDevice::Flags::InputRight)) {
+        else if (currentFormat.flags & static_cast<uint32_t>(AudioDevice::Flags::InputRight)) {
             saiInFormat.stereo = kSAI_MonoRight;
             InStart();
         }
-        else if (format.flags & static_cast<uint32_t>(AudioDevice::Flags::InputStereo)) {
+        else if (currentFormat.flags & static_cast<uint32_t>(AudioDevice::Flags::InputStereo)) {
             saiInFormat.stereo = kSAI_Stereo;
             InStart();
         }
 
-        if (format.flags & static_cast<uint32_t>(AudioDevice::Flags::OutputMono)) {
+        if (currentFormat.flags & static_cast<uint32_t>(AudioDevice::Flags::OutputMono)) {
             saiOutFormat.stereo = kSAI_MonoLeft;
             OutStart();
         }
-        else if (format.flags & static_cast<uint32_t>(AudioDevice::Flags::OutputStereo)) {
+        else if (currentFormat.flags & static_cast<uint32_t>(AudioDevice::Flags::OutputStereo)) {
             saiOutFormat.stereo = kSAI_Stereo;
             OutStart();
         }
 
-        codecParams.sampleRate = CodecParamsMAX98090::ValToSampleRate(format.sampleRate_Hz);
+        codecParams.sampleRate = CodecParamsMAX98090::ValToSampleRate(currentFormat.sampleRate_Hz);
         if (codecParams.sampleRate == CodecParamsMAX98090::SampleRate::Invalid) {
             LOG_ERROR("Unsupported sample rate");
         }
 
-        codecParams.inputPath  = getCodecInputPath(format);
-        codecParams.outputPath = getCodecOutputPath(format);
-        codecParams.outVolume  = format.outputVolume;
-        codecParams.inGain     = format.inputGain;
+        codecParams.inputPath  = getCodecInputPath(currentFormat);
+        codecParams.outputPath = getCodecOutputPath(currentFormat);
+        codecParams.outVolume  = currentFormat.outputVolume;
+        codecParams.inGain     = currentFormat.inputGain;
         codec.Start(codecParams);
-
-        // Store format passed
-        currentFormat = format;
 
         state = State::Running;
 
@@ -123,8 +115,6 @@ namespace audio
 
     AudioDevice::RetCode RT1051AudioCodec::Stop()
     {
-        cpp_freertos::LockGuard lock(mutex);
-
         if (state == State::Stopped) {
             return AudioDevice::RetCode::Failure;
         }

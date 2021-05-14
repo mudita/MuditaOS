@@ -86,7 +86,7 @@ namespace audio
         state          = State::Active;
 
         if (audioDevice->isFormatSupportedBySource(currentProfile->getAudioFormat())) {
-            auto ret = audioDevice->Start(currentProfile->GetAudioConfiguration());
+            auto ret = audioDevice->Start();
             return GetDeviceError(ret);
         }
         else {
@@ -124,7 +124,7 @@ namespace audio
         }
 
         state    = State::Active;
-        auto ret = audioDevice->Start(currentProfile->GetAudioConfiguration());
+        auto ret = audioDevice->Start();
         return GetDeviceError(ret);
     }
 

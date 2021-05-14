@@ -93,7 +93,7 @@ namespace audio
             return audioDeviceType;
         }
 
-        [[deprecated]] AudioDevice::Configuration GetAudioConfiguration()
+        [[deprecated]] AudioDevice::Configuration GetAudioConfiguration() const
         {
             return audioConfiguration;
         }

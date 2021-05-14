@@ -68,7 +68,7 @@ namespace audio
 
         virtual ~AudioDevice() = default;
 
-        virtual RetCode Start(const Configuration &format)
+        virtual RetCode Start()
         {
             return RetCode::Success;
         }

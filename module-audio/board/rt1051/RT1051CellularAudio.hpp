@@ -33,7 +33,7 @@ namespace audio
         RT1051CellularAudio();
         virtual ~RT1051CellularAudio();
 
-        AudioDevice::RetCode Start(const Configuration &format) override final;
+        AudioDevice::RetCode Start() override final;
         AudioDevice::RetCode Stop() override final;
 
         AudioDevice::RetCode setOutputVolume(float vol) override final;

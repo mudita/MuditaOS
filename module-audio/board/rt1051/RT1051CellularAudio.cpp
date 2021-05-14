@@ -25,7 +25,7 @@ namespace audio
         Deinit();
     }
 
-    AudioDevice::RetCode RT1051CellularAudio::Start(const AudioDevice::Configuration &format)
+    AudioDevice::RetCode RT1051CellularAudio::Start()
     {
         if (state == State::Running) {
             LOG_ERROR("Audio device already running");
