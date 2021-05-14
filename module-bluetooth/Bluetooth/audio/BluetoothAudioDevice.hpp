@@ -40,6 +40,7 @@ namespace bluetooth
         bool outputEnabled   = false;
         bool inputEnabled    = false;
         AudioProfile profile = AudioProfile::None;
+        float outputVolume;
     };
 
     class A2DPAudioDevice : public BluetoothAudioDevice

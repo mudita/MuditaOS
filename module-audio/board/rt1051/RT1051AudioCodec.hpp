@@ -76,6 +76,8 @@ namespace audio
         CodecParamsMAX98090 codecParams;
         CodecMAX98090 codec;
         std::vector<audio::AudioFormat> formats;
+        Configuration currentFormat;
+        bool isInitialized = false;
 
         static AT_NONCACHEABLE_SECTION_INIT(sai_edma_handle_t txHandle);
         static AT_NONCACHEABLE_SECTION_INIT(sai_edma_handle_t rxHandle);

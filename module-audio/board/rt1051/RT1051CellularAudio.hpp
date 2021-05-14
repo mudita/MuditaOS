@@ -15,8 +15,6 @@
 #include "drivers/dmamux/DriverDMAMux.hpp"
 #include "drivers/dma/DriverDMA.hpp"
 
-#include <mutex.hpp>
-
 #include <vector>
 
 namespace audio
@@ -37,31 +35,25 @@ namespace audio
 
         AudioDevice::RetCode Start(const Configuration &format) override final;
         AudioDevice::RetCode Stop() override final;
+
         AudioDevice::RetCode setOutputVolume(float vol) override final;
         AudioDevice::RetCode setInputGain(float gain) override final;
         auto getSupportedFormats() -> std::vector<AudioFormat> override final;
         auto getTraits() const -> Traits override final;
         auto getSourceFormat() -> AudioFormat override final;
 
-        cpp_freertos::MutexStandard mutex;
-
       private:
+        static constexpr auto supportedSampleRate = 16000U;
+        static constexpr auto supportedBitWidth   = 16U;
+        static constexpr auto supportedChannels   = 1U;
+
         enum class State
         {
             Running,
             Stopped
         };
 
-        struct SAIFormat
-        {
-            uint32_t sampleRate_Hz;   /*!< Sample rate of audio data */
-            uint32_t bitWidth;        /*!< Data length of audio data, usually 8/16/24/32 bits */
-            sai_mono_stereo_t stereo; /*!< Mono or stereo */
-        };
-
-        State state = State::Stopped;
-        SAIFormat saiInFormat;
-        SAIFormat saiOutFormat;
+        State state                = State::Stopped;
         uint32_t mclkSourceClockHz = 0;
         sai_config_t config;
 

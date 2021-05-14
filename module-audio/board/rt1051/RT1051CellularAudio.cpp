@@ -8,8 +8,6 @@
 
 #include "bsp/BoardDefinitions.hpp"
 
-#include <mutex.hpp>
-
 namespace audio
 {
 
@@ -18,11 +16,8 @@ namespace audio
     sai_edma_handle_t RT1051CellularAudio::txHandle = {};
     sai_edma_handle_t RT1051CellularAudio::rxHandle = {};
 
-    RT1051CellularAudio::RT1051CellularAudio()
-        : SAIAudioDevice(BOARD_CELLULAR_AUDIO_SAIx, &rxHandle, &txHandle), saiInFormat{}, saiOutFormat{}, config{}
-    {
-        isInitialized = true;
-    }
+    RT1051CellularAudio::RT1051CellularAudio() : SAIAudioDevice(BOARD_CELLULAR_AUDIO_SAIx, &rxHandle, &txHandle)
+    {}
 
     RT1051CellularAudio::~RT1051CellularAudio()
     {
@@ -32,45 +27,14 @@ namespace audio
 
     AudioDevice::RetCode RT1051CellularAudio::Start(const AudioDevice::Configuration &format)
     {
-        cpp_freertos::LockGuard lock(mutex);
-
         if (state == State::Running) {
             LOG_ERROR("Audio device already running");
             return AudioDevice::RetCode::Failure;
         }
 
         Init();
-
-        saiInFormat.bitWidth      = format.bitWidth;
-        saiInFormat.sampleRate_Hz = format.sampleRate_Hz;
-
-        saiOutFormat.bitWidth      = format.bitWidth;
-        saiOutFormat.sampleRate_Hz = format.sampleRate_Hz;
-
-        if (format.flags & static_cast<uint32_t>(AudioDevice::Flags::InputLeft)) {
-            saiInFormat.stereo = kSAI_MonoLeft;
-            InStart();
-        }
-        else if (format.flags & static_cast<uint32_t>(AudioDevice::Flags::InputRight)) {
-            saiInFormat.stereo = kSAI_MonoRight;
-            InStart();
-        }
-        else if (format.flags & static_cast<uint32_t>(AudioDevice::Flags::InputStereo)) {
-            saiInFormat.stereo = kSAI_Stereo;
-            InStart();
-        }
-
-        if (format.flags & static_cast<uint32_t>(AudioDevice::Flags::OutputMono)) {
-            saiOutFormat.stereo = kSAI_MonoLeft;
-            OutStart();
-        }
-        else if (format.flags & static_cast<uint32_t>(AudioDevice::Flags::OutputStereo)) {
-            saiOutFormat.stereo = kSAI_Stereo;
-            OutStart();
-        }
-
-        // Store format passed
-        currentFormat = format;
+        InStart();
+        OutStart();
 
         state = State::Running;
 
@@ -79,8 +43,6 @@ namespace audio
 
     AudioDevice::RetCode RT1051CellularAudio::Stop()
     {
-        cpp_freertos::LockGuard lock(mutex);
-
         if (state == State::Stopped) {
             return AudioDevice::RetCode::Failure;
         }
@@ -88,21 +50,18 @@ namespace audio
         InStop();
         OutStop();
 
-        currentFormat = {};
-        state         = State::Stopped;
+        state = State::Stopped;
 
         return AudioDevice::RetCode::Success;
     }
 
     AudioDevice::RetCode RT1051CellularAudio::setOutputVolume(float vol)
     {
-        currentFormat.outputVolume = vol;
         return AudioDevice::RetCode::Success;
     }
 
     AudioDevice::RetCode RT1051CellularAudio::setInputGain(float gain)
     {
-        currentFormat.inputGain = gain;
         return AudioDevice::RetCode::Success;
     }
 
@@ -156,13 +115,13 @@ namespace audio
         sai_transfer_format_t sai_format = {};
 
         /* Configure the audio format */
-        sai_format.bitWidth           = saiInFormat.bitWidth;
+        sai_format.bitWidth           = supportedBitWidth;
         sai_format.channel            = 0U;
-        sai_format.sampleRate_Hz      = saiInFormat.sampleRate_Hz;
+        sai_format.sampleRate_Hz      = supportedSampleRate;
         sai_format.masterClockHz      = mclkSourceClockHz;
         sai_format.isFrameSyncCompact = false;
         sai_format.protocol           = config.protocol;
-        sai_format.stereo             = saiInFormat.stereo;
+        sai_format.stereo             = kSAI_MonoLeft;
 #if defined(FSL_FEATURE_SAI_FIFO_COUNT) && (FSL_FEATURE_SAI_FIFO_COUNT > 1)
         sai_format.watermark = FSL_FEATURE_SAI_FIFO_COUNT / 2U;
 #endif
@@ -187,13 +146,13 @@ namespace audio
         sai_transfer_format_t sai_format;
 
         /* Configure the audio format */
-        sai_format.bitWidth           = saiOutFormat.bitWidth;
+        sai_format.bitWidth           = supportedBitWidth;
         sai_format.channel            = 0U;
-        sai_format.sampleRate_Hz      = saiOutFormat.sampleRate_Hz;
+        sai_format.sampleRate_Hz      = supportedSampleRate;
         sai_format.masterClockHz      = mclkSourceClockHz;
         sai_format.isFrameSyncCompact = false;
         sai_format.protocol           = config.protocol;
-        sai_format.stereo             = saiOutFormat.stereo;
+        sai_format.stereo             = kSAI_MonoLeft;
 #if defined(FSL_FEATURE_SAI_FIFO_COUNT) && (FSL_FEATURE_SAI_FIFO_COUNT > 1)
         sai_format.watermark = FSL_FEATURE_SAI_FIFO_COUNT / 2U;
 #endif
@@ -237,9 +196,6 @@ namespace audio
 
     auto RT1051CellularAudio::getSourceFormat() -> AudioFormat
     {
-        constexpr auto supportedSampleRate = 16000U;
-        constexpr auto supportedBitWidth   = 16U;
-        constexpr auto supportedChannels   = 1U;
         return AudioFormat(supportedSampleRate, supportedBitWidth, supportedChannels);
     }
 

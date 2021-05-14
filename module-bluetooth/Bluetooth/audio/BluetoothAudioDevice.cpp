@@ -52,7 +52,8 @@ auto BluetoothAudioDevice::setOutputVolume(float vol) -> audio::AudioDevice::Ret
         LOG_ERROR("Can't set volume level. Status %x", status);
         return audio::AudioDevice::RetCode::Failure;
     }
-    currentFormat.outputVolume = vol;
+
+    outputVolume = vol;
     return audio::AudioDevice::RetCode::Success;
 }
 
