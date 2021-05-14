@@ -68,8 +68,15 @@ namespace audio
 
         virtual ~AudioDevice() = default;
 
-        virtual RetCode Start(const Configuration &format);
-        virtual RetCode Stop() = 0;
+        virtual RetCode Start(const Configuration &format)
+        {
+            return RetCode::Success;
+        }
+
+        virtual RetCode Stop()
+        {
+            return RetCode::Success;
+        }
 
         virtual RetCode setOutputVolume(float vol) = 0;
         virtual RetCode setInputGain(float gain)   = 0;
