@@ -372,3 +372,26 @@ TEST(Transform, FactoryComposite)
     EXPECT_STREQ(typeid(*transform).name(), typeid(::audio::transcode::TransformComposite).name());
     EXPECT_EQ(transform->transformFormat(sourceFormat), sinkFormat);
 }
+
+TEST(Transform, FactoryErrors)
+{
+    auto factory = ::audio::transcode::TransformFactory();
+    EXPECT_THROW(factory.makeTransform(::audio::AudioFormat{16000, 16, 1}, ::audio::AudioFormat{16000, 24, 1}),
+                 std::runtime_error);
+    EXPECT_THROW(factory.makeTransform(::audio::AudioFormat{44100, 16, 1}, ::audio::AudioFormat{48000, 16, 1}),
+                 std::invalid_argument);
+    EXPECT_THROW(factory.makeTransform(::audio::AudioFormat{8000, 16, 1}, ::audio::AudioFormat{24000, 16, 1}),
+                 std::invalid_argument);
+    EXPECT_THROW(factory.makeTransform(::audio::AudioFormat{16000, 32, 1}, ::audio::AudioFormat{8000, 32, 1}),
+                 std::invalid_argument);
+    EXPECT_THROW(factory.makeTransform(::audio::AudioFormat{8000, 16, 2}, ::audio::AudioFormat{16000, 16, 2}),
+                 std::invalid_argument);
+
+    // channel conversions
+    EXPECT_THROW(factory.makeTransform(::audio::AudioFormat{8000, 16, 1}, ::audio::AudioFormat{8000, 16, 3}),
+                 std::invalid_argument);
+    EXPECT_THROW(factory.makeTransform(::audio::AudioFormat{8000, 16, 2}, ::audio::AudioFormat{8000, 16, 1}),
+                 std::invalid_argument);
+    EXPECT_THROW(factory.makeTransform(::audio::AudioFormat{8000, 32, 1}, ::audio::AudioFormat{8000, 32, 2}),
+                 std::invalid_argument);
+}
