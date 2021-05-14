@@ -73,18 +73,18 @@ namespace audio
 
         // create streams
         try {
-            auto sourceFormat        = audioDevice->getSourceFormat();
+            auto deviceFormat        = audioDevice->getSourceFormat();
             auto currentAudioProfile = currentProfile->getAudioFormat();
             auto streamFactory       = StreamFactory(callTimeConstraint);
 
-            if (sourceFormat == currentAudioProfile) {
+            if (deviceFormat == currentAudioProfile) {
                 dataStreamIn  = streamFactory.makeStream(*audioDevice, *audioDeviceCellular, currentAudioProfile);
                 dataStreamOut = streamFactory.makeStream(*audioDeviceCellular, *audioDevice, currentAudioProfile);
             }
             else {
                 auto transformFactory = transcode::TransformFactory();
-                auto inputTransform   = transformFactory.makeTransform(sourceFormat, currentAudioProfile);
-                auto outputTransform  = transformFactory.makeTransform(currentAudioProfile, sourceFormat);
+                auto inputTransform   = transformFactory.makeTransform(deviceFormat, currentAudioProfile);
+                auto outputTransform  = transformFactory.makeTransform(currentAudioProfile, deviceFormat);
                 dataStreamIn          = streamFactory.makeInputTranscodingStream(
                     *audioDevice, *audioDeviceCellular, currentAudioProfile, std::move(inputTransform));
                 dataStreamOut = streamFactory.makeInputTranscodingStream(
