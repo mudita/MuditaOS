@@ -14,7 +14,7 @@ namespace audio
             : Profile("Routing Headset",
                       Type::RoutingHeadphones,
                       AudioDevice::Configuration{
-                          .sampleRate_Hz = 16000,
+                          .sampleRate_Hz = 8000,
                           .bitWidth      = 16,
                           .flags         = static_cast<uint32_t>(
                                        AudioDevice::Flags::InputLeft) | // microphone use left audio channel
