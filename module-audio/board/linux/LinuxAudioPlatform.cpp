@@ -13,8 +13,14 @@ using audio::AudioPlatform;
 
 class DummyAudioFactory : public AudioDeviceFactory
 {
+  public:
+    std::shared_ptr<AudioDevice> createCellularAudioDevice() override
+    {
+        return nullptr;
+    }
+
   protected:
-    std::shared_ptr<AudioDevice> getDevice([[maybe_unused]] audio::Profile profile)
+    std::shared_ptr<AudioDevice> getDevice([[maybe_unused]] const audio::Profile &profile) override
     {
         return nullptr;
     }

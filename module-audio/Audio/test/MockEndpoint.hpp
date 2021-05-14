@@ -14,6 +14,7 @@ namespace testing::audio
       public:
         MOCK_METHOD(::audio::Endpoint::Traits, getTraits, (), (const, override));
         MOCK_METHOD(std::vector<::audio::AudioFormat>, getSupportedFormats, (), (override));
+        MOCK_METHOD(::audio::AudioFormat, getSinkFormat, (), (override));
         MOCK_METHOD(void, onDataSend, (), (override));
         MOCK_METHOD(void, enableOutput, (), (override));
         MOCK_METHOD(void, disableOutput, (), (override));
