@@ -24,8 +24,6 @@ namespace bluetooth
 
         auto OutputVolumeCtrl(float vol) -> audio::AudioDevice::RetCode override;
         auto InputGainCtrl(float gain) -> audio::AudioDevice::RetCode override;
-        auto OutputPathCtrl(OutputPath outputPath) -> audio::AudioDevice::RetCode override;
-        auto InputPathCtrl(InputPath inputPath) -> audio::AudioDevice::RetCode override;
 
         // Endpoint control methods
         void enableInput() override;

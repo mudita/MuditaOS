@@ -71,35 +71,8 @@ namespace audio
         virtual RetCode Start(const Configuration &format) = 0;
         virtual RetCode Stop()                             = 0;
 
-        virtual RetCode OutputVolumeCtrl(float vol)           = 0;
-        virtual RetCode InputGainCtrl(float gain)             = 0;
-        virtual RetCode OutputPathCtrl(OutputPath outputPath) = 0;
-        virtual RetCode InputPathCtrl(InputPath inputPath)    = 0;
-
-        float GetOutputVolume() const noexcept
-        {
-            return currentFormat.outputVolume;
-        }
-
-        float GetInputGain() const noexcept
-        {
-            return currentFormat.inputGain;
-        }
-
-        OutputPath GetOutputPath() const noexcept
-        {
-            return currentFormat.outputPath;
-        }
-
-        InputPath GetInputPath() const noexcept
-        {
-            return currentFormat.inputPath;
-        }
-
-        Configuration GetCurrentFormat() const noexcept
-        {
-            return currentFormat;
-        }
+        virtual RetCode OutputVolumeCtrl(float vol) = 0;
+        virtual RetCode InputGainCtrl(float gain)   = 0;
 
       protected:
         Configuration currentFormat;

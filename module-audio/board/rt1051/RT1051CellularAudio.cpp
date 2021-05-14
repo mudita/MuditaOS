@@ -106,18 +106,6 @@ namespace audio
         return AudioDevice::RetCode::Success;
     }
 
-    AudioDevice::RetCode RT1051CellularAudio::InputPathCtrl(InputPath inputPath)
-    {
-        currentFormat.inputPath = inputPath;
-        return AudioDevice::RetCode::Success;
-    }
-
-    AudioDevice::RetCode RT1051CellularAudio::OutputPathCtrl(OutputPath outputPath)
-    {
-        currentFormat.outputPath = outputPath;
-        return AudioDevice::RetCode::Success;
-    }
-
     void RT1051CellularAudio::Init()
     {
 

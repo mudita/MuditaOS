@@ -41,11 +41,12 @@ namespace audio
         AudioDevice::RetCode Stop() override final;
         AudioDevice::RetCode OutputVolumeCtrl(float vol) override final;
         AudioDevice::RetCode InputGainCtrl(float gain) override final;
-        AudioDevice::RetCode OutputPathCtrl(OutputPath outputPath) override final;
-        AudioDevice::RetCode InputPathCtrl(InputPath inputPath) override final;
         auto getSupportedFormats() -> std::vector<AudioFormat> override final;
         auto getTraits() const -> Traits override final;
         auto getSourceFormat() -> AudioFormat override final;
+
+        AudioDevice::RetCode OutputPathCtrl(OutputPath outputPath);
+        AudioDevice::RetCode InputPathCtrl(InputPath inputPath);
 
         cpp_freertos::MutexStandard mutex;
 

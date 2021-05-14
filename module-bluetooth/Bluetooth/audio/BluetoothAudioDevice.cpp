@@ -61,16 +61,6 @@ auto BluetoothAudioDevice::InputGainCtrl(float gain) -> audio::AudioDevice::RetC
     return audio::AudioDevice::RetCode::Success;
 }
 
-auto BluetoothAudioDevice::OutputPathCtrl(OutputPath outputPath) -> audio::AudioDevice::RetCode
-{
-    return audio::AudioDevice::RetCode::Success;
-}
-
-auto BluetoothAudioDevice::InputPathCtrl(InputPath inputPath) -> audio::AudioDevice::RetCode
-{
-    return audio::AudioDevice::RetCode::Success;
-}
-
 auto BluetoothAudioDevice::isInputEnabled() const -> bool
 {
     return inputEnabled;
