@@ -14,6 +14,8 @@
 #include <stdexcept>
 #include <vector>
 
+#include <cassert>
+
 using audio::transcode::NullTransform;
 using audio::transcode::Transform;
 using audio::transcode::TransformFactory;
@@ -39,14 +41,15 @@ auto TransformFactory::makeTransform(AudioFormat sourceFormat, AudioFormat sinkF
         transforms.push_back(getChannelsTransform(sourceFormat, sinkFormat));
     }
 
-    // create composite if more than one transform
-    if (transforms.size() == 1) {
-        return std::move(transforms[0]);
-    }
-    else {
+    assert(!transforms.empty());
+
+    if (transforms.size() > 1) {
         auto transformsListForComposite = std::vector<std::shared_ptr<Transform>>{};
         std::move(std::begin(transforms), std::end(transforms), std::back_inserter(transformsListForComposite));
         return std::make_unique<audio::transcode::TransformComposite>(transformsListForComposite);
+    }
+    else {
+        return std::move(transforms[0]);
     }
 }
 
