@@ -15,9 +15,11 @@
 #include <Audio/transcode/TransformComposite.hpp>
 #include <Audio/transcode/BasicInterpolator.hpp>
 #include <Audio/transcode/BasicDecimator.hpp>
+#include <Audio/transcode/NullTransform.hpp>
 
 #include <cstdlib>
 
+using ::audio::transcode::NullTransform;
 using ::testing::Return;
 using ::testing::audio::MockStream;
 using ::testing::audio::MockStreamEventListener;
@@ -53,35 +55,6 @@ class InverseTransform : public audio::transcode::Transform
     auto transformFormat(const audio::AudioFormat &inputFormat) const noexcept -> audio::AudioFormat override
     {
         return inputFormat;
-    }
-};
-
-class NullTransform : public audio::transcode::Transform
-{
-  public:
-    auto transform(const Span &span, const Span &transformSpace) const -> Span override
-    {
-        return span;
-    }
-
-    auto validateInputFormat(const audio::AudioFormat &inputFormat) const noexcept -> bool override
-    {
-        return true;
-    }
-
-    auto transformFormat(const audio::AudioFormat &inputFormat) const noexcept -> audio::AudioFormat override
-    {
-        return inputFormat;
-    }
-
-    auto transformBlockSize(std::size_t inputBufferSize) const noexcept -> std::size_t override
-    {
-        return inputBufferSize;
-    }
-
-    auto transformBlockSizeInversed(std::size_t outputBufferSize) const noexcept -> std::size_t override
-    {
-        return outputBufferSize;
     }
 };
 
