@@ -334,6 +334,7 @@ TEST(Transform, FactorySampleRateDecimator)
     auto transform = factory.makeTransform(sourceFormat, sinkFormat);
 
     EXPECT_STREQ(typeid(*transform).name(), typeid(::audio::transcode::BasicDecimator<std::uint16_t, 1, 2>).name());
+    EXPECT_EQ(transform->transformFormat(sourceFormat), sinkFormat);
 }
 
 TEST(Tranform, FactoryNullTransform)
@@ -345,9 +346,10 @@ TEST(Tranform, FactoryNullTransform)
     auto transform = factory.makeTransform(sourceFormat, sinkFormat);
 
     EXPECT_STREQ(typeid(*transform).name(), typeid(::audio::transcode::NullTransform).name());
+    EXPECT_EQ(transform->transformFormat(sourceFormat), sinkFormat);
 }
 
-TEST(Tranform, FactoryMonoToStereo)
+TEST(Transform, FactoryMonoToStereo)
 {
     auto factory      = ::audio::transcode::TransformFactory();
     auto sourceFormat = ::audio::AudioFormat{8000, 16, 1};
@@ -356,4 +358,17 @@ TEST(Tranform, FactoryMonoToStereo)
     auto transform = factory.makeTransform(sourceFormat, sinkFormat);
 
     EXPECT_STREQ(typeid(*transform).name(), typeid(::audio::transcode::MonoToStereo).name());
+    EXPECT_EQ(transform->transformFormat(sourceFormat), sinkFormat);
+}
+
+TEST(Transform, FactoryComposite)
+{
+    auto factory      = ::audio::transcode::TransformFactory();
+    auto sourceFormat = ::audio::AudioFormat{16000, 16, 1};
+    auto sinkFormat   = ::audio::AudioFormat{32000, 16, 2};
+
+    auto transform = factory.makeTransform(sourceFormat, sinkFormat);
+
+    EXPECT_STREQ(typeid(*transform).name(), typeid(::audio::transcode::TransformComposite).name());
+    EXPECT_EQ(transform->transformFormat(sourceFormat), sinkFormat);
 }
