@@ -94,13 +94,13 @@ namespace audio
         return AudioDevice::RetCode::Success;
     }
 
-    AudioDevice::RetCode RT1051CellularAudio::OutputVolumeCtrl(float vol)
+    AudioDevice::RetCode RT1051CellularAudio::setOutputVolume(float vol)
     {
         currentFormat.outputVolume = vol;
         return AudioDevice::RetCode::Success;
     }
 
-    AudioDevice::RetCode RT1051CellularAudio::InputGainCtrl(float gain)
+    AudioDevice::RetCode RT1051CellularAudio::setInputGain(float gain)
     {
         currentFormat.inputGain = gain;
         return AudioDevice::RetCode::Success;

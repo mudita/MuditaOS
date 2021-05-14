@@ -37,8 +37,8 @@ namespace audio
 
         AudioDevice::RetCode Start(const Configuration &format) override final;
         AudioDevice::RetCode Stop() override final;
-        AudioDevice::RetCode OutputVolumeCtrl(float vol) override final;
-        AudioDevice::RetCode InputGainCtrl(float gain) override final;
+        AudioDevice::RetCode setOutputVolume(float vol) override final;
+        AudioDevice::RetCode setInputGain(float gain) override final;
         auto getSupportedFormats() -> std::vector<AudioFormat> override final;
         auto getTraits() const -> Traits override final;
         auto getSourceFormat() -> AudioFormat override final;

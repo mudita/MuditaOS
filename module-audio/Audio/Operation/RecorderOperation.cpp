@@ -181,14 +181,14 @@ namespace audio
     audio::RetCode RecorderOperation::SetOutputVolume(float vol)
     {
         currentProfile->SetOutputVolume(vol);
-        auto ret = audioDevice->OutputVolumeCtrl(vol);
+        auto ret = audioDevice->setOutputVolume(vol);
         return GetDeviceError(ret);
     }
 
     audio::RetCode RecorderOperation::SetInputGain(float gain)
     {
         currentProfile->SetInputGain(gain);
-        auto ret = audioDevice->InputGainCtrl(gain);
+        auto ret = audioDevice->setInputGain(gain);
         return GetDeviceError(ret);
     }
 

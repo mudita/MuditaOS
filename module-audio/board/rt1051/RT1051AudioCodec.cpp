@@ -140,7 +140,7 @@ namespace audio
         return AudioDevice::RetCode::Success;
     }
 
-    AudioDevice::RetCode RT1051AudioCodec::OutputVolumeCtrl(float vol)
+    AudioDevice::RetCode RT1051AudioCodec::setOutputVolume(float vol)
     {
         currentFormat.outputVolume = vol;
         CodecParamsMAX98090 params;
@@ -150,7 +150,7 @@ namespace audio
         return AudioDevice::RetCode::Success;
     }
 
-    AudioDevice::RetCode RT1051AudioCodec::InputGainCtrl(float gain)
+    AudioDevice::RetCode RT1051AudioCodec::setInputGain(float gain)
     {
         currentFormat.inputGain = gain;
         CodecParamsMAX98090 params;

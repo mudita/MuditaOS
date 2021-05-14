@@ -44,7 +44,7 @@ auto BluetoothAudioDevice::Stop() -> audio::AudioDevice::RetCode
     return audio::AudioDevice::RetCode::Success;
 }
 
-auto BluetoothAudioDevice::OutputVolumeCtrl(float vol) -> audio::AudioDevice::RetCode
+auto BluetoothAudioDevice::setOutputVolume(float vol) -> audio::AudioDevice::RetCode
 {
     const auto volumeToSet = audio::volume::scaler::toAvrcpVolume(vol);
     const auto status      = avrcp_controller_set_absolute_volume(AVRCP::mediaTracker.avrcp_cid, volumeToSet);
@@ -56,7 +56,7 @@ auto BluetoothAudioDevice::OutputVolumeCtrl(float vol) -> audio::AudioDevice::Re
     return audio::AudioDevice::RetCode::Success;
 }
 
-auto BluetoothAudioDevice::InputGainCtrl(float gain) -> audio::AudioDevice::RetCode
+auto BluetoothAudioDevice::setInputGain(float gain) -> audio::AudioDevice::RetCode
 {
     return audio::AudioDevice::RetCode::Success;
 }

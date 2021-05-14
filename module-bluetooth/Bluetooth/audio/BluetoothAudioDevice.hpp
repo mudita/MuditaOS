@@ -22,8 +22,8 @@ namespace bluetooth
         auto Start(const Configuration &format) -> audio::AudioDevice::RetCode override;
         auto Stop() -> audio::AudioDevice::RetCode override;
 
-        auto OutputVolumeCtrl(float vol) -> audio::AudioDevice::RetCode override;
-        auto InputGainCtrl(float gain) -> audio::AudioDevice::RetCode override;
+        auto setOutputVolume(float vol) -> audio::AudioDevice::RetCode override;
+        auto setInputGain(float gain) -> audio::AudioDevice::RetCode override;
 
         // Endpoint control methods
         void enableInput() override;
