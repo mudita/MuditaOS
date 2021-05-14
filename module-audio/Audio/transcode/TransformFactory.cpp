@@ -77,10 +77,10 @@ auto TransformFactory::getSamplerateTransform(AudioFormat sourceFormat, AudioFor
     }
 
     if (sourceRate > sinkRate) {
-        return std::make_unique<audio::transcode::BasicDecimator<uint16_t, 1, 2>>();
+        return std::make_unique<audio::transcode::BasicDecimator<std::uint16_t, 1, 2>>();
     }
     else {
-        return std::make_unique<audio::transcode::BasicInterpolator<uint16_t, 1, 2>>();
+        return std::make_unique<audio::transcode::BasicInterpolator<std::uint16_t, 1, 2>>();
     }
 }
 
