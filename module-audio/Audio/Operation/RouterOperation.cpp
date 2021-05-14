@@ -60,7 +60,7 @@ namespace audio
         }
 
         // create streams
-        StreamFactory streamFactory;
+        StreamFactory streamFactory(callTimeConstraint);
         try {
             dataStreamIn  = streamFactory.makeStream(*audioDevice, *audioDeviceCellular);
             dataStreamOut = streamFactory.makeStream(*audioDeviceCellular, *audioDevice);
