@@ -7,6 +7,7 @@
 #include <Audio/AudioCommon.hpp>
 #include <Audio/Profiles/Profile.hpp>
 #include <Audio/StreamFactory.hpp>
+#include <Audio/transcode/TransformFactory.hpp>
 
 #include <log/log.hpp>
 #include <mutex.hpp>
@@ -71,14 +72,26 @@ namespace audio
         }
 
         // create streams
-        StreamFactory streamFactory(callTimeConstraint);
         try {
-            dataStreamIn =
-                streamFactory.makeStream(*audioDevice, *audioDeviceCellular, currentProfile->getAudioFormat());
-            dataStreamOut =
-                streamFactory.makeStream(*audioDevice, *audioDeviceCellular, currentProfile->getAudioFormat());
+            auto sourceFormat        = audioDevice->getSourceFormat();
+            auto currentAudioProfile = currentProfile->getAudioFormat();
+            auto streamFactory       = StreamFactory(callTimeConstraint);
+
+            if (sourceFormat == currentAudioProfile) {
+                dataStreamIn  = streamFactory.makeStream(*audioDevice, *audioDeviceCellular, currentAudioProfile);
+                dataStreamOut = streamFactory.makeStream(*audioDeviceCellular, *audioDevice, currentAudioProfile);
+            }
+            else {
+                auto transformFactory = transcode::TransformFactory();
+                auto inputTransform   = transformFactory.makeTransform(sourceFormat, currentAudioProfile);
+                auto outputTransform  = transformFactory.makeTransform(currentAudioProfile, sourceFormat);
+                dataStreamIn          = streamFactory.makeInputTranscodingStream(
+                    *audioDevice, *audioDeviceCellular, currentAudioProfile, std::move(inputTransform));
+                dataStreamOut = streamFactory.makeInputTranscodingStream(
+                    *audioDeviceCellular, *audioDevice, currentAudioProfile, std::move(outputTransform));
+            }
         }
-        catch (std::invalid_argument &e) {
+        catch (std::exception &e) {
             LOG_FATAL("Cannot create audio stream: %s", e.what());
             return audio::RetCode::Failed;
         }

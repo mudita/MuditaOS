@@ -68,8 +68,8 @@ namespace audio
         void Unmute();
         [[nodiscard]] auto IsMuted() const noexcept -> bool;
 
-        std::unique_ptr<Stream> dataStreamOut;
-        std::unique_ptr<Stream> dataStreamIn;
+        std::unique_ptr<AbstractStream> dataStreamOut;
+        std::unique_ptr<AbstractStream> dataStreamIn;
         std::unique_ptr<Encoder> enc;
         std::shared_ptr<AudioDevice> audioDeviceCellular;
         std::unique_ptr<StreamConnection> outputConnection;
