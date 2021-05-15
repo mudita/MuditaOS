@@ -32,12 +32,12 @@ constexpr std::size_t testStreamSize = 8;
 class InverseTransform : public audio::transcode::Transform
 {
   public:
-    auto transform(const Span &span, const Span &transformSpace) const -> Span override
+    auto transform(const Span &input, const Span &output) const -> Span override
     {
-        for (std::size_t i = 0; i < span.dataSize; i++) {
-            span.data[i] = ~span.data[i];
+        for (std::size_t i = 0; i < input.dataSize; i++) {
+            output.data[i] = ~input.data[i];
         }
-        return span;
+        return output;
     }
 
     auto transformBlockSize(std::size_t inputBufferSize) const noexcept -> std::size_t override
@@ -135,7 +135,9 @@ TEST(Transcode, PeekShrinking)
     auto decimatorTransform = std::make_shared<::audio::transcode::BasicDecimator<std::uint16_t, 1, 2>>();
     auto mockStream         = std::make_shared<MockStream>();
 
-    EXPECT_CALL(*mockStream, getInputTraits);
+    EXPECT_CALL(*mockStream, getInputTraits)
+        .WillRepeatedly(Return(::audio::AbstractStream::Traits{.blockSize = streamDataSpan.dataSize,
+                                                               .format    = audio::AudioFormat(8000, 16, 1)}));
 
     auto transcodingProxy = ::audio::transcode::InputTranscodeProxy(mockStream, decimatorTransform);
 
@@ -168,7 +170,9 @@ TEST(Transcode, PeekBloating)
     auto interpolatorTransform = std::make_shared<::audio::transcode::BasicInterpolator<std::uint16_t, 1, 2>>();
     auto mockStream            = std::make_shared<MockStream>();
 
-    EXPECT_CALL(*mockStream, getInputTraits);
+    EXPECT_CALL(*mockStream, getInputTraits)
+        .WillRepeatedly(Return(::audio::AbstractStream::Traits{.blockSize = streamDataSpan.dataSize,
+                                                               .format    = audio::AudioFormat(8000, 16, 1)}));
 
     auto transcodingProxy = ::audio::transcode::InputTranscodeProxy(mockStream, interpolatorTransform);
 

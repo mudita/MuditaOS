@@ -12,8 +12,8 @@ using audio::transcode::InputTranscodeProxy;
 InputTranscodeProxy::InputTranscodeProxy(std::shared_ptr<AbstractStream> wrappedStream,
                                          std::shared_ptr<Transform> transform) noexcept
     : StreamProxy(wrappedStream), transform(transform),
-      transcodingSpaceSize(transform->getTransformSize(wrappedStream->getInputTraits().blockSize)),
-      transcodingSpace(std::make_shared<std::uint8_t[]>(transcodingSpaceSize)), transcodingSpaceSpan{
+      transcodingSpaceSize(transform->transformBlockSizeInversed(wrappedStream->getInputTraits().blockSize)),
+      transcodingSpace(std::make_unique<std::uint8_t[]>(transcodingSpaceSize)), transcodingSpaceSpan{
                                                                                     .data     = transcodingSpace.get(),
                                                                                     .dataSize = transcodingSpaceSize}
 {}
@@ -25,7 +25,7 @@ bool InputTranscodeProxy::push(const Span &span)
 
 void InputTranscodeProxy::commit()
 {
-    transform->transform(peekedSpan, transcodingSpaceSpan);
+    transform->transform(transcodingSpaceSpan, peekedSpan);
     getWrappedStream().commit();
     peekedSpan.reset();
 }
@@ -34,10 +34,8 @@ bool InputTranscodeProxy::peek(Span &span)
 {
     auto result = getWrappedStream().peek(span);
 
-    if (result) {
-        span.dataSize = transform->transformBlockSizeInversed(span.dataSize);
-        peekedSpan    = span;
-    }
+    peekedSpan = span;
+    span       = transcodingSpaceSpan;
 
     return result;
 }

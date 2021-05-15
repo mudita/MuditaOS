@@ -23,10 +23,10 @@ namespace audio::transcode
          * @brief Transforms data within range
          *
          * @param inputSpan - input data to transform
-         * @param transformSpace - overall space available to the transform
-         * @return Output data (contained within )
+         * @param outputSpan - space for transformation output
+         * @return Output data
          */
-        virtual auto transform(const Span &inputSpan, const Span &transformSpace) const -> Span = 0;
+        virtual auto transform(const Span &inputSpan, const Span &outputSpan) const -> Span = 0;
 
         /**
          * @brief Checks if audio format is suitable for transformation.
