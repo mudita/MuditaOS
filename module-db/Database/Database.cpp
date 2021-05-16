@@ -16,6 +16,11 @@
 /* Declarations *********************/
 extern sqlite3_vfs *sqlite3_ecophonevfs(void);
 
+[[nodiscard]] static bool isNotPragmaRelated(const char *msg)
+{
+    return nullptr == strstr(msg, "PRAGMA");
+}
+
 extern "C"
 {
     int sqlite3_os_init(void)
@@ -60,7 +65,9 @@ extern "C"
     /* Internal Defines ***********************/
     void errorLogCallback(void *pArg, int iErrCode, const char *zMsg)
     {
-        LOG_ERROR("(%d) %s\n", iErrCode, zMsg);
+        if (isNotPragmaRelated(zMsg)) {
+            LOG_ERROR("(%d) %s\n", iErrCode, zMsg);
+        }
     }
 }
 
@@ -157,7 +164,9 @@ std::unique_ptr<QueryResult> Database::query(const char *format, ...)
     auto queryResult = std::make_unique<QueryResult>();
     if (const int result = sqlite3_exec(dbConnection, queryStatementBuffer, queryCallback, queryResult.get(), nullptr);
         result != SQLITE_OK) {
-        LOG_ERROR("SQL query \'%s\' failed selecting : %d", queryStatementBuffer, result);
+        if (isNotPragmaRelated(queryStatementBuffer)) {
+            LOG_ERROR("SQL query \'%s\' failed selecting : %d", queryStatementBuffer, result);
+        }
         return nullptr;
     }
     return queryResult;
