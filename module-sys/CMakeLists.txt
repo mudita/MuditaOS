@@ -51,14 +51,17 @@ target_include_directories(bus PRIVATE ${BOARD_DIR_INCLUDES})
 target_include_directories(bus PRIVATE ${PROJECT_INCLUDES})
 target_link_options(bus PRIVATE ${TARGET_LINK_OPTIONS})
 
-add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
+add_library(module-sys STATIC)
+target_sources(module-sys PRIVATE ${SOURCES} ${BOARD_SOURCES})
 
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(module-sys
     PRIVATE
         bus
         service-evtmgr
+        messagetype
     PUBLIC
-        module-os)
+        module-os
+    )
 
 # Board specific compilation definitions,options,include directories and features
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
