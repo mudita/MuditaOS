@@ -192,6 +192,8 @@ add_subdirectory(module-bluetooth)
 message("${PROJECT_NAME}: add_subdirectory module-lwip")
 add_subdirectory(module-lwip)
 
+add_subdirectory(third-party)
+
 add_subdirectory(image)
 
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES SUFFIX ".elf")
