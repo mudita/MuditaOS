@@ -87,8 +87,8 @@ void HSPAudioDevice::onDataSend(std::uint16_t scoHandle)
 
     LOG_DEBUG("CVSD SEND");
 
-    auto scoPacketLength  = hci_get_sco_packet_length();
-    auto scoPayloadLength = scoPacketLength - packetDataOffset;
+    // auto scoPacketLength  = hci_get_sco_packet_length();
+    // auto scoPayloadLength = scoPacketLength - packetDataOffset;
 
     hci_reserve_packet_buffer();
     auto scoPacket = hci_get_outgoing_packet_buffer();
@@ -99,15 +99,15 @@ void HSPAudioDevice::onDataSend(std::uint16_t scoHandle)
         LOG_ERROR("Sending empty block");
     }
 
-    assert(dataSpan.dataSize == scoPayloadLength);
+    assert(dataSpan.dataSize <= scoPayloadLength);
 
     // prepare packet to send
     std::copy(dataSpan.data, dataSpan.dataEnd(), &scoPacket[packetDataOffset]);
     little_endian_store_16(scoPacket, packetHandleOffset, scoHandle);
-    scoPacket[packetLengthOffset] = scoPayloadLength;
+    scoPacket[packetLengthOffset] = dataSpan.dataSize;
 
     // send packet
-    hci_send_sco_packet_buffer(scoPacketLength);
+    hci_send_sco_packet_buffer(dataSpan.dataSize + packetDataOffset);
     hci_request_sco_can_send_now_event();
 }
 
@@ -185,7 +185,7 @@ auto A2DPAudioDevice::getTraits() const -> ::audio::Endpoint::Traits
 
 auto HSPAudioDevice::getTraits() const -> ::audio::Endpoint::Traits
 {
-    return Traits{.usesDMA = false, .blockSizeConstraint = 60U};
+    return Traits{.usesDMA = false, .blockSizeConstraint = 32U};
 }
 
 auto A2DPAudioDevice::getSourceFormat() -> ::audio::AudioFormat
