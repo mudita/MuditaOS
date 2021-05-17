@@ -30,6 +30,12 @@ namespace sys
         void sendMulticast(std::shared_ptr<Message> message, BusChannel channel);
         void sendBroadcast(std::shared_ptr<Message> message);
 
+        template <typename Msg, typename... Params> bool sendUnicast(Params &&... params)
+        {
+            auto msg = std::make_shared<Msg>(std::forward<Params>(params)...);
+            return sendUnicast(msg, Msg::target);
+        }
+
         std::vector<BusChannel> channels;
 
       private:
