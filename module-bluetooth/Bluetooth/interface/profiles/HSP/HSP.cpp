@@ -143,7 +143,7 @@ namespace bluetooth
     {
         switch (hci_event_packet_get_type(event)) {
         case HCI_EVENT_SCO_CAN_SEND_NOW:
-            audioDevice->onDataSend();
+            audioDevice->onDataSend(scoHandle);
             break;
         case HCI_EVENT_HSP_META:
             processHSPEvent(event);
@@ -325,6 +325,5 @@ namespace bluetooth
     void HSP::HSPImpl::setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice)
     {
         HSP::HSPImpl::audioDevice = std::static_pointer_cast<HSPAudioDevice>(audioDevice);
-        HSP::HSPImpl::audioDevice->setSCOHandle(scoHandle);
     }
 } // namespace bluetooth

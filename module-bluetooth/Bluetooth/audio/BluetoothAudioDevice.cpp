@@ -73,6 +73,9 @@ void A2DPAudioDevice::onDataReceive()
 {}
 
 void HSPAudioDevice::onDataSend()
+{}
+
+void HSPAudioDevice::onDataSend(std::uint16_t scoHandle)
 {
     static constexpr auto packetHandleOffset = 0;
     static constexpr auto packetLengthOffset = 2;
@@ -193,9 +196,4 @@ auto HSPAudioDevice::getSourceFormat() -> ::audio::AudioFormat
     constexpr static auto supportedBitWidth = 16U;
     constexpr static auto supportedChannels = 1;
     return AudioFormat{bluetooth::SCO::CVSD_SAMPLE_RATE, supportedBitWidth, supportedChannels};
-}
-
-void HSPAudioDevice::setSCOHandle(std::uint16_t handle)
-{
-    scoHandle = handle;
 }

@@ -60,15 +60,11 @@ namespace bluetooth
         {}
 
         void onDataSend() override;
+        void onDataSend(std::uint16_t scoHandle);
         void onDataReceive() override;
         auto getSupportedFormats() -> std::vector<audio::AudioFormat> override;
         auto getTraits() const -> Traits override;
         auto getSourceFormat() -> ::audio::AudioFormat override;
-
-        void setSCOHandle(std::uint16_t handle);
-
-      private:
-        std::uint16_t scoHandle = HCI_CON_HANDLE_INVALID;
     };
 
 } // namespace bluetooth
