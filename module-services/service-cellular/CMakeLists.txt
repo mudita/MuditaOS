@@ -2,6 +2,10 @@ project(service-cellular)
 message( "${PROJECT_NAME}  ${CMAKE_CURRENT_LIST_DIR}" )
 
 set(SOURCES
+    src/ServiceCellularPriv.cpp
+    src/state.cpp
+    src/SimCard.cpp
+
     CellularCall.cpp
     CellularServiceAPI.cpp
     CellularUrcHandler.cpp
@@ -37,6 +41,9 @@ add_library(${PROJECT_NAME} STATIC ${SOURCES})
 target_include_directories(${PROJECT_NAME}
     PUBLIC
         ${CMAKE_CURRENT_LIST_DIR}
+        ${CMAKE_CURRENT_LIST_DIR}/include
+    PRIVATE
+        ${CMAKE_CURRENT_LIST_DIR}/src
 )
 
 target_link_libraries(${PROJECT_NAME}
