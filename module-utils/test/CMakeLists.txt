@@ -64,7 +64,7 @@ add_catch2_executable(
         module-utils
         iosyscalls
     DEPS
-        disk_image
+        PurePhone-disk-img
 )
 
 # utils tests
@@ -77,7 +77,7 @@ add_catch2_executable(
         module-utils
         iosyscalls
     DEPS
-        disk_image
+        PurePhone-disk-img
 )
 
 # Math tests

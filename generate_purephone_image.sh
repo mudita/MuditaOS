@@ -4,13 +4,14 @@
 
 usage() {
 cat << ==usage
-Usage: $(basename $0) [image_path] [build_dir]
-	image_path Destination image path name for. ex PurePhone.img
-	build_dir  PurePhone build dir for ex. build-rt1051-RelWithDebInfo
+Usage: $(basename $0) [image_path] [build_dir] [boot.bin_file]
+    image_path    - Destination image path name for. ex PurePhone.img
+    build_dir     - PurePhone build dir for ex. build-rt1051-RelWithDebInfo
+    boot.bin_file - name of the boot.bin file (for diferrent targets)
 ==usage
 }
 
-if [ $# -ne 2 ]; then
+if [ $# -ne 3 ]; then
 	echo "Error! Invalid argument count"
 	usage
 	exit -1
@@ -18,6 +19,8 @@ fi
 
 IMAGE_NAME=$(realpath $1)
 BUILDDIR=$(realpath $2)
+BIN_FILE="$3"
+BIN_FILE_PATH="current/${BIN_FILE}"
 
 if [ ! -d "$BUILDDIR" ]; then
 	echo "Error! \${build_dir} (${BUILDDIR}) is not a directory"
@@ -106,8 +109,8 @@ for i in $CURRENT_DATA; do
 	fi
 done
 
-if [ -f "current/boot.bin" ]; then
-	mcopy -s -i "$PART1" "current/boot.bin" ::/current/
+if [ -f "${BIN_FILE_PATH}" ]; then
+    mcopy -s -i "$PART1" ${BIN_FILE_PATH} ::/current/boot.bin
 else
 	echo "Warning! Missing boot.bin"
 	echo "(it's fine for a Linux build)"

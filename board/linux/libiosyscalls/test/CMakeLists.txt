@@ -9,5 +9,5 @@ add_catch2_executable(
     LIBS
         module-vfs iosyscalls
     DEPS
-        disk_image
+        PurePhone-disk-img
 )
