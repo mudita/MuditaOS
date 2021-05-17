@@ -37,6 +37,7 @@ namespace audio::transcode
         std::size_t transcodingSpaceSize;
         std::unique_ptr<std::uint8_t[]> transcodingSpace;
         Span transcodingSpaceSpan;
+        bool peeked = false;
     };
 
 }; // namespace audio::transcode

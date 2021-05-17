@@ -25,9 +25,12 @@ bool InputTranscodeProxy::push(const Span &span)
 
 void InputTranscodeProxy::commit()
 {
-    transform->transform(transcodingSpaceSpan, peekedSpan);
-    getWrappedStream().commit();
-    peekedSpan.reset();
+    if (peeked) {
+        transform->transform(transcodingSpaceSpan, peekedSpan);
+        getWrappedStream().commit();
+        peekedSpan.reset();
+        peeked = false;
+    }
 }
 
 bool InputTranscodeProxy::peek(Span &span)
@@ -36,6 +39,7 @@ bool InputTranscodeProxy::peek(Span &span)
 
     peekedSpan = span;
     span       = transcodingSpaceSpan;
+    peeked     = true;
 
     return result;
 }
