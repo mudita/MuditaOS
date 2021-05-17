@@ -7,7 +7,11 @@
 #include <unordered_map>
 
 #include "service-cellular/PacketDataTypes.hpp"
-#include "service-cellular/ServiceCellular.hpp"
+
+#include <at/Result.hpp>
+
+class ServiceCellular;
+class DLCChannel;
 
 namespace at
 {

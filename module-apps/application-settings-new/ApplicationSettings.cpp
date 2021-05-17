@@ -58,6 +58,7 @@
 
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
+#include <service-cellular-api>
 #include <service-bluetooth/BluetoothMessage.hpp>
 #include <service-bluetooth/Constants.hpp>
 #include <service-bluetooth/messages/Status.hpp>
@@ -121,13 +122,6 @@ namespace app
         }
 
         if (auto phoneMsg = dynamic_cast<CellularNotificationMessage *>(msgl); nullptr != phoneMsg) {
-            selectedSim = Store::GSM::get()->selected;
-            if (CellularNotificationMessage::Content::SIM_READY == phoneMsg->content) {
-                CellularServiceAPI::RequestForOwnNumber(this);
-            }
-            else if (CellularNotificationMessage::Content::SIM_NOT_READY == phoneMsg->content) {
-                selectedSimNumber = {};
-            }
             auto currentWindow = getCurrentWindow();
             if (gui::window::name::network == currentWindow->getName()) {
                 updateWindow(gui::window::name::network, nullptr);
@@ -153,6 +147,21 @@ namespace app
         if (ret != sys::ReturnCodes::Success) {
             return ret;
         }
+        connect(typeid(cellular::msg::notification::SimReady), [&](sys::Message *msg) {
+            auto simReadyMsg = static_cast<cellular::msg::notification::SimReady *>(msg);
+            selectedSim      = Store::GSM::get()->selected;
+            if (simReadyMsg->ready) {
+                CellularServiceAPI::RequestForOwnNumber(this);
+            }
+            else {
+                selectedSimNumber = {};
+            }
+            auto currentWindow = getCurrentWindow();
+            if (gui::window::name::network == currentWindow->getName()) {
+                updateWindow(gui::window::name::network, nullptr);
+            }
+            return sys::MessageNone{};
+        });
 
         connect(typeid(::message::bluetooth::ResponseStatus), [&](sys::Message *msg) {
             auto responseStatusMsg = static_cast<::message::bluetooth::ResponseStatus *>(msg);
@@ -271,13 +280,11 @@ namespace app
             return sys::MessageNone{};
         });
 
-        connect(typeid(CellularSimCardPinLockStateResponseDataMessage), [&](sys::Message *msg) {
-            auto simCardPinLockState = dynamic_cast<CellularSimCardPinLockStateResponseDataMessage *>(msg);
-            if (simCardPinLockState != nullptr) {
-                auto pinSettingsLockStateData =
-                    std::make_unique<gui::PINSettingsLockStateData>(simCardPinLockState->getSimCardPinLockState());
-                updateWindow(gui::window::name::pin_settings, std::move(pinSettingsLockStateData));
-            }
+        connect(typeid(cellular::msg::request::sim::GetLockState::Response), [&](sys::Message *msg) {
+            auto simCardPinLockState = static_cast<cellular::msg::request::sim::GetLockState::Response *>(msg);
+            auto pinSettingsLockStateData =
+                std::make_unique<gui::PINSettingsLockStateData>(simCardPinLockState->locked);
+            updateWindow(gui::window::name::pin_settings, std::move(pinSettingsLockStateData));
             return sys::MessageNone{};
         });
 
@@ -509,7 +516,8 @@ namespace app
 
     void ApplicationSettingsNew::setSim(Store::GSM::SIM sim)
     {
-        CellularServiceAPI::SetSimCard(this, sim);
+        auto arg = (sim == Store::GSM::SIM::SIM2) ? cellular::api::SimSlot::SIM2 : cellular::api::SimSlot::SIM1;
+        bus.sendUnicast<cellular::msg::request::sim::SetActiveSim>(arg);
     }
 
     Store::GSM::SIM ApplicationSettingsNew::getSim()

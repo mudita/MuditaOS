@@ -29,8 +29,7 @@ bool CellularServiceAPI::DialNumber(sys::Service *serv, const utils::PhoneNumber
 
 bool CellularServiceAPI::DialEmergencyNumber(sys::Service *serv, const utils::PhoneNumber &number)
 {
-    auto msg = std::make_shared<CellularCallRequestMessage>(number.getView(),
-                                                            CellularCallRequestMessage::RequestMode::Emergency);
+    auto msg = std::make_shared<CellularCallRequestMessage>(number.getView(), cellular::api::CallMode::Emergency);
     return serv->bus.sendUnicast(msg, ServiceCellular::serviceName);
 }
 
@@ -264,35 +263,6 @@ bool CellularServiceAPI::USSDRequest(sys::Service *serv, CellularUSSDMessage::Re
     ;
 }
 
-bool CellularServiceAPI::ChangeSimPin(sys::Service *serv,
-                                      Store::GSM::SIM sim,
-                                      const std::vector<unsigned int> &passcode,
-                                      const std::vector<unsigned int> &pin)
-{
-    return serv->bus.sendUnicast(std::make_shared<CellularSimPukDataMessage>(sim, passcode, pin),
-                                 ServiceCellular::serviceName);
-}
-
-bool CellularServiceAPI::RequestSimCardPinLockState(sys::Service *serv)
-{
-    return serv->bus.sendUnicast(std::make_shared<CellularSimCardPinLockStateRequestDataMessage>(),
-                                 ServiceCellular::serviceName);
-}
-
-bool CellularServiceAPI::SetSimCardLock(sys::Service *serv,
-                                        Store::GSM::SIM sim,
-                                        CellularSimCardLockDataMessage::SimCardLock lock,
-                                        const std::vector<unsigned int> &pin)
-{
-    return serv->bus.sendUnicast(std::make_shared<CellularSimCardLockDataMessage>(sim, lock, pin),
-                                 ServiceCellular::serviceName);
-}
-
-bool CellularServiceAPI::SetSimCard(sys::Service *serv, Store::GSM::SIM sim)
-{
-    return serv->bus.sendUnicast(std::make_shared<CellularChangeSimDataMessage>(sim), ServiceCellular::serviceName);
-}
-
 bool CellularServiceAPI::GetAPN(sys::Service *serv)
 {
     return serv->bus.sendUnicast(std::make_shared<CellularGetAPNMessage>(), ServiceCellular::serviceName);
@@ -342,7 +312,7 @@ bool CellularServiceAPI::SetVoLTE(sys::Service *serv, bool voLTE)
     return serv->bus.sendUnicast(std::make_shared<CellularChangeVoLTEDataMessage>(voLTE), ServiceCellular::serviceName);
 }
 
-bool CellularServiceAPI::ChangeModulePowerState(sys::Service *serv, cellular::State::PowerState newState)
+bool CellularServiceAPI::ChangeModulePowerState(sys::Service *serv, cellular::service::State::PowerState newState)
 {
     return serv->bus.sendUnicast(std::make_shared<CellularPowerStateChange>(newState), ServiceCellular::serviceName);
 }

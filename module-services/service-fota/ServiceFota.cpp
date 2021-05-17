@@ -105,8 +105,8 @@ namespace FotaService
     sys::MessagePointer Service::handleServiceCellularNotifications(sys::Message *req)
     {
         if (auto msg = dynamic_cast<cellular::StateChange *>(req)) {
-            LOG_DEBUG("cellular::StageChange: %s", cellular::State::c_str(msg->request));
-            if (msg->request == cellular::State::ST::Ready) {
+            LOG_DEBUG("cellular::StageChange: %s", cellular::service::State::c_str(msg->request));
+            if (msg->request == cellular::service::State::ST::Ready) {
                 LOG_DEBUG("Modem is \"Ready\"");
                 if (dataChannel == nullptr) {
                     LOG_DEBUG("Requesting channel");

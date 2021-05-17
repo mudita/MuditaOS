@@ -4,7 +4,8 @@
 #pragma once
 
 #include "Result.hpp"
-#include "service-cellular/ServiceCellular.hpp"
+
+class DLCChannel;
 
 namespace nv_paths
 {

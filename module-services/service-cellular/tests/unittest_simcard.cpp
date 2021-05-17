@@ -43,7 +43,7 @@ namespace at
 
 TEST_CASE("SimCard functionality test")
 {
-    SECTION("pinToString from vector")
+    SECTION("simCodeToString()")
     {
         cellular::api::SimCode v{1, 2, 3, 4};
         cellular::api::SimCode empty;

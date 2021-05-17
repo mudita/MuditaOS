@@ -4,9 +4,8 @@
 #pragma once
 
 #include "SignalStrength.hpp"
-#include "State.hpp"
+#include <service-cellular/State.hpp>
 
-#include <MessageType.hpp>
 #include <modem/mux/CellularMux.h>
 #include <PhoneNumber.hpp>
 #include <Service/Message.hpp>
@@ -23,6 +22,8 @@
 #include <service-appmgr/service-appmgr/Actions.hpp>
 #include <service-appmgr/service-appmgr/data/SimActionsParams.hpp>
 #include <service-appmgr/service-appmgr/data/MmiActionsParams.hpp>
+
+#include <service-cellular/api/common.hpp>
 
 class CellularMessage : public sys::DataMessage
 {
@@ -41,9 +42,8 @@ class CellularMessage : public sys::DataMessage
         PowerStateChange, ///< Change power state of the module
 
         ListCurrentCalls,
-        SimProcedure,        // Broadcast on sim state changed
-        SimResponse,         // Send to PIN window (show, error state, hide)
-        SimVerifyPinRequest, // Send from PIN window with PIN, PUK, ... number
+        SimProcedure, // Broadcast on sim state changed
+        SimResponse,  // Send to PIN window (show, error state, hide)
         SetVoLTE,
         SetFlightMode,
 
@@ -139,8 +139,6 @@ class CellularNotificationMessage : public CellularMessage
         NetworkStatusUpdate,      // update of the status of the network
         PowerUpProcedureComplete, // modem without cmux on initialization complete (cold start || reset modem -> and
         // cold start)
-        SIM_READY,              // change on SIM from URC
-        SIM_NOT_READY,          // change to not existing/not valid SIM
         PowerDownDeregistering, // modem informed it has started to disconnect from network
         PowerDownDeregistered,  // modem informed it has disconnected from network
         SMSDone,                // SMS initialization finished
@@ -217,17 +215,17 @@ class CellularSetOperatorMessage : public sys::DataMessage
 class CellularPowerStateChange : public CellularMessage
 {
   public:
-    explicit CellularPowerStateChange(cellular::State::PowerState new_state)
+    explicit CellularPowerStateChange(cellular::service::State::PowerState new_state)
         : CellularMessage(Type::PowerStateChange), newState(new_state)
     {}
 
-    cellular::State::PowerState getNewState() const noexcept
+    cellular::service::State::PowerState getNewState() const noexcept
     {
         return newState;
     }
 
   private:
-    cellular::State::PowerState newState;
+    cellular::service::State::PowerState newState;
 };
 
 class CellularStartOperatorsScanMessage : public CellularMessage
@@ -242,28 +240,6 @@ class CellularStartOperatorsScanMessage : public CellularMessage
     bool getFullInfo() const noexcept
     {
         return fullInfo;
-    }
-};
-
-class CellularSimStateMessage : public CellularMessage
-{
-  private:
-    at::SimState state;
-    std::string message;
-
-  public:
-    explicit CellularSimStateMessage(at::SimState state, std::string message)
-        : CellularMessage(Type::SimState), state(state), message(std::move(message))
-    {}
-
-    at::SimState getState() const noexcept
-    {
-        return state;
-    }
-
-    std::string getMessage() const
-    {
-        return message;
     }
 };
 
@@ -354,17 +330,12 @@ class CellularAntennaRequestMessage : public CellularMessage
 class CellularCallRequestMessage : public CellularMessage
 {
   public:
-    enum class RequestMode
-    {
-        Normal,
-        Emergency
-    };
-
-    CellularCallRequestMessage(const utils::PhoneNumber::View &number, RequestMode requestMode = RequestMode::Normal)
-        : CellularMessage(Type::CallRequest), number(number), requestMode(requestMode)
+    CellularCallRequestMessage(const utils::PhoneNumber::View &number,
+                               cellular::api::CallMode callMode = cellular::api::CallMode::Regular)
+        : CellularMessage(Type::CallRequest), number(number), callMode(callMode)
     {}
     utils::PhoneNumber::View number;
-    RequestMode requestMode = RequestMode::Normal;
+    cellular::api::CallMode callMode = cellular::api::CallMode::Regular;
 };
 
 class CellularSmsNoSimRequestMessage : public CellularMessage, public app::manager::actions::ConvertibleToAction
@@ -378,267 +349,6 @@ class CellularSmsNoSimRequestMessage : public CellularMessage, public app::manag
         return std::make_unique<app::manager::ActionRequest>(
             sender, app::manager::actions::SmsRejectNoSim, std::make_unique<app::manager::actions::ActionParams>());
     }
-};
-
-class CellularSimMessage : public CellularMessage
-{
-  public:
-    CellularSimMessage(Type type, Store::GSM::SIM sim) : CellularMessage(type), sim(sim)
-    {}
-    virtual ~CellularSimMessage() = default;
-    Store::GSM::SIM getSimCard() const noexcept
-    {
-        return sim;
-    }
-
-  private:
-    Store::GSM::SIM sim                         = defaultSimCard;
-    static const Store::GSM::SIM defaultSimCard = Store::GSM::SIM::SIM1;
-};
-
-/// Message use only for mockup GUI purposes
-class CellularSimVerifyPinRequestMessage : public CellularSimMessage
-{
-  public:
-    CellularSimVerifyPinRequestMessage(Store::GSM::SIM sim, std::vector<unsigned int> pinValue)
-        : CellularSimMessage(Type::SimVerifyPinRequest, sim), pinValue(std::move(pinValue))
-    {}
-    CellularSimVerifyPinRequestMessage(Store::GSM::SIM sim,
-                                       std::vector<unsigned int> pinValue,
-                                       std::vector<unsigned int> pukValue)
-        : CellularSimMessage(Type::SimVerifyPinRequest, sim), pinValue(std::move(pinValue)),
-          pukValue(std::move(pukValue))
-    {}
-
-    std::vector<unsigned int> getPinValue() const
-    {
-        return pinValue;
-    }
-    std::vector<unsigned int> getPukValue() const
-    {
-        return pukValue;
-    }
-
-  private:
-    std::vector<unsigned int> pinValue;
-    std::vector<unsigned int> pukValue;
-};
-
-class CellularSimPasscodeRequest : public CellularMessage
-{
-  protected:
-    app::manager::actions::PasscodeParams params;
-
-    CellularSimPasscodeRequest(Store::GSM::SIM _sim, unsigned int _attempts, std::string _passcodeName)
-        : CellularMessage(Type::SimResponse), params(_sim, _attempts, std::move(_passcodeName))
-    {}
-};
-
-class CellularSimRequestPinMessage : public CellularSimPasscodeRequest,
-                                     public app::manager::actions::ConvertibleToAction
-{
-  public:
-    CellularSimRequestPinMessage(Store::GSM::SIM _sim, unsigned int _attempts, std::string _passcodeName)
-        : CellularSimPasscodeRequest(_sim, _attempts, std::move(_passcodeName))
-    {}
-
-    [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
-    {
-        return std::make_unique<app::manager::ActionRequest>(
-            sender, app::manager::actions::RequestPin, std::make_unique<app::manager::actions::PasscodeParams>(params));
-    }
-};
-
-class CellularSimRequestPukMessage : public CellularSimPasscodeRequest,
-                                     public app::manager::actions::ConvertibleToAction
-{
-  public:
-    CellularSimRequestPukMessage(Store::GSM::SIM _sim, unsigned int _attempts, std::string _passcodeName)
-        : CellularSimPasscodeRequest(_sim, _attempts, std::move(_passcodeName))
-    {}
-
-    [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
-    {
-        return std::make_unique<app::manager::ActionRequest>(
-            sender, app::manager::actions::RequestPuk, std::make_unique<app::manager::actions::PasscodeParams>(params));
-    }
-};
-
-class CellularUnlockSimMessage : public CellularMessage, public app::manager::actions::ConvertibleToAction
-{
-    app::manager::actions::SimStateParams params;
-
-  public:
-    CellularUnlockSimMessage(Store::GSM::SIM _sim) : CellularMessage(Type::SimResponse), params(_sim)
-    {}
-
-    [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
-    {
-        return std::make_unique<app::manager::ActionRequest>(
-            sender, app::manager::actions::UnlockSim, std::make_unique<app::manager::actions::SimStateParams>(params));
-    }
-};
-
-class CellularBlockSimMessage : public CellularMessage, public app::manager::actions::ConvertibleToAction
-{
-    app::manager::actions::SimStateParams params;
-
-  public:
-    explicit CellularBlockSimMessage(Store::GSM::SIM _sim) : CellularMessage(Type::SimResponse), params(_sim)
-    {}
-
-    [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
-    {
-        return std::make_unique<app::manager::ActionRequest>(
-            sender, app::manager::actions::BlockSim, std::make_unique<app::manager::actions::SimStateParams>(params));
-    }
-};
-
-class CellularDisplayCMEMessage : public CellularMessage, public app::manager::actions::ConvertibleToAction
-{
-    app::manager::actions::UnhandledCMEParams params;
-
-  public:
-    CellularDisplayCMEMessage(Store::GSM::SIM _sim, unsigned int _cmeCode)
-        : CellularMessage(Type::SimResponse), params(_sim, _cmeCode)
-    {}
-
-    [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
-    {
-        return std::make_unique<app::manager::ActionRequest>(
-            sender,
-            app::manager::actions::DisplayCMEError,
-            std::make_unique<app::manager::actions::UnhandledCMEParams>(params));
-    }
-};
-
-class CellularSimDataMessage : public CellularMessage
-{
-    Store::GSM::SIM sim = Store::GSM::SIM::NONE;
-
-  public:
-    explicit CellularSimDataMessage(Store::GSM::SIM _sim) : CellularMessage{Type::SimResponse}, sim{_sim}
-    {}
-    [[nodiscard]] Store::GSM::SIM getSim() const noexcept
-    {
-        return sim;
-    }
-};
-
-class CellularChangeSimDataMessage : public CellularSimDataMessage
-{
-  public:
-    CellularChangeSimDataMessage(Store::GSM::SIM _sim) : CellularSimDataMessage{_sim}
-    {}
-};
-
-class CellularSimPinDataMessage : public CellularSimDataMessage
-{
-    std::vector<unsigned int> pinValue;
-
-  public:
-    CellularSimPinDataMessage(Store::GSM::SIM _sim, std::vector<unsigned int> _pinValue)
-        : CellularSimDataMessage{_sim}, pinValue{std::move(_pinValue)}
-    {}
-
-    [[nodiscard]] const std::vector<unsigned int> &getPin() const noexcept
-    {
-        return pinValue;
-    }
-};
-
-class CellularSimNewPinDataMessage : public CellularSimDataMessage
-{
-    std::vector<unsigned int> oldPin;
-    std::vector<unsigned int> newPin;
-
-  public:
-    CellularSimNewPinDataMessage(Store::GSM::SIM _sim,
-                                 std::vector<unsigned int> _oldPin,
-                                 std::vector<unsigned int> _newPin)
-        : CellularSimDataMessage{_sim}, oldPin{std::move(_oldPin)}, newPin{std::move(_newPin)}
-    {}
-
-    [[nodiscard]] const std::vector<unsigned int> &getOldPin() const noexcept
-    {
-        return oldPin;
-    }
-    [[nodiscard]] const std::vector<unsigned int> &getNewPin() const noexcept
-    {
-        return newPin;
-    }
-};
-
-class CellularSimCardPinLockStateRequestDataMessage : public sys::DataMessage
-{};
-
-class CellularSimCardPinLockStateResponseDataMessage : public sys::DataMessage
-{
-  public:
-    explicit CellularSimCardPinLockStateResponseDataMessage(bool state) : simCardPinLockState(state)
-    {}
-
-    [[nodiscard]] bool getSimCardPinLockState() const noexcept
-    {
-        return simCardPinLockState;
-    }
-
-  private:
-    const bool simCardPinLockState;
-};
-
-class CellularSimCardLockDataMessage : public CellularSimDataMessage
-{
-
-  public:
-    enum class SimCardLock
-    {
-        Locked,
-        Unlocked
-    };
-    CellularSimCardLockDataMessage(Store::GSM::SIM _sim, SimCardLock _simCardLock, std::vector<unsigned int> _pin)
-        : CellularSimDataMessage{_sim}, simCardLock{_simCardLock}, pin{std::move(_pin)}
-    {}
-
-    [[nodiscard]] SimCardLock getLock() const noexcept
-    {
-        return simCardLock;
-    }
-    [[nodiscard]] const std::vector<unsigned int> &getPin() const noexcept
-    {
-        return pin;
-    }
-
-  private:
-    SimCardLock simCardLock;
-    std::vector<unsigned int> pin;
-};
-
-class CellularSimPukDataMessage : public CellularSimDataMessage
-{
-    std::vector<unsigned int> puk;
-    std::vector<unsigned int> newPin;
-
-  public:
-    CellularSimPukDataMessage(Store::GSM::SIM _sim, std::vector<unsigned int> _puk, std::vector<unsigned int> _newPin)
-        : CellularSimDataMessage{_sim}, puk{std::move(_puk)}, newPin{std::move(_newPin)}
-    {}
-
-    [[nodiscard]] const std::vector<unsigned int> &getPuk() const noexcept
-    {
-        return puk;
-    }
-    [[nodiscard]] const std::vector<unsigned int> &getNewPin() const noexcept
-    {
-        return newPin;
-    }
-};
-
-class CellularSimAbortMessage : public CellularSimDataMessage
-{
-  public:
-    explicit CellularSimAbortMessage(Store::GSM::SIM _sim) : CellularSimDataMessage{_sim}
-    {}
 };
 
 class CellularGetChannelMessage : public CellularMessage
@@ -675,35 +385,6 @@ class CellularResponseMessage : public sys::ResponseMessage
     bool retCode;
     std::string data;
     CellularMessage::Type cellResponse;
-};
-
-class CellularSimNewPinResponseMessage : public CellularResponseMessage
-{
-  public:
-    explicit CellularSimNewPinResponseMessage(bool retCode) : CellularResponseMessage(retCode)
-    {}
-};
-
-class CellularSimPukResponseMessage : public CellularResponseMessage
-{
-  public:
-    explicit CellularSimPukResponseMessage(bool retCode) : CellularResponseMessage(retCode)
-    {}
-};
-
-class CellularSimCardLockResponseMessage : public CellularResponseMessage
-{
-    CellularSimCardLockDataMessage::SimCardLock cardLock;
-
-  public:
-    CellularSimCardLockResponseMessage(bool retCode, CellularSimCardLockDataMessage::SimCardLock cardLock)
-        : CellularResponseMessage(retCode), cardLock(cardLock)
-    {}
-
-    [[nodiscard]] auto getSimCardLock() const noexcept -> CellularSimCardLockDataMessage::SimCardLock
-    {
-        return cardLock;
-    }
 };
 
 class CellularGetOwnNumberResponseMessage : public CellularResponseMessage
@@ -1040,14 +721,6 @@ class CellularNewIncomingSMSNotification : public CellularNotificationMessage
     {}
 };
 
-class CellularSimReadyNotification : public CellularNotificationMessage
-{
-  public:
-    explicit CellularSimReadyNotification(const std::string &data = "")
-        : CellularNotificationMessage(CellularNotificationMessage::Content::SIM_READY, data)
-    {}
-};
-
 class CellularSmsDoneNotification : public CellularNotificationMessage
 {
   public:
@@ -1069,14 +742,6 @@ class CellularNetworkStatusUpdateNotification : public CellularNotificationMessa
   public:
     explicit CellularNetworkStatusUpdateNotification(const std::string &data = "")
         : CellularNotificationMessage(CellularNotificationMessage::Content::NetworkStatusUpdate, data)
-    {}
-};
-
-class CellularSimNotReadyNotification : public CellularNotificationMessage
-{
-  public:
-    explicit CellularSimNotReadyNotification(const std::string &data = "")
-        : CellularNotificationMessage(CellularNotificationMessage::Content::SIM_NOT_READY, data)
     {}
 };
 
@@ -1190,8 +855,9 @@ namespace cellular
     class StateChange : public CellularMessage
     {
       public:
-        const State::ST request;
-        StateChange(const State::ST request = State::ST::Failed) : CellularMessage(Type::StateRequest), request(request)
+        const service::State::ST request;
+        StateChange(const service::State::ST request = service::State::ST::Failed)
+            : CellularMessage(Type::StateRequest), request(request)
         {}
     };
 

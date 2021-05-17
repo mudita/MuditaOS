@@ -15,7 +15,11 @@ namespace cellular::msg::request::sim
         {}
         const api::SimSlot sim;
 
-        using Response = msg::Response;
+        struct Response : msg::Response
+        {
+            explicit Response(bool retCode) : msg::Response(retCode)
+            {}
+        };
     };
 
     /** Get current state of PIN lock
@@ -38,7 +42,11 @@ namespace cellular::msg::request::sim
         {}
         const api::SimCode pin;
 
-        using Response = msg::Response;
+        struct Response : msg::Response
+        {
+            explicit Response(bool retCode) : msg::Response(retCode)
+            {}
+        };
     };
 
     /** Change current PIN
@@ -50,7 +58,11 @@ namespace cellular::msg::request::sim
         const api::SimCode oldPin;
         const api::SimCode pin;
 
-        using Response = msg::Response;
+        struct Response : msg::Response
+        {
+            explicit Response(bool retCode) : msg::Response(retCode)
+            {}
+        };
     };
 
     /** Reset PIN using PUK
@@ -62,7 +74,11 @@ namespace cellular::msg::request::sim
         const api::SimCode puk;
         const api::SimCode pin;
 
-        using Response = msg::Response;
+        struct Response : msg::Response
+        {
+            explicit Response(bool retCode) : msg::Response(retCode)
+            {}
+        };
     };
 
     /** Enable or disable PIN lock on SIM

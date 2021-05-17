@@ -44,12 +44,12 @@ class CellularUrcHandler : public at::urc::UrcHandler
      * Gets the response that should be returned after handling Urc
      * @return
      */
-    std::optional<std::shared_ptr<CellularMessage>> getResponse()
+    std::optional<std::shared_ptr<sys::Message>> getResponse()
     {
         return std::move(response);
     };
 
   private:
     ServiceCellular &cellularService;
-    std::optional<std::unique_ptr<CellularMessage>> response;
+    std::optional<std::unique_ptr<sys::Message>> response;
 };

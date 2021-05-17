@@ -4,6 +4,7 @@
 #include "CellularUrcHandler.hpp"
 
 #include "service-cellular/CellularMessage.hpp"
+#include "messages.hpp"
 #include "service-cellular/CellularServiceAPI.hpp"
 
 #include <service-antenna/AntennaServiceAPI.hpp>
@@ -152,7 +153,7 @@ void CellularUrcHandler::Handle(Cpin &urc)
             LOG_INFO("Invalid cpin - ignore");
         }
         else {
-            response = std::make_unique<CellularSimStateMessage>(*state, *urc.getMessage());
+            response = std::make_unique<cellular::internal::msg::SimStateChanged>(*state);
             urc.setHandled(true);
         }
     }

@@ -5,6 +5,7 @@
 #include "Utils.hpp"
 #include "response.hpp"
 #include <at/ATFactory.hpp>
+#include <modem/mux/DLCChannel.h>
 
 namespace at
 {

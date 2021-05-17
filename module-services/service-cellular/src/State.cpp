@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <service-cellular/state.hpp>
+#include <service-cellular/State.hpp>
 #include <Service/Service.hpp>
 #include <service-cellular/CellularMessage.hpp>
 
@@ -68,7 +68,7 @@ namespace cellular::service
     {
         LOG_DEBUG("GSM state: (%s) -> (%s)", c_str(this->state), c_str(state));
         this->state = state;
-        auto msg    = std::make_shared<StateChange>(static_cast<cellular::State::ST>(state));
+        auto msg    = std::make_shared<StateChange>(state);
         owner->bus.sendMulticast(msg, sys::BusChannel::ServiceCellularNotifications);
     }
 
