@@ -58,6 +58,7 @@ target_link_libraries(${PROJECT_NAME}
         service-evtmgr
         module-utils
         module-cellular
+        crc32
 )
 
 if (${ENABLE_TESTS})

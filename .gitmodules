@@ -9,7 +9,7 @@
 	path = module-utils/segger
 	url = ../segger-utils.git
 [submodule "module-utils/crc32"]
-	path = module-utils/crc32
+	path = third-party/crc32/src
 	url = ../crc32
 [submodule "module-utils/re2"]
 	path = module-utils/re2

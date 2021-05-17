@@ -15,4 +15,10 @@ set( INCLUDES
 add_library( ${PROJECT_NAME} STATIC ${SOURCES} )
 
 target_include_directories( ${PROJECT_NAME} PUBLIC ${INCLUDES} )
-target_link_libraries( ${PROJECT_NAME} PRIVATE module-utils module-vfs)
+
+target_link_libraries( ${PROJECT_NAME}
+   PRIVATE
+      module-utils
+      module-vfs
+      crc32
+)
