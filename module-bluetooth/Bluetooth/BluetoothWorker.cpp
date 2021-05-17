@@ -38,7 +38,7 @@ namespace queues
 
 namespace
 {
-    constexpr auto BluetoothWorkerStackDepth = 3072U;
+    constexpr auto BluetoothWorkerStackDepth = 8192;
 
     class DeviceRegistration
     {
