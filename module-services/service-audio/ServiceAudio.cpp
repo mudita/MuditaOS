@@ -156,7 +156,7 @@ std::optional<std::string> ServiceAudio::AudioServicesCallback(const sys::Messag
                 std::static_pointer_cast<bluetooth::A2DPAudioDevice>(deviceMsg->getDevice()));
             bus.sendUnicast(std::move(startBluetoothAudioMsg), service::name::bluetooth);
         }
-        else if (deviceMsg->getDeviceType() == AudioDevice::Type::BluetoothA2DP) {
+        else if (deviceMsg->getDeviceType() == AudioDevice::Type::BluetoothHSP) {
             auto startBluetoothAudioMsg = std::make_shared<BluetoothAudioStartMessage>(
                 std::static_pointer_cast<bluetooth::HSPAudioDevice>(deviceMsg->getDevice()));
             bus.sendUnicast(std::move(startBluetoothAudioMsg), service::name::bluetooth);

@@ -143,7 +143,7 @@ namespace bluetooth
     {
         switch (hci_event_packet_get_type(event)) {
         case HCI_EVENT_SCO_CAN_SEND_NOW:
-            sco->send(scoHandle);
+            audioDevice->onDataSend();
             break;
         case HCI_EVENT_HSP_META:
             processHSPEvent(event);

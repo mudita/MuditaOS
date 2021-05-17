@@ -151,7 +151,7 @@ void SCO::SCOImpl::receiveCvsd(uint8_t *packet, uint16_t size)
 
     std::array<int16_t, AUDIO_BUFFER_LENGTH> audioFrameOut;
 
-    LOG_DEBUG("CVSD RX: %u", size);
+    // LOG_DEBUG("CVSD RX: %u", size);
 
     if (size > audioFrameOut.size()) {
         LOG_WARN("SCO packet larger than local output buffer - dropping data.");
