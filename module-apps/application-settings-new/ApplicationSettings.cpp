@@ -613,8 +613,8 @@ namespace app
     void ApplicationSettingsNew::setBrightnessFunction()
     {
         screen_light_control::Parameters parameters;
-        parameters.functionPoints =
-            screen_light_control::functions::BrightnessFunction({{0.0f, 0.0f}, {1000.0f, 100.0f}});
+        parameters.functionPoints = screen_light_control::functions::BrightnessFunction(
+            {{0.0f, 70.0f}, {250.0f, 70.0f}, {450.0f, 40.0f}, {500.0f, 0.0f}});
         bus.sendUnicast(std::make_shared<sevm::ScreenLightSetParameters>(
                             screen_light_control::ParameterizedAction::setAutomaticModeParameters, parameters),
                         service::name::evt_manager);
