@@ -92,16 +92,6 @@ namespace CellularServiceAPI
 
     bool USSDRequest(sys::Service *serv, CellularUSSDMessage::RequestType type, std::string data = "");
 
-    bool ChangeSimPin(sys::Service *serv,
-                      Store::GSM::SIM sim,
-                      const std::vector<unsigned int> &passcode,
-                      const std::vector<unsigned int> &pin);
-    bool RequestSimCardPinLockState(sys::Service *serv);
-    bool SetSimCardLock(sys::Service *serv,
-                        Store::GSM::SIM sim,
-                        CellularSimCardLockDataMessage::SimCardLock lock,
-                        const std::vector<unsigned int> &pin);
-    bool SetSimCard(sys::Service *serv, Store::GSM::SIM sim);
     /**
      * @brief get all APNs from phone configuration
      */
@@ -144,7 +134,7 @@ namespace CellularServiceAPI
     bool GetDataTransfer(sys::Service *serv);
     bool SetVoLTE(sys::Service *serv, bool value);
 
-    bool ChangeModulePowerState(sys::Service *serv, cellular::State::PowerState newState);
+    bool ChangeModulePowerState(sys::Service *serv, cellular::service::State::PowerState newState);
 
     bool SetFlightMode(sys::Service *serv, bool flightModeOn);
 

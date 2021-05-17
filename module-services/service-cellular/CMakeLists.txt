@@ -3,7 +3,7 @@ message( "${PROJECT_NAME}  ${CMAKE_CURRENT_LIST_DIR}" )
 
 set(SOURCES
     src/ServiceCellularPriv.cpp
-    src/state.cpp
+    src/State.cpp
     src/SimCard.cpp
 
     CellularCall.cpp
@@ -12,7 +12,6 @@ set(SOURCES
     checkSmsCenter.cpp
     ServiceCellular.cpp
     SignalStrength.cpp
-    SimCard.cpp
     NetworkSettings.cpp
     PacketData.cpp
     QMBNManager.cpp

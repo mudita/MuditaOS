@@ -71,7 +71,7 @@ namespace cellular::service
         /** Set cmd channel
          * \param channel channel (or nullptr to block communication)
          */
-        void setChannel(at::BaseChannel *channel = nullptr);
+        void setChannel(at::BaseChannel *channel);
 
         /**
          * Request message handlers

@@ -4,7 +4,7 @@
 #pragma once
 
 #include <service-cellular/ServiceCellular.hpp>
-#include <service-cellular/state.hpp>
+#include <service-cellular/State.hpp>
 
 #include "SimCard.hpp"
 
@@ -29,5 +29,7 @@ namespace cellular::internal
 
       private:
         void initSimCard();
+
+        friend class ::ServiceCellular;
     };
 } // namespace cellular::internal

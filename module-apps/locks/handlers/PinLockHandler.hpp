@@ -7,7 +7,7 @@
 
 #include <module-services/service-appmgr/service-appmgr/messages/ActionRequest.hpp>
 #include <module-services/service-appmgr/service-appmgr/Actions.hpp>
-#include <service-cellular/CellularMessage.hpp>
+#include <service-cellular/api/common.hpp>
 
 namespace app
 {
@@ -25,22 +25,21 @@ namespace gui
         Lock simLock;
         bool promptSimLockWindow = true;
 
-        void handlePasscode(Lock::LockType type, const std::vector<unsigned int> passcode);
-        void handlePasscodeChange(const std::vector<unsigned int> passcode);
-        void handleNewPasscodeUnconfirmed(const std::vector<unsigned int> &passcode,
-                                          const std::vector<unsigned int> &pin);
+        void handlePasscode(Lock::LockType type, const cellular::api::SimCode &passcode);
+        void handlePasscodeChange(const cellular::api::SimCode &passcode);
+        void handleNewPasscodeUnconfirmed(const cellular::api::SimCode &passcode, const cellular::api::SimCode &pin);
         void handleNewPasscodeConfirmed(Lock::LockType type,
-                                        const std::vector<unsigned int> &passcode,
-                                        const std::vector<unsigned int> &pin);
-        void handleNewPasscodeInvalid(const std::vector<unsigned int> &passcode);
+                                        const cellular::api::SimCode &passcode,
+                                        const cellular::api::SimCode &pin);
+        void handleNewPasscodeInvalid(const cellular::api::SimCode &passcode);
         void handlePasscodeParams(Lock::LockType type,
                                   Lock::LockState state,
                                   app::manager::actions::ActionParamsPtr &&data);
         void switchToPinLockWindow(
-            std::function<void(Lock::LockType, const std::vector<unsigned int> &)> onLockActivatedCallback);
+            std::function<void(Lock::LockType, const cellular::api::SimCode &)> onLockActivatedCallback);
         void switchToPinLockWindow(
             Lock::LockState type,
-            std::function<void(Lock::LockType, const std::vector<unsigned int> &)> onLockActivatedCallback);
+            std::function<void(Lock::LockType, const cellular::api::SimCode &)> onLockActivatedCallback);
 
         auto getStrongestLock() noexcept -> gui::Lock &;
         void unlock();
@@ -52,8 +51,8 @@ namespace gui
         void handlePasscodeRequest(Lock::LockType type, app::manager::actions::ActionParamsPtr &&data);
         void handlePinChangeRequest(app::manager::actions::ActionParamsPtr &&data);
         void handlePinEnableRequest(app::manager::actions::ActionParamsPtr &&data,
-                                    CellularSimCardLockDataMessage::SimCardLock simCardLock);
-        void handlePinEnableRequestFailed(CellularSimCardLockDataMessage::SimCardLock simCardLock);
+                                    cellular::api::SimLockState simCardLock);
+        void handlePinEnableRequestFailed(cellular::api::SimLockState simCardLock);
         void handleSimBlocked(app::manager::actions::ActionParamsPtr &&data);
         void handleUnlockSim(app::manager::actions::ActionParamsPtr &&data);
         void handleCMEError(app::manager::actions::ActionParamsPtr &&data) const;

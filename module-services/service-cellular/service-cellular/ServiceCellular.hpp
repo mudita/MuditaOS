@@ -3,11 +3,8 @@
 
 #pragma once
 
-#include "SimCardResult.hpp"
-
 #include "CellularCall.hpp"
 #include "CellularMessage.hpp"
-#include "State.hpp"
 #include "USSD.hpp"
 #include "PacketData.hpp"
 #include "PacketDataCellularMessage.hpp"
@@ -37,7 +34,6 @@
 #include <vector>   // for vector
 #include <cstdint>
 
-
 namespace db
 {
     namespace query
@@ -60,6 +56,11 @@ namespace constants
 } // namespace constants
 
 class ConnectionManager;
+
+namespace cellular::internal
+{
+    class ServiceCellularPriv;
+}
 
 class ServiceCellular : public sys::Service
 {
@@ -104,75 +105,6 @@ class ServiceCellular : public sys::Service
     bool getIMSI(std::string &destination, bool fullNumber = false);
     std::vector<std::string> getNetworkInfo();
 
-    /** group of action/messages send "outside" eg. GUI
-     * requestPin is call anytime modem need pin, here should be called any action
-     * which allow user input (or mockup) pin. Then send appropriate action to notify the modem
-     * \param attempts Attempts counter for current action
-     * \param msg Literal name of action eg. SIM PIN
-     * \return
-     */
-    bool requestPin(unsigned int attempts, const std::string msg);
-
-    /** requestPuk is call anytime modem need puk, here should be called any action
-     * which allow user input (or mockup) puk and new pin. Then send appropriate action to notify the modem
-     * \param attempts Attempts counter for current action
-     * \param msg Literal name of action eg. SIM PUK
-     * \return
-     */
-    bool requestPuk(unsigned int attempts, const std::string msg);
-
-    /** Call in case of SIM card unlocked, MT ready. Place for sending message/action inform rest
-     * \return
-     */
-    bool sendSimUnlocked();
-
-    /** Call in case of SIM card locked (card fail, eg. to many bad PUK). Place for sending message/action inform rest
-     * \return
-     */
-    bool sendSimBlocked();
-
-    /** From this point should be send message/action call interaction in other layers eg. GUI
-     * \param cme_error
-     * \return
-     */
-    bool sendUnhandledCME(unsigned int cme_error);
-
-    /** Similar to sendBadPin
-     * \return
-     */
-    bool sendBadPin();
-
-    /** Message send, when modem return incorrect password for PIN message.
-     * Probably modem firmware depend. On current version last bad message (attempts=1) return PUK request
-     * and generate PUK URC, so finally action on puk request will be call. This implementation allow to
-     * rethrow URC (so achive similar behavior in all cases).
-     * \return
-     */
-    bool sendBadPuk();
-
-    /** Place to send action notifying eg. GUI
-     * \param res
-     * \return
-     */
-    bool sendChangePinResult(SimCardResult res);
-
-    /// sim functionality
-
-    /** Function checks if sim pin is locked (enabled)
-     * @return True if sim pin is locked, False if it's not
-     */
-    bool isPinLocked();
-
-    /** Function ready for change pin action send to Service Cellular form eg. GUI
-     * \param oldPin
-     * \param newPin
-     * \return
-     */
-    bool changePin(const std::string oldPin, const std::string newPin);
-    bool unlockSimPin(std::string pin);
-    bool unlockSimPuk(std::string puk, std::string pin);
-    bool setPinLock(bool lock, const std::string pin);
-
   private:
     at::ATURCStream atURCStream;
     std::unique_ptr<CellularMux> cmux = std::make_unique<CellularMux>(PortSpeed_e::PS460800, this);
@@ -198,11 +130,10 @@ class ServiceCellular : public sys::Service
     std::unique_ptr<packet_data::PacketData> packetData;
     std::unique_ptr<sys::phone_modes::Observer> phoneModeObserver;
     std::unique_ptr<ConnectionManager> connectionManager;
-    cellular::State state;
     bsp::Board board = bsp::Board::none;
 
     /// URC GSM notification handler
-    std::optional<std::shared_ptr<CellularMessage>> identifyNotification(const std::string &data);
+    std::optional<std::shared_ptr<sys::Message>> identifyNotification(const std::string &data);
 
     std::vector<std::string> messageParts;
 
@@ -218,9 +149,8 @@ class ServiceCellular : public sys::Service
     };
 
     bool resetCellularModule(ResetType type);
-    bool isAfterForceReboot                    = false;
-    bool nextPowerStateChangeAwaiting          = false;
-    cellular::State::PowerState nextPowerState = cellular::State::PowerState::Off;
+    bool isAfterForceReboot           = false;
+    bool nextPowerStateChangeAwaiting = false;
 
     /// one point of state change handling
     void change_state(cellular::StateChange *msg);
@@ -305,10 +235,6 @@ class ServiceCellular : public sys::Service
     bool handleUSSDURC();
     void handleUSSDTimer();
 
-    bool handleSimState(at::SimState state, const std::string message);
-    auto handleSimPinMessage(sys::Message *msgl) -> std::shared_ptr<sys::ResponseMessage>;
-    auto handleSimPukMessage(sys::Message *msgl) -> std::shared_ptr<sys::ResponseMessage>;
-
     std::shared_ptr<cellular::RawCommandRespAsync> handleCellularStartOperatorsScan(
         CellularStartOperatorsScanMessage *msg);
 
@@ -376,11 +302,9 @@ class ServiceCellular : public sys::Service
     auto handlePowerDownDeregisteredNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleNewIncomingSMSNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleRawCommandNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
-    auto handleSimReadyNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleSmsDoneNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleSignalStrengthUpdateNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleNetworkStatusUpdateNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
-    auto handleSimNotReadyNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleUrcIncomingNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularSetFlightModeMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularSetRadioOnOffMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
@@ -392,6 +316,9 @@ class ServiceCellular : public sys::Service
     auto isIncommingCallAllowed() -> bool;
 
     auto hangUpCall() -> bool;
+
+  private:
+    std::unique_ptr<cellular::internal::ServiceCellularPriv> priv;
 };
 
 namespace sys
