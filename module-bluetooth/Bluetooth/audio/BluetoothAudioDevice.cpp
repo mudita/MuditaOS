@@ -73,7 +73,38 @@ void A2DPAudioDevice::onDataReceive()
 {}
 
 void HSPAudioDevice::onDataSend()
-{}
+{
+    static constexpr auto packetHandleOffset = 0;
+    static constexpr auto packetLengthOffset = 2;
+    static constexpr auto packetDataOffset   = 3;
+
+    if (!isOutputEnabled()) {
+        return;
+    }
+
+    LOG_DEBUG("CVSD SEND");
+
+    auto scoPacketLength  = hci_get_sco_packet_length();
+    auto scoPayloadLength = scoPacketLength - packetDataOffset;
+
+    hci_reserve_packet_buffer();
+    auto scoPacket = hci_get_outgoing_packet_buffer();
+
+    // get data to send
+    audio::Stream::Span dataSpan;
+    Sink::_stream->peek(dataSpan);
+
+    assert(dataSpan.dataSize == scoPayloadLength);
+
+    // prepare packet to send
+    std::copy(dataSpan.data, dataSpan.dataEnd(), &scoPacket[packetDataOffset]);
+    little_endian_store_16(scoPacket, packetHandleOffset, scoHandle);
+    scoPacket[packetLengthOffset] = scoPayloadLength;
+
+    // send packet
+    hci_send_sco_packet_buffer(scoPacketLength);
+    hci_request_sco_can_send_now_event();
+}
 
 void HSPAudioDevice::onDataReceive()
 {}
@@ -162,4 +193,9 @@ auto HSPAudioDevice::getSourceFormat() -> ::audio::AudioFormat
     constexpr static auto supportedBitWidth = 16U;
     constexpr static auto supportedChannels = 1;
     return AudioFormat{bluetooth::SCO::CVSD_SAMPLE_RATE, supportedBitWidth, supportedChannels};
+}
+
+void HSPAudioDevice::setSCOHandle(std::uint16_t handle)
+{
+    scoHandle = handle;
 }

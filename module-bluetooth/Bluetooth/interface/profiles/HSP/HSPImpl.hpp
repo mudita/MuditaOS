@@ -44,6 +44,6 @@ namespace bluetooth
         static bd_addr_t deviceAddr;
         static const sys::Service *ownerService;
         static bool isConnected;
-        static std::shared_ptr<BluetoothAudioDevice> audioDevice;
+        static std::shared_ptr<HSPAudioDevice> audioDevice;
     };
 } // namespace bluetooth

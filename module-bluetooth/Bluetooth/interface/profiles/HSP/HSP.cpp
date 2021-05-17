@@ -111,7 +111,7 @@ namespace bluetooth
     const sys::Service *HSP::HSPImpl::ownerService;
     std::string HSP::HSPImpl::agServiceName = "PurePhone HSP";
     bool HSP::HSPImpl::isConnected          = false;
-    std::shared_ptr<BluetoothAudioDevice> HSP::HSPImpl::audioDevice;
+    std::shared_ptr<HSPAudioDevice> HSP::HSPImpl::audioDevice;
 
     void HSP::HSPImpl::sendAudioEvent(audio::EventType event, audio::Event::DeviceState state)
     {
@@ -324,6 +324,7 @@ namespace bluetooth
 
     void HSP::HSPImpl::setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice)
     {
-        HSP::HSPImpl::audioDevice = std::move(audioDevice);
+        HSP::HSPImpl::audioDevice = std::static_pointer_cast<HSPAudioDevice>(audioDevice);
+        HSP::HSPImpl::audioDevice->setSCOHandle(scoHandle);
     }
 } // namespace bluetooth
