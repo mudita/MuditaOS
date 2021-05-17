@@ -28,16 +28,16 @@ namespace audio::transcode
 
         bool push(const Span &span) override;
         void commit() override;
-        bool peek(Span &span) override;
+        bool reserve(Span &span) override;
         [[nodiscard]] auto getInputTraits() const noexcept -> Traits override;
 
       private:
         std::shared_ptr<Transform> transform;
-        Span peekedSpan;
+        Span reservedSpan;
         std::size_t transcodingSpaceSize;
         std::unique_ptr<std::uint8_t[]> transcodingSpace;
         Span transcodingSpaceSpan;
-        bool peeked = false;
+        bool isReserved = false;
     };
 
 }; // namespace audio::transcode

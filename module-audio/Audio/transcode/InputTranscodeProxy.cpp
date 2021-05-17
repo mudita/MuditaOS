@@ -25,21 +25,21 @@ bool InputTranscodeProxy::push(const Span &span)
 
 void InputTranscodeProxy::commit()
 {
-    if (peeked) {
-        transform->transform(transcodingSpaceSpan, peekedSpan);
+    if (isReserved) {
+        transform->transform(transcodingSpaceSpan, reservedSpan);
         getWrappedStream().commit();
-        peekedSpan.reset();
-        peeked = false;
+        reservedSpan.reset();
+        isReserved = false;
     }
 }
 
-bool InputTranscodeProxy::peek(Span &span)
+bool InputTranscodeProxy::reserve(Span &span)
 {
-    auto result = getWrappedStream().peek(span);
+    auto result = getWrappedStream().reserve(span);
 
-    peekedSpan = span;
-    span       = transcodingSpaceSpan;
-    peeked     = true;
+    reservedSpan = span;
+    span         = transcodingSpaceSpan;
+    isReserved   = true;
 
     return result;
 }
