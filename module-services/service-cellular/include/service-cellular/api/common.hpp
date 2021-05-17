@@ -22,8 +22,8 @@ namespace cellular
 
         enum class SimLockState
         {
-            Locked,
-            Unlocked
+            Enabled,
+            Disabled
         };
 
         enum class SimSlot

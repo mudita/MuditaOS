@@ -80,7 +80,7 @@ namespace cellular
         bool SimCard::handleSetPinLock(const api::SimCode &pin, api::SimLockState lock)
         {
             const auto _pin = internal::simCodeToString(pin);
-            return processPinResult(setPinLock(_pin, lock == cellular::api::SimLockState::Locked));
+            return processPinResult(setPinLock(_pin, lock == cellular::api::SimLockState::Enabled));
         }
 
         bool SimCard::handlePinUnlock(const api::SimCode &pin)

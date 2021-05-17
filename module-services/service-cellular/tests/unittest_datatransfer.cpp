@@ -8,8 +8,6 @@
 #include "Result.hpp"
 #include <service-cellular/PacketData.hpp>
 
-using namespace cellular;
-
 TEST_CASE("Quectel AT DataTransfer commands")
 {
     SECTION("QIACT")
