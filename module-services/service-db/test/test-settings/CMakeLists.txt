@@ -1,4 +1,4 @@
-﻿# service-db tests
+# service-db tests
 add_catch2_executable(
         NAME
             service-db-settings
@@ -12,4 +12,5 @@ add_catch2_executable(
             service-cellular
             module-cellular
         DEPS
+            PurePhone-disk-img
 )

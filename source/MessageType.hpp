@@ -1,8 +1,7 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#ifndef SOURCE_MESSAGETYPE_HPP_
-#define SOURCE_MESSAGETYPE_HPP_
+#pragma once
 
 enum class MessageType
 {
@@ -165,5 +164,3 @@ enum class MessageType
     // Quotes messages
     Quotes,
 };
-
-#endif /* SOURCE_MESSAGETYPE_HPP_ */
