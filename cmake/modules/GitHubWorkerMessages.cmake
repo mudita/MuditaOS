@@ -1,0 +1,11 @@
+if (NOT "$ENV{GITHUB_WORKSPACE}" STREQUAL "")
+    message("set-output name=package-standalone::${PACKAGE_STANDALONE_FILE_NAME}")
+    message("::set-output name=package-standalone::${PACKAGE_STANDALONE_FILE_NAME}")
+    message("set-output name=standalone-mime_type::${PACKAGE_STANDALONE_MIME}")
+    message("::set-output name=standalone-mime_type::${PACKAGE_STANDALONE_MIME}")
+
+    message("set-output name=package-update::${PACKAGE_UPDATE_FILE_NAME}")
+    message("::set-output name=package-update::${PACKAGE_UPDATE_FILE_NAME}")
+    message("set-output name=update-mime_type::${PACKAGE_UPDATE_MIME}")
+    message("::set-output name=update-mime_type::${PACKAGE_UPDATE_MIME}")
+endif()
