@@ -100,10 +100,11 @@ namespace style
 
         namespace progressBar
         {
-            inline constexpr auto x     = 100U;
+            inline constexpr auto x     = style::window::default_left_margin;
             inline constexpr auto y     = 400U;
-            inline constexpr auto width = 280U;
+            inline constexpr auto w     = style::window::default_body_width;
             inline constexpr auto h     = 50U;
+            inline constexpr auto range = 10U;
         }; // namespace progressBar
     };     // namespace window
 
