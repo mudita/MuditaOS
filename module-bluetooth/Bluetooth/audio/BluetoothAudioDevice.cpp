@@ -104,6 +104,7 @@ void HSPAudioDevice::onDataSend(std::uint16_t scoHandle)
 
     // prepare packet to send
     std::copy(dataSpan.data, dataSpan.dataEnd(), &scoPacket[packetDataOffset]);
+    Sink::_stream->consume();
     little_endian_store_16(scoPacket, packetHandleOffset, scoHandle);
     scoPacket[packetLengthOffset] = dataSpan.dataSize;
 
