@@ -9,6 +9,8 @@
 #include "windows/StartConfigurationWindow.hpp"
 #include "windows/OnBoardingLanguagesWindow.hpp"
 #include "windows/EULALicenseWindow.hpp"
+#include "windows/OnBoardingSimSelectWindow.hpp"
+#include "windows/NoSimSelectedDialogWindow.hpp"
 #include "windows/ConfigurationSuccessfulDialogWindow.hpp"
 #include "windows/NoConfigurationDialogWindow.hpp"
 #include "windows/UpdateDialogWindow.hpp"
@@ -123,6 +125,13 @@ namespace app
                                                                                            std::move(eulaRepository));
             return std::make_unique<app::onBoarding::EULALicenseWindow>(app, std::move(presenter));
         });
+        windowsFactory.attach(gui::window::name::onBoarding_sim_select, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::OnBoardingSimSelectWindow>(app, gui::window::name::onBoarding_sim_select);
+        });
+        windowsFactory.attach(gui::window::name::onBoarding_no_sim_selected,
+                              [](Application *app, const std::string &name) {
+                                  return std::make_unique<app::onBoarding::NoSimSelectedDialogWindow>(app);
+                              });
         windowsFactory.attach(gui::window::name::onBoarding_configuration_successful,
                               [](Application *app, const std::string &name) {
                                   return std::make_unique<app::onBoarding::ConfigurationSuccessfulDialogWindow>(app);
@@ -134,7 +143,6 @@ namespace app
         windowsFactory.attach(gui::window::name::onBoarding_update, [](Application *app, const std::string &name) {
             return std::make_unique<app::onBoarding::UpdateDialogWindow>(app);
         });
-
         windowsFactory.attach(gui::window::name::onBoarding_skip, [](Application *app, const std::string &name) {
             return std::make_unique<app::onBoarding::SkipDialogWindow>(app);
         });

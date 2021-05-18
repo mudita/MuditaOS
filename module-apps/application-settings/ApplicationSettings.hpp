@@ -13,7 +13,6 @@ namespace app
 
     inline constexpr auto name_settings  = "ApplicationSettings";
     inline constexpr auto sim_select     = "SimSelect";
-    inline constexpr auto change_setting = "ChangeSetting";
 
     class SimSetter
     {
@@ -22,15 +21,7 @@ namespace app
         virtual void setSim(Store::GSM::SIM sim) = 0;
     };
 
-    class PinLockSetter
-    {
-      public:
-        virtual ~PinLockSetter()              = default;
-        virtual void setPin(unsigned int pin) = 0;
-        virtual void clearPin()               = 0;
-    };
-
-    class ApplicationSettings : public app::Application, public SimSetter, public PinLockSetter
+    class ApplicationSettings : public app::Application, public SimSetter
     {
       public:
         ApplicationSettings(std::string name                    = name_settings,
@@ -51,9 +42,6 @@ namespace app
         void destroyUserInterface() override;
         bsp::Board board = bsp::Board::none;
         void setSim(Store::GSM::SIM sim) override;
-        void setPin(unsigned int pin) override;
-        void clearPin() override;
-        void lockPassChanged(std::string value);
         void timeDateChanged(std::string value);
 
       private:

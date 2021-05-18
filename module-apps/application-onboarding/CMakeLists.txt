@@ -24,7 +24,9 @@ target_sources(${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/windows/SkipDialogWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/OnBoardingDateAndTimeWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/OnBoardingChangeDateAndTimeWindow.cpp"
-    PUBLIC
+		"${CMAKE_CURRENT_LIST_DIR}/windows/OnBoardingSimSelectWindow.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/windows/NoSimSelectedDialogWindow.cpp"
+	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationOnBoarding.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/OnBoardingMainWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/StartConfigurationWindow.hpp"
@@ -38,8 +40,11 @@ target_sources(${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/windows/UpdateDialogWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/SkipDialogWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/OnBoardingDateAndTimeWindow.hpp"
-
+		"${CMAKE_CURRENT_LIST_DIR}/windows/OnBoardingSimSelectWindow.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/windows/NoSimSelectedDialogWindow.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/style/OnBoardingStyle.hpp"
 		)
+
 target_include_directories(${PROJECT_NAME}
     PRIVATE
         service-db

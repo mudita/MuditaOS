@@ -18,6 +18,7 @@ namespace gui
         automaticTimeZoneIsOn    = utils::dateAndTimeSettings.isAutomaticTimeZoneOn();
         timeFormat               = utils::dateAndTimeSettings.getTimeFormat();
         dateFormat               = utils::dateAndTimeSettings.getDateFormat();
+        changeDateAndTimeWindow  = window::name::change_date_and_time;
     }
 
     auto DateAndTimeMainWindow::buildOptionsList() -> std::list<Option>
@@ -54,8 +55,8 @@ namespace gui
 
         if (!automaticDateAndTimeIsOn) {
             addOption(utils::translate("app_settings_date_and_time_change_date_and_time"), [=](Item &item) {
-                LOG_INFO("switching to %s page", window::name::change_date_and_time);
-                application->switchWindow(window::name::change_date_and_time, nullptr);
+                LOG_INFO("switching to %s page", changeDateAndTimeWindow.c_str());
+                application->switchWindow(changeDateAndTimeWindow, nullptr);
                 return true;
             });
         }

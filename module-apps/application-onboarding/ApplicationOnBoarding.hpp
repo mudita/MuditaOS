@@ -16,6 +16,8 @@ namespace gui::window::name
     inline constexpr auto onBoarding_skip                     = "OnBoardingSkipConfirm";
     inline constexpr auto onBoarding_date_and_time            = "OnBoardingDateAndTime";
     inline constexpr auto onBoarding_change_date_and_time     = "OnBoardingChangeDateAndTime";
+    inline constexpr auto onBoarding_sim_select               = "OnBoardingSimSelect";
+    inline constexpr auto onBoarding_no_sim_selected          = "OnBoardingNoSimSelected";
 } // namespace gui::window::name
 
 namespace app
