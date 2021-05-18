@@ -1,18 +1,17 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <i18n/i18n.hpp>
-#include <Style.hpp>
+#include "StartConfigurationWindow.hpp"
 
-#include <InputEvent.hpp>
+#include <application-onboarding/ApplicationOnBoarding.hpp>
+#include <application-onboarding/data/OnBoardingSwitchData.hpp>
 
-#include <module-apps/application-onboarding/ApplicationOnBoarding.hpp>
 #include <module-apps/windows/DialogMetadata.hpp>
 #include <module-apps/messages/DialogMetadataMessage.hpp>
-#include "module-apps/application-onboarding/data/OnBoardingSwitchData.hpp"
-#include "module-apps/application-onboarding/ApplicationOnBoarding.hpp"
 
-#include "StartConfigurationWindow.hpp"
+#include <i18n/i18n.hpp>
+#include <Style.hpp>
+#include <InputEvent.hpp>
 
 namespace app::onBoarding
 {
@@ -26,11 +25,8 @@ namespace app::onBoarding
     {
         AppWindow::buildInterface();
 
-        bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
         bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(::style::strings::common::start));
-        bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
         bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(::style::strings::common::back));
-        bottomBar->setActive(gui::BottomBar::Side::LEFT, true);
         bottomBar->setText(gui::BottomBar::Side::LEFT, utils::translate(::style::strings::common::skip));
 
         new gui::Icon(this,
@@ -51,7 +47,9 @@ namespace app::onBoarding
                                           std::make_unique<OnBoardingSwitchData>());
             }
             if (inputEvent.is(gui::KeyCode::KEY_ENTER)) {
-                application->getPhoneLockSubject().setPhoneLock();
+                application->switchWindow(gui::window::name::onBoarding_sim_select,
+                                          gui::ShowMode::GUI_SHOW_INIT,
+                                          std::make_unique<OnBoardingSwitchData>());
             }
             if (inputEvent.is(gui::KeyCode::KEY_LF)) {
 
