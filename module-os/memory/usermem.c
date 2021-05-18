@@ -9,6 +9,7 @@
 
 #include <stddef.h>
 #include <string.h>
+#include <stdlib.h>
 #include "macros.h"
 
 /**
@@ -117,6 +118,11 @@ void *usermalloc(size_t xWantedSize)
 {
 	BlockLink_t *pxBlock, *pxPreviousBlock, *pxNewBlockLink;
 	void *pvReturn = NULL;
+
+    // Preventing use of an allocator in an interrupt
+    if (isIRQ()) {
+        abort();
+    }
 
 		vTaskSuspendAll();
 		{
@@ -287,6 +293,11 @@ void userfree(void *pv)
 {
 	uint8_t *puc = ( uint8_t * ) pv;
 	BlockLink_t *pxLink;
+
+    // Preventing use of an allocator in an interrupt
+    if (isIRQ()) {
+        abort();
+    }
 
 		if( pv != NULL )
 		{
