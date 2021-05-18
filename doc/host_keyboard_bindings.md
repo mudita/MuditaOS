@@ -1,25 +1,31 @@
-# Keyboard binding on Linux Pure simulator
+# Table of contents
 
-## Table of contents
+- [Linux Pure simulator](#keyboard-binding-on-linux-pure-simulator)
 
-- [Functional buttons](#functional-buttons)
-- [Numeric buttons](#numeric-buttons)
-- [Battery "buttons"](#battery-buttons)
+  - [Functional buttons](#functional-buttons)
+
+  - [Numeric buttons](#numeric-buttons)
+
+  - [Battery "buttons"](#battery-buttons)
+
+- [Linux Bell simulator](#keyboard-binding-on-linux-bell-simulator)
+
+## Keyboard binding on Linux Pure simulator
 
 ### Functional buttons
 - Volume up         - key [ `R` ]
-- Volume down 		- key [ `F` ]
-- Functional left 	- key [ `Q` ]
+- Volume down       - key [ `F` ]
+- Functional left   - key [ `Q` ]
 - Functional right 	- key [ `E` ]
-- Joystick up 		- key [ `W` ]
-- Joystick down		- key [ `X` ]
-- Joystick left 		- key [ `A` ]
-- Joystick right		- key [ `D` ]
-- Joystick enter		- key [ `S` ]
-- Slider up			- key [ `V` ]
-- Slider mid		- key [ `B` ]
-- Slider down 		- key [ `N` ]
-- Torch button 		- key [ `T` ]
+- Joystick up       - key [ `W` ]
+- Joystick down     - key [ `X` ]
+- Joystick left     - key [ `A` ]
+- Joystick right    - key [ `D` ]
+- Joystick enter    - key [ `S` ]
+- Slider up         - key [ `V` ]
+- Slider mid        - key [ `B` ]
+- Slider down       - key [ `N` ]
+- Torch button      - key [ `T` ]
 - Headset OK        - key [ `U` ]
 - Headset Vol +     - key [ `J` ]
 - Headset Vol -     - key [ `M` ]
@@ -47,3 +53,13 @@
  - Standard Downstream Port (SDP) - key [ `L` ]
  - Charging Downstream Port (CDP) - key [ `;` ]
  - Dedicated Charging Port  (DCP) - key [ `'` ]
+
+## Keyboard binding on Linux Bell simulator
+
+- Back            - key [ `E` ]
+- Deep Press Up   - key [ `W` ]
+- Deep Press Down - key [ `X` ]
+- Rotate left     - key [ `A` ]
+- Rotate right    - key [ `D` ]
+- Light Click     - key [ `S` ]
+- Frontlight      - key [ `T` ]
