@@ -49,7 +49,7 @@ namespace gui
                 }
             }
             percentLabel->setText(std::to_string(progressPercent) + " %");
-            updateProgress->setValue(progressPercent);
+            updateProgress->setPercentageValue(progressPercent);
         }
         setVisibleState();
     }
@@ -109,13 +109,14 @@ namespace gui
         percentLabel->setAlignment(
             gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
 
-        updateProgress = new ProgressBar(this,
-                                         style::window::progressBar::x,
-                                         style::window::progressBar::y,
-                                         style::window::progressBar::width,
-                                         style::window::progressBar::h);
-        updateProgress->setMaximum(100);
-        updateProgress->setValue(0);
+        updateProgress = new HBarGraph(this,
+                                       style::window::progressBar::x,
+                                       style::window::progressBar::y,
+                                       style::window::progressBar::range,
+                                       BarGraphStyle::Light);
+        updateProgress->setSize(style::window::progressBar::w, style::window::progressBar::h);
+        updateProgress->setAlignment(
+            gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
     }
 
     void UpdateProgressWindow::destroyInterface()

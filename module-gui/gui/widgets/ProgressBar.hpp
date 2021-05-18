@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -24,7 +24,7 @@ namespace gui
     class ProgressBar : public Rect, public Progress
     {
       public:
-        ProgressBar(Item *parent, std::uint32_t x, std::uint32_t y, std::uint32_t w, std::uint32_t h);
+        [[deprecated]] ProgressBar(Item *parent, std::uint32_t x, std::uint32_t y, std::uint32_t w, std::uint32_t h);
 
         void setMaximum(unsigned int value) noexcept override;
         auto setValue(unsigned int value) noexcept -> bool override;

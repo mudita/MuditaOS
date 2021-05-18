@@ -10,7 +10,8 @@
 #include <module-gui/gui/widgets/TextFixedSize.hpp>
 #include <module-gui/gui/widgets/Image.hpp>
 #include <module-gui/gui/widgets/BottomBar.hpp>
-#include <module-gui/gui/widgets/ProgressBar.hpp>
+#include <module-apps/widgets/BarGraph.hpp>
+
 namespace gui
 {
 
@@ -20,7 +21,7 @@ namespace gui
         std::string textInfo;
 
         gui::Label *percentLabel    = nullptr;
-        ProgressBar *updateProgress = nullptr;
+        HBarGraph *updateProgress   = nullptr;
 
         fs::path updateFile;
 

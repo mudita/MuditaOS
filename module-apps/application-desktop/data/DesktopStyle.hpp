@@ -45,7 +45,7 @@ namespace style::desktop
     {
         inline constexpr uint32_t x = 0;
         inline constexpr uint32_t y = 450;
-        inline constexpr uint32_t w = 500;
+        inline constexpr uint32_t w = style::window_width;
         inline constexpr uint32_t h = 100;
 
     } // namespace percentlabel
