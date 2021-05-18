@@ -302,8 +302,8 @@ namespace gui
 
     void Item::setPosition(const Position &val, Axis axis)
     {
-        int16_t x = getX();
-        int16_t y = getY();
+        Position x = getX();
+        Position y = getY();
         if (axis == Axis::X) {
             x = val;
         }
