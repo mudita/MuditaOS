@@ -351,7 +351,7 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const Operation:
     }
     else if (opType == Operation::Type::Router) {
         auto input = audioMux.GetRoutingInput(true);
-        if (bluetoothA2DPConnected) {
+        if (bluetoothHSPConnected) {
             LOG_DEBUG("Sending Bluetooth start routing");
             bus.sendUnicast(std::make_shared<message::bluetooth::StartAudioRouting>(), service::name::bluetooth);
         }
