@@ -47,7 +47,6 @@ set( SOURCES
     "options/type/OptionCall.cpp"
     "options/type/OptionContact.cpp"
     "options/type/OptionSetting.cpp"
-    "options/type/OptionChangePin.cpp"
     "options/type/OptionWithActiveIcons.cpp"
     "notifications/NotificationData.cpp")
 

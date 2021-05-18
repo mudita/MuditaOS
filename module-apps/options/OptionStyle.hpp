@@ -30,6 +30,8 @@ namespace gui::option
         Off,
         Bt,
         Checked,
+        SIM1,
+        SIM2,
         Text
     };
 

@@ -25,7 +25,6 @@
 #include "windows/SettingsMainWindow.hpp"
 #include "windows/SimSelectWindow.hpp"
 #include "windows/CellularPassthroughWindow.hpp"
-#include "OptionChangePin.hpp"
 
 #include <i18n/i18n.hpp>
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
@@ -101,11 +100,6 @@ namespace app
         if (ret != sys::ReturnCodes::Success)
             return ret;
 
-        settings->registerValueChange(
-            settings::SystemProperties::lockPassHash,
-            [this](std::string value) { lockPassChanged(value); },
-            settings::SettingsScope::Global);
-
         createUserInterface();
 
         return ret;
@@ -125,9 +119,6 @@ namespace app
 
         windowsFactory.attach(app::sim_select, [this](Application *app, const std::string &name) {
             return std::make_unique<gui::OptionWindow>(app, name, simSelectWindow(app, this));
-        });
-        windowsFactory.attach(app::change_setting, [this](Application *app, const std::string &name) {
-            return std::make_unique<gui::OptionWindow>(app, name, settingChangePinWindow(app, this, lockPassHash));
         });
         windowsFactory.attach("Languages", [](Application *app, const std::string &name) {
             return std::make_unique<gui::LanguageWindow>(app);
@@ -174,34 +165,6 @@ namespace app
     void ApplicationSettings::setSim(Store::GSM::SIM sim)
     {
         CellularServiceAPI::SetSimCard(this, sim);
-    }
-
-    void ApplicationSettings::setPin(unsigned int value)
-    {
-        settings->setValue(
-            settings::SystemProperties::lockPassHash, std::to_string(value), settings::SettingsScope::Global);
-        lockPassHash = value;
-    }
-
-    void ApplicationSettings::clearPin()
-    {
-        settings->setValue(settings::SystemProperties::lockPassHash, "", settings::SettingsScope::Global);
-        lockPassHash = 0U;
-    }
-
-    void ApplicationSettings::lockPassChanged(std::string value)
-    {
-        auto newLockPassHash = 0U;
-        if (!value.empty()) {
-            newLockPassHash = utils::getNumericValue<unsigned int>(value);
-        }
-        if (lockPassHash != newLockPassHash) {
-            lockPassHash       = newLockPassHash;
-            auto currentWindow = getCurrentWindow();
-            if (app::change_setting == currentWindow->getName()) {
-                currentWindow->rebuild();
-            }
-        }
     }
 
     void ApplicationSettings::timeDateChanged(std::string value)

@@ -13,7 +13,7 @@ namespace gui
 
     bool OnBoardingChangeDateAndTimeWindow::onInput(const gui::InputEvent &inputEvent)
     {
-        if (inputEvent.is(gui::KeyCode::KEY_ENTER)) {
+        if (inputEvent.isKeyRelease(gui::KeyCode::KEY_ENTER)) {
             auto ret = ChangeDateAndTimeWindow::onInput(inputEvent);
             application->returnToPreviousWindow();
             return ret;

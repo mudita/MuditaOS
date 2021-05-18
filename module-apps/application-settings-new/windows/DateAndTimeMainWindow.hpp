@@ -22,5 +22,7 @@ namespace gui
 
         utils::time::Locale::TimeFormat timeFormat = utils::time::Locale::defaultTimeFormat;
         utils::time::Locale::DateFormat dateFormat = utils::time::Locale::defaultDateFormat;
+
+        std::string changeDateAndTimeWindow;
     };
 } // namespace gui
