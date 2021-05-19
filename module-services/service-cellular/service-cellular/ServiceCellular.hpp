@@ -8,6 +8,7 @@
 #include "USSD.hpp"
 #include "PacketData.hpp"
 #include "PacketDataCellularMessage.hpp"
+#include "src/CallManager.hpp"
 #include <service-cellular/connection-manager/ConnectionManager.hpp>
 
 #include <modem/ATURCStream.hpp>
@@ -320,8 +321,7 @@ class ServiceCellular : public sys::Service
 
   private:
     std::unique_ptr<cellular::internal::ServiceCellularPriv> priv;
-    bool ringSent = false;
-    bool clipSent = false;
+    cellular::internal::SimpleCallManager callManager;
 };
 
 namespace sys

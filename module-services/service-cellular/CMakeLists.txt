@@ -5,6 +5,7 @@ set(SOURCES
     src/ServiceCellularPriv.cpp
     src/State.cpp
     src/SimCard.cpp
+    src/CallManager.cpp
 
     CellularCall.cpp
     CellularServiceAPI.cpp

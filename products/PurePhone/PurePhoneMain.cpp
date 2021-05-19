@@ -126,7 +126,7 @@ int main()
                 app::CreateLauncher<app::ApplicationDesktop>(app::name_desktop, app::Closeable::False));
 #endif
 #ifdef ENABLE_APP_CALL
-            applications.push_back(app::CreateLauncher<app::ApplicationCall>(app::name_call, app::Closeable::False));
+            applications.push_back(app::CreateLauncher<app::ApplicationCall>(app::name_call));
 #endif
 #ifdef ENABLE_APP_SETTINGS
             applications.push_back(app::CreateLauncher<app::ApplicationSettings>(app::name_settings));

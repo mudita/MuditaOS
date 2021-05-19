@@ -137,10 +137,12 @@ namespace gui
         sendSmsIcon->activatedCallback = [=](gui::Item &item) {
             LOG_INFO("Send message template and reject the call");
             constexpr auto preventAutoLock = true;
-            return app::manager::Controller::sendAction(
-                application,
-                app::manager::actions::ShowSmsTemplates,
-                std::make_unique<SMSSendTemplateRequest>(phoneNumber, preventAutoLock));
+            auto msg                        = std::make_unique<SMSSendTemplateRequest>(phoneNumber, preventAutoLock);
+            msg->ignoreCurrentWindowOnStack = true;
+            return app::manager::Controller::sendAction(application,
+                                                        app::manager::actions::ShowSmsTemplates,
+                                                        std::move(msg),
+                                                        app::manager::OnSwitchBehaviour::RunInBackground);
         };
 
         // define navigation between icons
@@ -149,6 +151,8 @@ namespace gui
 
         speakerIcon->setNavigationItem(NavigationDirection::LEFT, microphoneIcon);
         speakerIcon->setNavigationItem(NavigationDirection::RIGHT, microphoneIcon);
+
+        setState(State::IDLE);
     }
 
     void CallWindow::destroyInterface()
@@ -166,7 +170,7 @@ namespace gui
     {
         auto prevState = getState();
         LOG_INFO("==> Call state change: %s -> %s", c_str(prevState), c_str(state));
-        interface->setState(state);
+        interface->setCallState(state);
 
         switch (state) {
         case State::INCOMING_CALL: {
@@ -252,7 +256,7 @@ namespace gui
 
     auto CallWindow::getState() const noexcept -> State
     {
-        return interface->getState();
+        return interface->getCallState();
     }
 
     void CallWindow::updateDuration(const utils::time::Duration duration)
@@ -291,16 +295,21 @@ namespace gui
                     LOG_DEBUG("ignoring IncomingCallData message");
                     return;
                 }
+                callEndType = CallEndType::None;
                 setState(State::INCOMING_CALL);
                 return;
             }
             if (dynamic_cast<app::ExecuteCallData *>(data) != nullptr) {
+                callEndType = CallEndType::None;
                 setState(State::OUTGOING_CALL);
                 return;
             }
         }
 
         if (dynamic_cast<app::CallAbortData *>(data) != nullptr) {
+            if (callEndType == CallEndType::None) {
+                callEndType = CallEndType::Ended;
+            }
             setState(State::CALL_ENDED);
             return;
         }
@@ -315,6 +324,7 @@ namespace gui
         }
 
         if (dynamic_cast<SMSTemplateSent *>(data) != nullptr) {
+            callEndType = CallEndType::Rejected;
             interface->hangupCall();
             return;
         }

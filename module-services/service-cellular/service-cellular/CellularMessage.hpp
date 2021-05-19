@@ -587,7 +587,7 @@ class CellularHangupCallMessage : public CellularMessage, public app::manager::a
     [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
     {
         return std::make_unique<app::manager::ActionRequest>(
-            sender, app::manager::actions::EndCall, std::make_unique<app::manager::actions::ActionParams>());
+            sender, app::manager::actions::AbortCall, std::make_unique<app::manager::actions::ActionParams>());
     }
 };
 

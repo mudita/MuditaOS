@@ -44,8 +44,10 @@ namespace gui
             else if (inputEvent.is(gui::KeyCode::KEY_ENTER)) {
                 auto data                        = std::make_unique<gui::SwitchData>();
                 data->ignoreCurrentWindowOnStack = true;
-                app::manager::Controller::sendAction(
-                    application, app::manager::actions::ShowEmergencyContacts, std::move(data));
+                app::manager::Controller::sendAction(application,
+                                                     app::manager::actions::ShowEmergencyContacts,
+                                                     std::move(data),
+                                                     app::manager::OnSwitchBehaviour::RunInBackground);
                 return true;
             }
         }
