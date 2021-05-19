@@ -11,7 +11,6 @@
 #include <application-desktop/Constants.hpp>
 #include <service-db/service-db/Settings.hpp>
 #include <purefs/filesystem_paths.hpp>
-#include <time/time_conversion.hpp>
 #include <filesystem>
 #include <Utils.hpp>
 #include <boot/bootconfig.hpp>
@@ -26,8 +25,9 @@
 #include <cstdarg>
 #include <cstdio>
 #include <cstdlib>
-#include <memory>
+#include <ctime>
 #include <fstream>
+#include <memory>
 
 FileInfo::FileInfo(mtar_header_t &h, unsigned long crc32) : fileSize(h.size), fileCRC32(crc32)
 {
@@ -93,7 +93,7 @@ updateos::UpdateError UpdateMuditaOS::runUpdate()
 {
     informDebug("Preparing temp dir");
 
-    updateRunStatus.startTime   = utils::time::getCurrentTimestamp().getTime();
+    updateRunStatus.startTime   = static_cast<uint32_t>(std::time(nullptr));
     updateRunStatus.fromVersion = bootConfig.to_json()[boot::json::git_info];
     versionInformation          = UpdateMuditaOS::getVersionInfoFromFile(updateFile);
 
@@ -166,7 +166,7 @@ updateos::UpdateError UpdateMuditaOS::runUpdate()
         informError(err, "runUpdate cleanupAfterUpdate failed, resetting anyway");
     }
 
-    updateRunStatus.endTime = utils::time::Time().getTime();
+    updateRunStatus.endTime = static_cast<uint32_t>(std::time(nullptr));
     storeRunStatusInDB();
 
     // reboot always

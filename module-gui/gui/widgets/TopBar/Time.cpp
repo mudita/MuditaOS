@@ -2,9 +2,9 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Time.hpp"
-#include "time/time_conversion.hpp"
 #include "Style.hpp"
 
+#include <ctime>
 namespace gui::top_bar
 {
     Time::Time(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h)
@@ -21,7 +21,7 @@ namespace gui::top_bar
 
     void Time::update()
     {
-        _time.set_time(utils::time::getCurrentTimestamp().getTime());
+        _time.set_time(std::time(nullptr));
         setText(_time.str());
     }
 

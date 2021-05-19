@@ -230,7 +230,7 @@ namespace gui
     {
         using namespace utils::time;
         auto ret       = AppWindow::updateTime();
-        auto timestamp = utils::time::Timestamp();
+        auto timestamp = utils::time::getCurrentTimestamp();
         if (time != nullptr) {
             auto fmt = utils::dateAndTimeSettings.isTimeFormat12()
                            ? Locale::format(Locale::TimeFormat::FormatTime12HShort)
