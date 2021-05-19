@@ -74,7 +74,6 @@
 #include <service-desktop/DeveloperModeMessage.hpp>
 #include <service-appmgr/model/ApplicationManager.hpp>
 #include <task.h>
-#include <time/time_conversion.hpp>
 #include <ucs2/UCS2.hpp>
 #include <utf8/UTF8.hpp>
 
@@ -98,6 +97,8 @@
 #include "ServiceCellularPriv.hpp"
 #include <service-cellular/api/request/sim.hpp>
 #include <service-cellular/api/notification/notification.hpp>
+
+#include <ctime>
 
 const char *ServiceCellular::serviceName = cellular::service::name;
 
@@ -1116,8 +1117,7 @@ auto ServiceCellular::receiveSMS(std::string messageNumber) -> bool
                 // parse date
                 tokens[3].erase(std::remove(tokens[3].begin(), tokens[3].end(), '\"'), tokens[3].end());
 
-                utils::time::Timestamp time;
-                auto messageDate = time.getTime();
+                auto messageDate = std::time(nullptr);
 
                 if (tokens.size() == 5) {
                     LOG_DEBUG("Single message");

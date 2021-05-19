@@ -14,10 +14,11 @@
 #include <module-apps/messages/OptionsWindow.hpp>
 
 #include <i18n/i18n.hpp>
-#include <module-utils/time/time_conversion.hpp>
 
 #include <module-gui/gui/widgets/BottomBar.hpp>
 #include <module-gui/gui/widgets/TopBar.hpp>
+
+#include <ctime>
 
 namespace app::notes
 {
@@ -138,7 +139,7 @@ namespace app::notes
 
     void NoteEditWindow::saveNote()
     {
-        notesRecord->date    = utils::time::getCurrentTimestamp().getTime();
+        notesRecord->date    = std::time(nullptr);
         notesRecord->snippet = edit->getText();
         presenter->save(*notesRecord);
     }

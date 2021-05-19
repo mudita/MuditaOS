@@ -149,7 +149,7 @@ namespace boot
             m_os_root_path       = purefs::createPath(purefs::dir::getRootDiskPath(), m_os_type);
             m_boot_json          = bootJsonPath;
             m_bootloader_version = m_boot_json_parsed[boot::json::bootloader][boot::json::os_version].string_value();
-            m_timestamp          = utils::time::Timestamp().str("%c");
+            m_timestamp          = utils::time::getCurrentTimestamp().str("%c");
             m_os_version         = std::string(VERSION);
 
             LOG_INFO("boot_config: %s", to_json().dump().c_str());
@@ -160,7 +160,7 @@ namespace boot
             m_os_image     = purefs::file::boot_bin;
             m_os_root_path = purefs::createPath(purefs::dir::getRootDiskPath(), m_os_type);
             m_boot_json    = bootJsonPath;
-            m_timestamp    = utils::time::Timestamp().str("%c");
+            m_timestamp    = utils::time::getCurrentTimestamp().str("%c");
             m_os_version   = std::string(VERSION);
             LOG_WARN("%s failed to parse %s: \"%s\"", __FUNCTION__, bootJsonPath.c_str(), parseErrors.c_str());
             return false;

@@ -21,8 +21,6 @@ namespace audio
 
 #define PERF_STATS_ON 0
 
-    using namespace bsp;
-
     RecorderOperation::RecorderOperation(const char *file, AudioServiceMessage::Callback callback) : Operation(callback)
     {
 

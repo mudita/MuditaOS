@@ -58,7 +58,7 @@ namespace gui
         // create date widgets
         uint32_t w = this->getWidth();
 
-        utils::time::Timestamp time;
+        utils::time::Timestamp time = utils::time::getCurrentTimestamp();
 
         // create date widgets
         dateBody = new gui::HBox(this,

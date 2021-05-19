@@ -91,9 +91,6 @@ namespace app
         return getState() == call::State::IDLE;
     }
 
-    //  number of seconds after end call to switch back to previous application
-    const inline utils::time::Duration delayToSwitchToPreviousApp = 3;
-
     void ApplicationCall::CallAbortHandler()
     {
         manager::Controller::sendAction(this, manager::actions::Call, std::make_unique<app::CallAbortData>());
