@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <Commands.hpp>
@@ -19,7 +19,7 @@ namespace at
             ret.push_back(AT::URC_DELAY_ON);
             ret.push_back(AT::URC_UART1);
             ret.push_back(AT::AT_PIN_READY_LOGIC);
-            ret.push_back(AT::URC_NOTIF_SIGNAL);
+            ret.push_back(AT::CSQ_URC_ON);
             break;
         case commadsSet::simInit:
             ret.push_back(AT::CALLER_NUMBER_PRESENTATION);
