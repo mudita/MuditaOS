@@ -16,6 +16,7 @@ void SAIAudioDevice::initiateRxTransfer()
     audio::Stream::Span dataSpan;
 
     Source::_stream->reserve(dataSpan);
+    LOG_DEBUG("Initiate rx transfer with %u bytes", dataSpan.dataSize);
     auto xfer = sai_transfer_t{.data = dataSpan.data, .dataSize = dataSpan.dataSize};
     SAI_TransferReceiveEDMA(_base, rx, &xfer);
 }

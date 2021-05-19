@@ -20,7 +20,7 @@ namespace audio::test
         void onDataSend() override;
         void enableOutput() override;
         void disableOutput() override;
-        auto getSupportedFormats() -> const std::vector<AudioFormat> & override;
+        auto getSupportedFormats() -> std::vector<AudioFormat> override;
         auto getTraits() const -> ::audio::Endpoint::Traits override;
 
       private:
@@ -37,7 +37,7 @@ namespace audio::test
         void onDataReceive() override;
         void enableInput() override;
         void disableInput() override;
-        auto getSupportedFormats() -> const std::vector<AudioFormat> & override;
+        auto getSupportedFormats() -> std::vector<AudioFormat> override;
         auto getTraits() const -> ::audio::Endpoint::Traits override;
 
       private:

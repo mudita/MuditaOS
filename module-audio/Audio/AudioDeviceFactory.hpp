@@ -5,6 +5,8 @@
 
 #include "AudioDevice.hpp"
 
+#include <Audio/Profiles/Profile.hpp>
+
 #include <memory>
 
 namespace audio
@@ -22,10 +24,11 @@ namespace audio
         explicit AudioDeviceFactory(Observer *observer = nullptr);
 
         void setObserver(Observer *observer) noexcept;
-        std::shared_ptr<AudioDevice> CreateDevice(AudioDevice::Type);
+        std::shared_ptr<AudioDevice> CreateDevice(const Profile &profile);
+        virtual std::shared_ptr<AudioDevice> createCellularAudioDevice() = 0;
 
       protected:
-        virtual std::shared_ptr<AudioDevice> getDeviceFromType(AudioDevice::Type) = 0;
+        virtual std::shared_ptr<AudioDevice> getDevice(const Profile &profile) = 0;
 
       private:
         Observer *_observer = nullptr;

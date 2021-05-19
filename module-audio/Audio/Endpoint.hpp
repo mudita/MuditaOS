@@ -35,7 +35,7 @@ namespace audio
         [[nodiscard]] virtual auto getTraits() const -> Traits = 0;
 
         auto isFormatSupported(const AudioFormat &format) -> bool;
-        virtual auto getSupportedFormats() -> const std::vector<AudioFormat> & = 0;
+        virtual auto getSupportedFormats() -> std::vector<AudioFormat> = 0;
 
       protected:
         AbstractStream *_stream = nullptr;
@@ -44,18 +44,19 @@ namespace audio
     class Sink : public Endpoint
     {
       public:
-        virtual void onDataSend()    = 0;
-        virtual void enableOutput()  = 0;
-        virtual void disableOutput() = 0;
+        virtual auto getSinkFormat() -> AudioFormat = 0;
+        virtual void onDataSend()                   = 0;
+        virtual void enableOutput()                 = 0;
+        virtual void disableOutput()                = 0;
     };
 
     class Source : public Endpoint
     {
       public:
-        virtual auto getSourceFormat() -> AudioFormat;
-        virtual void onDataReceive() = 0;
-        virtual void enableInput()   = 0;
-        virtual void disableInput()  = 0;
+        virtual auto getSourceFormat() -> AudioFormat = 0;
+        virtual void onDataReceive()                  = 0;
+        virtual void enableInput()                    = 0;
+        virtual void disableInput()                   = 0;
     };
 
     class IOProxy : public Source, public Sink

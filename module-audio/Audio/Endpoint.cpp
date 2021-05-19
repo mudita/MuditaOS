@@ -10,7 +10,6 @@
 
 using audio::AbstractStream;
 using audio::Endpoint;
-using audio::IOProxy;
 using audio::Sink;
 using audio::Source;
 using audio::StreamConnection;
@@ -105,9 +104,4 @@ Sink *StreamConnection::getSink() const noexcept
 AbstractStream *StreamConnection::getStream() const noexcept
 {
     return _stream;
-}
-
-auto Source::getSourceFormat() -> AudioFormat
-{
-    return audio::nullFormat;
 }

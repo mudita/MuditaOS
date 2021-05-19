@@ -13,13 +13,13 @@ namespace audio
         ProfilePlaybackHeadphones(Volume volume)
             : Profile("Playback Headphones",
                       Type::PlaybackHeadphones,
-                      AudioDevice::Configuration{.sampleRate_Hz = 0,
-                                                 .bitWidth      = 16,
-                                                 .flags         = 0,
-                                                 .outputVolume  = static_cast<float>(volume),
-                                                 .inputGain     = 0,
-                                                 .inputPath     = AudioDevice::InputPath::None,
-                                                 .outputPath    = AudioDevice::OutputPath::Headphones},
+                      audio::codec::Configuration{.sampleRate_Hz = 0,
+                                                  .bitWidth      = 16,
+                                                  .flags         = 0,
+                                                  .outputVolume  = static_cast<float>(volume),
+                                                  .inputGain     = 0,
+                                                  .inputPath     = audio::codec::InputPath::None,
+                                                  .outputPath    = audio::codec::OutputPath::Headphones},
                       AudioDevice::Type::Audiocodec)
         {}
     };
