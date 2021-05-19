@@ -30,80 +30,24 @@ namespace audio
             Bluetooth
         };
 
-        enum class Flags
-        {
-            OutputMono   = 1 << 0,
-            OutputStereo = 1 << 1,
-            InputLeft    = 1 << 2,
-            InputRight   = 1 << 3,
-            InputStereo  = 1 << 4
-        };
-
-        enum class InputPath
-        {
-            Headphones,
-            Microphone,
-            None
-        };
-
-        enum class OutputPath
-        {
-            Headphones,
-            Earspeaker,
-            Loudspeaker,
-            None
-        };
-
-        using Configuration = struct
-        {
-            uint32_t sampleRate_Hz = 0; /*!< Sample rate of audio data */
-            uint32_t bitWidth      = 0; /*!< Data length of audio data, usually 8/16/24/32 bits */
-            uint32_t flags         = 0; /*!< In/Out configuration flags */
-            float outputVolume     = 0.0f;
-            float inputGain        = 0.0f;
-            InputPath inputPath    = InputPath::None;
-            OutputPath outputPath  = OutputPath::None;
-        };
-
         virtual ~AudioDevice() = default;
 
-        virtual RetCode Start(const Configuration &format) = 0;
-        virtual RetCode Stop()                             = 0;
-
-        virtual RetCode OutputVolumeCtrl(float vol)                 = 0;
-        virtual RetCode InputGainCtrl(float gain)                   = 0;
-        virtual RetCode OutputPathCtrl(OutputPath outputPath)       = 0;
-        virtual RetCode InputPathCtrl(InputPath inputPath)          = 0;
-        virtual bool IsFormatSupported(const Configuration &format) = 0;
-
-        float GetOutputVolume() const noexcept
+        virtual RetCode Start()
         {
-            return currentFormat.outputVolume;
+            return RetCode::Success;
         }
 
-        float GetInputGain() const noexcept
+        virtual RetCode Stop()
         {
-            return currentFormat.inputGain;
+            return RetCode::Success;
         }
 
-        OutputPath GetOutputPath() const noexcept
+        virtual RetCode setOutputVolume(float vol) = 0;
+        virtual RetCode setInputGain(float gain)   = 0;
+
+        auto getSinkFormat() -> AudioFormat override
         {
-            return currentFormat.outputPath;
+            return getSourceFormat();
         }
-
-        InputPath GetInputPath() const noexcept
-        {
-            return currentFormat.inputPath;
-        }
-
-        Configuration GetCurrentFormat() const noexcept
-        {
-            return currentFormat;
-        }
-
-      protected:
-        Configuration currentFormat;
-
-        bool isInitialized = false;
     };
 } // namespace audio

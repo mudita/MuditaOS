@@ -69,7 +69,7 @@ namespace audio
         dec->startDecodingWorker(endOfFileCallback);
 
         // start output device and enable audio connection
-        auto ret = audioDevice->Start(currentProfile->GetAudioConfiguration());
+        auto ret = audioDevice->Start();
         outputConnection->enable();
 
         // update state and token
@@ -117,14 +117,14 @@ namespace audio
     audio::RetCode PlaybackOperation::SetOutputVolume(float vol)
     {
         currentProfile->SetOutputVolume(vol);
-        auto ret = audioDevice->OutputVolumeCtrl(vol);
+        auto ret = audioDevice->setOutputVolume(vol);
         return GetDeviceError(ret);
     }
 
     audio::RetCode PlaybackOperation::SetInputGain(float gain)
     {
         currentProfile->SetInputGain(gain);
-        auto ret = audioDevice->InputGainCtrl(gain);
+        auto ret = audioDevice->setInputGain(gain);
         return GetDeviceError(ret);
     }
 
@@ -163,13 +163,17 @@ namespace audio
             return RetCode::Success;
         }
 
+        // adjust new profile with information from file's tags
+        newProfile->SetSampleRate(tags->sample_rate);
+        newProfile->SetInOutFlags(static_cast<uint32_t>(audio::codec::Flags::OutputStereo));
+
         /// profile change - (re)create output device; stop audio first by
         /// killing audio connection
         outputConnection.reset();
         dec->stopDecodingWorker();
         audioDevice.reset();
         dataStreamOut.reset();
-        audioDevice = CreateDevice(newProfile->GetAudioDeviceType());
+        audioDevice = CreateDevice(*newProfile);
         if (audioDevice == nullptr) {
             LOG_ERROR("Error creating AudioDevice");
             return RetCode::Failed;
@@ -180,10 +184,6 @@ namespace audio
             LOG_ERROR("Format unsupported by the audio device: %s", format.toString().c_str());
             return RetCode::Failed;
         }
-
-        // adjust new profile with information from file's tags
-        newProfile->SetSampleRate(tags->sample_rate);
-        newProfile->SetInOutFlags(static_cast<uint32_t>(AudioDevice::Flags::OutputStereo));
 
         // store profile
         currentProfile = newProfile;

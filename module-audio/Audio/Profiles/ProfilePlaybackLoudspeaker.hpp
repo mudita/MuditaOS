@@ -14,13 +14,13 @@ namespace audio
         ProfilePlaybackLoudspeaker(Volume volume)
             : Profile("Playback Loudspeaker",
                       Type::PlaybackLoudspeaker,
-                      AudioDevice::Configuration{.sampleRate_Hz = 0,
-                                                 .bitWidth      = 16,
-                                                 .flags         = 0,
-                                                 .outputVolume  = static_cast<float>(volume),
-                                                 .inputGain     = 0,
-                                                 .inputPath     = AudioDevice::InputPath::None,
-                                                 .outputPath    = AudioDevice::OutputPath::Loudspeaker},
+                      audio::codec::Configuration{.sampleRate_Hz = 0,
+                                                  .bitWidth      = 16,
+                                                  .flags         = 0,
+                                                  .outputVolume  = static_cast<float>(volume),
+                                                  .inputGain     = 0,
+                                                  .inputPath     = audio::codec::InputPath::None,
+                                                  .outputPath    = audio::codec::OutputPath::Loudspeaker},
                       AudioDevice::Type::Audiocodec)
         {}
     };

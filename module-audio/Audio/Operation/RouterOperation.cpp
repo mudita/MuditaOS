@@ -31,14 +31,14 @@ namespace audio
     audio::RetCode RouterOperation::SetOutputVolume(float vol)
     {
         currentProfile->SetOutputVolume(vol);
-        auto ret = audioDevice->OutputVolumeCtrl(vol);
+        auto ret = audioDevice->setOutputVolume(vol);
         return GetDeviceError(ret);
     }
 
     audio::RetCode RouterOperation::SetInputGain(float gain)
     {
         currentProfile->SetInputGain(gain);
-        auto ret = audioDevice->InputGainCtrl(gain);
+        auto ret = audioDevice->setInputGain(gain);
         return GetDeviceError(ret);
     }
 
@@ -51,22 +51,20 @@ namespace audio
         state          = State::Active;
 
         // check if audio devices support desired audio format
-        if (!audioDevice->IsFormatSupported(currentProfile->GetAudioConfiguration())) {
+        if (!audioDevice->isFormatSupportedBySource(currentProfile->getAudioFormat())) {
             return RetCode::InvalidFormat;
         }
 
-        if (!audioDeviceCellular->IsFormatSupported(currentProfile->GetAudioConfiguration())) {
+        if (!audioDeviceCellular->isFormatSupportedBySource(currentProfile->getAudioFormat())) {
             return RetCode::InvalidFormat;
         }
 
         // try to run devices with the format
-        if (auto ret = audioDevice->Start(currentProfile->GetAudioConfiguration());
-            ret != AudioDevice::RetCode::Success) {
+        if (auto ret = audioDevice->Start(); ret != AudioDevice::RetCode::Success) {
             return GetDeviceError(ret);
         }
 
-        if (auto ret = audioDeviceCellular->Start(currentProfile->GetAudioConfiguration());
-            ret != AudioDevice::RetCode::Success) {
+        if (auto ret = audioDeviceCellular->Start(); ret != AudioDevice::RetCode::Success) {
             return GetDeviceError(ret);
         }
 
@@ -197,13 +195,13 @@ namespace audio
             Stop();
         }
 
-        audioDevice = CreateDevice(newProfile->GetAudioDeviceType());
+        audioDevice = CreateDevice(*newProfile);
         if (audioDevice == nullptr) {
             LOG_ERROR("Error creating AudioDevice");
             return RetCode::Failed;
         }
 
-        audioDeviceCellular = CreateDevice(AudioDevice::Type::Cellular);
+        audioDeviceCellular = createCellularAudioDevice();
         if (audioDeviceCellular == nullptr) {
             LOG_ERROR("Error creating AudioDeviceCellular");
             return RetCode::Failed;

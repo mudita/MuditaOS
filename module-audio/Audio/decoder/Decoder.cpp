@@ -172,13 +172,9 @@ namespace audio
         return AudioFormat{tags->sample_rate, bitWidth, channels};
     }
 
-    auto Decoder::getSupportedFormats() -> const std::vector<AudioFormat> &
+    auto Decoder::getSupportedFormats() -> std::vector<AudioFormat>
     {
-        if (formats.empty()) {
-            formats.push_back(getSourceFormat());
-        }
-
-        return formats;
+        return std::vector<AudioFormat>{getSourceFormat()};
     }
 
     auto Decoder::getTraits() const -> Endpoint::Traits

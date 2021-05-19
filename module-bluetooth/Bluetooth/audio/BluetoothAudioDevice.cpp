@@ -28,24 +28,10 @@ BluetoothAudioDevice::~BluetoothAudioDevice()
 
 void BluetoothAudioDevice::setMediaContext(MediaContext *mediaContext)
 {
-    constexpr static auto supportedBitWidth = 16U;
-    ctx                                     = mediaContext;
-    formats = std::vector<AudioFormat>{AudioFormat{static_cast<unsigned>(AVDTP::sbcConfig.samplingFrequency),
-                                                   supportedBitWidth,
-                                                   static_cast<unsigned>(AVDTP::sbcConfig.numChannels)}};
+    ctx = mediaContext;
 }
 
-auto BluetoothAudioDevice::Start(const Configuration &format) -> audio::AudioDevice::RetCode
-{
-    return audio::AudioDevice::RetCode::Success;
-}
-
-auto BluetoothAudioDevice::Stop() -> audio::AudioDevice::RetCode
-{
-    return audio::AudioDevice::RetCode::Success;
-}
-
-auto BluetoothAudioDevice::OutputVolumeCtrl(float vol) -> audio::AudioDevice::RetCode
+auto BluetoothAudioDevice::setOutputVolume(float vol) -> audio::AudioDevice::RetCode
 {
     const auto volumeToSet = audio::volume::scaler::toAvrcpVolume(vol);
     const auto status      = avrcp_controller_set_absolute_volume(ctx->avrcp_cid, volumeToSet);
@@ -53,28 +39,13 @@ auto BluetoothAudioDevice::OutputVolumeCtrl(float vol) -> audio::AudioDevice::Re
         LOG_ERROR("Can't set volume level. Status %x", status);
         return audio::AudioDevice::RetCode::Failure;
     }
-    currentFormat.outputVolume = vol;
+    outputVolume = vol;
     return audio::AudioDevice::RetCode::Success;
 }
 
-auto BluetoothAudioDevice::InputGainCtrl(float gain) -> audio::AudioDevice::RetCode
+auto BluetoothAudioDevice::setInputGain(float gain) -> audio::AudioDevice::RetCode
 {
     return audio::AudioDevice::RetCode::Success;
-}
-
-auto BluetoothAudioDevice::OutputPathCtrl(OutputPath outputPath) -> audio::AudioDevice::RetCode
-{
-    return audio::AudioDevice::RetCode::Success;
-}
-
-auto BluetoothAudioDevice::InputPathCtrl(InputPath inputPath) -> audio::AudioDevice::RetCode
-{
-    return audio::AudioDevice::RetCode::Success;
-}
-
-auto BluetoothAudioDevice::IsFormatSupported(const Configuration &format) -> bool
-{
-    return true;
 }
 
 void BluetoothAudioDevice::onDataSend()
@@ -133,9 +104,17 @@ auto BluetoothAudioDevice::fillSbcAudioBuffer(MediaContext *context) -> int
     return totalNumBytesRead;
 }
 
-auto BluetoothAudioDevice::getSupportedFormats() -> const std::vector<AudioFormat> &
+auto BluetoothAudioDevice::getSupportedFormats() -> std::vector<audio::AudioFormat>
 {
-    return formats;
+    constexpr static auto supportedBitWidth = 16U;
+    return std::vector<AudioFormat>{AudioFormat{static_cast<unsigned>(AVDTP::sbcConfig.samplingFrequency),
+                                                supportedBitWidth,
+                                                static_cast<unsigned>(AVDTP::sbcConfig.numChannels)}};
+}
+
+auto BluetoothAudioDevice::getSourceFormat() -> audio::AudioFormat
+{
+    return audio::nullFormat;
 }
 
 auto BluetoothAudioDevice::getTraits() const -> Traits

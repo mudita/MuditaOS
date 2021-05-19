@@ -3,7 +3,8 @@
 
 #pragma once
 
-#include "Audio/AudioDevice.hpp"
+#include <Audio/AudioDevice.hpp>
+#include <Audio/codec.hpp>
 
 #include <memory>
 #include <functional>
@@ -54,9 +55,9 @@ namespace audio
 
         void SetSampleRate(uint32_t samplerate);
 
-        void SetOutputPath(AudioDevice::OutputPath path);
+        void SetOutputPath(audio::codec::OutputPath path);
 
-        void SetInputPath(AudioDevice::InputPath path);
+        void SetInputPath(audio::codec::InputPath path);
 
         Volume GetOutputVolume() const
         {
@@ -78,12 +79,12 @@ namespace audio
             return audioConfiguration.flags;
         }
 
-        AudioDevice::OutputPath GetOutputPath() const
+        audio::codec::OutputPath GetOutputPath() const
         {
             return audioConfiguration.outputPath;
         }
 
-        AudioDevice::InputPath GetInputPath() const
+        audio::codec::InputPath GetInputPath() const
         {
             return audioConfiguration.inputPath;
         }
@@ -93,15 +94,16 @@ namespace audio
             return audioDeviceType;
         }
 
-        [[deprecated]] AudioDevice::Configuration GetAudioConfiguration()
+        [[deprecated]] audio::codec::Configuration GetAudioConfiguration() const
         {
             return audioConfiguration;
         }
 
         auto getAudioFormat() const noexcept
         {
-            auto isStereo = (audioConfiguration.flags & static_cast<uint32_t>(AudioDevice::Flags::OutputStereo)) != 0 ||
-                            (audioConfiguration.flags & static_cast<uint32_t>(AudioDevice::Flags::InputStereo)) != 0;
+            auto isStereo =
+                (audioConfiguration.flags & static_cast<std::uint32_t>(audio::codec::Flags::OutputStereo)) != 0 ||
+                (audioConfiguration.flags & static_cast<std::uint32_t>(audio::codec::Flags::InputStereo)) != 0;
             auto channels = isStereo ? 2U : 1U;
             return AudioFormat(audioConfiguration.sampleRate_Hz, audioConfiguration.bitWidth, channels);
         }
@@ -119,10 +121,10 @@ namespace audio
       protected:
         Profile(const std::string &name,
                 const Type type,
-                const AudioDevice::Configuration &fmt,
+                const audio::codec::Configuration &fmt,
                 AudioDevice::Type devType);
 
-        AudioDevice::Configuration audioConfiguration{};
+        audio::codec::Configuration audioConfiguration;
         AudioDevice::Type audioDeviceType = AudioDevice::Type::Audiocodec;
 
         std::string name;

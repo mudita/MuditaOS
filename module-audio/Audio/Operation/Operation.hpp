@@ -151,7 +151,8 @@ namespace audio
         virtual audio::RetCode SwitchProfile(const Profile::Type type) = 0;
         std::shared_ptr<Profile> GetProfile(const Profile::Type type);
 
-        std::shared_ptr<AudioDevice> CreateDevice(AudioDevice::Type type);
+        std::shared_ptr<AudioDevice> CreateDevice(const Profile &profile);
+        std::shared_ptr<AudioDevice> createCellularAudioDevice();
     };
 
 } // namespace audio
