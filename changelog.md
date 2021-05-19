@@ -4,6 +4,24 @@ To install the new version of MuditaOS please follow the steps described in this
 - [Linux](https://github.com/mudita/MuditaOS/blob/master/doc/boot_and_update.md#creating-a-storage-partition)
 - [Windows and macOS](https://github.com/mudita/MuditaOS/blob/master/doc/flashing_win_macos.md)
 
+## [0.65.1 2021-05-19]
+
+### Added
+
+* Add build system options to the quickstart documentation.
+* Add EEPROM low-level driver.
+* Add primary code owners configuration.
+
+### Fixed
+
+* Fix changing Bluetooth device name.
+* Fix communication with GSM modem on Linux,
+* Fix display backlight turning on in the off state.
+* Fix issues with sending messages from the new message window.
+* Fix network settings window rebuilding on SIM selection.
+* Fix returning to the correct screen from the SOS call window.
+* Fix simulator build for Valgrind.
+
 ## [0.64.1 2021-05-12]
 
 ### Added
