@@ -1911,7 +1911,7 @@ void ServiceCellular::handleCellularHangupCallMessage(CellularHangupCallMessage 
     LOG_INFO("CellularHangupCall");
     if (channel) {
         if (channel->cmd(at::AT::ATH)) {
-            ringSent = clipSent = false;
+            callManager.hangUp();
             AntennaServiceAPI::LockRequest(this, antenna::lockState::unlocked);
             callStateTimer.stop();
             if (!ongoingCall.endCall(CellularCall::Forced::True)) {
@@ -2173,7 +2173,7 @@ auto ServiceCellular::handleCallAbortedNotification(sys::Message *msg) -> std::s
 {
     callStateTimer.stop();
     auto ret = ongoingCall.endCall();
-    ringSent = clipSent = false;
+    callManager.hangUp();
     return std::make_shared<CellularResponseMessage>(ret);
 }
 auto ServiceCellular::handlePowerUpProcedureCompleteNotification(sys::Message *msg)
@@ -2259,11 +2259,11 @@ auto ServiceCellular::handleCellularSendSMSMessage(sys::Message *msg) -> std::sh
 auto ServiceCellular::handleCellularRingNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
     if (isIncommingCallAllowed()) {
-        if (!ringSent) {
+        if (!callManager.isIncomingCallPropagated()) {
             auto message = static_cast<CellularRingNotification *>(msg);
             bus.sendMulticast(std::make_shared<CellularIncominCallMessage>(message->getNubmer()),
                               sys::BusChannel::ServiceCellularNotifications);
-            ringSent = true;
+            callManager.ring();
         }
         return std::make_shared<CellularResponseMessage>(true);
     }
@@ -2274,11 +2274,11 @@ auto ServiceCellular::handleCellularCallerIdNotification(sys::Message *msg) -> s
 {
     auto message = static_cast<CellularCallerIdNotification *>(msg);
     if (isIncommingCallAllowed()) {
-        if (!clipSent) {
+        if (!callManager.isCallerInfoComplete()) {
             auto message = static_cast<CellularCallerIdNotification *>(msg);
             bus.sendMulticast(std::make_shared<CellularCallerIdMessage>(message->getNubmer()),
                               sys::BusChannel::ServiceCellularNotifications);
-            clipSent = true;
+            callManager.completeCallerInfo();
         }
         return std::make_shared<CellularResponseMessage>(true);
     }
@@ -2314,7 +2314,7 @@ auto ServiceCellular::hangUpCall() -> bool
     auto channel = cmux->get(CellularMux::Channel::Commands);
     if (channel != nullptr) {
         if (channel->cmd(at::factory(at::AT::ATH))) {
-            ringSent = clipSent = false;
+            callManager.hangUp();
             return true;
         }
     }

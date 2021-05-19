@@ -5,6 +5,7 @@
 
 #include "service-appmgr/model/ApplicationManager.hpp"
 #include "service-appmgr/messages/GetAllNotificationsRequest.hpp"
+#include "service-appmgr/messages/FinishRequest.hpp"
 
 #include <Service/Service.hpp>
 
@@ -28,6 +29,12 @@ namespace app::manager
     {
         auto msg = std::make_shared<app::manager::ApplicationInitialised>(sender->GetName(), status, startInBackground);
         return sender->bus.sendUnicast(msg, ApplicationManager::ServiceName);
+    }
+
+    auto Controller::finish(sys::Service *sender) -> bool
+    {
+        auto msg = std::make_shared<app::manager::FinishRequest>(sender->GetName());
+        return sender->bus.sendUnicast(std::move(msg), ApplicationManager::ServiceName);
     }
 
     auto Controller::sendAction(sys::Service *sender,

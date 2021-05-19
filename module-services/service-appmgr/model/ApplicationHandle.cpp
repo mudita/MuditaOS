@@ -43,7 +43,7 @@ namespace app::manager
 
     auto ApplicationHandle::closeable() const noexcept -> bool
     {
-        return launcher->isCloseable();
+        return launcher->isCloseable() && !blockClosing;
     }
 
     auto ApplicationHandle::started() const noexcept -> bool
@@ -57,6 +57,12 @@ namespace app::manager
     {
         const auto manifest = getManifest();
         return manifest.contains(action);
+    }
+
+    auto ApplicationHandle::actionFlag(actions::ActionId action) const noexcept -> actions::ActionFlag
+    {
+        const auto manifest = getManifest();
+        return manifest.getActionFlag(action);
     }
 
     void ApplicationHandle::run(sys::phone_modes::PhoneMode mode, sys::Service *caller)

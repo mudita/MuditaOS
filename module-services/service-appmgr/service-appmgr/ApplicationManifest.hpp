@@ -6,6 +6,8 @@
 #include "service-appmgr/Actions.hpp"
 #include <apps-common/locks/handlers/LockPolicyHandler.hpp>
 
+#include <optional>
+
 namespace app::manager
 {
     struct ApplicationManifest
@@ -15,11 +17,15 @@ namespace app::manager
                             AutoLockPolicy _startupAutoLockPolicy = AutoLockPolicy::DetermineByWindow);
 
         [[nodiscard]] auto contains(actions::ActionId action) const noexcept -> bool;
+        [[nodiscard]] auto getActionFlag(actions::ActionId action) const noexcept -> actions::ActionFlag;
         [[nodiscard]] auto getAutoLockPolicy() const noexcept -> AutoLockPolicy;
 
       private:
         /// Actions the application can respond to.
         actions::ActionFilter actions;
         AutoLockPolicy startupAutoLockPolicy = AutoLockPolicy::DetermineByWindow;
+
+      private:
+        auto find(actions::ActionId action) const noexcept -> std::optional<actions::RegisteredAction>;
     };
 } // namespace app::manager

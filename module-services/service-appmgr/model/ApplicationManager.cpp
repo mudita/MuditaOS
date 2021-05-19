@@ -40,6 +40,7 @@
 #include <service-appmgr/messages/DOMRequest.hpp>
 #include <service-appmgr/messages/GetAllNotificationsRequest.hpp>
 #include <service-appmgr/messages/AutoLockRequests.hpp>
+#include <service-appmgr/messages/FinishRequest.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <module-db/queries/notifications/QueryNotificationsGetAll.hpp>
 #include <service-cellular-api>
@@ -64,27 +65,10 @@ namespace app::manager
         state = _state;
     }
 
-    void ApplicationManagerBase::pushApplication(const ApplicationName &name)
-    {
-        stack.push_front(name);
-    }
-
-    void ApplicationManagerBase::popApplication()
-    {
-        if (!stack.empty()) {
-            stack.pop_front();
-        }
-    }
-
-    void ApplicationManagerBase::clearStack()
-    {
-        stack.clear();
-    }
-
     auto ApplicationManagerBase::getFocusedApplication() const noexcept -> ApplicationHandle *
     {
-        for (const auto &appName : stack) {
-            if (auto app = getApplication(appName);
+        for (const auto &item : stack) {
+            if (auto app = getApplication(item.appName);
                 app != nullptr && app->state() == app::Application::State::ACTIVE_FORGROUND) {
                 return app;
             }
@@ -94,10 +78,10 @@ namespace app::manager
 
     auto ApplicationManagerBase::getLaunchingApplication() const noexcept -> ApplicationHandle *
     {
-        if (stack.empty()) {
+        if (stack.isEmpty()) {
             return nullptr;
         }
-        auto app = getApplication(stack.front());
+        auto app = getApplication(stack.front().appName);
         return app->state() != app::Application::State::ACTIVE_FORGROUND ? app : nullptr;
     }
 
@@ -106,7 +90,7 @@ namespace app::manager
         if (stack.size() < 2) {
             return nullptr;
         }
-        return getApplication(stack[1]);
+        return getApplication(stack[1].appName);
     }
 
     auto ApplicationManagerBase::getApplication(const ApplicationName &name) const noexcept -> ApplicationHandle *
@@ -114,24 +98,26 @@ namespace app::manager
         return applications.findByName(name);
     }
 
-    auto ApplicationManagerBase::getRunningApplications() noexcept -> std::vector<ApplicationHandle *>
+    auto ApplicationManagerBase::isApplicationCloseable(const ApplicationHandle *app) const noexcept -> bool
     {
-        const auto &stackOfUniqueApps = getStackOfUniqueApplications();
+        if (stack.contains(app->name())) {
+            const auto &appOccurrences = stack.find(app->name());
+            return app->closeable() && std::none_of(appOccurrences.begin(), appOccurrences.end(), [](const auto &item) {
+                       return !item.isCloseable;
+                   });
+        }
+        return app->closeable();
+    }
+
+    auto ApplicationManagerBase::getStackedApplications() noexcept -> std::vector<ApplicationHandle *>
+    {
+        const auto &uniqueApps = stack.unique();
         std::vector<ApplicationHandle *> runningApps;
-        std::transform(stackOfUniqueApps.begin(),
-                       stackOfUniqueApps.end(),
+        std::transform(uniqueApps.begin(),
+                       uniqueApps.end(),
                        std::back_inserter(runningApps),
                        [this](const auto &appName) { return getApplication(appName); });
         return runningApps;
-    }
-
-    auto ApplicationManagerBase::getStackOfUniqueApplications() const -> ApplicationsStack
-    {
-        auto stackOfUniqueApps = stack;
-        std::sort(stackOfUniqueApps.begin(), stackOfUniqueApps.end());
-        const auto last = std::unique(stackOfUniqueApps.begin(), stackOfUniqueApps.end());
-        stackOfUniqueApps.erase(last, stackOfUniqueApps.end());
-        return stackOfUniqueApps;
     }
 
     ApplicationManager::ApplicationManager(const ApplicationName &serviceName,
@@ -259,7 +245,7 @@ namespace app::manager
 
     void ApplicationManager::startBackgroundApplications()
     {
-        for (const auto &name : std::vector<ApplicationName>{app::name_call, app::special_input}) {
+        for (const auto &name : std::vector<ApplicationName>{app::special_input}) {
             if (auto app = getApplication(name); app != nullptr) {
                 app->runInBackground(phoneModeObserver->getCurrentPhoneMode(), this);
             }
@@ -397,6 +383,12 @@ namespace app::manager
             auto actionMsg = static_cast<ActionRequest *>(request);
             handleActionRequest(actionMsg);
             return std::make_shared<sys::ResponseMessage>();
+        });
+        connect(typeid(FinishRequest), [this](sys::Message *request) {
+            auto finishMsg = static_cast<FinishRequest *>(request);
+            stack.eraseFirstOf(finishMsg->sender);
+            closeNoLongerNeededApplications();
+            return sys::msgHandled();
         });
         connect(typeid(ActionHandledResponse), [this](sys::Message *response) {
             actionsRegistry.finished();
@@ -660,6 +652,16 @@ namespace app::manager
         return true;
     }
 
+    void ApplicationManager::closeNoLongerNeededApplications()
+    {
+        for (const auto &app : getApplications()) {
+            if (app->started() && app->closeable() && !stack.contains(app->name())) {
+                closeApplication(app.get());
+                app->setState(ApplicationHandle::State::DEACTIVATED);
+            }
+        }
+    }
+
     auto ApplicationManager::closeApplicationsOnUpdate() -> bool
     {
         for (const auto &app : getApplications()) {
@@ -714,6 +716,15 @@ namespace app::manager
             return false;
         }
 
+        LOG_DEBUG("Switch applications: [%s][%s](%s) -> [%s][%s](%s)",
+                  currentlyFocusedApp->name().c_str(),
+                  currentlyFocusedApp->switchWindow.c_str(),
+                  app::Application::stateStr(currentlyFocusedApp->state()),
+                  app->name().c_str(),
+                  app->switchWindow.c_str(),
+                  app::Application::stateStr(app->state()));
+
+        stack.front().isCloseable = closeCurrentlyFocusedApp;
         onApplicationSwitch(*app, std::move(msg->getData()), msg->getWindow());
         if (app->name() == currentlyFocusedApp->name()) {
             // Switch window only.
@@ -722,22 +733,21 @@ namespace app::manager
             return false;
         }
 
-        const bool isFocusedAppCloseable =
-            closeCurrentlyFocusedApp && currentlyFocusedApp->closeable() && !currentlyFocusedApp->blockClosing;
-        requestApplicationClose(*currentlyFocusedApp, isFocusedAppCloseable);
+        requestApplicationClose(*currentlyFocusedApp, isApplicationCloseable(currentlyFocusedApp));
         return true;
     }
 
-    void ApplicationManager::onApplicationSwitch(ApplicationHandle &app,
+    void ApplicationManager::onApplicationSwitch(ApplicationHandle &nextApp,
                                                  std::unique_ptr<gui::SwitchData> &&data,
                                                  std::string targetWindow)
     {
-        if (app.name() == rootApplicationName) {
-            clearStack();
+        if (nextApp.name() == rootApplicationName) {
+            stack.clear();
         }
-        pushApplication(app.name());
-        app.switchData   = std::move(data);
-        app.switchWindow = std::move(targetWindow);
+
+        stack.push({nextApp.name(), true});
+        nextApp.switchData   = std::move(data);
+        nextApp.switchWindow = std::move(targetWindow);
     }
 
     void ApplicationManager::requestApplicationClose(ApplicationHandle &app, bool isCloseable)
@@ -762,7 +772,7 @@ namespace app::manager
 
     void ApplicationManager::handlePhoneModeChanged(sys::phone_modes::PhoneMode phoneMode)
     {
-        for (const auto app : getRunningApplications()) {
+        for (const auto app : getStackedApplications()) {
             changePhoneMode(phoneMode, app);
         }
     }
@@ -889,22 +899,38 @@ namespace app::manager
         }
 
         const auto targetApp = actionHandlers.front();
+        action.setTargetApplication(targetApp->name());
+        auto &actionParams = action.params;
+        if (const auto state = targetApp->state(); state == ApplicationHandle::State::ACTIVE_FORGROUND) {
+            app::Application::requestAction(this, targetApp->name(), action.actionId, std::move(actionParams));
+            return ActionProcessStatus::Accepted;
+        }
+        else if (state == ApplicationHandle::State::ACTIVE_BACKGROUND) {
+            if (const auto result = handleCustomActionOnBackgroundApp(targetApp, action);
+                result == ActionProcessStatus::Accepted) {
+                return result;
+            }
+        }
 
         // Inform that target app switch is caused by Action
         targetApp->startupReason = StartupReason::OnAction;
 
-        action.setTargetApplication(targetApp->name());
-        auto &actionParams = action.params;
-        if (targetApp->state() != ApplicationHandle::State::ACTIVE_FORGROUND) {
-            const auto focusedAppClose = !(actionParams && actionParams->disableAppClose);
-            SwitchRequest switchRequest(
-                ServiceName, targetApp->name(), targetApp->switchWindow, std::move(targetApp->switchData));
-            return handleSwitchApplication(&switchRequest, focusedAppClose) ? ActionProcessStatus::Accepted
-                                                                            : ActionProcessStatus::Skipped;
-        }
+        const auto focusedAppClose = !(actionParams && actionParams->disableAppClose);
+        SwitchRequest switchRequest(
+            ServiceName, targetApp->name(), targetApp->switchWindow, std::move(targetApp->switchData));
+        return handleSwitchApplication(&switchRequest, focusedAppClose) ? ActionProcessStatus::Accepted
+                                                                        : ActionProcessStatus::Skipped;
+    }
 
-        app::Application::requestAction(this, targetApp->name(), action.actionId, std::move(actionParams));
-        return ActionProcessStatus::Accepted;
+    auto ApplicationManager::handleCustomActionOnBackgroundApp(ApplicationHandle *app, ActionEntry &action)
+        -> ActionProcessStatus
+    {
+        if (const auto actionFlag = app->actionFlag(action.actionId);
+            actionFlag == actions::ActionFlag::AcceptWhenInBackground) {
+            app::Application::requestAction(this, app->name(), action.actionId, std::move(action.params));
+            return ActionProcessStatus::Accepted;
+        }
+        return ActionProcessStatus::Dropped;
     }
 
     auto ApplicationManager::handleSwitchBack(SwitchBackRequest *msg) -> bool
@@ -924,8 +950,10 @@ namespace app::manager
         }
 
         if (previousApp->name() == currentlyFocusedApp->name()) {
-            LOG_WARN("Failed to return to currently focused application.");
-            return false;
+            // Switch window only.
+            onApplicationSwitchToPrev(*previousApp, std::move(msg->getData()));
+            app::Application::messageSwitchBack(this, currentlyFocusedApp->name());
+            return true;
         }
 
         LOG_DEBUG("Switch applications: [%s][%s](%s) -> [%s][%s](%s)",
@@ -937,14 +965,14 @@ namespace app::manager
                   app::Application::stateStr(previousApp->state()));
 
         onApplicationSwitchToPrev(*previousApp, std::move(msg->getData()));
-        requestApplicationClose(*currentlyFocusedApp, currentlyFocusedApp->closeable());
+        requestApplicationClose(*currentlyFocusedApp, isApplicationCloseable(currentlyFocusedApp));
         return true;
     }
 
     void ApplicationManager::onApplicationSwitchToPrev(ApplicationHandle &previousApp,
                                                        std::unique_ptr<gui::SwitchData> &&data)
     {
-        popApplication();
+        stack.pop();
         previousApp.switchData = std::move(data);
     }
 
@@ -1187,7 +1215,7 @@ namespace app::manager
 
     auto ApplicationManager::onCloseConfirmed(ApplicationHandle &app) -> bool
     {
-        if (app.closeable()) {
+        if (isApplicationCloseable(&app)) {
             app.setState(ApplicationHandle::State::DEACTIVATED);
             Controller::closeApplication(this, app.name());
         }

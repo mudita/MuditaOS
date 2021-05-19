@@ -320,6 +320,10 @@ namespace app
         else if (msgl->messageType == MessageType::AppSwitch) {
             return handleApplicationSwitch(msgl);
         }
+        else if (msgl->messageType == MessageType::AppSwitchBack) {
+            returnToPreviousWindow();
+            return sys::msgHandled();
+        }
         else if (msgl->messageType == MessageType::AppSwitchWindow) {
             return handleSwitchWindow(msgl);
         }
@@ -405,7 +409,7 @@ namespace app
 
             auto result = actionHandler(std::move(data));
 
-            if (windowsStack.isEmpty()) {
+            if (getState() == State::ACTIVE_FORGROUND && windowsStack.isEmpty()) {
                 LOG_ERROR("OnAction application switch with no window provided. Fallback to default mainWindow.");
                 setActiveWindow(gui::name::window::main_window);
             }
@@ -700,8 +704,12 @@ namespace app
 
     void Application::messageApplicationLostFocus(sys::Service *sender, std::string application)
     {
-        auto msg = std::make_shared<AppLostFocusMessage>();
-        sender->bus.sendUnicast(msg, application);
+        sender->bus.sendUnicast(std::make_shared<AppLostFocusMessage>(), application);
+    }
+
+    void Application::messageSwitchBack(sys::Service *sender, const std::string &application)
+    {
+        sender->bus.sendUnicast(std::make_shared<AppSwitchBackMessage>(), application);
     }
 
     void Application::messageInputEventApplication(sys::Service *sender,

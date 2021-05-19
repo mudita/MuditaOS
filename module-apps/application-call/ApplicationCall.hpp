@@ -33,8 +33,8 @@ namespace app
         using NumberChangeCallback              = std::function<void(utils::PhoneNumber::View)>;
         virtual ~CallWindowInterface() noexcept = default;
 
-        virtual void setState(app::call::State state) noexcept              = 0;
-        [[nodiscard]] virtual auto getState() const noexcept -> call::State = 0;
+        virtual void setCallState(app::call::State state) noexcept              = 0;
+        [[nodiscard]] virtual auto getCallState() const noexcept -> call::State = 0;
 
         enum class AudioEvent
         {
@@ -69,7 +69,7 @@ namespace app
         sys::TimerHandle callerIdTimer;
 
       protected:
-        call::State state = call::State::IDLE;
+        call::State callState = call::State::IDLE;
 
       public:
         ApplicationCall(std::string name                    = name_call,
@@ -89,17 +89,19 @@ namespace app
         void createUserInterface() override;
         void destroyUserInterface() override;
 
+        void handleIncomingCall();
+        void handleCallerId(const app::manager::actions::CallParams *params);
         void handleEmergencyCallEvent(const std::string &number) override;
         void handleCallEvent(const std::string &number) override;
         void handleAddContactEvent(const std::string &number) override;
 
         auto showNotification(std::function<bool()> action, const std::string &icon, const std::string &text) -> bool;
 
-        [[nodiscard]] auto getState() const noexcept -> call::State override
+        [[nodiscard]] auto getCallState() const noexcept -> call::State override
         {
-            return state;
+            return callState;
         }
-        void setState(call::State state) noexcept override
+        void setCallState(call::State state) noexcept override
         {
             if (state == call::State::CALL_IN_PROGRESS) {
                 bus.sendUnicast(
@@ -111,7 +113,7 @@ namespace app
                     std::make_shared<sevm::KeypadBacklightMessage>(bsp::keypad_backlight::Action::turnOffCallMode),
                     service::name::evt_manager);
             }
-            this->state = state;
+            this->callState = state;
         }
 
         void stopAudio() override;
@@ -137,11 +139,12 @@ namespace app
                      manager::actions::CallRejectedByOfflineNotification,
                      manager::actions::PhoneModeChanged,
                      manager::actions::ActivateCall,
-                     manager::actions::AbortCall,
+                     {manager::actions::AbortCall, manager::actions::ActionFlag::AcceptWhenInBackground},
                      manager::actions::HandleOutgoingCall,
                      manager::actions::HandleIncomingCall,
                      manager::actions::HandleCallerId,
-                     manager::actions::EndCall}, locks::AutoLockPolicy::PreventPermanently};
+                     manager::actions::HandleCallerId},
+                    locks::AutoLockPolicy::PreventPermanently};
         }
     };
 } /* namespace app */

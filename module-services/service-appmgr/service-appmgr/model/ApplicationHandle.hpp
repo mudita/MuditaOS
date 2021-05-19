@@ -34,6 +34,7 @@ namespace app::manager
         auto closeable() const noexcept -> bool;
         auto started() const noexcept -> bool;
         auto handles(actions::ActionId action) const noexcept -> bool;
+        auto actionFlag(actions::ActionId action) const noexcept -> actions::ActionFlag;
 
         std::unique_ptr<app::ApplicationLauncher> launcher; // Handle to the application's start function.
         std::unique_ptr<gui::SwitchData> switchData;
