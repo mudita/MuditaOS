@@ -37,6 +37,9 @@ class EventManager : public sys::Service
     void toggleTorchOnOff();
     void toggleTorchColor();
 
+    void processRTCRequest(struct tm &newTime);
+    void processTimezoneRequest(const std::string &timezone);
+
     std::shared_ptr<settings::Settings> settings;
     sys::TimerHandle loggerTimer;
 

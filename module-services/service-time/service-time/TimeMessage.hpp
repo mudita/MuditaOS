@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -49,3 +49,36 @@ class TimeResponseMessage : public sys::ResponseMessage
     bool retCode;
     std::string data;
 };
+
+namespace stm::message
+{
+    class UpdateRTCValueMessage : public sys::DataMessage
+    {
+      public:
+        explicit UpdateRTCValueMessage(const struct tm &time)
+            : sys::DataMessage(MessageType::MessageTypeUninitialized), time(time){};
+
+        auto getTime() -> struct tm &
+        {
+            return time;
+        }
+
+      private:
+        struct tm time;
+    };
+
+    class UpdateTimeZoneMessage : public sys::DataMessage
+    {
+      public:
+        explicit UpdateTimeZoneMessage(const std::string &timezone)
+            : sys::DataMessage(MessageType::MessageTypeUninitialized), timezone(timezone){};
+
+        auto getTimezone() -> std::string
+        {
+            return timezone;
+        }
+
+      private:
+        std::string timezone;
+    };
+} // namespace stm::message

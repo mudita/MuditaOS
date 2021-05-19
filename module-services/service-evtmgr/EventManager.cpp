@@ -36,10 +36,13 @@
 #include <service-desktop/Constants.hpp>
 #include <service-desktop/DesktopMessages.hpp>
 #include <service-cellular/ServiceCellular.hpp>
+#include <service-time/service-time/TimeMessage.hpp>
+
 #include <cassert>
 #include <fstream>
 #include <filesystem>
 #include <list>
+#include <ctime>
 #include <module-apps/messages/AppMessage.hpp>
 #include <SystemManager/messages/CpuFrequencyMessage.hpp>
 #include <common_data/EventStore.hpp>
@@ -75,16 +78,6 @@ EventManager::~EventManager()
     }
 }
 
-// those static functions and variables will be replaced by Settings API
-static std::string tzSet;
-static void setSettingsTimeZone(const std::string &timeZone)
-{
-    tzSet = timeZone;
-}
-std::string getSettingsTimeZone()
-{
-    return tzSet;
-}
 
 // Invoked upon receiving data message
 sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
@@ -170,22 +163,6 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
             bus.sendUnicast(message, ServiceCellular::serviceName);
         }
         handled = true;
-    }
-    else if (auto msg = dynamic_cast<CellularMessage *>(msgl)) {
-        if (msg->type == CellularMessage::Type::TimeUpdated) {
-            if (auto msg = dynamic_cast<CellularTimeNotificationMessage *>(msgl)) {
-                if (auto time = msg->getTime(); time) {
-                    LOG_INFO("RTC set by network time.");
-                    bsp::rtc::setDateTime(&time.value());
-                }
-                if (auto timeZoneOffset = msg->getTimeZoneOffset(); timeZoneOffset) {
-                    setSettingsTimeZone(msg->getTimeZoneString().value());
-                    utils::time::Time::setTimeZoneOffset(msg->getTimeZoneOffset().value());
-                }
-                auto notification = std::make_shared<sys::DataMessage>(MessageType::EVMTimeUpdated);
-                bus.sendMulticast(notification, sys::BusChannel::ServiceEvtmgrNotifications);
-            }
-        }
     }
     else if (msgl->messageType == MessageType::EVMRingIndicator) {
         auto msg = std::make_shared<CellularUrcIncomingNotification>();
@@ -307,6 +284,17 @@ sys::ReturnCodes EventManager::InitHandler()
         return sys::MessageNone{};
     });
 
+    connect(typeid(stm::message::UpdateRTCValueMessage), [&](sys::Message *msg) {
+        auto message = static_cast<stm::message::UpdateRTCValueMessage *>(msg);
+        processRTCRequest(message->getTime());
+        return sys::MessageNone{};
+    });
+
+    connect(typeid(stm::message::UpdateTimeZoneMessage), [&](sys::Message *msg) {
+        auto message = static_cast<stm::message::UpdateTimeZoneMessage *>(msg);
+        processTimezoneRequest(message->getTimezone());
+        return sys::MessageNone{};
+    });
     // initialize keyboard worker
     EventWorker = std::make_unique<WorkerEvent>(this);
 
@@ -422,4 +410,25 @@ void EventManager::toggleTorchColor()
                                                                           : bsp::torch::ColourTemperature::coldest;
         bsp::torch::turn(bsp::torch::State::on, newColor);
     }
+}
+
+void EventManager::processRTCRequest(struct tm &newTime)
+{
+    if (bsp::rtc::setDateTime(&newTime) != bsp::rtc::ErrorCode::OK) {
+        LOG_ERROR("Setting RTC failed.");
+        return;
+    }
+    auto timestamp = time(nullptr);
+    bsp::rtc::setMinuteAlarm(timestamp);
+    auto notification = std::make_shared<sys::DataMessage>(MessageType::EVMTimeUpdated);
+    bus.sendMulticast(std::move(notification), sys::BusChannel::ServiceEvtmgrNotifications);
+}
+void EventManager::processTimezoneRequest(const std::string &timezone)
+{
+    if (setenv("TZ", timezone.c_str(), 1) != 0) {
+        LOG_ERROR("Setting timezone failed.");
+        return;
+    }
+    auto notification = std::make_shared<sys::DataMessage>(MessageType::EVMTimeUpdated);
+    bus.sendMulticast(std::move(notification), sys::BusChannel::ServiceEvtmgrNotifications);
 }

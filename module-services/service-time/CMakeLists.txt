@@ -3,6 +3,9 @@ message( "${PROJECT_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}" )
 
 set(SOURCES
     ServiceTime.cpp
+    TimeManager.cpp
+    RTCcommand.cpp
+    TimezoneHandler.cpp
     timeEvents/TimeEvents.cpp
     timeEvents/CalendarTimeEvents.cpp
 )
@@ -19,3 +22,7 @@ target_link_libraries(${PROJECT_NAME}
         module-sys
         module-apps
 )
+
+if (${ENABLE_TESTS})
+    add_subdirectory(tests)
+endif ()

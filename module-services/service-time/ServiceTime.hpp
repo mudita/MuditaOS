@@ -3,7 +3,9 @@
 
 #pragma once
 
+#include "Constants.hpp"
 #include "service-time/CalendarTimeEvents.hpp"
+#include "service-time/TimeManager.hpp"
 #include "service-time/ServiceTime.hpp"
 
 #include <service-db/DBServiceName.hpp>
@@ -18,18 +20,16 @@
 #include <functional>
 #include <string> // for allocator, string
 
-namespace service::name
-{
-    inline constexpr auto service_time = "ServiceTime";
-};
-
 namespace stm
 {
     class ServiceTime : public sys::Service
     {
       private:
-        static constexpr auto StackDepth = 1300;
+        static constexpr auto StackDepth = 2048;
         CalendarTimeEvents calendarEvents;
+
+        std::unique_ptr<TimeManager> timeManager;
+        void registerMessageHandlers();
 
       public:
         ServiceTime();
