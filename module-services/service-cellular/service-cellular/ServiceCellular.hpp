@@ -138,6 +138,7 @@ class ServiceCellular : public sys::Service
     std::vector<std::string> messageParts;
 
     CellularCall::CellularCall ongoingCall;
+    std::vector<CalllogRecord> tetheringCalllog;
 
     ussd::State ussdState = ussd::State::none;
 
@@ -316,6 +317,11 @@ class ServiceCellular : public sys::Service
     auto isIncommingCallAllowed() -> bool;
 
     auto hangUpCall() -> bool;
+    auto hangUpCallBusy() -> bool;
+
+    auto tetheringTurnOffURC() -> bool;
+    auto tetheringTurnOnURC() -> bool;
+    auto logTetheringCalls() -> void;
 
   private:
     std::unique_ptr<cellular::internal::ServiceCellularPriv> priv;

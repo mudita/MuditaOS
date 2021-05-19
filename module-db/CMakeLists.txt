@@ -98,6 +98,7 @@ set(SOURCES
         queries/calllog/QueryCalllogGetByContactID.cpp
         queries/notifications/QueryNotificationsGet.cpp
         queries/notifications/QueryNotificationsIncrement.cpp
+        queries/notifications/QueryNotificationsMultipleIncrement.cpp
         queries/notifications/QueryNotificationsClear.cpp
         queries/notifications/QueryNotificationsGetAll.cpp
         queries/phonebook/QueryContactGet.cpp

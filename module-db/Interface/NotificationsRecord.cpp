@@ -4,6 +4,7 @@
 #include "NotificationsRecord.hpp"
 #include "module-db/queries/notifications/QueryNotificationsGet.hpp"
 #include "module-db/queries/notifications/QueryNotificationsIncrement.hpp"
+#include "module-db/queries/notifications/QueryNotificationsMultipleIncrement.hpp"
 #include "module-db/queries/notifications/QueryNotificationsClear.hpp"
 #include "module-db/queries/notifications/QueryNotificationsGetAll.hpp"
 #include "Databases/NotificationsDB.hpp"
@@ -147,6 +148,9 @@ std::unique_ptr<db::QueryResult> NotificationsRecordInterface::runQuery(std::sha
     if (const auto local_query = dynamic_cast<const db::query::notifications::Increment *>(query.get())) {
         return runQueryImpl(local_query);
     }
+    if (const auto local_query = dynamic_cast<const db::query::notifications::MultipleIncrement *>(query.get())) {
+        return runQueryImpl(local_query);
+    }
     if (const auto local_query = dynamic_cast<const db::query::notifications::Clear *>(query.get())) {
         return runQueryImpl(local_query);
     }
@@ -166,25 +170,26 @@ std::unique_ptr<db::query::notifications::GetResult> NotificationsRecordInterfac
 std::unique_ptr<db::query::notifications::IncrementResult> NotificationsRecordInterface::runQueryImpl(
     const db::query::notifications::Increment *query)
 {
-    auto ret = false;
-    if (auto record = GetByKey(query->getKey()); record.isValid()) {
-        auto &currentContactRecord = record.contactRecord;
-        if (auto numberMatch = contactsDb->MatchByNumber(query->getNumber()); numberMatch.has_value()) {
-            if (record.value == 0) {
-                currentContactRecord = std::move(numberMatch.value().contact);
-            }
-            else if (currentContactRecord.has_value() &&
-                     numberMatch.value().contactId != currentContactRecord.value().ID) {
-                currentContactRecord.reset();
-            }
-        }
-        else {
-            currentContactRecord.reset();
-        }
-        record.value++;
-        ret = Update(record);
-    }
+    auto ret = processIncrement(query->getKey(), query->getNumber(), 1);
+
     return std::make_unique<db::query::notifications::IncrementResult>(ret);
+}
+
+std::unique_ptr<db::query::notifications::MultipleIncrementResult> NotificationsRecordInterface::runQueryImpl(
+    const db::query::notifications::MultipleIncrement *query)
+{
+    auto ret            = false;
+    const auto &numbers = query->getNumbers();
+    std::optional<utils::PhoneNumber::View> number;
+
+    if (!numbers.empty()) {
+        if (all_of(numbers.begin(), numbers.end(), [&](const auto &number) { return number == numbers.at(0); })) {
+            number = std::make_optional(numbers.at(0));
+        }
+
+        ret = processIncrement(query->getKey(), std::move(number), numbers.size());
+    }
+    return std::make_unique<db::query::notifications::MultipleIncrementResult>(ret);
 }
 
 std::unique_ptr<db::query::notifications::ClearResult> NotificationsRecordInterface::runQueryImpl(
@@ -205,4 +210,36 @@ std::unique_ptr<db::query::notifications::GetAllResult> NotificationsRecordInter
     auto numberOfNotifications = GetCount();
     auto records               = GetLimitOffset(0, numberOfNotifications);
     return std::make_unique<db::query::notifications::GetAllResult>(std::move(records));
+}
+
+bool NotificationsRecordInterface::processIncrement(NotificationsRecord::Key key,
+                                                    std::optional<utils::PhoneNumber::View> &&number,
+                                                    size_t size)
+{
+    auto ret = false;
+
+    if (auto record = GetByKey(key); record.isValid() && number.has_value()) {
+        auto &currentContactRecord = record.contactRecord;
+        if (size == 1) {
+            if (auto numberMatch = contactsDb->MatchByNumber(number.value()); numberMatch.has_value()) {
+                if (record.value == 0) {
+                    currentContactRecord = std::move(numberMatch.value().contact);
+                }
+                else if (currentContactRecord.has_value() &&
+                         numberMatch.value().contactId != currentContactRecord.value().ID) {
+                    currentContactRecord.reset();
+                }
+            }
+            else {
+                currentContactRecord.reset();
+            }
+        }
+        else if (size > 1) {
+            currentContactRecord.reset();
+        }
+        record.value += size;
+        ret = Update(record);
+    }
+
+    return ret;
 }

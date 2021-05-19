@@ -31,7 +31,7 @@ namespace at
         URC_DELAY_ON,               /// Enable delay the output of URC indication until ring indicator pulse ends
         URC_UART1,                  /// Route URCs to UART1
         AT_PIN_READY_LOGIC,         /// Configure AP_Ready pin logic ( enable, logic level 1, 200ms )
-        URC_NOTIF_SIGNAL,           /// Turn on signal strength change URC
+        CSQ_URC_ON,                 /// Turn on signal strength change URC
         CRC_ON,                     /// Change incoming call notification from "RING" to "+CRING:type"
         CALLER_NUMBER_PRESENTATION, /// Turn on caller's number presentation
         SMS_TEXT_FORMAT,            /// Set Message format to Text
@@ -54,13 +54,14 @@ namespace at
         CNUM, /// doc: the command can get the subscribers own number(s) from the (U)SI
         CIMI, /// Its getting IMSI from selected SIM card
         QCMGR,
-        ATH,  /// hangup
-        ATA,  /// (doc): timeout should be possibly set up to 90s
-        ATD,  /// setup call
-        IPR,  /// set baudrate
-        CMUX, /// setup cmux params
-        CFUN, /// set phone functionality
-        CMGS, /// sms
+        ATH,       /// hangup
+        QHUP_BUSY, /// hangup all calls with busy reason
+        ATA,       /// (doc): timeout should be possibly set up to 90s
+        ATD,       /// setup call
+        IPR,       /// set baudrate
+        CMUX,      /// setup cmux params
+        CFUN,      /// set phone functionality
+        CMGS,      /// sms
         QCMGS,
         CREG,       /// network registration status
         QNWINFO,    /// network informations (band etc)
@@ -126,6 +127,13 @@ namespace at
         QMBNCFG,  /// Quectel command for MBN files management
         QCFG_IMS, /// Set/Get IP Multimedia Services, get state of VoLTE
         QEEC,     /// Echo cancellation parameters
+        RING_URC_OFF,
+        RING_URC_ON,
+        CSQ_URC_OFF,
+        SMS_URC_OFF,
+        SMS_URC_ON,
+        ACT_URC_OFF,
+        ACT_URC_ON,
     };
 
     enum class commadsSet
