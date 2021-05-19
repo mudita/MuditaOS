@@ -41,6 +41,7 @@ enum class MessageType
     // application manager
     APMGeneric,
     APMAction,          ///< Used to send an action request to application manager.
+    APMFinish,          ///< Used to finish the last occurrence of the requesting application.
     APMCheckAppRunning, ///< check if application is running in application manager
     APMSwitch,          ///< request to switch to given application, optionally also to specified window
     APMSwitchPrevApp,   ///< Request to switch to previous application.
@@ -76,6 +77,7 @@ enum class MessageType
     AppClose,
     AppFocus,
     AppFocusLost,
+    AppSwitchBack,
 
     EVMFocusApplication,
     EVMKeyboardProfile,

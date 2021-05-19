@@ -16,7 +16,6 @@ namespace app::manager
     namespace actions
     {
         using ActionId        = int;
-        using ActionFilter    = std::vector<ActionId>;
         using ActionParams    = gui::SwitchData;
         using ActionParamsPtr = std::unique_ptr<ActionParams>;
 
@@ -30,7 +29,6 @@ namespace app::manager
             ActivateCall,
             HandleOutgoingCall,
             HandleIncomingCall,
-            EndCall,
             HandleCallerId,
             NotAnEmergencyNotification,
             NoSimNotification,
@@ -64,6 +62,22 @@ namespace app::manager
                        // All user-defined actions shall have values greater than UserAction.
                        // All system-wide actions shall have values lesser than UserAction.
         };
+
+        enum class ActionFlag
+        {
+            None,
+            AcceptWhenInBackground /// Accepts actions even if in background.
+        };
+
+        struct RegisteredAction
+        {
+            constexpr RegisteredAction(ActionId id, ActionFlag flag = ActionFlag::None) : id{id}, flag{flag}
+            {}
+
+            const ActionId id;
+            const ActionFlag flag;
+        };
+        using ActionFilter = std::vector<RegisteredAction>;
 
         class ConvertibleToAction
         {

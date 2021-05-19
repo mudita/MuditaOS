@@ -6,6 +6,7 @@
 #include "ApplicationHandle.hpp"
 #include "ApplicationsRegistry.hpp"
 #include "ActionsRegistry.hpp"
+#include "ApplicationStack.hpp"
 
 #include <apps-common/Application.hpp>
 #include <apps-common/ApplicationLauncher.hpp>
@@ -67,19 +68,16 @@ namespace app::manager
         explicit ApplicationManagerBase(std::vector<std::unique_ptr<app::ApplicationLauncher>> &&launchers);
         virtual ~ApplicationManagerBase() = default;
 
-        void pushApplication(const ApplicationName &name);
-        void popApplication();
-        void clearStack();
-
         auto getFocusedApplication() const noexcept -> ApplicationHandle *;
         auto getLaunchingApplication() const noexcept -> ApplicationHandle *;
         auto getPreviousApplication() const noexcept -> ApplicationHandle *;
         auto getApplication(const ApplicationName &name) const noexcept -> ApplicationHandle *;
-        auto getRunningApplications() noexcept -> std::vector<ApplicationHandle *>;
+        auto getStackedApplications() noexcept -> std::vector<ApplicationHandle *>;
         auto getApplications() const noexcept -> const ApplicationsContainer &
         {
             return applications.getAll();
         }
+        auto isApplicationCloseable(const ApplicationHandle *app) const noexcept -> bool;
 
         void setState(State _state) noexcept;
         auto getState() const noexcept -> State
@@ -89,14 +87,10 @@ namespace app::manager
 
       protected:
         ApplicationsRegistry applications;
+        ApplicationStack stack;
 
       private:
-        using ApplicationsStack = std::deque<ApplicationName>;
-
-        auto getStackOfUniqueApplications() const -> ApplicationsStack;
-
         State state = State::Running;
-        ApplicationsStack stack;
     };
 
     class ApplicationManager : public sys::Service, private ApplicationManagerBase
@@ -119,6 +113,7 @@ namespace app::manager
         void startBackgroundApplications();
         void rebuildActiveApplications();
         void suspendSystemServices();
+        void closeNoLongerNeededApplications();
         auto closeApplications() -> bool;
         auto closeApplicationsOnUpdate() -> bool;
         void closeApplication(ApplicationHandle *application);
@@ -139,6 +134,7 @@ namespace app::manager
         void handleTetheringChanged(sys::phone_modes::Tethering tethering);
         void changePhoneMode(sys::phone_modes::PhoneMode phoneMode, const ApplicationHandle *app);
         auto handleCustomAction(ActionEntry &action) -> ActionProcessStatus;
+        auto handleCustomActionOnBackgroundApp(ApplicationHandle *app, ActionEntry &action) -> ActionProcessStatus;
         auto handleSwitchApplication(SwitchRequest *msg, bool closeCurrentlyFocusedApp = true) -> bool;
         auto handleCloseConfirmation(CloseConfirmation *msg) -> bool;
         auto handleSwitchConfirmation(SwitchConfirmation *msg) -> bool;
@@ -162,7 +158,7 @@ namespace app::manager
         auto handleAutoLockSetRequest(SetAutoLockTimeoutRequest *request) -> std::shared_ptr<sys::ResponseMessage>;
 
         void requestApplicationClose(ApplicationHandle &app, bool isCloseable);
-        void onApplicationSwitch(ApplicationHandle &app,
+        void onApplicationSwitch(ApplicationHandle &nextApp,
                                  std::unique_ptr<gui::SwitchData> &&data,
                                  std::string targetWindow);
         void onApplicationSwitchToPrev(ApplicationHandle &previousApp, std::unique_ptr<gui::SwitchData> &&data);

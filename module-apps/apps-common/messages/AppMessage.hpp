@@ -224,4 +224,11 @@ namespace app
         AppLostFocusMessage() : AppMessage{MessageType::AppFocusLost}
         {}
     };
+
+    class AppSwitchBackMessage : public AppMessage
+    {
+      public:
+        AppSwitchBackMessage() : AppMessage(MessageType::AppSwitchBack)
+        {}
+    };
 } // namespace app
