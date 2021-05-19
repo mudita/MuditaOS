@@ -7,17 +7,15 @@
 
 namespace audio::transcode
 {
-    /**
-     * @brief Mono to stereo PCM16 data transform
-     */
-    class MonoToStereo : public Transform
+
+    class NullTransform : public Transform
     {
       public:
         auto transform(const Span &span, const Span &transformSpace) const -> Span override;
         auto validateInputFormat(const audio::AudioFormat &inputFormat) const noexcept -> bool override;
         auto transformFormat(const audio::AudioFormat &inputFormat) const noexcept -> audio::AudioFormat override;
-        auto transformBlockSize(std::size_t blockSize) const noexcept -> std::size_t override;
-        auto transformBlockSizeInverted(std::size_t blockSize) const noexcept -> std::size_t override;
+        auto transformBlockSize(std::size_t inputBufferSize) const noexcept -> std::size_t override;
+        auto transformBlockSizeInverted(std::size_t outputBufferSize) const noexcept -> std::size_t override;
     };
 
 } // namespace audio::transcode

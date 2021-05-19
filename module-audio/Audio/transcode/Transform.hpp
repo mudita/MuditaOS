@@ -23,10 +23,10 @@ namespace audio::transcode
          * @brief Transforms data within range
          *
          * @param inputSpan - input data to transform
-         * @param transformSpace - overall space available to the transform
-         * @return Output data (contained within )
+         * @param outputSpan - space for transformation output
+         * @return Output data
          */
-        virtual auto transform(const Span &inputSpan, const Span &transformSpace) const -> Span = 0;
+        virtual auto transform(const Span &inputSpan, const Span &outputSpan) const -> Span = 0;
 
         /**
          * @brief Checks if audio format is suitable for transformation.
@@ -54,17 +54,13 @@ namespace audio::transcode
         virtual auto transformBlockSize(std::size_t blockSize) const noexcept -> std::size_t = 0;
 
         /**
-         * @brief Get the overall space size required for transformation. Some transforms
-         * may need to use more space than the size of an output data, e.g. resampling
-         * where there is a signal interpolation before the final decimation.
+         * @brief Calculates required size of an input data to get transformed data of size equal
+         * outputBlockSize
          *
-         * @param inputBufferSize
+         * @param outputBlockSize - size of an output block
          * @return std::size_t
          */
-        virtual auto getTransformSize(std::size_t inputBufferSize) const noexcept -> std::size_t
-        {
-            return transformBlockSize(inputBufferSize);
-        }
+        virtual auto transformBlockSizeInverted(std::size_t outputBlockSize) const noexcept -> std::size_t = 0;
 
         /**
          * @brief A convenience transform operator.
