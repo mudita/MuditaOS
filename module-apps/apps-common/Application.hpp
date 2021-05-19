@@ -312,6 +312,7 @@ namespace app
         static void messageCloseApplication(sys::Service *sender, std::string application);
         static void messageRebuildApplication(sys::Service *sender, std::string application);
         static void messageApplicationLostFocus(sys::Service *sender, std::string application);
+        static void messageSwitchBack(sys::Service *sender, const std::string &application);
         /// @}
 
       protected:

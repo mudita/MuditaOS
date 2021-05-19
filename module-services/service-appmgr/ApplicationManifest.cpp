@@ -14,8 +14,29 @@ namespace app::manager
 
     auto ApplicationManifest::contains(actions::ActionId action) const noexcept -> bool
     {
-        auto it = std::find(actions.begin(), actions.end(), action);
-        return it != actions.end();
+        const auto &foundAction = find(action);
+        return foundAction.has_value();
+    }
+
+    auto ApplicationManifest::getActionFlag(actions::ActionId action) const noexcept -> actions::ActionFlag
+    {
+        const auto &foundAction = find(action);
+        if (!foundAction.has_value()) {
+            return actions::ActionFlag::None;
+        }
+
+        return foundAction->flag;
+    }
+
+    auto ApplicationManifest::find(actions::ActionId action) const noexcept -> std::optional<actions::RegisteredAction>
+    {
+        auto it = std::find_if(actions.begin(), actions.end(), [action](const actions::RegisteredAction &act) {
+            return action == act.id;
+        });
+        if (it == actions.end()) {
+            return std::nullopt;
+        }
+        return *it;
     }
 
     [[nodiscard]] auto ApplicationManifest::getAutoLockPolicy() const noexcept -> AutoLockPolicy

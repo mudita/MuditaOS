@@ -34,6 +34,7 @@ namespace app::manager
       public:
         Controller() = delete;
 
+        static auto finish(sys::Service *sender) -> bool;
         static auto applicationInitialised(sys::Service *sender,
                                            StartupStatus status,
                                            StartInBackground startInBackground) -> bool;
