@@ -103,17 +103,20 @@ void HSPAudioDevice::onDataSend(std::uint16_t scoHandle)
 
 void HSPAudioDevice::receiveCVSD(audio::AbstractStream::Span receivedData)
 {
-    auto blockSize          = Source::_stream->getInputTraits().blockSize;
-    auto processedDataIndex = 0;
+    if (!isInputEnabled()) {
+        return;
+    }
 
-    // TODO: decode CVSD
+    auto blockSize          = Source::_stream->getInputTraits().blockSize;
+    auto decodedData        = decodeCVSD(receivedData);
+    auto processedDataIndex = 0;
 
     // try to complete leftovers to the full block size
     if (leftoversSize != 0) {
         auto maxFillSize = blockSize - leftoversSize;
-        auto fillSize    = std::min(maxFillSize, receivedData.dataSize);
+        auto fillSize    = std::min(maxFillSize, decodedData.dataSize);
 
-        std::copy_n(receivedData.data, fillSize, &rxLeftovers[leftoversSize]);
+        std::copy_n(decodedData.data, fillSize, &rxLeftovers[leftoversSize]);
 
         if (fillSize + leftoversSize < blockSize) {
             leftoversSize += fillSize;
@@ -126,16 +129,40 @@ void HSPAudioDevice::receiveCVSD(audio::AbstractStream::Span receivedData)
     }
 
     // push as many blocks as possible
-    while (receivedData.dataSize - processedDataIndex >= blockSize) {
-        Source::_stream->push(&receivedData.data[processedDataIndex], blockSize);
+    while (decodedData.dataSize - processedDataIndex >= blockSize) {
+        Source::_stream->push(&decodedData.data[processedDataIndex], blockSize);
         processedDataIndex += blockSize;
     }
 
     // save leftovers
-    leftoversSize = receivedData.dataSize - processedDataIndex;
+    leftoversSize = decodedData.dataSize - processedDataIndex;
     if (leftoversSize > 0) {
-        std::copy_n(&receivedData.data[processedDataIndex], leftoversSize, &rxLeftovers[0]);
+        std::copy_n(&decodedData.data[processedDataIndex], leftoversSize, &rxLeftovers[0]);
     }
+}
+
+auto HSPAudioDevice::decodeCVSD(audio::AbstractStream::Span dataToDecode) -> audio::AbstractStream::Span
+{
+    auto decodedData = dataToDecode;
+    std::array<std::int16_t, scratchBufferSize> scratchBuffer;
+
+    const auto audioBytesRead = dataToDecode.dataSize - packetDataOffset;
+    const auto samplesCount   = audioBytesRead / sizeof(std::int16_t);
+    auto dataStart            = &dataToDecode.data[packetDataOffset];
+
+    for (auto i = 0; i < samplesCount; ++i) {
+        scratchBuffer[i] = little_endian_read_16(dataStart, i * sizeof(std::uint16_t));
+    }
+
+    auto packetStatusByte = dataToDecode.data[packetStatusOffset];
+    auto isBadFrame       = (packetStatusByte & allGoodMask) != 0;
+
+    btstack_cvsd_plc_process_data(&cvsdPlcState, isBadFrame, &scratchBuffer[0], samplesCount, &decoderBuffer[0]);
+
+    decodedData.data     = reinterpret_cast<std::uint8_t *>(decoderBuffer.get());
+    decodedData.dataSize = audioBytesRead;
+
+    return decodedData;
 }
 
 void HSPAudioDevice::onDataReceive()
@@ -167,6 +194,8 @@ void HSPAudioDevice::enableInput()
 {
     auto blockSize = Source::_stream->getInputTraits().blockSize;
     rxLeftovers    = std::make_unique<std::uint8_t[]>(blockSize);
+    decoderBuffer  = std::make_unique<std::int16_t[]>(scratchBufferSize);
+    btstack_cvsd_plc_init(&cvsdPlcState);
     BluetoothAudioDevice::enableInput();
 }
 
@@ -229,7 +258,5 @@ auto A2DPAudioDevice::getSourceFormat() -> ::audio::AudioFormat
 
 auto HSPAudioDevice::getSourceFormat() -> ::audio::AudioFormat
 {
-    constexpr static auto supportedBitWidth = 16U;
-    constexpr static auto supportedChannels = 1;
     return AudioFormat{bluetooth::SCO::CVSD_SAMPLE_RATE, supportedBitWidth, supportedChannels};
 }

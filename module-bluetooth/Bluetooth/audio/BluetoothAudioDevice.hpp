@@ -8,6 +8,11 @@
 #include <interface/profiles/A2DP/MediaContext.hpp>
 #include <interface/profiles/AudioProfile.hpp>
 
+extern "C"
+{
+#include "classic/btstack_cvsd_plc.h"
+}
+
 namespace bluetooth
 {
 
@@ -70,12 +75,24 @@ namespace bluetooth
         void receiveCVSD(audio::AbstractStream::Span receivedData);
 
       private:
+        static constexpr std::size_t scratchBufferSize = 128;
+
         static constexpr auto packetHandleOffset = 0;
+        static constexpr auto packetStatusOffset = 1;
         static constexpr auto packetLengthOffset = 2;
         static constexpr auto packetDataOffset   = 3;
 
+        constexpr static auto supportedBitWidth = 16U;
+        constexpr static auto supportedChannels = 1;
+
+        constexpr static auto allGoodMask = 0x30;
+
+        auto decodeCVSD(audio::AbstractStream::Span dataToDecode) -> audio::AbstractStream::Span;
+
         std::unique_ptr<std::uint8_t[]> rxLeftovers;
+        std::unique_ptr<std::int16_t[]> decoderBuffer;
         std::size_t leftoversSize = 0;
+        btstack_cvsd_plc_state_t cvsdPlcState;
     };
 
 } // namespace bluetooth
