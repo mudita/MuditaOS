@@ -51,6 +51,7 @@ bool TestStream::pop(AbstractStream::Span &span)
 
 bool TestStream::reserve(AbstractStream::Span &span)
 {
+    span = Span{.data = data.get(), .dataSize = bufSize};
     return true;
 }
 
@@ -62,7 +63,6 @@ void TestStream::release()
 
 bool TestStream::peek(AbstractStream::Span &span)
 {
-    span = Span{.data = data.get(), .dataSize = bufSize};
     return true;
 }
 

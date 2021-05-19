@@ -5,6 +5,8 @@
 
 #include "AbstractStream.hpp"
 
+#include <memory>
+
 namespace audio
 {
 
@@ -20,7 +22,7 @@ namespace audio
          *
          * @param wrappedStream - stream to wrap.
          */
-        explicit StreamProxy(AbstractStream &wrappedStream) noexcept;
+        explicit StreamProxy(std::shared_ptr<AbstractStream> wrappedStream) noexcept;
 
         // listener registration
         void registerListener(EventListener *listener) override;
@@ -55,7 +57,7 @@ namespace audio
         auto getWrappedStream() -> AbstractStream &;
 
       private:
-        AbstractStream &wrappedStream;
+        std::shared_ptr<AbstractStream> wrappedStream;
     };
 
 } // namespace audio

@@ -4,6 +4,8 @@
 #include "StreamFactory.hpp"
 #include "Endpoint.hpp"
 
+#include "transcode/TransformFactory.hpp"
+
 #include <math/Math.hpp>
 
 #include <algorithm>
@@ -15,24 +17,45 @@
 #include <cassert>
 #include <cmath>
 
+using audio::AudioFormat;
 using audio::Sink;
 using audio::Source;
 using audio::Stream;
 using audio::StreamFactory;
+using audio::transcode::InputTranscodeProxy;
+using audio::transcode::Transform;
+using audio::transcode::TransformFactory;
 using namespace std::chrono_literals;
 
 StreamFactory::StreamFactory(std::chrono::milliseconds operationPeriodRequirement)
     : periodRequirement(operationPeriodRequirement)
 {}
 
-auto StreamFactory::makeStream(Source &source, Sink &sink, AudioFormat streamFormat) -> std::unique_ptr<Stream>
+auto StreamFactory::makeStream(Source &source, Sink &sink) -> std::unique_ptr<AbstractStream>
+{
+    auto sourceFormat = source.getSourceFormat();
+    auto sinkFormat   = sink.getSinkFormat();
+
+    if (sourceFormat == sinkFormat) {
+        return makeStream(source.getTraits(), sink.getTraits(), sourceFormat);
+    }
+    else {
+        auto transformFactory = TransformFactory();
+        auto transform        = transformFactory.makeTransform(sourceFormat, sinkFormat);
+
+        return makeInputTranscodingStream(source, sink, sinkFormat, std::move(transform));
+    }
+}
+
+auto StreamFactory::makeStream(Traits sourceTraits, Traits sinkTraits, AudioFormat streamFormat)
+    -> std::unique_ptr<Stream>
 {
     auto streamBuffering     = defaultBuffering;
-    auto endpointsTraits     = {source.getTraits(), sink.getTraits()};
+    auto endpointsTraits     = {sourceTraits, sinkTraits};
     auto blockSizeConstraint = getBlockSizeConstraint(endpointsTraits);
     auto &streamAllocator    = negotiateAllocator(endpointsTraits);
     auto timingConstraint    = getTimingConstraints(std::initializer_list<std::optional<std::chrono::milliseconds>>{
-        sink.getTraits().timeConstraint, source.getTraits().timeConstraint, periodRequirement});
+        sinkTraits.timeConstraint, sourceTraits.timeConstraint, periodRequirement});
 
     if (streamFormat == audio::nullFormat) {
         throw std::invalid_argument("No source format provided");
@@ -51,6 +74,29 @@ auto StreamFactory::makeStream(Source &source, Sink &sink, AudioFormat streamFor
               streamBuffering);
 
     return std::make_unique<Stream>(streamFormat, streamAllocator, blockSizeConstraint.value(), streamBuffering);
+}
+
+auto StreamFactory::makeStream(Source &source, Sink &sink, AudioFormat streamFormat) -> std::unique_ptr<Stream>
+{
+    return makeStream(source.getTraits(), sink.getTraits(), streamFormat);
+}
+
+auto StreamFactory::makeInputTranscodingStream(Source &source,
+                                               Sink &sink,
+                                               AudioFormat streamFormat,
+                                               std::shared_ptr<Transform>(transform))
+    -> std::unique_ptr<InputTranscodeProxy>
+{
+    auto sourceTraits = source.getTraits();
+
+    if (sourceTraits.blockSizeConstraint.has_value()) {
+        sourceTraits.blockSizeConstraint = transform->transformBlockSize(sourceTraits.blockSizeConstraint.value());
+    }
+
+    auto stream            = makeStream(sourceTraits, sink.getTraits(), streamFormat);
+    auto transcodingStream = std::make_unique<InputTranscodeProxy>(std::move(stream), transform);
+
+    return transcodingStream;
 }
 
 auto StreamFactory::getBlockSizeConstraint(std::initializer_list<audio::Endpoint::Traits> traitsList) const

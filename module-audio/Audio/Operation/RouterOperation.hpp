@@ -6,7 +6,6 @@
 #include "Operation.hpp"
 
 #include <Audio/AudioDevice.hpp>
-#include <Audio/encoder/Encoder.hpp>
 #include <Audio/AudioCommon.hpp>
 #include <Audio/Profiles/Profile.hpp>
 #include <Audio/Endpoint.hpp>
@@ -68,12 +67,11 @@ namespace audio
         void Unmute();
         [[nodiscard]] auto IsMuted() const noexcept -> bool;
 
-        std::unique_ptr<Stream> dataStreamOut;
-        std::unique_ptr<Stream> dataStreamIn;
-        std::unique_ptr<Encoder> enc;
+        std::unique_ptr<AbstractStream> dataStreamOut;
+        std::unique_ptr<AbstractStream> dataStreamIn;
         std::shared_ptr<AudioDevice> audioDeviceCellular;
-        std::unique_ptr<StreamConnection> outputConnection;
-        std::unique_ptr<StreamConnection> inputConnection;
+        std::unique_ptr<StreamConnection> voiceOutputConnection;
+        std::unique_ptr<StreamConnection> voiceInputConnection;
     };
 
 } // namespace audio
