@@ -57,6 +57,7 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE
         bus
         service-evtmgr
+        service-cellular
     PUBLIC
         module-os)
 

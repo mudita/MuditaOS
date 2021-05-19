@@ -6,7 +6,7 @@
 #include <CrashCatcher.h>
 
 #include <log/log.hpp>
-#include <module-utils/date/include/date/date.h>
+#include <date/date.h>
 #include "crashdumpwriter.hpp"
 
 const CrashCatcherMemoryRegion *CrashCatcher_GetMemoryRegions(void)

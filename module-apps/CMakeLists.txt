@@ -123,6 +123,7 @@ target_link_libraries(${PROJECT_NAME}
         service-cellular
         service-db
         service-evtmgr
+        date
     PUBLIC
         module-audio
         module-bsp

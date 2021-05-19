@@ -34,7 +34,7 @@
 	path = test/Catch2
 	url = https://github.com/catchorg/Catch2
 [submodule "module-utils/date"]
-	path = module-utils/date
+	path = third-party/date
 	url = ../date.git
 [submodule "module-audio/Audio/decoder/minimp3"]
 	path = module-audio/Audio/decoder/minimp3

@@ -204,15 +204,18 @@ set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES LINK_FLAGS "-Xlinker -Map
 # They have to be arranged in specific order because of circular dependencies that need to be correctly resolved
 # In case of doubt please contact me: mateusz.piesta@mudita.com
 target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+        date
         module-apps
         service-desktop
         service-bluetooth
+        service-cellular
         service-lwip
         ${LWIP_LIBRARIES}
         )
 
 if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
-    target_link_libraries(${PROJECT_NAME} iosyscalls)
+    target_link_libraries(${PROJECT_NAME} PRIVATE iosyscalls)
 endif()
 
 include(tools/clang-tidy.cmake)

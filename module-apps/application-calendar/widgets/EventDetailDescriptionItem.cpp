@@ -5,7 +5,7 @@
 #include "application-calendar/widgets/CalendarStyle.hpp"
 #include <Style.hpp>
 #include <time/time_conversion.hpp>
-#include <module-utils/date/include/date/date.h>
+#include <date/date.h>
 #include <module-utils/time/TimeRangeParser.hpp>
 
 namespace gui

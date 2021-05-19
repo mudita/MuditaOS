@@ -18,5 +18,6 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE
        service-cellular
        module-cellular
+       module-sys
 )
 
