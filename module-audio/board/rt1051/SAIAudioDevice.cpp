@@ -58,8 +58,6 @@ void SAIAudioDevice::onDataReceive()
     Source::_stream->commit();
     Source::_stream->reserve(dataSpan);
 
-    LOG_DEBUG("Reserving %u bytes | stream=%p", dataSpan.dataSize, Source::_stream);
-
     sai_transfer_t xfer{.data = dataSpan.data, .dataSize = dataSpan.dataSize};
     SAI_TransferReceiveEDMA(_base, rx, &xfer);
 }

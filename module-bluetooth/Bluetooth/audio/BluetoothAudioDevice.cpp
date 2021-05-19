@@ -95,7 +95,6 @@ void HSPAudioDevice::onDataSend(std::uint16_t scoHandle)
 
     // get data to send
     audio::Stream::Span dataSpan;
-    LOG_DEBUG("Stream: %p", Sink::_stream);
     if (!Sink::_stream->peek(dataSpan)) {
         LOG_ERROR("Sending empty block");
     }

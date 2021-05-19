@@ -177,13 +177,6 @@ void SCO::SCOImpl::receiveCvsd(uint8_t *packet, uint16_t size)
     AudioData_t audioData;
     std::copy_n(std::begin(audioFrameOut), audioBytesRead, std::begin(audioData.data));
     audioData.bytesSent = audioBytesRead;
-
-    if (sinkQueue != nullptr) {
-        xQueueSend(sinkQueue, &audioData, 5);
-    }
-    else {
-        LOG_ERROR("queue is nullptr!");
-    }
 }
 
 void SCO::SCOImpl::init()
