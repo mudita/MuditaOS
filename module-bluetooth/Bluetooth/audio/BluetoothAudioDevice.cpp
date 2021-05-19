@@ -77,27 +77,16 @@ void HSPAudioDevice::onDataSend()
 
 void HSPAudioDevice::onDataSend(std::uint16_t scoHandle)
 {
-    static constexpr auto packetHandleOffset = 0;
-    static constexpr auto packetLengthOffset = 2;
-    static constexpr auto packetDataOffset   = 3;
-
     if (!isOutputEnabled()) {
         return;
     }
-
-    LOG_DEBUG("CVSD SEND");
-
-    // auto scoPacketLength  = hci_get_sco_packet_length();
-    // auto scoPayloadLength = scoPacketLength - packetDataOffset;
 
     hci_reserve_packet_buffer();
     auto scoPacket = hci_get_outgoing_packet_buffer();
 
     // get data to send
-    audio::Stream::Span dataSpan;
-    if (!Sink::_stream->peek(dataSpan)) {
-        LOG_ERROR("Sending empty block");
-    }
+    audio::AbstractStream::Span dataSpan;
+    Sink::_stream->peek(dataSpan);
 
     assert(dataSpan.dataSize <= scoPayloadLength);
 
@@ -110,6 +99,43 @@ void HSPAudioDevice::onDataSend(std::uint16_t scoHandle)
     // send packet
     hci_send_sco_packet_buffer(dataSpan.dataSize + packetDataOffset);
     hci_request_sco_can_send_now_event();
+}
+
+void HSPAudioDevice::receiveCVSD(audio::AbstractStream::Span receivedData)
+{
+    auto blockSize          = Source::_stream->getInputTraits().blockSize;
+    auto processedDataIndex = 0;
+
+    // TODO: decode CVSD
+
+    // try to complete leftovers to the full block size
+    if (leftoversSize != 0) {
+        auto maxFillSize = blockSize - leftoversSize;
+        auto fillSize    = std::min(maxFillSize, receivedData.dataSize);
+
+        std::copy_n(receivedData.data, fillSize, &rxLeftovers[leftoversSize]);
+
+        if (fillSize + leftoversSize < blockSize) {
+            leftoversSize += fillSize;
+            return;
+        }
+
+        Source::_stream->push(&rxLeftovers[0], blockSize);
+        leftoversSize      = 0;
+        processedDataIndex = fillSize;
+    }
+
+    // push as many blocks as possible
+    while (receivedData.dataSize - processedDataIndex >= blockSize) {
+        Source::_stream->push(&receivedData.data[processedDataIndex], blockSize);
+        processedDataIndex += blockSize;
+    }
+
+    // save leftovers
+    leftoversSize = receivedData.dataSize - processedDataIndex;
+    if (leftoversSize > 0) {
+        std::copy_n(&receivedData.data[processedDataIndex], leftoversSize, &rxLeftovers[0]);
+    }
 }
 
 void HSPAudioDevice::onDataReceive()
@@ -135,6 +161,13 @@ void BluetoothAudioDevice::disableOutput()
 {
     LOG_DEBUG("Disabling bluetooth audio output.");
     outputEnabled = false;
+}
+
+void HSPAudioDevice::enableInput()
+{
+    auto blockSize = Source::_stream->getInputTraits().blockSize;
+    rxLeftovers    = std::make_unique<std::uint8_t[]>(blockSize);
+    BluetoothAudioDevice::enableInput();
 }
 
 auto BluetoothAudioDevice::fillSbcAudioBuffer() -> int

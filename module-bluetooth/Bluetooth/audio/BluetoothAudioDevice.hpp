@@ -65,6 +65,17 @@ namespace bluetooth
         auto getSupportedFormats() -> std::vector<audio::AudioFormat> override;
         auto getTraits() const -> Traits override;
         auto getSourceFormat() -> ::audio::AudioFormat override;
+        void enableInput() override;
+
+        void receiveCVSD(audio::AbstractStream::Span receivedData);
+
+      private:
+        static constexpr auto packetHandleOffset = 0;
+        static constexpr auto packetLengthOffset = 2;
+        static constexpr auto packetDataOffset   = 3;
+
+        std::unique_ptr<std::uint8_t[]> rxLeftovers;
+        std::size_t leftoversSize = 0;
     };
 
 } // namespace bluetooth
