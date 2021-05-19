@@ -1,9 +1,10 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ServiceTime.hpp"
 #include "service-time/CalendarTimeEvents.hpp"
 #include "service-time/TimeMessage.hpp"
+#include "service-time/RTCCommand.hpp"
 
 #include <BaseInterface.hpp>
 #include <Common/Query.hpp>
@@ -12,10 +13,11 @@
 #include <module-db/queries/calendar/QueryEventsSelectFirstUpcoming.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <service-db/QueryMessage.hpp>
+#include <service-cellular/service-cellular/CellularMessage.hpp>
 
 #include <memory>
 #include <utility>
-#include <vector>
+#include <chrono>
 
 namespace stm
 {
@@ -23,6 +25,8 @@ namespace stm
     {
         LOG_INFO("[ServiceTime] Initializing");
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
+
+        timeManager = std::make_unique<TimeManager>(std::make_unique<RTCCommand>(this));
     }
 
     ServiceTime::~ServiceTime()
@@ -32,6 +36,8 @@ namespace stm
 
     sys::ReturnCodes ServiceTime::InitHandler()
     {
+        registerMessageHandlers();
+
         return sys::ReturnCodes::Success;
     }
 
@@ -111,5 +117,16 @@ namespace stm
         else {
             return std::make_shared<sys::ResponseMessage>();
         }
+    }
+
+    void ServiceTime::registerMessageHandlers()
+    {
+        connect(typeid(CellularTimeNotificationMessage), [&](sys::Message *request) -> sys::MessagePointer {
+            auto message = static_cast<CellularTimeNotificationMessage *>(request);
+            timeManager->handleCellularTimeUpdate(
+                message->getTime().value(),
+                std::chrono::minutes{message->getTimeZoneOffset().value() / utils::time::secondsInMinute});
+            return std::make_shared<sys::ResponseMessage>();
+        });
     }
 } /* namespace stm */
