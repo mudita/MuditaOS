@@ -12,7 +12,7 @@ using audio::test::TestSource;
 TestSink::TestSink(std::vector<AudioFormat> supportedFormats) : formats(std::move(supportedFormats))
 {}
 
-auto TestSink::getSupportedFormats() -> const std::vector<AudioFormat> &
+auto TestSink::getSupportedFormats() -> std::vector<AudioFormat>
 {
     return formats;
 }
@@ -53,7 +53,7 @@ void TestSource::enableInput()
 void TestSource::disableInput()
 {}
 
-auto TestSource::getSupportedFormats() -> const std::vector<AudioFormat> &
+auto TestSource::getSupportedFormats() -> std::vector<AudioFormat>
 {
     return formats;
 }

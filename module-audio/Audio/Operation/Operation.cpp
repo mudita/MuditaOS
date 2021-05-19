@@ -93,8 +93,13 @@ namespace audio
         supportedProfiles.emplace_back(Profile::Create(profile, volume, gain), isAvailable);
     }
 
-    std::shared_ptr<AudioDevice> Operation::CreateDevice(AudioDevice::Type type)
+    std::shared_ptr<AudioDevice> Operation::CreateDevice(const Profile &profile)
     {
-        return factory->CreateDevice(type);
+        return factory->CreateDevice(profile);
+    }
+
+    std::shared_ptr<AudioDevice> Operation::createCellularAudioDevice()
+    {
+        return factory->createCellularAudioDevice();
     }
 } // namespace audio

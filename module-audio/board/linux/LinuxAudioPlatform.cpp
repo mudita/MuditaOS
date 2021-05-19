@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <Audio/AudioPlatform.hpp>
+#include <Audio/Profiles/Profile.hpp>
 
 #include <memory>
 #include <utility>
@@ -12,8 +13,14 @@ using audio::AudioPlatform;
 
 class DummyAudioFactory : public AudioDeviceFactory
 {
+  public:
+    std::shared_ptr<AudioDevice> createCellularAudioDevice() override
+    {
+        return nullptr;
+    }
+
   protected:
-    std::shared_ptr<AudioDevice> getDeviceFromType([[maybe_unused]] AudioDevice::Type deviceType)
+    std::shared_ptr<AudioDevice> getDevice([[maybe_unused]] const audio::Profile &profile) override
     {
         return nullptr;
     }

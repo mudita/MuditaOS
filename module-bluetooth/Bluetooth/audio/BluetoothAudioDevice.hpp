@@ -4,6 +4,7 @@
 #pragma once
 
 #include <Audio/AudioDevice.hpp>
+#include <Audio/AudioFormat.hpp>
 #include <interface/profiles/A2DP/MediaContext.hpp>
 
 namespace bluetooth
@@ -16,18 +17,12 @@ namespace bluetooth
         explicit BluetoothAudioDevice(MediaContext *mediaContext);
         virtual ~BluetoothAudioDevice();
 
+        RetCode setOutputVolume(float vol) override;
+        RetCode setInputGain(float gain) override;
         void setMediaContext(MediaContext *MediaContext);
-
-        auto Start(const Configuration &format) -> audio::AudioDevice::RetCode override;
-        auto Stop() -> audio::AudioDevice::RetCode override;
-
-        auto OutputVolumeCtrl(float vol) -> audio::AudioDevice::RetCode override;
-        auto InputGainCtrl(float gain) -> audio::AudioDevice::RetCode override;
-        auto OutputPathCtrl(OutputPath outputPath) -> audio::AudioDevice::RetCode override;
-        auto InputPathCtrl(InputPath inputPath) -> audio::AudioDevice::RetCode override;
-        auto IsFormatSupported(const Configuration &format) -> bool override;
-        auto getSupportedFormats() -> const std::vector<audio::AudioFormat> & override;
         auto getTraits() const -> Traits override;
+        auto getSupportedFormats() -> std::vector<audio::AudioFormat> override;
+        auto getSourceFormat() -> audio::AudioFormat override;
 
         // Endpoint control methods
         void onDataSend() override;
@@ -42,7 +37,7 @@ namespace bluetooth
 
         MediaContext *ctx  = nullptr;
         bool outputEnabled = false;
-        std::vector<audio::AudioFormat> formats;
+        float outputVolume = 0.0;
     };
 
 } // namespace bluetooth

@@ -79,7 +79,7 @@ namespace audio
 
     Profile::Profile(const std::string &name,
                      const Type type,
-                     const AudioDevice::Configuration &fmt,
+                     const audio::codec::Configuration &fmt,
                      AudioDevice::Type devType)
         : audioConfiguration(fmt), audioDeviceType(devType), name(name), type(type)
     {}
@@ -94,12 +94,12 @@ namespace audio
         audioConfiguration.outputVolume = vol;
     }
 
-    void Profile::SetInputPath(AudioDevice::InputPath path)
+    void Profile::SetInputPath(audio::codec::InputPath path)
     {
         audioConfiguration.inputPath = path;
     }
 
-    void Profile::SetOutputPath(AudioDevice::OutputPath path)
+    void Profile::SetOutputPath(audio::codec::OutputPath path)
     {
         audioConfiguration.outputPath = path;
     }
