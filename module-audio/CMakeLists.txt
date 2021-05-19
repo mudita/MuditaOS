@@ -44,7 +44,9 @@ target_sources(
                 ${CMAKE_CURRENT_SOURCE_DIR}/Audio/StreamQueuedEventsListener.cpp
                 ${CMAKE_CURRENT_SOURCE_DIR}/Audio/transcode/InputTranscodeProxy.cpp
                 ${CMAKE_CURRENT_SOURCE_DIR}/Audio/transcode/MonoToStereo.cpp
+                ${CMAKE_CURRENT_SOURCE_DIR}/Audio/transcode/NullTransform.cpp
                 ${CMAKE_CURRENT_SOURCE_DIR}/Audio/transcode/TransformComposite.cpp
+                ${CMAKE_CURRENT_SOURCE_DIR}/Audio/transcode/TransformFactory.cpp
                 ${CMAKE_CURRENT_SOURCE_DIR}/Audio/VolumeScaler.cpp
 )
 target_include_directories(${PROJECT_NAME} PRIVATE ${TAGLIB_INCLUDE_DIRS})

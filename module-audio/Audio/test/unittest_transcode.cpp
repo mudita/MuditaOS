@@ -15,10 +15,15 @@
 #include <Audio/transcode/TransformComposite.hpp>
 #include <Audio/transcode/BasicInterpolator.hpp>
 #include <Audio/transcode/BasicDecimator.hpp>
+#include <Audio/transcode/NullTransform.hpp>
+#include <Audio/transcode/TransformFactory.hpp>
 
 #include <cstdlib>
 
+using ::audio::transcode::NullTransform;
+using ::testing::_;
 using ::testing::Return;
+using ::testing::SetArgReferee;
 using ::testing::audio::MockStream;
 using ::testing::audio::MockStreamEventListener;
 
@@ -27,17 +32,22 @@ constexpr std::size_t testStreamSize = 8;
 class InverseTransform : public audio::transcode::Transform
 {
   public:
-    auto transform(const Span &span, const Span &transformSpace) const -> Span override
+    auto transform(const Span &input, const Span &output) const -> Span override
     {
-        for (std::size_t i = 0; i < span.dataSize; i++) {
-            span.data[i] = ~span.data[i];
+        for (std::size_t i = 0; i < input.dataSize; i++) {
+            output.data[i] = ~input.data[i];
         }
-        return span;
+        return output;
     }
 
     auto transformBlockSize(std::size_t inputBufferSize) const noexcept -> std::size_t override
     {
         return inputBufferSize;
+    }
+
+    auto transformBlockSizeInverted(std::size_t outputBufferSize) const noexcept -> std::size_t override
+    {
+        return outputBufferSize;
     }
 
     auto validateInputFormat(const audio::AudioFormat &inputFormat) const noexcept -> bool override
@@ -48,42 +58,18 @@ class InverseTransform : public audio::transcode::Transform
     auto transformFormat(const audio::AudioFormat &inputFormat) const noexcept -> audio::AudioFormat override
     {
         return inputFormat;
-    }
-};
-
-class NullTransform : public audio::transcode::Transform
-{
-  public:
-    auto transform(const Span &span, const Span &transformSpace) const -> Span override
-    {
-        return span;
-    }
-
-    auto validateInputFormat(const audio::AudioFormat &inputFormat) const noexcept -> bool override
-    {
-        return true;
-    }
-
-    auto transformFormat(const audio::AudioFormat &inputFormat) const noexcept -> audio::AudioFormat override
-    {
-        return inputFormat;
-    }
-
-    auto transformBlockSize(std::size_t inputBufferSize) const noexcept -> std::size_t override
-    {
-        return inputBufferSize;
     }
 };
 
 TEST(Transcode, Reset)
 {
-    MockStream mock;
-    NullTransform nullTransform;
+    auto mock          = std::make_shared<MockStream>();
+    auto nullTransform = std::make_shared<NullTransform>();
 
-    EXPECT_CALL(mock, getInputTraits);
-    audio::transcode::InputTranscodeProxy proxy(mock, nullTransform);
+    EXPECT_CALL(*mock, getInputTraits);
+    audio::transcode::InputTranscodeProxy proxy(std::static_pointer_cast<::audio::AbstractStream>(mock), nullTransform);
 
-    EXPECT_CALL(mock, reset()).Times(1);
+    EXPECT_CALL(*mock, reset()).Times(1);
 
     proxy.reset();
 }
@@ -92,38 +78,39 @@ TEST(Transcode, Push)
 {
     static std::uint8_t testData[testStreamSize]     = {0, 1, 2, 3, 4, 5, 6, 7};
     static std::uint8_t invertedData[testStreamSize] = {255, 254, 253, 252, 251, 250, 249, 248};
-    InverseTransform inv;
-    ::testing::audio::TestStream stream(testStreamSize);
-    ::audio::transcode::InputTranscodeProxy transform(stream, inv);
+    auto inv                                         = std::make_shared<InverseTransform>();
+    auto stream                                      = std::make_shared<::testing::audio::TestStream>(testStreamSize);
+    ::audio::transcode::InputTranscodeProxy transform(std::static_pointer_cast<::audio::AbstractStream>(stream), inv);
 
     transform.push(::audio::AbstractStream::Span{testData, testStreamSize});
-    EXPECT_TRUE(stream.checkData(::audio::AbstractStream::Span{invertedData, testStreamSize}));
+    EXPECT_TRUE(stream->checkData(::audio::AbstractStream::Span{invertedData, testStreamSize}));
 }
 
 TEST(Transcode, FailedPeek)
 {
-    NullTransform nullTransform;
-    MockStream mockStream;
+    auto nullTransform = std::make_shared<NullTransform>();
+    auto mockStream    = std::make_shared<MockStream>();
 
-    EXPECT_CALL(mockStream, getInputTraits);
-    ::audio::transcode::InputTranscodeProxy transform(mockStream, nullTransform);
+    EXPECT_CALL(*mockStream, getInputTraits);
+    ::audio::transcode::InputTranscodeProxy transform(std::static_pointer_cast<::audio::AbstractStream>(mockStream),
+                                                      nullTransform);
     ::audio::AbstractStream::Span dataSpan;
 
-    EXPECT_CALL(mockStream, peek).Times(1).WillOnce(Return(false));
+    EXPECT_CALL(*mockStream, peek).Times(1).WillOnce(Return(false));
     EXPECT_EQ(transform.peek(dataSpan), false);
 }
 
 TEST(Transcode, Commit)
 {
     static std::uint8_t invertedData[testStreamSize] = {255, 254, 253, 252, 251, 250, 249, 248};
-    InverseTransform inv;
-    ::testing::audio::TestStream stream(testStreamSize);
-    ::audio::transcode::InputTranscodeProxy transform(stream, inv);
+    auto inv                                         = std::make_shared<InverseTransform>();
+    auto stream                                      = std::make_shared<::testing::audio::TestStream>(testStreamSize);
+    ::audio::transcode::InputTranscodeProxy transform(std::static_pointer_cast<::audio::AbstractStream>(stream), inv);
     ::audio::AbstractStream::Span span;
 
-    stream.setData(0);
+    stream->setData(0);
 
-    ASSERT_TRUE(transform.peek(span));
+    ASSERT_TRUE(transform.reserve(span));
     ASSERT_TRUE(span.data != nullptr);
     ASSERT_TRUE(span.dataSize == testStreamSize);
 
@@ -132,36 +119,106 @@ TEST(Transcode, Commit)
     }
 
     transform.commit();
-    EXPECT_TRUE(stream.checkData(::audio::AbstractStream::Span{invertedData, testStreamSize}));
+    EXPECT_TRUE(stream->checkData(::audio::AbstractStream::Span{invertedData, testStreamSize}));
 
-    // no conversion on commit with no peek
-    stream.commit();
-    EXPECT_TRUE(stream.checkData(::audio::AbstractStream::Span{invertedData, testStreamSize}));
+    // no conversion on commit with no reserve
+    stream->commit();
+    EXPECT_TRUE(stream->checkData(::audio::AbstractStream::Span{invertedData, testStreamSize}));
+}
+
+TEST(Transcode, ReserveShrinking)
+{
+    static std::uint16_t streamData[8];
+    auto streamDataSpan = ::audio::AbstractStream::Span{.data     = reinterpret_cast<std::uint8_t *>(streamData),
+                                                        .dataSize = sizeof(streamData)};
+
+    auto decimatorTransform = std::make_shared<::audio::transcode::BasicDecimator<std::uint16_t, 1, 2>>();
+    auto mockStream         = std::make_shared<MockStream>();
+
+    EXPECT_CALL(*mockStream, getInputTraits)
+        .WillRepeatedly(Return(::audio::AbstractStream::Traits{.blockSize = streamDataSpan.dataSize,
+                                                               .format    = audio::AudioFormat(8000, 16, 1)}));
+
+    auto transcodingProxy = ::audio::transcode::InputTranscodeProxy(mockStream, decimatorTransform);
+
+    EXPECT_CALL(*mockStream, reserve(_)).WillOnce(DoAll(SetArgReferee<0>(streamDataSpan), Return(true)));
+
+    ::audio::AbstractStream::Span span;
+    transcodingProxy.reserve(span);
+
+    EXPECT_EQ(span.dataSize, 16 * sizeof(std::uint16_t));
+
+    auto buf = reinterpret_cast<std::uint16_t *>(span.data);
+    for (unsigned int i = 0; i < 16; i++) {
+        buf[i] = i;
+    }
+
+    EXPECT_CALL(*mockStream, commit);
+
+    transcodingProxy.commit();
+
+    static std::uint16_t expectedData[8] = {0, 2, 4, 6, 8, 10, 12, 14};
+    EXPECT_TRUE(memcmp(expectedData, streamData, sizeof(expectedData)) == 0);
+}
+
+TEST(Transcode, ReserveBloating)
+{
+    static std::uint16_t streamData[8];
+    auto streamDataSpan = ::audio::AbstractStream::Span{.data     = reinterpret_cast<std::uint8_t *>(streamData),
+                                                        .dataSize = sizeof(streamData)};
+
+    auto interpolatorTransform = std::make_shared<::audio::transcode::BasicInterpolator<std::uint16_t, 1, 2>>();
+    auto mockStream            = std::make_shared<MockStream>();
+
+    EXPECT_CALL(*mockStream, getInputTraits)
+        .WillRepeatedly(Return(::audio::AbstractStream::Traits{.blockSize = streamDataSpan.dataSize,
+                                                               .format    = audio::AudioFormat(8000, 16, 1)}));
+
+    auto transcodingProxy = ::audio::transcode::InputTranscodeProxy(mockStream, interpolatorTransform);
+
+    EXPECT_CALL(*mockStream, reserve(_)).WillOnce(DoAll(SetArgReferee<0>(streamDataSpan), Return(true)));
+
+    ::audio::AbstractStream::Span span;
+    transcodingProxy.reserve(span);
+
+    EXPECT_EQ(span.dataSize, 4 * sizeof(std::uint16_t));
+
+    auto buf = reinterpret_cast<std::uint16_t *>(span.data);
+    for (unsigned int i = 0; i < 4; i++) {
+        buf[i] = i;
+    }
+
+    EXPECT_CALL(*mockStream, commit);
+
+    transcodingProxy.commit();
+
+    static std::uint16_t expectedData[8] = {0, 0, 1, 1, 2, 2, 3, 3};
+    EXPECT_TRUE(memcmp(expectedData, streamData, sizeof(expectedData)) == 0);
 }
 
 TEST(Transcode, Traits)
 {
     auto testFormat = ::audio::AudioFormat(44100, 16, 1);
-    ::audio::transcode::MonoToStereo m2s;
-    MockStream mockStream;
+    auto m2s        = std::make_shared<::audio::transcode::MonoToStereo>();
+    auto mockStream = std::make_shared<MockStream>();
 
-    EXPECT_CALL(mockStream, getInputTraits)
+    EXPECT_CALL(*mockStream, getInputTraits)
         .Times(1)
         .WillOnce(Return(::audio::AbstractStream::Traits{.blockSize = 128, .format = testFormat}));
 
-    ::audio::transcode::InputTranscodeProxy proxy(mockStream, m2s);
+    ::audio::transcode::InputTranscodeProxy proxy(std::static_pointer_cast<::audio::AbstractStream>(mockStream), m2s);
 
-    EXPECT_CALL(mockStream, getInputTraits)
+    EXPECT_CALL(*mockStream, getInputTraits)
         .Times(1)
         .WillOnce(Return(::audio::AbstractStream::Traits{.blockSize = 128, .format = testFormat}));
 
-    EXPECT_CALL(mockStream, getOutputTraits)
+    EXPECT_CALL(*mockStream, getOutputTraits)
         .Times(1)
         .WillOnce(Return(::audio::AbstractStream::Traits{.blockSize = 128, .format = testFormat}));
 
     auto proxyInputTraits = proxy.getInputTraits();
 
-    EXPECT_EQ(proxyInputTraits.blockSize, 256);
+    EXPECT_EQ(proxyInputTraits.blockSize, 64);
     EXPECT_EQ(proxyInputTraits.format.getChannels(), 2);
     EXPECT_EQ(proxyInputTraits.format.getSampleRate(), 44100);
     EXPECT_EQ(proxyInputTraits.format.getBitWidth(), 16);
@@ -176,18 +233,18 @@ TEST(Transcode, Traits)
 
 TEST(Transcode, ListenersWrap)
 {
-    MockStream mock;
+    auto mock          = std::make_shared<MockStream>();
+    auto nullTransform = std::make_shared<NullTransform>();
     MockStreamEventListener listener;
-    NullTransform nullTransform;
 
-    EXPECT_CALL(mock, getInputTraits);
-    audio::transcode::InputTranscodeProxy proxy(mock, nullTransform);
+    EXPECT_CALL(*mock, getInputTraits);
+    audio::transcode::InputTranscodeProxy proxy(std::static_pointer_cast<::audio::AbstractStream>(mock), nullTransform);
 
-    EXPECT_CALL(mock, registerListener(&listener)).Times(1);
+    EXPECT_CALL(*mock, registerListener(&listener)).Times(1);
 
     proxy.registerListener(&listener);
 
-    EXPECT_CALL(mock, unregisterListeners(&listener)).Times(1);
+    EXPECT_CALL(*mock, unregisterListeners(&listener)).Times(1);
 
     proxy.unregisterListeners(&listener);
 }
@@ -212,10 +269,6 @@ TEST(Transform, MonoToStereo)
     auto outputFormat = m2s.transformFormat(audio::AudioFormat(44100, 16, 1));
     EXPECT_EQ(outputFormat, audio::AudioFormat(44100, 16, 2));
 
-    EXPECT_EQ(m2s.getTransformSize(4), 8);
-    EXPECT_EQ(m2s.getTransformSize(128), 256);
-    EXPECT_EQ(m2s.getTransformSize(0), 0);
-
     static std::uint16_t expectedResult[16] = {0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7};
     ASSERT_EQ(m2s.transform(input, output), output);
     ASSERT_EQ(memcmp(output.data, expectedResult, 32), 0);
@@ -223,9 +276,10 @@ TEST(Transform, MonoToStereo)
 
 TEST(Transform, Composite)
 {
-    audio::transcode::MonoToStereo m2s;
-    InverseTransform inv;
-    audio::transcode::TransformComposite composite{&inv, &m2s};
+    auto m2s = std::make_shared<audio::transcode::MonoToStereo>();
+    auto inv = std::make_shared<InverseTransform>();
+    audio::transcode::TransformComposite composite(
+        std::vector<std::shared_ptr<::audio::transcode::Transform>>{m2s, inv});
     static std::uint16_t inputBuffer[8] = {0, 1, 2, 3, 4, 5, 6, 7};
     static std::uint16_t outputBuffer[16];
     static std::uint16_t expectedResult[] = {
@@ -252,7 +306,7 @@ TEST(Transform, Composite)
     auto output = ::audio::AbstractStream::Span{.data     = reinterpret_cast<std::uint8_t *>(&outputBuffer[0]),
                                                 .dataSize = sizeof(outputBuffer)};
 
-    ASSERT_EQ(output.dataSize, composite.getTransformSize(sizeof(inputBuffer)));
+    ASSERT_EQ(output.dataSize, composite.transformBlockSize(sizeof(inputBuffer)));
     auto result = composite.transform(input, output);
     ASSERT_EQ(result.dataSize, sizeof(expectedResult));
     ASSERT_EQ(memcmp(result.data, expectedResult, sizeof(expectedResult)), 0);
@@ -326,4 +380,86 @@ TEST(Transform, BasicDecimator)
 
     EXPECT_EQ(outputSpan.dataSize, sizeof(uint16_t) * 4);
     EXPECT_EQ(memcmp(outputSpan.data, expectBuffer, outputSpan.dataSize), 0);
+}
+
+TEST(Transform, FactorySampleRateInterpolator)
+{
+    auto factory      = ::audio::transcode::TransformFactory();
+    auto sourceFormat = ::audio::AudioFormat{8000, 16, 1};
+    auto sinkFormat   = ::audio::AudioFormat{16000, 16, 1};
+
+    auto transform = factory.makeTransform(sourceFormat, sinkFormat);
+
+    EXPECT_STREQ(typeid(*transform).name(), typeid(::audio::transcode::BasicInterpolator<std::uint16_t, 1, 2>).name());
+}
+
+TEST(Transform, FactorySampleRateDecimator)
+{
+    auto factory      = ::audio::transcode::TransformFactory();
+    auto sourceFormat = ::audio::AudioFormat{16000, 16, 1};
+    auto sinkFormat   = ::audio::AudioFormat{8000, 16, 1};
+
+    auto transform = factory.makeTransform(sourceFormat, sinkFormat);
+
+    EXPECT_STREQ(typeid(*transform).name(), typeid(::audio::transcode::BasicDecimator<std::uint16_t, 1, 2>).name());
+    EXPECT_EQ(transform->transformFormat(sourceFormat), sinkFormat);
+}
+
+TEST(Tranform, FactoryNullTransform)
+{
+    auto factory      = ::audio::transcode::TransformFactory();
+    auto sourceFormat = ::audio::AudioFormat{8000, 16, 1};
+    auto sinkFormat   = ::audio::AudioFormat{8000, 16, 1};
+
+    auto transform = factory.makeTransform(sourceFormat, sinkFormat);
+
+    EXPECT_STREQ(typeid(*transform).name(), typeid(::audio::transcode::NullTransform).name());
+    EXPECT_EQ(transform->transformFormat(sourceFormat), sinkFormat);
+}
+
+TEST(Transform, FactoryMonoToStereo)
+{
+    auto factory      = ::audio::transcode::TransformFactory();
+    auto sourceFormat = ::audio::AudioFormat{8000, 16, 1};
+    auto sinkFormat   = ::audio::AudioFormat{8000, 16, 2};
+
+    auto transform = factory.makeTransform(sourceFormat, sinkFormat);
+
+    EXPECT_STREQ(typeid(*transform).name(), typeid(::audio::transcode::MonoToStereo).name());
+    EXPECT_EQ(transform->transformFormat(sourceFormat), sinkFormat);
+}
+
+TEST(Transform, FactoryComposite)
+{
+    auto factory      = ::audio::transcode::TransformFactory();
+    auto sourceFormat = ::audio::AudioFormat{16000, 16, 1};
+    auto sinkFormat   = ::audio::AudioFormat{32000, 16, 2};
+
+    auto transform = factory.makeTransform(sourceFormat, sinkFormat);
+
+    EXPECT_STREQ(typeid(*transform).name(), typeid(::audio::transcode::TransformComposite).name());
+    EXPECT_EQ(transform->transformFormat(sourceFormat), sinkFormat);
+}
+
+TEST(Transform, FactoryErrors)
+{
+    auto factory = ::audio::transcode::TransformFactory();
+    EXPECT_THROW(factory.makeTransform(::audio::AudioFormat{16000, 16, 1}, ::audio::AudioFormat{16000, 24, 1}),
+                 std::runtime_error);
+    EXPECT_THROW(factory.makeTransform(::audio::AudioFormat{44100, 16, 1}, ::audio::AudioFormat{48000, 16, 1}),
+                 std::invalid_argument);
+    EXPECT_THROW(factory.makeTransform(::audio::AudioFormat{8000, 16, 1}, ::audio::AudioFormat{24000, 16, 1}),
+                 std::invalid_argument);
+    EXPECT_THROW(factory.makeTransform(::audio::AudioFormat{16000, 32, 1}, ::audio::AudioFormat{8000, 32, 1}),
+                 std::invalid_argument);
+    EXPECT_THROW(factory.makeTransform(::audio::AudioFormat{8000, 16, 2}, ::audio::AudioFormat{16000, 16, 2}),
+                 std::invalid_argument);
+
+    // channel conversions
+    EXPECT_THROW(factory.makeTransform(::audio::AudioFormat{8000, 16, 1}, ::audio::AudioFormat{8000, 16, 3}),
+                 std::invalid_argument);
+    EXPECT_THROW(factory.makeTransform(::audio::AudioFormat{8000, 16, 2}, ::audio::AudioFormat{8000, 16, 1}),
+                 std::invalid_argument);
+    EXPECT_THROW(factory.makeTransform(::audio::AudioFormat{8000, 32, 1}, ::audio::AudioFormat{8000, 32, 2}),
+                 std::invalid_argument);
 }

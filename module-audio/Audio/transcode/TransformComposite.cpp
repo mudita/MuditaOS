@@ -7,12 +7,13 @@
 #include <Audio/AudioFormat.hpp>
 
 #include <algorithm>
+#include <memory>
 #include <initializer_list>
 
 using audio::transcode::Transform;
 using audio::transcode::TransformComposite;
 
-TransformComposite::TransformComposite(std::initializer_list<Transform *> transforms) : children(transforms)
+TransformComposite::TransformComposite(std::vector<std::shared_ptr<Transform>> transforms) : children(transforms)
 {}
 
 auto TransformComposite::transform(const Span &input, const Span &conversionSpace) const -> Span
@@ -23,19 +24,6 @@ auto TransformComposite::transform(const Span &input, const Span &conversionSpac
         output = t->transform(output, conversionSpace);
     }
     return output;
-}
-
-auto TransformComposite::getTransformSize(std::size_t inputBufferSize) const noexcept -> std::size_t
-{
-    auto nextBlockSize  = inputBufferSize;
-    auto inputBlockSize = inputBufferSize;
-
-    for (auto t : children) {
-        nextBlockSize  = t->getTransformSize(nextBlockSize);
-        inputBlockSize = std::max(nextBlockSize, inputBlockSize);
-    }
-
-    return inputBlockSize;
 }
 
 auto TransformComposite::validateInputFormat(const audio::AudioFormat &inputFormat) const noexcept -> bool
@@ -69,6 +57,17 @@ auto TransformComposite::transformBlockSize(std::size_t blockSize) const noexcep
 
     for (auto t : children) {
         transformedBlockSize = t->transformBlockSize(transformedBlockSize);
+    }
+
+    return transformedBlockSize;
+}
+
+auto TransformComposite::transformBlockSizeInverted(std::size_t blockSize) const noexcept -> std::size_t
+{
+    std::size_t transformedBlockSize = blockSize;
+
+    for (auto t : children) {
+        transformedBlockSize = t->transformBlockSizeInverted(transformedBlockSize);
     }
 
     return transformedBlockSize;

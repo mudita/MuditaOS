@@ -7,6 +7,7 @@
 #include <Audio/AudioCommon.hpp>
 #include <Audio/Profiles/Profile.hpp>
 #include <Audio/StreamFactory.hpp>
+#include <Audio/transcode/TransformFactory.hpp>
 
 #include <log/log.hpp>
 #include <mutex.hpp>
@@ -50,16 +51,6 @@ namespace audio
         operationToken = token;
         state          = State::Active;
 
-        // check if audio devices support desired audio format
-        if (!audioDevice->isFormatSupportedBySource(currentProfile->getAudioFormat())) {
-            return RetCode::InvalidFormat;
-        }
-
-        if (!audioDeviceCellular->isFormatSupportedBySource(currentProfile->getAudioFormat())) {
-            return RetCode::InvalidFormat;
-        }
-
-        // try to run devices with the format
         if (auto ret = audioDevice->Start(); ret != AudioDevice::RetCode::Success) {
             return GetDeviceError(ret);
         }
@@ -71,26 +62,24 @@ namespace audio
         // create streams
         StreamFactory streamFactory(callTimeConstraint);
         try {
-            dataStreamIn =
-                streamFactory.makeStream(*audioDevice, *audioDeviceCellular, currentProfile->getAudioFormat());
-            dataStreamOut =
-                streamFactory.makeStream(*audioDevice, *audioDeviceCellular, currentProfile->getAudioFormat());
+            dataStreamIn  = streamFactory.makeStream(*audioDevice, *audioDeviceCellular);
+            dataStreamOut = streamFactory.makeStream(*audioDeviceCellular, *audioDevice);
         }
-        catch (std::invalid_argument &e) {
+        catch (const std::exception &e) {
             LOG_FATAL("Cannot create audio stream: %s", e.what());
             return audio::RetCode::Failed;
         }
 
         // create audio connections
-        inputConnection =
-            std::make_unique<audio::StreamConnection>(audioDeviceCellular.get(), audioDevice.get(), dataStreamIn.get());
-        outputConnection = std::make_unique<audio::StreamConnection>(
-            audioDevice.get(), audioDeviceCellular.get(), dataStreamOut.get());
+        voiceInputConnection =
+            std::make_unique<audio::StreamConnection>(audioDevice.get(), audioDeviceCellular.get(), dataStreamIn.get());
+        voiceOutputConnection = std::make_unique<audio::StreamConnection>(
+            audioDeviceCellular.get(), audioDevice.get(), dataStreamOut.get());
 
         // enable audio connections
-        inputConnection->enable();
+        voiceOutputConnection->enable();
         if (!IsMuted()) {
-            outputConnection->enable();
+            voiceInputConnection->enable();
         }
 
         return audio::RetCode::Success;
@@ -103,8 +92,8 @@ namespace audio
         }
 
         state = State::Idle;
-        outputConnection.reset();
-        inputConnection.reset();
+        voiceOutputConnection.reset();
+        voiceInputConnection.reset();
 
         audioDevice->Stop();
         audioDeviceCellular->Stop();
@@ -122,8 +111,8 @@ namespace audio
         }
 
         state = State::Paused;
-        outputConnection->disable();
-        inputConnection->disable();
+        voiceOutputConnection->disable();
+        voiceInputConnection->disable();
         return RetCode::Success;
     }
 
@@ -134,8 +123,8 @@ namespace audio
         }
 
         state = State::Active;
-        inputConnection->enable();
-        outputConnection->enable();
+        voiceInputConnection->enable();
+        voiceOutputConnection->enable();
         return RetCode::Success;
     }
 
@@ -219,13 +208,13 @@ namespace audio
 
     void RouterOperation::Mute()
     {
-        outputConnection->disable();
+        voiceInputConnection->disable();
         mute = Mute::Enabled;
     }
 
     void RouterOperation::Unmute()
     {
-        outputConnection->enable();
+        voiceInputConnection->enable();
         mute = Mute::Disabled;
     }
 
