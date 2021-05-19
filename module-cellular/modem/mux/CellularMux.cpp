@@ -14,11 +14,13 @@
 #include <service-cellular/CellularMessage.hpp>
 
 #include <RTOSWrapper/include/ticks.hpp>
+#include <SystemManager/messages/DeviceRegistrationMessage.hpp>
+#include <time/time_conversion.hpp>
 
 #include <gsl/gsl_util>
+
 #include <memory>
 #include <sstream>
-#include <SystemManager/messages/DeviceRegistrationMessage.hpp>
 
 std::map<TypeOfFrame_e, std::string> TypeOfFrame_text = {{TypeOfFrame_e::SABM, "SABM"},
                                                          {TypeOfFrame_e::UA, "UA"},
