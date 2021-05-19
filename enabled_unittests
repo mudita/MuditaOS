@@ -489,6 +489,9 @@ TESTS_LIST["catch2-settings-Settings"]="
     Interface - copied;
 "
 #---------
-
+TESTS_LIST["catch2-timezone-handler"]="
+    Not known timezone;
+"
+#---------
 
 

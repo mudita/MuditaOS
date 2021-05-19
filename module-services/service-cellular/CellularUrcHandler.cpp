@@ -10,6 +10,7 @@
 #include <service-antenna/AntennaServiceAPI.hpp>
 #include <service-evtmgr/Constants.hpp>
 #include <service-appmgr/Controller.hpp>
+#include <service-time/Constants.hpp>
 
 using namespace at::urc;
 
@@ -105,7 +106,7 @@ void CellularUrcHandler::Handle(Ctze &urc)
     if (isSettingsAutomaticTimeSyncEnabled()) {
         auto msg = std::make_shared<CellularTimeNotificationMessage>(
             urc.getGMTTime(), urc.getTimeZoneOffset(), urc.getTimeZoneString());
-        cellularService.bus.sendUnicast(msg, service::name::evt_manager);
+        cellularService.bus.sendUnicast(msg, service::name::service_time);
     }
     else {
         LOG_DEBUG("Timezone sync disabled.");
