@@ -30,11 +30,7 @@ namespace CellularCall
         }
 
         clear();
-        CalllogRecord callRec;
-        callRec.type        = type;
-        callRec.date         = std::time(nullptr);
-        callRec.presentation = PresentationType::PR_UNKNOWN;
-        callRec.phoneNumber  = number;
+        CalllogRecord callRec{type, number};
         call                = startCallAction ? startCallAction(callRec) : CalllogRecord();
         if (!call.isValid()) {
             LOG_ERROR("startCallAction failed");

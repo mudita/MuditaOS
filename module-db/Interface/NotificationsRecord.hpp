@@ -21,6 +21,8 @@ namespace db::query::notifications
     class Get;
     class GetResult;
     class Increment;
+    class MultipleIncrement;
+    class MultipleIncrementResult;
     class IncrementResult;
     class Clear;
     class ClearResult;
@@ -44,7 +46,7 @@ struct NotificationsRecord : public Record
 
     friend std::ostream &operator<<(std::ostream &out, const NotificationsRecord &point);
 
-    NotificationsRecord()  = default;
+    NotificationsRecord() = default;
     explicit NotificationsRecord(const NotificationsTableRow &tableRow,
                                  std::optional<ContactRecord> record = std::nullopt);
 
@@ -78,13 +80,18 @@ class NotificationsRecordInterface : public RecordInterface<NotificationsRecord,
     std::unique_ptr<db::QueryResult> runQuery(std::shared_ptr<db::Query> query) override;
 
   private:
-    NotificationsDB *notificationsDb = nullptr;
+    NotificationsDB *notificationsDb   = nullptr;
     ContactRecordInterface *contactsDb = nullptr;
 
     std::optional<ContactRecord> getContactRecord(uint32_t id) const;
     std::unique_ptr<db::query::notifications::GetResult> runQueryImpl(const db::query::notifications::Get *query);
     std::unique_ptr<db::query::notifications::IncrementResult> runQueryImpl(
         const db::query::notifications::Increment *query);
+    std::unique_ptr<db::query::notifications::MultipleIncrementResult> runQueryImpl(
+        const db::query::notifications::MultipleIncrement *query);
     std::unique_ptr<db::query::notifications::ClearResult> runQueryImpl(const db::query::notifications::Clear *query);
     std::unique_ptr<db::query::notifications::GetAllResult> runQueryImpl(const db::query::notifications::GetAll *query);
+    [[nodiscard]] bool processIncrement(NotificationsRecord::Key key,
+                                        std::optional<utils::PhoneNumber::View> &&number,
+                                        size_t size);
 };
