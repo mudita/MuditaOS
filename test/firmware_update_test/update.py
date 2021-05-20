@@ -80,7 +80,7 @@ def update(harness, update_filepath: str):
 
 
 def get_update_list(harness):
-    harness.unlock_usb()
+    harness.unlock_phone()
     ret = harness.endpoint_request("deviceInfo", "get", {})
     device_info = ret["body"]
     update_history = device_info["updateHistory"]

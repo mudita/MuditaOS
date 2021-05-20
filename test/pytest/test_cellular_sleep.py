@@ -26,8 +26,7 @@ def wait_for_cellular_sleep(harness, max_attempts):
 
 
 @pytest.mark.rt1051
-@pytest.mark.usefixtures("usb_unlocked")
-
+@pytest.mark.usefixtures("phone_unlocked")
 def test_call_during_cellular_sleep_mode(harness, phone_number, call_duration, max_attempts = 10):
     cellular_sleep_mode = wait_for_cellular_sleep(harness, max_attempts)
     if (cellular_sleep_mode == False):
@@ -43,7 +42,7 @@ def test_call_during_cellular_sleep_mode(harness, phone_number, call_duration, m
     assert ret["body"]["cellularSleepMode"] == False
 
 @pytest.mark.rt1051
-@pytest.mark.usefixtures("usb_unlocked")
+@pytest.mark.usefixtures("phone_unlocked")
 def test_sms_during_cellular_sleep_mode(harness, phone_number, sms_text, max_attempts = 10):
     cellular_sleep_mode = wait_for_cellular_sleep(harness, max_attempts)
     if (cellular_sleep_mode == False):

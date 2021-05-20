@@ -42,8 +42,6 @@ def wait_for_cellular_state(harness, state, max_attempts = 10):
 
 @pytest.mark.rt1051
 @pytest.mark.usefixtures("phone_unlocked")
-@pytest.mark.usefixtures("usb_unlocked")
-
 def test_cellular_cold_start(harness, phone_number, sms_text):
     ret = request_cellular_state_info(harness)
     assert ret["status"] == status["OK"]
@@ -72,8 +70,6 @@ def test_cellular_cold_start(harness, phone_number, sms_text):
 
 @pytest.mark.rt1051
 @pytest.mark.usefixtures("phone_unlocked")
-@pytest.mark.usefixtures("usb_unlocked")
-
 def test_cellular_hot_start(harness, phone_number, sms_text):
     time.sleep(2)
     request_cellular_power_state_change(harness, cellular_states["HotStart"])

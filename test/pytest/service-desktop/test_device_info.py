@@ -5,7 +5,7 @@ from harness.interface.defs import status
 
 
 @pytest.mark.service_desktop_test
-@pytest.mark.usefixtures("usb_unlocked")
+@pytest.mark.usefixtures("phone_unlocked")
 def test_device_info(harness):
     body = {}
     ret = harness.endpoint_request("deviceInfo", "get", body)

@@ -50,7 +50,7 @@ def main():
         exit()
 
     harness = Harness(port_name)
-    harness.unlock_usb()
+    harness.unlock_phone()
     [rev, branch, tag] = get_version(harness)
 
     if args.git_tag != tag or args.git_branch != branch or args.git_revision != rev:
