@@ -57,4 +57,41 @@ namespace locks
             return inputData;
         }
     };
+
+    class ExternalUnLockPhone : public UnLockPhoneInput
+    {
+      public:
+        explicit ExternalUnLockPhone(std::vector<unsigned int> inputData) : UnLockPhoneInput(std::move(inputData))
+        {}
+    };
+
+    class ExternalPhoneLockAvailabilityChange : public sys::DataMessage
+    {
+      private:
+        bool value = true;
+
+      public:
+        explicit ExternalPhoneLockAvailabilityChange(bool value) : value(value)
+        {}
+
+        [[nodiscard]] auto getAvailability() const noexcept
+        {
+            return value;
+        }
+    };
+
+    class ExternalUnLockPhoneInfo : public sys::DataMessage
+    {
+      private:
+        unsigned int attemptsLeft;
+
+      public:
+        explicit ExternalUnLockPhoneInfo(unsigned int attemptsLeft) : DataMessage{}, attemptsLeft(attemptsLeft)
+        {}
+
+        [[nodiscard]] auto getAttemptsLeft() const noexcept
+        {
+            return attemptsLeft;
+        }
+    };
 } // namespace locks

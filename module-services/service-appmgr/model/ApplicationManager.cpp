@@ -437,7 +437,7 @@ namespace app::manager
         });
         connect(typeid(locks::UnLockPhoneInput), [&](sys::Message *request) -> sys::MessagePointer {
             auto data = static_cast<locks::UnLockPhoneInput *>(request);
-            return phoneLockHandler.verifyPhoneLockInput(data->getInputData());
+            return phoneLockHandler.handlePhoneLockInput(data->getInputData());
         });
         connect(typeid(locks::EnablePhoneLock),
                 [&](sys::Message *request) -> sys::MessagePointer { return phoneLockHandler.handleEnablePhoneLock(); });
@@ -462,6 +462,14 @@ namespace app::manager
         connect(typeid(SetAutoLockTimeoutRequest), [&](sys::Message *request) -> sys::MessagePointer {
             auto req = static_cast<SetAutoLockTimeoutRequest *>(request);
             return handleAutoLockSetRequest(req);
+        });
+        connect(typeid(locks::ExternalUnLockPhone), [&](sys::Message *request) -> sys::MessagePointer {
+            auto data = static_cast<locks::ExternalUnLockPhone *>(request);
+            return phoneLockHandler.handleExternalUnlockRequest(data->getInputData());
+        });
+        connect(typeid(locks::ExternalPhoneLockAvailabilityChange), [&](sys::Message *request) -> sys::MessagePointer {
+            auto data = static_cast<locks::ExternalPhoneLockAvailabilityChange *>(request);
+            return phoneLockHandler.handleExternalAvailabilityChange(data->getAvailability());
         });
 
         // SimLock connects

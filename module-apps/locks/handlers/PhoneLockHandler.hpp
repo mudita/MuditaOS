@@ -45,10 +45,12 @@ namespace locks
         void phoneInputRequiredAction();
         void phoneUnlockPopupsCloseAction();
         void phoneLockChangeInfoAction();
+        void phoneExternalUnlockInfoAction();
 
         void checkNewPhoneLock();
         void resolvePhoneLockAction();
 
+        void comparePhoneLockHashCode(LockInput inputData);
         sys::MessagePointer verifyPhoneUnlockInput(LockInput inputData);
         sys::MessagePointer verifyPhoneLockChangeInput(LockInput inputData);
 
@@ -63,7 +65,9 @@ namespace locks
         sys::MessagePointer handleChangePhoneLock();
         sys::MessagePointer handleSetPhoneLock();
         sys::MessagePointer handleSkipSetPhoneLock();
-        sys::MessagePointer verifyPhoneLockInput(LockInput inputData);
+        sys::MessagePointer handlePhoneLockInput(LockInput inputData);
+        sys::MessagePointer handleExternalUnlockRequest(LockInput inputData);
+        sys::MessagePointer handleExternalAvailabilityChange(bool value);
 
         void enablePhoneLock(bool _phoneLockEnabled);
         void setPhoneLockHash(const std::string &value);
