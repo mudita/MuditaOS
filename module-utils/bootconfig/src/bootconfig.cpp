@@ -25,52 +25,6 @@ namespace boot
 {
     namespace
     {
-        bool updateFileCRC32(const std::filesystem::path &file)
-        {
-            auto fp = fopen(file.c_str(), "r");
-            if (!fp) {
-                LOG_WARN("updateFileCRC32 can't open file %s for read", file.c_str());
-                return false;
-            }
-            auto fpCloseAct = gsl::finally([fp] { fclose(fp); });
-
-            unsigned long fileCRC32 = utils::filesystem::computeFileCRC32(fp);
-            LOG_INFO("updateFileCRC32 writing new crc32 %08" PRIX32 " for %s",
-                     static_cast<std::uint32_t>(fileCRC32),
-                     file.c_str());
-
-            if (fileCRC32 == 0) {
-                return false;
-            }
-
-            std::array<char, boot::consts::crc_char_size + 1> crc32Buf;
-
-            if (int written = sprintf(crc32Buf.data(), "%08" PRIX32, fileCRC32);
-                written != boot::consts::crc_char_size) {
-                LOG_INFO("updateFileCRC32 can't prepare string for crc32, sprintf returned %d instead of %d",
-                         written,
-                         boot::consts::crc_char_size);
-                return false;
-            }
-
-            std::filesystem::path fileCRC32Path = file;
-            fileCRC32Path += boot::consts::ext_crc32;
-
-            auto fpCRC32 = fopen(fileCRC32Path.c_str(), "w");
-            if (!fpCRC32) {
-                LOG_WARN("updateFileCRC32 can't open crc32 file for write");
-                return false;
-            }
-            auto fpCRC32CloseAct = gsl::finally([fpCRC32] { fclose(fpCRC32); });
-
-            if (fwrite(crc32Buf.data(), 1, boot::consts::crc_char_size, fpCRC32) != boot::consts::crc_char_size) {
-                LOG_WARN("updateFileCRC32 can't write new crc32");
-                return false;
-            }
-
-            LOG_INFO("updateFileCRC32 wrote \"%s\" in %s", crc32Buf.data(), fileCRC32Path.c_str());
-            return true;
-        }
 
         std::string loadFileAsString(const std::filesystem::path &fileToLoad)
         {
@@ -179,38 +133,6 @@ namespace boot
         return 0;
     }
 
-    void BootConfig::updateBootJson(const std::filesystem::path &bootJsonPath)
-    {
-        m_timestamp = utils::time::Timestamp().str("%c");
-
-        struct statvfs stat;
-        if (statvfs(purefs::dir::getRootDiskPath().c_str(), &stat))
-            LOG_ERROR("%s: Failed to stat vfs", bootJsonPath.c_str());
-
-        auto remount_ro{true};
-        auto flags = stat.f_flag & ~MS_RDONLY;
-        if (mount(NULL, purefs::dir::getRootDiskPath().c_str(), NULL, flags | MS_REMOUNT, NULL)) {
-            LOG_WARN("%s: Failed to remount filesystem R/W - it's fine for a Linux FS", bootJsonPath.c_str());
-            remount_ro = false;
-        }
-
-        LOG_INFO("Writing new %s..", bootJsonPath.c_str());
-        std::ofstream file(bootJsonPath);
-        if (file.is_open()) {
-            file << to_json().dump() << std::flush;
-            if (!file.good())
-                LOG_ERROR("%s: Error while writing a file", bootJsonPath.c_str());
-            file.close();
-            updateFileCRC32(bootJsonPath);
-        }
-        else {
-            LOG_ERROR("%s: Failed to open file", bootJsonPath.c_str());
-        }
-
-        if (remount_ro)
-            if (mount(NULL, purefs::dir::getRootDiskPath().c_str(), NULL, flags | MS_RDONLY | MS_REMOUNT, NULL))
-                LOG_ERROR("%s: Failed to remount filesystem back to RO", bootJsonPath.c_str());
-    }
 
     bool BootConfig::loadBootConfig(const std::filesystem::path &bootJsonPath)
     {
@@ -250,8 +172,6 @@ namespace boot
         auto boot_json_path = purefs::dir::getRootDiskPath() / purefs::file::boot_json;
         if (!readAndVerifyCRC(boot_json_path)) {
             LOG_INFO("CRC check failed on %s", boot_json_path.c_str());
-            // replace broken .boot.json with a default one
-            updateBootJson(boot_json_path);
         }
         return boot_json_path;
     }
