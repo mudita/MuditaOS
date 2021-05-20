@@ -9,7 +9,7 @@ from harness.interface.defs import status
 
 @pytest.mark.service_desktop_test
 @pytest.mark.rt1051
-@pytest.mark.usefixtures("usb_unlocked")
+@pytest.mark.usefixtures("phone_unlocked")
 @pytest.mark.backup
 def test_backup(harness):
     body = { "request": True }

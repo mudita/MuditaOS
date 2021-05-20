@@ -8,7 +8,6 @@ import sys
 
 
 harness = Harness(sys.argv[1])
-harness.unlock_usb()
 
 harness.connection.send_at("at+cmgl=\"all\"", 10000)
 harness.connection.send_at("at+cmgd=1,4", 10000)

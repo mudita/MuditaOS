@@ -9,7 +9,7 @@ from bt_utils import *
 
 @pytest.mark.rt1051
 @pytest.mark.usefixtures("bt_state_on")
-@pytest.mark.usefixtures("usb_unlocked")
+@pytest.mark.usefixtures("phone_unlocked")
 @pytest.mark.skipif("not config.getvalue('--bt_device')", reason='--bt_device was not specified')
 def test_bt_pairing_dev(harness, bt_device):
     time.sleep(1)
@@ -47,7 +47,7 @@ def test_bt_pairing_dev(harness, bt_device):
 
 @pytest.mark.rt1051
 @pytest.mark.usefixtures("bt_state_on")
-@pytest.mark.usefixtures("usb_unlocked")
+@pytest.mark.usefixtures("phone_unlocked")
 @pytest.mark.skipif("not config.getvalue('--bt_device')", reason='--bt_device was not specified')
 def test_bt_connection_dev(harness, bt_device):
     time.sleep(1)
