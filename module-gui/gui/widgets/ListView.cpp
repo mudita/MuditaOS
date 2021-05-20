@@ -34,7 +34,7 @@ namespace gui
 
     void ListViewScroll::updateFixed(const ListViewScrollUpdateData &data)
     {
-        auto elementsOnPage = (parent->widgetArea.h - data.topMargin) / data.elementMinimalHeight;
+        auto elementsOnPage = parent->widgetArea.h / data.elementMinimalHeight;
 
         pagesCount = data.elementsCount % elementsOnPage == 0 ? data.elementsCount / elementsOnPage
                                                               : data.elementsCount / elementsOnPage + 1;
@@ -71,7 +71,7 @@ namespace gui
 
         storedStartIndex = data.startIndex;
 
-        auto scrollH = (parent->widgetArea.h - data.topMargin) / pagesCount;
+        auto scrollH = parent->widgetArea.h / pagesCount;
         auto scrollY = currentPage * scrollH > 0 ? currentPage * scrollH : data.topMargin;
 
         setArea(BoundingBox(
@@ -295,7 +295,8 @@ namespace gui
 
     void ListView::prepareOnPageElementRebuild(unsigned int dataOffset)
     {
-        storedFocusIndex = dataOffset;
+        startIndex       = (dataOffset / calculateMaxItemsOnPage()) * calculateMaxItemsOnPage();
+        storedFocusIndex = dataOffset % calculateMaxItemsOnPage();
     }
 
     void ListView::setup(listview::RebuildType rebuildType, unsigned int dataOffset)
@@ -317,6 +318,7 @@ namespace gui
 
         if (prepareRebuildCallback) {
             prepareRebuildCallback();
+            setElementsCount(provider->requestRecordsCount());
         }
 
         lastRebuildRequest = {rebuildType, dataOffset};

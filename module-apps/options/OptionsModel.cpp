@@ -14,7 +14,7 @@ auto OptionsModel::requestRecordsCount() -> unsigned int
 
 auto OptionsModel::getMinimalItemHeight() const -> unsigned int
 {
-    return style::window::label::big_h;
+    return style::window::label::big_h + gui::option::window::option_bottom_margin;
 }
 
 void OptionsModel::requestRecords(const uint32_t offset, const uint32_t limit)
