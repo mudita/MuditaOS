@@ -51,7 +51,7 @@
 	path = module-utils/pugixml
 	url = ../pugixml.git
 [submodule "module-utils/magic_enum"]
-	path = module-utils/magic_enum
+	path = third-party/magic_enum
 	url = https://github.com/Neargye/magic_enum.git
 [submodule "module-utils/tinyexpr"]
 	path = module-utils/tinyexpr

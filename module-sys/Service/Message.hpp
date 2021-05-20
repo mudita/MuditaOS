@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <module-utils/magic_enum/include/magic_enum.hpp>
+#include <magic_enum.hpp>
 #include "Common.hpp"
 #include "MessageType.hpp"
 #include "MessageForward.hpp"
