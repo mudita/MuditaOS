@@ -5,7 +5,7 @@ from harness.interface.defs import status
 
 
 @pytest.mark.service_desktop_test
-@pytest.mark.usefixtures("usb_unlocked")
+@pytest.mark.usefixtures("phone_unlocked")
 @pytest.mark.rt1051
 def test_update(harness):
     body = {}
