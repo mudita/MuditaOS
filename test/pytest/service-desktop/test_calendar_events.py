@@ -6,7 +6,7 @@ import copy
 import time
 
 @pytest.mark.service_desktop_test
-@pytest.mark.usefixtures("usb_unlocked")
+@pytest.mark.usefixtures("phone_unlocked")
 def test_calendar(harness):
     # add events
     add_body = {

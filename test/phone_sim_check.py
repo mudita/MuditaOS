@@ -7,8 +7,6 @@ from harness.harness import Harness
 import sys
 
 harness = Harness(sys.argv[1])
-harness.unlock_usb()
-
 
 results = harness.connection.send_at("AT+CPIN?", 10000)
 for result in results:
