@@ -9,7 +9,7 @@ MESSAGES_PAGE_SIZE = 4
 
 
 @pytest.mark.service_desktop_test
-@pytest.mark.usefixtures("usb_unlocked")
+@pytest.mark.usefixtures("phone_unlocked")
 def test_get_messages_without_pagination(harness):
     limit = MESSAGES_PAGE_SIZE - 1
     get_body = {"category": "message", "limit": limit, "offset": 0}
@@ -22,7 +22,7 @@ def test_get_messages_without_pagination(harness):
 
 
 @pytest.mark.service_desktop_test
-@pytest.mark.usefixtures("usb_unlocked")
+@pytest.mark.usefixtures("phone_unlocked")
 def test_get_messages_with_pagination(harness):
     limit = MESSAGES_PAGE_SIZE + 1
     body = {"category": "message", "limit": limit, "offset": 0}
@@ -35,7 +35,7 @@ def test_get_messages_with_pagination(harness):
 
 
 @pytest.mark.service_desktop_test
-@pytest.mark.usefixtures("usb_unlocked")
+@pytest.mark.usefixtures("phone_unlocked")
 def test_get_all_messages(harness):
     # get messages count
     body = {"category": "message", "count": True}
@@ -77,7 +77,7 @@ def test_get_all_messages(harness):
 
 
 @pytest.mark.service_desktop_test
-@pytest.mark.usefixtures("usb_unlocked")
+@pytest.mark.usefixtures("phone_unlocked")
 def test_get_messages_by_thread_id_without_pagination(harness):
     thread_id = 1
     limit = MESSAGES_PAGE_SIZE - 1
@@ -93,7 +93,7 @@ def test_get_messages_by_thread_id_without_pagination(harness):
 
 
 @pytest.mark.service_desktop_test
-@pytest.mark.usefixtures("usb_unlocked")
+@pytest.mark.usefixtures("phone_unlocked")
 def test_get_messages_by_thread_id_with_pagination(harness):
     thread_id = 1
     limit = MESSAGES_PAGE_SIZE + 1
@@ -109,7 +109,7 @@ def test_get_messages_by_thread_id_with_pagination(harness):
 
 
 @pytest.mark.service_desktop_test
-@pytest.mark.usefixtures("usb_unlocked")
+@pytest.mark.usefixtures("phone_unlocked")
 def test_get_all_messages_by_thread_id(harness):
     thread_id = 1
     # get messages count
@@ -152,7 +152,7 @@ def test_get_all_messages_by_thread_id(harness):
 
 
 @pytest.mark.service_desktop_test
-@pytest.mark.usefixtures("usb_unlocked")
+@pytest.mark.usefixtures("phone_unlocked")
 def test_remove_message(harness):
     # get messages count
     body = {"category": "message", "count": True}
@@ -186,7 +186,7 @@ def test_remove_message(harness):
 
 
 @pytest.mark.service_desktop_test
-@pytest.mark.usefixtures("usb_unlocked")
+@pytest.mark.usefixtures("phone_unlocked")
 def test_get_message_by_id(harness):
     message_id = 1
     get_body = {"category": "message", "messageID": message_id}
