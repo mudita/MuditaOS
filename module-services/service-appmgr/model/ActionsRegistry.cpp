@@ -4,7 +4,7 @@
 #include <service-appmgr/model/ActionsRegistry.hpp>
 
 #include <module-utils/log/log.hpp>
-#include <module-utils/magic_enum/include/magic_enum.hpp>
+#include <magic_enum.hpp>
 
 #include <cassert>
 #include <stdexcept>

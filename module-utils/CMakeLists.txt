@@ -75,7 +75,12 @@ target_link_libraries (${PROJECT_NAME} PUBLIC ${TINYEXPR_TARGET})
 # link against pugixml
 target_link_libraries (${PROJECT_NAME} PUBLIC ${PUGIXML_TARGET})
 
-target_link_libraries(${PROJECT_NAME} PUBLIC module-os module-vfs)
+target_link_libraries(${PROJECT_NAME} 
+PUBLIC 
+    module-os 
+    module-vfs
+    magic_enum
+)
 
 # Board specific compilation definitions,options,include directories and features
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
@@ -92,7 +97,6 @@ target_include_directories(${PROJECT_NAME}
 
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/gsl
-        ${CMAKE_CURRENT_SOURCE_DIR}/magic_enum/include
 )
 
 if((${PROJECT_TARGET} STREQUAL "TARGET_RT1051") AND (${SYSTEM_VIEW_ENABLED}))

@@ -14,4 +14,6 @@ add_catch2_executable(
             ${CMAKE_SOURCE_DIR}/module-services/service-db
             ${CMAKE_SOURCE_DIR}/module-utils/
         DEPS
+        LIBS
+            magic_enum
 )

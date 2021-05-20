@@ -5,7 +5,7 @@
 
 #include <Service/Service.hpp>
 
-#include <module-utils/magic_enum/include/magic_enum.hpp>
+#include <magic_enum.hpp>
 
 #include <stdexcept>
 #include <utility>
