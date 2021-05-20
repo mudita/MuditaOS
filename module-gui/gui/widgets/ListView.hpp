@@ -37,7 +37,7 @@ namespace gui
         {
             Full,          ///< Full rebuild - resets lists to all initial conditions and request data from beginning.
             InPlace,       ///< InPlace rebuild - stores currently focused part of list and rebuild from that part.
-            OnPageElement, ///< OnPageElement rebuild - same page but focus changed on provided element index.
+            OnPageElement, ///< OnPageElement rebuild - focus on provided element index and calculated page.
             OnOffset       ///< OnOffset rebuild - resets lists to all initial conditions and request data from provided
                            ///< offset.
         };

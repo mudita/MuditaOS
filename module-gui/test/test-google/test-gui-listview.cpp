@@ -394,10 +394,10 @@ TEST_F(ListViewTesting, Rebuild_Type_Test)
     ASSERT_EQ(1, dynamic_cast<gui::TestListItem *>(testListView->body->getFocusItem())->ID)
         << "Check if item 1 has focus";
 
-    // Do on page element rebuild on index outside Page scope (should focus on last possible)
-    testListView->rebuildList(gui::listview::RebuildType::OnPageElement, 10);
+    // Do on page element rebuild on index outside Page scope. Page should change and proper element should be focused.
+    testListView->rebuildList(gui::listview::RebuildType::OnPageElement, 8);
 
     // Check if focused item did not change
-    ASSERT_EQ(5, dynamic_cast<gui::TestListItem *>(testListView->body->getFocusItem())->ID)
-        << "Check if item 5 has focus";
+    ASSERT_EQ(8, dynamic_cast<gui::TestListItem *>(testListView->body->getFocusItem())->ID)
+        << "Check if item 8 has focus";
 }
