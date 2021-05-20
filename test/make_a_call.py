@@ -46,7 +46,7 @@ def main():
         port_name = sys.argv[1]
 
     harness = Harness(sys.argv[1])
-    harness. unlock_usb()
+    harness.unlock_phone()
     number = str(sys.argv[2])
     duration = int(sys.argv[3])
     count_before = get_calllog_count(harness)

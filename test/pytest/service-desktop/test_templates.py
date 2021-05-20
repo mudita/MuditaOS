@@ -145,28 +145,28 @@ class TemplatesTester:
 
 
 @pytest.mark.service_desktop_test
-@pytest.mark.usefixtures("usb_unlocked")
+@pytest.mark.usefixtures("phone_unlocked")
 def test_get_template_by_id(harness):
     templates_tester = TemplatesTester(harness)
     templates_tester.test_getting_template_by_id()
 
 
 @pytest.mark.service_desktop_test
-@pytest.mark.usefixtures("usb_unlocked")
+@pytest.mark.usefixtures("phone_unlocked")
 def test_get_templates_without_pagination(harness):
     templates_tester = TemplatesTester(harness)
     templates_tester.test_getting_templates_without_pagination()
 
 @pytest.mark.rt1051
 @pytest.mark.service_desktop_test
-@pytest.mark.usefixtures("usb_unlocked")
+@pytest.mark.usefixtures("phone_unlocked")
 def test_change_template(harness):
     templates_tester = TemplatesTester(harness)
     templates_tester.test_changing_template_body()
 
 @pytest.mark.rt1051
 @pytest.mark.service_desktop_test
-@pytest.mark.usefixtures("usb_unlocked")
+@pytest.mark.usefixtures("phone_unlocked")
 def test_get_templates_with_pagination(harness):
     templates_tester = TemplatesTester(harness)
     templates_tester.test_getting_templates_with_pagination()
