@@ -128,7 +128,9 @@ namespace bluetooth
             if (READ_SCO_CONNECTION_HANDLE(event) != scoHandle) {
                 break;
             }
-            sco->receive(event, eventSize);
+            if (audioDevice != nullptr) {
+                audioDevice->receiveCVSD(audio::AbstractStream::Span{.data = event, .dataSize = eventSize});
+            }
             break;
 
         case HCI_EVENT_PACKET:
