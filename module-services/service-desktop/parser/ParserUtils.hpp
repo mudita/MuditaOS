@@ -181,6 +181,7 @@ namespace parserFSM
             inline constexpr auto locked   = "locked";
             inline constexpr auto unlocked = "unlocked";
             inline constexpr auto security = "usbSecurity";
+            inline constexpr auto phoneLockCode = "phoneLockCode";
 
         } // namespace usb
 

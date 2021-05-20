@@ -6,9 +6,10 @@
 #include <endpoints/Context.hpp>
 #include <parser/MessageHandler.hpp>
 #include <service-desktop/service-desktop/ServiceDesktop.hpp>
+#include <module-services/service-appmgr/service-appmgr/model/ApplicationManager.hpp>
 #include <service-desktop/DesktopMessages.hpp>
 #include <json/json11.hpp>
-
+#include <module-apps/locks/data/PhoneLockMessages.hpp>
 #include <string>
 
 using namespace parserFSM;
@@ -60,15 +61,21 @@ auto SecurityEndpoint::processStatus(Context &context) -> http::Code
 auto SecurityEndpoint::processConfiguration(Context &context) -> http::Code
 {
     auto body = context.getBody();
+    auto passCode = body[json::usb::phoneLockCode].string_value();
 
-    std::shared_ptr<sys::DataMessage> msg;
-
-    if (body[json::usb::status].string_value() == json::usb::on) {
-        msg = std::make_shared<sdesktop::usb::USBSecurityOn>();
-    }
-    if (body[json::usb::status].string_value() == json::usb::off) {
-        msg = std::make_shared<sdesktop::usb::USBSecurityOff>();
+    if (passCode == "" || passCode.length() != 4) {
+        return http::Code::BadRequest;
     }
 
-    return toCode(ownerServicePtr->bus.sendUnicast(std::move(msg), service::name::service_desktop));
+    std::vector<unsigned int> passCodeAsInt;
+
+    for (auto i = 0u; i < passCode.length(); i++) {
+        auto c         = passCode[i];
+        unsigned int v = std::atoi(&c);
+        passCodeAsInt.push_back(v);
+    }
+
+    std::shared_ptr<sys::DataMessage> msg = std::make_shared<locks::UnLockPhoneInput>(passCodeAsInt);
+
+    return toCode(ownerServicePtr->bus.sendUnicast(std::move(msg), app::manager::ApplicationManager::ServiceName));
 }

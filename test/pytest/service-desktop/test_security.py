@@ -56,3 +56,34 @@ def test_all_other_endpoints_usb_locked(harness):
     assert ret["status"] == status["OK"]
 
     harness.unlock_usb()
+
+@pytest.mark.service_desktop_test
+@pytest.mark.usefixtures("usb_locked")
+def test_security_usb_unlock_with_too_short_passcode(harness):
+    body = {
+        "phoneLockCode":"9"
+    }
+
+    ret = harness.endpoint_request("usbSecurity", "put", body)
+    assert ret["status"] == status["BadRequest"]
+
+@pytest.mark.service_desktop_test
+@pytest.mark.usefixtures("usb_locked")
+def test_security_usb_unlock_with_wrong_passcode(harness):
+    body = {
+        "phoneLockCode":"1239"
+    }
+
+    ret = harness.endpoint_request("usbSecurity", "put", body)
+    assert ret["status"] == status["Forbidden"]
+
+
+@pytest.mark.service_desktop_test
+@pytest.mark.usefixtures("usb_locked")
+def test_security_usb_unlock_with_passcode(harness):
+    body = {
+        "phoneLockCode":"3333"
+    }
+
+    ret = harness.endpoint_request("usbSecurity", "put", body)
+    assert ret["status"] == status["OK"]
