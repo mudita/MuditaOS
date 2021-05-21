@@ -20,7 +20,9 @@ pipeline {
     node {
       label 'jenkins-slave-ccache'
     }
-
+  }
+  options{
+    ansiColor('xterm')
   }
   environment {
     JOBS=15
