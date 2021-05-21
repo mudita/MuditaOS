@@ -5,7 +5,6 @@
 
 #include "gui/SwitchData.hpp"
 #include <service-desktop/DesktopMessages.hpp>
-#include <service-desktop/ServiceDesktop.hpp>
 #include <filesystem>
 #include <utility>
 

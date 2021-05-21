@@ -28,7 +28,6 @@ set (SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/common_data/Clipboard.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/ucs2/UCS2.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/time/time_date_validation.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/microtar/src/microtar.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/PhoneNumber.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/PhoneNumber.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/NumberHolderMatcher.hpp

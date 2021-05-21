@@ -32,6 +32,7 @@
 #include <service-db/QueryMessage.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <magic_enum.hpp>
+#include <module-services/service-desktop/service-desktop/Constants.hpp>
 #include <module-apps/messages/AppMessage.hpp>
 #include <SystemManager/messages/SystemManagerMessage.hpp>
 #include <module-gui/gui/widgets/TopBar/SIM.hpp>
