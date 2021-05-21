@@ -5,7 +5,7 @@
 
 #include <SystemManager/SystemManager.hpp>
 #include <log/log.hpp>
-#include <microtar/src/microtar.hpp>
+#include <microtar.hpp>
 #include <purefs/filesystem_paths.hpp>
 #include <service-db/DBServiceAPI.hpp>
 #include <service-db/DBServiceName.hpp>

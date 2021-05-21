@@ -16,6 +16,7 @@
 #include <service-appmgr/model/ApplicationManager.hpp>
 
 #include "service-cellular/ServiceCellular.hpp"
+#include <service-desktop/service-desktop/Constants.hpp>
 #include <Style.hpp>
 #include <boot/bootconfig.hpp>
 

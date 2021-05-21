@@ -5,6 +5,7 @@
 #include <gui/widgets/BottomBar.hpp>
 #include <gui/widgets/TopBar.hpp>
 #include <source/version.hpp>
+#include <boot/bootconfig.hpp>
 
 // module-utils
 #include <i18n/i18n.hpp>
