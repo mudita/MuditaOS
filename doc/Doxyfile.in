@@ -889,7 +889,6 @@ EXCLUDE                = @PROJECT_SOURCE_DIR@/module-bluetooth/lib \
                          @PROJECT_SOURCE_DIR@/module-utils/tinyfsm \
                          @PROJECT_SOURCE_DIR@/module-utils/segger \
                          @PROJECT_SOURCE_DIR@/module-utils/sbini \
-                         @PROJECT_SOURCE_DIR@/module-utils/re2 \
                          @PROJECT_SOURCE_DIR@/module-utils/libphonenumber \
                          @PROJECT_SOURCE_DIR@/module-utils/test \
                          @PROJECT_SOURCE_DIR@/module-db/tests \
