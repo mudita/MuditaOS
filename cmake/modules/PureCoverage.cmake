@@ -34,7 +34,7 @@ if(COVERAGE_ENABLE)
         module-utils/microtar/.*
         module-utils/parallel-hashmap/.*
         module-utils/protobuf/.*
-        module-utils/pugixml/.*
+        third-party/pugixml/.*
         module-utils/re2/.*
         module-utils/segger/.*
         module-utils/sml/.*
