@@ -11,11 +11,6 @@
 [submodule "module-utils/crc32"]
 	path = third-party/crc32/src
 	url = ../crc32
-[submodule "module-utils/re2"]
-	path = module-utils/re2
-	url = ../re2.git
-	branch = rt1051
-	shallow = true
 [submodule "module-utils/protobuf"]
 	path = third-party/protobuf/src
 	url = ../protobuf.git
@@ -87,3 +82,7 @@
 [submodule "third-party/gsl"]
 	path = third-party/gsl
 	url = https://github.com/microsoft/GSL.git
+[submodule "third-party/re2/src"]
+	path = third-party/re2/src
+	url = ../re2.git
+	branch = rt1051
