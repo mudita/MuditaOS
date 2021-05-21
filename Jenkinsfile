@@ -8,7 +8,7 @@ def cancelPreviousBuilds() {
         def exec = build.getExecutor()
 
         /* Kill older jobs */
-        if (build.isBuilding() && build.number.toInteger() < buildNumber && exec != null) { 
+        if (build.isBuilding() && build.number.toInteger() < buildNumber && exec != null) {
             def cause = { "Job stoped by #${buildNumber}" as String} as CauseOfInterruption
             exec.interrupt(Result.ABORTED, cause)
             println("Aborting previous build:#${build.number}")
@@ -23,7 +23,7 @@ pipeline {
 
   }
   environment {
-    JOBS=10
+    JOBS=15
   }
   stages {
     stage('Check for previous running builds') {
@@ -40,6 +40,19 @@ pipeline {
             GITHUB_HEAD_REF="${pullRequest.headRef}"
         }
         steps {
+            echo "Check if branch needs rebasing"
+            sh '''#!/bin/bash -e
+pushd ${WORKSPACE}
+
+if [[ $(git log origin/${CHANGE_TARGET}..HEAD) ]]; then
+    echo "Branch OK"
+else
+    echo "Branch is not rebased. Exiting"
+    exit 1
+fi
+
+
+popd'''
             echo "Commit Message check"
             sh '''#!/bin/bash -e
 pushd ${WORKSPACE}
