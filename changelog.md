@@ -4,6 +4,38 @@ To install the new version of MuditaOS please follow the steps described in this
 - [Linux](https://github.com/mudita/MuditaOS/blob/master/doc/boot_and_update.md#creating-a-storage-partition)
 - [Windows and macOS](https://github.com/mudita/MuditaOS/blob/master/doc/flashing_win_macos.md)
 
+## [0.66.1 2021-05-21]
+
+### Added
+
+* Add autolocking settings.
+* Add EEPROM block device driver.
+* Add enabling screen light on a keypress.
+* Add front light brightness automatic adjustment.
+* Add key bindings documentation for Bell's simulator.
+* Add settings guidelines documentation.
+* Add SIM select window in the onboarding process.
+* Add single number message notifications.
+
+### Changed
+
+* Add several code quality improvements to the build system.
+* Cancel Jenkins builds on PR update.
+* Disable logs and allocations in interrupts to prevent crashing.
+* Disable WAL mechanism in databases.
+* Don't show contents of PurePhone in Center when PurePhone is locked.
+* Enable changing simulator's screen size at compilation time.
+* Reject uploads of non-audio files via MTP.
+* Remove logging database's pragma errors.
+* Update notifications icons.
+
+### Fixed
+
+* Fix building for Glibc v2.33.
+* Fix crashing progress bar during an update.
+* Fix NAT widget to be visible only during a call.
+* Fix parsing of boot descriptor file.
+
 ## [0.65.1 2021-05-19]
 
 ### Added
