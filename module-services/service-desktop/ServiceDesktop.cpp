@@ -220,14 +220,11 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
                             service::name::system_manager);
         }
 
-        if (!usbSecurityModel->isSecurityEnabled()) {
-            LOG_INFO("Endpoint security disabled.");
-            return sys::MessageNone{};
-        }
+        if (usbSecurityModel->isSecurityEnabled()) {
+            LOG_INFO("Endpoint security enabled, requesting passcode");
 
-        LOG_INFO("USB connected with endpoint security enabled. Requesting passcode.");
-        usbSecurityModel->setEndpointSecurity(EndpointSecurity::Block);
-        bus.sendUnicast(std::make_shared<locks::UnlockPhone>(), app::manager::ApplicationManager::ServiceName);
+            bus.sendUnicast(std::make_shared<locks::UnlockPhone>(), app::manager::ApplicationManager::ServiceName);
+        }
 
         return sys::MessageNone{};
     });
@@ -235,7 +232,6 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
     connect(sdesktop::usb::USBDisconnected(), [&](sys::Message *msg) {
         LOG_INFO("USB disconnected");
         if (usbSecurityModel->isSecurityEnabled()) {
-            LOG_INFO("Enabling secured endpoints.");
             bus.sendUnicast(std::make_shared<locks::CancelUnlockPhone>(),
                             app::manager::ApplicationManager::ServiceName);
         }
