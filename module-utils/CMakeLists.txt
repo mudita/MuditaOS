@@ -49,7 +49,6 @@ add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
 include(segger/rtt/CMakeLists.txt)
 
 # add third party libs
-include(third-party/re2.cmake)
 include(third-party/libphonenumber.cmake)
 
 # link against libphonenumber
