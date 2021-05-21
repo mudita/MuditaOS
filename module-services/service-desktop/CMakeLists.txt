@@ -59,6 +59,7 @@ target_link_libraries(${PROJECT_NAME}
         module-utils
         module-cellular
         crc32
+        microtar
 )
 
 if (${ENABLE_TESTS})

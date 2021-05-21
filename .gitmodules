@@ -3,7 +3,7 @@
 	url = ../lwip.git
 	shallow = true
 [submodule "module-utils/microtar"]
-	path = module-utils/microtar
+	path = third-party/microtar/src
 	url = ../microtar.git
 [submodule "module-utils/segger"]
 	path = module-utils/segger
