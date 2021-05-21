@@ -53,7 +53,6 @@ include(third-party/re2.cmake)
 include(third-party/protobuf-lite.cmake)
 include(third-party/libphonenumber.cmake)
 include(third-party/tinyexpr.cmake)
-include(third-party/pugixml.cmake)
 
 # link against libphonenumber
 target_link_libraries (${PROJECT_NAME} PUBLIC ${LIBPHONENUMBER_TARGET})
@@ -70,9 +69,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE crc32 )
 
 # link against tinyexpr
 target_link_libraries (${PROJECT_NAME} PUBLIC ${TINYEXPR_TARGET})
-
-# link against pugixml
-target_link_libraries (${PROJECT_NAME} PUBLIC ${PUGIXML_TARGET})
 
 target_link_libraries(${PROJECT_NAME} 
 PUBLIC 

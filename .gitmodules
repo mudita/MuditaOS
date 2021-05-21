@@ -48,7 +48,7 @@
 	path = module-bluetooth/lib/btstack
 	url = ../btstack.git
 [submodule "module-utils/pugixml"]
-	path = module-utils/pugixml
+	path = third-party/pugixml
 	url = ../pugixml.git
 [submodule "module-utils/magic_enum"]
 	path = third-party/magic_enum

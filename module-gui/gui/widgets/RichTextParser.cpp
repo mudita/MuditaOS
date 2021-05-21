@@ -12,7 +12,7 @@
 #include <log/log.hpp>
 #include "TextFormat.hpp"
 
-#include <module-utils/pugixml/src/pugixml.hpp>
+#include <pugixml.hpp>
 #include <module-utils/Utils.hpp>
 #include <utility>
 
