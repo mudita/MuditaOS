@@ -28,6 +28,13 @@ namespace sdesktop
                 lockPassHash = utils::getNumericValue<unsigned int>(value);
             },
             ::settings::SettingsScope::Global);
+
+        if (isSecurityEnabled()) {
+            setEndpointSecurity(EndpointSecurity::Block);
+        }
+        else {
+            setEndpointSecurity(EndpointSecurity::Allow);
+        }
     }
 
     auto USBSecurityModel::isBound(DeviceID id) const -> bool
