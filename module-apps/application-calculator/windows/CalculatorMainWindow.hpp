@@ -8,7 +8,6 @@
 #include "application-calculator/data/CalculatorInputProcessor.hpp"
 #include "application-calculator/widgets/MathOperationsBox.hpp"
 #include <module-gui/gui/widgets/Text.hpp>
-#include <module-utils/tinyexpr/tinyexpr.h>
 
 namespace gui
 {
