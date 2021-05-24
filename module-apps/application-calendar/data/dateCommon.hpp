@@ -4,7 +4,7 @@
 #ifndef DATECOMMON_H
 #define DATECOMMON_H
 
-#include <module-utils/date/include/date/date.h>
+#include <date/date.h>
 #include <module-utils/time/DateAndTimeSettings.hpp>
 #include <time/time_conversion.hpp>
 #include <Utils.hpp>
