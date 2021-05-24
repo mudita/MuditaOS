@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /*
@@ -124,7 +124,8 @@ void BOARD_BootClockRUN(void)
 {
     /* Init RTC OSC clock frequency. */
     CLOCK_SetRtcXtalFreq(32768U);
-
+    /* Disable 1MHz clock output. */
+    XTALOSC24M->OSC_CONFIG2 &= ~XTALOSC24M_OSC_CONFIG2_ENABLE_1M_MASK;
     /* Set XTAL 24MHz clock frequency. */
     CLOCK_SetXtalFreq(24000000U);
     /* Enable XTAL 24MHz clock source. */
