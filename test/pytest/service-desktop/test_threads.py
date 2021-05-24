@@ -12,6 +12,19 @@ def test_threads(harness):
     ret = harness.endpoint_request("messages", "get", body)
     assert ret["status"] == status["OK"]
 
+    # Check if all fields are present and have proper type
+    message_types = [1, 2, 4, 8, 16, 18, 255]
+    for thread in ret["body"]["entries"]:
+        assert type(thread["contactID"]) == int
+        assert type(thread["isUnread"]) == bool
+        assert type(thread["lastUpdatedAt"]) == int
+        assert type(thread["messageCount"]) == int
+        assert type(thread["messageSnippet"]) == str
+        assert type(thread["messageType"]) == int
+        assert type(thread["numberID"]) == int
+        assert type(thread["threadID"]) == int
+        assert thread["messageType"] in message_types
+
     # getting a number of threads
     number_of_requested_threads = 3
     if ret["body"]["totalCount"] < number_of_requested_threads:
