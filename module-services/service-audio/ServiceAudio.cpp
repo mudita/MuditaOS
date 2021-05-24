@@ -139,6 +139,10 @@ sys::ReturnCodes ServiceAudio::DeinitHandler()
 
 void ServiceAudio::ProcessCloseReason(sys::CloseReason closeReason)
 {
+    if (const auto &activeInputOpt = audioMux.GetActiveInput(); activeInputOpt.has_value()) {
+        const auto activeInput = activeInputOpt.value();
+        activeInput->audio->Stop();
+    }
     sendCloseReadyMessage(this);
 }
 
