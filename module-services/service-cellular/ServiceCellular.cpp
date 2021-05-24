@@ -1913,6 +1913,10 @@ void ServiceCellular::apnListChanged(const std::string &value)
 auto ServiceCellular::handleCellularAnswerIncomingCallMessage(CellularMessage *msg)
     -> std::shared_ptr<CellularResponseMessage>
 {
+    if (ongoingCall.getType() != CallType::CT_INCOMING) {
+        return std::make_shared<CellularResponseMessage>(true);
+    }
+
     auto channel = cmux->get(CellularMux::Channel::Commands);
     auto ret     = false;
     if (channel) {

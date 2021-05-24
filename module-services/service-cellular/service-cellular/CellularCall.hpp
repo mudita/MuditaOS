@@ -92,6 +92,12 @@ namespace CellularCall
         {
             return isActiveCall;
         }
+
+        [[nodiscard]] CallType getType() const noexcept
+        {
+            return call.type;
+        }
+
         void setCpuSentinel(std::shared_ptr<sys::CpuSentinel> sentinel);
     };
 } // namespace CellularCall
