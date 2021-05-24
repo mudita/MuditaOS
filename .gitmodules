@@ -50,7 +50,7 @@
 	path = third-party/magic_enum
 	url = https://github.com/Neargye/magic_enum.git
 [submodule "module-utils/tinyexpr"]
-	path = module-utils/tinyexpr
+	path = third-party/tinyexpr/src
 	url = https://github.com/codeplea/tinyexpr.git
 [submodule "module-bsp/board/rt1051/bsp/usb"]
 	path = module-bsp/board/rt1051/bsp/usb

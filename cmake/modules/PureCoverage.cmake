@@ -35,7 +35,6 @@ if(COVERAGE_ENABLE)
         module-utils/re2/.*
         module-utils/segger/.*
         module-utils/taglib/.*
-        module-utils/tinyexpr/.*
         source/main.cpp
         test/.*
         third-party/.*

@@ -6,3 +6,5 @@ add_subdirectory(date)
 add_subdirectory(pugixml)
 add_subdirectory(sml)
 add_subdirectory(minimp3)
+add_subdirectory(tinyexpr)
+
