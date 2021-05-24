@@ -83,6 +83,10 @@ class TemplatesTester:
         assert ret["status"] == status["OK"]
         assert ret["body"]["totalCount"] == count
         assert len(ret["body"]["entries"]) == number_of_requested_templates
+        for template in ret["body"]["entries"]:
+            assert type(template["lastUsedAt"]) == int
+            assert type(template["templateBody"]) == str
+            assert type(template["templateID"]) == int
 
     def test_changing_template_body(self):
         test_passed = False
