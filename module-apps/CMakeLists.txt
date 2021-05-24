@@ -117,6 +117,7 @@ add_subdirectory(locks)
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
+        date::date
         service-appmgr
         service-antenna
         service-audio

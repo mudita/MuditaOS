@@ -28,7 +28,6 @@ if(COVERAGE_ENABLE)
         module-db/Database/sqlite3.c
         module-lwip/lib/.*
         module-os/.*
-        module-utils/date/include/date/date.h
         module-utils/gsl/.*
         module-utils/json/.*
         module-utils/libphonenumber/.*
