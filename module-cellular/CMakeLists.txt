@@ -86,6 +86,7 @@ target_link_libraries(${PROJECT_NAME}
     module-sys
     module-db
     module-bsp
+    date::date
 )
 
 if (${ENABLE_TESTS})
