@@ -56,8 +56,17 @@ add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
         bus
+        module-apps
+        module-audio
+        module-cellular
+        module-db
+        module-gui
+        service-appmgr
         service-evtmgr
         service-cellular
+        service-db
+        service-desktop
+        service-gui
     PUBLIC
         module-os)
 

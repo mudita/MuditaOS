@@ -48,10 +48,16 @@ target_include_directories(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
         service-antenna
+        service-appmgr
         service-audio
+        service-desktop
         service-evtmgr
+        service-gui
+        module-apps
         module-bsp
         module-cellular
+        module-db
+        module-gui
     )
 
 if (${ENABLE_TESTS})

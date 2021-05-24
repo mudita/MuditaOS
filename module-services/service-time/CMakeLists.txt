@@ -16,6 +16,10 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
-        module-sys
         module-apps
+        module-sys
+        service-appmgr
+        service-cellular
+        service-desktop
+        service-gui
 )

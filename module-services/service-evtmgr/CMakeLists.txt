@@ -25,9 +25,11 @@ target_link_libraries(${PROJECT_NAME}
         service-appmgr
         service-cellular
         service-desktop
+        service-gui
         module-apps
-        module-utils
+        module-cellular
         module-gui
+        module-utils
 
 )
 

@@ -89,9 +89,14 @@ target_include_directories(${PROJECT_NAME}
 set_source_files_properties(${BOARD_SOURCE_FILES_PROPERTIES})
 
 target_link_libraries(${PROJECT_NAME}
-    module-os
-    service-bluetooth
-    ${TARGET_LIBRARIES}
+    PRIVATE
+        module-audio
+        module-bluetooth
+        module-os
+        service-bluetooth
+        service-cellular
+        service-db
+        ${TARGET_LIBRARIES}
 )
 
 if (${ENABLE_TESTS})

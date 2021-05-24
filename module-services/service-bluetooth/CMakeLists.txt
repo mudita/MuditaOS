@@ -18,8 +18,14 @@ target_include_directories(${PROJECT_NAME}
 )
 
 target_link_libraries(${PROJECT_NAME}
-    PUBLIC
+    PRIVATE
+        module-apps
         module-bluetooth
-        service-desktop
+        module-db
+        module-gui
         module-sys
+        service-appmgr
+        service-cellular
+        service-db
+        service-desktop
 )

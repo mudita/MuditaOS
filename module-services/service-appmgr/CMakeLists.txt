@@ -35,9 +35,12 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE
         service-cellular
         service-db
+        service-desktop
+        service-evtmgr
         service-gui
         module-apps
         module-audio
+        module-cellular
 )
 
 target_include_directories(${PROJECT_NAME}

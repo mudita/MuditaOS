@@ -16,8 +16,10 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
-       service-cellular
        module-cellular
+       module-db
        module-sys
+       service-cellular
+       service-desktop
 )
 

@@ -175,7 +175,14 @@ target_compile_options(${PROJECT_NAME}
     -Wno-error=return-local-addr
 )
 
-target_link_libraries(${PROJECT_NAME} module-utils module-vfs)
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+        date
+        module-utils
+        module-vfs
+        service-cellular
+        service-desktop
+)
 
 # Host target configuration(mainly used for unit testing)
 if (${ENABLE_TESTS})

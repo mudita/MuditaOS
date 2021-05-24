@@ -67,7 +67,7 @@ set( TAGLIB_INCLUDE_DIRS
 	 PARENT_SCOPE
 )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE crc32 date)
+target_link_libraries(${PROJECT_NAME} PRIVATE crc32 date service-cellular)
 
 # link against tinyexpr
 target_link_libraries (${PROJECT_NAME} PUBLIC ${TINYEXPR_TARGET})

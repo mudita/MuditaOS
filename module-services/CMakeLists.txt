@@ -33,7 +33,9 @@ add_subdirectory( service-antenna )
 add_subdirectory( service-time )
 add_subdirectory( service-fileindexer )
 
-target_link_libraries(${PROJECT_NAME} PUBLIC
+target_link_libraries(${PROJECT_NAME} 
+    PRIVATE
+    date
     service-gui
     service-eink
     service-appmgr

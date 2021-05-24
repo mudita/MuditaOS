@@ -31,7 +31,13 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
+        date
+        module-apps
         module-db
+        module-utils
+        service-appmgr
+        service-desktop
+        service-fileindexer
 )
 
 if (${ENABLE_TESTS})

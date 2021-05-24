@@ -27,9 +27,12 @@ target_sources(service-gui
 
 
 target_link_libraries(service-gui
-    service-eink
-    module-gui
-    module-apps
+    PRIVATE
+        module-apps
+        module-gui
+        service-appmgr
+        service-desktop
+        service-eink
 )
 
 target_include_directories(service-gui

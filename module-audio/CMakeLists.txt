@@ -64,12 +64,15 @@ set_source_files_properties(
 )
 
 target_link_libraries(${PROJECT_NAME}
-    ${AUDIO_BOARD_LIBRARY}
-    module-bsp
-    module-os
-    module-utils
-    module-sys
-    tag
+    PRIVATE
+        ${AUDIO_BOARD_LIBRARY}
+        module-bluetooth
+        module-bsp
+        module-os
+        module-utils
+        module-sys
+        service-bluetooth
+        tag
 )
 
 if (${ENABLE_TESTS})

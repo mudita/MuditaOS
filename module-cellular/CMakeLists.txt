@@ -78,16 +78,22 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
-    date
-    service-cellular
-    service-eink
-    service-fota
-    module-utils
-    module-vfs
-    module-services
-    module-sys
-    module-db
-    module-bsp
+        date
+        module-apps
+        module-audio
+        module-bsp
+        module-db
+        module-gui
+        module-services
+        module-sys
+        module-utils
+        module-vfs
+        service-appmgr
+        service-cellular
+        service-db
+        service-desktop
+        service-eink
+        service-fota
 )
 
 if (${ENABLE_TESTS})

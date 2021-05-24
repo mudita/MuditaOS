@@ -117,13 +117,15 @@ add_subdirectory(locks)
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
-        service-appmgr
+        date
+        module-cellular
         service-antenna
+        service-appmgr
         service-audio
         service-cellular
         service-db
         service-evtmgr
-        date
+        service-gui
     PUBLIC
         module-audio
         module-bsp

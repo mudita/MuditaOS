@@ -54,11 +54,18 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
-        service-cellular
-        service-evtmgr
-        module-utils
-        module-cellular
         crc32
+        module-apps
+        module-audio
+        module-bluetooth
+        module-cellular
+        module-db
+        module-utils
+        service-appmgr
+        service-cellular
+        service-db
+        service-evtmgr
+        service-gui
 )
 
 if (${ENABLE_TESTS})

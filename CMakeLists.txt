@@ -207,9 +207,15 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE
         date
         module-apps
-        service-desktop
+        module-bluetooth
+        module-cellular
+        service-appmgr
+        service-audio
         service-bluetooth
         service-cellular
+        service-desktop
+        service-evtmgr
+        service-gui
         service-lwip
         ${LWIP_LIBRARIES}
         )

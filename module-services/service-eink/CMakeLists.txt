@@ -22,8 +22,11 @@ set(SOURCES
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
 
 target_link_libraries( ${PROJECT_NAME}
-    module-utils
-    service-gui
+    PRIVATE
+        module-gui
+        module-utils
+        service-db
+        service-gui
 )
 
 target_include_directories(${PROJECT_NAME}

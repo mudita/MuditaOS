@@ -10,12 +10,18 @@ set(SOURCES
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
 
 target_link_libraries(${PROJECT_NAME}
-    service-bluetooth
-    service-db
-    module-bluetooth
-    module-audio
-    module-utils
-    module-services
+    PRIVATE
+        module-apps
+        module-audio
+        module-bluetooth
+        module-db
+        module-services
+        module-utils
+        service-appmgr
+        service-bluetooth
+        service-cellular
+        service-db
+        service-desktop
 )
 
 
