@@ -18,7 +18,7 @@ def cancelPreviousBuilds() {
 pipeline {
   agent {
     node {
-      label 'jenkins-slave-ccache'
+      label 'jenkins-slave-ccache-ram'
     }
   }
   options{
@@ -84,8 +84,8 @@ popd'''
         stage('Build RT1051') {
             agent {
                 node {
-                    label 'jenkins-slave-ccache'
-                }         
+                    label 'jenkins-slave-ccache-ram'
+                }
             }
             steps {
                 sh '''#!/bin/bash -e
@@ -115,8 +115,8 @@ ccache --show-stats'''
         stage('Build Linux') {
             agent {
                 node {
-                    label 'jenkins-slave-ccache'
-                }         
+                    label 'jenkins-slave-ccache-ram'
+                }
             }
 
             environment {
@@ -179,6 +179,10 @@ popd'''
             
         }
     }
-
+  }
+  post {
+    always {
+        cleanWs()
+    }
   }
 }
