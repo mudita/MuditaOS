@@ -154,7 +154,7 @@ void CellularUrcHandler::Handle(Cpin &urc)
             LOG_INFO("Invalid cpin - ignore");
         }
         else {
-            response = std::make_unique<cellular::internal::msg::SimStateChanged>(*state);
+            response = std::make_unique<cellular::internal::msg::HandleATSimStateChange>(*state);
             urc.setHandled(true);
         }
     }
