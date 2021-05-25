@@ -40,7 +40,6 @@ TEST_CASE("SMS Record tests")
     SmsDB smsDB(smsPath.c_str());
 
     const uint32_t dateTest      = 123456789;
-    const uint32_t dateSentTest  = 987654321;
     const uint32_t errorCodeTest = 555;
     auto numberTest              = utils::PhoneNumber("+48600123456", utils::country::Id::UNKNOWN).getView();
     auto numberTest2             = utils::PhoneNumber("222333444", utils::country::Id::UNKNOWN).getView();
@@ -52,7 +51,6 @@ TEST_CASE("SMS Record tests")
 
     SMSRecord recordIN;
     recordIN.date      = dateTest;
-    recordIN.dateSent  = dateSentTest;
     recordIN.errorCode = errorCodeTest;
     recordIN.number    = numberTest;
     recordIN.body      = bodyTest;

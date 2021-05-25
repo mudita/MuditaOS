@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -14,7 +14,6 @@ struct SMSTableRow : public Record
     uint32_t threadID;
     uint32_t contactID;
     uint32_t date;
-    uint32_t dateSent;
     uint32_t errorCode;
     UTF8 body;
     SMSType type;
