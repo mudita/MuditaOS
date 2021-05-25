@@ -18,15 +18,19 @@ def cancelPreviousBuilds() {
 pipeline {
   agent {
     node {
-      label 'jenkins-slave-ccache'
+      label 'jenkins-slave-ccache-ram'
     }
-
+  }
+  options{
+    ansiColor('xterm')
+    parallelsAlwaysFailFast()
   }
   environment {
     JOBS=15
   }
   stages {
     stage('Check for previous running builds') {
+        
         steps {
             script {
                 cancelPreviousBuilds()
@@ -35,6 +39,9 @@ pipeline {
     }
 
     stage('Initial checks') {
+        when {
+            changeRequest()
+        }
         environment {
             GITHUB_BASE_REF="${pullRequest.base}"
             GITHUB_HEAD_REF="${pullRequest.headRef}"
@@ -71,12 +78,15 @@ popd'''
         }
     }
     stage('Build') {
+        when {
+            changeRequest()
+        }
         parallel {
         stage('Build RT1051') {
             agent {
                 node {
-                    label 'jenkins-slave-ccache'
-                }         
+                    label 'jenkins-slave-ccache-ram'
+                }
             }
             steps {
                 sh '''#!/bin/bash -e
@@ -106,8 +116,8 @@ ccache --show-stats'''
         stage('Build Linux') {
             agent {
                 node {
-                    label 'jenkins-slave-ccache'
-                }         
+                    label 'jenkins-slave-ccache-ram'
+                }
             }
 
             environment {
@@ -158,6 +168,22 @@ popd'''
         }
         }
     }
-
+    stage('master-jobs') {
+        when {
+            branch 'master'
+        }
+        steps {
+            echo "run some tests"
+            sh '''#!/bin/bash
+                echo "HALL 9000 sleeps here."
+            '''
+            
+        }
+    }
+  }
+  post {
+    always {
+        cleanWs()
+    }
   }
 }
