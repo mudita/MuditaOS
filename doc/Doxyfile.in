@@ -887,9 +887,9 @@ RECURSIVE              = YES
 
 EXCLUDE                = @PROJECT_SOURCE_DIR@/module-bluetooth/lib \
                          @PROJECT_SOURCE_DIR@/module-utils/tinyfsm \
-                         @PROJECT_SOURCE_DIR@/module-utils/microtar \
+                         @PROJECT_SOURCE_DIR@/third-party/microtar \
                          @PROJECT_SOURCE_DIR@/module-utils/segger \
-                         @PROJECT_SOURCE_DIR@/module-utils/crc32 \
+                         @PROJECT_SOURCE_DIR@/third-party/crc32 \
                          @PROJECT_SOURCE_DIR@/module-utils/sbini \
                          @PROJECT_SOURCE_DIR@/module-utils/re2 \
                          @PROJECT_SOURCE_DIR@/module-utils/protobuf \

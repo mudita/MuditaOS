@@ -64,9 +64,6 @@
 [submodule "module-vfs/thirdparty/lfsfs/littlefs"]
 	path = module-vfs/thirdparty/lfsfs/littlefs
 	url = https://github.com/littlefs-project/littlefs.git
-[submodule "module-utils/parallel-hashmap"]
-	path = module-utils/parallel-hashmap
-	url = https://github.com/greg7mdp/parallel-hashmap.git
 [submodule "module-utils/sml"]
 	path = third-party/sml/src
 	url = https://github.com/boost-ext/sml
@@ -84,3 +81,6 @@
 	path = third-party/minimp3/minimp3
 	url = ../minimp3.git
 	branch = RT1051
+[submodule "third-party/parallel-hashmap/src"]
+	path = third-party/parallel-hashmap/src
+	url = https://github.com/greg7mdp/parallel-hashmap.git
