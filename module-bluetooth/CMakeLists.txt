@@ -68,16 +68,17 @@ target_include_directories(
 )
 
 target_link_libraries(${PROJECT_NAME}
-    service-evtmgr
+    ${BOARD_DIR_LIBRARIES}
+    module-audio
     module-bsp
-    service-bluetooth
+    module-sys
     module-utils
     module-vfs
-    module-sys
-    module-audio
     service-audio
-    ${BOARD_DIR_LIBRARIES}
-    )
+    service-bluetooth
+    service-evtmgr
+    sml::sml
+)
 
 if (${ENABLE_TESTS})
     add_subdirectory(tests)

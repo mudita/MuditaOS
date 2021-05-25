@@ -21,14 +21,14 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
-        service-audio
+        module-apps
+        module-gui
+        module-utils
         service-appmgr
+        service-audio
         service-cellular
         service-desktop
-        module-apps
-        module-utils
-        module-gui
-
+        sml::sml
 )
 
 if (${ENABLE_TESTS})
