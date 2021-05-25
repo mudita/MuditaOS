@@ -15,6 +15,7 @@
 #include <purefs/fs/directory_handle.hpp>
 #include <purefs/fs/mount_point.hpp>
 #include <purefs/fs/mount_flags.hpp>
+#include <purefs/fs/fsnotify.hpp>
 #include <type_traits>
 
 struct statvfs;
@@ -141,6 +142,10 @@ namespace purefs::fs
 
         auto getcwd() noexcept -> std::string_view;
         auto chdir(std::string_view name) noexcept -> int;
+
+        /** Inotify API */
+        auto inotify_create(std::string_view target_service) -> inotify::container_t;
+        auto inotify_remove(inotify::container_t);
 
       private:
         /** Unregister filesystem driver
@@ -271,7 +276,6 @@ namespace purefs::fs
                 }
             }
         }
-
       private:
         std::weak_ptr<blkdev::disk_manager> m_diskmm;
         std::unordered_map<std::string, std::shared_ptr<filesystem_operations>> m_fstypes;
