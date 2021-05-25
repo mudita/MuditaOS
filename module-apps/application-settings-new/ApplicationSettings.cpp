@@ -146,15 +146,9 @@ namespace app
         if (ret != sys::ReturnCodes::Success) {
             return ret;
         }
-        connect(typeid(cellular::msg::notification::SimReady), [&](sys::Message *msg) {
-            auto simReadyMsg = static_cast<cellular::msg::notification::SimReady *>(msg);
+        connect(typeid(cellular::msg::notification::SimReady), [&](sys::Message *) {
             selectedSim      = Store::GSM::get()->selected;
-            if (simReadyMsg->ready) {
-                CellularServiceAPI::RequestForOwnNumber(this);
-            }
-            else {
-                selectedSimNumber = {};
-            }
+            CellularServiceAPI::RequestForOwnNumber(this);
             auto currentWindow = getCurrentWindow();
             if (gui::window::name::network == currentWindow->getName()) {
                 updateWindow(gui::window::name::network, nullptr);

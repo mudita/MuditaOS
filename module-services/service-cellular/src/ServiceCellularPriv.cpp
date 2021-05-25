@@ -20,32 +20,22 @@ namespace cellular::internal
     void ServiceCellularPriv::initSimCard()
     {
         using namespace cellular::msg;
-        simCard->onSimReady = [this](bool ready) {
-            // SIM causes SIM INIT, only on ready
-            if (ready) {
-                state->set(State::ST::SimInit);
-            }
-            owner->bus.sendMulticast(std::make_shared<notification::SimReady>(ready),
-                                     sys::BusChannel::ServiceCellularNotifications);
+        simCard->onSimReady = [this]() {
+            state->set(State::ST::SimInit);
+            owner->bus.sendMulticast<notification::SimReady>();
         };
         simCard->onNeedPin = [this](unsigned int attempts) {
-            owner->bus.sendMulticast(std::make_shared<notification::SimNeedPin>(attempts),
-                                     sys::BusChannel::ServiceCellularNotifications);
+            owner->bus.sendMulticast<notification::SimNeedPin>(attempts);
         };
         simCard->onNeedPuk = [this](unsigned int attempts) {
-            owner->bus.sendMulticast(std::make_shared<notification::SimNeedPuk>(attempts),
-                                     sys::BusChannel::ServiceCellularNotifications);
+            owner->bus.sendMulticast<notification::SimNeedPuk>(attempts);
         };
-        simCard->onSimBlocked = [this]() {
-            owner->bus.sendMulticast(std::make_shared<notification::SimBlocked>(),
-                                     sys::BusChannel::ServiceCellularNotifications);
-        };
+        simCard->onSimBlocked = [this]() { owner->bus.sendMulticast<notification::SimBlocked>(); };
         simCard->onSimEvent = [this]() {
             owner->bus.sendUnicast(std::make_shared<sevm::SIMMessage>(), ::service::name::evt_manager);
         };
         simCard->onUnhandledCME = [this](unsigned int code) {
-            owner->bus.sendMulticast(std::make_shared<notification::UnhandledCME>(code),
-                                     sys::BusChannel::ServiceCellularNotifications);
+            owner->bus.sendMulticast<notification::UnhandledCME>(code);
         };
     }
 
@@ -77,11 +67,12 @@ namespace cellular::internal
             auto msg = static_cast<request::sim::PinUnlock *>(request);
             return std::make_shared<request::sim::PinUnlock::Response>(simCard->handlePinUnlock(msg->pin));
         });
-        owner->connect(typeid(internal::msg::SimStateChanged), [&](sys::Message *request) -> sys::MessagePointer {
-            auto msg = static_cast<internal::msg::SimStateChanged *>(request);
-            simCard->handleSimStateChanged(msg->state);
-            return sys::MessageNone{};
-        });
+        owner->connect(typeid(internal::msg::HandleATSimStateChange),
+                       [&](sys::Message *request) -> sys::MessagePointer {
+                           auto msg = static_cast<internal::msg::HandleATSimStateChange *>(request);
+                           simCard->handleATSimStateChange(msg->state);
+                           return sys::MessageNone{};
+                       });
     }
 
 } // namespace cellular::internal
