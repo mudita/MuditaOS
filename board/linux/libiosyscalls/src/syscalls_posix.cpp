@@ -48,7 +48,7 @@ namespace
         __REAL_DECL(fsync);
         __REAL_DECL(fdatasync);
 
-#if __GLIBC__ > 2 || ((__GLIBC__ == 2) && (__GLIBC_MINOR__ >= 32))
+#if __GLIBC__ > 2 || ((__GLIBC__ == 2) && (__GLIBC_MINOR__ >= 33))
         __REAL_DECL(stat);
         __REAL_DECL(lstat);
         __REAL_DECL(fstat);
@@ -101,7 +101,7 @@ namespace
         __REAL_DLSYM(fsync);
         __REAL_DLSYM(fdatasync);
 
-#if __GLIBC__ > 2 || ((__GLIBC__ == 2) && (__GLIBC_MINOR__ >= 32))
+#if __GLIBC__ > 2 || ((__GLIBC__ == 2) && (__GLIBC_MINOR__ >= 33))
         __REAL_DLSYM(stat);
         __REAL_DLSYM(lstat);
         __REAL_DLSYM(fstat);
@@ -137,7 +137,7 @@ namespace
 #if __GLIBC__ > 2 || ((__GLIBC__ == 2) && (__GLIBC_MINOR__ >= 28))
               && real::fcntl64
 #endif
-#if __GLIBC__ > 2 || ((__GLIBC__ == 2) && (__GLIBC_MINOR__ >= 32))
+#if __GLIBC__ > 2 || ((__GLIBC__ == 2) && (__GLIBC_MINOR__ >= 33))
               && real::stat && real::lstat && real::fstat && real::stat64 && real::lstat64 && real::fstat64
 #else
               && real::__xstat && real::__lxstat && real::__fxstat && real::__xstat64 && real::__lxstat64 &&
@@ -507,7 +507,7 @@ extern "C"
     }
     __asm__(".symver _iosys_symlink,symlink@GLIBC_2.2.5");
 
-#if __GLIBC__ > 2 || ((__GLIBC__ == 2) && (__GLIBC_MINOR__ >= 32))
+#if __GLIBC__ > 2 || ((__GLIBC__ == 2) && (__GLIBC_MINOR__ >= 33))
     int _iosys_stat(const char *file, struct stat *pstat)
     {
         if (vfs::redirect_to_image(file)) {
