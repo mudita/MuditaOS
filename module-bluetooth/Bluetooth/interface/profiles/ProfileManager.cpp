@@ -97,6 +97,7 @@ namespace bluetooth
 
     auto ProfileManager::startRinging() -> Error::Code
     {
+        switchProfile(AudioProfile::HSP);
         return currentProfilePtr->startRinging();
     }
 

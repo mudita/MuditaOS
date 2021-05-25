@@ -97,6 +97,7 @@ namespace bluetooth
 
     auto A2DP::startRinging() const noexcept -> Error::Code
     {
+        LOG_ERROR("Can't ring in A2DP profile");
         return Error::SystemError;
     }
 

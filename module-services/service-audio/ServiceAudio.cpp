@@ -328,11 +328,14 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const Operation:
     if (opType == Operation::Type::Playback) {
         auto input = audioMux.GetPlaybackInput(playbackType);
         // stop bluetooth stream if available
-        if (bluetoothA2DPConnected) {
+        if (bluetoothA2DPConnected || bluetoothHSPConnected) {
             if (playbackType == audio::PlaybackType::CallRingtone) {
+                HandleSendEvent(std::make_shared<audio::Event>(EventType::BlutoothHSPDeviceState));
+
                 LOG_DEBUG("Sending Bluetooth start ringing");
                 bus.sendUnicast(std::make_shared<message::bluetooth::Ring>(message::bluetooth::Ring::State::Enable),
                                 service::name::bluetooth);
+                return std::make_unique<AudioStartPlaybackResponse>(audio::RetCode::Success, retToken);
             }
             else {
                 LOG_DEBUG("Sending Bluetooth start stream request");
@@ -351,6 +354,9 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const Operation:
     }
     else if (opType == Operation::Type::Router) {
         auto input = audioMux.GetRoutingInput(true);
+        if (bluetoothA2DPConnected) {
+            HandleSendEvent(std::make_shared<audio::Event>(EventType::BlutoothHSPDeviceState));
+        }
         if (bluetoothHSPConnected) {
             LOG_DEBUG("Sending Bluetooth start routing");
             bus.sendUnicast(std::make_shared<message::bluetooth::StartAudioRouting>(), service::name::bluetooth);
@@ -370,7 +376,7 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleSendEvent(std::shared_
             LOG_DEBUG("Bluetooth connection status changed: %s", newState ? "connected" : "disconnected");
             bluetoothA2DPConnected = newState;
             HandleStop({audio::PlaybackType::Alarm,
-                        audio::PlaybackType::CallRingtone,
+                        // audio::PlaybackType::CallRingtone,
                         audio::PlaybackType::Meditation,
                         audio::PlaybackType::Notifications,
                         audio::PlaybackType::TextMessageRingtone},
