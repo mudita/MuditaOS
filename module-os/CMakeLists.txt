@@ -94,10 +94,10 @@ target_include_directories(${PROJECT_NAME}
 #Add FreeRTOS SystemvView headers if enabled
 if((${PROJECT_TARGET} STREQUAL "TARGET_RT1051") AND (${SYSTEM_VIEW_ENABLED}))
     target_include_directories(${PROJECT_NAME}
-
-            PUBLIC
+        PUBLIC
             ${CMAKE_CURRENT_SOURCE_DIR}/systemviewPatch
-            )
+    )
+    target_link_libraries(${PROJECT_NAME} PUBLIC segger::systemview)
 endif()
 
-target_link_libraries(${PROJECT_NAME} module-bsp module-utils)
+target_link_libraries(${PROJECT_NAME} PUBLIC module-bsp module-utils)

@@ -6,7 +6,7 @@
 #include <macros.h>
 #include <log.hpp>
 #include <Logger.hpp>
-#include "segger/rtt/SEGGER_RTT.h"
+#include <SEGGER_RTT.h>
 #include <ticks.hpp>
 
 /// get string description:
