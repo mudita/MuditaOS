@@ -72,7 +72,7 @@
 	path = module-utils/parallel-hashmap
 	url = https://github.com/greg7mdp/parallel-hashmap.git
 [submodule "module-utils/sml"]
-	path = module-utils/sml
+	path = third-party/sml/src
 	url = https://github.com/boost-ext/sml
 [submodule "tools/misc"]
 	path = tools/misc
