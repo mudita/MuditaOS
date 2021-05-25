@@ -218,7 +218,6 @@ TEST_CASE("Thread Record tests")
         SMSRecordInterface smsRecInterface(&smsDB, &contactsDB);
         SMSRecord recordIN;
         recordIN.date      = 123456789;
-        recordIN.dateSent  = 987654321;
         recordIN.errorCode = 0;
         recordIN.number    = phoneNumber.getView();
         recordIN.body      = "Ala";
@@ -274,7 +273,6 @@ TEST_CASE("Thread Record tests")
         SMSRecordInterface smsRecInterface(&smsDB, &contactsDB);
         SMSRecord recordIN;
         recordIN.date      = 123456789;
-        recordIN.dateSent  = 987654321;
         recordIN.errorCode = 0;
         recordIN.number    = phoneNumber.getView();
         recordIN.type      = SMSType ::DRAFT;

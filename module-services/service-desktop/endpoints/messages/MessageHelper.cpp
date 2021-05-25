@@ -41,8 +41,7 @@ namespace parserFSM
     {
 
         auto recordEntry = json11::Json::object{{json::messages::contactID, static_cast<int>(record.contactID)},
-                                                {json::messages::receivedAt, static_cast<int>(record.date)},
-                                                {json::messages::sentAt, static_cast<int>(record.dateSent)},
+                                                {json::messages::createdAt, static_cast<int>(record.date)},
                                                 {json::messages::messageID, static_cast<int>(record.ID)},
                                                 {json::messages::messageBody, record.body.c_str()},
                                                 {json::messages::messageType, static_cast<int>(record.type)},
