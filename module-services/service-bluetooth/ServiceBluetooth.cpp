@@ -35,6 +35,8 @@
 #include <BtKeysStorage.hpp>
 #include <Timers/TimerFactory.hpp>
 #include <typeinfo>
+#include <service-bluetooth/messages/Passkey.hpp>
+#include <GAP/GAP.hpp>
 
 namespace
 {
@@ -94,6 +96,7 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
     connectHandler<message::bluetooth::SetStatus>();
     connectHandler<message::bluetooth::Unpair>();
     connectHandler<sdesktop::developerMode::DeveloperModeRequest>();
+    connectHandler<message::bluetooth::ResponsePasskey>();
 
     settingsHolder->onStateChange = [this]() {
         auto initialState = std::visit(bluetooth::IntVisitor(), settingsHolder->getValue(bluetooth::Settings::State));
@@ -256,6 +259,13 @@ auto ServiceBluetooth::handle(message::bluetooth::DisconnectResult *msg) -> std:
                     nameSettingsNew);
     stopTimeoutTimer();
 
+    return sys::MessageNone{};
+}
+
+auto ServiceBluetooth::handle(message::bluetooth::ResponsePasskey *msg) -> std::shared_ptr<sys::Message>
+{
+    auto passKey = msg->getPasskey();
+    bluetooth::GAP::respondPinCode(passKey);
     return sys::MessageNone{};
 }
 
