@@ -19,6 +19,7 @@ namespace gui
     BluetoothCheckPasskeyWindow::BluetoothCheckPasskeyWindow(app::Application *app)
         : AppWindow(app, window::name::bluetooth_check_passkey)
     {
+        bluetoothSettingsModel = std::make_unique<BluetoothSettingsModel>(application);
         buildInterface();
     }
 
@@ -61,6 +62,7 @@ namespace gui
         auto passkey = text->getText();
         if (passkey.length() >= minPasskeyCharactersCount && inputEvent.isShortRelease(KeyCode::KEY_ENTER)) {
             bluetoothSettingsModel->responsePasskey(passkey);
+            application->returnToPreviousWindow();
             return true;
         }
         return AppWindow::onInput(inputEvent);

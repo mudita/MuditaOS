@@ -16,7 +16,10 @@
 #include <Timers/TimerHandle.hpp>
 
 #include <memory> // for unique_ptr
-
+namespace message::bluetooth
+{
+    class ResponsePasskey;
+}
 class BluetoothWorker;
 namespace settings
 {
@@ -98,6 +101,7 @@ class ServiceBluetooth : public sys::Service
     [[nodiscard]] auto handle(message::bluetooth::AudioVolume *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(message::bluetooth::Ring *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(message::bluetooth::StartAudioRouting *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(message::bluetooth::ResponsePasskey *msg) -> std::shared_ptr<sys::Message>;
 };
 
 namespace sys
