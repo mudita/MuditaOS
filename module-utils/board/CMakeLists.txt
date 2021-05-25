@@ -26,4 +26,4 @@ elseif(${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
     endif ()
 endif()
 
-target_link_libraries(board PUBLIC module-bsp)
+target_link_libraries(board PUBLIC module-bsp PRIVATE segger::rtt)
