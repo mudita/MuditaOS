@@ -19,8 +19,6 @@ set (SOURCES
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
 
-include(segger/rtt/CMakeLists.txt)
-
 target_link_libraries(${PROJECT_NAME}
 PUBLIC
     board
@@ -49,10 +47,6 @@ target_include_directories(${PROJECT_NAME}
 
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
-
-if((${PROJECT_TARGET} STREQUAL "TARGET_RT1051") AND (${SYSTEM_VIEW_ENABLED}))
-    add_subdirectory(segger/systemview)
-endif()
 
 if (${ENABLE_TESTS})
     add_subdirectory( test )

@@ -164,7 +164,7 @@ standard names. */
 #define configGPT_CLOCK_HZ                    (32768U)
 
 #if SYSTEM_VIEW_ENABLED
-#include "../module-utils/segger/systemview/FreeRTOSV10/SEGGER_SYSVIEW_FreeRTOS.h"
+#include <FreeRTOSV10/SEGGER_SYSVIEW_FreeRTOS.h>
 #endif
 
 

@@ -5,8 +5,8 @@
 [submodule "module-utils/microtar"]
 	path = third-party/microtar/src
 	url = ../microtar.git
-[submodule "module-utils/segger"]
-	path = module-utils/segger
+[submodule "third-party/segger"]
+	path = third-party/segger
 	url = ../segger-utils.git
 [submodule "module-utils/protobuf"]
 	path = third-party/protobuf/src
