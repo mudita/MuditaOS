@@ -55,6 +55,7 @@
 #include <application-settings-new/data/LanguagesData.hpp>
 #include <application-settings-new/data/PhoneNameData.hpp>
 #include <application-settings-new/data/PINSettingsLockStateData.hpp>
+#include <application-settings-new/windows/BluetoothCheckPasskeyWindow.hpp>
 
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
@@ -502,6 +503,10 @@ namespace app
         windowsFactory.attach(gui::window::name::connection_frequency, [](Application *app, const std::string &name) {
             return std::make_unique<gui::ConnectionFrequencyWindow>(app, static_cast<ApplicationSettingsNew *>(app));
         });
+        windowsFactory.attach(gui::window::name::bluetooth_check_passkey,
+                              [](Application *app, const std::string &name) {
+                                  return std::make_unique<gui::BluetoothCheckPasskeyWindow>(app);
+                              });
         attachPopups(
             {gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes, gui::popup::ID::PhoneLock});
     }

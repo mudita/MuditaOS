@@ -7,7 +7,8 @@
 #include <service-bluetooth/BluetoothMessage.hpp>
 #include <service-bluetooth/messages/ResponseVisibleDevices.hpp>
 #include <service-bluetooth/messages/Unpair.hpp>
-
+#include <service-bluetooth/messages/Passkey.hpp>
+#include <application-settings-new/ApplicationSettings.hpp>
 extern "C"
 {
 #include "btstack.h"
@@ -84,7 +85,7 @@ namespace bluetooth
     {
         auto msg = std::make_shared<message::bluetooth::ResponseVisibleDevices>(devices);
         ownerService->bus.sendUnicast(msg, "ApplicationSettings");
-        ownerService->bus.sendUnicast(std::move(msg), "ApplicationSettingsNew");
+        ownerService->bus.sendUnicast(std::move(msg), app::name_settings_new);
     }
 
     auto GAP::startScan() -> int
@@ -209,7 +210,7 @@ namespace bluetooth
 
         auto msg = std::make_shared<BluetoothPairResultMessage>(currentlyProcessedDeviceAddr, result == 0u);
         currentlyProcessedDeviceAddr.clear();
-        ownerService->bus.sendUnicast(std::move(msg), "ApplicationSettingsNew");
+        ownerService->bus.sendUnicast(std::move(msg), app::name_settings_new);
     }
     /* @text In ACTIVE, the following events are processed:
      *  - GAP Inquiry result event: BTstack provides a unified inquiry result that contain
@@ -257,7 +258,13 @@ namespace bluetooth
         if (packet_type != HCI_EVENT_PACKET) {
             return;
         }
-
+        if (hci_event_packet_get_type(packet) == HCI_EVENT_PIN_CODE_REQUEST) {
+            bd_addr_t address;
+            LOG_DEBUG("PIN code request!");
+            hci_event_pin_code_request_get_bd_addr(packet, address);
+            auto msg = std::make_shared<::message::bluetooth::RequestPasskey>();
+            ownerService->bus.sendUnicast(std::move(msg), app::name_settings_new);
+        }
         const auto eventType = hci_event_packet_get_type(packet);
         switch (state) {
         case ScanState::init:
@@ -288,7 +295,7 @@ namespace bluetooth
         std::string unpairedDevAddr{bd_addr_to_str(addr)};
         ownerService->bus.sendUnicast(
             std::make_shared<message::bluetooth::UnpairResult>(std::move(unpairedDevAddr), true),
-            "ApplicationSettingsNew");
+            app::name_settings_new);
         return true;
     }
     auto GAP::isServiceSupportedByRemote(bd_addr_t addr, uint32_t typeOfService) -> bool
@@ -299,5 +306,11 @@ namespace bluetooth
             }
         }
         return false;
+    }
+    void GAP::respondPinCode(const std::string &pin)
+    {
+        bd_addr_t address{};
+        sscanf_bd_addr(currentlyProcessedDeviceAddr.c_str(), address);
+        gap_pin_code_response(address, pin.c_str());
     }
 } // namespace bluetooth
