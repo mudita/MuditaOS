@@ -30,7 +30,6 @@ if(COVERAGE_ENABLE)
         module-utils/gsl/.*
         module-utils/json/.*
         module-utils/libphonenumber/.*
-        module-utils/parallel-hashmap/.*
         module-utils/protobuf/.*
         module-utils/re2/.*
         module-utils/segger/.*
