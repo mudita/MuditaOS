@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -23,7 +23,6 @@ namespace db::query
 struct SMSRecord : public Record
 {
     uint32_t date      = 0;
-    uint32_t dateSent  = 0;
     uint32_t errorCode = 0;
     UTF8 body;
     SMSType type       = SMSType::UNKNOWN;
@@ -33,12 +32,12 @@ struct SMSRecord : public Record
 
     SMSRecord() = default;
     SMSRecord(const SMSTableRow &w)
-        : Record(w.ID), date(w.date), dateSent(w.dateSent), errorCode(w.errorCode), body(w.body), type(w.type),
-          threadID(w.threadID), contactID(w.contactID)
+        : Record(w.ID), date(w.date), errorCode(w.errorCode), body(w.body), type(w.type), threadID(w.threadID),
+          contactID(w.contactID)
     {}
     SMSRecord(const SMSTableRow &w, const utils::PhoneNumber::View &num)
-        : Record(w.ID), date(w.date), dateSent(w.dateSent), errorCode(w.errorCode), body(w.body), type(w.type),
-          threadID(w.threadID), contactID(w.contactID), number(num)
+        : Record(w.ID), date(w.date), errorCode(w.errorCode), body(w.body), type(w.type), threadID(w.threadID),
+          contactID(w.contactID), number(num)
     {}
 };
 

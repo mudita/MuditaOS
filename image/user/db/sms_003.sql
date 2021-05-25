@@ -1,12 +1,12 @@
 -- Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 -- For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 BEGIN TRANSACTION;
-INSERT OR REPLACE INTO "sms" ("_id","thread_id","contact_id","date","date_send","error_code","body","type") VALUES (1,2,2,1547492320,3,0,'Thank you for today!' || CHAR(10) || 'You chose a fantastic place :)',8);
-INSERT OR REPLACE INTO "sms" ("_id","thread_id","contact_id","date","date_send","error_code","body","type") VALUES (2,2,2,1547492321,4,0,'It was great seeing you too :*',4);
-INSERT OR REPLACE INTO "sms" ("_id","thread_id","contact_id","date","date_send","error_code","body","type") VALUES (3,1,1,1618907731,3,2,'Hi! How are you today?',8);
-INSERT OR REPLACE INTO "sms" ("_id","thread_id","contact_id","date","date_send","error_code","body","type") VALUES (4,1,1,1618907732,3,2,'I hope you''re feeling better now...',8);
-INSERT OR REPLACE INTO "sms" ("_id","thread_id","contact_id","date","date_send","error_code","body","type") VALUES (5,1,1,1618907733,3,2,'Thanks :) Today is better than yesterday',4);
-INSERT OR REPLACE INTO "sms" ("_id","thread_id","contact_id","date","date_send","error_code","body","type") VALUES (6,1,1,1618907734,3,2,'I''m happy to hear that :)',8);
+INSERT OR REPLACE INTO "sms" ("_id","thread_id","contact_id","date","error_code","body","type") VALUES (1,2,2,1547492320,0,'Thank you for today!' || CHAR(10) || 'You chose a fantastic place :)',8);
+INSERT OR REPLACE INTO "sms" ("_id","thread_id","contact_id","date","error_code","body","type") VALUES (2,2,2,1547492321,0,'It was great seeing you too :*',4);
+INSERT OR REPLACE INTO "sms" ("_id","thread_id","contact_id","date","error_code","body","type") VALUES (3,1,1,1618907731,2,'Hi! How are you today?',8);
+INSERT OR REPLACE INTO "sms" ("_id","thread_id","contact_id","date","error_code","body","type") VALUES (4,1,1,1618907732,2,'I hope you''re feeling better now...',8);
+INSERT OR REPLACE INTO "sms" ("_id","thread_id","contact_id","date","error_code","body","type") VALUES (5,1,1,1618907733,2,'Thanks :) Today is better than yesterday',4);
+INSERT OR REPLACE INTO "sms" ("_id","thread_id","contact_id","date","error_code","body","type") VALUES (6,1,1,1618907734,2,'I''m happy to hear that :)',8);
 INSERT OR REPLACE INTO "templates" ("_id","text","lastUsageTimestamp") VALUES (1,'Thanks for reaching out. I can''t talk right now, I''ll call you later',4);
 INSERT OR REPLACE INTO "templates" ("_id","text","lastUsageTimestamp") VALUES (2,'I''ll call you later',3);
 INSERT OR REPLACE INTO "templates" ("_id","text","lastUsageTimestamp") VALUES (3,'I''ll be there in 15 minutes',2);
