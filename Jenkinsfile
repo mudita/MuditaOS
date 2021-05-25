@@ -20,13 +20,16 @@ pipeline {
     node {
       label 'jenkins-slave-ccache'
     }
-
+  }
+  options{
+    ansiColor('xterm')
   }
   environment {
     JOBS=15
   }
   stages {
     stage('Check for previous running builds') {
+        
         steps {
             script {
                 cancelPreviousBuilds()
@@ -35,6 +38,9 @@ pipeline {
     }
 
     stage('Initial checks') {
+        when {
+            changeRequest()
+        }
         environment {
             GITHUB_BASE_REF="${pullRequest.base}"
             GITHUB_HEAD_REF="${pullRequest.headRef}"
@@ -71,6 +77,9 @@ popd'''
         }
     }
     stage('Build') {
+        when {
+            changeRequest()
+        }
         parallel {
         stage('Build RT1051') {
             agent {
@@ -156,6 +165,18 @@ popd
 popd'''
             }
         }
+        }
+    }
+    stage('master-jobs') {
+        when {
+            branch 'test-master-pipe'
+        }
+        steps {
+            echo "run some tests"
+            sh '''#!/bin/bash
+                echo "update git"
+            '''
+            
         }
     }
 
