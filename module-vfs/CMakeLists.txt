@@ -34,6 +34,7 @@ set(SOURCES
     src/purefs/fs/filesystem_syscalls.cpp
     src/purefs/fs/filesystem_cwd.cpp
     src/purefs/vfs_subsystem.cpp
+    src/purefs/fs/notifier.cpp
     drivers/src/purefs/fs/filesystem_vfat.cpp
     drivers/src/purefs/fs/filesystem_littlefs.cpp
 )
@@ -67,9 +68,8 @@ target_compile_definitions(${PROJECT_NAME}
 
 target_include_directories(${PROJECT_NAME}
         PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/user/deprecated
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/user/
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/internal/
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/user
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/internal
         ${CMAKE_CURRENT_SOURCE_DIR}/drivers/include
 )
 
@@ -80,8 +80,8 @@ target_include_directories(${PROJECT_NAME}
         ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/fatfs/source
 )
 
-target_link_libraries(${PROJECT_NAME} PUBLIC ${TARGET_LIBRARIES} module-bsp module-utils)
-target_link_libraries(${PROJECT_NAME} PRIVATE littlefs )
+target_link_libraries(${PROJECT_NAME} PUBLIC ${TARGET_LIBRARIES} module-bsp module-utils module-sys)
+target_link_libraries(${PROJECT_NAME} PRIVATE littlefs)
 
 if (${ENABLE_TESTS})
     add_subdirectory(tests)

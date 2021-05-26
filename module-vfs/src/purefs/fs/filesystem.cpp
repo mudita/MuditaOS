@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 #include <purefs/fs/filesystem.hpp>
 #include <purefs/fs/filesystem_operations.hpp>
@@ -6,6 +6,7 @@
 #include <purefs/blkdev/disk_manager.hpp>
 #include <purefs/fs/thread_local_cwd.hpp>
 #include <purefs/blkdev/disk_handle.hpp>
+#include <purefs/fs/notifier.hpp>
 #include <log/log.hpp>
 #include <split_sv.hpp>
 #include <errno.h>

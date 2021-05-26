@@ -31,6 +31,11 @@ namespace cpp_freertos
     class MutexRecursive;
 }
 
+namespace sys
+{
+    class Service;
+}
+
 namespace purefs::fs
 {
     /** This is the filesystem class layer
@@ -42,6 +47,7 @@ namespace purefs::fs
     namespace internal
     {
         class directory_handle;
+        class notifier;
     }
     class filesystem
     {
@@ -144,7 +150,7 @@ namespace purefs::fs
         auto chdir(std::string_view name) noexcept -> int;
 
         /** Inotify API */
-        auto inotify_create(std::string_view target_service) -> inotify::container_t;
+        auto inotify_create(std::shared_ptr<sys::Service> owner) -> inotify::container_t;
         auto inotify_remove(inotify::container_t);
 
       private:
@@ -283,5 +289,6 @@ namespace purefs::fs
         std::unordered_set<std::string> m_partitions;
         internal::handle_mapper<fsfile> m_fds;
         std::unique_ptr<cpp_freertos::MutexRecursive> m_lock;
+        std::unique_ptr<internal::notifier> m_notifier;
     };
 } // namespace purefs::fs
