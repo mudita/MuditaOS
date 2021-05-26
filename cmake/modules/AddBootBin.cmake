@@ -35,4 +35,5 @@ function(add_boot_bin SOURCE_TARGET)
     message("Adding '${SOURCE_TARGET}-boot.bin' target")
     add_custom_target(${SOURCE_TARGET}-boot.bin
         DEPENDS ${BIN_FILE})
+    set_target_properties(${SOURCE_TARGET}-boot.bin PROPERTIES BIN_FILE ${BIN_FILE})
 endfunction()

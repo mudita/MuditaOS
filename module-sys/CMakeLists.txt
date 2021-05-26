@@ -51,7 +51,7 @@ target_include_directories(bus PRIVATE ${BOARD_DIR_INCLUDES})
 target_include_directories(bus PRIVATE ${PROJECT_INCLUDES})
 target_link_options(bus PRIVATE ${TARGET_LINK_OPTIONS})
 
-add_library(module-sys STATIC)
+add_library(module-sys)
 target_sources(module-sys PRIVATE ${SOURCES} ${BOARD_SOURCES})
 
 target_link_libraries(module-sys
@@ -59,6 +59,7 @@ target_link_libraries(module-sys
         bus
         service-evtmgr
         messagetype
+        magic_enum
     PUBLIC
         module-os
     )
