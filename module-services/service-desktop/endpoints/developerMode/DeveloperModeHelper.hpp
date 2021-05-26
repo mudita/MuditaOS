@@ -11,7 +11,7 @@
 #include <bsp/keyboard/key_codes.hpp>
 #include <input/InputEvent.hpp>
 #include <module-db/Interface/SMSRecord.hpp>
-#include "Mode/BaseHelper.hpp"
+#include <endpoints/BaseHelper.hpp>
 
 namespace sys
 {

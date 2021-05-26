@@ -6,7 +6,7 @@
 #include <Service/Service.hpp>
 #include <endpoints/Endpoint.hpp>
 #include <parser/ParserUtils.hpp>
-
+#include "SecurityEndpointHelper.hpp"
 #include <string>
 
 namespace parserFSM
@@ -19,13 +19,23 @@ namespace sys
     class Service;
 } // namespace sys
 
+enum class EndpointSecurity
+{
+    Allow = 0,
+    Block = 1
+};
+
 class SecurityEndpoint : public parserFSM::Endpoint
 {
+    const std::unique_ptr<parserFSM::SecurityEndpointHelper> helper;
+
   public:
-    explicit SecurityEndpoint(sys::Service *ownerServicePtr) : Endpoint(ownerServicePtr)
+    explicit SecurityEndpoint(sys::Service *ownerServicePtr)
+        : Endpoint(ownerServicePtr), helper(std::make_unique<parserFSM::SecurityEndpointHelper>(ownerServicePtr))
     {
         debugName = "SecurityEndpoint";
     }
+
     auto handle(parserFSM::Context &context) -> void override;
 
   private:
