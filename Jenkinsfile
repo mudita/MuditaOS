@@ -124,7 +124,7 @@ echo "./configure.sh linux Debug -G Ninja"
 ./configure.sh linux Debug -G Ninja
 
 pushd build-linux-Debug
-ninja -j ${JOBS}
+ninja -j ${JOBS} Pure Bell
 popd'''
                 echo "Build Unit Tests"
                 sh '''#!/bin/bash -e

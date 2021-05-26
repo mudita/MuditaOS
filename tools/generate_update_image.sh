@@ -6,7 +6,7 @@
 
 function help() {
 cat <<- EOF
-	Crate Update Image for the SOURCE_TARGET. This scritp should be run from build directory.
+	Create Update Image for the SOURCE_TARGET. This script should be run from build directory.
 	
 	${0} <SOURCE_TARGET> <VERSION> <PLATFORM>
 	
@@ -14,7 +14,7 @@ cat <<- EOF
 	    VERSION          - version number to attach to file name
 	    PLATFORM         - RT1051 or Linux
 	
-	In current work dir script will crete update image inf form:
+    In the current work dir, the script will create update image named from this template:
 	<SOURCE_TARGET>-<VERSION>-<PLATFORM>-Update.tar
 	
 	
@@ -54,7 +54,7 @@ function checkForDeps() {
     echo "Deps-OK"
 }
 
-function clenStagingDir(){
+function cleanStagingDir(){
     local STAGEING_DIR=${1}
     if [[ -d ${STAGEING_DIR} ]]; then
         rm -Rf ${STAGEING_DIR}
@@ -91,7 +91,7 @@ fi
 
 setVars "${1}" "${2}" "${3}"
 checkForDeps ${DEPS}
-clenStagingDir ${STAGEING_DIR}
+cleanStagingDir ${STAGEING_DIR}
 linkInStageing
 addChecksums
 compress

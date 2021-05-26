@@ -65,7 +65,7 @@ The type variable in `boot.json` is for MuditaOS - this will indicate a subdirec
 6. Move into the project root directory and run the image generation script
 
 ```bash
-    ./generate_purephone_image.sh pure.img build-rt1051-Debug
+    ./generate_image.sh pure.img build-rt1051-Debug
 ```
    
    Example output:
