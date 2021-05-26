@@ -18,13 +18,6 @@ PhoneLockedInfoWindow::PhoneLockedInfoWindow(app::Application *app, const std::s
 
 void PhoneLockedInfoWindow::onBeforeShow(ShowMode mode, SwitchData *data)
 {
-    setVisibleState();
-}
-
-void PhoneLockedInfoWindow::setVisibleState()
-{
-    lockImage->setVisible(true);
-
     bottomBar->setActive(BottomBar::Side::LEFT, true);
     bottomBar->setActive(BottomBar::Side::CENTER, false);
     bottomBar->setActive(BottomBar::Side::RIGHT, true);
@@ -56,19 +49,18 @@ top_bar::Configuration PhoneLockedInfoWindow::configureTopBar(top_bar::Configura
 
 void PhoneLockedInfoWindow::buildInterface()
 {
-    namespace lock_style = style::window::pin_lock;
+    namespace lock_style = style::window::lock_input;
     AppWindow::buildInterface();
 
     bottomBar->setText(BottomBar::Side::LEFT, utils::translate("app_desktop_emergency"));
     bottomBar->setText(BottomBar::Side::RIGHT, utils::translate("common_back"));
 
-    lockImage = new gui::Image(this, lock_style::image::x, lock_style::image::y, 0, 0, "pin_lock");
-    infoText  = new Text(this,
-                        lock_style::primary_text::x,
-                        lock_style::primary_text::y,
-                        lock_style::primary_text::w,
-                        lock_style::primary_text::h);
-
-    infoText->setRichText(utils::translate("app_desktop_press_to_unlock"));
-    infoText->setAlignment(Alignment::Horizontal::Center);
+    infoIcon = new gui::Icon(this,
+                             style::window::default_left_margin,
+                             style::header::height,
+                             style::window::default_body_width,
+                             style::window::default_body_height,
+                             "unlock_icon_W_G",
+                             utils::translate("app_desktop_press_to_unlock"));
+    infoIcon->setAlignment(Alignment::Horizontal::Center);
 }

@@ -44,33 +44,6 @@ namespace gui
             nullptr,
             isPhoneLockEnabled ? option::SettingRightItem::On : option::SettingRightItem::Off));
 
-        optionList.emplace_back(std::make_unique<option::OptionSettings>(
-            utils::translate("app_settings_security_usb_passcode"),
-            [=](Item &item) {
-                auto lock = std::make_unique<locks::Lock>(
-                    Store::GSM::SIM::NONE, locks::Lock::LockState::InputRequired, locks::Lock::LockType::Screen);
-                lock->onActivatedCallback = [this](locks::Lock::LockType type, const std::vector<unsigned int> &data) {
-                    securitySettings->setUSBSecurity(!securitySettings->isUSBSecured());
-                    application->returnToPreviousWindow();
-                };
-                application->switchWindow(
-                    app::window::name::desktop_pin_lock,
-                    gui::ShowMode::GUI_SHOW_INIT,
-                    std::make_unique<locks::LockData>(*lock, locks::PhoneLockInputTypeAction::Change));
-                return true;
-            },
-            [=](Item &item) {
-                if (item.focus) {
-                    this->setBottomBarText(utils::translate(style::strings::common::Switch), BottomBar::Side::CENTER);
-                }
-                else {
-                    this->setBottomBarText(utils::translate(style::strings::common::select), BottomBar::Side::CENTER);
-                }
-                return true;
-            },
-            nullptr,
-            securitySettings->isUSBSecured() ? option::SettingRightItem::On : option::SettingRightItem::Off));
-
         if (isPhoneLockEnabled) {
             optionList.emplace_back(std::make_unique<option::OptionSettings>(
                 utils::translate("app_settings_security_change_phone_lock"),

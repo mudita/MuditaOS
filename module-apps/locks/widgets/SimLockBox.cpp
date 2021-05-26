@@ -2,47 +2,46 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SimLockBox.hpp"
-
-#include "locks/data/LockStyle.hpp"
-#include "locks/windows/PinLockBaseWindow.hpp"
-#include "Lock.hpp"
-#include <Style.hpp>
-#include <Image.hpp>
-
-namespace label_style = style::window::pin_lock::pin_label;
+#include "locks/windows/LockInputWindow.hpp"
 
 namespace gui
 {
-
-    void SimLockBox::popChar(unsigned int charNum)
+    void SimLockBox::buildLockBox(unsigned int pinSize)
     {
-        rebuildInputLabels(charNum);
-    }
-    void SimLockBox::putChar(unsigned int charNum)
-    {
-        rebuildInputLabels(++charNum);
+        LockBoxAlternatingSize::buildLockBox(pinSize);
     }
 
-    void SimLockBox::buildLockBox(unsigned int inputSize)
+    void SimLockBox::applyLockActionText(locks::SimInputTypeAction simInputTypeAction)
     {
-        LockWindow->buildImages("pin_lock", "pin_lock_info");
-        buildInputLabels(0);
-    }
-    void SimLockBox::buildInputLabels(unsigned int inputSize)
-    {
-        auto itemBuilder = []() {
-            auto label = new gui::Image("dot_12px_hard_alpha_W_G");
-            return label;
-        };
+        LockWindow->setText("sim_header_setup",
+                            LockInputWindow::TextType::Title,
+                            {{LockWindow->getToken(LockInputWindow::Token::Sim), LockWindow->lock->getLockName()}});
+        LockWindow->setTitleBar(true, true);
 
-        LockWindow->buildPinLabels(itemBuilder, inputSize, label_style::x, label_style::y, label_style::w);
-        LockWindow->pinLabelsBox->setEdges(RectangleEdge::Bottom);
-    }
-
-    void SimLockBox::rebuildInputLabels(unsigned int inputSize)
-    {
-        LockWindow->pinLabelsBox->erase();
-        buildInputLabels(inputSize);
+        switch (simInputTypeAction) {
+        case locks::SimInputTypeAction::UnlockWithPin:
+            textForInputRequired                  = "sim_enter_pin_unlock";
+            textForInvalidInput                   = "sim_setup_wrong_pin";
+            textForInvalidInputLastAttempt        = "sim_setup_wrong_pin_last_attempt";
+            textForInvalidInputLastAttemptWarning = "";
+            break;
+        case locks::SimInputTypeAction::UnlockWithPuk:
+            textForInputRequired                  = "sim_setup_enter_puk";
+            textForInvalidInput                   = "sim_setup_wrong_puk";
+            textForInvalidInputLastAttempt        = "sim_setup_wrong_puk_last_attempt";
+            textForInvalidInputLastAttemptWarning = "sim_setup_wrong_puk_last_attempt_warning";
+            break;
+        case locks::SimInputTypeAction::ChangePin:
+        case locks::SimInputTypeAction::EnablePin:
+        case locks::SimInputTypeAction::DisablePin:
+            textForInputRequired                  = "sim_enter_enter_current";
+            textForInvalidInput                   = "sim_wrong_pin_confirmation";
+            textForInvalidInputLastAttempt        = "";
+            textForInvalidInputLastAttemptWarning = "";
+            break;
+        default:
+            break;
+        }
     }
 
     void SimLockBox::setVisibleStateInputRequired(InputActionType type)
@@ -51,59 +50,59 @@ namespace gui
         switch (type) {
         case LockBox::InputActionType::ProvideInput: {
             LockWindow->setText(
-                "app_desktop_sim_enter_pin_unlock",
-                PinLockBaseWindow::TextType::Primary,
-                {{LockWindow->getToken(PinLockBaseWindow::Token::PinType), LockWindow->lock->getLockName()}});
+                textForInputRequired,
+                LockInputWindow::TextType::Primary,
+                {{LockWindow->getToken(LockInputWindow::Token::PinType), LockWindow->lock->getLockName()}});
             break;
         }
         case LockBox::InputActionType::ProvideNewInput:
-            LockWindow->setText("app_desktop_sim_enter_new_pin", PinLockBaseWindow::TextType::Primary);
+            LockWindow->setText("sim_enter_new_pin", LockInputWindow::TextType::Primary);
             break;
         case LockBox::InputActionType::ConfirmNewInput:
-            LockWindow->setText("app_desktop_sim_confirm_new_pin", PinLockBaseWindow::TextType::Primary);
+            LockWindow->setText("sim_confirm_new_pin", LockInputWindow::TextType::Primary);
             break;
         }
 
-        LockWindow->setImagesVisible(true, false);
+        LockWindow->setImage("sim_card_W_G");
         LockWindow->setBottomBarWidgetsActive(false, false, true);
     }
+
     void SimLockBox::setVisibleStateInputInvalid(InputErrorType type, unsigned int value)
     {
         switch (type) {
         case LockBox::InputErrorType::InvalidInput:
             if (value == 1) {
-                LockWindow->setText("app_desktop_sim_setup_wrong_pin_last_attempt",
-                                    PinLockBaseWindow::TextType::Primary);
+                LockWindow->setText(textForInvalidInputLastAttempt, LockInputWindow::TextType::Primary);
+                LockWindow->setText(textForInvalidInputLastAttemptWarning, LockInputWindow::TextType::Secondary);
             }
             else {
                 LockWindow->setText(
-                    "app_desktop_sim_setup_wrong_pin",
-                    PinLockBaseWindow::TextType::Primary,
-                    {{LockWindow->getToken(PinLockBaseWindow::Token::Attempts), static_cast<int>(value)}});
+                    textForInvalidInput,
+                    LockInputWindow::TextType::Primary,
+                    {{LockWindow->getToken(LockInputWindow::Token::Attempts), static_cast<int>(value)}});
             }
             break;
         case LockBox::InputErrorType::NewInputConfirmFailed:
-            LockWindow->setText("app_desktop_sim_wrong_pin_confirmation", PinLockBaseWindow::TextType::Primary);
-            break;
-        case LockBox::InputErrorType::UnhandledError: {
-            LockWindow->setText("app_desktop_sim_cme_error",
-                                PinLockBaseWindow::TextType::Primary,
-                                {{LockWindow->getToken(PinLockBaseWindow::Token::CmeCode), static_cast<int>(value)}});
+            LockWindow->setText("sim_wrong_pin_confirmation", LockInputWindow::TextType::Primary);
             break;
         }
-        }
-        LockWindow->setImagesVisible(false, true);
-        LockWindow->setBottomBarWidgetsActive(false, true, true);
-    }
-    void SimLockBox::setVisibleStateBlocked()
-    {
-        LockWindow->setText("app_desktop_sim_puk_blocked", PinLockBaseWindow::TextType::Primary);
-        LockWindow->setImagesVisible(false, true);
+        LockWindow->setImage("info_icon_W_G");
         LockWindow->setBottomBarWidgetsActive(false, true, true);
     }
 
-    void SimLockBox::clear()
+    void SimLockBox::setVisibleStateBlocked()
     {
-        rebuildInputLabels(0);
+        LockWindow->setText("sim_puk_blocked", LockInputWindow::TextType::Primary);
+        LockWindow->setImage("sim_card_W_G");
+        LockWindow->setBottomBarWidgetsActive(false, false, true);
+    }
+
+    void SimLockBox::setVisibleStateError(unsigned int errorCode)
+    {
+        LockWindow->setText("sim_cme_error",
+                            LockInputWindow::TextType::Primary,
+                            {{LockWindow->getToken(LockInputWindow::Token::CmeCode), static_cast<int>(errorCode)}});
+        LockWindow->setImage("info_icon_W_G");
+        LockWindow->setBottomBarWidgetsActive(false, false, true);
     }
 } // namespace gui

@@ -6,17 +6,13 @@
 #include <locks/data/LockData.hpp>
 #include <locks/widgets/Lock.hpp>
 #include <locks/widgets/LockBox.hpp>
-#include <locks/windows/PinLockBaseWindow.hpp>
+#include <locks/windows/LockInputWindow.hpp>
 
 namespace gui
 {
-    class PhoneLockInputWindow : public PinLockBaseWindow
+    class PhoneLockInputWindow : public LockInputWindow
     {
-        std::unique_ptr<LockBox> lockBox                         = nullptr;
         locks::PhoneLockInputTypeAction phoneLockInputTypeAction = locks::PhoneLockInputTypeAction::Unlock;
-
-        void setVisibleState();
-        [[nodiscard]] auto isInInputState() const noexcept -> bool;
 
       public:
         PhoneLockInputWindow(app::Application *app, const std::string &window_name);
@@ -26,6 +22,7 @@ namespace gui
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;
+        top_bar::Configuration configureTopBar(top_bar::Configuration appConfiguration) override;
     };
 
 } /* namespace gui */

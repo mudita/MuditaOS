@@ -1,68 +1,78 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "PhoneLockInputWindow.hpp"
+#include "SimLockInputWindow.hpp"
+
+#include <locks/data/LockData.hpp>
+#include <locks/widgets/SimLockBox.hpp>
+#include <locks/widgets/LockHash.hpp>
 
 #include <service-appmgr/Controller.hpp>
-#include <locks/data/LockData.hpp>
-#include <locks/widgets/PhoneLockBox.hpp>
 #include <popups/data/PopupRequestParams.hpp>
 
 namespace gui
 {
-    PhoneLockInputWindow::PhoneLockInputWindow(app::Application *app, const std::string &window_name)
+    SimLockInputWindow::SimLockInputWindow(app::Application *app, const std::string &window_name)
         : LockInputWindow(app, window_name)
     {
         buildInterface();
     }
 
-    void PhoneLockInputWindow::rebuild()
+    void SimLockInputWindow::rebuild()
     {
         destroyInterface();
         buildInterface();
     }
-    void PhoneLockInputWindow::buildInterface()
+    void SimLockInputWindow::buildInterface()
     {
         AppWindow::buildInterface();
         LockInputWindow::build();
     }
 
-    void PhoneLockInputWindow::destroyInterface()
+    void SimLockInputWindow::destroyInterface()
     {
         erase();
     }
 
-    top_bar::Configuration PhoneLockInputWindow::configureTopBar(top_bar::Configuration appConfiguration)
+    void SimLockInputWindow::setVisibleState()
     {
-        if (phoneLockInputTypeAction == locks::PhoneLockInputTypeAction::Unlock) {
-            appConfiguration.enable(top_bar::Indicator::Lock);
-            appConfiguration.disable(top_bar::Indicator::Time);
+        LockInputWindow::setVisibleState();
+
+        if (lock->isState(locks::Lock::LockState::ErrorOccurred)) {
+            lockBox->setVisibleStateError(errorCode);
         }
-        else {
-            appConfiguration.enable(top_bar::Indicator::Time);
-            appConfiguration.disable(top_bar::Indicator::Lock);
-        }
+    }
+
+    top_bar::Configuration SimLockInputWindow::configureTopBar(top_bar::Configuration appConfiguration)
+    {
+        appConfiguration.disable(top_bar::Indicator::NetworkAccessTechnology);
+        appConfiguration.enable(top_bar::Indicator::Time);
+        appConfiguration.enable(top_bar::Indicator::PhoneMode);
+        appConfiguration.enable(top_bar::Indicator::Battery);
+        appConfiguration.enable(top_bar::Indicator::Signal);
+        appConfiguration.enable(top_bar::Indicator::SimCard);
         return appConfiguration;
     }
 
-    void PhoneLockInputWindow::onBeforeShow(ShowMode mode, SwitchData *data)
+    void SimLockInputWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        if (auto lockData = dynamic_cast<locks::LockData *>(data)) {
-            lock                     = std::make_unique<locks::Lock>(lockData->getLock());
-            phoneLockInputTypeAction = lockData->getPhoneLockInputTypeAction();
+        if (auto SimLockData = dynamic_cast<locks::SimLockData *>(data)) {
+            lock                   = std::make_unique<locks::Lock>(SimLockData->getLock());
+            simLockInputTypeAction = SimLockData->getSimInputTypeAction();
+            errorCode              = SimLockData->getErrorCode();
         }
 
         // Lock need to exist in that window flow
         assert(lock);
 
         rebuild();
-        lockBox = std::make_unique<PhoneLockBox>(this, phoneLockInputTypeAction);
+        lockBox = std::make_unique<SimLockBox>(this, simLockInputTypeAction);
         lockBox->buildLockBox(lock->getMaxInputSize());
 
         setVisibleState();
     }
 
-    bool PhoneLockInputWindow::onInput(const InputEvent &inputEvent)
+    bool SimLockInputWindow::onInput(const InputEvent &inputEvent)
     {
         if (!inputEvent.isShortRelease()) {
             return AppWindow::onInput(inputEvent);
@@ -86,41 +96,28 @@ namespace gui
             }
         }
         else if (inputEvent.isDigit()) {
-
             if (isInInputState() && lock->canPut()) {
-
                 lockBox->putChar(lock->getCharCount());
                 lock->putNextChar(inputEvent.numericValue());
 
-                if (lock->canVerify()) {
-                    application->getPhoneLockSubject().verifyInput(lock->getInput());
-                    lock->consumeState();
-                    lock->clearAttempt();
-                }
-
+                bottomBar->setActive(BottomBar::Side::CENTER, lock->canVerify());
                 return true;
             }
         }
-
         else if (inputEvent.is(KeyCode::KEY_ENTER) && bottomBar->isActive(BottomBar::Side::CENTER)) {
-            if (lock->isState(locks::Lock::LockState::Blocked)) {
-                application->returnToPreviousWindow();
+            if (isInInputState()) {
+                application->getSimLockSubject().verifyInput(lock->getInput());
             }
-            else {
+            else if (isInInvalidInputState()) {
                 lock->consumeState();
                 lock->clearAttempt();
                 setVisibleState();
             }
             return true;
         }
-        else if (inputEvent.is(KeyCode::KEY_LF) && bottomBar->isActive(BottomBar::Side::LEFT)) {
-            application->getPhoneLockSubject().skipSetPhoneLock();
-            lock->consumeState();
-            lock->clearAttempt();
-            return true;
-        }
 
         // check if any of the lower inheritance onInput methods catch the event
         return AppWindow::onInput(inputEvent);
     }
+
 } /* namespace gui */

@@ -18,3 +18,8 @@ void ImageBox::showImage(bool show)
 {
     image->setVisible(show);
 }
+
+void ImageBox::setImage(const UTF8 &name)
+{
+    image->set(name);
+}

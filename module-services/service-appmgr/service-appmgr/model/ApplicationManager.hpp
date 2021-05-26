@@ -32,7 +32,7 @@
 
 #include <notifications/NotificationProvider.hpp>
 #include <locks/handlers/PhoneLockHandler.hpp>
-#include <service-cellular-api>
+#include <locks/handlers/SimLockHandler.hpp>
 
 namespace app
 {
@@ -151,11 +151,6 @@ namespace app::manager
         auto handleDBResponse(db::QueryResponse *msg) -> bool;
         auto handlePowerSavingModeInit() -> bool;
         auto handleMessageAsAction(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>;
-        void handleSimReady(cellular::msg::notification::SimReady *msg);
-        void handleSimNeedPin(cellular::msg::notification::SimNeedPin *msg);
-        void handleSimNeedPuk(cellular::msg::notification::SimNeedPuk *msg);
-        void handleSimBlocked(cellular::msg::notification::SimBlocked *msg);
-        void handleUnhandledCME(cellular::msg::notification::UnhandledCME *msg);
         auto handleDeveloperModeRequest(sys::Message *request) -> sys::MessagePointer;
         /// handles dom request by passing this request to application which should provide the dom
         auto handleDOMRequest(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>;
@@ -192,6 +187,7 @@ namespace app::manager
         std::unique_ptr<sys::phone_modes::Observer> phoneModeObserver;
 
         locks::PhoneLockHandler phoneLockHandler;
+        locks::SimLockHandler simLockHandler;
 
         void displayLanguageChanged(std::string value);
         void lockTimeChanged(std::string value);

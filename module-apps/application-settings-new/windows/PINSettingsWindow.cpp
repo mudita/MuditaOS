@@ -8,7 +8,7 @@
 #include "OptionSetting.hpp"
 
 #include <service-appmgr/Controller.hpp>
-#include <service-appmgr/service-appmgr/data/SimActionsParams.hpp>
+#include <locks/data/SimLockMessages.hpp>
 #include <service-cellular-api>
 
 namespace gui
@@ -56,11 +56,7 @@ namespace gui
             optionList.emplace_back(std::make_unique<option::OptionSettings>(
                 utils::translate("app_settings_network_pin_change_code"),
                 [=](Item & /*item*/) {
-                    using namespace app::manager::actions;
-                    auto params = std::make_unique<PasscodeParams>(Store::GSM::get()->selected,
-                                                                   PasscodeParams::numOfAttemptsForEnteringPIN,
-                                                                   PasscodeParams::pinName);
-                    app::manager::Controller::sendAction(application, RequestPinChange, std::move(params));
+                    application->getSimLockSubject().changeSimPin();
                     return true;
                 },
                 nullptr,
@@ -75,14 +71,11 @@ namespace gui
     {
         currentState = !currentState;
         refreshOptionsList();
-        using namespace app::manager::actions;
-        auto params = std::make_unique<PasscodeParams>(
-            Store::GSM::get()->selected, PasscodeParams::numOfAttemptsForEnteringPIN, PasscodeParams::pinName);
         if (!currentState) {
-            app::manager::Controller::sendAction(application, RequestPinDisable, std::move(params));
+            application->getSimLockSubject().disableSimPin();
         }
         else {
-            app::manager::Controller::sendAction(application, RequestPinEnable, std::move(params));
+            application->getSimLockSubject().enableSimPin();
         }
     }
 } // namespace gui

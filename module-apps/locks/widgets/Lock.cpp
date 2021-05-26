@@ -24,9 +24,6 @@ namespace locks
         if (maxInputSize > inputValue.size()) {
             inputValue.push_back(c);
         }
-        if (canVerify() && autoActivate && onActivatedCallback != nullptr) {
-            onActivatedCallback(lockType, inputValue);
-        }
     }
 
     void Lock::popChar()
@@ -41,13 +38,4 @@ namespace locks
         inputValue.clear();
     }
 
-    void Lock::activate()
-    {
-        if (!onActivatedCallback) {
-            LOG_ERROR("Passcode verification callback null");
-            return;
-        }
-        onActivatedCallback(lockType, inputValue);
-        clearAttempt();
-    }
 } // namespace locks
