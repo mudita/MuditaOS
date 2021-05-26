@@ -16,7 +16,7 @@ unsigned int SoundsModel::requestRecordsCount()
 
 unsigned int SoundsModel::getMinimalItemHeight() const
 {
-    return style::listview::scroll::min_space;
+    return style::window::label::big_h + style::margins::big;
 }
 
 void SoundsModel::requestRecords(const uint32_t offset, const uint32_t limit)
@@ -87,11 +87,16 @@ void SoundsModel::applyItems(const std::vector<std::filesystem::path> &sounds,
                              app::Application *app,
                              audio_settings::AbstractAudioSettingsModel *model)
 {
+    auto currentItemIndex  = 0;
+    auto selectedItemIndex = 0;
+
     std::string selectedSound = purefs::dir::getCurrentOSPath() / model->getSound();
     for (const auto &sound : sounds) {
+
         bool isSelected = false;
         if (sound == selectedSound) {
-            isSelected = true;
+            isSelected        = true;
+            selectedItemIndex = currentItemIndex;
         }
 
         std::string itemTitle;
@@ -129,11 +134,12 @@ void SoundsModel::applyItems(const std::vector<std::filesystem::path> &sounds,
         }
 
         internalData.push_back(item);
+        ++currentItemIndex;
     }
 
     for (auto item : internalData) {
         item->deleteByList = false;
     }
 
-    list->rebuildList();
+    list->rebuildList(gui::listview::RebuildType::OnPageElement, selectedItemIndex);
 }
