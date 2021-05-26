@@ -53,6 +53,38 @@ namespace gui
         locks::PhoneLockInputTypeAction phoneLockInputTypeAction;
     };
 
+    class SimUnlockInputRequestParams : public PopupRequestParams
+    {
+      public:
+        SimUnlockInputRequestParams(gui::popup::ID popupId,
+                                    locks::Lock lock,
+                                    locks::SimInputTypeAction simInputTypeAction,
+                                    unsigned int errorCode = 0)
+            : PopupRequestParams{popupId}, lock{std::move(lock)}, simInputTypeAction(simInputTypeAction),
+              errorCode(errorCode)
+        {}
+
+        [[nodiscard]] auto getLock() const noexcept
+        {
+            return lock;
+        }
+
+        [[nodiscard]] auto getSimInputTypeAction() const noexcept
+        {
+            return simInputTypeAction;
+        }
+
+        [[nodiscard]] auto getErrorCode() const noexcept
+        {
+            return errorCode;
+        }
+
+      private:
+        locks::Lock lock;
+        locks::SimInputTypeAction simInputTypeAction;
+        unsigned int errorCode;
+    };
+
     class PhoneModePopupRequestParams : public PopupRequestParams
     {
       public:

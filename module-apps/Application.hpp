@@ -30,6 +30,7 @@
 #include <TopBarManager.hpp>
 #include <popups/Popups.hpp>
 #include <locks/handlers/PhoneLockSubject.hpp>
+#include <locks/handlers/SimLockSubject.hpp>
 #include <locks/handlers/LockPolicyHandler.hpp>
 #include "WindowsFactory.hpp"
 #include "WindowsStack.hpp"
@@ -402,9 +403,11 @@ namespace app
 
         locks::PhoneLockSubject phoneLockSubject;
         locks::LockPolicyHandler lockPolicyHandler;
+        locks::SimLockSubject simLockSubject;
 
       public:
         [[nodiscard]] auto getPhoneLockSubject() noexcept -> locks::PhoneLockSubject &;
+        [[nodiscard]] auto getSimLockSubject() noexcept -> locks::SimLockSubject &;
 
         [[nodiscard]] bool isPhoneLockEnabled() const noexcept;
 

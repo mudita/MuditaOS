@@ -40,6 +40,7 @@
 #include <service-appmgr/messages/AutoLockRequests.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <module-db/queries/notifications/QueryNotificationsGetAll.hpp>
+#include <service-cellular-api>
 
 #include "module-services/service-appmgr/service-appmgr/messages/ApplicationStatus.hpp"
 
@@ -138,7 +139,7 @@ namespace app::manager
           actionsRegistry{[this](ActionEntry &action) { return handleAction(action); }}, notificationProvider(this),
           settings(std::make_unique<settings::Settings>()),
           phoneModeObserver(std::make_unique<sys::phone_modes::Observer>()),
-          phoneLockHandler(locks::PhoneLockHandler(this, settings))
+          phoneLockHandler(locks::PhoneLockHandler(this, settings)), simLockHandler(this)
     {
         autoLockTimer = sys::TimerFactory::createSingleShotTimer(
             this, autoLockTimerName, sys::timer::InfiniteTimeout, [this](sys::Timer &) { onPhoneLocked(); });
@@ -425,6 +426,8 @@ namespace app::manager
             handleDBResponse(response);
             return sys::msgHandled();
         });
+
+        // PhoneLock connects
         connect(typeid(locks::LockPhone),
                 [&](sys::Message *request) -> sys::MessagePointer { return phoneLockHandler.handleLockRequest(); });
         connect(typeid(locks::UnlockPhone),
@@ -433,7 +436,7 @@ namespace app::manager
             return phoneLockHandler.handleUnlockCancelRequest();
         });
         connect(typeid(locks::UnLockPhoneInput), [&](sys::Message *request) -> sys::MessagePointer {
-            auto data = dynamic_cast<locks::UnLockPhoneInput *>(request);
+            auto data = static_cast<locks::UnLockPhoneInput *>(request);
             return phoneLockHandler.verifyPhoneLockInput(data->getInputData());
         });
         connect(typeid(locks::EnablePhoneLock),
@@ -443,7 +446,7 @@ namespace app::manager
         });
         connect(typeid(locks::UnlockedPhone), [&](sys::Message *request) -> sys::MessagePointer {
             autoLockTimer.start();
-            return sys::msgHandled();
+            return simLockHandler.releaseSimUnlockBlockOnLockedPhone();
         });
         connect(typeid(locks::ChangePhoneLock),
                 [&](sys::Message *request) -> sys::MessagePointer { return phoneLockHandler.handleChangePhoneLock(); });
@@ -459,6 +462,112 @@ namespace app::manager
         connect(typeid(SetAutoLockTimeoutRequest), [&](sys::Message *request) -> sys::MessagePointer {
             auto req = static_cast<SetAutoLockTimeoutRequest *>(request);
             return handleAutoLockSetRequest(req);
+        });
+
+        // SimLock connects
+        connect(typeid(cellular::msg::notification::SimNeedPin), [&](sys::Message *request) -> sys::MessagePointer {
+            auto data = static_cast<cellular::msg::notification::SimNeedPin *>(request);
+            if (phoneLockHandler.isPhoneLocked()) {
+                simLockHandler.setSimUnlockBlockOnLockedPhone();
+            }
+            return simLockHandler.handleSimPinRequest(data->attempts);
+        });
+        connect(typeid(cellular::msg::request::sim::PinUnlock::Response),
+                [&](sys::Message *request) -> sys::MessagePointer {
+                    auto data = static_cast<cellular::msg::request::sim::PinUnlock::Response *>(request);
+                    if (data->retCode) {
+                        return simLockHandler.handleSimUnlockedMessage();
+                    }
+                    return sys::msgNotHandled();
+                });
+        connect(typeid(locks::UnLockSimInput), [&](sys::Message *request) -> sys::MessagePointer {
+            auto msg = static_cast<locks::UnLockSimInput *>(request);
+            return simLockHandler.verifySimLockInput(msg->getInputData());
+        });
+        connect(typeid(cellular::msg::notification::SimNeedPuk), [&](sys::Message *request) -> sys::MessagePointer {
+            auto data = static_cast<cellular::msg::notification::SimNeedPuk *>(request);
+            if (phoneLockHandler.isPhoneLocked()) {
+                simLockHandler.setSimUnlockBlockOnLockedPhone();
+            }
+            return simLockHandler.handleSimPukRequest(data->attempts);
+        });
+        connect(typeid(cellular::msg::request::sim::UnblockWithPuk::Response),
+                [&](sys::Message *request) -> sys::MessagePointer {
+                    auto data = static_cast<cellular::msg::request::sim::UnblockWithPuk::Response *>(request);
+                    if (data->retCode) {
+                        return simLockHandler.handleSimUnlockedMessage();
+                    }
+                    return sys::msgNotHandled();
+                });
+        connect(typeid(locks::ChangeSimPin), [&](sys::Message *request) -> sys::MessagePointer {
+            return simLockHandler.handleSimPinChangeRequest();
+        });
+        connect(typeid(cellular::msg::request::sim::ChangePin::Response),
+                [&](sys::Message *request) -> sys::MessagePointer {
+                    auto data = static_cast<cellular::msg::request::sim::ChangePin::Response *>(request);
+                    if (data->retCode) {
+                        return simLockHandler.handleSimChangedMessage();
+                    }
+                    else {
+                        return simLockHandler.handleSimPinChangeFailedRequest();
+                    }
+                });
+        connect(typeid(locks::EnableSimPin),
+                [&](sys::Message *request) -> sys::MessagePointer { return simLockHandler.handleSimEnableRequest(); });
+        connect(typeid(locks::DisableSimPin),
+                [&](sys::Message *request) -> sys::MessagePointer { return simLockHandler.handleSimDisableRequest(); });
+        connect(typeid(cellular::msg::request::sim::SetPinLock::Response),
+                [&](sys::Message *request) -> sys::MessagePointer {
+                    auto data = static_cast<cellular::msg::request::sim::SetPinLock::Response *>(request);
+                    if (data->retCode) {
+                        return simLockHandler.handleSimAvailabilityMessage();
+                    }
+                    else {
+                        if (data->lock == cellular::api::SimLockState::Enabled) {
+                            return simLockHandler.handleSimEnableRequest();
+                        }
+                        else {
+                            return simLockHandler.handleSimDisableRequest();
+                        }
+                    }
+                });
+        connect(typeid(cellular::msg::notification::SimBlocked), [&](sys::Message *request) -> sys::MessagePointer {
+            if (phoneLockHandler.isPhoneLocked()) {
+                simLockHandler.setSimUnlockBlockOnLockedPhone();
+            }
+            return simLockHandler.handleSimBlockedRequest();
+        });
+        connect(typeid(cellular::msg::notification::UnhandledCME), [&](sys::Message *request) -> sys::MessagePointer {
+            auto data = static_cast<cellular::msg::notification::UnhandledCME *>(request);
+            if (phoneLockHandler.isPhoneLocked()) {
+                simLockHandler.setSimUnlockBlockOnLockedPhone();
+            }
+            return simLockHandler.handleCMEErrorRequest(data->code);
+        });
+        connect(typeid(locks::SetSim), [&](sys::Message *request) -> sys::MessagePointer {
+            auto data = static_cast<locks::SetSim *>(request);
+            simLockHandler.setSim(data->getSimSlot());
+            return sys::msgHandled();
+        });
+        connect(typeid(cellular::msg::request::sim::SetActiveSim::Response),
+                [&](sys::Message *request) -> sys::MessagePointer {
+                    auto data = static_cast<cellular::msg::request::sim::SetActiveSim::Response *>(request);
+                    if (data->retCode) {
+                        settings->setValue(::settings::SystemProperties::activeSim,
+                                           utils::enumToString(Store::GSM::get()->selected),
+                                           ::settings::SettingsScope::Global);
+                        return sys::msgHandled();
+                    }
+                    return sys::msgNotHandled();
+                });
+        connect(typeid(cellular::StateChange), [&](sys::Message *request) -> sys::MessagePointer {
+            auto data = static_cast<cellular::StateChange *>(request);
+            if (data->request == cellular::service::State::ST::URCReady) {
+                simLockHandler.getSettingsSimSelect(
+                    settings->getValue(settings::SystemProperties::activeSim, settings::SettingsScope::Global));
+                return sys::msgHandled();
+            }
+            return sys::msgNotHandled();
         });
 
         connect(typeid(sdesktop::developerMode::DeveloperModeRequest),
@@ -480,33 +589,6 @@ namespace app::manager
         connect(typeid(sys::TetheringQuestionAbort), convertibleToActionHandler);
         connect(typeid(sys::TetheringPhoneModeChangeProhibitedMessage), convertibleToActionHandler);
         connect(typeid(VolumeChanged), convertibleToActionHandler);
-
-        /* Notifications from sys::BusChannel::ServiceCellularNotifications */
-        connect(typeid(cellular::msg::notification::SimReady), [&](sys::Message *request) {
-            auto msg = static_cast<cellular::msg::notification::SimReady *>(request);
-            handleSimReady(msg);
-            return sys::MessageNone{};
-        });
-        connect(typeid(cellular::msg::notification::SimNeedPin), [&](sys::Message *request) {
-            auto msg = static_cast<cellular::msg::notification::SimNeedPin *>(request);
-            handleSimNeedPin(msg);
-            return sys::MessageNone{};
-        });
-        connect(typeid(cellular::msg::notification::SimNeedPuk), [&](sys::Message *request) {
-            auto msg = static_cast<cellular::msg::notification::SimNeedPuk *>(request);
-            handleSimNeedPuk(msg);
-            return sys::MessageNone{};
-        });
-        connect(typeid(cellular::msg::notification::SimBlocked), [&](sys::Message *request) {
-            auto msg = static_cast<cellular::msg::notification::SimBlocked *>(request);
-            handleSimBlocked(msg);
-            return sys::MessageNone{};
-        });
-        connect(typeid(cellular::msg::notification::UnhandledCME), [&](sys::Message *request) {
-            auto msg = static_cast<cellular::msg::notification::UnhandledCME *>(request);
-            handleUnhandledCME(msg);
-            return sys::MessageNone{};
-        });
     }
 
     sys::ReturnCodes ApplicationManager::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
@@ -652,55 +734,6 @@ namespace app::manager
     {
         ActionEntry entry{actionMsg->getAction(), std::move(actionMsg->getData())};
         actionsRegistry.enqueue(std::move(entry));
-    }
-
-    void ApplicationManager::handleSimReady(cellular::msg::notification::SimReady *msg)
-    {
-        if (msg->ready) {
-            auto action = std::make_unique<app::manager::ActionRequest>(
-                msg->sender,
-                app::manager::actions::UnlockSim,
-                std::make_unique<app::manager::actions::SimStateParams>(Store::GSM::get()->selected));
-            handleActionRequest(action.get());
-        }
-    }
-
-    void ApplicationManager::handleSimNeedPin(cellular::msg::notification::SimNeedPin *msg)
-    {
-        auto action = std::make_unique<app::manager::ActionRequest>(
-            msg->sender,
-            app::manager::actions::RequestPin,
-            std::make_unique<app::manager::actions::PasscodeParams>(
-                Store::GSM::get()->selected, msg->attempts, std::string()));
-        handleActionRequest(action.get());
-    }
-
-    void ApplicationManager::handleSimNeedPuk(cellular::msg::notification::SimNeedPuk *msg)
-    {
-        auto action = std::make_unique<app::manager::ActionRequest>(
-            msg->sender,
-            app::manager::actions::RequestPuk,
-            std::make_unique<app::manager::actions::PasscodeParams>(
-                Store::GSM::get()->selected, msg->attempts, std::string()));
-        handleActionRequest(action.get());
-    }
-
-    void ApplicationManager::handleSimBlocked(cellular::msg::notification::SimBlocked *msg)
-    {
-        auto action = std::make_unique<app::manager::ActionRequest>(
-            msg->sender,
-            app::manager::actions::BlockSim,
-            std::make_unique<app::manager::actions::SimStateParams>(Store::GSM::get()->selected));
-        handleActionRequest(action.get());
-    }
-
-    void ApplicationManager::handleUnhandledCME(cellular::msg::notification::UnhandledCME *msg)
-    {
-        auto action = std::make_unique<app::manager::ActionRequest>(
-            msg->sender,
-            app::manager::actions::DisplayCMEError,
-            std::make_unique<app::manager::actions::UnhandledCMEParams>(Store::GSM::get()->selected, msg->code));
-        handleActionRequest(action.get());
     }
 
     void ApplicationManager::handlePhoneModeChanged(sys::phone_modes::PhoneMode phoneMode)

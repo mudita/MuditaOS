@@ -49,6 +49,8 @@
 #include <popups/lock-popups/PhoneLockedInfoWindow.hpp>
 #include <popups/lock-popups/PhoneLockInputWindow.hpp>
 #include <popups/lock-popups/PhoneLockChangeInfoWindow.hpp>
+#include <popups/lock-popups/SimLockInputWindow.hpp>
+#include <popups/lock-popups/SimInfoWindow.hpp>
 #include <popups/data/PopupData.hpp>
 #include <popups/data/PopupRequestParams.hpp>
 #include <popups/data/PhoneModeParams.hpp>
@@ -104,7 +106,7 @@ namespace app
           keyTranslator{std::make_unique<gui::KeyInputSimpleTranslation>()}, startInBackground{startInBackground},
           callbackStorage{std::make_unique<CallbackStorage>()}, topBarManager{std::make_unique<TopBarManager>()},
           settings(std::make_unique<settings::Settings>()), phoneMode{mode}, phoneLockSubject(this),
-          lockPolicyHandler(this)
+          lockPolicyHandler(this), simLockSubject(this)
     {
         topBarManager->enableIndicators({gui::top_bar::Indicator::Time});
         using TimeMode = gui::top_bar::TimeConfiguration::TimeMode;
@@ -792,6 +794,15 @@ namespace app
                     return std::make_unique<gui::PowerOffWindow>(app, std::move(presenter));
                 });
                 break;
+            case ID::SimLock:
+            case ID::SimInfo:
+                windowsFactory.attach(window::sim_unlock_window, [](Application *app, const std::string &name) {
+                    return std::make_unique<gui::SimLockInputWindow>(app, window::sim_unlock_window);
+                });
+                windowsFactory.attach(window::sim_info_window, [](Application *app, const std::string &name) {
+                    return std::make_unique<gui::SimInfoWindow>(app, window::sim_info_window);
+                });
+                break;
             }
         }
     }
@@ -816,6 +827,14 @@ namespace app
             switchWindow(
                 gui::popup::resolveWindowName(id),
                 std::make_unique<locks::LockData>(popupParams->getLock(), popupParams->getPhoneLockInputTypeAction()));
+        }
+        else if (id == ID::SimLock || id == ID::SimInfo) {
+            auto popupParams = static_cast<const gui::SimUnlockInputRequestParams *>(params);
+
+            switchWindow(gui::popup::resolveWindowName(id),
+                         std::make_unique<locks::SimLockData>(popupParams->getLock(),
+                                                              popupParams->getSimInputTypeAction(),
+                                                              popupParams->getErrorCode()));
         }
         else {
             switchWindow(gui::popup::resolveWindowName(id));
@@ -951,5 +970,10 @@ namespace app
     auto Application::getLockPolicyHandler() noexcept -> locks::LockPolicyHandlerInterface &
     {
         return lockPolicyHandler;
+    }
+
+    auto Application::getSimLockSubject() noexcept -> locks::SimLockSubject &
+    {
+        return simLockSubject;
     }
 } /* namespace app */

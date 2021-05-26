@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <locks/data/LockData.hpp>
+
 #include <cstdint>
 #include <vector>
 #include <functional>
@@ -20,7 +22,7 @@ template <> struct std::hash<std::vector<unsigned int>>
     }
 };
 
-static inline uint32_t getHash(const std::vector<unsigned int> &input)
+static inline uint32_t getHash(locks::LockInput input)
 {
     static std::hash<std::vector<unsigned int>> hashEngine;
     return hashEngine(input);

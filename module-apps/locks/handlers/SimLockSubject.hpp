@@ -4,25 +4,24 @@
 #pragma once
 
 #include <locks/data/LockData.hpp>
+
 #include <module-sys/Service/Service.hpp>
+#include <service-cellular-api>
 
 namespace locks
 {
-    class PhoneLockSubject
+    class SimLockSubject
     {
       private:
         sys::Service *owner;
 
       public:
-        explicit PhoneLockSubject(sys::Service *owner);
+        explicit SimLockSubject(sys::Service *owner);
 
-        void unlock();
-        void lock();
-        void enablePhoneLock();
-        void disablePhoneLock();
-        void changePhoneLock();
-        void setPhoneLock();
-        void skipSetPhoneLock();
+        void setSim(cellular::api::SimSlot simSlot);
+        void changeSimPin();
+        void enableSimPin();
+        void disableSimPin();
         void verifyInput(LockInput inputData);
     };
 

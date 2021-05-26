@@ -28,7 +28,7 @@ void PostUpdateWindow::onBeforeShow(ShowMode mode, SwitchData *data)
             currentOsVersion = item->getCurrentOsVersion();
             auto info        = utils::translate("app_desktop_update_success");
             utils::findAndReplaceAll(info, "$VERSION", currentOsVersion);
-            infoText->setText(info);
+            infoIcon->text->setText(info);
         }
     }
     setVisibleState();
@@ -36,7 +36,6 @@ void PostUpdateWindow::onBeforeShow(ShowMode mode, SwitchData *data)
 
 void PostUpdateWindow::setVisibleState()
 {
-    successImage->setVisible(true);
     bottomBar->setActive(BottomBar::Side::CENTER, true);
 }
 
@@ -67,31 +66,23 @@ top_bar::Configuration PostUpdateWindow::configureTopBar(top_bar::Configuration 
 
 void PostUpdateWindow::buildInterface()
 {
-    namespace post_update_style = style::window::pin_lock;
     AppWindow::buildInterface();
 
     setTitle(utils::translate("app_desktop_update_muditaos"));
 
     bottomBar->setText(BottomBar::Side::CENTER, utils::translate("common_ok"));
 
-    successImage =
-        new gui::Image(this, post_update_style::image::x, post_update_style::image::y, 0, 0, "circle_success");
-    infoText = new Text(this,
-                        post_update_style::primary_text::x,
-                        post_update_style::primary_text::y,
-                        post_update_style::primary_text::w,
-                        post_update_style::primary_text::h);
-    infoText->setAlignment(Alignment::Horizontal::Center);
+    infoIcon = new gui::Icon(this,
+                             style::window::default_left_margin,
+                             style::header::height,
+                             style::window::default_body_width,
+                             style::window::default_body_height,
+                             "circle_success",
+                             "");
+    infoIcon->setAlignment(Alignment::Horizontal::Center);
 }
 
 void PostUpdateWindow::destroyInterface()
 {
     erase();
-    invalidate();
-}
-
-void PostUpdateWindow::invalidate() noexcept
-{
-    successImage = nullptr;
-    infoText     = nullptr;
 }

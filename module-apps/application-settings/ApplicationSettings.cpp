@@ -20,10 +20,7 @@
 
 #include "ApplicationSettings.hpp"
 
-#include "service-cellular/ServiceCellular.hpp"
-#include <service-cellular-api>
 #include "windows/SettingsMainWindow.hpp"
-#include "windows/SimSelectWindow.hpp"
 #include "windows/CellularPassthroughWindow.hpp"
 
 #include <i18n/i18n.hpp>
@@ -45,13 +42,7 @@ namespace app
                                              sys::phone_modes::PhoneMode mode,
                                              StartInBackground startInBackground)
         : Application(name, parent, mode, startInBackground)
-    {
-        bus.channels.push_back(sys::BusChannel::AntennaNotifications);
-        addActionReceiver(manager::actions::SelectSimCard, [this](auto &&data) {
-            switchWindow(app::sim_select);
-            return actionHandled();
-        });
-    }
+    {}
 
     ApplicationSettings::~ApplicationSettings()
     {}
@@ -116,10 +107,6 @@ namespace app
             return std::make_unique<gui::OptionWindow>(
                 app, utils::translate("app_settings_title_main"), mainWindowOptions(app));
         });
-
-        windowsFactory.attach(app::sim_select, [this](Application *app, const std::string &name) {
-            return std::make_unique<gui::OptionWindow>(app, name, simSelectWindow(app, this));
-        });
         windowsFactory.attach("Languages", [](Application *app, const std::string &name) {
             return std::make_unique<gui::LanguageWindow>(app);
         });
@@ -161,12 +148,6 @@ namespace app
 
     void ApplicationSettings::destroyUserInterface()
     {}
-
-    void ApplicationSettings::setSim(Store::GSM::SIM sim)
-    {
-        auto arg = (sim == Store::GSM::SIM::SIM2) ? cellular::api::SimSlot::SIM2 : cellular::api::SimSlot::SIM1;
-        bus.sendUnicast<cellular::msg::request::sim::SetActiveSim>(arg);
-    }
 
     void ApplicationSettings::timeDateChanged(std::string value)
     {

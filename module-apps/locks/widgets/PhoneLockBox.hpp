@@ -4,18 +4,18 @@
 #pragma once
 
 #include "locks/data/LockData.hpp"
-#include "locks/windows/PinLockBaseWindow.hpp"
-#include "PhoneLockBaseBox.hpp"
+#include "locks/windows/LockInputWindow.hpp"
+#include "LockBoxConstantSize.hpp"
 
 namespace gui
 {
-    class PhoneLockBox : public PhoneLockBaseBox
+    class PhoneLockBox : public LockBoxConstantSize
     {
       public:
         explicit PhoneLockBox(
-            PinLockBaseWindow *LockBaseWindow,
+            LockInputWindow *LockBaseWindow,
             locks::PhoneLockInputTypeAction phoneLockInputTypeAction = locks::PhoneLockInputTypeAction::Unlock)
-            : PhoneLockBaseBox(LockBaseWindow), LockWindow(LockBaseWindow)
+            : LockBoxConstantSize(LockBaseWindow), LockWindow(LockBaseWindow)
         {
             applyLockActionText(phoneLockInputTypeAction);
         }
@@ -23,14 +23,12 @@ namespace gui
       private:
         void buildLockBox(unsigned int pinSize) final;
         void setVisibleStateBlocked() final;
+        void setVisibleStateError(unsigned int errorCode) final;
         void setVisibleStateInputRequired(InputActionType type) final;
         void setVisibleStateInputInvalid(InputErrorType type, unsigned int value) final;
         void applyLockActionText(locks::PhoneLockInputTypeAction phoneLockInputTypeAction);
 
-        [[nodiscard]] top_bar::Configuration configureTopBarLocked();
-        [[nodiscard]] top_bar::Configuration configureTopBarUnLocked();
-
-        PinLockBaseWindow *LockWindow;
+        LockInputWindow *LockWindow;
         std::string textForInputRequired;
         std::string textForInvalidInput;
         std::string textForProvideNewInput;

@@ -4,12 +4,13 @@
 #pragma once
 
 #include <memory>
-#include <utility>
 #include "gui/SwitchData.hpp"
 #include "locks/widgets/Lock.hpp"
 
 namespace locks
 {
+    using LockInput = const std::vector<unsigned int> &;
+
     enum class PhoneLockInputTypeAction
     {
         Unlock,
@@ -18,6 +19,17 @@ namespace locks
         ConfirmCurrent,
         Change,
         Set
+    };
+
+    enum class SimInputTypeAction
+    {
+        UnlockWithPin,
+        UnlockWithPuk,
+        ChangePin,
+        EnablePin,
+        DisablePin,
+        Blocked,
+        Error,
     };
 
     // class template that stores information that was sent along with switch message
@@ -45,4 +57,26 @@ namespace locks
         }
     };
 
+    class SimLockData : public LockData
+    {
+        SimInputTypeAction simInputTypeAction;
+        unsigned int errorCode;
+
+      public:
+        explicit SimLockData(Lock lock, SimInputTypeAction simInputTypeAction, unsigned int errorCode)
+            : LockData(std::move(lock)), simInputTypeAction(simInputTypeAction), errorCode(errorCode)
+        {
+            description = "SimLockPhoneData";
+        }
+
+        [[nodiscard]] auto getSimInputTypeAction() const noexcept
+        {
+            return simInputTypeAction;
+        }
+
+        [[nodiscard]] auto getErrorCode() const noexcept
+        {
+            return errorCode;
+        }
+    };
 } // namespace locks

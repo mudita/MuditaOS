@@ -17,6 +17,7 @@ namespace gui
         ~ImageBox() override = default;
 
         void showImage(bool show);
+        void setImage(const UTF8 &name);
 
       private:
         Image *image;
