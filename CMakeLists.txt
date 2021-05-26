@@ -16,7 +16,7 @@ include(SerialPort)
 include(CopyGdbInit)
 include(Utils)
 include(ModuleUtils)
-include(AddBootloader)
+include(FetchBootloader)
 include(DiskImage)
 include(AddPackage)
 
@@ -131,7 +131,6 @@ add_subdirectory(module-apps)
 add_subdirectory(module-bluetooth)
 add_subdirectory(module-lwip)
 add_subdirectory(image)
-        $<$<STREQUAL:${PROJECT_TARGET},TARGET_RT1051>:CrashCatcher::CrashCatcher>
 add_subdirectory(host-tools)
 
 include(tools/clang-tidy.cmake)
@@ -157,7 +156,7 @@ add_custom_target(
         "Generating version info"
     )
 
-add_ecoboot()
+fetch_ecoboot()
 add_subdirectory(products)
 
 include(GitHubWorkerMessages)
