@@ -49,8 +49,8 @@ namespace locks
         void checkNewPhoneLock();
         void resolvePhoneLockAction();
 
-        sys::MessagePointer verifyPhoneUnlockInput(const std::vector<unsigned int> &inputData);
-        sys::MessagePointer verifyPhoneLockChangeInput(const std::vector<unsigned int> &inputData);
+        sys::MessagePointer verifyPhoneUnlockInput(LockInput inputData);
+        sys::MessagePointer verifyPhoneLockChangeInput(LockInput inputData);
 
       public:
         explicit PhoneLockHandler(sys::Service *owner, std::shared_ptr<settings::Settings> settings);
@@ -63,7 +63,7 @@ namespace locks
         sys::MessagePointer handleChangePhoneLock();
         sys::MessagePointer handleSetPhoneLock();
         sys::MessagePointer handleSkipSetPhoneLock();
-        sys::MessagePointer verifyPhoneLockInput(const std::vector<unsigned int> &inputData);
+        sys::MessagePointer verifyPhoneLockInput(LockInput inputData);
 
         void enablePhoneLock(bool _phoneLockEnabled);
         void setPhoneLockHash(const std::string &value);

@@ -20,7 +20,6 @@
 
 #include <service-appmgr/service-appmgr/messages/ActionRequest.hpp>
 #include <service-appmgr/service-appmgr/Actions.hpp>
-#include <service-appmgr/service-appmgr/data/SimActionsParams.hpp>
 #include <service-appmgr/service-appmgr/data/MmiActionsParams.hpp>
 
 #include <service-cellular/api/common.hpp>

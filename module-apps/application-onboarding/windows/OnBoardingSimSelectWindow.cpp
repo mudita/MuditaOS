@@ -51,7 +51,7 @@ namespace gui
         options.emplace_back(std::make_unique<gui::option::OptionSettings>(
             "SIM1",
             [=](const gui::Item &item) {
-                application->getPhoneLockSubject().setPhoneLock();
+                application->getSimLockSubject().setSim(cellular::api::SimSlot::SIM1);
                 return true;
             },
             nullptr,
@@ -61,7 +61,7 @@ namespace gui
         options.emplace_back(std::make_unique<gui::option::OptionSettings>(
             "SIM2",
             [=](const gui::Item &item) {
-                application->getPhoneLockSubject().setPhoneLock();
+                application->getSimLockSubject().setSim(cellular::api::SimSlot::SIM2);
                 return true;
             },
             nullptr,

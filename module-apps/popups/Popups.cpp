@@ -24,7 +24,12 @@ namespace gui::popup
             return gui::popup::window::phone_lock_input_window;
         case ID::PhoneLockChangeInfo:
             return gui::popup::window::phone_lock_change_info_window;
+        case ID::SimLock:
+            return gui::popup::window::sim_unlock_window;
+        case ID::SimInfo:
+            return gui::popup::window::sim_info_window;
         }
+
         return {};
     }
 } // namespace gui::popup

@@ -1,20 +1,19 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "PhoneLockChangeInfoWindow.hpp"
+#include "SimInfoWindow.hpp"
 #include <locks/data/LockStyle.hpp>
 #include <locks/data/LockData.hpp>
 #include <i18n/i18n.hpp>
 
 using namespace gui;
 
-PhoneLockChangeInfoWindow::PhoneLockChangeInfoWindow(app::Application *app, const std::string &name)
-    : WindowWithTimer(app, name)
+SimInfoWindow::SimInfoWindow(app::Application *app, const std::string &name) : WindowWithTimer(app, name)
 {
     buildInterface();
 }
 
-top_bar::Configuration PhoneLockChangeInfoWindow::configureTopBar(top_bar::Configuration appConfiguration)
+top_bar::Configuration SimInfoWindow::configureTopBar(top_bar::Configuration appConfiguration)
 {
     appConfiguration.enable(top_bar::Indicator::NetworkAccessTechnology);
     appConfiguration.enable(top_bar::Indicator::Time);
@@ -25,19 +24,25 @@ top_bar::Configuration PhoneLockChangeInfoWindow::configureTopBar(top_bar::Confi
     return appConfiguration;
 }
 
-void PhoneLockChangeInfoWindow::onBeforeShow(ShowMode mode, SwitchData *data)
+void SimInfoWindow::onBeforeShow(ShowMode mode, SwitchData *data)
 {
     WindowWithTimer::onBeforeShow(mode, data);
 
-    if (auto infoData = dynamic_cast<locks::LockData *>(data)) {
+    if (auto infoData = dynamic_cast<locks::SimLockData *>(data)) {
 
-        switch (infoData->getPhoneLockInputTypeAction()) {
-        case locks::PhoneLockInputTypeAction::Disable:
-            infoIcon->text->setRichText(utils::translate("phone_lock_disabled"));
+        switch (infoData->getSimInputTypeAction()) {
+        case locks::SimInputTypeAction::UnlockWithPuk:
+        case locks::SimInputTypeAction::ChangePin:
+            setTitle(utils::translate("sim_change_pin"));
+            infoIcon->text->setRichText(utils::translate("sim_pin_changed_successfully"));
             break;
-        case locks::PhoneLockInputTypeAction::Enable:
-        case locks::PhoneLockInputTypeAction::Change:
-            infoIcon->text->setRichText(utils::translate("phone_lock_changed_successfully"));
+        case locks::SimInputTypeAction::EnablePin:
+            setTitle("");
+            infoIcon->text->setRichText(utils::translate("sim_card_pin_enabled"));
+            break;
+        case locks::SimInputTypeAction::DisablePin:
+            setTitle("");
+            infoIcon->text->setRichText(utils::translate("sim_card_pin_disabled"));
             break;
         default:
             break;
@@ -45,11 +50,11 @@ void PhoneLockChangeInfoWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     }
 }
 
-void PhoneLockChangeInfoWindow::buildInterface()
+void SimInfoWindow::buildInterface()
 {
     AppWindow::buildInterface();
 
-    setTitle(utils::translate("phone_lock_configure"));
+    setTitle(utils::translate("sim_change_pin"));
 
     infoIcon = new gui::Icon(this,
                              style::window::default_left_margin,
@@ -57,6 +62,6 @@ void PhoneLockChangeInfoWindow::buildInterface()
                              style::window::default_body_width,
                              style::window::default_body_height,
                              "success_icon_W_G",
-                             "");
+                             utils::translate("sim_pin_changed_successfully"));
     infoIcon->setAlignment(Alignment::Horizontal::Center);
 }

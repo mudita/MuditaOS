@@ -10,18 +10,9 @@
 
 namespace app
 {
-
     inline constexpr auto name_settings  = "ApplicationSettings";
-    inline constexpr auto sim_select     = "SimSelect";
 
-    class SimSetter
-    {
-      public:
-        virtual ~SimSetter()                     = default;
-        virtual void setSim(Store::GSM::SIM sim) = 0;
-    };
-
-    class ApplicationSettings : public app::Application, public SimSetter
+    class ApplicationSettings : public app::Application
     {
       public:
         ApplicationSettings(std::string name                    = name_settings,
@@ -41,11 +32,9 @@ namespace app
         void createUserInterface() override;
         void destroyUserInterface() override;
         bsp::Board board = bsp::Board::none;
-        void setSim(Store::GSM::SIM sim) override;
         void timeDateChanged(std::string value);
 
       private:
-        unsigned int lockPassHash;
         bool europeanDateTimeFormat = false; // true europe format, false american format
     };
 
@@ -53,7 +42,7 @@ namespace app
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {
-            return {{manager::actions::Launch, manager::actions::SelectSimCard, manager::actions::PhoneModeChanged}};
+            return {{manager::actions::Launch, manager::actions::PhoneModeChanged}};
         }
     };
 } /* namespace app */

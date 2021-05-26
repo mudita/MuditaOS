@@ -1,5 +1,5 @@
-//// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
-//// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhoneLockSubject.hpp"
 
@@ -50,7 +50,7 @@ namespace locks
         owner->bus.sendUnicast(std::make_shared<SkipSetPhoneLock>(), app::manager::ApplicationManager::ServiceName);
     }
 
-    void PhoneLockSubject::verifyInput(const std::vector<unsigned int> &inputData)
+    void PhoneLockSubject::verifyInput(LockInput inputData)
     {
         owner->bus.sendUnicast(std::make_shared<UnLockPhoneInput>(inputData),
                                app::manager::ApplicationManager::ServiceName);

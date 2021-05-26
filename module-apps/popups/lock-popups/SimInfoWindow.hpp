@@ -3,22 +3,21 @@
 
 #pragma once
 
-#include <AppWindow.hpp>
+#include <popups/WindowWithTimer.hpp>
 #include <Text.hpp>
 #include <gui/widgets/Icon.hpp>
 
 namespace gui
 {
-    class PhoneLockedInfoWindow : public AppWindow
+    class SimInfoWindow : public WindowWithTimer
     {
         Icon *infoIcon = nullptr;
 
       public:
-        PhoneLockedInfoWindow(app::Application *app, const std::string &name);
-        void onBeforeShow(ShowMode mode, SwitchData *data) override;
-        bool onInput(const InputEvent &inputEvent) override;
+        SimInfoWindow(app::Application *app, const std::string &name);
 
         void buildInterface() override;
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
         top_bar::Configuration configureTopBar(top_bar::Configuration appConfiguration) override;
     };
 } /* namespace gui */

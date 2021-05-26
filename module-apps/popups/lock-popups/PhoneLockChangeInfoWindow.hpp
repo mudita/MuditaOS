@@ -5,14 +5,13 @@
 
 #include <popups/WindowWithTimer.hpp>
 #include <Text.hpp>
-#include <gui/widgets/Image.hpp>
+#include <gui/widgets/Icon.hpp>
 
 namespace gui
 {
     class PhoneLockChangeInfoWindow : public WindowWithTimer
     {
-        gui::Image *infoImage = nullptr;
-        gui::Text *infoText   = nullptr;
+        Icon *infoIcon = nullptr;
 
       public:
         PhoneLockChangeInfoWindow(app::Application *app, const std::string &name);

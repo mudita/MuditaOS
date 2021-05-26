@@ -3,32 +3,28 @@
 
 #pragma once
 
-#include "Image.hpp"
 #include "LockBox.hpp"
-#include "locks/windows/LockWindow.hpp"
+
+#include <locks/windows/LockInputWindow.hpp>
+#include <Image.hpp>
 
 namespace gui
 {
-    class PhoneLockBaseBox : public LockBox
+    class LockBoxConstantSize : public LockBox
     {
       public:
-        explicit PhoneLockBaseBox(LockWindow *lockBaseWindow) : lockWindow(lockBaseWindow)
-        {}
-
         void buildLockBox(unsigned int pinSize) override;
         void clear() final;
         void popChar(unsigned int charNum) final;
         void putChar(unsigned int charNum) final;
 
-      private:
-        void buildPinLabels(unsigned int pinSize);
-        void setVisibleStateBlocked() override
-        {}
-        void setVisibleStateInputRequired(InputActionType type) override
-        {}
-        void setVisibleStateInputInvalid(InputErrorType type, unsigned int value) override
+      protected:
+        explicit LockBoxConstantSize(LockInputWindow *lockBaseWindow) : lockWindow(lockBaseWindow)
         {}
 
+        void buildPinLabels(unsigned int pinSize);
+
+      private:
         struct InputLabel : public HBox
         {
             InputLabel(Item *parent, uint32_t w, uint32_t h);
@@ -37,7 +33,7 @@ namespace gui
             gui::Image *image = nullptr;
         };
 
-        LockWindow *lockWindow;
+        LockInputWindow *lockWindow;
         std::vector<InputLabel *> inputLabels;
     };
 } // namespace gui

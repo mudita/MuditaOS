@@ -7,7 +7,6 @@
 #include <endpoints/update/UpdateOSTypes.hpp>
 #include <service-appmgr/Actions.hpp>
 #include <service-appmgr/messages/ActionRequest.hpp>
-#include <service-appmgr/data/SimActionsParams.hpp>
 #include <Service/Message.hpp>
 #include <MessageType.hpp>
 #include <service-desktop/DeveloperModeMessage.hpp>

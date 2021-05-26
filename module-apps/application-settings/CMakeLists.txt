@@ -21,7 +21,6 @@ target_sources( ${PROJECT_NAME}
         windows/BtScanWindow.cpp
         windows/UITestWindow.cpp
         windows/Info.cpp
-        windows/SimSelectWindow.cpp
         windows/DateTimeWindow.cpp
         windows/CellularPassthroughWindow.cpp
         windows/FotaWindow.cpp

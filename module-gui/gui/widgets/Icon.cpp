@@ -22,7 +22,7 @@ Icon::Icon(Item *parent,
     setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
     image = new Image(this, imageName);
-    image->setMargins(Margins(0, 0, 0, icon::image_bottom_margin));
+    image->setMargins(Margins(0, icon::image_top_margin, 0, icon::image_bottom_margin));
 
     text = new Text(this, 0, 0, 0, 0);
     text->setMaximumSize(w, h);

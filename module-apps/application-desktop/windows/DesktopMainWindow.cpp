@@ -92,10 +92,6 @@ namespace gui
 
     void DesktopMainWindow::setVisibleState()
     {
-        auto app = getAppDesktop();
-
-        app->lockHandler.unlockScreen();
-
         setActiveState();
 
         if (osUpdateVer == osCurrentVer && osUpdateVer != updateos::initSysVer &&
@@ -104,10 +100,6 @@ namespace gui
             data->setData(osCurrentVer);
             application->switchWindow(app::window::name::desktop_post_update_window, std::move(data));
             getAppDesktop()->setOsUpdateVersion(updateos::initSysVer);
-        }
-
-        if (app->need_sim_select && Store::GSM::get()->sim == Store::GSM::SIM::SIM_UNKNOWN) {
-            app::manager::Controller::sendAction(application, app::manager::actions::SelectSimCard);
         }
 
         application->bus.sendUnicast(std::make_shared<TimersProcessingStartMessage>(), service::name::service_time);

@@ -59,8 +59,6 @@
 #include <application-settings-new/data/AutoLockData.hpp>
 
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
-#include <service-cellular/CellularServiceAPI.hpp>
-#include <service-cellular-api>
 #include <service-bluetooth/BluetoothMessage.hpp>
 #include <service-bluetooth/Constants.hpp>
 #include <service-bluetooth/messages/Status.hpp>
@@ -82,7 +80,6 @@
 #include <module-apps/application-desktop/windows/Names.hpp>
 #include <module-apps/messages/DialogMetadataMessage.hpp>
 #include <module-apps/windows/Dialog.hpp>
-#include <locks/windows/PinLockWindow.hpp>
 
 #include <i18n/i18n.hpp>
 
@@ -433,9 +430,6 @@ namespace app
         windowsFactory.attach(gui::window::name::security, [](Application *app, const std::string &name) {
             return std::make_unique<gui::SecurityMainWindow>(app, static_cast<ApplicationSettingsNew *>(app));
         });
-        windowsFactory.attach(app::window::name::desktop_pin_lock, [&](Application *app, const std::string newname) {
-            return std::make_unique<gui::PinLockWindow>(app, app::window::name::desktop_pin_lock);
-        });
         windowsFactory.attach(gui::window::name::dialog_confirm, [](Application *app, const std::string &name) {
             return std::make_unique<gui::DialogConfirm>(app, gui::window::name::dialog_confirm);
         });
@@ -514,8 +508,12 @@ namespace app
                               [](Application *app, const std::string &name) {
                                   return std::make_unique<gui::BluetoothCheckPasskeyWindow>(app);
                               });
-        attachPopups(
-            {gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes, gui::popup::ID::PhoneLock});
+
+        attachPopups({gui::popup::ID::Volume,
+                      gui::popup::ID::Tethering,
+                      gui::popup::ID::PhoneModes,
+                      gui::popup::ID::PhoneLock,
+                      gui::popup::ID::SimLock});
     }
 
     void ApplicationSettingsNew::destroyUserInterface()
@@ -529,7 +527,7 @@ namespace app
     void ApplicationSettingsNew::setSim(Store::GSM::SIM sim)
     {
         auto arg = (sim == Store::GSM::SIM::SIM2) ? cellular::api::SimSlot::SIM2 : cellular::api::SimSlot::SIM1;
-        bus.sendUnicast<cellular::msg::request::sim::SetActiveSim>(arg);
+        getSimLockSubject().setSim(arg);
     }
 
     Store::GSM::SIM ApplicationSettingsNew::getSim()

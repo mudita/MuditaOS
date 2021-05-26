@@ -3,33 +3,38 @@
 
 #pragma once
 
-#include "LockBox.hpp"
+#include "LockBoxAlternatingSize.hpp"
+#include <locks/data/LockData.hpp>
 
 namespace gui
 {
-    class PinLockBaseWindow;
+    class LockInputWindow;
 }
 
 namespace gui
 {
-    class SimLockBox : public LockBox
+    class SimLockBox : public LockBoxAlternatingSize
     {
       public:
-        SimLockBox(PinLockBaseWindow *LockBaseWindow) : LockWindow(LockBaseWindow)
-        {}
+        explicit SimLockBox(LockInputWindow *LockBaseWindow,
+                            locks::SimInputTypeAction simLockInputTypeAction = locks::SimInputTypeAction::UnlockWithPin)
+            : LockBoxAlternatingSize(LockBaseWindow), LockWindow(LockBaseWindow)
+        {
+            applyLockActionText(simLockInputTypeAction);
+        }
 
       private:
-        PinLockBaseWindow *LockWindow;
-        void popChar(unsigned int charNum) final;
-        void putChar(unsigned int charNum) final;
-        void clear() final;
-
+        void buildLockBox(unsigned int pinSize) final;
         void setVisibleStateInputRequired(InputActionType type) final;
         void setVisibleStateInputInvalid(InputErrorType type, unsigned int value) final;
         void setVisibleStateBlocked() final;
+        void setVisibleStateError(unsigned int errorCode) final;
+        void applyLockActionText(locks::SimInputTypeAction simLockInputTypeAction);
 
-        void buildLockBox(unsigned int inputSize) final;
-        void buildInputLabels(unsigned int inputSize);
-        void rebuildInputLabels(unsigned int inputSize);
+        LockInputWindow *LockWindow;
+        std::string textForInputRequired;
+        std::string textForInvalidInput;
+        std::string textForInvalidInputLastAttempt;
+        std::string textForInvalidInputLastAttemptWarning;
     };
 } // namespace gui

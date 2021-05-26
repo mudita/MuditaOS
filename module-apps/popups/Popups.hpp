@@ -19,6 +19,8 @@ namespace gui
             PhoneLock,
             PhoneLockInput,
             PhoneLockChangeInfo,
+            SimLock,
+            SimInfo,
         };
 
         namespace window
@@ -33,6 +35,8 @@ namespace gui
             inline constexpr auto phone_lock_input_window           = "PhoneLockInputPopup";
             inline constexpr auto phone_lock_change_info_window     = "PhoneLockChangeInfoPopup";
             inline constexpr auto power_off_window                  = "PowerOffPopup";
+            inline constexpr auto sim_unlock_window                 = "SimUnlockPopup";
+            inline constexpr auto sim_info_window                   = "SimInfoPopup";
 
         } // namespace window
 

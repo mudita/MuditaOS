@@ -27,6 +27,8 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/lock-popups/PhoneLockedWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/lock-popups/PhoneLockInputWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/lock-popups/PhoneLockChangeInfoWindow.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/lock-popups/SimLockInputWindow.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/lock-popups/SimInfoWindow.cpp"
 
 	PRIVATE
 		"${CMAKE_CURRENT_LIST_DIR}/Popups.hpp"
@@ -43,4 +45,6 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/lock-popups/PhoneLockedWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/lock-popups/PhoneLockInputWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/lock-popups/PhoneLockChangeInfoWindow.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/lock-popups/SimLockInputWindow.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/lock-popups/SimInfoWindow.hpp"
 )

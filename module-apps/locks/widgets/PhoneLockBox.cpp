@@ -10,26 +10,7 @@ namespace gui
 
     void PhoneLockBox::buildLockBox(unsigned int pinSize)
     {
-        LockWindow->buildImages("pin_lock", "pin_lock_info");
-        PhoneLockBaseBox::buildLockBox(pinSize);
-    }
-
-    top_bar::Configuration PhoneLockBox::configureTopBarLocked()
-    {
-        top_bar::Configuration appConfiguration;
-        appConfiguration.disable(top_bar::Indicator::Time);
-        appConfiguration.enable(top_bar::Indicator::Lock);
-
-        return appConfiguration;
-    }
-
-    top_bar::Configuration PhoneLockBox::configureTopBarUnLocked()
-    {
-        top_bar::Configuration appConfiguration;
-        appConfiguration.enable(top_bar::Indicator::Time);
-        appConfiguration.disable(top_bar::Indicator::Lock);
-
-        return appConfiguration;
+        LockBoxConstantSize::buildLockBox(pinSize);
     }
 
     void PhoneLockBox::applyLockActionText(locks::PhoneLockInputTypeAction phoneLockInputTypeAction)
@@ -37,7 +18,6 @@ namespace gui
         switch (phoneLockInputTypeAction) {
         case locks::PhoneLockInputTypeAction::Unlock:
             LockWindow->setTitleBar(false, false);
-            LockWindow->configureTopBar(configureTopBarLocked());
             textForInputRequired = "phone_lock_unlock";
             textForInvalidInput  = "phone_lock_unlock_invalid";
             leftBottomBarState   = false;
@@ -47,8 +27,7 @@ namespace gui
         case locks::PhoneLockInputTypeAction::ConfirmCurrent:
         case locks::PhoneLockInputTypeAction::Change:
             LockWindow->setTitleBar(true, false);
-            LockWindow->setText("phone_lock_configure", LockWindow::TextType::Title);
-            LockWindow->configureTopBar(configureTopBarUnLocked());
+            LockWindow->setText("phone_lock_configure", LockInputWindow::TextType::Title);
 
             textForInputRequired   = "phone_lock_current";
             textForInvalidInput    = "phone_lock_invalid";
@@ -58,8 +37,7 @@ namespace gui
             break;
         case locks::PhoneLockInputTypeAction::Set:
             LockWindow->setTitleBar(true, false);
-            LockWindow->setText("phone_lock_configure", LockWindow::TextType::Title);
-            LockWindow->configureTopBar(configureTopBarUnLocked());
+            LockWindow->setText("phone_lock_configure", LockInputWindow::TextType::Title);
 
             textForInputRequired   = "phone_lock_current";
             textForInvalidInput    = "phone_lock_invalid_retry";
@@ -74,9 +52,14 @@ namespace gui
 
     void PhoneLockBox::setVisibleStateBlocked()
     {
-        LockWindow->setText("phone_lock_blocked", LockWindow::TextType::Primary);
-        LockWindow->setImagesVisible(false, true);
+        LockWindow->setText("phone_lock_blocked", LockInputWindow::TextType::Primary);
+        LockWindow->setImage("info_icon_W_G");
         LockWindow->setBottomBarWidgetsActive(false, true, false);
+    }
+
+    void PhoneLockBox::setVisibleStateError(unsigned int errorCode)
+    {
+        LOG_ERROR("No use case for UnhandledError");
     }
 
     void PhoneLockBox::setVisibleStateInputRequired(InputActionType type)
@@ -85,19 +68,19 @@ namespace gui
 
         switch (type) {
         case LockBox::InputActionType::ProvideInput: {
-            LockWindow->setText(textForInputRequired, PinLockBaseWindow::TextType::Primary);
+            LockWindow->setText(textForInputRequired, LockInputWindow::TextType::Primary);
             break;
         }
         case LockBox::InputActionType::ProvideNewInput: {
-            LockWindow->setText(textForProvideNewInput, PinLockBaseWindow::TextType::Primary);
+            LockWindow->setText(textForProvideNewInput, LockInputWindow::TextType::Primary);
             break;
         }
         case LockBox::InputActionType::ConfirmNewInput:
-            LockWindow->setText(textForConfirmNewInput, PinLockBaseWindow::TextType::Primary);
+            LockWindow->setText(textForConfirmNewInput, LockInputWindow::TextType::Primary);
             break;
         }
 
-        LockWindow->setImagesVisible(true, false);
+        LockWindow->setImage("unlock_icon_W_G");
         LockWindow->setBottomBarWidgetsActive(leftBottomBarState, false, true);
     }
 
@@ -106,28 +89,26 @@ namespace gui
         switch (type) {
         case LockBox::InputErrorType::InvalidInput:
             if (value == 1) {
-                LockWindow->setText("phone_lock_unlock_last_attempt", LockWindow::TextType::Primary);
+                LockWindow->setText("phone_lock_unlock_last_attempt", LockInputWindow::TextType::Primary);
                 LockWindow->setText("phone_lock_unlock_last_attempt_warning",
-                                    LockWindow::TextType::Secondary,
-                                    {{LockWindow->getToken(LockWindow::Token::Mins), timeToUnlock}});
+                                    LockInputWindow::TextType::Secondary,
+                                    {{LockWindow->getToken(LockInputWindow::Token::Mins), timeToUnlock}});
             }
             else {
-                LockWindow->setText(textForInvalidInput,
-                                    LockWindow::TextType::Primary,
-                                    {{LockWindow->getToken(LockWindow::Token::Attempts), static_cast<int>(value)}});
+                LockWindow->setText(
+                    textForInvalidInput,
+                    LockInputWindow::TextType::Primary,
+                    {{LockWindow->getToken(LockInputWindow::Token::Attempts), static_cast<int>(value)}});
             }
             break;
 
         case LockBox::InputErrorType::NewInputConfirmFailed:
             LockWindow->setText(textForInvalidInput,
-                                LockWindow::TextType::Primary,
-                                {{LockWindow->getToken(LockWindow::Token::Attempts), static_cast<int>(value)}});
-            break;
-        case LockBox::InputErrorType::UnhandledError:
-            LOG_ERROR("No use case for UnhandledError");
+                                LockInputWindow::TextType::Primary,
+                                {{LockWindow->getToken(LockInputWindow::Token::Attempts), static_cast<int>(value)}});
             break;
         }
-        LockWindow->setImagesVisible(false, true);
+        LockWindow->setImage("info_icon_W_G");
         LockWindow->setBottomBarWidgetsActive(false, true, true);
     }
 } // namespace gui

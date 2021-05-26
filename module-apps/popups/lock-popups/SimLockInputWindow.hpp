@@ -3,21 +3,23 @@
 
 #pragma once
 
-#include <module-apps/windows/AppWindow.hpp>
-#include <module-gui/gui/widgets/Text.hpp>
-#include <module-gui/gui/widgets/Icon.hpp>
+#include <locks/data/LockData.hpp>
+#include <locks/widgets/Lock.hpp>
+#include <locks/widgets/LockBox.hpp>
+#include <locks/windows/LockInputWindow.hpp>
 
 namespace gui
 {
-    class PostUpdateWindow : public AppWindow
+    class SimLockInputWindow : public LockInputWindow
     {
-        Icon *infoIcon = nullptr;
+      private:
+        locks::SimInputTypeAction simLockInputTypeAction = locks::SimInputTypeAction::UnlockWithPin;
+        unsigned int errorCode                           = 0;
 
-        void setVisibleState();
-        std::string currentOsVersion;
+        void setVisibleState() override;
 
       public:
-        explicit PostUpdateWindow(app::Application *app);
+        SimLockInputWindow(app::Application *app, const std::string &window_name);
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         bool onInput(const InputEvent &inputEvent) override;
 
@@ -26,4 +28,5 @@ namespace gui
         void destroyInterface() override;
         top_bar::Configuration configureTopBar(top_bar::Configuration appConfiguration) override;
     };
+
 } /* namespace gui */

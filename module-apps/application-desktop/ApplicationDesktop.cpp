@@ -6,7 +6,6 @@
 #include "MessageType.hpp"
 #include "windows/DesktopMainWindow.hpp"
 #include "windows/MenuWindow.hpp"
-#include "locks/windows/PinLockWindow.hpp"
 #include "windows/DeadBatteryWindow.hpp"
 #include "windows/LogoWindow.hpp"
 #include "windows/ChargingBatteryWindow.hpp"
@@ -28,7 +27,6 @@
 #include <service-appmgr/Controller.hpp>
 #include <service-cellular/ServiceCellular.hpp>
 #include <service-cellular/CellularMessage.hpp>
-#include <service-cellular-api>
 #include <service-db/QueryMessage.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <magic_enum.hpp>
@@ -46,55 +44,13 @@ namespace app
                                            sys::phone_modes::PhoneMode mode,
                                            StartInBackground startInBackground)
         : Application(std::move(name), std::move(parent), mode, startInBackground), AsyncCallbackReceiver(this),
-          lockHandler(this), dbNotificationHandler(this)
+          dbNotificationHandler(this)
     {
         using namespace gui::top_bar;
         topBarManager->enableIndicators({Indicator::Signal, Indicator::Time, Indicator::Battery, Indicator::SimCard});
         topBarManager->set(Indicator::SimCard,
                            std::make_shared<SIMConfiguration>(SIMConfiguration::DisplayMode::OnlyInactiveState));
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
-
-        addActionReceiver(app::manager::actions::RequestPin, [this](auto &&data) {
-            lockHandler.handlePasscodeRequest(locks::Lock::LockType::SimPin, std::move(data));
-            return actionHandled();
-        });
-
-        addActionReceiver(app::manager::actions::RequestPuk, [this](auto &&data) {
-            lockHandler.handlePasscodeRequest(locks::Lock::LockType::SimPuk, std::move(data));
-            return actionHandled();
-        });
-
-        addActionReceiver(app::manager::actions::RequestPinChange, [this](auto &&data) {
-            lockHandler.handlePinChangeRequest(std::move(data));
-            return actionHandled();
-        });
-
-        addActionReceiver(app::manager::actions::RequestPinDisable, [this](auto &&data) {
-            lockHandler.handlePinEnableRequest(std::forward<decltype(data)>(data),
-                                               cellular::api::SimLockState::Disabled);
-            return actionHandled();
-        });
-
-        addActionReceiver(app::manager::actions::RequestPinEnable, [this](auto &&data) {
-            lockHandler.handlePinEnableRequest(std::forward<decltype(data)>(data),
-                                               cellular::api::SimLockState::Enabled);
-            return actionHandled();
-        });
-
-        addActionReceiver(app::manager::actions::BlockSim, [this](auto &&data) {
-            lockHandler.handleSimBlocked(std::move(data));
-            return actionHandled();
-        });
-
-        addActionReceiver(app::manager::actions::UnlockSim, [this](auto &&data) {
-            lockHandler.handleUnlockSim(std::move(data));
-            return actionHandled();
-        });
-
-        addActionReceiver(app::manager::actions::DisplayCMEError, [this](auto &&data) {
-            lockHandler.handleCMEError(std::move(data));
-            return actionHandled();
-        });
 
         addActionReceiver(app::manager::actions::ShowMMIResponse, [this](auto &&data) {
             switchWindow(app::window::name::desktop_mmi_pull, std::move(data));
@@ -192,15 +148,6 @@ namespace app
     auto ApplicationDesktop::handle(cellular::StateChange *msg) -> bool
     {
         assert(msg);
-        if (msg->request == cellular::service::State::ST::URCReady) {
-            if (need_sim_select && !lockHandler.isScreenLocked()) {
-                manager::Controller::sendAction(this, manager::actions::SelectSimCard);
-                return true;
-            }
-            else if (need_sim_select == false) {
-                bus.sendUnicast(std::make_shared<CellularSimProcedureMessage>(), ServiceCellular::serviceName);
-            }
-        }
         if (msg->request == cellular::service::State::ST::ModemFatalFailure) {
             switchWindow(app::window::name::desktop_reboot);
         }
@@ -242,68 +189,6 @@ namespace app
             return sys::msgHandled();
         });
 
-        auto createPinChangedSuccessfullyDialog =
-            [](app::ApplicationDesktop *app) -> std::unique_ptr<gui::DialogMetadataMessage> {
-            return std::make_unique<gui::DialogMetadataMessage>(
-                gui::DialogMetadata{utils::translate("app_desktop_sim_change_pin"),
-                                    "success_icon_W_G",
-                                    utils::translate("app_desktop_sim_pin_changed_successfully"),
-                                    "",
-                                    [app]() {
-                                        app->switchWindow(app::window::name::desktop_main_window);
-                                        return true;
-                                    }});
-        };
-
-        connect(typeid(cellular::msg::request::sim::ChangePin::Response),
-                [&](sys::Message *request) -> sys::MessagePointer {
-                    auto response = dynamic_cast<cellular::msg::request::sim::ChangePin::Response *>(request);
-                    if (response->retCode) {
-                        auto metaData = createPinChangedSuccessfullyDialog(this);
-                        switchWindow(
-                            gui::window::name::dialog_confirm, gui::ShowMode::GUI_SHOW_INIT, std::move(metaData));
-                    }
-                    else {
-                        lockHandler.handlePinChangeRequestFailed();
-                    }
-                    return sys::MessageNone{};
-                });
-
-        connect(typeid(cellular::msg::request::sim::UnblockWithPuk::Response),
-                [&](sys::Message *request) -> sys::MessagePointer {
-                    auto response = dynamic_cast<cellular::msg::request::sim::UnblockWithPuk::Response *>(request);
-                    if (response->retCode) {
-                        auto metaData = createPinChangedSuccessfullyDialog(this);
-                        switchWindow(
-                            gui::window::name::dialog_confirm, gui::ShowMode::GUI_SHOW_INIT, std::move(metaData));
-                    }
-                    return sys::MessageNone{};
-                });
-
-        connect(typeid(cellular::msg::request::sim::SetPinLock::Response),
-                [&](sys::Message *request) -> sys::MessagePointer {
-                    auto response = dynamic_cast<cellular::msg::request::sim::SetPinLock::Response *>(request);
-                    if (response->retCode) {
-                        auto metaData = std::make_unique<gui::DialogMetadataMessage>(
-                            gui::DialogMetadata{"",
-                                                "success_icon_W_G",
-                                                response->lock == cellular::api::SimLockState::Disabled
-                                                    ? utils::translate("app_desktop_sim_card_unlocked")
-                                                    : utils::translate("app_desktop_sim_card_locked"),
-                                                "",
-                                                [this]() {
-                                                    switchWindow(app::window::name::desktop_main_window);
-                                                    return true;
-                                                }});
-                        switchWindow(
-                            gui::window::name::dialog_confirm, gui::ShowMode::GUI_SHOW_INIT, std::move(metaData));
-                    }
-                    else {
-                        lockHandler.handlePinEnableRequestFailed(response->lock);
-                    }
-                    return sys::MessageNone{};
-                });
-
         connect(typeid(db::NotificationMessage), [&](sys::Message *request) {
             auto notificationMessage = static_cast<db::NotificationMessage *>(request);
             dbNotificationHandler.handle(notificationMessage);
@@ -313,20 +198,6 @@ namespace app
         auto msgToSend =
             std::make_shared<sdesktop::UpdateOsMessage>(updateos::UpdateMessageType::UpdateCheckForUpdateOnce);
         bus.sendUnicast(msgToSend, service::name::service_desktop);
-
-        auto selectedSim = magic_enum::enum_cast<Store::GSM::SIM>(
-            settings->getValue(settings::SystemProperties::activeSim, settings::SettingsScope::Global));
-        if (selectedSim.has_value()) {
-            Store::GSM::get()->selected = selectedSim.value();
-        }
-        else {
-            Store::GSM::get()->selected = Store::GSM::SIM::NONE;
-        }
-
-        settings->registerValueChange(
-            settings::SystemProperties::activeSim,
-            [this](const std::string &value) { activeSimChanged(value); },
-            settings::SettingsScope::Global);
 
         settings->registerValueChange(
             settings::SystemProperties::osCurrentVersion,
@@ -353,9 +224,6 @@ namespace app
         using namespace app::window::name;
         windowsFactory.attach(desktop_main_window, [](Application *app, const std::string &name) {
             return std::make_unique<gui::DesktopMainWindow>(app);
-        });
-        windowsFactory.attach(desktop_pin_lock, [&](Application *app, const std::string newname) {
-            return std::make_unique<gui::PinLockWindow>(app, desktop_pin_lock);
         });
         windowsFactory.attach(desktop_menu, [this](Application *app, const std::string newname) {
             return std::make_unique<gui::MenuWindow>(app, dbNotificationHandler);
@@ -395,8 +263,11 @@ namespace app
             return std::make_unique<gui::DialogConfirm>(app, name);
         });
 
-        attachPopups(
-            {gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes, gui::popup::ID::PhoneLock});
+        attachPopups({gui::popup::ID::Volume,
+                      gui::popup::ID::Tethering,
+                      gui::popup::ID::PhoneModes,
+                      gui::popup::ID::PhoneLock,
+                      gui::popup::ID::SimLock});
     }
 
     void ApplicationDesktop::destroyUserInterface()
@@ -410,21 +281,6 @@ namespace app
             return true;
         }
         return false;
-    }
-
-    void ApplicationDesktop::activeSimChanged(std::string value)
-    {
-        auto sim = magic_enum::enum_cast<Store::GSM::SIM>(value);
-        if (sim.has_value()) {
-            Store::GSM::get()->selected = sim.value();
-        }
-        else {
-            Store::GSM::get()->selected = Store::GSM::SIM::NONE;
-        }
-
-        if (Store::GSM::SIM::NONE == sim) {
-            need_sim_select = true;
-        }
     }
 
     void ApplicationDesktop::handleLowBatteryNotification(manager::actions::ActionParamsPtr &&data)
