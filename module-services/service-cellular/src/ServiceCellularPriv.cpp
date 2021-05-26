@@ -61,21 +61,23 @@ namespace cellular::internal
         });
         owner->connect(typeid(request::sim::ChangePin), [&](sys::Message *request) -> sys::MessagePointer {
             auto msg = static_cast<request::sim::ChangePin *>(request);
-            return std::make_shared<request::sim::ChangePin::Response>(simCard->handleChangePin(msg->oldPin, msg->pin));
+            return std::make_shared<request::sim::ChangePin::Response>(simCard->handleChangePin(msg->oldPin, msg->pin),
+                                                                       simCard->getAttemptsPin());
         });
         owner->connect(typeid(request::sim::UnblockWithPuk), [&](sys::Message *request) -> sys::MessagePointer {
             auto msg = static_cast<request::sim::UnblockWithPuk *>(request);
             return std::make_shared<request::sim::UnblockWithPuk::Response>(
-                simCard->handleUnblockWithPuk(msg->puk, msg->pin));
+                simCard->handleUnblockWithPuk(msg->puk, msg->pin), simCard->getAttemptsPuk());
         });
         owner->connect(typeid(request::sim::SetPinLock), [&](sys::Message *request) -> sys::MessagePointer {
             auto msg = static_cast<request::sim::SetPinLock *>(request);
-            return std::make_shared<request::sim::SetPinLock::Response>(simCard->handleSetPinLock(msg->pin, msg->lock),
-                                                                        msg->lock);
+            return std::make_shared<request::sim::SetPinLock::Response>(
+                simCard->handleSetPinLock(msg->pin, msg->lockState), msg->lockState, simCard->getAttemptsPin());
         });
         owner->connect(typeid(request::sim::PinUnlock), [&](sys::Message *request) -> sys::MessagePointer {
             auto msg = static_cast<request::sim::PinUnlock *>(request);
-            return std::make_shared<request::sim::PinUnlock::Response>(simCard->handlePinUnlock(msg->pin));
+            return std::make_shared<request::sim::PinUnlock::Response>(simCard->handlePinUnlock(msg->pin),
+                                                                       simCard->getAttemptsPin());
         });
         owner->connect(typeid(internal::msg::SimStateChanged), [&](sys::Message *request) -> sys::MessagePointer {
             auto msg = static_cast<internal::msg::SimStateChanged *>(request);

@@ -63,6 +63,16 @@ namespace cellular
             return isPinLocked();
         }
 
+        unsigned int SimCard::getAttemptsPin(sim::Pin pin) const
+        {
+            return attemptsPin[static_cast<int>(pin)];
+        }
+
+        unsigned int SimCard::getAttemptsPuk(sim::Pin pin) const
+        {
+            return attemptsPuk[static_cast<int>(pin)];
+        }
+
         bool SimCard::handleChangePin(const api::SimCode &oldPin, const api::SimCode &pin)
         {
             const auto _oldPin = internal::simCodeToString(oldPin);
@@ -110,11 +120,11 @@ namespace cellular
             case at::SimState::SimPin:
                 [[fallthrough]];
             case at::SimState::SimPin2: {
-                if (auto pc = getAttemptsCounters(state == at::SimState::SimPin ? sim::Pin::PIN1 : sim::Pin::PIN2);
-                    pc) {
-                    if (pc.value().PukCounter != 0) {
+                auto pin = (state == at::SimState::SimPin) ? sim::Pin::PIN1 : sim::Pin::PIN2;
+                if (readAttemptsCounters(pin)) {
+                    if (attemptsPuk[static_cast<int>(pin)] != 0) {
                         if (onNeedPin)
-                            onNeedPin(pc.value().PinCounter);
+                            onNeedPin(attemptsPin[static_cast<int>(pin)]);
                         break;
                     }
                 }
@@ -125,11 +135,11 @@ namespace cellular
             case at::SimState::SimPuk:
                 [[fallthrough]];
             case at::SimState::SimPuk2: {
-                if (auto pc = getAttemptsCounters(state == at::SimState::SimPuk ? sim::Pin::PIN1 : sim::Pin::PIN2);
-                    pc) {
-                    if (pc.value().PukCounter != 0) {
+                auto pin = (state == at::SimState::SimPuk) ? sim::Pin::PIN1 : sim::Pin::PIN2;
+                if (readAttemptsCounters(pin)) {
+                    if (attemptsPuk[static_cast<int>(pin)] != 0) {
                         if (onNeedPuk)
-                            onNeedPuk(pc.value().PukCounter);
+                            onNeedPuk(attemptsPuk[static_cast<int>(pin)]);
                         break;
                     }
                 }
@@ -167,20 +177,22 @@ namespace cellular
                 onSimEvent();
         }
 
-        std::optional<at::response::qpinc::AttemptsCounters> SimCard::getAttemptsCounters(sim::Pin pin) const
+        bool SimCard::readAttemptsCounters(sim::Pin pin)
         {
             if (!ready()) {
-                return std::nullopt;
+                return false;
             }
 
-            auto resp =
-                channel->cmd(at::factory(at::AT::QPINC) + "\"" + internal::pinString[static_cast<int>(pin)] + "\"");
+            auto pinid = static_cast<int>(pin);
+            auto resp  = channel->cmd(at::factory(at::AT::QPINC) + "\"" + internal::pinString[pinid] + "\"");
             at::response::qpinc::AttemptsCounters ret;
             if (at::response::parseQPINC(resp, ret)) {
-                return ret;
+                attemptsPin[pinid] = ret.PinCounter;
+                attemptsPuk[pinid] = ret.PukCounter;
+                return true;
             }
 
-            return std::nullopt;
+            return false;
         }
 
         bool SimCard::processPinResult(sim::Result result)
@@ -194,26 +206,28 @@ namespace cellular
                 if (onUnhandledCME)
                     onUnhandledCME(static_cast<unsigned int>(result));
             }
+            // refetch attempts counters after access
+            readAttemptsCounters();
             return result == sim::Result::OK;
         }
 
-        sim::Result SimCard::supplyPin(const std::string &pin) const
+        sim::Result SimCard::supplyPin(const std::string &pin)
         {
             return sendCommand(sim::LockType::PIN, at::factory(at::AT::CPIN) + "\"" + pin + "\"");
         }
 
-        sim::Result SimCard::changePin(const std::string &oldPin, const std::string &newPin) const
+        sim::Result SimCard::changePin(const std::string &oldPin, const std::string &newPin)
         {
             return sendCommand(sim::LockType::PIN,
                                at::factory(at::AT::CPWD) + "\"SC\", \"" + oldPin + "\",\"" + newPin + "\"");
         }
 
-        sim::Result SimCard::supplyPuk(const std::string &puk, const std::string &pin) const
+        sim::Result SimCard::supplyPuk(const std::string &puk, const std::string &pin)
         {
             return sendCommand(sim::LockType::PUK, at::factory(at::AT::CPIN) + "\"" + puk + "\"" + ",\"" + pin + "\"");
         }
 
-        sim::Result SimCard::setPinLock(const std::string &pin, bool lock) const
+        sim::Result SimCard::setPinLock(const std::string &pin, bool lock)
         {
             return sendCommand(sim::LockType::PIN,
                                at::factory(at::AT::CLCK) + "\"SC\"," + (lock ? "1" : "0") + ",\"" + pin + "\"");
@@ -245,16 +259,16 @@ namespace cellular
             return at::SimState::Unknown;
         }
 
-        sim::Result SimCard::sendCommand(sim::LockType check, const at::Cmd &cmd) const
+        sim::Result SimCard::sendCommand(sim::LockType check, const at::Cmd &cmd)
         {
-            if (auto pc = getAttemptsCounters(); pc) {
+            if (readAttemptsCounters()) {
                 switch (check) {
                 case sim::LockType::PIN:
-                    if (pc.value().PinCounter == 0)
+                    if (attemptsPin[0] == 0)
                         return sim::Result::Locked;
                     break;
                 case sim::LockType::PUK:
-                    if (pc.value().PukCounter == 0)
+                    if (attemptsPuk[0] == 0)
                         return sim::Result::Locked;
                     break;
                 }

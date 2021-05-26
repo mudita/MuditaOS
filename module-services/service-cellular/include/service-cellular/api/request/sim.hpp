@@ -44,8 +44,9 @@ namespace cellular::msg::request::sim
 
         struct Response : msg::Response
         {
-            explicit Response(bool retCode) : msg::Response(retCode)
+            explicit Response(bool retCode, unsigned int attempts) : msg::Response(retCode), attempts(attempts)
             {}
+            const unsigned int attempts;
         };
     };
 
@@ -60,8 +61,9 @@ namespace cellular::msg::request::sim
 
         struct Response : msg::Response
         {
-            explicit Response(bool retCode) : msg::Response(retCode)
+            explicit Response(bool retCode, unsigned int attempts) : msg::Response(retCode), attempts(attempts)
             {}
+            const unsigned int attempts;
         };
     };
 
@@ -76,8 +78,9 @@ namespace cellular::msg::request::sim
 
         struct Response : msg::Response
         {
-            explicit Response(bool retCode) : msg::Response(retCode)
+            explicit Response(bool retCode, unsigned int attempts) : msg::Response(retCode), attempts(attempts)
             {}
+            const unsigned int attempts;
         };
     };
 
@@ -85,16 +88,18 @@ namespace cellular::msg::request::sim
      */
     struct SetPinLock : msg::Request
     {
-        explicit SetPinLock(api::SimLockState lock, const api::SimCode &pin) : lock(lock), pin(pin)
+        explicit SetPinLock(api::SimLockState lockState, const api::SimCode &pin) : lockState(lockState), pin(pin)
         {}
-        const api::SimLockState lock;
+        const api::SimLockState lockState;
         const api::SimCode pin;
 
         struct Response : msg::Response
         {
-            explicit Response(bool retCode, api::SimLockState lock) : msg::Response(retCode), lock(lock)
+            explicit Response(bool retCode, api::SimLockState lockState, unsigned int attempts)
+                : msg::Response(retCode), lockState(lockState), attempts(attempts)
             {}
-            const api::SimLockState lock;
+            const api::SimLockState lockState;
+            const unsigned int attempts;
         };
     };
 } // namespace cellular::msg::request::sim

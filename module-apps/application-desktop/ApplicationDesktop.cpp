@@ -287,7 +287,7 @@ namespace app
                         auto metaData = std::make_unique<gui::DialogMetadataMessage>(
                             gui::DialogMetadata{"",
                                                 "success_icon_W_G",
-                                                response->lock == cellular::api::SimLockState::Disabled
+                                                response->lockState == cellular::api::SimLockState::Disabled
                                                     ? utils::translate("app_desktop_sim_card_unlocked")
                                                     : utils::translate("app_desktop_sim_card_locked"),
                                                 "",
@@ -299,7 +299,7 @@ namespace app
                             gui::window::name::dialog_confirm, gui::ShowMode::GUI_SHOW_INIT, std::move(metaData));
                     }
                     else {
-                        lockHandler.handlePinEnableRequestFailed(response->lock);
+                        lockHandler.handlePinEnableRequestFailed(response->lockState);
                     }
                     return sys::MessageNone{};
                 });
