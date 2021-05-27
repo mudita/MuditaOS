@@ -22,7 +22,7 @@ namespace sdesktop
         {
             context.setResponseStatus(http::Code::OK);
             context.setEndpoint(EndpointType::developerMode);
-            context.setResponseBody(json11::Json::object{{json::developerMode::isLocked, isLocked}});
+            context.setResponseBody(json11::Json::object{{json::developerMode::phoneLocked, isLocked}});
         }
 
         CellularStateInfoRequestEvent::CellularStateInfoRequestEvent(std::string stateStr)

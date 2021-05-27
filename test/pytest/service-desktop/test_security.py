@@ -2,6 +2,8 @@
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 import pytest
+import time
+
 from harness.interface.defs import status
 
 
@@ -52,18 +54,21 @@ def test_all_other_endpoints_phone_locked_with_code(harness):
         ret = harness.endpoint_request(endpoint_name, "del", body)
         assert ret["status"] == status["Forbidden"]
 
+    body = {"getInfo": "simState"}
     ret = harness.endpoint_request("developerMode", "get", body)
     assert ret["status"] == status["OK"]
 
 
 @pytest.mark.service_desktop_test
-@pytest.mark.usefixtures("phone_unlocked")
+@pytest.mark.usefixtures("phone_locked")
 def test_security_phone_locked_without_code(harness):
+
     body = {"phoneLockCodeEnabled": False}
     ret = harness.endpoint_request("developerMode", "put", body)
     assert ret["status"] == status["OK"]
 
-    harness.lock_phone()
+    time.sleep(.1)
+
     body = {}
     ret = harness.endpoint_request("usbSecurity", "get", body)
     assert ret["status"] == status["OK"]
@@ -73,26 +78,57 @@ def test_security_phone_locked_without_code(harness):
     assert ret["status"] == status["OK"]
 
     harness.lock_phone()
+    time.sleep(.1)
+
     body = {}
     ret = harness.endpoint_request("usbSecurity", "get", body)
     assert ret["status"] == status["Forbidden"]
 
 
 @pytest.mark.service_desktop_test
-@pytest.mark.usefixtures("phone_unlocked")
+@pytest.mark.usefixtures("phone_locked")
 def test_security_unlock_phone(harness):
 
+    """
+    Attempt unlocking with wrong passcode: 1111
+    Assuming 1111 is not the actual passcode :-)
+    """
     body = {"phoneLockCode": "1111"}
     ret = harness.endpoint_request("usbSecurity", "put", body)
+    assert ret["status"] == status["OK"]
+
+    time.sleep(.1)
+
+    body = {}
+    ret = harness.endpoint_request("usbSecurity", "get", body)
     assert ret["status"] == status["Forbidden"]
 
+    time.sleep(.1)
+
+    """
+    Attempt unlocking with too short passcode: 1
+    """
     body = {"phoneLockCode": "1"}
     ret = harness.endpoint_request("usbSecurity", "put", body)
     assert ret["status"] == status["BadRequest"]
 
+    time.sleep(.1)
+
+    body = {}
+    ret = harness.endpoint_request("usbSecurity", "get", body)
+    assert ret["status"] == status["Forbidden"]
+
+    time.sleep(.1)
+
+    """
+    Attempt unlocking with correct passcode: 3333
+    Assuming 3333 is the actual passcode :-)
+    """
     body = {"phoneLockCode": "3333"}
     ret = harness.endpoint_request("usbSecurity", "put", body)
     assert ret["status"] == status["OK"]
+
+    time.sleep(.1)
 
     body = {}
     ret = harness.endpoint_request("deviceInfo", "get", body)

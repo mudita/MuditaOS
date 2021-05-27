@@ -71,7 +71,7 @@ auto DeveloperModeHelper::processPut(Context &context) -> ProcessResult
         code       = toCode(owner->bus.sendUnicast(std::move(msg), service::name::evt_manager));
         return {sent::delayed, std::nullopt};
     }
-    else if (body[json::developerMode::isLocked].bool_value()) {
+    else if (body[json::developerMode::phoneLocked].bool_value()) {
         auto event = std::make_unique<sdesktop::developerMode::ScreenlockCheckEvent>();
         auto msg   = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
         code       = toCode(owner->bus.sendUnicast(std::move(msg), "ApplicationManager"));
@@ -115,12 +115,10 @@ auto DeveloperModeHelper::processPut(Context &context) -> ProcessResult
                                service::name::system_manager);
         return {sent::delayed, std::nullopt};
     }
-    else if (body[json::developerMode::usbSecurityStatus].is_string()) {
-        std::shared_ptr<sys::DataMessage> msg = std::make_shared<sdesktop::usb::USBConfigured>();
-        if (body[json::developerMode::usbSecurityStatus].string_value() == json::developerMode::usbUnlocked) {
-            msg = std::make_shared<locks::UnlockedPhone>();
-        }
-        code = toCode(owner->bus.sendUnicast(std::move(msg), "ServiceDesktop"));
+    else if (body[json::developerMode::phoneLockCodeEnabled].is_bool()) {
+        auto phoneLockState = body[json::developerMode::phoneLockCodeEnabled].bool_value();
+        auto msg            = std::make_shared<locks::ExternalPhoneLockAvailabilityChange>(phoneLockState);
+        code                = toCode(owner->bus.sendUnicast(std::move(msg), "ApplicationManager"));
     }
     else if (auto switchData = body[json::developerMode::switchApplication].object_items(); !switchData.empty()) {
         auto msg = std::make_shared<app::manager::SwitchRequest>(
