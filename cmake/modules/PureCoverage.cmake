@@ -22,7 +22,6 @@ if(COVERAGE_ENABLE)
         board/linux/libiosyscalls/.*
         host-tools/.*
         module-audio/Audio/decoder/dr_flac.h
-        module-audio/Audio/decoder/minimp3/minimp3.h
         module-bluetooth/Bluetooth/glucode/.*
         module-bluetooth/lib/.*
         module-db/Database/sqlite3.c
@@ -31,17 +30,15 @@ if(COVERAGE_ENABLE)
         module-utils/gsl/.*
         module-utils/json/.*
         module-utils/libphonenumber/.*
-        module-utils/microtar/.*
         module-utils/parallel-hashmap/.*
         module-utils/protobuf/.*
-        third-party/pugixml/.*
         module-utils/re2/.*
         module-utils/segger/.*
-        module-utils/sml/.*
         module-utils/taglib/.*
         module-utils/tinyexpr/.*
         source/main.cpp
         test/.*
+        third-party/.*
     )
 
     SET(GCOVR_ADDITIONAL_ARGS

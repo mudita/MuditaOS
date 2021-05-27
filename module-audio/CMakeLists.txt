@@ -66,12 +66,14 @@ set_source_files_properties(
 )
 
 target_link_libraries(${PROJECT_NAME}
-    ${AUDIO_BOARD_LIBRARY}
-    module-bsp
-    module-os
-    module-utils
-    module-sys
-    tag
+        PUBLIC
+                ${AUDIO_BOARD_LIBRARY}
+                module-bsp
+                module-os
+                module-utils
+                module-sys
+                tag
+                minimp3::minimp3
 )
 
 if (${ENABLE_TESTS})
