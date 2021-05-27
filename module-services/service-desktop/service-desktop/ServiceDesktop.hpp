@@ -110,9 +110,6 @@ class ServiceDesktop : public sys::Service
     }
 
   private:
-    void processUSBHandshake(sdesktop::usb::USBHandshake *msg);
-
-  private:
     std::unique_ptr<sdesktop::USBSecurityModel> usbSecurityModel;
     std::unique_ptr<settings::Settings> settings;
     sys::TimerHandle transferTimer;

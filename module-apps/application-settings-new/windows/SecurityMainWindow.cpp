@@ -11,8 +11,7 @@
 
 namespace gui
 {
-    SecurityMainWindow::SecurityMainWindow(app::Application *app, app::settingsInterface::SecuritySettings *settings)
-        : BaseSettingsWindow(app, window::name::security), securitySettings(settings)
+    SecurityMainWindow::SecurityMainWindow(app::Application *app) : BaseSettingsWindow(app, window::name::security)
     {}
 
     void SecurityMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
