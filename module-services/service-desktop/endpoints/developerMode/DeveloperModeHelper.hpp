@@ -50,21 +50,23 @@ namespace parserFSM
         inline constexpr auto AT                     = "AT";
         inline constexpr auto timeout                = "timeout";
         inline constexpr auto focus                  = "focus";
-        inline constexpr auto isLocked               = "isLocked";
+        inline constexpr auto phoneLocked            = "phoneLocked";
         inline constexpr auto changeSim              = "changeSim";
         inline constexpr auto changeAutoLockTimeout  = "changeAutoLockTimeout";
         inline constexpr auto smsCommand             = "smsCommand";
         inline constexpr auto changeCellularStateCmd = "changeCellularStateCmd";
         inline constexpr auto getInfo                = "getInfo";
         inline constexpr auto tethering              = "tethering";
-        inline constexpr auto usbSecurityStatus      = "usbSecurityStatus";
         inline constexpr auto switchApplication      = "switchApplication";
         inline constexpr auto switchWindow           = "switchWindow";
+        inline constexpr auto phoneLockCodeEnabled   = "phoneLockCodeEnabled";
+
         namespace switchData
         {
             inline constexpr auto applicationName = "applicationName";
             inline constexpr auto windowName      = "windowName";
         } // namespace switchData
+
         /// values for getInfo cmd
         inline constexpr auto simStateInfo      = "simState";
         inline constexpr auto cellularStateInfo = "cellularState";
@@ -76,10 +78,6 @@ namespace parserFSM
         /// values for tethering
         inline constexpr auto tetheringOn  = "on";
         inline constexpr auto tetheringOff = "off";
-
-        // values for usb security
-        inline constexpr auto usbLocked   = "locked";
-        inline constexpr auto usbUnlocked = "unlocked";
 
     } // namespace json::developerMode
 

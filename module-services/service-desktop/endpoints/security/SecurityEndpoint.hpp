@@ -21,8 +21,8 @@ namespace sys
 
 enum class EndpointSecurity
 {
-    Allow = 0,
-    Block = 1
+    Allow,
+    Block
 };
 
 class SecurityEndpoint : public parserFSM::Endpoint

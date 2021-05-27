@@ -9,8 +9,6 @@ namespace settings
     {
         constexpr inline auto activeSim                = "gs_active_sim";
         constexpr inline auto lockPassHash             = "gs_lock_pass_hash";
-        constexpr inline auto usbSecurity              = "gs_usb_security";
-        constexpr inline auto usbDevices               = "gs_usb_devices";
         constexpr inline auto lockScreenPasscodeIsOn   = "gs_lock_screen_passcode_is_on";
         constexpr inline auto autoLockTimeInSec        = "gs_lock_time";
         constexpr inline auto displayLanguage          = "gs_display_language";
