@@ -7,12 +7,14 @@ namespace purefs::fs
     //! Event monitor flag
     enum class inotify_flags : unsigned
     {
-        mattrib        = 0x01, //! Attribute changed
-        mclose_write   = 0x02, //! File closed after write
-        mclose_nowrite = 0x04, //! File closed without write
-        mdelete        = 0x08, //! File was deleted
-        mmove          = 0x10, //! File moved
-        mopen          = 0x20  //! File was opended
+        attrib        = 0x01, //! Attribute changed
+        close_write   = 0x02, //! File closed after write
+        close_nowrite = 0x04, //! File closed without write
+        del           = 0x08, //! File was deleted
+        move_src      = 0x10, //! File moved
+        move_dst      = 0x20, //! File moved
+        open          = 0x40, //! File was opended
+        dmodify       = 0x80, //! Directory entry modified
     };
     inline auto operator|(inotify_flags fl1, inotify_flags fl2)
     {

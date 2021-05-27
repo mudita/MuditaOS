@@ -3,12 +3,19 @@
 
 #pragma once
 #include <Service/Message.hpp>
+#include <purefs/fs/inotify_flags.hpp>
 
-namespace message
+namespace purefs::fs::message
 {
     //! Inotify message received by the notifier class
-    class inotify final : public ::sys::DataMessage
+    struct inotify final : public ::sys::DataMessage
     {
-      public:
+        inotify(inotify_flags _flags, std::string_view _name, std::string_view _name_prev)
+            : flags(_flags), name(_name), name_prev(_name_prev)
+        {}
+        virtual ~inotify() = default;
+        const inotify_flags flags;
+        const std::string name;
+        const std::string name_prev;
     };
 } // namespace message

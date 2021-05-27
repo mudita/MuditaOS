@@ -22,7 +22,8 @@ namespace purefs::fs
         };
     }
     filesystem::filesystem(std::shared_ptr<blkdev::disk_manager> diskmm)
-        : m_diskmm(diskmm), m_lock(new cpp_freertos::MutexRecursive)
+        : m_diskmm(diskmm), m_lock(std::make_unique<cpp_freertos::MutexRecursive>()),
+          m_notifier(std::make_unique<internal::notifier>())
     {}
 
     filesystem::~filesystem()
