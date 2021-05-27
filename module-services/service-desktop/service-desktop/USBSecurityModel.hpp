@@ -17,40 +17,29 @@ namespace sys
 
 namespace sdesktop
 {
-    namespace usb
-    {
-        class USBHandshake;
-    };
-
-    using DeviceID = std::string;
-    using Passcode = unsigned int;
-
     class USBSecurityModel
     {
       public:
+        enum PhoneLockState : bool
+        {
+            Unlocked = false,
+            Locked
+        };
         explicit USBSecurityModel(sys::Service *ownerSrv, settings::Settings *srvSettings);
 
-        auto isBound(DeviceID id) const -> bool;
-        auto addDevice(DeviceID id, Passcode passcode) -> bool;
-        bool checkPasscode(const Passcode &passcode);
+        auto isPasscodeEnabled() const -> bool;
+
+        auto setPhoneLocked() -> void;
+        auto setPhoneUnlocked() -> void;
+
+        auto isPhoneLocked() const -> bool;
 
         auto isSecurityEnabled() const -> bool;
-        void enableEndpointSecurity(bool securityEnabled);
-
-        bool processHandshake(const sdesktop::usb::USBHandshake *handshake);
-
-        void setEndpointSecurity(EndpointSecurity security);
 
         auto getEndpointSecurity() const -> EndpointSecurity;
 
       private:
-        std::set<DeviceID> parseDevices(const std::string &value) const;
-        std::string dumpDevices(const std::set<DeviceID> &devices) const;
-
-      private:
-        unsigned int lockPassHash = 0;
-        EndpointSecurity endpointSecurity;
-        std::set<DeviceID> bound;
+        PhoneLockState phoneLocked;
         settings::Settings *settings;
     };
 }; // namespace sdesktop

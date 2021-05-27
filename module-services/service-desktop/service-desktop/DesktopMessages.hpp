@@ -101,46 +101,6 @@ namespace sdesktop
             USBDisconnected() : sys::DataMessage(MessageType::USBDisconnected)
             {}
             ~USBDisconnected() override = default;
-        };
-
-        class USBSecurityOn : public sys::DataMessage
-        {
-          public:
-            USBSecurityOn() : sys::DataMessage(MessageType::USBSecurityOn)
-            {}
-            ~USBSecurityOn() override = default;
-        };
-
-        class USBSecurityOff : public sys::DataMessage
-        {
-          public:
-            USBSecurityOff() : sys::DataMessage(MessageType::USBSecurityOff)
-            {}
-            ~USBSecurityOff() override = default;
-        };
-
-        class USBHandshake : public sys::DataMessage
-        {
-          public:
-            USBHandshake() : sys::DataMessage(MessageType::USBHandshake)
-            {}
-            USBHandshake(const std::string &id, unsigned int passcode)
-                : sys::DataMessage(MessageType::USBHandshake), id(id), passcode(passcode)
-            {}
-            ~USBHandshake() override = default;
-
-            auto getId() const -> std::string
-            {
-                return id;
-            }
-            auto getPasscode() const
-            {
-                return passcode;
-            }
-
-          private:
-            const std::string id;
-            const unsigned int passcode = 0;
         }; // namespace usb
 
     } // namespace usb
@@ -178,7 +138,6 @@ namespace sdesktop
             explicit ScreenlockCheckEvent(bool isLocked);
         };
     } // namespace developerMode
-
 
     namespace transfer
     {

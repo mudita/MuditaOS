@@ -16,7 +16,6 @@ namespace sys
 
 namespace parserFSM
 {
-
     class SecurityEndpointHelper : public BaseHelper
     {
       public:
@@ -26,10 +25,10 @@ namespace parserFSM
       private:
         auto processPut(Context &context) -> ProcessResult final;
         auto processGet(Context &context) -> ProcessResult final;
-        auto processPost(Context &context) -> ProcessResult final;
 
-        auto processHandshake(Context &context) -> http::Code;
         auto processStatus(Context &context) -> http::Code;
         auto processConfiguration(Context &context) -> http::Code;
+
+        auto passCodeStringToVecOfInts(const std::string &passCode) -> std::vector<unsigned int>;
     };
 } // namespace parserFSM

@@ -171,16 +171,11 @@ namespace parserFSM
 
         namespace usb
         {
-            inline constexpr auto passcode = "passcode";
-            inline constexpr auto id       = "uniqueId";
             inline constexpr auto config   = "config";
-            inline constexpr auto status   = "usbSecurityStatus";
-            inline constexpr auto on       = "on";
-            inline constexpr auto off      = "off";
             inline constexpr auto locked   = "locked";
             inline constexpr auto unlocked = "unlocked";
             inline constexpr auto security = "usbSecurity";
-
+            inline constexpr auto phoneLockCode = "phoneLockCode";
         } // namespace usb
 
     } // namespace json

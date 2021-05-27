@@ -123,9 +123,6 @@ enum class MessageType
     USBConnected,
     USBConfigured,
     USBDisconnected,
-    USBSecurityOn,
-    USBSecurityOff,
-    USBHandshake,
 
     // FOTA messages
     HttpRequest,

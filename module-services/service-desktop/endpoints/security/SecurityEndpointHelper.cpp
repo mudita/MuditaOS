@@ -7,8 +7,10 @@
 #include <parser/ParserUtils.hpp>
 #include <Service/Common.hpp>
 #include <Service/Service.hpp>
+#include <service-appmgr/service-appmgr/model/ApplicationManager.hpp>
 #include <service-desktop/parser/MessageHandler.hpp>
 #include <service-desktop/service-desktop/ServiceDesktop.hpp>
+#include <module-apps/locks/data/PhoneLockMessages.hpp>
 #include <json/json11.hpp>
 
 namespace parserFSM
@@ -30,24 +32,6 @@ auto SecurityEndpointHelper::processGet(Context &context) -> ProcessResult
     return {sent::no, endpoint::ResponseContext{.status = code}};
 }
 
-auto SecurityEndpointHelper::processPost(Context &context) -> ProcessResult
-{
-    auto code = processHandshake(context);
-    return {sent::no, endpoint::ResponseContext{.status = code}};
-}
-
-auto SecurityEndpointHelper::processHandshake(Context &context) -> http::Code
-{
-    auto body = context.getBody();
-    if (!body[json::usb::id].is_string()) {
-        return http::Code::BadRequest;
-    }
-
-    auto msg = std::make_shared<sdesktop::usb::USBHandshake>(body[json::usb::id].string_value(),
-                                                             body[json::usb::passcode].int_value());
-    return toCode(owner->bus.sendUnicast(msg, service::name::service_desktop));
-}
-
 auto SecurityEndpointHelper::processStatus(Context &context) -> http::Code
 {
     auto desktopService = dynamic_cast<ServiceDesktop *>(owner);
@@ -56,23 +40,30 @@ auto SecurityEndpointHelper::processStatus(Context &context) -> http::Code
     return security == EndpointSecurity::Allow ? http::Code::OK : http::Code::Forbidden;
 }
 
+auto SecurityEndpointHelper::passCodeStringToVecOfInts(const std::string &passCode) -> std::vector<unsigned int>
+{
+    std::vector<unsigned int> passCodeAsInts(0, 0);
+
+    for (auto i = 0u; i < passCode.length(); i++) {
+        auto c         = passCode[i];
+        unsigned int v = std::atoi(&c);
+        passCodeAsInts.push_back(v);
+    }
+
+    return passCodeAsInts;
+}
+
 auto SecurityEndpointHelper::processConfiguration(Context &context) -> http::Code
 {
     auto body = context.getBody();
-    auto code = http::Code::BadRequest;
+    auto passCode = body[json::usb::phoneLockCode].string_value();
 
-    std::shared_ptr<sys::DataMessage> msg;
-
-    if (body[json::usb::status].string_value() == json::usb::on) {
-        msg = std::make_shared<sdesktop::usb::USBSecurityOn>();
+    if (passCode.length() != 4) {
+        return http::Code::BadRequest;
     }
-    if (body[json::usb::status].string_value() == json::usb::off) {
-        msg = std::make_shared<sdesktop::usb::USBSecurityOff>();
-    }
+    auto passCodeAsInts = passCodeStringToVecOfInts(passCode);
 
-    if (msg) {
-        code = toCode(owner->bus.sendUnicast(std::move(msg), service::name::service_desktop));
-    }
+    auto msg = std::make_shared<locks::ExternalUnLockPhone>(passCodeAsInts);
 
-    return code;
+    return toCode(owner->bus.sendUnicast(std::move(msg), app::manager::ApplicationManager::ServiceName));
 }
