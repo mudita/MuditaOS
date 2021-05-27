@@ -33,7 +33,7 @@ INSERT OR IGNORE INTO settings_tab (path, value) VALUES
     ('off_connection_frequency', '0'),
     ('off_notifications_when_locked', '0'),
     ('off_calls_from_favorites', '0'),
-    ('br_state', '0'),
-    ('br_auto_mode', '0'),
-    ('br_level', '50.0f'),
+    ('\EventManager\\br_state', '0'),
+    ('\EventManager\\br_auto_mode', '0'),
+    ('\EventManager\\br_level', '50.0f'),
     ('keypad_light_state', '0');

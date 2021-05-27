@@ -23,8 +23,6 @@ namespace gui
 
         setTitle(utils::translate("app_settings_display_display_light"));
 
-        screenLightSettings->setBrightnessFunction();
-
         timerCallback = [this](Item &it, sys::Timer &task) { return onTimerTimeout(it, task); };
         timerTask     = app::GuiTimerFactory::createPeriodicTimer(
             application, this, "AmbientLightTimer", std::chrono::milliseconds{gui::lighting::AMBIENT_LIGHT_TIMER_MS});
@@ -122,7 +120,7 @@ namespace gui
         auto spinner = std::make_unique<gui::SpinBoxOptionSettings>(
             utils::translate("app_settings_display_light_brightness"),
             std::ceil(brightnessValue / brightnessStep),
-            std::ceil(screen_light_control::Parameters::MAX_BRIGHTNESS / brightnessStep),
+            std::ceil(screen_light_control::ManualModeParameters::MAX_BRIGHTNESS / brightnessStep),
             setBrightness,
             setBottomBarOnSpinnerFocus);
 

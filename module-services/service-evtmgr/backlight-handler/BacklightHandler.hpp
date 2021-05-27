@@ -15,38 +15,23 @@ namespace settings
 
 namespace backlight
 {
-    class SettingsInterface
-    {
-      public:
-        virtual ~SettingsInterface() = default;
-
-      protected:
-        virtual auto getValue(std::string path) const -> std::string = 0;
-        virtual void setValue(std::string path, std::string value)   = 0;
-    };
-
     /// @brief Backlight events handler
-    class Handler : public SettingsInterface
+    class Handler
     {
       public:
         Handler(std::shared_ptr<settings::Settings> settings, sys::Service *parent);
 
-        /// initiaise in InitHandler when Service is ready
+        /// initialise in InitHandler when Service is ready
         void init();
 
         /// Process request of the screen light control
         /// @screen_light_control::Action an action to perform
-        void processScreenRequest(screen_light_control::Action action);
-
-        /// Process request of the screen light control with specified parameters
-        /// @screen_light_control::ParameterizedAction an action to perform
         /// @screen_light_control::Parameters parameters being set
-        void processScreenRequest(screen_light_control::ParameterizedAction action,
-                                  screen_light_control::Parameters params);
+        void processScreenRequest(screen_light_control::Action action, const screen_light_control::Parameters &params);
 
         void handleKeyPressed();
         /// Process request of the keypad light control
-        /// @screen_light_control::ParameterizedAction an action to perform
+        /// @keypad_backlight::action an action to perform
         /// @return True if request was processed successfully, false otherwise
         auto processKeypadRequest(bsp::keypad_backlight::Action action) -> bool;
 
@@ -55,8 +40,8 @@ namespace backlight
         [[nodiscard]] auto getScreenBrightnessValue() const noexcept -> bsp::eink_frontlight::BrightnessPercentage;
 
       protected:
-        [[nodiscard]] auto getValue(std::string path) const -> std::string override;
-        void setValue(std::string path, std::string value) override;
+        [[nodiscard]] auto getValue(const std::string &path) const -> std::string;
+        void setValue(const std::string &path, const std::string &value);
 
       private:
         std::shared_ptr<settings::Settings> settings;
@@ -76,8 +61,7 @@ namespace backlight
         void restoreKeypadLightState();
         void handleKeypadLightRefresh();
         void handleScreenLightRefresh();
-        void handleScreenLightSettings(screen_light_control::Action action);
-        void handleScreenLightSettings(screen_light_control::ParameterizedAction action,
-                                       screen_light_control::Parameters params);
+        void handleScreenLightSettings(screen_light_control::Action action,
+                                       const screen_light_control::Parameters &params);
     };
 } // namespace backlight
