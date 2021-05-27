@@ -109,15 +109,14 @@ namespace app
             {
                 bool lightOn;
                 screen_light_control::ScreenLightMode mode;
-                screen_light_control::Parameters parameters;
+                screen_light_control::ManualModeParameters parameters;
             };
 
             virtual ~ScreenLightSettings()                      = default;
             virtual auto getCurrentValues() -> Values           = 0;
-            virtual void setBrightness(float brigtnessValue)    = 0;
+            virtual void setBrightness(float brightnessValue)   = 0;
             virtual void setMode(bool isAutoLightSwitchOn)      = 0;
             virtual void setStatus(bool isDisplayLightSwitchOn) = 0;
-            virtual void setBrightnessFunction()                = 0;
         };
 
         class KeypdBacklightSettings
@@ -214,10 +213,9 @@ namespace app
         void setOsUpdateVersion(const std::string &value);
 
         ScreenLightSettings::Values getCurrentValues() override;
-        void setBrightness(float brigtnessValue) override;
+        void setBrightness(float brightnessValue) override;
         void setMode(bool isAutoLightSwitchOn) override;
         void setStatus(bool isDisplayLightSwitchOn) override;
-        void setBrightnessFunction() override;
 
         auto getKeypadBacklightState() -> bsp::keypad_backlight::State override;
         void setKeypadBacklightState(bsp::keypad_backlight::State keypadLightState) override;
