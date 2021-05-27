@@ -22,7 +22,6 @@
 #include <bsp/keyboard/key_codes.hpp>
 #include <bsp/magnetometer/magnetometer.hpp>
 #include <bsp/rtc/rtc.hpp>
-#include <bsp/torch/torch.hpp>
 #include <bsp/battery-charger/battery_charger.hpp>
 #include <common_data/RawKey.hpp>
 #include <log/log.hpp>
@@ -177,11 +176,32 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
     }
 }
 
+torch::TorchConfig configBySettings(std::shared_ptr<settings::Settings> &settings)
+{
+    torch::TorchConfig config{1, 1};
+    auto caseColor      = settings->getValue("factory_data/case", settings::SettingsScope::Global);
+    auto valueForWhite  = settings->getValue("intensity/white");
+    auto valueForYellow = settings->getValue("intensity/yellow");
+    try {
+        if (not valueForWhite.empty()) {
+            config.inWhite = std::stof(valueForWhite);
+        }
+        if (not valueForYellow.empty()) {
+            config.inYellow = std::stof(valueForYellow);
+        }
+    }
+    catch (std::invalid_argument &ex) {
+        LOG_ERROR("bad values in settings for intensity/white or intensity/yellow");
+    }
+    return config;
+}
+
 // Invoked during initialization
 sys::ReturnCodes EventManager::InitHandler()
 {
     settings->init(service::ServiceProxy(shared_from_this()));
     backlightHandler.init();
+    torch.init(configBySettings(settings));
 
     connect(sdesktop::developerMode::DeveloperModeRequest(), [&](sys::Message *msg) {
         using namespace sdesktop::developerMode;
@@ -270,12 +290,12 @@ sys::ReturnCodes EventManager::InitHandler()
     });
 
     connect(sevm::ToggleTorchOnOffMessage(), [&]([[maybe_unused]] sys::Message *msg) {
-        toggleTorchOnOff();
+        torch.toggleOnOff();
         return sys::MessageNone{};
     });
 
     connect(sevm::ToggleTorchColorMessage(), [&]([[maybe_unused]] sys::Message *msg) {
-        toggleTorchColor();
+        torch.toggleColor();
         return sys::MessageNone{};
     });
 
@@ -330,7 +350,7 @@ sys::ReturnCodes EventManager::DeinitHandler()
 
 void EventManager::ProcessCloseReason(sys::CloseReason closeReason)
 {
-    bsp::torch::turn(bsp::torch::State::off);
+    torch.off();
     sendCloseReadyMessage(this);
 }
 
@@ -392,24 +412,6 @@ bool EventManager::processVibraRequest(bsp::vibrator::Action act, std::chrono::m
         break;
     }
     return true;
-}
-
-void EventManager::toggleTorchOnOff()
-{
-    auto state    = bsp::torch::getState();
-    auto newState = (state.second == bsp::torch::State::off) ? bsp::torch::State::on : bsp::torch::State::off;
-    bsp::torch::turn(newState, bsp::torch::ColourTemperature::coldest);
-}
-
-void EventManager::toggleTorchColor()
-{
-    auto state = bsp::torch::getState();
-    if (state.second == bsp::torch::State::on) {
-        auto color    = bsp::torch::getColorTemp();
-        auto newColor = (color == bsp::torch::ColourTemperature::coldest) ? bsp::torch::ColourTemperature::warmest
-                                                                          : bsp::torch::ColourTemperature::coldest;
-        bsp::torch::turn(bsp::torch::State::on, newColor);
-    }
 }
 
 void EventManager::processRTCRequest(struct tm &newTime)

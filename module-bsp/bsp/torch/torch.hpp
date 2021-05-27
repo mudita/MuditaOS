@@ -27,6 +27,9 @@ namespace bsp::torch
         coldest = 6500,
     };
 
+
+    const unsigned short max_current_mA = 150;
+
     int32_t init(xQueueHandle qHandle);
     void deinit();
 

@@ -6,6 +6,7 @@
 #include "Constants.hpp"
 
 #include <backlight-handler/BacklightHandler.hpp>
+#include <torch-handler/TorchHandler.hpp>
 #include <bsp/vibrator/vibrator.hpp>
 #include <MessageType.hpp>
 #include <Service/Common.hpp>
@@ -34,8 +35,6 @@ class EventManager : public sys::Service
     void handleMinuteUpdate(time_t timestamp);
     bool processVibraRequest(bsp::vibrator::Action act,
                              std::chrono::milliseconds RepetitionTime = std::chrono::milliseconds{1000});
-    void toggleTorchOnOff();
-    void toggleTorchColor();
 
     void processRTCRequest(struct tm &newTime);
     void processTimezoneRequest(const std::string &timezone);
@@ -43,7 +42,6 @@ class EventManager : public sys::Service
     std::shared_ptr<settings::Settings> settings;
     sys::TimerHandle loggerTimer;
 
-  protected:
     std::unique_ptr<WorkerEvent> EventWorker;
     // application where key events are sent. This is also only application that is allowed to change keyboard long
     // press settings.
@@ -59,6 +57,7 @@ class EventManager : public sys::Service
 
     std::unique_ptr<vibra_handle::Vibra> Vibra;
     backlight::Handler backlightHandler;
+    torch::TorchHandler torch;
 
   public:
     explicit EventManager(const std::string &name = service::name::evt_manager);
