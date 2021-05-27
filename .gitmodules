@@ -36,10 +36,6 @@
 [submodule "module-utils/date"]
 	path = third-party/date
 	url = ../date.git
-[submodule "module-audio/Audio/decoder/minimp3"]
-	path = module-audio/Audio/decoder/minimp3
-	url = ../minimp3.git
-    branch = RT1051
 [submodule "module-utils/taglib"]
 	path = module-utils/taglib
 	url = ../taglib.git
@@ -84,3 +80,7 @@
 [submodule "module-utils/CrashDebug"]
 	path = module-utils/CrashDebug
 	url = https://github.com/adamgreen/CrashDebug.git
+[submodule "third-party/minimp3/minimp3"]
+	path = third-party/minimp3/minimp3
+	url = ../minimp3.git
+	branch = RT1051
