@@ -21,7 +21,6 @@ INSERT OR IGNORE INTO settings_tab (path, value) VALUES
     ('gs_eula_accepted', '0'),
     ('\ApplicationManager\\gs_onboarding_done', '1'),
     ('gs_usb_security', '1'),
-    ('gs_usb_devices', ''),
     ('gs_os_update_version', '0.00.0'),
     ('gs_os_current_version', '0.00.0'),
     ('\ServiceBluetooth\\bt_state', '0'),
