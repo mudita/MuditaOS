@@ -222,19 +222,25 @@ sys::ReturnCodes EventManager::InitHandler()
 
     connect(typeid(sevm::ScreenLightControlMessage), [&](sys::Message *msgl) {
         auto *m = dynamic_cast<sevm::ScreenLightControlMessage *>(msgl);
-        backlightHandler.processScreenRequest(m->action);
+        backlightHandler.processScreenRequest(m->getAction(), screen_light_control::Parameters());
         return sys::msgHandled();
     });
 
-    connect(typeid(sevm::ScreenLightSetParameters), [&](sys::Message *msgl) {
-        auto *m = dynamic_cast<sevm::ScreenLightSetParameters *>(msgl);
-        backlightHandler.processScreenRequest(m->action, std::move(m->parameters));
+    connect(typeid(sevm::ScreenLightSetAutoModeParams), [&](sys::Message *msgl) {
+        auto *m = static_cast<sevm::ScreenLightSetAutoModeParams *>(msgl);
+        backlightHandler.processScreenRequest(m->getAction(), screen_light_control::Parameters(m->getParams()));
+        return sys::msgHandled();
+    });
+
+    connect(typeid(sevm::ScreenLightSetManualModeParams), [&](sys::Message *msgl) {
+        auto *m = static_cast<sevm::ScreenLightSetManualModeParams *>(msgl);
+        backlightHandler.processScreenRequest(m->getAction(), screen_light_control::Parameters(m->getParams()));
         return sys::msgHandled();
     });
 
     connect(sevm::ScreenLightControlRequestParameters(), [&](sys::Message *msgl) {
-        screen_light_control::Parameters params = {backlightHandler.getScreenBrightnessValue()};
-        auto msg                                = std::make_shared<sevm::ScreenLightControlParametersResponse>(
+        screen_light_control::ManualModeParameters params = {backlightHandler.getScreenBrightnessValue()};
+        auto msg = std::make_shared<sevm::ScreenLightControlParametersResponse>(
             backlightHandler.getScreenLightState(), backlightHandler.getScreenAutoModeState(), params);
         return msg;
     });

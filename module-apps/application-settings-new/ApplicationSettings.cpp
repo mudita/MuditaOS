@@ -585,7 +585,7 @@ namespace app
                 return {};
             }
 
-            return {msgState->lightOn, msgState->mode, msgState->parameters};
+            return {msgState->isLightOn(), msgState->getMode(), msgState->getParams()};
         }
 
         return {};
@@ -593,10 +593,8 @@ namespace app
 
     void ApplicationSettingsNew::setBrightness(bsp::eink_frontlight::BrightnessPercentage value)
     {
-        screen_light_control::Parameters parameters{value};
-        bus.sendUnicast(std::make_shared<sevm::ScreenLightSetParameters>(
-                            screen_light_control::ParameterizedAction::setManualModeBrightness, parameters),
-                        service::name::evt_manager);
+        screen_light_control::ManualModeParameters parameters{value};
+        bus.sendUnicast(std::make_shared<sevm::ScreenLightSetManualModeParams>(parameters), service::name::evt_manager);
     }
 
     void ApplicationSettingsNew::setMode(bool isAutoLightSwitchOn)
@@ -612,15 +610,6 @@ namespace app
         bus.sendUnicast(std::make_shared<sevm::ScreenLightControlMessage>(isDisplayLightSwitchOn
                                                                               ? screen_light_control::Action::turnOn
                                                                               : screen_light_control::Action::turnOff),
-                        service::name::evt_manager);
-    }
-    void ApplicationSettingsNew::setBrightnessFunction()
-    {
-        screen_light_control::Parameters parameters;
-        parameters.functionPoints = screen_light_control::functions::BrightnessFunction(
-            {{0.0f, 70.0f}, {250.0f, 70.0f}, {450.0f, 40.0f}, {500.0f, 0.0f}});
-        bus.sendUnicast(std::make_shared<sevm::ScreenLightSetParameters>(
-                            screen_light_control::ParameterizedAction::setAutomaticModeParameters, parameters),
                         service::name::evt_manager);
     }
 
