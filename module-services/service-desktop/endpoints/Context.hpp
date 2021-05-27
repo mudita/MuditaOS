@@ -92,7 +92,7 @@ namespace parserFSM
 
         auto setResponse(endpoint::ResponseContext r)
         {
-            r = responseContext;
+            responseContext = r;
         }
 
         auto setResponseStatus(http::Code status)
