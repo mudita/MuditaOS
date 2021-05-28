@@ -20,7 +20,7 @@ namespace purefs::fs
     {
         return static_cast<inotify_flags>(static_cast<unsigned>(fl1) | static_cast<unsigned>(fl2));
     }
-    inline auto operator&&(inotify_flags fl1, inotify_flags fl2)
+    inline auto operator&&(inotify_flags fl1, inotify_flags fl2) -> bool
     {
         return static_cast<bool>(static_cast<unsigned>(fl1) & static_cast<unsigned>(fl2));
     }

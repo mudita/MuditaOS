@@ -54,6 +54,16 @@ add_catch2_executable(
         ${LITTLEFS_IMAGE}
 )
 
+add_catch2_executable(
+    NAME vfs-inotify
+    SRCS
+        ${CMAKE_CURRENT_LIST_DIR}/unittest_filesystem_inotify.cpp
+    LIBS
+        module-vfs
+    INCLUDE 
+        ${CMAKE_CURRENT_SOURCE_DIR}/../include/internal
+)
+
 # prepare test assets
 set(ASSETS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/test_dir")
 set(ASSETS_TARGET_DIR "${CMAKE_BINARY_DIR}/module-vfs/test_dir")

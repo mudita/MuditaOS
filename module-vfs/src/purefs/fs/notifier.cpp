@@ -6,7 +6,6 @@
 #include <Service/Service.hpp>
 #include <purefs/fs/inotify_message.hpp>
 #include <purefs/fs/thread_local_cwd.hpp>
-#include <log/log.hpp>
 
 namespace purefs::fs::internal
 {
@@ -22,25 +21,31 @@ namespace purefs::fs::internal
         std::string absolute_path(std::string_view path)
         {
             using namespace std::string_literals;
+            std::string ret;
             if (!path.empty() && path[0] != '/') {
-                return std::string(internal::get_thread_local_cwd_path()) + "/"s + std::string(path);
+                ret = std::string(internal::get_thread_local_cwd_path()) + "/"s + std::string(path);
             }
             else {
-                return std::string(path);
+                ret = std::string(path);
             }
+            if (!ret.empty() && ret.back() == '/') {
+                ret.pop_back();
+            }
+            return ret;
         }
     } // namespace
     auto notifier::register_path(std::string_view path, std::shared_ptr<sys::Service> owner, inotify_flags flags)
         -> item_it
     {
+        const auto abspath = absolute_path(path);
         // # Check if it is already registered for same path
-        const auto range = m_events.equal_range(std::string(path));
+        const auto range = m_events.equal_range(abspath);
         for (auto i = range.first; i != range.second; ++i) {
             if (i->second.first.lock() == owner) {
                 return std::end(m_events);
             }
         }
-        return m_events.emplace(std::make_pair(path, std::make_pair(owner, flags)));
+        return m_events.emplace(std::make_pair(abspath, std::make_pair(owner, flags)));
     }
     auto notifier::unregister_path(item_it item) -> void
     {
@@ -57,13 +62,13 @@ namespace purefs::fs::internal
     {
         const auto abs_path     = absolute_path(path);
         const auto abs_path_prv = absolute_path(path_prv);
-        for_path(abs_path, [this, path_prv, mask](std::string_view path) {
+        for_path(abs_path, [this, abs_path, abs_path_prv, mask](std::string_view path) {
             const auto range = m_events.equal_range(std::string(path));
             for (auto i = range.first; i != range.second; ++i) {
                 if (i->second.second && mask) {
                     auto svc = i->second.first.lock();
                     if (svc) {
-                        send_notification(svc, mask, path, path_prv);
+                        send_notification(svc, mask, abs_path, abs_path_prv);
                     }
                 }
             }
@@ -80,6 +85,7 @@ namespace purefs::fs::internal
         if (fname_it != std::end(m_fd_map)) {
             notify(fname_it->first,
                    fname_it->second.second ? inotify_flags::close_nowrite : inotify_flags::close_write);
+            m_fd_map.erase(fname_it);
         }
     }
     auto notifier::send_notification(std::shared_ptr<sys::Service> svc,
