@@ -22,4 +22,5 @@ target_link_libraries(${PROJECT_NAME}
         module-bluetooth
         service-desktop
         module-sys
+        json::json
 )

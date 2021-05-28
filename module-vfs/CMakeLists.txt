@@ -78,6 +78,7 @@ target_link_libraries(${PROJECT_NAME}
         module-utils
     PRIVATE 
         littlefs::littlefs
+        json::json
 )
 
 if (${ENABLE_TESTS})

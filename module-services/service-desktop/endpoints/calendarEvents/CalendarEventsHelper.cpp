@@ -8,7 +8,6 @@
 #include "Service/Common.hpp"
 #include <service-db/DBServiceAPI.hpp>
 #include <log.hpp>
-#include "json/json11.hpp"
 #include <queries/calendar/QueryEventsGetAll.hpp>
 #include <queries/calendar/QueryEventsGet.hpp>
 #include <queries/calendar/QueryEventsAdd.hpp>

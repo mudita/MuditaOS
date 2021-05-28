@@ -38,6 +38,7 @@ add_catch2_executable(
         module-sys
         iosyscalls
         module-db
+        json::json
     DEPS
         assets
         PurePhone-disk-img
