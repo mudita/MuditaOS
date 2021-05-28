@@ -9,4 +9,9 @@ set(PUREFLASH_SRCS
 
 add_executable(${PROJECT_NAME} ${PUREFLASH_SRCS})
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -pedantic -Werror -Wextra )
+
 target_compile_definitions(${PROJECT_NAME} PRIVATE _GNU_SOURCE _DEFAULT_SOURCE)
+
+install(TARGETS pureflash
+    RUNTIME DESTINATION .
+)
