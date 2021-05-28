@@ -1,17 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.12)
-
-if(NOT WIN32)
-    include(Colours)
-endif()
-
-project(board VERSION 1.0
-       DESCRIPTION "Library for different hardware targets.")
-
-if(${CMAKE_VERSION} VERSION_LESS 3.12)
-    cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
-endif()
-
-#module_is_test_entity()
+﻿#module_is_test_entity()
 
 if(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
 	include(targets/Target_Linux.cmake)
@@ -19,9 +6,15 @@ else()
 	include(targets/Target_Cross.cmake)
 endif()
 
-add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
+add_library(board STATIC)
+target_sources(board
+   PRIVATE
+       ${SOURCES}
+       ${BOARD_SOURCES}
+)
+target_link_libraries(board PUBLIC module-bsp)
 
-target_include_directories(${PROJECT_NAME} PUBLIC ${BOARD_DIR_INCLUDES} )
+#target_include_directories(board PUBLIC ${BOARD_DIR_INCLUDES} )
 
 #include(segger/rtt/CMakeLists.txt)
 

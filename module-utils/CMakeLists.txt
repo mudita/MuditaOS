@@ -65,6 +65,7 @@ target_link_libraries(${PROJECT_NAME}
     module-os
     module-vfs
     magic_enum
+    crc32
 )
 
 # Board specific compilation definitions,options,include directories and features
