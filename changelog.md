@@ -4,6 +4,31 @@ To install the new version of MuditaOS please follow the steps described in this
 - [Linux](https://github.com/mudita/MuditaOS/blob/master/doc/boot_and_update.md#creating-a-storage-partition)
 - [Windows and macOS](https://github.com/mudita/MuditaOS/blob/master/doc/flashing_win_macos.md)
 
+## [0.67.1 2021-05-28]
+
+### Added
+
+* Add a per-application auto-locking policy.
+* Add documentation on auto-locking mechanism.
+* Add RC oscillator self-calibrating to increase the precision of the system clock.
+* Add support for Bluetooth pairing with a PIN.
+* Add time updating with a value obtained from a GSM network.
+* Add using voice transcoding during phone calls if needed.
+
+### Changed
+
+* Block building commits that are not rebased to reduce CI workload.
+* Move CI builds to a RAM disk to reduce build times.
+* Move several third-party libraries to a single `third-party` subdirectory.
+
+### Fixed
+
+* Fix displaying currently selected ringtone in the ringtone settings.
+* Fix excessive ATA command when answering a phone call using headset buttons.
+* Fix invalid integer to string conversion used in the call records.
+* Fix reconnecting Pure to the Mudita Center when unlocked.
+* Fix RTC clock not being retained between resets.
+
 ## [0.66.1 2021-05-21]
 
 ### Added
