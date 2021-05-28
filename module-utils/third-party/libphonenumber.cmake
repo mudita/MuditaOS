@@ -67,11 +67,7 @@ if (NOT RE2_TARGET)
 endif ()
 target_link_libraries (${LIBPHONENUMBER_TARGET} PUBLIC ${RE2_TARGET})
 
-# protobuf dependency
-if (NOT PROTOBUF_TARGET)
-        message (FATAL_ERROR "Protobuf is required for libphonenumber")
-endif()
-target_link_libraries (${LIBPHONENUMBER_TARGET} PUBLIC ${PROTOBUF_TARGET})
+target_link_libraries (${LIBPHONENUMBER_TARGET} PUBLIC protobuf::libprotobuf-lite)
 
 # turn on optimization in debug
 third_party_source_optimization (${LIBPHONENUMBER_SOURCES})
