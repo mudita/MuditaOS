@@ -9,7 +9,7 @@
 
 #include <InputEvent.hpp>
 #include <i18n/i18n.hpp>
-#include <json/json11.hpp>
+#include <json11.hpp>
 #include <utility>
 
 namespace style::quotes

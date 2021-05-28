@@ -20,4 +20,5 @@ target_link_libraries( ${PROJECT_NAME}
       module-vfs
       crc32
       Microsoft.GSL::GSL
+      json::json
 )

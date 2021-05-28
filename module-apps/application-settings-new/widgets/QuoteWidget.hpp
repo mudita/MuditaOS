@@ -9,7 +9,6 @@
 #include <ImageBox.hpp>
 #include <Label.hpp>
 #include <ListItem.hpp>
-#include <json/json11.hpp>
 #include <service-db/QuotesMessages.hpp>
 
 namespace gui
