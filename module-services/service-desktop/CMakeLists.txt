@@ -1,4 +1,4 @@
-﻿project(service-desktop)
+project(service-desktop)
 message( "${PROJECT_NAME}  ${CMAKE_CURRENT_LIST_DIR}" )
 
 set(SOURCES
@@ -63,6 +63,7 @@ target_link_libraries(${PROJECT_NAME}
         utf8
         utils-bootconfig
         Microsoft.GSL::GSL
+        json::json
     PUBLIC
         module-cellular
         eventstore

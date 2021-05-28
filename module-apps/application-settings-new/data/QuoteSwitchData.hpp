@@ -6,7 +6,7 @@
 #include "application-settings-new/models/QuotesModel.hpp"
 
 #include <SwitchData.hpp>
-#include <json/json11.hpp>
+#include <json11.hpp>
 #include <utility>
 
 namespace Quotes

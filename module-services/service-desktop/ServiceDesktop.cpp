@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-appmgr/service-appmgr/messages/DOMRequest.hpp"
@@ -13,7 +13,7 @@
 #include <Common/Query.hpp>
 #include <MessageType.hpp>
 #include <Service/Worker.hpp>
-#include <json/json11.hpp>
+#include <json11.hpp>
 #include <log.hpp>
 #include <module-apps/application-desktop/ApplicationDesktop.hpp>
 #include <service-db/service-db/Settings.hpp>

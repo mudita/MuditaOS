@@ -9,7 +9,7 @@
 #include <service-desktop/DesktopMessages.hpp>
 #include <service-desktop/ServiceDesktop.hpp>
 
-#include <json/json11.hpp>
+#include <json11.hpp>
 #include <purefs/filesystem_paths.hpp>
 
 #include <filesystem>
