@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-#include <module-utils/json/json11.hpp>
+#include <json11.hpp>
 #include <string>
 #include <filesystem>
 

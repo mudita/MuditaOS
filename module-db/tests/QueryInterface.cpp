@@ -17,7 +17,7 @@
 #include <filesystem>
 #include <memory>
 #include <module-db/queries/messages/sms/QuerySMSGetCount.hpp>
-#include <module-utils/json/json11.hpp>
+#include <json11.hpp>
 
 namespace db
 {

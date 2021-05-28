@@ -5,7 +5,7 @@
 
 #include "BaseMessage.hpp"
 #include "service-desktop/DeveloperModeMessage.hpp"
-#include <json/json11.hpp>
+#include <json11.hpp>
 
 namespace app::manager
 {
