@@ -82,15 +82,11 @@ if (${CMAKE_BUILD_TYPE} STREQUAL "Debug" OR ${CMAKE_BUILD_TYPE} STREQUAL "RelWit
 endif ()
 
 target_include_directories(${PROJECT_NAME}
-
         PUBLIC
-
         ${CMAKE_CURRENT_SOURCE_DIR}
-
         ${CMAKE_CURRENT_SOURCE_DIR}/FreeRTOS/include
         ${CMAKE_CURRENT_SOURCE_DIR}/FreeRTOS
         ${CMAKE_CURRENT_SOURCE_DIR}/RTOSWrapper/include
-
         )
 
 #Add FreeRTOS SystemvView headers if enabled

@@ -13,11 +13,11 @@ endif()
 
 module_is_test_entity()
 
-if(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
-	include(targets/Target_Linux.cmake)
-else()
-	include(targets/Target_Cross.cmake)
-endif()
+#if(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
+#	include(targets/Target_Linux.cmake)
+#else()
+#	include(targets/Target_Cross.cmake)
+#endif()
 
 set (SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/i18n/i18n.cpp
@@ -44,7 +44,7 @@ set (SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/generators/RandomStringGenerator.cpp
 )
 
-add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
+add_library(${PROJECT_NAME} STATIC ${SOURCES})
 
 include(segger/rtt/CMakeLists.txt)
 
@@ -61,8 +61,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE crc32 )
 target_link_libraries (${PROJECT_NAME} PUBLIC ${TINYEXPR_TARGET})
 
 target_link_libraries(${PROJECT_NAME} 
-PUBLIC 
-    module-os 
+    PUBLIC 
+    module-os
     module-vfs
     magic_enum
 )
@@ -71,7 +71,7 @@ PUBLIC
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_TARGET})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_DEFINITIONS})
-target_include_directories(${PROJECT_NAME} PUBLIC ${BOARD_DIR_INCLUDES} )
+#target_include_directories(${PROJECT_NAME} PUBLIC ${BOARD_DIR_INCLUDES} )
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_INCLUDES})
 target_compile_features(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_FEATURES})
 target_compile_options(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_OPTIONS})
@@ -93,3 +93,4 @@ if (${ENABLE_TESTS})
 endif()
 
 add_subdirectory(bootconfig)
+add_subdirectory(board)
