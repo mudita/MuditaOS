@@ -17,7 +17,7 @@
 	branch = rt1051
 	shallow = true
 [submodule "module-utils/protobuf"]
-	path = module-utils/protobuf
+	path = third-party/protobuf/src
 	url = ../protobuf.git
 	branch = rt1051
 	shallow = true
