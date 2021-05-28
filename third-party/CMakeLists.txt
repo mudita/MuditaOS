@@ -1,10 +1,13 @@
+﻿
 add_subdirectory(crc32)
 add_subdirectory(magic_enum)
 add_subdirectory(microtar)
 add_subdirectory(date)
 add_subdirectory(pugixml)
 add_subdirectory(sml)
+add_subdirectory(taglib)
 add_subdirectory(minimp3)
 add_subdirectory(tinyexpr)
 add_subdirectory(parallel-hashmap)
 add_subdirectory(protobuf)
+

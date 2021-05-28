@@ -33,10 +33,8 @@ if(COVERAGE_ENABLE)
         module-utils/libphonenumber/.*
         module-utils/re2/.*
         module-utils/segger/.*
-        module-utils/taglib/.*
         source/main.cpp
         test/.*
-        third-party/.*
     )
 
     SET(GCOVR_ADDITIONAL_ARGS
