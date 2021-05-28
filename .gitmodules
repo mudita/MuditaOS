@@ -56,7 +56,7 @@
 [submodule "host-tools/littlefs-fuse/lfsfuse"]
 	path = host-tools/littlefs-fuse/lfsfuse
 	url = https://github.com/littlefs-project/littlefs-fuse.git
-[submodule "module-utils/sml"]
+[submodule "third-party/sml"]
 	path = third-party/sml/src
 	url = https://github.com/boost-ext/sml
 [submodule "tools/misc"]
@@ -66,8 +66,8 @@
 	path = test/harness
 	url = ../QAMuditaHarness.git
 	shallow = true
-[submodule "module-utils/CrashDebug"]
-	path = module-utils/CrashDebug
+[submodule "third-party/CrashDebug"]
+	path = third-party/CrashDebug/src
 	url = https://github.com/adamgreen/CrashDebug.git
 [submodule "third-party/minimp3/minimp3"]
 	path = third-party/minimp3/minimp3
