@@ -29,6 +29,8 @@ namespace bsp::keypad_backlight
 
     void deinit();
 
+    void setIntensity(DiodeIntensity value);
+
     bool turnOnAll();
 
     bool turnOnFunctionKeysBacklight();

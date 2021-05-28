@@ -73,6 +73,7 @@ namespace backlight
         void stopKeypadTimer();
         void setKeypadLightInCallMode(bool value) noexcept;
         void setKeypadLightState(bsp::keypad_backlight::State value) noexcept;
+        void setKeypadBrightness();
         void restoreKeypadLightState();
         void handleKeypadLightRefresh();
         void handleScreenLightRefresh();

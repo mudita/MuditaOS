@@ -21,6 +21,9 @@ namespace bsp::keypad_backlight
     void deinit()
     {}
 
+    void setIntensity([[maybe_unused]] DiodeIntensity value)
+    {}
+
     bool turnOnAll()
     {
         diodesState = true;

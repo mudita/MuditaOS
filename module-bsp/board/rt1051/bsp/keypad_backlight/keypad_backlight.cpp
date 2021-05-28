@@ -77,7 +77,14 @@ namespace bsp::keypad_backlight
             addr.subAddress = address;
             return i2c->Read(addr, readout, 1);
         }
+
+        DiodeIntensity intensity = 1.0f;
     } // namespace
+
+    void setIntensity(DiodeIntensity value)
+    {
+        intensity = value;
+    }
 
     std::int32_t init()
     {
@@ -110,7 +117,6 @@ namespace bsp::keypad_backlight
 
     bool configureDiodes()
     {
-        constexpr DiodeIntensity intensity = 1.0f; // Maximum brightness
         Diode_Reg diodeReg                 = {.max_current = MAX_DIODE_CURRENT_LIMIT,
                               .current     = encode_diode_brightness_to_6bits(intensity)};
 

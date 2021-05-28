@@ -6,6 +6,7 @@
 #include <service-db/service-db/Settings.hpp>
 #include <Timers/TimerFactory.hpp>
 #include <Utils.hpp>
+#include <stdexcept>
 
 namespace backlight
 {
@@ -80,8 +81,36 @@ namespace backlight
         keypadLightState = value;
     }
 
+    void Handler::setKeypadBrightness()
+    {
+        auto intensity = 0.0f;
+        try {
+            auto caseColor    = settings->getValue("factory_data/case", settings::SettingsScope::Global);
+            auto settings_val = getValue(settings::Brightness::state);
+            if (not settings_val.empty()) {
+                intensity = std::stof(settings_val);
+            }
+            else if (caseColor.empty()) {
+                LOG_ERROR("no case color on the platform - set keyboard_intensity to 1");
+            }
+            else {
+                if (caseColor == "black") {
+                    intensity = 1.0f;
+                }
+                else {
+                    intensity = 0.75f;
+                }
+            }
+        }
+        catch (std::out_of_range &ex) {
+            LOG_ERROR("cant get keypad brightness value");
+        }
+        bsp::keypad_backlight::setIntensity(intensity);
+    }
+
     auto Handler::processKeypadRequest(bsp::keypad_backlight::Action action) -> bool
     {
+        setKeypadBrightness();
         switch (action) {
         case bsp::keypad_backlight::Action::turnOn: {
             stopKeypadTimer();
