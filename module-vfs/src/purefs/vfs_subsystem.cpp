@@ -10,7 +10,7 @@
 #include <purefs/fs/thread_local_cwd.hpp>
 #include <log.hpp>
 #include <purefs/filesystem_paths.hpp>
-#include <module-utils/json/json11.hpp>
+#include <json11.hpp>
 #include <sys/stat.h>
 #include <fcntl.h>
 

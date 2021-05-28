@@ -78,6 +78,7 @@ target_link_libraries(${PROJECT_NAME}
     service-bluetooth
     service-evtmgr
     sml::sml
+    json::json
 )
 
 if (${ENABLE_TESTS})

@@ -47,7 +47,6 @@ export declare ignore_paths=(
     'module-lwip/includes/lwipopts.h'
     'module-lwip/lib/lwip/'
     'module-os/'
-    'module-utils/json/'
     'module-utils/microtar/'
     'module-utils/segger/log/'
     'module-utils/segger/systemview/'
@@ -56,6 +55,7 @@ export declare ignore_paths=(
     'module-vfs/board/free_rtos_custom/include/FreeRTOSFATConfig.h'
     'module-vfs/drivers/include/thirdparty/fatfs/ffconf.h'
     'module-vfs/thirdparty/*'
+    'third-party/'
 )
 
 # bash function using above config function

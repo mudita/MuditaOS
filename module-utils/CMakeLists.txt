@@ -1,7 +1,3 @@
-﻿if(NOT WIN32)
-    include(Colours)
-endif()
-
 project(module-utils VERSION 1.0)
 
 if(${CMAKE_VERSION} VERSION_LESS 3.12)
@@ -15,7 +11,6 @@ add_subdirectory(EventStore)
 
 set (SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/i18n/i18n.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/json/json11.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/PhoneNumber.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/PhoneNumber.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/NumberHolderMatcher.hpp
@@ -42,6 +37,7 @@ PUBLIC
     module-vfs
     ${LIBPHONENUMBER_TARGET}
 PRIVATE
+    json::json
     crc32
     time
 )

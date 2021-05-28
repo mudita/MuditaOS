@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <json/json11.hpp>
+#include <json11.hpp>
 #include <microtar.hpp>
 #include <boot/bootconfig.hpp>
 #include <purefs/filesystem_paths.hpp>

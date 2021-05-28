@@ -1,4 +1,4 @@
-﻿project(module-gui VERSION 1.0
+project(module-gui VERSION 1.0
         DESCRIPTION "GUI library dedicated for pure phone.")
 
 module_is_test_entity()
@@ -29,6 +29,7 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE
         pugixml::pugixml
         Microsoft.GSL::GSL
+        json::json
 )
 
 # Board specific compilation definitions,options,include directories and features

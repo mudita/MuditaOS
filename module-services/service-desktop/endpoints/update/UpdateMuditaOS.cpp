@@ -6,7 +6,7 @@
 #include <service-desktop/DesktopMessages.hpp>
 #include <SystemManager/SystemManager.hpp>
 #include <crc32.h>
-#include <json/json11.hpp>
+#include <json11.hpp>
 #include <log/log.hpp>
 #include <application-desktop/Constants.hpp>
 #include <service-db/service-db/Settings.hpp>

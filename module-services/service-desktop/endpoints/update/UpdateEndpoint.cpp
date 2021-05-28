@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "UpdateEndpoint.hpp"
@@ -9,7 +9,7 @@
 #include <endpoints/Context.hpp>
 #include <endpoints/messages/MessageHelper.hpp>
 
-#include <json/json11.hpp>
+#include <json11.hpp>
 #include <purefs/filesystem_paths.hpp>
 
 #include <filesystem>
