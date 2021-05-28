@@ -210,6 +210,7 @@ target_link_libraries(${PROJECT_NAME}
         service-bluetooth
         service-lwip
         ${LWIP_LIBRARIES}
+        board
         )
 
 if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
