@@ -5,8 +5,6 @@ project(service-fileindexer VERSION 1.0
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
 
-target_include_directories( ${PROJECT_NAME} PRIVATE ${TAGLIB_INCLUDE_DIRS} )
-
 # Board specific compilation definitions,options,include directories and features
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_TARGET})

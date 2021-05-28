@@ -37,7 +37,7 @@
 	path = third-party/date
 	url = ../date.git
 [submodule "module-utils/taglib"]
-	path = module-utils/taglib
+	path = third-party/taglib
 	url = ../taglib.git
 	branch = rt1051
 [submodule "module-bluetooth/lib/btstack"]
