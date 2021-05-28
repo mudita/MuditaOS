@@ -50,7 +50,6 @@ include(segger/rtt/CMakeLists.txt)
 
 # add third party libs
 include(third-party/re2.cmake)
-include(third-party/protobuf-lite.cmake)
 include(third-party/libphonenumber.cmake)
 
 # link against libphonenumber
