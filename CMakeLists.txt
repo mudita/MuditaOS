@@ -205,12 +205,13 @@ set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES LINK_FLAGS "-Xlinker -Map
 # In case of doubt please contact me: mateusz.piesta@mudita.com
 target_link_libraries(${PROJECT_NAME}
         date::date
+        $<$<STREQUAL:${PROJECT_TARGET},TARGET_RT1051>:CrashCatcher::CrashCatcher>
         module-apps
         service-desktop
         service-bluetooth
         service-lwip
         ${LWIP_LIBRARIES}
-        )
+)
 
 if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
     target_link_libraries(${PROJECT_NAME} iosyscalls)
