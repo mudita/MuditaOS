@@ -22,10 +22,7 @@ namespace torch
 
     class TorchHandler
     {
-        struct TorchConfig config
-        {
-            1, 1
-        };
+        TorchConfig config{1.0f, 1.0f};
         unsigned short intensityIn_mA(Intensity val);
         void setIntensityByColor();
 

@@ -3,6 +3,7 @@
 
 #include "TorchHandler.hpp"
 #include <bsp/torch/torch.hpp>
+#include <stdexcept>
 
 namespace torch
 {
@@ -31,16 +32,20 @@ namespace torch
 
     void TorchHandler::toggleOnOff()
     {
-        auto state    = getState();
-        auto newState = (state.second == State::off) ? State::on : State::off;
+        auto [success, state] = getState();
+        if (!success)
+            std::runtime_error("torch get state fail");
+        auto newState = (state == State::off) ? State::on : State::off;
         setIntensityByColor();
         turn(newState, ColourTemperature::coldest);
     }
 
     void TorchHandler::toggleColor()
     {
-        auto state = getState();
-        if (state.second == State::on) {
+        auto [success, state] = getState();
+        if (!success)
+            std::runtime_error("torch get state fail");
+        if (state == State::on) {
             auto color = getColorTemp();
             auto newColor =
                 (color == ColourTemperature::coldest) ? ColourTemperature::warmest : ColourTemperature::coldest;

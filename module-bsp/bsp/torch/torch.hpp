@@ -28,7 +28,7 @@ namespace bsp::torch
     };
 
 
-    const unsigned short max_current_mA = 150;
+    constexpr unsigned short max_current_mA = 150;
 
     int32_t init(xQueueHandle qHandle);
     void deinit();
