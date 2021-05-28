@@ -49,7 +49,7 @@ target_sources(
                 ${CMAKE_CURRENT_SOURCE_DIR}/Audio/transcode/TransformFactory.cpp
                 ${CMAKE_CURRENT_SOURCE_DIR}/Audio/VolumeScaler.cpp
 )
-target_include_directories(${PROJECT_NAME} PRIVATE ${TAGLIB_INCLUDE_DIRS})
+
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_TARGET})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_DEFINITIONS})

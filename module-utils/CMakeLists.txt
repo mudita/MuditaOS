@@ -55,14 +55,6 @@ include(third-party/libphonenumber.cmake)
 # link against libphonenumber
 target_link_libraries (${PROJECT_NAME} PUBLIC ${LIBPHONENUMBER_TARGET})
 
-add_subdirectory(taglib EXCLUDE_FROM_ALL)
-set( TAGLIB_INCLUDE_DIRS
-	 "${CMAKE_CURRENT_SOURCE_DIR}/taglib/taglib/toolkit"
-	 "${CMAKE_CURRENT_SOURCE_DIR}/taglib/taglib"
-	 "${CMAKE_CURRENT_BINARY_DIR}/taglib"
-	 PARENT_SCOPE
-)
-
 target_link_libraries(${PROJECT_NAME} PRIVATE crc32 )
 
 # link against tinyexpr
