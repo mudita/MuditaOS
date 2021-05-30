@@ -61,9 +61,6 @@
 [submodule "host-tools/littlefs-fuse/lfsfuse"]
 	path = host-tools/littlefs-fuse/lfsfuse
 	url = https://github.com/littlefs-project/littlefs-fuse.git
-[submodule "module-vfs/thirdparty/lfsfs/littlefs"]
-	path = module-vfs/thirdparty/lfsfs/littlefs
-	url = https://github.com/littlefs-project/littlefs.git
 [submodule "module-utils/sml"]
 	path = third-party/sml/src
 	url = https://github.com/boost-ext/sml
@@ -84,3 +81,6 @@
 [submodule "third-party/parallel-hashmap/src"]
 	path = third-party/parallel-hashmap/src
 	url = https://github.com/greg7mdp/parallel-hashmap.git
+[submodule "third-party/littlefs/src"]
+	path = third-party/littlefs/src
+	url = https://github.com/littlefs-project/littlefs.git
