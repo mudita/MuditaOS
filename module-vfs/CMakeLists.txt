@@ -5,8 +5,6 @@ project(module-vfs VERSION 1.0
 
 module_is_test_entity()
 
-add_subdirectory(thirdparty/lfsfs)
-
 set(FF_FAT_SOURCES_THIRDPARTY
         ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/fatfs/source/ff.c
         ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/fatfs/source/ffunicode.c
@@ -51,7 +49,6 @@ endif()
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
 
-
 # Board specific compilation definitions,options,include directories and features
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_TARGET})
@@ -63,26 +60,27 @@ target_compile_features(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_FEATURES})
 target_compile_options(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_OPTIONS})
 target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
 
-target_compile_definitions(${PROJECT_NAME}
-        PUBLIC
-)
-
 target_include_directories(${PROJECT_NAME}
-        PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/user
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/user/
         ${CMAKE_CURRENT_SOURCE_DIR}/drivers/include
-)
-
-target_include_directories(${PROJECT_NAME}
-        PRIVATE
+    PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include/internal
         ${CMAKE_CURRENT_SOURCE_DIR}/drivers/include/thirdparty/fatfs
         ${CMAKE_CURRENT_SOURCE_DIR}/drivers/include/thirdparty
         ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/fatfs/source
 )
 
-target_link_libraries(${PROJECT_NAME} PUBLIC ${TARGET_LIBRARIES} module-os module-sys module-bsp module-utils)
-target_link_libraries(${PROJECT_NAME} PRIVATE littlefs)
+target_link_libraries(${PROJECT_NAME} 
+    PUBLIC 
+        ${TARGET_LIBRARIES} 
+        module-os
+        module-sys
+        module-bsp 
+        module-utils
+    PRIVATE 
+        littlefs::littlefs
+)
 
 if (${ENABLE_TESTS})
     add_subdirectory(tests)
