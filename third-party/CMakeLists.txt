@@ -10,4 +10,4 @@ add_subdirectory(minimp3)
 add_subdirectory(tinyexpr)
 add_subdirectory(parallel-hashmap)
 add_subdirectory(protobuf)
-
+add_subdirectory(littlefs)
