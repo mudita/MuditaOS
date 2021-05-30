@@ -384,8 +384,8 @@ namespace gui
         if (!mode24H) {
             if (type == Type::Start) {
                 const auto hours12H = date::make12(hoursFrom);
-                hourInput->setText(std::to_string(hours12H.count()));
-                minuteInput->setText(std::to_string(minutesFrom.count()));
+                hourInput->setText(utils::to_string(hours12H.count()));
+                minuteInput->setText(utils::to_string(minutesFrom.count()));
                 if (date::is_am(hoursFrom)) {
                     mode12hInput->setText(timeConstants::before_noon);
                 }
@@ -395,8 +395,8 @@ namespace gui
             }
             else if (type == Type::End) {
                 const auto hours12H = date::make12(hoursTill);
-                hourInput->setText(std::to_string(hours12H.count()));
-                minuteInput->setText(std::to_string(minutesTill.count()));
+                hourInput->setText(utils::to_string(hours12H.count()));
+                minuteInput->setText(utils::to_string(minutesTill.count()));
                 if (date::is_am(hoursTill)) {
                     mode12hInput->setText(timeConstants::before_noon);
                 }
@@ -407,12 +407,12 @@ namespace gui
         }
         else {
             if (type == Type::Start) {
-                hourInput->setText(std::to_string(hoursFrom.count()));
-                minuteInput->setText(std::to_string(minutesFrom.count()));
+                hourInput->setText(utils::to_string(hoursFrom.count()));
+                minuteInput->setText(utils::to_string(minutesFrom.count()));
             }
             else if (type == Type::End) {
-                hourInput->setText(std::to_string(hoursTill.count()));
-                minuteInput->setText(std::to_string(minutesTill.count()));
+                hourInput->setText(utils::to_string(hoursTill.count()));
+                minuteInput->setText(utils::to_string(minutesTill.count()));
             }
         }
     }
