@@ -6,11 +6,11 @@
 #include "Image.hpp"
 #include "StatusBarWidgetBase.hpp"
 
-namespace gui::top_bar
+namespace gui::status_bar
 {
     class Lock : public StatusBarWidgetBase<Image>
     {
       public:
         Lock(Item *parent, uint32_t x, uint32_t y);
     };
-} // namespace gui::top_bar
+} // namespace gui::status_bar

@@ -3,7 +3,7 @@
 
 #include "SIM.hpp"
 
-namespace gui::top_bar
+namespace gui::status_bar
 {
     using namespace Store;
 
@@ -56,7 +56,7 @@ namespace gui::top_bar
     SIMConfiguration::SIMConfiguration(DisplayMode mode) : mode{mode}
     {}
 
-    void SIMConfiguration::visit(gui::top_bar::SIM &widget) const
+    void SIMConfiguration::visit(gui::status_bar::SIM &widget) const
     {
         widget.mode = getMode();
     }
@@ -73,4 +73,4 @@ namespace gui::top_bar
     {
         StatusBarWidgetBase<Image>::setVisible(true);
     }
-}; // namespace gui::top_bar
+}; // namespace gui::status_bar

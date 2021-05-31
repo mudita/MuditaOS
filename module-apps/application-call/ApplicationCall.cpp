@@ -36,8 +36,9 @@ namespace app
                                      StartInBackground startInBackground)
         : Application(name, parent, mode, startInBackground, app::call_stack_size)
     {
-        using namespace gui::top_bar;
-        topBarManager->enableIndicators({Indicator::Signal, Indicator::Time, Indicator::Battery, Indicator::SimCard});
+        using namespace gui::status_bar;
+        statusBarManager->enableIndicators(
+            {Indicator::Signal, Indicator::Time, Indicator::Battery, Indicator::SimCard});
         addActionReceiver(manager::actions::Call, [this](auto &&data) {
             switchWindow(window::name_call, std::forward<decltype(data)>(data));
             return actionHandled();
@@ -227,9 +228,7 @@ namespace app
         windowsFactory.attach(app::window::name_dialogConfirm, [](Application *app, const std::string &name) {
             return std::make_unique<gui::DialogConfirm>(app, name);
         });
-        attachPopups({gui::popup::ID::Volume,
-                      gui::popup::ID::Tethering,
-                      gui::popup::ID::PhoneModes});
+        attachPopups({gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes});
     }
 
     bool ApplicationCall::showNotification(std::function<bool()> action,

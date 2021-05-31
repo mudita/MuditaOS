@@ -9,7 +9,7 @@ namespace gui
 {
     class Label;
 }
-namespace gui::top_bar
+namespace gui::status_bar
 {
     class BatteryText : public BatteryBase
     {
@@ -22,4 +22,4 @@ namespace gui::top_bar
         void showBatteryCharging() override;
         Label *label = nullptr;
     };
-} // namespace gui::top_bar
+} // namespace gui::status_bar

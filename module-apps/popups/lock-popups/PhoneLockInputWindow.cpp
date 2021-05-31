@@ -32,15 +32,15 @@ namespace gui
         erase();
     }
 
-    top_bar::Configuration PhoneLockInputWindow::configureTopBar(top_bar::Configuration appConfiguration)
+    status_bar::Configuration PhoneLockInputWindow::configureStatusBar(status_bar::Configuration appConfiguration)
     {
         if (phoneLockInputTypeAction == locks::PhoneLockInputTypeAction::Unlock) {
-            appConfiguration.enable(top_bar::Indicator::Lock);
-            appConfiguration.disable(top_bar::Indicator::Time);
+            appConfiguration.enable(status_bar::Indicator::Lock);
+            appConfiguration.disable(status_bar::Indicator::Time);
         }
         else {
-            appConfiguration.enable(top_bar::Indicator::Time);
-            appConfiguration.disable(top_bar::Indicator::Lock);
+            appConfiguration.enable(status_bar::Indicator::Time);
+            appConfiguration.disable(status_bar::Indicator::Lock);
         }
         return appConfiguration;
     }

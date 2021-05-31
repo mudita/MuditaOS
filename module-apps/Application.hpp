@@ -27,7 +27,7 @@
 #include <string>   // for string
 #include <utility>  // for move, pair
 #include <vector>   // for vector
-#include <TopBarManager.hpp>
+#include <StatusBarManager.hpp>
 #include <popups/Popups.hpp>
 #include <locks/handlers/PhoneLockSubject.hpp>
 #include <locks/handlers/SimLockSubject.hpp>
@@ -395,7 +395,7 @@ namespace app
         void addActionReceiver(manager::actions::ActionId actionId, OnActionReceived &&callback);
         virtual void handleNotificationsChanged(std::unique_ptr<gui::SwitchData> notificationsParams);
 
-        std::unique_ptr<TopBarManager> topBarManager;
+        std::unique_ptr<StatusBarManager> statusBarManager;
 
         /// application's settings
         std::unique_ptr<settings::Settings> settings;
@@ -413,7 +413,7 @@ namespace app
 
         [[nodiscard]] auto getLockPolicyHandler() noexcept -> locks::LockPolicyHandlerInterface &;
 
-        const gui::top_bar::Configuration &getTopBarConfiguration() const noexcept;
+        const gui::status_bar::Configuration &getStatusBarConfiguration() const noexcept;
     };
 
     /// Parameter pack used by application launch action.

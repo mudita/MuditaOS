@@ -21,7 +21,7 @@ namespace gui
         AppWindow::buildInterface();
 
         bottomBar->setVisible(false);
-        topBar->setVisible(false);
+        statusBar->setVisible(false);
 
         modesBox = new ModesBox(this, 0, style::window::modes::top_offset);
     }
@@ -34,7 +34,7 @@ namespace gui
         WindowWithTimer::onBeforeShow(mode, data);
         const auto popupData = dynamic_cast<ModesPopupData *>(data);
         if (popupData != nullptr) {
-            const auto currentMode = popupData->getPhoneMode();
+            const auto currentMode       = popupData->getPhoneMode();
             const auto currentFlightMode = popupData->getFlightMode();
             modesBox->update(currentMode, currentFlightMode);
         }

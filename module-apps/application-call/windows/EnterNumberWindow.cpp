@@ -42,9 +42,9 @@ namespace gui
         setFocusItem(newContactIcon);
     }
 
-    top_bar::Configuration EnterNumberWindow::configureTopBar(top_bar::Configuration appConfiguration)
+    status_bar::Configuration EnterNumberWindow::configureStatusBar(status_bar::Configuration appConfiguration)
     {
-        appConfiguration.enable(top_bar::Indicator::PhoneMode);
+        appConfiguration.enable(status_bar::Indicator::PhoneMode);
         return appConfiguration;
     }
 
