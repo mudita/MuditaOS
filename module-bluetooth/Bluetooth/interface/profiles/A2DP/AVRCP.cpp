@@ -166,7 +166,7 @@ namespace bluetooth
         case AVRCP_SUBEVENT_NOTIFICATION_VOLUME_CHANGED: {
             const auto volume = avrcp_subevent_notification_volume_changed_get_absolute_volume(packet);
             auto &busProxy    = AVRCP::ownerService->bus;
-            busProxy.sendUnicast(std::make_shared<message::bluetooth::AudioVolume>(volume), service::name::bluetooth);
+            busProxy.sendUnicast(std::make_shared<message::bluetooth::A2DPVolume>(volume), service::name::bluetooth);
             LOG_INFO("AVRCP Controller: notification absolute volume changed %d %%\n", volume * 100 / 127);
         } break;
         case AVRCP_SUBEVENT_GET_CAPABILITY_EVENT_ID:

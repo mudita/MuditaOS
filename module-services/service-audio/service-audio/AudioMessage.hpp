@@ -287,3 +287,17 @@ class BluetoothDeviceVolumeChanged : public AudioMessage
   private:
     const std::uint8_t volume;
 };
+
+class A2DPDeviceVolumeChanged : public BluetoothDeviceVolumeChanged
+{
+  public:
+    A2DPDeviceVolumeChanged(std::uint8_t volume) : BluetoothDeviceVolumeChanged{volume}
+    {}
+};
+
+class HSPDeviceVolumeChanged : public BluetoothDeviceVolumeChanged
+{
+  public:
+    HSPDeviceVolumeChanged(std::uint8_t volume) : BluetoothDeviceVolumeChanged{volume}
+    {}
+};
