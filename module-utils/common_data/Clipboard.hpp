@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <module-os/RTOSWrapper/include/mutex.hpp>
+#include <mutex.hpp>
 
 #include <string>
 
