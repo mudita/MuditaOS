@@ -4,7 +4,7 @@
 #include "AudioSettingsModel.hpp"
 
 #include <service-audio/AudioServiceAPI.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 
 namespace audio_settings
 {

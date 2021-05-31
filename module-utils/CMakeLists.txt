@@ -37,9 +37,6 @@ set (SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/time/TimeRangeParser.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/time/DateAndTimeSettings.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Utils.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/log/Logger.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/log/log.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/log/LoggerBuffer.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/circular_buffer/StringCircularBuffer.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/generators/RandomStringGenerator.cpp
 )
@@ -64,6 +61,7 @@ PUBLIC
     module-os 
     module-vfs
     magic_enum
+    log
 )
 
 # Board specific compilation definitions,options,include directories and features
@@ -91,3 +89,4 @@ if (${ENABLE_TESTS})
 endif()
 
 add_subdirectory(bootconfig)
+add_subdirectory(log)

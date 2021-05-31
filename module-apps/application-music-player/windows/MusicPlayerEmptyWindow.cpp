@@ -7,7 +7,7 @@
 
 #include <Style.hpp>
 #include <i18n/i18n.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <service-audio/AudioServiceAPI.hpp>
 
 namespace gui

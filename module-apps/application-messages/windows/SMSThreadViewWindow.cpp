@@ -15,7 +15,7 @@
 #include <service-db/DBNotificationMessage.hpp>
 #include <module-db/queries/phonebook/QueryContactGetByID.hpp>
 
-#include <log/log.hpp>
+#include <log.hpp>
 #include <Style.hpp>
 
 #include <cassert>

@@ -6,7 +6,7 @@
 #include <Bluetooth/Device.hpp>
 #include <Bluetooth/Error.hpp>
 #include <BtCommand.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <Audio/AudioCommon.hpp>
 #include <audio/BluetoothAudioDevice.hpp>
 

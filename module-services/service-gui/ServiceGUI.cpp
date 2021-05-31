@@ -12,7 +12,7 @@
 #include <DrawCommand.hpp>
 #include <FontManager.hpp>
 #include <gui/core/ImageManager.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <service-eink/Common.hpp>
 #include <service-eink/messages/ImageMessage.hpp>
 #include <service-eink/messages/EinkMessage.hpp>

@@ -10,7 +10,7 @@
 #include "application-messages/data/MessagesStyle.hpp"
 #include "application-messages/widgets/ThreadItem.hpp"
 #include "application-messages/windows/ThreadWindowOptions.hpp"
-#include "log/log.hpp"
+#include "log.hpp"
 #include <module-db/queries/messages/threads/QueryThreadsGet.hpp>
 #include <module-db/queries/messages/threads/QueryThreadsGetForList.hpp>
 #include <service-db/DBServiceAPI.hpp>

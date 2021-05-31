@@ -15,7 +15,7 @@
 #include <queries/messages/threads/QueryThreadsGetCount.hpp>
 
 #include <cassert>
-#include <log/log.hpp>
+#include <log.hpp>
 
 ThreadRecordInterface::ThreadRecordInterface(SmsDB *smsDb, ContactsDB *contactsDb)
     : smsDB(smsDb), contactsDB(contactsDb)
