@@ -31,7 +31,7 @@ namespace purefs::fs::internal
         {}
         mount_point(const mount_point &) = delete;
         auto operator=(const mount_point &) = delete;
-        virtual ~mount_point() = default;
+        virtual ~mount_point()              = default;
         auto disk() const noexcept
         {
             return m_diskh.lock();

@@ -18,7 +18,6 @@ target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
 target_sources( ${PROJECT_NAME}
 	PRIVATE
 	"ServiceFileIndexer.cpp"
-	"messages/FileChangeMessage.cpp"
 	"StartupIndexer.cpp"
 	"notesIndexer.cpp"
 )
