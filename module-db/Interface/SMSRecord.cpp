@@ -19,7 +19,7 @@
 #include "queries/messages/sms/QuerySMSGetLastByThreadID.hpp"
 #include <queries/messages/sms/QuerySMSGetForList.hpp>
 
-#include <log/log.hpp>
+#include <log.hpp>
 
 #include <PhoneNumber.hpp>
 #include <optional>

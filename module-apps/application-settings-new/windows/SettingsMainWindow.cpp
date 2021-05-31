@@ -5,7 +5,7 @@
 #include "application-settings-new/ApplicationSettings.hpp"
 
 #include <i18n/i18n.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <service-appmgr/Controller.hpp>
 
 std::list<gui::Option> mainWindowOptionsNew(app::Application *app)

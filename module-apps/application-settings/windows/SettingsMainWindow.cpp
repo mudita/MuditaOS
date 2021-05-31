@@ -5,7 +5,7 @@
 #include "../ApplicationSettings.hpp"
 #include "Info.hpp"
 #include <i18n/i18n.hpp>
-#include "log/log.hpp"
+#include "log.hpp"
 #include "CellularPassthroughWindow.hpp"
 #include "FotaWindow.hpp"
 #include "EinkModeWindow.hpp"

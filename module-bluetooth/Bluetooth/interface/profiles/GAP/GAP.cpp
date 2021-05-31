@@ -3,7 +3,7 @@
 
 #include "GAP.hpp"
 
-#include <log/log.hpp>
+#include <log.hpp>
 #include <service-bluetooth/BluetoothMessage.hpp>
 #include <service-bluetooth/messages/ResponseVisibleDevices.hpp>
 #include <service-bluetooth/messages/Unpair.hpp>

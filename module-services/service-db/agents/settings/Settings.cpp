@@ -10,7 +10,7 @@
 #include <vector>
 
 #if defined(DEBUG_SETTINGS_DB) and DEBUG_SETTINGS_DB == 1
-#include <log/log.hpp>
+#include <log.hpp>
 #define log_debug(...) LOG_DEBUG(__VA_ARGS__);
 #else
 #define log_debug(...)

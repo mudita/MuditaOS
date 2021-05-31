@@ -9,7 +9,7 @@
 
 #include <at/response.hpp>
 #include <common_data/EventStore.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <MessageType.hpp>
 #include <module-utils/state/ServiceState.hpp>
 #include <projdefs.h>

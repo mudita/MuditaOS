@@ -11,7 +11,7 @@
 #include "Timers/TimerFactory.hpp"
 
 #include <bsp/usb/usb.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 
 #include <map>
 #include <vector>
