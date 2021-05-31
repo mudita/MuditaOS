@@ -8,6 +8,11 @@
 #include "Constants.hpp"
 #include "StartupIndexer.hpp"
 
+namespace purefs::fs
+{
+    class inotify;
+}
+
 namespace service
 {
 
@@ -28,6 +33,9 @@ namespace service
         auto onRenameFile(std::string_view oldPath, std::string_view newPath) -> void;
         auto onAudioContentChanged(std::string_view path) -> void;
         auto onTextContentChanged(std::string_view path) -> void;
+
+      private:
+        std::shared_ptr<purefs::fs::inotify> mfsNotifier;
         detail::StartupIndexer mStartupIndexer;
     };
 

@@ -95,6 +95,7 @@ set(BOARD_DIR_INCLUDES
         ${CMAKE_CURRENT_LIST_DIR}/board/rt1051/newlib/include
         ${CMAKE_SOURCE_DIR}/module-utils/CrashDebug/CrashCatcher/include
         ${CMAKE_SOURCE_DIR}/module-utils/CrashDebug/CrashCatcher/Core/src
+        ${CMAKE_SOURCE_DIR}/module-vfs/include/internal
 )
 
 set(TARGET_LIBRARIES

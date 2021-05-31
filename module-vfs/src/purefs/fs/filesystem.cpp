@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 #include <purefs/fs/filesystem.hpp>
 #include <purefs/fs/filesystem_operations.hpp>
@@ -6,6 +6,8 @@
 #include <purefs/blkdev/disk_manager.hpp>
 #include <purefs/fs/thread_local_cwd.hpp>
 #include <purefs/blkdev/disk_handle.hpp>
+#include <purefs/fs/notifier.hpp>
+#include <purefs/fs/fsnotify.hpp>
 #include <log/log.hpp>
 #include <split_sv.hpp>
 #include <errno.h>
@@ -21,7 +23,8 @@ namespace purefs::fs
         };
     }
     filesystem::filesystem(std::shared_ptr<blkdev::disk_manager> diskmm)
-        : m_diskmm(diskmm), m_lock(new cpp_freertos::MutexRecursive)
+        : m_diskmm(diskmm), m_lock(std::make_unique<cpp_freertos::MutexRecursive>()),
+          m_notifier(std::make_unique<internal::notifier>())
     {}
 
     filesystem::~filesystem()
@@ -308,4 +311,10 @@ namespace purefs::fs
             return {};
         }
     }
+
+    auto filesystem::inotify_create(std::shared_ptr<sys::Service> svc) -> std::shared_ptr<inotify>
+    {
+        return std::make_shared<inotify>(svc, m_notifier);
+    }
+
 } // namespace purefs::fs
