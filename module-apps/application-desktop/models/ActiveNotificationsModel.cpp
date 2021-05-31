@@ -6,7 +6,6 @@
 #include <module-db/queries/notifications/QueryNotificationsClear.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <application-call/data/CallSwitchData.hpp>
-#include <SystemManager/messages/TetheringStateRequest.hpp>
 #include <queries/messages/threads/QueryThreadGetByNumber.hpp>
 #include <application-messages/data/SMSdata.hpp>
 #include <application-messages/Constants.hpp>
@@ -148,8 +147,8 @@ namespace
     void setTetheringActivatedCallback(NotificationListItem *item, app::Application *app)
     {
         item->activatedCallback = [app]([[maybe_unused]] gui::Item &_item) {
-            return app->bus.sendUnicast(std::make_shared<sys::TetheringStateRequest>(sys::phone_modes::Tethering::Off),
-                                        service::name::system_manager);
+            app->switchWindow(gui::popup::window::tethering_off_window);
+            return true;
         };
     }
 
