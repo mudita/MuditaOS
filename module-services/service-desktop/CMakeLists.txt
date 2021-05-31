@@ -60,6 +60,7 @@ target_link_libraries(${PROJECT_NAME}
         module-cellular
         crc32
         microtar
+        utils-bootconfig
 )
 
 if (${ENABLE_TESTS})
