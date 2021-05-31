@@ -184,7 +184,10 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
         if (!queue->Dequeue(&notification, 0)) {
             return false;
         }
-        processKeyEvent(bsp::KeyEvents::Pressed, bsp::magnetometer::getCurrentSliderPosition());
+
+        bsp::magnetometer::resetCurrentParsedValue();
+        LOG_WARN("Received notify, current value reset!");
+        handleMagnetometerEvent();
     }
 
     if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueMagnetometerIRQ)) {
@@ -244,6 +247,7 @@ bool WorkerEvent::init(std::list<sys::WorkerQueueInfo> queuesList)
 
     auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuSentinel);
     service->bus.sendUnicast(std::move(sentinelRegistrationMsg), service::name::system_manager);
+
     return true;
 }
 
