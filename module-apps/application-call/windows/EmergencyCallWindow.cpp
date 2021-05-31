@@ -27,9 +27,9 @@ namespace gui
         numberDescriptionLabel->setText(utils::translate("app_call_emergency_text"));
     }
 
-    top_bar::Configuration EmergencyCallWindow::configureTopBar(top_bar::Configuration appConfiguration)
+    status_bar::Configuration EmergencyCallWindow::configureStatusBar(status_bar::Configuration appConfiguration)
     {
-        appConfiguration.enable(top_bar::Indicator::PhoneMode);
+        appConfiguration.enable(status_bar::Indicator::PhoneMode);
         return appConfiguration;
     }
 

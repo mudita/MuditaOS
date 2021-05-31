@@ -9,7 +9,7 @@ namespace gui
 {
     class Label;
 }
-namespace gui::top_bar
+namespace gui::status_bar
 {
     class SignalStrengthText : public SignalStrengthBase
     {
@@ -22,4 +22,4 @@ namespace gui::top_bar
       public:
         SignalStrengthText(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
     };
-} // namespace gui::top_bar
+} // namespace gui::status_bar

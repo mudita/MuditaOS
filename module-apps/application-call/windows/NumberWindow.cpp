@@ -8,10 +8,8 @@
 #include "application-call/data/CallSwitchData.hpp"
 
 #include <ContactRecord.hpp>
-#include <gui/widgets/BottomBar.hpp>
 #include <gui/widgets/Image.hpp>
 #include <gui/widgets/Label.hpp>
-#include <gui/widgets/TopBar.hpp>
 #include <gui/widgets/Window.hpp>
 #include <i18n/i18n.hpp>
 #include <InputMode.hpp>

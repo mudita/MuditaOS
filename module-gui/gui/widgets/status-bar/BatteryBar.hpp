@@ -10,7 +10,7 @@ namespace gui
     class Image;
 }
 
-namespace gui::top_bar
+namespace gui::status_bar
 {
     class BatteryBar : public BatteryBase
     {
@@ -24,4 +24,4 @@ namespace gui::top_bar
 
         Image *img = nullptr;
     };
-} // namespace gui::top_bar
+} // namespace gui::status_bar

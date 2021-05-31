@@ -5,20 +5,20 @@
 #include "Label.hpp"
 #include "Image.hpp"
 #include "BoxLayout.hpp"
-#include "TopBar.hpp"
-#include "TopBar/Style.hpp"
-#include "TopBar/BatteryBar.hpp"
-#include "TopBar/BatteryText.hpp"
-#include "TopBar/SignalStrengthBar.hpp"
-#include "TopBar/SignalStrengthText.hpp"
-#include "TopBar/NetworkAccessTechnology.hpp"
-#include "TopBar/PhoneMode.hpp"
-#include "TopBar/SIM.hpp"
-#include "TopBar/Time.hpp"
-#include "TopBar/Lock.hpp"
+#include "StatusBar.hpp"
+#include "status-bar/Style.hpp"
+#include "status-bar/BatteryBar.hpp"
+#include "status-bar/BatteryText.hpp"
+#include "status-bar/SignalStrengthBar.hpp"
+#include "status-bar/SignalStrengthText.hpp"
+#include "status-bar/NetworkAccessTechnology.hpp"
+#include "status-bar/PhoneMode.hpp"
+#include "status-bar/SIM.hpp"
+#include "status-bar/Time.hpp"
+#include "status-bar/Lock.hpp"
 #include "common_data/EventStore.hpp"
 
-namespace gui::top_bar
+namespace gui::status_bar
 {
     using namespace style::header::status_bar;
 
@@ -81,7 +81,7 @@ namespace gui::top_bar
         indicatorsModifiers[indicator] = std::move(config);
     }
 
-    TopBar::TopBar(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h) : HBox{parent, x, y, w, h}
+    StatusBar::StatusBar(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h) : HBox{parent, x, y, w, h}
     {
         prepareWidget();
 
@@ -92,7 +92,7 @@ namespace gui::top_bar
         preBuildDrawListHook = [this](std::list<Command> &) { updateTime(); };
     }
 
-    void TopBar::prepareWidget()
+    void StatusBar::prepareWidget()
     {
         // left
         leftBox = new HBox(this, 0, 0, 0, 0);
@@ -136,12 +136,12 @@ namespace gui::top_bar
         updatePhoneMode();
     }
 
-    auto TopBar::getConfiguration() const noexcept -> const Configuration &
+    auto StatusBar::getConfiguration() const noexcept -> const Configuration &
     {
         return configuration;
     }
 
-    void TopBar::configure(Configuration &&config)
+    void StatusBar::configure(Configuration &&config)
     {
         if (config.isEnabled(Indicator::Lock)) {
             // In current implementation, lock and time indicators are mutually exclusive.
@@ -171,7 +171,7 @@ namespace gui::top_bar
         resizeItems();
     }
 
-    void TopBar::setIndicatorStatus(Indicator indicator, bool enabled)
+    void StatusBar::setIndicatorStatus(Indicator indicator, bool enabled)
     {
         switch (indicator) {
         case Indicator::Signal:
@@ -198,7 +198,7 @@ namespace gui::top_bar
         }
     }
 
-    void TopBar::setIndicatorModifier(Indicator indicator, StatusBarVisitor &modifier)
+    void StatusBar::setIndicatorModifier(Indicator indicator, StatusBarVisitor &modifier)
     {
         if (indicator == Indicator::SimCard && sim != nullptr) {
             sim->acceptStatusBarVisitor(modifier);
@@ -208,7 +208,7 @@ namespace gui::top_bar
         }
     }
 
-    bool TopBar::updateBattery()
+    bool StatusBar::updateBattery()
     {
         if (battery == nullptr) {
             return false;
@@ -217,13 +217,13 @@ namespace gui::top_bar
         return true;
     }
 
-    void TopBar::showBattery(bool enabled)
+    void StatusBar::showBattery(bool enabled)
     {
         battery->update(Store::Battery::get());
         enabled ? battery->show() : battery->hide();
     }
 
-    void TopBar::showSim(bool enabled)
+    void StatusBar::showSim(bool enabled)
     {
         if (enabled) {
             sim->update();
@@ -234,7 +234,7 @@ namespace gui::top_bar
         }
     }
 
-    bool TopBar::updateSim()
+    bool StatusBar::updateSim()
     {
         if (sim == nullptr) {
             return false;
@@ -243,14 +243,14 @@ namespace gui::top_bar
         return true;
     }
 
-    void TopBar::showSignalStrength(bool enabled)
+    void StatusBar::showSignalStrength(bool enabled)
     {
         auto signalStrength = Store::GSM::get()->getSignalStrength();
         signal->update(signalStrength);
         enabled ? signal->show() : signal->hide();
     }
 
-    bool TopBar::updateSignalStrength()
+    bool StatusBar::updateSignalStrength()
     {
         if (signal == nullptr) {
             return false;
@@ -259,7 +259,7 @@ namespace gui::top_bar
         return true;
     }
 
-    bool TopBar::updatePhoneMode()
+    bool StatusBar::updatePhoneMode()
     {
         if (phoneMode == nullptr) {
             return false;
@@ -268,12 +268,12 @@ namespace gui::top_bar
         return true;
     }
 
-    void TopBar::showPhoneMode(bool enabled)
+    void StatusBar::showPhoneMode(bool enabled)
     {
         enabled ? phoneMode->show() : phoneMode->hide();
     }
 
-    bool TopBar::updateNetworkAccessTechnology()
+    bool StatusBar::updateNetworkAccessTechnology()
     {
         if (networkAccessTechnology == nullptr) {
             return false;
@@ -282,13 +282,13 @@ namespace gui::top_bar
         return true;
     }
 
-    void TopBar::showNetworkAccessTechnology(bool enabled)
+    void StatusBar::showNetworkAccessTechnology(bool enabled)
     {
         networkAccessTechnology->update(Store::GSM::get()->getNetwork().accessTechnology);
         enabled ? networkAccessTechnology->show() : networkAccessTechnology->hide();
     }
 
-    void TopBar::showTime(bool enabled)
+    void StatusBar::showTime(bool enabled)
     {
         time->update();
         if (enabled) {
@@ -301,7 +301,7 @@ namespace gui::top_bar
         time->hide();
     }
 
-    void TopBar::showLock(bool enabled)
+    void StatusBar::showLock(bool enabled)
     {
         if (enabled) {
             centralBox->setMinimumSize(boxes::center::minX, this->drawArea.h);
@@ -312,7 +312,7 @@ namespace gui::top_bar
         lock->hide();
     }
 
-    bool TopBar::updateTime()
+    bool StatusBar::updateTime()
     {
         if (time == nullptr) {
             return false;
@@ -321,8 +321,8 @@ namespace gui::top_bar
         return true;
     }
 
-    void TopBar::accept(GuiVisitor &visitor)
+    void StatusBar::accept(GuiVisitor &visitor)
     {
         visitor.visit(*this);
     }
-} // namespace gui::top_bar
+} // namespace gui::status_bar

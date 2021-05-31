@@ -14,9 +14,9 @@ namespace gui
     /// Base window for all UI windows
     ///
     /// It consists of:
-    /// 1. TopBar
+    /// 1. StatusBar
     /// 2. BottomBar
-    /// 3. Body defined per window between TopBar and BottomBar
+    /// 3. Body defined per window between StatusBar and BottomBar
     ///
     /// All window switches are done based on Window::name and SwitchData
     /// All windows are statically build at start of application, and removed on application end

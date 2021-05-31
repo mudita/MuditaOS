@@ -17,6 +17,6 @@ namespace gui
         SimNotReadyWindow(app::Application *app, const std::string &name);
 
         void buildInterface() override;
-        top_bar::Configuration configureTopBar(top_bar::Configuration appConfiguration) override;
+        status_bar::Configuration configureStatusBar(status_bar::Configuration appConfiguration) override;
     };
 } /* namespace gui */

@@ -122,14 +122,14 @@ auto MeditationTimerWindow::onInput(const InputEvent &inputEvent) -> bool
     return AppWindow::onInput(inputEvent);
 }
 
-void MeditationTimerWindow::setWidgetVisible(bool tBar, bool bBar, bool counter)
+void MeditationTimerWindow::setWidgetVisible(bool sBar, bool bBar, bool counter)
 {
-    applyToTopBar([tBar](top_bar::Configuration configuration) {
-        configuration.setIndicator(top_bar::Indicator::Time, tBar);
+    applyToStatusBar([sBar](status_bar::Configuration configuration) {
+        configuration.setIndicator(status_bar::Indicator::Time, sBar);
         return configuration;
     });
 
-    title->setVisible(tBar);
+    title->setVisible(sBar);
     bottomBar->setActive(BottomBar::Side::CENTER, bBar);
     bottomBar->setActive(BottomBar::Side::LEFT, bBar);
     timer->setVisible(counter);

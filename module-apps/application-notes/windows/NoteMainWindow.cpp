@@ -10,10 +10,6 @@
 
 #include <i18n/i18n.hpp>
 
-#include <gui/widgets/Label.hpp>
-#include <gui/widgets/BottomBar.hpp>
-#include <gui/widgets/TopBar.hpp>
-
 #include <Style.hpp>
 #include <module-apps/application-notes/style/NotesListStyle.hpp>
 #include <module-apps/application-notes/style/NotesMainWindowStyle.hpp>

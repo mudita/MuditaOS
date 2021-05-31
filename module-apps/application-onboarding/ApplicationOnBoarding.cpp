@@ -39,8 +39,9 @@ namespace app
                                                  StartInBackground startInBackground)
         : Application(std::move(name), std::move(parent), mode, startInBackground, OnBoardingStackSize)
     {
-        using namespace gui::top_bar;
-        topBarManager->enableIndicators({Indicator::Signal, Indicator::Time, Indicator::Battery, Indicator::SimCard});
+        using namespace gui::status_bar;
+        statusBarManager->enableIndicators(
+            {Indicator::Signal, Indicator::Time, Indicator::Battery, Indicator::SimCard});
 
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         bus.channels.push_back(sys::BusChannel::PhoneLockChanges);

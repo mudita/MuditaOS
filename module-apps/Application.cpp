@@ -7,8 +7,8 @@
 #include "Item.hpp"                           // for Item
 #include "MessageType.hpp"                    // for MessageType
 #include "module-sys/Timers/TimerFactory.hpp" // for Timer
-#include "TopBar.hpp"
-#include "TopBar/Time.hpp"
+#include "StatusBar.hpp"
+#include "status-bar/Time.hpp"
 #include "Translator.hpp"                // for KeyInputSim...
 #include "common_data/EventStore.hpp"    // for Battery
 #include "common_data/RawKey.hpp"        // for RawKey, key...
@@ -106,15 +106,15 @@ namespace app
         : Service(std::move(name), std::move(parent), stackDepth, priority),
           default_window(gui::name::window::main_window), windowsStack(this),
           keyTranslator{std::make_unique<gui::KeyInputSimpleTranslation>()}, startInBackground{startInBackground},
-          callbackStorage{std::make_unique<CallbackStorage>()}, topBarManager{std::make_unique<TopBarManager>()},
+          callbackStorage{std::make_unique<CallbackStorage>()}, statusBarManager{std::make_unique<StatusBarManager>()},
           settings(std::make_unique<settings::Settings>()), phoneMode{mode}, phoneLockSubject(this),
           lockPolicyHandler(this), simLockSubject(this)
     {
-        topBarManager->enableIndicators({gui::top_bar::Indicator::Time});
-        using TimeMode = gui::top_bar::TimeConfiguration::TimeMode;
-        auto modifier  = std::make_shared<gui::top_bar::TimeConfiguration>(
+        statusBarManager->enableIndicators({gui::status_bar::Indicator::Time});
+        using TimeMode = gui::status_bar::TimeConfiguration::TimeMode;
+        auto modifier  = std::make_shared<gui::status_bar::TimeConfiguration>(
             utils::dateAndTimeSettings.isTimeFormat12() ? TimeMode::Time12h : TimeMode::Time24h);
-        topBarManager->set(gui::top_bar::Indicator::Time, std::move(modifier));
+        statusBarManager->set(gui::status_bar::Indicator::Time, std::move(modifier));
 
         bus.channels.push_back(sys::BusChannel::ServiceCellularNotifications);
 
@@ -940,9 +940,9 @@ namespace app
         item->attachTimer(timer);
     }
 
-    const gui::top_bar::Configuration &Application::getTopBarConfiguration() const noexcept
+    const gui::status_bar::Configuration &Application::getStatusBarConfiguration() const noexcept
     {
-        return topBarManager->getConfiguration();
+        return statusBarManager->getConfiguration();
     }
 
     void Application::addActionReceiver(manager::actions::ActionId actionId, OnActionReceived &&callback)

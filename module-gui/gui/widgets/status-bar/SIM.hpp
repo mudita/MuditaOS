@@ -4,10 +4,10 @@
 #pragma once
 
 #include "Image.hpp"
-#include "TopBar/StatusBarWidgetBase.hpp"
+#include "status-bar/StatusBarWidgetBase.hpp"
 #include <common_data/EventStore.hpp>
 
-namespace gui::top_bar
+namespace gui::status_bar
 {
     class SIMConfiguration : public StatusBarVisitor
     {
@@ -22,7 +22,7 @@ namespace gui::top_bar
 
         [[nodiscard]] DisplayMode getMode() const noexcept;
 
-        void visit([[maybe_unused]] gui::top_bar::SIM &widget) const override;
+        void visit([[maybe_unused]] gui::status_bar::SIM &widget) const override;
 
       private:
         DisplayMode mode;
@@ -30,7 +30,7 @@ namespace gui::top_bar
 
     class SIM : public StatusBarWidgetBase<Image>
     {
-        Store::GSM::SIM current = Store::GSM::SIM::SIM_UNKNOWN;
+        Store::GSM::SIM current            = Store::GSM::SIM::SIM_UNKNOWN;
         SIMConfiguration::DisplayMode mode = SIMConfiguration::DisplayMode::AnyState;
         friend class SIMConfiguration;
 
@@ -52,4 +52,4 @@ namespace gui::top_bar
 
         void show() override;
     };
-} // namespace gui::top_bar
+} // namespace gui::status_bar

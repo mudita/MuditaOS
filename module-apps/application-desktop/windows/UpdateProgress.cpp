@@ -2,8 +2,6 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <log/log.hpp>
-#include <gui/widgets/BottomBar.hpp>
-#include <gui/widgets/TopBar.hpp>
 #include <source/version.hpp>
 #include <boot/bootconfig.hpp>
 
@@ -70,13 +68,13 @@ namespace gui
         buildInterface();
     }
 
-    top_bar::Configuration UpdateProgressWindow::configureTopBar(top_bar::Configuration appConfiguration)
+    status_bar::Configuration UpdateProgressWindow::configureStatusBar(status_bar::Configuration appConfiguration)
     {
-        appConfiguration.enable(top_bar::Indicator::Time);
-        appConfiguration.disable(top_bar::Indicator::Lock);
-        appConfiguration.disable(top_bar::Indicator::Battery);
-        appConfiguration.disable(top_bar::Indicator::Signal);
-        appConfiguration.disable(top_bar::Indicator::SimCard);
+        appConfiguration.enable(status_bar::Indicator::Time);
+        appConfiguration.disable(status_bar::Indicator::Lock);
+        appConfiguration.disable(status_bar::Indicator::Battery);
+        appConfiguration.disable(status_bar::Indicator::Signal);
+        appConfiguration.disable(status_bar::Indicator::SimCard);
         return appConfiguration;
     }
 

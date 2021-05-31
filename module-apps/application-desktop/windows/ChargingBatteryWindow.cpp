@@ -4,8 +4,6 @@
 #include "ChargingBatteryWindow.hpp"
 #include "InputEvent.hpp"
 #include "gui/widgets/Image.hpp"
-#include "gui/widgets/BottomBar.hpp"
-#include "gui/widgets/TopBar.hpp"
 #include "log/log.hpp"
 #include <application-desktop/windows/Names.hpp>
 #include <service-appmgr/model/ApplicationManager.hpp>
@@ -35,7 +33,7 @@ namespace gui
     {
         AppWindow::buildInterface();
         bottomBar->setVisible(false);
-        topBar->setVisible(false);
+        statusBar->setVisible(false);
         new gui::Image(this, imgPositionX, imgPositionY, 0, 0, "charging_battery_W_G");
     }
 

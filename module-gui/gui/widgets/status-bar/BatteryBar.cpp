@@ -7,7 +7,7 @@
 #include "visitor/GuiVisitor.hpp"
 #include <Image.hpp>
 
-namespace gui::top_bar
+namespace gui::status_bar
 {
     namespace
     {
@@ -67,4 +67,4 @@ namespace gui::top_bar
         img->set(batteryChargingReady);
     }
 
-} // namespace gui::top_bar
+} // namespace gui::status_bar

@@ -3,7 +3,7 @@
 
 #include "Lock.hpp"
 
-namespace gui::top_bar
+namespace gui::status_bar
 {
     constexpr auto lock = "lock";
 
@@ -11,4 +11,4 @@ namespace gui::top_bar
     {
         set(lock);
     }
-}; // namespace gui::top_bar
+}; // namespace gui::status_bar

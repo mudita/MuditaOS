@@ -5,7 +5,7 @@
 #include "Item.hpp"
 #include "Style.hpp"
 
-namespace gui::top_bar
+namespace gui::status_bar
 {
     NetworkAccessTechnology::NetworkAccessTechnology(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h)
         : StatusBarWidgetBase(parent, x, y, w, h)
@@ -42,4 +42,4 @@ namespace gui::top_bar
             break;
         }
     }
-} // namespace gui::top_bar
+} // namespace gui::status_bar

@@ -9,7 +9,7 @@ namespace gui
 {
     class Image;
 }
-namespace gui::top_bar
+namespace gui::status_bar
 {
     class SignalStrengthBar : public SignalStrengthBase
     {
@@ -21,4 +21,4 @@ namespace gui::top_bar
       public:
         SignalStrengthBar(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
     };
-} // namespace gui::top_bar
+} // namespace gui::status_bar
