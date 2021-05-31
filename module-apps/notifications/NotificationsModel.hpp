@@ -22,6 +22,7 @@ namespace gui
         void requestRecords(uint32_t offset, uint32_t limit) final;
 
       protected:
+        bool tetheringOn = false;
         [[nodiscard]] virtual auto create(const notifications::NotSeenSMSNotification *notification)
             -> NotificationListItem *;
         [[nodiscard]] virtual auto create(const notifications::NotSeenCallNotification *notification)
@@ -32,6 +33,7 @@ namespace gui
       public:
         [[nodiscard]] bool isEmpty() const noexcept;
         [[nodiscard]] bool hasDismissibleNotification() const noexcept;
+        [[nodiscard]] bool isTetheringOn() const noexcept;
 
         void updateData(app::manager::actions::NotificationsChangedParams *params);
         void dismissAll(const InputEvent &event);
