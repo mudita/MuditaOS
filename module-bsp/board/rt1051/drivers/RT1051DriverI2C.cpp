@@ -50,7 +50,6 @@ namespace drivers
         auto ret = BOARD_LPI2C_Send(
             base, addr.deviceAddress, addr.subAddress, addr.subAddressSize, const_cast<uint8_t *>(txBuff), size);
         if (ret != kStatus_Success) {
-            LOG_ERROR("I2C Write: Error %ld", ret);
             return -1; // TODO:M.P: fix me
         }
         else {
@@ -63,7 +62,6 @@ namespace drivers
         cpp_freertos::LockGuard lock(mutex);
         auto ret = BOARD_LPI2C_Receive(base, addr.deviceAddress, addr.subAddress, addr.subAddressSize, rxBuff, size);
         if (ret != kStatus_Success) {
-            LOG_ERROR("I2C Read: Error %ld", ret);
             return -1; // TODO:M.P: fix me
         }
         else {
