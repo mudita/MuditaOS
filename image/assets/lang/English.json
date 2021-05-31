@@ -566,6 +566,8 @@
   "app_desktop_update_success": "MuditaOS has been updated to ver. $VERSION succesfully.",
   "app_call_private_number": "Private number",
   "tethering": "Tethering",
+  "tethering_turn_off_question": "Turn tethering off?",
   "tethering_enable_question": "<text>You're connected to the computer.<br />Turn tethering on?<br /><text color='9'>(some functions may be disabled)</text></text>",
-  "tethering_phone_mode_change_prohibited": "<text>Tethering is on.<br /><br />Other modes (Connected, DND,<br />Offline) are overriden by this mode<br />and are not working.</text>"
+  "tethering_phone_mode_change_prohibited": "<text>Tethering is on.<br /><br />Other modes (Connected, DND,<br />Offline) are overriden by this mode<br />and are not working.</text>",
+  "tethering_menu_access_decline": "<text>Tethering is on.<br /><br />To access menu,<br />turn tethering off.</text>"
 }

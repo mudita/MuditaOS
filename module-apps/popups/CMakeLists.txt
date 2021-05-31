@@ -21,6 +21,7 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/TetheringConfirmationPopup.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/TetheringNotificationPopup.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/TetheringPhoneModePopup.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/TetheringOffPopup.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/PowerOffWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/presenter/PowerOffPresenter.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/lock-popups/PhoneLockedInfoWindow.cpp"

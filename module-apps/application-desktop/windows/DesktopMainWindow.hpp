@@ -50,6 +50,7 @@ namespace gui
         bool updateTime() override;
 
       private:
+        bool showInformationPopup(std::function<bool()> action, const std::string &notification);
         void invalidate() noexcept;
         std::string osUpdateVer;
         std::string osCurrentVer;
