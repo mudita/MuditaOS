@@ -212,11 +212,19 @@ namespace AudioServiceAPI
      */
     bool KeyPressed(sys::Service *serv, const int step);
 
-    /** @brief Bluetooth volume changed handler.
+    /** @brief Bluetooth A2DP volume changed handler.
      *
      * @param serv - requesting service.
      * @param volume - volume level
      * @return True if request has been sent successfully, false otherwise
      */
-    bool BluetoothVolumeChanged(sys::Service *serv, const uint8_t volume);
+    bool BluetoothA2DPVolumeChanged(sys::Service *serv, const std::uint8_t volume);
+
+    /** @brief Bluetooth HSP volume changed handler.
+     *
+     * @param serv - requesting service.
+     * @param volume - volume level
+     * @return True if request has been sent successfully, false otherwise
+     */
+    bool BluetoothHSPVolumeChanged(sys::Service *serv, const std::uint8_t volume);
 }; // namespace AudioServiceAPI
