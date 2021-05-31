@@ -15,7 +15,7 @@ namespace gui
     class Label;
     class Image;
 
-    namespace top_bar
+    namespace status_bar
     {
         class SignalStrengthBase;
         class PhoneMode;
@@ -24,14 +24,14 @@ namespace gui
         class SIM;
         class Time;
         class Lock;
-    } // namespace top_bar
+    } // namespace status_bar
 } // namespace gui
 
 class UTF8;
 
 class StatusBarVisitor;
 
-namespace gui::top_bar
+namespace gui::status_bar
 {
 
     enum class Indicator
@@ -45,11 +45,11 @@ namespace gui::top_bar
         PhoneMode,               /// phone mode
     };
 
-    using Indicators        = std::vector<Indicator>;
-    using IndicatorStatuses = std::map<Indicator, bool>;
+    using Indicators          = std::vector<Indicator>;
+    using IndicatorStatuses   = std::map<Indicator, bool>;
     using IndicatorsModifiers = std::map<Indicator, std::shared_ptr<StatusBarVisitor>>;
 
-    /// Carries the top bar configuration.
+    /// Carries the status bar configuration.
     class Configuration
     {
       public:
@@ -113,12 +113,12 @@ namespace gui::top_bar
         IndicatorsModifiers indicatorsModifiers;
     };
 
-    /// Top bar widget class.
+    /// Status bar widget class.
     /// This is horizontal box with three sections
     /// * left showing signal strenght, NAT info, and/or phone mode
     /// * center showing lock info or digital clock
     /// * right showing sim card and battery status
-    class TopBar : public HBox
+    class StatusBar : public HBox
     {
       public:
         /// Constructor
@@ -127,7 +127,7 @@ namespace gui::top_bar
         /// @param y widget y position
         /// @param w widget width
         /// @param h widget height
-        TopBar(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
+        StatusBar(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
 
         /// Set the configuration basing on the specialized gui::top_bar::Configuration class
         /// @param configuration desired configuration
@@ -155,11 +155,11 @@ namespace gui::top_bar
         /// Update NAT widget state depending on the current configuration
         bool updateNetworkAccessTechnology();
 
-        /// Accepts GuiVisitor to update the top bar
+        /// Accepts GuiVisitor to update the status bar
         void accept(GuiVisitor &visitor) override;
 
       protected:
-        /// Set up and add all the widgets to the top bar
+        /// Set up and add all the widgets to the status bar
         void prepareWidget();
 
         /// Show/hide sim card status widget
@@ -190,7 +190,7 @@ namespace gui::top_bar
         /// @param enabled true to show false to hide the widget
         void showNetworkAccessTechnology(bool enabled);
 
-        /// Sets the status of the specified indicator on the top bar
+        /// Sets the status of the specified indicator on the Status bar
         /// @param indicator indicator id
         /// @param enabled enable or disable the specified indicator
         void setIndicatorStatus(Indicator indicator, bool enabled);
@@ -230,8 +230,8 @@ namespace gui::top_bar
         /// Pointer to the right horizontal box
         HBox *rightBox = nullptr;
 
-        /// Current configuration of the TopBar
+        /// Current configuration of the Statusbar
         Configuration configuration;
     };
 
-} // namespace gui::top_bar
+} // namespace gui::status_bar

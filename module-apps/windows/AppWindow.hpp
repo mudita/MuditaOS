@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <gui/widgets/TopBar.hpp>
+#include <gui/widgets/StatusBar.hpp>
 #include <gui/widgets/BottomBar.hpp>
 #include <gui/widgets/Window.hpp>
 #include <Service/Service.hpp>
@@ -40,16 +40,17 @@ namespace gui
         /**
          * Information bar for signal, battery and lock icon on the top of the screen.
          */
-        gui::top_bar::TopBar *topBar = nullptr;
+        gui::status_bar::StatusBar *statusBar = nullptr;
         /**
          * Pointer to the application object that owns the window.
          */
         app::Application *application = nullptr;
 
         /**
-         * A function that applies configuration changes to the current top bar configuration.
+         * A function that applies configuration changes to the current status bar configuration.
          */
-        using TopBarConfigurationChangeFunction = std::function<top_bar::Configuration(top_bar::Configuration)>;
+        using StatusBarConfigurationChangeFunction =
+            std::function<status_bar::Configuration(status_bar::Configuration)>;
 
         /**
          * A flag that is set if current window state requires the phone to stay unlocked
@@ -83,17 +84,17 @@ namespace gui
         void accept(GuiVisitor &visitor) override;
 
         /**
-         * Configure the top bar using window-specific configuration.
-         * @param appConfiguration      Application-wide top bar configuration that it to be modified.
-         * @return window-specific configuration of the top bar.
+         * Configure the status bar using window-specific configuration.
+         * @param appConfiguration      Application-wide status bar configuration that it to be modified.
+         * @return window-specific configuration of the status bar.
          */
-        virtual top_bar::Configuration configureTopBar(top_bar::Configuration appConfiguration);
+        virtual status_bar::Configuration configureStatusBar(status_bar::Configuration appConfiguration);
 
         /**
-         * Applies configuration change on the current top bar configuration.
-         * @param configChange  The function that contains the top bar configuration changes.
+         * Applies configuration change on the current status bar configuration.
+         * @param configChange  The function that contains the status bar configuration changes.
          */
-        void applyToTopBar(TopBarConfigurationChangeFunction configChange);
+        void applyToStatusBar(StatusBarConfigurationChangeFunction configChange);
 
         /// Setting bottom bar temporary text
         /// @param text - bottomBar text

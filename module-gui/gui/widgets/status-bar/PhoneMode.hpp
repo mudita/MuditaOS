@@ -6,11 +6,11 @@
 #include "StatusBarWidgetBase.hpp"
 #include <Label.hpp>
 #include <common_data/EventStore.hpp>
-#include <gui/widgets/TopBar.hpp>
+#include <gui/widgets/StatusBar.hpp>
 
-namespace gui::top_bar
+namespace gui::status_bar
 {
-    /// widget drawn on the top bar showing current phone mode:
+    /// widget drawn on the status bar showing current phone mode:
     class PhoneMode : public StatusBarWidgetBase<Label>
     {
 
@@ -28,4 +28,4 @@ namespace gui::top_bar
         void setPhoneMode(sys::phone_modes::PhoneMode mode);
     };
 
-} // namespace gui::top_bar
+} // namespace gui::status_bar

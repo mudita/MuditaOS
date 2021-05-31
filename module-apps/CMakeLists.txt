@@ -21,7 +21,7 @@ set( SOURCES
     "GuiTimer.cpp"
     "DOMResponder.cpp"
     "WindowsFactory.cpp"
-    "TopBarManager.cpp"
+    "StatusBarManager.cpp"
     "AsyncTask.cpp"
     "CallbackStorage.cpp"
     "windows/AppWindow.cpp"

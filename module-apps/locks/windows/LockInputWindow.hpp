@@ -46,7 +46,7 @@ namespace gui
         void setBottomBarWidgetsActive(bool left, bool center, bool right);
 
         [[nodiscard]] auto getToken(Token token) const -> std::string;
-        top_bar::Configuration configureTopBar(top_bar::Configuration appConfiguration) override;
+        status_bar::Configuration configureStatusBar(status_bar::Configuration appConfiguration) override;
 
         std::unique_ptr<locks::Lock> lock = nullptr;
         gui::HBox *pinLabelsBox           = nullptr;

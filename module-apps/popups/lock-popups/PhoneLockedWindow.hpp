@@ -46,7 +46,7 @@ namespace gui
         bool onInput(const InputEvent &inputEvent) override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         void buildInterface() override;
-        top_bar::Configuration configureTopBar(top_bar::Configuration appConfiguration) override;
+        status_bar::Configuration configureStatusBar(status_bar::Configuration appConfiguration) override;
 
         bool updateTime() override;
     };

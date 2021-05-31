@@ -7,8 +7,6 @@
 #include "windows/DialogMetadata.hpp"
 #include "messages/DialogMetadataMessage.hpp"
 #include <InputEvent.hpp>
-#include <gui/widgets/BottomBar.hpp>
-#include <gui/widgets/TopBar.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <module-services/service-db/service-db/DBNotificationMessage.hpp>
 

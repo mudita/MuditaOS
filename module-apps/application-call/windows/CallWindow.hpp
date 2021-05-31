@@ -27,8 +27,8 @@ namespace gui
         gui::KeyInputMappedTranslation translator;
         sys::TimerHandle callTimer;
         sys::TimerHandle delayedExitTimer;
-        std::chrono::seconds callDuration                   = std::chrono::seconds().zero();
-        static constexpr inline auto callDelayedStopTime    = std::chrono::milliseconds{3000};
+        std::chrono::seconds callDuration                = std::chrono::seconds().zero();
+        static constexpr inline auto callDelayedStopTime = std::chrono::milliseconds{3000};
 
         [[nodiscard]] auto getDelayedStopTime() const
         {
@@ -70,7 +70,7 @@ namespace gui
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;
-        top_bar::Configuration configureTopBar(top_bar::Configuration appConfiguration) override;
+        status_bar::Configuration configureStatusBar(status_bar::Configuration appConfiguration) override;
 
         bool handleDigit(const uint32_t digit);
         void connectTimerOnExit();

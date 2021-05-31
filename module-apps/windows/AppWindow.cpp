@@ -4,8 +4,8 @@
 #include "AppWindow.hpp"
 #include "Application.hpp"
 #include "InputEvent.hpp"
-#include "TopBar.hpp"
-#include "TopBar/Time.hpp"
+#include "StatusBar.hpp"
+#include "status-bar/Time.hpp"
 #include <Style.hpp>
 #include <i18n/i18n.hpp>
 #include <service-appmgr/Controller.hpp>
@@ -25,11 +25,11 @@ namespace gui
     void AppWindow::destroyInterface()
     {
         erase(bottomBar);
-        erase(topBar);
+        erase(statusBar);
         erase(title);
         title     = nullptr;
         bottomBar = nullptr;
-        topBar    = nullptr;
+        statusBar = nullptr;
     }
 
     void AppWindow::rebuild()
@@ -51,67 +51,67 @@ namespace gui
         title->setEllipsis(Ellipsis::Right);
         title->visible = false;
 
-        auto config          = configureTopBar(application->getTopBarConfiguration());
+        auto config          = configureStatusBar(application->getStatusBarConfiguration());
         namespace status_bar = style::header::status_bar;
-        topBar               = new gui::top_bar::TopBar(
+        statusBar            = new gui::status_bar::StatusBar(
             this, (style::window_width - status_bar::width) / 2, 0, status_bar::width, status_bar::height);
-        topBar->configure(std::move(config));
+        statusBar->configure(std::move(config));
     }
 
-    top_bar::Configuration AppWindow::configureTopBar(top_bar::Configuration appConfiguration)
+    status_bar::Configuration AppWindow::configureStatusBar(status_bar::Configuration appConfiguration)
     {
         return appConfiguration;
     }
 
-    void AppWindow::applyToTopBar(TopBarConfigurationChangeFunction configChange)
+    void AppWindow::applyToStatusBar(StatusBarConfigurationChangeFunction configChange)
     {
         if (configChange) {
-            auto newConfiguration = configChange(topBar->getConfiguration());
-            topBar->configure(std::move(newConfiguration));
+            auto newConfiguration = configChange(statusBar->getConfiguration());
+            statusBar->configure(std::move(newConfiguration));
         }
     }
 
     bool AppWindow::updateSim()
     {
-        if (topBar == nullptr) {
+        if (statusBar == nullptr) {
             return false;
         }
-        return topBar->updateSim();
+        return statusBar->updateSim();
     }
 
     bool AppWindow::updateBatteryStatus()
     {
-        if (topBar == nullptr) {
+        if (statusBar == nullptr) {
             return false;
         }
-        return topBar->updateBattery();
+        return statusBar->updateBattery();
     }
     // updates battery level in the window
     bool AppWindow::updateSignalStrength()
     {
-        if (topBar == nullptr) {
+        if (statusBar == nullptr) {
             return false;
         }
-        return topBar->updateSignalStrength();
+        return statusBar->updateSignalStrength();
     }
 
     bool AppWindow::updateNetworkAccessTechnology()
     {
-        if (topBar == nullptr) {
+        if (statusBar == nullptr) {
             return false;
         }
-        return topBar->updateNetworkAccessTechnology();
+        return statusBar->updateNetworkAccessTechnology();
     }
 
     void AppWindow::updatePhoneMode(sys::phone_modes::PhoneMode mode)
     {
-        auto fn = [&](gui::top_bar::Configuration cfg) -> gui::top_bar::Configuration {
-            gui::top_bar::Configuration ret(cfg);
+        auto fn = [&](gui::status_bar::Configuration cfg) -> gui::status_bar::Configuration {
+            gui::status_bar::Configuration ret(cfg);
             ret.setPhoneMode(mode);
             return ret;
         };
 
-        applyToTopBar(std::move(fn));
+        applyToStatusBar(std::move(fn));
     }
 
     bool AppWindow::preventsAutoLocking() const noexcept
@@ -121,17 +121,17 @@ namespace gui
 
     bool AppWindow::updateTime()
     {
-        applyToTopBar([](top_bar::Configuration configuration) {
-            using TimeMode = gui::top_bar::TimeConfiguration::TimeMode;
-            auto modifier  = std::make_shared<gui::top_bar::TimeConfiguration>(
+        applyToStatusBar([](status_bar::Configuration configuration) {
+            using TimeMode = gui::status_bar::TimeConfiguration::TimeMode;
+            auto modifier  = std::make_shared<gui::status_bar::TimeConfiguration>(
                 utils::dateAndTimeSettings.isTimeFormat12() ? TimeMode::Time12h : TimeMode::Time24h);
-            configuration.setIndicatorModifier(gui::top_bar::Indicator::Time, std::move(modifier));
+            configuration.setIndicatorModifier(gui::status_bar::Indicator::Time, std::move(modifier));
             return configuration;
         });
-        if (topBar == nullptr) {
+        if (statusBar == nullptr) {
             return false;
         }
-        return topBar->updateTime();
+        return statusBar->updateTime();
     }
 
     void AppWindow::setTitle(const UTF8 &text)

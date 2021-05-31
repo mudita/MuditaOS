@@ -8,7 +8,7 @@
 #include "Text.hpp"
 #include "Window.hpp"
 #include "BottomBar.hpp"
-#include "TopBar.hpp"
+#include "StatusBar.hpp"
 #include "ListItem.hpp"
 
 #include "ItemDataNames.hpp"
@@ -86,10 +86,10 @@ void Item2JsonSerializingVisitor::visit(gui::BottomBar &item)
     visit(static_cast<gui::Item &>(item));
 }
 
-void Item2JsonSerializingVisitor::visit(gui::top_bar::TopBar &item)
+void Item2JsonSerializingVisitor::visit(gui::status_bar::StatusBar &item)
 {
     if (itemName.empty()) {
-        itemName = magic_enum::enum_name(visitor::Names::TopBar);
+        itemName = magic_enum::enum_name(visitor::Names::StatusBar);
     }
     visit(static_cast<gui::Item &>(item));
 }
