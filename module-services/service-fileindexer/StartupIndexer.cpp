@@ -2,10 +2,8 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "StartupIndexer.hpp"
-#include "messages/FileChangeMessage.hpp"
 #include <Timers/TimerFactory.hpp>
 #include <filesystem>
-//#include <ff_stdio_listdir_recursive.h>
 #include <purefs/filesystem_paths.hpp>
 #include "Constants.hpp"
 
@@ -63,7 +61,7 @@ namespace service::detail
             mIdxTimer = sys::TimerFactory::createPeriodicTimer(
                 svc.get(), "file_indexing", std::chrono::milliseconds{timer_indexing_time}, [this, svc](sys::Timer &) {
                     if (!mMsgs.empty()) {
-                        svc->bus.sendUnicast(mMsgs.front(), std::string(service::name::file_indexer));
+                        // svc->bus.sendUnicast(mMsgs.front(), std::string(service::name::file_indexer));
                         mMsgs.pop_front();
                     }
                     else {
