@@ -88,6 +88,7 @@ target_link_libraries(${PROJECT_NAME}
     module-db
     module-bsp
     date::date
+    eventstore
     PRIVATE
     Microsoft.GSL::GSL
 )

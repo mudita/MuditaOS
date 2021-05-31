@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <module-utils/common_data/EventStore.hpp>
+#include <EventStore.hpp>
 
 #include "board.h"
 #include "bsp/battery-charger/battery_charger.hpp"

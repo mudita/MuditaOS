@@ -56,6 +56,7 @@ target_link_libraries(${PROJECT_NAME}
         service-evtmgr
     PUBLIC
         utf8
+        eventstore
     )
 
 if (${ENABLE_TESTS})

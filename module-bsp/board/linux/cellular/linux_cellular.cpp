@@ -9,7 +9,7 @@
 
 #include <log.hpp>
 #include "mutex.hpp"
-#include <common_data/EventStore.hpp>
+#include <EventStore.hpp>
 #include <errno.h>
 #include <fcntl.h>
 #include <map>

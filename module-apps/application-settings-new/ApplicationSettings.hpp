@@ -8,7 +8,7 @@
 #include <bsp/common.hpp>
 #include <bsp/keypad_backlight/keypad_backlight.hpp>
 #include <module-services/service-evtmgr/screen-light-control/ScreenLightControl.hpp>
-#include <common_data/EventStore.hpp>
+#include <EventStore.hpp>
 
 namespace gui::window::name
 {

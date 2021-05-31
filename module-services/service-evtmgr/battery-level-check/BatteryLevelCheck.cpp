@@ -5,7 +5,7 @@
 #include "service-evtmgr/BatteryMessages.hpp"
 #include "SystemManager/Constants.hpp"
 #include <agents/settings/SystemSettings.hpp>
-#include <common_data/EventStore.hpp>
+#include <EventStore.hpp>
 #include <Utils.hpp>
 
 #define BOOST_SML_CFG_DISABLE_MIN_SIZE // GCC10 fix

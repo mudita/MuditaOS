@@ -126,6 +126,7 @@ target_link_libraries(${PROJECT_NAME}
         service-db
         service-evtmgr
         Microsoft.GSL::GSL
+        eventstore
     PUBLIC
         module-audio
         module-bsp

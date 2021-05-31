@@ -3,7 +3,7 @@
 
 #include "SignalStrengthText.hpp"
 #include "Label.hpp"
-#include "common_data/EventStore.hpp"
+#include <EventStore.hpp>
 #include <Utils.hpp>
 #include "Style.hpp"
 

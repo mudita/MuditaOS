@@ -44,7 +44,7 @@
 #include <ctime>
 #include <module-apps/messages/AppMessage.hpp>
 #include <SystemManager/messages/CpuFrequencyMessage.hpp>
-#include <common_data/EventStore.hpp>
+#include <EventStore.hpp>
 #include <SystemManager/messages/PhoneModeRequest.hpp>
 #include <vibra/Vibra.hpp>
 

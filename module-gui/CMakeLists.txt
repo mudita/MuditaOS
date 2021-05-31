@@ -22,9 +22,10 @@ include(gui/dom/CMakeLists.txt)
 include_directories( ../module-utils )
 
 target_link_libraries(${PROJECT_NAME} 
-    PUBLIC 
+    PUBLIC
         module-utils 
         utf8
+        eventstore
         ${TARGET_LIBRARIES} 
     PRIVATE
         pugixml::pugixml
