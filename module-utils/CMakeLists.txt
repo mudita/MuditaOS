@@ -13,12 +13,6 @@ endif()
 
 module_is_test_entity()
 
-#if(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
-#	include(targets/Target_Linux.cmake)
-#else()
-#	include(targets/Target_Cross.cmake)
-#endif()
-
 set (SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/i18n/i18n.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/json/json11.cpp
@@ -72,7 +66,6 @@ target_link_libraries(${PROJECT_NAME}
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_TARGET})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_DEFINITIONS})
-#target_include_directories(${PROJECT_NAME} PUBLIC ${BOARD_DIR_INCLUDES} )
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_INCLUDES})
 target_compile_features(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_FEATURES})
 target_compile_options(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_OPTIONS})
