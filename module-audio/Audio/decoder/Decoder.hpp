@@ -8,7 +8,7 @@
 #include "Audio/Stream.hpp"
 #include "DecoderWorker.hpp"
 
-#include <log/log.hpp>
+#include <log.hpp>
 
 #include <memory>
 #include <optional>

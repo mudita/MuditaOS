@@ -6,7 +6,7 @@
 //#include <module-apps/application-calendar/widgets/CalendarStyle.hpp>
 //#include <module-apps/application-calendar/data/OptionParser.hpp>
 
-#include <log/log.hpp>
+#include <log.hpp>
 #include <Utils.hpp>
 
 #include <cassert>

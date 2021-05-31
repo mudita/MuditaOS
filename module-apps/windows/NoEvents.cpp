@@ -4,7 +4,7 @@
 #include "NoEvents.hpp"
 #include "Dialog.hpp"
 #include "DialogMetadataMessage.hpp"
-#include "log/log.hpp"
+#include "log.hpp"
 
 #include <service-appmgr/Controller.hpp>
 #include <Image.hpp>

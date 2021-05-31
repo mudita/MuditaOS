@@ -7,7 +7,7 @@
 #include <endpoints/EndpointFactory.hpp>
 
 #include <FreeRTOS.h>
-#include <log/log.hpp>
+#include <log.hpp>
 
 #include <bits/exception.h>
 #include <memory>

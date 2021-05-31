@@ -7,7 +7,7 @@
 #include "drivers/i2c/DriverI2C.hpp"
 
 #include "fsl_common.h"
-#include "log/log.hpp"
+#include "log.hpp"
 
 #include "task.h"
 

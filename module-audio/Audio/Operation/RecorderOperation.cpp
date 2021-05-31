@@ -10,7 +10,7 @@
 #include "Audio/Profiles/ProfileRecordingOnBoardMic.hpp"
 #include "Audio/AudioCommon.hpp"
 
-#include "log/log.hpp"
+#include "log.hpp"
 #include "FreeRTOS.h"
 #include "task.h"
 

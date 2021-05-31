@@ -5,7 +5,7 @@
 
 #include <Service/Service.hpp>
 #include <json/json11.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 
 #include <string>
 

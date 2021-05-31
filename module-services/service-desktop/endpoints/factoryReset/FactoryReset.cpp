@@ -3,7 +3,7 @@
 
 #include "FactoryReset.hpp"
 #include <SystemManager/SystemManager.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <service-db/DBServiceName.hpp>
 #include <Utils.hpp>
 

@@ -39,7 +39,7 @@
  *----------------------------------------------------------*/
 #include <assert.h>
 #include <stdint.h>
-#include "log/log.hpp"
+#include "log.hpp"
 
 //TODO: Look at tasks.c: void vTaskStepTick( const TickType_t xTicksToJump ) before upgrading FreeRTOS
 #ifdef __cplusplus

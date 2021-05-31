@@ -17,7 +17,7 @@
 #include <windows/DialogMetadata.hpp>
 #include <messages/DialogMetadataMessage.hpp>
 
-#include <log/log.hpp>
+#include <log.hpp>
 
 namespace gui
 {

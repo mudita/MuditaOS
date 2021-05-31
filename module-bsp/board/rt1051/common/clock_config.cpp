@@ -54,7 +54,7 @@
 #include "fsl_iomuxc.h"
 #include "fsl_dcdc.h"
 #include "fsl_gpc.h"
-#include "log/log.hpp"
+#include "log.hpp"
 
 /*******************************************************************************
  * Definitions

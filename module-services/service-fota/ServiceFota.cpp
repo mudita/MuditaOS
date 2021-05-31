@@ -12,7 +12,7 @@
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
 #include <Timers/TimerFactory.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <at/Result.hpp>
 #include <at/UrcFactory.hpp>
 #include <portmacro.h>

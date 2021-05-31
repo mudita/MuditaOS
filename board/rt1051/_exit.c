@@ -32,7 +32,7 @@
 
 #include <FreeRTOS.h>
 #include <MIMXRT1051.h>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <task.h>
 #include <macros.h>
 // ----------------------------------------------------------------------------

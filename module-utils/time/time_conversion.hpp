@@ -8,7 +8,7 @@
 
 #include "time/time_locale.hpp"
 #include <bsp/rtc/rtc.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 
 #include <vector>
 #include <string>

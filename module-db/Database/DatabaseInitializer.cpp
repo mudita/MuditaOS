@@ -9,7 +9,7 @@
 #include <set>
 #include <string>
 #include <sstream>
-#include <log/log.hpp>
+#include <log.hpp>
 
 DatabaseInitializer::DatabaseInitializer(Database *db) : db(db)
 {}

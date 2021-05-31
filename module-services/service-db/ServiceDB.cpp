@@ -34,7 +34,7 @@
 #include <SMSTemplateRecord.hpp>
 #include <Tables/Record.hpp>
 #include <ThreadRecord.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <time/ScopedTime.hpp>
 
 #include <cassert>

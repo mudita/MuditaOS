@@ -3,7 +3,7 @@
 
 #include <service-appmgr/model/ActionsRegistry.hpp>
 
-#include <module-utils/log/log.hpp>
+#include <log.hpp>
 #include <magic_enum.hpp>
 
 #include <cassert>
