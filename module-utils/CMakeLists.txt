@@ -12,12 +12,13 @@ endif()
 
 module_is_test_entity()
 
+add_subdirectory(Clipboard)
+add_subdirectory(EventStore)
+
 set (SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/i18n/i18n.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/json/json11.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/time/time_conversion.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/common_data/EventStore.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/common_data/Clipboard.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/ucs2/UCS2.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/time/time_date_validation.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/PhoneNumber.cpp
@@ -39,21 +40,16 @@ include(segger/rtt/CMakeLists.txt)
 # add third party libs
 include(third-party/libphonenumber.cmake)
 
-# link against libphonenumber
-target_link_libraries (${PROJECT_NAME} PUBLIC ${LIBPHONENUMBER_TARGET})
-
-target_link_libraries(${PROJECT_NAME} PRIVATE crc32 )
-
-# link against tinyexpr
-target_link_libraries (${PROJECT_NAME} PUBLIC ${TINYEXPR_TARGET})
-
-target_link_libraries(${PROJECT_NAME} 
+target_link_libraries(${PROJECT_NAME}
 PUBLIC 
     board
     log
     magic_enum
     module-os 
     module-vfs
+    ${LIBPHONENUMBER_TARGET}
+PRIVATE
+    crc32
 )
 
 # Board specific compilation definitions,options,include directories and features

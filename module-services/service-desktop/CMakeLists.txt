@@ -65,6 +65,7 @@ target_link_libraries(${PROJECT_NAME}
         Microsoft.GSL::GSL
     PUBLIC
         module-cellular
+        eventstore
 )
 
 if (${ENABLE_TESTS})

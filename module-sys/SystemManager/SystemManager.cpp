@@ -6,7 +6,7 @@
 #include "DependencyGraph.hpp"
 #include "graph/TopologicalSort.hpp"
 
-#include <common_data/EventStore.hpp>
+#include <EventStore.hpp>
 #include "thread.hpp"
 #include "ticks.hpp"
 #include "critical.hpp"
