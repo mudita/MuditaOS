@@ -6,7 +6,7 @@
 #include <array>
 #include <utf8/UTF8.hpp>
 #include "i18n/i18n.hpp"
-#include <log/log.hpp>
+#include <log.hpp>
 
 namespace utils
 {

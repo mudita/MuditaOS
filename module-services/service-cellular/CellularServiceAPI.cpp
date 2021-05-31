@@ -10,7 +10,7 @@
 #include <PhoneNumber.hpp>
 #include <Service/Common.hpp>
 #include <bsp/cellular/bsp_cellular.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 
 #include <memory>
 #include <string>

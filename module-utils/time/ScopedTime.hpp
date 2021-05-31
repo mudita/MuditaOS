@@ -4,7 +4,7 @@
 #pragma once
 
 #include <FreeRTOS.h>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <string>
 #include <ticks.hpp>
 

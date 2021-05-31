@@ -14,7 +14,7 @@
 #include <MessageType.hpp>
 #include <Service/Worker.hpp>
 #include <json/json11.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <module-apps/application-desktop/ApplicationDesktop.hpp>
 #include <service-db/service-db/Settings.hpp>
 #include <service-db/QueryMessage.hpp>

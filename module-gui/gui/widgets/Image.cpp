@@ -7,7 +7,7 @@
 #include "ImageManager.hpp"
 
 #include <utf8/UTF8.hpp>
-#include <module-utils/log/log.hpp>
+#include <log.hpp>
 
 namespace gui
 {

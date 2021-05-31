@@ -11,7 +11,7 @@
 #include "module-sys/Timers/TimerHandle.hpp"  // for Timer
 #include "module-sys/Timers/TimerMessage.hpp" // for TimerMessage
 #include "log/debug.hpp"       // for DEBUG_SERVICE_MESSAGES
-#include "log/log.hpp"         // for LOG_ERROR, LOG_DEBUG, LOG_FATAL
+#include "log.hpp"         // for LOG_ERROR, LOG_DEBUG, LOG_FATAL
 #include "mutex.hpp"           // for cpp_freertos
 #include "portmacro.h"         // for UBaseType_t
 #include "thread.hpp"          // for Thread

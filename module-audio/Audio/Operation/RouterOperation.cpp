@@ -9,7 +9,7 @@
 #include <Audio/StreamFactory.hpp>
 #include <Audio/transcode/TransformFactory.hpp>
 
-#include <log/log.hpp>
+#include <log.hpp>
 #include <mutex.hpp>
 
 #include <algorithm>

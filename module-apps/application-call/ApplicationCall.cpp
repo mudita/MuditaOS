@@ -14,7 +14,7 @@
 #include <MessageType.hpp>
 #include <PhoneNumber.hpp>
 #include <Dialog.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <memory>
 #include <service-cellular/ServiceCellular.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>

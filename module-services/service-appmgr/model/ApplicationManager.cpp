@@ -20,7 +20,7 @@
 #include <application-onboarding/ApplicationOnBoarding.hpp>
 #include <application-onboarding/data/OnBoardingMessages.hpp>
 #include <i18n/i18n.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <service-appmgr/messages/Message.hpp>
 #include <service-evtmgr/EventManager.hpp>
 #include <service-evtmgr/EVMessages.hpp>

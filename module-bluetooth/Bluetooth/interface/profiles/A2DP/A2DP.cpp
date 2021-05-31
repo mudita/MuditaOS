@@ -11,12 +11,12 @@
 #include "AVRCP.hpp"
 #include <Bluetooth/Device.hpp>
 #include <Bluetooth/Error.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <service-bluetooth/BluetoothMessage.hpp>
 #include <Audio/AudioCommon.hpp>
 #include <service-audio/AudioMessage.hpp>
 #include <service-evtmgr/Constants.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 #include "service-bluetooth/messages/Connect.hpp"
 #include "service-bluetooth/messages/Disconnect.hpp"
 #include "service-bluetooth/Constants.hpp"

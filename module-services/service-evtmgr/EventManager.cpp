@@ -25,8 +25,8 @@
 #include <bsp/torch/torch.hpp>
 #include <bsp/battery-charger/battery_charger.hpp>
 #include <common_data/RawKey.hpp>
-#include <log/log.hpp>
-#include <log/Logger.hpp>
+#include <log.hpp>
+#include <Logger.hpp>
 #include <module-utils/time/time_conversion.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <service-audio/AudioMessage.hpp>

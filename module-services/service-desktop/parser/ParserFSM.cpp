@@ -10,7 +10,7 @@ namespace sys
 } // namespace sys
 
 #include <service-desktop/ServiceDesktop.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <json/json11.hpp>
 #include <memory>
 #include <string>

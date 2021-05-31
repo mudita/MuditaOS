@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-#include <log/log.hpp>      // for LOG_ERROR
+#include <log.hpp>      // for LOG_ERROR
 #include <bits/exception.h> // for exception
 #include <cstddef>          // for size_t
 #include <string>           // for string, allocator, basic_string, stol

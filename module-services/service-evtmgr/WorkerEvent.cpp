@@ -23,7 +23,7 @@
 #include <bsp/eink_frontlight/eink_frontlight.hpp>
 #include <common_data/RawKey.hpp>
 #include <headset.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <service-audio/AudioMessage.hpp>
 #include <service-desktop/Constants.hpp>
 #include <service-desktop/DesktopMessages.hpp>
