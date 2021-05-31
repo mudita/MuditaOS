@@ -34,19 +34,6 @@ auto BluetoothAudioDevice::getProfileType() const -> AudioProfile
     return profile;
 }
 
-auto BluetoothAudioDevice::setOutputVolume(float vol) -> audio::AudioDevice::RetCode
-{
-    const auto volumeToSet = audio::volume::scaler::toAvrcpVolume(vol);
-    const auto status      = avrcp_controller_set_absolute_volume(AVRCP::mediaTracker.avrcp_cid, volumeToSet);
-    if (status != ERROR_CODE_SUCCESS) {
-        LOG_ERROR("Can't set volume level. Status %x", status);
-        return audio::AudioDevice::RetCode::Failure;
-    }
-
-    outputVolume = vol;
-    return audio::AudioDevice::RetCode::Success;
-}
-
 auto BluetoothAudioDevice::setInputGain(float gain) -> audio::AudioDevice::RetCode
 {
     return audio::AudioDevice::RetCode::Success;
@@ -62,6 +49,19 @@ auto BluetoothAudioDevice::isOutputEnabled() const -> bool
     return outputEnabled;
 }
 
+auto A2DPAudioDevice::setOutputVolume(float vol) -> audio::AudioDevice::RetCode
+{
+    const auto volumeToSet = audio::volume::scaler::a2dp::toAvrcpVolume(vol);
+    const auto status      = avrcp_controller_set_absolute_volume(AVRCP::mediaTracker.avrcp_cid, volumeToSet);
+    if (status != ERROR_CODE_SUCCESS) {
+        LOG_ERROR("Can't set volume level. Status %x", status);
+        return audio::AudioDevice::RetCode::Failure;
+    }
+
+    outputVolume = vol;
+    return audio::AudioDevice::RetCode::Success;
+}
+
 void A2DPAudioDevice::onDataSend()
 {
     if (isOutputEnabled()) {
@@ -71,6 +71,16 @@ void A2DPAudioDevice::onDataSend()
 
 void A2DPAudioDevice::onDataReceive()
 {}
+
+auto HSPAudioDevice::setOutputVolume(float vol) -> audio::AudioDevice::RetCode
+{
+    const auto volumeToSet = audio::volume::scaler::hsp::toHSPGain(vol);
+    hsp_ag_set_speaker_gain(volumeToSet);
+
+    LOG_DEBUG("Volume to be set %d", volumeToSet);
+    outputVolume = vol;
+    return audio::AudioDevice::RetCode::Success;
+}
 
 void HSPAudioDevice::onDataSend()
 {}

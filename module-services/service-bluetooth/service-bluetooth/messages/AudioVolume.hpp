@@ -21,4 +21,17 @@ namespace message::bluetooth
       private:
         const std::uint8_t volume;
     };
+
+    class A2DPVolume : public AudioVolume
+    {
+      public:
+        explicit A2DPVolume(std::uint8_t volume) : AudioVolume{volume}
+        {}
+    };
+    class HSPVolume : public AudioVolume
+    {
+      public:
+        explicit HSPVolume(std::uint8_t volume) : AudioVolume{volume}
+        {}
+    };
 } // namespace message::bluetooth
