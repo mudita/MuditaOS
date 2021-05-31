@@ -82,7 +82,8 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
     connectHandler<BluetoothAudioStartMessage>();
     connectHandler<BluetoothMessage>();
     connectHandler<BluetoothPairMessage>();
-    connectHandler<message::bluetooth::AudioVolume>();
+    connectHandler<message::bluetooth::A2DPVolume>();
+    connectHandler<message::bluetooth::HSPVolume>();
     connectHandler<message::bluetooth::Ring>();
     connectHandler<message::bluetooth::StartAudioRouting>();
     connectHandler<message::bluetooth::Connect>();
@@ -343,9 +344,17 @@ auto ServiceBluetooth::handle(sdesktop::developerMode::DeveloperModeRequest *msg
     return sys::MessageNone{};
 }
 
-auto ServiceBluetooth::handle(message::bluetooth::AudioVolume *msg) -> std::shared_ptr<sys::Message>
+auto ServiceBluetooth::handle(message::bluetooth::A2DPVolume *msg) -> std::shared_ptr<sys::Message>
 {
-    AudioServiceAPI::BluetoothVolumeChanged(this, msg->getVolume());
+    using namespace message::bluetooth;
+    AudioServiceAPI::BluetoothA2DPVolumeChanged(this, msg->getVolume());
+    return sys::MessageNone{};
+}
+
+auto ServiceBluetooth::handle(message::bluetooth::HSPVolume *msg) -> std::shared_ptr<sys::Message>
+{
+    using namespace message::bluetooth;
+    AudioServiceAPI::BluetoothHSPVolumeChanged(this, msg->getVolume());
     return sys::MessageNone{};
 }
 

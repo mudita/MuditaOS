@@ -25,7 +25,6 @@ namespace bluetooth
 
         virtual auto getProfileType() const -> AudioProfile;
 
-        auto setOutputVolume(float vol) -> audio::AudioDevice::RetCode override;
         auto setInputGain(float gain) -> audio::AudioDevice::RetCode override;
 
         // Endpoint control methods
@@ -38,12 +37,12 @@ namespace bluetooth
         auto isInputEnabled() const -> bool;
         auto isOutputEnabled() const -> bool;
         auto fillSbcAudioBuffer() -> int;
+        float outputVolume;
 
       private:
         bool outputEnabled   = false;
         bool inputEnabled    = false;
         AudioProfile profile = AudioProfile::None;
-        float outputVolume;
     };
 
     class A2DPAudioDevice : public BluetoothAudioDevice
@@ -52,6 +51,7 @@ namespace bluetooth
         explicit A2DPAudioDevice() : BluetoothAudioDevice(AudioProfile::A2DP)
         {}
 
+        auto setOutputVolume(float vol) -> audio::AudioDevice::RetCode override;
         void onDataSend() override;
         void onDataReceive() override;
         auto getSupportedFormats() -> std::vector<audio::AudioFormat> override;
@@ -65,6 +65,7 @@ namespace bluetooth
         explicit HSPAudioDevice() : BluetoothAudioDevice(AudioProfile::HSP)
         {}
 
+        auto setOutputVolume(float vol) -> audio::AudioDevice::RetCode override;
         void onDataSend() override;
         void onDataSend(std::uint16_t scoHandle);
         void onDataReceive() override;

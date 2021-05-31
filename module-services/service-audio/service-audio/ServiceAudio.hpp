@@ -109,7 +109,9 @@ class ServiceAudio : public sys::Service
 
     const audio::Context getCurrentContext();
     void settingsChanged(const std::string &name, std::string value);
-    auto handleVolumeChangedOnBluetoothDevice(sys::Message *msgl) -> sys::MessagePointer;
+    void onVolumeChanged(audio::Volume volume);
+    auto handleA2DPVolumeChangedOnBluetoothDevice(sys::Message *msgl) -> sys::MessagePointer;
+    auto handleHSPVolumeChangedOnBluetoothDevice(sys::Message *msgl) -> sys::MessagePointer;
 };
 
 namespace sys

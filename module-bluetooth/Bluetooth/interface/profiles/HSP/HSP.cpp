@@ -1,15 +1,18 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include <log/log.hpp>
 #include "HSPImpl.hpp"
 #include "HSP.hpp"
 
 #include <Bluetooth/Error.hpp>
-#include <log.hpp>
 #include <service-evtmgr/Constants.hpp>
-#include <service-audio/AudioMessage.hpp>
-#include <service-cellular/service-cellular/CellularServiceAPI.hpp>
 #include <BluetoothWorker.hpp>
+#include <service-audio/AudioMessage.hpp>
+#include <service-bluetooth/Constants.hpp>
+#include <service-bluetooth/messages/AudioVolume.hpp>
+#include <service-cellular/service-cellular/CellularServiceAPI.hpp>
+#include <service-evtmgr/Constants.hpp>
 
 extern "C"
 {
@@ -202,9 +205,12 @@ namespace bluetooth
         case HSP_SUBEVENT_MICROPHONE_GAIN_CHANGED:
             LOG_DEBUG("Received microphone gain change %d\n", hsp_subevent_microphone_gain_changed_get_gain(event));
             break;
-        case HSP_SUBEVENT_SPEAKER_GAIN_CHANGED:
+        case HSP_SUBEVENT_SPEAKER_GAIN_CHANGED: {
+            const auto volume = hsp_subevent_speaker_gain_changed_get_gain(event);
+            auto &busProxy    = const_cast<sys::Service *>(ownerService)->bus;
+            busProxy.sendUnicast(std::make_shared<message::bluetooth::HSPVolume>(volume), service::name::bluetooth);
             LOG_DEBUG("Received speaker gain change %d\n", hsp_subevent_speaker_gain_changed_get_gain(event));
-            break;
+        } break;
         case HSP_SUBEVENT_HS_CALL_ANSWER:
             LOG_DEBUG("HSP CALL ANSWER");
             cellularInterface->answerIncomingCall(const_cast<sys::Service *>(ownerService));
