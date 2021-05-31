@@ -13,6 +13,9 @@
 #include <service-time/ServiceTime.hpp>
 #include <service-time/TimeMessage.hpp>
 #include <notifications/NotificationsModel.hpp>
+#include <windows/Dialog.hpp>
+#include <windows/DialogMetadata.hpp>
+#include <messages/DialogMetadataMessage.hpp>
 
 #include <log/log.hpp>
 
@@ -40,7 +43,17 @@ namespace gui
         dayText->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
 
         activatedCallback = [this]([[maybe_unused]] Item &item) {
-            application->switchWindow(app::window::name::desktop_menu);
+            if (notificationsModel->isTetheringOn()) {
+                showInformationPopup(
+                    [this]() {
+                        app::manager::Controller::sendAction(application, app::manager::actions::Home);
+                        return true;
+                    },
+                    utils::translate("tethering_menu_access_decline"));
+            }
+            else {
+                application->switchWindow(app::window::name::desktop_menu);
+            }
             return true;
         };
 
@@ -196,13 +209,14 @@ namespace gui
             return;
         }
         bottomBar->setText(BottomBar::Side::CENTER, utils::translate("app_desktop_menu"));
-        bottomBar->setText(BottomBar::Side::LEFT, utils::translate("app_desktop_calls"));
+        const auto tetheringNotActive = !notificationsModel->isTetheringOn();
+        bottomBar->setText(BottomBar::Side::LEFT, utils::translate("app_desktop_calls"), tetheringNotActive);
         const auto hasDismissibleNotification = notificationsModel->hasDismissibleNotification();
         bottomBar->setText(
             BottomBar::Side::RIGHT, utils::translate("app_desktop_clear_all"), hasDismissibleNotification);
 
-        inputCallback = [this, hasDismissibleNotification]([[maybe_unused]] Item &item,
-                                                           const InputEvent &inputEvent) -> bool {
+        inputCallback = [this, hasDismissibleNotification, tetheringNotActive]([[maybe_unused]] Item &item,
+                                                                               const InputEvent &inputEvent) -> bool {
             if (!inputEvent.isShortRelease() || notificationsList->focus) {
                 return false;
             }
@@ -211,7 +225,7 @@ namespace gui
                 notificationsModel->dismissAll(inputEvent);
                 return true;
             }
-            if (inputEvent.is(gui::KeyCode::KEY_LF)) {
+            if (inputEvent.is(gui::KeyCode::KEY_LF) && tetheringNotActive) {
                 LOG_DEBUG("KEY_LF pressed to navigate to calls");
                 return app::manager::Controller::sendAction(application, app::manager::actions::ShowCallLog);
             }
@@ -242,4 +256,16 @@ namespace gui
         }
         return ret;
     }
+
+    bool DesktopMainWindow::showInformationPopup(std::function<bool()> action, const std::string &notification)
+    {
+        DialogMetadata meta;
+        meta.icon       = "info_big_circle_W_G";
+        meta.text       = notification;
+        meta.action     = std::move(action);
+        auto switchData = std::make_unique<DialogMetadataMessage>(std::move(meta));
+        application->switchWindow(window::name::dialog_confirm, std::move(switchData));
+        return true;
+    }
+
 } /* namespace gui */
