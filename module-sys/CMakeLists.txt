@@ -60,6 +60,7 @@ target_link_libraries(module-sys
         service-evtmgr
         messagetype
         magic_enum
+        eventstore
     PUBLIC
         module-os
     )

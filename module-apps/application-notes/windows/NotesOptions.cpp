@@ -4,7 +4,7 @@
 #include "NotesOptions.hpp"
 
 #include <Option.hpp>
-#include <common_data/Clipboard.hpp>
+#include <Clipboard.hpp>
 
 #include <module-apps/windows/DialogMetadata.hpp>
 #include <module-apps/messages/DialogMetadataMessage.hpp>

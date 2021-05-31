@@ -52,7 +52,7 @@
 #include <at/UrcCpin.hpp> // for Cpin
 #include <at/response.hpp>
 #include <bsp/cellular/bsp_cellular.hpp>
-#include <common_data/EventStore.hpp>
+#include <EventStore.hpp>
 #include <country.hpp>
 #include <log.hpp>
 #include <at/UrcFactory.hpp>

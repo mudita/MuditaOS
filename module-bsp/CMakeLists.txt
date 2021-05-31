@@ -91,6 +91,7 @@ set_source_files_properties(${BOARD_SOURCE_FILES_PROPERTIES})
 target_link_libraries(${PROJECT_NAME}
     module-os
     service-bluetooth
+    eventstore
     ${TARGET_LIBRARIES}
 )
 

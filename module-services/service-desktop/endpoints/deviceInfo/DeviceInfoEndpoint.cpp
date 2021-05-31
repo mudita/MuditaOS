@@ -6,7 +6,7 @@
 #include <endpoints/update/UpdateMuditaOS.hpp>
 #include <parser/MessageHandler.hpp>
 
-#include <common_data/EventStore.hpp>
+#include <EventStore.hpp>
 #include <json/json11.hpp>
 #include <source/version.hpp>
 #include <service-desktop/service-desktop/ServiceDesktop.hpp>
