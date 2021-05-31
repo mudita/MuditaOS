@@ -9,8 +9,10 @@
 #include <service-appmgr/model/ApplicationManager.hpp>
 
 #include <at/response.hpp>
-#include <common_data/EventStore.hpp>
+
 #include <log.hpp>
+#include <EventStore.hpp>
+
 #include <MessageType.hpp>
 #include <projdefs.h>
 #include <module-sys/Timers/TimerFactory.hpp>

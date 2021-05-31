@@ -54,3 +54,7 @@ target_include_directories(${PROJECT_NAME}
         service-db
 )
 
+target_link_libraries(${PROJECT_NAME}
+	PRIVATE
+		clipboard
+)

@@ -6,7 +6,7 @@
 
 #include "Application.hpp"
 #include "bsp/common.hpp"
-#include <common_data/EventStore.hpp>
+#include <EventStore.hpp>
 
 namespace app
 {

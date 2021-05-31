@@ -8,7 +8,7 @@
 #include <memory>
 
 #include <module-apps/popups/data/PopupRequestParams.hpp>
-#include <module-utils/common_data/EventStore.hpp>
+#include <EventStore.hpp>
 #include <module-sys/Timers/TimerFactory.hpp>
 #include <service-cellular-api>
 

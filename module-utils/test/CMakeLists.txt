@@ -20,16 +20,6 @@ add_catch2_executable(
         module-utils
 )
 
-# Clipboard tests
-add_catch2_executable(
-    NAME
-        utils-clipboard
-    SRCS
-        unittest_clipboard.cpp
-    LIBS
-        module-utils
-)
-
 # UCS2 tests
 add_catch2_executable(
     NAME
