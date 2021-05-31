@@ -5,6 +5,7 @@ set(SOURCES
         EventManager.cpp
         WorkerEvent.cpp
         api/EventManagerServiceAPI.cpp
+        api/torch.cpp
         battery-level-check/BatteryLevelCheck.cpp
         backlight-handler/BacklightHandler.cpp
         battery-brownout-detector/BatteryBrownoutDetector.cpp
@@ -18,7 +19,9 @@ add_library(${PROJECT_NAME} STATIC ${SOURCES})
 target_include_directories(${PROJECT_NAME}
     PUBLIC
         "${CMAKE_CURRENT_LIST_DIR}"
+         ${CMAKE_CURRENT_LIST_DIR}/service-evtmgr/include
 )
+ 
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
