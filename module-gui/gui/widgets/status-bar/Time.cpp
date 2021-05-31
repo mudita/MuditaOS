@@ -5,7 +5,7 @@
 #include "Style.hpp"
 
 #include <ctime>
-namespace gui::top_bar
+namespace gui::status_bar
 {
     Time::Time(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h)
         : StatusBarWidgetBase(parent, x, y, w, h), _time{}
@@ -43,11 +43,11 @@ namespace gui::top_bar
         return mode;
     }
 
-    void TimeConfiguration::visit(gui::top_bar::Time &widget) const
+    void TimeConfiguration::visit(gui::status_bar::Time &widget) const
     {
         using namespace utils::time;
         getMode() == TimeConfiguration::TimeMode::Time12h
             ? widget.setFormat(Locale::format(Locale::TimeFormat::FormatTime12H))
             : widget.setFormat(Locale::format(Locale::TimeFormat::FormatTime24H));
     }
-} // namespace gui::top_bar
+} // namespace gui::status_bar

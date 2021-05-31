@@ -7,7 +7,7 @@
 #include "BoxLayout.hpp"
 #include <common_data/EventStore.hpp>
 
-namespace gui::top_bar
+namespace gui::status_bar
 {
     class SignalStrengthBase : public StatusBarWidgetBase<HBox>
     {
@@ -19,4 +19,4 @@ namespace gui::top_bar
         SignalStrengthBase(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
         void update(const Store::SignalStrength &data);
     };
-} // namespace gui::top_bar
+} // namespace gui::status_bar

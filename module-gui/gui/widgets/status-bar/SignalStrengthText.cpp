@@ -7,7 +7,7 @@
 #include <Utils.hpp>
 #include "Style.hpp"
 
-namespace gui::top_bar
+namespace gui::status_bar
 {
     SignalStrengthText::SignalStrengthText(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h)
         : SignalStrengthBase(parent, x, y, w, h)
@@ -27,4 +27,4 @@ namespace gui::top_bar
         label->setText(utils::to_string(signalStrength.rssidBm) + " dBm");
     }
 
-} // namespace gui::top_bar
+} // namespace gui::status_bar

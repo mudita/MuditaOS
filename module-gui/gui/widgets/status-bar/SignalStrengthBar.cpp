@@ -6,7 +6,7 @@
 #include <Image.hpp>
 #include <unordered_map>
 
-namespace gui::top_bar
+namespace gui::status_bar
 {
     namespace
     {
@@ -29,7 +29,7 @@ namespace gui::top_bar
     SignalStrengthBar::SignalStrengthBar(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h)
         : SignalStrengthBase(parent, x, y, w, h)
     {
-        img                             = new Image(this, signalMap.at(Store::RssiBar::zero));
+        img = new Image(this, signalMap.at(Store::RssiBar::zero));
         setMinimumSize(img->getWidth(), style::header::status_bar::height);
     }
 
@@ -38,4 +38,4 @@ namespace gui::top_bar
         img->set(signalMap.at(signalStrength.rssiBar));
     }
 
-} // namespace gui::top_bar
+} // namespace gui::status_bar

@@ -5,11 +5,11 @@
 
 #include <log/log.hpp>
 
-namespace gui::top_bar
+namespace gui::status_bar
 {
     class SIM;
     class Time;
-} // namespace gui::top_bar
+} // namespace gui::status_bar
 
 class StatusBarVisitor
 {
@@ -19,11 +19,11 @@ class StatusBarVisitor
     }
 
   public:
-    virtual void visit([[maybe_unused]] gui::top_bar::SIM &widget) const
+    virtual void visit([[maybe_unused]] gui::status_bar::SIM &widget) const
     {
         logError();
     }
-    virtual void visit([[maybe_unused]] gui::top_bar::Time &widget) const
+    virtual void visit([[maybe_unused]] gui::status_bar::Time &widget) const
     {
         logError();
     }

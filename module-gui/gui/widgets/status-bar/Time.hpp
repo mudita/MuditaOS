@@ -7,7 +7,7 @@
 #include <time/time_conversion.hpp>
 #include <Label.hpp>
 
-namespace gui::top_bar
+namespace gui::status_bar
 {
 
     /// Sets time mode (12h/24h) for Time widget
@@ -23,7 +23,7 @@ namespace gui::top_bar
         explicit TimeConfiguration(TimeMode mode);
 
         [[nodiscard]] TimeMode getMode() const noexcept;
-        void visit(gui::top_bar::Time &widget) const override;
+        void visit(gui::status_bar::Time &widget) const override;
 
       private:
         TimeMode mode;
@@ -40,4 +40,4 @@ namespace gui::top_bar
         void update();
         void acceptStatusBarVisitor(StatusBarVisitor &visitor) override;
     };
-} // namespace gui::top_bar
+} // namespace gui::status_bar

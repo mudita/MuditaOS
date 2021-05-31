@@ -6,7 +6,7 @@
 #include <Utils.hpp>
 #include "Style.hpp"
 
-namespace gui::top_bar
+namespace gui::status_bar
 {
     BatteryText::BatteryText(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h)
         : BatteryBase(parent, x, y, w, h)
@@ -28,12 +28,12 @@ namespace gui::top_bar
 
     void BatteryText::showBatteryCharging()
     {
-        label->setText(utils::translate("topbar_battery_charging"));
+        label->setText(utils::translate("statusbar_battery_charging"));
     }
 
     void BatteryText::showBatteryChargingDone()
     {
-        label->setText(utils::translate("topbar_battery_plugged"));
+        label->setText(utils::translate("statusbar_battery_plugged"));
     }
 
-} // namespace gui::top_bar
+} // namespace gui::status_bar

@@ -12,6 +12,6 @@ namespace app::onBoarding
       public:
         explicit SkipDialogWindow(app::Application *app);
 
-        gui::top_bar::Configuration configureTopBar(gui::top_bar::Configuration appConfiguration) override;
+        gui::status_bar::Configuration configureStatusBar(gui::status_bar::Configuration appConfiguration) override;
     };
 } // namespace app::onBoarding

@@ -9,16 +9,16 @@ namespace gui
     TetheringNotificationPopup::TetheringNotificationPopup(app::Application *app, const std::string &name)
         : gui::DialogConfirm(app, name)
     {
-        topBar->configure(configureTopBar(application->getTopBarConfiguration()));
+        statusBar->configure(configureStatusBar(application->getStatusBarConfiguration()));
     }
 
-    gui::top_bar::Configuration TetheringNotificationPopup::configureTopBar(
-        gui::top_bar::Configuration appConfiguration)
+    gui::status_bar::Configuration TetheringNotificationPopup::configureStatusBar(
+        gui::status_bar::Configuration appConfiguration)
     {
-        appConfiguration.setIndicator(gui::top_bar::Indicator::Time, false);
-        appConfiguration.setIndicator(gui::top_bar::Indicator::Battery, true);
-        appConfiguration.setIndicator(gui::top_bar::Indicator::SimCard, false);
-        appConfiguration.setIndicator(gui::top_bar::Indicator::Signal, true);
+        appConfiguration.setIndicator(gui::status_bar::Indicator::Time, false);
+        appConfiguration.setIndicator(gui::status_bar::Indicator::Battery, true);
+        appConfiguration.setIndicator(gui::status_bar::Indicator::SimCard, false);
+        appConfiguration.setIndicator(gui::status_bar::Indicator::Signal, true);
         return appConfiguration;
     }
 } // namespace gui

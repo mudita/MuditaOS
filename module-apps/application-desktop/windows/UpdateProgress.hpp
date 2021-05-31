@@ -20,8 +20,8 @@ namespace gui
         unsigned int progressPercent = 0;
         std::string textInfo;
 
-        gui::Label *percentLabel    = nullptr;
-        HBarGraph *updateProgress   = nullptr;
+        gui::Label *percentLabel  = nullptr;
+        HBarGraph *updateProgress = nullptr;
 
         fs::path updateFile;
 
@@ -38,7 +38,7 @@ namespace gui
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;
-        top_bar::Configuration configureTopBar(top_bar::Configuration appConfiguration) override;
+        status_bar::Configuration configureStatusBar(status_bar::Configuration appConfiguration) override;
     };
 
 } /* namespace gui */

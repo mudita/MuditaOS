@@ -2,8 +2,6 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "log/log.hpp"
-#include "gui/widgets/BottomBar.hpp"
-#include "gui/widgets/TopBar.hpp"
 #include "application-desktop/data/DesktopData.hpp"
 #include <source/version.hpp>
 
