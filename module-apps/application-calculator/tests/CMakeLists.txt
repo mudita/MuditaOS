@@ -10,8 +10,10 @@ add_catch2_executable(
         "${CMAKE_CURRENT_SOURCE_DIR}/CalculatorInput_tests.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/CalculatorUtility_tests.cpp"
     LIBS
+        module-sys
+        iosyscalls
         module-apps
         module-utils
-        module-vfs
-        iosyscalls
+    DEPS
+        assets
 )

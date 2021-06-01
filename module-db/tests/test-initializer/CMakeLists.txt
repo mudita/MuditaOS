@@ -10,9 +10,9 @@ add_catch2_executable(
         "${CMAKE_CURRENT_SOURCE_DIR}/tests-main.cpp"
         
     LIBS
-        module-db
-        module-vfs
+        module-sys
         iosyscalls
+        module-db
     DEPS
-        disk_image
+        assets
 )

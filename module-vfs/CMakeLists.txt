@@ -81,7 +81,7 @@ target_include_directories(${PROJECT_NAME}
         ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/fatfs/source
 )
 
-target_link_libraries(${PROJECT_NAME} PUBLIC ${TARGET_LIBRARIES} module-bsp module-utils module-sys module-os)
+target_link_libraries(${PROJECT_NAME} PUBLIC ${TARGET_LIBRARIES} module-os module-sys module-bsp module-utils)
 target_link_libraries(${PROJECT_NAME} PRIVATE littlefs)
 
 if (${ENABLE_TESTS})

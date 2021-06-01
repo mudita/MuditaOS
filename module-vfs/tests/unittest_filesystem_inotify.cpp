@@ -30,7 +30,7 @@ namespace sys
     {};
 } // namespace sys
 
-TEST_CASE("vfsinotify: Notifier base class test")
+TEST_CASE("Notifier base class test")
 {
     using namespace purefs::fs;
     auto svc = std::make_shared<sys::Service>();
@@ -102,7 +102,7 @@ TEST_CASE("vfsinotify: Notifier base class test")
     }
 }
 
-TEST_CASE("vfsinotify: Filtering test")
+TEST_CASE("Filtering test")
 {
     using namespace purefs::fs;
     SECTION("Different mask for services")

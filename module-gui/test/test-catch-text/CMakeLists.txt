@@ -20,10 +20,9 @@ add_catch2_executable(
                 ..
                 ../mock/
         LIBS
-                module-vfs
-                module-gui
+                module-sys
                 iosyscalls
+                module-gui
         DEPS
                 assets
-                disk_image
 )
