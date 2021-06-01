@@ -15,6 +15,7 @@
 # build system
 /CMakeLists.txt                             @mudita/chapter-bsp
 /third-party/CMakeLists.txt                 @mudita/chapter-bsp
+/module-utils/CMakeLists.txt                @mudita/chapter-bsp
 /cmake                                      @mudita/chapter-bsp
 /test/CMakeLists.txt                        @mudita/chapter-bsp
 
