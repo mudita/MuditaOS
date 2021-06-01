@@ -128,5 +128,11 @@ namespace stm
                 std::chrono::minutes{message->getTimeZoneOffset().value() / utils::time::secondsInMinute});
             return std::make_shared<sys::ResponseMessage>();
         });
+
+        connect(typeid(stm::message::TimeChangeRequestMessage), [&](sys::Message *request) -> sys::MessagePointer {
+            auto message = static_cast<stm::message::TimeChangeRequestMessage *>(request);
+            timeManager->handleTimeChangeRequest(message->getTime());
+            return std::make_shared<sys::ResponseMessage>();
+        });
     }
 } /* namespace stm */

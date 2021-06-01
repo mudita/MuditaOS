@@ -25,6 +25,11 @@ class TimeManager
      * @param timezoneOffset timezone offset related to UTC time
      */
     void handleCellularTimeUpdate(const struct tm time, std::chrono::minutes timezoneOffset);
+    /**
+     * Handles time change request.
+     * @param time UTC time to set
+     */
+    void handleTimeChangeRequest(const time_t &time);
 
   private:
     std::unique_ptr<RTCCommandInterface> rtcCommand;
