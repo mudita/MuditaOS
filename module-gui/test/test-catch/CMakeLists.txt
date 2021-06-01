@@ -14,10 +14,9 @@ add_catch2_executable(
         INCLUDE
                 ..
         LIBS
-                module-gui
-                module-vfs
+                module-sys
                 iosyscalls
+                module-gui
         DEPS
                 assets
-                disk_image
 )
