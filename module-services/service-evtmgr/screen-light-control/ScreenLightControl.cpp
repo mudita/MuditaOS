@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ScreenLightControl.hpp"
+#include "ScreenLightControlParameters.hpp"
 #include <module-sys/Timers/TimerFactory.hpp>
 #include <Service/Service.hpp>
 

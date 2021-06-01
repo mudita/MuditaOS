@@ -11,6 +11,7 @@ set(SOURCES
         battery-brownout-detector/BatteryBrownoutDetector.cpp
         screen-light-control/ControlFunctions.cpp
         screen-light-control/ScreenLightControl.cpp
+        screen-light-control/ScreenLightControlParameters.cpp
         vibra/Vibra.cpp
 )
 
@@ -33,6 +34,7 @@ target_link_libraries(${PROJECT_NAME}
         service-cellular
         service-desktop
         sml::sml
+        Microsoft.GSL::GSL
 )
 
 if (${ENABLE_TESTS})

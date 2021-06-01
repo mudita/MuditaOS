@@ -14,7 +14,7 @@
 
 #include <cassert>
 #include <vector>
-#include <gsl_assert>
+#include <gsl/assert>
 
 NotificationsRecord::NotificationsRecord(const NotificationsTableRow &tableRow, std::optional<ContactRecord> record)
     : Record{tableRow.ID}, value{tableRow.value}, contactRecord{std::move(record)}

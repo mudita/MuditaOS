@@ -4,7 +4,7 @@
 #include "EinkDisplay.hpp"
 
 #include <gui/core/Color.hpp>
-#include <gsl/gsl_util>
+#include <gsl/util>
 #include <bsp/BoardDefinitions.hpp>
 #include <cstdio>
 #include <cstring>

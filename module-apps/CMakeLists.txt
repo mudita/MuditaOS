@@ -125,6 +125,7 @@ target_link_libraries(${PROJECT_NAME}
         service-cellular
         service-db
         service-evtmgr
+        Microsoft.GSL::GSL
     PUBLIC
         module-audio
         module-bsp
