@@ -84,3 +84,6 @@
 [submodule "third-party/littlefs/src"]
 	path = third-party/littlefs/src
 	url = https://github.com/littlefs-project/littlefs.git
+[submodule "third-party/gsl"]
+	path = third-party/gsl
+	url = https://github.com/microsoft/GSL.git

@@ -15,6 +15,7 @@
 #include <widgets/TextWithIconsWidget.hpp>
 #include <widgets/ActiveIconFactory.hpp>
 
+#include <gsl/assert>
 #include <i18n/i18n.hpp>
 #include <time/time_conversion.hpp>
 #include <Style.hpp>

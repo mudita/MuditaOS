@@ -3,7 +3,7 @@
 
 #include "critical.hpp"
 #include <fstream>
-#include <gsl/gsl_util>
+#include <gsl/util>
 #include "LockGuard.hpp"
 #include "Logger.hpp"
 #include "macros.h"

@@ -27,6 +27,7 @@ target_link_libraries(${PROJECT_NAME}
         ${TARGET_LIBRARIES} 
     PRIVATE
         pugixml::pugixml
+        Microsoft.GSL::GSL
 )
 
 # Board specific compilation definitions,options,include directories and features

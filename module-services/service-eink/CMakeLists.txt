@@ -24,6 +24,7 @@ add_library(${PROJECT_NAME} STATIC ${SOURCES})
 target_link_libraries( ${PROJECT_NAME}
     module-utils
     service-gui
+    Microsoft.GSL::GSL
 )
 
 target_include_directories(${PROJECT_NAME}

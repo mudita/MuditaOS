@@ -61,6 +61,7 @@ target_link_libraries(${PROJECT_NAME}
         crc32
         microtar
         utils-bootconfig
+        Microsoft.GSL::GSL
 )
 
 if (${ENABLE_TESTS})

@@ -17,7 +17,7 @@
 #include <SystemManager/messages/DeviceRegistrationMessage.hpp>
 #include <time/time_conversion.hpp>
 
-#include <gsl/gsl_util>
+#include <gsl/util>
 
 #include <memory>
 #include <sstream>

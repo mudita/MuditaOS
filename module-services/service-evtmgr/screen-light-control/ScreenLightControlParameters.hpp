@@ -4,7 +4,6 @@
 #pragma once
 
 #include "ControlFunctions.hpp"
-#include <gsl_assert>
 #include <optional>
 
 namespace screen_light_control
@@ -67,21 +66,13 @@ namespace screen_light_control
             return manualModeParams.has_value();
         }
 
-        [[nodiscard]] auto getManualModeParams() const noexcept -> ManualModeParameters
-        {
-            Expects(hasManualModeParams());
-            return manualModeParams.value();
-        }
+        [[nodiscard]] auto getManualModeParams() const noexcept -> ManualModeParameters;
 
         [[nodiscard]] bool hasAutoModeParams() const noexcept
         {
             return autoModeParams.has_value();
         }
 
-        [[nodiscard]] auto getAutoModeParams() const noexcept -> const AutomaticModeParameters &
-        {
-            Expects(hasAutoModeParams());
-            return autoModeParams.value();
-        }
+        [[nodiscard]] auto getAutoModeParams() const noexcept -> const AutomaticModeParameters &;
     };
 } // namespace screen_light_control

@@ -6,7 +6,6 @@
 #include <sstream>
 #include <cstdint>
 #include <type_traits>
-#include <gsl_assert>
 #include "bsp/keyboard/key_codes.hpp"
 #include "common_data/RawKey.hpp"
 
@@ -168,13 +167,9 @@ namespace gui
             return toNumeric(keyCode) != InvalidNumericKeyCode;
         }
 
-        [[nodiscard]] auto numericValue() const -> int
-        {
-            Expects(isDigit());
-            return toNumeric(keyCode);
-        }
-
         [[nodiscard]] auto str() const -> std::string;
+
+        [[nodiscard]] auto numericValue() const -> int;
 
       private:
         RawKey rawKey   = {};                     /// RawKey data
