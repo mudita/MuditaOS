@@ -140,28 +140,41 @@ auto SettingsAgent::handleSetVariable(sys::Message *req) -> sys::MessagePointer
     return std::make_shared<sys::ResponseMessage>();
 }
 
+bool SettingsAgent::addUniquePath(const settings::EntryPath &path)
+{
+    if (auto it = variableChangeRecipients.find(path.to_string()); it == std::end(variableChangeRecipients)) {
+        variableChangeRecipients[path.to_string()] = {path};
+    }
+    else if (it->second.find(path) == std::end(it->second)) {
+        it->second.insert(path);
+    }
+    else {
+        return false;
+    }
+    return true;
+}
+
 auto SettingsAgent::handleRegisterOnVariableChange(sys::Message *req) -> sys::MessagePointer
 {
     if (auto msg = dynamic_cast<settings::Messages::RegisterOnVariableChange *>(req)) {
         auto path = msg->getPath();
         if (dbRegisterValueChange(path)) {
-            if (auto it = variableChangeRecipients.find(path.to_string()); it == variableChangeRecipients.end()) {
-                variableChangeRecipients[path.to_string()] = {path};
-            }
-            else if (it->second.find(path) == it->second.end()) {
-                it->second.insert(path);
-            }
-            else {
+            if (not addUniquePath(path)) {
                 return std::make_shared<sys::ResponseMessage>();
             }
-            auto currentValue = dbGetValue(path).value_or("");
-            LOG_DEBUG("[SettingsAgent::handleRegisterOnVariableChange] %s=%s to %s",
-                      path.to_string().c_str(),
-                      currentValue.c_str(),
-                      msg->sender.c_str());
-            auto msgValue =
-                std::make_shared<::settings::Messages::VariableChanged>(std::move(path), std::move(currentValue), "");
-            parentService->bus.sendUnicast(std::move(msgValue), msg->sender);
+            if (auto value = dbGetValue(path); value.has_value()) {
+                auto currentValue = value.value();
+                LOG_DEBUG("[SettingsAgent::handleRegisterOnVariableChange] %s=%s to %s",
+                          path.to_string().c_str(),
+                          currentValue.c_str(),
+                          msg->sender.c_str());
+                auto msgValue = std::make_shared<::settings::Messages::VariableChanged>(
+                    std::move(path), std::move(currentValue), "");
+                parentService->bus.sendUnicast(std::move(msgValue), msg->sender);
+            }
+            else {
+                LOG_ERROR("no such value in db in path: %s", path.to_string().c_str());
+            }
         }
     }
     return std::make_shared<sys::ResponseMessage>();

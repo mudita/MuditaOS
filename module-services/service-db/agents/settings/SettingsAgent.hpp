@@ -41,6 +41,8 @@ class SettingsAgent : public DatabaseAgent
 
     using MapOfRecipentsToBeNotified = std::map<std::string, std::set<settings::EntryPath>>;
     MapOfRecipentsToBeNotified variableChangeRecipients;
+    /// adds unique path to variableChangeRecipients or returns false
+    bool addUniquePath(const settings::EntryPath &);
     using SetOfRecipents = std::set<std::string>;
     SetOfRecipents profileChangedRecipients;
     SetOfRecipents modeChangeRecipients;

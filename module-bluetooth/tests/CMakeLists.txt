@@ -7,3 +7,14 @@ add_catch2_executable(
     LIBS
         module-bluetooth
 )
+
+add_catch2_executable(
+    NAME
+        bt-abstracts
+    SRCS
+        tests-main.cpp
+        tests-device.cpp
+    INCLUDE
+        ${PROJECT_SOURCE_DIR}/Bluetooth/
+    LIBS
+)

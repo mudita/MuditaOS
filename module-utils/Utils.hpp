@@ -164,8 +164,12 @@ namespace utils
         try {
             value = std::stoi(text);
         }
-        catch (const std::exception &e) {
-            LOG_ERROR("toNumeric exception %s", e.what());
+        catch (const std::out_of_range &e) {
+            LOG_ERROR("toNumeric exception - out_or_range >%s<", e.what());
+            return false;
+        }
+        catch (const std::invalid_argument &e) {
+            LOG_ERROR("toNumeric exception - invalid_argument >%s<", e.what());
             return false;
         }
         return true;

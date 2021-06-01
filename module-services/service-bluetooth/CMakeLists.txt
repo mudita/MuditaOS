@@ -24,3 +24,7 @@ target_link_libraries(${PROJECT_NAME}
         module-sys
         json::json
 )
+ 
+if (${ENABLE_TESTS})
+    add_subdirectory(test)
+endif()

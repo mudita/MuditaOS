@@ -45,6 +45,7 @@ namespace bluetooth
                 LOG_DEBUG("Connecting device %s to A2DP", bd_addr_to_str(address));
                 profilePtr->setDeviceAddress(remoteAddr);
                 profilePtr->connect();
+                return Error::Success;
             }
         }
         if (GAP::isServiceSupportedByRemote(address, TYPE_OF_SERVICE::AUDIO)) {
@@ -53,9 +54,18 @@ namespace bluetooth
                 LOG_DEBUG("Connecting device %s to HSP", bd_addr_to_str(address));
                 profilePtr->setDeviceAddress(remoteAddr);
                 profilePtr->connect();
+                return Error::Success;
             }
         }
-        return Error::Success;
+
+        for (const auto &dev : GAP::getDevicesList()) {
+            if (dev == address) {
+                LOG_ERROR("Not supported device on Paired list: %s", dev.name.c_str());
+                return Error::SystemError;
+            }
+        }
+        LOG_ERROR("Not supported type of service on list %d!", static_cast<int>(GAP::getDevicesList().size()));
+        return Error::SystemError;
     }
 
     auto ProfileManager::disconnect() -> Error::Code

@@ -10,14 +10,16 @@ namespace strings
     constexpr inline auto addr    = "addr";
     constexpr inline auto name    = "name";
     constexpr inline auto devices = "devices";
+    constexpr inline auto classOfDevice = "classOfDevice";
 } // namespace strings
 
 auto SettingsSerializer::toString(const std::vector<Devicei> &devices) -> std::string
 {
     json11::Json::array devicesJson;
     for (auto &device : devices) {
-        auto deviceEntry =
-            json11::Json::object{{strings::addr, bd_addr_to_str(device.address)}, {strings::name, device.name}};
+        auto deviceEntry = json11::Json::object{{strings::addr, bd_addr_to_str(device.address)},
+                                                {strings::name, device.name},
+                                                {strings::classOfDevice, static_cast<int>(device.classOfDevice)}};
         devicesJson.emplace_back(deviceEntry);
     }
     json11::Json finalJson = json11::Json::object{{strings::devices, devicesJson}};
@@ -33,14 +35,14 @@ auto SettingsSerializer::fromString(const std::string &jsonStr) -> std::vector<D
         LOG_ERROR("Failed parsing device string!");
         return std::vector<Devicei>();
     }
-    json11::Json::array devicesArray;
-    devicesArray = std::move(devicesJson[strings::devices].array_items());
+    auto devices = devicesJson[strings::devices].array_items();
 
     std::vector<Devicei> devicesVector;
-    for (auto &device : devicesArray) {
+    for (auto &device : devices) {
         Devicei temp;
         sscanf_bd_addr(device[strings::addr].string_value().c_str(), temp.address);
         temp.name = device[strings::name].string_value();
+        temp.classOfDevice = device[strings::classOfDevice].int_value();
         devicesVector.emplace_back(temp);
     }
     return devicesVector;

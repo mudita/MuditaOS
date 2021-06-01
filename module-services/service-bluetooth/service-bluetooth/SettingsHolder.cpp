@@ -22,30 +22,50 @@ namespace bluetooth
     {
         settingsMap[newSetting] = value;
 
-        settingsProvider->setValue(
-            settingString[newSetting], std::visit(StringVisitor(), value), ::settings::SettingsScope::Global);
+        settingsProvider->setValue(settingString[newSetting], std::visit(StringVisitor(), value));
         LOG_INFO("setting %s set: %s", settingString[newSetting].c_str(), std::visit(StringVisitor(), value).c_str());
     }
     SettingsHolder::SettingsHolder(std::unique_ptr<settings::Settings> settingsPtr)
         : settingsProvider(std::move(settingsPtr))
     {
-        settingsProvider->registerValueChange(settings::Bluetooth::deviceVisibility, [this](std::string value) {
-            setValue(Settings::Visibility, value);
-            settingsProvider->unregisterValueChange(settings::Bluetooth::deviceVisibility);
-        });
-        settingsProvider->registerValueChange(settings::Bluetooth::deviceName, [this](std::string value) {
-            setValue(Settings::DeviceName, value);
-            settingsProvider->unregisterValueChange(settings::Bluetooth::deviceName);
-        });
-        settingsProvider->registerValueChange(settings::Bluetooth::bondedDevices, [this](std::string value) {
-            setValue(Settings::BondedDevices, value);
-            settingsProvider->unregisterValueChange(settings::Bluetooth::bondedDevices);
-        });
-        settingsProvider->registerValueChange(settings::Bluetooth::btKeys, [this](std::string value) {
+        auto returnIfEmpty = [](const std::string &value) {
+            if (value.empty()) {
+                LOG_ERROR("We got empty value");
+                return false;
+            }
+            return true;
+        };
+
+        settingsProvider->registerValueChange(
+            settings::Bluetooth::deviceVisibility, [this, returnIfEmpty](std::string value) {
+                if (returnIfEmpty(value))
+                    return;
+                setValue(Settings::Visibility, value);
+                settingsProvider->unregisterValueChange(settings::Bluetooth::deviceVisibility);
+            });
+        settingsProvider->registerValueChange(
+            settings::Bluetooth::deviceName, [this, returnIfEmpty](std::string value) {
+                if (returnIfEmpty(value))
+                    return;
+                setValue(Settings::DeviceName, value);
+                settingsProvider->unregisterValueChange(settings::Bluetooth::deviceName);
+            });
+        settingsProvider->registerValueChange(
+            settings::Bluetooth::bondedDevices, [this, returnIfEmpty](std::string value) {
+                if (returnIfEmpty(value))
+                    return;
+                setValue(Settings::BondedDevices, value);
+                settingsProvider->unregisterValueChange(settings::Bluetooth::bondedDevices);
+            });
+        settingsProvider->registerValueChange(settings::Bluetooth::btKeys, [this, returnIfEmpty](std::string value) {
+            if (returnIfEmpty(value))
+                return;
             setValue(Settings::BtKeys, value);
             settingsProvider->unregisterValueChange(settings::Bluetooth::btKeys);
         });
-        settingsProvider->registerValueChange(settings::Bluetooth::state, [this](std::string value) {
+        settingsProvider->registerValueChange(settings::Bluetooth::state, [this, returnIfEmpty](std::string value) {
+            if (returnIfEmpty(value))
+                return;
             setValue(Settings::State, value);
             settingsProvider->unregisterValueChange(settings::Bluetooth::state);
             if (onStateChange) {
@@ -58,4 +78,4 @@ namespace bluetooth
     {
         settingsProvider->deinit();
     }
-} // namespace Bluetooth
+} // namespace bluetooth

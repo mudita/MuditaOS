@@ -91,6 +91,16 @@ struct Devicei : public Device
     }
 };
 
+inline bool operator==(const Devicei &dev, bd_addr_t addr)
+{
+    return memcmp(&dev.address, addr, sizeof dev.address) == 0;
+}
+
+inline bool operator==(const Devicei &lhs, const Devicei &rhs)
+{
+    return memcmp(&lhs.address, rhs.address, sizeof lhs.address) == 0;
+}
+
 struct DeviceMetadata_t
 {
     unsigned int sampleRate;

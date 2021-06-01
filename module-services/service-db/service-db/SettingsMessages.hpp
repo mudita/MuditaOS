@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include <MessageType.hpp>
 #include <Service/Message.hpp>
 #include "EntryPath.hpp"
 
@@ -21,7 +20,7 @@ namespace settings
         class SettingsMessage : public sys::DataMessage
         {
           public:
-            explicit SettingsMessage(MessageType type = MessageType::Settings) : sys::DataMessage(type){};
+            explicit SettingsMessage() : sys::DataMessage(){};
             ~SettingsMessage() override = default;
         };
 
