@@ -18,7 +18,7 @@
 
 #include <cstring>
 #include <memory>
-#include <gsl_util>
+#include <gsl/util>
 
 namespace service::eink
 {

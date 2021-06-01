@@ -81,7 +81,6 @@ target_include_directories(${PROJECT_NAME}
         PUBLIC
 
         ${CMAKE_CURRENT_SOURCE_DIR}
-        ${CMAKE_CURRENT_SOURCE_DIR}/gsl
 )
 
 if((${PROJECT_TARGET} STREQUAL "TARGET_RT1051") AND (${SYSTEM_VIEW_ENABLED}))
