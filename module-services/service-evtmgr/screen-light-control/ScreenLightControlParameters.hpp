@@ -4,7 +4,7 @@
 #pragma once
 
 #include "ControlFunctions.hpp"
-#include <gsl_assert>
+#include <gsl/assert>
 #include <optional>
 
 namespace screen_light_control

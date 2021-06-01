@@ -7,7 +7,7 @@
 #include "log/log.hpp"
 
 #include <purefs/filesystem_paths.hpp>
-#include <gsl/gsl_util>
+#include <gsl/util>
 
 #include <cassert>
 #include <cstring>

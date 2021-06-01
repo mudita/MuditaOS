@@ -84,3 +84,6 @@
 [submodule "third-party/parallel-hashmap/src"]
 	path = third-party/parallel-hashmap/src
 	url = https://github.com/greg7mdp/parallel-hashmap.git
+[submodule "third-party/gsl/src"]
+	path = third-party/gsl/src
+	url = https://github.com/microsoft/GSL.git

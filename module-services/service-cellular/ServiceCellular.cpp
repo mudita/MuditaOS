@@ -92,7 +92,7 @@
 #include <vector>
 #include "checkSmsCenter.hpp"
 #include <service-desktop/Constants.hpp>
-#include <gsl/gsl_util>
+#include <gsl/util>
 #include <ticks.hpp>
 
 #include "ServiceCellularPriv.hpp"

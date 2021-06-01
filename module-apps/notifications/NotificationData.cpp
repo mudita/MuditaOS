@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NotificationData.hpp"
-#include <gsl_assert>
+#include <gsl/assert>
 uint32_t notifications::Notification::priorityPool = 0;
 
 using namespace notifications;

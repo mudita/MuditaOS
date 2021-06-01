@@ -7,7 +7,7 @@
 #include <gui/input/InputEvent.hpp>
 #include <gui/widgets/Text.hpp>
 #include <i18n/i18n.hpp>
-#include <module-utils/gsl/gsl_assert>
+#include <gsl/assert>
 
 calc::InputProcessorText::InputProcessorText(gsl::strict_not_null<gui::Text *> inputField) : inputField{inputField}
 {}

@@ -6,7 +6,7 @@
 #include <sstream>
 #include <cstdint>
 #include <type_traits>
-#include <gsl_assert>
+#include <gsl/assert>
 #include "bsp/keyboard/key_codes.hpp"
 #include "common_data/RawKey.hpp"
 
