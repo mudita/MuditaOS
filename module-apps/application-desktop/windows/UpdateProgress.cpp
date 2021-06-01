@@ -27,6 +27,7 @@ namespace gui
         : AppWindow(app, app::window::name::desktop_update_progress)
     {
         buildInterface();
+        preventsAutoLock = true;
     }
 
     void UpdateProgressWindow::onBeforeShow(ShowMode mode, SwitchData *data)
@@ -37,7 +38,7 @@ namespace gui
         else {
             auto *item = dynamic_cast<gui::UpdateSwitchData *>(data);
             if (item != nullptr) {
-                auto msg   = item->getUpdateOsMessage();
+                const auto &msg = item->getUpdateOsMessage();
                 updateFile = msg.updateStats.updateFile;
                 auto updateVersion =
                     msg.updateStats.versionInformation[boot::json::os_version][boot::json::version_string]
