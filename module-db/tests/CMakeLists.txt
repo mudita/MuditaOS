@@ -35,10 +35,10 @@ add_catch2_executable(
         common.cpp
         
     LIBS
-        module-db
-        module-vfs
+        module-sys
         iosyscalls
+        module-db
     DEPS
-        disk_image
+        assets
 )
 add_subdirectory(test-initializer)
