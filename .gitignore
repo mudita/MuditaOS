@@ -60,3 +60,5 @@ update/
 
 # often created by the visual studio code
 /null.d
+
+test/test_env

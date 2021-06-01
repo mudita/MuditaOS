@@ -460,6 +460,11 @@ TESTS_LIST["catch2-iosyscalls"]="
     VFS linux support;
 "
 #---------
+TESTS_LIST["catch2-vfs-inotify"]="
+   Notifier base class test;
+   Filtering test;
+"
+#---------
 TESTS_LIST["catch2-cellular-cmux"]="
     TS0170 frame;
 "
