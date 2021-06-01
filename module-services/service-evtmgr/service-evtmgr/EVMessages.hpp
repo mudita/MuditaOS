@@ -40,27 +40,12 @@ namespace sevm
         uint32_t timestamp = 0;
     };
 
-    class RtcUpdateTimeMessage : public sys::DataMessage
-    {
-      public:
-        explicit RtcUpdateTimeMessage(time_t time) : time(time)
-        {}
-        [[nodiscard]] time_t getTime() const noexcept
-        {
-            return time;
-        }
-
-      private:
-        const time_t time = 0;
-    };
-
     class SIMMessage : public sys::DataMessage
     {
       public:
         SIMMessage() : DataMessage(MessageType::SIMTrayEvent)
         {}
     };
-
     /*
      * @brief Template for all messages that go to application manager
      */
