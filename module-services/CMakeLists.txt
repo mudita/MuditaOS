@@ -47,8 +47,9 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     module-cellular
     module-audio
     service-fileindexer
-        service-antenna
-    ${TARGET_LIBRARIES} )
+    service-antenna
+    ${TARGET_LIBRARIES}
+)
 
 # Board specific compilation definitions,options,include directories and features
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})

@@ -52,6 +52,7 @@ target_link_libraries(${PROJECT_NAME}
         service-evtmgr
         module-bsp
         module-cellular
+        Microsoft.GSL::GSL
     )
 
 if (${ENABLE_TESTS})

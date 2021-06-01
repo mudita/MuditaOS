@@ -5,7 +5,7 @@
 #include "utf8/UTF8.hpp"
 #include "Profile.hpp"
 #include <Utils.hpp>
-#include <gsl>
+#include <gsl/gsl>
 
 namespace gui
 {
