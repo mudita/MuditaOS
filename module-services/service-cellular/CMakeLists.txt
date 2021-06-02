@@ -55,6 +55,7 @@ target_link_libraries(${PROJECT_NAME}
         service-audio
         service-evtmgr
     PUBLIC
+        time
         utf8
         eventstore
     )

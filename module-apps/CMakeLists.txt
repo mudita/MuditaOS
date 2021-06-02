@@ -136,6 +136,7 @@ target_link_libraries(${PROJECT_NAME}
         module-services
         module-sys
         module-utils
+        time
         utf8
         ${TARGET_LIBRARIES}
 )

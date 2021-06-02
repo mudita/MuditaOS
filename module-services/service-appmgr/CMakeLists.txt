@@ -37,6 +37,8 @@ target_link_libraries(${PROJECT_NAME}
         service-gui
         module-apps
         module-audio
+    PUBLIC
+        time
 )
 
 target_include_directories(${PROJECT_NAME}
