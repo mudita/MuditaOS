@@ -45,6 +45,7 @@
 #include <service-cellular-api>
 
 #include "module-services/service-appmgr/service-appmgr/messages/ApplicationStatus.hpp"
+#include <event-manager-api>
 
 namespace app::manager
 {
@@ -1212,12 +1213,15 @@ namespace app::manager
             autoLockTimer.stop();
             return;
         }
-        auto focusedApp = getFocusedApplication();
-        if (focusedApp == nullptr || focusedApp->preventsAutoLocking()) {
+        if (auto focusedApp = getFocusedApplication(); focusedApp == nullptr || focusedApp->preventsAutoLocking()) {
             autoLockTimer.start();
             return;
         }
         if (phoneModeObserver->isTetheringOn()) {
+            autoLockTimer.start();
+            return;
+        }
+        if (event::service::api::isTorchOn()) {
             autoLockTimer.start();
             return;
         }

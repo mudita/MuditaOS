@@ -10,8 +10,8 @@
 
 namespace app::onBoarding
 {
-    OnBoardingLanguagesWindow::OnBoardingLanguagesWindow(app::Application *app)
-        : LanguagesWindow(app, gui::window::name::onBoarding_languages)
+    OnBoardingLanguagesWindow::OnBoardingLanguagesWindow(app::Application *app, const std::string &name)
+        : LanguagesWindow(app, name)
     {}
 
     void OnBoardingLanguagesWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
