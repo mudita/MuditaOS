@@ -21,6 +21,7 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/TetheringConfirmationPopup.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/TetheringNotificationPopup.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/TetheringPhoneModePopup.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/TetheringOffPopup.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/PowerOffWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/presenter/PowerOffPresenter.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/lock-popups/PhoneLockedInfoWindow.cpp"
@@ -29,6 +30,7 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/lock-popups/PhoneLockChangeInfoWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/lock-popups/SimLockInputWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/lock-popups/SimInfoWindow.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/lock-popups/SimNotReadyWindow.cpp"
 
 	PRIVATE
 		"${CMAKE_CURRENT_LIST_DIR}/Popups.hpp"
@@ -47,4 +49,5 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/lock-popups/PhoneLockChangeInfoWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/lock-popups/SimLockInputWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/lock-popups/SimInfoWindow.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/lock-popups/SimNotReadyWindow.hpp"
 )

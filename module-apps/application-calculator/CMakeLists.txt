@@ -18,4 +18,6 @@ endif()
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
-        service-evtmgr)
+        service-evtmgr
+        tinyexpr::tinyexpr
+)

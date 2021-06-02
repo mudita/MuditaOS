@@ -4,7 +4,6 @@
 import pytest
 from harness.interface.defs import status
 
-
 MESSAGES_PAGE_SIZE = 4
 
 
@@ -19,6 +18,15 @@ def test_get_messages_without_pagination(harness):
     messages = ret["body"]["entries"]
     messages_count = len(messages)
     assert messages_count == limit
+    message_types = [1, 2, 4, 8, 16, 18, 255]
+    for message in messages:
+        assert type(message["contactID"]) == int
+        assert type(message["messageBody"]) == str
+        assert type(message["messageID"]) == int
+        assert type(message["messageType"]) == int
+        assert type(message["createdAt"]) == int
+        assert type(message["threadID"]) == int
+        assert message["messageType"] in message_types
 
 
 @pytest.mark.service_desktop_test
@@ -61,7 +69,7 @@ def test_get_all_messages(harness):
             if "nextPage" in ret["body"]:
 
                 offset = ret["body"]["nextPage"]["offset"]
-                messages_left_count =  count - len(all_messages)
+                messages_left_count = count - len(all_messages)
 
                 body = {"category": "message", "limit": messages_left_count, "offset": offset}
                 ret = harness.endpoint_request("messages", "get", body)
@@ -136,7 +144,7 @@ def test_get_all_messages_by_thread_id(harness):
             if "nextPage" in ret["body"]:
 
                 offset = ret["body"]["nextPage"]["offset"]
-                messages_left_count =  messages_by_thread_id_count - len(all_messages)
+                messages_left_count = messages_by_thread_id_count - len(all_messages)
 
                 body = {"category": "message", "threadID": thread_id, "limit": messages_left_count, "offset": offset}
                 ret = harness.endpoint_request("messages", "get", body)

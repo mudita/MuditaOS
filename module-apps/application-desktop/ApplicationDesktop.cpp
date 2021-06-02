@@ -17,6 +17,7 @@
 #include "windows/MmiPushWindow.hpp"
 #include "windows/MmiInternalMsgWindow.hpp"
 #include <popups/presenter/PowerOffPresenter.hpp>
+#include <popups/TetheringOffPopup.hpp>
 #include <windows/Dialog.hpp>
 #include <windows/DialogMetadata.hpp>
 #include <messages/DialogMetadataMessage.hpp>
@@ -262,6 +263,9 @@ namespace app
         windowsFactory.attach(gui::window::name::dialog_confirm, [](Application *app, const std::string &name) {
             return std::make_unique<gui::DialogConfirm>(app, name);
         });
+        windowsFactory.attach(gui::popup::window::tethering_off_window, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::TetheringOffPopup>(app, gui::popup::window::tethering_off_window);
+        });
 
         attachPopups({gui::popup::ID::Volume,
                       gui::popup::ID::Tethering,
@@ -329,4 +333,5 @@ namespace app
         osUpdateVersion = value;
         settings->setValue(settings::SystemProperties::osUpdateVersion, value, settings::SettingsScope::Global);
     }
+
 } // namespace app

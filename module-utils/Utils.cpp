@@ -2,8 +2,11 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Utils.hpp"
-#include <filesystem>
+
 #include <crc32.h>
+
+#include <ctime>
+#include <filesystem>
 
 namespace utils::filesystem
 {
@@ -35,7 +38,7 @@ namespace utils::filesystem
 
         std::random_device random_device;
         std::mt19937 generator(random_device());
-        generator.seed(utils::time::Timestamp().getTime());
+        generator.seed(std::time(nullptr));
         std::uniform_int_distribution<> distribution(0, CHARACTERS.size() - 1);
 
         std::string random_string;

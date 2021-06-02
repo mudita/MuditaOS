@@ -17,7 +17,7 @@
 	branch = rt1051
 	shallow = true
 [submodule "module-utils/protobuf"]
-	path = module-utils/protobuf
+	path = third-party/protobuf/src
 	url = ../protobuf.git
 	branch = rt1051
 	shallow = true
@@ -36,12 +36,8 @@
 [submodule "module-utils/date"]
 	path = third-party/date
 	url = ../date.git
-[submodule "module-audio/Audio/decoder/minimp3"]
-	path = module-audio/Audio/decoder/minimp3
-	url = ../minimp3.git
-    branch = RT1051
 [submodule "module-utils/taglib"]
-	path = module-utils/taglib
+	path = third-party/taglib
 	url = ../taglib.git
 	branch = rt1051
 [submodule "module-bluetooth/lib/btstack"]
@@ -54,7 +50,7 @@
 	path = third-party/magic_enum
 	url = https://github.com/Neargye/magic_enum.git
 [submodule "module-utils/tinyexpr"]
-	path = module-utils/tinyexpr
+	path = third-party/tinyexpr/src
 	url = https://github.com/codeplea/tinyexpr.git
 [submodule "module-bsp/board/rt1051/bsp/usb"]
 	path = module-bsp/board/rt1051/bsp/usb
@@ -68,9 +64,6 @@
 [submodule "module-vfs/thirdparty/lfsfs/littlefs"]
 	path = module-vfs/thirdparty/lfsfs/littlefs
 	url = https://github.com/littlefs-project/littlefs.git
-[submodule "module-utils/parallel-hashmap"]
-	path = module-utils/parallel-hashmap
-	url = https://github.com/greg7mdp/parallel-hashmap.git
 [submodule "module-utils/sml"]
 	path = third-party/sml/src
 	url = https://github.com/boost-ext/sml
@@ -84,3 +77,10 @@
 [submodule "module-utils/CrashDebug"]
 	path = module-utils/CrashDebug
 	url = https://github.com/adamgreen/CrashDebug.git
+[submodule "third-party/minimp3/minimp3"]
+	path = third-party/minimp3/minimp3
+	url = ../minimp3.git
+	branch = RT1051
+[submodule "third-party/parallel-hashmap/src"]
+	path = third-party/parallel-hashmap/src
+	url = https://github.com/greg7mdp/parallel-hashmap.git

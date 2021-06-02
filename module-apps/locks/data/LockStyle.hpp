@@ -22,22 +22,6 @@ namespace style::window::lock_input
         constexpr inline auto top_margin   = 30;
     } // namespace pin_label
 
-    namespace ice
-    {
-        constexpr inline auto x = style::window::default_left_margin;
-        constexpr inline auto y = 60;
-        constexpr inline auto w = 60;
-        constexpr inline auto h = 50;
-
-        constexpr inline auto margin = 3;
-
-        namespace text
-        {
-            constexpr inline auto w = 40;
-        }
-
-    } // namespace ice
-
     namespace primary_text
     {
         constexpr inline auto h = 60;

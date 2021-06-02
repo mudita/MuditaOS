@@ -50,7 +50,6 @@ namespace bluetooth
         static void sendMediaPacket();
         static void sendAudioEvent(audio::EventType event, audio::Event::DeviceState state);
         static bool isConnected;
-
         static std::shared_ptr<BluetoothAudioDevice> audioDevice;
 
       public:

@@ -52,10 +52,10 @@ class TimeResponseMessage : public sys::ResponseMessage
 
 namespace stm::message
 {
-    class UpdateRTCValueMessage : public sys::DataMessage
+    class UpdateRTCValueFromTmMessage : public sys::DataMessage
     {
       public:
-        explicit UpdateRTCValueMessage(const struct tm &time)
+        explicit UpdateRTCValueFromTmMessage(const struct tm &time)
             : sys::DataMessage(MessageType::MessageTypeUninitialized), time(time){};
 
         auto getTime() -> struct tm &
@@ -65,6 +65,21 @@ namespace stm::message
 
       private:
         struct tm time;
+    };
+
+    class UpdateRTCValueFromTimestampMessage : public sys::DataMessage
+    {
+      public:
+        explicit UpdateRTCValueFromTimestampMessage(const time_t &time)
+            : sys::DataMessage(MessageType::MessageTypeUninitialized), time(time){};
+
+        auto getTime() -> time_t &
+        {
+            return time;
+        }
+
+      private:
+        time_t time;
     };
 
     class UpdateTimeZoneMessage : public sys::DataMessage
@@ -80,5 +95,20 @@ namespace stm::message
 
       private:
         std::string timezone;
+    };
+
+    class TimeChangeRequestMessage : public sys::DataMessage
+    {
+      public:
+        explicit TimeChangeRequestMessage(const time_t &time)
+            : sys::DataMessage(MessageType::MessageTypeUninitialized), time(time){};
+
+        auto getTime() -> time_t
+        {
+            return time;
+        }
+
+      private:
+        time_t time;
     };
 } // namespace stm::message

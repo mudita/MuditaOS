@@ -18,9 +18,8 @@ enum class BoardDefinitions
 
     USB_FUNCTION_MUX_SELECT = 25, // GPIO_AD_B1_09, USB_MUX_SEL0
     USB_POWER_ACK           = 3,  // GPIO_B0_03  Note: pull-up in order to read
+    I2C_STD_BAUDRATE   = 100000,
 
-    I2C_STD_BAUDRATE = 100000,
-    I2C_FAST_BAUDRATE = 400000,
     AUDIOCODEC_I2C_BAUDRATE   = I2C_STD_BAUDRATE,
     AUDIOCODEC_I2C            = static_cast<int>(drivers::I2CInstances ::I2C2),
     AUDIOCODEC_DMAMUX         = static_cast<int>(drivers::DMAMuxInstances ::DMAMUX0),
@@ -107,7 +106,7 @@ enum class BoardDefinitions
     VIBRATOR_EN = 0, // GPIO_AD_B0_00
 
 	MAGNETOMETER_I2C = AUDIOCODEC_I2C,
-	MAGNETOMETER_I2C_BAUDRATE = I2C_FAST_BAUDRATE,
+	MAGNETOMETER_I2C_BAUDRATE = AUDIOCODEC_I2C_BAUDRATE,
     MAGNETOMETER_GPIO = static_cast<int>(drivers::GPIOInstances::GPIO_1),
     MAGNETOMETER_IRQ = 20, // GPIO_AD_B1_04
 

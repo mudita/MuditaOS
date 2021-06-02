@@ -5,7 +5,7 @@
 
 #include <module-sys/Service/Service.hpp>
 
-#include <time.h>
+#include <ctime>
 
 /**
  * @brief Basic interface for bsp rtc related commands
@@ -19,9 +19,14 @@ class RTCCommandInterface
     virtual ~RTCCommandInterface() = default;
     /**
      * Sets RTC counter
-     * @param time UTC time value to sed
+     * @param time UTC time value to set
      */
     virtual void setTime(const struct tm &time) = 0;
+    /**
+     * Sets RTC counter
+     * @param time UTC time value to set
+     */
+    virtual void setTime(const time_t &time) = 0;
     /**
      * Sets timezone variable
      * @param timezone new timezone variable

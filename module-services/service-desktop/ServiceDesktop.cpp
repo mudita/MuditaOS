@@ -22,8 +22,6 @@
 #include <module-sys/SystemManager/SystemManager.hpp>
 #include <module-sys/Timers/TimerFactory.hpp>
 
-#include <cinttypes>
-#include <filesystem>
 #include <module-services/service-appmgr/service-appmgr/model/ApplicationManager.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <module-sys/SystemManager/Constants.hpp>
@@ -33,6 +31,10 @@
 #include <purefs/filesystem_paths.hpp>
 #include <sys/mount.h>
 #include <sys/statvfs.h>
+
+#include <ctime>
+#include <cinttypes>
+#include <filesystem>
 
 namespace
 {
@@ -348,7 +350,7 @@ void ServiceDesktop::storeHistory(const std::string &historyValue)
 void ServiceDesktop::prepareBackupData()
 {
     backupRestoreStatus.operation = ServiceDesktop::Operation::Backup;
-    backupRestoreStatus.task      = std::to_string(static_cast<uint32_t>(utils::time::getCurrentTimestamp().getTime()));
+    backupRestoreStatus.task          = std::to_string(static_cast<uint32_t>(std::time(nullptr)));
     backupRestoreStatus.state     = OperationState::Stopped;
     backupRestoreStatus.backupTempDir = purefs::dir::getTemporaryPath() / backupRestoreStatus.task;
 }

@@ -5,22 +5,21 @@ project(iosyscalls VERSION 1.0
 
 
 set(SOURCES
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/syscalls_stdio.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/syscalls_scan_family.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/syscalls_posix.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/syscalls_posix_dirent.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/iosyscalls.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/syscalls_stdio.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/syscalls_scan_family.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/syscalls_posix.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/syscalls_posix_dirent.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/iosyscalls.cpp
 )
 
 
 set(INCLUDES
-	"${CMAKE_CURRENT_SOURCE_DIR}/include"
-	"${CMAKE_SOURCE_DIR}/module-os/board/linux"
-        "${CMAKE_SOURCE_DIR}/module-os/RTOSWrapper/include"
-	"${CMAKE_SOURCE_DIR}/module-utils/parallel-hashmap"
-	"${CMAKE_SOURCE_DIR}/module-utils"
-	"${CMAKE_SOURCE_DIR}/module-vfs/include/user"
-	"${CMAKE_SOURCE_DIR}/module-vfs/include/internal"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include"
+    "${CMAKE_SOURCE_DIR}/module-os/board/linux"
+    "${CMAKE_SOURCE_DIR}/module-os/RTOSWrapper/include"
+    "${CMAKE_SOURCE_DIR}/module-utils"
+    "${CMAKE_SOURCE_DIR}/module-vfs/include/user"
+    "${CMAKE_SOURCE_DIR}/module-vfs/include/internal"
 )
 
 
@@ -45,7 +44,16 @@ target_link_options(${PROJECT_NAME} PRIVATE
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${INCLUDES} )
-target_link_libraries( ${PROJECT_NAME} dl )
+
+target_link_libraries(
+    ${PROJECT_NAME} 
+    PUBLIC
+        dl
+    PRIVATE
+        phmap
+)
+
+
 target_compile_definitions( ${PROJECT_NAME} PUBLIC TARGET_Linux )
 
 if (${ENABLE_TESTS})

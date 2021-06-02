@@ -111,6 +111,7 @@ namespace bluetooth
     const sys::Service *HSP::HSPImpl::ownerService;
     std::string HSP::HSPImpl::agServiceName = "PurePhone HSP";
     bool HSP::HSPImpl::isConnected          = false;
+    std::shared_ptr<HSPAudioDevice> HSP::HSPImpl::audioDevice;
 
     void HSP::HSPImpl::sendAudioEvent(audio::EventType event, audio::Event::DeviceState state)
     {
@@ -127,7 +128,9 @@ namespace bluetooth
             if (READ_SCO_CONNECTION_HANDLE(event) != scoHandle) {
                 break;
             }
-            sco->receive(event, eventSize);
+            if (audioDevice != nullptr) {
+                audioDevice->receiveCVSD(audio::AbstractStream::Span{.data = event, .dataSize = eventSize});
+            }
             break;
 
         case HCI_EVENT_PACKET:
@@ -142,7 +145,9 @@ namespace bluetooth
     {
         switch (hci_event_packet_get_type(event)) {
         case HCI_EVENT_SCO_CAN_SEND_NOW:
-            sco->send(scoHandle);
+            if (audioDevice != nullptr) {
+                audioDevice->onDataSend(scoHandle);
+            }
             break;
         case HCI_EVENT_HSP_META:
             processHSPEvent(event);
@@ -163,6 +168,7 @@ namespace bluetooth
                 break;
             }
             LOG_DEBUG("RFCOMM connection established.\n");
+            sendAudioEvent(audio::EventType::BlutoothHSPDeviceState, audio::Event::DeviceState::Connected);
             isConnected = true;
             break;
         case HSP_SUBEVENT_RFCOMM_DISCONNECTION_COMPLETE:
@@ -313,5 +319,15 @@ namespace bluetooth
     {
         stopRinging();
         establishAudioConnection();
+    }
+
+    void HSP::setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice)
+    {
+        pimpl->setAudioDevice(audioDevice);
+    }
+
+    void HSP::HSPImpl::setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice)
+    {
+        HSP::HSPImpl::audioDevice = std::static_pointer_cast<HSPAudioDevice>(audioDevice);
     }
 } // namespace bluetooth

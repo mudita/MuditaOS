@@ -222,30 +222,28 @@ sys::ReturnCodes EventManager::InitHandler()
 
     connect(typeid(sevm::ScreenLightControlMessage), [&](sys::Message *msgl) {
         auto *m = dynamic_cast<sevm::ScreenLightControlMessage *>(msgl);
-        backlightHandler.processScreenRequest(m->action);
+        backlightHandler.processScreenRequest(m->getAction(), screen_light_control::Parameters());
         return sys::msgHandled();
     });
 
-    connect(typeid(sevm::ScreenLightSetParameters), [&](sys::Message *msgl) {
-        auto *m = dynamic_cast<sevm::ScreenLightSetParameters *>(msgl);
-        backlightHandler.processScreenRequest(m->action, std::move(m->parameters));
+    connect(typeid(sevm::ScreenLightSetAutoModeParams), [&](sys::Message *msgl) {
+        auto *m = static_cast<sevm::ScreenLightSetAutoModeParams *>(msgl);
+        backlightHandler.processScreenRequest(m->getAction(), screen_light_control::Parameters(m->getParams()));
+        return sys::msgHandled();
+    });
+
+    connect(typeid(sevm::ScreenLightSetManualModeParams), [&](sys::Message *msgl) {
+        auto *m = static_cast<sevm::ScreenLightSetManualModeParams *>(msgl);
+        backlightHandler.processScreenRequest(m->getAction(), screen_light_control::Parameters(m->getParams()));
         return sys::msgHandled();
     });
 
     connect(sevm::ScreenLightControlRequestParameters(), [&](sys::Message *msgl) {
-        screen_light_control::Parameters params = {backlightHandler.getScreenBrightnessValue()};
-        auto msg                                = std::make_shared<sevm::ScreenLightControlParametersResponse>(
+        screen_light_control::ManualModeParameters params = {backlightHandler.getScreenBrightnessValue()};
+        auto msg = std::make_shared<sevm::ScreenLightControlParametersResponse>(
             backlightHandler.getScreenLightState(), backlightHandler.getScreenAutoModeState(), params);
         return msg;
     });
-    connect(sevm::RtcUpdateTimeMessage(0), [&](sys::Message *msgl) {
-        auto msg = static_cast<sevm::RtcUpdateTimeMessage *>(msgl);
-        bsp::rtc::setDateTimeFromTimestamp(msg->getTime());
-        bsp::rtc::setMinuteAlarm(msg->getTime());
-        handleMinuteUpdate(msg->getTime());
-        return sys::msgHandled();
-    });
-
     connect(sevm::BatteryStatusChangeMessage(), [&](sys::Message *msgl) {
         if (msgl->sender == this->GetName()) {
             LOG_INFO("Battery level: %d , charging: %d",
@@ -284,9 +282,15 @@ sys::ReturnCodes EventManager::InitHandler()
         return sys::MessageNone{};
     });
 
-    connect(typeid(stm::message::UpdateRTCValueMessage), [&](sys::Message *msg) {
-        auto message = static_cast<stm::message::UpdateRTCValueMessage *>(msg);
-        processRTCRequest(message->getTime());
+    connect(typeid(stm::message::UpdateRTCValueFromTmMessage), [&](sys::Message *msg) {
+        auto message = static_cast<stm::message::UpdateRTCValueFromTmMessage *>(msg);
+        processRTCFromTmRequest(message->getTime());
+        return sys::MessageNone{};
+    });
+
+    connect(typeid(stm::message::UpdateRTCValueFromTimestampMessage), [&](sys::Message *msg) {
+        auto message = static_cast<stm::message::UpdateRTCValueFromTimestampMessage *>(msg);
+        processRTCFromTimestampRequest(message->getTime());
         return sys::MessageNone{};
     });
 
@@ -412,7 +416,7 @@ void EventManager::toggleTorchColor()
     }
 }
 
-void EventManager::processRTCRequest(struct tm &newTime)
+void EventManager::processRTCFromTmRequest(struct tm &newTime)
 {
     if (bsp::rtc::setDateTime(&newTime) != bsp::rtc::ErrorCode::OK) {
         LOG_ERROR("Setting RTC failed.");
@@ -423,6 +427,18 @@ void EventManager::processRTCRequest(struct tm &newTime)
     auto notification = std::make_shared<sys::DataMessage>(MessageType::EVMTimeUpdated);
     bus.sendMulticast(std::move(notification), sys::BusChannel::ServiceEvtmgrNotifications);
 }
+
+void EventManager::processRTCFromTimestampRequest(time_t &newTime)
+{
+    if (bsp::rtc::setDateTimeFromTimestamp(newTime) != bsp::rtc::ErrorCode::OK) {
+        LOG_ERROR("Setting RTC failed.");
+        return;
+    }
+    bsp::rtc::setMinuteAlarm(newTime);
+    auto notification = std::make_shared<sys::DataMessage>(MessageType::EVMTimeUpdated);
+    bus.sendMulticast(std::move(notification), sys::BusChannel::ServiceEvtmgrNotifications);
+}
+
 void EventManager::processTimezoneRequest(const std::string &timezone)
 {
     if (setenv("TZ", timezone.c_str(), 1) != 0) {

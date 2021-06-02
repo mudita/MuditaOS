@@ -153,7 +153,8 @@ namespace utils
             std::string long_ago_format = "%d.%m.%y";
 
             /// shows time in past: time_now - val in seconds
-            DateTime(time_t val = 0, bool date_format_long = true) : date_format_long(date_format_long)
+            DateTime(time_t val = 0, bool date_format_long = true)
+                : Timestamp(std::time(nullptr)), date_format_long(date_format_long)
             {
                 before_n_sec(val);
             }
@@ -185,11 +186,6 @@ namespace utils
           public:
             Time(time_t val = 0, bool date_format_long = true) : DateTime(val, date_format_long){};
             virtual UTF8 str(std::string format = "") final;
-
-            /// set time zone offset including adjustment for daylight saving
-            static void setTimeZoneOffset(int tzOffset);
-            // get time zone offset including adjustment for daylight saving
-            static int getTimeZoneOffset();
         };
 
         class Duration
@@ -288,6 +284,5 @@ namespace utils
         };
 
         Timestamp getCurrentTimestamp();
-        std::string getHoursMinInCurrentTimeFormat();
     } // namespace time
 } // namespace utils

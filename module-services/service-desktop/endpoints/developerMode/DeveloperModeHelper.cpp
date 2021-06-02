@@ -21,10 +21,11 @@
 #include <module-sys/SystemManager/Constants.hpp>
 
 #include <service-db/DBServiceAPI.hpp>
-#include <time/time_conversion.hpp>
 #include <service-desktop/parser/MessageHandler.hpp>
 #include <service-desktop/endpoints/developerMode/event/ATRequest.hpp>
 #include <service-appmgr/service-appmgr/Controller.hpp>
+
+#include <ctime>
 
 namespace parserFSM
 {
@@ -283,7 +284,7 @@ auto DeveloperModeHelper::smsRecordFromJson(json11::Json msgJson) -> SMSRecord
     record.type = static_cast<SMSType>(msgJson[json::messages::messageType].int_value());
     utils::PhoneNumber phoneNumber(msgJson[json::messages::phoneNumber].string_value());
     record.number = phoneNumber.getView();
-    record.date   = utils::time::getCurrentTimestamp().getTime();
+    record.date   = std::time(nullptr);
     record.body   = UTF8(msgJson[json::messages::messageBody].string_value());
     return record;
 }

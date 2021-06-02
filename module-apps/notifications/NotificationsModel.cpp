@@ -20,6 +20,15 @@ namespace
             item->setName(utils::translate(text), true);
         }
     }
+
+    bool hasTetheringNotification(app::manager::actions::NotificationsChangedParams *params)
+    {
+        const auto &notifications = params->getNotifications();
+        const auto it = std::find_if(std::begin(notifications), std::end(notifications), [](const auto &notification) {
+            return notification->getType() == notifications::NotificationType::Tethering;
+        });
+        return it != std::end(notifications);
+    }
 } // namespace
 
 unsigned int NotificationsModel::requestRecordsCount()
@@ -104,12 +113,13 @@ void NotificationsModel::updateData(app::manager::actions::NotificationsChangedP
             delete item;
         }
     };
+    tetheringOn = hasTetheringNotification(params);
     for (const auto &notification : params->getNotifications()) {
-        if (typeid(*notification) == typeid(notifications::NotSeenSMSNotification)) {
+        if (not tetheringOn && typeid(*notification) == typeid(notifications::NotSeenSMSNotification)) {
             auto sms = static_cast<const notifications::NotSeenSMSNotification *>(notification.get());
             internalData.push_back(create(sms));
         }
-        else if (typeid(*notification) == typeid(notifications::NotSeenCallNotification)) {
+        else if (not tetheringOn && typeid(*notification) == typeid(notifications::NotSeenCallNotification)) {
             auto call = static_cast<const notifications::NotSeenCallNotification *>(notification.get());
             internalData.push_back(create(call));
         }
@@ -127,4 +137,9 @@ void NotificationsModel::clearAll()
 {
     list->reset();
     eraseInternalData();
+}
+
+bool NotificationsModel::isTetheringOn() const noexcept
+{
+    return tetheringOn;
 }

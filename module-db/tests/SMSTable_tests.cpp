@@ -28,7 +28,6 @@ TEST_CASE("SMS Table tests")
                             .threadID  = 0,
                             .contactID = 0,
                             .date      = 0,
-                            .dateSent  = 0,
                             .errorCode = 0,
                             .body      = "Test SMS message 1",
                             .type      = SMSType ::INBOX
@@ -39,7 +38,6 @@ TEST_CASE("SMS Table tests")
                             .threadID  = 0,
                             .contactID = 0,
                             .date      = 0,
-                            .dateSent  = 0,
                             .errorCode = 0,
                             .body      = "Test Draft SMS",
                             .type      = SMSType ::DRAFT

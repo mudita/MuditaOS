@@ -7,9 +7,11 @@
 #include <application-onboarding/style/OnBoardingStyle.hpp>
 #include <OptionSetting.hpp>
 
+#include <widgets/IceBox.hpp>
+#include <service-appmgr/Controller.hpp>
 #include <module-apps/messages/DialogMetadataMessage.hpp>
 
-namespace gui
+namespace app::onBoarding
 {
     OnBoardingSimSelectWindow::OnBoardingSimSelectWindow(app::Application *app, std::string name)
         : BaseSettingsWindow(app, std::move(name))
@@ -25,6 +27,8 @@ namespace gui
         bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(::style::strings::common::back));
         bottomBar->setText(gui::BottomBar::Side::LEFT, utils::translate(::style::strings::common::skip));
 
+        new gui::IceBox(this);
+
         descriptionText = new gui::Text(this,
                                         style::window::default_left_margin,
                                         style::onboarding::sim_select::description_y,
@@ -33,15 +37,10 @@ namespace gui
         descriptionText->setFont(style::window::font::medium);
         descriptionText->setAlignment(
             gui::Alignment{gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top});
-        descriptionText->setEdges(RectangleEdge::Top);
+        descriptionText->setEdges(gui::RectangleEdge::Top);
         descriptionText->setPenWidth(style::window::default_border_rect_no_focus);
-        descriptionText->setPadding(Padding(0, style::onboarding::sim_select::description_top_padding, 0, 0));
+        descriptionText->setPadding(gui::Padding(0, style::onboarding::sim_select::description_top_padding, 0, 0));
         descriptionText->setRichText(utils::translate("app_onboarding_select_sim_description"));
-    }
-
-    void OnBoardingSimSelectWindow::onBeforeShow(ShowMode mode, SwitchData *data)
-    {
-        refreshOptionsList();
     }
 
     auto OnBoardingSimSelectWindow::buildOptionsList() -> std::list<gui::Option>
@@ -97,6 +96,13 @@ namespace gui
                 gui::window::name::onBoarding_skip, gui::ShowMode::GUI_SHOW_INIT, std::move(metaData));
             return true;
         }
+        else if (inputEvent.isShortRelease(gui::KeyCode::KEY_LEFT)) {
+            app::manager::Controller::sendAction(application,
+                                                 app::manager::actions::EmergencyDial,
+                                                 std::make_unique<gui::SwitchData>(),
+                                                 app::manager::OnSwitchBehaviour::RunInBackground);
+            return true;
+        }
         return AppWindow::onInput(inputEvent);
     }
-} /* namespace gui */
+} // namespace app::onBoarding

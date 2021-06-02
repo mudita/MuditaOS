@@ -49,7 +49,7 @@ target_sources(
                 ${CMAKE_CURRENT_SOURCE_DIR}/Audio/transcode/TransformFactory.cpp
                 ${CMAKE_CURRENT_SOURCE_DIR}/Audio/VolumeScaler.cpp
 )
-target_include_directories(${PROJECT_NAME} PRIVATE ${TAGLIB_INCLUDE_DIRS})
+
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_TARGET})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_DEFINITIONS})
@@ -66,12 +66,14 @@ set_source_files_properties(
 )
 
 target_link_libraries(${PROJECT_NAME}
-    ${AUDIO_BOARD_LIBRARY}
-    module-bsp
-    module-os
-    module-utils
-    module-sys
-    tag
+        PUBLIC
+                ${AUDIO_BOARD_LIBRARY}
+                module-bsp
+                module-os
+                module-utils
+                module-sys
+                tag
+                minimp3::minimp3
 )
 
 if (${ENABLE_TESTS})
