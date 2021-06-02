@@ -10,8 +10,8 @@
 
 namespace gui
 {
-    DateAndTimeMainWindow::DateAndTimeMainWindow(app::Application *app)
-        : BaseSettingsWindow(app, window::name::date_and_time)
+    DateAndTimeMainWindow::DateAndTimeMainWindow(app::Application *app, std::string name)
+        : BaseSettingsWindow(app, std::move(name))
     {
         setTitle(utils::translate("app_settings_date_and_time"));
         automaticDateAndTimeIsOn = utils::dateAndTimeSettings.isAutomaticDateAndTimeOn();

@@ -24,7 +24,8 @@ namespace at
         {AT::URC_DELAY_ON, {"AT+QCFG=\"urc/delay\",1"}},
         {AT::URC_UART1, {"AT+QURCCFG=\"urcport\",\"uart1\""}},
         {AT::AT_PIN_READY_LOGIC, {"AT+QCFG=\"apready\",1,1,200"}},
-        {AT::URC_NOTIF_SIGNAL, {"AT+QINDCFG=\"csq\",1"}},
+        {AT::CSQ_URC_ON, {"AT+QINDCFG=\"csq\",1"}},
+        {AT::CSQ_URC_OFF, {"AT+QINDCFG=\"csq\",0"}},
         {AT::CRC_ON, {"AT+CRC=1"}},
         {AT::CALLER_NUMBER_PRESENTATION, {"AT+CLIP=1", default_long_timeout}},
         {AT::SMS_TEXT_FORMAT, {"AT+CMGF=1"}},
@@ -41,6 +42,7 @@ namespace at
         {AT::CIMI, {"AT+CIMI"}},
         {AT::QCMGR, {"AT+QCMGR=", 180s}},
         {AT::ATH, {"ATH", 100s}},
+        {AT::QHUP_BUSY, {"AT+QHUP=17", 100s}},
         {AT::ATA, {"ATA", 100s}},
         {AT::ATD, {"ATD", 6s}},
         {AT::IPR, {"AT+IPR="}},
@@ -110,7 +112,15 @@ namespace at
         {AT::QNVFR, {"AT+QNVFR=", default_long_timeout}},
         {AT::QNVFW, {"AT+QNVFW=", default_long_timeout}},
         {AT::QMBNCFG, {"AT+QMBNCFG=", default_long_timeout}},
-        {AT::QCFG_IMS, {"AT+QCFG=\"ims\""}}};
+        {AT::QCFG_IMS, {"AT+QCFG=\"ims\""}},
+        {AT::RING_URC_ON, {"AT+QINDCFG=\"ring\",1"}},
+        {AT::RING_URC_OFF, {"AT+QINDCFG=\"ring\",0"}},
+        {AT::ACT_URC_OFF, {"AT+QINDCFG=\"act\",0"}},
+        {AT::ACT_URC_ON, {"AT+QINDCFG=\"act\",1"}},
+        {AT::SMS_URC_ON, {"AT+QINDCFG=\"smsincoming\",1"}},
+        {AT::SMS_URC_OFF, {"AT+QINDCFG=\"smsincoming\",0"}},
+
+    };
 
     auto factory(AT at) -> const Cmd &
     {

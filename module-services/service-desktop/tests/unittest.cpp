@@ -187,7 +187,6 @@ TEST_CASE("DB Helpers test - json encoding (messages)")
     message->body      = "test message";
     message->contactID = 1;
     message->date      = 12345;
-    message->dateSent  = 54321;
     message->errorCode = 0;
     message->number    = contactNum.number;
     message->threadID  = 1;
@@ -198,8 +197,7 @@ TEST_CASE("DB Helpers test - json encoding (messages)")
 
     REQUIRE(messageJson[json::messages::messageBody] == "test message");
     REQUIRE(messageJson[json::messages::contactID] == 1);
-    REQUIRE(messageJson[json::messages::receivedAt] == 12345);
-    REQUIRE(messageJson[json::messages::sentAt] == 54321);
+    REQUIRE(messageJson[json::messages::createdAt] == 12345);
     REQUIRE(messageJson[json::messages::threadID] == 1);
     REQUIRE(messageJson[json::messages::messageID] == 10);
 

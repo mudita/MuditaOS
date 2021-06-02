@@ -7,9 +7,9 @@
 #include <PhoneNumber.hpp>
 #include <Utils.hpp>
 #include <log/log.hpp>
-#include <time/time_conversion.hpp>
 
 #include <cinttypes>
+#include <ctime>
 #include <optional>
 #include <sstream>
 #include <stdexcept>
@@ -30,11 +30,7 @@ namespace CellularCall
         }
 
         clear();
-        CalllogRecord callRec;
-        callRec.type        = type;
-        callRec.date        = utils::time::Timestamp().getTime();
-        callRec.presentation = PresentationType::PR_UNKNOWN;
-        callRec.phoneNumber  = number;
+        CalllogRecord callRec{type, number};
         call                = startCallAction ? startCallAction(callRec) : CalllogRecord();
         if (!call.isValid()) {
             LOG_ERROR("startCallAction failed");
@@ -51,7 +47,7 @@ namespace CellularCall
     bool CellularCall::setActive()
     {
         if (isValid()) {
-            startActiveTime = utils::time::Timestamp();
+            startActiveTime = utils::time::getCurrentTimestamp();
             isActiveCall    = true;
             return true;
         }
@@ -70,7 +66,7 @@ namespace CellularCall
         }
 
         if (isActiveCall) {
-            auto endTime  = utils::time::Timestamp();
+            auto endTime  = utils::time::getCurrentTimestamp();
             call.duration = (endTime - startActiveTime).get();
         }
         else {

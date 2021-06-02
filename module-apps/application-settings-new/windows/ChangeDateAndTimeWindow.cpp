@@ -5,8 +5,8 @@
 #include <application-settings-new/ApplicationSettings.hpp>
 #include <gui/input/InputEvent.hpp>
 #include <ListView.hpp>
-#include <service-evtmgr/service-evtmgr/Constants.hpp>
-#include <service-evtmgr/service-evtmgr/EVMessages.hpp>
+#include <service-time/Constants.hpp>
+#include <service-time/service-time/TimeMessage.hpp>
 #include <widgets/DateAndTimeStyle.hpp>
 
 namespace gui
@@ -64,7 +64,7 @@ namespace gui
 
     void ChangeDateAndTimeWindow::sendRtcUpdateTimeMessage()
     {
-        auto msg = std::make_shared<sevm::RtcUpdateTimeMessage>(TimePointToTimeT(fromTillDate->from));
-        application->bus.sendUnicast(std::move(msg), service::name::evt_manager);
+        auto msg = std::make_shared<stm::message::TimeChangeRequestMessage>(TimePointToTimeT(fromTillDate->from));
+        application->bus.sendUnicast(std::move(msg), service::name::service_time);
     }
 } /* namespace gui */

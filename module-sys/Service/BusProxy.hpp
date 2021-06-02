@@ -32,8 +32,18 @@ namespace sys
 
         template <typename Msg, typename... Params> bool sendUnicast(Params &&... params)
         {
+            static_assert(std::is_base_of<sys::msg::Request, Msg>::value,
+                          "Only sys::msg::Request can be sent via Unicast<>");
             auto msg = std::make_shared<Msg>(std::forward<Params>(params)...);
-            return sendUnicast(msg, Msg::target);
+            return sendUnicast(msg, msg->target());
+        }
+
+        template <typename Msg, typename... Params> void sendMulticast(Params &&... params)
+        {
+            static_assert(std::is_base_of<sys::msg::Notification, Msg>::value,
+                          "Only sys::msg::Notification can be sent via Multicast<>");
+            auto msg = std::make_shared<Msg>(std::forward<Params>(params)...);
+            sendMulticast(msg, msg->channel());
         }
 
         std::vector<BusChannel> channels;

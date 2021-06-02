@@ -4,13 +4,13 @@
 #include "SimLockHandler.hpp"
 
 #include <service-appmgr/service-appmgr/Controller.hpp>
-#include <locks/widgets/LockHash.hpp>
 #include <Utils.hpp>
 #include <memory>
 
 #include <module-apps/popups/data/PopupRequestParams.hpp>
-#include <service-cellular-api>
 #include <module-utils/common_data/EventStore.hpp>
+#include <module-sys/Timers/TimerFactory.hpp>
+#include <service-cellular-api>
 
 namespace locks
 {
@@ -22,6 +22,11 @@ namespace locks
         : owner(owner), lock(Lock::LockState::Unlocked, default_attempts)
     {
         lock.setInputSizeBounds(min_input_size, max_input_size);
+
+        simResponseTimer = sys::TimerFactory::createSingleShotTimer(
+            owner, simResponseTimerName, std::chrono::seconds{1}, [this](sys::Timer &) {
+                handleSimNotRespondingMessage();
+            });
     }
 
     void SimLockHandler::clearStoredInputs()
@@ -32,6 +37,8 @@ namespace locks
 
     void SimLockHandler::setSimInputTypeAction(SimInputTypeAction _simInputTypeAction)
     {
+        simResponseTimer.stop();
+
         if (simInputTypeAction != _simInputTypeAction) {
             simInputTypeAction = _simInputTypeAction;
             lock.lockState     = Lock::LockState::Unlocked;
@@ -61,6 +68,20 @@ namespace locks
                                              std::make_unique<gui::PopupRequestParams>(gui::popup::ID::SimLock));
     }
 
+    void SimLockHandler::simNotReadyAction()
+    {
+        app::manager::Controller::sendAction(owner,
+                                             app::manager::actions::ShowPopup,
+                                             std::make_unique<gui::PopupRequestParams>(gui::popup::ID::SimNotReady));
+    }
+
+    void SimLockHandler::simReadyAction()
+    {
+        app::manager::Controller::sendAction(owner,
+                                             app::manager::actions::AbortPopup,
+                                             std::make_unique<gui::PopupRequestParams>(gui::popup::ID::SimNotReady));
+    }
+
     void SimLockHandler::simInfoAction()
     {
         app::manager::Controller::sendAction(
@@ -71,10 +92,10 @@ namespace locks
 
     void SimLockHandler::getSettingsSimSelect(const std::string &settingsSim)
     {
-        auto selectedSim            = magic_enum::enum_cast<Store::GSM::SIM>(settingsSim);
-        Store::GSM::get()->selected = selectedSim.value();
+        auto selectedSim = magic_enum::enum_cast<Store::GSM::SIM>(settingsSim);
 
-        if ((selectedSim.value() == Store::GSM::SIM::SIM1 || selectedSim.value() == Store::GSM::SIM::SIM2)) {
+        if (selectedSim.has_value() &&
+            (selectedSim.value() == Store::GSM::SIM::SIM1 || selectedSim.value() == Store::GSM::SIM::SIM2)) {
             setSim(static_cast<cellular::api::SimSlot>(selectedSim.value()));
         }
         else {
@@ -84,7 +105,14 @@ namespace locks
 
     void SimLockHandler::setSim(cellular::api::SimSlot simSlot)
     {
-        owner->bus.sendUnicast<cellular::msg::request::sim::SetActiveSim>(simSlot);
+        if (simReady) {
+            simResponseTimer.start();
+            Store::GSM::get()->selected = static_cast<Store::GSM::SIM>(simSlot);
+            owner->bus.sendUnicast<cellular::msg::request::sim::SetActiveSim>(simSlot);
+        }
+        else {
+            simNotReadyAction();
+        }
     }
 
     sys::MessagePointer SimLockHandler::handleSimPinRequest(unsigned int attempts)
@@ -147,7 +175,7 @@ namespace locks
         return sys::msgHandled();
     }
 
-    sys::MessagePointer SimLockHandler::handleSimChangedMessage()
+    sys::MessagePointer SimLockHandler::handleSimPinChangedMessage()
     {
         lock.lockState = Lock::LockState::Unlocked;
         simInfoAction();
@@ -240,6 +268,22 @@ namespace locks
         return sys::msgHandled();
     }
 
+    sys::MessagePointer SimLockHandler::handleSimReadyMessage()
+    {
+        simResponseTimer.stop();
+        return sys::msgHandled();
+    }
+
+    sys::MessagePointer SimLockHandler::handleSimNotRespondingMessage()
+    {
+        setSimInputTypeAction(SimInputTypeAction::Error);
+
+        lock.lockName = utils::enumToString(Store::GSM::get()->selected);
+        simInfoAction();
+
+        return sys::msgHandled();
+    }
+
     sys::MessagePointer SimLockHandler::processLockWithNewInput(LockInput inputData)
     {
         if (lock.isState(Lock::LockState::InputRequired) || (lock.isState(Lock::LockState::InputInvalid))) {
@@ -287,6 +331,12 @@ namespace locks
     void SimLockHandler::setSimUnlockBlockOnLockedPhone()
     {
         simUnlockBlockOnLockedPhone = true;
+    }
+
+    void SimLockHandler::setSimReady()
+    {
+        simReady = true;
+        simReadyAction();
     }
 
     sys::MessagePointer SimLockHandler::releaseSimUnlockBlockOnLockedPhone()
@@ -351,4 +401,5 @@ namespace locks
                                                                         pinInputData);
         return sys::msgHandled();
     }
+
 } // namespace locks

@@ -3,42 +3,46 @@
 
 #include "BluetoothAudioDevice.hpp"
 
-#include <Audio/AudioCommon.hpp>
 #include <interface/profiles/A2DP/AVDTP.hpp>
-#include <module-audio/Audio/VolumeScaler.hpp>
+#include <interface/profiles/A2DP/AVRCP.hpp>
+#include <interface/profiles/HSP/SCO.hpp>
 
+#include <Audio/AudioCommon.hpp>
+#include <Audio/VolumeScaler.hpp>
 #include <Audio/Stream.hpp>
 
 #include <chrono>
 #include <cassert>
 
 using audio::AudioFormat;
-using namespace bluetooth;
+using bluetooth::A2DPAudioDevice;
+using bluetooth::BluetoothAudioDevice;
+using bluetooth::HSPAudioDevice;
+
 using namespace std::chrono_literals;
 
-BluetoothAudioDevice::BluetoothAudioDevice(MediaContext *mediaContext) : ctx(mediaContext)
-{
-    LOG_DEBUG("Bluetooth audio device created");
-}
+BluetoothAudioDevice::BluetoothAudioDevice(AudioProfile audioProfile) : profile(audioProfile)
+{}
 
 BluetoothAudioDevice::~BluetoothAudioDevice()
 {
     LOG_DEBUG("Destroying bluetooth audio device");
 }
 
-void BluetoothAudioDevice::setMediaContext(MediaContext *mediaContext)
+auto BluetoothAudioDevice::getProfileType() const -> AudioProfile
 {
-    ctx = mediaContext;
+    return profile;
 }
 
 auto BluetoothAudioDevice::setOutputVolume(float vol) -> audio::AudioDevice::RetCode
 {
     const auto volumeToSet = audio::volume::scaler::toAvrcpVolume(vol);
-    const auto status      = avrcp_controller_set_absolute_volume(ctx->avrcp_cid, volumeToSet);
+    const auto status      = avrcp_controller_set_absolute_volume(AVRCP::mediaTracker.avrcp_cid, volumeToSet);
     if (status != ERROR_CODE_SUCCESS) {
         LOG_ERROR("Can't set volume level. Status %x", status);
         return audio::AudioDevice::RetCode::Failure;
     }
+
     outputVolume = vol;
     return audio::AudioDevice::RetCode::Success;
 }
@@ -48,18 +52,124 @@ auto BluetoothAudioDevice::setInputGain(float gain) -> audio::AudioDevice::RetCo
     return audio::AudioDevice::RetCode::Success;
 }
 
-void BluetoothAudioDevice::onDataSend()
+auto BluetoothAudioDevice::isInputEnabled() const -> bool
 {
-    if (outputEnabled) {
-        fillSbcAudioBuffer(ctx);
+    return inputEnabled;
+}
+
+auto BluetoothAudioDevice::isOutputEnabled() const -> bool
+{
+    return outputEnabled;
+}
+
+void A2DPAudioDevice::onDataSend()
+{
+    if (isOutputEnabled()) {
+        fillSbcAudioBuffer();
     }
 }
 
-void BluetoothAudioDevice::onDataReceive()
+void A2DPAudioDevice::onDataReceive()
+{}
+
+void HSPAudioDevice::onDataSend()
+{}
+
+void HSPAudioDevice::onDataSend(std::uint16_t scoHandle)
+{
+    if (!isOutputEnabled()) {
+        return;
+    }
+
+    hci_reserve_packet_buffer();
+    auto scoPacket = hci_get_outgoing_packet_buffer();
+
+    // get data to send
+    audio::AbstractStream::Span dataSpan;
+    Sink::_stream->peek(dataSpan);
+
+    // prepare packet to send
+    std::copy(dataSpan.data, dataSpan.dataEnd(), &scoPacket[packetDataOffset]);
+    Sink::_stream->consume();
+    little_endian_store_16(scoPacket, packetHandleOffset, scoHandle);
+    scoPacket[packetLengthOffset] = dataSpan.dataSize;
+
+    // send packet
+    hci_send_sco_packet_buffer(dataSpan.dataSize + packetDataOffset);
+    hci_request_sco_can_send_now_event();
+}
+
+void HSPAudioDevice::receiveCVSD(audio::AbstractStream::Span receivedData)
+{
+    if (!isInputEnabled()) {
+        return;
+    }
+
+    auto blockSize          = Source::_stream->getInputTraits().blockSize;
+    auto decodedData        = decodeCVSD(receivedData);
+    auto processedDataIndex = 0;
+
+    // try to complete leftovers to the full block size
+    if (leftoversSize != 0) {
+        auto maxFillSize = blockSize - leftoversSize;
+        auto fillSize    = std::min(maxFillSize, decodedData.dataSize);
+
+        std::copy_n(decodedData.data, fillSize, &rxLeftovers[leftoversSize]);
+
+        if (fillSize + leftoversSize < blockSize) {
+            leftoversSize += fillSize;
+            return;
+        }
+
+        Source::_stream->push(&rxLeftovers[0], blockSize);
+        leftoversSize      = 0;
+        processedDataIndex = fillSize;
+    }
+
+    // push as many blocks as possible
+    while (decodedData.dataSize - processedDataIndex >= blockSize) {
+        Source::_stream->push(&decodedData.data[processedDataIndex], blockSize);
+        processedDataIndex += blockSize;
+    }
+
+    // save leftovers
+    leftoversSize = decodedData.dataSize - processedDataIndex;
+    if (leftoversSize > 0) {
+        std::copy_n(&decodedData.data[processedDataIndex], leftoversSize, &rxLeftovers[0]);
+    }
+}
+
+auto HSPAudioDevice::decodeCVSD(audio::AbstractStream::Span dataToDecode) -> audio::AbstractStream::Span
+{
+    auto decodedData = dataToDecode;
+    std::array<std::int16_t, scratchBufferSize> scratchBuffer;
+
+    const auto audioBytesRead = dataToDecode.dataSize - packetDataOffset;
+    const auto samplesCount   = audioBytesRead / sizeof(std::int16_t);
+    auto dataStart            = &dataToDecode.data[packetDataOffset];
+
+    for (auto i = 0; i < samplesCount; ++i) {
+        scratchBuffer[i] = little_endian_read_16(dataStart, i * sizeof(std::uint16_t));
+    }
+
+    auto packetStatusByte = dataToDecode.data[packetStatusOffset];
+    auto isBadFrame       = (packetStatusByte & allGoodMask) != 0;
+
+    btstack_cvsd_plc_process_data(&cvsdPlcState, isBadFrame, &scratchBuffer[0], samplesCount, &decoderBuffer[0]);
+
+    decodedData.data     = reinterpret_cast<std::uint8_t *>(decoderBuffer.get());
+    decodedData.dataSize = audioBytesRead;
+
+    return decodedData;
+}
+
+void HSPAudioDevice::onDataReceive()
 {}
 
 void BluetoothAudioDevice::enableInput()
-{}
+{
+    inputEnabled = true;
+}
 
 void BluetoothAudioDevice::enableOutput()
 {
@@ -68,7 +178,9 @@ void BluetoothAudioDevice::enableOutput()
 }
 
 void BluetoothAudioDevice::disableInput()
-{}
+{
+    inputEnabled = false;
+}
 
 void BluetoothAudioDevice::disableOutput()
 {
@@ -76,11 +188,21 @@ void BluetoothAudioDevice::disableOutput()
     outputEnabled = false;
 }
 
-auto BluetoothAudioDevice::fillSbcAudioBuffer(MediaContext *context) -> int
+void HSPAudioDevice::enableInput()
+{
+    auto blockSize = Source::_stream->getInputTraits().blockSize;
+    rxLeftovers    = std::make_unique<std::uint8_t[]>(blockSize);
+    decoderBuffer  = std::make_unique<std::int16_t[]>(scratchBufferSize);
+    btstack_cvsd_plc_init(&cvsdPlcState);
+    BluetoothAudioDevice::enableInput();
+}
+
+auto BluetoothAudioDevice::fillSbcAudioBuffer() -> int
 {
     // perform sbc encodin
     int totalNumBytesRead                    = 0;
     unsigned int numAudioSamplesPerSbcBuffer = btstack_sbc_encoder_num_audio_frames();
+    auto context                             = &AVRCP::mediaTracker;
 
     assert(context != nullptr);
 
@@ -104,7 +226,7 @@ auto BluetoothAudioDevice::fillSbcAudioBuffer(MediaContext *context) -> int
     return totalNumBytesRead;
 }
 
-auto BluetoothAudioDevice::getSupportedFormats() -> std::vector<audio::AudioFormat>
+auto A2DPAudioDevice::getSupportedFormats() -> std::vector<audio::AudioFormat>
 {
     constexpr static auto supportedBitWidth = 16U;
     return std::vector<AudioFormat>{AudioFormat{static_cast<unsigned>(AVDTP::sbcConfig.samplingFrequency),
@@ -112,12 +234,27 @@ auto BluetoothAudioDevice::getSupportedFormats() -> std::vector<audio::AudioForm
                                                 static_cast<unsigned>(AVDTP::sbcConfig.numChannels)}};
 }
 
-auto BluetoothAudioDevice::getSourceFormat() -> audio::AudioFormat
+auto HSPAudioDevice::getSupportedFormats() -> std::vector<audio::AudioFormat>
+{
+    return std::vector<AudioFormat>{getSourceFormat()};
+}
+
+auto A2DPAudioDevice::getTraits() const -> ::audio::Endpoint::Traits
+{
+    return Traits{.usesDMA = false, .blockSizeConstraint = 512U, .timeConstraint = 10ms};
+}
+
+auto HSPAudioDevice::getTraits() const -> ::audio::Endpoint::Traits
+{
+    return Traits{.usesDMA = false, .blockSizeConstraint = 32U, .timeConstraint = 16ms};
+}
+
+auto A2DPAudioDevice::getSourceFormat() -> ::audio::AudioFormat
 {
     return audio::nullFormat;
 }
 
-auto BluetoothAudioDevice::getTraits() const -> Traits
+auto HSPAudioDevice::getSourceFormat() -> ::audio::AudioFormat
 {
-    return Traits{.usesDMA = false, .blockSizeConstraint = 512U, .timeConstraint = 10ms};
+    return AudioFormat{bluetooth::SCO::CVSD_SAMPLE_RATE, supportedBitWidth, supportedChannels};
 }

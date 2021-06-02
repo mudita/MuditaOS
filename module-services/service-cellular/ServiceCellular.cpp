@@ -58,6 +58,7 @@
 #include <at/UrcFactory.hpp>
 #include <queries/messages/sms/QuerySMSSearchByType.hpp>
 #include <queries/notifications/QueryNotificationsIncrement.hpp>
+#include <queries/notifications/QueryNotificationsMultipleIncrement.hpp>
 #include <projdefs.h>
 #include <service-antenna/AntennaMessage.hpp>
 #include <service-antenna/AntennaServiceAPI.hpp>
@@ -74,7 +75,6 @@
 #include <service-desktop/DeveloperModeMessage.hpp>
 #include <service-appmgr/model/ApplicationManager.hpp>
 #include <task.h>
-#include <time/time_conversion.hpp>
 #include <ucs2/UCS2.hpp>
 #include <utf8/UTF8.hpp>
 
@@ -98,6 +98,8 @@
 #include "ServiceCellularPriv.hpp"
 #include <service-cellular/api/request/sim.hpp>
 #include <service-cellular/api/notification/notification.hpp>
+
+#include <ctime>
 
 const char *ServiceCellular::serviceName = cellular::service::name;
 
@@ -279,9 +281,23 @@ void ServiceCellular::registerMessageHandlers()
     phoneModeObserver->connect(this);
     phoneModeObserver->subscribe(
         [this](sys::phone_modes::PhoneMode mode) { connectionManager->onPhoneModeChange(mode); });
-    phoneModeObserver->subscribe([](sys::phone_modes::Tethering tethering) {
+    phoneModeObserver->subscribe([&](sys::phone_modes::Tethering tethering) {
         using bsp::cellular::USB::setPassthrough;
         using bsp::cellular::USB::PassthroughState;
+        if (tethering == sys::phone_modes::Tethering::On) {
+            if (!tetheringTurnOffURC()) {
+                LOG_ERROR("Failed to disable URC on tethering enable");
+            }
+        }
+        else {
+            if (!tetheringTurnOnURC()) {
+                LOG_ERROR("Failed to enable URC on tethering disable");
+            }
+            if (!receiveAllMessages()) {
+                LOG_ERROR("Failed to receive all sms after tethering disabling");
+            }
+            logTetheringCalls();
+        }
         setPassthrough(tethering == sys::phone_modes::Tethering::On ? PassthroughState::ENABLED
                                                                     : PassthroughState::DISABLED);
     });
@@ -1116,8 +1132,7 @@ auto ServiceCellular::receiveSMS(std::string messageNumber) -> bool
                 // parse date
                 tokens[3].erase(std::remove(tokens[3].begin(), tokens[3].end(), '\"'), tokens[3].end());
 
-                utils::time::Timestamp time;
-                auto messageDate = time.getTime();
+                auto messageDate = std::time(nullptr);
 
                 if (tokens.size() == 5) {
                     LOG_DEBUG("Single message");
@@ -1413,6 +1428,7 @@ bool ServiceCellular::handle_modem_on()
     channel->cmd("AT+CCLK?");
     // inform host ap ready
     cmux->informModemHostWakeup();
+    tetheringTurnOnURC();
     priv->state->set(State::ST::URCReady);
     LOG_DEBUG("AP ready");
     return true;
@@ -2048,6 +2064,7 @@ auto ServiceCellular::handleCellularIncominCallMessage(sys::Message *msg) -> std
 
 auto ServiceCellular::handleCellularCallerIdMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
+
     auto message = static_cast<CellularCallerIdMessage *>(msg);
     ongoingCall.setNumber(message->number);
     return sys::MessageNone{};
@@ -2319,13 +2336,19 @@ auto ServiceCellular::handleCellularRingNotification(sys::Message *msg) -> std::
 
 auto ServiceCellular::handleCellularCallerIdNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
+    auto message = static_cast<CellularCallerIdNotification *>(msg);
     if (isIncommingCallAllowed()) {
-        auto message = static_cast<CellularCallerIdNotification *>(msg);
         bus.sendMulticast(std::make_shared<CellularCallerIdMessage>(message->getNubmer()),
                           sys::BusChannel::ServiceCellularNotifications);
         return std::make_shared<CellularResponseMessage>(true);
     }
-    return std::make_shared<CellularResponseMessage>(this->hangUpCall());
+    else {
+        if (phoneModeObserver->isTetheringOn()) {
+            tetheringCalllog.push_back(CalllogRecord{CallType::CT_MISSED, message->getNubmer()});
+            return std::make_shared<CellularResponseMessage>(hangUpCallBusy());
+        }
+    }
+    return std::make_shared<CellularResponseMessage>(hangUpCall());
 }
 
 auto ServiceCellular::handleCellularSetConnectionFrequencyMessage(sys::Message *msg)
@@ -2343,17 +2366,102 @@ auto ServiceCellular::handleCellularSetConnectionFrequencyMessage(sys::Message *
 
 auto ServiceCellular::isIncommingCallAllowed() -> bool
 {
-    return phoneModeObserver->isInMode(sys::phone_modes::PhoneMode::Connected);
+    return phoneModeObserver->isInMode(sys::phone_modes::PhoneMode::Connected) && !phoneModeObserver->isTetheringOn();
 }
 
 auto ServiceCellular::hangUpCall() -> bool
 {
     auto channel = cmux->get(CellularMux::Channel::Commands);
-    if (channel) {
+    if (channel != nullptr) {
         if (channel->cmd(at::factory(at::AT::ATH))) {
             return true;
         }
     }
     LOG_ERROR("Failed to hang up call");
     return false;
+}
+
+auto ServiceCellular::hangUpCallBusy() -> bool
+{
+    auto channel = cmux->get(CellularMux::Channel::Commands);
+    if (channel != nullptr) {
+        if (channel->cmd(at::factory(at::AT::QHUP_BUSY))) {
+            return true;
+        }
+    }
+    LOG_ERROR("Failed to hang up call");
+    return false;
+}
+
+auto ServiceCellular::tetheringTurnOffURC() -> bool
+{
+    auto channel = cmux->get(CellularMux::Channel::Commands);
+    if (channel != nullptr) {
+        if (!channel->cmd(at::factory(at::AT::CSQ_URC_OFF))) {
+            LOG_ERROR("Failed to stop CSQ URC");
+            return false;
+        }
+        if (!channel->cmd(at::factory(at::AT::ACT_URC_OFF))) {
+            LOG_ERROR("Failed to stop ACT URC");
+            return false;
+        }
+        if (!channel->cmd(at::factory(at::AT::SMS_URC_OFF))) {
+            LOG_ERROR("Failed to stop SMS URC");
+            return false;
+        }
+        if (!channel->cmd(at::factory(at::AT::RING_URC_OFF))) {
+            LOG_ERROR("Failed to stop RING URC");
+            return false;
+        }
+    }
+    return true;
+}
+
+auto ServiceCellular::tetheringTurnOnURC() -> bool
+{
+    auto channel = cmux->get(CellularMux::Channel::Commands);
+    if (channel != nullptr) {
+        if (!channel->cmd(at::factory(at::AT::CSQ_URC_ON))) {
+            LOG_ERROR("Failed to stop CSQ URC");
+            return false;
+        }
+        if (!channel->cmd(at::factory(at::AT::ACT_URC_ON))) {
+            LOG_ERROR("Failed to stop ACT URC");
+            return false;
+        }
+        if (!channel->cmd(at::factory(at::AT::SMS_URC_ON))) {
+            LOG_ERROR("Failed to stop SMS URC");
+            return false;
+        }
+
+        if (!channel->cmd(at::factory(at::AT::RING_URC_ON))) {
+            LOG_ERROR("Failed to stop RING URC");
+            return false;
+        }
+    }
+    return true;
+}
+
+auto ServiceCellular::logTetheringCalls() -> void
+{
+    if (!tetheringCalllog.empty()) {
+        for (auto callRecord : tetheringCalllog) {
+            auto call = DBServiceAPI::CalllogAdd(this, callRecord);
+            if (call.ID == DB_ID_NONE) {
+                LOG_ERROR("CalllogAdd failed");
+            }
+        }
+
+        std::vector<utils::PhoneNumber::View> numbers;
+        for (auto calllogRecord : tetheringCalllog) {
+            numbers.push_back(calllogRecord.phoneNumber);
+        }
+
+        DBServiceAPI::GetQuery(
+            this,
+            db::Interface::Name::Notifications,
+            std::make_unique<db::query::notifications::MultipleIncrement>(NotificationsRecord::Key::Calls, numbers));
+
+        tetheringCalllog.clear();
+    }
 }

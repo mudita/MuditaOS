@@ -6,13 +6,13 @@
 #include <application-settings-new/windows/ChangeDateAndTimeWindow.hpp>
 #include <application-settings-new/models/DateAndTimeModel.hpp>
 
-namespace gui
+namespace app::onBoarding
 {
-    class OnBoardingChangeDateAndTimeWindow : public ChangeDateAndTimeWindow
+    class OnBoardingChangeDateAndTimeWindow : public gui::ChangeDateAndTimeWindow
     {
       public:
         explicit OnBoardingChangeDateAndTimeWindow(app::Application *app);
 
-        bool onInput(const InputEvent &inputEvent) override;
+        bool onInput(const gui::InputEvent &inputEvent) override;
     };
-} /* namespace gui */
+} // namespace app::onBoarding

@@ -20,7 +20,7 @@
 #include <service-db/QueryMessage.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 
-#include <time/time_conversion.hpp>
+#include <ctime>
 
 namespace app
 {
@@ -98,8 +98,7 @@ namespace app
 
     sys::ReturnCodes ApplicationCalendar::InitHandler()
     {
-        utils::time::Timestamp timestamp;
-        applicationStartTime = timestamp.getTime();
+        applicationStartTime = std::time(nullptr);
         auto ret             = Application::InitHandler();
         createUserInterface();
         return ret;

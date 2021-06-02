@@ -3,7 +3,8 @@
 
 #pragma once
 
-#include "request.hpp"
+#include <service-cellular/api/common.hpp>
+#include <service-cellular/api/message.hpp>
 
 namespace cellular::msg::request::sim
 {

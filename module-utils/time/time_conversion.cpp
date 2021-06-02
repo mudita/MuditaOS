@@ -56,7 +56,6 @@ namespace utils::time
     } // namespace
 
     Locale tlocale;
-    static int msTimeGmtOff = 4 * utils::time::minutesInQuarterOfHour * utils::time::secondsInMinute;
 
     UTF8 Localer::get_replacement(Replacements val, const struct tm &timeinfo)
     {
@@ -82,12 +81,8 @@ namespace utils::time
 
     Timestamp::Timestamp()
     {
-        auto err = bsp::rtc::getCurrentTimestamp(&time);
-        time += utils::time::Time::getTimeZoneOffset();
-        if (err != bsp::rtc::ErrorCode::OK) {
-            LOG_ERROR("rtc::getCurrentTimestamp failure!");
-        }
-        timeinfo = *localtime(&time);
+        time     = 0;
+        timeinfo = *std::localtime(&time);
     }
 
     void Timestamp::set_time(time_t newtime)
@@ -284,16 +279,6 @@ namespace utils::time
         }
     }
 
-    void Time::setTimeZoneOffset(int tzOffset)
-    {
-        msTimeGmtOff = tzOffset;
-    }
-
-    int Time::getTimeZoneOffset()
-    {
-        return msTimeGmtOff;
-    };
-
     Duration::Duration(time_t duration) : duration(duration)
     {
         calculate();
@@ -345,13 +330,6 @@ namespace utils::time
 
     Timestamp getCurrentTimestamp()
     {
-        return Timestamp{};
-    }
-
-    std::string getHoursMinInCurrentTimeFormat()
-    {
-        auto timestamp = getCurrentTimestamp();
-        return utils::dateAndTimeSettings.isTimeFormat12() ? timestamp.str(hoursMinFormat12H)
-                                                           : timestamp.str(hoursMinFormat24H);
+        return Timestamp{std::time(nullptr)};
     }
 }; // namespace utils::time

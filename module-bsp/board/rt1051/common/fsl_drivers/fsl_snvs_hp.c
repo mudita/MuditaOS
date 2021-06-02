@@ -417,8 +417,6 @@ void SNVS_HP_RTC_GetDatetime(SNVS_Type *base, snvs_hp_rtc_datetime_t *datetime)
  */
 status_t SNVS_HP_RTC_SetAlarmSeconds(SNVS_Type *base, uint32_t alarmSeconds)
 {
-    assert(alarmTime != NULL);
-
     uint32_t currSeconds  = 0U;
     uint32_t tmp          = base->HPCR;
 

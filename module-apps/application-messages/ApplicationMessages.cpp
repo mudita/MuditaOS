@@ -32,10 +32,10 @@
 #include <module-db/queries/phonebook/QueryContactGetByID.hpp>
 
 #include <service-cellular/CellularMessage.hpp>
+#include <messages/OptionsWindow.hpp>
 
 #include <cassert>
-#include <time/time_conversion.hpp>
-#include <messages/OptionsWindow.hpp>
+#include <ctime>
 
 namespace app
 {
@@ -329,7 +329,7 @@ namespace app
         assert(!body.empty()); // precondition check.
 
         record.body = body;
-        record.date = utils::time::getCurrentTimestamp().getTime();
+        record.date = std::time(nullptr);
 
         using db::query::SMSUpdate;
         const auto [succeed, _] =
@@ -346,7 +346,7 @@ namespace app
         record.number = number;
         record.body   = body;
         record.type   = SMSType::DRAFT;
-        record.date   = utils::time::getCurrentTimestamp().getTime();
+        record.date   = std::time(nullptr);
 
         using db::query::SMSAdd;
         const auto [success, _] =
@@ -372,7 +372,7 @@ namespace app
         record.number = number;
         record.body   = body;
         record.type   = SMSType::QUEUED;
-        record.date   = utils::time::getCurrentTimestamp().getTime();
+        record.date   = std::time(nullptr);
 
         using db::query::SMSAdd;
         const auto [succeed, _] =
@@ -384,9 +384,8 @@ namespace app
     {
         auto resendRecord = record;
         resendRecord.type = SMSType::QUEUED;
-        resendRecord.date =
-            utils::time::getCurrentTimestamp().getTime(); // update date sent - it will display an old, failed sms at
-                                                          // the the bottom, but this is correct
+        resendRecord.date = std::time(nullptr); // update date sent - it will display an old, failed sms at
+                                                // the the bottom, but this is correct
 
         using db::query::SMSUpdate;
         const auto [succeed, _] =

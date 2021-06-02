@@ -22,6 +22,8 @@ add_catch2_executable(
     NAME vfs-core-fs
     SRCS
         ${CMAKE_CURRENT_LIST_DIR}/unittest_filesystem_core.cpp
+    INCLUDE 
+        ${CMAKE_CURRENT_SOURCE_DIR}/../include/internal
     LIBS
         module-vfs
 )
@@ -38,6 +40,8 @@ add_catch2_executable(
     NAME vfs-littlefs
     SRCS
         ${CMAKE_CURRENT_LIST_DIR}/unittest_filesystem_littlefs.cpp
+    INCLUDE 
+        ${CMAKE_CURRENT_SOURCE_DIR}/../include/internal
     LIBS
         module-vfs
     DEPS
@@ -48,10 +52,23 @@ add_catch2_executable(
     NAME vfs-dualmount
     SRCS
         ${CMAKE_CURRENT_LIST_DIR}/unittest_filesystem_dualmount.cpp
+    INCLUDE 
+        ${CMAKE_CURRENT_SOURCE_DIR}/../include/internal
+
     LIBS
         module-vfs
     DEPS
         ${LITTLEFS_IMAGE}
+)
+
+add_catch2_executable(
+    NAME vfs-inotify
+    SRCS
+        ${CMAKE_CURRENT_LIST_DIR}/unittest_filesystem_inotify.cpp
+    LIBS
+        module-vfs
+    INCLUDE 
+        ${CMAKE_CURRENT_SOURCE_DIR}/../include/internal
 )
 
 # prepare test assets

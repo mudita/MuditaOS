@@ -8,6 +8,8 @@
 
 #include <module-apps/windows/DialogMetadata.hpp>
 #include <module-apps/messages/DialogMetadataMessage.hpp>
+#include <widgets/IceBox.hpp>
+#include <service-appmgr/Controller.hpp>
 
 #include <i18n/i18n.hpp>
 #include <Style.hpp>
@@ -29,6 +31,7 @@ namespace app::onBoarding
         bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(::style::strings::common::back));
         bottomBar->setText(gui::BottomBar::Side::LEFT, utils::translate(::style::strings::common::skip));
 
+        new gui::IceBox(this);
         new gui::Icon(this,
                       0,
                       0,
@@ -50,6 +53,12 @@ namespace app::onBoarding
                 application->switchWindow(gui::window::name::onBoarding_sim_select,
                                           gui::ShowMode::GUI_SHOW_INIT,
                                           std::make_unique<OnBoardingSwitchData>());
+            }
+            if (inputEvent.is(gui::KeyCode::KEY_LEFT)) {
+                app::manager::Controller::sendAction(application,
+                                                     app::manager::actions::EmergencyDial,
+                                                     std::make_unique<gui::SwitchData>(),
+                                                     app::manager::OnSwitchBehaviour::RunInBackground);
             }
             if (inputEvent.is(gui::KeyCode::KEY_LF)) {
 

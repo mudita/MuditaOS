@@ -17,6 +17,8 @@
 #include <application-call/ApplicationCall.hpp>
 #include <application-special-input/ApplicationSpecialInput.hpp>
 #include <application-desktop/ApplicationDesktop.hpp>
+#include <application-onboarding/ApplicationOnBoarding.hpp>
+#include <application-onboarding/data/OnBoardingMessages.hpp>
 #include <i18n/i18n.hpp>
 #include <log/log.hpp>
 #include <service-appmgr/messages/Message.hpp>
@@ -437,7 +439,7 @@ namespace app::manager
         });
         connect(typeid(locks::UnLockPhoneInput), [&](sys::Message *request) -> sys::MessagePointer {
             auto data = static_cast<locks::UnLockPhoneInput *>(request);
-            return phoneLockHandler.verifyPhoneLockInput(data->getInputData());
+            return phoneLockHandler.handlePhoneLockInput(data->getInputData());
         });
         connect(typeid(locks::EnablePhoneLock),
                 [&](sys::Message *request) -> sys::MessagePointer { return phoneLockHandler.handleEnablePhoneLock(); });
@@ -462,6 +464,14 @@ namespace app::manager
         connect(typeid(SetAutoLockTimeoutRequest), [&](sys::Message *request) -> sys::MessagePointer {
             auto req = static_cast<SetAutoLockTimeoutRequest *>(request);
             return handleAutoLockSetRequest(req);
+        });
+        connect(typeid(locks::ExternalUnLockPhone), [&](sys::Message *request) -> sys::MessagePointer {
+            auto data = static_cast<locks::ExternalUnLockPhone *>(request);
+            return phoneLockHandler.handleExternalUnlockRequest(data->getInputData());
+        });
+        connect(typeid(locks::ExternalPhoneLockAvailabilityChange), [&](sys::Message *request) -> sys::MessagePointer {
+            auto data = static_cast<locks::ExternalPhoneLockAvailabilityChange *>(request);
+            return phoneLockHandler.handleExternalAvailabilityChange(data->getAvailability());
         });
 
         // SimLock connects
@@ -506,7 +516,7 @@ namespace app::manager
                 [&](sys::Message *request) -> sys::MessagePointer {
                     auto data = static_cast<cellular::msg::request::sim::ChangePin::Response *>(request);
                     if (data->retCode) {
-                        return simLockHandler.handleSimChangedMessage();
+                        return simLockHandler.handleSimPinChangedMessage();
                     }
                     else {
                         return simLockHandler.handleSimPinChangeFailedRequest();
@@ -560,15 +570,21 @@ namespace app::manager
                     }
                     return sys::msgNotHandled();
                 });
+        connect(typeid(cellular::msg::notification::SimReady),
+                [&](sys::Message *request) -> sys::MessagePointer { return simLockHandler.handleSimReadyMessage(); });
         connect(typeid(cellular::StateChange), [&](sys::Message *request) -> sys::MessagePointer {
             auto data = static_cast<cellular::StateChange *>(request);
             if (data->request == cellular::service::State::ST::URCReady) {
+                simLockHandler.setSimReady();
                 simLockHandler.getSettingsSimSelect(
                     settings->getValue(settings::SystemProperties::activeSim, settings::SettingsScope::Global));
                 return sys::msgHandled();
             }
             return sys::msgNotHandled();
         });
+
+        connect(typeid(onBoarding::FinalizeOnBoarding),
+                [&](sys::Message *request) -> sys::MessagePointer { return handleOnBoardingFinalize(); });
 
         connect(typeid(sdesktop::developerMode::DeveloperModeRequest),
                 [&](sys::Message *request) -> sys::MessagePointer { return handleDeveloperModeRequest(request); });
@@ -777,9 +793,9 @@ namespace app::manager
 
     auto ApplicationManager::handleHomeAction(ActionEntry &action) -> ActionProcessStatus
     {
-        action.setTargetApplication(rootApplicationName);
+        action.setTargetApplication(resolveHomeApplication());
 
-        SwitchRequest switchRequest(ServiceName, rootApplicationName, resolveHomeWindow(), nullptr);
+        SwitchRequest switchRequest(ServiceName, resolveHomeApplication(), resolveHomeWindow(), nullptr);
         return handleSwitchApplication(&switchRequest) ? ActionProcessStatus::Accepted : ActionProcessStatus::Dropped;
     }
 
@@ -787,6 +803,27 @@ namespace app::manager
     {
         return phoneLockHandler.isPhoneLocked() ? gui::popup::window::phone_lock_window
                                                 : gui::name::window::main_window;
+    }
+
+    auto ApplicationManager::handleOnBoardingFinalize() -> sys::MessagePointer
+    {
+        settings->setValue(settings::SystemProperties::onboardingDone, utils::to_string(true));
+        app::manager::Controller::sendAction(this, app::manager::actions::Home);
+        return sys::msgHandled();
+    }
+
+    auto ApplicationManager::checkOnBoarding() -> bool
+    {
+        return not utils::getNumericValue<bool>(settings->getValue(settings::SystemProperties::onboardingDone));
+    }
+
+    auto ApplicationManager::resolveHomeApplication() -> std::string
+    {
+        if (checkOnBoarding()) {
+            phoneLockHandler.handleUnlockRequest();
+            return app::name_onboarding;
+        }
+        return rootApplicationName;
     }
 
     auto ApplicationManager::handleLaunchAction(ActionEntry &action) -> ActionProcessStatus
