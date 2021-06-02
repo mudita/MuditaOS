@@ -96,17 +96,6 @@ add_catch2_executable(
 #        module-utils
 #)
 
-#  time display tests
-add_catch2_executable(
-    NAME
-        utils-time_display
-    SRCS
-        unittest_TimeRangeParser.cpp
-    LIBS
-        module-utils
-        module-db
-)
-
 #  i18n language change tests
 add_catch2_executable(
     NAME

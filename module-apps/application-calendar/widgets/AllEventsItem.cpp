@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AllEventsItem.hpp"
@@ -7,7 +7,7 @@
 #include <Style.hpp>
 #include <gui/widgets/Label.hpp>
 #include <time/time_conversion.hpp>
-#include <module-utils/time/TimeRangeParser.hpp>
+#include <time/TimeRangeParser.hpp>
 
 namespace gui
 {

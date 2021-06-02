@@ -89,10 +89,13 @@ target_include_directories(${PROJECT_NAME}
 set_source_files_properties(${BOARD_SOURCE_FILES_PROPERTIES})
 
 target_link_libraries(${PROJECT_NAME}
-    module-os
-    service-bluetooth
-    eventstore
-    ${TARGET_LIBRARIES}
+    PUBLIC
+        eventstore
+        module-os
+        service-bluetooth
+        ${TARGET_LIBRARIES}
+    PRIVATE
+        time
 )
 
 if (${ENABLE_TESTS})

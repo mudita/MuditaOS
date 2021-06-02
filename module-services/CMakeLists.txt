@@ -33,22 +33,25 @@ add_subdirectory( service-antenna )
 add_subdirectory( service-time )
 add_subdirectory( service-fileindexer )
 
-target_link_libraries(${PROJECT_NAME} PUBLIC
-    service-gui
-    service-eink
-    service-appmgr
-    module-bsp
-    module-os
-    module-sys
-    module-utils
-    module-gui
-    module-apps
-    module-db
-    module-cellular
-    module-audio
-    service-fileindexer
-    service-antenna
-    ${TARGET_LIBRARIES}
+target_link_libraries(${PROJECT_NAME} 
+    PUBLIC
+        service-gui
+        service-eink
+        service-appmgr
+        module-bsp
+        module-os
+        module-sys
+        module-utils
+        module-gui
+        module-apps
+        module-db
+        module-cellular
+        module-audio
+        service-fileindexer
+        service-antenna
+        ${TARGET_LIBRARIES}
+    PRIVATE
+        time
 )
 
 # Board specific compilation definitions,options,include directories and features

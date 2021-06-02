@@ -18,16 +18,12 @@ add_subdirectory(EventStore)
 set (SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/i18n/i18n.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/json/json11.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/time/time_conversion.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/ucs2/UCS2.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/time/time_date_validation.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/PhoneNumber.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/PhoneNumber.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/NumberHolderMatcher.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/country.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/ical/ParserICS.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/time/TimeRangeParser.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/time/DateAndTimeSettings.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Utils.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/circular_buffer/StringCircularBuffer.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/generators/RandomStringGenerator.cpp
@@ -50,6 +46,7 @@ PUBLIC
     ${LIBPHONENUMBER_TARGET}
 PRIVATE
     crc32
+    time
 )
 
 # Board specific compilation definitions,options,include directories and features
@@ -78,4 +75,5 @@ endif()
 add_subdirectory(board)
 add_subdirectory(bootconfig)
 add_subdirectory(log)
+add_subdirectory(time)
 add_subdirectory(utf8)
