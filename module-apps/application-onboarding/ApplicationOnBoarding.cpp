@@ -69,7 +69,7 @@ namespace app
         createUserInterface();
 
         connect(typeid(manager::GetCurrentDisplayLanguageResponse), [&](sys::Message *msg) {
-            if (gui::window::name::onBoarding_languages == getCurrentWindow()->getName()) {
+            if (gui::name::window::main_window == getCurrentWindow()->getName()) {
                 switchWindow(gui::window::name::onBoarding_eula, nullptr);
                 return sys::msgHandled();
             }
@@ -124,7 +124,7 @@ namespace app
     void ApplicationOnBoarding::createUserInterface()
     {
         windowsFactory.attach(gui::name::window::main_window, [](Application *app, const std::string &name) {
-            return std::make_unique<app::onBoarding::OnBoardingLanguagesWindow>(app);
+            return std::make_unique<app::onBoarding::OnBoardingLanguagesWindow>(app, gui::name::window::main_window);
         });
         windowsFactory.attach(gui::window::name::onBoarding_start_configuration,
                               [](Application *app, const std::string &name) {
