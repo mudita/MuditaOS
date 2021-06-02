@@ -14,9 +14,10 @@
 
 namespace locks
 {
-    constexpr unsigned int default_attempts = 4;
-    constexpr unsigned int max_input_size   = 8;
-    constexpr unsigned int min_input_size   = 4;
+    constexpr unsigned int default_attempts           = 4;
+    constexpr unsigned int max_input_size             = 8;
+    constexpr unsigned int min_input_size             = 4;
+    constexpr unsigned int sim_not_responding_timeout = 3;
 
     SimLockHandler::SimLockHandler(sys::Service *owner)
         : owner(owner), lock(Lock::LockState::Unlocked, default_attempts)
@@ -24,7 +25,7 @@ namespace locks
         lock.setInputSizeBounds(min_input_size, max_input_size);
 
         simResponseTimer = sys::TimerFactory::createSingleShotTimer(
-            owner, simResponseTimerName, std::chrono::seconds{1}, [this](sys::Timer &) {
+            owner, simResponseTimerName, std::chrono::seconds{sim_not_responding_timeout}, [this](sys::Timer &) {
                 handleSimNotRespondingMessage();
             });
     }
