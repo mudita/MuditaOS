@@ -11,7 +11,7 @@
 #include <application-calllog/data/CallLogInternals.hpp>
 #include <application-calllog/data/CallLogSwitchData.hpp>
 #include <application-calllog/windows/CallLogOptionsWindow.hpp>
-#include <module-utils/time/DateAndTimeSettings.hpp>
+#include <time/DateAndTimeSettings.hpp>
 #include <widgets/TextWithIconsWidget.hpp>
 #include <widgets/ActiveIconFactory.hpp>
 

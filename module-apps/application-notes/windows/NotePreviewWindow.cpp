@@ -10,7 +10,7 @@
 #include <module-apps/messages/OptionsWindow.hpp>
 
 #include <i18n/i18n.hpp>
-#include <module-utils/time/time_conversion.hpp>
+#include <time/time_conversion.hpp>
 
 #include <Style.hpp>
 

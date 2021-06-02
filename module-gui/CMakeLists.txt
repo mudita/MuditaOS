@@ -27,6 +27,7 @@ target_link_libraries(${PROJECT_NAME}
         utf8
         eventstore
         ${TARGET_LIBRARIES} 
+        time
     PRIVATE
         pugixml::pugixml
         Microsoft.GSL::GSL
