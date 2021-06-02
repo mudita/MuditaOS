@@ -14,6 +14,8 @@
 
 #include <linux/fs.h>
 #include <linux/fiemap.h>
+#include <mntent.h>
+#include <sys/sysmacros.h>
 
 static void syntax(char **argv)
 {
@@ -140,6 +142,40 @@ static off_t copy_extent(int fd_dest, int fd_src, off_t start_offs, size_t len)
     return 0;
 }
 
+static int device_is_mounted(const char *block_device, char *mntpath, size_t mntpath_len)
+{
+    struct mntent *ent;
+    FILE *fil = setmntent("/proc/mounts", "r");
+    if (!fil) {
+        return -1;
+    }
+    int major_blk;
+    {
+        struct stat blkinfo;
+        if (lstat(block_device, &blkinfo)) {
+            return -1;
+        }
+        major_blk = gnu_dev_major(blkinfo.st_rdev);
+    }
+    while ((ent = getmntent(fil)) != NULL) {
+        struct stat info;
+        if (lstat(ent->mnt_dir, &info)) {
+            if (errno == EACCES)
+                continue;
+            else
+                return -1;
+        }
+        const int mnt_major_dev = gnu_dev_major(info.st_dev);
+        if (major_blk == mnt_major_dev) {
+            strncpy(mntpath, ent->mnt_dir, mntpath_len - 1);
+            mntpath[mntpath_len - 1] = '\0';
+            return 1;
+        }
+    }
+    endmntent(fil);
+    return 0;
+}
+
 static int verify_image(const char *image_file, const char *block_device)
 {
     int fd_sparse, fd_block;
@@ -176,7 +212,7 @@ static int verify_image(const char *image_file, const char *block_device)
                 fprintf(stderr, "Error: Data mismatch at offset %ld\n", result);
             }
             else {
-                perror("System error:");
+                perror("System error (Verify):");
             }
             break;
         }
@@ -191,7 +227,7 @@ static int write_image(const char *image_file, const char *block_device)
 {
     struct stat sbuf;
     if (stat(image_file, &sbuf)) {
-        perror("stat image");
+        perror("System error (stat image_file):");
         return EXIT_FAILURE;
     }
     if (!S_ISREG(sbuf.st_mode)) {
@@ -199,26 +235,44 @@ static int write_image(const char *image_file, const char *block_device)
         return EXIT_FAILURE;
     }
     if (stat(block_device, &sbuf)) {
-        perror("stat blkdev");
+        perror("System error (stat block_device):");
         return EXIT_FAILURE;
     }
     if (!S_ISBLK(sbuf.st_mode)) {
         fprintf(stderr, "Error: %s is not a block device\n", block_device);
         return EXIT_FAILURE;
     }
+    if (gnu_dev_minor(sbuf.st_rdev)) {
+        fprintf(stderr, "Error: %s is partition device not a disc\n", block_device);
+        fprintf(stderr, "Please specify disk device instead of a partition\n");
+        return EXIT_FAILURE;
+    }
+    {
+        char mntpath[FILENAME_MAX];
+        const int err = device_is_mounted(block_device, mntpath, sizeof mntpath);
+        if (err > 0) {
+            fprintf(stderr, "Error: Block device %s is already mounted at %s\n", block_device, mntpath);
+            fprintf(stderr, "Please umount device first before flashing\n");
+            return EXIT_FAILURE;
+        }
+        else if (err < 0) {
+            perror("System error (check mount):");
+            return EXIT_FAILURE;
+        }
+    }
     int fd_sparse, fd_block;
     if ((fd_sparse = open(image_file, O_RDONLY)) < 0) {
-        fprintf(stderr, "Cannot open sparse file %s\n", image_file);
+        fprintf(stderr, "Error: Cannot open sparse file %s\n", image_file);
         return EXIT_FAILURE;
     }
     if ((fd_block = open(block_device, O_WRONLY)) < 0) {
-        fprintf(stderr, "Cannot open block device %s\n", block_device);
+        fprintf(stderr, "Error: Cannot open block device %s\n", block_device);
         close(fd_sparse);
         return EXIT_FAILURE;
     }
     struct fiemap *fiemap;
     if (!(fiemap = read_fiemap(fd_sparse))) {
-        fprintf(stderr, "Unable to read fiemap %s\n", image_file);
+        fprintf(stderr, "Error: Unable to read fiemap %s\n", image_file);
         close(fd_block);
         close(fd_sparse);
         return EXIT_FAILURE;
@@ -234,7 +288,8 @@ static int write_image(const char *image_file, const char *block_device)
                fiemap->fm_extents[i].fe_length,
                result ? "FAIL" : "OK");
         if (result) {
-            perror("System error:");
+            if (errno)
+                perror("System error (Write copy_extent):");
             break;
         }
     }
@@ -242,7 +297,9 @@ static int write_image(const char *image_file, const char *block_device)
     // Sync block filesystem
     syncfs(fd_block);
     // Re-read partition table on the device
-    ioctl(fd_block, BLKRRPART, NULL);
+    if (ioctl(fd_block, BLKRRPART, NULL)) {
+        fprintf(stderr, "Warning: Unable to re-read kernel partition table\n");
+    }
     close(fd_block);
     close(fd_sparse);
     return result ? EXIT_FAILURE : EXIT_SUCCESS;
@@ -252,7 +309,7 @@ int main(int argc, char **argv)
 {
     if (argc < 3) {
         syntax(argv);
-        exit(EXIT_FAILURE);
+        return EXIT_FAILURE;
     }
     if (write_image(argv[1], argv[2])) {
         return EXIT_FAILURE;
