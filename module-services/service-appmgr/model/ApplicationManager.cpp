@@ -35,7 +35,7 @@
 #include <limits>
 #include <utility>
 #include <module-utils/Utils.hpp>
-#include <module-utils/time/DateAndTimeSettings.hpp>
+#include <time/DateAndTimeSettings.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <service-appmgr/messages/DOMRequest.hpp>
 #include <service-appmgr/messages/GetAllNotificationsRequest.hpp>

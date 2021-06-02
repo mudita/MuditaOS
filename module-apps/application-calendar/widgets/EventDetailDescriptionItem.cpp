@@ -6,7 +6,7 @@
 #include <Style.hpp>
 #include <time/time_conversion.hpp>
 #include <date/date.h>
-#include <module-utils/time/TimeRangeParser.hpp>
+#include <time/TimeRangeParser.hpp>
 
 namespace gui
 {

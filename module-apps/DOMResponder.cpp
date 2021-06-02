@@ -7,7 +7,7 @@
 #include <module-gui/gui/dom/Item2JsonSerializer.hpp>
 #include <memory>
 #include <Item.hpp>
-#include <module-utils/time/ScopedTime.hpp>
+#include <time/ScopedTime.hpp>
 #include <service-desktop/endpoints/developerMode/event/DomRequest.hpp>
 
 namespace app
