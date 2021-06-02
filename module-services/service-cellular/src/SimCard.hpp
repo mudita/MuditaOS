@@ -86,12 +86,12 @@ namespace cellular::service
         /**
          * Internal message handlers
          */
-        void handleSimStateChanged(at::SimState state);
+        void handleATSimStateChange(at::SimState state);
 
         /**
          * Notification events
          */
-        std::function<void(bool ready)> onSimReady;
+        std::function<void()> onSimReady;
         std::function<void(unsigned int attempts)> onNeedPin;
         std::function<void(unsigned int attempts)> onNeedPuk;
         std::function<void()> onSimBlocked;

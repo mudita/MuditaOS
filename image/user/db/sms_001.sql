@@ -7,7 +7,6 @@ CREATE TABLE IF NOT EXISTS sms
     thread_id  INTEGER,
     contact_id INTEGER,
     date       INTEGER,
-    date_send  INTEGER,
     error_code INTEGER,
     body       TEXT NOT_NULL,
     type       INTEGER,

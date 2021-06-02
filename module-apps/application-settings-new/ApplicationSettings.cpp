@@ -146,15 +146,9 @@ namespace app
         if (ret != sys::ReturnCodes::Success) {
             return ret;
         }
-        connect(typeid(cellular::msg::notification::SimReady), [&](sys::Message *msg) {
-            auto simReadyMsg = static_cast<cellular::msg::notification::SimReady *>(msg);
-            selectedSim      = Store::GSM::get()->selected;
-            if (simReadyMsg->ready) {
-                CellularServiceAPI::RequestForOwnNumber(this);
-            }
-            else {
-                selectedSimNumber = {};
-            }
+        connect(typeid(cellular::msg::notification::SimReady), [&](sys::Message *) {
+            selectedSim = Store::GSM::get()->selected;
+            CellularServiceAPI::RequestForOwnNumber(this);
             auto currentWindow = getCurrentWindow();
             if (gui::window::name::network == currentWindow->getName()) {
                 updateWindow(gui::window::name::network, nullptr);
@@ -446,7 +440,7 @@ namespace app
             return std::make_unique<gui::LanguagesWindow>(app);
         });
         windowsFactory.attach(gui::window::name::date_and_time, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::DateAndTimeMainWindow>(app);
+            return std::make_unique<gui::DateAndTimeMainWindow>(app, gui::window::name::date_and_time);
         });
         windowsFactory.attach(gui::window::name::about_your_pure, [](Application *app, const std::string &name) {
             return std::make_unique<gui::AboutYourPureWindow>(app);
@@ -530,6 +524,11 @@ namespace app
         getSimLockSubject().setSim(arg);
     }
 
+    void ApplicationSettingsNew::updateSim()
+    {
+        selectedSim = Store::GSM::get()->selected;
+    }
+
     Store::GSM::SIM ApplicationSettingsNew::getSim()
     {
         return selectedSim;
@@ -591,7 +590,7 @@ namespace app
                 return {};
             }
 
-            return {msgState->lightOn, msgState->mode, msgState->parameters};
+            return {msgState->isLightOn(), msgState->getMode(), msgState->getParams()};
         }
 
         return {};
@@ -599,10 +598,8 @@ namespace app
 
     void ApplicationSettingsNew::setBrightness(bsp::eink_frontlight::BrightnessPercentage value)
     {
-        screen_light_control::Parameters parameters{value};
-        bus.sendUnicast(std::make_shared<sevm::ScreenLightSetParameters>(
-                            screen_light_control::ParameterizedAction::setManualModeBrightness, parameters),
-                        service::name::evt_manager);
+        screen_light_control::ManualModeParameters parameters{value};
+        bus.sendUnicast(std::make_shared<sevm::ScreenLightSetManualModeParams>(parameters), service::name::evt_manager);
     }
 
     void ApplicationSettingsNew::setMode(bool isAutoLightSwitchOn)
@@ -618,15 +615,6 @@ namespace app
         bus.sendUnicast(std::make_shared<sevm::ScreenLightControlMessage>(isDisplayLightSwitchOn
                                                                               ? screen_light_control::Action::turnOn
                                                                               : screen_light_control::Action::turnOff),
-                        service::name::evt_manager);
-    }
-    void ApplicationSettingsNew::setBrightnessFunction()
-    {
-        screen_light_control::Parameters parameters;
-        parameters.functionPoints = screen_light_control::functions::BrightnessFunction(
-            {{0.0f, 70.0f}, {250.0f, 70.0f}, {450.0f, 40.0f}, {500.0f, 0.0f}});
-        bus.sendUnicast(std::make_shared<sevm::ScreenLightSetParameters>(
-                            screen_light_control::ParameterizedAction::setAutomaticModeParameters, parameters),
                         service::name::evt_manager);
     }
 

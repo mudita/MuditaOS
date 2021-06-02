@@ -13,3 +13,8 @@ void TimeManager::handleCellularTimeUpdate(struct tm time, std::chrono::minutes 
     rtcCommand->setTime(time);
     rtcCommand->setTimezone(timezone);
 }
+
+void TimeManager::handleTimeChangeRequest(const time_t &time)
+{
+    rtcCommand->setTime(time);
+}

@@ -81,13 +81,8 @@ popd'''
         when {
             changeRequest()
         }
-        parallel {
+        stages{
         stage('Build RT1051') {
-            agent {
-                node {
-                    label 'jenkins-slave-ccache-ram'
-                }
-            }
             steps {
                 sh '''#!/bin/bash -e
 PATH="/usr/local/cmake-3.19.5-Linux-x86_64/bin:/usr/local/gcc-arm-none-eabi-10-2020-q4-major/bin:$PATH"
@@ -114,12 +109,6 @@ ccache --show-stats'''
         }
 
         stage('Build Linux') {
-            agent {
-                node {
-                    label 'jenkins-slave-ccache-ram'
-                }
-            }
-
             environment {
                 PATH="/usr/local/cmake-3.19.5-Linux-x86_64/bin:/usr/local/gcc-arm-none-eabi-10-2020-q4-major/bin:$PATH"
                 CCACHE_DIR="/ccache/Linux"
@@ -166,7 +155,7 @@ popd
 popd'''
             }
         }
-        }
+    }
     }
     stage('master-jobs') {
         when {

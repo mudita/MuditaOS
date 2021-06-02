@@ -97,6 +97,7 @@ namespace bluetooth
 
     auto A2DP::startRinging() const noexcept -> Error::Code
     {
+        LOG_ERROR("Can't ring in A2DP profile");
         return Error::SystemError;
     }
 
@@ -622,7 +623,6 @@ namespace bluetooth
 
     void A2DP::A2DPImpl::setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> newAudioDevice)
     {
-        newAudioDevice->setMediaContext(&AVRCP::mediaTracker);
         A2DP::A2DPImpl::audioDevice = std::move(newAudioDevice);
     }
 

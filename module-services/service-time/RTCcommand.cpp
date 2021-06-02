@@ -8,7 +8,13 @@
 
 void RTCCommand::setTime(const struct tm &time)
 {
-    auto message = std::make_shared<stm::message::UpdateRTCValueMessage>(time);
+    auto message = std::make_shared<stm::message::UpdateRTCValueFromTmMessage>(time);
+    owner->bus.sendUnicast(message, service::name::evt_manager);
+}
+
+void RTCCommand::setTime(const time_t &time)
+{
+    auto message = std::make_shared<stm::message::UpdateRTCValueFromTimestampMessage>(time);
     owner->bus.sendUnicast(message, service::name::evt_manager);
 }
 

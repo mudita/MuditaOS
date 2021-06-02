@@ -8,11 +8,13 @@
 #include <module-gui/gui/input/InputEvent.hpp>
 #include <module-apps/application-onboarding/data/OnBoardingSwitchData.hpp>
 #include <module-apps/messages/DialogMetadataMessage.hpp>
-#include <module-apps/application-settings-new/data/ChangePasscodeData.hpp>
+#include <widgets/IceBox.hpp>
+#include <service-appmgr/Controller.hpp>
 
 namespace app::onBoarding
 {
-    OnBoardingDateAndTimeWindow::OnBoardingDateAndTimeWindow(app::Application *app) : DateAndTimeMainWindow(app)
+    OnBoardingDateAndTimeWindow::OnBoardingDateAndTimeWindow(app::Application *app)
+        : DateAndTimeMainWindow(app, gui::window::name::onBoarding_date_and_time)
     {
         changeDateAndTimeWindow = gui::window::name::onBoarding_change_date_and_time;
     }
@@ -25,6 +27,7 @@ namespace app::onBoarding
     void OnBoardingDateAndTimeWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
     {
         DateAndTimeMainWindow::onBeforeShow(mode, data);
+        new gui::IceBox(this);
 
         bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(style::strings::common::save));
         bottomBar->setText(gui::BottomBar::Side::LEFT, utils::translate(style::strings::common::Switch));
@@ -46,6 +49,13 @@ namespace app::onBoarding
             application->switchWindow(gui::window::name::onBoarding_configuration_successful,
                                       gui::ShowMode::GUI_SHOW_INIT,
                                       std::move(metaData));
+            return true;
+        }
+        else if (inputEvent.isShortRelease(gui::KeyCode::KEY_LEFT)) {
+            app::manager::Controller::sendAction(application,
+                                                 app::manager::actions::EmergencyDial,
+                                                 std::make_unique<gui::SwitchData>(),
+                                                 app::manager::OnSwitchBehaviour::RunInBackground);
             return true;
         }
         else {

@@ -49,3 +49,7 @@ Implementation is interrupt-driven. In interrupt handler temperature measurement
 ![](charger_temperature_algorithm.svg "Charging control due to temperature")
 
 Additional 2 Cdeg hysteresis was introduced to prevent rapid changes in charging states.
+
+## Battery Brownout Detection
+
+Battery charger chip is capable of providing interrupt when low voltage threshold is violated. This voltage value is instantaneous measurement. To prevent spurious brownout events, additional algorithm was introduced. This kind of false detection could occur when phone call is stared and GSM module consumes high current what results in narrow voltage dip. Interrupt from battery charger creates a time window of 5 seconds and every second filtered value of voltage is sampled. If any of those samples drop below given 3.6V threshold, the brownout event is fired.

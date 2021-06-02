@@ -9,7 +9,6 @@
 #include <common_data/EventStore.hpp>
 #include <json/json11.hpp>
 #include <source/version.hpp>
-#include <time/time_conversion.hpp>
 #include <service-desktop/service-desktop/ServiceDesktop.hpp>
 #include <version.hpp>
 
@@ -17,6 +16,8 @@
 #include <string>
 #include <sys/statvfs.h>
 #include <purefs/filesystem_paths.hpp>
+
+#include <ctime>
 
 using namespace parserFSM;
 
@@ -61,7 +62,7 @@ auto DeviceInfoEndpoint::getDeviceInfo(Context &context) -> bool
          {json::gitTag, (std::string)GIT_TAG},
          {json::gitBranch, (std::string)GIT_BRANCH},
          {json::updateHistory, updateHistory},
-         {json::currentRTCTime, std::to_string(static_cast<uint32_t>(utils::time::getCurrentTimestamp().getTime()))},
+         {json::currentRTCTime, std::to_string(static_cast<uint32_t>(std::time(nullptr)))},
          {json::version, std::string(VERSION)}}));
 
     MessageHandler::putToSendQueue(context.createSimpleResponse());

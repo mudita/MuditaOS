@@ -103,8 +103,7 @@ inline time_t TimePointToTimeT(const TimePoint &tp)
 
 inline TimePoint TimePointNow()
 {
-    utils::time::Timestamp timestamp;
-    return TimePointFromTimeT(timestamp.getTime());
+    return TimePointFromTimeT(std::time(nullptr));
 }
 
 inline std::string TimePointToString(const TimePoint &tp)
@@ -130,7 +129,7 @@ inline auto LocalizedHoursToUtcHours(int hour = 0)
 {
     std::tm tm           = CreateTmStruct(unix_epoch_year, 1, 1, hour, 0, 0);
     std::time_t basetime = std::mktime(&tm);
-    basetime -= utils::time::Time::getTimeZoneOffset();
+    basetime -= GetDiffLocalWithUTCTime();
     return TimePointToHour24H(TimePointFromTimeT(basetime));
 }
 
@@ -304,7 +303,7 @@ inline std::string createUID()
 {
     constexpr uint32_t bufferLimit = 16;
     char Buffer[bufferLimit];
-    utils::time::Timestamp timestamp;
+    utils::time::Timestamp timestamp = utils::time::getCurrentTimestamp();
     std::string UID{timestamp.str("%Y%m%dT%H%M%S")};
     UID += '-';
     std::random_device rd;

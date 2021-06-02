@@ -90,6 +90,7 @@ namespace app
           public:
             virtual ~SimParams()                     = default;
             virtual void setSim(Store::GSM::SIM sim) = 0;
+            virtual void updateSim()                 = 0;
             virtual Store::GSM::SIM getSim()         = 0;
             virtual std::string getNumber()          = 0;
         };
@@ -109,15 +110,14 @@ namespace app
             {
                 bool lightOn;
                 screen_light_control::ScreenLightMode mode;
-                screen_light_control::Parameters parameters;
+                screen_light_control::ManualModeParameters parameters;
             };
 
             virtual ~ScreenLightSettings()                      = default;
             virtual auto getCurrentValues() -> Values           = 0;
-            virtual void setBrightness(float brigtnessValue)    = 0;
+            virtual void setBrightness(float brightnessValue)   = 0;
             virtual void setMode(bool isAutoLightSwitchOn)      = 0;
             virtual void setStatus(bool isDisplayLightSwitchOn) = 0;
-            virtual void setBrightnessFunction()                = 0;
         };
 
         class KeypdBacklightSettings
@@ -202,6 +202,7 @@ namespace app
         void createUserInterface() override;
         void destroyUserInterface() override;
         void setSim(Store::GSM::SIM sim) override;
+        void updateSim() override;
         Store::GSM::SIM getSim() override;
         std::string getNumber() override;
 
@@ -214,10 +215,9 @@ namespace app
         void setOsUpdateVersion(const std::string &value);
 
         ScreenLightSettings::Values getCurrentValues() override;
-        void setBrightness(float brigtnessValue) override;
+        void setBrightness(float brightnessValue) override;
         void setMode(bool isAutoLightSwitchOn) override;
         void setStatus(bool isDisplayLightSwitchOn) override;
-        void setBrightnessFunction() override;
 
         auto getKeypadBacklightState() -> bsp::keypad_backlight::State override;
         void setKeypadBacklightState(bsp::keypad_backlight::State keypadLightState) override;

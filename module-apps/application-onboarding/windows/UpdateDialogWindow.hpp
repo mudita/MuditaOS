@@ -5,18 +5,19 @@
 
 #include "Dialog.hpp"
 
-#include <module-apps/application-onboarding/presenter/EULALicenseWindowPresenter.hpp>
-
-#include <module-gui/gui/widgets/Label.hpp>
-#include <module-gui/gui/widgets/Text.hpp>
-#include <module-gui/gui/input/InputEvent.hpp>
+#include <application-onboarding/presenter/EULALicenseWindowPresenter.hpp>
+#include <application-onboarding/presenter/OnBoardingFinalizeWindowPresenter.hpp>
 
 namespace app::onBoarding
 {
-    class UpdateDialogWindow : public gui::Dialog
+    class UpdateDialogWindow : public gui::Dialog, public OnBoardingFinalizeContract::View
     {
+      private:
+        std::unique_ptr<OnBoardingFinalizeContract::Presenter> presenter;
+
       public:
-        explicit UpdateDialogWindow(app::Application *app);
+        UpdateDialogWindow(app::Application *app,
+                           std::unique_ptr<OnBoardingFinalizeContract::Presenter> &&windowPresenter);
 
         bool onInput(const gui::InputEvent &inputEvent) override;
     };

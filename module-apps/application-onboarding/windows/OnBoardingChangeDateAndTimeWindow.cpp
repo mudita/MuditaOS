@@ -5,7 +5,7 @@
 #include <module-apps/application-onboarding/ApplicationOnBoarding.hpp>
 #include <InputEvent.hpp>
 
-namespace gui
+namespace app::onBoarding
 {
     OnBoardingChangeDateAndTimeWindow::OnBoardingChangeDateAndTimeWindow(app::Application *app)
         : ChangeDateAndTimeWindow(app, gui::window::name::onBoarding_change_date_and_time)
@@ -22,4 +22,4 @@ namespace gui
         return ChangeDateAndTimeWindow::onInput(inputEvent);
     }
 
-} /* namespace gui */
+} // namespace app::onBoarding

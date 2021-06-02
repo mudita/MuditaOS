@@ -9,6 +9,7 @@
 #include <RichTextParser.hpp>
 #include <Text.hpp>
 #include <ImageBox.hpp>
+#include <widgets/IceBox.hpp>
 
 namespace locks
 {
@@ -62,10 +63,11 @@ namespace gui
 
         [[nodiscard]] auto isInInputState() const noexcept -> bool;
         [[nodiscard]] auto isInInvalidInputState() const noexcept -> bool;
+        [[nodiscard]] auto isIceVisible() const noexcept -> bool;
 
       private:
         gui::VBox *body          = nullptr;
-        gui::HBox *iceBox        = nullptr;
+        gui::IceBox *iceBox      = nullptr;
         gui::ImageBox *infoImage = nullptr;
         gui::Text *primaryText   = nullptr;
         gui::Text *secondaryText = nullptr;

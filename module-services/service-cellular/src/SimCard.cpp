@@ -89,7 +89,7 @@ namespace cellular
             return processPinResult(supplyPin(_pin));
         }
 
-        void SimCard::handleSimStateChanged(at::SimState state)
+        void SimCard::handleATSimStateChange(at::SimState state)
         {
             handleSimState(state);
         }
@@ -100,12 +100,10 @@ namespace cellular
             case at::SimState::Ready:
                 Store::GSM::get()->sim = Store::GSM::get()->selected;
                 if (onSimReady)
-                    onSimReady(true);
+                    onSimReady();
                 break;
             case at::SimState::NotReady:
                 Store::GSM::get()->sim = Store::GSM::SIM::SIM_FAIL;
-                if (onSimReady)
-                    onSimReady(false);
                 break;
             case at::SimState::SimPin:
                 [[fallthrough]];

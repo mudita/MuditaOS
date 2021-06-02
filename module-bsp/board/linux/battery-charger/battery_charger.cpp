@@ -185,4 +185,15 @@ namespace bsp::battery_charger
         }
     }
 
+    int getVoltageFilteredMeasurement()
+    {
+        constexpr auto nominalVoltage = 4350;
+        return nominalVoltage;
+    }
+
+    BaseType_t INTB_IRQHandler()
+    {
+        return 1;
+    }
+
 } // namespace bsp::battery_charger

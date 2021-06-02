@@ -16,7 +16,7 @@ TEST_CASE("Test set display language - empty display language string")
     REQUIRE(utils::getDisplayLanguage().empty());
 
     // Invalid string provided - language should be set to default one.
-    CHECK(utils::setDisplayLanguage(""));
+    CHECK_FALSE(utils::setDisplayLanguage(""));
     REQUIRE(utils::getDisplayLanguage() == utils::getDefaultLanguage());
 }
 
@@ -27,7 +27,7 @@ TEST_CASE("Test set display language - invalid display language string")
     REQUIRE(utils::getDisplayLanguage().empty());
 
     // Invalid string provided - language should be set to default one.
-    CHECK(utils::setDisplayLanguage("NonExistingLanguage"));
+    CHECK_FALSE(utils::setDisplayLanguage("NonExistingLanguage"));
     REQUIRE(utils::getDisplayLanguage() == utils::getDefaultLanguage());
 }
 
@@ -38,7 +38,7 @@ TEST_CASE("Test set display language - double invalid display language string")
     REQUIRE(utils::getDisplayLanguage().empty());
 
     // Invalid string provided - language should be set to default one.
-    CHECK(utils::setDisplayLanguage(""));
+    CHECK_FALSE(utils::setDisplayLanguage(""));
     REQUIRE(utils::getDisplayLanguage() == utils::getDefaultLanguage());
 
     // Invalid string provided - language already set to default one so method returns false.
@@ -93,7 +93,7 @@ TEST_CASE("Test get string method - invalid display language set")
     REQUIRE(utils::getDisplayLanguage().empty());
 
     // Invalid string provided - language should be set to default one.
-    CHECK(utils::setDisplayLanguage(""));
+    CHECK_FALSE(utils::setDisplayLanguage(""));
     REQUIRE(utils::getDisplayLanguage() == utils::getDefaultLanguage());
 
     // Default fallback language set - English

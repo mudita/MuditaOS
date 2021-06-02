@@ -19,6 +19,7 @@ namespace settings
         constexpr inline auto automaticTimeZoneIsOn    = "gs_automatic_time_zone_is_on";
         constexpr inline auto timeFormat               = "gs_time_format";
         constexpr inline auto dateFormat               = "gs_date_format";
+        constexpr inline auto onboardingDone           = "gs_onboarding_done";
         constexpr inline auto eulaAccepted             = "gs_eula_accepted";
         constexpr inline auto osCurrentVersion         = "gs_os_current_version";
         constexpr inline auto osUpdateVersion          = "gs_os_update_version";

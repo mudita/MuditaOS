@@ -150,6 +150,8 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_INCLUDES})
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_BINARY_DIR})
 
+add_subdirectory(third-party)
+
 if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
      add_subdirectory(board/linux/libiosyscalls)
 endif()
@@ -191,8 +193,6 @@ add_subdirectory(module-bluetooth)
 
 message("${PROJECT_NAME}: add_subdirectory module-lwip")
 add_subdirectory(module-lwip)
-
-add_subdirectory(third-party)
 
 add_subdirectory(image)
 

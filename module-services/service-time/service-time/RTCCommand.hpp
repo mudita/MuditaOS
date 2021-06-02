@@ -12,6 +12,7 @@ class RTCCommand : public RTCCommandInterface
     {}
     virtual ~RTCCommand() = default;
     virtual void setTime(const struct tm &time) final;
+    virtual void setTime(const time_t &time) final;
     virtual void setTimezone(const std::string &timezone) final;
 
   private:

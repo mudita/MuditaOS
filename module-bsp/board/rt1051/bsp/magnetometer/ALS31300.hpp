@@ -17,7 +17,7 @@ namespace drivers::als31300
     using whole_reg_t = uint32_t; // ALS31300 always talks 4 bytes
 
     constexpr auto I2C_ADDRESS = 0x64;
-    constexpr auto DUMMY_BYTE  = 1;
+
     // base ALS31300 register struct.
     struct base_reg
     {
@@ -109,33 +109,13 @@ namespace drivers::als31300
     constexpr auto PWR_REG_LOOP_MODE_fast_loop = 0b01;
     constexpr auto PWR_REG_LOOP_MODE_full_loop = 0b10;
 
-    enum class PWR_REG_SLEEP_MODE
+    enum PWR_REG_SLEEP_MODE
     {
         active          = PWR_REG_SLEEP_MODE_active,
         sleep           = PWR_REG_SLEEP_MODE_sleep,
         periodic_active = PWR_REG_SLEEP_MODE_LPDCM,
     };
-    enum class LPDCM_INACTIVE_TIME
-    {
-        inactive_500us,
-        inactive_1ms,
-        inactive_5ms,
-        inactive_10ms,
-        inactive_50ms,
-        inactive_100ms,
-        inactive_500ms,
-        inactive_1s
-    };
 
-    enum class BANDWIDTH_SELECT
-    {
-        bandwidth_3500Hz = 0,
-        bandwidth_7kHz   = 1,
-        bandwidth_14kHz  = 2,
-        bandwidth_10kHz  = 4,
-        bandwidth_20kHz  = 5,
-        bandwidth_40kHz  = 6
-    };
     constexpr auto PWR_ON_DELAY_MS = 1; //  spec'd as 600µs at most
 
     // --------

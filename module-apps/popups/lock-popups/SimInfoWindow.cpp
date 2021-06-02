@@ -44,6 +44,12 @@ void SimInfoWindow::onBeforeShow(ShowMode mode, SwitchData *data)
             setTitle("");
             infoIcon->text->setRichText(utils::translate("sim_card_pin_disabled"));
             break;
+        case locks::SimInputTypeAction::Error:
+            setTitle(utils::translate("app_settings_net"));
+            infoIcon->text->setRichText(utils::translate("sim_card_cant_connect"),
+                                        {{"$SIM", infoData->getLock().getLockName()}});
+            infoIcon->image->set("sim_card_W_G");
+            break;
         default:
             break;
         }

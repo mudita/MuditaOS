@@ -23,6 +23,11 @@ bool InputTranscodeProxy::push(const Span &span)
     return getWrappedStream().push(transform->transform(span, transcodingSpaceSpan));
 }
 
+bool InputTranscodeProxy::push(void *data, std::size_t dataSize)
+{
+    return push(Span{.data = reinterpret_cast<std::uint8_t *>(data), .dataSize = dataSize});
+}
+
 void InputTranscodeProxy::commit()
 {
     if (isReserved) {

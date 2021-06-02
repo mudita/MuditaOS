@@ -68,7 +68,6 @@ bool SMSRecordInterface::Add(const SMSRecord &rec)
                                     .threadID  = thread.ID,
                                     .contactID = contactID,
                                     .date      = rec.date,
-                                    .dateSent  = rec.dateSent,
                                     .errorCode = rec.errorCode,
                                     .body      = rec.body,
                                     .type      = rec.type
@@ -175,7 +174,6 @@ bool SMSRecordInterface::Update(const SMSRecord &recUpdated)
                                   .threadID  = recCurrent.threadID,
                                   .contactID = recCurrent.contactID,
                                   .date      = recUpdated.date,
-                                  .dateSent  = recUpdated.dateSent,
                                   .errorCode = recUpdated.errorCode,
                                   .body      = recUpdated.body,
                                   .type      = recUpdated.type});

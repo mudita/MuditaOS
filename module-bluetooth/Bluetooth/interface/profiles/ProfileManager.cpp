@@ -97,6 +97,7 @@ namespace bluetooth
 
     auto ProfileManager::startRinging() -> Error::Code
     {
+        switchProfile(AudioProfile::HSP);
         return currentProfilePtr->startRinging();
     }
 
@@ -107,16 +108,19 @@ namespace bluetooth
 
     auto ProfileManager::initializeCall() -> Error::Code
     {
+        switchProfile(AudioProfile::HSP);
         return currentProfilePtr->initializeCall();
     }
 
     auto ProfileManager::setAudioDevice(std::shared_ptr<BluetoothAudioDevice> device) -> Error::Code
     {
-        if (currentProfilePtr == nullptr) {
+        auto profileType = device->getProfileType();
+
+        if (currentProfilePtr == nullptr || profilesList[profileType] == nullptr) {
             return Error::NotReady;
         }
 
-        currentProfilePtr->setAudioDevice(std::move(device));
-        return Error::Success;
+        profilesList[profileType]->setAudioDevice(device);
+        return switchProfile(profileType);
     }
 } // namespace bluetooth

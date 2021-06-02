@@ -106,6 +106,30 @@ namespace sys
         void ValidateMulticastMessage() const;
     };
 
+    namespace msg
+    {
+        struct Request : public sys::Message
+        {
+            Request() : Message(Type::Data)
+            {}
+            virtual const char *target() const = 0;
+        };
+
+        struct Response : public sys::Message
+        {
+            explicit Response(bool retCode = true) : Message(Type::Data), retCode(retCode)
+            {}
+            const bool retCode;
+        };
+
+        struct Notification : public sys::Message
+        {
+            Notification() : Message(Type::Data)
+            {}
+            virtual sys::BusChannel channel() const = 0;
+        };
+    } // namespace msg
+
     enum class SystemMessageType
     {
         Ping,

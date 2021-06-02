@@ -33,7 +33,7 @@ namespace crashdump
         {
             std::time_t now;
             std::time(&now);
-            std::strftime(name.data(), name.size(), CrashDumpFileNameFormat, gmtime(&now));
+            std::strftime(name.data(), name.size(), CrashDumpFileNameFormat, std::localtime(&now));
         }
 
         int dumpFd{-1};

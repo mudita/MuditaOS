@@ -3,49 +3,36 @@
 
 #pragma once
 
-#include <Service/Message.hpp>
-
 #include <service-cellular/api/common.hpp>
+#include <service-cellular/api/message.hpp>
 
-namespace cellular::msg
+namespace cellular::msg::notification
 {
-    struct Notification : public sys::Message
+    struct SimReady : public msg::Notification
+    {};
+
+    struct SimNeedPin : public msg::Notification
     {
-        Notification() : Message(Type::Data)
+        explicit SimNeedPin(unsigned int attempts) : attempts(attempts)
         {}
+        const unsigned int attempts;
     };
 
-    namespace notification
+    struct SimNeedPuk : public msg::Notification
     {
-        struct SimReady : public msg::Notification
-        {
-            explicit SimReady(bool ready) : ready(ready)
-            {}
-            const bool ready;
-        };
+        explicit SimNeedPuk(unsigned int attempts) : attempts(attempts)
+        {}
+        const unsigned int attempts;
+    };
 
-        struct SimNeedPin : public msg::Notification
-        {
-            explicit SimNeedPin(unsigned int attempts) : attempts(attempts)
-            {}
-            const unsigned int attempts;
-        };
+    struct SimBlocked : public msg::Notification
+    {};
 
-        struct SimNeedPuk : public msg::Notification
-        {
-            explicit SimNeedPuk(unsigned int attempts) : attempts(attempts)
-            {}
-            const unsigned int attempts;
-        };
+    struct UnhandledCME : public msg::Notification
+    {
+        explicit UnhandledCME(unsigned int code) : code(code)
+        {}
+        const unsigned int code;
+    };
 
-        struct SimBlocked : public msg::Notification
-        {};
-
-        struct UnhandledCME : public msg::Notification
-        {
-            explicit UnhandledCME(unsigned int code) : code(code)
-            {}
-            const unsigned int code;
-        };
-    } // namespace notification
-} // namespace cellular::msg
+} // namespace cellular::msg::notification

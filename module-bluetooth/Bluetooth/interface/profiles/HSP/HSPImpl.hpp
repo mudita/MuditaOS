@@ -27,6 +27,7 @@ namespace bluetooth
         void setDeviceAddress(bd_addr_t addr);
         void setOwnerService(const sys::Service *service);
         auto getStreamData() -> std::shared_ptr<BluetoothStreamData>;
+        void setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice);
 
       private:
         static void sendAudioEvent(audio::EventType event, audio::Event::DeviceState state);
@@ -43,5 +44,6 @@ namespace bluetooth
         static bd_addr_t deviceAddr;
         static const sys::Service *ownerService;
         static bool isConnected;
+        static std::shared_ptr<HSPAudioDevice> audioDevice;
     };
-} // namespace Bt
+} // namespace bluetooth

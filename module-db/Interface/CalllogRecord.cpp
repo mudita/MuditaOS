@@ -25,6 +25,10 @@ CalllogRecord::CalllogRecord(const CalllogTableRow &tableRow)
       phoneNumber(utils::PhoneNumber(tableRow.number, tableRow.e164number).getView()), isRead(tableRow.isRead)
 {}
 
+CalllogRecord::CalllogRecord(const CallType type, const utils::PhoneNumber::View &number)
+    : presentation(PresentationType::PR_UNKNOWN), date(std::time(nullptr)), type(type), phoneNumber(number)
+{}
+
 uint32_t CalllogRecord::getContactId() const
 {
     return contactId;
@@ -54,7 +58,7 @@ CalllogRecordInterface::CalllogRecordInterface(CalllogDB *calllogDb, ContactsDB 
 
 bool CalllogRecordInterface::Add(const CalllogRecord &rec)
 {
-    auto localRec      = rec;
+    auto localRec = rec;
     if (!rec.phoneNumber.getFormatted().empty()) {
         ContactRecordInterface contactInterface(contactsDB);
         auto contactMatch =
