@@ -30,10 +30,8 @@ namespace cellular::internal
         simCard->onNeedPuk = [this](unsigned int attempts) {
             owner->bus.sendMulticast<notification::SimNeedPuk>(attempts);
         };
-        simCard->onSimBlocked = [this]() { owner->bus.sendMulticast<notification::SimBlocked>(); };
-        simCard->onSimEvent = [this]() {
-            owner->bus.sendUnicast(std::make_shared<sevm::SIMMessage>(), ::service::name::evt_manager);
-        };
+        simCard->onSimBlocked   = [this]() { owner->bus.sendMulticast<notification::SimBlocked>(); };
+        simCard->onSimEvent     = [this]() { owner->bus.sendMulticast<notification::SimStateUpdate>(); };
         simCard->onUnhandledCME = [this](unsigned int code) {
             owner->bus.sendMulticast<notification::UnhandledCME>(code);
         };
@@ -42,6 +40,9 @@ namespace cellular::internal
     void ServiceCellularPriv::connectSimCard()
     {
         using namespace cellular::msg;
+        /**
+         * Request message handlers
+         */
         owner->connect(typeid(request::sim::SetActiveSim), [&](sys::Message *request) -> sys::MessagePointer {
             auto msg = static_cast<request::sim::SetActiveSim *>(request);
             return std::make_shared<request::sim::SetActiveSim::Response>(simCard->handleSetActiveSim(msg->sim));
@@ -67,6 +68,18 @@ namespace cellular::internal
             auto msg = static_cast<request::sim::PinUnlock *>(request);
             return std::make_shared<request::sim::PinUnlock::Response>(simCard->handlePinUnlock(msg->pin));
         });
+
+        /**
+         * Notification message handlers
+         */
+        owner->connect(typeid(sevm::SIMTrayMessage), [&](sys::Message *request) -> sys::MessagePointer {
+            simCard->handleTrayState();
+            return sys::MessageNone{};
+        });
+
+        /**
+         * Internal message handlers
+         */
         owner->connect(typeid(internal::msg::HandleATSimStateChange),
                        [&](sys::Message *request) -> sys::MessagePointer {
                            auto msg = static_cast<internal::msg::HandleATSimStateChange *>(request);

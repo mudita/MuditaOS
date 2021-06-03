@@ -38,7 +38,7 @@ namespace gui::top_bar
         SIM(Item *parent, uint32_t x, uint32_t y);
 
         /// check if sim set in state -> if not -> show new sim
-        void update(const Store::GSM::SIM &state);
+        void update();
 
         void show() override;
 

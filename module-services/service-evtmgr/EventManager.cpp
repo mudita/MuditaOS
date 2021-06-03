@@ -31,7 +31,6 @@
 #include <service-appmgr/Controller.hpp>
 #include <service-audio/AudioMessage.hpp>
 #include <service-audio/AudioServiceAPI.hpp>
-#include <service-cellular/CellularMessage.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <service-desktop/Constants.hpp>
 #include <service-desktop/DesktopMessages.hpp>
@@ -142,9 +141,6 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
     else if (auto msg = dynamic_cast<AudioEventRequest *>(msgl); msg) {
         AudioServiceAPI::SendEvent(this, msg->getEvent());
         handled = true;
-    }
-    else if (!targetApplication.empty() && dynamic_cast<sevm::SIMMessage *>(msgl) != nullptr) {
-        bus.sendUnicast(std::make_shared<sevm::SIMMessage>(), targetApplication);
     }
     else if (msgl->messageType == MessageType::EVMGetBoard) {
         using namespace bsp;
@@ -279,6 +275,11 @@ sys::ReturnCodes EventManager::InitHandler()
 
     connect(sevm::RequestPhoneModeForceUpdate(), [&]([[maybe_unused]] sys::Message *msg) {
         EventWorker->requestSliderPositionRead();
+        return sys::MessageNone{};
+    });
+
+    connect(typeid(sevm::SIMTrayMessage), [&](sys::Message *) {
+        bus.sendUnicast(std::make_shared<sevm::SIMTrayMessage>(), ServiceCellular::serviceName);
         return sys::MessageNone{};
     });
 

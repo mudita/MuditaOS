@@ -17,12 +17,12 @@ namespace gui::top_bar
         set(simunknown);
     }
 
-    void SIM::update(const Store::GSM::SIM &state)
+    void SIM::update()
     {
-        if (state == current) {
+        if (current == Store::GSM::get()->sim) {
             return;
         }
-        current = state;
+        current = Store::GSM::get()->sim;
         switch (current) {
         case GSM::SIM::SIM1:
             set(sim1);
