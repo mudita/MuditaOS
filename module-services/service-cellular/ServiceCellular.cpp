@@ -1406,7 +1406,7 @@ bool ServiceCellular::handle_select_sim()
             // NO SIM IN
             Store::GSM::get()->sim = Store::GSM::SIM::SIM_FAIL;
         }
-        bus.sendUnicast(std::make_shared<sevm::SIMMessage>(), ::service::name::evt_manager);
+        bus.sendMulticast<cellular::msg::notification::SimStateUpdate>();
         bool ready = false;
         while (!ready) {
             auto response = channel->cmd("AT+CPIN?");

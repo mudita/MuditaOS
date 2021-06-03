@@ -94,6 +94,13 @@ namespace cellular
             handleSimState(state);
         }
 
+        void SimCard::handleTrayState()
+        {
+            bsp::cellular::sim::hotSwapTrigger();
+            if (onSimEvent)
+                onSimEvent();
+        }
+
         void SimCard::handleSimState(at::SimState state)
         {
             switch (state) {

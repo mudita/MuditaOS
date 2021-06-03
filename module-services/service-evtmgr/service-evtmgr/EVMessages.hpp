@@ -40,10 +40,10 @@ namespace sevm
         uint32_t timestamp = 0;
     };
 
-    class SIMMessage : public sys::DataMessage
+    class SIMTrayMessage : public sys::DataMessage
     {
       public:
-        SIMMessage() : DataMessage(MessageType::SIMTrayEvent)
+        SIMTrayMessage() : DataMessage(MessageType::SIMTrayEvent)
         {}
     };
     /*
