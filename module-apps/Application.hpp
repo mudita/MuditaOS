@@ -177,7 +177,7 @@ namespace app
         sys::MessagePointer handleAppRefresh(sys::Message *msgl);
         sys::MessagePointer handleGetDOM(sys::Message *msgl);
         sys::MessagePointer handleAppFocusLost(sys::Message *msgl);
-        sys::MessagePointer handleSIMMessage(sys::Message *msgl);
+        sys::MessagePointer handleSimStateUpdateMessage(sys::Message *msgl);
 
         virtual bool isPopupPermitted(gui::popup::ID popupId) const;
 
