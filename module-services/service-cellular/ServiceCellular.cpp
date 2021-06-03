@@ -245,6 +245,8 @@ sys::ReturnCodes ServiceCellular::InitHandler()
 
     cmux->registerCellularDevice();
 
+    priv->startup();
+
     return sys::ReturnCodes::Success;
 }
 
@@ -301,8 +303,6 @@ void ServiceCellular::registerMessageHandlers()
         setPassthrough(tethering == sys::phone_modes::Tethering::On ? PassthroughState::ENABLED
                                                                     : PassthroughState::DISABLED);
     });
-
-    priv->connectSimCard();
 
     connect(typeid(CellularStartOperatorsScanMessage), [&](sys::Message *request) -> sys::MessagePointer {
         auto msg = static_cast<CellularStartOperatorsScanMessage *>(request);

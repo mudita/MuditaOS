@@ -8,28 +8,45 @@
 
 #include "SimCard.hpp"
 
-namespace cellular::internal
+namespace cellular
 {
-    using service::SimCard;
-    using service::State;
-
-    class ServiceCellularPriv
+    namespace service
     {
-        ServiceCellular *owner;
+        class Settings;
+    }
 
-        std::unique_ptr<SimCard> simCard;
-        std::unique_ptr<State> state;
+    namespace internal
+    {
+        using service::Settings;
+        using service::SimCard;
+        using service::State;
 
-        State::PowerState nextPowerState = State::PowerState::Off;
+        class ServiceCellularPriv
+        {
+            ServiceCellular *owner = nullptr;
 
-      public:
-        ServiceCellularPriv(ServiceCellular *owner);
+            std::unique_ptr<SimCard> simCard;
+            std::unique_ptr<State> state;
 
-        void connectSimCard();
+            State::PowerState nextPowerState = State::PowerState::Off;
 
-      private:
-        void initSimCard();
+            std::unique_ptr<Settings> settings{};
 
-        friend class ::ServiceCellular;
-    };
-} // namespace cellular::internal
+          public:
+            ServiceCellularPriv(ServiceCellular *owner);
+            ~ServiceCellularPriv();
+
+            void startup();
+
+          private:
+            void initStaticData();
+
+            void initSimCard();
+
+            void connectSimCard();
+
+            friend class ::ServiceCellular;
+        };
+
+    } // namespace internal
+} // namespace cellular

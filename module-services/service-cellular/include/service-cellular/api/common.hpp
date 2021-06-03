@@ -28,8 +28,8 @@ namespace cellular
 
         enum class SimSlot
         {
-            SIM1 = 0,
-            SIM2 = 1
+            SIM1,
+            SIM2
         };
 
         enum class ModemState
@@ -38,6 +38,20 @@ namespace cellular
             Ready,
             Fail,
             Fatal
+        };
+
+        enum class SimState
+        {
+            Invalid, // Value in Settings is invalid, and so is currentSimSlot()
+            Init,    // SimSlot selected, waiting for initialization result
+            Ready,   // Initialization complete
+            Fail     // Initialization failed
+        };
+
+        enum class TrayState
+        {
+            Inserted,
+            Ejected
         };
 
         using SimCode = std::vector<unsigned int>;

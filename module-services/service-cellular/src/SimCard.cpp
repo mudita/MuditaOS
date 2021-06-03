@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SimCard.hpp"
+#include "static-api.hpp"
 
 #include <EventStore.hpp>
 #include <bsp/cellular/bsp_cellular.hpp>
@@ -53,6 +54,7 @@ namespace cellular
         bool SimCard::handleSetActiveSim(api::SimSlot sim)
         {
             Store::GSM::get()->selected = static_cast<Store::GSM::SIM>(sim);
+            internal::static_data::get()->setOwnNumber({});
             bsp::cellular::sim::simSelect();
             bsp::cellular::sim::hotSwapTrigger();
             return true;
@@ -121,6 +123,7 @@ namespace cellular
             case at::SimState::Ready:
                 if (initSimCard()) {
                     Store::GSM::get()->sim = Store::GSM::get()->selected;
+                    internal::static_data::get()->setOwnNumber(readOwnNumber());
                     if (onSimReady)
                         onSimReady();
                 }
@@ -268,6 +271,33 @@ namespace cellular
                 }
             }
             return at::SimState::Unknown;
+        }
+
+        std::string SimCard::readOwnNumber() const
+        {
+            if (!ready()) {
+                return std::string{};
+            }
+
+            if (auto result = channel->cmd(at::AT::CNUM)) {
+                auto begin = result.response[0].find(',');
+                auto end   = result.response[0].rfind(',');
+                if (begin != std::string::npos && end != std::string::npos) {
+                    std::string number;
+                    try {
+                        number = result.response[0].substr(begin, end - begin);
+                    }
+                    catch (std::exception &e) {
+                        LOG_ERROR("ServiceCellular::getOwnNumber exception: %s", e.what());
+                        return std::string{};
+                    }
+                    number.erase(std::remove(number.begin(), number.end(), '"'), number.end());
+                    number.erase(std::remove(number.begin(), number.end(), ','), number.end());
+
+                    return number;
+                }
+            }
+            return std::string{};
         }
 
         sim::Result SimCard::sendCommand(sim::LockType check, const at::Cmd &cmd) const

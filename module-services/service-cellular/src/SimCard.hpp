@@ -159,6 +159,11 @@ namespace cellular::service
          */
         bool processPinResult(sim::Result result);
 
+        /** Read number from SIM card
+         * \result phone number on success, empty string on failure
+         */
+        std::string readOwnNumber() const;
+
         sim::Result sendCommand(sim::LockType check, const at::Cmd &cmd) const;
 
         void handleSimState(at::SimState state);

@@ -3,23 +3,79 @@
 
 #include "ServiceCellularPriv.hpp"
 #include "messages.hpp"
+#include "static-api.hpp"
+#include "Settings.hpp"
 
 #include <service-cellular-api>
 
 #include <service-evtmgr/EVMessages.hpp>
 #include <service-evtmgr/Constants.hpp>
 
+#include <bsp/cellular/bsp_cellular.hpp>
+
 namespace cellular::internal
 {
+    using namespace cellular::msg;
+
     ServiceCellularPriv::ServiceCellularPriv(ServiceCellular *owner)
         : owner{owner}, simCard{std::make_unique<SimCard>()}, state{std::make_unique<State>(owner)}
     {
         initSimCard();
     }
 
-    void ServiceCellularPriv::initSimCard()
+    ServiceCellularPriv::~ServiceCellularPriv()
+    {}
+
+    void ServiceCellularPriv::startup()
+    {
+        /**
+         * Create Settings object, which requires owner to be constructed and shared already
+         */
+        settings = std::make_unique<service::Settings>(owner);
+
+        /**
+         * Init static data at startup (InitHandler) stage as there is no access to Settings earlier
+         */
+        initStaticData();
+
+        /**
+         * Connect all handlers
+         */
+        connectSimCard();
+
+        /**
+         * Apply initial Settings
+         */
+        if (auto activeSim = settings->getSimSlot()) {
+            owner->bus.sendUnicast<request::sim::SetActiveSim>(*activeSim);
+        }
+    }
+
+    void ServiceCellularPriv::initStaticData()
     {
         using namespace cellular::msg;
+        auto data = static_data::get();
+
+        /**
+         * Set initial values before activating on-change callbacks
+         */
+        data->setTrayState((bsp::cellular::sim::getTray() == Store::GSM::Tray::IN) ? api::TrayState::Inserted
+                                                                                   : api::TrayState::Ejected);
+        if (auto activeSim = settings->getSimSlot()) {
+            data->setSimSlot(*activeSim);
+        }
+
+        /**
+         * Handle changes that require handling - undefined callback are ignored by static_data
+         */
+        data->onSimSlot  = [this](api::SimSlot slot) { settings->setSimSlot(slot); };
+        data->onSimState = [this](api::SimState state) {
+            owner->bus.sendMulticast<notification::SimStateChanged>(state);
+        };
+    }
+
+    void ServiceCellularPriv::initSimCard()
+    {
         simCard->onSimReady = [this]() {
             state->set(State::ST::Ready);
             owner->bus.sendMulticast<notification::SimReady>();
@@ -40,6 +96,7 @@ namespace cellular::internal
     void ServiceCellularPriv::connectSimCard()
     {
         using namespace cellular::msg;
+
         /**
          * Request message handlers
          */

@@ -45,4 +45,11 @@ namespace cellular::msg::notification
         const api::ModemState state;
     };
 
+    struct SimStateChanged : public msg::Notification
+    {
+        explicit SimStateChanged(api::SimState state) : state(state)
+        {}
+        const api::SimState state;
+    };
+
 } // namespace cellular::msg::notification

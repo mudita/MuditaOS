@@ -6,3 +6,4 @@
 
 #include "service-cellular/api/request/sim.hpp"
 #include "service-cellular/api/notification/notification.hpp"
+#include "service-cellular/api/static.hpp"
