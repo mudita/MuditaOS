@@ -17,6 +17,7 @@
 #include "log/log.hpp"                   // for LOG_INFO
 #include "messages/AppMessage.hpp"       // for AppSwitchMe...
 #include "service-appmgr/Controller.hpp" // for Controller
+#include <service-cellular-api>
 #include <service-cellular/CellularMessage.hpp>
 #include <service-evtmgr/BatteryMessages.hpp>
 #include <service-evtmgr/Constants.hpp>
@@ -129,6 +130,8 @@ namespace app
                 [&](sys::Message *msg) -> sys::MessagePointer { return handleGetDOM(msg); });
         connect(typeid(AppUpdateWindowMessage),
                 [&](sys::Message *msg) -> sys::MessagePointer { return handleUpdateWindow(msg); });
+        connect(typeid(cellular::msg::notification::SimStateUpdate),
+                [&](sys::Message *msg) -> sys::MessagePointer { return handleSimStateUpdateMessage(msg); });
 
         addActionReceiver(app::manager::actions::PhoneModeChanged, [this](auto &&params) {
             if (params != nullptr) {
@@ -332,9 +335,6 @@ namespace app
         }
         else if (msgl->messageType == MessageType::AppFocusLost) {
             return handleAppFocusLost(msgl);
-        }
-        else if (dynamic_cast<sevm::SIMMessage *>(msgl) != nullptr) {
-            return handleSIMMessage(msgl);
         }
         return sys::msgNotHandled();
     }
@@ -613,7 +613,7 @@ namespace app
         return sys::msgHandled();
     }
 
-    sys::MessagePointer Application::handleSIMMessage(sys::Message *msgl)
+    sys::MessagePointer Application::handleSimStateUpdateMessage(sys::Message *msgl)
     {
         if (getCurrentWindow()->updateSim()) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);

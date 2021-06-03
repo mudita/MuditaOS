@@ -225,8 +225,13 @@ namespace gui::top_bar
 
     void TopBar::showSim(bool enabled)
     {
-        sim->update(Store::GSM::get()->sim);
-        enabled ? sim->show() : sim->hide();
+        if (enabled) {
+            sim->update();
+            sim->show();
+        }
+        else {
+            sim->hide();
+        }
     }
 
     bool TopBar::updateSim()

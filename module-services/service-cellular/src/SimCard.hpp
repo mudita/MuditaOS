@@ -84,6 +84,11 @@ namespace cellular::service
         bool handlePinUnlock(const api::SimCode &pin);
 
         /**
+         * Notification message handlers
+         */
+        void handleTrayState();
+
+        /**
          * Internal message handlers
          */
         void handleATSimStateChange(at::SimState state);
