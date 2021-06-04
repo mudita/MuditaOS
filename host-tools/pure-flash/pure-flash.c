@@ -21,7 +21,7 @@
 static void syntax(char **argv)
 {
     fprintf(stderr, "%s [--force] filename blkdev\n", argv[0]);
-    fprintf(stderr, "\t--force Skip check partitons (optional)\n");
+    fprintf(stderr, "\t--force Skip device sanity checks (optional)\n");
 }
 
 static struct fiemap *read_fiemap(int fd)
@@ -249,7 +249,7 @@ static int write_image(const char *image_file, const char *block_device, bool fo
         fprintf(stderr, "Please specify disk device instead of a partition\n");
         return EXIT_FAILURE;
     }
-    {
+    if (!force) {
         char mntpath[FILENAME_MAX];
         const int err = device_is_mounted(block_device, mntpath, sizeof mntpath);
         if (err > 0) {
