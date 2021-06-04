@@ -104,8 +104,13 @@ namespace cellular::service
         std::function<void(unsigned int code)> onUnhandledCME;
 
       private:
+        /** SIM card initialization sequence
+         * \return true on success, false on failure
+         */
+        bool initSimCard();
+
         /** Get information about attempts of PIN and PUK for standard sim card (optionally PIN2/PUK2)
-         * @return  As optional SimCard::AttemptsCounters, in case of error nullopt. Should be noted that in some case
+         * \return  As optional SimCard::AttemptsCounters, in case of error nullopt. Should be noted that in some case
          * could return SIMFailure which could mean 0 attempts (happen if lock during session, on modem/sim reboot again
          * return 0,0);
          */
