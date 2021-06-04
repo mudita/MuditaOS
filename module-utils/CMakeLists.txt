@@ -4,8 +4,7 @@ if(NOT WIN32)
     include(Colours)
 endif()
 
-project(module-utils VERSION 1.0
-       DESCRIPTION "Library for processing utf8 strings.")
+project(module-utils VERSION 1.0)
 
 if(${CMAKE_VERSION} VERSION_LESS 3.12)
     cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
@@ -16,7 +15,6 @@ module_is_test_entity()
 set (SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/i18n/i18n.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/json/json11.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/utf8/UTF8.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/time/time_conversion.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/common_data/EventStore.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/common_data/Clipboard.cpp
@@ -51,11 +49,11 @@ target_link_libraries (${PROJECT_NAME} PUBLIC ${TINYEXPR_TARGET})
 
 target_link_libraries(${PROJECT_NAME} 
 PUBLIC 
+    board
+    log
+    magic_enum
     module-os 
     module-vfs
-    magic_enum
-    log
-    board
 )
 
 # Board specific compilation definitions,options,include directories and features
@@ -81,6 +79,7 @@ if (${ENABLE_TESTS})
     add_subdirectory( test )
 endif()
 
+add_subdirectory(board)
 add_subdirectory(bootconfig)
 add_subdirectory(log)
-add_subdirectory(board)
+add_subdirectory(utf8)
