@@ -6,8 +6,8 @@
 #include <cstdint>
 #include <ostream>
 
-#include "UTF8.hpp"
 #include <log.hpp>
+#include "utf8/UTF8.hpp"
 
 #define debug_utf(...)
 
@@ -115,8 +115,7 @@ void U8char::set(char *val, unsigned int size)
 UTF8::UTF8()
     : data{std::make_unique<char[]>(stringExpansion)},
       sizeAllocated{stringExpansion}, sizeUsed{1}, strLength{0}, lastIndex{0}, lastIndexData{data.get()}
-{
-}
+{}
 
 UTF8::UTF8(const char *str)
 {
@@ -166,7 +165,7 @@ UTF8::UTF8(const UTF8 &utf)
     else {
         sizeAllocated = stringExpansion;
         data          = std::make_unique<char[]>(sizeAllocated);
-        sizeUsed = 1;
+        sizeUsed      = 1;
     }
     lastIndex     = 0;
     lastIndexData = data.get();
@@ -175,8 +174,7 @@ UTF8::UTF8(const UTF8 &utf)
 UTF8::UTF8(UTF8 &&utf)
     : data{std::move(utf.data)}, sizeAllocated{utf.sizeAllocated}, sizeUsed{utf.sizeUsed}, strLength{utf.strLength},
       lastIndex{0}, lastIndexData{data.get()}
-{
-}
+{}
 
 UTF8::UTF8(const char *data, const uint32_t allocated, const uint32_t used, const uint32_t len)
     : sizeAllocated{allocated}, sizeUsed{used}, strLength{len}, lastIndex{0}
