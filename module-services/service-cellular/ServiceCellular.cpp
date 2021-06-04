@@ -467,9 +467,6 @@ void ServiceCellular::registerMessageHandlers()
         return handleCellularCallerIdMessage(msg);
     });
 
-    connect(typeid(CellularSimProcedureMessage),
-            [&](sys::Message *request) -> sys::MessagePointer { return handleCellularSimProcedureMessage(request); });
-
     connect(typeid(CellularGetIMSIMessage),
             [&](sys::Message *request) -> sys::MessagePointer { return handleCellularGetIMSIMessage(request); });
 
@@ -638,12 +635,6 @@ void ServiceCellular::change_state(cellular::StateChange *msg)
         break;
     case State::ST::SanityCheck:
         handle_sim_sanity_check();
-        break;
-    case State::ST::SimInit:
-        handle_sim_init();
-        break;
-    case State::ST::SimSelect:
-        handle_select_sim();
         break;
     case State::ST::ModemOn:
         handle_modem_on();
@@ -1386,42 +1377,6 @@ bool ServiceCellular::handle_sim_sanity_check()
     return ret;
 }
 
-bool ServiceCellular::handle_select_sim()
-{
-
-    bsp::cellular::sim::simSelect();
-    bsp::cellular::sim::hotSwapTrigger();
-#if defined(TARGET_Linux)
-    DLCChannel *channel = cmux->get(CellularMux::Channel::Commands);
-    auto ret            = channel->cmd(at::AT::QSIMSTAT);
-    if (!ret) {
-        LOG_FATAL("Cant check sim stat status");
-    }
-    else {
-        if (ret.response[0].find("+QSIMSTAT: 1,1") != std::string::npos) {
-            // SIM IN - only sim1 mocup
-            Store::GSM::get()->sim = Store::GSM::SIM::SIM1;
-        }
-        else {
-            // NO SIM IN
-            Store::GSM::get()->sim = Store::GSM::SIM::SIM_FAIL;
-        }
-        bus.sendMulticast<cellular::msg::notification::SimStateUpdate>();
-        bool ready = false;
-        while (!ready) {
-            auto response = channel->cmd("AT+CPIN?");
-            for (auto &line : response.response) {
-                if (line.find("+CPIN: READY") == std::string::npos) {
-                    ready = true;
-                }
-            }
-        }
-        priv->state->set(State::ST::SimInit);
-    }
-#endif
-    return true;
-}
-
 bool ServiceCellular::handle_modem_on()
 {
     auto channel = cmux->get(CellularMux::Channel::Commands);
@@ -1446,28 +1401,6 @@ bool ServiceCellular::handle_URCReady()
 
     LOG_DEBUG("%s", priv->state->c_str());
     return ret;
-}
-
-bool ServiceCellular::handle_sim_init()
-{
-    auto channel = cmux->get(CellularMux::Channel::Commands);
-    if (channel == nullptr) {
-        LOG_ERROR("Cant configure sim! no Commands channel!");
-        priv->state->set(State::ST::Failed);
-        return false;
-    }
-    bool success  = true;
-    auto commands = at::getCommadsSet(at::commadsSet::simInit);
-
-    for (auto command : commands) {
-        if (!channel->cmd(command)) {
-            LOG_ERROR("SIM initialization failure!");
-            return false;
-        }
-    }
-
-    priv->state->set(State::ST::Ready);
-    return success;
 }
 
 bool ServiceCellular::handleTextMessagesInit()
@@ -2068,12 +2001,6 @@ auto ServiceCellular::handleCellularCallerIdMessage(sys::Message *msg) -> std::s
     auto message = static_cast<CellularCallerIdMessage *>(msg);
     ongoingCall.setNumber(message->number);
     return sys::MessageNone{};
-}
-
-auto ServiceCellular::handleCellularSimProcedureMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
-{
-    priv->state->set(State::ST::SimSelect);
-    return std::make_shared<CellularResponseMessage>(true);
 }
 
 auto ServiceCellular::handleCellularGetIMSIMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>

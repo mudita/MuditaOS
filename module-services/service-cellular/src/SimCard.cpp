@@ -101,13 +101,33 @@ namespace cellular
                 onSimEvent();
         }
 
+        bool SimCard::initSimCard()
+        {
+            if (!ready()) {
+                return false;
+            }
+
+            for (const auto &command : at::getCommadsSet(at::commadsSet::simInit)) {
+                if (!channel->cmd(command)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         void SimCard::handleSimState(at::SimState state)
         {
             switch (state) {
             case at::SimState::Ready:
-                Store::GSM::get()->sim = Store::GSM::get()->selected;
-                if (onSimReady)
-                    onSimReady();
+                if (initSimCard()) {
+                    Store::GSM::get()->sim = Store::GSM::get()->selected;
+                    if (onSimReady)
+                        onSimReady();
+                }
+                else {
+                    LOG_ERROR("SIM initialization failure!");
+                    Store::GSM::get()->sim = Store::GSM::SIM::SIM_FAIL;
+                }
                 break;
             case at::SimState::NotReady:
                 Store::GSM::get()->sim = Store::GSM::SIM::SIM_FAIL;

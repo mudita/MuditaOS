@@ -21,7 +21,7 @@ namespace cellular::internal
     {
         using namespace cellular::msg;
         simCard->onSimReady = [this]() {
-            state->set(State::ST::SimInit);
+            state->set(State::ST::Ready);
             owner->bus.sendMulticast<notification::SimReady>();
         };
         simCard->onNeedPin = [this](unsigned int attempts) {

@@ -41,7 +41,6 @@ class CellularMessage : public sys::DataMessage
         PowerStateChange, ///< Change power state of the module
 
         ListCurrentCalls,
-        SimProcedure, // Broadcast on sim state changed
         SimResponse,  // Send to PIN window (show, error state, hide)
         SetVoLTE,
         SetFlightMode,
@@ -567,13 +566,6 @@ class CellularListCallsMessage : public CellularMessage
 {
   public:
     CellularListCallsMessage() : CellularMessage(Type::ListCurrentCalls)
-    {}
-};
-
-class CellularSimProcedureMessage : public CellularMessage
-{
-  public:
-    CellularSimProcedureMessage() : CellularMessage(Type::SimProcedure)
     {}
 };
 
