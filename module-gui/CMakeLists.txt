@@ -24,6 +24,7 @@ include_directories( ../module-utils )
 target_link_libraries(${PROJECT_NAME} 
     PUBLIC 
         module-utils 
+        utf8
         ${TARGET_LIBRARIES} 
     PRIVATE
         pugixml::pugixml

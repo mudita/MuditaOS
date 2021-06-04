@@ -178,11 +178,11 @@ target_compile_options(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
-    module-utils
-    module-vfs
-
+        module-utils
+        module-vfs
+        utf8
     PRIVATE
-    Microsoft.GSL::GSL
+        Microsoft.GSL::GSL
 )
 
 # Host target configuration(mainly used for unit testing)
