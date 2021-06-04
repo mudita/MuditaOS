@@ -119,8 +119,8 @@ add_subdirectory(locks)
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
         date::date
-        service-appmgr
         service-antenna
+        service-appmgr
         service-audio
         service-cellular
         service-db
@@ -129,12 +129,13 @@ target_link_libraries(${PROJECT_NAME}
     PUBLIC
         module-audio
         module-bsp
+        module-db
+        module-gui
         module-os
+        module-services
         module-sys
         module-utils
-        module-gui
-        module-services
-        module-db
+        utf8
         ${TARGET_LIBRARIES}
 )
 

@@ -36,20 +36,6 @@ add_catch2_executable(
         utils-ucs2
     SRCS
         unittest_ucs2.cpp
-        ../ucs2/UCS2.cpp
-        ../ucs2/UCS2.hpp
-    LIBS
-        module-utils
-)
-
-# UTF8 tests
-add_catch2_executable(
-    NAME
-        utils-utf8
-    SRCS
-        unittest_utf8.cpp
-        ../utf8/UTF8.cpp
-        ../utf8/UTF8.hpp
     LIBS
         module-utils
 )

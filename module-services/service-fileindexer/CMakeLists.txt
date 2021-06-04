@@ -23,4 +23,14 @@ target_sources( ${PROJECT_NAME}
 )
 
 
-target_link_libraries(${PROJECT_NAME} module-bsp module-os module-utils module-vfs module-sys tag )
+target_link_libraries(${PROJECT_NAME} 
+	PUBLIC
+		module-bsp 
+		module-os 
+		module-utils 
+		module-vfs 
+		module-sys 
+		tag
+	PRIVATE
+		utf8
+)

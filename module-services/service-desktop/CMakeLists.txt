@@ -55,14 +55,16 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
-        service-cellular
-        service-evtmgr
-        module-utils
-        module-cellular
         crc32
         microtar
+        module-utils
+        service-cellular
+        service-evtmgr
+        utf8
         utils-bootconfig
         Microsoft.GSL::GSL
+    PUBLIC
+        module-cellular
 )
 
 if (${ENABLE_TESTS})
