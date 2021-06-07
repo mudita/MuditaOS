@@ -10,7 +10,6 @@
 
 #include "../core/BoundingBox.hpp"
 #include "../core/DrawCommand.hpp"
-#include <log.hpp>
 
 #include "Rect.hpp"
 #include "Style.hpp"

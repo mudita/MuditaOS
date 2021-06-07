@@ -7,7 +7,7 @@
 #include <iostream>
 #include <algorithm>
 
-#include "log.hpp"
+#include <log.hpp>
 #include "mutex.hpp"
 #include <common_data/EventStore.hpp>
 #include <errno.h>

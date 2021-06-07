@@ -3,7 +3,7 @@
 
 #include "RT1051DriverDMA.hpp"
 #include <algorithm>
-#include "log.hpp"
+#include <log.hpp>
 
 namespace drivers
 {
