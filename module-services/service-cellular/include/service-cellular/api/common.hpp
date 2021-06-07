@@ -32,6 +32,14 @@ namespace cellular
             SIM2 = 1
         };
 
+        enum class ModemState
+        {
+            Startup,
+            Ready,
+            Fail,
+            Fatal
+        };
+
         using SimCode = std::vector<unsigned int>;
     } // namespace api
 } // namespace cellular

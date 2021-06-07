@@ -12,6 +12,6 @@ namespace cellular::internal::msg
     {
         HandleATSimStateChange(at::SimState state) : state(state)
         {}
-        at::SimState state;
+        const at::SimState state;
     };
 } // namespace cellular::internal::msg

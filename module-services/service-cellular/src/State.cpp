@@ -4,6 +4,7 @@
 #include <service-cellular/State.hpp>
 #include <Service/Service.hpp>
 #include <service-cellular/CellularMessage.hpp>
+#include <service-cellular/api/common.hpp>
 
 namespace cellular::service
 {
@@ -65,7 +66,7 @@ namespace cellular::service
         LOG_DEBUG("GSM state: (%s) -> (%s)", c_str(this->state), c_str(state));
         this->state = state;
         auto msg    = std::make_shared<StateChange>(state);
-        owner->bus.sendMulticast(msg, sys::BusChannel::ServiceCellularNotifications);
+        owner->bus.sendUnicast(msg, cellular::service::name);
     }
 
     State::ST State::get() const
