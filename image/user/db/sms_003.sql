@@ -12,6 +12,6 @@ INSERT OR REPLACE INTO "templates" ("_id","text","lastUsageTimestamp") VALUES (2
 INSERT OR REPLACE INTO "templates" ("_id","text","lastUsageTimestamp") VALUES (3,'I''ll be there in 15 minutes',2);
 INSERT OR REPLACE INTO "templates" ("_id","text","lastUsageTimestamp") VALUES (4,'Some test template number, which is too long to be displayed.',1);
 INSERT OR REPLACE INTO "templates" ("_id","text","lastUsageTimestamp") VALUES (5,'Give me 5 minutes',5);
-INSERT OR REPLACE INTO "threads" ("_id","date","msg_count","read","contact_id","number_id","snippet","last_dir") VALUES (1,1574335694,3,1,1,1,'I''m happy to hear that :)',4);
-INSERT OR REPLACE INTO "threads" ("_id","date","msg_count","read","contact_id","number_id","snippet","last_dir") VALUES (2,1618910720,2,0,2,2,'It was great seeing you too :*',4);
+INSERT OR REPLACE INTO "threads" ("_id","date","msg_count","read","contact_id","number_id","snippet","last_dir") VALUES (1,1618907734,3,1,1,1,'I''m happy to hear that :)',4);
+INSERT OR REPLACE INTO "threads" ("_id","date","msg_count","read","contact_id","number_id","snippet","last_dir") VALUES (2,1547492321,2,0,2,2,'It was great seeing you too :*',4);
 COMMIT;

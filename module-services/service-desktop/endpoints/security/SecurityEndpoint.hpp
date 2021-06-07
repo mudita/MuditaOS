@@ -3,11 +3,8 @@
 
 #pragma once
 
-#include <Service/Service.hpp>
 #include <endpoints/Endpoint.hpp>
-#include <parser/ParserUtils.hpp>
 #include "SecurityEndpointHelper.hpp"
-#include <string>
 
 namespace parserFSM
 {
@@ -37,9 +34,4 @@ class SecurityEndpoint : public parserFSM::Endpoint
     }
 
     auto handle(parserFSM::Context &context) -> void override;
-
-  private:
-    auto processHandshake(parserFSM::Context &context) -> parserFSM::http::Code;
-    auto processConfiguration(parserFSM::Context &context) -> parserFSM::http::Code;
-    auto processStatus(parserFSM::Context &context) -> parserFSM::http::Code;
 };

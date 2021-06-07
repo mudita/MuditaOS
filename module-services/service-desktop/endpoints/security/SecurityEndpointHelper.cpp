@@ -2,13 +2,9 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SecurityEndpointHelper.hpp"
-#include "service-db/SettingsMessages.hpp"
-#include <service-desktop/DesktopMessages.hpp>
 #include <parser/ParserUtils.hpp>
-#include <Service/Common.hpp>
-#include <Service/Service.hpp>
-#include <service-appmgr/service-appmgr/model/ApplicationManager.hpp>
-#include <service-desktop/parser/MessageHandler.hpp>
+#include <service-appmgr/model/ApplicationManager.hpp>
+#include <service-appmgr/messages/PreventBlockingRequest.hpp>
 #include <service-desktop/service-desktop/ServiceDesktop.hpp>
 #include <module-apps/locks/data/PhoneLockMessages.hpp>
 #include <json/json11.hpp>
@@ -19,6 +15,13 @@ namespace parserFSM
 } // namespace parserFSM
 
 using namespace parserFSM;
+
+auto SecurityEndpointHelper::preventBlockingDevice() -> bool
+{
+    auto desktopService = dynamic_cast<ServiceDesktop *>(owner);
+    auto msg            = std::make_shared<app::manager::PreventBlockingRequest>(desktopService->GetName());
+    return desktopService->bus.sendUnicast(std::move(msg), "ApplicationManager");
+}
 
 auto SecurityEndpointHelper::processPut(Context &context) -> ProcessResult
 {
@@ -36,6 +39,10 @@ auto SecurityEndpointHelper::processStatus(Context &context) -> http::Code
 {
     auto desktopService = dynamic_cast<ServiceDesktop *>(owner);
     auto security       = desktopService->getSecurity()->getEndpointSecurity();
+
+    if (security == EndpointSecurity::Allow) {
+        preventBlockingDevice();
+    }
 
     return security == EndpointSecurity::Allow ? http::Code::OK : http::Code::Forbidden;
 }
