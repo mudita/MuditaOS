@@ -54,6 +54,7 @@ target_link_libraries(${PROJECT_NAME}
         service-antenna
         service-audio
         service-evtmgr
+        ucs2
     PUBLIC
         time
         utf8

@@ -20,16 +20,6 @@ add_catch2_executable(
         module-utils
 )
 
-# UCS2 tests
-add_catch2_executable(
-    NAME
-        utils-ucs2
-    SRCS
-        unittest_ucs2.cpp
-    LIBS
-        module-utils
-)
-
 # duration tests
 add_catch2_executable(
     NAME

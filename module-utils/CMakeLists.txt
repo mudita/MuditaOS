@@ -18,7 +18,6 @@ add_subdirectory(EventStore)
 set (SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/i18n/i18n.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/json/json11.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/ucs2/UCS2.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/PhoneNumber.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/PhoneNumber.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/NumberHolderMatcher.hpp
@@ -76,4 +75,6 @@ add_subdirectory(board)
 add_subdirectory(bootconfig)
 add_subdirectory(log)
 add_subdirectory(time)
+add_subdirectory(ucs2)
 add_subdirectory(utf8)
+
