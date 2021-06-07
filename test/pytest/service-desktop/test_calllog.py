@@ -41,7 +41,7 @@ def test_calllog(harness):
     # remove exact call log
     body = {"id": calllog[0]["id"]}
     ret = harness.endpoint_request("calllog", "del", body)
-    assert ret["status"] == status["OK"]
+    assert ret["status"] == status["NoContent"]
 
     # getting the count again
     body = {"count": True}

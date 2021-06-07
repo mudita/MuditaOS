@@ -67,7 +67,7 @@ def test_calendar(harness):
     # remove event
     del_body = {"UID": ret["body"]["calendar_events"][0]["UID"]}
     ret = harness.endpoint_request("events", "del", del_body)
-    assert ret["status"] == status["OK"]
+    assert ret["status"] == status["NoContent"]
 
     # check events after remove
     body = {"offset": 0, "limit": 1}
@@ -102,7 +102,7 @@ def test_calendar(harness):
     }
 
     ret = harness.endpoint_request("events", "post", update_body)
-    assert ret["status"] == status["OK"]
+    assert ret["status"] == status["NoContent"]
 
     # get updated event
     body = {"offset": 0, "limit": 1}
@@ -131,7 +131,7 @@ def test_calendar(harness):
 
     del_body = {"UID": ret["body"]["calendar_events"][0]["UID"]}
     ret = harness.endpoint_request("events", "del", del_body)
-    assert ret["status"] == status["OK"]
+    assert ret["status"] == status["NoContent"]
 
     # check events after remove
     body = {"offset": 0, "limit": 1}

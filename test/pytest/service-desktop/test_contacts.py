@@ -93,7 +93,7 @@ def test_contacts(harness):
             "priName": "Test2",
             "id": contact_id_to_update}
     ret = harness.endpoint_request("contacts", "post", body)
-    assert ret["status"] == status["OK"]
+    assert ret["status"] == status["NoContent"]
 
     # gathering updated contact
     body = {"id": contact_id_to_update}
@@ -110,7 +110,7 @@ def test_contacts(harness):
     # removing added contact
     body = {"id": contact_id_to_update}
     ret = harness.endpoint_request("contacts", "del", body)
-    assert ret["status"] == status["OK"]
+    assert ret["status"] == status["NoContent"]
 
     # verifying count
     body = {"count": True}
