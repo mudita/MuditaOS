@@ -5,7 +5,6 @@
 
 #include <bsp/cellular/bsp_cellular.hpp>
 #include <MessageType.hpp>
-#include <module-utils/state/ServiceState.hpp>
 #include <Service/Common.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
@@ -19,13 +18,12 @@
 #include <cstdint>
 #include <memory>
 
-namespace utils
+#include "ServiceState.hpp"
+
+namespace state
 {
-    namespace state
-    {
-        template <typename T> class State;
-    } // namespace state
-} // namespace utils
+    template <typename T> class State;
+} // namespace state
 
 namespace service::name
 {
@@ -62,7 +60,7 @@ namespace antenna
 class ServiceAntenna : public sys::Service
 {
   private:
-    utils::state::State<antenna::State> *state;
+    state::State<antenna::State> *state;
     bool HandleStateChange(antenna::State state);
 
     sys::TimerHandle timer;
