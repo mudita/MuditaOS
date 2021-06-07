@@ -6,7 +6,7 @@
 #include <list>
 #include <cstdint>
 
-#include <module-utils/math/Math.hpp>
+#include <Math.hpp>
 
 #include "Common.hpp"
 #include "Item.hpp"

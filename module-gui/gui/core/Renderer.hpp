@@ -5,7 +5,7 @@
 
 #include <list>
 
-#include <module-utils/math/Math.hpp>
+#include <Math.hpp>
 
 #include "DrawCommand.hpp"
 #include "Context.hpp"
