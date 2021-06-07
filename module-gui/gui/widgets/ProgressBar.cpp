@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <log.hpp>
-#include <module-utils/math/Math.hpp>
+#include <Math.hpp>
 
 #include "DrawCommand.hpp"
 #include "ProgressBar.hpp"

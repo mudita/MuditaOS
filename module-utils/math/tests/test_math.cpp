@@ -5,7 +5,7 @@
 
 #include <catch2/catch.hpp>
 
-#include "math/Math.hpp"
+#include <Math.hpp>
 
 #include <climits>
 

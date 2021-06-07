@@ -44,16 +44,6 @@ add_catch2_executable(
         PurePhone-disk-img
 )
 
-# Math tests
-add_catch2_executable(
-    NAME
-        utils-math
-    SRCS
-        test_math.cpp
-    LIBS
-        module-utils
-)
-
 # Log tests
 add_catch2_executable(
     NAME
