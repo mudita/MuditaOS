@@ -12,7 +12,7 @@ import random
 def change_auto_lock_timer(harness, value: str):
     body = {"changeAutoLockTimeout": value}
     ret = harness.endpoint_request("developerMode", "put", body)
-    assert ret["status"] == status["OK"]
+    assert ret["status"] == status["NoContent"]
 
 @pytest.fixture(scope='function')
 def phone_ends_with_default_auto_lock(harness):
