@@ -18,8 +18,7 @@ namespace ucs2
 } // namespace ucs2
 
 UCS2::UCS2() : sizeAllocated{ucs2::bufferExt}, buffer{std::make_unique<uint32_t[]>(ucs2::bufferExt)}
-{
-}
+{}
 
 UCS2::UCS2(const UTF8 &string)
 {

@@ -363,7 +363,7 @@ TESTS_LIST["catch2-utils-time_display"]="
     Time display parser;
 "
 #---------
-TESTS_LIST["catch2-utils-ucs2"]="
+TESTS_LIST["catch2-ucs2"]="
     UCS2 to UTF8 conversion;
     UCS2 from UTF8 emoji 😁;
     UCS2 from UTF8 emoji 🍣;
