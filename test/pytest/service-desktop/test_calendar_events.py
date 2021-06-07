@@ -36,14 +36,14 @@ def test_calendar(harness):
 
     UIDS = []
     ret = harness.endpoint_request("events", "put", add_body)
-    assert ret["status"] == status["OK"]
+    assert ret["status"] == status["NoContent"]
     UIDS.insert(0,ret["body"]["UID"])
     event_count = 15
     for new_event_counter  in range(2,event_count+1):
         new_event = copy.deepcopy(add_body)
         new_event["calendar_events"][0]["SUMMARY"] = "Test" + str(new_event_counter)
         ret = harness.endpoint_request("events", "put", new_event)
-        assert ret["status"] == status["OK"]
+        assert ret["status"] == status["NoContent"]
         UIDS.insert(new_event_counter-1,ret["body"]["UID"])
 
     # get events limit < pageSize - pagination not used
@@ -84,6 +84,6 @@ def test_calendar(harness):
     for ev in range(0,event_count):
         del_body = {"UID": UIDS[ev]}
         ret = harness.endpoint_request("events", "del", del_body)
-        assert ret["status"] == status["OK"]
+        assert ret["status"] == status["NoContent"]
 
 

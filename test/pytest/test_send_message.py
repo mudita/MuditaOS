@@ -44,14 +44,14 @@ def erase_all_templates(harness):
     for template in ret["body"]["entries"]:
         body = {"category": "template", "templateID": template["templateID"]}
         del_res = harness.endpoint_request("messages", "del", body)
-        assert del_res["status"] == status["OK"]
+        assert del_res["status"] == status["NoContent"]
 
 
 def add_new_template(harness, template_text: str):
     # adding new template
     body = {"category": "template", "templateBody": template_text}
     ret = harness.endpoint_request("messages", "post", body)
-    assert ret["status"] == status["OK"]
+    assert ret["status"] == status["NoContent"]
 
 
 def get_all_contacts(harness):
@@ -97,7 +97,7 @@ def erase_contacts_by_name(harness, name):
         # removing added contact
         body = {"id": identifier}
         ret = harness.endpoint_request("contacts", "del", body)
-        assert ret["status"] == status["OK"]
+        assert ret["status"] == status["NoContent"]
 
 
 def erase_contacts_by_phone_number(harness, phone_number):
@@ -117,7 +117,7 @@ def erase_contacts_by_phone_number(harness, phone_number):
         # removing added contact
         body = {"id": identifier}
         ret = harness.endpoint_request("contacts", "del", body)
-        assert ret["status"] == status["OK"]
+        assert ret["status"] == status["NoContent"]
 
 
 def get_message_by_text(harness, message: str, phone_number: str):
@@ -168,7 +168,7 @@ def remove_added_messages(harness, diff_messages):
     for  message in diff_messages:
         body = {"category": "message", "messageID": message["messageID"]}
         del_res = harness.endpoint_request("messages", "del", body)
-        assert del_res["status"] == status["OK"]
+        assert del_res["status"] == status["NoContent"]
 
 
 @pytest.mark.rt1051
@@ -399,7 +399,7 @@ def test_send_message_from_phonebook(harness, phone_number, sms_text):
             "numbers": [str(phone_number)],
             "priName": "Test"}
     ret = harness.endpoint_request("contacts", "put", body)
-    assert ret["status"] == status["OK"]
+    assert ret["status"] == status["NoContent"]
     added_contact_id = ret["body"]["id"]
 
     # enter contacts (phonebook) menu
@@ -443,7 +443,7 @@ def test_send_message_from_phonebook(harness, phone_number, sms_text):
     # removing added contact
     body = {"id": added_contact_id}
     ret = harness.endpoint_request("contacts", "del", body)
-    assert ret["status"] == status["OK"]
+    assert ret["status"] == status["NoContent"]
 
 @pytest.mark.rt1051
 @pytest.mark.usefixtures("phone_unlocked")
@@ -463,7 +463,7 @@ def test_send_message_using_phonebook(harness, phone_number, sms_text):
             "numbers": [str(phone_number)],
             "priName": "Test"}
     ret = harness.endpoint_request("contacts", "put", body)
-    assert ret["status"] == status["OK"]
+    assert ret["status"] == status["NoContent"]
     added_contact_id = ret["body"]["id"]
 
     # enter messages menu
@@ -516,6 +516,6 @@ def test_send_message_using_phonebook(harness, phone_number, sms_text):
     # removing added contact
     body = {"id": added_contact_id}
     ret = harness.endpoint_request("contacts", "del", body)
-    assert ret["status"] == status["OK"]
+    assert ret["status"] == status["NoContent"]
 
 
