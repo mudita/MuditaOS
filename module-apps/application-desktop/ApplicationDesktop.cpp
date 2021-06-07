@@ -26,8 +26,7 @@
 #include "data/DesktopData.hpp"
 
 #include <service-appmgr/Controller.hpp>
-#include <service-cellular/ServiceCellular.hpp>
-#include <service-cellular/CellularMessage.hpp>
+#include <service-cellular-api>
 #include <service-db/QueryMessage.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <magic_enum.hpp>
@@ -85,6 +84,12 @@ namespace app
             switchWindow(app::window::name::logo_window, std::move(data));
             return actionHandled();
         });
+
+        connect(typeid(cellular::msg::notification::ModemStateChanged), [this](sys::Message *request) {
+            auto msg = static_cast<cellular::msg::notification::ModemStateChanged *>(request);
+            handle(msg);
+            return sys::MessageNone{};
+        });
     }
 
     // Invoked upon receiving data message
@@ -98,10 +103,7 @@ namespace app
         }
 
         bool handled = false;
-        if (auto msg = dynamic_cast<cellular::StateChange *>(msgl)) {
-            handled = handle(msg);
-        }
-        else if (auto msg = dynamic_cast<sdesktop::UpdateOsMessage *>(msgl)) {
+        if (auto msg = dynamic_cast<sdesktop::UpdateOsMessage *>(msgl)) {
             handled = handle(msg);
         }
 
@@ -147,13 +149,12 @@ namespace app
         }
     }
 
-    auto ApplicationDesktop::handle(cellular::StateChange *msg) -> bool
+    void ApplicationDesktop::handle(cellular::msg::notification::ModemStateChanged *msg)
     {
         assert(msg);
-        if (msg->request == cellular::service::State::ST::ModemFatalFailure) {
+        if (msg->state == cellular::api::ModemState::Fatal) {
             switchWindow(app::window::name::desktop_reboot);
         }
-        return false;
     }
 
     // Invoked during initialization
