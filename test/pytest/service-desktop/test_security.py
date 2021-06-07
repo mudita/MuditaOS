@@ -65,17 +65,17 @@ def test_security_phone_locked_without_code(harness):
 
     body = {"phoneLockCodeEnabled": False}
     ret = harness.endpoint_request("developerMode", "put", body)
-    assert ret["status"] == status["OK"]
+    assert ret["status"] == status["NoContent"]
 
     time.sleep(.1)
 
     body = {}
     ret = harness.endpoint_request("usbSecurity", "get", body)
-    assert ret["status"] == status["OK"]
+    assert ret["status"] == status["NoContent"]
 
     body = {"phoneLockCodeEnabled": True}
     ret = harness.endpoint_request("developerMode", "put", body)
-    assert ret["status"] == status["OK"]
+    assert ret["status"] == status["NoContent"]
 
     harness.lock_phone()
     time.sleep(.1)
@@ -95,7 +95,7 @@ def test_security_unlock_phone(harness):
     """
     body = {"phoneLockCode": "1111"}
     ret = harness.endpoint_request("usbSecurity", "put", body)
-    assert ret["status"] == status["OK"]
+    assert ret["status"] == status["NoContent"]
 
     time.sleep(.1)
 
@@ -126,7 +126,7 @@ def test_security_unlock_phone(harness):
     """
     body = {"phoneLockCode": "3333"}
     ret = harness.endpoint_request("usbSecurity", "put", body)
-    assert ret["status"] == status["OK"]
+    assert ret["status"] == status["NoContent"]
 
     time.sleep(.1)
 
