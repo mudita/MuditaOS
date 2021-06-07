@@ -4,6 +4,25 @@ To install the new version of MuditaOS please follow the steps described in this
 - [Linux](https://github.com/mudita/MuditaOS/blob/master/doc/boot_and_update.md#creating-a-storage-partition)
 - [Windows and macOS](https://github.com/mudita/MuditaOS/blob/master/doc/flashing_win_macos.md)
 
+## [0.68.1 2021-06-04]
+
+### Added
+
+* Add Onboarding application.
+* Add iNotify mechanism for the VFS.
+
+### Changed
+
+* Hide calls and messages notifications while tethering is on.
+* SIM handling refactored.
+* Automatic locking disabled when torch is on.
+* Automatic locking disabled during OS update.
+
+### Fixed
+
+* Fix preserving automatic display light setting between phone starts.
+* Fix current time displaying in "Date and time" window.
+
 ## [0.67.1 2021-05-28]
 
 ### Added
