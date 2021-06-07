@@ -7,7 +7,7 @@
 #include <ostream>
 
 #include "UTF8.hpp"
-#include "log.hpp"
+#include <log.hpp>
 
 #define debug_utf(...)
 

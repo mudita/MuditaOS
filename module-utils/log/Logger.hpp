@@ -5,7 +5,7 @@
 
 #include <assert.h>
 #include <board.h>
-#include "log.hpp"
+#include <log.hpp>
 #include "LoggerBuffer.hpp"
 #include "log_colors.hpp"
 #include <map>

@@ -7,7 +7,7 @@
 #include <sstream>
 
 #include <iomanip>
-#include "log.hpp"
+#include <log.hpp>
 #include <iterator>
 #include <locale>
 #include <codecvt>

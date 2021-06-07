@@ -3,7 +3,7 @@
 
 #include "linux_audiocodec.hpp"
 
-#include "log.hpp"
+#include <log.hpp>
 
 namespace bsp
 {
