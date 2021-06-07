@@ -4,6 +4,7 @@
 #include "service-antenna/ServiceAntenna.hpp"
 #include "service-antenna/AntennaMessage.hpp"
 #include "service-antenna/AntennaServiceAPI.hpp"
+#include "service-antenna/ServiceState.hpp"
 
 #include <service-appmgr/model/ApplicationManager.hpp>
 
@@ -11,7 +12,6 @@
 #include <common_data/EventStore.hpp>
 #include <log.hpp>
 #include <MessageType.hpp>
-#include <module-utils/state/ServiceState.hpp>
 #include <projdefs.h>
 #include <module-sys/Timers/TimerFactory.hpp>
 #include <service-cellular/State.hpp>
@@ -60,7 +60,7 @@ ServiceAntenna::ServiceAntenna()
       phoneModeObserver{std::make_unique<sys::phone_modes::Observer>()}
 {
     LOG_INFO("[%s] Initializing", service::name::antenna);
-    state = new utils::state::State<antenna::State>(this);
+    state = new state::State<antenna::State>(this);
     timer = sys::TimerFactory::createPeriodicTimer(
         this, "Antenna", std::chrono::seconds{5}, [this](sys::Timer & /*timer*/) {
             timer.stop();
