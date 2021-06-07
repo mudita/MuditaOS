@@ -72,6 +72,8 @@ target_link_libraries(${PROJECT_NAME}
                 module-sys
                 tag
                 minimp3::minimp3
+        PRIVATE
+                math
 )
 
 if (${ENABLE_TESTS})

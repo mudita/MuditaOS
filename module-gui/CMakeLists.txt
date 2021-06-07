@@ -20,7 +20,8 @@ include(gui/dom/CMakeLists.txt)
 include_directories( ../module-utils )
 
 target_link_libraries(${PROJECT_NAME} 
-    PUBLIC
+    PUBLIC 
+        math
         module-utils 
         utf8
         eventstore

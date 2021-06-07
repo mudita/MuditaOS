@@ -71,4 +71,4 @@ add_subdirectory(log)
 add_subdirectory(time)
 add_subdirectory(ucs2)
 add_subdirectory(utf8)
-
+add_subdirectory(math)
