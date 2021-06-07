@@ -8,7 +8,7 @@
 #include "drivers/gpio/DriverGPIO.hpp"
 
 #include "fsl_common.h"
-#include "log.hpp"
+#include <log.hpp>
 
 namespace bsp::light_sensor
 {

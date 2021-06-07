@@ -9,7 +9,7 @@
 #include "Rect.hpp"
 #include <Alignment.hpp>
 #include "LayoutSizeStore.hpp"
-#include "log.hpp"
+#include <log.hpp>
 
 namespace gui
 {
