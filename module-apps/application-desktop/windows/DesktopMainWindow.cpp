@@ -134,8 +134,7 @@ namespace gui
     {
         // long press of '0' key is translated to '+'
         if (inputEvent.is(KeyCode::KEY_0)) {
-            return app::manager::Controller::sendAction(
-                application, app::manager::actions::Dial, std::make_unique<app::EnterNumberData>("+"));
+            return resolveDialAction(std::string{"+"});
         }
         if (inputEvent.is(KeyCode::KEY_RF)) {
             application->switchWindow(popup::window::power_off_window);
@@ -157,8 +156,7 @@ namespace gui
         // if numeric key was pressed record that key and send it to call application
         if (code != 0) {
             const auto &number = std::string(1, static_cast<char>(code));
-            return app::manager::Controller::sendAction(
-                application, app::manager::actions::Dial, std::make_unique<app::EnterNumberData>(number));
+            return resolveDialAction(number);
         }
         else if (const auto notificationsNotFocused = (focusItem == nullptr);
                  notificationsNotFocused && !notificationsModel->isEmpty()) {
@@ -266,6 +264,17 @@ namespace gui
         auto switchData = std::make_unique<DialogMetadataMessage>(std::move(meta));
         application->switchWindow(window::name::dialog_confirm, std::move(switchData));
         return true;
+    }
+
+    bool DesktopMainWindow::resolveDialAction(const std::string &number)
+    {
+        if (notificationsModel->isTetheringOn()) {
+            return false;
+        }
+        else {
+            return app::manager::Controller::sendAction(
+                application, app::manager::actions::Dial, std::make_unique<app::EnterNumberData>(number));
+        }
     }
 
 } /* namespace gui */
