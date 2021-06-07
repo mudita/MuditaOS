@@ -77,6 +77,11 @@ ServiceAntenna::ServiceAntenna()
     bus.channels.push_back(sys::BusChannel::AntennaNotifications);
     bus.channels.push_back(sys::BusChannel::PhoneModeChanges);
 
+    connect(typeid(cellular::msg::notification::SimReady), [this](sys::Message *) {
+        state->set(antenna::State::init);
+        return sys::MessageNone{};
+    });
+
     phoneModeObserver->connect(this);
     phoneModeObserver->subscribe([this](sys::phone_modes::PhoneMode mode) {
         if (mode == sys::phone_modes::PhoneMode::Offline) {
@@ -118,14 +123,6 @@ sys::MessagePointer ServiceAntenna::DataReceivedHandler(sys::DataMessage *msgl, 
         } break;
         case CellularMessage::Type::HangupCall: {
             AntennaServiceAPI::LockRequest(this, antenna::lockState::unlocked);
-        } break;
-        case CellularMessage::Type::StateRequest: {
-            auto msg = dynamic_cast<cellular::StateChange *>(msgl);
-            if (msg != nullptr) {
-                if (msg->request == cellular::service::State::ST::Ready) {
-                    state->set(antenna::State::init);
-                }
-            }
         } break;
         default:
             break;

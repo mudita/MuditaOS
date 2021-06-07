@@ -81,7 +81,8 @@ namespace FotaService
         using std::placeholders::_1;
         connect(CellularGetChannelResponseMessage(),
                 std::bind(&Service::handleCellularGetChannelResponseMessage, this, _1));
-        connect(cellular::StateChange(), std::bind(&Service::handleServiceCellularNotifications, this, _1));
+        connect(typeid(cellular::msg::notification::SimReady),
+                std::bind(&Service::handleSimReadyNotification, this, _1));
         connect(ConfigureAPNMessage(), std::bind(&Service::handleConfigureAPN, this, _1));
         connect(ConnectMessage(), std::bind(&Service::handleConnect, this, _1));
         connect(HTTPRequestMessage(), std::bind(&Service::handleHttpGet, this, _1));
@@ -102,20 +103,15 @@ namespace FotaService
         return sys::MessageNone{};
     }
 
-    sys::MessagePointer Service::handleServiceCellularNotifications(sys::Message *req)
+    sys::MessagePointer Service::handleSimReadyNotification(sys::Message *)
     {
-        if (auto msg = dynamic_cast<cellular::StateChange *>(req)) {
-            LOG_DEBUG("cellular::StageChange: %s", cellular::service::State::c_str(msg->request));
-            if (msg->request == cellular::service::State::ST::Ready) {
-                LOG_DEBUG("Modem is \"Ready\"");
-                if (dataChannel == nullptr) {
-                    LOG_DEBUG("Requesting channel");
-                    CellularServiceAPI::GetDataChannel(this);
-                }
-                else {
-                    LOG_DEBUG("Channel already present: %p", dataChannel);
-                }
-            }
+        LOG_DEBUG("Modem is \"Ready\"");
+        if (dataChannel == nullptr) {
+            LOG_DEBUG("Requesting channel");
+            CellularServiceAPI::GetDataChannel(this);
+        }
+        else {
+            LOG_DEBUG("Channel already present: %p", dataChannel);
         }
         return std::make_shared<sys::ResponseMessage>();
     }

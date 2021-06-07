@@ -573,16 +573,17 @@ namespace app::manager
                 });
         connect(typeid(cellular::msg::notification::SimReady),
                 [&](sys::Message *request) -> sys::MessagePointer { return simLockHandler.handleSimReadyMessage(); });
-        connect(typeid(cellular::StateChange), [&](sys::Message *request) -> sys::MessagePointer {
-            auto data = static_cast<cellular::StateChange *>(request);
-            if (data->request == cellular::service::State::ST::URCReady) {
-                simLockHandler.setSimReady();
-                simLockHandler.getSettingsSimSelect(
-                    settings->getValue(settings::SystemProperties::activeSim, settings::SettingsScope::Global));
-                return sys::msgHandled();
-            }
-            return sys::msgNotHandled();
-        });
+        connect(typeid(cellular::msg::notification::ModemStateChanged),
+                [&](sys::Message *request) -> sys::MessagePointer {
+                    auto data = static_cast<cellular::msg::notification::ModemStateChanged *>(request);
+                    if (data->state == cellular::api::ModemState::Ready) {
+                        simLockHandler.setSimReady();
+                        simLockHandler.getSettingsSimSelect(
+                            settings->getValue(settings::SystemProperties::activeSim, settings::SettingsScope::Global));
+                        return sys::msgHandled();
+                    }
+                    return sys::msgNotHandled();
+                });
 
         connect(typeid(onBoarding::FinalizeOnBoarding),
                 [&](sys::Message *request) -> sys::MessagePointer { return handleOnBoardingFinalize(); });
