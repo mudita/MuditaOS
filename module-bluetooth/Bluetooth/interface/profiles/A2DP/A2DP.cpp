@@ -16,7 +16,6 @@
 #include <Audio/AudioCommon.hpp>
 #include <service-audio/AudioMessage.hpp>
 #include <service-evtmgr/Constants.hpp>
-#include <log.hpp>
 #include "service-bluetooth/messages/Connect.hpp"
 #include "service-bluetooth/messages/Disconnect.hpp"
 #include "service-bluetooth/Constants.hpp"

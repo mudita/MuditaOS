@@ -6,4 +6,6 @@ target_sources(log
         ${CMAKE_CURRENT_SOURCE_DIR}/LoggerBuffer.cpp
 )
 target_include_directories(log PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(log PRIVATE module-bsp)
+#if(${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
+        target_link_libraries(log PRIVATE module-bsp)
+#endif()

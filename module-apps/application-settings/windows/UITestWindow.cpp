@@ -6,7 +6,7 @@
 #include "Label.hpp"
 #include "Margins.hpp"
 #include <i18n/i18n.hpp>
-#include "log.hpp"
+#include <log.hpp>
 #include "messages/AppMessage.hpp"
 #include <service-appmgr/model/ApplicationManager.hpp>
 #include <GridLayout.hpp>
