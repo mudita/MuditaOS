@@ -25,6 +25,7 @@ namespace parserFSM
         static constexpr auto PasscodeLength = 4;
 
       private:
+        auto preventBlockingDevice() -> bool;
         auto processPut(Context &context) -> ProcessResult final;
         auto processGet(Context &context) -> ProcessResult final;
 
