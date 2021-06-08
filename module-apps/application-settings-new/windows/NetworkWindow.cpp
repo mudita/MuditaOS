@@ -45,7 +45,6 @@ namespace gui
             break;
         }
         auto operatorsOn = operatorsSettings->getOperatorsOn();
-        auto voLteOn     = operatorsSettings->getVoLTEOn();
 
         optList.emplace_back(std::make_unique<gui::option::OptionSettings>(
             utils::translate("app_settings_network_active_card") + ":" + simStr + " / " + phoneNumber,
@@ -114,6 +113,8 @@ namespace gui
             nullptr,
             nullptr));
 
+#if ENABLE_VOLTE == 1
+        auto voLteOn = operatorsSettings->getVoLTEOn();
         optList.emplace_back(std::make_unique<gui::option::OptionSettings>(
             utils::translate("app_settings_network_voice_over_lte"),
             [=](gui::Item &item) {
@@ -124,7 +125,7 @@ namespace gui
             nullptr,
             nullptr,
             voLteOn ? gui::option::SettingRightItem::On : gui::option::SettingRightItem::Off));
-
+#endif // ENABLE_VOLTE
         optList.emplace_back(std::make_unique<gui::option::OptionSettings>(
             utils::translate("app_settings_network_apn_settings"),
             [=](gui::Item &item) {
