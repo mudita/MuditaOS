@@ -105,6 +105,11 @@ if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
     endforeach()
 endif()
 
+option(ENABLE_VOLTE "Enable VoLTE" OFF)
+if(${ENABLE_VOLTE})
+    target_compile_definitions(${PROJECT_NAME} PUBLIC ENABLE_VOLTE=1)
+endif()
+
 include_directories( ../module-sys )
 include_directories( ../module-utils )
 include_directories( ../module-services )
