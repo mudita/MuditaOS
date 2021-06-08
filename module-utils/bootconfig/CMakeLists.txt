@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 3.12)
-
 project( utils-bootconfig VERSION 1.0
         DESCRIPTION "Library for processing boot config"
 )
