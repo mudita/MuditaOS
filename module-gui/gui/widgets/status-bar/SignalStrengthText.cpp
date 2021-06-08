@@ -22,9 +22,10 @@ namespace gui::status_bar
         label->setMaximumSize(style::header::status_bar::signal::maxX, style::header::status_bar::height);
     }
 
-    void SignalStrengthText::update()
+    void SignalStrengthText::update(const Store::SignalStrength &signal,
+                                    [[maybe_unused]] const Store::Network::Status &status)
     {
-        label->setText(utils::to_string(signalStrength.rssidBm) + " dBm");
+        label->setText(utils::to_string(signal.rssidBm) + " dBm");
     }
 
 } // namespace gui::status_bar
