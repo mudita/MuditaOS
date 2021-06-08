@@ -1,6 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.14)
-
-project(module-services VERSION 1.0
+﻿project(module-services VERSION 1.0
         DESCRIPTION "Library with all services.")
 
 module_is_test_entity()

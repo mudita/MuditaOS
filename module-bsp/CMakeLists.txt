@@ -1,8 +1,6 @@
 ﻿# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-cmake_minimum_required(VERSION 3.12)
-
 project(module-bsp VERSION 1.0
         DESCRIPTION "VFS module library")
 
