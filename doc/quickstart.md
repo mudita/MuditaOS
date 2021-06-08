@@ -74,8 +74,8 @@ git submodule update --init --recursive                        # initialize subm
 cd ./config/ && ./bootstrap.sh 0- && cd ../                    # bootstrap requirements
 ./configure.sh rt1051|linux Debug|Release|RelWithDebInfo       # configure build
 cd <build-dir>                                                 # build dir depends on configuration
-make -j                                                        # build
-./PurePhone                                                    # run PurePhone - simulator screen will pop up (on the Linux filesystem)
+make Pure                                               # build
+./PurePhone.elf                                                # run PurePhone - simulator screen will pop up (on the Linux filesystem)
 ```
 
 If you want to run the simulator with image and our VFS implementation
@@ -105,7 +105,7 @@ git submodule update --init --recursive
 cd ./config/ && ./bootstrap.sh 0- && cd ../
 ./configure.sh rt1051 RelWithDebInfo
 cd build-arm-RelWithDebInfo
-make -j
+make Pure
 
 ```
 
@@ -270,16 +270,7 @@ Please be aware that when building custom image you'll have to give it some tag 
 
 ## Preparing packages
 
-If you need a package, containing everything needed to run the application (on target device or Linux), in the build directory run the following command: `make package`
-
-After executing this command, the name of the package that was created will be displayed on the screen.
-
-Package name is: `PurePhone-<version>-<target>.<extension>`
-where:
-
-- `<version>`   - is read from the latest "release-x.y.z" tag
-- `<target>`    - RT1051 or Linux 
-- `<extension>` - `zip` for RT1051 and `tar.gz` for Linux
+If you need a package, containing everything needed to run the application, please check (build_targests.md)[./doc/build_targests.md] document.
 
 ## Generating code coverage reports
 

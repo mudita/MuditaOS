@@ -1,6 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.12)
-
-project(module-db VERSION 1.0
+﻿project(module-db VERSION 1.0
         DESCRIPTION "Database module library")
 
 module_is_test_entity()

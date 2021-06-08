@@ -1,6 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.12)
-
-if(NOT WIN32)
+﻿if(NOT WIN32)
     include(Colours)
 endif()
 

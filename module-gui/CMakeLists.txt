@@ -1,6 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.12)
-
-project(module-gui VERSION 1.0
+﻿project(module-gui VERSION 1.0
         DESCRIPTION "GUI library dedicated for pure phone.")
 
 module_is_test_entity()
