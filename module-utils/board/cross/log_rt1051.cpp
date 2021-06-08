@@ -5,7 +5,7 @@
 #include <critical.hpp>
 #include <macros.h>
 #include <log.hpp>
-#include "Logger.hpp"
+#include <Logger.hpp>
 #include "segger/rtt/SEGGER_RTT.h"
 #include <ticks.hpp>
 

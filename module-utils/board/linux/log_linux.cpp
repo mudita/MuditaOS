@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <log.hpp>
-#include "Logger.hpp"
+#include <Logger.hpp>
 #include <iostream>
 #include <string_view>
 #include <ticks.hpp>
