@@ -27,14 +27,7 @@ namespace app::onBoarding
     {
         if (inputEvent.isShortRelease()) {
             if (inputEvent.is(gui::KeyCode::KEY_ENTER)) {
-                auto metaData = std::make_unique<gui::DialogMetadataMessage>(
-                    gui::DialogMetadata{utils::translate("app_onboarding_title_update_info"),
-                                        "update_icon_W_G",
-                                        utils::translate("app_onboarding_update_info"),
-                                        "",
-                                        [=]() -> bool { return true; }});
-                application->switchWindow(
-                    gui::window::name::onBoarding_update, gui::ShowMode::GUI_SHOW_INIT, std::move(metaData));
+                application->switchWindow(gui::window::name::onBoarding_update, gui::ShowMode::GUI_SHOW_INIT);
                 return true;
             }
 
