@@ -191,7 +191,6 @@ std::optional<std::pair<at::response::qcfg_ims::IMSState, at::response::qcfg_ims
 
 at::Result::Code NetworkSettings::setVoLTEState(VoLTEState state)
 {
-
     /**
      * VoLTE On scenario
      * 1^) auto select off
@@ -226,6 +225,7 @@ at::Result::Code NetworkSettings::setVoLTEState(VoLTEState state)
     }
     LOG_DEBUG("Modem soft reboot");
     cellularService.resetCellularModule(ServiceCellular::ResetType::SoftReset);
+
     return at::Result::Code::OK;
 }
 
@@ -249,7 +249,6 @@ VoLTEState NetworkSettings::getVoLTEState()
 
 std::string NetworkSettings::printVoLTEDebug()
 {
-
     auto channel = cellularService.cmux->get(CellularMux::Channel::Commands);
     if (channel) {
         auto resp = channel->cmd("AT+QVOLTEDBG");
@@ -262,6 +261,5 @@ std::string NetworkSettings::printVoLTEDebug()
             return buffer;
         }
     }
-
     return {};
 }
