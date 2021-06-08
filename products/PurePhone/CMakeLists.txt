@@ -82,3 +82,7 @@ add_hex_target(PurePhone)
 add_standalone_image(PurePhone)
 add_update_package(PurePhone)
 
+include(GitHubWorkerMessages)
+github_message_standalone()
+github_message_update()
+

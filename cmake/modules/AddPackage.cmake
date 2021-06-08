@@ -1,5 +1,3 @@
-
-
 macro(set_cpack_vars)
     if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
         set(CPACK_SYSTEM_NAME "Linux")
@@ -33,11 +31,12 @@ function(add_standalone_image SOURCE_TARGET)
     set(CPACK_PACKAGE_NAME ${SOURCE_TARGET})
     set_cpack_vars()
 
-    set(PACKAGE_STANDALONE_MIME "application/x-xz")
-    set(PACKAGE_STANDALONE_FILE_NAME ${PACKAGE_COMMON_NAME}-image.tar.xz)
+    set(STANDALONE_PKG ${PACKAGE_COMMON_NAME}-image.tar.xz)
+    set(PACKAGE_STANDALONE_FILE_NAME ${STANDALONE_PKG} PARENT_SCOPE)
+    set(PACKAGE_STANDALONE_MIME "application/x-xz" PARENT_SCOPE)
 
     add_custom_target(${PACKAGE_COMMON_NAME}-package-standalone
-        COMMAND tar -ScJf ${PACKAGE_STANDALONE_FILE_NAME} ${SOURCE_TARGET}.img
+        COMMAND tar -ScJf ${STANDALONE_PKG} ${SOURCE_TARGET}.img
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         DEPENDS ${BIN_FILE} ${ECOBOOT_FILE}-target ${VERSION_JSON_FILE}-target ${SOURCE_TARGET}.img
         )
@@ -55,6 +54,10 @@ function(add_update_package SOURCE_TARGET)
     set(CPACK_PACKAGE_NAME ${SOURCE_TARGET})
     set_cpack_vars()
     set(UPDATE_PKG "${SOURCE_TARGET}-${CMAKE_PROJECT_VERSION}-${CPACK_SYSTEM_NAME}-Update.tar")
+
+    set(PACKAGE_UPDATE_FILE_NAME ${UPDATE_PKG} PARENT_SCOPE)
+    set(PACKAGE_UPDATE_MIME "application/x-tar" PARENT_SCOPE)
+
     add_custom_command(
         OUTPUT ${UPDATE_PKG}
         DEPENDS ${SOURCE_TARGET}

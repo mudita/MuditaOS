@@ -38,9 +38,9 @@ jobs:
         echo "JOBS=${JOBS}" &&  \
         ./configure.sh rt1051 RelWithDebInfo -G Ninja && \
         pushd build-rt1051-RelWithDebInfo && \
-        ninja -j ${JOBS} && \
-        ninja -j ${JOBS} package-update && \
-        ninja -j ${JOBS} package-standalone && \
+        ninja -j ${JOBS} Pure&& \
+        ninja -j ${JOBS} PurePhone-UpdatePackage && \
+        ninja -j ${JOBS} PurePhone-StandaloneImage && \
         popd && \
         ./print_last_changes.sh && \
         uptime

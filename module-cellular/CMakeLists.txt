@@ -1,6 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.12)
-
-project(module-cellular VERSION 1.0
+﻿project(module-cellular VERSION 1.0
         DESCRIPTION "Cellular module library")
 
 include(SerialPort)
