@@ -245,8 +245,9 @@ namespace gui::status_bar
 
     void StatusBar::showSignalStrength(bool enabled)
     {
-        auto signalStrength = Store::GSM::get()->getSignalStrength();
-        signal->update(signalStrength);
+        const auto signalStrength = Store::GSM::get()->getSignalStrength();
+        const auto networkStatus  = Store::GSM::get()->getNetwork().status;
+        signal->update(signalStrength, networkStatus);
         enabled ? signal->show() : signal->hide();
     }
 

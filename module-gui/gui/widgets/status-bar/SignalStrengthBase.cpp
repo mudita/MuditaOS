@@ -11,10 +11,4 @@ namespace gui::status_bar
         setEdges(RectangleEdge::None);
         setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Bottom));
     }
-
-    void SignalStrengthBase::update(const Store::SignalStrength &data)
-    {
-        signalStrength = data;
-        update();
-    }
 } // namespace gui::status_bar
