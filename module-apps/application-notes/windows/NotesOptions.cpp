@@ -27,7 +27,7 @@ namespace app::notes
         void removeNote(const NotesRecord &record, Application *application, AbstractNotesRepository &notesRepository)
         {
             auto metaData = std::make_unique<gui::DialogMetadataMessage>(
-                gui::DialogMetadata{utils::translate("app_alarm_clock_title_main"),
+                gui::DialogMetadata{record.snippet,
                                     "phonebook_contact_delete_trashcan",
                                     utils::translate("app_notes_note_delete_confirmation"),
                                     "",
