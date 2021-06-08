@@ -1,6 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.12)
-
-add_catch2_executable(
+﻿add_catch2_executable(
     NAME
         utils-conditional-invoke-tests
     SRCS

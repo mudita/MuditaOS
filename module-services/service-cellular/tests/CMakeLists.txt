@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 3.12)
-
 add_catch2_executable(
         NAME
         cellular-request-factory

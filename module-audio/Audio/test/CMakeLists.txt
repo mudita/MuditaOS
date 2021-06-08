@@ -1,4 +1,3 @@
-cmake_minimum_required(VERSION 3.12)
 
 # audio tests
 add_catch2_executable(
