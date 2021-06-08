@@ -9,17 +9,17 @@ namespace gui
 {
     class Label;
 }
+
 namespace gui::status_bar
 {
     class SignalStrengthText : public SignalStrengthBase
     {
-      private:
-        Label *label = nullptr;
-
-      protected:
-        void update() override;
-
       public:
         SignalStrengthText(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
+        void update(const Store::SignalStrength &signal,
+                    [[maybe_unused]] const Store::Network::Status &status) override;
+
+      private:
+        Label *label = nullptr;
     };
 } // namespace gui::status_bar
