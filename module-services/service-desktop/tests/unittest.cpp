@@ -226,8 +226,7 @@ TEST_CASE("Context class test")
         REQUIRE(context.getMethod() == http::Method::get);
         REQUIRE(context.getUuid() == 12345);
         REQUIRE(context.getEndpoint() == EndpointType::contacts);
-        REQUIRE(context.createSimpleResponse() ==
-                R"(#000000059{"body": null, "endpoint": 7, "status": 200, "uuid": 12345})");
+        REQUIRE(context.createSimpleResponse() == R"(#000000045{"endpoint": 7, "status": 200, "uuid": 12345})");
 
         context.setResponseBody(context.getBody());
         REQUIRE(context.createSimpleResponse() ==

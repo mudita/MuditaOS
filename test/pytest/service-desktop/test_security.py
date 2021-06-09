@@ -12,8 +12,8 @@ from harness.interface.defs import status
 def test_security_phone_unlocked(harness):
     body = {}
 
-    ret = harness.endpoint_request("deviceInfo", "get", body)
-    assert ret["status"] == status["OK"]
+    ret = harness.endpoint_request("usbSecurity", "get", body)
+    assert ret["status"] == status["NoContent"]
 
 
 @pytest.mark.service_desktop_test
