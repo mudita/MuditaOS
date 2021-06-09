@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -26,7 +26,7 @@ class CalllogEndpoint : public parserFSM::Endpoint
     std::unique_ptr<parserFSM::CalllogHelper> helper;
 
   public:
-    CalllogEndpoint(sys::Service *_ownerServicePtr) : Endpoint(_ownerServicePtr)
+    explicit CalllogEndpoint(sys::Service *_ownerServicePtr) : Endpoint(_ownerServicePtr)
     {
         debugName = "CalllogEndpoint";
         helper    = std::make_unique<parserFSM::CalllogHelper>(ownerServicePtr);

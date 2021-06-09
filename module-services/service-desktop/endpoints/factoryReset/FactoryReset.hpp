@@ -15,6 +15,6 @@ namespace FactoryReset
 {
     bool Run(sys::Service *ownerService);
     bool DeleteSelectedUserFiles(const std::filesystem::path &userOSPath);
-    bool DeleteDirContent(std::string dir);
-    bool CopyDirContent(std::string sourcedir, std::string targetdir);
+    bool DeleteDirContent(const std::string &dir);
+    bool CopyDirContent(const std::string &sourcedir, const std::string &targetdir);
 } // namespace FactoryReset

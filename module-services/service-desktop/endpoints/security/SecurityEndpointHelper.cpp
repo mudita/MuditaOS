@@ -44,7 +44,7 @@ auto SecurityEndpointHelper::processStatus(Context &context) -> http::Code
         preventBlockingDevice();
     }
 
-    return security == EndpointSecurity::Allow ? http::Code::OK : http::Code::Forbidden;
+    return security == EndpointSecurity::Allow ? http::Code::NoContent : http::Code::Forbidden;
 }
 
 auto SecurityEndpointHelper::passCodeArrayToVecOfInts(const json11::Json::array &passCode) -> std::vector<unsigned int>
@@ -73,7 +73,9 @@ auto SecurityEndpointHelper::processConfiguration(Context &context) -> http::Cod
     if (passCode.size() == PasscodeLength) {
         try {
             auto msg = std::make_shared<locks::ExternalUnLockPhone>(passCodeArrayToVecOfInts(passCode));
-            status   = toCode(owner->bus.sendUnicast(std::move(msg), app::manager::ApplicationManager::ServiceName));
+            status   = owner->bus.sendUnicast(std::move(msg), app::manager::ApplicationManager::ServiceName)
+                         ? http::Code::NoContent
+                         : http::Code::InternalServerError;
         }
         catch (const std::exception &e) {
             LOG_ERROR("Passcode decoding exception: %s", e.what());

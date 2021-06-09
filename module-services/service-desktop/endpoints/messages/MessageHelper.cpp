@@ -165,7 +165,7 @@ namespace parserFSM
 
     auto MessageHelper::createSMS(Context &context) -> sys::ReturnCodes
     {
-        context.setResponseStatus(http::Code::InternalServerError);
+        context.setResponseStatus(http::Code::NotImplemented);
         MessageHandler::putToSendQueue(context.createSimpleResponse());
         return sys::ReturnCodes::Success;
     }
@@ -182,7 +182,7 @@ namespace parserFSM
             [=](db::QueryResult *result, Context context) {
                 if (auto smsTemplateResult = dynamic_cast<db::query::SMSRemoveResult *>(result)) {
 
-                    context.setResponseStatus(smsTemplateResult->getResults() ? http::Code::OK
+                    context.setResponseStatus(smsTemplateResult->getResults() ? http::Code::NoContent
                                                                               : http::Code::InternalServerError);
                     MessageHandler::putToSendQueue(context.createSimpleResponse());
                     return true;
@@ -238,7 +238,7 @@ namespace parserFSM
             [=](db::QueryResult *result, Context context) {
                 if (auto smsTemplateResult = dynamic_cast<db::query::SMSTemplateUpdateResult *>(result)) {
 
-                    context.setResponseStatus(smsTemplateResult->getResult() ? http::Code::OK
+                    context.setResponseStatus(smsTemplateResult->getResult() ? http::Code::NoContent
                                                                              : http::Code::InternalServerError);
                     MessageHandler::putToSendQueue(context.createSimpleResponse());
                     return true;
@@ -271,7 +271,7 @@ namespace parserFSM
             [=](db::QueryResult *result, Context context) {
                 if (auto smsTemplateResult = dynamic_cast<db::query::SMSTemplateAddResult *>(result)) {
 
-                    context.setResponseStatus(smsTemplateResult->getResult() ? http::Code::OK
+                    context.setResponseStatus(smsTemplateResult->getResult() ? http::Code::NoContent
                                                                              : http::Code::InternalServerError);
                     MessageHandler::putToSendQueue(context.createSimpleResponse());
                     return true;
@@ -303,7 +303,7 @@ namespace parserFSM
             [=](db::QueryResult *result, Context context) {
                 if (auto smsTemplateResult = dynamic_cast<db::query::SMSTemplateRemoveResult *>(result)) {
 
-                    context.setResponseStatus(smsTemplateResult->getResults() ? http::Code::OK
+                    context.setResponseStatus(smsTemplateResult->getResults() ? http::Code::NoContent
                                                                               : http::Code::InternalServerError);
                     MessageHandler::putToSendQueue(context.createSimpleResponse());
                     return true;
@@ -337,7 +337,7 @@ namespace parserFSM
                         auto theResults = threadsResults->getResults();
                         threadsArray.reserve(theResults.size());
                         for (auto &record : theResults) {
-                            threadsArray.emplace_back(MessageHelper::toJson(std::move(record)));
+                            threadsArray.emplace_back(MessageHelper::toJson(record));
                         }
                         context.setResponseBody(std::move(threadsArray));
                         context.setTotalCount(threadsResults->getTotalCount());
@@ -384,7 +384,7 @@ namespace parserFSM
             [=](db::QueryResult *result, Context context) {
                 if (auto threadResult = dynamic_cast<db::query::MarkAsReadResult *>(result)) {
 
-                    context.setResponseStatus(threadResult->getResult() ? http::Code::OK
+                    context.setResponseStatus(threadResult->getResult() ? http::Code::NoContent
                                                                         : http::Code::InternalServerError);
                     MessageHandler::putToSendQueue(context.createSimpleResponse());
                     return true;
@@ -404,7 +404,7 @@ namespace parserFSM
 
     auto MessageHelper::deleteThread(Context &context) -> sys::ReturnCodes
     {
-        context.setResponseStatus(http::Code::InternalServerError);
+        context.setResponseStatus(http::Code::NotImplemented);
         MessageHandler::putToSendQueue(context.createSimpleResponse());
         return sys::ReturnCodes::Success;
     }
