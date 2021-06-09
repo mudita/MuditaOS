@@ -47,14 +47,18 @@ auto SecurityEndpointHelper::processStatus(Context &context) -> http::Code
     return security == EndpointSecurity::Allow ? http::Code::OK : http::Code::Forbidden;
 }
 
-auto SecurityEndpointHelper::passCodeStringToVecOfInts(const std::string &passCode) -> std::vector<unsigned int>
+auto SecurityEndpointHelper::passCodeArrayToVecOfInts(const json11::Json::array &passCode) -> std::vector<unsigned int>
 {
     std::vector<unsigned int> passCodeAsInts(0, 0);
 
-    for (auto i = 0u; i < passCode.length(); i++) {
-        auto c         = passCode.at(i);
-        unsigned int v = std::atoi(&c);
-        passCodeAsInts.push_back(v);
+    for (const auto &value : passCode) {
+        if (value.is_number()) {
+            auto v = value.number_value();
+            passCodeAsInts.push_back(v);
+        }
+        else {
+            throw std::invalid_argument("value not a digit");
+        }
     }
 
     return passCodeAsInts;
@@ -63,14 +67,18 @@ auto SecurityEndpointHelper::passCodeStringToVecOfInts(const std::string &passCo
 auto SecurityEndpointHelper::processConfiguration(Context &context) -> http::Code
 {
     auto body     = context.getBody();
-    auto passCode = body[json::usb::phoneLockCode].string_value();
+    auto passCode = body[json::usb::phoneLockCode].array_items();
+    http::Code status{http::Code::BadRequest};
 
-    if (passCode.length() != PasscodeLength) {
-        return http::Code::BadRequest;
+    if (passCode.size() == PasscodeLength) {
+        try {
+            auto msg = std::make_shared<locks::ExternalUnLockPhone>(passCodeArrayToVecOfInts(passCode));
+            status   = toCode(owner->bus.sendUnicast(std::move(msg), app::manager::ApplicationManager::ServiceName));
+        }
+        catch (const std::exception &e) {
+            LOG_ERROR("Passcode decoding exception: %s", e.what());
+        }
     }
-    auto passCodeAsInts = passCodeStringToVecOfInts(passCode);
 
-    auto msg = std::make_shared<locks::ExternalUnLockPhone>(passCodeAsInts);
-
-    return toCode(owner->bus.sendUnicast(std::move(msg), app::manager::ApplicationManager::ServiceName));
+    return status;
 }

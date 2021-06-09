@@ -93,9 +93,21 @@ def test_security_unlock_phone(harness):
     Attempt unlocking with wrong passcode: 1111
     Assuming 1111 is not the actual passcode :-)
     """
-    body = {"phoneLockCode": "1111"}
+    body = {"phoneLockCode": [1, 1, 1, 1]}
     ret = harness.endpoint_request("usbSecurity", "put", body)
     assert ret["status"] == status["OK"]
+
+    time.sleep(.1)
+
+    body = {}
+    ret = harness.endpoint_request("usbSecurity", "get", body)
+    assert ret["status"] == status["Forbidden"]
+
+    time.sleep(.1)
+
+    body = {"phoneLockCode": ['a', 'a', 'a', 'a']}
+    ret = harness.endpoint_request("usbSecurity", "put", body)
+    assert ret["status"] == status["BadRequest"]
 
     time.sleep(.1)
 
@@ -108,7 +120,7 @@ def test_security_unlock_phone(harness):
     """
     Attempt unlocking with too short passcode: 1
     """
-    body = {"phoneLockCode": "1"}
+    body = {"phoneLockCode": [1]}
     ret = harness.endpoint_request("usbSecurity", "put", body)
     assert ret["status"] == status["BadRequest"]
 
@@ -124,7 +136,7 @@ def test_security_unlock_phone(harness):
     Attempt unlocking with correct passcode: 3333
     Assuming 3333 is the actual passcode :-)
     """
-    body = {"phoneLockCode": "3333"}
+    body = {"phoneLockCode": [3, 3, 3, 3]}
     ret = harness.endpoint_request("usbSecurity", "put", body)
     assert ret["status"] == status["OK"]
 
