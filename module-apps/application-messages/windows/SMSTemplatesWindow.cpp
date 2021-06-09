@@ -73,6 +73,7 @@ namespace gui
 
     void SMSTemplatesWindow::smsSendTemplateRequestHandler(const SMSSendTemplateRequest *const switchData)
     {
+        preventsAutoLock = switchData->isAutoLockPrevented();
         auto app = dynamic_cast<app::ApplicationMessages *>(application);
         assert(app != nullptr);
 
@@ -89,6 +90,7 @@ namespace gui
 
     void SMSTemplatesWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
+        preventsAutoLock = false;
         if (mode == ShowMode::GUI_SHOW_INIT) {
             list->rebuildList();
         }

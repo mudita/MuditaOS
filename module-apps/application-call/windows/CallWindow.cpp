@@ -136,9 +136,11 @@ namespace gui
         };
         sendSmsIcon->activatedCallback = [=](gui::Item &item) {
             LOG_INFO("Send message template and reject the call");
-            return app::manager::Controller::sendAction(application,
-                                                        app::manager::actions::ShowSmsTemplates,
-                                                        std::make_unique<SMSSendTemplateRequest>(phoneNumber));
+            constexpr auto preventAutoLock = true;
+            return app::manager::Controller::sendAction(
+                application,
+                app::manager::actions::ShowSmsTemplates,
+                std::make_unique<SMSSendTemplateRequest>(phoneNumber, preventAutoLock));
         };
 
         // define navigation between icons
