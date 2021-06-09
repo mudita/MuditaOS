@@ -31,7 +31,7 @@ struct FileInfo
 class UpdateMuditaOS : public updateos::UpdateStats
 {
   public:
-    UpdateMuditaOS(ServiceDesktop *ownerService);
+    explicit UpdateMuditaOS(ServiceDesktop *ownerService);
 
     updateos::UpdateError runUpdate();
     updateos::UpdateError prepareTempDirForUpdate(const std::filesystem::path &temporaryPath,
@@ -42,13 +42,13 @@ class UpdateMuditaOS : public updateos::UpdateStats
     updateos::UpdateError updateBootloader();
     updateos::UpdateError prepareRoot();
     updateos::UpdateError updateBootJSON();
-    updateos::UpdateError setUpdateFile(const std::filesystem::path &updatesOSPath, fs::path updateFileToUse);
+    updateos::UpdateError setUpdateFile(const std::filesystem::path &updatesOSPath, const fs::path &updateFileToUse);
     updateos::UpdateError cleanupAfterUpdate();
     updateos::UpdateError updateUserData();
 
     updateos::UpdateError informError(updateos::UpdateError errorCode, const char *format, ...);
     void informDebug(const char *format, ...);
-    void informUpdate(const updateos::UpdateState statusCode, const char *format, ...);
+    void informUpdate(updateos::UpdateState statusCode, const char *format, ...);
 
     updateos::UpdateError writeBootloader(fs::path bootloaderFile);
 

@@ -4,6 +4,7 @@
 #pragma once
 
 #include <module-services/service-desktop/parser/ParserUtils.hpp>
+#include <utility>
 #include "ResponseContext.hpp"
 
 namespace parserFSM
@@ -40,7 +41,7 @@ namespace parserFSM
 
         auto validate() -> void
         {
-            if (body.is_object() == false) {
+            if (!body.is_object()) {
                 body = json11::Json();
             }
             if (static_cast<int>(endpoint) > lastEndpoint) {
@@ -83,16 +84,22 @@ namespace parserFSM
 
         virtual auto createSimpleResponse(const std::string &entryTitle = json::entries) -> std::string
         {
-            json11::Json responseJson = json11::Json::object{{json::endpoint, static_cast<int>(getEndpoint())},
-                                                             {json::status, static_cast<int>(responseContext.status)},
-                                                             {json::uuid, getUuid()},
-                                                             {json::body, responseContext.body}};
+            json11::Json::object contextJsonObject =
+                json11::Json::object{{json::endpoint, static_cast<int>(getEndpoint())},
+                                     {json::status, static_cast<int>(responseContext.status)},
+                                     {json::uuid, getUuid()}};
+            if (!responseContext.body.is_null()) {
+                contextJsonObject[json::body] = responseContext.body;
+            }
+
+            const json11::Json responseJson{std::move(contextJsonObject)};
+
             return buildResponseStr(responseJson.dump().size(), responseJson.dump());
         }
 
         auto setResponse(endpoint::ResponseContext r)
         {
-            responseContext = r;
+            responseContext = std::move(r);
         }
 
         auto setResponseStatus(http::Code status)

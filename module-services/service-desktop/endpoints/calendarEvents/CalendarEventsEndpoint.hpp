@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -14,7 +14,7 @@ class CalendarEventsEndpoint : public parserFSM::Endpoint
     std::unique_ptr<parserFSM::CalendarEventsHelper> helper;
 
   public:
-    CalendarEventsEndpoint(sys::Service *_ownerServicePtr) : Endpoint(_ownerServicePtr)
+    explicit CalendarEventsEndpoint(sys::Service *_ownerServicePtr) : Endpoint(_ownerServicePtr)
     {
         helper = std::make_unique<parserFSM::CalendarEventsHelper>(ownerServicePtr);
     }

@@ -27,7 +27,7 @@ namespace FactoryReset
         inline constexpr auto copy_buf = 8192 * 4;
     } // namespace
 
-    static bool CopyFile(std::string sourcefile, std::string targetfile);
+    static bool CopyFile(const std::string &sourcefile, const std::string &targetfile);
 
     static int recurseDepth            = 0;
     static const int max_recurse_depth = 120; /* 120 is just an arbitrary value of max number of recursive calls.
@@ -39,8 +39,8 @@ namespace FactoryReset
     {
         LOG_INFO("Restoring factory state started...");
 
-        recurseDepth             = 0;
-        const auto userOSPath    = purefs::dir::getUserDiskPath();
+        recurseDepth          = 0;
+        const auto userOSPath = purefs::dir::getUserDiskPath();
 
         if (std::filesystem::is_directory(userOSPath.c_str()) && std::filesystem::is_empty(userOSPath.c_str())) {
             LOG_ERROR("Restoring factory state aborted");
@@ -71,7 +71,7 @@ namespace FactoryReset
             for (const auto &ext : selectedFileExt) {
                 if (f.path().extension() == ext) {
                     auto removeStatus = std::filesystem::remove(f.path());
-                    if (removeStatus == false) {
+                    if (!removeStatus) {
                         LOG_ERROR("Error deleting file %s, aborting...", f.path().c_str());
                         returnStatus = false;
                     }
@@ -85,34 +85,34 @@ namespace FactoryReset
         return returnStatus;
     }
 
-    bool DeleteDirContent(std::string dir)
+    bool DeleteDirContent(const std::string &dir)
     {
         for (auto &direntry : std::filesystem::directory_iterator(dir.c_str())) {
-            if ((direntry.path().string().compare(".") != 0) && (direntry.path().string().compare("..") != 0) &&
-                (direntry.path().string().compare("...") != 0)) {
+            if (!((direntry.path().string() != ".") && (direntry.path().string() != "..") &&
+                  (direntry.path().string() != "..."))) {
+                continue;
+            }
+            std::string delpath = dir;
+            delpath += "/";
+            delpath += direntry.path().string();
 
-                std::string delpath = dir;
-                delpath += "/";
-                delpath += direntry.path().string().c_str();
-
-                if (std::filesystem::is_directory(direntry)) {
-                    if (direntry.path().string().compare(purefs::dir::getFactoryOSPath()) != 0) {
-                        LOG_INFO("FactoryReset: recursively deleting dir %s...", delpath.c_str());
-                        try {
-                            std::filesystem::remove_all(delpath.c_str());
-                        }
-                        catch (const std::filesystem::filesystem_error &e) {
-                            LOG_ERROR("FactoryReset: error deleting dir %s, aborting...", delpath.c_str());
-                            return false;
-                        }
+            if (std::filesystem::is_directory(direntry)) {
+                if (direntry.path().string() != purefs::dir::getFactoryOSPath()) {
+                    LOG_INFO("FactoryReset: recursively deleting dir %s...", delpath.c_str());
+                    try {
+                        std::filesystem::remove_all(delpath.c_str());
                     }
-                }
-                else {
-                    LOG_INFO("FactoryReset: deleting file %s...", delpath.c_str());
-                    if (std::filesystem::remove(delpath.c_str())) {
-                        LOG_ERROR("FactoryReset: error deleting file %s, aborting...", delpath.c_str());
+                    catch (const std::filesystem::filesystem_error &e) {
+                        LOG_ERROR("FactoryReset: error deleting dir %s, aborting...", delpath.c_str());
                         return false;
                     }
+                }
+            }
+            else {
+                LOG_INFO("FactoryReset: deleting file %s...", delpath.c_str());
+                if (std::filesystem::remove(delpath.c_str())) {
+                    LOG_ERROR("FactoryReset: error deleting file %s, aborting...", delpath.c_str());
+                    return false;
                 }
             }
         }
@@ -120,7 +120,7 @@ namespace FactoryReset
         return true;
     }
 
-    bool CopyDirContent(std::string sourcedir, std::string targetdir)
+    bool CopyDirContent(const std::string &sourcedir, const std::string &targetdir)
     {
         if (recurseDepth >= max_recurse_depth) {
             LOG_ERROR("FactoryReset: recurse level %d (too high), error assumed, skipping restore of dir %s",
@@ -132,18 +132,18 @@ namespace FactoryReset
         const auto factoryOSPath = purefs::dir::getFactoryOSPath();
 
         for (auto &direntry : std::filesystem::directory_iterator(sourcedir.c_str())) {
-            if ((direntry.path().string().compare(".") == 0) || (direntry.path().string().compare("..") == 0) ||
-                (direntry.path().string().compare("...") == 0)) {
+            if ((direntry.path().string() == ".") || (direntry.path().string() == "..") ||
+                (direntry.path().string() == "...")) {
                 continue;
             }
 
             std::string sourcepath = sourcedir;
             sourcepath += "/";
-            sourcepath += direntry.path().string().c_str();
+            sourcepath += direntry.path().string();
 
             std::string targetpath = targetdir;
             targetpath += "/";
-            targetpath += direntry.path().string().c_str();
+            targetpath += direntry.path().string();
 
             if ((sourcepath.size() >= max_filepath_length) || (targetpath.size() >= max_filepath_length)) {
                 LOG_ERROR("FactoryReset: path length (source or target) exceeds system limit of %d",
@@ -153,7 +153,7 @@ namespace FactoryReset
             }
 
             if (std::filesystem::is_directory(direntry)) {
-                if (targetpath.compare(factoryOSPath.c_str()) == 0) {
+                if (targetpath == factoryOSPath) {
                     continue;
                 }
 
@@ -172,7 +172,7 @@ namespace FactoryReset
 
                 recurseDepth++;
 
-                if (CopyDirContent(sourcepath, targetpath) != true) {
+                if (!CopyDirContent(sourcepath, targetpath)) {
                     recurseDepth--;
                     return false;
                 }
@@ -182,7 +182,7 @@ namespace FactoryReset
             else {
                 LOG_INFO("FactoryReset: restoring file %s into %s...", sourcepath.c_str(), targetpath.c_str());
 
-                if (CopyFile(sourcepath, targetpath) != true) {
+                if (!CopyFile(sourcepath, targetpath)) {
                     return false;
                 }
             }
@@ -191,7 +191,7 @@ namespace FactoryReset
         return true;
     }
 
-    static bool CopyFile(std::string sourcefile, std::string targetfile)
+    static bool CopyFile(const std::string &sourcefile, const std::string &targetfile)
     {
         bool ret  = true;
         auto lamb = [](std::FILE *stream) { std::fclose(stream); };
@@ -199,10 +199,10 @@ namespace FactoryReset
         std::unique_ptr<std::FILE, decltype(lamb)> sf(std::fopen(sourcefile.c_str(), "r"), lamb);
         std::unique_ptr<std::FILE, decltype(lamb)> tf(std::fopen(targetfile.c_str(), "w"), lamb);
 
-        if ((sf.get() != nullptr) && (tf.get() != nullptr)) {
+        if (sf && tf) {
             std::unique_ptr<unsigned char[]> buffer(new unsigned char[copy_buf]);
 
-            if (buffer.get() != nullptr) {
+            if (buffer) {
                 uint32_t loopcount = (std::filesystem::file_size(sourcefile) / copy_buf) + 1u;
                 uint32_t readsize  = copy_buf;
 
