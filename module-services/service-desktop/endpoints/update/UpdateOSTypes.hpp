@@ -7,8 +7,6 @@
 #include <purefs/filesystem_paths.hpp>
 
 namespace fs = std::filesystem;
-
-namespace fs = std::filesystem;
 namespace updateos
 {
     inline constexpr auto initSysVer = "0.00.0";
@@ -97,7 +95,7 @@ namespace updateos
         uint32_t currentExtractedBytes = 0;
         uint32_t fileExtractedSize     = 0;
         uint32_t uuid                  = 0;
-        std::string messageText        = "";
+        std::string messageText;
         updateos::UpdateState status;
         json11::Json versionInformation;
     };
@@ -113,8 +111,8 @@ namespace updateos
         {
             return json11::Json::object{{updateos::settings::startTime, std::to_string(startTime)},
                                         {updateos::settings::endTime, std::to_string(endTime)},
-                                        {updateos::settings::finishedState, (int)finishedState},
-                                        {updateos::settings::finishedError, (int)finishedError},
+                                        {updateos::settings::finishedState, static_cast<int>(finishedState)},
+                                        {updateos::settings::finishedError, static_cast<int>(finishedError)},
                                         {updateos::settings::fromVersion, fromVersion},
                                         {updateos::settings::toVersion, toVersion}};
         }
