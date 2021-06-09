@@ -53,7 +53,7 @@ UpdateMuditaOS::UpdateMuditaOS(ServiceDesktop *ownerService) : owner(ownerServic
 }
 
 updateos::UpdateError UpdateMuditaOS::setUpdateFile(const std::filesystem::path &updatesOSPath,
-                                                    fs::path updateFileToUse)
+                                                    const fs::path &updateFileToUse)
 {
     if (isUpdateToBeAborted()) {
         setUpdateAbortFlag(false);
@@ -338,7 +338,7 @@ updateos::UpdateError UpdateMuditaOS::updateBootloader()
 
 unsigned long UpdateMuditaOS::getExtractedFileCRC32(const std::string &filePath)
 {
-    for (auto file : filesInUpdatePackage) {
+    for (const auto &file : filesInUpdatePackage) {
         if (file.fileName == filePath) {
             return file.fileCRC32;
         }
@@ -448,7 +448,7 @@ updateos::UpdateError UpdateMuditaOS::updateBootJSON()
 
         auto *fpCRC = std::fopen(bootJSONAbsoulte.c_str(), "w");
         if (fpCRC != nullptr) {
-            std::array<char, boot::consts::crc_char_size + 1> crcBuf;
+            std::array<char, boot::consts::crc_char_size + 1> crcBuf{};
             snprintf(crcBuf.data(), crcBuf.size(), "%lX", bootJSONAbsoulteCRC);
             std::fwrite(crcBuf.data(), 1, boot::consts::crc_char_size, fpCRC);
             std::fclose(fpCRC);
@@ -544,7 +544,7 @@ updateos::UpdateError UpdateMuditaOS::cleanupAfterUpdate()
 
     try {
         mtar_close(&updateTar);
-        if (std::remove(updateFile.c_str())) {
+        if (std::remove(updateFile.c_str()) != 0) {
             return informError(updateos::UpdateError::CantRemoveUpdateFile, "Failed to delete %s", updateFile.c_str());
         }
     }
@@ -561,10 +561,12 @@ updateos::UpdateError UpdateMuditaOS::cleanupAfterUpdate()
 
 const fs::path UpdateMuditaOS::getUpdateTmpChild(const fs::path &childPath)
 {
-    if (childPath.string().rfind("./", 0) == 0)
+    if (childPath.string().rfind("./", 0) == 0) {
         return updateTempDirectory / childPath.string().substr(2);
-    else
+    }
+    else {
         return updateTempDirectory / childPath;
+    }
 }
 
 updateos::UpdateError UpdateMuditaOS::prepareTempDirForUpdate(const std::filesystem::path &temporaryPath,
@@ -872,8 +874,9 @@ void UpdateMuditaOS::informUpdateWindow()
     auto msgToSend = std::make_shared<sdesktop::UpdateOsMessage>(updateos::UpdateMessageType::UpdateNow, file);
     msgToSend->updateStats.versionInformation = UpdateMuditaOS::getVersionInfoFromFile(file);
     msgToSend->updateStats.status             = status;
-    if (owner)
+    if (owner != nullptr) {
         owner->bus.sendUnicast(msgToSend, app::name_desktop);
+    }
 }
 
 void UpdateMuditaOS::storeRunStatusInDB()
@@ -902,7 +905,7 @@ void UpdateMuditaOS::storeRunStatusInDB()
             }
         }
 
-        if (statusRunFound == false) {
+        if (!statusRunFound) {
             // if our element was not found, insert it
             tempTable.emplace_back(updateRunStatus);
         }

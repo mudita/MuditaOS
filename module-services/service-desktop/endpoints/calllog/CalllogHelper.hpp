@@ -27,7 +27,7 @@ namespace parserFSM
     class CalllogHelper : public DBHelper
     {
       public:
-        CalllogHelper(sys::Service *_ownerServicePtr) : DBHelper(_ownerServicePtr){};
+        explicit CalllogHelper(sys::Service *_ownerServicePtr) : DBHelper(_ownerServicePtr){};
 
         auto createDBEntry(Context &context) -> sys::ReturnCodes override;
         auto requestDataFromDB(Context &context) -> sys::ReturnCodes override;

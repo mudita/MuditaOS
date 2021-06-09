@@ -19,18 +19,13 @@ auto FilesystemEndpoint::handle(Context &context) -> void
         break;
     }
 }
-static bool isWritable(const fs::path file)
+static bool isWritable(const fs::path &file)
 {
     auto lamb = [](std::FILE *stream) { std::fclose(stream); };
 
     std::unique_ptr<std::FILE, decltype(lamb)> sf(std::fopen(file.c_str(), "w"), lamb);
 
-    if (sf.get() != nullptr) {
-        return true;
-    }
-    else {
-        return false;
-    }
+    return static_cast<bool>(sf);
 }
 
 auto FilesystemEndpoint::run(Context &context) -> sys::ReturnCodes
