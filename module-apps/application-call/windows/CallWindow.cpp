@@ -452,13 +452,13 @@ namespace gui
     void CallWindow::setCallEndMessage()
     {
         switch (callEndType) {
+        case CallEndType::None:
+            [[fallthrough]];
         case CallEndType::Ended:
             durationLabel->setText(utils::translate(strings::callended));
             break;
         case CallEndType::Rejected:
             durationLabel->setText(utils::translate(strings::callrejected));
-            break;
-        case CallEndType::None:
             break;
         }
     }
