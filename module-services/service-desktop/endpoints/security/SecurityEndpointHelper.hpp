@@ -32,6 +32,6 @@ namespace parserFSM
         auto processStatus(Context &context) -> http::Code;
         auto processConfiguration(Context &context) -> http::Code;
 
-        auto passCodeStringToVecOfInts(const std::string &passCode) -> std::vector<unsigned int>;
+        auto passCodeArrayToVecOfInts(const json11::Json::array &passCode) -> std::vector<unsigned int>;
     };
 } // namespace parserFSM
