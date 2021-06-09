@@ -379,7 +379,7 @@ TESTS_LIST["catch2-utils-ucs2"]="
     UTF8 to UCS2 long string conversion;
 "
 #---------
-TESTS_LIST["catch2-utils-utf8"]="
+TESTS_LIST["catch2-utf8"]="
     UTF8: operator index returns value;
     UTF8: operator index exceeds string size;
     UTF8: operator== returns properly;
