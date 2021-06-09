@@ -20,7 +20,7 @@ namespace sys
 class RestoreEndpoint : public parserFSM::Endpoint
 {
   public:
-    RestoreEndpoint(sys::Service *ownerServicePtr) : Endpoint(ownerServicePtr)
+    explicit RestoreEndpoint(sys::Service *ownerServicePtr) : Endpoint(ownerServicePtr)
     {
         debugName = "RestoreEndpoint";
     }

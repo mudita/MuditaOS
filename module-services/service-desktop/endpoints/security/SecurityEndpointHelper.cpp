@@ -44,7 +44,7 @@ auto SecurityEndpointHelper::processStatus(Context &context) -> http::Code
         preventBlockingDevice();
     }
 
-    return security == EndpointSecurity::Allow ? http::Code::OK : http::Code::Forbidden;
+    return security == EndpointSecurity::Allow ? http::Code::NoContent : http::Code::Forbidden;
 }
 
 auto SecurityEndpointHelper::passCodeStringToVecOfInts(const std::string &passCode) -> std::vector<unsigned int>

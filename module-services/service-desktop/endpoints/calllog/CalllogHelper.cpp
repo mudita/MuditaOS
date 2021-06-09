@@ -47,7 +47,7 @@ auto CalllogHelper::requestDataFromDB(Context &context) -> sys::ReturnCodes
                     auto recordsPtr = std::make_unique<std::vector<CalllogRecord>>(contactResult->getRecords());
                     json11::Json::array calllogArray;
 
-                    for (auto record : *recordsPtr.get()) {
+                    for (const auto &record : *recordsPtr) {
                         calllogArray.emplace_back(CalllogHelper::to_json(record));
                     }
 
@@ -102,7 +102,7 @@ auto CalllogHelper::getCalllogByContactID(Context &context) -> sys::ReturnCodes
                 auto records = calllogResult->getResults();
                 json11::Json::array calllogArray;
 
-                for (auto record : records) {
+                for (const auto &record : records) {
                     calllogArray.emplace_back(CalllogHelper::to_json(record));
                 }
 
@@ -133,7 +133,7 @@ auto CalllogHelper::deleteDBEntry(Context &context) -> sys::ReturnCodes
         [](db::QueryResult *result, Context context) {
             if (auto calllogResult = dynamic_cast<db::query::CalllogRemoveResult *>(result)) {
 
-                context.setResponseStatus(calllogResult->getResults() ? http::Code::OK
+                context.setResponseStatus(calllogResult->getResults() ? http::Code::NoContent
                                                                       : http::Code::InternalServerError);
                 MessageHandler::putToSendQueue(context.createSimpleResponse());
                 return true;
