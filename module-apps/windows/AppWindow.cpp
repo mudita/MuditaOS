@@ -24,12 +24,12 @@ namespace gui
 
     void AppWindow::destroyInterface()
     {
-        erase(bottomBar);
         erase(statusBar);
-        erase(title);
-        title     = nullptr;
-        bottomBar = nullptr;
+        erase(header);
+        erase(bottomBar);
         statusBar = nullptr;
+        header    = nullptr;
+        bottomBar = nullptr;
     }
 
     void AppWindow::rebuild()
@@ -37,25 +37,25 @@ namespace gui
 
     void AppWindow::buildInterface()
     {
+        auto config          = configureStatusBar(application->getStatusBarConfiguration());
+        namespace status_bar = style::status_bar;
+        statusBar            = new gui::status_bar::StatusBar(this,
+                                                   status_bar::default_horizontal_pos,
+                                                   status_bar::default_vertical_pos,
+                                                   status_bar::width,
+                                                   status_bar::height);
+        statusBar->configure(std::move(config));
+
+        header = new gui::header::Header(this,
+                                         style::header::default_horizontal_pos,
+                                         style::header::default_vertical_pos,
+                                         style::header::width,
+                                         style::header::height);
+
         bottomBar = new gui::BottomBar(this, 0, style::window_height - 51, style::window_width, 50);
         bottomBar->setActive(BottomBar::Side::LEFT, false);
         bottomBar->setActive(BottomBar::Side::CENTER, false);
         bottomBar->setActive(BottomBar::Side::RIGHT, false);
-
-        title = new gui::Label(this, 0, 52, style::window_width, 52);
-        title->setFilled(false);
-        title->setFont(font::title);
-        title->clear();
-        title->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
-        title->setEdges(RectangleEdge::Bottom);
-        title->setEllipsis(Ellipsis::Right);
-        title->visible = false;
-
-        auto config          = configureStatusBar(application->getStatusBarConfiguration());
-        namespace status_bar = style::header::status_bar;
-        statusBar            = new gui::status_bar::StatusBar(
-            this, (style::window_width - status_bar::width) / 2, 0, status_bar::width, status_bar::height);
-        statusBar->configure(std::move(config));
     }
 
     status_bar::Configuration AppWindow::configureStatusBar(status_bar::Configuration appConfiguration)
@@ -136,13 +136,27 @@ namespace gui
 
     void AppWindow::setTitle(const UTF8 &text)
     {
-        if (title != nullptr) {
-            title->setText(text);
-            title->setVisible(text.length() != 0);
-        }
-        else {
-            LOG_ERROR("cant set title - it doesn't exist!");
-        }
+        header->setTitle(text);
+    }
+
+    UTF8 AppWindow::getTitle()
+    {
+        return header->getTitle();
+    }
+
+    void AppWindow::headerIndicatorAdd(header::NavigationIndicator indicator)
+    {
+        header->navigationIndicatorAdd(indicator);
+    }
+
+    void AppWindow::headerIndicatorRemove(header::NavigationIndicator indicator)
+    {
+        header->navigationIndicatorRemove(indicator);
+    }
+
+    bool AppWindow::headerIndicatorVisible(header::NavigationIndicator indicator) const
+    {
+        return header->navigationIndicatorVisible(indicator);
     }
 
     bool AppWindow::onDatabaseMessage(sys::Message *msg)
@@ -269,9 +283,9 @@ namespace gui
     BoundingBox AppWindow::bodySize()
     {
         return {0,
-                title->offset_h(),
+                header->offset_h(),
                 this->getWidth(),
-                this->getHeight() - this->title->offset_h() - bottomBar->getHeight()};
+                this->getHeight() - this->header->offset_h() - bottomBar->getHeight()};
     }
 
     void AppWindow::setBottomBarActive(BottomBar::Side side, bool value)

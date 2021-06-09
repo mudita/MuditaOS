@@ -7,7 +7,6 @@
 #include <application-onboarding/style/OnBoardingStyle.hpp>
 #include <OptionSetting.hpp>
 
-#include <widgets/IceBox.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <module-apps/messages/DialogMetadataMessage.hpp>
 
@@ -27,7 +26,7 @@ namespace app::onBoarding
         bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(::style::strings::common::back));
         bottomBar->setText(gui::BottomBar::Side::LEFT, utils::translate(::style::strings::common::skip));
 
-        new gui::IceBox(this);
+        headerIndicatorAdd(gui::header::NavigationIndicator::IceBox);
 
         descriptionText = new gui::Text(this,
                                         style::window::default_left_margin,

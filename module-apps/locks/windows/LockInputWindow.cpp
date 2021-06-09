@@ -30,7 +30,7 @@ namespace gui
     {
         body = new VBox(this,
                         style::window::default_left_margin,
-                        style::header::height,
+                        style::window::default_vertical_pos,
                         style::window::default_body_width,
                         style::window::default_body_height);
         body->setEdges(RectangleEdge::None);
@@ -72,7 +72,7 @@ namespace gui
 
     void LockInputWindow::buildIceBox()
     {
-        iceBox = new gui::IceBox(this);
+        headerIndicatorAdd(gui::header::NavigationIndicator::IceBox);
     }
 
     void LockInputWindow::buildPinBody()
@@ -138,14 +138,13 @@ namespace gui
     {
         switch (type) {
         case TextType::Title: {
-            title->setVisible(true);
+            header->setTitleVisibility(true);
             if (!tokens.empty()) {
                 TextFormat format(FontManager::getInstance().getFont(style::window::font::medium));
-                title->setText(
-                    text::RichTextParser().parse(utils::translate(value), &format, std::move(tokens))->getText());
+                setTitle(text::RichTextParser().parse(utils::translate(value), &format, std::move(tokens))->getText());
             }
             else {
-                title->setText(utils::translate(value));
+                setTitle(utils::translate(value));
             }
             break;
         }
@@ -162,8 +161,14 @@ namespace gui
 
     void LockInputWindow::setTitleBar(bool titleVisible, bool iceVisible)
     {
-        title->setVisible(titleVisible);
-        iceBox->setVisible(iceVisible);
+        header->setTitleVisibility(titleVisible);
+
+        if (iceVisible) {
+            headerIndicatorAdd(header::NavigationIndicator::IceBox);
+        }
+        else {
+            headerIndicatorRemove(header::NavigationIndicator::IceBox);
+        }
     }
 
     auto LockInputWindow::getToken(LockInputWindow::Token token) const -> std::string
@@ -216,7 +221,7 @@ namespace gui
 
     auto LockInputWindow::isIceVisible() const noexcept -> bool
     {
-        return iceBox->visible;
+        return headerIndicatorVisible(header::NavigationIndicator::IceBox);
     }
 
     auto LockInputWindow::isInInputState() const noexcept -> bool

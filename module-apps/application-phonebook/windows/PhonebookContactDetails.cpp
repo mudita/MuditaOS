@@ -82,13 +82,13 @@ namespace gui
         contactFlagsWidget->setBlocked(contact->isOnBlocked());
         contactFlagsWidget->setFavourites(contact->isOnFavourites());
         if (contactFlagsWidget->visible) {
-            title->setEdges(RectangleEdge::None);
+            header->setEdges(RectangleEdge::None);
             bodyList->setY(phonebookStyle::contactDetailsWindow::contactDetailsList::y);
             bodyList->setSize(phonebookStyle::contactDetailsWindow::contactDetailsList::w,
                               phonebookStyle::contactDetailsWindow::contactDetailsList::h);
         }
         else {
-            title->setEdges(RectangleEdge::Bottom);
+            header->setEdges(RectangleEdge::Bottom);
             bodyList->setY(phonebookStyle::contactDetailsWindow::contactDetailsListNoFlags::y);
             bodyList->setSize(phonebookStyle::contactDetailsWindow::contactDetailsListNoFlags::w,
                               phonebookStyle::contactDetailsWindow::contactDetailsListNoFlags::h);

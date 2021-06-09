@@ -52,7 +52,7 @@ namespace gui
         titleLabel = new gui::Label(this, 0, 60, 480, 40);
         titleLabel->setFilled(false);
         titleLabel->setBorderColor(gui::ColorFullBlack);
-        titleLabel->setFont(style::header::font::title);
+        titleLabel->setFont(style::header::title_font);
         titleLabel->setEdges(RectangleEdge::None);
         titleLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
         titleLabel->setText(utils::translate("app_desktop_update"));

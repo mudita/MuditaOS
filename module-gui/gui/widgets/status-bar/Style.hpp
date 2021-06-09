@@ -5,14 +5,8 @@
 
 #include <Style.hpp>
 
-namespace style::header::status_bar
+namespace style::status_bar
 {
-    namespace font
-    {
-
-        inline constexpr auto title = "gt_pressura_bold_32";
-    }; // namespace font
-
     namespace margins
     {
         inline constexpr auto iconBottom = 4u;
@@ -21,8 +15,9 @@ namespace style::header::status_bar
     }; // namespace margins
     namespace time
     {
-        inline constexpr auto font = "gt_pressura_regular_24";
-        inline constexpr auto maxX = 100u;
+        inline constexpr auto font          = "gt_pressura_regular_24";
+        inline constexpr auto maxX          = 100u;
+        inline constexpr auto bottomPadding = 7u;
     }; // namespace time
     namespace nat
     {
@@ -63,4 +58,4 @@ namespace style::header::status_bar
         }; // namespace center
     };     // namespace boxes
 
-}; // namespace style::header::status_bar
+}; // namespace style::status_bar

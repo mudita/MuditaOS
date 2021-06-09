@@ -20,7 +20,7 @@
 
 namespace gui::status_bar
 {
-    using namespace style::header::status_bar;
+    using namespace style::status_bar;
 
     constexpr auto batteryWidgetAsText = false;
     using BatteryType                  = std::conditional<batteryWidgetAsText, BatteryText, BatteryBar>::type;
@@ -117,6 +117,7 @@ namespace gui::status_bar
         lock = new Lock(centralBox, 0, 0);
         lock->setMargins(Margins(0, 0, 0, margins::iconBottom));
         time = new Time(centralBox, 0, 0, 0, 0);
+        time->setPadding(gui::Padding(0, 0, 0, time::bottomPadding));
         time->setMaximumSize(time::maxX, this->drawArea.h);
 
         // right

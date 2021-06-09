@@ -8,7 +8,6 @@
 
 #include <module-apps/windows/DialogMetadata.hpp>
 #include <module-apps/messages/DialogMetadataMessage.hpp>
-#include <widgets/IceBox.hpp>
 #include <service-appmgr/Controller.hpp>
 
 #include <i18n/i18n.hpp>
@@ -31,7 +30,7 @@ namespace app::onBoarding
         bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(::style::strings::common::back));
         bottomBar->setText(gui::BottomBar::Side::LEFT, utils::translate(::style::strings::common::skip));
 
-        new gui::IceBox(this);
+        headerIndicatorAdd(gui::header::NavigationIndicator::IceBox);
         new gui::Icon(this,
                       0,
                       0,

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Reboot.hpp"
@@ -37,7 +37,7 @@ namespace gui
             "Phone have to reboot, press any key to confirm and remove battery for 10 sec to perform full reboot");
         text->setFilled(false);
         text->setBorderColor(gui::ColorFullBlack);
-        text->setFont(style::header::font::title);
+        text->setFont(style::header::title_font);
         text->setEdges(RectangleEdge::None);
         text->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Bottom));
     }

@@ -17,7 +17,7 @@ namespace gui
 
     const unsigned char ContactFlagsWidget::iconsCount = 4;
     ContactFlagsWidget::ContactFlagsWidget(Item *parent)
-        : Rect(parent, 0, style::header::height, style::window_width, style::widget::ContactFlag::height)
+        : Rect(parent, 0, style::window::default_vertical_pos, style::window_width, style::widget::ContactFlag::height)
     {
         favourites = speedDial = ice = true;
         blocked                      = false;

@@ -39,7 +39,7 @@ namespace gui
 
         setTitle("Info");
 
-        box = new gui::VBox(this, 0, title->offset_h(), style::window_width, style::window_height);
+        box = new gui::VBox(this, 0, style::window::default_vertical_pos, style::window_width, style::window_height);
         box->setPenWidth(style::window::default_border_no_focus_w);
 
         addAlignedLabelWithValue(box, "GIT revision:", std::string(GIT_REV));

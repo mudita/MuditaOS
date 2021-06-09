@@ -35,7 +35,6 @@ set( SOURCES
     "widgets/ActiveIconFactory.cpp"
     "widgets/TextWithIconsWidget.cpp"
     "widgets/DateWidget.cpp"
-    "widgets/IceBox.cpp"
     "widgets/TimeWidget.cpp"
     "widgets/WidgetsUtils.cpp"
     "notifications/NotificationListItem.cpp"

@@ -4,7 +4,6 @@
 #include "OnBoardingLanguagesWindow.hpp"
 #include <application-onboarding/ApplicationOnBoarding.hpp>
 
-#include <widgets/IceBox.hpp>
 #include <module-gui/gui/input/InputEvent.hpp>
 #include <service-appmgr/Controller.hpp>
 
@@ -17,7 +16,9 @@ namespace app::onBoarding
     void OnBoardingLanguagesWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
     {
         bottomBar->setActive(gui::BottomBar::Side::RIGHT, false);
-        new gui::IceBox(this);
+
+        headerIndicatorAdd(gui::header::NavigationIndicator::IceBox);
+        headerIndicatorAdd(gui::header::NavigationIndicator::SearchBox);
 
         LanguagesWindow::onBeforeShow(mode, data);
     }

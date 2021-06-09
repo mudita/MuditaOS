@@ -14,11 +14,11 @@ namespace gui::status_bar
         label = new Label(this, 0, 0, 0, 0);
         label->setFilled(false);
         label->setBorderColor(gui::ColorNoColor);
-        label->setFont(style::header::status_bar::battery::font);
+        label->setFont(style::status_bar::battery::font);
         label->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Bottom));
 
-        setMinimumSize(style::header::status_bar::battery::maxX, style::header::status_bar::height);
-        label->setMaximumSize(style::header::status_bar::battery::maxX, style::header::status_bar::height);
+        setMinimumSize(style::status_bar::battery::maxX, style::status_bar::height);
+        label->setMaximumSize(style::status_bar::battery::maxX, style::status_bar::height);
     }
 
     void BatteryText::showBatteryLevel(std::uint32_t percentage)

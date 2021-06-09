@@ -21,20 +21,25 @@ namespace style
 {
     inline constexpr auto window_height = getScreenResolutionY();
     inline constexpr auto window_width  = getScreenResolutionX();
+
+    namespace status_bar
+    {
+        inline constexpr auto default_horizontal_pos  = 20U;
+        inline constexpr auto default_vertical_pos    = 0U;
+        inline constexpr unsigned status_bar_margin_w = default_horizontal_pos * 2;
+        inline constexpr auto height                  = 46U;
+        inline constexpr auto width                   = window_width - status_bar_margin_w;
+    }; // namespace status_bar
+
     namespace header
     {
-        inline constexpr auto height = 105U;
-        namespace status_bar
-        {
-            inline constexpr unsigned status_bar_margin_w = 40U;
-            inline constexpr auto height                  = 46U;
-            inline constexpr auto width                   = window_width - status_bar_margin_w;
-        }; // namespace status_bar
-        namespace font
-        {
-            inline constexpr auto title = "gt_pressura_bold_32";
-        }; // namespace font
-    };     // namespace header
+        inline constexpr auto default_horizontal_pos = 0U;
+        inline constexpr auto default_vertical_pos   = status_bar::height;
+        inline constexpr auto height                 = 59U;
+        inline constexpr auto width                  = window_width;
+
+        inline constexpr auto title_font = "gt_pressura_bold_30";
+    }; // namespace header
 
     namespace footer
     {
@@ -48,12 +53,13 @@ namespace style
 
     namespace window
     {
+        inline constexpr auto default_vertical_pos = header::default_vertical_pos + header::height;
         inline constexpr auto default_left_margin  = 20U;
         inline constexpr auto default_right_margin = 20U;
         inline constexpr auto default_body_width =
             style::window_width - style::window::default_right_margin - style::window::default_left_margin;
         inline constexpr auto default_body_height =
-            style::window_height - style::header::height - style::footer::height;
+            style::window_height - style::window::default_vertical_pos - style::footer::height;
         inline constexpr auto default_border_focus_w       = 2U;
         inline constexpr auto default_border_rect_no_focus = 1U;
         inline constexpr auto default_border_no_focus_w    = 0U;
