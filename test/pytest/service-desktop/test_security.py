@@ -31,7 +31,7 @@ def test_all_other_endpoints_phone_locked_with_code(harness):
     body = {}
     endpoints_list = ["deviceInfo",
                       "update",
-                      "filesystemUpload",
+                      "filesystem",
                       "backup",
                       "restore",
                       "factory",

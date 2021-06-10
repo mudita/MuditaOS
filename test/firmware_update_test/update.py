@@ -44,7 +44,7 @@ def update(harness, update_filepath: str):
     filename = update_filepath.split('/')[-1]
     body = {"command": "download", "fileName": filename, "fileSize": file_size}
 
-    ret = harness.endpoint_request("filesystemUpload", "post", body)["body"]
+    ret = harness.endpoint_request("filesystem", "post", body)["body"]
     if ret["status"] is not None:
         log.info(f"Update status: {update_status_code[int(ret['status'])]}")
 
