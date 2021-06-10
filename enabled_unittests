@@ -328,7 +328,7 @@ TESTS_LIST["catch2-utils-log"]="
     Log tests;
 "
 #---------
-TESTS_LIST["catch2-utils-i18n"]="
+TESTS_LIST["catch2-i18n"]="
     Test set display language - empty display language string;
     Test set display language - invalid display language string;
     Test set display language - double invalid display language string;

@@ -1,4 +1,4 @@
-project(module-utils VERSION 1.0)
+﻿project(module-utils VERSION 1.0)
 
 if(${CMAKE_VERSION} VERSION_LESS 3.12)
     cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
@@ -6,11 +6,7 @@ endif()
 
 module_is_test_entity()
 
-add_subdirectory(Clipboard)
-add_subdirectory(EventStore)
-
 set (SOURCES
-        ${CMAKE_CURRENT_SOURCE_DIR}/i18n/i18n.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/PhoneNumber.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/PhoneNumber.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/NumberHolderMatcher.hpp
@@ -67,8 +63,11 @@ endif()
 
 add_subdirectory(board)
 add_subdirectory(bootconfig)
+add_subdirectory(Clipboard)
+add_subdirectory(EventStore)
+add_subdirectory(i18n)
 add_subdirectory(log)
+add_subdirectory(math)
 add_subdirectory(time)
 add_subdirectory(ucs2)
 add_subdirectory(utf8)
-add_subdirectory(math)
