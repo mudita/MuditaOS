@@ -1,0 +1,8 @@
+add_catch2_executable(
+    NAME
+        i18n
+    SRCS
+        test_i18n.cpp
+    LIBS
+        i18n
+)

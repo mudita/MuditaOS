@@ -60,13 +60,3 @@ add_catch2_executable(
 #    LIBS
 #        module-utils
 #)
-
-#  i18n language change tests
-add_catch2_executable(
-    NAME
-        utils-i18n
-    SRCS
-        test_i18n.cpp
-    LIBS
-        module-utils
-)

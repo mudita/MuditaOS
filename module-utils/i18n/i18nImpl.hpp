@@ -5,7 +5,7 @@
 
 #include <mutex.hpp>
 #include <json11.hpp>
-#include "i18n.hpp"
+#include <i18n/i18n.hpp>
 
 namespace utils
 {
