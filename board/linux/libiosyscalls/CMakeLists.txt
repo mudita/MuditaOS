@@ -18,8 +18,6 @@ set(INCLUDES
     "${CMAKE_SOURCE_DIR}/module-os/board/linux"
     "${CMAKE_SOURCE_DIR}/module-os/RTOSWrapper/include"
     "${CMAKE_SOURCE_DIR}/module-utils"
-    "${CMAKE_SOURCE_DIR}/module-vfs/include/user"
-    "${CMAKE_SOURCE_DIR}/module-vfs/include/internal"
 )
 
 
@@ -51,6 +49,7 @@ target_link_libraries(
         dl
     PRIVATE
         phmap
+        module-vfs
 )
 
 

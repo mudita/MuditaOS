@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
 
-project(module-vfs VERSION 1.0
-        DESCRIPTION "VFS module library")
+add_library(module-vfs STATIC)
 
 module_is_test_entity()
 
@@ -47,31 +46,39 @@ else()
     message(FATAL_ERROR "Invalid target!")
 endif()
 
-add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
+target_sources(module-vfs PRIVATE ${SOURCES} ${BOARD_SOURCES})
+
+#this is needed as linux iosyscalls produces SHARED code instead of STATIC. Without -fPIC it won't link
+if(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
+    set(TARGET_COMPILE_OPTIONS
+        "-fPIC"
+        CACHE INTERNAL ""
+        )
+endif()
 
 # Board specific compilation definitions,options,include directories and features
-target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
-target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_TARGET})
-target_compile_definitions(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_DEFINITIONS})
-target_include_directories(${PROJECT_NAME} PUBLIC ${BOARD_DIR_INCLUDES})
-target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_INCLUDES})
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_BINARY_DIR})
-target_compile_features(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_FEATURES})
-target_compile_options(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_OPTIONS})
-target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
+target_compile_definitions(module-vfs PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
+target_compile_definitions(module-vfs PUBLIC ${PROJECT_TARGET})
+target_compile_definitions(module-vfs PUBLIC ${TARGET_COMPILE_DEFINITIONS})
+target_include_directories(module-vfs PUBLIC ${BOARD_DIR_INCLUDES})
+target_include_directories(module-vfs PUBLIC ${PROJECT_INCLUDES})
+target_include_directories(module-vfs PUBLIC ${CMAKE_BINARY_DIR})
+target_compile_features(module-vfs PUBLIC ${TARGET_COMPILE_FEATURES})
+target_compile_options(module-vfs PUBLIC ${TARGET_COMPILE_OPTIONS})
+target_link_options(module-vfs PUBLIC ${TARGET_LINK_OPTIONS})
 
-target_include_directories(${PROJECT_NAME}
+target_include_directories(module-vfs
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/include/user/
         ${CMAKE_CURRENT_SOURCE_DIR}/drivers/include
-    PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include/internal
+    PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/drivers/include/thirdparty/fatfs
         ${CMAKE_CURRENT_SOURCE_DIR}/drivers/include/thirdparty
         ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/fatfs/source
 )
 
-target_link_libraries(${PROJECT_NAME} 
+target_link_libraries(module-vfs
     PUBLIC 
         ${TARGET_LIBRARIES} 
         module-os
