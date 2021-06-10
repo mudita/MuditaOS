@@ -3,8 +3,9 @@
 
 #include "BatteryText.hpp"
 #include "Label.hpp"
-#include <Utils.hpp>
 #include "Style.hpp"
+#include <i18n/i18n.hpp>
+#include <Utils.hpp>
 
 namespace gui::status_bar
 {

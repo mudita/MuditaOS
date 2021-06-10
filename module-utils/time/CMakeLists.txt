@@ -24,11 +24,13 @@ target_include_directories(time PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_
 
 target_link_libraries(time 
     PRIVATE 
-        log
         module-utils
-        utf8
-        utz::utz
         time-constants
+        utz::utz
+    PUBLIC
+        i18n
+        log
+        utf8
 )
 
 if (${ENABLE_TESTS})

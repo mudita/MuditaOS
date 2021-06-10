@@ -73,14 +73,15 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE
         apps-common
         date::date
+        eventstore
+        i18n
+        Microsoft.GSL::GSL
         service-antenna
         service-appmgr
         service-audio
         service-cellular
         service-db
         service-evtmgr
-        Microsoft.GSL::GSL
-        eventstore
         time
     PUBLIC
         application-bell-main
