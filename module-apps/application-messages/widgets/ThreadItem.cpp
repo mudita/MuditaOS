@@ -51,7 +51,7 @@ namespace gui
 
         setContactName(getNumberImportance());
         using namespace utils::time;
-        timestamp->setText(*createTimestamp(TimestampType::DateTime, threadStruct->thread->date));
+        timestamp->setText(*TimestampFactory().createTimestamp(TimestampType::DateTime, threadStruct->thread->date));
         setPreview();
     }
 

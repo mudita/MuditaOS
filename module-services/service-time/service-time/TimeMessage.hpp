@@ -4,7 +4,8 @@
 #pragma once
 
 #include <MessageType.hpp>
-#include <Service/Message.hpp>
+#include <module-sys/Service/Message.hpp>
+#include <time/time_locale.hpp>
 
 class TimeMessage : public sys::DataMessage
 {
@@ -110,5 +111,75 @@ namespace stm::message
 
       private:
         time_t time;
+    };
+
+    class SetAutomaticDateAndTimeRequest : public sys::DataMessage
+    {
+      public:
+        explicit SetAutomaticDateAndTimeRequest(const bool value)
+            : sys::DataMessage(MessageType::MessageTypeUninitialized), value(value){};
+        auto getValue() const -> bool
+        {
+            return value;
+        }
+
+      private:
+        bool value;
+    };
+
+    class AutomaticDateAndTimeChangedMessage : public sys::DataMessage
+    {
+      public:
+        explicit AutomaticDateAndTimeChangedMessage(const bool value)
+            : sys::DataMessage(MessageType::MessageTypeUninitialized), value(value){};
+        auto getValue() const -> bool
+        {
+            return value;
+        }
+
+      private:
+        bool value;
+    };
+
+    class SetAutomaticTimezoneRequest : public sys::DataMessage
+    {
+      public:
+        explicit SetAutomaticTimezoneRequest(const bool value)
+            : sys::DataMessage(MessageType::MessageTypeUninitialized), value(value){};
+        auto getValue() const -> bool
+        {
+            return value;
+        }
+
+      private:
+        bool value;
+    };
+
+    class SetTimeFormatRequest : public sys::DataMessage
+    {
+      public:
+        explicit SetTimeFormatRequest(const utils::time::Locale::TimeFormat timeFormat)
+            : sys::DataMessage(MessageType::MessageTypeUninitialized), timeFormat(timeFormat){};
+        auto getTimeFormat() const -> utils::time::Locale::TimeFormat
+        {
+            return timeFormat;
+        };
+
+      private:
+        utils::time::Locale::TimeFormat timeFormat;
+    };
+
+    class SetDateFormatRequest : public sys::DataMessage
+    {
+      public:
+        explicit SetDateFormatRequest(const utils::time::Locale::DateFormat dateFormat)
+            : sys::DataMessage(MessageType::MessageTypeUninitialized), dateFormat(dateFormat){};
+        auto getDateFormat() const -> utils::time::Locale::DateFormat
+        {
+            return dateFormat;
+        };
+
+      private:
+        utils::time::Locale::DateFormat dateFormat;
     };
 } // namespace stm::message

@@ -4,9 +4,10 @@
 #include "application-settings-new/ApplicationSettings.hpp"
 #include "DateAndTimeMainWindow.hpp"
 #include "module-apps/application-desktop/windows/Names.hpp"
-#include <time/DateAndTimeSettings.hpp>
 #include "OptionSetting.hpp"
-#include "service-appmgr/Controller.hpp"
+#include <service-time/service-time/TimeMessage.hpp>
+#include <service-time/Constants.hpp>
+#include <service-time/api/TimeSettingsApi.hpp>
 
 namespace gui
 {
@@ -14,10 +15,11 @@ namespace gui
         : BaseSettingsWindow(app, std::move(name))
     {
         setTitle(utils::translate("app_settings_date_and_time"));
-        automaticDateAndTimeIsOn = utils::dateAndTimeSettings.isAutomaticDateAndTimeOn();
-        automaticTimeZoneIsOn    = utils::dateAndTimeSettings.isAutomaticTimeZoneOn();
-        timeFormat               = utils::dateAndTimeSettings.getTimeFormat();
-        dateFormat               = utils::dateAndTimeSettings.getDateFormat();
+
+        automaticDateAndTimeIsOn = stm::api::isAutomaticDateAndTime();
+        automaticTimeZoneIsOn    = stm::api::isAutomaticTimezone();
+        timeFormat               = stm::api::timeFormat();
+        dateFormat               = stm::api::dateFormat();
         changeDateAndTimeWindow  = window::name::change_date_and_time;
     }
 
@@ -47,7 +49,9 @@ namespace gui
             utils::translate("app_settings_date_and_time_automatic_date_and_time"),
             [=](Item &item) {
                 automaticDateAndTimeIsOn = !automaticDateAndTimeIsOn;
-                app::manager::Controller::changeAutomaticDateAndTimeIsOn(application, automaticDateAndTimeIsOn);
+                application->bus.sendUnicast(
+                    std::make_shared<stm::message::SetAutomaticDateAndTimeRequest>(automaticDateAndTimeIsOn),
+                    service::name::service_time);
                 refreshOptionsList();
                 return true;
             },
@@ -65,7 +69,9 @@ namespace gui
             utils::translate("app_settings_date_and_time_automatic_time_zone"),
             [=](Item &item) {
                 automaticTimeZoneIsOn = !automaticTimeZoneIsOn;
-                app::manager::Controller::changeAutomaticTimeZoneIsOn(application, automaticTimeZoneIsOn);
+                application->bus.sendUnicast(
+                    std::make_shared<stm::message::SetAutomaticTimezoneRequest>(automaticDateAndTimeIsOn),
+                    service::name::service_time);
                 refreshOptionsList();
                 return true;
             },
@@ -85,7 +91,8 @@ namespace gui
                 timeFormat = (timeFormat == utils::time::Locale::TimeFormat::FormatTime12H)
                                  ? utils::time::Locale::TimeFormat::FormatTime24H
                                  : utils::time::Locale::TimeFormat::FormatTime12H;
-                app::manager::Controller::changeTimeFormat(application, timeFormat);
+                application->bus.sendUnicast(std::make_shared<stm::message::SetTimeFormatRequest>(timeFormat),
+                                             service::name::service_time);
                 refreshOptionsList();
                 return true;
             },
@@ -98,7 +105,8 @@ namespace gui
                 dateFormat = (dateFormat == utils::time::Locale::DateFormat::DD_MM_YYYY)
                                  ? utils::time::Locale::DateFormat::MM_DD_YYYY
                                  : utils::time::Locale::DateFormat::DD_MM_YYYY;
-                app::manager::Controller::changeDateFormat(application, dateFormat);
+                application->bus.sendUnicast(std::make_shared<stm::message::SetDateFormatRequest>(dateFormat),
+                                             service::name::service_time);
                 refreshOptionsList();
                 return true;
             },

@@ -6,7 +6,6 @@
 #include "DateAndTimeModel.hpp"
 #include <ListView.hpp>
 #include <apps-common/widgets/DateAndTimeStyle.hpp>
-#include <time/DateAndTimeSettings.hpp>
 
 DateAndTimeModel::DateAndTimeModel(app::Application *application) : app(application)
 {}

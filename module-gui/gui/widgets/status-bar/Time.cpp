@@ -16,7 +16,7 @@ namespace gui::status_bar
         setFont(style::status_bar::time::font);
         setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Bottom));
         using namespace utils::time;
-        time = createTimestamp(TimestampType::Clock, std::time(nullptr));
+        time = TimestampFactory().createTimestamp(TimestampType::Clock, std::time(nullptr));
         update();
     }
 

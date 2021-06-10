@@ -11,7 +11,6 @@
 #include <application-calllog/data/CallLogInternals.hpp>
 #include <application-calllog/data/CallLogSwitchData.hpp>
 #include <application-calllog/windows/CallLogOptionsWindow.hpp>
-#include <time/DateAndTimeSettings.hpp>
 #include <widgets/TextWithIconsWidget.hpp>
 #include <widgets/ActiveIconFactory.hpp>
 
@@ -197,8 +196,8 @@ namespace gui
     {
         Expects(dateDay != nullptr && dateDate != nullptr);
         using namespace utils::time;
-        auto date = createTimestamp(TimestampType::Date, record.date);
-        auto time = createTimestamp(TimestampType::Time, record.date);
+        auto date = TimestampFactory().createTimestamp(TimestampType::Date, record.date);
+        auto time = TimestampFactory().createTimestamp(TimestampType::Time, record.date);
 
         dateDay->setText(date->day() + ",");
 
