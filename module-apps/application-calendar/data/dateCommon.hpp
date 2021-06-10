@@ -5,9 +5,10 @@
 #define DATECOMMON_H
 
 #include <date/date.h>
-#include <time/DateAndTimeSettings.hpp>
 #include <time/time_conversion_factory.hpp>
 #include <Utils.hpp>
+#include <service-time/api/TimeSettingsApi.hpp>
+
 #include <random>
 
 using Clock     = std::chrono::system_clock;
@@ -260,7 +261,7 @@ inline std::string TimePointToLocalizedDateString(const TimePoint &tp, const std
 {
     using namespace utils::time;
     auto time = TimePointToTimeT(tp);
-    auto timestamp = createTimestamp(TimestampType::Date, time);
+    auto timestamp = TimestampFactory().createTimestamp(TimestampType::Date, time);
     return timestamp->str(format);
 }
 
@@ -268,14 +269,15 @@ inline std::string TimePointToLocalizedTimeString(const TimePoint &tp, const std
 {
     using namespace utils::time;
     auto time = TimePointToTimeT(tp);
-    auto timestamp = createTimestamp(TimestampType::Time, time);
+
+    auto timestamp = TimestampFactory().createTimestamp(TimestampType::Time, time);
     return timestamp->str(format);
 }
 
 inline std::string TimePointToLocalizedHourMinString(const TimePoint &tp)
 {
-    return utils::dateAndTimeSettings.isTimeFormat12() ? TimePointToLocalizedTimeString(tp, "%I:%M")
-                                                       : TimePointToLocalizedTimeString(tp, "%H:%M");
+    return stm::api::isTimeFormat12h() ? TimePointToLocalizedTimeString(tp, "%I:%M")
+                                       : TimePointToLocalizedTimeString(tp, "%H:%M");
 }
 
 inline TimePoint TimePointFromString(const char *s1)
@@ -324,8 +326,8 @@ inline std::string TimePointToHourString12H(const TimePoint &tp)
 
 inline std::string TimePointToLocalizedHourString(const TimePoint &tp)
 {
-    return utils::dateAndTimeSettings.isTimeFormat12() ? TimePointToLocalizedTimeString(tp, "%I")
-                                                       : TimePointToLocalizedTimeString(tp, "%H");
+    return stm::api::isTimeFormat12h() ? TimePointToLocalizedTimeString(tp, "%I")
+                                       : TimePointToLocalizedTimeString(tp, "%H");
 }
 
 inline std::string TimePointToHourString24H(const TimePoint &tp)

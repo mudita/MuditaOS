@@ -28,7 +28,7 @@ class TimeManager
     /**
      * Handles time change request.
      * @param time UTC time to set
-     */
+     * **/
     void handleTimeChangeRequest(const time_t &time);
 
   private:

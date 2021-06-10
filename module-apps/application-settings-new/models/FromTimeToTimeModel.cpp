@@ -5,7 +5,6 @@
 #include <application-settings-new/widgets/SettingsDateItem.hpp>
 #include <application-settings-new/widgets/SettingsTimeItem.hpp>
 #include <ListView.hpp>
-#include <time/DateAndTimeSettings.hpp>
 #include <widgets/DateAndTimeStyle.hpp>
 
 FromTimeToTimeModel::FromTimeToTimeModel(app::Application *application) : app(application)

@@ -37,7 +37,6 @@
 #include <service-gui/Common.hpp>
 #include <module-utils/Utils.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
-#include <time/DateAndTimeSettings.hpp>
 #include <service-audio/AudioServiceAPI.hpp> // for GetOutputVolume
 
 #include <popups/VolumeWindow.hpp>

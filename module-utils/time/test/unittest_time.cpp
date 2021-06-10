@@ -10,6 +10,8 @@
 
 #include "time/time_conversion.hpp"
 #include "time/time_locale.hpp"
+#include "time/time_conversion_factory.hpp"
+#include "mock/TimeSettingsMock.hpp"
 
 #define CATCH_CONFIG_MAIN // This tells Catch to provide a main() - only do this in one cpp file
 
@@ -679,5 +681,22 @@ TEST_CASE("Duration - display")
         REQUIRE(duration.str(Duration::DisplayedFormat::AutoM) == "48:03:04");
         REQUIRE(duration.str(Duration::DisplayedFormat::Fixed0M0S) == "2883:04");
         REQUIRE(duration.str(Duration::DisplayedFormat::FixedH0M0S) == "48:03:04");
+    }
+}
+TEST_CASE("Timestamp factory")
+{
+    SECTION("No setting provided")
+    {
+        auto timestamp = utils::time::TimestampFactory().createTimestamp(utils::time::TimestampType::Clock);
+
+        REQUIRE(typeid(*(timestamp.get())).name() == typeid(utils::time::Timestamp).name());
+    }
+    SECTION("Settings provided")
+    {
+        auto factory = utils::time::TimestampFactory();
+        factory.init(new BaseTimeSettings);
+        auto timestamp = factory.createTimestamp(utils::time::TimestampType::Clock);
+
+        REQUIRE(typeid(*(timestamp.get())).name() == typeid(utils::time::Clock).name());
     }
 }
