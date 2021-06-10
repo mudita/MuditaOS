@@ -1,4 +1,4 @@
-﻿# gui tests
+# gui tests
 add_catch2_executable(
         NAME
                 gui-text
@@ -25,4 +25,5 @@ add_catch2_executable(
                 module-gui
         DEPS
                 assets
+                PurePhone-disk-img
 )

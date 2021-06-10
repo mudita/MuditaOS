@@ -34,7 +34,7 @@
 #include <module-services/service-desktop/service-desktop/Constants.hpp>
 #include <module-apps/messages/AppMessage.hpp>
 #include <SystemManager/messages/SystemManagerMessage.hpp>
-#include <module-gui/gui/widgets/TopBar/SIM.hpp>
+#include <module-gui/gui/widgets/status-bar/SIM.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 
 #include <cassert>
@@ -47,10 +47,11 @@ namespace app
         : Application(std::move(name), std::move(parent), mode, startInBackground), AsyncCallbackReceiver(this),
           dbNotificationHandler(this)
     {
-        using namespace gui::top_bar;
-        topBarManager->enableIndicators({Indicator::Signal, Indicator::Time, Indicator::Battery, Indicator::SimCard});
-        topBarManager->set(Indicator::SimCard,
-                           std::make_shared<SIMConfiguration>(SIMConfiguration::DisplayMode::OnlyInactiveState));
+        using namespace gui::status_bar;
+        statusBarManager->enableIndicators(
+            {Indicator::Signal, Indicator::Time, Indicator::Battery, Indicator::SimCard});
+        statusBarManager->set(Indicator::SimCard,
+                              std::make_shared<SIMConfiguration>(SIMConfiguration::DisplayMode::OnlyInactiveState));
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
 
         addActionReceiver(app::manager::actions::ShowMMIResponse, [this](auto &&data) {

@@ -9,7 +9,7 @@
 #include <purefs/blkdev/disk_manager.hpp>
 #include <purefs/blkdev/disk_handle.hpp>
 #include <purefs/fs/mount_flags.hpp>
-#include <littlefs/lfs.h>
+#include <lfs.h>
 #include <log/log.hpp>
 
 #include <climits>

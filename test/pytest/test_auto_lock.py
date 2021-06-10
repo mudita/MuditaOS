@@ -78,7 +78,7 @@ def contains_value_recursively(body: dict, attr_name, attr_value):
 def get_dom(harness):
     body = {"ui": True, "getWindow": True}
     result = harness.endpoint_request("developerMode", "get", body)
-    # log.info("data {}".format(find_item_depth_first(result['body']['dom'], 'TopBar')))
+    # log.info("data {}".format(find_item_depth_first(result['body']['dom'], 'StatusBar')))
     assert result['body']
     assert 'Window' in result['body']['dom']
     return result

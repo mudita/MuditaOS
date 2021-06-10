@@ -14,9 +14,6 @@
 
 #include <Style.hpp>
 
-#include <module-gui/gui/widgets/BottomBar.hpp>
-#include <module-gui/gui/widgets/TopBar.hpp>
-
 namespace app::notes
 {
     NotePreviewWindow::NotePreviewWindow(app::Application *app,

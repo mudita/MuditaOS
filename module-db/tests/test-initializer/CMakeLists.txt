@@ -1,4 +1,4 @@
-﻿if (NOT IS_SYMLINK "${CMAKE_BINARY_DIR}/sys/user")
+if (NOT IS_SYMLINK "${CMAKE_BINARY_DIR}/sys/user")
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/sys/user")
 endif()
 
@@ -15,4 +15,5 @@ add_catch2_executable(
         module-db
     DEPS
         assets
+        PurePhone-disk-img
 )

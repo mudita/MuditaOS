@@ -32,14 +32,10 @@ namespace cellular::service
             return "ModemOn";
         case ST::URCReady:
             return "URCReady";
-        case ST::SimSelect:
-            return "SimSelect";
         case ST::Failed:
             return "Failed";
         case ST::SanityCheck:
             return "SanityCheck";
-        case ST::SimInit:
-            return "SimInit";
         case ST::ModemFatalFailure:
             return "ModemFatalFailure";
         case ST::CellularConfProcedure:

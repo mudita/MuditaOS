@@ -14,14 +14,14 @@ PhoneLockChangeInfoWindow::PhoneLockChangeInfoWindow(app::Application *app, cons
     buildInterface();
 }
 
-top_bar::Configuration PhoneLockChangeInfoWindow::configureTopBar(top_bar::Configuration appConfiguration)
+status_bar::Configuration PhoneLockChangeInfoWindow::configureStatusBar(status_bar::Configuration appConfiguration)
 {
-    appConfiguration.enable(top_bar::Indicator::NetworkAccessTechnology);
-    appConfiguration.enable(top_bar::Indicator::Time);
-    appConfiguration.enable(top_bar::Indicator::PhoneMode);
-    appConfiguration.enable(top_bar::Indicator::Battery);
-    appConfiguration.enable(top_bar::Indicator::Signal);
-    appConfiguration.enable(top_bar::Indicator::SimCard);
+    appConfiguration.enable(status_bar::Indicator::NetworkAccessTechnology);
+    appConfiguration.enable(status_bar::Indicator::Time);
+    appConfiguration.enable(status_bar::Indicator::PhoneMode);
+    appConfiguration.enable(status_bar::Indicator::Battery);
+    appConfiguration.enable(status_bar::Indicator::Signal);
+    appConfiguration.enable(status_bar::Indicator::SimCard);
     return appConfiguration;
 }
 

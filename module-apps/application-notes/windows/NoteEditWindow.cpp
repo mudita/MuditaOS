@@ -15,9 +15,6 @@
 
 #include <i18n/i18n.hpp>
 
-#include <module-gui/gui/widgets/BottomBar.hpp>
-#include <module-gui/gui/widgets/TopBar.hpp>
-
 #include <ctime>
 
 namespace app::notes

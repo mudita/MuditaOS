@@ -13,16 +13,16 @@ namespace gui
 {
     TetheringOffPopup::TetheringOffPopup(app::Application *app, const std::string &name) : DialogYesNo{app, name}
     {
-        topBar->configure(configureTopBar(application->getTopBarConfiguration()));
+        statusBar->configure(configureStatusBar(application->getStatusBarConfiguration()));
     }
 
-    top_bar::Configuration TetheringOffPopup::configureTopBar(top_bar::Configuration appConfiguration)
+    status_bar::Configuration TetheringOffPopup::configureStatusBar(status_bar::Configuration appConfiguration)
     {
-        appConfiguration.enable(top_bar::Indicator::Time);
-        appConfiguration.disable(top_bar::Indicator::Lock);
-        appConfiguration.disable(top_bar::Indicator::Battery);
-        appConfiguration.disable(top_bar::Indicator::Signal);
-        appConfiguration.disable(top_bar::Indicator::SimCard);
+        appConfiguration.enable(status_bar::Indicator::Time);
+        appConfiguration.disable(status_bar::Indicator::Lock);
+        appConfiguration.disable(status_bar::Indicator::Battery);
+        appConfiguration.disable(status_bar::Indicator::Signal);
+        appConfiguration.disable(status_bar::Indicator::SimCard);
         return appConfiguration;
     }
 

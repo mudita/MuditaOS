@@ -12,6 +12,6 @@ namespace gui
       public:
         TetheringNotificationPopup(app::Application *app, const std::string &name);
 
-        gui::top_bar::Configuration configureTopBar(gui::top_bar::Configuration appConfiguration) override;
+        gui::status_bar::Configuration configureStatusBar(gui::status_bar::Configuration appConfiguration) override;
     };
 } // namespace gui

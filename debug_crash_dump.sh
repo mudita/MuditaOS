@@ -76,7 +76,7 @@ function parse_args()
 
 function exec_gdb()
 {
-    local CRASH_DEBUG="$BUILD_DIR/host-tools/crashdebug/CrashDebug"
+    local CRASH_DEBUG="$BUILD_DIR/third-party/CrashDebug/bin/CrashDebug"
 
     exec "$GDB" "$PURE_ELF"                                                             \
         -ex "set target-charset ASCII"                                                  \

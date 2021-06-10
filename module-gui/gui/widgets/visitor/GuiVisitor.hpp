@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -13,9 +13,9 @@ namespace gui
     class BottomBar;
     class ListItem;
 
-    namespace top_bar
+    namespace status_bar
     {
-        class TopBar;
+        class StatusBar;
     }
 
     /// The general purpose abstract interface for enabling Double-Dispatch behavior throughout `gui::Item`'s
@@ -23,14 +23,14 @@ namespace gui
     class GuiVisitor
     {
       public:
-        virtual void visit(gui::Item &item)      = 0;
-        virtual void visit(gui::Rect &item)      = 0;
-        virtual void visit(gui::Text &item)      = 0;
-        virtual void visit(gui::Window &item)    = 0;
-        virtual void visit(gui::Label &item)     = 0;
-        virtual void visit(gui::BottomBar &item) = 0;
-        virtual void visit(gui::top_bar::TopBar &item) = 0;
-        virtual void visit(gui::ListItem &item)        = 0;
-        virtual ~GuiVisitor()                    = default;
+        virtual void visit(gui::Item &item)                  = 0;
+        virtual void visit(gui::Rect &item)                  = 0;
+        virtual void visit(gui::Text &item)                  = 0;
+        virtual void visit(gui::Window &item)                = 0;
+        virtual void visit(gui::Label &item)                 = 0;
+        virtual void visit(gui::BottomBar &item)             = 0;
+        virtual void visit(gui::status_bar::StatusBar &item) = 0;
+        virtual void visit(gui::ListItem &item)              = 0;
+        virtual ~GuiVisitor()                                = default;
     };
 } // namespace gui

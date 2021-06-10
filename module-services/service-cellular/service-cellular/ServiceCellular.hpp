@@ -189,10 +189,6 @@ class ServiceCellular : public sys::Service
     /// check one time modem configuration for sim (hot swap)
     /// if hot swap is not enabled full modem restart is needed (right now at best reboot)
     bool handle_sim_sanity_check();
-    /// select sim from settings
-    bool handle_select_sim();
-    /// initialize sim (GSM commands for initialization)
-    bool handle_sim_init();
     /// modem failure handler
     bool handle_failure();
     /// fatal failure handler, if we have power switch - we could handle it here
@@ -278,7 +274,6 @@ class ServiceCellular : public sys::Service
     auto handleCellularRingingMessage(CellularRingingMessage *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularIncominCallMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularCallerIdMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
-    auto handleCellularSimProcedureMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularGetIMSIMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularGetOwnNumberMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularGetNetworkInfoMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;

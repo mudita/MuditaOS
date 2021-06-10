@@ -28,8 +28,6 @@ namespace cellular::service
             SanityCheck,                 /// prior to ModemOn last sanity checks for one time configurations etc
             ModemOn,   /// modem ready - indicates that modem is fully configured, ( **SIM is not yet configured** )
             URCReady,  /// State indicates that URC handling is enabled
-            SimInit,   /// initialize sim card
-            SimSelect, /// triggers hw SIM selection (! state now will be **changed on URC** )
             ModemFatalFailure, /// modem full shutdown need
             Failed,
             Ready,            /// Service is fully initialized

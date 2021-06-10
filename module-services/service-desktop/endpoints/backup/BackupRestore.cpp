@@ -18,7 +18,7 @@
 #include <string>
 #include <vector>
 #include <sys/statvfs.h>
-#include <gsl>
+#include <gsl/gsl>
 
 namespace sys
 {
