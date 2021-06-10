@@ -3,10 +3,11 @@
 
 #pragma once
 
-#include <magic_enum.hpp>
 #include "Common.hpp"
-#include "MessageType.hpp"
 #include "MessageForward.hpp"
+
+#include <MessageType.hpp>
+#include <magic_enum.hpp>
 
 #include <cstdint>
 #include <memory>

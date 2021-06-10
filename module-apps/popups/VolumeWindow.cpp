@@ -42,7 +42,7 @@ namespace gui
         WindowWithTimer::buildInterface();
 
         bottomBar->setVisible(false);
-        topBar->setVisible(false);
+        statusBar->setVisible(false);
 
         addVolumeText();
         addVolumeBar();

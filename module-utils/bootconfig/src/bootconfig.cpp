@@ -3,7 +3,7 @@
 #include <boot/bootconfig.hpp>
 #include <boot/bootconstants.hpp>
 
-#include <module-utils/gsl/gsl_util>
+#include <gsl/util>
 #include <limits.h>
 #include <purefs/filesystem_paths.hpp>
 #include <source/version.hpp>

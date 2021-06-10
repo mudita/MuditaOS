@@ -3,7 +3,6 @@
 
 #include <board.h>
 #include <critical.hpp>
-#include <gsl/gsl_util>
 #include <macros.h>
 #include "log/log.hpp"
 #include "log/Logger.hpp"

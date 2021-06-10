@@ -154,9 +154,9 @@ namespace gui
         erase();
     }
 
-    top_bar::Configuration CallWindow::configureTopBar(top_bar::Configuration appConfiguration)
+    status_bar::Configuration CallWindow::configureStatusBar(status_bar::Configuration appConfiguration)
     {
-        appConfiguration.enable(top_bar::Indicator::NetworkAccessTechnology);
+        appConfiguration.enable(status_bar::Indicator::NetworkAccessTechnology);
         return appConfiguration;
     }
 

@@ -11,7 +11,7 @@ namespace gui
     {
       public:
         TetheringOffPopup(app::Application *app, const std::string &name);
-        top_bar::Configuration configureTopBar(top_bar::Configuration appConfiguration) override;
+        status_bar::Configuration configureStatusBar(status_bar::Configuration appConfiguration) override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
     };
 

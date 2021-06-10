@@ -3,7 +3,7 @@
 
 #include "SARInfoRepository.hpp"
 
-#include <gsl_util>
+#include <gsl/util>
 #include <i18n/i18n.hpp>
 
 #include <fstream>

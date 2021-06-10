@@ -45,11 +45,12 @@ namespace gui
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;
-        top_bar::Configuration configureTopBar(top_bar::Configuration appConfiguration) override;
+        status_bar::Configuration configureStatusBar(status_bar::Configuration appConfiguration) override;
 
         bool updateTime() override;
 
       private:
+        bool resolveDialAction(const std::string &number);
         bool showInformationPopup(std::function<bool()> action, const std::string &notification);
         void invalidate() noexcept;
         std::string osUpdateVer;

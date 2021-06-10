@@ -4,7 +4,7 @@
 #include "LockPolicyHandler.hpp"
 #include <log/log.hpp>
 #include <Application.hpp>
-#include <gsl_assert>
+#include <gsl/assert>
 
 using namespace locks;
 

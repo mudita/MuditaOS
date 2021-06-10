@@ -49,7 +49,6 @@ add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
 include(segger/rtt/CMakeLists.txt)
 
 # add third party libs
-include(third-party/re2.cmake)
 include(third-party/libphonenumber.cmake)
 
 # link against libphonenumber
@@ -81,7 +80,6 @@ target_include_directories(${PROJECT_NAME}
         PUBLIC
 
         ${CMAKE_CURRENT_SOURCE_DIR}
-        ${CMAKE_CURRENT_SOURCE_DIR}/gsl
 )
 
 if((${PROJECT_TARGET} STREQUAL "TARGET_RT1051") AND (${SYSTEM_VIEW_ENABLED}))

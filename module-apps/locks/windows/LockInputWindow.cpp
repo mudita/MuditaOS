@@ -102,14 +102,14 @@ namespace gui
         }
     }
 
-    top_bar::Configuration LockInputWindow::configureTopBar(top_bar::Configuration appConfiguration)
+    status_bar::Configuration LockInputWindow::configureStatusBar(status_bar::Configuration appConfiguration)
     {
-        appConfiguration.disable(top_bar::Indicator::NetworkAccessTechnology);
-        appConfiguration.enable(top_bar::Indicator::Time);
-        appConfiguration.enable(top_bar::Indicator::PhoneMode);
-        appConfiguration.enable(top_bar::Indicator::Battery);
-        appConfiguration.enable(top_bar::Indicator::Signal);
-        appConfiguration.enable(top_bar::Indicator::SimCard);
+        appConfiguration.disable(status_bar::Indicator::NetworkAccessTechnology);
+        appConfiguration.enable(status_bar::Indicator::Time);
+        appConfiguration.enable(status_bar::Indicator::PhoneMode);
+        appConfiguration.enable(status_bar::Indicator::Battery);
+        appConfiguration.enable(status_bar::Indicator::Signal);
+        appConfiguration.enable(status_bar::Indicator::SimCard);
         return appConfiguration;
     }
 

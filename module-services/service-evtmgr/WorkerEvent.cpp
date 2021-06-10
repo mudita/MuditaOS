@@ -21,7 +21,6 @@
 #include <bsp/light_sensor/light_sensor.hpp>
 #include <bsp/vibrator/vibrator.hpp>
 #include <bsp/eink_frontlight/eink_frontlight.hpp>
-#include <common_data/EventStore.hpp>
 #include <common_data/RawKey.hpp>
 #include <headset.hpp>
 #include <log/log.hpp>
@@ -148,7 +147,7 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
         if (notification == bsp::cellular::trayPin) {
             Store::GSM::Tray pinstate = bsp::cellular::sim::getTray();
             LOG_DEBUG("SIM state change: %d", static_cast<int>(pinstate));
-            bsp::cellular::sim::hotSwapTrigger();
+            service->bus.sendUnicast(std::make_shared<sevm::SIMTrayMessage>(), service::name::evt_manager);
         }
 
         if (notification == bsp::cellular::ringIndicatorPin) {

@@ -1,4 +1,3 @@
-﻿
 add_subdirectory(crc32)
 add_subdirectory(magic_enum)
 add_subdirectory(microtar)
@@ -10,4 +9,9 @@ add_subdirectory(minimp3)
 add_subdirectory(tinyexpr)
 add_subdirectory(parallel-hashmap)
 add_subdirectory(protobuf)
-
+add_subdirectory(littlefs)
+add_subdirectory(gsl)
+add_subdirectory(re2)
+if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
+    add_subdirectory(CrashDebug)
+endif()

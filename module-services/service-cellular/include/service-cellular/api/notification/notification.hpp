@@ -35,4 +35,7 @@ namespace cellular::msg::notification
         const unsigned int code;
     };
 
+    struct SimStateUpdate : public msg::Notification
+    {};
+
 } // namespace cellular::msg::notification

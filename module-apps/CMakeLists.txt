@@ -21,7 +21,7 @@ set( SOURCES
     "GuiTimer.cpp"
     "DOMResponder.cpp"
     "WindowsFactory.cpp"
-    "TopBarManager.cpp"
+    "StatusBarManager.cpp"
     "AsyncTask.cpp"
     "CallbackStorage.cpp"
     "windows/AppWindow.cpp"
@@ -125,6 +125,7 @@ target_link_libraries(${PROJECT_NAME}
         service-cellular
         service-db
         service-evtmgr
+        Microsoft.GSL::GSL
     PUBLIC
         module-audio
         module-bsp

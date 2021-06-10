@@ -77,6 +77,7 @@ target_include_directories(${PROJECT_NAME}
 )
 
 target_link_libraries(${PROJECT_NAME}
+    PUBLIC
     service-cellular
     service-eink
     service-fota
@@ -87,6 +88,8 @@ target_link_libraries(${PROJECT_NAME}
     module-db
     module-bsp
     date::date
+    PRIVATE
+    Microsoft.GSL::GSL
 )
 
 if (${ENABLE_TESTS})

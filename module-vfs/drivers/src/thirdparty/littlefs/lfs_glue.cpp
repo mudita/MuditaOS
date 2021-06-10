@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 #include <littlefs/volume_mapper.hpp>
-#include <littlefs/lfs.h>
+#include <lfs.h>
 #include <purefs/blkdev/disk_handle.hpp>
 #include <purefs/blkdev/disk_manager.hpp>
 #include <log/log.hpp>

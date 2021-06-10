@@ -5,8 +5,6 @@
 #include "InputEvent.hpp"
 #include "application-calendar/ApplicationCalendar.hpp"
 #include "application-calendar/data/CalendarData.hpp"
-#include <gui/widgets/BottomBar.hpp>
-#include <gui/widgets/TopBar.hpp>
 #include <gui/widgets/Window.hpp>
 #include <service-appmgr/Controller.hpp>
 
