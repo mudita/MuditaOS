@@ -41,9 +41,9 @@ namespace gui
         buildInterface();
     }
 
-    top_bar::Configuration EventReminderWindow::configureTopBar(top_bar::Configuration appConfiguration)
+    status_bar::Configuration EventReminderWindow::configureStatusBar(status_bar::Configuration appConfiguration)
     {
-        using namespace top_bar;
+        using namespace status_bar;
         appConfiguration.enable({Indicator::Signal, Indicator::Time, Indicator::Battery, Indicator::SimCard});
         return appConfiguration;
     }
@@ -58,7 +58,7 @@ namespace gui
 
         const uint32_t w = this->getWidth() - style::window::default_left_margin - style::window::default_right_margin;
         const uint32_t h = this->getHeight() - bottomBar->getHeight();
-        body             = new gui::VBox(this, style::window::default_left_margin, topBar->getHeight(), w, h);
+        body             = new gui::VBox(this, style::window::default_left_margin, statusBar->getHeight(), w, h);
         body->setBorderColor(gui::ColorNoColor);
 
         topImage = new gui::Image(body,

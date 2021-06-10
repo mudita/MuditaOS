@@ -20,7 +20,7 @@
 #include <Timers/TimerFactory.hpp>
 #include <SystemManager/SystemManager.hpp>
 
-#include <gsl/gsl_util>
+#include <gsl/util>
 #include <purefs/filesystem_paths.hpp>
 
 namespace service::gui

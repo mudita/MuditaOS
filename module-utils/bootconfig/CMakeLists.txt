@@ -21,4 +21,5 @@ target_link_libraries( ${PROJECT_NAME}
       module-utils
       module-vfs
       crc32
+      Microsoft.GSL::GSL
 )

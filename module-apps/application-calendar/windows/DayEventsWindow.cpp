@@ -8,8 +8,6 @@
 #include <gui/widgets/Label.hpp>
 #include <gui/widgets/Item.hpp>
 #include <gui/widgets/Image.hpp>
-#include <gui/widgets/BottomBar.hpp>
-#include <gui/widgets/TopBar.hpp>
 
 #include <time/time_conversion.hpp>
 #include <module-db/queries/calendar/QueryEventsGetFiltered.hpp>

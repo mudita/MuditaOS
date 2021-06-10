@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <stdbool.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -19,7 +20,8 @@
 
 static void syntax(char **argv)
 {
-    fprintf(stderr, "%s [filename] [blkdev]\n", argv[0]);
+    fprintf(stderr, "%s [--force] filename blkdev\n", argv[0]);
+    fprintf(stderr, "\t--force Skip device sanity checks (optional)\n");
 }
 
 static struct fiemap *read_fiemap(int fd)
@@ -223,7 +225,7 @@ static int verify_image(const char *image_file, const char *block_device)
     return (result ? EXIT_FAILURE : EXIT_SUCCESS);
 }
 
-static int write_image(const char *image_file, const char *block_device)
+static int write_image(const char *image_file, const char *block_device, bool force)
 {
     struct stat sbuf;
     if (stat(image_file, &sbuf)) {
@@ -242,12 +244,12 @@ static int write_image(const char *image_file, const char *block_device)
         fprintf(stderr, "Error: %s is not a block device\n", block_device);
         return EXIT_FAILURE;
     }
-    if (gnu_dev_minor(sbuf.st_rdev)) {
+    if (gnu_dev_minor(sbuf.st_rdev) && !force) {
         fprintf(stderr, "Error: %s is partition device not a disc\n", block_device);
         fprintf(stderr, "Please specify disk device instead of a partition\n");
         return EXIT_FAILURE;
     }
-    {
+    if (!force) {
         char mntpath[FILENAME_MAX];
         const int err = device_is_mounted(block_device, mntpath, sizeof mntpath);
         if (err > 0) {
@@ -307,14 +309,26 @@ static int write_image(const char *image_file, const char *block_device)
 
 int main(int argc, char **argv)
 {
-    if (argc < 3) {
+    const char *img_file, *blk_dev;
+    bool force;
+    if (argc == 4 && !strcmp(argv[1], "--force")) {
+        force    = true;
+        img_file = argv[2];
+        blk_dev  = argv[3];
+    }
+    else if (argc == 3) {
+        force    = false;
+        img_file = argv[1];
+        blk_dev  = argv[2];
+    }
+    else {
         syntax(argv);
         return EXIT_FAILURE;
     }
-    if (write_image(argv[1], argv[2])) {
+    if (write_image(img_file, blk_dev, force)) {
         return EXIT_FAILURE;
     }
-    int result = verify_image(argv[1], argv[2]);
-    fprintf(stderr, "Write image %s to %s %s\n", argv[1], argv[2], result ? "FAILED" : "SUCCESS");
+    int result = verify_image(img_file, blk_dev);
+    fprintf(stderr, "Write image %s to %s %s\n", img_file, blk_dev, result ? "FAILED" : "SUCCESS");
     return result;
 }

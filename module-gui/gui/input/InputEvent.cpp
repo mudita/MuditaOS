@@ -2,6 +2,8 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "InputEvent.hpp"
+#include <gsl/assert>
+
 namespace gui
 {
 
@@ -15,6 +17,12 @@ namespace gui
         ss << "State: " << c_str(state) << " ";
         ss << "short press: " << isShortRelease();
         return ss.str();
+    }
+
+    auto InputEvent::numericValue() const -> int
+    {
+        Expects(isDigit());
+        return toNumeric(keyCode);
     }
 
 }; // namespace gui

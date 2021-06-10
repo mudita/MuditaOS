@@ -65,15 +65,15 @@ namespace gui
                                          listview::ScrollBarType::None);
     }
 
-    top_bar::Configuration PhoneLockedWindow::configureTopBar(top_bar::Configuration appConfiguration)
+    status_bar::Configuration PhoneLockedWindow::configureStatusBar(status_bar::Configuration appConfiguration)
     {
-        appConfiguration.disable(top_bar::Indicator::NetworkAccessTechnology);
-        appConfiguration.disable(top_bar::Indicator::Time);
-        appConfiguration.enable(top_bar::Indicator::PhoneMode);
-        appConfiguration.enable(top_bar::Indicator::Lock);
-        appConfiguration.enable(top_bar::Indicator::Battery);
-        appConfiguration.enable(top_bar::Indicator::Signal);
-        appConfiguration.enable(top_bar::Indicator::SimCard);
+        appConfiguration.disable(status_bar::Indicator::NetworkAccessTechnology);
+        appConfiguration.disable(status_bar::Indicator::Time);
+        appConfiguration.enable(status_bar::Indicator::PhoneMode);
+        appConfiguration.enable(status_bar::Indicator::Lock);
+        appConfiguration.enable(status_bar::Indicator::Battery);
+        appConfiguration.enable(status_bar::Indicator::Signal);
+        appConfiguration.enable(status_bar::Indicator::SimCard);
         return appConfiguration;
     }
 

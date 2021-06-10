@@ -58,16 +58,12 @@ set_source_files_properties (${LIBPHONENUMBER}/asyoutypeformatter.cc
 # add include directory path
 target_include_directories (${LIBPHONENUMBER_TARGET} PUBLIC ${LIBPHONENUMBER_SRCDIR})
 
-# module-os dependency (locking support)
-target_link_libraries (${LIBPHONENUMBER_TARGET} PUBLIC module-os)
-
-# RE2 dependency
-if (NOT RE2_TARGET)
-        message (FATAL_ERROR "RE2 is required for libphonenumber")
-endif ()
-target_link_libraries (${LIBPHONENUMBER_TARGET} PUBLIC ${RE2_TARGET})
-
-target_link_libraries (${LIBPHONENUMBER_TARGET} PUBLIC protobuf::libprotobuf-lite)
+target_link_libraries (${LIBPHONENUMBER_TARGET} 
+        PRIVATE 
+                re2::re2
+        PUBLIC 
+                protobuf::libprotobuf-lite
+)
 
 # turn on optimization in debug
 third_party_source_optimization (${LIBPHONENUMBER_SOURCES})

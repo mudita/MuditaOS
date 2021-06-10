@@ -11,6 +11,8 @@
 #include <application-messages/Constants.hpp>
 #include <service-appmgr/messages/SwitchRequest.hpp>
 
+#include <gsl/assert>
+
 using namespace gui;
 
 namespace

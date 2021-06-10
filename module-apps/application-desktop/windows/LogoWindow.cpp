@@ -3,8 +3,6 @@
 
 #include "LogoWindow.hpp"
 #include "gui/widgets/Image.hpp"
-#include "gui/widgets/BottomBar.hpp"
-#include "gui/widgets/TopBar.hpp"
 #include "log/log.hpp"
 #include <application-desktop/windows/Names.hpp>
 
@@ -25,7 +23,7 @@ namespace gui
     {
         AppWindow::buildInterface();
         bottomBar->setVisible(false);
-        topBar->setVisible(false);
+        statusBar->setVisible(false);
         new gui::Image(this, 0, 0, 0, 0, "logo");
     }
 
