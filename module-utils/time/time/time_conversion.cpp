@@ -17,7 +17,6 @@
 #include "i18n/i18n.hpp"
 
 #include "time_locale.hpp"
-#include "DateAndTimeSettings.hpp"
 #include <Utils.hpp>
 #include <time/time_constants.hpp>
 

@@ -8,6 +8,7 @@ set(SOURCES
     TimezoneHandler.cpp
     timeEvents/TimeEvents.cpp
     timeEvents/CalendarTimeEvents.cpp
+    internal/StaticData.cpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
@@ -19,9 +20,13 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
+        time
+        service-time-api
         module-sys
         module-apps
 )
+
+add_subdirectory(api)
 
 if (${ENABLE_TESTS})
     add_subdirectory(tests)

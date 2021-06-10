@@ -18,6 +18,17 @@ namespace utils::time
         Date,      /// date
         DateText,  /// date in textual represnatation
     };
+    class TimestampFactory
+    {
+      private:
+        static TimeSettingsInterface *timeSettings;
 
-    std::unique_ptr<Timestamp> createTimestamp(TimestampType type, time_t time = 0);
+      public:
+        TimestampFactory() = default;
+        void init(TimeSettingsInterface *settings)
+        {
+            timeSettings = settings;
+        }
+        std::unique_ptr<Timestamp> createTimestamp(TimestampType type, time_t time = 0);
+    };
 } // namespace utils::time

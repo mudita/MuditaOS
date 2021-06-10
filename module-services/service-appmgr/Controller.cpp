@@ -84,30 +84,6 @@ namespace app::manager
         return sender->bus.sendUnicast(msg, ApplicationManager::ServiceName);
     }
 
-    auto Controller::changeAutomaticDateAndTimeIsOn(sys::Service *sender, bool isOn) -> bool
-    {
-        auto msg = std::make_shared<app::manager::AutomaticDateAndTimeIsOnChangeRequest>(isOn);
-        return sender->bus.sendUnicast(std::move(msg), ApplicationManager::ServiceName);
-    }
-
-    auto Controller::changeAutomaticTimeZoneIsOn(sys::Service *sender, bool isOn) -> bool
-    {
-        auto msg = std::make_shared<app::manager::AutomaticTimeZoneIsOnChangeRequest>(isOn);
-        return sender->bus.sendUnicast(std::move(msg), ApplicationManager::ServiceName);
-    }
-
-    auto Controller::changeTimeFormat(sys::Service *sender, utils::time::Locale::TimeFormat timeFormat) -> bool
-    {
-        auto msg = std::make_shared<app::manager::TimeFormatChangeRequest>(timeFormat);
-        return sender->bus.sendUnicast(std::move(msg), ApplicationManager::ServiceName);
-    }
-
-    auto Controller::changeDateFormat(sys::Service *sender, utils::time::Locale::DateFormat dateFormat) -> bool
-    {
-        auto msg = std::make_shared<app::manager::DateFormatChangeRequest>(dateFormat);
-        return sender->bus.sendUnicast(std::move(msg), ApplicationManager::ServiceName);
-    }
-
     auto Controller::preventBlockingDevice(sys::Service *sender) -> bool
     {
         auto msg = std::make_shared<app::manager::PreventBlockingRequest>(sender->GetName());

@@ -35,7 +35,7 @@ namespace gui::model
         {
             using namespace utils::time;
             ret->setContact(threadStruct->contact->getFormattedName());
-            ret->setTimestamp(*createTimestamp(TimestampType::DateTime, threadStruct->thread->date));
+            ret->setTimestamp(*TimestampFactory().createTimestamp(TimestampType::DateTime, threadStruct->thread->date));
             // The only thing that differs with ThreadModel actually - here show what was found
             ret->setPreview(threadStruct->thread->snippet);
         }

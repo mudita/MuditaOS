@@ -57,7 +57,7 @@ namespace gui
     void NotesItem::setDateText(std::uint32_t timestamp)
     {
         using namespace utils::time;
-        auto dt = createTimestamp(TimestampType::DateTime, timestamp);
+        auto dt = TimestampFactory().createTimestamp(TimestampType::DateTime, timestamp);
         date->setText(*dt);
     }
 

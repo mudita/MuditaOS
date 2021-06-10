@@ -120,4 +120,6 @@ target_link_libraries(${PROJECT_NAME}
     PUBLIC
         service-bluetooth
         eventstore
+    PRIVATE
+        service-time-api
 )

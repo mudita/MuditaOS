@@ -142,10 +142,6 @@ namespace app::manager
         auto handleInitApplication(ApplicationInitialised *msg) -> bool;
         auto handleDisplayLanguageChange(DisplayLanguageChangeRequest *msg) -> bool;
         auto handleInputLanguageChange(InputLanguageChangeRequest *msg) -> bool;
-        auto handleAutomaticDateAndTimeChange(AutomaticDateAndTimeIsOnChangeRequest *msg) -> bool;
-        auto handleAutomaticTimeZoneChange(AutomaticTimeZoneIsOnChangeRequest *msg) -> bool;
-        auto handleTimeFormatChange(TimeFormatChangeRequest *msg) -> bool;
-        auto handleDateFormatChange(DateFormatChangeRequest *msg) -> bool;
         auto handleSetOsUpdateVersionChange(SetOsUpdateVersion *msg) -> bool;
         auto handleDBResponse(db::QueryResponse *msg) -> bool;
         auto handlePowerSavingModeInit() -> bool;
