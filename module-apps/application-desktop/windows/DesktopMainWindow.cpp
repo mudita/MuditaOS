@@ -243,8 +243,8 @@ namespace gui
     {
         using namespace utils::time;
         auto ret       = AppWindow::updateTime();
-        auto clock     = createTimestamp(TimestampType::Clock, std::time(nullptr));
-        auto date      = createTimestamp(TimestampType::DateText, std::time(nullptr));
+        auto clock     = TimestampFactory().createTimestamp(TimestampType::Clock, std::time(nullptr));
+        auto date      = TimestampFactory().createTimestamp(TimestampType::DateText, std::time(nullptr));
         if (time != nullptr) {
             time->setText(clock->str());
         }

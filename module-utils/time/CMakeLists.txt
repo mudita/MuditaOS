@@ -13,7 +13,6 @@ module_is_test_entity(time)
 
 target_sources(time
     PRIVATE
-        time/DateAndTimeSettings.cpp
         time/time_conversion.cpp
         time/time_date_validation.cpp
         time/TimeRangeParser.cpp

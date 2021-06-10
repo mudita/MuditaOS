@@ -94,7 +94,7 @@ namespace app::notes
     void NotePreviewWindow::setEditDateText(std::uint32_t timestamp)
     {
         using namespace utils::time;
-        auto dateTime = createTimestamp(TimestampType::DateTime, timestamp);
+        auto dateTime = TimestampFactory().createTimestamp(TimestampType::DateTime, timestamp);
         auto dt       = dynamic_cast<DateTime *>(dateTime.get());
         if (dt == nullptr) {
             return;

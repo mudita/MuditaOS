@@ -20,6 +20,11 @@
 #include <functional>
 #include <string> // for allocator, string
 
+namespace settings
+{
+    class Settings;
+}
+
 namespace stm
 {
     class ServiceTime : public sys::Service
@@ -29,7 +34,16 @@ namespace stm
         CalendarTimeEvents calendarEvents;
 
         std::unique_ptr<TimeManager> timeManager;
+
+        std::unique_ptr<settings::Settings> settings;
+
         void registerMessageHandlers();
+        auto handleSetAutomaticDateAndTimeRequest(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>;
+        auto handleSetAutomaticTimezoneRequest(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>;
+        auto handleSetTimeFormatRequest(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>;
+        auto handleSetDateFormatRequest(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>;
+
+        void initStaticData();
 
       public:
         ServiceTime();

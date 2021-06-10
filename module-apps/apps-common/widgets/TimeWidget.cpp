@@ -19,7 +19,7 @@ namespace gui
                            Type type,
                            std::function<void(const UTF8 &text)> bottomBarTemporaryMode,
                            std::function<void()> bottomBarRestoreFromTemporaryMode)
-        : VBox(parent), mode24H{!utils::dateAndTimeSettings.isTimeFormat12()}, type{type},
+        : VBox(parent), mode24H{!stm::api::isTimeFormat12h()}, type{type},
           bottomBarTemporaryMode(std::move(bottomBarTemporaryMode)),
           bottomBarRestoreFromTemporaryMode(std::move(bottomBarRestoreFromTemporaryMode))
     {
