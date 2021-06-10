@@ -17,6 +17,7 @@ set(INCLUDES
     "${CMAKE_CURRENT_SOURCE_DIR}/include"
     "${CMAKE_SOURCE_DIR}/module-os/board/linux"
     "${CMAKE_SOURCE_DIR}/module-os/RTOSWrapper/include"
+    "${CMAKE_SOURCE_DIR}/module-utils"
 )
 
 
