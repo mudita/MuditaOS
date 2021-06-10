@@ -48,7 +48,7 @@ namespace purefs::fs
     {
         class directory_handle;
         class notifier;
-    }
+    } // namespace internal
     class filesystem
     {
         static constexpr auto path_separator = '/';
@@ -60,8 +60,8 @@ namespace purefs::fs
         static constexpr auto first_file_descriptor = 3;
 
       public:
-        using fsdir                    = std::shared_ptr<internal::directory_handle>;
-        using fsfile                         = std::shared_ptr<internal::file_handle>;
+        using fsdir  = std::shared_ptr<internal::directory_handle>;
+        using fsfile = std::shared_ptr<internal::file_handle>;
         explicit filesystem(std::shared_ptr<blkdev::disk_manager> diskmm);
         ~filesystem();
         filesystem(const filesystem &) = delete;
@@ -281,6 +281,7 @@ namespace purefs::fs
                 }
             }
         }
+
       private:
         std::weak_ptr<blkdev::disk_manager> m_diskmm;
         std::unordered_map<std::string, std::shared_ptr<filesystem_operations>> m_fstypes;

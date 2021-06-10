@@ -11,7 +11,7 @@ namespace purefs::fs::internal
     {
         thread_local std::string cwd_per_thread;
         std::string default_cwd{"/"};
-    }
+    } // namespace
     auto get_thread_local_cwd_path() noexcept -> std::string_view
     {
         if (cwd_per_thread.empty()) {

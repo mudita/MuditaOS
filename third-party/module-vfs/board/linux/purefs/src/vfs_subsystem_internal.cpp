@@ -9,11 +9,11 @@ namespace purefs::subsystem::internal
 {
     namespace
     {
-        constexpr auto disk_image_name = "PurePhone.img";
+        constexpr auto disk_image_name            = "PurePhone.img";
         constexpr auto eeprom_image_name          = "eeprom.img";
         static constexpr auto eeprom_sector_size  = 64;
         static constexpr auto eeprom_num_sysparts = 1;
-    }
+    } // namespace
     auto create_default_block_device() -> std::shared_ptr<blkdev::disk>
     {
         return std::make_shared<blkdev::disk_image>(disk_image_name);

@@ -18,7 +18,7 @@ namespace purefs::blkdev
     namespace
     {
         using namespace std::literals;
-        static constexpr auto part_suffix = "part"sv;
+        static constexpr auto part_suffix    = "part"sv;
         static constexpr auto syspart_suffix = "sys"sv;
     } // namespace
 

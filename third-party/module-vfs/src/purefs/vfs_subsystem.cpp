@@ -18,15 +18,15 @@ namespace purefs::subsystem
 {
     namespace
     {
-        constexpr auto default_blkdev_name = "emmc0";
+        constexpr auto default_blkdev_name      = "emmc0";
         constexpr auto default_nvrom_name       = "nvrom0";
-        constexpr auto fat_part_code         = 0x0b;
-        constexpr auto lfs_part_code         = 0x9e;
-        constexpr auto old_layout_part_count = 2;
-        constexpr auto new_layout_part_count = 3;
-        constexpr auto boot_size_limit       = 16384L;
-        constexpr auto block_size_max_shift  = 21;
-        constexpr auto block_size_min_shift  = 8;
+        constexpr auto fat_part_code            = 0x0b;
+        constexpr auto lfs_part_code            = 0x9e;
+        constexpr auto old_layout_part_count    = 2;
+        constexpr auto new_layout_part_count    = 3;
+        constexpr auto boot_size_limit          = 16384L;
+        constexpr auto block_size_max_shift     = 21;
+        constexpr auto block_size_min_shift     = 8;
         constexpr uint32_t nvrom_lfs_block_size = 128U;
         namespace json
         {
@@ -147,8 +147,8 @@ namespace purefs::subsystem
             return {};
         }
 
-        g_disk_mgr   = disk_mgr;
-        g_fs_core    = fs_core;
+        g_disk_mgr = disk_mgr;
+        g_fs_core  = fs_core;
         return {disk_mgr, fs_core};
     }
 
