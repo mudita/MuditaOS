@@ -4,7 +4,7 @@
 #include "CheckBox.hpp"
 #include "InputEvent.hpp"
 #include "Style.hpp"
-#include "Utils.hpp"
+#include <i18n/i18n.hpp>
 
 namespace gui
 {

@@ -21,15 +21,16 @@ include_directories( ../module-utils )
 
 target_link_libraries(${PROJECT_NAME} 
     PUBLIC 
+        ${TARGET_LIBRARIES} 
+        eventstore
         math
         module-utils 
         utf8
-        eventstore
-        ${TARGET_LIBRARIES} 
     PRIVATE
-        pugixml::pugixml
-        Microsoft.GSL::GSL
+        i18n
         json::json
+        Microsoft.GSL::GSL
+        pugixml::pugixml
         time
 )
 

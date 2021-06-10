@@ -176,6 +176,7 @@ target_compile_options(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
+        i18n
         module-utils
         module-vfs
         utf8
