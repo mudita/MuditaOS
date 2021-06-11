@@ -28,7 +28,7 @@ namespace backlight
           screenLightTimer{sys::TimerFactory::createSingleShotTimer(
               parent, timers::screenLightTimerName, timers::keypadLightTimerTimeout, [this](sys::Timer &t) {
                   if (getScreenLightState() &&
-                      getScreenAutoModeState() == screen_light_control::ScreenLightMode::Manual &&
+                      getScreenAutoModeState() == screen_light_control::ScreenLightMode::Automatic &&
                       screenLightControl->isLightOn()) {
                       screenLightControl->processRequest(screen_light_control::Action::turnOff);
                   }
@@ -190,7 +190,7 @@ namespace backlight
 
     void Handler::handleScreenLightRefresh()
     {
-        if (getScreenLightState() && getScreenAutoModeState() == screen_light_control::ScreenLightMode::Manual) {
+        if (getScreenLightState() && getScreenAutoModeState() == screen_light_control::ScreenLightMode::Automatic) {
             if (!screenLightControl->isLightOn()) {
                 screenLightControl->processRequest(screen_light_control::Action::turnOn);
             }
