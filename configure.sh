@@ -80,7 +80,6 @@ if check_target && check_build_type ; then
         CMAKE_CMD="cmake \
                     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} \
                     -DCMAKE_TOOLCHAIN_FILE=${SRC_DIR}/${CMAKE_TOOLCHAIN_FILE} \
-                    -DCMAKE_EXPORT_COMPILE_COMMANDS=1 \
                     $@ \
                     ${SRC_DIR} "
         echo -e "\e[32m${CMAKE_CMD}\e[0m" | tr -s " "
