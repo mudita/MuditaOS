@@ -20,6 +20,7 @@
 #include <application-calculator/ApplicationCalculator.hpp>
 #include <application-alarm-clock/ApplicationAlarmClock.hpp>
 #include <application-onboarding/ApplicationOnBoarding.hpp>
+#include <application-bell-main/ApplicationBellMain.hpp>
 
 // services
 #include <service-appmgr/model/ApplicationManager.hpp>
@@ -121,61 +122,12 @@ int main()
         [sysmgr]() {
             // vector with launchers to applications
             std::vector<std::unique_ptr<app::ApplicationLauncher>> applications;
-#ifdef ENABLE_APP_DESKTOP
             applications.push_back(
-                app::CreateLauncher<app::ApplicationDesktop>(app::name_desktop, app::Closeable::False));
-#endif
-#ifdef ENABLE_APP_CALL
-            applications.push_back(app::CreateLauncher<app::ApplicationCall>(app::name_call, app::Closeable::False));
-#endif
-#ifdef ENABLE_APP_SETTINGS
-            applications.push_back(app::CreateLauncher<app::ApplicationSettings>(app::name_settings));
-#endif
-#ifdef ENABLE_APP_SETTINGS_NEW
-            applications.push_back(app::CreateLauncher<app::ApplicationSettingsNew>(app::name_settings_new));
-#endif
-#ifdef ENABLE_APP_NOTES
-            applications.push_back(app::CreateLauncher<app::ApplicationNotes>(app::name_notes));
-#endif
-#ifdef ENABLE_APP_CALLLOG
-            applications.push_back(app::CreateLauncher<app::ApplicationCallLog>(app::CallLogAppStr));
-#endif
-#ifdef ENABLE_APP_PHONEBOOK
-            applications.push_back(app::CreateLauncher<app::ApplicationPhonebook>(app::name_phonebook));
-#endif
-#ifdef ENABLE_APP_MESSAGES
-            applications.push_back(app::CreateLauncher<app::ApplicationMessages>(app::name_messages));
-#endif
-#ifdef ENABLE_APP_SPECIAL_INPUT
-            applications.push_back(
-                app::CreateLauncher<app::ApplicationSpecialInput>(app::special_input, app::Closeable::False));
-#endif
-#ifdef ENABLE_APP_ANTENNA
-            applications.push_back(app::CreateLauncher<app::ApplicationAntenna>(app::name_antenna));
-#endif
-#ifdef ENABLE_APP_CALENDAR
-            applications.push_back(app::CreateLauncher<app::ApplicationCalendar>(app::name_calendar));
-#endif
-#ifdef ENABLE_APP_MUSIC_PLAYER
-            applications.push_back(app::CreateLauncher<app::ApplicationMusicPlayer>(app::name_music_player));
-#endif
-#ifdef ENABLE_APP_MEDITATION
-            applications.push_back(
-                app::CreateLauncher<app::ApplicationMeditation>(app::name_meditation, app::Closeable::True));
-#endif
-#ifdef ENABLE_APP_CALCULATOR
-            applications.push_back(app::CreateLauncher<app::ApplicationCalculator>(app::name_calculator));
-#endif
-#ifdef ENABLE_APP_ALARM_CLOCK
-            applications.push_back(app::CreateLauncher<app::ApplicationAlarmClock>(app::name_alarm_clock));
-#endif
-#ifdef ENABLE_APP_ONBOARDING
-            applications.push_back(app::CreateLauncher<app::ApplicationOnBoarding>(app::name_onboarding));
-#endif
+                app::CreateLauncher<app::ApplicationBellMain>(app::applicationBellName, app::Closeable::False));
             // start application manager
             return sysmgr->RunSystemService(
                 std::make_shared<app::manager::ApplicationManager>(
-                    app::manager::ApplicationManager::ServiceName, std::move(applications), app::name_desktop),
+                    app::manager::ApplicationManager::ServiceName, std::move(applications), app::applicationBellName),
                 sysmgr.get());
         });
 

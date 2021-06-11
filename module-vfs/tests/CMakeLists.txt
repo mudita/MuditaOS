@@ -11,6 +11,7 @@ add_catch2_executable(
     SRCS
         ${CMAKE_CURRENT_LIST_DIR}/unittest_disk_manager.cpp
     LIBS
+        module-sys
         module-vfs
     DEPS
         test_disk_image
@@ -23,6 +24,7 @@ add_catch2_executable(
     INCLUDE 
         ${CMAKE_CURRENT_SOURCE_DIR}/../include/internal
     LIBS
+        module-sys
         module-vfs
 )
 
@@ -41,6 +43,7 @@ add_catch2_executable(
     INCLUDE 
         ${CMAKE_CURRENT_SOURCE_DIR}/../include/internal
     LIBS
+        module-sys
         module-vfs
     DEPS
         ${LITTLEFS_IMAGE}
@@ -52,8 +55,8 @@ add_catch2_executable(
         ${CMAKE_CURRENT_LIST_DIR}/unittest_filesystem_dualmount.cpp
     INCLUDE 
         ${CMAKE_CURRENT_SOURCE_DIR}/../include/internal
-
     LIBS
+        module-sys
         module-vfs
     DEPS
         ${LITTLEFS_IMAGE}
@@ -64,6 +67,7 @@ add_catch2_executable(
     SRCS
         ${CMAKE_CURRENT_LIST_DIR}/unittest_filesystem_inotify.cpp
     LIBS
+        module-sys
         module-vfs
     INCLUDE 
         ${CMAKE_CURRENT_SOURCE_DIR}/../include/internal

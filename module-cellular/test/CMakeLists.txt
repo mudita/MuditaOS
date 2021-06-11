@@ -5,6 +5,7 @@ add_catch2_executable(
     SRCS
         unittest_URC.cpp
     LIBS
+        module-sys
         module-cellular 
 )
 
@@ -14,6 +15,7 @@ add_catch2_executable(
         SRCS
         unittest_response.cpp
         LIBS
+        module-sys
         module-cellular
 )
 
@@ -23,6 +25,7 @@ add_catch2_executable(
         SRCS
         unittest_parse_result.cpp
         LIBS
+        module-sys
         module-cellular
 )
 
@@ -32,6 +35,7 @@ add_catch2_executable(
         SRCS
         unittest_ATStream.cpp
         LIBS
+        module-sys
         module-cellular
 )
 
@@ -41,6 +45,7 @@ add_catch2_executable(
         SRCS
         unittest_cmux.cpp
         LIBS
+        module-sys
         module-cellular
 )
 
@@ -50,6 +55,7 @@ add_catch2_executable(
         SRCS
         unittest_ATURCStream.cpp
         LIBS
+        module-sys
         module-cellular
 )
 
@@ -59,6 +65,7 @@ add_catch2_executable(
         SRCS
         unittest_CellularResult.cpp
         LIBS
+        module-sys
         module-cellular
         module-bsp
 )
