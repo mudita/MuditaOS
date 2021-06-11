@@ -8,9 +8,6 @@
 
 namespace cellular::msg::notification
 {
-    struct SimReady : public msg::Notification
-    {};
-
     struct SimNeedPin : public msg::Notification
     {
         explicit SimNeedPin(unsigned int attempts) : attempts(attempts)
@@ -34,9 +31,6 @@ namespace cellular::msg::notification
         {}
         const unsigned int code;
     };
-
-    struct SimStateUpdate : public msg::Notification
-    {};
 
     struct ModemStateChanged : public msg::Notification
     {

@@ -89,8 +89,10 @@ namespace app
             return sys::msgHandled();
         });
 
-        connect(typeid(cellular::msg::notification::SimReady), [&](sys::Message *msg) {
-            if (getCurrentWindow()->getName() == gui::window::name::onBoarding_sim_select) {
+        connect(typeid(cellular::msg::notification::SimStateChanged), [&](sys::Message *msg) {
+            auto data = static_cast<cellular::msg::notification::SimStateChanged *>(msg);
+            if (data->state == cellular::api::SimState::Ready &&
+                getCurrentWindow()->getName() == gui::window::name::onBoarding_sim_select) {
                 phoneLockSubject.setPhoneLock();
                 return sys::msgHandled();
             }

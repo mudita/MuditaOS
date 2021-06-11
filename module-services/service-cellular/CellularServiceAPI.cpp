@@ -69,26 +69,6 @@ std::string CellularServiceAPI::GetIMSI(sys::Service *serv, bool getFullIMSINumb
     }
 }
 
-void CellularServiceAPI::SubscribeForOwnNumber(sys::Service *serv, std::function<void(const std::string &)> callback)
-{
-    serv->connect(typeid(CellularGetOwnNumberResponseMessage), [callback](sys::Message *msg) {
-        auto response = dynamic_cast<CellularGetOwnNumberResponseMessage *>(msg);
-        if (response != nullptr && response->retCode) {
-            callback(response->data);
-        }
-        else {
-            LOG_ERROR("Getting own number failed");
-            callback(std::string());
-        }
-        return sys::MessageNone{};
-    });
-}
-
-void CellularServiceAPI::RequestForOwnNumber(sys::Service *serv)
-{
-    serv->bus.sendUnicast(std::make_shared<CellularGetOwnNumberMessage>(), ServiceCellular::serviceName);
-}
-
 void CellularServiceAPI::GetNetworkInfo(sys::Service *serv)
 {
     auto msg = std::make_shared<CellularGetNetworkInfoMessage>();

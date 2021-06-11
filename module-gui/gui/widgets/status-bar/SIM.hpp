@@ -5,7 +5,7 @@
 
 #include "Image.hpp"
 #include "status-bar/StatusBarWidgetBase.hpp"
-#include <EventStore.hpp>
+#include <service-cellular-api>
 
 namespace gui::status_bar
 {
@@ -30,7 +30,8 @@ namespace gui::status_bar
 
     class SIM : public StatusBarWidgetBase<Image>
     {
-        Store::GSM::SIM current            = Store::GSM::SIM::SIM_UNKNOWN;
+        cellular::api::SimSlot currentSim;
+        cellular::api::SimState currentState = cellular::api::SimState::Invalid;
         SIMConfiguration::DisplayMode mode = SIMConfiguration::DisplayMode::AnyState;
         friend class SIMConfiguration;
 

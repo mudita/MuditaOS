@@ -560,26 +560,16 @@ namespace app::manager
             simLockHandler.setSim(data->getSimSlot());
             return sys::msgHandled();
         });
-        connect(typeid(cellular::msg::request::sim::SetActiveSim::Response),
+        connect(typeid(cellular::msg::notification::SimStateChanged),
                 [&](sys::Message *request) -> sys::MessagePointer {
-                    auto data = static_cast<cellular::msg::request::sim::SetActiveSim::Response *>(request);
-                    if (data->retCode) {
-                        settings->setValue(::settings::SystemProperties::activeSim,
-                                           utils::enumToString(Store::GSM::get()->selected),
-                                           ::settings::SettingsScope::Global);
-                        return sys::msgHandled();
-                    }
-                    return sys::msgNotHandled();
+                    auto data = static_cast<cellular::msg::notification::SimStateChanged *>(request);
+                    return simLockHandler.handleSimStateChangedMessage(data->state);
                 });
-        connect(typeid(cellular::msg::notification::SimReady),
-                [&](sys::Message *request) -> sys::MessagePointer { return simLockHandler.handleSimReadyMessage(); });
         connect(typeid(cellular::msg::notification::ModemStateChanged),
                 [&](sys::Message *request) -> sys::MessagePointer {
                     auto data = static_cast<cellular::msg::notification::ModemStateChanged *>(request);
                     if (data->state == cellular::api::ModemState::Ready) {
                         simLockHandler.setSimReady();
-                        simLockHandler.getSettingsSimSelect(
-                            settings->getValue(settings::SystemProperties::activeSim, settings::SettingsScope::Global));
                         return sys::msgHandled();
                     }
                     return sys::msgNotHandled();

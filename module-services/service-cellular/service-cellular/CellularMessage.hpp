@@ -385,14 +385,6 @@ class CellularResponseMessage : public sys::ResponseMessage
     CellularMessage::Type cellResponse;
 };
 
-class CellularGetOwnNumberResponseMessage : public CellularResponseMessage
-{
-  public:
-    CellularGetOwnNumberResponseMessage(bool retCode, std::string number = std::string())
-        : CellularResponseMessage(retCode, std::move(number))
-    {}
-};
-
 class CellularAntennaResponseMessage : public CellularResponseMessage
 {
   public:
@@ -573,13 +565,6 @@ class CellularGetIMSIMessage : public CellularMessage
 {
   public:
     CellularGetIMSIMessage() : CellularMessage(Type::GetIMSI)
-    {}
-};
-
-class CellularGetOwnNumberMessage : public CellularMessage
-{
-  public:
-    CellularGetOwnNumberMessage() : CellularMessage(Type::GetOwnNumber)
     {}
 };
 

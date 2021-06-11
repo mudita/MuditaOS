@@ -20,7 +20,6 @@ namespace gui
 
     void NetworkWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        simParams->updateSim();
         BaseSettingsWindow::onBeforeShow(mode, data);
     }
 
@@ -28,32 +27,33 @@ namespace gui
     {
         std::list<gui::Option> optList;
         std::string simStr;
+        using namespace cellular::api;
+        auto state       = simParams->getSimState();
         auto phoneNumber = simParams->getNumber();
         auto sim         = simParams->getSim();
-        switch (sim) {
-        case Store::GSM::SIM::SIM1:
-            simStr = utils::translate("app_settings_network_sim1");
-            break;
-        case Store::GSM::SIM::SIM2:
-            simStr = utils::translate("app_settings_network_sim2");
-            break;
-        case Store::GSM::SIM::NONE:
-        case Store::GSM::SIM::SIM_FAIL:
-        case Store::GSM::SIM::SIM_UNKNOWN:
-            simStr      = utils::translate("app_settings_network_sim_none");
-            phoneNumber = {};
-            break;
+        if (state == SimState::Invalid) {
+            simStr = utils::translate("app_settings_network_sim_none");
+        }
+        else {
+            switch (sim) {
+            case SimSlot::SIM1:
+                simStr = utils::translate("app_settings_network_sim1");
+                break;
+            case SimSlot::SIM2:
+                simStr = utils::translate("app_settings_network_sim2");
+                break;
+            }
         }
         auto operatorsOn = operatorsSettings->getOperatorsOn();
 
         optList.emplace_back(std::make_unique<gui::option::OptionSettings>(
             utils::translate("app_settings_network_active_card") + ":" + simStr + " / " + phoneNumber,
             [=](gui::Item &item) {
-                if (Store::GSM::SIM::SIM1 == sim) {
-                    simParams->setSim(Store::GSM::SIM::SIM2);
+                if (SimSlot::SIM1 == sim) {
+                    simParams->setSim(SimSlot::SIM2);
                 }
                 else {
-                    simParams->setSim(Store::GSM::SIM::SIM1);
+                    simParams->setSim(SimSlot::SIM1);
                 }
 
                 return true;

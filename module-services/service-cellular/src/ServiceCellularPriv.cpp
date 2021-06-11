@@ -75,10 +75,6 @@ namespace cellular::internal
 
     void ServiceCellularPriv::initSimCard()
     {
-        simCard->onSimReady = [this]() {
-            state->set(State::ST::Ready);
-            owner->bus.sendMulticast<notification::SimReady>();
-        };
         simCard->onNeedPin = [this](unsigned int attempts) {
             owner->bus.sendMulticast<notification::SimNeedPin>(attempts);
         };
@@ -86,7 +82,6 @@ namespace cellular::internal
             owner->bus.sendMulticast<notification::SimNeedPuk>(attempts);
         };
         simCard->onSimBlocked   = [this]() { owner->bus.sendMulticast<notification::SimBlocked>(); };
-        simCard->onSimEvent     = [this]() { owner->bus.sendMulticast<notification::SimStateUpdate>(); };
         simCard->onUnhandledCME = [this](unsigned int code) {
             owner->bus.sendMulticast<notification::UnhandledCME>(code);
         };

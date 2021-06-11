@@ -88,11 +88,11 @@ namespace app
         class SimParams
         {
           public:
-            virtual ~SimParams()                     = default;
-            virtual void setSim(Store::GSM::SIM sim) = 0;
-            virtual void updateSim()                 = 0;
-            virtual Store::GSM::SIM getSim()         = 0;
-            virtual std::string getNumber()          = 0;
+            virtual ~SimParams()                            = default;
+            virtual void setSim(cellular::api::SimSlot sim) = 0;
+            virtual cellular::api::SimState getSimState()   = 0;
+            virtual cellular::api::SimSlot getSim()         = 0;
+            virtual std::string getNumber()                 = 0;
         };
         class OperatorsSettings
         {
@@ -191,9 +191,9 @@ namespace app
 
         void createUserInterface() override;
         void destroyUserInterface() override;
-        void setSim(Store::GSM::SIM sim) override;
-        void updateSim() override;
-        Store::GSM::SIM getSim() override;
+        void setSim(cellular::api::SimSlot sim) override;
+        cellular::api::SimState getSimState() override;
+        cellular::api::SimSlot getSim() override;
         std::string getNumber() override;
 
         void operatorOnChanged(const std::string &value);
@@ -230,8 +230,6 @@ namespace app
         void attachQuotesWindows();
         void switchToAllDevicesViaBtErrorPrompt(std::shared_ptr<sys::DataMessage> msg, const std::string &errorMsg);
 
-        Store::GSM::SIM selectedSim   = Store::GSM::get()->selected;
-        std::string selectedSimNumber = {};
         bsp::Board board              = bsp::Board::none;
         bool operatorsOn              = false;
         bool voLteStateOn             = false;

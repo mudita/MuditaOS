@@ -96,11 +96,9 @@ namespace cellular::service
         /**
          * Notification events
          */
-        std::function<void()> onSimReady;
         std::function<void(unsigned int attempts)> onNeedPin;
         std::function<void(unsigned int attempts)> onNeedPuk;
         std::function<void()> onSimBlocked;
-        std::function<void()> onSimEvent;
         std::function<void(unsigned int code)> onUnhandledCME;
 
       private:

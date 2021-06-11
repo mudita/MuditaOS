@@ -4,7 +4,6 @@
 #include "rt1051_cellular.hpp"
 #include "fsl_cache.h"
 
-#include <EventStore.hpp>
 #include <task.h>
 #include <ticks.hpp>
 
@@ -730,9 +729,9 @@ namespace bsp
                 GPIO_PinWrite(BSP_CELLULAR_SIM_CARD_PRESENCE_PORT, BSP_CELLULAR_SIM_CARD_PRESENCE_PIN, 0);
             }
 
-            void simSelect()
+            void simSelect(SimSlot slot)
             {
-                if (Store::GSM::get()->selected == Store::GSM::SIM::SIM2) {
+                if (slot == SimSlot::SIM2) {
                     GPIO_PinWrite(BSP_CELLULAR_SIM_CARD_PRESENCE_PORT, BSP_CELLULAR_SIMSEL_PIN, 1);
                 }
                 else {

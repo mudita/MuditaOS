@@ -69,10 +69,9 @@ namespace locks
         sys::MessagePointer handleSimUnlockedMessage();
         sys::MessagePointer handleSimPinChangedMessage();
         sys::MessagePointer handleSimAvailabilityMessage();
-        sys::MessagePointer handleSimReadyMessage();
+        sys::MessagePointer handleSimStateChangedMessage(cellular::api::SimState state);
         sys::MessagePointer handleSimNotRespondingMessage();
 
-        void getSettingsSimSelect(const std::string &settingsSim);
         void setSim(cellular::api::SimSlot simSlot);
     };
 

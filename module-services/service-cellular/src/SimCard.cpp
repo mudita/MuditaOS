@@ -53,9 +53,12 @@ namespace cellular
 
         bool SimCard::handleSetActiveSim(api::SimSlot sim)
         {
-            Store::GSM::get()->selected = static_cast<Store::GSM::SIM>(sim);
-            internal::static_data::get()->setOwnNumber({});
-            bsp::cellular::sim::simSelect();
+            auto data = internal::static_data::get();
+            data->setSimSlot(sim);
+            data->setOwnNumber({});
+            data->setSimState(api::SimState::Init);
+            bsp::cellular::sim::simSelect(sim == api::SimSlot::SIM1 ? bsp::cellular::sim::SimSlot::SIM1
+                                                                    : bsp::cellular::sim::SimSlot::SIM2);
             bsp::cellular::sim::hotSwapTrigger();
             return true;
         }
@@ -98,16 +101,22 @@ namespace cellular
 
         void SimCard::handleTrayState()
         {
-            auto data = internal::static_data::get();
+            auto data        = internal::static_data::get();
+            bool simSelected = data->getSimState() != api::SimState::Invalid;
+            data->setOwnNumber({});
             if (bsp::cellular::sim::trayInserted()) {
                 data->setTrayState(api::TrayState::Inserted);
-                bsp::cellular::sim::hotSwapTrigger();
+                if (simSelected) {
+                    data->setSimState(api::SimState::Init);
+                    bsp::cellular::sim::hotSwapTrigger();
+                }
             }
             else {
                 data->setTrayState(api::TrayState::Ejected);
+                if (simSelected) {
+                    data->setSimState(api::SimState::Fail);
+                }
             }
-            if (onSimEvent)
-                onSimEvent();
         }
 
         bool SimCard::initSimCard()
@@ -126,21 +135,27 @@ namespace cellular
 
         void SimCard::handleSimState(at::SimState state)
         {
+            using api::SimSlot;
+            using api::SimState;
+            using internal::static_data;
             switch (state) {
             case at::SimState::Ready:
                 if (initSimCard()) {
-                    Store::GSM::get()->sim = Store::GSM::get()->selected;
-                    internal::static_data::get()->setOwnNumber(readOwnNumber());
-                    if (onSimReady)
-                        onSimReady();
+                    static_data::get()->setOwnNumber(readOwnNumber());
+                    static_data::get()->setSimState(SimState::Ready);
                 }
                 else {
                     LOG_ERROR("SIM initialization failure!");
-                    Store::GSM::get()->sim = Store::GSM::SIM::SIM_FAIL;
+                    static_data::get()->setSimState(SimState::Fail);
                 }
                 break;
             case at::SimState::NotReady:
-                Store::GSM::get()->sim = Store::GSM::SIM::SIM_FAIL;
+                // Here SimState should theoretically be changed to Fail,
+                // but it seems that we get these URCs randomly
+                // and reporting them breaks our flow
+                //
+                // static_data::get()->setSimState(SimState::Fail);
+                LOG_WARN("Received SIM state at::SimState::NotReady");
                 break;
             case at::SimState::SimPin:
                 [[fallthrough]];
@@ -173,7 +188,7 @@ namespace cellular
                 break;
             }
             case at::SimState::Locked:
-                Store::GSM::get()->sim = Store::GSM::SIM::SIM_FAIL;
+                static_data::get()->setSimState(SimState::Fail);
                 if (onSimBlocked)
                     onSimBlocked();
                 break;
@@ -195,11 +210,11 @@ namespace cellular
                 [[fallthrough]];
             case at::SimState::Unknown:
                 LOG_ERROR("SimState not supported");
-                Store::GSM::get()->sim = Store::GSM::SIM::SIM_UNKNOWN;
+                // Should we really report unsupported states as fatal sim error?
+                // Maybe just log and ignore?
+                static_data::get()->setSimState(SimState::Fail);
                 break;
             }
-            if (onSimEvent)
-                onSimEvent();
         }
 
         std::optional<at::response::qpinc::AttemptsCounters> SimCard::getAttemptsCounters(sim::Pin pin) const

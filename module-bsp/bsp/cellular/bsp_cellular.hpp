@@ -9,7 +9,6 @@
 #include <FreeRTOS.h>
 #include <FreeRTOS/include/queue.h>
 #include "drivers/lpuart/DriverLPUART.hpp"
-#include <EventStore.hpp>
 
 namespace bsp
 {
@@ -118,12 +117,16 @@ namespace bsp
 
         namespace sim
         {
+            enum class SimSlot {
+                SIM1,
+                SIM2
+            };
 
             bool trayInserted();
             /// trigger swap pin on gsm so that it would reload sim card in tray
             /// after that +QPIN urc should come
             void hotSwapTrigger();
-            void simSelect();
+            void simSelect(SimSlot slot);
 
             /// handler for SIM tray which is connected to phone, not GSM
             BaseType_t trayIRQHandler();

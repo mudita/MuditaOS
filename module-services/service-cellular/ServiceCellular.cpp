@@ -470,9 +470,6 @@ void ServiceCellular::registerMessageHandlers()
     connect(typeid(CellularGetIMSIMessage),
             [&](sys::Message *request) -> sys::MessagePointer { return handleCellularGetIMSIMessage(request); });
 
-    connect(typeid(CellularGetOwnNumberMessage),
-            [&](sys::Message *request) -> sys::MessagePointer { return handleCellularGetOwnNumberMessage(request); });
-
     connect(typeid(CellularGetNetworkInfoMessage),
             [&](sys::Message *request) -> sys::MessagePointer { return handleCellularGetNetworkInfoMessage(request); });
 
@@ -895,7 +892,7 @@ auto ServiceCellular::handle(db::query::SMSSearchByTypeResult *response) -> bool
 {
     if (response->getResults().size() > 0) {
         LOG_DEBUG("sending %u last queued message(s)", static_cast<unsigned int>(response->getResults().size()));
-        if (Store::GSM::get()->simCardInserted() == false) {
+        if (cellular::api::currentSimState() != cellular::api::SimState::Ready) {
             auto message = std::make_shared<CellularSmsNoSimRequestMessage>();
             bus.sendUnicast(std::move(message), app::manager::ApplicationManager::ServiceName);
             auto records = response->getResults();
@@ -1368,7 +1365,9 @@ bool ServiceCellular::handle_sim_sanity_check()
     auto ret = sim_check_hot_swap(cmux->get(CellularMux::Channel::Commands));
     if (ret) {
         priv->state->set(State::ST::ModemOn);
-        bsp::cellular::sim::simSelect();
+        using namespace cellular::api;
+        bsp::cellular::sim::simSelect(currentSimSlot() == SimSlot::SIM1 ? bsp::cellular::sim::SimSlot::SIM1
+                                                                        : bsp::cellular::sim::SimSlot::SIM2);
     }
     else {
         LOG_ERROR("Sanity check failure - user will be promped about full shutdown");
@@ -1894,8 +1893,10 @@ auto ServiceCellular::handleCellularCallRequestMessage(CellularCallRequestMessag
         return std::make_shared<CellularResponseMessage>(false);
     }
 
-    cellular::RequestFactory factory(
-        msg->number.getEntered(), *channel, msg->callMode, Store::GSM::get()->simCardInserted());
+    cellular::RequestFactory factory(msg->number.getEntered(),
+                                     *channel,
+                                     msg->callMode,
+                                     cellular::api::currentSimState() == cellular::api::SimState::Ready);
 
     auto request = factory.create();
 
@@ -2014,15 +2015,6 @@ auto ServiceCellular::handleCellularGetIMSIMessage(sys::Message *msg) -> std::sh
         return std::make_shared<CellularResponseMessage>(true, temp);
     }
     return std::make_shared<CellularResponseMessage>(false);
-}
-
-auto ServiceCellular::handleCellularGetOwnNumberMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
-{
-    std::string temp;
-    if (getOwnNumber(temp)) {
-        return std::make_shared<CellularGetOwnNumberResponseMessage>(true, temp);
-    }
-    return std::make_shared<CellularGetOwnNumberResponseMessage>(false);
 }
 
 auto ServiceCellular::handleCellularGetNetworkInfoMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>

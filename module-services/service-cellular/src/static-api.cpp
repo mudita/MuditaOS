@@ -90,7 +90,7 @@ namespace cellular::internal
 
     void static_data::setOwnNumber(const std::string &number)
     {
-        if (number != ownNumber) {
+        if (number != getOwnNumber()) {
             {
                 cpp_freertos::LockGuard lock(mutex);
                 ownNumber = number;

@@ -5,12 +5,13 @@
 
 namespace gui::status_bar
 {
-    using namespace Store;
-
-    constexpr auto sim1       = "sim1_status"; // sim 1 indicator
-    constexpr auto sim2       = "sim2_status"; // sim 2 indicator
-    constexpr auto simunknown = "simunknown";  // sim - unknown sim state indicator (i.e. no initialization was done)
-    constexpr auto simfailed  = "simfail";     // sim - notification for sim failure
+    namespace
+    {
+        constexpr auto sim1       = "sim1_status"; // sim 1 indicator
+        constexpr auto sim2       = "sim2_status"; // sim 2 indicator
+        constexpr auto simunknown = "simunknown"; // sim - unknown sim state indicator (i.e. no initialization was done)
+        constexpr auto simfailed  = "simfail";    // sim - notification for sim failure
+    }                                             // namespace
 
     SIM::SIM(Item *parent, uint32_t x, uint32_t y) : StatusBarWidgetBase(parent, x, y, 0, 0)
     {
@@ -19,24 +20,34 @@ namespace gui::status_bar
 
     void SIM::update()
     {
-        if (current == Store::GSM::get()->sim) {
-            return;
+        using namespace cellular::api;
+        auto state = currentSimState();
+        auto sim   = currentSimSlot();
+
+        if (currentState == state) {
+            if (state == SimState::Ready) {
+                if (currentSim == sim) {
+                    return;
+                }
+            }
+            else {
+                return;
+            }
         }
-        current = Store::GSM::get()->sim;
-        switch (current) {
-        case GSM::SIM::SIM1:
-            set(sim1);
+
+        currentState = state;
+        currentSim   = sim;
+
+        switch (state) {
+        case SimState::Invalid:
+        case SimState::Init:
+            set(simunknown);
             break;
-        case GSM::SIM::SIM2:
-            set(sim2);
-            break;
-        case GSM::SIM::SIM_FAIL:
+        case SimState::Fail:
             set(simfailed);
             break;
-        case GSM::SIM::NONE:
-            [[fallthrough]];
-        case GSM::SIM::SIM_UNKNOWN:
-            set(simunknown);
+        case SimState::Ready:
+            set((sim == SimSlot::SIM1) ? sim1 : sim2);
             break;
         }
     }
@@ -44,7 +55,7 @@ namespace gui::status_bar
     void SIM::show()
     {
         bool isVisible = !(mode == SIMConfiguration::DisplayMode::OnlyInactiveState &&
-                           (current == GSM::SIM::SIM1 || current == GSM::SIM::SIM2));
+                           (currentState == cellular::api::SimState::Ready));
         StatusBarWidgetBase<Image>::setVisible(isVisible);
     }
 

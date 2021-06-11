@@ -130,8 +130,8 @@ namespace app
                 [&](sys::Message *msg) -> sys::MessagePointer { return handleGetDOM(msg); });
         connect(typeid(AppUpdateWindowMessage),
                 [&](sys::Message *msg) -> sys::MessagePointer { return handleUpdateWindow(msg); });
-        connect(typeid(cellular::msg::notification::SimStateUpdate),
-                [&](sys::Message *msg) -> sys::MessagePointer { return handleSimStateUpdateMessage(msg); });
+        connect(typeid(cellular::msg::notification::SimStateChanged),
+                [&](sys::Message *msg) -> sys::MessagePointer { return handleSimStateChangedMessage(msg); });
 
         addActionReceiver(app::manager::actions::PhoneModeChanged, [this](auto &&params) {
             if (params != nullptr) {
@@ -613,7 +613,7 @@ namespace app
         return sys::msgHandled();
     }
 
-    sys::MessagePointer Application::handleSimStateUpdateMessage(sys::Message *msgl)
+    sys::MessagePointer Application::handleSimStateChangedMessage(sys::Message *msgl)
     {
         if (getCurrentWindow()->updateSim()) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);

@@ -91,24 +91,10 @@ namespace locks
             std::make_unique<gui::SimUnlockInputRequestParams>(gui::popup::ID::SimInfo, lock, simInputTypeAction));
     }
 
-    void SimLockHandler::getSettingsSimSelect(const std::string &settingsSim)
-    {
-        auto selectedSim = magic_enum::enum_cast<Store::GSM::SIM>(settingsSim);
-
-        if (selectedSim.has_value() &&
-            (selectedSim.value() == Store::GSM::SIM::SIM1 || selectedSim.value() == Store::GSM::SIM::SIM2)) {
-            setSim(static_cast<cellular::api::SimSlot>(selectedSim.value()));
-        }
-        else {
-            Store::GSM::get()->selected = Store::GSM::SIM::NONE;
-        }
-    }
-
     void SimLockHandler::setSim(cellular::api::SimSlot simSlot)
     {
         if (simReady) {
             simResponseTimer.start();
-            Store::GSM::get()->selected = static_cast<Store::GSM::SIM>(simSlot);
             owner->bus.sendUnicast<cellular::msg::request::sim::SetActiveSim>(simSlot);
         }
         else {
@@ -120,7 +106,7 @@ namespace locks
     {
         setSimInputTypeAction(SimInputTypeAction::UnlockWithPin);
         lock.attemptsLeft = attempts;
-        lock.lockName     = utils::enumToString(Store::GSM::get()->selected);
+        lock.lockName     = utils::enumToString(cellular::api::currentSimSlot());
 
         if (simUnlockBlockOnLockedPhone) {
             return sys::msgNotHandled();
@@ -141,7 +127,7 @@ namespace locks
     {
         setSimInputTypeAction(SimInputTypeAction::UnlockWithPuk);
         lock.attemptsLeft = attempts;
-        lock.lockName     = utils::enumToString(Store::GSM::get()->selected);
+        lock.lockName     = utils::enumToString(cellular::api::currentSimSlot());
 
         if (simUnlockBlockOnLockedPhone) {
             return sys::msgNotHandled();
@@ -198,7 +184,7 @@ namespace locks
     {
         setSimInputTypeAction(SimInputTypeAction::ChangePin);
 
-        lock.lockName  = utils::enumToString(Store::GSM::get()->selected);
+        lock.lockName  = utils::enumToString(cellular::api::currentSimSlot());
         lock.lockState = Lock::LockState::InputRequired;
         simInputRequiredAction();
 
@@ -209,7 +195,7 @@ namespace locks
     {
         clearStoredInputs();
 
-        lock.lockName  = utils::enumToString(Store::GSM::get()->selected);
+        lock.lockName  = utils::enumToString(cellular::api::currentSimSlot());
         lock.lockState = Lock::LockState::InputInvalid;
         simInputRequiredAction();
 
@@ -220,7 +206,7 @@ namespace locks
     {
         setSimInputTypeAction(SimInputTypeAction::EnablePin);
 
-        lock.lockName  = utils::enumToString(Store::GSM::get()->selected);
+        lock.lockName  = utils::enumToString(cellular::api::currentSimSlot());
         lock.lockState = Lock::LockState::InputRequired;
         simInputRequiredAction();
 
@@ -231,7 +217,7 @@ namespace locks
     {
         setSimInputTypeAction(SimInputTypeAction::DisablePin);
 
-        lock.lockName  = utils::enumToString(Store::GSM::get()->selected);
+        lock.lockName  = utils::enumToString(cellular::api::currentSimSlot());
         lock.lockState = Lock::LockState::InputRequired;
         simInputRequiredAction();
 
@@ -246,7 +232,7 @@ namespace locks
             return sys::msgNotHandled();
         }
 
-        lock.lockName  = utils::enumToString(Store::GSM::get()->selected);
+        lock.lockName  = utils::enumToString(cellular::api::currentSimSlot());
         lock.lockState = Lock::LockState::Blocked;
         simInputRequiredAction();
 
@@ -262,16 +248,18 @@ namespace locks
             return sys::msgNotHandled();
         }
 
-        lock.lockName  = utils::enumToString(Store::GSM::get()->selected);
+        lock.lockName  = utils::enumToString(cellular::api::currentSimSlot());
         lock.lockState = Lock::LockState::ErrorOccurred;
         simErrorAction(errorCode);
 
         return sys::msgHandled();
     }
 
-    sys::MessagePointer SimLockHandler::handleSimReadyMessage()
+    sys::MessagePointer SimLockHandler::handleSimStateChangedMessage(cellular::api::SimState state)
     {
-        simResponseTimer.stop();
+        if (state == cellular::api::SimState::Ready) {
+            simResponseTimer.stop();
+        }
         return sys::msgHandled();
     }
 
@@ -279,7 +267,7 @@ namespace locks
     {
         setSimInputTypeAction(SimInputTypeAction::Error);
 
-        lock.lockName = utils::enumToString(Store::GSM::get()->selected);
+        lock.lockName = utils::enumToString(cellular::api::currentSimSlot());
         simInfoAction();
 
         return sys::msgHandled();

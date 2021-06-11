@@ -50,7 +50,7 @@ auto DeviceInfoEndpoint::getDeviceInfo(Context &context) -> bool
     context.setResponseBody(json11::Json::object(
         {{json::batteryLevel, std::to_string(Store::Battery::get().level)},
          {json::batteryState, std::to_string(static_cast<int>(Store::Battery::get().state))},
-         {json::selectedSim, std::to_string(static_cast<int>(Store::GSM::get()->selected))},
+         {json::selectedSim, std::to_string(static_cast<int>(cellular::api::currentSimSlot()))},
          {json::trayState, std::to_string(static_cast<int>(cellular::api::trayState()))},
          {json::signalStrength, std::to_string(static_cast<int>(Store::GSM::get()->getSignalStrength().rssiBar))},
          {json::accessTechnology, std::to_string(static_cast<int>(Store::GSM::get()->getNetwork().accessTechnology))},

@@ -150,8 +150,8 @@ auto DeveloperModeHelper::processGet(Context &context) -> ProcessResult
         if (keyValue == json::developerMode::simStateInfo) {
             auto response = endpoint::ResponseContext{
                 .body = json11::Json::object(
-                    {{json::selectedSim, std::to_string(static_cast<int>(Store::GSM::get()->selected))},
-                     {json::sim, std::to_string(static_cast<int>(Store::GSM::get()->sim))},
+                    {{json::selectedSim, std::to_string(static_cast<int>(cellular::api::currentSimSlot()))},
+                     {json::sim, std::to_string(static_cast<int>(cellular::api::currentSimState()))},
                      {json::trayState, std::to_string(static_cast<int>(cellular::api::trayState()))}})};
             response.status = http::Code::OK;
             return {sent::no, std::move(response)};

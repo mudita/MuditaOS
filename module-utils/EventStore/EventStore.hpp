@@ -99,18 +99,6 @@ namespace Store
         GSM(const GSM &) = delete;
         GSM &operator=(const GSM &) = delete;
 
-        enum class SIM
-        {
-            SIM1 = static_cast<int>(cellular::api::SimSlot::SIM1),
-            SIM2 = static_cast<int>(cellular::api::SimSlot::SIM2),
-            SIM_FAIL,
-            SIM_UNKNOWN,
-            NONE,
-        } sim      = SIM::SIM_UNKNOWN,
-          selected = SIM::SIM1;
-
-        bool simCardInserted();
-
         /// state of modem
         enum class Modem
         {

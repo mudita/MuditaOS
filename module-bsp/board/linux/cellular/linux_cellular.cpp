@@ -264,7 +264,7 @@ namespace bsp
             void hotSwapTrigger()
             {}
 
-            void simSelect()
+            void simSelect(SimSlot)
             {}
         } // namespace sim
         namespace ringIndicator

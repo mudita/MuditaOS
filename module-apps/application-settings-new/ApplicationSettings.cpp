@@ -96,14 +96,6 @@ namespace app
                                                    StartInBackground startInBackground)
         : Application(std::move(name), std::move(parent), mode, startInBackground), AsyncCallbackReceiver{this}
     {
-        CellularServiceAPI::SubscribeForOwnNumber(this, [&](const std::string &number) {
-            selectedSimNumber = number;
-            LOG_DEBUG("Sim number changed: %s", selectedSimNumber.c_str());
-        });
-        if ((Store::GSM::SIM::SIM1 == selectedSim || Store::GSM::SIM::SIM2 == selectedSim) &&
-            Store::GSM::get()->sim == selectedSim) {
-            CellularServiceAPI::RequestForOwnNumber(this);
-        }
     }
 
     ApplicationSettingsNew::~ApplicationSettingsNew()
@@ -146,9 +138,7 @@ namespace app
         if (ret != sys::ReturnCodes::Success) {
             return ret;
         }
-        connect(typeid(cellular::msg::notification::SimReady), [&](sys::Message *) {
-            selectedSim = Store::GSM::get()->selected;
-            CellularServiceAPI::RequestForOwnNumber(this);
+        connect(typeid(cellular::msg::notification::SimStateChanged), [&](sys::Message *) {
             auto currentWindow = getCurrentWindow();
             if (gui::window::name::network == currentWindow->getName()) {
                 updateWindow(gui::window::name::network, nullptr);
@@ -511,23 +501,22 @@ namespace app
 
     std::string ApplicationSettingsNew::getNumber()
     {
-        return selectedSimNumber;
+        return cellular::api::ownNumber();
     }
 
-    void ApplicationSettingsNew::setSim(Store::GSM::SIM sim)
+    void ApplicationSettingsNew::setSim(cellular::api::SimSlot sim)
     {
-        auto arg = (sim == Store::GSM::SIM::SIM2) ? cellular::api::SimSlot::SIM2 : cellular::api::SimSlot::SIM1;
-        getSimLockSubject().setSim(arg);
+        getSimLockSubject().setSim(sim);
     }
 
-    void ApplicationSettingsNew::updateSim()
+    cellular::api::SimState ApplicationSettingsNew::getSimState()
     {
-        selectedSim = Store::GSM::get()->selected;
+        return cellular::api::currentSimState();
     }
 
-    Store::GSM::SIM ApplicationSettingsNew::getSim()
+    cellular::api::SimSlot ApplicationSettingsNew::getSim()
     {
-        return selectedSim;
+        return cellular::api::currentSimSlot();
     }
 
     void ApplicationSettingsNew::operatorOnChanged(const std::string &value)

@@ -65,7 +65,7 @@ target_link_libraries(${PROJECT_NAME}
         Microsoft.GSL::GSL
         json::json
     PUBLIC
-        module-cellular
+        service-cellular
         eventstore
 )
 

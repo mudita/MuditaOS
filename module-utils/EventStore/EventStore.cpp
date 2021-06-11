@@ -61,8 +61,4 @@ namespace Store
         return network;
     }
 
-    bool GSM::simCardInserted()
-    {
-        return (sim == SIM::SIM1 || sim == SIM::SIM2);
-    }
 }; // namespace Store

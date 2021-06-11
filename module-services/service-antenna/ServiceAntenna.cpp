@@ -79,8 +79,11 @@ ServiceAntenna::ServiceAntenna()
     bus.channels.push_back(sys::BusChannel::AntennaNotifications);
     bus.channels.push_back(sys::BusChannel::PhoneModeChanges);
 
-    connect(typeid(cellular::msg::notification::SimReady), [this](sys::Message *) {
-        state->set(antenna::State::init);
+    connect(typeid(cellular::msg::notification::SimStateChanged), [this](sys::Message *request) {
+        auto msg = static_cast<cellular::msg::notification::SimStateChanged *>(request);
+        if (msg->state == cellular::api::SimState::Ready) {
+            state->set(antenna::State::init);
+        }
         return sys::MessageNone{};
     });
 
