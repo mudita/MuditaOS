@@ -30,7 +30,6 @@ if(COVERAGE_ENABLE)
         module-os/.*
         module-utils/gsl/.*
         module-utils/json/.*
-        module-utils/libphonenumber/.*
         module-utils/segger/.*
         source/main.cpp
         test/.*
