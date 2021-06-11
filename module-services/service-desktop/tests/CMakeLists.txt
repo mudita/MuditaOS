@@ -29,3 +29,17 @@ add_catch2_executable(
         module-vfs
         iosyscalls
 )
+
+add_catch2_executable(
+    NAME
+        service-desktop-endpoint-filesystem
+    SRCS
+        tests-main.cpp
+        test-fs-ep-operations.cpp
+    LIBS
+        service-desktop
+        module-utils
+        module-apps
+        module-vfs
+        iosyscalls
+)
