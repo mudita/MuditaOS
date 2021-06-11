@@ -33,7 +33,7 @@ class EndpointFactory
         case parserFSM::EndpointType::update:
             return std::make_unique<UpdateEndpoint>(ownerServicePtr);
         case parserFSM::EndpointType::filesystemUpload:
-            return std::make_unique<FilesystemEndpoint>(ownerServicePtr);
+            return FilesystemEndpoint::createInstance(ownerServicePtr);
         case parserFSM::EndpointType::backup:
             return std::make_unique<BackupEndpoint>(ownerServicePtr);
         case parserFSM::EndpointType::deviceInfo:

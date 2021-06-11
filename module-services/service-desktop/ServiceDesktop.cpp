@@ -28,7 +28,6 @@
 #include <module-sys/SystemManager/messages/TetheringStateRequest.hpp>
 #include <endpoints/bluetooth/BluetoothMessagesHandler.hpp>
 
-#include <purefs/filesystem_paths.hpp>
 #include <sys/mount.h>
 #include <sys/statvfs.h>
 
