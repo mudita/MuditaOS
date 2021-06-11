@@ -10,6 +10,7 @@ add_catch2_executable(
             test-service-db-quotes.cpp
             test-factory-settings.cpp
         LIBS
+            module-sys
             service-audio
             module-vfs
             module-audio
@@ -28,6 +29,7 @@ add_catch2_executable(
             test-entry-path.cpp
             ${CMAKE_SOURCE_DIR}/module-services/service-db/EntryPath.cpp
         LIBS
+            module-sys
         INCLUDE
             ${CMAKE_SOURCE_DIR}/module-utils/
             ${CMAKE_SOURCE_DIR}/module-services/service-db/

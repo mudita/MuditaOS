@@ -61,6 +61,7 @@ target_link_libraries(module-sys
         eventstore
     PUBLIC
         module-os
+        module-bsp
     )
 
 # Board specific compilation definitions,options,include directories and features
