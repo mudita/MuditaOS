@@ -15,5 +15,6 @@ add_catch2_executable(
             ${CMAKE_SOURCE_DIR}/module-utils/
         DEPS
         LIBS
+            module-sys
             magic_enum
 )
