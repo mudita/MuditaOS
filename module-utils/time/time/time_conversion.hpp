@@ -7,7 +7,6 @@
 /// as stdlib builtin locale doesn't provide way to substitute C-LOCALE
 
 #include "time/time_locale.hpp"
-#include <bsp/rtc/rtc.hpp>
 #include <log.hpp>
 
 #include <vector>
@@ -17,23 +16,6 @@ namespace utils
 {
     namespace time
     {
-        inline constexpr auto secondsInMinute        = 60;
-        inline constexpr auto minutesInHour          = 60;
-        inline constexpr auto hoursInday             = 24;
-        inline constexpr auto minutesInQuarterOfHour = 15;
-        inline constexpr auto secondsInHour          = minutesInHour * secondsInMinute;
-        inline constexpr auto secondsInDay           = hoursInday * secondsInHour;
-        inline constexpr auto milisecondsInSecond    = 1000;
-
-        enum class GetParameters
-        {
-            Hour,
-            Minute,
-            Day,
-            Month,
-            Year
-        };
-
         // helper class to not put everything in time
         struct Localer
         {
@@ -44,10 +26,9 @@ namespace utils
                 DayLong,
                 MonthAbbrev,
                 MonthLong,
-                Timezone,
             };
 
-            UTF8 get_replacement(Replacements val, const struct tm &timeinfo);
+            UTF8 get_replacement(Replacements val, const struct tm &timeinfo) const;
         };
 
         class Duration; // fw decl
@@ -56,7 +37,6 @@ namespace utils
         {
           protected:
             time_t time = 0;
-            struct tm timeinfo;
             /// only reformat on: new format
             std::string format = "";
 
@@ -66,16 +46,10 @@ namespace utils
             }
 
           public:
-            Timestamp();
-            Timestamp(time_t newtime) : time(newtime)
-            {
-                timeinfo = *localtime(&time);
-            }
+            explicit Timestamp(time_t newtime = 0);
 
             /// set Time time_t value held (set timestamp)
             void set_time(time_t newtime);
-            /// set Time from string
-            void set_time(std::string time, const char *fmt);
             void set_format(std::string format)
             {
                 this->format = format;
@@ -85,11 +59,13 @@ namespace utils
             {
                 return str();
             }
+
             friend std::ostream &operator<<(std::ostream &os, Timestamp t)
             {
                 os << t.str();
                 return os;
             }
+
             friend Duration operator-(const Timestamp &lhs, const Timestamp &rhs);
             friend Timestamp operator-(const Timestamp &lhs, const Duration &rhs);
             friend Timestamp operator+(const Timestamp &lhs, const Duration &rhs);
@@ -121,23 +97,19 @@ namespace utils
             }
 
             /// get Time in any format possible via strftime
-            virtual UTF8 str(std::string format = "");
+            virtual UTF8 str(std::string format = "") const;
 
             /// get day UTF8 value
-            UTF8 day(bool abbrev = false);
+            UTF8 day(bool abbrev = false) const;
 
             /// get month UTF8 value
-            UTF8 month(bool abbrev = false);
+            UTF8 month(bool abbrev = false) const;
 
-            // get timestamp value
-            time_t getTime() const
+            /// get timestamp value
+            time_t getTime() const // TODO: alek: rem
             {
                 return time;
             };
-
-            UTF8 get_date_time_substr(GetParameters param);
-            uint32_t get_date_time_sub_value(GetParameters param);
-            uint32_t get_UTC_date_time_sub_value(GetParameters param);
         };
 
         /// helper class to operate on time now
@@ -145,16 +117,15 @@ namespace utils
         class DateTime : public Timestamp
         {
             time_t local_time = 0;
+            /// converter -> returns time in past: (val) and stores localtime in ref_time
+            void before_n_sec(time_t val);
 
           public:
-            bool show_textual_past      = true;
-            bool date_format_long       = true;
-            std::string today_format    = "%H:%M";
-            std::string long_ago_format = "%d.%m.%y";
-
-            /// shows time in past: time_now - val in seconds
-            DateTime(time_t val = 0, bool date_format_long = true)
-                : Timestamp(std::time(nullptr)), date_format_long(date_format_long)
+            /// shows time in past
+            ///
+            /// @val - timestamp in seconds
+            /// @date_format_long - long or short format
+            explicit DateTime(time_t val) : Timestamp(std::time(nullptr))
             {
                 before_n_sec(val);
             }
@@ -165,27 +136,25 @@ namespace utils
                 return os;
             }
 
-            /// converter -> returns time in past: (val) and stores localtime in ref_time
-            void before_n_sec(time_t val);
+            UTF8 str(std::string fmt = "") const override;
 
-            /// Time have str(std::string ) this one uses presets
-            virtual UTF8 str(std::string fmt = "");
-            bool isToday();
-            bool isYesterday();
+            bool isToday() const;
+            bool isYesterday() const;
+            bool isCurrentYear() const;
         };
 
         class Date : public DateTime
         {
           public:
-            Date(time_t val = 0, bool date_format_long = true) : DateTime(val, date_format_long){};
-            virtual UTF8 str(std::string format = "") final;
+            Date(time_t val = 0) : DateTime(val){};
+            UTF8 str(std::string format = "") const final;
         };
 
         class Time : public DateTime
         {
           public:
-            Time(time_t val = 0, bool date_format_long = true) : DateTime(val, date_format_long){};
-            virtual UTF8 str(std::string format = "") final;
+            Time(time_t val = 0) : DateTime(val){};
+            UTF8 str(std::string format = "") const final;
         };
 
         class Duration

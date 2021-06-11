@@ -7,7 +7,6 @@
 #include "application-settings/windows/EinkModeWindow.hpp"
 #include "windows/BtScanWindow.hpp"
 #include "windows/BtWindow.hpp"
-#include "windows/DateTimeWindow.hpp"
 #include "windows/FotaWindow.hpp"
 #include "windows/Info.hpp"
 #include "windows/LanguageWindow.hpp"
@@ -121,9 +120,6 @@ namespace app
         });
         windowsFactory.attach(gui::window::hw_info, [](Application *app, const std::string &name) {
             return std::make_unique<gui::Info>(app);
-        });
-        windowsFactory.attach(gui::window::name::date_time, [this](Application *app, const std::string &name) {
-            return std::make_unique<gui::DateTimeWindow>(app, europeanDateTimeFormat);
         });
         windowsFactory.attach(gui::window::name::fota_window, [](Application *app, const std::string &name) {
             return std::make_unique<gui::FotaWindow>(app);

@@ -3,7 +3,7 @@
 
 #include "MonthModel.hpp"
 #include <time/time_locale.hpp>
-#include <time/time_conversion.hpp>
+#include <time/time_constants.hpp>
 
 date::year_month_day MonthModel::getYearMonthDayFromTimePoint(TimePoint timePoint) const
 {

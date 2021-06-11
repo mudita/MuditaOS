@@ -15,7 +15,7 @@
 
 #include <RTOSWrapper/include/ticks.hpp>
 #include <SystemManager/messages/DeviceRegistrationMessage.hpp>
-#include <time/time_conversion.hpp>
+#include <time/time_constants.hpp>
 
 #include <gsl/util>
 

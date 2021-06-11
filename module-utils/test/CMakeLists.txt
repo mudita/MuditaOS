@@ -18,19 +18,6 @@ add_catch2_executable(
         module-utils
 )
 
-# duration tests
-add_catch2_executable(
-    NAME
-        utils-duration
-    SRCS
-        unittest_duration.cpp
-    LIBS
-        module-utils
-        iosyscalls
-    DEPS
-        PurePhone-disk-img
-)
-
 # utils tests
 add_catch2_executable(
     NAME
@@ -83,4 +70,3 @@ add_catch2_executable(
     LIBS
         module-utils
 )
-
