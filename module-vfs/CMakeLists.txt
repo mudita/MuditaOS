@@ -5,13 +5,7 @@ project(module-vfs VERSION 1.0
 
 module_is_test_entity()
 
-set(FF_FAT_SOURCES_THIRDPARTY
-        ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/fatfs/source/ff.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/fatfs/source/ffunicode.c
-)
-
 set(FF_FAT_SOURCES
-    ${FF_FAT_SOURCES_THIRDPARTY}
     ${CMAKE_CURRENT_SOURCE_DIR}/drivers/src/thirdparty/fatfs/ffsystem.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/drivers/src/thirdparty/fatfs/ff_glue.cpp
 )
@@ -64,11 +58,10 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/include/user/
         ${CMAKE_CURRENT_SOURCE_DIR}/drivers/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/drivers/include/thirdparty/fatfs
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include/internal
-        ${CMAKE_CURRENT_SOURCE_DIR}/drivers/include/thirdparty/fatfs
         ${CMAKE_CURRENT_SOURCE_DIR}/drivers/include/thirdparty
-        ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/fatfs/source
 )
 
 target_link_libraries(${PROJECT_NAME} 
@@ -80,6 +73,7 @@ target_link_libraries(${PROJECT_NAME}
         module-utils
     PRIVATE 
         littlefs::littlefs
+        fatfs
 )
 
 if (${ENABLE_TESTS})
