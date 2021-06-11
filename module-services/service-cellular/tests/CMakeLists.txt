@@ -4,6 +4,7 @@ add_catch2_executable(
         SRCS
         unittest_request_factory.cpp
         LIBS
+        module-sys
         module-cellular
 )
 
@@ -34,6 +35,7 @@ add_catch2_executable(
         SRCS
         unittest_qmbn.cpp
         LIBS
+        module-sys
         module-cellular
 )
 
@@ -43,5 +45,6 @@ add_gtest_executable(
         SRCS
         unittest_connection-manager.cpp
         LIBS
+        module-sys
         module-cellular
 )

@@ -118,6 +118,7 @@ include_directories( ../module-db )
 
 add_subdirectory(popups)
 add_subdirectory(locks)
+add_subdirectory(application-bell-main)
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
@@ -131,6 +132,7 @@ target_link_libraries(${PROJECT_NAME}
         Microsoft.GSL::GSL
         eventstore
     PUBLIC
+        application-bell-main
         module-audio
         module-bsp
         module-db
