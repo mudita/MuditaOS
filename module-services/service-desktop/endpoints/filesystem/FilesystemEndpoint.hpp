@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -12,6 +12,11 @@ class FilesystemEndpoint : public parserFSM::Endpoint
     FilesystemEndpoint(sys::Service *ownerServicePtr) : Endpoint(ownerServicePtr)
     {}
     auto handle(parserFSM::Context &context) -> void override;
-    auto run(parserFSM::Context &context) -> sys::ReturnCodes;
+    auto runGet(parserFSM::Context &context) -> sys::ReturnCodes;
+    auto runPost(parserFSM::Context &context) -> sys::ReturnCodes;
     auto getUpdates(parserFSM::Context &context) -> sys::ReturnCodes;
+
+  private:
+    auto startGetFile(parserFSM::Context &context) -> sys::ReturnCodes;
+    auto getFileChunk(parserFSM::Context &context) -> sys::ReturnCodes;
 };

@@ -86,3 +86,6 @@
 	path = third-party/re2/src
 	url = ../re2.git
 	branch = rt1051
+[submodule "third-party/base64/src"]
+	path = third-party/base64/src
+	url = https://github.com/rafagafe/base64.git
