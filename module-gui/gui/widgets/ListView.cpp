@@ -4,7 +4,7 @@
 #include "ListView.hpp"
 #include "InputEvent.hpp"
 #include "cassert"
-#include <log/log.hpp>
+#include <log.hpp>
 
 namespace gui
 {

@@ -3,7 +3,7 @@
 
 #include "PowerOffWindow.hpp"
 
-#include <log/log.hpp>
+#include <log.hpp>
 #include <messages/DialogMetadataMessage.hpp>
 
 namespace gui

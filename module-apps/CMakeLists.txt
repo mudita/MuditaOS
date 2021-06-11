@@ -1,8 +1,6 @@
 ﻿# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-cmake_minimum_required(VERSION 3.14)
-
 project(module-apps VERSION 1.0
         DESCRIPTION "Library with all applications.")
 
@@ -105,6 +103,11 @@ if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
     endforeach()
 endif()
 
+option(ENABLE_VOLTE "Enable VoLTE" OFF)
+if(${ENABLE_VOLTE})
+    target_compile_definitions(${PROJECT_NAME} PUBLIC ENABLE_VOLTE=1)
+endif()
+
 include_directories( ../module-sys )
 include_directories( ../module-utils )
 include_directories( ../module-services )
@@ -119,22 +122,25 @@ add_subdirectory(locks)
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
         date::date
-        service-appmgr
         service-antenna
+        service-appmgr
         service-audio
         service-cellular
         service-db
         service-evtmgr
         Microsoft.GSL::GSL
+        eventstore
     PUBLIC
         module-audio
         module-bsp
+        module-db
+        module-gui
         module-os
+        module-services
         module-sys
         module-utils
-        module-gui
-        module-services
-        module-db
+        time
+        utf8
         ${TARGET_LIBRARIES}
 )
 

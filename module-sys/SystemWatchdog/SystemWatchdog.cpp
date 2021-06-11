@@ -6,7 +6,7 @@
 #include "critical.hpp"
 #include "ticks.hpp"
 #include "bsp/watchdog/watchdog.hpp"
-#include "log/log.hpp"
+#include <log.hpp>
 
 namespace sys
 {

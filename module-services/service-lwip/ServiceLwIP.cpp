@@ -6,7 +6,7 @@
 #include <MessageType.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 
 extern "C"
 {

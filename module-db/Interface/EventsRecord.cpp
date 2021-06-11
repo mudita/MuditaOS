@@ -13,7 +13,7 @@
 #include <module-db/queries/calendar/QueryEventsGetFilteredByDay.hpp>
 #include <module-db/queries/calendar/QueryEventsGetAllLimited.hpp>
 #include <module-db/queries/calendar/QueryEventsSelectFirstUpcoming.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <Utils.hpp>
 #include <cassert>
 #include <vector>

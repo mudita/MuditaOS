@@ -9,7 +9,7 @@
 #include <BaseInterface.hpp>
 #include <Common/Query.hpp>
 #include <MessageType.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <module-db/queries/calendar/QueryEventsSelectFirstUpcoming.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <service-db/QueryMessage.hpp>

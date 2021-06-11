@@ -8,9 +8,9 @@
 #include <purefs/vfs_subsystem.hpp>
 #include <purefs/vfs_subsystem_internal.hpp>
 #include <purefs/fs/thread_local_cwd.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <purefs/filesystem_paths.hpp>
-#include <module-utils/json/json11.hpp>
+#include <json11.hpp>
 #include <sys/stat.h>
 #include <fcntl.h>
 

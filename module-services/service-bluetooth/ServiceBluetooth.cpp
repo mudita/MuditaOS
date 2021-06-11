@@ -24,7 +24,7 @@
 
 #include "SystemManager/messages/SentinelRegistrationMessage.hpp"
 
-#include <log/log.hpp>
+#include <log.hpp>
 #include <bits/exception.h>
 #include <utility>
 #include <service-desktop/service-desktop/DesktopMessages.hpp>

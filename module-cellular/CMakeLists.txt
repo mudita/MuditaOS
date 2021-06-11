@@ -1,6 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.12)
-
-project(module-cellular VERSION 1.0
+﻿project(module-cellular VERSION 1.0
         DESCRIPTION "Cellular module library")
 
 include(SerialPort)
@@ -60,16 +58,8 @@ target_compile_options(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_OPTIONS})
 target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
 
 
-target_compile_definitions(${PROJECT_NAME}
-
-        PUBLIC
-
-)
-
 target_include_directories(${PROJECT_NAME}
-
-        PUBLIC
-
+    PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/at/
         ${CMAKE_SOURCE_DIR}/module-services
@@ -78,16 +68,18 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
+    date::date
+    eventstore
+    module-bsp
+    module-db
+    module-services
+    module-sys
+    module-utils
+    module-vfs
     service-cellular
     service-eink
     service-fota
-    module-utils
-    module-vfs
-    module-services
-    module-sys
-    module-db
-    module-bsp
-    date::date
+    time
     PRIVATE
     Microsoft.GSL::GSL
 )

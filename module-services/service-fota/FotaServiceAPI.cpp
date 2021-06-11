@@ -6,7 +6,7 @@
 #include "service-fota/ServiceFota.hpp"
 
 #include <MessageType.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 
 #include <memory>
 #include <sstream>

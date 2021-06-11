@@ -52,9 +52,9 @@
 #include <at/UrcCpin.hpp> // for Cpin
 #include <at/response.hpp>
 #include <bsp/cellular/bsp_cellular.hpp>
-#include <common_data/EventStore.hpp>
+#include <EventStore.hpp>
 #include <country.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <at/UrcFactory.hpp>
 #include <queries/messages/sms/QuerySMSSearchByType.hpp>
 #include <queries/notifications/QueryNotificationsIncrement.hpp>
@@ -1399,6 +1399,8 @@ bool ServiceCellular::handle_URCReady()
     }
     ret = ret && channel->cmd(at::AT::ENABLE_NETWORK_REGISTRATION_URC);
 
+    bus.sendMulticast<cellular::msg::notification::ModemStateChanged>(cellular::api::ModemState::Ready);
+
     LOG_DEBUG("%s", priv->state->c_str());
     return ret;
 }
@@ -1494,12 +1496,14 @@ bool ServiceCellular::receiveAllMessages()
 bool ServiceCellular::handle_failure()
 {
     priv->state->set(State::ST::Idle);
+    bus.sendMulticast<cellular::msg::notification::ModemStateChanged>(cellular::api::ModemState::Fail);
     return true;
 }
 
 bool ServiceCellular::handle_fatal_failure()
 {
     LOG_FATAL("Await for death!");
+    bus.sendMulticast<cellular::msg::notification::ModemStateChanged>(cellular::api::ModemState::Fatal);
     while (true) {
         vTaskDelay(500);
     }

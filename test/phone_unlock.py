@@ -6,7 +6,8 @@
 from harness.harness import Harness
 
 harness = Harness.from_detect()
-harness. unlock_usb()
+
+
 @harness.with_phone_unlocked
 def done(connection):
     pass

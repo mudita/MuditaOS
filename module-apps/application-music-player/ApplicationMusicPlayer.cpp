@@ -6,7 +6,7 @@
 #include "windows/MusicPlayerEmptyWindow.hpp"
 
 #include <filesystem>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <i18n/i18n.hpp>
 #include <purefs/filesystem_paths.hpp>
 #include <service-audio/AudioServiceAPI.hpp>

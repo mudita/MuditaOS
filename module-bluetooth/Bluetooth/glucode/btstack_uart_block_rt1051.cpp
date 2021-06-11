@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <bsp/bluetooth/Bluetooth.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 
 using namespace bsp;
 

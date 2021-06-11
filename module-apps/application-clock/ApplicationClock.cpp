@@ -6,7 +6,7 @@
 #include "gui/widgets/Window.hpp"
 
 // module-utils
-#include "log/log.hpp"
+#include <log.hpp>
 #include <service-evtmgr/EVMessages.hpp>
 #include <service-evtmgr/EventManager.hpp>
 #include <service-appmgr/model/ApplicationManager.hpp>

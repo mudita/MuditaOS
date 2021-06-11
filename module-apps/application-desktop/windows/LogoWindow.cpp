@@ -3,7 +3,7 @@
 
 #include "LogoWindow.hpp"
 #include "gui/widgets/Image.hpp"
-#include "log/log.hpp"
+#include <log.hpp>
 #include <application-desktop/windows/Names.hpp>
 
 namespace gui

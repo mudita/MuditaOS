@@ -18,7 +18,7 @@
 #include "FontManager.hpp"
 #include "RawFont.hpp"
 // utils
-#include "log/log.hpp"
+#include <log.hpp>
 // module-utils
 #include <cmath>
 #include <cassert>

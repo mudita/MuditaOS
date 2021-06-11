@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ContactHelper.hpp"
@@ -16,8 +16,7 @@
 #include <ContactRecord.hpp>
 #include <PhoneNumber.hpp>
 #include <Service/Common.hpp>
-#include <json/json11.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <queries/RecordQuery.hpp>
 #include <queries/phonebook/QueryContactGetByID.hpp>
 #include <queries/phonebook/QueryContactUpdate.hpp>

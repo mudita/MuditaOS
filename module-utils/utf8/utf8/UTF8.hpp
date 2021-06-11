@@ -63,6 +63,7 @@ class UTF8
      */
     uint32_t getDataBufferSize(uint32_t dataBytes);
     bool expand(uint32_t size = stringExpansion);
+
   public:
     UTF8();
     UTF8(const char *str);

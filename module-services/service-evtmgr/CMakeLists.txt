@@ -35,6 +35,7 @@ target_link_libraries(${PROJECT_NAME}
         service-desktop
         sml::sml
         Microsoft.GSL::GSL
+        eventstore
 )
 
 if (${ENABLE_TESTS})

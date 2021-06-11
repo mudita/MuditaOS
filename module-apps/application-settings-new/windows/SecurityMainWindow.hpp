@@ -10,13 +10,12 @@ namespace gui
     class SecurityMainWindow : public BaseSettingsWindow
     {
       public:
-        explicit SecurityMainWindow(app::Application *app, app::settingsInterface::SecuritySettings *settings);
+        explicit SecurityMainWindow(app::Application *app);
 
       private:
         auto buildOptionsList() -> std::list<Option> override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
 
         bool isPhoneLockEnabled;
-        app::settingsInterface::SecuritySettings *securitySettings;
     };
 } // namespace gui

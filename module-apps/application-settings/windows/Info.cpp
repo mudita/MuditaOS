@@ -7,7 +7,7 @@
 #include <service-cellular/CellularServiceAPI.hpp>
 
 #include <source/version.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 
 #include <gui/widgets/BoxLayout.hpp>
 #include <gui/widgets/Label.hpp>

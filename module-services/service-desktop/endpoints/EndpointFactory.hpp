@@ -19,7 +19,7 @@
 #include "restore/RestoreEndpoint.hpp"
 #include "update/UpdateEndpoint.hpp"
 #include <endpoints/bluetooth/BluetoothEndpoint.hpp>
-#include <module-services/service-desktop/endpoints/security/SecurityEndpoint.hpp>
+#include "security/SecurityEndpoint.hpp"
 
 class EndpointFactory
 {
@@ -60,12 +60,6 @@ class EndpointFactory
             return nullptr;
         }
     }
-};
-
-enum class EndpointSecurity
-{
-    Allow = 0,
-    Block = 1
 };
 
 class SecuredEndpointFactory : public EndpointFactory

@@ -25,9 +25,8 @@
 #include <bsp/torch/torch.hpp>
 #include <bsp/battery-charger/battery_charger.hpp>
 #include <common_data/RawKey.hpp>
-#include <log/log.hpp>
-#include <log/Logger.hpp>
-#include <module-utils/time/time_conversion.hpp>
+#include <log.hpp>
+#include <Logger.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <service-audio/AudioMessage.hpp>
 #include <service-audio/AudioServiceAPI.hpp>
@@ -44,7 +43,7 @@
 #include <ctime>
 #include <module-apps/messages/AppMessage.hpp>
 #include <SystemManager/messages/CpuFrequencyMessage.hpp>
-#include <common_data/EventStore.hpp>
+#include <EventStore.hpp>
 #include <SystemManager/messages/PhoneModeRequest.hpp>
 #include <vibra/Vibra.hpp>
 

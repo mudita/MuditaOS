@@ -4,7 +4,7 @@
 #include "RT1051LPM.hpp"
 
 #include "board.h"
-#include "log/log.hpp"
+#include <log.hpp>
 #include "bsp/BoardDefinitions.hpp"
 #include "bsp/watchdog/watchdog.hpp"
 #include <clock_config.h>

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -53,9 +53,18 @@ class SMSSendRequest : public SMSRequest
 class SMSSendTemplateRequest : public SMSRequest
 {
   public:
-    SMSSendTemplateRequest(const utils::PhoneNumber::View &phoneNumber) : SMSRequest(phoneNumber)
+    SMSSendTemplateRequest(const utils::PhoneNumber::View &phoneNumber, bool preventAutoLock = false)
+        : SMSRequest(phoneNumber), preventAutoLock(preventAutoLock)
     {}
     ~SMSSendTemplateRequest() override = default;
+
+    [[nodiscard]] bool isAutoLockPrevented() const
+    {
+        return preventAutoLock;
+    }
+
+  private:
+    bool preventAutoLock;
 };
 
 class SMSTemplateSent : public gui::SwitchData

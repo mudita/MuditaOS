@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-appmgr/service-appmgr/messages/DOMRequest.hpp"
@@ -13,8 +13,8 @@
 #include <Common/Query.hpp>
 #include <MessageType.hpp>
 #include <Service/Worker.hpp>
-#include <json/json11.hpp>
-#include <log/log.hpp>
+#include <json11.hpp>
+#include <log.hpp>
 #include <module-apps/application-desktop/ApplicationDesktop.hpp>
 #include <service-db/service-db/Settings.hpp>
 #include <service-db/QueryMessage.hpp>
@@ -242,35 +242,15 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
         return sys::MessageNone{};
     });
 
-    connect(sdesktop::usb::USBHandshake(), [&](sys::Message *msg) {
-        auto handshakeMsg = dynamic_cast<sdesktop::usb::USBHandshake *>(msg);
-        processUSBHandshake(handshakeMsg);
-        return sys::MessageNone{};
-    });
-
-    connect(sdesktop::usb::USBSecurityOn(), [&](sys::Message *msg) {
-        usbSecurityModel->enableEndpointSecurity(true);
-        return sys::MessageNone{};
-    });
-
-    connect(sdesktop::usb::USBSecurityOff(), [&](sys::Message *msg) {
-        usbSecurityModel->enableEndpointSecurity(false);
-        return sys::MessageNone{};
-    });
-
     connect(typeid(locks::UnlockedPhone), [&](sys::Message *msg) {
-        if (usbSecurityModel->isSecurityEnabled()) {
-            LOG_INFO("Phone unlocked. Enabling endpoints.");
-            usbSecurityModel->setEndpointSecurity(EndpointSecurity::Allow);
-        }
+        LOG_INFO("Phone unlocked.");
+        usbSecurityModel->setPhoneUnlocked();
         return sys::MessageNone{};
     });
 
     connect(typeid(locks::LockedPhone), [&](sys::Message *msg) {
-        if (usbSecurityModel->isSecurityEnabled()) {
-            LOG_INFO("Phone locked. Securing endpoints.");
-            usbSecurityModel->setEndpointSecurity(EndpointSecurity::Block);
-        }
+        LOG_INFO("Phone locked.");
+        usbSecurityModel->setPhoneLocked();
         return sys::MessageNone{};
     });
 
@@ -290,14 +270,6 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
     });
     settings->registerValueChange(updateos::settings::history,
                                   [this](const std::string &value) { updateOS->setInitialHistory(value); });
-
-    settings->registerValueChange(
-        ::settings::SystemProperties::usbSecurity,
-        [this](std::string value) {
-            bool securityEnabled = utils::getNumericValue<bool>(value);
-            usbSecurityModel->setEndpointSecurity(securityEnabled ? EndpointSecurity::Block : EndpointSecurity::Allow);
-        },
-        settings::SettingsScope::Global);
 
     return (sys::ReturnCodes::Success);
 }
@@ -353,21 +325,6 @@ void ServiceDesktop::prepareBackupData()
     backupRestoreStatus.task          = std::to_string(static_cast<uint32_t>(std::time(nullptr)));
     backupRestoreStatus.state     = OperationState::Stopped;
     backupRestoreStatus.backupTempDir = purefs::dir::getTemporaryPath() / backupRestoreStatus.task;
-}
-
-void ServiceDesktop::processUSBHandshake(sdesktop::usb::USBHandshake *msg)
-{
-    parserFSM::Context responseContext;
-    responseContext.setEndpoint(parserFSM::EndpointType::usbSecurity);
-    responseContext.setResponseStatus(parserFSM::http::Code::Forbidden);
-
-    if (usbSecurityModel->processHandshake(msg)) {
-        LOG_DEBUG("Handshake ok. Unlocking.");
-        bus.sendUnicast(std::make_shared<locks::UnlockPhone>(), service::name::service_desktop);
-        responseContext.setResponseStatus(parserFSM::http::Code::OK);
-    }
-
-    parserFSM::MessageHandler::putToSendQueue(responseContext.createSimpleResponse());
 }
 
 void ServiceDesktop::prepareRestoreData(const std::filesystem::path &restoreLocation)
