@@ -10,11 +10,11 @@
 #include "StatusBar.hpp"
 #include "status-bar/Time.hpp"
 #include "Translator.hpp"                // for KeyInputSim...
-#include "common_data/EventStore.hpp"    // for Battery
+#include <EventStore.hpp>                // for Battery
 #include "common_data/RawKey.hpp"        // for RawKey, key...
 #include "gui/input/InputEvent.hpp"      // for InputEvent
 #include "log/debug.hpp"                 // for DEBUG_APPLI...
-#include "log/log.hpp"                   // for LOG_INFO
+#include <log.hpp>                       // for LOG_INFO
 #include "messages/AppMessage.hpp"       // for AppSwitchMe...
 #include "service-appmgr/Controller.hpp" // for Controller
 #include <service-cellular-api>
@@ -37,7 +37,7 @@
 #include <service-gui/Common.hpp>
 #include <module-utils/Utils.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
-#include <module-utils/time/DateAndTimeSettings.hpp>
+#include <time/DateAndTimeSettings.hpp>
 #include <service-audio/AudioServiceAPI.hpp> // for GetOutputVolume
 
 #include <popups/VolumeWindow.hpp>

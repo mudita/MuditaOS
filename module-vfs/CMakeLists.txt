@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 3.12)
-
 project(module-vfs VERSION 1.0
         DESCRIPTION "VFS module library")
 
@@ -80,6 +78,7 @@ target_link_libraries(${PROJECT_NAME}
         module-utils
     PRIVATE 
         littlefs::littlefs
+        json::json
 )
 
 if (${ENABLE_TESTS})

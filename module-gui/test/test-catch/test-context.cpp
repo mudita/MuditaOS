@@ -6,7 +6,7 @@
 
 #include <catch2/catch.hpp>
 #include <module-gui/gui/core/Context.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 
 TEST_CASE("test context size and position")
 {

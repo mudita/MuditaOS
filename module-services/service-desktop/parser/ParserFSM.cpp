@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MessageHandler.hpp"
@@ -10,8 +10,7 @@ namespace sys
 } // namespace sys
 
 #include <service-desktop/ServiceDesktop.hpp>
-#include <log/log.hpp>
-#include <json/json11.hpp>
+#include <log.hpp>
 #include <memory>
 #include <string>
 

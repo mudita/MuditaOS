@@ -4,7 +4,7 @@
 #include "RT1051CellularAudio.hpp"
 #include "board.h"
 #include "dma_config.h"
-#include "log/log.hpp"
+#include <log.hpp>
 
 #include "bsp/BoardDefinitions.hpp"
 

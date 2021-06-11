@@ -9,7 +9,7 @@
 #include <FreeRTOS.h>
 #include <FreeRTOS/include/queue.h>
 #include "drivers/lpuart/DriverLPUART.hpp"
-#include <common_data/EventStore.hpp>
+#include <EventStore.hpp>
 
 namespace bsp
 {

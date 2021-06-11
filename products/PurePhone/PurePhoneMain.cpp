@@ -46,8 +46,8 @@
 #include <bsp/bsp.hpp>
 #include <Application.hpp>
 #include <ApplicationLauncher.hpp>
-#include <log/log.hpp>
-#include <log/Logger.hpp>
+#include <log.hpp>
+#include <Logger.hpp>
 #include <phonenumbers/phonenumberutil.h>
 #include <source/version.hpp>
 #include <SystemManager/SystemManager.hpp>

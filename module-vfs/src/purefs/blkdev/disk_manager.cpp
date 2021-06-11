@@ -3,7 +3,7 @@
 
 #include <purefs/blkdev/disk_manager.hpp>
 #include <purefs/blkdev/disk.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <mutex.hpp>
 #include <errno.h>
 #include <charconv>

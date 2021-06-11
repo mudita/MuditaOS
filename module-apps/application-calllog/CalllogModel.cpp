@@ -8,7 +8,7 @@
 #include "data/CallLogInternals.hpp"
 #include "data/CallLogSwitchData.hpp"
 #include "widgets/CalllogItem.hpp"
-#include <module-utils/time/DateAndTimeSettings.hpp>
+#include <time/DateAndTimeSettings.hpp>
 
 #include <service-appmgr/Controller.hpp>
 #include "application-call/data/CallSwitchData.hpp"

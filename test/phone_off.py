@@ -28,7 +28,6 @@ def main():
         port_name = sys.argv[1]
 
     harness = Harness(port_name)
-    harness.unlock_usb()
     harness.unlock_phone()
     harness.turn_phone_off()
 

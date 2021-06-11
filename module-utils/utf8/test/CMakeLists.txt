@@ -1,0 +1,9 @@
+add_catch2_executable(
+    NAME
+        utf8
+    SRCS
+        unittest_utf8.cpp
+    LIBS
+        log
+        utf8
+)

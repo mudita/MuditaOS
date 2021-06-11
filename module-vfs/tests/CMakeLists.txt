@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 3.12)
-
 add_custom_target("test_disk_image")
 add_custom_command(
         PRE_BUILD

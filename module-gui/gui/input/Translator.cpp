@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Translator.hpp"
-#include "log/log.hpp"
+#include <log.hpp>
 #include <algorithm>
 #include <filesystem>
 #include "i18n/i18n.hpp"

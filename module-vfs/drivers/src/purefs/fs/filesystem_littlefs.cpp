@@ -10,7 +10,7 @@
 #include <purefs/blkdev/disk_handle.hpp>
 #include <purefs/fs/mount_flags.hpp>
 #include <lfs.h>
-#include <log/log.hpp>
+#include <log.hpp>
 
 #include <climits>
 #include <syslimits.h>

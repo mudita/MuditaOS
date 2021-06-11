@@ -5,8 +5,6 @@
 #include "SystemManager/Constants.hpp"
 #include <module-sys/Timers/TimerFactory.hpp>
 
-#include <common_data/EventStore.hpp>
-
 namespace vibra_handle
 {
     Vibra::Vibra(sys::Service *parent) : parent{parent}

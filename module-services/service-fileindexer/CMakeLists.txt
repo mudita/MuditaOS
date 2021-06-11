@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 3.12)
-
 project(service-fileindexer VERSION 1.0
 	DESCRIPTION "File indexer service ")
 
@@ -23,4 +21,14 @@ target_sources( ${PROJECT_NAME}
 )
 
 
-target_link_libraries(${PROJECT_NAME} module-bsp module-os module-utils module-vfs module-sys tag )
+target_link_libraries(${PROJECT_NAME} 
+	PUBLIC
+		module-bsp 
+		module-os 
+		module-utils 
+		module-vfs 
+		module-sys 
+		tag
+	PRIVATE
+		utf8
+)

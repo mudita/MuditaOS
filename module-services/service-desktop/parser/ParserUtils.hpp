@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-#include <log/log.hpp>      // for LOG_ERROR
+#include <log.hpp>          // for LOG_ERROR
 #include <bits/exception.h> // for exception
 #include <cstddef>          // for size_t
 #include <string>           // for string, allocator, basic_string, stol
@@ -171,16 +171,11 @@ namespace parserFSM
 
         namespace usb
         {
-            inline constexpr auto passcode = "passcode";
-            inline constexpr auto id       = "uniqueId";
             inline constexpr auto config   = "config";
-            inline constexpr auto status   = "usbSecurityStatus";
-            inline constexpr auto on       = "on";
-            inline constexpr auto off      = "off";
             inline constexpr auto locked   = "locked";
             inline constexpr auto unlocked = "unlocked";
             inline constexpr auto security = "usbSecurity";
-
+            inline constexpr auto phoneLockCode = "phoneLockCode";
         } // namespace usb
 
     } // namespace json

@@ -10,9 +10,9 @@
 #include <Service/Message.hpp>
 #include <service-desktop/DesktopMessages.hpp>
 
-namespace cellular
+namespace cellular::msg::notification
 {
-    class StateChange;
+    class ModemStateChanged;
 }
 
 namespace gui
@@ -42,7 +42,7 @@ namespace app
         void destroyUserInterface() override;
         // if there is modem notification and there is no default SIM selected, then we need to select if when unlock is
         // done
-        bool handle(cellular::StateChange *msg);
+        void handle(cellular::msg::notification::ModemStateChanged *msg);
         auto handle(sdesktop::UpdateOsMessage *msg) -> bool;
         void handleNotificationsChanged(std::unique_ptr<gui::SwitchData> notificationsParams) override;
 

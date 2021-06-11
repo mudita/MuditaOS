@@ -8,6 +8,7 @@
 
 #include <application-onboarding/ApplicationOnBoarding.hpp>
 #include <service-appmgr/service-appmgr/Controller.hpp>
+#include <source/version.hpp>
 
 namespace app::onBoarding
 {
@@ -18,6 +19,13 @@ namespace app::onBoarding
         bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(style::strings::common::ok));
         bottomBar->setActive(gui::BottomBar::Side::RIGHT, false);
         presenter->attach(this);
+    }
+
+    void UpdateDialogWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
+    {
+        setTitle(utils::translate("app_onboarding_title_update_info"));
+        icon->image->set("update_icon_W_G");
+        icon->text->setRichText(utils::translate("app_onboarding_update_info"), {{"$VERSION", std::string(VERSION)}});
     }
 
     bool UpdateDialogWindow::onInput(const gui::InputEvent &inputEvent)

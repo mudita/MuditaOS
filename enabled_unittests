@@ -248,7 +248,6 @@ TESTS_LIST["catch2-service-db"]="
     Settings Messages;
     Quotes;
     Factory Settings;
-    Factory Settings Init;
 "
 #---------
 TESTS_LIST["catch2-service-db-settings"]="
@@ -364,7 +363,7 @@ TESTS_LIST["catch2-utils-time_display"]="
     Time display parser;
 "
 #---------
-TESTS_LIST["catch2-utils-ucs2"]="
+TESTS_LIST["catch2-ucs2"]="
     UCS2 to UTF8 conversion;
     UCS2 from UTF8 emoji 😁;
     UCS2 from UTF8 emoji 🍣;
@@ -380,7 +379,7 @@ TESTS_LIST["catch2-utils-ucs2"]="
     UTF8 to UCS2 long string conversion;
 "
 #---------
-TESTS_LIST["catch2-utils-utf8"]="
+TESTS_LIST["catch2-utf8"]="
     UTF8: operator index returns value;
     UTF8: operator index exceeds string size;
     UTF8: operator== returns properly;

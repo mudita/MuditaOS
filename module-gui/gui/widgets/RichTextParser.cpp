@@ -9,7 +9,7 @@
 #include <sstream>
 #include <string>
 #include <map>
-#include <log/log.hpp>
+#include <log.hpp>
 #include "TextFormat.hpp"
 
 #include <pugixml.hpp>

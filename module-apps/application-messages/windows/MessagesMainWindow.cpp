@@ -16,7 +16,7 @@
 #include <i18n/i18n.hpp>
 #include <application-phonebook/data/PhonebookItemData.hpp>
 #include <Style.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 
 #include <module-db/queries/notifications/QueryNotificationsClear.hpp>
 #include <module-db/queries/messages/threads/QueryThreadGetByContactID.hpp>

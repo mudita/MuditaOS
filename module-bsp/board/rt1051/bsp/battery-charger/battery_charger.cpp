@@ -6,7 +6,7 @@
 #include "fsl_common.h"
 
 #include "bsp/BoardDefinitions.hpp"
-#include "common_data/EventStore.hpp"
+#include <EventStore.hpp>
 #include "drivers/gpio/DriverGPIO.hpp"
 #include "drivers/i2c/DriverI2C.hpp"
 #include <purefs/filesystem_paths.hpp>

@@ -1,6 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.12)
-
-project(module-db VERSION 1.0
+﻿project(module-db VERSION 1.0
         DESCRIPTION "Database module library")
 
 module_is_test_entity()
@@ -178,11 +176,11 @@ target_compile_options(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
-    module-utils
-    module-vfs
-
+        module-utils
+        module-vfs
+        utf8
     PRIVATE
-    Microsoft.GSL::GSL
+        Microsoft.GSL::GSL
 )
 
 # Host target configuration(mainly used for unit testing)

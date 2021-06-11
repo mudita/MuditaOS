@@ -1,6 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.14)
-
-project(module-sys VERSION 1.0
+﻿project(module-sys VERSION 1.0
         DESCRIPTION "Core module library")
 
 module_is_test_entity()
@@ -60,6 +58,7 @@ target_link_libraries(module-sys
         service-evtmgr
         messagetype
         magic_enum
+        eventstore
     PUBLIC
         module-os
     )

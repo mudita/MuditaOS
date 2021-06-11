@@ -13,7 +13,6 @@
 #include <SMSTemplateRecord.hpp>
 #include <Service/Common.hpp>
 #include <ThreadRecord.hpp>
-#include <json/json11.hpp>
 #include <queries/messages/sms/QuerySMSGet.hpp>
 #include <queries/messages/sms/QuerySMSGetByID.hpp>
 #include <queries/messages/sms/QuerySMSGetByThreadID.hpp>

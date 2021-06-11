@@ -10,7 +10,7 @@ from bt_utils import *
 
 @pytest.mark.rt1051
 @pytest.mark.usefixtures("bt_state_off")
-@pytest.mark.usefixtures("usb_unlocked")
+@pytest.mark.usefixtures("phone_unlocked")
 def test_bt_turning_on_off(harness):
     state = bt_get_state(harness)
     assert state["power"] == "off"
@@ -30,7 +30,7 @@ def test_bt_turning_on_off(harness):
 
 @pytest.mark.rt1051
 @pytest.mark.usefixtures("bt_state_on")
-@pytest.mark.usefixtures("usb_unlocked")
+@pytest.mark.usefixtures("phone_unlocked")
 def test_bt_visibility_on_off(harness):
     state = bt_get_state(harness)
     assert state["power"] == "on"

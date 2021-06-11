@@ -4,7 +4,7 @@
 #include "OptionWindow.hpp"
 #include "Label.hpp"
 #include <i18n/i18n.hpp>
-#include "log/log.hpp"
+#include <log.hpp>
 #include <service-appmgr/model/ApplicationManager.hpp>
 #include <Style.hpp>
 #include <memory>

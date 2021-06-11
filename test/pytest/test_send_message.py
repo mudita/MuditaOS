@@ -174,7 +174,6 @@ def remove_added_messages(harness, diff_messages):
 @pytest.mark.rt1051
 @pytest.mark.usefixtures("phone_unlocked")
 @pytest.mark.usefixtures("phone_in_desktop")
-@pytest.mark.usefixtures("usb_unlocked")
 def test_send_message(harness, phone_number, sms_text):
     old_messages = get_message_by_text(harness, sms_text, str(phone_number))
 

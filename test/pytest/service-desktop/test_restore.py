@@ -8,7 +8,7 @@ from harness import log
 
 @pytest.mark.service_desktop_test
 @pytest.mark.rt1051
-@pytest.mark.usefixtures("usb_unlocked")
+@pytest.mark.usefixtures("phone_unlocked")
 @pytest.mark.restore
 def test_restore(harness):
     # this requests the list of available files

@@ -1,7 +1,8 @@
-﻿project(service-desktop)
+project(service-desktop)
 message( "${PROJECT_NAME}  ${CMAKE_CURRENT_LIST_DIR}" )
 
 set(SOURCES
+    endpoints/BaseHelper.cpp
     endpoints/backup/BackupEndpoint.cpp
     endpoints/backup/BackupRestore.cpp
     endpoints/bluetooth/BluetoothEndpoint.cpp
@@ -14,7 +15,6 @@ set(SOURCES
     endpoints/contacts/ContactsEndpoint.cpp
     endpoints/developerMode/DeveloperModeEndpoint.cpp
     endpoints/developerMode/DeveloperModeHelper.cpp
-    endpoints/developerMode/Mode/BaseHelper.cpp
     endpoints/developerMode/Mode/UI_Helper.cpp
     endpoints/developerMode/event/DomRequest.cpp
     endpoints/developerMode/event/ATRequest.cpp
@@ -30,6 +30,7 @@ set(SOURCES
     endpoints/calendarEvents/CalendarEventsHelper.cpp
     endpoints/calendarEvents/CalendarEventsEndpoint.cpp
     endpoints/security/SecurityEndpoint.cpp
+    endpoints/security/SecurityEndpointHelper.cpp
 
     parser/HttpEnums.cpp
     parser/ParserFSM.cpp
@@ -54,14 +55,18 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
-        service-cellular
-        service-evtmgr
-        module-utils
-        module-cellular
         crc32
         microtar
+        module-utils
+        service-cellular
+        service-evtmgr
+        utf8
         utils-bootconfig
         Microsoft.GSL::GSL
+        json::json
+    PUBLIC
+        module-cellular
+        eventstore
 )
 
 if (${ENABLE_TESTS})

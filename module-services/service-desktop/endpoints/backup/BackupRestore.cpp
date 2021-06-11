@@ -4,7 +4,7 @@
 #include "BackupRestore.hpp"
 
 #include <SystemManager/SystemManager.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <microtar.hpp>
 #include <purefs/filesystem_paths.hpp>
 #include <service-db/DBServiceAPI.hpp>

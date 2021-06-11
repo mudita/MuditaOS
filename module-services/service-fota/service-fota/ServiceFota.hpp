@@ -71,7 +71,7 @@ namespace FotaService
         sys::MessagePointer handleCellularGetChannelResponseMessage(sys::Message *req);
         /** Do nothing until celular finishes it's startup
          */
-        sys::MessagePointer handleServiceCellularNotifications(sys::Message *req);
+        sys::MessagePointer handleSimReadyNotification(sys::Message *req);
         sys::MessagePointer handleConfigureAPN(sys::Message *req);
         sys::MessagePointer handleConnect(sys::Message *req);
         sys::MessagePointer handleHttpGet(sys::Message *req);

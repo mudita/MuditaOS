@@ -5,7 +5,7 @@
 #include <fstream>
 #include <gsl/util>
 #include "LockGuard.hpp"
-#include "Logger.hpp"
+#include <Logger.hpp>
 #include "macros.h"
 
 namespace Log

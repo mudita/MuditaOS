@@ -1,6 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.12)
-
-add_catch2_executable(
+﻿add_catch2_executable(
     NAME
         utils-conditional-invoke-tests
     SRCS
@@ -16,40 +14,6 @@ add_catch2_executable(
     SRCS
         unittest_phonenumber.cpp
         unittest_numbermatcher.cpp
-    LIBS
-        module-utils
-)
-
-# Clipboard tests
-add_catch2_executable(
-    NAME
-        utils-clipboard
-    SRCS
-        unittest_clipboard.cpp
-    LIBS
-        module-utils
-)
-
-# UCS2 tests
-add_catch2_executable(
-    NAME
-        utils-ucs2
-    SRCS
-        unittest_ucs2.cpp
-        ../ucs2/UCS2.cpp
-        ../ucs2/UCS2.hpp
-    LIBS
-        module-utils
-)
-
-# UTF8 tests
-add_catch2_executable(
-    NAME
-        utils-utf8
-    SRCS
-        unittest_utf8.cpp
-        ../utf8/UTF8.cpp
-        ../utf8/UTF8.hpp
     LIBS
         module-utils
 )
@@ -119,17 +83,6 @@ add_catch2_executable(
 #    LIBS
 #        module-utils
 #)
-
-#  time display tests
-add_catch2_executable(
-    NAME
-        utils-time_display
-    SRCS
-        unittest_TimeRangeParser.cpp
-    LIBS
-        module-utils
-        module-db
-)
 
 #  i18n language change tests
 add_catch2_executable(
