@@ -7,6 +7,7 @@ add_catch2_executable(
     LIBS
         module-sys
         module-cellular 
+        time-constants
 )
 
 add_catch2_executable(
