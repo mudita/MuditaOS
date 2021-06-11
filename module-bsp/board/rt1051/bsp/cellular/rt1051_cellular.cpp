@@ -318,7 +318,7 @@ namespace bsp
         exitSleep();
 
         auto timeoutTicks = pdMS_TO_TICKS(timeoutMs.count());
-        if (timeoutTicks > portMAX_DELAY) {
+        if ((timeoutTicks > portMAX_DELAY) || (timeoutMs == std::chrono::milliseconds::max())) {
             timeoutTicks = portMAX_DELAY;
         }
 

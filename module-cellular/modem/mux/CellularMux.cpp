@@ -549,7 +549,7 @@ void CellularMux::processData(bsp::cellular::CellularDMAResultStruct &result)
 {
     LOG_DEBUG("Worker start");
 
-    constexpr auto readTimeout = std::chrono::seconds{1};
+    constexpr auto waitForDataIndefinitely = std::chrono::milliseconds::max();
     CellularMux *inst          = static_cast<CellularMux *>(ptr);
 
     bsp::cellular::CellularDMAResultStruct result{};
@@ -557,7 +557,7 @@ void CellularMux::processData(bsp::cellular::CellularDMAResultStruct &result)
     while (true) {
         result.resultCode = bsp::cellular::CellularResultCode::ReceivedNoData;
 
-        inst->cellular->read(&result, bsp::cellular::CellularDMAResultStruct::getMaxSize(), readTimeout);
+        inst->cellular->read(&result, bsp::cellular::CellularDMAResultStruct::getMaxSize(), waitForDataIndefinitely);
 
         switch (result.resultCode) {
         case bsp::cellular::CellularResultCode::ReceivedAndFull:
