@@ -1,5 +1,3 @@
-﻿cmake_minimum_required(VERSION 3.12)
-
 project(module-gui VERSION 1.0
         DESCRIPTION "GUI library dedicated for pure phone.")
 
@@ -22,12 +20,16 @@ include(gui/dom/CMakeLists.txt)
 include_directories( ../module-utils )
 
 target_link_libraries(${PROJECT_NAME} 
-    PUBLIC 
+    PUBLIC
         module-utils 
+        utf8
+        eventstore
         ${TARGET_LIBRARIES} 
+        time
     PRIVATE
         pugixml::pugixml
         Microsoft.GSL::GSL
+        json::json
 )
 
 # Board specific compilation definitions,options,include directories and features

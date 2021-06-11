@@ -6,7 +6,7 @@ from harness.interface.defs import status
 
 @pytest.mark.service_desktop_test
 @pytest.mark.rt1051
-@pytest.mark.usefixtures("usb_unlocked")
+@pytest.mark.usefixtures("phone_unlocked")
 def test_factory_reset(harness):
     body = {"factoryRequest": True}
     ret = harness.endpoint_request("factory", "post", body)

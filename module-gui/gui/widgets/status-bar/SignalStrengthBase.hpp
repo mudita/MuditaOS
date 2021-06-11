@@ -5,7 +5,7 @@
 
 #include "StatusBarWidgetBase.hpp"
 #include "BoxLayout.hpp"
-#include <common_data/EventStore.hpp>
+#include <EventStore.hpp>
 
 namespace gui::status_bar
 {

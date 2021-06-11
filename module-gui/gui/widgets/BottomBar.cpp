@@ -12,7 +12,7 @@
 #include "Margins.hpp"
 #include "utf8/UTF8.hpp"
 #include <Style.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 
 namespace gui
 {

@@ -5,7 +5,7 @@
 
 #include <cstdint>
 #include <memory>
-#include "utf8/UTF8.hpp"
+#include <utf8/UTF8.hpp>
 
 class UCS2
 {

@@ -5,7 +5,7 @@
 #include <fsl_snvs_hp.h>
 #include <fsl_snvs_lp.h>
 #include <module-os/RTOSWrapper/include/ticks.hpp>
-#include <module-utils/time/time_conversion.hpp>
+#include <time/time_conversion.hpp>
 #include <time.h>
 
 namespace

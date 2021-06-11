@@ -6,7 +6,7 @@
 #include <re2/re2.h>
 
 #include <at/Commands.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 
 #include "service-cellular/requests/CallRequest.hpp"
 #include "service-cellular/requests/SupplementaryServicesRequest.hpp"
@@ -16,7 +16,7 @@
 #include "service-cellular/requests/UssdRequest.hpp"
 #include "service-cellular/requests/RejectRequest.hpp"
 
-#include <common_data/EventStore.hpp>
+#include <EventStore.hpp>
 #include <cmd/QECCNUM.hpp>
 
 namespace cellular

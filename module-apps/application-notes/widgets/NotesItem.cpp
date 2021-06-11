@@ -6,7 +6,7 @@
 #include <Style.hpp>
 #include <module-apps/application-notes/style/NotesListStyle.hpp>
 
-#include <module-utils/time/time_conversion.hpp>
+#include <time/time_conversion.hpp>
 
 namespace gui
 {

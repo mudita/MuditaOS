@@ -4,8 +4,8 @@
 #include <board.h>
 #include <critical.hpp>
 #include <macros.h>
-#include "log/log.hpp"
-#include "log/Logger.hpp"
+#include <log.hpp>
+#include <Logger.hpp>
 #include "segger/rtt/SEGGER_RTT.h"
 #include <ticks.hpp>
 

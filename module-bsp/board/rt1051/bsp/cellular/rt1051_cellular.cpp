@@ -4,7 +4,7 @@
 #include "rt1051_cellular.hpp"
 #include "fsl_cache.h"
 
-#include <common_data/EventStore.hpp>
+#include <EventStore.hpp>
 #include <task.h>
 #include <ticks.hpp>
 

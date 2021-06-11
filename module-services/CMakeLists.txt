@@ -1,6 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.14)
-
-project(module-services VERSION 1.0
+﻿project(module-services VERSION 1.0
         DESCRIPTION "Library with all services.")
 
 module_is_test_entity()
@@ -33,22 +31,25 @@ add_subdirectory( service-antenna )
 add_subdirectory( service-time )
 add_subdirectory( service-fileindexer )
 
-target_link_libraries(${PROJECT_NAME} PUBLIC
-    service-gui
-    service-eink
-    service-appmgr
-    module-bsp
-    module-os
-    module-sys
-    module-utils
-    module-gui
-    module-apps
-    module-db
-    module-cellular
-    module-audio
-    service-fileindexer
-    service-antenna
-    ${TARGET_LIBRARIES}
+target_link_libraries(${PROJECT_NAME} 
+    PUBLIC
+        service-gui
+        service-eink
+        service-appmgr
+        module-bsp
+        module-os
+        module-sys
+        module-utils
+        module-gui
+        module-apps
+        module-db
+        module-cellular
+        module-audio
+        service-fileindexer
+        service-antenna
+        ${TARGET_LIBRARIES}
+    PRIVATE
+        time
 )
 
 # Board specific compilation definitions,options,include directories and features

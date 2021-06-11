@@ -3,7 +3,7 @@
 
 #include "SimCard.hpp"
 
-#include <common_data/EventStore.hpp>
+#include <EventStore.hpp>
 #include <bsp/cellular/bsp_cellular.hpp>
 #include <modem/BaseChannel.hpp>
 #include <at/ATFactory.hpp>

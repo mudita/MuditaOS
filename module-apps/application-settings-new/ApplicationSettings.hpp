@@ -8,7 +8,7 @@
 #include <bsp/common.hpp>
 #include <bsp/keypad_backlight/keypad_backlight.hpp>
 #include <module-services/service-evtmgr/screen-light-control/ScreenLightControl.hpp>
-#include <common_data/EventStore.hpp>
+#include <EventStore.hpp>
 
 namespace gui::window::name
 {
@@ -128,15 +128,6 @@ namespace app
             virtual void setKeypadBacklightState(bsp::keypad_backlight::State state) = 0;
         };
 
-        class SecuritySettings
-        {
-          public:
-            virtual ~SecuritySettings() = default;
-
-            virtual auto isUSBSecured() const -> bool  = 0;
-            virtual void setUSBSecurity(bool security) = 0;
-        };
-
         class DndSettings
         {
           public:
@@ -178,7 +169,6 @@ namespace app
                                    public settingsInterface::OperatorsSettings,
                                    public settingsInterface::ScreenLightSettings,
                                    public settingsInterface::KeypdBacklightSettings,
-                                   public settingsInterface::SecuritySettings,
                                    public settingsInterface::DndSettings,
                                    public settingsInterface::OfflineSettings,
                                    public settingsInterface::ConnectionSettings,
@@ -222,9 +212,6 @@ namespace app
         auto getKeypadBacklightState() -> bsp::keypad_backlight::State override;
         void setKeypadBacklightState(bsp::keypad_backlight::State keypadLightState) override;
 
-        auto isUSBSecured() const -> bool override;
-        void setUSBSecurity(bool security) override;
-
         auto getNotificationsWhenLocked() const noexcept -> bool override;
         void setNotificationsWhenLocked(bool on) noexcept override;
         auto getCallsFromFavourite() const noexcept -> bool override;
@@ -248,7 +235,6 @@ namespace app
         bsp::Board board              = bsp::Board::none;
         bool operatorsOn              = false;
         bool voLteStateOn             = false;
-        bool usbSecured               = true;
         bool notificationsWhenLocked  = true;
         bool callsFromFavorites       = false;
         int connectionFrequency       = 0;

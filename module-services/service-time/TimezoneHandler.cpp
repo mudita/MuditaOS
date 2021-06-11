@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-time/TimezoneHandler.hpp"
-#include <module-utils/time/time_conversion.hpp>
+#include <time/time_conversion.hpp>
 #include <iomanip>
 
 auto TimezoneHandler::getTimezone() -> std::string const

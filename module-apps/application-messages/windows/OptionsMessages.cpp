@@ -5,7 +5,7 @@
 #include "application-messages/data/SMSdata.hpp"
 #include "tools/Common.hpp"
 
-#include <common_data/Clipboard.hpp>
+#include <Clipboard.hpp>
 #include <Option.hpp>
 #include <Text.hpp>
 #include <i18n/i18n.hpp>

@@ -307,10 +307,6 @@ namespace app
             [this](const std::string &value) { volteChanged(value); },
             ::settings::SettingsScope::Global);
         settings->registerValueChange(
-            ::settings::SystemProperties::usbSecurity,
-            [this](const std::string &value) { usbSecured = utils::getNumericValue<bool>(value); },
-            ::settings::SettingsScope::Global);
-        settings->registerValueChange(
             ::settings::Cellular::offlineMode,
             [this](const std::string &value) { flightModeOn = utils::getNumericValue<bool>(value); },
             ::settings::SettingsScope::Global);
@@ -422,7 +418,7 @@ namespace app
             return std::make_unique<gui::DialogYesNo>(app, name);
         });
         windowsFactory.attach(gui::window::name::security, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::SecurityMainWindow>(app, static_cast<ApplicationSettingsNew *>(app));
+            return std::make_unique<gui::SecurityMainWindow>(app);
         });
         windowsFactory.attach(gui::window::name::dialog_confirm, [](Application *app, const std::string &name) {
             return std::make_unique<gui::DialogConfirm>(app, gui::window::name::dialog_confirm);
@@ -629,18 +625,6 @@ namespace app
         settings->setValue(::settings::KeypadLight::state,
                            std::to_string(static_cast<int>(keypadLightState)),
                            ::settings::SettingsScope::Global);
-    }
-
-    bool ApplicationSettingsNew::isUSBSecured() const
-    {
-        return usbSecured;
-    }
-
-    void ApplicationSettingsNew::setUSBSecurity(bool security)
-    {
-        usbSecured = security;
-        settings->setValue(
-            ::settings::SystemProperties::usbSecurity, std::to_string(security), ::settings::SettingsScope::Global);
     }
 
     auto ApplicationSettingsNew::getNotificationsWhenLocked() const noexcept -> bool

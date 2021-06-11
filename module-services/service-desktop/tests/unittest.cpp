@@ -16,7 +16,7 @@
 #include <SMSRecord.hpp>
 #include <SMSTemplateRecord.hpp>
 #include <catch2/catch.hpp>
-#include <json/json11.hpp>
+#include <json11.hpp>
 #include <purefs/filesystem_paths.hpp>
 #include <utf8/UTF8.hpp>
 #include <memory>

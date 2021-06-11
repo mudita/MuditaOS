@@ -1,4 +1,4 @@
-﻿project(service-db)
+project(service-db)
 message("${PROJECT_NAME}  ${CMAKE_CURRENT_LIST_DIR}" )
 
 
@@ -32,6 +32,9 @@ target_include_directories(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
         module-db
+        json::json
+    PUBLIC
+        utf8
 )
 
 if (${ENABLE_TESTS})

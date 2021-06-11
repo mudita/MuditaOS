@@ -3,7 +3,7 @@
 
 #include "chip.hpp"
 
-#include <log/log.hpp>
+#include <log.hpp>
 
 #include <map>
 #include <string>

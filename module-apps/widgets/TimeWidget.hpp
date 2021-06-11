@@ -7,7 +7,7 @@
 #include <Text.hpp>
 #include <BoxLayout.hpp>
 #include "widgets/DateWidget.hpp"
-#include <module-utils/time/FromTillDate.hpp>
+#include <time/FromTillDate.hpp>
 
 namespace gui
 {

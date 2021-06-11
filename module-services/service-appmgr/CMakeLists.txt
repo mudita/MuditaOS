@@ -1,4 +1,4 @@
-﻿project(service-appmgr)
+project(service-appmgr)
 message( "${PROJECT_NAME}  ${CMAKE_CURRENT_LIST_DIR}" )
 
 set(SOURCES
@@ -37,6 +37,9 @@ target_link_libraries(${PROJECT_NAME}
         service-gui
         module-apps
         module-audio
+        json::json
+    PUBLIC
+        time
 )
 
 target_include_directories(${PROJECT_NAME}

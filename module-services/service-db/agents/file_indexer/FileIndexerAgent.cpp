@@ -4,7 +4,7 @@
 #include "FileIndexerAgent.hpp"
 #include "FileIndexer_queries.hpp"
 
-#include <log/log.hpp>
+#include <log.hpp>
 #include <purefs/filesystem_paths.hpp>
 #include <Application.hpp>
 #include <memory>

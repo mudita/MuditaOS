@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DeviceInfoEndpoint.hpp"
@@ -6,8 +6,7 @@
 #include <endpoints/update/UpdateMuditaOS.hpp>
 #include <parser/MessageHandler.hpp>
 
-#include <common_data/EventStore.hpp>
-#include <json/json11.hpp>
+#include <EventStore.hpp>
 #include <source/version.hpp>
 #include <service-desktop/service-desktop/ServiceDesktop.hpp>
 #include <version.hpp>

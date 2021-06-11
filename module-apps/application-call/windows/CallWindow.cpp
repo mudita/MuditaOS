@@ -7,7 +7,7 @@
 #include "InputEvent.hpp"
 #include "application-call/data/CallState.hpp"
 #include "application-call/widgets/StateIcons.hpp"
-#include "log/log.hpp"
+#include <log.hpp>
 #include "service-appmgr/Controller.hpp"
 
 #include "application-call/ApplicationCall.hpp"
@@ -136,9 +136,11 @@ namespace gui
         };
         sendSmsIcon->activatedCallback = [=](gui::Item &item) {
             LOG_INFO("Send message template and reject the call");
-            return app::manager::Controller::sendAction(application,
-                                                        app::manager::actions::ShowSmsTemplates,
-                                                        std::make_unique<SMSSendTemplateRequest>(phoneNumber));
+            constexpr auto preventAutoLock = true;
+            return app::manager::Controller::sendAction(
+                application,
+                app::manager::actions::ShowSmsTemplates,
+                std::make_unique<SMSSendTemplateRequest>(phoneNumber, preventAutoLock));
         };
 
         // define navigation between icons
@@ -452,13 +454,13 @@ namespace gui
     void CallWindow::setCallEndMessage()
     {
         switch (callEndType) {
+        case CallEndType::None:
+            [[fallthrough]];
         case CallEndType::Ended:
             durationLabel->setText(utils::translate(strings::callended));
             break;
         case CallEndType::Rejected:
             durationLabel->setText(utils::translate(strings::callrejected));
-            break;
-        case CallEndType::None:
             break;
         }
     }

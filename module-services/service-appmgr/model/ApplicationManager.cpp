@@ -20,7 +20,7 @@
 #include <application-onboarding/ApplicationOnBoarding.hpp>
 #include <application-onboarding/data/OnBoardingMessages.hpp>
 #include <i18n/i18n.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <service-appmgr/messages/Message.hpp>
 #include <service-evtmgr/EventManager.hpp>
 #include <service-evtmgr/EVMessages.hpp>
@@ -35,7 +35,7 @@
 #include <limits>
 #include <utility>
 #include <module-utils/Utils.hpp>
-#include <module-utils/time/DateAndTimeSettings.hpp>
+#include <time/DateAndTimeSettings.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <service-appmgr/messages/DOMRequest.hpp>
 #include <service-appmgr/messages/GetAllNotificationsRequest.hpp>
@@ -573,16 +573,17 @@ namespace app::manager
                 });
         connect(typeid(cellular::msg::notification::SimReady),
                 [&](sys::Message *request) -> sys::MessagePointer { return simLockHandler.handleSimReadyMessage(); });
-        connect(typeid(cellular::StateChange), [&](sys::Message *request) -> sys::MessagePointer {
-            auto data = static_cast<cellular::StateChange *>(request);
-            if (data->request == cellular::service::State::ST::URCReady) {
-                simLockHandler.setSimReady();
-                simLockHandler.getSettingsSimSelect(
-                    settings->getValue(settings::SystemProperties::activeSim, settings::SettingsScope::Global));
-                return sys::msgHandled();
-            }
-            return sys::msgNotHandled();
-        });
+        connect(typeid(cellular::msg::notification::ModemStateChanged),
+                [&](sys::Message *request) -> sys::MessagePointer {
+                    auto data = static_cast<cellular::msg::notification::ModemStateChanged *>(request);
+                    if (data->state == cellular::api::ModemState::Ready) {
+                        simLockHandler.setSimReady();
+                        simLockHandler.getSettingsSimSelect(
+                            settings->getValue(settings::SystemProperties::activeSim, settings::SettingsScope::Global));
+                        return sys::msgHandled();
+                    }
+                    return sys::msgNotHandled();
+                });
 
         connect(typeid(onBoarding::FinalizeOnBoarding),
                 [&](sys::Message *request) -> sys::MessagePointer { return handleOnBoardingFinalize(); });

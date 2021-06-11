@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <json/json11.hpp>
+#include <json11.hpp>
 #include <Device.hpp>
 
 class SettingsSerializer

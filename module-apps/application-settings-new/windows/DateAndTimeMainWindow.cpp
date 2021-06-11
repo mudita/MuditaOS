@@ -4,7 +4,7 @@
 #include "application-settings-new/ApplicationSettings.hpp"
 #include "DateAndTimeMainWindow.hpp"
 #include "module-apps/application-desktop/windows/Names.hpp"
-#include <module-utils/time/DateAndTimeSettings.hpp>
+#include <time/DateAndTimeSettings.hpp>
 #include "OptionSetting.hpp"
 #include "service-appmgr/Controller.hpp"
 

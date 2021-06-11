@@ -10,7 +10,7 @@
 #include <time/time_conversion.hpp>
 #include <ticks.hpp>
 #include <cstdio>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <crc32.h>
 #include <array>
 #include <Utils.hpp>

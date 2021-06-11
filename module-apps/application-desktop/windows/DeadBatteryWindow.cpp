@@ -4,7 +4,7 @@
 #include "DeadBatteryWindow.hpp"
 #include "InputEvent.hpp"
 #include "gui/widgets/Image.hpp"
-#include "log/log.hpp"
+#include <log.hpp>
 #include <application-desktop/windows/Names.hpp>
 #include <service-appmgr/model/ApplicationManager.hpp>
 #include <service-appmgr/Controller.hpp>

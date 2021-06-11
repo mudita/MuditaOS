@@ -4,14 +4,16 @@
 #include "service-antenna/ServiceAntenna.hpp"
 #include "service-antenna/AntennaMessage.hpp"
 #include "service-antenna/AntennaServiceAPI.hpp"
+#include "service-antenna/ServiceState.hpp"
 
 #include <service-appmgr/model/ApplicationManager.hpp>
 
 #include <at/response.hpp>
-#include <common_data/EventStore.hpp>
-#include <log/log.hpp>
+
+#include <log.hpp>
+#include <EventStore.hpp>
+
 #include <MessageType.hpp>
-#include <module-utils/state/ServiceState.hpp>
 #include <projdefs.h>
 #include <module-sys/Timers/TimerFactory.hpp>
 #include <service-cellular/State.hpp>
@@ -60,7 +62,7 @@ ServiceAntenna::ServiceAntenna()
       phoneModeObserver{std::make_unique<sys::phone_modes::Observer>()}
 {
     LOG_INFO("[%s] Initializing", service::name::antenna);
-    state = new utils::state::State<antenna::State>(this);
+    state = new state::State<antenna::State>(this);
     timer = sys::TimerFactory::createPeriodicTimer(
         this, "Antenna", std::chrono::seconds{5}, [this](sys::Timer & /*timer*/) {
             timer.stop();
@@ -76,6 +78,11 @@ ServiceAntenna::ServiceAntenna()
     bus.channels.push_back(sys::BusChannel::ServiceCellularNotifications);
     bus.channels.push_back(sys::BusChannel::AntennaNotifications);
     bus.channels.push_back(sys::BusChannel::PhoneModeChanges);
+
+    connect(typeid(cellular::msg::notification::SimReady), [this](sys::Message *) {
+        state->set(antenna::State::init);
+        return sys::MessageNone{};
+    });
 
     phoneModeObserver->connect(this);
     phoneModeObserver->subscribe([this](sys::phone_modes::PhoneMode mode) {
@@ -118,14 +125,6 @@ sys::MessagePointer ServiceAntenna::DataReceivedHandler(sys::DataMessage *msgl, 
         } break;
         case CellularMessage::Type::HangupCall: {
             AntennaServiceAPI::LockRequest(this, antenna::lockState::unlocked);
-        } break;
-        case CellularMessage::Type::StateRequest: {
-            auto msg = dynamic_cast<cellular::StateChange *>(msgl);
-            if (msg != nullptr) {
-                if (msg->request == cellular::service::State::ST::Ready) {
-                    state->set(antenna::State::init);
-                }
-            }
         } break;
         default:
             break;
