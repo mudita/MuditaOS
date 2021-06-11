@@ -74,6 +74,7 @@ target_link_libraries(${PROJECT_NAME}
         date::date
         eventstore
         i18n
+        libphonenumber::libphonenumber
         Microsoft.GSL::GSL
         service-antenna
         service-appmgr
