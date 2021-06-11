@@ -5,5 +5,6 @@ add_catch2_executable(
     SRCS
         unittest_clipboard.cpp
     LIBS
+        module-sys
         clipboard
 )
