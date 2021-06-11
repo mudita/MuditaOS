@@ -19,6 +19,7 @@
 #include "time_locale.hpp"
 #include "DateAndTimeSettings.hpp"
 #include <Utils.hpp>
+#include <time/time_constants.hpp>
 
 namespace utils::time
 {
@@ -32,8 +33,7 @@ namespace utils::time
         const std::vector<std::string> specifiers_replacement = {"%a",  // day abbrew
                                                                  "%A",  // day long
                                                                  "%b",  // month abbrew
-                                                                 "%B",  // month long
-                                                                 "%Z"}; // timezone
+                                                                 "%B"}; // month long
         constexpr auto hoursMinFormat12H                      = "%I:%M";
         constexpr auto hoursMinFormat24H                      = "%H:%M";
 
@@ -57,7 +57,7 @@ namespace utils::time
 
     Locale tlocale;
 
-    UTF8 Localer::get_replacement(Replacements val, const struct tm &timeinfo)
+    UTF8 Localer::get_replacement(Replacements val, const struct tm &timeinfo) const
     {
         UTF8 retval = "";
         switch (val) {
@@ -73,72 +73,53 @@ namespace utils::time
         case MonthAbbrev:
             retval = Locale::get_month(Locale::Month(timeinfo.tm_mon)).substr(0, abbrev_len);
             break;
-        case Timezone:
-            break;
         }
         return retval;
     }
 
-    Timestamp::Timestamp()
-    {
-        time     = 0;
-        timeinfo = *std::localtime(&time);
-    }
+    Timestamp::Timestamp(time_t newtime) : time(newtime)
+    {}
 
     void Timestamp::set_time(time_t newtime)
     {
-        time     = newtime;
-        timeinfo = *localtime(&time);
+        time = newtime;
     }
-
-    void Timestamp::set_time(std::string timestr, const char *fmt)
-    {
-
-        std::stringstream stream(timestr);
-        try {
-            stream >> std::get_time(&(this->timeinfo), "%y/%m/%d %H:%M:%S");
-
-            // add missing years, otherwise mktime returns bad timestamp
-            timeinfo.tm_year += 100;
-            this->time = mktime(&timeinfo);
-        }
-        catch (std::exception &e) {
-            LOG_ERROR("Time::set_time error %s", e.what());
-        }
-    }
-
     constexpr uint32_t datasize = 128;
-    UTF8 Timestamp::str(std::string fmt)
+    UTF8 Timestamp::str(std::string fmt) const
     {
-        if (fmt.compare("") != 0) {
-            this->format = fmt;
+        if (fmt.compare("") == 0) {
+            fmt = format; // take default
         }
         UTF8 datetimestr = "";
-        auto replaceFunc = [&](int idx) { return get_replacement(Replacements(idx), timeinfo); };
-        utils::findAndReplaceAll(this->format, specifiers_replacement, replaceFunc);
+        auto timeInfo    = std::localtime(&time);
+        auto replaceFunc = [&](int idx) { return get_replacement(Replacements(idx), *timeInfo); };
+        utils::findAndReplaceAll(fmt, specifiers_replacement, replaceFunc);
         auto data = std::unique_ptr<char[]>(new char[datasize]);
-        std::strftime(data.get(), datasize, this->format.c_str(), &timeinfo);
-        datetimestr = UTF8(data.get());
+        if (std::strftime(data.get(), datasize, fmt.c_str(), timeInfo) != 0) {
+            datetimestr = UTF8(data.get());
+        }
         return datetimestr;
     }
 
-    UTF8 Timestamp::day(bool abbrev)
+    UTF8 Timestamp::day(bool abbrev) const
     {
+        auto timeInfo = *std::localtime(&time);
         if (abbrev) {
-            return get_replacement(Replacements::DayAbbrev, timeinfo);
+            return get_replacement(Replacements::DayAbbrev, timeInfo);
         }
         else {
-            return get_replacement(Replacements::DayLong, timeinfo);
+            return get_replacement(Replacements::DayLong, timeInfo);
         }
     }
 
-    UTF8 Timestamp::month(bool abbrev)
+    UTF8 Timestamp::month(bool abbrev) const
     {
+        auto timeInfo = *std::localtime(&time);
         if (abbrev) {
-            return get_replacement(Replacements::MonthAbbrev, timeinfo);
+            return get_replacement(Replacements::MonthAbbrev, timeInfo);
         }
         else {
-            return get_replacement(Replacements::MonthLong, timeinfo);
+            return get_replacement(Replacements::MonthLong, timeInfo);
         }
     }
 
@@ -167,14 +148,16 @@ namespace utils::time
         }
     }
 
-    bool DateTime::isToday()
+    bool DateTime::isToday() const
     {
+        auto timeinfo       = *std::localtime(&time);
         auto newer_timeinfo = *localtime(&local_time);
-        return (newer_timeinfo.tm_yday == timeinfo.tm_yday && newer_timeinfo.tm_year == timeinfo.tm_year);
+        return (newer_timeinfo.tm_yday == timeinfo.tm_yday && isCurrentYear());
     }
 
-    bool DateTime::isYesterday()
+    bool DateTime::isYesterday() const
     {
+        auto timeinfo       = *std::localtime(&time);
         auto newer_timeinfo = *localtime(&local_time);
         bool is_leap_year   = (timeinfo.tm_year % 4 == 0 && timeinfo.tm_year % 100 != 0) || timeinfo.tm_year % 400 == 0;
 
@@ -185,98 +168,52 @@ namespace utils::time
         );
     }
 
-    UTF8 DateTime::str(std::string format)
+    bool DateTime::isCurrentYear() const
+    {
+        auto timeinfo       = *std::localtime(&time);
+        auto newer_timeinfo = *localtime(&local_time);
+        return (newer_timeinfo.tm_year == timeinfo.tm_year);
+    }
+
+    UTF8 DateTime::str(std::string format) const
     {
         if (format.compare("") != 0) {
             return Timestamp::str(format);
         }
-        if (isToday()) // if the same computer day, then return hour.
-        {
+        if (isToday()) {
             return Timestamp::str(Locale::format(Locale::TimeFormat::FormatTime12H));
         }
-        else if (show_textual_past && isYesterday()) {
+        if (isYesterday()) {
             return Locale::yesterday();
         }
-        else {
-            return Timestamp::str(Locale::format(date_format_long ? Locale::TimeFormat::FormatLocaleDateFull
-                                                                  : Locale::TimeFormat::FormatLocaleDateShort));
+        if (isCurrentYear()) {
+            return Timestamp::str(Locale::format(Locale::TimeFormat::FormatLocaleDateShort));
         }
-    }
-    UTF8 Timestamp::get_date_time_substr(GetParameters param)
-    {
-        auto value = get_date_time_sub_value(param);
-        if (value != UINT32_MAX) {
-            return UTF8(std::to_string(value));
-        }
-        return UTF8();
+        return Timestamp::str(Locale::format(Locale::TimeFormat::FormatLocaleDateFull));
     }
 
-    uint32_t Timestamp::get_date_time_sub_value(GetParameters param)
-    {
-        switch (param) {
-        case GetParameters::Hour:
-            return timeinfo.tm_hour;
-            break;
-        case GetParameters::Minute:
-            return timeinfo.tm_min;
-            break;
-        case GetParameters::Day:
-            return timeinfo.tm_mday;
-            break;
-        case GetParameters::Month:
-            return timeinfo.tm_mon + 1;
-            break;
-        case GetParameters::Year:
-            return timeinfo.tm_year + 1900;
-            break;
-        }
-        return UINT32_MAX;
-    }
-    uint32_t Timestamp::get_UTC_date_time_sub_value(GetParameters param)
-    {
-        std::tm tm = *std::gmtime(&time);
-        switch (param) {
-        case GetParameters::Hour:
-            return tm.tm_hour;
-        case GetParameters::Minute:
-            return tm.tm_min;
-        case GetParameters::Day:
-            return tm.tm_mday;
-        case GetParameters::Month:
-            return tm.tm_mon + 1;
-        case GetParameters::Year:
-            return tm.tm_year + 1900;
-        }
-        return UINT32_MAX;
-    }
-
-    UTF8 Date::str(std::string format)
+    UTF8 Date::str(std::string format) const
     {
         if (!format.empty()) {
             return Timestamp::str(format);
         }
-        else if (show_textual_past) {
-            if (isToday()) {
-                return Locale::today();
-            }
-            else if (isYesterday()) {
-                return Locale::yesterday();
-            }
+        if (isToday()) {
+            return Locale::today();
+        }
+        if (isYesterday()) {
+            return Locale::yesterday();
         }
 
-        return Timestamp::str(Locale::format(date_format_long ? Locale::TimeFormat::FormatLocaleDateFull
-                                                              : Locale::TimeFormat::FormatLocaleDateShort));
+        return Timestamp::str(Locale::format(Locale::TimeFormat::FormatLocaleDateFull));
     }
 
-    UTF8 Time::str(std::string format)
+    UTF8 Time::str(std::string format) const
     {
         if (!format.empty()) {
             return Timestamp::str(format);
         }
-        else {
-            return Timestamp::str(Locale::format(
-                Locale::TimeFormat::FormatTime12HShort)); // @TODO: M.G. FormatLocaleTime which actually works
-        }
+        return Timestamp::str(Locale::format(
+            Locale::TimeFormat::FormatTime12HShort)); // @TODO: M.G. FormatLocaleTime which actually works
     }
 
     Duration::Duration(time_t duration) : duration(duration)

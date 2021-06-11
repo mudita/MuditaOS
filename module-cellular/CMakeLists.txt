@@ -68,20 +68,21 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
-    date::date
-    eventstore
-    module-bsp
-    module-db
-    module-services
-    module-sys
-    module-utils
-    module-vfs
-    service-cellular
-    service-eink
-    service-fota
-    time
+        date::date
+        eventstore
+        module-bsp
+        module-db
+        module-services
+        module-sys
+        module-utils
+        module-vfs
+        service-cellular
+        service-eink
+        service-fota
+    
     PRIVATE
-    Microsoft.GSL::GSL
+        Microsoft.GSL::GSL
+        time-constants
 )
 
 if (${ENABLE_TESTS})

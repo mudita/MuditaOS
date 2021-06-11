@@ -17,9 +17,60 @@ namespace calendar
 {
     using YearMonthDay     = date::year_month_day;
     using YearMonthDayLast = date::year_month_day_last;
+
+    class Timestamp : public utils::time::Timestamp
+    {
+      public:
+        enum class GetParameters
+        {
+            Hour,
+            Minute,
+            Day,
+            Month,
+            Year
+        };
+
+        explicit Timestamp(time_t newtime) : utils::time::Timestamp(newtime)
+        {}
+
+        uint32_t get_date_time_sub_value(GetParameters param)
+        {
+            auto timeinfo = *std::localtime(&time);
+            switch (param) {
+            case GetParameters::Hour:
+                return timeinfo.tm_hour;
+            case GetParameters::Minute:
+                return timeinfo.tm_min;
+            case GetParameters::Day:
+                return timeinfo.tm_mday;
+            case GetParameters::Month:
+                return timeinfo.tm_mon + 1;
+            case GetParameters::Year:
+                return timeinfo.tm_year + 1900;
+            }
+            return UINT32_MAX;
+        }
+        uint32_t get_UTC_date_time_sub_value(GetParameters param)
+        {
+            std::tm tm = *std::gmtime(&time);
+            switch (param) {
+            case GetParameters::Hour:
+                return tm.tm_hour;
+            case GetParameters::Minute:
+                return tm.tm_min;
+            case GetParameters::Day:
+                return tm.tm_mday;
+            case GetParameters::Month:
+                return tm.tm_mon + 1;
+            case GetParameters::Year:
+                return tm.tm_year + 1900;
+            }
+            return UINT32_MAX;
+        }
+    };
 } // namespace calendar
 
-inline constexpr auto max_month_day = 31;
+inline constexpr auto max_month_day   = 31;
 inline constexpr auto unix_epoch_year = 1900;
 
 enum class Reminder
@@ -120,8 +171,8 @@ inline auto TimePointToHourMinSec(const TimePoint &tp)
 inline uint32_t TimePointToHour24H(const TimePoint &tp)
 {
     auto time = TimePointToTimeT(tp);
-    utils::time::Timestamp timestamp(time);
-    auto hour = timestamp.get_date_time_sub_value(utils::time::GetParameters::Hour);
+    calendar::Timestamp timestamp(time);
+    auto hour = timestamp.get_date_time_sub_value(calendar::Timestamp::GetParameters::Hour);
     return hour;
 }
 
@@ -136,8 +187,8 @@ inline auto LocalizedHoursToUtcHours(int hour = 0)
 inline uint32_t TimePointToMinutes(const TimePoint &tp)
 {
     auto time = TimePointToTimeT(tp);
-    utils::time::Timestamp timestamp(time);
-    auto minute = timestamp.get_date_time_sub_value(utils::time::GetParameters::Minute);
+    calendar::Timestamp timestamp(time);
+    auto minute = timestamp.get_date_time_sub_value(calendar::Timestamp::GetParameters::Minute);
     return minute;
 }
 
@@ -221,8 +272,8 @@ inline std::string TimePointToLocalizedTimeString(const TimePoint &tp, const std
 
 inline std::string TimePointToLocalizedHourMinString(const TimePoint &tp)
 {
-    return utils::dateAndTimeSettings.isTimeFormat12() ? TimePointToLocalizedDateString(tp, "%I:%M")
-                                                       : TimePointToLocalizedDateString(tp, "%H:%M");
+    return utils::dateAndTimeSettings.isTimeFormat12() ? TimePointToLocalizedTimeString(tp, "%I:%M")
+                                                       : TimePointToLocalizedTimeString(tp, "%H:%M");
 }
 
 inline TimePoint TimePointFromString(const char *s1)
@@ -253,8 +304,8 @@ inline time_t TimePointToMin(const TimePoint &tp)
 inline uint32_t TimePointToHour12H(const TimePoint &tp)
 {
     auto time = TimePointToTimeT(tp);
-    utils::time::Timestamp timestamp(time);
-    auto hour = timestamp.get_date_time_sub_value(utils::time::GetParameters::Hour);
+    calendar::Timestamp timestamp(time);
+    auto hour = timestamp.get_date_time_sub_value(calendar::Timestamp::GetParameters::Hour);
     if (hour > 12) {
         hour -= 12;
     }
@@ -264,21 +315,21 @@ inline uint32_t TimePointToHour12H(const TimePoint &tp)
 inline std::string TimePointToHourString12H(const TimePoint &tp)
 {
     auto hour =
-        utils::time::Timestamp(TimePointToTimeT(tp)).get_UTC_date_time_sub_value(utils::time::GetParameters::Hour);
+        calendar::Timestamp(TimePointToTimeT(tp)).get_UTC_date_time_sub_value(calendar::Timestamp::GetParameters::Hour);
     auto hour12h = date::make12(std::chrono::hours(hour)).count();
     return utils::to_string(hour12h);
 }
 
 inline std::string TimePointToLocalizedHourString(const TimePoint &tp)
 {
-    return utils::dateAndTimeSettings.isTimeFormat12() ? TimePointToLocalizedDateString(tp, "%I")
-                                                       : TimePointToLocalizedDateString(tp, "%H");
+    return utils::dateAndTimeSettings.isTimeFormat12() ? TimePointToLocalizedTimeString(tp, "%I")
+                                                       : TimePointToLocalizedTimeString(tp, "%H");
 }
 
 inline std::string TimePointToHourString24H(const TimePoint &tp)
 {
     auto hour =
-        utils::time::Timestamp(TimePointToTimeT(tp)).get_UTC_date_time_sub_value(utils::time::GetParameters::Hour);
+        calendar::Timestamp(TimePointToTimeT(tp)).get_UTC_date_time_sub_value(calendar::Timestamp::GetParameters::Hour);
     return utils::to_string(hour);
 }
 
@@ -303,7 +354,7 @@ inline std::string createUID()
 {
     constexpr uint32_t bufferLimit = 16;
     char Buffer[bufferLimit];
-    utils::time::Timestamp timestamp = utils::time::getCurrentTimestamp();
+    utils::time::Timestamp timestamp(std::time(nullptr));
     std::string UID{timestamp.str("%Y%m%dT%H%M%S")};
     UID += '-';
     std::random_device rd;

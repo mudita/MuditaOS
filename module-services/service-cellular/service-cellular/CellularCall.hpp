@@ -31,7 +31,7 @@ namespace CellularCall
         bool isActiveCall = false;
         std::function<CalllogRecord(const CalllogRecord &rec)> startCallAction;
         std::function<bool(const CalllogRecord &rec)> endCallAction;
-        utils::time::Timestamp startActiveTime = 0;
+        utils::time::Timestamp startActiveTime;
 
         std::shared_ptr<sys::CpuSentinel> cpuSentinel;
 
@@ -49,7 +49,7 @@ namespace CellularCall
         {
             call            = CalllogRecord();
             isActiveCall    = false;
-            startActiveTime = 0;
+            startActiveTime.set_time(0);
         }
 
       public:

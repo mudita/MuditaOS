@@ -1,3 +1,12 @@
+add_library(time-constants INTERFACE)
+
+target_include_directories(time-constants INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
+
+target_sources(time-constants 
+    PUBLIC
+        time/time_constants.hpp
+)
+
 add_library(time)
 
 module_is_test_entity(time)
@@ -19,6 +28,7 @@ target_link_libraries(time
         module-utils
         utf8
         utz::utz
+        time-constants
 )
 
 if (${ENABLE_TESTS})

@@ -56,8 +56,8 @@ target_link_libraries(${PROJECT_NAME}
         service-evtmgr
         ucs2
         json::json
-    PUBLIC
         time
+    PUBLIC
         utf8
         eventstore
     )

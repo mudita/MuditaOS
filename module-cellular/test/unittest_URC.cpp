@@ -9,6 +9,7 @@
 
 #include <catch2/catch.hpp>
 #include <time/time_conversion.hpp>
+#include <time/time_constants.hpp>
 
 #include "UrcQind.hpp"
 #include "UrcCusd.hpp"

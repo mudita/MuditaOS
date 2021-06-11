@@ -28,7 +28,7 @@ namespace style
             inline constexpr uint32_t leftMargin  = 10;
             inline constexpr uint32_t rightMargin = 10;
 
-            inline constexpr uint32_t timestampWidth             = 100;
+            inline constexpr uint32_t timestampWidth             = 120;
             inline constexpr uint32_t numberImportanceWidth      = 80;
             inline constexpr uint32_t numberImportanceLeftMargin = 10;
             inline constexpr uint32_t snippetLeftMargin          = 5;

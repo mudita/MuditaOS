@@ -93,7 +93,7 @@ target_link_libraries(${PROJECT_NAME}
         service-bluetooth
         ${TARGET_LIBRARIES}
     PRIVATE
-        time
+        time-constants
 )
 
 if (${ENABLE_TESTS})

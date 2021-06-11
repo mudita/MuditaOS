@@ -14,6 +14,7 @@
 #include <service-db/DBNotificationMessage.hpp>
 #include <service-db/QueryMessage.hpp>
 #include <service-cellular/service-cellular/CellularMessage.hpp>
+#include <time/time_constants.hpp>
 
 #include <memory>
 #include <utility>

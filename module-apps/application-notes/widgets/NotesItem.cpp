@@ -27,7 +27,7 @@ namespace gui
 
         date = new gui::Label(this, 0, 0, 0, 0);
         date->setEdges(RectangleEdge::None);
-        date->setFont(style::window::font::medium);
+        date->setFont(style::window::font::small);
         date->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Top});
 
         title   = createTextField(this, style::window::font::bigbold);
