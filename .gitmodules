@@ -16,8 +16,8 @@
 	url = ../protobuf.git
 	branch = rt1051
 	shallow = true
-[submodule "module-utils/libphonenumber"]
-	path = module-utils/libphonenumber
+[submodule "third-party/libphonenumber"]
+	path = third-party/libphonenumber/src
 	url = ../libphonenumber.git
 	branch = rt1051
 	shallow = true
@@ -28,7 +28,7 @@
 [submodule "test/Catch2"]
 	path = test/Catch2
 	url = https://github.com/catchorg/Catch2
-[submodule "module-utils/date"]
+[submodule "third-party/date"]
 	path = third-party/date
 	url = ../date.git
 [submodule "module-utils/taglib"]

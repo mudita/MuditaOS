@@ -48,7 +48,6 @@
 #include <ApplicationLauncher.hpp>
 #include <log.hpp>
 #include <Logger.hpp>
-#include <phonenumbers/phonenumberutil.h>
 #include <source/version.hpp>
 #include <SystemManager/SystemManager.hpp>
 #include <SystemWatchdog/SystemWatchdog.hpp>
