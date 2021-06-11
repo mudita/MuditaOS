@@ -14,7 +14,6 @@ set(FF_LFS_SOURCES
 )
 
 set(SOURCES
-    ${FF_FAT_SOURCES}
     ${FF_LFS_SOURCES}
     src/purefs/filesystem_paths.cpp
     src/purefs/blkdev/disk_manager.cpp
@@ -41,7 +40,15 @@ else()
     message(FATAL_ERROR "Invalid target!")
 endif()
 
-add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
+add_library(${PROJECT_NAME} STATIC)
+
+target_sources(${PROJECT_NAME}
+    PUBLIC
+        ${FF_FAT_SOURCES}
+    PRIVATE
+        ${SOURCES}
+        ${BOARD_SOURCES}
+)
 
 # Board specific compilation definitions,options,include directories and features
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
@@ -59,8 +66,8 @@ target_include_directories(${PROJECT_NAME}
         ${CMAKE_CURRENT_SOURCE_DIR}/include/user/
         ${CMAKE_CURRENT_SOURCE_DIR}/drivers/include
         ${CMAKE_CURRENT_SOURCE_DIR}/drivers/include/thirdparty/fatfs
-    PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include/internal
+    PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/drivers/include/thirdparty
 )
 
@@ -71,9 +78,9 @@ target_link_libraries(${PROJECT_NAME}
         module-sys
         module-bsp 
         module-utils
+        fatfs
     PRIVATE 
         littlefs::littlefs
-        fatfs
 )
 
 if (${ENABLE_TESTS})

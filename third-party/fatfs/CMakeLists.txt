@@ -6,6 +6,6 @@ target_sources(fatfs
 )
 target_include_directories(fatfs
     PUBLIC 
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/fatfs/source
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/fatfs/source>
 )
-target_link_libraries(fatfs PRIVATE module-vfs)
+target_link_libraries(fatfs PUBLIC module-vfs)
