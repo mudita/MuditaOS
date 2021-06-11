@@ -11,6 +11,7 @@
 #include <Rect.hpp>
 #include <Image.hpp>
 #include <AppWindow.hpp>
+#include <time/time_conversion.hpp>
 
 namespace gui
 {

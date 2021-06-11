@@ -26,11 +26,11 @@ target_link_libraries(${PROJECT_NAME}
         utf8
         eventstore
         ${TARGET_LIBRARIES} 
-        time
     PRIVATE
         pugixml::pugixml
         Microsoft.GSL::GSL
         json::json
+        time
 )
 
 # Board specific compilation definitions,options,include directories and features

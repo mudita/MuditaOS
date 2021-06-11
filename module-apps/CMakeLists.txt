@@ -131,6 +131,7 @@ target_link_libraries(${PROJECT_NAME}
         service-evtmgr
         Microsoft.GSL::GSL
         eventstore
+        time
     PUBLIC
         application-bell-main
         module-audio
@@ -141,7 +142,6 @@ target_link_libraries(${PROJECT_NAME}
         module-services
         module-sys
         module-utils
-        time
         utf8
         ${TARGET_LIBRARIES}
 )

@@ -16,3 +16,16 @@ add_catch2_executable(
     LIBS
         time
 )
+# time tests
+add_catch2_executable(
+    NAME
+        utils-time
+    SRCS
+        unittest_time.cpp
+    LIBS
+        time
+        utf8
+        iosyscalls
+    DEPS
+        PurePhone-disk-img
+)
