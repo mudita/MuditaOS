@@ -27,6 +27,8 @@ set(SOURCES
     endpoints/update/UpdateEndpoint.cpp
     endpoints/update/UpdateMuditaOS.cpp
     endpoints/filesystem/FilesystemEndpoint.cpp
+    endpoints/filesystem/FileOperations.cpp
+    endpoints/filesystem/FileContext.cpp
     endpoints/calendarEvents/CalendarEventsHelper.cpp
     endpoints/calendarEvents/CalendarEventsEndpoint.cpp
     endpoints/security/SecurityEndpoint.cpp
@@ -64,6 +66,7 @@ target_link_libraries(${PROJECT_NAME}
         utils-bootconfig
         Microsoft.GSL::GSL
         json::json
+        base64::base64
     PUBLIC
         module-cellular
         eventstore

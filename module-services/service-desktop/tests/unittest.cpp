@@ -7,6 +7,8 @@
 #include <endpoints/contacts/ContactsEndpoint.hpp>
 #include <endpoints/factoryReset/FactoryReset.hpp>
 #include <endpoints/messages/MessageHelper.hpp>
+#include <endpoints/filesystem/FileContext.hpp>
+#include <endpoints/filesystem/FileOperations.hpp>
 #include <parser/ParserFSM.hpp>
 #include <parser/ParserUtils.hpp>
 
@@ -302,5 +304,65 @@ TEST_CASE("Secured Endpoint Factory test")
         auto factory = std::make_unique<SecuredEndpointFactory>(EndpointSecurity::Block);
         auto handler = factory->create(context, nullptr);
         REQUIRE(dynamic_cast<SecuredEndpoint *>(handler.get()));
+    }
+}
+
+TEST_CASE("FileOperations UT Test")
+{
+    auto &fileOps = FileOperations::instance();
+
+    SECTION("Create receive id for file")
+    {
+        auto filePath{"/sys/user/music/SMS-drum2-stereo.mp3"};
+
+        auto [rxID, fileSize] = fileOps.createReceiveIDForFile(filePath);
+
+        REQUIRE(rxID == 1);
+        REQUIRE(fileSize == 49146);
+    }
+}
+
+TEST_CASE("FileContext UT Test Valid Input")
+{
+    auto filePath{"/sys/user/MuditaOS.log"};
+    auto fileSize{1536u};
+    auto fileOffset{128 * 6u};
+    auto chunkSize{128 * 3u};
+
+    SECTION("Create file context for file")
+    {
+        auto fileCtx = FileContext(filePath, fileSize, fileOffset, chunkSize);
+
+        REQUIRE(3 == fileCtx.expectedChunkInFile());
+
+        REQUIRE(true == fileCtx.validateChunkRequest(3));
+        REQUIRE(false == fileCtx.validateChunkRequest(4));
+
+        REQUIRE(4 == fileCtx.totalChunksInFile());
+
+        fileCtx.advanceFileOffset(fileSize - fileOffset);
+        REQUIRE(true == fileCtx.reachedEOF());
+    }
+}
+
+TEST_CASE("FileContext UT Test Invalid Input")
+{
+    auto filePath{"/sys/user/music/SMS-drum2-stereo.mp3"};
+    auto fileOffset{0u};
+
+    SECTION("Create file context for file with invalid file size")
+    {
+        auto fileSize{0u};
+        auto chunkSize{1024 * 3u};
+
+        REQUIRE_THROWS_WITH(FileContext(filePath, fileSize, fileOffset, chunkSize), "Invalid FileContext arguments");
+    }
+
+    SECTION("Create file context for file with invalid chunk size")
+    {
+        auto fileSize{49146u};
+        auto chunkSize{0u};
+
+        REQUIRE_THROWS_WITH(FileContext(filePath, fileSize, fileOffset, chunkSize), "Invalid FileContext arguments");
     }
 }
