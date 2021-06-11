@@ -79,7 +79,7 @@ def test_get_file(harness):
 
         assert ret["status"] == status["OK"]
 
-        data += ret["body"]["data"]
+        data += ret["body"]["data"][0:-1] # Skiping null char at end of chunk
 
     file_64 = open(fileName + ".base64" , 'w')
     file_64.write(data)

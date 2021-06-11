@@ -89,3 +89,6 @@
 [submodule "third-party/utz/src/utz"]
 	path = third-party/utz/src/utz
 	url = https://github.com/mudita/utz.git
+[submodule "third-party/base64/src"]
+	path = third-party/base64/src
+	url = https://github.com/rafagafe/base64.git

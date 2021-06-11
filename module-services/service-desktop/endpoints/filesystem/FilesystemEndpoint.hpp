@@ -5,13 +5,27 @@
 
 #include <module-services/service-desktop/endpoints/Endpoint.hpp>
 #include "Service/Service.hpp"
+#include "FileOperations.hpp"
 
 class FilesystemEndpoint : public parserFSM::Endpoint
 {
   public:
-    explicit FilesystemEndpoint(sys::Service *ownerServicePtr) : Endpoint(ownerServicePtr)
+    static auto createInstance(sys::Service *ownerServicePtr) -> std::unique_ptr<parserFSM::Endpoint>
+    {
+        return std::make_unique<FilesystemEndpoint>(ownerServicePtr, FileOperations::instance());
+    }
+
+    explicit FilesystemEndpoint(sys::Service *ownerServicePtr, FileOperations &fileOps)
+        : Endpoint(ownerServicePtr), fileOps(fileOps)
     {}
     auto handle(parserFSM::Context &context) -> void override;
-    auto run(parserFSM::Context &context) -> sys::ReturnCodes;
+    auto runGet(parserFSM::Context &context) -> sys::ReturnCodes;
+    auto runPost(parserFSM::Context &context) -> sys::ReturnCodes;
     auto getUpdates(parserFSM::Context &context) -> sys::ReturnCodes;
+
+  private:
+    auto startGetFile(parserFSM::Context &context) const -> sys::ReturnCodes;
+    auto getFileChunk(parserFSM::Context &context) const -> sys::ReturnCodes;
+
+    FileOperations &fileOps;
 };

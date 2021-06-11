@@ -115,9 +115,17 @@ namespace parserFSM
         inline constexpr auto finished         = "finished";
         inline constexpr auto pending          = "pending";
         inline constexpr auto location         = "location";
+        inline constexpr auto reason           = "reason";
+
         namespace filesystem
         {
-            inline constexpr auto command = "command";
+            inline constexpr auto command   = "command";
+            inline constexpr auto chunkSize = "chunkSize";
+            inline constexpr auto chunkNo   = "chunkNo";
+            inline constexpr auto data      = "data";
+            inline constexpr auto rxID      = "rxID";
+            inline constexpr auto txID      = "txID";
+
             namespace commands
             {
                 inline constexpr auto upload    = "upload";
@@ -125,6 +133,11 @@ namespace parserFSM
                 inline constexpr auto download  = "download";
                 inline constexpr auto checkFile = "checkFile";
             } // namespace commands
+
+            namespace reasons
+            {
+                inline constexpr auto fileDoesNotExist = "file does not exist";
+            }
         }     // namespace filesystem
 
         namespace updateprocess
