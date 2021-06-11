@@ -101,6 +101,6 @@ foreach(ASSET ${ASSETS_LIST})
 
     string(REPLACE "/" "_" target_name ${ASSET})
     add_custom_target(${target_name} DEPENDS ${ASSET} ${outfile})
-    add_dependencies(module-vfs ${target_name})
+    add_dependencies(${PROJECT_NAME} ${target_name})
 endforeach()
 
