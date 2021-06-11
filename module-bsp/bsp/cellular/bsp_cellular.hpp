@@ -118,14 +118,15 @@ namespace bsp
 
         namespace sim
         {
-            /// handler for SIM tray which is connected to phone, not GSM
-            BaseType_t trayIRQHandler();
 
-            Store::GSM::Tray getTray();
+            bool trayInserted();
             /// trigger swap pin on gsm so that it would reload sim card in tray
             /// after that +QPIN urc should come
             void hotSwapTrigger();
             void simSelect();
+
+            /// handler for SIM tray which is connected to phone, not GSM
+            BaseType_t trayIRQHandler();
         } // namespace sim
 
         namespace ringIndicator

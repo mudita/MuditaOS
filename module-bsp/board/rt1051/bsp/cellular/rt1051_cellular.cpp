@@ -81,9 +81,6 @@ namespace bsp
     RT1051Cellular::RT1051Cellular()
     {
         MSPInit();
-        /// to set Store::GSM sim state and to log debug
-        Store::GSM::get()->tray =
-            GPIO_PinRead(GPIO2, BSP_CELLULAR_SIM_TRAY_INSERTED_PIN) == 0 ? Store::GSM::Tray::IN : Store::GSM::Tray::OUT;
         DMAInit();
 
         uartRxBuffer = xMessageBufferCreate(rxMessageBufferLength);
@@ -721,11 +718,9 @@ namespace bsp
                 return xHigherPriorityTaskWoken;
             }
 
-            auto getTray() -> Store::GSM::Tray
+            auto trayInserted() -> bool
             {
-                auto state = GPIO_PinRead(GPIO2, BSP_CELLULAR_SIM_TRAY_INSERTED_PIN) == 0 ? Store::GSM::Tray::IN
-                                                                                          : Store::GSM::Tray::OUT;
-                return state;
+                return (GPIO_PinRead(GPIO2, BSP_CELLULAR_SIM_TRAY_INSERTED_PIN) == 0);
             }
 
             void hotSwapTrigger()

@@ -147,8 +147,8 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
         }
 
         if (notification == bsp::cellular::trayPin) {
-            Store::GSM::Tray pinstate = bsp::cellular::sim::getTray();
-            LOG_DEBUG("SIM state change: %d", static_cast<int>(pinstate));
+            bool traystate = bsp::cellular::sim::trayInserted();
+            LOG_DEBUG("SIM tray state change: %s", traystate ? "inserted" : "ejected");
             service->bus.sendUnicast(std::make_shared<sevm::SIMTrayMessage>(), service::name::evt_manager);
         }
 

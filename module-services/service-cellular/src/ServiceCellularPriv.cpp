@@ -59,8 +59,7 @@ namespace cellular::internal
         /**
          * Set initial values before activating on-change callbacks
          */
-        data->setTrayState((bsp::cellular::sim::getTray() == Store::GSM::Tray::IN) ? api::TrayState::Inserted
-                                                                                   : api::TrayState::Ejected);
+        data->setTrayState(bsp::cellular::sim::trayInserted() ? api::TrayState::Inserted : api::TrayState::Ejected);
         if (auto activeSim = settings->getSimSlot()) {
             data->setSimSlot(*activeSim);
         }

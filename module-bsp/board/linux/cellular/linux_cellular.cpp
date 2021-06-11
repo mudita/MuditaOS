@@ -256,9 +256,9 @@ namespace bsp
                 return BaseType_t();
             }
 
-            auto getTray() -> Store::GSM::Tray
+            auto trayInserted() -> bool
             {
-                return Store::GSM::Tray::IN;
+                return true;
             }
 
             void hotSwapTrigger()

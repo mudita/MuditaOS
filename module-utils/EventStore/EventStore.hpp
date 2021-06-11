@@ -99,13 +99,6 @@ namespace Store
         GSM(const GSM &) = delete;
         GSM &operator=(const GSM &) = delete;
 
-        enum class Tray
-        {
-            OUT,
-            IN
-        } tray = Tray::IN;
-        /// tray - tray actual status which is visible right now on screen
-        /// selected - tray selection settings settable sim tray
         enum class SIM
         {
             SIM1 = static_cast<int>(cellular::api::SimSlot::SIM1),

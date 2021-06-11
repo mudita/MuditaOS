@@ -9,6 +9,7 @@
 #include <EventStore.hpp>
 #include <source/version.hpp>
 #include <service-desktop/service-desktop/ServiceDesktop.hpp>
+#include <service-cellular-api>
 #include <version.hpp>
 
 #include <cstdint>
@@ -50,7 +51,7 @@ auto DeviceInfoEndpoint::getDeviceInfo(Context &context) -> bool
         {{json::batteryLevel, std::to_string(Store::Battery::get().level)},
          {json::batteryState, std::to_string(static_cast<int>(Store::Battery::get().state))},
          {json::selectedSim, std::to_string(static_cast<int>(Store::GSM::get()->selected))},
-         {json::trayState, std::to_string(static_cast<int>(Store::GSM::get()->tray))},
+         {json::trayState, std::to_string(static_cast<int>(cellular::api::trayState()))},
          {json::signalStrength, std::to_string(static_cast<int>(Store::GSM::get()->getSignalStrength().rssiBar))},
          {json::accessTechnology, std::to_string(static_cast<int>(Store::GSM::get()->getNetwork().accessTechnology))},
          {json::networkStatus, std::to_string(static_cast<int>(Store::GSM::get()->getNetwork().status))},

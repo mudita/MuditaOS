@@ -98,7 +98,14 @@ namespace cellular
 
         void SimCard::handleTrayState()
         {
-            bsp::cellular::sim::hotSwapTrigger();
+            auto data = internal::static_data::get();
+            if (bsp::cellular::sim::trayInserted()) {
+                data->setTrayState(api::TrayState::Inserted);
+                bsp::cellular::sim::hotSwapTrigger();
+            }
+            else {
+                data->setTrayState(api::TrayState::Ejected);
+            }
             if (onSimEvent)
                 onSimEvent();
         }
