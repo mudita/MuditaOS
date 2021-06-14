@@ -1,8 +1,6 @@
 # Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-include(board/rt1051/bsp/usb/usb.cmake)
-
 set(BOARD_SOURCES ${BOARD_SOURCES}
 
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/fsl_drivers/fsl_cache.c"
@@ -65,7 +63,6 @@ set(BOARD_SOURCES ${BOARD_SOURCES}
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/battery-charger/battery_charger.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/audio/CodecMAX98090.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/audio/qfilter.c"
-	"${USB_SRC}"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/drivers/RT1051DriverPLL.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/drivers/RT1051DriverPLL2.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/drivers/RT1051DriverLPSPI.cpp"
@@ -101,7 +98,6 @@ set(BOARD_DIR_INCLUDES ${BOARD_DIR_INCLUDES}
 	${CMAKE_CURRENT_SOURCE_DIR}/bsp/headset
 	${CMAKE_SOURCE_DIR}/module-bluetooth/Bluetooth
 	${CMAKE_SOURCE_DIR}/module-sys/
-	${USB_DIR_INCLUDES}
 
 	CACHE INTERNAL ""
 )
