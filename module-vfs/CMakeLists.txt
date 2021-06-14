@@ -78,7 +78,7 @@ target_link_libraries(${PROJECT_NAME}
         module-sys
         module-bsp 
         module-utils
-        fatfs
+        fatfs::fatfs
     PRIVATE 
         littlefs::littlefs
 )

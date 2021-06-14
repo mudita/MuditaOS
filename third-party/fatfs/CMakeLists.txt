@@ -1,4 +1,5 @@
 add_library(fatfs STATIC)
+add_library(fatfs::fatfs ALIAS fatfs)
 target_sources(fatfs
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/fatfs/source/ff.c
