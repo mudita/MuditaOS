@@ -60,7 +60,8 @@ namespace antenna
 class ServiceAntenna : public sys::Service
 {
   private:
-    state::State<antenna::State> *state;
+    std::unique_ptr<state::State<antenna::State>> state;
+
     bool HandleStateChange(antenna::State state);
 
     sys::TimerHandle timer;

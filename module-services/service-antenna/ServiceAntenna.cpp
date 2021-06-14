@@ -59,10 +59,10 @@ inline constexpr auto antennaServiceStackSize = 1024 * 2;
 
 ServiceAntenna::ServiceAntenna()
     : sys::Service(service::name::antenna, "", antennaServiceStackSize, sys::ServicePriority::Idle),
-      phoneModeObserver{std::make_unique<sys::phone_modes::Observer>()}
+      state{std::make_unique<state::State<antenna::State>>(this)}, phoneModeObserver{
+                                                                       std::make_unique<sys::phone_modes::Observer>()}
 {
     LOG_INFO("[%s] Initializing", service::name::antenna);
-    state = new state::State<antenna::State>(this);
     timer = sys::TimerFactory::createPeriodicTimer(
         this, "Antenna", std::chrono::seconds{5}, [this](sys::Timer & /*timer*/) {
             timer.stop();
