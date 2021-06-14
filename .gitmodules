@@ -44,9 +44,6 @@
 [submodule "module-utils/tinyexpr"]
 	path = third-party/tinyexpr/src
 	url = https://github.com/codeplea/tinyexpr.git
-[submodule "module-bsp/board/rt1051/bsp/usb"]
-	path = module-bsp/board/rt1051/bsp/usb
-	url = ../usb_stack.git
 [submodule "module-vfs/thirdparty/fatfs"]
 	path = third-party/fatfs/src
 	url = ../fatfs.git
@@ -93,3 +90,6 @@
 	path = third-party/hash-library/src
 	url = https://github.com/mudita/hash-library.git
 	branch = rt1051
+[submodule "third-party/usb_stack"]
+	path = third-party/usb_stack
+	url = ../usb_stack.git

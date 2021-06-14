@@ -83,6 +83,7 @@ SECTIONS
         *libmodule-os.a:*(.bss*)
         *libmodule-sys.a:*(.bss*)
         *libmodule-bsp.a:*(.bss*)
+        *libusb_stack.a:*(.bss*)
     } > SRAM_DTC
 
     /* System initialized data */
@@ -93,6 +94,7 @@ SECTIONS
         *libmodule-os.a:*(.data*)
         *libmodule-sys.a:*(.data*)
         *libmodule-bsp.a:*(.data*)
+        *libusb_stack.a:*(.data*)
     } > SRAM_DTC AT > BOARD_SDRAM_TEXT
 
     /* MAIN TEXT SECTION */
