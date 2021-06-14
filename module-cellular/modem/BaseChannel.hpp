@@ -16,6 +16,7 @@ namespace at
     class BaseChannel
     {
       public:
+        virtual ~BaseChannel() = default;
         /// @defgroup Channel OS dependent methods
         /// {
 

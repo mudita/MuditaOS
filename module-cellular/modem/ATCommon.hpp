@@ -57,7 +57,7 @@ namespace at
         [[nodiscard]] auto formatCommand(const std::string &cmd) const -> std::string;
 
         MessageBufferHandle_t responseBuffer = nullptr;
-        std::unique_ptr<uint8_t> receiveBuffer;
+        std::unique_ptr<uint8_t[]> receiveBuffer;
         AwaitingResponseFlag awaitingResponseFlag;
         cpp_freertos::MutexStandard mutex;
 
