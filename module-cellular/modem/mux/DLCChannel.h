@@ -46,7 +46,7 @@ class DLCChannel : public at::Channel
                                                size_t rxCount,
                                                std::chrono::milliseconds timeout = std::chrono::milliseconds{300});
 
-    at::Result parseInputData(bsp::cellular::CellularResult *cellularResult);
+    at::Result parseInputData(bsp::cellular::CellularResult *cellularResult) const;
 
     bool evaluateEstablishResponse(bsp::cellular::CellularResult &response) const;
 

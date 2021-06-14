@@ -159,7 +159,7 @@ namespace sys
             LOG_FATAL("State changed after reset/shutdown was requested to: %s! this is terrible failure!",
                       c_str(state));
             exit(1);
-        };
+        }
     }
 
     void SystemManager::initialize()

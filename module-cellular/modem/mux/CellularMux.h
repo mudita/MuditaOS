@@ -188,6 +188,7 @@ repeated until a response is obtained or action is taken by a higher layer.
 
 */
 
+#include <memory>
 #include <vector>
 #include <queue>
 #include <string>
@@ -258,12 +259,12 @@ class CellularMux
     MuxParameters startParams;
     sys::Service *parentService{};
     std::unique_ptr<bsp::Cellular> cellular;
-    ATParser *parser{};
+    std::unique_ptr<ATParser> parser;
 
     const uint32_t taskPriority = 0;
     xTaskHandle taskHandle      = nullptr;
 
-    std::vector<DLCChannel *> channels;
+    std::vector<std::unique_ptr<DLCChannel>> channels;
     DLCChannel::Callback_t controlCallback = nullptr;
 
     friend void workerTaskFunction(void *ptr);
@@ -291,7 +292,6 @@ class CellularMux
 
     ~CellularMux();
 
-    void init(PortSpeed_e portSpeed, sys::Service *parent);
     void setStartParams(PortSpeed_e portSpeed);
     void setMode(Mode mode);
 
@@ -300,7 +300,6 @@ class CellularMux
     /// @return pointer to channel or nullptr if such channel doesn't exist (nullptr return should never happen how -
     /// because all channels are opened once on start)
     DLCChannel *get(Channel selectedChannel);
-    std::vector<DLCChannel *> &getChannels();
     bool openChannel(Channel channelIndex);
     void closeChannels();
 
@@ -312,7 +311,7 @@ class CellularMux
 
     MuxParameters getStartParams() const noexcept;
     bsp::Cellular *getCellular();
-    ATParser *getParser();
+    [[nodiscard]] const std::unique_ptr<ATParser> &getParser() const;
 
     /// @brief It is searching the resposne for a string
     ///
