@@ -154,7 +154,7 @@ std::vector<std::string> DLCChannel::sendCommandPrompt(const char *cmd,
     return tokens;
 }
 
-at::Result DLCChannel::parseInputData(bsp::cellular::CellularResult *cellularResult)
+at::Result DLCChannel::parseInputData(bsp::cellular::CellularResult *cellularResult) const
 {
     at::Result result;
 

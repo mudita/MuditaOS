@@ -169,12 +169,12 @@ auto SettingsAgent::handleRegisterOnVariableChange(sys::Message *req) -> sys::Me
 
 auto SettingsAgent::handleUnregisterOnVariableChange(sys::Message *req) -> sys::MessagePointer
 {
-    if (auto msg = dynamic_cast<settings::Messages::UnregisterOnVariableChange *>(req)) {
+    if (auto msg = dynamic_cast<settings::Messages::UnregisterOnVariableChange *>(req); msg != nullptr) {
         auto path = msg->getPath();
         if (dbUnregisterValueChange(path)) {
             if (auto it = variableChangeRecipients.find(path.to_string()); it != variableChangeRecipients.end()) {
-                it->second.erase(path);
                 LOG_DEBUG("[SettingsAgent::handleUnregisterOnVariableChange] %s", path.to_string().c_str());
+                it->second.erase(path);
             }
         }
     }

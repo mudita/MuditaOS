@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <atomic>
 #include <FreeRTOS.h>
 #include <at/ErrorCode.hpp>
 #include <mutex.hpp>
@@ -26,25 +27,21 @@ namespace at
     struct AwaitingResponseFlag
     {
       private:
-        cpp_freertos::MutexStandard mutex;
-        bool isWaiting = false;
+        std::atomic_bool isWaiting = false;
 
       public:
         void set()
         {
-            cpp_freertos::LockGuard lock{mutex};
             isWaiting = true;
         }
 
         void clear()
         {
-            cpp_freertos::LockGuard lock{mutex};
             isWaiting = false;
         }
 
-        bool state()
+        bool state() const
         {
-            cpp_freertos::LockGuard lock{mutex};
             return isWaiting;
         }
     };
