@@ -55,30 +55,10 @@ static constexpr std::uint16_t threadSizeWords = 2048;
 
 CellularMux::CellularMux(PortSpeed_e portSpeed, sys::Service *parent)
 {
-    init(portSpeed, parent);
-}
-
-CellularMux::~CellularMux()
-{
-    for (auto it : channels) {
-        delete it;
-    }
-    channels.clear();
-
-    if (taskHandle != nullptr) {
-        vTaskDelete(taskHandle);
-    }
-    mode = Mode::AT;
-
-    delete parser;
-}
-
-void CellularMux::init(PortSpeed_e portSpeed, sys::Service *parent)
-{
     setStartParams(portSpeed);
 
     cellular      = bsp::Cellular::create(SERIAL_PORT, portSpeed).value_or(nullptr);
-    parser        = new ATParser(cellular.get());
+    parser        = std::make_unique<ATParser>(cellular.get());
     parentService = parent;
 
     if (auto flushed = flushReceiveData(); flushed > 0) {
@@ -95,8 +75,15 @@ void CellularMux::init(PortSpeed_e portSpeed, sys::Service *parent)
         xTaskCreate(workerTaskFunction, workerName, threadSizeWords, this, taskPriority, &taskHandle);
     if (taskError != pdPASS) {
         LOG_ERROR("Failed to start %s task", workerName);
-        return;
     }
+}
+
+CellularMux::~CellularMux()
+{
+    if (taskHandle != nullptr) {
+        vTaskDelete(taskHandle);
+    }
+    mode = Mode::AT;
 }
 
 void CellularMux::setStartParams(PortSpeed_e portSpeed)
@@ -182,22 +169,22 @@ CellularMux::ConfState CellularMux::baudDetectOnce()
         case BaudTestStep::baud460800_NoCmux:
             cellular->setSpeed(ATPortSpeeds_text[PortSpeed_e::PS460800]);
             lastStep = step;
-            result   = baudDetectTestAT(parser, step, BaudTestStep::baud460800_Cmux);
+            result   = baudDetectTestAT(parser.get(), step, BaudTestStep::baud460800_Cmux);
             break;
         case BaudTestStep::baud460800_Cmux:
             closeCMux(cellular);
             lastStep = step;
-            result   = baudDetectTestAT(parser, step, BaudTestStep::baud115200_NoCmux);
+            result   = baudDetectTestAT(parser.get(), step, BaudTestStep::baud115200_NoCmux);
             break;
         case BaudTestStep::baud115200_NoCmux:
             cellular->setSpeed(ATPortSpeeds_text[PortSpeed_e::PS115200]);
             lastStep = step;
-            result   = baudDetectTestAT(parser, step, BaudTestStep::baud115200_Cmux);
+            result   = baudDetectTestAT(parser.get(), step, BaudTestStep::baud115200_Cmux);
             break;
         case BaudTestStep::baud115200_Cmux:
             closeCMux(cellular);
             lastStep = step;
-            result   = baudDetectTestAT(parser, step, BaudTestStep::baud_NotFound);
+            result   = baudDetectTestAT(parser.get(), step, BaudTestStep::baud_NotFound);
             break;
         case BaudTestStep::baud_NotFound:
             cellular->setSpeed(ATPortSpeeds_text[PortSpeed_e::PS115200]); // set port speed to default 115200
@@ -462,7 +449,7 @@ void CellularMux::sendFrameToChannel(bsp::cellular::CellularResult &resultStruct
 {
     auto frame = CellularMuxFrame{resultStruct.getData()};
 
-    for (auto chan : getChannels()) {
+    for (const auto &chan : channels) {
         if (frame.getFrameDLCI() == chan->getDLCI()) {
             if (frame.getData().empty()) {
                 // Control frame contains no data
@@ -773,27 +760,20 @@ CellularMux::ConfState CellularMux::setupEchoCanceller(EchoCancellerStrength str
 
 DLCChannel *CellularMux::get(Channel selectedChannel)
 {
-    for (auto channel : channels) {
+    for (const auto &channel : channels) {
         if (channel != nullptr && static_cast<Channel>(channel->getDLCI()) == selectedChannel) {
-            return channel;
+            return channel.get();
         }
     }
     return nullptr;
 }
 
-std::vector<DLCChannel *> &CellularMux::getChannels()
-{
-    return channels;
-}
-
 bool CellularMux::openChannel(Channel channelIndex)
 {
-    auto channel = new DLCChannel(static_cast<DLCI_t>(channelIndex), name(channelIndex), cellular.get());
-    channels.push_back(channel);
-
-    if (!channel->init()) {
+    channels.push_back(
+        std::make_unique<DLCChannel>(static_cast<DLCI_t>(channelIndex), name(channelIndex), cellular.get()));
+    if (!channels.back()->init()) {
         channels.pop_back();
-        delete channel;
         return false;
     }
 
@@ -802,9 +782,6 @@ bool CellularMux::openChannel(Channel channelIndex)
 
 void CellularMux::closeChannels()
 {
-    for (auto &it : channels) {
-        delete it;
-    }
     channels.clear();
     mode = Mode::AT;
 }
@@ -853,7 +830,7 @@ bsp::Cellular *CellularMux::getCellular()
     return cellular.get();
 }
 
-ATParser *CellularMux::getParser()
+const std::unique_ptr<ATParser> &CellularMux::getParser() const
 {
     return parser;
 }
