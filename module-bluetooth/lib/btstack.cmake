@@ -134,7 +134,7 @@ message("-----------------------")
 else ()
 endif()
 
-include(${CMAKE_SOURCE_DIR}/module-lwip/lwip-includes.cmake)
+include(${CMAKE_SOURCE_DIR}/third-party/lwip/lwip-includes.cmake)
 list(APPEND TARGET_LIBRARIES_INCLUDES ${LWIP_INCLUDE_DIRS})
 list(APPEND TARGET_LIBRARIES_INCLUDES
     ${BT_STACK_ROOT}/platform/lwip

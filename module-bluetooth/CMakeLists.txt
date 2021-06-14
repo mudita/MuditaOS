@@ -79,6 +79,7 @@ target_link_libraries(${PROJECT_NAME}
     service-evtmgr
     sml::sml
     json::json
+    lwip::lwip
 )
 
 if (${ENABLE_TESTS})

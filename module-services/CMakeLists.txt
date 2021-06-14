@@ -3,7 +3,7 @@
 
 module_is_test_entity()
 
-include(${CMAKE_SOURCE_DIR}/module-lwip/lwip-includes.cmake)
+include(${CMAKE_SOURCE_DIR}/third-party/lwip/lwip-includes.cmake)
 
 if(${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
     include(targets/Target_RT1051.cmake)
