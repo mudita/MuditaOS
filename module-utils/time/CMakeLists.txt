@@ -8,6 +8,7 @@ target_sources(time
         time/time_conversion.cpp
         time/time_date_validation.cpp
         time/TimeRangeParser.cpp
+        time/TimeZone.cpp
 )
 
 target_include_directories(time PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
@@ -17,6 +18,7 @@ target_link_libraries(time
         log
         module-utils
         utf8
+        utz::utz
 )
 
 if (${ENABLE_TESTS})
