@@ -75,6 +75,11 @@ popd'''
 pushd ${WORKSPACE}
 ./config/style_check_hook.sh --last
 popd'''
+            echo "Clang Tidy check"
+            sh '''#!/bin/bash -e
+pushd ${WORKSPACE}
+./config/clang_check.sh
+popd'''
         }
     }
     stage('Build') {
