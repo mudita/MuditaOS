@@ -5,33 +5,6 @@ project(module-vfs VERSION 1.0
 
 module_is_test_entity()
 
-set(FF_FAT_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/drivers/src/thirdparty/fatfs/ffsystem.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/drivers/src/thirdparty/fatfs/ff_glue.cpp
-)
-set(FF_LFS_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/drivers/src/thirdparty/littlefs/lfs_glue.cpp
-)
-
-set(SOURCES
-    ${FF_LFS_SOURCES}
-    src/purefs/filesystem_paths.cpp
-    src/purefs/blkdev/disk_manager.cpp
-    src/purefs/blkdev/disk.cpp
-    src/purefs/blkdev/partition_parser.cpp
-    src/purefs/blkdev/disk_handle.cpp
-    src/purefs/fs/filesystem.cpp
-    src/purefs/fs/filesystem_operations.cpp
-    src/purefs/fs/filesystem_syscalls.cpp
-    src/purefs/fs/filesystem_cwd.cpp
-    src/purefs/vfs_subsystem.cpp
-    src/purefs/fs/notifier.cpp
-    src/purefs/fs/fsnotify.cpp
-    drivers/src/purefs/fs/filesystem_vfat.cpp
-    drivers/src/purefs/fs/filesystem_littlefs.cpp
-)
-
-
 if(${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
     include(targets/Target_RT1051.cmake)
 elseif(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
@@ -43,10 +16,24 @@ endif()
 add_library(${PROJECT_NAME} STATIC)
 
 target_sources(${PROJECT_NAME}
-    PUBLIC
-        ${FF_FAT_SOURCES}
     PRIVATE
-        ${SOURCES}
+        ${CMAKE_CURRENT_SOURCE_DIR}/drivers/src/thirdparty/fatfs/ffsystem.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/drivers/src/thirdparty/fatfs/ff_glue.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/drivers/src/thirdparty/littlefs/lfs_glue.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/purefs/filesystem_paths.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/purefs/blkdev/disk_manager.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/purefs/blkdev/disk.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/purefs/blkdev/partition_parser.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/purefs/blkdev/disk_handle.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/purefs/fs/filesystem.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/purefs/fs/filesystem_operations.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/purefs/fs/filesystem_syscalls.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/purefs/fs/filesystem_cwd.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/purefs/vfs_subsystem.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/purefs/fs/notifier.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/purefs/fs/fsnotify.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/drivers/src/purefs/fs/filesystem_vfat.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/drivers/src/purefs/fs/filesystem_littlefs.cpp
         ${BOARD_SOURCES}
 )
 
@@ -78,9 +65,9 @@ target_link_libraries(${PROJECT_NAME}
         module-sys
         module-bsp 
         module-utils
-        fatfs::fatfs
     PRIVATE 
         littlefs::littlefs
+        fatfs::fatfs
 )
 
 if (${ENABLE_TESTS})
