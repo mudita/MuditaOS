@@ -35,12 +35,20 @@ TEST_CASE("Setting an incorrect image name")
 {
     constexpr auto imageName = "ABC";
     gui::Image image{};
-    REQUIRE_THROWS(image.set(imageName));
+    image.set(imageName);
+
+    std::list<gui::Command> commands;
+    image.buildDrawListImplementation(commands);
+    REQUIRE(!commands.empty());
 }
 
 TEST_CASE("Setting an incorrect image id")
 {
     constexpr auto imageId = 1000;
     gui::Image image{};
-    REQUIRE_THROWS(image.set(imageId));
+    image.set(imageId);
+
+    std::list<gui::Command> commands;
+    image.buildDrawListImplementation(commands);
+    REQUIRE(!commands.empty());
 }
