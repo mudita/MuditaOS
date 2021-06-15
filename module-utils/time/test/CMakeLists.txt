@@ -7,3 +7,12 @@ add_catch2_executable(
         module-utils
         time
 )
+
+add_catch2_executable(
+    NAME
+        utils-TimeZone
+    SRCS
+        unittest_TimeZone.cpp
+    LIBS
+        time
+)
