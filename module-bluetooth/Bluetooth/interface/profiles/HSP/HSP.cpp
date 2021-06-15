@@ -189,7 +189,6 @@ namespace bluetooth
             else {
                 scoHandle = hsp_subevent_audio_connection_complete_get_handle(event);
                 LOG_DEBUG("Audio connection established with SCO handle 0x%04x.\n", scoHandle);
-                cellularInterface->answerIncomingCall(const_cast<sys::Service *>(ownerService));
                 hci_request_sco_can_send_now_event();
                 RunLoop::trigger();
             }
@@ -197,7 +196,6 @@ namespace bluetooth
         case HSP_SUBEVENT_AUDIO_DISCONNECTION_COMPLETE:
             LOG_DEBUG("Audio connection released.\n\n");
             sendAudioEvent(audio::EventType::BlutoothHSPDeviceState, audio::Event::DeviceState::Disconnected);
-            cellularInterface->hangupCall(const_cast<sys::Service *>(ownerService));
             scoHandle   = HCI_CON_HANDLE_INVALID;
             isConnected = false;
             break;
@@ -206,6 +204,14 @@ namespace bluetooth
             break;
         case HSP_SUBEVENT_SPEAKER_GAIN_CHANGED:
             LOG_DEBUG("Received speaker gain change %d\n", hsp_subevent_speaker_gain_changed_get_gain(event));
+            break;
+        case HSP_SUBEVENT_HS_CALL_ANSWER:
+            LOG_DEBUG("HSP CALL ANSWER");
+            cellularInterface->answerIncomingCall(const_cast<sys::Service *>(ownerService));
+            break;
+        case HSP_SUBEVENT_HS_CALL_HANGUP:
+            LOG_DEBUG("HSP CALL HANGUP");
+            cellularInterface->hangupCall(const_cast<sys::Service *>(ownerService));
             break;
         case HSP_SUBEVENT_HS_COMMAND: {
             ATcommandBuffer.fill(0);
