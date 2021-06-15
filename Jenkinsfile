@@ -131,6 +131,11 @@ echo "./configure.sh linux Debug -G Ninja"
 pushd build-linux-Debug
 ninja -j ${JOBS} Pure Bell
 popd'''
+            echo "Clang Tidy check"
+            sh '''#!/bin/bash -e
+pushd ${WORKSPACE}
+./config/clang_check.sh
+popd'''
                 echo "Build Unit Tests"
                 sh '''#!/bin/bash -e
 pushd "${WORKSPACE}"
