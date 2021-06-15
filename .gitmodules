@@ -86,3 +86,6 @@
 	path = third-party/re2/src
 	url = ../re2.git
 	branch = rt1051
+[submodule "third-party/utz/src/utz"]
+	path = third-party/utz/src/utz
+	url = https://github.com/mudita/utz.git
