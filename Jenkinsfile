@@ -132,6 +132,7 @@ pushd build-linux-Debug
 ninja -j ${JOBS} Pure Bell
 popd'''
             echo "Clang Tidy check"
+            /* requires compilation database - must be run after configuration */
             sh '''#!/bin/bash -e
 pushd ${WORKSPACE}
 ./config/clang_check.sh
