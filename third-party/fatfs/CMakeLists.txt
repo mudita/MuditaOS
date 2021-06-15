@@ -9,5 +9,3 @@ target_include_directories(fatfs
     INTERFACE 
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/fatfs/source>
 )
-
-#target_link_libraries(fatfs PUBLIC module-vfs)
