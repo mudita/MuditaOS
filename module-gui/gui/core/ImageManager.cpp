@@ -1,34 +1,25 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-/*
- * ImageManager.cpp
- *
- *  Created on: 18 maj 2019
- *      Author: robert
- */
-
-#include <set>
-#include <string>
-
-#include <cstdio>
-#include <cstring>
-#include <filesystem>
-
 #include "ImageManager.hpp"
-#include "utf8/UTF8.hpp"
-#include <log.hpp>
-// module-gui
 #include "ImageMap.hpp"
 #include "VecMap.hpp"
 #include "PixMap.hpp"
-#include <Utils.hpp>
+#include "DrawCommand.hpp"
+#include "Renderer.hpp"
+#include <log.hpp>
+#include <set>
+#include <string>
+#include <filesystem>
+#include <list>
 
 namespace gui
 {
 
     ImageManager::ImageManager()
-    {}
+    {
+        addFallbackImage();
+    }
 
     ImageManager::~ImageManager()
     {
@@ -167,6 +158,49 @@ namespace gui
         return vecMap;
     }
 
+    void ImageManager::addFallbackImage()
+    {
+        const std::string fallbackImageName{"FallbackImage"};
+
+        auto *fallbackImage = createFallbackImage();
+        fallbackImageId     = imageMaps.size();
+        fallbackImage->setID(fallbackImageId);
+        fallbackImage->setName(fallbackImageName);
+        imageMaps.push_back(fallbackImage);
+    }
+
+    ImageMap *ImageManager::createFallbackImage()
+    {
+        // Creation of square with crossed lines as fallback image
+        constexpr auto squareWidth = 15;
+
+        std::list<std::unique_ptr<gui::DrawCommand>> commands;
+        auto rectangle    = std::make_unique<DrawRectangle>();
+        rectangle->origin = {0, 0};
+        rectangle->width  = squareWidth;
+        rectangle->height = squareWidth;
+        rectangle->areaX  = 0;
+        rectangle->areaY  = 0;
+        rectangle->areaW  = squareWidth;
+        rectangle->areaH  = squareWidth;
+        commands.emplace_back(std::move(rectangle));
+
+        auto line1   = std::make_unique<DrawLine>();
+        line1->start = {0, 0};
+        line1->end   = {squareWidth, squareWidth};
+        commands.emplace_back(std::move(line1));
+
+        auto line2   = std::make_unique<DrawLine>();
+        line2->start = {squareWidth - 1, 0};
+        line2->end   = {0, squareWidth - 1};
+        commands.emplace_back(std::move(line2));
+
+        auto renderContext = std::make_unique<Context>(squareWidth, squareWidth);
+        Renderer().render(renderContext.get(), commands);
+
+        return new PixMap(squareWidth, squareWidth, renderContext->getData());
+    }
+
     std::vector<std::string> ImageManager::getImageMapList(std::string ext)
     {
 
@@ -204,8 +238,8 @@ namespace gui
     ImageMap *ImageManager::getImageMap(uint32_t id)
     {
         if (id >= imageMaps.size()) {
-            LOG_FATAL("Unable to find an image by id: %" PRIu32, id);
-            throw ImageNotFound{"Image could not be found."};
+            LOG_ERROR("Unable to find an image by id: %" PRIu32, id);
+            return imageMaps[fallbackImageId];
         }
         return imageMaps[id];
     }
@@ -216,9 +250,8 @@ namespace gui
                 return i;
             }
         }
-
-        LOG_FATAL("Unable to find an image: %s", name.c_str());
-        throw ImageNotFound{"Image could not be found."};
+        LOG_ERROR("Unable to find an image: %s , using deafult fallback image instead.", name.c_str());
+        return fallbackImageId;
     }
 
 } /* namespace gui */
