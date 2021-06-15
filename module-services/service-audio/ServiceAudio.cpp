@@ -27,7 +27,7 @@ using namespace audio;
 inline constexpr auto audioServiceStackSize = 1024 * 4;
 
 static constexpr auto defaultVolumeHigh              = "10";
-static constexpr auto defaultVolumeLow               = "2";
+static constexpr auto defaultVolumeLow               = "5";
 static constexpr auto defaultVolumeMuted             = "0";
 static constexpr auto defaultTrue                    = "1";
 static constexpr auto defaultFalse                   = "0";
