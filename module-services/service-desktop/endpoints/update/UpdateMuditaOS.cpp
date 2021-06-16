@@ -544,9 +544,10 @@ updateos::UpdateError UpdateMuditaOS::cleanupAfterUpdate()
 
     try {
         mtar_close(&updateTar);
-        if (std::remove(updateFile.c_str()) != 0) {
+        if (!std::filesystem::remove(updateFile)) {
             return informError(updateos::UpdateError::CantRemoveUpdateFile, "Failed to delete %s", updateFile.c_str());
         }
+        LOG_DEBUG("Deleted update file %s", updateFile.c_str());
     }
     catch (const std::filesystem::filesystem_error &fsError) {
         LOG_ERROR("remove_all on %s, error %s", updateFile.c_str(), fsError.what());
