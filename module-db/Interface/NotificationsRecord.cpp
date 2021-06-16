@@ -93,7 +93,7 @@ bool NotificationsRecordInterface::Update(const NotificationsRecord &rec)
     uint32_t contactId = rec.contactRecord.has_value() ? rec.contactRecord.value().ID : DB_ID_NONE;
 
     return notificationsDb->notifications.update(NotificationsTableRow{
-        {.ID = rec.ID}, .key = static_cast<uint32_t>(rec.key), .value = rec.value, .contactID = contactId});
+        Record(rec.ID), .key = static_cast<uint32_t>(rec.key), .value = rec.value, .contactID = contactId});
 }
 
 bool NotificationsRecordInterface::RemoveByID(uint32_t id)

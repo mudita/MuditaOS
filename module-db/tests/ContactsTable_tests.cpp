@@ -19,7 +19,7 @@ TEST_CASE("Contacts Table tests")
     ContactsDB contactsdb{contactsPath.c_str()};
     REQUIRE(contactsdb.isInitialized());
 
-    ContactsTableRow testRow1 = {{.ID = DB_ID_NONE},
+    ContactsTableRow testRow1 = {Record(DB_ID_NONE),
                                  .nameID    = DB_ID_NONE,
                                  .numbersID = "0 1 2 3 4",
                                  .ringID    = DB_ID_NONE,
