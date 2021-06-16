@@ -51,7 +51,7 @@
 	path = module-bsp/board/rt1051/bsp/usb
 	url = ../usb_stack.git
 [submodule "module-vfs/thirdparty/fatfs"]
-	path = module-vfs/thirdparty/fatfs
+	path = third-party/fatfs/src
 	url = ../fatfs.git
 [submodule "host-tools/littlefs-fuse/lfsfuse"]
 	path = host-tools/littlefs-fuse/lfsfuse
