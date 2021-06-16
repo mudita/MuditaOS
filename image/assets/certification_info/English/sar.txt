@@ -7,12 +7,12 @@
 <br></br>
 <text font='gt_pressura' weight='bold' size='32' align='left'><p>The maximum SAR value for Mudita Pure:</p></text>
 <text font='gt_pressura' weight='bold' size='27' align='left'>1,6 W/kg </text><text font='gt_pressura' weight='regular' size='27' align='left'>(over 1 g) SAR Limit</text><br></br>
-<text font='gt_pressura' weight='regular' size='27' align='left' color='9'><p>American Standard ANSI C95.1 (ANSI 1992)</p></text>
+<text font='gt_pressura' weight='regular' size='27' align='left'><p>American Standard ANSI C95.1 (ANSI 1992)</p></text>
 <text font='gt_pressura' weight='regular' size='27' align='left'><p>Head: 0,08</p>
 <p>Body: 0,08</p></text>
 <br></br>
 <text font='gt_pressura' weight='bold' size='27' align='left'>2,0 W/kg</text> <text font='gt_pressura' weight='regular' size='27' align='left'>(over 10 g) SAR Limit</text><br></br>
-<text font='gt_pressura' weight='regular' size='27' align='left' color='9'><p>ICNIRP Guidelines 1998 (ICNIRP 1998)</p></text>
+<text font='gt_pressura' weight='regular' size='27' align='left'><p>ICNIRP Guidelines 1998 (ICNIRP 1998)</p></text>
 <text font='gt_pressura' weight='regular' size='27' align='left'><p>Head: 0,08</p>
 <p>Body: 0,08</p>
 <br></br>
