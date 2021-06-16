@@ -31,9 +31,9 @@ class TimeManager
     void handleTimeChangeRequest(const time_t &time);
     /**
      * Handles timezone change request
-     * @param timezone formatted timezone string
+     * @param timezoneRules formatted timezone rules string
      */
-    void handleTimezoneChangeRequest(const std::string &timezone);
+    void handleTimezoneChangeRequest(const std::string &timezoneRules);
 
   private:
     std::unique_ptr<RTCCommandInterface> rtcCommand;

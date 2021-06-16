@@ -31,8 +31,12 @@ namespace stm::api
     {
         return stm::internal::StaticData::get().getTimeFormat() == utils::time::Locale::TimeFormat::FormatTime12H;
     }
-    const std::string getCurrentTimezone()
+    const std::string getCurrentTimezoneName()
     {
-        return stm::internal::StaticData::get().getCurrentTimezone();
+        return stm::internal::StaticData::get().getCurrentTimezoneName();
+    }
+    const std::string getCurrentTimezoneRules()
+    {
+        return stm::internal::StaticData::get().getCurrentTimezoneRules();
     }
 } // namespace stm::api

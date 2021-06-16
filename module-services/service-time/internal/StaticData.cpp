@@ -51,13 +51,22 @@ namespace stm::internal
     {
         return timeFormat;
     }
-    void StaticData::setTimezone(const std::string &newTimezone)
+    void StaticData::setTimezoneName(const std::string &newTimezone)
     {
-        timezone = newTimezone;
+        timezoneName = newTimezone;
     }
-    std::string StaticData::getCurrentTimezone() const
+    std::string StaticData::getCurrentTimezoneName() const
     {
-        return timezone;
+        return timezoneName;
+    }
+
+    void StaticData::setTimezoneRules(const std::string &newTimezone)
+    {
+        timezoneRules = newTimezone;
+    }
+    std::string StaticData::getCurrentTimezoneRules() const
+    {
+        return timezoneRules;
     }
 
 } // namespace stm::internal

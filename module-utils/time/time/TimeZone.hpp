@@ -5,21 +5,26 @@
 
 #include <string>
 #include <vector>
+#include <chrono>
 
 namespace utils::time
 {
-    /** @brief get all available TimeZones to display
-     *
-     *  @return vector of string with TimeZones names
-     */
-    [[nodiscard]] auto getAvailableTimeZonesToDisplay() -> std::vector<std::string>;
+    constexpr uint8_t timeZoneNameOffset{10};
+    constexpr auto defaultTimeZoneName{"London"};
 
-    /** @brief get offset of TimeZone
+    /** @brief get all available TimeZones with offsets
+     *
+     *  @return vector of string with TimeZones names and offsets
+     */
+    [[nodiscard]] auto getAvailableTimeZonesWithOffset() -> std::vector<std::string>;
+
+    /** @brief get offset of TimeZone include DST rules
      *
      *  @param zoneName - name of TimeZone
-     *  @return offset hours and minutes with a sign in the interval of 15 minutes [6 => 1h 30 min]
+     *  @param time - date and time for the offset
+     *  @return offset in seconds with a sign
      */
-    [[nodiscard]] auto getTimeZoneOffset(const std::string &zoneName) -> std::int8_t;
+    [[nodiscard]] auto getTimeZoneOffset(const std::string &zoneName, const time_t &time) -> std::chrono::seconds;
 
     /** @brief get offset and DST rules of TimeZone
      *

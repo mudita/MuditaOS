@@ -17,7 +17,8 @@ namespace stm::internal
         bool isAutomaticTimezoneOn                 = false;
         utils::time::Locale::DateFormat dateFormat = utils::time::Locale::DateFormat::DD_MM_YYYY;
         utils::time::Locale::TimeFormat timeFormat = utils::time::Locale::TimeFormat::FormatTime12H;
-        std::string timezone;
+        std::string timezoneName;
+        std::string timezoneRules;
 
         StaticData() = default;
 
@@ -70,14 +71,24 @@ namespace stm::internal
          */
         [[nodiscard]] utils::time::Locale::TimeFormat getTimeFormat() const noexcept;
         /**
-         * Sets value corresponded to current Timezone setting
+         * Sets value corresponded to current Timezone name setting
          * @param timezone new timezone to set
          */
-        void setTimezone(const std::string &newTimezone);
+        void setTimezoneName(const std::string &newTimezone);
         /**
-         * Gets value corresponded to current Timezone setting
+         * Gets value corresponded to current Timezone name setting
          * @retrun actual timezone setting
          */
-        [[nodiscard]] std::string getCurrentTimezone() const;
+        [[nodiscard]] std::string getCurrentTimezoneName() const;
+        /**
+         * Sets value corresponded to current Timezone rules setting
+         * @param timezone new timezone to set
+         */
+        void setTimezoneRules(const std::string &newTimezone);
+        /**
+         * Gets value corresponded to current Timezone rules setting
+         * @retrun actual timezone setting
+         */
+        [[nodiscard]] std::string getCurrentTimezoneRules() const;
     };
 } // namespace stm::internal
