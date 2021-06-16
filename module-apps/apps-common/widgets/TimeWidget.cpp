@@ -9,6 +9,7 @@
 #include <time/time_date_validation.hpp>
 #include "DateAndTimeStyle.hpp"
 #include <module-apps/application-calendar/data/dateCommon.hpp>
+#include <time/TimeZone.hpp>
 
 namespace gui
 {
@@ -422,19 +423,26 @@ namespace gui
         if (!validateHour()) {
             return false;
         }
-        auto hours   = std::chrono::hours(LocalizedHoursToUtcHours(std::stoi(hourInput->getText().c_str())));
+        auto hours   = std::chrono::hours(std::stoi(hourInput->getText().c_str()));
         auto minutes = std::chrono::minutes(std::stoi(minuteInput->getText().c_str()));
+
         if (!mode24H) {
             hours = date::make24(hours, isPm(mode12hInput->getText()));
         }
         auto date = (dateItem != nullptr) ? TimePointFromYearMonthDay(dateItem->getChosenDate())
                                           : TimePointFromYearMonthDay(TimePointToYearMonthDay(TimePointNow()));
+
+        TimePoint presetPointTime = date + hours + minutes;
+        auto timeZoneOffset =
+            utils::time::getTimeZoneOffset(stm::api::getCurrentTimezoneName(), TimePointToTimeT(presetPointTime));
+
         if (type == Type::Start) {
-            fromTillDate->from = date + hours + minutes;
+            fromTillDate->from = presetPointTime - timeZoneOffset;
         }
         else if (type == Type::End) {
-            fromTillDate->till = date + hours + minutes;
+            fromTillDate->till = presetPointTime - timeZoneOffset;
         }
+
         return true;
     }
 
