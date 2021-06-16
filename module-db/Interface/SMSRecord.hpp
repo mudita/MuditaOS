@@ -32,11 +32,11 @@ struct SMSRecord : public Record
 
     SMSRecord() = default;
     SMSRecord(const SMSTableRow &w)
-        : Record{.ID = w.ID}, date(w.date), errorCode(w.errorCode), body(w.body), type(w.type), threadID(w.threadID),
+        : Record(w.ID), date(w.date), errorCode(w.errorCode), body(w.body), type(w.type), threadID(w.threadID),
           contactID(w.contactID)
     {}
     SMSRecord(const SMSTableRow &w, const utils::PhoneNumber::View &num)
-        : Record{.ID = w.ID}, date(w.date), errorCode(w.errorCode), body(w.body), type(w.type), threadID(w.threadID),
+        : Record(w.ID), date(w.date), errorCode(w.errorCode), body(w.body), type(w.type), threadID(w.threadID),
           contactID(w.contactID), number(num)
     {}
 };

@@ -26,7 +26,7 @@ TEST_CASE("Contacts Name Table tests")
     REQUIRE(contactsdb.isInitialized());
 
     ContactsNameTableRow testRow1 = {
-        {.ID = DB_ID_NONE}, .contactID = DB_ID_NONE, .namePrimary = "Mateusz", .nameAlternative = "Pati"};
+        Record(DB_ID_NONE), .contactID = DB_ID_NONE, .namePrimary = "Mateusz", .nameAlternative = "Pati"};
 
     const auto contactsCount = contactsdb.name.count() + 1;
     // clear contacts table
