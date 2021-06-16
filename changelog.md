@@ -4,6 +4,56 @@ To install the new version of MuditaOS please follow the steps described in this
 - [Linux](https://github.com/mudita/MuditaOS/blob/master/doc/boot_and_update.md#creating-a-storage-partition)
 - [Windows and macOS](https://github.com/mudita/MuditaOS/blob/master/doc/flashing_win_macos.md)
 
+## [0.69.1 2021-06-16]
+
+### Added
+
+* [EGD-6896] Sanitize Tray event handling
+* [BH-353] Add minimal build target for BH
+* [CP-84] Implement Security API
+* [CP-145] Implement Security Endpoint helper
+* [EGD-6907] Introduce ModemState in Cellular
+* [BH-353] Add Documentation for main targets
+
+### Changed
+
+* [EGD-6897] Add force flag to the pureflash
+* [EGD-6897] Change force flag to disable check
+* [BH-460] Moved TPLIB littlefs
+* [BH-371] Replace gsl with mainline submodule and move to third-party
+* [EGD-6867] Renamed TopBar into StatusBar
+* [EGD-6898] Remove dead SimProcedure code
+* [BH-396] Move CrashDebug to a separate directory
+* [BH-360] Move TPLIB re2 to separate dir
+* [CP-83] Update tests for unlocking phone and usb
+* [BH-378] Utils move log to library
+* [BH-458] Pureflash turned to ExternalProject
+* [EGD-6906] Updated OnBoarding update info window
+* [CP-140] Deactivate autolock while connected to MC
+* [BH-370] Convert utils common_data into a libs
+* [BH-369] Turned UTF8 into separate library
+* [BH-368] Added missing CMAkeLists
+* [BH-368] Moved board to library
+* [BH-387] Move utils/state to service-antenna
+* [BH-367] Convert UCS2 to library
+* [BH-376] Time module unit test decoupled
+* [BH-376] Utils time turned to separate library
+* [EGD-6544] Switch for VoLTE
+* [EGD-6917] Screen light in automode does not turnoff itself
+* [BH-373] Convert utils json into a lib
+
+### Fixed
+
+* [EGD-6035] Fix support for glibc-2.32
+* [EGD-6899] Fix AppCall access
+* [EGD-6446] Fix notes delete window
+* [CP-148] Fix setting of response in the Parser Context
+* [EGD-6684] Fix call ended message
+* [EGD-6875] Fix UT check script
+* [BH-369] Fixed UTF8 unit test CI run
+* [EGD-6884] Fix autolock in sms template
+* [CP-187] Fix stack overflow on passcode decoding
+
 ## [0.68.1 2021-06-04]
 
 ### Added
