@@ -15,6 +15,7 @@
 
 #include <map>
 #include <vector>
+#include <filesystem>
 #include <module-services/service-desktop/service-desktop/DesktopMessages.hpp>
 #include "SystemManager/messages/SentinelRegistrationMessage.hpp"
 
@@ -227,8 +228,14 @@ void WorkerDesktop::stopTransfer(const TransferFailAction action)
     writeFileDataWritten  = 0;
 
     if (action == TransferFailAction::removeDesitnationFile) {
-        if (remove(filePath.c_str()) != 0) {
-            LOG_ERROR("stopTransfer can't delete file(requested) %s", filePath.c_str());
+        try {
+            if (!std::filesystem::remove(filePath)) {
+                LOG_ERROR("stopTransfer can't delete  %s", filePath.c_str());
+            }
+            LOG_DEBUG("Deleted file(requested) %s", filePath.c_str());
+        }
+        catch (const std::filesystem::filesystem_error &fsError) {
+            LOG_ERROR("remove on %s, error %s", filePath.c_str(), fsError.what());
         }
     }
 
