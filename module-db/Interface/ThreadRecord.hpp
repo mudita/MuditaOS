@@ -25,7 +25,7 @@ struct ThreadRecord : Record
 
     ThreadRecord() = default;
     ThreadRecord(const ThreadsTableRow &rec)
-        : Record{.ID = rec.ID}, date(rec.date), msgCount(rec.msgCount), unreadMsgCount(rec.unreadMsgCount),
+        : Record(rec.ID), date(rec.date), msgCount(rec.msgCount), unreadMsgCount(rec.unreadMsgCount),
           snippet(rec.snippet), type(rec.type), contactID(rec.contactID), numberID(rec.numberID)
     {}
 
