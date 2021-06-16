@@ -183,7 +183,7 @@ TEST_CASE("SMS Record tests")
         }
         ThreadRecord threadRec = threadRecordInterface.GetByID(1);
         REQUIRE(threadRec.isValid());
-        ThreadsTableRow threadRaw{{.ID = threadRec.ID},
+        ThreadsTableRow threadRaw{Record(threadRec.ID),
                                   .date           = threadRec.date,
                                   .msgCount       = threadRec.msgCount,
                                   .unreadMsgCount = threadRec.unreadMsgCount,

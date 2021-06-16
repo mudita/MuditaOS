@@ -42,7 +42,7 @@ TEST_CASE("Calllog Table tests")
         REQUIRE(testRow.isRead == true);
     }
 
-    CalllogTableRow testRow = {{.ID = DB_ID_NONE},
+    CalllogTableRow testRow = {Record(DB_ID_NONE),
                                .number       = "600123456",
                                .e164number   = "+48600226908",
                                .presentation = PresentationType::PR_ALLOWED,

@@ -96,7 +96,7 @@ ContactsTableRow ContactsTable::getByIdCommon(std::unique_ptr<QueryResult> retQu
     debug_db_data(
         "got results: %" PRIu32 "; ID: %" PRIu32, retQuery->getRowCount(), (*retQuery)[ColumnName::id].getInt32());
     return ContactsTableRow{
-        {.ID = (*retQuery)[ColumnName::id].getUInt32()},
+        Record((*retQuery)[ColumnName::id].getUInt32()),
         .nameID    = (*retQuery)[ColumnName::name_id].getUInt32(),
         .numbersID = (*retQuery)[ColumnName::numbers_id].getString(),
         .ringID    = (*retQuery)[ColumnName::ring_id].getUInt32(),

@@ -23,7 +23,7 @@ ThreadRecordInterface::ThreadRecordInterface(SmsDB *smsDb, ContactsDB *contactsD
 
 bool ThreadRecordInterface::Add(const ThreadRecord &rec)
 {
-    auto ret = smsDB->threads.add(ThreadsTableRow{{.ID = rec.ID},
+    auto ret = smsDB->threads.add(ThreadsTableRow{Record(rec.ID),
                                                   .date           = rec.date,
                                                   .msgCount       = rec.msgCount,
                                                   .unreadMsgCount = rec.unreadMsgCount,
@@ -48,7 +48,7 @@ bool ThreadRecordInterface::RemoveByID(uint32_t id)
 
 bool ThreadRecordInterface::Update(const ThreadRecord &rec)
 {
-    return smsDB->threads.update(ThreadsTableRow{{.ID = rec.ID},
+    return smsDB->threads.update(ThreadsTableRow{Record(rec.ID),
                                                  .date           = rec.date,
                                                  .msgCount       = rec.msgCount,
                                                  .unreadMsgCount = rec.unreadMsgCount,

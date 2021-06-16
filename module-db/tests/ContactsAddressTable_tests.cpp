@@ -18,7 +18,7 @@ TEST_CASE("Contacts address Table tests")
     ContactsDB contactsdb{callogPath.c_str()};
     REQUIRE(contactsdb.isInitialized());
 
-    ContactsAddressTableRow testRow1 = {{.ID = DB_ID_NONE},
+    ContactsAddressTableRow testRow1 = {Record(DB_ID_NONE),
                                         .contactID = 0,
                                         .address   = "6 Czeczota St.\n02600 Warsaw",
                                         .note      = "Test note",
