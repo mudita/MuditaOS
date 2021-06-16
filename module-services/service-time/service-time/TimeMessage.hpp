@@ -186,10 +186,10 @@ namespace stm::message
     class SetTimezoneRequest : public sys::DataMessage
     {
       public:
-        explicit SetTimezoneRequest(const std::string &timezoneRules)
-            : sys::DataMessage(MessageType::MessageTypeUninitialized), timezone(timezoneRules)
+        explicit SetTimezoneRequest(const std::string &timezoneName)
+            : sys::DataMessage(MessageType::MessageTypeUninitialized), timezone(timezoneName)
         {}
-        auto getTimezone() const -> std::string
+        auto getTimezoneName() const -> std::string
         {
             return timezone;
         }
