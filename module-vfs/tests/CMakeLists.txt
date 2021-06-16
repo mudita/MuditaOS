@@ -105,3 +105,4 @@ foreach(ASSET ${ASSETS_LIST})
     add_custom_target(${target_name} DEPENDS ${ASSET} ${outfile})
     add_dependencies(${PROJECT_NAME} ${target_name})
 endforeach()
+
