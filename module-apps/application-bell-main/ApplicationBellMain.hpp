@@ -5,6 +5,13 @@
 
 #include <Application.hpp>
 
+namespace gui::window::name
+{
+    inline constexpr auto bell_main_menu        = "BellMainMenu";
+    inline constexpr auto bell_main_menu_dialog = "BellMainMenuDialog";
+
+} // namespace gui::window::name
+
 namespace app
 {
     inline constexpr auto applicationBellName = "ApplicationBell";
