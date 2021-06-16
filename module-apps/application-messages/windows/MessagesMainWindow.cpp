@@ -66,11 +66,8 @@ namespace gui
         bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
         setTitle(utils::translate("app_messages_title_main"));
-
-        leftArrowImage  = new gui::Image(this, 30, 62, 0, 0, "arrow_left");
-        rightArrowImage = new gui::Image(this, 480 - 30 - 13, 62, 0, 0, "arrow_right");
-        newMessageImage = new gui::Image(this, 48, 55, 0, 0, "cross");
-        searchImage     = new gui::Image(this, 480 - 48 - 26, 55, 0, 0, "search");
+        headerIndicatorAdd(header::NavigationIndicator::AddElementBox);
+        headerIndicatorAdd(header::NavigationIndicator::SearchBox);
 
         emptyListIcon = new Icon(this,
                                  0,
@@ -84,8 +81,6 @@ namespace gui
         list->focusChangedCallback = [this]([[maybe_unused]] gui::Item &item) {
             bottomBar->setActive(BottomBar::Side::LEFT, true);
             bottomBar->setActive(BottomBar::Side::CENTER, true);
-            rightArrowImage->setVisible(true);
-            searchImage->setVisible(true);
             return true;
         };
 

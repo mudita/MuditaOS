@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -20,10 +20,6 @@ namespace gui
     class MessagesMainWindow : public AppWindow, public app::AsyncCallbackReceiver
     {
       protected:
-        Image *leftArrowImage                      = nullptr;
-        Image *rightArrowImage                     = nullptr;
-        Image *newMessageImage                     = nullptr;
-        Image *searchImage                         = nullptr;
         Icon *emptyListIcon                        = nullptr;
         std::shared_ptr<ThreadsModel> threadsModel = nullptr;
         gui::ListView *list                        = nullptr;

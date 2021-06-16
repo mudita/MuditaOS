@@ -23,8 +23,6 @@ namespace gui
         auto onInput(const InputEvent &inputEvent) -> bool override;
         auto optionsList(std::vector<std::shared_ptr<packet_data::APN::Config>> vector) -> std::list<Option>;
 
-        Image *leftArrowImage = nullptr;
-        Image *crossImage     = nullptr;
         Icon *emptyListIcon   = nullptr;
         std::vector<std::shared_ptr<packet_data::APN::Config>> apns;
         std::shared_ptr<packet_data::APN::Config> activeApn;

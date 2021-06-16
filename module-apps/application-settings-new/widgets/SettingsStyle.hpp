@@ -42,21 +42,6 @@ namespace style
 
         namespace window
         {
-            namespace leftArrowImage
-            {
-                inline constexpr auto x = style::window::default_left_margin;
-                inline constexpr auto y = 62;
-                inline constexpr auto w = 11;
-                inline constexpr auto h = 13;
-            } // namespace leftArrowImage
-
-            namespace crossImage
-            {
-                inline constexpr auto x = style::window::default_left_margin + 20;
-                inline constexpr auto y = 55;
-                inline constexpr auto w = 24;
-                inline constexpr auto h = 24;
-            } // namespace crossImage
             namespace languageChange
             {
                 inline constexpr auto options_posX             = 17;

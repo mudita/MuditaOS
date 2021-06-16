@@ -43,12 +43,12 @@ namespace style::status_bar
     {
         namespace left
         {
-            inline constexpr auto minX = 165u;
+            inline constexpr auto minX = 170u;
             inline constexpr auto maxX = 205u;
         }; // namespace left
         namespace right
         {
-            inline constexpr auto minX = 165u;
+            inline constexpr auto minX = 170u;
             inline constexpr auto maxX = 205u;
         }; // namespace right
         namespace center

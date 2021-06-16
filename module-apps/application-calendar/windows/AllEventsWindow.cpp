@@ -38,10 +38,7 @@ namespace gui
         bottomBar->setText(gui::BottomBar::Side::LEFT, utils::translate("app_calendar_bar_month"));
 
         setTitle(utils::translate("app_calendar_title_main"));
-        leftArrowImage = new gui::Image(
-            this, style::window::calendar::arrow_x, style::window::calendar::arrow_y, 0, 0, "arrow_left");
-        newDayEventImage =
-            new gui::Image(this, style::window::calendar::cross_x, style::window::calendar::cross_y, 0, 0, "cross");
+        headerIndicatorAdd(header::NavigationIndicator::AddElementBox);
 
         allEventsList = new gui::CalendarListView(this,
                                                   style::window::calendar::listView_x,

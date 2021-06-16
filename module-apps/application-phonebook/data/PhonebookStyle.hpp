@@ -12,35 +12,7 @@ namespace phonebookStyle
         inline constexpr uint32_t default_x = style::window::default_left_margin;
         inline constexpr uint32_t default_w =
             style::window_width - style::window::default_left_margin - style::window::default_right_margin;
-        namespace leftArrowImage
-        {
-            inline constexpr uint32_t x = default_x;
-            inline constexpr uint32_t y = 62;
-            inline constexpr uint32_t w = 11;
-            inline constexpr uint32_t h = 13;
-        } // namespace leftArrowImage
-        namespace rightArrowImage
-        {
-            inline constexpr uint32_t x = style::window_width - style::window::default_left_margin - 11;
-            inline constexpr uint32_t y = 62;
-            inline constexpr uint32_t w = 11;
-            inline constexpr uint32_t h = 13;
-        } // namespace rightArrowImage
-        namespace newContactImage
-        {
-            inline constexpr uint32_t x = style::window::default_left_margin + 20;
-            inline constexpr uint32_t y = 55;
-            inline constexpr uint32_t w = 24;
-            inline constexpr uint32_t h = 24;
-        } // namespace newContactImage
-        namespace searchImage
-        {
-            inline constexpr uint32_t x =
-                style::window_width - style::window::default_left_margin - rightArrowImage::w - 8 - 26;
-            inline constexpr uint32_t y = 55;
-            inline constexpr uint32_t w = 26;
-            inline constexpr uint32_t h = 26;
-        } // namespace searchImage
+
         namespace contactsList
         {
             inline constexpr uint32_t x = style::window::default_left_margin;

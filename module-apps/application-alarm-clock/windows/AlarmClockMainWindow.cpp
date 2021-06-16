@@ -36,10 +36,7 @@ namespace app::alarmClock
         bottomBar->setText(gui::BottomBar::Side::LEFT, utils::translate(style::strings::common::options));
 
         setTitle(utils::translate("app_alarm_clock_title_main"));
-        leftArrowImage = new gui::Image(
-            this, style::alarmClock::window::arrow_x, style::alarmClock::window::arrow_y, 0, 0, "arrow_left");
-        plusSignImage =
-            new gui::Image(this, style::alarmClock::window::cross_x, style::alarmClock::window::cross_y, 0, 0, "cross");
+        headerIndicatorAdd(gui::header::NavigationIndicator::AddElementBox);
 
         alarmsList                       = new gui::ListView(this,
                                        style::alarmClock::window::listView_x,
@@ -74,10 +71,8 @@ namespace app::alarmClock
     void AlarmClockMainWindow::destroyInterface()
     {
         erase();
-        alarmsList     = nullptr;
-        leftArrowImage = nullptr;
-        plusSignImage  = nullptr;
-        emptyListIcon  = nullptr;
+        alarmsList    = nullptr;
+        emptyListIcon = nullptr;
     }
 
     void AlarmClockMainWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)

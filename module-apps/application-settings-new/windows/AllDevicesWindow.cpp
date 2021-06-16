@@ -26,18 +26,7 @@ namespace gui
     void AllDevicesWindow::buildInterface()
     {
         setTitle(utils::translate("app_settings_bluetooth_all_devices"));
-        leftArrowImage = new gui::Image(this,
-                                        style::settings::window::leftArrowImage::x,
-                                        style::settings::window::leftArrowImage::y,
-                                        style::settings::window::leftArrowImage::w,
-                                        style::settings::window::leftArrowImage::h,
-                                        "arrow_left");
-        crossImage     = new gui::Image(this,
-                                    style::settings::window::crossImage::x,
-                                    style::settings::window::crossImage::y,
-                                    style::settings::window::crossImage::w,
-                                    style::settings::window::crossImage::h,
-                                    "cross");
+        headerIndicatorAdd(header::NavigationIndicator::AddElementBox);
     }
 
     void AllDevicesWindow::onBeforeShow(ShowMode mode, SwitchData *data)

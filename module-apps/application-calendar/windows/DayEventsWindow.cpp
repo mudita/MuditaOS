@@ -68,10 +68,7 @@ namespace gui
         bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(style::strings::common::open));
 
         setTitle(dayMonthTitle);
-        leftArrowImage = new gui::Image(
-            this, style::window::calendar::arrow_x, style::window::calendar::arrow_y, 0, 0, "arrow_left");
-        newDayEventImage =
-            new gui::Image(this, style::window::calendar::cross_x, style::window::calendar::cross_y, 0, 0, "cross");
+        headerIndicatorAdd(header::NavigationIndicator::AddElementBox);
 
         dayEventsList = new gui::ListView(this,
                                           style::window::calendar::listView_x,
