@@ -20,6 +20,7 @@
 #include <service-cellular/ServiceCellular.hpp>
 #include <time/time_constants.hpp>
 #include <time/time_conversion_factory.hpp>
+#include <time/TimeZone.hpp>
 #include <service-evtmgr/Constants.hpp>
 #include <service-db/service-db/Settings.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
@@ -30,6 +31,8 @@
 
 namespace stm
 {
+    constexpr auto automaticTimezoneName = "";
+
     ServiceTime::ServiceTime() : sys::Service(service::name::service_time, "", StackDepth), calendarEvents(this)
     {
         LOG_INFO("[ServiceTime] Initializing");
@@ -158,6 +161,12 @@ namespace stm
 
         connect(typeid(stm::message::SetTimezoneRequest),
                 [&](sys::Message *request) -> sys::MessagePointer { return handleSetTimezoneRequest(request); });
+
+        connect(typeid(stm::message::TimeChangeRequestMessage), [&](sys::Message *request) -> sys::MessagePointer {
+            auto message = static_cast<stm::message::TimeChangeRequestMessage *>(request);
+            timeManager->handleTimeChangeRequest(message->getTime());
+            return std::make_shared<sys::ResponseMessage>();
+        });
     }
 
     auto ServiceTime::handleSetAutomaticDateAndTimeRequest(sys::Message *request)
@@ -217,10 +226,16 @@ namespace stm
     auto ServiceTime::handleSetTimezoneRequest(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>
     {
         auto message = static_cast<stm::message::SetTimezoneRequest *>(request);
+        auto timeZoneName  = message->getTimezoneName();
+        auto timeZoneRules = utils::time::getTimeZoneRules(timeZoneName);
 
-        timeManager->handleTimezoneChangeRequest(message->getTimezone());
-        settings->setValue(settings::SystemProperties::currentTimezone, message->getTimezone());
-        stm::internal::StaticData::get().setTimezone(message->getTimezone());
+        timeManager->handleTimezoneChangeRequest(timeZoneRules);
+        settings->setValue(settings::SystemProperties::currentTimezoneName, timeZoneName);
+        stm::internal::StaticData::get().setTimezoneName(timeZoneName);
+
+        settings->setValue(settings::SystemProperties::currentTimezoneRules, timeZoneRules);
+        stm::internal::StaticData::get().setTimezoneRules(timeZoneRules);
+
         return std::shared_ptr<sys::ResponseMessage>();
     }
 
@@ -228,18 +243,24 @@ namespace stm
         -> std::shared_ptr<sys::ResponseMessage>
     {
         auto message  = static_cast<CellularTimeNotificationMessage *>(request);
-        auto timezone = TimezoneHandler(std::chrono::duration_cast<std::chrono::minutes>(
-                                            std::chrono::seconds{message->getTimeZoneOffset().value()}))
-                            .getTimezone();
+        auto timezoneRules = TimezoneHandler(std::chrono::duration_cast<std::chrono::minutes>(
+                                                 std::chrono::seconds{message->getTimeZoneOffset().value()}))
+                                 .getTimezone();
         if (stm::api::isAutomaticDateAndTime()) {
-            timeManager->handleCellularTimeUpdate(message->getTime().value(), timezone);
-            settings->setValue(settings::SystemProperties::currentTimezone, timezone);
-            stm::internal::StaticData::get().setTimezone(timezone);
+            timeManager->handleCellularTimeUpdate(message->getTime().value(), timezoneRules);
+            settings->setValue(settings::SystemProperties::currentTimezoneRules, timezoneRules);
+            stm::internal::StaticData::get().setTimezoneRules(timezoneRules);
+
+            settings->setValue(settings::SystemProperties::currentTimezoneName, automaticTimezoneName);
+            stm::internal::StaticData::get().setTimezoneName(automaticTimezoneName);
         }
         else if (stm::api::isAutomaticTimezone()) {
-            timeManager->handleTimezoneChangeRequest(timezone);
-            settings->setValue(settings::SystemProperties::currentTimezone, timezone);
-            stm::internal::StaticData::get().setTimezone(timezone);
+            timeManager->handleTimezoneChangeRequest(timezoneRules);
+            settings->setValue(settings::SystemProperties::currentTimezoneRules, timezoneRules);
+            stm::internal::StaticData::get().setTimezoneRules(timezoneRules);
+
+            settings->setValue(settings::SystemProperties::currentTimezoneName, automaticTimezoneName);
+            stm::internal::StaticData::get().setTimezoneName(automaticTimezoneName);
         }
 
         return std::make_shared<sys::ResponseMessage>();
@@ -261,10 +282,13 @@ namespace stm
         if (timeFormat != std::nullopt) {
             stm::internal::StaticData::get().setTimeFormat(timeFormat.value());
         }
-        auto timezone =
-            settings->getValue(settings::SystemProperties::currentTimezone, settings::SettingsScope::AppLocal);
-        stm::internal::StaticData::get().setTimezone(timezone);
-        timeManager->handleTimezoneChangeRequest(timezone);
+        auto timezoneName =
+            settings->getValue(settings::SystemProperties::currentTimezoneName, settings::SettingsScope::AppLocal);
+        stm::internal::StaticData::get().setTimezoneName(timezoneName);
+        auto timezoneRules =
+            settings->getValue(settings::SystemProperties::currentTimezoneRules, settings::SettingsScope::AppLocal);
+        stm::internal::StaticData::get().setTimezoneRules(timezoneRules);
+        timeManager->handleTimezoneChangeRequest(timezoneRules);
     }
 
 } /* namespace stm */

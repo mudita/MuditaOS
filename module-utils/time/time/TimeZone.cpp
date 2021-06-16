@@ -9,57 +9,90 @@
 
 namespace utils::time
 {
+    constexpr uint16_t maxZoneToDisplayLength{27};
     constexpr uint16_t maxZoneRuleLength{50};
     constexpr uint8_t localTimeYearOffset{100};
 
-    [[nodiscard]] auto getAvailableTimeZonesToDisplay() -> std::vector<std::string>
+    namespace
+    {
+        void copyTmToUdateTime(const tm *tm, udatetime_t *dt)
+        {
+            dt->date.year       = tm->tm_year - 100;
+            dt->date.month      = tm->tm_mon;
+            dt->date.dayofmonth = tm->tm_mday;
+            dt->date.dayofweek  = tm->tm_wday;
+            dt->time.hour       = tm->tm_hour;
+            dt->time.minute     = tm->tm_min;
+            dt->time.second     = tm->tm_sec;
+        }
+
+        void unpackDstRules(
+            urule_packed_t *packedRules, char *dstRules, int8_t tzOffset, uint8_t currYear, bool isEndRule)
+        {
+            switch (packedRules->on_dayofmonth) {
+            case 0: // the last day of week in month
+                [[fallthrough]];
+            case 1: // first day of week in month
+                snprintf(dstRules,
+                         maxZoneRuleLength,
+                         ",M%d.%d.%d/%d",
+                         packedRules->in_month,
+                         packedRules->on_dayofmonth == 0 ? 5 : packedRules->on_dayofmonth,
+                         packedRules->on_dayofweek % 7,
+                         packedRules->at_hours + (isEndRule ? 1 : 0) + (packedRules->at_is_local_time ? 0 : tzOffset));
+                break;
+            default: // The Julian day n (1 <= n <= 365)
+                snprintf(dstRules,
+                         maxZoneRuleLength,
+                         ",J%d/%d",
+                         get_day_in_year(packedRules, currYear),
+                         packedRules->at_hours + (isEndRule ? 1 : 0) + (packedRules->at_is_local_time ? 0 : tzOffset));
+            }
+        }
+    } // namespace
+
+    [[nodiscard]] auto getAvailableTimeZonesWithOffset() -> std::vector<std::string>
     {
         std::vector<std::string> timeZonesNames;
+        char zoneToDisplay[maxZoneToDisplayLength];
         auto zonePointer = reinterpret_cast<const char *>(zone_names);
         uzone_t zoneOut;
 
         for (uint16_t zone = 0; zone < NUM_ZONE_NAMES; zone++) {
-            unpack_zone(&zone_defns[get_next(&zonePointer)], zonePointer, &zoneOut);
-            timeZonesNames.push_back(zoneOut.name);
+            auto pointerToZoneName = zonePointer;
+            unpack_zone(&zone_defns[get_next(&zonePointer)], pointerToZoneName, &zoneOut);
+
+            snprintf(zoneToDisplay,
+                     maxZoneToDisplayLength,
+                     "UTC%s%02d:%02d %s",
+                     zoneOut.offset.hours > 0 ? "+" : "-",
+                     std::abs(zoneOut.offset.hours),
+                     zoneOut.offset.minutes,
+                     zoneOut.name);
+            timeZonesNames.push_back(zoneToDisplay);
             zonePointer++;
         }
 
         return timeZonesNames;
     }
 
-    [[nodiscard]] auto getTimeZoneOffset(const std::string &zoneName) -> std::int8_t
+    [[nodiscard]] auto getTimeZoneOffset(const std::string &zoneName, const time_t &time) -> std::chrono::seconds
     {
         uzone_t zoneOut;
 
-        if (get_zone_by_name(const_cast<char *>(zoneName.c_str()), &zoneOut)) {
+        if (zoneName.empty() || get_zone_by_name(const_cast<char *>(zoneName.c_str()), &zoneOut)) {
             LOG_ERROR("Zone %s not found", zoneName.c_str());
-            return 0;
+            return std::chrono::seconds(0);
         }
 
-        return zoneOut.src->offset_inc_minutes;
-    }
+        auto gmTime = gmtime(&time);
+        udatetime_t udateTime;
+        copyTmToUdateTime(gmTime, &udateTime);
 
-    void unpackDstRules(urule_packed_t *packedRules, char *dstRules, int8_t tzOffset, uint8_t currYear, bool isEndRule)
-    {
-        switch (packedRules->on_dayofmonth) {
-        case 0: // the last day of week in month
-            [[fallthrough]];
-        case 1: // first day of week in month
-            snprintf(dstRules,
-                     maxZoneRuleLength,
-                     ",M%d.%d.%d/%d",
-                     packedRules->in_month,
-                     packedRules->on_dayofmonth == 0 ? 5 : packedRules->on_dayofmonth,
-                     packedRules->on_dayofweek % 7,
-                     packedRules->at_hours + (isEndRule ? 1 : 0) + (packedRules->at_is_local_time ? 0 : tzOffset));
-            break;
-        default: // The Julian day n (1 <= n <= 365)
-            snprintf(dstRules,
-                     maxZoneRuleLength,
-                     ",J%d/%d",
-                     get_day_in_year(packedRules, currYear),
-                     packedRules->at_hours + (isEndRule ? 1 : 0) + (packedRules->at_is_local_time ? 0 : tzOffset));
-        }
+        uoffset_t offset;
+        get_current_offset(&zoneOut, &udateTime, &offset);
+
+        return std::chrono::seconds(std::chrono::hours(offset.hours) + std::chrono::minutes(offset.minutes));
     }
 
     [[nodiscard]] auto getTimeZoneRules(const std::string &zoneName) -> std::string

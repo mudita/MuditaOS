@@ -17,7 +17,7 @@ void TimeManager::handleTimeChangeRequest(const time_t &time)
     rtcCommand->setTime(time);
 }
 
-void TimeManager::handleTimezoneChangeRequest(const std::string &timezone)
+void TimeManager::handleTimezoneChangeRequest(const std::string &timezoneRules)
 {
-    rtcCommand->setTimezone(timezone);
+    rtcCommand->setTimezone(timezoneRules);
 }
