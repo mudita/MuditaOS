@@ -38,7 +38,7 @@ TEST_CASE("Notifications Record tests")
     SECTION("Constructor from NotificationsTableRow")
     {
         NotificationsTableRow tableRow{
-            {.ID = 10}, .key = static_cast<uint32_t>(NotificationsRecord::Key::Calls), .value = 2};
+            Record(10), .key = static_cast<uint32_t>(NotificationsRecord::Key::Calls), .value = 2};
         NotificationsRecord testRec(tableRow);
         REQUIRE(testRec.isValid());
         REQUIRE(testRec.ID == 10);
@@ -70,12 +70,12 @@ TEST_CASE("Notifications Record tests")
     REQUIRE(notificationsRecordInterface.GetCount() == 0);
 
     NotificationsTableRow callsRow{
-        {.ID = DB_ID_NONE}, .key = static_cast<uint32_t>(NotificationsRecord::Key::Calls), .value = 0};
+        Record(DB_ID_NONE), .key = static_cast<uint32_t>(NotificationsRecord::Key::Calls), .value = 0};
 
     REQUIRE(notificationsDb.notifications.add(callsRow));
 
     NotificationsTableRow smsRow{
-        {.ID = DB_ID_NONE}, .key = static_cast<uint32_t>(NotificationsRecord::Key::Sms), .value = 0};
+        Record(DB_ID_NONE), .key = static_cast<uint32_t>(NotificationsRecord::Key::Sms), .value = 0};
 
     REQUIRE(notificationsDb.notifications.add(smsRow));
     NotificationsRecord testRec;
