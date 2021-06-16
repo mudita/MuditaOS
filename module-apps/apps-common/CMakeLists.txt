@@ -101,3 +101,20 @@ target_compile_options(apps-common
         $<$<COMPILE_LANGUAGE:CXX>:-Wno-literal-suffix>
 
 )
+
+# Bell Hybrid related libs
+add_library(bellgui)
+target_sources( bellgui
+   PRIVATE
+      ${CMAKE_CURRENT_SOURCE_DIR}/options/type/OptionBellMenu.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/options/type/OptionBellMenu.hpp
+)
+target_include_directories( bellgui
+   PUBLIC
+      $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/options/type>
+)
+
+target_link_libraries( bellgui
+   PRIVATE
+      module-gui
+)

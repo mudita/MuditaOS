@@ -3,6 +3,8 @@
 
 #include "ApplicationBellMain.hpp"
 #include "windows/BellMainWindow.hpp"
+#include "windows/BellMainMenuWindow.hpp"
+#include <windows/Dialog.hpp>
 
 namespace app
 {
@@ -29,6 +31,15 @@ namespace app
     {
         windowsFactory.attach(gui::name::window::main_window, [](Application *app, const std::string &name) {
             return std::make_unique<gui::BellMainWindow>(app);
+        });
+
+        windowsFactory.attach(gui::window::name::bell_main_menu, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::BellMainMenuWindow>(app);
+        });
+
+        // for demo only - to be removed
+        windowsFactory.attach(gui::window::name::bell_main_menu_dialog, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::Dialog>(app, name);
         });
     }
 
