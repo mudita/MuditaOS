@@ -25,9 +25,6 @@ add_library(${PROJECT_NAME} STATIC ${SOURCES})
 
 include(segger/rtt/CMakeLists.txt)
 
-# add third party libs
-include(third-party/libphonenumber.cmake)
-
 target_link_libraries(${PROJECT_NAME}
 PUBLIC 
     board
@@ -35,7 +32,7 @@ PUBLIC
     magic_enum
     module-os 
     module-vfs
-    ${LIBPHONENUMBER_TARGET}
+    phonenumber
 PRIVATE
     json::json
     crc32
