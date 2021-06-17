@@ -2,16 +2,14 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlgoParamsWindow.hpp"
-#include "gui/widgets/BoxLayout.hpp"
-#include "gui/widgets/Item.hpp"
-#include "gui/widgets/Label.hpp"
-#include "gui/widgets/Window.hpp"
-
+#include <AntennaAppStyle.hpp>
+#include <application-antenna/ApplicationAntenna.hpp>
+#include <module-gui/gui/widgets/BoxLayout.hpp>
+#include <module-gui/gui/widgets/Item.hpp>
+#include <module-gui/gui/widgets/Label.hpp>
+#include <module-gui/gui/widgets/Style.hpp>
+#include <module-gui/gui/widgets/Window.hpp>
 #include <i18n/i18n.hpp>
-#include <Style.hpp>
-#include "gui/widgets/BoxLayout.hpp"
-#include "../AntennaAppStyle.hpp"
-#include "../ApplicationAntenna.hpp"
 #include <service-cellular/CellularServiceAPI.hpp>
 
 using StringList = std::list<std::string>;

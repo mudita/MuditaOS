@@ -8,16 +8,15 @@
  *      Author: kuba
  */
 
-#include "ApplicationAntenna.hpp"
-#include "module-sys/Timers/TimerFactory.hpp"
-#include "module-cellular/at/response.hpp"
+#include <application-antenna/ApplicationAntenna.hpp>
+#include <windows/AntennaMainWindow.hpp>
+#include <windows/ScanModesWindow.hpp>
+#include <windows/AlgoParamsWindow.hpp>
+#include <module-cellular/at/response.hpp>
+#include <module-sys/Timers/TimerFactory.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
-
-#include "windows/AntennaMainWindow.hpp"
-#include "windows/ScanModesWindow.hpp"
-#include "windows/AlgoParamsWindow.hpp"
-
 #include <ticks.hpp>
+
 namespace app
 {
 

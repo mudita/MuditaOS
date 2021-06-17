@@ -3,11 +3,11 @@
 
 #pragma once
 
-#include "Application.hpp"
-#include "gui/widgets/Text.hpp"
-#include "windows/AppWindow.hpp"
+#include <apps-common/Application.hpp>
+#include <apps-common/windows/AppWindow.hpp>
+#include <module-gui/gui/widgets/Text.hpp>
+#include <service-antenna/ServiceAntenna.hpp>
 
-#include "service-antenna/ServiceAntenna.hpp"
 namespace gui
 {
 
