@@ -8,7 +8,7 @@
 #include "application-messages/data/MessagesStyle.hpp"
 
 #include <Style.hpp>
-#include <time/time_conversion.hpp>
+#include <time/time_conversion_factory.hpp>
 #include <OptionsWindow.hpp>
 
 namespace gui
@@ -127,7 +127,8 @@ namespace gui
         timeLabel             = new gui::Label(body, 0, 0, 0, 0);
         timeLabel->activeItem = false;
         timeLabel->setFont(style::window::font::verysmall);
-        timeLabel->setText(utils::time::Time(timestamp));
+        using namespace utils::time;
+        timeLabel->setText(*createTimestamp(TimestampType::Time, timestamp));
         timeLabel->setVisible(false);
         timeLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
         timeLabel->setEdges(RectangleEdge::None);

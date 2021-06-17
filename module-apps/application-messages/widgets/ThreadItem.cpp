@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ThreadItem.hpp"
-#include "time/time_conversion.hpp"
+#include <time/time_conversion_factory.hpp>
 
 #include <Style.hpp>
 #include "application-messages/data/MessagesStyle.hpp"
@@ -50,7 +50,8 @@ namespace gui
         threadStruct = std::move(_threadStruct);
 
         setContactName(getNumberImportance());
-        timestamp->setText(utils::time::DateTime(threadStruct->thread->date));
+        using namespace utils::time;
+        timestamp->setText(*createTimestamp(TimestampType::DateTime, threadStruct->thread->date));
         setPreview();
     }
 

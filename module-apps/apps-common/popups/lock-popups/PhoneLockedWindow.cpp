@@ -147,15 +147,13 @@ namespace gui
     {
         using namespace utils::time;
         auto ret       = AppWindow::updateTime();
-        auto timestamp = utils::time::getCurrentTimestamp();
+        auto clock     = createTimestamp(TimestampType::Clock, std::time(nullptr));
+        auto date      = createTimestamp(TimestampType::DateText, std::time(nullptr));
         if (time != nullptr) {
-            auto fmt = utils::dateAndTimeSettings.isTimeFormat12()
-                           ? Locale::format(Locale::TimeFormat::FormatTime12HShort)
-                           : Locale::format(Locale::TimeFormat::FormatTime24H);
-            time->setText(timestamp.str(fmt));
+            time->setText(clock->str());
         }
         if (dayText != nullptr) {
-            dayText->setText(timestamp.str("%A, %d %b"));
+            dayText->setText(date->str());
         }
         return ret;
     }
