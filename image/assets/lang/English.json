@@ -447,7 +447,7 @@
   "phone_lock_unlock": "<text>Enter the passcode<br></br>to unlock:</text>",
   "phone_lock_unlock_last_attempt": "<text>Wrong passcode.<br></br>You have 1 attempt left.</text>",
   "phone_lock_unlock_last_attempt_warning": "<text>If the passcode is wrong this time,<br></br>you'll have to wait <token>$MINUTES</token> minutes<br></br>before trying again.</text>",
-  "phone_lock_unlock_invalid": "<text>Wrong passcode.<br></br>You have <token>$ATTEMPTS</token> attempts left.</text>",
+  "phone_lock_unlock_invalid": "<text>Wrong passcode.</text>",
   "phone_lock_blocked": "Sorry, phone blocked",
   "phone_lock_current": "Type current passcode",
   "phone_lock_enter_new": "Enter new passcode",
