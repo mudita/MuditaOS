@@ -56,7 +56,8 @@ TEST_CASE("Factory Settings Init")
         factory.initDb(&db);
 
         settings::EntryPath variablePath{
-            "", "", settings::factory::entry_key, "serial", settings::SettingsScope::Global};
+            "", "", "", settings::factory::entry_key + std::string("/serial"), settings::SettingsScope::Global};
+
         auto results = db.query(settings::Statements::getValue, variablePath.to_string().c_str());
         REQUIRE(results->getRowCount() == 1);
     }
