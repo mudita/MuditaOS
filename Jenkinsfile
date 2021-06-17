@@ -153,11 +153,8 @@ popd'''
 export JOBS=${JOBS:-6}
 echo "JOBS=${JOBS}"
 pushd "${WORKSPACE}"
-./tools/run_unittests.sh enabled_unittests
-set +e
-./tools/check_unittests.sh
-set -e
 pushd build-linux-Debug
+ninja check -j ${JOBS}
 ./googletest-gui
 popd
 popd'''
