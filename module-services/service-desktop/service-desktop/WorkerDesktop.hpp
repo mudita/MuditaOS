@@ -32,7 +32,9 @@ class WorkerDesktop : public sys::Worker, public bsp::USBDeviceListener
         CancelTransfer,
     };
 
-    WorkerDesktop(sys::Service *ownerServicePtr, const sdesktop::USBSecurityModel &securityModel);
+    WorkerDesktop(sys::Service *ownerServicePtr,
+                  const sdesktop::USBSecurityModel &securityModel,
+                  const std::string serialNumber);
 
     virtual bool init(std::list<sys::WorkerQueueInfo> queues) override;
     virtual bool deinit() override;
@@ -73,6 +75,7 @@ class WorkerDesktop : public sys::Worker, public bsp::USBDeviceListener
     std::filesystem::path filePath;
     std::atomic<bool> rawModeEnabled = false;
     const sdesktop::USBSecurityModel &securityModel;
+    const std::string serialNumber;
     sys::Service *ownerService = nullptr;
     parserFSM::StateMachine parser;
     sys::TimerHandle usbSuspendTimer;
