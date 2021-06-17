@@ -10,6 +10,7 @@ add_library(${PROJECT_NAME} STATIC)
 
 add_subdirectory(application-antenna)
 add_subdirectory(application-bell-main)
+add_subdirectory(application-calculator)
 add_subdirectory(application-music-player)
 add_subdirectory(application-phonebook)
 add_subdirectory(apps-common)
@@ -27,7 +28,6 @@ set(APPLICATIONS
     calllog
     special-input
     meditation
-    calculator
     alarm-clock
 )
 
