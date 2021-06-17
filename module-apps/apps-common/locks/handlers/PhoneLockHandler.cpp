@@ -13,10 +13,8 @@
 
 namespace locks
 {
-    constexpr unsigned int default_attempts = 4;
-
     PhoneLockHandler::PhoneLockHandler(sys::Service *owner, std::shared_ptr<settings::Settings> settings)
-        : owner(owner), lock(Lock::LockState::InputRequired, default_attempts), settings(std::move(settings))
+        : owner(owner), lock(Lock::LockState::InputRequired), settings(std::move(settings))
     {}
 
     void PhoneLockHandler::enablePhoneLock(bool _phoneLockEnabled)
@@ -38,7 +36,7 @@ namespace locks
     {
         if (phoneLockInputTypeAction != _phoneLockInputTypeAction) {
             phoneLockInputTypeAction = _phoneLockInputTypeAction;
-            lock.attemptsLeft        = default_attempts;
+            lock.attemptsLeft        = Lock::unlimitedNumOfAttempts;
             storedInputData.clear();
         }
     }
@@ -263,7 +261,7 @@ namespace locks
 
         if (phoneLockHash == hash) {
             lock.lockState    = Lock::LockState::Unlocked;
-            lock.attemptsLeft = default_attempts;
+            lock.attemptsLeft = Lock::unlimitedNumOfAttempts;
         }
         else if (lock.attemptsLeft > 0) {
             lock.lockState = Lock::LockState::InputInvalid;
