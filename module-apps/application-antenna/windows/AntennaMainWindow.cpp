@@ -7,22 +7,21 @@
  *  Created on: 18 lut 2020
  *      Author: kuba
  */
-#include "AntennaMainWindow.hpp"
-#include "gui/widgets/BoxLayout.hpp"
-#include "gui/widgets/Item.hpp"
-#include "gui/widgets/Label.hpp"
-#include "gui/widgets/Window.hpp"
-
-#include <i18n/i18n.hpp>
-#include <Style.hpp>
-
-#include "../AntennaAppStyle.hpp"
-#include "ScanModesWindow.hpp"
 #include "AlgoParamsWindow.hpp"
-#include "../ApplicationAntenna.hpp"
-#include <service-cellular/CellularServiceAPI.hpp>
+#include "AntennaMainWindow.hpp"
+#include "ScanModesWindow.hpp"
+#include <application-antenna/AntennaAppStyle.hpp>
+#include <application-antenna/ApplicationAntenna.hpp>
+#include <module-gui/gui/widgets/BoxLayout.hpp>
+#include <module-gui/gui/widgets/Item.hpp>
+#include <module-gui/gui/widgets/Label.hpp>
+#include <module-gui/gui/widgets/Style.hpp>
+#include <module-gui/gui/widgets/Window.hpp>
+#include <i18n/i18n.hpp>
+#include <module-cellular/at/response.hpp>
 #include <service-antenna/AntennaServiceAPI.hpp>
-#include <at/response.hpp>
+#include <service-cellular/CellularServiceAPI.hpp>
+
 namespace gui
 {
 

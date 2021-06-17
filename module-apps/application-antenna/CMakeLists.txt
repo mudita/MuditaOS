@@ -4,26 +4,33 @@
 add_library(application-antenna STATIC)
 
 target_include_directories(application-antenna
-
+    PRIVATE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     PUBLIC
-        "${CMAKE_CURRENT_LIST_DIR}"
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
 
 target_sources(application-antenna
 
     PRIVATE
         ApplicationAntenna.cpp
+        windows/AlgoParamsWindow.cpp
         windows/AntennaMainWindow.cpp
         windows/ScanModesWindow.cpp
-        windows/AlgoParamsWindow.cpp
+    PRIVATE
+        AntennaAppStyle.hpp
+        windows/AlgoParamsWindow.hpp
+        windows/AntennaMainWindow.hpp
+        windows/ScanModesWindow.hpp
     PUBLIC
-        ApplicationAntenna.hpp
+        include/application-antenna/ApplicationAntenna.hpp
 )
 
+option(ENABLE_APP_ANTENNA "Enable application antenna" ON)
 
-target_compile_options(application-antenna
-    PRIVATE
-        $<$<CONFIG:DEBUG>: -Os>
+target_compile_definitions(application-antenna
+    INTERFACE
+        $<$<BOOL:${ENABLE_APP_ANTENNA}>:ENABLE_APP_ANTENNA>
 )
 
 target_link_libraries(application-antenna
