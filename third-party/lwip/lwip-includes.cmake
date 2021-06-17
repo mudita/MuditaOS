@@ -1,5 +1,5 @@
-set (LWIP_DIR ${CMAKE_SOURCE_DIR}/module-lwip/lib/lwip)
-set (LWIP_CONTRIB_DIR ${CMAKE_SOURCE_DIR}/module-lwip/lib/lwip/contrib)
+set (LWIP_DIR ${CMAKE_SOURCE_DIR}/third-party/lwip/src)
+set (LWIP_CONTRIB_DIR ${CMAKE_SOURCE_DIR}/third-party/lwip/src/contrib)
 
 set (LWIP_INCLUDE_DIRS
     "${LWIP_DIR}/src/include"
