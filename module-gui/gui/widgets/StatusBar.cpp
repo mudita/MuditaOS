@@ -204,9 +204,6 @@ namespace gui::status_bar
         if (indicator == Indicator::SimCard && sim != nullptr) {
             sim->acceptStatusBarVisitor(modifier);
         }
-        else if (indicator == Indicator::Time && time != nullptr) {
-            time->acceptStatusBarVisitor(modifier);
-        }
     }
 
     bool StatusBar::updateBattery()

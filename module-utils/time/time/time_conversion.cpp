@@ -181,15 +181,21 @@ namespace utils::time
             return Timestamp::str(format);
         }
         if (isToday()) {
-            return Timestamp::str(Locale::format(Locale::TimeFormat::FormatTime12H));
+            auto localeFormat =
+                timeSettings.isTimeFormat12h() ? Locale::TimeFormat::FormatTime12H : Locale::TimeFormat::FormatTime24H;
+            return Timestamp::str(Locale::format(localeFormat));
         }
         if (isYesterday()) {
             return Locale::yesterday();
         }
         if (isCurrentYear()) {
-            return Timestamp::str(Locale::format(Locale::TimeFormat::FormatLocaleDateShort));
+            auto localeFormat = timeSettings.isDateFormatDDMM() ? Locale::TimeFormat::FormatLocaleDate_DD_MM
+                                                                : Locale::TimeFormat::FormatLocaleDate_MM_DD;
+            return Timestamp::str(Locale::format(localeFormat));
         }
-        return Timestamp::str(Locale::format(Locale::TimeFormat::FormatLocaleDateFull));
+        auto localeFormat = timeSettings.isDateFormatDDMM() ? Locale::TimeFormat::FormatLocaleDate_DD_MM_YYYY
+                                                            : Locale::TimeFormat::FormatLocaleDate_MM_DD_YYYY;
+        return Timestamp::str(Locale::format(localeFormat));
     }
 
     UTF8 Date::str(std::string format) const
@@ -197,14 +203,21 @@ namespace utils::time
         if (!format.empty()) {
             return Timestamp::str(format);
         }
-        if (isToday()) {
-            return Locale::today();
-        }
-        if (isYesterday()) {
-            return Locale::yesterday();
+
+        auto localeFormat = timeSettings.isDateFormatDDMM() ? Locale::TimeFormat::FormatLocaleDate_DD_MM_YYYY
+                                                            : Locale::TimeFormat::FormatLocaleDate_MM_DD_YYYY;
+        return Timestamp::str(Locale::format(localeFormat));
+    }
+
+    UTF8 DateText::str(std::string format) const
+    {
+        if (!format.empty()) {
+            return Timestamp::str(format);
         }
 
-        return Timestamp::str(Locale::format(Locale::TimeFormat::FormatLocaleDateFull));
+        auto localeFormat = timeSettings.isDateFormatDDMM() ? Locale::TimeFormat::FormatDate_Day_DD_Month
+                                                            : Locale::TimeFormat::FormatDate_Day_Month_DD;
+        return Timestamp::str(Locale::format(localeFormat));
     }
 
     UTF8 Time::str(std::string format) const
@@ -212,8 +225,19 @@ namespace utils::time
         if (!format.empty()) {
             return Timestamp::str(format);
         }
-        return Timestamp::str(Locale::format(
-            Locale::TimeFormat::FormatTime12HShort)); // @TODO: M.G. FormatLocaleTime which actually works
+        auto localeFormat =
+            timeSettings.isTimeFormat12h() ? Locale::TimeFormat::FormatTime12H : Locale::TimeFormat::FormatTime24H;
+        return Timestamp::str(Locale::format(localeFormat));
+    }
+
+    UTF8 Clock::str(std::string format) const
+    {
+        if (!format.empty()) {
+            return Timestamp::str(format);
+        }
+        auto localeFormat =
+            timeSettings.isTimeFormat12h() ? Locale::TimeFormat::FormatTime12HShort : Locale::TimeFormat::FormatTime24H;
+        return Timestamp::str(Locale::format(localeFormat));
     }
 
     Duration::Duration(time_t duration) : duration(duration)

@@ -3,51 +3,26 @@
 
 #include "Time.hpp"
 #include "Style.hpp"
+#include <time/time_conversion_factory.hpp>
 
 #include <ctime>
 namespace gui::status_bar
 {
     Time::Time(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h)
-        : StatusBarWidgetBase(parent, x, y, w, h), _time{}
+        : StatusBarWidgetBase(parent, x, y, w, h), time{}
     {
         setFilled(false);
         setBorderColor(gui::ColorNoColor);
         setFont(style::status_bar::time::font);
         setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Bottom));
         using namespace utils::time;
-        setFormat(Locale::format(Locale::TimeFormat::FormatTime12H));
+        time = createTimestamp(TimestampType::Clock, std::time(nullptr));
         update();
     }
 
     void Time::update()
     {
-        _time.set_time(std::time(nullptr));
-        setText(_time.str());
-    }
-
-    void Time::setFormat(const std::string &format)
-    {
-        _time.set_format(format);
-    }
-
-    void Time::acceptStatusBarVisitor(StatusBarVisitor &visitor)
-    {
-        visitor.visit(*this);
-    }
-
-    TimeConfiguration::TimeConfiguration(TimeMode mode) : mode{mode}
-    {}
-
-    TimeConfiguration::TimeMode TimeConfiguration::getMode() const noexcept
-    {
-        return mode;
-    }
-
-    void TimeConfiguration::visit(gui::status_bar::Time &widget) const
-    {
-        using namespace utils::time;
-        getMode() == TimeConfiguration::TimeMode::Time12h
-            ? widget.setFormat(Locale::format(Locale::TimeFormat::FormatTime12H))
-            : widget.setFormat(Locale::format(Locale::TimeFormat::FormatTime24H));
+        time->set_time(std::time(nullptr));
+        setText(time->str());
     }
 } // namespace gui::status_bar

@@ -52,8 +52,7 @@ namespace gui
 
     void AlarmItem::setAlarm()
     {
-        timeLabel->setText(TimePointToLocalizedTimeString(
-            alarm->time, utils::time::Locale::format(utils::time::Locale::TimeFormat::FormatTime12H)));
+        timeLabel->setText(TimePointToLocalizedTimeString(alarm->time));
         if (alarm->status == AlarmStatus::Off) {
             onOffImage->switchState(ButtonState::Off);
         }

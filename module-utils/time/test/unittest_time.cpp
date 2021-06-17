@@ -18,10 +18,29 @@
 using namespace utils::time;
 using namespace std::chrono_literals;
 
-time_t calculateTime(time_t time, std::chrono::milliseconds offset)
+class TimeSettings : public TimeSettingsInterface
 {
-    return std::chrono::system_clock::to_time_t(std::chrono::system_clock::from_time_t(time) + offset);
-}
+  public:
+    bool timeFormat12h  = true;
+    bool dateFormatDDMM = true;
+
+    bool isTimeFormat12h() const final
+    {
+        return timeFormat12h;
+    }
+    bool isDateFormatDDMM() const final
+    {
+        return dateFormatDDMM;
+    }
+};
+
+const std::regex reg12h("^(0[0-9]|1[0-2]):[0-5][0-9] (A|P)M$");
+const std::regex reg12hShort("^(0[0-9]|1[0-2]):[0-5][0-9]$");
+const std::regex reg24h("^([0-1][0-9]|2[0-4]):[0-5][0-9]$");
+const std::regex regexDDMMYYYY("^([0-2]\\d|3[0-1])\\.(0[1-9]|1[0-2])\\.\\d{4}$");
+const std::regex regexDDMM("^([0-2]\\d|3[0-1])\\.(0[1-9]|1[0-2])$");
+const std::regex regexMMDDYYYY("^(0[1-9]|1[0-2])\\.([0-2]\\d|3[0-1])\\.\\d{4}$");
+const std::regex regexMMDD("^(0[1-9]|1[0-2])\\.([0-2]\\d|3[0-1])$");
 
 TEST_CASE("TimeStamp")
 {
@@ -83,8 +102,10 @@ TEST_CASE("TimeStamp")
             REQUIRE(timestamp.str(Locale::format(Locale::TimeFormat::FormatTime12H)) == "11:41 PM");
             REQUIRE(timestamp.str(Locale::format(Locale::TimeFormat::FormatTime12HShort)) == "11:41");
             REQUIRE(timestamp.str(Locale::format(Locale::TimeFormat::FormatTime24H)) == "23:41");
-            REQUIRE(timestamp.str(Locale::format(Locale::TimeFormat::FormatLocaleDateFull)) == "14.06.2021");
-            REQUIRE(timestamp.str(Locale::format(Locale::TimeFormat::FormatLocaleDateShort)) == "14.06");
+            REQUIRE(timestamp.str(Locale::format(Locale::TimeFormat::FormatLocaleDate_DD_MM_YYYY)) == "14.06.2021");
+            REQUIRE(timestamp.str(Locale::format(Locale::TimeFormat::FormatLocaleDate_MM_DD_YYYY)) == "06.14.2021");
+            REQUIRE(timestamp.str(Locale::format(Locale::TimeFormat::FormatLocaleDate_DD_MM)) == "14.06");
+            REQUIRE(timestamp.str(Locale::format(Locale::TimeFormat::FormatLocaleDate_MM_DD)) == "06.14");
         }
 
         SECTION("day and month")
@@ -153,6 +174,7 @@ TEST_CASE("DateTime")
 {
     utils::setDisplayLanguage("English");
     setenv("TZ", "GMT0", 1);
+    TimeSettings timeSettings;
 
     SECTION("isToday")
     {
@@ -165,7 +187,7 @@ TEST_CASE("DateTime")
             for (int i = 0; i < 24; i++) {
                 newTimeTimeinfo.tm_hour = i;
                 auto newTime            = std::mktime(&newTimeTimeinfo);
-                DateTime datetime(newTime);
+                DateTime datetime(timeSettings, newTime);
                 REQUIRE(datetime.isToday());
             }
         }
@@ -174,27 +196,27 @@ TEST_CASE("DateTime")
             for (int i = 1; i < 32; i++) {
                 newTimeTimeinfo.tm_mday = currentTimeTimeinfo.tm_mday - i;
                 auto newTime            = std::mktime(&newTimeTimeinfo);
-                DateTime datetime(newTime);
+                DateTime datetime(timeSettings, newTime);
                 REQUIRE(!datetime.isToday());
             }
             for (int i = 0; i < 12; i++) {
                 newTimeTimeinfo.tm_mon = currentTimeTimeinfo.tm_mon - i;
                 auto newTime           = std::mktime(&newTimeTimeinfo);
-                DateTime datetime(newTime);
+                DateTime datetime(timeSettings, newTime);
                 REQUIRE(!datetime.isToday());
             }
             // previous
             for (int i = 0; i < 100; i++) {
                 newTimeTimeinfo.tm_year = currentTimeTimeinfo.tm_year - i;
                 auto newTime            = std::mktime(&newTimeTimeinfo);
-                DateTime datetime(newTime);
+                DateTime datetime(timeSettings, newTime);
                 REQUIRE(!datetime.isToday());
             }
             // forward
             for (int i = 0; i < 100; i++) {
                 newTimeTimeinfo.tm_year = currentTimeTimeinfo.tm_year + i;
                 auto newTime            = std::mktime(&newTimeTimeinfo);
-                DateTime datetime(newTime);
+                DateTime datetime(timeSettings, newTime);
                 REQUIRE(!datetime.isToday());
             }
         }
@@ -212,7 +234,7 @@ TEST_CASE("DateTime")
             for (int i = 0; i < 24; i++) {
                 newTimeTimeinfo.tm_hour = i;
                 auto newTime            = std::mktime(&newTimeTimeinfo);
-                DateTime datetime(newTime);
+                DateTime datetime(timeSettings, newTime);
                 REQUIRE(datetime.isYesterday());
             }
         }
@@ -226,7 +248,7 @@ TEST_CASE("DateTime")
                         continue;
                     }
                     auto newTime = std::mktime(&newTimeTimeinfo);
-                    DateTime datetime(newTime);
+                    DateTime datetime(timeSettings, newTime);
                     REQUIRE(!datetime.isYesterday());
                 }
             }
@@ -241,7 +263,7 @@ TEST_CASE("DateTime")
                     for (int i = 1; i < 32; i++) {
                         newTimeTimeinfo.tm_mday = i;
                         auto newTime            = std::mktime(&newTimeTimeinfo);
-                        DateTime datetime(newTime);
+                        DateTime datetime(timeSettings, newTime);
                         REQUIRE(!datetime.isYesterday());
                     }
                 }
@@ -252,14 +274,14 @@ TEST_CASE("DateTime")
                 for (int i = 1; i < 100; i++) {
                     newTimeTimeinfo.tm_year = currentTimeTimeinfo.tm_year - i;
                     auto newTime            = std::mktime(&newTimeTimeinfo);
-                    DateTime datetime(newTime);
+                    DateTime datetime(timeSettings, newTime);
                     REQUIRE(!datetime.isYesterday());
                 }
                 // forward
                 for (int i = 1; i < 100; i++) {
                     newTimeTimeinfo.tm_year = currentTimeTimeinfo.tm_year + i;
                     auto newTime            = std::mktime(&newTimeTimeinfo);
-                    DateTime datetime(newTime);
+                    DateTime datetime(timeSettings, newTime);
                     REQUIRE(!datetime.isYesterday());
                 }
             }
@@ -276,7 +298,7 @@ TEST_CASE("DateTime")
                 for (int i = 1; i < 32; i++) {
                     newTimeTimeinfo.tm_mday = i;
                     auto newTime            = std::mktime(&newTimeTimeinfo);
-                    DateTime datetime(newTime);
+                    DateTime datetime(timeSettings, newTime);
                     REQUIRE(datetime.isCurrentYear());
                 }
             }
@@ -285,7 +307,7 @@ TEST_CASE("DateTime")
                 for (int i = 0; i < 12; i++) {
                     newTimeTimeinfo.tm_mon = i;
                     auto newTime           = std::mktime(&newTimeTimeinfo);
-                    DateTime datetime(newTime);
+                    DateTime datetime(timeSettings, newTime);
                     REQUIRE(datetime.isCurrentYear());
                 }
             }
@@ -295,14 +317,14 @@ TEST_CASE("DateTime")
                 for (int i = 1; i < 100; i++) {
                     newTimeTimeinfo.tm_year = currentTimeTimeinfo.tm_year - i;
                     auto newTime            = std::mktime(&newTimeTimeinfo);
-                    DateTime datetime(newTime);
+                    DateTime datetime(timeSettings, newTime);
                     REQUIRE(!datetime.isCurrentYear());
                 }
                 // forward
                 for (int i = 1; i < 100; i++) {
                     newTimeTimeinfo.tm_year = currentTimeTimeinfo.tm_year + i;
                     auto newTime            = std::mktime(&newTimeTimeinfo);
-                    DateTime datetime(newTime);
+                    DateTime datetime(timeSettings, newTime);
                     REQUIRE(!datetime.isCurrentYear());
                 }
             }
@@ -315,12 +337,17 @@ TEST_CASE("DateTime")
         const auto currentTimeTimeinfo = *std::localtime(&currentTime);
 
         auto newTimeTimeinfo = currentTimeTimeinfo;
-
+        timeSettings.timeFormat12h  = true;
+        timeSettings.dateFormatDDMM = true;
         SECTION("now")
         {
+            std::regex reg = reg12h;
             auto newTime = std::mktime(&newTimeTimeinfo);
-            DateTime datetime(newTime);
-            std::regex reg("[0-2][0-9]:\\d{1,2} (A|P)M");
+            DateTime datetime(timeSettings, newTime);
+
+            REQUIRE(std::regex_match(std::string(datetime.str()), reg));
+            timeSettings.timeFormat12h = false;
+            reg                        = reg24h;
             REQUIRE(std::regex_match(std::string(datetime.str()), reg));
         }
 
@@ -328,14 +355,14 @@ TEST_CASE("DateTime")
         {
             newTimeTimeinfo.tm_mday -= 1;
             auto newTime = std::mktime(&newTimeTimeinfo);
-            DateTime datetime(newTime);
+            DateTime datetime(timeSettings, newTime);
 
             REQUIRE(datetime.str() == "Yesterday");
         }
 
         SECTION("same year")
         {
-            std::regex regexSameYear("([0-2]\\d|3[0-1])\\.(0[0-9]|1[0-2])");
+            std::regex regexSameYear = regexDDMM;
             if (newTimeTimeinfo.tm_mon == 0) {
                 newTimeTimeinfo.tm_mon = 1;
             }
@@ -344,20 +371,126 @@ TEST_CASE("DateTime")
             }
             auto newTime = std::mktime(&newTimeTimeinfo);
 
-            DateTime datetime(newTime);
-            printf("%s", std::string(datetime.str()).c_str());
+            DateTime datetime(timeSettings, newTime);
+            REQUIRE(std::regex_match(std::string(datetime.str()), regexSameYear));
+            timeSettings.dateFormatDDMM = false;
+            regexSameYear               = regexMMDD;
             REQUIRE(std::regex_match(std::string(datetime.str()), regexSameYear));
         }
 
         SECTION("different year")
         {
-            std::regex regexPreviousYear("([0-2]\\d|3[0-1])\\.(0[0-9]|1[0-2])\\.\\d{4}");
+            std::regex regexPreviousYear = regexDDMMYYYY;
             newTimeTimeinfo.tm_year -= 1;
             auto newTime = std::mktime(&newTimeTimeinfo);
 
-            DateTime datetime(newTime);
+            DateTime datetime(timeSettings, newTime);
 
             REQUIRE(std::regex_match(std::string(datetime.str()), regexPreviousYear));
+            timeSettings.dateFormatDDMM = false;
+            regexPreviousYear           = regexMMDDYYYY;
+            REQUIRE(std::regex_match(std::string(datetime.str()), regexPreviousYear));
+        }
+    }
+}
+
+TEST_CASE("Time")
+{
+    utils::setDisplayLanguage("English");
+    setenv("TZ", "GMT0", 1);
+    TimeSettings timeSettings;
+
+    SECTION("Display")
+    {
+        const auto currentTime = std::time(nullptr);
+
+        timeSettings.timeFormat12h  = true;
+        timeSettings.dateFormatDDMM = true;
+        SECTION("now")
+        {
+            std::regex reg = reg12h;
+            Time time(timeSettings, currentTime);
+
+            REQUIRE(std::regex_match(std::string(time.str()), reg));
+            timeSettings.timeFormat12h = false;
+            reg                        = reg24h;
+            REQUIRE(std::regex_match(std::string(time.str()), reg));
+        }
+    }
+}
+
+TEST_CASE("Clock")
+{
+    utils::setDisplayLanguage("English");
+    setenv("TZ", "GMT0", 1);
+    TimeSettings timeSettings;
+
+    SECTION("Display")
+    {
+        const auto currentTime = std::time(nullptr);
+
+        timeSettings.timeFormat12h  = true;
+        timeSettings.dateFormatDDMM = true;
+        SECTION("now")
+        {
+            std::regex reg = reg12hShort;
+            Clock clock(timeSettings, currentTime);
+
+            REQUIRE(std::regex_match(std::string(clock.str()), reg));
+            timeSettings.timeFormat12h = false;
+            reg                        = reg24h;
+            REQUIRE(std::regex_match(std::string(clock.str()), reg));
+        }
+    }
+}
+
+TEST_CASE("Date")
+{
+    utils::setDisplayLanguage("English");
+    setenv("TZ", "GMT0", 1);
+    TimeSettings timeSettings;
+
+    SECTION("Display")
+    {
+        const auto currentTime = std::time(nullptr);
+
+        timeSettings.timeFormat12h  = true;
+        timeSettings.dateFormatDDMM = true;
+        SECTION("now")
+        {
+            std::regex reg = regexDDMMYYYY;
+            Date date(timeSettings, currentTime);
+
+            REQUIRE(std::regex_match(std::string(date.str()), reg));
+            timeSettings.dateFormatDDMM = false;
+            reg                         = regexMMDDYYYY;
+            REQUIRE(std::regex_match(std::string(date.str()), reg));
+        }
+    }
+}
+
+TEST_CASE("DateText")
+{
+    utils::setDisplayLanguage("English");
+    setenv("TZ", "GMT0", 1);
+    TimeSettings timeSettings;
+
+    SECTION("Display")
+    {
+        // Epoch timestamp: 1623714101
+        // Timestamp in milliseconds: 1623670901000
+        // Date and time (GMT): Monday, June 14, 2021 11:41:41 PM
+        // Date and time (CET): Tuesday, June 15, 2021 1:41:41 AM GMT+02:00
+        DateText timestamp(timeSettings, 1623714101);
+        setenv("TZ", "GMT0", 1);
+
+        timeSettings.timeFormat12h  = true;
+        timeSettings.dateFormatDDMM = true;
+        SECTION("now")
+        {
+            REQUIRE(timestamp.str() == "Monday, 14 Jun");
+            timeSettings.dateFormatDDMM = false;
+            REQUIRE(timestamp.str() == "Monday, Jun 14");
         }
     }
 }
