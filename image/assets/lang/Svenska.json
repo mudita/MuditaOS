@@ -383,7 +383,7 @@
   "phone_lock_unlock": "<text>Lösenord:</text>",
   "phone_lock_unlock_last_attempt": "<text>Fel lösenord.<br></br>Du har 1 försök kvar.</text>",
   "phone_lock_unlock_last_attempt_warning": "<text>Om lösenordet är fel den här gången,<br></br>måste du vänta <token>$MINUTES</token> minuter<br></br>innan nästa försök.</text>",
-  "phone_lock_unlock_invalid": "<text>Fel lösenord.<br></br>Du har <token>$ATTEMPTS</token> försök kvar.</text>",
+  "phone_lock_unlock_invalid": "<text>Fel lösenord.</text>",
   "phone_lock_blocked": "Tyvärr, telefonen blockerad.",
   "phone_lock_current": "Det förra lösenordet",
   "phone_lock_enter_new": "Det nya lösenordet",
