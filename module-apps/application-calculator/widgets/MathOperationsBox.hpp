@@ -2,9 +2,10 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
+
 #include <apps-common/Application.hpp>
-#include <module-gui/gui/widgets/Item.hpp>
 #include <module-gui/gui/widgets/GridLayout.hpp>
+#include <module-gui/gui/widgets/Item.hpp>
 
 namespace gui
 {

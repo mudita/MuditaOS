@@ -2,8 +2,8 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CalculatorMainWindow.hpp"
-#include "application-calculator/widgets/CalculatorStyle.hpp"
-#include "application-calculator/data/CalculatorInputProcessorText.hpp"
+#include <data/CalculatorInputProcessorText.hpp>
+#include <widgets/CalculatorStyle.hpp>
 
 namespace gui
 {

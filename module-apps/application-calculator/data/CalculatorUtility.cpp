@@ -1,12 +1,12 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "CalculatorInputProcessor.hpp"
 #include "CalculatorUtility.hpp"
-#include "application-calculator/data/CalculatorInputProcessor.hpp"
-#include "application-calculator/widgets/CalculatorStyle.hpp"
-#include <tinyexpr.h>
+#include <widgets/CalculatorStyle.hpp>
 #include <i18n/i18n.hpp>
-#include <Utils.hpp>
+#include <module-utils/Utils.hpp>
+#include <tinyexpr.h>
 #include <cmath>
 
 namespace calc

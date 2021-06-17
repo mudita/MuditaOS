@@ -1,23 +1,54 @@
-﻿target_sources( ${PROJECT_NAME}
-    PRIVATE
-        "${CMAKE_CURRENT_LIST_DIR}/ApplicationCalculator.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/windows/CalculatorMainWindow.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/widgets/MathOperationsBox.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/data/CalculatorUtility.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/data/CalculatorInputProcessor.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/data/CalculatorInputProcessorText.cpp"
+﻿# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+# For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+add_library(application-calculator STATIC)
+
+target_include_directories(application-calculator
+    PRIVATE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     PUBLIC
-        "${CMAKE_CURRENT_LIST_DIR}/ApplicationCalculator.hpp"
-        "${CMAKE_CURRENT_LIST_DIR}/widgets/CalculatorStyle.hpp"
-        )
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+)
+
+target_sources(application-calculator
+    PRIVATE
+        ApplicationCalculator.cpp
+        data/CalculatorInputProcessor.cpp
+        data/CalculatorInputProcessorText.cpp
+        data/CalculatorUtility.cpp
+        widgets/MathOperationsBox.cpp
+        windows/CalculatorMainWindow.cpp
+   PUBLIC
+        data/CalculatorInputProcessor.hpp
+        data/CalculatorInputProcessorText.hpp
+        data/CalculatorUtility.hpp
+        include/application-calculator/ApplicationCalculator.hpp
+        widgets/CalculatorStyle.hpp
+        widgets/MathOperationsBox.hpp
+        windows/CalculatorMainWindow.hpp
+        
+       
+)
+
+option(ENABLE_APP_CALCULATOR "Enable application calculator" ON)
+
+target_compile_definitions(application-calculator
+    INTERFACE
+        $<$<BOOL:${ENABLE_APP_CALCULATOR}>:ENABLE_APP_CALCULATOR>
+)
 
 if (${ENABLE_TESTS})
-    add_subdirectory( tests )
+    add_subdirectory(tests)
 endif()
 
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(application-calculator
+    PUBLIC
+        apps-common
     PRIVATE
-        service-evtmgr
+        i18n
+        Microsoft.GSL::GSL
+        module-gui
+        module-utils
         tinyexpr::tinyexpr
+        utf8
 )

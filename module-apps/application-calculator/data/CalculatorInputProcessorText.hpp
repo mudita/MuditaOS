@@ -4,7 +4,6 @@
 #pragma once
 
 #include "CalculatorInputProcessor.hpp"
-
 #include <gsl/pointers>
 
 namespace gui
