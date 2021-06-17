@@ -39,7 +39,14 @@ namespace bsp
         virtual void rawDataReceived(void *dataPtr, uint32_t dataLen) = 0;
     };
 
-    int usbInit(xQueueHandle, xQueueHandle, USBDeviceListener *deviceListener = nullptr);
+    struct usbInitParams {
+        xQueueHandle queueHandle;
+        xQueueHandle irqQueueHandle;
+        USBDeviceListener *deviceListener;
+        const char *serialNumber;
+    };
+
+    int usbInit(const usbInitParams &initParams);
     int usbCDCReceive(void *ptr);
     int usbCDCSend(std::string *sendMsg);
     int usbCDCSendRaw(const char *dataPtr, size_t dataLen);

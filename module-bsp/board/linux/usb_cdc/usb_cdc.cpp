@@ -160,7 +160,7 @@ namespace bsp
         LOG_INFO("usbSuspend");
     }
 
-    int usbInit(xQueueHandle receiveQueue, xQueueHandle irqQueue, USBDeviceListener *)
+    int usbInit(const bsp::usbInitParams &initParams)
     {
 
         fd = 0;
@@ -203,8 +203,8 @@ namespace bsp
         tcsetattr(fd, TCSANOW, &newtio);
 
         xTaskHandle taskHandleReceive;
-        USBReceiveQueue = receiveQueue;
-        USBIrqQueue     = irqQueue;
+        USBReceiveQueue = initParams.queueHandle;
+        USBIrqQueue     = initParams.irqQueueHandle;
 
         BaseType_t task_error = xTaskCreate(&bsp::usbDeviceTask,
                                             "USBLinuxReceive",
