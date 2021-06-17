@@ -21,9 +21,11 @@
 
 inline constexpr auto uploadFailedMessage = "file upload terminated before all data transferred";
 
-WorkerDesktop::WorkerDesktop(sys::Service *ownerServicePtr, const sdesktop::USBSecurityModel &securityModel)
+WorkerDesktop::WorkerDesktop(sys::Service *ownerServicePtr,
+                             const sdesktop::USBSecurityModel &securityModel,
+                             const std::string serialNumber)
     : sys::Worker(ownerServicePtr, sdesktop::worker_stack), fileDes(nullptr), securityModel(securityModel),
-      ownerService(ownerServicePtr), parser(ownerServicePtr)
+      serialNumber(serialNumber), ownerService(ownerServicePtr), parser(ownerServicePtr)
 {}
 
 bool WorkerDesktop::init(std::list<sys::WorkerQueueInfo> queues)
@@ -41,7 +43,9 @@ bool WorkerDesktop::init(std::list<sys::WorkerQueueInfo> queues)
     usbSuspendTimer = sys::TimerFactory::createSingleShotTimer(
         ownerService, "usbSuspend", constants::usbSuspendTimeout, [this](sys::Timer &) { suspendUsb(); });
 
-    return (bsp::usbInit(receiveQueue, irqQueue, this) < 0) ? false : true;
+    bsp::usbInitParams initParams = {receiveQueue, irqQueue, this, serialNumber.c_str()};
+
+    return (bsp::usbInit(initParams) < 0) ? false : true;
 }
 
 bool WorkerDesktop::deinit(void)

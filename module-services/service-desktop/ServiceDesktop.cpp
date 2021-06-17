@@ -77,13 +77,24 @@ ServiceDesktop::~ServiceDesktop()
     LOG_INFO("[ServiceDesktop] Cleaning resources");
 }
 
+auto ServiceDesktop::getSerialNumber() const -> std::string
+{
+    return settings->getValue(std::string("factory_data/serial"), settings::SettingsScope::Global);
+}
+
 sys::ReturnCodes ServiceDesktop::InitHandler()
 {
 
     settings = std::make_unique<settings::Settings>();
     settings->init(service::ServiceProxy(shared_from_this()));
     usbSecurityModel = std::make_unique<sdesktop::USBSecurityModel>(this, settings.get());
-    desktopWorker = std::make_unique<WorkerDesktop>(this, *usbSecurityModel.get());
+
+    auto serialNumber = getSerialNumber();
+
+    LOG_DEBUG("Serial Number: %s", serialNumber.c_str());
+
+    desktopWorker = std::make_unique<WorkerDesktop>(this, *usbSecurityModel.get(), serialNumber);
+
     const bool ret =
         desktopWorker->init({{sdesktop::RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_len},
                              {sdesktop::SEND_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_object_size},

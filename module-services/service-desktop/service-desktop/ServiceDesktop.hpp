@@ -110,6 +110,7 @@ class ServiceDesktop : public sys::Service
     }
 
   private:
+    auto getSerialNumber() const -> std::string;
     std::unique_ptr<sdesktop::USBSecurityModel> usbSecurityModel;
     std::unique_ptr<settings::Settings> settings;
     sys::TimerHandle transferTimer;
