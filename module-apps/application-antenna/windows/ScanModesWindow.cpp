@@ -2,16 +2,14 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ScanModesWindow.hpp"
-#include "gui/widgets/BoxLayout.hpp"
-#include "gui/widgets/Item.hpp"
-#include "gui/widgets/Label.hpp"
-#include "gui/widgets/Window.hpp"
-
+#include <application-antenna/AntennaAppStyle.hpp>
+#include <application-antenna/ApplicationAntenna.hpp>
 #include <i18n/i18n.hpp>
-#include <Style.hpp>
-
-#include "../AntennaAppStyle.hpp"
-#include "../ApplicationAntenna.hpp"
+#include <module-gui/gui/widgets/BoxLayout.hpp>
+#include <module-gui/gui/widgets/Item.hpp>
+#include <module-gui/gui/widgets/Label.hpp>
+#include <module-gui/gui/widgets/Style.hpp>
+#include <module-gui/gui/widgets/Window.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
 
 namespace gui
