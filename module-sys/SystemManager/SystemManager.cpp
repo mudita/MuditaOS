@@ -755,6 +755,12 @@ namespace sys
     MessagePointer SystemManager::handleTetheringStateRequest(TetheringStateRequest *request)
     {
         LOG_INFO("Tethering state change requested");
+
+        if (Store::Battery::get().levelState != Store::Battery::LevelState::Normal) {
+            LOG_INFO("Tethering state change refused - battery too low");
+            return MessageNone{};
+        }
+
         if (const auto requestedState = request->getTetheringState(); requestedState == phone_modes::Tethering::On) {
             bus.sendUnicast(std::make_shared<TetheringQuestionRequest>(),
                             app::manager::ApplicationManager::ServiceName);
