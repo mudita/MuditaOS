@@ -5,7 +5,7 @@
 
 #include "AppWindow.hpp"
 
-#include <module-apps/Application.hpp>
+#include <apps-common/Application.hpp>
 #include <module-apps/application-notes/presenter/SearchEngineWindowPresenter.hpp>
 
 #include <module-gui/gui/input/InputEvent.hpp>

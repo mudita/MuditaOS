@@ -5,5 +5,5 @@ add_catch2_executable(
         tests-main.cpp
         test-CallbackStorage.cpp
     LIBS
-        ${PROJECT_NAME}
+        module-apps
 )

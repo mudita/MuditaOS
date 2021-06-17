@@ -7,7 +7,7 @@
 #include <application-onboarding/ApplicationOnBoarding.hpp>
 #include <module-gui/gui/input/InputEvent.hpp>
 #include <module-apps/application-onboarding/data/OnBoardingSwitchData.hpp>
-#include <module-apps/messages/DialogMetadataMessage.hpp>
+#include <apps-common/messages/DialogMetadataMessage.hpp>
 #include <widgets/IceBox.hpp>
 #include <service-appmgr/Controller.hpp>
 

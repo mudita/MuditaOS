@@ -14,28 +14,28 @@ namespace sys::phone_modes
 
 namespace style::window::modes
 {
-    constexpr inline auto top_offset    = 182;
+    constexpr inline auto top_offset        = 182;
     constexpr inline auto bottom_offset     = 235;
-    constexpr inline auto height        = style::window_height - top_offset - bottom_offset;
+    constexpr inline auto height            = style::window_height - top_offset - bottom_offset;
     constexpr inline auto width             = style::window_width;
     constexpr inline auto number_of_entries = 4;
     namespace connected
     {
         constexpr inline auto title_key = "home_modes_connected";
 
-    }     // namespace connected
+    } // namespace connected
 
     namespace notdisturb
     {
         constexpr inline auto title_key = "home_modes_notdisturb";
 
-    }     // namespace notdisturb
+    } // namespace notdisturb
 
     namespace offline
     {
-        constexpr inline auto title_key = "home_modes_offline";
+        constexpr inline auto title_key       = "home_modes_offline";
         constexpr inline auto description_key = "home_modes_message_only";
-    }     // namespace offline
+    } // namespace offline
 
     namespace image
     {
@@ -54,16 +54,13 @@ namespace gui
 
     class ModeRow : public HBox
     {
-        Label *label = nullptr;
+        Label *label  = nullptr;
         ImageBox *img = nullptr;
 
       public:
         ModeRow(Item *parent = nullptr, uint32_t x = 0, uint32_t y = 0, uint32_t width = 0, uint32_t height = 0);
 
-        void addText(const std::string &text,
-                     const std::string &fontSize,
-                     uint32_t width,
-                     uint32_t height);
+        void addText(const std::string &text, const std::string &fontSize, uint32_t width, uint32_t height);
 
         void update(std::pair<std::string, const bool> &&params);
         void addImage(const std::string &imageName);
@@ -71,9 +68,9 @@ namespace gui
 
     class ModesBox : public VBox
     {
-        ModeRow *connected  = nullptr;
-        ModeRow *notDisturb = nullptr;
-        ModeRow *offline    = nullptr;
+        ModeRow *connected   = nullptr;
+        ModeRow *notDisturb  = nullptr;
+        ModeRow *offline     = nullptr;
         ModeRow *messageOnly = nullptr;
 
         void addConnected();

@@ -4,13 +4,13 @@
 #pragma once
 
 #include <vector>
-#include <module-apps/windows/AppWindow.hpp>
-#include <module-apps/windows/Dialog.hpp>
+#include <apps-common/windows/AppWindow.hpp>
+#include <apps-common/windows/Dialog.hpp>
 #include <module-gui/gui/widgets/Label.hpp>
 #include <module-gui/gui/widgets/TextFixedSize.hpp>
 #include <module-gui/gui/widgets/Image.hpp>
 #include <module-gui/gui/widgets/BottomBar.hpp>
-#include <module-apps/widgets/BarGraph.hpp>
+#include <apps-common/widgets/BarGraph.hpp>
 
 namespace gui
 {

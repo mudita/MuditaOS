@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include <module-apps/DatabaseModel.hpp>
+#include <apps-common/DatabaseModel.hpp>
 #include <module-db/Interface/NotesRecord.hpp>
-#include <module-apps/Application.hpp>
+#include <apps-common/Application.hpp>
 
 namespace app::notes
 {

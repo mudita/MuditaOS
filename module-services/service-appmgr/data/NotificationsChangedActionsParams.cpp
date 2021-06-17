@@ -3,7 +3,7 @@
 
 #include <service-appmgr/data/NotificationsChangedActionsParams.hpp>
 
-#include <module-apps/notifications/NotificationData.hpp>
+#include <apps-common/notifications/NotificationData.hpp>
 
 using namespace app::manager::actions;
 

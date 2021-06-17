@@ -6,7 +6,7 @@
 #include <atomic>
 #include <chrono>
 
-#include <module-apps/GuiTimer.hpp>
+#include <apps-common/GuiTimer.hpp>
 #include <application-meditation/ApplicationMeditation.hpp>
 
 #include "BoxLayout.hpp"

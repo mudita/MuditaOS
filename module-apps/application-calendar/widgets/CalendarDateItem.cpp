@@ -2,9 +2,9 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CalendarDateItem.hpp"
-#include <module-apps/widgets/DateAndTimeStyle.hpp>
-#include <module-apps/widgets/DateWidget.hpp>
-#include <module-apps/widgets/WidgetsUtils.hpp>
+#include <apps-common/widgets/DateAndTimeStyle.hpp>
+#include <apps-common/widgets/DateWidget.hpp>
+#include <apps-common/widgets/WidgetsUtils.hpp>
 
 namespace date_and_time = style::window::date_and_time;
 

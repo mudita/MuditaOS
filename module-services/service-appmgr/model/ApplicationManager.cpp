@@ -4,9 +4,9 @@
 #include <service-appmgr/model/ApplicationManager.hpp>
 #include <service-appmgr/Controller.hpp>
 
-#include <module-apps/messages/AppMessage.hpp>
-#include <module-apps/popups/data/PhoneModeParams.hpp>
-#include <module-apps/popups/data/PopupRequestParams.hpp>
+#include <apps-common/messages/AppMessage.hpp>
+#include <apps-common/popups/data/PhoneModeParams.hpp>
+#include <apps-common/popups/data/PopupRequestParams.hpp>
 #include <Common.hpp>
 #include <Service/Message.hpp>
 #include <module-sys/Timers/TimerFactory.hpp>

@@ -54,6 +54,7 @@ target_sources(module-sys PRIVATE ${SOURCES} ${BOARD_SOURCES})
 
 target_link_libraries(module-sys
     PRIVATE
+        apps-common
         bus
         service-evtmgr
         messagetype

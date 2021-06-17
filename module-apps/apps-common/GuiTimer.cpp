@@ -2,9 +2,9 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "GuiTimer.hpp"
-#include "Item.hpp"                    // for Item
+#include "Item.hpp" // for Item
 
-#include "module-apps/Application.hpp" // for Application
+#include <apps-common/Application.hpp> // for Application
 
 #include "module-sys/Timers/SystemTimer.hpp" // for Timer, Timer::Type, Timer::Ty...
 #include "module-sys/Timers/TimerFactory.hpp"

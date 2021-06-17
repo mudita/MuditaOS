@@ -6,8 +6,8 @@
 #include <module-apps/application-notes/ApplicationNotes.hpp>
 #include <module-apps/application-notes/data/NotesFoundData.hpp>
 #include <module-apps/application-notes/style/NotesListStyle.hpp>
-#include <module-apps/windows/DialogMetadata.hpp>
-#include <module-apps/messages/DialogMetadataMessage.hpp>
+#include <apps-common/windows/DialogMetadata.hpp>
+#include <apps-common/messages/DialogMetadataMessage.hpp>
 
 namespace app::notes
 {

@@ -7,7 +7,7 @@
 #include "OptionWindow.hpp"
 #include "Application.hpp"
 
-#include <module-apps/options/type/OptionSetting.hpp>
+#include <apps-common/options/type/OptionSetting.hpp>
 
 namespace gui
 {

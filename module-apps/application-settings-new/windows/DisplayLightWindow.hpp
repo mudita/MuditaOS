@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <module-apps/GuiTimer.hpp>
+#include <apps-common/GuiTimer.hpp>
 #include <module-services/service-evtmgr/screen-light-control/ScreenLightControl.hpp>
 #include <module-apps/application-settings-new/widgets/SpinBox.hpp>
 #include <module-apps/application-settings-new/ApplicationSettings.hpp>

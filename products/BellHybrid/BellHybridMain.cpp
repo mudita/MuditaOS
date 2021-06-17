@@ -4,7 +4,6 @@
 #include "config.h"
 
 // applications
-#include <application-antenna/ApplicationAntenna.hpp>
 #include <application-call/ApplicationCall.hpp>
 #include <application-calllog/ApplicationCallLog.hpp>
 #include <application-desktop/ApplicationDesktop.hpp>
@@ -37,12 +36,6 @@
 #include <service-fileindexer/Constants.hpp>
 #include <service-fileindexer/ServiceFileIndexer.hpp>
 #include <service-desktop/ServiceDesktop.hpp>
-
-#if ENABLE_GSM == 1
-#include <service-fota/ServiceFota.hpp>
-#include <service-cellular/ServiceCellular.hpp>
-#include <service-antenna/ServiceAntenna.hpp>
-#endif
 
 #include <bsp/bsp.hpp>
 #include <Application.hpp>
@@ -87,14 +80,6 @@ int main()
     systemServices.emplace_back(sys::CreatorFor<service::ServiceFileIndexer>());
 #endif
     systemServices.emplace_back(sys::CreatorFor<ServiceDB>());
-#if ENABLE_GSM == 0
-    // For now disable permanently Service cellular when there is no GSM configured
-    LOG_INFO("ServiceCellular (GSM) - Disabled");
-#else
-    systemServices.emplace_back(sys::CreatorFor<ServiceAntenna>());
-    systemServices.emplace_back(sys::CreatorFor<ServiceCellular>());
-    systemServices.emplace_back(sys::CreatorFor<FotaService::Service>());
-#endif
     systemServices.emplace_back(sys::CreatorFor<ServiceAudio>());
     systemServices.emplace_back(sys::CreatorFor<ServiceBluetooth>());
     systemServices.emplace_back(sys::CreatorFor<ServiceLwIP>());
