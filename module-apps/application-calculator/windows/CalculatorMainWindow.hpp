@@ -3,10 +3,10 @@
 
 #pragma once
 
-#include "windows/AppWindow.hpp"
-#include "Application.hpp"
-#include "application-calculator/data/CalculatorInputProcessor.hpp"
-#include "application-calculator/widgets/MathOperationsBox.hpp"
+#include <data/CalculatorInputProcessor.hpp>
+#include <widgets/MathOperationsBox.hpp>
+#include <apps-common/Application.hpp>
+#include <apps-common/windows/AppWindow.hpp>
 #include <module-gui/gui/widgets/Text.hpp>
 
 namespace gui

@@ -1,10 +1,10 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "CalculatorStyle.hpp"
 #include "MathOperationsBox.hpp"
-#include "application-calculator/widgets/CalculatorStyle.hpp"
-#include "application-calculator/data/CalculatorInputProcessor.hpp"
-#include <gui/widgets/Label.hpp>
+#include <data/CalculatorInputProcessor.hpp>
+#include <module-gui/gui/widgets/Label.hpp>
 #include <cassert>
 
 namespace gui
