@@ -184,8 +184,8 @@ std::size_t ContactsNameTable::GetCountByName(const std::string &name)
 
     if (!namePart1.empty() && !namePart2.empty()) {
         queryRet = db->query(
-            "SELECT COUNT(*) FROM contact_name WHERE (name_primary like '%s%%' AND name_alternative like '%s%%') OR "
-            "(name_primary like '%s%%' AND name_alternative like '%s%%');",
+            "SELECT COUNT(*) FROM contact_name WHERE (name_primary like '%q%%' AND name_alternative like '%q%%') OR "
+            "(name_primary like '%q%%' AND name_alternative like '%q%%');",
             namePart1.c_str(),
             namePart2.c_str(),
             namePart2.c_str(),
@@ -193,7 +193,7 @@ std::size_t ContactsNameTable::GetCountByName(const std::string &name)
     }
     else {
         queryRet = db->query(
-            "SELECT COUNT(*) FROM contact_name WHERE name_primary like '%s%%' OR name_alternative like '%s%%';",
+            "SELECT COUNT(*) FROM contact_name WHERE name_primary like '%q%%' OR name_alternative like '%q%%';",
             namePart1.c_str(),
             namePart1.c_str());
     }
