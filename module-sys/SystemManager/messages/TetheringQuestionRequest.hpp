@@ -5,7 +5,7 @@
 
 #include <module-sys/Service/Message.hpp>
 
-#include <module-apps/popups/data/PopupRequestParams.hpp>
+#include <apps-common/popups/data/PopupRequestParams.hpp>
 
 #include <service-appmgr/Actions.hpp>
 #include <service-appmgr/messages/ActionRequest.hpp>

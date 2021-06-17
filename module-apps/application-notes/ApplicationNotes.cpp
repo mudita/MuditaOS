@@ -15,8 +15,8 @@
 #include <module-apps/application-notes/presenter/NotesMainWindowPresenter.hpp>
 #include <module-apps/application-notes/presenter/NotePreviewWindowPresenter.hpp>
 #include <module-apps/application-notes/presenter/NoteEditWindowPresenter.hpp>
-#include <module-apps/windows/OptionWindow.hpp>
-#include <module-apps/windows/Dialog.hpp>
+#include <apps-common/windows/OptionWindow.hpp>
+#include <apps-common/windows/Dialog.hpp>
 #include <module-services/service-db/service-db/DBNotificationMessage.hpp>
 #include <utility>
 

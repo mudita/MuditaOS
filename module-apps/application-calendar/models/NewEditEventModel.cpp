@@ -13,7 +13,7 @@
 #include <application-calendar/ApplicationCalendar.hpp>
 #include <module-db/queries/calendar/QueryEventsAdd.hpp>
 #include <module-db/queries/calendar/QueryEventsEdit.hpp>
-#include <module-apps/messages/DialogMetadataMessage.hpp>
+#include <apps-common/messages/DialogMetadataMessage.hpp>
 
 #include <service-db/DBServiceAPI.hpp>
 #include <time/time_conversion.hpp>

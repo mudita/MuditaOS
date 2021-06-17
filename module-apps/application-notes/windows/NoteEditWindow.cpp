@@ -11,7 +11,7 @@
 #include <module-apps/application-notes/windows/NotesOptions.hpp>
 #include <module-apps/application-notes/data/NoteSwitchData.hpp>
 #include <module-apps/application-notes/style/NoteEditStyle.hpp>
-#include <module-apps/messages/OptionsWindow.hpp>
+#include <apps-common/messages/OptionsWindow.hpp>
 
 #include <i18n/i18n.hpp>
 

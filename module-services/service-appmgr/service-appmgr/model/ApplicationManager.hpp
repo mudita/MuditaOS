@@ -7,8 +7,8 @@
 #include "ApplicationsRegistry.hpp"
 #include "ActionsRegistry.hpp"
 
-#include <module-apps/Application.hpp>
-#include <module-apps/ApplicationLauncher.hpp>
+#include <apps-common/Application.hpp>
+#include <apps-common/ApplicationLauncher.hpp>
 
 #include <bsp/keypad_backlight/keypad_backlight.hpp>
 #include <service-appmgr/messages/Message.hpp>
@@ -31,8 +31,8 @@
 #include <service-eink/Common.hpp>
 
 #include <notifications/NotificationProvider.hpp>
-#include <locks/handlers/PhoneLockHandler.hpp>
-#include <locks/handlers/SimLockHandler.hpp>
+#include <apps-common/locks/handlers/PhoneLockHandler.hpp>
+#include <apps-common/locks/handlers/SimLockHandler.hpp>
 
 namespace app
 {

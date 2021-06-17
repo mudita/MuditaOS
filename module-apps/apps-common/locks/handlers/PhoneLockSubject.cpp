@@ -55,4 +55,4 @@ namespace locks
         owner->bus.sendUnicast(std::make_shared<UnLockPhoneInput>(inputData),
                                app::manager::ApplicationManager::ServiceName);
     }
-} // namespace lock
+} // namespace locks

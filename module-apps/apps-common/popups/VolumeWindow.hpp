@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "module-apps/widgets/BarGraph.hpp"
+#include "apps-common/widgets/BarGraph.hpp"
 #include "WindowWithTimer.hpp"
 
 #include <module-audio/Audio/AudioCommon.hpp>
@@ -13,7 +13,7 @@
 
 namespace style::window::volume
 {
-    constexpr inline auto title_height = 33;
+    constexpr inline auto title_height    = 33;
     constexpr inline auto base_title_key  = "app_popup_volume_text";
     constexpr inline auto music_title_key = "app_popup_music_volume_text";
     constexpr inline auto call_title_key  = "app_popup_call_volume_text";

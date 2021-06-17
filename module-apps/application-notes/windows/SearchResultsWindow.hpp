@@ -7,7 +7,7 @@
 
 #include "AppWindow.hpp"
 
-#include <module-apps/Application.hpp>
+#include <apps-common/Application.hpp>
 #include <module-apps/application-notes/presenter/NotesSearchResultPresenter.hpp>
 
 #include <module-gui/gui/widgets/ListView.hpp>

@@ -4,7 +4,7 @@
 #include "EditQuotesWindow.hpp"
 
 #include <module-apps/application-settings-new/ApplicationSettings.hpp>
-#include <module-apps/options/type/OptionSetting.hpp>
+#include <apps-common/options/type/OptionSetting.hpp>
 
 #include <i18n/i18n.hpp>
 

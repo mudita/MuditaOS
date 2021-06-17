@@ -5,7 +5,7 @@
 
 #include <module-apps/application-notes/ApplicationNotes.hpp>
 #include <module-apps/application-notes/data/NotesFoundData.hpp>
-#include <module-apps/widgets/InputBox.hpp>
+#include <apps-common/widgets/InputBox.hpp>
 
 #include <i18n/i18n.hpp>
 

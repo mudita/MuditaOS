@@ -7,7 +7,7 @@
 #include "module-apps/application-notes/style/NotesListStyle.hpp"
 #include "module-apps/application-notes/windows/NotesOptions.hpp"
 #include "module-apps/application-notes/data/NoteSwitchData.hpp"
-#include <module-apps/messages/OptionsWindow.hpp>
+#include <apps-common/messages/OptionsWindow.hpp>
 
 #include <module-gui/gui/widgets/ListView.hpp>
 #include <module-gui/gui/input/InputEvent.hpp>

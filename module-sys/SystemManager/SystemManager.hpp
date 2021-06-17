@@ -28,7 +28,7 @@
 #include "DeviceManager.hpp"
 #include <chrono>
 #include <vector>
-#include <module-apps/Application.hpp>
+#include <apps-common/Application.hpp>
 
 namespace sys
 {

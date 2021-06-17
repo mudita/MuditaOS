@@ -78,8 +78,8 @@
 #include <module-services/service-appmgr/service-appmgr/messages/Message.hpp>
 #include <module-services/service-appmgr/service-appmgr/model/ApplicationManager.hpp>
 #include <module-apps/application-desktop/windows/Names.hpp>
-#include <module-apps/messages/DialogMetadataMessage.hpp>
-#include <module-apps/windows/Dialog.hpp>
+#include <apps-common/messages/DialogMetadataMessage.hpp>
+#include <apps-common/windows/Dialog.hpp>
 
 #include <i18n/i18n.hpp>
 

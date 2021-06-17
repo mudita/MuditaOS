@@ -6,7 +6,7 @@
 #include <service-appmgr/model/ApplicationManager.hpp>
 #include <service-appmgr/messages/PreventBlockingRequest.hpp>
 #include <service-desktop/service-desktop/ServiceDesktop.hpp>
-#include <module-apps/locks/data/PhoneLockMessages.hpp>
+#include <apps-common/locks/data/PhoneLockMessages.hpp>
 #include <json11.hpp>
 
 namespace parserFSM

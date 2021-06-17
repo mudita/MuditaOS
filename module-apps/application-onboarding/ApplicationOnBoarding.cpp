@@ -22,8 +22,8 @@
 #include <module-apps/application-settings-new/data/LanguagesData.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <module-apps/application-settings-new/windows/ChangeTimeZone.hpp>
-#include <module-apps/locks/data/PhoneLockMessages.hpp>
-#include <module-apps/locks/data/SimLockMessages.hpp>
+#include <apps-common/locks/data/PhoneLockMessages.hpp>
+#include <apps-common/locks/data/SimLockMessages.hpp>
 #include <service-appmgr/service-appmgr/model/ApplicationManager.hpp>
 
 namespace app

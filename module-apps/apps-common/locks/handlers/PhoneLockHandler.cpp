@@ -8,7 +8,7 @@
 #include <Utils.hpp>
 #include <memory>
 
-#include <module-apps/popups/data/PopupRequestParams.hpp>
+#include <apps-common/popups/data/PopupRequestParams.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
 
 namespace locks

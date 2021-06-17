@@ -3,8 +3,8 @@
 
 #include "CalendarDateItem.hpp"
 #include "CalendarTimeItem.hpp"
-#include <module-apps/widgets/DateAndTimeStyle.hpp>
-#include <module-apps/widgets/WidgetsUtils.hpp>
+#include <apps-common/widgets/DateAndTimeStyle.hpp>
+#include <apps-common/widgets/WidgetsUtils.hpp>
 #include <module-gui/gui/input/InputEvent.hpp>
 
 namespace date_and_time = style::window::date_and_time;

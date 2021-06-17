@@ -9,7 +9,7 @@
 
 #include <widgets/IceBox.hpp>
 #include <service-appmgr/Controller.hpp>
-#include <module-apps/messages/DialogMetadataMessage.hpp>
+#include <apps-common/messages/DialogMetadataMessage.hpp>
 
 namespace app::onBoarding
 {

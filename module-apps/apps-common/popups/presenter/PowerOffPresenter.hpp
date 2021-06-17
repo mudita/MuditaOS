@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <module-apps/Application.hpp>
+#include <apps-common/Application.hpp>
 
 namespace gui
 {
