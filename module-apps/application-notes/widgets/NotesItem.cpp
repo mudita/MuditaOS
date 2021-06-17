@@ -6,7 +6,7 @@
 #include <Style.hpp>
 #include <module-apps/application-notes/style/NotesListStyle.hpp>
 
-#include <time/time_conversion.hpp>
+#include <time/time_conversion_factory.hpp>
 
 namespace gui
 {
@@ -56,12 +56,9 @@ namespace gui
 
     void NotesItem::setDateText(std::uint32_t timestamp)
     {
-        if (auto dt = utils::time::DateTime(timestamp); dt.isYesterday()) {
-            date->setText(utils::translate("common_yesterday"));
-        }
-        else {
-            date->setText(dt);
-        }
+        using namespace utils::time;
+        auto dt = createTimestamp(TimestampType::DateTime, timestamp);
+        date->setText(*dt);
     }
 
     bool NotesItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)

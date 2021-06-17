@@ -124,13 +124,6 @@ namespace gui
 
     bool AppWindow::updateTime()
     {
-        applyToStatusBar([](status_bar::Configuration configuration) {
-            using TimeMode = gui::status_bar::TimeConfiguration::TimeMode;
-            auto modifier  = std::make_shared<gui::status_bar::TimeConfiguration>(
-                utils::dateAndTimeSettings.isTimeFormat12() ? TimeMode::Time12h : TimeMode::Time24h);
-            configuration.setIndicatorModifier(gui::status_bar::Indicator::Time, std::move(modifier));
-            return configuration;
-        });
         if (statusBar == nullptr) {
             return false;
         }

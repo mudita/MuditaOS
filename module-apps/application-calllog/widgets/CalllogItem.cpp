@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CalllogItem.hpp"
-#include "time/time_conversion.hpp"
+#include <time/time_conversion_factory.hpp>
 #include "../data/CallLogInternals.hpp"
 #include "gui/widgets/BoxLayout.hpp"
 
@@ -13,7 +13,7 @@ using namespace calllog;
 namespace gui
 {
 
-    CalllogItem::CalllogItem(CalllogModel *model, bool mode24H) : model{model}, mode24H{mode24H}
+    CalllogItem::CalllogItem(CalllogModel *model) : model{model}
     {
         setMargins(Margins(0, style::margins::big, 0, 0));
         setMinimumSize(clItemStyle::w, clItemStyle::h);
@@ -74,7 +74,8 @@ namespace gui
 
         imageCallType[static_cast<uint32_t>(callType)]->setVisible(true);
 
-        timestamp->setText(utils::time::DateTime(call->date));
+        using namespace utils::time;
+        timestamp->setText(*createTimestamp(TimestampType::DateTime, call->date));
     }
 
 } /* namespace gui */

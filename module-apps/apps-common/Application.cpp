@@ -111,10 +111,6 @@ namespace app
           lockPolicyHandler(this), simLockSubject(this)
     {
         statusBarManager->enableIndicators({gui::status_bar::Indicator::Time});
-        using TimeMode = gui::status_bar::TimeConfiguration::TimeMode;
-        auto modifier  = std::make_shared<gui::status_bar::TimeConfiguration>(
-            utils::dateAndTimeSettings.isTimeFormat12() ? TimeMode::Time12h : TimeMode::Time24h);
-        statusBarManager->set(gui::status_bar::Indicator::Time, std::move(modifier));
 
         bus.channels.push_back(sys::BusChannel::ServiceCellularNotifications);
 

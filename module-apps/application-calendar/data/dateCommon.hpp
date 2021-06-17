@@ -6,7 +6,7 @@
 
 #include <date/date.h>
 #include <time/DateAndTimeSettings.hpp>
-#include <time/time_conversion.hpp>
+#include <time/time_conversion_factory.hpp>
 #include <Utils.hpp>
 #include <random>
 
@@ -258,16 +258,18 @@ inline std::string TimePointToString(const TimePoint &tp, date::years years)
 
 inline std::string TimePointToLocalizedDateString(const TimePoint &tp, const std::string format = "")
 {
+    using namespace utils::time;
     auto time = TimePointToTimeT(tp);
-    utils::time::Date timestamp(time);
-    return timestamp.str(format);
+    auto timestamp = createTimestamp(TimestampType::Date, time);
+    return timestamp->str(format);
 }
 
 inline std::string TimePointToLocalizedTimeString(const TimePoint &tp, const std::string format = "")
 {
+    using namespace utils::time;
     auto time = TimePointToTimeT(tp);
-    utils::time::Time timestamp(time);
-    return timestamp.str(format);
+    auto timestamp = createTimestamp(TimestampType::Time, time);
+    return timestamp->str(format);
 }
 
 inline std::string TimePointToLocalizedHourMinString(const TimePoint &tp)

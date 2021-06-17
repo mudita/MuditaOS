@@ -10,7 +10,7 @@
 #include <apps-common/messages/OptionsWindow.hpp>
 
 #include <i18n/i18n.hpp>
-#include <time/time_conversion.hpp>
+#include <time/time_conversion_factory.hpp>
 
 #include <Style.hpp>
 
@@ -93,16 +93,21 @@ namespace app::notes
 
     void NotePreviewWindow::setEditDateText(std::uint32_t timestamp)
     {
-        utils::time::DateTime dt{timestamp};
+        using namespace utils::time;
+        auto dateTime = createTimestamp(TimestampType::DateTime, timestamp);
+        auto dt       = dynamic_cast<DateTime *>(dateTime.get());
+        if (dt == nullptr) {
+            return;
+        }
         std::ostringstream dateText;
         dateText << utils::translate("app_notes_edited") << ": ";
-        if (dt.isToday()) {
+        if (dt->isToday()) {
             dateText << utils::translate("common_today") << ", ";
         }
-        else if (dt.isYesterday()) {
+        else if (dt->isYesterday()) {
             dateText << utils::translate("common_yesterday") << ", ";
         }
-        dateText << dt;
+        dateText << *dt;
         date->setText(dateText.str());
     }
 
