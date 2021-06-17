@@ -12,8 +12,8 @@
 
 #include <memory>
 #include <module-services/service-db/service-db/DBServiceAPI.hpp>
-#include <module-apps/options/type/OptionCall.hpp>
-#include <module-apps/options/type/OptionContact.hpp>
+#include <apps-common/options/type/OptionCall.hpp>
+#include <apps-common/options/type/OptionContact.hpp>
 
 std::list<gui::Option> smsWindowOptions(app::ApplicationMessages *app, const SMSRecord &record)
 {

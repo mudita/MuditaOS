@@ -15,7 +15,6 @@ namespace locks
     class Lock
     {
       public:
-
         enum class LockState
         {
             Unlocked,
@@ -101,4 +100,4 @@ namespace locks
         friend class SimLockHandler;
     };
 
-} // namespace lock
+} // namespace locks

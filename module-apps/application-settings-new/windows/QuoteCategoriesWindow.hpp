@@ -7,7 +7,7 @@
 #include <application-settings-new/widgets/CategoryWidget.hpp>
 #include <application-settings-new/models/CategoriesModel.hpp>
 #include <module-gui/gui/widgets/ListView.hpp>
-#include <module-apps/InternalModel.hpp>
+#include <apps-common/InternalModel.hpp>
 
 namespace gui
 {

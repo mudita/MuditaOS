@@ -9,7 +9,7 @@
 
 #include <purefs/filesystem_paths.hpp>
 #include <module-gui/gui/widgets/ListView.hpp>
-#include <module-apps/InternalModel.hpp>
+#include <apps-common/InternalModel.hpp>
 #include <utility>
 
 namespace gui

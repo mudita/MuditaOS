@@ -3,10 +3,10 @@
 
 #pragma once
 
-#include "module-apps/Application.hpp"
+#include <apps-common/Application.hpp>
 #include "AppWindow.hpp"
-#include "module-apps/widgets/BarGraph.hpp"
-#include "module-apps/widgets/BightnessBox.hpp"
+#include "apps-common/widgets/BarGraph.hpp"
+#include "apps-common/widgets/BightnessBox.hpp"
 #include <functional>
 
 namespace gui

@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <module-apps/BasePresenter.hpp>
+#include <apps-common/BasePresenter.hpp>
 
 #include <module-apps/application-notes/model/NotesListModel.hpp>
 

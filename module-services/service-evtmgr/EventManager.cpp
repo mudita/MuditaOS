@@ -41,7 +41,7 @@
 #include <filesystem>
 #include <list>
 #include <ctime>
-#include <module-apps/messages/AppMessage.hpp>
+#include <apps-common/messages/AppMessage.hpp>
 #include <SystemManager/messages/CpuFrequencyMessage.hpp>
 #include <EventStore.hpp>
 #include <SystemManager/messages/PhoneModeRequest.hpp>

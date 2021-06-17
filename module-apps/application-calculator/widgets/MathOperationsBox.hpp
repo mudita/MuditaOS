@@ -1,8 +1,8 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-#include "module-apps/Application.hpp"
+#include <apps-common/Application.hpp>
 #include <module-gui/gui/widgets/Item.hpp>
 #include <module-gui/gui/widgets/GridLayout.hpp>
 

@@ -6,8 +6,8 @@
 #include <application-onboarding/ApplicationOnBoarding.hpp>
 #include <application-onboarding/data/OnBoardingSwitchData.hpp>
 
-#include <module-apps/windows/DialogMetadata.hpp>
-#include <module-apps/messages/DialogMetadataMessage.hpp>
+#include <apps-common/windows/DialogMetadata.hpp>
+#include <apps-common/messages/DialogMetadataMessage.hpp>
 #include <widgets/IceBox.hpp>
 #include <service-appmgr/Controller.hpp>
 

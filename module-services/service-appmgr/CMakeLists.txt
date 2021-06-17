@@ -35,10 +35,10 @@ target_link_libraries(${PROJECT_NAME}
         service-cellular
         service-db
         service-gui
-        module-apps
         module-audio
         json::json
     PUBLIC
+        apps-common
         time
 )
 

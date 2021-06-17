@@ -7,7 +7,7 @@
 #include <Label.hpp>
 #include <Text.hpp>
 #include <BoxLayout.hpp>
-#include <module-apps/Application.hpp>
+#include <apps-common/Application.hpp>
 #include <module-apps/application-calendar/ApplicationCalendar.hpp>
 
 namespace gui

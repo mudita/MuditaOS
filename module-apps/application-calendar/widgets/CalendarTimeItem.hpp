@@ -4,7 +4,7 @@
 #pragma once
 
 #include "CalendarListItem.hpp"
-#include <module-apps/widgets/TimeWidget.hpp>
+#include <apps-common/widgets/TimeWidget.hpp>
 
 namespace gui
 {

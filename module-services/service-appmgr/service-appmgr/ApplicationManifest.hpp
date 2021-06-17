@@ -4,7 +4,7 @@
 #pragma once
 
 #include "service-appmgr/Actions.hpp"
-#include <locks/handlers/LockPolicyHandler.hpp>
+#include <apps-common/locks/handlers/LockPolicyHandler.hpp>
 
 namespace app::manager
 {
