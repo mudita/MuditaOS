@@ -33,6 +33,16 @@ namespace utils
 
         class Duration; // fw decl
 
+        class TimeSettingsInterface
+        {
+          public:
+            virtual ~TimeSettingsInterface()
+            {}
+
+            virtual bool isTimeFormat12h() const  = 0;
+            virtual bool isDateFormatDDMM() const = 0;
+        };
+
         class Timestamp : protected Localer
         {
           protected:
@@ -47,8 +57,8 @@ namespace utils
 
           public:
             explicit Timestamp(time_t newtime = 0);
+            virtual ~Timestamp() = default;
 
-            /// set Time time_t value held (set timestamp)
             void set_time(time_t newtime);
             void set_format(std::string format)
             {
@@ -120,12 +130,16 @@ namespace utils
             /// converter -> returns time in past: (val) and stores localtime in ref_time
             void before_n_sec(time_t val);
 
+          protected:
+            const TimeSettingsInterface &timeSettings;
+
           public:
             /// shows time in past
             ///
             /// @val - timestamp in seconds
-            /// @date_format_long - long or short format
-            explicit DateTime(time_t val) : Timestamp(std::time(nullptr))
+            /// @timeSettings - time settings interface
+            explicit DateTime(const TimeSettingsInterface &timeSettings, time_t val)
+                : Timestamp(std::time(nullptr)), timeSettings(timeSettings)
             {
                 before_n_sec(val);
             }
@@ -146,14 +160,29 @@ namespace utils
         class Date : public DateTime
         {
           public:
-            Date(time_t val = 0) : DateTime(val){};
+            explicit Date(const TimeSettingsInterface &timeSettings, time_t val = 0) : DateTime(timeSettings, val){};
+            UTF8 str(std::string format = "") const final;
+        };
+
+        class DateText : public DateTime
+        {
+          public:
+            explicit DateText(const TimeSettingsInterface &timeSettings, time_t val = 0)
+                : DateTime(timeSettings, val){};
             UTF8 str(std::string format = "") const final;
         };
 
         class Time : public DateTime
         {
           public:
-            Time(time_t val = 0) : DateTime(val){};
+            explicit Time(const TimeSettingsInterface &timeSettings, time_t val = 0) : DateTime(timeSettings, val){};
+            UTF8 str(std::string format = "") const final;
+        };
+
+        class Clock : public DateTime
+        {
+          public:
+            explicit Clock(const TimeSettingsInterface &timeSettings, time_t val = 0) : DateTime(timeSettings, val){};
             UTF8 str(std::string format = "") const final;
         };
 

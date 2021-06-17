@@ -18,6 +18,7 @@ target_sources(time
         time/time_date_validation.cpp
         time/TimeRangeParser.cpp
         time/TimeZone.cpp
+        time/time_conversion_factory.cpp
 )
 
 target_include_directories(time PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)

@@ -17,7 +17,7 @@
 
 #include <gsl/assert>
 #include <i18n/i18n.hpp>
-#include <time/time_conversion.hpp>
+#include <time/time_conversion_factory.hpp>
 #include <Style.hpp>
 #include <cassert>
 
@@ -196,14 +196,13 @@ namespace gui
     void CallLogDetailsWindow::initDateWidgets()
     {
         Expects(dateDay != nullptr && dateDate != nullptr);
-        using utils::time::Locale;
-        utils::time::Timestamp t(record.date);
-        dateDay->setText(t.day() + ",");
+        using namespace utils::time;
+        auto date = createTimestamp(TimestampType::Date, record.date);
+        auto time = createTimestamp(TimestampType::Time, record.date);
 
-        auto timeFormat = Locale::format(utils::dateAndTimeSettings.getTimeFormat());
-        auto dateFormat = utils::translate("locale_date_full");
+        dateDay->setText(date->day() + ",");
 
-        dateDate->setText(t.str(dateFormat + ", " + timeFormat));
+        dateDate->setText(date->str() + ", " + time->str());
     }
 
     void CallLogDetailsWindow::onBeforeShow(ShowMode mode, SwitchData *data)

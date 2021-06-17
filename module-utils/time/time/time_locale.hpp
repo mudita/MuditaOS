@@ -21,7 +21,7 @@ namespace utils
         {
             static const int num_days       = 7;
             static const int num_monts      = 12;
-            static const int num_formatters = 5;
+            static const int num_formatters = 9;
             // imo it would be nicer to have datetime locales in different json with thiny bit nicer and more effective
             // getters
             const std::array<std::string, num_days> daysShort = {
@@ -48,13 +48,15 @@ namespace utils
                                                                "common_november",
                                                                "common_december"};
 
-            const std::array<std::string, num_formatters> time_formats{
-                "locale_12hour_min",
-                "locale_12hour_min_short",
-                "locale_24hour_min",
-                "locale_date_full",
-                "locale_date_short",
-            };
+            const std::array<std::string, num_formatters> time_formats{"locale_12hour_min",
+                                                                       "locale_12hour_min_short",
+                                                                       "locale_24hour_min",
+                                                                       "locale_date_DD_MM_YYYY",
+                                                                       "locale_date_MM_DD_YYYY",
+                                                                       "locale_date_DD_MM",
+                                                                       "locale_date_MM_DD",
+                                                                       "locale_date_Day_DD_Mon",
+                                                                       "locale_date_Day_Mon_DD"};
 
             const std::string ltoday     = "common_today";
             const std::string lyesterday = "common_yesterday";
@@ -96,11 +98,15 @@ namespace utils
 
             enum class TimeFormat
             {
-                FormatTime12H = 0,     // H:M in 12h format
-                FormatTime12HShort,    // H:M in 12h format, am/pm excluded
-                FormatTime24H,         // H:M in 24h format
-                FormatLocaleDateFull,  // format locale specified format
-                FormatLocaleDateShort, // format locale specified format
+                FormatTime12H,      // H:M in 12h format
+                FormatTime12HShort, // H:M in 12h format, am/pm excluded
+                FormatTime24H,      // H:M in 24h format
+                FormatLocaleDate_DD_MM_YYYY,
+                FormatLocaleDate_MM_DD_YYYY,
+                FormatLocaleDate_DD_MM,
+                FormatLocaleDate_MM_DD,
+                FormatDate_Day_DD_Month,
+                FormatDate_Day_Month_DD,
             };
             static constexpr TimeFormat defaultTimeFormat      = TimeFormat::FormatTime24H;
             static constexpr std::string_view time_format_12_H = "12 H";
