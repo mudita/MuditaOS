@@ -3,10 +3,10 @@
 
 #pragma once
 
-#include <module-sys/Timers/TimerHandle.hpp>
-#include <Application.hpp>
-#include <service-cellular/CellularServiceAPI.hpp>
 #include <windows/AppWindow.hpp>
+#include <apps-common/Application.hpp>
+#include <module-sys/Timers/TimerHandle.hpp>
+#include <service-cellular/CellularServiceAPI.hpp>
 
 namespace app
 {

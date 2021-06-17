@@ -11,7 +11,7 @@
 #ifndef MODULE_APPS_APPLICATION_ANTENNA_ANTENNAAPPSTYLE_HPP_
 #define MODULE_APPS_APPLICATION_ANTENNA_ANTENNAAPPSTYLE_HPP_
 
-#include <Style.hpp>
+#include <module-gui/gui/widgets/Style.hpp>
 
 namespace antenna
 {
