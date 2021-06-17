@@ -6,14 +6,16 @@ add_catch2_executable(
     NAME
         calculator
     SRCS
-        "${CMAKE_CURRENT_SOURCE_DIR}/tests-main.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/CalculatorInput_tests.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/CalculatorUtility_tests.cpp"
+        tests-main.cpp
+        CalculatorInput_tests.cpp
+        CalculatorUtility_tests.cpp
     LIBS
-        module-sys
+        application-calculator
         iosyscalls
-        module-apps
-        module-utils
+        module-gui
+        module-sys
     DEPS
         assets
 )
+
+target_include_directories(catch2-calculator PRIVATE $<TARGET_PROPERTY:application-calculator,INCLUDE_DIRECTORIES>)
