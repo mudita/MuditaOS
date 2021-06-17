@@ -5,7 +5,7 @@
 
 #include <log/log.hpp>
 #include <messages/DialogMetadataMessage.hpp>
-#include <module-apps/Application.hpp>
+#include <apps-common/Application.hpp>
 #include <SystemManager/messages/TetheringStateRequest.hpp>
 #include <service-appmgr/Controller.hpp>
 

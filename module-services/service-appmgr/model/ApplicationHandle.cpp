@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <service-appmgr/model/ApplicationHandle.hpp>
-#include <module-apps/ApplicationLauncher.hpp>
+#include <apps-common/ApplicationLauncher.hpp>
 
 namespace app::manager
 {

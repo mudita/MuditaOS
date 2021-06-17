@@ -1,5 +1,4 @@
 ﻿project(service-antenna)
-message( "${PROJECT_NAME}  ${CMAKE_CURRENT_LIST_DIR}" )
 
 set(SOURCES
     ServiceAntenna.cpp

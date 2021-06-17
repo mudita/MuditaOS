@@ -5,7 +5,7 @@
 
 #include <functional>
 
-#include <module-apps/Application.hpp>
+#include <apps-common/Application.hpp>
 
 #include <module-db/Interface/NotesRecord.hpp>
 

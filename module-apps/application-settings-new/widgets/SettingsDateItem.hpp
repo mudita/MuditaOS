@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <module-apps/widgets/DateWidget.hpp>
+#include <apps-common/widgets/DateWidget.hpp>
 #include <widgets/DateOrTimeListItem.hpp>
 
 namespace gui

@@ -6,8 +6,8 @@
 #include <Option.hpp>
 #include <Clipboard.hpp>
 
-#include <module-apps/windows/DialogMetadata.hpp>
-#include <module-apps/messages/DialogMetadataMessage.hpp>
+#include <apps-common/windows/DialogMetadata.hpp>
+#include <apps-common/messages/DialogMetadataMessage.hpp>
 
 #include <i18n/i18n.hpp>
 

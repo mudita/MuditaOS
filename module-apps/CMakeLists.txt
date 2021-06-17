@@ -6,50 +6,10 @@ project(module-apps VERSION 1.0
 
 module_is_test_entity()
 
-if(${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
-    include(targets/Target_RT1051.cmake)
-elseif(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
-    include(targets/Target_Linux.cmake)
-else()
-    message(FATAL_ERROR "Invalid target!")
-endif()
+add_library(${PROJECT_NAME} STATIC)
 
-set( SOURCES 
-    "Application.cpp"
-    "GuiTimer.cpp"
-    "DOMResponder.cpp"
-    "WindowsFactory.cpp"
-    "StatusBarManager.cpp"
-    "AsyncTask.cpp"
-    "CallbackStorage.cpp"
-    "windows/AppWindow.cpp"
-    "windows/OptionWindow.cpp"
-    "windows/Dialog.cpp"
-    "windows/NoEvents.cpp"
-    "widgets/ButtonOnOff.cpp"
-    "widgets/InputBox.cpp"
-    "windows/BrightnessWindow.cpp"
-    "widgets/BrightnessBox.cpp"
-    "widgets/ModesBox.cpp"
-    "widgets/BarGraph.cpp"
-    "widgets/ActiveIconFactory.cpp"
-    "widgets/TextWithIconsWidget.cpp"
-    "widgets/DateWidget.cpp"
-    "widgets/IceBox.cpp"
-    "widgets/TimeWidget.cpp"
-    "widgets/WidgetsUtils.cpp"
-    "notifications/NotificationListItem.cpp"
-    "notifications/NotificationsModel.cpp"
-    "notifications/NotificationProvider.cpp"
-    "options/OptionsModel.cpp"
-    "options/type/OptionSimple.cpp"
-    "options/type/OptionCall.cpp"
-    "options/type/OptionContact.cpp"
-    "options/type/OptionSetting.cpp"
-    "options/type/OptionWithActiveIcons.cpp"
-    "notifications/NotificationData.cpp")
-
-add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
+add_subdirectory(apps-common)
+add_subdirectory(application-antenna)
 
 set(APPLICATIONS
     clock
@@ -64,7 +24,6 @@ set(APPLICATIONS
     messages
     calllog
     special-input
-    antenna
     music-player
     meditation
     calculator
@@ -108,20 +67,11 @@ if(${ENABLE_VOLTE})
     target_compile_definitions(${PROJECT_NAME} PUBLIC ENABLE_VOLTE=1)
 endif()
 
-include_directories( ../module-sys )
-include_directories( ../module-utils )
-include_directories( ../module-services )
-include_directories( ../module-gui )
-include_directories( ../module-os )
-include_directories( ../module-bsp )
-include_directories( ../module-db )
-
-add_subdirectory(popups)
-add_subdirectory(locks)
 add_subdirectory(application-bell-main)
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
+        apps-common
         date::date
         service-antenna
         service-appmgr
@@ -160,19 +110,8 @@ target_include_directories(${PROJECT_NAME}
         PUBLIC
 
         ${CMAKE_CURRENT_SOURCE_DIR}
-        ${CMAKE_CURRENT_SOURCE_DIR}/messages
-        ${CMAKE_CURRENT_SOURCE_DIR}/windows
-        ${CMAKE_CURRENT_SOURCE_DIR}/options
-        ${CMAKE_CURRENT_SOURCE_DIR}/options/type
         ${CMAKE_BINARY_DIR}
 )
-
-
-target_compile_definitions(${PROJECT_NAME}
-
-        PUBLIC
-
-        )
 
 target_compile_options(${PROJECT_NAME}
 
@@ -186,11 +125,6 @@ target_compile_options(${PROJECT_NAME}
         $<$<COMPILE_LANGUAGE:CXX>:-fno-non-call-exceptions>
         $<$<COMPILE_LANGUAGE:CXX>:-Wno-literal-suffix>
 
-)
-
-target_compile_features(${PROJECT_NAME} PUBLIC
-
-        cxx_std_14
 )
 
 if (${ENABLE_TESTS})

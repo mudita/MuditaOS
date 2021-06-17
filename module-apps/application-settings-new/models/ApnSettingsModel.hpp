@@ -5,7 +5,7 @@
 
 #include <service-cellular/PacketDataTypes.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
-#include <module-apps/Application.hpp>
+#include <apps-common/Application.hpp>
 
 class ApnSettingsModel
 {

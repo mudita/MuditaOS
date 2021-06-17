@@ -20,7 +20,7 @@ namespace style::window::lock_input
         constexpr inline auto h            = 60;
         constexpr inline auto label_margin = 10;
         constexpr inline auto top_margin   = 30;
-    } // namespace pin_label
+    } // namespace input_box
 
     namespace primary_text
     {

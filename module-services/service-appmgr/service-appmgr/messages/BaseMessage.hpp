@@ -5,7 +5,7 @@
 
 #include <Service/Message.hpp>
 #include <MessageType.hpp>
-#include <module-apps/Application.hpp>
+#include <apps-common/Application.hpp>
 
 namespace app::manager
 {

@@ -31,7 +31,7 @@
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <magic_enum.hpp>
 #include <module-services/service-desktop/service-desktop/Constants.hpp>
-#include <module-apps/messages/AppMessage.hpp>
+#include <apps-common/messages/AppMessage.hpp>
 #include <SystemManager/messages/SystemManagerMessage.hpp>
 #include <module-gui/gui/widgets/status-bar/SIM.hpp>
 #include <service-db/DBNotificationMessage.hpp>

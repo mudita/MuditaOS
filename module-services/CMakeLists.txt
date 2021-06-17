@@ -41,7 +41,6 @@ target_link_libraries(${PROJECT_NAME}
         module-sys
         module-utils
         module-gui
-        module-apps
         module-db
         module-cellular
         module-audio

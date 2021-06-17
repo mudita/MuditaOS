@@ -5,7 +5,7 @@
 #include <application-settings-new/widgets/SettingsTimeItem.hpp>
 #include "DateAndTimeModel.hpp"
 #include <ListView.hpp>
-#include <module-apps/widgets/DateAndTimeStyle.hpp>
+#include <apps-common/widgets/DateAndTimeStyle.hpp>
 #include <time/DateAndTimeSettings.hpp>
 
 DateAndTimeModel::DateAndTimeModel(app::Application *application) : app(application)

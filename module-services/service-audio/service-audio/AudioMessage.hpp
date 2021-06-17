@@ -8,7 +8,7 @@
 #include <MessageType.hpp>
 #include <service-appmgr/service-appmgr/messages/ActionRequest.hpp>
 #include <module-services/service-appmgr/service-appmgr/Actions.hpp>
-#include <module-apps/popups/data/PopupRequestParams.hpp>
+#include <apps-common/popups/data/PopupRequestParams.hpp>
 
 #include <Service/Message.hpp>
 

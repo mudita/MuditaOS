@@ -14,7 +14,7 @@
 #include <application-calendar/windows/NewEditEventWindow.hpp>
 #include <application-calendar/windows/CustomRepeatWindow.hpp>
 #include <application-calendar/windows/EventReminderWindow.hpp>
-#include <module-apps/messages/DialogMetadataMessage.hpp>
+#include <apps-common/messages/DialogMetadataMessage.hpp>
 #include <module-db/queries/calendar/QueryEventsAdd.hpp>
 #include <service-db/DBServiceAPI.hpp>
 #include <service-db/QueryMessage.hpp>
