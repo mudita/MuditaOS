@@ -34,7 +34,8 @@ namespace gui
 
         setTitle(utils::translate("app_settings_cellular_passthrough"));
 
-        layout = new VBox(this, 0, title->offset_h(), style::window_width, 8 * style::window::label::big_h);
+        layout = new VBox(
+            this, 0, style::window::default_vertical_pos, style::window_width, 8 * style::window::label::big_h);
         layout->setPenFocusWidth(style::window::default_border_no_focus_w);
 
         statusHbox = new gui::HBox(layout,

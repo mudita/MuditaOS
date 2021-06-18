@@ -273,15 +273,13 @@ namespace gui
 
         using namespace style::window;
         mainMenu->setSize(this->area().w - default_left_margin - default_right_margin,
-                          bottomBar->area().pos(Axis::Y) - this->title->getOffset(Axis::Y) -
-                              style::design::grid_offset);
-        mainMenu->setPosition(default_left_margin, title->getOffset(Axis::Y) + style::design::grid_offset);
+                          bottomBar->area().pos(Axis::Y) - default_vertical_pos - style::design::grid_offset);
+        mainMenu->setPosition(default_left_margin, default_vertical_pos + style::design::grid_offset);
         mainMenu->setVisible(false);
 
         toolsMenu->setSize(this->area().w - default_left_margin - default_right_margin,
-                           bottomBar->area().pos(Axis::Y) - this->title->getOffset(Axis::Y) -
-                               style::design::grid_offset);
-        toolsMenu->setPosition(default_left_margin, title->getOffset(Axis::Y) + style::design::grid_offset);
+                           bottomBar->area().pos(Axis::Y) - default_vertical_pos - style::design::grid_offset);
+        toolsMenu->setPosition(default_left_margin, default_vertical_pos + style::design::grid_offset);
         toolsMenu->setVisible(false);
 
         switchMenu(mainMenu);

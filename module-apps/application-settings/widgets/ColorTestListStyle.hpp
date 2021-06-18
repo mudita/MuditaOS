@@ -10,7 +10,7 @@ namespace style::colorTest
     namespace listview
     {
         inline constexpr auto x      = style::window::default_left_margin;
-        inline constexpr auto y      = style::header::height;
+        inline constexpr auto y      = style::window::default_vertical_pos;
         inline constexpr auto width  = style::listview::body_width_with_scroll;
         inline constexpr auto height = style::window_height - y - style::footer::height;
     } // namespace listview

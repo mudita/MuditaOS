@@ -74,7 +74,7 @@ void PostUpdateWindow::buildInterface()
 
     infoIcon = new gui::Icon(this,
                              style::window::default_left_margin,
-                             style::header::height,
+                             style::window::default_vertical_pos,
                              style::window::default_body_width,
                              style::window::default_body_height,
                              "circle_success",

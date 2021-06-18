@@ -50,9 +50,9 @@ namespace gui
         modeButtonParams.insert(std::pair<uint32_t, std::string>(scanModes::CDMA_and_HDR_only, "CDMA and HDR only"));
 
         uint32_t w = this->getWidth() - style::window::default_left_margin * 2;
-        uint32_t h = this->getHeight() - title->offset_h() - bottomBar->getHeight();
+        uint32_t h = this->getHeight() - style::window::default_vertical_pos - bottomBar->getHeight();
 
-        modesBox = new gui::VBox(this, style::window::default_left_margin, (uint32_t)title->offset_h(), w, h);
+        modesBox = new gui::VBox(this, style::window::default_left_margin, style::window::default_vertical_pos, w, h);
         modesBox->setPenWidth(0);
         modesBox->setPenFocusWidth(0);
         modesBox->setEdges(gui::RectangleEdge::None);

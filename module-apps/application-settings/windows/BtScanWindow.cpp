@@ -65,7 +65,8 @@ namespace gui
 
         setTitle(utils::translate("BT_scan_results"));
 
-        box = new gui::VBox(this, 0, title->offset_h(), style::window_width, 7 * style::window::label::default_h);
+        box = new gui::VBox(
+            this, 0, style::window::default_vertical_pos, style::window_width, 7 * style::window::label::default_h);
 
         for (auto device : devices) {
             add_box_label2(box, device.name, [=](Item &) {

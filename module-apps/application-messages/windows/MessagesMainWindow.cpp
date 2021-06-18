@@ -74,9 +74,9 @@ namespace gui
 
         emptyListIcon = new Icon(this,
                                  0,
-                                 style::header::height,
+                                 style::window::default_vertical_pos,
                                  style::window_width,
-                                 style::window_height - style::header::height - style::footer::height,
+                                 style::window_height - style::window::default_vertical_pos - style::footer::height,
                                  "phonebook_empty_grey_circle_W_G",
                                  utils::translate("app_messages_no_messages"));
 

@@ -12,8 +12,8 @@ namespace gui::status_bar
     {
         setFilled(false);
         setBorderColor(gui::ColorNoColor);
-        setFont(style::header::status_bar::time::font);
-        setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
+        setFont(style::status_bar::time::font);
+        setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Bottom));
         using namespace utils::time;
         setFormat(Locale::format(Locale::TimeFormat::FormatTime12H));
         update();
