@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -20,9 +20,6 @@ namespace gui
 
     class NoEvents : public Dialog
     {
-        gui::Image *arrow = nullptr;
-        gui::Image *cross = nullptr;
-
       public:
         NoEvents(app::Application *app, const std::string &name);
         void onBeforeShow(ShowMode mode, SwitchData *data) override;

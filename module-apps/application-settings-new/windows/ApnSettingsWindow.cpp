@@ -8,6 +8,7 @@
 #include "application-settings-new/data/SettingsItemData.hpp"
 #include "OptionSetting.hpp"
 
+#include <header/AddElementAction.hpp>
 #include <InputEvent.hpp>
 
 namespace gui
@@ -21,20 +22,9 @@ namespace gui
     void ApnSettingsWindow::buildInterface()
     {
         setTitle(utils::translate("app_settings_network_apn_settings"));
+        header->navigationIndicatorAdd(new gui::header::AddElementAction(), gui::header::BoxSelection::Left);
 
-        leftArrowImage = new gui::Image(this,
-                                        style::settings::window::leftArrowImage::x,
-                                        style::settings::window::leftArrowImage::y,
-                                        style::settings::window::leftArrowImage::w,
-                                        style::settings::window::leftArrowImage::h,
-                                        "arrow_left");
-        crossImage     = new gui::Image(this,
-                                    style::settings::window::crossImage::x,
-                                    style::settings::window::crossImage::y,
-                                    style::settings::window::crossImage::w,
-                                    style::settings::window::crossImage::h,
-                                    "cross");
-        emptyListIcon  = new Icon(this,
+        emptyListIcon = new Icon(this,
                                  0,
                                  style::window::default_vertical_pos,
                                  style::window_width,

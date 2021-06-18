@@ -7,6 +7,7 @@
 #include "application-settings-new/widgets/SettingsStyle.hpp"
 #include "OptionSetting.hpp"
 
+#include <header/AddElementAction.hpp>
 #include <InputEvent.hpp>
 #include <i18n/i18n.hpp>
 #include <json11.hpp>
@@ -42,13 +43,11 @@ namespace gui
         AppWindow::buildInterface();
 
         setTitle(utils::translate("app_settings_display_wallpaper_quotes"));
+        header->navigationIndicatorAdd(new gui::header::AddElementAction(), gui::header::BoxSelection::Left);
 
         bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::check));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
         bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::options));
-
-        new gui::Image(this, style::quotes::arrow_x, style::quotes::arrow_y, 0, 0, "arrow_left");
-        new gui::Image(this, style::quotes::cross_x, style::quotes::cross_y, 0, 0, "cross");
 
         list = new gui::ListView(this,
                                  style::quotes::list::X,
