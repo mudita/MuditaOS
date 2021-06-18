@@ -13,9 +13,9 @@ Window consist of 4 different segments presented on image below.
 selected sim. Objects in status bar are not focusable and activeable. 
 * `Header` - Displaying selected window information. Mainly its title and in addition window particular input actions
 descriptions. In example adding object to list, search and emergency calls action. Objects in header are not focusable 
-and activeable. Currently that part is not clearly represented in Code and is being refactored.
+and activeable.
 * `Body` - Main part of window responsible for displaying and manipulating window logic. In example: contact information, 
  sms list manipulations, alarm clock settings. Objects in Body are focusable and activeable. 
 * `NavBar` - Bottom part of window displaying input action descriptions assigned to main keyboard keys (Left Function key, 
 Enter Key, Right Function Key). In example: accepting prompt, going to previous window, selecting object. Objects in 
-NavBar are not focusable and activeable. Currently that part is named BottomBar in Code. 
+NavBar are not focusable and activeable. Currently, that part is named BottomBar in Code. 

@@ -7,7 +7,7 @@
 #include <application-onboarding/style/OnBoardingStyle.hpp>
 #include <OptionSetting.hpp>
 
-#include <widgets/IceBox.hpp>
+#include <header/IceAction.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <apps-common/messages/DialogMetadataMessage.hpp>
 
@@ -22,12 +22,10 @@ namespace app::onBoarding
     void OnBoardingSimSelectWindow::buildInterface()
     {
         setTitle(utils::translate("app_onboarding_select_sim"));
-
+        header->navigationIndicatorAdd(new gui::header::IceAction(), gui::header::BoxSelection::Left);
         bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(::style::strings::common::select));
         bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(::style::strings::common::back));
         bottomBar->setText(gui::BottomBar::Side::LEFT, utils::translate(::style::strings::common::skip));
-
-        new gui::IceBox(this);
 
         descriptionText = new gui::Text(this,
                                         style::window::default_left_margin,

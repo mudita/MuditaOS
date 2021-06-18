@@ -129,7 +129,7 @@ void MeditationTimerWindow::setWidgetVisible(bool sBar, bool bBar, bool counter)
         return configuration;
     });
 
-    title->setVisible(sBar);
+    header->setTitleVisibility(sBar);
     bottomBar->setActive(BottomBar::Side::CENTER, bBar);
     bottomBar->setActive(BottomBar::Side::LEFT, bBar);
     timer->setVisible(counter);
