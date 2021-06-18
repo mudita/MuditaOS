@@ -1,23 +1,22 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "ApplicationNotes.hpp"
+#include <application-notes/ApplicationNotes.hpp>
+#include <presenter/NoteEditWindowPresenter.hpp>
+#include <presenter/NotePreviewWindowPresenter.hpp>
+#include <presenter/NotesMainWindowPresenter.hpp>
+#include <windows/NoteEditWindow.hpp>
+#include <windows/NoteMainWindow.hpp>
+#include <windows/NotePreviewWindow.hpp>
+#include <windows/SearchEngineWindow.hpp>
+#include <windows/SearchResultsWindow.hpp>
 
-#include "MessageType.hpp"
-#include "windows/NoteMainWindow.hpp"
-#include "windows/NotePreviewWindow.hpp"
-#include "windows/NoteEditWindow.hpp"
-#include "windows/SearchEngineWindow.hpp"
-#include "windows/SearchResultsWindow.hpp"
-
+#include <apps-common/windows/Dialog.hpp>
+#include <apps-common/windows/OptionWindow.hpp>
+#include <MessageType.hpp>
+#include <service-db/DBNotificationMessage.hpp>
 #include <service-db/QueryMessage.hpp>
 
-#include <module-apps/application-notes/presenter/NotesMainWindowPresenter.hpp>
-#include <module-apps/application-notes/presenter/NotePreviewWindowPresenter.hpp>
-#include <module-apps/application-notes/presenter/NoteEditWindowPresenter.hpp>
-#include <apps-common/windows/OptionWindow.hpp>
-#include <apps-common/windows/Dialog.hpp>
-#include <module-services/service-db/service-db/DBNotificationMessage.hpp>
 #include <utility>
 
 namespace app

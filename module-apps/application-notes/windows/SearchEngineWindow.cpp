@@ -3,7 +3,7 @@
 
 #include "SearchEngineWindow.hpp"
 
-#include <module-apps/application-notes/ApplicationNotes.hpp>
+#include <application-notes/ApplicationNotes.hpp>
 #include <module-apps/application-notes/data/NotesFoundData.hpp>
 #include <apps-common/widgets/InputBox.hpp>
 

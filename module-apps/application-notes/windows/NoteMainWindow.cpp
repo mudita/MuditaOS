@@ -3,7 +3,7 @@
 
 #include "NoteMainWindow.hpp"
 
-#include <module-apps/application-notes/ApplicationNotes.hpp>
+#include <application-notes/ApplicationNotes.hpp>
 #include <module-apps/application-notes/data/NoteSwitchData.hpp>
 
 #include <InputEvent.hpp>

@@ -7,7 +7,7 @@
 
 #include <Style.hpp>
 
-#include <module-apps/application-notes/ApplicationNotes.hpp>
+#include <application-notes/ApplicationNotes.hpp>
 #include <module-apps/application-notes/windows/NotesOptions.hpp>
 #include <module-apps/application-notes/data/NoteSwitchData.hpp>
 #include <module-apps/application-notes/style/NoteEditStyle.hpp>

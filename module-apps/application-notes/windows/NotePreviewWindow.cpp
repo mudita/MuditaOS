@@ -3,7 +3,7 @@
 
 #include "NotePreviewWindow.hpp"
 
-#include <module-apps/application-notes/ApplicationNotes.hpp>
+#include <application-notes/ApplicationNotes.hpp>
 #include <module-apps/application-notes/data/NoteSwitchData.hpp>
 #include <module-apps/application-notes/style/NotePreviewStyle.hpp>
 #include <module-apps/application-notes/windows/NotesOptions.hpp>
