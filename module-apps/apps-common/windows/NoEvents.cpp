@@ -58,7 +58,7 @@ void NoEvents::onBeforeShow(ShowMode mode, SwitchData *data)
         };
     }
 
-    if (title->getText() == utils::translate("app_calendar_title_main")) {
+    if (getTitle() == utils::translate("app_calendar_title_main")) {
         bottomBar->setActive(gui::BottomBar::Side::LEFT, true);
         bottomBar->setText(gui::BottomBar::Side::LEFT, utils::translate("app_calendar_bar_month"));
     }
@@ -66,8 +66,7 @@ void NoEvents::onBeforeShow(ShowMode mode, SwitchData *data)
 
 bool NoEvents::onInput(const gui::InputEvent &inputEvent)
 {
-    if (inputEvent.isShortRelease(gui::KeyCode::KEY_RF) &&
-        title->getText() == utils::translate("app_calendar_title_main")) {
+    if (inputEvent.isShortRelease(gui::KeyCode::KEY_RF) && getTitle() == utils::translate("app_calendar_title_main")) {
         app::manager::Controller::switchBack(application);
         return true;
     }
@@ -76,8 +75,7 @@ bool NoEvents::onInput(const gui::InputEvent &inputEvent)
         return true;
     }
 
-    if (inputEvent.isShortRelease(gui::KeyCode::KEY_LF) &&
-        title->getText() == utils::translate("app_calendar_title_main")) {
+    if (inputEvent.isShortRelease(gui::KeyCode::KEY_LF) && getTitle() == utils::translate("app_calendar_title_main")) {
         application->switchWindow(gui::name::window::main_window);
         return true;
     }

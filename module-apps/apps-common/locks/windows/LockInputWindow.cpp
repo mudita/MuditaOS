@@ -7,6 +7,7 @@
 #include <locks/widgets/Lock.hpp>
 
 #include <service-appmgr/Controller.hpp>
+#include <header/IceAction.hpp>
 #include <FontManager.hpp>
 #include <i18n/i18n.hpp>
 
@@ -72,7 +73,7 @@ namespace gui
 
     void LockInputWindow::buildIceBox()
     {
-        iceBox = new gui::IceBox(this);
+        header->navigationIndicatorAdd(new gui::header::IceAction(), gui::header::BoxSelection::Left);
     }
 
     void LockInputWindow::buildPinBody()
@@ -138,14 +139,13 @@ namespace gui
     {
         switch (type) {
         case TextType::Title: {
-            title->setVisible(true);
+            header->setTitleVisibility(true);
             if (!tokens.empty()) {
                 TextFormat format(FontManager::getInstance().getFont(style::window::font::medium));
-                title->setText(
-                    text::RichTextParser().parse(utils::translate(value), &format, std::move(tokens))->getText());
+                setTitle(text::RichTextParser().parse(utils::translate(value), &format, std::move(tokens))->getText());
             }
             else {
-                title->setText(utils::translate(value));
+                setTitle(utils::translate(value));
             }
             break;
         }
@@ -162,8 +162,14 @@ namespace gui
 
     void LockInputWindow::setTitleBar(bool titleVisible, bool iceVisible)
     {
-        title->setVisible(titleVisible);
-        iceBox->setVisible(iceVisible);
+        header->setTitleVisibility(titleVisible);
+
+        if (iceVisible) {
+            header->navigationIndicatorAdd(new gui::header::IceAction(), gui::header::BoxSelection::Left);
+        }
+        else {
+            header->navigationIndicatorRemove(gui::header::BoxSelection::Left);
+        }
     }
 
     auto LockInputWindow::getToken(LockInputWindow::Token token) const -> std::string
@@ -216,7 +222,7 @@ namespace gui
 
     auto LockInputWindow::isIceVisible() const noexcept -> bool
     {
-        return iceBox->visible;
+        return header->navigationIndicatorVisible(header::BoxSelection::Left);
     }
 
     auto LockInputWindow::isInInputState() const noexcept -> bool

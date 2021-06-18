@@ -8,7 +8,7 @@
 #include <module-gui/gui/input/InputEvent.hpp>
 #include <module-apps/application-onboarding/data/OnBoardingSwitchData.hpp>
 #include <apps-common/messages/DialogMetadataMessage.hpp>
-#include <widgets/IceBox.hpp>
+#include <header/IceAction.hpp>
 #include <service-appmgr/Controller.hpp>
 
 namespace app::onBoarding
@@ -27,7 +27,7 @@ namespace app::onBoarding
     void OnBoardingDateAndTimeWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
     {
         DateAndTimeMainWindow::onBeforeShow(mode, data);
-        new gui::IceBox(this);
+        header->navigationIndicatorAdd(new gui::header::IceAction(), gui::header::BoxSelection::Left);
 
         bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(style::strings::common::save));
         bottomBar->setText(gui::BottomBar::Side::LEFT, utils::translate(style::strings::common::Switch));
