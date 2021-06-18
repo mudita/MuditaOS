@@ -8,7 +8,6 @@
 #include <application-calllog/ApplicationCallLog.hpp>
 #include <application-desktop/ApplicationDesktop.hpp>
 #include <application-messages/ApplicationMessages.hpp>
-#include <application-notes/ApplicationNotes.hpp>
 #include <application-settings/ApplicationSettings.hpp>
 #include <application-settings-new/ApplicationSettings.hpp>
 #include <application-special-input/ApplicationSpecialInput.hpp>
