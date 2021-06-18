@@ -3,7 +3,6 @@
 
 #pragma once
 #include <Style.hpp>
-#include <utf8/UTF8.hpp>
 
 namespace musicPlayerStyle
 {

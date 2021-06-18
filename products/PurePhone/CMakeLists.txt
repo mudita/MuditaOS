@@ -49,6 +49,7 @@ set_target_properties(PurePhone
 target_link_libraries(PurePhone
     PRIVATE
         application-antenna
+        application-music-player
         module-apps
         service-desktop
         service-bluetooth

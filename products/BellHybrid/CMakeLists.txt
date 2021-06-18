@@ -46,6 +46,7 @@ set_target_properties(BellHybrid
 
 target_link_libraries(BellHybrid
     PRIVATE
+        application-music-player
         module-apps
         service-desktop
         service-bluetooth
