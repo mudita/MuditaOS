@@ -7,41 +7,14 @@
 #include <log.hpp>
 
 #include <service-appmgr/Controller.hpp>
+#include <header/AddElementAction.hpp>
 #include <Image.hpp>
 
 using namespace gui;
 
-namespace style
-{
-    namespace arrow
-    {
-        const inline uint32_t x = 30;
-        const inline uint32_t y = 62;
-    } // namespace arrow
-
-    namespace cross
-    {
-        const inline uint32_t x = 48;
-        const inline uint32_t y = 55;
-    } // namespace cross
-
-    namespace icon
-    {
-        constexpr inline auto x = 176;
-        constexpr inline auto y = 195;
-    } // namespace icon
-
-    namespace text
-    {
-        constexpr inline auto x = 40;
-        constexpr inline auto y = 333;
-    } // namespace text
-} // namespace style
-
 NoEvents::NoEvents(app::Application *app, const std::string &name) : gui::Dialog(app, name)
 {
-    arrow = new gui::Image(this, style::arrow::x, style::arrow::y, 0, 0, "arrow_left");
-    cross = new gui::Image(this, style::cross::x, style::cross::y, 0, 0, "cross");
+    header->navigationIndicatorAdd(new gui::header::AddElementAction(), gui::header::BoxSelection::Left);
 }
 
 void NoEvents::onBeforeShow(ShowMode mode, SwitchData *data)

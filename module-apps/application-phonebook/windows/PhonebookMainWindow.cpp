@@ -8,6 +8,8 @@
 
 #include <queries/phonebook/QueryContactGet.hpp>
 
+#include <header/AddElementAction.hpp>
+#include <header/SearchAction.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <service-db/QueryMessage.hpp>
 #include <service-db/DBNotificationMessage.hpp>
@@ -31,30 +33,8 @@ namespace gui
         AppWindow::buildInterface();
 
         setTitle(utils::translate("app_phonebook_title_main"));
-        leftArrowImage  = new gui::Image(this,
-                                        phonebookStyle::mainWindow::leftArrowImage::x,
-                                        phonebookStyle::mainWindow::leftArrowImage::y,
-                                        phonebookStyle::mainWindow::leftArrowImage::w,
-                                        phonebookStyle::mainWindow::leftArrowImage::h,
-                                        "arrow_left");
-        rightArrowImage = new gui::Image(this,
-                                         phonebookStyle::mainWindow::rightArrowImage::x,
-                                         phonebookStyle::mainWindow::rightArrowImage::y,
-                                         phonebookStyle::mainWindow::rightArrowImage::w,
-                                         phonebookStyle::mainWindow::rightArrowImage::h,
-                                         "arrow_right");
-        newContactImage = new gui::Image(this,
-                                         phonebookStyle::mainWindow::newContactImage::x,
-                                         phonebookStyle::mainWindow::newContactImage::y,
-                                         phonebookStyle::mainWindow::newContactImage::w,
-                                         phonebookStyle::mainWindow::newContactImage::h,
-                                         "cross");
-        searchImage     = new gui::Image(this,
-                                     phonebookStyle::mainWindow::searchImage::x,
-                                     phonebookStyle::mainWindow::searchImage::y,
-                                     phonebookStyle::mainWindow::searchImage::w,
-                                     phonebookStyle::mainWindow::searchImage::h,
-                                     "search");
+        header->navigationIndicatorAdd(new gui::header::AddElementAction(), gui::header::BoxSelection::Left);
+        header->navigationIndicatorAdd(new gui::header::SearchAction(), gui::header::BoxSelection::Right);
 
         contactsList = new gui::PhonebookListView(this,
                                                   phonebookStyle::mainWindow::contactsList::x,
@@ -110,8 +90,8 @@ namespace gui
                     std::make_unique<app::manager::SwitchBackRequest>(application->GetName(), std::move(data)));
             };
 
-            leftArrowImage->setVisible(false);
-            newContactImage->setVisible(false);
+            header->navigationIndicatorRemove(gui::header::BoxSelection::Left);
+            header->navigationIndicatorRemove(gui::header::BoxSelection::Right);
         }
     }
 

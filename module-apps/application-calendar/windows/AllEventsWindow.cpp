@@ -6,6 +6,7 @@
 #include "application-calendar/ApplicationCalendar.hpp"
 #include "application-calendar/data/CalendarData.hpp"
 #include <gui/widgets/Window.hpp>
+#include <header/AddElementAction.hpp>
 #include <service-appmgr/Controller.hpp>
 
 #include <module-db/queries/calendar/QueryEventsGetAllLimited.hpp>
@@ -38,10 +39,7 @@ namespace gui
         bottomBar->setText(gui::BottomBar::Side::LEFT, utils::translate("app_calendar_bar_month"));
 
         setTitle(utils::translate("app_calendar_title_main"));
-        leftArrowImage = new gui::Image(
-            this, style::window::calendar::arrow_x, style::window::calendar::arrow_y, 0, 0, "arrow_left");
-        newDayEventImage =
-            new gui::Image(this, style::window::calendar::cross_x, style::window::calendar::cross_y, 0, 0, "cross");
+        header->navigationIndicatorAdd(new gui::header::AddElementAction(), gui::header::BoxSelection::Left);
 
         allEventsList = new gui::CalendarListView(this,
                                                   style::window::calendar::listView_x,
