@@ -27,7 +27,6 @@ target_sources(apps-common
         widgets/BrightnessBox.cpp
         widgets/ButtonOnOff.cpp
         widgets/DateWidget.cpp
-        widgets/IceBox.cpp
         widgets/InputBox.cpp
         widgets/ModesBox.cpp
         widgets/TextWithIconsWidget.cpp

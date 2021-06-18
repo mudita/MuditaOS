@@ -6,7 +6,7 @@
 #include <module-apps/application-onboarding/ApplicationOnBoarding.hpp>
 #include <module-apps/application-onboarding/data/OnBoardingSwitchData.hpp>
 #include <apps-common/messages/DialogMetadataMessage.hpp>
-#include <widgets/IceBox.hpp>
+#include <header/IceAction.hpp>
 #include <service-appmgr/Controller.hpp>
 
 #include <i18n/i18n.hpp>
@@ -17,10 +17,9 @@ namespace app::onBoarding
     ConfigurationSuccessfulDialogWindow::ConfigurationSuccessfulDialogWindow(app::Application *app)
         : gui::Dialog(app, gui::window::name::onBoarding_configuration_successful)
     {
+        header->navigationIndicatorAdd(new gui::header::IceAction(), gui::header::BoxSelection::Left);
         bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(style::strings::common::start));
         bottomBar->setActive(gui::BottomBar::Side::RIGHT, false);
-
-        new gui::IceBox(this);
     }
 
     bool ConfigurationSuccessfulDialogWindow::onInput(const gui::InputEvent &inputEvent)
