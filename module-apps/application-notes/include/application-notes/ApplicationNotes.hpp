@@ -3,8 +3,7 @@
 
 #pragma once
 
-#include "module-apps/application-notes/model/NotesListModel.hpp"
-#include "Application.hpp"
+#include <Application.hpp>
 
 namespace gui::name::window
 {
