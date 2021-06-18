@@ -20,9 +20,10 @@ namespace gui
 
     void BellMainMenuWindow::buildInterface()
     {
-        bottomBar->setVisible(false);
         statusBar->setVisible(false);
-        title->visible = false;
+        header->setTitleVisibility(false);
+        bottomBar->setVisible(false);
+
         optionsList->setPosition(bellMainStyle::mainMenuWindow::options_list_x,
                                  bellMainStyle::mainMenuWindow::options_list_y);
         optionsList->setMaximumWidth(bellMainStyle::mainMenuWindow::default_body_width);

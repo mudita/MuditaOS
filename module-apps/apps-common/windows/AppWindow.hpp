@@ -4,6 +4,7 @@
 #pragma once
 
 #include <gui/widgets/StatusBar.hpp>
+#include <gui/widgets/header/Header.hpp>
 #include <gui/widgets/BottomBar.hpp>
 #include <gui/widgets/Window.hpp>
 #include <Service/Service.hpp>
@@ -31,16 +32,18 @@ namespace gui
     class AppWindow : public Window
     {
       protected:
-        /// actual built window title
-        gui::Label *title = nullptr;
-        /**
-         * Information bar for the buttons on the bottom of the page.
-         */
-        gui::BottomBar *bottomBar = nullptr;
         /**
          * Information bar for signal, battery and lock icon on the top of the screen.
          */
         gui::status_bar::StatusBar *statusBar = nullptr;
+        /**
+         * Information bar for window title and additional action buttons.
+         */
+        gui::header::Header *header = nullptr;
+        /**
+         * Information bar for the buttons on the bottom of the page.
+         */
+        gui::BottomBar *bottomBar = nullptr;
         /**
          * Pointer to the application object that owns the window.
          */
@@ -75,7 +78,6 @@ namespace gui
         void updatePhoneMode(sys::phone_modes::PhoneMode mode);
         [[nodiscard]] bool preventsAutoLocking() const noexcept;
         virtual bool updateTime();
-        void setTitle(const UTF8 &text);
 
         void rebuild() override;
         void buildInterface() override;
@@ -95,6 +97,9 @@ namespace gui
          * @param configChange  The function that contains the status bar configuration changes.
          */
         void applyToStatusBar(StatusBarConfigurationChangeFunction configChange);
+
+        void setTitle(const UTF8 &text);
+        [[nodiscard]] UTF8 getTitle();
 
         /// Setting bottom bar temporary text
         /// @param text - bottomBar text

@@ -8,7 +8,7 @@
 
 #include <apps-common/windows/DialogMetadata.hpp>
 #include <apps-common/messages/DialogMetadataMessage.hpp>
-#include <widgets/IceBox.hpp>
+#include <header/IceAction.hpp>
 #include <service-appmgr/Controller.hpp>
 
 #include <i18n/i18n.hpp>
@@ -27,11 +27,11 @@ namespace app::onBoarding
     {
         AppWindow::buildInterface();
 
+        header->navigationIndicatorAdd(new gui::header::IceAction(), gui::header::BoxSelection::Left);
         bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(::style::strings::common::start));
         bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(::style::strings::common::back));
         bottomBar->setText(gui::BottomBar::Side::LEFT, utils::translate(::style::strings::common::skip));
 
-        new gui::IceBox(this);
         new gui::Icon(this,
                       0,
                       0,

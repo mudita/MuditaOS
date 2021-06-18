@@ -9,7 +9,6 @@
 #include <RichTextParser.hpp>
 #include <Text.hpp>
 #include <ImageBox.hpp>
-#include <widgets/IceBox.hpp>
 
 namespace locks
 {
@@ -67,7 +66,6 @@ namespace gui
 
       private:
         gui::VBox *body          = nullptr;
-        gui::IceBox *iceBox      = nullptr;
         gui::ImageBox *infoImage = nullptr;
         gui::Text *primaryText   = nullptr;
         gui::Text *secondaryText = nullptr;
