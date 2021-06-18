@@ -26,7 +26,7 @@ namespace gui
 
         auto vBox = new VBox(this,
                              style::window::default_left_margin,
-                             style::header::height + style::margins::very_big,
+                             style::window::default_vertical_pos + style::margins::very_big,
                              style::window::default_body_width,
                              style::window::default_body_height);
         vBox->setEdges(RectangleEdge::None);

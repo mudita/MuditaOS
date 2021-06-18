@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -8,7 +8,7 @@
 namespace app::notes::style::edit
 {
     constexpr inline auto LeftMargin = ::style::window::default_left_margin;
-    constexpr inline auto TopMargin  = ::style::header::height + ::style::margins::very_big - 1;
+    constexpr inline auto TopMargin  = ::style::window::default_vertical_pos + ::style::margins::very_big - 1;
     constexpr inline auto Width      = ::style::window::default_body_width;
     constexpr inline auto Height     = ::style::window::default_body_height - ::style::margins::very_big;
 

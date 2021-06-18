@@ -28,8 +28,11 @@ namespace gui
         bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::select));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
         setTitle("UI TEST");
-        text = new gui::Text(
-            this, style::window::default_left_margin, title->offset_h(), style::window::default_body_width, 300);
+        text = new gui::Text(this,
+                             style::window::default_left_margin,
+                             style::window::default_vertical_pos,
+                             style::window::default_body_width,
+                             300);
         text->setEditMode(EditMode::Edit);
         text->setFont(style::window::font::medium);
         LOG_DEBUG(

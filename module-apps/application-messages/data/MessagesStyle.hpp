@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -11,7 +11,7 @@ namespace style
         {
             inline constexpr uint32_t listPositionX = style::window::default_left_margin;
             // Magic 1 -> discussed with Design for proper alignment.
-            inline constexpr uint32_t ListPositionY = style::header::height - 1;
+            inline constexpr uint32_t ListPositionY = style::window::default_vertical_pos - 1;
             // Bottom margin need to be added to fit all elements.
             inline constexpr uint32_t listHeight =
                 style::window_height - ListPositionY - style::footer::height + style::margins::small;
@@ -96,7 +96,7 @@ namespace style
         namespace smsList
         {
             inline constexpr uint32_t x = style::window::default_left_margin;
-            inline constexpr uint32_t y = style::header::height;
+            inline constexpr uint32_t y = style::window::default_vertical_pos;
             inline constexpr uint32_t h = style::window::default_body_height;
             inline constexpr uint32_t w = style::listview::body_width_with_scroll;
         } // namespace smsList
@@ -106,7 +106,7 @@ namespace style
             namespace list
             {
                 inline constexpr uint32_t x = style::window::default_left_margin;
-                inline constexpr uint32_t y = style::header::height;
+                inline constexpr uint32_t y = style::window::default_vertical_pos;
                 inline constexpr uint32_t h = style::window_height - y - style::footer::height;
                 inline constexpr uint32_t w = style::listview::body_width_with_scroll;
 

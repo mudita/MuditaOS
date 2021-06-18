@@ -18,7 +18,7 @@ namespace gui
     {
         volumeText = new Label(this,
                                style::window::default_left_margin,
-                               title->offset_h(),
+                               style::window::default_vertical_pos,
                                style::window::default_body_width,
                                style::window::volume::title_height,
                                utils::translate(style::window::volume::base_title_key));

@@ -31,10 +31,10 @@ namespace gui
 
         mSoundsList = new gui::ListView(this,
                                         style::window::default_left_margin,
-                                        style::header::height - 1,
+                                        style::window::default_vertical_pos - 1,
                                         style::listview::body_width_with_scroll,
-                                        style::window_height - style::header::height + 1 - style::footer::height +
-                                            style::margins::small,
+                                        style::window_height - style::window::default_vertical_pos + 1 -
+                                            style::footer::height + style::margins::small,
                                         mSoundsModel,
                                         listview::ScrollBarType::Proportional);
 
