@@ -1,9 +1,9 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "ApplicationMusicPlayer.hpp"
-#include "windows/MusicPlayerAllSongsWindow.hpp"
-#include "windows/MusicPlayerEmptyWindow.hpp"
+#include <application-music-player/ApplicationMusicPlayer.hpp>
+#include <windows/MusicPlayerAllSongsWindow.hpp>
+#include <windows/MusicPlayerEmptyWindow.hpp>
 
 #include <filesystem>
 #include <log.hpp>
