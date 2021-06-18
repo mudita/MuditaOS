@@ -190,8 +190,8 @@ namespace gui
         setTitle(utils::translate("sms_title_message"));
 
         const uint32_t w = this->getWidth() - style::window::default_left_margin - style::window::default_right_margin;
-        const uint32_t h = this->getHeight() - title->offset_h() - bottomBar->getHeight();
-        body             = new gui::VBox(this, style::window::default_left_margin, (uint32_t)title->offset_h(), w, h);
+        const uint32_t h = this->getHeight() - style::window::default_vertical_pos - bottomBar->getHeight();
+        body = new gui::VBox(this, style::window::default_left_margin, style::window::default_vertical_pos, w, h);
 
         auto recipientLabel = new Label(body, 0, 0, body->getWidth(), msgStyle::recipientLabel::h);
         recipientLabel->setText(utils::translate("sms_add_rec_num"));

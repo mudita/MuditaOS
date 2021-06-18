@@ -15,11 +15,11 @@ namespace gui::status_bar
         label = new Label(this, 0, 0, 0, 0);
         label->setFilled(false);
         label->setBorderColor(gui::ColorNoColor);
-        label->setFont(style::header::status_bar::signal::font);
+        label->setFont(style::status_bar::signal::font);
         label->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom));
 
-        setMinimumSize(style::header::status_bar::signal::maxX, style::header::status_bar::height);
-        label->setMaximumSize(style::header::status_bar::signal::maxX, style::header::status_bar::height);
+        setMinimumSize(style::status_bar::signal::maxX, style::status_bar::height);
+        label->setMaximumSize(style::status_bar::signal::maxX, style::status_bar::height);
     }
 
     void SignalStrengthText::update(const Store::SignalStrength &signal,

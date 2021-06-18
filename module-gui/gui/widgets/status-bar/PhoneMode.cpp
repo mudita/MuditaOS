@@ -15,7 +15,7 @@ namespace gui::status_bar
         : StatusBarWidgetBase(parent, x, y, w, h)
     {
         setEdges(RectangleEdge::None);
-        setFont(style::header::status_bar::nat::font);
+        setFont(style::status_bar::nat::font);
         setAlignment(gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
     }
 

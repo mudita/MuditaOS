@@ -63,7 +63,8 @@ namespace gui
         setTitle(utils::translate("app_settings_bt"));
 
         LOG_INFO("Create box layout");
-        box = new gui::VBox(this, 0, title->offset_h(), style::window_width, 8 * style::window::label::default_h);
+        box = new gui::VBox(
+            this, 0, style::window::default_vertical_pos, style::window_width, 8 * style::window::label::default_h);
         box->setEdges(RectangleEdge::None);
 
         add_box_label(box, "Bluetooth on off", [=](Item &) {

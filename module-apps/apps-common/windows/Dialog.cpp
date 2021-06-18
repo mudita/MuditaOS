@@ -17,7 +17,7 @@ Dialog::Dialog(app::Application *app, const std::string &name) : gui::AppWindow(
 
     icon = new Icon(this,
                     style::window::default_left_margin,
-                    style::header::height,
+                    style::window::default_vertical_pos,
                     style::window::default_body_width,
                     style::window::default_body_height,
                     "",
@@ -123,7 +123,7 @@ DialogYesNoIconTxt::DialogYesNoIconTxt(app::Application *app, const std::string 
 {
     iconText = new Label(this,
                          style::window::default_left_margin,
-                         style::header::height,
+                         style::window::default_vertical_pos,
                          style::window::default_body_width,
                          dialog::style::iconTextLabel::h,
                          "");
