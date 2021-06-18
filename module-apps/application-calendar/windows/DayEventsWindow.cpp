@@ -8,6 +8,7 @@
 #include <gui/widgets/Label.hpp>
 #include <gui/widgets/Item.hpp>
 #include <gui/widgets/Image.hpp>
+#include <header/AddElementAction.hpp>
 
 #include <time/time_conversion.hpp>
 #include <module-db/queries/calendar/QueryEventsGetFiltered.hpp>
@@ -68,10 +69,7 @@ namespace gui
         bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(style::strings::common::open));
 
         setTitle(dayMonthTitle);
-        leftArrowImage = new gui::Image(
-            this, style::window::calendar::arrow_x, style::window::calendar::arrow_y, 0, 0, "arrow_left");
-        newDayEventImage =
-            new gui::Image(this, style::window::calendar::cross_x, style::window::calendar::cross_y, 0, 0, "cross");
+        header->navigationIndicatorAdd(new gui::header::AddElementAction(), gui::header::BoxSelection::Left);
 
         dayEventsList = new gui::ListView(this,
                                           style::window::calendar::listView_x,

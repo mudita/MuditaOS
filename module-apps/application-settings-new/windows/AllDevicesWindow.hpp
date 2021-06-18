@@ -45,8 +45,6 @@ namespace gui
         auto handleDeviceAction(const ActiveDevice &) -> bool;
 
         ActiveDevice activeDevice;
-        Image *leftArrowImage = nullptr;
-        Image *crossImage     = nullptr;
         std::vector<Devicei> devices{};
         std::string addressOfDeviceSelected;
         std::unique_ptr<BluetoothSettingsModel> bluetoothSettingsModel{};
