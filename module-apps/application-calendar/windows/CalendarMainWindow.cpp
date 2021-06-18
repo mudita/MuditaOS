@@ -51,9 +51,9 @@ namespace gui
         auto app = dynamic_cast<app::ApplicationCalendar *>(application);
         assert(app != nullptr);
 
-        offsetFromTop = title->offset_h() + style::window::calendar::month_year_height;
+        offsetFromTop = style::window::default_vertical_pos + style::window::calendar::month_year_height;
         monthWidth    = style::window::default_body_width;
-        monthHeight   = style::window_height - title->offset_h() - style::footer::height;
+        monthHeight   = style::window_height - style::window::default_vertical_pos - style::footer::height;
         dayWidth      = style::window::calendar::day_cell_width;
         dayHeight     = style::window::calendar::day_cell_height;
 
@@ -133,7 +133,7 @@ namespace gui
     {
         dateLabel = new Label(this,
                               style::window::default_left_margin,
-                              title->offset_h(),
+                              style::window::default_vertical_pos,
                               style::window::default_body_width,
                               style::window::calendar::month_year_height,
                               actualDateTime);

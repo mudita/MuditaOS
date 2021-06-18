@@ -43,7 +43,7 @@ namespace gui::status_bar
         : SignalStrengthBase(parent, x, y, w, h)
     {
         img = new Image(this, signal_none);
-        setMinimumSize(img->getWidth(), style::header::status_bar::height);
+        setMinimumSize(img->getWidth(), style::status_bar::height);
     }
 
     void SignalStrengthBar::update(const Store::SignalStrength &signal, const Store::Network::Status &status)

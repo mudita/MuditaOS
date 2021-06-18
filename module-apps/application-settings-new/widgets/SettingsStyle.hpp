@@ -77,7 +77,7 @@ namespace style
 
             namespace nightshift
             {
-                inline constexpr auto body_offset = style::header::height + 16;
+                inline constexpr auto body_offset = style::window::default_vertical_pos + 16;
 
                 inline constexpr auto separator_h = 55;
             } // namespace nightshift
@@ -85,7 +85,7 @@ namespace style
             namespace newApn
             {
                 inline constexpr uint32_t x = style::window::default_left_margin;
-                inline constexpr uint32_t y = style::header::height;
+                inline constexpr uint32_t y = style::window::default_vertical_pos;
                 inline constexpr uint32_t w = style::listview::body_width_with_scroll;
                 inline constexpr uint32_t h = style::window_height - y - style::footer::height;
             } // namespace newApn
@@ -131,7 +131,8 @@ namespace style
             namespace sar
             {
                 inline constexpr auto LeftMargin = ::style::window::default_left_margin;
-                inline constexpr auto TopMargin  = ::style::header::height + ::style::margins::very_big - 1;
+                inline constexpr auto TopMargin =
+                    ::style::window::default_vertical_pos + ::style::margins::very_big - 1;
                 inline constexpr auto Width      = ::style::window::default_body_width;
                 inline constexpr auto Height     = ::style::window::default_body_height - ::style::margins::very_big;
 
@@ -153,7 +154,7 @@ namespace style
         namespace list
         {
             inline constexpr auto X      = style::window::default_left_margin;
-            inline constexpr auto Y      = style::header::height;
+            inline constexpr auto Y      = style::window::default_vertical_pos;
             inline constexpr auto Width  = style::listview::body_width_with_scroll;
             inline constexpr auto Height = style::window_height - Y - style::footer::height;
         } // namespace list

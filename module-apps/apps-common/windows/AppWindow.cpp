@@ -37,6 +37,15 @@ namespace gui
 
     void AppWindow::buildInterface()
     {
+        auto config          = configureStatusBar(application->getStatusBarConfiguration());
+        namespace status_bar = style::status_bar;
+        statusBar            = new gui::status_bar::StatusBar(this,
+                                                   status_bar::default_horizontal_pos,
+                                                   status_bar::default_vertical_pos,
+                                                   status_bar::width,
+                                                   status_bar::height);
+        statusBar->configure(std::move(config));
+
         bottomBar = new gui::BottomBar(this, 0, style::window_height - 51, style::window_width, 50);
         bottomBar->setActive(BottomBar::Side::LEFT, false);
         bottomBar->setActive(BottomBar::Side::CENTER, false);
@@ -50,12 +59,6 @@ namespace gui
         title->setEdges(RectangleEdge::Bottom);
         title->setEllipsis(Ellipsis::Right);
         title->visible = false;
-
-        auto config          = configureStatusBar(application->getStatusBarConfiguration());
-        namespace status_bar = style::header::status_bar;
-        statusBar            = new gui::status_bar::StatusBar(
-            this, (style::window_width - status_bar::width) / 2, 0, status_bar::width, status_bar::height);
-        statusBar->configure(std::move(config));
     }
 
     status_bar::Configuration AppWindow::configureStatusBar(status_bar::Configuration appConfiguration)

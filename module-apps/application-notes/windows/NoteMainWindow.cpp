@@ -93,13 +93,14 @@ namespace app::notes
         list->setVisible(true);
         list->rebuildList();
 
-        emptyListIcon                       = new gui::Icon(this,
-                                      0,
-                                      ::style::header::height,
-                                      ::style::window_width,
-                                      ::style::window_height - ::style::header::height - ::style::footer::height,
-                                      "phonebook_empty_grey_circle_W_G",
-                                      utils::translate("app_notes_no_notes"));
+        emptyListIcon =
+            new gui::Icon(this,
+                          0,
+                          ::style::window::default_vertical_pos,
+                          ::style::window_width,
+                          ::style::window_height - ::style::window::default_vertical_pos - ::style::footer::height,
+                          "phonebook_empty_grey_circle_W_G",
+                          utils::translate("app_notes_no_notes"));
         emptyListIcon->focusChangedCallback = [this]([[maybe_unused]] gui::Item &item) {
             onEmptyList();
             return true;
