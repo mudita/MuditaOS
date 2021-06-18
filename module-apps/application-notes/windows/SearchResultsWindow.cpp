@@ -3,7 +3,7 @@
 
 #include "SearchResultsWindow.hpp"
 
-#include <module-apps/application-notes/ApplicationNotes.hpp>
+#include <application-notes/ApplicationNotes.hpp>
 #include <module-apps/application-notes/data/NotesFoundData.hpp>
 #include <module-apps/application-notes/style/NotesListStyle.hpp>
 #include <apps-common/windows/DialogMetadata.hpp>

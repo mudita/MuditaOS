@@ -52,12 +52,13 @@ target_link_libraries(PurePhone
         application-calculator
         application-music-player
         application-phonebook
+        application-notes
+        messagetype
         module-apps
-        service-desktop
         service-bluetooth
+        service-desktop
         service-lwip
         ${LWIP_LIBRARIES}
-        messagetype
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_Linux>:iosyscalls>"
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_RT1051>:CrashCatcher::CrashCatcher>"
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_RT1051>:CrashCatcherARM>"
