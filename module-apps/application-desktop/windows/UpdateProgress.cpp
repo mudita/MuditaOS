@@ -54,6 +54,11 @@ namespace gui
         setVisibleState();
     }
 
+    bool UpdateProgressWindow::onInput(const InputEvent & /*inputEvent*/)
+    {
+        return true;
+    }
+
     void UpdateProgressWindow::setVisibleState()
     {
         percentLabel->setVisible(true);

@@ -32,8 +32,9 @@ namespace gui
         void invalidate() noexcept;
 
       public:
-        UpdateProgressWindow(app::Application *app);
+        explicit UpdateProgressWindow(app::Application *app);
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        bool onInput(const InputEvent &inputEvent) override;
         bool handleSwitchData(SwitchData *data) override;
         void rebuild() override;
         void buildInterface() override;
