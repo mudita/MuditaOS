@@ -4,6 +4,23 @@ To install the new version of MuditaOS please follow the steps described in this
 - [Linux](https://github.com/mudita/MuditaOS/blob/master/doc/boot_and_update.md#creating-a-storage-partition)
 - [Windows and macOS](https://github.com/mudita/MuditaOS/blob/master/doc/flashing_win_macos.md)
 
+## [0.70.1 2021-06-21]
+
+* [BH-393] Create separate math lib
+* [BH-515] Create main Bell app
+* [CP-142] Update tests with 204 response code
+* [CP-143] Set 204 code for responses with empty body
+* [EGD-2949] Fix fallback image
+* [EGD-3243] Fix cellular memory leaks
+* [EGD-4384] Status bar roaming indicator
+* [EGD-5011] Set headphones maximal sound level
+* [EGD-5689] Add clang tidy to jenkins
+* [EGD-6702] Add time zone library
+* [EGD-6790] Fix cellular sleep mode
+* [EGD-6916] Fixed makefile build linking issue
+* [EGD-6918] Timestamp clean up
+* [EGD-6932] Small cellular refactor
+
 ## [0.69.1 2021-06-16]
 
 ### Added
