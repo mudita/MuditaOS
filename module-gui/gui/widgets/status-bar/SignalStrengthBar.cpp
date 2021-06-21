@@ -24,7 +24,7 @@ namespace gui::status_bar
         constexpr auto signal3_roaming = "signal3_roaming";
         constexpr auto signal4_roaming = "signal4_roaming";
 
-        using SignalMap           = std::unordered_map<Store::RssiBar, std::string>;
+        using SignalMap = std::unordered_map<Store::RssiBar, std::string>;
 
         const SignalMap signalMapHomeCon = {{Store::RssiBar::zero, signal0},
                                             {Store::RssiBar::one, signal1},
@@ -48,15 +48,24 @@ namespace gui::status_bar
 
     void SignalStrengthBar::update(const Store::SignalStrength &signal, const Store::Network::Status &status)
     {
-        if (status == Store::Network::Status::RegisteredRoaming) {
-            img->set(signalMapRoaming.at(signal.rssiBar));
+        try {
+            if (img == nullptr) {
+                LOG_ERROR("SignalStrength Image nullptr");
+                return;
+            }
+
+            if (status == Store::Network::Status::RegisteredRoaming) {
+                img->set(signalMapRoaming.at(signal.rssiBar));
+            }
+            else if (status == Store::Network::Status::RegisteredHomeNetwork) {
+                img->set(signalMapHomeCon.at(signal.rssiBar));
+            }
+            else {
+                img->set(signal_none);
+            }
         }
-        else if (status == Store::Network::Status::RegisteredHomeNetwork) {
-            img->set(signalMapHomeCon.at(signal.rssiBar));
-        }
-        else {
-            img->set(signal_none);
+        catch (const std::exception &exception) {
+            LOG_ERROR("%s", exception.what());
         }
     }
-
 } // namespace gui::status_bar
