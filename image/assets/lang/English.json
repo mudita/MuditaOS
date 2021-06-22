@@ -253,6 +253,7 @@
   "sim_card_cant_connect": "<text>Cannot connect to <token>$SIM</token> card.<br></br>Please insert card.</text>",
   "sim_card_not_ready": "<text>Waiting for Modem to start.<br></br>This may take a moment.</text>",
   "app_desktop_press_to_unlock": "<text font='gt_pressura' size='27'>Press <b>Unlock</b> and then <b>#</b></text>",
+  "app_desktop_press_to_complete_unlock": "<text font='gt_pressura' size='27'>Press <b>#</b> to unlock</text>",
   "app_desktop_unread_messages": "<text>Unread <b>messages</b></text>",
   "app_desktop_missed_calls": "<text>Missed <b>calls</b></text>",
   "app_desktop_menu_phone": "CALLS",
