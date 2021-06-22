@@ -8,9 +8,10 @@ module_is_test_entity()
 
 add_library(${PROJECT_NAME} STATIC)
 
-add_subdirectory(apps-common)
 add_subdirectory(application-antenna)
+add_subdirectory(application-bell-main)
 add_subdirectory(application-music-player)
+add_subdirectory(apps-common)
 
 set(APPLICATIONS
     clock
@@ -67,8 +68,6 @@ if(${ENABLE_VOLTE})
     target_compile_definitions(${PROJECT_NAME} PUBLIC ENABLE_VOLTE=1)
 endif()
 
-add_subdirectory(application-bell-main)
-
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
         apps-common
@@ -84,7 +83,6 @@ target_link_libraries(${PROJECT_NAME}
         service-evtmgr
         time
     PUBLIC
-        application-bell-main
         module-audio
         module-bsp
         module-db

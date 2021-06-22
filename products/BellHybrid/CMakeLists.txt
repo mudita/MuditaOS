@@ -46,13 +46,14 @@ set_target_properties(BellHybrid
 
 target_link_libraries(BellHybrid
     PRIVATE
+        application-bell-main
         application-music-player
+        messagetype
         module-apps
-        service-desktop
         service-bluetooth
+        service-desktop
         service-lwip
         ${LWIP_LIBRARIES}
-        messagetype
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_Linux>:iosyscalls>"
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_RT1051>:CrashCatcher::CrashCatcher>"
     )
