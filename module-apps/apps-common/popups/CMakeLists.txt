@@ -35,6 +35,7 @@ target_sources(apps-common
 		VolumeWindow.hpp
 		WindowWithTimer.hpp
 		data/PopupData.hpp
+		lock-popups/PhoneLockedInfoData.hpp
 		lock-popups/PhoneLockedInfoWindow.hpp
 		lock-popups/PhoneLockedWindow.hpp
 		lock-popups/PhoneLockInputWindow.hpp

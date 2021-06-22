@@ -8,13 +8,11 @@
 
 namespace gui
 {
-    inline constexpr auto defautTimeout = std::chrono::milliseconds{3000};
+    inline constexpr auto defautTimeout = std::chrono::seconds{3};
     class WindowWithTimer : public gui::AppWindow
     {
       private:
         sys::TimerHandle popupTimer;
-        void resetTimer();
-        void detachTimerIfExists();
 
       public:
         explicit WindowWithTimer(app::Application *app,
@@ -24,5 +22,9 @@ namespace gui
         ~WindowWithTimer() override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         bool onInput(const gui::InputEvent &inputEvent) override;
+
+      protected:
+        void detachTimerIfExists();
+        void resetTimer();
     };
 } // namespace gui
