@@ -399,4 +399,3 @@ namespace vfsn::internal::syscalls
     }
 
 } // namespace vfsn::internal::syscalls
-
