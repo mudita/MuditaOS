@@ -7,11 +7,16 @@
 
 using namespace app::manager::actions;
 
-NotificationsChangedParams::NotificationsChangedParams(Notifications notifications)
-    : notifications{std::move(notifications)}
+NotificationsChangedParams::NotificationsChangedParams(Notifications notifications, bool showNotificationsWhenLocked)
+    : notifications{std::move(notifications)}, showWhenLocked{showNotificationsWhenLocked}
 {}
 
 auto NotificationsChangedParams::getNotifications() const noexcept -> const Notifications &
 {
     return notifications;
+}
+
+auto NotificationsChangedParams::showNotificationsWhenLocked() const noexcept -> bool
+{
+    return showWhenLocked;
 }

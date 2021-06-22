@@ -439,6 +439,11 @@ void ServiceCellular::registerMessageHandlers()
         return sys::MessageNone{};
     });
 
+    connect(typeid(CellularDismissCallMessage), [&](sys::Message *request) -> sys::MessagePointer {
+        handleCellularDismissCallMessage(request);
+        return sys::MessageNone{};
+    });
+
     connect(typeid(db::QueryResponse), [&](sys::Message *request) -> sys::MessagePointer {
         auto msg = static_cast<db::QueryResponse *>(request);
         return handleDBQueryResponseMessage(msg);
@@ -1930,6 +1935,12 @@ void ServiceCellular::handleCellularHangupCallMessage(CellularHangupCallMessage 
                       sys::BusChannel::ServiceCellularNotifications);
 }
 
+void ServiceCellular::handleCellularDismissCallMessage(sys::Message *msg)
+{
+    hangUpCall();
+    handleCallAbortedNotification(msg);
+}
+
 auto ServiceCellular::handleDBQueryResponseMessage(db::QueryResponse *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
     bool responseHandled = false;
@@ -2258,37 +2269,32 @@ auto ServiceCellular::handleCellularSendSMSMessage(sys::Message *msg) -> std::sh
 
 auto ServiceCellular::handleCellularRingNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
-    if (isIncommingCallAllowed()) {
-        if (!callManager.isIncomingCallPropagated()) {
-            auto message = static_cast<CellularRingNotification *>(msg);
-            bus.sendMulticast(std::make_shared<CellularIncominCallMessage>(message->getNubmer()),
-                              sys::BusChannel::ServiceCellularNotifications);
-            callManager.ring();
-        }
-        return std::make_shared<CellularResponseMessage>(true);
+    if (phoneModeObserver->isTetheringOn())
+        return std::make_shared<CellularResponseMessage>(hangUpCall());
+
+    if (!callManager.isIncomingCallPropagated()) {
+        auto message = static_cast<CellularRingNotification *>(msg);
+        bus.sendMulticast(std::make_shared<CellularIncominCallMessage>(message->getNubmer()),
+                          sys::BusChannel::ServiceCellularNotifications);
+        callManager.ring();
     }
-    return std::make_shared<CellularResponseMessage>(this->hangUpCall());
+    return std::make_shared<CellularResponseMessage>(true);
 }
 
 auto ServiceCellular::handleCellularCallerIdNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
     auto message = static_cast<CellularCallerIdNotification *>(msg);
-    if (isIncommingCallAllowed()) {
-        if (!callManager.isCallerInfoComplete()) {
-            auto message = static_cast<CellularCallerIdNotification *>(msg);
-            bus.sendMulticast(std::make_shared<CellularCallerIdMessage>(message->getNubmer()),
-                              sys::BusChannel::ServiceCellularNotifications);
-            callManager.completeCallerInfo();
-        }
-        return std::make_shared<CellularResponseMessage>(true);
+    if (phoneModeObserver->isTetheringOn()) {
+        tetheringCalllog.push_back(CalllogRecord{CallType::CT_MISSED, message->getNubmer()});
+        return std::make_shared<CellularResponseMessage>(hangUpCallBusy());
     }
-    else {
-        if (phoneModeObserver->isTetheringOn()) {
-            tetheringCalllog.push_back(CalllogRecord{CallType::CT_MISSED, message->getNubmer()});
-            return std::make_shared<CellularResponseMessage>(hangUpCallBusy());
-        }
+
+    if (!callManager.isCallerInfoComplete()) {
+        bus.sendMulticast(std::make_shared<CellularCallerIdMessage>(message->getNubmer()),
+                          sys::BusChannel::ServiceCellularNotifications);
+        callManager.completeCallerInfo();
     }
-    return std::make_shared<CellularResponseMessage>(hangUpCall());
+    return std::make_shared<CellularResponseMessage>(true);
 }
 
 auto ServiceCellular::handleCellularSetConnectionFrequencyMessage(sys::Message *msg)
@@ -2302,11 +2308,6 @@ auto ServiceCellular::handleCellularSetConnectionFrequencyMessage(sys::Message *
     connectionManager->setInterval(std::chrono::minutes{setMsg->getConnectionFrequency()});
     connectionManager->onPhoneModeChange(phoneModeObserver->getCurrentPhoneMode());
     return std::make_shared<CellularResponseMessage>(true);
-}
-
-auto ServiceCellular::isIncommingCallAllowed() -> bool
-{
-    return phoneModeObserver->isInMode(sys::phone_modes::PhoneMode::Connected) && !phoneModeObserver->isTetheringOn();
 }
 
 auto ServiceCellular::hangUpCall() -> bool
