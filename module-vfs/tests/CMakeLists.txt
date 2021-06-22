@@ -10,6 +10,8 @@ add_catch2_executable(
     NAME vfs-disk
     SRCS
         ${CMAKE_CURRENT_LIST_DIR}/unittest_disk_manager.cpp
+    INCLUDE
+        $<TARGET_PROPERTY:module-vfs,INCLUDE_DIRECTORIES>
     LIBS
         module-sys
         module-vfs
@@ -21,8 +23,8 @@ add_catch2_executable(
     NAME vfs-core-fs
     SRCS
         ${CMAKE_CURRENT_LIST_DIR}/unittest_filesystem_core.cpp
-    INCLUDE 
-        ${CMAKE_CURRENT_SOURCE_DIR}/../include/internal
+    INCLUDE
+        $<TARGET_PROPERTY:module-vfs,INCLUDE_DIRECTORIES>
     LIBS
         module-sys
         module-vfs
@@ -40,8 +42,8 @@ add_catch2_executable(
     NAME vfs-littlefs
     SRCS
         ${CMAKE_CURRENT_LIST_DIR}/unittest_filesystem_littlefs.cpp
-    INCLUDE 
-        ${CMAKE_CURRENT_SOURCE_DIR}/../include/internal
+    INCLUDE
+        $<TARGET_PROPERTY:module-vfs,INCLUDE_DIRECTORIES>
     LIBS
         module-sys
         module-vfs
@@ -53,8 +55,8 @@ add_catch2_executable(
     NAME vfs-dualmount
     SRCS
         ${CMAKE_CURRENT_LIST_DIR}/unittest_filesystem_dualmount.cpp
-    INCLUDE 
-        ${CMAKE_CURRENT_SOURCE_DIR}/../include/internal
+    INCLUDE
+        $<TARGET_PROPERTY:module-vfs,INCLUDE_DIRECTORIES>
     LIBS
         module-sys
         module-vfs
@@ -69,8 +71,8 @@ add_catch2_executable(
     LIBS
         module-sys
         module-vfs
-    INCLUDE 
-        ${CMAKE_CURRENT_SOURCE_DIR}/../include/internal
+    INCLUDE
+        $<TARGET_PROPERTY:module-vfs,INCLUDE_DIRECTORIES>
 )
 
 # prepare test assets
