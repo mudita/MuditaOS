@@ -576,7 +576,6 @@
   "app_bellmain_meditation_timer": "Meditation timer",
   "app_bellmain_media_library": "Media Library",
   "app_bellmain_settings": "Settings",
-  "app_bellmain_main_window_title": "Bell Hybrid+",
   "tethering": "Tethering",
   "tethering_turn_off_question": "Turn tethering off?",
   "tethering_enable_question": "<text>You're connected to the computer.<br />Turn tethering on?<br /><text color='9'>(some functions may be disabled)</text></text>",
