@@ -174,7 +174,6 @@ namespace gui
 
         switch (state) {
         case State::INCOMING_CALL: {
-            interface->startAudioRinging();
             bottomBar->setText(gui::BottomBar::Side::LEFT, utils::translate(strings::answer), true);
             bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(strings::reject), true);
             durationLabel->setText(utils::translate(strings::iscalling));

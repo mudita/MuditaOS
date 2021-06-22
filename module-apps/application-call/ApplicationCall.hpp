@@ -45,7 +45,6 @@ namespace app
         };
 
         virtual void stopAudio()                           = 0;
-        virtual void startAudioRinging()                   = 0;
         virtual void startAudioRouting()                   = 0;
         virtual void sendAudioEvent(AudioEvent audioEvent) = 0;
 
@@ -117,7 +116,6 @@ namespace app
         }
 
         void stopAudio() override;
-        void startAudioRinging() override;
         void startAudioRouting() override;
         void sendAudioEvent(AudioEvent audioEvent) override;
 

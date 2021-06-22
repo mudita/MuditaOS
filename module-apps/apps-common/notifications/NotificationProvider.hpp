@@ -4,6 +4,8 @@
 #pragma once
 
 #include "NotificationData.hpp"
+#include "NotificationsConfiguration.hpp"
+#include "policies/NotificationsListPolicy.hpp"
 #include <PhoneModes/Common.hpp>
 
 namespace sys
@@ -30,7 +32,7 @@ namespace notifications
         template <NotificationType type, typename T> bool handleNotSeenWithCounter(NotificationsRecord &&record);
 
       public:
-        explicit NotificationProvider(sys::Service *ownerService);
+        explicit NotificationProvider(sys::Service *ownerService, NotificationsConfiguration &notifcationConfig);
 
         void handle(db::query::notifications::GetAllResult *msg);
         void handle(db::NotificationMessage *msg);
@@ -42,6 +44,8 @@ namespace notifications
 
       private:
         sys::Service *ownerService;
+        NotificationsConfiguration &notifcationConfig;
+        NotificationsListPolicy listPolicy;
         Notifications notifications;
     };
 

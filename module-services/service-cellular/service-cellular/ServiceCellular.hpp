@@ -269,6 +269,7 @@ class ServiceCellular : public sys::Service
     auto handleCellularAnswerIncomingCallMessage(CellularMessage *msg) -> std::shared_ptr<CellularResponseMessage>;
     auto handleCellularCallRequestMessage(CellularCallRequestMessage *msg) -> std::shared_ptr<CellularResponseMessage>;
     void handleCellularHangupCallMessage(CellularHangupCallMessage *msg);
+    void handleCellularDismissCallMessage(sys::Message *msg);
     auto handleDBQueryResponseMessage(db::QueryResponse *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularListCallsMessage(CellularMessage *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleDBNotificatioMessage(db::NotificationMessage *msg) -> std::shared_ptr<sys::ResponseMessage>;
@@ -309,8 +310,6 @@ class ServiceCellular : public sys::Service
     auto handleCellularRingNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularCallerIdNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularSetConnectionFrequencyMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
-
-    auto isIncommingCallAllowed() -> bool;
 
     auto hangUpCall() -> bool;
     auto hangUpCallBusy() -> bool;

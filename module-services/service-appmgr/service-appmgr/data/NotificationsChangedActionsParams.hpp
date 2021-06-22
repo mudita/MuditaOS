@@ -17,11 +17,13 @@ namespace app::manager::actions
     {
       public:
         using Notifications = std::list<std::shared_ptr<const notifications::Notification>>;
-        explicit NotificationsChangedParams(Notifications notifications);
+        explicit NotificationsChangedParams(Notifications notifications, bool showWhenLocked);
 
         [[nodiscard]] auto getNotifications() const noexcept -> const Notifications &;
+        [[nodiscard]] auto showNotificationsWhenLocked() const noexcept -> bool;
 
       private:
         Notifications notifications;
+        const bool showWhenLocked;
     };
 } // namespace app::manager::actions

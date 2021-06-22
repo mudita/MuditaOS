@@ -109,6 +109,7 @@ class DBServiceAPI
 
     static auto DBBackup(sys::Service *serv, std::string backupPath) -> bool;
 
+    static auto IsContactInFavourites(sys::Service *serv, const utils::PhoneNumber::View &numberView) -> bool;
     /**
      * @brief Add sms via DBService interface
      *

@@ -124,10 +124,12 @@ namespace app::manager
                                            const ApplicationName &_rootApplicationName)
         : Service{serviceName, {}, ApplicationManagerStackDepth},
           ApplicationManagerBase(std::move(launchers)), rootApplicationName{_rootApplicationName},
-          actionsRegistry{[this](ActionEntry &action) { return handleAction(action); }}, notificationProvider(this),
-          settings(std::make_unique<settings::Settings>()),
-          phoneModeObserver(std::make_unique<sys::phone_modes::Observer>()),
-          phoneLockHandler(locks::PhoneLockHandler(this, settings)), simLockHandler(this)
+          actionsRegistry{[this](ActionEntry &action) { return handleAction(action); }},
+          settings(std::make_shared<settings::Settings>()),
+          phoneModeObserver(std::make_shared<sys::phone_modes::Observer>()),
+          phoneLockHandler(locks::PhoneLockHandler(this, settings)),
+          simLockHandler(this), notificationsConfig{phoneModeObserver, settings, phoneLockHandler},
+          notificationsHandler{this, notificationsConfig}, notificationProvider{this, notificationsConfig}
     {
         autoLockTimer = sys::TimerFactory::createSingleShotTimer(
             this, autoLockTimerName, sys::timer::InfiniteTimeout, [this](sys::Timer &) { onPhoneLocked(); });
@@ -266,6 +268,8 @@ namespace app::manager
 
         phoneModeObserver->subscribe(
             [this](sys::phone_modes::Tethering tethering) { handleTetheringChanged(tethering); });
+
+        notificationsHandler.registerMessageHandlers();
 
         connect(typeid(StartAllowedMessage), [this](sys::Message *request) {
             auto msg = static_cast<StartAllowedMessage *>(request);
@@ -553,8 +557,6 @@ namespace app::manager
         connect(typeid(VolumeChanged), convertibleToActionHandler);
         connect(typeid(CellularCallAbortedNotification), convertibleToActionHandler);
         connect(typeid(CellularRingingMessage), convertibleToActionHandler);
-        connect(typeid(CellularIncominCallMessage), convertibleToActionHandler);
-        connect(typeid(CellularCallerIdMessage), convertibleToActionHandler);
         connect(typeid(CellularCallActiveNotification), convertibleToActionHandler);
         connect(typeid(CellularHangupCallMessage), convertibleToActionHandler);
     }
