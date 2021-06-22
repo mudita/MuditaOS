@@ -1,9 +1,9 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "ApplicationBellMain.hpp"
-#include "windows/BellMainWindow.hpp"
-#include "windows/BellMainMenuWindow.hpp"
+#include <application-bell-main/ApplicationBellMain.hpp>
+#include <windows/BellMainWindow.hpp>
+#include <windows/BellMainMenuWindow.hpp>
 #include <windows/Dialog.hpp>
 
 namespace app
