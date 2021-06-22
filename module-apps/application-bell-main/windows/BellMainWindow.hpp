@@ -14,5 +14,9 @@ namespace gui
 
         void buildInterface() override;
         bool onInput(const InputEvent &inputEvent) override;
+        bool updateTime() override;
+
+        gui::Label *time        = nullptr;
+        gui::Label *temperature = nullptr;
     };
 } // namespace gui

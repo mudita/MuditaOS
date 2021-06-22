@@ -2,12 +2,14 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BellMainMenuWindow.hpp"
+
+#include <application-bell-main/ApplicationBellMain.hpp>
+#include <data/BellMainStyle.hpp>
+
+#include <Dialog.hpp>
+#include <DialogMetadataMessage.hpp>
 #include <OptionBellMenu.hpp>
 #include <service-appmgr/Controller.hpp>
-#include <application-bell-main/ApplicationBellMain.hpp>
-#include <windows/Dialog.hpp>
-#include <DialogMetadataMessage.hpp>
-#include <application-bell-main/data/BellMainStyle.hpp>
 
 namespace gui
 {
