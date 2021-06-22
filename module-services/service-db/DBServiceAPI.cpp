@@ -90,6 +90,19 @@ auto DBServiceAPI::MatchContactByPhoneNumber(sys::Service *serv, const utils::Ph
     return std::move(contactResponse->contact);
 }
 
+auto DBServiceAPI::IsContactInFavourites(sys::Service *serv, const utils::PhoneNumber::View &numberView) -> bool
+{
+    auto msg = std::make_shared<DBContactNumberMessage>(numberView);
+
+    auto ret             = serv->bus.sendUnicastSync(std::move(msg), service::name::db, DefaultTimeoutInMs);
+    auto contactResponse = dynamic_cast<DBContactNumberResponseMessage *>(ret.second.get());
+    if (contactResponse == nullptr || contactResponse->retCode != sys::ReturnCodes::Success) {
+        LOG_ERROR("DB response error, return code: %s", c_str(ret.first));
+        return false;
+    }
+    return contactResponse->contact->isOnFavourites();
+}
+
 auto DBServiceAPI::verifyContact(sys::Service *serv, const ContactRecord &rec)
     -> DBServiceAPI::ContactVerificationResult
 {
