@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhoneLockedWindow.hpp"
+#include "PhoneLockedInfoData.hpp"
 
 #include <application-desktop/data/DesktopStyle.hpp>
 #include <module-services/service-appmgr/service-appmgr/Controller.hpp>
@@ -10,26 +11,6 @@
 
 namespace gui
 {
-    bool PhoneLockedWindow::LockingTimer::storeEnter(const InputEvent &evt)
-    {
-        enterPressed    = evt.is(KeyCode::KEY_ENTER);
-        unLockStartTime = xTaskGetTickCount();
-        return enterPressed;
-    }
-
-    void PhoneLockedWindow::LockingTimer::clear() noexcept
-    {
-        enterPressed = false;
-    }
-
-    bool PhoneLockedWindow::LockingTimer::cached() noexcept
-    {
-        if (xTaskGetTickCount() - unLockStartTime >= unLockTime) {
-            clear();
-        }
-        return enterPressed;
-    }
-
     PhoneLockedWindow::PhoneLockedWindow(app::Application *app, const std::string &name)
         : AppWindow(app, name), notificationsModel(std::make_shared<NotificationsModel>())
     {
@@ -104,41 +85,17 @@ namespace gui
         return AppWindow::onInput(inputEvent);
     }
 
-    bool PhoneLockedWindow::processShortReleaseEvent(const InputEvent &inputEvent)
-    {
-        // if enter was pressed
-        if (lockingTimer.cached() && inputEvent.is(KeyCode::KEY_PND)) {
-            // if interval between enter and pnd keys is less than time defined for unlocking
-            // display pin lock screen or simply refresh current window to update labels
-
-            application->getPhoneLockSubject().unlock();
-            return true;
-        }
-        else if (lockingTimer.storeEnter(inputEvent)) {
-            return true;
-        }
-        // back not allowed on blocked screen
-        else if (inputEvent.is(KeyCode::KEY_RF)) {
-            application->switchWindow(gui::popup::window::phone_lock_info_window);
-            return true;
-        }
-        // check if any of the lower inheritance onInput methods catch the event
-        else if (AppWindow::onInput(inputEvent)) {
-            return true;
-        }
-
-        application->switchWindow(gui::popup::window::phone_lock_info_window);
-
-        return true;
-    }
-
     bool PhoneLockedWindow::onInput(const InputEvent &inputEvent)
     {
         if (inputEvent.isLongRelease()) {
             return processLongReleaseEvent(inputEvent);
         }
         else if (inputEvent.isShortRelease()) {
-            return processShortReleaseEvent(inputEvent);
+            const auto requiredStage = (inputEvent.is(KeyCode::KEY_ENTER)) ? PhoneLockedInfoData::Stage::Waiting
+                                                                           : PhoneLockedInfoData::Stage::Idle;
+            application->switchWindow(gui::popup::window::phone_lock_info_window,
+                                      std::make_unique<PhoneLockedInfoData>(requiredStage));
+            return true;
         }
         return AppWindow::onInput(inputEvent);
     }
