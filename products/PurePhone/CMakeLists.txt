@@ -57,6 +57,8 @@ target_link_libraries(PurePhone
         application-phonebook
         messagetype
         module-apps
+        module-bsp
+        module-vfs
         service-bluetooth
         service-desktop
         service-lwip

@@ -50,6 +50,8 @@ target_link_libraries(BellHybrid
         application-music-player
         messagetype
         module-apps
+        module-bsp
+        module-vfs
         service-bluetooth
         service-desktop
         service-lwip
