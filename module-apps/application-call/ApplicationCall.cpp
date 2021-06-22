@@ -250,12 +250,6 @@ namespace app
         AudioServiceAPI::StopAll(this);
     }
 
-    void ApplicationCall::startAudioRinging()
-    {
-        const auto filePath = AudioServiceAPI::GetSound(this, audio::PlaybackType::CallRingtone);
-        AudioServiceAPI::PlaybackStart(this, audio::PlaybackType::CallRingtone, filePath);
-    }
-
     void ApplicationCall::startAudioRouting()
     {
         AudioServiceAPI::RoutingStart(this);

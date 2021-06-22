@@ -16,6 +16,10 @@ target_sources(apps-common
         notifications/NotificationListItem.cpp
         notifications/NotificationProvider.cpp
         notifications/NotificationsModel.cpp
+        notifications/NotificationsHandler.cpp
+        notifications/NotificationsConfiguration.cpp
+        notifications/policies/CallNotificationPolicy.cpp
+        notifications/policies/NotificationsListPolicy.cpp
         options/OptionsModel.cpp
         options/type/OptionCall.cpp
         options/type/OptionContact.cpp

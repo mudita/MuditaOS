@@ -13,7 +13,11 @@
 
 namespace gui
 {
-
+    enum class NotificationsListPlacement
+    {
+        Desktop,
+        LockedScreen
+    };
     class NotificationsModel : public app::InternalModel<gui::NotificationListItem *>, public gui::ListItemProvider
     {
         [[nodiscard]] unsigned int requestRecordsCount() final;
@@ -23,6 +27,7 @@ namespace gui
 
       protected:
         bool tetheringOn = false;
+        const NotificationsListPlacement listPlacement;
         [[nodiscard]] virtual auto create(const notifications::NotSeenSMSNotification *notification)
             -> NotificationListItem *;
         [[nodiscard]] virtual auto create(const notifications::NotSeenCallNotification *notification)
@@ -31,6 +36,7 @@ namespace gui
             -> NotificationListItem *;
 
       public:
+        explicit NotificationsModel(NotificationsListPlacement listPlacement = NotificationsListPlacement::Desktop);
         [[nodiscard]] bool isEmpty() const noexcept;
         [[nodiscard]] bool hasDismissibleNotification() const noexcept;
         [[nodiscard]] bool isTetheringOn() const noexcept;

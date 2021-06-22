@@ -31,6 +31,10 @@ namespace
     }
 } // namespace
 
+NotificationsModel::NotificationsModel(NotificationsListPlacement listPlacement)
+    : app::InternalModel<gui::NotificationListItem *>{}, gui::ListItemProvider{}, listPlacement{listPlacement}
+{}
+
 unsigned int NotificationsModel::requestRecordsCount()
 {
     return internalData.size();
@@ -113,19 +117,25 @@ void NotificationsModel::updateData(app::manager::actions::NotificationsChangedP
             delete item;
         }
     };
-    tetheringOn = hasTetheringNotification(params);
-    for (const auto &notification : params->getNotifications()) {
-        if (not tetheringOn && typeid(*notification) == typeid(notifications::NotSeenSMSNotification)) {
-            auto sms = static_cast<const notifications::NotSeenSMSNotification *>(notification.get());
-            internalData.push_back(create(sms));
-        }
-        else if (not tetheringOn && typeid(*notification) == typeid(notifications::NotSeenCallNotification)) {
-            auto call = static_cast<const notifications::NotSeenCallNotification *>(notification.get());
-            internalData.push_back(create(call));
-        }
-        else if (typeid(*notification) == typeid(notifications::TetheringNotification)) {
-            auto tethering = static_cast<const notifications::TetheringNotification *>(notification.get());
-            internalData.push_back(create(tethering));
+
+    const auto showOnLocked =
+        (listPlacement == NotificationsListPlacement::LockedScreen) && params->showNotificationsWhenLocked();
+
+    if ((listPlacement == NotificationsListPlacement::Desktop) || showOnLocked) {
+        tetheringOn = hasTetheringNotification(params);
+        for (const auto &notification : params->getNotifications()) {
+            if (not tetheringOn && typeid(*notification) == typeid(notifications::NotSeenSMSNotification)) {
+                auto sms = static_cast<const notifications::NotSeenSMSNotification *>(notification.get());
+                internalData.push_back(create(sms));
+            }
+            else if (not tetheringOn && typeid(*notification) == typeid(notifications::NotSeenCallNotification)) {
+                auto call = static_cast<const notifications::NotSeenCallNotification *>(notification.get());
+                internalData.push_back(create(call));
+            }
+            else if (typeid(*notification) == typeid(notifications::TetheringNotification)) {
+                auto tethering = static_cast<const notifications::TetheringNotification *>(notification.get());
+                internalData.push_back(create(tethering));
+            }
         }
     }
 

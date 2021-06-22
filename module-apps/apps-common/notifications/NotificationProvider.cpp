@@ -11,7 +11,8 @@
 
 using namespace notifications;
 
-NotificationProvider::NotificationProvider(sys::Service *ownerService) : ownerService{ownerService}
+NotificationProvider::NotificationProvider(sys::Service *ownerService, NotificationsConfiguration &notifcationConfig)
+    : ownerService{ownerService}, notifcationConfig{notifcationConfig}
 {}
 
 template <NotificationType type, typename T>
@@ -56,7 +57,9 @@ void NotificationProvider::handle(db::query::notifications::GetAllResult *msg)
         }
     }
 
-    if (notificationsChanged) {
+    notifcationConfig.updateCurrentList(listPolicy);
+
+    if (notificationsChanged && listPolicy.updateListAllowed()) {
         send();
     }
 }
@@ -108,6 +111,8 @@ namespace
 
 void NotificationProvider::send()
 {
+    notifcationConfig.updateCurrentList(listPolicy);
+
     std::list<std::shared_ptr<const Notification>> toSendNotifications;
     transform(notifications.begin(), notifications.end(), back_inserter(toSendNotifications), get_second());
 
@@ -116,8 +121,8 @@ void NotificationProvider::send()
             return (lhs->getPriority() > rhs->getPriority());
         });
 
-    app::manager::Controller::sendAction(
-        ownerService,
-        app::manager::actions::NotificationsChanged,
-        std::make_unique<app::manager::actions::NotificationsChangedParams>(std::move(toSendNotifications)));
+    app::manager::Controller::sendAction(ownerService,
+                                         app::manager::actions::NotificationsChanged,
+                                         std::make_unique<app::manager::actions::NotificationsChangedParams>(
+                                             std::move(toSendNotifications), listPolicy.showListWhenLocked()));
 }

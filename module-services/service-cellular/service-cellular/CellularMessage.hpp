@@ -35,6 +35,7 @@ class CellularMessage : public sys::DataMessage
         Notification,       ///< Async notification message
         AnswerIncomingCall, ///< Answer incoming call
         HangupCall,         ///< Hang up call
+        DismissCall,        ///< Dismiss incoming call request
         Ringing,
         IncomingCall,
         CallerId,
@@ -42,7 +43,7 @@ class CellularMessage : public sys::DataMessage
         PowerStateChange, ///< Change power state of the module
 
         ListCurrentCalls,
-        SimResponse,  // Send to PIN window (show, error state, hide)
+        SimResponse, // Send to PIN window (show, error state, hide)
         SetVoLTE,
         SetFlightMode,
 
@@ -103,7 +104,7 @@ class CellularRingingMessage : public CellularMessage, public app::manager::acti
     utils::PhoneNumber::View number;
 };
 
-class CellularIncominCallMessage : public CellularMessage, public app::manager::actions::ConvertibleToAction
+class CellularIncominCallMessage : public CellularMessage
 {
   public:
     CellularIncominCallMessage(const utils::PhoneNumber::View &number)
@@ -116,18 +117,10 @@ class CellularIncominCallMessage : public CellularMessage, public app::manager::
         : CellularMessage(Type::IncomingCall), number(utils::PhoneNumber::parse(e164number))
     {}
 
-    [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
-    {
-        return std::make_unique<app::manager::ActionRequest>(
-            sender,
-            app::manager::actions::HandleIncomingCall,
-            std::make_unique<app::manager::actions::CallParams>(number));
-    }
-
     utils::PhoneNumber::View number;
 };
 
-class CellularCallerIdMessage : public CellularMessage, public app::manager::actions::ConvertibleToAction
+class CellularCallerIdMessage : public CellularMessage
 {
   public:
     CellularCallerIdMessage(const utils::PhoneNumber::View &number) : CellularMessage(Type::CallerId), number(number)
@@ -138,12 +131,6 @@ class CellularCallerIdMessage : public CellularMessage, public app::manager::act
     CellularCallerIdMessage(const std::string &e164number)
         : CellularMessage(Type::CallerId), number(utils::PhoneNumber::parse(e164number))
     {}
-
-    [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
-    {
-        return std::make_unique<app::manager::ActionRequest>(
-            sender, app::manager::actions::HandleCallerId, std::make_unique<app::manager::actions::CallParams>(number));
-    }
 
     utils::PhoneNumber::View number;
 };
@@ -589,6 +576,13 @@ class CellularHangupCallMessage : public CellularMessage, public app::manager::a
         return std::make_unique<app::manager::ActionRequest>(
             sender, app::manager::actions::AbortCall, std::make_unique<app::manager::actions::ActionParams>());
     }
+};
+
+class CellularDismissCallMessage : public CellularMessage
+{
+  public:
+    CellularDismissCallMessage() : CellularMessage(Type::DismissCall)
+    {}
 };
 
 class CellularListCallsMessage : public CellularMessage

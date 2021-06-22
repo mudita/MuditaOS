@@ -35,6 +35,8 @@
 #include <notifications/NotificationProvider.hpp>
 #include <apps-common/locks/handlers/PhoneLockHandler.hpp>
 #include <apps-common/locks/handlers/SimLockHandler.hpp>
+#include <apps-common/notifications/NotificationsHandler.hpp>
+#include <apps-common/notifications/NotificationsConfiguration.hpp>
 
 namespace app
 {
@@ -174,17 +176,20 @@ namespace app::manager
         ApplicationName rootApplicationName;
         ActionsRegistry actionsRegistry;
         OnActionPolicy actionPolicy;
-        notifications::NotificationProvider notificationProvider;
 
         sys::TimerHandle autoLockTimer; //< auto-lock timer to count time from last user's activity.
                                         // If it reaches time defined in settings database application
                                         // manager is sending signal to Application Desktop in order to
                                         // lock screen.
         std::shared_ptr<settings::Settings> settings;
-        std::unique_ptr<sys::phone_modes::Observer> phoneModeObserver;
+        std::shared_ptr<sys::phone_modes::Observer> phoneModeObserver;
 
         locks::PhoneLockHandler phoneLockHandler;
         locks::SimLockHandler simLockHandler;
+
+        notifications::NotificationsConfiguration notificationsConfig;
+        notifications::NotificationsHandler notificationsHandler;
+        notifications::NotificationProvider notificationProvider;
 
         void displayLanguageChanged(std::string value);
         void lockTimeChanged(std::string value);
