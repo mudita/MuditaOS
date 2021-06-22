@@ -14,6 +14,7 @@ namespace gui::status_bar
     class TimeConfiguration : public StatusBarVisitor
     {
       public:
+      
         enum class TimeMode
         {
             Time12h, /// 12h time format
