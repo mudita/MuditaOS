@@ -32,4 +32,9 @@ namespace stm::api
      * @return true when 12h format is set, false when 24h format is set
      */
     bool isTimeFormat12h();
+    /**
+     * Gets value corresponded to current timezone setting stored in DB
+     * @return current timezone
+     */
+    const std::string getCurrentTimezone();
 } // namespace stm::api
