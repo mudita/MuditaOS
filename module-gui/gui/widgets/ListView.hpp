@@ -16,15 +16,6 @@ namespace gui
     {
         inline constexpr auto nPos = std::numeric_limits<unsigned int>::max();
 
-        /// Possible List boundaries handling types
-        enum class Boundaries
-        {
-            Fixed,     ///< Fixed - list will stop scrolling on first or last elements on appropriate top or bottom
-                       ///< directions.
-            Continuous ///< Continuous - list will continue to beginning or end on first or last elements on
-                       ///< appropriate top or bottom directions.
-        };
-
         /// Possible List scrolling directions
         enum class Direction
         {
@@ -73,7 +64,7 @@ namespace gui
         const unsigned int elementsCount;
         const unsigned int elementMinimalHeight;
         const listview::Direction direction;
-        const listview::Boundaries boundaries;
+        const Boundaries boundaries;
         const int topMargin;
     };
 
@@ -118,7 +109,7 @@ namespace gui
         bool focusOnLastItem         = false;
         int scrollTopMargin          = style::margins::big;
 
-        listview::Boundaries boundaries   = listview::Boundaries::Fixed;
+        Boundaries boundaries             = Boundaries::Fixed;
         listview::Direction direction     = listview::Direction::Bottom;
         listview::Orientation orientation = listview::Orientation::TopBottom;
 
@@ -182,7 +173,7 @@ namespace gui
 
         std::shared_ptr<ListItemProvider> getProvider();
         void setOrientation(listview::Orientation value);
-        void setBoundaries(listview::Boundaries value);
+        void setBoundaries(Boundaries value);
         void setScrollTopMargin(int value);
         void setAlignment(const Alignment &value) override;
         void onProviderDataUpdate();

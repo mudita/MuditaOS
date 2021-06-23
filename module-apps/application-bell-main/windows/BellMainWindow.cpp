@@ -47,6 +47,7 @@ namespace gui
 
     bool BellMainWindow::onInput(const InputEvent &inputEvent)
     {
+        LOG_INFO("Bell Main Window Input");
         if (inputEvent.isShortRelease()) {
             switch (inputEvent.getKeyCode()) {
             case KeyCode::KEY_ENTER:

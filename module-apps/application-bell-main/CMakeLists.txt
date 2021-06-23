@@ -1,13 +1,15 @@
-﻿add_library(application-bell-main STATIC)
+add_library(application-bell-main)
 
 target_sources(application-bell-main
     PRIVATE
         ApplicationBellMain.cpp
         windows/BellMainWindow.cpp
         windows/BellMainMenuWindow.cpp
-    PRIVATE
+        windows/BellMainSetHour.cpp
+ 
         windows/BellMainWindow.hpp
         windows/BellMainMenuWindow.hpp
+        windows/BellMainSetHour.hpp
     PUBLIC
         include/application-bell-main/ApplicationBellMain.hpp
 )
