@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -9,8 +9,9 @@ namespace gui
 {
     namespace text
     {
-        const unsigned int npos = std::numeric_limits<unsigned int>().max();
-        const char newline      = '\n';
+        constexpr auto npos                     = std::numeric_limits<unsigned int>::max();
+        const char newline                      = '\n';
+        const unsigned int word_detection_range = 10;
     }; // namespace text
 
     enum class TextLimitType
