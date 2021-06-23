@@ -1369,3 +1369,69 @@ TEST_CASE("Navigating down between input texts")
         REQUIRE(layout.getFocusItemIndex() == 1);
     }
 }
+
+TEST_CASE("Text word line breaking tests")
+{
+    std::string testStringBlock1 = "Test ";
+    std::string testStringBlock2 = "String ";
+    std::string testStringBlock3 = "LongLongLong";
+    std::string testStringBlock4 = testStringBlock1 + testStringBlock3 + testStringBlock2;
+    std::string testStringBlock5 = testStringBlock1 + testStringBlock2;
+    std::string emptyParagraph   = "<p></p>";
+
+    SECTION("Breaking lines on space on whole words with long words")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = std::make_unique<gui::TestText>();
+        text->setMaximumSize(300, 200);
+
+        text->addRichText("<text>" + testStringBlock4 + testStringBlock5 + "</text>");
+
+        REQUIRE(text->linesSize() == 2);
+        REQUIRE((*text->lineGet(0)).getText(0) == testStringBlock4);
+        REQUIRE((*text->lineGet(1)).getText(0) == testStringBlock5);
+    }
+
+    SECTION("Breaking lines on space on whole words with short word")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = std::make_unique<gui::TestText>();
+        text->setMaximumSize(250, 200);
+
+        text->addRichText("<text>" + testStringBlock5 + testStringBlock5 + testStringBlock5 + "</text>");
+
+        REQUIRE(text->linesSize() == 2);
+        REQUIRE((*text->lineGet(0)).getText(0) == testStringBlock5 + testStringBlock5);
+        REQUIRE((*text->lineGet(1)).getText(0) == testStringBlock5);
+    }
+
+    SECTION("Breaking lines on newline before breaking it on space")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = std::make_unique<gui::TestText>();
+        text->setMaximumSize(250, 200);
+
+        text->addRichText("<text>" + testStringBlock5 + emptyParagraph + testStringBlock5 + "</text>");
+
+        REQUIRE(text->linesSize() == 2);
+        REQUIRE((*text->lineGet(0)).getText(0) == testStringBlock5 + "\n");
+        REQUIRE((*text->lineGet(1)).getText(0) == testStringBlock5);
+    }
+
+    SECTION("Breaking lines by splitting word with dash")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = std::make_unique<gui::TestText>();
+        text->setMaximumSize(220, 200);
+
+        text->addRichText("<text>" + testStringBlock4 + "</text>");
+
+        REQUIRE(text->linesSize() == 2);
+        REQUIRE((*text->lineGet(0)).getText(0) == testStringBlock1 + testStringBlock3 + "-");
+        REQUIRE((*text->lineGet(1)).getText(0) == testStringBlock2);
+    }
+}
