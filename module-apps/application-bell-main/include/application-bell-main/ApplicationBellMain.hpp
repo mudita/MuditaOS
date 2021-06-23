@@ -9,6 +9,7 @@ namespace gui::window::name
 {
     inline constexpr auto bell_main_menu        = "BellMainMenu";
     inline constexpr auto bell_main_menu_dialog = "BellMainMenuDialog";
+    inline constexpr auto bell_main_set_hour    = "BellMainSetHour";
 
 } // namespace gui::window::name
 

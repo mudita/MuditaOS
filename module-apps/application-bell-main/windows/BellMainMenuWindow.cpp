@@ -29,7 +29,7 @@ namespace gui
         optionsList->setPosition(bellMainStyle::mainMenuWindow::options_list_x,
                                  bellMainStyle::mainMenuWindow::options_list_y);
         optionsList->setMaximumWidth(bellMainStyle::mainMenuWindow::default_body_width);
-        optionsList->setBoundaries(listview::Boundaries::Continuous);
+        optionsList->setBoundaries(gui::Boundaries::Continuous);
     }
 
     std::list<Option> BellMainMenuWindow::mainMenuOptionsList()
@@ -80,6 +80,7 @@ namespace gui
         addWinMenu(utils::translate("app_bellmain_meditation_timer"), gui::window::name::bell_main_menu_dialog);
         addWinMenu(utils::translate("app_bellmain_media_library"), gui::window::name::bell_main_menu_dialog);
         addWinMenu(utils::translate("app_bellmain_settings"), gui::window::name::bell_main_menu_dialog);
+        addWinMenu(utils::translate("Set Hour"), gui::window::name::bell_main_set_hour);
 
         return menuOptionList;
     }

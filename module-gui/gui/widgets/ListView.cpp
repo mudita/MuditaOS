@@ -52,7 +52,7 @@ namespace gui
     {
         if (data.startIndex != storedStartIndex) {
             if (data.direction == listview::Direction::Bottom) {
-                if (data.boundaries == listview::Boundaries::Continuous && (data.startIndex == 0)) {
+                if (data.boundaries == Boundaries::Continuous && (data.startIndex == 0)) {
                     currentPage = 0;
                 }
                 else if (currentPage + 1 < pagesCount) {
@@ -60,7 +60,7 @@ namespace gui
                 }
             }
             else {
-                if (data.boundaries == listview::Boundaries::Continuous && storedStartIndex == 0) {
+                if (data.boundaries == Boundaries::Continuous && storedStartIndex == 0) {
                     currentPage = pagesCount - 1;
                 }
                 else if (currentPage > 0 && storedStartIndex != 0) {
@@ -203,7 +203,7 @@ namespace gui
         }
     }
 
-    void ListView::setBoundaries(listview::Boundaries value)
+    void ListView::setBoundaries(Boundaries value)
     {
         boundaries = value;
     }
@@ -688,11 +688,11 @@ namespace gui
 
     bool ListView::requestNextPage()
     {
-        if (startIndex + currentPageSize >= elementsCount && boundaries == listview::Boundaries::Continuous) {
+        if (startIndex + currentPageSize >= elementsCount && boundaries == Boundaries::Continuous) {
 
             startIndex = 0;
         }
-        else if (startIndex + currentPageSize >= elementsCount && boundaries == listview::Boundaries::Fixed) {
+        else if (startIndex + currentPageSize >= elementsCount && boundaries == Boundaries::Fixed) {
 
             return false;
         }
@@ -716,13 +716,13 @@ namespace gui
         auto topFetchIndex = 0;
         auto limit         = 0;
 
-        if (startIndex == 0 && boundaries == listview::Boundaries::Continuous) {
+        if (startIndex == 0 && boundaries == Boundaries::Continuous) {
 
             startIndex    = elementsCount;
             topFetchIndex = elementsCount - calculateLimit(listview::Direction::Top);
             limit         = calculateLimit(listview::Direction::Top);
         }
-        else if (startIndex == 0 && boundaries == listview::Boundaries::Fixed) {
+        else if (startIndex == 0 && boundaries == Boundaries::Fixed) {
 
             return false;
         }

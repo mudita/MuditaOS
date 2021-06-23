@@ -232,7 +232,7 @@ TEST_F(ListViewTesting, Navigate_Test)
 TEST_F(ListViewTesting, Continuous_Type_Test)
 {
     // set list type to Continuous
-    testListView->setBoundaries(gui::listview::Boundaries::Continuous);
+    testListView->setBoundaries(gui::Boundaries::Continuous);
 
     // 10 provider elements, 100 h each, list 600 -> 6 elements on page.
     testListView->provider->requestRecords(0, 10);
