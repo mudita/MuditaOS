@@ -182,14 +182,19 @@ namespace gui
         }
 
         /// right - corner case
-        if ((checkNpos() || (direction == NavigationDirection::RIGHT && selectedLineNumber == lastVisibleLineNumber))) {
+        if ((checkNpos() || (direction == NavigationDirection::RIGHT && selectedLineNumber >= lastVisibleLineNumber))) {
 
-            if (text->lines->stopCondition != LinesDrawStop::OutOfText &&
+            auto onLastLine = selectedLineNumber == lastVisibleLineNumber;
+            auto onLastLineLastCharacter =
+                onLastLine &&
                 (selectedLineCursorPosition ==
                  (text->lines->getLine(lastVisibleLineNumber)->length() -
-                  (text->lines->getLine(lastVisibleLineNumber)->getEnd() == TextBlock::End::Newline ? 1 : 0)))) {
+                  (text->lines->getLine(lastVisibleLineNumber)->getEnd() == TextBlock::End::Newline ? 1 : 0)));
 
-                if (checkNextLineDocumentEnd(selectedLineNumber)) {
+            if (text->lines->stopCondition != LinesDrawStop::OutOfText &&
+                (onLastLineLastCharacter || (selectedLineNumber > lastVisibleLineNumber))) {
+
+                if (onLastLine && checkNextLineDocumentEnd(selectedLineNumber)) {
                     return TextCursor::Move::End;
                 }
 
@@ -200,7 +205,6 @@ namespace gui
                 return ret;
             }
             else {
-
                 return TextCursor::moveCursor(direction);
             }
         }

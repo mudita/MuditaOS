@@ -157,7 +157,7 @@ TEST_CASE("TextFixedSize remove Char")
     using namespace gui;
     mockup::fontManager();
 
-    std::string testString1 = "Test Line Line Line";
+    std::string testString1 = "Test Line Line Line ";
     std::string testString2 = "End";
 
     std::string testStringLongLine = testString1 + testString2;
