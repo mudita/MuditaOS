@@ -52,7 +52,7 @@ To install the new version of MuditaOS please follow the steps described in this
 * [EGD-6875] Fix UT check script
 * [BH-369] Fixed UTF8 unit test CI run
 * [EGD-6884] Fix autolock in sms template
-* [CP-187] Fix stack overflow on passcode decoding
+*dsada [CP-187] Fix stack overflow on passcode decoding
 
 ## [0.68.1 2021-06-04]
 
