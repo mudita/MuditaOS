@@ -9,16 +9,17 @@
 
 namespace gui
 {
-    class BellMainWindow : public AppWindow
+    class BellMainSetHour : public AppWindow
     {
       public:
-        explicit BellMainWindow(app::Application *app);
+        explicit BellMainSetHour(app::Application *app);
 
         void buildInterface() override;
         bool onInput(const InputEvent &inputEvent) override;
-        bool updateTime() override;
+        status_bar::Configuration configureStatusBar(status_bar::Configuration appConfiguration) override;
 
-        gui::Label *time        = nullptr;
-        gui::Label *temperature = nullptr;
+      private:
+        gui::Spinner *spinnerHour   = nullptr;
+        gui::Spinner *spinnerMinute = nullptr;
     };
 } // namespace gui

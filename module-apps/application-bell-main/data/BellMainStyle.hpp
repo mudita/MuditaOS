@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <module-gui/gui/Common.hpp>
+
 namespace bellMainStyle
 {
     namespace mainWindow
@@ -34,5 +36,12 @@ namespace bellMainStyle
         inline constexpr gui::Length options_list_y     = 85;
         inline constexpr gui::Length default_body_width = 400;
     } // namespace mainMenuWindow
+
+    namespace clockSpinner
+    {
+        inline constexpr auto default_width             = 100;
+        inline constexpr auto default_height            = 100;
+        inline constexpr auto hour_or_munte_field_width = 2;
+    } // namespace clockSpinner
 
 } // namespace bellMainStyle
