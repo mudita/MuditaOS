@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -36,9 +36,11 @@ namespace gui
         Position storedYOffset              = 0;
         bool lineEnd                        = false;
         bool lineVisible                    = true;
+        bool breakLineDashAddition          = false;
         unsigned int lineStartBlockNumber   = text::npos;
         unsigned int lineStartBlockPosition = text::npos;
 
+        unsigned int calculateSignsToShow(BlockCursor &localCursor, UTF8 &text, unsigned int space);
         void createUnderline(unsigned int max_w, unsigned int max_height);
         void updateUnderline(const short &x, const short &y);
         void setLineStartConditions(unsigned int startBlockNumber, unsigned int startBlockPosition);
