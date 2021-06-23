@@ -114,6 +114,8 @@ add_subdirectory(third-party)
 
 if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
     add_subdirectory(board/linux/libiosyscalls)
+elseif(${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
+    add_subdirectory(board/rt1051)
 endif()
 
 add_subdirectory(source)
