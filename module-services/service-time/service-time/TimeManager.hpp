@@ -6,7 +6,6 @@
 #include "RTCCommandInterface.hpp"
 
 #include <ctime>
-#include <chrono>
 
 class TimeManager
 {
@@ -22,14 +21,19 @@ class TimeManager
     /**
      * Handles GSM time update notification. Sets custom timezone.
      * @param time new UTC time
-     * @param timezoneOffset timezone offset related to UTC time
+     * @param timezone formatted timezone string
      */
-    void handleCellularTimeUpdate(const struct tm time, std::chrono::minutes timezoneOffset);
+    void handleCellularTimeUpdate(const struct tm time, const std::string &timezone);
     /**
      * Handles time change request.
      * @param time UTC time to set
      * **/
     void handleTimeChangeRequest(const time_t &time);
+    /**
+     * Handles timezone change request
+     * @param timezone formatted timezone string
+     */
+    void handleTimezoneChangeRequest(const std::string &timezone);
 
   private:
     std::unique_ptr<RTCCommandInterface> rtcCommand;

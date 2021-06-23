@@ -182,4 +182,19 @@ namespace stm::message
       private:
         utils::time::Locale::DateFormat dateFormat;
     };
+
+    class SetTimezoneRequest : public sys::DataMessage
+    {
+      public:
+        explicit SetTimezoneRequest(const std::string &timezoneRules)
+            : sys::DataMessage(MessageType::MessageTypeUninitialized), timezone(timezoneRules)
+        {}
+        auto getTimezone() const -> std::string
+        {
+            return timezone;
+        }
+
+      private:
+        std::string timezone;
+    };
 } // namespace stm::message

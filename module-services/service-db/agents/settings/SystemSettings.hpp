@@ -21,6 +21,7 @@ namespace settings
         constexpr inline auto eulaAccepted             = "gs_eula_accepted";
         constexpr inline auto osCurrentVersion         = "gs_os_current_version";
         constexpr inline auto osUpdateVersion          = "gs_os_update_version";
+        constexpr inline auto currentTimezone          = "gs_current_timezone";
     } // namespace SystemProperties
     namespace Bluetooth
     {
