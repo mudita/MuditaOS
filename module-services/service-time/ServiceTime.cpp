@@ -7,6 +7,7 @@
 #include "service-time/RTCCommand.hpp"
 #include <service-time/internal/StaticData.hpp>
 #include <service-time/TimeSettings.hpp>
+#include <service-time/TimezoneHandler.hpp>
 
 #include <BaseInterface.hpp>
 #include <Common/Query.hpp>
@@ -16,10 +17,12 @@
 #include <service-db/DBNotificationMessage.hpp>
 #include <service-db/QueryMessage.hpp>
 #include <service-cellular/service-cellular/CellularMessage.hpp>
-#include <service-cellular/service-cellular/ServiceCellular.hpp>
-#include <module-utils/Utils.hpp>
+#include <service-cellular/ServiceCellular.hpp>
 #include <time/time_constants.hpp>
 #include <time/time_conversion_factory.hpp>
+#include <service-evtmgr/Constants.hpp>
+#include <service-db/service-db/Settings.hpp>
+#include <service-db/agents/settings/SystemSettings.hpp>
 
 #include <memory>
 #include <utility>
@@ -135,13 +138,7 @@ namespace stm
     void ServiceTime::registerMessageHandlers()
     {
         connect(typeid(CellularTimeNotificationMessage), [&](sys::Message *request) -> sys::MessagePointer {
-            auto message = static_cast<CellularTimeNotificationMessage *>(request);
-            if (stm::api::isAutomaticDateAndTime()) {
-                timeManager->handleCellularTimeUpdate(
-                    message->getTime().value(),
-                    std::chrono::minutes{message->getTimeZoneOffset().value() / utils::time::secondsInMinute});
-            }
-            return std::make_shared<sys::ResponseMessage>();
+            return handleCellularTimeNotificationMessage(request);
         });
 
         connect(typeid(stm::message::SetAutomaticDateAndTimeRequest),
@@ -158,7 +155,11 @@ namespace stm
 
         connect(typeid(stm::message::SetDateFormatRequest),
                 [&](sys::Message *request) -> sys::MessagePointer { return handleSetDateFormatRequest(request); });
+
+        connect(typeid(stm::message::SetTimezoneRequest),
+                [&](sys::Message *request) -> sys::MessagePointer { return handleSetTimezoneRequest(request); });
     }
+
     auto ServiceTime::handleSetAutomaticDateAndTimeRequest(sys::Message *request)
         -> std::shared_ptr<sys::ResponseMessage>
     {
@@ -167,9 +168,7 @@ namespace stm
             LOG_WARN("The selected value is already set. Ignore.");
             return std::shared_ptr<sys::ResponseMessage>();
         }
-        settings->setValue(settings::SystemProperties::automaticDateAndTimeIsOn,
-                           std::to_string(message->getValue()),
-                           settings::SettingsScope::AppLocal);
+        settings->setValue(settings::SystemProperties::automaticDateAndTimeIsOn, std::to_string(message->getValue()));
         stm::internal::StaticData::get().setAutomaticDateAndTime(message->getValue());
 
         bus.sendUnicast(std::make_shared<stm::message::AutomaticDateAndTimeChangedMessage>(message->getValue()),
@@ -184,9 +183,7 @@ namespace stm
             LOG_WARN("The selected value is already set. Ignore.");
             return std::shared_ptr<sys::ResponseMessage>();
         }
-        settings->setValue(settings::SystemProperties::automaticTimeZoneIsOn,
-                           std::to_string(message->getValue()),
-                           settings::SettingsScope::AppLocal);
+        settings->setValue(settings::SystemProperties::automaticTimeZoneIsOn, std::to_string(message->getValue()));
         stm::internal::StaticData::get().setAutomaticTimezoneOn(message->getValue());
         return std::shared_ptr<sys::ResponseMessage>();
     }
@@ -199,8 +196,7 @@ namespace stm
             return std::shared_ptr<sys::ResponseMessage>();
         }
         settings->setValue(settings::SystemProperties::timeFormat,
-                           std::to_string(static_cast<unsigned>(message->getTimeFormat())),
-                           settings::SettingsScope::AppLocal);
+                           std::to_string(static_cast<unsigned>(message->getTimeFormat())));
         stm::internal::StaticData::get().setTimeFormat(message->getTimeFormat());
         return std::shared_ptr<sys::ResponseMessage>();
     }
@@ -213,28 +209,62 @@ namespace stm
             return std::shared_ptr<sys::ResponseMessage>();
         }
         settings->setValue(settings::SystemProperties::dateFormat,
-                           std::to_string(static_cast<unsigned>(message->getDateFormat())),
-                           settings::SettingsScope::AppLocal);
+                           std::to_string(static_cast<unsigned>(message->getDateFormat())));
         stm::internal::StaticData::get().setDateFormat(message->getDateFormat());
         return std::shared_ptr<sys::ResponseMessage>();
     }
 
+    auto ServiceTime::handleSetTimezoneRequest(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>
+    {
+        auto message = static_cast<stm::message::SetTimezoneRequest *>(request);
+
+        timeManager->handleTimezoneChangeRequest(message->getTimezone());
+        settings->setValue(settings::SystemProperties::currentTimezone, message->getTimezone());
+        stm::internal::StaticData::get().setTimezone(message->getTimezone());
+        return std::shared_ptr<sys::ResponseMessage>();
+    }
+
+    auto ServiceTime::handleCellularTimeNotificationMessage(sys::Message *request)
+        -> std::shared_ptr<sys::ResponseMessage>
+    {
+        auto message  = static_cast<CellularTimeNotificationMessage *>(request);
+        auto timezone = TimezoneHandler(std::chrono::duration_cast<std::chrono::minutes>(
+                                            std::chrono::seconds{message->getTimeZoneOffset().value()}))
+                            .getTimezone();
+        if (stm::api::isAutomaticDateAndTime()) {
+            timeManager->handleCellularTimeUpdate(message->getTime().value(), timezone);
+            settings->setValue(settings::SystemProperties::currentTimezone, timezone);
+            stm::internal::StaticData::get().setTimezone(timezone);
+        }
+        else if (stm::api::isAutomaticTimezone()) {
+            timeManager->handleTimezoneChangeRequest(timezone);
+            settings->setValue(settings::SystemProperties::currentTimezone, timezone);
+            stm::internal::StaticData::get().setTimezone(timezone);
+        }
+
+        return std::make_shared<sys::ResponseMessage>();
+    }
+
     void ServiceTime::initStaticData()
     {
-        stm::internal::StaticData::get().setAutomaticDateAndTime(utils::getNumericValue<bool>(settings->getValue(
-            ::settings::SystemProperties::automaticDateAndTimeIsOn, settings::SettingsScope::AppLocal)));
-        stm::internal::StaticData::get().setAutomaticTimezoneOn(utils::getNumericValue<bool>(settings->getValue(
-            ::settings::SystemProperties::automaticTimeZoneIsOn, settings::SettingsScope::AppLocal)));
-        auto dateFormat = magic_enum::enum_cast<utils::time::Locale::DateFormat>(utils::getNumericValue<unsigned int>(
-            settings->getValue(::settings::SystemProperties::dateFormat, settings::SettingsScope::AppLocal)));
+        stm::internal::StaticData::get().setAutomaticDateAndTime(
+            utils::getNumericValue<bool>(settings->getValue(::settings::SystemProperties::automaticDateAndTimeIsOn)));
+        stm::internal::StaticData::get().setAutomaticTimezoneOn(
+            utils::getNumericValue<bool>(settings->getValue(::settings::SystemProperties::automaticTimeZoneIsOn)));
+        auto dateFormat = magic_enum::enum_cast<utils::time::Locale::DateFormat>(
+            utils::getNumericValue<unsigned int>(settings->getValue(::settings::SystemProperties::dateFormat)));
         if (dateFormat != std::nullopt) {
             stm::internal::StaticData::get().setDateFormat(dateFormat.value());
         }
-        auto timeFormat = magic_enum::enum_cast<utils::time::Locale::TimeFormat>(utils::getNumericValue<unsigned int>(
-            settings->getValue(::settings::SystemProperties::timeFormat, settings::SettingsScope::AppLocal)));
+        auto timeFormat = magic_enum::enum_cast<utils::time::Locale::TimeFormat>(
+            utils::getNumericValue<unsigned int>(settings->getValue(::settings::SystemProperties::timeFormat)));
         if (timeFormat != std::nullopt) {
             stm::internal::StaticData::get().setTimeFormat(timeFormat.value());
         }
+        auto timezone =
+            settings->getValue(settings::SystemProperties::currentTimezone, settings::SettingsScope::AppLocal);
+        stm::internal::StaticData::get().setTimezone(timezone);
+        timeManager->handleTimezoneChangeRequest(timezone);
     }
 
 } /* namespace stm */

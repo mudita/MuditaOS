@@ -42,7 +42,8 @@ namespace stm
         auto handleSetAutomaticTimezoneRequest(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>;
         auto handleSetTimeFormatRequest(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>;
         auto handleSetDateFormatRequest(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>;
-
+        auto handleSetTimezoneRequest(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>;
+        auto handleCellularTimeNotificationMessage(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>;
         void initStaticData();
 
       public:

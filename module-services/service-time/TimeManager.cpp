@@ -4,12 +4,10 @@
 #include <service-time/TimeManager.hpp>
 #include <service-time/TimezoneHandler.hpp>
 
-#include <chrono>
-#include "time.h"
+#include <ctime>
 
-void TimeManager::handleCellularTimeUpdate(struct tm time, std::chrono::minutes timezoneOffset)
+void TimeManager::handleCellularTimeUpdate(struct tm time, const std::string &timezone)
 {
-    auto timezone = TimezoneHandler(timezoneOffset).getTimezone();
     rtcCommand->setTime(time);
     rtcCommand->setTimezone(timezone);
 }
@@ -17,4 +15,9 @@ void TimeManager::handleCellularTimeUpdate(struct tm time, std::chrono::minutes 
 void TimeManager::handleTimeChangeRequest(const time_t &time)
 {
     rtcCommand->setTime(time);
+}
+
+void TimeManager::handleTimezoneChangeRequest(const std::string &timezone)
+{
+    rtcCommand->setTimezone(timezone);
 }
