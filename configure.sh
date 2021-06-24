@@ -11,7 +11,10 @@ fi
 function help() {
     echo -e "Use this script for faster configuring build types"
     echo -e "ussage:"
-    echo -e "\t$0 <target> <build_type> [other cmake options]"
+    echo -e "\t$0 <product> <target> <build_type> [other cmake options]"
+    echo -e "available products are:"
+    echo -e "\t\t\tpure"
+    echo -e "\t\t\tbell"
     echo -e "available targets are:"
     echo -e "\t\t\tlinux\n\t\t\trt1051"
     echo -e "available build types:"
@@ -19,6 +22,21 @@ function help() {
     echo -e "\t\t\tRelease\t\t- release build (not for debugging)"
     echo -e "\t\t\tRelWithDebInfo\t - release with debug info in separate file"
     echo -e "\n\e[1m\e[31mThis script will delete previous build dir!\e[0m"
+}
+
+function validate_product_selection() {
+    case ${PRODUCT,,} in
+        pure | purephone)
+            PRODUCT_SHORTNAME="purephone"
+            PRODUCT="PurePhone"
+            return 0 ;;
+        bell | bellhybrid)
+            PRODUCT_SHORTNAME="bell"
+            PRODUCT="BellHybrid"
+            return 0 ;;
+        *)
+            echo "Wrong product: \"${PRODUCT}\""
+    esac
 }
 
 function check_target() {
@@ -35,6 +53,7 @@ function check_target() {
             ;;
     esac
 }
+
 function check_build_type() {
     case ${BUILD_TYPE,,} in
         debug)
@@ -59,12 +78,13 @@ function github_return_build_dir() {
     fi
 }
 
-TARGET=$1
-BUILD_TYPE=$2
+PRODUCT=$1
+TARGET=$2
+BUILD_TYPE=$3
 
-if check_target && check_build_type ; then
-    shift 2
-    BUILD_DIR="build-${TARGET,,}-${CMAKE_BUILD_TYPE}"
+if validate_product_selection && check_target && check_build_type ; then
+    shift 3
+    BUILD_DIR="build-${PRODUCT_SHORTNAME}-${TARGET,,}-${CMAKE_BUILD_TYPE}"
     echo -e "build dir:\e[34m\n\t${BUILD_DIR}\e[0m"
     SRC_DIR=`pwd`
     if [ -d ${BUILD_DIR} ]; then
@@ -80,6 +100,7 @@ if check_target && check_build_type ; then
         CMAKE_CMD="cmake \
                     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} \
                     -DCMAKE_TOOLCHAIN_FILE=${SRC_DIR}/${CMAKE_TOOLCHAIN_FILE} \
+                    -DPRODUCT=${PRODUCT} \
                     -DCMAKE_EXPORT_COMPILE_COMMANDS=1 \
                     $@ \
                     ${SRC_DIR} "
