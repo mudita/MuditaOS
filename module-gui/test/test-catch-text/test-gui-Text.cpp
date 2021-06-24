@@ -1202,6 +1202,31 @@ TEST_CASE("Text newline navigation and deletion tests")
         REQUIRE(text->linesSize() == 0);
         REQUIRE(text->linesGet().empty());
     }
+
+    SECTION("Empty new block at end and delete from text beginning")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = std::make_unique<gui::TestText>();
+        text->setMaximumSize(600, 200);
+
+        text->addRichText("<text>" + testStringBlock1 + emptyParagraph + "</text>");
+
+        REQUIRE(text->linesSize() == 2);
+        REQUIRE((*text->lineGet(0)).getText(0) == testStringBlock1 + "\n");
+        REQUIRE((*text->lineGet(1)).getText(0) == "");
+
+        text->moveCursor(gui::NavigationDirection::LEFT, testStringBlock1.length());
+        text->removeNCharacters(testStringBlock1.length());
+
+        REQUIRE(text->linesSize() == 2);
+        REQUIRE((*text->lineGet(0)).getText(0) == "\n");
+        REQUIRE((*text->lineGet(1)).getText(0) == "");
+
+        text->removeNCharacters(1);
+        REQUIRE(text->linesSize() == 0);
+        REQUIRE(text->linesGet().empty());
+    }
 }
 
 TEST_CASE("RichText newline and empty lines tests")
