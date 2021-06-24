@@ -79,7 +79,7 @@ namespace gui
 
         auto phoneNumber       = switchData->getPhoneNumber();
         app->templatesCallback = [=](std::shared_ptr<SMSTemplateRecord> templ) {
-            LOG_DEBUG("SMS template id = %" PRIu32 "sent to %s", templ->ID, phoneNumber.getFormatted().c_str());
+            LOG_DEBUG("SMS template id = %" PRIu32 "sent", templ->ID);
             app->sendSms(phoneNumber, templ->text);
             app::manager::Controller::switchBack(app,
                                                  std::make_unique<app::manager::SwitchBackRequest>(
