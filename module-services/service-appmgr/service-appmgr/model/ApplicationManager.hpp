@@ -7,6 +7,7 @@
 #include "ApplicationsRegistry.hpp"
 #include "ActionsRegistry.hpp"
 #include "ApplicationStack.hpp"
+#include "OnActionPolicy.hpp"
 
 #include <apps-common/Application.hpp>
 #include <apps-common/ApplicationLauncher.hpp>
@@ -172,6 +173,7 @@ namespace app::manager
 
         ApplicationName rootApplicationName;
         ActionsRegistry actionsRegistry;
+        OnActionPolicy actionPolicy;
         notifications::NotificationProvider notificationProvider;
 
         sys::TimerHandle autoLockTimer; //< auto-lock timer to count time from last user's activity.
