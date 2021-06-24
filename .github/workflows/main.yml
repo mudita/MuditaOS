@@ -55,8 +55,8 @@ jobs:
         run: |
           export JOBS=${JOBS:-$(nproc)} && \
           echo "JOBS=${JOBS}" &&  \
-          ./configure.sh rt1051 Release -G Ninja && \
-          pushd build-rt1051-Release && \
+          ./configure.sh pure rt1051 Release -G Ninja && \
+          pushd build-purephone-rt1051-Release && \
           ninja -j ${JOBS} && \
           popd 
 
@@ -76,8 +76,8 @@ jobs:
         run: |
           export JOBS=${JOBS:-$(nproc)} && \
           echo "JOBS=${JOBS}" &&  \
-          ./configure.sh linux Debug -G Ninja && \
-          pushd build-linux-Debug && \
+          ./configure.sh pure linux Debug -G Ninja && \
+          pushd build-purephone-linux-Debug && \
           ninja -j ${JOBS} unittests && \
           ninja -j ${JOBS} && \
           popd
