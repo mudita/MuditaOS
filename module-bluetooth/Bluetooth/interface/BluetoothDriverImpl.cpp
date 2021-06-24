@@ -25,6 +25,8 @@ extern "C"
 #else
 extern "C"
 {
+#include <btstack_uart.h>
+
 #include <btstack_run_loop_posix.h>
 #include <btstack_tlv_posix.h>
 }
@@ -73,7 +75,7 @@ namespace bluetooth
         auto uartDriver = runLoopInitLinux(runLoop);
 #endif
 
-        const hci_transport_t *transport = hci_transport_h4_instance(uartDriver);
+        const hci_transport_t *transport = hci_transport_h4_instance_for_uart(uartDriver);
         hci_init(transport, (void *)&config);
 
         hci_set_link_key_db(bluetooth::KeyStorage::getKeyStorage());
