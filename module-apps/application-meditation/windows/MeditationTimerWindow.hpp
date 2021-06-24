@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include "AppWindow.hpp"
+#include <AppWindow.hpp>
+#include <Timers/TimerHandle.hpp>
 
-#include <module-sys/Timers/TimerHandle.hpp>
 #include <chrono>
 
 namespace gui

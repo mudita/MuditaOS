@@ -2,11 +2,10 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationMeditation.hpp"
-
-#include "windows/MeditationWindow.hpp"
-#include "windows/MeditationListViewWindows.hpp"
-#include "windows/MeditationTimerWindow.hpp"
-#include "windows/Names.hpp"
+#include "MeditationListViewWindows.hpp"
+#include "MeditationTimerWindow.hpp"
+#include "MeditationWindow.hpp"
+#include "Names.hpp"
 
 namespace app
 {

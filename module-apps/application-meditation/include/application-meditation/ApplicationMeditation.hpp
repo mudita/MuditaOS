@@ -3,10 +3,11 @@
 
 #pragma once
 
-#include <string>
+#include <application-meditation/OptionsData.hpp>
 
 #include <Application.hpp>
-#include "data/OptionsData.hpp"
+
+#include <string>
 
 namespace app
 {

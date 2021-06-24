@@ -3,15 +3,15 @@
 
 #pragma once
 
+#include "ApplicationMeditation.hpp"
+
+#include <gui/widgets/BoxLayout.hpp>
+#include <gui/widgets/ProgressBar.hpp>
+#include <gui/widgets/Text.hpp>
+#include <GuiTimer.hpp>
+
 #include <atomic>
 #include <chrono>
-
-#include <apps-common/GuiTimer.hpp>
-#include <application-meditation/ApplicationMeditation.hpp>
-
-#include "BoxLayout.hpp"
-#include "ProgressBar.hpp"
-#include "Text.hpp"
 
 namespace gui
 {
