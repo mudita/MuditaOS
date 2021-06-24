@@ -12,6 +12,7 @@ set(SOURCES
     model/ApplicationsRegistry.cpp
     model/ActionsRegistry.cpp
     model/ApplicationStack.cpp
+    model/OnActionPolicy.cpp
     messages/ActionRequest.cpp
     messages/FinishRequest.cpp
     messages/ApplicationCloseRequest.cpp

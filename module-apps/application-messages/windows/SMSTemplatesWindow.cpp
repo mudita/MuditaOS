@@ -84,6 +84,7 @@ namespace gui
             app::manager::Controller::switchBack(app,
                                                  std::make_unique<app::manager::SwitchBackRequest>(
                                                      application->GetName(), std::make_unique<SMSTemplateSent>()));
+            app->popCurrentWindow();
             return true;
         };
     }
