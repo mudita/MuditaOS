@@ -9,7 +9,6 @@
 #include <application-special-input/ApplicationSpecialInput.hpp>
 #include <application-calendar/ApplicationCalendar.hpp>
 #include <application-music-player/ApplicationMusicPlayer.hpp>
-#include <application-meditation/ApplicationMeditation.hpp>
 #include <application-alarm-clock/ApplicationAlarmClock.hpp>
 #include <application-onboarding/ApplicationOnBoarding.hpp>
 #include <application-bell-main/ApplicationBellMain.hpp>

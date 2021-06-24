@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <gui/widgets/Style.hpp>
+
 namespace style::meditation
 {
     constexpr auto VerticalWidgetGap = 20;

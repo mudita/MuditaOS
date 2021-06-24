@@ -1,19 +1,18 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "ApplicationMeditation.hpp"
+#include "IntervalBox.hpp"
+#include "MeditationTimerData.hpp"
 #include "MeditationWindow.hpp"
+#include "Names.hpp"
+#include "Style.hpp"
+#include "TimerProperty.hpp"
 
-#include "application-meditation/windows/Names.hpp"
-#include "application-meditation/widgets/IntervalBox.hpp"
-#include "application-meditation/widgets/TimerProperty.hpp"
-#include "application-meditation/data/Style.hpp"
-#include "application-meditation/data/MeditationTimerData.hpp"
-#include "application-meditation/ApplicationMeditation.hpp"
-
-#include "InputEvent.hpp"
-#include <cassert>
-
+#include <gui/input/InputEvent.hpp>
 #include <i18n/i18n.hpp>
+
+#include <cassert>
 
 namespace gui
 {
