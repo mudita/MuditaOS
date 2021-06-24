@@ -867,7 +867,8 @@ namespace app::manager
         // Inform that target app switch is caused by Action
         targetApp->startupReason = StartupReason::OnAction;
 
-        const auto focusedAppClose = !(actionParams && actionParams->disableAppClose);
+        const auto focusedAppClose = !(actionPolicy(action.actionId) == Reaction::KeepFocusedAppInBackground ||
+                                       (actionParams && actionParams->disableAppClose));
         SwitchRequest switchRequest(
             ServiceName, targetApp->name(), targetApp->switchWindow, std::move(targetApp->switchData));
         return handleSwitchApplication(&switchRequest, focusedAppClose) ? ActionProcessStatus::Accepted
