@@ -75,7 +75,7 @@ namespace gui
         }
         else if (auto textData = dynamic_cast<SMSTextData *>(data); textData != nullptr) {
             const auto &text = textData->text;
-            LOG_INFO("Received sms text data \"%s\"", text.c_str());
+            LOG_INFO("Received sms text data");
             if (textData->concatenate == SMSTextData::Concatenate::True) {
                 message->addText(text);
             }
@@ -86,10 +86,10 @@ namespace gui
         }
         else if (auto sendRequest = dynamic_cast<SMSSendRequest *>(data); sendRequest != nullptr) {
             phoneNumber = sendRequest->getPhoneNumber();
-            LOG_INFO("Received sms send request to number: %s", phoneNumber.getFormatted().c_str());
+            LOG_INFO("Received sms send request");
             auto retContact = DBServiceAPI::MatchContactByPhoneNumber(application, phoneNumber);
             if (!retContact) {
-                LOG_WARN("Not valid contact for number %s", phoneNumber.getEntered().c_str());
+                LOG_WARN("No valid contact for given number");
                 recipient->setText(phoneNumber.getFormatted());
                 message->setText(sendRequest->textData);
                 return;

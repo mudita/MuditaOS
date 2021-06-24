@@ -85,7 +85,7 @@ namespace gui
         }
         if (auto pdata = dynamic_cast<SMSTextData *>(data)) {
             auto txt = pdata->text;
-            LOG_INFO("received sms templates data \"%s\"", txt.c_str());
+            LOG_INFO("received sms templates data");
             pdata->concatenate == SMSTextData::Concatenate::True ? smsModel->smsInput->inputText->addText(txt)
                                                                  : smsModel->smsInput->inputText->setText(txt);
         }
