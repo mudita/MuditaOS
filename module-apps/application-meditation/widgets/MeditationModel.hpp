@@ -3,10 +3,11 @@
 
 #pragma once
 
-#include "ListItemProvider.hpp"
-#include "InternalModel.hpp"
 #include "MeditationListItems.hpp"
-#include "Application.hpp"
+
+#include <Application.hpp>
+#include <gui/widgets/ListItemProvider.hpp>
+#include <InternalModel.hpp>
 
 namespace gui
 {

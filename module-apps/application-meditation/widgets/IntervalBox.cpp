@@ -2,13 +2,12 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "IntervalBox.hpp"
-
-#include "application-meditation/data/Style.hpp"
 #include "Style.hpp"
 #include "TimerProperty.hpp"
-#include "InputEvent.hpp"
 
+#include <gui/input/InputEvent.hpp>
 #include <i18n/i18n.hpp>
+
 #include <cassert>
 
 using namespace gui;

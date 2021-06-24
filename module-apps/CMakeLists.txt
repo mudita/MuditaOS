@@ -11,9 +11,12 @@ add_library(${PROJECT_NAME} STATIC)
 add_subdirectory(application-antenna)
 add_subdirectory(application-bell-main)
 add_subdirectory(application-calculator)
+add_subdirectory(application-call)
 add_subdirectory(application-desktop)
+add_subdirectory(application-meditation)
 add_subdirectory(application-messages)
 add_subdirectory(application-music-player)
+add_subdirectory(application-notes)
 add_subdirectory(application-phonebook)
 add_subdirectory(apps-common)
 
@@ -21,12 +24,9 @@ set(APPLICATIONS
     clock
     calendar
     settings
-    call
-    notes
     onboarding
     calllog
     special-input
-    meditation
     alarm-clock
 )
 

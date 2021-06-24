@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MeditationListItems.hpp"
-#include "application-meditation/data/Style.hpp"
+#include "Style.hpp"
 
 #include <i18n/i18n.hpp>
 

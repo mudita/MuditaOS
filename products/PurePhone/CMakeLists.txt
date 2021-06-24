@@ -52,6 +52,7 @@ target_link_libraries(PurePhone
         application-calculator
         application-call
         application-desktop
+        application-meditation
         application-messages
         application-music-player
         application-notes
