@@ -93,13 +93,21 @@ echo "JOBS=${JOBS}"
 echo "\'workspace dir:${WORKSPACE}\'"
 
 pushd "${WORKSPACE}"
-echo "./configure.sh rt1051 Release -G Ninja"
 
-./configure.sh rt1051 Release -G Ninja
+echo "./configure.sh pure rt1051 Release -G Ninja"
+./configure.sh pure rt1051 Release -G Ninja
 
-pushd build-rt1051-Release
+pushd build-purephone-rt1051-Release
 ninja -j ${JOBS}
 popd
+
+echo "./configure.sh bell rt1051 Release -G Ninja"
+./configure.sh bell rt1051 Release -G Ninja
+
+pushd build-bell-rt1051-Release
+ninja -j ${JOBS}
+popd
+
 popd'''
                 echo "CCache stats"
                 sh '''#!/bin/bash
@@ -119,12 +127,22 @@ ccache --show-stats'''
                 sh '''#!/bin/bash -e
 echo "JOBS=${JOBS}"
 pushd "${WORKSPACE}"
-echo "./configure.sh linux Debug -G Ninja"
+echo "./configure.sh pure linux Debug -G Ninja"
 
-./configure.sh linux Debug -G Ninja
+./configure.sh pure linux Debug -G Ninja
 
-pushd build-linux-Debug
-ninja -j ${JOBS} Pure Bell
+pushd build-purephone-linux-Debug
+ninja -j ${JOBS}
+popd
+
+echo "./configure.sh bell linux Debug -G Ninja"
+
+./configure.sh bell linux Debug -G Ninja
+
+pushd build-bell-linux-Debug
+ninja -j ${JOBS}
+popd
+
 popd'''
             echo "Clang Tidy check"
             /* requires compilation database - must be run after configuration */
@@ -135,7 +153,11 @@ popd'''
                 echo "Build Unit Tests"
                 sh '''#!/bin/bash -e
 pushd "${WORKSPACE}"
-pushd build-linux-Debug
+pushd build-purephone-linux-Debug
+ninja -j ${JOBS} unittests
+popd
+pushd "${WORKSPACE}"
+pushd build-bell-linux-Debug
 ninja -j ${JOBS} unittests
 popd
 popd'''
@@ -146,16 +168,19 @@ ccache --show-stats'''
                 echo "Check for Statics"
                 sh '''#!/bin/bash -e
 pushd "${WORKSPACE}"
-./tools/find_global_data.py build-linux-Debug/PurePhone.elf
+./tools/find_global_data.py build-purephone-linux-Debug/PurePhone.elf
 popd'''
                 echo "Run Unit Tests"
                 sh '''#!/bin/bash -e
 export JOBS=${JOBS:-6}
 echo "JOBS=${JOBS}"
 pushd "${WORKSPACE}"
-pushd build-linux-Debug
+pushd build-purephone-linux-Debug
 ninja check -j ${JOBS}
-./googletest-gui
+popd
+
+pushd build-bell-linux-Debug
+ninja check -j ${JOBS}
 popd
 popd'''
             }

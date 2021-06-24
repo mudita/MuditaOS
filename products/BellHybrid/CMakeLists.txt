@@ -1,9 +1,5 @@
 add_executable(BellHybrid)
 
-add_custom_target(Bell ALL
-    DEPENDS BellHybrid PurePhone-disk-img
-    )
-
 target_link_directories(BellHybrid PRIVATE ${PROJECT_LIB_DIRECTORY})
 
 target_compile_definitions(BellHybrid
@@ -68,7 +64,7 @@ target_link_libraries(BellHybrid
 target_link_options(BellHybrid PRIVATE ${TARGET_LINK_OPTIONS})
 
 if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
-    add_dependencies(Bell service_renderer)
+    add_dependencies(BellHybrid service_renderer)
 endif()
 
 set_source_files_properties(BellHybridMain.cpp PROPERTIES COMPILE_DEFINITIONS "${ENABLED_APPS_DEFINES}")
