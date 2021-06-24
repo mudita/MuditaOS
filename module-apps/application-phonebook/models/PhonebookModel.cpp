@@ -97,11 +97,8 @@ auto PhonebookModel::updateRecords(std::vector<ContactRecord> records) -> bool
 #if DEBUG_DB_MODEL_DATA == 1
     LOG_DEBUG("Offset: %" PRIu32 ", Limit: %" PRIu32 " Count:%" PRIu32 "", offset, limit, count);
     for (uint32_t i = 0; i < records->size(); ++i) {
-        LOG_DEBUG("id: %" PRIu32 ", name: %s %s, fav: %d",
-                  records.get()->operator[](i).ID,
-                  records.get()->operator[](i).primaryName.c_str(),
-                  records.get()->operator[](i).alternativeName.c_str(),
-                  records.get()->operator[](i).isOnFavourites());
+        LOG_DEBUG(
+            "id: %" PRIu32 ", fav: %d", records.get()->operator[](i).ID, records.get()->operator[](i).isOnFavourites());
     }
 #endif
 
