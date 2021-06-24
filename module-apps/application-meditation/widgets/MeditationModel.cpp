@@ -1,13 +1,12 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "ApplicationMeditation.hpp"
 #include "MeditationModel.hpp"
+#include "Names.hpp"
+#include "Style.hpp"
 
-#include "application-meditation/windows/Names.hpp"
-#include "application-meditation/ApplicationMeditation.hpp"
-#include "application-meditation/data/Style.hpp"
-
-#include "ListView.hpp"
+#include <gui/widgets/ListView.hpp>
 
 using namespace gui;
 

@@ -1,19 +1,18 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "MeditationTimer.hpp"
+#include "MeditationTimerData.hpp"
 #include "MeditationTimerWindow.hpp"
-
-#include "application-meditation/widgets/MeditationTimer.hpp"
-#include "application-meditation/data/Style.hpp"
-#include "application-meditation/data/MeditationTimerData.hpp"
 #include "Names.hpp"
+#include "Style.hpp"
 
-#include <Timers/TimerFactory.hpp>
-#include <cassert>
+#include <gui/core/FontManager.hpp>
+#include <gui/widgets/RichTextParser.hpp>
 #include <i18n/i18n.hpp>
+#include <Timers/TimerFactory.hpp>
 
-#include "RichTextParser.hpp"
-#include "FontManager.hpp"
+#include <cassert>
 
 using namespace gui;
 

@@ -2,11 +2,11 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MeditationTimer.hpp"
-#include "GuiTimer.hpp"
+#include "Style.hpp"
 
-#include <service-audio/AudioServiceAPI.hpp>
-#include <application-meditation/data/Style.hpp>
+#include <GuiTimer.hpp>
 #include <purefs/filesystem_paths.hpp>
+#include <service-audio/AudioServiceAPI.hpp>
 #include <time/time_conversion.hpp>
 
 namespace gui
