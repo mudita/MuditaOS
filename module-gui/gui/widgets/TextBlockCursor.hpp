@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -29,14 +29,14 @@ namespace gui
     {
       protected:
         TextDocument *document = nullptr;
-        [[nodiscard]] auto currentBlock() const -> std::_List_iterator<TextBlock>;
-        [[nodiscard]] auto blocksEnd() const -> std::_List_iterator<TextBlock>;
-        [[nodiscard]] auto blocksBegin() const -> std::_List_iterator<TextBlock>;
+        [[nodiscard]] auto currentBlock() const -> std::list<TextBlock>::iterator;
+        [[nodiscard]] auto blocksEnd() const -> std::list<TextBlock>::iterator;
+        [[nodiscard]] auto blocksBegin() const -> std::list<TextBlock>::iterator;
         RawFont *default_font = nullptr;
 
       private:
-        bool emptyNewLineAdded      = false;
-        bool blockChanged           = false;
+        bool emptyNewLineAdded          = false;
+        bool blockChanged               = false;
         unsigned int pos                = text::npos;
         unsigned int currentBlockNumber = text::npos;
 
@@ -50,7 +50,7 @@ namespace gui
         /// @note it does not select next block - to do so add another ctor based on operator+
         /// and check if this one is needed
         BlockCursor(TextDocument *document, unsigned int pos, unsigned int block_nr, RawFont *default_font);
-        BlockCursor() = default; /// bad cursor
+        BlockCursor()          = default; /// bad cursor
         virtual ~BlockCursor() = default;
 
         [[nodiscard]] auto getPosition() const -> unsigned int
@@ -145,6 +145,9 @@ namespace gui
 
         auto goToNextBlock() -> BlockCursor &;
         auto goToPreviousBlock() -> BlockCursor &;
+
+        auto checkIfBlockFirstAndEmpty(std::list<TextBlock>::iterator block) -> bool;
+        auto checkIfNextBlockEmpty(std::list<TextBlock>::iterator nextBlock) -> bool;
 
         auto operator+=(unsigned int) -> BlockCursor &;
         auto operator++() -> BlockCursor &;
