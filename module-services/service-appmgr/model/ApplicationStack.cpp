@@ -64,8 +64,9 @@ namespace app::manager
 
         std::vector<ApplicationName> uniqueApps{};
         uniqueApps.reserve(stackCopy.size());
-        std::transform(
-            stackCopy.begin(), stackCopy.end(), uniqueApps.begin(), [](const auto &item) { return item.appName; });
+        std::transform(stackCopy.begin(), stackCopy.end(), std::back_inserter(uniqueApps), [](const auto &item) {
+            return item.appName;
+        });
         return uniqueApps;
     }
 
