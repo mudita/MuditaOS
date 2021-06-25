@@ -150,7 +150,7 @@ namespace gui
     bool QuoteAddEditWindow::onInput(const gui::InputEvent &inputEvent)
     {
         if (inputEvent.isShortRelease(gui::KeyCode::KEY_ENTER)) {
-            LOG_DEBUG("Save Quote: %s", quoteText->getText().c_str());
+            LOG_DEBUG("Save Quote requested");
             quoteData.quote  = quoteText->getText();
             quoteData.author = authorText->getText();
 
