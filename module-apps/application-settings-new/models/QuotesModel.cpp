@@ -107,11 +107,7 @@ namespace Quotes
 
     void QuotesModel::add(const Quotes::QuoteRecord &record)
     {
-        LOG_DEBUG("Adding quote: lang_id = %u, author = %s, quote = %s",
-                  static_cast<unsigned>(record.lang_id),
-                  record.quote.c_str(),
-                  record.author.c_str());
-
+        LOG_DEBUG("Adding quote: lang_id = %u", static_cast<unsigned>(record.lang_id));
         auto query = std::make_unique<Messages::AddQuoteRequest>(record.lang_id, record.quote, record.author, true);
         auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Quotes);
         task->execute(app, this);
@@ -119,10 +115,7 @@ namespace Quotes
 
     void QuotesModel::edit(const Quotes::QuoteRecord &record)
     {
-        LOG_DEBUG("Saving quote: lang_id = %u, author = %s, quote = %s",
-                  static_cast<unsigned>(record.lang_id),
-                  record.quote.c_str(),
-                  record.author.c_str());
+        LOG_DEBUG("Saving quote: lang_id = %u", static_cast<unsigned>(record.lang_id));
 
         auto query = std::make_unique<Messages::WriteQuoteRequest>(
             record.quote_id, record.lang_id, record.quote, record.author, record.enabled);
@@ -132,10 +125,7 @@ namespace Quotes
 
     void QuotesModel::remove(const Quotes::QuoteRecord &record)
     {
-        LOG_DEBUG("Removing quote: lang_id = %u, author = %s, quote = %s",
-                  static_cast<unsigned>(record.lang_id),
-                  record.quote.c_str(),
-                  record.author.c_str());
+        LOG_DEBUG("Removing quote: lang_id = %u", static_cast<unsigned>(record.lang_id));
 
         auto query = std::make_unique<Messages::DeleteQuoteRequest>(record.quote_id);
         auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Quotes);
