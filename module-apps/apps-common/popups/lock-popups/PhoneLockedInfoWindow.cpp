@@ -60,7 +60,6 @@ bool PhoneLockedInfoWindow::onInput(const InputEvent &inputEvent)
     // Pnd key = go to PIN code screen
     else if (inputEvent.isShortRelease(KeyCode::KEY_PND) && mStage == PhoneLockedInfoData::Stage::Waiting) {
         detachTimerIfExists();
-        application->returnToPreviousWindow();
         application->getPhoneLockSubject().unlock();
         return true;
     }

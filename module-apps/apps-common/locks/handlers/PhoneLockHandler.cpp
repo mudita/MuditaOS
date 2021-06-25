@@ -57,9 +57,6 @@ namespace locks
 
     void PhoneLockHandler::phoneUnlockPopupsCloseAction()
     {
-        app::manager::Controller::sendAction(owner,
-                                             app::manager::actions::AbortPopup,
-                                             std::make_unique<gui::PopupRequestParams>(gui::popup::ID::PhoneLockInput));
         if (!isPhoneLocked()) {
             app::manager::Controller::sendAction(owner,
                                                  app::manager::actions::AbortPopup,
@@ -69,6 +66,10 @@ namespace locks
                 app::manager::actions::AbortPopup,
                 std::make_unique<gui::PopupRequestParams>(gui::popup::ID::PhoneLockInfo));
         }
+
+        app::manager::Controller::sendAction(owner,
+                                             app::manager::actions::AbortPopup,
+                                             std::make_unique<gui::PopupRequestParams>(gui::popup::ID::PhoneLockInput));
     }
 
     void PhoneLockHandler::phoneUnlockAction()
