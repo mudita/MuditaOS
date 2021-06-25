@@ -49,14 +49,6 @@ bool CalllogModel::onCalllogRetrieved(const std::vector<CalllogRecord> &records,
 
 bool CalllogModel::updateRecords(std::vector<CalllogRecord> records)
 {
-#if DEBUG_DB_MODEL_DATA == 1
-    LOG_DEBUG("Offset: %" PRIu32 ", Limit: %" PRIu32 " Count: %" PRIu32 "", offset, limit, count);
-    for (uint32_t i = 0; i < records.get()->size(); ++i) {
-        LOG_DEBUG(
-            "id: %" PRIu32 ", name: %s", records.get()->operator[](i).ID, records.get()->operator[](i).name.c_str());
-    }
-#endif
-
     DatabaseModel::updateRecords(std::move(records));
     list->onProviderDataUpdate();
     return true;

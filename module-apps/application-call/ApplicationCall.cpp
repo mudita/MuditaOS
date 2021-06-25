@@ -221,16 +221,12 @@ namespace app
 
     void ApplicationCall::handleAddContactEvent(const std::string &number)
     {
-        LOG_INFO("add contact information: %s", number.c_str());
+        LOG_INFO("add contact information");
 
         auto numberView    = utils::PhoneNumber(number).getView();
         auto searchResults = DBServiceAPI::MatchContactByPhoneNumber(this, numberView);
         if (searchResults != nullptr) {
-            LOG_INFO("Found contact matching search num %s : contact ID %" PRIu32 " - %s %s",
-                     number.c_str(),
-                     searchResults->ID,
-                     searchResults->primaryName.c_str(),
-                     searchResults->alternativeName.c_str());
+            LOG_INFO("Found contact matching search num : contact ID %" PRIu32, searchResults->ID);
             app::manager::Controller::sendAction(this,
                                                  app::manager::actions::EditContact,
                                                  std::make_unique<PhonebookItemData>(std::move(searchResults)));

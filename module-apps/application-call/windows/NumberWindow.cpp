@@ -139,7 +139,7 @@ namespace gui
     {
         auto newFormatter = std::unique_ptr<Formatter>(numberUtil.GetAsYouTypeFormatter(regionCode));
         formatter.swap(newFormatter);
-        LOG_INFO("Switched formatter to region: %s", regionCode.c_str());
+        LOG_INFO("Switched formatter to new region");
     }
 
     void NumberWindow::initFormatterInput(const std::string &number)
