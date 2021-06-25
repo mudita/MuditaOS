@@ -1,55 +1,76 @@
-include_directories( ${CMAKE_PROJECT_NAME}
+# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+# For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-        PUBLIC
-                "${CMAKE_CURRENT_LIST_DIR}"
+add_library(application-phonebook STATIC)
+
+target_include_directories(application-phonebook
+    PRIVATE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
 
-include_directories( ${PROJECT_NAME}
 
-        PUBLIC
-                "${CMAKE_CURRENT_LIST_DIR}"
+target_sources(application-phonebook
+    PRIVATE
+        ApplicationPhonebook.cpp
+        data/PhonebookUtils.cpp
+        models/ContactDetailsModel.cpp
+        models/NewContactModel.cpp
+        models/PhonebookModel.cpp
+        widgets/ContactFlagIconWidget.cpp
+        widgets/ContactFlagsWidget.cpp
+        widgets/InformationWidget.cpp
+        widgets/InputBoxWithLabelAndIconWidget.cpp
+        widgets/InputLinesWithLabelIWidget.cpp
+        widgets/OutputLinesTextWithLabelWidget.cpp
+        widgets/PhonebookItem.cpp
+        widgets/PhonebookListView.cpp
+        windows/PhonebookContactDetails.cpp
+        windows/PhonebookContactOptions.cpp
+        windows/PhonebookIceContacts.cpp
+        windows/PhonebookMainWindow.cpp
+        windows/PhonebookNamecardOptions.cpp
+        windows/PhonebookNewContact.cpp
+        windows/PhonebookSearch.cpp
+        windows/PhonebookSearchResults.cpp
+    PRIVATE
+        data/ContactsMap.hpp
+        models/ContactDetailsModel.hpp
+        models/NewContactModel.hpp
+        models/PhonebookModel.hpp
+        widgets/ContactListItem.hpp
+        widgets/InformationWidget.hpp
+        widgets/InputBoxWithLabelAndIconWidget.hpp
+        widgets/InputLinesWithLabelIWidget.hpp
+        widgets/OutputLinesTextWithLabelWidget.hpp
+        widgets/PhonebookItem.hpp
+        widgets/PhonebookListView.hpp
+        windows/PhonebookContactDetails.hpp
+        windows/PhonebookIceContacts.hpp
+        windows/PhonebookNamecardOptions.hpp
+        windows/PhonebookNewContact.hpp
+    PUBLIC
+        include/application-phonebook/ApplicationPhonebook.hpp
 )
 
-target_sources( ${PROJECT_NAME}
+option(ENABLE_APP_PHONEBOOK "Enable application phonebook" ON)
 
-        PRIVATE
-                "${CMAKE_CURRENT_LIST_DIR}/ApplicationPhonebook.cpp"
-                "${CMAKE_CURRENT_LIST_DIR}/data/PhonebookUtils.cpp"
-                "${CMAKE_CURRENT_LIST_DIR}/widgets/InformationWidget.cpp"
-                "${CMAKE_CURRENT_LIST_DIR}/widgets/InputBoxWithLabelAndIconWidget.cpp"
-                "${CMAKE_CURRENT_LIST_DIR}/widgets/InputLinesWithLabelIWidget.cpp"
-                "${CMAKE_CURRENT_LIST_DIR}/widgets/OutputLinesTextWithLabelWidget.cpp"
-                "${CMAKE_CURRENT_LIST_DIR}/widgets/PhonebookItem.cpp"
-                "${CMAKE_CURRENT_LIST_DIR}/widgets/PhonebookListView.cpp"
-                "${CMAKE_CURRENT_LIST_DIR}/widgets/ContactFlagsWidget.cpp"
-                "${CMAKE_CURRENT_LIST_DIR}/widgets/ContactFlagIconWidget.cpp"
-                "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookMainWindow.cpp"
-                "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookNewContact.cpp"
-                "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookContactDetails.cpp"
-                "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookSearch.cpp"
-                "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookNamecardOptions.cpp"
-                "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookContactOptions.cpp"
-                "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookSearchResults.cpp"
-                "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookIceContacts.cpp"
-                "${CMAKE_CURRENT_LIST_DIR}/models/ContactDetailsModel.cpp"
-                "${CMAKE_CURRENT_LIST_DIR}/models/NewContactModel.cpp"
-                "${CMAKE_CURRENT_LIST_DIR}/models/PhonebookModel.cpp"
-        PUBLIC
-                "${CMAKE_CURRENT_LIST_DIR}/models/ContactDetailsModel.hpp"
-                "${CMAKE_CURRENT_LIST_DIR}/models/NewContactModel.hpp"
-                "${CMAKE_CURRENT_LIST_DIR}/models/PhonebookModel.hpp"
-                "${CMAKE_CURRENT_LIST_DIR}/ApplicationPhonebook.hpp"
-                "${CMAKE_CURRENT_LIST_DIR}/data/ContactsMap.hpp"
-                "${CMAKE_CURRENT_LIST_DIR}/widgets/ContactListItem.hpp"
-                "${CMAKE_CURRENT_LIST_DIR}/widgets/InformationWidget.hpp"
-                "${CMAKE_CURRENT_LIST_DIR}/widgets/InputBoxWithLabelAndIconWidget.hpp"
-                "${CMAKE_CURRENT_LIST_DIR}/widgets/InputLinesWithLabelIWidget.hpp"
-                "${CMAKE_CURRENT_LIST_DIR}/widgets/OutputLinesTextWithLabelWidget.hpp"
-                "${CMAKE_CURRENT_LIST_DIR}/widgets/PhonebookListView.hpp"
-                "${CMAKE_CURRENT_LIST_DIR}/widgets/PhonebookItem.hpp"
-                "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookContactDetails.hpp"
-                "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookNewContact.hpp"
-                "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookNamecardOptions.hpp"
-                "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookIceContacts.hpp"
+target_compile_definitions(application-phonebook
+    INTERFACE
+        $<$<BOOL:${ENABLE_APP_PHONEBOOK}>:ENABLE_APP_PHONEBOOK>
 )
 
+target_link_libraries(application-phonebook
+    PRIVATE
+        utf8
+        module-gui
+        module-utils
+        time
+        module-db
+        service-appmgr
+        service-db
+        i18n
+    PUBLIC
+        apps-common
+)
