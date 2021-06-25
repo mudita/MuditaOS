@@ -257,7 +257,6 @@ std::string NetworkSettings::printVoLTEDebug()
             for (auto el : resp.response) {
                 buffer = el + "\r\n";
             }
-            LOG_DEBUG("VOLTEDEBUG:\r\n%s", buffer.c_str());
             return buffer;
         }
     }
