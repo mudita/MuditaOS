@@ -274,14 +274,11 @@ namespace gui
                 auto contact     = DBServiceAPI::MatchContactByPhoneNumber(this->application, phoneNumber);
                 auto displayName = phoneNumber.getFormatted();
                 if (contact) {
-                    LOG_INFO("number = %s recognized as contact id = %" PRIu32 ", name = %s",
-                             phoneNumber.getEntered().c_str(),
-                             contact->ID,
-                             contact->getFormattedName().c_str());
+                    LOG_INFO("number recognized as contact id = %" PRIu32, contact->ID);
                     displayName = contact->getFormattedName();
                 }
                 else {
-                    LOG_INFO("number = %s was not recognized as any valid contact", phoneNumber.getEntered().c_str());
+                    LOG_INFO("number was not recognized as any valid contact");
                 }
 
                 numberLabel->setText(displayName);
@@ -387,15 +384,12 @@ namespace gui
 
     bool CallWindow::onInput(const InputEvent &inputEvent)
     {
-        LOG_INFO("key code: %" PRIu32 ", state: %" PRIu32,
-                 static_cast<uint32_t>(inputEvent.getKeyCode()),
-                 static_cast<uint32_t>(inputEvent.getState()));
-
         bool handled = false;
 
         // process only if key is released
         // InputEvent::State::keyReleasedLong is necessary for KeyCode::KEY_RF to properly abort the active call
         if (inputEvent.isKeyRelease()) {
+            LOG_INFO("key released");
             auto code = translator.handle(inputEvent.getRawKey(), InputMode({InputMode::phone}).get());
             switch (inputEvent.getKeyCode()) {
             case KeyCode::KEY_LF:
