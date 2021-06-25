@@ -160,7 +160,7 @@ ServiceCellular::ServiceCellular()
         LOG_DEBUG("Notifications callback called with %u data bytes", static_cast<unsigned int>(data.size()));
 
         std::string logStr = utils::removeNewLines(data);
-        LOG_DEBUG("Data: %s", logStr.c_str());
+        LOG_SENSITIVE(LOGDEBUG, "Data: %s", logStr.c_str());
         atURCStream.write(data);
         auto vUrc = atURCStream.getURCList();
 
@@ -938,13 +938,13 @@ std::optional<std::shared_ptr<sys::Message>> ServiceCellular::identifyNotificati
     std::string str(data.begin(), data.end());
 
     std::string logStr = utils::removeNewLines(str);
-    LOG_DEBUG("Notification:: %s", logStr.c_str());
+    LOG_SENSITIVE(LOGDEBUG, "Notification:: %s", logStr.c_str());
 
     auto urc = at::urc::UrcFactory::Create(str);
     urc->Handle(urcHandler);
 
     if (!urc->isHandled()) {
-        LOG_WARN("Unhandled notification: %s", logStr.c_str());
+        LOG_SENSITIVE(LOGWARN, "Unhandled notification: %s", logStr.c_str());
     }
 
     return urcHandler.getResponse();
@@ -984,8 +984,9 @@ auto ServiceCellular::sendSMS(SMSRecord record) -> bool
                 else {
                     result = false;
                 }
-                if (!result)
-                    LOG_ERROR("Message to: %s send failure", receiver.c_str());
+                if (!result) {
+                    LOG_ERROR("Message send failure");
+                }
             }
         }
         // split text, and send concatenated messages
