@@ -4,8 +4,9 @@
 #include "BellMainMenuWindow.hpp"
 
 #include <application-bell-main/ApplicationBellMain.hpp>
+#include <application-bell-main/data/BellMainStyle.hpp>
 #include <data/BellMainStyle.hpp>
-
+#include <application-bell-settings/ApplicationBellSettings.hpp>
 #include <Dialog.hpp>
 #include <DialogMetadataMessage.hpp>
 #include <OptionBellMenu.hpp>
@@ -79,8 +80,8 @@ namespace gui
         addWinMenu(utils::translate("app_bellmain_power_nap"), gui::window::name::bell_main_menu_dialog);
         addWinMenu(utils::translate("app_bellmain_meditation_timer"), gui::window::name::bell_main_menu_dialog);
         addWinMenu(utils::translate("app_bellmain_media_library"), gui::window::name::bell_main_menu_dialog);
-        addWinMenu(utils::translate("app_bellmain_settings"), gui::window::name::bell_main_menu_dialog);
-        addWinMenu(utils::translate("Set Hour"), gui::window::name::bell_main_set_hour);
+
+        addAppMenu(utils::translate("app_bellmain_settings"), app::applicationBellSettingsName);
 
         return menuOptionList;
     }

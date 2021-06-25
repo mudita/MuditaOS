@@ -5,11 +5,9 @@ target_sources(application-bell-main
         ApplicationBellMain.cpp
         windows/BellMainWindow.cpp
         windows/BellMainMenuWindow.cpp
-        windows/BellMainSetHour.cpp
  
         windows/BellMainWindow.hpp
         windows/BellMainMenuWindow.hpp
-        windows/BellMainSetHour.hpp
     PUBLIC
         include/application-bell-main/ApplicationBellMain.hpp
 )
@@ -23,6 +21,7 @@ target_include_directories(application-bell-main
 
 target_link_libraries(application-bell-main
     PRIVATE
+        application-bell-settings
         apps-common
         bellgui
         i18n

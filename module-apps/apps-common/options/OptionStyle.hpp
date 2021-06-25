@@ -53,6 +53,7 @@ namespace gui::option
     {
         inline constexpr gui::Length option_bottom_margin = 9;
         inline constexpr gui::Length option_left_margin   = 10;
+        inline constexpr gui::Length option_right_margin  = 10;
         inline constexpr gui::Length default_text_width   = 400;
     } // namespace bell::window
 

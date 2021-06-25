@@ -67,6 +67,10 @@ namespace style
         inline constexpr auto default_border_rect_no_focus = 1U;
         inline constexpr auto default_border_no_focus_w    = 0U;
         inline constexpr auto default_rect_yaps            = 10U;
+
+        inline constexpr auto bellDefaultVerticalPos = 0U;
+        inline constexpr auto bellDefaultLeftMargin  = 0U;
+
         namespace font
         {
             inline constexpr auto supersizemelight = "gt_pressura_light_90";
@@ -234,6 +238,63 @@ namespace style
             style::window::default_body_width + style::listview::scroll::margin;
 
     } // namespace listview
+
+    namespace sidelistview
+    {
+        inline auto arrowLeftImage  = "arrow_left_24px_W_G";
+        inline auto arrowRightImage = "arrow_right_24px_W_G";
+        inline constexpr auto bodyX = 0U;
+        inline constexpr auto bodyY = 0U;
+
+        namespace progressBar
+        {
+            inline constexpr auto x = 0U;
+            inline constexpr auto y = 10U;
+            inline constexpr auto w = window_width;
+            inline constexpr auto h = 50U;
+        } // namespace progressBar
+        namespace topMessage
+        {
+            inline constexpr auto x = 0U;
+            inline constexpr auto y = 0U;
+            inline constexpr auto w = window_width;
+            inline constexpr auto h = 100U;
+        } // namespace topMessage
+        namespace middleHBox
+        {
+            inline constexpr auto x = 0U;
+            inline constexpr auto y = 0U;
+            inline constexpr auto w = 480U;
+            inline constexpr auto h = 450U;
+        } // namespace middleHBox
+        namespace listItem
+        {
+            inline constexpr auto x = 0U;
+            inline constexpr auto y = 0U;
+            inline constexpr auto w = 432U;
+            inline constexpr auto h = 450U;
+        } // namespace listItem
+
+    } // namespace sidelistview
+
+    namespace timeSetSpinner
+    {
+
+        namespace colon
+        {
+            inline constexpr auto x = 0U;
+            inline constexpr auto y = 0U;
+            inline constexpr auto w = 32U;
+            inline constexpr auto h = 100U;
+        } // namespace colon
+        namespace timeText
+        {
+            inline constexpr auto x = 0U;
+            inline constexpr auto y = 0U;
+            inline constexpr auto w = 200U;
+            inline constexpr auto h = 100U;
+        } // namespace timeText
+    }     // namespace timeSetSpinner
 
     namespace margins
     {

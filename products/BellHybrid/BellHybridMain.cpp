@@ -18,6 +18,7 @@
 #include <application-alarm-clock/ApplicationAlarmClock.hpp>
 #include <application-onboarding/ApplicationOnBoarding.hpp>
 #include <application-bell-main/ApplicationBellMain.hpp>
+#include <application-bell-settings/ApplicationBellSettings.hpp>
 
 // services
 #include <service-appmgr/model/ApplicationManager.hpp>
@@ -106,6 +107,8 @@ int main()
             std::vector<std::unique_ptr<app::ApplicationLauncher>> applications;
             applications.push_back(
                 app::CreateLauncher<app::ApplicationBellMain>(app::applicationBellName, app::Closeable::False));
+            applications.push_back(app::CreateLauncher<app::ApplicationBellSettings>(app::applicationBellSettingsName,
+                                                                                     app::Closeable::False));
             // start application manager
             return sysmgr->RunSystemService(
                 std::make_shared<app::manager::ApplicationManager>(
