@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "ApplicationPhonebook.hpp"
+#include <application-phonebook/ApplicationPhonebook.hpp>
 #include "Dialog.hpp"
 #include "DialogMetadataMessage.hpp"
 #include "models/PhonebookModel.hpp"

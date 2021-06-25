@@ -11,6 +11,7 @@ add_library(${PROJECT_NAME} STATIC)
 add_subdirectory(application-antenna)
 add_subdirectory(application-bell-main)
 add_subdirectory(application-music-player)
+add_subdirectory(application-phonebook)
 add_subdirectory(apps-common)
 
 set(APPLICATIONS
@@ -22,7 +23,6 @@ set(APPLICATIONS
     call
     notes
     onboarding
-    phonebook
     messages
     calllog
     special-input

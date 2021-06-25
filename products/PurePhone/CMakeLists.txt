@@ -50,6 +50,7 @@ target_link_libraries(PurePhone
     PRIVATE
         application-antenna
         application-music-player
+        application-phonebook
         module-apps
         service-desktop
         service-bluetooth
