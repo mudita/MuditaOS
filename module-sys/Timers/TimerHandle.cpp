@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TimerHandle.hpp"
+#include <module-utils/log/log.hpp>
 
 namespace sys
 {
@@ -44,17 +45,32 @@ namespace sys
 
     void TimerHandle::start()
     {
-        timer->start();
+        if (isValid()) {
+            timer->start();
+        }
+        else {
+            LOG_ERROR("Cannot start, null timer pointer");
+        }
     }
 
     void TimerHandle::stop()
     {
-        timer->stop();
+        if (isValid()) {
+            timer->stop();
+        }
+        else {
+            LOG_ERROR("Cannot stop, null timer pointer");
+        }
     }
 
     void TimerHandle::restart(std::chrono::milliseconds newInterval)
     {
-        timer->restart(newInterval);
+        if (isValid()) {
+            timer->restart(newInterval);
+        }
+        else {
+            LOG_ERROR("Cannot restart, null timer pointer");
+        }
     }
 
     bool TimerHandle::isActive() const noexcept
