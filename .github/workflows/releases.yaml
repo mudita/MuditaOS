@@ -27,7 +27,11 @@ jobs:
         popd
     - name: Run unit tests
       run: |
-        ./tools/run_unittests.sh enabled_unittests
+        export JOBS=${JOBS:-$(nproc)} && \
+        echo "JOBS=${JOBS}" &&  \
+        pushd build-linux-Debug && \
+        ninja check -j ${JOBS} && \
+        popd
     - name: "Build and package for RT1051"
       id: build_release_package 
       env:
