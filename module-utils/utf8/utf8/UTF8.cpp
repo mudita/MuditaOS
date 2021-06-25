@@ -155,7 +155,6 @@ UTF8::UTF8(const UTF8 &utf)
     if (strLength != 0) {
         data = std::make_unique<char[]>(sizeAllocated);
         if (data == nullptr) {
-            // LOG_FATAL("No memory for copy constructor.");
             sizeAllocated = 0;
             sizeUsed      = 0;
             return;
@@ -677,7 +676,7 @@ bool UTF8::insertCode(const uint32_t &charCode, const uint32_t &index)
 {
     auto u = U8char(charCode);
     if (u.size == 0) {
-        LOG_ERROR("Failed to encode value: %x", static_cast<int>(charCode));
+        LOG_ERROR("Failed to encode character code");
         return false;
     }
     debug_utf("from 0x%x to size: %d -- 0x%x 0x%x\n", charCode, u.size, u.utf8[0], u.utf8[1]);
