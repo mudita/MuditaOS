@@ -31,19 +31,25 @@ void Channel::cmdLog(std::string cmd, const Result &result, std::chrono::millise
     cmd.erase(std::remove(cmd.begin(), cmd.end(), '\n'), cmd.end());
     switch (result.code) {
     case Result::Code::TIMEOUT: {
-        LOG_ERROR("[AT]: >%s<, timeout %s - please check the value with Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf",
-                  cmd.c_str(),
-                  utils::to_string(timeout.count()).c_str());
+        LOG_ERROR("AT response: timeout");
+        LOG_SENSITIVE(
+            LOGERROR,
+            "[AT]: >%s<, timeout %s - please check the value with Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf",
+            cmd.c_str(),
+            utils::to_string(timeout.count()).c_str());
     } break;
     case Result::Code::ERROR: {
-        LOG_ERROR("[AT]: >%s<, >%s<", cmd.c_str(), !result.response.empty() ? result.response.back().c_str() : "");
+        LOG_ERROR("AT response: error");
+        LOG_SENSITIVE(
+            LOGERROR, "[AT]: >%s<, >%s<", cmd.c_str(), result.response.size() ? result.response.back().c_str() : "");
     } break;
     default:
-        LOG_INFO("[AT]: >%s<, >%s<", cmd.c_str(), !result.response.empty() ? result.response.back().c_str() : "");
+        LOG_SENSITIVE(
+            LOGDEBUG, "[AT]: >%s<, >%s<", cmd.c_str(), result.response.size() ? result.response.back().c_str() : "");
         break;
     }
-    for (const auto &s : result.response) {
-        LOG_INFO("[AT] > %s", s.c_str());
+    for ([[maybe_unused]] const auto &s : result.response) {
+        LOG_SENSITIVE(LOGINFO, "[AT] > %s", s.c_str());
     }
 }
 
