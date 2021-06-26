@@ -21,6 +21,7 @@ namespace gui
     DeadBatteryWindow::DeadBatteryWindow(app::Application *app) : AppWindow(app, app::window::name::dead_battery)
     {
         buildInterface();
+        preventsAutoLock = true;
     }
 
     void DeadBatteryWindow::rebuild()
