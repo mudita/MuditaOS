@@ -97,7 +97,7 @@ namespace bluetooth
                 break;
             }
             gap_local_bd_addr(addr);
-            LOG_INFO("BTstack up and running at %s", bd_addr_to_str(addr));
+            LOG_INFO("BTstack up and running");
             bluetooth::KeyStorage::settings->setValue(bluetooth::Settings::State,
                                                       static_cast<int>(BluetoothStatus::State::On));
             break;
@@ -108,7 +108,6 @@ namespace bluetooth
                 }
                 // terminate, name 248 chars
                 packet[6 + 248] = 0;
-                LOG_INFO("Local name: %s", &packet[6]);
             }
             if (HCI_EVENT_IS_COMMAND_COMPLETE(packet, hci_read_local_version_information)) {
                 local_version_information_handler(packet);

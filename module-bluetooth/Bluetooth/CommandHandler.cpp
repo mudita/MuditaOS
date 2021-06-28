@@ -125,7 +125,7 @@ namespace bluetooth
     Error::Code CommandHandler::establishAudioConnection(uint8_t *addr)
     {
         profileManager->init();
-        LOG_INFO("Connecting audio with %s", bd_addr_to_str(addr));
+        LOG_INFO("Connecting audio");
         profileManager->connect(addr);
         return Error::Success;
     }
@@ -137,7 +137,7 @@ namespace bluetooth
     }
     Error::Code CommandHandler::pair(bd_addr_t addr)
     {
-        LOG_INFO("Pairing with %s", bd_addr_to_str(addr));
+        LOG_INFO("Pairing...");
 
         return driver->pair(addr) ? Error::Success : Error::LibraryError;
     }
@@ -157,7 +157,7 @@ namespace bluetooth
     }
     Error::Code CommandHandler::unpair(uint8_t *addr)
     {
-        LOG_INFO("Unpairing %s", bd_addr_to_str(addr));
+        LOG_INFO("Unpairing...");
 
         return driver->unpair(addr) ? Error::Success : Error::LibraryError;
     }
