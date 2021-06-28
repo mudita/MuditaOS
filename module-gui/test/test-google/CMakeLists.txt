@@ -12,4 +12,5 @@ add_gtest_executable(
         LIBS
                 module-utils
                 module-gui
+        USE_FS
 )

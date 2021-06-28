@@ -4,7 +4,7 @@
 
 usage() {
 cat << ==usage
-Usage: $(basename $0) [image_size] [image_file] [files]...
+Usage: $(basename $0) [image_size] [image_file] [sysroot] [files]...
 	image_size Target disk image size
 	image_file Target image name
 	files Files to include in the image
@@ -19,7 +19,13 @@ if [ $# -lt 2 ]; then
 fi
 IMAGE_SIZE="$1"
 IMAGE_FILE="$2"
-shift 2
+SYSROOT="$3"
+shift 3
+
+if [ ! -d "${SYSROOT}/sys" ]; then
+	echo "Invalid sysroot: ${SYSROOT}"
+	exit -1
+fi
 
 _REQ_CMDS="sfdisk truncate"
 for cmd in $_REQ_CMDS; do
@@ -33,8 +39,6 @@ truncate -s $IMAGE_SIZE $IMAGE_FILE
 SECTOR_START=2048
 SECTOR_END=$(( $(stat -c "%s" $IMAGE_FILE)/512 - $SECTOR_START))
 
-
-
 sfdisk $IMAGE_FILE << ==sfdisk
 label: dos
 unit: sectors
@@ -42,5 +46,4 @@ unit: sectors
 /dev/sdz1 : start=$SECTOR_START, size=$SECTOR_END, type=9e
 ==sfdisk
 pwd
-./genlittlefs --image $IMAGE_FILE --block_size=32768  --overwrite  --partition_num 1 -- sys/.boot.json sys/current/assets/* module-platform/test_dir/*
-
+./genlittlefs --image $IMAGE_FILE --block_size=32768  --overwrite  --partition_num 1 -- ${SYSROOT}/sys/.boot.json ${SYSROOT}/sys/current/assets/* module-platform/test_dir/*

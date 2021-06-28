@@ -1,19 +1,19 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <iosyscalls.hpp>
+#include "iosyscalls-internal.hpp"
 
-#include <unistd.h>
-#include <sys/types.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <limits.h> // for PATH_MAX
+#include <poll.h>
+#include <stdarg.h> // for va_*
+#include <sys/ioctl.h>
+#include <sys/mount.h>
 #include <sys/stat.h>
 #include <sys/statvfs.h>
-#include <sys/mount.h>
-#include <sys/ioctl.h>
-#include <poll.h>
-#include <fcntl.h>
-#include <errno.h>
-#include <stdarg.h> // for va_*
-#include <limits.h> // for PATH_MAX
+#include <sys/types.h>
+#include <unistd.h>
 
 #include "syscalls_real.hpp"
 

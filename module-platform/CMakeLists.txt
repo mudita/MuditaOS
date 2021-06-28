@@ -16,4 +16,11 @@ target_sources(
         include/Platform.hpp
 )
 
+target_link_libraries(
+        platform
+
+    PRIVATE
+        module-bsp
+)
+
 add_subdirectory(${PROJECT_TARGET_NAME})
