@@ -363,19 +363,7 @@ namespace bsp::battery_charger
 
             return batteryRetval::OK;
         }
-        /*
-                batteryRetval setChargingDischargingThresholds(std::uint8_t chargedThresholdPercent,
-                                                               std::uint8_t dischargedThresholdPercent)
-                {
-                    uint16_t regVal = (chargedThresholdPercent << 8) | dischargedThresholdPercent;
 
-                    if (fuelGaugeWrite(Registers::SALRT_Th_REG, regVal) != kStatus_Success) {
-                        LOG_ERROR("setChargingDischargingThresholds failed.");
-                        return batteryRetval::ChargerError;
-                    }
-                    return batteryRetval::OK;
-                }
-        */
         batteryRetval setTemperatureThresholds(std::uint8_t minTemperatureDegrees, std::uint8_t maxTemperatureDegrees)
         {
             std::uint16_t regVal = (static_cast<uint16_t>(maxTemperatureDegrees) << 8) | minTemperatureDegrees;
