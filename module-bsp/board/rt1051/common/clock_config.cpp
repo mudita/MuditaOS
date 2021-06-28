@@ -1100,7 +1100,6 @@ void PrintSystemClocks()
 
     for (i = 0; i < 22; i++) {
         LOG_PRINTF("%s: %lu Hz\r\n", _PLLNames[i], CLOCK_GetFreq(static_cast<clock_name_t>(i)));
-        // volatile uint32_t val = CLOCK_GetFreq(static_cast<clock_name_t>(i));
     }
 
     LOG_PRINTF("PerphSourceClock_I2C: %lu\r\n", GetPerphSourceClock(PerphClock_I2C));
@@ -1110,12 +1109,6 @@ void PrintSystemClocks()
     LOG_PRINTF("PerphSourceClock_SAI2: %lu\r\n", GetPerphSourceClock(PerphClock_SAI2));
     LOG_PRINTF("PerphSourceClock_USDHC2: %lu\r\n", GetPerphSourceClock(PerphClock_USDHC2));
 
-    /*    volatile auto  val1 = GetPerphSourceClock(PerphClock_I2C);
-        volatile auto  val2 = GetPerphSourceClock(PerphClock_LPSPI);
-        volatile auto  val3 = GetPerphSourceClock(PerphClock_LPUART);
-        volatile auto  val4 = GetPerphSourceClock(PerphClock_SAI1);
-        volatile auto  val5 = GetPerphSourceClock(PerphClock_SAI2);
-        volatile auto  val6 = GetPerphSourceClock(PerphClock_USDHC2);*/
 }
 
 #define CLOCK_CCM_HANDSHAKE_WAIT()                                                                                     \
