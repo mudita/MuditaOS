@@ -6,7 +6,6 @@ add_catch2_executable(
             main.cpp
             test-service-db-api.cpp
             test-service-db-settings-messages.cpp
-            #test-service-db-file_indexer.cpp
             test-service-db-quotes.cpp
             test-factory-settings.cpp
         LIBS
@@ -18,8 +17,7 @@ add_catch2_executable(
             module-vfs
             service-audio
             service-cellular
-        DEPS
-            PurePhone-disk-img
+	    USE_FS
 )
 
 add_catch2_executable(

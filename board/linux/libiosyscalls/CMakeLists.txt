@@ -3,16 +3,6 @@ project(iosyscalls VERSION 1.0
 	DESCRIPTION "linux syscalls wrapper to our VFS"
 )
 
-
-set(SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/syscalls_stdio.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/syscalls_scan_family.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/syscalls_posix.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/syscalls_posix_dirent.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/iosyscalls.cpp
-)
-
-
 set(INCLUDES
     "${CMAKE_CURRENT_SOURCE_DIR}/include"
     "${CMAKE_SOURCE_DIR}/module-os/board/linux"
@@ -22,8 +12,26 @@ set(INCLUDES
     "${CMAKE_SOURCE_DIR}/module-vfs/include/internal"
 )
 
+add_library(${PROJECT_NAME} SHARED)
 
-add_library(${PROJECT_NAME} SHARED ${SOURCES})
+target_sources(
+        ${PROJECT_NAME}
+
+    PRIVATE
+        src/interface.cpp
+        src/iosyscalls-internal.hpp
+        src/iosyscalls.cpp
+        src/syscalls_posix_dirent.cpp
+        src/syscalls_posix.cpp
+        src/syscalls_real.hpp
+        src/syscalls_scan_family.cpp
+        src/syscalls_stdio.cpp
+
+    PUBLIC
+        include/debug.hpp
+        include/iosyscalls.h
+        include/iosyscalls.hpp
+)
 
 target_compile_options( ${PROJECT_NAME} PRIVATE "-Wno-nonnull-compare" )
 get_target_property( target_options ${PROJECT_NAME} COMPILE_OPTIONS)

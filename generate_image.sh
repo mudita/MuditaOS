@@ -5,8 +5,8 @@
 usage() {
 cat << ==usage
 Usage: $(basename $0) image_path build_dir [boot.bin_file]
-    image_path    - Destination image path name e.g. PurePhone.img
-    build_dir     - PurePhone build dir e.g. build-rt1051-RelWithDebInfo
+    image_path    - Destination image path name e.g., PurePhone.img
+    sysroot       - product's system root e.g., build-rt1051-RelWithDebInfo/sysroot
     boot.bin_file - optional for linux image - name of the boot.bin file (for different targets)
 ==usage
 }
@@ -18,11 +18,11 @@ if [[ ( $# -ne 2 ) && ( $# -ne 3 ) ]]; then
 fi
 
 IMAGE_NAME=$(realpath $1)
-BUILDDIR=$(realpath $2)
+SYSROOT=$(realpath $2)
 BIN_FILE=$3
 
-if [ ! -d "$BUILDDIR" ]; then
-	echo "Error! \${build_dir} (${BUILDDIR}) is not a directory"
+if [ ! -d "$SYSROOT" ]; then
+	echo "Error! ${SYSROOT} is not a directory"
 	usage
 	exit -1
 fi
@@ -49,7 +49,7 @@ if [ ! $MTOOLS_OK ]; then
 	exit -1
 fi
 
-GENLFS=$(find $BUILDDIR -type f -iname genlittlefs -executable -print -quit)
+GENLFS=$(realpath $(find $BUILDDIR -type f -iname genlittlefs -executable -print -quit))
 if [ -z ${GENLFS} ]; then
     echo "Error: Unable to find genlilttlefs..."
     exit -1
@@ -82,11 +82,11 @@ unit: sectors
 PART1="$IMAGE_NAME@@$(($PART1_START * $DEVICE_BLK_SIZE))"
 mformat -i "$PART1" -F -T $PART1_SIZE -M $DEVICE_BLK_SIZE -v MUDITAOS
 
-if [ ! -d "$BUILDDIR/sys" ]; then
+if [ ! -d "${SYSROOT}/sys" ]; then
 	echo "Fatal! Image folder sys/ missing in build. Check build system."
 	exit -1
 fi
-cd "$BUILDDIR"/sys
+cd "${SYSROOT}/sys"
 
 #Copy FAT data
 CURRENT_DATA="assets country-codes.db Luts.bin"
@@ -97,7 +97,7 @@ mmd -i "$PART1" ::/updates
 
 for i in $CURRENT_DATA; do
 	f="current/$i"
-    if [ -f "$f" -o -d "$f" ]; then
+	if [ -f "$f" -o -d "$f" ]; then
 		mcopy -s -i "$PART1" $f ::/current/
 	else
 		echo "Error! Unable to copy item: $f"
@@ -106,7 +106,7 @@ for i in $CURRENT_DATA; do
 done
 
 if [[ -n "${BIN_FILE}" && -f "${BIN_FILE}" ]]; then
-    mcopy -v -s -i "$PART1" ${BIN_FILE} ::/current/boot.bin
+	mcopy -v -s -i "$PART1" ${BIN_FILE} ::/current/boot.bin
 else
 	echo "Warning! Missing boot.bin"
 	echo "(it's fine for a Linux build)"
@@ -116,6 +116,7 @@ mcopy -s -i "$PART1" .boot.json ::
 mcopy -s -i "$PART1" .boot.json.crc32 ::
 
 #Littlefs generate image
+echo $(pwd)
 $GENLFS --image=$IMAGE_NAME --block_size=32768  --overwrite  --partition_num=3 -- user/*
 $GENLFS --image=$IMAGE_NAME --block_size=4096  --overwrite  --partition_num=2
 

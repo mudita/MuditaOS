@@ -3,12 +3,15 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 #include <purefs/blkdev/disk_manager.hpp>
+
 #include <platform/linux/DiskImage.hpp>
+
+#include "test-setup.hpp"
+
 #include <filesystem>
 
 namespace
 {
-    constexpr auto disk_image          = "PurePhone.img";
     constexpr auto part_disk_image     = "test_disk.img";
     constexpr auto part_disk_image_ext = "test_disk_ext.img";
     constexpr auto part_disk_image_bad = "test_disk_bad.img";
@@ -19,7 +22,7 @@ TEST_CASE("Registering and unregistering device")
 {
     using namespace purefs;
     blkdev::disk_manager dm;
-    auto disk = std::make_shared<blkdev::disk_image>(disk_image);
+    auto disk = std::make_shared<blkdev::disk_image>(::testing::vfs::disk_image);
     REQUIRE(disk);
     REQUIRE(dm.register_device(disk, "emmc0") == 0);
     REQUIRE(dm.register_device(disk, "emmc0") == -EEXIST);
@@ -93,7 +96,7 @@ TEST_CASE("RW boundary checking")
 {
     using namespace purefs;
     blkdev::disk_manager dm;
-    auto disk = std::make_shared<blkdev::disk_image>(disk_image);
+    auto disk = std::make_shared<blkdev::disk_image>(::testing::vfs::disk_image);
     REQUIRE(disk);
     REQUIRE(dm.register_device(disk, "emmc0") == 0);
     const auto parts = dm.partitions("emmc0");
@@ -112,7 +115,7 @@ TEST_CASE("Alternative partitions in the disk manager")
 {
     using namespace purefs;
     blkdev::disk_manager dm;
-    auto disk = std::make_shared<blkdev::disk_image>(disk_image);
+    auto disk = std::make_shared<blkdev::disk_image>(::testing::vfs::disk_image);
     REQUIRE(disk);
     REQUIRE(dm.register_device(disk, "emmc0") == 0);
     const auto sect_size  = dm.get_info("emmc0", blkdev::info_type::sector_size);
@@ -291,7 +294,7 @@ TEST_CASE("Disk sectors out of range for partition")
 {
     using namespace purefs;
     blkdev::disk_manager dm;
-    auto disk = std::make_shared<blkdev::disk_image>(disk_image);
+    auto disk = std::make_shared<blkdev::disk_image>(::testing::vfs::disk_image);
     REQUIRE(disk);
     REQUIRE(dm.register_device(disk, "emmc1") == 0);
     const auto parts = dm.partitions("emmc1");

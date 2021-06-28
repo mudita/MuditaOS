@@ -26,9 +26,6 @@ add_catch2_executable(
         unittest_utils.cpp
     LIBS
         module-utils
-        iosyscalls
-    DEPS
-        PurePhone-disk-img
 )
 
 # Log tests
@@ -50,13 +47,3 @@ add_catch2_executable(
     LIBS
         module-utils
 )
-
-# ParserICS tests
-#add_catch2_executable(
-#    NAME
-#        utils-parserIcs
-#    SRCS
-#        test_ParserICS.cpp
-#    LIBS
-#        module-utils
-#)

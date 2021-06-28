@@ -10,21 +10,22 @@
 #include <purefs/blkdev/disk_manager.hpp>
 #include <purefs/fs/drivers/filesystem_vfat.hpp>
 #include <purefs/vfs_subsystem.hpp>
+
+#include <purefs/fs/thread_local_cwd.hpp>
+
+#include "test-setup.hpp"
+
+#include <tuple>
+
 #include <sys/statvfs.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <tuple>
-
-namespace
-{
-    constexpr auto disk_image = "PurePhone.img";
-}
 
 TEST_CASE("Corefs: Registering and unregistering block device")
 {
     using namespace purefs;
     auto dm   = std::make_shared<blkdev::disk_manager>();
-    auto disk = std::make_shared<blkdev::disk_image>(disk_image);
+    auto disk = std::make_shared<blkdev::disk_image>(::testing::vfs::disk_image);
     REQUIRE(disk);
     REQUIRE(dm->register_device(disk, "emmc0") == 0);
     purefs::fs::filesystem fscore(dm);
@@ -58,7 +59,7 @@ TEST_CASE("Corefs: Basic API test")
 {
     using namespace purefs;
     auto dm   = std::make_shared<blkdev::disk_manager>();
-    auto disk = std::make_shared<blkdev::disk_image>(disk_image);
+    auto disk = std::make_shared<blkdev::disk_image>(::testing::vfs::disk_image);
     REQUIRE(disk);
     REQUIRE(dm->register_device(disk, "emmc0") == 0);
     purefs::fs::filesystem fscore(dm);
@@ -117,7 +118,7 @@ TEST_CASE("Corefs: Create new file, write, read from it")
 {
     using namespace purefs;
     auto dm   = std::make_shared<blkdev::disk_manager>();
-    auto disk = std::make_shared<blkdev::disk_image>(disk_image);
+    auto disk = std::make_shared<blkdev::disk_image>(::testing::vfs::disk_image);
     REQUIRE(disk);
     REQUIRE(dm->register_device(disk, "emmc0") == 0);
     purefs::fs::filesystem fscore(dm);
@@ -162,7 +163,7 @@ TEST_CASE("Corefs: Register null filesystem")
 {
     using namespace purefs;
     auto dm   = std::make_shared<blkdev::disk_manager>();
-    auto disk = std::make_shared<blkdev::disk_image>(disk_image);
+    auto disk = std::make_shared<blkdev::disk_image>(::testing::vfs::disk_image);
     REQUIRE(disk);
     REQUIRE(dm->register_device(disk, "emmc0") == 0);
     purefs::fs::filesystem fscore(dm);
@@ -173,7 +174,7 @@ TEST_CASE("Corefs: Mount empty strings")
 {
     using namespace purefs;
     auto dm   = std::make_shared<blkdev::disk_manager>();
-    auto disk = std::make_shared<blkdev::disk_image>(disk_image);
+    auto disk = std::make_shared<blkdev::disk_image>(::testing::vfs::disk_image);
     REQUIRE(disk);
     REQUIRE(dm->register_device(disk, "emmc0") == 0);
     purefs::fs::filesystem fscore(dm);
@@ -189,7 +190,7 @@ TEST_CASE("Corefs: Write to not valid file descriptor")
 {
     using namespace purefs;
     auto dm   = std::make_shared<blkdev::disk_manager>();
-    auto disk = std::make_shared<blkdev::disk_image>(disk_image);
+    auto disk = std::make_shared<blkdev::disk_image>(::testing::vfs::disk_image);
     REQUIRE(disk);
     REQUIRE(dm->register_device(disk, "emmc0") == 0);
     purefs::fs::filesystem fscore(dm);
@@ -211,7 +212,7 @@ TEST_CASE("Corefs: Directory operations")
 {
     using namespace purefs;
     auto dm   = std::make_shared<blkdev::disk_manager>();
-    auto disk = std::make_shared<blkdev::disk_image>(disk_image);
+    auto disk = std::make_shared<blkdev::disk_image>(::testing::vfs::disk_image);
     REQUIRE(disk);
     REQUIRE(dm->register_device(disk, "emmc0") == 0);
     purefs::fs::filesystem fscore(dm);
@@ -277,7 +278,7 @@ TEST_CASE("Corefs: Read only filesystem")
 {
     using namespace purefs;
     auto dm   = std::make_shared<blkdev::disk_manager>();
-    auto disk = std::make_shared<blkdev::disk_image>(disk_image);
+    auto disk = std::make_shared<blkdev::disk_image>(::testing::vfs::disk_image);
     REQUIRE(disk);
     REQUIRE(dm->register_device(disk, "emmc0") == 0);
     purefs::fs::filesystem fscore(dm);
@@ -314,7 +315,7 @@ TEST_CASE("Corefs: Remount filesystem from RO to RW and to RO")
 {
     using namespace purefs;
     auto dm   = std::make_shared<blkdev::disk_manager>();
-    auto disk = std::make_shared<blkdev::disk_image>(disk_image);
+    auto disk = std::make_shared<blkdev::disk_image>(::testing::vfs::disk_image);
     REQUIRE(disk);
     REQUIRE(dm->register_device(disk, "emmc0") == 0);
     auto fscore         = std::make_shared<purefs::fs::filesystem>(dm);
@@ -350,7 +351,7 @@ TEST_CASE("Corefs: Autodetect filesystems")
 {
     using namespace purefs;
     auto dm   = std::make_shared<blkdev::disk_manager>();
-    auto disk = std::make_shared<blkdev::disk_image>(disk_image);
+    auto disk = std::make_shared<blkdev::disk_image>(::testing::vfs::disk_image);
     REQUIRE(disk);
     REQUIRE(dm->register_device(disk, "emmc0") == 0);
     auto fscore         = std::make_shared<purefs::fs::filesystem>(dm);

@@ -1,15 +1,15 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "iosyscalls-internal.hpp"
+
+#include "debug.hpp"
+#include "syscalls_real.hpp"
+
 #include <stdlib.h>
 #include <errno.h>
 #include <ctype.h>
 #include <stdarg.h>
-#include <iosyscalls.hpp>
-
-#include "syscalls_real.hpp"
-
-#include "debug.hpp"
 
 namespace
 {

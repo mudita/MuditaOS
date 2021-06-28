@@ -73,15 +73,13 @@ endif()
 
 set_source_files_properties(BellHybridMain.cpp PROPERTIES COMPILE_DEFINITIONS "${ENABLED_APPS_DEFINES}")
 
-
 strip_executable(BellHybrid)
-
 
 add_dependencies(BellHybrid version)
 
 include(AddBootBin)
 add_boot_bin(BellHybrid)
-add_image(BellHybrid)
+add_image(BellHybrid sysroot assets)
 
 include(AddHexTarget)
 add_hex_target(BellHybrid)
