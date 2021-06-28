@@ -200,7 +200,7 @@ auto CalendarEventsHelper::eventJsonObjectFrom(const EventsRecord &record) const
 {
     auto icalEvent = icalEventFrom(record);
     if (!isICalEventValid(icalEvent)) {
-        LOG_ERROR("Bad event record formatting  (Event UID: %s)", icalEvent.event.getUID().c_str());
+        LOG_ERROR("Bad event record formatting");
     }
 
     auto rruleObj = json11::Json::object{
@@ -375,7 +375,7 @@ auto CalendarEventsHelper::createDBEntry(Context &context) -> sys::ReturnCodes
             context.setResponseBody(jsonObj);
         }
         else {
-            LOG_ERROR("UID should not be recieved in put event endpoint. Recieved UID: %s", record.UID.c_str());
+            LOG_ERROR("UID should not be recieved in put event endpoint.");
             context.setResponseStatus(http::Code::BadRequest);
             MessageHandler::putToSendQueue(context.createSimpleResponse());
             return sys::ReturnCodes::Failure;
@@ -457,7 +457,7 @@ auto CalendarEventsHelper::deleteDBEntry(Context &context) -> sys::ReturnCodes
     auto checkUID = Event();
     checkUID.setUID(UID);
     if (!checkUID.isValid) {
-        LOG_ERROR("Wrong UID format. Provided UID: %s", UID.c_str());
+        LOG_ERROR("Wrong UID format.");
         context.setResponseStatus(http::Code::BadRequest);
         MessageHandler::putToSendQueue(context.createSimpleResponse());
         return sys::ReturnCodes::Failure;
