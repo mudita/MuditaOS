@@ -18,13 +18,13 @@ def test_device_info(harness):
     assert ret["body"]["signalStrength"] is not None
     assert ret["body"]["accessTechnology"] is not None
     assert ret["body"]["networkStatus"] is not None
+    assert ret["body"]["networkOperatorName"]
     assert ret["body"]["fsTotal"] is not None
     assert ret["body"]["fsFree"] is not None
     assert 0 < int(ret["body"]["fsFreePercent"]) <= 100
     assert ret["body"]["gitRevision"] is not None
     assert ret["body"]["gitTag"] is not None
     assert ret["body"]["gitBranch"] is not None
-    #assert ret["body"]["updateHistory"] is not None
     assert ret["body"]["currentRTCTime"] is not None
     assert ret["body"]["version"] is not None
 

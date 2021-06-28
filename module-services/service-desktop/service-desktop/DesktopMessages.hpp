@@ -139,6 +139,13 @@ namespace sdesktop
         };
     } // namespace developerMode
 
+    class DeviceInfoRequestEvent : public Event
+    {
+      public:
+        DeviceInfoRequestEvent() = default;
+        explicit DeviceInfoRequestEvent(const std::string &networkOperatorName);
+    };
+
     namespace transfer
     {
         class TransferTimerState : public sys::DataMessage

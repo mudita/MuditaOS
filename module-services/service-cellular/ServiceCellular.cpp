@@ -408,6 +408,12 @@ void ServiceCellular::registerMessageHandlers()
             auto handler = cellular::RawATHandler(*channel);
             return handler.handle(msg);
         }
+        if (typeid(*msg->event.get()) == typeid(sdesktop::DeviceInfoRequestEvent)) {
+            NetworkSettings networkSettings(*this);
+            auto event   = std::make_unique<sdesktop::DeviceInfoRequestEvent>(networkSettings.getCurrentOperator());
+            auto message = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
+            bus.sendUnicast(std::move(message), ::service::name::service_desktop);
+        }
         return sys::MessageNone{};
     });
 

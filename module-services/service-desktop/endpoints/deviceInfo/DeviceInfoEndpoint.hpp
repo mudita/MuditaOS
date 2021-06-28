@@ -3,12 +3,8 @@
 
 #pragma once
 
+#include "DeviceInfoEndpointHelper.hpp"
 #include <endpoints/Endpoint.hpp>
-#include <parser/ParserUtils.hpp>
-
-#include <Service/Service.hpp>
-
-#include <string>
 
 namespace parserFSM
 {
@@ -21,12 +17,13 @@ namespace sys
 
 class DeviceInfoEndpoint : public parserFSM::Endpoint
 {
+    const std::unique_ptr<parserFSM::DeviceInfoEndpointHelper> helper;
 
   public:
-    explicit DeviceInfoEndpoint(sys::Service *ownerServicePtr) : Endpoint(ownerServicePtr)
+    explicit DeviceInfoEndpoint(sys::Service *ownerServicePtr)
+        : Endpoint(ownerServicePtr), helper(std::make_unique<parserFSM::DeviceInfoEndpointHelper>(ownerServicePtr))
     {
         debugName = "DeviceInfoEndpoint";
     }
     auto handle(parserFSM::Context &context) -> void override;
-    auto getDeviceInfo(parserFSM::Context &context) -> bool;
 };
