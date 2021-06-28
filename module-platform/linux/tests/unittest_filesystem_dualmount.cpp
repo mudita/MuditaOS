@@ -10,14 +10,16 @@
 #include <purefs/blkdev/disk_manager.hpp>
 #include <purefs/fs/drivers/filesystem_vfat.hpp>
 #include <purefs/fs/drivers/filesystem_littlefs.hpp>
+
+#include "test-setup.hpp"
+
 #include <sys/statvfs.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 
 namespace
 {
-    constexpr auto vfat_disk_image = "PurePhone.img";
-    constexpr auto lfs_disk_image  = "lfstest.img";
+    constexpr auto lfs_disk_image = "lfstest.img";
 
     auto prepare_filesystem(std::string_view vfat_dev_name, std::string_view lfs_dev_name)
         -> std::pair<std::unique_ptr<purefs::fs::filesystem>, std::shared_ptr<purefs::blkdev::disk_manager>>
@@ -25,7 +27,7 @@ namespace
         using namespace purefs;
 
         auto dm        = std::make_shared<blkdev::disk_manager>();
-        auto vfat_disk = std::make_shared<blkdev::disk_image>(vfat_disk_image);
+        auto vfat_disk = std::make_shared<blkdev::disk_image>(::testing::vfs::disk_image);
         auto lfs_disk  = std::make_shared<blkdev::disk_image>(lfs_disk_image);
 
         if (dm->register_device(vfat_disk, vfat_dev_name) != 0) {
@@ -55,7 +57,7 @@ TEST_CASE("dualmount: Basic mount")
     using namespace purefs;
 
     auto dm        = std::make_shared<blkdev::disk_manager>();
-    auto vfat_disk = std::make_shared<blkdev::disk_image>(vfat_disk_image);
+    auto vfat_disk = std::make_shared<blkdev::disk_image>(::testing::vfs::disk_image);
     auto lfs_disk  = std::make_shared<blkdev::disk_image>(lfs_disk_image);
     REQUIRE(vfat_disk);
     REQUIRE(lfs_disk);

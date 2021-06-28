@@ -10,7 +10,7 @@
 
 TEST_CASE("VFS linux support")
 {
-    auto platform = platform::linux::LinuxPlatform("PurePhone.img");
+    auto platform = platform::linux::LinuxPlatform("Test.img");
 
     REQUIRE_NOTHROW(platform.init());
 
