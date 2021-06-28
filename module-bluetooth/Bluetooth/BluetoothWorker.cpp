@@ -275,7 +275,7 @@ void BluetoothWorker::removeFromBoundDevices(uint8_t *addr)
     if (position != pairedDevices.end()) {
         pairedDevices.erase(position);
         settings->setValue(bluetooth::Settings::BondedDevices, SettingsSerializer::toString(pairedDevices));
-        LOG_INFO("Device %s removed from paired devices list", bd_addr_to_str(addr));
+        LOG_INFO("Device removed from paired devices list");
     }
 }
 

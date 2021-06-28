@@ -42,7 +42,7 @@ namespace bluetooth
         if (GAP::isServiceSupportedByRemote(address, TYPE_OF_SERVICE::RENDERING)) {
             auto profilePtr = profilesList[AudioProfile::A2DP].get();
             if (profilePtr != nullptr) {
-                LOG_DEBUG("Connecting device %s to A2DP", bd_addr_to_str(address));
+                LOG_DEBUG("Connecting device to A2DP");
                 profilePtr->setDeviceAddress(remoteAddr);
                 profilePtr->connect();
             }
@@ -50,7 +50,7 @@ namespace bluetooth
         if (GAP::isServiceSupportedByRemote(address, TYPE_OF_SERVICE::AUDIO)) {
             auto profilePtr = profilesList[AudioProfile::HSP].get();
             if (profilePtr != nullptr) {
-                LOG_DEBUG("Connecting device %s to HSP", bd_addr_to_str(address));
+                LOG_DEBUG("Connecting device to HSP");
                 profilePtr->setDeviceAddress(remoteAddr);
                 profilePtr->connect();
             }

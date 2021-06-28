@@ -237,7 +237,7 @@ namespace bluetooth
 
     void HSP::HSPImpl::establishAudioConnection()
     {
-        LOG_DEBUG("Establish Audio connection to %s...\n", bd_addr_to_str(deviceAddr));
+        LOG_DEBUG("Establish Audio connection...\n");
         hsp_ag_establish_audio_connection();
     }
 
