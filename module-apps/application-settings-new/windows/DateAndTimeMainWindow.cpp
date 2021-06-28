@@ -70,7 +70,7 @@ namespace gui
             [=](Item &item) {
                 automaticTimeZoneIsOn = !automaticTimeZoneIsOn;
                 application->bus.sendUnicast(
-                    std::make_shared<stm::message::SetAutomaticTimezoneRequest>(automaticDateAndTimeIsOn),
+                    std::make_shared<stm::message::SetAutomaticTimezoneRequest>(automaticTimeZoneIsOn),
                     service::name::service_time);
                 refreshOptionsList();
                 return true;
