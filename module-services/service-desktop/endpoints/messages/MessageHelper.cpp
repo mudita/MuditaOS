@@ -552,7 +552,6 @@ namespace parserFSM
                         smsArray.reserve(results.size());
                         for (const auto &record : results) {
                             smsArray.emplace_back(MessageHelper::toJson(record));
-                            LOG_DEBUG("Record found!: %" PRIu32 "\n", record.ID);
                         }
 
                         context.setResponseBody(std::move(smsArray));
