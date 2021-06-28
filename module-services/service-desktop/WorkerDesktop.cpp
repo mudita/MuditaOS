@@ -80,8 +80,6 @@ bool WorkerDesktop::handleMessage(uint32_t queueID)
     auto &queue       = queues[queueID];
     const auto &qname = queue->GetQueueName();
 
-    LOG_INFO("handleMessage received data from queue: %s", qname.c_str());
-
     if (qname == sdesktop::RECEIVE_QUEUE_BUFFER_NAME) {
         std::string *receivedMsg = nullptr;
         if (!queue->Dequeue(&receivedMsg, 0)) {

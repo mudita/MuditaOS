@@ -308,7 +308,6 @@ sys::MessagePointer ServiceDesktop::DataReceivedHandler(sys::DataMessage *msg, s
             if (auto queryResponse = dynamic_cast<db::QueryResponse *>(resp)) {
                 auto result = queryResponse->getResult();
                 if (result != nullptr) {
-                    LOG_DEBUG("Result: %s", result->debugInfo().c_str());
                     if (result->hasListener()) {
                         LOG_DEBUG("Handling result...");
                         result->handle();
