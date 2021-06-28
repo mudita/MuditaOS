@@ -75,7 +75,7 @@ gui::ListItem *CalllogModel::getItem(gui::Order order)
         if (event.isShortRelease(gui::KeyCode::KEY_LF)) {
             return app::manager::Controller::sendAction(
                 application,
-                app::manager::actions::Dial,
+                app::manager::actions::Call,
                 std::make_unique<app::ExecuteCallData>(item->getCall().phoneNumber));
         }
         return false;

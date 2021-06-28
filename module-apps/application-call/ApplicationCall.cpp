@@ -38,8 +38,11 @@ namespace app
         statusBarManager->enableIndicators(
             {Indicator::Signal, Indicator::Time, Indicator::Battery, Indicator::SimCard});
         addActionReceiver(manager::actions::Call, [this](auto &&data) {
-            switchWindow(window::name_call, std::forward<decltype(data)>(data));
-            return actionHandled();
+            if (auto msg = dynamic_cast<app::CallSwitchData *>(data.get()); msg != nullptr) {
+                handleCallEvent(msg->getPhoneNumber().getEntered());
+                return actionHandled();
+            }
+            return actionNotHandled();
         });
         addActionReceiver(manager::actions::Dial, [this](auto &&data) {
             switchWindow(window::name_enterNumber, std::forward<decltype(data)>(data));
