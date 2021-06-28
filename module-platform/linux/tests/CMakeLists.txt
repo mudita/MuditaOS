@@ -1,3 +1,5 @@
+
+set(TEST_SYSROOT ${CMAKE_BINARY_DIR}/test-sysroot)
 add_custom_target("test_disk_image")
 add_custom_command(
         PRE_BUILD
@@ -12,9 +14,9 @@ add_catch2_executable(
         ${CMAKE_CURRENT_LIST_DIR}/unittest_disk_manager.cpp
     LIBS
         platform
-        module-vfs
     DEPS
         test_disk_image
+    USE_FS
 )
 
 add_catch2_executable(
@@ -24,14 +26,15 @@ add_catch2_executable(
     LIBS
         platform
         module-vfs
+    USE_FS
 )
 
 set(LITTLEFS_IMAGE "lfstest.img")
 add_custom_target(
     ${LITTLEFS_IMAGE}
-    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/genlfstestimg.sh 1G ${LITTLEFS_IMAGE}
+    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/genlfstestimg.sh 1G ${LITTLEFS_IMAGE} ${TEST_SYSROOT}
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-    DEPENDS genlittlefs assets
+    DEPENDS genlittlefs test-assets
 )
 
 add_catch2_executable(
@@ -40,9 +43,9 @@ add_catch2_executable(
         ${CMAKE_CURRENT_LIST_DIR}/unittest_filesystem_littlefs.cpp
     LIBS
         platform
-        module-vfs
     DEPS
         ${LITTLEFS_IMAGE}
+    USE_FS
 )
 
 add_catch2_executable(
@@ -51,9 +54,9 @@ add_catch2_executable(
         ${CMAKE_CURRENT_LIST_DIR}/unittest_filesystem_dualmount.cpp
     LIBS
         platform
-        module-vfs
     DEPS
         ${LITTLEFS_IMAGE}
+    USE_FS
 )
 
 # iosyscalls tests
@@ -65,10 +68,8 @@ add_catch2_executable(
     LIBS
         module-sys
         module-vfs
-        iosyscalls
         platform
-    DEPS
-        PurePhone-disk-img
+    USE_FS
 )
 
 # prepare test assets

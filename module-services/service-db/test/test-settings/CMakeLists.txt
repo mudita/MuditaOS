@@ -13,5 +13,4 @@ add_catch2_executable(
             module-cellular
         DEPS
             module-sys
-            PurePhone-disk-img
 )

@@ -96,7 +96,7 @@ target_include_directories(module-vfs
 )
 
 target_link_libraries(module-vfs 
-    PRIVATE 
+    PRIVATE
         fatfs::fatfs
         json::json
         littlefs::littlefs
