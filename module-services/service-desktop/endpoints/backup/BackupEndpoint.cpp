@@ -70,7 +70,7 @@ auto BackupEndpoint::request(Context &context) -> sys::ReturnCodes
         context.setResponseStatus(parserFSM::http::Code::BadRequest);
     }
 
-    LOG_DEBUG("responding: %s", context.createSimpleResponse().c_str());
+    LOG_DEBUG("responding");
     MessageHandler::putToSendQueue(context.createSimpleResponse());
 
     return sys::ReturnCodes::Success;
