@@ -337,8 +337,7 @@ namespace bluetooth
             AVRCP::mediaTracker.a2dp_cid = cid;
             AVRCP::mediaTracker.volume   = 64;
 
-            LOG_INFO("A2DP Source: Connected to address %s, a2dp cid 0x%02x, local seid %d.\n",
-                     bd_addr_to_str(address),
+            LOG_INFO("A2DP Source: Connected, a2dp cid 0x%02x, local seid %d.\n",
                      AVRCP::mediaTracker.a2dp_cid,
                      AVRCP::mediaTracker.local_seid);
             isConnected    = true;
@@ -458,8 +457,7 @@ namespace bluetooth
                          AVRCP::mediaTracker.local_seid);
                 break;
             }
-            LOG_INFO("A2DP Source: Stream established, address %s, a2dp cid 0x%02x, local seid %d, remote seid %d.\n",
-                     bd_addr_to_str(address),
+            LOG_INFO("A2DP Source: Stream established, a2dp cid 0x%02x, local seid %d, remote seid %d.\n",
                      AVRCP::mediaTracker.a2dp_cid,
                      AVRCP::mediaTracker.local_seid,
                      a2dp_subevent_stream_established_get_remote_seid(packet));
@@ -577,7 +575,7 @@ namespace bluetooth
     void A2DP::A2DPImpl::connect()
     {
         if (!isConnected) {
-            LOG_INFO("Starting playback to %s", bd_addr_to_str(deviceAddr));
+            LOG_INFO("Starting playback");
             a2dp_source_establish_stream(deviceAddr, &AVRCP::mediaTracker.a2dp_cid);
         }
     }
