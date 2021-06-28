@@ -91,7 +91,11 @@ add_dependencies(PurePhone version)
 
 include(AddBootBin)
 add_boot_bin(PurePhone)
-add_image(PurePhone)
+add_image(
+    PRODUCT PurePhone
+    SYSROOT sysroot
+    ASSETS  assets
+)
 
 include(AddHexTarget)
 add_hex_target(PurePhone)

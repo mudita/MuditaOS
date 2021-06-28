@@ -21,9 +21,6 @@ add_catch2_executable(
                 ../mock/
         LIBS
                 module-sys
-                iosyscalls
                 module-gui
-        DEPS
-                assets
-                PurePhone-disk-img
+	USE_FS
 )

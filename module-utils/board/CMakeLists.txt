@@ -1,5 +1,3 @@
-add_library(board STATIC)
-
 if(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
     target_sources(board
     PRIVATE

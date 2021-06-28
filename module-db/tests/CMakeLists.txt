@@ -1,7 +1,3 @@
-if (NOT IS_SYMLINK "${CMAKE_BINARY_DIR}/sys/user")
-    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/sys/user")
-endif()
-
 add_catch2_executable(
     NAME
         db
@@ -34,11 +30,8 @@ add_catch2_executable(
         
     LIBS
         module-sys
-        iosyscalls
         module-db
         json::json
-    DEPS
-        assets
-        PurePhone-disk-img
+    USE_FS
 )
 add_subdirectory(test-initializer)

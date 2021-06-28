@@ -111,9 +111,7 @@ endif ()
 
 add_subdirectory(third-party)
 
-if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
-    add_subdirectory(board/linux/libiosyscalls)
-endif()
+add_subdirectory(board)
 
 add_subdirectory(source)
 add_subdirectory(module-platform)

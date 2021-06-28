@@ -25,7 +25,5 @@ add_catch2_executable(
     LIBS
         time
         utf8
-        iosyscalls
-    DEPS
-        PurePhone-disk-img
+    USE_FS
 )

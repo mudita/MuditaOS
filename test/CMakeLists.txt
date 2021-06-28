@@ -12,18 +12,37 @@ define_property(
     FULL_DOCS "Add directory to a test entity to group tests defined in the directory and its subdirectories"
 )
 
-include(CMakeParseArguments)
-include(GoogleTest)
+include(Assets)
 include(Catch)
+include(CMakeParseArguments)
+include(DiskImage)
+include(GoogleTest)
 
 add_custom_target(unittests)
 
 set(ROOT_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR} PARENT_SCOPE)
+set(TEST_ASSETS_DEST_DIR ${CMAKE_BINARY_DIR}/test-sysroot/sys)
+set(TEST_ASSETS_DEST_DIR ${TEST_ASSETS_DEST_DIR} PARENT_SCOPE)
+
+add_assets_target(test-assets ${ASSETS_SOURCE_DIR} ${TEST_ASSETS_DEST_DIR})
+add_image(
+    PRODUCT Test
+    SYSROOT test-sysroot
+    ASSETS  test-assets
+)
+
+macro(enable_test_filesystem)
+    target_sources(${_TESTNAME} PRIVATE ${ROOT_TEST_DIR}/filesystem.cpp)
+    list(APPEND _TEST_ARGS_LIBS iosyscalls)
+    list(APPEND _TEST_ARGS_LIBS board)
+    list(APPEND _TEST_ARGS_INCLUDE ${CMAKE_SOURCE_DIR}/module-vfs/include/user)
+    list(APPEND _TEST_ARGS_DEPS Test-disk-img)
+endmacro()
 
 function(add_gtest_executable)
     cmake_parse_arguments(
         _TEST_ARGS
-        ""
+        "USE_FS"
         "NAME"
         "SRCS;INCLUDE;LIBS;DEFS;DEPS"
         ${ARGN}
@@ -51,6 +70,11 @@ function(add_gtest_executable)
         target_sources(${_TESTNAME} PRIVATE ${ROOT_TEST_DIR}/mock-freertos-tls.cpp)
     endif (NOT ${ENABLE_TEST_LOGS})
 
+    set(_TEST_LABELS "")
+    if(_TEST_ARGS_USE_FS)
+        enable_test_filesystem()
+    endif()
+
     target_link_libraries(${_TESTNAME} PRIVATE gtest_main gmock log)
     foreach(lib ${_TEST_ARGS_LIBS})
         target_link_libraries(${_TESTNAME} PRIVATE ${lib})
@@ -74,7 +98,6 @@ function(add_gtest_executable)
     add_dependencies(unittests ${_TESTNAME})
     add_dependencies(check ${_TESTNAME})
 
-    set(_TEST_LABELS "")
     if(_TEST_ENTITY)
         add_dependencies(unittests-${_TEST_ENTITY} ${_TESTNAME})
         list(APPEND _TEST_LABELS ${_TEST_ENTITY})
@@ -86,13 +109,13 @@ function(add_gtest_executable)
         TEST_LIST _TEST_LIST
     )
 
-    set_tests_properties(${_TEST_LIST} PROPERTIES LABELS ${_TEST_ENTITY})
+    set_tests_properties(${_TEST_LIST} PROPERTIES LABELS ${_TEST_LABELS})
 endfunction()
 
 function(add_catch2_executable)
     cmake_parse_arguments(
         _TEST_ARGS
-        ""
+        "USE_FS"
         "NAME"
         "SRCS;INCLUDE;LIBS;DEFS;DEPS"
         ${ARGN}
@@ -120,11 +143,15 @@ function(add_catch2_executable)
         target_sources(${_TESTNAME} PRIVATE ${ROOT_TEST_DIR}/mock-freertos-tls.cpp)
     endif (NOT ${ENABLE_TEST_LOGS} AND NOT ${_TESTNAME} STREQUAL "catch2-utils-log")
 
+    set(_TEST_LABELS "")
+    if(_TEST_ARGS_USE_FS)
+        enable_test_filesystem()
+    endif()
+
     target_link_libraries(${_TESTNAME} PRIVATE Catch2::Catch2 log)
     foreach(lib ${_TEST_ARGS_LIBS})
         target_link_libraries(${_TESTNAME} PRIVATE ${lib})
     endforeach(lib)
-
     foreach(include ${_TEST_ARGS_INCLUDE})
         target_include_directories(${_TESTNAME} PRIVATE ${include})
     endforeach(include)
@@ -142,11 +169,12 @@ function(add_catch2_executable)
 
     if(_TEST_ENTITY)
         add_dependencies(unittests-${_TEST_ENTITY} ${_TESTNAME})
+        list(APPEND _TEST_LABELS ${_TEST_ENTITY})
     endif()
 
     catch_discover_tests(${_TESTNAME}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-        PROPERTIES LABELS ${_TEST_ENTITY}
+        PROPERTIES LABELS ${_TEST_LABELS}
     )
 endfunction()
 
