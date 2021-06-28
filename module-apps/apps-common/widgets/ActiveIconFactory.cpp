@@ -59,7 +59,7 @@ auto ActiveIconFactory::makeCallIcon(const utils::PhoneNumber::View &number) -> 
         "phonebook_phone_ringing",
         [application = app, number](gui::Item &item) {
             return app::manager::Controller::sendAction(application,
-                                                        app::manager::actions::Dial,
+                                                        app::manager::actions::Call,
                                                         std::make_unique<app::ExecuteCallData>(number),
                                                         app::manager::OnSwitchBehaviour::RunInBackground);
         },
