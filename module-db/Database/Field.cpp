@@ -20,7 +20,7 @@ template <class T> static T lget(T &val, const std::string &mValue, std::functio
         return foo();
     }
     catch (...) {
-        LOG_FATAL("Can't convert: %s to: %s", mValue.c_str(), typeid(T).name());
+        LOG_FATAL("Can't convert value to: %s", typeid(T).name());
     }
     return val;
 }
