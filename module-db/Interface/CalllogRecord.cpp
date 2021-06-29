@@ -64,7 +64,7 @@ bool CalllogRecordInterface::Add(const CalllogRecord &rec)
         auto contactMatch =
             contactInterface.MatchByNumber(rec.phoneNumber, ContactRecordInterface::CreateTempContact::True);
         if (!contactMatch) {
-            LOG_ERROR("Cannot get contact, for number %s", rec.phoneNumber.getNonEmpty().c_str());
+            LOG_ERROR("Cannot get contact, for id %" PRIu32, rec.contactId);
             return false;
         }
         auto &contactRec = contactMatch->contact;
@@ -74,7 +74,7 @@ bool CalllogRecordInterface::Add(const CalllogRecord &rec)
         if (localRec.presentation == PresentationType::PR_UNKNOWN) {
             localRec.presentation = PresentationType::PR_ALLOWED;
         }
-        LOG_DEBUG("Adding call log record %s", localRec.str().c_str());
+        LOG_DEBUG("Adding call log record");
     }
     else {
         // private number so do not add contact just call log entry
@@ -152,7 +152,7 @@ bool CalllogRecordInterface::Update(const CalllogRecord &rec)
         auto contactMatch =
             contactInterface.MatchByNumber(rec.phoneNumber, ContactRecordInterface::CreateTempContact::True);
         if (!contactMatch) {
-            LOG_ERROR("Cannot get or create temporary contact for number %s", rec.phoneNumber.getNonEmpty().c_str());
+            LOG_ERROR("Cannot get or create temporary contact for id %" PRIu32, rec.contactId);
             return false;
         }
         contactID = contactMatch->contact.ID;
