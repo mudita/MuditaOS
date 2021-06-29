@@ -18,6 +18,7 @@
 #include <RawFont.hpp>
 #include "Font.hpp"
 #include "RichTextParser.hpp"
+#include "TextFixedSize.hpp"
 
 TEST_CASE("Text ctor")
 {
@@ -1328,5 +1329,43 @@ TEST_CASE("RichText newline and empty lines tests")
         REQUIRE((*text->lineGet(0)).getText(0) == "\n");
         REQUIRE((*text->lineGet(1)).getText(0) == testStringBlock1 + "\n");
         REQUIRE((*text->lineGet(2)).getText(0) == "");
+    }
+}
+
+TEST_CASE("Navigating down between input texts")
+{
+    using namespace gui;
+    const InputEvent keyDown{{}, InputEvent::State::keyReleasedShort, KeyCode::KEY_DOWN};
+
+    mockup::fontManager();
+    SECTION("Empty texts")
+    {
+        auto layout                 = VBox(nullptr, 0, 0, 100, 200);
+        [[maybe_unused]] auto text1 = new TextFixedSize(&layout, 0, 0, 100, 150);
+        [[maybe_unused]] auto text2 = new TextFixedSize(&layout, 0, 150, 100, 50);
+        layout.setFocus(true);
+
+        REQUIRE(layout.getFocusItemIndex() == 0);
+
+        layout.onInput(keyDown);
+        REQUIRE(layout.getFocusItemIndex() == 1);
+    }
+
+    SECTION("Non-empty texts and no new line at the end [EGD-7047]")
+    {
+        constexpr auto testString = "Test String";
+
+        auto layout = VBox(nullptr, 0, 0, 100, 200);
+        auto text1  = new TextFixedSize(&layout, 0, 0, 100, 150);
+        text1->addText(TextBlock(testString, Font(27).raw(), TextBlock::End::None));
+        text1->setCursorStartPosition(CursorStartPosition::DocumentBegin);
+
+        [[maybe_unused]] auto text2 = new TextFixedSize(&layout, 0, 150, 100, 50);
+        layout.setFocus(true);
+
+        REQUIRE(layout.getFocusItemIndex() == 0);
+
+        layout.onInput(keyDown);
+        REQUIRE(layout.getFocusItemIndex() == 1);
     }
 }
