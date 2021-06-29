@@ -141,7 +141,7 @@ bool Database::execute(const char *format, ...)
 
     if (const int result = sqlite3_exec(dbConnection, queryStatementBuffer, nullptr, nullptr, nullptr);
         result != SQLITE_OK) {
-        LOG_ERROR("Execution of \'%s\' failed with %d", queryStatementBuffer, result);
+        LOG_ERROR("Execution of query failed with %d", result);
         return false;
     }
     return true;
@@ -164,7 +164,7 @@ std::unique_ptr<QueryResult> Database::query(const char *format, ...)
     if (const int result = sqlite3_exec(dbConnection, queryStatementBuffer, queryCallback, queryResult.get(), nullptr);
         result != SQLITE_OK) {
         if (isNotPragmaRelated(queryStatementBuffer)) {
-            LOG_ERROR("SQL query \'%s\' failed selecting : %d", queryStatementBuffer, result);
+            LOG_ERROR("SQL query failed selecting : %d", result);
         }
         return nullptr;
     }
@@ -181,7 +181,7 @@ int Database::queryCallback(void *usrPtr, int count, char **data, char **columns
             row.push_back(Field{data[i]});
         }
         catch (...) {
-            LOG_FATAL("Error on: %" PRIu32 " %s", i, data[i]);
+            LOG_FATAL("Error on column: %" PRIu32, i);
         }
     }
 
@@ -202,7 +202,6 @@ void Database::pragmaQuery(const std::string &pragmaStatemnt)
         do {
             for (uint32_t i = 0; i < fieldsCount; i++) {
                 Field field = (*results)[i];
-                LOG_INFO("%s: '%s'", pragmaStatemnt.c_str(), field.getCString());
             }
         } while (results->nextRow());
     }

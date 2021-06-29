@@ -32,7 +32,7 @@ bool SMSRecordInterface::Add(const SMSRecord &rec)
     ContactRecordInterface contactInterface(contactsDB);
     auto contactMatch = contactInterface.MatchByNumber(rec.number, ContactRecordInterface::CreateTempContact::True);
     if (!contactMatch.has_value()) {
-        LOG_ERROR("Cannot find contact, for number %s", rec.number.getFormatted().c_str());
+        LOG_ERROR("Cannot find contact, for id %" PRIu32, rec.contactID);
         return false;
     }
     auto contactID = contactMatch->contactId;

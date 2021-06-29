@@ -39,7 +39,7 @@ bool stubExecute(const std::string &format, const std::string &path, const std::
     }
 
     if (format == std::string(settings::Statements::insertValue)) {
-        LOG_DEBUG("Database::execute set %s = %s", path.c_str(), val.c_str());
+        LOG_DEBUG("Database::execute set %s", path.c_str());
         variables[path] = val;
         return true;
     }
@@ -98,7 +98,7 @@ std::unique_ptr<QueryResult> stubQuery(const std::string &format, const std::str
             if (variables.end() == variables.find(what)) {
                 variables[what] = what + " _initialValue";
             }
-            LOG_DEBUG("Database::query for %s returns %s", what.c_str(), variables[what].c_str());
+            LOG_DEBUG("Database::query for %s", what.c_str());
             row.push_back(Field{variables[what].c_str()});
         }
         queryResult->addRow(row);
