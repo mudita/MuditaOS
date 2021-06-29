@@ -99,6 +99,7 @@ namespace parserFSM
         inline constexpr auto accessTechnology = "accessTechnology";
         inline constexpr auto fileName         = "fileName";
         inline constexpr auto fileSize         = "fileSize";
+        inline constexpr auto fileCrc32        = "fileCrc32";
         inline constexpr auto update           = "update";
         inline constexpr auto updateInfo       = "updateInfo";
         inline constexpr auto updateError      = "updateError";

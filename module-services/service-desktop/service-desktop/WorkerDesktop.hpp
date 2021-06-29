@@ -3,8 +3,6 @@
 
 #pragma once
 
-#include <filesystem>
-#include <atomic>
 #include "Service/Message.hpp"
 #include "Service/Service.hpp"
 #include "Service/Worker.hpp"
@@ -13,6 +11,11 @@
 #include "endpoints/EndpointFactory.hpp"
 #include "bsp/usb/usb.hpp"
 #include "USBSecurityModel.hpp"
+
+#include <crc32.h>
+
+#include <filesystem>
+#include <atomic>
 
 namespace constants
 {
@@ -47,7 +50,9 @@ class WorkerDesktop : public sys::Worker, public bsp::USBDeviceListener
         return receiveQueue;
     }
 
-    sys::ReturnCodes startDownload(const std::filesystem::path &destinationPath, const uint32_t fileSize);
+    sys::ReturnCodes startDownload(const std::filesystem::path &destinationPath,
+                                   const uint32_t fileSize,
+                                   std::string fileCrc32);
     void stopTransfer(const TransferFailAction action);
 
     void cancelTransferOnTimeout();
@@ -72,6 +77,7 @@ class WorkerDesktop : public sys::Worker, public bsp::USBDeviceListener
     FILE *fileDes                  = nullptr;
     uint32_t writeFileSizeExpected = 0;
     uint32_t writeFileDataWritten  = 0;
+    std::string expectedFileCrc32;
     std::filesystem::path filePath;
     std::atomic<bool> rawModeEnabled = false;
     const sdesktop::USBSecurityModel &securityModel;
@@ -82,4 +88,5 @@ class WorkerDesktop : public sys::Worker, public bsp::USBDeviceListener
     bsp::USBDeviceStatus usbStatus = bsp::USBDeviceStatus::Disconnected;
 
     std::shared_ptr<sys::CpuSentinel> cpuSentinel;
+    CRC32 digestCrc32;
 };

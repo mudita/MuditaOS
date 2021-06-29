@@ -129,14 +129,15 @@ auto FilesystemEndpoint::runPost(Context &context) -> sys::ReturnCodes
         fs::path filePath    = context.getBody()[parserFSM::json::fileName].string_value();
         fs::path tmpFilePath = purefs::dir::getUpdatesOSPath() / filePath;
 
-        uint32_t fileSize = context.getBody()[parserFSM::json::fileSize].int_value();
+        const uint32_t fileSize = context.getBody()[parserFSM::json::fileSize].int_value();
+        const auto fileCrc32    = context.getBody()[parserFSM::json::fileCrc32].string_value();
 
         LOG_DEBUG("got owner, file %s", tmpFilePath.c_str());
 
         if (isWritable(tmpFilePath)) {
             LOG_INFO("download %" PRIu32 " bytes to: %s", fileSize, tmpFilePath.c_str());
 
-            if (owner->desktopWorker->startDownload(tmpFilePath, fileSize) == sys::ReturnCodes::Success) {
+            if (owner->desktopWorker->startDownload(tmpFilePath, fileSize, fileCrc32) == sys::ReturnCodes::Success) {
                 context.setResponseStatus(parserFSM::http::Code::Accepted);
                 returnCode = sys::ReturnCodes::Success;
             }
