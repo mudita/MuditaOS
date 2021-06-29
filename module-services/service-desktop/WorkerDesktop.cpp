@@ -12,6 +12,7 @@
 
 #include <bsp/usb/usb.hpp>
 #include <log.hpp>
+#include <crc32.h>
 
 #include <map>
 #include <vector>
@@ -163,7 +164,9 @@ bool WorkerDesktop::handleMessage(uint32_t queueID)
     return true;
 }
 
-sys::ReturnCodes WorkerDesktop::startDownload(const std::filesystem::path &destinationPath, uint32_t fileSize)
+sys::ReturnCodes WorkerDesktop::startDownload(const std::filesystem::path &destinationPath,
+                                              uint32_t fileSize,
+                                              std::string fileCrc32)
 {
     filePath = destinationPath;
     fileDes  = fopen(filePath.c_str(), "w");
@@ -177,7 +180,10 @@ sys::ReturnCodes WorkerDesktop::startDownload(const std::filesystem::path &desti
     startTransferTimer();
 
     writeFileSizeExpected = fileSize;
+    expectedFileCrc32     = fileCrc32;
     rawModeEnabled        = true;
+
+    digestCrc32.reset();
 
     LOG_DEBUG("startDownload all checks passed starting download");
     return sys::ReturnCodes::Success;
@@ -205,18 +211,31 @@ void WorkerDesktop::reloadTransferTimer()
 
 void WorkerDesktop::stopTransfer(const TransferFailAction action)
 {
-    LOG_DEBUG("stopTransfer %s",
-              action == TransferFailAction::removeDesitnationFile ? "remove desination file" : "do nothing");
     parser.setState(parserFSM::State::NoMsg);
     rawModeEnabled = false;
 
+    auto removeFile     = (action == TransferFailAction::removeDesitnationFile);
+    auto responseStatus = removeFile ? parserFSM::http::Code::NotAcceptable : parserFSM::http::Code::Accepted;
+
+    const auto fileCrc32  = digestCrc32.getHash();
+    const auto crc32Match = expectedFileCrc32.empty() ? true : (expectedFileCrc32.compare(fileCrc32) == 0);
+
+    if (!crc32Match && !removeFile) {
+        responseStatus = parserFSM::http::Code::NotAcceptable;
+        removeFile     = true;
+
+        LOG_ERROR("File %s transfer CRC32 mismatch, expected: %s, actual: %s",
+                  filePath.c_str(),
+                  expectedFileCrc32.c_str(),
+                  fileCrc32.c_str());
+    }
+
     parserFSM::Context responseContext;
-    responseContext.setResponseStatus((action == TransferFailAction::removeDesitnationFile)
-                                          ? parserFSM::http::Code::NotAcceptable
-                                          : parserFSM::http::Code::Accepted);
+    responseContext.setResponseStatus(responseStatus);
     responseContext.setEndpoint(parserFSM::EndpointType::filesystemUpload);
     json11::Json responseJson = json11::Json::object{{parserFSM::json::fileSize, std::to_string(writeFileDataWritten)},
-                                                     {parserFSM::json::fileName, filePath.filename().c_str()}};
+                                                     {parserFSM::json::fileName, filePath.filename().c_str()},
+                                                     {parserFSM::json::fileCrc32, fileCrc32.c_str()}};
     responseContext.setResponseBody(responseJson);
 
     // close the file descriptor
@@ -229,7 +248,7 @@ void WorkerDesktop::stopTransfer(const TransferFailAction action)
     writeFileSizeExpected = 0;
     writeFileDataWritten  = 0;
 
-    if (action == TransferFailAction::removeDesitnationFile) {
+    if (removeFile) {
         try {
             if (!std::filesystem::remove(filePath)) {
                 LOG_ERROR("stopTransfer can't delete  %s", filePath.c_str());
@@ -253,6 +272,8 @@ void WorkerDesktop::rawDataReceived(void *dataPtr, uint32_t dataLen)
             LOG_ERROR("transferDataReceived invalid data");
             return;
         }
+
+        digestCrc32.add(dataPtr, dataLen);
 
         const uint32_t bytesWritten = std::fwrite(dataPtr, 1, dataLen, fileDes);
 

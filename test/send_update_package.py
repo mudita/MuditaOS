@@ -8,13 +8,13 @@ import sys
 import os.path
 import json
 import atexit
+import binascii
 
 sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 
 from harness.harness import Harness
 from harness.interface.defs import status
-from harness.utils import Timeout
 from harness.interface.error import TestError, Error
 from functools import partial
 
@@ -25,8 +25,13 @@ CHUNK_SIZE = 1024 * 16
 def send_update_package(harness, package_filepath: str):
     file_size = os.path.getsize(package_filepath)
     file_name = package_filepath.split('/')[-1]
+    with open(package_filepath, 'rb') as file:
+        file_data = open(package_filepath,'rb').read()
+        file_crc32 = format((binascii.crc32(file_data) & 0xFFFFFFFF), '08x')
 
-    body = {"command": "download", "fileName": file_name, "fileSize": file_size}
+    print(f"Sending {file_name}, size {file_size}, CRC32 {file_crc32}")
+
+    body = {"command": "download", "fileName": file_name, "fileSize": file_size, "fileCrc32" : file_crc32}
     ret = harness.endpoint_request("filesystem", "post", body)
 
     if ret["status"] != status["Accepted"]:
@@ -55,6 +60,12 @@ def send_update_package(harness, package_filepath: str):
         if "status" in body:
             stat = body["status"]
             print(f"Transfer status: {stat}")
+
+        if "fileCrc32" in body:
+            fileCrc32 = body["fileCrc32"]
+            if fileCrc32 != file_crc32:
+                print(f"Returned CRC32 mismatch: {fileCrc32}")
+                return False
 
     print("Sending complete")
 
@@ -102,11 +113,15 @@ def setPasscode(harness, flag):
 def main():
     if len(sys.argv) == 1:
         print(f'Please pass update file path as the parameter: python {sys.argv[0]} file_path ')
-        raise TestError(Error.PORT_NOT_FOUND)
-
-    harness = Harness.from_detect()
+        raise TestError(Error.OTHER_ERROR)
 
     package_filepath = str(sys.argv[1])
+
+    if (not os.path.exists(package_filepath)):
+        print(f'Update file {package_filepath} not found')
+        raise TestError(Error.OTHER_ERROR)
+
+    harness = Harness.from_detect()
 
     atexit.register(setPasscode, harness, True)
 
