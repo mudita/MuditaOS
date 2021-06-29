@@ -497,6 +497,8 @@ bool UpdateMuditaOS::unpackFileToTemp(mtar_header_t &h, unsigned long *crc32)
         return false;
     }
 
+    CRC32 digest;
+
     for (uint32_t i = 0; i < blocksToRead; i++) {
         if (i + 1 == blocksToRead) {
             sizeToRead = h.size % boot::consts::tar_buf;
@@ -524,9 +526,11 @@ bool UpdateMuditaOS::unpackFileToTemp(mtar_header_t &h, unsigned long *crc32)
 
         currentExtractedBytes += dataWritten;
 
-        *crc32 = Crc32_ComputeBuf(*crc32, readBuf.get(), sizeToRead);
+        digest.add(readBuf.get(), sizeToRead);
     }
     std::fclose(fp);
+
+    *crc32 = digest.getHashValue();
     return true;
 }
 

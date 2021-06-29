@@ -8,9 +8,6 @@
 [submodule "module-utils/segger"]
 	path = module-utils/segger
 	url = ../segger-utils.git
-[submodule "module-utils/crc32"]
-	path = third-party/crc32/src
-	url = ../crc32
 [submodule "module-utils/protobuf"]
 	path = third-party/protobuf/src
 	url = ../protobuf.git
@@ -92,3 +89,7 @@
 [submodule "third-party/base64/src"]
 	path = third-party/base64/src
 	url = https://github.com/rafagafe/base64.git
+[submodule "third-party/hash-library/src"]
+	path = third-party/hash-library/src
+	url = https://github.com/mudita/hash-library.git
+	branch = rt1051
