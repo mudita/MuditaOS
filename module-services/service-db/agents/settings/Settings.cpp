@@ -46,7 +46,7 @@ namespace settings
 
     void Settings::handleVariableChanged(const EntryPath &path, const std::string &value)
     {
-        log_debug("handleVariableChanged: (k=v): (%s=%s)", path.to_string().c_str(), value.c_str());
+        log_debug("handleVariableChanged: (key=%s)", path.to_string().c_str());
         if (auto callbacks = cbValues.find(path); std::end(cbValues) != callbacks) {
             // we cant get by const ref here - as user can remove this callback from cbValues map which would cause use
             // after free

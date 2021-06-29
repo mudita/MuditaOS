@@ -155,10 +155,7 @@ auto SettingsAgent::handleRegisterOnVariableChange(sys::Message *req) -> sys::Me
                 return std::make_shared<sys::ResponseMessage>();
             }
             auto currentValue = dbGetValue(path).value_or("");
-            LOG_DEBUG("[SettingsAgent::handleRegisterOnVariableChange] %s=%s to %s",
-                      path.to_string().c_str(),
-                      currentValue.c_str(),
-                      msg->sender.c_str());
+            LOG_DEBUG("[SettingsAgent::handleRegisterOnVariableChange] %s", path.to_string().c_str());
             auto msgValue =
                 std::make_shared<::settings::Messages::VariableChanged>(std::move(path), std::move(currentValue), "");
             parentService->bus.sendUnicast(std::move(msgValue), msg->sender);
