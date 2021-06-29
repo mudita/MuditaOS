@@ -18,7 +18,7 @@ target_link_libraries( ${PROJECT_NAME}
    PRIVATE
       module-utils
       module-vfs
-      crc32
+      hash-library::hash-library
       Microsoft.GSL::GSL
       json::json
 )

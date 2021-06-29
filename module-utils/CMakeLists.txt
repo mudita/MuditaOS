@@ -22,15 +22,15 @@ add_library(${PROJECT_NAME} STATIC ${SOURCES})
 include(segger/rtt/CMakeLists.txt)
 
 target_link_libraries(${PROJECT_NAME}
-PUBLIC 
+PUBLIC
     board
     libphonenumber::libphonenumber
     log
     magic_enum
-    module-os 
+    module-os
     module-vfs
 PRIVATE
-    crc32
+    hash-library::hash-library
     json::json
     time
 )
