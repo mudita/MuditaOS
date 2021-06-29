@@ -37,5 +37,4 @@ INSERT OR IGNORE INTO settings_tab (path, value) VALUES
     ('\EventManager\\br_level', '50.0f'),
     ('keypad_light_state', '0'),
     ('gs_current_timezone', ''),
-    ('gs_automatic_time_zone_is_on', '1');
-
+    ('\ServiceTime\\gs_automatic_time_zone_is_on', '1');

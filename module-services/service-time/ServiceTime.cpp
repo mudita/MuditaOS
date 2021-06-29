@@ -247,22 +247,21 @@ namespace stm
 
     void ServiceTime::initStaticData()
     {
-        stm::internal::StaticData::get().setAutomaticDateAndTime(utils::getNumericValue<bool>(settings->getValue(
-            ::settings::SystemProperties::automaticDateAndTimeIsOn, ::settings::SettingsScope::Global)));
-        stm::internal::StaticData::get().setAutomaticTimezoneOn(utils::getNumericValue<bool>(settings->getValue(
-            ::settings::SystemProperties::automaticTimeZoneIsOn, ::settings::SettingsScope::Global)));
-        auto dateFormat = magic_enum::enum_cast<utils::time::Locale::DateFormat>(utils::getNumericValue<unsigned int>(
-            settings->getValue(::settings::SystemProperties::dateFormat, ::settings::SettingsScope::Global)));
+        stm::internal::StaticData::get().setAutomaticDateAndTime(
+            utils::getNumericValue<bool>(settings->getValue(::settings::SystemProperties::automaticDateAndTimeIsOn)));
+        stm::internal::StaticData::get().setAutomaticTimezoneOn(
+            utils::getNumericValue<bool>(settings->getValue(::settings::SystemProperties::automaticTimeZoneIsOn)));
+        auto dateFormat = magic_enum::enum_cast<utils::time::Locale::DateFormat>(
+            utils::getNumericValue<unsigned int>(settings->getValue(::settings::SystemProperties::dateFormat)));
         if (dateFormat != std::nullopt) {
             stm::internal::StaticData::get().setDateFormat(dateFormat.value());
         }
-        auto timeFormat = magic_enum::enum_cast<utils::time::Locale::TimeFormat>(utils::getNumericValue<unsigned int>(
-            settings->getValue(::settings::SystemProperties::timeFormat, ::settings::SettingsScope::Global)));
+        auto timeFormat = magic_enum::enum_cast<utils::time::Locale::TimeFormat>(
+            utils::getNumericValue<unsigned int>(settings->getValue(::settings::SystemProperties::timeFormat)));
         if (timeFormat != std::nullopt) {
             stm::internal::StaticData::get().setTimeFormat(timeFormat.value());
         }
-        auto timezone =
-            settings->getValue(settings::SystemProperties::currentTimezone, ::settings::SettingsScope::Global);
+        auto timezone = settings->getValue(settings::SystemProperties::currentTimezone);
         stm::internal::StaticData::get().setTimezone(timezone);
         timeManager->handleTimezoneChangeRequest(timezone);
     }
