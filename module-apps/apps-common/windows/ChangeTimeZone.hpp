@@ -4,12 +4,15 @@
 #pragma once
 
 #include "BaseSettingsWindow.hpp"
-#include <application-settings/ApplicationSettings.hpp>
+
 #include <Option.hpp>
 
 namespace gui
 {
-
+    namespace window::name
+    {
+        inline constexpr auto change_time_zone = "ChangeTimeZone";
+    }
     class ChangeTimeZone : public BaseSettingsWindow
     {
       public:

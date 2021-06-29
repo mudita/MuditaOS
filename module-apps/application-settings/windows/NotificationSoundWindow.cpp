@@ -2,7 +2,9 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NotificationSoundWindow.hpp"
-#include "application-settings/ApplicationSettings.hpp"
+
+#include "ApplicationSettings.hpp"
+
 #include <i18n/i18n.hpp>
 
 namespace gui

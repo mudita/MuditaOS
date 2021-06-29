@@ -2,9 +2,10 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "QuoteCategoriesWindow.hpp"
-#include <application-settings/models/CategoriesModel.hpp>
-#include <application-settings/ApplicationSettings.hpp>
-#include <application-settings/widgets/SettingsStyle.hpp>
+
+#include "ApplicationSettings.hpp"
+#include "CategoriesModel.hpp"
+#include "SettingsStyle.hpp"
 
 namespace gui
 {

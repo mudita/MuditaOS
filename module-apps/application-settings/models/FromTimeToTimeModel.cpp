@@ -2,8 +2,9 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "FromTimeToTimeModel.hpp"
-#include <application-settings/widgets/SettingsDateItem.hpp>
-#include <application-settings/widgets/SettingsTimeItem.hpp>
+
+#include <apps-common/widgets/SettingsDateItem.hpp>
+#include <apps-common/widgets/SettingsTimeItem.hpp>
 #include <ListView.hpp>
 #include <widgets/DateAndTimeStyle.hpp>
 

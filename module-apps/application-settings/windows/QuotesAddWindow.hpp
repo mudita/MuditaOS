@@ -3,9 +3,10 @@
 
 #pragma once
 
-#include "BaseSettingsWindow.hpp"
 #include "QuotesMainWindow.hpp"
-#include "application-settings/models/QuotesModel.hpp"
+#include "QuotesModel.hpp"
+
+#include <apps-common/windows/BaseSettingsWindow.hpp>
 
 namespace gui
 {

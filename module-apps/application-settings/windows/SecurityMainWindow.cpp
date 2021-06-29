@@ -1,13 +1,15 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <locks/widgets/Lock.hpp>
-#include <locks/data/LockData.hpp>
-#include "application-settings/ApplicationSettings.hpp"
-#include "application-settings/data/ChangePasscodeData.hpp"
-#include "module-apps/application-desktop/windows/Names.hpp"
-#include "OptionSetting.hpp"
 #include "SecurityMainWindow.hpp"
+
+#include "ApplicationSettings.hpp"
+#include "ChangePasscodeData.hpp"
+
+#include <application-desktop/windows/Names.hpp>
+#include <locks/data/LockData.hpp>
+#include <locks/widgets/Lock.hpp>
+#include <OptionSetting.hpp>
 
 namespace gui
 {

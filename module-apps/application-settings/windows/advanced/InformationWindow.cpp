@@ -3,11 +3,11 @@
 
 #include "InformationWindow.hpp"
 
-#include <application-settings/ApplicationSettings.hpp>
-#include <service-cellular/CellularServiceAPI.hpp>
+#include "ApplicationSettings.hpp"
 
-#include <source/version.hpp>
 #include <log.hpp>
+#include <service-cellular/CellularServiceAPI.hpp>
+#include <source/version.hpp>
 
 namespace gui
 {

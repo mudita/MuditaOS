@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <application-settings/windows/BaseSettingsWindow.hpp>
+#include <apps-common/windows/BaseSettingsWindow.hpp>
 
 namespace app::settingsInterface
 {

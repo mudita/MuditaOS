@@ -3,10 +3,10 @@
 
 #include "WallpaperWindow.hpp"
 
-#include "application-settings/ApplicationSettings.hpp"
-#include "OptionSetting.hpp"
+#include "ApplicationSettings.hpp"
 
 #include <i18n/i18n.hpp>
+#include <OptionSetting.hpp>
 
 namespace gui
 {

@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include <widgets/DateOrTimeListItem.hpp>
-#include <widgets/TimeWidget.hpp>
+#include "DateOrTimeListItem.hpp"
+#include "TimeWidget.hpp"
 
 namespace gui
 {

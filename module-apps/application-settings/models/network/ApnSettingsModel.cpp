@@ -1,7 +1,8 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "ApnSettingsModel.hpp"
+#include "network/ApnSettingsModel.hpp"
+
 #include <service-cellular/PacketDataCellularMessage.hpp>
 #include <service-cellular/ServiceCellular.hpp>
 

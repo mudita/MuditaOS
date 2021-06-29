@@ -3,8 +3,8 @@
 
 #include "ColorTestWindow.hpp"
 
-#include <application-settings/ApplicationSettings.hpp>
-#include <application-settings/widgets/advanced/ColorTestListStyle.hpp>
+#include "advanced/ColorTestListStyle.hpp"
+#include "ApplicationSettings.hpp"
 
 #include <service-gui/Common.hpp>
 #include <service-gui/messages/ChangeColorScheme.hpp>

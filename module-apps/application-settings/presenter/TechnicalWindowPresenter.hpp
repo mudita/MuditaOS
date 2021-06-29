@@ -3,8 +3,9 @@
 
 #pragma once
 
-#include "application-settings/models/FactoryData.hpp"
-#include "BasePresenter.hpp"
+#include "FactoryData.hpp"
+
+#include <apps-common/BasePresenter.hpp>
 
 class TechnicalWindowContract
 {

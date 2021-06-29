@@ -1,13 +1,13 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "NetworkWindow.hpp"
+#include "network/NetworkWindow.hpp"
 
-#include <application-settings/ApplicationSettings.hpp>
-#include <application-settings/data/PINSettingsSimData.hpp>
-#include <OptionSetting.hpp>
+#include "ApplicationSettings.hpp"
+#include "PINSettingsSimData.hpp"
 
 #include <i18n/i18n.hpp>
+#include <OptionSetting.hpp>
 
 namespace gui
 {

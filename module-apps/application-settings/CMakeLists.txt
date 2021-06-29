@@ -1,143 +1,141 @@
-﻿
-include_directories( ${CMAKE_PROJECT_NAME}
+﻿# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+# For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+add_library(application-settings STATIC)
+
+target_include_directories(application-settings
+    PRIVATE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}
+            data
+            models
+            presenter
+            widgets
+            windows
+            include/application-settings>
     PUBLIC
-        "${CMAKE_CURRENT_LIST_DIR}"
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
 
-include_directories( ${PROJECT_NAME}
-
-    PUBLIC
-        ${CMAKE_CURRENT_LIST_DIR}
-)
-
-target_sources( ${PROJECT_NAME}
-
+target_sources(application-settings
     PRIVATE
         ApplicationSettings.cpp
         models/advanced/ColorTestModel.cpp
+        models/AudioSettingsModel.cpp
         models/bluetooth/BluetoothSettingsModel.cpp
+        models/CategoriesModel.cpp
+        models/FactoryData.cpp
+        models/FromTimeToTimeModel.cpp
         models/network/ApnSettingsModel.cpp
         models/network/NewApnModel.cpp
-        models/DateAndTimeModel.cpp
-        models/FromTimeToTimeModel.cpp
         models/QuotesModel.cpp
-        models/CategoriesModel.cpp
         models/SARInfoRepository.cpp
-        models/FactoryData.cpp
-        models/AudioSettingsModel.cpp
         models/SoundsModel.cpp
         presenter/SARInfoWindowPresenter.cpp
         presenter/TechnicalWindowPresenter.cpp
         widgets/advanced/ColorTestListItem.cpp
         widgets/advanced/ColorTestListView.cpp
+        widgets/CategoryWidget.cpp
         widgets/network/ApnInputWidget.cpp
         widgets/QuoteWidget.cpp
-        widgets/CategoryWidget.cpp
-        widgets/SettingsDateItem.cpp
-        widgets/SettingsTimeItem.cpp
         widgets/SettingsSoundItem.cpp
-        windows/SettingsMainWindow.cpp
+        widgets/SpinBox.cpp
+        widgets/SpinBoxOptionSettings.cpp
+        windows/AboutYourPureWindow.cpp
         windows/advanced/AdvancedOptionsWindow.cpp
+        windows/advanced/ColorTestWindow.cpp
+        windows/advanced/EinkModeWindow.cpp
         windows/advanced/InformationWindow.cpp
         windows/advanced/UITestWindow.cpp
-        windows/advanced/EinkModeWindow.cpp
-        windows/advanced/ColorTestWindow.cpp
+        windows/AlarmClockWindow.cpp
+        windows/AppsAndToolsWindow.cpp
+        windows/AutolockWindow.cpp
         windows/bluetooth/AddDeviceWindow.cpp
         windows/bluetooth/AllDevicesWindow.cpp
+        windows/bluetooth/BluetoothCheckPasskeyWindow.cpp
         windows/bluetooth/BluetoothWindow.cpp
         windows/bluetooth/PhoneNameWindow.cpp
-        windows/bluetooth/BluetoothCheckPasskeyWindow.cpp
-        windows/network/NetworkWindow.cpp
-        windows/network/SimCardsWindow.cpp
-        windows/network/ApnSettingsWindow.cpp
-        windows/network/ApnOptionsWindow.cpp
-        windows/BaseSettingsWindow.cpp
+        windows/CertificationWindow.cpp
+        windows/ConnectionFrequencyWindow.cpp
+        windows/DateAndTimeMainWindow.cpp
+        windows/DisplayAndKeypadWindow.cpp
+        windows/DisplayLightWindow.cpp
+        windows/DoNotDisturbWindow.cpp
+        windows/EditQuotesWindow.cpp
         windows/FontSizeWindow.cpp
         windows/InputLanguageWindow.cpp
-        windows/DisplayLightWindow.cpp
         windows/KeypadLightWindow.cpp
         windows/LockedScreenWindow.cpp
-        windows/DisplayAndKeypadWindow.cpp
-        windows/AppsAndToolsWindow.cpp
-        windows/NightshiftWindow.cpp
-        windows/OptionsWidgetMaker.cpp
-        windows/PhoneWindow.cpp
         windows/MessagesWindow.cpp
-        windows/AlarmClockWindow.cpp
-        windows/SoundSelectWindow.cpp
-        windows/AutolockWindow.cpp
-        windows/TorchWindow.cpp
-        windows/WallpaperWindow.cpp
-        windows/QuotesMainWindow.cpp
+        windows/network/ApnOptionsWindow.cpp
+        windows/network/ApnSettingsWindow.cpp
+        windows/network/NetworkWindow.cpp
+        windows/network/NewApnWindow.cpp
+        windows/network/SimCardsWindow.cpp
+        windows/NightshiftWindow.cpp
+        windows/OfflineWindow.cpp
+        windows/OptionsWidgetMaker.cpp
+        windows/PhoneModesWindow.cpp
+        windows/PhoneWindow.cpp
+        windows/PINSettingsWindow.cpp
+        windows/QuoteCategoriesWindow.cpp
         windows/QuotesAddWindow.cpp
+        windows/QuotesMainWindow.cpp
         windows/QuotesOptionsWindow.cpp
         windows/SARInfoWindow.cpp
         windows/SecurityMainWindow.cpp
-        windows/network/NewApnWindow.cpp
-        widgets/SpinBox.cpp
-        widgets/SpinBoxOptionSettings.cpp
+        windows/SettingsMainWindow.cpp
+        windows/SoundSelectWindow.cpp
         windows/SystemMainWindow.cpp
-        windows/LanguagesWindow.cpp
-        windows/DateAndTimeMainWindow.cpp
-        windows/ChangeTimeZone.cpp
-        windows/ChangeDateAndTimeWindow.cpp
-        windows/EditQuotesWindow.cpp
-        windows/QuoteCategoriesWindow.cpp
-        windows/ConnectionFrequencyWindow.cpp
-        windows/DoNotDisturbWindow.cpp
-        windows/OfflineWindow.cpp
-        windows/PhoneModesWindow.cpp
-        windows/PINSettingsWindow.cpp
-        windows/AboutYourPureWindow.cpp
-        windows/CertificationWindow.cpp
         windows/TechnicalInformationWindow.cpp
-
-    PUBLIC
-        ApplicationSettings.hpp
+        windows/TorchWindow.cpp
+        windows/WallpaperWindow.cpp
+    PRIVATE
         models/advanced/ColorTestModel.hpp
         widgets/advanced/ColorTestListItem.hpp
         widgets/advanced/ColorTestListItem.hpp
         widgets/advanced/ColorTestListStyle.hpp
-        widgets/network/ApnInputWidget.hpp
         widgets/CategoryWidget.hpp
-        windows/SettingsMainWindow.hpp
+        widgets/network/ApnInputWidget.hpp
+        widgets/SettingsStyle.hpp
+        windows/AboutYourPureWindow.hpp
         windows/advanced/AdvancedOptionsWindow.hpp
+        windows/advanced/ColorTestWindow.hpp
+        windows/advanced/EinkModeWindow.hpp
         windows/advanced/InformationWindow.hpp
         windows/advanced/UITestWindow.hpp
-        windows/advanced/EinkModeWindow.hpp
-        windows/advanced/ColorTestWindow.hpp
-        windows/network/SimCardsWindow.hpp
-        windows/network/NewApnWindow.hpp
-        windows/BaseSettingsWindow.hpp
+        windows/AppsAndToolsWindow.hpp
+        windows/AutolockWindow.hpp
+        windows/CertificationWindow.hpp
+        windows/DateAndTimeMainWindow.hpp
+        windows/DisplayAndKeypadWindow.hpp
+        windows/DisplayLightWindow.hpp
+        windows/EditQuotesWindow.hpp
         windows/FontSizeWindow.hpp
         windows/InputLanguageWindow.hpp
-        windows/DisplayLightWindow.hpp
         windows/KeypadLightWindow.hpp
         windows/LockedScreenWindow.hpp
-        windows/DisplayAndKeypadWindow.hpp
-        windows/AppsAndToolsWindow.hpp
         windows/MessagesWindow.hpp
-        widgets/SettingsStyle.hpp
-        windows/AutolockWindow.hpp
-        windows/WallpaperWindow.hpp
-        windows/SystemMainWindow.hpp
-        windows/LanguagesWindow.hpp
-        windows/DateAndTimeMainWindow.hpp
-        windows/ChangeDateAndTimeWindow.hpp
-        windows/EditQuotesWindow.hpp
+        windows/network/NewApnWindow.hpp
+        windows/network/SimCardsWindow.hpp
         windows/QuoteCategoriesWindow.hpp
-        windows/AboutYourPureWindow.hpp
-        windows/CertificationWindow.hpp
+        windows/SettingsMainWindow.hpp
+        windows/SystemMainWindow.hpp
         windows/TechnicalInformationWindow.hpp
+        windows/WallpaperWindow.hpp
+    PUBLIC
+        include/application-settings/ApplicationSettings.hpp
 )
 
-add_dependencies(${PROJECT_NAME} version)
+option(ENABLE_APP_SETTINGS "Enable application settings" ON)
 
-target_link_libraries(${PROJECT_NAME}
-    PUBLIC
-        service-bluetooth
-        eventstore
+target_compile_definitions(application-settings
+    INTERFACE
+        $<$<BOOL:${ENABLE_APP_SETTINGS}>:ENABLE_APP_SETTINGS>
+)
+
+target_link_libraries(application-settings
     PRIVATE
+        apps-common
+        eventstore
         service-time-api
 )

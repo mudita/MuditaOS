@@ -1,11 +1,12 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "BluetoothCheckPasskeyWindow.hpp"
-#include "application-settings/ApplicationSettings.hpp"
-#include "application-settings/widgets/SettingsStyle.hpp"
-#include <widgets/Text.hpp>
+#include "ApplicationSettings.hpp"
+#include "bluetooth/BluetoothCheckPasskeyWindow.hpp"
+#include "SettingsStyle.hpp"
+
 #include <Image.hpp>
+#include <widgets/Text.hpp>
 
 namespace gui
 {

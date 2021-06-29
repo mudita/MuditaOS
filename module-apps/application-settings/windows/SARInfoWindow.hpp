@@ -3,13 +3,12 @@
 
 #pragma once
 
-#include "AppWindow.hpp"
+#include "SARInfoWindowPresenter.hpp"
 
-#include "application-settings/presenter/SARInfoWindowPresenter.hpp"
-
+#include <AppWindow.hpp>
+#include <module-gui/gui/input/InputEvent.hpp>
 #include <module-gui/gui/widgets/Label.hpp>
 #include <module-gui/gui/widgets/Text.hpp>
-#include <module-gui/gui/input/InputEvent.hpp>
 
 namespace gui
 {

@@ -4,12 +4,11 @@
 #pragma once
 
 #include "AbstractSoundsModel.hpp"
-#include "application-settings/widgets/SettingsSoundItem.hpp"
+#include "SettingsSoundItem.hpp"
 
-#include "InternalModel.hpp"
-#include "Application.hpp"
-
+#include <Application.hpp>
 #include <Audio/decoder/Decoder.hpp>
+#include <InternalModel.hpp>
 
 /// Simple SoundsModel
 class SoundsModel : public app::InternalModel<gui::ListItem *>, public AbstractSoundsModel

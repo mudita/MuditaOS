@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <application-settings/models/AbstractSoundsModel.hpp>
+#include "AbstractSoundsModel.hpp"
 
 ///  @brief Switch data for SoundSelectWindow which allows
 ///  to specify its behaviour

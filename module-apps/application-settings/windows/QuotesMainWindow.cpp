@@ -2,15 +2,16 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "QuotesMainWindow.hpp"
-#include "application-settings/models/QuotesModel.hpp"
-#include "application-settings/ApplicationSettings.hpp"
-#include "application-settings/widgets/SettingsStyle.hpp"
-#include "OptionSetting.hpp"
+
+#include "ApplicationSettings.hpp"
+#include "QuotesModel.hpp"
+#include "SettingsStyle.hpp"
 
 #include <header/AddElementAction.hpp>
-#include <InputEvent.hpp>
 #include <i18n/i18n.hpp>
+#include <InputEvent.hpp>
 #include <json11.hpp>
+#include <OptionSetting.hpp>
 #include <utility>
 
 namespace style::quotes

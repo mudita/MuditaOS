@@ -2,14 +2,14 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "QuotesOptionsWindow.hpp"
-#include "OptionSetting.hpp"
-#include "application-settings/ApplicationSettings.hpp"
+
+#include "ApplicationSettings.hpp"
 #include "DialogMetadataMessage.hpp"
 #include "QuotesMainWindow.hpp"
-#include "application-settings/ApplicationSettings.hpp"
-#include "application-settings/widgets/QuoteWidget.hpp"
+#include "QuoteWidget.hpp"
 
 #include <i18n/i18n.hpp>
+#include <OptionSetting.hpp>
 #include <widgets/Text.hpp>
 
 namespace gui

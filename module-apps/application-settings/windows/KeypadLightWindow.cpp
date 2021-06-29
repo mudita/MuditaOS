@@ -3,11 +3,11 @@
 
 #include "KeypadLightWindow.hpp"
 
-#include <application-settings/ApplicationSettings.hpp>
-#include <OptionSetting.hpp>
+#include "ApplicationSettings.hpp"
 
 #include <bsp/keypad_backlight/keypad_backlight.hpp>
 #include <i18n/i18n.hpp>
+#include <OptionSetting.hpp>
 
 namespace gui
 {

@@ -2,10 +2,10 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmClockWindow.hpp"
-#include "application-settings/ApplicationSettings.hpp"
-#include "application-settings/widgets/SpinBoxOptionSettings.hpp"
-#include "BaseSettingsWindow.hpp"
+#include "ApplicationSettings.hpp"
+#include "SpinBoxOptionSettings.hpp"
 
+#include <apps-common/windows/BaseSettingsWindow.hpp>
 #include <i18n/i18n.hpp>
 
 namespace gui

@@ -3,12 +3,17 @@
 
 #pragma once
 
-#include "application-settings/ApplicationSettings.hpp"
 #include "BaseSettingsWindow.hpp"
+
 #include <i18n/i18n.hpp>
 
 namespace gui
 {
+    namespace window::name
+    {
+        inline constexpr auto languages = "Languages";
+    } /* namespace window::name */
+
     class LanguagesWindow : public BaseSettingsWindow
     {
       public:

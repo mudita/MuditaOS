@@ -3,8 +3,7 @@
 
 #pragma once
 
-#include "BaseSettingsWindow.hpp"
-
+#include <apps-common/windows/BaseSettingsWindow.hpp>
 #include <Text.hpp>
 
 namespace gui

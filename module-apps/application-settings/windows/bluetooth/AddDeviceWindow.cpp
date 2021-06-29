@@ -2,12 +2,11 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AddDeviceWindow.hpp"
-#include <application-settings/ApplicationSettings.hpp>
-#include <application-settings/data/DeviceData.hpp>
-#include <application-settings/data/PairingDeviceData.hpp>
+#include "ApplicationSettings.hpp"
+#include "DeviceData.hpp"
+#include "PairingDeviceData.hpp"
 
-#include "OptionSetting.hpp"
-
+#include <OptionSetting.hpp>
 extern "C"
 {
 #include <module-bluetooth/lib/btstack/src/btstack_util.h>

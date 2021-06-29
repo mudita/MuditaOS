@@ -1,10 +1,11 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "AutoLockData.hpp"
 #include "AutolockWindow.hpp"
-#include <application-settings/data/AutoLockData.hpp>
-#include <OptionSetting.hpp>
+
 #include <i18n/i18n.hpp>
+#include <OptionSetting.hpp>
 
 namespace gui
 {

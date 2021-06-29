@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <gui/widgets/Style.hpp>
+
 namespace style::window::date_and_time
 {
     inline constexpr auto leftMargin       = 10;

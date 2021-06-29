@@ -3,18 +3,22 @@
 
 #pragma once
 
+#include <apps-common/models/DateAndTimeModel.hpp>
 #include <AppWindow.hpp>
-#include <application-settings/ApplicationSettings.hpp>
-#include "application-settings/models/DateAndTimeModel.hpp"
 
 namespace gui
 {
+    namespace window::name
+    {
+        inline constexpr auto change_date_and_time = "ChangeDateAndTime";
+    }
+
     class ListView;
     class ChangeDateAndTimeWindow : public AppWindow
     {
       public:
         explicit ChangeDateAndTimeWindow(app::Application *app,
-                                         std::string name = gui::window::name::change_date_and_time);
+                                         std::string name = window::name::change_date_and_time);
 
         void buildInterface() override;
         bool onInput(const InputEvent &inputEvent) override;

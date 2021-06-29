@@ -3,12 +3,13 @@
 
 #pragma once
 
+#include "ApplicationSettings.hpp"
+#include "SpinBox.hpp"
+#include "SpinBoxOptionSettings.hpp"
+
 #include <apps-common/GuiTimer.hpp>
+#include <apps-common/windows/BaseSettingsWindow.hpp>
 #include <module-services/service-evtmgr/screen-light-control/ScreenLightControl.hpp>
-#include <module-apps/application-settings/widgets/SpinBox.hpp>
-#include <module-apps/application-settings/ApplicationSettings.hpp>
-#include <module-apps/application-settings/widgets/SpinBoxOptionSettings.hpp>
-#include "BaseSettingsWindow.hpp"
 
 namespace gui
 {

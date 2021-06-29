@@ -3,7 +3,8 @@
 
 #include "UITestWindow.hpp"
 
-#include <application-settings/ApplicationSettings.hpp>
+#include "ApplicationSettings.hpp"
+
 #include <Font.hpp>
 
 namespace gui

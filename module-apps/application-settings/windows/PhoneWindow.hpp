@@ -3,9 +3,10 @@
 
 #pragma once
 
-#include "BaseSettingsWindow.hpp"
+#include "AudioSettingsModel.hpp"
 #include "OptionsWidgetMaker.hpp"
-#include <application-settings/models/AudioSettingsModel.hpp>
+
+#include <apps-common/windows/BaseSettingsWindow.hpp>
 
 namespace gui
 {

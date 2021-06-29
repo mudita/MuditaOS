@@ -2,10 +2,10 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "QuotesAddWindow.hpp"
-#include "QuotesMainWindow.hpp"
 
-#include "application-settings/ApplicationSettings.hpp"
-#include "application-settings/data/QuoteSwitchData.hpp"
+#include "ApplicationSettings.hpp"
+#include "QuotesMainWindow.hpp"
+#include "QuoteSwitchData.hpp"
 
 #include <i18n/i18n.hpp>
 #include <widgets/Text.hpp>

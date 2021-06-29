@@ -3,7 +3,7 @@
 
 #include "AdvancedOptionsWindow.hpp"
 
-#include <application-settings/ApplicationSettings.hpp>
+#include "ApplicationSettings.hpp"
 
 std::list<gui::Option> advancedOptions(app::Application *app)
 {

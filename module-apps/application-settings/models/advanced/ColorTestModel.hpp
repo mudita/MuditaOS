@@ -3,12 +3,12 @@
 
 #pragma once
 
-#include "application-settings/widgets/advanced/ColorTestListItem.hpp"
+#include "advanced/ColorTestListItem.hpp"
 
 #include <Application.hpp>
 #include <InternalModel.hpp>
-#include <ListView.hpp>
 #include <ListItemProvider.hpp>
+#include <ListView.hpp>
 
 namespace gui
 {

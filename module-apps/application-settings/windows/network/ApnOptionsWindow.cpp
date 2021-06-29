@@ -1,10 +1,12 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "ApnOptionsWindow.hpp"
+#include "network/ApnOptionsWindow.hpp"
+#include "network/ApnSettingsModel.hpp"
 
-#include <application-settings/ApplicationSettings.hpp>
-#include <application-settings/data/SettingsItemData.hpp>
+#include "ApplicationSettings.hpp"
+#include "SettingsItemData.hpp"
+
 #include <OptionSetting.hpp>
 
 namespace gui

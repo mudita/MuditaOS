@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "Application.hpp"
-#include "InternalModel.hpp"
+#include <Application.hpp>
+#include <InternalModel.hpp>
 #include <ListItemProvider.hpp>
 #include <widgets/DateOrTimeListItem.hpp>
 

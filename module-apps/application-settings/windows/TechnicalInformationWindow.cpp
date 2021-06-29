@@ -2,10 +2,12 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TechnicalInformationWindow.hpp"
-#include <application-settings/ApplicationSettings.hpp>
-#include <widgets/Text.hpp>
-#include <application-settings/widgets/SettingsStyle.hpp>
+
+#include "ApplicationSettings.hpp"
+#include "SettingsStyle.hpp"
+
 #include <source/version.hpp>
+#include <widgets/Text.hpp>
 
 namespace gui
 {

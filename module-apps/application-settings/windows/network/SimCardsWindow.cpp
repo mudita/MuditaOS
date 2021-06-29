@@ -3,11 +3,11 @@
 
 #include "SimCardsWindow.hpp"
 
-#include <application-settings/ApplicationSettings.hpp>
-#include <application-settings/data/PINSettingsSimData.hpp>
-#include <OptionSetting.hpp>
+#include "ApplicationSettings.hpp"
+#include "PINSettingsSimData.hpp"
 
 #include <i18n/i18n.hpp>
+#include <OptionSetting.hpp>
 
 namespace gui
 {

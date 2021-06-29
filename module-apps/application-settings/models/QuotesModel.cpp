@@ -1,17 +1,17 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "application-settings/windows/QuotesMainWindow.hpp"
-#include "application-settings/ApplicationSettings.hpp"
+#include "ApplicationSettings.hpp"
+#include "QuotesMainWindow.hpp"
 #include "QuotesModel.hpp"
 
-#include <InputEvent.hpp>
 #include <i18n/i18n.hpp>
+#include <InputEvent.hpp>
 #include <json11.hpp>
-#include <Utils.hpp>
+#include <service-db/QuotesMessages.hpp>
 #include <string>
 #include <utility>
-#include <service-db/QuotesMessages.hpp>
+#include <Utils.hpp>
 
 namespace style::quotes::list
 {

@@ -2,12 +2,14 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ChangeTimeZone.hpp"
+
+#include "ChangeDateAndTimeWindow.hpp"
 #include "OptionSetting.hpp"
 
-#include <time/TimeZone.hpp>
-#include <service-time/service-time/TimeMessage.hpp>
-#include <service-time/Constants.hpp>
 #include <service-time/api/TimeSettingsApi.hpp>
+#include <service-time/Constants.hpp>
+#include <service-time/service-time/TimeMessage.hpp>
+#include <time/TimeZone.hpp>
 
 namespace gui
 {

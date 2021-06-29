@@ -1,13 +1,16 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "application-settings/ApplicationSettings.hpp"
+#include "ApplicationSettings.hpp"
 #include "DateAndTimeMainWindow.hpp"
-#include "module-apps/application-desktop/windows/Names.hpp"
-#include "OptionSetting.hpp"
-#include <service-time/service-time/TimeMessage.hpp>
-#include <service-time/Constants.hpp>
+
+#include <apps-common/windows/ChangeDateAndTimeWindow.hpp>
+#include <apps-common/windows/ChangeTimeZone.hpp>
+#include <application-desktop/windows/Names.hpp>
+#include <OptionSetting.hpp>
 #include <service-time/api/TimeSettingsApi.hpp>
+#include <service-time/Constants.hpp>
+#include <service-time/service-time/TimeMessage.hpp>
 
 namespace gui
 {

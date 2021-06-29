@@ -3,11 +3,12 @@
 
 #pragma once
 
-#include "BaseSettingsWindow.hpp"
-#include <application-settings/widgets/CategoryWidget.hpp>
-#include <application-settings/models/CategoriesModel.hpp>
-#include <module-gui/gui/widgets/ListView.hpp>
+#include "CategoriesModel.hpp"
+#include "CategoryWidget.hpp"
+
 #include <apps-common/InternalModel.hpp>
+#include <apps-common/windows/BaseSettingsWindow.hpp>
+#include <module-gui/gui/widgets/ListView.hpp>
 
 namespace gui
 {

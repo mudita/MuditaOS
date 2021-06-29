@@ -3,8 +3,9 @@
 
 #pragma once
 
+#include "AudioSettingsModel.hpp"
+
 #include <ListItemProvider.hpp>
-#include <application-settings/models/AudioSettingsModel.hpp>
 
 namespace app
 {

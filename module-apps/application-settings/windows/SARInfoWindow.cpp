@@ -2,8 +2,9 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SARInfoWindow.hpp"
-#include "application-settings/ApplicationSettings.hpp"
-#include "application-settings/widgets/SettingsStyle.hpp"
+
+#include "ApplicationSettings.hpp"
+#include "SettingsStyle.hpp"
 
 namespace gui
 {

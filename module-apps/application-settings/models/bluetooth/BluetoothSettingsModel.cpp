@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "BluetoothSettingsModel.hpp"
+#include "bluetooth/BluetoothSettingsModel.hpp"
 
 #include <service-bluetooth/Constants.hpp>
 #include <service-bluetooth/messages/BondedDevices.hpp>

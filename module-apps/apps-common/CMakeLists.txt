@@ -10,23 +10,23 @@ target_sources(apps-common
         CallbackStorage.cpp
         DOMResponder.cpp
         GuiTimer.cpp
-        StatusBarManager.cpp
-        WindowsFactory.cpp
+        models/DateAndTimeModel.cpp
         notifications/NotificationData.cpp
         notifications/NotificationListItem.cpp
         notifications/NotificationProvider.cpp
-        notifications/NotificationsModel.cpp
-        notifications/NotificationsHandler.cpp
         notifications/NotificationsConfiguration.cpp
+        notifications/NotificationsHandler.cpp
+        notifications/NotificationsModel.cpp
         notifications/policies/CallNotificationPolicy.cpp
-        notifications/policies/SMSNotificationPolicy.cpp
         notifications/policies/NotificationsListPolicy.cpp
+        notifications/policies/SMSNotificationPolicy.cpp
         options/OptionsModel.cpp
         options/type/OptionCall.cpp
         options/type/OptionContact.cpp
         options/type/OptionSetting.cpp
         options/type/OptionSimple.cpp
         options/type/OptionWithActiveIcons.cpp
+        StatusBarManager.cpp
         widgets/ActiveIconFactory.cpp
         widgets/BarGraph.cpp
         widgets/BrightnessBox.cpp
@@ -34,13 +34,29 @@ target_sources(apps-common
         widgets/DateWidget.cpp
         widgets/InputBox.cpp
         widgets/ModesBox.cpp
+        widgets/SettingsDateItem.cpp
+        widgets/SettingsTimeItem.cpp
         widgets/TextWithIconsWidget.cpp
         widgets/TimeWidget.cpp
         widgets/WidgetsUtils.cpp
         windows/AppWindow.cpp
+        windows/BaseSettingsWindow.cpp
         windows/BrightnessWindow.cpp
+        windows/ChangeDateAndTimeWindow.cpp
+        windows/ChangeTimeZone.cpp
         windows/Dialog.cpp
+        windows/LanguagesWindow.cpp
         windows/OptionWindow.cpp
+        WindowsFactory.cpp
+    PRIVATE
+        data/LanguagesData.hpp
+        models/DateAndTimeModel.hpp
+        widgets/SettingsDateItem.hpp
+        widgets/SettingsTimeItem.hpp
+        windows/BaseSettingsWindow.hpp
+        windows/ChangeDateAndTimeWindow.hpp
+        windows/ChangeTimeZone.hpp
+        windows/LanguagesWindow.hpp
 )
 
 add_subdirectory(popups)

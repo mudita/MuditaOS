@@ -1,12 +1,13 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "PhoneNameWindow.hpp"
-#include "application-settings/ApplicationSettings.hpp"
-#include "application-settings/data/PhoneNameData.hpp"
-#include "widgets/InputBox.hpp"
+#include "bluetooth/PhoneNameWindow.hpp"
+
+#include "ApplicationSettings.hpp"
+#include "PhoneNameData.hpp"
 
 #include <Utils.hpp>
+#include <widgets/InputBox.hpp>
 
 namespace gui
 {

@@ -3,10 +3,10 @@
 
 #pragma once
 
-#include "AppWindow.hpp"
+#include "advanced/ColorTestListView.hpp"
+#include "advanced/ColorTestModel.hpp"
 
-#include "application-settings/models/advanced/ColorTestModel.hpp"
-#include "application-settings/widgets/advanced/ColorTestListView.hpp"
+#include <AppWindow.hpp>
 
 namespace gui
 {

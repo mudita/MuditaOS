@@ -1,13 +1,13 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "application-settings/ApplicationSettings.hpp"
-#include "application-settings/data/LanguagesData.hpp"
 #include "LanguagesWindow.hpp"
+#include "OptionSetting.hpp"
+
+#include <service-appmgr/Controller.hpp>
+#include <apps-common/data/LanguagesData.hpp>
 
 #include <utility>
-#include "OptionSetting.hpp"
-#include "service-appmgr/Controller.hpp"
 
 namespace gui
 {

@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "BaseSettingsWindow.hpp"
-#include "Translator.hpp"
+#include <apps-common/windows/BaseSettingsWindow.hpp>
+#include <gui/input/Translator.hpp>
 
 namespace gui
 {

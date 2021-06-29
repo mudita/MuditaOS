@@ -3,8 +3,9 @@
 
 #pragma once
 
-#include "application-settings/models/AbstractSoundsModel.hpp"
-#include "AppWindow.hpp"
+#include "AbstractSoundsModel.hpp"
+
+#include <AppWindow.hpp>
 
 namespace gui
 {

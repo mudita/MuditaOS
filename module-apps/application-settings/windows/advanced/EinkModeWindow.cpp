@@ -3,7 +3,8 @@
 
 #include "EinkModeWindow.hpp"
 
-#include <application-settings/ApplicationSettings.hpp>
+#include "ApplicationSettings.hpp"
+
 #include <messages/EinkModeMessage.hpp>
 
 namespace gui

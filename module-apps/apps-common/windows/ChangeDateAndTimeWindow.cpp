@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ChangeDateAndTimeWindow.hpp"
-#include <application-settings/ApplicationSettings.hpp>
+
 #include <gui/input/InputEvent.hpp>
 #include <ListView.hpp>
 #include <service-time/Constants.hpp>

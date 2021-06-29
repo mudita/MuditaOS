@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include <application-settings/models/network/ApnSettingsModel.hpp>
-#include <application-settings/windows/BaseSettingsWindow.hpp>
+#include "network/ApnSettingsModel.hpp"
 
+#include <apps-common/windows/BaseSettingsWindow.hpp>
 #include <service-cellular/PacketDataTypes.hpp>
 
 namespace gui

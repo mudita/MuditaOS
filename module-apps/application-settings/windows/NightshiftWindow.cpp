@@ -2,8 +2,10 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NightshiftWindow.hpp"
-#include <application-settings/ApplicationSettings.hpp>
-#include <application-settings/widgets/SettingsStyle.hpp>
+
+#include "ApplicationSettings.hpp"
+#include "SettingsStyle.hpp"
+
 #include <gui/input/InputEvent.hpp>
 #include <ListView.hpp>
 #include <widgets/DateAndTimeStyle.hpp>

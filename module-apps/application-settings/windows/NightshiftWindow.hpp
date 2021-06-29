@@ -3,8 +3,9 @@
 
 #pragma once
 
-#include "AppWindow.hpp"
-#include <application-settings/models/FromTimeToTimeModel.hpp>
+#include "FromTimeToTimeModel.hpp"
+
+#include <AppWindow.hpp>
 
 namespace gui
 {

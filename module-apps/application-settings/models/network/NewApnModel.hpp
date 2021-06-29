@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <application-settings/widgets/network/ApnListItem.hpp>
+#include "network/ApnListItem.hpp"
 
 #include <InternalModel.hpp>
 #include <Application.hpp>

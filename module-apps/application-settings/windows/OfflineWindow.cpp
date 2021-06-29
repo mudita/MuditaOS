@@ -2,12 +2,12 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "OfflineWindow.hpp"
-#include "application-settings/ApplicationSettings.hpp"
-#include "application-settings/widgets/SettingsStyle.hpp"
 
-#include "OptionSetting.hpp"
+#include "ApplicationSettings.hpp"
+#include "SettingsStyle.hpp"
 
 #include <i18n/i18n.hpp>
+#include <OptionSetting.hpp>
 
 namespace gui
 {

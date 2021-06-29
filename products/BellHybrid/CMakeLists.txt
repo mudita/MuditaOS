@@ -48,6 +48,7 @@ target_link_libraries(BellHybrid
     PRIVATE
         application-bell-main
         application-music-player
+        application-settings
         messagetype
         module-apps
         service-bluetooth

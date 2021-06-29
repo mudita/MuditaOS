@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "application-settings/data/QuoteSwitchData.hpp"
+#include "QuoteSwitchData.hpp"
 
 #include <BoxLayout.hpp>
 #include <ImageBox.hpp>

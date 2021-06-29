@@ -3,13 +3,13 @@
 
 #pragma once
 
-#include "BaseSettingsWindow.hpp"
-#include "application-settings/widgets/QuoteWidget.hpp"
-#include "application-settings/models/QuotesModel.hpp"
+#include "QuotesModel.hpp"
+#include "QuoteWidget.hpp"
 
-#include <purefs/filesystem_paths.hpp>
-#include <module-gui/gui/widgets/ListView.hpp>
 #include <apps-common/InternalModel.hpp>
+#include <apps-common/windows/BaseSettingsWindow.hpp>
+#include <module-gui/gui/widgets/ListView.hpp>
+#include <purefs/filesystem_paths.hpp>
 #include <utility>
 
 namespace gui

@@ -1,8 +1,8 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "advanced/ColorTestListStyle.hpp"
 #include "ColorTestModel.hpp"
-#include <application-settings/widgets/advanced/ColorTestListStyle.hpp>
 
 namespace gui
 {

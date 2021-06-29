@@ -1,13 +1,12 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "ApplicationSettings.hpp"
 #include "DisplayAndKeypadWindow.hpp"
 
-#include "application-settings/ApplicationSettings.hpp"
-#include "windows/OptionWindow.hpp"
-#include "OptionSetting.hpp"
-
+#include <apps-common/windows/OptionWindow.hpp>
 #include <i18n/i18n.hpp>
+#include <OptionSetting.hpp>
 
 namespace gui
 {

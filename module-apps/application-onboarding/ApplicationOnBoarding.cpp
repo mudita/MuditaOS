@@ -18,12 +18,12 @@
 #include "windows/OnBoardingDateAndTimeWindow.hpp"
 #include "windows/OnBoardingChangeDateAndTimeWindow.hpp"
 
-#include <module-services/service-appmgr/service-appmgr/messages/GetCurrentDisplayLanguageResponse.hpp>
-#include <module-apps/application-settings/data/LanguagesData.hpp>
-#include <module-services/service-db/agents/settings/SystemSettings.hpp>
-#include <module-apps/application-settings/windows/ChangeTimeZone.hpp>
+#include <apps-common/data/LanguagesData.hpp>
 #include <apps-common/locks/data/PhoneLockMessages.hpp>
 #include <apps-common/locks/data/SimLockMessages.hpp>
+#include <apps-common/windows/ChangeTimeZone.hpp>
+#include <module-services/service-appmgr/service-appmgr/messages/GetCurrentDisplayLanguageResponse.hpp>
+#include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <service-appmgr/service-appmgr/model/ApplicationManager.hpp>
 
 namespace app

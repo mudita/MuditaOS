@@ -1,10 +1,11 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "SettingsDateItem.hpp"
 #include "SettingsTimeItem.hpp"
-#include <apps-common/widgets/DateAndTimeStyle.hpp>
-#include <apps-common/widgets/WidgetsUtils.hpp>
+
+#include "DateAndTimeStyle.hpp"
+#include "SettingsDateItem.hpp"
+#include "WidgetsUtils.hpp"
 
 namespace date_and_time = style::window::date_and_time;
 

@@ -3,10 +3,12 @@
 
 #pragma once
 
-#include "application-settings/models/QuotesModel.hpp"
+#include "QuotesModel.hpp"
 
 #include <SwitchData.hpp>
+
 #include <json11.hpp>
+
 #include <utility>
 
 namespace Quotes
