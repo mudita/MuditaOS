@@ -201,7 +201,7 @@ TEST_CASE("DateTime")
                 DateTime datetime(timeSettings, newTime);
                 REQUIRE(!datetime.isToday());
             }
-            for (int i = 0; i < 12; i++) {
+            for (int i = 1; i < 12; i++) {
                 newTimeTimeinfo.tm_mon = currentTimeTimeinfo.tm_mon - i;
                 auto newTime           = std::mktime(&newTimeTimeinfo);
                 DateTime datetime(timeSettings, newTime);
