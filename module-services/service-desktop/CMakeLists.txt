@@ -57,7 +57,6 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
-        crc32
         microtar
         module-utils
         service-cellular
@@ -70,6 +69,7 @@ target_link_libraries(${PROJECT_NAME}
     PUBLIC
         module-cellular
         eventstore
+        hash-library::hash-library
 )
 
 if (${ENABLE_TESTS})

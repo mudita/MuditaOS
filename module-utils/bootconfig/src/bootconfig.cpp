@@ -11,7 +11,6 @@
 #include <ticks.hpp>
 #include <cstdio>
 #include <log.hpp>
-#include <crc32.h>
 #include <array>
 #include <Utils.hpp>
 
