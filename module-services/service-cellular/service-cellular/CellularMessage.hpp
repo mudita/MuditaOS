@@ -73,6 +73,7 @@ class CellularMessage : public sys::DataMessage
         SimState,
         MMIData,
         NewIncomingSMS,
+        IncomingSMSNotification,
         RadioOnOff,
         SendSMS,
         CellularSetConnectionFrequency
@@ -556,6 +557,13 @@ class CellularNewIncomingSMSMessage : public CellularMessage
 
   private:
     std::string notificationData;
+};
+
+class CellularIncomingSMSNotificationMessage : public CellularMessage
+{
+  public:
+    CellularIncomingSMSNotificationMessage() : CellularMessage(Type::IncomingSMSNotification)
+    {}
 };
 
 class CellularAnswerIncomingCallMessage : public CellularMessage

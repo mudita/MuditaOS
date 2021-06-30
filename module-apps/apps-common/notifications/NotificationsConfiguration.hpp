@@ -5,6 +5,7 @@
 
 #include "policies/CallNotificationPolicy.hpp"
 #include "policies/NotificationsListPolicy.hpp"
+#include "policies/SMSNotificationPolicy.hpp"
 #include <service-db/Settings.hpp>
 #include <PhoneModes/Observer.hpp>
 #include <apps-common/locks/handlers/PhoneLockHandler.hpp>
@@ -20,6 +21,7 @@ namespace notifications
         void updateCurrentCall(CallNotificationPolicy &policy);
         void callNumberCheck(CallNotificationPolicy &policy, bool contactInFavourites);
         void updateCurrentList(NotificationsListPolicy &policy);
+        void updateCurrentSMS(SMSNotificationPolicy &policy);
 
       private:
         auto getDNDNotificationsOnLockedScreen() const noexcept -> bool;

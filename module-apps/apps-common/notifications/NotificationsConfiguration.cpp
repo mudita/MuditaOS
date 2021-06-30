@@ -30,6 +30,11 @@ void NotificationsConfiguration::updateCurrentList(NotificationsListPolicy &poli
                              getDNDNotificationsOnLockedScreen());
 }
 
+void NotificationsConfiguration::updateCurrentSMS(SMSNotificationPolicy &policy)
+{
+    policy.updateCurrentSMS(phoneModeObserver->getCurrentPhoneMode());
+}
+
 auto NotificationsConfiguration::getDNDNotificationsOnLockedScreen() const noexcept -> bool
 {
     return utils::getNumericValue<bool>(
