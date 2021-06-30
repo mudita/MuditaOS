@@ -1,15 +1,15 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <application-messages/ApplicationMessages.hpp>
-#include "application-messages/windows/OptionsMessages.hpp"
-#include <OptionWindow.hpp>
+#include "ApplicationMessages.hpp"
+#include "MessagesStyle.hpp"
+#include "OptionsMessages.hpp"
 #include "SMSOutputWidget.hpp"
-#include "application-messages/data/MessagesStyle.hpp"
 
+#include <OptionsWindow.hpp>
+#include <OptionWindow.hpp>
 #include <Style.hpp>
 #include <time/time_conversion_factory.hpp>
-#include <OptionsWindow.hpp>
 
 namespace gui
 {

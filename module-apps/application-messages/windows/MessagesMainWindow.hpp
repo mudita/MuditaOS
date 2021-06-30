@@ -3,14 +3,14 @@
 
 #pragma once
 
-#include "application-messages/models/ThreadsModel.hpp"
+#include "ThreadsModel.hpp"
 
 #include <AppWindow.hpp>
+#include <gui/widgets/Icon.hpp>
 #include <Image.hpp>
 #include <Label.hpp>
 #include <ListView.hpp>
 #include <Text.hpp>
-#include <gui/widgets/Icon.hpp>
 
 #include <functional>
 #include <string>

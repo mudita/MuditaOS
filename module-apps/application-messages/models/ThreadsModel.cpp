@@ -1,18 +1,19 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "MessagesStyle.hpp"
+#include "SMSdata.hpp"
+#include "ThreadItem.hpp"
 #include "ThreadsModel.hpp"
-#include "InputEvent.hpp"
-#include "OptionWindow.hpp"
-#include "OptionsWindow.hpp"
-#include "ListView.hpp"
-#include "application-messages/data/SMSdata.hpp"
-#include "application-messages/data/MessagesStyle.hpp"
-#include "application-messages/widgets/ThreadItem.hpp"
-#include "application-messages/windows/ThreadWindowOptions.hpp"
+#include "ThreadWindowOptions.hpp"
+
+#include <InputEvent.hpp>
+#include <ListView.hpp>
 #include <log.hpp>
 #include <module-db/queries/messages/threads/QueryThreadsGet.hpp>
 #include <module-db/queries/messages/threads/QueryThreadsGetForList.hpp>
+#include <OptionsWindow.hpp>
+#include <OptionWindow.hpp>
 #include <service-db/DBServiceAPI.hpp>
 
 ThreadsModel::ThreadsModel(app::Application *app) : BaseThreadsRecordModel(app), app::AsyncCallbackReceiver{app}

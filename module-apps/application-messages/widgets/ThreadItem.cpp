@@ -1,11 +1,11 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "MessagesStyle.hpp"
 #include "ThreadItem.hpp"
-#include <time/time_conversion_factory.hpp>
 
 #include <Style.hpp>
-#include "application-messages/data/MessagesStyle.hpp"
+#include <time/time_conversion_factory.hpp>
 
 namespace gui
 {

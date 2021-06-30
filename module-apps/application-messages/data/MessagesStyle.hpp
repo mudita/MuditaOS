@@ -3,6 +3,10 @@
 
 #pragma once
 
+#include <gui/widgets/Style.hpp>
+
+#include <cstdint>
+
 namespace style
 {
     namespace messages
