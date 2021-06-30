@@ -13,11 +13,6 @@ namespace stm::api
      */
     bool isAutomaticDateAndTime();
     /**
-     * Gets value corresponded to current Automatic Timezone stored in DB
-     * @return actual setting value
-     */
-    bool isAutomaticTimezone();
-    /**
      * Gets value corresponded to current Time format stored in DB
      * @return actual setting value
      */
