@@ -64,7 +64,25 @@ TEST_CASE("Notes Record tests")
         auto addResult = static_cast<db::query::NoteStoreResult *>(response.get());
 
         REQUIRE(addResult->succeed());
+        REQUIRE(addResult->getNoteId() == 2);
         REQUIRE(notesRecordInterface.GetCount() == 2);
+    }
+
+    SECTION("Update a note")
+    {
+        constexpr auto testId = 1;
+
+        NotesRecord record;
+        record.ID      = testId;
+        record.snippet = testSnippet;
+
+        auto query        = std::make_unique<db::query::QueryNoteStore>(record);
+        auto response     = notesRecordInterface.runQuery(std::move(query));
+        auto updateResult = static_cast<db::query::NoteStoreResult *>(response.get());
+
+        REQUIRE(updateResult->succeed());
+        REQUIRE(updateResult->getNoteId() == testId);
+        REQUIRE(notesRecordInterface.GetCount() == 1);
     }
 
     SECTION("Remove a note")

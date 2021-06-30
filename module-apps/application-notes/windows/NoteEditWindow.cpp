@@ -107,7 +107,7 @@ namespace app::notes
             return;
         }
 
-        notesRecord = std::make_unique<NotesRecord>(editData->getRecord());
+        notesRecord = editData->getRecord();
         setNoteText(notesRecord->snippet);
     }
 
@@ -121,7 +121,7 @@ namespace app::notes
         if (inputEvent.isShortRelease()) {
             if (inputEvent.is(gui::KeyCode::KEY_ENTER)) {
                 saveNote();
-                auto switchData                        = std::make_unique<NoteSwitchData>(*notesRecord);
+                auto switchData                        = std::make_unique<NoteSwitchData>(notesRecord);
                 switchData->ignoreCurrentWindowOnStack = true;
                 application->switchWindow(gui::name::window::note_preview, std::move(switchData));
             }
@@ -138,6 +138,6 @@ namespace app::notes
     {
         notesRecord->date    = std::time(nullptr);
         notesRecord->snippet = edit->getText();
-        presenter->save(*notesRecord);
+        presenter->save(notesRecord);
     }
 } // namespace app::notes
