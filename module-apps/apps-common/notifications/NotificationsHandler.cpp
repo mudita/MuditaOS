@@ -26,6 +26,12 @@ void NotificationsHandler::registerMessageHandlers()
         callerIdHandler(request);
         return sys::msgHandled();
     });
+
+    parentService->connect(typeid(CellularIncomingSMSNotificationMessage),
+                           [&](sys::Message *request) -> sys::MessagePointer {
+                               incomingSMSHandler();
+                               return sys::msgHandled();
+                           });
 }
 
 void NotificationsHandler::incomingCallHandler(sys::Message *request)
@@ -37,7 +43,6 @@ void NotificationsHandler::incomingCallHandler(sys::Message *request)
         app::manager::Controller::sendAction(parentService,
                                              app::manager::actions::HandleIncomingCall,
                                              std::make_unique<app::manager::actions::CallParams>(msg->number));
-
         playbackCallRingtone();
     }
 }
@@ -66,10 +71,24 @@ void NotificationsHandler::policyNumberCheck(const utils::PhoneNumber::View &num
     notifcationConfig.callNumberCheck(currentCallPolicy, isContactInFavourites);
 }
 
+void NotificationsHandler::incomingSMSHandler()
+{
+    notifcationConfig.updateCurrentSMS(currentSMSPolicy);
+    playbackSMSRingtone();
+}
+
 void NotificationsHandler::playbackCallRingtone()
 {
     if (currentCallPolicy.isRingtoneAllowed()) {
         const auto filePath = AudioServiceAPI::GetSound(parentService, audio::PlaybackType::CallRingtone);
         AudioServiceAPI::PlaybackStart(parentService, audio::PlaybackType::CallRingtone, filePath);
+    }
+}
+
+void NotificationsHandler::playbackSMSRingtone()
+{
+    if (currentSMSPolicy.isRingtoneAllowed()) {
+        const auto filePath = AudioServiceAPI::GetSound(parentService, audio::PlaybackType::TextMessageRingtone);
+        AudioServiceAPI::PlaybackStart(parentService, audio::PlaybackType::TextMessageRingtone, filePath);
     }
 }

@@ -64,7 +64,6 @@
 #include <service-antenna/AntennaServiceAPI.hpp>
 #include <service-antenna/ServiceAntenna.hpp>
 #include <service-appmgr/Controller.hpp>
-#include <service-audio/AudioServiceAPI.hpp>
 #include <service-db/DBServiceAPI.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <service-db/QueryMessage.hpp>
@@ -1465,10 +1464,8 @@ void ServiceCellular::onSMSReceived(const utils::PhoneNumber::View &number)
         db::Interface::Name::Notifications,
         std::make_unique<db::query::notifications::Increment>(NotificationsRecord::Key::Sms, number));
 
-    const auto guard = [&]() { return !phoneModeObserver->isInMode(sys::phone_modes::PhoneMode::DoNotDisturb); };
-    auto filePath    = AudioServiceAPI::GetSound(this, audio::PlaybackType::TextMessageRingtone);
-    utility::conditionally_invoke(
-        guard, &AudioServiceAPI::PlaybackStart, this, audio::PlaybackType::TextMessageRingtone, filePath);
+    bus.sendMulticast(std::make_shared<CellularIncomingSMSNotificationMessage>(),
+                      sys::BusChannel::ServiceCellularNotifications);
 }
 
 bool ServiceCellular::receiveAllMessages()
