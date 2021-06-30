@@ -119,7 +119,7 @@ namespace app::notes
         if (inputEvent.isShortRelease()) {
             if (inputEvent.is(gui::KeyCode::KEY_LEFT)) {
                 application->switchWindow(gui::name::window::note_edit,
-                                          std::make_unique<NoteSwitchData>(NotesRecord{}));
+                                          std::make_unique<NoteSwitchData>(std::make_shared<NotesRecord>()));
             }
             else if (inputEvent.is(gui::KeyCode::KEY_RIGHT)) {
                 application->switchWindow(gui::name::window::notes_search);

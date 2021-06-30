@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NoteEditWindowPresenter.hpp"
@@ -9,8 +9,12 @@ namespace app::notes
         : notesRepository{std::move(notesRepository)}
     {}
 
-    void NoteEditWindowPresenter::save(const NotesRecord &note)
+    void NoteEditWindowPresenter::save(std::shared_ptr<NotesRecord> &note)
     {
-        notesRepository->save(note, nullptr);
+        notesRepository->save(*note, [this, note](bool succeed, std::uint32_t noteId) {
+            if (succeed) {
+                note->ID = noteId;
+            }
+        });
     }
 } // namespace app::notes

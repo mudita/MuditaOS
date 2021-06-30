@@ -86,7 +86,7 @@ namespace app::notes
             return;
         }
 
-        notesRecord = std::make_unique<NotesRecord>(previewData->getRecord());
+        notesRecord = previewData->getRecord();
         setEditDateText(notesRecord->date);
         note->setText(notesRecord->snippet);
     }
@@ -115,7 +115,7 @@ namespace app::notes
     {
         if (inputEvent.isShortRelease()) {
             if (inputEvent.is(gui::KeyCode::KEY_ENTER)) {
-                application->switchWindow(gui::name::window::note_edit, std::make_unique<NoteSwitchData>(*notesRecord));
+                application->switchWindow(gui::name::window::note_edit, std::make_unique<NoteSwitchData>(notesRecord));
             }
             else if (inputEvent.is(gui::KeyCode::KEY_LF)) {
                 application->switchWindow(utils::translate("app_phonebook_options_title"),

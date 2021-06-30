@@ -155,17 +155,24 @@ std::unique_ptr<db::QueryResult> NotesRecordInterface::getByTextQuery(const std:
 
 std::unique_ptr<db::QueryResult> NotesRecordInterface::storeQuery(const std::shared_ptr<db::Query> &query)
 {
-    const auto localQuery = static_cast<db::query::QueryNoteStore *>(query.get());
-    const auto &record    = localQuery->getRecord();
-    bool isSuccess        = false;
-    if (const auto exists = notesDB->notes.getById(record.ID).ID != DB_ID_NONE; exists) {
+    const auto localQuery  = static_cast<db::query::QueryNoteStore *>(query.get());
+    const auto &record     = localQuery->getRecord();
+    bool isSuccess         = false;
+    std::uint32_t resultId = DB_ID_NONE;
+
+    if (const auto id = notesDB->notes.getById(record.ID).ID; id != DB_ID_NONE) {
+        // Already exists in the DB.
         isSuccess = Update(record);
+        resultId  = id;
     }
     else {
         isSuccess = Add(record);
+        if (isSuccess) {
+            resultId = notesDB->getLastInsertRowId();
+        }
     }
 
-    auto response = std::make_unique<db::query::NoteStoreResult>(isSuccess);
+    auto response = std::make_unique<db::query::NoteStoreResult>(isSuccess, resultId);
     response->setRequestQuery(query);
     return response;
 }
