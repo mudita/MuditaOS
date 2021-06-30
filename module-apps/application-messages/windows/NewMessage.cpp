@@ -1,24 +1,21 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "ApplicationMessages.hpp"
+#include "MessagesStyle.hpp"
 #include "NewMessage.hpp"
-
-#include "application-messages/ApplicationMessages.hpp"
-#include "application-messages/data/SMSdata.hpp"
-#include "application-messages/data/MessagesStyle.hpp"
+#include "SMSdata.hpp"
 
 #include <application-phonebook/windows/PhonebookSearchResults.hpp>
-#include <service-appmgr/Controller.hpp>
-#include <service-db/DBServiceAPI.hpp>
-#include <i18n/i18n.hpp>
 #include <BoxLayout.hpp>
-#include <Text.hpp>
-
+#include <i18n/i18n.hpp>
+#include <module-db/queries/messages/sms/QuerySMSGetLastByThreadID.hpp>
 #include <module-db/queries/messages/threads/QueryThreadGetByContactID.hpp>
 #include <module-db/queries/messages/threads/QueryThreadGetByNumber.hpp>
-#include <module-db/queries/messages/sms/QuerySMSGetLastByThreadID.hpp>
-
+#include <service-appmgr/Controller.hpp>
 #include <service-cellular/service-cellular/MessageConstants.hpp>
+#include <service-db/DBServiceAPI.hpp>
+#include <Text.hpp>
 
 #include <cassert>
 

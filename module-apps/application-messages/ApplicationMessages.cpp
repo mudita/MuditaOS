@@ -2,37 +2,34 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationMessages.hpp"
+#include "MessagesMainWindow.hpp"
+#include "NewMessage.hpp"
+#include "OptionsMessages.hpp"
+#include "SearchResults.hpp"
+#include "SearchStart.hpp"
+#include "SMSTemplatesWindow.hpp"
+#include "SMSTextToSearch.hpp"
+#include "SMSThreadViewWindow.hpp"
 
-#include "DialogMetadata.hpp"
-#include "DialogMetadataMessage.hpp"
-#include "OptionsWindow.hpp"
-#include "application-messages/data/SMSTextToSearch.hpp"
-#include "windows/MessagesMainWindow.hpp"
-#include "windows/NewMessage.hpp"
-#include "windows/OptionsMessages.hpp"
-#include "windows/SMSThreadViewWindow.hpp"
-#include "windows/SearchStart.hpp"
-#include "windows/SMSTemplatesWindow.hpp"
-#include "windows/SearchResults.hpp"
-
-#include <MessageType.hpp>
 #include <Dialog.hpp>
+#include <DialogMetadata.hpp>
+#include <DialogMetadataMessage.hpp>
 #include <i18n/i18n.hpp>
 #include <memory>
-#include <service-db/DBServiceAPI.hpp>
-#include <service-db/DBNotificationMessage.hpp>
-#include <service-db/QueryMessage.hpp>
-#include <OptionWindow.hpp>
-
+#include <messages/OptionsWindow.hpp>
+#include <MessageType.hpp>
 #include <module-db/queries/messages/sms/QuerySMSAdd.hpp>
 #include <module-db/queries/messages/sms/QuerySMSRemove.hpp>
 #include <module-db/queries/messages/sms/QuerySMSUpdate.hpp>
 #include <module-db/queries/messages/threads/QueryThreadGetByID.hpp>
 #include <module-db/queries/messages/threads/QueryThreadRemove.hpp>
 #include <module-db/queries/phonebook/QueryContactGetByID.hpp>
-
+#include <OptionsWindow.hpp>
+#include <OptionWindow.hpp>
 #include <service-cellular/CellularMessage.hpp>
-#include <messages/OptionsWindow.hpp>
+#include <service-db/DBNotificationMessage.hpp>
+#include <service-db/DBServiceAPI.hpp>
+#include <service-db/QueryMessage.hpp>
 
 #include <cassert>
 #include <ctime>

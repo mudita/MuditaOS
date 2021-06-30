@@ -11,6 +11,7 @@ add_library(${PROJECT_NAME} STATIC)
 add_subdirectory(application-antenna)
 add_subdirectory(application-bell-main)
 add_subdirectory(application-calculator)
+add_subdirectory(application-messages)
 add_subdirectory(application-music-player)
 add_subdirectory(application-phonebook)
 add_subdirectory(apps-common)
@@ -24,7 +25,6 @@ set(APPLICATIONS
     call
     notes
     onboarding
-    messages
     calllog
     special-input
     meditation
@@ -70,6 +70,7 @@ endif()
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
+        application-messages
         apps-common
         date::date
         eventstore
