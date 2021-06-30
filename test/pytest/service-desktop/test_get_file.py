@@ -4,6 +4,11 @@ import pytest
 import base64
 from harness.interface.defs import status
 
+def setPasscode(harness, flag):
+    body = {"phoneLockCodeEnabled": flag}
+    ret = harness.endpoint_request("developerMode", "put", body)
+    assert ret["status"] == status["NoContent"]
+
 @pytest.mark.service_desktop_test
 @pytest.mark.usefixtures("phone_unlocked")
 @pytest.mark.rt1051
@@ -11,6 +16,13 @@ def test_get_not_existing_file(harness):
     """
     Attempt requesting not exiting file
     """
+
+    """
+    Getting a large file may hit screen auto lock.
+    We need to disable pass code for duration of test
+    """
+    setPasscode(harness, False)
+
     fileName = "Unknown.file"
     body = {"fileName" : "/sys/user/" + fileName}
     ret = harness.endpoint_request("filesystem", "get", body)
@@ -36,7 +48,7 @@ def test_get_invalid_chunks(harness):
     fileSize  = ret["body"]["fileSize"]
     chunkSize = ret["body"]["chunkSize"]
 
-    totalChunks = int((fileSize/chunkSize) + 1)
+    totalChunks = int(((fileSize + chunkSize - 1) / chunkSize))
     print("totalChunks #: " + str(totalChunks))
 
     body = {"rxID" : rxID, "chunkNo": 0}
@@ -68,7 +80,7 @@ def test_get_file(harness):
     fileSize  = ret["body"]["fileSize"]
     chunkSize = ret["body"]["chunkSize"]
 
-    totalChunks = int((fileSize/chunkSize) + 1)
+    totalChunks = int(((fileSize + chunkSize - 1) / chunkSize))
     print("totalChunks #: " + str(totalChunks))
 
     data = ""
@@ -107,7 +119,7 @@ def test_get_invalid_rxID(harness):
     fileSize  = ret["body"]["fileSize"]
     chunkSize = ret["body"]["chunkSize"]
 
-    totalChunks = int((fileSize/chunkSize) + 1)
+    totalChunks = int(((fileSize + chunkSize - 1) / chunkSize))
     print("totalChunks #: " + str(totalChunks))
 
     body = {"rxID" : int(rxID - 1), "chunkNo": 1}
@@ -119,3 +131,9 @@ def test_get_invalid_rxID(harness):
     ret = harness.endpoint_request("filesystem", "get", body)
 
     assert ret["status"] == status["BadRequest"]
+
+    """
+    Getting a large file may hit screen auto lock.
+    We need to disable pass code for duration of test
+    """
+    setPasscode(harness, True)
