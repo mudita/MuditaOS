@@ -22,16 +22,6 @@ namespace stm::internal
         return isAutomaticDateAndTimeOn;
     }
 
-    void StaticData::setAutomaticTimezoneOn(bool value)
-    {
-        isAutomaticTimezoneOn = value;
-    }
-
-    bool StaticData::getAutomaticTimezone() const noexcept
-    {
-        return isAutomaticTimezoneOn;
-    }
-
     void StaticData::setDateFormat(utils::time::Locale::DateFormat format)
     {
         dateFormat = format;

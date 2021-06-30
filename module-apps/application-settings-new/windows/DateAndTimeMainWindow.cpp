@@ -17,7 +17,6 @@ namespace gui
         setTitle(utils::translate("app_settings_date_and_time"));
 
         automaticDateAndTimeIsOn = stm::api::isAutomaticDateAndTime();
-        automaticTimeZoneIsOn    = stm::api::isAutomaticTimezone();
         timeFormat               = stm::api::timeFormat();
         dateFormat               = stm::api::dateFormat();
         changeDateAndTimeWindow  = window::name::change_date_and_time;
@@ -63,21 +62,6 @@ namespace gui
                 application->switchWindow(changeDateAndTimeWindow, nullptr);
                 return true;
             });
-        }
-
-        addSwitchOption(
-            utils::translate("app_settings_date_and_time_automatic_time_zone"),
-            [=](Item &item) {
-                automaticTimeZoneIsOn = !automaticTimeZoneIsOn;
-                application->bus.sendUnicast(
-                    std::make_shared<stm::message::SetAutomaticTimezoneRequest>(automaticDateAndTimeIsOn),
-                    service::name::service_time);
-                refreshOptionsList();
-                return true;
-            },
-            automaticTimeZoneIsOn ? option::SettingRightItem::On : option::SettingRightItem::Off);
-
-        if (!automaticTimeZoneIsOn) {
             addOption(utils::translate("app_settings_date_and_time_change_time_zone"), [=](Item &item) {
                 LOG_INFO("switching to %s page", window::name::change_time_zone);
                 application->switchWindow(window::name::change_time_zone, nullptr);

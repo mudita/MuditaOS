@@ -141,20 +141,6 @@ namespace stm::message
         bool value;
     };
 
-    class SetAutomaticTimezoneRequest : public sys::DataMessage
-    {
-      public:
-        explicit SetAutomaticTimezoneRequest(const bool value)
-            : sys::DataMessage(MessageType::MessageTypeUninitialized), value(value){};
-        auto getValue() const -> bool
-        {
-            return value;
-        }
-
-      private:
-        bool value;
-    };
-
     class SetTimeFormatRequest : public sys::DataMessage
     {
       public:
