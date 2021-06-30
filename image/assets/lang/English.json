@@ -84,6 +84,7 @@
   "duration_0hmin_0sec": "%0N:%0S",
   "duration_hour_0min_0sec": "%H:%0M:%0S",
   "brightness_text": "BRIGHTNESS",
+  "phone_needs_rebooting": "Your phone needs rebooting. Press any key to confirm and please remove the battery for 10 seconds to perform a full reboot",
   "home_modes_connected": "CONNECTED",
   "home_modes_notdisturb": "DO NOT DISTURB",
   "home_modes_offline": "OFFLINE",
