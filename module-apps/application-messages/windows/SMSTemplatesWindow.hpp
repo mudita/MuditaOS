@@ -3,15 +3,15 @@
 
 #pragma once
 
-#include "application-messages/models/SMSTemplateModel.hpp"
-#include "application-messages/data/SMSdata.hpp"
+#include "SMSdata.hpp"
+#include "SMSTemplateModel.hpp"
 
 #include <AppWindow.hpp>
 #include <gui/widgets/Label.hpp>
 #include <gui/widgets/ListView.hpp>
 
-#include <string>
 #include <functional>
+#include <string>
 
 namespace gui
 {

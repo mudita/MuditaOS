@@ -1,16 +1,15 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "ApplicationMessages.hpp"
+#include "MessagesStyle.hpp"
 #include "SearchResults.hpp"
+#include "SMSTextToSearch.hpp"
 #include "ThreadRecord.hpp"
-#include <application-messages/data/SMSTextToSearch.hpp>
-#include <application-messages/ApplicationMessages.hpp>
-#include "module-apps/application-messages/data/MessagesStyle.hpp"
-#include "queries/messages/threads/QueryThreadsSearchForList.hpp"
-
-#include <service-db/QueryMessage.hpp>
 
 #include <i18n/i18n.hpp>
+#include <queries/messages/threads/QueryThreadsSearchForList.hpp>
+#include <service-db/QueryMessage.hpp>
 
 namespace gui
 {
