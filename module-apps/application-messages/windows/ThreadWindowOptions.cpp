@@ -2,12 +2,13 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ThreadWindowOptions.hpp"
+
 #include <i18n/i18n.hpp>
 #include <log.hpp>
-#include <OptionWindow.hpp>
 #include <module-services/service-db/service-db/DBServiceAPI.hpp>
 #include <OptionCall.hpp>
 #include <OptionContact.hpp>
+#include <OptionWindow.hpp>
 
 /// below just for apps names...
 

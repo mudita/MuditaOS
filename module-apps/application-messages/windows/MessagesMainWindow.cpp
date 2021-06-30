@@ -1,31 +1,27 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "ApplicationMessages.hpp"
 #include "MessagesMainWindow.hpp"
+#include "MessagesStyle.hpp"
+#include "SearchStart.hpp"
+#include "SMSdata.hpp"
+#include "ThreadItem.hpp"
 
-#include "application-messages/ApplicationMessages.hpp"
-#include "application-messages/data/MessagesStyle.hpp"
-#include "application-messages/data/SMSdata.hpp"
-#include "application-messages/widgets/ThreadItem.hpp"
-#include "application-messages/windows/SearchStart.hpp"
-
-#include <service-db/DBServiceAPI.hpp>
-#include <service-db/DBNotificationMessage.hpp>
-
-#include <service-appmgr/model/ApplicationManager.hpp>
-#include <i18n/i18n.hpp>
 #include <application-phonebook/data/PhonebookItemData.hpp>
-#include <Style.hpp>
-#include <log.hpp>
-
 #include <header/AddElementAction.hpp>
 #include <header/SearchAction.hpp>
-
-#include <module-db/queries/notifications/QueryNotificationsClear.hpp>
+#include <i18n/i18n.hpp>
+#include <log.hpp>
 #include <module-db/queries/messages/threads/QueryThreadGetByContactID.hpp>
+#include <module-db/queries/notifications/QueryNotificationsClear.hpp>
+#include <service-appmgr/model/ApplicationManager.hpp>
+#include <service-db/DBNotificationMessage.hpp>
+#include <service-db/DBServiceAPI.hpp>
+#include <Style.hpp>
 
-#include <memory>
 #include <cassert>
+#include <memory>
 
 namespace gui
 {

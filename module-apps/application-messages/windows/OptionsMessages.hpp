@@ -1,10 +1,11 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include "../ApplicationMessages.hpp"
-#include "Interface/SMSRecord.hpp"
+#include "ApplicationMessages.hpp"
+
+#include <Interface/SMSRecord.hpp>
 #include <Option.hpp>
 
 std::list<gui::Option> smsWindowOptions(app::ApplicationMessages *app, const SMSRecord &record);

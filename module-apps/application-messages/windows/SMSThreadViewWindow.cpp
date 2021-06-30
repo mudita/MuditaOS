@@ -1,22 +1,19 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "ApplicationMessages.hpp"
+#include "MessagesStyle.hpp"
+#include "SMSdata.hpp"
 #include "SMSThreadViewWindow.hpp"
 
-#include "application-messages/ApplicationMessages.hpp"
-#include "application-messages/data/SMSdata.hpp"
-#include "application-messages/data/MessagesStyle.hpp"
-
-#include "OptionsMessages.hpp"
-#include "Service/Message.hpp"
-
-#include <TextBubble.hpp>
-#include <service-db/DBServiceAPI.hpp>
-#include <service-db/DBNotificationMessage.hpp>
-#include <module-db/queries/phonebook/QueryContactGetByID.hpp>
-
 #include <log.hpp>
+#include <module-db/queries/phonebook/QueryContactGetByID.hpp>
+#include <OptionsMessages.hpp>
+#include <service-db/DBNotificationMessage.hpp>
+#include <service-db/DBServiceAPI.hpp>
+#include <Service/Message.hpp>
 #include <Style.hpp>
+#include <TextBubble.hpp>
 
 #include <cassert>
 

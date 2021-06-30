@@ -3,12 +3,13 @@
 
 #pragma once
 
-#include <Application.hpp>
-#include <Interface/ThreadRecord.hpp>
-#include <Interface/SMSTemplateRecord.hpp>
-#include <Interface/SMSRecord.hpp>
-#include <PhoneNumber.hpp>
 #include "Constants.hpp"
+
+#include <Application.hpp>
+#include <Interface/SMSRecord.hpp>
+#include <Interface/SMSTemplateRecord.hpp>
+#include <Interface/ThreadRecord.hpp>
+#include <PhoneNumber.hpp>
 
 namespace gui
 {
