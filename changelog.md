@@ -4,6 +4,55 @@ To install the new version of MuditaOS please follow the steps described in this
 - [Linux](https://github.com/mudita/MuditaOS/blob/master/doc/boot_and_update.md#creating-a-storage-partition)
 - [Windows and macOS](https://github.com/mudita/MuditaOS/blob/master/doc/flashing_win_macos.md)
 
+## [0.71.1 2021-06-30]
+
+* [BH-372] Turned i18n into separate library
+* [BH-374] Fix ENABLE\_APP mechanism + adjust includes policy
+* [BH-374] Librarize application-antenna
+* [BH-388] Turned music player app into library
+* [BH-392] Turned application phonebook into lib
+* [BH-459] Moved fatfs to third-party v2
+* [BH-495] Cleaned up Bell Hybrid App cmake
+* [BH-495] Created Bell Hybrid home screen
+* [BH-501] MainMenu
+* [CP-163] Implement FS Endpoint read file
+* [CP-166] Update Harness Tests
+* [CP-174] Remove limit of maximum attempts of unlocking phone
+* [CP-194] Intercept all input when OS update window is displayed
+* [CP-200] Delete file with old OS version
+* [CP-200] Revert Delete file with old OS version
+* [CP-206] Report Pure serial number in USB descriptors
+* [EGD-5709] Add full actions support in call application
+* [EGD-5709] Fixed a crash on switching phone modes
+* [EGD-5709] Fixed actions support in Call application
+* [EGD-6041] Fix unlock windows behaviour
+* [EGD-6514] HSP volume control
+* [EGD-6697] Date and time formatting
+* [EGD-6745] Add tool to create JIRA version
+* [EGD-6797] Remove color from SAR
+* [EGD-6876] Fix Factory Settings Test
+* [EGD-6882] Fix call hangup after BT device disconnect
+* [EGD-6883] Change time settings cleanup
+* [EGD-6947] Fix SQL vulnerabilities
+* [EGD-6950] Added header layout
+* [EGD-6951] Removed old header implementation
+* [EGD-6952] Fix tethering on low battery
+* [EGD-6954] Enable all unit tests
+* [EGD-6958] Fix rssibar oor exception
+* [EGD-6960] Header addition related style cleanups
+* [EGD-6966] Fixed a switch from call window back
+* [EGD-6970] Autolock default value
+* [EGD-6972] Update BT stack to 1.4.1 version
+* [EGD-6979] Fix for "Unable to catch hard faults on rt1051 via GDB"
+* [EGD-6986] Add Store timezone in settings db
+* [EGD-6994] Remove sensitive data logging
+* [EGD-6995] Remove sensitive data from logs
+* [EGD-6999] Removed sensitive data
+* [EGD-7000] Removed sensitive data
+* [EGD-7015] Revert "test"
+* [EGD-7018] Fixed text empty block removal at end
+* [EGD-7029] Fix running unit tests in release script
+
 ## [0.70.1 2021-06-21]
 
 * [BH-393] Create separate math lib
