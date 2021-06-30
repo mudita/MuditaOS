@@ -32,9 +32,10 @@ namespace gui
             options.emplace_back(std::make_unique<gui::option::OptionSettings>(
                 zone,
                 [=](const gui::Item &item) {
-                    application->bus.sendUnicast(
-                        std::make_shared<stm::message::SetTimezoneRequest>(extractTimeZoneName(zone)),
-                        service::name::service_time);
+                    selectedTimeZone = extractTimeZoneName(zone);
+                    application->bus.sendUnicast(std::make_shared<stm::message::SetTimezoneRequest>(selectedTimeZone),
+                                                 service::name::service_time);
+                    refreshOptionsList(setTimeZoneIndex());
                     return true;
                 },
                 nullptr,

@@ -13,11 +13,6 @@ namespace stm::api
         return stm::internal::StaticData::get().getAutomaticDateAndTime();
     }
 
-    bool isAutomaticTimezone()
-    {
-        return stm::internal::StaticData::get().getAutomaticTimezone();
-    }
-
     utils::time::Locale::DateFormat dateFormat()
     {
         return stm::internal::StaticData::get().getDateFormat();

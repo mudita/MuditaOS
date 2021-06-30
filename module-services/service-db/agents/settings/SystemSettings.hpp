@@ -14,7 +14,6 @@ namespace settings
         constexpr inline auto displayLanguage          = "gs_display_language";
         constexpr inline auto inputLanguage            = "gs_input_language";
         constexpr inline auto automaticDateAndTimeIsOn = "gs_automatic_date_and_time_is_on";
-        constexpr inline auto automaticTimeZoneIsOn    = "gs_automatic_time_zone_is_on";
         constexpr inline auto timeFormat               = "gs_time_format";
         constexpr inline auto dateFormat               = "gs_date_format";
         constexpr inline auto onboardingDone           = "gs_onboarding_done";
