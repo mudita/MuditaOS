@@ -14,8 +14,9 @@ namespace app::notes
     class AbstractNotesRepository
     {
       public:
-        using OnGetCallback      = std::function<bool(const std::vector<NotesRecord> &, unsigned int)>;
-        using OnResultCallback   = std::function<void(bool)>;
+        using OnGetCallback    = std::function<bool(const std::vector<NotesRecord> &, unsigned int)>;
+        using OnSaveCallback   = std::function<void(bool, std::uint32_t)>;
+        using OnRemoveCallback = std::function<void(bool)>;
 
         virtual ~AbstractNotesRepository() noexcept = default;
 
@@ -24,8 +25,8 @@ namespace app::notes
                                std::uint32_t offset,
                                std::uint32_t limit,
                                const OnGetCallback &callback)                                      = 0;
-        virtual void save(const NotesRecord &note, const OnResultCallback &callback)               = 0;
-        virtual void remove(const NotesRecord &note, const OnResultCallback &callback)             = 0;
+        virtual void save(const NotesRecord &note, const OnSaveCallback &callback)                 = 0;
+        virtual void remove(const NotesRecord &note, const OnRemoveCallback &callback)             = 0;
     };
 
     class NotesDBRepository : public AbstractNotesRepository, public app::AsyncCallbackReceiver
@@ -38,8 +39,8 @@ namespace app::notes
                        std::uint32_t offset,
                        std::uint32_t limit,
                        const OnGetCallback &callback) override;
-        void save(const NotesRecord &note, const OnResultCallback &callback) override;
-        void remove(const NotesRecord &note, const OnResultCallback &callback) override;
+        void save(const NotesRecord &note, const OnSaveCallback &callback) override;
+        void remove(const NotesRecord &note, const OnRemoveCallback &callback) override;
 
       private:
         Application *application;
