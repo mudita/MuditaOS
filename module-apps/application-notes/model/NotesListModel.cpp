@@ -46,8 +46,8 @@ namespace app::notes
         }
 
         auto item               = new gui::NotesItem(note);
-        item->activatedCallback = [this, note = note.get()](gui::Item &) {
-            application->switchWindow(gui::name::window::note_preview, std::make_unique<NoteSwitchData>(*note));
+        item->activatedCallback = [this, note](gui::Item &) {
+            application->switchWindow(gui::name::window::note_preview, std::make_unique<NoteSwitchData>(note));
             return true;
         };
         item->inputCallback = [this, note = note.get()](gui::Item &, const gui::InputEvent &event) {
