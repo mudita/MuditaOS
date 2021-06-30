@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Reboot.hpp"
@@ -28,13 +28,12 @@ namespace gui
         auto text_y_offset = 270;
         auto text_height   = 300;
 
-        text = new Text(
-            this,
-            style::window::default_left_margin,
-            text_y_offset,
-            style::window_width - style::window::default_left_margin * 2,
-            text_height,
-            "Phone have to reboot, press any key to confirm and remove battery for 10 sec to perform full reboot");
+        text = new Text(this,
+                        style::window::default_left_margin,
+                        text_y_offset,
+                        style::window_width - style::window::default_left_margin * 2,
+                        text_height,
+                        utils::translate("phone_needs_rebooting"));
         text->setFilled(false);
         text->setBorderColor(gui::ColorFullBlack);
         text->setFont(style::header::font::title);
