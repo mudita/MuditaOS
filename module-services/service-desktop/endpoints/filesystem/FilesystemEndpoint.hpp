@@ -21,11 +21,15 @@ class FilesystemEndpoint : public parserFSM::Endpoint
     auto handle(parserFSM::Context &context) -> void override;
     auto runGet(parserFSM::Context &context) -> sys::ReturnCodes;
     auto runPost(parserFSM::Context &context) -> sys::ReturnCodes;
+    auto runPut(parserFSM::Context &context) -> sys::ReturnCodes;
     auto getUpdates(parserFSM::Context &context) -> sys::ReturnCodes;
 
   private:
     auto startGetFile(parserFSM::Context &context) const -> sys::ReturnCodes;
     auto getFileChunk(parserFSM::Context &context) const -> sys::ReturnCodes;
+
+    auto startSendFile(parserFSM::Context &context) const -> sys::ReturnCodes;
+    auto sendFileChunk(parserFSM::Context &context) const -> sys::ReturnCodes;
 
     FileOperations &fileOps;
 };
