@@ -4,6 +4,7 @@
 #include <catch2/catch.hpp>
 
 #include "notifications/policies/CallNotificationPolicy.hpp"
+#include "notifications/policies/SMSNotificationPolicy.hpp"
 #include "notifications/policies/NotificationsListPolicy.hpp"
 
 using namespace notifications;
@@ -16,6 +17,14 @@ TEST_CASE("Connected Mode notifications - calls policy test")
     REQUIRE(callPolicy.isPopupAllowed());
     REQUIRE(callPolicy.isRingtoneAllowed());
     REQUIRE(!callPolicy.isNumberCheckRequired());
+}
+
+TEST_CASE("Connected Mode notifications - sms policy test")
+{
+    SMSNotificationPolicy callPolicy;
+
+    callPolicy.updateCurrentSMS(sys::phone_modes::PhoneMode::Connected);
+    REQUIRE(callPolicy.isRingtoneAllowed());
 }
 
 TEST_CASE("Connected Mode notifications - list policy test")
@@ -84,6 +93,14 @@ TEST_CASE("DoNotDisturb Mode notifications  - calls policy test")
     }
 }
 
+TEST_CASE("DoNotDisturb Mode notifications - sms policy test")
+{
+    SMSNotificationPolicy callPolicy;
+
+    callPolicy.updateCurrentSMS(sys::phone_modes::PhoneMode::DoNotDisturb);
+    REQUIRE(!callPolicy.isRingtoneAllowed());
+}
+
 TEST_CASE("DoNotDisturb Mode notifications  - list policy test")
 {
     NotificationsListPolicy listPolicy;
@@ -111,4 +128,12 @@ TEST_CASE("DoNotDisturb Mode notifications  - list policy test")
     listPolicy.updateCurrentList(sys::phone_modes::PhoneMode::DoNotDisturb, phoneLocked, notificationsWhenLocked);
     REQUIRE(listPolicy.updateListAllowed());
     REQUIRE(listPolicy.showListWhenLocked());
+}
+
+TEST_CASE("Offline Mode notifications - sms policy test")
+{
+    SMSNotificationPolicy callPolicy;
+
+    callPolicy.updateCurrentSMS(sys::phone_modes::PhoneMode::Offline);
+    REQUIRE(callPolicy.isRingtoneAllowed());
 }
