@@ -64,6 +64,7 @@ TEST_CASE("DoNotDisturb Mode notifications  - calls policy test")
     REQUIRE(!callPolicy.isPopupAllowed());
     REQUIRE(!callPolicy.isRingtoneAllowed());
     REQUIRE(callPolicy.isNumberCheckRequired());
+    REQUIRE(callPolicy.isDismissedCallNotificationAllowed());
 
     SECTION("Number in/not in Favourites")
     {
@@ -136,4 +137,15 @@ TEST_CASE("Offline Mode notifications - sms policy test")
 
     callPolicy.updateCurrentSMS(sys::phone_modes::PhoneMode::Offline);
     REQUIRE(callPolicy.isRingtoneAllowed());
+}
+
+TEST_CASE("Offline Mode notifications - calls policy test")
+{
+    CallNotificationPolicy callPolicy;
+
+    callPolicy.updateCurrentCall(sys::phone_modes::PhoneMode::Offline);
+    REQUIRE(!callPolicy.isPopupAllowed());
+    REQUIRE(!callPolicy.isRingtoneAllowed());
+    REQUIRE(!callPolicy.isNumberCheckRequired());
+    REQUIRE(!callPolicy.isDismissedCallNotificationAllowed());
 }

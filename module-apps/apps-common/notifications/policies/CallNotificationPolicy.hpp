@@ -14,12 +14,14 @@ namespace notifications
         void updateCurrentCall(sys::phone_modes::PhoneMode phoneMode);
         bool isPopupAllowed() const noexcept;
         bool isRingtoneAllowed() const noexcept;
+        bool isDismissedCallNotificationAllowed() const noexcept;
         bool isNumberCheckRequired() const noexcept;
         void numberCheck(bool callsFromFavouritesSetting, bool isNumberInFavourites);
 
       private:
         bool popupOn;
         bool ringtoneOn;
+        bool dismissedCallNotification;
         bool numberCheckNeeded;
     };
 } // namespace notifications
