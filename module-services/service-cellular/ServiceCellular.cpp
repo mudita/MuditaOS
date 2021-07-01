@@ -1934,8 +1934,11 @@ void ServiceCellular::handleCellularHangupCallMessage(CellularHangupCallMessage 
 
 void ServiceCellular::handleCellularDismissCallMessage(sys::Message *msg)
 {
+    auto message = static_cast<CellularDismissCallMessage *>(msg);
     hangUpCall();
-    handleCallAbortedNotification(msg);
+    if (message->addNotificationRequired()) {
+        handleCallAbortedNotification(msg);
+    }
 }
 
 auto ServiceCellular::handleDBQueryResponseMessage(db::QueryResponse *msg) -> std::shared_ptr<sys::ResponseMessage>

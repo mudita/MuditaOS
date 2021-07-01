@@ -589,8 +589,17 @@ class CellularHangupCallMessage : public CellularMessage, public app::manager::a
 class CellularDismissCallMessage : public CellularMessage
 {
   public:
-    CellularDismissCallMessage() : CellularMessage(Type::DismissCall)
+    CellularDismissCallMessage(bool addNotificationToDB)
+        : CellularMessage(Type::DismissCall), addNotificationToDB{addNotificationToDB}
     {}
+
+    auto addNotificationRequired() const noexcept -> bool
+    {
+        return addNotificationToDB;
+    }
+
+  private:
+    const bool addNotificationToDB;
 };
 
 class CellularListCallsMessage : public CellularMessage
