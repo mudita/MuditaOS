@@ -266,6 +266,12 @@ TEST_CASE("DateTime")
                         newTimeTimeinfo.tm_mday = i;
                         auto newTime            = std::mktime(&newTimeTimeinfo);
                         DateTime datetime(timeSettings, newTime);
+
+                        if (currentTimeTimeinfo.tm_mday == 1 &&
+                            newTimeTimeinfo.tm_mon == currentTimeTimeinfo.tm_mon - 1) {
+                            continue;
+                        }
+
                         REQUIRE(!datetime.isYesterday());
                     }
                 }
