@@ -26,7 +26,6 @@ if(COVERAGE_ENABLE)
         module-bluetooth/Bluetooth/glucode/.*
         module-bluetooth/lib/.*
         module-db/Database/sqlite3.c
-        module-lwip/lib/.*
         module-os/.*
         module-utils/gsl/.*
         module-utils/json/.*

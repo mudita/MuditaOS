@@ -53,7 +53,7 @@ target_link_libraries(BellHybrid
         service-bluetooth
         service-desktop
         service-lwip
-        ${LWIP_LIBRARIES}
+        lwipcore
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_Linux>:iosyscalls>"
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_RT1051>:CrashCatcher::CrashCatcher>"
     )

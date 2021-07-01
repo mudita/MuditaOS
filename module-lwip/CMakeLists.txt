@@ -1,58 +1,34 @@
-﻿project(module-lwip VERSION 1.0 DESCRIPTION "LwIP port layer")
-
+﻿add_library(module-lwip STATIC)
 
 # remove -Werror for lwip
 string(REPLACE "-Wno-error=format" "" LWIP_COMPILER_FLAGS "${TARGET_COMPILE_OPTIONS}")
 
-# module-lwip/lib/lwip/src/include/lwip/err.h
-
-include(${CMAKE_CURRENT_SOURCE_DIR}/lwip-includes.cmake)
-
-set (SOURCES
-    "${LWIP_DIR}/contrib/ports/freertos/sys_arch.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/lib/dhcp-server/dhserver.c"
+target_sources(module-lwip
+    PRIVATE
+        lib/dhcp-server/dhserver.c
 )
 
-if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-set (LWIP_DEFINITIONS LWIP_DEBUG=1)
-endif()
-
-include(${LWIP_DIR}/src/Filelists.cmake)
-include(${LWIP_DIR}/contrib/Filelists.cmake)
-
-# for any target dependent on lwip
-# target_include_directories(<app> PRIVATE ${LWIP_INCLUDE_DIRS})
-
-# add to target
-set(LWIP_LIBRARIES lwipcontribapps lwipallapps lwipcore)
-
-### TODO maybe make it a bit shared
-add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_DIR_SOURCES})
-target_compile_definitions(${PROJECT_NAME} PUBLIC   ${PROJECT_CONFIG_DEFINITIONS}
+target_compile_definitions(module-lwip PUBLIC   ${PROJECT_CONFIG_DEFINITIONS}
                                                     ${PROJECT_TARGET}
                                                     ${TARGET_COMPILE_DEFINITIONS}
                                                     ${BOARD_DIR_DEFINITIONS}
                                                     )
-target_compile_features(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_FEATURES})
-target_compile_options(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_OPTIONS})
-target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
-
+target_compile_features(module-lwip PUBLIC ${TARGET_COMPILE_FEATURES})
+target_compile_options(module-lwip PUBLIC ${TARGET_COMPILE_OPTIONS})
+target_link_options(module-lwip PUBLIC ${TARGET_LINK_OPTIONS})
 
 target_include_directories(
-    ${PROJECT_NAME}
+    module-lwip
     PUBLIC
     ${BOARD_DIR_INCLUDES}
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${TARGET_LIBRARIES_INCLUDES}
-    ${LWIP_INCLUDE_DIRS}
 )
 
 target_link_libraries(
-    ${PROJECT_NAME}
+    module-lwip
     module-bsp
     module-utils
     module-vfs
     module-sys
-    ${BOARD_DIR_LIBRARIES}
-    ${LWIP_LIBRARIES}
+    lwip::lwip
     )
