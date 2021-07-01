@@ -10,6 +10,7 @@ void CallNotificationPolicy::updateCurrentCall(sys::phone_modes::PhoneMode phone
     popupOn           = false;
     ringtoneOn        = false;
     numberCheckNeeded = false;
+    dismissedCallNotification = false;
 
     switch (phoneMode) {
     case sys::phone_modes::PhoneMode::Connected:
@@ -17,9 +18,11 @@ void CallNotificationPolicy::updateCurrentCall(sys::phone_modes::PhoneMode phone
         ringtoneOn = true;
         break;
     case sys::phone_modes::PhoneMode::DoNotDisturb:
+        dismissedCallNotification = true;
         numberCheckNeeded = true;
         break;
     case sys::phone_modes::PhoneMode::Offline:
+        dismissedCallNotification = false;
         break;
     }
 }
@@ -32,6 +35,11 @@ bool CallNotificationPolicy::isPopupAllowed() const noexcept
 bool CallNotificationPolicy::isRingtoneAllowed() const noexcept
 {
     return ringtoneOn;
+}
+
+bool CallNotificationPolicy::isDismissedCallNotificationAllowed() const noexcept
+{
+    return dismissedCallNotification;
 }
 
 bool CallNotificationPolicy::isNumberCheckRequired() const noexcept

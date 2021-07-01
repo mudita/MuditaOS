@@ -61,7 +61,7 @@ void NotificationsHandler::callerIdHandler(sys::Message *request)
         playbackCallRingtone();
     }
     else {
-        CellularServiceAPI::DismissCall(parentService);
+        CellularServiceAPI::DismissCall(parentService, currentCallPolicy.isDismissedCallNotificationAllowed());
     }
 }
 
