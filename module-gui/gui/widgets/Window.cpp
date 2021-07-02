@@ -23,7 +23,7 @@ namespace gui
     void Window::onBeforeShow(ShowMode mode, SwitchData *data)
     {}
 
-    void Window::onClose()
+    void Window::onClose(CloseReason reason)
     {}
 
     void Window::getRefreshArea(uint16_t &x, uint16_t &y, uint16_t &w, uint16_t &h)
