@@ -39,7 +39,11 @@ namespace gui
             if (!state) {
                 return;
             }
+            auto currentText = _state->getText();
             _state->restoreFrom(*state);
+            if (!currentText.empty()) {
+                _state->addText(currentText);
+            }
             state = nullptr;
         }
 
@@ -107,7 +111,6 @@ namespace gui
     {
         // select contact only if there is no entered number
         if (recipient->getText().empty()) {
-            memento->setState(message);
             return app::manager::Controller::sendAction(application,
                                                         app::manager::actions::ShowContacts,
                                                         std::make_unique<PhonebookSearchRequest>(),
