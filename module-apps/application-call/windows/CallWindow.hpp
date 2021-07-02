@@ -3,14 +3,14 @@
 
 #pragma once
 
-#include "application-call/ApplicationCall.hpp"
-#include "application-call/widgets/StateIcons.hpp"
-#include "application-call/data/CallState.hpp"
+#include "ApplicationCall.hpp"
+#include "CallState.hpp"
+#include "StateIcons.hpp"
 
-#include <gui/input/Translator.hpp>
-#include <Rect.hpp>
-#include <Image.hpp>
 #include <AppWindow.hpp>
+#include <gui/input/Translator.hpp>
+#include <Image.hpp>
+#include <Rect.hpp>
 #include <time/time_conversion.hpp>
 
 namespace gui

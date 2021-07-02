@@ -4,7 +4,6 @@
 #include "config.h"
 
 // applications
-#include <application-call/ApplicationCall.hpp>
 #include <application-calllog/ApplicationCallLog.hpp>
 #include <application-desktop/ApplicationDesktop.hpp>
 #include <application-settings/ApplicationSettings.hpp>

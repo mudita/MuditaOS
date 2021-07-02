@@ -3,11 +3,12 @@
 
 #pragma once
 
-#include "Image.hpp"
-#include "Label.hpp"
-#include <Style.hpp>
-#include <log.hpp>
 #include <i18n/i18n.hpp>
+#include <Image.hpp>
+#include <Label.hpp>
+#include <log.hpp>
+#include <Style.hpp>
+
 #include <map>
 
 namespace gui
