@@ -6,6 +6,7 @@
 #include <presenter/NotePreviewWindowPresenter.hpp>
 #include <presenter/NotesMainWindowPresenter.hpp>
 #include <windows/NoteEditWindow.hpp>
+#include <windows/NoteCreateWindow.hpp>
 #include <windows/NoteMainWindow.hpp>
 #include <windows/NotePreviewWindow.hpp>
 #include <windows/SearchEngineWindow.hpp>
@@ -79,7 +80,7 @@ namespace app
 
     sys::ReturnCodes ApplicationNotes::DeinitHandler()
     {
-        return sys::ReturnCodes::Success;
+        return Application::DeinitHandler();
     }
 
     sys::ReturnCodes ApplicationNotes::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
@@ -104,6 +105,11 @@ namespace app
             auto notesRepository = std::make_unique<notes::NotesDBRepository>(app);
             auto presenter       = std::make_unique<notes::NoteEditWindowPresenter>(std::move(notesRepository));
             return std::make_unique<notes::NoteEditWindow>(app, std::move(presenter));
+        });
+        windowsFactory.attach(gui::name::window::note_create, [](Application *app, const std::string &name) {
+            auto notesRepository = std::make_unique<notes::NotesDBRepository>(app);
+            auto presenter       = std::make_unique<notes::NoteCreateWindowPresenter>(std::move(notesRepository));
+            return std::make_unique<notes::NoteCreateWindow>(app, std::move(presenter));
         });
         windowsFactory.attach(gui::name::window::notes_search, [](Application *app, const std::string &name) {
             return std::make_unique<notes::SearchEngineWindow>(app,
