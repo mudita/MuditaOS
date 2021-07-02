@@ -223,12 +223,12 @@ namespace text
             for (auto &attr : attrs) {
                 if (attr->is(name)) {
                     if (!attr->visit(format, value)) {
-                        LOG_ERROR("Attribute %s parsing error, default set", name.c_str());
+                        LOG_ERROR("Attribute parsing error, default set");
                     }
                     return true;
                 }
             }
-            LOG_ERROR("Attr: %s not found", name.c_str());
+            LOG_ERROR("Attribute not found");
             return false;
         }
 
@@ -267,7 +267,7 @@ namespace text
                                                                                     : attribute.second);
             }
             catch (const std::out_of_range &) {
-                LOG_ERROR("ShortTextNode: %s not found", nodeName);
+                LOG_ERROR("ShortTextNode not found");
                 return {};
             }
         }
@@ -308,7 +308,7 @@ namespace text
                     std::move(token));
             }
             catch (const std::out_of_range &) {
-                LOG_ERROR("Tokens: %s not found", contentName.c_str());
+                LOG_ERROR("Tokens not found");
             }
             return std::nullopt;
         }
