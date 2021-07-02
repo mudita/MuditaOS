@@ -44,7 +44,13 @@ namespace settings
     }
     json11::Json FactorySettings::readMfgSettings(const std::string &path)
     {
-        std::ifstream file(path.c_str());
+        std::ifstream file(path.c_str(), std::ifstream::ate | std::ifstream::binary);
+        if (!file.is_open() || file.bad() || file.tellg() < 1) {
+            LOG_ERROR("Could not open factory settings file: %s", path.c_str());
+            return {};
+        }
+        return {};
+        file.seekg(std::ifstream::beg);
         std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 
         std::string parserError;
