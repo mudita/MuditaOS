@@ -48,11 +48,6 @@ namespace gui
         // id of the font assigned by the font manager
         id = 1;
 
-        //	LOG_INFO("font: %s glyphs: %d, kern: %d", info.face.c_str(), glyph_count, kern_count );
-        //	LOG_INFO("glyph offset: %d", glyph_data_offset );
-        //	LOG_INFO("kerning offset: %d", kern_data_offset );
-        //	LOG_INFO("image offset: %d", image_data_offset );
-
         // load glyphs
         uint32_t glyphOffset = glyph_data_offset;
         for (unsigned int i = 0; i < glyph_count; i++) {
