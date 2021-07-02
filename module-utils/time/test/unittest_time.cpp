@@ -254,28 +254,6 @@ TEST_CASE("DateTime")
                     REQUIRE(!datetime.isYesterday());
                 }
             }
-            SECTION("different month, same year")
-            {
-                for (int i = 0; i < 12; i++) {
-                    newTimeTimeinfo.tm_mon = i;
-                    if (newTimeTimeinfo.tm_mon == currentTimeTimeinfo.tm_mon) {
-                        continue; // tested above
-                    }
-
-                    for (int i = 1; i < 32; i++) {
-                        newTimeTimeinfo.tm_mday = i;
-                        auto newTime            = std::mktime(&newTimeTimeinfo);
-                        DateTime datetime(timeSettings, newTime);
-
-                        if (currentTimeTimeinfo.tm_mday == 1 &&
-                            newTimeTimeinfo.tm_mon == currentTimeTimeinfo.tm_mon - 1) {
-                            continue;
-                        }
-
-                        REQUIRE(!datetime.isYesterday());
-                    }
-                }
-            }
             SECTION("different year")
             {
                 // previous
