@@ -2053,6 +2053,12 @@ auto ServiceCellular::handleCellularSelectAntennaMessage(sys::Message *msg) -> s
     cmux->selectAntenna(message->antenna);
     vTaskDelay(50); // sleep for 50 ms...
     auto actualAntenna  = cmux->getAntenna();
+    if (actualAntenna == bsp::cellular::antenna::lowBand) {
+        LOG_INFO("Low band antenna set");
+    }
+    else {
+        LOG_INFO("High band antenna set");
+    }
     bool changedAntenna = (actualAntenna == message->antenna);
 
     auto notification = std::make_shared<AntennaChangedMessage>();
