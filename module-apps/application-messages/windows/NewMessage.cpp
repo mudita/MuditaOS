@@ -290,10 +290,16 @@ namespace gui
         setFocusItem(body);
     }
 
-    void NewMessageWindow::onClose()
+    void NewMessageWindow::onClose(CloseReason reason)
     {
         if (message->getText().empty()) {
             // Nothing to do if text is empty.
+            return;
+        }
+
+        if (reason == CloseReason::PhoneLock) {
+            memento->setState(message);
+            message->clear();
             return;
         }
         if (const auto handled = handleMessageText(); !handled) {
