@@ -96,9 +96,6 @@ namespace gui
             return center;
         case Side::RIGHT:
             return right;
-        default:
-            LOG_ERROR("shall never got here - just to ommit warning");
-            return right;
         };
         return nullptr;
     }
