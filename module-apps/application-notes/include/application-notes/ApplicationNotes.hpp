@@ -9,6 +9,7 @@ namespace gui::name::window
 {
     inline constexpr auto note_preview        = "NotePreview";
     inline constexpr auto note_edit           = "NoteEdit";
+    inline constexpr auto note_create         = "NoteCreate";
     inline constexpr auto notes_search        = "NotesSearch";
     inline constexpr auto notes_search_result = "NotesSearchResult";
     inline constexpr auto note_dialog         = "Dialog";
