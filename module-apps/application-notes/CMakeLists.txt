@@ -25,6 +25,7 @@ target_sources(application-notes
 		presenter/SearchEngineWindowPresenter.cpp
 		widgets/NotesItem.cpp
 		windows/NoteEditWindow.cpp
+		windows/NoteCreateWindow.cpp
 		windows/NoteMainWindow.cpp
 		windows/NotePreviewWindow.cpp
 		windows/NotesOptions.cpp
@@ -43,6 +44,7 @@ target_sources(application-notes
 		presenter/SearchEngineWindowPresenter.hpp
 		widgets/NotesItem.hpp
 		windows/NoteEditWindow.hpp
+		windows/NoteCreateWindow.hpp
 		windows/NoteMainWindow.hpp
 		windows/NotePreviewWindow.hpp
 		windows/NotesOptions.hpp
