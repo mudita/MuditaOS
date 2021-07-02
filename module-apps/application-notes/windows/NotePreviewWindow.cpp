@@ -83,12 +83,25 @@ namespace app::notes
     {
         auto previewData = dynamic_cast<NoteSwitchData *>(data);
         if (previewData == nullptr) {
+            if (mode == gui::ShowMode::GUI_SHOW_RETURN) {
+                updatePreview();
+            }
             return;
         }
 
         notesRecord = previewData->getRecord();
-        setEditDateText(notesRecord->date);
-        note->setText(notesRecord->snippet);
+        updatePreview();
+    }
+
+    void NotePreviewWindow::updatePreview()
+    {
+        if (notesRecord) {
+            setEditDateText(notesRecord->date);
+            note->setText(notesRecord->snippet);
+        }
+        else {
+            LOG_ERROR("Unable to update the preview: the note does not exist.");
+        }
     }
 
     void NotePreviewWindow::setEditDateText(std::uint32_t timestamp)
