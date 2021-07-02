@@ -1,37 +1,31 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "ApplicationCall.hpp"
+#include "CallAppStyle.hpp"
+#include "CallState.hpp"
+#include "CallSwitchData.hpp"
 #include "CallWindow.hpp"
-
-#include "GuiTimer.hpp"
-#include "InputEvent.hpp"
-#include "application-call/data/CallState.hpp"
-#include "application-call/widgets/StateIcons.hpp"
-#include <log.hpp>
-#include "service-appmgr/Controller.hpp"
-
-#include "application-call/ApplicationCall.hpp"
-#include "application-call/data/CallSwitchData.hpp"
-
-#include <i18n/i18n.hpp>
-
-#include "service-db/DBServiceAPI.hpp"
-
-#include "Label.hpp"
-#include "Margins.hpp"
-#include "application-call/data/CallAppStyle.hpp"
-#include "time/time_conversion.hpp"
+#include "StateIcons.hpp"
 
 #include <application-messages/data/SMSdata.hpp>
+#include <GuiTimer.hpp>
+#include <i18n/i18n.hpp>
+#include <InputEvent.hpp>
 #include <InputMode.hpp>
-
-#include <memory>
-#include <functional>
-#include <sstream>
-#include <iomanip>
+#include <Label.hpp>
+#include <log.hpp>
+#include <magic_enum.hpp>
+#include <Margins.hpp>
+#include <service-appmgr/Controller.hpp>
+#include <service-db/DBServiceAPI.hpp>
+#include <time/time_conversion.hpp>
 
 #include <cassert>
-#include <magic_enum.hpp>
+#include <functional>
+#include <iomanip>
+#include <memory>
+#include <sstream>
 
 namespace gui
 {

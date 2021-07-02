@@ -1,11 +1,10 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "ApplicationCall.hpp"
+#include "CallAppStyle.hpp"
+#include "CallSwitchData.hpp"
 #include "NumberWindow.hpp"
-
-#include "application-call/ApplicationCall.hpp"
-#include "application-call/data/CallAppStyle.hpp"
-#include "application-call/data/CallSwitchData.hpp"
 
 #include <ContactRecord.hpp>
 #include <gui/widgets/Image.hpp>

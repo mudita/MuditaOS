@@ -3,16 +3,15 @@
 
 #pragma once
 
-#include "application-call/ApplicationCall.hpp"
-#include "application-call/widgets/StateIcons.hpp"
+#include "ApplicationCall.hpp"
+#include "StateIcons.hpp"
 
 #include <AppWindow.hpp>
 #include <ContactRecord.hpp>
 #include <country.hpp>
 #include <gui/input/Translator.hpp>
-
-#include <phonenumbers/phonenumberutil.h>
 #include <phonenumbers/asyoutypeformatter.h>
+#include <phonenumbers/phonenumberutil.h>
 
 #include <memory>
 #include <string>
