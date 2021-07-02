@@ -120,7 +120,7 @@ namespace app::notes
         setNoteText(notesRecord->snippet);
     }
 
-    void NoteEditWindow::onClose()
+    void NoteEditWindow::onClose([[maybe_unused]] CloseReason reason)
     {
         if (presenter->isAutoSaveApproved()) {
             saveNote();

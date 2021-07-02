@@ -109,7 +109,7 @@ namespace gui
         return appConfiguration;
     }
 
-    void OptionWindow::onClose()
+    void OptionWindow::onClose([[maybe_unused]] CloseReason reason)
     {
         optionsList->onClose();
     }

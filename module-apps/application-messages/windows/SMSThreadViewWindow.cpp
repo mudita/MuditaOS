@@ -93,7 +93,7 @@ namespace gui
         return AppWindow::onInput(inputEvent);
     }
 
-    void SMSThreadViewWindow::onClose()
+    void SMSThreadViewWindow::onClose([[maybe_unused]] CloseReason reason)
     {
         smsModel->handleDraftMessage();
     }

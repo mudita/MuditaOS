@@ -234,7 +234,8 @@ namespace app
 
     void Application::switchWindow(const std::string &windowName,
                                    gui::ShowMode cmd,
-                                   std::unique_ptr<gui::SwitchData> data)
+                                   std::unique_ptr<gui::SwitchData> data,
+                                   SwitchReason reason)
     {
 
         std::string window;
@@ -248,13 +249,13 @@ namespace app
         // case to handle returning to previous application
         if (windowName.empty()) {
             window = getCurrentWindow()->getName();
-            auto msg =
-                std::make_shared<AppSwitchWindowMessage>(window, getCurrentWindow()->getName(), std::move(data), cmd);
+            auto msg = std::make_shared<AppSwitchWindowMessage>(
+                window, getCurrentWindow()->getName(), std::move(data), cmd, reason);
             bus.sendUnicast(msg, this->GetName());
         }
         else {
             auto msg = std::make_shared<AppSwitchWindowMessage>(
-                windowName, getCurrentWindow() ? getCurrentWindow()->getName() : "", std::move(data), cmd);
+                windowName, getCurrentWindow() ? getCurrentWindow()->getName() : "", std::move(data), cmd, reason);
             bus.sendUnicast(msg, this->GetName());
         }
     }
@@ -507,7 +508,10 @@ namespace app
             }
             if (!isCurrentWindow(msg->getWindowName())) {
                 if (!windowsStack.isEmpty()) {
-                    getCurrentWindow()->onClose();
+                    const auto closeReason = msg->getReason() == SwitchReason::PhoneLock
+                                                 ? gui::Window::CloseReason::PhoneLock
+                                                 : gui::Window::CloseReason::WindowSwitch;
+                    getCurrentWindow()->onClose(closeReason);
                 }
                 setActiveWindow(msg->getWindowName());
             }
@@ -641,7 +645,7 @@ namespace app
 
         for (const auto &[windowName, window] : windowsStack) {
             LOG_INFO("Closing a window: %s", windowName.c_str());
-            window->onClose();
+            window->onClose(gui::Window::CloseReason::ApplicationClose);
         }
 
         windowsStack.windows.clear();
@@ -829,6 +833,10 @@ namespace app
                      audio::str(volumeParams->getAudioContext().second).c_str(),
                      std::to_string(volumeParams->getVolume()).c_str());
             handleVolumeChanged(volumeParams->getVolume(), volumeParams->getAudioContext());
+        }
+        else if (id == ID::PhoneLock) {
+            switchWindow(
+                gui::popup::resolveWindowName(id), gui::ShowMode::GUI_SHOW_INIT, nullptr, SwitchReason::PhoneLock);
         }
         else if (id == ID::PhoneLockInput || id == ID::PhoneLockChangeInfo) {
             auto popupParams = static_cast<const gui::PhoneUnlockInputRequestParams *>(params);
