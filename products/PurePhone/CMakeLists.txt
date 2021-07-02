@@ -50,10 +50,11 @@ target_link_libraries(PurePhone
     PRIVATE
         application-antenna
         application-calculator
+        application-call
         application-messages
         application-music-player
-        application-phonebook
         application-notes
+        application-phonebook
         messagetype
         module-apps
         service-bluetooth

@@ -14,13 +14,13 @@
 #include <SystemManager/messages/SystemManagerMessage.hpp>
 #include <SystemManager/messages/TetheringQuestionRequest.hpp>
 #include <SystemManager/messages/TetheringPhoneModeChangeProhibitedMessage.hpp>
-#include <application-call/ApplicationCall.hpp>
 #include <application-special-input/ApplicationSpecialInput.hpp>
 #include <application-desktop/ApplicationDesktop.hpp>
 #include <application-onboarding/ApplicationOnBoarding.hpp>
 #include <application-onboarding/data/OnBoardingMessages.hpp>
 #include <i18n/i18n.hpp>
 #include <log/log.hpp>
+#include <service-cellular/CellularMessage.hpp>
 #include <service-appmgr/messages/Message.hpp>
 #include <service-evtmgr/EventManager.hpp>
 #include <service-evtmgr/EVMessages.hpp>

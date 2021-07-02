@@ -3,15 +3,15 @@
 
 #pragma once
 
-#include "data/CallState.hpp"
+#include "Application.hpp"
+#include "CallState.hpp"
 
-#include <apps-common/Application.hpp>
-#include <Service/Message.hpp>
 #include <module-sys/Timers/TimerHandle.hpp>
-#include <SystemManager/SystemManager.hpp>
 #include <service-cellular/CellularMessage.hpp>
 #include <service-evtmgr/Constants.hpp>
 #include <service-evtmgr/EVMessages.hpp>
+#include <Service/Message.hpp>
+#include <SystemManager/SystemManager.hpp>
 
 namespace app
 {

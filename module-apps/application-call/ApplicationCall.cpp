@@ -2,29 +2,27 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationCall.hpp"
-
-#include "data/CallSwitchData.hpp"
-#include "windows/CallWindow.hpp"
-#include "windows/EmergencyCallWindow.hpp"
-#include "windows/EnterNumberWindow.hpp"
+#include "CallSwitchData.hpp"
+#include "CallWindow.hpp"
+#include "EmergencyCallWindow.hpp"
+#include "EnterNumberWindow.hpp"
 
 #include <apps-common/messages/DialogMetadataMessage.hpp>
 #include <apps-common/windows/Dialog.hpp>
 #include <apps-common/windows/DialogMetadata.hpp>
-
 #include <log/log.hpp>
 #include <module-apps/application-phonebook/data/PhonebookItemData.hpp>
 #include <module-services/service-db/service-db/DBServiceAPI.hpp>
 #include <module-sys/Timers/TimerFactory.hpp>
 #include <PhoneNumber.hpp>
-#include <service-cellular/CellularServiceAPI.hpp>
-#include <service-audio/AudioServiceAPI.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <service-appmgr/data/MmiActionsParams.hpp>
+#include <service-audio/AudioServiceAPI.hpp>
+#include <service-cellular/CellularServiceAPI.hpp>
 #include <time/time_conversion.hpp>
 
-#include <memory>
 #include <cassert>
+#include <memory>
 
 namespace app
 {

@@ -3,7 +3,7 @@
 
 #include "BluetoothSettingsModel.hpp"
 
-#include <Constants.hpp>
+#include <service-bluetooth/Constants.hpp>
 #include <service-bluetooth/messages/BondedDevices.hpp>
 #include <service-bluetooth/messages/Connect.hpp>
 #include <service-bluetooth/messages/DeviceName.hpp>
