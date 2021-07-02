@@ -83,7 +83,6 @@ EventManager::~EventManager()
     }
 }
 
-
 // Invoked upon receiving data message
 sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
 {
@@ -371,6 +370,7 @@ void EventManager::handleKeyEvent(sys::Message *msg)
 void EventManager::handleKeyMoveEvent(RawKey key)
 {
     if (isSliderKeyCode(key.key_code)) {
+        LOG_INFO("Slider position: %s", magic_enum::enum_name(key.key_code).data());
         const auto mode = sys::SystemManager::translateSliderState(key);
         bus.sendUnicast(std::make_shared<sys::PhoneModeRequest>(mode), service::name::system_manager);
     }
