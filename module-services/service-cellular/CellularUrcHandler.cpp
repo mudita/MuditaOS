@@ -129,6 +129,10 @@ void CellularUrcHandler::Handle(Qind &urc)
             Store::GSM::get()->setSignalStrength(signalStrength.data);
             response = std::make_unique<CellularSignalStrengthUpdateNotification>(urc.getUrcBody());
         }
+        auto ber = urc.getBER();
+        if (ber.has_value()) {
+            LOG_INFO("BER value: %d", ber.value());
+        }
         urc.setHandled(true);
     }
     else if (urc.isFota()) {
