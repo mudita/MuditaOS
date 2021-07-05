@@ -574,10 +574,11 @@ namespace bluetooth
 
     void A2DP::A2DPImpl::connect()
     {
-        if (!isConnected) {
-            LOG_INFO("Starting playback");
-            a2dp_source_establish_stream(deviceAddr, &AVRCP::mediaTracker.a2dp_cid);
+        if (isConnected) {
+            disconnect();
         }
+        LOG_INFO("Starting playback");
+        a2dp_source_establish_stream(deviceAddr, &AVRCP::mediaTracker.a2dp_cid);
     }
 
     void A2DP::A2DPImpl::disconnect()
