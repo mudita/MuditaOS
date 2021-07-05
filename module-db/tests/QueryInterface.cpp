@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -14,10 +14,10 @@
 #include "queries/messages/sms/QuerySMSRemove.hpp"
 #include "queries/messages/sms/QuerySMSUpdate.hpp"
 
+#include <filesystem>
 #include <memory>
 #include <module-db/queries/messages/sms/QuerySMSGetCount.hpp>
-#include <module-utils/json/json11.hpp>
-#include <purefs/filesystem_paths.hpp>
+#include <json11.hpp>
 
 namespace db
 {
@@ -39,8 +39,8 @@ TEST_CASE("Query interface")
 {
     Database::initialize();
 
-    auto contactsDB      = std::make_unique<ContactsDB>((purefs::dir::getUserDiskPath() / "contacts.db").c_str());
-    auto smsDB           = std::make_unique<SmsDB>((purefs::dir::getUserDiskPath() / "sms.db").c_str());
+    auto contactsDB      = std::make_unique<ContactsDB>((std::filesystem::path{"sys/user"} / "contacts.db").c_str());
+    auto smsDB           = std::make_unique<SmsDB>((std::filesystem::path{"sys/user"} / "sms.db").c_str());
     auto smsInterface    = std::make_unique<SMSRecordInterface>(smsDB.get(), contactsDB.get());
     auto threadInterface = std::make_unique<ThreadRecordInterface>(smsDB.get(), contactsDB.get());
 

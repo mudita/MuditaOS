@@ -1,18 +1,17 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Operation.hpp"
 
 #include <algorithm>
 
+#include "Audio/AudioDevice.hpp"
+#include "Audio/AudioDeviceFactory.hpp"
+
 #include "IdleOperation.hpp"
 #include "PlaybackOperation.hpp"
 #include "RecorderOperation.hpp"
 #include "RouterOperation.hpp"
-
-#include "Audio/BluetoothProxyAudio.hpp"
-
-#include <bsp/audio/bsp_audio.hpp>
 
 namespace audio
 {
@@ -77,8 +76,8 @@ namespace audio
     }
     void Operation::AddProfile(const Profile::Type &profile, const PlaybackType &playback, bool isAvailable)
     {
-        const auto reqVol  = AudioServiceMessage::DbRequest(audio::dbPath(Setting::Volume, playback, profile));
-        const auto reqGain = AudioServiceMessage::DbRequest(audio::dbPath(Setting::Gain, playback, profile));
+        const auto reqVol  = AudioServiceMessage::DbRequest(Setting::Volume, playback, profile);
+        const auto reqGain = AudioServiceMessage::DbRequest(Setting::Gain, playback, profile);
 
         std::optional<audio::Volume> volume;
         std::optional<audio::Gain> gain;
@@ -91,16 +90,16 @@ namespace audio
             gain = utils::getNumericValue<audio::Gain>(val.value());
         }
 
-        supportedProfiles.emplace_back(Profile::Create(profile, nullptr, volume, gain), isAvailable);
+        supportedProfiles.emplace_back(Profile::Create(profile, volume, gain), isAvailable);
     }
-    std::optional<std::unique_ptr<bsp::AudioDevice>> Operation::CreateDevice(bsp::AudioDevice::Type type,
-                                                                             bsp::AudioDevice::audioCallback_t callback)
+
+    std::shared_ptr<AudioDevice> Operation::CreateDevice(const Profile &profile)
     {
-        if (type == bsp::AudioDevice::Type::Bluetooth) {
-            auto audioFormat = currentProfile->GetAudioFormat();
-            return std::make_unique<bsp::BluetoothProxyAudio>(
-                serviceCallback, *dataStreamOut, *dataStreamIn, audioFormat);
-        }
-        return bsp::AudioDevice::Create(type, callback).value_or(nullptr);
+        return factory->CreateDevice(profile);
+    }
+
+    std::shared_ptr<AudioDevice> Operation::createCellularAudioDevice()
+    {
+        return factory->createCellularAudioDevice();
     }
 } // namespace audio

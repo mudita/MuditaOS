@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -19,14 +19,26 @@ namespace drivers
 
         ~RT1051DriverPWM() final;
 
-        void SetDutyCycle(std::uint8_t duty_cycle_percent) final;
+        void SetDutyCycle(std::uint8_t dutyCyclePercent) final;
 
         void Start() final;
 
         void Stop() final;
 
+        void UpdateClockFrequency(std::uint32_t newFrequency) final;
+
+        enum class PwmState
+        {
+            Off,
+            On,
+        };
+
       private:
-        void SetupPWMChannel(PWMChannel channel, std::uint32_t frequency);
+        PwmState GetPwmState();
+
+        void SetupPWMChannel(PWMChannel channel);
+
+        void SetupPWMInstance(std::uint32_t clockFrequency);
 
         void ForceLowOutput();
 
@@ -44,7 +56,7 @@ namespace drivers
 
         std::uint8_t lastDutyCycle = 0;
 
-        cpp_freertos::MutexStandard dutyCycleMutex;
+        cpp_freertos::MutexStandard frequencyChangeMutex;
     };
 
 } // namespace drivers

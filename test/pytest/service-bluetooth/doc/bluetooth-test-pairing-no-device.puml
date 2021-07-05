@@ -1,0 +1,29 @@
+@startuml
+
+partition Initialization {
+    :enforce pretest machine conditions:
+    -inject test data to DB:
+    ** BT device
+    -PurePhone visible state:
+    ** in ApplicationSettings:Bluetooth
+    ** bluetooth turned off;
+}
+partition test-run {
+    : turn BT on;
+    : enter AllDevices;
+if (BT device name displayed) then (yes)
+    : connect;
+else (no = failure)
+stop
+endif
+if (connection-failed window) then (success)
+else (no = failure)
+stop
+endif
+}
+partition post-test-analysis {
+    :on "all device" window:
+    -parse all devices window content
+    -check for BT device name + no connected icon;
+}
+@enduml

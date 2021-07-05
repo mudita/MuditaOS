@@ -3,14 +3,15 @@
 
 #include <algorithm>
 #include "BtKeysStorage.hpp"
+#include <log.hpp>
 
-json11::Json Bt::KeyStorage::keysJson = json11::Json();
-btstack_link_key_db_t Bt::KeyStorage::keyStorage;
-json11::Json::array Bt::KeyStorage::keys;
-std::string Bt::KeyStorage::keysEntry;
-std::shared_ptr<Bluetooth::SettingsHolder> Bt::KeyStorage::settings = nullptr;
+json11::Json bluetooth::KeyStorage::keysJson = json11::Json();
+btstack_link_key_db_t bluetooth::KeyStorage::keyStorage;
+json11::Json::array bluetooth::KeyStorage::keys;
+std::string bluetooth::KeyStorage::keysEntry;
+std::shared_ptr<bluetooth::SettingsHolder> bluetooth::KeyStorage::settings = nullptr;
 
-namespace Bt
+namespace bluetooth
 {
     namespace strings
     {
@@ -39,7 +40,7 @@ namespace Bt
     {
         LOG_INFO("opening storage from API");
         if (settings) {
-            keysEntry = std::visit(Bluetooth::StringVisitor(), settings->getValue(Bluetooth::Settings::BtKeys));
+            keysEntry = std::visit(bluetooth::StringVisitor(), settings->getValue(bluetooth::Settings::BtKeys));
         }
         else {
             LOG_ERROR("failed opening settings for BT!");
@@ -70,8 +71,9 @@ namespace Bt
     auto KeyStorage::getLinkKey(uint8_t *bd_addr, link_key_t link_key, link_key_type_t *type) -> int
     {
         if (type != nullptr && bd_addr != nullptr) {
-            LOG_INFO("getting key for address %s from API", bd_addr_to_str(bd_addr));
-            if (keys.size() == 0) {
+            LOG_INFO("getting key from API");
+            if (keys.empty()) {
+                LOG_ERROR("Keys empty!");
                 return 0;
             }
             for (auto key : keys) {
@@ -80,18 +82,19 @@ namespace Bt
 
                 if (bd_addr_cmp(addr, bd_addr) == 0) {
                     auto foundLinkKey = key[strings::link_key].string_value().c_str();
-                    memcpy(link_key, foundLinkKey, sizeof(link_key_t));
+                    memcpy(link_key, reinterpret_cast<const uint8_t *>(foundLinkKey), sizeof(link_key_t));
+                    LOG_INFO("Getting key: %s", foundLinkKey);
                     *type = static_cast<link_key_type_t>(key[strings::type].int_value());
 
                     return 1;
                 }
+                LOG_ERROR("Can't find key for this address!");
             }
         }
         return 0;
     }
     void KeyStorage::putLinkKey(uint8_t *bd_addr, uint8_t *link_key, link_key_type_t type)
     {
-        LOG_INFO("putting key for address %s from API", bd_addr_to_str(bd_addr));
         auto keyEntry = json11::Json::object{{strings::bd_addr, bd_addr_to_str(bd_addr)},
                                              {strings::link_key, std::string(reinterpret_cast<char *>(link_key))},
                                              {strings::type, type}};
@@ -106,7 +109,7 @@ namespace Bt
     void KeyStorage::deleteLinkKey(uint8_t *bd_addr)
     {
         auto keysSize = keys.size();
-        LOG_INFO("deleting key for address %s from API", bd_addr_to_str(bd_addr));
+        LOG_INFO("deleting key from API");
         auto end = std::remove_if(keys.begin(), keys.end(), [&](auto &key) {
             bd_addr_t addr;
             sscanf_bd_addr(key[strings::bd_addr].string_value().c_str(), addr);
@@ -140,7 +143,7 @@ namespace Bt
         json11::Json finalJson = json11::Json::object{{strings::keys, keys}};
         keysEntry              = finalJson.dump();
         if (settings) {
-            settings->setValue(Bluetooth::Settings::BtKeys, keysEntry);
+            settings->setValue(bluetooth::Settings::BtKeys, keysEntry);
         }
         else {
             LOG_ERROR("failed to open settings to write!");

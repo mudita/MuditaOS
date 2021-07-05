@@ -1,0 +1,7 @@
+#!/bin/bash
+#Date: 2021-04-14 13:31:14
+echo "----"
+echo "$@"
+echo "---"
+[[ "$2" == "-D" ]] && shift 2
+exec /usr/sbin/sshd -D -e $@

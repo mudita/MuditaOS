@@ -1,10 +1,14 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
+#include "Constants.hpp"
 #include "service-time/CalendarTimeEvents.hpp"
+#include "service-time/TimeManager.hpp"
 #include "service-time/ServiceTime.hpp"
+
+#include <service-db/DBServiceName.hpp>
 
 #include <MessageType.hpp>
 #include <Service/Common.hpp>
@@ -12,22 +16,34 @@
 #include <Service/Service.hpp>
 #include <module-db/queries/calendar/QueryEventsEdit.hpp>
 #include <module-db/queries/calendar/QueryEventsGet.hpp>
-#include <module-sys/Service/Timer.hpp>
 
 #include <functional>
 #include <string> // for allocator, string
 
-namespace service::name
+namespace settings
 {
-    inline constexpr auto service_time = "ServiceTime";
-};
+    class Settings;
+}
 
 namespace stm
 {
     class ServiceTime : public sys::Service
     {
       private:
+        static constexpr auto StackDepth = 2048;
         CalendarTimeEvents calendarEvents;
+
+        std::unique_ptr<TimeManager> timeManager;
+
+        std::unique_ptr<settings::Settings> settings;
+
+        void registerMessageHandlers();
+        auto handleSetAutomaticDateAndTimeRequest(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>;
+        auto handleSetTimeFormatRequest(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>;
+        auto handleSetDateFormatRequest(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>;
+        auto handleSetTimezoneRequest(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>;
+        auto handleCellularTimeNotificationMessage(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>;
+        void initStaticData();
 
       public:
         ServiceTime();
@@ -35,9 +51,24 @@ namespace stm
 
         sys::ReturnCodes InitHandler() override;
         sys::ReturnCodes DeinitHandler() override;
+        void ProcessCloseReason(sys::CloseReason closeReason) override;
         sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final;
 
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp = nullptr) override;
     };
 
 } /* namespace stm */
+
+namespace sys
+{
+    template <> struct ManifestTraits<stm::ServiceTime>
+    {
+        static auto GetManifest() -> ServiceManifest
+        {
+            ServiceManifest manifest;
+            manifest.name         = service::name::service_time;
+            manifest.dependencies = {service::name::db};
+            return manifest;
+        }
+    };
+} // namespace sys

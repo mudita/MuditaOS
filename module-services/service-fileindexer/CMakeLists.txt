@@ -1,11 +1,7 @@
-cmake_minimum_required(VERSION 3.12)
-
 project(service-fileindexer VERSION 1.0
 	DESCRIPTION "File indexer service ")
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
-
-target_include_directories( ${PROJECT_NAME} PRIVATE ${TAGLIB_INCLUDE_DIRS} )
 
 # Board specific compilation definitions,options,include directories and features
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
@@ -20,10 +16,19 @@ target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
 target_sources( ${PROJECT_NAME}
 	PRIVATE
 	"ServiceFileIndexer.cpp"
-	"messages/FileChangeMessage.cpp"
 	"StartupIndexer.cpp"
 	"notesIndexer.cpp"
 )
 
 
-target_link_libraries(${PROJECT_NAME} module-bsp module-os module-utils module-vfs module-sys tag )
+target_link_libraries(${PROJECT_NAME} 
+	PUBLIC
+		module-bsp 
+		module-os 
+		module-utils 
+		module-vfs 
+		module-sys 
+		tag
+	PRIVATE
+		utf8
+)

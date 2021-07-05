@@ -57,6 +57,8 @@ namespace drivers
 
         virtual void Stop() = 0;
 
+        virtual void UpdateClockFrequency(std::uint32_t) = 0;
+
       protected:
         PWMInstances instance;
         PWMModules module;

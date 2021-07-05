@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -22,9 +22,10 @@ namespace gui
 
       public:
         SwitchData() = default;
-        SwitchData(const std::string &description) : description{description} {};
+        explicit SwitchData(std::string description) : description{std::move(description)} {};
+
         virtual ~SwitchData() = default;
-        virtual const std::string &getDescription() const
+        [[nodiscard]] virtual const std::string &getDescription() const
         {
             return description;
         };

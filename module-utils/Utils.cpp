@@ -1,46 +1,35 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Utils.hpp"
-#include <purefs/fs/filesystem.hpp>
-#include <crc32/crc32.h>
+
+#include <crc32.h>
+
+#include <ctime>
+#include <filesystem>
 
 namespace utils::filesystem
 {
     namespace
     {
-        inline constexpr auto crc_buf = 1024;
+        inline constexpr auto crc_buf_len = 1024;
     } // namespace
 
-    long int filelength(std::FILE *file) noexcept
+    unsigned long computeFileCRC32(std::FILE *file) noexcept
     {
-        if (file == nullptr) {
-            return 0;
-        }
-        const auto startPosition = std::ftell(file);
-        std::fseek(file, 0, SEEK_END);
-        const auto endPosition = std::ftell(file);
-        std::fseek(file, startPosition, SEEK_SET);
-        return endPosition;
-    }
+        auto buf = std::make_unique<unsigned char[]>(crc_buf_len);
 
-    void computeCRC32(std::FILE *file, unsigned long *outCrc32) noexcept
-    {
-        if (outCrc32 == nullptr)
-            return;
-
-        auto buf = std::make_unique<unsigned char[]>(crc_buf);
-        size_t bufLen;
-
-        *outCrc32 = 0;
-
+        CRC32 digestCrc32;
         while (!std::feof(file)) {
-            bufLen = std::fread(buf.get(), 1, crc_buf, file);
-            if (bufLen <= 0)
+            size_t dataLen = std::fread(buf.get(), 1, crc_buf_len, file);
+            if (dataLen == 0) {
                 break;
+            }
 
-            *outCrc32 = Crc32_ComputeBuf(*outCrc32, buf.get(), bufLen);
+            digestCrc32.add(buf.get(), dataLen);
         }
+
+        return digestCrc32.getHashValue();
     }
 
     std::string generateRandomId(std::size_t length) noexcept
@@ -49,7 +38,7 @@ namespace utils::filesystem
 
         std::random_device random_device;
         std::mt19937 generator(random_device());
-        generator.seed(utils::time::Timestamp().getTime());
+        generator.seed(std::time(nullptr));
         std::uniform_int_distribution<> distribution(0, CHARACTERS.size() - 1);
 
         std::string random_string;
@@ -85,4 +74,29 @@ namespace utils::filesystem
 
         return ret;
     }
+
 } // namespace utils::filesystem
+
+namespace utils
+{
+    std::vector<std::uint8_t> hexToBytes(const std::string &hex)
+    {
+        std::vector<std::uint8_t> bytes;
+
+        for (unsigned int i = 0; i < hex.length(); i += 2) {
+            std::string byteString = hex.substr(i, 2);
+            std::uint8_t byte      = std::stoull(byteString.c_str(), nullptr, 16);
+            bytes.push_back(byte);
+        }
+        return bytes;
+    }
+    std::string bytesToHex(const std::vector<std::uint8_t> &bytes)
+    {
+        std::stringstream s;
+        s.fill('0');
+        for (auto const &b : bytes)
+            s << std::setw(2) << std::hex << (unsigned short)b;
+        return s.str();
+    }
+
+} // namespace utils

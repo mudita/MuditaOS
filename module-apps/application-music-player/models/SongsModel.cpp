@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SongsModel.hpp"
@@ -32,10 +32,11 @@ auto SongsModel::getItem(gui::Order order) -> gui::ListItem *
     return getRecord(order);
 }
 
-void SongsModel::createData(std::vector<audio::Tags> songsList, std::function<bool(const std::string &fileName)> func)
+void SongsModel::createData(const std::vector<audio::Tags> &songsList,
+                            std::function<bool(const std::string &fileName)> func)
 {
-    for (auto song : songsList) {
-        auto item = new gui::SongItem(song.title, song.artist, utils::time::Duration(song.total_duration_s).str());
+    for (const auto &song : songsList) {
+        auto item = new gui::SongItem(song.artist, song.title, utils::time::Duration(song.total_duration_s).str());
 
         item->activatedCallback = [=](gui::Item &) {
             func(song.filePath);
@@ -54,7 +55,7 @@ void SongsModel::createData(std::vector<audio::Tags> songsList, std::function<bo
 
 void SongsModel::clearData()
 {
-    list->clear();
+    list->reset();
 
     list->rebuildList();
 }

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RichTextParser.hpp"
@@ -9,10 +9,10 @@
 #include <sstream>
 #include <string>
 #include <map>
-#include <log/log.hpp>
+#include <log.hpp>
 #include "TextFormat.hpp"
 
-#include <module-utils/pugixml/src/pugixml.hpp>
+#include <pugixml.hpp>
 #include <module-utils/Utils.hpp>
 #include <utility>
 
@@ -223,12 +223,12 @@ namespace text
             for (auto &attr : attrs) {
                 if (attr->is(name)) {
                     if (!attr->visit(format, value)) {
-                        LOG_ERROR("Attribute %s parsing error, default set", name.c_str());
+                        LOG_ERROR("Attribute parsing error, default set");
                     }
                     return true;
                 }
             }
-            LOG_ERROR("Attr: %s not found", name.c_str());
+            LOG_ERROR("Attribute not found");
             return false;
         }
 
@@ -267,7 +267,7 @@ namespace text
                                                                                     : attribute.second);
             }
             catch (const std::out_of_range &) {
-                LOG_ERROR("ShortTextNode: %s not found", nodeName);
+                LOG_ERROR("ShortTextNode not found");
                 return {};
             }
         }
@@ -308,7 +308,7 @@ namespace text
                     std::move(token));
             }
             catch (const std::out_of_range &) {
-                LOG_ERROR("Tokens: %s not found", contentName.c_str());
+                LOG_ERROR("Tokens not found");
             }
             return std::nullopt;
         }
@@ -325,8 +325,8 @@ struct walker : pugi::xml_tree_walker
     std::list<gui::TextFormat> style_stack;
     text::CustomTokens tokens;
 
-    bool add_newline = false;
-    bool adding_tokens = false;
+    bool add_empty_line = false;
+    bool adding_tokens  = false;
 
   public:
     walker(gui::TextFormat entry_style, ::text::CustomTokens::TokenMap &&tokens) : tokens{std::move(tokens)}
@@ -398,8 +398,17 @@ struct walker : pugi::xml_tree_walker
 
     auto push_newline_node(pugi::xml_node &)
     {
-        if (blocks.size() != 0u) {
-            blocks.back().setEnd(gui::TextBlock::End::Newline);
+        if (!blocks.empty()) {
+            if (blocks.back().getEnd() != gui::TextBlock::End::Newline) {
+                blocks.back().setEnd(gui::TextBlock::End::Newline);
+                add_empty_line = false;
+            }
+            else {
+                add_empty_line = true;
+            }
+        }
+        else {
+            add_empty_line = true;
         }
     }
 
@@ -462,7 +471,12 @@ struct walker : pugi::xml_tree_walker
 
     auto pop_newline_node(pugi::xml_node &node)
     {
-        if (blocks.size() != 0u) {
+        if (add_empty_line) {
+            blocks.emplace_back(gui::TextBlock("", std::make_unique<gui::TextFormat>(style_stack.back())));
+            add_empty_line = false;
+        }
+
+        if (!blocks.empty()) {
             blocks.back().setEnd(gui::TextBlock::End::Newline);
         }
     }
@@ -511,7 +525,7 @@ namespace gui::text
         log_parser("parsing: %s", text.c_str());
         if (text.empty() || base_style == nullptr) {
             LOG_ERROR("no: %s", text.empty() ? "text" : "base style");
-            return std::unique_ptr<TextDocument>();
+            return nullptr;
         }
 
         pugi::xml_document doc;

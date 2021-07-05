@@ -1,10 +1,10 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CheckBox.hpp"
 #include "InputEvent.hpp"
 #include "Style.hpp"
-#include "Utils.hpp"
+#include <i18n/i18n.hpp>
 
 namespace gui
 {
@@ -37,10 +37,10 @@ namespace gui
             if (focus) {
                 setFocusItem(image);
                 if (image->visible) {
-                    bottomBarTemporaryMode(utils::localize.get("common_uncheck"));
+                    bottomBarTemporaryMode(utils::translate("common_uncheck"));
                 }
                 else {
-                    bottomBarTemporaryMode(utils::localize.get("common_check"));
+                    bottomBarTemporaryMode(utils::translate("common_check"));
                 }
             }
             else {
@@ -51,29 +51,29 @@ namespace gui
         };
 
         inputCallback = [&](gui::Item &item, const gui::InputEvent &event) {
-            if (event.state != gui::InputEvent::State::keyReleasedShort) {
+            if (!event.isShortRelease()) {
                 return false;
             }
             if (textOnLeft) {
-                if (event.keyCode == gui::KeyCode::KEY_LF) {
+                if (event.is(gui::KeyCode::KEY_LF)) {
                     image->setVisible(!image->visible);
                     if (image->visible) {
-                        bottomBarTemporaryMode(utils::localize.get("common_uncheck"));
+                        bottomBarTemporaryMode(utils::translate("common_uncheck"));
                     }
                     else {
-                        bottomBarTemporaryMode(utils::localize.get("common_check"));
+                        bottomBarTemporaryMode(utils::translate("common_check"));
                     }
                     return true;
                 }
             }
             else {
-                if (event.keyCode == gui::KeyCode::KEY_ENTER) {
+                if (event.is(gui::KeyCode::KEY_ENTER)) {
                     image->setVisible(!image->visible);
                     if (image->visible) {
-                        bottomBarTemporaryMode(utils::localize.get("common_uncheck"));
+                        bottomBarTemporaryMode(utils::translate("common_uncheck"));
                     }
                     else {
-                        bottomBarTemporaryMode(utils::localize.get("common_check"));
+                        bottomBarTemporaryMode(utils::translate("common_check"));
                     }
                     return true;
                 }

@@ -1,22 +1,25 @@
-﻿cmake_minimum_required(VERSION 3.12)
+﻿# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+# For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 project(module-bsp VERSION 1.0
         DESCRIPTION "VFS module library")
 
 set(SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/bsp/cellular/bsp_cellular.cpp"
-		"${CMAKE_CURRENT_SOURCE_DIR}/bsp/audio/bsp_audio.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/bsp/lpm/bsp_lpm.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/drivers/pll/DriverPLL.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/drivers/dmamux/DriverDMAMux.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/drivers/dma/DriverDMA.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/drivers/i2c/DriverI2C.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/drivers/pwm/DriverPWM.cpp"
-        #"${CMAKE_CURRENT_SOURCE_DIR}/drivers/sai/DriverSAI.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/drivers/lpspi/DriverLPSPI.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/drivers/lpuart/DriverLPUART.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/drivers/usdhc/DriverUSDHC.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/drivers/semc/DriverSEMC.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/drivers/gpio/DriverGPIO.cpp"
-        board/linux/lpm/LinuxLPM.cpp board/linux/lpm/LinuxLPM.h
         "${CMAKE_CURRENT_SOURCE_DIR}/bsp/bluetooth/Bluetooth.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/bsp/common.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/devices/Device.cpp"    
         )
 
 if (NOT ${PROJECT_TARGET} STREQUAL "TARGET_Linux")
@@ -71,6 +74,8 @@ target_compile_definitions(${PROJECT_NAME}
         -DFSL_SDK_ENABLE_DRIVER_CACHE_CONTROL=1
         -D__STARTUP_INITIALIZE_NONCACHEDATA
         -D__USE_CMSIS
+        -DDEBUG_VCOM=1
+        -DDEBUG_USB=1
         )
 
 target_include_directories(${PROJECT_NAME}
@@ -82,8 +87,15 @@ target_include_directories(${PROJECT_NAME}
 set_source_files_properties(${BOARD_SOURCE_FILES_PROPERTIES})
 
 target_link_libraries(${PROJECT_NAME}
-    module-os
-    service-bluetooth
-    ${TARGET_LIBRARIES}
+    PUBLIC
+        eventstore
+        module-os
+        service-bluetooth
+        ${TARGET_LIBRARIES}
+    PRIVATE
+        time-constants
 )
 
+if (${ENABLE_TESTS})
+    add_subdirectory(tests)
+endif ()

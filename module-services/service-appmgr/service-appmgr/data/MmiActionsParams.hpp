@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -13,6 +13,11 @@ namespace app::manager::actions
     class MMINoneSpecifiedResult;
     class MMICallForwardingResult;
     class MMICustomResultParams;
+    class MMICallBarringResult;
+    class MMICallWaitingResult;
+    class MMIClipResult;
+    class MMIClirResult;
+    class MMIImeiResult;
 
     class Visitor
     {
@@ -20,6 +25,11 @@ namespace app::manager::actions
         virtual void visit(MMINoneSpecifiedResult &, std::string &)  = 0;
         virtual void visit(MMICallForwardingResult &, std::string &) = 0;
         virtual void visit(MMICustomResultParams &, std::string &)   = 0;
+        virtual void visit(MMICallBarringResult &, std::string &)    = 0;
+        virtual void visit(MMICallWaitingResult &, std::string &)    = 0;
+        virtual void visit(MMIClipResult &, std::string &)           = 0;
+        virtual void visit(MMIClirResult &, std::string &)           = 0;
+        virtual void visit(MMIImeiResult &, std::string &)           = 0;
     };
 
     class IMMICustomResultParams
@@ -30,7 +40,13 @@ namespace app::manager::actions
             NoneSpecified,
             CallForwardingNotification,
             CallForwardingData,
-            Clir
+            Clir,
+            Clip,
+            Imei,
+            CallBarringNotification,
+            CallBarringData,
+            CallWaitingNotification,
+            CallWaitingData
         };
 
         enum class MMIResultMessage
@@ -38,8 +54,19 @@ namespace app::manager::actions
             NoneSpecifiedSuccess,
             NoneSpecifiedFailed,
             CommonFailure,
-            CommonMMINotSupported,
             CommonNoMessage,
+            CommonMMINotSupported,
+            CommonEnabled,
+            CommonDisabled,
+            CommonVoice,
+            CommonData,
+            CommonFax,
+            CommonSync,
+            CommonAsync,
+            CommonAllDisabled,
+            CommonDeactivated,
+            CommonActivated,
+            CommonQuery,
 
             ClirAccordingToSubscription,
             ClirEnabled,
@@ -59,7 +86,19 @@ namespace app::manager::actions
             DisablingFailed,
             EnablingSuccessful,
             EnablingFailed,
-            CallForwardingDisabled
+            CallForwardingDisabled,
+
+            CallBarringActivated,
+            CallBarringDeactivated,
+
+            ClipActivted,
+            ClipDeactivated,
+            ClipNotProvisioned,
+            ClipProvisioned,
+            ClipUnknown,
+
+            CallWaitingActivated,
+            CallWaitingDeactivated,
 
         };
 
@@ -88,7 +127,7 @@ namespace app::manager::actions
       public:
         MMINoneSpecifiedResult() : MMICustomResultParams(MMIType::NoneSpecified)
         {}
-        virtual void accept(Visitor &v, std::string &displayMessage) override;
+        void accept(Visitor &v, std::string &displayMessage) override;
     };
 
     class MMICallForwardingResult : public MMICustomResultParams
@@ -103,7 +142,7 @@ namespace app::manager::actions
         {}
 
         auto getData() const -> std::tuple<std::string, std::string, std::string, std::string>;
-        virtual void accept(Visitor &v, std::string &displayMessage) override;
+        void accept(Visitor &v, std::string &displayMessage) override;
 
       private:
         std::string voice;
@@ -117,6 +156,20 @@ namespace app::manager::actions
       public:
         MMIClirResult() : MMICustomResultParams(MMIType::Clir)
         {}
+        void accept(Visitor &v, std::string &displayMessage) override;
+    };
+
+    class MMICallBarringResult : public MMICustomResultParams
+    {
+      public:
+        explicit MMICallBarringResult(MMIType type) : MMICustomResultParams(type)
+        {}
+        void addMessages(const std::pair<MMIResultMessage, MMIResultMessage> &message) noexcept;
+        auto getMessages(void) noexcept -> std::vector<std::pair<MMIResultMessage, MMIResultMessage>>;
+        void accept(Visitor &v, std::string &displayMessage) override;
+
+      private:
+        std::vector<std::pair<MMIResultMessage, MMIResultMessage>> data;
     };
 
     class MMIParams : public ActionParams
@@ -147,5 +200,40 @@ namespace app::manager::actions
       private:
         MMIResult result;
         std::shared_ptr<MMICustomResultParams> customResult = nullptr;
+    };
+
+    class MMIClipResult : public MMICustomResultParams
+    {
+      public:
+        MMIClipResult() : MMICustomResultParams(MMIType::Clip)
+        {}
+        void accept(Visitor &v, std::string &displayMessage) override;
+    };
+
+    class MMIImeiResult : public MMICustomResultParams
+    {
+      public:
+        explicit MMIImeiResult(const std::string &imei) : MMICustomResultParams(MMIType::Imei), imei(imei)
+        {}
+        explicit MMIImeiResult() : MMICustomResultParams(MMIType::Imei)
+        {}
+        auto getImei() const noexcept -> std::string;
+        void accept(Visitor &v, std::string &displayMessage) override;
+
+      private:
+        std::string imei;
+    };
+
+    class MMICallWaitingResult : public MMICustomResultParams
+    {
+      public:
+        explicit MMICallWaitingResult(const MMIType type) : MMICustomResultParams(type)
+        {}
+        void addMessages(const std::pair<MMIResultMessage, MMIResultMessage> &message);
+        auto getMessages() const noexcept -> std::vector<std::pair<MMIResultMessage, MMIResultMessage>>;
+        void accept(Visitor &v, std::string &displayMessage) override;
+
+      private:
+        std::vector<std::pair<MMIResultMessage, MMIResultMessage>> messages;
     };
 } // namespace app::manager::actions

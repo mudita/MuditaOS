@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NewEditEventWindow.hpp"
@@ -27,36 +27,35 @@ namespace gui
 
         bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
         bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
-        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get(style::strings::common::save));
+        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(style::strings::common::save));
 
         list = new gui::ListView(this,
                                  style::window::calendar::listView_x,
                                  style::window::calendar::listView_y,
                                  style::window::calendar::listView_w,
                                  style::window::calendar::listView_h,
-                                 newEditEventModel);
+                                 newEditEventModel,
+                                 gui::listview::ScrollBarType::PreRendered);
         setFocusItem(list);
     }
 
     void NewEditEventWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
     {
         switch (eventAction) {
-        case EventAction::None:
-            break;
         case EventAction::Add: {
-            setTitle(utils::localize.get("app_calendar_new_event_title"));
+            setTitle(utils::translate("app_calendar_new_event_title"));
             break;
         }
         case EventAction::Edit:
-            setTitle(utils::localize.get("app_calendar_edit_event_title"));
+            setTitle(utils::translate("app_calendar_edit_event_title"));
             break;
         }
 
         if (mode == ShowMode::GUI_SHOW_INIT) {
             auto rec = dynamic_cast<EventRecordData *>(data);
             if (rec != nullptr) {
-                eventRecord    = rec->getData();
+                eventRecord = rec->getData();
             }
             newEditEventModel->loadData(eventRecord);
         }
@@ -77,21 +76,9 @@ namespace gui
             return true;
         }
 
-        if (!inputEvent.isShortPress()) {
-            return false;
-        }
-
-        if (inputEvent.keyCode == gui::KeyCode::KEY_ENTER) {
+        if (inputEvent.isShortRelease(gui::KeyCode::KEY_ENTER)) {
             LOG_DEBUG("Save Event");
-            bool edit = true;
-            if (eventAction == EventAction::Edit) {
-                edit = true;
-            }
-            else if (eventAction == EventAction::Add) {
-                edit = false;
-            }
-
-            newEditEventModel->saveData(eventRecord, edit);
+            newEditEventModel->saveData(eventRecord, eventAction);
             return true;
         }
 

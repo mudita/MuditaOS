@@ -1,7 +1,7 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 #pragma once
-#include <json/json11.hpp>
+#include <json11.hpp>
 #include <string>
 #include <variant>
 #include <service-db/Settings.hpp>
@@ -9,7 +9,7 @@
 #include <module-utils/Utils.hpp>
 #include "SettingsSerializer.hpp"
 
-namespace Bluetooth
+namespace bluetooth
 {
 
     enum class Settings
@@ -18,7 +18,8 @@ namespace Bluetooth
         Visibility,
         State,
         BondedDevices,
-        BtKeys
+        BtKeys,
+        ConnectedDevice
     };
 
     constexpr inline auto trueStr  = "true";
@@ -82,7 +83,8 @@ namespace Bluetooth
         auto getValue(const Settings setting) -> SettingEntry;
         void setValue(const Settings &newSetting, const SettingEntry &value);
         std::function<void()> onStateChange;
-        std::function<void(std::string addr)> onLinkKeyAdded;
+        std::function<void(const std::string &)> onLinkKeyAdded;
+        void deinit();
 
       private:
         static std::map<Settings, std::string> settingString;

@@ -1,9 +1,9 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 #include <module-apps/application-calendar/data/dateCommon.hpp>
-#include "json/json11.hpp"
+#include <json11.hpp>
 #include <memory>
 
 /**
@@ -91,8 +91,8 @@ class Event
 {
     std::string uid;
     std::string summary;
-    calendar::TimePoint dtstart;
-    calendar::TimePoint dtend;
+    TimePoint dtstart;
+    TimePoint dtend;
 
     auto isDate(const std::string &dt) -> bool;
     auto isTime(const std::string &dt) -> bool;
@@ -112,13 +112,13 @@ class Event
     [[nodiscard]] auto dateStringFrom(const std::string &icalDate) const -> std::string;
     [[nodiscard]] auto timeStringFrom(const std::string &icalTime) const -> std::string;
 
-    [[nodiscard]] auto TimePointFromIcalDate(const std::string &icalDateTime) const -> calendar::TimePoint;
-    [[nodiscard]] auto TimePointToIcalDate(const calendar::TimePoint &tp) const -> std::string;
+    [[nodiscard]] auto TimePointFromIcalDate(const std::string &icalDateTime) const -> TimePoint;
+    [[nodiscard]] auto TimePointToIcalDate(const TimePoint &tp) const -> std::string;
 
   public:
     bool isValid = true;
     Event()      = default;
-    Event(const std::string &summary, calendar::TimePoint from, calendar::TimePoint till, const std::string &uid);
+    Event(const std::string &summary, TimePoint from, TimePoint till, const std::string &uid);
 
     void setUID(const std::string &property);
     void setSummary(const std::string &property);
@@ -127,8 +127,8 @@ class Event
 
     [[nodiscard]] auto getUID() const -> std::string;
     [[nodiscard]] auto getSummary() const -> std::string;
-    [[nodiscard]] auto getDTStartTimePoint() const -> calendar::TimePoint;
-    [[nodiscard]] auto getDTEndTimePoint() const -> calendar::TimePoint;
+    [[nodiscard]] auto getDTStartTimePoint() const -> TimePoint;
+    [[nodiscard]] auto getDTEndTimePoint() const -> TimePoint;
 
     [[nodiscard]] auto getDTStartString() const -> std::string;
     [[nodiscard]] auto getDTEndString() const -> std::string;

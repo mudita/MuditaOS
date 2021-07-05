@@ -8,7 +8,7 @@
 namespace purefs::fs
 {
 
-    auto filesystem_operations::mount(fsmount mnt) noexcept -> int
+    auto filesystem_operations::mount(fsmount mnt, const void *data) noexcept -> int
     {
         ++m_mount_count;
         return -ENOTSUP;

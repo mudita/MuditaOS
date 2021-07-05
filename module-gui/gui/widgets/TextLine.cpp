@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TextLine.hpp"
@@ -45,6 +45,7 @@ namespace gui
             auto text = localCursor.getUTF8Text();
 
             if (text.length() == 0 && localCursor.checkCurrentBlockNoNewLine() && !localCursor.atEnd()) {
+                setLineStartConditions(localCursor.getBlockNumber(), localCursor.getPosition());
                 localCursor.goToNextBlock();
                 continue;
             }

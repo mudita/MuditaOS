@@ -6,10 +6,10 @@
 #include "application-settings-new/models/QuotesModel.hpp"
 
 #include <SwitchData.hpp>
-#include <json/json11.hpp>
+#include <json11.hpp>
 #include <utility>
 
-namespace app
+namespace Quotes
 {
     class QuotesModel;
 };
@@ -26,7 +26,7 @@ namespace gui
     class QuoteSwitchData : public gui::SwitchData
     {
       public:
-        QuoteSwitchData(QuoteAction action, app::QuoteRecord quote = {}) : action(action), quote(std::move(quote))
+        QuoteSwitchData(QuoteAction action, Quotes::QuoteRecord quote = {}) : action(action), quote(std::move(quote))
         {}
 
         [[nodiscard]] auto getQuote() const
@@ -40,6 +40,6 @@ namespace gui
 
       private:
         QuoteAction action;
-        app::QuoteRecord quote;
+        Quotes::QuoteRecord quote;
     };
 } // namespace gui

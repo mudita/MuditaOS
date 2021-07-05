@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /*
@@ -12,17 +12,23 @@
 #define SYSTEMMANAGER_SYSTEMMANAGER_HPP_
 
 #include <functional>
+#include <stdexcept>
 #include "thread.hpp"
 #include "condition_variable.hpp"
 #include "mutex.hpp"
 #include "Service/Mailbox.hpp"
-#include "Service/Bus.hpp"
 #include "Service/Service.hpp"
-#include "Service/Message.hpp"
+#include "Service/ServiceCreator.hpp"
+#include "Timers/TimerHandle.hpp"
 #include "PowerManager.hpp"
+#include "PhoneModes/Subject.hpp"
+#include <common_data/RawKey.hpp>
 #include "Constants.hpp"
 #include "CpuStatistics.hpp"
+#include "DeviceManager.hpp"
 #include <chrono>
+#include <vector>
+#include <apps-common/Application.hpp>
 
 namespace sys
 {
@@ -31,22 +37,37 @@ namespace sys
         using namespace std::chrono_literals;
         inline constexpr std::chrono::milliseconds timerInitInterval{30s};
         inline constexpr std::chrono::milliseconds timerPeriodInterval{100ms};
+        inline constexpr auto restoreTimeout{5000};
     } // namespace constants
+
+    class PhoneModeRequest; // Forward declaration
+    class TetheringStateRequest; // Forward declaration
+    class TetheringEnabledResponse; // Forward declaration
 
     enum class Code
     {
         CloseSystem,
+        Update,
+        Restore,
         Reboot,
         None,
+    };
+
+    class SystemInitialisationError : public std::runtime_error
+    {
+      public:
+        using std::runtime_error::runtime_error;
     };
 
     class SystemManagerCmd : public DataMessage
     {
       public:
-        SystemManagerCmd(Code type = Code::None) : DataMessage(BusChannels::SystemManagerRequests), type(type)
+        explicit SystemManagerCmd(Code type = Code::None, CloseReason closeReason = CloseReason::RegularPowerDown)
+            : DataMessage(BusChannel::SystemManagerRequests), type(type), closeReason(closeReason)
         {}
 
         Code type;
+        CloseReason closeReason;
     };
 
     class SystemManager : public Service
@@ -60,30 +81,48 @@ namespace sys
             Suspend,
             Shutdown,
             ShutdownReady,
-            Reboot,
+            Reboot
         } state = State::Running;
+
+        explicit SystemManager(std::vector<std::unique_ptr<BaseServiceCreator>> &&creators);
+        ~SystemManager() override;
+
         void set(enum State state);
-        SystemManager(TickType_t pingInterval);
 
-        ~SystemManager();
+        void initialize();
 
-        void StartSystem(InitFunction init);
+        void StartSystem(InitFunction sysInit, InitFunction appSpaceInit);
 
         // Invoke system close procedure
         static bool CloseSystem(Service *s);
 
+        static bool Update(Service *s, const std::string &updateOSVer, const std::string &currentOSVer);
+
+        static bool Restore(Service *s);
+
         static bool Reboot(Service *s);
+
+        static void storeOsVersion(Service *s, const std::string &updateOSVer, const std::string &currentOSVer);
 
         static bool SuspendService(const std::string &name, Service *caller);
 
         static bool ResumeService(const std::string &name, Service *caller);
 
-        // Create new service
-        static bool CreateService(std::shared_ptr<Service> service, Service *caller, TickType_t timeout = 5000);
+        /// Runs a service
+        static bool RunSystemService(std::shared_ptr<Service> service, Service *caller, TickType_t timeout = 5000);
+        /// Runs an application
+        static bool RunApplication(std::shared_ptr<app::Application> app, Service *caller, TickType_t timeout = 5000);
 
         /// Destroy existing service
         /// @note there is no fallback
-        static bool DestroyService(const std::string &name, Service *caller, TickType_t timeout = 5000);
+        static bool DestroySystemService(const std::string &name, Service *caller);
+        /// Destroy existing application
+        static bool DestroyApplication(const std::string &name, Service *caller);
+
+        /// Translates a slider state into a phone mode.
+        /// \param key  Slider button state
+        /// \return Phone mode.
+        static phone_modes::PhoneMode translateSliderState(const RawKey &key);
 
         /// Kill service
         /// @note - this is final, it straight takes service, calls it's close callback and it's gone
@@ -105,19 +144,37 @@ namespace sys
             return ReturnCodes::Success;
         }
 
-        ReturnCodes SwitchPowerModeHandler(const ServicePowerMode mode) override final
+        ReturnCodes SwitchPowerModeHandler(const ServicePowerMode mode) final
         {
             return ReturnCodes::Success;
         }
 
         void Run() override;
 
+        void StartSystemServices();
+
+        static bool RunService(std::shared_ptr<Service> service, Service *caller, TickType_t timeout = 5000);
+        static bool RequestServiceClose(const std::string &name, Service *caller, TickType_t timeout = 5000);
+
+        template <typename T> void DestroyServices(const T &whitelist);
         /// Sysmgr stores list of all active services but some of them are under control of parent services.
         /// Parent services ought to manage lifetime of child services hence we are sending DestroyRequests only to
         /// parents.
         /// It closes all workers except EventManager -as it needs information from Eventmanager that it's safe to
         /// shutdown
-        void CloseSystemHandler();
+        void CloseSystemHandler(CloseReason closeReason = CloseReason::RegularPowerDown);
+
+        void CloseServices();
+
+        void preCloseRoutine(CloseReason closeReason);
+
+        void postStartRoutine();
+
+        void readyToCloseHandler(Message *msg);
+
+        void UpdateSystemHandler();
+
+        void RestoreSystemHandler();
 
         void RebootHandler();
 
@@ -132,20 +189,38 @@ namespace sys
         /// periodic update of cpu statistics
         void CpuStatisticsTimerHandler();
 
-        TickType_t pingInterval;
-        uint32_t pingPongTimerID;
+        /// used for power management control for the filesystem
+        void UpdateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyHz newFrequency);
+
+        MessagePointer handlePhoneModeRequest(PhoneModeRequest *request);
+        MessagePointer handleTetheringStateRequest(TetheringStateRequest *request);
+        MessagePointer enableTethering(TetheringEnabledResponse *response);
+
+        void batteryCriticalLevelAction(bool charging);
+        void batteryNormalLevelAction();
+        void batteryShutdownLevelAction();
+
         bool cpuStatisticsTimerInit{false};
 
+        std::vector<std::unique_ptr<BaseServiceCreator>> systemServiceCreators;
+        sys::TimerHandle cpuStatisticsTimer;
+        sys::TimerHandle servicesPreShutdownRoutineTimeout;
+        sys::TimerHandle lowBatteryShutdownDelay;
+        std::unique_ptr<phone_modes::Subject> phoneModeSubject;
         InitFunction userInit;
+        InitFunction systemInit;
+        std::vector<std::string> readyForCloseRegister;
 
-        std::unique_ptr<sys::Timer> cpuStatisticsTimer;
+        std::shared_ptr<sys::CpuSentinel> cpuSentinel;
 
         static std::vector<std::shared_ptr<Service>> servicesList;
-        static cpp_freertos::MutexStandard destroyMutex;
+        static std::vector<std::shared_ptr<app::Application>> applicationsList;
+        static cpp_freertos::MutexStandard serviceDestroyMutex;
+        static cpp_freertos::MutexStandard appDestroyMutex;
         static std::unique_ptr<PowerManager> powerManager;
         static std::unique_ptr<CpuStatistics> cpuStatistics;
+        static std::unique_ptr<DeviceManager> deviceManager;
     };
-
 } // namespace sys
 
 inline const char *c_str(sys::SystemManager::State state)

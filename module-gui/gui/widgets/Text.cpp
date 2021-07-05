@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <iterator>
@@ -15,7 +15,7 @@
 #include "TextDocument.hpp"
 #include "TextLine.hpp"
 #include "TextParse.hpp"
-#include "log/log.hpp"
+#include <log.hpp>
 #include "utf8/UTF8.hpp"
 #include <Style.hpp>
 #include <cassert>
@@ -155,18 +155,20 @@ namespace gui
         drawLines();
     }
 
-    void Text::setRichText(const UTF8 &text)
+    void Text::setRichText(const UTF8 &text, text::RichTextParser::TokenMap &&tokenMap)
     {
         setText("");
-        addRichText(text);
+        addRichText(text, std::move(tokenMap));
     }
 
-    void Text::addRichText(const UTF8 &text)
+    void Text::addRichText(const UTF8 &text, text::RichTextParser::TokenMap &&tokenMap)
     {
-        auto tmp_document = text::RichTextParser().parse(text, &format);
-        if (tmp_document->isEmpty()) {
+        auto tmp_document = text::RichTextParser().parse(text, &format, std::move(tokenMap));
+
+        if (!tmp_document || tmp_document->isEmpty()) {
+
             debug_text("Nothing to parse/parser error in rich text: %s", text.c_str());
-            addText(text); // fallback
+            return addText(text); // fallback
         }
         for (auto block : tmp_document->getBlockCursor(0)) {
             *cursor << block;
@@ -177,6 +179,7 @@ namespace gui
     void Text::clear()
     {
         buildDocument("");
+        onTextChanged();
     }
 
     bool Text::isEmpty()
@@ -203,8 +206,12 @@ namespace gui
     void Text::setFont(const UTF8 &fontName)
     {
         RawFont *newFont = FontManager::getInstance().getFont(fontName);
-        format.setFont(newFont);
-        buildCursor();
+
+        if (format.getFont() != newFont) {
+            format.setFont(newFont);
+            buildCursor();
+            drawLines();
+        }
     }
 
     void Text::setFont(RawFont *font)
@@ -307,7 +314,7 @@ namespace gui
 
     auto Text::getSizeMinusPadding(Axis axis, Area val) -> Length
     {
-        auto size = area(val).size(axis);
+        int size = area(val).size(axis);
 
         if (size <= padding.getSumInAxis(axis)) {
             size = 0;
@@ -450,7 +457,7 @@ namespace gui
 
     auto Text::handleRotateInputMode(const InputEvent &inputEvent) -> bool
     {
-        if (mode != nullptr && inputEvent.isShortPress() && inputEvent.keyCode == gui::KeyCode::KEY_AST) {
+        if (mode != nullptr && inputEvent.isShortRelease(gui::KeyCode::KEY_AST)) {
             mode->next();
             return true;
         }
@@ -467,7 +474,7 @@ namespace gui
 
     auto Text::handleSelectSpecialChar(const InputEvent &inputEvent) -> bool
     {
-        if (mode != nullptr && inputEvent.isLongPress() && inputEvent.keyCode == gui::KeyCode::KEY_AST) {
+        if (mode != nullptr && inputEvent.isLongRelease() && inputEvent.is(gui::KeyCode::KEY_AST)) {
             mode->select_special_char();
             return true;
         }
@@ -476,12 +483,12 @@ namespace gui
 
     auto Text::handleActivation(const InputEvent &inputEvent) -> bool
     {
-        return inputEvent.isShortPress() && inputEvent.is(KeyCode::KEY_AST) && Rect::onActivated(nullptr);
+        return inputEvent.isShortRelease(KeyCode::KEY_AST) && Rect::onActivated(nullptr);
     }
 
     auto Text::handleNavigation(const InputEvent &inputEvent) -> bool
     {
-        if (!inputEvent.isShortPress()) {
+        if (!inputEvent.isShortRelease()) {
             return false;
         }
 
@@ -525,7 +532,7 @@ namespace gui
         if (!isMode(EditMode::Edit)) {
             return false;
         }
-        if (inputEvent.isShortPress() && inputEvent.is(key_signs_remove)) {
+        if (inputEvent.isShortRelease(key_signs_remove)) {
 
             setCursorStartPosition(CursorStartPosition::Offset);
 
@@ -539,11 +546,11 @@ namespace gui
 
     bool Text::handleAddChar(const InputEvent &inputEvent)
     {
-        if (!inputEvent.isShortPress() || !isMode(EditMode::Edit)) {
+        if (!inputEvent.isShortRelease() || !isMode(EditMode::Edit)) {
             return false;
         }
 
-        auto code = translator.handle(inputEvent.key, mode ? mode->get() : "");
+        auto code = translator.handle(inputEvent.getRawKey(), mode ? mode->get() : "");
 
         if (code != Profile::none_key && checkAdditionBounds(code) == AdditionBound::CanAddAll) {
 
@@ -569,14 +576,15 @@ namespace gui
 
     bool Text::handleDigitLongPress(const InputEvent &inputEvent)
     {
-        if (!inputEvent.isLongPress()) {
+        if (!inputEvent.isLongRelease()) {
             return false;
         }
 
-        auto val = toNumeric(inputEvent.keyCode);
+        if (!inputEvent.isDigit()) {
+            return false;
+        }
 
-        if (val != InvalidNumericKeyCode && checkAdditionBounds(val) == AdditionBound::CanAddAll) {
-
+        if (const auto val = inputEvent.numericValue(); checkAdditionBounds(val) == AdditionBound::CanAddAll) {
             setCursorStartPosition(CursorStartPosition::Offset);
             addChar(intToAscii(val));
             onTextChanged();
@@ -904,7 +912,7 @@ namespace gui
     TextBackup Text::backupText() const
     {
         return TextBackup{std::list<TextBlock>(document->getBlocks().begin(), document->getBlocks().end()),
-                          cursor->getOnScreenPosition()};
+                          cursor->getAbsolutePosition()};
     }
 
     void Text::restoreFrom(const TextBackup &backup)

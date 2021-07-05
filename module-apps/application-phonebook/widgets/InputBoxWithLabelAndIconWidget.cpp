@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "InputBoxWithLabelAndIconWidget.hpp"
@@ -66,15 +66,11 @@ namespace gui
         applyItemNameSpecificSettings();
 
         setEdges(gui::RectangleEdge::None);
-    }
 
-    auto InputBoxWithLabelAndIconWidget::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
-        -> bool
-    {
-        hBox->setPosition(0, 0);
-        hBox->setSize(newDim.w, newDim.h);
-
-        return true;
+        dimensionChangedCallback = [&](gui::Item &, const BoundingBox &newDim) -> bool {
+            hBox->setArea({0, 0, newDim.w, newDim.h});
+            return true;
+        };
     }
 
     void InputBoxWithLabelAndIconWidget::applyItemNameSpecificSettings()
@@ -100,7 +96,7 @@ namespace gui
 
     void InputBoxWithLabelAndIconWidget::speedDialKeyHandler()
     {
-        descriptionLabel->setText(utils::localize.get("app_phonebook_new_speed_dial_key"));
+        descriptionLabel->setText(utils::translate("app_phonebook_new_speed_dial_key"));
         iconImage->set("speed_dial_empty_W_M");
 
         focusChangedCallback = [&](gui::Item &item) {
@@ -114,14 +110,14 @@ namespace gui
         };
 
         inputCallback = [&](gui::Item &item, const gui::InputEvent &event) {
-            if (event.state != gui::InputEvent::State::keyReleasedShort) {
+            if (!event.isShortRelease()) {
                 return false;
             }
-            if (toNumeric(event.keyCode) != -1) {
-                inputBoxLabel->setText(std::to_string(toNumeric(event.keyCode)));
+            if (event.isDigit()) {
+                inputBoxLabel->setText(std::to_string(event.numericValue()));
                 return true;
             }
-            if (event.keyCode == KeyCode::KEY_PND) {
+            if (event.is(KeyCode::KEY_PND)) {
                 inputBoxLabel->clear();
                 return true;
             }
@@ -134,7 +130,7 @@ namespace gui
 
     void InputBoxWithLabelAndIconWidget::addToFavouritesHandler()
     {
-        descriptionLabel->setText(utils::localize.get("app_phonebook_new_add_to_fav"));
+        descriptionLabel->setText(utils::translate("app_phonebook_new_add_to_fav"));
         iconImage->set("small_heart_W_M");
         tickImage->set("small_tick_W_M");
 
@@ -142,10 +138,10 @@ namespace gui
             if (focus) {
                 setFocusItem(inputBoxLabel);
                 if (tickImage->visible) {
-                    bottomBarTemporaryMode(utils::localize.get("app_phonebook_uncheck"));
+                    bottomBarTemporaryMode(utils::translate("app_phonebook_uncheck"));
                 }
                 else {
-                    bottomBarTemporaryMode(utils::localize.get("app_phonebook_check"));
+                    bottomBarTemporaryMode(utils::translate("app_phonebook_check"));
                 }
             }
             else {
@@ -156,16 +152,13 @@ namespace gui
         };
 
         inputCallback = [&](gui::Item &item, const gui::InputEvent &event) {
-            if (event.state != gui::InputEvent::State::keyReleasedShort) {
-                return false;
-            }
-            if (event.keyCode == gui::KeyCode::KEY_LF) {
+            if (event.isShortRelease(gui::KeyCode::KEY_LF)) {
                 tickImage->setVisible(!tickImage->visible);
                 if (tickImage->visible) {
-                    bottomBarTemporaryMode(utils::localize.get("app_phonebook_uncheck"));
+                    bottomBarTemporaryMode(utils::translate("app_phonebook_uncheck"));
                 }
                 else {
-                    bottomBarTemporaryMode(utils::localize.get("app_phonebook_check"));
+                    bottomBarTemporaryMode(utils::translate("app_phonebook_check"));
                 }
                 hBox->resizeItems();
                 return true;
@@ -180,7 +173,7 @@ namespace gui
     }
     void InputBoxWithLabelAndIconWidget::addToICEHandler()
     {
-        descriptionLabel->setText(utils::localize.get("app_phonebook_new_add_to_ice"));
+        descriptionLabel->setText(utils::translate("app_phonebook_new_add_to_ice"));
         iconImage->set("ice");
         tickImage->set("small_tick_W_M");
 
@@ -188,10 +181,10 @@ namespace gui
             if (focus) {
                 setFocusItem(inputBoxLabel);
                 if (tickImage->visible) {
-                    bottomBarTemporaryMode(utils::localize.get("app_phonebook_uncheck"));
+                    bottomBarTemporaryMode(utils::translate("app_phonebook_uncheck"));
                 }
                 else {
-                    bottomBarTemporaryMode(utils::localize.get("app_phonebook_check"));
+                    bottomBarTemporaryMode(utils::translate("app_phonebook_check"));
                 }
             }
             else {
@@ -202,17 +195,13 @@ namespace gui
         };
 
         inputCallback = [&](gui::Item &item, const gui::InputEvent &event) {
-            if (event.state != gui::InputEvent::State::keyReleasedShort) {
-                return false;
-            }
-
-            if (event.keyCode == gui::KeyCode::KEY_LF) {
+            if (event.isShortRelease(gui::KeyCode::KEY_LF)) {
                 tickImage->setVisible(!tickImage->visible);
                 if (tickImage->visible) {
-                    bottomBarTemporaryMode(utils::localize.get("app_phonebook_uncheck"));
+                    bottomBarTemporaryMode(utils::translate("app_phonebook_uncheck"));
                 }
                 else {
-                    bottomBarTemporaryMode(utils::localize.get("app_phonebook_check"));
+                    bottomBarTemporaryMode(utils::translate("app_phonebook_check"));
                 }
                 hBox->resizeItems();
                 return true;

@@ -6,34 +6,41 @@ add_catch2_executable(
     NAME
         db
     SRCS
-        "${CMAKE_CURRENT_SOURCE_DIR}/unittest.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/tests-main.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/SMSTable_tests.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/ThreadsTable_tests.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/ContactsTable_tests.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/ContactsNameTable_tests.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/ContactsNumberTable_tests.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/ContactsRingtonesTable_tests.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/ContactsAddressTable_tests.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/ContactGroups_tests.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/AlarmsTable_tests.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/SMSTemplateTable_tests.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/CalllogTable_tests.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/NotificationsTable_tests.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/EventsTable_tests.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/NotesRecord_tests.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/NotesTable_tests.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/CalllogRecord_tests.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/ContactsRecord_tests.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/SMSRecord_tests.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/ThreadRecord_tests.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/AlarmsRecord_tests.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/SMSTemplateRecord_tests.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/NotificationsRecord_tests.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/EventsRecord_tests.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/QueryInterface.cpp"
+        AlarmsRecord_tests.cpp
+        AlarmsTable_tests.cpp
+        CalllogRecord_tests.cpp
+        CalllogTable_tests.cpp
+        ContactGroups_tests.cpp
+        ContactsAddressTable_tests.cpp
+        ContactsNameTable_tests.cpp
+        ContactsNumberTable_tests.cpp
+        ContactsRecord_tests.cpp
+        ContactsRingtonesTable_tests.cpp
+        ContactsTable_tests.cpp
+        DbInitializer.cpp
+        EventsRecord_tests.cpp
+        #EventsTable_tests.cpp
+        NotesRecord_tests.cpp
+        NotesTable_tests.cpp
+        NotificationsRecord_tests.cpp
+        NotificationsTable_tests.cpp
+        QueryInterface.cpp
+        SMSRecord_tests.cpp
+        SMSTable_tests.cpp
+        SMSTemplateRecord_tests.cpp
+        SMSTemplateTable_tests.cpp
+        ThreadRecord_tests.cpp
+        ThreadsTable_tests.cpp
+        tests-main.cpp
+        common.cpp
         
     LIBS
+        module-sys
+        iosyscalls
         module-db
-        module-vfs
+        json::json
+    DEPS
+        assets
+        PurePhone-disk-img
 )
+add_subdirectory(test-initializer)

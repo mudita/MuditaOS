@@ -17,6 +17,7 @@
 #include "Audio/Audio.hpp"
 #include "Audio/Operation/Operation.hpp"
 
+using namespace audio;
 
 TEST_CASE("Test audio tags")
 {
@@ -66,6 +67,50 @@ TEST_CASE("Audio settings string creation")
     {
         const auto str = audio::dbPath(audio::Setting::Volume, audio::PlaybackType::None, audio::Profile::Type::Idle);
         REQUIRE(str.empty());
+    }
+
+    SECTION("System settings change")
+    {
+        struct TestCase
+        {
+            PlaybackType playbackType;
+            Setting setting;
+            std::string path;
+        };
+
+        std::vector<TestCase> testCases = {
+            // system volume
+            {PlaybackType::System, Setting::Volume, "audio/RecordingBuiltInMic/Notifications/Volume"},
+            {PlaybackType::Meditation, Setting::Volume, "audio/RecordingBuiltInMic/Notifications/Volume"},
+            {PlaybackType::CallRingtone, Setting::Volume, "audio/RecordingBuiltInMic/Notifications/Volume"},
+            {PlaybackType::KeypadSound, Setting::Volume, "audio/RecordingBuiltInMic/Notifications/Volume"},
+            {PlaybackType::TextMessageRingtone, Setting::Volume, "audio/RecordingBuiltInMic/Notifications/Volume"},
+            {PlaybackType::Notifications, Setting::Volume, "audio/RecordingBuiltInMic/Notifications/Volume"},
+            // other types volume
+            {PlaybackType::Alarm, Setting::Volume, "audio/RecordingBuiltInMic/Alarm/Volume"},
+            {PlaybackType::Multimedia, Setting::Volume, "audio/RecordingBuiltInMic/Multimedia/Volume"},
+            {PlaybackType::None, Setting::Volume, "audio/RecordingBuiltInMic/Volume"},
+
+            // EnableSound
+            {PlaybackType::System, Setting::EnableSound, "audio/RecordingBuiltInMic/Notifications/EnableSound"},
+            {PlaybackType::Meditation, Setting::EnableSound, "audio/RecordingBuiltInMic/Meditation/EnableSound"},
+            {PlaybackType::CallRingtone, Setting::EnableSound, "audio/RecordingBuiltInMic/CallRingtone/EnableSound"},
+            {PlaybackType::KeypadSound, Setting::EnableSound, "audio/RecordingBuiltInMic/KeypadSound/EnableSound"},
+            {PlaybackType::TextMessageRingtone,
+             Setting::EnableSound,
+             "audio/RecordingBuiltInMic/TextMessageRingtone/EnableSound"},
+            {PlaybackType::Notifications, Setting::EnableSound, "audio/RecordingBuiltInMic/Notifications/EnableSound"},
+            {PlaybackType::Alarm, Setting::EnableSound, "audio/RecordingBuiltInMic/Alarm/EnableSound"},
+            {PlaybackType::Multimedia, Setting::EnableSound, "audio/RecordingBuiltInMic/Multimedia/EnableSound"},
+            {PlaybackType::None, Setting::EnableSound, "audio/RecordingBuiltInMic/EnableSound"},
+        };
+
+        for (auto &testCase : testCases) {
+            const auto str =
+                audio::dbPath(testCase.setting, testCase.playbackType, audio::Profile::Type::RecordingBuiltInMic);
+            REQUIRE_FALSE(str.empty());
+            REQUIRE(str == testCase.path);
+        }
     }
 }
 
@@ -239,9 +284,11 @@ TEST_CASE("Test AudioMux")
         std::vector<AudioMux::Input> audioInputs;
         AudioMux aMux(audioInputs);
 
-        auto testPlaybackTypeLowPrio  = PlaybackType::Multimedia;
-        auto testPlaybackTypeMidPrio  = PlaybackType::Notifications;
+        auto testPlaybackTypeLowPrio  = PlaybackType::Alarm;
+        auto testPlaybackTypeMidPrio  = PlaybackType::Multimedia;
         auto testPlaybackTypeHighPrio = PlaybackType::CallRingtone;
+
+        auto mergableType = PlaybackType::Notifications;
 
         GIVEN("One Input")
         {
@@ -270,9 +317,8 @@ TEST_CASE("Test AudioMux")
             }
             WHEN("Should merge due to same mergable type active")
             {
-                tkId = insertAudio(
-                    audioInputs, Audio::State::Playback, testPlaybackTypeMidPrio, Operation::State::Idle, tokenIdx);
-                auto retInput = aMux.GetAvailableInput(testPlaybackTypeMidPrio);
+                tkId = insertAudio(audioInputs, Audio::State::Playback, mergableType, Operation::State::Idle, tokenIdx);
+                auto retInput = aMux.GetAvailableInput(mergableType);
                 REQUIRE(retInput == std::nullopt);
             }
         }
@@ -314,9 +360,8 @@ TEST_CASE("Test AudioMux")
             }
             WHEN("Should merge due to same mergable type active")
             {
-                insertAudio(
-                    audioInputs, Audio::State::Playback, testPlaybackTypeMidPrio, Operation::State::Idle, tokenIdx);
-                auto retInput = aMux.GetAvailableInput(testPlaybackTypeMidPrio);
+                insertAudio(audioInputs, Audio::State::Playback, mergableType, Operation::State::Idle, tokenIdx);
+                auto retInput = aMux.GetAvailableInput(mergableType);
                 REQUIRE(retInput == std::nullopt);
             }
             WHEN("Should merge due to same mergable type active even if Idle available")

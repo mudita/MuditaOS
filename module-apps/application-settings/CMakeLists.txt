@@ -21,18 +21,19 @@ target_sources( ${PROJECT_NAME}
         windows/BtScanWindow.cpp
         windows/UITestWindow.cpp
         windows/Info.cpp
-        windows/SimSelectWindow.cpp
-        windows/DateTimeWindow.cpp
         windows/CellularPassthroughWindow.cpp
         windows/FotaWindow.cpp
         windows/Fota.cpp
         windows/EinkModeWindow.cpp
+        windows/ColorTestWindow.cpp
+        widgets/ColorTestListItem.cpp
+        widgets/ColorTestListView.cpp
+        models/ColorTestModel.cpp
 
     PUBLIC
         ApplicationSettings.hpp
         windows/SettingsMainWindow.hpp
         windows/LanguageWindow.hpp
-        windows/DateTimeWindow.hpp
 )
 
 add_dependencies(${PROJECT_NAME} version)
@@ -42,4 +43,6 @@ target_link_libraries(${PROJECT_NAME}
         service-bluetooth
         service-evtmgr
         service-fota
+    PUBLIC
+        eventstore
 )

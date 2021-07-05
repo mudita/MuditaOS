@@ -1,34 +1,40 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <vfs.hpp>
-#include <filesystem>
+#include "common.hpp"
+
+#include <Database/Database.hpp>
+#include <Databases/AlarmsDB.hpp>
+#include <Tables/AlarmsTable.hpp>
 
 #include <catch2/catch.hpp>
 
-#include "Database/Database.hpp"
-#include "Databases/AlarmsDB.hpp"
-#include "Tables/AlarmsTable.hpp"
-
 #include <algorithm>
-
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
-#include <purefs/filesystem_paths.hpp>
+#include <filesystem>
 
 TEST_CASE("Alarms Table tests")
 {
     Database::initialize();
 
-    const auto alarmsPath = (purefs::dir::getUserDiskPath() / "alarms.db").c_str();
-    std::filesystem::remove(alarmsPath);
+    const auto alarmsPath = (std::filesystem::path{"sys/user"} / "alarms.db");
+    RemoveDbFiles(alarmsPath.stem());
 
-    AlarmsDB alarmsDb(alarmsPath);
+    AlarmsDB alarmsDb(alarmsPath.c_str());
     REQUIRE(alarmsDb.isInitialized());
 
     auto &alarmsTbl = alarmsDb.alarms;
     REQUIRE(alarmsTbl.count() == 0);
+
+    REQUIRE(alarmsTbl.add(
+        AlarmsTableRow(1, TimePointFromString("2020-11-11 15:10:00"), 0, AlarmStatus::Off, 0, "file.mp3")));
+    REQUIRE(alarmsTbl.add(
+        AlarmsTableRow(2, TimePointFromString("2020-11-11 15:15:00"), 1, AlarmStatus::On, 1, "file2.mp3")));
+
+    REQUIRE(alarmsTbl.count() == 2);
+    REQUIRE(alarmsTbl.countByFieldId("status", 0) == 1);
 
     SECTION("Default Constructor")
     {
@@ -39,14 +45,6 @@ TEST_CASE("Alarms Table tests")
         REQUIRE(test.repeat == 0);
         REQUIRE(test.path == "");
     }
-
-    REQUIRE(alarmsTbl.add(
-        AlarmsTableRow(1, TimePointFromString("2020-11-11 15:10:00"), 0, AlarmStatus::Off, 0, "file.mp3")));
-    REQUIRE(alarmsTbl.add(
-        AlarmsTableRow(2, TimePointFromString("2020-11-11 15:15:00"), 1, AlarmStatus::On, 1, "file2.mp3")));
-
-    REQUIRE(alarmsTbl.count() == 2);
-    REQUIRE(alarmsTbl.countByFieldId("status", 0) == 1);
 
     SECTION("Get entry by ID")
     {
@@ -139,11 +137,11 @@ TEST_CASE("Alarms Table tests")
         REQUIRE(alarmsTbl.add(
             AlarmsTableRow(5, TimePointFromString("2020-12-11 07:15:00"), 1, AlarmStatus::On, 1, "file2.mp3")));
 
-        const std::array<calendar::TimePoint, 5> paramTime{TimePointFromString("2020-12-11 07:15:00"),
-                                                           TimePointFromString("2020-11-11 15:10:00"),
-                                                           TimePointFromString("2020-11-11 15:15:00"),
-                                                           TimePointFromString("2020-11-12 17:10:00"),
-                                                           TimePointFromString("2020-11-11 19:25:00")};
+        const std::array<TimePoint, 5> paramTime{TimePointFromString("2020-12-11 07:15:00"),
+                                                 TimePointFromString("2020-11-11 15:10:00"),
+                                                 TimePointFromString("2020-11-11 15:15:00"),
+                                                 TimePointFromString("2020-11-12 17:10:00"),
+                                                 TimePointFromString("2020-11-11 19:25:00")};
 
         REQUIRE(alarmsTbl.count() == 5);
         auto entries   = alarmsTbl.getLimitOffset(0, 5);

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -8,39 +8,25 @@
 #include <Interface/SMSTemplateRecord.hpp>
 #include <Interface/SMSRecord.hpp>
 #include <PhoneNumber.hpp>
+#include "Constants.hpp"
 
 namespace gui
 {
     // fw declarations
     class OptionWindow;
     class Text;
-    namespace name
-    {
-        namespace window
-        {
-            inline constexpr auto dialog_yes_no     = "DialogYesNo";
-            inline constexpr auto dialog_confirm    = "DialogConfirm";
-            inline constexpr auto dialog            = "Dialog";
-            inline constexpr auto new_sms           = "NewSMS";
-            inline constexpr auto thread_sms_search = "SMSSearch";
-            inline constexpr auto sms_templates     = "SMSTemplates";
-            inline constexpr auto thread_view       = "ThreadViewWindow";
-
-        }; // namespace window
-    };     // namespace name
-};         // namespace gui
+} // namespace gui
 
 namespace app
 {
 
-    inline constexpr auto name_messages = "ApplicationMessages";
-
     class ApplicationMessages : public app::Application, public app::AsyncCallbackReceiver
     {
       public:
-        ApplicationMessages(std::string name                    = name_messages,
-                            std::string parent                  = {},
-                            StartInBackground startInBackground = {false});
+        explicit ApplicationMessages(std::string name                    = name_messages,
+                                     std::string parent                  = {},
+                                     sys::phone_modes::PhoneMode mode    = sys::phone_modes::PhoneMode::Connected,
+                                     StartInBackground startInBackground = {false});
 
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
@@ -63,7 +49,9 @@ namespace app
         bool sendSms(const utils::PhoneNumber::View &number, const UTF8 &body);
         bool resendSms(const SMSRecord &record);
         bool newMessageOptions(const std::string &requestingWindow, gui::Text *text);
-        bool showNotification(std::function<bool()> action, bool ignoreCurrentWindowOnStack = false);
+        bool showNotification(std::function<bool()> action,
+                              const std::string &notification,
+                              bool ignoreCurrentWindowOnStack = false);
         bool handleSendSmsFromThread(const utils::PhoneNumber::View &number, const UTF8 &body);
 
         std::pair<SMSRecord, bool> createDraft(const utils::PhoneNumber::View &number, const UTF8 &body);
@@ -81,7 +69,12 @@ namespace app
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {
-            return {{manager::actions::Launch, manager::actions::CreateSms, manager::actions::ShowSmsTemplates}};
+            return {{manager::actions::Launch,
+                     manager::actions::CreateSms,
+                     manager::actions::ShowSmsTemplates,
+                     manager::actions::SmsRejectNoSim,
+                     manager::actions::SMSRejectedByOfflineNotification,
+                     manager::actions::PhoneModeChanged}};
         }
     };
 } /* namespace app */

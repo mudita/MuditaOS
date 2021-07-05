@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-cellular/RequestFactory.hpp"
@@ -6,7 +6,7 @@
 #include <re2/re2.h>
 
 #include <at/Commands.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 
 #include "service-cellular/requests/CallRequest.hpp"
 #include "service-cellular/requests/SupplementaryServicesRequest.hpp"
@@ -14,10 +14,18 @@
 #include "service-cellular/requests/PinChangeRequest.hpp"
 #include "service-cellular/requests/ImeiRequest.hpp"
 #include "service-cellular/requests/UssdRequest.hpp"
+#include "service-cellular/requests/RejectRequest.hpp"
+
+#include <EventStore.hpp>
+#include <cmd/QECCNUM.hpp>
 
 namespace cellular
 {
-    RequestFactory::RequestFactory(const std::string &data) : request(data)
+    RequestFactory::RequestFactory(const std::string &data,
+                                   at::BaseChannel &channel,
+                                   cellular::api::CallMode callMode,
+                                   bool simInserted)
+        : request(data), channel(channel), callMode(callMode), simInserted(simInserted)
     {
         registerRequest(ImeiRegex, ImeiRequest::create);
         registerRequest(PasswordRegistrationRegex, PasswordRegistrationRequest::create);
@@ -32,8 +40,39 @@ namespace cellular
         requestMap.emplace_back(std::make_pair(regex, callback));
     }
 
+    std::unique_ptr<IRequest> RequestFactory::emergencyCheck()
+    {
+        at::cmd::QECCNUM cmd;
+        auto qeccnumResult   = channel.cmd(cmd);
+        auto qeccnumResponse = cmd.parse(qeccnumResult);
+
+        auto isSimEmergency =
+            std::find(qeccnumResponse.eccNumbersSim.begin(), qeccnumResponse.eccNumbersSim.end(), request) !=
+            qeccnumResponse.eccNumbersSim.end();
+        auto isNoSimEmergency =
+            std::find(qeccnumResponse.eccNumbersNoSim.begin(), qeccnumResponse.eccNumbersNoSim.end(), request) !=
+            qeccnumResponse.eccNumbersNoSim.end();
+
+        if (isSimEmergency || isNoSimEmergency) {
+            if (simInserted || isNoSimEmergency) {
+                return std::make_unique<CallRequest>(request);
+            }
+            else {
+                return std::make_unique<RejectRequest>(RejectRequest::RejectReason::NoSim, request);
+            }
+        }
+        else if (callMode == cellular::api::CallMode::Emergency) {
+            return std::make_unique<RejectRequest>(RejectRequest::RejectReason::NotAnEmergencyNumber, request);
+        }
+        return nullptr;
+    }
+
     std::unique_ptr<IRequest> RequestFactory::create()
     {
+        if (auto req = emergencyCheck(); req) {
+            return req;
+        }
+
         std::string groupA, groupB, groupC, groupD, groupE, groupF;
         GroupMatch matchPack = {groupA, groupB, groupC, groupD, groupE, groupF};
 
@@ -75,6 +114,10 @@ namespace cellular
                     LOG_ERROR("Failed to create MMI request. Error message:\n%s", except.what());
                 }
             }
+        }
+
+        if (!simInserted) {
+            return std::make_unique<RejectRequest>(RejectRequest::RejectReason::NoSim, request);
         }
         return std::make_unique<CallRequest>(request);
     }

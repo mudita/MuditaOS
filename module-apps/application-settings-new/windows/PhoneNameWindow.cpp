@@ -1,21 +1,19 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhoneNameWindow.hpp"
 #include "application-settings-new/ApplicationSettings.hpp"
+#include "application-settings-new/data/PhoneNameData.hpp"
 #include "widgets/InputBox.hpp"
 
-#include <service-bluetooth/Constants.hpp>
-#include <service-bluetooth/messages/DeviceName.hpp>
-#include <service-bluetooth/messages/SetDeviceName.hpp>
-
 #include <Utils.hpp>
-#include <application-settings-new/data/PhoneNameData.hpp>
 
 namespace gui
 {
     PhoneNameWindow::PhoneNameWindow(app::Application *app) : AppWindow(app, gui::window::name::phone_name)
     {
+        bluetoothSettingsModel = std::make_unique<BluetoothSettingsModel>(application);
+        bluetoothSettingsModel->requestDeviceName();
         buildInterface();
     }
 
@@ -23,23 +21,27 @@ namespace gui
     {
         AppWindow::buildInterface();
 
-        setTitle(utils::localize.get("app_settings_bluetooth_phone_name"));
+        setTitle(utils::translate("app_settings_bluetooth_phone_name"));
 
-        inputField = inputBox(this, utils::localize.get("app_settings_bluetooth_phone_name"));
+        inputField = inputBox(this, utils::translate("app_settings_bluetooth_phone_name"));
         bottomBar->setActive(BottomBar::Side::LEFT, false);
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
 
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::save));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
-
-        sys::Bus::SendUnicast(
-            std::make_shared<::message::bluetooth::RequestDeviceName>(), service::name::bluetooth, application);
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::save));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
         setFocusItem(inputField);
     }
 
-    void PhoneNameWindow::onBeforeShow(ShowMode mode, SwitchData *data)
+    void PhoneNameWindow::destroyInterface()
+    {
+        AppWindow::destroyInterface();
+        erase(inputField);
+        inputField = nullptr;
+    }
+
+    void PhoneNameWindow::onBeforeShow(ShowMode /*mode*/, SwitchData *data)
     {
         inputField->clear();
         if (const auto newData = dynamic_cast<PhoneNameData *>(data); data != nullptr) {
@@ -53,13 +55,8 @@ namespace gui
             return true;
         }
 
-        if (!inputEvent.isShortPress()) {
-            return false;
-        }
-
-        if (inputEvent.is(gui::KeyCode::KEY_ENTER) && !inputField->isEmpty()) {
-            auto result = std::make_shared<::message::bluetooth::SetDeviceName>(inputField->getText());
-            sys::Bus::SendUnicast(std::move(result), service::name::bluetooth, application);
+        if (inputEvent.isShortRelease(gui::KeyCode::KEY_ENTER) && !inputField->isEmpty()) {
+            bluetoothSettingsModel->setDeviceName(inputField->getText());
             return true;
         }
 

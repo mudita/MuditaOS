@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ListItem.hpp"
-#include <log/log.hpp>
+#include <log.hpp>
 #include <Style.hpp>
 
 namespace gui
@@ -18,4 +18,10 @@ namespace gui
 
         type = ItemType::LIST_ITEM;
     }
+
+    void ListItem::accept(GuiVisitor &visitor)
+    {
+        visitor.visit(*this);
+    }
+
 } /* namespace gui */

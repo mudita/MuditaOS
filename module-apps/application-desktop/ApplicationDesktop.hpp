@@ -1,59 +1,35 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include "windows/Names.hpp"
-#include "widgets/PinLockHandler.hpp"
-
+#include "widgets/DBNotificationsHandler.hpp"
+#include "Constants.hpp"
 #include <Application.hpp>
 #include <Service/Message.hpp>
-#include <service-cellular/CellularMessage.hpp>
-#include <service-db/DBNotificationMessage.hpp>
-#include <module-db/queries/notifications/QueryNotificationsGetAll.hpp>
-#include <endpoints/update/UpdateMuditaOS.hpp>
-#include <service-desktop/ServiceDesktop.hpp>
 #include <service-desktop/DesktopMessages.hpp>
 
-namespace cellular
+namespace cellular::msg::notification
 {
-    class StateChange;
+    class ModemStateChanged;
+}
+
+namespace gui
+{
+    class NotificationsModel;
 }
 
 namespace app
 {
-    inline constexpr auto name_desktop = "ApplicationDesktop";
-
-    class ApplicationDesktop : public Application
+    class ApplicationDesktop : public Application, public AsyncCallbackReceiver
     {
       public:
-        bool need_sim_select = false;
-        struct Notifications
-        {
-            struct Counters
-            {
-                unsigned int SMS   = 0;
-                unsigned int Calls = 0;
+        explicit ApplicationDesktop(std::string name                    = name_desktop,
+                                    std::string parent                  = {},
+                                    sys::phone_modes::PhoneMode mode    = sys::phone_modes::PhoneMode::Connected,
+                                    StartInBackground startInBackground = {false});
 
-                auto areEmpty()
-                {
-                    return Calls == 0 && SMS == 0;
-                }
-            };
-
-            Counters notSeen;
-            Counters notRead;
-
-            bool batteryLowLevel = false;
-
-        } notifications;
-
-        gui::PinLockHandler lockHandler;
-
-        ApplicationDesktop(std::string name                    = name_desktop,
-                           std::string parent                  = {},
-                           StartInBackground startInBackground = {false});
-        virtual ~ApplicationDesktop();
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
         sys::ReturnCodes DeinitHandler() override;
@@ -66,31 +42,28 @@ namespace app
         void destroyUserInterface() override;
         // if there is modem notification and there is no default SIM selected, then we need to select if when unlock is
         // done
-        bool handle(db::NotificationMessage *msg);
-        bool handle(cellular::StateChange *msg);
-        auto handle(db::query::notifications::GetAllResult *msg) -> bool;
+        void handle(cellular::msg::notification::ModemStateChanged *msg);
         auto handle(sdesktop::UpdateOsMessage *msg) -> bool;
-        auto handle(sdesktop::developerMode::ScreenlockCheckEvent *event) -> bool;
-        /**
-         * This static method will be used to lock the phone
-         */
-        //	static bool messageLockPhone( sys::Service* sender, std::string application , const gui::InputEvent& event
-        //);
-        bool showCalls();
-        bool clearCallsNotification();
-        bool clearMessagesNotification();
-        bool requestNotSeenNotifications();
-        bool requestNotReadNotifications();
-        unsigned int getLockPassHash() const noexcept
+        void handleNotificationsChanged(std::unique_ptr<gui::SwitchData> notificationsParams) override;
+
+        std::string getOsUpdateVersion() const
         {
-            return lockPassHash;
+            return osUpdateVersion;
         }
+        std::string getOsCurrentVersion() const
+        {
+            return osCurrentVersion;
+        }
+        void setOsUpdateVersion(const std::string &value);
 
       private:
-        void activeSimChanged(std::string value);
-        void lockPassHashChanged(std::string value);
+        bool refreshMenuWindow();
         void handleLowBatteryNotification(manager::actions::ActionParamsPtr &&data);
-        unsigned int lockPassHash = 0;
+        void osUpdateVersionChanged(const std::string &value);
+        void osCurrentVersionChanged(const std::string &value);
+        std::string osUpdateVersion{updateos::initSysVer};
+        std::string osCurrentVersion{updateos::initSysVer};
+        DBNotificationsHandler dbNotificationHandler;
     };
 
     template <> struct ManifestTraits<ApplicationDesktop>
@@ -98,17 +71,15 @@ namespace app
         static auto GetManifest() -> manager::ApplicationManifest
         {
             return {{manager::actions::Launch,
-                     manager::actions::RequestPin,
-                     manager::actions::RequestPuk,
-                     manager::actions::RequestPinChange,
-                     manager::actions::UnlockSim,
-                     manager::actions::BlockSim,
+                     manager::actions::AutoLock,
                      manager::actions::ShowMMIResponse,
                      manager::actions::ShowMMIPush,
                      manager::actions::ShowMMIResult,
-                     manager::actions::DisplayCMEError,
-                     manager::actions::DisplayLowBatteryNotification,
-                     manager::actions::SystemBrownout}};
+                     manager::actions::DisplayLowBatteryScreen,
+                     manager::actions::SystemBrownout,
+                     manager::actions::DisplayLogoAtExit,
+                     manager::actions::PhoneModeChanged,
+                     manager::actions::NotificationsChanged}};
         }
     };
 

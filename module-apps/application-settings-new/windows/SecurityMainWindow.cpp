@@ -1,6 +1,8 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include <locks/widgets/Lock.hpp>
+#include <locks/data/LockData.hpp>
 #include "application-settings-new/ApplicationSettings.hpp"
 #include "application-settings-new/data/ChangePasscodeData.hpp"
 #include "module-apps/application-desktop/windows/Names.hpp"
@@ -9,47 +11,43 @@
 
 namespace gui
 {
-    SecurityMainWindow::SecurityMainWindow(app::Application *app)
-        : BaseSettingsWindow(app, window::name::security), lockScreenPasscodeIsOn(app->isLockScreenPasscodeOn())
+    SecurityMainWindow::SecurityMainWindow(app::Application *app) : BaseSettingsWindow(app, window::name::security)
     {}
+
+    void SecurityMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
+    {
+        isPhoneLockEnabled = application->isPhoneLockEnabled();
+        BaseSettingsWindow::onBeforeShow(mode, data);
+    }
 
     auto SecurityMainWindow::buildOptionsList() -> std::list<Option>
     {
         std::list<Option> optionList;
 
         optionList.emplace_back(std::make_unique<option::OptionSettings>(
-            utils::translateI18("app_settings_security_lock_screen_passcode"),
+            utils::translate("app_settings_security_phone_lock"),
             [=](Item &item) {
-                lockScreenPasscodeIsOn = !lockScreenPasscodeIsOn;
-                LOG_INFO("switching to %s page", window::name::change_passcode);
-                auto data = lockScreenPasscodeIsOn
-                                ? std::make_unique<ChangePasscodeData>(ChangePasscodeAction::OnlyProvideNewPasscode)
-                                : std::make_unique<ChangePasscodeData>(ChangePasscodeAction::OnlyCheckCurrentPasscode);
-                application->switchWindow(window::name::change_passcode, std::move(data));
+                isPhoneLockEnabled ? application->getPhoneLockSubject().disablePhoneLock()
+                                   : application->getPhoneLockSubject().enablePhoneLock();
                 return true;
             },
             [=](Item &item) {
                 if (item.focus) {
-                    this->setBottomBarText(utils::localize.get(style::strings::common::Switch),
-                                           BottomBar::Side::CENTER);
+                    this->setBottomBarText(utils::translate(style::strings::common::Switch), BottomBar::Side::CENTER);
                 }
                 else {
-                    this->setBottomBarText(utils::localize.get(style::strings::common::select),
-                                           BottomBar::Side::CENTER);
+                    this->setBottomBarText(utils::translate(style::strings::common::select), BottomBar::Side::CENTER);
                 }
                 return true;
             },
             nullptr,
-            lockScreenPasscodeIsOn ? option::SettingRightItem::On : option::SettingRightItem::Off));
+            isPhoneLockEnabled ? option::SettingRightItem::On : option::SettingRightItem::Off));
 
-        if (lockScreenPasscodeIsOn) {
+        if (isPhoneLockEnabled) {
             optionList.emplace_back(std::make_unique<option::OptionSettings>(
-                utils::translateI18("app_settings_security_change_passcode"),
+                utils::translate("app_settings_security_change_phone_lock"),
                 [=](Item &item) {
-                    LOG_INFO("switching to %s page", window::name::change_passcode);
-                    application->switchWindow(
-                        window::name::change_passcode,
-                        std::make_unique<ChangePasscodeData>(ChangePasscodeAction::ChangeCurrentPasscode));
+                    application->getPhoneLockSubject().changePhoneLock();
                     return true;
                 },
                 nullptr,

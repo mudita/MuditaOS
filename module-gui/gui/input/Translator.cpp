@@ -1,8 +1,8 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Translator.hpp"
-#include "log/log.hpp"
+#include <log.hpp>
 #include <algorithm>
 #include <filesystem>
 #include "i18n/i18n.hpp"
@@ -21,7 +21,7 @@ namespace gui
         if (key.state == RawKey::State::Released && prev_key_press.key_code == key.key_code) {
             // determine long press
             if (key.time_release - prev_key_press.time_press >= key_time_longpress_ms) {
-                evt.state = InputEvent::State::keyReleasedLong;
+                evt.setState(InputEvent::State::keyReleasedLong);
             }
         }
     }
@@ -30,10 +30,10 @@ namespace gui
     {
         gui::InputEvent evt(key);
         if (key.state == RawKey::State::Pressed) {
-            evt.state = InputEvent::State::keyPressed;
+            evt.setState(InputEvent::State::keyPressed);
         }
         else if (key.state == RawKey::State::Released) {
-            evt.state = InputEvent::State::keyReleasedShort;
+            evt.setState(InputEvent::State::keyReleasedShort);
         }
         recon_long_press(evt, key, prev_key_press, key_time_longpress_ms);
         // store last key press/release
@@ -137,6 +137,15 @@ namespace gui
         case bsp::KeyCodes::SSwitchMid:
             return gui::KeyCode::SWITCH_MID;
             break;
+        case bsp::KeyCodes::HeadsetOk:
+            return gui::KeyCode::HEADSET_OK;
+
+        case bsp::KeyCodes::HeadsetVolUp:
+            return gui::KeyCode::HEADSET_VOLUP;
+
+        case bsp::KeyCodes::HeadsetVolDown:
+            return gui::KeyCode::HEADSET_VOLDN;
+
         default:
             LOG_ERROR("Unhandled bsp key!");
             return gui::KeyCode::KEY_UNDEFINED;
@@ -148,24 +157,17 @@ namespace gui
         auto evt = KeyBaseTranslation::set(key);
         // when last action timed out we don't want to handle key release
         if (prev_key_timedout && key.state == RawKey::State::Released) {
-            evt.state         = InputEvent::State::Undefined;
+            evt.setState(InputEvent::State::Undefined);
             prev_key_timedout = false;
         }
-        evt.keyCode = getKeyCode(key.key_code);
+        evt.setKeyCode(getKeyCode(key.key_code));
         return evt;
     }
 
     InputEvent KeyInputSimpleTranslation::translate(uint32_t timeout)
     {
-        RawKey key;
-        key.state        = RawKey::State::Released;
-        key.key_code     = prev_key_press.key_code;
-        key.time_press   = 0;
-        key.time_release = timeout;
-        InputEvent evt(key);
-        evt.state   = InputEvent::State::keyReleasedLong;
-        evt.keyCode = getKeyCode(key.key_code);
-        return evt;
+        RawKey key{RawKey::State::Released, prev_key_press.key_code, 0, timeout};
+        return InputEvent{key, InputEvent::State::keyReleasedLong, getKeyCode(key.key_code)};
     }
 
     uint32_t KeyInputMappedTranslation::handle(RawKey key, const std::string &keymap)
@@ -206,11 +208,9 @@ namespace gui
     std::vector<std::string> Profiles::getProfilesNames()
     {
         std::vector<std::string> profilesNames;
-        LOG_INFO("Scanning %s profiles folder: %s",
-                 utils::files::jsonExtension,
-                 utils::localize.InputLanguageDirPath.c_str());
+        LOG_INFO("Scanning %s profiles folder: %s", utils::files::jsonExtension, utils::getInputLanguagePath().c_str());
 
-        for (const auto &entry : std::filesystem::directory_iterator(utils::localize.InputLanguageDirPath)) {
+        for (const auto &entry : std::filesystem::directory_iterator(utils::getInputLanguagePath())) {
             profilesNames.push_back(std::filesystem::path(entry.path().stem()));
         }
 
@@ -242,7 +242,7 @@ namespace gui
         std::vector<std::string> profilesNames = getProfilesNames();
         for (const auto &profileName : profilesNames) {
             if (!profileName.empty()) {
-                auto filePath = utils::localize.InputLanguageDirPath / (profileName + utils::files::jsonExtension);
+                auto filePath = utils::getInputLanguagePath() / (profileName + utils::files::jsonExtension);
                 loadProfile(filePath);
             }
         }
@@ -263,7 +263,7 @@ namespace gui
 
     Profile &Profiles::get(const std::string &name)
     {
-        std::filesystem::path filepath = utils::localize.InputLanguageDirPath / (name + utils::files::jsonExtension);
+        std::filesystem::path filepath = utils::getInputLanguagePath() / (name + utils::files::jsonExtension);
         // if profile not in profile map -> load
         if (filepath.empty()) {
             LOG_ERROR("Request for nonexistent profile: %s", filepath.c_str());

@@ -6,7 +6,7 @@
 #include "Text.hpp"
 #include "TextBlockCursor.hpp"
 #include "TextDocument.hpp"
-#include "log/log.hpp"
+#include <log.hpp>
 #include "TextLine.hpp"
 #include <cassert>
 #include <RawFont.hpp>
@@ -214,6 +214,20 @@ namespace gui
             return true;
         }
         return false;
+    }
+
+    auto TextCursor::getAbsolutePosition() const -> unsigned int
+    {
+        auto pos     = 0U;
+        auto blockNo = 0U;
+        for (const auto &block : document->getBlocks()) {
+            if (blockNo == getBlockNumber()) {
+                break;
+            }
+            pos += block.length();
+            blockNo++;
+        }
+        return pos + BlockCursor::getPosition();
     }
 
 } // namespace gui

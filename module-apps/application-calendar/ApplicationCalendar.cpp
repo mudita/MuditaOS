@@ -1,24 +1,26 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationCalendar.hpp"
 #include "DialogMetadataMessage.hpp"
-#include "windows/CalendarMainWindow.hpp"
-#include "windows/DayEventsWindow.hpp"
-#include "windows/CalendarEventsOptionsWindow.hpp"
-#include "windows/AllEventsWindow.hpp"
-#include "windows/EventDetailWindow.hpp"
-#include "windows/NewEditEventWindow.hpp"
-#include "windows/CustomRepeatWindow.hpp"
-#include "windows/EventReminderWindow.hpp"
 #include "NoEvents.hpp"
 #include "Dialog.hpp"
-#include <time/time_conversion.hpp>
-#include <module-db/queries/calendar/QueryEventsAdd.hpp>
 
+#include <application-calendar/windows/CalendarMainWindow.hpp>
+#include <application-calendar/windows/DayEventsWindow.hpp>
+#include <application-calendar/windows/CalendarEventsOptionsWindow.hpp>
+#include <application-calendar/windows/AllEventsWindow.hpp>
+#include <application-calendar/windows/EventDetailWindow.hpp>
+#include <application-calendar/windows/NewEditEventWindow.hpp>
+#include <application-calendar/windows/CustomRepeatWindow.hpp>
+#include <application-calendar/windows/EventReminderWindow.hpp>
+#include <apps-common/messages/DialogMetadataMessage.hpp>
+#include <module-db/queries/calendar/QueryEventsAdd.hpp>
 #include <service-db/DBServiceAPI.hpp>
 #include <service-db/QueryMessage.hpp>
 #include <service-db/DBNotificationMessage.hpp>
+
+#include <ctime>
 
 namespace app
 {
@@ -44,15 +46,16 @@ namespace app
 
     ApplicationCalendar::ApplicationCalendar(std::string name,
                                              std::string parent,
+                                             sys::phone_modes::PhoneMode mode,
                                              StartInBackground startInBackground,
                                              uint32_t stackDepth,
                                              sys::ServicePriority priority)
-        : Application(name, parent, startInBackground, stackDepth, priority)
+        : Application(name, parent, mode, startInBackground, stackDepth, priority)
     {
-        busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
+        bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         addActionReceiver(manager::actions::ShowReminder, [this](auto &&data) {
             switchWindow(style::window::calendar::name::event_reminder_window, std::move(data));
-            return msgHandled();
+            return actionHandled();
         });
     }
 
@@ -95,8 +98,7 @@ namespace app
 
     sys::ReturnCodes ApplicationCalendar::InitHandler()
     {
-        utils::time::Timestamp timestamp;
-        applicationStartTime = timestamp.getTime();
+        applicationStartTime = std::time(nullptr);
         auto ret             = Application::InitHandler();
         createUserInterface();
         return ret;
@@ -142,12 +144,18 @@ namespace app
         windowsFactory.attach(event_reminder_window, [](Application *app, const std::string &name) {
             return std::make_unique<gui::EventReminderWindow>(app, event_reminder_window);
         });
+        windowsFactory.attach(gui::window::name::dialog_confirm, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::DialogConfirm>(app, name);
+        });
+
+        attachPopups(
+            {gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes, gui::popup::ID::PhoneLock});
     }
 
     void ApplicationCalendar::destroyUserInterface()
     {}
 
-    void ApplicationCalendar::switchToNoEventsWindow(const std::string &title, const calendar::TimePoint &dateFilter)
+    void ApplicationCalendar::switchToNoEventsWindow(const std::string &title, const TimePoint &dateFilter)
     {
         if (equivalentWindow == EquivalentWindow::DayEventsWindow) {
             popToWindow(gui::name::window::main_window);
@@ -155,28 +163,29 @@ namespace app
         if (equivalentWindow == EquivalentWindow::AllEventsWindow) {
             popToWindow(gui::name::window::main_window);
         }
-        gui::DialogMetadata meta;
-        meta.text   = utils::localize.get("app_calendar_no_events_information");
-        meta.title  = title;
-        meta.icon   = "phonebook_empty_grey_circle_W_G";
-        meta.action = [=]() -> bool {
-            LOG_DEBUG("Switch to new event window");
-            std::unique_ptr<EventRecordData> eventData = std::make_unique<EventRecordData>();
-            eventData->setDescription(style::window::calendar::new_event);
-            auto event       = std::make_shared<EventsRecord>();
-            event->date_from = dateFilter;
-            event->date_till = dateFilter + std::chrono::hours(style::window::calendar::time::max_hour_24H_mode) +
-                               std::chrono::minutes(style::window::calendar::time::max_minutes);
-            eventData->setData(event);
-
-            switchWindow(
-                style::window::calendar::name::new_edit_event, gui::ShowMode::GUI_SHOW_INIT, std::move(eventData));
-            return true;
-        };
 
         LOG_DEBUG("Switch to no events window");
-        switchWindow(style::window::calendar::name::no_events_window,
-                     std::make_unique<gui::DialogMetadataMessage>(meta));
+
+        auto metaData = std::make_unique<gui::DialogMetadataMessage>(gui::DialogMetadata{
+            title,
+            "phonebook_empty_grey_circle_W_G",
+            utils::translate("app_calendar_no_events_information"),
+            "",
+            [=]() -> bool {
+                LOG_DEBUG("Switch to new event window");
+                auto event       = std::make_shared<EventsRecord>();
+                event->date_from = dateFilter;
+                event->date_till = dateFilter + std::chrono::hours(utils::time::Locale::max_hour_24H_mode) +
+                                   std::chrono::minutes(utils::time::Locale::max_minutes);
+
+                auto eventData = std::make_unique<EventRecordData>(std::move(event));
+                eventData->setDescription(style::window::calendar::new_event);
+                switchWindow(
+                    style::window::calendar::name::new_edit_event, gui::ShowMode::GUI_SHOW_INIT, std::move(eventData));
+                return true;
+            }});
+
+        switchWindow(style::window::calendar::name::no_events_window, std::move(metaData));
     }
 
 } /* namespace app */

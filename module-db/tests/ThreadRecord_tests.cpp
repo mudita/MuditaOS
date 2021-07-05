@@ -1,44 +1,44 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
+#include "common.hpp"
+
+#include <Database/Database.hpp>
+#include <Databases/ContactsDB.hpp>
+#include <Databases/SmsDB.hpp>
+#include <Interface/ContactRecord.hpp>
+#include <Interface/SMSRecord.hpp>
+#include <Interface/ThreadRecord.hpp>
+#include <queries/messages/threads/QueryThreadMarkAsRead.hpp>
+#include <queries/messages/threads/QueryThreadsSearchForList.hpp>
+#include <queries/messages/threads/QueryThreadGetByID.hpp>
+#include <queries/messages/threads/QueryThreadGetByContactID.hpp>
+#include <queries/messages/threads/QueryThreadGetByNumber.hpp>
+#include <queries/messages/threads/QueryThreadRemove.hpp>
+#include <queries/messages/threads/QueryThreadsGet.hpp>
+#include <queries/messages/sms/QuerySMSGetLastByThreadID.hpp>
 
 #include <catch2/catch.hpp>
 
-#include "Database/Database.hpp"
-#include "Databases/ContactsDB.hpp"
-#include "Databases/SmsDB.hpp"
-#include "Interface/ContactRecord.hpp"
-#include "Interface/SMSRecord.hpp"
-#include "Interface/ThreadRecord.hpp"
-#include "queries/messages/threads/QueryThreadMarkAsRead.hpp"
-#include "queries/messages/threads/QueryThreadsSearchForList.hpp"
-#include "queries/messages/threads/QueryThreadGetByID.hpp"
-#include "queries/messages/threads/QueryThreadGetByContactID.hpp"
-#include "queries/messages/threads/QueryThreadGetByNumber.hpp"
-#include "queries/messages/threads/QueryThreadRemove.hpp"
-#include "queries/messages/threads/QueryThreadsGet.hpp"
-#include "queries/messages/sms/QuerySMSGetLastByThreadID.hpp"
-#include <vfs.hpp>
-#include <purefs/filesystem_paths.hpp>
-
 #include <algorithm>
-
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
+#include <filesystem>
 
 TEST_CASE("Thread Record tests")
 {
     Database::initialize();
 
-    const auto contactsPath = (purefs::dir::getUserDiskPath() / "contacts.db").c_str();
-    const auto smsPath      = (purefs::dir::getUserDiskPath() / "sms.db").c_str();
-    std::filesystem::remove(contactsPath);
-    std::filesystem::remove(smsPath);
+    const auto contactsPath = (std::filesystem::path{"sys/user"} / "contacts.db");
+    const auto smsPath      = (std::filesystem::path{"sys/user"} / "sms.db");
+    RemoveDbFiles(contactsPath.stem());
+    RemoveDbFiles(smsPath.stem());
 
-    auto smsDB = std::make_unique<SmsDB>(smsPath);
-    REQUIRE(smsDB->isInitialized());
-    auto contactsDB = std::make_unique<ContactsDB>(contactsPath);
-    REQUIRE(contactsDB->isInitialized());
+    SmsDB smsDB(smsPath.c_str());
+    REQUIRE(smsDB.isInitialized());
+    ContactsDB contactsDB(contactsPath.c_str());
+    REQUIRE(contactsDB.isInitialized());
 
     const uint32_t dateTest      = 123456789;
     const char *snippetTest      = "Test snippet";
@@ -46,13 +46,19 @@ TEST_CASE("Thread Record tests")
     const SMSType typeTest       = SMSType ::UNKNOWN;
     const uint32_t contactIDTest = 100;
 
-    ThreadRecordInterface threadRecordInterface1(smsDB.get(), contactsDB.get());
+    ThreadRecordInterface threadRecordInterface1(&smsDB, &contactsDB);
 
     ThreadRecord recordIN;
     recordIN.date      = dateTest;
     recordIN.snippet   = snippetTest;
     recordIN.type      = typeTest;
     recordIN.contactID = contactIDTest;
+
+    const auto threadRecords = threadRecordInterface1.GetCount() + 1;
+    // clear all records
+    for (std::size_t id = 1; id < threadRecords; id++) {
+        REQUIRE(threadRecordInterface1.RemoveByID(id));
+    }
 
     // Add 2 records
     REQUIRE(threadRecordInterface1.Add(recordIN));
@@ -88,6 +94,7 @@ TEST_CASE("Thread Record tests")
             REQUIRE(w.contactID == contactIDTest);
         }
     }
+
     SECTION("Get all available records with query")
     {
         auto query  = std::make_shared<db::query::ThreadsGet>(0, 100);
@@ -208,10 +215,9 @@ TEST_CASE("Thread Record tests")
         const utils::PhoneNumber phoneNumber("+48600123456", utils::country::Id::UNKNOWN);
         const std::string lastSmsBody = "Ola";
 
-        SMSRecordInterface smsRecInterface(smsDB.get(), contactsDB.get());
+        SMSRecordInterface smsRecInterface(&smsDB, &contactsDB);
         SMSRecord recordIN;
         recordIN.date      = 123456789;
-        recordIN.dateSent  = 987654321;
         recordIN.errorCode = 0;
         recordIN.number    = phoneNumber.getView();
         recordIN.body      = "Ala";
@@ -256,6 +262,49 @@ TEST_CASE("Thread Record tests")
             auto smsRec = getLastResult->record;
             REQUIRE(smsRec.has_value());
             REQUIRE(smsRec->body == lastSmsBody);
+        }
+    }
+
+    SECTION("Thread with end of line in the body")
+    {
+
+        const utils::PhoneNumber phoneNumber("+48600123456", utils::country::Id::UNKNOWN);
+
+        SMSRecordInterface smsRecInterface(&smsDB, &contactsDB);
+        SMSRecord recordIN;
+        recordIN.date      = 123456789;
+        recordIN.errorCode = 0;
+        recordIN.number    = phoneNumber.getView();
+        recordIN.type      = SMSType ::DRAFT;
+
+        UTF8 snippetIncluded = "Good 😁IS GOOD";
+        UTF8 snippetExcluded = "\nthis part should not be included in snippet";
+        UTF8 smsBody         = snippetIncluded + snippetExcluded;
+
+        recordIN.body = smsBody;
+        REQUIRE(smsRecInterface.Add(recordIN));
+
+        auto getThreadQuery  = std::make_shared<db::query::ThreadGetByNumber>(phoneNumber.getView());
+        auto getThreadRet    = threadRecordInterface1.runQuery(getThreadQuery);
+        auto getThreatResult = dynamic_cast<db::query::ThreadGetByNumberResult *>(getThreadRet.get());
+        REQUIRE(getThreatResult != nullptr);
+        auto threadRec = getThreatResult->getThread();
+        REQUIRE(threadRec.isValid());
+
+        SECTION("Snippet should not contain characters after EoL")
+        {
+            REQUIRE(snippetIncluded == threadRec.snippet);
+        }
+
+        SECTION("Body content should not be affected by EoL")
+        {
+            auto getLastQuery  = std::make_shared<db::query::SMSGetLastByThreadID>(threadRec.ID);
+            auto getLastRet    = smsRecInterface.runQuery(getLastQuery);
+            auto getLastResult = dynamic_cast<db::query::SMSGetLastByThreadIDResult *>(getLastRet.get());
+            REQUIRE(getLastResult != nullptr);
+            auto smsRec = getLastResult->record;
+            REQUIRE(smsRec.has_value());
+            REQUIRE(smsRec->body == smsBody);
         }
     }
 

@@ -19,3 +19,13 @@ add_catch2_executable(
     LIBS
         service-gui
 )
+
+add_catch2_executable(
+    NAME
+        render-cache-tests
+    SRCS
+        tests-main.cpp
+        test-RenderCache.cpp
+    LIBS
+        service-gui
+)

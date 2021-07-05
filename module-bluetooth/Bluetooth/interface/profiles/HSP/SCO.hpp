@@ -5,13 +5,12 @@
 
 #include "Profile.hpp"
 #include <memory>
-#include <module-sys/Service/Bus.hpp>
 
 extern "C"
 {
 #include <module-bluetooth/lib/btstack/src/bluetooth.h>
 };
-namespace Bt
+namespace bluetooth
 {
 
     class SCO
@@ -31,8 +30,10 @@ namespace Bt
         [[nodiscard]] auto getStreamData() const -> std::shared_ptr<BluetoothStreamData>;
         void setOwnerService(const sys::Service *service);
 
+        static constexpr auto CVSD_SAMPLE_RATE = 8000;
+
       private:
         class SCOImpl;
         std::unique_ptr<SCOImpl> pimpl;
     };
-} // namespace Bt
+} // namespace bluetooth

@@ -1,6 +1,788 @@
 # MuditaOS changelog
 
-## [0.53.2 2020-01-15]
+To install the new version of MuditaOS please follow the steps described in this guide:
+- [Linux](https://github.com/mudita/MuditaOS/blob/master/doc/boot_and_update.md#creating-a-storage-partition)
+- [Windows and macOS](https://github.com/mudita/MuditaOS/blob/master/doc/flashing_win_macos.md)
+
+## [0.71.1 2021-06-30]
+
+* [BH-372] Turned i18n into separate library
+* [BH-374] Fix ENABLE\_APP mechanism + adjust includes policy
+* [BH-374] Librarize application-antenna
+* [BH-388] Turned music player app into library
+* [BH-392] Turned application phonebook into lib
+* [BH-459] Moved fatfs to third-party v2
+* [BH-495] Cleaned up Bell Hybrid App cmake
+* [BH-495] Created Bell Hybrid home screen
+* [BH-501] MainMenu
+* [CP-163] Implement FS Endpoint read file
+* [CP-166] Update Harness Tests
+* [CP-174] Remove limit of maximum attempts of unlocking phone
+* [CP-194] Intercept all input when OS update window is displayed
+* [CP-200] Delete file with old OS version
+* [CP-200] Revert Delete file with old OS version
+* [CP-206] Report Pure serial number in USB descriptors
+* [EGD-5709] Add full actions support in call application
+* [EGD-5709] Fixed a crash on switching phone modes
+* [EGD-5709] Fixed actions support in Call application
+* [EGD-6041] Fix unlock windows behaviour
+* [EGD-6514] HSP volume control
+* [EGD-6697] Date and time formatting
+* [EGD-6745] Add tool to create JIRA version
+* [EGD-6797] Remove color from SAR
+* [EGD-6876] Fix Factory Settings Test
+* [EGD-6882] Fix call hangup after BT device disconnect
+* [EGD-6883] Change time settings cleanup
+* [EGD-6947] Fix SQL vulnerabilities
+* [EGD-6950] Added header layout
+* [EGD-6951] Removed old header implementation
+* [EGD-6952] Fix tethering on low battery
+* [EGD-6954] Enable all unit tests
+* [EGD-6958] Fix rssibar oor exception
+* [EGD-6960] Header addition related style cleanups
+* [EGD-6966] Fixed a switch from call window back
+* [EGD-6970] Autolock default value
+* [EGD-6972] Update BT stack to 1.4.1 version
+* [EGD-6979] Fix for "Unable to catch hard faults on rt1051 via GDB"
+* [EGD-6986] Add Store timezone in settings db
+* [EGD-6994] Remove sensitive data logging
+* [EGD-6995] Remove sensitive data from logs
+* [EGD-6999] Removed sensitive data
+* [EGD-7000] Removed sensitive data
+* [EGD-7015] Revert "test"
+* [EGD-7018] Fixed text empty block removal at end
+* [EGD-7029] Fix running unit tests in release script
+
+## [0.70.1 2021-06-21]
+
+* [BH-393] Create separate math lib
+* [BH-515] Create main Bell app
+* [CP-142] Update tests with 204 response code
+* [CP-143] Set 204 code for responses with empty body
+* [EGD-2949] Fix fallback image
+* [EGD-3243] Fix cellular memory leaks
+* [EGD-4384] Status bar roaming indicator
+* [EGD-5011] Set headphones maximal sound level
+* [EGD-5689] Add clang tidy to jenkins
+* [EGD-6702] Add time zone library
+* [EGD-6790] Fix cellular sleep mode
+* [EGD-6916] Fixed makefile build linking issue
+* [EGD-6918] Timestamp clean up
+* [EGD-6932] Small cellular refactor
+
+## [0.69.1 2021-06-16]
+
+### Added
+
+* [EGD-6896] Sanitize Tray event handling
+* [BH-353] Add minimal build target for BH
+* [CP-84] Implement Security API
+* [CP-145] Implement Security Endpoint helper
+* [EGD-6907] Introduce ModemState in Cellular
+* [BH-353] Add Documentation for main targets
+
+### Changed
+
+* [EGD-6897] Add force flag to the pureflash
+* [EGD-6897] Change force flag to disable check
+* [BH-460] Moved TPLIB littlefs
+* [BH-371] Replace gsl with mainline submodule and move to third-party
+* [EGD-6867] Renamed TopBar into StatusBar
+* [EGD-6898] Remove dead SimProcedure code
+* [BH-396] Move CrashDebug to a separate directory
+* [BH-360] Move TPLIB re2 to separate dir
+* [CP-83] Update tests for unlocking phone and usb
+* [BH-378] Utils move log to library
+* [BH-458] Pureflash turned to ExternalProject
+* [EGD-6906] Updated OnBoarding update info window
+* [CP-140] Deactivate autolock while connected to MC
+* [BH-370] Convert utils common_data into a libs
+* [BH-369] Turned UTF8 into separate library
+* [BH-368] Added missing CMAkeLists
+* [BH-368] Moved board to library
+* [BH-387] Move utils/state to service-antenna
+* [BH-367] Convert UCS2 to library
+* [BH-376] Time module unit test decoupled
+* [BH-376] Utils time turned to separate library
+* [EGD-6544] Switch for VoLTE
+* [EGD-6917] Screen light in automode does not turnoff itself
+* [BH-373] Convert utils json into a lib
+
+### Fixed
+
+* [EGD-6035] Fix support for glibc-2.32
+* [EGD-6899] Fix AppCall access
+* [EGD-6446] Fix notes delete window
+* [CP-148] Fix setting of response in the Parser Context
+* [EGD-6684] Fix call ended message
+* [EGD-6875] Fix UT check script
+* [BH-369] Fixed UTF8 unit test CI run
+* [EGD-6884] Fix autolock in sms template
+* [CP-187] Fix stack overflow on passcode decoding
+
+## [0.68.1 2021-06-04]
+
+### Added
+
+* Add Onboarding application.
+* Add iNotify mechanism for the VFS.
+
+### Changed
+
+* Hide calls and messages notifications while tethering is on.
+* SIM handling refactored.
+* Automatic locking disabled when torch is on.
+* Automatic locking disabled during OS update.
+
+### Fixed
+
+* Fix preserving automatic display light setting between phone starts.
+* Fix current time displaying in "Date and time" window.
+
+## [0.67.1 2021-05-28]
+
+### Added
+
+* Add a per-application auto-locking policy.
+* Add documentation on auto-locking mechanism.
+* Add RC oscillator self-calibrating to increase the precision of the system clock.
+* Add support for Bluetooth pairing with a PIN.
+* Add time updating with a value obtained from a GSM network.
+* Add using voice transcoding during phone calls if needed.
+
+### Changed
+
+* Block building commits that are not rebased to reduce CI workload.
+* Move CI builds to a RAM disk to reduce build times.
+* Move several third-party libraries to a single `third-party` subdirectory.
+
+### Fixed
+
+* Fix displaying currently selected ringtone in the ringtone settings.
+* Fix excessive ATA command when answering a phone call using headset buttons.
+* Fix invalid integer to string conversion used in the call records.
+* Fix reconnecting Pure to the Mudita Center when unlocked.
+* Fix RTC clock not being retained between resets.
+
+## [0.66.1 2021-05-21]
+
+### Added
+
+* Add autolocking settings.
+* Add EEPROM block device driver.
+* Add enabling screen light on a keypress.
+* Add front light brightness automatic adjustment.
+* Add key bindings documentation for Bell's simulator.
+* Add settings guidelines documentation.
+* Add SIM select window in the onboarding process.
+* Add single number message notifications.
+
+### Changed
+
+* Add several code quality improvements to the build system.
+* Cancel Jenkins builds on PR update.
+* Disable logs and allocations in interrupts to prevent crashing.
+* Disable WAL mechanism in databases.
+* Don't show contents of PurePhone in Center when PurePhone is locked.
+* Enable changing simulator's screen size at compilation time.
+* Reject uploads of non-audio files via MTP.
+* Remove logging database's pragma errors.
+* Update notifications icons.
+
+### Fixed
+
+* Fix building for Glibc v2.33.
+* Fix crashing progress bar during an update.
+* Fix NAT widget to be visible only during a call.
+* Fix parsing of boot descriptor file.
+
+## [0.65.1 2021-05-19]
+
+### Added
+
+* Add build system options to the quickstart documentation.
+* Add EEPROM low-level driver.
+* Add primary code owners configuration.
+
+### Fixed
+
+* Fix changing Bluetooth device name.
+* Fix communication with GSM modem on Linux,
+* Fix display backlight turning on in the off state.
+* Fix issues with sending messages from the new message window.
+* Fix network settings window rebuilding on SIM selection.
+* Fix returning to the correct screen from the SOS call window.
+* Fix simulator build for Valgrind.
+
+## [0.64.1 2021-05-12]
+
+### Added
+
+* Add a warning when adding a calendar event is invalid, e.g., has an empty title.
+* Add Bluetooth notifications playback when Bluetooth audio device is connected.
+* Add compilation caching to the Jenkins CI.
+* Add displaying factory data in the technical information window.
+* Add documentation for home notifications.
+* Add minimum documentation on filesystem support.
+* Add timeout on meditation end screen to automatically return to the main window of meditation application.
+
+### Changed
+
+* Improve audio block size calculation algorithm to reduce voice latency in a phone call.
+* Remove excessive logs from the USB stack.
+* Tweak call window alignment.
+
+### Fixed
+
+* Fix Bluetooth default entries not being loaded at startup.
+* Fix crash when searching for notes.
+* Fix crash when trying to set a new calendar event and change its date or time.
+* Fix database and GUI unit tests.
+* Fix displaying Bluetooth name in the Bluetooth settings window.
+* Fix labels in Calls and Meditation applications.
+* Fix numeric inputs.
+* Fix repeated tethering notification.
+* Fix switching to a loudspeaker with headphones plugged in.
+* Fix switching window after editing a contact.
+
+## [0.63.2 2021-05-05]
+
+### Added
+
+* Add "connecting" and "pairing" statuses to the Bluetooth connectivity settings window.
+* Add audio transcoding framework with basic sample rate transcoding.
+* Add handling of Pause/Resume/Stop headset controls while in the music player application.
+* Add Out-of-Memory hooks to the system for better protection against failures related to memory handling.
+* Add settings initialization from factory data.
+* Add tethering notification.
+* Add tool to generate EEPROM image with factory data.
+* Add volume level feedback for Bluetooth audio devices.
+
+### Changed
+
+* Add a distinction between rejected and ended the call when presenting finished call status to the user.
+* Adjust OS to be used with Secure Boot.
+* Change calculator behavior to finish the existing equation before starting the next one.
+* Enable cyclic database writes.
+* Enable power saving for filesystem operations.
+* Enable power saving for the USB peripheral.
+* Limit digits to 7 in the calculator.
+* Remake cellular flow for better error handling.
+* Switch CI process from Github actions to Jenkins server.
+
+### Fixed
+
+* Fix audio assets' tags not being displayed in the list view.
+* Fix invalid "block contact" icon.
+* Fix keypad backlight random state changes when on battery power.
+* Fix meditation start sound.
+* Fix no "send" text on the bottom bar while receiving a call.
+* Fix phone crashes after playing ringtone in the new alarm window.
+* Fix several issues with APN settings.
+* Fix the SIM card icon in the top bar.
+
+## [0.63.1 2021-04-26]
+
+### Added
+
+* Add "On when active" keypad light setting handling.
+* Add `clang-tidy` to the CI process.
+* Add answering or rejecting phone calls with wired headset controls.
+* Add API for controlling disks' power usage.
+* Add audio format checking before audio playback.
+* Add clearing user input in the calculator on the `#` key press.
+* Add code coverage reporting.
+* Add connecting to GSM network in user-defined intervals.
+* Add controlling charge current depending on the temperature of the battery.
+* Add current value selection depending on the USB connection type.
+* Add EEPROM emulation in the Linux simulator.
+* Add HSP ringing on a call with the ability to reject or answer the call with headset controls.
+* Add keypad backlight turning on during a call.
+* Add logic to change SIM PIN.
+* Add low power mode to magnetometer handling.
+* Add low-power handling during Bluetooth communication.
+* Add mechanism to automount the `mfgconf` partition.
+* Add per-module unit testing.
+* Add ringtone selection UI.
+* Add support for eMMC system partitions.
+* Add windows for setting passcode during the onboarding process.
+
+### Changed
+
+* Add only last project changes during project release creation by the CI.
+* Change all `emulator` references in the documentation to `simulator`.
+* Cleanup database API.
+* Cleanup localization files.
+* Disable phone mode changes when tethering is enabled.
+* Don't allow to edit exponent output in the calculator.
+* Limit calculator decimals to 6 digits.
+* Refactor audio settings API.
+* Refactor handling of phone modes in applications.
+* Turn audio on only when the user is using audio to save energy.
+* Unify localization API.
+* Update audio assets.
+* Update tests in the tests harness.
+* Update tethering icon.
+
+### Fixed
+
+* Fix assets copying issues during the build process.
+* Fix building Linux simulator with `glibc` older than `2.28`. 
+* Fix building SystemView.
+* Fix calculator operations on empty input.
+* Fix crash when navigating left on search results in the phonebook.
+* Fix crashes in list view related to options handling.
+* Fix crashing on single char removal in the text input widget.
+* Fix device unresponsiveness when opening settings window.
+* Fix display backlight settings not being persistent.
+* Fix displaying complete contact list after ICE call.
+* Fix displaying wrong contact info in the call log.
+* Fix ghosting in the meditation application.
+* Fix handling unit tests in IDEs by removing unnecessary messages from `libiosyscalls`.
+* Fix inability to find a contact with its full name.
+* Fix inability to unlock the phone with proper PIN due to race mode with settings.
+* Fix invalid initialization of Bluetooth profiles.
+* Fix issues with displaying grey colors.
+* Fix phone mode discovery in the tethering mode.
+* Fix race between focus gain and the user pressing asterisk button in the SMS thread view.
+* Fix several typos in shell scripts.
+* Fix SIM card not being detected.
+* Fix turning off the phone.
+* Fix unnecessary displaying applications' main windows on user actions.
+
+## [0.62.2 2021-04-09]
+
+### Added
+
+* Add factory reset mode.
+* Add SIM PIN settings.
+* Add tethering confirmation popup.
+* Add volume control of Bluetooth headsets.
+* Add windows for audio volume and vibration settings.
+
+### Changed
+
+* Disable functional tests with test harness during CI builds.
+
+### Fixed
+
+* Fix CrashDump repository path causing build issues.
+* Fix database initialization's unit test.
+* Fix phone call muting.
+
+## [0.62.1 2021-04-07]
+
+### Added
+
+* Add a window to display technical information about the device for certification purposes.
+* Add calls rejecting in the 'Do not Disturb mode.
+* Add crash dumping with CrashCatcher.
+* Add detection of headset buttons.
+* Add factory reset window.
+* Add offline mode handling by the cellular modem.
+* Add test harness for cellular in the sleep mode.
+* Add window to display SAR parameter value.
+
+### Changed
+
+* Change USB charging current to 500 mA.
+* Disable USB security temporarily to prevent connectivity issues with Mudita Center.
+* Improve boot time by optimizing the start time of the desktop application.
+* Move quotes from JSON file to the database.
+* Prevent starting the phone if the battery is below shutdown level.
+* Run unit tests on Release configuration instead of Debug during CI checks.
+* Split CI build types for unit tests and test harness.
+* Update documentation on the cellular modem's low power mode.
+
+### Fixed
+
+* Fix backup/restore API.
+* Fix crash in the calendar application when focusing on an all-day event.
+* Fix crashing unit tests of the desktop service.
+* Fix execution time of test harness during CI runs.
+* Fix inability to unlock SIM with PIN.
+* Fix invalid language fallback on assets load error.
+* Fix issues with date and time in the onboarding application.
+* Fix linking with GCC10.
+* Fix several minor issues in automated testing.
+* Fix silent boot fail when there is no valid image available.
+* Fix storing quotation marks in the notes.
+* Fix text addition and deletion for the text line widget.
+* Fix USB disconnect time.
+
+## [0.61.1 2021-03-26]
+
+### Added
+
+* Add "About Your Pure" main window.
+* Add `pureflash` rapid image flashing utility.
+* Add a phone mode status bar widget.
+* Add access to data backups over MTP.
+* Add auto disconnect of a Bluetooth device on timeout to save energy.
+* Add Bluetooth audio playback using the A2DP profile.
+* Add documentation of the logging subsystem.
+* Add documentation of the Pure simulator.
+* Add dumping logs to file.
+* Add linear backlight controller.
+* Add phone mode popups.
+* Add popup volume control.
+* Add Swedish localization.
+
+### Changed
+
+* Add improvements to the test harness.
+* Add several enhancements to the Quotes application.
+* Block CPU frequency dropping when a USB cable is connected to improve USB communication stability.
+* Improve memory usage.
+* Improve power management when Bluetooth is active.
+* Refactor of system timers.
+* Remove a workaround to support old battery packs.
+* Replace test data in Polish with the English version.
+* Update torch controlling.
+
+### Fixed
+
+* Fix broken update process.
+* Fix building simulator using Release configuration.
+* Fix communication stability with the cellular modem by tweaking command timeouts.
+* Fix flushing database contents to the non-volatile memory.
+* Fix image building by updating its build dependencies.
+* Fix image checksum validation.
+* Fix issues with incoming messages.
+* Fix newline handling in messages' thumbnails.
+* Fix occasional crashes when handling MTP transfers.
+* Fix persistent entry in the call log database.
+* Fix transmission errors on communication with the Bluetooth modem.
+* Fix wording for English localization.
+
+## [0.60.1 2021-03-19]
+
+### Added
+
+* Add ability to discover disconnection of connected Bluetooth device.
+* Add ability to pre-setup paired USB devices.
+* Add battery charging UI
+* Add dialog windows for the onboarding application.
+* Add DMA transfers handling to the cellular modem communication.
+* Add documentation for Bluetooth automatic tests.
+* Add option to update windows' contents more effectively.
+* Add phone flashing guide.
+* Add selective Bluetooth connection based on a device class.
+* Add status window on Bluetooth connection fail.
+* Add technical documentation on Bluetooth pairing process implementation.
+* Add the category for the quote selection window.
+* Add USB passthrough to tethering.
+* Add window to edit quotes.
+* Add windows for phone modes.
+* Introduce daily builds.
+
+### Changed
+
+* Change quotes storing from JSON files to the database.
+* Improve communication stability with the cellular modem by fixing the configuration of the hardware flow control pins.
+* Improve layout of the status bar.
+* Improve power saving when using the cellular modem.
+* Improve stability by tweaking applications' and services' stack size.
+* Improve the design of the power-off window.
+* Improve the number of logs produced by cellular modem handling.
+* Improved design of the quote edit window.
+* Optimize displaying of a call log by retrieving data in chunks.
+* Reduce the number of logs produced by services and settings.
+* Unify settings' menu text labels in terms of capital and small letters.
+* Update quickstart guide with security-related information.
+
+### Fixed
+
+* Fix database performance issues related to the filesystem interface.
+* Fix displaying Bluetooth configuration data window after changing phone visibility.
+* Fix issues with e-ink refresh by prohibiting CPU frequency change during the process.
+* Fix issues with the update process related to filesystem usage.
+* Fix memory leak in the phonebook application.
+* Fix missing version file in an update package issue.
+* Fix modem start issue associated with an invalid battery level check.
+* Fix parsing issues with first cellular command reply after a hot start.
+* Fix refreshing Bluetooth devices list after disconnect.
+* Fix removing buttons on Bluetooth devices list window's bottom bar after removing last Bluetooth device.
+* Fix several broken functional tests.
+* Fix text formatting in retry windows.
+* Fix UI issues caused by consuming too much data by spin boxes.
+
+## [0.59.1 2021-03-09]
+
+### Added
+
+* Add a separate set of audio settings for each mode.
+* Add Bluetooth pairing.
+* Add cache for settings reducing average settings processing time.
+* Add clearing the phone screen when the phone is off.
+* Add EULA window for the onboarding process.
+* Add Handling a simultaneous A2DP/HSP Bluetooth connection.
+* Add missing Swedish glyphs.
+* Add pagination for message threads.
+* Add post-update window with update status information.
+* Add reusable "Retry action" dialog window.
+* Add SIM PIN2 handling.
+* Add system watchdog preventing random freezes.
+* Add the ability to send a message using the contact information.
+* Add time selection window.
+* Add vibration handling.
+* Add window for entering Bluetooth pairing code.
+* Add windows to visualize the progress of the phone update process.
+
+### Changed
+
+* Improve Bluetooth communication stability.
+* Improve displaying information on the top bar.
+* Improve handling of URC, increasing communication stability with the modem.
+* Improve quickstart procedure.
+* Improve user actions handling by processing them in order. 
+* Improve volume buttons logic to be more intuitive for the user.
+* Increase stability by changing filesystem to littleFS.
+* Introduce an improved and unified way to close the system.
+* Remove volume indicator from the music player to be replaced with popup volume indicator in the future.
+* Restore phone auto-locking on timeout.
+* Secure USB endpoints with screen passcode.
+* Several improvements to low power mode.
+
+### Fixed
+
+* Fix call application not showing up when there is no caller information available.
+* Fix crashes in logging subsystem related to long messages.
+* Fix database startup process.
+* Fix improper contacts being displayed in the phonebook window.
+* Fix minor UX issues in messages' user interface.
+* Fix multimedia playback priorities regarding alarm and meditation sounds.
+* Fix quotes windows.
+* Fix several minor issues with system stability.
+* Fix several random issues related to system heap shortage.
+* Fix small Bluetooth icon.
+* Fix status icons indicating charging status.
+* Fix switching to loudspeaker not working on rare occasions.
+* Fix timeout timer, increasing update process stability.
+* Fix URC handling.
+* Fix USD settings menu navigation.
+
+### Other
+
+* Add an option to use minimal phone number data, reducing firmware size.
+* Add map parser and `puregdb` tools to the main repo.
+* Add support for `newlib` time syscalls.
+* Disable OS optimization for development build configurations.
+* Enable differential static analysis with `clang-tidy-diff`.
+* Fix Linux build with GSM enabled.
+* Several tests added.
+* Update GCC to version 10.
+
+## [0.58.1 2021-02-19]
+
+### Added
+
+* Add charger temperature cutoff.
+* Add onboarding application.
+* Add signal strength bar indicator.
+
+### Changed
+
+* Change the date format separator from "/" to ".".
+* Improve update process stability by introducing a special phone mode for updating.
+* Increase visibility time of the "Call ended" window.
+* Store battery critical level in the settings.
+
+### Fixed
+
+* Fix crashing on text removal.
+* Fix displaying the "call waiting" and "call barring" MMI responses.
+* Fix displaying white color during Color Test.
+* Fix focus reset on GUI refresh in the "Time and Date" window.
+* Fix handling of private numbers.
+* Fix invalid parsing of messages containing emojis.
+* Fix no call log entry when aborting a call.
+* Fix problems with adding characters in the special input window.
+* Fix problems with the inability to send long messages by setting a message size limit in the user interface to 7*67 characters.
+* Fix problems with setting message recipient when creating a new message.
+* Fix timeouts on MMI operations.
+* Fix turning off Bluetooth.
+
+### Other
+
+* Add documentation for the Low Power mode.
+* Add support for handling phone modes.
+* Add tests harness for cellular hot/cold start.
+* Improve charger state detection.
+* Improve parsing of CLCC commands.
+* Several improvements to the low power mode support.
+* Update `clang-tidy` rules.
+* Update documentation for Bluetooth support. 
+* Update i18n documentation related to font rendering.
+* Update test harness for Bluetooth.
+
+## [0.57.1 2021-02-11]
+
+### Added
+
+* Add color test window to the settings app.
+* Add support for an empty line in the rich text control.
+* Add support for VoLTE on/off.
+* Add USB charger detection.
+* Add windows for custom responses to MMIs.
+
+### Changed
+
+* Add several stability improvements to the Bluetooth support.
+* Change a reaction to a fatal error - restart the system instead of hanging.
+* Change call handling to allow emergency and ICE numbers only.
+* Change list of supported files type for MTP to MP3, WAV, and FLAC.
+* Improve display features of the list view control.
+* Improve power management by adding low power support to the drivers.
+* Improve power management by powering off the e-ink display on timeout.
+* Remove audio echo during voice call by tweaking echo cancellation parameters.
+
+### Fixed
+
+* Fix broken mute on a voice call option.
+* Fix crashes when parsing a rich text.
+* Fix freezes due to invalid handling of long messages during communication with the modem.
+* Fix invalid warning about messages not being sent.
+* Fix options distances in SMS and Settings options.
+
+### Other
+
+* Add preliminary support for the T6 platform.
+* Add several harness tests.
+* Add synchronization between services.
+* Allow formatting hook scripts to ignore preconfigured paths.
+* Fix excessive logging in the USB-CDC
+* Fix memory leaks in the PIN lock window.
+* Fix several issues with unit testing.
+* Refactor code responsible for low-level drawing.
+* Restore logs coloring for the RT1051 based platforms.
+* Switch CI build to ninja to improve performance.
+* Update documentation of test harness.
+
+## [0.56.1 2021-02-03]
+
+### Added
+
+* Add the ability to change APNs.
+* Add SMS Center validity verification.
+* Add the "Wrong emergency number called" window.
+* Add user interface to control keypad backlight.
+
+### Changed
+
+* Improve audio quality during voice calls by tweaking microphone settings.
+* Improve network time synchronization with periodic updates.
+* Reduce audio lag during voice calls, significantly reducing echo as a result.
+* Tweak calendar's user interface.
+* Tweak battery charger parameters.
+
+### Fixed
+
+* Fix lock screen not showing after reset.
+* Fix lack of system clock refreshing.
+* Fix lack of audio during voice calls.
+* Fix SOS button showing on the PIN screen.
+
+### Other
+
+* Add an ability to interrupt the OS update process.
+* Add harness test for Bluetooth on/off.
+* Add harness test for the phone on/off.
+* Add harness test for SIM card change.
+* Add parser for the "call waiting" MMI response.
+* Fix missing build dependency for the image file.
+* Fix logs mocking in unit tests.
+* Fix unit tests not always running on `check` operation.
+
+## [0.55.1 2021-01-28]
+
+### Added
+
+* Add brownout information window.
+* Add language select settings window.
+* Add emergency call window.
+
+### Changed
+
+* Add several improvements to the USB handling.
+* Improve e-ink display speed.
+
+### Fixed
+
+* Fix crash on USB deinitialization.
+* Fix USB Full Speed.
+* Fix selecting contact for edit by phone number from speed dial window.
+* Fix VoLTE settings editing.
+* Fix sim indicator displaying on the top bar.
+* Fix returning from ICE contacts window.
+
+### Other
+
+* Improvements to the harness tests.
+* Improve downloading assets for selected releases.
+* Add backend for multi-day events in the calendar application.
+* Add call forwarding and MMI status parsers.
+
+## [0.54.3 2021-01-22]
+
+### Added
+
+* Add options to create, edit and remove quotes.
+* Add main system settings window.
+* Add APN settings window.
+
+### Changed
+
+* Improve e-ink responsiveness.
+* Change time format on home screen and status bar.
+* Add application-wide top bar manager.
+* Improved screen light control.
+
+### Fixed
+
+* Fix changing passcode windows.
+* Fix the possibility to write illogical operations in the calculator.
+* Fix the possibility to write multiple zeroes in the calculator when it is not needed.
+* Change the display format of a calculation result to scientific notation when it does not fit the screen.
+* Fix freezes and resets due to invalid assertions.
+* Fix grid layout navigation.
+* Fix Linux simulator crashes.
+
+### Other
+
+* Add build target to generate a package with version information.
+* Update licensing information.
+* Add option to change VID/PID via build system.
+* Add several filesystem improvements.
+* Update development workflow documentation and scripts.
+* Add integration with `clang-tidy`.
+* Add assets uploading to Github on release.
+
+## [0.54.2 2021-01-19]
+
+### Added
+
+* Add passcode changing.
+
+### Fixed
+
+* Fix the persistent answer and reject labels in the call window.
+* Fix the wrong call duration issue in both Call and Calls apps.
+* Fix call ignoring.
+
+### Other
+
+* Enable modem's debug output.
+* Enable timers enhanced debug.
+* Fix licensing information.
+
+## [0.54.1 2021-01-18]
+
+### Fixed
+
+* Fix settings broken by the accidentally removed script.
+
+## [0.53.2 2021-01-15]
 
 ### Added
 
@@ -30,7 +812,7 @@
 * Fix query-callback synchronization mechanism.
 * Remove the requirement to start a commit message with the "Change" verb.
 
-## [0.53.1 2020-01-11]
+## [0.53.1 2021-01-11]
 
 ### Added
 

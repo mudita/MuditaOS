@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -7,7 +7,7 @@
 #include "Databases/EventsDB.hpp"
 #include "Tables/EventsTable.hpp"
 
-#include <vfs.hpp>
+#include <purefs/filesystem_paths.hpp>
 #include <stdint.h>
 #include <string>
 #include <algorithm>
@@ -30,13 +30,14 @@ static auto remove_events(EventsDB &db) -> bool
 
 TEST_CASE("Events Table tests")
 {
-
     Database::initialize();
 
-    const auto eventsPath = (purefs::dir::getUserDiskPath() / "events.db").c_str();
-    std::filesystem::remove(eventsPath);
+    const auto eventsPath = (std::filesystem::path{"sys/user"} / "events.db");
+    if (std::filesystem::exists(eventsPath)) {
+        REQUIRE(std::filesystem::remove(eventsPath));
+    }
 
-    EventsDB eventsDb{eventsPath};
+    EventsDB eventsDb{eventsPath.c_str()};
     REQUIRE(eventsDb.isInitialized());
 
     auto &eventsTbl = eventsDb.events;
@@ -166,8 +167,8 @@ TEST_CASE("Events Table tests")
         CHECK(eventsTbl.count() == 0);
 
         uint32_t numberOfEvents = 7;
-        calendar::TimePoint startDate = TimePointFromString("2019-10-20 14:30:00");
-        calendar::TimePoint endDate   = TimePointFromString("2019-10-20 15:30:00");
+        TimePoint startDate     = TimePointFromString("2019-10-20 14:30:00");
+        TimePoint endDate       = TimePointFromString("2019-10-20 15:30:00");
         testRow1.date_from      = startDate;
         testRow1.date_till      = endDate;
         CHECK(eventsTbl.addDaily(testRow1));
@@ -201,8 +202,8 @@ TEST_CASE("Events Table tests")
         CHECK(eventsTbl.count() == 0);
 
         uint32_t numberOfEvents = 4;
-        calendar::TimePoint startDate = TimePointFromString("2019-10-20 14:30:00");
-        calendar::TimePoint endDate   = TimePointFromString("2019-10-20 15:30:00");
+        TimePoint startDate     = TimePointFromString("2019-10-20 14:30:00");
+        TimePoint endDate       = TimePointFromString("2019-10-20 15:30:00");
         testRow1.date_from      = startDate;
         testRow1.date_till      = endDate;
         CHECK(eventsTbl.addWeekly(testRow1));
@@ -236,8 +237,8 @@ TEST_CASE("Events Table tests")
         CHECK(eventsTbl.count() == 0);
 
         uint32_t numberOfEvents = 4;
-        calendar::TimePoint startDate = TimePointFromString("2019-10-20 14:30:00");
-        calendar::TimePoint endDate   = TimePointFromString("2019-10-20 15:30:00");
+        TimePoint startDate     = TimePointFromString("2019-10-20 14:30:00");
+        TimePoint endDate       = TimePointFromString("2019-10-20 15:30:00");
         testRow1.date_from      = startDate;
         testRow1.date_till      = endDate;
         CHECK(eventsTbl.addTwoWeeks(testRow1));
@@ -271,7 +272,7 @@ TEST_CASE("Events Table tests")
         CHECK(eventsTbl.count() == 0);
 
         uint32_t numberOfEvents = 12;
-        const std::array<calendar::TimePoint, 24> dates{
+        const std::array<TimePoint, 24> dates{
             TimePointFromString("2019-01-20 14:30:00"), TimePointFromString("2019-01-20 15:30:00"),
             TimePointFromString("2019-02-20 14:30:00"), TimePointFromString("2019-02-20 15:30:00"),
             TimePointFromString("2019-03-20 14:30:00"), TimePointFromString("2019-03-20 15:30:00"),
@@ -318,14 +319,14 @@ TEST_CASE("Events Table tests")
         REQUIRE(eventsTbl.count() == 0);
 
         uint32_t numberOfEvents = 4;
-        std::array<calendar::TimePoint, 8> dates{TimePointFromString("2019-02-20 14:30:00"),
-                                                 TimePointFromString("2019-02-20 15:30:00"),
-                                                 TimePointFromString("2020-02-20 14:30:00"),
-                                                 TimePointFromString("2020-02-20 15:30:00"),
-                                                 TimePointFromString("2021-02-20 14:30:00"),
-                                                 TimePointFromString("2021-02-20 15:30:00"),
-                                                 TimePointFromString("2022-02-20 14:30:00"),
-                                                 TimePointFromString("2022-02-20 15:30:00")};
+        std::array<TimePoint, 8> dates{TimePointFromString("2019-02-20 14:30:00"),
+                                       TimePointFromString("2019-02-20 15:30:00"),
+                                       TimePointFromString("2020-02-20 14:30:00"),
+                                       TimePointFromString("2020-02-20 15:30:00"),
+                                       TimePointFromString("2021-02-20 14:30:00"),
+                                       TimePointFromString("2021-02-20 15:30:00"),
+                                       TimePointFromString("2022-02-20 14:30:00"),
+                                       TimePointFromString("2022-02-20 15:30:00")};
 
         testRow1.date_from = dates[0];
         testRow1.date_till = dates[1];
@@ -367,8 +368,8 @@ TEST_CASE("Events Table tests")
     {
         auto check_custom_repeat = [&](uint32_t customRepeatOption,
                                        uint32_t numberOfEvents,
-                                       calendar::TimePoint originalStartDate,
-                                       calendar::TimePoint originalEndDate) {
+                                       TimePoint originalStartDate,
+                                       TimePoint originalEndDate) {
             if (eventsTbl.count() > 0) {
                 REQUIRE(remove_events(eventsDb));
             }
@@ -396,8 +397,8 @@ TEST_CASE("Events Table tests")
                 }
             }
 
-            calendar::TimePoint expectedStartDate = TimePointFromString("2020-12-07 14:30:00"); // monday
-            calendar::TimePoint expectedEndDate   = TimePointFromString("2020-12-07 15:30:00"); // monday
+            TimePoint expectedStartDate = TimePointFromString("2020-12-07 14:30:00"); // monday
+            TimePoint expectedEndDate   = TimePointFromString("2020-12-07 15:30:00"); // monday
 
             uint32_t i = 0;
             for (uint32_t l = 0; l < numberOfWeeks; l++) {
@@ -439,8 +440,13 @@ TEST_CASE("Events Table tests")
             uint32_t customRepeatOption =
                 static_cast<uint32_t>(weekDayOption::monday) + static_cast<uint32_t>(weekDayOption::wednesday);
             uint32_t numberOfEvents     = 9;
-            calendar::TimePoint originalStartDate = TimePointFromString("2020-12-10 14:30:00"); // thursday
-            calendar::TimePoint originalEndDate   = TimePointFromString("2020-12-10 15:30:00"); // thursday
+            TimePoint originalStartDate = TimePointFromString("2020-12-10 14:30:00"); // thursday
+            TimePoint originalEndDate   = TimePointFromString("2020-12-10 15:30:00"); // thursday
+            LOG_DEBUG("start: %s", TimePointToString(originalStartDate + date::days{0}).c_str());
+            LOG_DEBUG("start: %s", TimePointToString(originalEndDate + date::days{0}).c_str());
+            LOG_DEBUG("start is: %s",
+                      TimePointToString(TimePointFromTimeT(TimePointToTimeT(originalStartDate))).c_str());
+            LOG_DEBUG("start is: %s", TimePointToString(TimePointFromTimeT(TimePointToTimeT(originalEndDate))).c_str());
 
             check_custom_repeat(customRepeatOption, numberOfEvents, originalStartDate, originalEndDate);
         }
@@ -451,8 +457,8 @@ TEST_CASE("Events Table tests")
                 static_cast<uint32_t>(weekDayOption::monday) + static_cast<uint32_t>(weekDayOption::wednesday) +
                 static_cast<uint32_t>(weekDayOption::tuesday) + static_cast<uint32_t>(weekDayOption::sunday);
             uint32_t numberOfEvents     = 17;
-            calendar::TimePoint originalStartDate = TimePointFromString("2020-12-10 14:30:00"); // thursday
-            calendar::TimePoint originalEndDate   = TimePointFromString("2020-12-10 15:30:00"); // thursday
+            TimePoint originalStartDate = TimePointFromString("2020-12-10 14:30:00"); // thursday
+            TimePoint originalEndDate   = TimePointFromString("2020-12-10 15:30:00"); // thursday
 
             check_custom_repeat(customRepeatOption, numberOfEvents, originalStartDate, originalEndDate);
         }
@@ -461,8 +467,8 @@ TEST_CASE("Events Table tests")
         {
             uint32_t customRepeatOption = static_cast<uint32_t>(weekDayOption::saturday);
             uint32_t numberOfEvents     = 5;
-            calendar::TimePoint originalStartDate = TimePointFromString("2020-12-10 14:30:00"); // thursday
-            calendar::TimePoint originalEndDate   = TimePointFromString("2020-12-10 15:30:00"); // thursday
+            TimePoint originalStartDate = TimePointFromString("2020-12-10 14:30:00"); // thursday
+            TimePoint originalEndDate   = TimePointFromString("2020-12-10 15:30:00"); // thursday
 
             check_custom_repeat(customRepeatOption, numberOfEvents, originalStartDate, originalEndDate);
         }
@@ -470,8 +476,8 @@ TEST_CASE("Events Table tests")
 
     SECTION("Check count from filter")
     {
-        calendar::TimePoint from = TimePointFromString("2019-10-20 14:30:00");
-        calendar::TimePoint till = TimePointFromString("2019-10-24 14:20:00");
+        TimePoint from = TimePointFromString("2019-10-20 14:30:00");
+        TimePoint till = TimePointFromString("2019-10-24 14:20:00");
 
         CHECK(eventsTbl.countFromFilter(from, till) == 4);
     }
@@ -516,8 +522,8 @@ TEST_CASE("Events Table tests")
         CHECK(eventsTbl.count() == 6);
 
         std::string newTitle = "Updated Title", newProviderID = "PurePhoneUpdated";
-        calendar::TimePoint newDateFrom = TimePointFromString("2020-10-20 15:00:00"),
-                            newDateTill = TimePointFromString("2020-10-20 16:00:00");
+        TimePoint newDateFrom    = TimePointFromString("2020-10-20 15:00:00"),
+                  newDateTill    = TimePointFromString("2020-10-20 16:00:00");
         uint32_t newReminder     = static_cast<uint32_t>(Reminder::one_week_before);
         uint32_t newRepeatOption = static_cast<uint32_t>(Repeat::biweekly);
 
@@ -572,8 +578,8 @@ TEST_CASE("Events Table tests")
 
         std::string newTitle = "Updated Title", newProviderType = "PurePhoneUpdate", newProviderID = "newID",
                     newProvideriCalUid = "new iCalUid";
-        calendar::TimePoint newDateFrom = TimePointFromString("2020-10-20 15:00:00"),
-                            newDateTill = TimePointFromString("2020-10-20 16:00:00");
+        TimePoint newDateFrom          = TimePointFromString("2020-10-20 15:00:00"),
+                  newDateTill          = TimePointFromString("2020-10-20 16:00:00");
         uint32_t newReminder           = static_cast<uint32_t>(Reminder::one_week_before);
         uint32_t newRepeatOption       = static_cast<uint32_t>(Repeat::biweekly);
 
@@ -630,8 +636,8 @@ TEST_CASE("Events Table tests")
 
         std::string newTitle = "Updated Title", newProviderType = "PurePhoneUpdate", newProviderID = "newID",
                     newProvideriCalUid = "new iCalUid";
-        calendar::TimePoint newDateFrom = TimePointFromString("2020-10-20 15:00:00"),
-                            newDateTill = TimePointFromString("2020-10-20 16:00:00");
+        TimePoint newDateFrom          = TimePointFromString("2020-10-20 15:00:00"),
+                  newDateTill          = TimePointFromString("2020-10-20 16:00:00");
         uint32_t newReminder           = static_cast<uint32_t>(Reminder::one_week_before);
         uint32_t newRepeatOption       = static_cast<uint32_t>(Repeat::biweekly);
 
@@ -729,11 +735,11 @@ TEST_CASE("Events Table tests")
         }
         CHECK(eventsTbl.count() == 0);
 
-        calendar::TimePoint startDate1 = TimePointFromString("2018-10-20 14:24:00");
-        calendar::TimePoint startDate2 = TimePointFromString("2020-10-20 14:24:00");
+        TimePoint startDate1 = TimePointFromString("2018-10-20 14:24:00");
+        TimePoint startDate2 = TimePointFromString("2020-10-20 14:24:00");
 
-        calendar::TimePoint tillDate  = TimePointFromString("2030-10-20 15:24:00");
-        calendar::TimePoint firedDate = TimePointFromString("2018-10-20 14:24:00");
+        TimePoint tillDate  = TimePointFromString("2030-10-20 15:24:00");
+        TimePoint firedDate = TimePointFromString("2018-10-20 14:24:00");
 
         EventsTableRow testEvent1 = {{1},
                                      .UID              = "test1",

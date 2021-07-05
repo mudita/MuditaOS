@@ -3,26 +3,18 @@
 	url = ../lwip.git
 	shallow = true
 [submodule "module-utils/microtar"]
-	path = module-utils/microtar
+	path = third-party/microtar/src
 	url = ../microtar.git
 [submodule "module-utils/segger"]
 	path = module-utils/segger
 	url = ../segger-utils.git
-[submodule "module-utils/crc32"]
-	path = module-utils/crc32
-	url = ../crc32
-[submodule "module-utils/re2"]
-	path = module-utils/re2
-	url = ../re2.git
-	branch = rt1051
-	shallow = true
 [submodule "module-utils/protobuf"]
-	path = module-utils/protobuf
+	path = third-party/protobuf/src
 	url = ../protobuf.git
 	branch = rt1051
 	shallow = true
-[submodule "module-utils/libphonenumber"]
-	path = module-utils/libphonenumber
+[submodule "third-party/libphonenumber"]
+	path = third-party/libphonenumber/src
 	url = ../libphonenumber.git
 	branch = rt1051
 	shallow = true
@@ -33,42 +25,71 @@
 [submodule "test/Catch2"]
 	path = test/Catch2
 	url = https://github.com/catchorg/Catch2
-[submodule "module-utils/date"]
-	path = module-utils/date
+[submodule "third-party/date"]
+	path = third-party/date
 	url = ../date.git
-[submodule "module-audio/Audio/decoder/minimp3"]
-	path = module-audio/Audio/decoder/minimp3
-	url = ../minimp3.git
-    branch = RT1051
 [submodule "module-utils/taglib"]
-	path = module-utils/taglib
+	path = third-party/taglib
 	url = ../taglib.git
 	branch = rt1051
 [submodule "module-bluetooth/lib/btstack"]
 	path = module-bluetooth/lib/btstack
 	url = ../btstack.git
 [submodule "module-utils/pugixml"]
-	path = module-utils/pugixml
+	path = third-party/pugixml
 	url = ../pugixml.git
 [submodule "module-utils/magic_enum"]
-	path = module-utils/magic_enum
-	url = git@github.com:Neargye/magic_enum.git
-[submodule "module-vfs/board/freeRTOS_FAT"]
-	path = module-vfs/board/freeRTOS_FAT
-	url = ../Lab-Project-FreeRTOS-FAT.git
+	path = third-party/magic_enum
+	url = https://github.com/Neargye/magic_enum.git
 [submodule "module-utils/tinyexpr"]
-	path = module-utils/tinyexpr
+	path = third-party/tinyexpr/src
 	url = https://github.com/codeplea/tinyexpr.git
-[submodule "module-bsp/board/rt1051/bsp/usb"]
-	path = module-bsp/board/rt1051/bsp/usb
-	url = ../usb_stack.git
-	branch = stable
 [submodule "module-vfs/thirdparty/fatfs"]
-	path = module-vfs/thirdparty/fatfs
+	path = third-party/fatfs/src
 	url = ../fatfs.git
 [submodule "host-tools/littlefs-fuse/lfsfuse"]
 	path = host-tools/littlefs-fuse/lfsfuse
 	url = https://github.com/littlefs-project/littlefs-fuse.git
-[submodule "module-vfs/thirdparty/lfsfs/littlefs"]
-	path = module-vfs/thirdparty/lfsfs/littlefs
+[submodule "third-party/sml"]
+	path = third-party/sml/src
+	url = https://github.com/boost-ext/sml
+[submodule "tools/misc"]
+	path = tools/misc
+	url = ../misc-tools.git
+[submodule "test/harness"]
+	path = test/harness
+	url = ../QAMuditaHarness.git
+	shallow = true
+[submodule "third-party/CrashDebug"]
+	path = third-party/CrashDebug/src
+	url = https://github.com/adamgreen/CrashDebug.git
+[submodule "third-party/minimp3/minimp3"]
+	path = third-party/minimp3/minimp3
+	url = ../minimp3.git
+	branch = RT1051
+[submodule "third-party/parallel-hashmap/src"]
+	path = third-party/parallel-hashmap/src
+	url = https://github.com/greg7mdp/parallel-hashmap.git
+[submodule "third-party/littlefs/src"]
+	path = third-party/littlefs/src
 	url = https://github.com/littlefs-project/littlefs.git
+[submodule "third-party/gsl"]
+	path = third-party/gsl
+	url = https://github.com/microsoft/GSL.git
+[submodule "third-party/re2/src"]
+	path = third-party/re2/src
+	url = ../re2.git
+	branch = rt1051
+[submodule "third-party/utz/src/utz"]
+	path = third-party/utz/src/utz
+	url = https://github.com/mudita/utz.git
+[submodule "third-party/base64/src"]
+	path = third-party/base64/src
+	url = https://github.com/rafagafe/base64.git
+[submodule "third-party/hash-library/src"]
+	path = third-party/hash-library/src
+	url = https://github.com/mudita/hash-library.git
+	branch = rt1051
+[submodule "third-party/usb_stack"]
+	path = third-party/usb_stack
+	url = ../usb_stack.git

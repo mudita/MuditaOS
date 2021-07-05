@@ -4,15 +4,17 @@
 #pragma once
 
 #include "BaseSettingsWindow.hpp"
+#include <module-apps/application-settings-new/ApplicationSettings.hpp>
 
 namespace gui
 {
     class KeypadLightWindow : public BaseSettingsWindow
     {
       public:
-        KeypadLightWindow(app::Application *app);
+        KeypadLightWindow(app::Application *app, app::settingsInterface::KeypdBacklightSettings *settings);
 
       private:
+        app::settingsInterface::KeypdBacklightSettings *keypadLightSettings;
         void switchHandler(bool &onOffSwitch);
         std::list<Option> buildOptionsList() override;
 

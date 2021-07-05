@@ -1,15 +1,17 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RT1051LPM.hpp"
 
 #include "board.h"
-#include "log/log.hpp"
+#include <log.hpp>
 #include "bsp/BoardDefinitions.hpp"
 #include "bsp/watchdog/watchdog.hpp"
 #include <clock_config.h>
 #include <fsl_clock.h>
-#include <fsl_dcdc.h>
+#include "ClockState.hpp"
+#include "Oscillator.hpp"
+#include "critical.hpp"
 
 namespace bsp
 {
@@ -39,98 +41,53 @@ namespace bsp
 
     int32_t RT1051LPM::Reboot()
     {
-        bsp::watchdog::init();
-        bsp::watchdog::system_reset();
+        NVIC_SystemReset();
         return 0;
     }
 
-    void RT1051LPM::SetCpuFrequency(bsp::LowPowerMode::CpuFrequency freq)
+    void RT1051LPM::SetCpuFrequency(bsp::CpuFrequencyHz freq)
     {
         currentFrequency = freq;
         switch (freq) {
-        case bsp::LowPowerMode::CpuFrequency::Level_1:
+        case bsp::CpuFrequencyHz::Level_1:
             CpuFreq->SetCpuFrequency(CpuFreqLPM::CpuClock::CpuClock_Osc_12_Mhz);
             break;
-        case bsp::LowPowerMode::CpuFrequency::Level_2:
+        case bsp::CpuFrequencyHz::Level_2:
             CpuFreq->SetCpuFrequency(CpuFreqLPM::CpuClock::CpuClock_Osc_24_Mhz);
             break;
-        case bsp::LowPowerMode::CpuFrequency::Level_3:
+        case bsp::CpuFrequencyHz::Level_3:
             CpuFreq->SetCpuFrequency(CpuFreqLPM::CpuClock::CpuClock_Pll2_66_Mhz);
             break;
-        case bsp::LowPowerMode::CpuFrequency::Level_4:
+        case bsp::CpuFrequencyHz::Level_4:
             CpuFreq->SetCpuFrequency(CpuFreqLPM::CpuClock::CpuClock_Pll2_132_Mhz);
             break;
-        case bsp::LowPowerMode::CpuFrequency::Level_5:
+        case bsp::CpuFrequencyHz::Level_5:
             CpuFreq->SetCpuFrequency(CpuFreqLPM::CpuClock::CpuClock_Pll2_264_Mhz);
             break;
-        case bsp::LowPowerMode::CpuFrequency::Level_6:
+        case bsp::CpuFrequencyHz::Level_6:
             CpuFreq->SetCpuFrequency(CpuFreqLPM::CpuClock::CpuClock_Pll2_528_Mhz);
             break;
         }
         LOG_INFO("CPU frequency changed to %lu", CLOCK_GetFreq(kCLOCK_CpuClk));
     }
 
+    uint32_t RT1051LPM::GetCpuFrequency() const noexcept
+    {
+        return CLOCK_GetCpuClkFreq();
+    }
+
     void RT1051LPM::SwitchOscillatorSource(bsp::LowPowerMode::OscillatorSource source)
     {
         if (source == bsp::LowPowerMode::OscillatorSource::Internal) {
-            if (IsClockEnabled(kCLOCK_Lpuart1) || IsClockEnabled(kCLOCK_Lpuart2) || IsClockEnabled(kCLOCK_Lpuart3) ||
-                IsClockEnabled(kCLOCK_Lpuart4) || IsClockEnabled(kCLOCK_Lpuart5) || IsClockEnabled(kCLOCK_Lpuart6) ||
-                IsClockEnabled(kCLOCK_Lpuart7) || IsClockEnabled(kCLOCK_Lpuart8)) {
-                return;
-            }
-
-            /// Switch DCDC to use DCDC internal OSC
-            DCDC_SetClockSource(DCDC, kDCDC_ClockInternalOsc);
-            /// Switch clock source to internal RC
-            CLOCK_SwitchOsc(kCLOCK_RcOsc);
-            CLOCK_DeinitExternalClk();
-            /// Wait CCM operation finishes
-            while (CCM->CDHIPR != 0) {}
+            cpp_freertos::CriticalSection::Enter();
+            bsp::DisableExternalOscillator();
+            cpp_freertos::CriticalSection::Exit();
         }
         else if (source == bsp::LowPowerMode::OscillatorSource::External) {
-            CLOCK_InitExternalClk(0);
-            /// Switch DCDC to use DCDC external OSC
-            DCDC_SetClockSource(DCDC, kDCDC_ClockExternalOsc);
-            /// Switch clock source to external OSC.
-            CLOCK_SwitchOsc(kCLOCK_XtalOsc);
-            /// Wait CCM operation finishes
-            while (CCM->CDHIPR != 0) {}
-            /// Set Oscillator ready counter value.
-            CCM->CCR = (CCM->CCR & (~CCM_CCR_OSCNT_MASK)) | CCM_CCR_OSCNT(bsp::OscillatorReadyCounterValue);
+            cpp_freertos::CriticalSection::Enter();
+            bsp::EnableExternalOscillator();
+            cpp_freertos::CriticalSection::Exit();
         }
-
-        currentOscSource = source;
-    }
-
-    void RT1051LPM::SwitchPll2State(bsp::LowPowerMode::Pll2State state)
-    {
-        if (state == bsp::LowPowerMode::Pll2State::Disable) {
-            if (IsClockEnabled(kCLOCK_Lpspi1) || IsClockEnabled(kCLOCK_Lpspi2) || IsClockEnabled(kCLOCK_Lpspi3) ||
-                IsClockEnabled(kCLOCK_Lpspi4) || IsClockEnabled(kCLOCK_Usdhc1) || IsClockEnabled(kCLOCK_Usdhc2)) {
-                return;
-            }
-
-            /// First switch external RAM clock
-            CLOCK_SetMux(kCLOCK_SemcMux, 0);
-            /// Then turn off PLL2
-            clkPLL2setup(CLK_DISABLE);
-        }
-        else {
-            /// First turn on PLL2
-            clkPLL2setup(CLK_ENABLE);
-            /// Then switch external RAM clock
-            CLOCK_SetMux(kCLOCK_SemcMux, 1);
-        }
-
-        currentPll2State = state;
-    }
-
-    bool RT1051LPM::IsClockEnabled(clock_ip_name_t name) const noexcept
-    {
-        const auto index = static_cast<uint32_t>(name) >> CCM_TupleShift;
-        const auto shift = static_cast<uint32_t>(name) & CCM_TupleMask;
-
-        return ((*reinterpret_cast<volatile uint32_t *>(&CCM->CCGR0 + index)) & (ClockNeededRunWaitMode << shift));
     }
 
 } // namespace bsp

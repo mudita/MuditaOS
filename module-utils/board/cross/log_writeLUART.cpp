@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "../../log/log.hpp"
+#include <log.hpp>
 #include "fsl_lpuart.h"
 
 #define LOG_UART_DEV LPUART3

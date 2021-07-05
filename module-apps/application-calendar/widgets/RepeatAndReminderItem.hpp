@@ -1,12 +1,13 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
+
 #include "CalendarListItem.hpp"
 #include <Label.hpp>
 #include <Text.hpp>
 #include <BoxLayout.hpp>
-#include <module-apps/Application.hpp>
+#include <apps-common/Application.hpp>
 #include <module-apps/application-calendar/ApplicationCalendar.hpp>
 
 namespace gui
@@ -30,7 +31,6 @@ namespace gui
         virtual ~RepeatAndReminderItem() = default;
 
         void descriptionHandler();
-        bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
     };
 
 } /* namespace gui */

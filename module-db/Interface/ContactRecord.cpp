@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ContactRecord.hpp"
@@ -135,6 +135,9 @@ auto ContactRecordInterface::runQuery(std::shared_ptr<db::Query> query) -> std::
     if (typeid(*query) == typeid(db::query::ContactGet)) {
         return getQuery(query);
     }
+    else if (typeid(*query) == typeid(db::query::ContactGetWithTotalCount)) {
+        return getQueryWithTotalCount(query);
+    }
     else if (typeid(*query) == typeid(db::query::ContactGetLetterMap)) {
         return getLetterMapQuery(query);
     }
@@ -162,7 +165,7 @@ auto ContactRecordInterface::runQuery(std::shared_ptr<db::Query> query) -> std::
     }
 }
 
-auto ContactRecordInterface::getQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
+auto ContactRecordInterface::getQueryRecords(std::shared_ptr<db::Query> query) -> std::vector<ContactRecord>
 {
     auto textFilter = dynamic_cast<const db::query::TextFilter *>(query.get());
     assert(query != nullptr);
@@ -203,9 +206,29 @@ auto ContactRecordInterface::getQuery(std::shared_ptr<db::Query> query) -> std::
     for (uint32_t idx = 0; idx < static_cast<uint32_t>(ids.size()); idx++) {
         result[idx].contactPosOnList = offset + idx;
     }
-    auto response = std::make_unique<db::query::ContactGetResult>(result);
+    return result;
+}
+
+auto ContactRecordInterface::getQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
+{
+    auto response = std::make_unique<db::query::ContactGetResult>(getQueryRecords(query));
     response->setRequestQuery(query);
     return response;
+}
+
+auto ContactRecordInterface::getQueryWithTotalCount(std::shared_ptr<db::Query> query)
+    -> std::unique_ptr<db::QueryResult>
+{
+    if (auto queryContacts = dynamic_cast<db::query::ContactGet *>(query.get())) {
+        auto querySize = std::make_shared<db::query::ContactGetSize>(queryContacts->getFilterData(),
+                                                                     queryContacts->getGroupFilterData(),
+                                                                     queryContacts->getContactDisplayMode());
+        auto response  = std::make_unique<db::query::ContactGetResultWithTotalCount>(getQueryRecords(query),
+                                                                                    getContactsSize(querySize));
+        response->setRequestQuery(query);
+        return response;
+    }
+    return nullptr;
 }
 
 auto ContactRecordInterface::getLetterMapQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
@@ -233,7 +256,7 @@ auto ContactRecordInterface::getByIDQuery(std::shared_ptr<db::Query> query) -> s
     return response;
 }
 
-auto ContactRecordInterface::getSizeQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
+auto ContactRecordInterface::getContactsSize(std::shared_ptr<db::Query> query) -> std::size_t
 {
     auto textFilter = dynamic_cast<const db::query::TextFilter *>(query.get());
     assert(query != nullptr);
@@ -280,7 +303,12 @@ auto ContactRecordInterface::getSizeQuery(std::shared_ptr<db::Query> query) -> s
     else {
         count = contactDB->name.GetCountByName(countQuery->getFilterData());
     }
+    return count;
+}
 
+auto ContactRecordInterface::getSizeQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
+{
+    auto count = getContactsSize(query);
     debug_db_data("Contact count query result: %lu", static_cast<unsigned long>(count));
 
     auto response = std::make_unique<db::query::RecordsSizeQueryResult>(count);

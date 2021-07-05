@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 import sys
@@ -14,7 +14,7 @@ from harness.interface.error import TestError, Error
 def search_sms(harness, message: str, phone_number: str):
     @harness.with_phone_unlocked
     def do_it(connection):
-        body = {"messageBody": message, "phoneNumber": phone_number}
+        body = {"category": "message", "messageBody": message, "phoneNumber": phone_number}
         messages = harness.endpoint_request("messages", "get", body)["body"]
         print(f'Found {len(messages)} messages')
 
@@ -37,6 +37,7 @@ def main():
         port_name = sys.argv[1]
 
     harness = Harness(port_name)
+    harness.unlock_phone()
     message = str(sys.argv[2])
     phone_number = str(sys.argv[3])
 
@@ -49,4 +50,3 @@ if __name__ == "__main__":
     except TestError as err:
         log.error(err)
         exit(err.get_error_code())
-

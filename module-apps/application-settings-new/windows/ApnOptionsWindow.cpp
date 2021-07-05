@@ -12,7 +12,7 @@ namespace gui
 {
     ApnOptionsWindow::ApnOptionsWindow(app::Application *app) : BaseSettingsWindow(app, window::name::apn_options)
     {
-        setTitle(utils::localize.get("app_settings_apn_options"));
+        setTitle(utils::translate("app_settings_apn_options"));
         apnSettingsModel = new ApnSettingsModel(application);
     }
 
@@ -21,9 +21,10 @@ namespace gui
         std::list<gui::Option> optionsList;
 
         optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
-            utils::localize.get("app_settings_apn_options_edit"),
+            utils::translate("app_settings_apn_options_edit"),
             [=](gui::Item &item) {
                 std::unique_ptr<gui::SwitchData> data = std::make_unique<ApnItemData>(apn);
+                data->ignoreCurrentWindowOnStack      = true;
                 application->switchWindow(gui::window::name::new_apn, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
                 return true;
             },
@@ -31,18 +32,20 @@ namespace gui
             this));
 
         optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
-            utils::localize.get("app_settings_apn_options_delete"),
+            utils::translate("app_settings_apn_options_delete"),
             [=](gui::Item &item) {
                 apnSettingsModel->removeAPN(apn);
+                application->returnToPreviousWindow();
                 return true;
             },
             nullptr,
             this));
 
         optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
-            utils::localize.get("app_settings_apn_options_set_as_default"),
+            utils::translate("app_settings_apn_options_set_as_default"),
             [=](gui::Item &item) {
                 apnSettingsModel->setAsDefaultAPN(apn);
+                application->returnToPreviousWindow();
                 return true;
             },
             nullptr,

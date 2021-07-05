@@ -10,9 +10,25 @@
 
 #include <Utils.hpp>
 
+#include <json11.hpp>
+
 namespace packet_data
 {
 
+    namespace json::APN
+    {
+        namespace Config
+        {
+            constexpr inline auto contextId   = "contextId";
+            constexpr inline auto apnType     = "apnType";
+            constexpr inline auto contextType = "contextType";
+            constexpr inline auto authMethod  = "authMethod";
+            constexpr inline auto apn         = "apn";
+            constexpr inline auto username    = "username";
+            constexpr inline auto password    = "password";
+
+        } // namespace Config
+    }     // namespace json::APN
     enum class DataTransfer
     {
         Off,
@@ -26,11 +42,13 @@ namespace packet_data
          */
         enum class APNType
         {
-            Default, ///< only one APN is set as default
-            IMS,     ///< IP Multimedia Subsystem for eg VoLTE
-            MMS,     ///< for MMS service
-            Fota,    ///< for Firmware Update
-            Internet //< for data traffic
+            Default,  ///< only one APN is set as default
+            IMS,      ///< IP Multimedia Subsystem for eg VoLTE
+            MMS,      ///< for MMS service
+            Fota,     ///< for Firmware Update
+            Internet, ///< for internet connection, Default have same meaning (but default). If this change to default,
+                      ///< existing Default will change to Internet
+            Internal  ///< for Internal MBN APNs
         };
 
         /**
@@ -77,7 +95,7 @@ namespace packet_data
           public:
             unsigned char contextId =
                 0; /// context on which apn is configured available values 1-16, 0 - means not set yet
-            APNType apnType         = APNType::Default;
+            APNType apnType         = APNType::Internal;
             ContextState state      = ContextState::Deactivated;
             ContextType contextType = ContextType::ipv4; /// IP type
             AuthMethod authMethod   = AuthMethod::NONE;
@@ -167,12 +185,44 @@ namespace packet_data
             {
                 return !(c1 == c2);
             }
+
+            void from_json(json11::Json json)
+            {
+                contextId = json[json::APN::Config::contextId].int_value();
+                apnType   = static_cast<packet_data::APN::APNType>(json[json::APN::Config::apnType].int_value());
+                contextType =
+                    static_cast<packet_data::APN::ContextType>(json[json::APN::Config::contextType].int_value());
+                authMethod = static_cast<packet_data::APN::AuthMethod>(json[json::APN::Config::authMethod].int_value());
+                apn        = json[json::APN::Config::apn].string_value();
+                username   = json[json::APN::Config::username].string_value();
+                password   = json[json::APN::Config::password].string_value();
+            }
+            [[nodiscard]] auto to_json() const -> json11::Json
+            {
+                return json11::Json::object{{json::APN::Config::contextId, contextId},
+                                            {json::APN::Config::apnType, static_cast<int>(apnType)},
+                                            {json::APN::Config::contextType, static_cast<int>(contextType)},
+                                            {json::APN::Config::authMethod, static_cast<int>(authMethod)},
+                                            {json::APN::Config::apn, apn},
+                                            {json::APN::Config::username, username},
+                                            {json::APN::Config::password, password}};
+            }
         };
 
     } // namespace APN
-
+    constexpr unsigned char EmptyContextId = 0;
     constexpr unsigned char MINContextId = 1;
     constexpr unsigned char MAXContextId = 16;
+
+    /** Comment from quectel (2020.12):
+     * As I know, only VZW MBN would use IMS on CID 1 to register IMS service directly.
+     * So we usually ask customers to set up data connection on CID3 for VZW sim card.
+     * Regarding other MBN files, the CID 1 shouldn’t be IMS because the CID1 is used
+     * to activate default bearer for LTE network. So we usually ask customers to
+     * configure their own APN on CID1.  With this rule, it’s easy for customer
+     * to configure their APN no matter which MBN file is activated
+     */
+    constexpr auto internalAPNMaxId      = 4;
     using ContextMap                     = std::unordered_map<unsigned char, std::shared_ptr<APN::Config>>;
     using ContextPair                    = std::pair<unsigned char, std::shared_ptr<APN::Config>>;
 

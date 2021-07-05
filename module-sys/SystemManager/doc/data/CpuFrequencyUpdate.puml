@@ -1,0 +1,19 @@
+@startuml
+
+PowerManager -> CpuGovernor : GetMinimumFrequencyRequested
+CpuGovernor --> PowerManager : minimumFrequency
+
+...CPU frequency change...
+
+PowerManager -> CpuGovernor : CpuFrequencyHasChanged
+
+CpuGovernor -> cellularSentinel : CpuFrequencyHasChanged
+
+CpuGovernor -> eInkSentinel : CpuFrequencyHasChanged
+eInkSentinel -> DriverPWM : updatePWM
+note right
+Critical section!
+mutex necessary
+end note
+
+@enduml

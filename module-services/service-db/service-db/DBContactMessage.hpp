@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -80,28 +80,6 @@ class DBContactNumberResponseMessage : public sys::ResponseMessage
      *
      */
     std::unique_ptr<ContactRecord> contact;
-};
-
-class DBContactBlock : public DBMessage
-{
-  public:
-    DBContactBlock(MessageType messageType, const uint32_t _id, bool _shouldBeBlocked);
-
-    uint32_t id;
-    bool shouldBeBlocked;
-};
-
-class DBContactSearchMessage : public DBMessage
-{
-  public:
-    DBContactSearchMessage(MessageType messageType,
-                           const char *_primaryName,
-                           const char *_alternativeName,
-                           const char *_number);
-
-    const char *primaryName;
-    const char *alternativeName;
-    const char *number;
 };
 
 class DBContactResponseMessage : public DBResponseMessage

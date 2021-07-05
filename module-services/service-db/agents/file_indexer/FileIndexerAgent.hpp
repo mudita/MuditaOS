@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -40,7 +40,8 @@ class FileIndexerAgent : public DatabaseAgent
     // db operations
     auto dbRegisterFileChange(std::string dir, std::string service) -> bool;
     auto dbUnregisterFileChange(std::string dir, std::string service) -> bool;
-    auto dbListDir(std::unique_ptr<FileIndexer::ListDirData> listDir) -> std::unique_ptr<FileIndexer::ListDirData>;
+    auto dbListDir(unsigned int offset, unsigned int limit, const std::string &directory)
+        -> std::unique_ptr<FileIndexer::ListDir>;
     auto dbGetProperty(std::unique_ptr<FileIndexer::FileMetadata> metaData) -> FileIndexer::FileMetadata;
     auto dbSetProperty(std::unique_ptr<FileIndexer::FileMetadata> metaData) -> bool;
     auto dbSetProperties(std::unique_ptr<FileIndexer::FileMetadata> metaData) -> bool;

@@ -1,12 +1,15 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <string>
 
 #include <at/Commands.hpp>
 #include <Utils.hpp>
+#include <at/ATFactory.hpp>
 
 #include "service-cellular/requests/PinChangeRequest.hpp"
+#include <at/ATFactory.hpp>
+#include <map>
 
 namespace
 {
@@ -42,7 +45,7 @@ namespace cellular
         return std::make_unique<PinChangeRequest>(data, matchGroups);
     }
 
-    auto PinChangeRequest::command() -> std::string
+    auto PinChangeRequest::command() -> at::Cmd
     {
         std::array<std::function<std::string()>, 2> commandParts = {
             [this]() { return this->getOldPinOrPuk(); },
@@ -50,24 +53,26 @@ namespace cellular
         };
 
         if (!isValid()) {
-            return std::string();
+            return at::Cmd(std::string());
         }
 
-        std::string cmd;
+        at::Cmd cmd("");
         switch (passChangeType) {
         case PassChangeType::ChangePin:
-            cmd.append(at::factory(at::AT::CPWD) + "\"SC\",");
+            cmd = at::factory(at::AT::CPWD);
+            cmd = cmd + "\"SC\",";
             break;
         case PassChangeType::ChangePin2:
-            cmd.append(at::factory(at::AT::CPWD) + "\"P2\",");
+            cmd = at::factory(at::AT::CPWD);
+            cmd = cmd + "\"P2\",";
             break;
         case PassChangeType::ChangePinByPuk:
-            cmd.append(at::factory(at::AT::CPIN));
+            cmd = at::factory(at::AT::CPIN);
             break;
         };
 
         for (auto &cmdPart : commandParts) {
-            cmd.append(cmdPart());
+            cmd = cmd + cmdPart();
         }
 
         return cmd;

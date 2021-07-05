@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <functional>
@@ -15,6 +15,11 @@
 #include "Margins.hpp"
 
 #include <Style.hpp>
+
+extern "C"
+{
+#include <module-bluetooth/lib/btstack/src/btstack_util.h>
+}
 
 namespace gui
 {
@@ -43,7 +48,7 @@ namespace gui
     sys::ReturnCodes message_bt2(app::Application *app, BluetoothMessage::Request req)
     {
         std::shared_ptr<BluetoothMessage> msg = std::make_shared<BluetoothMessage>(req);
-        auto ret                              = sys::Bus::SendUnicast(msg, "ServiceBluetooth", app);
+        auto ret                              = app->bus.sendUnicast(msg, "ServiceBluetooth");
         if (!ret) {
             LOG_ERROR("err: %d", static_cast<int>(ret));
         }
@@ -55,12 +60,13 @@ namespace gui
         AppWindow::buildInterface();
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::select));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::select));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
-        setTitle(utils::localize.get("BT_scan_results"));
+        setTitle(utils::translate("BT_scan_results"));
 
-        box = new gui::VBox(this, 0, title->offset_h(), style::window_width, 7 * style::window::label::default_h);
+        box = new gui::VBox(
+            this, 0, style::window::default_vertical_pos, style::window_width, 7 * style::window::label::default_h);
 
         for (auto device : devices) {
             add_box_label2(box, device.name, [=](Item &) {
@@ -68,7 +74,7 @@ namespace gui
 
                 std::shared_ptr<BluetoothAddrMessage> msg =
                     std::make_shared<BluetoothAddrMessage>(bd_addr_to_str(device.address));
-                sys::Bus::SendUnicast(msg, "ServiceBluetooth", application, 5000);
+                application->bus.sendUnicastSync(msg, "ServiceBluetooth", 5000);
 
                 message_bt2(application, BluetoothMessage::Request::StopScan);
                 // message_bt2(application, BluetoothMessage::Request::Start);

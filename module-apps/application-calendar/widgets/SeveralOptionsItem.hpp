@@ -1,7 +1,8 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
+
 #include "Application.hpp"
 #include "CalendarListItem.hpp"
 #include "application-calendar/widgets/CalendarStyle.hpp"
@@ -49,9 +50,6 @@ namespace gui
         void prepareOptionsNames();
         void applyCallbacks();
         uint32_t repeatOptionValue = 0;
-
-        // virtual methods from Item
-        bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
     };
 
 } /* namespace gui */

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -7,6 +7,9 @@
 #include "agents/settings/SettingsAgent.hpp"
 #include "service-db/DatabaseAgent.hpp"
 #include "service-db/DBNotificationMessage.hpp"
+#include "service-db/DBServiceName.hpp"
+
+#include "service-fileindexer/Constants.hpp"
 
 #include <Common/Query.hpp>
 #include <Interface/AlarmsRecord.hpp>
@@ -16,7 +19,6 @@
 #include <Interface/CountryCodeRecord.hpp>
 #include <Interface/EventsRecord.hpp>
 #include <Interface/NotesRecord.hpp>
-#include <Interface/NotificationsRecord.hpp>
 #include <Interface/SMSRecord.hpp>
 #include <Interface/SMSTemplateRecord.hpp>
 #include <Interface/ThreadRecord.hpp>
@@ -48,6 +50,10 @@ class SMSTemplateRecordInterface;
 class SettingsDB;
 class SmsDB;
 class ThreadRecordInterface;
+namespace Quotes
+{
+    class QuotesAgent;
+}
 
 class ServiceDB : public sys::Service
 {
@@ -60,6 +66,7 @@ class ServiceDB : public sys::Service
     std::unique_ptr<CountryCodesDB> countryCodesDB;
     std::unique_ptr<NotificationsDB> notificationsDB;
     std::unique_ptr<EventsDB> eventsDB;
+    std::unique_ptr<Database> quotesDB;
 
     std::unique_ptr<SMSRecordInterface> smsRecordInterface;
     std::unique_ptr<ThreadRecordInterface> threadRecordInterface;
@@ -71,6 +78,7 @@ class ServiceDB : public sys::Service
     std::unique_ptr<CountryCodeRecordInterface> countryCodeRecordInterface;
     std::unique_ptr<NotificationsRecordInterface> notificationsRecordInterface;
     std::unique_ptr<EventsRecordInterface> eventsRecordInterface;
+    std::unique_ptr<Quotes::QuotesAgent> quotesRecordInterface;
 
   protected:
     db::Interface *getInterface(db::Interface::Name interface);
@@ -86,8 +94,27 @@ class ServiceDB : public sys::Service
 
     sys::ReturnCodes DeinitHandler() override;
 
+    void ProcessCloseReason(sys::CloseReason closeReason) override;
+
     sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) final;
 
-    bool StoreIntoBackup(const std::string &backupPath);
+    bool StoreIntoBackup(const std::filesystem::path &backupPath);
     void sendUpdateNotification(db::Interface::Name interface, db::Query::Type type);
 };
+
+namespace sys
+{
+    template <> struct ManifestTraits<ServiceDB>
+    {
+        static auto GetManifest() -> ServiceManifest
+        {
+            ServiceManifest manifest;
+            manifest.name = service::name::db;
+#if ENABLE_FILEINDEXER_SERVICE
+            manifest.dependencies = {service::name::file_indexer.data()};
+#endif
+            manifest.timeout = std::chrono::minutes{1};
+            return manifest;
+        }
+    };
+} // namespace sys

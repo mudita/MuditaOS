@@ -1,10 +1,11 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 #pragma once
 
 #include <MessageType.hpp>
-#include <Service/Message.hpp>
 #include <module-db/Database/QueryResult.hpp>
+#include "PagedData.hpp"
+#include <Service/Message.hpp>
 
 #include <map>
 #include <memory>
@@ -16,8 +17,6 @@ namespace FileIndexer
     constexpr unsigned int FILE_ID_NOT_EXISTS       = 0;
     constexpr unsigned int FILE_RECORD_COLUMN_COUNT = 7;
     constexpr unsigned int NOTIFICATION_RECORD_COLUMN_COUNT = 3;
-    constexpr unsigned int ONE_ROW_FOUND            = 1;
-    constexpr unsigned int ZERO_ROWS_FOUND          = 0;
 
     // refers to file_tab
     struct FileRecord
@@ -74,13 +73,8 @@ namespace FileIndexer
         std::map<std::string, std::string> properties; // propertyName, value
     };
 
-    struct ListDirData : FileRecord
-    {
-        std::vector<FileRecord> fileList;
-        unsigned int list_limit;
-        unsigned int list_offset;
-        unsigned int count;
-    };
+    struct ListDir : FileRecord, PagedData<FileRecord>
+    {};
 
     namespace Messages
     {
@@ -119,31 +113,33 @@ namespace FileIndexer
             std::unique_ptr<std::string> directory;
         };
 
-        class GetListDirMessage : public FileIndexerMessage
+        class GetListDirRequest : public FileIndexerMessage
         {
           public:
-            GetListDirMessage() = default;
-            explicit GetListDirMessage(std::unique_ptr<ListDirData> listDir)
-                : FileIndexerMessage(), listDir(std::move(listDir))
+            GetListDirRequest() = default;
+            explicit GetListDirRequest(unsigned int offset, unsigned int limit, const std::string &directory)
+                : FileIndexerMessage(), offset(offset), limit(limit), directory(directory)
             {}
-            std::unique_ptr<ListDirData> listDir;
+            const unsigned int offset   = 0;
+            const unsigned int limit    = 0;
+            const std::string directory = std::string();
         };
 
-        class GetListDirResponseMessage : public sys::ResponseMessage
+        class GetListDirResponse : public sys::ResponseMessage
         {
           public:
-            explicit GetListDirResponseMessage(std::unique_ptr<ListDirData> listDir,
-                                               sys::ReturnCodes code = sys::ReturnCodes::Success)
+            explicit GetListDirResponse(std::unique_ptr<ListDir> listDir,
+                                        sys::ReturnCodes code = sys::ReturnCodes::Success)
                 : sys::ResponseMessage(code), listDir(std::move(listDir))
             {}
-            std::unique_ptr<ListDirData> listDir;
+            std::unique_ptr<ListDir> listDir;
             unsigned int getCount()
             {
                 return listDir->count;
             }
             auto getResults() -> std::vector<FileRecord>
             {
-                return listDir->fileList;
+                return listDir->data;
             }
         };
 

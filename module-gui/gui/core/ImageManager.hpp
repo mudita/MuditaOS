@@ -1,28 +1,20 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+#pragma once
 
-/*
- * ImageManager.hpp
- *
- *  Created on: 18 maj 2019
- *      Author: robert
- */
-
-#ifndef GUI_CORE_PIXMAPMANAGER_HPP_
-#define GUI_CORE_PIXMAPMANAGER_HPP_
-
+#include "ImageMap.hpp"
 #include <vector>
 #include <string>
 #include <cstdint>
-#include <cstring>
-
-#include "ImageMap.hpp"
 
 namespace gui
 {
-
     class ImageManager
     {
+      private:
+        ImageMap *createFallbackImage();
+        std::uint32_t fallbackImageId{0};
+
       protected:
         std::string mapFolder;
         std::vector<ImageMap *> imageMaps;
@@ -31,6 +23,7 @@ namespace gui
 
         ImageMap *loadPixMap(std::string filename);
         ImageMap *loadVecMap(std::string filename);
+        void addFallbackImage();
         void loadImageMaps(std::string baseDirectory);
 
         ImageManager();
@@ -50,5 +43,3 @@ namespace gui
     };
 
 } /* namespace gui */
-
-#endif /* GUI_CORE_PIXMAPMANAGER_HPP_ */

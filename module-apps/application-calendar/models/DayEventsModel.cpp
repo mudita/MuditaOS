@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DayEventsModel.hpp"
@@ -6,7 +6,7 @@
 #include "application-calendar/data/CalendarData.hpp"
 #include "application-calendar/ApplicationCalendar.hpp"
 #include <ListView.hpp>
-#include <queries/calendar/QueryEventsGetFiltered.hpp>
+#include <queries/calendar/QueryEventsGetFilteredByDay.hpp>
 #include <service-db/DBServiceAPI.hpp>
 #include <service-db/QueryMessage.hpp>
 #include <module-db/queries/RecordQuery.hpp>
@@ -27,7 +27,7 @@ unsigned int DayEventsModel::getMinimalItemHeight() const
 
 void DayEventsModel::requestRecords(const uint32_t offset, const uint32_t limit)
 {
-    auto query = std::make_unique<db::query::events::GetFiltered>(filterFrom, filterTill, offset, limit);
+    auto query = std::make_unique<db::query::events::GetFilteredByDay>(filterFrom, offset, limit);
     auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Events);
     task->setCallback([this](auto response) { return handleQueryResponse(response); });
     task->execute(application, this);
@@ -63,14 +63,13 @@ bool DayEventsModel::updateRecords(std::vector<EventsRecord> records)
 
 auto DayEventsModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
 {
-    if (auto response = dynamic_cast<db::query::events::GetFilteredResult *>(queryResult); response != nullptr) {
+    if (auto response = dynamic_cast<db::query::events::GetFilteredByDayResult *>(queryResult); response != nullptr) {
         if (recordsCount != (response->getCountResult())) {
             recordsCount = response->getCountResult();
-            list->rebuildList(style::listview::RebuildType::Full, 0, true);
+            list->rebuildList(gui::listview::RebuildType::Full, 0, true);
             return false;
         }
 
-        auto records = response->getResult();
         if (auto app = dynamic_cast<app::ApplicationCalendar *>(application); app != nullptr) {
             if (response->getCountResult() == 0) {
                 LOG_DEBUG("Empty records");
@@ -80,6 +79,7 @@ auto DayEventsModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
                 }
             }
             auto eventShift = app->getEventShift();
+            auto records    = response->getResult();
             if (eventShift) {
                 for (auto &record : records) {
                     record.date_from += std::chrono::hours(eventShift);
@@ -95,8 +95,9 @@ auto DayEventsModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
     return false;
 }
 
-void DayEventsModel::setFilters(calendar::TimePoint from, calendar::TimePoint till, const std::string &dayMonth)
+void DayEventsModel::setFilters(TimePoint from, TimePoint till, const std::string &dayMonth)
 {
+    /// TODO: change to one filter
     this->filterFrom    = from;
     this->filterTill    = till;
     this->dayMonthTitle = dayMonth;

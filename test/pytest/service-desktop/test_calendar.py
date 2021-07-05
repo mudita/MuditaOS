@@ -1,10 +1,13 @@
-# Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 import pytest
 from harness.interface.defs import status
 import copy
 
+
+@pytest.mark.rt1051
 @pytest.mark.service_desktop_test
+@pytest.mark.usefixtures("phone_unlocked")
 def test_calendar(harness):
     # add events
     add_body = {
@@ -38,16 +41,16 @@ def test_calendar(harness):
     #add second event
     second_event = copy.deepcopy(add_body)
     second_event["calendar_events"][0]["SUMMARY"] = "Testowy2"
+    second_event["calendar_events"][0]["UID"] = 5
     ret = harness.endpoint_request("events", "put", second_event)
     assert ret["status"] == status["OK"]
 
     # get all limited events
     get_body = {"offset": 0, "limit": 1}
     ret = harness.endpoint_request("events", "get", get_body)
-
     assert ret["status"] == status["OK"]
-    assert ret["body"]["count"] == '1'
-    assert ret["body"]["total_count"] == '2'
+    assert len(ret["body"]["calendar_events"]) == 1
+    assert ret["body"]["totalCount"] == 2
 
 
     for event in ret["body"]["calendar_events"]:
@@ -64,13 +67,13 @@ def test_calendar(harness):
     # remove event
     del_body = {"UID": ret["body"]["calendar_events"][0]["UID"]}
     ret = harness.endpoint_request("events", "del", del_body)
-    assert ret["status"] == status["OK"]
+    assert ret["status"] == status["NoContent"]
 
     # check events after remove
     body = {"offset": 0, "limit": 1}
     ret = harness.endpoint_request("events", "get", body)
     assert ret["status"] == status["OK"]
-    assert ret["body"]["count"] == "1"
+    assert ret["body"]["totalCount"] == 1
 
     # update event
     update_body = {
@@ -99,7 +102,7 @@ def test_calendar(harness):
     }
 
     ret = harness.endpoint_request("events", "post", update_body)
-    assert ret["status"] == status["OK"]
+    assert ret["status"] == status["NoContent"]
 
     # get updated event
     body = {"offset": 0, "limit": 1}
@@ -117,7 +120,7 @@ def test_calendar(harness):
         assert event["provider"]["id"] == update_body["calendar_events"][0]["provider"]["id"]
         assert event["provider"]["type"] == update_body["calendar_events"][0]["provider"]["type"]
 
-    assert ret["body"]["count"] == "1"
+    assert ret["body"]["totalCount"] == 1
 
 
 
@@ -128,13 +131,13 @@ def test_calendar(harness):
 
     del_body = {"UID": ret["body"]["calendar_events"][0]["UID"]}
     ret = harness.endpoint_request("events", "del", del_body)
-    assert ret["status"] == status["OK"]
+    assert ret["status"] == status["NoContent"]
 
     # check events after remove
     body = {"offset": 0, "limit": 1}
     ret = harness.endpoint_request("events", "get", body)
     assert ret["status"] == status["OK"]
-    assert ret["body"]["count"] == "0"
+    assert ret["body"]["totalCount"] == 0
 
 
 

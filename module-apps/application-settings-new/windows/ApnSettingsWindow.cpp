@@ -4,11 +4,11 @@
 #include "ApnSettingsWindow.hpp"
 #include "application-settings-new/ApplicationSettings.hpp"
 #include "application-settings-new/data/ApnListData.hpp"
-#include "application-settings-new/models/ApnSettingsModel.hpp"
 #include "application-settings-new/widgets/SettingsStyle.hpp"
 #include "application-settings-new/data/SettingsItemData.hpp"
 #include "OptionSetting.hpp"
 
+#include <header/AddElementAction.hpp>
 #include <InputEvent.hpp>
 
 namespace gui
@@ -21,31 +21,21 @@ namespace gui
 
     void ApnSettingsWindow::buildInterface()
     {
-        setTitle(utils::localize.get("app_settings_network_apn_settings"));
+        setTitle(utils::translate("app_settings_network_apn_settings"));
+        header->navigationIndicatorAdd(new gui::header::AddElementAction(), gui::header::BoxSelection::Left);
 
-        leftArrowImage = new gui::Image(this,
-                                        style::settings::window::leftArrowImage::x,
-                                        style::settings::window::leftArrowImage::y,
-                                        style::settings::window::leftArrowImage::w,
-                                        style::settings::window::leftArrowImage::h,
-                                        "arrow_left");
-        crossImage     = new gui::Image(this,
-                                    style::settings::window::crossImage::x,
-                                    style::settings::window::crossImage::y,
-                                    style::settings::window::crossImage::w,
-                                    style::settings::window::crossImage::h,
-                                    "cross");
-        emptyListIcon  = new Icon(this,
+        emptyListIcon = new Icon(this,
                                  0,
-                                 style::header::height,
+                                 style::window::default_vertical_pos,
                                  style::window_width,
-                                 style::window_height - style::header::height - style::footer::height,
+                                 style::window_height - style::window::default_vertical_pos - style::footer::height,
                                  "phonebook_empty_grey_circle_W_G",
-                                 utils::localize.get("app_settings_apn_settings_no_apns"));
+                                 utils::translate("app_settings_apn_settings_no_apns"));
 
-        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(style::strings::common::options));
+        bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::options));
 
-        auto apnSettingsModel = new ApnSettingsModel(application);
+        activeApn        = std::make_shared<packet_data::APN::Config>();
+        apnSettingsModel = std::make_shared<ApnSettingsModel>(application);
         apnSettingsModel->requestAPNList();
     }
     auto ApnSettingsWindow::handleSwitchData(SwitchData *data) -> bool
@@ -82,6 +72,11 @@ namespace gui
         }
 
         addOptions(optionsList(apns));
+
+        if (mode == gui::ShowMode::GUI_SHOW_RETURN) {
+            apnSettingsModel->requestAPNList();
+        }
+
         bottomBar->setActive(gui::BottomBar::Side::LEFT, true);
         bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
     }
@@ -91,7 +86,7 @@ namespace gui
         if (AppWindow::onInput(inputEvent)) {
             return true;
         }
-        if (!inputEvent.isShortPress()) {
+        if (!inputEvent.isShortRelease()) {
             return false;
         }
         if (inputEvent.is(gui::KeyCode::KEY_LEFT)) {
@@ -101,8 +96,7 @@ namespace gui
             return true;
         }
         if (inputEvent.is(gui::KeyCode::KEY_LF)) {
-            auto apnRecord                        = std::make_shared<packet_data::APN::Config>();
-            std::unique_ptr<gui::SwitchData> data = std::make_unique<ApnItemData>(apnRecord);
+            std::unique_ptr<gui::SwitchData> data = std::make_unique<ApnItemData>(activeApn);
             application->switchWindow(gui::window::name::apn_options, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
             return true;
         }
@@ -125,7 +119,10 @@ namespace gui
                         gui::window::name::new_apn, gui::ShowMode::GUI_SHOW_INIT, std::move(apnData));
                     return true;
                 },
-                nullptr,
+                [=](gui::Item &item) {
+                    activeApn = apn;
+                    return true;
+                },
                 nullptr));
         }
 

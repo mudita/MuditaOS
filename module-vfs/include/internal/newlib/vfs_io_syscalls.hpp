@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -8,6 +8,7 @@
 #include <dirent.h>
 #include <stdint.h>
 
+struct statvfs;
 namespace vfsn::internal::syscalls
 {
     int open(int &_errno_, const char *file, int flags, int mode);
@@ -34,4 +35,17 @@ namespace vfsn::internal::syscalls
     int chmod(int &_errno_, const char *path, mode_t mode);
     int fchmod(int &_errno_, int fd, mode_t mode);
     int fsync(int &_errno_, int fd);
+    int mount(int &_errno_,
+              const char *special_file,
+              const char *dir,
+              const char *fstype,
+              unsigned long int rwflag,
+              const void *data);
+    int umount(int &_errno_, const char *special_file);
+    int statvfs(int &_errno_, const char *path, struct statvfs *buf);
+    ssize_t readlink(int &_errno_, const char *path, char *buf, size_t buflen);
+    int symlink(int &_errno_, const char *name1, const char *name2);
+    long fpathconf(int &_errno, int fd, int name);
+    long pathconf(int &_errno, const char *path, int name);
+
 } // namespace vfsn::internal::syscalls

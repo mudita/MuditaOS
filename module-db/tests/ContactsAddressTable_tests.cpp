@@ -1,21 +1,21 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
 
 #include "Databases/ContactsDB.hpp"
-#include <vfs.hpp>
 #include <filesystem>
-#include <purefs/filesystem_paths.hpp>
 
 TEST_CASE("Contacts address Table tests")
 {
     Database::initialize();
 
-    const auto callogPath = (purefs::dir::getUserDiskPath() / "contacts.db").c_str();
-    std::filesystem::remove(callogPath);
+    const auto callogPath = (std::filesystem::path{"sys/user"} / "contacts.db");
+    if (std::filesystem::exists(callogPath)) {
+        REQUIRE(std::filesystem::remove(callogPath));
+    }
 
-    ContactsDB contactsdb{callogPath};
+    ContactsDB contactsdb{callogPath.c_str()};
     REQUIRE(contactsdb.isInitialized());
 
     ContactsAddressTableRow testRow1 = {{.ID = DB_ID_NONE},
@@ -24,6 +24,11 @@ TEST_CASE("Contacts address Table tests")
                                         .note      = "Test note",
                                         .mail      = "test@mudita.com"};
 
+    const auto contactsCount = contactsdb.address.count() + 1;
+    // clear contacts table
+    for (std::uint32_t id = 1; id <= contactsCount; id++) {
+        REQUIRE(contactsdb.address.removeById(id));
+    }
     // add 4 elements into table
     REQUIRE(contactsdb.address.add(testRow1));
     REQUIRE(contactsdb.address.add(testRow1));

@@ -1,10 +1,10 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include "visitor/GuiVisitor.hpp"
-#include <module-utils/json/json11.hpp>
+#include <json11.hpp>
 #include <list>
 
 namespace gui
@@ -29,7 +29,8 @@ namespace gui
         void visit(gui::Window &item) override;
         void visit(gui::Label &item) override;
         void visit(gui::BottomBar &item) override;
-        void visit(gui::top_bar::TopBar &item) override;
+        void visit(gui::status_bar::StatusBar &item) override;
+        void visit(gui::ListItem &item) override;
 
       public:
         /// retrieves current state of the `sink`. The state of the `sink` after call is default-initialized

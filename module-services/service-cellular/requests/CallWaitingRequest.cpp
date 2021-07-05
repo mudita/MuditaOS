@@ -5,6 +5,7 @@
 
 #include <at/Commands.hpp>
 #include <Utils.hpp>
+#include <at/ATFactory.hpp>
 
 #include "service-cellular/requests/CallWaitingRequest.hpp"
 
@@ -23,7 +24,7 @@ namespace cellular
         }
     }
 
-    auto CallWaitingRequest::command() -> std::string
+    auto CallWaitingRequest::command() -> at::Cmd
     {
         std::vector<commandBuilderFunc> commandParts = {
             [this]() { return getCommandPresentation(); },

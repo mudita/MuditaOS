@@ -1,9 +1,10 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include "Audio/StreamQueuedEventsListener.hpp"
+#include <Audio/StreamQueuedEventsListener.hpp>
+#include <Audio/AbstractStream.hpp>
 
 #include <Service/Worker.hpp>
 #include <semaphore.hpp>
@@ -21,7 +22,16 @@ namespace audio
             DisablePlayback,
         };
 
-        DecoderWorker(Stream *audioStreamOut, Decoder *decoder, EndOfFileCallback endOfFileCallback);
+        enum class ChannelMode
+        {
+            NoConversion,
+            ForceStereo
+        };
+
+        DecoderWorker(AbstractStream *audioStreamOut,
+                      Decoder *decoder,
+                      EndOfFileCallback endOfFileCallback,
+                      ChannelMode mode);
         ~DecoderWorker() override;
 
         virtual auto init(std::list<sys::WorkerQueueInfo> queues = std::list<sys::WorkerQueueInfo>()) -> bool override;
@@ -30,6 +40,8 @@ namespace audio
         auto disablePlayback() -> bool;
 
       private:
+        static constexpr std::size_t stackDepth = 2 * 1024;
+
         virtual auto handleMessage(uint32_t queueID) -> bool override;
         void pushAudioData();
         bool stateChangeWait();
@@ -41,8 +53,8 @@ namespace audio
         static constexpr auto listenerQueueName     = "DecoderWorkerQueue";
         static constexpr auto listenerQueueCapacity = 1024;
 
-        Stream *audioStreamOut = nullptr;
-        Decoder *decoder       = nullptr;
+        AbstractStream *audioStreamOut = nullptr;
+        Decoder *decoder               = nullptr;
         EndOfFileCallback endOfFileCallback;
         std::unique_ptr<StreamQueuedEventsListener> queueListener;
         bool playbackEnabled = false;
@@ -50,5 +62,6 @@ namespace audio
 
         const int bufferSize;
         std::unique_ptr<BufferInternalType[]> decoderBuffer;
+        ChannelMode channelMode = ChannelMode::NoConversion;
     };
 } // namespace audio

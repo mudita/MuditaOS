@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #ifndef PUREPHONE_LINUX_CELLULAR_HPP
@@ -8,13 +8,12 @@
 
 #include <cstring>
 #include <sys/epoll.h>
-#include "termios.h"
+#include <termios.h>
 #include <sys/ioctl.h>
-#include "mutex.hpp"
+#include <mutex.hpp>
 
 namespace bsp
 {
-
     class LinuxCellular : public Cellular
     {
       private:
@@ -24,40 +23,32 @@ namespace bsp
         LinuxCellular(const char *term, uint32_t portSpeed);
         ~LinuxCellular();
 
-        void PowerUp() override final;
+        void powerUp() override final;
+        void powerDown() override final;
+        void restart() override final;
 
-        void PowerDown() override final;
+        uint32_t wait(std::chrono::milliseconds timeoutMs) override final;
+        ssize_t read(void *buf, size_t nbytes, std::chrono::milliseconds timeoutMs) override final;
+        ssize_t write(void *buf, size_t nbytes) override final;
 
-        void Restart() override final;
+        void informModemHostAsleep() override final;
+        void informModemHostWakeup() override final;
 
-        uint32_t Wait(uint32_t timeout) override final;
+        void enterSleep() override final;
+        void exitSleep() override final;
+        void setSpeed(uint32_t portSpeed) override final;
 
-        ssize_t Read(void *buf, size_t nbytes) override final;
-
-        ssize_t Write(void *buf, size_t nbytes) override final;
-
-        void InformModemHostAsleep() override final;
-
-        void InformModemHostWakeup() override final;
-
-        void EnterSleep() override final;
-
-        void ExitSleep() override final;
-
-        void SetSpeed(uint32_t portSpeed);
-
-        void SetSendingAllowed(bool state) override final
+        void setSendingAllowed(bool state) override final
         {
             pv_SendingAllowed = state;
         }
-        bool GetSendingAllowed() override final
+        bool getSendingAllowed() const noexcept override final
         {
             return pv_SendingAllowed;
         }
 
-        void SelectAntenna(bsp::cellular::antenna antenna) override final;
-
-        bsp::cellular::antenna GetAntenna() override final;
+        void selectAntenna(bsp::cellular::antenna antenna) override final;
+        bsp::cellular::antenna getAntenna() override final;
 
       private:
         static constexpr speed_t baud_bits[] = {0,
@@ -73,8 +64,6 @@ namespace bsp
                                                 B2000000,
                                                 B3000000,
                                                 B4000000};
-
-        static const uint32_t portBaudRate = 115200;
 
         static const uint32_t MAX_EVENTS = 1;
 

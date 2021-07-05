@@ -1,10 +1,7 @@
-cmake_minimum_required(VERSION 3.12)
-
 project(module-os VERSION 1.0
         DESCRIPTION "OS module library")
 
 set(SOURCES
-
         ${CMAKE_CURRENT_SOURCE_DIR}/RTOSWrapper/ccondition_variable.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/RTOSWrapper/cevent_groups.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/RTOSWrapper/cmem_pool.cpp
@@ -18,7 +15,6 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/RTOSWrapper/ctimer.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/RTOSWrapper/cworkqueue.cpp
 
-
         ${CMAKE_CURRENT_SOURCE_DIR}/FreeRTOS/application.c
         ${CMAKE_CURRENT_SOURCE_DIR}/FreeRTOS/event_groups.c
         ${CMAKE_CURRENT_SOURCE_DIR}/FreeRTOS/heap_4.c
@@ -30,6 +26,7 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/usermem.c
 
         ${CMAKE_CURRENT_SOURCE_DIR}/CriticalSectionGuard.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/LockGuard.cpp
         )
 
 #Substitute FreeRTOS SystemvView sources if enabled
@@ -44,7 +41,6 @@ else()
             ${CMAKE_CURRENT_SOURCE_DIR}/FreeRTOS/tasks.c
             )
 endif()
-
 
 if(${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
     include(targets/Target_RT1051.cmake)
@@ -74,7 +70,12 @@ target_compile_definitions(${PROJECT_NAME}
         CPP_FREERTOS_CONDITION_VARIABLES
 )
 
-if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+# enforce no optimization for RelWithDebInfo configuration to debug system memory
+if (${CMAKE_BUILD_TYPE} STREQUAL "RelWithDebInfo")
+        target_compile_options (${PROJECT_NAME} PRIVATE "-O0")
+endif ()
+
+if (${CMAKE_BUILD_TYPE} STREQUAL "Debug" OR ${CMAKE_BUILD_TYPE} STREQUAL "RelWithDebInfo")
 	target_compile_definitions(${PROJECT_NAME} PRIVATE DEBUG_FREERTOS)
 endif ()
 

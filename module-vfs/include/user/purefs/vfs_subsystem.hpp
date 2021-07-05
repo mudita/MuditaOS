@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -8,7 +8,8 @@
 
 namespace purefs::subsystem
 {
-    auto initialize() -> std::tuple<std::shared_ptr<blkdev::disk_manager>, std::shared_ptr<fs::filesystem>>;
+    using vfs_handle_t = std::tuple<std::shared_ptr<blkdev::disk_manager>, std::shared_ptr<fs::filesystem>>;
+    auto initialize() -> vfs_handle_t;
     auto disk_mgr() -> std::shared_ptr<blkdev::disk_manager>;
     auto vfs_core() -> std::shared_ptr<fs::filesystem>;
     auto mount_defaults() -> int;

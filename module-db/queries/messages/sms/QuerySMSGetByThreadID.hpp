@@ -15,10 +15,17 @@ namespace db::query
     {
       public:
         unsigned int threadId;
-        unsigned int offset;
         unsigned int limit;
+        unsigned int offset;
 
-        SMSGetByThreadID(unsigned int id, unsigned int offset = 0, unsigned int limit = 0);
+        explicit SMSGetByThreadID(unsigned int id, unsigned int limit = 0, unsigned int offset = 0);
+        [[nodiscard]] auto debugInfo() const -> std::string override;
+    };
+
+    class SMSGetByThreadIDWithTotalCount : public SMSGetByThreadID
+    {
+      public:
+        SMSGetByThreadIDWithTotalCount(unsigned int threadId, std::size_t limit, std::size_t offset);
         [[nodiscard]] auto debugInfo() const -> std::string override;
     };
 
@@ -30,6 +37,17 @@ namespace db::query
         SMSGetByThreadIDResult(std::vector<SMSRecord> result);
         [[nodiscard]] auto getResults() const -> std::vector<SMSRecord>;
         [[nodiscard]] auto debugInfo() const -> std::string override;
+    };
+
+    class SMSGetByThreadIDResultWithTotalCount : public SMSGetByThreadIDResult
+    {
+      public:
+        SMSGetByThreadIDResultWithTotalCount(std::vector<SMSRecord> records, std::size_t totalCount);
+        [[nodiscard]] auto debugInfo() const -> std::string override;
+        auto getTotalCount() const -> std::size_t;
+
+      private:
+        std::size_t totalCount;
     };
 
 } // namespace db::query

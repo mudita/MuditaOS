@@ -28,7 +28,7 @@ MuditaOS is a mobile operating system optimized for E Ink displays. Built on Fre
 - system manager that restores the system after switching on the device or performs the initial start-up
 - application manager for managing application lifecycle 
 - SQLite database for storing contacts and notes
-- VFS (Virtual File System) + file storage based on FAT File System
+- VFS (Virtual File System) + file storage based on `littlefs` (little fail-safe file system)
 - MTP (Media Transfer Protocol) support
 
 ## Table of contents
@@ -37,6 +37,7 @@ MuditaOS is a mobile operating system optimized for E Ink displays. Built on Fre
 * [Contributing](#Contributing)
    * [Discussions](#Discussions)
    * [Reporting issues and feature requests](#Reporting-bugs-and-feature-requests)
+   * [Internationalization](#Internationalization)
    * [Development workflow](#Development-workflow)
 * [Documentation](#documentation)
    * [How to generate documentation using Doxygen](#How-to-generate-documentation-using-Doxygen)    
@@ -54,6 +55,7 @@ You can quickstart the project by going through one of the following guides:
 - [Super dirty quickstart with unit tests](./doc/quickstart.md#super-dirty-quickstart-with-unit-tests)
 - [Super dirty quickstart on the phone](./doc/quickstart.md#super-dirty-quickstart-on-the-phone)
 - [Preparing packages](./doc/quickstart.md#preparing-packages)
+- [Logging engine](./module-utils/log/doc/logging_engine.md)
 
 ## Contributing
 
@@ -67,13 +69,17 @@ For general questions and ideas regarding MuditaOS please post in the [“Mudita
 
 You can report bugs and feature requests on [GitHub](https://github.com/mudita/MuditaOS/issues). This is also a good place to discuss architecture decisions and things that aren’t yet covered by the documentation. Please refer to the ["Contributing to MuditaOS"](./CONTRIBUTING.md) article for more details.
 
+### Internationalization
+
+If you want to start localizing MuditaOS interface please start from [the "Internationalization" article](./doc/i18n.md).
+
 ### Development workflow
 
 When contributing code or documentation changes please follow the guidleines inside the ["Development workflow"](./doc/development_workflow.md) article.
 
 ## Documentation
 
-For everything that you need to kickstart your development environment please go to the [Documentation](./doc/) folder on Github.
+For everything you need to kickstart your development environment please go to the [Documentation](./doc/README.md) on GitHub.
 
 A fully detailed documentation can be build locally using [Doxygen](https://www.doxygen.nl/index.html).
 

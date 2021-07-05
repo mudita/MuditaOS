@@ -3,7 +3,7 @@
 
 #include "ThreadsSearchResultsModel.hpp"
 #include "ListView.hpp"
-#include "time/time_conversion.hpp"
+#include <time/time_conversion_factory.hpp>
 #include "application-messages/widgets/SearchResultsItem.hpp"
 
 #include <service-db/DBServiceAPI.hpp>
@@ -33,8 +33,9 @@ namespace gui::model
 
         auto ret = new gui::SearchResultsItem();
         {
+            using namespace utils::time;
             ret->setContact(threadStruct->contact->getFormattedName());
-            ret->setTimestamp(utils::time::DateTime(threadStruct->thread->date));
+            ret->setTimestamp(*TimestampFactory().createTimestamp(TimestampType::DateTime, threadStruct->thread->date));
             // The only thing that differs with ThreadModel actually - here show what was found
             ret->setPreview(threadStruct->thread->snippet);
         }

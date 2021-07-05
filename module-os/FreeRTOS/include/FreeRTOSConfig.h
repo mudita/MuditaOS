@@ -37,8 +37,9 @@
  *
  * See http://www.freertos.org/a00110.html.
  *----------------------------------------------------------*/
+#include <assert.h>
 #include <stdint.h>
-#include "log/log.hpp"
+#include <log.hpp>
 
 //TODO: Look at tasks.c: void vTaskStepTick( const TickType_t xTicksToJump ) before upgrading FreeRTOS
 #ifdef __cplusplus
@@ -80,9 +81,9 @@ extern uint32_t SystemCoreClock;
 #define configSUPPORT_STATIC_ALLOCATION         1
 #define configSUPPORT_DYNAMIC_ALLOCATION        1
 #ifdef TARGET_Linux
-#   define configTOTAL_HEAP_SIZE                   ((size_t)(1024*373))
+#   define configTOTAL_HEAP_SIZE                   ((size_t)(1024*512))
 #else
-#   define configTOTAL_HEAP_SIZE                   ((size_t)(1024*324))
+#   define configTOTAL_HEAP_SIZE                   ((size_t)(1024*386))
 #endif
 
 #define configAPPLICATION_ALLOCATED_HEAP        0
@@ -91,7 +92,7 @@ extern uint32_t SystemCoreClock;
 #define configUSE_IDLE_HOOK                     0
 #define configUSE_TICK_HOOK                     0
 #define configCHECK_FOR_STACK_OVERFLOW          2
-#define configUSE_MALLOC_FAILED_HOOK            0
+#define configUSE_MALLOC_FAILED_HOOK            1
 #define configUSE_DAEMON_TASK_STARTUP_HOOK      0
 
 /* Run time and task stats gathering related definitions. */
@@ -111,7 +112,9 @@ extern uint32_t SystemCoreClock;
 #define configTIMER_TASK_STACK_DEPTH            (1024)
 
 /* Define to trap errors during development. */
-#define configASSERT(x) if( (x) == 0 ) { taskDISABLE_INTERRUPTS(); LOG_FATAL("Assert!"); while(1){};}
+#ifndef NDEBUG
+#   define configASSERT(x)                      assert(x)
+#endif
 
 
 /* Optional functions - most linkers will remove unused functions anyway. */
@@ -176,6 +179,7 @@ standard names. */
 #define configSYSTEM_HEAP_STATS           (1)
 #define configUSER_HEAP_STATS             (1)
 #define configSYSTEM_HEAP_INTEGRITY_CHECK (1)
+#define PROJECT_CONFIG_HEAP_INTEGRITY_CHECKS (1)
 #endif
 
 extern void vConfigureTimerForRunTimeStats(void);

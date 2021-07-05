@@ -14,9 +14,21 @@ It's meant to provide interface layer for service-bluetooth like that:
 * `lib`
     Libraries used with as little modifications as possible
 
+## Supported profiles
+* `A2DP`
+* `HSP`
+* `HFP` (Currently not supported)
+
+NOTE: Remote devices that do not support at least one of above profiles will not be added to list of devices during scan
+process.
+
 ## Events flowchart
 ![Flowchart](./flowchart.svg)
 <img src="./flowchart.svg">
+
+## Table of content
+- [Bluetooth on/off operation](./doc/bt_on_off.md)
+- [Bluetooth scan operation](./doc/bt_scan.md)
 
 # Proposal of Bluetooth settings data flow
 
@@ -45,3 +57,4 @@ When all variables are loaded from *DB*, then *BluetoothWorker* reloads Bluetoot
 Flowchart below is an example of scenario, when user opens *BluetoothWindow*, and tries to change some of settings presented there.
 
 ![change_bt_status_flowchart](./change_bt_status_flowchart.svg)
+

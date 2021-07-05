@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CustomCheckBoxWithLabel.hpp"
@@ -80,21 +80,20 @@ namespace gui
             return false;
         };
         onContentChangedCallback = [&]() { return checkBox->isChecked(); };
+
+        dimensionChangedCallback = [&](gui::Item &, const BoundingBox &newDim) -> bool {
+            hBox->setArea({0, 0, newDim.w, newDim.h});
+            return true;
+        };
     }
 
     void CustomCheckBoxWithLabel::setCheckBoxes()
     {
         for (auto const &[key, dayName] : weekDays) {
-            if (descriptionLabel->getText() == utils::localize.get(dayName)) {
+            if (descriptionLabel->getText() == utils::translate(dayName)) {
                 checkBox->setImageVisible(checkBoxData.getData(static_cast<uint32_t>(key)));
             }
         }
     }
 
-    bool CustomCheckBoxWithLabel::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
-    {
-        hBox->setPosition(0, 0);
-        hBox->setSize(newDim.w, newDim.h);
-        return true;
-    }
 } // namespace gui

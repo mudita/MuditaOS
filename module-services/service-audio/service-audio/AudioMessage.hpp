@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -6,6 +6,10 @@
 #include <Audio/AudioCommon.hpp>
 #include <Audio/decoder/Decoder.hpp>
 #include <MessageType.hpp>
+#include <service-appmgr/service-appmgr/messages/ActionRequest.hpp>
+#include <module-services/service-appmgr/service-appmgr/Actions.hpp>
+#include <apps-common/popups/data/PopupRequestParams.hpp>
+
 #include <Service/Message.hpp>
 
 #include <memory>
@@ -23,21 +27,20 @@ class AudioMessage : public sys::DataMessage
 class AudioResponseMessage : public sys::ResponseMessage
 {
   public:
-    AudioResponseMessage(audio::RetCode retCode  = audio::RetCode::Success,
-                         const audio::Tags &tags = {},
-                         const float val         = 0.0)
+    explicit AudioResponseMessage(audio::RetCode retCode  = audio::RetCode::Success,
+                                  const audio::Tags &tags = {},
+                                  const std::string &val  = {})
         : sys::ResponseMessage(), retCode(retCode), tags(tags), val(val)
     {}
 
-    AudioResponseMessage(audio::RetCode retCode, const float val) : AudioResponseMessage(retCode, {}, val)
+    AudioResponseMessage(audio::RetCode retCode, const std::string &val) : AudioResponseMessage(retCode, {}, val)
     {}
 
-    virtual ~AudioResponseMessage()
-    {}
+    virtual ~AudioResponseMessage() = default;
 
     const audio::RetCode retCode = audio::RetCode::Success;
     audio::Tags tags             = {};
-    float val                    = 0.0;
+    std::string val;
 };
 
 class AudioNotificationMessage : public AudioMessage
@@ -62,16 +65,14 @@ class AudioNotificationMessage : public AudioMessage
 class AudioSettingsMessage : public AudioMessage
 {
   public:
-    AudioSettingsMessage(const audio::Profile::Type &profileType,
-                         const audio::PlaybackType &playbackType,
+    AudioSettingsMessage(const audio::PlaybackType &playbackType,
                          const audio::Setting &setting,
                          const std::string &val = {})
-        : AudioMessage{}, profileType{profileType}, playbackType{playbackType}, setting{setting}, val{val}
+        : AudioMessage{}, playbackType{playbackType}, setting{setting}, val{val}
     {}
 
     ~AudioSettingsMessage() override = default;
 
-    audio::Profile::Type profileType = audio::Profile::Type::Idle;
     audio::PlaybackType playbackType = audio::PlaybackType::None;
     const audio::Setting setting;
     std::string val{};
@@ -80,10 +81,8 @@ class AudioSettingsMessage : public AudioMessage
 class AudioGetSetting : public AudioSettingsMessage
 {
   public:
-    AudioGetSetting(const audio::Profile::Type &profileType,
-                    const audio::PlaybackType &playbackType,
-                    const audio::Setting &setting)
-        : AudioSettingsMessage{profileType, playbackType, setting}
+    AudioGetSetting(const audio::PlaybackType &playbackType, const audio::Setting &setting)
+        : AudioSettingsMessage{playbackType, setting}
     {}
 
     ~AudioGetSetting() override = default;
@@ -92,11 +91,8 @@ class AudioGetSetting : public AudioSettingsMessage
 class AudioSetSetting : public AudioSettingsMessage
 {
   public:
-    AudioSetSetting(const audio::Profile::Type &profileType,
-                    const audio::PlaybackType &playbackType,
-                    const audio::Setting &setting,
-                    const std::string &val)
-        : AudioSettingsMessage{profileType, playbackType, setting, val}
+    AudioSetSetting(const audio::PlaybackType &playbackType, const audio::Setting &setting, const std::string &val)
+        : AudioSettingsMessage{playbackType, setting, val}
     {}
 
     ~AudioSetSetting() override = default;
@@ -259,17 +255,49 @@ class AudioKeyPressedRequest : public AudioMessage
     const int step{};
 };
 
-class AudioKeyPressedResponse : public sys::DataMessage
+class VolumeChanged : public sys::DataMessage, public app::manager::actions::ConvertibleToAction
 {
   public:
-    AudioKeyPressedResponse(audio::RetCode retCode,
-                            const audio::Volume &volume,
-                            const bool muted,
-                            const std::pair<audio::Profile::Type, audio::PlaybackType> &context)
-        : sys::DataMessage(MessageType::AudioMessage), volume(volume), muted(muted), context(context)
+    VolumeChanged(audio::Volume volume, audio::Context context)
+        : sys::DataMessage{MessageType::MessageTypeUninitialized}, volume{volume}, context{context}
     {}
 
-    const audio::Volume volume{};
-    const bool muted = false;
-    std::pair<audio::Profile::Type, audio::PlaybackType> context;
+    [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest> override
+    {
+        return std::make_unique<app::manager::ActionRequest>(
+            sender, app::manager::actions::ShowPopup, std::make_unique<gui::VolumePopupRequestParams>(volume, context));
+    }
+
+  private:
+    const audio::Volume volume;
+    audio::Context context;
+};
+
+class BluetoothDeviceVolumeChanged : public AudioMessage
+{
+  public:
+    explicit BluetoothDeviceVolumeChanged(std::uint8_t volume) : volume{volume}
+    {}
+
+    [[nodiscard]] auto getVolume() const noexcept -> std::uint8_t
+    {
+        return volume;
+    }
+
+  private:
+    const std::uint8_t volume;
+};
+
+class A2DPDeviceVolumeChanged : public BluetoothDeviceVolumeChanged
+{
+  public:
+    A2DPDeviceVolumeChanged(std::uint8_t volume) : BluetoothDeviceVolumeChanged{volume}
+    {}
+};
+
+class HSPDeviceVolumeChanged : public BluetoothDeviceVolumeChanged
+{
+  public:
+    HSPDeviceVolumeChanged(std::uint8_t volume) : BluetoothDeviceVolumeChanged{volume}
+    {}
 };

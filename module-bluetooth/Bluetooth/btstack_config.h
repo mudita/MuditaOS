@@ -1,3 +1,6 @@
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 //
 // btstack_config.h for generic POSIX H4 port
 //
@@ -25,31 +28,32 @@
 // #define ENABLE_LE_DATA_CHANNELS
 // #define ENABLE_LE_DATA_LENGTH_EXTENSION
 #define ENABLE_ATT_DELAYED_RESPONSE
-#define ENABLE_USER_LOG
-#define ENABLE_LOG_ERROR
-#define ENABLE_LOG_INFO
-#define ENABLE_LOG_WARNING
-#define ENABLE_LOG_DEBUG
+// #define ENABLE_USER_LOG
+// #define ENABLE_LOG_ERROR
+// #define ENABLE_LOG_INFO
+// #define ENABLE_LOG_WARNING
+// #define ENABLE_LOG_DEBUG
 #define ENABLE_SCO_OVER_HCI
 #define ENABLE_SDP_DES_DUMP
 // #define ENABLE_EHCILL
 
 // BTstack configuration. buffers, sizes, ...
 #define HCI_INCOMING_PRE_BUFFER_SIZE 14 // sizeof benep heade, avoid memcpy
-#define HCI_ACL_PAYLOAD_SIZE         (1691 + 4)
+//#define HCI_ACL_PAYLOAD_SIZE         (1691 + 4)
+#define HCI_ACL_PAYLOAD_SIZE         (1021+4)
 
 #define ENABLE_GATT_CLIENT_PAIRING
 #define ENABLE_L2CAP_ENHANCED_RETRANSMISSION_MODE
 #define ENABLE_CC256X_BAUDRATE_CHANGE_FLOWCONTROL_BUG_WORKAROUND
 //#define HAVE_EMBEDDED_TIME_MS
 
-#define MAX_NR_HCI_CONNECTIONS                    3
-#define MAX_NR_L2CAP_SERVICES                     4
-#define MAX_NR_L2CAP_CHANNELS                     10
-#define MAX_NR_RFCOMM_MULTIPLEXERS                2
-#define MAX_NR_RFCOMM_SERVICES                    4
-#define MAX_NR_RFCOMM_CHANNELS                    4
-#define MAX_NR_BTSTACK_LINK_KEY_DB_MEMORY_ENTRIES 10
+//#define MAX_NR_HCI_CONNECTIONS                    4
+//#define MAX_NR_L2CAP_SERVICES                     5
+//#define MAX_NR_L2CAP_CHANNELS                     6
+//#define MAX_NR_RFCOMM_MULTIPLEXERS                2
+//#define MAX_NR_RFCOMM_SERVICES                    3
+//#define MAX_NR_RFCOMM_CHANNELS                    3
+//#define MAX_NR_BTSTACK_LINK_KEY_DB_MEMORY_ENTRIES 10
 
 // As an option - much slower (according to docs)
 // HCI Controller to Host Flow Control

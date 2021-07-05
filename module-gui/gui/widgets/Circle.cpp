@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <module-utils/log/log.hpp>
+#include <log.hpp>
 #include "Circle.hpp"
 #include "DrawCommand.hpp"
 
@@ -77,7 +77,7 @@ namespace gui
 
     void Circle::buildDrawListImplementation(std::list<Command> &commands)
     {
-        auto circle = std::make_unique<CommandCircle>(
+        auto circle = std::make_unique<DrawCircle>(
             center, radius, focus ? focusPenWidth : penWidth, focus ? focusBorderColor : color, isFilled, fillColor);
         circle->areaX = widgetArea.x;
         circle->areaY = widgetArea.y;

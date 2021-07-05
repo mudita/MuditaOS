@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /// These are random tests what could be salvaged from old tests
@@ -6,7 +6,6 @@
 #include "mock/InitializedFontManager.hpp"
 #define CATCH_CONFIG_MAIN // This tells Catch to provide a main() - only do this in one cpp file
 
-#include <vfs.hpp>
 #include <memory>
 #include <functional>
 #include <iostream>
@@ -18,7 +17,7 @@
 #include <fcntl.h>
 #include <catch2/catch.hpp>
 
-#include <log/log.hpp>
+#include <log.hpp>
 #include <utf8/UTF8.hpp>
 
 #include <module-gui/gui/core/ImageManager.hpp>
@@ -30,16 +29,6 @@
 #include <mock/TestWindow.hpp>
 
 using namespace std;
-
-class vfs vfs;
-
-struct vfs_initializer
-{
-    vfs_initializer()
-    {
-        vfs.Init();
-    }
-} vfs_init;
 
 TEST_CASE("Test BoundingBox intersect")
 {
@@ -66,7 +55,7 @@ TEST_CASE("Are fonts loaded")
     // this is because no fonts are loaded
     REQUIRE(fontmanager.getFont(0) == nullptr);
     // now initialize, from where is it taken? nobody knows from this foo
-    fontmanager.init("assets");
+    fontmanager.init("sys/current/assets");
     // check if there is at least default font
     REQUIRE(fontmanager.getFont(0) != nullptr);
 }

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BoundingBox.hpp"
@@ -65,9 +65,28 @@ namespace gui
             return lines->get();
         }
 
+        [[nodiscard]] auto lineGet(unsigned int nr)
+        {
+            auto line = lines->get().begin();
+
+            if (nr >= lines->size()) {
+                nr = lines->size() - 1;
+            }
+
+            std::advance(line, nr);
+            return line;
+        }
+
         [[nodiscard]] auto *getInputMode()
         {
             return mode;
+        }
+
+        auto removeNCharacters(unsigned int n)
+        {
+            for (unsigned int i = 0; i < n; i++) {
+                removeChar();
+            }
         }
 
         auto moveCursor(NavigationDirection direction, unsigned int n)
@@ -77,7 +96,12 @@ namespace gui
 
         [[nodiscard]] auto getCursorPosition()
         {
-            return cursor->getOnScreenPosition();
+            return cursor->getAbsolutePosition();
+        }
+
+        void setExpandMode(ExpandMode expandMode)
+        {
+            this->expandMode = expandMode;
         }
     };
 } // namespace gui
@@ -144,7 +168,7 @@ TEST_CASE("Text buildDrawList")
 
 TEST_CASE("handle input mode ABC/abc/1234")
 {
-    utils::localize.setInputLanguage("English"); /// needed to load input mode
+    utils::setInputLanguage("English"); /// needed to load input mode
     auto &fontmanager = mockup::fontManager();
     auto font         = fontmanager.getFont(0);
     auto text         = gui::TestText();
@@ -178,14 +202,15 @@ TEST_CASE("handle input mode ABC/abc/1234")
     {
         auto time_long_enough_to_not_be_multipress = 1000;
         text.onInput(next_mode);
-        key_2.key.time_release += time_long_enough_to_not_be_multipress;
+        auto rawKey_2 = key_2.getRawKey();
+        rawKey_2.time_release += time_long_enough_to_not_be_multipress;
         REQUIRE(text.getInputMode()->is(InputMode::abc));
-        text.onInput(key_2);
-        key_2.key.time_release += time_long_enough_to_not_be_multipress;
+        text.onInput(gui::InputEvent{rawKey_2, key_2.getState()});
+        rawKey_2.time_release += time_long_enough_to_not_be_multipress;
         str += "a";
         REQUIRE(str == text.getText());
 
-        text.onInput(key_2);
+        text.onInput(gui::InputEvent{rawKey_2, key_2.getState()});
         str += "a";
         REQUIRE(str == text.getText());
     }
@@ -254,13 +279,13 @@ TEST_CASE("handle text block - moved cursor to end")
     REQUIRE(text.getText() == test_text);
 }
 
-TEST_CASE("Text backup and restore tests")
+TEST_CASE("Text backup overwrite and restore tests")
 {
-    std::string testStringOneLine   = "Test String ";
-    std::string testStringTwoLines  = "Test String 1 \n Test String 2";
-    std::string overwriteTestString = "Overwrite test String";
+    const std::string testStringOneLine   = "Test String ";
+    const std::string testStringTwoLines  = "Test String 1 \n Test String 2";
+    const std::string overwriteTestString = "Overwrite test String";
 
-    SECTION("Backup one line text with moved cursor, overwrite text and restore")
+    SECTION("Backup one line text with moved cursor")
     {
         mockup::fontManager();
         auto text = std::make_unique<gui::TestText>();
@@ -286,7 +311,7 @@ TEST_CASE("Text backup and restore tests")
         REQUIRE(text->getCursorPosition() == testStringOneLine.length() - cursorMoveN);
     }
 
-    SECTION("Backup two line text with moved cursor, overwrite text and restore")
+    SECTION("Backup two line text with moved cursor")
     {
         mockup::fontManager();
         auto text = std::make_unique<gui::TestText>();
@@ -310,6 +335,131 @@ TEST_CASE("Text backup and restore tests")
 
         REQUIRE(text->getText() == testStringTwoLines);
         REQUIRE(text->getCursorPosition() == testStringTwoLines.length() - cursorMoveN);
+    }
+}
+
+TEST_CASE("Text backup with max width restricted - overwrite restore and add tests")
+{
+    const std::string testStringOneLine   = "Test String ";
+    const std::string testStringTwoLines  = "Test String 1 \n Test String 2";
+    const std::string overwriteTestString = "Overwrite test String";
+    const std::string toAppendString1     = "Some text1";
+    const std::string toAppendString2     = "Some text2";
+
+    auto &fontManager = mockup::fontManager();
+    auto font         = fontManager.getFont("gt_pressura_light_27");
+    gui::TestText text;
+    text.setFont(font);
+    const auto textMaxHeight = 47;
+
+    SECTION("Backup single line text")
+    {
+        const std::string expectedString1 = testStringOneLine + toAppendString1;
+        const std::string expectedString2 = testStringOneLine + toAppendString1 + toAppendString2;
+        text.setMaximumSize(font->getPixelWidth(testStringOneLine), textMaxHeight);
+
+        text.setText(testStringOneLine);
+        text.addText(toAppendString1);
+        REQUIRE(text.getCursorPosition() == expectedString1.length());
+
+        auto backup = text.backupText();
+
+        REQUIRE(backup.document.getText() == text.getText());
+        REQUIRE(backup.document.getText().length() == text.getText().length());
+        REQUIRE(backup.cursorPos == text.getCursorPosition());
+
+        text.setText(overwriteTestString);
+        REQUIRE(text.getText() != expectedString1);
+
+        text.restoreFrom(backup);
+        text.addText(toAppendString2);
+
+        REQUIRE(text.getText() == expectedString2);
+        REQUIRE(text.getCursorPosition() == expectedString2.length());
+    }
+
+    SECTION("Backup single line text with moved cursor")
+    {
+        const std::string expectedString1 = testStringOneLine + toAppendString1;
+        const std::string expectedString2 = testStringOneLine + toAppendString2 + toAppendString1;
+        text.setMaximumSize(font->getPixelWidth(testStringOneLine), textMaxHeight);
+
+        text.setText(testStringOneLine);
+        text.addText(toAppendString1);
+
+        const unsigned int cursorMoveN = toAppendString1.length();
+        text.moveCursor(gui::NavigationDirection::LEFT, cursorMoveN);
+        REQUIRE(text.getCursorPosition() == expectedString1.length() - cursorMoveN);
+
+        auto backup = text.backupText();
+
+        REQUIRE(backup.document.getText() == text.getText());
+        REQUIRE(backup.document.getText().length() == text.getText().length());
+        REQUIRE(backup.cursorPos == text.getCursorPosition());
+
+        text.setText(overwriteTestString);
+        REQUIRE(text.getText() != expectedString1);
+
+        text.restoreFrom(backup);
+        text.addText(toAppendString2);
+
+        REQUIRE(text.getText() == expectedString2);
+        REQUIRE(text.getCursorPosition() == testStringOneLine.length() + toAppendString2.length());
+    }
+
+    SECTION("Backup multi line text")
+    {
+        const std::string expectedString1 = testStringTwoLines + toAppendString1;
+        const std::string expectedString2 = testStringTwoLines + toAppendString1 + toAppendString2;
+        text.setMaximumSize(font->getPixelWidth(testStringTwoLines), textMaxHeight);
+
+        text.setText(testStringTwoLines);
+        text.addText(toAppendString1);
+        REQUIRE(text.getCursorPosition() == expectedString1.length());
+
+        auto backup = text.backupText();
+
+        REQUIRE(backup.document.getText() == text.getText());
+        REQUIRE(backup.document.getText().length() == text.getText().length());
+        REQUIRE(backup.cursorPos == text.getCursorPosition());
+
+        text.setText(overwriteTestString);
+        REQUIRE(text.getText() != expectedString1);
+
+        text.restoreFrom(backup);
+        text.addText(toAppendString2);
+
+        REQUIRE(text.getText() == expectedString2);
+        REQUIRE(text.getCursorPosition() == expectedString2.length());
+    }
+
+    SECTION("Backup multi line text with moved cursor")
+    {
+        const std::string expectedString1 = testStringTwoLines + toAppendString1;
+        const std::string expectedString2 = testStringTwoLines + toAppendString2 + toAppendString1;
+        text.setMaximumSize(font->getPixelWidth(testStringTwoLines), textMaxHeight);
+
+        text.setText(testStringTwoLines);
+        text.addText(toAppendString1);
+
+        const unsigned int cursorMoveN = toAppendString1.length();
+        text.moveCursor(gui::NavigationDirection::LEFT, cursorMoveN);
+        REQUIRE(text.getCursorPosition() == expectedString1.length() - cursorMoveN);
+
+        auto backup = text.backupText();
+
+        REQUIRE(backup.document.getText() == text.getText());
+        REQUIRE(backup.document.getText().length() == text.getText().length());
+        REQUIRE(backup.cursorPos == text.getCursorPosition());
+
+        text.setText(overwriteTestString);
+        REQUIRE(text.getText() != expectedString1);
+
+        text.restoreFrom(backup);
+        text.addText(toAppendString2);
+
+        REQUIRE(text.getText() == expectedString2);
+        REQUIRE(text.getCursorPosition() == testStringTwoLines.length() + toAppendString2.length());
     }
 }
 
@@ -835,7 +985,7 @@ TEST_CASE("Text addition bounds - multiple limits tests")
     std::string testStringTwoLines = "Test String 1\nTest String 2";
 
     std::string richTextTwoLines =
-        "<text font='gt_pressura' color='12' size='30'>Test </text><text size='25'>String </text><text size='20' "
+        "<text font='gt_pressura' color='12' size='30'>Test </text><text size='20'>String </text><text size='27' "
         "weight='bold'>1</text><br></br><text>Test String 2</text>";
 
     SECTION("Adding text to lower limit set to signs count and size and lines on higher limit")
@@ -955,5 +1105,228 @@ TEST_CASE("Text addition bounds - multiple limits tests")
 
         REQUIRE(text->linesSize() == 1);
         REQUIRE(text->getText().length() != signsLimit);
+    }
+}
+
+TEST_CASE("Text newline navigation and deletion tests")
+{
+    std::string testStringBlock1 = "Test String 1";
+    std::string testStringBlock2 = "Test String 2";
+    std::string emptyParagraph   = "<p></p>";
+
+    SECTION("Empty new block at start and delete from text end")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = std::make_unique<gui::TestText>();
+        text->setMaximumSize(600, 200);
+
+        text->addRichText("<text>" + emptyParagraph + testStringBlock1 + "</text>");
+
+        REQUIRE(text->linesSize() == 2);
+        REQUIRE((*text->lineGet(0)).getText(0) == "\n");
+        REQUIRE((*text->lineGet(1)).getText(0) == testStringBlock1);
+
+        text->removeNCharacters(text->getText().length());
+
+        REQUIRE(text->linesSize() == 0);
+        REQUIRE(text->linesGet().empty());
+    }
+
+    SECTION("Empty new block at start and delete from text center")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = std::make_unique<gui::TestText>();
+        text->setMaximumSize(600, 200);
+
+        text->addRichText("<text>" + emptyParagraph + testStringBlock1 + emptyParagraph + testStringBlock2 + "</text>");
+
+        REQUIRE(text->linesSize() == 3);
+        REQUIRE((*text->lineGet(0)).getText(0) == "\n");
+        REQUIRE((*text->lineGet(1)).getText(0) == testStringBlock1 + "\n");
+        REQUIRE((*text->lineGet(2)).getText(0) == testStringBlock2);
+
+        text->moveCursor(gui::NavigationDirection::LEFT, testStringBlock2.length());
+        text->removeNCharacters(1);
+
+        REQUIRE(text->linesSize() == 2);
+        REQUIRE((*text->lineGet(0)).getText(0) == "\n");
+        REQUIRE((*text->lineGet(1)).getText(0) == testStringBlock1 + testStringBlock2);
+
+        text->removeNCharacters(testStringBlock1.length());
+
+        REQUIRE(text->linesSize() == 2);
+        REQUIRE((*text->lineGet(0)).getText(0) == "\n");
+        REQUIRE((*text->lineGet(1)).getText(0) == testStringBlock2);
+
+        text->removeNCharacters(1);
+
+        REQUIRE(text->linesSize() == 1);
+        REQUIRE((*text->lineGet(0)).getText(0) == testStringBlock2);
+
+        text->removeNCharacters(testStringBlock2.length());
+
+        REQUIRE(text->linesSize() == 0);
+        REQUIRE(text->linesGet().empty());
+    }
+
+    SECTION("Empty new block at start and delete from text beginning")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = std::make_unique<gui::TestText>();
+        text->setCursorStartPosition(gui::CursorStartPosition::DocumentBegin);
+        text->setMaximumSize(600, 200);
+
+        text->addRichText("<text>" + emptyParagraph + testStringBlock1 + emptyParagraph + testStringBlock2 + "</text>");
+
+        REQUIRE(text->linesSize() == 3);
+        REQUIRE((*text->lineGet(0)).getText(0) == "\n");
+        REQUIRE((*text->lineGet(1)).getText(0) == testStringBlock1 + "\n");
+        REQUIRE((*text->lineGet(2)).getText(0) == testStringBlock2);
+
+        text->removeNCharacters(1);
+
+        REQUIRE(text->linesSize() == 2);
+        REQUIRE((*text->lineGet(0)).getText(0) == testStringBlock1 + "\n");
+        REQUIRE((*text->lineGet(1)).getText(0) == testStringBlock2);
+
+        text->removeNCharacters(testStringBlock1.length() + 1);
+
+        REQUIRE(text->linesSize() == 1);
+        REQUIRE((*text->lineGet(0)).getText(0) == testStringBlock2);
+
+        text->removeNCharacters(testStringBlock2.length());
+
+        REQUIRE(text->linesSize() == 0);
+        REQUIRE(text->linesGet().empty());
+    }
+
+    SECTION("Empty new block at end and delete from text beginning")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = std::make_unique<gui::TestText>();
+        text->setMaximumSize(600, 200);
+
+        text->addRichText("<text>" + testStringBlock1 + emptyParagraph + "</text>");
+
+        REQUIRE(text->linesSize() == 2);
+        REQUIRE((*text->lineGet(0)).getText(0) == testStringBlock1 + "\n");
+        REQUIRE((*text->lineGet(1)).getText(0) == "");
+
+        text->moveCursor(gui::NavigationDirection::LEFT, testStringBlock1.length());
+        text->removeNCharacters(testStringBlock1.length());
+
+        REQUIRE(text->linesSize() == 2);
+        REQUIRE((*text->lineGet(0)).getText(0) == "\n");
+        REQUIRE((*text->lineGet(1)).getText(0) == "");
+
+        text->removeNCharacters(1);
+        REQUIRE(text->linesSize() == 0);
+        REQUIRE(text->linesGet().empty());
+    }
+}
+
+TEST_CASE("RichText newline and empty lines tests")
+{
+    std::string testStringBlock1 = "Test String 1";
+    std::string testStringBlock2 = "Test String 2";
+    std::string testStringBlock3 = "Test String 3";
+    std::string emptyParagraph   = "<p></p>";
+
+    SECTION("Paragraph inside no newlines blocks")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = std::make_unique<gui::TestText>();
+        text->setMaximumSize(600, 200);
+
+        text->addRichText("<text>" + testStringBlock1 + "<p>" + testStringBlock2 + "</p>" + testStringBlock3 +
+                          "</text>");
+
+        REQUIRE(text->linesSize() == 3);
+        REQUIRE((*text->lineGet(0)).getText(0) == testStringBlock1 + "\n");
+        REQUIRE((*text->lineGet(1)).getText(0) == testStringBlock2 + "\n");
+        REQUIRE((*text->lineGet(2)).getText(0) == testStringBlock3);
+    }
+
+    SECTION("Two empty paragraphs at beginning")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = std::make_unique<gui::TestText>();
+        text->setMaximumSize(600, 200);
+
+        text->addRichText("<text>" + emptyParagraph + emptyParagraph + testStringBlock1 + testStringBlock2 +
+                          testStringBlock3 + "</text>");
+
+        REQUIRE(text->linesSize() == 3);
+        REQUIRE((*text->lineGet(0)).getText(0) == "\n");
+        REQUIRE((*text->lineGet(1)).getText(0) == "\n");
+        REQUIRE((*text->lineGet(2)).getText(0) == testStringBlock1 + testStringBlock2 + testStringBlock3);
+    }
+
+    SECTION("Two empty paragraphs at end")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = std::make_unique<gui::TestText>();
+        text->setMaximumSize(600, 200);
+
+        text->addRichText("<text>" + testStringBlock1 + testStringBlock2 + testStringBlock3 + emptyParagraph +
+                          emptyParagraph + "</text>");
+
+        REQUIRE(text->linesSize() == 3);
+        REQUIRE((*text->lineGet(0)).getText(0) == testStringBlock1 + testStringBlock2 + testStringBlock3 + "\n");
+        REQUIRE((*text->lineGet(1)).getText(0) == "\n");
+        REQUIRE((*text->lineGet(2)).getText(0) == "");
+    }
+
+    SECTION("One empty paragraphs at beginning, one in center and one at end")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = std::make_unique<gui::TestText>();
+        text->setMaximumSize(600, 200);
+
+        text->addRichText("<text>" + emptyParagraph + testStringBlock1 + emptyParagraph + testStringBlock2 +
+                          testStringBlock3 + emptyParagraph + "</text>");
+
+        REQUIRE(text->linesSize() == 4);
+        REQUIRE((*text->lineGet(0)).getText(0) == "\n");
+        REQUIRE((*text->lineGet(1)).getText(0) == testStringBlock1 + "\n");
+        REQUIRE((*text->lineGet(2)).getText(0) == testStringBlock2 + testStringBlock3 + "\n");
+        REQUIRE((*text->lineGet(3)).getText(0) == "");
+    }
+
+    SECTION("Text inside paragraph at beginning")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = std::make_unique<gui::TestText>();
+        text->setMaximumSize(600, 200);
+
+        text->addRichText("<text><p>" + testStringBlock1 + "</p>" + testStringBlock2 + testStringBlock3 + "</text>");
+
+        REQUIRE(text->linesSize() == 2);
+        REQUIRE((*text->lineGet(0)).getText(0) == testStringBlock1 + "\n");
+        REQUIRE((*text->lineGet(1)).getText(0) == testStringBlock2 + testStringBlock3);
+    }
+
+    SECTION("Text empty paragraph and text inside paragraph at beginning")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = std::make_unique<gui::TestText>();
+        text->setMaximumSize(600, 200);
+
+        text->addRichText("<text>" + emptyParagraph + "<p>" + testStringBlock1 + "</p></text>");
+
+        REQUIRE(text->linesSize() == 3);
+        REQUIRE((*text->lineGet(0)).getText(0) == "\n");
+        REQUIRE((*text->lineGet(1)).getText(0) == testStringBlock1 + "\n");
+        REQUIRE((*text->lineGet(2)).getText(0) == "");
     }
 }

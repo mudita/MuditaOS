@@ -1,8 +1,7 @@
-﻿cmake_minimum_required(VERSION 3.12)
-
-
 project(module-gui VERSION 1.0
         DESCRIPTION "GUI library dedicated for pure phone.")
+
+module_is_test_entity()
 
 if( NOT ${PROJECT_TARGET} STREQUAL "TARGET_Linux")
     include(targets/Target_Cross.cmake)
@@ -10,7 +9,6 @@ else()
 	set(CMAKE_CXX_STANDARD 17)
     include(targets/Target_Linux.cmake)
 endif()
-
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
 include(gui/CMakeLists.txt)
@@ -21,7 +19,20 @@ include(gui/dom/CMakeLists.txt)
 
 include_directories( ../module-utils )
 
-target_link_libraries(${PROJECT_NAME} PUBLIC module-utils ${TARGET_LIBRARIES} )
+target_link_libraries(${PROJECT_NAME} 
+    PUBLIC 
+        ${TARGET_LIBRARIES} 
+        eventstore
+        math
+        module-utils 
+        utf8
+    PRIVATE
+        i18n
+        json::json
+        Microsoft.GSL::GSL
+        pugixml::pugixml
+        time
+)
 
 # Board specific compilation definitions,options,include directories and features
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})

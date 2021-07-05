@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NotesItem.hpp"
@@ -6,7 +6,7 @@
 #include <Style.hpp>
 #include <module-apps/application-notes/style/NotesListStyle.hpp>
 
-#include <module-utils/time/time_conversion.hpp>
+#include <time/time_conversion_factory.hpp>
 
 namespace gui
 {
@@ -27,7 +27,7 @@ namespace gui
 
         date = new gui::Label(this, 0, 0, 0, 0);
         date->setEdges(RectangleEdge::None);
-        date->setFont(style::window::font::medium);
+        date->setFont(style::window::font::small);
         date->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Top});
 
         title   = createTextField(this, style::window::font::bigbold);
@@ -56,12 +56,9 @@ namespace gui
 
     void NotesItem::setDateText(std::uint32_t timestamp)
     {
-        if (auto dt = utils::time::DateTime(timestamp); dt.isYesterday()) {
-            date->setText(utils::localize.get("common_yesterday"));
-        }
-        else {
-            date->setText(dt);
-        }
+        using namespace utils::time;
+        auto dt = TimestampFactory().createTimestamp(TimestampType::DateTime, timestamp);
+        date->setText(*dt);
     }
 
     bool NotesItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)

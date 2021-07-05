@@ -26,7 +26,7 @@ namespace gui::renderer
         }
     } // namespace
 
-    auto RectangleRenderer::DrawableStyle::from(const CommandRectangle &command) -> DrawableStyle
+    auto RectangleRenderer::DrawableStyle::from(const DrawRectangle &command) -> DrawableStyle
     {
         return DrawableStyle{command.penWidth,
                              command.radius,
@@ -183,8 +183,9 @@ namespace gui::renderer
         while (!q.empty()) {
             const auto currPoint = q.front();
             q.pop();
-            if (const auto color = getPixelColor(ctx, currPoint, borderColor.intensity);
-                color == borderColor.intensity || color == fillColor.intensity) {
+            if (const auto color = getPixelColor(ctx, currPoint, PixelRenderer::getColor(borderColor.intensity));
+                color == PixelRenderer::getColor(borderColor.intensity) ||
+                color == PixelRenderer::getColor(fillColor.intensity)) {
                 continue;
             }
 

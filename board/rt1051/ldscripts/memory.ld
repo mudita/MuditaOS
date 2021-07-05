@@ -10,6 +10,12 @@
  */
 MEMORY
 {
+        /********************************   WARNING   *******************************/
+        /*                                                                          */
+        /* must be kept in sync with 'board/rt1051/crashdump/crashcatcher_impl.cpp' */
+        /*                                                                          */
+        /****************************************************************************/
+
 	/* Define each memory region */
 	SRAM_OC (rwx) : ORIGIN = 0x20200000, LENGTH = 0x10000 /* 64K bytes (alias RAM) */
 	/*SRAM_ITC (rwx) : ORIGIN = 0x0, LENGTH = 0x0*/ /* 0K bytes (alias RAM2) */

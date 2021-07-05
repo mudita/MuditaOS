@@ -1,13 +1,17 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DecoderWorker.hpp"
-#include "Audio/decoder/Decoder.hpp"
+#include <Audio/AbstractStream.hpp>
+#include <Audio/decoder/Decoder.hpp>
 
-audio::DecoderWorker::DecoderWorker(Stream *audioStreamOut, Decoder *decoder, EndOfFileCallback endOfFileCallback)
-    : sys::Worker(DecoderWorker::workerName, DecoderWorker::workerPriority), audioStreamOut(audioStreamOut),
+audio::DecoderWorker::DecoderWorker(audio::AbstractStream *audioStreamOut,
+                                    Decoder *decoder,
+                                    EndOfFileCallback endOfFileCallback,
+                                    ChannelMode mode)
+    : sys::Worker(DecoderWorker::workerName, DecoderWorker::workerPriority, stackDepth), audioStreamOut(audioStreamOut),
       decoder(decoder), endOfFileCallback(endOfFileCallback),
-      bufferSize(audioStreamOut->getBlockSize() / sizeof(BufferInternalType))
+      bufferSize(audioStreamOut->getInputTraits().blockSize / sizeof(BufferInternalType)), channelMode(mode)
 {}
 
 audio::DecoderWorker::~DecoderWorker()
@@ -84,17 +88,27 @@ bool audio::DecoderWorker::handleMessage(uint32_t queueID)
 
 void audio::DecoderWorker::pushAudioData()
 {
-    auto samplesRead = 0;
+    auto samplesRead             = 0;
+    const unsigned int readScale = channelMode == ChannelMode::ForceStereo ? 2 : 1;
 
     while (!audioStreamOut->isFull() && playbackEnabled) {
-        samplesRead = decoder->decode(bufferSize, decoderBuffer.get());
+        auto buffer = decoderBuffer.get();
+
+        samplesRead = decoder->decode(bufferSize / readScale, buffer);
 
         if (samplesRead == 0) {
             endOfFileCallback();
             break;
         }
 
-        if (!audioStreamOut->push(decoderBuffer.get(), samplesRead * sizeof(BufferInternalType))) {
+        // pcm mono to stereo force conversion
+        if (channelMode == ChannelMode::ForceStereo) {
+            for (unsigned int i = bufferSize / 2; i > 0; i--) {
+                buffer[i * 2 - 1] = buffer[i * 2 - 2] = buffer[i - 1];
+            }
+        }
+
+        if (!audioStreamOut->push(decoderBuffer.get(), samplesRead * sizeof(BufferInternalType) * readScale)) {
             LOG_FATAL("Decoder failed to push to stream.");
             break;
         }

@@ -1,87 +1,165 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BatteryLevelCheck.hpp"
 #include "service-evtmgr/BatteryMessages.hpp"
 #include "SystemManager/Constants.hpp"
+#include <agents/settings/SystemSettings.hpp>
+#include <EventStore.hpp>
+#include <Utils.hpp>
 
-#include <Service/Bus.hpp>
-#include <common_data/EventStore.hpp>
+#define BOOST_SML_CFG_DISABLE_MIN_SIZE // GCC10 fix
+#include <boost/sml.hpp>
 
 namespace battery_level_check
 {
     namespace
     {
-        enum class CheckState
-        {
-            InitialCheck,
-            LevelCritical,
-            LevelNormal
-        };
+        unsigned int batteryLevelCritical = 10;
 
-        CheckState state = CheckState::InitialCheck;
-
-        constexpr inline auto DEFAULT_LEVEL = 10;
-
-        unsigned int batteryLevelCritical = DEFAULT_LEVEL;
+        constexpr auto batteryShutdownLevel = 5;
 
         sys::Service *parentService = nullptr;
 
-        bool isBatteryLevelCritical(unsigned int level)
-        {
-            return level < batteryLevelCritical;
-        }
+        std::shared_ptr<settings::Settings> settings = nullptr;
 
-        void sendCriticalLevelMessage()
-        {
-            auto levelCriticalMessage = std::make_shared<sevm::BatteryLevelCriticalMessage>();
-            sys::Bus::SendUnicast(levelCriticalMessage, service::name::system_manager, parentService);
-        }
+        namespace sml = boost::sml;
 
-        void sendNormalLevelMessage()
+        // events
+        struct initialLevelCheck
+        {};
+        struct criticalLevelCheck
+        {};
+
+        // guards
+        struct isNormal
         {
-            auto levelNormalMessage = std::make_shared<sevm::BatteryLevelNormalMessage>();
-            sys::Bus::SendUnicast(levelNormalMessage, service::name::system_manager, parentService);
-        }
+            bool operator()() const
+            {
+                return Store::Battery::get().level >= batteryLevelCritical;
+            }
+        } isNormal;
+        struct isCriticalNotCharging
+        {
+            bool operator()() const
+            {
+                return Store::Battery::get().level < batteryLevelCritical &&
+                       Store::Battery::get().state != Store::Battery::State::Charging;
+            }
+        } isCriticalNotCharging;
+        struct isCriticalCharging
+        {
+            bool operator()() const
+            {
+                return Store::Battery::get().level < batteryLevelCritical &&
+                       Store::Battery::get().state == Store::Battery::State::Charging;
+            }
+        } isCriticalCharging;
+        struct isShutdown
+        {
+            bool operator()() const
+            {
+                return Store::Battery::get().level < batteryShutdownLevel;
+            }
+        } isShutdown;
+
+        // actions
+        struct setCriticalNotCharging
+        {
+            void operator()()
+            {
+                Store::Battery::modify().levelState = Store::Battery::LevelState::CriticalNotCharging;
+            }
+        } setCriticalNotCharging;
+        struct setCriticalCharging
+        {
+            void operator()()
+            {
+                Store::Battery::modify().levelState = Store::Battery::LevelState::CriticalCharging;
+            }
+        } setCriticalCharging;
+        struct setNormal
+        {
+            void operator()()
+            {
+                Store::Battery::modify().levelState = Store::Battery::LevelState::Normal;
+            }
+        } setNormal;
+        struct setShutdown
+        {
+            void operator()()
+            {
+                Store::Battery::modify().levelState = Store::Battery::LevelState::Shutdown;
+            }
+        } setShutdown;
+
+        struct sendStateChange
+        {
+            void operator()()
+            {
+                auto stateChangeMessage = std::make_shared<sevm::BatteryStateChangeMessage>();
+                parentService->bus.sendUnicast(std::move(stateChangeMessage), service::name::system_manager);
+            }
+        } sendStateChange;
+
+        struct StateMachine
+        {
+            auto operator()() const
+            {
+                using namespace sml;
+                // clang-format off
+                return make_transition_table(
+                *"InitialCheck"_s + event<initialLevelCheck> [ isCriticalNotCharging && !isShutdown ] / setCriticalNotCharging = "LevelCriticalNotCharging"_s,
+                "InitialCheck"_s + event<initialLevelCheck> [ isCriticalNotCharging && isShutdown ] / setShutdown = "Shutdown"_s,
+                "InitialCheck"_s + event<initialLevelCheck> [ isCriticalCharging ] / setCriticalCharging = "LevelCriticalCharging"_s,
+                "InitialCheck"_s + event<initialLevelCheck> [ isNormal ]  / setNormal = "LevelNormal"_s,
+                "LevelNormal"_s + event<criticalLevelCheck> [ isCriticalNotCharging && !isShutdown ] / (setCriticalNotCharging, sendStateChange) = "LevelCriticalNotCharging"_s,
+                "LevelNormal"_s + event<criticalLevelCheck> [ isCriticalNotCharging && isShutdown ] / (setShutdown, sendStateChange) = "Shutdown"_s,
+                "LevelNormal"_s + event<criticalLevelCheck> [ isCriticalCharging ] / (setCriticalCharging, sendStateChange) = "LevelCriticalCharging"_s,
+                "LevelCriticalNotCharging"_s + event<criticalLevelCheck> [ isNormal ] / (setNormal, sendStateChange) = "LevelNormal"_s,
+                "LevelCriticalNotCharging"_s + event<criticalLevelCheck> [ isCriticalCharging ] / (setCriticalCharging, sendStateChange) = "LevelCriticalCharging"_s,
+                "LevelCriticalNotCharging"_s + event<criticalLevelCheck> [ isShutdown ] / (setShutdown, sendStateChange) = "Shutdown"_s,
+                "LevelCriticalCharging"_s + event<criticalLevelCheck> [ isCriticalNotCharging && !isShutdown ] / (setCriticalNotCharging, sendStateChange) = "LevelCriticalNotCharging"_s,
+                "LevelCriticalCharging"_s + event<criticalLevelCheck> [ isNormal ] / (setNormal, sendStateChange) = "LevelNormal"_s,
+                "LevelCriticalCharging"_s + event<criticalLevelCheck> [ isCriticalNotCharging && isShutdown ] / (setShutdown, sendStateChange) = "Shutdown"_s
+                );
+                // clang-format on
+            }
+        };
+
+        std::unique_ptr<sml::sm<StateMachine>> sm;
     } // namespace
 
-    void init(sys::Service *service)
+    void init(sys::Service *service, std::shared_ptr<settings::Settings> &setts)
     {
+        sm            = std::make_unique<sml::sm<StateMachine>>();
         parentService = service;
+        settings      = setts;
+        settings->registerValueChange(
+            settings::Battery::batteryCriticalLevel,
+            [&](const std::string &value) { batteryLevelCritical = utils::getNumericValue<unsigned int>(value); },
+            settings::SettingsScope::Global);
+        sm->process_event(initialLevelCheck{});
     }
 
-    void checkBatteryLevelCritical()
+    void deinit()
     {
-        switch (state) {
-        case CheckState::InitialCheck:
-            if (isBatteryLevelCritical(Store::Battery::get().level)) {
-                sendCriticalLevelMessage();
-                state = CheckState::LevelCritical;
-            }
-            else {
-                sendNormalLevelMessage();
-                state = CheckState::LevelNormal;
-            }
-            break;
-        case CheckState::LevelCritical:
-            if (!isBatteryLevelCritical(Store::Battery::get().level)) {
-                sendNormalLevelMessage();
-                state = CheckState::LevelNormal;
-            }
-            break;
-        case CheckState::LevelNormal:
-            if (isBatteryLevelCritical(Store::Battery::get().level)) {
-                sendCriticalLevelMessage();
-                state = CheckState::LevelCritical;
-            }
-            break;
-        }
+        settings->unregisterValueChange(settings::Battery::batteryCriticalLevel, settings::SettingsScope::Global);
+        settings.reset();
+        sm.reset();
+    }
+
+    void checkBatteryLevel()
+    {
+        sm->process_event(criticalLevelCheck{});
     }
 
     void setBatteryCriticalLevel(unsigned int level)
     {
         batteryLevelCritical = level;
-        checkBatteryLevelCritical();
+        settings->setValue(
+            settings::Battery::batteryCriticalLevel, utils::to_string(level), settings::SettingsScope::Global);
+        checkBatteryLevel();
     }
 
 } // namespace battery_level_check

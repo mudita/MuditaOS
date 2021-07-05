@@ -1,17 +1,18 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MenuWindow.hpp"
-#include "../ApplicationDesktop.hpp"
 #include "InputEvent.hpp"
 #include "Item.hpp"
 #include "Navigation.hpp"
 #include "service-appmgr/Controller.hpp"
+#include <application-desktop/widgets/DBNotificationsHandler.hpp>
+#include "Names.hpp"
 
 #include <tools/Common.hpp>
 #include <Style.hpp>
-#include <cassert>
 #include <i18n/i18n.hpp>
+#include <Image.hpp>
 
 namespace style::design
 {
@@ -63,7 +64,7 @@ namespace gui
         desc->setPenWidth(style::window::default_border_no_focus_w);
         desc->setFont(style::window::font::verysmall);
         desc->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Bottom));
-        desc->setText(utils::localize.get(title));
+        desc->setText(utils::translate(title));
 
         if (hasNotificationsCallback != nullptr) {
             onNotificationsChangeCallback =
@@ -82,7 +83,7 @@ namespace gui
             onNotificationsChangeCallback(gui::RefreshModes::GUI_REFRESH_DEEP);
         }
 
-        this->activatedCallback = activatedCallback;
+        this->activatedCallback = std::move(activatedCallback);
         this->setPenWidth(style::window::default_border_no_focus_w);
         this->setPenFocusWidth(style::window::default_border_focus_w);
         this->setEdges(RectangleEdge::Top | RectangleEdge::Bottom);
@@ -129,7 +130,8 @@ namespace gui
         return visibleStateChanged;
     }
 
-    MenuWindow::MenuWindow(app::Application *app) : AppWindow(app, app::window::name::desktop_menu)
+    MenuWindow::MenuWindow(app::Application *app, const app::DBNotificationsBaseHandler &accessor)
+        : AppWindow(app, app::window::name::desktop_menu), dbNotifications(accessor)
     {
         buildInterface();
     }
@@ -146,15 +148,12 @@ namespace gui
         AppWindow::buildInterface();
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::open));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
-
-        auto app = dynamic_cast<app::ApplicationDesktop *>(application);
-        assert(app);
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::open));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
         mainMenu = new MenuPage(
             this,
-            utils::localize.get("app_desktop_menu_title"),
+            utils::translate("app_desktop_menu_title"),
             {
 
                 new gui::Tile{
@@ -193,7 +192,10 @@ namespace gui
                                       app::manager::actions::Launch,
                                       std::make_unique<app::ApplicationLaunchData>("ApplicationCallLog"));
                               },
-                              [=]() { return app->notifications.notRead.Calls > 0; }},
+                              [=]() {
+                                  return dbNotifications.hasNotification(
+                                      app::DBNotificationsBaseHandler::Type::notReadCall);
+                              }},
 
                 new gui::Tile("menu_contacts_W_G",
                               "app_desktop_menu_contacts",
@@ -212,7 +214,10 @@ namespace gui
                                       app::manager::actions::Launch,
                                       std::make_unique<app::ApplicationLaunchData>("ApplicationMessages"));
                               },
-                              [=]() { return app->notifications.notRead.SMS > 0; }},
+                              [=]() {
+                                  return dbNotifications.hasNotification(
+                                      app::DBNotificationsBaseHandler::Type::notReadSMS);
+                              }},
                 new gui::Tile{"menu_music_player_W_G",
                               "app_desktop_menu_music",
                               [=](gui::Item &item) {
@@ -238,7 +243,7 @@ namespace gui
 
         toolsMenu = new MenuPage(
             this,
-            utils::localize.get("app_desktop_tools_title"),
+            utils::translate("app_desktop_tools_title"),
             {
                 new gui::Tile{"menu_tools_notes_W_G",
                               "app_desktop_tools_notes",
@@ -268,15 +273,13 @@ namespace gui
 
         using namespace style::window;
         mainMenu->setSize(this->area().w - default_left_margin - default_right_margin,
-                          bottomBar->area().pos(Axis::Y) - this->title->getOffset(Axis::Y) -
-                              style::design::grid_offset);
-        mainMenu->setPosition(default_left_margin, title->getOffset(Axis::Y) + style::design::grid_offset);
+                          bottomBar->area().pos(Axis::Y) - default_vertical_pos - style::design::grid_offset);
+        mainMenu->setPosition(default_left_margin, default_vertical_pos + style::design::grid_offset);
         mainMenu->setVisible(false);
 
         toolsMenu->setSize(this->area().w - default_left_margin - default_right_margin,
-                           bottomBar->area().pos(Axis::Y) - this->title->getOffset(Axis::Y) -
-                               style::design::grid_offset);
-        toolsMenu->setPosition(default_left_margin, title->getOffset(Axis::Y) + style::design::grid_offset);
+                           bottomBar->area().pos(Axis::Y) - default_vertical_pos - style::design::grid_offset);
+        toolsMenu->setPosition(default_left_margin, default_vertical_pos + style::design::grid_offset);
         toolsMenu->setVisible(false);
 
         switchMenu(mainMenu);
@@ -297,8 +300,7 @@ namespace gui
 
     bool MenuWindow::onInput(const InputEvent &inputEvent)
     {
-        if ((inputEvent.state == InputEvent::State::keyReleasedShort) && (inputEvent.keyCode == KeyCode::KEY_RF) &&
-            (toolsMenu->visible)) {
+        if (inputEvent.isShortRelease(KeyCode::KEY_RF) && toolsMenu->visible) {
             switchMenu(mainMenu);
             return true;
         }

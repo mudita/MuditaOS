@@ -42,3 +42,4 @@ if(_target_link_flags)
 	list(REMOVE_ITEM _target_link_flags -fsanitize=address)
 	set_target_properties(${PROJECT_NAME} PROPERTIES LINK_OPTIONS "${_target_link_flags}")
 endif()
+

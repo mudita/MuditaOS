@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -7,6 +7,7 @@
 #include "gui/widgets/Label.hpp"
 #include "gui/widgets/Image.hpp"
 #include "gui/widgets/ProgressBar.hpp"
+#include "module-sys/Timers/TimerHandle.hpp"
 
 namespace app
 {
@@ -14,12 +15,13 @@ namespace app
 
     class ApplicationClock : public Application
     {
-        std::unique_ptr<sys::Timer> timerClock;
+        sys::TimerHandle timerClock;
         void timerClockCallback();
 
       public:
         ApplicationClock(std::string name                    = name_clock,
                          std::string parent                  = {},
+                         sys::phone_modes::PhoneMode mode    = sys::phone_modes::PhoneMode::Connected,
                          StartInBackground startInBackground = {false},
                          uint32_t stackDepth                 = 4096,
                          sys::ServicePriority priority       = sys::ServicePriority::Idle);
@@ -41,7 +43,7 @@ namespace app
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {
-            return {{manager::actions::Launch}};
+            return {{manager::actions::Launch, manager::actions::PhoneModeChanged}};
         }
     };
 } /* namespace app */

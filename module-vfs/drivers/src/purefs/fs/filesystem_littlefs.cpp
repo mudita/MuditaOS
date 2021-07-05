@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <purefs/fs/drivers/filesystem_littlefs.hpp>
@@ -8,9 +8,9 @@
 #include <purefs/fs/drivers/directory_handle_littlefs.hpp>
 #include <purefs/blkdev/disk_manager.hpp>
 #include <purefs/blkdev/disk_handle.hpp>
-#include <littlefs/lfs.h>
-#include <littlefs/lfs_extension.h>
-#include <log/log.hpp>
+#include <purefs/fs/mount_flags.hpp>
+#include <lfs.h>
+#include <log.hpp>
 
 #include <climits>
 #include <syslimits.h>
@@ -18,13 +18,14 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <cstring>
+#include <algorithm>
 #include <sys/stat.h>
-
-/** NOTE: LITTLEFS is not thread safe like ELM FAT, so it will require global fs mutex lock :(
- */
 
 namespace
 {
+    // NOTE: lfs block size is configured during format
+    static constexpr auto c_lfs_block_size = 32U * 1024U;
+
     template <typename T> auto lfs_to_errno(T error) -> T
     {
         if (error >= 0) {
@@ -72,64 +73,72 @@ namespace
             lfs_mode |= LFS_O_RDWR;
             break;
         }
-        if (flags & O_APPEND)
+        if (flags & O_APPEND) {
             lfs_mode |= LFS_O_APPEND;
-        if (flags & O_CREAT)
+        }
+        if (flags & O_CREAT) {
             lfs_mode |= LFS_O_CREAT;
-        if (flags & O_TRUNC)
+        }
+        if (flags & O_TRUNC) {
             lfs_mode |= LFS_O_TRUNC;
-        if (flags & O_EXCL)
+        }
+        if (flags & O_EXCL) {
             lfs_mode |= LFS_O_EXCL;
+        }
         return lfs_mode;
     }
 
-    auto translate_attrib_to_st_mode(uint8_t type)
+    auto translate_attrib_to_st_mode(uint8_t type, bool readOnly)
     {
-        decltype(static_cast<struct stat *>(nullptr)->st_mode) mode =
-            S_IRUSR | S_IRGRP | S_IROTH | S_IWUSR | S_IWGRP | S_IWOTH;
+        decltype(std::declval<struct stat *>()->st_mode) mode = S_IRUSR | S_IRGRP | S_IROTH;
+        if (!readOnly) {
+            mode |= S_IWUSR | S_IWGRP | S_IWOTH;
+        }
         if (type == LFS_TYPE_REG) {
-            mode |= (S_IFDIR | S_IXUSR | S_IXGRP | S_IXOTH);
+            mode |= S_IFREG;
         }
         else if (type == LFS_TYPE_DIR) {
-            mode |= S_IFREG;
+            mode |= (S_IFDIR | S_IXUSR | S_IXGRP | S_IXOTH);
         }
         return mode;
     }
 
-    void translate_lfsinfo_to_stat(const ::lfs_info &fs, const lfs_config &cfg, struct stat &st)
+    void translate_lfsinfo_to_stat(const ::lfs_info &fs, const lfs_config &cfg, bool readOnly, struct stat &st)
     {
         std::memset(&st, 0, sizeof st);
         st.st_nlink   = 1;
         st.st_size    = fs.size;
         st.st_blksize = cfg.block_size;
         st.st_blocks  = fs.size / cfg.block_count;
-        st.st_mode    = translate_attrib_to_st_mode(fs.type);
+        st.st_mode    = translate_attrib_to_st_mode(fs.type, readOnly);
     }
 
-    [[gnu::nonnull(1)]] int setup_lfs_config(lfs_config *cfg, size_t sector_size, size_t part_sectors_count)
+    [[gnu::nonnull(1)]] int setup_lfs_config(lfs_config *cfg,
+                                             size_t sector_size,
+                                             size_t part_sectors_count,
+                                             const void *data)
     {
-        cfg->block_cycles   = 512;
-        cfg->block_size     = 0; // Read later from superblock
-        cfg->block_count    = 0; // Read later from super block
-        cfg->lookahead_size = 8192;
-
-        int err = lfs_extension_read_config_from_superblock(cfg, sector_size);
-        if (err) {
-            LOG_ERROR("Unable to read the superblock info %i", err);
-            return lfs_to_errno(err);
+        if (data) {
+            // NOTE: block size from mount param
+            cfg->block_size = *(reinterpret_cast<const uint32_t *>(data));
         }
-        if (cfg->block_size > 1024U * 1024U) {
-            LOG_ERROR("Block size too big");
-            return -E2BIG;
+        else {
+            cfg->block_size = c_lfs_block_size;
+            LOG_WARN("LFS: mount block size not specified using default value");
         }
-
-        if ((uint64_t(cfg->block_count) * uint64_t(cfg->block_size)) / sector_size > part_sectors_count) {
-            LOG_ERROR("Block count out of range sectors count");
+        cfg->block_cycles    = 512;
+        cfg->block_count     = 0; // Read later from super block
+        const auto total_siz = uint64_t(sector_size) * uint64_t(part_sectors_count);
+        if (total_siz % cfg->block_size) {
+            LOG_ERROR("Block size doesn't match partition size");
             return -ERANGE;
         }
+        cfg->block_count = total_siz / cfg->block_size - 1;
+        cfg->lookahead_size = std::min<lfs_size_t>(131072U, ((cfg->block_count >> 3U) + 1U) << 3U);
         cfg->read_size  = cfg->block_size;
         cfg->prog_size  = cfg->block_size;
         cfg->cache_size = cfg->block_size;
+        LOG_INFO("LFS: block count %u block size %u", unsigned(cfg->block_count), unsigned(cfg->block_size));
         return 0;
     }
 
@@ -209,7 +218,7 @@ namespace purefs::fs::drivers
         return std::make_shared<mount_point_littlefs>(diskh, path, flags, shared_from_this());
     }
 
-    auto filesystem_littlefs::mount(fsmount mnt) noexcept -> int
+    auto filesystem_littlefs::mount(fsmount mnt, const void *data) noexcept -> int
     {
         auto disk = mnt->disk();
         if (!disk) {
@@ -226,13 +235,20 @@ namespace purefs::fs::drivers
         }
         {
             auto diskmm = disk_mngr();
-            auto ssize  = diskmm->get_info(disk, blkdev::info_type::sector_size);
+            const auto ssize = diskmm->get_info(disk, blkdev::info_type::sector_size);
             if (ssize < 0) {
                 LOG_ERROR("Unable to read sector size %i", int(ssize));
                 err = ssize;
             }
             else {
-                err = setup_lfs_config(vmnt->lfs_config(), ssize, disk->sectors());
+                auto sect_count = diskmm->get_info(disk, blkdev::info_type::sector_count);
+                if (sect_count > 0) {
+                    err = setup_lfs_config(vmnt->lfs_config(), ssize, sect_count, data);
+                }
+                else {
+                    LOG_ERROR("Unable to read sector count %i", int(sect_count));
+                    err = sect_count;
+                }
             }
         }
         if (!err) {
@@ -242,7 +258,7 @@ namespace purefs::fs::drivers
             LOG_ERROR("LFS mount error %i", err);
         }
         if (!err) {
-            filesystem_operations::mount(mnt);
+            filesystem_operations::mount(mnt, data);
         }
         else {
             littlefs::internal::remove_volume(vmnt->lfs_config());
@@ -277,14 +293,16 @@ namespace purefs::fs::drivers
         }
         auto lerr = lfs_fs_size(vmnt->lfs_mount());
         if (lerr >= 0) {
-            std::memset(&stat, 0, sizeof stat);
-            stat.f_bfree   = stat.f_blocks - lerr;
-            lerr           = 0;
             const auto cfg = vmnt->lfs_config();
+            std::memset(&stat, 0, sizeof stat);
+            stat.f_blocks  = cfg->block_count;
+            stat.f_bfree   = stat.f_blocks - lerr;
+            stat.f_bavail  = stat.f_bfree;
             stat.f_bsize   = cfg->prog_size;
             stat.f_frsize  = cfg->block_size;
-            stat.f_blocks  = cfg->block_count;
             stat.f_namemax = PATH_MAX;
+            stat.f_flag    = vmnt->flags();
+            lerr           = 0;
         }
         return lfs_to_errno(lerr);
     }
@@ -297,7 +315,7 @@ namespace purefs::fs::drivers
             return nullptr;
         }
         const auto fspath = vmnt->native_path(path);
-        const auto fsflag = translate_flags(mode);
+        const auto fsflag = translate_flags(flags);
         auto filep        = std::make_shared<file_handle_littlefs>(mnt, fspath, flags);
         auto lerr         = lfs_file_open(vmnt->lfs_mount(), filep->lfs_filp(), fspath.c_str(), fsflag);
         filep->error(lfs_to_errno(lerr));
@@ -336,7 +354,7 @@ namespace purefs::fs::drivers
         const auto err  = invoke_lfs(zfile->mntpoint(), ::lfs_stat, path.c_str(), &linfo);
         if (!err) {
             auto vmnt = std::static_pointer_cast<mount_point_littlefs>(vfile->mntpoint());
-            translate_lfsinfo_to_stat(linfo, *vmnt->lfs_config(), st);
+            translate_lfsinfo_to_stat(linfo, *vmnt->lfs_config(), vmnt->is_ro(), st);
         }
         return err;
     }
@@ -347,7 +365,7 @@ namespace purefs::fs::drivers
         const auto err = invoke_lfs(mnt, file, ::lfs_stat, &linfo);
         if (!err) {
             auto mntp = std::static_pointer_cast<mount_point_littlefs>(mnt);
-            translate_lfsinfo_to_stat(linfo, *mntp->lfs_config(), st);
+            translate_lfsinfo_to_stat(linfo, *mntp->lfs_config(), mntp->is_ro(), st);
         }
         return err;
     }
@@ -416,7 +434,7 @@ namespace purefs::fs::drivers
         int err = invoke_lfs(dirstate, ::lfs_dir_read, &linfo);
         if (err == 1) {
             auto mntp = std::static_pointer_cast<mount_point_littlefs>(dirstate->mntpoint());
-            translate_lfsinfo_to_stat(linfo, *mntp->lfs_config(), filestat);
+            translate_lfsinfo_to_stat(linfo, *mntp->lfs_config(), mntp->is_ro(), filestat);
             filename = linfo.name;
             err      = 0;
         }
@@ -429,6 +447,13 @@ namespace purefs::fs::drivers
     auto filesystem_littlefs::dirclose(fsdir dirstate) noexcept -> int
     {
         return invoke_lfs(dirstate, ::lfs_dir_close);
+    }
+
+    auto filesystem_littlefs::fchmod(fsfile zfile, mode_t mode) noexcept -> int
+    {
+        // Littlefs doesn't support chmod() so we need that path exists
+        struct stat filestat;
+        return fstat(zfile, filestat);
     }
 
 } // namespace purefs::fs::drivers

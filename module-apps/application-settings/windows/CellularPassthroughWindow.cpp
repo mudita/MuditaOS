@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CellularPassthroughWindow.hpp"
@@ -29,12 +29,13 @@ namespace gui
         AppWindow::buildInterface();
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::select));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::select));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
-        setTitle(utils::localize.get("app_settings_cellular_passthrough"));
+        setTitle(utils::translate("app_settings_cellular_passthrough"));
 
-        layout = new VBox(this, 0, title->offset_h(), style::window_width, 8 * style::window::label::big_h);
+        layout = new VBox(
+            this, 0, style::window::default_vertical_pos, style::window_width, 8 * style::window::label::big_h);
         layout->setPenFocusWidth(style::window::default_border_no_focus_w);
 
         statusHbox = new gui::HBox(layout,

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmsModel.hpp"
@@ -56,8 +56,8 @@ namespace app::alarmClock
             return true;
         };
         item->inputCallback = [this, record = record.get()](gui::Item &, const gui::InputEvent &event) {
-            if (event.isShortPress() && event.is(gui::KeyCode::KEY_LF)) {
-                application->switchWindow(utils::localize.get("app_alarm_clock_options_title"),
+            if (event.isShortRelease(gui::KeyCode::KEY_LF)) {
+                application->switchWindow(utils::translate("app_alarm_clock_options_title"),
                                           std::make_unique<gui::OptionsWindowOptions>(
                                               alarmsListOptions(application, *record, *alarmsRepository)));
             }
@@ -77,7 +77,7 @@ namespace app::alarmClock
     {
         if (recordsCount != alarmsRepoCount) {
             recordsCount = alarmsRepoCount;
-            list->rebuildList(style::listview::RebuildType::Full, 0, true);
+            list->rebuildList(gui::listview::RebuildType::Full, 0, true);
             return false;
         }
 

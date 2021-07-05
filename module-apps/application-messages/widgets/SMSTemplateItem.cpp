@@ -17,14 +17,11 @@ namespace gui
         text = new gui::Label(this, 0, 0, 0, 0);
         style::window::decorateOption(text);
         text->setEllipsis(gui::Ellipsis::Right);
-    }
 
-    bool SMSTemplateItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
-    {
-        text->setPosition(0, 0);
-        text->setSize(newDim.w, newDim.h);
-
-        return true;
+        dimensionChangedCallback = [&](gui::Item &, const BoundingBox &newDim) -> bool {
+            text->setArea({0, 0, newDim.w, newDim.h});
+            return true;
+        };
     }
 
     void SMSTemplateItem::setTemplate(std::shared_ptr<SMSTemplateRecord> templ)

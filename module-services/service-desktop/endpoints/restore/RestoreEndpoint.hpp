@@ -1,9 +1,10 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
+#pragma once
 
 #include <endpoints/Endpoint.hpp>
 #include <parser/ParserUtils.hpp>
-#include <service-desktop/ServiceDesktop.hpp>
 
 #include <string>
 
@@ -19,9 +20,10 @@ namespace sys
 class RestoreEndpoint : public parserFSM::Endpoint
 {
   public:
-    RestoreEndpoint(sys::Service *ownerServicePtr) : Endpoint(ownerServicePtr)
+    explicit RestoreEndpoint(sys::Service *ownerServicePtr) : Endpoint(ownerServicePtr)
     {
         debugName = "RestoreEndpoint";
     }
     auto handle(parserFSM::Context &context) -> void override;
+    auto request(parserFSM::Context &context) -> sys::ReturnCodes;
 };

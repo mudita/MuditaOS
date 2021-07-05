@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <UrcFactory.hpp>
@@ -13,6 +13,8 @@
 #include <UrcResponse.hpp>
 #include <UrcCpin.hpp>
 #include <UrcQiurc.hpp>
+#include <UrcRing.hpp>
+
 using namespace at::urc;
 
 std::unique_ptr<Urc> UrcFactory::Create(const std::string &urcMessage)
@@ -22,7 +24,7 @@ std::unique_ptr<Urc> UrcFactory::Create(const std::string &urcMessage)
     }
     const char headDelimiter = ':';
     auto it                  = std::find(urcMessage.begin(), urcMessage.end(), headDelimiter);
-    std::string head         = std::string(urcMessage.begin(), it);
+    std::string head         = utils::trim(std::string(urcMessage.begin(), it));
     std::string body         = std::string(it == urcMessage.end() ? urcMessage.begin() : it + 1, urcMessage.end());
 
     if (Ctze::isURC(head)) {
@@ -48,6 +50,9 @@ std::unique_ptr<Urc> UrcFactory::Create(const std::string &urcMessage)
     }
     else if (PoweredDown::isURC(head)) {
         return std::make_unique<PoweredDown>(body);
+    }
+    else if (Ring::isURC(head)) {
+        return std::make_unique<Ring>(body);
     }
     else if (auto type = UrcResponse::isURC(head)) {
         return std::make_unique<UrcResponse>(type.value());

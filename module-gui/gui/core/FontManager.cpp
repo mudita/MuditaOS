@@ -5,7 +5,7 @@
 #include "Common.hpp"   // for Status, Status::GUI_SUCCESS
 #include "FontInfo.hpp" // for FontInfo
 #include "RawFont.hpp"  // for RawFont
-#include "log/log.hpp"  // for LOG_ERROR, LOG_INFO, LOG_WARN
+#include <log.hpp>      // for LOG_ERROR, LOG_INFO, LOG_WARN
 #include <Utils.hpp>
 #include <filesystem>
 #include <cstdio>
@@ -46,7 +46,7 @@ namespace gui
 
         auto file = std::fopen(filename.c_str(), "rb");
 
-        auto fileSize = utils::filesystem::filelength(file);
+        auto fileSize = std::filesystem::file_size(filename);
         std::rewind(file);
 
         char *fontData = new char[fileSize];
@@ -61,7 +61,7 @@ namespace gui
 
         // close file
         std::fclose(file);
-        if (static_cast<long>(bytesRead) != fileSize) {
+        if (static_cast<uintmax_t>(bytesRead) != fileSize) {
             LOG_ERROR("Failed to read all file");
             delete[] fontData;
             return nullptr;

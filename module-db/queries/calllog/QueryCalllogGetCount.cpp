@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "QueryCalllogGetCount.hpp"
@@ -7,11 +7,21 @@
 
 using namespace db::query;
 
-CalllogGetCount::CalllogGetCount() : Query(Query::Type::Read)
+CalllogGetCount::CalllogGetCount(EntryState state) : Query(Query::Type::Read), state(state)
 {}
 
-CalllogGetCountResult::CalllogGetCountResult(const uint32_t count) : count(count)
+auto CalllogGetCount::getState() const noexcept -> EntryState
+{
+    return state;
+}
+
+CalllogGetCountResult::CalllogGetCountResult(EntryState state, unsigned count) : state(state), count(count)
 {}
+
+auto CalllogGetCountResult::getState() const noexcept -> EntryState
+{
+    return state;
+}
 
 [[nodiscard]] auto CalllogGetCount::debugInfo() const -> std::string
 {
@@ -23,7 +33,7 @@ CalllogGetCountResult::CalllogGetCountResult(const uint32_t count) : count(count
     return "CalllogGetCountResult";
 }
 
-auto CalllogGetCountResult::getCount() const -> uint32_t
+auto CalllogGetCountResult::getCount() const noexcept -> unsigned
 {
     return count;
 }

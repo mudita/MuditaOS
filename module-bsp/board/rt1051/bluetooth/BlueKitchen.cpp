@@ -1,9 +1,9 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "bsp/bluetooth/Bluetooth.hpp"
 #include "BluetoothWorker.hpp"
-#include "log/log.hpp"
+#include <log.hpp>
 #include "FreeRTOS.h"
 #include "fsl_lpuart.h"
 #include "board.h"
@@ -23,8 +23,7 @@ BlueKitchen::BlueKitchen()
     write_done_cb = NULL;
 }
 
-BlueKitchen::~BlueKitchen()
-{}
+BlueKitchen::~BlueKitchen() = default;
 
 BlueKitchen *BlueKitchen::getInstance()
 {
@@ -47,12 +46,12 @@ BTdev::Error BlueKitchen::read(uint8_t *buf, size_t nbytes)
     read_len  = nbytes;
 
     if (BluetoothCommon::read(buf, nbytes) == Success) {
-        val = Bt::Message::EvtReceiving;
+        val = bluetooth::Message::EvtReceiving;
         xQueueSend(qHandle, &val, portMAX_DELAY);
         return BTdev::Success;
     }
     else {
-        val = Bt::Message::EvtReceivingError;
+        val = bluetooth::Message::EvtReceivingError;
         xQueueSend(qHandle, &val, portMAX_DELAY);
         return BTdev::ErrorBSP;
     }
@@ -65,12 +64,12 @@ BTdev::Error BlueKitchen::write(const uint8_t *buf, size_t size)
     logHciStack("BlueKitchen sends %d bytes", size);
 
     if (BluetoothCommon::write(buf, size) == Success) {
-        val = Bt::Message::EvtSending;
+        val = bluetooth::Message::EvtSending;
         xQueueSend(qHandle, &val, portMAX_DELAY);
         return BTdev::Success;
     }
     else {
-        val = Bt::Message::EvtSendingError;
+        val = bluetooth::Message::EvtSendingError;
         xQueueSend(qHandle, &val, portMAX_DELAY);
         return BTdev::ErrorBSP;
     }

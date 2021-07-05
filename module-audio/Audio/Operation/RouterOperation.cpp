@@ -1,13 +1,15 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RouterOperation.hpp"
 
+#include <Audio/AudioDevice.hpp>
 #include <Audio/AudioCommon.hpp>
 #include <Audio/Profiles/Profile.hpp>
+#include <Audio/StreamFactory.hpp>
+#include <Audio/transcode/TransformFactory.hpp>
 
-#include <bsp_audio.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <mutex.hpp>
 
 #include <algorithm>
@@ -30,14 +32,14 @@ namespace audio
     audio::RetCode RouterOperation::SetOutputVolume(float vol)
     {
         currentProfile->SetOutputVolume(vol);
-        auto ret = audioDevice->OutputVolumeCtrl(vol);
+        auto ret = audioDevice->setOutputVolume(vol);
         return GetDeviceError(ret);
     }
 
     audio::RetCode RouterOperation::SetInputGain(float gain)
     {
         currentProfile->SetInputGain(gain);
-        auto ret = audioDevice->InputGainCtrl(gain);
+        auto ret = audioDevice->setInputGain(gain);
         return GetDeviceError(ret);
     }
 
@@ -49,35 +51,36 @@ namespace audio
         operationToken = token;
         state          = State::Active;
 
-        // check if audio devices support desired audio format
-        if (!audioDevice->IsFormatSupported(currentProfile->GetAudioFormat())) {
-            return RetCode::InvalidFormat;
-        }
-
-        if (!audioDeviceCellular->IsFormatSupported(currentProfile->GetAudioFormat())) {
-            return RetCode::InvalidFormat;
-        }
-
-        // try to run devices with the format
-        if (auto ret = audioDevice->Start(currentProfile->GetAudioFormat());
-            ret != bsp::AudioDevice::RetCode::Success) {
+        if (auto ret = audioDevice->Start(); ret != AudioDevice::RetCode::Success) {
             return GetDeviceError(ret);
         }
 
-        if (auto ret = audioDeviceCellular->Start(currentProfile->GetAudioFormat());
-            ret != bsp::AudioDevice::RetCode::Success) {
+        if (auto ret = audioDeviceCellular->Start(); ret != AudioDevice::RetCode::Success) {
             return GetDeviceError(ret);
+        }
+
+        // create streams
+        StreamFactory streamFactory(callTimeConstraint);
+        try {
+            dataStreamIn  = streamFactory.makeStream(*audioDevice, *audioDeviceCellular);
+            dataStreamOut = streamFactory.makeStream(*audioDeviceCellular, *audioDevice);
+        }
+        catch (const std::exception &e) {
+            LOG_FATAL("Cannot create audio stream: %s", e.what());
+            return audio::RetCode::Failed;
         }
 
         // create audio connections
-        inputConnection =
-            std::make_unique<audio::StreamConnection>(audioDeviceCellular.get(), audioDevice.get(), dataStreamIn);
-        outputConnection =
-            std::make_unique<audio::StreamConnection>(audioDevice.get(), audioDeviceCellular.get(), dataStreamOut);
+        voiceInputConnection =
+            std::make_unique<audio::StreamConnection>(audioDevice.get(), audioDeviceCellular.get(), dataStreamIn.get());
+        voiceOutputConnection = std::make_unique<audio::StreamConnection>(
+            audioDeviceCellular.get(), audioDevice.get(), dataStreamOut.get());
 
         // enable audio connections
-        inputConnection->enable();
-        outputConnection->enable();
+        voiceOutputConnection->enable();
+        if (!IsMuted()) {
+            voiceInputConnection->enable();
+        }
 
         return audio::RetCode::Success;
     }
@@ -89,8 +92,8 @@ namespace audio
         }
 
         state = State::Idle;
-        outputConnection.reset();
-        inputConnection.reset();
+        voiceOutputConnection.reset();
+        voiceInputConnection.reset();
 
         audioDevice->Stop();
         audioDeviceCellular->Stop();
@@ -108,8 +111,8 @@ namespace audio
         }
 
         state = State::Paused;
-        outputConnection->disable();
-        inputConnection->disable();
+        voiceOutputConnection->disable();
+        voiceInputConnection->disable();
         return RetCode::Success;
     }
 
@@ -120,8 +123,8 @@ namespace audio
         }
 
         state = State::Active;
-        inputConnection->enable();
-        outputConnection->enable();
+        voiceInputConnection->enable();
+        voiceOutputConnection->enable();
         return RetCode::Success;
     }
 
@@ -132,6 +135,7 @@ namespace audio
         switch (evt->getType()) {
         case EventType::JackState:
             SetProfileAvailability({Profile::Type::RoutingHeadphones}, isAvailable);
+            jackState = isAvailable ? JackState::Plugged : JackState::Unplugged;
             SwitchToPriorityProfile();
             break;
         case EventType::BlutoothHSPDeviceState:
@@ -139,16 +143,22 @@ namespace audio
             SwitchToPriorityProfile();
             break;
         case EventType::CallLoudspeakerOn:
+            SetProfileAvailability({Profile::Type::RoutingEarspeaker}, false);
+            SetProfileAvailability({Profile::Type::RoutingHeadphones}, false);
             SwitchProfile(Profile::Type::RoutingLoudspeaker);
             break;
         case EventType::CallLoudspeakerOff:
+            SetProfileAvailability({Profile::Type::RoutingEarspeaker}, true);
+            if (jackState == JackState::Plugged) {
+                SetProfileAvailability({Profile::Type::RoutingHeadphones}, true);
+            }
             SwitchToPriorityProfile();
             break;
         case EventType::CallMute:
-            Mute(true);
+            Mute();
             break;
         case EventType::CallUnmute:
-            Mute(false);
+            Unmute();
             break;
         default:
             return RetCode::UnsupportedEvent;
@@ -174,13 +184,13 @@ namespace audio
             Stop();
         }
 
-        audioDevice = CreateDevice(newProfile->GetAudioDeviceType(), nullptr).value_or(nullptr);
+        audioDevice = CreateDevice(*newProfile);
         if (audioDevice == nullptr) {
             LOG_ERROR("Error creating AudioDevice");
             return RetCode::Failed;
         }
 
-        audioDeviceCellular = CreateDevice(bsp::AudioDevice::Type::Cellular, nullptr).value_or(nullptr);
+        audioDeviceCellular = createCellularAudioDevice();
         if (audioDeviceCellular == nullptr) {
             LOG_ERROR("Error creating AudioDeviceCellular");
             return RetCode::Failed;
@@ -196,10 +206,21 @@ namespace audio
         return RetCode::Success;
     }
 
-    bool RouterOperation::Mute(bool enable)
+    void RouterOperation::Mute()
     {
-        muteEnable = enable;
-        return true;
+        voiceInputConnection->disable();
+        mute = Mute::Enabled;
+    }
+
+    void RouterOperation::Unmute()
+    {
+        voiceInputConnection->enable();
+        mute = Mute::Disabled;
+    }
+
+    auto RouterOperation::IsMuted() const noexcept -> bool
+    {
+        return mute == RouterOperation::Mute::Enabled;
     }
 
     Position RouterOperation::GetPosition()

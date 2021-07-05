@@ -21,6 +21,13 @@ namespace db::query
         [[nodiscard]] auto debugInfo() const -> std::string override;
     };
 
+    class ThreadsGetWithTotalCount : public ThreadsGet
+    {
+      public:
+        ThreadsGetWithTotalCount(std::size_t offset, std::size_t limit);
+        [[nodiscard]] auto debugInfo() const -> std::string override;
+    };
+
     class ThreadsGetResults : public QueryResult
     {
         std::vector<ThreadRecord> results;
@@ -31,4 +38,14 @@ namespace db::query
         [[nodiscard]] auto debugInfo() const -> std::string override;
     };
 
+    class ThreadsGetResultsWithTotalCount : public ThreadsGetResults
+    {
+      public:
+        ThreadsGetResultsWithTotalCount(std::vector<ThreadRecord> records, std::size_t allLength);
+        [[nodiscard]] auto debugInfo() const -> std::string override;
+        auto getTotalCount() const noexcept -> std::size_t;
+
+      private:
+        std::size_t totalCount;
+    };
 }; // namespace db::query

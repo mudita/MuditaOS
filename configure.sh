@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 if [[ $BASH_VERSINFO -lt 4 ]]; then
@@ -64,7 +64,6 @@ BUILD_TYPE=$2
 
 if check_target && check_build_type ; then
     shift 2
-
     BUILD_DIR="build-${TARGET,,}-${CMAKE_BUILD_TYPE}"
     echo -e "build dir:\e[34m\n\t${BUILD_DIR}\e[0m"
     SRC_DIR=`pwd`
@@ -86,7 +85,12 @@ if check_target && check_build_type ; then
                     ${SRC_DIR} "
         echo -e "\e[32m${CMAKE_CMD}\e[0m" | tr -s " "
         if $CMAKE_CMD; then
-            echo -e "\e[32mcd ${BUILD_DIR} && make -j\e[0m"
+            Ninja=$(echo $@ | grep "Ninja")
+            if [[ -z ${Ninja} ]]; then
+                echo -e "\e[32mcd ${BUILD_DIR} && make -j $(nproc) <Pure|Bell>\e[0m"
+            else
+                echo -e "\e[32mcd ${BUILD_DIR} && ninja <Pure|Bell>\e[0m"
+            fi
         else
             echo -e "configuration error!"
         fi

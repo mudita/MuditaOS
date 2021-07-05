@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NewEditAlarmModel.hpp"
@@ -71,7 +71,7 @@ namespace app::alarmClock
 
     void NewEditAlarmModel::loadData(std::shared_ptr<AlarmsRecord> record)
     {
-        list->clear();
+        list->reset();
         eraseInternalData();
 
         createData();
@@ -107,7 +107,7 @@ namespace app::alarmClock
         else {
             alarmsRepository->add(*alarm, [this](bool) { application->returnToPreviousWindow(); });
         }
-        list->clear();
+        list->reset();
         eraseInternalData();
     }
 } // namespace app::alarmClock

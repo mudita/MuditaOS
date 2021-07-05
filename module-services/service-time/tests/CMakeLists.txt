@@ -1,0 +1,9 @@
+add_catch2_executable(
+        NAME
+        timezone-handler
+        SRCS
+        unittest_timezone_handler.cpp
+        LIBS
+        service-time
+        module-sys
+)

@@ -8,7 +8,7 @@
 
 namespace gui::renderer
 {
-    auto CircleRenderer::DrawableStyle::from(const CommandCircle &command) -> DrawableStyle
+    auto CircleRenderer::DrawableStyle::from(const DrawCircle &command) -> DrawableStyle
     {
         return DrawableStyle{command.width, command.borderColor, command.filled ? command.fillColor : ColorNoColor};
     }

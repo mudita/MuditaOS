@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <cstdio>
@@ -14,7 +14,6 @@
 
 namespace audio
 {
-
     Decoder::Decoder(const char *fileName)
         : filePath(fileName), workerBuffer(std::make_unique<int16_t[]>(workerBufferSize)), tag(std::make_unique<Tags>())
     {
@@ -125,7 +124,12 @@ namespace audio
     {
         assert(_stream != nullptr);
         if (!audioWorker) {
-            audioWorker = std::make_unique<DecoderWorker>(_stream, this, endOfFileCallback);
+            audioWorker =
+                std::make_unique<DecoderWorker>(_stream,
+                                                this,
+                                                endOfFileCallback,
+                                                tag->num_channel == 1 ? DecoderWorker::ChannelMode::ForceStereo
+                                                                      : DecoderWorker::ChannelMode::NoConversion);
             audioWorker->init();
             audioWorker->run();
         }
@@ -155,6 +159,27 @@ namespace audio
     void Decoder::disableInput()
     {
         audioWorker->disablePlayback();
+    }
+
+    auto Decoder::getSourceFormat() -> AudioFormat
+    {
+        auto tags     = fetchTags();
+        auto bitWidth = getBitWidth();
+        // this is a decoder mono to stereo hack, will be removed when proper
+        // transcoding implementation is added
+        auto channels = tags->num_channel == 1 ? 2U : tags->num_channel;
+
+        return AudioFormat{tags->sample_rate, bitWidth, channels};
+    }
+
+    auto Decoder::getSupportedFormats() -> std::vector<AudioFormat>
+    {
+        return std::vector<AudioFormat>{getSourceFormat()};
+    }
+
+    auto Decoder::getTraits() const -> Endpoint::Traits
+    {
+        return Endpoint::Traits{};
     }
 
 } // namespace audio

@@ -1,11 +1,11 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include "AppWindow.hpp"
 
-#include <module-apps/Application.hpp>
+#include <apps-common/Application.hpp>
 #include <module-apps/application-notes/presenter/SearchEngineWindowPresenter.hpp>
 
 #include <module-gui/gui/input/InputEvent.hpp>
@@ -24,7 +24,8 @@ namespace app::notes
         void destroyInterface() override;
         bool onInput(const gui::InputEvent &inputEvent) override;
 
-        void notesFound(const std::vector<NotesRecord> &notes, const std::string &searchText) override;
+        void emptySearch() override;
+        virtual void processValidSearch(const std::string &searchText) override;
 
       private:
         std::unique_ptr<SearchEngineWindowContract::Presenter> presenter;

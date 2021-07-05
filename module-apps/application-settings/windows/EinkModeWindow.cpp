@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <memory>
@@ -25,8 +25,8 @@ namespace gui
         AppWindow::buildInterface();
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::select));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::select));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
         setTitle("Change eink mode");
         auto label               = new Label(this, 100, 200, 300, 50, "Change mode on click");
@@ -39,10 +39,8 @@ namespace gui
                 last_mode = service::eink::EinkModeMessage::Mode::Normal;
             }
 
-            sys::Bus::SendUnicast(std::make_shared<service::eink::EinkModeMessage>(last_mode),
-                                  service::name::eink,
-                                  this->application,
-                                  5000);
+            application->bus.sendUnicastSync(
+                std::make_shared<service::eink::EinkModeMessage>(last_mode), service::name::eink, 5000);
             return true;
         };
         setFocusItem(label);

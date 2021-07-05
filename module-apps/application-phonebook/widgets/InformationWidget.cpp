@@ -1,10 +1,12 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "InformationWidget.hpp"
 
 #include "AppWindow.hpp"
 #include "application-phonebook/data/PhonebookStyle.hpp"
+#include "widgets/TextWithIconsWidget.hpp"
+#include "widgets/ActiveIconFactory.hpp"
 
 #include <ContactRecord.hpp>
 #include <i18n/i18n.hpp>
@@ -21,7 +23,7 @@ namespace gui
         vBox = new VBox(this, 0, 0, 0, 0);
         vBox->setEdges(RectangleEdge::None);
 
-        titleLabel = new Label(vBox, 0, 0, 0, 0, utils::localize.get("app_phonebook_contact_information"));
+        titleLabel = new Label(vBox, 0, 0, 0, 0, utils::translate("app_phonebook_contact_information"));
         titleLabel->setMinimumSize(phonebookStyle::informationWidget::w,
                                    phonebookStyle::informationWidget::title_label_h);
         titleLabel->setEdges(RectangleEdge::None);
@@ -32,28 +34,31 @@ namespace gui
         titleLabel->activeItem = false;
 
         onLoadCallback = [=](std::shared_ptr<ContactRecord> contact) {
+            auto createBox = [=](const utils::PhoneNumber::View &number, const UTF8 &font) {
+                auto numberHBox = new TextWithIconsWidget(vBox);
+                ActiveIconFactory factory(app);
+                numberHBox->addText(number.getFormatted(), font);
+                numberHBox->addIcon(factory.makeCallIcon(number));
+                numberHBox->addIcon(factory.makeSMSIcon(number));
+                return numberHBox;
+            };
+
             if (contact->numbers.size() > 0) {
-
                 setMinimumHeight(widgetMinimumArea.h + phonebookStyle::numbersWithIconsWidget::h);
-
-                primaryNumberHBox = new NumberWithIconsWidget(
-                    app, contact->numbers[0].number, style::window::font::mediumbold, nullptr);
-                vBox->addWidget(primaryNumberHBox);
+                primaryNumberHBox = createBox(contact->numbers[0].number, style::window::font::mediumbold);
             }
             if (contact->numbers.size() > 1) {
                 setMinimumHeight(widgetMinimumArea.h + phonebookStyle::numbersWithIconsWidget::h);
-                secondNumberHBox =
-                    new NumberWithIconsWidget(app, contact->numbers[1].number, style::window::font::medium, nullptr);
-
-                vBox->addWidget(secondNumberHBox);
+                secondaryNumberHBox = createBox(contact->numbers[1].number, style::window::font::medium);
 
                 // Set proper navigation if second number is present
-                primaryNumberHBox->smsImage->setNavigationItem(NavigationDirection::DOWN, secondNumberHBox->smsImage);
-                primaryNumberHBox->phoneImage->setNavigationItem(NavigationDirection::DOWN,
-                                                                 secondNumberHBox->phoneImage);
+                primaryNumberHBox->icons[0]->setNavigationItem(NavigationDirection::DOWN,
+                                                               secondaryNumberHBox->icons[0]);
+                primaryNumberHBox->icons[1]->setNavigationItem(NavigationDirection::DOWN,
+                                                               secondaryNumberHBox->icons[1]);
 
-                secondNumberHBox->smsImage->setNavigationItem(NavigationDirection::UP, primaryNumberHBox->smsImage);
-                secondNumberHBox->phoneImage->setNavigationItem(NavigationDirection::UP, primaryNumberHBox->phoneImage);
+                secondaryNumberHBox->icons[0]->setNavigationItem(NavigationDirection::UP, primaryNumberHBox->icons[0]);
+                secondaryNumberHBox->icons[1]->setNavigationItem(NavigationDirection::UP, primaryNumberHBox->icons[1]);
             }
             if (contact->mail.length() > 0) {
                 setMinimumHeight(widgetMinimumArea.h + phonebookStyle::informationWidget::email_text_h +
@@ -89,25 +94,23 @@ namespace gui
         };
 
         inputCallback = [&](gui::Item &item, const gui::InputEvent &event) {
-            if (event.state != gui::InputEvent::State::keyReleasedShort) {
+            if (!event.isShortRelease()) {
                 return false;
             }
 
             // Clear VBox down navigation if second number is present.
-            if (secondNumberHBox != nullptr) {
+            if (secondaryNumberHBox != nullptr) {
                 primaryNumberHBox->clearNavigationItem(NavigationDirection::DOWN);
             }
 
             return vBox->onInput(event);
         };
 
-        setEdges(RectangleEdge::None);
-    }
+        dimensionChangedCallback = [&](gui::Item &, const BoundingBox &newDim) -> bool {
+            vBox->setArea({0, 0, newDim.w, newDim.h});
+            return true;
+        };
 
-    auto InformationWidget::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool
-    {
-        vBox->setPosition(0, 0);
-        vBox->setSize(newDim.w, newDim.h);
-        return true;
+        setEdges(RectangleEdge::None);
     }
 } /* namespace gui */

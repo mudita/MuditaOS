@@ -1,19 +1,25 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NewEditEventModel.hpp"
 #include "AppWindow.hpp"
-#include "application-calendar/widgets/NewEventCheckBoxWithLabel.hpp"
-#include "module-apps/application-calendar/data/CalendarData.hpp"
-#include <BottomBar.hpp>
-#include <ListView.hpp>
+#include <application-calendar/widgets/NewEventCheckBoxWithLabel.hpp>
+#include <application-calendar/widgets/TextWithLabelItem.hpp>
+#include <application-calendar/widgets/CalendarStyle.hpp>
+#include <application-calendar/widgets/CalendarDateItem.hpp>
+#include <application-calendar/widgets/CalendarTimeItem.hpp>
+#include <application-calendar/widgets/SeveralOptionsItem.hpp>
+#include <application-calendar/data/CalendarData.hpp>
+#include <application-calendar/ApplicationCalendar.hpp>
 #include <module-db/queries/calendar/QueryEventsAdd.hpp>
 #include <module-db/queries/calendar/QueryEventsEdit.hpp>
+#include <apps-common/messages/DialogMetadataMessage.hpp>
+
 #include <service-db/DBServiceAPI.hpp>
 #include <time/time_conversion.hpp>
-#include <module-apps/application-calendar/ApplicationCalendar.hpp>
+#include <ListView.hpp>
 
-NewEditEventModel::NewEditEventModel(app::Application *app, bool mode24H) : application(app), mode24H(mode24H)
+NewEditEventModel::NewEditEventModel(app::Application *app) : application(app)
 {}
 
 unsigned int NewEditEventModel::requestRecordsCount()
@@ -32,27 +38,6 @@ void NewEditEventModel::requestRecords(const uint32_t offset, const uint32_t lim
     list->onProviderDataUpdate();
 }
 
-uint32_t NewEditEventModel::getRepeatOptionValue()
-{
-    if (repeat != nullptr) {
-        return repeat->repeatOptionValue;
-    }
-    else {
-        LOG_ERROR("Repeat option value returned before assigned!");
-        return 0;
-    }
-}
-
-void NewEditEventModel::setRepeatOptionValue(const uint32_t &value)
-{
-    if (repeat != nullptr) {
-        repeat->repeatOptionValue = value;
-    }
-    else {
-        LOG_ERROR("Value not assigned. Repeat option item was not ready!");
-    }
-}
-
 gui::ListItem *NewEditEventModel::getItem(gui::Order order)
 {
     return getRecord(order);
@@ -64,55 +49,48 @@ void NewEditEventModel::createData(bool allDayEvent)
     assert(app != nullptr);
 
     eventNameInput = new gui::TextWithLabelItem(
-        utils::localize.get("app_calendar_new_edit_event_name"),
+        utils::translate("app_calendar_new_edit_event_name"),
         [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); });
 
     allDayEventCheckBox = new gui::NewEventCheckBoxWithLabel(
-        application, utils::localize.get("app_calendar_new_edit_event_allday"), true, this);
+        application, utils::translate("app_calendar_new_edit_event_allday"), [this](bool isChecked) {
+            isChecked ? createTimeItems() : eraseTimeItems();
+            const auto it = std::find(std::begin(internalData), std::end(internalData), allDayEventCheckBox);
+            list->rebuildList(gui::listview::RebuildType::OnPageElement, std::distance(std::begin(internalData), it));
+        });
 
-    dateItem = new gui::EventDateItem();
-
-    startTime = new gui::EventTimeItem(
-        utils::localize.get("app_calendar_new_edit_event_start"),
-        mode24H,
-        [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
-        [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); });
-
-    endTime = new gui::EventTimeItem(
-        utils::localize.get("app_calendar_new_edit_event_end"),
-        mode24H,
-        [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
-        [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); });
+    dateItem = new gui::CalendarDateItem();
 
     reminder = new gui::SeveralOptionsItem(
         application,
-        utils::localize.get("app_calendar_event_detail_reminder"),
+        utils::translate("app_calendar_event_detail_reminder"),
         [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); });
 
     repeat = new gui::SeveralOptionsItem(
         application,
-        utils::localize.get("app_calendar_event_detail_repeat"),
+        utils::translate("app_calendar_event_detail_repeat"),
         [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); });
 
-    endTime->setConnectionToSecondItem(startTime);
-    startTime->setConnectionToSecondItem(endTime);
-
-    startTime->setConnectionToDateItem(dateItem);
-    endTime->setConnectionToDateItem(dateItem);
+    allDayEventCheckBox->setConnectionToDateItem(dateItem->getDateWidget());
 
     internalData.push_back(eventNameInput);
     internalData.push_back(allDayEventCheckBox);
-    if (!allDayEvent) {
-        internalData.push_back(dateItem);
-        internalData.push_back(startTime);
-        internalData.push_back(endTime);
-    }
+    internalData.push_back(dateItem);
     internalData.push_back(reminder);
     internalData.push_back(repeat);
+
+    if (!allDayEvent) {
+        createTimeItems();
+    }
+    else {
+        startTimeBuffer +=
+            TimePointToHourMinSec(TimePointNow()).hours() + TimePointToHourMinSec(TimePointNow()).minutes();
+        endTimeBuffer = startTimeBuffer + std::chrono::hours(1);
+    }
 
     for (auto &item : internalData) {
         item->deleteByList = false;
@@ -121,41 +99,17 @@ void NewEditEventModel::createData(bool allDayEvent)
 
 void NewEditEventModel::loadData(std::shared_ptr<EventsRecord> record)
 {
-    list->clear();
-    eraseInternalData();
-    auto start_time    = TimePointToHourMinSec(record->date_from);
-    auto end_time      = TimePointToHourMinSec(record->date_till);
-    auto isAllDayEvent = [&]() -> bool {
-        return start_time.hours().count() == 0 && start_time.minutes().count() == 0 &&
-               end_time.hours().count() == style::window::calendar::time::max_hour_24H_mode &&
-               end_time.minutes().count() == style::window::calendar::time::max_minutes;
-    };
+    clearData();
+    startTimeBuffer = record->date_from;
+    endTimeBuffer   = record->date_till;
 
-    createData(isAllDayEvent());
+    createData(gui::allDayEvents::isAllDayEvent(startTimeBuffer, endTimeBuffer));
 
     for (auto &item : internalData) {
         if (item->onLoadCallback) {
             item->onLoadCallback(record);
         }
     }
-
-    if (isAllDayEvent()) {
-        record->date_from = record->date_from - TimePointToHourMinSec(record->date_from).hours() -
-                            TimePointToHourMinSec(record->date_from).minutes() +
-                            TimePointToHourMinSec(TimePointNow()).hours() +
-                            TimePointToHourMinSec(TimePointNow()).minutes();
-        record->date_till = record->date_from + std::chrono::hours(1);
-        if (dateItem->onLoadCallback) {
-            dateItem->onLoadCallback(record);
-        }
-        if (startTime->onLoadCallback) {
-            startTime->onLoadCallback(record);
-        }
-        if (endTime->onLoadCallback) {
-            endTime->onLoadCallback(record);
-        }
-    }
-
     list->rebuildList();
 }
 
@@ -166,34 +120,7 @@ void NewEditEventModel::loadRepeat(const std::shared_ptr<EventsRecord> &record)
     }
 }
 
-void NewEditEventModel::loadDataWithoutTimeItem()
-{
-    internalData.erase(std::find(internalData.begin(), internalData.end(), dateItem));
-    internalData.erase(std::find(internalData.begin(), internalData.end(), startTime));
-    internalData.erase(std::find(internalData.begin(), internalData.end(), endTime));
-    list->rebuildList();
-}
-
-void NewEditEventModel::reloadDataWithTimeItem()
-{
-    internalData.clear();
-
-    internalData.push_back(eventNameInput);
-    internalData.push_back(allDayEventCheckBox);
-    internalData.push_back(dateItem);
-    internalData.push_back(startTime);
-    internalData.push_back(endTime);
-    internalData.push_back(reminder);
-    internalData.push_back(repeat);
-
-    for (auto &item : internalData) {
-        item->deleteByList = false;
-    }
-
-    list->rebuildList();
-}
-
-void NewEditEventModel::saveData(std::shared_ptr<EventsRecord> event, bool edit)
+void NewEditEventModel::saveData(std::shared_ptr<EventsRecord> event, EventAction action)
 {
     for (auto &item : internalData) {
         if (item->onSaveCallback) {
@@ -201,53 +128,141 @@ void NewEditEventModel::saveData(std::shared_ptr<EventsRecord> event, bool edit)
         }
     }
 
-    if (edit) {
-        auto record = event.get();
-        record->reminder_fired = TIME_POINT_INVALID;
-        if (record->title != "") {
-            DBServiceAPI::GetQuery(
-                application, db::Interface::Name::Events, std::make_unique<db::query::events::Edit>(*record));
-        }
-        const uint32_t numberOfIgnoredWindows = 3;
-        application->returnToPreviousWindow(numberOfIgnoredWindows);
+    std::string errorMessage;
+    if (!isDataCorrect(event, errorMessage)) {
+
+        std::string windowTitle = (action == EventAction::Edit) ? utils::translate("app_calendar_edit_event_title")
+                                                                : utils::translate("app_calendar_new_event_title");
+
+        application->switchWindow(
+            gui::window::name::dialog_confirm,
+            gui::ShowMode::GUI_SHOW_INIT,
+            std::make_unique<gui::DialogMetadataMessage>(gui::DialogMetadata{
+                std::move(windowTitle), "emergency_W_G", std::move(errorMessage), "", [=]() -> bool {
+                    application->returnToPreviousWindow();
+                    return true;
+                }}));
+
+        return;
+    }
+
+    if (action == EventAction::Edit) {
+        saveEditData(event);
     }
     else {
-        auto record = event.get();
-        if (record->title != "") {
-            DBServiceAPI::GetQuery(
-                application, db::Interface::Name::Events, std::make_unique<db::query::events::Add>(*record));
-
-            auto data       = std::make_unique<DayMonthData>();
-            auto startDate  = TimePointToYearMonthDay(record->date_from);
-            auto filterDate = TimePointFromYearMonthDay(startDate);
-            std::string monthStr =
-                utils::time::Locale::get_month(utils::time::Locale::Month(unsigned(startDate.month()) - 1));
-            data->setData(std::to_string(unsigned(startDate.day())) + " " + monthStr, filterDate);
-
-            if (application->getPrevWindow() == style::window::calendar::name::no_events_window) {
-                auto app = dynamic_cast<app::ApplicationCalendar *>(application);
-                assert(app != nullptr);
-                if (app->getEquivalentToEmptyWindow() == EquivalentWindow::DayEventsWindow) {
-                    app->popToWindow(gui::name::window::main_window);
-                    app->switchWindow(style::window::calendar::name::day_events_window, std::move(data));
-                }
-                else if (app->getEquivalentToEmptyWindow() == EquivalentWindow::AllEventsWindow) {
-                    app->popToWindow(gui::name::window::main_window);
-                    app->switchWindow(style::window::calendar::name::all_events_window, std::move(data));
-                }
-            }
-            else {
-                if (application->getPrevWindow() == style::window::calendar::name::day_events_window) {
-                    application->switchWindow(style::window::calendar::name::day_events_window, std::move(data));
-                }
-                application->returnToPreviousWindow();
-            }
-        }
-        else {
-            application->returnToPreviousWindow();
-        }
+        saveNewData(event);
     }
 
-    list->clear();
+    clearData();
+}
+
+void NewEditEventModel::saveNewData(std::shared_ptr<EventsRecord> event)
+{
+    DBServiceAPI::GetQuery(application, db::Interface::Name::Events, std::make_unique<db::query::events::Add>(*event));
+
+    auto data            = std::make_unique<DayMonthData>();
+    auto startDate       = TimePointToYearMonthDay(event->date_from);
+    auto filterDate      = TimePointFromYearMonthDay(startDate);
+    std::string monthStr = utils::time::Locale::get_month(utils::time::Locale::Month(unsigned(startDate.month()) - 1));
+    data->setData(std::to_string(unsigned(startDate.day())) + " " + monthStr, filterDate);
+
+    if (application->getPrevWindow() == style::window::calendar::name::no_events_window) {
+        auto app = dynamic_cast<app::ApplicationCalendar *>(application);
+        assert(app != nullptr);
+        if (app->getEquivalentToEmptyWindow() == EquivalentWindow::DayEventsWindow) {
+            app->popToWindow(gui::name::window::main_window);
+            app->switchWindow(style::window::calendar::name::day_events_window, std::move(data));
+        }
+        else if (app->getEquivalentToEmptyWindow() == EquivalentWindow::AllEventsWindow) {
+            app->popToWindow(gui::name::window::main_window);
+            app->switchWindow(style::window::calendar::name::all_events_window, std::move(data));
+        }
+    }
+    else {
+        if (application->getPrevWindow() == style::window::calendar::name::day_events_window) {
+            application->switchWindow(style::window::calendar::name::day_events_window, std::move(data));
+        }
+        application->returnToPreviousWindow();
+    }
+}
+
+void NewEditEventModel::saveEditData(std::shared_ptr<EventsRecord> event)
+{
+    event->reminder_fired = TIME_POINT_INVALID;
+    if (!event->title.empty()) {
+        DBServiceAPI::GetQuery(
+            application, db::Interface::Name::Events, std::make_unique<db::query::events::Edit>(*event));
+    }
+    auto rec  = std::make_unique<EventsRecord>(*event);
+    auto data = std::make_unique<EventRecordData>(std::move(rec));
+    application->switchWindow(style::window::calendar::name::details_window, std::move(data));
+}
+
+bool NewEditEventModel::isDataCorrect(std::shared_ptr<EventsRecord> event, std::string &message)
+{
+    if (event->title.empty()) {
+        LOG_WARN("Event data has empty title!");
+        message = utils::translate("app_calendar_event_error_empty_name");
+        return false;
+    }
+
+    if (event->date_from > event->date_till) {
+        LOG_WARN("Event data has wrong dates!");
+        message = utils::translate("app_calendar_event_error_dates");
+        return false;
+    }
+
+    return true;
+}
+
+void NewEditEventModel::createTimeItems()
+{
+    auto create = [this](gui::CalendarTimeItem *&item, const std::string &description, gui::TimeWidget::Type type) {
+        if (item == nullptr) {
+            auto app = application;
+            item     = new gui::CalendarTimeItem(
+                description,
+                type,
+                [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
+                [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
+                startTimeBuffer,
+                endTimeBuffer);
+
+            item->deleteByList = false;
+            item->setConnectionToDateItem(dateItem);
+            internalData.insert(std::find(internalData.begin(), internalData.end(), reminder), item);
+        }
+    };
+
+    create(startTime, utils::translate("app_calendar_new_edit_event_start"), gui::TimeWidget::Type::Start);
+    create(endTime, utils::translate("app_calendar_new_edit_event_end"), gui::TimeWidget::Type::End);
+
+    startTime->setConnectionToSecondItem(endTime);
+    endTime->setConnectionToSecondItem(startTime);
+}
+
+void NewEditEventModel::eraseTimeItems()
+{
+    auto erase = [this](gui::CalendarTimeItem *&item) {
+        if (item != nullptr) {
+            item->deleteByList = true;
+            internalData.erase(std::find(internalData.begin(), internalData.end(), item));
+            item = nullptr;
+        }
+    };
+
+    startTimeBuffer = startTime->getFromTillDate()->from;
+    endTimeBuffer   = endTime->getFromTillDate()->till;
+    erase(startTime);
+    erase(endTime);
+}
+
+void NewEditEventModel::clearData()
+{
+    list->reset();
     eraseInternalData();
+    startTime       = nullptr;
+    endTime         = nullptr;
+    startTimeBuffer = TimePoint();
+    endTimeBuffer   = TimePoint();
 }

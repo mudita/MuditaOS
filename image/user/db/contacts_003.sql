@@ -1,3 +1,6 @@
+-- Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+-- For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 BEGIN;
 INSERT OR REPLACE INTO  contacts (_id,name_id,numbers_id,ring_id,address_id,speeddial) VALUES (1,1,'1',1,1,1);
 INSERT OR REPLACE INTO  contacts (_id,name_id,numbers_id,ring_id,address_id,speeddial) VALUES (2,2,'2',2,2,2);
@@ -75,82 +78,82 @@ INSERT OR REPLACE INTO  contacts (_id,name_id,numbers_id,ring_id,address_id,spee
 INSERT OR REPLACE INTO  contacts (_id,name_id,numbers_id,ring_id,address_id,speeddial) VALUES (74,74,'74',74,74,'');
 INSERT OR REPLACE INTO  contacts (_id,name_id,numbers_id,ring_id,address_id,speeddial) VALUES (75,75,'75',75,75,'');
 INSERT OR REPLACE INTO  contacts (_id,name_id,numbers_id,ring_id,address_id,speeddial) VALUES (76,76,'76',76,76,'');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (1,1,'Alek','Wyczesany');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (2,2,'Zofia','Wyczesany');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (3,3,'Cezary','Wyczesany');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (4,4,'Alek','Arbuz');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (5,5,'Zofia','Pacha');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (6,6,'Roland','Pacha');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (7,7,'Cezary','Pacha');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (8,8,'Ignacy','Pacha');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (9,9,'Ejdiran','Pacha');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (10,10,'Sebastian','Pacha');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (11,11,'Mariola','Pacha');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (12,12,'Mateusz','Pacha');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (13,13,'Alek','Małolepszy');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (14,14,'Roland','Małolepszy');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (15,15,'Cezary','Małolepszy');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (16,16,'Ignacy','Małolepszy');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (17,17,'Grażyna','Małolepszy');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (18,18,'Mariola','Małolepszy');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (19,19,'Alek','Boligłowa');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (20,20,'Zofia','Boligłowa');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (21,21,'Cezary','Boligłowa');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (22,22,'Grażyna','Boligłowa');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (23,23,'Alek','Kiełbasa');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (24,24,'Zofia','Kiełbasa');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (25,25,'Alek','Ściera');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (26,26,'Zofia','Ściera');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (27,27,'Cezary','Ściera');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (28,28,'Ejdiran','Ściera');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (29,29,'Sebastian','Ściera');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (30,30,'Ola','Ściera');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (31,31,'Alek','Słaby');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (32,32,'Roland','Słaby');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (33,33,'Ejdiran','Słaby');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (34,34,'Grażyna','Słaby');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (35,35,'Alek','Cnotliwy');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (36,36,'Janusz','Cnotliwy');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (37,37,'Ignacy','Cnotliwy');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (38,38,'Ejdiran','Cnotliwy');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (39,39,'Karyna','Cnotliwy');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (40,40,'Alek','Bubel');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (41,41,'Zofia','Bubel');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (42,42,'Roland','Bubel');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (43,43,'Cezary','Bubel');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (44,44,'Brian','Bubel');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (45,45,'Ejdiran','Bubel');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (46,46,'Grażyna','Bubel');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (47,47,'Sebastian','Bubel');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (48,48,'Mariola','Bubel');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (49,49,'Alek','Fundament');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (50,50,'Roland','Fundament');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (51,51,'Ignacy','Fundament');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (52,52,'Alek','Rura');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (53,53,'Zofia','Rura');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (54,54,'Cezary','Rura');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (55,55,'Ignacy','Rura');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (56,56,'Ejdiran','Rura');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (57,57,'Sebastian','Rura');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (58,58,'Karyna','Rura');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (59,59,'Ola','Rura');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (60,60,'Alek','Bucior');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (61,61,'Roland','Bucior');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (62,62,'Brian','Bucior');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (63,63,'Grażyna','Bucior');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (64,64,'Sebastian','Bucior');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (65,65,'Ola','Bucior');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (66,66,'Alek','Kusibab');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (67,67,'Roland','Kusibab');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (68,68,'Cezary','Kusibab');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (69,69,'Brian','Kusibab');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (70,70,'Grażyna','Kusibab');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (71,71,'Alek','Kwasigroch');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (72,72,'Janusz','Kwasigroch');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (73,73,'Roland','Kwasigroch');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (74,74,'Ignacy','Kwasigroch');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (75,75,'Alek','Siekierka');
-INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) VALUES (76,76,'Ejdiran','Siekierka');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (1,1,'Olivia','Abraham');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (2,2,'Luke','Alsop');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (3,3,'Charles','Alsop');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (4,4,'Joan','Anderson');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (5,5,'Donna','Arnold');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (6,6,'Robert','Arnold');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (7,7,'Oliver','Blake');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (8,8,'Chloe','Bower');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (9,9,'Karen','Brown');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (10,10,'Carl','Brown');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (11,11,'Stephanie','Brown');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (12,12,'Sonia','Butler');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (13,13,'Charles','Carr');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (14,14,'Vanessa','Carr');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (15,15,'Gordon','Carr');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (16,16,'Isaac','Clark');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (17,17,'Max','Clarkson');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (18,18,'Nathan','Coleman');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (19,19,'Audrey','Dowd');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (20,20,'Austin','Duncan');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (21,21,'Melanie','Ferguson');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (22,22,'Christian','Fisher');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (23,23,'Alison','Fisher');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (24,24,'Ruth','Gibson');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (25,25,'Dan','Glover');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (26,26,'Amanda','Graham');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (27,27,'Julian','Greene');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (28,28,'Donna','Greene');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (29,29,'Vanessa','Hamilton');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (30,30,'Jane','Hamilton');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (31,31,'Audrey','Hardacre');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (32,32,'Katherine','Hart');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (33,33,'Madeleine','Hill');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (34,34,'Rose','Hodges');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (35,35,'Richard','Hudson');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (36,36,'Julian','Jackson');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (37,37,'Jack','Jackson');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (38,38,'Emma','Jones');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (39,39,'Boris','Kelly');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (40,40,'Michelle','Kelly');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (41,41,'Alan','Kerr');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (42,42,'Ava','King');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (43,43,'Harry','Knox');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (44,44,'Justin','Lawrence');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (45,45,'Benjamin','Lee');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (46,46,'Christopher','Lewis');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (47,47,'Ruth','Lyman');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (48,48,'Megan','Lyman');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (49,49,'Michelle','Mackenzie');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (50,50,'Caroline','Marshall');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (51,51,'Tim','McGrath');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (52,52,'Joseph','Murray');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (53,53,'Isaac','Newman');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (54,54,'Paul','Oliver');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (55,55,'Jane','Paige');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (56,56,'Madeleine','Parr');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (57,57,'Tim','Parsons');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (58,58,'Bella','Peters');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (59,59,'Stephanie','Poole');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (60,60,'Brandon','Pullman');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (61,61,'Nathan','Pullman');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (62,62,'Oliver','Pullman');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (63,63,'Kylie','Quinn');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (64,64,'Wanda','Reid');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (65,65,'Diana','Sharp');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (66,66,'Robert','Sharp');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (67,67,'Joseph','Short');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (68,68,'Jane','Short');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (69,69,'Alan','Smith');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (70,70,'Diane','Springer');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (71,71,'Madeleine','Springer');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (72,72,'Stewart','Thomson');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (73,73,'Wendy','Thomson');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (74,74,'Kevin','Vance');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (75,75,'Alan','Wallace');
+INSERT OR REPLACE INTO contact_name (_id,contact_id,name_primary,name_alternative) VALUES (76,76,'Chloe','Wilson');
 INSERT OR REPLACE INTO  contact_match_groups (_id,group_id,contact_id) VALUES (1,1,1);
 INSERT OR REPLACE INTO  contact_match_groups (_id,group_id,contact_id) VALUES (2,2,2);
 INSERT OR REPLACE INTO  contact_match_groups (_id,group_id,contact_id) VALUES (3,1,3);
@@ -357,156 +360,82 @@ INSERT OR REPLACE INTO  contact_ringtones (_id,contact_id,asset_path) VALUES (73
 INSERT OR REPLACE INTO  contact_ringtones (_id,contact_id,asset_path) VALUES (74,74,'');
 INSERT OR REPLACE INTO  contact_ringtones (_id,contact_id,asset_path) VALUES (75,75,'');
 INSERT OR REPLACE INTO  contact_ringtones (_id,contact_id,asset_path) VALUES (76,76,'');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (1,1,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Alek.Wyczesany@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (2,2,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Zofia.Wyczesany@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (3,3,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Cezary.Wyczesany@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (4,4,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Alek.Pacha@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (5,5,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Zofia.Pacha@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (6,6,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Roland.Pacha@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (7,7,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Cezary.Pacha@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (8,8,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Ignacy.Pacha@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (9,9,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Ejdiran.Pacha@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (10,10,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Sebastian.Pacha@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (11,11,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Mariola.Pacha@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (12,12,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Mateusz.Pacha@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (13,13,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Alek.Małolepszy@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (14,14,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Roland.Małolepszy@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (15,15,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Cezary.Małolepszy@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (16,16,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Ignacy.Małolepszy@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (17,17,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Grażyna.Małolepszy@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (18,18,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Mariola.Małolepszy@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (19,19,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Alek.Boligłowa@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (20,20,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Zofia.Boligłowa@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (21,21,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Cezary.Boligłowa@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (22,22,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Grażyna.Boligłowa@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (23,23,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Alek.Kiełbasa@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (24,24,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Zofia.Kiełbasa@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (25,25,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Alek.Ściera@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (26,26,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Zofia.Ściera@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (27,27,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Cezary.Ściera@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (28,28,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Ejdiran.Ściera@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (29,29,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Sebastian.Ściera@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (30,30,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Ola.Ściera@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (31,31,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Alek.Słaby@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (32,32,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Roland.Słaby@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (33,33,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Ejdiran.Słaby@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (34,34,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Grażyna.Słaby@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (35,35,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Alek.Cnotliwy@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (36,36,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Janusz.Cnotliwy@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (37,37,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Ignacy.Cnotliwy@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (38,38,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Ejdiran.Cnotliwy@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (39,39,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Karyna.Cnotliwy@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (40,40,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Alek.Bubel@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (41,41,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Zofia.Bubel@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (42,42,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Roland.Bubel@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (43,43,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Cezary.Bubel@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (44,44,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Brian.Bubel@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (45,45,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Ejdiran.Bubel@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (46,46,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Grażyna.Bubel@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (47,47,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Sebastian.Bubel@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (48,48,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Mariola.Bubel@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (49,49,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Alek.Fundament@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (50,50,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Roland.Fundament@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (51,51,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Ignacy.Fundament@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (52,52,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Alek.Rura@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (53,53,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Zofia.Rura@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (54,54,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Cezary.Rura@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (55,55,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Ignacy.Rura@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (56,56,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Ejdiran.Rura@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (57,57,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Sebastian.Rura@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (58,58,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Karyna.Rura@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (59,59,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Ola.Rura@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (60,60,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Alek.Bucior@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (61,61,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Roland.Bucior@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (62,62,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Brian.Bucior@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (63,63,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Grażyna.Bucior@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (64,64,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Sebastian.Bucior@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (65,65,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Ola.Bucior@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (66,66,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Alek.Kusibab@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (67,67,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Roland.Kusibab@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (68,68,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Cezary.Kusibab@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (69,69,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Brian.Kusibab@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (70,70,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Grażyna.Kusibab@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (71,71,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Alek.Kwasigroch@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (72,72,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Janusz.Kwasigroch@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (73,73,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Roland.Kwasigroch@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (74,74,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Ignacy.Kwasigroch@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (75,75,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Alek.Siekierka@mudita.com');
-INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (76,76,'6 Czeczota St.
-02600 Warsaw','This is interesting note. More information is needed in this note.','Ejdiran.Siekierka@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (1,1,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','olivia.abraham@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (2,2,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','luke.alsop@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (3,3,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','charles.alsop@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (4,4,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','joan.anderson@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (5,5,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','donna.arnold@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (6,6,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','robert.arnold@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (7,7,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','oliver.blake@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (8,8,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','chloe.bower@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (9,9,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','karen.brown@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (10,10,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','carl.brown@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (11,11,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','stephanie.brown@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (12,12,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','sonia.butler@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (13,13,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','charles.carr@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (14,14,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','vanessa.carr@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (15,15,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','gordon.carr@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (16,16,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','isaac.clark@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (17,17,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','max.clarkson@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (18,18,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','nathan.coleman@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (19,19,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','audrey.dowd@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (20,20,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','austin.duncan@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (21,21,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','melanie.ferguson@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (22,22,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','christian.fisher@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (23,23,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','alison.fisher@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (24,24,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','ruth.gibson@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (25,25,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','dan.glover@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (26,26,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','amanda.graham@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (27,27,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','julian.greene@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (28,28,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','donna.greene@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (29,29,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','vanessa.hamilton@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (30,30,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','jane.hamilton@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (31,31,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','audrey.hardacre@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (32,32,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','katherine.hart@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (33,33,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','madeleine.hill@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (34,34,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','rose.hodges@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (35,35,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','richard.hudson@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (36,36,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','julian.jackson@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (37,37,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','jack.jackson@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (38,38,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','emma.jones@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (39,39,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','boris.kelly@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (40,40,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','michelle.kelly@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (41,41,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','alan.kerr@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (42,42,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','ava.king@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (43,43,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','harry.knox@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (44,44,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','justin.lawrence@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (45,45,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','benjamin.lee@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (46,46,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','christopher.lewis@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (47,47,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','ruth.lyman@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (48,48,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','megan.lyman@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (49,49,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','michelle.mackenzie@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (50,50,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','caroline.marshall@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (51,51,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','tim.mcgrath@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (52,52,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','joseph.murray@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (53,53,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','isaac.newman@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (54,54,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','paul.oliver@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (55,55,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','jane.paige@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (56,56,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','madeleine.parr@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (57,57,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','tim.parsons@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (58,58,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','bella.peters@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (59,59,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','stephanie.poole@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (60,60,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','brandon.pullman@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (61,61,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','nathan.pullman@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (62,62,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','oliver.pullman@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (63,63,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','kylie.quinn@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (64,64,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','wanda.reid@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (65,65,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','diana.sharp@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (66,66,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','robert.sharp@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (67,67,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','joseph.short@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (68,68,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','jane.short@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (69,69,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','alan.smith@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (70,70,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','diane.springer@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (71,71,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','madeleine.springer@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (72,72,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','stewart.thomson@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (73,73,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','wendy.thomson@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (74,74,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','kevin.vance@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (75,75,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','alan.wallace@mudita.com');
+INSERT OR REPLACE INTO  contact_address (_id,contact_id,address,note,mail) VALUES (76,76,'Czeczota 6, 02-600 Warsaw, Poland','You can fill this field with any details about this contact.','chloe.wilson@mudita.com');
 COMMIT;
+
+

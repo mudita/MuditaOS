@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 3.12)
-
-project(module-db VERSION 1.0
+﻿project(module-db VERSION 1.0
         DESCRIPTION "Database module library")
+
+module_is_test_entity()
 
 include(thirdparty)
 
@@ -84,6 +84,7 @@ set(SOURCES
         queries/messages/threads/QueryThreadGetByContactID.cpp
         queries/messages/threads/QueryThreadRemove.cpp
         queries/messages/threads/QueryThreadMarkAsRead.cpp
+        queries/messages/threads/QueryThreadsGetCount.cpp
         queries/notes/QueryNotesGet.cpp
         queries/notes/QueryNotesGetByText.cpp
         queries/notes/QueryNoteStore.cpp
@@ -95,6 +96,7 @@ set(SOURCES
         queries/calllog/QueryCalllogGetByContactID.cpp
         queries/notifications/QueryNotificationsGet.cpp
         queries/notifications/QueryNotificationsIncrement.cpp
+        queries/notifications/QueryNotificationsMultipleIncrement.cpp
         queries/notifications/QueryNotificationsClear.cpp
         queries/notifications/QueryNotificationsGetAll.cpp
         queries/phonebook/QueryContactGet.cpp
@@ -111,6 +113,7 @@ set(SOURCES
         queries/calendar/QueryEventsEditICS.cpp
         queries/calendar/QueryEventsEdit.cpp
         queries/calendar/QueryEventsGetFiltered.cpp
+        queries/calendar/QueryEventsGetFilteredByDay.cpp
         queries/calendar/QueryEventsGetAllLimited.cpp
         queries/calendar/QueryEventsSelectFirstUpcoming.cpp
         queries/alarms/QueryAlarmsAdd.cpp
@@ -141,6 +144,7 @@ target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
 
 
 set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/Database/sqlite3vfs.cpp PROPERTIES COMPILE_FLAGS -Wno-overflow)
+set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/Database/sqlite3.c PROPERTIES COMPILE_FLAGS -DSQLITE_DEFAULT_WAL_AUTOCHECKPOINT=1)
 
 target_compile_definitions(${PROJECT_NAME}
 
@@ -170,7 +174,15 @@ target_compile_options(${PROJECT_NAME}
     -Wno-error=return-local-addr
 )
 
-target_link_libraries(${PROJECT_NAME} module-utils module-vfs )
+target_link_libraries(${PROJECT_NAME}
+    PUBLIC
+        i18n
+        module-utils
+        module-vfs
+        utf8
+    PRIVATE
+        Microsoft.GSL::GSL
+)
 
 # Host target configuration(mainly used for unit testing)
 if (${ENABLE_TESTS})

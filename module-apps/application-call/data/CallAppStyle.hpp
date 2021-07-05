@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -9,22 +9,24 @@ namespace callAppStyle
 {
     namespace strings
     {
-        inline constexpr auto call      = "app_call_call";
-        inline constexpr auto clear     = "app_call_clear";
-        inline constexpr auto reject    = "app_call_reject";
-        inline constexpr auto answer    = "app_call_answer";
-        inline constexpr auto message   = "app_call_message";
-        inline constexpr auto endcall   = "app_call_end_call";
-        inline constexpr auto emergency = "app_call_emergency";
-        inline constexpr auto iscalling = "app_call_is_calling";
-        inline constexpr auto calling   = "app_call_calling";
-        inline constexpr auto callended = "app_call_call_ended";
-        inline constexpr auto contact   = "app_call_contact";
-        inline constexpr auto mute      = "app_call_mute";
-        inline constexpr auto MUTED     = "app_call_muted";
-        inline constexpr auto speaker   = "app_call_speaker";
-        inline constexpr auto speakeron = "app_call_speaker_on";
-        inline constexpr auto bluetooth = "app_call_bluetooth";
+        inline constexpr auto call          = "app_call_call";
+        inline constexpr auto clear         = "app_call_clear";
+        inline constexpr auto reject        = "app_call_reject";
+        inline constexpr auto answer        = "app_call_answer";
+        inline constexpr auto message       = "app_call_message";
+        inline constexpr auto endcall       = "app_call_end_call";
+        inline constexpr auto emergency     = "app_call_emergency";
+        inline constexpr auto iscalling     = "app_call_is_calling";
+        inline constexpr auto calling       = "app_call_calling";
+        inline constexpr auto callended     = "app_call_call_ended";
+        inline constexpr auto callrejected  = "app_call_call_rejected";
+        inline constexpr auto contact       = "app_call_contact";
+        inline constexpr auto mute          = "app_call_mute";
+        inline constexpr auto MUTED         = "app_call_muted";
+        inline constexpr auto speaker       = "app_call_speaker";
+        inline constexpr auto speakeron     = "app_call_speaker_on";
+        inline constexpr auto bluetooth     = "app_call_bluetooth";
+        inline constexpr auto privateNumber = "app_call_private_number";
     } // namespace strings
 
     namespace numberLabel
@@ -35,6 +37,14 @@ namespace callAppStyle
         inline constexpr auto h       = 51U + 16U;
         inline constexpr auto borderW = 1U;
     } // namespace numberLabel
+
+    namespace numberDescriptionLabel
+    {
+        inline constexpr auto x = 60U;
+        inline constexpr auto y = 254U;
+        inline constexpr auto w = style::window_width - 2 * x;
+        inline constexpr auto h = 20U;
+    } // namespace numberDescriptionLabel
 
     namespace icon
     {
@@ -56,13 +66,13 @@ namespace callAppStyle
     {
         namespace imageCircleTop
         {
-            inline constexpr auto x    = 116U; // TODO: should be 104 with final image
+            inline constexpr auto x    = 111U;
             inline constexpr auto y    = 59U;
             inline constexpr auto name = "circle_top";
         } // namespace imageCircleTop
         namespace imageCircleBottom
         {
-            inline constexpr auto x    = 106U; // TODO: should be 104 with final image
+            inline constexpr auto x    = 104U;
             inline constexpr auto y    = 240U;
             inline constexpr auto name = "circle_bottom";
         } // namespace imageCircleBottom

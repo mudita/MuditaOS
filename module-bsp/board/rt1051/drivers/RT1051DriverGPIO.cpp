@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RT1051DriverGPIO.hpp"
-#include "log/log.hpp"
+#include <log.hpp>
 
 namespace drivers
 {
@@ -35,6 +35,8 @@ namespace drivers
             base = GPIO5;
             name = "GPIO_5";
         } break;
+        default:
+            break;
         }
 
         LOG_DEBUG("Init: %s", name.c_str());

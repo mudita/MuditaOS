@@ -10,9 +10,10 @@
 #include "module-db/queries/calendar/QueryEventsEdit.hpp"
 #include <module-db/queries/calendar/QueryEventsEditICS.hpp>
 #include <module-db/queries/calendar/QueryEventsGetFiltered.hpp>
+#include <module-db/queries/calendar/QueryEventsGetFilteredByDay.hpp>
 #include <module-db/queries/calendar/QueryEventsGetAllLimited.hpp>
 #include <module-db/queries/calendar/QueryEventsSelectFirstUpcoming.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <Utils.hpp>
 #include <cassert>
 #include <vector>
@@ -70,12 +71,25 @@ bool EventsRecordInterface::Add(const EventsRecord &rec)
     return false;
 }
 
-std::vector<EventsRecord> EventsRecordInterface::Select(calendar::TimePoint filter_from,
-                                                        calendar::TimePoint filter_till,
+std::vector<EventsRecord> EventsRecordInterface::Select(TimePoint filter_from,
+                                                        TimePoint filter_till,
                                                         uint32_t offset,
                                                         uint32_t limit)
 {
     auto rows = eventsDb->events.selectByDatePeriod(filter_from, filter_till, offset, limit);
+
+    auto records = std::vector<EventsRecord>();
+
+    for (auto &r : rows) {
+        records.push_back(r);
+    }
+
+    return records;
+}
+
+std::vector<EventsRecord> EventsRecordInterface::Select(TimePoint date, uint32_t offset, uint32_t limit)
+{
+    auto rows = eventsDb->events.selectByDate(date, offset, limit);
 
     auto records = std::vector<EventsRecord>();
 
@@ -265,13 +279,17 @@ uint32_t EventsRecordInterface::GetCount()
     return eventsDb->events.count();
 }
 
-uint32_t EventsRecordInterface::GetCountFiltered(calendar::TimePoint from, calendar::TimePoint till)
+uint32_t EventsRecordInterface::GetCountFiltered(TimePoint from, TimePoint till)
 {
     return eventsDb->events.countFromFilter(from, till);
 }
 
-std::vector<EventsRecord> EventsRecordInterface::SelectFirstUpcoming(calendar::TimePoint filter_from,
-                                                                     calendar::TimePoint filter_till)
+uint32_t EventsRecordInterface::GetCountFilteredByDay(TimePoint filter)
+{
+    return eventsDb->events.countFromDayFilter(filter);
+}
+
+std::vector<EventsRecord> EventsRecordInterface::SelectFirstUpcoming(TimePoint filter_from, TimePoint filter_till)
 {
     auto rows = eventsDb->events.SelectFirstUpcoming(filter_from, filter_till);
 
@@ -296,6 +314,9 @@ std::unique_ptr<db::QueryResult> EventsRecordInterface::runQuery(std::shared_ptr
     }
     if (typeid(*query) == typeid(db::query::events::GetFiltered)) {
         return runQueryImplGetFilteredResult(query);
+    }
+    if (typeid(*query) == typeid(db::query::events::GetFilteredByDay)) {
+        return runQueryImplGetFilteredByDayResult(query);
     }
     if (typeid(*query) == typeid(db::query::events::Add)) {
         return runQueryImplAdd(query);
@@ -354,12 +375,27 @@ std::unique_ptr<db::query::events::GetFilteredResult> EventsRecordInterface::run
     std::shared_ptr<db::Query> query)
 {
     auto getFilteredQuery = static_cast<db::query::events::GetFiltered *>(query.get());
-    auto records          = Select(getFilteredQuery->filter_from,
+
+    auto records = Select(getFilteredQuery->filter_from,
                           getFilteredQuery->filter_till,
                           getFilteredQuery->offset,
                           getFilteredQuery->limit);
-    auto numberOfEvents   = GetCountFiltered(getFilteredQuery->filter_from, getFilteredQuery->filter_till);
-    auto response         = std::make_unique<db::query::events::GetFilteredResult>(std::move(records), numberOfEvents);
+
+    auto numberOfEvents = GetCountFiltered(getFilteredQuery->filter_from, getFilteredQuery->filter_till);
+    auto response       = std::make_unique<db::query::events::GetFilteredResult>(std::move(records), numberOfEvents);
+    response->setRequestQuery(query);
+    return response;
+}
+
+std::unique_ptr<db::query::events::GetFilteredByDayResult> EventsRecordInterface::runQueryImplGetFilteredByDayResult(
+    std::shared_ptr<db::Query> query)
+{
+    auto getFilteredQuery = static_cast<db::query::events::GetFilteredByDay *>(query.get());
+
+    auto records = Select(getFilteredQuery->filterDate, getFilteredQuery->offset, getFilteredQuery->limit);
+
+    auto numberOfEvents = GetCountFilteredByDay(getFilteredQuery->filterDate);
+    auto response = std::make_unique<db::query::events::GetFilteredByDayResult>(std::move(records), numberOfEvents);
     response->setRequestQuery(query);
     return response;
 }

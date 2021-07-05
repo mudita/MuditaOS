@@ -1,12 +1,10 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "StartupIndexer.hpp"
-#include "messages/FileChangeMessage.hpp"
+#include <Timers/TimerFactory.hpp>
 #include <filesystem>
-#include <ff_stdio_listdir_recursive.h>
 #include <purefs/filesystem_paths.hpp>
-#include <Service/Bus.hpp>
 #include "Constants.hpp"
 
 namespace service::detail
@@ -37,6 +35,7 @@ namespace service::detail
     // Collect startup files when service starts
     auto StartupIndexer::collectStartupFiles() -> void
     {
+        /*
         using namespace std::string_literals;
         auto searcher_cb = [](void *ctx, const char *path, bool isDir) {
             auto _this = reinterpret_cast<StartupIndexer *>(ctx);
@@ -53,22 +52,23 @@ namespace service::detail
         for (const auto &path : start_dirs) {
             ff_stdio_listdir_recursive(path.c_str(), searcher_cb, this);
         }
+        */
     }
     // Setup timers for notification
     auto StartupIndexer::setupTimers(std::shared_ptr<sys::Service> svc, std::string_view svc_name) -> void
     {
-        if (!mIdxTimer) {
-            mIdxTimer = std::make_unique<sys::Timer>("file_indexing", svc.get(), timer_indexing_time);
-            mIdxTimer->connect([this, svc](sys::Timer &) {
-                if (!mMsgs.empty()) {
-                    sys::Bus::SendUnicast(mMsgs.front(), std::string(service::name::file_indexer), svc.get());
-                    mMsgs.pop_front();
-                }
-                else {
-                    mIdxTimer->stop();
-                }
-            });
-            mIdxTimer->start();
+        if (!mIdxTimer.isValid()) {
+            mIdxTimer = sys::TimerFactory::createPeriodicTimer(
+                svc.get(), "file_indexing", std::chrono::milliseconds{timer_indexing_time}, [this, svc](sys::Timer &) {
+                    if (!mMsgs.empty()) {
+                        // svc->bus.sendUnicast(mMsgs.front(), std::string(service::name::file_indexer));
+                        mMsgs.pop_front();
+                    }
+                    else {
+                        mIdxTimer.stop();
+                    }
+                });
+            mIdxTimer.start();
         }
     }
 } // namespace service::detail

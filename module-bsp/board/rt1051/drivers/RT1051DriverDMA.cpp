@@ -3,7 +3,7 @@
 
 #include "RT1051DriverDMA.hpp"
 #include <algorithm>
-#include "log/log.hpp"
+#include <log.hpp>
 
 namespace drivers
 {
@@ -29,12 +29,14 @@ namespace drivers
         switch (instance) {
         case DMAInstances::DMA_0: {
             base                    = DMA0;
-            edma_config_t dmaConfig = {0};
+            edma_config_t dmaConfig = {};
 
             EDMA_GetDefaultConfig(&dmaConfig);
             EDMA_Init(base, &dmaConfig);
             LOG_DEBUG("Init: DMA_0");
         } break;
+        default:
+            break;
         }
     }
 
@@ -44,6 +46,8 @@ namespace drivers
         case DMAInstances::DMA_0:
             EDMA_Deinit(base);
             LOG_DEBUG("Deinit: DMA_0");
+        default:
+            break;
         }
     }
 

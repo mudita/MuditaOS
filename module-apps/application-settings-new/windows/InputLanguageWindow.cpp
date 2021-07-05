@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "InputLanguageWindow.hpp"
@@ -14,7 +14,7 @@ namespace gui
     InputLanguageWindow::InputLanguageWindow(app::Application *app)
         : BaseSettingsWindow(app, window::name::input_language)
     {
-        setTitle(utils::localize.get("app_settings_display_input_language"));
+        setTitle(utils::translate("app_settings_display_input_language"));
     }
 
     auto InputLanguageWindow::buildOptionsList() -> std::list<gui::Option>
@@ -27,12 +27,12 @@ namespace gui
                 [=](gui::Item &item) {
                     selectedLang = lang;
                     app::manager::Controller::changeInputLanguage(application, lang);
-                    rebuildOptionList();
+                    refreshOptionsList();
                     return true;
                 },
                 [=](gui::Item &item) {
                     if (item.focus) {
-                        this->setBottomBarText(utils::translateI18(style::strings::common::select),
+                        this->setBottomBarText(utils::translate(style::strings::common::select),
                                                BottomBar::Side::CENTER);
                     }
                     return true;

@@ -1,17 +1,15 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "WorkerGUI.hpp"
 
 #include <DrawCommand.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <Renderer.hpp>
-#include <Service/Bus.hpp>
 #include <Service/Worker.hpp>
 #include <service-gui/ServiceGUI.hpp>
 
 #include <memory>
-#include <module-utils/time/ScopedTime.hpp>
 #include "messages/RenderingFinished.hpp"
 
 namespace service::gui
@@ -38,22 +36,36 @@ namespace service::gui
 
     void WorkerGUI::handleCommand(Signal command)
     {
-        if (command == Signal::Render) {
+        switch (command) {
+        case Signal::Render: {
             auto item = guiService->commandsQueue->dequeue();
             render(item.commands, item.refreshMode);
+            break;
+        }
+        case Signal::ChangeColorScheme: {
+            changeColorScheme(guiService->colorSchemeUpdate);
+            break;
+        }
+        default:
+            LOG_ERROR("Command not valid.");
         }
     }
 
-    void WorkerGUI::render(std::list<std::unique_ptr<::gui::DrawCommand>> &commands, ::gui::RefreshModes refreshMode)
+    void WorkerGUI::render(DrawCommandsQueue::CommandList &commands, ::gui::RefreshModes refreshMode)
     {
         const auto [contextId, context] = guiService->contextPool->borrowContext(); // Waits for the context.
         renderer.render(context, commands);
         onRenderingFinished(contextId, refreshMode);
     }
 
+    void WorkerGUI::changeColorScheme(const std::unique_ptr<::gui::ColorScheme> &scheme)
+    {
+        renderer.changeColorScheme(scheme);
+    }
+
     void WorkerGUI::onRenderingFinished(int contextId, ::gui::RefreshModes refreshMode)
     {
         auto msg = std::make_shared<service::gui::RenderingFinished>(contextId, refreshMode);
-        sys::Bus::SendUnicast(std::move(msg), guiService->GetName(), guiService);
+        guiService->bus.sendUnicast(std::move(msg), guiService->GetName());
     }
 } // namespace service::gui

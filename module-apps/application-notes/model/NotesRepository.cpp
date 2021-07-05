@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NotesRepository.hpp"
@@ -33,9 +33,12 @@ namespace app::notes
         task->execute(application, this);
     }
 
-    void NotesDBRepository::getByText(const std::string &text, const OnFilteredCallback &callback)
+    void NotesDBRepository::getByText(const std::string &text,
+                                      std::uint32_t offset,
+                                      std::uint32_t limit,
+                                      const OnGetCallback &callback)
     {
-        auto query = std::make_unique<db::query::QueryNotesGetByText>(text);
+        auto query = std::make_unique<db::query::QueryNotesGetByText>(text, offset, limit);
         auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Notes);
         task->setCallback([callback](auto response) {
             auto result = dynamic_cast<db::query::NotesGetByTextResult *>(response);
@@ -43,14 +46,14 @@ namespace app::notes
                 return false;
             }
             if (callback) {
-                callback(result->getRecords());
+                callback(result->getRecords(), result->getCount());
             }
             return true;
         });
         task->execute(application, this);
     }
 
-    void NotesDBRepository::save(const NotesRecord &note, const OnResultCallback &callback)
+    void NotesDBRepository::save(const NotesRecord &note, const OnSaveCallback &callback)
     {
         auto query = std::make_unique<db::query::QueryNoteStore>(note);
         auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Notes);
@@ -60,14 +63,14 @@ namespace app::notes
                 return false;
             }
             if (callback) {
-                callback(result->succeed());
+                callback(result->succeed(), result->getNoteId());
             }
             return true;
         });
         task->execute(application, this);
     }
 
-    void NotesDBRepository::remove(const NotesRecord &note, const OnResultCallback &callback)
+    void NotesDBRepository::remove(const NotesRecord &note, const OnRemoveCallback &callback)
     {
         auto query = std::make_unique<db::query::QueryNoteRemove>(note.ID);
         auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Notes);

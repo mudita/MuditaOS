@@ -1,7 +1,8 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <service-appmgr/model/ApplicationHandle.hpp>
+#include <apps-common/ApplicationLauncher.hpp>
 
 namespace app::manager
 {
@@ -35,14 +36,14 @@ namespace app::manager
         }
     }
 
-    auto ApplicationHandle::preventsBlocking() const noexcept -> bool
+    auto ApplicationHandle::preventsAutoLocking() const noexcept -> bool
     {
-        return launcher->isBlocking();
+        return launcher->preventsAutoLocking();
     }
 
     auto ApplicationHandle::closeable() const noexcept -> bool
     {
-        return launcher->isCloseable();
+        return launcher->isCloseable() && !blockClosing;
     }
 
     auto ApplicationHandle::started() const noexcept -> bool
@@ -58,14 +59,20 @@ namespace app::manager
         return manifest.contains(action);
     }
 
-    void ApplicationHandle::run(sys::Service *caller)
+    auto ApplicationHandle::actionFlag(actions::ActionId action) const noexcept -> actions::ActionFlag
     {
-        launcher->run(caller);
+        const auto manifest = getManifest();
+        return manifest.getActionFlag(action);
     }
 
-    void ApplicationHandle::runInBackground(sys::Service *caller)
+    void ApplicationHandle::run(sys::phone_modes::PhoneMode mode, sys::Service *caller)
     {
-        launcher->runBackground(caller);
+        launcher->run(mode, caller);
+    }
+
+    void ApplicationHandle::runInBackground(sys::phone_modes::PhoneMode mode, sys::Service *caller)
+    {
+        launcher->runBackground(mode, caller);
     }
 
     void ApplicationHandle::close() noexcept

@@ -1,0 +1,24 @@
+@startuml
+participant "Battery Charger" as bc
+participant "Worker Event" as we
+participant "Event Manager" as evm
+participant "System Manager" as sm
+participant "Current application" as ca
+participant "TopBar" as tb
+participant "Battery Widget" as bw
+participant "Event Store\nBattery" as es
+
+bc -> we : Interrupt
+we -> bc : Store status to EventStore
+bc -> es : modify()
+we -> evm : BatteryStatusChangeMessage
+group If Discharging
+    evm -> sm : BatteryStatusChangeMessage
+    sm -> sm : If State::ShutdownReady:\n state = State:Shutdown
+end
+evm -> ca : BatteryStatusChangeMessage
+ca -> tb : updateBattery()
+tb <-> es : get() 
+tb -> bw : show(batteryContext)
+
+@enduml

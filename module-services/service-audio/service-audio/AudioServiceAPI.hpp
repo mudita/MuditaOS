@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -34,7 +34,7 @@ namespace AudioServiceAPI
      *
      * @param serv Requesting service.
      * @param playbackType Type of playback.
-     * @param fileName Name of the file.
+     * @param fileName Name of the file
      * @return True if request has been sent successfully, false otherwise
      *  Response will come as message AudioStartPlaybackResponse
      */
@@ -130,42 +130,101 @@ namespace AudioServiceAPI
      * @return audio::Tags on success, std::nullopt on failure
      */
     std::optional<audio::Tags> GetFileTags(sys::Service *serv, const std::string &fileName);
-    /** @brief Gets settings. Current profile is taken by default.
+
+    /** @brief Sets vibrations setting state
      *
      * @param serv - requesting service.
-     * @param setting - setting to be set eg. Gain, volume etc.
-     * @param value - requested value.
-     * @param profileType - selected profile type.
-     * @param playbackType -  type of playback. Not used when profileType is different than playback.
+     * @param settingState - state to be set.
+     * @param playbackType -  type of playback.
      * @return Standard service-api return code. Success if suitable.
      */
-    template <typename T>
-    audio::RetCode GetSetting(sys::Service *serv,
-                              const audio::Setting &setting,
-                              T &value,
-                              const audio::PlaybackType &playbackType = audio::PlaybackType::None,
-                              const audio::Profile::Type &profileType = audio::Profile::Type::Idle);
-    /** @brief Sets settings. Current profile is taken by default.
+    audio::RetCode SetVibrationSetting(sys::Service *serv,
+                                       audio::SettingState settingState,
+                                       audio::PlaybackType playbackType);
+
+    /** @brief Gets vibrations setting state
      *
      * @param serv - requesting service.
-     * @param setting - setting to be set eg. Gain, volume etc.
-     * @param value - value to be set.
-     * @param profileType - selected profile type.
-     * @param playbackType -  type of playback. Not used when profileType is different than playback.
+     * @param playbackType -  type of playback.
+     * @return Requested setting state on success. std::nullopt on failure
+     */
+    std::optional<audio::SettingState> GetVibrationSetting(sys::Service *serv, audio::PlaybackType playbackType);
+
+    /** @brief Sets sound setting state
+     *
+     * @param serv - requesting service.
+     * @param settingState - state to be set.
+     * @param playbackType -  type of playback.
      * @return Standard service-api return code. Success if suitable.
      */
-    template <typename T>
-    audio::RetCode SetSetting(sys::Service *serv,
-                              const audio::Setting &setting,
-                              const T value,
-                              const audio::PlaybackType &playbackType = audio::PlaybackType::None,
-                              const audio::Profile::Type &profileType = audio::Profile::Type::Idle);
+    audio::RetCode SetSoundSetting(sys::Service *serv,
+                                   audio::SettingState settingState,
+                                   audio::PlaybackType playbackType);
+
+    /** @brief Gets sound setting state
+     *
+     * @param serv - requesting service.
+     * @param playbackType -  type of playback. Not used when profileType is different than playback.
+     * @return Requested setting state on success. std::nullopt on failure
+     */
+    std::optional<audio::SettingState> GetSoundSetting(sys::Service *serv, audio::PlaybackType playbackType);
+
+    /** @brief Sets sound for chosen playback type
+     *
+     * @param serv - requesting service.
+     * @param settingState - path to the file
+     * @param playbackType -  type of playback.
+     * @return Standard service-api return code. Success if suitable.
+     */
+    audio::RetCode SetSound(sys::Service *serv, const std::string &filePath, audio::PlaybackType playbackType);
+
+    /** @brief Gets sound for chosen playback type
+     *
+     * @param serv - requesting service.
+     * @param playbackType -  type of playback.
+     * @return requested path to the file. Empty string on failure
+     */
+    std::string GetSound(sys::Service *serv, audio::PlaybackType playbackType);
+
+    /** @brief Sets volume level for chosen playback type
+     *
+     * @param serv - requesting service.
+     * @param vol - volume level
+     * @param playbackType -  type of playback.
+     * @return Standard service-api return code. Success if suitable.
+     */
+    audio::RetCode SetVolume(sys::Service *serv, const audio::Volume vol, audio::PlaybackType playbackType);
+
+    /** @brief Gets volume level for chosen playback type
+     *
+     * @param serv - requesting service.
+     * @param playbackType -  type of playback.
+     * @return requested volume level. std::nullopt on failure
+     */
+    std::optional<audio::Volume> GetVolume(sys::Service *serv, audio::PlaybackType playbackType);
+
     /** @brief Key pressed handler.
      *
      * @param serv - requesting service.
      * @param step - step that will be added to current volume.
      * @return True if request has been sent successfully, false otherwise
-     *  Response will come as message AudioKeyPressedResponse
+     * @note If volume popup should be shown then Application Manager is informed.
      */
     bool KeyPressed(sys::Service *serv, const int step);
+
+    /** @brief Bluetooth A2DP volume changed handler.
+     *
+     * @param serv - requesting service.
+     * @param volume - volume level
+     * @return True if request has been sent successfully, false otherwise
+     */
+    bool BluetoothA2DPVolumeChanged(sys::Service *serv, const std::uint8_t volume);
+
+    /** @brief Bluetooth HSP volume changed handler.
+     *
+     * @param serv - requesting service.
+     * @param volume - volume level
+     * @return True if request has been sent successfully, false otherwise
+     */
+    bool BluetoothHSPVolumeChanged(sys::Service *serv, const std::uint8_t volume);
 }; // namespace AudioServiceAPI

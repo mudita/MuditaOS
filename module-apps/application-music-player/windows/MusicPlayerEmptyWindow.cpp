@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MusicPlayerEmptyWindow.hpp"
@@ -7,7 +7,7 @@
 
 #include <Style.hpp>
 #include <i18n/i18n.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <service-audio/AudioServiceAPI.hpp>
 
 namespace gui
@@ -30,13 +30,14 @@ namespace gui
     {
         AppWindow::buildInterface();
 
-        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get("app_music_player_music_library"));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_music_player_quit"));
+        bottomBar->setText(BottomBar::Side::LEFT, utils::translate("app_music_player_music_library"));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate("app_music_player_play"));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate("app_music_player_quit"));
 
         img = new gui::Image(this, noteImg::x, noteImg::y, "note");
 
         text = new Text(this, infoText::x, infoText::y, infoText::w, infoText::h);
-        text->setText(utils::localize.get("app_music_player_music_empty_window_notification"));
+        text->setText(utils::translate("app_music_player_music_empty_window_notification"));
         text->setTextType(TextType::MultiLine);
         text->setEditMode(EditMode::Browse);
         text->setEdges(RectangleEdge::None);
@@ -65,13 +66,24 @@ namespace gui
             return true;
         }
 
-        if (!inputEvent.isShortPress()) {
-            return false;
-        }
-
-        if (inputEvent.is(gui::KeyCode::KEY_LF)) {
+        if (inputEvent.isShortRelease(gui::KeyCode::KEY_LF)) {
             application->switchWindow(gui::name::window::all_songs_window);
             return true;
+        }
+
+        if (inputEvent.is(gui::KeyCode::KEY_ENTER) || inputEvent.is(gui::KeyCode::HEADSET_OK)) {
+            if (inputEvent.isLongRelease()) {
+                auto app = dynamic_cast<app::ApplicationMusicPlayer *>(application);
+                assert(app);
+                app->stop();
+                return true;
+            }
+            else if (inputEvent.isShortRelease()) {
+                auto app = dynamic_cast<app::ApplicationMusicPlayer *>(application);
+                assert(app);
+                app->togglePlaying();
+                return true;
+            }
         }
 
         return false;

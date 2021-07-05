@@ -1,11 +1,13 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RepeatAndReminderItem.hpp"
 #include "application-calendar/widgets/CalendarStyle.hpp"
+#include "application-calendar/ApplicationCalendar.hpp"
+#include "application-alarm-clock/data/AlarmsData.hpp"
 #include <Style.hpp>
 #include <Utils.hpp>
-#include <module-apps/application-calendar/ApplicationCalendar.hpp>
+#include <Image.hpp>
 
 namespace gui
 {
@@ -88,30 +90,28 @@ namespace gui
         reminder->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
         reminder->activeItem = false;
 
-        descriptionHandler();
-    }
+        dimensionChangedCallback = [&](gui::Item &, const BoundingBox &newDim) -> bool {
+            hBox->setArea({0, 0, newDim.w, newDim.h});
+            return true;
+        };
 
-    bool RepeatAndReminderItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
-    {
-        hBox->setPosition(0, 0);
-        hBox->setSize(newDim.w, newDim.h);
-        return true;
+        descriptionHandler();
     }
 
     void RepeatAndReminderItem::descriptionHandler()
     {
-        repeatTitle->setText(utils::localize.get("app_calendar_event_detail_repeat"));
-        reminderTitle->setText(utils::localize.get("app_calendar_event_detail_reminder"));
+        repeatTitle->setText(utils::translate("app_calendar_event_detail_repeat"));
+        reminderTitle->setText(utils::translate("app_calendar_event_detail_reminder"));
         onLoadCallback = [&](std::shared_ptr<EventsRecord> event) {
             if (event->repeat > app::ApplicationCalendar::repeatOptions.size()) {
-                repeat->setText("app_calendar_custom_repeat_title");
+                repeat->setText(CustomRepeatValueParser(event->repeat).getWeekDaysText());
             }
             else {
-                repeat->setText(utils::localize.get(
-                    app::ApplicationCalendar::repeatOptions.at(static_cast<Repeat>(event->repeat))));
+                repeat->setText(
+                    utils::translate(app::ApplicationCalendar::repeatOptions.at(static_cast<Repeat>(event->repeat))));
             }
-            reminder->setText(utils::localize.get(
-                app::ApplicationCalendar::reminderOptions.at(static_cast<Reminder>(event->reminder))));
+            reminder->setText(
+                utils::translate(app::ApplicationCalendar::reminderOptions.at(static_cast<Reminder>(event->reminder))));
         };
     }
 

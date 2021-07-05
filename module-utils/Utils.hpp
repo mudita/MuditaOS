@@ -1,19 +1,17 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-#include "i18n/i18n.hpp"
+#include "Split.hpp"
+#include <log.hpp>
+#include <magic_enum.hpp>
+
 #include <algorithm> // std::find_if_not
-#include <log/log.hpp>
 #include <sstream>
 #include <iomanip>
 #include <cmath>
 #include <chrono>
 #include <random>
-#include "time/time_conversion.hpp"
-
-#define MAGIC_ENUM_RANGE_MAX 256
-#include <magic_enum.hpp>
 
 namespace utils
 {
@@ -21,45 +19,15 @@ namespace utils
     constexpr unsigned int secondsInMinute =
         std::chrono::duration_cast<std::chrono::seconds>(std::chrono::minutes(1)).count();
 
-    template <typename Out> void split(const std::string &s, char delim, Out result)
+    std::string bytesToHex(const std::vector<std::uint8_t> &bytes);
+    std::vector<std::uint8_t> hexToBytes(const std::string &hex);
+
+    template <typename T> std::string numToHex(T c)
     {
-        std::stringstream ss(s);
-        std::string item;
-        while (std::getline(ss, item, delim)) {
-            *(result++) = item;
-        }
-    }
-
-    static inline std::vector<std::string> split(const std::string &s, char delim)
-    {
-        std::vector<std::string> elems;
-        split(s, delim, std::back_inserter(elems));
-        return elems;
-    }
-
-    static inline std::vector<std::string> split(const std::string &s,
-                                                 const std::string &delimiter,
-                                                 const bool skipEmptyTokens = true)
-    {
-        size_t pos_start = 0, pos_end, delim_len = delimiter.length();
-        std::string token;
-        std::vector<std::string> res;
-        uint32_t tokenCount = 0;
-
-        while (((pos_end = s.find(delimiter, pos_start)) != std::string::npos)) {
-            token     = s.substr(pos_start, pos_end - pos_start);
-            pos_start = pos_end + delim_len;
-            if (!skipEmptyTokens || !token.empty()) {
-                tokenCount++;
-                res.push_back(token);
-            }
-        }
-
-        token = s.substr(pos_start);
-        if (!skipEmptyTokens || !token.empty()) {
-            res.push_back(token);
-        }
-        return res;
+        std::stringstream s;
+        s.fill('0');
+        s << std::setw(sizeof(T) * 2) << std::hex << static_cast<unsigned long long>(c);
+        return s.str();
     }
 
     static inline std::string removeNewLines(const std::string &s)
@@ -103,14 +71,12 @@ namespace utils
         return base;
     }
 
-    template <typename T> std::string to_string(T t)
+    template <typename T>[[nodiscard]] std::string to_string(T t)
     {
-        std::ostringstream ss;
-        ss << t;
-        return ss.str();
+        return std::to_string(t);
     }
 
-    template <> inline std::string to_string<long double>(long double t)
+    template <>[[nodiscard]] inline std::string to_string<long double>(long double t)
     {
         uint32_t precision = 6;
         int base           = static_cast<int>(t);
@@ -123,7 +89,7 @@ namespace utils
             }
         }
 
-        auto fractionalPart = static_cast<unsigned long int>(roundl(frac));
+        auto fractionalPart       = static_cast<unsigned long int>(roundl(frac));
         auto fractionalPartLength = std::to_string(fractionalPart).length();
         if (fractionalPartLength > precision) {
             base += 1;
@@ -146,14 +112,28 @@ namespace utils
         return baseAsStr + "." + fractionalAsStr;
     }
 
-    template <> inline std::string to_string<float>(float t)
+    template <>[[nodiscard]] inline std::string to_string<float>(float t)
     {
-        return to_string((long double)(t));
+        return to_string(static_cast<long double>(t));
     }
 
-    template <> inline std::string to_string<double>(double t)
+    template <>[[nodiscard]] inline std::string to_string<double>(double t)
     {
-        return to_string((long double)(t));
+        return to_string(static_cast<long double>(t));
+    }
+
+    template <>[[nodiscard]] inline std::string to_string<std::int64_t>(std::int64_t value)
+    {
+        std::ostringstream ss;
+        ss << value;
+        return ss.str();
+    }
+
+    template <>[[nodiscard]] inline std::string to_string<std::uint64_t>(std::uint64_t value)
+    {
+        std::ostringstream ss;
+        ss << value;
+        return ss.str();
     }
 
     template <typename T>[[nodiscard]] const std::string enumToString(const T &t)
@@ -252,8 +232,7 @@ namespace utils
 
     namespace filesystem
     {
-        [[nodiscard]] long int filelength(std::FILE *file) noexcept;
-        void computeCRC32(std::FILE *file, unsigned long *outCrc32) noexcept;
+        [[nodiscard]] unsigned long computeFileCRC32(std::FILE *file) noexcept;
         [[nodiscard]] std::string generateRandomId(std::size_t length = 0) noexcept;
         [[nodiscard]] std::string getline(std::FILE *stream, uint32_t length = 1024) noexcept;
     } // namespace filesystem

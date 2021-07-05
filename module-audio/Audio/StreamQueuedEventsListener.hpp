@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -18,18 +18,18 @@ namespace audio
       private:
         struct EventStorage
         {
-            Stream *stream      = nullptr;
-            Stream::Event event = Stream::Event::NoEvent;
+            AbstractStream *stream      = nullptr;
+            AbstractStream::Event event = AbstractStream::Event::NoEvent;
         };
 
       public:
         using queueInfo                           = std::pair<QueueHandle_t, std::string>;
-        using queuedEvent                         = std::pair<Stream *, Stream::Event>;
+        using queuedEvent                         = std::pair<AbstractStream *, AbstractStream::Event>;
         static constexpr auto listenerElementSize = sizeof(EventStorage);
 
-        StreamQueuedEventsListener(std::shared_ptr<cpp_freertos::Queue> eventsQueue);
+        explicit StreamQueuedEventsListener(std::shared_ptr<cpp_freertos::Queue> eventsQueue);
 
-        void onEvent(Stream *stream, Stream::Event event, Stream::EventSourceMode source);
+        void onEvent(AbstractStream *stream, Stream::Event event) override;
 
         queuedEvent waitForEvent();
         queuedEvent getEvent();

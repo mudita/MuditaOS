@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "OutputLinesTextWithLabelWidget.hpp"
@@ -46,17 +46,13 @@ namespace gui
             return true;
         };
 
+        dimensionChangedCallback = [&](gui::Item &, const BoundingBox &newDim) -> bool {
+            vBox->setArea({0, 0, newDim.w, newDim.h});
+            return true;
+        };
+
         this->activeItem = false;
         setEdges(RectangleEdge::All);
-    }
-
-    auto OutputLinesTextWithLabelWidget::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
-        -> bool
-    {
-        vBox->setPosition(0, 0);
-        vBox->setSize(newDim.w, newDim.h);
-
-        return true;
     }
 
     void OutputLinesTextWithLabelWidget::applyItemNameSpecificSettings()
@@ -78,21 +74,20 @@ namespace gui
 
     void OutputLinesTextWithLabelWidget::addressHandler()
     {
-        titleLabel->setText(utils::localize.get("app_phonebook_new_contact_address"));
+        titleLabel->setText(utils::translate("app_phonebook_new_contact_address"));
 
         onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { multilineText->setText(contact->address); };
     }
 
     void OutputLinesTextWithLabelWidget::noteHandler()
     {
-        titleLabel->setText(utils::localize.get("app_phonebook_new_contact_note"));
+        titleLabel->setText(utils::translate("app_phonebook_new_contact_note"));
 
         onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { multilineText->setText(contact->note); };
     }
 
-    auto OutputLinesTextWithLabelWidget::handleRequestResize(const Item *child,
-                                                             unsigned short request_w,
-                                                             unsigned short request_h) -> Size
+    auto OutputLinesTextWithLabelWidget::handleRequestResize(const Item *child, Length request_w, Length request_h)
+        -> Size
     {
         setMinimumHeight(phonebookStyle::outputLinesTextWithLabelWidget::title_label_h +
                          phonebookStyle::outputLinesTextWithLabelWidget::span_size + request_h);

@@ -5,7 +5,7 @@
 #include <catch2/catch.hpp>
 
 #include "generators/RandomStringGenerator.hpp"
-#include "log/LoggerBuffer.hpp"
+#include "LoggerBuffer.hpp"
 #include <string>
 #include <vector>
 

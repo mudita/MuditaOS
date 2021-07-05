@@ -1,5 +1,4 @@
 ﻿project(service-antenna)
-message( "${PROJECT_NAME}  ${CMAKE_CURRENT_LIST_DIR}" )
 
 set(SOURCES
     ServiceAntenna.cpp
@@ -14,6 +13,7 @@ target_link_libraries(${PROJECT_NAME}
         module-cellular
         module-utils
         service-cellular
+        eventstore
 )
 
 target_include_directories(${PROJECT_NAME}

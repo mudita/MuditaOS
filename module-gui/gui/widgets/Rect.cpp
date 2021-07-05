@@ -10,11 +10,10 @@
 
 #include "../core/BoundingBox.hpp"
 #include "../core/DrawCommand.hpp"
-#include <log/log.hpp>
 
 #include "Rect.hpp"
 #include "Style.hpp"
-#include <log/log.hpp>
+#include <log.hpp>
 
 namespace gui
 {
@@ -96,12 +95,11 @@ namespace gui
 
     void Rect::buildDrawListImplementation(std::list<Command> &commands)
     {
-        auto rect = std::make_unique<CommandRectangle>();
+        auto rect = std::make_unique<DrawRectangle>();
 
-        rect->x         = drawArea.x;
-        rect->y         = drawArea.y;
-        rect->w         = drawArea.w;
-        rect->h         = drawArea.h;
+        rect->origin    = {drawArea.x, drawArea.y};
+        rect->width     = drawArea.w;
+        rect->height    = drawArea.h;
         rect->areaX     = widgetArea.x;
         rect->areaY     = widgetArea.y;
         rect->areaW     = widgetArea.w;

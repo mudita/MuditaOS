@@ -1,12 +1,14 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <string>
 
 #include <at/Commands.hpp>
 #include <Utils.hpp>
+#include <at/ATFactory.hpp>
 
 #include "service-cellular/requests/CallForwardingRequest.hpp"
+#include <map>
 
 namespace
 {
@@ -35,7 +37,7 @@ namespace cellular
         return nullptr;
     }
 
-    auto CallForwardingRequest::command() -> std::string
+    auto CallForwardingRequest::command() -> at::Cmd
     {
         std::vector<commandBuilderFunc> commandParts = {[this]() { return getCommandReason(); },
                                                         [this]() { return getCommandMode(); },

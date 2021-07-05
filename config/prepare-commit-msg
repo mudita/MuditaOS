@@ -24,7 +24,7 @@ if [[ ${BRANCH_NAME} =~ ${BRANCH_REGEXP} ]]; then
     if [[ -n $( cat $FILE | grep "${TITLE_TAG}" ) ]]; then
         sed  -i "s:${TITLE_TAG}:${NEW_TITLE}:" $FILE
     else 
-        echo -e "$TICKET $MESSAGE_TEXT \n $MESSAGE" > $FILE
+        echo -e "$TICKET $MESSAGE_TEXT \n$MESSAGE" > $FILE
     fi
 else
     echo "$MESSAGE" > $FILE

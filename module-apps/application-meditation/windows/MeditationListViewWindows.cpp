@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MeditationListViewWindows.hpp"
@@ -22,10 +22,15 @@ void MeditationListViewWindow::buildInterface()
 {
     AppWindow::buildInterface();
     model->createData();
-    list = new gui::ListView(
-        this, listViewWindow::X, listViewWindow::Y, listViewWindow::Width, listViewWindow::Height, model);
+    list = new gui::ListView(this,
+                             listViewWindow::X,
+                             listViewWindow::Y,
+                             listViewWindow::Width,
+                             listViewWindow::Height,
+                             model,
+                             gui::listview::ScrollBarType::Fixed);
     setFocusItem(list);
-    bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+    bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 }
 
 void MeditationListViewWindow::destroyInterface()
@@ -48,7 +53,7 @@ void MeditationListViewWindow::invalidate() noexcept
 
 void MeditationListViewWindow::onBeforeShow(ShowMode mode, SwitchData *data)
 {
-    list->rebuildList(style::listview::RebuildType::InPlace);
+    list->rebuildList(gui::listview::RebuildType::InPlace);
     list->setVisible(true);
 }
 
@@ -62,8 +67,8 @@ MeditationOptionsWindow::MeditationOptionsWindow(app::Application *app)
 void MeditationOptionsWindow::buildInterface()
 {
     MeditationListViewWindow::buildInterface();
-    setTitle(utils::localize.get("common_options"));
-    bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::Switch));
+    setTitle(utils::translate("common_options"));
+    bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::Switch));
 }
 
 PreparationTimeWindow::PreparationTimeWindow(app::Application *app)
@@ -76,6 +81,6 @@ PreparationTimeWindow::PreparationTimeWindow(app::Application *app)
 void PreparationTimeWindow::buildInterface()
 {
     MeditationListViewWindow::buildInterface();
-    setTitle(utils::localize.get("app_meditation_preparation_time"));
-    bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::select));
+    setTitle(utils::translate("app_meditation_preparation_time"));
+    bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::select));
 }

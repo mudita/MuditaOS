@@ -5,6 +5,7 @@
 
 #include <at/Commands.hpp>
 #include <Utils.hpp>
+#include <at/ATFactory.hpp>
 
 #include "service-cellular/requests/ColpRequest.hpp"
 
@@ -23,23 +24,21 @@ namespace cellular
         }
     }
 
-    auto ColpRequest::command() -> std::string
+    auto ColpRequest::command() -> at::Cmd
     {
         switch (procedureType) {
         case ProcedureType::Deactivation:
-            return std::string(at::factory(at::AT::COLP_DISABLE));
+            return at::factory(at::AT::COLP_DISABLE);
         case ProcedureType::Activation:
-            return std::string(at::factory(at::AT::COLP_ENABLE));
+            return at::factory(at::AT::COLP_ENABLE);
         case ProcedureType::Interrogation:
-            return std::string(at::factory(at::AT::COLP_GET));
+            return at::factory(at::AT::COLP_GET);
         case ProcedureType::Registration:
-            // not supported
-            return std::string();
         case ProcedureType::Erasure:
             // not supported
-            return std::string();
+            break;
         }
-        return std::string();
+        return at::Cmd("");
     }
 
     void ColpRequest::handle(RequestHandler &h, at::Result &result)

@@ -1,17 +1,15 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MessageHandler.hpp"
 
 #include <endpoints/Context.hpp>
-#include <endpoints/Endpoint.hpp>
 #include <endpoints/EndpointFactory.hpp>
 
 #include <FreeRTOS.h>
-#include <log/log.hpp>
+#include <log.hpp>
 
 #include <bits/exception.h>
-#include <cinttypes>
 #include <memory>
 
 namespace sys
@@ -23,10 +21,14 @@ using namespace parserFSM;
 
 xQueueHandle MessageHandler::sendQueue;
 
-MessageHandler::MessageHandler(const std::string &message, sys::Service *OwnerService) : OwnerServicePtr(OwnerService)
+MessageHandler::MessageHandler(sys::Service *OwnerService, std::unique_ptr<EndpointFactory> endpointFactory)
+    : OwnerServicePtr(OwnerService), endpointFactory(std::move(endpointFactory))
+{}
+
+void MessageHandler::parseMessage(const std::string &msg)
 {
     try {
-        messageJson = json11::Json::parse(message, JsonErrorMsg);
+        messageJson = json11::Json::parse(msg, JsonErrorMsg);
     }
     catch (const std::exception &e) {
         LOG_ERROR("Cannot create MessageHandler! err:%s", e.what());
@@ -35,18 +37,17 @@ MessageHandler::MessageHandler(const std::string &message, sys::Service *OwnerSe
 
 void MessageHandler::processMessage()
 {
-    Context context(messageJson);
+    auto context = ContextFactory::create(messageJson);
 
-    LOG_DEBUG("[MsgHandler]\nmethod: %d\nendpoint: %d\nuuid: %" PRIu32 "\nbody: %s\n",
-              static_cast<int>(context.getMethod()),
-              static_cast<int>(context.getEndpoint()),
-              context.getUuid(),
-              context.getBody().dump().c_str());
+    LOG_DEBUG("[MsgHandler]\nmethod: %d\nendpoint: %d\nuuid: %d\n",
+              static_cast<int>(context->getMethod()),
+              static_cast<int>(context->getEndpoint()),
+              context->getUuid());
 
-    auto handler = EndpointFactory::create(context, OwnerServicePtr);
+    auto handler = endpointFactory->create(*context, OwnerServicePtr);
 
     if (handler != nullptr) {
-        handler->handle(context);
+        handler->handle(*context);
     }
     else {
         LOG_ERROR("No way to handle!");

@@ -1,16 +1,18 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include <map>
-#include <bitset>
-#include <bsp/audio/bsp_audio.hpp>
-#include <Utils.hpp>
-#include <utility>
-#include <Service/Message.hpp>
-
+#include "AudioDevice.hpp"
 #include "Profiles/Profile.hpp"
+
+#include <Service/Message.hpp>
+#include <Utils.hpp>
+
+#include <bitset>
+#include <map>
+#include <memory>
+#include <utility>
 
 namespace audio
 {
@@ -32,14 +34,23 @@ namespace audio
 
     inline constexpr auto audioOperationTimeout = 1000U;
 
-    inline constexpr auto audioDbPrefix = "audio/";
+    inline constexpr auto audioDbPrefix   = "audio";
+    inline constexpr auto systemDbPrefix  = "system";
+    inline constexpr auto dbPathSeparator = '/';
 
     enum class Setting
     {
         Volume,
         Gain,
         EnableVibration,
-        EnableSound
+        EnableSound,
+        Sound
+    };
+
+    enum class SettingState : bool
+    {
+        Enabled,
+        Disabled
     };
 
     enum class PlaybackType
@@ -47,19 +58,36 @@ namespace audio
         None,
         Multimedia,
         Notifications,
+        System = Notifications,
         KeypadSound,
         CallRingtone,
         TextMessageRingtone,
-        Last = TextMessageRingtone,
+        Meditation,
+        Alarm,
+        Last = Alarm,
+    };
+
+    /// Used to describe audio operations
+    using Context = std::pair<Profile::Type, PlaybackType>;
+
+    struct DbPathElement
+    {
+        Setting setting;
+        PlaybackType playbackType;
+        Profile::Type profileType;
     };
 
     [[nodiscard]] const std::string str(const PlaybackType &playbackType) noexcept;
 
     [[nodiscard]] const std::string str(const Setting &setting) noexcept;
 
+    [[nodiscard]] const std::string dbPath(const DbPathElement &element);
+
     [[nodiscard]] const std::string dbPath(const Setting &setting,
                                            const PlaybackType &playbackType,
                                            const Profile::Type &profileType);
+
+    [[nodiscard]] bool isSystemSound(const PlaybackType &playbackType) noexcept;
 
     enum class EventType
     {
@@ -159,6 +187,7 @@ namespace audio
         ProfileNotSet,
         DeviceFailure,
         TokenNotFound,
+        Ignored,
         Failed
     };
 
@@ -243,14 +272,14 @@ namespace audio
         friend class ::audio::AudioMux;
     };
 
-    RetCode GetDeviceError(bsp::AudioDevice::RetCode retCode);
+    RetCode GetDeviceError(AudioDevice::RetCode retCode);
     const std::string str(RetCode retcode);
     [[nodiscard]] auto GetVolumeText(const audio::Volume &volume) -> std::string;
 } // namespace audio
 
 namespace AudioServiceMessage
 {
-    class EndOfFile : public sys::Message
+    class EndOfFile : public sys::DataMessage
     {
       public:
         explicit EndOfFile(audio::Token &token) : token(token)
@@ -264,7 +293,7 @@ namespace AudioServiceMessage
         audio::Token token = audio::Token::MakeBadToken();
     };
 
-    class FileSystemNoSpace : public sys::Message
+    class FileSystemNoSpace : public sys::DataMessage
     {
       public:
         explicit FileSystemNoSpace(audio::Token &token) : token(token)
@@ -278,18 +307,40 @@ namespace AudioServiceMessage
         audio::Token token = audio::Token::MakeBadToken();
     };
 
-    class DbRequest : public sys::Message
+    class DbRequest : public sys::DataMessage
     {
       public:
-        explicit DbRequest(std::string path) : path(std::move(path))
+        explicit DbRequest(const audio::Setting &setting,
+                           const audio::PlaybackType &playback,
+                           const audio::Profile::Type &profile)
+            : setting(setting), profile(profile), playback(playback)
         {}
-        const std::string &GetPath() const
+
+        const audio::Setting setting;
+        const audio::Profile::Type profile;
+        const audio::PlaybackType playback;
+    };
+
+    class AudioDeviceCreated : public sys::DataMessage
+    {
+      public:
+        explicit AudioDeviceCreated(std::shared_ptr<audio::AudioDevice> device, audio::AudioDevice::Type type)
+            : device(std::move(device)), type(type)
+        {}
+
+        auto getDevice() const noexcept -> std::shared_ptr<audio::AudioDevice>
         {
-            return path;
+            return device;
+        }
+
+        auto getDeviceType() const noexcept -> audio::AudioDevice::Type
+        {
+            return type;
         }
 
       private:
-        const std::string path;
+        std::shared_ptr<audio::AudioDevice> device;
+        audio::AudioDevice::Type type;
     };
 
     using Callback = std::function<std::optional<std::string>(const sys::Message *msg)>;

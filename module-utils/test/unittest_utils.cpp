@@ -1,7 +1,8 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <cstring>
+#include <filesystem>
 #include <iostream>
 #include <memory>
 #include <unistd.h>
@@ -11,17 +12,6 @@
 #include <catch2/catch.hpp>
 
 #include "Utils.hpp"
-#include <vfs.hpp>
-
-class vfs vfs;
-
-struct vfs_initializer
-{
-    vfs_initializer()
-    {
-        vfs.Init();
-    }
-} vfs_initializer;
 
 TEST_CASE("Split tests")
 {
@@ -271,6 +261,90 @@ TEST_CASE("Floating point to string")
     }
 }
 
+TEST_CASE("Integer types to string")
+{
+    GIVEN("Uint8 equals to zero")
+    {
+        constexpr std::uint8_t value = 0;
+        REQUIRE(utils::to_string(value) == "0");
+    }
+    GIVEN("Uint8 equals to max")
+    {
+        constexpr std::uint8_t value = std::numeric_limits<std::uint8_t>::max();
+        REQUIRE(utils::to_string(value) == "255");
+    }
+    GIVEN("Int8 equals to zero")
+    {
+        constexpr std::int8_t value = 0;
+        REQUIRE(utils::to_string(value) == "0");
+    }
+    GIVEN("Int8 equals to max")
+    {
+        constexpr std::int8_t value = std::numeric_limits<std::int8_t>::max();
+        REQUIRE(utils::to_string(value) == "127");
+    }
+    GIVEN("Uint16t equals to zero")
+    {
+        constexpr std::uint16_t value = 0;
+        REQUIRE(utils::to_string(value) == "0");
+    }
+    GIVEN("Uint16t equals to max")
+    {
+        constexpr std::uint16_t value = std::numeric_limits<std::uint16_t>::max();
+        REQUIRE(utils::to_string(value) == "65535");
+    }
+    GIVEN("Int16t equals to zero")
+    {
+        constexpr std::int16_t value = 0;
+        REQUIRE(utils::to_string(value) == "0");
+    }
+    GIVEN("Int16t equals to max")
+    {
+        constexpr std::int16_t value = std::numeric_limits<std::int16_t>::max();
+        REQUIRE(utils::to_string(value) == "32767");
+    }
+    GIVEN("Uint32t equals to zero")
+    {
+        constexpr std::uint32_t value = 0;
+        REQUIRE(utils::to_string(value) == "0");
+    }
+    GIVEN("Uint32 equals to max")
+    {
+        constexpr std::uint32_t value = std::numeric_limits<std::uint32_t>::max();
+        REQUIRE(utils::to_string(value) == "4294967295");
+    }
+    GIVEN("Int32t equals to zero")
+    {
+        constexpr std::int32_t value = 0;
+        REQUIRE(utils::to_string(value) == "0");
+    }
+    GIVEN("Int32 equals to max")
+    {
+        constexpr std::int32_t value = std::numeric_limits<std::int32_t>::max();
+        REQUIRE(utils::to_string(value) == "2147483647");
+    }
+    GIVEN("Int64 equals to zero")
+    {
+        constexpr std::int64_t value = 0;
+        REQUIRE(utils::to_string(value) == "0");
+    }
+    GIVEN("Int64 equals to max")
+    {
+        constexpr std::int64_t value = std::numeric_limits<std::int64_t>::max();
+        REQUIRE(utils::to_string(value) == "9223372036854775807");
+    }
+    GIVEN("Uint64 equals to zero")
+    {
+        constexpr std::uint64_t value = 0;
+        REQUIRE(utils::to_string(value) == "0");
+    }
+    GIVEN("Uint64 equals to max")
+    {
+        constexpr std::uint64_t value = std::numeric_limits<std::uint64_t>::max();
+        REQUIRE(utils::to_string(value) == "18446744073709551615");
+    }
+}
+
 TEST_CASE("Fill leading digit in string")
 {
     std::string test = "45";
@@ -281,35 +355,73 @@ TEST_CASE("Fill leading digit in string")
     REQUIRE(utils::addLeadingZeros(test, 4) == "0045");
 }
 
-class ScopedDir
+TEST_CASE("Hex to bytes")
 {
-  public:
-    ScopedDir(const std::filesystem::path &dirPath) : dirPath{dirPath}
+    SECTION("One byte as two hex digits")
     {
-        REQUIRE(std::filesystem::create_directory(dirPath));
+        auto b = utils::hexToBytes("11");
+        REQUIRE(b.size() == 1);
+        REQUIRE(b[0] == 0x11);
     }
 
-    ~ScopedDir()
+    SECTION("One byte as one hex digit")
     {
-        REQUIRE(std::filesystem::remove(dirPath));
+        auto b = utils::hexToBytes("2");
+        REQUIRE(b.size() == 1);
+        REQUIRE(b[0] == 2);
     }
 
-    auto operator()(std::string file = "") -> std::filesystem::path
+    SECTION("Next numbers")
     {
-        return dirPath.c_str() + file;
+        auto b = utils::hexToBytes("010203");
+        REQUIRE(b.size() == 3);
+        REQUIRE(b[0] == 1);
+        REQUIRE(b[1] == 2);
+        REQUIRE(b[2] == 3);
     }
 
-  private:
-    std::filesystem::path dirPath;
-};
+    SECTION("Upper case")
+    {
+        auto b = utils::hexToBytes("DEADBEEF");
+        REQUIRE(b.size() == 4);
+        REQUIRE(b[0] == 0xDE);
+        REQUIRE(b[1] == 0xAD);
+        REQUIRE(b[2] == 0xBE);
+        REQUIRE(b[3] == 0xEF);
+    }
 
-TEST_CASE("Read file length")
+    SECTION("Lower case")
+    {
+        auto b = utils::hexToBytes("deadbeef");
+        REQUIRE(b.size() == 4);
+        REQUIRE(b[0] == 0xDE);
+        REQUIRE(b[1] == 0xAD);
+        REQUIRE(b[2] == 0xBE);
+        REQUIRE(b[3] == 0xEF);
+    }
+
+    SECTION("Mixed case")
+    {
+        auto b = utils::hexToBytes("deAdbEEf");
+        REQUIRE(b.size() == 4);
+        REQUIRE(b[0] == 0xDE);
+        REQUIRE(b[1] == 0xAD);
+        REQUIRE(b[2] == 0xBE);
+        REQUIRE(b[3] == 0xEF);
+    }
+
+    SECTION("Out of hex")
+    {
+        REQUIRE_THROWS_AS(utils::hexToBytes("deAdbEZZ"), std::invalid_argument);
+    }
+}
+
+TEST_CASE("Bytes to hex")
 {
-    ScopedDir dir(USER_PATH("test"));
-    auto *file = std::fopen(dir("test.txt").c_str(), "w");
-    REQUIRE(file != nullptr);
-    std::array<int, 3> v = {42, -1, 7};
-    std::fwrite(v.data(), sizeof(v[0]), v.size(), file);
-    REQUIRE(utils::filesystem::filelength(file) == static_cast<long>(sizeof(v[0]) * v.size()));
-    REQUIRE(std::fclose(file) == 0);
+    SECTION("Vector of bytes")
+    {
+        std::vector<std::uint8_t> vb = {1, 2, 3, 4, 0xFF};
+        auto ret                     = utils::bytesToHex(vb);
+        REQUIRE((ret == "01020304ff"));
+    }
 }

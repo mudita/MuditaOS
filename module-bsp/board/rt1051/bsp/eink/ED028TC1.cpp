@@ -65,14 +65,8 @@
 
 #define _delay_ms(ms) vTaskDelay(pdMS_TO_TICKS(ms))
 
-//#define EINK_DEBUG_LOG  1
-//
-//#if EINK_DEBUG_LOG == 1
-//#define EINK_DEBUG_PRINTF(...)	LOG_INFO(__VA_ARGS__)
-//#endif
-
 /// This is DMA handle for internal frame buffer memory-to-memory copying operation
-static edma_handle_t s_einkMemcpyDma_handle;
+static edma_handle_t s_einkMemcpyDma_handle __attribute__((used));
 
 using namespace drivers;
 using namespace magic_enum;
@@ -522,7 +516,6 @@ void EinkChangeDisplayUpdateTimings(EinkDisplayTimingsMode_e timingsMode)
     }
 
     if (BSP_EinkWriteData(tmpbuf, 4, SPI_AUTOMATIC_CS) != 0) {
-        //        LOG_ERROR("Changing the display timings FAILED");
         EinkResetAndInitialize();
         return;
     }
@@ -538,7 +531,6 @@ void EinkPowerOn()
     if (!s_einkIsPoweredOn) {
         uint8_t cmd = EinkPowerON; // 0x04
         if (BSP_EinkWriteData(&cmd, sizeof(cmd), SPI_AUTOMATIC_CS) != 0) {
-            //            LOG_ERROR("Powering on the display FAILED");
             EinkResetAndInitialize();
             return;
         }
@@ -553,7 +545,6 @@ void EinkPowerOff()
     if (s_einkIsPoweredOn) {
         uint8_t cmd = EinkPowerOFF; // 0x02
         if (BSP_EinkWriteData(&cmd, sizeof(cmd), SPI_AUTOMATIC_CS) != 0) {
-            //            LOG_ERROR("Powering off the display FAILED");
             EinkResetAndInitialize();
             return;
         }
@@ -579,7 +570,6 @@ int16_t EinkGetTemperatureInternal()
     BSP_EinkWriteCS(BSP_Eink_CS_Clr);
 
     if (BSP_EinkWriteData(cmd, sizeof(cmd), SPI_MANUAL_CS) != 0) {
-        //        LOG_ERROR("Requesting the temperature FAILED");
         BSP_EinkWriteCS(BSP_Eink_CS_Set);
         EinkResetAndInitialize();
         return -1;
@@ -588,7 +578,6 @@ int16_t EinkGetTemperatureInternal()
     BSP_EinkWaitUntilDisplayBusy(pdMS_TO_TICKS(BSP_EinkBusyTimeout));
 
     if (BSP_EinkReadData(temp, sizeof(temp), SPI_MANUAL_CS) != 0) {
-        //        LOG_ERROR("Requesting the temperature FAILED");
         BSP_EinkWriteCS(BSP_Eink_CS_Set);
         EinkResetAndInitialize();
         return -1;
@@ -614,7 +603,6 @@ static void s_EinkSetGateOrder()
     buf[1] = 0x02; // Magic value required by the ED028TC1 display manufacturer
     buf[2] = 0x00;
     if (BSP_EinkWriteData(buf, 3, SPI_AUTOMATIC_CS) != 0) {
-        //       LOG_ERROR("Setting the gate order for the Eink failed");
         EinkResetAndInitialize();
         return;
     }
@@ -631,7 +619,6 @@ static void s_EinkSetInitialConfig()
     tmpbuf[3] = 0x00; // 0x06
     tmpbuf[4] = 0x00;
     if (BSP_EinkWriteData(tmpbuf, 5, SPI_AUTOMATIC_CS) != 0) {
-        //         LOG_ERROR("Setting the initial configuration for the Eink failed");
         return;
     }
 
@@ -640,21 +627,18 @@ static void s_EinkSetInitialConfig()
                                        // If 0x35 (DM - 1 is used (2bpp)) the SPI speed can be 25MHz
     tmpbuf[2] = 0x00;
     if (BSP_EinkWriteData(tmpbuf, 3, SPI_AUTOMATIC_CS) != 0) {
-        //         LOG_ERROR("Setting the initial configuration for the Eink failed");
         return;
     }
 
     tmpbuf[0] = EinkPowerSaving; // 0x26
     tmpbuf[1] = 0x82;            // B2
     if (BSP_EinkWriteData(tmpbuf, 2, SPI_AUTOMATIC_CS) != 0) {
-        //         LOG_ERROR("Setting the initial configuration for the Eink failed");
         return;
     }
 
     tmpbuf[0] = EinkPowerOFFSequenceSetting; // 0x03
     tmpbuf[1] = 0x01;                        // 0x00;//0x03;
     if (BSP_EinkWriteData(tmpbuf, 2, SPI_AUTOMATIC_CS) != 0) {
-        //         LOG_ERROR("Setting the initial configuration for the Eink failed");
         return;
     }
 
@@ -671,14 +655,12 @@ static void s_EinkSetInitialConfig()
                 (EPD_BOOSTER_DRIVING_STRENGTH_7 << EPD_BOOSTER_DRIVING_STRENGTH_POS) |
                 (EPD_BOOSTER_START_PERIOD_10MS << EPD_BOOSTER_START_PERIOD_POS);
     if (BSP_EinkWriteData(tmpbuf, 4, SPI_AUTOMATIC_CS) != 0) {
-        //         LOG_ERROR("Setting the initial configuration for the Eink failed");
         return;
     }
 
     tmpbuf[0] = EinkPLLControl; // 0x30
     tmpbuf[1] = 0x0E;
     if (BSP_EinkWriteData(tmpbuf, 2, SPI_AUTOMATIC_CS) != 0) {
-        //         LOG_ERROR("Setting the initial configuration for the Eink failed");
         return;
     }
 
@@ -686,7 +668,6 @@ static void s_EinkSetInitialConfig()
     tmpbuf[1] = EINK_TEMPERATURE_SENSOR_USE_INTERNAL | 0x00; // Temperature offset
     tmpbuf[2] = 0x00;                                        // Host forced temperature value
     if (BSP_EinkWriteData(tmpbuf, 3, SPI_AUTOMATIC_CS) != 0) {
-        //         LOG_ERROR("Setting the initial configuration for the Eink failed");
         return;
     }
 
@@ -694,7 +675,6 @@ static void s_EinkSetInitialConfig()
     tmpbuf[1] = DDX;                            // 0x01;   // 0x0D
     tmpbuf[2] = 0x00;                           // 0x22;
     if (BSP_EinkWriteData(tmpbuf, 3, SPI_AUTOMATIC_CS) != 0) {
-        //         LOG_ERROR("Setting the initial configuration for the Eink failed");
         return;
     }
 
@@ -703,7 +683,6 @@ static void s_EinkSetInitialConfig()
     tmpbuf[2] = 0x09;
     tmpbuf[3] = 0x2D;
     if (BSP_EinkWriteData(tmpbuf, 4, SPI_AUTOMATIC_CS) != 0) {
-        //         LOG_ERROR("Setting the initial configuration for the Eink failed");
         return;
     }
 
@@ -713,23 +692,18 @@ static void s_EinkSetInitialConfig()
     tmpbuf[3] = 0x01;                  // 0x01
     tmpbuf[4] = 0xE0;                  // 0xE0
     if (BSP_EinkWriteData(tmpbuf, 5, SPI_AUTOMATIC_CS) != 0) {
-        //         LOG_ERROR("Setting the initial configuration for the Eink failed");
         return;
     }
 
     tmpbuf[0] = EinkVCM_DCSetting; // 0x82
     tmpbuf[1] = 0x30;
     if (BSP_EinkWriteData(tmpbuf, 2, SPI_AUTOMATIC_CS) != 0) {
-        //         LOG_ERROR("Setting the initial configuration for the Eink failed");
         return;
     }
-
-    //     LOG_DEBUG("Eink Display configured");
 }
 
 EinkStatus_e EinkResetAndInitialize()
 {
-    //    LOG_INFO("Resetting the SPI peripheral, Eink display and setting init configuration");
     // Initialize the synchronization resources, SPI and GPIOs for the Eink BSP
     BSP_EinkInit(NULL);
     // Reset the display
@@ -769,14 +743,12 @@ static EinkStatus_e s_EinkReadFlagsRegister(uint16_t *flags)
 
     if (BSP_EinkWriteData(&cmd, sizeof(cmd), SPI_MANUAL_CS) != 0) {
         BSP_EinkWriteCS(BSP_Eink_CS_Set);
-        //        LOG_ERROR("Eink: request for the temperature failed");
         EinkResetAndInitialize();
         return EinkSPIErr;
     }
 
     if (BSP_EinkReadData(flags, sizeof(uint16_t), SPI_MANUAL_CS) != 0) {
         BSP_EinkWriteCS(BSP_Eink_CS_Set);
-        //        LOG_ERROR("Eink: request for the temperature failed");
         EinkResetAndInitialize();
         return EinkSPIErr;
     }
@@ -805,7 +777,6 @@ EinkStatus_e EinkDitherDisplay()
     uint8_t cmdWithArgs[2] = {EinkDPC, EINK_DITHER_4BPP_MODE | EINK_DITHER_START};
 
     if (BSP_EinkWriteData(cmdWithArgs, sizeof(cmdWithArgs), SPI_AUTOMATIC_CS) != 0) {
-        //        LOG_ERROR("Eink: dithering the display failed");
         EinkResetAndInitialize();
         return EinkSPIErr;
     }
@@ -892,7 +863,6 @@ EinkStatus_e EinkUpdateFrame(
                          // system to the ED028TC1 one
 
     if (BSP_EinkWriteData(buf, 9, SPI_AUTOMATIC_CS) != 0) {
-        //        LOG_ERROR("Eink: transmitting the display update header FAILED");
         EinkResetAndInitialize();
         return EinkSPIErr;
     }
@@ -902,7 +872,6 @@ EinkStatus_e EinkUpdateFrame(
     // Send the part of the image to the display memory
 
     if (BSP_EinkWriteData(s_einkServiceRotatedBuf, msgSize, SPI_AUTOMATIC_CS) != 0) {
-        //        LOG_ERROR("Eink: transmitting the display update image FAILED");
         EinkResetAndInitialize();
         return EinkSPIErr;
     }
@@ -926,7 +895,6 @@ EinkStatus_e EinkFillScreenWithColor(EinkDisplayColorFilling_e colorFill)
     buf[8] = BOARD_EINK_DISPLAY_RES_X & 0x00FF;
 
     if (BSP_EinkWriteData(buf, 9, SPI_AUTOMATIC_CS) != 0) {
-        //        LOG_ERROR("Eink: transmitting the display update header FAILED");
         EinkResetAndInitialize();
         return EinkSPIErr;
     }
@@ -936,7 +904,6 @@ EinkStatus_e EinkFillScreenWithColor(EinkDisplayColorFilling_e colorFill)
     buf[0] = EinkDataStartTransmission1; // 0x10
     buf[1] = Eink1Bpp - 1;
     if (BSP_EinkWriteData(buf, 2, SPI_MANUAL_CS) != 0) {
-        //        LOG_ERROR("Eink: transmitting the display update image FAILED");
         BSP_EinkWriteCS(BSP_Eink_CS_Set);
         EinkResetAndInitialize();
         return EinkSPIErr;
@@ -956,7 +923,6 @@ EinkStatus_e EinkFillScreenWithColor(EinkDisplayColorFilling_e colorFill)
     memset(bg.get(), background, BOARD_EINK_DISPLAY_RES_Y * BOARD_EINK_DISPLAY_RES_X / 8);
 
     if (BSP_EinkWriteData(bg.get(), BOARD_EINK_DISPLAY_RES_Y * BOARD_EINK_DISPLAY_RES_X / 8, SPI_MANUAL_CS) != 0) {
-        //        LOG_ERROR("Eink: transmitting the display update image FAILED");
         BSP_EinkWriteCS(BSP_Eink_CS_Set);
         EinkResetAndInitialize();
         return EinkSPIErr;
@@ -1001,7 +967,6 @@ EinkStatus_e EinkRefreshImage(
                          // system to the ED028TC1 one
 
     if (BSP_EinkWriteData(buf, sizeof(buf), SPI_AUTOMATIC_CS) != 0) {
-        //        LOG_ERROR("Eink: transmitting the refresh request image FAILED");
         EinkResetAndInitialize();
         return EinkSPIErr;
     }

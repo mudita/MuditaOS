@@ -6,6 +6,9 @@
 #include "drivers/i2c/DriverI2C.hpp"
 #include "drivers/pll/DriverPLL.hpp"
 #include "drivers/gpio/DriverGPIO.hpp"
+#include "drivers/lpspi/DriverLPSPI.hpp"
+#include "drivers/usdhc/DriverUSDHC.hpp"
+#include "drivers/lpuart/DriverLPUART.hpp"
 
 enum class BoardDefinitions
 {
@@ -15,13 +18,14 @@ enum class BoardDefinitions
 
     USB_FUNCTION_MUX_SELECT = 25, // GPIO_AD_B1_09, USB_MUX_SEL0
     USB_POWER_ACK           = 3,  // GPIO_B0_03  Note: pull-up in order to read
+    I2C_STD_BAUDRATE   = 100000,
 
-    AUDIOCODEC_I2C_BAUDRATE   = 100000,
+    AUDIOCODEC_I2C_BAUDRATE   = I2C_STD_BAUDRATE,
     AUDIOCODEC_I2C            = static_cast<int>(drivers::I2CInstances ::I2C2),
     AUDIOCODEC_DMAMUX         = static_cast<int>(drivers::DMAMuxInstances ::DMAMUX0),
     AUDIOCODEC_DMA            = static_cast<int>(drivers::DMAInstances ::DMA_0),
-    AUDIOCODEC_TX_DMA_CHANNEL = 5,
-    AUDIOCODEC_RX_DMA_CHANNEL = 6,
+    AUDIOCODEC_TX_DMA_CHANNEL = 6,
+    AUDIOCODEC_RX_DMA_CHANNEL = 7,
     AUDIOCODEC_IRQ            = 31, // GPIO_B1_15  requires pull-up 10kΩ
     AUDIOCODEC_IRQ_GPIO       = static_cast<int>(drivers::GPIOInstances ::GPIO_2),
 
@@ -40,21 +44,22 @@ enum class BoardDefinitions
     KEYBOARD_IRQ_PIN      = 28,
     KEYBOARD_RESET_PIN    = 29,
 
-	HEADSET_I2C_BAUDRATE = AUDIOCODEC_I2C_BAUDRATE,
-	HEADSET_I2C = AUDIOCODEC_I2C,
-	HEADSET_GPIO = static_cast<int >(drivers::GPIOInstances ::GPIO_2),
-	HEADSET_IRQ_PIN = 30,
+	HEADSET_I2C_BAUDRATE  = AUDIOCODEC_I2C_BAUDRATE,
+	HEADSET_I2C           = AUDIOCODEC_I2C,
+	HEADSET_GPIO          = static_cast<int >(drivers::GPIOInstances ::GPIO_2),
+	HEADSET_IRQ_PIN       = 30,
 
     BATTERY_CHARGER_I2C_BAUDRATE = AUDIOCODEC_I2C_BAUDRATE,
     BATTERY_CHARGER_I2C = AUDIOCODEC_I2C,
     BATTERY_CHARGER_GPIO = static_cast<int >(drivers::GPIOInstances ::GPIO_2),
     BATTERY_CHARGER_INOKB_PIN = 12,
-    BATTERY_CHARGER_WCINOKB = 13, /// UNUSABLE as WCIN is not connected to the charger !
-    BATTERY_CHARGER_INTB_PIN = 14, /// interrupt on battery percentage change
+    BATTERY_CHARGER_WCINOKB = 13, // UNUSABLE as WCIN is not connected to the charger !
+    BATTERY_CHARGER_INTB_PIN = 14, // interrupt on charger/fuel-gauge event
 
     CELLULAR_DMA = static_cast<int >(drivers::DMAInstances ::DMA_0),
     CELLULAR_DMAMUX = static_cast<int >(drivers::DMAMuxInstances ::DMAMUX0),
     CELLULAR_TX_DMA_CHANNEL = 4,
+    CELLULAR_RX_DMA_CHANNEL = 5,
     CELLULAR_GPIO_1 = static_cast<int >(drivers::GPIOInstances ::GPIO_1),
     CELLULAR_GPIO_2 = static_cast<int >(drivers::GPIOInstances ::GPIO_2),
     CELLULAR_GPIO_3 = static_cast<int >(drivers::GPIOInstances ::GPIO_3),
@@ -65,7 +70,8 @@ enum class BoardDefinitions
     CELLULAR_GPIO_2_RESET_PIN = 17,
     CELLULAR_GPIO_2_RI_PIN = 21,
     CELLULAR_GPIO_2_APRDY_PIN = 16,
-    CELLULAR_GPIO_2_WAKEUP_PIN = 19,
+    CELLULAR_GPIO_2_WAKEUP_PIN = 22, // GPIO_B1_06, long time no see. Active low, external pull-down 10kΩ. docs: 6. Do not pull up WAKEUP_IN, […], pins unless the module starts up sucessfully.
+    CELLULAR_GPIO_2_WIRELESS_DISABLE_PIN = 23, // GPIO_B1_07, pull-up in modem, active low, equiv. AT+CFUN=4, see docs
     CELLULAR_GPIO_2_SIM_TRAY_INSERTED_PIN = 11,
     CELLULAR_GPIO_2_NC = 10, // GPIO_B0_10
     CELLULAR_GPIO_2_SIMCARD_PRESENCE_PIN = 9,
@@ -73,6 +79,7 @@ enum class BoardDefinitions
     CELLULAR_GPIO_2_ANTSEL_PIN = 2,
     CELLULAR_GPIO_1_STATUS_PIN = 2, // GPIO_AD_B0_02
     CELLULAR_GPIO_2_USB_BOOT_PIN = 24, // GPIO_B1_08, output
+    CELLULAR_LPUART_INSTANCE = static_cast<int >(drivers::LPUARTInstances::LPUART_1),
 
     EINK_DMA = static_cast<int >(drivers::DMAInstances ::DMA_0),
     EINK_DMAMUX = static_cast<int >(drivers::DMAMuxInstances ::DMAMUX0),
@@ -83,21 +90,20 @@ enum class BoardDefinitions
     EINK_RESET_PIN=16,
     EINK_BUSY_PIN=17,
     EINK_PLL = static_cast<int >(drivers::PLLInstances::PLL2_PFD2),
+    EINK_LPSPI_INSTANCE = static_cast<int >(drivers::LPSPIInstances::LPSPI_1),
 
     BLUETOOTH_DMA = static_cast<int >(drivers::DMAInstances ::DMA_0),
     BLUETOOTH_DMAMUX = static_cast<int >(drivers::DMAMuxInstances ::DMAMUX0),
-    BLUETOOTH_TX_DMA_CHANNEL = 7,
-    BLUETOOTH_RX_DMA_CHANNEL = 8,
+    BLUETOOTH_TX_DMA_CHANNEL = 8,
+    BLUETOOTH_RX_DMA_CHANNEL = 9,
 
     EMMC_PLL = static_cast<int >(drivers::PLLInstances::PLL2_PFD2),
+    EMMC_USDHC_INSTANCE = static_cast<int >(drivers::USDHCInstances::USDHC_2),
 
     AUDIO_PLL = static_cast<int >(drivers::PLLInstances::PLL4_Audio),
 
     VIBRATOR_GPIO = static_cast<int>(drivers::GPIOInstances::GPIO_1),
     VIBRATOR_EN = 0, // GPIO_AD_B0_00
-
-    TORCH_GPIO = static_cast<int>(drivers::GPIOInstances::GPIO_1),
-    TORCH_EN = 21, // GPIO_AD_B1_05
 
 	MAGNETOMETER_I2C = AUDIOCODEC_I2C,
 	MAGNETOMETER_I2C_BAUDRATE = AUDIOCODEC_I2C_BAUDRATE,
@@ -122,6 +128,9 @@ enum class BoardDefinitions
     LIGHT_SENSOR_I2C_BAUDRATE = AUDIOCODEC_I2C_BAUDRATE,
     LIGHT_SENSOR_IRQ_GPIO = static_cast<int>(drivers::GPIOInstances::GPIO_2),
     LIGHT_SENSOR_IRQ = 15, // GPIO_B0_15
+
+    EEPROM_I2C = AUDIOCODEC_I2C,
+    EEPROM_I2C_BAUDRATE = I2C_STD_BAUDRATE,
 };
 
 #endif //PUREPHONE_BOARDDEFINITIONS_HPP

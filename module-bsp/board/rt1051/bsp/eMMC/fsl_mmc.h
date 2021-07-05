@@ -338,6 +338,24 @@ extern "C"
      */
     status_t MMC_SetGeneralPurposePartitioning(mmc_card_t *card, mmc_access_partition_t partition, uint32_t size);
 
+    /*!
+     * @brief Wait write process complete.
+     *
+     * @param card Card descriptor.
+     * @retval kStatus_Timeout Operation timeout.
+     * @retval kStatus_Success Operate successfully.
+     */
+    status_t MMC_WaitWriteComplete(mmc_card_t *card);
+
+    /*!
+     * @brief Set erase unit size of the card
+     *
+     * @param card Card descriptor.
+     * @retval kStatus_SDMMC_ConfigureExtendedCsdFailed Configure Extended CSD failed.
+     * @retval kStatus_Success Operate successfully.
+     */
+    status_t MMC_SetMaxEraseUnitSize(mmc_card_t *card);
+
 /* @} */
 #if defined(__cplusplus)
 }

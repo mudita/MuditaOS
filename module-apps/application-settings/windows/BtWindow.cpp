@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <functional>
@@ -45,7 +45,7 @@ namespace gui
     sys::ReturnCodes message_bt(app::Application *app, BluetoothMessage::Request req)
     {
         std::shared_ptr<BluetoothMessage> msg = std::make_shared<BluetoothMessage>(req);
-        auto ret                              = sys::Bus::SendUnicast(msg, "ServiceBluetooth", app);
+        auto ret                              = app->bus.sendUnicast(msg, "ServiceBluetooth");
         if (!ret) {
             LOG_ERROR("err: %d", static_cast<int>(ret));
         }
@@ -57,20 +57,19 @@ namespace gui
         AppWindow::buildInterface();
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::select));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::select));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
-        setTitle(utils::localize.get("app_settings_bt"));
+        setTitle(utils::translate("app_settings_bt"));
 
         LOG_INFO("Create box layout");
-        box = new gui::VBox(this, 0, title->offset_h(), style::window_width, 7 * style::window::label::default_h);
+        box = new gui::VBox(
+            this, 0, style::window::default_vertical_pos, style::window_width, 8 * style::window::label::default_h);
         box->setEdges(RectangleEdge::None);
 
-        // TODO WIP: it's just for usability now
-        // TODO scan should return async - handle that... (if in scan -> add to list and refresh if new on window)
         add_box_label(box, "Bluetooth on off", [=](Item &) {
             LOG_DEBUG("Callback Bluetooth on");
-            message_bt(application, BluetoothMessage::Request::Start);
+
             for (auto &el : box->children) {
                 el->visible = true;
             }
@@ -92,21 +91,26 @@ namespace gui
             return true;
         });
 
-        add_box_label(box, "  -> Set visible", [=](Item &) {
-            LOG_DEBUG("Callback set visibility");
-            message_bt(application, BluetoothMessage::Request::Visible);
+        add_box_label(box, "  -> Switch A2DP <-> HSP", [=](Item &) {
+            LOG_DEBUG("Callback switch profile");
+            message_bt(application, BluetoothMessage::Request::SwitchProfile);
             return true;
         });
 
-        add_box_label(box, "  -> Play", [=](Item &) {
-            LOG_DEBUG("Start playback");
+        add_box_label(box, "  -> Start stream", [=](Item &) {
+            LOG_DEBUG("Start stream");
             message_bt(application, BluetoothMessage::Request::Play);
             return true;
         });
 
-        add_box_label(box, "  -> Stop", [=](Item &) {
-            LOG_DEBUG("Stop playback");
+        add_box_label(box, "  -> Stop stream", [=](Item &) {
+            LOG_DEBUG("Stop stream");
             message_bt(application, BluetoothMessage::Request::Stop);
+            return true;
+        });
+        add_box_label(box, "  -> Disconnect audio", [=](Item &) {
+            LOG_DEBUG("Disconnect");
+            message_bt(application, BluetoothMessage::Request::Disconnect);
             return true;
         });
 

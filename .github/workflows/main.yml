@@ -20,6 +20,7 @@ jobs:
           fetch-depth: 0
       - name: check commit messages
         run: ./tools/check_commit_messages.py
+
   check_copyright_and_style:
     name: check copyright and style
     if: github.event.pull_request.draft == false
@@ -35,6 +36,8 @@ jobs:
         run: config/license_header_check.sh --ci --check-only
       - name: Style checking
         run: ./config/style_check_hook.sh --last
+      - name: Clang tidy check
+        run: ./config/clang_check.sh
 
   build_rt1051_binary:
     name: build rt1051 binary
@@ -50,13 +53,12 @@ jobs:
           submodules: recursive
       - name: Build for RT1051
         run: |
-          ./configure.sh rt1051 Release && \
+          export JOBS=${JOBS:-$(nproc)} && \
+          echo "JOBS=${JOBS}" &&  \
+          ./configure.sh rt1051 Release -G Ninja && \
           pushd build-rt1051-Release && \
-          export JOBS=${JOBS:-`nproc`} && \
-          echo "JOBS=${JOBS}" && \
-          make -j ${JOBS} && \
-          popd && \
-          uptime
+          ninja -j ${JOBS} && \
+          popd 
 
   build_linux_binary_and_run_tests:
     name: build linux binary and run tests
@@ -70,35 +72,22 @@ jobs:
         with:
           token: ${{ secrets.GitHub_PAT }}
           submodules: recursive
-      - name: build linux binary
+      - name: build Linux Debug
         run: |
-          ./configure.sh linux Debug && \
+          export JOBS=${JOBS:-$(nproc)} && \
+          echo "JOBS=${JOBS}" &&  \
+          ./configure.sh linux Debug -G Ninja && \
           pushd build-linux-Debug && \
-          export JOBS=${JOBS:-`nproc`} && \
-          echo "JOBS=${JOBS}" && \
-          make -j ${JOBS} && \
+          ninja -j ${JOBS} unittests && \
+          ninja -j ${JOBS} && \
           popd
-      - name: Check for statics
-        run: ./tools/find_global_data.py build-linux-Debug/PurePhone.elf
       - name: run unit tests
         run: |
-          pushd build-linux-Debug && \
-          export JOBS=${JOBS:-`nproc`} && \
-          echo "JOBS=${JOBS}" && \
-          make -j ${JOBS} check && \
-          popd
-      - name: start emulator
+          ./tools/run_unittests.sh enabled_unittests
+      - name: Check for statics
         run: |
-          ./run_emulator_on_filesystem_image.sh 2>&1 > emulator.log &
-          echo $! > emulator.pid
-      - name: run tests
-        run: pytest ./pytest -rP --port=simulator --timeout=20 -m 'not rt1051'
-        working-directory: test
-      - name: kill emulator
+          ./tools/find_global_data.py build-linux-Debug/PurePhone.elf
+      - name: check if all Unit Tests where run
         run: |
-          kill $(cat emulator.pid)
-          rm emulator.pid
-        if: always()
-      - name: print emulator logs
-        run: cat emulator.log
-        if: always()
+          ./tools/check_unittests.sh enabled_unit_tests
+

@@ -1,9 +1,9 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include <common_data/EventStore.hpp>
+#include <EventStore.hpp>
 
 #include <limits>
 class SignalStrength
@@ -33,11 +33,10 @@ class SignalStrength
     static const auto rssi_tdscmda_step = (rssi_tdscmda_low_dBm - rssi_tdscmda_max_dBm) / (rssi_tdscmda_max - rssi_low);
 
     static const auto rssidBm_invalid          = 0;
-    static const auto rssidBm_five_bar_margin  = -60;
-    static const auto rssidBm_four_bar_margin  = -75;
-    static const auto rssidBm_three_bar_margin = -90;
-    static const auto rssidBm_two_bar_margin   = -100;
-    static const auto rssidBm_one_bar_margin   = -110;
+    static const auto rssidBm_four_bar_margin  = -60;
+    static const auto rssidBm_three_bar_margin = -75;
+    static const auto rssidBm_two_bar_margin   = -90;
+    static const auto rssidBm_one_bar_margin   = -100;
 
   public:
     SignalStrength(int rssi);

@@ -1,7 +1,7 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "log/log.hpp"
+#include <log.hpp>
 #include "utf8/UTF8.hpp"
 
 #include "../core/DrawCommand.hpp"
@@ -63,7 +63,9 @@ namespace gui
 
         switch (alignment.vertical) {
         case (Alignment::Vertical::Center):
-            textArea.y = (widgetArea.h - font->info.line_height) / 2 + font->info.base;
+            textArea.y = widgetArea.h > font->info.line_height
+                             ? (widgetArea.h - font->info.line_height) / 2 + font->info.base
+                             : font->info.base;
             break;
         case Alignment::Vertical::Top:
             textArea.y = font->info.base + padding.top;
@@ -219,20 +221,16 @@ namespace gui
     {
         Rect::buildDrawListImplementation(commands);
         if (font != nullptr) {
-            auto cmd    = std::make_unique<CommandText>();
+            auto cmd    = std::make_unique<DrawText>();
             cmd->str    = textDisplayed;
             cmd->fontID = font->id;
             cmd->color  = textColor;
 
-            cmd->x          = drawArea.x;
-            cmd->y          = drawArea.y;
-            cmd->w          = drawArea.w;
-            cmd->h          = drawArea.h;
-            cmd->tx         = textArea.x;
-            cmd->ty         = textArea.y;
-            cmd->tw         = textArea.w;
-            cmd->th         = textArea.h;
-            cmd->charsWidth = stringPixelWidth;
+            cmd->origin     = {drawArea.x, drawArea.y};
+            cmd->width      = drawArea.w;
+            cmd->height     = drawArea.h;
+            cmd->textOrigin = {textArea.x, textArea.y};
+            cmd->textHeight = textArea.h;
 
             cmd->areaX = widgetArea.x;
             cmd->areaY = widgetArea.y;

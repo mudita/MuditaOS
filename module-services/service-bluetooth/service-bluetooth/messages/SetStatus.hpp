@@ -1,16 +1,16 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <Service/Message.hpp>
+#pragma once
+
 #include "service-bluetooth/BluetoothMessage.hpp"
-#include <string>
 
 namespace message::bluetooth
 {
     class SetStatus : public BluetoothMessage
     {
       public:
-        SetStatus(BluetoothStatus status) : status(std::move(status))
+        explicit SetStatus(BluetoothStatus status) : status(status)
         {}
         [[nodiscard]] auto getStatus() const noexcept -> BluetoothStatus
         {

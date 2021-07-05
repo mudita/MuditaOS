@@ -8,6 +8,7 @@
 
 #include <memory>
 #include <stdexcept>
+#include <filesystem>
 
 class DatabaseInitializer;
 
@@ -20,7 +21,7 @@ class DatabaseInitialisationError : public std::runtime_error
 class Database
 {
   public:
-    explicit Database(const char *name);
+    explicit Database(const char *name, bool readOnly = false);
     virtual ~Database();
 
     std::unique_ptr<QueryResult> query(const char *format, ...);
@@ -33,7 +34,7 @@ class Database
     // Must be invoked before closing system in order to properly close OS layer
     static bool deinitialize();
 
-    bool storeIntoFile(const std::string &backupPath);
+    bool storeIntoFile(const std::filesystem::path &backupPath);
 
     uint32_t getLastInsertRowId();
     void pragmaQuery(const std::string &pragmaStatemnt);

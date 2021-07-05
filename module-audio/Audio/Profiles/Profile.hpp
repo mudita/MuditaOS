@@ -1,13 +1,14 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
+#include <Audio/AudioDevice.hpp>
+#include <Audio/codec.hpp>
+
 #include <memory>
 #include <functional>
 #include <string>
-
-#include <bsp/audio/bsp_audio.hpp>
 
 namespace audio
 {
@@ -43,9 +44,8 @@ namespace audio
         };
 
         static std::unique_ptr<Profile> Create(const Type t,
-                                               std::function<int32_t()> callback = nullptr,
-                                               std::optional<Volume> vol         = 0,
-                                               std::optional<Gain> gain          = 0);
+                                               std::optional<Volume> vol = 0,
+                                               std::optional<Gain> gain  = 0);
 
         void SetOutputVolume(Volume vol);
 
@@ -55,48 +55,57 @@ namespace audio
 
         void SetSampleRate(uint32_t samplerate);
 
-        void SetOutputPath(bsp::AudioDevice::OutputPath path);
+        void SetOutputPath(audio::codec::OutputPath path);
 
-        void SetInputPath(bsp::AudioDevice::InputPath path);
+        void SetInputPath(audio::codec::InputPath path);
 
         Volume GetOutputVolume() const
         {
-            return audioFormat.outputVolume;
+            return audioConfiguration.outputVolume;
         }
 
         Gain GetInputGain() const
         {
-            return audioFormat.inputGain;
+            return audioConfiguration.inputGain;
         }
 
         uint32_t GetSampleRate()
         {
-            return audioFormat.sampleRate_Hz;
+            return audioConfiguration.sampleRate_Hz;
         }
 
         uint32_t GetInOutFlags()
         {
-            return audioFormat.flags;
+            return audioConfiguration.flags;
         }
 
-        bsp::AudioDevice::OutputPath GetOutputPath() const
+        audio::codec::OutputPath GetOutputPath() const
         {
-            return audioFormat.outputPath;
+            return audioConfiguration.outputPath;
         }
 
-        bsp::AudioDevice::InputPath GetInputPath() const
+        audio::codec::InputPath GetInputPath() const
         {
-            return audioFormat.inputPath;
+            return audioConfiguration.inputPath;
         }
 
-        bsp::AudioDevice::Type GetAudioDeviceType() const
+        AudioDevice::Type GetAudioDeviceType() const
         {
             return audioDeviceType;
         }
 
-        bsp::AudioDevice::Format GetAudioFormat()
+        [[deprecated]] audio::codec::Configuration GetAudioConfiguration() const
         {
-            return audioFormat;
+            return audioConfiguration;
+        }
+
+        auto getAudioFormat() const noexcept
+        {
+            auto isStereo =
+                (audioConfiguration.flags & static_cast<std::uint32_t>(audio::codec::Flags::OutputStereo)) != 0 ||
+                (audioConfiguration.flags & static_cast<std::uint32_t>(audio::codec::Flags::InputStereo)) != 0;
+            auto channels = isStereo ? 2U : 1U;
+            return AudioFormat(audioConfiguration.sampleRate_Hz, audioConfiguration.bitWidth, channels);
         }
 
         const std::string &GetName() const
@@ -112,17 +121,14 @@ namespace audio
       protected:
         Profile(const std::string &name,
                 const Type type,
-                const bsp::AudioDevice::Format &fmt,
-                bsp::AudioDevice::Type devType,
-                std::function<int32_t()> callback);
+                const audio::codec::Configuration &fmt,
+                AudioDevice::Type devType);
 
-        bsp::AudioDevice::Format audioFormat{};
-        bsp::AudioDevice::Type audioDeviceType = bsp::AudioDevice::Type::Audiocodec;
+        audio::codec::Configuration audioConfiguration;
+        AudioDevice::Type audioDeviceType = AudioDevice::Type::Audiocodec;
 
         std::string name;
         Type type = Type::Idle;
-
-        std::function<int32_t()> dbAccessCallback = nullptr;
     };
 
     [[nodiscard]] const std::string str(const Profile::Type &profileType);

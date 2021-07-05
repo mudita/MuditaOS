@@ -1,11 +1,11 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "log/log.hpp"
+#include <log.hpp>
 #include "utf8/UTF8.hpp"
 #include "Profile.hpp"
 #include <Utils.hpp>
-#include <gsl>
+#include <gsl/gsl>
 
 namespace gui
 {
@@ -35,7 +35,7 @@ namespace gui
             return json11::Json();
         }
 
-        uint32_t fsize = utils::filesystem::filelength(fd);
+        uint32_t fsize = std::filesystem::file_size(filepath);
 
         auto stream = std::make_unique<char[]>(fsize + 1);
 

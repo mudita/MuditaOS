@@ -1,27 +1,27 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
+#include "common.hpp"
+
+#include <Interface/EventsRecord.hpp>
+#include <Database/Database.hpp>
+#include <Databases/EventsDB.hpp>
+#include <module-db/queries/calendar/QueryEventsGet.hpp>
+#include <module-db/queries/calendar/QueryEventsGetAll.hpp>
+#include <module-db/queries/calendar/QueryEventsGetAllLimited.hpp>
+#include <module-db/queries/calendar/QueryEventsGetFiltered.hpp>
+#include <module-db/queries/calendar/QueryEventsAdd.hpp>
+#include <module-db/queries/calendar/QueryEventsRemove.hpp>
+#include <module-db/queries/calendar/QueryEventsRemoveICS.hpp>
+#include <module-db/queries/calendar/QueryEventsEdit.hpp>
+#include <module-db/queries/calendar/QueryEventsEditICS.hpp>
+#include <module-db/queries/calendar/QueryEventsSelectFirstUpcoming.hpp>
 
 #include <catch2/catch.hpp>
 
-#include "Interface/EventsRecord.hpp"
-#include "Database/Database.hpp"
-#include "Databases/EventsDB.hpp"
-#include "module-db/queries/calendar/QueryEventsGet.hpp"
-#include "module-db/queries/calendar/QueryEventsGetAll.hpp"
-#include "module-db/queries/calendar/QueryEventsGetAllLimited.hpp"
-#include "module-db/queries/calendar/QueryEventsGetFiltered.hpp"
-#include "module-db/queries/calendar/QueryEventsAdd.hpp"
-#include "module-db/queries/calendar/QueryEventsRemove.hpp"
-#include "module-db/queries/calendar/QueryEventsRemoveICS.hpp"
-#include "module-db/queries/calendar/QueryEventsEdit.hpp"
-#include "module-db/queries/calendar/QueryEventsEditICS.hpp"
-#include "module-db/queries/calendar/QueryEventsSelectFirstUpcoming.hpp"
-
-#include <vfs.hpp>
-#include <purefs/filesystem_paths.hpp>
-
-#include <stdint.h>
 #include <algorithm>
+#include <cstdint>
+#include <filesystem>
 #include <iostream>
 
 using namespace std::chrono_literals;
@@ -41,20 +41,12 @@ TEST_CASE("Events Record tests")
 {
     Database::initialize();
 
-    const auto eventsPath = (purefs::dir::getUserDiskPath() / "events.db").c_str();
-    std::filesystem::remove(eventsPath);
+    const auto eventsPath = (std::filesystem::path{"sys/user"} / "events.db");
+    RemoveDbFiles(eventsPath.stem());
 
-    EventsDB eventsDb{eventsPath};
+    EventsDB eventsDb{eventsPath.c_str()};
 
     REQUIRE(eventsDb.isInitialized());
-
-    SECTION("Default Constructor")
-    {
-        EventsRecord testRec;
-        REQUIRE(testRec.title == "");
-        REQUIRE(testRec.reminder == 0);
-        REQUIRE(testRec.repeat == 0);
-    }
 
     EventsTableRow testRow = {{1},
                               .UID              = "test1",
@@ -129,7 +121,6 @@ TEST_CASE("Events Record tests")
                                .provider_iCalUid = "test6"};
 
     auto check_record = [](const EventsRecord &actual, const EventsRecord &expected) {
-        CHECK(actual.ID == expected.ID);
         CHECK(actual.UID == expected.UID);
         CHECK(actual.title == expected.title);
         CHECK(TimePointToString(actual.date_from) == TimePointToString(expected.date_from));
@@ -143,11 +134,6 @@ TEST_CASE("Events Record tests")
         CHECK(actual.isValid());
     };
 
-    SECTION("Constructor from EventsTableRow")
-    {
-        EventsRecord testRecord(testRow);
-        check_record(testRecord, testRow);
-    }
 
     EventsRecordInterface eventsRecordInterface(&eventsDb);
     auto numberOfEvents = eventsRecordInterface.GetCount();
@@ -169,6 +155,197 @@ TEST_CASE("Events Record tests")
 
     numberOfEvents = eventsRecordInterface.GetCount();
     REQUIRE(numberOfEvents == 6);
+
+    ///====TEST QUERY====
+    auto getQuery = [&](uint32_t id, EventsRecord expected_record) {
+        auto query  = std::make_shared<db::query::events::Get>(id);
+        auto ret    = eventsRecordInterface.runQuery(query);
+        auto result = dynamic_cast<db::query::events::GetResult *>(ret.get());
+        REQUIRE(result != nullptr);
+        auto record = result->getResult();
+        check_record(record, expected_record);
+    };
+
+    [[maybe_unused]] auto getAll = [&](std::vector<EventsRecord> expected_records, uint32_t expectedAllRecsNumber) {
+        auto query  = std::make_shared<db::query::events::GetAll>();
+        auto ret    = eventsRecordInterface.runQuery(query);
+        auto result = dynamic_cast<db::query::events::GetAllResult *>(ret.get());
+        REQUIRE(result != nullptr);
+        auto records = result->getResult();
+        REQUIRE(records.size() == expectedAllRecsNumber);
+
+        auto expected_record = expected_records.begin();
+        std::for_each(records.begin(), records.end(), [&expected_record](const EventsRecord &record) {
+            CHECK(record.ID == expected_record->ID);
+            CHECK(record.UID == expected_record->UID);
+            CHECK(record.title == expected_record->title);
+            CHECK(TimePointToString(record.date_from) == TimePointToString(expected_record->date_from));
+            CHECK(TimePointToString(record.date_till) == TimePointToString(expected_record->date_till));
+            CHECK(record.reminder == expected_record->reminder);
+            CHECK(record.repeat == expected_record->repeat);
+            CHECK(record.reminder_fired == expected_record->reminder_fired);
+            CHECK(record.provider_type == expected_record->provider_type);
+            CHECK(record.provider_id == expected_record->provider_id);
+            CHECK(record.provider_iCalUid == expected_record->provider_iCalUid);
+            CHECK(record.isValid());
+            expected_record++;
+        });
+    };
+
+    auto getFiltered = [&](TimePoint filter_from, TimePoint filter_till, std::vector<EventsRecord> expected_records) {
+        auto query  = std::make_shared<db::query::events::GetFiltered>(filter_from, filter_till);
+        auto ret    = eventsRecordInterface.runQuery(query);
+        auto result = dynamic_cast<db::query::events::GetFilteredResult *>(ret.get());
+        REQUIRE(result != nullptr);
+        auto records = result->getResult();
+        REQUIRE(records.size() == expected_records.size());
+        auto count = result->getCountResult();
+        REQUIRE(count == expected_records.size());
+
+        auto expected_record = expected_records.begin();
+        std::for_each(records.begin(), records.end(), [&expected_record](const EventsRecord &record) {
+            CHECK(record.ID == expected_record->ID);
+            CHECK(record.UID == expected_record->UID);
+            CHECK(record.title == expected_record->title);
+            CHECK(TimePointToString(record.date_from) == TimePointToString(expected_record->date_from));
+            CHECK(TimePointToString(record.date_till) == TimePointToString(expected_record->date_till));
+            CHECK(record.reminder == expected_record->reminder);
+            CHECK(record.repeat == expected_record->repeat);
+            CHECK(record.reminder_fired == expected_record->reminder_fired);
+            CHECK(record.provider_type == expected_record->provider_type);
+            CHECK(record.provider_id == expected_record->provider_id);
+            CHECK(record.provider_iCalUid == expected_record->provider_iCalUid);
+            CHECK(record.isValid());
+            expected_record++;
+        });
+    };
+
+    auto getAllLimited = [&](uint32_t offset,
+                             uint32_t limit,
+                             std::vector<EventsRecord> expected_records,
+                             uint32_t expectedAllRecsNumber) {
+        auto query  = std::make_shared<db::query::events::GetAllLimited>(offset, limit);
+        auto ret    = eventsRecordInterface.runQuery(query);
+        auto result = dynamic_cast<db::query::events::GetAllLimitedResult *>(ret.get());
+        REQUIRE(result != nullptr);
+        auto records = result->getResult();
+        REQUIRE(records.size() == limit);
+        auto count = result->getCountResult();
+        CHECK(count == expectedAllRecsNumber);
+
+        auto expected_record = expected_records.begin();
+        std::for_each(records.begin(), records.end(), [&expected_record](const EventsRecord &record) {
+            CHECK(record.ID == expected_record->ID);
+            CHECK(record.UID == expected_record->UID);
+            CHECK(record.title == expected_record->title);
+            CHECK(TimePointToString(record.date_from) == TimePointToString(expected_record->date_from));
+            CHECK(TimePointToString(record.date_till) == TimePointToString(expected_record->date_till));
+            CHECK(record.reminder == expected_record->reminder);
+            CHECK(record.repeat == expected_record->repeat);
+            CHECK(record.reminder_fired == expected_record->reminder_fired);
+            CHECK(record.provider_type == expected_record->provider_type);
+            CHECK(record.provider_id == expected_record->provider_id);
+            CHECK(record.provider_iCalUid == expected_record->provider_iCalUid);
+            CHECK(record.isValid());
+            expected_record++;
+        });
+    };
+
+    auto AddQuery = [&](EventsRecord record) {
+        auto query  = std::make_shared<db::query::events::Add>(record);
+        auto ret    = eventsRecordInterface.runQuery(query);
+        auto result = dynamic_cast<db::query::events::AddResult *>(ret.get());
+        REQUIRE(result != nullptr);
+        REQUIRE(result->getResult());
+
+        auto entry = eventsRecordInterface.GetByID(record.ID);
+        check_record(entry, record);
+    };
+
+    auto RemoveQueryICS = [&](std::string uid) {
+        auto query  = std::make_shared<db::query::events::RemoveICS>(uid);
+        auto ret    = eventsRecordInterface.runQuery(query);
+        auto result = dynamic_cast<db::query::events::RemoveICSResult *>(ret.get());
+        REQUIRE(result != nullptr);
+        REQUIRE(result->getResult());
+        REQUIRE_NOTHROW(eventsRecordInterface.GetByUID(uid));
+    };
+
+    auto EditQuery = [&](uint32_t id, EventsRecord record) {
+        auto entryToUpdate             = eventsRecordInterface.GetByID(id);
+        entryToUpdate.title            = record.title;
+        entryToUpdate.date_from        = record.date_from;
+        entryToUpdate.date_till        = record.date_till;
+        entryToUpdate.reminder         = record.reminder;
+        entryToUpdate.repeat           = record.repeat;
+        entryToUpdate.provider_type    = record.provider_type;
+        entryToUpdate.provider_id      = record.provider_id;
+        entryToUpdate.provider_iCalUid = record.provider_iCalUid;
+
+        auto query  = std::make_shared<db::query::events::Edit>(entryToUpdate);
+        auto ret    = eventsRecordInterface.runQuery(query);
+        auto result = dynamic_cast<db::query::events::EditResult *>(ret.get());
+        REQUIRE(result != nullptr);
+
+        auto entry = eventsRecordInterface.GetByID(entryToUpdate.ID);
+        record.ID  = entry.ID;
+        record.UID = entry.UID;
+        check_record(entry, record);
+    };
+
+    auto RemoveQuery = [&](uint32_t id) {
+        auto query  = std::make_shared<db::query::events::Remove>(id);
+        auto ret    = eventsRecordInterface.runQuery(query);
+        auto result = dynamic_cast<db::query::events::RemoveResult *>(ret.get());
+        REQUIRE(result != nullptr);
+        REQUIRE(result->getResult());
+        REQUIRE_NOTHROW(eventsRecordInterface.GetByID(id));
+    };
+
+    auto EditQueryICS = [&](std::string uid, EventsRecord recordUpdateData) {
+        auto entryToUpdate             = eventsRecordInterface.GetByUID(uid);
+        entryToUpdate.title            = recordUpdateData.title;
+        entryToUpdate.date_from        = recordUpdateData.date_from;
+        entryToUpdate.date_till        = recordUpdateData.date_till;
+        entryToUpdate.reminder         = recordUpdateData.reminder;
+        entryToUpdate.repeat           = recordUpdateData.repeat;
+        entryToUpdate.provider_type    = recordUpdateData.provider_type;
+        entryToUpdate.provider_id      = recordUpdateData.provider_id;
+        entryToUpdate.provider_iCalUid = recordUpdateData.provider_iCalUid;
+
+        auto query  = std::make_shared<db::query::events::EditICS>(entryToUpdate);
+        auto ret    = eventsRecordInterface.runQuery(query);
+        auto result = dynamic_cast<db::query::events::EditICSResult *>(ret.get());
+        REQUIRE(result != nullptr);
+
+        auto entry           = eventsRecordInterface.GetByID(entryToUpdate.ID);
+        recordUpdateData.ID  = entry.ID;
+        recordUpdateData.UID = entry.UID;
+        check_record(entry, recordUpdateData);
+    };
+
+    [[maybe_unused]] auto selectFirstUpcomingEvent = [&](TimePoint filter_from, TimePoint filter_till) {
+        auto query  = std::make_shared<db::query::events::SelectFirstUpcoming>(filter_from, filter_till);
+        auto ret    = eventsRecordInterface.runQuery(query);
+        auto result = dynamic_cast<db::query::events::SelectFirstUpcomingResult *>(ret.get());
+        REQUIRE(result != nullptr);
+        auto records = result->getResult();
+        return records;
+    };
+
+    SECTION("Default Constructor")
+    {
+        EventsRecord testRec;
+        REQUIRE(testRec.title == "");
+        REQUIRE(testRec.reminder == 0);
+        REQUIRE(testRec.repeat == 0);
+    }
+
+    SECTION("Constructor from EventsTableRow")
+    {
+        EventsRecord testRecord(testRow);
+        check_record(testRecord, testRow);
+    }
 
     SECTION("Get entry by ID")
     {
@@ -458,12 +635,12 @@ TEST_CASE("Events Record tests")
             expectedRecordData.date_till = TimePointFromString("2020-02-28 17:00:00");
             check_record(entries[1], expectedRecordData);
 
-            expectedRecordData.date_from = TimePointFromString("2020-02-28 15:00:00");
-            expectedRecordData.date_till = TimePointFromString("2020-02-28 17:00:00");
+            expectedRecordData.date_from = TimePointFromString("2021-02-28 15:00:00");
+            expectedRecordData.date_till = TimePointFromString("2021-02-28 17:00:00");
             check_record(entries[2], expectedRecordData);
 
-            expectedRecordData.date_from = TimePointFromString("2020-02-28 15:00:00");
-            expectedRecordData.date_till = TimePointFromString("2020-02-28 17:00:00");
+            expectedRecordData.date_from = TimePointFromString("2022-02-28 15:00:00");
+            expectedRecordData.date_till = TimePointFromString("2022-02-28 17:00:00");
             check_record(entries[3], expectedRecordData);
         }
     }
@@ -730,7 +907,7 @@ TEST_CASE("Events Record tests")
 
     SECTION("Select first upcoming event")
     {
-        calendar::TimePoint start_date = TimePointFromString("2019-10-19 14:24:00");
+        TimePoint start_date = TimePointFromString("2019-10-19 14:24:00");
         auto nextUpcoming    = eventsRecordInterface.SelectFirstUpcoming(start_date, start_date);
         REQUIRE(nextUpcoming.size() == 1);
         EventsRecord nextEventsRecord = nextUpcoming.at(0);
@@ -744,48 +921,12 @@ TEST_CASE("Events Record tests")
         REQUIRE(nextEventsRecord.ID == 2);
     }
 
-    ///====TEST QUERY====
-    auto getQuery = [&](uint32_t id, EventsRecord expected_record) {
-        auto query  = std::make_shared<db::query::events::Get>(id);
-        auto ret    = eventsRecordInterface.runQuery(query);
-        auto result = dynamic_cast<db::query::events::GetResult *>(ret.get());
-        REQUIRE(result != nullptr);
-        auto record = result->getResult();
-        check_record(record, expected_record);
-    };
-
     SECTION("Check Get via query")
     {
         getQuery(testRecord.ID, testRecord);
         getQuery(testRecord3.ID, testRecord3);
         getQuery(testRecord6.ID, testRecord6);
     }
-
-    [[maybe_unused]] auto getAll = [&](std::vector<EventsRecord> expected_records, uint32_t expectedAllRecsNumber) {
-        auto query  = std::make_shared<db::query::events::GetAll>();
-        auto ret    = eventsRecordInterface.runQuery(query);
-        auto result = dynamic_cast<db::query::events::GetAllResult *>(ret.get());
-        REQUIRE(result != nullptr);
-        auto records = result->getResult();
-        REQUIRE(records.size() == expectedAllRecsNumber);
-
-        auto expected_record = expected_records.begin();
-        std::for_each(records.begin(), records.end(), [&expected_record](const EventsRecord &record) {
-            CHECK(record.ID == expected_record->ID);
-            CHECK(record.UID == expected_record->UID);
-            CHECK(record.title == expected_record->title);
-            CHECK(TimePointToString(record.date_from) == TimePointToString(expected_record->date_from));
-            CHECK(TimePointToString(record.date_till) == TimePointToString(expected_record->date_till));
-            CHECK(record.reminder == expected_record->reminder);
-            CHECK(record.repeat == expected_record->repeat);
-            CHECK(record.reminder_fired == expected_record->reminder_fired);
-            CHECK(record.provider_type == expected_record->provider_type);
-            CHECK(record.provider_id == expected_record->provider_id);
-            CHECK(record.provider_iCalUid == expected_record->provider_iCalUid);
-            CHECK(record.isValid());
-            expected_record++;
-        });
-    };
 
     SECTION("Get All via query")
     {
@@ -799,36 +940,6 @@ TEST_CASE("Events Record tests")
         getAll(expectedRecords, numberOfEvents);
     }
 
-    auto getFiltered = [&](calendar::TimePoint filter_from,
-                           calendar::TimePoint filter_till,
-                           std::vector<EventsRecord> expected_records) {
-        auto query  = std::make_shared<db::query::events::GetFiltered>(filter_from, filter_till);
-        auto ret    = eventsRecordInterface.runQuery(query);
-        auto result = dynamic_cast<db::query::events::GetFilteredResult *>(ret.get());
-        REQUIRE(result != nullptr);
-        auto records = result->getResult();
-        REQUIRE(records.size() == expected_records.size());
-        auto count = result->getCountResult();
-        REQUIRE(count == expected_records.size());
-
-        auto expected_record = expected_records.begin();
-        std::for_each(records.begin(), records.end(), [&expected_record](const EventsRecord &record) {
-            CHECK(record.ID == expected_record->ID);
-            CHECK(record.UID == expected_record->UID);
-            CHECK(record.title == expected_record->title);
-            CHECK(TimePointToString(record.date_from) == TimePointToString(expected_record->date_from));
-            CHECK(TimePointToString(record.date_till) == TimePointToString(expected_record->date_till));
-            CHECK(record.reminder == expected_record->reminder);
-            CHECK(record.repeat == expected_record->repeat);
-            CHECK(record.reminder_fired == expected_record->reminder_fired);
-            CHECK(record.provider_type == expected_record->provider_type);
-            CHECK(record.provider_id == expected_record->provider_id);
-            CHECK(record.provider_iCalUid == expected_record->provider_iCalUid);
-            CHECK(record.isValid());
-            expected_record++;
-        });
-    };
-
     SECTION("GetFiltered via query")
     {
         auto startDate = testRecord2.date_from;
@@ -840,37 +951,6 @@ TEST_CASE("Events Record tests")
         getFiltered(startDate, endDate, expectedFilteredRecords);
     }
 
-    auto getAllLimited = [&](uint32_t offset,
-                             uint32_t limit,
-                             std::vector<EventsRecord> expected_records,
-                             uint32_t expectedAllRecsNumber) {
-        auto query  = std::make_shared<db::query::events::GetAllLimited>(offset, limit);
-        auto ret    = eventsRecordInterface.runQuery(query);
-        auto result = dynamic_cast<db::query::events::GetAllLimitedResult *>(ret.get());
-        REQUIRE(result != nullptr);
-        auto records = result->getResult();
-        REQUIRE(records.size() == limit);
-        auto count = result->getCountResult();
-        CHECK(count == expectedAllRecsNumber);
-
-        auto expected_record = expected_records.begin();
-        std::for_each(records.begin(), records.end(), [&expected_record](const EventsRecord &record) {
-            CHECK(record.ID == expected_record->ID);
-            CHECK(record.UID == expected_record->UID);
-            CHECK(record.title == expected_record->title);
-            CHECK(TimePointToString(record.date_from) == TimePointToString(expected_record->date_from));
-            CHECK(TimePointToString(record.date_till) == TimePointToString(expected_record->date_till));
-            CHECK(record.reminder == expected_record->reminder);
-            CHECK(record.repeat == expected_record->repeat);
-            CHECK(record.reminder_fired == expected_record->reminder_fired);
-            CHECK(record.provider_type == expected_record->provider_type);
-            CHECK(record.provider_id == expected_record->provider_id);
-            CHECK(record.provider_iCalUid == expected_record->provider_iCalUid);
-            CHECK(record.isValid());
-            expected_record++;
-        });
-    };
-
     SECTION("Get All Limited via query")
     {
         std::vector<EventsRecord> expectedRecords;
@@ -881,17 +961,6 @@ TEST_CASE("Events Record tests")
         uint32_t limit = 4;
         getAllLimited(testRecord2.ID - 1, limit, expectedRecords, numberOfEvents);
     }
-
-    auto AddQuery = [&](EventsRecord record) {
-        auto query  = std::make_shared<db::query::events::Add>(record);
-        auto ret    = eventsRecordInterface.runQuery(query);
-        auto result = dynamic_cast<db::query::events::AddResult *>(ret.get());
-        REQUIRE(result != nullptr);
-        REQUIRE(result->getResult());
-
-        auto entry = eventsRecordInterface.GetByID(record.ID);
-        check_record(entry, record);
-    };
 
     SECTION("Add via query")
     {
@@ -911,15 +980,6 @@ TEST_CASE("Events Record tests")
         AddQuery(testRecord7);
     }
 
-    auto RemoveQuery = [&](uint32_t id) {
-        auto query  = std::make_shared<db::query::events::Remove>(id);
-        auto ret    = eventsRecordInterface.runQuery(query);
-        auto result = dynamic_cast<db::query::events::RemoveResult *>(ret.get());
-        REQUIRE(result != nullptr);
-        REQUIRE(result->getResult());
-        REQUIRE_NOTHROW(eventsRecordInterface.GetByID(id));
-    };
-
     SECTION("Remove via query")
     {
         RemoveQuery(testRecord2.ID);
@@ -932,15 +992,6 @@ TEST_CASE("Events Record tests")
         expectedRecords.push_back(testRecord6);
         getAll(expectedRecords, numberOfEvents - 1);
     }
-
-    auto RemoveQueryICS = [&](std::string uid) {
-        auto query  = std::make_shared<db::query::events::RemoveICS>(uid);
-        auto ret    = eventsRecordInterface.runQuery(query);
-        auto result = dynamic_cast<db::query::events::RemoveICSResult *>(ret.get());
-        REQUIRE(result != nullptr);
-        REQUIRE(result->getResult());
-        REQUIRE_NOTHROW(eventsRecordInterface.GetByUID(uid));
-    };
 
     SECTION("RemoveICS via query")
     {
@@ -955,28 +1006,6 @@ TEST_CASE("Events Record tests")
         getAll(expectedRecords, numberOfEvents - 1);
     }
 
-    auto EditQuery = [&](uint32_t id, EventsRecord record) {
-        auto entryToUpdate             = eventsRecordInterface.GetByID(id);
-        entryToUpdate.title            = record.title;
-        entryToUpdate.date_from        = record.date_from;
-        entryToUpdate.date_till        = record.date_till;
-        entryToUpdate.reminder         = record.reminder;
-        entryToUpdate.repeat           = record.repeat;
-        entryToUpdate.provider_type    = record.provider_type;
-        entryToUpdate.provider_id      = record.provider_id;
-        entryToUpdate.provider_iCalUid = record.provider_iCalUid;
-
-        auto query  = std::make_shared<db::query::events::Edit>(entryToUpdate);
-        auto ret    = eventsRecordInterface.runQuery(query);
-        auto result = dynamic_cast<db::query::events::EditResult *>(ret.get());
-        REQUIRE(result != nullptr);
-
-        auto entry = eventsRecordInterface.GetByID(entryToUpdate.ID);
-        record.ID  = entry.ID;
-        record.UID = entry.UID;
-        check_record(entry, record);
-    };
-
     SECTION("Update via query")
     {
         EditQuery(testRecord.ID, testRecord);
@@ -984,44 +1013,12 @@ TEST_CASE("Events Record tests")
         EditQuery(testRecord6.ID, testRecord6);
     }
 
-    auto EditQueryICS = [&](std::string uid, EventsRecord recordUpdateData) {
-        auto entryToUpdate             = eventsRecordInterface.GetByUID(uid);
-        entryToUpdate.title            = recordUpdateData.title;
-        entryToUpdate.date_from        = recordUpdateData.date_from;
-        entryToUpdate.date_till        = recordUpdateData.date_till;
-        entryToUpdate.reminder         = recordUpdateData.reminder;
-        entryToUpdate.repeat           = recordUpdateData.repeat;
-        entryToUpdate.provider_type    = recordUpdateData.provider_type;
-        entryToUpdate.provider_id      = recordUpdateData.provider_id;
-        entryToUpdate.provider_iCalUid = recordUpdateData.provider_iCalUid;
-
-        auto query  = std::make_shared<db::query::events::EditICS>(entryToUpdate);
-        auto ret    = eventsRecordInterface.runQuery(query);
-        auto result = dynamic_cast<db::query::events::EditICSResult *>(ret.get());
-        REQUIRE(result != nullptr);
-
-        auto entry           = eventsRecordInterface.GetByID(entryToUpdate.ID);
-        recordUpdateData.ID  = entry.ID;
-        recordUpdateData.UID = entry.UID;
-        check_record(entry, recordUpdateData);
-    };
-
     SECTION("Update ICS via query")
     {
         EditQueryICS(testRecord.UID, testRecord);
         EditQueryICS(testRecord3.UID, testRecord3);
         EditQueryICS(testRecord6.UID, testRecord6);
     }
-
-    [[maybe_unused]] auto selectFirstUpcomingEvent = [&](calendar::TimePoint filter_from,
-                                                         calendar::TimePoint filter_till) {
-        auto query  = std::make_shared<db::query::events::SelectFirstUpcoming>(filter_from, filter_till);
-        auto ret    = eventsRecordInterface.runQuery(query);
-        auto result = dynamic_cast<db::query::events::SelectFirstUpcomingResult *>(ret.get());
-        REQUIRE(result != nullptr);
-        auto records = result->getResult();
-        return records;
-    };
 
     SECTION("Select first upcoming via query")
     {

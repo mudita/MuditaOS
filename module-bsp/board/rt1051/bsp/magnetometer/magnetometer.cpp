@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "bsp/magnetometer/magnetometer.hpp"
@@ -18,7 +18,7 @@ using namespace utils;
 
 static std::shared_ptr<drivers::DriverI2C> i2c;
 
-static I2CAddress addr = {.deviceAddress = als31300::I2C_ADDRESS, .subAddressSize = 1};
+static I2CAddress addr = {.deviceAddress = als31300::I2C_ADDRESS, .subAddress = 0, .subAddressSize = 1};
 
 union i2c_buf_t
 {
@@ -34,6 +34,27 @@ namespace bsp
 {
     namespace magnetometer
     {
+        enum class LPDCM_INACTIVE_TIME
+        {
+            inactive_500us,
+            inactive_1ms,
+            inactive_5ms,
+            inactive_10ms,
+            inactive_50ms,
+            inactive_100ms,
+            inactive_500ms,
+            inactive_1s
+        };
+
+        enum class BANDWIDTH_SELECT
+        {
+            bandwidth_3500Hz = 0,
+            bandwidth_7kHz   = 1,
+            bandwidth_14kHz  = 2,
+            bandwidth_10kHz  = 4,
+            bandwidth_20kHz  = 5,
+            bandwidth_40kHz  = 6
+        };
         namespace
         {
             bool isTimeToCompleteWriteDefinedForRegistry(std::uint8_t address)
@@ -118,9 +139,10 @@ namespace bsp
             reg_conf.channel_X_en       = als31300::CONF_REG_CHANNEL_enabled;
             reg_conf.channel_Y_en       = als31300::CONF_REG_CHANNEL_enabled;
             reg_conf.channel_Z_en       = als31300::CONF_REG_CHANNEL_disabled;
-            reg_conf.bandwidth          = 1; // longest unit measurement
+            reg_conf.bandwidth          = static_cast<uint8_t>(BANDWIDTH_SELECT::bandwidth_7kHz);
             if (current_reg_conf != reg_conf) {
-                assert(i2cWrite(als31300::CONF_REG, reg_conf));
+                [[maybe_unused]] auto ret = i2cWrite(als31300::CONF_REG, reg_conf);
+                assert(ret);
                 LOG_DEBUG("CONF wrote:\t%" PRIu32, static_cast<uint32_t>(reg_conf));
 
                 i2cRead(als31300::CONF_REG, read_reg);
@@ -145,7 +167,8 @@ namespace bsp
             reg_int.int_Y_threshold      = 4;
             reg_int.int_Z_threshold      = 0;
             if (current_reg_int != reg_int) {
-                assert(i2cWrite(als31300::INT_REG, reg_int));
+                [[maybe_unused]] auto ret = i2cWrite(als31300::INT_REG, reg_int);
+                assert(ret);
                 LOG_DEBUG("INT wrote:\t%" PRIu32, static_cast<uint32_t>(reg_int));
 
                 i2cRead(als31300::INT_REG, read_reg);
@@ -161,9 +184,10 @@ namespace bsp
 
             // INTERRUPT PIN
             gpio->ClearPortInterrupts(1 << static_cast<uint32_t>(BoardDefinitions::MAGNETOMETER_IRQ));
-            gpio->ConfPin(DriverGPIOPinParams{.dir     = DriverGPIOPinParams::Direction::Input,
-                                              .irqMode = DriverGPIOPinParams::InterruptMode::IntFallingEdge,
-                                              .pin     = static_cast<uint32_t>(BoardDefinitions::MAGNETOMETER_IRQ)});
+            gpio->ConfPin(DriverGPIOPinParams{.dir      = DriverGPIOPinParams::Direction::Input,
+                                              .irqMode  = DriverGPIOPinParams::InterruptMode::IntFallingEdge,
+                                              .defLogic = 0,
+                                              .pin      = static_cast<uint32_t>(BoardDefinitions::MAGNETOMETER_IRQ)});
             // NOTE: irq not yet enabled
             // this version uses timer to poll the sensor
             // the timer requests to read the magnetometer periodically
@@ -183,7 +207,7 @@ namespace bsp
             als31300::pwr_reg reg_pwr = current_reg_pwr;
             reg_pwr.I2C_loop_mode     = als31300::PWR_REG_LOOP_MODE_single; // we don't want constant data flow
             reg_pwr.sleep             = als31300::PWR_REG_SLEEP_MODE_active;
-            reg_pwr.count_max_LP_mode = 3U; // get an update every 6 - 500, 7 - 1000 ms
+            reg_pwr.count_max_LP_mode = static_cast<uint8_t>(LPDCM_INACTIVE_TIME::inactive_10ms);
 
             i2cWrite(als31300::PWR_REG, reg_pwr);
             LOG_DEBUG("POWER wrote:\t%" PRIu32, static_cast<uint32_t>(reg_pwr));
@@ -259,10 +283,7 @@ namespace bsp
             addr.subAddress = 0x00;
             auto read       = i2c->Read(addr, &buf, 1);
 
-            if (read != 1) {
-                return false;
-            }
-            return true;
+            return read == 1;
         }
 
         bsp::KeyCodes parse(const Measurements &measurements)
@@ -296,6 +317,10 @@ namespace bsp
             }
             return bsp::KeyCodes::Undefined;
         }
+        void resetCurrentParsedValue()
+        {
+            current_parsed = bsp::KeyCodes::Undefined;
+        }
 
         std::optional<bsp::KeyCodes> WorkerEventHandler()
         {
@@ -303,7 +328,7 @@ namespace bsp
             setActive(als31300::PWR_REG_SLEEP_MODE::active);
             auto [new_data, measurement] = getMeasurement();
             setActive(als31300::PWR_REG_SLEEP_MODE::sleep);
-            if (new_data == true) {
+            if (new_data) {
                 auto incoming_parsed = parse(measurement);
                 if (incoming_parsed != bsp::KeyCodes::Undefined and incoming_parsed != current_parsed) {
                     current_parsed = incoming_parsed;

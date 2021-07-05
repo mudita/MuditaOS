@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmItem.hpp"
@@ -6,7 +6,7 @@
 #include "application-alarm-clock/data/AlarmsData.hpp"
 #include "application-calendar/data/dateCommon.hpp"
 #include <InputEvent.hpp>
-#include <module-utils/time/time_conversion.hpp>
+#include <time/time_conversion.hpp>
 
 namespace gui
 {
@@ -43,27 +43,24 @@ namespace gui
         onOffImage->setMargins(gui::Margins(style::alarmClock::window::item::imageMargin, 0, 0, 0));
 
         setAlarm();
-    }
 
-    bool AlarmItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
-    {
-        hBox->setPosition(0, 0);
-        hBox->setSize(newDim.w, newDim.h);
-        return true;
+        dimensionChangedCallback = [&](gui::Item &, const BoundingBox &newDim) -> bool {
+            hBox->setArea({0, 0, newDim.w, newDim.h});
+            return true;
+        };
     }
 
     void AlarmItem::setAlarm()
     {
-        timeLabel->setText(TimePointToLocalizedTimeString(
-            alarm->time, utils::time::Locale::format(utils::time::Locale::FormatTime12H)));
+        timeLabel->setText(TimePointToLocalizedTimeString(alarm->time));
         if (alarm->status == AlarmStatus::Off) {
             onOffImage->switchState(ButtonState::Off);
         }
         if (alarm->repeat == static_cast<uint32_t>(AlarmRepeat::everyday)) {
-            periodLabel->setText(utils::localize.get("app_alarm_clock_repeat_everyday"));
+            periodLabel->setText(utils::translate("app_alarm_clock_repeat_everyday"));
         }
         else if (alarm->repeat == static_cast<uint32_t>(AlarmRepeat::weekDays)) {
-            periodLabel->setText(utils::localize.get("app_alarm_clock_repeat_week_days"));
+            periodLabel->setText(utils::translate("app_alarm_clock_repeat_week_days"));
         }
         else if (alarm->repeat != static_cast<uint32_t>(AlarmRepeat::never)) {
             periodLabel->setText(CustomRepeatValueParser(alarm->repeat).getWeekDaysText());

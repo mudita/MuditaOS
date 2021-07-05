@@ -1,13 +1,13 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "../core/DrawCommand.hpp"
-#include "../core/PixMap.hpp"
-#include "BoundingBox.hpp"
 #include "Image.hpp"
+#include "DrawCommand.hpp"
+#include "BoundingBox.hpp"
+#include "ImageManager.hpp"
 
-#include "../core/ImageManager.hpp"
-#include "utf8/UTF8.hpp"
+#include <utf8/UTF8.hpp>
+#include <log.hpp>
 
 namespace gui
 {
@@ -25,6 +25,12 @@ namespace gui
         setPosition(x, y);
     }
 
+    Image::Image(Item *parent, const UTF8 &imageName) : Rect(parent, 0, 0, 0, 0), imageMap{nullptr}
+    {
+        type = ItemType::IMAGE;
+        set(imageName);
+    }
+
     Image::Image(const UTF8 &imageName) : imageMap{nullptr}
     {
         type = ItemType::IMAGE;
@@ -33,7 +39,13 @@ namespace gui
 
     bool Image::set(int id)
     {
-        imageMap = ImageManager::getInstance().getImageMap(id);
+        auto map = ImageManager::getInstance().getImageMap(id);
+        if (map == nullptr) {
+            LOG_ERROR("Unable to get an image map for id: %d", id);
+            return false;
+        }
+
+        imageMap = map;
         auto w   = imageMap->getWidth();
         auto h   = imageMap->getHeight();
         setMinimumWidth(w);
@@ -44,26 +56,29 @@ namespace gui
 
     void Image::set(const UTF8 &name)
     {
-        if (name.length()) {
-            int id = ImageManager::getInstance().getImageMapID(name.c_str());
-            set(id);
+        if (name.empty()) {
+            return;
         }
+
+        const auto id = ImageManager::getInstance().getImageMapID(name);
+        set(id);
     }
 
     void Image::buildDrawListImplementation(std::list<Command> &commands)
     {
-        auto img = std::make_unique<CommandImage>();
-        // image
-        img->x = drawArea.x;
-        img->y = drawArea.y;
-        img->w = drawArea.w;
-        img->h = drawArea.h;
-        // cmd part
-        img->areaX = img->x;
-        img->areaY = img->y;
-        img->areaW = img->w;
-        img->areaH = img->h;
+        if (imageMap == nullptr) {
+            LOG_ERROR("Unable to draw the image: ImageMap does not exist.");
+            return;
+        }
 
+        auto img = std::make_unique<DrawImage>();
+        // image
+        img->origin = {drawArea.x, drawArea.y};
+        // cmd part
+        img->areaX = img->origin.x;
+        img->areaY = img->origin.y;
+        img->areaW = drawArea.w;
+        img->areaH = drawArea.h;
         img->imageID = this->imageMap->getID();
 
         commands.emplace_back(std::move(img));

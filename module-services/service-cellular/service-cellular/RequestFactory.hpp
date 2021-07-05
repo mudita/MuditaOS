@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -8,7 +8,11 @@
 #include <map>
 #include <functional>
 
+#include <modem/mux/DLCChannel.h>
+
 #include "requests/CallRequest.hpp"
+#include "service-appmgr/Actions.hpp"
+#include "CellularMessage.hpp"
 
 namespace cellular
 {
@@ -17,12 +21,21 @@ namespace cellular
     class RequestFactory
     {
       public:
-        RequestFactory(const std::string &data);
+        RequestFactory(const std::string &data,
+                       at::BaseChannel &channel,
+                       cellular::api::CallMode callMode,
+                       bool simInserted);
         std::unique_ptr<IRequest> create();
 
       private:
+        void registerRequest(std::string regex, CreateCallback);
+        std::unique_ptr<IRequest> emergencyCheck();
+
         std::string request;
         std::vector<std::pair<std::string, CreateCallback>> requestMap;
-        void registerRequest(std::string regex, CreateCallback);
+
+        at::BaseChannel &channel;
+        const cellular::api::CallMode callMode;
+        const bool simInserted;
     };
 } // namespace cellular

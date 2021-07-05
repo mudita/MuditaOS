@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -25,6 +25,7 @@ namespace app
       public:
         ApplicationCalendar(std::string name,
                             std::string parent,
+                            sys::phone_modes::PhoneMode mode    = sys::phone_modes::PhoneMode::Connected,
                             StartInBackground startInBackground = {false},
                             uint32_t stackDepth                 = 8192,
                             sys::ServicePriority priority       = sys::ServicePriority::Idle);
@@ -55,8 +56,7 @@ namespace app
         }
         void createUserInterface() override;
         void destroyUserInterface() override;
-        void switchToNoEventsWindow(const std::string &title              = "",
-                                    const calendar::TimePoint &dateFilter = calendar::TimePoint());
+        void switchToNoEventsWindow(const std::string &title = "", const TimePoint &dateFilter = TimePoint());
 
         static const std::map<Reminder, const char *> reminderOptions;
         static const std::map<Repeat, const char *> repeatOptions;
@@ -66,7 +66,7 @@ namespace app
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {
-            return {{manager::actions::Launch, manager::actions::ShowReminder}};
+            return {{manager::actions::Launch, manager::actions::ShowReminder, manager::actions::PhoneModeChanged}};
         }
     };
 } /* namespace app */

@@ -1,3 +1,6 @@
+-- Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+-- For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 INSERT OR REPLACE INTO contact_group_protected
     (_id, group_id)
 VALUES (1, 1),

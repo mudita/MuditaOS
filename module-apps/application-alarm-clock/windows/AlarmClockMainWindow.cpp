@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmClockMainWindow.hpp"
@@ -7,8 +7,7 @@
 #include "windows/DialogMetadata.hpp"
 #include "messages/DialogMetadataMessage.hpp"
 #include <InputEvent.hpp>
-#include <gui/widgets/BottomBar.hpp>
-#include <gui/widgets/TopBar.hpp>
+#include <header/AddElementAction.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <module-services/service-db/service-db/DBNotificationMessage.hpp>
 
@@ -33,35 +32,34 @@ namespace app::alarmClock
         AppWindow::buildInterface();
 
         bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
-        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get(style::strings::common::Switch));
-        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::localize.get(style::strings::common::options));
+        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(style::strings::common::Switch));
+        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::translate(style::strings::common::options));
 
-        setTitle(utils::localize.get("app_alarm_clock_title_main"));
-        leftArrowImage = new gui::Image(
-            this, style::alarmClock::window::arrow_x, style::alarmClock::window::arrow_y, 0, 0, "arrow_left");
-        plusSignImage =
-            new gui::Image(this, style::alarmClock::window::cross_x, style::alarmClock::window::cross_y, 0, 0, "cross");
+        setTitle(utils::translate("app_alarm_clock_title_main"));
+        header->navigationIndicatorAdd(new gui::header::AddElementAction(), gui::header::BoxSelection::Left);
 
         alarmsList                       = new gui::ListView(this,
                                        style::alarmClock::window::listView_x,
                                        style::alarmClock::window::listView_y,
                                        style::alarmClock::window::listView_w,
                                        style::alarmClock::window::listView_h,
-                                       presenter->getAlarmsItemProvider());
+                                       presenter->getAlarmsItemProvider(),
+                                       gui::listview::ScrollBarType::Fixed);
         alarmsList->focusChangedCallback = [this](gui::Item &) {
             onListFilled();
             return true;
         };
         alarmsList->rebuildList();
 
-        emptyListIcon                       = new gui::Icon(this,
-                                      0,
-                                      style::header::height,
-                                      style::window_width,
-                                      style::window_height - ::style::header::height - ::style::footer::height,
-                                      "phonebook_empty_grey_circle_W_G",
-                                      utils::localize.get("app_alarm_clock_no_alarms_information"));
+        emptyListIcon =
+            new gui::Icon(this,
+                          0,
+                          style::window::default_vertical_pos,
+                          style::window_width,
+                          style::window_height - ::style::window::default_vertical_pos - ::style::footer::height,
+                          "phonebook_empty_grey_circle_W_G",
+                          utils::translate("app_alarm_clock_no_alarms_information"));
         emptyListIcon->focusChangedCallback = [this](gui::Item &) {
             onEmptyList();
             return true;
@@ -74,10 +72,8 @@ namespace app::alarmClock
     void AlarmClockMainWindow::destroyInterface()
     {
         erase();
-        alarmsList     = nullptr;
-        leftArrowImage = nullptr;
-        plusSignImage  = nullptr;
-        emptyListIcon  = nullptr;
+        alarmsList    = nullptr;
+        emptyListIcon = nullptr;
     }
 
     void AlarmClockMainWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
@@ -96,7 +92,7 @@ namespace app::alarmClock
             return true;
         }
 
-        if (inputEvent.isShortPress() && inputEvent.is(gui::KeyCode::KEY_LEFT)) {
+        if (inputEvent.isShortRelease(gui::KeyCode::KEY_LEFT)) {
             auto rec                              = new AlarmsRecord();
             rec->time                             = TimePointNow();
             auto event                            = std::make_shared<AlarmsRecord>(*rec);
@@ -114,7 +110,7 @@ namespace app::alarmClock
         auto *msgNotification = dynamic_cast<db::NotificationMessage *>(msgl);
         if (msgNotification != nullptr && msgNotification->interface == db::Interface::Name::Alarms) {
             if (msgNotification->dataModified()) {
-                alarmsList->rebuildList(style::listview::RebuildType::InPlace);
+                alarmsList->rebuildList(gui::listview::RebuildType::InPlace);
             }
             if (presenter->isAlarmsListEmpty()) {
                 showEmptyIcon();

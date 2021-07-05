@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DesktopInputWidget.hpp"
@@ -75,19 +75,15 @@ namespace gui
         replyImage->setAlignment(Alignment(gui::Alignment::Vertical::Center));
         replyImage->setMargins(Margins(0, 0, 0, 0));
         replyImage->activeItem = false;
+
+        dimensionChangedCallback = [&](gui::Item &, const BoundingBox &newDim) -> bool {
+            body->setArea({0, 0, newDim.w, newDim.h});
+            return true;
+        };
     }
 
-    auto DesktopInputWidget::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool
-    {
-        body->setPosition(0, 0);
-        body->setSize(newDim.w, newDim.h);
-
-        return true;
-    }
-
-    auto DesktopInputWidget::handleRequestResize([[maybe_unused]] const Item *child,
-                                                 unsigned short request_w,
-                                                 unsigned short request_h) -> Size
+    auto DesktopInputWidget::handleRequestResize([[maybe_unused]] const Item *child, Length request_w, Length request_h)
+        -> Size
     {
         request_h = std::clamp(
             static_cast<Length>(request_h), style::desktop::inputWidget::min_h, style::desktop::inputWidget::max_h);

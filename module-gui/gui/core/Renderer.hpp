@@ -5,7 +5,7 @@
 
 #include <list>
 
-#include <module-utils/math/Math.hpp>
+#include <Math.hpp>
 
 #include "DrawCommand.hpp"
 #include "Context.hpp"
@@ -32,25 +32,12 @@ namespace gui
          * 3
          *
          */
-      protected:
-        void drawLine(Context *ctx, CommandLine *cmd);
-
-        void drawRectangle(Context *ctx, CommandRectangle *cmd);
-
-        void drawArc(Context *ctx, CommandArc *cmd);
-
-        void drawCircle(Context *ctx, CommandCircle *cmd);
-
-        void drawText(Context *ctx, CommandText *cmd);
-
-        void drawChar(Context *context, const int16_t x, const int16_t y, FontGlyph *glyph, const Color color);
-
-        void drawImage(Context *ctx, CommandImage *cmd);
 
       public:
         virtual ~Renderer() = default;
 
         void render(Context *ctx, std::list<std::unique_ptr<DrawCommand>> &commands);
+        void changeColorScheme(const std::unique_ptr<ColorScheme> &scheme);
     };
 
 } /* namespace gui */

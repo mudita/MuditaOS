@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -12,30 +12,32 @@
 
 class PhonebookItemData : public gui::SwitchData
 {
+    std::string text;
+    std::shared_ptr<ContactRecord> contact = nullptr;
+
   public:
-    PhonebookItemData(std::shared_ptr<ContactRecord> contact, const std::string &text = "")
-        : text(text), contact(contact){};
-    virtual ~PhonebookItemData(){};
-    std::shared_ptr<ContactRecord> getContact()
+    PhonebookItemData() = default;
+    explicit PhonebookItemData(std::shared_ptr<ContactRecord> contact, const std::string &text = "")
+        : text(text), contact(std::move(contact)){};
+
+    std::shared_ptr<ContactRecord> getContact() const
     {
         return contact;
     }
 
-  public:
-    PhonebookItemData() : contact(nullptr)
-    {}
-    std::string text;
-    std::shared_ptr<ContactRecord> contact = nullptr;
+    const std::string &getText() const noexcept
+    {
+        return text;
+    }
 };
 
 class PhonebookSearchQuery : public gui::SwitchData
 {
   public:
-    PhonebookSearchQuery(std::string _searchQuery) : searchQuery(_searchQuery){};
-    virtual ~PhonebookSearchQuery(){};
-    std::string getQuery()
+    explicit PhonebookSearchQuery(std::string searchQuery) : searchQuery(std::move(searchQuery)){};
+    const std::string &getQuery() const noexcept
     {
-        return (searchQuery);
+        return searchQuery;
     }
 
   protected:
@@ -47,7 +49,6 @@ class PhonebookSearchResultsData : public gui::SwitchData
   public:
     PhonebookSearchResultsData() = delete;
     PhonebookSearchResultsData(std::unique_ptr<PhonebookModel> model) : model(std::move(model)){};
-    virtual ~PhonebookSearchResultsData(){};
 
     std::unique_ptr<PhonebookModel> consumeSearchResultsModel()
     {
@@ -61,14 +62,14 @@ class PhonebookSearchResultsData : public gui::SwitchData
     bool consumed = false;
 };
 
-class PhonebookSearchReuqest : public gui::SwitchData
+class PhonebookSearchRequest : public gui::SwitchData
 {
   public:
     std::string request                                 = "";
     std::shared_ptr<std::vector<ContactRecord>> results = nullptr;
-    PhonebookSearchReuqest(std::string request, std::shared_ptr<std::vector<ContactRecord>> results)
-        : request(request), results(results)
+    PhonebookSearchRequest(std::string request, std::shared_ptr<std::vector<ContactRecord>> results)
+        : request(std::move(request)), results(std::move(results))
     {}
-    PhonebookSearchReuqest()              = default;
+    PhonebookSearchRequest()              = default;
     std::shared_ptr<ContactRecord> result = nullptr;
 };

@@ -14,9 +14,6 @@ set(BOARD_SOURCES
 
         "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/lpm/LinuxLPM.cpp"
 
-        "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/audio/linux_audiocodec.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/audio/LinuxCellularAudio.cpp"
-
         "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/bluetooth/Bluetooth.cpp"
 
         "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/usb_cdc/usb_cdc.cpp"
@@ -33,7 +30,11 @@ set(BOARD_SOURCES
 
         "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/light_sensor/light_sensor.cpp"
 
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/watchdog/software_watchdog.cpp"
+
         "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/watchdog/watchdog.cpp"
+
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/eeprom/eeprom.cpp"
 
         CACHE INTERNAL "")
 

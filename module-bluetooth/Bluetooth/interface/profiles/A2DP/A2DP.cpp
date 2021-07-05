@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 //
@@ -11,19 +11,23 @@
 #include "AVRCP.hpp"
 #include <Bluetooth/Device.hpp>
 #include <Bluetooth/Error.hpp>
-#include <log/log.hpp>
-#include <Service/Bus.hpp>
+#include <log.hpp>
 #include <service-bluetooth/BluetoothMessage.hpp>
 #include <Audio/AudioCommon.hpp>
 #include <service-audio/AudioMessage.hpp>
 #include <service-evtmgr/Constants.hpp>
+#include "service-bluetooth/messages/Connect.hpp"
+#include "service-bluetooth/messages/Disconnect.hpp"
+#include "service-bluetooth/Constants.hpp"
+#include <audio/BluetoothAudioDevice.hpp>
+
 extern "C"
 {
 #include "module-bluetooth/lib/btstack/src/btstack.h"
 #include <btstack_defines.h>
 }
 
-namespace Bt
+namespace bluetooth
 {
     A2DP::A2DP() : pimpl(std::make_unique<A2DPImpl>(A2DPImpl()))
     {}
@@ -70,19 +74,45 @@ namespace Bt
         pimpl->setOwnerService(service);
     }
 
-    auto A2DP::getStreamData() -> std::shared_ptr<BluetoothStreamData>
-    {
-        return pimpl->getStreamData();
-    }
-
     void A2DP::connect()
     {
-        pimpl->start();
+        pimpl->connect();
     }
 
     void A2DP::disconnect()
     {
+        pimpl->disconnect();
+    }
+
+    void A2DP::start()
+    {
+        pimpl->start();
+    }
+
+    void A2DP::stop()
+    {
         pimpl->stop();
+    }
+
+    auto A2DP::startRinging() const noexcept -> Error::Code
+    {
+        LOG_ERROR("Can't ring in A2DP profile");
+        return Error::SystemError;
+    }
+
+    auto A2DP::stopRinging() const noexcept -> Error::Code
+    {
+        return Error::SystemError;
+    }
+
+    auto A2DP::initializeCall() const noexcept -> Error::Code
+    {
+        return Error::SystemError;
+    }
+
+    void A2DP::setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice)
+    {
+        pimpl->setAudioDevice(std::move(audioDevice));
     }
 
     const sys::Service *A2DP::A2DPImpl::ownerService;
@@ -97,7 +127,9 @@ namespace Bt
         0xFF, //(AVDTP_SBC_BLOCK_LENGTH_16 << 4) | (AVDTP_SBC_SUBBANDS_8 << 2) | AVDTP_SBC_ALLOCATION_METHOD_LOUDNESS,
         2,
         53};
+    std::shared_ptr<BluetoothAudioDevice> A2DP::A2DPImpl::audioDevice;
 
+    bool A2DP::A2DPImpl::isConnected = false;
     /* LISTING_START(MainConfiguration): Setup Audio Source and AVRCP Target services */
 
     auto A2DP::A2DPImpl::init() -> Error::Code
@@ -105,7 +137,7 @@ namespace Bt
         // request role change on reconnecting headset to always use them in slave mode
         hci_set_master_slave_policy(0);
 
-        l2cap_init();
+        Profile::initL2cap();
         // Initialize  A2DP Source.
         a2dp_source_init();
         a2dp_source_register_packet_handler(&sourcePacketHandler);
@@ -120,20 +152,24 @@ namespace Bt
                                                AVDTP::sbcCodecConfiguration.size());
         if (local_stream_endpoint == nullptr) {
             LOG_INFO("A2DP Source: not enough memory to create local stream endpoint\n");
-            return Bt::Error::SystemError;
+            return bluetooth::Error::SystemError;
         }
         AVRCP::mediaTracker.local_seid = avdtp_local_seid(local_stream_endpoint);
         avdtp_source_register_delay_reporting_category(AVRCP::mediaTracker.local_seid);
 
-        AVRCP::init();
-        // Initialize SDP,
-        sdp_init();
+        AVRCP::init(const_cast<sys::Service *>(ownerService));
+
+        // Initialize SDP
+        Profile::initSdp();
 
         // Create  A2DP Source service record and register it with SDP.
         sdpSourceServiceBuffer.fill(0);
+        constexpr uint32_t a2dpSdpRecordHandle = 0x10001;
         a2dp_source_create_sdp_record(
-            sdpSourceServiceBuffer.data(), 0x10001, AVDTP_SOURCE_FEATURE_MASK_PLAYER, nullptr, nullptr);
-        sdp_register_service(sdpSourceServiceBuffer.data());
+            sdpSourceServiceBuffer.data(), a2dpSdpRecordHandle, AVDTP_SOURCE_FEATURE_MASK_PLAYER, nullptr, nullptr);
+        if (const auto status = sdp_register_service(sdpSourceServiceBuffer.data()); status != ERROR_CODE_SUCCESS) {
+            LOG_ERROR("Can't register service. Status %x", status);
+        }
 
         // Create AVRCP target service record and register it with SDP.
         AVRCP::sdpTargetServiceBuffer.fill(0);
@@ -141,22 +177,31 @@ namespace Bt
 #ifdef AVRCP_BROWSING_ENABLED
         supported_features |= AVRCP_FEATURE_MASK_BROWSING;
 #endif
+        constexpr uint32_t avrcpServiceSdpRecordHandle = 0x10002;
         avrcp_target_create_sdp_record(
-            AVRCP::sdpTargetServiceBuffer.data(), 0x10002, supportedFeatures, nullptr, nullptr);
-        sdp_register_service(AVRCP::sdpTargetServiceBuffer.data());
+            AVRCP::sdpTargetServiceBuffer.data(), avrcpServiceSdpRecordHandle, supportedFeatures, nullptr, nullptr);
+        if (const auto status = sdp_register_service(AVRCP::sdpTargetServiceBuffer.data());
+            status != ERROR_CODE_SUCCESS) {
+            LOG_ERROR("Can't register service. Status %x", status);
+        }
 
         // setup AVRCP Controller
         AVRCP::sdpControllerServiceBuffer.fill(0);
-        uint16_t controllerSupportedFeatures = AVRCP_FEATURE_MASK_CATEGORY_PLAYER_OR_RECORDER;
-        avrcp_controller_create_sdp_record(
-            AVRCP::sdpControllerServiceBuffer.data(), 0x10003, controllerSupportedFeatures, nullptr, nullptr);
-        sdp_register_service(AVRCP::sdpControllerServiceBuffer.data());
+        uint16_t controllerSupportedFeatures              = AVRCP_FEATURE_MASK_CATEGORY_PLAYER_OR_RECORDER;
+        constexpr uint32_t avrcpControllerSdpRecordHandle = 0x10003;
+        avrcp_controller_create_sdp_record(AVRCP::sdpControllerServiceBuffer.data(),
+                                           avrcpControllerSdpRecordHandle,
+                                           controllerSupportedFeatures,
+                                           nullptr,
+                                           nullptr);
+        if (const auto status = sdp_register_service(AVRCP::sdpControllerServiceBuffer.data());
+            status != ERROR_CODE_SUCCESS) {
+            LOG_ERROR("Can't register service. Status %x", status);
+        }
 
         // Set local name with a template Bluetooth address, that will be automatically
         // replaced with a actual address once it is available, i.e. when BTstack boots
         // up and starts talking to a Bluetooth module.
-        gap_set_local_name("PurePhone");
-        gap_discoverable_control(1);
         gap_set_class_of_device(0x200408);
 
         // Register for HCI events.
@@ -165,7 +210,7 @@ namespace Bt
 
         LOG_INFO("Init done!");
 
-        return Bt::Error::Success;
+        return bluetooth::Error::Success;
     }
 
     void A2DP::A2DPImpl::sendMediaPacket()
@@ -181,40 +226,6 @@ namespace Bt
                                               0);
         AVRCP::mediaTracker.sbc_storage_count = 0;
         AVRCP::mediaTracker.sbc_ready_to_send = 0;
-    }
-
-    auto A2DP::A2DPImpl::fillSbcAudioBuffer(MediaContext *context) -> int
-    {
-        // perform sbc encodin
-        int totalNumBytesRead                    = 0;
-        unsigned int numAudioSamplesPerSbcBuffer = btstack_sbc_encoder_num_audio_frames();
-        while (context->samples_ready >= numAudioSamplesPerSbcBuffer &&
-               (context->max_media_payload_size - context->sbc_storage_count) >=
-                   btstack_sbc_encoder_sbc_buffer_length()) {
-
-            AudioData_t audioData;
-
-            if (sourceQueue != nullptr) {
-                if (xQueueReceive(sourceQueue, &audioData, 10) != pdPASS) {
-                    audioData.data.fill(0);
-                }
-            }
-            else {
-                audioData.data.fill(0);
-                LOG_ERROR("queue is nullptr!");
-            }
-
-            btstack_sbc_encoder_process_data(audioData.data.data());
-
-            uint16_t sbcFrameSize = btstack_sbc_encoder_sbc_buffer_length();
-            uint8_t *sbcFrame     = btstack_sbc_encoder_sbc_buffer();
-
-            totalNumBytesRead += numAudioSamplesPerSbcBuffer;
-            memcpy(&context->sbc_storage[context->sbc_storage_count], sbcFrame, sbcFrameSize);
-            context->sbc_storage_count += sbcFrameSize;
-            context->samples_ready -= numAudioSamplesPerSbcBuffer;
-        }
-        return totalNumBytesRead;
     }
 
     void A2DP::A2DPImpl::audioTimeoutHandler(btstack_timer_source_t *timer)
@@ -243,7 +254,9 @@ namespace Bt
             return;
         }
 
-        fillSbcAudioBuffer(context);
+        if (audioDevice != nullptr) {
+            audioDevice->onDataSend();
+        }
 
         if ((context->sbc_storage_count + btstack_sbc_encoder_sbc_buffer_length()) > context->max_media_payload_size) {
             // schedule sending
@@ -286,13 +299,6 @@ namespace Bt
         if (packetType != HCI_EVENT_PACKET) {
             return;
         }
-
-        if (hci_event_packet_get_type(packet) == HCI_EVENT_PIN_CODE_REQUEST) {
-            bd_addr_t address;
-            LOG_INFO("Pin code request - using '0000'\n");
-            hci_event_pin_code_request_get_bd_addr(packet, address);
-            gap_pin_code_response(address, "0000");
-        }
     }
 
     void A2DP::A2DPImpl::sourcePacketHandler(uint8_t packetType, uint16_t channel, uint8_t *packet, uint16_t size)
@@ -310,35 +316,43 @@ namespace Bt
         }
 
         switch (hci_event_a2dp_meta_get_subevent_code(packet)) {
-        case A2DP_SUBEVENT_SIGNALING_CONNECTION_ESTABLISHED:
+        case A2DP_SUBEVENT_SIGNALING_CONNECTION_ESTABLISHED: {
             a2dp_subevent_signaling_connection_established_get_bd_addr(packet, address);
             cid    = a2dp_subevent_signaling_connection_established_get_a2dp_cid(packet);
             status = a2dp_subevent_signaling_connection_established_get_status(packet);
-
+            std::string deviceAddress{bd_addr_to_str(address)};
             if (status != ERROR_CODE_SUCCESS) {
                 LOG_INFO("A2DP Source: Connection failed, status 0x%02x, cid 0x%02x, a2dp_cid 0x%02x \n",
                          status,
                          cid,
                          AVRCP::mediaTracker.a2dp_cid);
                 AVRCP::mediaTracker.a2dp_cid = 0;
+
+                auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
+                busProxy.sendUnicast(
+                    std::make_shared<message::bluetooth::ConnectResult>(std::move(deviceAddress), false),
+                    service::name::bluetooth);
                 break;
             }
             AVRCP::mediaTracker.a2dp_cid = cid;
             AVRCP::mediaTracker.volume   = 64;
 
-            LOG_INFO("A2DP Source: Connected to address %s, a2dp cid 0x%02x, local seid %d.\n",
-                     bd_addr_to_str(address),
+            LOG_INFO("A2DP Source: Connected, a2dp cid 0x%02x, local seid %d.\n",
                      AVRCP::mediaTracker.a2dp_cid,
                      AVRCP::mediaTracker.local_seid);
+            isConnected    = true;
+            auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
+            busProxy.sendUnicast(std::make_shared<message::bluetooth::ConnectResult>(std::move(deviceAddress), true),
+                                 service::name::bluetooth);
             break;
-
+        }
         case A2DP_SUBEVENT_SIGNALING_MEDIA_CODEC_SBC_CONFIGURATION: {
             cid = avdtp_subevent_signaling_media_codec_sbc_configuration_get_avdtp_cid(packet);
             if (cid != AVRCP::mediaTracker.a2dp_cid) {
                 return;
             }
             AVRCP::mediaTracker.remote_seid =
-                a2dp_subevent_signaling_media_codec_sbc_configuration_get_acp_seid(packet);
+                a2dp_subevent_signaling_media_codec_sbc_configuration_get_remote_seid(packet);
 
             AVDTP::sbcConfig.reconfigure =
                 a2dp_subevent_signaling_media_codec_sbc_configuration_get_reconfigure(packet);
@@ -346,43 +360,40 @@ namespace Bt
                 a2dp_subevent_signaling_media_codec_sbc_configuration_get_num_channels(packet);
             AVDTP::sbcConfig.samplingFrequency =
                 a2dp_subevent_signaling_media_codec_sbc_configuration_get_sampling_frequency(packet);
-            AVDTP::sbcConfig.channelMode =
-                a2dp_subevent_signaling_media_codec_sbc_configuration_get_channel_mode(packet);
             AVDTP::sbcConfig.blockLength =
                 a2dp_subevent_signaling_media_codec_sbc_configuration_get_block_length(packet);
             AVDTP::sbcConfig.subbands = a2dp_subevent_signaling_media_codec_sbc_configuration_get_subbands(packet);
-            AVDTP::sbcConfig.allocationMethod =
-                a2dp_subevent_signaling_media_codec_sbc_configuration_get_allocation_method(packet);
             AVDTP::sbcConfig.minBitpoolValue =
                 a2dp_subevent_signaling_media_codec_sbc_configuration_get_min_bitpool_value(packet);
             AVDTP::sbcConfig.maxBitpoolValue =
                 a2dp_subevent_signaling_media_codec_sbc_configuration_get_max_bitpool_value(packet);
-            AVDTP::sbcConfig.framesPerBuffer = AVDTP::sbcConfig.subbands * AVDTP::sbcConfig.blockLength;
-            LOG_INFO(
-                "A2DP Source: Received SBC codec configuration, sampling frequency %u, a2dp_cid 0x%02x, local seid %d "
-                "(expected %d), remote seid %d .\n",
-                AVDTP::sbcConfig.samplingFrequency,
-                cid,
-                a2dp_subevent_signaling_media_codec_sbc_configuration_get_int_seid(packet),
-                AVRCP::mediaTracker.local_seid,
-                AVRCP::mediaTracker.remote_seid);
+            LOG_INFO("A2DP Source: Received SBC codec configuration, sampling frequency %u, a2dp_cid 0x%02x, local "
+                     "seid 0x%02x, remote seid 0x%02x.\n",
+                     AVDTP::sbcConfig.samplingFrequency,
+                     cid,
+                     AVRCP::mediaTracker.local_seid,
+                     AVRCP::mediaTracker.remote_seid);
 
             // Adapt Bluetooth spec definition to SBC Encoder expected input
-            AVDTP::sbcConfig.allocationMethod -= 1;
+            auto allocation_method =
+                a2dp_subevent_signaling_media_codec_sbc_configuration_get_allocation_method(packet);
+            AVDTP::sbcConfig.allocationMethod = static_cast<btstack_sbc_allocation_method_t>(allocation_method - 1);
+            auto channel_mode                 = static_cast<avdtp_channel_mode_t>(
+                a2dp_subevent_signaling_media_codec_sbc_configuration_get_channel_mode(packet));
+
             AVDTP::sbcConfig.numChannels = 2;
-            switch (AVDTP::sbcConfig.channelMode) {
-            case AVDTP_SBC_JOINT_STEREO:
-                AVDTP::sbcConfig.channelMode = 3;
+            switch (channel_mode) {
+            case AVDTP_CHANNEL_MODE_JOINT_STEREO:
+                AVDTP::sbcConfig.channelMode = SBC_CHANNEL_MODE_JOINT_STEREO;
                 break;
-            case AVDTP_SBC_STEREO:
-                AVDTP::sbcConfig.channelMode = 2;
+            case AVDTP_CHANNEL_MODE_STEREO:
+                AVDTP::sbcConfig.channelMode = SBC_CHANNEL_MODE_STEREO;
                 break;
-            case AVDTP_SBC_DUAL_CHANNEL:
-                AVDTP::sbcConfig.channelMode = 1;
+            case AVDTP_CHANNEL_MODE_DUAL_CHANNEL:
+                AVDTP::sbcConfig.channelMode = SBC_CHANNEL_MODE_DUAL_CHANNEL;
                 break;
-            case AVDTP_SBC_MONO:
-                AVDTP::sbcConfig.channelMode = 0;
-                AVDTP::sbcConfig.numChannels = 1;
+            case AVDTP_CHANNEL_MODE_MONO:
+                AVDTP::sbcConfig.channelMode = SBC_CHANNEL_MODE_MONO;
                 break;
             }
             AVDTP::dumpSbcConfiguration();
@@ -446,8 +457,7 @@ namespace Bt
                          AVRCP::mediaTracker.local_seid);
                 break;
             }
-            LOG_INFO("A2DP Source: Stream established, address %s, a2dp cid 0x%02x, local seid %d, remote seid %d.\n",
-                     bd_addr_to_str(address),
+            LOG_INFO("A2DP Source: Stream established, a2dp cid 0x%02x, local seid %d, remote seid %d.\n",
                      AVRCP::mediaTracker.a2dp_cid,
                      AVRCP::mediaTracker.local_seid,
                      a2dp_subevent_stream_established_get_remote_seid(packet));
@@ -461,8 +471,6 @@ namespace Bt
                 LOG_ERROR("failed to create queue!");
             }
 
-            AVRCP::mediaTracker.stream_opened = 1;
-            a2dp_source_start_stream(AVRCP::mediaTracker.a2dp_cid, AVRCP::mediaTracker.local_seid);
             break;
 
         case A2DP_SUBEVENT_STREAM_RECONFIGURED:
@@ -500,9 +508,6 @@ namespace Bt
         case A2DP_SUBEVENT_STREAMING_CAN_SEND_MEDIA_PACKET_NOW:
             local_seid = a2dp_subevent_streaming_can_send_media_packet_now_get_local_seid(packet);
             cid        = a2dp_subevent_signaling_media_codec_sbc_configuration_get_a2dp_cid(packet);
-            // LOG_INFO("A2DP Source: can send media packet: a2dp_cid [expected 0x%02x, received 0x%02x], local_seid
-            // [expected %d, received %d]\n", AVRCP::mediaTracker.a2dp_cid, cid, AVRCP::mediaTracker.local_seid,
-            // local_seid);
             sendMediaPacket();
             break;
 
@@ -525,7 +530,7 @@ namespace Bt
             stopTimer(&AVRCP::mediaTracker);
             break;
 
-        case A2DP_SUBEVENT_STREAM_RELEASED:
+        case A2DP_SUBEVENT_STREAM_RELEASED: {
             AVRCP::playInfo.status = AVRCP_PLAYBACK_STATUS_STOPPED;
             cid                    = a2dp_subevent_stream_released_get_a2dp_cid(packet);
             local_seid             = a2dp_subevent_stream_released_get_local_seid(packet);
@@ -549,31 +554,37 @@ namespace Bt
 
             stopTimer(&AVRCP::mediaTracker);
             break;
+        }
         case A2DP_SUBEVENT_SIGNALING_CONNECTION_RELEASED:
             cid = a2dp_subevent_signaling_connection_released_get_a2dp_cid(packet);
             if (cid == AVRCP::mediaTracker.a2dp_cid) {
                 AVRCP::mediaTracker.avrcp_cid = 0;
                 AVRCP::mediaTracker.a2dp_cid  = 0;
                 LOG_INFO("A2DP Source: Signaling released.\n\n");
+                auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
+                busProxy.sendUnicast(std::make_shared<message::bluetooth::DisconnectResult>(),
+                                     service::name::bluetooth);
             }
+            isConnected = false;
             break;
         default:
             break;
         }
     }
 
-    void A2DP::A2DPImpl::start()
+    void A2DP::A2DPImpl::connect()
     {
-        LOG_INFO("Starting playback to %s", bd_addr_to_str(deviceAddr));
-        a2dp_source_establish_stream(deviceAddr, AVRCP::mediaTracker.local_seid, &AVRCP::mediaTracker.a2dp_cid);
+        if (!isConnected) {
+            LOG_INFO("Starting playback");
+            a2dp_source_establish_stream(deviceAddr, &AVRCP::mediaTracker.a2dp_cid);
+        }
     }
 
-    void A2DP::A2DPImpl::stop()
+    void A2DP::A2DPImpl::disconnect()
     {
         LOG_INFO("Stopping playback");
         a2dp_source_disconnect(AVRCP::mediaTracker.a2dp_cid);
-        l2cap_unregister_service(1);
-    };
+    }
 
     void A2DP::A2DPImpl::setDeviceAddress(bd_addr_t addr)
     {
@@ -586,16 +597,30 @@ namespace Bt
         ownerService = service;
     }
 
-    auto A2DP::A2DPImpl::getStreamData() -> std::shared_ptr<BluetoothStreamData>
-    {
-        return std::make_shared<BluetoothStreamData>(sinkQueue, sourceQueue, metadata);
-    }
-
     void A2DP::A2DPImpl::sendAudioEvent(audio::EventType event, audio::Event::DeviceState state)
     {
-        auto evt = std::make_shared<audio::Event>(event, state);
-        auto msg = std::make_shared<AudioEventRequest>(std::move(evt));
-        sys::Bus::SendUnicast(std::move(msg), service::name::evt_manager, const_cast<sys::Service *>(ownerService));
+        auto evt       = std::make_shared<audio::Event>(event, state);
+        auto msg       = std::make_shared<AudioEventRequest>(std::move(evt));
+        auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
+        busProxy.sendUnicast(std::move(msg), service::name::evt_manager);
+    }
+    void A2DP::A2DPImpl::start()
+    {
+        if (!isConnected) {
+            connect();
+        }
+        AVRCP::mediaTracker.stream_opened = 1;
+        a2dp_source_start_stream(AVRCP::mediaTracker.a2dp_cid, AVRCP::mediaTracker.local_seid);
+    }
+    void A2DP::A2DPImpl::stop()
+    {
+        AVRCP::mediaTracker.stream_opened = 1;
+        a2dp_source_pause_stream(AVRCP::mediaTracker.a2dp_cid, AVRCP::mediaTracker.local_seid);
     }
 
-} // namespace Bt
+    void A2DP::A2DPImpl::setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> newAudioDevice)
+    {
+        A2DP::A2DPImpl::audioDevice = std::move(newAudioDevice);
+    }
+
+} // namespace bluetooth

@@ -1,11 +1,11 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include <Service/Service.hpp>
-#include <json/json11.hpp>
-#include <log/log.hpp>
+#include <json11.hpp>
+#include <log.hpp>
 
 #include <string>
 
@@ -20,6 +20,8 @@ extern "C"
 #include <queue.h>
 }
 
+class EndpointFactory;
+
 namespace parserFSM
 {
     class MessageHandler
@@ -29,9 +31,10 @@ namespace parserFSM
         json11::Json messageJson;
         std::string JsonErrorMsg;
         sys::Service *OwnerServicePtr = nullptr;
+        std::unique_ptr<EndpointFactory> endpointFactory;
 
       public:
-        MessageHandler(const std::string &message, sys::Service *OwnerService);
+        MessageHandler(sys::Service *OwnerService, std::unique_ptr<EndpointFactory> endpointFactory);
 
         [[nodiscard]] auto isJSONNull() const -> bool
         {
@@ -45,6 +48,7 @@ namespace parserFSM
         {
             return JsonErrorMsg;
         };
+        void parseMessage(const std::string &msg);
         void processMessage();
         static void putToSendQueue(const std::string &msg);
         static void setSendQueueHandle(xQueueHandle handle)

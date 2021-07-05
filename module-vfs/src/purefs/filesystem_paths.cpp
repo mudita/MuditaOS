@@ -1,21 +1,12 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <purefs/filesystem_paths.hpp>
 
-// FIXME: Remove it when deprecated API will be removed
-#undef PATH_SYS
-#undef PATH_USER
-#undef PATH_CURRENT
-#undef PATH_PREVIOUS
-#undef PATH_UPDATES
-#undef PATH_TMP
-#undef PATH_BACKUP
-#undef PATH_FACTORY
-
 namespace
 {
     constexpr inline auto PATH_SYS      = "/sys";
+    constexpr inline auto PATH_CONF     = "/mfgconf";
     constexpr inline auto PATH_USER     = "user";
     constexpr inline auto PATH_CURRENT  = "current";
     constexpr inline auto PATH_PREVIOUS = "previous";
@@ -39,6 +30,12 @@ namespace purefs
         {
             return std::filesystem::path{eMMC_disk};
         }
+
+        std::filesystem::path getMfgConfPath() noexcept
+        {
+            return std::filesystem::path{PATH_CONF};
+        }
+
         std::filesystem::path getUserDiskPath() noexcept
         {
             return std::filesystem::path{eMMC_disk} / PATH_USER;
@@ -56,17 +53,17 @@ namespace purefs
 
         std::filesystem::path getUpdatesOSPath() noexcept
         {
-            return std::filesystem::path{eMMC_disk} / PATH_UPDATES;
+            return std::filesystem::path{eMMC_disk} / PATH_USER / PATH_UPDATES;
         }
 
         std::filesystem::path getTemporaryPath() noexcept
         {
-            return std::filesystem::path{eMMC_disk} / PATH_TMP;
+            return std::filesystem::path{eMMC_disk} / PATH_USER / PATH_TMP;
         }
 
         std::filesystem::path getBackupOSPath() noexcept
         {
-            return std::filesystem::path{eMMC_disk} / PATH_BACKUP;
+            return std::filesystem::path{eMMC_disk} / PATH_USER / PATH_BACKUP;
         }
 
         std::filesystem::path getFactoryOSPath() noexcept

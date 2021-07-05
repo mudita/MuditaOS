@@ -25,7 +25,6 @@ namespace gui
                  bool isDayEmpty);
         ~DayLabel() override = default;
 
-        bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
         uint32_t getDayNumber();
     };
 

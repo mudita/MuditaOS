@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-evtmgr/BatteryMessages.hpp"
@@ -14,8 +14,8 @@
 
 #include <BaseInterface.hpp>
 #include <MessageType.hpp>
-#include <Service/Bus.hpp>
 #include <Service/Worker.hpp>
+#include <Timers/TimerFactory.hpp>
 #include <SystemManager/Constants.hpp>
 #include <SystemManager/SystemManager.hpp>
 #include <bsp/common.hpp>
@@ -25,29 +25,48 @@
 #include <bsp/torch/torch.hpp>
 #include <bsp/battery-charger/battery_charger.hpp>
 #include <common_data/RawKey.hpp>
-#include <log/log.hpp>
-#include <module-utils/time/time_conversion.hpp>
+#include <log.hpp>
+#include <Logger.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <service-audio/AudioMessage.hpp>
 #include <service-audio/AudioServiceAPI.hpp>
-#include <service-cellular/CellularMessage.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <service-desktop/Constants.hpp>
 #include <service-desktop/DesktopMessages.hpp>
+#include <service-cellular/ServiceCellular.hpp>
+#include <service-time/service-time/TimeMessage.hpp>
+
 #include <cassert>
+#include <fstream>
+#include <filesystem>
 #include <list>
-#include <tuple>
-#include <vector>
-#include <module-apps/messages/AppMessage.hpp>
+#include <ctime>
+#include <apps-common/messages/AppMessage.hpp>
 #include <SystemManager/messages/CpuFrequencyMessage.hpp>
+#include <EventStore.hpp>
+#include <SystemManager/messages/PhoneModeRequest.hpp>
+#include <vibra/Vibra.hpp>
+
+namespace
+{
+    constexpr auto loggerDelayMs   = 1000 * 60 * 5;
+    constexpr auto loggerTimerName = "Logger";
+} // namespace
 
 EventManager::EventManager(const std::string &name)
-    : sys::Service(name), screenLightControl(std::make_unique<screen_light_control::ScreenLightControl>(this))
+    : sys::Service(name, "", stackDepth),
+      settings(std::make_shared<settings::Settings>()), loggerTimer{sys::TimerFactory::createPeriodicTimer(
+                                                            this,
+                                                            loggerTimerName,
+                                                            std::chrono::milliseconds{loggerDelayMs},
+                                                            [this](sys::Timer & /*timer*/) { dumpLogsToFile(); })},
+      Vibra(std::make_unique<vibra_handle::Vibra>(this)), backlightHandler(settings, this)
 {
     LOG_INFO("[%s] Initializing", name.c_str());
     alarmTimestamp = 0;
     alarmID        = 0;
-    busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
+    bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
+    loggerTimer.start();
 }
 
 EventManager::~EventManager()
@@ -57,30 +76,12 @@ EventManager::~EventManager()
     }
 }
 
-// those static functions and variables will be replaced by Settings API
-static std::string tzSet;
-static void setSettingsTimeZone(const std::string &timeZone)
-{
-    tzSet = timeZone;
-}
-std::string getSettingsTimeZone()
-{
-    return tzSet;
-}
 
 // Invoked upon receiving data message
 sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
 {
     bool handled = false;
 
-    if (auto msg = dynamic_cast<cellular::RawCommandResp *>(resp)) {
-
-        auto event   = std::make_unique<sdesktop::developerMode::ATResponseEvent>(msg->response);
-        auto message = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
-        sys::Bus::SendUnicast(message, service::name::service_desktop, this);
-
-        handled = true;
-    }
     if (msgl->messageType == MessageType::DBServiceNotification) {
         auto *msg = dynamic_cast<db::NotificationMessage *>(msgl);
         if (msg != nullptr) {
@@ -102,14 +103,22 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
         auto message = std::make_shared<sevm::KbdMessage>();
         message->key = msg->key;
 
-        if (message->key.state == RawKey::State::Pressed && message->key.key_code == bsp::KeyCodes::FnRight) {
-            // and state == ShutDown
-            sys::Bus::SendUnicast(message, service::name::system_manager, this);
+        if (message->key.state == RawKey::State::Pressed) {
+            const auto code = message->key.key_code;
+            if (code == bsp::KeyCodes::FnRight) {
+                bus.sendUnicast(message, service::name::system_manager);
+            }
+            else if (code == bsp::KeyCodes::SSwitchUp || code == bsp::KeyCodes::SSwitchMid ||
+                     code == bsp::KeyCodes::SSwitchDown) {
+                const auto mode = sys::SystemManager::translateSliderState(message->key);
+                bus.sendUnicast(std::make_shared<sys::PhoneModeRequest>(mode), service::name::system_manager);
+            }
+            backlightHandler.handleKeyPressed();
         }
 
         // send key to focused application
         if (!targetApplication.empty()) {
-            sys::Bus::SendUnicast(message, targetApplication, this);
+            bus.sendUnicast(message, targetApplication);
         }
         // notify application manager to prevent screen locking
         app::manager::Controller::preventBlockingDevice(this);
@@ -123,44 +132,14 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
             LOG_INFO("Switching focus to %s", targetApplication.c_str());
         }
     }
-    else if (msgl->messageType == MessageType::EVMBatteryLevel && msgl->sender == this->GetName()) {
-        auto *msg = static_cast<sevm::BatteryLevelMessage *>(msgl);
-
-        auto message = std::make_shared<sevm::BatteryLevelMessage>(msg->levelPercents, msg->fullyCharged);
-
-        if (!targetApplication.empty()) {
-            sys::Bus::SendUnicast(message, targetApplication, this);
-        }
-
-        handled = true;
-    }
-    else if (msgl->messageType == MessageType::EVMChargerPlugged && msgl->sender == this->GetName()) {
-        auto *msg = static_cast<sevm::BatteryPlugMessage *>(msgl);
-
-        auto message     = std::make_shared<sevm::BatteryPlugMessage>();
-        message->plugged = msg->plugged;
-
-        if (!message->plugged) {
-            sys::Bus::SendUnicast(message, service::name::system_manager, this);
-        }
-
-        if (!targetApplication.empty()) {
-            sys::Bus::SendUnicast(message, targetApplication, this);
-        }
-        handled = true;
-    }
     else if (msgl->messageType == MessageType::EVMMinuteUpdated && msgl->sender == this->GetName()) {
-
-        // HandleAlarmTrigger(msgl);
-
+        auto msg = static_cast<sevm::RtcMinuteAlarmMessage *>(msgl);
+        handleMinuteUpdate(msg->timestamp);
         handled = true;
     }
-    else if (auto msg = dynamic_cast<AudioEventRequest *>(msgl); msg /*&& msgl->sender == this->GetName()*/) {
+    else if (auto msg = dynamic_cast<AudioEventRequest *>(msgl); msg) {
         AudioServiceAPI::SendEvent(this, msg->getEvent());
         handled = true;
-    }
-    else if (!targetApplication.empty() && dynamic_cast<sevm::SIMMessage *>(msgl) != nullptr) {
-        sys::Bus::SendUnicast(std::make_shared<sevm::SIMMessage>(), targetApplication, this);
     }
     else if (msgl->messageType == MessageType::EVMGetBoard) {
         using namespace bsp;
@@ -173,52 +152,16 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
         return msg;
     }
     else if (msgl->messageType == MessageType::EVMModemStatus) {
-        auto msg = dynamic_cast<sevm::StatusStateMessage *>(msgl);
-        if (msg != nullptr) {
+        if (auto msg = dynamic_cast<sevm::StatusStateMessage *>(msgl)) {
             auto message   = std::make_shared<sevm::StatusStateMessage>(MessageType::EVMModemStatus);
             message->state = msg->state;
-            sys::Bus::SendUnicast(message, "ServiceCellular", this);
+            bus.sendUnicast(message, ServiceCellular::serviceName);
         }
         handled = true;
     }
-    else if (msgl->messageType == MessageType::EVMTorchStateMessage) {
-        auto msg = dynamic_cast<sevm::TorchStateMessage *>(msgl);
-        if (msg != nullptr) {
-            auto message = std::make_shared<sevm::TorchStateResultMessage>(msg->action);
-
-            switch (msg->action) {
-            case bsp::torch::Action::getState:
-                std::tie(message->success, message->state) = bsp::torch::getState();
-                message->colourTemp                        = bsp::torch::getColorTemp();
-                break;
-            case bsp::torch::Action::setState:
-                message->success = bsp::torch::turn(msg->state, msg->colourTemp);
-                break;
-            case bsp::torch::Action::toggle:
-                message->success = bsp::torch::toggle();
-                break;
-            }
-            return message;
-        }
-    }
-    else if (msgl->messageType == MessageType::CellularTimeUpdated) {
-        auto msg = dynamic_cast<CellularTimeNotificationMessage *>(msgl);
-        if (msg != nullptr) {
-            if (auto time = msg->getTime(); time) {
-                LOG_INFO("RTC set by network time.");
-                bsp::rtc_SetDateTime(&time.value());
-            }
-            if (auto timeZoneOffset = msg->getTimeZoneOffset(); timeZoneOffset) {
-                setSettingsTimeZone(msg->getTimeZoneString().value());
-                utils::time::Time::setTimeZoneOffset(msg->getTimeZoneOffset().value());
-            }
-            auto notification = std::make_shared<sys::DataMessage>(MessageType::EVMTimeUpdated);
-            sys::Bus::SendMulticast(notification, sys::BusChannels::ServiceEvtmgrNotifications, this);
-        }
-    }
     else if (msgl->messageType == MessageType::EVMRingIndicator) {
-        auto msg = std::make_shared<sys::CpuFrequencyMessage>(sys::CpuFrequencyMessage::Action::Increase);
-        sys::Bus::SendUnicast(msg, service::name::system_manager, this);
+        auto msg = std::make_shared<CellularUrcIncomingNotification>();
+        bus.sendUnicast(std::move(msg), ServiceCellular::serviceName);
     }
 
     if (handled) {
@@ -232,6 +175,8 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
 // Invoked during initialization
 sys::ReturnCodes EventManager::InitHandler()
 {
+    settings->init(service::ServiceProxy(shared_from_this()));
+    backlightHandler.init();
 
     connect(sdesktop::developerMode::DeveloperModeRequest(), [&](sys::Message *msg) {
         using namespace sdesktop::developerMode;
@@ -239,7 +184,7 @@ sys::ReturnCodes EventManager::InitHandler()
         if (typeid(*req->event.get()) == typeid(AppFocusChangeEvent)) {
             auto event   = std::make_unique<AppFocusChangeEvent>(targetApplication);
             auto message = std::make_shared<DeveloperModeRequest>(std::move(event));
-            sys::Bus::SendUnicast(message, service::name::service_desktop, this);
+            bus.sendUnicast(message, service::name::service_desktop);
         }
 
         return std::make_shared<sys::ResponseMessage>();
@@ -251,76 +196,126 @@ sys::ReturnCodes EventManager::InitHandler()
 
         auto message = std::make_shared<app::AppInputEventMessage>(msg->getEvent());
         if (!targetApplication.empty()) {
-            sys::Bus::SendUnicast(std::move(message), targetApplication, this);
+            bus.sendUnicast(std::move(message), targetApplication);
         }
 
         return std::make_shared<sys::ResponseMessage>();
     });
 
-    connect(sevm::KeypadBacklightMessage(), [&](sys::Message *msgl) {
+    connect(sevm::KeypadBacklightMessage(bsp::keypad_backlight::Action::turnOff), [&](sys::Message *msgl) {
         auto request      = static_cast<sevm::KeypadBacklightMessage *>(msgl);
         auto response     = std::make_shared<sevm::KeypadBacklightResponseMessage>();
-        response->success = processKeypadBacklightRequest(request->action);
+        response->success = backlightHandler.processKeypadRequest(request->action);
         return response;
     });
 
     connect(sevm::BatterySetCriticalLevel(0), [&](sys::Message *msgl) {
         auto request = static_cast<sevm::BatterySetCriticalLevel *>(msgl);
         battery_level_check::setBatteryCriticalLevel(request->criticalLevel);
-        return std::make_shared<sys::ResponseMessage>();
+        return sys::msgHandled();
     });
 
-    connect(sevm::BatteryLevelCriticalCheckMessage(), [&](sys::Message *msgl) {
-        EventWorker->checkBatteryLevelCritical();
-        return std::make_shared<sys::ResponseMessage>();
-    });
-
-    connect(sevm::ScreenLightControlMessage(), [&](sys::Message *msgl) {
+    connect(typeid(sevm::ScreenLightControlMessage), [&](sys::Message *msgl) {
         auto *m = dynamic_cast<sevm::ScreenLightControlMessage *>(msgl);
-        screenLightControl->processRequest(m->action, m->parameters);
-        return std::make_shared<sys::ResponseMessage>();
+        backlightHandler.processScreenRequest(m->getAction(), screen_light_control::Parameters());
+        return sys::msgHandled();
+    });
+
+    connect(typeid(sevm::ScreenLightSetAutoModeParams), [&](sys::Message *msgl) {
+        auto *m = static_cast<sevm::ScreenLightSetAutoModeParams *>(msgl);
+        backlightHandler.processScreenRequest(m->getAction(), screen_light_control::Parameters(m->getParams()));
+        return sys::msgHandled();
+    });
+
+    connect(typeid(sevm::ScreenLightSetManualModeParams), [&](sys::Message *msgl) {
+        auto *m = static_cast<sevm::ScreenLightSetManualModeParams *>(msgl);
+        backlightHandler.processScreenRequest(m->getAction(), screen_light_control::Parameters(m->getParams()));
+        return sys::msgHandled();
     });
 
     connect(sevm::ScreenLightControlRequestParameters(), [&](sys::Message *msgl) {
-        screen_light_control::Parameters params = {screenLightControl->getBrightnessValue()};
-        auto msg                                = std::make_shared<sevm::ScreenLightControlParametersResponse>(
-            screenLightControl->getLightState(), screenLightControl->getAutoModeState(), params);
+        screen_light_control::ManualModeParameters params = {backlightHandler.getScreenBrightnessValue()};
+        auto msg = std::make_shared<sevm::ScreenLightControlParametersResponse>(
+            backlightHandler.getScreenLightState(), backlightHandler.getScreenAutoModeState(), params);
         return msg;
     });
+    connect(sevm::BatteryStatusChangeMessage(), [&](sys::Message *msgl) {
+        if (msgl->sender == this->GetName()) {
+            LOG_INFO("Battery level: %d , charging: %d",
+                     Store::Battery::get().level,
+                     Store::Battery::get().state == Store::Battery::State::Charging);
 
+            if (Store::Battery::get().state == Store::Battery::State::Discharging) {
+                bus.sendUnicast(std::make_shared<sevm::BatteryStatusChangeMessage>(), service::name::system_manager);
+            }
+
+            if (!targetApplication.empty()) {
+                bus.sendUnicast(std::make_shared<sevm::BatteryStatusChangeMessage>(), targetApplication);
+            }
+        }
+        return sys::msgHandled();
+    });
+
+    connect(sevm::VibraMessage(bsp::vibrator::Action::stop), [&](sys::Message *msgl) {
+        auto request = static_cast<sevm::VibraMessage *>(msgl);
+        processVibraRequest(request->action, request->repetitionTime);
+        return sys::msgHandled();
+    });
+
+    connect(sevm::ToggleTorchOnOffMessage(), [&]([[maybe_unused]] sys::Message *msg) {
+        toggleTorchOnOff();
+        return sys::MessageNone{};
+    });
+
+    connect(sevm::ToggleTorchColorMessage(), [&]([[maybe_unused]] sys::Message *msg) {
+        toggleTorchColor();
+        return sys::MessageNone{};
+    });
+
+    connect(sevm::RequestPhoneModeForceUpdate(), [&]([[maybe_unused]] sys::Message *msg) {
+        EventWorker->requestSliderPositionRead();
+        return sys::MessageNone{};
+    });
+
+    connect(typeid(sevm::SIMTrayMessage), [&](sys::Message *) {
+        bus.sendUnicast(std::make_shared<sevm::SIMTrayMessage>(), ServiceCellular::serviceName);
+        return sys::MessageNone{};
+    });
+
+    connect(typeid(stm::message::UpdateRTCValueFromTmMessage), [&](sys::Message *msg) {
+        auto message = static_cast<stm::message::UpdateRTCValueFromTmMessage *>(msg);
+        processRTCFromTmRequest(message->getTime());
+        return sys::MessageNone{};
+    });
+
+    connect(typeid(stm::message::UpdateRTCValueFromTimestampMessage), [&](sys::Message *msg) {
+        auto message = static_cast<stm::message::UpdateRTCValueFromTimestampMessage *>(msg);
+        processRTCFromTimestampRequest(message->getTime());
+        return sys::MessageNone{};
+    });
+
+    connect(typeid(stm::message::UpdateTimeZoneMessage), [&](sys::Message *msg) {
+        auto message = static_cast<stm::message::UpdateTimeZoneMessage *>(msg);
+        processTimezoneRequest(message->getTimezone());
+        return sys::MessageNone{};
+    });
     // initialize keyboard worker
     EventWorker = std::make_unique<WorkerEvent>(this);
 
-    // create queues for worker
-    // keyboard irq queue
-    sys::WorkerQueueInfo qIrq = {"qIrq", sizeof(uint8_t), 10};
-    // headset irq queue
-    sys::WorkerQueueInfo qHeadset = {"qHeadset", sizeof(uint8_t), 10};
-    // battery manager queue
-    sys::WorkerQueueInfo qBattery = {"qBattery", sizeof(uint8_t), 10};
-    // RTC irq queue
-    sys::WorkerQueueInfo qRTC = {"qRTC", sizeof(uint8_t), 20};
-    // sim tray queue
-    sys::WorkerQueueInfo qSIM = {"qSIM", sizeof(uint8_t), 5};
-    // magnetometer queue
-    sys::WorkerQueueInfo qMagnetometer = {"qMagnetometer", sizeof(uint8_t), 5};
-    // torch driver queue
-    sys::WorkerQueueInfo qTorch = {"qTorch", sizeof(uint8_t), 5};
-    // light sensor queue
-    sys::WorkerQueueInfo qLightSensor = {"qLightSensor", sizeof(uint8_t), 5};
-
+    using namespace std::string_literals;
     std::list<sys::WorkerQueueInfo> list;
+    list.emplace_back("qIrq"s, sizeof(uint8_t), 10);
+    list.emplace_back("qHeadset"s, sizeof(uint8_t), 10);
+    list.emplace_back("qBattery"s, sizeof(uint8_t), 10);
+    list.emplace_back("qRTC"s, sizeof(uint8_t), 20);
+    list.emplace_back("qSIM"s, sizeof(uint8_t), 5);
+    list.emplace_back("qMagnetometer"s, sizeof(uint8_t), 5);
+    list.emplace_back(WorkerEvent::MagnetometerNotifyQueue, sizeof(uint8_t), 1);
+    list.emplace_back("qTorch"s, sizeof(uint8_t), 5);
+    list.emplace_back("qLightSensor"s, sizeof(uint8_t), 5);
+    list.emplace_back("qChargerDetect"s, sizeof(uint8_t), 5);
 
-    list.push_back(qIrq);
-    list.push_back(qHeadset);
-    list.push_back(qBattery);
-    list.push_back(qRTC);
-    list.push_back(qSIM);
-    list.push_back(qMagnetometer);
-    list.push_back(qTorch);
-    list.push_back(qLightSensor);
-
-    EventWorker->init(list);
+    EventWorker->init(list, settings);
     EventWorker->run();
 
     return sys::ReturnCodes::Success;
@@ -328,11 +323,19 @@ sys::ReturnCodes EventManager::InitHandler()
 
 sys::ReturnCodes EventManager::DeinitHandler()
 {
+    settings->deinit();
+
     EventWorker->close();
     EventWorker.reset();
     EventWorker = nullptr;
 
     return sys::ReturnCodes::Success;
+}
+
+void EventManager::ProcessCloseReason(sys::CloseReason closeReason)
+{
+    bsp::torch::turn(bsp::torch::State::off);
+    sendCloseReadyMessage(this);
 }
 
 sys::ReturnCodes EventManager::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
@@ -353,22 +356,95 @@ sys::ReturnCodes EventManager::SwitchPowerModeHandler(const sys::ServicePowerMod
 bool EventManager::messageSetApplication(sys::Service *sender, const std::string &applicationName)
 {
     auto msg = std::make_shared<sevm::EVMFocusApplication>(applicationName);
-    return sys::Bus::SendUnicast(msg, service::name::evt_manager, sender);
+    return sender->bus.sendUnicast(msg, service::name::evt_manager);
 }
 
-bool EventManager::processKeypadBacklightRequest(bsp::keypad_backlight::Action act)
+void EventManager::dumpLogsToFile()
 {
-    bool response = false;
+    const auto logPath = purefs::dir::getUserDiskPath() / LOG_FILE_NAME;
+    const bool dumpLog = !(std::filesystem::exists(logPath) && std::filesystem::file_size(logPath) > MAX_LOG_FILE_SIZE);
+    if (dumpLog) {
+        const auto &logs = Log::Logger::get().getLogs();
+        std::fstream logFile(logPath, std::fstream::out | std::fstream::app);
+        logFile.write(logs.data(), logs.size());
+    }
+}
+
+void EventManager::handleMinuteUpdate(time_t timestamp)
+{
+    if (!targetApplication.empty()) {
+        auto message       = std::make_shared<sevm::RtcMinuteAlarmMessage>(MessageType::EVMMinuteUpdated);
+        message->timestamp = timestamp;
+        bus.sendUnicast(message, targetApplication);
+    }
+}
+
+bool EventManager::processVibraRequest(bsp::vibrator::Action act, std::chrono::milliseconds RepetitionTime)
+{
     switch (act) {
-    case bsp::keypad_backlight::Action::turnOn:
-        response = bsp::keypad_backlight::turnOnAll();
+    case bsp::vibrator::Action::pulse:
+        Vibra->Pulse();
         break;
-    case bsp::keypad_backlight::Action::turnOff:
-        response = bsp::keypad_backlight::shutdown();
+    case bsp::vibrator::Action::pulseRepeat:
+        Vibra->PulseRepeat(RepetitionTime);
         break;
-    case bsp::keypad_backlight::Action::checkState:
-        response = bsp::keypad_backlight::checkState();
+    case bsp::vibrator::Action::pulseRepeatInfinite:
+        Vibra->PulseRepeat();
+        break;
+    case bsp::vibrator::Action::stop:
+        Vibra->PulseRepeatStop();
         break;
     }
-    return response;
+    return true;
+}
+
+void EventManager::toggleTorchOnOff()
+{
+    auto state    = bsp::torch::getState();
+    auto newState = (state.second == bsp::torch::State::off) ? bsp::torch::State::on : bsp::torch::State::off;
+    bsp::torch::turn(newState, bsp::torch::ColourTemperature::coldest);
+}
+
+void EventManager::toggleTorchColor()
+{
+    auto state = bsp::torch::getState();
+    if (state.second == bsp::torch::State::on) {
+        auto color    = bsp::torch::getColorTemp();
+        auto newColor = (color == bsp::torch::ColourTemperature::coldest) ? bsp::torch::ColourTemperature::warmest
+                                                                          : bsp::torch::ColourTemperature::coldest;
+        bsp::torch::turn(bsp::torch::State::on, newColor);
+    }
+}
+
+void EventManager::processRTCFromTmRequest(struct tm &newTime)
+{
+    if (bsp::rtc::setDateTime(&newTime) != bsp::rtc::ErrorCode::OK) {
+        LOG_ERROR("Setting RTC failed.");
+        return;
+    }
+    auto timestamp = time(nullptr);
+    bsp::rtc::setMinuteAlarm(timestamp);
+    auto notification = std::make_shared<sys::DataMessage>(MessageType::EVMTimeUpdated);
+    bus.sendMulticast(std::move(notification), sys::BusChannel::ServiceEvtmgrNotifications);
+}
+
+void EventManager::processRTCFromTimestampRequest(time_t &newTime)
+{
+    if (bsp::rtc::setDateTimeFromTimestamp(newTime) != bsp::rtc::ErrorCode::OK) {
+        LOG_ERROR("Setting RTC failed.");
+        return;
+    }
+    bsp::rtc::setMinuteAlarm(newTime);
+    auto notification = std::make_shared<sys::DataMessage>(MessageType::EVMTimeUpdated);
+    bus.sendMulticast(std::move(notification), sys::BusChannel::ServiceEvtmgrNotifications);
+}
+
+void EventManager::processTimezoneRequest(const std::string &timezone)
+{
+    if (setenv("TZ", timezone.c_str(), 1) != 0) {
+        LOG_ERROR("Setting timezone failed.");
+        return;
+    }
+    auto notification = std::make_shared<sys::DataMessage>(MessageType::EVMTimeUpdated);
+    bus.sendMulticast(std::move(notification), sys::BusChannel::ServiceEvtmgrNotifications);
 }

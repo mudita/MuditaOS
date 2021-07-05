@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <log/log.hpp>
+#include <log.hpp>
 
 extern "C"
 {
@@ -59,7 +59,7 @@ static void packet_handler(uint8_t packet_type, uint16_t channel, uint8_t *packe
 
         case HCI_EVENT_PIN_CODE_REQUEST:
             // inform about pin code request
-            LOG_INFO("Pin code request - using '0000'");
+            LOG_INFO("Pin code request");
             hci_event_pin_code_request_get_bd_addr(packet, event_addr);
             gap_pin_code_response(event_addr, "0000");
             break;
@@ -82,8 +82,7 @@ static void packet_handler(uint8_t packet_type, uint16_t channel, uint8_t *packe
                 uint16_t uuid_dest   = bnep_event_channel_opened_get_destination_uuid(packet);
                 uint16_t mtu         = bnep_event_channel_opened_get_mtu(packet);
                 bnep_event_channel_opened_get_remote_address(packet, event_addr);
-                LOG_INFO("BNEP connection open succeeded to %s source UUID 0x%04x dest UUID: 0x%04x, max frame size %u",
-                         bd_addr_to_str(event_addr),
+                LOG_INFO("BNEP connection open succeeded source UUID 0x%04x dest UUID: 0x%04x, max frame size %u",
                          uuid_source,
                          uuid_dest,
                          mtu);
@@ -106,7 +105,7 @@ static void packet_handler(uint8_t packet_type, uint16_t channel, uint8_t *packe
     }
 }
 
-namespace Bt
+namespace bluetooth
 {
 
     // Set local name with a template Bluetooth address, that will be automatically
@@ -115,10 +114,9 @@ namespace Bt
     {
         // name has to have storage
         constexpr uint32_t size = 64;
-        static char lname[size] = {0};
-        snprintf(lname, size, "%s %s", name.c_str(), "00:00:00:00:00:00");
-        LOG_INFO("Setting local name: %s", lname);
-        gap_set_local_name(lname);
+        static std::array<char, size> lname;
+        snprintf(lname.data(), size, "%s", name.c_str());
+        gap_set_local_name(lname.data());
         return Error();
     }
     namespace PAN

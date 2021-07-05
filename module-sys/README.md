@@ -5,6 +5,12 @@ Repository contains core sys functionality of PurePhone system (service abstract
 
 module-sys is made of four main parts which are thoroughly described below:
 
+## System manager
+
+System manager is responsible for:
+* [resolving services dependencies at system startup](./SystemManager/doc/ServicesSynchronization.md)
+* [system shutdown sequence](./SystemManager/doc/SystemCloseSequence.md)
+
 ## Services
 In order to crate new custom service you have to inherit from base Service class. Then you have to implement
 several virtual methods which are listed below:
@@ -53,13 +59,14 @@ Timers are system feature and is Service/Application thread safe. Timer callback
 
 ### System Timers
 System have basic coarse sys::Timer capability. There are two ways to handle actions on timer:
-* assign callback to Timer with method: `void sys::Timer::connect(std::function<void(Timer &)> new_callback)`
-* overwrite `sys::Timer::onTimer()` function - overriding it means that callback wont be triggered if not requested manually!
-
+* create a timer via TimerFactory
+* assign callback to Timer with method: `void sys::timer::SystemTimer::connect(timer::TimerCallback &&newCallback)`
 
 ### GUI Timers
 
-* Build on top of `sys::Timer` is `GuiTimer` which is meant as a connector between System <=> GUI.
+* Build on top of `SystemTimer` is `GuiTimer` which is meant as a connector between System <=> GUI.
+
+### Hints
 * Each service can have any amount of timers.
 * For timer to work one have to first start it. Otherwise timer is created and not started.
 * After creating `GuiTimer` one can `connect` it to `gui::Item` related element with `Application::connect(GuiTimer &&, gui::Item*)` so that timer life-cycle would be same as Item referenced
@@ -92,7 +99,7 @@ From my understanding they are mostly used as a mean of unloading services from 
 For examples of using them please check application code as it seems that's where they are used the most.
 
 # Power management
-PureOS power management was designed and developed based on Linux Power Management subsystem.  
+MuditaOS [power management](./SystemManager/doc/PowerManagement.md) was designed and developed based on Linux Power Management subsystem.
 There are three main assumptions:
 * It is responsibility of each service to properly support power mode switching
 * Each bsp package from module-bsp should use smart drivers when interfacing with hardware
@@ -123,7 +130,7 @@ and it absolutely doesn't correspond to low power idle mode from RT1051's data s
 Actual code is implemented in `module-bsp/board/rt1051/bsp/lpm/RT1051LPM.cpp` and `module-bsp/board/rt1051/common/clock_config.cpp`.
 
 Research was done about using `Suspend` state and it resulted in several conclusions:
-* It is not possible to use it in PureOS  
+* It is not possible to use it in MuditaOS
 This is mostly due to software design where app code is executed from external SDRAM. It is almost impossible in current state of the system to
 switch to suspend state and gracefully return to normal state when code is placed into SDRAM.
 * It is not necessary to use `Suspend` state in order to fulfill business requirements (5mA in aeroplane mode)  

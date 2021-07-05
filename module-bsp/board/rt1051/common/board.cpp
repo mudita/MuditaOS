@@ -5,14 +5,16 @@ extern "C"
 #include "fsl_common.h"
 #include "fsl_clock.h"
 #include "fsl_dcdc.h"
+#include "fsl_snvs_hp.h"
+#include "fsl_snvs_lp.h"
 #include "pin_mux.h"
 #if LOG_LUART_ENABLED
 #include "fsl_lpuart.h"
 #endif
 }
+#include "audio.hpp"
 #include "chip.hpp"
 #include "irq/irq_gpio.hpp"
-#include "audio/RT1051Audiocodec.hpp"
 
 #include <cstdint>
 
@@ -173,6 +175,8 @@ namespace bsp
         /* Enable MPU */
         ARM_MPU_Enable(MPU_CTRL_PRIVDEFENA_Msk);
 
+        SCB->SHCSR &= ~(SCB_SHCSR_MEMFAULTENA_Msk | SCB_SHCSR_USGFAULTENA_Msk | SCB_SHCSR_BUSFAULTENA_Msk);
+
         /* Enable I cache and D cache */
         SCB_EnableDCache();
         SCB_EnableICache();
@@ -189,11 +193,13 @@ namespace bsp
 
         irq_gpio_Init();
 
+        // SNVS init. is required for proper operation of the RTC when Secure Boot is used
+        SNVS_LP_Init(SNVS);
+        SNVS_HP_Init(SNVS);
+        SNVS_HP_ChangeSSMState(SNVS);
+
         // Set internal DCDC to DCM mode. Switching between DCM and CCM mode will be done automatically.
         DCDC_BootIntoDCM(DCDC);
-
-        // init audio
-        RT1051Audiocodec::Init();
 
         PrintSystemClocks();
         clearAndPrintBootReason();

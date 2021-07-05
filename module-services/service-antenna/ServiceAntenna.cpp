@@ -1,19 +1,21 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-antenna/ServiceAntenna.hpp"
 #include "service-antenna/AntennaMessage.hpp"
 #include "service-antenna/AntennaServiceAPI.hpp"
+#include "service-antenna/ServiceState.hpp"
 
 #include <service-appmgr/model/ApplicationManager.hpp>
 
 #include <at/response.hpp>
-#include <common_data/EventStore.hpp>
-#include <log/log.hpp>
+
+#include <log.hpp>
+#include <EventStore.hpp>
+
 #include <MessageType.hpp>
-#include <module-utils/state/ServiceState.hpp>
 #include <projdefs.h>
-#include <Service/Timer.hpp>
+#include <module-sys/Timers/TimerFactory.hpp>
 #include <service-cellular/State.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
 #include <service-cellular/CellularMessage.hpp>
@@ -24,8 +26,6 @@
 #include <memory>
 #include <string>
 #include <vector>
-
-const char *ServiceAntenna::serviceName = "ServiceAntenna";
 
 namespace antenna
 {
@@ -55,32 +55,49 @@ namespace antenna
     }
 } // namespace antenna
 
-ServiceAntenna::ServiceAntenna() : sys::Service(serviceName)
-{
-    LOG_INFO("[%s] Initializing", serviceName);
+inline constexpr auto antennaServiceStackSize = 1024 * 2;
 
-    timer = std::make_unique<sys::Timer>("Antena", this, 5000, sys::Timer::Type::Periodic);
-    timer->connect([&](sys::Timer &) {
-        timer->stop();
-        auto stateToSet = state->get();
-        if (state->timeoutOccured(cpp_freertos::Ticks::GetTicks())) {
-            LOG_WARN("State [ %s ] timeout occured, setting [ %s ] state",
-                     c_str(state->get()),
-                     c_str(state->getTimeoutState()));
-            stateToSet = state->getTimeoutState();
-        }
-        state->set(stateToSet);
+ServiceAntenna::ServiceAntenna()
+    : sys::Service(service::name::antenna, "", antennaServiceStackSize, sys::ServicePriority::Idle),
+      state{std::make_unique<state::State<antenna::State>>(this)}, phoneModeObserver{
+                                                                       std::make_unique<sys::phone_modes::Observer>()}
+{
+    LOG_INFO("[%s] Initializing", service::name::antenna);
+    timer = sys::TimerFactory::createPeriodicTimer(
+        this, "Antenna", std::chrono::seconds{5}, [this](sys::Timer & /*timer*/) {
+            timer.stop();
+            auto stateToSet = state->get();
+            if (state->timeoutOccured(cpp_freertos::Ticks::GetTicks())) {
+                LOG_WARN("State [ %s ] timeout occured, setting [ %s ] state",
+                         c_str(state->get()),
+                         c_str(state->getTimeoutState()));
+                stateToSet = state->getTimeoutState();
+            }
+            state->set(stateToSet);
+        });
+    bus.channels.push_back(sys::BusChannel::ServiceCellularNotifications);
+    bus.channels.push_back(sys::BusChannel::AntennaNotifications);
+    bus.channels.push_back(sys::BusChannel::PhoneModeChanges);
+
+    connect(typeid(cellular::msg::notification::SimReady), [this](sys::Message *) {
+        state->set(antenna::State::init);
+        return sys::MessageNone{};
     });
 
-    state = new utils::state::State<antenna::State>(this);
-
-    busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
-    busChannels.push_back(sys::BusChannels::AntennaNotifications);
+    phoneModeObserver->connect(this);
+    phoneModeObserver->subscribe([this](sys::phone_modes::PhoneMode mode) {
+        if (mode == sys::phone_modes::PhoneMode::Offline) {
+            handleLockRequest(antenna::lockState::locked);
+        }
+        else {
+            handleLockRequest(antenna::lockState::unlocked);
+        }
+    });
 }
 
 ServiceAntenna::~ServiceAntenna()
 {
-    LOG_INFO("[%s] Cleaning resources", serviceName);
+    LOG_INFO("[%s] Cleaning resources", service::name::antenna);
 }
 
 // Invoked upon receiving data message
@@ -88,71 +105,72 @@ sys::MessagePointer ServiceAntenna::DataReceivedHandler(sys::DataMessage *msgl, 
 {
     bool handled = false;
 
-    switch (msgl->messageType) {
-    case MessageType::StateChange:
-        HandleStateChange(state->get());
-        break;
-    case MessageType::AntennaChanged: {
-        bsp::cellular::antenna antenna;
-        if (CellularServiceAPI::GetAntenna(this, antenna)) {
-            currentAntenna = antenna;
-            if (state->get() == antenna::State::switchAntenna) {
-                LOG_INFO("Antena switched.");
+    if (auto msg = dynamic_cast<CellularMessage *>(msgl)) {
+        switch (msg->type) {
+        case CellularMessage::Type::Notification: {
 
-                state->enableStateTimeout(cpp_freertos::Ticks::GetTicks(),
-                                          pdMS_TO_TICKS(antenna::connectionStatusTimeout),
-                                          antenna::State::switchAntenna);
-                state->set(antenna::State::connectionStatus);
+            if (auto notif = dynamic_cast<CellularNotificationMessage *>(msg)) {
+                if (notif->content == CellularNotificationMessage::Content::CallAborted) {
+                    AntennaServiceAPI::LockRequest(this, antenna::lockState::unlocked);
+                }
             }
-        }
-        handled = true;
-        break;
-    }
-    case MessageType::CellularNotification: {
-
-        auto msg = dynamic_cast<CellularNotificationMessage *>(msgl);
-        if (msg != nullptr) {
-            if (msg->type == CellularNotificationMessage::Type::CallAborted) {
-                AntennaServiceAPI::LockRequest(this, antenna::lockState::unlocked);
-            }
-        }
-        handled = true;
-        break;
-    }
-    case MessageType::CellularCall: {
-        auto msg = dynamic_cast<CellularCallMessage *>(msgl);
-        if (msg != nullptr) {
-            AntennaServiceAPI::LockRequest(this, antenna::lockState::locked);
-        }
-    } break;
-    case MessageType::CellularStateRequest: {
-        auto msg = dynamic_cast<cellular::StateChange *>(msgl);
-        if (msg != nullptr) {
-            if (msg->request == cellular::State::ST::Ready) {
-                state->set(antenna::State::init);
-            }
-        }
-    } break;
-    case MessageType::AntennaCSQChange:
-        LOG_WARN("CSQChange message");
-        if (state->get() == antenna::State::idle) {
-            state->set(antenna::State::csqChange);
-        }
-        break;
-    case MessageType::AntennaLockService: {
-        auto msg = dynamic_cast<AntennaLockRequestMessage *>(msgl);
-        if (msg != nullptr) {
-            handleLockRequest(msg->request);
             handled = true;
+            break;
         }
-    } break;
-    case MessageType::AntennaGetLockState: {
-        auto responseMessage = std::make_shared<AntennaLockRequestResponse>(true, serviceLocked);
-        return responseMessage;
-    } break;
-    default:
-        break;
+        case CellularMessage::Type::IncomingCall: {
+            AntennaServiceAPI::LockRequest(this, antenna::lockState::locked);
+        } break;
+        case CellularMessage::Type::Ringing: {
+            AntennaServiceAPI::LockRequest(this, antenna::lockState::locked);
+        } break;
+        case CellularMessage::Type::HangupCall: {
+            AntennaServiceAPI::LockRequest(this, antenna::lockState::unlocked);
+        } break;
+        default:
+            break;
+        }
     }
+    else
+        switch (msgl->messageType) {
+        case MessageType::StateChange:
+            HandleStateChange(state->get());
+            break;
+        case MessageType::AntennaChanged: {
+            bsp::cellular::antenna antenna;
+            if (CellularServiceAPI::GetAntenna(this, antenna)) {
+                currentAntenna = antenna;
+                if (state->get() == antenna::State::switchAntenna) {
+                    LOG_INFO("Antena switched.");
+
+                    state->enableStateTimeout(cpp_freertos::Ticks::GetTicks(),
+                                              pdMS_TO_TICKS(antenna::connectionStatusTimeout),
+                                              antenna::State::switchAntenna);
+                    state->set(antenna::State::connectionStatus);
+                }
+            }
+            handled = true;
+            break;
+        }
+        case MessageType::AntennaCSQChange:
+            LOG_DEBUG("CSQChange message");
+            if (state->get() == antenna::State::idle) {
+                state->set(antenna::State::csqChange);
+            }
+            break;
+        case MessageType::AntennaLockService: {
+            auto msg = dynamic_cast<AntennaLockRequestMessage *>(msgl);
+            if (msg != nullptr) {
+                handleLockRequest(msg->request);
+                handled = true;
+            }
+        } break;
+        case MessageType::AntennaGetLockState: {
+            auto responseMessage = std::make_shared<AntennaLockRequestResponse>(true, serviceLocked);
+            return responseMessage;
+        } break;
+        default:
+            break;
+        }
 
     if (handled)
         return std::make_shared<sys::ResponseMessage>();
@@ -169,6 +187,11 @@ sys::ReturnCodes ServiceAntenna::InitHandler()
 sys::ReturnCodes ServiceAntenna::DeinitHandler()
 {
     return sys::ReturnCodes::Success;
+}
+
+void ServiceAntenna::ProcessCloseReason(sys::CloseReason closeReason)
+{
+    sendCloseReadyMessage(this);
 }
 
 sys::ReturnCodes ServiceAntenna::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
@@ -220,7 +243,6 @@ bool ServiceAntenna::HandleStateChange(antenna::State state)
     switch (state) {
     case antenna::State::none:
         ret = noneStateHandler();
-        ;
         break;
     case antenna::State::init:
         ret = initStateHandler();
@@ -249,8 +271,7 @@ bool ServiceAntenna::HandleStateChange(antenna::State state)
     }
     if (!ret) {
         LOG_WARN("State [ %s ] not handled. Reloading timer.", c_str(state));
-        timer->reload();
-        timer->start();
+        timer.start();
     }
     return ret;
 }
@@ -259,6 +280,11 @@ bool ServiceAntenna::initStateHandler(void)
 {
     LOG_INFO("State Init");
     bsp::cellular::antenna antenna;
+    if (phoneModeObserver->isInMode(sys::phone_modes::PhoneMode::Offline)) {
+        AntennaServiceAPI::LockRequest(this, antenna::lockState::locked);
+        return true;
+    }
+
     if (CellularServiceAPI::GetAntenna(this, antenna)) {
         currentAntenna = antenna;
         state->enableStateTimeout(cpp_freertos::Ticks::GetTicks(),

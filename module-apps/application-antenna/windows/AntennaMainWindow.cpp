@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /*
@@ -7,22 +7,21 @@
  *  Created on: 18 lut 2020
  *      Author: kuba
  */
-#include "AntennaMainWindow.hpp"
-#include "gui/widgets/BoxLayout.hpp"
-#include "gui/widgets/Item.hpp"
-#include "gui/widgets/Label.hpp"
-#include "gui/widgets/Window.hpp"
-
-#include <i18n/i18n.hpp>
-#include <Style.hpp>
-
-#include "../AntennaAppStyle.hpp"
-#include "ScanModesWindow.hpp"
 #include "AlgoParamsWindow.hpp"
-#include "../ApplicationAntenna.hpp"
-#include <service-cellular/CellularServiceAPI.hpp>
+#include "AntennaMainWindow.hpp"
+#include "ScanModesWindow.hpp"
+#include <application-antenna/AntennaAppStyle.hpp>
+#include <application-antenna/ApplicationAntenna.hpp>
+#include <module-gui/gui/widgets/BoxLayout.hpp>
+#include <module-gui/gui/widgets/Item.hpp>
+#include <module-gui/gui/widgets/Label.hpp>
+#include <module-gui/gui/widgets/Style.hpp>
+#include <module-gui/gui/widgets/Window.hpp>
+#include <i18n/i18n.hpp>
+#include <module-cellular/at/response.hpp>
 #include <service-antenna/AntennaServiceAPI.hpp>
-#include <at/response.hpp>
+#include <service-cellular/CellularServiceAPI.hpp>
+
 namespace gui
 {
 
@@ -45,10 +44,10 @@ namespace gui
 
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::open));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::open));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
-        setTitle(utils::localize.get("app_desktop_tools_antenna"));
+        setTitle(utils::translate("app_desktop_tools_antenna"));
 
         for (auto title : titlesText) {
             titles.push_back(addLabel(title, [=](gui::Item &item) { return true; }));

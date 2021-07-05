@@ -1,10 +1,12 @@
+-- Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+-- For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 CREATE TABLE IF NOT EXISTS sms
 (
     _id        INTEGER PRIMARY KEY,
     thread_id  INTEGER,
     contact_id INTEGER,
     date       INTEGER,
-    date_send  INTEGER,
     error_code INTEGER,
     body       TEXT NOT_NULL,
     type       INTEGER,

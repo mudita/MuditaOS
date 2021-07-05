@@ -1,12 +1,14 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "EventReminderWindow.hpp"
+#include <Timers/TimerFactory.hpp>
 #include "application-calendar/widgets/CalendarStyle.hpp"
 #include "module-apps/application-calendar/data/CalendarData.hpp"
 #include <gui/widgets/Window.hpp>
 #include <time/time_conversion.hpp>
 #include "service-appmgr/Controller.hpp"
+#include <Image.hpp>
 
 namespace gui
 {
@@ -17,9 +19,10 @@ namespace gui
     {
         buildInterface();
 
-        reminderTimer = std::make_unique<sys::Timer>(
-            "CalendarReminderTimer", app, reminderLifeDuration, sys::Timer::Type::SingleShot);
-        reminderTimer->connect([=](sys::Timer &) { reminderTimerCallback(); });
+        reminderTimer = sys::TimerFactory::createSingleShotTimer(app,
+                                                                 "CalendarReminderTimer",
+                                                                 std::chrono::milliseconds{reminderLifeDuration},
+                                                                 [this](sys::Timer &) { reminderTimerCallback(); });
     }
 
     EventReminderWindow::~EventReminderWindow()
@@ -38,14 +41,10 @@ namespace gui
         buildInterface();
     }
 
-    top_bar::Configuration EventReminderWindow::configureTopBar(top_bar::Configuration appConfiguration)
+    status_bar::Configuration EventReminderWindow::configureStatusBar(status_bar::Configuration appConfiguration)
     {
-        using namespace top_bar;
-        appConfiguration.enable({Indicator::Signal,
-                                 Indicator::Time,
-                                 Indicator::Battery,
-                                 Indicator::SimCard,
-                                 Indicator::NetworkAccessTechnology});
+        using namespace status_bar;
+        appConfiguration.enable({Indicator::Signal, Indicator::Time, Indicator::Battery, Indicator::SimCard});
         return appConfiguration;
     }
 
@@ -54,12 +53,12 @@ namespace gui
         AppWindow::buildInterface();
 
         bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get(style::strings::common::ok));
+        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(style::strings::common::ok));
         bottomBar->setBorderColor(ColorNoColor);
 
         const uint32_t w = this->getWidth() - style::window::default_left_margin - style::window::default_right_margin;
         const uint32_t h = this->getHeight() - bottomBar->getHeight();
-        body             = new gui::VBox(this, style::window::default_left_margin, topBar->getHeight(), w, h);
+        body             = new gui::VBox(this, style::window::default_left_margin, statusBar->getHeight(), w, h);
         body->setBorderColor(gui::ColorNoColor);
 
         topImage = new gui::Image(body,
@@ -105,13 +104,12 @@ namespace gui
 
     void EventReminderWindow::startTimer()
     {
-        reminderTimer->connect([=](sys::Timer &) { reminderTimerCallback(); });
-        reminderTimer->reload();
+        reminderTimer.start();
     }
 
     void EventReminderWindow::destroyTimer()
     {
-        reminderTimer->stop();
+        reminderTimer.stop();
     }
 
     auto EventReminderWindow::handleSwitchData(SwitchData *data) -> bool
@@ -141,11 +139,7 @@ namespace gui
             return true;
         }
 
-        if (!inputEvent.isShortPress()) {
-            return false;
-        }
-
-        if (inputEvent.keyCode == gui::KeyCode::KEY_ENTER) {
+        if (inputEvent.isShortRelease(gui::KeyCode::KEY_ENTER)) {
             closeReminder();
             return true;
         }

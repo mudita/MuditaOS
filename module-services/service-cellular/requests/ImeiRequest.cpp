@@ -6,14 +6,15 @@
 
 #include <at/Result.hpp>
 #include <at/Commands.hpp>
+#include <at/ATFactory.hpp>
 
 #include "service-cellular/requests/ImeiRequest.hpp"
 
 namespace cellular
 {
-    std::string ImeiRequest::command()
+    at::Cmd ImeiRequest::command()
     {
-        return std::string(at::factory(at::AT::GET_IMEI));
+        return at::Cmd(at::factory(at::AT::GET_IMEI));
     }
 
     void ImeiRequest::handle(RequestHandler &h, at::Result &result)

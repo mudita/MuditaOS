@@ -1,27 +1,42 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#define CATCH_CONFIG_MAIN
+#include <data/CalculatorUtility.hpp>
+#include <data/CalculatorInputProcessor.hpp>
 #include <catch2/catch.hpp>
-#include "application-calculator/data/CalculatorUtility.hpp"
 #include <i18n/i18n.hpp>
 #include <cstring>
-#include <vfs.hpp>
-
-class vfs vfs;
-
-struct vfs_initializer
-{
-    vfs_initializer()
-    {
-        vfs.Init();
-    }
-} vfs_initializer;
 
 TEST_CASE("Calculator utilities")
 {
-    auto calculator = Calculator();
-    utils::localize.setDisplayLanguage("English");
+    auto calculator = calc::Calculator();
+    utils::setDisplayLanguage("English");
+
+    SECTION("Empty input")
+    {
+        auto result = calculator.calculate("");
+        REQUIRE(result.value == std::string{});
+        REQUIRE(result.equation == "");
+        REQUIRE(!result.isError);
+    }
+
+    SECTION("No operation")
+    {
+        auto result = calculator.calculate("0");
+        REQUIRE(result.value == "0");
+        REQUIRE(result.equation == "0");
+        REQUIRE(!result.isError);
+
+        result = calculator.calculate("1234");
+        REQUIRE(result.value == "1234");
+        REQUIRE(result.equation == "1234");
+        REQUIRE(!result.isError);
+
+        result = calculator.calculate("43211e6");
+        REQUIRE(result.value == "4.321e10");
+        REQUIRE(result.equation == "43211e6");
+        REQUIRE(!result.isError);
+    }
 
     SECTION("Addition")
     {
@@ -73,7 +88,7 @@ TEST_CASE("Calculator utilities")
 
     SECTION("Fraction with comma")
     {
-        utils::localize.setDisplayLanguage("Polski");
+        utils::setDisplayLanguage("Polski");
         auto result = calculator.calculate("15,5+12,056");
         REQUIRE(result.value == "27,556");
         REQUIRE(result.equation == "15.5+12.056");
@@ -83,7 +98,7 @@ TEST_CASE("Calculator utilities")
     SECTION("Division by 0")
     {
         auto result = calculator.calculate("15+5÷0");
-        REQUIRE(result.value == utils::localize.get("app_calculator_error"));
+        REQUIRE(result.value == calc::symbols::strings::error_str());
         REQUIRE(result.equation == "15+5/0");
         REQUIRE(result.isError);
     }
@@ -91,7 +106,7 @@ TEST_CASE("Calculator utilities")
     SECTION("Division 0 by 0")
     {
         auto result = calculator.calculate("0÷0");
-        REQUIRE(result.value == utils::localize.get("app_calculator_error"));
+        REQUIRE(result.value == calc::symbols::strings::error_str());
         REQUIRE(result.equation == "0/0");
         REQUIRE(result.isError);
     }
@@ -99,7 +114,7 @@ TEST_CASE("Calculator utilities")
     SECTION("Result exceeds maximum number")
     {
         auto result = calculator.calculate("1.79769e+308×2");
-        REQUIRE(result.value == utils::localize.get("app_calculator_error"));
+        REQUIRE(result.value == calc::symbols::strings::error_str());
         REQUIRE(result.equation == "1.79769e+308*2");
         REQUIRE(result.isError);
     }

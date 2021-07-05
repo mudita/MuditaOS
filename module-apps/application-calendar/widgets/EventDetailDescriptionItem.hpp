@@ -1,7 +1,8 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
+
 #include "CalendarListItem.hpp"
 #include <Label.hpp>
 #include <Text.hpp>
@@ -23,8 +24,6 @@ namespace gui
         virtual ~EventDetailDescriptionItem() override = default;
 
         void descriptionHandler();
-        // virtual methods from Item
-        bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
     };
 
 } /* namespace gui */

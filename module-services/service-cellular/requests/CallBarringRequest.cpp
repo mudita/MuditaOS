@@ -5,6 +5,7 @@
 
 #include <at/Commands.hpp>
 #include <Utils.hpp>
+#include <at/ATFactory.hpp>
 
 #include "service-cellular/requests/CallBarringRequest.hpp"
 
@@ -24,7 +25,7 @@ namespace cellular
         return nullptr;
     }
 
-    auto CallBarringRequest::command() -> std::string
+    auto CallBarringRequest::command() -> at::Cmd
     {
         std::vector<commandBuilderFunc> commandParts = {
             [this]() { return getCommandFacility(); },

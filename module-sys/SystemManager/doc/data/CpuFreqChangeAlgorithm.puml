@@ -1,0 +1,40 @@
+@startuml
+start
+
+if (cpuLoad > frequencyShiftUpperThreshold) then (yes) 
+  : aboveThresholdCounter++
+  belowThresholdCounter = 0;
+else (no)
+  if (cpuLoad < frequencyShiftLowerThreshold) then (yes)
+    : belowThresholdCounter++
+    aboveThresholdCounter = 0;
+  else (no)
+  	: belowThresholdCounter = 0
+    aboveThresholdCounter = 0;  
+  endif
+endif
+
+if (
+   aboveThresholdCounter >= maxAboveThresholdCount
+   or
+   minFrequencyRequested > currentCpuFrequency
+   ) then (yes)
+  : IncreaseCpuFrequency()
+  
+  belowThresholdCounter = 0
+  aboveThresholdCounter = 0;
+else (no) 
+   if (
+   belowThresholdCounter >= maxBelowThresholdCount
+   and
+   currentCpuFreq > minFrequencyRequested
+   ) then (yes)
+  : DecreaseCpuFrequency()
+  
+  belowThresholdCounter = 0
+  aboveThresholdCounter = 0;
+  endif
+endif
+
+stop
+@enduml

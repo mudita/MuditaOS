@@ -1,7 +1,7 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <littlefs/lfs.h>
+#include <lfs.h>
 #include "lfs_ioaccess.h"
 #include "parse_partitions.h"
 
@@ -11,6 +11,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
+#include <linux/fs.h>
+#include <sys/ioctl.h>
 
 struct lfs_ioaccess_context
 {
@@ -169,6 +171,7 @@ struct lfs_ioaccess_context *lfs_ioaccess_open(struct lfs_config *cfg,
     }
     ret->file_des = open(filename, O_RDWR);
     if (ret->file_des < 0) {
+        free((void *)ret->empty_flash_mem);
         free(ret);
         return NULL;
     }
@@ -176,14 +179,30 @@ struct lfs_ioaccess_context *lfs_ioaccess_open(struct lfs_config *cfg,
     int err = fstat(ret->file_des, &statbuf);
     if (err < 0) {
         close(ret->file_des);
+        free((void *)ret->empty_flash_mem);
         free(ret);
         return NULL;
     }
+    if (S_ISBLK(statbuf.st_mode)) {
+        uint64_t blk_size;
+        err = ioctl(ret->file_des, BLKGETSIZE64, &blk_size);
+        if (err < 0) {
+            close(ret->file_des);
+            free((void *)ret->empty_flash_mem);
+            free(ret);
+            return NULL;
+        }
+        else {
+            statbuf.st_size = blk_size;
+        }
+    }
+
     off_t start_pos = 0;
     ret->last_offs  = statbuf.st_size;
     if (partition) {
         if (partition->end > statbuf.st_size) {
             close(ret->file_des);
+            free((void *)ret->empty_flash_mem);
             free(ret);
             errno = E2BIG;
             return NULL;

@@ -6,6 +6,7 @@ set(SOURCES
     ServiceBluetooth.cpp
     service-bluetooth/SettingsHolder.cpp
     service-bluetooth/SettingsSerializer.cpp
+    service-bluetooth/BluetoothMessage.cpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
@@ -19,5 +20,7 @@ target_include_directories(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
         module-bluetooth
+        service-desktop
         module-sys
+        json::json
 )

@@ -1,32 +1,21 @@
-﻿#ifndef PUREPHONE_BSP_LPM_HPP
-#define PUREPHONE_BSP_LPM_HPP
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
+#pragma once
 
 #include <optional>
 #include <memory>
+#include <bsp/common.hpp>
 
 namespace bsp {
 
     class LowPowerMode
     {
       public:
-        enum class CpuFrequency
-        {
-            Level_1, // 12 MHz
-            Level_2, // 24 MHz
-            Level_3, // 66 MHz
-            Level_4, // 132 MHz
-            Level_5, // 264 MHz
-            Level_6  // 528 MHz
-        };
         enum class OscillatorSource
         {
             External,
             Internal
-        };
-        enum class Pll2State
-        {
-            Enable,
-            Disable
         };
 
         LowPowerMode()          = default;
@@ -37,20 +26,14 @@ namespace bsp {
         virtual int32_t PowerOff() = 0;
         virtual int32_t Reboot() = 0;
 
-        virtual void SetCpuFrequency(CpuFrequency freq) = 0;
-        [[nodiscard]] CpuFrequency GetCurrentFrequency() const noexcept;
+        virtual void SetCpuFrequency(CpuFrequencyHz freq) = 0;
+        [[nodiscard]] CpuFrequencyHz GetCurrentFrequencyLevel() const noexcept;
+        [[nodiscard]] virtual uint32_t GetCpuFrequency() const noexcept = 0;
 
         virtual void SwitchOscillatorSource(OscillatorSource source) = 0;
-        [[nodiscard]] OscillatorSource GetCurrentOscillatorSource() const noexcept;
-
-        virtual void SwitchPll2State(Pll2State state) = 0;
-        [[nodiscard]] Pll2State GetCurrentPll2State() const noexcept;
 
     protected:
-        CpuFrequency currentFrequency = CpuFrequency::Level_6;
-        OscillatorSource currentOscSource = OscillatorSource::External;
-        Pll2State currentPll2State = Pll2State::Enable;
+        CpuFrequencyHz currentFrequency = CpuFrequencyHz::Level_6;
     };
 } // namespace bsp
 
-#endif //PUREPHONE_BSP_LPM_HPP

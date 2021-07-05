@@ -1,6 +1,5 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
-
 
 #include <catch2/catch.hpp>
 
@@ -12,21 +11,28 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
-#include <purefs/filesystem_paths.hpp>
+#include <filesystem>
 
 TEST_CASE("Contacts Name Table tests")
 {
     Database::initialize();
 
-    const auto contactsPath = (purefs::dir::getUserDiskPath() / "contacts.db").c_str();
-    std::remove(contactsPath);
+    const auto contactsPath = (std::filesystem::path{"sys/user"} / "contacts.db");
+    if (std::filesystem::exists(contactsPath)) {
+        REQUIRE(std::filesystem::remove(contactsPath));
+    }
 
-    ContactsDB contactsdb(contactsPath);
+    ContactsDB contactsdb(contactsPath.c_str());
     REQUIRE(contactsdb.isInitialized());
 
     ContactsNameTableRow testRow1 = {
         {.ID = DB_ID_NONE}, .contactID = DB_ID_NONE, .namePrimary = "Mateusz", .nameAlternative = "Pati"};
 
+    const auto contactsCount = contactsdb.name.count() + 1;
+    // clear contacts table
+    for (std::uint32_t id = 1; id <= contactsCount; id++) {
+        REQUIRE(contactsdb.name.removeById(id));
+    }
     // add 4 elements into table
     REQUIRE(contactsdb.name.add(testRow1));
     REQUIRE(contactsdb.name.add(testRow1));

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -44,13 +44,10 @@ namespace style
             inline constexpr auto month_year_height = 60;
             inline constexpr auto week_days_number  = 7;
             inline constexpr auto max_weeks_number  = 6;
+            inline constexpr auto leftMargin        = 10;
 
-            inline constexpr auto cross_x    = 48;
-            inline constexpr auto cross_y    = 55;
-            inline constexpr auto arrow_x    = 30;
-            inline constexpr auto arrow_y    = 62;
             inline constexpr auto listView_x = style::window::default_left_margin;
-            inline constexpr auto listView_y = style::header::height;
+            inline constexpr auto listView_y = style::window::default_vertical_pos;
             inline constexpr auto listView_w = style::listview::body_width_with_scroll;
             inline constexpr auto listView_h = style::window_height - listView_y - style::footer::height;
 
@@ -63,16 +60,6 @@ namespace style
                 inline constexpr auto date_text_2   = "February 2019";
                 inline constexpr auto date_text_3   = "March 2019";
             } // namespace test
-
-            namespace time
-            {
-                inline constexpr auto max_time_length   = 2;
-                inline constexpr auto max_hour_24H_mode = 23;
-                inline constexpr auto max_hour_12H_mode = 12;
-                inline constexpr auto max_minutes       = 59;
-                inline constexpr auto max_years         = 2038;
-                inline constexpr auto min_years         = 1970;
-            } // namespace time
 
             namespace item
             {
@@ -108,15 +95,6 @@ namespace style
                     inline constexpr auto label_h           = 35;
                 } // namespace eventDetail
 
-                namespace eventTime
-                {
-                    inline constexpr auto height           = 106;
-                    inline constexpr auto margin           = 21;
-                    inline constexpr auto separator        = 30;
-                    inline constexpr auto time_input_12h_w = 120;
-                    inline constexpr auto time_input_24h_w = 195;
-                } // namespace eventTime
-
                 namespace checkBox
                 {
                     inline constexpr auto height              = 44;
@@ -128,15 +106,20 @@ namespace style
                 namespace severalOptions
                 {
                     inline constexpr auto height    = 63;
-                    inline constexpr auto label_h   = 30;
-                    inline constexpr auto arrow_w_h = 20;
+                    inline constexpr auto label_h   = 20;
+                    inline constexpr auto arrow_w_h = 12;
+                    inline constexpr auto margin    = 5;
+                    inline constexpr auto hBox_h    = height - label_h - margin;
+                    inline constexpr auto option_w =
+                        style::window::default_body_width - 2 * arrow_w_h - 2 * style::window::calendar::leftMargin;
                 } // namespace severalOptions
 
                 namespace textWithLabel
                 {
-                    inline constexpr auto height        = 80;
-                    inline constexpr auto description_h = 30;
-                    inline constexpr auto text_input_h  = 40;
+                    inline constexpr auto height        = 63;
+                    inline constexpr auto description_h = 20;
+                    inline constexpr auto text_input_h  = 37;
+                    inline constexpr auto margin        = 6;
                 } // namespace textWithLabel
             }     // namespace item
         };        // namespace calendar

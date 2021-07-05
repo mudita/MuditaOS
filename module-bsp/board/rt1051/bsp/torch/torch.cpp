@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "bsp/torch/torch.hpp"
@@ -20,11 +20,11 @@ namespace bsp
     {
         static xQueueHandle qHandleIrq = NULL;
 
-        static I2CAddress addr = {.deviceAddress = 0x63, .subAddressSize = 1};
+        static I2CAddress addr = {.deviceAddress = 0x63, .subAddress = 0, .subAddressSize = 1};
 
         std::shared_ptr<DriverGPIO> gpio;
         const unsigned short max_current_mA = 150;
-        ColourTemperature currentColourTemp = warmest;
+        ColourTemperature currentColourTemp = ColourTemperature::warmest;
 
         int32_t init(xQueueHandle qHandle)
         {
@@ -95,7 +95,7 @@ namespace bsp
         };
         bool turn(State state, ColourTemperature colourTemp)
         {
-            if (colourTemp != no_change) {
+            if (colourTemp != ColourTemperature::noChange) {
                 currentColourTemp = colourTemp;
             }
 

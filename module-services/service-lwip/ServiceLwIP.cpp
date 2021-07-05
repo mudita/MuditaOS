@@ -1,13 +1,12 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-lwip/ServiceLwIP.hpp"
 
 #include <MessageType.hpp>
-#include <Service/Bus.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 
 extern "C"
 {
@@ -45,16 +44,14 @@ extern "C"
 sys::ReturnCodes message_lwip(sys::Service *app, LwIP_message::Request req)
 {
     std::shared_ptr<LwIP_message> msg = std::make_shared<LwIP_message>(req);
-    auto ret                          = sys::Bus::SendUnicast(msg, "ServiceLwIP", app, 5000);
+    auto ret                          = app->bus.sendUnicastSync(msg, "ServiceLwIP", 5000);
     if (ret.first != sys::ReturnCodes::Success) {
         LOG_ERROR("err: %s", c_str(ret.first));
     }
     return ret.first;
 }
 
-const char *ServiceLwIP::serviceName = "ServiceLwIP";
-
-ServiceLwIP::ServiceLwIP() : sys::Service(serviceName)
+ServiceLwIP::ServiceLwIP() : sys::Service(service::name::lwip, "", StackDepth)
 {
     LOG_INFO("[ServiceLwIP] Initializing");
     tcpip_init(nullptr, nullptr);
@@ -73,6 +70,11 @@ sys::ReturnCodes ServiceLwIP::DeinitHandler()
 {
     LOG_ERROR("TODO");
     return sys::ReturnCodes::Success;
+}
+
+void ServiceLwIP::ProcessCloseReason(sys::CloseReason closeReason)
+{
+    sendCloseReadyMessage(this);
 }
 
 sys::MessagePointer ServiceLwIP::DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp)

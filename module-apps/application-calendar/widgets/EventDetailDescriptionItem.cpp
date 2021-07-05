@@ -1,12 +1,12 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "EventDetailDescriptionItem.hpp"
 #include "application-calendar/widgets/CalendarStyle.hpp"
 #include <Style.hpp>
 #include <time/time_conversion.hpp>
-#include <module-utils/date/include/date/date.h>
-#include <module-utils/time/TimeRangeParser.hpp>
+#include <date/date.h>
+#include <time/TimeRangeParser.hpp>
 
 namespace gui
 {
@@ -64,19 +64,17 @@ namespace gui
             return true;
         };
 
-        descriptionHandler();
-    }
+        dimensionChangedCallback = [&](gui::Item &, const BoundingBox &newDim) -> bool {
+            vBox->setArea({0, 0, newDim.w, newDim.h});
+            return true;
+        };
 
-    bool EventDetailDescriptionItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
-    {
-        vBox->setPosition(0, 0);
-        vBox->setSize(newDim.w, newDim.h);
-        return true;
+        descriptionHandler();
     }
 
     void EventDetailDescriptionItem::descriptionHandler()
     {
-        title->setText(utils::localize.get("app_calendar_event_detail"));
+        title->setText(utils::translate("app_calendar_event_detail"));
         onLoadCallback = [&](std::shared_ptr<EventsRecord> event) {
             description->setText(event->title);
             eventTime->setText(

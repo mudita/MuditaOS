@@ -1,48 +1,44 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
+#include "ServiceForward.hpp"
+#include "BusProxy.hpp"
 #include "Common.hpp"  // for ReturnCodes, ServicePriority, BusChannels
 #include "Mailbox.hpp" // for Mailbox
 #include "Message.hpp" // for MessagePointer
-#include "thread.hpp"  // for Thread
-#include <algorithm>   // for find, max
-#include <cstdint>     // for uint32_t, uint64_t
-#include <functional>  // for function
-#include <iterator>    // for end
-#include <map>         // for map
-#include <memory>      // for allocator, shared_ptr, enable_shared_from_this
-#include <string>      // for string
-#include <typeindex>   // for type_index
-#include <utility>     // for pair
-#include <vector>      // for vector<>::iterator, vector
-#include <typeinfo>    // for connect by type
+#include "ServiceManifest.hpp"
+#include "Watchdog.hpp"
+#include "thread.hpp"                                   // for Thread
+#include <module-sys/SystemWatchdog/SystemWatchdog.hpp> // for SystemWatchdog
+#include <algorithm>                                    // for find, max
+#include <cstdint>                                      // for uint32_t, uint64_t
+#include <functional>                                   // for function
+#include <iterator>                                     // for end
+#include <map>                                          // for map
+#include <memory>                                       // for allocator, shared_ptr, enable_shared_from_this
+#include <string>                                       // for string
+#include <typeindex>                                    // for type_index
+#include <utility>                                      // for pair
+#include <vector>                                       // for vector<>::iterator, vector
+#include <typeinfo>                                     // for connect by type
 
 namespace sys
 {
-    class Timer;
-} // namespace sys
-namespace sys
-{
-    struct Proxy;
-} // namespace sys
-
-namespace sys
-{
-    using MessageHandler = std::function<MessagePointer(Message *)>;
-
     class Service : public cpp_freertos::Thread, public std::enable_shared_from_this<Service>
     {
       public:
         Service(std::string name,
                 std::string parent       = "",
                 uint32_t stackDepth      = 4096,
-                ServicePriority priority = ServicePriority::Idle);
+                ServicePriority priority = ServicePriority::Idle,
+                Watchdog &watchdog       = SystemWatchdog::getInstance());
 
         ~Service() override;
 
         void StartService();
+        void CloseService();
 
         // Invoked for not processed already messages
         // override should in in either callback, function or whatever...
@@ -60,6 +56,8 @@ namespace sys
          */
         virtual ReturnCodes DeinitHandler() = 0;
 
+        virtual auto ProcessCloseReason(CloseReason closeReason) -> void;
+
         virtual ReturnCodes SwitchPowerModeHandler(const ServicePowerMode mode) = 0;
 
         /**
@@ -69,9 +67,11 @@ namespace sys
 
         std::string parent;
 
-        std::vector<BusChannels> busChannels;
+        BusProxy bus;
 
         Mailbox<std::shared_ptr<Message>> mailbox;
+
+        Watchdog &watchdog;
 
         uint32_t pingTimestamp;
 
@@ -83,6 +83,9 @@ namespace sys
         bool connect(const std::type_info &type, MessageHandler handler);
         bool connect(Message *msg, MessageHandler handler);
         bool connect(Message &&msg, MessageHandler handler);
+        bool disconnect(const std::type_info &type);
+
+        void sendCloseReadyMessage(Service *service);
 
       protected:
         bool enableRunLoop;
@@ -109,33 +112,16 @@ namespace sys
 
         class Timers
         {
-
-            friend Timer;
+            friend timer::SystemTimer;
 
           private:
-            std::vector<Timer *> list;
-            auto attach(Timer *timer)
-            {
-                list.push_back(timer);
-            }
-
-            void detach(Timer *timer)
-            {
-                list.erase(std::find(list.begin(), list.end(), timer));
-            }
+            std::vector<timer::SystemTimer *> list;
+            void attach(timer::SystemTimer *timer);
+            void detach(timer::SystemTimer *timer);
 
           public:
             void stop();
-
-            [[nodiscard]] auto get(Timer *timer) const
-            {
-                return std::find(list.begin(), list.end(), timer);
-            }
-
-            [[nodiscard]] auto noTimer() const
-            {
-                return std::end(list);
-            }
+            [[nodiscard]] auto get(timer::SystemTimer *timer) noexcept -> timer::SystemTimer *;
         } timers;
 
       public:

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -17,6 +17,7 @@
 #include <module-cellular/at/UrcQind.hpp>
 #include <module-cellular/at/UrcResponse.hpp>
 #include <module-cellular/at/UrcQiurc.hpp>
+#include <module-cellular/at/UrcRing.hpp>
 
 /**
  * ServiceCellular helper for handling Urc messages
@@ -24,7 +25,7 @@
 class CellularUrcHandler : public at::urc::UrcHandler
 {
   public:
-    CellularUrcHandler(ServiceCellular &cellularService) : cellularService(cellularService)
+    explicit CellularUrcHandler(ServiceCellular &cellularService) : cellularService(cellularService)
     {}
 
     void Handle(at::urc::Clip &urc) final;
@@ -35,6 +36,7 @@ class CellularUrcHandler : public at::urc::UrcHandler
     void Handle(at::urc::Qind &urc) final;
     void Handle(at::urc::Cpin &urc) final;
     void Handle(at::urc::Qiurc &urc) final;
+    void Handle(at::urc::Ring &urc) final;
     void Handle(at::urc::PoweredDown &urc) final;
     void Handle(at::urc::UrcResponse &urc) final;
 
@@ -42,12 +44,12 @@ class CellularUrcHandler : public at::urc::UrcHandler
      * Gets the response that should be returned after handling Urc
      * @return
      */
-    std::optional<std::shared_ptr<CellularMessage>> getResponse()
+    std::optional<std::shared_ptr<sys::Message>> getResponse()
     {
         return std::move(response);
     };
 
   private:
     ServiceCellular &cellularService;
-    std::optional<std::unique_ptr<CellularMessage>> response;
+    std::optional<std::unique_ptr<sys::Message>> response;
 };

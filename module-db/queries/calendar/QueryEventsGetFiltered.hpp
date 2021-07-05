@@ -13,14 +13,11 @@ namespace db::query::events
     class GetFiltered : public Query
     {
       public:
-        GetFiltered(calendar::TimePoint filter_from,
-                    calendar::TimePoint filter_till,
-                    uint32_t offset = 0,
-                    uint32_t limit  = UINT32_MAX);
+        GetFiltered(TimePoint filter_from, TimePoint filter_till, uint32_t offset = 0, uint32_t limit = UINT32_MAX);
         [[nodiscard]] auto debugInfo() const -> std::string override;
 
-        calendar::TimePoint filter_from;
-        calendar::TimePoint filter_till;
+        TimePoint filter_from;
+        TimePoint filter_till;
         uint32_t offset;
         uint32_t limit;
     };

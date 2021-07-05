@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CheckBoxWithLabelItem.hpp"
@@ -7,52 +7,38 @@
 #include <ListView.hpp>
 #include <Style.hpp>
 #include <Utils.hpp>
+#include <InputEvent.hpp>
 
 namespace gui
 {
 
     CheckBoxWithLabelItem::CheckBoxWithLabelItem(app::Application *application,
                                                  const std::string &description,
-                                                 std::shared_ptr<WeekDaysRepeatData> data,
-                                                 bool checkIsOnLeftBarSide)
-        : app(application), checkBoxData(std::move(data)), checkIsOnLeftBarSide(checkIsOnLeftBarSide)
+                                                 std::shared_ptr<WeekDaysRepeatData> data)
+        : app(application), checkBoxData(std::move(data))
     {
         app = application;
         assert(app != nullptr);
 
         setMinimumSize(style::window::default_body_width, style::window::calendar::item::checkBox::height);
-        setMargins(gui::Margins(style::margins::small, style::window::calendar::item::checkBox::margin_top, 0, 0));
+        setMargins(gui::Margins(
+            style::window::calendar::leftMargin, style::window::calendar::item::checkBox::margin_top, 0, 0));
         setEdges(RectangleEdge::None);
 
         hBox = new gui::HBox(this, 0, 0, 0, 0);
         hBox->setEdges(gui::RectangleEdge::None);
 
-        if (checkIsOnLeftBarSide) {
-            checkBox = new gui::CheckBox(
-                hBox,
-                0,
-                0,
-                0,
-                0,
-                [=](const UTF8 &text) {
-                    app->getCurrentWindow()->bottomBarTemporaryMode(text, BottomBar::Side::LEFT, false);
-                },
-                [=]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
-                checkIsOnLeftBarSide);
-        }
-        else {
-            checkBox = new gui::CheckBox(
-                hBox,
-                0,
-                0,
-                0,
-                0,
-                [=](const UTF8 &text) {
-                    app->getCurrentWindow()->bottomBarTemporaryMode(text, BottomBar::Side::CENTER, false);
-                },
-                [=]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
-                checkIsOnLeftBarSide);
-        }
+        checkBox = new gui::CheckBox(
+            hBox,
+            0,
+            0,
+            0,
+            0,
+            [=](const UTF8 &text) {
+                app->getCurrentWindow()->bottomBarTemporaryMode(text, BottomBar::Side::LEFT, false);
+            },
+            [=]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); });
+
         checkBox->setMinimumSize(style::window::calendar::item::checkBox::input_box_label_w,
                                  style::window::calendar::item::checkBox::height);
         checkBox->activeItem = false;
@@ -62,7 +48,7 @@ namespace gui
                                          style::window::calendar::item::checkBox::height);
         descriptionLabel->setMargins(gui::Margins(style::margins::very_big, 0, 0, 0));
         descriptionLabel->setEdges(gui::RectangleEdge::None);
-        descriptionLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
+        descriptionLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
         descriptionLabel->setFont(style::window::font::medium);
         descriptionLabel->activeItem = false;
         descriptionLabel->setText(description);
@@ -71,7 +57,7 @@ namespace gui
         if (checkBoxData != nullptr) {
             setCheckBoxes();
         }
-        onContentChangeCallback = [&]() { return checkBox->isChecked(); };
+        onContentChangedCallback = [&]() { return checkBox->isChecked(); };
     }
 
     void CheckBoxWithLabelItem::applyCallbacks()
@@ -83,7 +69,6 @@ namespace gui
             }
             else {
                 descriptionLabel->setFont(style::window::font::medium);
-                setFocusItem(nullptr);
             }
             return true;
         };
@@ -91,43 +76,41 @@ namespace gui
         inputCallback = [&](gui::Item &item, const gui::InputEvent &event) {
             if (checkBox->onInput(event)) {
                 checkBox->resizeItems();
-                onContentChangeCallback = [&]() { return checkBox->isChecked(); };
+                onContentChangedCallback = [&]() { return checkBox->isChecked(); };
                 return true;
             }
             return false;
+        };
+
+        dimensionChangedCallback = [&](gui::Item &, const BoundingBox &newDim) -> bool {
+            hBox->setArea({0, 0, newDim.w, newDim.h});
+            return true;
         };
     }
 
     void CheckBoxWithLabelItem::setCheckBoxes()
     {
-        if (descriptionLabel->getText() == utils::localize.get(style::strings::common::Monday)) {
+        if (descriptionLabel->getText() == utils::translate(style::strings::common::Monday)) {
             checkBox->setImageVisible(checkBoxData->getData(date::Monday.iso_encoding() - 1));
         }
-        else if (descriptionLabel->getText() == utils::localize.get(style::strings::common::Tuesday)) {
+        else if (descriptionLabel->getText() == utils::translate(style::strings::common::Tuesday)) {
             checkBox->setImageVisible(checkBoxData->getData(date::Tuesday.iso_encoding() - 1));
         }
-        else if (descriptionLabel->getText() == utils::localize.get(style::strings::common::Wednesday)) {
+        else if (descriptionLabel->getText() == utils::translate(style::strings::common::Wednesday)) {
             checkBox->setImageVisible(checkBoxData->getData(date::Wednesday.iso_encoding() - 1));
         }
-        else if (descriptionLabel->getText() == utils::localize.get(style::strings::common::Thursday)) {
+        else if (descriptionLabel->getText() == utils::translate(style::strings::common::Thursday)) {
             checkBox->setImageVisible(checkBoxData->getData(date::Thursday.iso_encoding() - 1));
         }
-        else if (descriptionLabel->getText() == utils::localize.get(style::strings::common::Friday)) {
+        else if (descriptionLabel->getText() == utils::translate(style::strings::common::Friday)) {
             checkBox->setImageVisible(checkBoxData->getData(date::Friday.iso_encoding() - 1));
         }
-        else if (descriptionLabel->getText() == utils::localize.get(style::strings::common::Saturday)) {
+        else if (descriptionLabel->getText() == utils::translate(style::strings::common::Saturday)) {
             checkBox->setImageVisible(checkBoxData->getData(date::Saturday.iso_encoding() - 1));
         }
-        else if (descriptionLabel->getText() == utils::localize.get(style::strings::common::Sunday)) {
+        else if (descriptionLabel->getText() == utils::translate(style::strings::common::Sunday)) {
             checkBox->setImageVisible(checkBoxData->getData(date::Sunday.iso_encoding() - 1));
         }
-    }
-
-    bool CheckBoxWithLabelItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
-    {
-        hBox->setPosition(0, 0);
-        hBox->setSize(newDim.w, newDim.h);
-        return true;
     }
 
 } /* namespace gui */

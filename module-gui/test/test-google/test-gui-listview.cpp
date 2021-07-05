@@ -1,9 +1,9 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "gtest/gtest.h"
 #include <module-gui/gui/widgets/ListView.hpp>
-#include <module-utils/log/log.hpp>
+#include <log.hpp>
 #include <mock/TestListViewProvider.hpp>
 #include <gui/input/InputEvent.hpp>
 
@@ -55,6 +55,7 @@ class ListViewTesting : public ::testing::Test
 
         testListView->setProvider(testProvider);
         testListView->rebuildList();
+        testListView->focus = true;
     }
 
     void TearDown() override
@@ -62,13 +63,13 @@ class ListViewTesting : public ::testing::Test
         delete testListView;
     }
 
-    void moveNTimes(unsigned int n, style::listview::Direction direction)
+    void moveNTimes(unsigned int n, gui::listview::Direction direction)
     {
         auto key = gui::KeyCode::KEY_UP;
 
-        if (direction == style::listview::Direction::Top)
+        if (direction == gui::listview::Direction::Top)
             key = gui::KeyCode::KEY_UP;
-        if (direction == style::listview::Direction::Bottom)
+        if (direction == gui::listview::Direction::Bottom)
             key = gui::KeyCode::KEY_DOWN;
 
         for (unsigned int i = 0; i < n; i++) {
@@ -107,12 +108,12 @@ TEST_F(ListViewTesting, Not_Equal_Items_Test)
 
     ASSERT_EQ(3, testListView->currentPageSize) << "3 elements should fit into list (100+200+300)";
 
-    moveNTimes(testListView->currentPageSize, style::listview::Direction::Bottom);
+    moveNTimes(testListView->currentPageSize, gui::listview::Direction::Bottom);
     ASSERT_TRUE(testListView->listBorderReached) << "Navigate bottom by page size - page should change";
     testListView->listBorderReached = false;
     ASSERT_EQ(1, testListView->currentPageSize) << "1 elements should fit into list (400)";
 
-    moveNTimes(1, style::listview::Direction::Top);
+    moveNTimes(1, gui::listview::Direction::Top);
     ASSERT_TRUE(testListView->listBorderReached) << "Navigate top by one - page should change";
     testListView->listBorderReached = false;
     ASSERT_EQ(3, testListView->currentPageSize) << "3 elements should fit into list (100+200+300)";
@@ -130,11 +131,11 @@ TEST_F(ListViewTesting, List_Clear_Test)
         << "Last element ID should be 0";
 
     // Change pages
-    moveNTimes(6, style::listview::Direction::Bottom);
-    moveNTimes(1, style::listview::Direction::Top);
+    moveNTimes(6, gui::listview::Direction::Bottom);
+    moveNTimes(1, gui::listview::Direction::Top);
 
     // Clear list and request same data as before -> page should refresh with same data.
-    testListView->clear();
+    testListView->reset();
     testProvider->refreshList();
 
     ASSERT_EQ(6, testListView->currentPageSize) << "6 elements should fit into list.";
@@ -169,7 +170,7 @@ TEST_F(ListViewTesting, Navigate_Test)
     ASSERT_EQ(6, dynamic_cast<gui::TestListItem *>(testListView->body->children.back())->ID)
         << "Last element ID should be 0";
 
-    moveNTimes(1, style::listview::Direction::Top);
+    moveNTimes(1, gui::listview::Direction::Top);
     ASSERT_TRUE(testListView->listBorderReached)
         << "Navigate top by 1 - page should not change as it is TopDown list - but list border reached";
     testListView->listBorderReached = false;
@@ -178,7 +179,7 @@ TEST_F(ListViewTesting, Navigate_Test)
     ASSERT_EQ(6, dynamic_cast<gui::TestListItem *>(testListView->body->children.back())->ID)
         << "Last element ID should be 0";
 
-    moveNTimes(6, style::listview::Direction::Bottom);
+    moveNTimes(6, gui::listview::Direction::Bottom);
     ASSERT_TRUE(testListView->listBorderReached) << "Navigate bottom by 6 - page should change";
     testListView->listBorderReached = false;
     ASSERT_EQ(4, testListView->currentPageSize) << "4 elements should be displayed (10 - 6)";
@@ -186,9 +187,9 @@ TEST_F(ListViewTesting, Navigate_Test)
         << "First element ID should be 6";
     ASSERT_EQ(9, dynamic_cast<gui::TestListItem *>(testListView->body->children.back())->ID)
         << "Last element ID should be 9";
-    ASSERT_EQ(style::listview::Direction::Bottom, testListView->direction) << "List Direction should be Bottom";
+    ASSERT_EQ(gui::listview::Direction::Bottom, testListView->direction) << "List Direction should be Bottom";
 
-    moveNTimes(1, style::listview::Direction::Top);
+    moveNTimes(1, gui::listview::Direction::Top);
     ASSERT_TRUE(testListView->listBorderReached) << "Navigate top by one - page should change";
     testListView->listBorderReached = false;
     ASSERT_EQ(6, testListView->currentPageSize) << "6 elements should be displayed";
@@ -196,9 +197,9 @@ TEST_F(ListViewTesting, Navigate_Test)
         << "First element ID should be 5";
     ASSERT_EQ(0, dynamic_cast<gui::TestListItem *>(testListView->body->children.back())->ID)
         << "Last element ID should be 0";
-    ASSERT_EQ(style::listview::Direction::Top, testListView->direction) << "List Direction should be Top";
+    ASSERT_EQ(gui::listview::Direction::Top, testListView->direction) << "List Direction should be Top";
 
-    moveNTimes(1, style::listview::Direction::Bottom);
+    moveNTimes(1, gui::listview::Direction::Bottom);
     ASSERT_TRUE(testListView->listBorderReached) << "Navigate bot by one - page should change";
     testListView->listBorderReached = false;
     ASSERT_EQ(4, testListView->currentPageSize) << "4 elements should be displayed (10 - 6)";
@@ -206,58 +207,58 @@ TEST_F(ListViewTesting, Navigate_Test)
         << "First element ID should be 5";
     ASSERT_EQ(9, dynamic_cast<gui::TestListItem *>(testListView->body->children.back())->ID)
         << "Last element ID should be 0";
-    ASSERT_EQ(style::listview::Direction::Bottom, testListView->direction) << "List Direction should be Bottom";
+    ASSERT_EQ(gui::listview::Direction::Bottom, testListView->direction) << "List Direction should be Bottom";
 
     ASSERT_EQ(6, dynamic_cast<gui::TestListItem *>(testListView->body->getFocusItem())->ID)
         << "Check if item 6 has focus";
-    moveNTimes(2, style::listview::Direction::Bottom);
+    moveNTimes(2, gui::listview::Direction::Bottom);
     ASSERT_FALSE(testListView->listBorderReached) << "Navigate bot by 2 - page should not change";
     ASSERT_EQ(8, dynamic_cast<gui::TestListItem *>(testListView->body->getFocusItem())->ID)
         << "Check if item 8 has focus";
     ASSERT_EQ(4, testListView->currentPageSize) << "4 elements should be displayed (10 - 6)";
-    ASSERT_NE(style::listview::Direction::Top, testListView->direction) << "list direction not changed should be Top";
+    ASSERT_NE(gui::listview::Direction::Top, testListView->direction) << "list direction not changed should be Top";
 
     ASSERT_EQ(8, dynamic_cast<gui::TestListItem *>(testListView->body->getFocusItem())->ID)
         << "Check if item 8 has focus";
 
-    moveNTimes(2, style::listview::Direction::Top);
+    moveNTimes(2, gui::listview::Direction::Top);
     ASSERT_FALSE(testListView->listBorderReached) << "Navigate top by 2 - page should not change";
     ASSERT_EQ(6, dynamic_cast<gui::TestListItem *>(testListView->body->getFocusItem())->ID)
         << "Check if item 6 has focus";
     ASSERT_EQ(4, testListView->currentPageSize) << "4 elements should be displayed (10 - 6)";
-    ASSERT_NE(style::listview::Direction::Top, testListView->direction) << "list direction not changed should be Top";
+    ASSERT_NE(gui::listview::Direction::Top, testListView->direction) << "list direction not changed should be Top";
 }
 
 TEST_F(ListViewTesting, Continuous_Type_Test)
 {
     // set list type to Continuous
-    testListView->setBoundaries(style::listview::Boundaries::Continuous);
+    testListView->setBoundaries(gui::Boundaries::Continuous);
 
     // 10 provider elements, 100 h each, list 600 -> 6 elements on page.
     testListView->provider->requestRecords(0, 10);
 
-    moveNTimes(1, style::listview::Direction::Top);
+    moveNTimes(1, gui::listview::Direction::Top);
     ASSERT_TRUE(testListView->listBorderReached) << "Navigate top by one - page should change to last page";
     testListView->listBorderReached = false;
-    ASSERT_EQ(4, testListView->currentPageSize) << "4 elements should be displayed";
+    ASSERT_EQ(6, testListView->currentPageSize) << "6 elements should be displayed";
 
     ASSERT_EQ(9, dynamic_cast<gui::TestListItem *>(testListView->body->children.front())->ID)
         << "First element ID should be 9";
-    ASSERT_EQ(6, dynamic_cast<gui::TestListItem *>(testListView->body->children.back())->ID)
+    ASSERT_EQ(3, dynamic_cast<gui::TestListItem *>(testListView->body->children.back())->ID)
         << "Last element ID should be 3 (9 - 6)";
-    ASSERT_EQ(style::listview::Direction::Top, testListView->direction) << "List Direction should be Top";
+    ASSERT_EQ(gui::listview::Direction::Top, testListView->direction) << "List Direction should be Top";
 
-    moveNTimes(testListView->currentPageSize, style::listview::Direction::Top);
+    moveNTimes(testListView->currentPageSize, gui::listview::Direction::Top);
     ASSERT_TRUE(testListView->listBorderReached) << "Navigate top by page size - page should change";
     testListView->listBorderReached = false;
     ASSERT_EQ(6, testListView->currentPageSize) << "6 elements should be displayed";
-    ASSERT_EQ(5, dynamic_cast<gui::TestListItem *>(testListView->body->children.front())->ID)
-        << "First element ID should be 5";
-    ASSERT_EQ(0, dynamic_cast<gui::TestListItem *>(testListView->body->children.back())->ID)
-        << "Last element ID should be 0";
-    ASSERT_EQ(style::listview::Direction::Top, testListView->direction) << "List Direction should be Top";
+    ASSERT_EQ(0, dynamic_cast<gui::TestListItem *>(testListView->body->children.front())->ID)
+        << "First element ID should be 0";
+    ASSERT_EQ(6, dynamic_cast<gui::TestListItem *>(testListView->body->children.back())->ID)
+        << "Last element ID should be 6";
+    ASSERT_EQ(gui::listview::Direction::Bottom, testListView->direction) << "List Direction should be Bottom";
 
-    moveNTimes(1, style::listview::Direction::Bottom);
+    moveNTimes(1, gui::listview::Direction::Bottom);
     ASSERT_TRUE(testListView->listBorderReached) << "Navigate bot by one - page should change";
     testListView->listBorderReached = false;
     ASSERT_EQ(4, testListView->currentPageSize) << "6 elements should be displayed";
@@ -265,9 +266,9 @@ TEST_F(ListViewTesting, Continuous_Type_Test)
         << "First element ID should be 5";
     ASSERT_EQ(9, dynamic_cast<gui::TestListItem *>(testListView->body->children.back())->ID)
         << "Last element ID should be 0";
-    ASSERT_EQ(style::listview::Direction::Bottom, testListView->direction) << "List Direction should be Bottom";
+    ASSERT_EQ(gui::listview::Direction::Bottom, testListView->direction) << "List Direction should be Bottom";
 
-    moveNTimes(4, style::listview::Direction::Bottom);
+    moveNTimes(4, gui::listview::Direction::Bottom);
     ASSERT_TRUE(testListView->listBorderReached) << "Navigate bot by 4 - page should change to first page";
     testListView->listBorderReached = false;
     ASSERT_EQ(6, testListView->currentPageSize) << "6 elements should be displayed";
@@ -275,7 +276,7 @@ TEST_F(ListViewTesting, Continuous_Type_Test)
         << "First element ID should be 5";
     ASSERT_EQ(6, dynamic_cast<gui::TestListItem *>(testListView->body->children.back())->ID)
         << "Last element ID should be 0";
-    ASSERT_EQ(style::listview::Direction::Bottom, testListView->direction) << "List Direction should be Bottom";
+    ASSERT_EQ(gui::listview::Direction::Bottom, testListView->direction) << "List Direction should be Bottom";
 }
 
 TEST_F(ListViewTesting, Data_Deletion_Test)
@@ -291,7 +292,7 @@ TEST_F(ListViewTesting, Data_Deletion_Test)
     auto pointerToLast  = dynamic_cast<gui::TestListItem *>(testListView->body->children.back());
 
     // Clear list
-    testListView->clear();
+    testListView->reset();
     ASSERT_EQ(0, testListView->body->children.size()) << "List should be empty";
     testProvider->refreshList();
 
@@ -312,7 +313,7 @@ TEST_F(ListViewTesting, Data_Deletion_Test)
     pointerToLast  = dynamic_cast<gui::TestListItem *>(testListView->body->children.back());
 
     // Clear list
-    testListView->clear();
+    testListView->reset();
     ASSERT_EQ(0, testListView->body->children.size()) << "List should be empty";
     testProvider->refreshList();
 
@@ -329,13 +330,13 @@ TEST_F(ListViewTesting, Rebuild_Type_Test)
     testProvider->dataSource = gui::TestListViewDataSource::Internal;
 
     // Do full list rebuild
-    testListView->rebuildList(style::listview::RebuildType::Full);
+    testListView->rebuildList(gui::listview::RebuildType::Full);
 
     ASSERT_EQ(6, testListView->currentPageSize) << "6 elements should fit into list.";
     ASSERT_EQ(0, dynamic_cast<gui::TestListItem *>(testListView->body->getFocusItem())->ID)
         << "Check if item 0 has focus";
 
-    moveNTimes(3, style::listview::Direction::Bottom);
+    moveNTimes(3, gui::listview::Direction::Bottom);
     ASSERT_FALSE(testListView->listBorderReached) << "Navigate bot by 3 - page should not change";
     ASSERT_EQ(3, dynamic_cast<gui::TestListItem *>(testListView->body->getFocusItem())->ID)
         << "Check if item 3 has focus";
@@ -343,7 +344,7 @@ TEST_F(ListViewTesting, Rebuild_Type_Test)
     auto pointerToFocusedElement = dynamic_cast<gui::TestListItem *>(testListView->body->getFocusItem());
 
     // Do in place rebuild
-    testListView->rebuildList(style::listview::RebuildType::InPlace);
+    testListView->rebuildList(gui::listview::RebuildType::InPlace);
 
     // Check if focused item did not change
     ASSERT_EQ(3, dynamic_cast<gui::TestListItem *>(testListView->body->getFocusItem())->ID)
@@ -352,14 +353,14 @@ TEST_F(ListViewTesting, Rebuild_Type_Test)
         << "Focused item should be same";
 
     // Do on offset rebuild on 8 element
-    testListView->rebuildList(style::listview::RebuildType::OnOffset, 8);
+    testListView->rebuildList(gui::listview::RebuildType::OnOffset, 8);
 
     // Page should change and 2 elements should fit (10 - 8)
     ASSERT_EQ(2, testListView->currentPageSize) << "2 elements should fit into list.";
     ASSERT_EQ(8, dynamic_cast<gui::TestListItem *>(testListView->body->getFocusItem())->ID)
         << "Check if item 8 has focus";
 
-    moveNTimes(2, style::listview::Direction::Top);
+    moveNTimes(2, gui::listview::Direction::Top);
     ASSERT_TRUE(testListView->listBorderReached) << "Navigate Top by 3 - page should change";
     ASSERT_EQ(6, testListView->currentPageSize) << "6 elements should fit into list.";
     ASSERT_EQ(6, dynamic_cast<gui::TestListItem *>(testListView->body->getFocusItem())->ID)
@@ -368,11 +369,35 @@ TEST_F(ListViewTesting, Rebuild_Type_Test)
     pointerToFocusedElement = dynamic_cast<gui::TestListItem *>(testListView->body->getFocusItem());
 
     // Do in place rebuild
-    testListView->rebuildList(style::listview::RebuildType::InPlace);
+    testListView->rebuildList(gui::listview::RebuildType::InPlace);
 
     // Check if focused item did not change
     ASSERT_EQ(6, dynamic_cast<gui::TestListItem *>(testListView->body->getFocusItem())->ID)
         << "Check if item 6 has focus";
     ASSERT_EQ(pointerToFocusedElement, dynamic_cast<gui::TestListItem *>(testListView->body->getFocusItem()))
         << "Focused item should be same";
+
+    // Do full list rebuild
+    testListView->rebuildList(gui::listview::RebuildType::Full);
+
+    // Do on page element rebuild on index in Page scope
+    testListView->rebuildList(gui::listview::RebuildType::OnPageElement, 3);
+
+    // Check if focused item did not change
+    ASSERT_EQ(3, dynamic_cast<gui::TestListItem *>(testListView->body->getFocusItem())->ID)
+        << "Check if item 3 has focus";
+
+    // Do on page element rebuild in Page scope
+    testListView->rebuildList(gui::listview::RebuildType::OnPageElement, 1);
+
+    // Check if focused item did not change
+    ASSERT_EQ(1, dynamic_cast<gui::TestListItem *>(testListView->body->getFocusItem())->ID)
+        << "Check if item 1 has focus";
+
+    // Do on page element rebuild on index outside Page scope. Page should change and proper element should be focused.
+    testListView->rebuildList(gui::listview::RebuildType::OnPageElement, 8);
+
+    // Check if focused item did not change
+    ASSERT_EQ(8, dynamic_cast<gui::TestListItem *>(testListView->body->getFocusItem())->ID)
+        << "Check if item 8 has focus";
 }

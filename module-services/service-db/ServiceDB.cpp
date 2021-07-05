@@ -1,20 +1,15 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ServiceDB.hpp"
 
 #include "service-db/DBCalllogMessage.hpp"
 #include "service-db/DBContactMessage.hpp"
-#include "service-db/DBCountryCodeMessage.hpp"
-#include "service-db/DBNotesMessage.hpp"
 #include "service-db/DBNotificationMessage.hpp"
-#include "service-db/DBSMSMessage.hpp"
-#include "service-db/DBSMSTemplateMessage.hpp"
 #include "service-db/DBServiceMessage.hpp"
-#include "service-db/DBServiceName.hpp"
-#include "service-db/DBThreadMessage.hpp"
 #include "service-db/QueryMessage.hpp"
 #include "service-db/DatabaseAgent.hpp"
+#include "agents/quotes/QuotesAgent.cpp"
 #include "agents/settings/SettingsAgent.hpp"
 
 #include <AlarmsRecord.hpp>
@@ -37,10 +32,9 @@
 #include <purefs/filesystem_paths.hpp>
 #include <SMSRecord.hpp>
 #include <SMSTemplateRecord.hpp>
-#include <Service/Bus.hpp>
 #include <Tables/Record.hpp>
 #include <ThreadRecord.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <time/ScopedTime.hpp>
 
 #include <cassert>
@@ -66,6 +60,7 @@ ServiceDB::~ServiceDB()
     countryCodesDB.reset();
     notificationsDB.reset();
     eventsDB.reset();
+    quotesDB.reset();
 
     Database::deinitialize();
     LOG_INFO("[ServiceDB] Cleaning resources");
@@ -94,6 +89,8 @@ db::Interface *ServiceDB::getInterface(db::Interface::Name interface)
         return notificationsRecordInterface.get();
     case db::Interface::Name::Events:
         return eventsRecordInterface.get();
+    case db::Interface::Name::Quotes:
+        return quotesRecordInterface.get();
     }
     return nullptr;
 }
@@ -106,163 +103,6 @@ sys::MessagePointer ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::
     auto type = static_cast<MessageType>(msgl->messageType);
     switch (type) {
 
-        /*
-         * SMS records
-         */
-
-    case MessageType::DBSMSAdd: {
-        auto time         = utils::time::Scoped("DBSMSAdd");
-        DBSMSMessage *msg = reinterpret_cast<DBSMSMessage *>(msgl);
-        auto ret          = smsRecordInterface->Add(msg->record);
-        if (ret == true) {
-            // update db ID in response message
-            auto record    = std::make_unique<std::vector<SMSRecord>>();
-            msg->record.ID = smsRecordInterface->GetLastID();
-            record->push_back(msg->record);
-            LOG_INFO("SMS added, record ID: %" PRIu32, msg->record.ID);
-            responseMsg = std::make_shared<DBSMSResponseMessage>(std::move(record), ret);
-            sendUpdateNotification(db::Interface::Name::SMS, db::Query::Type::Create);
-        }
-    } break;
-
-    case MessageType::DBSMSRemove: {
-        auto time         = utils::time::Scoped("DBSMSRemove");
-        DBSMSMessage *msg = reinterpret_cast<DBSMSMessage *>(msgl);
-        auto ret          = smsRecordInterface->RemoveByID(msg->record.ID);
-        responseMsg       = std::make_shared<DBSMSResponseMessage>(nullptr, ret);
-        sendUpdateNotification(db::Interface::Name::SMS, db::Query::Type::Delete);
-        auto thread = threadRecordInterface->GetByID((msg->record.threadID));
-        if (!thread.isValid()) {
-            LOG_DEBUG("also thread has been deleted");
-            sendUpdateNotification(db::Interface::Name::SMSThread, db::Query::Type::Delete);
-        }
-    } break;
-
-    case MessageType::DBSMSUpdate: {
-        auto time         = utils::time::Scoped("DBSMSUpdate");
-        DBSMSMessage *msg = reinterpret_cast<DBSMSMessage *>(msgl);
-        auto ret          = smsRecordInterface->Update(msg->record);
-        responseMsg       = std::make_shared<DBSMSResponseMessage>(nullptr, ret);
-        sendUpdateNotification(db::Interface::Name::SMS, db::Query::Type::Update);
-    } break;
-
-    case MessageType::DBSMSGetSMSLimitOffset: {
-        auto time         = utils::time::Scoped("DBSMSGetSMSLimitOffset");
-        DBSMSMessage *msg = reinterpret_cast<DBSMSMessage *>(msgl);
-        auto ret          = smsRecordInterface->GetLimitOffset(msg->offset, msg->limit);
-        responseMsg       = std::make_shared<DBSMSResponseMessage>(std::move(ret), true);
-    } break;
-
-    case MessageType::DBSMSGetSMSLimitOffsetByThreadID: {
-        auto time         = utils::time::Scoped("DBSMSGetSMSLimitOffsetByThreadID");
-        DBSMSMessage *msg = reinterpret_cast<DBSMSMessage *>(msgl);
-        auto ret          = smsRecordInterface->GetLimitOffsetByField(
-            msg->offset, msg->limit, SMSRecordField::ThreadID, std::to_string(msg->id).c_str());
-        responseMsg = std::make_shared<DBSMSResponseMessage>(std::move(ret), true);
-    } break;
-
-    case MessageType::DBSMSGetLastRecord: {
-        auto time    = utils::time::Scoped("DBSMSGetLastRecord");
-        uint32_t id  = smsRecordInterface->GetLastID();
-        auto rec     = smsRecordInterface->GetByID(id);
-        auto records = std::make_unique<std::vector<SMSRecord>>();
-        records->push_back(rec);
-        responseMsg = std::make_shared<DBSMSResponseMessage>(std::move(records), true);
-        break;
-    }
-    case MessageType::DBSMSGetCount: {
-        auto time   = utils::time::Scoped("DBSMSGetCount");
-        auto ret    = smsRecordInterface->GetCount();
-        responseMsg = std::make_shared<DBSMSResponseMessage>(nullptr, true, ret);
-        break;
-    }
-        /**
-         * Thread records
-         */
-
-    case MessageType::DBThreadGet: {
-        auto time            = utils::time::Scoped("DBThreadGet");
-        DBThreadMessage *msg = reinterpret_cast<DBThreadMessage *>(msgl);
-        auto ret             = threadRecordInterface->GetByID(msg->id);
-        auto records         = std::make_unique<std::vector<ThreadRecord>>();
-        records->push_back(ret);
-        responseMsg = std::make_shared<DBThreadResponseMessage>(std::move(records), ret.isValid());
-    } break;
-
-    case MessageType::DBThreadGetForContact: {
-        auto time = utils::time::Scoped("DBThreadGetForContact");
-        auto msg  = dynamic_cast<DBThreadMessageGet *>(msgl);
-        if (!msg) {
-            LOG_ERROR("ERROR wrong message sent!");
-        }
-        auto ret     = threadRecordInterface->GetByContact(msg->contactID);
-        auto records = std::make_unique<std::vector<ThreadRecord>>();
-        records->push_back(ret);
-        responseMsg = std::make_shared<DBThreadResponseMessage>(std::move(records), ret.isValid());
-    }; break;
-
-    case MessageType::DBThreadRemove: {
-        auto time            = utils::time::Scoped("DBThreadRemove");
-        DBThreadMessage *msg = reinterpret_cast<DBThreadMessage *>(msgl);
-        auto ret             = threadRecordInterface->RemoveByID(msg->id);
-        responseMsg          = std::make_shared<DBThreadResponseMessage>(nullptr, ret);
-        sendUpdateNotification(db::Interface::Name::SMSThread, db::Query::Type::Delete);
-    } break;
-
-    case MessageType::DBThreadGetCount: {
-        auto *msg   = static_cast<DBThreadGetCountMessage *>(msgl);
-        auto time   = utils::time::Scoped("DBThreadGetCountMessage");
-        auto ret    = threadRecordInterface->GetCount(msg->state);
-        responseMsg = std::make_shared<DBThreadResponseMessage>(nullptr, true, 0, 0, ret);
-    } break;
-
-    case MessageType::DBThreadUpdate: {
-        auto time   = utils::time::Scoped("DBThreadUpdate");
-        auto msg    = static_cast<DBThreadMessage *>(msgl);
-        auto ret    = threadRecordInterface->Update(msg->record);
-        responseMsg = std::make_shared<DBThreadResponseMessage>(nullptr, true, 0, 0, ret);
-        sendUpdateNotification(db::Interface::Name::SMSThread, db::Query::Type::Update);
-    } break;
-
-        /**
-         * SMS templates records
-         */
-
-    case MessageType::DBSMSTemplateAdd: {
-        auto time   = utils::time::Scoped("DBSMSTemplateAdd");
-        auto msg    = static_cast<DBSMSTemplateMessage *>(msgl);
-        auto ret    = smsTemplateRecordInterface->Add(msg->record);
-        responseMsg = std::make_shared<DBSMSTemplateResponseMessage>(nullptr, ret);
-    } break;
-
-    case MessageType::DBSMSTemplateUpdate: {
-        auto time   = utils::time::Scoped("DBSMSTemplateUpdate");
-        auto msg    = static_cast<DBSMSTemplateMessage *>(msgl);
-        auto ret    = smsTemplateRecordInterface->Update(msg->record);
-        responseMsg = std::make_shared<DBSMSTemplateResponseMessage>(nullptr, ret);
-    }; break;
-
-    case MessageType::DBSMSTemplateRemove: {
-        auto time   = utils::time::Scoped("DBSMSTemplateRemove");
-        auto msg    = static_cast<DBSMSTemplateMessage *>(msgl);
-        auto ret    = smsTemplateRecordInterface->RemoveByID(msg->id);
-        responseMsg = std::make_shared<DBSMSTemplateResponseMessage>(nullptr, ret);
-    } break;
-
-    case MessageType::DBSMSTemplateGetLimitOffset: {
-        auto time   = utils::time::Scoped("DBSMSTemplateGetLimitOffset");
-        auto msg    = static_cast<DBSMSTemplateMessage *>(msgl);
-        auto ret    = smsTemplateRecordInterface->GetLimitOffset(msg->offset, msg->limit);
-        responseMsg = std::make_shared<DBSMSTemplateResponseMessage>(
-            std::move(ret), true, msg->limit, msg->offset, ret->size(), type);
-    } break;
-
-    case MessageType::DBSMSTemplateGetCount: {
-        auto time   = utils::time::Scoped("DBSMSTemplateGetCount");
-        auto ret    = smsTemplateRecordInterface->GetCount();
-        responseMsg = std::make_shared<DBSMSTemplateResponseMessage>(nullptr, true, 0, 0, ret);
-    } break;
-
         /**
          * Contact records
          */
@@ -273,21 +113,6 @@ sys::MessagePointer ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::
         auto ret              = contactRecordInterface->Add(msg->record);
         responseMsg           = std::make_shared<DBContactResponseMessage>(nullptr, ret);
         sendUpdateNotification(db::Interface::Name::Contact, db::Query::Type::Create);
-    } break;
-
-    case MessageType::DBContactGetByName: {
-        auto time             = utils::time::Scoped("DBContactGetByName");
-        DBContactMessage *msg = reinterpret_cast<DBContactMessage *>(msgl);
-        auto ret              = contactRecordInterface->GetByName(msg->record.primaryName, msg->record.alternativeName);
-        responseMsg           = std::make_shared<DBContactResponseMessage>(
-            std::move(ret), true, msg->limit, msg->offset, msg->favourite, ret->size(), type);
-    } break;
-
-    case MessageType::DBContactSearch: {
-        auto time                   = utils::time::Scoped("DBContactSearch");
-        DBContactSearchMessage *msg = reinterpret_cast<DBContactSearchMessage *>(msgl);
-        auto ret    = contactRecordInterface->Search(msg->primaryName, msg->alternativeName, msg->number);
-        responseMsg = std::make_shared<DBContactResponseMessage>(std::move(ret), true);
     } break;
 
     case MessageType::DBContactGetByID: {
@@ -314,19 +139,6 @@ sys::MessagePointer ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::
                                                                  MessageType::DBContactGetBySpeedDial);
     } break;
 
-    case MessageType::DBContactGetByNumber: {
-        auto time             = utils::time::Scoped("DBContactGetByNumber");
-        DBContactMessage *msg = reinterpret_cast<DBContactMessage *>(msgl);
-        auto ret              = contactRecordInterface->GetByNumber(msg->record.numbers[0].number);
-        responseMsg           = std::make_shared<DBContactResponseMessage>(std::move(ret),
-                                                                 true,
-                                                                 msg->limit,
-                                                                 msg->offset,
-                                                                 msg->favourite,
-                                                                 ret->size(),
-                                                                 MessageType::DBContactGetByNumber);
-    } break;
-
     case MessageType::DBContactMatchByNumber: {
         auto time = utils::time::Scoped("DBContactMatchByNumber");
         auto *msg = dynamic_cast<DBContactNumberMessage *>(msgl);
@@ -334,7 +146,7 @@ sys::MessagePointer ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::
 
         if (ret.has_value()) {
             responseMsg = std::make_shared<DBContactNumberResponseMessage>(
-                sys::ReturnCodes::Success, std::make_unique<ContactRecord>(ret->contact));
+                sys::ReturnCodes::Success, std::make_unique<ContactRecord>(std::move(ret->contact)));
         }
         else {
             responseMsg = std::make_shared<DBContactNumberResponseMessage>(sys::ReturnCodes::Failure,
@@ -350,86 +162,12 @@ sys::MessagePointer ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::
         sendUpdateNotification(db::Interface::Name::Contact, db::Query::Type::Delete);
     } break;
 
-    case MessageType::DBContactBlock: {
-        auto time           = utils::time::Scoped("DBContactBlock");
-        DBContactBlock *msg = reinterpret_cast<DBContactBlock *>(msgl);
-        auto ret            = contactRecordInterface->BlockByID(msg->id, msg->shouldBeBlocked);
-        responseMsg         = std::make_shared<DBContactResponseMessage>(nullptr, ret);
-    } break;
-
     case MessageType::DBContactUpdate: {
         auto time             = utils::time::Scoped("DBContactUpdate");
         DBContactMessage *msg = reinterpret_cast<DBContactMessage *>(msgl);
         auto ret              = contactRecordInterface->Update(msg->record);
         responseMsg           = std::make_shared<DBContactResponseMessage>(nullptr, ret);
         sendUpdateNotification(db::Interface::Name::Contact, db::Query::Type::Update);
-    } break;
-
-    case MessageType::DBContactGetCount: {
-        auto time             = utils::time::Scoped("DBContactGetCount");
-        DBContactMessage *msg = reinterpret_cast<DBContactMessage *>(msgl);
-        uint32_t ret          = 0;
-        if (msg->favourite)
-            ret = contactRecordInterface->GetCountFavourites();
-        else
-            ret = contactRecordInterface->GetCount();
-        responseMsg = std::make_shared<DBContactResponseMessage>(nullptr, true, 0, 0, msg->favourite, ret);
-    } break;
-
-    case MessageType::DBContactGetLimitOffset: {
-        auto time             = utils::time::Scoped("DBContactGetLimitOffset");
-        DBContactMessage *msg = reinterpret_cast<DBContactMessage *>(msgl);
-        std::unique_ptr<std::vector<ContactRecord>> ret;
-
-        ret = contactRecordInterface->GetLimitOffset(msg->offset, msg->limit);
-
-        responseMsg = std::make_shared<DBContactResponseMessage>(std::move(ret),
-                                                                 true,
-                                                                 msg->limit,
-                                                                 msg->offset,
-                                                                 msg->favourite,
-                                                                 ret->size(),
-                                                                 MessageType::DBContactGetLimitOffset);
-
-    } break;
-
-        /**
-         * Notes records
-         */
-
-    case MessageType::DBNotesAdd: {
-        auto time           = utils::time::Scoped("DBNotesAdd");
-        DBNotesMessage *msg = reinterpret_cast<DBNotesMessage *>(msgl);
-        auto ret            = notesRecordInterface->Add(msg->record);
-        responseMsg         = std::make_shared<DBNotesResponseMessage>(nullptr, ret);
-    } break;
-
-    case MessageType::DBNotesRemove: {
-        auto time           = utils::time::Scoped("DBNotesRemove");
-        DBNotesMessage *msg = reinterpret_cast<DBNotesMessage *>(msgl);
-        auto ret            = notesRecordInterface->RemoveByID(msg->id);
-        responseMsg         = std::make_shared<DBNotesResponseMessage>(nullptr, ret);
-    } break;
-
-    case MessageType::DBNotesUpdate: {
-        auto time           = utils::time::Scoped("DBNotesUpdate");
-        DBNotesMessage *msg = reinterpret_cast<DBNotesMessage *>(msgl);
-        auto ret            = notesRecordInterface->Update(msg->record);
-        responseMsg         = std::make_shared<DBNotesResponseMessage>(nullptr, ret);
-    } break;
-
-    case MessageType::DBNotesGetCount: {
-        auto time   = utils::time::Scoped("DBNotesGetCount");
-        auto ret    = notesRecordInterface->GetCount();
-        responseMsg = std::make_shared<DBNotesResponseMessage>(nullptr, true, 0, 0, ret);
-    } break;
-
-    case MessageType::DBNotesGetLimitOffset: {
-        auto time           = utils::time::Scoped("DBNotesGetLimitOffset");
-        DBNotesMessage *msg = reinterpret_cast<DBNotesMessage *>(msgl);
-        auto ret            = notesRecordInterface->GetLimitOffset(msg->offset, msg->limit);
-        responseMsg =
-            std::make_shared<DBNotesResponseMessage>(std::move(ret), true, msg->limit, msg->offset, ret->size());
     } break;
 
         /**
@@ -466,28 +204,6 @@ sys::MessagePointer ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::
         auto ret              = calllogRecordInterface->Update(msg->record);
         responseMsg           = std::make_shared<DBCalllogResponseMessage>(nullptr, ret);
         sendUpdateNotification(db::Interface::Name::Calllog, db::Query::Type::Update);
-    } break;
-
-    case MessageType::DBCalllogGetCount: {
-        auto *msg = dynamic_cast<DBCalllogGetCount *>(msgl);
-        assert(msg);
-        auto time   = utils::time::Scoped("DBCalllogGetCount");
-        auto ret    = calllogRecordInterface->GetCount(msg->state);
-        responseMsg = std::make_shared<DBCalllogResponseMessage>(nullptr, true, 0, 0, ret);
-    } break;
-
-    case MessageType::DBCalllogGetLimitOffset: {
-        auto time             = utils::time::Scoped("DBCalllogGetLimitOffset");
-        DBCalllogMessage *msg = reinterpret_cast<DBCalllogMessage *>(msgl);
-        auto ret              = calllogRecordInterface->GetLimitOffset(msg->offset, msg->limit);
-        responseMsg =
-            std::make_shared<DBCalllogResponseMessage>(std::move(ret), true, msg->limit, msg->offset, ret->size());
-    } break;
-
-    case MessageType::DBCountryCode: {
-        DBCountryCodeMessage *msg = reinterpret_cast<DBCountryCodeMessage *>(msgl);
-        auto ret                  = countryCodeRecordInterface->GetByMCC(msg->mcc);
-        responseMsg               = std::make_shared<DBCountryCodeResponseMessage>(ret);
     } break;
 
     case MessageType::DBQuery: {
@@ -536,6 +252,7 @@ sys::ReturnCodes ServiceDB::InitHandler()
     countryCodesDB  = std::make_unique<CountryCodesDB>("country-codes.db");
     notificationsDB = std::make_unique<NotificationsDB>((purefs::dir::getUserDiskPath() / "notifications.db").c_str());
     eventsDB        = std::make_unique<EventsDB>((purefs::dir::getUserDiskPath() / "events.db").c_str());
+    quotesDB        = std::make_unique<Database>((purefs::dir::getUserDiskPath() / "quotes.db").c_str());
 
     // Create record interfaces
     contactRecordInterface       = std::make_unique<ContactRecordInterface>(contactsDB.get());
@@ -546,8 +263,10 @@ sys::ReturnCodes ServiceDB::InitHandler()
     notesRecordInterface         = std::make_unique<NotesRecordInterface>(notesDB.get());
     calllogRecordInterface       = std::make_unique<CalllogRecordInterface>(calllogDB.get(), contactsDB.get());
     countryCodeRecordInterface   = std::make_unique<CountryCodeRecordInterface>(countryCodesDB.get());
-    notificationsRecordInterface = std::make_unique<NotificationsRecordInterface>(notificationsDB.get());
+    notificationsRecordInterface =
+        std::make_unique<NotificationsRecordInterface>(notificationsDB.get(), contactRecordInterface.get());
     eventsRecordInterface        = std::make_unique<EventsRecordInterface>(eventsDB.get());
+    quotesRecordInterface        = std::make_unique<Quotes::QuotesAgent>(quotesDB.get());
 
     databaseAgents.emplace(std::make_unique<SettingsAgent>(this));
     databaseAgents.emplace(std::make_unique<FileIndexerAgent>(this));
@@ -565,6 +284,11 @@ sys::ReturnCodes ServiceDB::DeinitHandler()
     return sys::ReturnCodes::Success;
 }
 
+void ServiceDB::ProcessCloseReason(sys::CloseReason closeReason)
+{
+    sendCloseReadyMessage(this);
+}
+
 sys::ReturnCodes ServiceDB::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
 {
     LOG_FATAL("[%s] PowerModeHandler: %s", this->GetName().c_str(), c_str(mode));
@@ -574,16 +298,56 @@ sys::ReturnCodes ServiceDB::SwitchPowerModeHandler(const sys::ServicePowerMode m
 void ServiceDB::sendUpdateNotification(db::Interface::Name interface, db::Query::Type type)
 {
     auto notificationMessage = std::make_shared<db::NotificationMessage>(interface, type);
-    sys::Bus::SendMulticast(notificationMessage, sys::BusChannels::ServiceDBNotifications, this);
+    bus.sendMulticast(notificationMessage, sys::BusChannel::ServiceDBNotifications);
 }
 
-bool ServiceDB::StoreIntoBackup(const std::string &backupPath)
+bool ServiceDB::StoreIntoBackup(const std::filesystem::path &backupPath)
 {
-    bool rc = contactsDB.get()->storeIntoFile(backupPath + "contacts.db");
-    rc |= smsDB.get()->storeIntoFile(backupPath + "sms.db");
-    rc |= alarmsDB.get()->storeIntoFile(backupPath + "alarms.db");
-    rc |= notesDB.get()->storeIntoFile(backupPath + "notes.db");
-    rc |= calllogDB.get()->storeIntoFile(backupPath + "calllog.db");
-    rc |= eventsDB.get()->storeIntoFile(backupPath + "events.db");
-    return rc;
+    if (contactsDB->storeIntoFile(backupPath / std::filesystem::path(contactsDB->getName()).filename()) == false) {
+        LOG_ERROR("contactsDB backup failed");
+        return false;
+    }
+
+    if (smsDB->storeIntoFile(backupPath / std::filesystem::path(smsDB->getName()).filename()) == false) {
+        LOG_ERROR("smsDB backup failed");
+        return false;
+    }
+
+    if (alarmsDB->storeIntoFile(backupPath / std::filesystem::path(alarmsDB->getName()).filename()) == false) {
+        LOG_ERROR("alarmsDB backup failed");
+        return false;
+    }
+
+    if (notesDB->storeIntoFile(backupPath / std::filesystem::path(notesDB->getName()).filename()) == false) {
+        LOG_ERROR("notesDB backup failed");
+        return false;
+    }
+
+    if (calllogDB->storeIntoFile(backupPath / std::filesystem::path(calllogDB->getName()).filename()) == false) {
+        LOG_ERROR("calllogDB backup failed");
+        return false;
+    }
+
+    if (eventsDB->storeIntoFile(backupPath / std::filesystem::path(eventsDB->getName()).filename()) == false) {
+        LOG_ERROR("eventsDB backup failed");
+        return false;
+    }
+
+    if (quotesDB->storeIntoFile(backupPath / std::filesystem::path(quotesDB->getName()).filename()) == false) {
+        LOG_ERROR("quotesDB backup failed");
+        return false;
+    }
+
+    for (auto &db : databaseAgents) {
+        if (db.get() && db.get()->getAgentName() == "settingsAgent") {
+
+            if (db->storeIntoFile(backupPath / std::filesystem::path(db->getDbFilePath()).filename()) == false) {
+                LOG_ERROR("settingsAgent backup failed");
+                return false;
+            }
+            break;
+        }
+    }
+
+    return true;
 }

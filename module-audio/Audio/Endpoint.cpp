@@ -1,21 +1,20 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Endpoint.hpp"
 
+#include <algorithm>
+#include <vector>
+
 #include <cassert> // assert
 
-using namespace audio;
+using audio::AbstractStream;
+using audio::Endpoint;
+using audio::Sink;
+using audio::Source;
+using audio::StreamConnection;
 
-Endpoint::Endpoint(const Capabilities &caps) : _caps(caps)
-{}
-
-const Endpoint::Capabilities &Endpoint::getCapabilities() const noexcept
-{
-    return _caps;
-}
-
-void Endpoint::connectStream(Stream &stream)
+void Endpoint::connectStream(AbstractStream &stream)
 {
     assert(_stream == nullptr);
     _stream = &stream;
@@ -32,7 +31,13 @@ bool Endpoint::isConnected() const noexcept
     return _stream != nullptr;
 }
 
-StreamConnection::StreamConnection(Source *source, Sink *sink, Stream *stream)
+auto Endpoint::isFormatSupported(const AudioFormat &format) -> bool
+{
+    const auto &formats = getSupportedFormats();
+    return std::find(std::begin(formats), std::end(formats), format) != std::end(formats);
+}
+
+StreamConnection::StreamConnection(Source *source, Sink *sink, AbstractStream *stream)
     : _sink(sink), _source(source), _stream(stream)
 {
     assert(_sink != nullptr);
@@ -96,7 +101,7 @@ Sink *StreamConnection::getSink() const noexcept
     return _sink;
 }
 
-Stream *StreamConnection::getStream() const noexcept
+AbstractStream *StreamConnection::getStream() const noexcept
 {
     return _stream;
 }

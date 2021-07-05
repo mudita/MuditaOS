@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 import sys
@@ -17,7 +17,7 @@ def get_device_info(harness):
 
 def get_version(harness):
     device_info = get_device_info(harness)
-    return [device_info["gitRevision"], device_info["gitBranch"], device_info["gitTag"]]
+    return [device_info["body"]["gitRevision"], device_info["body"]["gitBranch"], device_info["body"]["gitTag"]]
 
 
 def main():
@@ -50,6 +50,7 @@ def main():
         exit()
 
     harness = Harness(port_name)
+    harness.unlock_phone()
     [rev, branch, tag] = get_version(harness)
 
     if args.git_tag != tag or args.git_branch != branch or args.git_revision != rev:

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -11,7 +11,7 @@
 #include <Service/Common.hpp>
 #include <Service/Service.hpp>
 #include <application-phonebook/models/PhonebookModel.hpp>
-#include <json/json11.hpp>
+#include <json11.hpp>
 
 #include <string>
 
@@ -26,8 +26,10 @@ namespace parserFSM
 
     class ContactHelper : public DBHelper
     {
+
       public:
-        ContactHelper(sys::Service *_ownerServicePtr) : DBHelper(_ownerServicePtr){};
+        explicit ContactHelper(sys::Service *_ownerServicePtr) : DBHelper(_ownerServicePtr)
+        {}
 
         auto createDBEntry(Context &context) -> sys::ReturnCodes override;
         auto requestDataFromDB(Context &context) -> sys::ReturnCodes override;
@@ -36,13 +38,13 @@ namespace parserFSM
 
         auto requestCount(Context &context) -> sys::ReturnCodes;
         auto requestContactByID(Context &context) -> sys::ReturnCodes;
-        static auto to_json(ContactRecord record) -> json11::Json;
-        static auto from_json(json11::Json contactJSON) -> ContactRecord;
+        static auto to_json(const ContactRecord &record) -> json11::Json;
+        static auto from_json(const json11::Json &contactJSON) -> ContactRecord;
     };
 
     namespace json::contacts
     {
-        inline constexpr auto count           = "count";
+        inline constexpr auto limit           = "limit";
         inline constexpr auto offset          = "offset";
         inline constexpr auto primaryName     = "priName";
         inline constexpr auto alternativeName = "altName";
@@ -51,6 +53,7 @@ namespace parserFSM
         inline constexpr auto numbers         = "numbers";
         inline constexpr auto isBlocked       = "blocked";
         inline constexpr auto isFavourite     = "favourite";
+        inline constexpr auto count           = "count";
 
     } // namespace json::contacts
 } // namespace parserFSM

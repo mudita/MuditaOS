@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -21,6 +21,7 @@ namespace app
 
         ApplicationSpecialInput(std::string name                    = special_input,
                                 std::string parent                  = {},
+                                sys::phone_modes::PhoneMode mode    = sys::phone_modes::PhoneMode::Connected,
                                 StartInBackground startInBackground = {true});
         virtual ~ApplicationSpecialInput() = default;
 
@@ -39,7 +40,7 @@ namespace app
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {
-            return {{manager::actions::ShowSpecialInput}};
+            return {{manager::actions::ShowSpecialInput, manager::actions::PhoneModeChanged}};
         }
     };
 }; // namespace app

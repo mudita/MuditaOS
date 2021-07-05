@@ -1,8 +1,8 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ThreadItem.hpp"
-#include "time/time_conversion.hpp"
+#include <time/time_conversion_factory.hpp>
 
 #include <Style.hpp>
 #include "application-messages/data/MessagesStyle.hpp"
@@ -30,14 +30,14 @@ namespace gui
     {
         switch (threadStruct->thread->type) {
         case SMSType::DRAFT:
-            snippetPrefix->setText(utils::localize.get("app_messages_thread_draft"));
+            snippetPrefix->setText(utils::translate("app_messages_thread_draft"));
             break;
         case SMSType::FAILED:
-            snippetPrefix->setText(utils::localize.get("app_messages_thread_not_sent"));
+            snippetPrefix->setText(utils::translate("app_messages_thread_not_sent"));
             break;
         case SMSType::OUTBOX:
         case SMSType::QUEUED:
-            snippetPrefix->setText(utils::localize.get("app_messages_thread_you"));
+            snippetPrefix->setText(utils::translate("app_messages_thread_you"));
             break;
         default:
             break;
@@ -50,7 +50,8 @@ namespace gui
         threadStruct = std::move(_threadStruct);
 
         setContactName(getNumberImportance());
-        timestamp->setText(utils::time::DateTime(threadStruct->thread->date));
+        using namespace utils::time;
+        timestamp->setText(*TimestampFactory().createTimestamp(TimestampType::DateTime, threadStruct->thread->date));
         setPreview();
     }
 

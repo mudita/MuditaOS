@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "EventDetailWindow.hpp"
@@ -30,15 +30,16 @@ namespace gui
 
         bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
         bottomBar->setActive(gui::BottomBar::Side::LEFT, true);
-        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
-        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::localize.get(style::strings::common::options));
+        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::translate(style::strings::common::options));
 
         bodyList = new gui::ListView(this,
                                      style::window::calendar::listView_x,
                                      style::window::calendar::listView_y,
                                      style::window::calendar::listView_w,
                                      style::window::calendar::listView_h,
-                                     eventDetailModel);
+                                     eventDetailModel,
+                                     gui::listview::ScrollBarType::PreRendered);
 
         setFocusItem(bodyList);
     }
@@ -78,11 +79,7 @@ namespace gui
             return true;
         }
 
-        if (!inputEvent.isShortPress()) {
-            return false;
-        }
-
-        if (inputEvent.keyCode == gui::KeyCode::KEY_LF) {
+        if (inputEvent.isShortRelease(gui::KeyCode::KEY_LF)) {
             LOG_DEBUG("Switch to option window");
             auto rec  = std::make_unique<EventsRecord>(*eventRecord);
             auto data = std::make_unique<EventRecordData>(std::move(rec));

@@ -1,8 +1,8 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RT1051DriverI2C.hpp"
-#include "log/log.hpp"
+#include <log.hpp>
 #include "../board.h"
 
 namespace drivers
@@ -11,7 +11,7 @@ namespace drivers
     RT1051DriverI2C::RT1051DriverI2C(const I2CInstances inst, const DriverI2CParams &params) : DriverI2C(params, inst)
     {
 
-        lpi2c_master_config_t lpi2cConfig = {0};
+        lpi2c_master_config_t lpi2cConfig = {};
 
         switch (instance) {
         case I2CInstances ::I2C1:
@@ -21,6 +21,8 @@ namespace drivers
         case I2CInstances ::I2C2:
             base = LPI2C2;
             LOG_DEBUG("Init: I2C2");
+            break;
+        default:
             break;
         }
         LPI2C_MasterGetDefaultConfig(&lpi2cConfig);
@@ -35,6 +37,8 @@ namespace drivers
             break;
         case I2CInstances ::I2C2:
             LOG_DEBUG("Deinit: I2C2");
+            break;
+        default:
             break;
         }
         LPI2C_MasterDeinit(base);

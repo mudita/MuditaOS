@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DayEventsItem.hpp"
@@ -6,7 +6,7 @@
 #include <ListView.hpp>
 #include <gui/widgets/Label.hpp>
 #include <Style.hpp>
-#include <module-utils/time/TimeRangeParser.hpp>
+#include <time/TimeRangeParser.hpp>
 
 namespace gui
 {
@@ -41,6 +41,11 @@ namespace gui
         description->setEdges(gui::RectangleEdge::None);
         description->setFont(style::window::font::medium);
         description->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
+
+        dimensionChangedCallback = [&](gui::Item &, const BoundingBox &newDim) -> bool {
+            vBox->setArea({0, 0, newDim.w, newDim.h});
+            return true;
+        };
     }
 
     void DayEventsItem::setEvent(std::shared_ptr<EventsRecord> rec)
@@ -55,12 +60,4 @@ namespace gui
             }
         }
     }
-
-    bool DayEventsItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
-    {
-        vBox->setPosition(0, 0);
-        vBox->setSize(newDim.w, newDim.h);
-        return true;
-    }
-
 } /* namespace gui */

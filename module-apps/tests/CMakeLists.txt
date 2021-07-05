@@ -1,9 +1,10 @@
 add_catch2_executable(
     NAME
-        callback-storage-test
+        apps-common
     SRCS
         tests-main.cpp
         test-CallbackStorage.cpp
+        test-PhoneModesPolicies.cpp
     LIBS
-        ${PROJECT_NAME}
+        module-apps
 )

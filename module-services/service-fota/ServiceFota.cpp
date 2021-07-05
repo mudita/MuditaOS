@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-fota/FotaMessages.hpp"
@@ -8,54 +8,50 @@
 
 #include <Commands.hpp>
 #include <MessageType.hpp>
-#include <Modem/TS0710/DLC_channel.h>
-#include <Service/Bus.hpp>
+#include <modem/mux/DLCChannel.h>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
-#include <Service/Timer.hpp>
-#include <log/log.hpp>
-#include <module-cellular/at/Result.hpp>
-#include <module-cellular/at/UrcFactory.hpp>
+#include <Timers/TimerFactory.hpp>
+#include <log.hpp>
+#include <at/Result.hpp>
+#include <at/UrcFactory.hpp>
 #include <portmacro.h>
 #include <service-cellular/CellularMessage.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
 #include <service-cellular/State.hpp>
 
-#include <bits/exception.h>                            // for exception
-#include <algorithm>                                   // for find_if, remove, transform
-#include <cctype>                                      // for tolower
-#include <functional>                                  // for _Bind_helper<>::type, _Placeholder, bind, _1, _2
-#include <numeric>                                     // for accumulate
+#include <bits/exception.h> // for exception
+#include <algorithm>        // for find_if, remove, transform
+#include <cctype>           // for tolower
+#include <functional>       // for _Bind_helper<>::type, _Placeholder, bind, _1, _2
+#include <numeric>          // for accumulate
 #include <sstream> // for operator<<, basic_ostream, ostringstream, basic_ostream::operator<<, char_traits, basic_istream, istringstream, basic_ostream<>::__ostream_type
 #include <string>  // for string, basic_string, stoi, getline, operator<<, operator==, operator+, operator!=
 #include <unordered_map> // for unordered_map<>::iterator, _Node_iterator, operator==, _Map_base<>::mapped_type, _Node_iterator_base, unordered_map<>::mapped_type
 #include <utility>       // for move, pair
 #include <vector>        // for vector
 
-
 namespace FotaService
 {
-
-    const char *Service::serviceName     = "ServiceFota";
     const TickType_t defaultTimer        = 1000;
     const uint32_t QIDEACTTimeout        = 40000;
     const uint32_t QIACTTimeout          = 150000;
     const char *httpErrorCode200         = "200";
     const uint32_t httpErrorCodeValue200 = 200;
 
-    Service::Service() : sys::Service(serviceName)
+    Service::Service() : sys::Service(service::name::fota)
     {
         LOG_INFO("[ServiceFota] Initializing");
 
-        busChannels.push_back(sys::BusChannels::ServiceFotaNotifications);
-        busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
+        bus.channels.push_back(sys::BusChannel::ServiceFotaNotifications);
+        bus.channels.push_back(sys::BusChannel::ServiceCellularNotifications);
 
-        connectionTimer = std::make_unique<sys::Timer>("Fota", this, defaultTimer);
-        connectionTimer->connect([&](sys::Timer &) {
-            std::shared_ptr<InternetRequestMessage> msg =
-                std::make_shared<InternetRequestMessage>(MessageType::CellularListCurrentCalls);
-            sys::Bus::SendUnicast(msg, Service::serviceName, this);
-        });
+        connectionTimer = sys::TimerFactory::createPeriodicTimer(
+            this, "Fota", std::chrono::milliseconds{defaultTimer}, [this](sys::Timer &) {
+                std::shared_ptr<InternetRequestMessage> msg =
+                    std::make_shared<InternetRequestMessage>(MessageType::MessageTypeUninitialized);
+                bus.sendUnicast(msg, service::name::fota);
+            });
         registerMessageHandlers();
     }
 
@@ -74,13 +70,19 @@ namespace FotaService
         return sys::ReturnCodes::Success;
     }
 
+    void Service::ProcessCloseReason(sys::CloseReason closeReason)
+    {
+        sendCloseReadyMessage(this);
+    }
+
     void Service::registerMessageHandlers()
     {
         LOG_DEBUG("Registring Handlers for Fota::Service:");
         using std::placeholders::_1;
         connect(CellularGetChannelResponseMessage(),
                 std::bind(&Service::handleCellularGetChannelResponseMessage, this, _1));
-        connect(cellular::StateChange(), std::bind(&Service::handleServiceCellularNotifications, this, _1));
+        connect(typeid(cellular::msg::notification::SimReady),
+                std::bind(&Service::handleSimReadyNotification, this, _1));
         connect(ConfigureAPNMessage(), std::bind(&Service::handleConfigureAPN, this, _1));
         connect(ConnectMessage(), std::bind(&Service::handleConnect, this, _1));
         connect(HTTPRequestMessage(), std::bind(&Service::handleHttpGet, this, _1));
@@ -101,20 +103,15 @@ namespace FotaService
         return sys::MessageNone{};
     }
 
-    sys::MessagePointer Service::handleServiceCellularNotifications(sys::Message *req)
+    sys::MessagePointer Service::handleSimReadyNotification(sys::Message *)
     {
-        if (auto msg = dynamic_cast<cellular::StateChange *>(req)) {
-            LOG_DEBUG("cellular::StageChange: %s", cellular::State::c_str(msg->request));
-            if (msg->request == cellular::State::ST::Ready) {
-                LOG_DEBUG("Modem is \"Ready\"");
-                if (dataChannel == nullptr) {
-                    LOG_DEBUG("Requesting channel");
-                    CellularServiceAPI::GetDataChannel(this);
-                }
-                else {
-                    LOG_DEBUG("Channel already present: %p", dataChannel);
-                }
-            }
+        LOG_DEBUG("Modem is \"Ready\"");
+        if (dataChannel == nullptr) {
+            LOG_DEBUG("Requesting channel");
+            CellularServiceAPI::GetDataChannel(this);
+        }
+        else {
+            LOG_DEBUG("Channel already present: %p", dataChannel);
         }
         return std::make_shared<sys::ResponseMessage>();
     }
@@ -149,10 +146,8 @@ namespace FotaService
                 }
 
                 if (atResult) {
-                    sys::Bus::SendMulticast(
-                        std::make_shared<NotificationMessage>(NotificationMessage::Type::Configured),
-                        sys::BusChannels::ServiceFotaNotifications,
-                        this);
+                    bus.sendMulticast(std::make_shared<NotificationMessage>(NotificationMessage::Type::Configured),
+                                      sys::BusChannel::ServiceFotaNotifications);
                     LOG_DEBUG("Internet Cofiguration OK");
                 }
                 return std::make_shared<FotaResponseMessage>(true);
@@ -172,10 +167,9 @@ namespace FotaService
                 }
             }
             LOG_DEBUG("InternetConnect OK");
-            sys::Bus::SendMulticast(std::make_shared<NotificationMessage>(
-                                        static_cast<NotificationMessage::Type>(NotificationMessage::Type::Connected)),
-                                    sys::BusChannels::ServiceFotaNotifications,
-                                    this);
+            bus.sendMulticast(std::make_shared<NotificationMessage>(
+                                  static_cast<NotificationMessage::Type>(NotificationMessage::Type::Connected)),
+                              sys::BusChannel::ServiceFotaNotifications);
             return std::make_shared<FotaResponseMessage>(true);
         }
         return std::make_shared<FotaResponseMessage>(false);
@@ -347,7 +341,7 @@ namespace FotaService
     void Service::getActiveCotext()
     {
         if (dataChannel) {
-            auto availableContext = sendAndLogError("AT+QIACT?");
+            auto availableContext = sendAndLogError("AT+QIACT?", 150000);
             if (availableContext) {
                 parseQIACT(availableContext);
             }
@@ -402,8 +396,8 @@ namespace FotaService
                     LOG_ERROR("Conversion error of %s, taking default value %d", data[2].c_str(), contextTypeRaw);
                 }
 
-                apnConfig.type      = static_cast<APN::ContextType>(contextTypeRaw);
-                apnConfig.ip        = data[3].substr(1, data[3].size() - 1);
+                apnConfig.type = static_cast<APN::ContextType>(contextTypeRaw);
+                apnConfig.ip   = data[3].substr(1, data[3].size() - 1);
                 LOG_DEBUG("Warking APN: %s", apnConfig.toString().c_str());
                 contextMap[apnConfig.contextId] = apnConfig;
             }
@@ -516,7 +510,7 @@ namespace FotaService
 
     at::Result Service::sendAndLogError(const std::string &msg, uint32_t timeout) const
     {
-        at::Result result = dataChannel->cmd(msg, timeout);
+        at::Result result = dataChannel->cmd(msg, std::chrono::milliseconds(timeout));
         logIfError(result, msg);
         return result;
     }
@@ -526,7 +520,9 @@ namespace FotaService
             auto results = dataChannel->cmd(at::AT::QIGETERROR);
             LOG_WARN("error cmd:%s", cmdString.c_str());
             LOG_WARN("Error str:%s",
-                     std::accumulate(results.response.begin(), results.response.end(), std::string("\n")).c_str());
+                     utils::removeNewLines(
+                         std::accumulate(results.response.begin(), results.response.end(), std::string("\n")))
+                         .c_str());
         }
     }
 
@@ -574,7 +570,7 @@ namespace FotaService
         msg->httpServerResponseError             = httpErrorCodeValue200;
         msg->responseHeaders                     = std::move(headers);
         msg->body                                = std::move(body);
-        sys::Bus::SendUnicast(msg, receiverServiceName, this);
+        bus.sendUnicast(msg, receiverServiceName);
     }
 
     void Service::parseQIND(const std::string &message)
@@ -588,13 +584,13 @@ namespace FotaService
     {
         auto progressMsg      = std::make_shared<FOTAProgres>();
         progressMsg->progress = progress;
-        sys::Bus::SendUnicast(progressMsg, receiver, this);
+        bus.sendUnicast(progressMsg, receiver);
     }
 
     void Service::sendFotaFinshed(const std::string &receiver)
     {
         auto msg = std::make_shared<FOTAFinished>();
-        sys::Bus::SendUnicast(std::move(msg), receiver, this);
+        bus.sendUnicast(std::move(msg), receiver);
     }
 
     sys::MessagePointer Service::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage * /*resp*/)
@@ -602,7 +598,7 @@ namespace FotaService
         std::shared_ptr<sys::ResponseMessage> responseMsg;
 
         LOG_DEBUG("%s: DataRecieve: bus:%d | message:%d",
-                  serviceName,
+                  service::name::fota,
                   static_cast<int>(msgl->channel),
                   static_cast<int>(msgl->messageType));
         return (responseMsg ? responseMsg : std::make_shared<sys::ResponseMessage>());

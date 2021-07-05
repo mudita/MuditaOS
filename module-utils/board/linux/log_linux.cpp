@@ -1,15 +1,11 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "log/log.hpp"
-#include "log/Logger.hpp"
+#include <log.hpp>
+#include <Logger.hpp>
 #include <iostream>
 #include <string_view>
 #include <ticks.hpp>
-
-#if LOG_USE_COLOR == 1
-static const char *level_colors[] = {"\x1b[94m", "\x1b[36m", "\x1b[32m", "\x1b[33m", "\x1b[31m", "\x1b[35m"};
-#endif
 
 namespace Log
 {
@@ -19,23 +15,17 @@ namespace Log
                                            LOGGER_BUFFER_SIZE - loggerBufferCurrentPos,
                                            "%d ms ",
                                            cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks()));
-#if LOG_USE_COLOR == 1
+
         loggerBufferCurrentPos += snprintf(&loggerBuffer[loggerBufferCurrentPos],
                                            LOGGER_BUFFER_SIZE - loggerBufferCurrentPos,
-                                           "%s%-5s\x1b[0m \x1b[90m%s:%d:\x1b[0m ",
-                                           level_colors[level],
-                                           level_names[level],
-                                           file,
-                                           line);
-#else
-        loggerBufferCurrentPos += snprintf(&loggerBuffer[loggerBufferCurrentPos],
-                                           LOGGER_BUFFER_SIZE - loggerBufferCurrentPos,
-                                           "%-5s %s:%s:%d: ",
-                                           level_names[level],
+                                           "%s%-5s %s%s:%s:%d:%s ",
+                                           logColors->levelColors[level].data(),
+                                           levelNames[level],
+                                           logColors->callerInfoColor.data(),
                                            file,
                                            function,
-                                           line);
-#endif
+                                           line,
+                                           logColors->resetColor.data());
     }
 
     bool Logger::filterLogs(logger_level _level)
@@ -48,8 +38,8 @@ namespace Log
         assert(false && "Not implemented");
     }
 
-    void Logger::logToDevice(Device, std::string_view log, size_t)
+    void Logger::logToDevice(Device, std::string_view logMsg, size_t)
     {
-        std::cout << log;
+        std::cout << logMsg;
     }
 } // namespace Log

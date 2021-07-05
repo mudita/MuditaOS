@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -27,9 +27,10 @@ struct CalllogRecord : public Record
     bool isRead                          = true;
 
     friend std::ostream &operator<<(std::ostream &out, const CalllogRecord &point);
+    [[nodiscard]] std::string str() const;
 
-    CalllogRecord()  = default;
-    ~CalllogRecord() = default;
+    CalllogRecord() = default;
+    CalllogRecord(const CallType type, const utils::PhoneNumber::View &number);
     CalllogRecord(const CalllogTableRow &tableRow);
 
     uint32_t getContactId() const;
@@ -45,7 +46,6 @@ class CalllogRecordInterface : public RecordInterface<CalllogRecord, CalllogReco
 {
   public:
     CalllogRecordInterface(CalllogDB *CalllogDb, ContactsDB *contactsDb);
-    virtual ~CalllogRecordInterface();
 
     bool Add(const CalllogRecord &rec) override final;
     bool RemoveByID(uint32_t id) override final;

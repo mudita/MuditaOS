@@ -1,0 +1,32 @@
+@startuml
+participant ServiceCellular as cellular
+participant TS0710 as ts
+participant WorkerThread as worker
+participant UrcFactory as factory
+participant Urc as urc
+participant CellularUrcHandler as handler
+
+
+cellular -> ts + : <<create>>
+cellular -> ts  : setCallback
+ts -> worker * : <<create>>
+note right worker 
+processing of the incoming data takes place is separate thread
+utilizing the callback function set by ServiceCellular
+end note
+loop true
+?-> worker : new data
+worker -> cellular : callback
+cellular -> factory + : Create
+factory -> urc ** : <<create>>
+return <<return>>
+cellular -> urc +: Handle(CellularUrcHandler)
+urc -> handler + : Handle(Urc)
+handler->? : <<specific system\nactions>>
+handler<-? - : <<result>>
+cellular -> handler + : getResponse
+handler --> cellular - : <<response>>
+?<--    cellular -- : ""multicast\nresponse""
+cellular -> urc !! : delete
+end
+@enduml

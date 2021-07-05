@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "EventsRecord.hpp"
@@ -7,8 +7,7 @@
 #include <parser/ParserUtils.hpp>
 #include "Service/Common.hpp"
 #include <service-db/DBServiceAPI.hpp>
-#include "log/log.hpp"
-#include "json/json11.hpp"
+#include <log.hpp>
 #include <queries/calendar/QueryEventsGetAll.hpp>
 #include <queries/calendar/QueryEventsGet.hpp>
 #include <queries/calendar/QueryEventsAdd.hpp>
@@ -18,6 +17,7 @@
 #include <queries/calendar/QueryEventsRemoveICS.hpp>
 #include <queries/calendar/QueryEventsGetAllLimited.hpp>
 #include <variant>
+#include <utility>
 
 namespace parserFSM
 {
@@ -76,16 +76,14 @@ namespace parserFSM
                 constexpr inline auto iCalUid = "iCalUid";
             } // namespace provider
         }     // namespace event
-        constexpr inline auto offset      = "offset";
-        constexpr inline auto limit       = "limit";
-        constexpr inline auto count       = "count";
-        constexpr inline auto total_count = "total_count";
+        constexpr inline auto limit  = "limit";
+        constexpr inline auto offset = "offset";
 
     } // namespace json::calendar
 } // namespace parserFSM
 using namespace parserFSM;
 
-auto CalendarEventsHelper::isICalEventValid(ICalEvent icalEvent) const -> bool
+auto CalendarEventsHelper::isICalEventValid(const ICalEvent &icalEvent) const -> bool
 {
     if (!icalEvent.event.isValid) {
         LOG_ERROR("Ical event invalid!");
@@ -198,11 +196,11 @@ auto CalendarEventsHelper::icalEventFrom(const EventsRecord &record) const -> IC
     return ICalEvent{event, alarm, rrule};
 }
 
-auto CalendarEventsHelper::eventJsonObjectFrom(EventsRecord record) const -> json11::Json
+auto CalendarEventsHelper::eventJsonObjectFrom(const EventsRecord &record) const -> json11::Json
 {
     auto icalEvent = icalEventFrom(record);
     if (!isICalEventValid(icalEvent)) {
-        LOG_ERROR("Bad event record formatting  (Event UID: %s)", icalEvent.event.getUID().c_str());
+        LOG_ERROR("Bad event record formatting");
     }
 
     auto rruleObj = json11::Json::object{
@@ -232,49 +230,45 @@ auto CalendarEventsHelper::eventJsonObjectFrom(EventsRecord record) const -> jso
 
 auto CalendarEventsHelper::requestDataFromDB(Context &context) -> sys::ReturnCodes
 {
-    const auto obj  = context.getBody();
-    uint32_t offset = obj[json::calendar::offset].int_value();
-    uint32_t limit  = obj[json::calendar::limit].int_value();
-    auto query      = std::make_unique<db::query::events::GetAllLimited>(offset, limit);
+    try {
+        auto &ctx          = dynamic_cast<PagedContext &>(context);
+        std::size_t limit  = ctx.getBody()[json::calendar::limit].int_value();
+        std::size_t offset = ctx.getBody()[json::calendar::offset].int_value();
+        ctx.setRequestedLimit(limit);
+        ctx.setRequestedOffset(offset);
+        auto query = std::make_unique<db::query::events::GetAllLimited>(offset, std::min(ctx.getPageSize(), limit));
 
-    auto listener = std::make_unique<db::EndpointListener>(
-        [&](db::QueryResult *result, Context context) {
-            if (auto EventsResult = dynamic_cast<db::query::events::GetAllLimitedResult *>(result)) {
-                auto records        = EventsResult->getResult();
-                uint32_t totalCount = EventsResult->getCountResult();
-                auto parser         = std::make_unique<ParserICS>();
-                std::vector<ICalEvent> icalEvents;
+        auto listener = std::make_unique<db::EndpointListenerWithPages>(
+            [&](db::QueryResult *result, PagedContext &context) {
+                if (auto EventsResult = dynamic_cast<db::query::events::GetAllLimitedResult *>(result)) {
+                    auto records        = EventsResult->getResult();
+                    uint32_t totalCount = EventsResult->getCountResult();
+                    auto parser         = std::make_unique<ParserICS>();
+                    std::vector<ICalEvent> icalEvents;
+                    context.setTotalCount(totalCount);
+                    auto eventsArray = json11::Json::array();
 
-                auto eventsArray = json11::Json::array();
+                    for (const auto &rec : records) {
+                        auto eventObject = eventJsonObjectFrom(rec);
+                        eventsArray.emplace_back(eventObject);
+                    }
+                    context.setResponseBody(eventsArray);
+                    MessageHandler::putToSendQueue(context.createSimpleResponse(json::calendar::events));
 
-                for (auto rec : records) {
-                    auto eventObject = eventJsonObjectFrom(rec);
-
-                    eventsArray.emplace_back(eventObject);
+                    return true;
                 }
+                return false;
+            },
+            ctx);
 
-                auto jsonObj = json11::Json::object({{json::calendar::events, eventsArray},
-                                                     {json::calendar::count, std::to_string(records.size())},
-                                                     {json::calendar::total_count, std::to_string(totalCount)}});
-
-                context.setResponseBody(jsonObj);
-                MessageHandler::putToSendQueue(context.createSimpleResponse());
-
-                return true;
-            }
-            return false;
-        },
-        context);
-
-    query->setQueryListener(std::move(listener));
-    auto [ret, _] = DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::Events, std::move(query));
-
-    if (ret) {
-        return sys::ReturnCodes::Success;
+        query->setQueryListener(std::move(listener));
+        DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::Events, std::move(query));
     }
-    else {
+    catch (const std::exception &e) {
+        LOG_ERROR("%s", e.what());
         return sys::ReturnCodes::Failure;
     }
+    return sys::ReturnCodes::Success;
 }
 
 auto CalendarEventsHelper::frequencyToCustomRepeat(Frequency freq) const -> uint32_t
@@ -331,7 +325,7 @@ auto CalendarEventsHelper::eventsRecordFrom(ICalEvent &icalEvent) const -> Event
     return record;
 }
 
-auto CalendarEventsHelper::ICalEventFromJson(json11::Json eventObj) const -> ICalEvent
+auto CalendarEventsHelper::ICalEventFromJson(const json11::Json &eventObj) const -> ICalEvent
 {
     ICalEvent icalEvent;
     icalEvent.event.setUID(eventObj[json::calendar::event::uid].string_value());
@@ -361,10 +355,10 @@ auto CalendarEventsHelper::ICalEventFromJson(json11::Json eventObj) const -> ICa
 
 auto CalendarEventsHelper::createDBEntry(Context &context) -> sys::ReturnCodes
 {
-    auto eventsJsonObj   = context.getBody();
-    auto eventsJsonArray = eventsJsonObj[json::calendar::events].array_items();
-    bool ret             = true;
-    for (auto event : eventsJsonArray) {
+    const auto eventsJsonObj   = context.getBody();
+    const auto eventsJsonArray = eventsJsonObj[json::calendar::events].array_items();
+    bool ret                   = true;
+    for (const auto &event : eventsJsonArray) {
 
         auto icalEvent = ICalEventFromJson(event);
 
@@ -381,7 +375,7 @@ auto CalendarEventsHelper::createDBEntry(Context &context) -> sys::ReturnCodes
             context.setResponseBody(jsonObj);
         }
         else {
-            LOG_ERROR("UID should not be recieved in put event endpoint. Recieved UID: %s", record.UID.c_str());
+            LOG_ERROR("UID should not be recieved in put event endpoint.");
             context.setResponseStatus(http::Code::BadRequest);
             MessageHandler::putToSendQueue(context.createSimpleResponse());
             return sys::ReturnCodes::Failure;
@@ -421,7 +415,7 @@ auto CalendarEventsHelper::updateDBEntry(Context &context) -> sys::ReturnCodes
     auto eventsJsonObj = context.getBody();
 
     bool ret = true;
-    for (auto event : eventsJsonObj[json::calendar::events].array_items()) {
+    for (const auto &event : eventsJsonObj[json::calendar::events].array_items()) {
 
         auto icalEvent = ICalEventFromJson(event);
         if (!isICalEventValid(icalEvent) || icalEvent.event.getUID().empty()) {
@@ -435,7 +429,7 @@ auto CalendarEventsHelper::updateDBEntry(Context &context) -> sys::ReturnCodes
         auto listener = std::make_unique<db::EndpointListener>(
             [](db::QueryResult *result, Context context) {
                 if (auto EventResult = dynamic_cast<db::query::events::EditICSResult *>(result)) {
-                    context.setResponseStatus(EventResult->getResult() ? http::Code::OK
+                    context.setResponseStatus(EventResult->getResult() ? http::Code::NoContent
                                                                        : http::Code::InternalServerError);
                     MessageHandler::putToSendQueue(context.createSimpleResponse());
                     return true;
@@ -463,7 +457,7 @@ auto CalendarEventsHelper::deleteDBEntry(Context &context) -> sys::ReturnCodes
     auto checkUID = Event();
     checkUID.setUID(UID);
     if (!checkUID.isValid) {
-        LOG_ERROR("Wrong UID format. Provided UID: %s", UID.c_str());
+        LOG_ERROR("Wrong UID format.");
         context.setResponseStatus(http::Code::BadRequest);
         MessageHandler::putToSendQueue(context.createSimpleResponse());
         return sys::ReturnCodes::Failure;

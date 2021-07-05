@@ -1,13 +1,13 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Database.hpp"
 #include "DatabaseInitializer.hpp"
 
-#include "log/log.hpp"
+#include <log.hpp>
 
 #include <purefs/filesystem_paths.hpp>
-#include <gsl/gsl_util>
+#include <gsl/util>
 
 #include <cassert>
 #include <cstring>
@@ -15,6 +15,11 @@
 
 /* Declarations *********************/
 extern sqlite3_vfs *sqlite3_ecophonevfs(void);
+
+[[nodiscard]] static bool isNotPragmaRelated(const char *msg)
+{
+    return nullptr == strstr(msg, "PRAGMA");
+}
 
 extern "C"
 {
@@ -60,16 +65,19 @@ extern "C"
     /* Internal Defines ***********************/
     void errorLogCallback(void *pArg, int iErrCode, const char *zMsg)
     {
-        LOG_ERROR("(%d) %s\n", iErrCode, zMsg);
+        if (isNotPragmaRelated(zMsg)) {
+            LOG_ERROR("(%d) %s\n", iErrCode, zMsg);
+        }
     }
 }
 
-Database::Database(const char *name)
+Database::Database(const char *name, bool readOnly)
     : dbConnection(nullptr), dbName(name), queryStatementBuffer{nullptr}, isInitialized_(false),
       initializer(std::make_unique<DatabaseInitializer>(this))
 {
+    const int flags = (readOnly) ? (SQLITE_OPEN_READONLY) : (SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE);
     LOG_INFO("Creating database: %s", dbName.c_str());
-    if (const auto rc = sqlite3_open(name, &dbConnection); rc != SQLITE_OK) {
+    if (const auto rc = sqlite3_open_v2(name, &dbConnection, flags, nullptr); rc != SQLITE_OK) {
         LOG_ERROR("SQLITE INITIALIZATION ERROR! rc=%d dbName=%s", rc, name);
         throw DatabaseInitialisationError{"Failed to initialize the sqlite db"};
     }
@@ -133,7 +141,7 @@ bool Database::execute(const char *format, ...)
 
     if (const int result = sqlite3_exec(dbConnection, queryStatementBuffer, nullptr, nullptr, nullptr);
         result != SQLITE_OK) {
-        LOG_ERROR("Execution of \'%s\' failed with %d", queryStatementBuffer, result);
+        LOG_ERROR("Execution of query failed with %d", result);
         return false;
     }
     return true;
@@ -155,7 +163,9 @@ std::unique_ptr<QueryResult> Database::query(const char *format, ...)
     auto queryResult = std::make_unique<QueryResult>();
     if (const int result = sqlite3_exec(dbConnection, queryStatementBuffer, queryCallback, queryResult.get(), nullptr);
         result != SQLITE_OK) {
-        LOG_ERROR("SQL query \'%s\' failed selecting : %d", queryStatementBuffer, result);
+        if (isNotPragmaRelated(queryStatementBuffer)) {
+            LOG_ERROR("SQL query failed selecting : %d", result);
+        }
         return nullptr;
     }
     return queryResult;
@@ -171,7 +181,7 @@ int Database::queryCallback(void *usrPtr, int count, char **data, char **columns
             row.push_back(Field{data[i]});
         }
         catch (...) {
-            LOG_FATAL("Error on: %" PRIu32 " %s", i, data[i]);
+            LOG_FATAL("Error on column: %" PRIu32, i);
         }
     }
 
@@ -192,7 +202,6 @@ void Database::pragmaQuery(const std::string &pragmaStatemnt)
         do {
             for (uint32_t i = 0; i < fieldsCount; i++) {
                 Field field = (*results)[i];
-                LOG_INFO("%s: '%s'", pragmaStatemnt.c_str(), field.getCString());
             }
         } while (results->nextRow());
     }
@@ -201,7 +210,7 @@ void Database::pragmaQuery(const std::string &pragmaStatemnt)
     }
 }
 
-bool Database::storeIntoFile(const std::string &backupPath)
+bool Database::storeIntoFile(const std::filesystem::path &backupPath)
 {
     LOG_INFO("Backup database: %s, into file: %s - STARTED", dbName.c_str(), backupPath.c_str());
     if (const auto rc = execute("VACUUM INTO '%q';", backupPath.c_str()); !rc) {

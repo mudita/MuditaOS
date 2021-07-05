@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CustomRepeatModel.hpp"
@@ -33,19 +33,19 @@ gui::ListItem *CustomRepeatModel::getItem(gui::Order order)
 void CustomRepeatModel::createData(const std::shared_ptr<WeekDaysRepeatData> &data)
 {
     internalData.push_back(
-        new gui::CheckBoxWithLabelItem(application, utils::localize.get(style::strings::common::Monday), data));
+        new gui::CheckBoxWithLabelItem(application, utils::translate(style::strings::common::Monday), data));
     internalData.push_back(
-        new gui::CheckBoxWithLabelItem(application, utils::localize.get(style::strings::common::Tuesday), data));
+        new gui::CheckBoxWithLabelItem(application, utils::translate(style::strings::common::Tuesday), data));
     internalData.push_back(
-        new gui::CheckBoxWithLabelItem(application, utils::localize.get(style::strings::common::Wednesday), data));
+        new gui::CheckBoxWithLabelItem(application, utils::translate(style::strings::common::Wednesday), data));
     internalData.push_back(
-        new gui::CheckBoxWithLabelItem(application, utils::localize.get(style::strings::common::Thursday), data));
+        new gui::CheckBoxWithLabelItem(application, utils::translate(style::strings::common::Thursday), data));
     internalData.push_back(
-        new gui::CheckBoxWithLabelItem(application, utils::localize.get(style::strings::common::Friday), data));
+        new gui::CheckBoxWithLabelItem(application, utils::translate(style::strings::common::Friday), data));
     internalData.push_back(
-        new gui::CheckBoxWithLabelItem(application, utils::localize.get(style::strings::common::Saturday), data));
+        new gui::CheckBoxWithLabelItem(application, utils::translate(style::strings::common::Saturday), data));
     internalData.push_back(
-        new gui::CheckBoxWithLabelItem(application, utils::localize.get(style::strings::common::Sunday), data));
+        new gui::CheckBoxWithLabelItem(application, utils::translate(style::strings::common::Sunday), data));
 
     for (auto &item : internalData) {
         item->deleteByList = false;
@@ -54,7 +54,7 @@ void CustomRepeatModel::createData(const std::shared_ptr<WeekDaysRepeatData> &da
 
 void CustomRepeatModel::loadData(const std::shared_ptr<WeekDaysRepeatData> &data)
 {
-    list->clear();
+    list->reset();
     eraseInternalData();
 
     createData(data);
@@ -66,7 +66,7 @@ std::vector<bool> CustomRepeatModel::getIsCheckedData()
 {
     std::vector<bool> isCheckedData;
     for (auto item : internalData) {
-        if (item->onContentChangeCallback && item->onContentChangeCallback()) {
+        if (item->onContentChangedCallback && item->onContentChangedCallback()) {
             isCheckedData.push_back(true);
         }
         else {

@@ -12,7 +12,7 @@
 #include "Margins.hpp"
 #include "utf8/UTF8.hpp"
 #include <Style.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 
 namespace gui
 {
@@ -20,7 +20,7 @@ namespace gui
     BottomBar::BottomBar()
     {
 
-        Padding margins{20, 0, 20, 0};
+        Padding margins{style::window::bottomBar::leftMargin, 0, style::window::bottomBar::rightMargin, 0};
         left   = prepareLabel(Side::LEFT);
         center = prepareLabel(Side::CENTER);
         right  = prepareLabel(Side::RIGHT);
@@ -36,12 +36,12 @@ namespace gui
         setFillColor(ColorFullWhite);
         setBorderColor(ColorNoColor);
         setFilled(true);
-        setSize(480, 50);
+        setSize(style::window::bottomBar::w, style::window::bottomBar::h);
     }
     BottomBar::BottomBar(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h) : Rect{parent, x, y, w, h}
     {
 
-        Padding margins{20, 0, 20, 0};
+        Padding margins{style::window::bottomBar::leftMargin, 0, style::window::bottomBar::rightMargin, 0};
         left   = prepareLabel(Side::LEFT);
         center = prepareLabel(Side::CENTER);
         right  = prepareLabel(Side::RIGHT);
@@ -57,7 +57,7 @@ namespace gui
         setFillColor(ColorFullWhite);
         setBorderColor(ColorNoColor);
         setFilled(true);
-        setSize(480, 50);
+        setSize(style::window::bottomBar::w, style::window::bottomBar::h);
         updateDrawArea();
     }
     BottomBar::~BottomBar()
@@ -95,9 +95,6 @@ namespace gui
         case Side::CENTER:
             return center;
         case Side::RIGHT:
-            return right;
-        default:
-            LOG_ERROR("shall never got here - just to ommit warning");
             return right;
         };
         return nullptr;

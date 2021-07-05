@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "bluetooth/Bluetooth.hpp"
-#include "log/log.hpp"
+#include <log.hpp>
 #include "fsl_lpuart.h"
 #include "board.h"
 
@@ -41,10 +41,7 @@ namespace bsp
             if (isrReg & kLPUART_RxDataRegFullFlag) {
                 characterReceived  = LPUART_ReadByte(BSP_BLUETOOTH_UART_BASE);
                 bsp::Bluetopia *bt = bsp::Bluetopia::getInstance();
-                if (bt->in.push(characterReceived) != 0) {
-                    // LOG_ERROR("BT: error no RX space!");
-                }
-                else {
+                if (bt->in.push(characterReceived) == 0) {
                     bt->set_data();
                 }
                 if (bt->in.threshold_guard()) {

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ThreadsModel.hpp"
@@ -10,7 +10,7 @@
 #include "application-messages/data/MessagesStyle.hpp"
 #include "application-messages/widgets/ThreadItem.hpp"
 #include "application-messages/windows/ThreadWindowOptions.hpp"
-#include "log/log.hpp"
+#include <log.hpp>
 #include <module-db/queries/messages/threads/QueryThreadsGet.hpp>
 #include <module-db/queries/messages/threads/QueryThreadsGetForList.hpp>
 #include <service-db/DBServiceAPI.hpp>
@@ -50,12 +50,12 @@ auto ThreadsModel::getItem(gui::Order order) -> gui::ListItem *
     item->inputCallback = [this, item](gui::Item &, const gui::InputEvent &event) {
         auto app = dynamic_cast<app::ApplicationMessages *>(application);
         assert(app);
-        if (event.state != gui::InputEvent::State::keyReleasedShort) {
+        if (!event.isShortRelease()) {
             return false;
         }
-        if (event.keyCode == gui::KeyCode::KEY_LF) {
+        if (event.is(gui::KeyCode::KEY_LF)) {
             application->switchWindow(
-                utils::localize.get("app_phonebook_options_title"),
+                utils::translate("app_phonebook_options_title"),
                 std::make_unique<gui::OptionsWindowOptions>(threadWindowOptions(app, item->getThreadItem().get())));
         }
         return false;

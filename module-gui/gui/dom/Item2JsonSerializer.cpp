@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Item2JsonSerializer.hpp"
@@ -6,7 +6,7 @@
 #include "visitor/DepthFirstItemTree.hpp"
 #include "ItemDataNames.hpp"
 
-#include <module-utils/magic_enum/include/magic_enum.hpp>
+#include <magic_enum.hpp>
 using namespace gui;
 
 void Item2JsonSerializer::handleSibling(gui::ItemNode &node, prototype &doc, int &level)
@@ -68,4 +68,9 @@ void Item2JsonSerializer::traverse(gui::Item &root)
 void Item2JsonSerializer::dump(std::ostream &stream)
 {
     stream << document.dump();
+}
+
+[[nodiscard]] auto Item2JsonSerializer::get() -> json11::Json &&
+{
+    return std::move(document);
 }

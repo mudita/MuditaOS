@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <endpoints/Endpoint.hpp>
@@ -7,7 +7,8 @@
 #include <endpoints/contacts/ContactsEndpoint.hpp>
 #include <endpoints/factoryReset/FactoryReset.hpp>
 #include <endpoints/messages/MessageHelper.hpp>
-#include <endpoints/update/UpdateMuditaOS.hpp>
+#include <endpoints/filesystem/FileContext.hpp>
+#include <endpoints/filesystem/FileOperations.hpp>
 #include <parser/ParserFSM.hpp>
 #include <parser/ParserUtils.hpp>
 
@@ -17,57 +18,23 @@
 #include <SMSRecord.hpp>
 #include <SMSTemplateRecord.hpp>
 #include <catch2/catch.hpp>
-#include <json/json11.hpp>
+#include <json11.hpp>
 #include <purefs/filesystem_paths.hpp>
 #include <utf8/UTF8.hpp>
-#include <vfs.hpp>
-
 #include <memory>
 #include <filesystem>
 #include <string>
 #include <vector>
-
-class vfs vfs;
-
-struct vfs_initializer
-{
-    vfs_initializer()
-    {
-        vfs.Init();
-    }
-} vfs_initializer;
-
-TEST_CASE("System Update Tests")
-{
-    UpdateMuditaOS updateOS(nullptr);
-
-    updateos::UpdateError err = updateOS.prepareTempDirForUpdate();
-    REQUIRE(err == updateos::UpdateError::NoError);
-
-    updateOS.setUpdateFile("muditaos-unittest.tar");
-
-    err = updateOS.unpackUpdate();
-    REQUIRE(err == updateos::UpdateError::NoError);
-
-    err = updateOS.verifyChecksums();
-    REQUIRE(err == updateos::UpdateError::NoError);
-}
-
-TEST_CASE("Factory Reset Test")
-{
-
-    std::string sysdir = purefs::dir::getRootDiskPath();
-    sysdir += "/factory-test/sys";
-    std::string factorydir = sysdir + "/factory";
-    REQUIRE(FactoryReset::DeleteDirContent(sysdir) == true);
-    REQUIRE(FactoryReset::CopyDirContent(factorydir, sysdir) == true);
-}
 
 using namespace parserFSM;
 
 TEST_CASE("Parser Test")
 {
     StateMachine parser(nullptr);
+
+    auto factory = std::make_unique<SecuredEndpointFactory>(EndpointSecurity::Allow);
+    auto handler = std::make_unique<parserFSM::MessageHandler>(nullptr, std::move(factory));
+    parser.setMessageHandler(std::move(handler));
 
     SECTION("Parse message with divided header and payload")
     {
@@ -222,38 +189,36 @@ TEST_CASE("DB Helpers test - json encoding (messages)")
     message->body      = "test message";
     message->contactID = 1;
     message->date      = 12345;
-    message->dateSent  = 54321;
     message->errorCode = 0;
     message->number    = contactNum.number;
     message->threadID  = 1;
     message->ID        = 10;
     message->type      = SMSType::DRAFT;
 
-    auto messageJson = helper->to_json(*message);
+    auto messageJson = helper->toJson(*message);
 
     REQUIRE(messageJson[json::messages::messageBody] == "test message");
     REQUIRE(messageJson[json::messages::contactID] == 1);
-    REQUIRE(messageJson[json::messages::date] == 12345);
-    REQUIRE(messageJson[json::messages::dateSent] == 54321);
+    REQUIRE(messageJson[json::messages::createdAt] == 12345);
     REQUIRE(messageJson[json::messages::threadID] == 1);
-    REQUIRE(messageJson[json::messages::id] == 10);
+    REQUIRE(messageJson[json::messages::messageID] == 10);
 
     auto messageTemplate = std::make_unique<SMSTemplateRecord>();
 
     messageTemplate->text = "test template";
     messageTemplate->ID   = 1;
 
-    auto messageTemplateJson = helper->to_json(*messageTemplate);
+    auto messageTemplateJson = helper->toJson(*messageTemplate);
 
-    REQUIRE(messageTemplateJson[json::messages::templateText] == "test template");
-    REQUIRE(messageTemplateJson[json::messages::id] == 1);
+    REQUIRE(messageTemplateJson[json::messages::templateBody] == "test template");
+    REQUIRE(messageTemplateJson[json::messages::templateID] == 1);
 }
 
 TEST_CASE("Context class test")
 {
     SECTION("Correct message")
     {
-        auto testMessage = R"({"endpoint":6, "method":1, "uuid":12345, "body":{"test":"test"}})";
+        auto testMessage = R"({"endpoint":7, "method":1, "uuid":12345, "body":{"test":"test"}})";
         std::string err;
         auto msgJson = json11::Json::parse(testMessage, err);
         REQUIRE(err.empty());
@@ -263,16 +228,15 @@ TEST_CASE("Context class test")
         REQUIRE(context.getMethod() == http::Method::get);
         REQUIRE(context.getUuid() == 12345);
         REQUIRE(context.getEndpoint() == EndpointType::contacts);
-        REQUIRE(context.createSimpleResponse() ==
-                R"(#000000061{"body": null, "endpoint": 6, "status": 200, "uuid": "12345"})");
+        REQUIRE(context.createSimpleResponse() == R"(#000000045{"endpoint": 7, "status": 200, "uuid": 12345})");
 
         context.setResponseBody(context.getBody());
         REQUIRE(context.createSimpleResponse() ==
-                R"(#000000073{"body": {"test": "test"}, "endpoint": 6, "status": 200, "uuid": "12345"})");
+                R"(#000000071{"body": {"test": "test"}, "endpoint": 7, "status": 200, "uuid": 12345})");
     }
     SECTION("Invalid message")
     {
-        auto testMessage = R"({"endpoint":25, "method":8, "uuid":"0", "body":{"te":"test"}})";
+        auto testMessage = R"({"endpoint":25, "method":8, "uuid":0, "body":{"te":"test"}})";
         std::string err;
         auto msgJson = json11::Json::parse(testMessage, err);
         REQUIRE(err.empty());
@@ -289,25 +253,116 @@ TEST_CASE("Endpoint Factory test")
 {
     SECTION("Proper endpoint")
     {
-        auto testMessage = R"({"endpoint":6, "method":1, "uuid":12345, "body":{"test":"test"}})";
+        auto testMessage = R"({"endpoint":7, "method":1, "uuid":12345, "body":{"test":"test"}})";
         std::string err;
         auto msgJson = json11::Json::parse(testMessage, err);
         REQUIRE(err.empty());
 
         Context context(msgJson);
-        auto handler = EndpointFactory::create(context, nullptr);
+        auto factory = std::make_unique<EndpointFactory>();
+        auto handler = factory->create(context, nullptr);
         REQUIRE(dynamic_cast<ContactsEndpoint *>(handler.get()));
     }
 
     SECTION("Wrong endpoint")
     {
-        auto testMessage = R"({"endpoint":25, "method":8, "uuid":"12345", "body":{"te":"test"}})";
+        auto testMessage = R"({"endpoint":25, "method":8, "uuid":12345, "body":{"te":"test"}})";
         std::string err;
         auto msgJson = json11::Json::parse(testMessage, err);
         REQUIRE(err.empty());
 
         Context context(msgJson);
-        auto handler = EndpointFactory::create(context, nullptr);
+        auto factory = std::make_unique<EndpointFactory>();
+        auto handler = factory->create(context, nullptr);
         REQUIRE(handler == nullptr);
+    }
+}
+
+TEST_CASE("Secured Endpoint Factory test")
+{
+    SECTION("Allowed endpoint")
+    {
+        auto testMessage = R"({"endpoint":7, "method":1, "uuid":12345, "body":{"test":"test"}})";
+        std::string err;
+        auto msgJson = json11::Json::parse(testMessage, err);
+        REQUIRE(err.empty());
+
+        Context context(msgJson);
+        auto factory = std::make_unique<SecuredEndpointFactory>(EndpointSecurity::Allow);
+        auto handler = factory->create(context, nullptr);
+        REQUIRE(dynamic_cast<ContactsEndpoint *>(handler.get()));
+    }
+
+    SECTION("Secured endpoint")
+    {
+        auto testMessage = R"({"endpoint":25, "method":8, "uuid":12345, "body":{"te":"test"}})";
+        std::string err;
+        auto msgJson = json11::Json::parse(testMessage, err);
+        REQUIRE(err.empty());
+
+        Context context(msgJson);
+        auto factory = std::make_unique<SecuredEndpointFactory>(EndpointSecurity::Block);
+        auto handler = factory->create(context, nullptr);
+        REQUIRE(dynamic_cast<SecuredEndpoint *>(handler.get()));
+    }
+}
+
+TEST_CASE("FileOperations UT Test")
+{
+    auto &fileOps = FileOperations::instance();
+
+    SECTION("Create receive id for file")
+    {
+        auto filePath{"/sys/user/music/SMS-drum2-stereo.mp3"};
+
+        auto [rxID, fileSize] = fileOps.createReceiveIDForFile(filePath);
+
+        REQUIRE(rxID == 1);
+        REQUIRE(fileSize == 49146);
+    }
+}
+
+TEST_CASE("FileContext UT Test Valid Input")
+{
+    auto filePath{"/sys/user/MuditaOS.log"};
+    auto fileSize{1536u};
+    auto fileOffset{128 * 6u};
+    auto chunkSize{128 * 3u};
+
+    SECTION("Create file context for file")
+    {
+        auto fileCtx = FileContext(filePath, fileSize, fileOffset, chunkSize);
+
+        REQUIRE(3 == fileCtx.expectedChunkInFile());
+
+        REQUIRE(true == fileCtx.validateChunkRequest(3));
+        REQUIRE(false == fileCtx.validateChunkRequest(4));
+
+        REQUIRE(4 == fileCtx.totalChunksInFile());
+
+        fileCtx.advanceFileOffset(fileSize - fileOffset);
+        REQUIRE(true == fileCtx.reachedEOF());
+    }
+}
+
+TEST_CASE("FileContext UT Test Invalid Input")
+{
+    auto filePath{"/sys/user/music/SMS-drum2-stereo.mp3"};
+    auto fileOffset{0u};
+
+    SECTION("Create file context for file with invalid file size")
+    {
+        auto fileSize{0u};
+        auto chunkSize{1024 * 3u};
+
+        REQUIRE_THROWS_WITH(FileContext(filePath, fileSize, fileOffset, chunkSize), "Invalid FileContext arguments");
+    }
+
+    SECTION("Create file context for file with invalid chunk size")
+    {
+        auto fileSize{49146u};
+        auto chunkSize{0u};
+
+        REQUIRE_THROWS_WITH(FileContext(filePath, fileSize, fileOffset, chunkSize), "Invalid FileContext arguments");
     }
 }

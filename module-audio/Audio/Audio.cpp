@@ -1,10 +1,10 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Audio.hpp"
 #include "Operation/Operation.hpp"
 
-#include <log/log.hpp>
+#include <log.hpp>
 #include <bsp/headset/headset.hpp>
 
 namespace audio
@@ -90,8 +90,6 @@ namespace audio
                 break;
             }
             currentOperation = std::move(ret);
-            currentOperation->SetDataStreams(&dataStreamOut, &dataStreamIn);
-
             UpdateProfiles();
         }
         catch (const AudioInitException &audioException) {
@@ -126,6 +124,7 @@ namespace audio
             LOG_ERROR("Operation STOP failure: %s", audio::str(retStop).c_str());
         }
 
+        muted    = Muted::False;
         auto ret = Operation::Create(Operation::Type::Idle);
         if (ret) {
             currentState     = State::Idle;
@@ -156,6 +155,7 @@ namespace audio
 
     audio::RetCode Audio::Mute()
     {
+        muted = Muted::True;
         return SetOutputVolume(0);
     }
 

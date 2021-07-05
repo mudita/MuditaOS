@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationMessages.hpp"
@@ -31,23 +31,49 @@
 #include <module-db/queries/messages/threads/QueryThreadRemove.hpp>
 #include <module-db/queries/phonebook/QueryContactGetByID.hpp>
 
-#include <cassert>
-#include <time/time_conversion.hpp>
+#include <service-cellular/CellularMessage.hpp>
 #include <messages/OptionsWindow.hpp>
+
+#include <cassert>
+#include <ctime>
 
 namespace app
 {
-    ApplicationMessages::ApplicationMessages(std::string name, std::string parent, StartInBackground startInBackground)
-        : Application(name, parent, startInBackground, 4096 * 2), AsyncCallbackReceiver{this}
+    static constexpr auto messagesStackDepth = 1024 * 6; // 6Kb stack size
+
+    ApplicationMessages::ApplicationMessages(std::string name,
+                                             std::string parent,
+                                             sys::phone_modes::PhoneMode mode,
+                                             StartInBackground startInBackground)
+        : Application(name, parent, mode, startInBackground, messagesStackDepth), AsyncCallbackReceiver{this}
     {
-        busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
+        bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         addActionReceiver(manager::actions::CreateSms, [this](auto &&data) {
             switchWindow(gui::name::window::new_sms, std::move(data));
-            return msgHandled();
+            return actionHandled();
         });
         addActionReceiver(manager::actions::ShowSmsTemplates, [this](auto &&data) {
             switchWindow(gui::name::window::sms_templates, std::move(data));
-            return msgHandled();
+            return actionHandled();
+        });
+        addActionReceiver(manager::actions::SmsRejectNoSim, [this](auto &&data) {
+            auto action = [this]() {
+                returnToPreviousWindow();
+                return true;
+            };
+            const auto notification = utils::translate("app_messages_no_sim");
+            showNotification(action, notification);
+            return actionHandled();
+        });
+        addActionReceiver(manager::actions::SMSRejectedByOfflineNotification, [this](auto &&data) {
+            auto action = [=]() -> bool {
+                returnToPreviousWindow();
+                return true;
+            };
+            const auto notification = utils::translate("app_sms_offline");
+            showNotification(action, notification);
+
+            return actionHandled();
         });
     }
 
@@ -59,7 +85,6 @@ namespace app
         if (reinterpret_cast<sys::ResponseMessage *>(retMsg.get())->retCode == sys::ReturnCodes::Success) {
             return retMsg;
         }
-
         if (msgl->messageType == MessageType::DBServiceNotification) {
             auto msg = dynamic_cast<db::NotificationMessage *>(msgl);
             if (msg != nullptr) {
@@ -101,7 +126,7 @@ namespace app
         }
 
         createUserInterface();
-        setActiveWindow(gui::name::window::main_window);
+
         return ret;
     }
 
@@ -117,7 +142,7 @@ namespace app
             return std::make_unique<gui::NewMessageWindow>(app);
         });
         windowsFactory.attach(
-            utils::localize.get("app_phonebook_options_title"),
+            utils::translate("app_phonebook_options_title"),
             [](Application *app, const std::string &name) { return std::make_unique<gui::OptionWindow>(app, name); });
         windowsFactory.attach(gui::name::window::dialog, [](Application *app, const std::string &name) {
             return std::make_unique<gui::Dialog>(app, name);
@@ -137,6 +162,9 @@ namespace app
         windowsFactory.attach(gui::name::window::search_results, [](Application *app, const std::string &name) {
             return std::make_unique<gui::SearchResults>(app);
         });
+
+        attachPopups(
+            {gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes, gui::popup::ID::PhoneLock});
     }
 
     void ApplicationMessages::destroyUserInterface()
@@ -177,12 +205,13 @@ namespace app
             auto result = dynamic_cast<ContactGetByIDResult *>(response);
             if (result != nullptr) {
                 const auto &contact = result->getResult();
-                gui::DialogMetadata meta;
-                meta.action = [this, record]() { return onRemoveSmsThreadConfirmed(*record); };
-                meta.text   = utils::localize.get("app_messages_thread_delete_confirmation");
-                meta.title  = contact.getFormattedName();
-                meta.icon   = "phonebook_contact_delete_trashcan";
-                switchWindow(gui::name::window::dialog_yes_no, std::make_unique<gui::DialogMetadataMessage>(meta));
+                auto metaData       = std::make_unique<gui::DialogMetadataMessage>(
+                    gui::DialogMetadata{contact.getFormattedName(),
+                                        "phonebook_contact_delete_trashcan",
+                                        utils::translate("app_messages_thread_delete_confirmation"),
+                                        "",
+                                        [this, record]() { return onRemoveSmsThreadConfirmed(*record); }});
+                switchWindow(gui::name::window::dialog_yes_no, gui::ShowMode::GUI_SHOW_INIT, std::move(metaData));
                 return true;
             }
             return false;
@@ -214,14 +243,13 @@ namespace app
     bool ApplicationMessages::removeSms(const SMSRecord &record)
     {
         LOG_DEBUG("Removing sms: %" PRIu32, record.ID);
-
-        gui::DialogMetadata meta;
-        meta.action = [this, record] { return onRemoveSmsConfirmed(record); };
-        meta.text   = utils::localize.get("app_messages_message_delete_confirmation");
-        meta.title  = record.body;
-        meta.icon   = "phonebook_contact_delete_trashcan";
-
-        switchWindow(gui::name::window::dialog_yes_no, std::make_unique<gui::DialogMetadataMessage>(meta));
+        auto metaData = std::make_unique<gui::DialogMetadataMessage>(
+            gui::DialogMetadata{record.body,
+                                "phonebook_contact_delete_trashcan",
+                                utils::translate("app_messages_message_delete_confirmation"),
+                                "",
+                                [this, record] { return onRemoveSmsConfirmed(record); }});
+        switchWindow(gui::name::window::dialog_yes_no, gui::ShowMode::GUI_SHOW_INIT, std::move(metaData));
         return true;
     }
 
@@ -266,12 +294,13 @@ namespace app
     bool ApplicationMessages::searchEmpty(const std::string &query)
     {
         gui::DialogMetadata meta;
-        meta.icon  = "search_big";
-        meta.text  = utils::localize.get("app_messages_thread_no_result");
-        meta.title = utils::localize.get("common_results_prefix") + query;
+        meta.icon                        = "search_big";
+        meta.text                        = utils::translate("app_messages_thread_no_result");
+        meta.title                       = utils::translate("common_results_prefix") + query;
         auto data                        = std::make_unique<gui::DialogMetadataMessage>(meta);
         data->ignoreCurrentWindowOnStack = true;
         switchWindow(gui::name::window::dialog, std::make_unique<gui::DialogMetadataMessage>(meta));
+
         return true;
     }
 
@@ -281,12 +310,14 @@ namespace app
         return true;
     }
 
-    bool ApplicationMessages::showNotification(std::function<bool()> action, bool ignoreCurrentWindowOnStack)
+    bool ApplicationMessages::showNotification(std::function<bool()> action,
+                                               const std::string &notification,
+                                               bool ignoreCurrentWindowOnStack)
     {
         gui::DialogMetadata meta;
-        meta.icon   = "info_big_circle_W_G";
-        meta.text   = utils::localize.get("app_messages_no_sim");
-        meta.action = action;
+        meta.icon                              = "info_big_circle_W_G";
+        meta.text                              = notification;
+        meta.action                            = action;
         auto switchData                        = std::make_unique<gui::DialogMetadataMessage>(meta);
         switchData->ignoreCurrentWindowOnStack = ignoreCurrentWindowOnStack;
         switchWindow(gui::name::window::dialog_confirm, std::move(switchData));
@@ -298,7 +329,7 @@ namespace app
         assert(!body.empty()); // precondition check.
 
         record.body = body;
-        record.date = utils::time::getCurrentTimestamp().getTime();
+        record.date = std::time(nullptr);
 
         using db::query::SMSUpdate;
         const auto [succeed, _] =
@@ -315,7 +346,7 @@ namespace app
         record.number = number;
         record.body   = body;
         record.type   = SMSType::DRAFT;
-        record.date   = utils::time::getCurrentTimestamp().getTime();
+        record.date   = std::time(nullptr);
 
         using db::query::SMSAdd;
         const auto [success, _] =
@@ -341,7 +372,7 @@ namespace app
         record.number = number;
         record.body   = body;
         record.type   = SMSType::QUEUED;
-        record.date   = utils::time::getCurrentTimestamp().getTime();
+        record.date   = std::time(nullptr);
 
         using db::query::SMSAdd;
         const auto [succeed, _] =
@@ -353,9 +384,8 @@ namespace app
     {
         auto resendRecord = record;
         resendRecord.type = SMSType::QUEUED;
-        resendRecord.date =
-            utils::time::getCurrentTimestamp().getTime(); // update date sent - it will display an old, failed sms at
-                                                          // the the bottom, but this is correct
+        resendRecord.date = std::time(nullptr); // update date sent - it will display an old, failed sms at
+                                                // the the bottom, but this is correct
 
         using db::query::SMSUpdate;
         const auto [succeed, _] =
@@ -369,14 +399,6 @@ namespace app
             return false;
         }
 
-        if (!Store::GSM::get()->simCardInserted()) {
-            auto action = [=]() -> bool {
-                returnToPreviousWindow();
-                return true;
-            };
-            return showNotification(action);
-        }
-
         return true;
     }
 
@@ -384,7 +406,7 @@ namespace app
     {
         LOG_INFO("New message options for %s", requestingWindow.c_str());
         auto opts = std::make_unique<gui::OptionsWindowOptions>(newMessageWindowOptions(this, requestingWindow, text));
-        switchWindow(utils::localize.get("app_phonebook_options_title"), std::move(opts));
+        switchWindow(utils::translate("app_phonebook_options_title"), std::move(opts));
         return true;
     }
 

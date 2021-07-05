@@ -8,7 +8,8 @@ with `service-desktop` service in the operating system and get data from the int
 Both `service-desktop` and functional tests are using [`pyTest`](https://github.com/pytest-dev/pytest/) -
  a testing framework written for Python. 
 Convenient usage of pre-defined fixtures and `harness` API enables quick development of further tests.
-
+## Update utility
+To be able to flash release package without Mudita Center app or entering the bootloader you can use the script provided in `firmware_utility_test` folder. [Here](firmware_update_test/README.md) is a short guide how to use it.
 ## Test harness API
 As a part of the test bundle, test harness is responsible for low-level communication with target or linux simulator.
 As for now, it consists of the following methods that can be used during writing tests:
@@ -20,10 +21,6 @@ As for now, it consists of the following methods that can be used during writing
 * `get_connection()`
 
    returns a `CDCSerial` object - wrapper for Python's `Serial`
-   
-* `get_window_name()`
-
-   returns current application(window) name
    
 * `with_phone_unlocked(func)`
 
@@ -54,7 +51,8 @@ As for now, it consists of the following methods that can be used during writing
 
 #### CDCSerial API
 CDCSerial is `Serial` wrapper intended to encapsulate commands and data into communication protocol thus 
-allowing to seamlessly transfer data between `Harness` and the operating system. It has the following user-applicable
+allowing to seamlessly transfer data between `Harness` and the operating system. It can automatically detect a connected phone, so you don't have to pass the port name anymore.
+It has the following user-applicable
 methods:
 
 
@@ -73,6 +71,7 @@ methods:
     * `wait` - timeout
     
 #### Example
+
 ```python
 from harness.harness import Harness
 from harness.interface.defs import key_codes
@@ -81,20 +80,21 @@ from harness.interface.defs import key_codes
 harness = Harness.from_detect()
 
 # get current application name
-current_window = harness.get_window_name()
+current_window = harness.get_application_name()
 
-#open messages when phone is unlocked
+
+# open messages when phone is unlocked
 @harness.with_phone_unlocked
 def do_after_unlock(connection):
-    # open menu
-    connection.send_key_code(key_codes["enter"])
+  # open menu
+  connection.send_key_code(key_codes["enter"])
 
-    harness.open_application("messages")
-    # send joystick down keypress
-    connection.send_key_code(key_codes["down"])
+  harness.open_application("messages")
+  # send joystick down keypress
+  connection.send_key_code(key_codes["down"])
 
-    # open a thread
-    connection.send_key_code(key_codes["enter"])
+  # open a thread
+  connection.send_key_code(key_codes["enter"])
 ```
 
 ### pyTest running
@@ -102,14 +102,13 @@ To execute pyTest test cases make sure that you have installed the `pyTest` pack
 recommended to execute those tests in a virtual environment (eg. in `test` dir):
 
 ```shell script
-pip3 install virtualenv 
-virtualenv -p python3 test_env
+python3 -m venv test_venv
 source test_env/bin/activate
 pip3 install -r requirements.txt
 ```
 and then execute the tests (located in `pytest` subdirectory and below):
 ```shell script
-pytest ./pytest --port=/dev/ttyACM2 --timeout=20 
+pytest ./pytest --timeout=20 
 ```
 by default, call and message sending tests are enabled thus you have to provide additional parameters:
 ```shell script
@@ -117,7 +116,7 @@ by default, call and message sending tests are enabled thus you have to provide 
 ```
 which gives full command like this:
 ```shell script
-pytest ./pytest --port=/dev/ttyACM2 --timeout=20  --phone_number=123456789 --call_duration=30 --sms_text="sms text"
+pytest ./pytest  --timeout=20  --phone_number=123456789 --call_duration=30 --sms_text="sms text"
 ```
 To run the tests with Linux simulator just pass `simulator` as the port parameter and use `-m` switch with marker negation:
 ```shell script
@@ -145,3 +144,97 @@ def test_sample_test(harness):
 ``` 
 All tests written in this manner will be found by pyTest.
 #### Notice: all tests that are applicable only to the target should be marked with a `@pytest.mark.rt1051` decorator
+
+## FAQ:
+
+### My computer doesn't see harness and there is no session -  just timeout, and an error
+
+#### Check if Mudita Pure is properly connected
+
+Check the device, it should be either `ls /dev/tty*` or `cat /dev/ttyUSBx`.
+If there is no device:
+- try connecting and disconnecting the phone with the USB port while verifying with `sudo journalctl -f` if there are any new logs
+- check if your USB cable is right (and works)
+- check if your USB port on the computer works fine - please check with a direct USB port without any hubs
+
+Check device origin:
+- `udevadm info -a -n /dev/ttyACM1 | less`
+- `lsusb -vvv | less` -> and then write `/Mudita`
+
+#### Add udev rule if you do not have access to device without sudo
+
+`cat /dev/ttyACMx` or `cat /dev/ttyUSBx`
+
+If there is no dialout group on your computer?
+`sudo groupadd dialout`
+
+If your user isn't in the dialout group?
+`sudo usermod -a -G dialout $USER`
+
+Add new udev rule and please check the `idVendor` in `idProduct` (how-to is available: `Check if Mudita Pure is properly connected`, lsusb or udevadm commands)
+`ATTRS{idVendor}=="1fc9", ATTRS{idProduct}=="0094", MODE="666", GROUP="dialout"`
+
+Reload the udev rules - **this is super important**!
+`sudo udevadm control --reload-rules && sudo udevadm trigger`
+
+### AT commands
+Fixing AT commands in harness is planned
+
+### Can I test a subset of tests?
+That's the purpose of harness. We can either:
+- use tests markers
+- run a single test via file, test name - both: read the manual
+
+### What are the folders?
+
+```
+├── test
+│   ├── firmware_update_test      : Folder with release package update utility
+│   ├── harness                   : All harness implementation
+│   │   └── interface             : Serial link PHY implementation
+│   └── pytest                    : Folder with ALL harness tests to run
+```
+
+### How to print all logs
+Pass to pytest execution `-s`
+Please use the `logger` module instead of prints:
+`from harness import log`
+
+### How does the endpoit work?
+
+Please read the dedicated [endpoints documentation](https://appnroll.atlassian.net/wiki/spaces/MFP/pages/656637953/Protocol+description)
+
+### How to add harness API
+
+Please use existing API, do not modify existing endpoints behavior if it's not needed for Mudita Center
+If you need to expand the existing API - please contact solution architects first.
+
+### How do I add a test?
+
+- See the docs and copy example
+- Add it to pytest folder ( see `What are the folders` ) 
+- Name it properly (if you do not know how - please read this readme once again :) )
+
+### How do I verify harness issues
+
+- Fail will have exit code != 0
+- Fail will be displayed in red
+- If a test skips - it's displayed in yellow, please double-check why - if it's not needed please remove it, if needed - inform the rest of the team.
+- Double-check that you have properly loaded software - that it's not lacking any assets and that you have proper code
+- Contact QA to add Issue
+
+### Do we plan to run Harware in the loop tests on CI
+
+- Yes, there is such plan. It's executed step by step. [HIL docs](https://appnroll.atlassian.net/wiki/spaces/MFP/pages/794296490/Project+Hardware+in+the+loop+integration+testing)
+
+### Why do we use virtual env? why no pyenv? 
+
+We started with nothing, added virtual env as something - pyenv would be a natural extension. If you know how to integrate it, then please do - but please remember to add the docs.
+
+### Do we want to emulate states in harness
+
+For now we are emulating key-press and checking the windows and database indirectly. We are gathering requirements and improvements - please contact someone from the core dev team at Mudita.
+
+### What's next?
+
+If you managed to read this all, you are ready to use harness! Enjoy! You are welcome :)

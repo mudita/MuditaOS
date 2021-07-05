@@ -1,18 +1,18 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SettingsMainWindow.hpp"
 #include "application-settings-new/ApplicationSettings.hpp"
 
 #include <i18n/i18n.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <service-appmgr/Controller.hpp>
 
 std::list<gui::Option> mainWindowOptionsNew(app::Application *app)
 {
     std::list<gui::Option> l;
 
-    auto i18     = [](const std::string &text) { return utils::localize.get(text); };
+    auto i18     = [](const std::string &text) { return utils::translate(text); };
     auto addMenu = [&l, &app](UTF8 name, const std::string &window = "") {
         l.emplace_back(gui::Option{name,
                                    [=](gui::Item &item) {
@@ -47,7 +47,7 @@ std::list<gui::Option> mainWindowOptionsNew(app::Application *app)
     addMenu(i18("app_settings_net"), gui::window::name::network);
     addMenu(i18("app_settings_disp_key"), gui::window::name::display_and_keypad);
     addMenu(i18("app_settings_phone_modes"), gui::window::name::phone_modes);
-    addMenu(i18("app_settings_apps_tools"), gui::window::name::apps_and_tools);
+    addMenu(i18("app_settings_apps"), gui::window::name::apps_and_tools);
     addMenu(i18("app_settings_security"), gui::window::name::security);
     addMenu(i18("app_settings_system"), gui::window::name::system);
     return l;

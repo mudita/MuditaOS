@@ -1,23 +1,25 @@
 #!/bin/bash -e
-#Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+#Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 #For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 usage() {
 cat << ==usage
-Usage: $(basename $0) [image_size] [image_file]
+Usage: $(basename $0) [image_size] [image_file] [files]...
 	image_size Target disk image size
 	image_file Target image name
+	files Files to include in the image
 ==usage
 }
 
 
-if [ $# -ne 2 ]; then
+if [ $# -lt 2 ]; then
 	echo "Error! Invalid argument count"
 	usage
 	exit -1
 fi
 IMAGE_SIZE="$1"
 IMAGE_FILE="$2"
+shift 2
 
 _REQ_CMDS="sfdisk truncate"
 for cmd in $_REQ_CMDS; do
@@ -39,5 +41,6 @@ unit: sectors
 
 /dev/sdz1 : start=$SECTOR_START, size=$SECTOR_END, type=9e
 ==sfdisk
-./genlittlefs --image $IMAGE_FILE --block_size=4096  --overwrite  --partition_num 1 -- assets/* .boot.json
+pwd
+./genlittlefs --image $IMAGE_FILE --block_size=32768  --overwrite  --partition_num 1 -- sys/.boot.json sys/current/assets/* module-vfs/test_dir/*
 

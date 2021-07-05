@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -14,7 +14,7 @@ namespace cellular
     {
       public:
         CallRequest(const std::string &data) : Request(data){};
-        std::string command() final;
+        at::Cmd command() final;
         std::string getNumber() const
         {
             return request;

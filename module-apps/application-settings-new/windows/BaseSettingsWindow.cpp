@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BaseSettingsWindow.hpp"
@@ -6,23 +6,8 @@
 
 namespace gui
 {
-
     BaseSettingsWindow::BaseSettingsWindow(app::Application *app, std::string name) : OptionWindow(app, name)
     {}
-
-    void BaseSettingsWindow::buildInterface()
-    {
-        OptionWindow::buildInterface();
-
-        bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
-    }
-
-    void BaseSettingsWindow::destroyInterface()
-    {
-        erase();
-        invalidate();
-    }
 
     void BaseSettingsWindow::rebuild()
     {
@@ -32,13 +17,21 @@ namespace gui
 
     void BaseSettingsWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        rebuildOptionList();
+        refreshOptionsList();
     }
 
     void BaseSettingsWindow::rebuildOptionList()
     {
-        clearOptions();
-        addOptions(buildOptionsList());
+        changeOptions(buildOptionsList());
     }
 
+    void BaseSettingsWindow::refreshOptionsList()
+    {
+        refreshOptions(buildOptionsList());
+    }
+
+    void BaseSettingsWindow::refreshOptionsList(unsigned int pageIndex)
+    {
+        refreshOptions(buildOptionsList(), pageIndex);
+    }
 } // namespace gui

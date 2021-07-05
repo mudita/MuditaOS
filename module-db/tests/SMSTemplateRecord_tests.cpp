@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -6,9 +6,6 @@
 #include "Interface/SMSTemplateRecord.hpp"
 #include "Database/Database.hpp"
 #include "Databases/SmsDB.hpp"
-
-#include <vfs.hpp>
-#include <purefs/filesystem_paths.hpp>
 
 #include <algorithm>
 #include <filesystem>
@@ -21,17 +18,24 @@ TEST_CASE("SMS templates Record tests")
 {
     Database::initialize();
 
-    const auto smsPath = (purefs::dir::getUserDiskPath() / "sms.db").c_str();
-    std::filesystem::remove(smsPath);
+    const auto smsPath = (std::filesystem::path{"sys/user"} / "sms.db");
+    if (std::filesystem::exists(smsPath)) {
+        REQUIRE(std::filesystem::remove(smsPath));
+    }
 
-    auto smsDB = std::make_unique<SmsDB>(smsPath);
-    REQUIRE(smsDB->isInitialized());
+    SmsDB smsDB(smsPath.c_str());
+    REQUIRE(smsDB.isInitialized());
 
-    SMSTemplateRecordInterface SMSTemplateRecordInterface(smsDB.get());
+    SMSTemplateRecordInterface SMSTemplateRecordInterface(&smsDB);
     SMSTemplateRecord testRec;
     testRec.text               = "Test text";
     testRec.lastUsageTimestamp = 100;
 
+    const auto smsRecords = SMSTemplateRecordInterface.GetCount();
+    // clear sms table
+    for (std::uint32_t id = 1; id <= smsRecords; id++) {
+        REQUIRE(SMSTemplateRecordInterface.RemoveByID(id));
+    }
     // Add 4 records
     REQUIRE(SMSTemplateRecordInterface.Add(testRec));
     REQUIRE(SMSTemplateRecordInterface.Add(testRec));

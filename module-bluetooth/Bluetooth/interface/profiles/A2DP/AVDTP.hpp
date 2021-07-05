@@ -10,7 +10,7 @@ extern "C"
 #include <btstack_defines.h>
 #include <classic/avdtp.h>
 }
-namespace Bt
+namespace bluetooth
 {
 
     class AVDTP
@@ -19,15 +19,15 @@ namespace Bt
         struct SbcConfiguration
         {
             int reconfigure;
+
             int numChannels;
             int samplingFrequency;
-            int channelMode;
             int blockLength;
             int subbands;
-            int allocationMethod;
             int minBitpoolValue;
             int maxBitpoolValue;
-            int framesPerBuffer;
+            btstack_sbc_channel_mode_t channelMode;
+            btstack_sbc_allocation_method_t allocationMethod;
         };
         static SbcConfiguration sbcConfig;
         static btstack_sbc_encoder_state_t sbcEncoderState;

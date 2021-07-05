@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -16,12 +16,12 @@
 
 namespace gui
 {
+    class Image;
+
     class DayEventsWindow : public gui::AppWindow
     {
         std::string dayMonthTitle;
-        calendar::TimePoint filterFrom;
-        gui::Image *leftArrowImage                               = nullptr;
-        gui::Image *newDayEventImage                             = nullptr;
+        TimePoint filterFrom;
         gui::ListView *dayEventsList                             = nullptr;
         std::shared_ptr<DayEventsModel> dayEventsModel           = nullptr;
 

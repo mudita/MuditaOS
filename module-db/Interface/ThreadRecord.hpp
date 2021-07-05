@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -76,9 +76,13 @@ class ThreadRecordInterface : public RecordInterface<ThreadRecord, ThreadRecordF
     std::unique_ptr<db::QueryResult> threadSearchForListQuery(const std::shared_ptr<db::Query> &query);
     std::unique_ptr<db::QueryResult> markAsReadQuery(const std::shared_ptr<db::Query> &query);
     std::unique_ptr<db::QueryResult> threadsGetQuery(const std::shared_ptr<db::Query> &query);
+    std::unique_ptr<db::QueryResult> threadsGetQueryWithTotalCount(const std::shared_ptr<db::Query> &query);
     std::unique_ptr<db::QueryResult> threadsGetForListQuery(const std::shared_ptr<db::Query> &query);
     std::unique_ptr<db::QueryResult> threadGetByIDQuery(const std::shared_ptr<db::Query> &query);
     std::unique_ptr<db::QueryResult> threadGetByNumberQuery(const std::shared_ptr<db::Query> &query);
     std::unique_ptr<db::QueryResult> threadGetByContactIDQuery(const std::shared_ptr<db::Query> &query);
     std::unique_ptr<db::QueryResult> threadRemoveQuery(const std::shared_ptr<db::Query> &query);
+    std::unique_ptr<db::QueryResult> threadsGetCount(const std::shared_ptr<db::Query> &query);
+
+    std::vector<ThreadRecord> getThreads(const std::shared_ptr<db::Query> &query);
 };

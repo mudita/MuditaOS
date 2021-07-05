@@ -33,3 +33,4 @@ add_test(NAME ${PROJECT_NAME}
         )
 
 add_dependencies(check ${PROJECT_NAME})
+add_dependencies(unittests ${PROJECT_NAME})

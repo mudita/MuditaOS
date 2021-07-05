@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 import time
@@ -14,10 +14,11 @@ from harness import log
 from harness.harness import Harness
 from harness import utils
 from harness.interface.error import TestError, Error
-from harness.interface.CDCSerial import CDCSerial as serial
+from harness.interface.CDCSerial import Keytype, CDCSerial as serial
+from harness.interface.defs import key_codes
+
 
 simulator_port = 'simulator'
-
 
 def pytest_addoption(parser):
     parser.addoption("--port", type=str, action="store", required=False)
@@ -25,6 +26,7 @@ def pytest_addoption(parser):
     parser.addoption("--phone_number", type=int, action="store")
     parser.addoption("--call_duration", type=int, action="store", default=30)
     parser.addoption("--sms_text", type=str, action="store", default='')
+    parser.addoption("--bt_device", type=str, action="store", default='')
 
 
 @pytest.fixture(scope='session')
@@ -47,6 +49,10 @@ def sms_text(request):
     assert sms_text != ''
     return sms_text
 
+@pytest.fixture(scope='session')
+def bt_device(request):
+    bt_device = request.config.option.bt_device
+    return bt_device
 
 @pytest.fixture(scope='session')
 def harness(request):
@@ -54,7 +60,8 @@ def harness(request):
     Try to init one Pure phone with serial port path or automatically
     '''
     port_name = request.config.option.port
-    TIMEOUT = min(1, request.config.option.timeout)
+    TIMEOUT = request.config.option.timeout
+
     timeout_started = time.time()
 
     RETRY_EVERY_SECONDS = 1.0
@@ -91,11 +98,23 @@ def harness(request):
                     pytest.exit("not a valid sim pts entry!")
 
             harness = Harness(port_name)
+
+            '''
+            Wait for endpoints to initialize
+            '''
+            testbody = {"ui": True, "getWindow": True}
+            result = None
+            with utils.Timeout.limit(seconds=305):
+                while not result:
+                    try:
+                        result = harness.endpoint_request("developerMode", "get", testbody)
+                    except ValueError:
+                        log.info("Endpoints not ready..")
+
     except utils.Timeout:
         pytest.exit("couldn't find any viable port. exiting")
     else:
         return harness
-
 
 @pytest.fixture(scope='session')
 def harnesses():
@@ -112,14 +131,61 @@ def harnesses():
 @pytest.fixture(scope='session')
 def phone_unlocked(harness):
     harness.unlock_phone()
-    assert harness.is_phone_unlocked
+    assert not harness.is_phone_locked()
 
+@pytest.fixture(scope='session')
+def phone_locked(harness):
+    harness.lock_phone()
+    assert harness.is_phone_locked()
 
 @pytest.fixture(scope='session')
 def phones_unlocked(harnesses):
     for harness in harnesses:
         harness.unlock_phone()
-        assert harness.is_phone_unlocked
+        assert not harness.is_phone_locked()
+
+
+@pytest.fixture(scope='session')
+def phone_in_desktop(harness):
+    # go to desktop
+    if harness.get_application_name() != "ApplicationDesktop":
+        harness.connection.send_key_code(key_codes["fnRight"], Keytype.long_press)
+        # in some cases we have to do it twice
+        if harness.get_application_name() != "ApplicationDesktop":
+            harness.connection.send_key_code(key_codes["fnRight"], Keytype.long_press)
+    # assert that we are in ApplicationDesktop
+    assert harness.get_application_name() == "ApplicationDesktop"
+
+@pytest.fixture(scope='function')
+def phone_ends_test_in_desktop(harness):
+    yield
+    target_application = "ApplicationDesktop"
+    target_window     = "MainWindow"
+    log.info(f"returning to {target_window} of {target_application} ...")
+    time.sleep(1)
+
+    if harness.get_application_name() != target_application :
+        body = {"switchApplication" : {"applicationName": target_application, "windowName" : target_window }}
+        harness.endpoint_request("developerMode", "put", body)
+        time.sleep(1)
+
+        max_retry_counter = 5
+        while harness.get_application_name() != target_application:
+            max_retry_counter -= 1
+            if max_retry_counter == 0:
+                break
+
+            log.info(f"Not in {target_application}, {max_retry_counter} attempts left...")
+            time.sleep(1)
+    else :
+        # switching window in case ApplicationDesktop is not on MainWindow:
+        body = {"switchWindow" : {"applicationName": target_application, "windowName" : target_window }}
+        harness.endpoint_request("developerMode", "put", body)
+        time.sleep(1)
+
+    # assert that we are in ApplicationDesktop
+    assert harness.get_application_name() == target_application
+    time.sleep(1)
 
 def pytest_configure(config):
     config.addinivalue_line("markers",
@@ -128,3 +194,9 @@ def pytest_configure(config):
                             "rt1051: mark test if it's target only (eg. calls, messages)")
     config.addinivalue_line("markers",
                             "usb_cdc_echo: mark test if it's intended for usb-cdc echo mode")
+    config.addinivalue_line("markers",
+                            "two_sim_cards: mark test in case when two sim cards are required")
+    config.addinivalue_line("markers",
+                            "backup: subset of backup user data tests")
+    config.addinivalue_line("markers",
+                            "restore: subset of restore user data tests")

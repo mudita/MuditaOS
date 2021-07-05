@@ -3,12 +3,15 @@
 
 #include "PacketData.hpp"
 
+#include <service-cellular/ServiceCellular.hpp>
+
 #include <optional>
 #include <algorithm>
 #include <iterator>
-
 #include <response.hpp>
 #include <Utils.hpp>
+#include <at/ATFactory.hpp>
+
 namespace at
 {
     namespace response
@@ -106,7 +109,7 @@ namespace packet_data
 
     PDPContext::PDPContext(ServiceCellular &cellularService) : cellularService(cellularService)
     {
-        channel = cellularService.cmux->get(TS0710::Channel::Commands);
+        channel = cellularService.cmux->get(CellularMux::Channel::Commands);
     }
 
     std::shared_ptr<APN::Config> PDPContext::getConfiguration(std::uint8_t contextId)
@@ -177,23 +180,37 @@ namespace packet_data
 
     PacketData::PacketData(ServiceCellular &cellularService) : cellularService(cellularService){};
 
-    void PacketData::loadAPNSettings()
+    void PacketData::loadAPNSettings(const std::string &json)
     {
 
-        std::shared_ptr<APN::Config> apnConfig = std::make_shared<APN::Config>();
-        apnConfig->contextId                   = 1;
-        apnConfig->apnType                     = APN::APNType::Default;
-        apnConfig->apn                         = "internet";
-        apnConfig->authMethod                  = APN::AuthMethod::NONE;
+        std::string err;
+        auto apnsObj = json11::Json::parse(json, err).array_items();
+        if (!err.empty()) {
+            LOG_ERROR("Error while parsing APN configuration: %s", err.c_str());
+            return;
+        }
 
-        contextMap[apnConfig->contextId] = apnConfig;
+        contextMap.clear();
+        for (auto &it : apnsObj) {
+            std::shared_ptr<APN::Config> apnConfig = std::make_shared<APN::Config>();
+            apnConfig->from_json(it);
+            contextMap[apnConfig->contextId] = apnConfig;
+        }
 
-        LOG_ERROR("loadAPNSettings");
+        LOG_DEBUG("loadAPNSettings");
     }
 
-    void PacketData::saveAPNSettings()
+    std::string PacketData::saveAPNSettings() const
     {
-        /// Save in phone memory
+        /// Save as JSON string
+        std::vector<json11::Json> vec;
+
+        std::transform(contextMap.begin(), contextMap.end(), std::back_inserter(vec), [](auto &apn) {
+            return apn.second->to_json();
+        });
+        LOG_DEBUG("saveAPNSettings");
+
+        return json11::Json(vec).dump();
     }
 
     at::Result::Code PacketData::updateAPNSettings(std::uint8_t ctxId)
@@ -202,48 +219,53 @@ namespace packet_data
         PDPContext pdpCtx(cellularService);
         std::shared_ptr<APN::Config> apnConfig;
         std::shared_ptr<APN::Config> modemApn;
-        if ((modemApn = pdpCtx.getConfiguration(ctxId)) && (modemApn != nullptr)) {
+        if (!(modemApn = pdpCtx.getConfiguration(ctxId))) {
+            return at::Result::Code::ERROR;
+        }
+        auto phoneApn = contextMap.find(ctxId);
 
-            auto phoneApn = contextMap.find(ctxId);
-
-            if (phoneApn != contextMap.end()) {
-                LOG_DEBUG("Phone context exists");
-                if (dataTransfer == DataTransfer::Off) {
-                    /// set null configuration, solution based on lack of quectel documentation
-                    return pdpCtx.setConfiguration(phoneApn->second, true);
-                }
-                else {
-                    if (!phoneApn->second->compare(modemApn)) {
-                        /// rebuild configuratio
-                        LOG_DEBUG("Update modem context %d", ctxId);
+        if (phoneApn != contextMap.end()) {
+            LOG_DEBUG("Phone context exists");
+            if (dataTransfer == DataTransfer::Off) {
+                /// set null configuration, solution based on lack of quectel documentation
+                return pdpCtx.setConfiguration(phoneApn->second, true);
+            }
+            else {
+                if (!phoneApn->second->compare(modemApn)) {
+                    /// rebuild configuration
+                    LOG_DEBUG("Update modem context %d", ctxId);
+                    if (ctxId > internalAPNMaxId) {
                         return pdpCtx.setConfiguration(phoneApn->second);
+                    }
+                    else {
+                        contextMap[ctxId] = modemApn;
                     }
                 }
             }
-            else {
-                LOG_ERROR("Phone context not exists");
-                if (!modemApn->isEmpty()) {
-                    /** update phone configuration base on modem conf (eg. ims)
-                     *
-                     * Comment from quectel (2020.12):
-                     * As I know, only VZW MBN would use IMS on CID 1 to register IMS service directly.
-                     * So we usually ask customers to set up data connection on CID3 for VZW sim card.
-                     * Regarding other MBN files, the CID 1 shouldn’t be IMS because the CID1 is used
-                     * to activate default bearer for LTE network. So we usually ask customers to
-                     * configure their own APN on CID1.  With this rule, it’s easy for customer
-                     * to configure their APN no matter which MBN file is activated
-                     */
-                    LOG_ERROR("Update modem context %d", ctxId);
+        }
+        else {
+            LOG_DEBUG("Phone context not exists");
+            if (!modemApn->isEmpty()) {
+                /** update phone configuration base on modem conf (eg. ims)
+                 */
+                LOG_DEBUG("Update modem context %d", ctxId);
+                if (ctxId > internalAPNMaxId) {
                     return pdpCtx.setConfiguration(modemApn, true);
+                }
+                else {
+                    contextMap[ctxId] = modemApn;
                 }
             }
         }
         return at::Result::Code::OK;
     }
+
     void PacketData::setupAPNSettings()
     {
         for (std::uint8_t ctxId = MINContextId; ctxId <= MAXContextId; ctxId++) {
-            updateAPNSettings(ctxId);
+            if (updateAPNSettings(ctxId) != at::Result::Code::OK) {
+                LOG_ERROR("Failed update APN settings for context %d", ctxId);
+            }
         }
     }
 
@@ -284,8 +306,38 @@ namespace packet_data
 
     at::Result::Code PacketData::setAPN(std::shared_ptr<APN::Config> apn)
     {
-        contextMap[apn->contextId] = apn;
+        /// Only one default, save on phone configuration (not modem)
+        if (apn->apnType == packet_data::APN::APNType::Default) {
+            for (std::uint8_t ctxId = internalAPNMaxId + 1; ctxId <= MAXContextId; ctxId++) {
+
+                auto phoneApn = contextMap.find(ctxId);
+                if ((phoneApn != contextMap.end()) && (!phoneApn->second->isEmpty()) &&
+                    (phoneApn->second->apnType == packet_data::APN::APNType::Default) && (ctxId != apn->contextId)) {
+                    contextMap[ctxId]->apnType = packet_data::APN::APNType::Internet;
+                }
+            }
+        }
+
+        if (apn->isEmpty()) {
+            contextMap.erase(apn->contextId);
+        }
+        else {
+            contextMap[apn->contextId] = apn;
+        }
         return updateAPNSettings(apn->contextId);
+    }
+
+    at::Result::Code PacketData::newAPN(std::shared_ptr<APN::Config> apn, std::uint8_t &newId)
+    {
+        for (std::uint8_t ctxId = internalAPNMaxId + 1; ctxId <= MAXContextId; ctxId++) {
+            if (contextMap.find(ctxId) == contextMap.end()) {
+                newId          = ctxId;
+                apn->contextId = ctxId;
+                return setAPN(apn);
+            }
+        }
+
+        return at::Result::Code::ERROR;
     }
 
     bool PacketData::setDataTransfer(DataTransfer dt)

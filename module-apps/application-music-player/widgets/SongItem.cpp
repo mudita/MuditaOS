@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "module-apps/application-music-player/widgets/SongItem.hpp"
@@ -8,7 +8,7 @@ namespace gui
 
     using namespace musicPlayerStyle;
 
-    SongItem::SongItem(std::string songName, std::string authorName, std::string duration)
+    SongItem::SongItem(const std::string &authorName, const std::string &songName, const std::string &duration)
     {
         setMinimumSize(songItem::w, songItem::h);
         setMargins(Margins(0, style::margins::small, 0, style::margins::small));
@@ -52,6 +52,7 @@ namespace gui
         playedSong = new ImageBox(secondHBox, 0, 0, 0, 0, new Image("messages_error_W_M"));
         playedSong->setMinimumSize(songItem::duration_w, songItem::text_h);
         playedSong->setVisible(false);
+        playedSong->setEdges(RectangleEdge::None);
 
         authorText = new TextFixedSize(secondHBox, 0, 0, 0, 0);
         authorText->setMinimumHeight(songItem::text_h);
@@ -63,14 +64,10 @@ namespace gui
         authorText->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
         authorText->setEditMode(EditMode::Browse);
         authorText->setText(authorName);
+
+        dimensionChangedCallback = [&]([[maybe_unused]] gui::Item &item, const BoundingBox &newDim) -> bool {
+            vBox->setArea({0, 0, newDim.w, newDim.h});
+            return true;
+        };
     }
-
-    auto SongItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool
-    {
-        vBox->setPosition(0, 0);
-        vBox->setSize(newDim.w, newDim.h);
-
-        return true;
-    }
-
 } /* namespace gui */

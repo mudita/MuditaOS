@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationAlarmClock.hpp"
@@ -19,11 +19,12 @@ namespace app
 
     ApplicationAlarmClock::ApplicationAlarmClock(std::string name,
                                                  std::string parent,
+                                                 sys::phone_modes::PhoneMode mode,
                                                  uint32_t stackDepth,
                                                  sys::ServicePriority priority)
-        : Application(name, parent, false, stackDepth, priority)
+        : Application(name, parent, mode, false, stackDepth, priority)
     {
-        busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
+        bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
     }
 
     sys::MessagePointer ApplicationAlarmClock::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
@@ -56,9 +57,9 @@ namespace app
             }
         }
         if (handled) {
-            return msgHandled();
+            return sys::msgHandled();
         }
-        return msgNotHandled();
+        return sys::msgNotHandled();
     }
 
     sys::ReturnCodes ApplicationAlarmClock::InitHandler()
@@ -69,7 +70,6 @@ namespace app
         }
 
         createUserInterface();
-        setActiveWindow(gui::name::window::main_window);
         return ret;
     }
 
@@ -101,12 +101,15 @@ namespace app
                 return std::make_unique<alarmClock::CustomRepeatWindow>(app, std::move(presenter));
             });
         windowsFactory.attach(
-            utils::localize.get("app_alarm_clock_options_title"),
+            utils::translate("app_alarm_clock_options_title"),
             [](Application *app, const std::string &name) { return std::make_unique<gui::OptionWindow>(app, name); });
 
         windowsFactory.attach(
             style::alarmClock::window::name::dialogYesNo,
             [](Application *app, const std::string &name) { return std::make_unique<gui::DialogYesNo>(app, name); });
+
+        attachPopups(
+            {gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes, gui::popup::ID::PhoneLock});
     }
 
     void ApplicationAlarmClock::destroyUserInterface()

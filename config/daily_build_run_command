@@ -1,0 +1,15 @@
+#!/bin/bash
+
+#starting daily builder example
+#please adjust paths to your needs
+
+# this script has removed execution bits on purpose, please do not set them!
+
+ARTEFACTS_LOCAL_DIR=$HOME/mudita/Artefacts
+TOOLS_LOCAL_DIR=$HOME/mudita/PurePhone/tools
+ENV_FILE=daily_build_environment
+CONTAINER="wearemudita/mudita_os_builder:1.9"
+WORK_DIR=$HOME/mudita/daily_build/
+
+
+docker run -v ${ARTEFACTS_LOCAL_DIR}:/artefacts -v ${TOOLS_LOCAL_DIR}:/scripts -v ${WORK_DIR}:/workdir -w /workdir --user "$(id -u):$(id -g)" --env-file=$ENV_FILE --entrypoint /scripts/daily_release.sh ${CONTAINER}

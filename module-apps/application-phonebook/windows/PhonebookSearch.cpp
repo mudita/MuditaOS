@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhonebookSearch.hpp"
@@ -17,9 +17,9 @@ namespace gui
     {
         AppWindow::buildInterface();
 
-        setTitle(utils::localize.get("app_phonebook_title_main"));
+        setTitle(utils::translate("app_phonebook_title_main"));
 
-        inputField = inputBox(this, utils::localize.get("common_search_uc"), "search");
+        inputField = inputBox(this, utils::translate("common_search_uc"), "search");
         inputField->setInputMode(new InputMode(
             {InputMode::ABC, InputMode::abc, InputMode::digit},
             [=](const UTF8 &Text) { application->getCurrentWindow()->bottomBarTemporaryMode(Text); },
@@ -30,8 +30,8 @@ namespace gui
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
 
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::search));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::search));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
         setFocusItem(inputField);
     }
@@ -61,7 +61,7 @@ namespace gui
         if (AppWindow::onInput(inputEvent)) {
             return true;
         }
-        if (!inputEvent.isShortPress()) {
+        if (!inputEvent.isShortRelease()) {
             return false;
         }
         if (!inputEvent.is(gui::KeyCode::KEY_ENTER)) {

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "irq_gpio.hpp"
@@ -12,6 +12,7 @@
 #include "bsp/battery-charger/battery_charger.hpp"
 #include "bsp/cellular/bsp_cellular.hpp"
 #include "bsp/keyboard/keyboard.hpp"
+#include "bsp/headset/headset.hpp"
 #include "bsp/BoardDefinitions.hpp"
 #include "bsp/magnetometer/magnetometer.hpp"
 #include "bsp/light_sensor/light_sensor.hpp"
@@ -112,9 +113,7 @@ namespace bsp
                 xHigherPriorityTaskWoken |= keyboard_right_functional_IRQHandler();
             }
 
-            if (irq_mask & (1 << BOARD_BATTERY_CHARGER_INOKB_PIN)) {
-                xHigherPriorityTaskWoken |= bsp::battery_charger::INOKB_IRQHandler();
-            }
+            if (irq_mask & (1 << BOARD_BATTERY_CHARGER_INOKB_PIN)) {}
 
             if (irq_mask & (1 << BOARD_BATTERY_CHARGER_WCINOKB_PIN)) {}
 
@@ -123,7 +122,7 @@ namespace bsp
             }
 
             if (irq_mask & (1 << BSP_CELLULAR_SIM_TRAY_INSERTED_PIN)) {
-                xHigherPriorityTaskWoken |= bsp::cellular::sim::trayIRQ_handler();
+                xHigherPriorityTaskWoken |= bsp::cellular::sim::trayIRQHandler();
             }
 
             if (irq_mask & (1 << static_cast<uint32_t>(BoardDefinitions::LIGHT_SENSOR_IRQ))) {
@@ -151,10 +150,11 @@ namespace bsp
             }
 
             if (irq_mask & (1 << BOARD_JACKDET_IRQ_GPIO_PIN)) {
+                xHigherPriorityTaskWoken |= bsp::headset::headset_IRQHandler();
             }
 
             if (irq_mask & (1 << BSP_CELLULAR_RI_PIN)) {
-                bsp::cellular::ringIndicator::riIRQ_handler();
+                bsp::cellular::ringIndicator::riIRQHandler();
             }
 
             // Clear all IRQs

@@ -1,8 +1,9 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RT1051DriverPWM.hpp"
-#include "log/log.hpp"
+#include "RT1051DriverPWMhelper.hpp"
+#include <log.hpp>
 #include "../board.h"
 #include <algorithm>
 
@@ -12,7 +13,7 @@ namespace drivers
         : DriverPWM(inst, mod, params)
     {
 
-        pwm_config_t pwmConfig = {0};
+        pwm_config_t pwmConfig = {};
 
         switch (instance) {
         case PWMInstances::PWM_1:
@@ -30,6 +31,8 @@ namespace drivers
         case PWMInstances::PWM_4:
             base = PWM4;
             LOG_DEBUG("Init: PWM4");
+            break;
+        default:
             break;
         }
 
@@ -50,12 +53,14 @@ namespace drivers
             pwmModule = kPWM_Module_3;
             LOG_DEBUG("Init: PWM module 3");
             break;
+        default:
+            break;
         }
 
         PWM_GetDefaultConfig(&pwmConfig);
         PWM_Init(base, pwmModule, &pwmConfig);
 
-        SetupPWMChannel(parameters.channel, parameters.frequency);
+        SetupPWMChannel(parameters.channel);
         Start();
     }
 
@@ -65,13 +70,13 @@ namespace drivers
         LOG_DEBUG("Deinit: PWM");
     }
 
-    void RT1051DriverPWM::SetDutyCycle(std::uint8_t duty_cycle_percent)
+    void RT1051DriverPWM::SetDutyCycle(std::uint8_t dutyCyclePercent)
     {
-        cpp_freertos::LockGuard lock(dutyCycleMutex);
         pwm_mode_t pwmMode = kPWM_SignedCenterAligned;
 
         std::uint8_t dutyCycle =
-            std::clamp(duty_cycle_percent, static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(100));
+            std::clamp(dutyCyclePercent, static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(100));
+        pwmSignalConfig.dutyCyclePercent = dutyCycle;
         PWM_UpdatePwmDutycycle(base, pwmModule, pwmSignalConfig.pwmChannel, pwmMode, dutyCycle);
         PWM_SetPwmLdok(base, 1 << pwmModule, true);
     }
@@ -88,7 +93,17 @@ namespace drivers
         ForceLowOutput();
     }
 
-    void RT1051DriverPWM::SetupPWMChannel(PWMChannel channel, std::uint32_t pwm_frequency)
+    RT1051DriverPWM::PwmState RT1051DriverPWM::GetPwmState()
+    {
+        if (PWM_GetPwmGeneratorState(base, 1 << pwmModule)) {
+            return PwmState::On;
+        }
+        else {
+            return PwmState::Off;
+        }
+    }
+
+    void RT1051DriverPWM::SetupPWMChannel(PWMChannel channel)
     {
         switch (parameters.channel) {
         case PWMChannel::A:
@@ -107,15 +122,19 @@ namespace drivers
 
         // Currently connected to IPbus clock
         const auto clockSource = CLOCK_GetFreq(kCLOCK_IpgClk);
-        pwm_mode_t pwmMode     = kPWM_SignedCenterAligned;
-
-        PWM_SetupPwm(base, pwmModule, &pwmSignalConfig, 1, pwmMode, pwm_frequency, clockSource);
+        SetupPWMInstance(clockSource);
 
         PWM_SetupFaultDisableMap(base, pwmModule, pwmSignalConfig.pwmChannel, kPWM_faultchannel_0, 0);
 
         // Force logic config
         PWM_SetupSwCtrlOut(base, pwmModule, pwmSignalConfig.pwmChannel, false);
         base->SM[pwmModule].CTRL2 |= PWM_CTRL2_FRCEN(1U);
+    }
+
+    void RT1051DriverPWM::SetupPWMInstance(std::uint32_t clockFrequency)
+    {
+        pwm_mode_t pwmMode = kPWM_SignedCenterAligned;
+        PWM_SetupPwm(base, pwmModule, &pwmSignalConfig, 1, pwmMode, parameters.frequency, clockFrequency);
     }
 
     void RT1051DriverPWM::ForceLowOutput()
@@ -128,6 +147,18 @@ namespace drivers
     {
         PWM_SetupForceSignal(base, pwmModule, pwmSignalConfig.pwmChannel, kPWM_UsePwm);
         base->SM[pwmModule].CTRL2 |= PWM_CTRL2_FORCE(1U);
+    }
+
+    void RT1051DriverPWM::UpdateClockFrequency(std::uint32_t newFrequency)
+    {
+        cpp_freertos::LockGuard lock(frequencyChangeMutex);
+
+        SetupPWMInstance(newFrequency);
+        if (GetPwmState() == PwmState::On) {
+            Stop();
+            SetDutyCycle(pwmSignalConfig.dutyCyclePercent);
+            Start();
+        }
     }
 
 } // namespace drivers

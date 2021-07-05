@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <service-time/CalendarTimeEvents.hpp>
@@ -37,8 +37,8 @@ namespace stm
 
     bool CalendarTimeEvents::sendNextEventQuery()
     {
-        calendar::TimePoint filterFrom = TimePointNow();
-        calendar::TimePoint filterTill = filterFrom;
+        TimePoint filterFrom = TimePointNow();
+        TimePoint filterTill = filterFrom;
         if (startTP != TIME_POINT_INVALID) {
             filterFrom = std::min(startTP, filterFrom);
             filterTill = filterFrom;
@@ -84,10 +84,9 @@ namespace stm
 
     void CalendarTimeEvents::invokeEvent()
     {
-        std::unique_ptr<EventRecordData> eventData = std::make_unique<EventRecordData>();
-        eventData->setDescription(style::window::calendar::name::event_reminder_window);
         auto event = std::make_shared<EventsRecord>(eventRecord);
-        eventData->setData(event);
+        auto eventData = std::make_unique<EventRecordData>(std::move(event));
+        eventData->setDescription(style::window::calendar::name::event_reminder_window);
 
         app::manager::Controller::sendAction(service(), app::manager::actions::ShowReminder, std::move(eventData));
     }

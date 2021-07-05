@@ -1,68 +1,39 @@
-/*
- * rtc.hpp
- *
- *  Created on: Jun 26, 2019
- *      Author: kuba
- */
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#ifndef MODULE_BSP_BSP_RTC_RTC_HPP_
-#define MODULE_BSP_BSP_RTC_RTC_HPP_
+#pragma once
 
+#include <FreeRTOS.h>
+#include <queue.h>
+#include <ctime>
+#include <cstdint>
 
-#include <time.h>
-#include <stdint.h>
+namespace bsp::rtc {
+	enum class IrqNotification
+    {
+        AlarmOccurred = 0x01
+    };
 
-extern "C" {
-	#include "FreeRTOS.h"
-	#include "task.h"
-	#include "queue.h"
-}
-
-typedef enum
-{
-    RtcBspOK,
-    RtcBspError
-} RtcBspError_e;
-
-
-namespace bsp {
-
-	enum class rtcIrqNotifications
+	enum class ErrorCode
 	{
-		alarmOcured = 0x01
+		OK,
+		Error
 	};
 
-	/*
-	 * RTC functions are using FreeRTOS functions, RTC should be initialized after scheduler starts.
-	 * */
-	RtcBspError_e rtc_Init(xQueueHandle qHandle);
+	// RTC functions are using FreeRTOS functions, RTC should be initialized after scheduler starts.
 
-	RtcBspError_e rtc_EnableAlarmIrq();
-
-	RtcBspError_e rtc_DisableAlarmIrq();
-
-	RtcBspError_e rtc_MaskAlarmIrq();
-
-	RtcBspError_e rtc_UnmaskAlarmIrq();
-
-	RtcBspError_e rtc_SetDateTimeFromTimestamp(time_t timestamp);
-
-	RtcBspError_e rtc_SetDateTime(struct tm* time);
-
-	RtcBspError_e rtc_GetCurrentDateTime(struct tm* datetime);
-
-	RtcBspError_e rtc_GetCurrentTimestamp(time_t* timestamp);
-
-	RtcBspError_e rtc_SetAlarmOnDate(struct tm* datetime);
-
-	RtcBspError_e rtc_SetAlarmOnTimestamp(uint32_t secs);
-
-	RtcBspError_e rtc_SetAlarmInSecondsFromNow(uint32_t secs);
-
-	RtcBspError_e rtc_GetAlarmTimestamp(uint32_t* secs);
-
-	time_t rtc_GetSecondCounter();
-
-;	RtcBspError_e rtc_SetMinuteAlarm(time_t timestamp);
+	ErrorCode init(xQueueHandle qHandle);
+	ErrorCode enableAlarmIrq();
+	ErrorCode disableAlarmIrq();
+	ErrorCode maskAlarmIrq();
+	ErrorCode unmaskAlarmIrq();
+	ErrorCode setDateTimeFromTimestamp(time_t timestamp);
+	ErrorCode setDateTime(struct tm* time);
+	ErrorCode getCurrentDateTime(struct tm* datetime);
+	ErrorCode getCurrentTimestamp(time_t* timestamp);
+	ErrorCode setAlarmOnDate(struct tm* datetime);
+	ErrorCode setAlarmOnTimestamp(std::uint32_t secs);
+	ErrorCode setAlarmInSecondsFromNow(std::uint32_t secs);
+	ErrorCode getAlarmTimestamp(std::uint32_t* secs);
+	ErrorCode setMinuteAlarm(time_t timestamp);
 }
-#endif /* MODULE_BSP_BSP_RTC_RTC_HPP_ */

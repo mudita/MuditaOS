@@ -8,6 +8,7 @@ add_catch2_executable(
                 ../mock/multi-line-string.cpp
                 ../mock/InitializedFontManager.cpp
                 test-gui-Text.cpp
+                test-gui-TextFixedSize.cpp
                 test-gui-TextBlock.cpp
                 test-gui-TextBlockCursor.cpp
                 test-gui-TextDocument.cpp
@@ -19,7 +20,10 @@ add_catch2_executable(
                 ..
                 ../mock/
         LIBS
+                module-sys
+                iosyscalls
                 module-gui
         DEPS
                 assets
+                PurePhone-disk-img
 )

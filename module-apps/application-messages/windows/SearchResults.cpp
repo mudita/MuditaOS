@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SearchResults.hpp"
@@ -8,9 +8,7 @@
 #include "module-apps/application-messages/data/MessagesStyle.hpp"
 #include "queries/messages/threads/QueryThreadsSearchForList.hpp"
 
-#include <service-db/DBThreadMessage.hpp>
 #include <service-db/QueryMessage.hpp>
-#include <service-db/DBMessage.hpp>
 
 #include <i18n/i18n.hpp>
 
@@ -21,11 +19,11 @@ namespace gui
         namespace msgThreadStyle = style::messages::threads;
 
         AppWindow::buildInterface();
-        setTitle(utils::localize.get("app_messages_title_main"));
+        setTitle(utils::translate("app_messages_title_main"));
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::search));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::search));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
         body = new gui::Item();
         body->setBoundingBox(bodySize());
         addWidget(body);
@@ -37,7 +35,8 @@ namespace gui
                                  msgThreadStyle::ListPositionY,
                                  msgThreadStyle::listWidth,
                                  msgThreadStyle::listHeight,
-                                 model);
+                                 model,
+                                 listview::ScrollBarType::Fixed);
         list->setScrollTopMargin(style::margins::small);
         setFocusItem(list);
 

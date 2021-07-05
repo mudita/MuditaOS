@@ -17,22 +17,22 @@ target_sources( ${PROJECT_NAME}
 
 	PRIVATE
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationCall.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/CallMainWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/EnterNumberWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/EmergencyCallWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/CallWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/StateIcons.cpp"
-	PUBLIC
+		"${CMAKE_CURRENT_LIST_DIR}/windows/NumberWindow.cpp"
+		PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationCall.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/EnterNumberWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/EmergencyCallWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/CallWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/data/CallSwitchData.hpp"
-)
+		"${CMAKE_CURRENT_LIST_DIR}/windows/NumberWindow.hpp"
+		)
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
         service-audio
         service-cellular
 )
-

@@ -1,15 +1,16 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RecorderOperation.hpp"
+
+#include "Audio/AudioDevice.hpp"
 #include "Audio/encoder/Encoder.hpp"
-#include "bsp/audio/bsp_audio.hpp"
 #include "Audio/Profiles/Profile.hpp"
 #include "Audio/Profiles/ProfileRecordingHeadphones.hpp"
 #include "Audio/Profiles/ProfileRecordingOnBoardMic.hpp"
 #include "Audio/AudioCommon.hpp"
 
-#include "log/log.hpp"
+#include <log.hpp>
 #include "FreeRTOS.h"
 #include "task.h"
 
@@ -19,8 +20,6 @@ namespace audio
     using namespace utils;
 
 #define PERF_STATS_ON 0
-
-    using namespace bsp;
 
     RecorderOperation::RecorderOperation(const char *file, AudioServiceMessage::Callback callback) : Operation(callback)
     {
@@ -37,7 +36,7 @@ namespace audio
             // during sf tests on hardware
 #endif
             if (ret == 0) {
-                state = State::Idle;
+                state          = State::Idle;
                 const auto req = AudioServiceMessage::FileSystemNoSpace(operationToken);
                 serviceCallback(&req);
             }
@@ -56,11 +55,11 @@ namespace audio
         currentProfile = defaultProfile;
 
         uint32_t channels = 0;
-        if ((currentProfile->GetInOutFlags() & static_cast<uint32_t>(AudioDevice::Flags::InputLeft)) ||
-            (currentProfile->GetInOutFlags() & static_cast<uint32_t>(AudioDevice::Flags::InputRight))) {
+        if ((currentProfile->GetInOutFlags() & static_cast<uint32_t>(audio::codec::Flags::InputLeft)) ||
+            (currentProfile->GetInOutFlags() & static_cast<uint32_t>(audio::codec::Flags::InputRight))) {
             channels = 1;
         }
-        else if (currentProfile->GetInOutFlags() & static_cast<uint32_t>(AudioDevice::Flags::InputStereo)) {
+        else if (currentProfile->GetInOutFlags() & static_cast<uint32_t>(audio::codec::Flags::InputStereo)) {
             channels = 2;
         }
 
@@ -82,10 +81,10 @@ namespace audio
             return RetCode::InvokedInIncorrectState;
         }
         operationToken = token;
-        state         = State::Active;
+        state          = State::Active;
 
-        if (audioDevice->IsFormatSupported(currentProfile->GetAudioFormat())) {
-            auto ret = audioDevice->Start(currentProfile->GetAudioFormat());
+        if (audioDevice->isFormatSupportedBySource(currentProfile->getAudioFormat())) {
+            auto ret = audioDevice->Start();
             return GetDeviceError(ret);
         }
         else {
@@ -122,8 +121,8 @@ namespace audio
             return RetCode::InvokedInIncorrectState;
         }
 
-        state = State::Active;
-        auto ret = audioDevice->Start(currentProfile->GetAudioFormat());
+        state    = State::Active;
+        auto ret = audioDevice->Start();
         return GetDeviceError(ret);
     }
 
@@ -157,7 +156,7 @@ namespace audio
             return RetCode::UnsupportedProfile;
         }
 
-        audioDevice = CreateDevice(currentProfile->GetAudioDeviceType(), audioCallback).value_or(nullptr);
+        audioDevice = CreateDevice(*currentProfile);
         if (audioDevice == nullptr) {
             LOG_ERROR("Error creating AudioDevice");
             return RetCode::Failed;
@@ -180,14 +179,14 @@ namespace audio
     audio::RetCode RecorderOperation::SetOutputVolume(float vol)
     {
         currentProfile->SetOutputVolume(vol);
-        auto ret = audioDevice->OutputVolumeCtrl(vol);
+        auto ret = audioDevice->setOutputVolume(vol);
         return GetDeviceError(ret);
     }
 
     audio::RetCode RecorderOperation::SetInputGain(float gain)
     {
         currentProfile->SetInputGain(gain);
-        auto ret = audioDevice->InputGainCtrl(gain);
+        auto ret = audioDevice->setInputGain(gain);
         return GetDeviceError(ret);
     }
 

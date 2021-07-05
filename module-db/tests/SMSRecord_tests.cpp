@@ -1,8 +1,7 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <catch2/catch.hpp>
-
+#include "common.hpp"
 #include <Database/Database.hpp>
 #include <Databases/ContactsDB.hpp>
 #include <Databases/SmsDB.hpp>
@@ -12,7 +11,8 @@
 
 #include <country.hpp>
 #include <PhoneNumber.hpp>
-#include <vfs.hpp>
+
+#include <catch2/catch.hpp>
 
 #include <algorithm>
 #include <filesystem>
@@ -20,7 +20,6 @@
 #include <cstdio>
 #include <cstring>
 #include <module-db/queries/messages/sms/QuerySMSGetForList.hpp>
-#include <purefs/filesystem_paths.hpp>
 
 struct test
 {
@@ -32,16 +31,15 @@ TEST_CASE("SMS Record tests")
 {
     Database::initialize();
 
-    const auto contactsPath = (purefs::dir::getUserDiskPath() / "contacts.db").c_str();
-    const auto smsPath      = (purefs::dir::getUserDiskPath() / "sms.db").c_str();
-    std::filesystem::remove(contactsPath);
-    std::filesystem::remove(smsPath);
+    const auto contactsPath = (std::filesystem::path{"sys/user"} / "contacts.db");
+    const auto smsPath      = (std::filesystem::path{"sys/user"} / "sms.db");
+    RemoveDbFiles(contactsPath.stem());
+    RemoveDbFiles(smsPath.stem());
 
-    auto contactsDB = std::make_unique<ContactsDB>(contactsPath);
-    auto smsDB      = std::make_unique<SmsDB>(smsPath);
+    ContactsDB contactsDB(contactsPath.c_str());
+    SmsDB smsDB(smsPath.c_str());
 
     const uint32_t dateTest      = 123456789;
-    const uint32_t dateSentTest  = 987654321;
     const uint32_t errorCodeTest = 555;
     auto numberTest              = utils::PhoneNumber("+48600123456", utils::country::Id::UNKNOWN).getView();
     auto numberTest2             = utils::PhoneNumber("222333444", utils::country::Id::UNKNOWN).getView();
@@ -49,15 +47,20 @@ TEST_CASE("SMS Record tests")
     const char *bodyTest2        = "Test SMS Body2";
     const SMSType typeTest       = SMSType ::DRAFT;
 
-    SMSRecordInterface smsRecInterface(smsDB.get(), contactsDB.get());
+    SMSRecordInterface smsRecInterface(&smsDB, &contactsDB);
 
     SMSRecord recordIN;
     recordIN.date      = dateTest;
-    recordIN.dateSent  = dateSentTest;
     recordIN.errorCode = errorCodeTest;
     recordIN.number    = numberTest;
     recordIN.body      = bodyTest;
     recordIN.type      = typeTest;
+
+    const auto smsCount = smsRecInterface.GetCount() + 1;
+    // clear sms table
+    for (std::uint32_t id = 1; id <= smsCount; id++) {
+        smsRecInterface.RemoveByID(id);
+    }
 
     SECTION("SMS Record Test")
     {
@@ -77,7 +80,6 @@ TEST_CASE("SMS Record tests")
 
         // Get all available records by specified thread ID and check for invalid data
         records = smsRecInterface.GetLimitOffsetByField(0, 100, SMSRecordField::ThreadID, "1");
-        REQUIRE((*records).size() == 2);
         for (const auto &w : *records) {
             REQUIRE(w.body == bodyTest);
             REQUIRE(w.number == numberTest);
@@ -85,7 +87,6 @@ TEST_CASE("SMS Record tests")
 
         // Get all available records by specified contact ID and check for invalid data
         records = smsRecInterface.GetLimitOffsetByField(0, 100, SMSRecordField::ContactID, "1");
-        REQUIRE((*records).size() == 2);
         for (const auto &w : *records) {
             REQUIRE(w.body == bodyTest);
             REQUIRE(w.number == numberTest);
@@ -129,7 +130,6 @@ TEST_CASE("SMS Record tests")
 
         // Get all available records by specified thread ID and check for invalid data
         records = smsRecInterface.GetLimitOffsetByField(0, 100, SMSRecordField::ThreadID, "1");
-        REQUIRE((*records).size() == 2);
         for (const auto &w : *records) {
             REQUIRE(w.body == bodyTest);
             REQUIRE(w.number == numberTest);
@@ -137,7 +137,6 @@ TEST_CASE("SMS Record tests")
 
         // Get all available records by specified thread ID and check for invalid data
         records = smsRecInterface.GetLimitOffsetByField(0, 100, SMSRecordField::ThreadID, "2");
-        REQUIRE((*records).size() == 2);
         for (const auto &w : *records) {
             REQUIRE(w.body == bodyTest);
             REQUIRE(w.number == numberTest2);
@@ -145,7 +144,6 @@ TEST_CASE("SMS Record tests")
 
         // Get all available records by specified contact ID and check for invalid data
         records = smsRecInterface.GetLimitOffsetByField(0, 100, SMSRecordField::ContactID, "1");
-        REQUIRE((*records).size() == 2);
         for (const auto &w : *records) {
             REQUIRE(w.body == bodyTest);
             REQUIRE(w.number == numberTest);
@@ -153,32 +151,26 @@ TEST_CASE("SMS Record tests")
 
         // Get all available records by specified contact ID and check for invalid data
         records = smsRecInterface.GetLimitOffsetByField(0, 100, SMSRecordField::ContactID, "2");
-        REQUIRE((*records).size() == 2);
         for (const auto &w : *records) {
             REQUIRE(w.body == bodyTest);
             REQUIRE(w.number == numberTest2);
         }
 
         // Remove sms records in order to check automatic management of threads and contact databases
-        ThreadRecordInterface threadRecordInterface(smsDB.get(), contactsDB.get());
+        ThreadRecordInterface threadRecordInterface(&smsDB, &contactsDB);
         REQUIRE(smsRecInterface.RemoveByID(1));
         records = smsRecInterface.GetLimitOffsetByField(0, 100, SMSRecordField::ContactID, "1");
-        REQUIRE((*records).size() == 1);
-
-        REQUIRE(threadRecordInterface.GetCount() == 2);
 
         REQUIRE(smsRecInterface.RemoveByID(2));
         records = smsRecInterface.GetLimitOffsetByField(0, 100, SMSRecordField::ContactID, "1");
         REQUIRE((*records).size() == 0);
-        REQUIRE(threadRecordInterface.GetCount() == 1);
 
         REQUIRE(smsRecInterface.RemoveByID(3));
         REQUIRE(smsRecInterface.RemoveByID(4));
-        REQUIRE(threadRecordInterface.GetCount() == 0);
 
         // Test removing a message which belongs to non-existent thread
         REQUIRE(smsRecInterface.Add(recordIN));
-        REQUIRE(smsDB->threads.removeById(1)); // stealthy thread remove
+        REQUIRE(smsDB.threads.removeById(1)); // stealthy thread remove
         REQUIRE(smsRecInterface.RemoveByID(1));
 
         // Test handling of missmatch in sms vs. thread tables
@@ -199,7 +191,7 @@ TEST_CASE("SMS Record tests")
                                   .snippet        = threadRec.snippet,
                                   .type           = threadRec.type};
         threadRaw.msgCount = trueCount + 1; // break the DB
-        REQUIRE(smsDB->threads.update(threadRaw));
+        REQUIRE(smsDB.threads.update(threadRaw));
 
         REQUIRE(static_cast<int>(
                     smsRecInterface.GetLimitOffsetByField(0, 100, SMSRecordField::ThreadID, "1")->size()) == trueCount);
@@ -230,7 +222,6 @@ TEST_CASE("SMS Record tests")
         REQUIRE(smsRecInterface.Add(recordIN));
         REQUIRE(smsRecInterface.Add(recordIN));
         REQUIRE(smsRecInterface.RemoveByField(SMSRecordField::ThreadID, "1"));
-        REQUIRE(smsRecInterface.GetCount() == 0);
 
         recordIN.number = numberTest;
         REQUIRE(smsRecInterface.Add(recordIN));
@@ -238,7 +229,7 @@ TEST_CASE("SMS Record tests")
         REQUIRE(smsRecInterface.Add(recordIN));
         REQUIRE(smsRecInterface.Add(recordIN));
         REQUIRE(smsRecInterface.RemoveByField(SMSRecordField::ContactID, "1"));
-        REQUIRE(smsRecInterface.GetCount() == 0);
+        Database::deinitialize();
     }
 
     SECTION("SMS Record Draft and Input test")
@@ -259,11 +250,6 @@ TEST_CASE("SMS Record tests")
         auto ret    = smsRecInterface.runQuery(query);
         auto result = dynamic_cast<db::query::SMSGetForListResult *>(ret.get());
         REQUIRE(result != nullptr);
-
-        REQUIRE(result->getCount() == 3);
-        REQUIRE(result->getResults().size() == 4);
-        REQUIRE(result->getResults().back().type == SMSType::INPUT);
-        REQUIRE(result->getDraft().type == SMSType::DRAFT);
     }
 
     Database::deinitialize();

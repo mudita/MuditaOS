@@ -1,42 +1,59 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <service-appmgr/model/ApplicationManager.hpp>
 #include <service-appmgr/Controller.hpp>
 
-#include <module-apps/messages/AppMessage.hpp>
+#include <apps-common/messages/AppMessage.hpp>
+#include <apps-common/popups/data/PhoneModeParams.hpp>
+#include <apps-common/popups/data/PopupRequestParams.hpp>
 #include <Common.hpp>
-#include <Service/Bus.hpp>
 #include <Service/Message.hpp>
-#include <Service/Timer.hpp>
+#include <module-sys/Timers/TimerFactory.hpp>
 #include <SystemManager/SystemManager.hpp>
 #include <SystemManager/messages/SystemManagerMessage.hpp>
+#include <SystemManager/messages/TetheringQuestionRequest.hpp>
+#include <SystemManager/messages/TetheringPhoneModeChangeProhibitedMessage.hpp>
 #include <application-call/ApplicationCall.hpp>
 #include <application-special-input/ApplicationSpecialInput.hpp>
+#include <application-desktop/ApplicationDesktop.hpp>
+#include <application-onboarding/ApplicationOnBoarding.hpp>
+#include <application-onboarding/data/OnBoardingMessages.hpp>
 #include <i18n/i18n.hpp>
 #include <log/log.hpp>
 #include <service-appmgr/messages/Message.hpp>
 #include <service-evtmgr/EventManager.hpp>
+#include <service-evtmgr/EVMessages.hpp>
 #include <service-gui/ServiceGUI.hpp>
 #include <service-eink/ServiceEink.hpp>
-#include <service-gui/Common.hpp>
+#include <service-desktop/DesktopMessages.hpp>
+#include <service-desktop/Constants.hpp>
+#include <service-appmgr/StartupType.hpp>
+#include <module-services/service-audio/service-audio/AudioMessage.hpp>
 
 #include <algorithm>
 #include <limits>
 #include <utility>
-
 #include <module-utils/Utils.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
-// Auto phone lock disabled for now till the times when it's debugged
-// #define AUTO_PHONE_LOCK_ENABLED
+#include <service-appmgr/messages/DOMRequest.hpp>
+#include <service-appmgr/messages/GetAllNotificationsRequest.hpp>
+#include <service-appmgr/messages/AutoLockRequests.hpp>
+#include <service-appmgr/messages/FinishRequest.hpp>
+#include <service-db/DBNotificationMessage.hpp>
+#include <module-db/queries/notifications/QueryNotificationsGetAll.hpp>
+#include <service-cellular-api>
+
+#include "module-services/service-appmgr/service-appmgr/messages/ApplicationStatus.hpp"
+#include <event-manager-api>
 
 namespace app::manager
 {
     namespace
     {
-        static constexpr auto default_application_locktime_ms = 30000;
-        static constexpr auto shutdown_delay_ms               = 500;
-    }; // namespace
+        constexpr auto ApplicationManagerStackDepth = 3072;
+        constexpr auto autoLockTimerName            = "AutoLockTimer";
+    } // namespace
 
     ApplicationManagerBase::ApplicationManagerBase(std::vector<std::unique_ptr<app::ApplicationLauncher>> &&launchers)
         : applications{std::move(launchers)}
@@ -47,27 +64,10 @@ namespace app::manager
         state = _state;
     }
 
-    void ApplicationManagerBase::pushApplication(const ApplicationName &name)
-    {
-        stack.push_front(name);
-    }
-
-    void ApplicationManagerBase::popApplication()
-    {
-        if (!stack.empty()) {
-            stack.pop_front();
-        }
-    }
-
-    void ApplicationManagerBase::clearStack()
-    {
-        stack.clear();
-    }
-
     auto ApplicationManagerBase::getFocusedApplication() const noexcept -> ApplicationHandle *
     {
-        for (const auto &appName : stack) {
-            if (auto app = getApplication(appName);
+        for (const auto &item : stack) {
+            if (auto app = getApplication(item.appName);
                 app != nullptr && app->state() == app::Application::State::ACTIVE_FORGROUND) {
                 return app;
             }
@@ -77,10 +77,10 @@ namespace app::manager
 
     auto ApplicationManagerBase::getLaunchingApplication() const noexcept -> ApplicationHandle *
     {
-        if (stack.empty()) {
+        if (stack.isEmpty()) {
             return nullptr;
         }
-        auto app = getApplication(stack.front());
+        auto app = getApplication(stack.front().appName);
         return app->state() != app::Application::State::ACTIVE_FORGROUND ? app : nullptr;
     }
 
@@ -89,7 +89,7 @@ namespace app::manager
         if (stack.size() < 2) {
             return nullptr;
         }
-        return getApplication(stack[1]);
+        return getApplication(stack[1].appName);
     }
 
     auto ApplicationManagerBase::getApplication(const ApplicationName &name) const noexcept -> ApplicationHandle *
@@ -97,58 +97,117 @@ namespace app::manager
         return applications.findByName(name);
     }
 
+    auto ApplicationManagerBase::isApplicationCloseable(const ApplicationHandle *app) const noexcept -> bool
+    {
+        if (stack.contains(app->name())) {
+            const auto &appOccurrences = stack.find(app->name());
+            return app->closeable() && std::none_of(appOccurrences.begin(), appOccurrences.end(), [](const auto &item) {
+                       return !item.isCloseable;
+                   });
+        }
+        return app->closeable();
+    }
+
+    auto ApplicationManagerBase::getStackedApplications() noexcept -> std::vector<ApplicationHandle *>
+    {
+        const auto &uniqueApps = stack.unique();
+        std::vector<ApplicationHandle *> runningApps;
+        std::transform(uniqueApps.begin(),
+                       uniqueApps.end(),
+                       std::back_inserter(runningApps),
+                       [this](const auto &appName) { return getApplication(appName); });
+        return runningApps;
+    }
+
     ApplicationManager::ApplicationManager(const ApplicationName &serviceName,
                                            std::vector<std::unique_ptr<app::ApplicationLauncher>> &&launchers,
                                            const ApplicationName &_rootApplicationName)
-        : Service{serviceName}, ApplicationManagerBase(std::move(launchers)), rootApplicationName{_rootApplicationName},
-          blockingTimer{std::make_unique<sys::Timer>(
-              "BlockTimer", this, std::numeric_limits<sys::ms>::max(), sys::Timer::Type::SingleShot)},
-          shutdownDelay{std::make_unique<sys::Timer>("ShutdownDelay", this, shutdown_delay_ms)},
-          settings(std::make_unique<settings::Settings>(this))
+        : Service{serviceName, {}, ApplicationManagerStackDepth},
+          ApplicationManagerBase(std::move(launchers)), rootApplicationName{_rootApplicationName},
+          actionsRegistry{[this](ActionEntry &action) { return handleAction(action); }},
+          settings(std::make_shared<settings::Settings>()),
+          phoneModeObserver(std::make_shared<sys::phone_modes::Observer>()),
+          phoneLockHandler(locks::PhoneLockHandler(this, settings)),
+          simLockHandler(this), notificationsConfig{phoneModeObserver, settings, phoneLockHandler},
+          notificationsHandler{this, notificationsConfig}, notificationProvider{this, notificationsConfig}
     {
+        autoLockTimer = sys::TimerFactory::createSingleShotTimer(
+            this, autoLockTimerName, sys::timer::InfiniteTimeout, [this](sys::Timer &) { onPhoneLocked(); });
+        bus.channels.push_back(sys::BusChannel::PhoneModeChanges);
+        bus.channels.push_back(sys::BusChannel::ServiceAudioNotifications);
+        bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
+        bus.channels.push_back(sys::BusChannel::PhoneLockChanges);
+        bus.channels.push_back(sys::BusChannel::ServiceCellularNotifications);
         registerMessageHandlers();
-        blockingTimer->connect([this](sys::Timer &) { onPhoneLocked(); });
     }
 
     sys::ReturnCodes ApplicationManager::InitHandler()
     {
-        blockingTimer->setInterval(default_application_locktime_ms);
-        utils::localize.setFallbackLanguage(utils::localize.DefaultLanguage);
-        utils::localize.setDisplayLanguage(displayLanguage);
-        utils::localize.setInputLanguage(inputLanguage);
+        settings->init(service::ServiceProxy(shared_from_this()));
+        utils::setDisplayLanguage(
+            settings->getValue(settings::SystemProperties::displayLanguage, settings::SettingsScope::Global));
+
+        phoneLockHandler.enablePhoneLock((utils::getNumericValue<bool>(
+            settings->getValue(settings::SystemProperties::lockScreenPasscodeIsOn, settings::SettingsScope::Global))));
+
+        phoneLockHandler.setPhoneLockHash(
+            settings->getValue(settings::SystemProperties::lockPassHash, settings::SettingsScope::Global));
+
+        settings->registerValueChange(
+            settings::SystemProperties::lockScreenPasscodeIsOn,
+            [this](const std::string &value) { phoneLockHandler.enablePhoneLock(utils::getNumericValue<bool>(value)); },
+            settings::SettingsScope::Global);
+
+        settings->registerValueChange(
+            settings::SystemProperties::lockPassHash,
+            [this](const std::string &value) { phoneLockHandler.setPhoneLockHash(value); },
+            settings::SettingsScope::Global);
+
         settings->registerValueChange(
             settings::SystemProperties::displayLanguage,
-            [this](std::string value) { displayLanguageChanged(value); },
+            [this](std::string value) { displayLanguageChanged(std::move(value)); },
             settings::SettingsScope::Global);
         settings->registerValueChange(
             settings::SystemProperties::inputLanguage,
-            [this](std::string value) { inputLanguageChanged(value); },
+            [this](std::string value) { inputLanguageChanged(std::move(value)); },
             settings::SettingsScope::Global);
         settings->registerValueChange(
-            settings::SystemProperties::lockTime,
-            [this](std::string value) { lockTimeChanged(value); },
+            settings::SystemProperties::autoLockTimeInSec,
+            [this](std::string value) { lockTimeChanged(std::move(value)); },
             settings::SettingsScope::Global);
+        settings->registerValueChange(
+            ::settings::KeypadLight::state,
+            [this](const std::string &value) {
+                const auto keypadLightState =
+                    static_cast<bsp::keypad_backlight::State>(utils::getNumericValue<int>(value));
+                processKeypadBacklightState(keypadLightState);
+            },
+            ::settings::SettingsScope::Global);
 
-        startSystemServices();
         startBackgroundApplications();
-        if (auto app = getApplication(rootApplicationName); app != nullptr) {
-            Controller::sendAction(this, actions::Home);
-        }
+        bus.sendUnicast(std::make_unique<CheckIfStartAllowedMessage>(), service::name::system_manager);
 
         return sys::ReturnCodes::Success;
     }
 
-    void ApplicationManager::startSystemServices()
+    void ApplicationManager::handleStart(StartAllowedMessage *msg)
     {
-        if (bool ret = sys::SystemManager::CreateService(
-                std::make_shared<service::gui::ServiceGUI>(service::name::gui, GetName()), this);
-            !ret) {
-            LOG_ERROR("Failed to initialize GUI service");
-        }
-        if (bool ret = sys::SystemManager::CreateService(
-                std::make_shared<service::eink::ServiceEink>(service::name::eink, GetName()), this);
-            !ret) {
-            LOG_ERROR("Failed to initialize EInk service");
+        switch (msg->getStartupType()) {
+        case StartupType::Regular:
+            if (auto app = getApplication(rootApplicationName); app != nullptr) {
+                Controller::sendAction(this, actions::Home);
+            }
+            break;
+        case StartupType::LowBattery:
+            handleSwitchApplication(
+                std::make_unique<SwitchRequest>(ServiceName, app::name_desktop, window::name::dead_battery, nullptr)
+                    .get());
+            break;
+        case StartupType::LowBatteryCharging:
+            handleSwitchApplication(
+                std::make_unique<SwitchRequest>(ServiceName, app::name_desktop, window::name::charging_battery, nullptr)
+                    .get());
+            break;
         }
     }
 
@@ -160,19 +219,36 @@ namespace app::manager
 
     void ApplicationManager::startBackgroundApplications()
     {
-        for (const auto &name : std::vector<ApplicationName>{app::name_call, app::special_input}) {
+        for (const auto &name : std::vector<ApplicationName>{app::special_input}) {
             if (auto app = getApplication(name); app != nullptr) {
-                app->runInBackground(this);
+                app->runInBackground(phoneModeObserver->getCurrentPhoneMode(), this);
             }
         }
     }
 
     sys::ReturnCodes ApplicationManager::DeinitHandler()
     {
-        settings->unregisterValueChange();
+        settings->deinit();
         closeApplications();
-        closeServices();
         return sys::ReturnCodes::Success;
+    }
+
+    auto ApplicationManager::ProcessCloseReason(sys::CloseReason closeReason) -> void
+    {
+        ActionRequest act = ActionRequest{this->GetName(), app::manager::actions::DisplayLogoAtExit, nullptr};
+        switch (closeReason) {
+        case sys::CloseReason::SystemBrownout:
+            [[fallthrough]];
+        case sys::CloseReason::LowBattery:
+            act = ActionRequest{this->GetName(), app::manager::actions::SystemBrownout, nullptr};
+            break;
+        case sys::CloseReason::RegularPowerDown:
+            [[fallthrough]];
+        case sys::CloseReason::Reboot:
+            break;
+        }
+        handleActionRequest(&act);
+        sendCloseReadyMessage(this);
     }
 
     auto ApplicationManager::DataReceivedHandler([[maybe_unused]] sys::DataMessage *msgl,
@@ -183,17 +259,36 @@ namespace app::manager
 
     void ApplicationManager::registerMessageHandlers()
     {
+        phoneModeObserver->connect(this);
+        phoneModeObserver->subscribe([this](sys::phone_modes::PhoneMode phoneMode) {
+            handlePhoneModeChanged(phoneMode);
+            actionsRegistry.enqueue(
+                ActionEntry{actions::ShowPopup, std::make_unique<gui::PhoneModePopupRequestParams>(phoneMode)});
+        });
+
+        phoneModeObserver->subscribe(
+            [this](sys::phone_modes::Tethering tethering) { handleTetheringChanged(tethering); });
+
+        notificationsHandler.registerMessageHandlers();
+
+        connect(typeid(StartAllowedMessage), [this](sys::Message *request) {
+            auto msg = static_cast<StartAllowedMessage *>(request);
+            handleStart(msg);
+            return sys::MessageNone{};
+        });
         connect(typeid(ApplicationStatusRequest), [this](sys::Message *request) {
             auto msg = static_cast<ApplicationStatusRequest *>(request);
             return std::make_shared<ApplicationStatusResponse>(msg->checkAppName,
                                                                getApplication(msg->checkAppName) != nullptr);
         });
-        connect(typeid(PowerSaveModeInitRequest), [this](sys::Message *) {
+        connect(typeid(PowerSaveModeInitRequest), [this]([[maybe_unused]] sys::Message *msg) {
             handlePowerSavingModeInit();
             return std::make_shared<sys::ResponseMessage>();
         });
-        connect(typeid(PreventBlockingRequest), [this](sys::Message *) {
-            blockingTimer->reload();
+        connect(typeid(PreventBlockingRequest), [this]([[maybe_unused]] sys::Message *msg) {
+            if (!phoneLockHandler.isPhoneLocked()) {
+                autoLockTimer.start();
+            }
             return std::make_shared<sys::ResponseMessage>();
         });
         connect(typeid(SwitchRequest), [this](sys::Message *request) {
@@ -229,35 +324,241 @@ namespace app::manager
         connect(typeid(DisplayLanguageChangeRequest), [this](sys::Message *request) {
             auto msg = static_cast<DisplayLanguageChangeRequest *>(request);
             handleDisplayLanguageChange(msg);
-            return msgHandled();
+            return std::make_shared<GetCurrentDisplayLanguageResponse>(utils::getDisplayLanguage());
         });
         connect(typeid(InputLanguageChangeRequest), [this](sys::Message *request) {
             auto msg = static_cast<InputLanguageChangeRequest *>(request);
             handleInputLanguageChange(msg);
-            return msgHandled();
+            return sys::msgHandled();
         });
         connect(typeid(ShutdownRequest), [this](sys::Message *) {
             closeApplications();
-            closeServices();
             return std::make_shared<sys::ResponseMessage>();
         });
         connect(typeid(ActionRequest), [this](sys::Message *request) {
             auto actionMsg = static_cast<ActionRequest *>(request);
-            handleAction(actionMsg);
+            handleActionRequest(actionMsg);
             return std::make_shared<sys::ResponseMessage>();
         });
+        connect(typeid(FinishRequest), [this](sys::Message *request) {
+            auto finishMsg = static_cast<FinishRequest *>(request);
+            stack.eraseFirstOf(finishMsg->sender);
+            closeNoLongerNeededApplications();
+            return sys::msgHandled();
+        });
+        connect(typeid(ActionHandledResponse), [this](sys::Message *response) {
+            actionsRegistry.finished();
+            return sys::MessageNone{};
+        });
+        connect(typeid(GetCurrentDisplayLanguageRequest), [&](sys::Message *request) {
+            return std::make_shared<GetCurrentDisplayLanguageResponse>(utils::getDisplayLanguage());
+        });
+        connect(typeid(UpdateInProgress), [this](sys::Message *) {
+            closeApplicationsOnUpdate();
+            return sys::msgHandled();
+        });
+        connect(typeid(SetOsUpdateVersion), [this](sys::Message *request) {
+            auto msg = static_cast<SetOsUpdateVersion *>(request);
+            handleSetOsUpdateVersionChange(msg);
+            return sys::msgHandled();
+        });
+        connect(typeid(GetAllNotificationsRequest), [&](sys::Message *request) {
+            notificationProvider.requestNotSeenNotifications();
+            notificationProvider.send();
+            return sys::msgHandled();
+        });
+        connect(typeid(db::NotificationMessage), [&](sys::Message *msg) {
+            auto msgl = static_cast<db::NotificationMessage *>(msg);
+            notificationProvider.handle(msgl);
+            return sys::msgHandled();
+        });
+        connect(typeid(db::QueryResponse), [&](sys::Message *msg) {
+            auto response = static_cast<db::QueryResponse *>(msg);
+            handleDBResponse(response);
+            return sys::msgHandled();
+        });
+
+        // PhoneLock connects
+        connect(typeid(locks::LockPhone),
+                [&](sys::Message *request) -> sys::MessagePointer { return phoneLockHandler.handleLockRequest(); });
+        connect(typeid(locks::UnlockPhone),
+                [&](sys::Message *request) -> sys::MessagePointer { return phoneLockHandler.handleUnlockRequest(); });
+        connect(typeid(locks::CancelUnlockPhone), [&](sys::Message *request) -> sys::MessagePointer {
+            return phoneLockHandler.handleUnlockCancelRequest();
+        });
+        connect(typeid(locks::UnLockPhoneInput), [&](sys::Message *request) -> sys::MessagePointer {
+            auto data = static_cast<locks::UnLockPhoneInput *>(request);
+            return phoneLockHandler.handlePhoneLockInput(data->getInputData());
+        });
+        connect(typeid(locks::EnablePhoneLock),
+                [&](sys::Message *request) -> sys::MessagePointer { return phoneLockHandler.handleEnablePhoneLock(); });
+        connect(typeid(locks::DisablePhoneLock), [&](sys::Message *request) -> sys::MessagePointer {
+            return phoneLockHandler.handleDisablePhoneLock();
+        });
+        connect(typeid(locks::UnlockedPhone), [&](sys::Message *request) -> sys::MessagePointer {
+            autoLockTimer.start();
+            return simLockHandler.releaseSimUnlockBlockOnLockedPhone();
+        });
+        connect(typeid(locks::ChangePhoneLock),
+                [&](sys::Message *request) -> sys::MessagePointer { return phoneLockHandler.handleChangePhoneLock(); });
+        connect(typeid(locks::SetPhoneLock),
+                [&](sys::Message *request) -> sys::MessagePointer { return phoneLockHandler.handleSetPhoneLock(); });
+        connect(typeid(locks::SkipSetPhoneLock), [&](sys::Message *request) -> sys::MessagePointer {
+            return phoneLockHandler.handleSkipSetPhoneLock();
+        });
+        connect(typeid(GetAutoLockTimeoutRequest), [&](sys::Message *request) -> sys::MessagePointer {
+            auto req = static_cast<GetAutoLockTimeoutRequest *>(request);
+            return handleAutoLockGetRequest(req);
+        });
+        connect(typeid(SetAutoLockTimeoutRequest), [&](sys::Message *request) -> sys::MessagePointer {
+            auto req = static_cast<SetAutoLockTimeoutRequest *>(request);
+            return handleAutoLockSetRequest(req);
+        });
+        connect(typeid(locks::ExternalUnLockPhone), [&](sys::Message *request) -> sys::MessagePointer {
+            auto data = static_cast<locks::ExternalUnLockPhone *>(request);
+            return phoneLockHandler.handleExternalUnlockRequest(data->getInputData());
+        });
+        connect(typeid(locks::ExternalPhoneLockAvailabilityChange), [&](sys::Message *request) -> sys::MessagePointer {
+            auto data = static_cast<locks::ExternalPhoneLockAvailabilityChange *>(request);
+            return phoneLockHandler.handleExternalAvailabilityChange(data->getAvailability());
+        });
+
+        // SimLock connects
+        connect(typeid(cellular::msg::notification::SimNeedPin), [&](sys::Message *request) -> sys::MessagePointer {
+            auto data = static_cast<cellular::msg::notification::SimNeedPin *>(request);
+            if (phoneLockHandler.isPhoneLocked()) {
+                simLockHandler.setSimUnlockBlockOnLockedPhone();
+            }
+            return simLockHandler.handleSimPinRequest(data->attempts);
+        });
+        connect(typeid(cellular::msg::request::sim::PinUnlock::Response),
+                [&](sys::Message *request) -> sys::MessagePointer {
+                    auto data = static_cast<cellular::msg::request::sim::PinUnlock::Response *>(request);
+                    if (data->retCode) {
+                        return simLockHandler.handleSimUnlockedMessage();
+                    }
+                    return sys::msgNotHandled();
+                });
+        connect(typeid(locks::UnLockSimInput), [&](sys::Message *request) -> sys::MessagePointer {
+            auto msg = static_cast<locks::UnLockSimInput *>(request);
+            return simLockHandler.verifySimLockInput(msg->getInputData());
+        });
+        connect(typeid(cellular::msg::notification::SimNeedPuk), [&](sys::Message *request) -> sys::MessagePointer {
+            auto data = static_cast<cellular::msg::notification::SimNeedPuk *>(request);
+            if (phoneLockHandler.isPhoneLocked()) {
+                simLockHandler.setSimUnlockBlockOnLockedPhone();
+            }
+            return simLockHandler.handleSimPukRequest(data->attempts);
+        });
+        connect(typeid(cellular::msg::request::sim::UnblockWithPuk::Response),
+                [&](sys::Message *request) -> sys::MessagePointer {
+                    auto data = static_cast<cellular::msg::request::sim::UnblockWithPuk::Response *>(request);
+                    if (data->retCode) {
+                        return simLockHandler.handleSimUnlockedMessage();
+                    }
+                    return sys::msgNotHandled();
+                });
+        connect(typeid(locks::ChangeSimPin), [&](sys::Message *request) -> sys::MessagePointer {
+            return simLockHandler.handleSimPinChangeRequest();
+        });
+        connect(typeid(cellular::msg::request::sim::ChangePin::Response),
+                [&](sys::Message *request) -> sys::MessagePointer {
+                    auto data = static_cast<cellular::msg::request::sim::ChangePin::Response *>(request);
+                    if (data->retCode) {
+                        return simLockHandler.handleSimPinChangedMessage();
+                    }
+                    else {
+                        return simLockHandler.handleSimPinChangeFailedRequest();
+                    }
+                });
+        connect(typeid(locks::EnableSimPin),
+                [&](sys::Message *request) -> sys::MessagePointer { return simLockHandler.handleSimEnableRequest(); });
+        connect(typeid(locks::DisableSimPin),
+                [&](sys::Message *request) -> sys::MessagePointer { return simLockHandler.handleSimDisableRequest(); });
+        connect(typeid(cellular::msg::request::sim::SetPinLock::Response),
+                [&](sys::Message *request) -> sys::MessagePointer {
+                    auto data = static_cast<cellular::msg::request::sim::SetPinLock::Response *>(request);
+                    if (data->retCode) {
+                        return simLockHandler.handleSimAvailabilityMessage();
+                    }
+                    else {
+                        if (data->lock == cellular::api::SimLockState::Enabled) {
+                            return simLockHandler.handleSimEnableRequest();
+                        }
+                        else {
+                            return simLockHandler.handleSimDisableRequest();
+                        }
+                    }
+                });
+        connect(typeid(cellular::msg::notification::SimBlocked), [&](sys::Message *request) -> sys::MessagePointer {
+            if (phoneLockHandler.isPhoneLocked()) {
+                simLockHandler.setSimUnlockBlockOnLockedPhone();
+            }
+            return simLockHandler.handleSimBlockedRequest();
+        });
+        connect(typeid(cellular::msg::notification::UnhandledCME), [&](sys::Message *request) -> sys::MessagePointer {
+            auto data = static_cast<cellular::msg::notification::UnhandledCME *>(request);
+            if (phoneLockHandler.isPhoneLocked()) {
+                simLockHandler.setSimUnlockBlockOnLockedPhone();
+            }
+            return simLockHandler.handleCMEErrorRequest(data->code);
+        });
+        connect(typeid(locks::SetSim), [&](sys::Message *request) -> sys::MessagePointer {
+            auto data = static_cast<locks::SetSim *>(request);
+            simLockHandler.setSim(data->getSimSlot());
+            return sys::msgHandled();
+        });
+        connect(typeid(cellular::msg::request::sim::SetActiveSim::Response),
+                [&](sys::Message *request) -> sys::MessagePointer {
+                    auto data = static_cast<cellular::msg::request::sim::SetActiveSim::Response *>(request);
+                    if (data->retCode) {
+                        settings->setValue(::settings::SystemProperties::activeSim,
+                                           utils::enumToString(Store::GSM::get()->selected),
+                                           ::settings::SettingsScope::Global);
+                        return sys::msgHandled();
+                    }
+                    return sys::msgNotHandled();
+                });
+        connect(typeid(cellular::msg::notification::SimReady),
+                [&](sys::Message *request) -> sys::MessagePointer { return simLockHandler.handleSimReadyMessage(); });
+        connect(typeid(cellular::msg::notification::ModemStateChanged),
+                [&](sys::Message *request) -> sys::MessagePointer {
+                    auto data = static_cast<cellular::msg::notification::ModemStateChanged *>(request);
+                    if (data->state == cellular::api::ModemState::Ready) {
+                        simLockHandler.setSimReady();
+                        simLockHandler.getSettingsSimSelect(
+                            settings->getValue(settings::SystemProperties::activeSim, settings::SettingsScope::Global));
+                        return sys::msgHandled();
+                    }
+                    return sys::msgNotHandled();
+                });
+
+        connect(typeid(onBoarding::FinalizeOnBoarding),
+                [&](sys::Message *request) -> sys::MessagePointer { return handleOnBoardingFinalize(); });
+
+        connect(typeid(sdesktop::developerMode::DeveloperModeRequest),
+                [&](sys::Message *request) -> sys::MessagePointer { return handleDeveloperModeRequest(request); });
+
+        connect(typeid(app::manager::DOMRequest), [&](sys::Message *request) { return handleDOMRequest(request); });
 
         auto convertibleToActionHandler = [this](sys::Message *request) { return handleMessageAsAction(request); };
-        connect(typeid(CellularSimRequestPinMessage), convertibleToActionHandler);
-        connect(typeid(CellularSimRequestPukMessage), convertibleToActionHandler);
-        connect(typeid(CellularUnlockSimMessage), convertibleToActionHandler);
-        connect(typeid(CellularBlockSimMessage), convertibleToActionHandler);
-        connect(typeid(CellularDisplayCMEMessage), convertibleToActionHandler);
         connect(typeid(CellularMMIResultMessage), convertibleToActionHandler);
         connect(typeid(CellularMMIResponseMessage), convertibleToActionHandler);
         connect(typeid(CellularMMIPushMessage), convertibleToActionHandler);
+        connect(typeid(CellularNoSimNotification), convertibleToActionHandler);
+        connect(typeid(CellularNotAnEmergencyNotification), convertibleToActionHandler);
         connect(typeid(sys::CriticalBatteryLevelNotification), convertibleToActionHandler);
-        connect(typeid(sys::SystemBrownoutMesssage), convertibleToActionHandler);
+        connect(typeid(CellularSmsNoSimRequestMessage), convertibleToActionHandler);
+        connect(typeid(CellularSMSRejectedByOfflineNotification), convertibleToActionHandler);
+        connect(typeid(CellularCallRejectedByOfflineNotification), convertibleToActionHandler);
+        connect(typeid(sys::TetheringQuestionRequest), convertibleToActionHandler);
+        connect(typeid(sys::TetheringQuestionAbort), convertibleToActionHandler);
+        connect(typeid(sys::TetheringPhoneModeChangeProhibitedMessage), convertibleToActionHandler);
+        connect(typeid(VolumeChanged), convertibleToActionHandler);
+        connect(typeid(CellularCallAbortedNotification), convertibleToActionHandler);
+        connect(typeid(CellularRingingMessage), convertibleToActionHandler);
+        connect(typeid(CellularCallActiveNotification), convertibleToActionHandler);
+        connect(typeid(CellularHangupCallMessage), convertibleToActionHandler);
     }
 
     sys::ReturnCodes ApplicationManager::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
@@ -283,19 +584,13 @@ namespace app::manager
         if (app.state() == ApplicationHandle::State::ACTIVE_BACKGROUND) {
             LOG_INFO("Switching focus to application [%s] (window [%s])", app.name().c_str(), app.switchWindow.c_str());
             setState(State::AwaitingFocusConfirmation);
-            app::Application::messageSwitchApplication(this, app.name(), app.switchWindow, std::move(app.switchData));
+            app::Application::messageSwitchApplication(
+                this, app.name(), app.switchWindow, std::move(app.switchData), StartupReason::Launch);
         }
         else {
             LOG_INFO("Starting application %s", app.name().c_str());
-            app.run(this);
+            app.run(phoneModeObserver->getCurrentPhoneMode(), this);
         }
-        return true;
-    }
-
-    auto ApplicationManager::closeServices() -> bool
-    {
-        closeService(service::name::gui);
-        closeService(service::name::eink);
         return true;
     }
 
@@ -311,15 +606,31 @@ namespace app::manager
         return true;
     }
 
-    void ApplicationManager::closeService(const std::string &name)
+    void ApplicationManager::closeNoLongerNeededApplications()
     {
-        bool ret = sys::SystemManager::DestroyService(name, this);
-        if (ret) {
-            LOG_INFO("Service/Application %s closed", name.c_str());
+        for (const auto &app : getApplications()) {
+            if (app->started() && app->closeable() && !stack.contains(app->name())) {
+                closeApplication(app.get());
+                app->setState(ApplicationHandle::State::DEACTIVATED);
+            }
         }
-        else {
-            LOG_FATAL("Service/Application %s is still running", name.c_str());
+    }
+
+    auto ApplicationManager::closeApplicationsOnUpdate() -> bool
+    {
+        for (const auto &app : getApplications()) {
+            if (app->started()) {
+                auto appName = app->name();
+                if (appName == app::name_desktop) {
+                    LOG_DEBUG("Delay closing %s", app::name_desktop);
+                    continue;
+                }
+                LOG_INFO("Closing application on Update %s", appName.c_str());
+                closeApplication(app.get());
+                app->setState(ApplicationHandle::State::DEACTIVATED);
+            }
         }
+        return true;
     }
 
     void ApplicationManager::closeApplication(ApplicationHandle *application)
@@ -328,7 +639,12 @@ namespace app::manager
             return;
         }
 
-        closeService(application->name());
+        if (sys::SystemManager::DestroyApplication(application->name(), this)) {
+            LOG_INFO("Application %s closed", application->name().c_str());
+        }
+        else {
+            LOG_FATAL("Application %s is still running", application->name().c_str());
+        }
         application->close();
     }
 
@@ -351,31 +667,41 @@ namespace app::manager
             LOG_INFO("No focused application at the moment. Starting new application...");
             onApplicationSwitch(*app, std::move(msg->getData()), msg->getWindow());
             startApplication(*app);
-            return true;
-        }
-
-        if (app->name() == currentlyFocusedApp->name()) {
-            LOG_WARN("Failed to return to currently focused application.");
             return false;
         }
 
+        LOG_DEBUG("Switch applications: [%s][%s](%s) -> [%s][%s](%s)",
+                  currentlyFocusedApp->name().c_str(),
+                  currentlyFocusedApp->switchWindow.c_str(),
+                  app::Application::stateStr(currentlyFocusedApp->state()),
+                  app->name().c_str(),
+                  app->switchWindow.c_str(),
+                  app::Application::stateStr(app->state()));
+
+        stack.front().isCloseable = closeCurrentlyFocusedApp;
         onApplicationSwitch(*app, std::move(msg->getData()), msg->getWindow());
-        const bool isFocusedAppCloseable =
-            closeCurrentlyFocusedApp && currentlyFocusedApp->closeable() && !currentlyFocusedApp->blockClosing;
-        requestApplicationClose(*currentlyFocusedApp, isFocusedAppCloseable);
+        if (app->name() == currentlyFocusedApp->name()) {
+            // Switch window only.
+            app::Application::messageSwitchApplication(
+                this, app->name(), app->switchWindow, std::move(app->switchData), StartupReason::Launch);
+            return false;
+        }
+
+        requestApplicationClose(*currentlyFocusedApp, isApplicationCloseable(currentlyFocusedApp));
         return true;
     }
 
-    void ApplicationManager::onApplicationSwitch(ApplicationHandle &app,
+    void ApplicationManager::onApplicationSwitch(ApplicationHandle &nextApp,
                                                  std::unique_ptr<gui::SwitchData> &&data,
                                                  std::string targetWindow)
     {
-        if (app.name() == rootApplicationName) {
-            clearStack();
+        if (nextApp.name() == rootApplicationName) {
+            stack.clear();
         }
-        pushApplication(app.name());
-        app.switchData   = std::move(data);
-        app.switchWindow = std::move(targetWindow);
+
+        stack.push({nextApp.name(), true});
+        nextApp.switchData   = std::move(data);
+        nextApp.switchWindow = std::move(targetWindow);
     }
 
     void ApplicationManager::requestApplicationClose(ApplicationHandle &app, bool isCloseable)
@@ -392,74 +718,174 @@ namespace app::manager
         }
     }
 
-    auto ApplicationManager::handleAction(ActionRequest *actionMsg) -> bool
+    void ApplicationManager::handleActionRequest(ActionRequest *actionMsg)
     {
-        switch (const auto action = actionMsg->getAction(); action) {
+        ActionEntry entry{actionMsg->getAction(), std::move(actionMsg->getData())};
+        actionsRegistry.enqueue(std::move(entry));
+    }
+
+    void ApplicationManager::handlePhoneModeChanged(sys::phone_modes::PhoneMode phoneMode)
+    {
+        for (const auto app : getStackedApplications()) {
+            changePhoneMode(phoneMode, app);
+        }
+    }
+
+    void ApplicationManager::changePhoneMode(sys::phone_modes::PhoneMode phoneMode, const ApplicationHandle *app)
+    {
+        ActionEntry action{actions::PhoneModeChanged, std::make_unique<gui::PhoneModeParams>(phoneMode)};
+        action.setTargetApplication(app->name());
+        actionsRegistry.enqueue(std::move(action));
+    }
+
+    void ApplicationManager::handleTetheringChanged(sys::phone_modes::Tethering tethering)
+    {
+        notificationProvider.handle(tethering);
+    }
+
+    ActionProcessStatus ApplicationManager::handleAction(ActionEntry &action)
+    {
+        switch (action.actionId) {
         case actions::Home:
-            return handleHomeAction();
-        case actions::Launch: {
-            auto params = static_cast<ApplicationLaunchData *>(actionMsg->getData().get());
-            return handleLaunchAction(params);
-        }
-        case actions::CloseSystem:
-            return handleCloseSystem();
-        default: {
-            auto &actionParams = actionMsg->getData();
-            return handleCustomAction(action, std::move(actionParams));
-        }
+            return handleHomeAction(action);
+        case actions::Launch:
+            return handleLaunchAction(action);
+        case actions::PhoneModeChanged:
+            return handlePhoneModeChangedAction(action);
+        case actions::ShowPopup:
+            [[fallthrough]];
+        case actions::AbortPopup:
+            return handleActionOnFocusedApp(action);
+        case actions::NotificationsChanged:
+            return handleActionOnFocusedApp(action);
+        default:
+            return handleCustomAction(action);
         }
     }
 
-    auto ApplicationManager::handleHomeAction() -> bool
+    auto ApplicationManager::handleHomeAction(ActionEntry &action) -> ActionProcessStatus
     {
-        SwitchRequest switchRequest(ServiceName, rootApplicationName, gui::name::window::main_window, nullptr);
-        return handleSwitchApplication(&switchRequest);
+        action.setTargetApplication(resolveHomeApplication());
+
+        SwitchRequest switchRequest(ServiceName, resolveHomeApplication(), resolveHomeWindow(), nullptr);
+        return handleSwitchApplication(&switchRequest) ? ActionProcessStatus::Accepted : ActionProcessStatus::Dropped;
     }
 
-    auto ApplicationManager::handleLaunchAction(ApplicationLaunchData *launchParams) -> bool
+    auto ApplicationManager::resolveHomeWindow() -> std::string
     {
-        auto targetApp = getApplication(launchParams->getTargetApplicationName());
+        return phoneLockHandler.isPhoneLocked() ? gui::popup::window::phone_lock_window
+                                                : gui::name::window::main_window;
+    }
+
+    auto ApplicationManager::handleOnBoardingFinalize() -> sys::MessagePointer
+    {
+        settings->setValue(settings::SystemProperties::onboardingDone, utils::to_string(true));
+        app::manager::Controller::sendAction(this, app::manager::actions::Home);
+        return sys::msgHandled();
+    }
+
+    auto ApplicationManager::checkOnBoarding() -> bool
+    {
+        return not utils::getNumericValue<bool>(settings->getValue(settings::SystemProperties::onboardingDone));
+    }
+
+    auto ApplicationManager::resolveHomeApplication() -> std::string
+    {
+        if (checkOnBoarding()) {
+            phoneLockHandler.handleUnlockRequest();
+            return app::name_onboarding;
+        }
+        return rootApplicationName;
+    }
+
+    auto ApplicationManager::handleLaunchAction(ActionEntry &action) -> ActionProcessStatus
+    {
+        auto launchParams = static_cast<ApplicationLaunchData *>(action.params.get());
+        auto targetApp    = getApplication(launchParams->getTargetApplicationName());
         if (targetApp == nullptr || !targetApp->handles(actions::Launch)) {
-            return false;
+            return ActionProcessStatus::Dropped;
         }
 
+        targetApp->startupReason = StartupReason::Launch;
+        action.setTargetApplication(targetApp->name());
         SwitchRequest switchRequest(ServiceName, targetApp->name(), gui::name::window::main_window, nullptr);
-        return handleSwitchApplication(&switchRequest);
+        return handleSwitchApplication(&switchRequest) ? ActionProcessStatus::Accepted : ActionProcessStatus::Dropped;
     }
 
-    auto ApplicationManager::handleCloseSystem() -> bool
+    auto ApplicationManager::handlePhoneModeChangedAction(ActionEntry &action) -> ActionProcessStatus
     {
-        shutdownDelay->connect([&](sys::Timer &) { sys::SystemManager::CloseSystem(this); });
-        shutdownDelay->start();
+        const auto &targetName = action.target;
+        auto targetApp         = getApplication(targetName);
+        if (targetApp == nullptr || !targetApp->handles(action.actionId)) {
+            return ActionProcessStatus::Dropped;
+        }
 
-        return true;
+        if (targetApp->state() == ApplicationHandle::State::ACTIVE_FORGROUND ||
+            targetApp->state() == ApplicationHandle::State::ACTIVE_BACKGROUND) {
+            app::Application::requestAction(this, targetName, action.actionId, std::move(action.params));
+            return ActionProcessStatus::Accepted;
+        }
+        return ActionProcessStatus::Skipped;
     }
 
-    auto ApplicationManager::handleCustomAction(actions::ActionId action, actions::ActionParamsPtr &&actionParams)
-        -> bool
+    auto ApplicationManager::handleActionOnFocusedApp(ActionEntry &action) -> ActionProcessStatus
     {
-        const auto actionHandlers = applications.findByAction(action);
+        auto targetApp = getFocusedApplication();
+        if (targetApp == nullptr) {
+            return ActionProcessStatus::Skipped;
+        }
+        action.setTargetApplication(targetApp->name());
+        auto &params = action.params;
+        app::Application::requestAction(this, targetApp->name(), action.actionId, std::move(params));
+        return ActionProcessStatus::Accepted;
+    }
+
+    auto ApplicationManager::handleCustomAction(ActionEntry &action) -> ActionProcessStatus
+    {
+        const auto actionHandlers = applications.findByAction(action.actionId);
         if (actionHandlers.empty()) {
-            LOG_ERROR("No applications handling action #%d.", action);
-            return false;
+            LOG_ERROR("No applications handling action #%d.", action.actionId);
+            return ActionProcessStatus::Dropped;
         }
         if (actionHandlers.size() > 1) {
             LOG_FATAL("Choosing amongst multiple action handler applications is not yet implemented.");
-            return false;
+            return ActionProcessStatus::Dropped;
         }
 
         const auto targetApp = actionHandlers.front();
-        if (targetApp->state() != ApplicationHandle::State::ACTIVE_FORGROUND) {
-            const auto focusedAppClose = !(actionParams && actionParams->disableAppClose);
-            pendingAction              = std::make_tuple(targetApp->name(), action, std::move(actionParams));
-
-            SwitchRequest switchRequest(
-                ServiceName, targetApp->name(), targetApp->switchWindow, std::move(targetApp->switchData));
-            return handleSwitchApplication(&switchRequest, focusedAppClose);
+        action.setTargetApplication(targetApp->name());
+        auto &actionParams = action.params;
+        if (const auto state = targetApp->state(); state == ApplicationHandle::State::ACTIVE_FORGROUND) {
+            app::Application::requestAction(this, targetApp->name(), action.actionId, std::move(actionParams));
+            return ActionProcessStatus::Accepted;
+        }
+        else if (state == ApplicationHandle::State::ACTIVE_BACKGROUND) {
+            if (const auto result = handleCustomActionOnBackgroundApp(targetApp, action);
+                result == ActionProcessStatus::Accepted) {
+                return result;
+            }
         }
 
-        app::Application::requestAction(this, targetApp->name(), action, std::move(actionParams));
-        return true;
+        // Inform that target app switch is caused by Action
+        targetApp->startupReason = StartupReason::OnAction;
+
+        const auto focusedAppClose = !(actionPolicy(action.actionId) == Reaction::KeepFocusedAppInBackground ||
+                                       (actionParams && actionParams->disableAppClose));
+        SwitchRequest switchRequest(
+            ServiceName, targetApp->name(), targetApp->switchWindow, std::move(targetApp->switchData));
+        return handleSwitchApplication(&switchRequest, focusedAppClose) ? ActionProcessStatus::Accepted
+                                                                        : ActionProcessStatus::Skipped;
+    }
+
+    auto ApplicationManager::handleCustomActionOnBackgroundApp(ApplicationHandle *app, ActionEntry &action)
+        -> ActionProcessStatus
+    {
+        if (const auto actionFlag = app->actionFlag(action.actionId);
+            actionFlag == actions::ActionFlag::AcceptWhenInBackground) {
+            app::Application::requestAction(this, app->name(), action.actionId, std::move(action.params));
+            return ActionProcessStatus::Accepted;
+        }
+        return ActionProcessStatus::Dropped;
     }
 
     auto ApplicationManager::handleSwitchBack(SwitchBackRequest *msg) -> bool
@@ -479,8 +905,10 @@ namespace app::manager
         }
 
         if (previousApp->name() == currentlyFocusedApp->name()) {
-            LOG_WARN("Failed to return to currently focused application.");
-            return false;
+            // Switch window only.
+            onApplicationSwitchToPrev(*previousApp, std::move(msg->getData()));
+            app::Application::messageSwitchBack(this, currentlyFocusedApp->name());
+            return true;
         }
 
         LOG_DEBUG("Switch applications: [%s][%s](%s) -> [%s][%s](%s)",
@@ -492,14 +920,14 @@ namespace app::manager
                   app::Application::stateStr(previousApp->state()));
 
         onApplicationSwitchToPrev(*previousApp, std::move(msg->getData()));
-        requestApplicationClose(*currentlyFocusedApp, currentlyFocusedApp->closeable());
+        requestApplicationClose(*currentlyFocusedApp, isApplicationCloseable(currentlyFocusedApp));
         return true;
     }
 
     void ApplicationManager::onApplicationSwitchToPrev(ApplicationHandle &previousApp,
                                                        std::unique_ptr<gui::SwitchData> &&data)
     {
-        popApplication();
+        stack.pop();
         previousApp.switchData = std::move(data);
     }
 
@@ -519,7 +947,7 @@ namespace app::manager
         }
 
         auto notification = std::make_shared<ApplicationStatusRequest>(GetName(), app->name());
-        sys::Bus::SendMulticast(notification, sys::BusChannels::AppManagerNotifications, this);
+        bus.sendMulticast(notification, sys::BusChannel::AppManagerNotifications);
         return true;
     }
 
@@ -541,7 +969,9 @@ namespace app::manager
             LOG_INFO("Switch application to %s", app.name().c_str());
             app.setState(ApplicationHandle::State::ACTIVATING);
             setState(State::AwaitingFocusConfirmation);
-            app::Application::messageSwitchApplication(this, app.name(), app.switchWindow, std::move(app.switchData));
+
+            app::Application::messageSwitchApplication(
+                this, app.name(), app.switchWindow, std::move(app.switchData), launchingApp->startupReason);
         }
     }
 
@@ -555,14 +985,12 @@ namespace app::manager
     {
         const auto &requestedLanguage = msg->getLanguage();
 
-        if (requestedLanguage == displayLanguage) {
+        if (not utils::setDisplayLanguage(requestedLanguage)) {
             LOG_WARN("The selected language is already set. Ignore.");
             return false;
         }
-        displayLanguage = requestedLanguage;
         settings->setValue(
-            settings::SystemProperties::displayLanguage, displayLanguage, settings::SettingsScope::Global);
-        utils::localize.setDisplayLanguage(displayLanguage);
+            settings::SystemProperties::displayLanguage, requestedLanguage, settings::SettingsScope::Global);
         rebuildActiveApplications();
         return true;
     }
@@ -571,14 +999,34 @@ namespace app::manager
     {
         const auto &requestedLanguage = msg->getLanguage();
 
-        if (requestedLanguage == inputLanguage) {
+        if (not utils::setInputLanguage(requestedLanguage)) {
             LOG_WARN("The selected language is already set. Ignore.");
             return false;
         }
-        inputLanguage = requestedLanguage;
-        settings->setValue(settings::SystemProperties::inputLanguage, inputLanguage, settings::SettingsScope::Global);
-        utils::localize.setInputLanguage(inputLanguage);
+        settings->setValue(
+            settings::SystemProperties::inputLanguage, requestedLanguage, settings::SettingsScope::Global);
         return true;
+    }
+
+    auto ApplicationManager::handleSetOsUpdateVersionChange(SetOsUpdateVersion *msg) -> bool
+    {
+        LOG_DEBUG("[ApplicationManager::handleSetOsUpdateVersionChange] value ....");
+        settings->setValue(
+            settings::SystemProperties::osUpdateVersion, msg->osUpdateVer, settings::SettingsScope::Global);
+
+        settings->setValue(
+            settings::SystemProperties::osCurrentVersion, msg->osCurrentVer, settings::SettingsScope::Global);
+        return true;
+    }
+
+    auto ApplicationManager::handleDBResponse(db::QueryResponse *msg) -> bool
+    {
+        auto result = msg->getResult();
+        if (auto response = dynamic_cast<db::query::notifications::GetAllResult *>(result.get())) {
+            notificationProvider.handle(response);
+            return true;
+        }
+        return false;
     }
 
     void ApplicationManager::rebuildActiveApplications()
@@ -612,12 +1060,7 @@ namespace app::manager
             app.setState(ApplicationHandle::State::ACTIVE_FORGROUND);
             setState(State::Running);
             EventManager::messageSetApplication(this, app.name());
-
-            auto &[appName, action, data] = pendingAction;
-            if (appName == app.name()) {
-                app::Application::requestAction(this, appName, action, std::move(data));
-                pendingAction = std::make_tuple(ApplicationName{}, 0, nullptr);
-            }
+            onLaunchFinished(app);
             return true;
         }
         if (getState() == State::AwaitingLostFocusConfirmation) {
@@ -634,6 +1077,34 @@ namespace app::manager
         return false;
     }
 
+    void ApplicationManager::onLaunchFinished(ApplicationHandle &app)
+    {
+        // reset startupReason to default Launch
+        app.startupReason = StartupReason::Launch;
+
+        if (!actionsRegistry.hasPendingAction()) {
+            return;
+        }
+
+        auto action = actionsRegistry.getPendingAction();
+        if (app.name() != action->target) {
+            return;
+        }
+
+        switch (action->actionId) {
+        case actions::Home:
+            [[fallthrough]];
+        case actions::Launch:
+            actionsRegistry.finished();
+            break;
+        default: {
+            auto &params = action->params;
+            app::Application::requestAction(this, app.name(), action->actionId, std::move(params));
+            break;
+        }
+        }
+    }
+
     auto ApplicationManager::handleCloseConfirmation(CloseConfirmation *msg) -> bool
     {
         auto senderApp = getApplication(msg->getSenderName());
@@ -647,7 +1118,7 @@ namespace app::manager
 
     auto ApplicationManager::onCloseConfirmed(ApplicationHandle &app) -> bool
     {
-        if (app.closeable()) {
+        if (isApplicationCloseable(&app)) {
             app.setState(ApplicationHandle::State::DEACTIVATED);
             Controller::closeApplication(this, app.name());
         }
@@ -669,62 +1140,116 @@ namespace app::manager
             return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Failure);
         }
         auto action = actionMsg->toAction();
-        handleAction(action.get());
+        handleActionRequest(action.get());
 
         return std::make_shared<sys::ResponseMessage>();
     }
 
     void ApplicationManager::onPhoneLocked()
     {
-#ifdef AUTO_PHONE_LOCK_ENABLED
-        LOG_INFO("Screen lock timer triggered.");
-        blockingTimer->stop();
-
-        auto focusedApp = getFocusedApplication();
-        if (focusedApp == nullptr || focusedApp->preventsBlocking()) {
-            blockingTimer->reload();
+        if (phoneLockHandler.isPhoneLocked()) {
+            autoLockTimer.stop();
             return;
         }
-
-        if (focusedApp->name() == rootApplicationName) {
-            app::Application::messageSwitchApplication(
-                this,
-                rootApplicationName,
-                gui::name::window::main_window,
-                std::make_unique<gui::LockPhoneData>(gui::LockPhoneData::Request::NoPin));
+        if (auto focusedApp = getFocusedApplication(); focusedApp == nullptr || focusedApp->preventsAutoLocking()) {
+            autoLockTimer.start();
+            return;
         }
-        else {
-            focusedApp->blockClosing = true;
-            std::unique_ptr<gui::LockPhoneData> data =
-                std::make_unique<gui::LockPhoneData>(gui::LockPhoneData::Request::NoPin);
-            data->setPrevApplication(focusedApp->name());
-            Controller::switchApplication(this, rootApplicationName, gui::name::window::main_window, std::move(data));
+        if (phoneModeObserver->isTetheringOn()) {
+            autoLockTimer.start();
+            return;
         }
-#endif
+        if (event::service::api::isTorchOn()) {
+            autoLockTimer.start();
+            return;
+        }
+        phoneLockHandler.handleLockRequest();
     }
+
     void ApplicationManager::displayLanguageChanged(std::string value)
     {
-        if (value.empty()) {
-            return;
+        if (utils::setDisplayLanguage(value)) {
+            rebuildActiveApplications();
         }
-        displayLanguage = value;
-        utils::localize.setDisplayLanguage(displayLanguage);
-        rebuildActiveApplications();
     }
+
     void ApplicationManager::lockTimeChanged(std::string value)
     {
         if (value.empty()) {
+            LOG_ERROR("No value for auto-locking time period, request ignored");
             return;
         }
-        blockingTimer->setInterval(utils::getNumericValue<unsigned int>(value));
-        //?any additional action needed here?
+        const auto interval = std::chrono::seconds{utils::getNumericValue<unsigned int>(value)};
+        if (interval.count() == 0) {
+            LOG_ERROR("Invalid auto-locking time period of 0s, request ignored");
+            return;
+        }
+        autoLockTimer.restart(interval);
     }
+
+    auto ApplicationManager::handleAutoLockGetRequest([[maybe_unused]] GetAutoLockTimeoutRequest *request)
+        -> std::shared_ptr<sys::ResponseMessage>
+    {
+        auto intervalValue =
+            settings->getValue(settings::SystemProperties::autoLockTimeInSec, settings::SettingsScope::Global);
+        const auto interval = std::chrono::seconds{utils::getNumericValue<unsigned int>(intervalValue)};
+        return std::make_shared<GetAutoLockTimeoutResponse>(interval);
+    }
+    auto ApplicationManager::handleAutoLockSetRequest(SetAutoLockTimeoutRequest *request)
+        -> std::shared_ptr<sys::ResponseMessage>
+    {
+        auto interval = request->getValue();
+        settings->setValue(settings::SystemProperties::autoLockTimeInSec,
+                           utils::to_string(interval.count()),
+                           settings::SettingsScope::Global);
+        autoLockTimer.restart(interval);
+        return std::make_shared<sys::ResponseMessage>();
+    }
+
     void ApplicationManager::inputLanguageChanged(std::string value)
     {
-        if (value.empty()) {
-            return;
+        utils::setInputLanguage(value);
+    }
+
+    auto ApplicationManager::handleDOMRequest(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>
+    {
+        auto app = getFocusedApplication();
+        if (app != nullptr) {
+            auto message = static_cast<app::manager::DOMRequest *>(request);
+            LOG_INFO("DOM request for: %s", message->getSenderName().c_str());
+            bus.sendUnicast(std::make_unique<app::manager::DOMRequest>(*message), app->name());
+            return sys::MessageNone{};
         }
-        inputLanguage = value;
-        utils::localize.setInputLanguage(value);
+        return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
+    }
+
+    auto ApplicationManager::handleDeveloperModeRequest(sys::Message *request) -> sys::MessagePointer
+    {
+        if (auto msg = dynamic_cast<sdesktop::developerMode::DeveloperModeRequest *>(request)) {
+            if (dynamic_cast<sdesktop::developerMode::ScreenlockCheckEvent *>(msg->event.get())) {
+                auto response = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(
+                    std::make_unique<sdesktop::developerMode::ScreenlockCheckEvent>(phoneLockHandler.isPhoneLocked()));
+                bus.sendUnicast(std::move(response), service::name::service_desktop);
+                return sys::msgHandled();
+            }
+        }
+        return sys::msgNotHandled();
+    }
+
+    void ApplicationManager::processKeypadBacklightState(bsp::keypad_backlight::State keypadLightState)
+    {
+        auto action = bsp::keypad_backlight::Action::turnOff;
+        switch (keypadLightState) {
+        case bsp::keypad_backlight::State::on:
+            action = bsp::keypad_backlight::Action::turnOn;
+            break;
+        case bsp::keypad_backlight::State::activeMode:
+            action = bsp::keypad_backlight::Action::turnOnActiveMode;
+            break;
+        case bsp::keypad_backlight::State::off:
+            action = bsp::keypad_backlight::Action::turnOff;
+            break;
+        }
+        bus.sendUnicast(std::make_shared<sevm::KeypadBacklightMessage>(action), service::name::evt_manager);
     }
 } // namespace app::manager

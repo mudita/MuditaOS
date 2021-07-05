@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -8,9 +8,7 @@
 
 #include "Tables/SMSTemplateTable.hpp"
 
-#include <vfs.hpp>
 #include <filesystem>
-#include <purefs/filesystem_paths.hpp>
 
 #include <algorithm>
 #include <string>
@@ -21,16 +19,23 @@ TEST_CASE("SMS Templates Table tests")
 {
     Database::initialize();
 
-    const auto smsPath = (purefs::dir::getUserDiskPath() / "sms.db").c_str();
-    std::filesystem::remove(smsPath);
+    const auto smsPath = (std::filesystem::path{"sys/user"} / "sms.db");
+    if (std::filesystem::exists(smsPath)) {
+        REQUIRE(std::filesystem::remove(smsPath));
+    }
 
-    SmsDB smsDb{smsPath};
+    SmsDB smsDb{smsPath.c_str()};
     REQUIRE(smsDb.isInitialized());
 
     auto &templatesTbl = smsDb.templates;
 
     SMSTemplateTableRow testRow = {{.ID = 0}, .text = "Test text", .lastUsageTimestamp = 100};
 
+    const auto templatesCount = templatesTbl.count() + 1;
+    // clear sms table
+    for (std::uint32_t id = 1; id <= templatesCount; id++) {
+        REQUIRE(templatesTbl.removeById(id));
+    }
     // add 4 elements into table
     REQUIRE(templatesTbl.add(testRow));
     REQUIRE(templatesTbl.add(testRow));

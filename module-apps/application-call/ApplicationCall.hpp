@@ -5,12 +5,13 @@
 
 #include "data/CallState.hpp"
 
-#include <Application.hpp>
+#include <apps-common/Application.hpp>
 #include <Service/Message.hpp>
-#include <Service/Timer.hpp>
+#include <module-sys/Timers/TimerHandle.hpp>
 #include <SystemManager/SystemManager.hpp>
 #include <service-cellular/CellularMessage.hpp>
-#include <time/time_conversion.hpp>
+#include <service-evtmgr/Constants.hpp>
+#include <service-evtmgr/EVMessages.hpp>
 
 namespace app
 {
@@ -19,55 +20,65 @@ namespace app
 
     namespace window
     {
+        inline constexpr auto name_enterNumber       = gui::name::window::main_window;
         inline constexpr auto name_call              = "CallWindow";
-        inline constexpr auto name_enterNumber       = "EnterNumberWindow";
         inline constexpr auto name_emergencyCall     = "EmergencyCallWindow";
         inline constexpr auto name_duplicatedContact = "DuplicatedContactWindow";
         inline constexpr auto name_dialogConfirm     = "DialogConfirm";
+        inline constexpr auto name_number            = "NumberWindow";
     } // namespace window
-
-    inline constexpr auto ringtone_path = "assets/audio/Ringtone-drum2.mp3"; // Should bo moved to database
-
     class CallWindowInterface
     {
       public:
+        using NumberChangeCallback              = std::function<void(utils::PhoneNumber::View)>;
         virtual ~CallWindowInterface() noexcept = default;
 
-        virtual void setState(app::call::State state) noexcept              = 0;
-        [[nodiscard]] virtual auto getState() const noexcept -> call::State = 0;
+        virtual void setCallState(app::call::State state) noexcept              = 0;
+        [[nodiscard]] virtual auto getCallState() const noexcept -> call::State = 0;
+
+        enum class AudioEvent
+        {
+            Mute,
+            Unmute,
+            LoudspeakerOn,
+            LoudspeakerOff
+        };
+
+        virtual void stopAudio()                           = 0;
+        virtual void startAudioRouting()                   = 0;
+        virtual void sendAudioEvent(AudioEvent audioEvent) = 0;
 
         virtual void transmitDtmfTone(uint32_t digit) = 0;
-        virtual void stopAudio()                      = 0;
-        virtual void startRinging()                   = 0;
-        virtual void startRouting()                   = 0;
+        virtual void hangupCall()                     = 0;
+        virtual void answerIncomingCall()             = 0;
     };
 
     class EnterNumberWindowInterface
     {
       public:
-        virtual ~EnterNumberWindowInterface() noexcept                = default;
-        virtual void handleCallEvent(const std::string &number)       = 0;
-        virtual void handleAddContactEvent(const std::string &number) = 0;
+        virtual ~EnterNumberWindowInterface() noexcept                   = default;
+        virtual void handleCallEvent(const std::string &number)          = 0;
+        virtual void handleEmergencyCallEvent(const std::string &number) = 0;
+        virtual void handleAddContactEvent(const std::string &number)    = 0;
     };
 
     class ApplicationCall : public Application, public CallWindowInterface, public EnterNumberWindowInterface
     {
       private:
-        void CallAbortHandler();
-        void CallActiveHandler();
-        void IncomingCallHandler(const CellularCallMessage *const msg);
-        void RingingHandler(const CellularCallMessage *const msg);
+        sys::TimerHandle callerIdTimer;
 
       protected:
-        call::State state = call::State::IDLE;
+        call::State callState = call::State::IDLE;
 
       public:
         ApplicationCall(std::string name                    = name_call,
                         std::string parent                  = {},
+                        sys::phone_modes::PhoneMode mode    = sys::phone_modes::PhoneMode::Connected,
                         StartInBackground startInBackground = {false});
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
         sys::ReturnCodes DeinitHandler() override;
+        bool isPopupPermitted(gui::popup::ID popupId) const override;
 
         sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final
         {
@@ -77,30 +88,61 @@ namespace app
         void createUserInterface() override;
         void destroyUserInterface() override;
 
+        void handleIncomingCall();
+        void handleCallerId(const app::manager::actions::CallParams *params);
+        void handleEmergencyCallEvent(const std::string &number) override;
         void handleCallEvent(const std::string &number) override;
         void handleAddContactEvent(const std::string &number) override;
 
-        auto showNotification(std::function<bool()> action) -> bool;
+        auto showNotification(std::function<bool()> action, const std::string &icon, const std::string &text) -> bool;
 
-        [[nodiscard]] auto getState() const noexcept -> call::State override
+        [[nodiscard]] auto getCallState() const noexcept -> call::State override
         {
-            return state;
+            return callState;
         }
-        void setState(call::State state) noexcept override
+        void setCallState(call::State state) noexcept override
         {
-            this->state = state;
+            if (state == call::State::CALL_IN_PROGRESS) {
+                bus.sendUnicast(
+                    std::make_shared<sevm::KeypadBacklightMessage>(bsp::keypad_backlight::Action::turnOnCallMode),
+                    service::name::evt_manager);
+            }
+            else {
+                bus.sendUnicast(
+                    std::make_shared<sevm::KeypadBacklightMessage>(bsp::keypad_backlight::Action::turnOffCallMode),
+                    service::name::evt_manager);
+            }
+            this->callState = state;
         }
-        void transmitDtmfTone(uint32_t digit) override;
+
         void stopAudio() override;
-        void startRinging() override;
-        void startRouting() override;
+        void startAudioRouting() override;
+        void sendAudioEvent(AudioEvent audioEvent) override;
+
+        void transmitDtmfTone(uint32_t digit) override;
+        void hangupCall() override;
+        void answerIncomingCall() override;
     };
 
     template <> struct ManifestTraits<ApplicationCall>
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {
-            return {{manager::actions::Launch, manager::actions::Call, manager::actions::Dial}};
+            return {{manager::actions::Launch,
+                     manager::actions::Call,
+                     manager::actions::Dial,
+                     manager::actions::EmergencyDial,
+                     manager::actions::NotAnEmergencyNotification,
+                     manager::actions::NoSimNotification,
+                     manager::actions::CallRejectedByOfflineNotification,
+                     manager::actions::PhoneModeChanged,
+                     manager::actions::ActivateCall,
+                     {manager::actions::AbortCall, manager::actions::ActionFlag::AcceptWhenInBackground},
+                     manager::actions::HandleOutgoingCall,
+                     manager::actions::HandleIncomingCall,
+                     manager::actions::HandleCallerId,
+                     manager::actions::HandleCallerId},
+                    locks::AutoLockPolicy::PreventPermanently};
         }
     };
 } /* namespace app */

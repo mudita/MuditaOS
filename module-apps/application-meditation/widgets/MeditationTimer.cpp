@@ -1,21 +1,19 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MeditationTimer.hpp"
-
-#include <cassert>
+#include "GuiTimer.hpp"
 
 #include <service-audio/AudioServiceAPI.hpp>
 #include <application-meditation/data/Style.hpp>
+#include <purefs/filesystem_paths.hpp>
 #include <time/time_conversion.hpp>
-
-#include "GuiTimer.hpp"
 
 namespace gui
 {
     namespace
     {
-        constexpr gui::ms TimerInterval{1000};
+        constexpr auto TimerInterval = std::chrono::milliseconds{1000};
     } // namespace
 
     MeditationTimer::MeditationTimer(std::uint32_t x,
@@ -87,8 +85,8 @@ namespace gui
     {
         assert(_duration != std::chrono::seconds::zero()); // Pre-condition check.
 
-        duration = _duration;
-        elapsed  = std::chrono::seconds::zero();
+        duration       = _duration;
+        elapsed        = std::chrono::seconds::zero();
         intervalPeriod = _intervalPeriod;
         hasInterval    = _intervalPeriod != std::chrono::seconds::zero();
         onReset();
@@ -103,19 +101,15 @@ namespace gui
     void MeditationTimer::startTimer()
     {
         assert(application != nullptr);
-        auto timerTask =
-            std::make_unique<app::GuiTimer>("MeditationTimer", application, TimerInterval, Timer::Type::Continous);
-        timerCallback = [this](Item &it, Timer &timerTask) { return onTimerTimeout(it, timerTask); };
-        timerTask->start();
-        application->connect(std::move(timerTask), this);
+        timerCallback = [this](Item &it, sys::Timer &task) { return onTimerTimeout(it, task); };
+        timerTask     = app::GuiTimerFactory::createPeriodicTimer(application, this, "MeditationTimer", TimerInterval);
+        timerTask.start();
     }
 
-    auto MeditationTimer::onTimerTimeout(Item &self, Timer &timerTask) -> bool
+    auto MeditationTimer::onTimerTimeout(Item &self, sys::Timer &task) -> bool
     {
         if (isStopped() || isFinished()) {
-            timerTask.stop();
-            detachTimer(timerTask);
-
+            task.stop();
             if (isFinished() && timeoutCallback != nullptr) {
                 timeoutCallback();
             }
@@ -161,14 +155,11 @@ namespace gui
         timer->setVisible(isVisible);
     }
 
-    namespace
-    {
-        constexpr auto intervalSoundPath = "assets/audio/SMS-drum2.mp3";
-    }
-
     void MeditationTimer::onInterval() const
     {
-        AudioServiceAPI::PlaybackStart(application, audio::PlaybackType::Multimedia, intervalSoundPath);
+        AudioServiceAPI::PlaybackStart(application,
+                                       audio::PlaybackType::Meditation,
+                                       purefs::dir::getCurrentOSPath() / "assets/audio/meditation/gong.mp3");
     }
 
     void MeditationTimer::registerTimeoutCallback(const std::function<void()> &cb)

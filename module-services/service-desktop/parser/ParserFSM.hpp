@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -6,7 +6,7 @@
 #include "MessageHandler.hpp"
 #include "ParserUtils.hpp"
 
-#include <json/json11.hpp>
+#include <json11.hpp>
 
 #include <string>
 
@@ -35,6 +35,8 @@ namespace parserFSM
             state = newState;
         }
 
+        void setMessageHandler(std::unique_ptr<MessageHandler> handler);
+
       private:
         std::string receivedMsg;
         parserFSM::State state = State::NoMsg;
@@ -42,6 +44,7 @@ namespace parserFSM
         std::string header;
         unsigned long payloadLength   = 0;
         sys::Service *OwnerServicePtr = nullptr;
+        std::unique_ptr<MessageHandler> messageHandler;
 
         void parseHeader();
         void parsePartialHeader();

@@ -1,15 +1,23 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <log/log.hpp>
-#include <vfs.hpp>
+#include <purefs/filesystem_paths.hpp>
+#include <purefs/fs/inotify.hpp>
 #include "ServiceFileIndexer.hpp"
-#include "notesIndexer.hpp"
-#include "messages/FileChangeMessage.hpp"
-#include "Constants.hpp"
-#include <Service/Bus.hpp>
 #include <fileref.h>
 #include <tag.h>
+#include "notesIndexer.hpp"
+#include "Constants.hpp"
+#include <purefs/fs/inotify_message.hpp>
+
+namespace
+{
+    inline auto getMusicPath()
+    {
+        return purefs::createPath(purefs::dir::getUserDiskPath(), "music").string();
+    }
+} // namespace
 
 namespace service
 {
@@ -22,6 +30,15 @@ namespace service
     // When receive notification handler
     sys::MessagePointer ServiceFileIndexer::DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp)
     {
+        auto inotify = dynamic_cast<purefs::fs::message::inotify *>(msg);
+        if (inotify) {
+            LOG_ERROR("Inotify event %s %08x", inotify->name.c_str(), int(inotify->flags));
+        }
+        else {
+            LOG_ERROR("Not a inotify message");
+        }
+
+#if 0
         auto fcm = dynamic_cast<msg::FileChangeMessage *>(msg);
         if (fcm) {
             switch (fcm->event()) {
@@ -49,26 +66,37 @@ namespace service
             }
             return std::make_shared<sys::ResponseMessage>();
         }
+#endif
         return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
     }
 
     // Initialize data notification handler
     sys::ReturnCodes ServiceFileIndexer::InitHandler()
     {
-        vfs.registerNotificationHandler(
-            [_this = shared_from_this()](std::string_view new_path, vfs::FsEvent event, std::string_view old_path) {
-                namespace fs       = std::filesystem;
-                const auto new_ext = fs::path(new_path).extension().string();
-                auto msg           = std::make_shared<msg::FileChangeMessage>(new_path, event, old_path);
-                sys::Bus::SendUnicast(msg, std::string(service::name::file_indexer), _this.get());
-            });
+        /*
         mStartupIndexer.start(shared_from_this(), service::name::file_indexer);
+        */
+
+        mfsNotifier = purefs::fs::inotify_create(shared_from_this());
+        if (!mfsNotifier) {
+            LOG_ERROR("Unable to create inotify object");
+            return sys::ReturnCodes::Failure;
+        }
+        const int err = mfsNotifier->add_watch(getMusicPath(), purefs::fs::inotify_flags::close_write);
+        if (err) {
+            LOG_ERROR("Unable to create inotify watch errno: %i", err);
+            return sys::ReturnCodes::Failure;
+        }
         return sys::ReturnCodes::Success;
     }
 
     sys::ReturnCodes ServiceFileIndexer::DeinitHandler()
     {
-        vfs.registerNotificationHandler(nullptr);
+        const int err = mfsNotifier->rm_watch(getMusicPath());
+        if (err) {
+            LOG_ERROR("Unable to remove watch errno: %i", err);
+            return sys::ReturnCodes::Failure;
+        }
         return sys::ReturnCodes::Success;
     }
 

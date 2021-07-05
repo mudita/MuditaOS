@@ -1,13 +1,9 @@
-cmake_minimum_required(VERSION 3.12)
-
-# vfs tests
-add_catch2_executable(
-    NAME
-        vfs
-    SRCS
-        ${CMAKE_CURRENT_LIST_DIR}/unittest_vfs.cpp
-    LIBS
-        module-vfs module-utils
+add_custom_target("test_disk_image")
+add_custom_command(
+        PRE_BUILD
+        TARGET test_disk_image
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/gendisktestimg.sh ${CMAKE_BINARY_DIR}
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
 
 add_catch2_executable(
@@ -15,38 +11,67 @@ add_catch2_executable(
     SRCS
         ${CMAKE_CURRENT_LIST_DIR}/unittest_disk_manager.cpp
     LIBS
+        module-sys
         module-vfs
+    DEPS
+        test_disk_image
 )
 
 add_catch2_executable(
     NAME vfs-core-fs
     SRCS
         ${CMAKE_CURRENT_LIST_DIR}/unittest_filesystem_core.cpp
+    INCLUDE 
+        ${CMAKE_CURRENT_SOURCE_DIR}/../include/internal
     LIBS
+        module-sys
         module-vfs
 )
 
 set(LITTLEFS_IMAGE "lfstest.img")
-
-add_custom_command( 
-    OUTPUT ${LITTLEFS_IMAGE}
+add_custom_target(
+    ${LITTLEFS_IMAGE}
     COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/genlfstestimg.sh 1G ${LITTLEFS_IMAGE}
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-    DEPENDS genlittlefs
+    DEPENDS genlittlefs assets
 )
-
-add_custom_target( test_lfs_image DEPENDS ${LITTLEFS_IMAGE} )
 
 add_catch2_executable(
     NAME vfs-littlefs
     SRCS
         ${CMAKE_CURRENT_LIST_DIR}/unittest_filesystem_littlefs.cpp
+    INCLUDE 
+        ${CMAKE_CURRENT_SOURCE_DIR}/../include/internal
     LIBS
+        module-sys
         module-vfs
     DEPS
-        test_lfs_image
+        ${LITTLEFS_IMAGE}
 )
 
+add_catch2_executable(
+    NAME vfs-dualmount
+    SRCS
+        ${CMAKE_CURRENT_LIST_DIR}/unittest_filesystem_dualmount.cpp
+    INCLUDE 
+        ${CMAKE_CURRENT_SOURCE_DIR}/../include/internal
+    LIBS
+        module-sys
+        module-vfs
+    DEPS
+        ${LITTLEFS_IMAGE}
+)
+
+add_catch2_executable(
+    NAME vfs-inotify
+    SRCS
+        ${CMAKE_CURRENT_LIST_DIR}/unittest_filesystem_inotify.cpp
+    LIBS
+        module-sys
+        module-vfs
+    INCLUDE 
+        ${CMAKE_CURRENT_SOURCE_DIR}/../include/internal
+)
 
 # prepare test assets
 set(ASSETS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/test_dir")
@@ -78,6 +103,6 @@ foreach(ASSET ${ASSETS_LIST})
 
     string(REPLACE "/" "_" target_name ${ASSET})
     add_custom_target(${target_name} DEPENDS ${ASSET} ${outfile})
-    add_dependencies(${PROJECT_NAME} ${target_name})
+    add_dependencies(module-vfs ${target_name})
 endforeach()
 

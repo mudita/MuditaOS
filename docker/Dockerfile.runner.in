@@ -5,10 +5,12 @@ MAINTAINER radoslaw.wicik@mudiata.com
 
 RUN ln -fs /usr/share/zoneinfo/@DOCKER_TIMEZONE@ /etc/localtime
 RUN export DEBIAN_FRONTEND=noninteractive 
-RUN apt-get update && \
-    apt-get full-upgrade -y && \
-    apt-get install -y \
-        @INSTALL_PACKAGES@ 
+RUN apt-get update 
+RUN apt-get full-upgrade -y 
+RUN apt-get install -y \
+        @INSTALL_PACKAGES@
+RUN apt-get -qy autoremove
+RUN apt-get -qy clean
 RUN ln -fs /usr/bin/python3 /usr/bin/python
 RUN locale-gen pl_PL.UTF-8 \
                en_US.UTF-8 \
@@ -16,6 +18,8 @@ RUN locale-gen pl_PL.UTF-8 \
                es_ES.UTF-8 && \
     dpkg-reconfigure --frontend noninteractive tzdata
 RUN mkdir -p /home/runner/app/settings
+
+RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 1000 --slave /usr/bin/g++ g++ /usr/bin/g++-10
 
 #add python packages
 ADD assets/requirements.txt /home/docker/requirements.txt

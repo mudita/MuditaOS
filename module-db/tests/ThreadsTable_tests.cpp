@@ -1,7 +1,5 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
-
-#include <vfs.hpp>
 
 #include <catch2/catch.hpp>
 
@@ -15,16 +13,17 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
-#include <purefs/filesystem_paths.hpp>
 
 TEST_CASE("Threads Table tests")
 {
     Database::initialize();
 
-    const auto smsPath = (purefs::dir::getUserDiskPath() / "sms.db").c_str();
-    std::filesystem::remove(smsPath);
+    const auto smsPath = (std::filesystem::path{"sys/user"} / "sms.db");
+    if (std::filesystem::exists(smsPath)) {
+        REQUIRE(std::filesystem::remove(smsPath));
+    }
 
-    SmsDB smsdb{smsPath};
+    SmsDB smsdb{smsPath.c_str()};
     REQUIRE(smsdb.isInitialized());
 
     ThreadsTableRow testRow1 = {{.ID = 0},
@@ -36,6 +35,12 @@ TEST_CASE("Threads Table tests")
                                 .type           = SMSType ::DRAFT
 
     };
+
+    const auto smsThreadsCount = smsdb.threads.count() + 1;
+    // clear threads table
+    for (std::size_t id = 1; id <= smsThreadsCount; id++) {
+        REQUIRE(smsdb.threads.removeById(id));
+    }
 
     // add 4 elements into table
     REQUIRE(smsdb.threads.add(testRow1));

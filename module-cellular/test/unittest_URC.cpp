@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Utils.hpp"
@@ -8,7 +8,8 @@
 #define CATCH_CONFIG_MAIN
 
 #include <catch2/catch.hpp>
-#include <module-utils/time/time_conversion.hpp>
+#include <time/time_conversion.hpp>
+#include <time/time_constants.hpp>
 
 #include "UrcQind.hpp"
 #include "UrcCusd.hpp"
@@ -18,6 +19,7 @@
 #include "UrcClip.hpp"
 #include "UrcCpin.hpp"
 #include "UrcQiurc.hpp"
+#include "UrcRing.hpp"
 #include "UrcPoweredDown.hpp"
 #include "UrcResponse.hpp"
 #include "UrcFactory.hpp"
@@ -753,11 +755,6 @@ TEST_CASE("Urc RESPONSE")
         REQUIRE(rsp);
         REQUIRE(rsp->getURCResponseType() == at::urc::UrcResponse::URCResponseType::Connect);
 
-        urc = at::urc::UrcFactory::Create("RING");
-        rsp = getURC<at::urc::UrcResponse>(urc);
-        REQUIRE(rsp);
-        REQUIRE(rsp->getURCResponseType() == at::urc::UrcResponse::URCResponseType::Ring);
-
         urc = at::urc::UrcFactory::Create("NO CARRIER");
         rsp = getURC<at::urc::UrcResponse>(urc);
         REQUIRE(rsp);
@@ -839,5 +836,39 @@ TEST_CASE("+Qiurc: TCP Context and connection message")
         auto urc   = at::urc::UrcFactory::Create("+QIURC:\"pdpdeactwww\",1,3");
         auto qiurc = getURC<at::urc::Qiurc>(urc);
         REQUIRE(qiurc->getType() == std::nullopt);
+    }
+}
+
+TEST_CASE("RING")
+{
+    struct RingTest
+    {
+        std::string body;
+        std::optional<at::urc::Ring::RingType> ringType;
+    };
+
+    std::vector<RingTest> testCases = {
+        {"RING", at::urc::Ring::Normal},
+        {"+CRING: ASYNC", at::urc::Ring::Async},
+        {"+CRING: SYNC", at::urc::Ring::Sync},
+        {"+CRING: REL ASYNC", at::urc::Ring::RelAsync},
+        {"\r\n+CRING: REL SYNC", at::urc::Ring::RelSync},
+        {"+CRING: FAX", at::urc::Ring::Fax},
+        {"+CRING: VOICE", at::urc::Ring::Voice},
+        {"+CRING: BUMMER", std::nullopt},
+    };
+
+    for (auto &test : testCases) {
+        auto urc  = at::urc::UrcFactory::Create(test.body);
+        auto ring = getURC<at::urc::Ring>(urc);
+        REQUIRE(ring);
+        if (test.ringType) {
+            REQUIRE(ring->getType());
+            REQUIRE(ring->getType().value() == test.ringType);
+        }
+        else {
+            REQUIRE(!ring->isValid());
+            REQUIRE(!ring->getType());
+        }
     }
 }

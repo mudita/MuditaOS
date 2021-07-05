@@ -6,7 +6,7 @@
 //#include <module-apps/application-calendar/widgets/CalendarStyle.hpp>
 //#include <module-apps/application-calendar/data/OptionParser.hpp>
 
-#include <log/log.hpp>
+#include <log.hpp>
 #include <Utils.hpp>
 
 #include <cassert>
@@ -422,8 +422,8 @@ bool EventsTable::addYear(EventsTableRow entry)
                        entry.provider_iCalUid.c_str(),
                        entry.UID.c_str(),
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from + date::years{1}).c_str(),
-                       TimePointToString(entry.date_till + date::years{1}).c_str(),
+                       TimePointToString(entry.date_from, date::years{1}).c_str(),
+                       TimePointToString(entry.date_till, date::years{1}).c_str(),
                        entry.reminder,
                        entry.repeat,
                        TimePointToString(entry.reminder_fired).c_str(),
@@ -432,8 +432,8 @@ bool EventsTable::addYear(EventsTableRow entry)
                        entry.provider_iCalUid.c_str(),
                        entry.UID.c_str(),
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from + date::years{2}).c_str(),
-                       TimePointToString(entry.date_till + date::years{2}).c_str(),
+                       TimePointToString(entry.date_from, date::years{2}).c_str(),
+                       TimePointToString(entry.date_till, date::years{2}).c_str(),
                        entry.reminder,
                        entry.repeat,
                        TimePointToString(entry.reminder_fired).c_str(),
@@ -442,8 +442,8 @@ bool EventsTable::addYear(EventsTableRow entry)
                        entry.provider_iCalUid.c_str(),
                        entry.UID.c_str(),
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from + date::years{3}).c_str(),
-                       TimePointToString(entry.date_till + date::years{3}).c_str(),
+                       TimePointToString(entry.date_from, date::years{3}).c_str(),
+                       TimePointToString(entry.date_till, date::years{3}).c_str(),
                        entry.reminder,
                        entry.repeat,
                        TimePointToString(entry.reminder_fired).c_str(),
@@ -452,8 +452,8 @@ bool EventsTable::addYear(EventsTableRow entry)
                        entry.provider_iCalUid.c_str(),
                        entry.UID.c_str(),
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from + date::years{4}).c_str(),
-                       TimePointToString(entry.date_till + date::years{4}).c_str(),
+                       TimePointToString(entry.date_from, date::years{4}).c_str(),
+                       TimePointToString(entry.date_till, date::years{4}).c_str(),
                        entry.reminder,
                        entry.repeat,
                        TimePointToString(entry.reminder_fired).c_str(),
@@ -508,6 +508,8 @@ bool EventsTable::addCustom(EventsTableRow entry)
     for (uint32_t i = 1; i <= numberOfWeeks; i++) {
         for (auto option : weekDayOptions) {
             if (option) {
+                LOG_DEBUG("start: %s", TimePointToString(dateFrom + date::days{incrementation}).c_str());
+                LOG_DEBUG("start: %s", TimePointToString(dateTill + date::days{incrementation}).c_str());
                 result =
                     result &&
                     db->execute("INSERT or IGNORE INTO events (uid, title, date_from, date_till, "
@@ -643,17 +645,61 @@ EventsTableRow EventsTable::getByUID(const std::string &UID)
     };
 }
 
-std::vector<EventsTableRow> EventsTable::selectByDatePeriod(calendar::TimePoint date_filter,
-                                                            calendar::TimePoint filter_till,
+std::vector<EventsTableRow> EventsTable::selectByDatePeriod(TimePoint filterFrom,
+                                                            TimePoint filterTill,
                                                             uint32_t offset,
                                                             uint32_t limit)
 {
-    auto retQuery = db->query("SELECT * FROM events WHERE date_from >= date('%q') AND date_from < date('%q', 'start of "
-                              "day') ORDER BY datetime(date_from) LIMIT %u OFFSET %u;",
-                              TimePointToString(date_filter).c_str(),
-                              TimePointToString(filter_till).c_str(),
-                              limit,
-                              offset);
+    auto retQuery = db->query(
+        "SELECT * FROM events WHERE ( date('%q') >= date_from AND date_from > date('%q', 'start of day') ) OR "
+        " ( date('%q') >= date_till AND date_till > date('%q', 'start of day') ) OR "
+        " ( date_till > date('%q') AND date('%q', 'start of day') > date_from ) ORDER BY datetime(date_from) LIMIT %u "
+        "OFFSET %u;",
+        TimePointToString(filterFrom).c_str(),
+        TimePointToString(filterTill).c_str(),
+        TimePointToString(filterFrom).c_str(),
+        TimePointToString(filterTill).c_str(),
+        TimePointToString(filterFrom).c_str(),
+        TimePointToString(filterTill).c_str(),
+        limit,
+        offset);
+
+    if (retQuery == nullptr || retQuery->getRowCount() == 0) {
+        return std::vector<EventsTableRow>();
+    }
+
+    std::vector<EventsTableRow> ret;
+
+    do {
+        ret.push_back(EventsTableRow{
+            (*retQuery)[0].getUInt32(),                              // ID
+            (*retQuery)[1].getString(),                              // UID
+            (*retQuery)[2].getString(),                              // title
+            TimePointFromString((*retQuery)[3].getString().c_str()), // date_from
+            TimePointFromString((*retQuery)[4].getString().c_str()), // date_till
+            (*retQuery)[5].getUInt32(),                              // reminder
+            (*retQuery)[6].getUInt32(),                              // repeat
+            TimePointFromString((*retQuery)[7].getString().c_str()), // reminder_fired
+            (*retQuery)[8].getString(),                              // provider type
+            (*retQuery)[9].getString(),                              // provider id
+            (*retQuery)[10].getString()                              // provider iCalUid
+        });
+
+    } while (retQuery->nextRow());
+
+    return ret;
+}
+
+std::vector<EventsTableRow> EventsTable::selectByDate(TimePoint dateFilter, uint32_t offset, uint32_t limit)
+{
+    auto dateFilterFrom = dateFilter + date::days{1};
+    auto retQuery       = db->query(
+        "SELECT * FROM events WHERE date_from < date('%q', 'start of day') AND date('%q', 'start of day') <= date_till "
+        "ORDER BY datetime(date_from) LIMIT %u OFFSET %u;",
+        TimePointToString(dateFilterFrom).c_str(),
+        TimePointToString(dateFilter).c_str(),
+        limit,
+        offset);
 
     if (retQuery == nullptr || retQuery->getRowCount() == 0) {
         return std::vector<EventsTableRow>();
@@ -714,7 +760,6 @@ std::vector<EventsTableRow> EventsTable::getLimitOffset(uint32_t offset, uint32_
 
 std::vector<EventsTableRow> EventsTable::getLimitOffsetByDate(uint32_t offset, uint32_t limit)
 {
-
     auto retQuery = db->query("SELECT * from events ORDER BY datetime(date_from) LIMIT %u OFFSET %u;", limit, offset);
 
     if (retQuery == nullptr || retQuery->getRowCount() == 0) {
@@ -770,12 +815,27 @@ uint32_t EventsTable::count()
     return (*queryRet)[0].getUInt32();
 }
 
-uint32_t EventsTable::countFromFilter(calendar::TimePoint from, calendar::TimePoint till)
+uint32_t EventsTable::countFromFilter(TimePoint from, TimePoint till)
 {
     auto queryRet = db->query(
-        "SELECT COUNT(*) FROM events WHERE date_from >= date('%q') AND date_from < date('%q', 'start of day');",
+        "SELECT COUNT(*) FROM events WHERE date('%q') <= date_from AND date_from < date('%q', 'start of day');",
         TimePointToString(from).c_str(),
         TimePointToString(till).c_str());
+
+    if (queryRet == nullptr || queryRet->getRowCount() == 0) {
+        return 0;
+    }
+
+    return (*queryRet)[0].getUInt32();
+}
+
+uint32_t EventsTable::countFromDayFilter(TimePoint filter)
+{
+    auto filterFrom = filter + date::days{1};
+    auto queryRet   = db->query("SELECT COUNT(*) FROM events WHERE date_from < datetime('%q', 'start of day') AND "
+                              "datetime('%q', 'start of day') <= date_till;",
+                              TimePointToString(filterFrom).c_str(),
+                              TimePointToString(filter).c_str());
 
     if (queryRet == nullptr || queryRet->getRowCount() == 0) {
         return 0;
@@ -791,8 +851,7 @@ uint32_t EventsTable::countByFieldId(const char *field, uint32_t id)
     return 0;
 }
 
-std::vector<EventsTableRow> EventsTable::SelectFirstUpcoming(calendar::TimePoint filter_from,
-                                                             calendar::TimePoint filter_till)
+std::vector<EventsTableRow> EventsTable::SelectFirstUpcoming(TimePoint filter_from, TimePoint filter_till)
 {
     auto retQuery = db->query("SELECT DATETIME(date_from, '-' || reminder || ' minutes') AS calc_dt, * "
                               "FROM events "

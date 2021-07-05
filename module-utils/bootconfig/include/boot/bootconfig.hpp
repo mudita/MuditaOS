@@ -1,13 +1,33 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-#include <module-utils/json/json11.hpp>
+#include <json11.hpp>
 #include <string>
 #include <filesystem>
 
 namespace boot
 {
+    namespace json
+    {
+        inline constexpr auto main            = "main";
+        inline constexpr auto os_type         = "ostype";
+        inline constexpr auto os_image        = "imagename";
+        inline constexpr auto os_version      = "version";
+        inline constexpr auto version_major   = "major";
+        inline constexpr auto version_minor   = "minor";
+        inline constexpr auto version_patch   = "patch";
+        inline constexpr auto version_string  = "string";
+        inline constexpr auto timestamp       = "timestamp";
+        inline constexpr auto misc            = "misc";
+        inline constexpr auto builddate       = "builddate";
+        inline constexpr auto git_info        = "git";
+        inline constexpr auto os_git_tag      = "git_tag";
+        inline constexpr auto os_git_revision = "git_commit";
+        inline constexpr auto os_git_branch   = "git_branch";
+        inline constexpr auto bootloader      = "bootloader";
+    } // namespace json
+
     class BootConfig
     {
       public:
@@ -40,13 +60,10 @@ namespace boot
         {
             return m_os_root_path;
         }
-        void updateTimestamp();
 
       private:
         bool loadBootConfig(const std::filesystem::path &bootJsonPath);
-        const std::filesystem::path getCurrentBootJSON();
-        bool verifyCRC(const std::filesystem::path filePath);
-        bool verifyCRC(const std::string filePath, const unsigned long crc32);
+        std::filesystem::path getCurrentBootJSON();
 
       private:
         std::string m_os_image{"boot.bin"};

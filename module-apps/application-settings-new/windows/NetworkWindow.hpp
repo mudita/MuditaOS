@@ -1,9 +1,9 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include "OptionWindow.hpp"
+#include "BaseSettingsWindow.hpp"
 #include "Application.hpp"
 
 namespace app::settingsInterface
@@ -20,18 +20,18 @@ namespace gui
         inline constexpr auto network_window = "Network";
     };
 
-    class NetworkWindow : public OptionWindow
+    class NetworkWindow : public BaseSettingsWindow
     {
       private:
-        auto netOptList() -> std::list<gui::Option>;
+        auto buildOptionsList() -> std::list<Option> override;
         app::settingsInterface::SimParams *simParams;
-        void rebuild() override;
         app::settingsInterface::OperatorsSettings *operatorsSettings;
 
       public:
         NetworkWindow(app::Application *app,
                       app::settingsInterface::SimParams *simParams,
                       app::settingsInterface::OperatorsSettings *operatorsSettings);
-        void onBeforeShow(ShowMode m, SwitchData *d) override;
+
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
     };
 } // namespace gui

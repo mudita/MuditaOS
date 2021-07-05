@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -18,11 +18,14 @@
 #include "messages/MessagesEndpoint.hpp"
 #include "restore/RestoreEndpoint.hpp"
 #include "update/UpdateEndpoint.hpp"
+#include <endpoints/bluetooth/BluetoothEndpoint.hpp>
+#include "security/SecurityEndpoint.hpp"
 
 class EndpointFactory
 {
   public:
-    static auto create(parserFSM::Context &context, sys::Service *ownerServicePtr)
+    virtual ~EndpointFactory() = default;
+    virtual auto create(parserFSM::Context &context, sys::Service *ownerServicePtr)
         -> std::unique_ptr<parserFSM::Endpoint>
     {
         LOG_DEBUG("Creating endpoint: %d", static_cast<int>(context.getEndpoint()));
@@ -30,7 +33,7 @@ class EndpointFactory
         case parserFSM::EndpointType::update:
             return std::make_unique<UpdateEndpoint>(ownerServicePtr);
         case parserFSM::EndpointType::filesystemUpload:
-            return std::make_unique<FilesystemEndpoint>(ownerServicePtr);
+            return FilesystemEndpoint::createInstance(ownerServicePtr);
         case parserFSM::EndpointType::backup:
             return std::make_unique<BackupEndpoint>(ownerServicePtr);
         case parserFSM::EndpointType::deviceInfo:
@@ -49,8 +52,40 @@ class EndpointFactory
             return std::make_unique<DeveloperModeEndpoint>(ownerServicePtr);
         case parserFSM::EndpointType::calendarEvents:
             return std::make_unique<CalendarEventsEndpoint>(ownerServicePtr);
+        case parserFSM::EndpointType::bluetooth:
+            return std::make_unique<BluetoothEndpoint>(ownerServicePtr);
+        case parserFSM::EndpointType::usbSecurity:
+            return std::make_unique<SecurityEndpoint>(ownerServicePtr);
         default:
             return nullptr;
         }
     }
+};
+
+class SecuredEndpointFactory : public EndpointFactory
+{
+    static constexpr auto Whitelist = {parserFSM::EndpointType::developerMode, parserFSM::EndpointType::usbSecurity};
+
+  public:
+    explicit SecuredEndpointFactory(EndpointSecurity security) : endpointSecurity(security)
+    {}
+
+    auto create(parserFSM::Context &context, sys::Service *ownerServicePtr)
+        -> std::unique_ptr<parserFSM::Endpoint> override
+    {
+        auto security = endpointSecurity;
+        if (std::find(Whitelist.begin(), Whitelist.end(), context.getEndpoint()) != Whitelist.end()) {
+            security = EndpointSecurity::Allow;
+        }
+
+        switch (security) {
+        case EndpointSecurity::Allow:
+            return EndpointFactory::create(context, ownerServicePtr);
+        default:
+            return std::make_unique<parserFSM::SecuredEndpoint>(ownerServicePtr);
+        }
+    }
+
+  private:
+    EndpointSecurity endpointSecurity;
 };

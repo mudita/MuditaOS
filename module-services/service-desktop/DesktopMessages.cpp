@@ -1,43 +1,55 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-desktop/DesktopMessages.hpp"
 #include "parser/MessageHandler.hpp"
+#include <module-bluetooth/Bluetooth/Device.hpp>
 
-namespace sdesktop::developerMode
+namespace sdesktop
 {
     using namespace parserFSM;
-    void Event::send()
+    namespace developerMode
     {
-        MessageHandler::putToSendQueue(context.createSimpleResponse());
-    }
 
-    ATResponseEvent::ATResponseEvent(std::vector<std::string> resp)
+        AppFocusChangeEvent::AppFocusChangeEvent(std::string appName)
+        {
+            context.setResponseStatus(http::Code::OK);
+            context.setEndpoint(EndpointType::developerMode);
+            context.setResponseBody(json11::Json::object{{json::developerMode::focus, appName}});
+        }
+
+        ScreenlockCheckEvent::ScreenlockCheckEvent(bool isLocked)
+        {
+            context.setResponseStatus(http::Code::OK);
+            context.setEndpoint(EndpointType::developerMode);
+            context.setResponseBody(json11::Json::object{{json::developerMode::phoneLocked, isLocked}});
+        }
+
+        CellularStateInfoRequestEvent::CellularStateInfoRequestEvent(std::string stateStr)
+        {
+            context.setResponseStatus(http::Code::OK);
+            context.setEndpoint(EndpointType::developerMode);
+            context.setResponseBody(json11::Json::object{{json::developerMode::cellularStateInfo, stateStr}});
+        }
+
+        CellularSleepModeInfoRequestEvent::CellularSleepModeInfoRequestEvent(bool isInSleepMode)
+        {
+            context.setResponseStatus(http::Code::OK);
+            context.setEndpoint(EndpointType::developerMode);
+            context.setResponseBody(json11::Json::object{{json::developerMode::cellularSleepModeInfo, isInSleepMode}});
+        }
+    } // namespace developerMode
+
+    namespace usb
     {
-        context.setResponseStatus(http::Code::OK);
-        context.setEndpoint(EndpointType::developerMode);
-        context.setResponseBody(json11::Json::object{{json::developerMode::ATResponse, resp}});
-    }
+        USBConfigured::USBConfigured(USBConfigurationType configurationType)
+            : sys::DataMessage(MessageType::USBConfigured), configurationType(configurationType)
+        {}
 
-    AppFocusChangeEvent::AppFocusChangeEvent(std::string appName)
-    {
-        context.setResponseStatus(http::Code::OK);
-        context.setEndpoint(EndpointType::developerMode);
-        context.setResponseBody(json11::Json::object{{json::developerMode::focus, appName}});
-    }
+        USBConfigurationType USBConfigured::getConfigurationType() const noexcept
+        {
+            return configurationType;
+        }
+    } // namespace usb
 
-    ScreenlockCheckEvent::ScreenlockCheckEvent(bool isLocked)
-    {
-        context.setResponseStatus(http::Code::OK);
-        context.setEndpoint(EndpointType::developerMode);
-        context.setResponseBody(json11::Json::object{{json::developerMode::isLocked, isLocked}});
-    }
-
-    DeveloperModeRequest::DeveloperModeRequest(std::unique_ptr<Event> event)
-        : sys::DataMessage(MessageType::DeveloperModeRequest), event(std::move(event))
-    {}
-
-    DeveloperModeRequest::DeveloperModeRequest() : sys::DataMessage(MessageType::DeveloperModeRequest)
-    {}
-
-} // namespace sdesktop::developerMode
+} // namespace sdesktop

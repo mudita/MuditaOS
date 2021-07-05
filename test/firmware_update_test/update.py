@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
@@ -23,7 +23,7 @@ from functools import partial
 CHUNK_SIZE = 1024 * 16
 
 # update performing timeout
-UPDATE_TIMEOUT = 30
+UPDATE_TIMEOUT = 90
 
 update_status_code = {
     0: "Initial",
@@ -44,7 +44,7 @@ def update(harness, update_filepath: str):
     filename = update_filepath.split('/')[-1]
     body = {"command": "download", "fileName": filename, "fileSize": file_size}
 
-    ret = harness.endpoint_request("filesystemUpload", "post", body)["body"]
+    ret = harness.endpoint_request("filesystem", "post", body)["body"]
     if ret["status"] is not None:
         log.info(f"Update status: {update_status_code[int(ret['status'])]}")
 
@@ -80,6 +80,7 @@ def update(harness, update_filepath: str):
 
 
 def get_update_list(harness):
+    harness.unlock_phone()
     ret = harness.endpoint_request("deviceInfo", "get", {})
     device_info = ret["body"]
     update_history = device_info["updateHistory"]
@@ -120,7 +121,7 @@ def main():
         log.info("Waiting for device to reset")
         time.sleep(5)
         # connect to the phone once again
-        with Timeout.limit(seconds=20):
+        with Timeout.limit(seconds=90):
             while not harness:
                 try:
                     harness = Harness.from_detect()

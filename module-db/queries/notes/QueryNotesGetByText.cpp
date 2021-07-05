@@ -1,11 +1,14 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "QueryNotesGetByText.hpp"
 
+#include <utility>
+
 namespace db::query
 {
-    QueryNotesGetByText::QueryNotesGetByText(std::string text) : Query(Query::Type::Read), text{std::move(text)}
+    QueryNotesGetByText::QueryNotesGetByText(std::string text, unsigned int offset, unsigned int limit)
+        : Query(Query::Type::Read), offset(offset), limit(limit), text(std::move(text))
     {}
 
     const std::string &QueryNotesGetByText::getText() const noexcept
@@ -18,7 +21,8 @@ namespace db::query
         return {"QueryNotesGetByText"};
     }
 
-    NotesGetByTextResult::NotesGetByTextResult(std::vector<NotesRecord> notes) : records{std::move(notes)}
+    NotesGetByTextResult::NotesGetByTextResult(std::vector<NotesRecord> notes, unsigned int count)
+        : records{std::move(notes)}, dbRecordsCount(count)
     {}
 
     const std::vector<NotesRecord> &NotesGetByTextResult::getRecords() const noexcept

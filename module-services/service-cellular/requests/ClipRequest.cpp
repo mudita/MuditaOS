@@ -5,6 +5,7 @@
 
 #include <at/Commands.hpp>
 #include <Utils.hpp>
+#include <at/ATFactory.hpp>
 
 #include "service-cellular/requests/ClipRequest.hpp"
 
@@ -23,9 +24,9 @@ namespace cellular
         }
     }
 
-    auto ClipRequest::command() -> std::string
+    auto ClipRequest::command() -> at::Cmd
     {
-        return isValid() ? std::string(at::factory(at::AT::CLIP_GET)) : std::string();
+        return isValid() ? at::factory(at::AT::CLIP_GET) : at::Cmd("");
     }
 
     auto ClipRequest::isValid() const noexcept -> bool

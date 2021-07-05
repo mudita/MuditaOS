@@ -3,7 +3,7 @@
 
 #include "bsp/bluetooth/Bluetooth.hpp"
 #include "BluetoothWorker.hpp"
-#include "log/log.hpp"
+#include <log.hpp>
 
 /// stubs
 
@@ -74,13 +74,7 @@ BTdev::Error BluetoothCommon::set_reset(bool on)
     return Success;
 }
 
-void BluetoothCommon::configure_uart_io()
-{}
-
-void BluetoothCommon::configure_lpuart()
-{}
-
-void BluetoothCommon::configure_cts_irq()
+void BluetoothCommon::init_uart()
 {}
 
 void BluetoothCommon::set_irq(bool enable)

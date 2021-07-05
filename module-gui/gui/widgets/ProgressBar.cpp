@@ -1,8 +1,8 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <module-utils/log/log.hpp>
-#include <module-utils/math/Math.hpp>
+#include <log.hpp>
+#include <Math.hpp>
 
 #include "DrawCommand.hpp"
 #include "ProgressBar.hpp"
@@ -39,11 +39,6 @@ namespace gui
     {
         currentValue = std::clamp(value, 0U, maxValue);
         return currentValue == value;
-    }
-
-    bool ProgressBar::update(int value) noexcept
-    {
-        return setValue(currentValue + value);
     }
 
     void ProgressBar::setPercentageValue(unsigned int value) noexcept
@@ -115,11 +110,6 @@ namespace gui
     {
         currentValue = std::clamp(value, 0U, maxValue);
         return value == currentValue;
-    }
-
-    bool CircularProgressBar::update(int value) noexcept
-    {
-        return setValue(currentValue + value);
     }
 
     void CircularProgressBar::setPercentageValue(unsigned int value) noexcept

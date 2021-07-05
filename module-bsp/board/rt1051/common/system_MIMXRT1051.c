@@ -96,23 +96,35 @@ void SystemInit(void)
     extern uint32_t g_pfnVectors[]; // Vector table defined in startup code
     SCB->VTOR = (uint32_t)g_pfnVectors;
 
-    /* Disable Watchdog Power Down Counter */
+    // Disable WDOGx Power Down Counter
     WDOG1->WMCR &= ~WDOG_WMCR_PDE_MASK;
     WDOG2->WMCR &= ~WDOG_WMCR_PDE_MASK;
 
-    /* Watchdog disable */
-
-#if (DISABLE_WDOG)
+    // Disable WDOGx watchdogs timers
     if (WDOG1->WCR & WDOG_WCR_WDE_MASK) {
         WDOG1->WCR &= ~WDOG_WCR_WDE_MASK;
     }
     if (WDOG2->WCR & WDOG_WCR_WDE_MASK) {
         WDOG2->WCR &= ~WDOG_WCR_WDE_MASK;
     }
-    RTWDOG->CNT   = 0xD928C520U; /* 0xD928C520U is the update key */
+
+#if defined(DISABLE_WATCHDOG)
+    // Write watchdog update key to unlock
+    RTWDOG->CNT = 0xD928C520U;
+    // Disable RTWDOG and allow configuration updates
     RTWDOG->TOVAL = 0xFFFF;
-    RTWDOG->CS    = (uint32_t)((RTWDOG->CS) & ~RTWDOG_CS_EN_MASK) | RTWDOG_CS_UPDATE_MASK;
-#endif /* (DISABLE_WDOG) */
+    RTWDOG->CS    = (uint32_t)(((RTWDOG->CS) & ~RTWDOG_CS_EN_MASK) | RTWDOG_CS_UPDATE_MASK);
+#else
+    //
+    // Perform preliminary RTWDOG configuration
+    //
+    // Write RTWDOG update key to unlock
+    RTWDOG->CNT = 0xD928C520U;
+    // Set timeout value (16s, assuming 128Hz clock - 32.768kHz after 256 prescaler)
+    RTWDOG->TOVAL = 2048;
+    // Enable RTWDOG, set 256 clock prescaler and allow configuration updates
+    RTWDOG->CS = (uint32_t)((RTWDOG->CS) | RTWDOG_CS_EN_MASK | RTWDOG_CS_UPDATE_MASK | RTWDOG_CS_PRES_MASK);
+#endif // (DISABLE_WATCHDOG)
 
     /* Disable Systick which might be enabled by bootrom */
     if (SysTick->CTRL & SysTick_CTRL_ENABLE_Msk) {

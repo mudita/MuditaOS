@@ -1,15 +1,16 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include "FreeRTOSConfig.h"
+#include "SystemReturnCodes.hpp"
 
 namespace sys
 {
 
-    enum class BusChannels
+    enum class BusChannel
     {
+        Unknown,
         System,
         SystemManagerRequests,
         PowerManagerRequests,
@@ -21,7 +22,9 @@ namespace sys
         ServiceFotaNotifications,
         AntennaNotifications,
         ServiceEvtmgrNotifications,
-        CalendarNotifications
+        CalendarNotifications,
+        PhoneModeChanges,
+        PhoneLockChanges,
     };
 
     enum class ServicePriority
@@ -40,16 +43,12 @@ namespace sys
         SuspendToNVM
     };
 
-    enum class ReturnCodes
+    enum class CloseReason
     {
-        Success,
-        Failure,
-        Timeout,
-        ServiceDoesntExist,
-        // This is used in application's template in base class messages handler. The meaning is that
-        // message that was processed by base class implementation of the DataReceivedHandler was not processed
-        // and it should be handled by the class next in hierarchy.
-        Unresolved
+        RegularPowerDown,
+        Reboot,
+        SystemBrownout,
+        LowBattery
     };
 
 } // namespace sys
@@ -84,33 +83,39 @@ inline const char *c_str(sys::ServicePowerMode code)
     return "";
 }
 
-inline const char *c_str(sys::BusChannels channel)
+inline const char *c_str(sys::BusChannel channel)
 {
     switch (channel) {
-    case sys::BusChannels::System:
+    case sys::BusChannel::Unknown:
+        return "Unknown";
+    case sys::BusChannel::System:
         return "System";
-    case sys::BusChannels::SystemManagerRequests:
+    case sys::BusChannel::SystemManagerRequests:
         return "SystemManagerRequests";
-    case sys::BusChannels::PowerManagerRequests:
+    case sys::BusChannel::PowerManagerRequests:
         return "PowerManagerRequests";
-    case sys::BusChannels::ServiceCellularNotifications:
+    case sys::BusChannel::ServiceCellularNotifications:
         return "ServiceCellularNotifications,";
-    case sys::BusChannels::Test2CustomBusChannel:
+    case sys::BusChannel::Test2CustomBusChannel:
         return "Test2CustomBusChannel,";
-    case sys::BusChannels::ServiceDBNotifications:
+    case sys::BusChannel::ServiceDBNotifications:
         return "ServiceDBNotifications,";
-    case sys::BusChannels::ServiceAudioNotifications:
+    case sys::BusChannel::ServiceAudioNotifications:
         return "ServiceAudioNotifications";
-    case sys::BusChannels::AppManagerNotifications:
+    case sys::BusChannel::AppManagerNotifications:
         return "AppManagerNotifications,";
-    case sys::BusChannels::ServiceFotaNotifications:
+    case sys::BusChannel::ServiceFotaNotifications:
         return "ServiceFotaNotifications";
-    case sys::BusChannels::AntennaNotifications:
+    case sys::BusChannel::AntennaNotifications:
         return "AntennaNotifications";
-    case sys::BusChannels::ServiceEvtmgrNotifications:
+    case sys::BusChannel::ServiceEvtmgrNotifications:
         return "ServiceEvtmgrNotifications";
-    case sys::BusChannels::CalendarNotifications:
+    case sys::BusChannel::CalendarNotifications:
         return "CalendarNotifications";
+    case sys::BusChannel::PhoneModeChanges:
+        return "PhoneModeChanges";
+    case sys::BusChannel::PhoneLockChanges:
+        return "PhoneLockChanges";
     }
     return "";
 }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DayEventsWindow.hpp"
@@ -7,8 +7,8 @@
 #include <gui/widgets/Window.hpp>
 #include <gui/widgets/Label.hpp>
 #include <gui/widgets/Item.hpp>
-#include <gui/widgets/BottomBar.hpp>
-#include <gui/widgets/TopBar.hpp>
+#include <gui/widgets/Image.hpp>
+#include <header/AddElementAction.hpp>
 
 #include <time/time_conversion.hpp>
 #include <module-db/queries/calendar/QueryEventsGetFiltered.hpp>
@@ -47,7 +47,7 @@ namespace gui
             return false;
         }
 
-        dayMonthTitle = item->getDayMonthText();
+        dayMonthTitle   = item->getDayMonthText();
         filterFrom      = item->getDateFilter();
         auto filterTill = filterFrom + date::days{1};
         dayEventsModel->setFilters(filterFrom, filterTill, dayMonthTitle);
@@ -65,21 +65,19 @@ namespace gui
         AppWindow::buildInterface();
 
         bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
-        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get(style::strings::common::open));
+        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(style::strings::common::open));
 
         setTitle(dayMonthTitle);
-        leftArrowImage = new gui::Image(
-            this, style::window::calendar::arrow_x, style::window::calendar::arrow_y, 0, 0, "arrow_left");
-        newDayEventImage =
-            new gui::Image(this, style::window::calendar::cross_x, style::window::calendar::cross_y, 0, 0, "cross");
+        header->navigationIndicatorAdd(new gui::header::AddElementAction(), gui::header::BoxSelection::Left);
 
         dayEventsList = new gui::ListView(this,
                                           style::window::calendar::listView_x,
                                           style::window::calendar::listView_y,
                                           style::window::calendar::listView_w,
                                           style::window::calendar::listView_h,
-                                          dayEventsModel);
+                                          dayEventsModel,
+                                          gui::listview::ScrollBarType::Fixed);
         setFocusItem(dayEventsList);
     }
 
@@ -89,20 +87,14 @@ namespace gui
             return true;
         }
 
-        if (!inputEvent.isShortPress()) {
-            return false;
-        }
-
-        if (inputEvent.keyCode == gui::KeyCode::KEY_LEFT) {
+        if (inputEvent.isShortRelease(gui::KeyCode::KEY_LEFT)) {
             LOG_DEBUG("Switch to new window - edit window");
-            std::unique_ptr<EventRecordData> data = std::make_unique<EventRecordData>();
+            auto event       = std::make_shared<EventsRecord>();
+            event->date_from = filterFrom;
+            event->date_till = filterFrom + std::chrono::hours(utils::time::Locale::max_hour_24H_mode) +
+                               std::chrono::minutes(utils::time::Locale::max_minutes);
+            auto data = std::make_unique<EventRecordData>(std::move(event));
             data->setDescription(style::window::calendar::new_event);
-            auto rec       = new EventsRecord();
-            rec->date_from = filterFrom;
-            rec->date_till = filterFrom + std::chrono::hours(style::window::calendar::time::max_hour_24H_mode) +
-                             std::chrono::minutes(style::window::calendar::time::max_minutes);
-            auto event     = std::make_shared<EventsRecord>(*rec);
-            data->setData(event);
             application->switchWindow(
                 style::window::calendar::name::new_edit_event, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
             return true;
@@ -116,7 +108,7 @@ namespace gui
         if (msgNotification != nullptr) {
             if (msgNotification->interface == db::Interface::Name::Events) {
                 if (msgNotification->dataModified()) {
-                    dayEventsList->rebuildList(style::listview::RebuildType::InPlace);
+                    dayEventsList->rebuildList(gui::listview::RebuildType::InPlace);
                     return true;
                 }
             }

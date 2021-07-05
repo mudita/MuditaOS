@@ -19,7 +19,7 @@ extern "C"
 #include "hci.h"
 }
 
-namespace Bt
+namespace bluetooth
 {
 
     class SCO::SCOImpl
@@ -32,7 +32,6 @@ namespace Bt
         auto getStreamData() -> std::shared_ptr<BluetoothStreamData>;
 
       private:
-        static constexpr auto CVSD_SAMPLE_RATE    = 8000;
         static constexpr auto BYTES_PER_FRAME     = 2;
         static constexpr auto ALL_GOOD_MASK       = 0x30;
         static constexpr auto AUDIO_BUFFER_LENGTH = 128;
@@ -94,7 +93,7 @@ namespace Bt
     SCO::~SCO() = default;
 } // namespace Bt
 
-using namespace Bt;
+using namespace bluetooth;
 
 btstack_cvsd_plc_state_t SCO::SCOImpl::cvsdPlcState;
 QueueHandle_t SCO::SCOImpl::sinkQueue;
@@ -106,7 +105,8 @@ void SCO::SCOImpl::sendEvent(audio::EventType event, audio::Event::DeviceState s
 {
     auto evt = std::make_shared<audio::Event>(event, state);
     auto msg = std::make_shared<AudioEventRequest>(std::move(evt));
-    sys::Bus::SendUnicast(std::move(msg), service::name::evt_manager, const_cast<sys::Service *>(ownerService));
+    auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
+    busProxy.sendUnicast(std::move(msg), service::name::evt_manager);
 }
 auto SCO::SCOImpl::audioInitialize(int sampleRate) -> Error
 {

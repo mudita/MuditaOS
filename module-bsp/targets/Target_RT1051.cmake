@@ -1,4 +1,5 @@
-include(board/rt1051/bsp/usb/usb.cmake)
+# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+# For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 set(BOARD_SOURCES ${BOARD_SOURCES}
 
@@ -29,8 +30,10 @@ set(BOARD_SOURCES ${BOARD_SOURCES}
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/fsl_drivers/fsl_dmamux.c"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/fsl_drivers/fsl_edma.c"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/fsl_drivers/fsl_wdog.c"
+	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/fsl_drivers/fsl_rtwdog.c"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/fsl_drivers/fsl_pwm.c"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/irq/irq_gpio.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/audio.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/board.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/chip.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/clock_config.cpp"
@@ -52,17 +55,21 @@ set(BOARD_SOURCES ${BOARD_SOURCES}
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/watchdog/watchdog.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/lpm/RT1051LPM.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/lpm/CpuFreqLPM.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/lpm/ClockState.cpp"	
+	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/lpm/Oscillator.cpp"		
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bluetooth/BluetoothCommon.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bluetooth/BlueKitchen.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/rtc/rtc.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/battery-charger/battery_charger.cpp"
-	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/audio/RT1051Audiocodec.cpp"
-	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/audio/RT1051CellularAudio.cpp"
-	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/audio/SAIAudioDevice.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/audio/CodecMAX98090.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/audio/qfilter.c"
-	"${USB_SRC}"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/drivers/RT1051DriverPLL.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/drivers/RT1051DriverPLL2.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/drivers/RT1051DriverLPSPI.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/drivers/RT1051DriverLPUART.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/drivers/RT1051DriverOscillator.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/drivers/RT1051DriverUSDHC.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/drivers/RT1051DriverSEMC.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/drivers/RT1051DriverI2C.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/drivers/RT1051DriverPWM.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/drivers/RT1051DriverDMAMux.cpp"
@@ -74,6 +81,8 @@ set(BOARD_SOURCES ${BOARD_SOURCES}
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/keypad_backlight/keypad_backlight.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/eink_frontlight/eink_frontlight.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/light_sensor/light_sensor.cpp"
+
+	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/eeprom/eeprom.cpp"
 	CACHE INTERNAL ""
 )
 
@@ -89,7 +98,6 @@ set(BOARD_DIR_INCLUDES ${BOARD_DIR_INCLUDES}
 	${CMAKE_CURRENT_SOURCE_DIR}/bsp/headset
 	${CMAKE_SOURCE_DIR}/module-bluetooth/Bluetooth
 	${CMAKE_SOURCE_DIR}/module-sys/
-	${USB_DIR_INCLUDES}
 
 	CACHE INTERNAL ""
 )

@@ -1,7 +1,8 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ContactsNameTable.hpp"
+#include <Utils.hpp>
 
 ContactsNameTable::ContactsNameTable(Database *db) : Table(db)
 {}
@@ -174,10 +175,28 @@ std::size_t ContactsNameTable::GetCountByName(const std::string &name)
     if (name.empty()) {
         return count();
     }
-    auto queryRet =
-        db->query("SELECT COUNT(*) FROM contact_name WHERE name_primary like '%s%%' OR name_alternative like '%s%%';",
-                  name.c_str(),
-                  name.c_str());
+
+    const auto names     = utils::split(name, " ");
+    const auto namePart1 = names[0];
+    const auto namePart2 = names.size() > 1 ? names[1] : "";
+
+    std::unique_ptr<QueryResult> queryRet;
+
+    if (!namePart1.empty() && !namePart2.empty()) {
+        queryRet = db->query(
+            "SELECT COUNT(*) FROM contact_name WHERE (name_primary like '%q%%' AND name_alternative like '%q%%') OR "
+            "(name_primary like '%q%%' AND name_alternative like '%q%%');",
+            namePart1.c_str(),
+            namePart2.c_str(),
+            namePart2.c_str(),
+            namePart1.c_str());
+    }
+    else {
+        queryRet = db->query(
+            "SELECT COUNT(*) FROM contact_name WHERE name_primary like '%q%%' OR name_alternative like '%q%%';",
+            namePart1.c_str(),
+            namePart1.c_str());
+    }
 
     if ((queryRet == nullptr) || (queryRet->getRowCount() == 0)) {
         return 0;

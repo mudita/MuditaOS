@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TorchWindow.hpp"
@@ -19,8 +19,7 @@ namespace gui
 
     void TorchWindow::buildInterface()
     {
-        BaseSettingsWindow::buildInterface();
-        setTitle(utils::translateI18("app_settings_title_torch"));
+        setTitle(utils::translate("app_settings_title_torch"));
         optionsList->setSize(optionsList->getWidth(),
                              optionsList->getHeight() - style::settings::window::torch::body_offset);
         bar = new Rect(this,
@@ -35,7 +34,7 @@ namespace gui
                                    style::window::default_body_width,
                                    style::settings::window::torch::description_h);
         descriptionText->setFont(style::window::font::medium);
-        descriptionText->setText(utils::translateI18("app_settings_torch_description"));
+        descriptionText->setText(utils::translate("app_settings_torch_description"));
         descriptionText->setVisible(false);
     }
 
@@ -44,15 +43,14 @@ namespace gui
         std::list<gui::Option> optionsList;
 
         optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
-            utils::translateI18("app_settings_torch_sunset_red_light_option"),
+            utils::translate("app_settings_torch_sunset_red_light_option"),
             [=](gui::Item &item) {
                 toggleSwitchState();
                 return true;
             },
             [=](gui::Item &item) {
                 if (item.focus) {
-                    this->setBottomBarText(utils::translateI18(style::strings::common::Switch),
-                                           BottomBar::Side::CENTER);
+                    this->setBottomBarText(utils::translate(style::strings::common::Switch), BottomBar::Side::CENTER);
                 }
                 return true;
             },
@@ -61,14 +59,14 @@ namespace gui
 
         if (switchState) {
             optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
-                utils::translateI18("app_settings_torch_nightshift_time_option"),
+                utils::translate("app_settings_torch_nightshift_time_option"),
                 [=](gui::Item &item) {
                     application->switchWindow(gui::window::name::nightshift, gui::ShowMode::GUI_SHOW_INIT);
                     return true;
                 },
                 [=](gui::Item &item) {
                     if (item.focus) {
-                        this->setBottomBarText(utils::translateI18(style::strings::common::select),
+                        this->setBottomBarText(utils::translate(style::strings::common::select),
                                                BottomBar::Side::CENTER);
                     }
                     return true;

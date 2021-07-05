@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -12,6 +12,7 @@ namespace purefs
     namespace dir
     {
         std::filesystem::path getRootDiskPath() noexcept;
+        std::filesystem::path getMfgConfPath() noexcept;
         std::filesystem::path getUserDiskPath() noexcept;
         std::filesystem::path getCurrentOSPath() noexcept;
         std::filesystem::path getPreviousOSPath() noexcept;
@@ -26,4 +27,14 @@ namespace purefs
         constexpr inline auto boot_json = ".boot.json";
         constexpr inline auto boot_bin  = "boot.bin";
     } // namespace file
+
+    namespace extension
+    {
+        constexpr inline auto tar = ".tar";
+    }
+
+    namespace buffer
+    {
+        constexpr inline auto tar_buf = 8192 * 4;
+    }
 } // namespace purefs

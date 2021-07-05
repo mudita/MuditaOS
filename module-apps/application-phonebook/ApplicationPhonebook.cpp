@@ -1,7 +1,7 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "ApplicationPhonebook.hpp"
+#include <application-phonebook/ApplicationPhonebook.hpp>
 #include "Dialog.hpp"
 #include "DialogMetadataMessage.hpp"
 #include "models/PhonebookModel.hpp"
@@ -16,34 +16,36 @@
 #include <service-appmgr/Controller.hpp>
 #include <service-db/QueryMessage.hpp>
 #include <service-db/DBNotificationMessage.hpp>
+#include <utility>
 
 namespace app
 {
     ApplicationPhonebook::ApplicationPhonebook(std::string name,
                                                std::string parent,
+                                               sys::phone_modes::PhoneMode mode,
                                                StartInBackground startInBackground)
-        : Application(name, parent, startInBackground, phonebook_stack_size)
+        : Application(std::move(name), std::move(parent), mode, startInBackground, phonebook_stack_size)
     {
-        busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
+        bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         addActionReceiver(manager::actions::ShowContacts, [this](auto &&data) {
             switchWindow(gui::name::window::main_window, std::move(data));
-            return msgHandled();
+            return actionHandled();
         });
         addActionReceiver(manager::actions::AddContact, [this](auto &&data) {
             switchWindow(gui::window::name::new_contact, std::move(data));
-            return msgHandled();
+            return actionHandled();
         });
         addActionReceiver(manager::actions::EditContact, [this](auto &&data) {
             switchWindow(gui::window::name::new_contact, std::move(data));
-            return msgHandled();
+            return actionHandled();
         });
         addActionReceiver(manager::actions::ShowContactDetails, [this](auto &&data) {
             switchWindow(gui::window::name::contact, std::move(data));
-            return msgHandled();
+            return actionHandled();
         });
         addActionReceiver(manager::actions::ShowEmergencyContacts, [this](auto &&data) {
             switchWindow(gui::window::name::ice_contacts, std::move(data));
-            return msgHandled();
+            return actionHandled();
         });
     }
 
@@ -146,6 +148,9 @@ namespace app
         windowsFactory.attach(gui::window::name::new_contact, [](Application *app, const std::string &name) {
             return std::make_unique<gui::PhonebookNewContact>(app);
         });
+
+        attachPopups(
+            {gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes, gui::popup::ID::PhoneLock});
     }
 
     void ApplicationPhonebook::destroyUserInterface()
@@ -166,7 +171,7 @@ namespace app
 
             if (main_window->isSearchRequested()) {
                 searchModel->messagesSelectCallback = [=](gui::PhonebookItem *item) {
-                    std::unique_ptr<PhonebookSearchReuqest> data = std::make_unique<PhonebookSearchReuqest>();
+                    std::unique_ptr<PhonebookSearchRequest> data = std::make_unique<PhonebookSearchRequest>();
                     data->result                                 = item->contact;
                     data->setDescription("PhonebookSearchRequest");
                     return app::manager::Controller::switchBack(
@@ -185,9 +190,9 @@ namespace app
     bool ApplicationPhonebook::searchEmpty(const std::string &query)
     {
         gui::DialogMetadata meta;
-        meta.icon  = "search_big";
-        meta.text  = utils::localize.get("app_phonebook_search_no_results");
-        meta.title = utils::localize.get("common_results_prefix") + "\"" + query + "\"";
+        meta.icon                        = "search_big";
+        meta.text                        = utils::translate("app_phonebook_search_no_results");
+        meta.title                       = utils::translate("common_results_prefix") + "\"" + query + "\"";
         auto data                        = std::make_unique<gui::DialogMetadataMessage>(meta);
         data->ignoreCurrentWindowOnStack = true;
         LOG_DEBUG("Switching to app_phonebook_search_no_results window.");

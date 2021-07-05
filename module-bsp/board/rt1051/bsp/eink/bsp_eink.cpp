@@ -112,6 +112,11 @@ static bsp_eink_driver_t BSP_EINK_LPSPI_EdmaDriverState = {
     &BSP_EINK_LPSPI_EdmaHandle,
     nullptr, // will be filled in init function
     nullptr, // will be filled in init function
+    0,
+    0,
+    0,
+    SPI_AUTOMATIC_CS,
+    EventWaitRegistered,
 };
 
 static SemaphoreHandle_t bsp_eink_TransferComplete;
@@ -129,7 +134,6 @@ static void s_LPSPI_MasterEdmaCallback(LPSPI_Type *base,
 
     if (xQueueSendFromISR(bsp_eink_TransferComplete, &status, &xHigherPriorityTaskWoken) != pdPASS) {
         // if here sth really bad happened
-        // LOG_IRQ_ERROR("Could not give the Eink TX Completed semaphore");
         return;
     }
 
@@ -142,7 +146,7 @@ static void s_LPSPI_MasterEdmaCallback(LPSPI_Type *base,
 status_t BSP_EinkInit(bsp_eink_BusyEvent event)
 {
     bsp_eink_driver_t *lpspi           = &BSP_EINK_LPSPI_EdmaDriverState;
-    lpspi_edma_resource_t *dmaResource = lpspi->dmaResource;
+    // lpspi_edma_resource_t *dmaResource = lpspi->dmaResource;
 
     // If was already created - free it
     if (bsp_eink_busySemaphore != NULL) {
@@ -152,7 +156,6 @@ status_t BSP_EinkInit(bsp_eink_BusyEvent event)
     // Create new semaphore
     bsp_eink_busySemaphore = xSemaphoreCreateBinary();
     if (bsp_eink_busySemaphore == NULL) {
-        //        LOG_ERROR("Could not create the Eink BUSY semaphore");
         return kStatus_Fail;
     }
 
@@ -167,7 +170,6 @@ status_t BSP_EinkInit(bsp_eink_BusyEvent event)
     // Create new queue
     bsp_eink_TransferComplete = xQueueCreate(1, sizeof(uint32_t));
     if (bsp_eink_TransferComplete == NULL) {
-        //        LOG_ERROR("Could not create the single element queue for TX complete");
         vSemaphoreDelete(bsp_eink_busySemaphore);
         bsp_eink_busySemaphore = NULL;
         return kStatus_Fail;
@@ -264,7 +266,6 @@ status_t BSP_EinkChangeSpiFrequency(uint32_t frequencyHz)
 
 void BSP_EinkDeinit(void)
 {
-    //    LOG_WARN("Eink BSP DEINIT");
     LPSPI_Enable(BSP_EINK_LPSPI_BASE, false);
 
     if (bsp_eink_busySemaphore != NULL) {
@@ -297,7 +298,7 @@ status_t BSP_EinkWriteData(void *txBuffer, uint32_t len, eink_spi_cs_config_e cs
     const uint32_t TX_TIMEOUT_MS = 1000;
     status_t tx_status           = 0;
     status_t status;
-    lpspi_transfer_t xfer = {0};
+    lpspi_transfer_t xfer = {};
 
     if (cs == SPI_AUTOMATIC_CS) {
         BSP_EinkWriteCS(BSP_Eink_CS_Clr);
@@ -342,7 +343,6 @@ status_t BSP_EinkWriteData(void *txBuffer, uint32_t len, eink_spi_cs_config_e cs
             BSP_EINK_LPSPI_EdmaDriverState.resource->base, BSP_EINK_LPSPI_EdmaDriverState.handle, &xfer);
 
         if (status != kStatus_Success) {
-            //            LOG_ERROR("Eink SPI transfer failed with reason: %d",status);
             // in case of error just flush transfer complete queue
             xQueueReset(bsp_eink_TransferComplete);
 
@@ -355,7 +355,6 @@ status_t BSP_EinkWriteData(void *txBuffer, uint32_t len, eink_spi_cs_config_e cs
         else {
             if (xQueueReceive(bsp_eink_TransferComplete, &tx_status, pdMS_TO_TICKS(TX_TIMEOUT_MS)) != pdPASS) {
                 // sth really bad happened
-                //                LOG_ERROR("Timeout: The Eink SPI transfer did not complete in time");
                 if (cs == SPI_AUTOMATIC_CS) {
                     BSP_EinkWriteCS(BSP_Eink_CS_Set);
                 }
@@ -366,10 +365,6 @@ status_t BSP_EinkWriteData(void *txBuffer, uint32_t len, eink_spi_cs_config_e cs
 
         bytesSent += frameSize;
         len -= frameSize;
-    }
-
-    if (len > 0) {
-        //        LOG_ERROR("EINK: Some data not transfered: [%d] bytes", len);
     }
 
     if (cs == SPI_AUTOMATIC_CS) {
@@ -384,7 +379,7 @@ status_t BSP_EinkReadData(void *rxBuffer, uint32_t len, eink_spi_cs_config_e cs)
     const int RX_TIMEOUT_MS = 1000;
     status_t tx_status      = 0;
     status_t status;
-    lpspi_transfer_t xfer = {0};
+    lpspi_transfer_t xfer = {};
 
     xfer.txData      = NULL;
     xfer.rxData      = (uint8_t *)rxBuffer;
@@ -414,7 +409,6 @@ status_t BSP_EinkReadData(void *rxBuffer, uint32_t len, eink_spi_cs_config_e cs)
     status = LPSPI_MasterTransferEDMA(
         BSP_EINK_LPSPI_EdmaDriverState.resource->base, BSP_EINK_LPSPI_EdmaDriverState.handle, &xfer);
     if (status != kStatus_Success) {
-        //    	LOG_ERROR("eink transfer failed:%d",status);
         // in case of error just flush transfer complete queue
         uint32_t dummy = 0;
         xQueueReceive(bsp_eink_TransferComplete, &dummy, 0);
@@ -427,7 +421,6 @@ status_t BSP_EinkReadData(void *rxBuffer, uint32_t len, eink_spi_cs_config_e cs)
     else {
         if (xQueueReceive(bsp_eink_TransferComplete, &tx_status, pdMS_TO_TICKS(RX_TIMEOUT_MS)) != pdPASS) {
             // sth really bad happened
-            //            LOG_ERROR("Timeout: The Eink SPI read operation did not complete in time");
             if (cs == SPI_AUTOMATIC_CS) {
                 BSP_EinkWriteCS(BSP_Eink_CS_Set);
             }
@@ -478,7 +471,6 @@ void BSP_EinkWriteCS(bsp_eink_cs_ctrl_t ctrl)
         gpio->WritePin(static_cast<uint32_t>(BoardDefinitions::EINK_CS_PIN), 1);
     }
     else {
-        //		LOG_ERROR("Invalid control request");
         return;
     }
 }
@@ -493,16 +485,12 @@ BaseType_t BSP_EinkBusyPinStateChangeHandler(void)
 
         if (xSemaphoreGiveFromISR(bsp_eink_busySemaphore, &xHigherPriorityTaskWoken) != pdPASS) {
             // shouldn't get here!
-            // LOG_IRQ_ERROR("Could not clear the BUSY semaphore");
         }
 
         // call user defined "eink not busy" event
         if (BSP_EINK_LPSPI_EdmaDriverState.event) {
             BSP_EINK_LPSPI_EdmaDriverState.event();
         }
-    }
-    else {
-        // LOG_IRQ_INFO("Busy asserted without wait event registered");
     }
 
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping

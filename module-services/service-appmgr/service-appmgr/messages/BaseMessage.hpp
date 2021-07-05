@@ -1,12 +1,11 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include <Service/Message.hpp>
 #include <MessageType.hpp>
-
-#include <module-apps/Application.hpp>
+#include <apps-common/Application.hpp>
 
 namespace app::manager
 {
@@ -14,6 +13,8 @@ namespace app::manager
     {
       public:
         BaseMessage(MessageType type, ApplicationName sender);
+        explicit BaseMessage(ApplicationName sender);
+        BaseMessage() = default;
 
         [[nodiscard]] auto getSenderName() const noexcept -> const ApplicationName &;
 

@@ -1,19 +1,30 @@
-﻿project(module-bluetooth VERSION 1.0 DESCRIPTION "Bluetooth module library")
+﻿# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+# For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-include(${CMAKE_SOURCE_DIR}/config/ModuleConfig.cmake)
+project(module-bluetooth VERSION 1.0 DESCRIPTION "Bluetooth module library")
 
 set(CMAKE_CXX_STANDARD 17)
 
+module_is_test_entity()
+
 set(SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/audio/BluetoothAudioDevice.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/BluetoothWorker.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/BtstackWorker.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/WorkerController.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/CommandHandler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/glucode/BluetoothRunLoop.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/BluetoothDriverImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/BtKeysStorage.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/GAP/GAP.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/A2DP/A2DP.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/A2DP/AVRCP.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/A2DP/AVDTP.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/HSP/HSP.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/HSP/SCO.cpp
-    )
+    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/Profile.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/ProfileManager.cpp
+
+        )
 
 message("Build with BlueKitchen")
 include(lib/btstack.cmake)
@@ -57,13 +68,19 @@ target_include_directories(
 )
 
 target_link_libraries(${PROJECT_NAME}
-    service-evtmgr
+    ${BOARD_DIR_LIBRARIES}
+    module-audio
     module-bsp
-    service-bluetooth
+    module-sys
     module-utils
     module-vfs
-    module-sys
-    module-audio
     service-audio
-    ${BOARD_DIR_LIBRARIES}
-    )
+    service-bluetooth
+    service-evtmgr
+    sml::sml
+    json::json
+)
+
+if (${ENABLE_TESTS})
+    add_subdirectory(tests)
+endif()

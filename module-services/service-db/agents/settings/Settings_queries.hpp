@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <log/log.hpp>
+#include <log.hpp>
 
 namespace settings::Statements
 {
@@ -13,6 +13,11 @@ namespace settings::Statements
                          WHERE ST.path = '%q'
                          COLLATE NOCASE;
                          )sql";
+
+    constexpr auto getAllValues = R"sql(
+                                        SELECT path, value
+                                        FROM settings_tab;
+                                        )sql";
 
     constexpr auto checkPathExists = R"sql(
                         SELECT COUNT(value) AS PATH_EXISTS FROM  settings_tab AS ST
