@@ -1,9 +1,6 @@
 add_library(lwip-port STATIC)
 add_library(lwip::lwip ALIAS lwip-port)
 
-# remove -Werror for lwip
-string(REPLACE "-Wno-error=format" "" LWIP_COMPILER_FLAGS "${TARGET_COMPILE_OPTIONS}")
-
 set (LWIP_DIR ${CMAKE_SOURCE_DIR}/third-party/lwip/src)
 set (LWIP_CONTRIB_DIR ${CMAKE_SOURCE_DIR}/third-party/lwip/src/contrib)
 
@@ -19,8 +16,8 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
 set (LWIP_DEFINITIONS LWIP_DEBUG=1)
 endif()
 
-include(${CMAKE_CURRENT_SOURCE_DIR}/src/src/Filelists.cmake)
-include(${CMAKE_CURRENT_SOURCE_DIR}/src/contrib/Filelists.cmake)
+include(src/src/Filelists.cmake)
+include(src/contrib/Filelists.cmake)
 
 target_sources(lwip-port
     PRIVATE
@@ -49,13 +46,10 @@ target_include_directories(
 
 )
 
-set(LWIP_LIBRARIES lwipcontribapps lwipallapps lwipcore)
-
 target_link_libraries(
     lwip-port
-        module-bsp
-        module-utils
-        module-vfs
+    PRIVATE
         module-sys
-        ${LWIP_LIBRARIES}
+        lwipallapps
+        lwipcore
 )

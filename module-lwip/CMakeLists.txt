@@ -26,9 +26,10 @@ target_include_directories(
 
 target_link_libraries(
     module-lwip
-    module-bsp
-    module-utils
-    module-vfs
-    module-sys
-    lwip::lwip
+    PUBLIC
+        module-bsp
+        module-utils
+        module-vfs
+        module-sys
+        lwip::lwip
     )
