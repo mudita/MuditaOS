@@ -6,8 +6,6 @@ set(SOURCES
     TimeManager.cpp
     RTCcommand.cpp
     TimezoneHandler.cpp
-    timeEvents/TimeEvents.cpp
-    timeEvents/CalendarTimeEvents.cpp
     internal/StaticData.cpp
 )
 

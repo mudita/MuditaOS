@@ -2,7 +2,8 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-#include "module-db/Interface/EventsRecord.hpp"
+
+#include "dateCommon.hpp"
 #include <module-gui/gui/SwitchData.hpp>
 #include "application-calendar/widgets/CalendarStyle.hpp"
 
@@ -10,19 +11,6 @@ enum class EventAction
 {
     Add,
     Edit
-};
-
-class EventRecordData : public gui::SwitchData
-{
-  protected:
-    std::shared_ptr<EventsRecord> record;
-
-  public:
-    explicit EventRecordData(std::shared_ptr<EventsRecord> record) : record{std::move(record)} {};
-    std::shared_ptr<EventsRecord> getData()
-    {
-        return record;
-    };
 };
 
 class WeekDaysRepeatData : public gui::SwitchData

@@ -187,7 +187,6 @@ namespace parserFSM
     namespace endpoint_pageing
     {
         inline constexpr std::size_t contactsPageSize       = 10;
-        inline constexpr std::size_t calendarEventsPageSize = 10;
         inline constexpr std::size_t messagesPageSize       = 4;
     } // namespace endpoint_pageing
 
@@ -198,8 +197,6 @@ namespace parserFSM
         {
             switch (static_cast<EndpointType>(js[json::endpoint].int_value())) {
             // enable for pagination in other endpoints
-            case EndpointType::calendarEvents:
-                return std::make_unique<PagedContext>(js, endpoint_pageing::calendarEventsPageSize);
             // case EndpointType::calllog:
             case EndpointType::contacts:
                 return std::make_unique<PagedContext>(js, endpoint_pageing::contactsPageSize);

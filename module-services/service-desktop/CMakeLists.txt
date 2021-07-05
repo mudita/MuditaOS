@@ -29,8 +29,6 @@ set(SOURCES
     endpoints/filesystem/FilesystemEndpoint.cpp
     endpoints/filesystem/FileOperations.cpp
     endpoints/filesystem/FileContext.cpp
-    endpoints/calendarEvents/CalendarEventsHelper.cpp
-    endpoints/calendarEvents/CalendarEventsEndpoint.cpp
     endpoints/security/SecurityEndpoint.cpp
     endpoints/security/SecurityEndpointHelper.cpp
 

@@ -3,17 +3,9 @@
 
 #pragma once
 
-#include "windows/AppWindow.hpp"
-#include "Application.hpp"
-#include <gui/widgets/GridLayout.hpp>
-#include <gui/widgets/Item.hpp>
-#include <Text.hpp>
-#include <date/date.h>
-#include <map>
+#include <module-apps/application-calendar/data/dateCommon.hpp>
 #include <string>
 #include <vector>
-#include <module-apps/application-calendar/data/dateCommon.hpp>
-#include <module-db/Interface/EventsRecord.hpp>
 
 class YearMonth
 {
@@ -55,16 +47,10 @@ class MonthModel
   private:
     YearMonth yearMonth;
 
-    [[nodiscard]] date::year_month_day getYearMonthDayFromTimePoint(TimePoint timePoint) const;
-    [[nodiscard]] uint32_t getEventDurationInDays(const EventsRecord &records) const;
-    [[nodiscard]] uint32_t getDayIndex(TimePoint date) const;
-
   public:
     explicit MonthModel(date::year_month_day yearMonthDay);
     MonthModel()          = default;
     virtual ~MonthModel() = default;
-
-    void markEventsInDays(const std::vector<EventsRecord> &records, std::array<bool, 31> &isDayEmpty);
 
     date::year getYear();
     date::month getMonth();

@@ -23,7 +23,7 @@ namespace app::alarmClock
         bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
         bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(style::strings::common::save));
 
-        setTitle(utils::translate("app_calendar_custom_repeat_title"));
+        setTitle(utils::translate("app_alarm_clock_custom_repeat_title"));
         list = new gui::ListView(this,
                                  style::alarmClock::window::listView_x,
                                  style::alarmClock::window::listView_y,

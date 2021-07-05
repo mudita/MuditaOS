@@ -27,7 +27,6 @@ namespace db
             Calllog,
             CountryCodes,
             Notifications,
-            Events,
             Quotes,
         };
     };
@@ -54,8 +53,6 @@ constexpr const char *c_str(enum db::Interface::Name db)
         return "CountryCodes";
     case db::Interface::Name::Notifications:
         return "Notifications";
-    case db::Interface::Name::Events:
-        return "Events";
     case db::Interface::Name::Quotes:
         return "Quotes";
     };
