@@ -4,7 +4,6 @@
 #pragma once
 
 #include "Constants.hpp"
-#include "service-time/CalendarTimeEvents.hpp"
 #include "service-time/TimeManager.hpp"
 #include "service-time/ServiceTime.hpp"
 
@@ -14,8 +13,6 @@
 #include <Service/Common.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
-#include <module-db/queries/calendar/QueryEventsEdit.hpp>
-#include <module-db/queries/calendar/QueryEventsGet.hpp>
 
 #include <functional>
 #include <string> // for allocator, string
@@ -31,7 +28,6 @@ namespace stm
     {
       private:
         static constexpr auto StackDepth = 2048;
-        CalendarTimeEvents calendarEvents;
 
         std::unique_ptr<TimeManager> timeManager;
 

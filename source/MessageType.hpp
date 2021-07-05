@@ -136,11 +136,6 @@ enum class MessageType
     FotaProgress,
     FotaFinished,
 
-    // Time messages
-    TimersProcessingStart,
-    TimersProcessingStop,
-    ReloadTimers,
-
     StateChange,
     // antenna messages
     AntennaChanged,

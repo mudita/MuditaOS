@@ -35,7 +35,6 @@ namespace gui
 
         addMenu(i18("app_settings_apps_phone"), gui::window::name::phone);
         addMenu(i18("app_settings_apps_messages"), gui::window::name::messages);
-        addMenu(i18("app_settings_apps_calendar"), gui::window::name::calendar);
         addMenu(i18("app_settings_apps_alarm_clock"), gui::window::name::alarm_clock);
 
         return optionList;

@@ -40,7 +40,6 @@ target_sources(apps-common
         windows/AppWindow.cpp
         windows/BrightnessWindow.cpp
         windows/Dialog.cpp
-        windows/NoEvents.cpp
         windows/OptionWindow.cpp
 )
 
