@@ -6,6 +6,7 @@
 
 #include <application-desktop/data/DesktopStyle.hpp>
 #include <module-services/service-appmgr/service-appmgr/Controller.hpp>
+#include <time/time_conversion_factory.hpp>
 #include <service-time/ServiceTime.hpp>
 #include <service-time/TimeMessage.hpp>
 
@@ -71,8 +72,6 @@ namespace gui
         bottomBar->setActive(BottomBar::Side::RIGHT, false);
         bottomBar->setText(BottomBar::Side::CENTER, utils::translate("app_desktop_unlock"));
         bottomBar->setActive(BottomBar::Side::LEFT, false);
-
-        application->bus.sendUnicast(std::make_shared<TimersProcessingStopMessage>(), service::name::service_time);
     }
 
     bool PhoneLockedWindow::processLongReleaseEvent(const InputEvent &inputEvent)

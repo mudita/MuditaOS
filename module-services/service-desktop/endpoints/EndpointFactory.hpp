@@ -6,7 +6,6 @@
 #include "Endpoint.hpp"
 
 #include "Service/Service.hpp"
-#include "calendarEvents/CalendarEventsEndpoint.hpp"
 #include "backup/BackupEndpoint.hpp"
 #include "deviceInfo/DeviceInfoEndpoint.hpp"
 #include "update/UpdateEndpoint.hpp"
@@ -50,8 +49,6 @@ class EndpointFactory
             return std::make_unique<CalllogEndpoint>(ownerServicePtr);
         case parserFSM::EndpointType::developerMode:
             return std::make_unique<DeveloperModeEndpoint>(ownerServicePtr);
-        case parserFSM::EndpointType::calendarEvents:
-            return std::make_unique<CalendarEventsEndpoint>(ownerServicePtr);
         case parserFSM::EndpointType::bluetooth:
             return std::make_unique<BluetoothEndpoint>(ownerServicePtr);
         case parserFSM::EndpointType::usbSecurity:

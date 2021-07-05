@@ -21,11 +21,9 @@
 #include <Databases/CalllogDB.hpp>
 #include <Databases/ContactsDB.hpp>
 #include <Databases/CountryCodesDB.hpp>
-#include <Databases/EventsDB.hpp>
 #include <Databases/NotesDB.hpp>
 #include <Databases/NotificationsDB.hpp>
 #include <Databases/SmsDB.hpp>
-#include <EventsRecord.hpp>
 #include <MessageType.hpp>
 #include <NotesRecord.hpp>
 #include <NotificationsRecord.hpp>
@@ -59,7 +57,6 @@ ServiceDB::~ServiceDB()
     notesDB.reset();
     countryCodesDB.reset();
     notificationsDB.reset();
-    eventsDB.reset();
     quotesDB.reset();
 
     Database::deinitialize();
@@ -87,8 +84,6 @@ db::Interface *ServiceDB::getInterface(db::Interface::Name interface)
         return countryCodeRecordInterface.get();
     case db::Interface::Name::Notifications:
         return notificationsRecordInterface.get();
-    case db::Interface::Name::Events:
-        return eventsRecordInterface.get();
     case db::Interface::Name::Quotes:
         return quotesRecordInterface.get();
     }
@@ -251,7 +246,6 @@ sys::ReturnCodes ServiceDB::InitHandler()
     calllogDB       = std::make_unique<CalllogDB>((purefs::dir::getUserDiskPath() / "calllog.db").c_str());
     countryCodesDB  = std::make_unique<CountryCodesDB>("country-codes.db");
     notificationsDB = std::make_unique<NotificationsDB>((purefs::dir::getUserDiskPath() / "notifications.db").c_str());
-    eventsDB        = std::make_unique<EventsDB>((purefs::dir::getUserDiskPath() / "events.db").c_str());
     quotesDB        = std::make_unique<Database>((purefs::dir::getUserDiskPath() / "quotes.db").c_str());
 
     // Create record interfaces
@@ -265,7 +259,6 @@ sys::ReturnCodes ServiceDB::InitHandler()
     countryCodeRecordInterface   = std::make_unique<CountryCodeRecordInterface>(countryCodesDB.get());
     notificationsRecordInterface =
         std::make_unique<NotificationsRecordInterface>(notificationsDB.get(), contactRecordInterface.get());
-    eventsRecordInterface        = std::make_unique<EventsRecordInterface>(eventsDB.get());
     quotesRecordInterface        = std::make_unique<Quotes::QuotesAgent>(quotesDB.get());
 
     databaseAgents.emplace(std::make_unique<SettingsAgent>(this));
@@ -325,11 +318,6 @@ bool ServiceDB::StoreIntoBackup(const std::filesystem::path &backupPath)
 
     if (calllogDB->storeIntoFile(backupPath / std::filesystem::path(calllogDB->getName()).filename()) == false) {
         LOG_ERROR("calllogDB backup failed");
-        return false;
-    }
-
-    if (eventsDB->storeIntoFile(backupPath / std::filesystem::path(eventsDB->getName()).filename()) == false) {
-        LOG_ERROR("eventsDB backup failed");
         return false;
     }
 

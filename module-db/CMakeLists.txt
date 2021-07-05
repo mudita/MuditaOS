@@ -24,7 +24,6 @@ set(SOURCES
         Databases/CalllogDB.cpp
         Databases/CountryCodesDB.cpp
         Databases/NotificationsDB.cpp
-        Databases/EventsDB.cpp
 
         Tables/Table.cpp
         Tables/SMSTable.cpp
@@ -42,7 +41,6 @@ set(SOURCES
         Tables/CountryCodesTable.cpp
         Tables/SMSTemplateTable.cpp
         Tables/NotificationsTable.cpp
-        Tables/EventsTable.cpp
 
         Interface/Record.cpp
         Interface/SMSRecord.cpp
@@ -53,7 +51,6 @@ set(SOURCES
         Interface/CalllogRecord.cpp
         Interface/SMSTemplateRecord.cpp
         Interface/NotificationsRecord.cpp
-        Interface/EventsRecord.cpp
 
         queries/RecordQuery.cpp
         queries/messages/sms/QuerySMSSearchByType.cpp
@@ -105,17 +102,6 @@ set(SOURCES
         queries/phonebook/QueryContactUpdate.cpp
         queries/phonebook/QueryContactRemove.cpp
         queries/phonebook/QueryNumberGetByID.cpp
-        queries/calendar/QueryEventsRemoveICS.cpp
-        queries/calendar/QueryEventsRemove.cpp
-        queries/calendar/QueryEventsGet.cpp
-        queries/calendar/QueryEventsGetAll.cpp
-        queries/calendar/QueryEventsAdd.cpp
-        queries/calendar/QueryEventsEditICS.cpp
-        queries/calendar/QueryEventsEdit.cpp
-        queries/calendar/QueryEventsGetFiltered.cpp
-        queries/calendar/QueryEventsGetFilteredByDay.cpp
-        queries/calendar/QueryEventsGetAllLimited.cpp
-        queries/calendar/QueryEventsSelectFirstUpcoming.cpp
         queries/alarms/QueryAlarmsAdd.cpp
         queries/alarms/QueryAlarmsRemove.cpp
         queries/alarms/QueryAlarmsEdit.cpp

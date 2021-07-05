@@ -25,7 +25,6 @@ namespace parserFSM
         contacts,
         messages,
         calllog,
-        calendarEvents,
         developerMode,
         bluetooth,
         usbSecurity

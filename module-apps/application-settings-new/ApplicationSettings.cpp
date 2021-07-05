@@ -20,7 +20,6 @@
 #include <application-settings-new/windows/NetworkWindow.hpp>
 #include <application-settings-new/windows/PhoneWindow.hpp>
 #include <application-settings-new/windows/MessagesWindow.hpp>
-#include <application-settings-new/windows/CalendarWindow.hpp>
 #include <application-settings-new/windows/AlarmClockWindow.hpp>
 #include <application-settings-new/windows/SoundSelectWindow.hpp>
 #include <application-settings-new/windows/PhoneNameWindow.hpp>
@@ -388,11 +387,6 @@ namespace app
             auto audioModel = std::make_unique<audio_settings::AudioSettingsModel>(
                 app, audio_settings::PlaybackType::TextMessageRingtone);
             return std::make_unique<gui::MessagesWindow>(app, std::move(audioModel));
-        });
-        windowsFactory.attach(gui::window::name::calendar, [](Application *app, const std::string &name) {
-            auto audioModel =
-                std::make_unique<audio_settings::AudioSettingsModel>(app, audio_settings::PlaybackType::Notifications);
-            return std::make_unique<gui::CalendarWindow>(app, std::move(audioModel));
         });
         windowsFactory.attach(gui::window::name::alarm_clock, [](Application *app, const std::string &name) {
             auto audioModel =

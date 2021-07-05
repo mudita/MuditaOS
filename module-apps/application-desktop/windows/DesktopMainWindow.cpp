@@ -115,8 +115,6 @@ namespace gui
             application->switchWindow(app::window::name::desktop_post_update_window, std::move(data));
             getAppDesktop()->setOsUpdateVersion(updateos::initSysVer);
         }
-
-        application->bus.sendUnicast(std::make_shared<TimersProcessingStartMessage>(), service::name::service_time);
     }
 
     void DesktopMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
