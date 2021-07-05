@@ -148,7 +148,7 @@
   "app_calendar_event_error_empty_name": "Nazwa wydarzenia nie może być pusta",
   "app_calculator_title_main": "Kalkulator",
   "app_calculator_equals": "RÓWNA SIĘ",
-  "app_calculator_decimal_separator": ".",
+  "app_calculator_decimal_separator": ",",
   "app_calculator_error": "Błąd",
   "app_options_invalid_option": " <Nieprawidłowa opcja> ",
   "app_options_contact_details": "Szczegóły kontaktu",
