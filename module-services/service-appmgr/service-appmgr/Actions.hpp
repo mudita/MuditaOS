@@ -44,7 +44,6 @@ namespace app::manager
             ShowContactDetails,
             ShowSpecialInput,
             ShowAlarm,
-            ShowReminder,
             ShowMMIResult,
             ShowMMIResponse,
             ShowMMIPush,

@@ -17,7 +17,6 @@
 #include <Interface/CalllogRecord.hpp>
 #include <Interface/ContactRecord.hpp>
 #include <Interface/CountryCodeRecord.hpp>
-#include <Interface/EventsRecord.hpp>
 #include <Interface/NotesRecord.hpp>
 #include <Interface/SMSRecord.hpp>
 #include <Interface/SMSTemplateRecord.hpp>
@@ -39,8 +38,6 @@ class ContactsDB;
 class CountryCodeRecordInterface;
 class CountryCodesDB;
 class DatabaseAgent;
-class EventsDB;
-class EventsRecordInterface;
 class NotesDB;
 class NotesRecordInterface;
 class NotificationsDB;
@@ -65,7 +62,6 @@ class ServiceDB : public sys::Service
     std::unique_ptr<CalllogDB> calllogDB;
     std::unique_ptr<CountryCodesDB> countryCodesDB;
     std::unique_ptr<NotificationsDB> notificationsDB;
-    std::unique_ptr<EventsDB> eventsDB;
     std::unique_ptr<Database> quotesDB;
 
     std::unique_ptr<SMSRecordInterface> smsRecordInterface;
@@ -77,7 +73,6 @@ class ServiceDB : public sys::Service
     std::unique_ptr<CalllogRecordInterface> calllogRecordInterface;
     std::unique_ptr<CountryCodeRecordInterface> countryCodeRecordInterface;
     std::unique_ptr<NotificationsRecordInterface> notificationsRecordInterface;
-    std::unique_ptr<EventsRecordInterface> eventsRecordInterface;
     std::unique_ptr<Quotes::QuotesAgent> quotesRecordInterface;
 
   protected:

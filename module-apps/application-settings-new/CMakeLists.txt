@@ -53,7 +53,6 @@ target_sources( ${PROJECT_NAME}
         windows/OptionsWidgetMaker.cpp
         windows/PhoneWindow.cpp
         windows/MessagesWindow.cpp
-        windows/CalendarWindow.cpp
         windows/AlarmClockWindow.cpp
         windows/SoundSelectWindow.cpp
         windows/PhoneNameWindow.cpp

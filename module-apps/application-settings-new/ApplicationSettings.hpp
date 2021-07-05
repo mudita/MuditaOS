@@ -34,7 +34,6 @@ namespace gui::window::name
     inline constexpr auto phone             = "Phone";
     inline constexpr auto messages          = "Messages";
     inline constexpr auto message_templates = "MessageTemplates";
-    inline constexpr auto calendar          = "Calendar";
     inline constexpr auto alarm_clock       = "AlarmClock";
     inline constexpr auto sound_select      = "SoundSelect";
     inline constexpr auto torch             = "Torch";

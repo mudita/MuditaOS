@@ -15,27 +15,6 @@ class TimeMessage : public sys::DataMessage
     virtual ~TimeMessage() = default;
 };
 
-class TimersProcessingStartMessage : public TimeMessage
-{
-  public:
-    TimersProcessingStartMessage() : TimeMessage(MessageType::TimersProcessingStart)
-    {}
-};
-
-class TimersProcessingStopMessage : public TimeMessage
-{
-  public:
-    TimersProcessingStopMessage() : TimeMessage(MessageType::TimersProcessingStop)
-    {}
-};
-
-class ReloadTimersMessage : public TimeMessage
-{
-  public:
-    ReloadTimersMessage() : TimeMessage(MessageType::ReloadTimers)
-    {}
-};
-
 class TimeResponseMessage : public sys::ResponseMessage
 {
   public:
