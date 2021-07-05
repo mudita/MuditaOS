@@ -158,7 +158,7 @@ namespace bluetooth
     Error::Code CommandHandler::unpair(uint8_t *addr)
     {
         LOG_INFO("Unpairing...");
-
+        profileManager->disconnect();
         return driver->unpair(addr) ? Error::Success : Error::LibraryError;
     }
 
