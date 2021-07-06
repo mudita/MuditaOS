@@ -100,8 +100,8 @@ namespace gui
                           devices.end());
             bottomBar->setActive(BottomBar::Side::LEFT, false);
             bottomBar->setActive(BottomBar::Side::CENTER, false);
-            refreshOptionsList();
             bluetoothSettingsModel->requestDeviceUnpair(addressOfDeviceSelected);
+            refreshOptionsList();
             return true;
         }
         return AppWindow::onInput(inputEvent);
