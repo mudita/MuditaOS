@@ -13,7 +13,7 @@
 #include "gui/widgets/BottomBar.hpp"
 #include "gui/widgets/ListView.hpp"
 
-#include "../CalllogModel.hpp"
+#include "CalllogModel.hpp"
 
 namespace gui
 {

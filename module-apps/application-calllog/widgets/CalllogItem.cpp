@@ -2,9 +2,9 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CalllogItem.hpp"
+#include "data/CallLogInternals.hpp"
 #include <time/time_conversion_factory.hpp>
-#include "../data/CallLogInternals.hpp"
-#include "gui/widgets/BoxLayout.hpp"
+#include <gui/widgets/BoxLayout.hpp>
 
 #include <Style.hpp>
 
