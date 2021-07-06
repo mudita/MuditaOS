@@ -73,23 +73,23 @@ namespace purefs::subsystem
             struct stat stbuf;
             int err = vfsn->stat(file, stbuf);
             if (err) {
-                LOG_ERROR("Unable to lock vfs fallback to current dir");
+                LOG_ERROR("Unable to lock vfs. Fallback to current dir");
                 return "current"s;
             }
             if (stbuf.st_size > boot_size_limit) {
-                LOG_ERROR("Boot file to long fallback to current dir");
+                LOG_ERROR("Boot file to long. Fallback to current dir");
                 return "current"s;
             }
             std::string json_str(stbuf.st_size, ' ');
             std::string error;
             err = read_file_to_cpp_string(vfsn, file, json_str);
             if (err) {
-                LOG_ERROR("Unable to read boot file fallback to current dir err %i", err);
+                LOG_ERROR("Unable to read boot file (err: %i). Fallback to current dir", err);
                 return "current"s;
             }
             auto json = json11::Json::parse(json_str, error);
             if (!error.empty()) {
-                LOG_ERROR("Unable to parse json boot file fallback to current dir error %s", error.c_str());
+                LOG_ERROR("Unable to parse json boot file (err: %s). Fallback to current dir", error.c_str());
                 return "current"s;
             }
             return json[json::main][json::os_type].string_value();

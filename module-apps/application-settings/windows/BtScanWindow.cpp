@@ -70,7 +70,7 @@ namespace gui
 
         for (auto device : devices) {
             add_box_label2(box, device.name, [=](Item &) {
-                LOG_DEBUG("Device: %s", device.name.c_str());
+                LOG_DEBUG("Device added to list");
 
                 std::shared_ptr<BluetoothAddrMessage> msg =
                     std::make_shared<BluetoothAddrMessage>(bd_addr_to_str(device.address));

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <log.hpp>
@@ -14,7 +14,7 @@ namespace service::detail
     {
         auto file = std::fopen(std::string(path).c_str(), "r");
         if (!file) {
-            LOG_INFO("Unable to open file [%s]. Ignore...", std::string(path).c_str());
+            LOG_INFO("Unable to open requested file. Ignore...");
             return;
         }
         if (!std::feof(file)) {

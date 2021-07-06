@@ -69,7 +69,6 @@ namespace purefs::fs::drivers::littlefs::internal
             }
             int read(const struct lfs_config *lfsc, lfs_block_t block, lfs_off_t off, void *buffer, lfs_size_t size)
             {
-                // LOG_DEBUG("lfs_read_req(block=%u off=%u size=%u", unsigned(block), unsigned(off), unsigned(size));
                 auto ctx = reinterpret_cast<io_context *>(lfsc->context);
                 if (!ctx) {
                     return LFS_ERR_IO;

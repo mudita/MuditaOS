@@ -59,7 +59,7 @@ auto DeveloperModeHelper::processPut(Context &context) -> ProcessResult
         using namespace sdesktop::developerMode;
         auto cmd     = body[json::developerMode::AT].string_value();
         auto timeout = std::chrono::milliseconds(body[json::developerMode::timeout].int_value());
-        LOG_DEBUG("at request send >%s\n< with timeout >%d<", cmd.c_str(), int(timeout.count()));
+        LOG_DEBUG("at request sent with timeout >%d<", int(timeout.count()));
         auto event = std::make_unique<ATResponseEvent>(cmd, timeout);
         auto msg   = std::make_shared<DeveloperModeRequest>(std::move(event));
         code       = toCode(owner->bus.sendUnicast(msg, ServiceCellular::serviceName));
@@ -252,7 +252,6 @@ bool DeveloperModeHelper::sendKeypress(bsp::KeyCodes keyCode, gui::InputEvent::S
     RawKey key{.state = RawKey::State::Released, .key_code = keyCode};
 
     gui::InputEvent event(key, state, static_cast<gui::KeyCode>(keyCode));
-    LOG_INFO("Sending %s", event.str().c_str());
     auto message = std::make_shared<app::AppInputEventMessage>(event);
 
     return owner->bus.sendUnicast(std::move(message), service::name::evt_manager);
