@@ -50,6 +50,7 @@ target_link_libraries(PurePhone
     PRIVATE
         application-antenna
         application-calculator
+        application-calllog
         application-call
         application-desktop
         application-meditation
