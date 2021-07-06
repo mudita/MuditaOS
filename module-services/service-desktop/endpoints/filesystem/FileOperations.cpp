@@ -19,7 +19,7 @@ auto FileOperations::createReceiveIDForFile(const std::filesystem::path &file) -
     const auto size = std::filesystem::file_size(file);
 
     if (!size) {
-        LOG_ERROR("File %s is empty", file.c_str());
+        LOG_ERROR("File is empty");
         return std::make_pair(0, 0);
     }
 
@@ -29,7 +29,7 @@ auto FileOperations::createReceiveIDForFile(const std::filesystem::path &file) -
         createFileContextFor(file, size, rxID);
     }
     catch (std::exception &e) {
-        LOG_ERROR("FileOperations::createFileContextFor() exception: %s", e.what());
+        LOG_ERROR("FileOperations::createFileContextFor() exception");
         return std::make_pair(0, 0);
     }
 

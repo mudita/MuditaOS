@@ -41,19 +41,19 @@ auto FilesystemEndpoint::startGetFile(Context &context) const -> sys::ReturnCode
     std::filesystem::path filePath = context.getBody()[parserFSM::json::fileName].string_value();
 
     if (!std::filesystem::exists(filePath)) {
-        LOG_ERROR("file not found: %s", filePath.c_str());
+        LOG_ERROR("file not found");
 
         context.setResponseStatus(parserFSM::http::Code::NotFound);
         context.setResponseBody(json11::Json::object({{json::reason, json::filesystem::reasons::fileDoesNotExist}}));
         return sys::ReturnCodes::Failure;
     }
 
-    LOG_DEBUG("Checking file: %s", filePath.c_str());
+    LOG_DEBUG("Checking file");
 
     auto [rxID, fileSize] = fileOps.createReceiveIDForFile(filePath);
 
     if (!fileSize) {
-        LOG_ERROR("File %s corrupted", filePath.c_str());
+        LOG_ERROR("File is corrupted");
 
         context.setResponseStatus(parserFSM::http::Code::InternalServerError);
         context.setResponseBody(json11::Json::object({{json::reason, json::filesystem::reasons::fileDoesNotExist}}));
@@ -132,10 +132,10 @@ auto FilesystemEndpoint::runPost(Context &context) -> sys::ReturnCodes
         const uint32_t fileSize = context.getBody()[parserFSM::json::fileSize].int_value();
         const auto fileCrc32    = context.getBody()[parserFSM::json::fileCrc32].string_value();
 
-        LOG_DEBUG("got owner, file %s", tmpFilePath.c_str());
+        LOG_DEBUG("got owner for tmp file");
 
         if (isWritable(tmpFilePath)) {
-            LOG_INFO("download %" PRIu32 " bytes to: %s", fileSize, tmpFilePath.c_str());
+            LOG_INFO("download %" PRIu32 " bytes to tmp file", fileSize);
 
             if (owner->desktopWorker->startDownload(tmpFilePath, fileSize, fileCrc32) == sys::ReturnCodes::Success) {
                 context.setResponseStatus(parserFSM::http::Code::Accepted);
@@ -143,18 +143,18 @@ auto FilesystemEndpoint::runPost(Context &context) -> sys::ReturnCodes
             }
         }
         else {
-            LOG_ERROR("download command failed, can't write %" PRIu32 " bytes to: %s", fileSize, tmpFilePath.c_str());
+            LOG_ERROR("download command failed, can't write %" PRIu32 " bytes to tmp file", fileSize);
         }
     }
     else if (cmd == parserFSM::json::filesystem::commands::checkFile) {
         fs::path filePath = context.getBody()[parserFSM::json::fileName].string_value();
-        LOG_DEBUG("Checking file: %s", filePath.c_str());
+        LOG_DEBUG("Checking file");
 
         context.setResponseBody(json11::Json::object{{json::fileExists, std::filesystem::exists(filePath)}});
         returnCode = sys::ReturnCodes::Success;
     }
     else {
-        LOG_ERROR("unknown command: %s", cmd.c_str());
+        LOG_ERROR("unknown command");
     }
 
     MessageHandler::putToSendQueue(context.createSimpleResponse());
