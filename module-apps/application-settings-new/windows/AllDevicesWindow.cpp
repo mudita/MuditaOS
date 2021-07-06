@@ -27,6 +27,19 @@ namespace gui
     void AllDevicesWindow::buildInterface()
     {
         setTitle(utils::translate("app_settings_bluetooth_all_devices"));
+
+        optionsList = new gui::ListView(this,
+                                        option::window::optionsListX,
+                                        option::window::optionsListY,
+                                        option::window::optionsListW,
+                                        option::window::optionsListH,
+                                        optionsModel,
+                                        listview::ScrollBarType::Proportional);
+
+        optionsList->prepareRebuildCallback = [this]() { recreateOptions(); };
+        optionsModel->createData(options);
+        setFocusItem(optionsList);
+
         header->navigationIndicatorAdd(new gui::header::AddElementAction(), gui::header::BoxSelection::Left);
     }
 
