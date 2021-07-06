@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "../ApplicationCallLog.hpp"
+#include "ApplicationCallLog.hpp"
 #include "Interface/CalllogRecord.hpp"
 #include "OptionWindow.hpp"
 

@@ -2,9 +2,9 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CallLogMainWindow.hpp"
-#include "application-calllog/data/CallLogInternals.hpp"
-#include "application-calllog/ApplicationCallLog.hpp"
-#include "application-calllog/widgets/CalllogItem.hpp"
+#include "data/CallLogInternals.hpp"
+#include "ApplicationCallLog.hpp"
+#include "widgets/CalllogItem.hpp"
 
 #include <service-appmgr/model/ApplicationManager.hpp>
 #include <service-db/DBCalllogMessage.hpp>
