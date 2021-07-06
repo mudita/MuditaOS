@@ -77,6 +77,13 @@ TEST(Stream, Init)
     EXPECT_EQ(s.getUsedBlockCount(), 0);
 }
 
+TEST(Stream, DefaultBuffering)
+{
+    StandardStreamAllocator allocator;
+    Stream stream(format, allocator, defaultBlockSize);
+    EXPECT_EQ(stream.getBlockCount(), defaultBuffering);
+}
+
 TEST(Stream, EmptyFull)
 {
     StandardStreamAllocator a;
@@ -487,7 +494,7 @@ TEST(Factory, TimeConstraints)
 
     auto stream = factory.makeStream(mockSource, mockSink, ::audio::AudioFormat(44100, 16, 2));
 
-    EXPECT_EQ(stream->getBlockCount(), 8);
+    EXPECT_EQ(stream->getBlockCount(), 16);
     EXPECT_EQ(stream->getOutputTraits().blockSize, 512);
 }
 
@@ -502,7 +509,7 @@ TEST(Factory, TimeBlockConstraints)
 
     auto stream = factory.makeStream(mockSource, mockSink, ::audio::AudioFormat(8000, 16, 1));
 
-    EXPECT_EQ(stream->getBlockCount(), 2);
+    EXPECT_EQ(stream->getBlockCount(), defaultBuffering);
     EXPECT_EQ(stream->getOutputTraits().blockSize, 60);
 }
 
@@ -517,7 +524,7 @@ TEST(Factory, NoConstraints)
 
     auto stream = factory.makeStream(mockSource, mockSink, ::audio::AudioFormat(16000, 16, 1));
 
-    EXPECT_EQ(stream->getBlockCount(), 2);
+    EXPECT_EQ(stream->getBlockCount(), defaultBuffering);
     EXPECT_EQ(stream->getOutputTraits().blockSize, 64);
 }
 
@@ -533,7 +540,7 @@ TEST(Factory, TranscodingStreamSinkTraits)
 
     auto stream = factory.makeStream(mockSource, mockSink, format);
 
-    EXPECT_EQ(stream->getBlockCount(), 2);
+    EXPECT_EQ(stream->getBlockCount(), defaultBuffering);
     EXPECT_EQ(stream->getOutputTraits().blockSize, 60);
 
     auto decimatorTransform = std::make_shared<::audio::transcode::BasicDecimator<std::uint16_t, 1, 2>>();
@@ -556,7 +563,7 @@ TEST(Factory, TranscodingStreamSourceTraits)
 
     auto stream = factory.makeStream(mockSource, mockSink, format);
 
-    EXPECT_EQ(stream->getBlockCount(), 2);
+    EXPECT_EQ(stream->getBlockCount(), defaultBuffering);
     EXPECT_EQ(stream->getOutputTraits().blockSize, 60);
 
     auto decimatorTransform = std::make_shared<::audio::transcode::BasicDecimator<std::uint16_t, 1, 2>>();
