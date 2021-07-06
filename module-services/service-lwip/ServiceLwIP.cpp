@@ -102,7 +102,7 @@ sys::MessagePointer ServiceLwIP::DataReceivedHandler(sys::DataMessage *msg, sys:
         }
     }
     catch (std::exception &ex) {
-        LOG_ERROR("Exception on BtService!: %s", ex.what());
+        LOG_ERROR("Exception on ServiceLwIP!: %s", ex.what());
     }
     return std::make_shared<sys::ResponseMessage>();
 }

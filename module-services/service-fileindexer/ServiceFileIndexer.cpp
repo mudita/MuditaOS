@@ -51,7 +51,7 @@ namespace service
                     onTextContentChanged(fcm->newPath());
                     break;
                 default:
-                    LOG_INFO("Skip indexing file %s", fcm->newPath().c_str());
+                    LOG_INFO("Skip indexing file");
                     break;
                 }
             } break;
@@ -109,17 +109,17 @@ namespace service
     // When file is changed update db only
     auto ServiceFileIndexer::onDeleteFile(std::string_view path) -> void
     {
-        LOG_DEBUG("File deleted %s", std::string(path).c_str());
+        LOG_DEBUG("File deleted");
     }
     // When file is renamed
     auto ServiceFileIndexer::onRenameFile(std::string_view oldPath, std::string_view newPath) -> void
     {
-        LOG_DEBUG("File renamed old: %s, new: %s", std::string(oldPath).c_str(), std::string(newPath).c_str());
+        LOG_DEBUG("File renamed");
     }
     // On audio file content change
     auto ServiceFileIndexer::onAudioContentChanged(std::string_view path) -> void
     {
-        LOG_DEBUG("Audio content index %s", std::string(path).c_str());
+        LOG_DEBUG("Audio content index...");
         TagLib::FileRef fref(std::string(path).c_str());
         if (!fref.isNull() && fref.tag()) {
             const auto tag = fref.tag();
@@ -144,7 +144,7 @@ namespace service
     // On text file content change
     auto ServiceFileIndexer::onTextContentChanged(std::string_view path) -> void
     {
-        LOG_DEBUG("Text content index %s", std::string(path).c_str());
+        LOG_DEBUG("Text content index...");
         detail::notesIndexer noteInfo(path);
         LOG_DEBUG("Words %zu Lines %zu Chars %zu Size %zu",
                   noteInfo.getWords(),

@@ -615,8 +615,7 @@ updateos::UpdateError UpdateMuditaOS::prepareTempDirForUpdate(const std::filesys
     if (!std::filesystem::is_directory(temporaryPath)) {
         informDebug("prepareTempDirForUpdate %s is not a directory", temporaryPath.c_str());
         if (!std::filesystem::create_directory(temporaryPath.c_str())) {
-            return informError(
-                updateos::UpdateError::CantCreateTempDir, "%s can't create it %s", temporaryPath.c_str());
+            return informError(updateos::UpdateError::CantCreateTempDir, "can't create %s", temporaryPath.c_str());
         }
         else {
             informDebug("prepareTempDirForUpdate %s created", temporaryPath.c_str());

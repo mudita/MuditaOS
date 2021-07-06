@@ -51,7 +51,7 @@ auto FileContext::getDataForFile() -> std::vector<std::uint8_t>
     std::unique_ptr<std::FILE, decltype(fileCloser)> file(std::fopen(path.c_str(), "rb"), fileCloser);
 
     if (!file) {
-        LOG_ERROR("File %s open error", path.c_str());
+        LOG_ERROR("File open error");
         return {};
     }
 
@@ -66,14 +66,14 @@ auto FileContext::getDataForFile() -> std::vector<std::uint8_t>
     LOG_DEBUG("Read %u bytes", static_cast<unsigned int>(dataRead));
 
     if (dataRead != dataLeft) {
-        LOG_ERROR("File %s read error", path.c_str());
+        LOG_ERROR("File read error");
         return {};
     }
 
     advanceFileOffset(buffer.size());
 
     if (reachedEOF()) {
-        LOG_INFO("Reached EOF of %s", path.c_str());
+        LOG_INFO("Reached EOF");
     }
 
     return buffer;

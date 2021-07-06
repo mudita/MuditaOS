@@ -109,7 +109,7 @@ auto ContactHelper::requestDataFromDB(Context &context) -> sys::ReturnCodes
         DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::Contact, std::move(query));
     }
     catch (const std::exception &e) {
-        LOG_ERROR("%s", e.what());
+        LOG_ERROR("exception while requesting data from DB");
         return sys::ReturnCodes::Failure;
     }
 
