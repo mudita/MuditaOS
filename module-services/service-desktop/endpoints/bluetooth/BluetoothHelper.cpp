@@ -82,7 +82,7 @@ auto parserFSM::BluetoothHelper::processPostRequest(Context &context) -> sys::Re
         msg = std::make_unique<::message::bluetooth::Connect>(std::move(address));
     }
     else if (auto address = body[json::bluetooth::pair].string_value(); !address.empty()) {
-        LOG_INFO("Requesting pairing with %s form harness", address.c_str());
+        LOG_INFO("Requesting pairing form harness");
         msg = std::make_unique<BluetoothPairMessage>(std::move(address));
     }
 
@@ -101,7 +101,7 @@ auto parserFSM::BluetoothHelper::processDeleteRequest(Context &context) -> sys::
         }
     }
     else if (auto address = body[json::bluetooth::unpair].string_value(); !address.empty()) {
-        LOG_INFO("Requesting pairing with %s form harness", address.c_str());
+        LOG_INFO("Requesting pairing form harness");
         msg = std::make_unique<::message::bluetooth::Unpair>(std::move(address));
     }
     sendRequest(context, std::move(msg));

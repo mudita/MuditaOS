@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Fota.hpp"
@@ -247,7 +247,7 @@ void Fota::handleHTTPResponse()
     app->connect(FotaService::HTTPResponseMessage(), [&](sys::Message *req) {
         if (auto msg = dynamic_cast<FotaService::HTTPResponseMessage *>(req)) {
             LOG_DEBUG("HTTP Response to: %s", msg->url.c_str());
-            LOG_DEBUG("HTPP AT Error   : %s", FotaService::toString(msg->httpError).c_str());
+            LOG_DEBUG("HTTP AT Error   : %s", FotaService::toString(msg->httpError).c_str());
             LOG_DEBUG(
                 "response headers:\n\t%s",
                 std::accumulate(msg->responseHeaders.begin(), msg->responseHeaders.end(), std::string("\n\t")).c_str());

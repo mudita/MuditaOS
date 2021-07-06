@@ -44,7 +44,7 @@ namespace service::detail
                     if (fs::path(path).extension() == ext.first) {
                         _this->mMsgs.emplace_back(std::make_shared<msg::FileChangeMessage>(
                             path, msg::FileChangeMessage::evt_t::modified, ""s));
-                        LOG_DEBUG("Initial indexing file added %s", path);
+                        LOG_DEBUG("Initial indexing file added");
                     }
                 }
             }

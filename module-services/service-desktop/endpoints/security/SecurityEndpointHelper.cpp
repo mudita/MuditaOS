@@ -78,7 +78,7 @@ auto SecurityEndpointHelper::processConfiguration(Context &context) -> http::Cod
                          : http::Code::InternalServerError;
         }
         catch (const std::exception &e) {
-            LOG_ERROR("Passcode decoding exception: %s", e.what());
+            LOG_ERROR("Passcode decoding exception");
         }
     }
 

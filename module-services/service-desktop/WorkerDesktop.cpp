@@ -224,10 +224,8 @@ void WorkerDesktop::stopTransfer(const TransferFailAction action)
         responseStatus = parserFSM::http::Code::NotAcceptable;
         removeFile     = true;
 
-        LOG_ERROR("File %s transfer CRC32 mismatch, expected: %s, actual: %s",
-                  filePath.c_str(),
-                  expectedFileCrc32.c_str(),
-                  fileCrc32.c_str());
+        LOG_ERROR(
+            "File transfer CRC32 mismatch, expected: %s, actual: %s", expectedFileCrc32.c_str(), fileCrc32.c_str());
     }
 
     parserFSM::Context responseContext;
@@ -251,12 +249,12 @@ void WorkerDesktop::stopTransfer(const TransferFailAction action)
     if (removeFile) {
         try {
             if (!std::filesystem::remove(filePath)) {
-                LOG_ERROR("stopTransfer can't delete  %s", filePath.c_str());
+                LOG_ERROR("can't delete file");
             }
-            LOG_DEBUG("Deleted file(requested) %s", filePath.c_str());
+            LOG_DEBUG("Deleted file");
         }
         catch (const std::filesystem::filesystem_error &fsError) {
-            LOG_ERROR("remove on %s, error %s", filePath.c_str(), fsError.what());
+            LOG_ERROR("Removing file failed");
         }
     }
 
