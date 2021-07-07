@@ -97,7 +97,7 @@ namespace sys
         : Service(service::name::system_manager, "", systemManagerStack), systemServiceCreators{std::move(creators)}
     {
         // Specify list of channels which System Manager is registered to
-        bus.channels = {BusChannel::SystemManagerRequests};
+        bus.channels            = {BusChannel::SystemManagerRequests};
         lowBatteryShutdownDelay = sys::TimerFactory::createPeriodicTimer(
             this, "lowBatteryShutdownDelay", lowBatteryShutdownDelayTime, [this](sys::Timer &) {
                 CloseSystemHandler(CloseReason::LowBattery);
@@ -154,6 +154,10 @@ namespace sys
         case State::ShutdownReady:
             LOG_INFO("  ---> SHUTDOWN <--- ");
             powerManager->PowerOff();
+            break;
+        case State::RebootToUpdate:
+            LOG_INFO("  ---> REBOOT TO UPDATER <--- ");
+            powerManager->RebootToUpdate();
             break;
         default:
             LOG_FATAL("State changed after reset/shutdown was requested to: %s! this is terrible failure!",
@@ -268,6 +272,12 @@ namespace sys
     bool SystemManager::Reboot(Service *s)
     {
         s->bus.sendUnicast(std::make_shared<SystemManagerCmd>(Code::Reboot), service::name::system_manager);
+        return true;
+    }
+
+    bool SystemManager::RebootToUpdate(Service *s)
+    {
+        s->bus.sendUnicast(std::make_shared<SystemManagerCmd>(Code::RebootToUpdate), service::name::system_manager);
         return true;
     }
 
@@ -501,7 +511,10 @@ namespace sys
                     RestoreSystemHandler();
                     break;
                 case Code::Reboot:
-                    RebootHandler();
+                    RebootHandler(State::Reboot);
+                    break;
+                case Code::RebootToUpdate:
+                    RebootHandler(State::RebootToUpdate);
                     break;
                 case Code::None:
                     break;
@@ -711,10 +724,10 @@ namespace sys
         DestroyServices(sys::state::update::whitelist);
     }
 
-    void SystemManager::RebootHandler()
+    void SystemManager::RebootHandler(State state)
     {
         CloseSystemHandler(CloseReason::Reboot);
-        set(State::Reboot);
+        set(state);
     }
 
     void SystemManager::CpuStatisticsTimerHandler()

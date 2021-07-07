@@ -15,7 +15,7 @@ namespace bsp
         return 0;
     }
 
-    int32_t LinuxLPM::Reboot()
+    int32_t LinuxLPM::Reboot(RebootType)
     {
         return 0;
     }
@@ -31,7 +31,6 @@ namespace bsp
     }
 
     void LinuxLPM::SwitchOscillatorSource(bsp::LowPowerMode::OscillatorSource source)
-    {
-    }
+    {}
 
 } // namespace bsp
