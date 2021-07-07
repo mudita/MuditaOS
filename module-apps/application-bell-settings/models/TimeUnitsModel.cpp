@@ -2,10 +2,11 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TimeUnitsModel.hpp"
-#include <widgets/TimeSetSpinner.hpp>
-#include <module-gui/gui/widgets/Text.hpp>
+
 #include <service-time/Constants.hpp>
 #include <service-time/service-time/TimeMessage.hpp>
+#include <widgets/TimeSetSpinner.hpp>
+#include <widgets/Text.hpp>
 
 namespace gui
 {

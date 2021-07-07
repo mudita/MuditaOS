@@ -3,9 +3,10 @@
 
 #include "BellSettingsTimeUnitsWindow.hpp"
 #include <application-bell-settings/ApplicationBellSettings.hpp>
-#include <application-bell-settings/data/BellSettingsStyle.hpp>
-#include <apps-common/options/OptionStyle.hpp>
-#include <module-gui/gui/input/InputEvent.hpp>
+
+#include <data/BellSettingsStyle.hpp>
+#include <input/InputEvent.hpp>
+#include <options/OptionStyle.hpp>
 
 namespace gui
 {

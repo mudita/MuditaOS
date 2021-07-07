@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <module-gui/gui/Common.hpp>
+#include <gui/Common.hpp>
 
 namespace bellSettingsStyle
 {

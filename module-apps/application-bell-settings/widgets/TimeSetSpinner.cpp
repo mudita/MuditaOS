@@ -2,7 +2,12 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TimeSetSpinner.hpp"
-#include <module-gui/gui/widgets/Label.hpp>
+
+#include <widgets/Label.hpp>
+#include <FontManager.hpp>
+#include <RawFont.hpp>
+
+#include <memory>
 
 namespace gui
 {
@@ -20,11 +25,15 @@ namespace gui
         hbox->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
         hbox->setEdges(gui::RectangleEdge::None);
 
+        auto fontHeight      = getFontHeight();
+        auto doubleCharWidth = getWidestDigitWidth() * noOfDigits + noOfDigits; // two digits + minimal space beetween
+
         hour = new gui::Spinner(hourMin, hourMax, hourStep, gui::Boundaries::Continuous);
-        hour->setMinimumSize(style::timeSetSpinner::timeText::w, style::timeSetSpinner::timeText::h);
-        hour->setFont(style::window::font::supersizemelight);
+        hour->setMinimumSize(doubleCharWidth, fontHeight);
+        hour->setFont(fontName);
         hour->setAlignment(Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Center));
         hour->setCurrentValue(0);
+        hour->setFixedFieldWidth(noOfDigits);
         hour->setFocus(true);
         hbox->addWidget(hour);
 
@@ -33,17 +42,18 @@ namespace gui
                                     style::timeSetSpinner::colon::y,
                                     style::timeSetSpinner::colon::w,
                                     style::timeSetSpinner::colon::h);
-        colon->setFont(style::window::font::supersizemelight);
+        colon->setFont(fontName);
         colon->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
         colon->setEdges(gui::RectangleEdge::None);
         colon->activeItem = false;
         colon->setText(":");
 
         minute = new gui::Spinner(minuteMin, minuteMax, minuteStep, gui::Boundaries::Continuous);
-        minute->setMinimumSize(style::timeSetSpinner::timeText::w, style::timeSetSpinner::timeText::h);
-        minute->setFont(style::window::font::supersizemelight);
+        minute->setMinimumSize(doubleCharWidth, fontHeight);
+        minute->setFont(fontName);
         minute->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
         minute->setCurrentValue(0);
+        minute->setFixedFieldWidth(noOfDigits);
         hbox->addWidget(minute);
 
         hbox->resizeItems();
@@ -64,6 +74,25 @@ namespace gui
             }
         }
         return this->focusItem->onInput(inputEvent);
+    }
+
+    uint16_t TimeSetSpinner::getFontHeight()
+    {
+        RawFont *font = FontManager::getInstance().getFont(fontName);
+        return font->info.line_height;
+    }
+
+    uint32_t TimeSetSpinner::getWidestDigitWidth()
+    {
+        RawFont *font     = FontManager::getInstance().getFont(fontName);
+        uint32_t maxWidth = 0;
+        for (uint32_t i = 48; i < 57; i++) {
+            uint32_t width = font->getCharPixelWidth(i);
+            if (width > maxWidth) {
+                maxWidth = width;
+            }
+        }
+        return maxWidth;
     }
 
     auto TimeSetSpinner::handleEnterKey() -> bool

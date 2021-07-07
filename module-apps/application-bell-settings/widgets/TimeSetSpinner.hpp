@@ -1,10 +1,13 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include <widgets/SideListItem.hpp>
-#include <module-gui/gui/widgets/Spinner.hpp>
+#include <widgets/Spinner.hpp>
+#include <widgets/Style.hpp>
+
+#include <string>
 
 namespace gui
 {
@@ -27,12 +30,16 @@ namespace gui
         const uint32_t minuteMin  = 0;
         const uint32_t minuteMax  = 59;
         const uint32_t minuteStep = 1;
+        const uint32_t noOfDigits = 2;
         gui::Spinner *hour        = nullptr;
         gui::Spinner *minute      = nullptr;
+        std::string fontName      = style::window::font::supersizemelight;
 
         auto handleEnterKey() -> bool;
         auto handleRightFunctionKey() -> bool;
         auto onInput(const gui::InputEvent &inputEvent) -> bool override;
+        auto getFontHeight() -> uint16_t;
+        auto getWidestDigitWidth() -> uint32_t;
     };
 
 } /* namespace gui */
