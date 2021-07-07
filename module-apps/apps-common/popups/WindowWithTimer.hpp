@@ -13,6 +13,7 @@ namespace gui
     {
       private:
         sys::TimerHandle popupTimer;
+        const std::chrono::milliseconds timeout;
 
       public:
         explicit WindowWithTimer(app::Application *app,

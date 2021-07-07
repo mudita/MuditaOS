@@ -3,6 +3,7 @@
 
 #include "PhoneLockInputWindow.hpp"
 
+#include <locks/input/PhoneLockedKeysWhitelist.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <locks/data/LockData.hpp>
 #include <locks/widgets/PhoneLockBox.hpp>
@@ -127,6 +128,9 @@ namespace gui
         }
 
         // check if any of the lower inheritance onInput methods catch the event
-        return AppWindow::onInput(inputEvent);
+        if (locks::PhoneLockedKeysWhitelist::isOnWhitelist(inputEvent)) {
+            return AppWindow::onInput(inputEvent);
+        }
+        return true;
     }
 } /* namespace gui */

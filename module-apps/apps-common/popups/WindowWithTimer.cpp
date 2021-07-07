@@ -15,7 +15,7 @@ namespace gui
     WindowWithTimer::WindowWithTimer(app::Application *app,
                                      const std::string &name,
                                      const std::chrono::milliseconds timeout)
-        : AppWindow{app, name}
+        : AppWindow{app, name}, timeout{timeout}
     {
         popupTimer    = app::GuiTimerFactory::createSingleShotTimer(application, this, popup::timerName, timeout);
         timerCallback = [this](Item &, sys::Timer &timer) {
@@ -27,6 +27,9 @@ namespace gui
 
     void WindowWithTimer::resetTimer()
     {
+        if (!popupTimer.isValid()) {
+            popupTimer = app::GuiTimerFactory::createSingleShotTimer(application, this, popup::timerName, timeout);
+        }
         popupTimer.stop();
         popupTimer.start();
     }

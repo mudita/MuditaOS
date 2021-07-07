@@ -11,6 +11,7 @@ target_sources(apps-common
 		handlers/SimLockHandler.cpp
 		handlers/SimLockSubject.cpp
 		handlers/LockPolicyHandler.cpp
+		input/PhoneLockedKeysWhitelist.cpp
 		widgets/Lock.cpp
 		widgets/LockBoxConstantSize.cpp
 		widgets/LockBoxAlternatingSize.cpp
@@ -28,6 +29,7 @@ target_sources(apps-common
 		handlers/LockPolicyHandler.hpp
 		handlers/SimLockHandler.hpp
 		handlers/SimLockSubject.hpp
+		input/PhoneLockedKeysWhitelist.hpp
 		widgets/LockHash.hpp
 		widgets/Lock.hpp
 		widgets/LockBox.hpp

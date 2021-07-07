@@ -4,6 +4,7 @@
 #include "PhoneLockedWindow.hpp"
 #include "PhoneLockedInfoData.hpp"
 
+#include <locks/input/PhoneLockedKeysWhitelist.hpp>
 #include <application-desktop/data/DesktopStyle.hpp>
 #include <module-services/service-appmgr/service-appmgr/Controller.hpp>
 #include <time/time_conversion_factory.hpp>
@@ -79,14 +80,17 @@ namespace gui
         if (inputEvent.is(KeyCode::KEY_RF)) {
 
             application->switchWindow(gui::popup::window::power_off_window);
-            return true;
         }
-        // check if any of the lower inheritance onInput methods catch the event
-        return AppWindow::onInput(inputEvent);
+        return true;
     }
 
     bool PhoneLockedWindow::onInput(const InputEvent &inputEvent)
     {
+        // check if any of the lower inheritance onInput methods catch the event
+        if (locks::PhoneLockedKeysWhitelist::isOnWhitelist(inputEvent)) {
+            return AppWindow::onInput(inputEvent);
+        }
+
         if (inputEvent.isLongRelease()) {
             return processLongReleaseEvent(inputEvent);
         }
@@ -97,7 +101,7 @@ namespace gui
                                       std::make_unique<PhoneLockedInfoData>(requiredStage));
             return true;
         }
-        return AppWindow::onInput(inputEvent);
+        return true;
     }
 
     bool PhoneLockedWindow::updateTime()
