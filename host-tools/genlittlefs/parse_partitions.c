@@ -12,7 +12,7 @@
 #include <linux/fs.h>
 #include <fcntl.h>
 #include <unistd.h>
-static const size_t sector_size = 512;
+static const size_t sector_size      = 512;
 static const size_t bootstrap_offset = 0x00E0;
 
 struct partition *find_partitions(const char *filename, part_type_t ptype, size_t *nelems)
@@ -91,7 +91,7 @@ static ssize_t sector_block_size(int filedes)
     if (err < 0) {
         return err;
     }
-    uint64_t blk_sz;
+    uint64_t blk_sz = 0;
     if (S_ISBLK(statbuf.st_mode)) {
         err = ioctl(filedes, BLKSSZGET, &blk_sz);
         if (err < 0) {
@@ -115,8 +115,15 @@ int write_partition_bootunit(const char *filename, int part_num, uint32_t block_
         return -1;
     }
     const ssize_t sector_size = sector_block_size(fd);
-    char *const sect_buf      = malloc(sector_size);
-    if (read(fd, sect_buf, sector_size) != sector_size) {
+    if (sector_size <= 0) {
+        return -1;
+    }
+    char *const sect_buf = malloc(sector_size);
+    if (!sect_buf) {
+        return -1;
+    }
+    int ret;
+    if ((ret = read(fd, sect_buf, sector_size)) != sector_size) {
         close(fd);
         free(sect_buf);
         return -1;
