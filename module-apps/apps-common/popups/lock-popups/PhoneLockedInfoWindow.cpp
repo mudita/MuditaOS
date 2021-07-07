@@ -3,6 +3,7 @@
 
 #include "PhoneLockedInfoWindow.hpp"
 
+#include <locks/input/PhoneLockedKeysWhitelist.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <application-desktop/data/DesktopStyle.hpp>
 
@@ -41,6 +42,11 @@ void PhoneLockedInfoWindow::onBeforeShow([[maybe_unused]] ShowMode mode, SwitchD
 
 bool PhoneLockedInfoWindow::onInput(const InputEvent &inputEvent)
 {
+    // check if any of the lower inheritance onInput methods catch the event
+    if (locks::PhoneLockedKeysWhitelist::isOnWhitelist(inputEvent)) {
+        return AppWindow::onInput(inputEvent);
+    }
+
     // Right key = go back
     if (inputEvent.isShortRelease(KeyCode::KEY_RF)) {
         detachTimerIfExists();
