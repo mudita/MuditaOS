@@ -8,9 +8,9 @@ namespace sdesktop::developerMode
     DomRequestEvent::DomRequestEvent(Event &p) : Event(p)
     {}
 
-    void DomRequestEvent::setJson(json11::Json json)
+    void DomRequestEvent::setJson(json11::Json json, const std::string &appName)
     {
         context.setResponseStatus(parserFSM::http::Code::OK);
-        context.setResponseBody(json11::Json::object{{"dom", json}});
+        context.setResponseBody(json11::Json::object{{"app", appName}, {"dom", json}});
     };
 } // namespace sdesktop::developerMode
