@@ -22,6 +22,7 @@ namespace gui
         void destroyInterface() override;
         ~WindowWithTimer() override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        void onClose() override;
         bool onInput(const gui::InputEvent &inputEvent) override;
 
       protected:
