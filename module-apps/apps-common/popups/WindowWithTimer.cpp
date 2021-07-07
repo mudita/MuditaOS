@@ -52,6 +52,11 @@ namespace gui
         resetTimer();
     }
 
+    void WindowWithTimer::onClose()
+    {
+        detachTimerIfExists();
+    }
+
     WindowWithTimer::~WindowWithTimer()
     {
         destroyInterface();
