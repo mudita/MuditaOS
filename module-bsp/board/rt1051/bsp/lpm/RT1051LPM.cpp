@@ -39,8 +39,18 @@ namespace bsp
         return 0;
     }
 
-    int32_t RT1051LPM::Reboot()
+    int32_t RT1051LPM::Reboot(RebootType reason)
     {
+        constexpr uint32_t rebootToUpdaterCode{0xdeadbeaf};
+        constexpr uint32_t rebootNormalCode{0};
+        switch (reason) {
+        case RebootType::GoToUpdater:
+            SNVS->LPGPR[0] = rebootToUpdaterCode;
+            break;
+        case RebootType::NormalRestart:
+            SNVS->LPGPR[0] = rebootNormalCode;
+            break;
+        }
         NVIC_SystemReset();
         return 0;
     }
