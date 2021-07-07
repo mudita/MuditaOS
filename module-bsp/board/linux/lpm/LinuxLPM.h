@@ -13,7 +13,7 @@ namespace bsp
     {
       public:
         int32_t PowerOff() override final;
-        int32_t Reboot() override final;
+        int32_t Reboot(RebootType reason) override final;
         void SetCpuFrequency(CpuFrequencyHz freq) final;
         [[nodiscard]] uint32_t GetCpuFrequency() const noexcept final;
         void SwitchOscillatorSource(OscillatorSource source) final;

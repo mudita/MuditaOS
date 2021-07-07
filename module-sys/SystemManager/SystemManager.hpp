@@ -40,8 +40,8 @@ namespace sys
         inline constexpr auto restoreTimeout{5000};
     } // namespace constants
 
-    class PhoneModeRequest; // Forward declaration
-    class TetheringStateRequest; // Forward declaration
+    class PhoneModeRequest;         // Forward declaration
+    class TetheringStateRequest;    // Forward declaration
     class TetheringEnabledResponse; // Forward declaration
 
     enum class Code
@@ -50,6 +50,7 @@ namespace sys
         Update,
         Restore,
         Reboot,
+        RebootToUpdate,
         None,
     };
 
@@ -81,7 +82,8 @@ namespace sys
             Suspend,
             Shutdown,
             ShutdownReady,
-            Reboot
+            Reboot,
+            RebootToUpdate
         } state = State::Running;
 
         explicit SystemManager(std::vector<std::unique_ptr<BaseServiceCreator>> &&creators);
@@ -101,6 +103,8 @@ namespace sys
         static bool Restore(Service *s);
 
         static bool Reboot(Service *s);
+
+        static bool RebootToUpdate(Service *s);
 
         static void storeOsVersion(Service *s, const std::string &updateOSVer, const std::string &currentOSVer);
 
@@ -176,7 +180,7 @@ namespace sys
 
         void RestoreSystemHandler();
 
-        void RebootHandler();
+        void RebootHandler(State state);
 
         /// loop to handle prior to full system close
         /// for now for rt1051 we need to
@@ -234,6 +238,8 @@ inline const char *c_str(sys::SystemManager::State state)
         return "Shutdown";
     case sys::SystemManager::State::Reboot:
         return "Reboot";
+    case sys::SystemManager::State::RebootToUpdate:
+        return "RebootToUpdate";
     case sys::SystemManager::State::ShutdownReady:
         return "ShutdownReady";
     }
