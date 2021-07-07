@@ -28,7 +28,7 @@ namespace app
         auto serializer = gui::Item2JsonSerializer();
         serializer.traverse(item);
         auto evt = std::make_unique<sdesktop::developerMode::DomRequestEvent>(*event);
-        evt->setJson(serializer.get());
+        evt->setJson(serializer.get(),name);
         event = std::move(evt);
     }
 } // namespace app

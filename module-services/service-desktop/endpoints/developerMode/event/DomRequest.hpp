@@ -12,6 +12,6 @@ namespace sdesktop::developerMode
       public:
         explicit DomRequestEvent(sdesktop::Event &);
         DomRequestEvent() = delete;
-        void setJson(json11::Json json);
+        void setJson(json11::Json json,const std::string& appName);
     };
 } // namespace sdesktop::developerMode
