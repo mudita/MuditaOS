@@ -104,6 +104,8 @@ namespace stm
             timeManager->handleTimeChangeRequest(message->getTime());
             return std::make_shared<sys::ResponseMessage>();
         });
+        connect(typeid(stm::message::GetAutomaticDateAndTimeRequest),
+                [&](sys::Message *request) -> sys::MessagePointer { return handleGetAutomaticDateAndTimeRequest(); });
     }
 
     auto ServiceTime::handleSetAutomaticDateAndTimeRequest(sys::Message *request)
@@ -213,6 +215,11 @@ namespace stm
             settings->getValue(settings::SystemProperties::currentTimezoneRules, settings::SettingsScope::AppLocal);
         stm::internal::StaticData::get().setTimezoneRules(timezoneRules);
         timeManager->handleTimezoneChangeRequest(timezoneRules);
+    }
+
+    auto ServiceTime::handleGetAutomaticDateAndTimeRequest() -> std::shared_ptr<sys::ResponseMessage>
+    {
+        return std::make_shared<stm::message::GetAutomaticDateAndTimeResponse>(stm::api::isAutomaticDateAndTime());
     }
 
 } /* namespace stm */
