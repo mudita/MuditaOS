@@ -51,7 +51,14 @@ bool WorkerDesktop::init(std::list<sys::WorkerQueueInfo> queues)
 
 bool WorkerDesktop::deinit(void)
 {
-    LOG_DEBUG("deinit");
+    unsigned int maxcount = 10;
+    while (parser.getCurrentState() != parserFSM::State::NoMsg && --maxcount > 0) {
+        vTaskDelay(300);
+    }
+    LOG_INFO("we can deinit worker now");
+
+    /// additional wait to flush on serial - we should wait for data sent...
+    vTaskDelay(3000);
 
     if (fileDes != nullptr) {
         LOG_DEBUG("deinit close opened fileDes");
