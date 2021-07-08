@@ -17,6 +17,7 @@ namespace sys
         ServiceCellularNotifications,
         Test2CustomBusChannel,
         ServiceDBNotifications,
+        ServiceAlarmNotifications,
         ServiceAudioNotifications,
         AppManagerNotifications,
         ServiceFotaNotifications,
@@ -107,6 +108,8 @@ inline const char *c_str(sys::BusChannel channel)
         return "Test2CustomBusChannel,";
     case sys::BusChannel::ServiceDBNotifications:
         return "ServiceDBNotifications,";
+    case sys::BusChannel::ServiceAlarmNotifications:
+        return "ServiceAlarmNotifications";
     case sys::BusChannel::ServiceAudioNotifications:
         return "ServiceAudioNotifications";
     case sys::BusChannel::AppManagerNotifications:

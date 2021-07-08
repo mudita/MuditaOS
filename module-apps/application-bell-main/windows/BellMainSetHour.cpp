@@ -8,6 +8,7 @@
 #include <log/log.hpp>
 #include <gui/input/InputEvent.hpp>
 #include <application-bell-main/ApplicationBellMain.hpp>
+#include <service-alarm/ServiceAlarmAPI.hpp>
 
 namespace gui
 {
@@ -85,6 +86,14 @@ namespace gui
                     }
                     return true;
                 }
+                break;
+            }
+            case KeyCode::KEY_ENTER: {
+                // FAKE EXAMPLE OF SETTING SERVICE ALARM
+                const std::chrono::seconds delay(spinnerMinute->getCurrentValue());
+                const auto alarmTimeStamp = std::chrono::system_clock::now() + delay;
+                auto alarm                = std::make_shared<AlarmObject>(alarmTimeStamp);
+                ServiceAlarmAPI::SetAlarm(application, alarm);
                 break;
             }
             default:

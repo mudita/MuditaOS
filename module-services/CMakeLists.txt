@@ -30,6 +30,7 @@ add_subdirectory( service-fota )
 add_subdirectory( service-antenna )
 add_subdirectory( service-time )
 add_subdirectory( service-fileindexer )
+add_subdirectory( service-alarm )
 
 target_link_libraries(${PROJECT_NAME} 
     PUBLIC

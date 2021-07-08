@@ -35,6 +35,9 @@ enum class MessageType
     DBCalllogRemove [[deprecated]], ///< Remove selected note's record
     DBCalllogUpdate [[deprecated]], ///< Update selected note's record
 
+    // Alarm service messages
+    AlarmMessage,
+
     // Audio service messages
     AudioMessage,
 

@@ -16,6 +16,7 @@
 
 // services
 #include <service-appmgr/model/ApplicationManager.hpp>
+#include <service-alarm/ServiceAlarm.hpp>
 #include <service-audio/ServiceAudio.hpp>
 #include <service-bluetooth/ServiceBluetooth.hpp>
 #include <service-db/ServiceDB.hpp>
@@ -72,6 +73,7 @@ int main()
     systemServices.emplace_back(sys::CreatorFor<service::ServiceFileIndexer>());
 #endif
     systemServices.emplace_back(sys::CreatorFor<ServiceDB>());
+    systemServices.emplace_back(sys::CreatorFor<ServiceAlarm>());
     systemServices.emplace_back(sys::CreatorFor<ServiceAudio>());
     systemServices.emplace_back(sys::CreatorFor<ServiceBluetooth>());
     systemServices.emplace_back(sys::CreatorFor<ServiceLwIP>());

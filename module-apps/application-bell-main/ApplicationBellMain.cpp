@@ -6,6 +6,7 @@
 #include "windows/BellMainSetHour.hpp"
 #include "windows/BellMainWindow.hpp"
 #include <windows/Dialog.hpp>
+#include <service-alarm/ServiceAlarmMessages.hpp>
 
 namespace app
 {
@@ -14,7 +15,21 @@ namespace app
                                              sys::phone_modes::PhoneMode mode,
                                              StartInBackground startInBackground)
         : Application(name, parent, mode, startInBackground)
-    {}
+    {
+        bus.channels.push_back(sys::BusChannel::ServiceAlarmNotifications);
+
+        // FAKE/EXAMPLE OF HANDLING SERVICE ALARM TRIGGER MESSAGE
+        connect(typeid(AlarmResponseMessage), [&](sys::Message *msg) {
+            auto alarmResponse = static_cast<AlarmResponseMessage *>(msg);
+            if (alarmResponse->retCode == sys::ReturnCodes::Success) {
+                LOG_INFO("Service Alarm response success");
+            }
+            else {
+                LOG_INFO("Service Alarm response fail");
+            }
+            return sys::MessageNone{};
+        });
+    }
 
     sys::ReturnCodes ApplicationBellMain::InitHandler()
     {
@@ -50,7 +65,14 @@ namespace app
 
     sys::MessagePointer ApplicationBellMain::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
     {
+        // FAKE/EXAMPLE OF HANDLING SERVICE ALARM TRIGGER MESSAGE
+        if (msgl->messageType == MessageType::AlarmMessage) {
+            LOG_INFO("Service Alarm triggered notification received");
+            return sys::msgHandled();
+        }
+
         auto retMsg = Application::DataReceivedHandler(msgl);
+
         if (dynamic_cast<sys::ResponseMessage *>(retMsg.get())->retCode == sys::ReturnCodes::Success) {
             return retMsg;
         }

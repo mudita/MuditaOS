@@ -27,6 +27,7 @@ target_link_libraries(application-bell-main
         bellgui
         i18n
         module-gui
+        service-alarm
         service-gui
         time
         ${TARGET_LIBRARIES}
