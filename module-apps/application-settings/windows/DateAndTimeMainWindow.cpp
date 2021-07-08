@@ -3,7 +3,6 @@
 
 #include "application-settings/ApplicationSettings.hpp"
 #include "DateAndTimeMainWindow.hpp"
-#include "module-apps/application-desktop/windows/Names.hpp"
 #include "OptionSetting.hpp"
 #include <service-time/service-time/TimeMessage.hpp>
 #include <service-time/Constants.hpp>

@@ -2,16 +2,16 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ActiveNotificationsModel.hpp"
-#include <application-desktop/ApplicationDesktop.hpp>
-#include <module-db/queries/notifications/QueryNotificationsClear.hpp>
-#include <service-appmgr/Controller.hpp>
-#include <application-call/data/CallSwitchData.hpp>
-#include <queries/messages/threads/QueryThreadGetByNumber.hpp>
-#include <application-messages/data/SMSdata.hpp>
-#include <application-messages/Constants.hpp>
-#include <service-appmgr/messages/SwitchRequest.hpp>
+#include "ApplicationDesktop.hpp"
 
+#include <application-call/data/CallSwitchData.hpp>
+#include <application-messages/Constants.hpp>
+#include <application-messages/data/SMSdata.hpp>
 #include <gsl/assert>
+#include <module-db/queries/notifications/QueryNotificationsClear.hpp>
+#include <queries/messages/threads/QueryThreadGetByNumber.hpp>
+#include <service-appmgr/Controller.hpp>
+#include <service-appmgr/messages/SwitchRequest.hpp>
 
 using namespace gui;
 
