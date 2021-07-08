@@ -14,10 +14,10 @@ add_subdirectory(application-calculator)
 add_subdirectory(application-messages)
 add_subdirectory(application-music-player)
 add_subdirectory(application-phonebook)
+add_subdirectory(application-clock)
 add_subdirectory(apps-common)
 
 set(APPLICATIONS
-    clock
     calendar
     desktop
     settings
@@ -71,6 +71,7 @@ endif()
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
         application-messages
+        application-clock
         apps-common
         date::date
         eventstore

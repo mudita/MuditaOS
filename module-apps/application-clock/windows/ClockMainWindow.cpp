@@ -10,7 +10,7 @@
 #include "gui/widgets/ProgressBar.hpp"
 #include "gui/widgets/BoxLayout.hpp"
 #include "gui/core/ImageManager.hpp"
-#include "../ClockData.hpp"
+#include "ClockData.hpp"
 #include <Style.hpp>
 
 namespace gui

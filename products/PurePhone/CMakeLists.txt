@@ -54,6 +54,7 @@ target_link_libraries(PurePhone
         application-music-player
         application-phonebook
         application-notes
+        application-clock
         messagetype
         module-apps
         service-bluetooth

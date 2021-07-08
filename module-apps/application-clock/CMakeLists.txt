@@ -1,27 +1,37 @@
 ﻿
-include_directories( ${CMAKE_PROJECT_NAME}
+add_library(application-clock STATIC)
 
-	PUBLIC
-		"${CMAKE_CURRENT_LIST_DIR}"
-)
-
-include_directories( ${PROJECT_NAME}
-
-	PUBLIC
-		"${CMAKE_CURRENT_LIST_DIR}"
-)
-
-target_sources( ${PROJECT_NAME}
+target_include_directories(application-clock
 
 	PRIVATE
-		"${CMAKE_CURRENT_LIST_DIR}/ApplicationClock.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/ClockMainWindow.cpp"
+		$<BUILD_INTERFACE:
+			${CMAKE_CURRENT_LIST_DIR}/windows
+		>
+
 	PUBLIC
-		"${CMAKE_CURRENT_LIST_DIR}/ApplicationClock.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/ClockMainWindow.hpp"
+		$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
 )
-target_link_libraries(${PROJECT_NAME}
+
+target_sources(application-clock
+
+	PRIVATE
+		ApplicationClock.cpp
+		windows/ClockMainWindow.cpp
+	PUBLIC
+		include/ApplicationClock.hpp
+		windows/ClockMainWindow.hpp
+)
+
+option(ENABLE_APP_CLOCK "Enable application clock" ON)
+
+target_compile_definitions(application-clock
+    INTERFACE
+        $<$<BOOL:${ENABLE_APP_CLOCK}>:ENABLE_APP_CLOCK>
+)
+
+target_link_libraries(application-clock
     PRIVATE
        service-evtmgr
+	   apps-common
     )
 
