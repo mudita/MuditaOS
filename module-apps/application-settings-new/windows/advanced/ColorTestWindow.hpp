@@ -3,25 +3,13 @@
 
 #pragma once
 
-#include <memory>
-#include <functional>
-
-#include "module-apps/application-settings/models/ColorTestModel.hpp"
 #include "AppWindow.hpp"
-#include "application-settings/widgets/ColorTestListView.hpp"
 
-#include <gui/widgets/Label.hpp>
-#include <gui/widgets/Image.hpp>
-#include <gui/widgets/Window.hpp>
-#include <gui/widgets/BottomBar.hpp>
+#include "application-settings-new/models/advanced/ColorTestModel.hpp"
+#include "application-settings-new/widgets/advanced/ColorTestListView.hpp"
 
 namespace gui
 {
-    namespace window::name
-    {
-        inline constexpr auto color_test_window = "ColorTestWindow";
-    } // namespace window::name
-
     class ColorTestWindow : public AppWindow
     {
       private:

@@ -234,7 +234,7 @@ namespace gui
                                       app::manager::actions::Launch,
                                       std::make_unique<app::ApplicationLaunchData>("ApplicationMeditation"));
                               }},
-                new gui::Tile{"menu_settings_W_G", "app_desktop_menu_settings_new", [=](gui::Item &item) {
+                new gui::Tile{"menu_settings_W_G", "app_desktop_menu_settings", [=](gui::Item &item) {
                                   return app::manager::Controller::sendAction(
                                       application,
                                       app::manager::actions::Launch,
