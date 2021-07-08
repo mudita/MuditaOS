@@ -213,16 +213,6 @@ namespace purefs::subsystem
         const auto user_dir         = (dir::getRootDiskPath() / boot_dir_name).string();
         fs::internal::set_default_thread_cwd(user_dir);
 
-        // Mount NVRAM memory
-        err = vfs->mount(default_nvrom_name,
-                         purefs::dir::getMfgConfPath().c_str(),
-                         "littlefs",
-                         fs::mount_flags::read_only,
-                         &nvrom_lfs_block_size);
-        if (err) {
-            LOG_WARN("Unable to mount NVROM partition err %i. Maybe running on rev>T7", err);
-            err = 0;
-        }
         return err;
     }
 

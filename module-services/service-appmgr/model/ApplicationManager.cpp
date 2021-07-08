@@ -172,14 +172,6 @@ namespace app::manager
             settings::SystemProperties::autoLockTimeInSec,
             [this](std::string value) { lockTimeChanged(std::move(value)); },
             settings::SettingsScope::Global);
-        settings->registerValueChange(
-            ::settings::KeypadLight::state,
-            [this](const std::string &value) {
-                const auto keypadLightState =
-                    static_cast<bsp::keypad_backlight::State>(utils::getNumericValue<int>(value));
-                processKeypadBacklightState(keypadLightState);
-            },
-            ::settings::SettingsScope::Global);
 
         startBackgroundApplications();
         bus.sendUnicast(std::make_unique<CheckIfStartAllowedMessage>(), service::name::system_manager);
@@ -770,8 +762,8 @@ namespace app::manager
 
     auto ApplicationManager::resolveHomeWindow() -> std::string
     {
-        return phoneLockHandler.isPhoneLocked() ? gui::popup::window::phone_lock_window
-                                                : gui::name::window::main_window;
+        // Temporary workaround for Bell
+        return gui::name::window::main_window;
     }
 
     auto ApplicationManager::handleOnBoardingFinalize() -> sys::MessagePointer
@@ -1231,22 +1223,5 @@ namespace app::manager
             }
         }
         return sys::msgNotHandled();
-    }
-
-    void ApplicationManager::processKeypadBacklightState(bsp::keypad_backlight::State keypadLightState)
-    {
-        auto action = bsp::keypad_backlight::Action::turnOff;
-        switch (keypadLightState) {
-        case bsp::keypad_backlight::State::on:
-            action = bsp::keypad_backlight::Action::turnOn;
-            break;
-        case bsp::keypad_backlight::State::activeMode:
-            action = bsp::keypad_backlight::Action::turnOnActiveMode;
-            break;
-        case bsp::keypad_backlight::State::off:
-            action = bsp::keypad_backlight::Action::turnOff;
-            break;
-        }
-        bus.sendUnicast(std::make_shared<sevm::KeypadBacklightMessage>(action), service::name::evt_manager);
     }
 } // namespace app::manager

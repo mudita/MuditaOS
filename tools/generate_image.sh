@@ -64,9 +64,7 @@ DEVICE_BLK_SIZE=512
 PART1_START=2048
 PART1_SIZE=2097152
 PART2_START=$(($PART1_START + $PART1_SIZE))
-PART2_SIZE=$PART1_SIZE
-PART3_START=$(($PART2_START + $PART2_SIZE))
-PART3_SIZE=$(($DEVICE_BLK_COUNT - $PART1_SIZE - $PART2_SIZE - $PART1_START))
+PART2_SIZE=5306368
 
 truncate -s $(($DEVICE_BLK_COUNT * $DEVICE_BLK_SIZE)) $IMAGE_NAME
 sfdisk $IMAGE_NAME << ==sfdisk
@@ -76,7 +74,6 @@ unit: sectors
 
 /dev/sdx1 : start=    $PART1_START,  size=    $PART1_SIZE, type=b, bootable
 /dev/sdx2 : start=    $PART2_START,  size=    $PART2_SIZE, type=9e
-/dev/sdx3 : start=    $PART3_START,  size=    $PART3_SIZE, type=9e
 ==sfdisk
 
 

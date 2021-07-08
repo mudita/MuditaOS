@@ -151,7 +151,6 @@ namespace screen_light_control
     void ScreenLightControl::turnOff()
     {
         bsp::eink_frontlight::turnOff();
-        bsp::light_sensor::standby();
         disableTimers();
         lightOn = false;
     }

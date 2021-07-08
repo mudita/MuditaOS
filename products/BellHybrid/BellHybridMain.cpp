@@ -62,9 +62,6 @@ int main()
     systemServices.emplace_back(sys::CreatorFor<service::ServiceFileIndexer>());
 #endif
     systemServices.emplace_back(sys::CreatorFor<ServiceDB>());
-    systemServices.emplace_back(sys::CreatorFor<ServiceAudio>());
-    systemServices.emplace_back(sys::CreatorFor<ServiceBluetooth>());
-    systemServices.emplace_back(sys::CreatorFor<ServiceLwIP>());
     systemServices.emplace_back(sys::CreatorFor<ServiceDesktop>());
     systemServices.emplace_back(sys::CreatorFor<stm::ServiceTime>());
     systemServices.emplace_back(sys::CreatorFor<service::eink::ServiceEink>());
@@ -82,10 +79,6 @@ int main()
             }
 
             Log::Logger::get().init();
-            /// force initialization of PhonenumberUtil because of its stack usage
-            /// otherwise we would end up with an init race and PhonenumberUtil could
-            /// be initiated in a task with stack not big enough to handle it
-            i18n::phonenumbers::PhoneNumberUtil::GetInstance();
             return true;
         },
         [sysmgr]() {
