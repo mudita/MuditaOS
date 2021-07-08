@@ -4,8 +4,8 @@
 #pragma once
 
 #include <apps-common/windows/AppWindow.hpp>
-#include <module-gui/gui/widgets/Text.hpp>
 #include <module-gui/gui/widgets/Icon.hpp>
+#include <module-gui/gui/widgets/Text.hpp>
 
 namespace gui
 {

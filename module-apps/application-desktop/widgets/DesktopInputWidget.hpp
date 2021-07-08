@@ -4,12 +4,12 @@
 #pragma once
 
 #include "Application.hpp"
-#include <AppWindow.hpp>
 
-#include "Text.hpp"
-#include "Image.hpp"
-#include "ListItem.hpp"
+#include <AppWindow.hpp>
 #include <BoxLayout.hpp>
+#include <Image.hpp>
+#include <ListItem.hpp>
+#include <Text.hpp>
 
 namespace gui
 {

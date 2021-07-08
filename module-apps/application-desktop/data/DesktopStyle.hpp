@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "Style.hpp"
+#include <Style.hpp>
 
 namespace style::desktop
 {

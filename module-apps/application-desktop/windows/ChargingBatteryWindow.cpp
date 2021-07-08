@@ -3,11 +3,12 @@
 
 #include "ChargingBatteryWindow.hpp"
 #include "InputEvent.hpp"
-#include "gui/widgets/Image.hpp"
+#include "Names.hpp"
+
+#include <gui/widgets/Image.hpp>
 #include <log.hpp>
-#include <application-desktop/windows/Names.hpp>
-#include <service-appmgr/model/ApplicationManager.hpp>
 #include <service-appmgr/Controller.hpp>
+#include <service-appmgr/model/ApplicationManager.hpp>
 
 namespace gui
 {

@@ -3,14 +3,15 @@
 
 #pragma once
 
-#include <vector>
+#include <apps-common/widgets/BarGraph.hpp>
 #include <apps-common/windows/AppWindow.hpp>
 #include <apps-common/windows/Dialog.hpp>
+#include <module-gui/gui/widgets/BottomBar.hpp>
+#include <module-gui/gui/widgets/Image.hpp>
 #include <module-gui/gui/widgets/Label.hpp>
 #include <module-gui/gui/widgets/TextFixedSize.hpp>
-#include <module-gui/gui/widgets/Image.hpp>
-#include <module-gui/gui/widgets/BottomBar.hpp>
-#include <apps-common/widgets/BarGraph.hpp>
+
+#include <vector>
 
 namespace gui
 {
