@@ -42,6 +42,7 @@ namespace bluetooth
         auto startRinging() -> Error::Code;
         auto stopRinging() -> Error::Code;
         auto initializeCall() -> Error::Code;
+        auto isAddressActuallyUsed(bd_addr_t address) -> bool;
 
         auto setAudioDevice(std::shared_ptr<BluetoothAudioDevice> device) -> Error::Code;
 
