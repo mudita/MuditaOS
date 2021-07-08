@@ -43,9 +43,9 @@ namespace gui
 
     void PhoneNameWindow::onBeforeShow(ShowMode /*mode*/, SwitchData *data)
     {
-        inputField->clear();
         if (const auto newData = dynamic_cast<PhoneNameData *>(data); data != nullptr) {
             inputField->setText(newData->getName());
+            inputField->setTextLimitType(gui::TextLimitType::MaxSignsCount, maxNameLength);
         }
     }
 
