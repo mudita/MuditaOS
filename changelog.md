@@ -4,6 +4,24 @@ To install the new version of MuditaOS please follow the steps described in this
 - [Linux](https://github.com/mudita/MuditaOS/blob/master/doc/boot_and_update.md#creating-a-storage-partition)
 - [Windows and macOS](https://github.com/mudita/MuditaOS/blob/master/doc/flashing_win_macos.md)
 
+## [0.72.1 2021-07-05]
+
+* [BH-363] Move libphonenumber to a separate directory
+* [BH-379] Librarize application-calculator
+* [BH-390] Turned notes app into library
+* [BH-464] Moved USB stack to third-party dir
+* [BH-591] Add Spinner Widget
+* [CP-183] Do not log sensitive data in service-desktop
+* [CP-248] Harness script to transfer Update package to Pure
+* [CP-253] Add checksum to package transfer
+* [CP-270] Replace CRC32 library
+* [EGD-6697] Fix DateTime tests
+* [EGD-6699] Add timezone selecting window
+* [EGD-6978] Outgoing calls fixes
+* [EGD-6990] No autolock when battery is low
+* [EGD-7003] Removed sensitive data bt
+* [EGD-7004] Removed sensitive data
+
 ## [0.71.1 2021-06-30]
 
 * [BH-372] Turned i18n into separate library
