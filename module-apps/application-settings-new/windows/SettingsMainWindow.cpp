@@ -25,24 +25,8 @@ std::list<gui::Option> mainWindowOptionsNew(app::Application *app)
                                    },
                                    gui::option::Arrow::Enabled});
     };
-    auto addApp = [&l, &app](UTF8 name, const std::string &window = "") {
-        l.emplace_back(gui::Option{name,
-                                   [=](gui::Item &item) {
-                                       if (window.empty()) {
-                                           return false;
-                                       }
-                                       LOG_INFO("switching to %s page", window.c_str());
-                                       app::manager::Controller::sendAction(
-                                           app,
-                                           app::manager::actions::Launch,
-                                           std::make_unique<app::ApplicationLaunchData>("ApplicationSettings"));
-                                       app->switchWindow(window, nullptr);
-                                       return true;
-                                   },
-                                   gui::option::Arrow::Enabled});
-    };
 
-    addApp(i18("app_desktop_menu_settings"), "Settings");
+    addMenu(i18("app_settings_advanced"), gui::window::name::advanced);
     addMenu(i18("app_settings_bt"), gui::window::name::bluetooth);
     addMenu(i18("app_settings_net"), gui::window::name::network);
     addMenu(i18("app_settings_disp_key"), gui::window::name::display_and_keypad);

@@ -12,6 +12,12 @@
 
 namespace gui::window::name
 {
+    inline constexpr auto advanced          = "Advanced";
+    inline constexpr auto information       = "Information";
+    inline constexpr auto ui_test           = "UI Test";
+    inline constexpr auto eink_mode         = "Change Eink Mode";
+    inline constexpr auto color_test_window = "Color Test";
+
     inline constexpr auto bluetooth   = "Bluetooth";
     inline constexpr auto all_devices = "AllDevices";
     inline constexpr auto phone_name  = "PhoneName";
