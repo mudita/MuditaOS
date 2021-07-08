@@ -16,6 +16,7 @@ set(SOURCES
     endpoints/developerMode/DeveloperModeEndpoint.cpp
     endpoints/developerMode/DeveloperModeHelper.cpp
     endpoints/developerMode/Mode/UI_Helper.cpp
+    endpoints/developerMode/Mode/UpdateHelper.cpp
     endpoints/developerMode/event/DomRequest.cpp
     endpoints/developerMode/event/ATRequest.cpp
     endpoints/deviceInfo/DeviceInfoEndpoint.cpp
