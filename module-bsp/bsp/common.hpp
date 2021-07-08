@@ -15,7 +15,7 @@ namespace bsp
     enum class KeyEvents{
         Released,
         Pressed,
-
+        Moved,
     };
 
     /// CPU frequency is dependent on the clock settings.

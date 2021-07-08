@@ -14,6 +14,7 @@
 #include <Timers/TimerHandle.hpp>
 #include <Service/Worker.hpp>
 #include <service-db/DBServiceName.hpp>
+#include <common_data/RawKey.hpp>
 
 #include <cstdint>
 #include <memory>
@@ -31,6 +32,8 @@ class EventManager : public sys::Service
 {
   private:
     static constexpr auto stackDepth = 4096;
+    void handleKeyEvent(sys::Message *msg);
+    void handleKeyMoveEvent(RawKey key);
     void handleMinuteUpdate(time_t timestamp);
     bool processVibraRequest(bsp::vibrator::Action act,
                              std::chrono::milliseconds RepetitionTime = std::chrono::milliseconds{1000});
