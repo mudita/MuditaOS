@@ -2,9 +2,10 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "LogoWindow.hpp"
-#include "gui/widgets/Image.hpp"
+#include "Names.hpp"
+
+#include <gui/widgets/Image.hpp>
 #include <log.hpp>
-#include <application-desktop/windows/Names.hpp>
 
 namespace gui
 {

@@ -2,41 +2,41 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationDesktop.hpp"
-#include "Dialog.hpp"
-#include "MessageType.hpp"
-#include "windows/DesktopMainWindow.hpp"
-#include "windows/MenuWindow.hpp"
-#include "windows/DeadBatteryWindow.hpp"
-#include "windows/LogoWindow.hpp"
-#include "windows/ChargingBatteryWindow.hpp"
-#include "windows/Reboot.hpp"
-#include "windows/Update.hpp"
-#include "windows/UpdateProgress.hpp"
-#include "windows/PostUpdateWindow.hpp"
-#include "windows/MmiPullWindow.hpp"
-#include "windows/MmiPushWindow.hpp"
-#include "windows/MmiInternalMsgWindow.hpp"
+#include "ChargingBatteryWindow.hpp"
+#include "DeadBatteryWindow.hpp"
+#include "DesktopData.hpp"
+#include "DesktopMainWindow.hpp"
+#include "LogoWindow.hpp"
+#include "MenuWindow.hpp"
+#include "MmiInternalMsgWindow.hpp"
+#include "MmiPullWindow.hpp"
+#include "MmiPushWindow.hpp"
+#include "PostUpdateWindow.hpp"
+#include "Reboot.hpp"
+#include "Update.hpp"
+#include "UpdateProgress.hpp"
+
+#include <apps-common/messages/AppMessage.hpp>
+#include <AppWindow.hpp>
+#include <Dialog.hpp>
+#include <magic_enum.hpp>
+#include <messages/DialogMetadataMessage.hpp>
+#include <MessageType.hpp>
+#include <module-gui/gui/widgets/status-bar/SIM.hpp>
+#include <module-services/service-db/agents/settings/SystemSettings.hpp>
+#include <module-services/service-desktop/service-desktop/Constants.hpp>
 #include <popups/presenter/PowerOffPresenter.hpp>
 #include <popups/TetheringOffPopup.hpp>
-#include <windows/Dialog.hpp>
-#include <windows/DialogMetadata.hpp>
-#include <messages/DialogMetadataMessage.hpp>
-
-#include "AppWindow.hpp"
-#include "data/DesktopData.hpp"
-
 #include <service-appmgr/Controller.hpp>
 #include <service-cellular-api>
-#include <service-db/QueryMessage.hpp>
-#include <module-services/service-db/agents/settings/SystemSettings.hpp>
-#include <magic_enum.hpp>
-#include <module-services/service-desktop/service-desktop/Constants.hpp>
-#include <apps-common/messages/AppMessage.hpp>
-#include <SystemManager/messages/SystemManagerMessage.hpp>
-#include <module-gui/gui/widgets/status-bar/SIM.hpp>
 #include <service-db/DBNotificationMessage.hpp>
+#include <service-db/QueryMessage.hpp>
+#include <SystemManager/messages/SystemManagerMessage.hpp>
+#include <windows/Dialog.hpp>
+#include <windows/DialogMetadata.hpp>
 
 #include <cassert>
+
 namespace app
 {
     ApplicationDesktop::ApplicationDesktop(std::string name,

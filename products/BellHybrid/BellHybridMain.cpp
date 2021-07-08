@@ -5,7 +5,6 @@
 
 // applications
 #include <application-calllog/ApplicationCallLog.hpp>
-#include <application-desktop/ApplicationDesktop.hpp>
 #include <application-settings/ApplicationSettings.hpp>
 #include <application-special-input/ApplicationSpecialInput.hpp>
 #include <application-calendar/ApplicationCalendar.hpp>

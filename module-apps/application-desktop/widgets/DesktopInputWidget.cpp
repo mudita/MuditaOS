@@ -2,11 +2,12 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DesktopInputWidget.hpp"
-#include "AppWindow.hpp"
-#include <service-cellular/CellularServiceAPI.hpp>
 
-#include <Style.hpp>
+#include <AppWindow.hpp>
 #include <Font.hpp>
+#include <service-cellular/CellularServiceAPI.hpp>
+#include <Style.hpp>
+
 #include <algorithm>
 
 namespace style::desktop

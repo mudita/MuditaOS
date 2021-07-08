@@ -3,7 +3,11 @@
 
 #pragma once
 
+#include <i18n/i18n.hpp>
 #include <service-appmgr/data/MmiActionsParams.hpp>
+#include <utf8/UTF8.hpp>
+
+#include <map>
 
 namespace mmi
 {

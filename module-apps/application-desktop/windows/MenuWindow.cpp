@@ -1,18 +1,18 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "DBNotificationsHandler.hpp"
 #include "MenuWindow.hpp"
-#include "InputEvent.hpp"
-#include "Item.hpp"
-#include "Navigation.hpp"
-#include "service-appmgr/Controller.hpp"
-#include <application-desktop/widgets/DBNotificationsHandler.hpp>
 #include "Names.hpp"
 
-#include <tools/Common.hpp>
-#include <Style.hpp>
 #include <i18n/i18n.hpp>
 #include <Image.hpp>
+#include <InputEvent.hpp>
+#include <Item.hpp>
+#include <Navigation.hpp>
+#include <service-appmgr/Controller.hpp>
+#include <Style.hpp>
+#include <tools/Common.hpp>
 
 namespace style::design
 {

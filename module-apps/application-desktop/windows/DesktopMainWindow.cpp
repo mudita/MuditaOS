@@ -1,24 +1,23 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <memory>
-
+#include "ApplicationDesktop.hpp"
+#include "DesktopData.hpp"
 #include "DesktopMainWindow.hpp"
-#include <application-desktop/ApplicationDesktop.hpp>
-#include <application-desktop/data/DesktopStyle.hpp>
-#include <application-desktop/data/DesktopData.hpp>
-#include <application-call/data/CallSwitchData.hpp>
+#include "DesktopStyle.hpp"
 
+#include <application-call/data/CallSwitchData.hpp>
+#include <log.hpp>
+#include <messages/DialogMetadataMessage.hpp>
+#include <notifications/NotificationsModel.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <service-time/ServiceTime.hpp>
 #include <service-time/TimeMessage.hpp>
-#include <notifications/NotificationsModel.hpp>
+#include <time/time_conversion_factory.hpp>
 #include <windows/Dialog.hpp>
 #include <windows/DialogMetadata.hpp>
-#include <messages/DialogMetadataMessage.hpp>
-#include <time/time_conversion_factory.hpp>
 
-#include <log.hpp>
+#include <memory>
 
 namespace gui
 {
