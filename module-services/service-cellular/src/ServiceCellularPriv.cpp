@@ -9,10 +9,16 @@
 #include <service-evtmgr/EVMessages.hpp>
 #include <service-evtmgr/Constants.hpp>
 
+#include <service-time/service-time/TimeMessage.hpp>
+#include <service-time/Constants.hpp>
+
+using service::name::service_time;
+
 namespace cellular::internal
 {
     ServiceCellularPriv::ServiceCellularPriv(ServiceCellular *owner)
-        : owner{owner}, simCard{std::make_unique<SimCard>()}, state{std::make_unique<State>(owner)}
+        : owner{owner}, simCard{std::make_unique<SimCard>()}, state{std::make_unique<State>(owner)},
+          networkTime{std::make_unique<NetworkTime>()}
     {
         initSimCard();
     }
@@ -86,6 +92,27 @@ namespace cellular::internal
                            simCard->handleATSimStateChange(msg->state);
                            return sys::MessageNone{};
                        });
+    }
+
+    void ServiceCellularPriv::connectNetworkTime()
+    {
+        owner->connect(typeid(stm::message::AutomaticDateAndTimeChangedMessage),
+                       [&](sys::Message *request) -> sys::MessagePointer {
+                           auto message = static_cast<stm::message::AutomaticDateAndTimeChangedMessage *>(request);
+                           networkTime->processSettings(message->getValue());
+                           return sys::MessageNone{};
+                       });
+        owner->connect(typeid(stm::message::GetAutomaticDateAndTimeResponse),
+                       [&](sys::Message *request) -> sys::MessagePointer {
+                           auto message = static_cast<stm::message::GetAutomaticDateAndTimeResponse *>(request);
+                           networkTime->processSettings(message->isAutomaticDateAndTime());
+                           return sys::MessageNone{};
+                       });
+    }
+
+    void ServiceCellularPriv::requestNetworkTimeSettings()
+    {
+        owner->bus.sendUnicast(networkTime->createSettingsRequest(), service_time);
     }
 
 } // namespace cellular::internal
