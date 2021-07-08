@@ -80,6 +80,7 @@
   "duration_0hmin_0sec": "%0N:%0S",
   "duration_hour_0min_0sec": "%H:%0M:%0S",
   "brightness_text": "BRILLO",
+  "phone_needs_rebooting": "Tu teléfono necesita reiniciarse. Pulsa cualquier tecla para confirmar y retira la batería del dispositivo durante 10 segundos para reiniciarlo por completo.",
   "home_modes_connected": "CONECTADO",
   "home_modes_notdisturb": "NO MOLESTAR",
   "home_modes_offline": "DESCONECTADO",
