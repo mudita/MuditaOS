@@ -57,6 +57,7 @@ namespace gui
 
         if (inputEvent.isShortRelease(gui::KeyCode::KEY_ENTER) && !inputField->isEmpty()) {
             bluetoothSettingsModel->setDeviceName(inputField->getText());
+            application->returnToPreviousWindow();
             return true;
         }
 
