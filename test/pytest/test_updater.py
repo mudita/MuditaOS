@@ -3,68 +3,53 @@
 
 import os
 import pytest
+import logging
 from harness import log
 from harness.interface.defs import Method, Endpoint
 from harness.request import Transaction, Request,TransactionError
-
+from harness.rt_harness_discovery import get_rt1051_harness
 from harness.harness import Harness
-import binascii
+from harness.api.filesystem import put_file, get_file
+from harness.api.developermode import PhoneModeLock, PhoneReboot, Reboot
 
 
-def send_file(harness: Harness, file: str, where: str) -> Transaction:
+def get_version(harness: Harness):
+    r = harness.request(Endpoint.DEVICEINFO, Method.GET, {}).response
+    version = r.body["version"]
+    sha = r.body["gitRevision"]
+    return f"version: {version} sha: {sha}"
 
-    fileSize = os.path.getsize(file)
 
-
-    with open(file, 'rb') as l_file:
-        file_data = l_file.read()
-        fileCrc32 = format((binascii.crc32(file_data) & 0xFFFFFFFF), '08x')
-
-    body = {"fileName": where + file,
-            "fileSize": fileSize, "fileCrc32": fileCrc32}
-
-    log.debug(f"sending {body}")
-
-    ret = harness.request(Endpoint.FILESYSTEM, Method.PUT, body)
-
-    log.debug(f"response {ret.response}")
-    assert ret.response.body["txID"] != 0
-
-    txID = ret.response.body["txID"]
-    chunkSize = ret.response.body["chunkSize"]
-
-    chunkNo = 1
-    sent = 0
-
-    from functools import partial
-    import base64
-    with open(file, 'rb') as l_file:
-        for chunk in iter(partial(l_file.read, chunkSize), b''):
-            data = base64.standard_b64encode(chunk).decode()
-
-            body = {"txID": txID, "chunkNo": chunkNo, "data": data}
-            ret = harness.request(Endpoint.FILESYSTEM, Method.PUT, body)
-            chunkNo += 1
-
-            sent += len(chunk)
-            percent = (sent / fileSize)*100
-            time = ret.send_time + ret.read_time
-            Mbps = (len(data)*8)/(time*1024*1024)
-
-            log.info(f"-> {percent:0.2f}% in {time:0.3f}s {Mbps:0.3f}Mbps")
-
-    return ret
+def disable_some_logs(harness: Harness):
+    from harness.interface.defs import PureLogLevel
+    for val in ["SysMgrService", "ServiceDesktop_w2", "CellularMux"]:
+        ret = harness.request(Endpoint.DEVELOPERMODE, Method.POST, {
+                              "log": True, "service": val, "level": PureLogLevel.LOGERROR.value})
+        log.info(f"{ret.response}")
 
 
 @pytest.mark.usefixtures("phone_unlocked")
 @pytest.mark.rt1051
 def test_update(harness: Harness):
     filename = "update.tar"
-    try:
-        harness.request(Endpoint.DEVELOPERMODE, Method.PUT, {"phoneLockCodeEnabled": False})
-        send_file(harness, filename, "/sys/user/")
-        harness.request(Endpoint.DEVELOPERMODE, Method.PUT, {"phoneLockCodeEnabled": True})
-        harness.request(Endpoint.DEVELOPERMODE, Method.POST, {"update": True, "reboot": True})
-    except TransactionError as err:
-        log.error(f"{err.message} Status: {err.status}")
+
+    log.info(get_version(harness))
+    PhoneModeLock(False).run(harness)
+    put_file(harness, filename, "/sys/user/")
+    PhoneReboot(Reboot.UPDATE).run(harness)
+    assert harness.connection.watch_port_reboot(60)
+
+    harness = get_rt1051_harness(60)
+    import time
+    time.sleep(10)
+    harness.unlock_phone()
+    PhoneModeLock(False).run(harness)
+
+    log.info(get_version(harness))
+    get_file(harness, "updater.log", "./")
+    with open("updater.log") as f:
+        line = f.readline()
+        assert "OK" in line
+    PhoneModeLock(True).run(harness)
+
     log.info("update done!")
