@@ -1853,14 +1853,15 @@ std::shared_ptr<CellularSetOperatorResponse> ServiceCellular::handleCellularSetO
 void ServiceCellular::volteChanged(const std::string &value)
 {
     if (!value.empty()) {
+        LOG_INFO("VoLTE setting state changed to '%s'.", value.c_str());
         volteOn = utils::getNumericValue<bool>(value);
     }
 }
 
 void ServiceCellular::apnListChanged(const std::string &value)
 {
-    LOG_DEBUG("apnListChanged");
     if (!value.empty()) {
+        LOG_INFO("apn_list setting state changed to '%s'.", value.c_str());
         packetData->loadAPNSettings(value);
     }
 }
@@ -1868,6 +1869,7 @@ void ServiceCellular::apnListChanged(const std::string &value)
 auto ServiceCellular::handleCellularAnswerIncomingCallMessage(CellularMessage *msg)
     -> std::shared_ptr<CellularResponseMessage>
 {
+    LOG_INFO(__PRETTY_FUNCTION__);
     if (ongoingCall.getType() != CallType::CT_INCOMING) {
         return std::make_shared<CellularResponseMessage>(true);
     }
@@ -1891,6 +1893,7 @@ auto ServiceCellular::handleCellularAnswerIncomingCallMessage(CellularMessage *m
 auto ServiceCellular::handleCellularCallRequestMessage(CellularCallRequestMessage *msg)
     -> std::shared_ptr<CellularResponseMessage>
 {
+    LOG_INFO(__PRETTY_FUNCTION__);
     auto channel = cmux->get(CellularMux::Channel::Commands);
     if (channel == nullptr) {
         return std::make_shared<CellularResponseMessage>(false);
@@ -1909,8 +1912,8 @@ auto ServiceCellular::handleCellularCallRequestMessage(CellularCallRequestMessag
 
 void ServiceCellular::handleCellularHangupCallMessage(CellularHangupCallMessage *msg)
 {
+    LOG_INFO(__PRETTY_FUNCTION__);
     auto channel = cmux->get(CellularMux::Channel::Commands);
-    LOG_INFO("CellularHangupCall");
     if (channel) {
         if (channel->cmd(at::AT::ATH)) {
             callManager.hangUp();
@@ -2003,6 +2006,7 @@ auto ServiceCellular::handleCellularRingingMessage(CellularRingingMessage *msg) 
 
 auto ServiceCellular::handleCellularIncominCallMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
+    LOG_INFO(__PRETTY_FUNCTION__);
     auto ret     = true;
     auto message = static_cast<CellularIncominCallMessage *>(msg);
     if (!ongoingCall.isValid()) {
@@ -2275,6 +2279,8 @@ auto ServiceCellular::handleCellularSendSMSMessage(sys::Message *msg) -> std::sh
 
 auto ServiceCellular::handleCellularRingNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
+    LOG_INFO(__PRETTY_FUNCTION__);
+
     if (phoneModeObserver->isTetheringOn())
         return std::make_shared<CellularResponseMessage>(hangUpCall());
 
