@@ -41,11 +41,22 @@ namespace bsp
 
     int32_t RT1051LPM::Reboot(RebootType reason)
     {
-        constexpr uint32_t rebootToUpdaterCode{0xdeadbeaf};
-        constexpr uint32_t rebootNormalCode{0};
+        enum rebootCode : std::uint32_t
+        {
+            rebootNormalCode       = std::uint32_t{0},
+            rebootToUpdateCode     = std::uint32_t{0xdead0000},
+            rebootToRecoveryCode   = std::uint32_t{0xdead0001},
+            rebootToFactoryRstCode = std::uint32_t{0xdead0002}
+        };
         switch (reason) {
-        case RebootType::GoToUpdater:
-            SNVS->LPGPR[0] = rebootToUpdaterCode;
+        case RebootType::GoToUpdaterUpdate:
+            SNVS->LPGPR[0] = rebootToUpdateCode;
+            break;
+        case RebootType::GoToUpdaterRecovery:
+            SNVS->LPGPR[0] = rebootToRecoveryCode;
+            break;
+        case RebootType::GoToUpdaterFactoryReset:
+            SNVS->LPGPR[0] = rebootToFactoryRstCode;
             break;
         case RebootType::NormalRestart:
             SNVS->LPGPR[0] = rebootNormalCode;

@@ -157,7 +157,7 @@ namespace sys
             break;
         case State::RebootToUpdate:
             LOG_INFO("  ---> REBOOT TO UPDATER <--- ");
-            powerManager->RebootToUpdate();
+            powerManager->RebootToUpdate(updateReason);
             break;
         default:
             LOG_FATAL("State changed after reset/shutdown was requested to: %s! this is terrible failure!",
@@ -275,9 +275,11 @@ namespace sys
         return true;
     }
 
-    bool SystemManager::RebootToUpdate(Service *s)
+    bool SystemManager::RebootToUpdate(Service *s, UpdateReason updateReason)
     {
-        s->bus.sendUnicast(std::make_shared<SystemManagerCmd>(Code::RebootToUpdate), service::name::system_manager);
+        s->bus.sendUnicast(
+            std::make_shared<SystemManagerCmd>(Code::RebootToUpdate, CloseReason::RegularPowerDown, updateReason),
+            service::name::system_manager);
         return true;
     }
 
@@ -514,7 +516,7 @@ namespace sys
                     RebootHandler(State::Reboot);
                     break;
                 case Code::RebootToUpdate:
-                    RebootHandler(State::RebootToUpdate);
+                    RebootHandler(State::RebootToUpdate, data->updateReason);
                     break;
                 case Code::None:
                     break;
@@ -724,10 +726,13 @@ namespace sys
         DestroyServices(sys::state::update::whitelist);
     }
 
-    void SystemManager::RebootHandler(State state)
+    void SystemManager::RebootHandler(State state, std::optional<UpdateReason> updateReason)
     {
         CloseSystemHandler(CloseReason::Reboot);
         set(state);
+        if (updateReason) {
+            this->updateReason = updateReason.value();
+        }
     }
 
     void SystemManager::CpuStatisticsTimerHandler()
