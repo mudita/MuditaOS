@@ -4,7 +4,6 @@
 
 import sys
 import time
-import sys
 import os.path
 import json
 import atexit
@@ -18,41 +17,12 @@ from harness.harness import Harness
 from harness.interface.defs import status
 from harness.interface.error import TestError, Error
 from functools import partial
+from harness.api.filesystem import put_file
+from harness.api.developermode import PhoneModeLock
 
 def send_update_package(harness, package_filepath: str):
-    file_size = os.path.getsize(package_filepath)
     file_name = package_filepath.split('/')[-1]
-
-    with open(package_filepath, 'rb') as file:
-        file_data = open(package_filepath,'rb').read()
-        file_crc32 = format((binascii.crc32(file_data) & 0xFFFFFFFF), '08x')
-
-    print(f"Sending {file_name}, size {file_size}, CRC32 {file_crc32}")
-
-    body = {"fileName" : "/sys/user/updates/" + file_name, "fileSize" : file_size, "fileCrc32" : file_crc32}
-    ret = harness.endpoint_request("filesystem", "put", body)
-
-    assert ret["status"] == status["OK"]
-    assert ret["body"]["txID"] != 0
-
-    txID      = ret["body"]["txID"]
-    chunkSize = ret["body"]["chunkSize"]
-    chunkNo = 1
-
-    with open(package_filepath, 'rb') as file:
-        with tqdm(total=file_size, unit='B', unit_scale=True) as pbar:
-            for chunk in iter(partial(file.read, chunkSize), b''):
-                data = binascii.b2a_base64(chunk).decode()
-                pbar.update(chunkSize)
-                body = {"txID" : txID, "chunkNo": chunkNo, "data" : data}
-                ret = harness.endpoint_request("filesystem", "put", body)
-                assert ret["status"] == status["OK"]
-                time.sleep(.1)
-                chunkNo += 1
-
-    print("Sending complete")
-
-    return True
+    put_file(harness, file_name , "/sys/user/updates/")
 
 def check_update_package(harness, package_filepath: str):
     body = {}
@@ -89,9 +59,7 @@ def check_update_package(harness, package_filepath: str):
     return True
 
 def setPasscode(harness, flag):
-    body = {"phoneLockCodeEnabled": flag}
-    ret = harness.endpoint_request("developerMode", "put", body)
-    assert ret["status"] == status["NoContent"]
+    PhoneModeLock(flag).run(harness)
 
 def main():
     if len(sys.argv) == 1:
@@ -107,16 +75,8 @@ def main():
     harness = Harness.from_detect()
 
     atexit.register(setPasscode, harness, True)
-
     setPasscode(harness, False)
-
-    time.sleep(.1)
-
-    if not send_update_package(harness, package_filepath):
-        print("Update package transfer failed")
-        exit(1)
-
-    time.sleep(.1)
+    send_update_package(harness, package_filepath)
 
     if not check_update_package(harness, package_filepath):
         print("Update package corrupted in transfer")
