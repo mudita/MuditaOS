@@ -1,16 +1,13 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <memory>
+#include "ColorTestWindow.hpp"
 
-#include <service-appmgr/Controller.hpp>
+#include <application-settings-new/ApplicationSettings.hpp>
+#include <application-settings-new/widgets/advanced/ColorTestListStyle.hpp>
+
 #include <service-gui/Common.hpp>
 #include <service-gui/messages/ChangeColorScheme.hpp>
-#include <Style.hpp>
-
-#include "application-settings/ApplicationSettings.hpp"
-#include "application-settings/widgets/ColorTestListStyle.hpp"
-#include "ColorTestWindow.hpp"
 
 namespace gui
 {

@@ -3,12 +3,17 @@
 
 #include "ApplicationSettings.hpp"
 
+#include <application-settings-new/windows/SettingsMainWindow.hpp>
+#include <application-settings-new/windows/advanced/AdvancedOptionsWindow.hpp>
+#include <application-settings-new/windows/advanced/InformationWindow.hpp>
+#include <application-settings-new/windows/advanced/UITestWindow.hpp>
+#include <application-settings-new/windows/advanced/EinkModeWindow.hpp>
+#include <application-settings-new/windows/advanced/ColorTestWindow.hpp>
 #include <application-settings-new/windows/AddDeviceWindow.hpp>
 #include <application-settings-new/windows/AllDevicesWindow.hpp>
 #include <application-settings-new/windows/ApnSettingsWindow.hpp>
 #include <application-settings-new/windows/ApnOptionsWindow.hpp>
 #include <application-settings-new/windows/BluetoothWindow.hpp>
-#include <application-settings-new/windows/SettingsMainWindow.hpp>
 #include <application-settings-new/windows/DisplayAndKeypadWindow.hpp>
 #include <application-settings-new/windows/InputLanguageWindow.hpp>
 #include <application-settings-new/windows/LockedScreenWindow.hpp>
@@ -330,7 +335,23 @@ namespace app
     {
         windowsFactory.attach(gui::name::window::main_window, [](Application *app, const std::string &name) {
             return std::make_unique<gui::OptionWindow>(
-                app, utils::translate("app_settings_title_main_new"), mainWindowOptionsNew(app));
+                app, utils::translate("app_settings_title_main"), mainWindowOptionsNew(app));
+        });
+        windowsFactory.attach(gui::window::name::advanced, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::OptionWindow>(
+                app, utils::translate("app_settings_advanced"), advancedOptions(app));
+        });
+        windowsFactory.attach(gui::window::name::information, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::InformationWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::ui_test, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::UiTestWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::eink_mode, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::EinkModeWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::color_test_window, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::ColorTestWindow>(app);
         });
         windowsFactory.attach(gui::window::name::bluetooth, [](Application *app, const std::string &name) {
             return std::make_unique<gui::BluetoothWindow>(app);
