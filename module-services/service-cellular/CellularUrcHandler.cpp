@@ -14,11 +14,6 @@
 
 using namespace at::urc;
 
-// this static function will be replaced by Settings API
-static bool isSettingsAutomaticTimeSyncEnabled()
-{
-    return true;
-}
 
 void CellularUrcHandler::Handle(Clip &urc)
 {
@@ -103,14 +98,10 @@ void CellularUrcHandler::Handle(Ctze &urc)
         return;
     }
 
-    if (isSettingsAutomaticTimeSyncEnabled()) {
         auto msg = std::make_shared<CellularTimeNotificationMessage>(
             urc.getGMTTime(), urc.getTimeZoneOffset(), urc.getTimeZoneString());
         cellularService.bus.sendUnicast(msg, service::name::service_time);
-    }
-    else {
-        LOG_DEBUG("Timezone sync disabled.");
-    }
+
     urc.setHandled(true);
 }
 

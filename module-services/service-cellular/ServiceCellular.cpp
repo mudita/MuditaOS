@@ -73,6 +73,7 @@
 #include <service-desktop/DesktopMessages.hpp>
 #include <service-desktop/DeveloperModeMessage.hpp>
 #include <service-appmgr/model/ApplicationManager.hpp>
+#include <service-time/service-time/TimeMessage.hpp>
 #include <task.h>
 #include <ucs2/UCS2.hpp>
 #include <utf8/UTF8.hpp>
@@ -182,12 +183,6 @@ ServiceCellular::ServiceCellular()
 ServiceCellular::~ServiceCellular()
 {
     LOG_INFO("[ServiceCellular] Cleaning resources");
-}
-
-// this static function will be replaced by Settings API
-static bool isSettingsAutomaticTimeSyncEnabled()
-{
-    return true;
 }
 
 void ServiceCellular::SleepTimerHandler()
@@ -302,6 +297,7 @@ void ServiceCellular::registerMessageHandlers()
     });
 
     priv->connectSimCard();
+    priv->connectNetworkTime();
 
     connect(typeid(CellularStartOperatorsScanMessage), [&](sys::Message *request) -> sys::MessagePointer {
         auto msg = static_cast<CellularStartOperatorsScanMessage *>(request);
@@ -386,6 +382,8 @@ void ServiceCellular::registerMessageHandlers()
         auto msg = static_cast<sdesktop::developerMode::DeveloperModeRequest *>(request);
         if (typeid(*msg->event.get()) == typeid(sdesktop::developerMode::CellularHotStartEvent)) {
             priv->simCard->setChannel(nullptr);
+            priv->networkTime->setChannel(nullptr);
+
             cmux->closeChannels();
             ///> change state - simulate hot start
             handle_power_up_request();
@@ -854,7 +852,7 @@ bool ServiceCellular::handle_audio_conf_procedure()
             LOG_DEBUG("[ServiceCellular] Modem is fully operational");
 
             priv->simCard->setChannel(cmux->get(CellularMux::Channel::Commands));
-
+            priv->networkTime->setChannel(cmux->get(CellularMux::Channel::Commands));
             // open channel - notifications
             DLCChannel *notificationsChannel = cmux->get(CellularMux::Channel::Notifications);
             if (notificationsChannel != nullptr) {
@@ -1398,10 +1396,9 @@ bool ServiceCellular::handle_URCReady()
 {
     auto channel = cmux->get(CellularMux::Channel::Commands);
     bool ret     = true;
-    if (isSettingsAutomaticTimeSyncEnabled()) {
-        ret = ret && channel->cmd(at::AT::ENABLE_TIME_ZONE_UPDATE);
-        ret = ret && channel->cmd(at::AT::SET_TIME_ZONE_REPORTING);
-    }
+
+    priv->requestNetworkTimeSettings();
+
     ret = ret && channel->cmd(at::AT::ENABLE_NETWORK_REGISTRATION_URC);
 
     bus.sendMulticast<cellular::msg::notification::ModemStateChanged>(cellular::api::ModemState::Ready);
