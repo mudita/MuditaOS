@@ -15,6 +15,7 @@ target_sources( ${PROJECT_NAME}
 
     PRIVATE
         ApplicationSettings.cpp
+        models/advanced/ColorTestModel.cpp
         models/ApnSettingsModel.cpp
         models/BluetoothSettingsModel.cpp
         models/NewApnModel.cpp
@@ -28,6 +29,8 @@ target_sources( ${PROJECT_NAME}
         models/SoundsModel.cpp
         presenter/SARInfoWindowPresenter.cpp
         presenter/TechnicalWindowPresenter.cpp
+        widgets/advanced/ColorTestListItem.cpp
+        widgets/advanced/ColorTestListView.cpp
         widgets/QuoteWidget.cpp
         widgets/CategoryWidget.cpp
         widgets/ApnInputWidget.cpp
@@ -35,6 +38,11 @@ target_sources( ${PROJECT_NAME}
         widgets/SettingsTimeItem.cpp
         widgets/SettingsSoundItem.cpp
         windows/SettingsMainWindow.cpp
+        windows/advanced/AdvancedOptionsWindow.cpp
+        windows/advanced/InformationWindow.cpp
+        windows/advanced/UITestWindow.cpp
+        windows/advanced/EinkModeWindow.cpp
+        windows/advanced/ColorTestWindow.cpp
         windows/AddDeviceWindow.cpp
         windows/AllDevicesWindow.cpp
         windows/ApnSettingsWindow.cpp
@@ -86,10 +94,19 @@ target_sources( ${PROJECT_NAME}
 
     PUBLIC
         ApplicationSettings.hpp
+        models/advanced/ColorTestModel.hpp
+        widgets/advanced/ColorTestListItem.hpp
+        widgets/advanced/ColorTestListItem.hpp
+        widgets/advanced/ColorTestListStyle.hpp
         widgets/ApnInputWidget.hpp
         widgets/CategoryWidget.hpp
         windows/NewApnWindow.hpp
         windows/SettingsMainWindow.hpp
+        windows/advanced/AdvancedOptionsWindow.hpp
+        windows/advanced/InformationWindow.hpp
+        windows/advanced/UITestWindow.hpp
+        windows/advanced/EinkModeWindow.hpp
+        windows/advanced/ColorTestWindow.hpp
         windows/BaseSettingsWindow.hpp
         windows/FontSizeWindow.hpp
         windows/InputLanguageWindow.hpp

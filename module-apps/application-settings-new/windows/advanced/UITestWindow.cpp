@@ -2,17 +2,8 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "UITestWindow.hpp"
-#include "../ApplicationSettings.hpp"
-#include "Label.hpp"
-#include "Margins.hpp"
-#include <i18n/i18n.hpp>
-#include <log.hpp>
-#include "messages/AppMessage.hpp"
-#include <service-appmgr/model/ApplicationManager.hpp>
-#include <GridLayout.hpp>
-#include <Style.hpp>
-#include <functional>
-#include <memory>
+
+#include <application-settings-new/ApplicationSettings.hpp>
 #include <Font.hpp>
 
 namespace gui
@@ -68,27 +59,4 @@ namespace gui
         text->setPenFocusWidth(0);
         setFocusItem(text);
     }
-
-    void UiTestWindow::rebuild()
-    {
-        LOG_INFO("Only if I have to!");
-    }
-
-    void UiTestWindow::buildInterface()
-    {}
-
-    void UiTestWindow::destroyInterface()
-    {
-        erase();
-        invalidate();
-    }
-
-    void UiTestWindow::invalidate() noexcept
-    {
-        text = nullptr;
-    }
-
-    void UiTestWindow::onBeforeShow(ShowMode mode, SwitchData *data)
-    {}
-
 } // namespace gui

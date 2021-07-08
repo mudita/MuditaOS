@@ -20,7 +20,6 @@ set(APPLICATIONS
     clock
     calendar
     desktop
-    settings
     settings-new
     call
     notes
