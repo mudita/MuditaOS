@@ -30,3 +30,4 @@ Logs from `Circular buffer` are dumped to a file named `MuditaOS.log` every 10 s
 Current max log file size is 50 MB (after reaching this size no more logs are dumped).
 
 Logs can be accessed using `mount_user_lfs_partition.py` script from `tools` directory.
+Additionally, `test/get_os_log.py` script allows getting a log file from a running phone.
