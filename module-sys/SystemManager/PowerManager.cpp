@@ -27,9 +27,18 @@ namespace sys
         return lowPowerControl->Reboot(bsp::LowPowerMode::RebootType::NormalRestart);
     }
 
-    int32_t PowerManager::RebootToUpdate()
+    int32_t PowerManager::RebootToUpdate(UpdateReason reason)
     {
-        return lowPowerControl->Reboot(bsp::LowPowerMode::RebootType::GoToUpdater);
+        switch (reason) {
+        case UpdateReason::FactoryReset:
+            return lowPowerControl->Reboot(bsp::LowPowerMode::RebootType::GoToUpdaterFactoryReset);
+        case UpdateReason::Recovery:
+            return lowPowerControl->Reboot(bsp::LowPowerMode::RebootType::GoToUpdaterRecovery);
+        case UpdateReason::Update:
+            return lowPowerControl->Reboot(bsp::LowPowerMode::RebootType::GoToUpdaterUpdate);
+        default:
+            return -1;
+        }
     }
 
     void PowerManager::UpdateCpuFrequency(uint32_t cpuLoad)

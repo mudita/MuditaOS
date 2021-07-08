@@ -26,7 +26,7 @@ namespace sys
 
         int32_t PowerOff();
         int32_t Reboot();
-        int32_t RebootToUpdate();
+        int32_t RebootToUpdate(UpdateReason reason);
 
         /// called periodically to calculate the CPU requirement
         ///

@@ -50,6 +50,14 @@ namespace sys
         LowBattery
     };
 
+    // Updater reason code
+    enum class UpdateReason
+    {
+        Update,
+        Recovery,
+        FactoryReset
+    };
+
 } // namespace sys
 
 inline const char *c_str(sys::ReturnCodes code)

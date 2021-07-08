@@ -18,9 +18,12 @@ namespace bsp
             External,
             Internal
         };
-        enum class RebootType {
+        enum class RebootType
+        {
             NormalRestart,
-            GoToUpdater,
+            GoToUpdaterUpdate,       //! Goto updater into the update mode
+            GoToUpdaterFactoryReset, //! GOto updater into the factory reset mode
+            GoToUpdaterRecovery      //! Goto to updater into recovery mode
         };
 
         LowPowerMode()          = default;
@@ -28,7 +31,7 @@ namespace bsp
 
         static std::optional<std::unique_ptr<LowPowerMode>> Create();
 
-        virtual int32_t PowerOff()              = 0;
+        virtual int32_t PowerOff()                = 0;
         virtual int32_t Reboot(RebootType reason) = 0;
 
         virtual void SetCpuFrequency(CpuFrequencyHz freq) = 0;
