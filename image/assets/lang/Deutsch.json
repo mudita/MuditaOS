@@ -80,6 +80,7 @@
   "duration_0hmin_0sec": "%0N:%0S",
   "duration_hour_0min_0sec": "%H:%0M:%0S",
   "brightness_text": "HELLIGKEIT",
+  "phone_needs_rebooting": "Das Telefon muss neu gestartet werden. Drücken Sie zur Bestätigung eine beliebige Taste und entfernen Sie die Batterie für 10 Sekunden, um das Gerät komplett neu starten zu lassen.",
   "home_modes_connected": "VERBUNDEN",
   "home_modes_notdisturb": "NICHT STÖREN",
   "home_modes_offline": "OFFLINE",
