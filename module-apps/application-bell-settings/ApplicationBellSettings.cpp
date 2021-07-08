@@ -2,9 +2,10 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <application-bell-settings/ApplicationBellSettings.hpp>
-#include <windows/BellSettingsAdvancedWindow.hpp>
-#include <windows/BellSettingsTimeUnitsWindow.hpp>
-#include <windows/BellSettingsWindow.hpp>
+
+#include "windows/BellSettingsAdvancedWindow.hpp"
+#include "windows/BellSettingsTimeUnitsWindow.hpp"
+#include "windows/BellSettingsWindow.hpp"
 #include <apps-common/windows/Dialog.hpp>
 
 namespace app

@@ -108,7 +108,7 @@ int main()
             applications.push_back(
                 app::CreateLauncher<app::ApplicationBellMain>(app::applicationBellName, app::Closeable::False));
             applications.push_back(app::CreateLauncher<app::ApplicationBellSettings>(app::applicationBellSettingsName,
-                                                                                     app::Closeable::False));
+                                                                                     app::Closeable::True));
             // start application manager
             return sysmgr->RunSystemService(
                 std::make_shared<app::manager::ApplicationManager>(

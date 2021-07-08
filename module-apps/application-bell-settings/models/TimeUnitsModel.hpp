@@ -6,7 +6,7 @@
 #include <apps-common/Application.hpp>
 #include <apps-common/SimpleInternalModel.hpp>
 #include <widgets/SideListItemProvider.hpp>
-#include <widgets/TimeSetSpinner.hpp>
+#include <TimeSetSpinner.hpp>
 
 namespace gui
 {

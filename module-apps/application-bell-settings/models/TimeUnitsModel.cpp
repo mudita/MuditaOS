@@ -5,7 +5,7 @@
 
 #include <service-time/Constants.hpp>
 #include <service-time/service-time/TimeMessage.hpp>
-#include <widgets/TimeSetSpinner.hpp>
+#include <TimeSetSpinner.hpp>
 #include <widgets/Text.hpp>
 
 namespace gui

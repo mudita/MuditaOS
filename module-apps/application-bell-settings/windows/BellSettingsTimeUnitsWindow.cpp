@@ -11,7 +11,7 @@
 namespace gui
 {
     BellSettingsTimeUnitsWindow::BellSettingsTimeUnitsWindow(app::Application *app, std::string name)
-        : AppWindow(app, name), timeUnitsModel(new TimeUnitsModel(app))
+        : AppWindow(app, name), timeUnitsModel(std::make_shared<TimeUnitsModel>(app))
     {
         buildInterface();
     }
@@ -46,17 +46,15 @@ namespace gui
         if (sidelistview->onInput(inputEvent)) {
             return true;
         }
-        else {
-            if (inputEvent.isShortRelease(KeyCode::KEY_ENTER)) {
-                timeUnitsModel->saveData();
-                application->returnToPreviousWindow();
-                return true;
-            }
+        if (inputEvent.isShortRelease(KeyCode::KEY_ENTER)) {
+            timeUnitsModel->saveData();
+            application->returnToPreviousWindow();
+            return true;
         }
         if (AppWindow::onInput(inputEvent)) {
             return true;
         }
 
-        return false;
+        return AppWindow::onInput(inputEvent);
     }
 } /* namespace gui */

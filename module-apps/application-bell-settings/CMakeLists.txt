@@ -3,6 +3,9 @@
 target_include_directories(application-bell-settings
     PRIVATE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/models>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/widgets>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/windows>
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )

@@ -2,8 +2,10 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BellSettingsWindow.hpp"
+
 #include <application-bell-settings/ApplicationBellSettings.hpp>
-#include <application-bell-settings/data/BellSettingsStyle.hpp>
+#include <data/BellSettingsStyle.hpp>
+
 #include <apps-common/messages/DialogMetadataMessage.hpp>
 #include <apps-common/options/type/OptionBellMenu.hpp>
 #include <apps-common/windows/Dialog.hpp>

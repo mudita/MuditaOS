@@ -16,8 +16,6 @@ namespace gui
       public:
         TimeSetSpinner(gui::Length x, gui::Length y, gui::Length w, gui::Length h, std::string description = "");
 
-        ~TimeSetSpinner() override = default;
-
         auto setHour(int value) noexcept -> void;
         auto setMinute(int value) noexcept -> void;
         [[nodiscard]] auto getHour() const noexcept -> int;

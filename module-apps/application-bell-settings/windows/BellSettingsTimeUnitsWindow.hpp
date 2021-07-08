@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <models/TimeUnitsModel.hpp>
+#include <TimeUnitsModel.hpp>
 #include <application-bell-settings/ApplicationBellSettings.hpp>
 #include <apps-common/windows/AppWindow.hpp>
 #include <module-gui/gui/widgets/SideListView.hpp>
