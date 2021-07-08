@@ -21,6 +21,8 @@ namespace gui
 
         Text *inputField = nullptr;
         std::unique_ptr<BluetoothSettingsModel> bluetoothSettingsModel;
+
+        static constexpr auto maxNameLength = 248; // Max 248 bytes according to Bluetooth Core Specification v5.2
     };
 
 } /* namespace gui */
