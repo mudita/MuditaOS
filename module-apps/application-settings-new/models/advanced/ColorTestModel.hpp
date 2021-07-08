@@ -3,9 +3,10 @@
 
 #pragma once
 
-#include "Application.hpp"
-#include "InternalModel.hpp"
-#include "module-apps/application-settings/widgets/ColorTestListItem.hpp"
+#include "application-settings-new/widgets/advanced/ColorTestListItem.hpp"
+
+#include <Application.hpp>
+#include <InternalModel.hpp>
 #include <ListView.hpp>
 #include <ListItemProvider.hpp>
 

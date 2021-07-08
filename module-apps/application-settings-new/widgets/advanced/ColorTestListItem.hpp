@@ -3,14 +3,11 @@
 
 #pragma once
 
-#include <memory>
-
+#include <Application.hpp>
 #include <BoxLayout.hpp>
 #include <Label.hpp>
 #include <ListItem.hpp>
 #include <InputEvent.hpp>
-
-#include "Application.hpp"
 
 namespace gui
 {

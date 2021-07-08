@@ -1,26 +1,15 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <memory>
-#include <functional>
-
-#include "Common.hpp"
-#include "service-eink/Common.hpp"
-#include "messages/EinkModeMessage.hpp"
-#include "service-appmgr/Controller.hpp"
-#include "../ApplicationSettings.hpp"
-
-#include <i18n/i18n.hpp>
-
-#include "Label.hpp"
-#include "Margins.hpp"
 #include "EinkModeWindow.hpp"
-#include <Style.hpp>
+
+#include <application-settings-new/ApplicationSettings.hpp>
+#include <messages/EinkModeMessage.hpp>
 
 namespace gui
 {
 
-    EinkModeWindow::EinkModeWindow(app::Application *app) : AppWindow(app, window::name::eink)
+    EinkModeWindow::EinkModeWindow(app::Application *app) : AppWindow(app, window::name::eink_mode)
     {
         AppWindow::buildInterface();
         bottomBar->setActive(BottomBar::Side::CENTER, true);
@@ -28,7 +17,7 @@ namespace gui
         bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::select));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
-        setTitle("Change eink mode");
+        setTitle(window::name::eink_mode);
         auto label               = new Label(this, 100, 200, 300, 50, "Change mode on click");
         label->activatedCallback = [this](Item &) -> bool {
             static auto last_mode = service::eink::EinkModeMessage::Mode::Normal;

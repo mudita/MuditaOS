@@ -1,43 +1,29 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "Info.hpp"
+#include "InformationWindow.hpp"
 
-#include <application-settings/ApplicationSettings.hpp>
+#include <application-settings-new/ApplicationSettings.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
 
 #include <source/version.hpp>
 #include <log.hpp>
 
-#include <gui/widgets/BoxLayout.hpp>
-#include <gui/widgets/Label.hpp>
-#include <gui/widgets/Margins.hpp>
-#include <gui/widgets/Style.hpp>
-
-#include <i18n/i18n.hpp>
-#include <boot/bootconfig.hpp>
-
 namespace gui
 {
 
-    Info::Info(app::Application *app) : AppWindow(app, gui::window::hw_info)
+    InformationWindow::InformationWindow(app::Application *app) : AppWindow(app, gui::window::name::information)
     {
         buildInterface();
     }
 
-    void Info::rebuild()
-    {
-        destroyInterface();
-        buildInterface();
-    }
-
-    void Info::buildInterface()
+    void InformationWindow::buildInterface()
     {
         AppWindow::buildInterface();
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
         bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
-        setTitle("Info");
+        setTitle(gui::window::name::information);
 
         box = new gui::VBox(this, 0, style::window::default_vertical_pos, style::window_width, style::window_height);
         box->setPenWidth(style::window::default_border_no_focus_w);
@@ -55,18 +41,9 @@ namespace gui
             box, "Modem Frimware:", (firmwareVersion.empty() ? utils::translate("not available") : firmwareVersion));
     }
 
-    void Info::destroyInterface()
-    {
-        erase();
-        invalidate();
-    }
-
-    void Info::invalidate() noexcept
-    {
-        box = nullptr;
-    }
-
-    void Info::addAlignedLabelWithValue(BoxLayout *layout, const std::string &labelText, const std::string &valueText)
+    void InformationWindow::addAlignedLabelWithValue(BoxLayout *layout,
+                                                     const std::string &labelText,
+                                                     const std::string &valueText)
     {
         auto lineBox = new gui::VBox(layout, 0, 0, style::window_width, style::window::label::small_h * 2);
         lineBox->setEdges(RectangleEdge::Bottom);

@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "ListView.hpp"
-#include "Application.hpp"
+#include <Application.hpp>
+#include <ListView.hpp>
 
 namespace gui
 {
