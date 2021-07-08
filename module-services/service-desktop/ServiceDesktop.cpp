@@ -15,7 +15,7 @@
 #include <Service/Worker.hpp>
 #include <json11.hpp>
 #include <log.hpp>
-#include <module-apps/application-desktop/ApplicationDesktop.hpp>
+#include <application-desktop/Constants.hpp>
 #include <service-db/service-db/Settings.hpp>
 #include <service-db/QueryMessage.hpp>
 #include <purefs/filesystem_paths.hpp>

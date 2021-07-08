@@ -3,12 +3,13 @@
 
 #pragma once
 
-#include "windows/Names.hpp"
-#include "widgets/DBNotificationsHandler.hpp"
 #include "Constants.hpp"
+#include "DBNotificationsHandler.hpp"
+#include "Names.hpp"
+
 #include <Application.hpp>
-#include <Service/Message.hpp>
 #include <service-desktop/DesktopMessages.hpp>
+#include <Service/Message.hpp>
 
 namespace cellular::msg::notification
 {

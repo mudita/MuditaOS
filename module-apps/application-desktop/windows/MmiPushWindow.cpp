@@ -1,12 +1,13 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "Mmi.hpp"
 #include "MmiPushWindow.hpp"
-#include <service-appmgr/model/ApplicationManager.hpp>
-#include <service-appmgr/data/MmiActionsParams.hpp>
-#include <application-desktop/data/Mmi.hpp>
+
 #include <i18n/i18n.hpp>
 #include <Image.hpp>
+#include <service-appmgr/data/MmiActionsParams.hpp>
+#include <service-appmgr/model/ApplicationManager.hpp>
 
 using namespace gui;
 

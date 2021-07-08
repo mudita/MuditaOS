@@ -1,13 +1,12 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "DesktopData.hpp"
+#include "Names.hpp"
 #include "PostUpdateWindow.hpp"
 
-#include <locks/data/LockStyle.hpp>
-#include <application-desktop/data/DesktopData.hpp>
-#include <application-desktop/windows/Names.hpp>
-
 #include <i18n/i18n.hpp>
+#include <locks/data/LockStyle.hpp>
 
 using namespace gui;
 

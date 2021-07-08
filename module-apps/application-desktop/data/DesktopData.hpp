@@ -3,8 +3,9 @@
 
 #pragma once
 
-#include "gui/SwitchData.hpp"
+#include <gui/SwitchData.hpp>
 #include <service-desktop/DesktopMessages.hpp>
+
 #include <filesystem>
 #include <utility>
 
