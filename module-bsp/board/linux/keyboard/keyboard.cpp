@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /*
@@ -27,52 +27,74 @@
 
 namespace bsp
 {
-
-    static TaskHandle_t linux_keyboard_worker_handle = NULL;
-
-    static uint8_t kcode  = 0;
-    static uint8_t kevent = 0;
-
-    static int fd;
-
-    static void linux_keyboard_worker(void *pvp)
+    namespace
     {
+        TaskHandle_t linux_keyboard_worker_handle = nullptr;
 
-        const char *myfifo = "/tmp/myfifo3";
+        uint8_t kcode  = 0;
+        uint8_t kevent = 0;
 
-        // Creating the named file(FIFO)
-        // mkfifo(<pathname>, <permission>)
-        mkfifo(myfifo, 0666);
+        int fd;
 
-        // Open FIFO for write only
-        fd = open(myfifo, O_RDONLY | O_NONBLOCK);
-
-        while (1) {
-            uint8_t buff[10];
-            int32_t readedBytes = read(fd, buff, 10);
-
-            if (readedBytes > 1) {
-                kevent = buff[0];
-                kcode  = buff[1];
-
-                xQueueHandle qhandle = reinterpret_cast<xQueueHandle>(pvp);
-
-                uint8_t notification = 0;
-                if (kcode == static_cast<uint8_t>(bsp::KeyCodes::FnRight)) {
-                    if (kevent == static_cast<uint8_t>(bsp::KeyEvents::Pressed))
-                        notification = 0x02;
-                    else
-                        notification = 0x04;
+        bool handleSliderKey()
+        {
+            bool breakIfSliderReleased = false;
+            if (kcode == static_cast<uint8_t>(bsp::KeyCodes::SSwitchUp) ||
+                kcode == static_cast<uint8_t>(bsp::KeyCodes::SSwitchMid) ||
+                kcode == static_cast<uint8_t>(bsp::KeyCodes::SSwitchDown)) {
+                if (kevent == static_cast<uint8_t>(bsp::KeyEvents::Pressed)) {
+                    kevent = static_cast<uint8_t>(bsp::KeyEvents::Moved);
                 }
-                else
-                    notification = 0x01;
-                xQueueSend(qhandle, &notification, 100);
+                else {
+                    breakIfSliderReleased = true;
+                }
             }
-            vTaskDelay(50);
+            return breakIfSliderReleased;
         }
 
-        close(fd);
-    }
+        void linux_keyboard_worker(void *pvp)
+        {
+
+            const char *myfifo = "/tmp/myfifo3";
+
+            // Creating the named file(FIFO)
+            // mkfifo(<pathname>, <permission>)
+            mkfifo(myfifo, 0666);
+
+            // Open FIFO for write only
+            fd = open(myfifo, O_RDONLY | O_NONBLOCK);
+
+            while (1) {
+                uint8_t buff[10];
+                int32_t readedBytes = read(fd, buff, 10);
+
+                if (readedBytes > 1) {
+                    kevent = buff[0];
+                    kcode  = buff[1];
+
+                    xQueueHandle qhandle = reinterpret_cast<xQueueHandle>(pvp);
+
+                    uint8_t notification = 0;
+                    if (kcode == static_cast<uint8_t>(bsp::KeyCodes::FnRight)) {
+                        if (kevent == static_cast<uint8_t>(bsp::KeyEvents::Pressed))
+                            notification = 0x02;
+                        else
+                            notification = 0x04;
+                    }
+                    else
+                        notification = 0x01;
+
+                    if (handleSliderKey()) {
+                        break;
+                    }
+                    xQueueSend(qhandle, &notification, 100);
+                }
+                vTaskDelay(50);
+            }
+
+            close(fd);
+        }
+    } // namespace
 
     void keyboard_get_data(const uint8_t &notification, uint8_t &event, uint8_t &code)
     {
