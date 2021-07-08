@@ -60,7 +60,7 @@ namespace app
             return (index < internalData.size());
         }
 
-        void clearItemProperties(T Item)
+        void clearItemProperties(T &Item)
         {
             Item->setFocus(false);
             Item->setVisible(true);

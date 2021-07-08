@@ -35,31 +35,31 @@ namespace gui
         topMessage->activeItem = false;
         topMessage->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
 
-        auto middle_hbox = new gui::HBox(body,
-                                         style::sidelistview::middleHBox::x,
-                                         style::sidelistview::middleHBox::y,
-                                         style::sidelistview::middleHBox::w,
-                                         style::sidelistview::middleHBox::h);
-        middle_hbox->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-        middle_hbox->setEdges(gui::RectangleEdge::None);
+        auto middleHbox = new gui::HBox(body,
+                                        style::sidelistview::middleHBox::x,
+                                        style::sidelistview::middleHBox::y,
+                                        style::sidelistview::middleHBox::w,
+                                        style::sidelistview::middleHBox::h);
+        middleHbox->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
+        middleHbox->setEdges(gui::RectangleEdge::None);
 
-        auto arrow_left = new gui::Image(style::sidelistview::arrowLeftImage);
-        arrow_left->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
-        arrow_left->activeItem = false;
-        middle_hbox->addWidget(arrow_left);
+        auto arrowLeft = new gui::Image(style::sidelistview::arrowLeftImage);
+        arrowLeft->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
+        arrowLeft->activeItem = false;
+        middleHbox->addWidget(arrowLeft);
 
-        listitemBox = new gui::Rect(middle_hbox,
+        listItemBox = new gui::Rect(middleHbox,
                                     style::sidelistview::listItem::x,
                                     style::sidelistview::listItem::y,
                                     style::sidelistview::listItem::w,
                                     style::sidelistview::listItem::h);
-        listitemBox->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-        listitemBox->setEdges(gui::RectangleEdge::None);
+        listItemBox->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
+        listItemBox->setEdges(gui::RectangleEdge::None);
 
-        auto arrow_right = new gui::Image(style::sidelistview::arrowRightImage);
-        arrow_right->setAlignment(Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Center));
-        arrow_right->activeItem = false;
-        middle_hbox->addWidget(arrow_right);
+        auto arrowRight = new gui::Image(style::sidelistview::arrowRightImage);
+        arrowRight->setAlignment(Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Center));
+        arrowRight->activeItem = false;
+        middleHbox->addWidget(arrowRight);
 
         if (prov != nullptr) {
             provider       = std::move(prov);
@@ -73,7 +73,7 @@ namespace gui
         progressbar->setValue(provider->getCurrentIndex() + 1);
 
         if (auto firstItem = provider->getItem(Order::Next)) {
-            listitemBox->addWidget(firstItem);
+            listItemBox->addWidget(firstItem);
             topMessage->setText(firstItem->getDescription());
             setFocusItem(firstItem);
         }
@@ -81,7 +81,7 @@ namespace gui
 
     bool SideListView::onInput(const gui::InputEvent &inputEvent)
     {
-        if (auto item = listitemBox->children.back()) {
+        if (auto item = listItemBox->children.back()) {
             if (auto ret = item->onInput(inputEvent)) {
                 return ret;
             }
@@ -104,14 +104,14 @@ namespace gui
 
     auto SideListView::slide(gui::Order order) -> bool
     {
-        auto oldItem = listitemBox->children.back();
+        auto oldItem = listItemBox->children.back();
         auto newItem = provider->getItem(order);
 
         if (oldItem) {
-            listitemBox->removeWidget(oldItem);
+            listItemBox->removeWidget(oldItem);
         }
         if (newItem != nullptr) {
-            listitemBox->addWidget(newItem);
+            listItemBox->addWidget(newItem);
             topMessage->setText(newItem->getDescription());
             return true;
         }
@@ -125,14 +125,14 @@ namespace gui
 
     void SideListView::clear()
     {
-        listitemBox->setFocusItem(nullptr);
+        listItemBox->setFocusItem(nullptr);
 
-        while (auto el = listitemBox->children.back()) {
+        while (auto el = listItemBox->children.back()) {
             if (el->type == ItemType::LIST_ITEM) {
-                listitemBox->removeWidget(el);
+                listItemBox->removeWidget(el);
             }
             else {
-                listitemBox->erase(el);
+                listItemBox->erase(el);
             }
         }
     }

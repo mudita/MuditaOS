@@ -18,10 +18,10 @@ namespace gui
 
         ~TimeSetSpinner() override = default;
 
-        auto setHour(int value) const noexcept -> void;
-        auto setMinute(int value) const noexcept -> void;
-        auto getHour() const noexcept -> int;
-        auto getMinute() const noexcept -> int;
+        auto setHour(int value) noexcept -> void;
+        auto setMinute(int value) noexcept -> void;
+        [[nodiscard]] auto getHour() const noexcept -> int;
+        [[nodiscard]] auto getMinute() const noexcept -> int;
 
       private:
         const uint32_t hourMin    = 0;
@@ -38,8 +38,8 @@ namespace gui
         auto handleEnterKey() -> bool;
         auto handleRightFunctionKey() -> bool;
         auto onInput(const gui::InputEvent &inputEvent) -> bool override;
-        auto getFontHeight() -> uint16_t;
-        auto getWidestDigitWidth() -> uint32_t;
+        [[nodiscard]] auto getFontHeight() const noexcept -> uint16_t;
+        [[nodiscard]] auto getWidestDigitWidth() const noexcept -> uint32_t;
     };
 
 } /* namespace gui */

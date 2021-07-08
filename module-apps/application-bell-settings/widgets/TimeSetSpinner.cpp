@@ -26,7 +26,8 @@ namespace gui
         hbox->setEdges(gui::RectangleEdge::None);
 
         auto fontHeight      = getFontHeight();
-        auto doubleCharWidth = getWidestDigitWidth() * noOfDigits + noOfDigits; // two digits + minimal space beetween
+        auto doubleCharWidth =
+            (getWidestDigitWidth() * noOfDigits) + (1 * noOfDigits); // two digits + minimal space beetween
 
         hour = new gui::Spinner(hourMin, hourMax, hourStep, gui::Boundaries::Continuous);
         hour->setMinimumSize(doubleCharWidth, fontHeight);
@@ -76,17 +77,17 @@ namespace gui
         return this->focusItem->onInput(inputEvent);
     }
 
-    uint16_t TimeSetSpinner::getFontHeight()
+    uint16_t TimeSetSpinner::getFontHeight() const noexcept
     {
-        RawFont *font = FontManager::getInstance().getFont(fontName);
+        const RawFont *font = FontManager::getInstance().getFont(fontName);
         return font->info.line_height;
     }
 
-    uint32_t TimeSetSpinner::getWidestDigitWidth()
+    uint32_t TimeSetSpinner::getWidestDigitWidth() const noexcept
     {
-        RawFont *font     = FontManager::getInstance().getFont(fontName);
+        const RawFont *font = FontManager::getInstance().getFont(fontName);
         uint32_t maxWidth = 0;
-        for (uint32_t i = 48; i < 57; i++) {
+        for (uint32_t i = '0'; i < '9'; i++) {
             uint32_t width = font->getCharPixelWidth(i);
             if (width > maxWidth) {
                 maxWidth = width;
@@ -113,11 +114,11 @@ namespace gui
         return false;
     }
 
-    auto TimeSetSpinner::setHour(int value) const noexcept -> void
+    auto TimeSetSpinner::setHour(int value) noexcept -> void
     {
         hour->setCurrentValue(value);
     }
-    auto TimeSetSpinner::setMinute(int value) const noexcept -> void
+    auto TimeSetSpinner::setMinute(int value) noexcept -> void
     {
         minute->setCurrentValue(value);
     }

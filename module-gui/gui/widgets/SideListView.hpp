@@ -21,7 +21,7 @@ namespace gui
         std::shared_ptr<SideListItemProvider> provider = nullptr;
         Label *topMessage                              = nullptr;
         HBarGraph *progressbar                         = nullptr;
-        Rect *listitemBox                              = nullptr;
+        Rect *listItemBox                              = nullptr;
 
         [[nodiscard]] auto slide(Order order) -> bool;
         auto clear() -> void;
