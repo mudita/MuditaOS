@@ -63,16 +63,23 @@ namespace sys
     class SystemManagerCmd : public DataMessage
     {
       public:
-        explicit SystemManagerCmd(Code type = Code::None, CloseReason closeReason = CloseReason::RegularPowerDown)
-            : DataMessage(BusChannel::SystemManagerRequests), type(type), closeReason(closeReason)
+        explicit SystemManagerCmd(Code type                 = Code::None,
+                                  CloseReason closeReason   = CloseReason::RegularPowerDown,
+                                  UpdateReason updateReason = UpdateReason::Update)
+            : DataMessage(BusChannel::SystemManagerRequests), type(type), closeReason(closeReason),
+              updateReason(updateReason)
         {}
 
         Code type;
         CloseReason closeReason;
+        UpdateReason updateReason;
     };
 
     class SystemManager : public Service
     {
+      private:
+        UpdateReason updateReason{UpdateReason::Update};
+
       public:
         using InitFunction = std::function<bool()>;
 
@@ -104,7 +111,7 @@ namespace sys
 
         static bool Reboot(Service *s);
 
-        static bool RebootToUpdate(Service *s);
+        static bool RebootToUpdate(Service *s, UpdateReason updateReason);
 
         static void storeOsVersion(Service *s, const std::string &updateOSVer, const std::string &currentOSVer);
 
@@ -180,7 +187,7 @@ namespace sys
 
         void RestoreSystemHandler();
 
-        void RebootHandler(State state);
+        void RebootHandler(State state, std::optional<UpdateReason> updateReason = std::nullopt);
 
         /// loop to handle prior to full system close
         /// for now for rt1051 we need to
