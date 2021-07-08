@@ -194,8 +194,6 @@ namespace app::manager
         void displayLanguageChanged(std::string value);
         void lockTimeChanged(std::string value);
         void inputLanguageChanged(std::string value);
-
-        void processKeypadBacklightState(bsp::keypad_backlight::State keypadLightState);
     };
 } // namespace app::manager
 

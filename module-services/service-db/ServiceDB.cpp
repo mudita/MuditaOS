@@ -51,13 +51,7 @@ ServiceDB::ServiceDB() : sys::Service(service::name::db, "", service_db_stack, s
 
 ServiceDB::~ServiceDB()
 {
-    contactsDB.reset();
-    smsDB.reset();
     alarmsDB.reset();
-    notesDB.reset();
-    countryCodesDB.reset();
-    notificationsDB.reset();
-    quotesDB.reset();
 
     Database::deinitialize();
     LOG_INFO("[ServiceDB] Cleaning resources");
@@ -239,30 +233,12 @@ sys::ReturnCodes ServiceDB::InitHandler()
     }
 
     // Create databases
-    contactsDB      = std::make_unique<ContactsDB>((purefs::dir::getUserDiskPath() / "contacts.db").c_str());
-    smsDB           = std::make_unique<SmsDB>((purefs::dir::getUserDiskPath() / "sms.db").c_str());
     alarmsDB        = std::make_unique<AlarmsDB>((purefs::dir::getUserDiskPath() / "alarms.db").c_str());
-    notesDB         = std::make_unique<NotesDB>((purefs::dir::getUserDiskPath() / "notes.db").c_str());
-    calllogDB       = std::make_unique<CalllogDB>((purefs::dir::getUserDiskPath() / "calllog.db").c_str());
-    countryCodesDB  = std::make_unique<CountryCodesDB>("country-codes.db");
-    notificationsDB = std::make_unique<NotificationsDB>((purefs::dir::getUserDiskPath() / "notifications.db").c_str());
-    quotesDB        = std::make_unique<Database>((purefs::dir::getUserDiskPath() / "quotes.db").c_str());
 
     // Create record interfaces
-    contactRecordInterface       = std::make_unique<ContactRecordInterface>(contactsDB.get());
-    smsRecordInterface           = std::make_unique<SMSRecordInterface>(smsDB.get(), contactsDB.get());
-    threadRecordInterface        = std::make_unique<ThreadRecordInterface>(smsDB.get(), contactsDB.get());
-    smsTemplateRecordInterface   = std::make_unique<SMSTemplateRecordInterface>(smsDB.get());
     alarmsRecordInterface        = std::make_unique<AlarmsRecordInterface>(alarmsDB.get());
-    notesRecordInterface         = std::make_unique<NotesRecordInterface>(notesDB.get());
-    calllogRecordInterface       = std::make_unique<CalllogRecordInterface>(calllogDB.get(), contactsDB.get());
-    countryCodeRecordInterface   = std::make_unique<CountryCodeRecordInterface>(countryCodesDB.get());
-    notificationsRecordInterface =
-        std::make_unique<NotificationsRecordInterface>(notificationsDB.get(), contactRecordInterface.get());
-    quotesRecordInterface        = std::make_unique<Quotes::QuotesAgent>(quotesDB.get());
 
     databaseAgents.emplace(std::make_unique<SettingsAgent>(this));
-    databaseAgents.emplace(std::make_unique<FileIndexerAgent>(this));
 
     for (auto &dbAgent : databaseAgents) {
         dbAgent->initDb();
@@ -296,33 +272,8 @@ void ServiceDB::sendUpdateNotification(db::Interface::Name interface, db::Query:
 
 bool ServiceDB::StoreIntoBackup(const std::filesystem::path &backupPath)
 {
-    if (contactsDB->storeIntoFile(backupPath / std::filesystem::path(contactsDB->getName()).filename()) == false) {
-        LOG_ERROR("contactsDB backup failed");
-        return false;
-    }
-
-    if (smsDB->storeIntoFile(backupPath / std::filesystem::path(smsDB->getName()).filename()) == false) {
-        LOG_ERROR("smsDB backup failed");
-        return false;
-    }
-
     if (alarmsDB->storeIntoFile(backupPath / std::filesystem::path(alarmsDB->getName()).filename()) == false) {
         LOG_ERROR("alarmsDB backup failed");
-        return false;
-    }
-
-    if (notesDB->storeIntoFile(backupPath / std::filesystem::path(notesDB->getName()).filename()) == false) {
-        LOG_ERROR("notesDB backup failed");
-        return false;
-    }
-
-    if (calllogDB->storeIntoFile(backupPath / std::filesystem::path(calllogDB->getName()).filename()) == false) {
-        LOG_ERROR("calllogDB backup failed");
-        return false;
-    }
-
-    if (quotesDB->storeIntoFile(backupPath / std::filesystem::path(quotesDB->getName()).filename()) == false) {
-        LOG_ERROR("quotesDB backup failed");
         return false;
     }
 

@@ -627,27 +627,10 @@ namespace sys
         });
 
         connect(typeid(app::manager::CheckIfStartAllowedMessage), [this](sys::Message *) -> sys::MessagePointer {
-            switch (Store::Battery::get().levelState) {
-            case Store::Battery::LevelState::Normal:
-                bus.sendUnicast(std::make_unique<app::manager::StartAllowedMessage>(app::manager::StartupType::Regular),
-                                app::manager::ApplicationManager::ServiceName);
-                break;
-            case Store::Battery::LevelState::Shutdown:
-                if (!lowBatteryShutdownDelay.isActive()) {
-                    lowBatteryShutdownDelay.start();
-                }
-                [[fallthrough]];
-            case Store::Battery::LevelState::CriticalNotCharging:
-                bus.sendUnicast(
-                    std::make_unique<app::manager::StartAllowedMessage>(app::manager::StartupType::LowBattery),
-                    app::manager::ApplicationManager::ServiceName);
-                break;
-            case Store::Battery::LevelState::CriticalCharging:
-                bus.sendUnicast(
-                    std::make_unique<app::manager::StartAllowedMessage>(app::manager::StartupType::LowBatteryCharging),
-                    app::manager::ApplicationManager::ServiceName);
-                break;
-            }
+            // Store::Battery::get().levelState returns Store::Battery::LevelState::CriticalNotCharging.
+            // It's a temporary workaround for now to run Bell app normally.
+            bus.sendUnicast(std::make_unique<app::manager::StartAllowedMessage>(app::manager::StartupType::Regular),
+                            app::manager::ApplicationManager::ServiceName);
             return sys::MessageNone{};
         });
 

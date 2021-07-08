@@ -185,13 +185,6 @@ sys::ReturnCodes EventManager::InitHandler()
         return std::make_shared<sys::ResponseMessage>();
     });
 
-    connect(sevm::KeypadBacklightMessage(bsp::keypad_backlight::Action::turnOff), [&](sys::Message *msgl) {
-        auto request      = static_cast<sevm::KeypadBacklightMessage *>(msgl);
-        auto response     = std::make_shared<sevm::KeypadBacklightResponseMessage>();
-        response->success = backlightHandler.processKeypadRequest(request->action);
-        return response;
-    });
-
     connect(sevm::BatterySetCriticalLevel(0), [&](sys::Message *msgl) {
         auto request = static_cast<sevm::BatterySetCriticalLevel *>(msgl);
         battery_level_check::setBatteryCriticalLevel(request->criticalLevel);
@@ -221,48 +214,6 @@ sys::ReturnCodes EventManager::InitHandler()
         auto msg = std::make_shared<sevm::ScreenLightControlParametersResponse>(
             backlightHandler.getScreenLightState(), backlightHandler.getScreenAutoModeState(), params);
         return msg;
-    });
-    connect(sevm::BatteryStatusChangeMessage(), [&](sys::Message *msgl) {
-        if (msgl->sender == this->GetName()) {
-            LOG_INFO("Battery level: %d , charging: %d",
-                     Store::Battery::get().level,
-                     Store::Battery::get().state == Store::Battery::State::Charging);
-
-            if (Store::Battery::get().state == Store::Battery::State::Discharging) {
-                bus.sendUnicast(std::make_shared<sevm::BatteryStatusChangeMessage>(), service::name::system_manager);
-            }
-
-            if (!targetApplication.empty()) {
-                bus.sendUnicast(std::make_shared<sevm::BatteryStatusChangeMessage>(), targetApplication);
-            }
-        }
-        return sys::msgHandled();
-    });
-
-    connect(sevm::VibraMessage(bsp::vibrator::Action::stop), [&](sys::Message *msgl) {
-        auto request = static_cast<sevm::VibraMessage *>(msgl);
-        processVibraRequest(request->action, request->repetitionTime);
-        return sys::msgHandled();
-    });
-
-    connect(sevm::ToggleTorchOnOffMessage(), [&]([[maybe_unused]] sys::Message *msg) {
-        toggleTorchOnOff();
-        return sys::MessageNone{};
-    });
-
-    connect(sevm::ToggleTorchColorMessage(), [&]([[maybe_unused]] sys::Message *msg) {
-        toggleTorchColor();
-        return sys::MessageNone{};
-    });
-
-    connect(sevm::RequestPhoneModeForceUpdate(), [&]([[maybe_unused]] sys::Message *msg) {
-        EventWorker->requestSliderPositionRead();
-        return sys::MessageNone{};
-    });
-
-    connect(typeid(sevm::SIMTrayMessage), [&](sys::Message *) {
-        bus.sendUnicast(std::make_shared<sevm::SIMTrayMessage>(), ServiceCellular::serviceName);
-        return sys::MessageNone{};
     });
 
     connect(typeid(stm::message::UpdateRTCValueFromTmMessage), [&](sys::Message *msg) {
@@ -294,16 +245,7 @@ sys::ReturnCodes EventManager::InitHandler()
 
     using namespace std::string_literals;
     std::list<sys::WorkerQueueInfo> list;
-    list.emplace_back("qIrq"s, sizeof(uint8_t), 10);
-    list.emplace_back("qHeadset"s, sizeof(uint8_t), 10);
-    list.emplace_back("qBattery"s, sizeof(uint8_t), 10);
     list.emplace_back("qRTC"s, sizeof(uint8_t), 20);
-    list.emplace_back("qSIM"s, sizeof(uint8_t), 5);
-    list.emplace_back("qMagnetometer"s, sizeof(uint8_t), 5);
-    list.emplace_back(WorkerEvent::MagnetometerNotifyQueue, sizeof(uint8_t), 1);
-    list.emplace_back("qTorch"s, sizeof(uint8_t), 5);
-    list.emplace_back("qLightSensor"s, sizeof(uint8_t), 5);
-    list.emplace_back("qChargerDetect"s, sizeof(uint8_t), 5);
 
     EventWorker->init(list, settings);
     EventWorker->run();
@@ -324,7 +266,6 @@ sys::ReturnCodes EventManager::DeinitHandler()
 
 void EventManager::ProcessCloseReason(sys::CloseReason closeReason)
 {
-    bsp::torch::turn(bsp::torch::State::off);
     sendCloseReadyMessage(this);
 }
 

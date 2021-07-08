@@ -21,7 +21,7 @@ check_any_arch() {
     local path="${1}"
     local arch="${2}"
     [ -d ${path} ] || ( echo "no such directory: ${path}" > /dev/stderr ; exit 1)
-    file ${path}/PurePhone.elf | grep "$arch" -q || ( echo "Bad file: $1/PurePhone.elf for selected architecture!" ; exit 1 )
+    file ${path}/BellHybrid.elf | grep "$arch" -q || ( echo "Bad file: $1/BellHybrid.elf for selected architecture!" ; exit 1 )
 }
 
 check_target_rt1051() {

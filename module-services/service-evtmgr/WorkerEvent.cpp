@@ -201,19 +201,8 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
 bool WorkerEvent::init(std::list<sys::WorkerQueueInfo> queuesList)
 {
     Worker::init(queuesList);
-    bsp::vibrator::init();
-    bsp::keyboard_Init(queues[static_cast<int32_t>(WorkerEventQueues::queueKeyboardIRQ)]->GetQueueHandle());
-    bsp::headset::Init(queues[static_cast<int32_t>(WorkerEventQueues::queueHeadsetIRQ)]->GetQueueHandle());
-    auto queueBatteryHandle = queues[static_cast<int32_t>(WorkerEventQueues::queueBattery)]->GetQueueHandle();
-    auto queueChargerDetect = queues[static_cast<int32_t>(WorkerEventQueues::queueChargerDetect)]->GetQueueHandle();
-    bsp::battery_charger::init(queueBatteryHandle, queueChargerDetect);
     bsp::rtc::init(queues[static_cast<int32_t>(WorkerEventQueues::queueRTC)]->GetQueueHandle());
-    bsp::cellular::init(queues[static_cast<int32_t>(WorkerEventQueues::queueCellular)]->GetQueueHandle());
-    bsp::magnetometer::init(queues[static_cast<int32_t>(WorkerEventQueues::queueMagnetometerIRQ)]->GetQueueHandle());
-    bsp::torch::init(queues[static_cast<int32_t>(WorkerEventQueues::queueTorch)]->GetQueueHandle());
-    bsp::keypad_backlight::init();
     bsp::eink_frontlight::init();
-    bsp::light_sensor::init(queues[static_cast<int32_t>(WorkerEventQueues::queueLightSensor)]->GetQueueHandle());
 
     time_t timestamp;
     bsp::rtc::getCurrentTimestamp(&timestamp);
@@ -239,16 +228,7 @@ void WorkerEvent::init(std::list<sys::WorkerQueueInfo> queuesList, std::shared_p
 bool WorkerEvent::deinit(void)
 {
     Worker::deinit();
-    bsp::keyboard_Deinit();
-    bsp::headset::Deinit();
-    bsp::battery_charger::deinit();
-    bsp::torch::deinit();
-    bsp::keypad_backlight::deinit();
     bsp::eink_frontlight::deinit();
-    bsp::light_sensor::deinit();
-    bsp::vibrator::deinit();
-
-    battery_level_check::deinit();
 
     return true;
 }
