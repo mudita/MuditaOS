@@ -1,10 +1,11 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "ApplicationDesktop.hpp"
 #include "Reboot.hpp"
-#include "../ApplicationDesktop.hpp"
-#include <Style.hpp>
+
 #include <i18n/i18n.hpp>
+#include <Style.hpp>
 
 namespace gui
 {

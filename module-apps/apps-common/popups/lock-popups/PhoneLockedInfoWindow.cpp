@@ -5,7 +5,6 @@
 
 #include <locks/input/PhoneLockedKeysWhitelist.hpp>
 #include <service-appmgr/Controller.hpp>
-#include <application-desktop/data/DesktopStyle.hpp>
 
 #include <i18n/i18n.hpp>
 

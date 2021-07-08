@@ -1,23 +1,18 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <log.hpp>
-#include <source/version.hpp>
-#include <boot/bootconfig.hpp>
-
-// module-utils
-#include <i18n/i18n.hpp>
-
-#include <application-desktop/ApplicationDesktop.hpp>
-#include <application-desktop/data/DesktopStyle.hpp>
-#include <application-desktop/data/DesktopData.hpp>
-
-// services
-#include <service-appmgr/model/ApplicationManager.hpp>
-
-#include <Style.hpp>
-#include <DialogMetadataMessage.hpp>
+#include "ApplicationDesktop.hpp"
+#include "DesktopData.hpp"
+#include "DesktopStyle.hpp"
 #include "UpdateProgress.hpp"
+
+#include <boot/bootconfig.hpp>
+#include <DialogMetadataMessage.hpp>
+#include <i18n/i18n.hpp>
+#include <log.hpp>
+#include <service-appmgr/model/ApplicationManager.hpp>
+#include <source/version.hpp>
+#include <Style.hpp>
 
 namespace gui
 {
