@@ -3,12 +3,12 @@
 
 #pragma once
 
-#include <application-desktop/models/ActiveNotificationsModel.hpp>
+#include "ActiveNotificationsModel.hpp"
 
 #include <AppWindow.hpp>
 #include <gui/widgets/Label.hpp>
-#include <Translator.hpp>
 #include <ListView.hpp>
+#include <Translator.hpp>
 
 namespace app
 {

@@ -5,7 +5,6 @@
 #include <locks/data/LockData.hpp>
 #include "application-settings/ApplicationSettings.hpp"
 #include "application-settings/data/ChangePasscodeData.hpp"
-#include "module-apps/application-desktop/windows/Names.hpp"
 #include "OptionSetting.hpp"
 #include "SecurityMainWindow.hpp"
 
