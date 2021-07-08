@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -20,7 +20,8 @@ struct RawKey
         Undefined,
         Pressed,
         Released,
-    } state                = State::Undefined;
+        Moved,
+    } state                   = State::Undefined;
     bsp::KeyCodes key_code = bsp::KeyCodes::Undefined;
     unsigned int time_press   = 0;
     unsigned int time_release = 0;
