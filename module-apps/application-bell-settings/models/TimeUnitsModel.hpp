@@ -4,13 +4,13 @@
 #pragma once
 
 #include <apps-common/Application.hpp>
-#include <apps-common/SimpleInternalModel.hpp>
+#include <apps-common/InternalModelNoOffset.hpp>
 #include <widgets/SideListItemProvider.hpp>
 #include <TimeSetSpinner.hpp>
 
 namespace gui
 {
-    class TimeUnitsModel : public app::SimpleInternalModel<gui::SideListItem *>, public gui::SideListItemProvider
+    class TimeUnitsModel : public app::InternalModelNoOffset<gui::SideListItem *>, public gui::SideListItemProvider
     {
       public:
         explicit TimeUnitsModel(app::Application *app);

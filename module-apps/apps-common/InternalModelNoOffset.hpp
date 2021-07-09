@@ -9,14 +9,14 @@
 namespace app
 {
 
-    template <class T> class SimpleInternalModel
+    template <class T> class InternalModelNoOffset
     {
 
       protected:
         int modelIndex = 0;
         std::vector<T> internalData;
 
-        virtual ~SimpleInternalModel()
+        virtual ~InternalModelNoOffset()
         {
             eraseInternalData();
         }
