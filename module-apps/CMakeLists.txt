@@ -20,7 +20,7 @@ set(APPLICATIONS
     clock
     calendar
     desktop
-    settings-new
+    settings
     call
     notes
     onboarding

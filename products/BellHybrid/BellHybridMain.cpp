@@ -7,7 +7,7 @@
 #include <application-call/ApplicationCall.hpp>
 #include <application-calllog/ApplicationCallLog.hpp>
 #include <application-desktop/ApplicationDesktop.hpp>
-#include <application-settings-new/ApplicationSettings.hpp>
+#include <application-settings/ApplicationSettings.hpp>
 #include <application-special-input/ApplicationSpecialInput.hpp>
 #include <application-calendar/ApplicationCalendar.hpp>
 #include <application-music-player/ApplicationMusicPlayer.hpp>

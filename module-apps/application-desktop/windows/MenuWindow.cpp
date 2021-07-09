@@ -43,7 +43,6 @@ namespace
 
 namespace gui
 {
-    inline const auto APP_SETTINGS_NEW = "ApplicationSettingsNew";
     Tile::Tile(UTF8 icon,
                std::string title,
                std::function<bool(Item &)> activatedCallback,
@@ -238,7 +237,7 @@ namespace gui
                                   return app::manager::Controller::sendAction(
                                       application,
                                       app::manager::actions::Launch,
-                                      std::make_unique<app::ApplicationLaunchData>(APP_SETTINGS_NEW));
+                                      std::make_unique<app::ApplicationLaunchData>("ApplicationSettings"));
                               }}});
 
         toolsMenu = new MenuPage(

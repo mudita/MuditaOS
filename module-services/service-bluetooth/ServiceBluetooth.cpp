@@ -41,7 +41,7 @@
 namespace
 {
     constexpr auto BluetoothServiceStackDepth = 2560U;
-    inline constexpr auto nameSettingsNew     = "ApplicationSettingsNew";
+    inline constexpr auto nameSettings        = "ApplicationSettings";
     inline constexpr auto connectionTimeout   = std::chrono::minutes{30};
 } // namespace
 
@@ -240,7 +240,7 @@ auto ServiceBluetooth::handle(message::bluetooth::ConnectResult *msg) -> std::sh
         settingsHolder->setValue(bluetooth::Settings::ConnectedDevice, msg->getAddr());
         startTimeoutTimer();
     }
-    bus.sendUnicast(std::make_shared<message::bluetooth::ConnectResult>(*msg), nameSettingsNew);
+    bus.sendUnicast(std::make_shared<message::bluetooth::ConnectResult>(*msg), nameSettings);
     return sys::MessageNone{};
 }
 
@@ -257,7 +257,7 @@ auto ServiceBluetooth::handle(message::bluetooth::DisconnectResult *msg) -> std:
         std::visit(bluetooth::StringVisitor(), this->settingsHolder->getValue(bluetooth::Settings::BondedDevices));
     bus.sendUnicast(std::make_shared<message::bluetooth::ResponseBondedDevices>(
                         SettingsSerializer::fromString(bondedDevicesStr), std::string()),
-                    nameSettingsNew);
+                    nameSettings);
     stopTimeoutTimer();
 
     return sys::MessageNone{};
