@@ -52,7 +52,7 @@ namespace gui
         resetTimer();
     }
 
-    void WindowWithTimer::onClose()
+    void WindowWithTimer::onClose([[maybe_unused]] CloseReason reason)
     {
         detachTimerIfExists();
     }

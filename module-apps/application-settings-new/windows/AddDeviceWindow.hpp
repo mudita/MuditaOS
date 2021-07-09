@@ -17,7 +17,7 @@ namespace gui
 
       private:
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
-        void onClose() override;
+        void onClose(CloseReason reason) override;
         auto buildOptionsList() -> std::list<Option> override;
 
         std::unique_ptr<BluetoothSettingsModel> bluetoothSettingsModel;

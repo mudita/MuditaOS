@@ -24,7 +24,7 @@ namespace app::notes
         ~NoteEditWindow() noexcept override;
 
         void onBeforeShow(gui::ShowMode mode, gui::SwitchData *data) override;
-        void onClose() override;
+        void onClose(CloseReason reason) override;
         bool onInput(const gui::InputEvent &inputEvent) override;
 
         void rebuild() override;

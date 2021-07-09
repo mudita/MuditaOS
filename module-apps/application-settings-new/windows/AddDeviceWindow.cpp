@@ -30,7 +30,7 @@ namespace gui
         refreshOptionsList();
     }
 
-    void AddDeviceWindow::onClose()
+    void AddDeviceWindow::onClose([[maybe_unused]] CloseReason reason)
     {
         bluetoothSettingsModel->stopScan();
     }

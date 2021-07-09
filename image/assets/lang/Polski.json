@@ -80,6 +80,7 @@
   "duration_0hmin_0sec": "%0N:%0S",
   "duration_hour_0min_0sec": "%H:%0M:%0S",
   "brightness_text": "JASNOŚĆ",
+  "phone_needs_rebooting": "Twój telefon musi zostać ponownie uruchomiony. Wciśnij dowolny przycisk, aby potwierdzić, a następnie wyjmij baterię na 10 sekund, by przeprowadzić pełny reset.",
   "home_modes_connected": "POŁĄCZONY",
   "home_modes_notdisturb": "NIE PRZESZKADZAĆ",
   "home_modes_offline": "OFFLINE",
