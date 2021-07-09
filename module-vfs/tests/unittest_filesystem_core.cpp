@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #define CATCH_CONFIG_MAIN
@@ -33,20 +33,20 @@ TEST_CASE("Corefs: Registering and unregistering block device")
     REQUIRE(vfs_vfat->mount_count() == 0);
     auto ret = fscore.register_filesystem("vfat", vfs_vfat);
     REQUIRE(ret == 0);
-    ret = fscore.mount("emmc0part1", "/sys", "vfat");
+    ret = fscore.mount("emmc0part0", "/sys", "vfat");
     REQUIRE(ret == 0);
     REQUIRE(vfs_vfat->mount_count() == 1);
     REQUIRE(fscore.umount("/ala") == -ENOENT);
-    ret = fscore.mount("emmc0part1", "/sys", "vfat");
+    ret = fscore.mount("emmc0part0", "/sys", "vfat");
     REQUIRE(ret == -EBUSY);
-    ret = fscore.mount("emmc0part1", "/path", "vfat");
+    ret = fscore.mount("emmc0part0", "/path", "vfat");
     REQUIRE(ret == -EBUSY);
     ret = fscore.mount("emmc0part2", "/path", "nonexisting_fs");
     REQUIRE(ret == -ENODEV);
     ret = fscore.umount("/sys");
     REQUIRE(ret == 0);
     REQUIRE(vfs_vfat->mount_count() == 0);
-    ret = fscore.mount("emmc0part1", "/path", "vfat");
+    ret = fscore.mount("emmc0part0", "/path", "vfat");
     REQUIRE(ret == 0);
     REQUIRE(vfs_vfat->mount_count() == 1);
     ret = fscore.umount("/path");
