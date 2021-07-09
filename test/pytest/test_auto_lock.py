@@ -27,7 +27,7 @@ app_navigation_to_name_mapping = {
     "contacts": "ApplicationPhonebook",
     "music": "ApplicationMusicPlayer",
     #    "meditation": "ApplicationMeditation",
-    #    "settings": "ApplicationSettingsNew",
+    #    "settings": "ApplicationSettings",
     "tools": "ApplicationDesktop",  # other MenuPage
     "alarm": "ApplicationAlarmClock",
     "calendar": "ApplicationCalendar"

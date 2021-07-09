@@ -16,9 +16,9 @@ def bt_main_window(harness):
 
     log.info("Navigating to ApplicationSettings")
     harness.open_application("settings")
-    if harness.connection.get_application_name() != "ApplicationSettingsNew":
+    if harness.connection.get_application_name() != "ApplicationSettings":
         time.sleep(5)
-        assert harness.connection.get_application_name() == "ApplicationSettingsNew"
+        assert harness.connection.get_application_name() == "ApplicationSettings"
 
     log.info("Opening Bluetooth")
     harness.connection.send_key_code(key_codes["down"])
