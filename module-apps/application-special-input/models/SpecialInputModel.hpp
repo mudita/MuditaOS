@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include "module-apps/application-special-input/data/SpecialCharactersTableStyle.hpp"
-#include "InternalModel.hpp"
-#include "Application.hpp"
+#include "SpecialCharactersTableStyle.hpp"
+#include <InternalModel.hpp>
+#include <Application.hpp>
 
 #include <ListItemProvider.hpp>
 

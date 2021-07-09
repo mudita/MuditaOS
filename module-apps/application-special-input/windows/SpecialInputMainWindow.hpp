@@ -3,17 +3,16 @@
 
 #pragma once
 
+#include "SpecialInputModel.hpp"
+#include <gui/widgets/Image.hpp>
+#include <gui/widgets/Label.hpp>
+#include <gui/widgets/Window.hpp>
+#include <AppWindow.hpp>
+#include <GridLayout.hpp>
+#include <ListView.hpp>
+#include <memory>
 #include <functional>
 #include <string>
-
-#include "AppWindow.hpp"
-#include "gui/widgets/Image.hpp"
-#include "gui/widgets/Label.hpp"
-#include "gui/widgets/Window.hpp"
-#include <GridLayout.hpp>
-#include <memory>
-#include <module-gui/gui/widgets/ListView.hpp>
-#include <module-apps/application-special-input/models/SpecialInputModel.hpp>
 
 namespace gui
 {

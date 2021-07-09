@@ -5,7 +5,6 @@
 
 // applications
 #include <application-settings/ApplicationSettings.hpp>
-#include <application-special-input/ApplicationSpecialInput.hpp>
 #include <application-calendar/ApplicationCalendar.hpp>
 #include <application-music-player/ApplicationMusicPlayer.hpp>
 #include <application-alarm-clock/ApplicationAlarmClock.hpp>

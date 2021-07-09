@@ -19,6 +19,7 @@ add_subdirectory(application-music-player)
 add_subdirectory(application-notes)
 add_subdirectory(application-phonebook)
 add_subdirectory(application-calllog)
+add_subdirectory(application-special-input)
 add_subdirectory(apps-common)
 
 set(APPLICATIONS
@@ -26,7 +27,6 @@ set(APPLICATIONS
     calendar
     settings
     onboarding
-    special-input
     alarm-clock
 )
 

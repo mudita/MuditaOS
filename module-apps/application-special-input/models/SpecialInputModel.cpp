@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SpecialInputModel.hpp"
-#include "module-apps/application-special-input/widgets/SpecialInputTableWidget.hpp"
+#include "SpecialInputTableWidget.hpp"
 #include <ListView.hpp>
 
 SpecialInputModel::SpecialInputModel(app::Application *app) : application(app)
