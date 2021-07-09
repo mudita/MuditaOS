@@ -37,6 +37,7 @@ add_library(${PROJECT_NAME} STATIC ${SOURCES})
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
         application-desktop
+        application-special-input
         json::json
         module-audio
         service-cellular

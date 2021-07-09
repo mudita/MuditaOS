@@ -2,8 +2,8 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationSpecialInput.hpp"
-#include "messages/AppMessage.hpp"
-#include "windows/SpecialInputMainWindow.hpp"
+#include "SpecialInputMainWindow.hpp"
+#include <messages/AppMessage.hpp>
 
 using namespace app;
 
