@@ -40,7 +40,7 @@ INSTALL_PACKAGES="
         gnupg2 \
         graphviz \
         libgtkmm-3.0-dev \
-        libblkid-dev 
+        libblkid-dev \
         libfdisk-dev \
         libfuse-dev \
         locales \
@@ -60,4 +60,3 @@ INSTALL_PACKAGES="
         wget \
         zip \
 "
-

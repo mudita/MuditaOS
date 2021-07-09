@@ -1,5 +1,5 @@
 #!/bin/bash -e
-# Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #####################################################################
@@ -127,7 +127,7 @@ function install_docker() {
         TESTED_VERSION="19.03.8"
         DOCKER_VERSION=$(docker version -f '{{.Server.Version}}')
         if [[ ${TESTED_VERSION} != ${DOCKER_VERSION} ]]; then
-            echo -e "Tested with docker ${DOCKER_VERSION} your is ${DOCKER_VERSION} consider updating"
+            echo -e "Tested with docker ${TESTED_VERSION} your is ${DOCKER_VERSION} consider updating"
         else
             echo "Docker already installed"
         fi
