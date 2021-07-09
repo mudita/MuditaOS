@@ -25,7 +25,7 @@ namespace gui
         hbox->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
         hbox->setEdges(gui::RectangleEdge::None);
 
-        auto fontHeight      = getFontHeight();
+        auto fontHeight = getFontHeight();
         auto doubleCharWidth =
             (getWidestDigitWidth() * noOfDigits) + (1 * noOfDigits); // two digits + minimal space beetween
 
@@ -86,7 +86,7 @@ namespace gui
     uint32_t TimeSetSpinner::getWidestDigitWidth() const noexcept
     {
         const RawFont *font = FontManager::getInstance().getFont(fontName);
-        uint32_t maxWidth = 0;
+        uint32_t maxWidth   = 0;
         for (uint32_t i = '0'; i < '9'; i++) {
             uint32_t width = font->getCharPixelWidth(i);
             if (width > maxWidth) {
