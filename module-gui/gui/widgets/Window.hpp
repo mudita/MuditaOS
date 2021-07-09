@@ -67,10 +67,17 @@ namespace gui
 
         void buildDrawListImplementation(std::list<Command> &commands) override;
 
+        /// used for window switching purposes
         std::string getName()
         {
             return name;
         };
+
+        /// used for fetching unique name of window
+        virtual std::string getUniqueName()
+        {
+            return name;
+        }
     };
 
 } /* namespace gui */
