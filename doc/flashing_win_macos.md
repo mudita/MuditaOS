@@ -11,14 +11,18 @@
 
 2. Flashing on Windows and macOS
 
-- download [balenaEtcher](https://www.balena.io/etcher/) for your operating system.
+- download [balenaEtcher](https://www.balena.io/etcher/) from the website for your operating system. The downloaded file is either called `balenaEtcher-Setup-{version}.exe` (for Windows) or `balenaEtcher-{version}.dmg` (for MacOS) and will be used to install the application on your computer.
+
+![balenaEtcher_download](./balenaetcher4.png)
+
+- install the balenaEtcher application.
 - download the MuditaOS image you want to use and extract it locally. 
 
 **Note: unzipped image has 16 GB**
 
 The `.xz` image is compressed twice using both `tar` and `xz`. Some unpackers will only extract `.tar` which should be extracted again to get a `PurePhone.img` file.
 
-- Run balenaEtcher and choose `Flash from file` and the ISO image as the image type. Load unzipped image onto the target device. It might look something like this:
+- Run balenaEtcher application and choose `Flash from file` and the ISO image as the image type. Load unzipped image onto the target device. It might look something like this:
 
 ![balenaEtcher interface screenshot](./balenaetcher1.png)
 
@@ -29,4 +33,9 @@ The `.xz` image is compressed twice using both `tar` and `xz`. Some unpackers wi
 
 ![balenaEtcher interface screenshots](./balenaetcher3.png)
 
-- reboot the phone by disconnecting the USB cable and putting in the battery 👌🏻
+- reboot the phone.
+
+Note: In order to reboot the phone, do the following:
+* Eject the drive from your Operating System (either using `Safely remove` on Windows, or `Eject` on Linux), or
+* Reboot the phone by disconnecting it from the power supply (USB cable and battery) and connecting it to the relevant power source again.
+
