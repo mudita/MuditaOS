@@ -22,7 +22,7 @@ source config/common.sh
 is_root=`id -u`
 if [ "$1" == "" ] || [ $is_root != 0 ]; then
 	echo "Refuse to work with no device. Runme as root [uid=$is_root]"
-	echo -e "$0 <dev> [-f]\n"
+	echo -e "$0 <dev> [-f] [-p <product>]\n"
 	exit 1
 else
 	dev=$1
@@ -33,6 +33,25 @@ if [ "$2" == "-f" ]; then
 else
 	use_the_force=0
 fi
+
+if [ "$2" == "-p" ]; then
+	product_name=$3
+elif [ "$3" == "-p" ]; then
+	product_name=$4
+fi
+
+if [ "$product_name" == "" ]; then
+	product_name=$PURE_PHONE_NAME
+	echo "Using default product: $product_name"
+elif [[ ! " ${PRODUCTS_LIST[@]} " =~ " ${product_name} " ]]; then
+	echo "Unrecognized product: $3! Please provide one of the following products:"
+	for i in "${PRODUCTS_LIST[@]}";
+	do
+		echo "$i"
+	done
+	exit 1
+fi
+echo "Using product: $product_name"
 
 pcount=$(sfdisk --dump $dev | grep "start=" | wc -l)
 is_mounted=$(grep $dev /etc/mtab | awk '{print $2}')
@@ -68,7 +87,8 @@ sleep 1
 partprobe
 
 echo "write partition table"
-sfdisk --wipe always $dev < config/emmc_partition_table.dump
+
+sfdisk --wipe always $dev < config/products/$product_name/emmc_partition_table.dump
 
 if [ $? != 0 ]; then
 	echo "partitioning device $dev failed"
@@ -76,10 +96,18 @@ if [ $? != 0 ]; then
 fi
 
 part1=$(sfdisk $dev --dump | grep bootable | awk '{print $1}')
+if [ "$product_name" == $PURE_PHONE_NAME ]; then
+	part2=$(sfdisk $dev --dump | tail -n 1 | awk '{print $1}')
+fi
 
 echo "create FATs"
 echo "FAT: $MUDITAOS_PARTITION_PRIMARY $part1"
 mkfs.vfat -n $MUDITAOS_PARTITION_PRIMARY $part1
+
+if [ "$product_name" == $PURE_PHONE_NAME ]; then
+	echo "FAT: $MUDITAOS_PARTITION_RECOVERY $part2"
+	mkfs.vfat -n $MUDITAOS_PARTITION_RECOVERY $part2
+fi
 
 echo "probe new partitions to OS"
 partprobe
