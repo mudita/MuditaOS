@@ -3,14 +3,14 @@
 
 #pragma once
 
+#include "SpecialCharactersTableStyle.hpp"
+#include "SpecialInputMainWindow.hpp"
+#include <apps-common/Application.hpp>
 #include <ListItem.hpp>
 #include <Text.hpp>
 #include <TextFixedSize.hpp>
 #include <ImageBox.hpp>
-#include <module-gui/gui/widgets/GridLayout.hpp>
-#include <apps-common/Application.hpp>
-#include <module-apps/application-special-input/data/SpecialCharactersTableStyle.hpp>
-#include <module-apps/application-special-input/windows/SpecialInputMainWindow.hpp>
+#include <GridLayout.hpp>
 
 namespace gui
 {
