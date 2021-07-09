@@ -4,6 +4,40 @@ To install the new version of MuditaOS please follow the steps described in this
 - [Linux](https://github.com/mudita/MuditaOS/blob/master/doc/boot_and_update.md#creating-a-storage-partition)
 - [Windows and macOS](https://github.com/mudita/MuditaOS/blob/master/doc/flashing_win_macos.md)
 
+## [0.73.1 2021-07-09]
+
+* [BH-386] Turned app messages into lib
+* [CP-312] Add reboot to update function
+* [CP-314] Allow genlittlefs to create empty part
+* [CP-315] Remove old fat only partition layout
+* [EGD-6697] Fix DateTime::isYesterday() tests
+* [EGD-6955] Add calls notifications in DND
+* [EGD-6956] Add offline calls notifications
+* [EGD-6957] Add sms notifications in DnD
+* [EGD-7006] Removed sensitive data from db
+* [EGD-7007] Removed sensitive data from gui
+* [EGD-7026] Fix nullptr calls and unlock behaviour
+* [EGD-7040] Notes autosave
+* [EGD-7043] Added 3 localizations
+* [EGD-7043] Fixes in German JSON
+* [EGD-7043] Fixes in Polish localization
+* [EGD-7043] Reverted the decimal separator for Polish
+* [EGD-7044] Strip down calendar code
+* [EGD-7047] Fixed navigation down through input texts
+* [EGD-7048] Remove "Automatic time zone" from settings
+* [EGD-7050] Fixed reboot copy
+* [EGD-7051] Fixed saving multiple notes at once
+* [EGD-7071] Text paste fixed
+* [EGD-7074] Removed incorrect and failing unit tests
+* [EGD-7077] Don't allow for connecting more than 1 BT device at once
+* [EGD-7081] Disconnect forgotten BT device
+* [EGD-7084] No scrollbar on All devices list
+* [EGD-7089] Fix torch color change when locked
+* [EGD-7091] Forgetting forgets incorrect BT device
+* [EGD-7100] Fix shuttered audio
+* [EGD-7105] Fix window with timeout
+* [EGD-7111] Restore calendarEvents endpoint number
+
 ## [0.72.1 2021-07-05]
 
 * [BH-363] Move libphonenumber to a separate directory
