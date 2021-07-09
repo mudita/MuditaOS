@@ -1,6 +1,6 @@
 add_executable(PurePhone)
 
-add_custom_target(Pure
+add_custom_target(Pure ALL
     DEPENDS PurePhone PurePhone.img
     )
 

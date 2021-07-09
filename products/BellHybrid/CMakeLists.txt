@@ -1,6 +1,6 @@
 add_executable(BellHybrid)
 
-add_custom_target(Bell
+add_custom_target(Bell ALL
     DEPENDS BellHybrid BellHybrid.img
     )
 
