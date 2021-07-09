@@ -195,11 +195,13 @@ uint32_t Database::getLastInsertRowId()
     return sqlite3_last_insert_rowid(dbConnection);
 }
 
-void Database::pragmaQuery(const std::string &pragmaStatemnt)
+void Database::pragmaQuery(const std::string &pragmaStatement)
 {
-    if (auto results = query(pragmaStatemnt.c_str()); results) {
-        const auto fieldsCount = results->getFieldCount();
+    auto results = query(pragmaStatement.c_str());
+
+    if (results && results->getRowCount()) {
         do {
+            const auto fieldsCount = results->getFieldCount();
             for (uint32_t i = 0; i < fieldsCount; i++) {
                 Field field = (*results)[i];
             }
