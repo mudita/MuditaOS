@@ -74,16 +74,14 @@ label-id: 0x09650eb4
 unit: sectors
 
 /dev/sdx1 : start=    $PART1_START,  size=    $PART1_SIZE, type=b, bootable
-/dev/sdx2 : start=    $PART2_START,  size=    $PART2_SIZE, type=b
+/dev/sdx2 : start=    $PART2_START,  size=    $PART2_SIZE, type=9e
 /dev/sdx3 : start=    $PART3_START,  size=    $PART3_SIZE, type=9e
 ==sfdisk
 
 
 # Format FAT partitions
 PART1="$IMAGE_NAME@@$(($PART1_START * $DEVICE_BLK_SIZE))"
-PART2="$IMAGE_NAME@@$(($PART2_START * $DEVICE_BLK_SIZE))"
 mformat -i "$PART1" -F -T $PART1_SIZE -M $DEVICE_BLK_SIZE -v MUDITAOS
-mformat -i "$PART2" -F -T $PART2_SIZE -M $DEVICE_BLK_SIZE -v RECOVER
 
 if [ ! -d "$BUILDDIR/sys" ]; then
 	echo "Fatal! Image folder sys/ missing in build. Check build system."
@@ -120,9 +118,8 @@ mcopy -s -i "$PART1" .boot.json.crc32 ::
 
 #Littlefs generate image
 $GENLFS --image=$IMAGE_NAME --block_size=32768  --overwrite  --partition_num=3 -- user/*
+$GENLFS --image=$IMAGE_NAME --block_size=4096  --overwrite  --partition_num=2
 
 # back to previous dir
 cd -
 sync
-sleep 7
-
