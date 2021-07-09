@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <module-apps/application-settings-new/windows/DateAndTimeMainWindow.hpp>
+#include <module-apps/application-settings/windows/DateAndTimeMainWindow.hpp>
 
 namespace app::onBoarding
 {
