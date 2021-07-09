@@ -1,16 +1,15 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "SpecialInputTableWidget.hpp"
+#include "ApplicationSpecialInput.hpp"
+#include "SpecialCharactersTableStyle.hpp"
+#include <service-appmgr/Controller.hpp>
+#include <messages/AppMessage.hpp>
+#include <Style.hpp>
+#include <cassert>
 #include <locale>
 #include <codecvt>
-#include "module-apps/application-special-input/widgets/SpecialInputTableWidget.hpp"
-#include "application-special-input/data/SpecialCharactersTableStyle.hpp"
-#include <cassert>
-#include <module-apps/application-special-input/ApplicationSpecialInput.hpp>
-#include <service-appmgr/Controller.hpp>
-
-#include "Style.hpp"
-#include "messages/AppMessage.hpp"
 
 namespace gui
 {

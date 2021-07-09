@@ -2,10 +2,10 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SpecialInputMainWindow.hpp"
-#include "../ApplicationSpecialInput.hpp"
-#include "Style.hpp"
-#include "messages/AppMessage.hpp"
+#include "ApplicationSpecialInput.hpp"
+#include <messages/AppMessage.hpp>
 #include <i18n/i18n.hpp>
+#include <Style.hpp>
 #include <cassert>
 
 using namespace gui;
