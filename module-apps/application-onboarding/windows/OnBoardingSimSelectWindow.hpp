@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <application-settings-new/windows/BaseSettingsWindow.hpp>
+#include <application-settings/windows/BaseSettingsWindow.hpp>
 #include <Text.hpp>
 
 namespace app::onBoarding
