@@ -275,4 +275,10 @@ namespace gui
         visitor.visit(*this);
     }
 
+    std::string AppWindow::getUniqueName()
+    {
+        constexpr auto separator = "/";
+        return application->GetName() + separator + getName();
+    }
+
 } /* namespace gui */
