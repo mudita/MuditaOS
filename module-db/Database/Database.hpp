@@ -39,6 +39,8 @@ class Database
     uint32_t getLastInsertRowId();
     void pragmaQuery(const std::string &pragmaStatement);
 
+    auto pragmaQueryForValue(const std::string &pragmaStatement, const std::int32_t value) -> bool;
+
     [[nodiscard]] bool isInitialized() const noexcept
     {
         return isInitialized_;
@@ -55,6 +57,8 @@ class Database
 
     void initQueryStatementBuffer();
     void clearQueryStatementBuffer();
+
+    void populateDbAppId();
 
     /*
      * Arguments:

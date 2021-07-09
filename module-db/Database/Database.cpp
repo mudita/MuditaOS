@@ -71,12 +71,14 @@ extern "C"
     }
 }
 
+constexpr auto dbApplicationId = 0x65727550; // ASCII for "Pure"
+
 Database::Database(const char *name, bool readOnly)
     : dbConnection(nullptr), dbName(name), queryStatementBuffer{nullptr}, isInitialized_(false),
       initializer(std::make_unique<DatabaseInitializer>(this))
 {
     const int flags = (readOnly) ? (SQLITE_OPEN_READONLY) : (SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE);
-    LOG_INFO("Creating database: %s", dbName.c_str());
+    LOG_INFO("Opening database: %s", dbName.c_str());
     if (const auto rc = sqlite3_open_v2(name, &dbConnection, flags, nullptr); rc != SQLITE_OK) {
         LOG_ERROR("SQLITE INITIALIZATION ERROR! rc=%d dbName=%s", rc, name);
         throw DatabaseInitialisationError{"Failed to initialize the sqlite db"};
@@ -86,9 +88,26 @@ Database::Database(const char *name, bool readOnly)
     pragmaQuery("PRAGMA integrity_check;");
     pragmaQuery("PRAGMA locking_mode=EXCLUSIVE");
 
+    if (pragmaQueryForValue("PRAGMA application_id;", dbApplicationId)) {
+        LOG_DEBUG("Database %s initialized", dbName.c_str());
+        isInitialized_ = true;
+        return;
+    }
+
     const auto filePath = (purefs::dir::getUserDiskPath() / "db");
     LOG_INFO("Running scripts: %s", filePath.c_str());
     isInitialized_ = initializer->run(filePath.c_str(), InitScriptExtension);
+
+    if (isInitialized_) {
+        populateDbAppId();
+    }
+}
+
+void Database::populateDbAppId()
+{
+    std::stringstream setAppIdPragma;
+    setAppIdPragma << "PRAGMA application_id=" << dbApplicationId << ";";
+    pragmaQuery(setAppIdPragma.str());
 }
 
 void Database::initQueryStatementBuffer()
@@ -193,6 +212,29 @@ int Database::queryCallback(void *usrPtr, int count, char **data, char **columns
 uint32_t Database::getLastInsertRowId()
 {
     return sqlite3_last_insert_rowid(dbConnection);
+}
+
+auto Database::pragmaQueryForValue(const std::string &pragmaStatement, const std::int32_t value) -> bool
+{
+    auto results = query(pragmaStatement.c_str());
+
+    if (!results || results->getRowCount() == 0) {
+        LOG_DEBUG("no results!");
+        return false;
+    }
+
+    do {
+        const auto fieldsCount = results->getFieldCount();
+        for (uint32_t i = 0; i < fieldsCount; i++) {
+            Field field{(*results)[i]};
+            if (field.getInt32() == value) {
+                LOG_DEBUG("Found the match: %" PRIx32, value);
+                return true;
+            }
+        }
+    } while (results->nextRow());
+
+    return false;
 }
 
 void Database::pragmaQuery(const std::string &pragmaStatement)
