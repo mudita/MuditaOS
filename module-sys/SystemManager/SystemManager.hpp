@@ -168,6 +168,7 @@ namespace sys
         static bool RequestServiceClose(const std::string &name, Service *caller, TickType_t timeout = 5000);
 
         template <typename T> void DestroyServices(const T &whitelist);
+        void DestroyRemainingServices();
         /// Sysmgr stores list of all active services but some of them are under control of parent services.
         /// Parent services ought to manage lifetime of child services hence we are sending DestroyRequests only to
         /// parents.

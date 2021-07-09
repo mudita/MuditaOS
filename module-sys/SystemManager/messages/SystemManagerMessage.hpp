@@ -39,4 +39,7 @@ namespace sys
         bool isCharging;
     };
 
+    class DestroyRemainingServicesMessage : public SystemManagerMessage
+    {};
+
 } // namespace sys

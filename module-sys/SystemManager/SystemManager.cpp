@@ -139,7 +139,12 @@ namespace sys
             }
         }
 
-        DestroySystemService(service::name::evt_manager, this);
+        this->bus.sendUnicast(std::make_shared<DestroyRemainingServicesMessage>(), service::name::system_manager);
+        while (!servicesList.empty()) {
+            if (auto msg = mailbox.pop(); msg) {
+                msg->Execute(this);
+            }
+        }
 
         CloseService();
 
@@ -376,6 +381,18 @@ namespace sys
         }
     }
 
+    void SystemManager::DestroyRemainingServices()
+    {
+        cpp_freertos::LockGuard lck(serviceDestroyMutex);
+        for (auto service = servicesList.begin(); service != servicesList.end();) {
+            if (!RequestServiceClose((*service)->GetName(), this)) {
+                LOG_ERROR("Service %s did not respond -> to kill", (*service)->GetName().c_str());
+                kill(*service);
+            }
+            service = servicesList.erase(service);
+        }
+    }
+
     bool SystemManager::DestroySystemService(const std::string &name, Service *caller)
     {
         cpp_freertos::LockGuard lck(serviceDestroyMutex);
@@ -523,6 +540,11 @@ namespace sys
                 }
             }
 
+            return MessageNone{};
+        });
+
+        connect(DestroyRemainingServicesMessage(), [&](Message *) {
+            DestroyRemainingServices();
             return MessageNone{};
         });
 
