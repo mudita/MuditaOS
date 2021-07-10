@@ -36,17 +36,15 @@ void Channel::cmdLog(std::string cmd, const Result &result, std::chrono::millise
                   utils::to_string(timeout.count()).c_str());
     } break;
     case Result::Code::ERROR: {
-        LOG_ERROR("[AT]: >%s<, >%s<", cmd.c_str(), result.response.size() ? result.response.back().c_str() : "");
+        LOG_ERROR("[AT]: >%s<, >%s<", cmd.c_str(), !result.response.empty() ? result.response.back().c_str() : "");
     } break;
     default:
-        LOG_DEBUG("[AT]: >%s<, >%s<", cmd.c_str(), result.response.size() ? result.response.back().c_str() : "");
+        LOG_INFO("[AT]: >%s<, >%s<", cmd.c_str(), !result.response.empty() ? result.response.back().c_str() : "");
         break;
     }
-#if DEBUG_MODEM_OUTPUT_RESPONSE
-    for (auto s : result.response) {
-        LOG_DEBUG("[AT] > %s", s.c_str());
+    for (const auto &s : result.response) {
+        LOG_INFO("[AT] > %s", s.c_str());
     }
-#endif
 }
 
 std::string Channel::formatCommand(const std::string &cmd) const

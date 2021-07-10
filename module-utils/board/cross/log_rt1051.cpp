@@ -45,7 +45,7 @@ namespace Log
 
     bool Logger::filterLogs(logger_level level)
     {
-        return getLogLevel(getTaskDesc()) < level;
+        return getLogLevel(getTaskDesc()) <= level;
     }
 
     void Logger::logToDevice(const char *fmt, va_list args)

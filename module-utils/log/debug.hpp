@@ -8,7 +8,6 @@
 #define DEBUG_CELLULAR_UART          0 /// show full modem uart communication
 #define DEBUG_BLUETOOTH_HCI_COMS     0 /// show communication with BT module - transactions
 #define DEBUG_BLUETOOTH_HCI_BYTES    0 /// show communication with BT module - all the HCI bytes
-#define DEBUG_MODEM_OUTPUT_RESPONSE  0 /// show full modem output
 #define DEBUG_SERVICE_MESSAGES       0 /// show messages prior to handling in service
 #define DEBUG_DB_MODEL_DATA          0 /// show messages prior to handling in service
 #define DEBUG_FONT                   0 /// show Font debug messages
