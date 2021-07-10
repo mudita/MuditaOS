@@ -228,10 +228,10 @@ namespace gui
         uint32_t offsetRowContext = 0;
         uint32_t imageOffset      = 0;
         uint8_t alphaColor        = vecMap->getAlphaColor();
+        checkImageSize(ctx, vecMap);
 
         for (uint32_t row = 0; row < std::min(vecMap->getHeight(), ctx->getH()); row++) {
-            checkImageSize(ctx, vecMap);
-            uint16_t vecCount = *(vecMap->getData() + imageOffset);
+            uint16_t vecCount = *reinterpret_cast<const uint16_t *>(vecMap->getData() + imageOffset);
             imageOffset += sizeof(uint16_t);
 
             const auto ctxData = ctx->getData();
@@ -239,7 +239,7 @@ namespace gui
 
             for (uint32_t vec = 0; vec < vecCount; ++vec) {
 
-                uint16_t vecOffset = *(vecMap->getData() + imageOffset);
+                uint16_t vecOffset = *reinterpret_cast<const uint16_t *>(vecMap->getData() + imageOffset);
                 imageOffset += sizeof(uint16_t);
                 uint16_t vecLength = *(vecMap->getData() + imageOffset);
                 imageOffset += sizeof(uint8_t);
