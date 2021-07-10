@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/bin/bash -e
 # Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
@@ -6,9 +6,10 @@ set -eo pipefail
 
 verify_clang_format_version()
 {
-    # check if clang-format in path is in proper version, version is 3rd column in `clang-format --version`
+    # check if clang-format in path is in proper major version, major version is a numeric
+    #   value after "version " from `clang-format --version`
     local version
-    version=$( [[ $(which clang-format) ]] && (clang-format --version | cut -d ' ' -f 3 | cut -d '.' -f 1) || echo "0")
+    version=$( [[ $(which clang-format) ]] && (clang-format --version | sed "s/.*version \([0-9]\+\).*/\1/") || echo "0")
     # check for either clang-format or clang-format-9
     if [[ $version -lt 10 && ! $(which clang-format-10) ]]; then
         cat << EOF >&1
