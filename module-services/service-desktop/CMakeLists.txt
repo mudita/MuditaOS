@@ -16,6 +16,7 @@ set(SOURCES
     endpoints/developerMode/DeveloperModeEndpoint.cpp
     endpoints/developerMode/DeveloperModeHelper.cpp
     endpoints/developerMode/Mode/UI_Helper.cpp
+    endpoints/developerMode/Mode/UpdateHelper.cpp
     endpoints/developerMode/event/DomRequest.cpp
     endpoints/developerMode/event/ATRequest.cpp
     endpoints/deviceInfo/DeviceInfoEndpoint.cpp
@@ -29,8 +30,6 @@ set(SOURCES
     endpoints/filesystem/FilesystemEndpoint.cpp
     endpoints/filesystem/FileOperations.cpp
     endpoints/filesystem/FileContext.cpp
-    endpoints/calendarEvents/CalendarEventsHelper.cpp
-    endpoints/calendarEvents/CalendarEventsEndpoint.cpp
     endpoints/security/SecurityEndpoint.cpp
     endpoints/security/SecurityEndpointHelper.cpp
 

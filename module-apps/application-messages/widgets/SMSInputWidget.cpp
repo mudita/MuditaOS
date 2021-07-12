@@ -1,19 +1,19 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "SMSInputWidget.hpp"
-#include "AppWindow.hpp"
-#include "application-messages/data/MessagesStyle.hpp"
-#include <module-apps/application-messages/ApplicationMessages.hpp>
-#include <service-cellular/service-cellular/MessageConstants.hpp>
+#include "ApplicationMessages.hpp"
+#include "MessagesStyle.hpp"
 
-#include <Style.hpp>
-#include <i18n/i18n.hpp>
+#include <AppWindow.hpp>
 #include <Font.hpp>
-#include <utility>
-#include <algorithm>
+#include <i18n/i18n.hpp>
+#include <service-cellular/service-cellular/MessageConstants.hpp>
+#include <SMSInputWidget.hpp>
+#include <Style.hpp>
+#include <TextParse.hpp>
 
-#include "TextParse.hpp"
+#include <algorithm>
+#include <utility>
 
 namespace gui
 {

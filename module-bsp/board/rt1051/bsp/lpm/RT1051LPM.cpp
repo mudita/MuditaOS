@@ -39,8 +39,29 @@ namespace bsp
         return 0;
     }
 
-    int32_t RT1051LPM::Reboot()
+    int32_t RT1051LPM::Reboot(RebootType reason)
     {
+        enum rebootCode : std::uint32_t
+        {
+            rebootNormalCode       = std::uint32_t{0},
+            rebootToUpdateCode     = std::uint32_t{0xdead0000},
+            rebootToRecoveryCode   = std::uint32_t{0xdead0001},
+            rebootToFactoryRstCode = std::uint32_t{0xdead0002}
+        };
+        switch (reason) {
+        case RebootType::GoToUpdaterUpdate:
+            SNVS->LPGPR[0] = rebootToUpdateCode;
+            break;
+        case RebootType::GoToUpdaterRecovery:
+            SNVS->LPGPR[0] = rebootToRecoveryCode;
+            break;
+        case RebootType::GoToUpdaterFactoryReset:
+            SNVS->LPGPR[0] = rebootToFactoryRstCode;
+            break;
+        case RebootType::NormalRestart:
+            SNVS->LPGPR[0] = rebootNormalCode;
+            break;
+        }
         NVIC_SystemReset();
         return 0;
     }

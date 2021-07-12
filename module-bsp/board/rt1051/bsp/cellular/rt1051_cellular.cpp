@@ -737,12 +737,10 @@ namespace bsp
 
             void simSelect()
             {
-                if (Store::GSM::get()->selected == Store::GSM::SIM::SIM2) {
-                    GPIO_PinWrite(BSP_CELLULAR_SIM_CARD_PRESENCE_PORT, BSP_CELLULAR_SIMSEL_PIN, 1);
-                }
-                else {
-                    GPIO_PinWrite(BSP_CELLULAR_SIM_CARD_PRESENCE_PORT, BSP_CELLULAR_SIMSEL_PIN, 0);
-                }
+                GPIO_PinWrite(BSP_CELLULAR_SIM_CARD_PRESENCE_PORT,
+                              BSP_CELLULAR_SIMSEL_PIN,
+                              static_cast<uint8_t>(Store::GSM::get()->selected));
+                LOG_INFO("%s slot selected", magic_enum::enum_name(Store::GSM::get()->selected).data());
             }
         } // namespace sim
 

@@ -1,3 +1,6 @@
+# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+# For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 add_subdirectory(base64)
 add_subdirectory(date)
 add_subdirectory(fatfs)
@@ -16,9 +19,11 @@ add_subdirectory(re2)
 add_subdirectory(sml)
 add_subdirectory(taglib)
 add_subdirectory(tinyexpr)
-add_subdirectory(usb_stack)
 add_subdirectory(utz)
 
 if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
     add_subdirectory(CrashDebug)
+    add_subdirectory(usb_stack)
 endif()
+add_subdirectory(segger/rtt)
+add_subdirectory(segger/systemview)

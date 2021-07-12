@@ -183,6 +183,7 @@ namespace bluetooth
                 LOG_DEBUG("RFCOMM disconnected.\n");
                 sendAudioEvent(audio::EventType::BlutoothHSPDeviceState, audio::Event::DeviceState::Disconnected);
             }
+            isConnected = false;
             break;
         case HSP_SUBEVENT_AUDIO_CONNECTION_COMPLETE:
             if (hsp_subevent_audio_connection_complete_get_status(event) != 0u) {
@@ -278,9 +279,10 @@ namespace bluetooth
 
     void HSP::HSPImpl::connect()
     {
-        if (!isConnected) {
-            hsp_ag_connect(deviceAddr);
+        if (isConnected) {
+            disconnect();
         }
+        hsp_ag_connect(deviceAddr);
     }
 
     void HSP::HSPImpl::disconnect()

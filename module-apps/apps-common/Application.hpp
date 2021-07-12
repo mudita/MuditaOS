@@ -78,6 +78,12 @@ namespace app
         // switch to main window on application switch and allow declared handler to switch to desired window.
     };
 
+    enum class SwitchReason
+    {
+        SwitchRequest,
+        PhoneLock
+    };
+
     struct StartInBackground
     {
         StartInBackground(bool _value) : value{_value}
@@ -225,7 +231,8 @@ namespace app
         ///        that we dont want to close app calling
         void switchWindow(const std::string &windowName,
                           gui::ShowMode cmd                     = gui::ShowMode::GUI_SHOW_INIT,
-                          std::unique_ptr<gui::SwitchData> data = nullptr);
+                          std::unique_ptr<gui::SwitchData> data = nullptr,
+                          SwitchReason reason                   = SwitchReason::SwitchRequest);
 
         /// Same as switchWindow above
         inline void switchWindow(const std::string &windowName, std::unique_ptr<gui::SwitchData> data)

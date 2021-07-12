@@ -1,24 +1,21 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "ApplicationMessages.hpp"
+#include "MessagesStyle.hpp"
 #include "NewMessage.hpp"
-
-#include "application-messages/ApplicationMessages.hpp"
-#include "application-messages/data/SMSdata.hpp"
-#include "application-messages/data/MessagesStyle.hpp"
+#include "SMSdata.hpp"
 
 #include <application-phonebook/windows/PhonebookSearchResults.hpp>
-#include <service-appmgr/Controller.hpp>
-#include <service-db/DBServiceAPI.hpp>
-#include <i18n/i18n.hpp>
 #include <BoxLayout.hpp>
-#include <Text.hpp>
-
+#include <i18n/i18n.hpp>
+#include <module-db/queries/messages/sms/QuerySMSGetLastByThreadID.hpp>
 #include <module-db/queries/messages/threads/QueryThreadGetByContactID.hpp>
 #include <module-db/queries/messages/threads/QueryThreadGetByNumber.hpp>
-#include <module-db/queries/messages/sms/QuerySMSGetLastByThreadID.hpp>
-
+#include <service-appmgr/Controller.hpp>
 #include <service-cellular/service-cellular/MessageConstants.hpp>
+#include <service-db/DBServiceAPI.hpp>
+#include <Text.hpp>
 
 #include <cassert>
 
@@ -39,7 +36,11 @@ namespace gui
             if (!state) {
                 return;
             }
+            auto currentText = _state->getText();
             _state->restoreFrom(*state);
+            if (!currentText.empty()) {
+                _state->addText(currentText);
+            }
             state = nullptr;
         }
 
@@ -107,7 +108,6 @@ namespace gui
     {
         // select contact only if there is no entered number
         if (recipient->getText().empty()) {
-            memento->setState(message);
             return app::manager::Controller::sendAction(application,
                                                         app::manager::actions::ShowContacts,
                                                         std::make_unique<PhonebookSearchRequest>(),
@@ -290,10 +290,16 @@ namespace gui
         setFocusItem(body);
     }
 
-    void NewMessageWindow::onClose()
+    void NewMessageWindow::onClose(CloseReason reason)
     {
         if (message->getText().empty()) {
             // Nothing to do if text is empty.
+            return;
+        }
+
+        if (reason == CloseReason::PhoneLock) {
+            memento->setState(message);
+            message->clear();
             return;
         }
         if (const auto handled = handleMessageText(); !handled) {

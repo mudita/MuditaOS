@@ -24,13 +24,18 @@ namespace app::notes
         ~NoteEditWindow() noexcept override;
 
         void onBeforeShow(gui::ShowMode mode, gui::SwitchData *data) override;
+        void onClose(CloseReason reason) override;
         bool onInput(const gui::InputEvent &inputEvent) override;
 
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;
 
+      protected:
+        virtual void onCharactersCountChanged(std::uint32_t count);
+
       private:
+        bool isNoteEmpty() const noexcept override;
         void setCharactersCount(std::uint32_t count);
         void setNoteText(const UTF8 &text);
         void saveNote();

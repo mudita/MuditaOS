@@ -1,16 +1,15 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "ApplicationMessages.hpp"
+#include "MessagesStyle.hpp"
+#include "SMSTemplateItem.hpp"
 #include "SMSTemplatesWindow.hpp"
 
-#include "application-messages/ApplicationMessages.hpp"
-#include "application-messages/widgets/SMSTemplateItem.hpp"
-#include "application-messages/data/MessagesStyle.hpp"
-
-#include <service-appmgr/Controller.hpp>
 #include <i18n/i18n.hpp>
-#include <Style.hpp>
 #include <log.hpp>
+#include <service-appmgr/Controller.hpp>
+#include <Style.hpp>
 
 #include <cassert>
 #include <memory>

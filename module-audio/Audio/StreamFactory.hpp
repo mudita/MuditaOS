@@ -32,7 +32,7 @@ namespace audio
       private:
         using Traits = audio::Endpoint::Traits;
 
-        static constexpr auto defaultBuffering = 2U;
+        static constexpr auto defaultBuffering = 4U;
 
         auto makeStream(Traits sourceTraits, Traits sinkTraits, AudioFormat streamFormat) -> std::unique_ptr<Stream>;
 

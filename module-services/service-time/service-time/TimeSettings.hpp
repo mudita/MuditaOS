@@ -4,6 +4,7 @@
 #pragma once
 
 #include <time/time_conversion.hpp>
+#include <service-time/api/TimeSettingsApi.hpp>
 
 class TimeSettings : public utils::time::TimeSettingsInterface
 {

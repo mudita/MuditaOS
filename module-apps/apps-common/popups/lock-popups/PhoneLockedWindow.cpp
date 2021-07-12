@@ -4,8 +4,10 @@
 #include "PhoneLockedWindow.hpp"
 #include "PhoneLockedInfoData.hpp"
 
+#include <locks/input/PhoneLockedKeysWhitelist.hpp>
 #include <application-desktop/data/DesktopStyle.hpp>
 #include <module-services/service-appmgr/service-appmgr/Controller.hpp>
+#include <time/time_conversion_factory.hpp>
 #include <service-time/ServiceTime.hpp>
 #include <service-time/TimeMessage.hpp>
 
@@ -71,8 +73,6 @@ namespace gui
         bottomBar->setActive(BottomBar::Side::RIGHT, false);
         bottomBar->setText(BottomBar::Side::CENTER, utils::translate("app_desktop_unlock"));
         bottomBar->setActive(BottomBar::Side::LEFT, false);
-
-        application->bus.sendUnicast(std::make_shared<TimersProcessingStopMessage>(), service::name::service_time);
     }
 
     bool PhoneLockedWindow::processLongReleaseEvent(const InputEvent &inputEvent)
@@ -80,14 +80,17 @@ namespace gui
         if (inputEvent.is(KeyCode::KEY_RF)) {
 
             application->switchWindow(gui::popup::window::power_off_window);
-            return true;
         }
-        // check if any of the lower inheritance onInput methods catch the event
-        return AppWindow::onInput(inputEvent);
+        return true;
     }
 
     bool PhoneLockedWindow::onInput(const InputEvent &inputEvent)
     {
+        // check if any of the lower inheritance onInput methods catch the event
+        if (locks::PhoneLockedKeysWhitelist::isOnWhitelist(inputEvent)) {
+            return AppWindow::onInput(inputEvent);
+        }
+
         if (inputEvent.isLongRelease()) {
             return processLongReleaseEvent(inputEvent);
         }
@@ -98,7 +101,7 @@ namespace gui
                                       std::make_unique<PhoneLockedInfoData>(requiredStage));
             return true;
         }
-        return AppWindow::onInput(inputEvent);
+        return true;
     }
 
     bool PhoneLockedWindow::updateTime()

@@ -24,7 +24,21 @@ namespace sys
 
     int32_t PowerManager::Reboot()
     {
-        return lowPowerControl->Reboot();
+        return lowPowerControl->Reboot(bsp::LowPowerMode::RebootType::NormalRestart);
+    }
+
+    int32_t PowerManager::RebootToUpdate(UpdateReason reason)
+    {
+        switch (reason) {
+        case UpdateReason::FactoryReset:
+            return lowPowerControl->Reboot(bsp::LowPowerMode::RebootType::GoToUpdaterFactoryReset);
+        case UpdateReason::Recovery:
+            return lowPowerControl->Reboot(bsp::LowPowerMode::RebootType::GoToUpdaterRecovery);
+        case UpdateReason::Update:
+            return lowPowerControl->Reboot(bsp::LowPowerMode::RebootType::GoToUpdaterUpdate);
+        default:
+            return -1;
+        }
     }
 
     void PowerManager::UpdateCpuFrequency(uint32_t cpuLoad)
@@ -58,7 +72,7 @@ namespace sys
 
     void PowerManager::IncreaseCpuFrequency() const
     {
-        const auto freq      = lowPowerControl->GetCurrentFrequencyLevel();
+        const auto freq = lowPowerControl->GetCurrentFrequencyLevel();
 
         if (freq == bsp::CpuFrequencyHz::Level_1) {
             // switch osc source first

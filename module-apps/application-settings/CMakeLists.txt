@@ -15,34 +15,127 @@ target_sources( ${PROJECT_NAME}
 
     PRIVATE
         ApplicationSettings.cpp
+        models/advanced/ColorTestModel.cpp
+        models/bluetooth/BluetoothSettingsModel.cpp
+        models/ApnSettingsModel.cpp
+        models/NewApnModel.cpp
+        models/DateAndTimeModel.cpp
+        models/FromTimeToTimeModel.cpp
+        models/QuotesModel.cpp
+        models/CategoriesModel.cpp
+        models/SARInfoRepository.cpp
+        models/FactoryData.cpp
+        models/AudioSettingsModel.cpp
+        models/SoundsModel.cpp
+        presenter/SARInfoWindowPresenter.cpp
+        presenter/TechnicalWindowPresenter.cpp
+        widgets/advanced/ColorTestListItem.cpp
+        widgets/advanced/ColorTestListView.cpp
+        widgets/QuoteWidget.cpp
+        widgets/CategoryWidget.cpp
+        widgets/ApnInputWidget.cpp
+        widgets/SettingsDateItem.cpp
+        widgets/SettingsTimeItem.cpp
+        widgets/SettingsSoundItem.cpp
         windows/SettingsMainWindow.cpp
-        windows/LanguageWindow.cpp
-        windows/BtWindow.cpp
-        windows/BtScanWindow.cpp
-        windows/UITestWindow.cpp
-        windows/Info.cpp
-        windows/CellularPassthroughWindow.cpp
-        windows/FotaWindow.cpp
-        windows/Fota.cpp
-        windows/EinkModeWindow.cpp
-        windows/ColorTestWindow.cpp
-        widgets/ColorTestListItem.cpp
-        widgets/ColorTestListView.cpp
-        models/ColorTestModel.cpp
+        windows/advanced/AdvancedOptionsWindow.cpp
+        windows/advanced/InformationWindow.cpp
+        windows/advanced/UITestWindow.cpp
+        windows/advanced/EinkModeWindow.cpp
+        windows/advanced/ColorTestWindow.cpp
+        windows/bluetooth/AddDeviceWindow.cpp
+        windows/bluetooth/AllDevicesWindow.cpp
+        windows/bluetooth/BluetoothWindow.cpp
+        windows/bluetooth/PhoneNameWindow.cpp
+        windows/bluetooth/BluetoothCheckPasskeyWindow.cpp
+        windows/ApnSettingsWindow.cpp
+        windows/ApnOptionsWindow.cpp
+        windows/BaseSettingsWindow.cpp
+        windows/FontSizeWindow.cpp
+        windows/InputLanguageWindow.cpp
+        windows/DisplayLightWindow.cpp
+        windows/KeypadLightWindow.cpp
+        windows/LockedScreenWindow.cpp
+        windows/DisplayAndKeypadWindow.cpp
+        windows/AppsAndToolsWindow.cpp
+        windows/NetworkWindow.cpp
+        windows/NightshiftWindow.cpp
+        windows/OptionsWidgetMaker.cpp
+        windows/PhoneWindow.cpp
+        windows/MessagesWindow.cpp
+        windows/AlarmClockWindow.cpp
+        windows/SoundSelectWindow.cpp
+        windows/AutolockWindow.cpp
+        windows/TorchWindow.cpp
+        windows/WallpaperWindow.cpp
+        windows/QuotesMainWindow.cpp
+        windows/QuotesAddWindow.cpp
+        windows/QuotesOptionsWindow.cpp
+        windows/SARInfoWindow.cpp
+        windows/SecurityMainWindow.cpp
+        windows/NewApnWindow.cpp
+        widgets/SpinBox.cpp
+        widgets/SpinBoxOptionSettings.cpp
+        windows/SystemMainWindow.cpp
+        windows/LanguagesWindow.cpp
+        windows/DateAndTimeMainWindow.cpp
+        windows/ChangeTimeZone.cpp
+        windows/ChangeDateAndTimeWindow.cpp
+        windows/EditQuotesWindow.cpp
+        windows/QuoteCategoriesWindow.cpp
+        windows/ConnectionFrequencyWindow.cpp
+        windows/DoNotDisturbWindow.cpp
+        windows/OfflineWindow.cpp
+        windows/PhoneModesWindow.cpp
+        windows/PINSettingsWindow.cpp
+        windows/AboutYourPureWindow.cpp
+        windows/CertificationWindow.cpp
+        windows/TechnicalInformationWindow.cpp
 
     PUBLIC
         ApplicationSettings.hpp
+        models/advanced/ColorTestModel.hpp
+        widgets/advanced/ColorTestListItem.hpp
+        widgets/advanced/ColorTestListItem.hpp
+        widgets/advanced/ColorTestListStyle.hpp
+        widgets/ApnInputWidget.hpp
+        widgets/CategoryWidget.hpp
+        windows/NewApnWindow.hpp
         windows/SettingsMainWindow.hpp
-        windows/LanguageWindow.hpp
+        windows/advanced/AdvancedOptionsWindow.hpp
+        windows/advanced/InformationWindow.hpp
+        windows/advanced/UITestWindow.hpp
+        windows/advanced/EinkModeWindow.hpp
+        windows/advanced/ColorTestWindow.hpp
+        windows/BaseSettingsWindow.hpp
+        windows/FontSizeWindow.hpp
+        windows/InputLanguageWindow.hpp
+        windows/DisplayLightWindow.hpp
+        windows/KeypadLightWindow.hpp
+        windows/LockedScreenWindow.hpp
+        windows/DisplayAndKeypadWindow.hpp
+        windows/AppsAndToolsWindow.hpp
+        windows/MessagesWindow.hpp
+        widgets/SettingsStyle.hpp
+        windows/AutolockWindow.hpp
+        windows/WallpaperWindow.hpp
+        windows/SystemMainWindow.hpp
+        windows/LanguagesWindow.hpp
+        windows/DateAndTimeMainWindow.hpp
+        windows/ChangeDateAndTimeWindow.hpp
+        windows/EditQuotesWindow.hpp
+        windows/QuoteCategoriesWindow.hpp
+        windows/AboutYourPureWindow.hpp
+        windows/CertificationWindow.hpp
+        windows/TechnicalInformationWindow.hpp
 )
 
 add_dependencies(${PROJECT_NAME} version)
 
 target_link_libraries(${PROJECT_NAME}
-    PRIVATE
-        service-bluetooth
-        service-evtmgr
-        service-fota
     PUBLIC
+        service-bluetooth
         eventstore
+    PRIVATE
+        service-time-api
 )

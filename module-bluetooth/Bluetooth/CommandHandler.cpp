@@ -132,14 +132,16 @@ namespace bluetooth
 
     Error::Code CommandHandler::disconnectAudioConnection()
     {
+        LOG_INFO("Disconnecting audio");
         profileManager->disconnect();
         return Error::Success;
     }
     Error::Code CommandHandler::pair(bd_addr_t addr)
     {
         LOG_INFO("Pairing...");
-
-        return driver->pair(addr) ? Error::Success : Error::LibraryError;
+        const auto error_code = driver->pair(addr) ? Error::Success : Error::LibraryError;
+        LOG_INFO("Pairing result: %s", magic_enum::enum_name(error_code).data());
+        return error_code;
     }
     Error::Code CommandHandler::switchAudioProfile()
     {
@@ -158,8 +160,12 @@ namespace bluetooth
     Error::Code CommandHandler::unpair(uint8_t *addr)
     {
         LOG_INFO("Unpairing...");
-
-        return driver->unpair(addr) ? Error::Success : Error::LibraryError;
+        if (profileManager->isAddressActuallyUsed(addr)) {
+            profileManager->disconnect();
+        }
+        const auto error_code = driver->unpair(addr) ? Error::Success : Error::LibraryError;
+        LOG_INFO("Unpairing result: %s", magic_enum::enum_name(error_code).data());
+        return error_code;
     }
 
     Error::Code CommandHandler::availableDevices()

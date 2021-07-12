@@ -40,8 +40,8 @@ namespace sys
         inline constexpr auto restoreTimeout{5000};
     } // namespace constants
 
-    class PhoneModeRequest; // Forward declaration
-    class TetheringStateRequest; // Forward declaration
+    class PhoneModeRequest;         // Forward declaration
+    class TetheringStateRequest;    // Forward declaration
     class TetheringEnabledResponse; // Forward declaration
 
     enum class Code
@@ -50,6 +50,7 @@ namespace sys
         Update,
         Restore,
         Reboot,
+        RebootToUpdate,
         None,
     };
 
@@ -62,16 +63,23 @@ namespace sys
     class SystemManagerCmd : public DataMessage
     {
       public:
-        explicit SystemManagerCmd(Code type = Code::None, CloseReason closeReason = CloseReason::RegularPowerDown)
-            : DataMessage(BusChannel::SystemManagerRequests), type(type), closeReason(closeReason)
+        explicit SystemManagerCmd(Code type                 = Code::None,
+                                  CloseReason closeReason   = CloseReason::RegularPowerDown,
+                                  UpdateReason updateReason = UpdateReason::Update)
+            : DataMessage(BusChannel::SystemManagerRequests), type(type), closeReason(closeReason),
+              updateReason(updateReason)
         {}
 
         Code type;
         CloseReason closeReason;
+        UpdateReason updateReason;
     };
 
     class SystemManager : public Service
     {
+      private:
+        UpdateReason updateReason{UpdateReason::Update};
+
       public:
         using InitFunction = std::function<bool()>;
 
@@ -81,7 +89,8 @@ namespace sys
             Suspend,
             Shutdown,
             ShutdownReady,
-            Reboot
+            Reboot,
+            RebootToUpdate
         } state = State::Running;
 
         explicit SystemManager(std::vector<std::unique_ptr<BaseServiceCreator>> &&creators);
@@ -101,6 +110,8 @@ namespace sys
         static bool Restore(Service *s);
 
         static bool Reboot(Service *s);
+
+        static bool RebootToUpdate(Service *s, UpdateReason updateReason);
 
         static void storeOsVersion(Service *s, const std::string &updateOSVer, const std::string &currentOSVer);
 
@@ -176,7 +187,7 @@ namespace sys
 
         void RestoreSystemHandler();
 
-        void RebootHandler();
+        void RebootHandler(State state, std::optional<UpdateReason> updateReason = std::nullopt);
 
         /// loop to handle prior to full system close
         /// for now for rt1051 we need to
@@ -234,6 +245,8 @@ inline const char *c_str(sys::SystemManager::State state)
         return "Shutdown";
     case sys::SystemManager::State::Reboot:
         return "Reboot";
+    case sys::SystemManager::State::RebootToUpdate:
+        return "RebootToUpdate";
     case sys::SystemManager::State::ShutdownReady:
         return "ShutdownReady";
     }

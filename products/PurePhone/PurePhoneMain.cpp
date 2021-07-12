@@ -12,7 +12,6 @@
 #include <application-notes/ApplicationNotes.hpp>
 #include <application-phonebook/ApplicationPhonebook.hpp>
 #include <application-settings/ApplicationSettings.hpp>
-#include <application-settings-new/ApplicationSettings.hpp>
 #include <application-special-input/ApplicationSpecialInput.hpp>
 #include <application-calendar/ApplicationCalendar.hpp>
 #include <application-music-player/ApplicationMusicPlayer.hpp>
@@ -129,9 +128,6 @@ int main()
 #endif
 #ifdef ENABLE_APP_SETTINGS
             applications.push_back(app::CreateLauncher<app::ApplicationSettings>(app::name_settings));
-#endif
-#ifdef ENABLE_APP_SETTINGS_NEW
-            applications.push_back(app::CreateLauncher<app::ApplicationSettingsNew>(app::name_settings_new));
 #endif
 #ifdef ENABLE_APP_NOTES
             applications.push_back(app::CreateLauncher<app::ApplicationNotes>(app::name_notes));

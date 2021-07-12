@@ -22,7 +22,6 @@ namespace sys
         ServiceFotaNotifications,
         AntennaNotifications,
         ServiceEvtmgrNotifications,
-        CalendarNotifications,
         PhoneModeChanges,
         PhoneLockChanges,
     };
@@ -49,6 +48,14 @@ namespace sys
         Reboot,
         SystemBrownout,
         LowBattery
+    };
+
+    // Updater reason code
+    enum class UpdateReason
+    {
+        Update,
+        Recovery,
+        FactoryReset
     };
 
 } // namespace sys
@@ -110,8 +117,6 @@ inline const char *c_str(sys::BusChannel channel)
         return "AntennaNotifications";
     case sys::BusChannel::ServiceEvtmgrNotifications:
         return "ServiceEvtmgrNotifications";
-    case sys::BusChannel::CalendarNotifications:
-        return "CalendarNotifications";
     case sys::BusChannel::PhoneModeChanges:
         return "PhoneModeChanges";
     case sys::BusChannel::PhoneLockChanges:

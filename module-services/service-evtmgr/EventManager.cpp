@@ -19,12 +19,11 @@
 #include <SystemManager/Constants.hpp>
 #include <SystemManager/SystemManager.hpp>
 #include <bsp/common.hpp>
-#include <bsp/keyboard/key_codes.hpp>
 #include <bsp/magnetometer/magnetometer.hpp>
 #include <bsp/rtc/rtc.hpp>
 #include <bsp/torch/torch.hpp>
 #include <bsp/battery-charger/battery_charger.hpp>
-#include <common_data/RawKey.hpp>
+#include <bsp/keyboard/key_codes.hpp>
 #include <log.hpp>
 #include <Logger.hpp>
 #include <service-appmgr/Controller.hpp>
@@ -51,6 +50,14 @@ namespace
 {
     constexpr auto loggerDelayMs   = 1000 * 60 * 5;
     constexpr auto loggerTimerName = "Logger";
+    constexpr std::array sliderKeyCodes = {
+        bsp::KeyCodes::SSwitchUp, bsp::KeyCodes::SSwitchMid, bsp::KeyCodes::SSwitchDown};
+
+    [[nodiscard]] bool isSliderKeyCode(bsp::KeyCodes code)
+    {
+        return std::find(std::begin(sliderKeyCodes), std::end(sliderKeyCodes), code) != std::end(sliderKeyCodes);
+    }
+
 } // namespace
 
 EventManager::EventManager(const std::string &name)
@@ -76,7 +83,6 @@ EventManager::~EventManager()
     }
 }
 
-
 // Invoked upon receiving data message
 sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
 {
@@ -94,35 +100,6 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
     }
     else if (msgl->messageType == MessageType::EVM_GPIO) {
         LOG_DEBUG("EVM_GPIO msg");
-    }
-    else if (msgl->messageType == MessageType::KBDKeyEvent &&
-             (msgl->sender == this->GetName() || msgl->sender == service::name::service_desktop)) {
-
-        auto *msg = dynamic_cast<sevm::KbdMessage *>(msgl);
-        assert(msg);
-        auto message = std::make_shared<sevm::KbdMessage>();
-        message->key = msg->key;
-
-        if (message->key.state == RawKey::State::Pressed) {
-            const auto code = message->key.key_code;
-            if (code == bsp::KeyCodes::FnRight) {
-                bus.sendUnicast(message, service::name::system_manager);
-            }
-            else if (code == bsp::KeyCodes::SSwitchUp || code == bsp::KeyCodes::SSwitchMid ||
-                     code == bsp::KeyCodes::SSwitchDown) {
-                const auto mode = sys::SystemManager::translateSliderState(message->key);
-                bus.sendUnicast(std::make_shared<sys::PhoneModeRequest>(mode), service::name::system_manager);
-            }
-            backlightHandler.handleKeyPressed();
-        }
-
-        // send key to focused application
-        if (!targetApplication.empty()) {
-            bus.sendUnicast(message, targetApplication);
-        }
-        // notify application manager to prevent screen locking
-        app::manager::Controller::preventBlockingDevice(this);
-        handled = true;
     }
     else if (msgl->messageType == MessageType::EVMFocusApplication) {
         auto *msg = static_cast<sevm::EVMFocusApplication *>(msgl);
@@ -187,6 +164,11 @@ sys::ReturnCodes EventManager::InitHandler()
             bus.sendUnicast(message, service::name::service_desktop);
         }
 
+        return std::make_shared<sys::ResponseMessage>();
+    });
+
+    connect(sevm::KbdMessage(), [&](sys::Message *msg) {
+        handleKeyEvent(msg);
         return std::make_shared<sys::ResponseMessage>();
     });
 
@@ -357,6 +339,41 @@ bool EventManager::messageSetApplication(sys::Service *sender, const std::string
 {
     auto msg = std::make_shared<sevm::EVMFocusApplication>(applicationName);
     return sender->bus.sendUnicast(msg, service::name::evt_manager);
+}
+
+void EventManager::handleKeyEvent(sys::Message *msg)
+{
+    auto kbdMessage = dynamic_cast<sevm::KbdMessage *>(msg);
+    auto message    = std::make_shared<sevm::KbdMessage>();
+    message->key    = kbdMessage->key;
+
+    if (message->key.state == RawKey::State::Pressed) {
+        const auto code = message->key.key_code;
+        if (code == bsp::KeyCodes::FnRight) {
+            bus.sendUnicast(message, service::name::system_manager);
+        }
+        backlightHandler.handleKeyPressed();
+    }
+    else if (message->key.state == RawKey::State::Moved) {
+        handleKeyMoveEvent(message->key);
+        backlightHandler.handleKeyPressed();
+    }
+
+    // send key to focused application
+    if (!targetApplication.empty()) {
+        bus.sendUnicast(message, targetApplication);
+    }
+    // notify application manager to prevent screen locking
+    app::manager::Controller::preventBlockingDevice(this);
+}
+
+void EventManager::handleKeyMoveEvent(RawKey key)
+{
+    if (isSliderKeyCode(key.key_code)) {
+        LOG_INFO("Slider position: %s", magic_enum::enum_name(key.key_code).data());
+        const auto mode = sys::SystemManager::translateSliderState(key);
+        bus.sendUnicast(std::make_shared<sys::PhoneModeRequest>(mode), service::name::system_manager);
+    }
 }
 
 void EventManager::dumpLogsToFile()

@@ -1,6 +1,6 @@
 add_executable(PurePhone)
 
-add_custom_target(Pure
+add_custom_target(Pure ALL
     DEPENDS PurePhone PurePhone.img
     )
 
@@ -50,6 +50,7 @@ target_link_libraries(PurePhone
     PRIVATE
         application-antenna
         application-calculator
+        application-messages
         application-music-player
         application-phonebook
         application-notes

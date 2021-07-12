@@ -1,11 +1,12 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include "AppWindow.hpp"
+#include "ThreadsSearchResultsModel.hpp"
+
+#include <AppWindow.hpp>
 #include <ListView.hpp>
-#include "application-messages/models/ThreadsSearchResultsModel.hpp"
 
 namespace gui
 {

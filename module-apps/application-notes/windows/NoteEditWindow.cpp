@@ -71,7 +71,11 @@ namespace app::notes
             [=](const UTF8 &text) { bottomBarTemporaryMode(text); },
             [=]() { bottomBarRestoreFromTemporaryMode(); },
             [=]() { selectSpecialCharacter(); }));
-        edit->setTextChangedCallback([this](Item &, const UTF8 &text) { setCharactersCount(text.length()); });
+        edit->setTextChangedCallback([this](Item &, const UTF8 &text) {
+            const auto count = text.length();
+            setCharactersCount(count);
+            onCharactersCountChanged(count);
+        });
         edit->setTextLimitType(gui::TextLimitType::MaxSignsCount, MaxCharactersCount);
 
         bottomBar->setActive(gui::BottomBar::Side::LEFT, true);
@@ -93,6 +97,11 @@ namespace app::notes
         charactersCounter->setText(counterText.str());
     }
 
+    void NoteEditWindow::onCharactersCountChanged([[maybe_unused]] std::uint32_t count)
+    {
+        presenter->onNoteChanged();
+    }
+
     void NoteEditWindow::destroyInterface()
     {
         erase();
@@ -109,6 +118,13 @@ namespace app::notes
 
         notesRecord = editData->getRecord();
         setNoteText(notesRecord->snippet);
+    }
+
+    void NoteEditWindow::onClose([[maybe_unused]] CloseReason reason)
+    {
+        if (presenter->isAutoSaveApproved()) {
+            saveNote();
+        }
     }
 
     void NoteEditWindow::setNoteText(const UTF8 &text)
@@ -139,5 +155,11 @@ namespace app::notes
         notesRecord->date    = std::time(nullptr);
         notesRecord->snippet = edit->getText();
         presenter->save(notesRecord);
+        LOG_INFO("Note saved.");
+    }
+
+    bool NoteEditWindow::isNoteEmpty() const noexcept
+    {
+        return edit != nullptr ? edit->isEmpty() : true;
     }
 } // namespace app::notes

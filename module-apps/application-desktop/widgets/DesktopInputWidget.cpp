@@ -3,7 +3,6 @@
 
 #include "DesktopInputWidget.hpp"
 #include "AppWindow.hpp"
-#include "application-messages/data/MessagesStyle.hpp"
 #include <service-cellular/CellularServiceAPI.hpp>
 
 #include <Style.hpp>

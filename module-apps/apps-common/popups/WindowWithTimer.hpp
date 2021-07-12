@@ -13,6 +13,7 @@ namespace gui
     {
       private:
         sys::TimerHandle popupTimer;
+        const std::chrono::milliseconds timeout;
 
       public:
         explicit WindowWithTimer(app::Application *app,
@@ -21,6 +22,7 @@ namespace gui
         void destroyInterface() override;
         ~WindowWithTimer() override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        void onClose(CloseReason reason) override;
         bool onInput(const gui::InputEvent &inputEvent) override;
 
       protected:

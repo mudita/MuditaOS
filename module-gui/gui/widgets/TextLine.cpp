@@ -62,11 +62,10 @@ namespace gui
                 return;
             }
 
-            auto canShow = textFormat->getFont()->getCharCountInSpace(text, maxWidth - widthUsed);
+            auto signsCountToShow = calculateSignsToShow(localCursor, text, maxWidth - widthUsed);
 
             // we can show nothing - this is the end of this line
-            if (canShow == 0) {
-
+            if (signsCountToShow == 0) {
                 auto item  = buildUITextPart("", textFormat);
                 widthUsed  = item->getTextNeedSpace();
                 heightUsed = std::max(heightUsed, item->getTextHeight());
@@ -79,15 +78,16 @@ namespace gui
             }
 
             // create item for show and update Line data
-            auto item = buildUITextPart(text.substr(0, canShow), textFormat);
-            shownLetterCount += canShow;
+            auto item =
+                buildUITextPart(text.substr(0, signsCountToShow) + (breakLineDashAddition ? "-" : ""), textFormat);
+            shownLetterCount += signsCountToShow;
             widthUsed += item->getTextNeedSpace();
             heightUsed = std::max(heightUsed, item->getTextHeight());
             lineContent.emplace_back(item);
 
             setLineStartConditions(localCursor.getBlockNumber(), localCursor.getPosition());
 
-            localCursor += canShow;
+            localCursor += signsCountToShow;
 
             if (localCursor.checkAndInvalidateBlockChanged() && localCursor.checkPreviousBlockNewLine()) {
                 end = TextBlock::End::Newline;
@@ -95,12 +95,47 @@ namespace gui
             }
 
             // not whole text shown, try again for next line if you want
-            if (canShow < text.length()) {
+            if (signsCountToShow < text.length()) {
                 end = TextBlock::End::None;
                 return;
             }
 
         } while (true);
+    }
+
+    unsigned int TextLine::calculateSignsToShow(BlockCursor &localCursor, UTF8 &text, unsigned int space)
+    {
+        auto signsCountToShow = localCursor->getFormat()->getFont()->getCharCountInSpace(text, space);
+
+        // additional one sign to detect potential space as last character in line
+        auto searchSubstring = text.substr(0, signsCountToShow + 1);
+
+        auto newlinePos = searchSubstring.findLast("\n", signsCountToShow);
+        auto spacePos   = searchSubstring.findLast(" ", signsCountToShow);
+
+        // check if space or newline in word detection range
+        if (spacePos <= signsCountToShow - text::word_detection_range) {
+            spacePos = UTF8::npos;
+        }
+
+        if (newlinePos <= signsCountToShow - text::word_detection_range) {
+            newlinePos = UTF8::npos;
+        }
+
+        // check if space found and no newline at end
+        if (spacePos != UTF8::npos && newlinePos == UTF8::npos) {
+            // add one to include space in the line
+            signsCountToShow      = spacePos + 1;
+            breakLineDashAddition = false;
+        }
+        // if sings still left in text add dash sign
+        else if (signsCountToShow != 0 && signsCountToShow < text.length()) {
+            // decrease character shown count by one to fit dash
+            signsCountToShow      = signsCountToShow - 1;
+            breakLineDashAddition = true;
+        }
+
+        return signsCountToShow;
     }
 
     TextLine::TextLine(TextLine &&from) noexcept
@@ -117,6 +152,7 @@ namespace gui
         lineEnd                = from.lineEnd;
         end                    = from.end;
         maxWidth               = from.maxWidth;
+        breakLineDashAddition  = from.breakLineDashAddition;
         lineStartBlockNumber   = from.lineStartBlockNumber;
         lineStartBlockPosition = from.lineStartBlockPosition;
         lineVisible            = from.lineVisible;
@@ -314,5 +350,4 @@ namespace gui
             underline->setArea({x, y, getWidth(), height()});
         }
     }
-
 } // namespace gui
