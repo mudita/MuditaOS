@@ -262,7 +262,7 @@ void WorkerEvent::processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code)
 {
     auto message = std::make_shared<sevm::KbdMessage>();
 
-    message->key.key_code = code;
+    message->key.keyCode = code;
 
     switch (event) {
     case bsp::KeyEvents::Pressed:
@@ -270,7 +270,7 @@ void WorkerEvent::processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code)
             return;
         }
         message->key.state      = RawKey::State::Pressed;
-        message->key.time_press = xTaskGetTickCount();
+        message->key.timePress  = xTaskGetTickCount();
         lastPressed             = code;
         lastState               = event;
         break;
@@ -284,7 +284,7 @@ void WorkerEvent::processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code)
         lastState = bsp::KeyEvents::Released;
         {
             message->key.state        = RawKey::State::Released;
-            message->key.time_release = xTaskGetTickCount();
+            message->key.timeRelease  = xTaskGetTickCount();
         }
         break;
     case bsp::KeyEvents::Moved:

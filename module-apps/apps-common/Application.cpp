@@ -115,7 +115,7 @@ namespace app
 
         longPressTimer = sys::TimerFactory::createPeriodicTimer(this,
                                                                 "LongPress",
-                                                                std::chrono::milliseconds{key_timer_ms},
+                                                                std::chrono::milliseconds{keyTimerMs},
                                                                 [this](sys::Timer &) { longPressTimerCallback(); });
 
         connect(typeid(AppRefreshMessage),
@@ -174,21 +174,18 @@ namespace app
 
     void Application::longPressTimerCallback()
     {
-        // TODO if(check widget type long press trigger)
-        uint32_t time = xTaskGetTickCount();
-        if (keyTranslator->timeout(time)) {
-            // previous key press was over standard keypress timeout - send long press
-            gui::InputEvent iev = keyTranslator->translate(time);
+        const auto actualTimeStamp = xTaskGetTickCount();
+        if (keyTranslator->isKeyPressTimedOut(actualTimeStamp)) {
+            gui::InputEvent iev = keyTranslator->translate(actualTimeStamp);
             messageInputEventApplication(this, this->GetName(), iev);
-            // clean previous key
-            keyTranslator->prev_key_press = {};
+            keyTranslator->resetPreviousKeyPress();
             longPressTimer.stop();
         }
     }
 
     void Application::clearLongPressTimeout()
     {
-        keyTranslator->prev_key_timedout = false;
+        keyTranslator->setPreviousKeyTimedOut(false);
     }
 
     void Application::render(gui::RefreshModes mode)

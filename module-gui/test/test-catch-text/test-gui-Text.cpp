@@ -204,10 +204,10 @@ TEST_CASE("handle input mode ABC/abc/1234")
         auto time_long_enough_to_not_be_multipress = 1000;
         text.onInput(next_mode);
         auto rawKey_2 = key_2.getRawKey();
-        rawKey_2.time_release += time_long_enough_to_not_be_multipress;
+        rawKey_2.timeRelease += time_long_enough_to_not_be_multipress;
         REQUIRE(text.getInputMode()->is(InputMode::abc));
         text.onInput(gui::InputEvent{rawKey_2, key_2.getState()});
-        rawKey_2.time_release += time_long_enough_to_not_be_multipress;
+        rawKey_2.timeRelease += time_long_enough_to_not_be_multipress;
         str += "a";
         REQUIRE(str == text.getText());
 
