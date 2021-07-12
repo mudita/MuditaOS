@@ -348,7 +348,7 @@ void EventManager::handleKeyEvent(sys::Message *msg)
     message->key    = kbdMessage->key;
 
     if (message->key.state == RawKey::State::Pressed) {
-        const auto code = message->key.key_code;
+        const auto code = message->key.keyCode;
         if (code == bsp::KeyCodes::FnRight) {
             bus.sendUnicast(message, service::name::system_manager);
         }
@@ -369,8 +369,8 @@ void EventManager::handleKeyEvent(sys::Message *msg)
 
 void EventManager::handleKeyMoveEvent(RawKey key)
 {
-    if (isSliderKeyCode(key.key_code)) {
-        LOG_INFO("Slider position: %s", magic_enum::enum_name(key.key_code).data());
+    if (isSliderKeyCode(key.keyCode)) {
+        LOG_INFO("Slider position: %s", magic_enum::enum_name(key.keyCode).data());
         const auto mode = sys::SystemManager::translateSliderState(key);
         bus.sendUnicast(std::make_shared<sys::PhoneModeRequest>(mode), service::name::system_manager);
     }

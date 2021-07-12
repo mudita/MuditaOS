@@ -11,6 +11,7 @@ add_catch2_executable(
                 ../mock/TestWindow.cpp
                 ../mock/InitializedFontManager.cpp
         test-language-input-parser.cpp
+        test-key-translator.cpp
         INCLUDE
                 ..
         LIBS

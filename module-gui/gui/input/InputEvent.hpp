@@ -84,10 +84,11 @@ namespace gui
       public:
         enum class State
         {
-            Undefined        = 0x00,
-            keyPressed       = 0x01,
-            keyReleasedShort = 0x02,
-            keyReleasedLong  = 0x04,
+            Undefined        = 0x00, /// No action defined or translation error
+            keyPressed       = 0x01, /// Key pressed event
+            keyReleasedShort = 0x02, /// Key released before timeout
+            keyReleasedLong  = 0x04, /// Key released after timeout
+            keyMoved         = 0x05, /// Monostable key event
         };
 
         InputEvent(RawKey key, State state = State::Undefined, KeyCode keyCode = KeyCode::KEY_UNDEFINED);
@@ -192,6 +193,8 @@ namespace gui
         return "keyReleasedShort";
     case gui::InputEvent::State::keyReleasedLong:
         return "keyReleasedLong ";
+    case gui::InputEvent::State::keyMoved:
+        return "keyMoved";
     }
     return "";
 }
