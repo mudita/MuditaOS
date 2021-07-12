@@ -74,11 +74,19 @@ function(add_gtest_executable)
     add_dependencies(unittests ${_TESTNAME})
     add_dependencies(check ${_TESTNAME})
 
+    set(_TEST_LABELS "")
     if(_TEST_ENTITY)
         add_dependencies(unittests-${_TEST_ENTITY} ${_TESTNAME})
+        list(APPEND _TEST_LABELS ${_TEST_ENTITY})
     endif()
 
-    gtest_add_tests(${_TESTNAME} "" AUTO)
+    gtest_add_tests(
+        TARGET ${_TESTNAME}
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        TEST_LIST _TEST_LIST
+    )
+
+    set_tests_properties(${_TEST_LIST} PROPERTIES LABELS ${_TEST_ENTITY})
 endfunction()
 
 function(add_catch2_executable)
