@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "application-settings/models/BluetoothSettingsModel.hpp"
-#include "BaseSettingsWindow.hpp"
+#include <application-settings/models/bluetooth/BluetoothSettingsModel.hpp>
+#include <application-settings/windows/BaseSettingsWindow.hpp>
 
 namespace gui
 {
