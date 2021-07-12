@@ -14,8 +14,11 @@
 #include <application-settings/windows/bluetooth/AllDevicesWindow.hpp>
 #include <application-settings/windows/bluetooth/PhoneNameWindow.hpp>
 #include <application-settings/windows/bluetooth/BluetoothCheckPasskeyWindow.hpp>
-#include <application-settings/windows/ApnSettingsWindow.hpp>
-#include <application-settings/windows/ApnOptionsWindow.hpp>
+#include <application-settings/windows/network/NetworkWindow.hpp>
+#include <application-settings/windows/network/SimCardsWindow.hpp>
+#include <application-settings/windows/network/NewApnWindow.hpp>
+#include <application-settings/windows/network/ApnSettingsWindow.hpp>
+#include <application-settings/windows/network/ApnOptionsWindow.hpp>
 #include <application-settings/windows/DisplayAndKeypadWindow.hpp>
 #include <application-settings/windows/InputLanguageWindow.hpp>
 #include <application-settings/windows/LockedScreenWindow.hpp>
@@ -24,7 +27,6 @@
 #include <application-settings/windows/KeypadLightWindow.hpp>
 #include <application-settings/windows/AppsAndToolsWindow.hpp>
 #include <application-settings/windows/NightshiftWindow.hpp>
-#include <application-settings/windows/NetworkWindow.hpp>
 #include <application-settings/windows/PhoneWindow.hpp>
 #include <application-settings/windows/MessagesWindow.hpp>
 #include <application-settings/windows/AlarmClockWindow.hpp>
@@ -40,7 +42,6 @@
 #include <application-settings/windows/QuotesOptionsWindow.hpp>
 #include <application-settings/windows/SARInfoWindow.hpp>
 #include <application-settings/windows/SystemMainWindow.hpp>
-#include <application-settings/windows/NewApnWindow.hpp>
 #include <application-settings/windows/LanguagesWindow.hpp>
 #include <application-settings/windows/DateAndTimeMainWindow.hpp>
 #include <application-settings/windows/ChangeTimeZone.hpp>
@@ -154,8 +155,8 @@ namespace app
             selectedSim = Store::GSM::get()->selected;
             CellularServiceAPI::RequestForOwnNumber(this);
             auto currentWindow = getCurrentWindow();
-            if (gui::window::name::network == currentWindow->getName()) {
-                updateWindow(gui::window::name::network, nullptr);
+            if (gui::window::name::sim_cards == currentWindow->getName()) {
+                updateWindow(gui::window::name::sim_cards, nullptr);
             }
             return sys::MessageNone{};
         });
@@ -362,6 +363,19 @@ namespace app
         windowsFactory.attach(gui::window::name::all_devices, [](Application *app, const std::string &name) {
             return std::make_unique<gui::AllDevicesWindow>(app);
         });
+        windowsFactory.attach(gui::window::name::phone_name, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::PhoneNameWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::bluetooth_check_passkey,
+                              [](Application *app, const std::string &name) {
+                                  return std::make_unique<gui::BluetoothCheckPasskeyWindow>(app);
+                              });
+        windowsFactory.attach(gui::window::name::network, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::NetworkWindow>(app, static_cast<ApplicationSettings *>(app));
+        });
+        windowsFactory.attach(gui::window::name::sim_cards, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::SimCardsWindow>(app, static_cast<ApplicationSettings *>(app));
+        });
         windowsFactory.attach(gui::window::name::dialog_settings, [](Application *app, const std::string &name) {
             return std::make_unique<gui::Dialog>(app, name);
         });
@@ -389,10 +403,7 @@ namespace app
         windowsFactory.attach(gui::window::name::nightshift, [](Application *app, const std::string &name) {
             return std::make_unique<gui::NightshiftWindow>(app);
         });
-        windowsFactory.attach(gui::window::name::network, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::NetworkWindow>(
-                app, static_cast<ApplicationSettings *>(app), static_cast<ApplicationSettings *>(app));
-        });
+
         windowsFactory.attach(gui::window::name::apn_settings, [](Application *app, const std::string &name) {
             return std::make_unique<gui::ApnSettingsWindow>(app);
         });
@@ -417,9 +428,7 @@ namespace app
         windowsFactory.attach(gui::window::name::sound_select, [](Application *app, const std::string &name) {
             return std::make_unique<gui::SoundSelectWindow>(app, name);
         });
-        windowsFactory.attach(gui::window::name::phone_name, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::PhoneNameWindow>(app);
-        });
+
         windowsFactory.attach(gui::window::name::autolock, [](Application *app, const std::string &name) {
             return std::make_unique<gui::AutolockWindow>(app, static_cast<ApplicationSettings *>(app));
         });
@@ -509,10 +518,6 @@ namespace app
         windowsFactory.attach(gui::window::name::connection_frequency, [](Application *app, const std::string &name) {
             return std::make_unique<gui::ConnectionFrequencyWindow>(app, static_cast<ApplicationSettings *>(app));
         });
-        windowsFactory.attach(gui::window::name::bluetooth_check_passkey,
-                              [](Application *app, const std::string &name) {
-                                  return std::make_unique<gui::BluetoothCheckPasskeyWindow>(app);
-                              });
 
         attachPopups({gui::popup::ID::Volume,
                       gui::popup::ID::Tethering,

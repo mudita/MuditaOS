@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "application-settings/models/ApnSettingsModel.hpp"
-#include "application-settings/models/NewApnModel.hpp"
+#include <application-settings/models/network/ApnSettingsModel.hpp>
+#include <application-settings/models/network/NewApnModel.hpp>
 
 #include <AppWindow.hpp>
 #include <ListView.hpp>
