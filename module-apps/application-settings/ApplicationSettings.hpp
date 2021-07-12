@@ -18,10 +18,11 @@ namespace gui::window::name
     inline constexpr auto eink_mode         = "Change Eink Mode";
     inline constexpr auto color_test_window = "Color Test";
 
-    inline constexpr auto bluetooth   = "Bluetooth";
-    inline constexpr auto all_devices = "AllDevices";
-    inline constexpr auto phone_name  = "PhoneName";
-    inline constexpr auto add_device  = "AddDevice";
+    inline constexpr auto bluetooth               = "Bluetooth";
+    inline constexpr auto all_devices             = "AllDevices";
+    inline constexpr auto phone_name              = "PhoneName";
+    inline constexpr auto add_device              = "AddDevice";
+    inline constexpr auto bluetooth_check_passkey = "BluetoothCheckPasskey";
 
     inline constexpr auto network        = "Network";
     inline constexpr auto apn_settings   = "APNSettings";
@@ -75,8 +76,7 @@ namespace gui::window::name
     inline constexpr auto change_date_and_time = "ChangeDateAndTime";
     inline constexpr auto change_time_zone     = "ChangeTimeZone";
 
-    inline constexpr auto new_apn                 = "NewApn";
-    inline constexpr auto bluetooth_check_passkey = "BluetoothCheckPasskey";
+    inline constexpr auto new_apn = "NewApn";
 
     inline constexpr auto do_not_disturb       = "DoNotDisturb";
     inline constexpr auto offline              = "Offline";

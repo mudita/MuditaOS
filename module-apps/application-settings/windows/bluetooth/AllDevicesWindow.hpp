@@ -2,8 +2,8 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 #pragma once
 
-#include "application-settings/models/BluetoothSettingsModel.hpp"
-#include "BaseSettingsWindow.hpp"
+#include <application-settings/models/bluetooth/BluetoothSettingsModel.hpp>
+#include <application-settings/windows/BaseSettingsWindow.hpp>
 
 #include <Device.hpp>
 
