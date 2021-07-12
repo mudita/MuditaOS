@@ -235,6 +235,47 @@ namespace style
 
     } // namespace listview
 
+    namespace sidelistview
+    {
+        inline auto arrow_left_image  = "arrow_left_24px_W_G";
+        inline auto arrow_right_image = "arrow_right_24px_W_G";
+
+        namespace arrows_hbox
+        {
+            inline constexpr auto x = 0U;
+            inline constexpr auto y = 150U;
+            inline constexpr auto w = window_width;
+            inline constexpr auto h = 300U;
+        } // namespace arrows_hbox
+        namespace list_item
+        {
+            inline constexpr auto w = window_width;
+            inline constexpr auto h = 550U;
+        } // namespace list_item
+        namespace middle_box
+        {
+            inline constexpr auto x = 0U;
+            inline constexpr auto y = 50U;
+            inline constexpr auto w = 480U;
+            inline constexpr auto h = 450U;
+        } // namespace middle_box
+        namespace progress_bar
+        {
+            inline constexpr auto margin_left   = 0U;
+            inline constexpr auto margin_top    = 10U;
+            inline constexpr auto margin_right  = 0U;
+            inline constexpr auto margin_bottom = 10U;
+            inline constexpr auto w             = window_width;
+            inline constexpr auto h             = 50U;
+        } // namespace progress_bar
+        namespace top_message
+        {
+            inline constexpr auto w    = window_width;
+            inline constexpr auto h    = 100U;
+            inline constexpr auto font = style::window::font::supersizemelight;
+        } // namespace top_message
+    }     // namespace sidelistview
+
     namespace margins
     {
         inline constexpr auto small    = 6U;
