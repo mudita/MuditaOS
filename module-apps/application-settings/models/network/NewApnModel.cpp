@@ -3,11 +3,11 @@
 
 #include "NewApnModel.hpp"
 
-#include "application-settings/widgets/ApnInputWidget.hpp"
+#include <application-settings/data/SettingsItemData.hpp>
+#include <application-settings/widgets/SettingsStyle.hpp>
+#include <application-settings/widgets/network/ApnInputWidget.hpp>
 
 #include <ListView.hpp>
-#include <time/ScopedTime.hpp>
-#include <BottomBar.hpp>
 
 NewApnModel::NewApnModel(app::Application *app) : application(app)
 {}

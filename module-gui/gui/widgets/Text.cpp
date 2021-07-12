@@ -220,6 +220,11 @@ namespace gui
         buildCursor();
     }
 
+    void Text::setMinimumWidthToFitText(const UTF8 &text)
+    {
+        setMinimumWidth(format.getFont()->getPixelWidth(text) + TextCursor::defaultWidth);
+    }
+
     auto Text::setCursorStartPosition(CursorStartPosition val) -> void
     {
         // As we destroy cursors starting position information need to be stored in both places

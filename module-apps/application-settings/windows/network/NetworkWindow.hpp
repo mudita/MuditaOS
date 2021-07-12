@@ -3,34 +3,23 @@
 
 #pragma once
 
-#include "BaseSettingsWindow.hpp"
-#include "Application.hpp"
+#include <application-settings/windows/BaseSettingsWindow.hpp>
 
 namespace app::settingsInterface
 {
-    class SimParams;
     class OperatorsSettings;
 }; // namespace app::settingsInterface
 
 namespace gui
 {
-
-    namespace window
-    {
-        inline constexpr auto network_window = "Network";
-    };
-
     class NetworkWindow : public BaseSettingsWindow
     {
       private:
         auto buildOptionsList() -> std::list<Option> override;
-        app::settingsInterface::SimParams *simParams;
         app::settingsInterface::OperatorsSettings *operatorsSettings;
 
       public:
-        NetworkWindow(app::Application *app,
-                      app::settingsInterface::SimParams *simParams,
-                      app::settingsInterface::OperatorsSettings *operatorsSettings);
+        NetworkWindow(app::Application *app, app::settingsInterface::OperatorsSettings *operatorsSettings);
 
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
     };

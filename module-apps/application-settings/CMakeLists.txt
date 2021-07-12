@@ -17,8 +17,8 @@ target_sources( ${PROJECT_NAME}
         ApplicationSettings.cpp
         models/advanced/ColorTestModel.cpp
         models/bluetooth/BluetoothSettingsModel.cpp
-        models/ApnSettingsModel.cpp
-        models/NewApnModel.cpp
+        models/network/ApnSettingsModel.cpp
+        models/network/NewApnModel.cpp
         models/DateAndTimeModel.cpp
         models/FromTimeToTimeModel.cpp
         models/QuotesModel.cpp
@@ -31,9 +31,9 @@ target_sources( ${PROJECT_NAME}
         presenter/TechnicalWindowPresenter.cpp
         widgets/advanced/ColorTestListItem.cpp
         widgets/advanced/ColorTestListView.cpp
+        widgets/network/ApnInputWidget.cpp
         widgets/QuoteWidget.cpp
         widgets/CategoryWidget.cpp
-        widgets/ApnInputWidget.cpp
         widgets/SettingsDateItem.cpp
         widgets/SettingsTimeItem.cpp
         widgets/SettingsSoundItem.cpp
@@ -48,8 +48,10 @@ target_sources( ${PROJECT_NAME}
         windows/bluetooth/BluetoothWindow.cpp
         windows/bluetooth/PhoneNameWindow.cpp
         windows/bluetooth/BluetoothCheckPasskeyWindow.cpp
-        windows/ApnSettingsWindow.cpp
-        windows/ApnOptionsWindow.cpp
+        windows/network/NetworkWindow.cpp
+        windows/network/SimCardsWindow.cpp
+        windows/network/ApnSettingsWindow.cpp
+        windows/network/ApnOptionsWindow.cpp
         windows/BaseSettingsWindow.cpp
         windows/FontSizeWindow.cpp
         windows/InputLanguageWindow.cpp
@@ -58,7 +60,6 @@ target_sources( ${PROJECT_NAME}
         windows/LockedScreenWindow.cpp
         windows/DisplayAndKeypadWindow.cpp
         windows/AppsAndToolsWindow.cpp
-        windows/NetworkWindow.cpp
         windows/NightshiftWindow.cpp
         windows/OptionsWidgetMaker.cpp
         windows/PhoneWindow.cpp
@@ -73,7 +74,7 @@ target_sources( ${PROJECT_NAME}
         windows/QuotesOptionsWindow.cpp
         windows/SARInfoWindow.cpp
         windows/SecurityMainWindow.cpp
-        windows/NewApnWindow.cpp
+        windows/network/NewApnWindow.cpp
         widgets/SpinBox.cpp
         widgets/SpinBoxOptionSettings.cpp
         windows/SystemMainWindow.cpp
@@ -98,15 +99,16 @@ target_sources( ${PROJECT_NAME}
         widgets/advanced/ColorTestListItem.hpp
         widgets/advanced/ColorTestListItem.hpp
         widgets/advanced/ColorTestListStyle.hpp
-        widgets/ApnInputWidget.hpp
+        widgets/network/ApnInputWidget.hpp
         widgets/CategoryWidget.hpp
-        windows/NewApnWindow.hpp
         windows/SettingsMainWindow.hpp
         windows/advanced/AdvancedOptionsWindow.hpp
         windows/advanced/InformationWindow.hpp
         windows/advanced/UITestWindow.hpp
         windows/advanced/EinkModeWindow.hpp
         windows/advanced/ColorTestWindow.hpp
+        windows/network/SimCardsWindow.hpp
+        windows/network/NewApnWindow.hpp
         windows/BaseSettingsWindow.hpp
         windows/FontSizeWindow.hpp
         windows/InputLanguageWindow.hpp

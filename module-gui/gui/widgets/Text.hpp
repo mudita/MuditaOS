@@ -158,6 +158,7 @@ namespace gui
         virtual bool saveText(UTF8 path);
         void setFont(const UTF8 &fontName);
         void setFont(RawFont *font);
+        void setMinimumWidthToFitText(const UTF8 &text);
 
         // virtual methods from Item
         bool onInput(const InputEvent &inputEvent) override;

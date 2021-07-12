@@ -3,11 +3,9 @@
 
 #pragma once
 
-#include "application-settings/data/SettingsInternals.hpp"
-#include "application-settings//widgets/ApnListItem.hpp"
+#include "ApnListItem.hpp"
 
-#include <ListItem.hpp>
-#include <Text.hpp>
+#include <application-settings/data/SettingsInternals.hpp>
 #include <TextFixedSize.hpp>
 
 namespace gui
