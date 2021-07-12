@@ -1,10 +1,12 @@
-#!/bin/bash -e
+#!/bin/bash
 # Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #script is used on CI for creating daily builds
 
 #this script should be run in docker container
+
+set -e
 
 LOGIN=${LOGIN}
 TOKEN=${TOKEN}
