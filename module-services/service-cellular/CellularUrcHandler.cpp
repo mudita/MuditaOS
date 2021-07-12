@@ -42,8 +42,9 @@ void CellularUrcHandler::Handle(Creg &urc)
                  utils::enumToString(status).c_str(),
                  utils::enumToString(accessTechnology).c_str());
 
-        Store::Network network{status, accessTechnology};
+        CellularServiceAPI::GetCurrentOperator(&cellularService);
 
+        Store::Network network{status, accessTechnology};
         Store::GSM::get()->setNetwork(network);
         response = std::make_unique<CellularNetworkStatusUpdateNotification>();
         urc.setHandled(true);
