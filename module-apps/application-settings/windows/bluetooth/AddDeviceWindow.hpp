@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "BaseSettingsWindow.hpp"
-#include "application-settings/models/BluetoothSettingsModel.hpp"
+#include <application-settings/windows/BaseSettingsWindow.hpp>
+#include <application-settings/models/bluetooth/BluetoothSettingsModel.hpp>
 
 #include <Device.hpp>
 
