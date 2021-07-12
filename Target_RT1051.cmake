@@ -110,5 +110,4 @@ SET(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 
 
 
-set(CMAKE_EXE_LINKER_FLAGS "-nostdlib -Xlinker --gc-sections -Xlinker --sort-section=alignment -mcpu=cortex-m7 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb -Xlinker -print-memory-usage -T ${LDSCRIPTSDIR}/libs.ld -T ${LDSCRIPTSDIR}/memory.ld -T ${LDSCRIPTSDIR}/sections.ld -nostartfiles" CACHE INTERNAL "")
 SET(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY BOTH)
