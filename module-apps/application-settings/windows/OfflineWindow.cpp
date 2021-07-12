@@ -54,7 +54,7 @@ namespace gui
             false,
             utils::translate(isFlightMode ? "app_settings_no_network_connection_flight_mode"
                                           : "app_settings_messages_only"),
-            false));
+            true));
 
         if (!isFlightMode) {
             optList.emplace_back(std::make_unique<gui::option::OptionSettings>(

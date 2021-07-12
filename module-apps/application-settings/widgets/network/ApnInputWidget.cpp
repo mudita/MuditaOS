@@ -2,10 +2,9 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApnInputWidget.hpp"
-#include <Span.hpp>
-#include "application-settings/widgets/SettingsStyle.hpp"
+
+#include <application-settings/widgets/SettingsStyle.hpp>
 #include <i18n/i18n.hpp>
-#include <utility>
 
 namespace gui
 {
@@ -17,7 +16,6 @@ namespace gui
                                    unsigned int lines)
         : listItemName(listItemName), checkTextContent(std::move(contentChanged))
     {
-
         setMinimumSize(style::settings::widget::apnInputWidget::w,
                        style::settings::widget::apnInputWidget::title_label_h +
                            style::settings::widget::apnInputWidget::span_size +

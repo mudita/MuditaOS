@@ -2,11 +2,12 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApnSettingsWindow.hpp"
-#include "application-settings/ApplicationSettings.hpp"
-#include "application-settings/data/ApnListData.hpp"
-#include "application-settings/widgets/SettingsStyle.hpp"
-#include "application-settings/data/SettingsItemData.hpp"
-#include "OptionSetting.hpp"
+
+#include <application-settings/ApplicationSettings.hpp>
+#include <application-settings/data/ApnListData.hpp>
+#include <application-settings/widgets/SettingsStyle.hpp>
+#include <application-settings/data/SettingsItemData.hpp>
+#include <OptionSetting.hpp>
 
 #include <header/AddElementAction.hpp>
 #include <InputEvent.hpp>

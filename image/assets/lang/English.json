@@ -393,6 +393,7 @@
   "app_settings_sar": "SAR",
   "app_settings_about": "About Mudita Pure",
   "app_settings_title_languages": "Language selection",
+  "app_settings_network_sim_cards": "Sim cards",
   "app_settings_network_active_card": "Active card",
   "app_settings_network_operator_auto_select": "Operator auto-select",
   "app_settings_network_all_operators": "All operators",
