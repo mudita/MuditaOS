@@ -16,8 +16,8 @@ target_sources( ${PROJECT_NAME}
     PRIVATE
         ApplicationSettings.cpp
         models/advanced/ColorTestModel.cpp
+        models/bluetooth/BluetoothSettingsModel.cpp
         models/ApnSettingsModel.cpp
-        models/BluetoothSettingsModel.cpp
         models/NewApnModel.cpp
         models/DateAndTimeModel.cpp
         models/FromTimeToTimeModel.cpp
@@ -43,12 +43,14 @@ target_sources( ${PROJECT_NAME}
         windows/advanced/UITestWindow.cpp
         windows/advanced/EinkModeWindow.cpp
         windows/advanced/ColorTestWindow.cpp
-        windows/AddDeviceWindow.cpp
-        windows/AllDevicesWindow.cpp
+        windows/bluetooth/AddDeviceWindow.cpp
+        windows/bluetooth/AllDevicesWindow.cpp
+        windows/bluetooth/BluetoothWindow.cpp
+        windows/bluetooth/PhoneNameWindow.cpp
+        windows/bluetooth/BluetoothCheckPasskeyWindow.cpp
         windows/ApnSettingsWindow.cpp
         windows/ApnOptionsWindow.cpp
         windows/BaseSettingsWindow.cpp
-        windows/BluetoothWindow.cpp
         windows/FontSizeWindow.cpp
         windows/InputLanguageWindow.cpp
         windows/DisplayLightWindow.cpp
@@ -63,7 +65,6 @@ target_sources( ${PROJECT_NAME}
         windows/MessagesWindow.cpp
         windows/AlarmClockWindow.cpp
         windows/SoundSelectWindow.cpp
-        windows/PhoneNameWindow.cpp
         windows/AutolockWindow.cpp
         windows/TorchWindow.cpp
         windows/WallpaperWindow.cpp
@@ -80,7 +81,6 @@ target_sources( ${PROJECT_NAME}
         windows/DateAndTimeMainWindow.cpp
         windows/ChangeTimeZone.cpp
         windows/ChangeDateAndTimeWindow.cpp
-        windows/BluetoothCheckPasskeyWindow.cpp
         windows/EditQuotesWindow.cpp
         windows/QuoteCategoriesWindow.cpp
         windows/ConnectionFrequencyWindow.cpp

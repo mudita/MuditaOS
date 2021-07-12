@@ -9,11 +9,13 @@
 #include <application-settings/windows/advanced/UITestWindow.hpp>
 #include <application-settings/windows/advanced/EinkModeWindow.hpp>
 #include <application-settings/windows/advanced/ColorTestWindow.hpp>
-#include <application-settings/windows/AddDeviceWindow.hpp>
-#include <application-settings/windows/AllDevicesWindow.hpp>
+#include <application-settings/windows/bluetooth/BluetoothWindow.hpp>
+#include <application-settings/windows/bluetooth/AddDeviceWindow.hpp>
+#include <application-settings/windows/bluetooth/AllDevicesWindow.hpp>
+#include <application-settings/windows/bluetooth/PhoneNameWindow.hpp>
+#include <application-settings/windows/bluetooth/BluetoothCheckPasskeyWindow.hpp>
 #include <application-settings/windows/ApnSettingsWindow.hpp>
 #include <application-settings/windows/ApnOptionsWindow.hpp>
-#include <application-settings/windows/BluetoothWindow.hpp>
 #include <application-settings/windows/DisplayAndKeypadWindow.hpp>
 #include <application-settings/windows/InputLanguageWindow.hpp>
 #include <application-settings/windows/LockedScreenWindow.hpp>
@@ -27,7 +29,6 @@
 #include <application-settings/windows/MessagesWindow.hpp>
 #include <application-settings/windows/AlarmClockWindow.hpp>
 #include <application-settings/windows/SoundSelectWindow.hpp>
-#include <application-settings/windows/PhoneNameWindow.hpp>
 #include <application-settings/windows/AutolockWindow.hpp>
 #include <application-settings/windows/TorchWindow.hpp>
 #include <application-settings/windows/WallpaperWindow.hpp>
@@ -59,7 +60,6 @@
 #include <application-settings/data/LanguagesData.hpp>
 #include <application-settings/data/PhoneNameData.hpp>
 #include <application-settings/data/PINSettingsLockStateData.hpp>
-#include <application-settings/windows/BluetoothCheckPasskeyWindow.hpp>
 #include <application-settings/data/AutoLockData.hpp>
 
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
