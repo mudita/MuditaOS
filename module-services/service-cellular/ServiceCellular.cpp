@@ -1757,7 +1757,9 @@ std::shared_ptr<CellularGetCurrentOperatorResponse> ServiceCellular::handleCellu
 {
     LOG_INFO("CellularGetCurrentOperator handled");
     NetworkSettings networkSettings(*this);
-    return std::make_shared<CellularGetCurrentOperatorResponse>(networkSettings.getCurrentOperator());
+    const auto currentNetworkOperatorName = networkSettings.getCurrentOperator();
+    Store::GSM::get()->setNetworkOperatorName(currentNetworkOperatorName);
+    return std::make_shared<CellularGetCurrentOperatorResponse>(currentNetworkOperatorName);
 }
 
 std::shared_ptr<CellularGetAPNResponse> ServiceCellular::handleCellularGetAPNMessage(CellularGetAPNMessage *msg)

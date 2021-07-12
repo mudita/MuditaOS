@@ -11,6 +11,7 @@
 
 #include <cstddef>
 #include <service-cellular/api/common.hpp>
+#include <string>
 
 namespace cpp_freertos
 {
@@ -91,6 +92,7 @@ namespace Store
         GSM() = default;
         SignalStrength signalStrength;
         Network network;
+        std::string networkOperatorName;
 
         static cpp_freertos::MutexStandard mutex;
 
@@ -131,6 +133,9 @@ namespace Store
 
         void setNetwork(const Network &signalStrength);
         Network getNetwork() const;
+
+        void setNetworkOperatorName(const std::string &newNetworkOperatorName);
+        std::string getNetworkOperatorName() const;
 
         static GSM *get();
     };
