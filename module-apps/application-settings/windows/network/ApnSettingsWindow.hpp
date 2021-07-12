@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "OptionWindow.hpp"
-#include "application-settings/models/ApnSettingsModel.hpp"
+#include <OptionWindow.hpp>
+#include <application-settings/models/network/ApnSettingsModel.hpp>
 
 #include <Icon.hpp>
 #include <service-cellular/PacketDataTypes.hpp>
