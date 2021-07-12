@@ -748,7 +748,7 @@ namespace sys
 
     phone_modes::PhoneMode SystemManager::translateSliderState(const RawKey &key)
     {
-        const auto code = key.key_code;
+        const auto code = key.keyCode;
         if (code != bsp::KeyCodes::SSwitchUp && code != bsp::KeyCodes::SSwitchMid &&
             code != bsp::KeyCodes::SSwitchDown) {
             throw std::invalid_argument{"Invalid key code passed."};

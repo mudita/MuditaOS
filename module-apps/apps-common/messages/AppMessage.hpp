@@ -210,8 +210,8 @@ namespace app
             std::stringstream ss;
             ss << "{ ";
             ss << "state:   " << c_str(event.getState()) << ", ";
-            ss << "RawKey:  " << c_str(rawKey.key_code) << "}";
-            ss << "t0: " << rawKey.time_press << ", t1: " << rawKey.time_release;
+            ss << "RawKey:  " << c_str(rawKey.keyCode) << "}";
+            ss << "t0: " << rawKey.timePress << ", t1: " << rawKey.timeRelease;
             ss << " }";
             return ss.str().c_str();
         }
