@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "EventStore.hpp"
@@ -44,7 +44,6 @@ namespace Store
     SignalStrength GSM::getSignalStrength() const
     {
         cpp_freertos::LockGuard lock(mutex);
-
         return signalStrength;
     }
 
@@ -57,12 +56,22 @@ namespace Store
     Network GSM::getNetwork() const
     {
         cpp_freertos::LockGuard lock(mutex);
-
         return network;
     }
 
     bool GSM::simCardInserted()
     {
+        cpp_freertos::LockGuard lock(mutex);
         return (sim == SIM::SIM1 || sim == SIM::SIM2);
+    }
+    void GSM::setNetworkOperatorName(const std::string &newNetworkOperatorName)
+    {
+        cpp_freertos::LockGuard lock(mutex);
+        networkOperatorName = newNetworkOperatorName;
+    }
+    std::string GSM::getNetworkOperatorName() const
+    {
+        cpp_freertos::LockGuard lock(mutex);
+        return networkOperatorName;
     }
 }; // namespace Store
