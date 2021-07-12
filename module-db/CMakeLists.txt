@@ -132,7 +132,7 @@ target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
 
 
 set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/Database/sqlite3vfs.cpp PROPERTIES COMPILE_FLAGS -Wno-overflow)
-set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/Database/sqlite3.c PROPERTIES COMPILE_FLAGS -DSQLITE_DEFAULT_WAL_AUTOCHECKPOINT=1)
+set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/Database/sqlite3.c PROPERTIES COMPILE_FLAGS "-DSQLITE_DEFAULT_WAL_AUTOCHECKPOINT=1 -Wno-misleading-indentation")
 
 target_compile_definitions(${PROJECT_NAME}
 
