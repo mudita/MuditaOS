@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "application-settings/data/SettingsItemData.hpp"
+#include <application-settings/data/SettingsItemData.hpp>
 
 namespace gui
 {

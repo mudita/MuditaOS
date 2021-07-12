@@ -2,10 +2,9 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NewApnWindow.hpp"
-#include "application-settings/ApplicationSettings.hpp"
 
-#include <Dialog.hpp>
-#include <messages/DialogMetadataMessage.hpp>
+#include <application-settings/ApplicationSettings.hpp>
+#include <application-settings/widgets/SettingsStyle.hpp>
 
 namespace gui
 {

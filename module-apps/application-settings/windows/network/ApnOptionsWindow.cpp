@@ -3,10 +3,9 @@
 
 #include "ApnOptionsWindow.hpp"
 
-#include "application-settings/ApplicationSettings.hpp"
-#include "application-settings/data/SettingsItemData.hpp"
-#include "application-settings/models/ApnSettingsModel.hpp"
-#include "OptionSetting.hpp"
+#include <application-settings/ApplicationSettings.hpp>
+#include <application-settings/data/SettingsItemData.hpp>
+#include <OptionSetting.hpp>
 
 namespace gui
 {

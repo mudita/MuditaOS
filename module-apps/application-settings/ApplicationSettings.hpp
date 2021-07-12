@@ -24,9 +24,12 @@ namespace gui::window::name
     inline constexpr auto add_device              = "AddDevice";
     inline constexpr auto bluetooth_check_passkey = "BluetoothCheckPasskey";
 
-    inline constexpr auto network        = "Network";
-    inline constexpr auto apn_settings   = "APNSettings";
-    inline constexpr auto apn_options    = "APNOptions";
+    inline constexpr auto network       = "Network";
+    inline constexpr auto sim_cards     = "SimCards";
+    inline constexpr auto all_operators = "AllOperators";
+    inline constexpr auto apn_settings  = "APNSettings";
+    inline constexpr auto apn_options   = "APNOptions";
+
     inline constexpr auto phone_modes    = "PhoneModes";
     inline constexpr auto apps_and_tools = "AppsAndTools";
     inline constexpr auto security       = "Security";
@@ -59,7 +62,6 @@ namespace gui::window::name
 
     inline constexpr auto display_and_keypad = "DisplayAndKeypad";
     inline constexpr auto change_settings    = "ChangeSettings";
-    inline constexpr auto all_operators      = "AllOperators";
     inline constexpr auto pin_settings       = "PINSettings";
     inline constexpr auto import_contacts    = "ImportContacts";
     inline constexpr auto dialog_settings    = "DialogSettings";
