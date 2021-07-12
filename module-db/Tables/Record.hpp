@@ -12,9 +12,6 @@ struct Record
 {
     uint32_t ID = DB_ID_NONE;
 
-    Record() = default;
-    Record(uint32_t ID) : ID(ID){};
-
     bool isValid() const
     {
         auto result = ID != DB_ID_NONE;
