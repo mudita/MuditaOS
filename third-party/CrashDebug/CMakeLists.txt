@@ -16,4 +16,10 @@ target_include_directories(CrashCatcher
         src/CrashCatcher/Core/src
 )
 
-target_sources(CrashCatcher INTERFACE src/CrashCatcher/Core/src/CrashCatcher.c)
+target_sources(CrashCatcher
+    INTERFACE
+        src/CrashCatcher/Core/src/CrashCatcher.c
+        CrashCatcher_armv7m.S
+)
+
+set_source_files_properties(CrashCatcher_armv7m.S PROPERTIES LANGUAGE C)

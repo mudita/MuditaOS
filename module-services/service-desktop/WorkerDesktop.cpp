@@ -31,6 +31,15 @@ WorkerDesktop::WorkerDesktop(sys::Service *ownerServicePtr,
 
 bool WorkerDesktop::init(std::list<sys::WorkerQueueInfo> queues)
 {
+    LOG_ERROR("sadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsad");
+    delete x;
+    delete x;
+    LOG_ERROR("sadsadsadsadsad %d", *x);
+    x = new int(200000);
+    delete x;
+    delete x;
+    LOG_ERROR("sadsadsadsadsad %d", *x);
+
     Worker::init(queues);
 
     irqQueue     = Worker::getQueueHandleByName(sdesktop::IRQ_QUEUE_BUFFER_NAME);

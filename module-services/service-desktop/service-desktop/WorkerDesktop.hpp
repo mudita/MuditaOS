@@ -25,6 +25,7 @@ namespace constants
 class WorkerDesktop : public sys::Worker, public bsp::USBDeviceListener
 {
   public:
+  int *x;
     enum TransferFailAction
     {
         doNothing,

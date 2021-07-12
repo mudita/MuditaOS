@@ -62,7 +62,6 @@ target_link_libraries(PurePhone
         ${LWIP_LIBRARIES}
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_Linux>:iosyscalls>"
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_RT1051>:CrashCatcher::CrashCatcher>"
-        "$<$<STREQUAL:${PROJECT_TARGET},TARGET_RT1051>:CrashCatcherARM>"
     )
 
 target_link_options(PurePhone PUBLIC ${TARGET_LINK_OPTIONS})
