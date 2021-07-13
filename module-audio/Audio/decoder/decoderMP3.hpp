@@ -26,7 +26,6 @@ namespace audio
         void setPosition(float pos) override;
 
       private:
-        void fetchTagsSpecific() override;
         auto getBitWidth() -> unsigned int override;
 
         bool find_first_valid_frame();
