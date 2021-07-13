@@ -1,7 +1,7 @@
 add_executable(BellHybrid)
 
 add_custom_target(Bell ALL
-    DEPENDS BellHybrid BellHybrid.img
+    DEPENDS BellHybrid PurePhone-disk-img
     )
 
 target_link_directories(BellHybrid PRIVATE ${PROJECT_LIB_DIRECTORY})
@@ -48,6 +48,7 @@ set_target_properties(BellHybrid
 target_link_libraries(BellHybrid
     PRIVATE
         application-bell-main
+        application-bell-settings
         application-music-player
         messagetype
         module-apps

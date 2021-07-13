@@ -537,14 +537,19 @@
   "app_desktop_update_ready_for_reset": "Ready for reset...",
   "app_desktop_update_success": "MuditaOS has been updated to ver. $VERSION succesfully.",
   "app_call_private_number": "Private number",
+  "tethering": "Tethering",
+  "tethering_turn_off_question": "Turn tethering off?",
+  "tethering_enable_question": "<text>You're connected to the computer.<br />Turn tethering on?<br /><text color='9'>(some functions may be disabled)</text></text>",
+  "tethering_phone_mode_change_prohibited": "<text>Tethering is on.<br /><br />Other modes (Connected, DND,<br />Offline) are overriden by this mode<br />and are not working.</text>",
+  "tethering_menu_access_decline": "<text>Tethering is on.<br /><br />To access menu,<br />turn tethering off.</text>",
+
+  "app_bell_settings_time_units_time_message": "Time",
   "app_bellmain_next_alarm": "Next alarm",
   "app_bellmain_power_nap": "Power nap",
   "app_bellmain_meditation_timer": "Meditation timer",
   "app_bellmain_media_library": "Media Library",
   "app_bellmain_settings": "Settings",
-  "tethering": "Tethering",
-  "tethering_turn_off_question": "Turn tethering off?",
-  "tethering_enable_question": "<text>You're connected to the computer.<br />Turn tethering on?<br /><text color='9'>(some functions may be disabled)</text></text>",
-  "tethering_phone_mode_change_prohibited": "<text>Tethering is on.<br /><br />Other modes (Connected, DND,<br />Offline) are overriden by this mode<br />and are not working.</text>",
-  "tethering_menu_access_decline": "<text>Tethering is on.<br /><br />To access menu,<br />turn tethering off.</text>"
+  "app_bellmain_main_window_title": "Bell Hybrid+",
+  "app_bell_settings_advanced": "Advanced",
+  "app_bell_settings_advanced_time_units": "Time & units"
 }

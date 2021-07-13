@@ -11,7 +11,7 @@ namespace gui
     class SideListItem : public ListItemWithDescription
     {
       public:
-        HBox *body = nullptr;
+        VBox *body = nullptr;
 
         SideListItem(std::string description);
     };
