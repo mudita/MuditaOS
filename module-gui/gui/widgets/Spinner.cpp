@@ -75,15 +75,15 @@ namespace gui
             switch (inputEvent.getKeyCode()) {
             case KeyCode::KEY_UP:
                 stepUp();
-                break;
+                return true;
             case KeyCode::KEY_DOWN:
                 stepDown();
-                break;
+                return true;
             default:
                 break;
             }
         }
-        return true;
+        return false;
     }
 
     bool Spinner::onFocus(bool state)

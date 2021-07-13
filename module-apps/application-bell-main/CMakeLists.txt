@@ -5,11 +5,9 @@ target_sources(application-bell-main
         ApplicationBellMain.cpp
         windows/BellMainWindow.cpp
         windows/BellMainMenuWindow.cpp
-        windows/BellMainSetHour.cpp
  
         windows/BellMainWindow.hpp
         windows/BellMainMenuWindow.hpp
-        windows/BellMainSetHour.hpp
     PUBLIC
         include/application-bell-main/ApplicationBellMain.hpp
 )

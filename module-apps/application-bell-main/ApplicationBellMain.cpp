@@ -3,7 +3,6 @@
 
 #include "include/application-bell-main/ApplicationBellMain.hpp"
 #include "windows/BellMainMenuWindow.hpp"
-#include "windows/BellMainSetHour.hpp"
 #include "windows/BellMainWindow.hpp"
 #include <windows/Dialog.hpp>
 
@@ -41,10 +40,6 @@ namespace app
         // for demo only - to be removed
         windowsFactory.attach(gui::window::name::bell_main_menu_dialog, [](Application *app, const std::string &name) {
             return std::make_unique<gui::Dialog>(app, name);
-        });
-
-        windowsFactory.attach(gui::window::name::bell_main_set_hour, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::BellMainSetHour>(app);
         });
     }
 

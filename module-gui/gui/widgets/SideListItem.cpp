@@ -10,11 +10,13 @@ namespace gui
 {
     SideListItem::SideListItem(std::string description) : ListItemWithDescription(description)
     {
-        body = new HBox(this, 0U, 0U, style::sidelistview::list_item::w, style::sidelistview::list_item::h);
+        setEdges(RectangleEdge::None);
+        body = new VBox(this);
+        body->setMinimumSize(style::sidelistview::list_item::w, style::sidelistview::list_item::h);
         body->setEdges(RectangleEdge::None);
 
-        auto topMessage =
-            new Label(body, 0U, 0U, style::sidelistview::top_message::w, style::sidelistview::top_message::h);
+        auto topMessage = new Label(body);
+        topMessage->setMinimumSize(style::sidelistview::top_message::w, style::sidelistview::top_message::h);
         topMessage->setFont(style::sidelistview::top_message::font);
         topMessage->setEdges(gui::RectangleEdge::None);
         topMessage->activeItem = false;
