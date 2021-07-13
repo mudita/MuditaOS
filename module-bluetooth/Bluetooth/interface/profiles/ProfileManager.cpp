@@ -38,23 +38,13 @@ namespace bluetooth
     auto ProfileManager::connect(bd_addr_t address) -> Error::Code
     {
         bd_addr_copy(remoteAddr, address);
-        ///> connect to remote only if we are sure that remote side supports our profiles
-        if (GAP::isServiceSupportedByRemote(address, TYPE_OF_SERVICE::RENDERING)) {
-            auto profilePtr = profilesList[AudioProfile::A2DP].get();
-            if (profilePtr != nullptr) {
-                LOG_DEBUG("Connecting device to A2DP");
-                profilePtr->setDeviceAddress(remoteAddr);
-                profilePtr->connect();
+        for (auto &[profileName, ptr] : profilesList) {
+            if (ptr != nullptr) {
+                ptr->setDeviceAddress(remoteAddr);
+                ptr->connect();
             }
         }
-        if (GAP::isServiceSupportedByRemote(address, TYPE_OF_SERVICE::AUDIO)) {
-            auto profilePtr = profilesList[AudioProfile::HSP].get();
-            if (profilePtr != nullptr) {
-                LOG_DEBUG("Connecting device to HSP");
-                profilePtr->setDeviceAddress(remoteAddr);
-                profilePtr->connect();
-            }
-        }
+
         return Error::Success;
     }
 
