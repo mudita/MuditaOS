@@ -222,7 +222,11 @@ namespace gui
 
     void Text::setMinimumWidthToFitText(const UTF8 &text)
     {
-        setMinimumWidth(format.getFont()->getPixelWidth(text) + TextCursor::defaultWidth);
+        auto textToFit = !text::RichTextParser().parse(text, &format)->getText().empty()
+                             ? text::RichTextParser().parse(text, &format)->getText()
+                             : text;
+
+        setMinimumWidth(format.getFont()->getPixelWidth(textToFit) + TextCursor::defaultWidth);
     }
 
     auto Text::setCursorStartPosition(CursorStartPosition val) -> void
