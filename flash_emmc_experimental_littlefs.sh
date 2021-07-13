@@ -64,7 +64,7 @@ fi
 SDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 GENLFS=$(find $SDIR -type f -iname genlittlefs -executable -print -quit)
 if [ -z ${GENLFS} ]; then
-    echo "Unable to find genlilttlefs..."
+    echo "Unable to find genlittlefs..."
     exit -1
 fi
 
