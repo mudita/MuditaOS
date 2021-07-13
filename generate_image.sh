@@ -49,7 +49,7 @@ if [ ! $MTOOLS_OK ]; then
 	exit -1
 fi
 
-SDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+SDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd && echo $BUILDDIR )"
 GENLFS=$(find $SDIR -type f -iname genlittlefs -executable -print -quit)
 if [ -z ${GENLFS} ]; then
     echo "Error: Unable to find genlilttlefs..."
