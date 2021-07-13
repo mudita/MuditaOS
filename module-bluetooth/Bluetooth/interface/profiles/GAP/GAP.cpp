@@ -176,6 +176,7 @@ namespace bluetooth
             return; // already in our list
         }
         uint32_t classOfDevice = gap_event_inquiry_result_get_class_of_device(packet);
+        LOG_INFO("Device CoD: %" PRIx32 "", classOfDevice);
         ///> Device has to support services: AUDIO for HFP and HSP profiles, and RENDERING for SNK of A2DP profile
         if (!(classOfDevice & TYPE_OF_SERVICE::REMOTE_SUPPORTED_SERVICES)) {
             LOG_INFO("Ignoring device with incompatible services: %s, ",
@@ -294,15 +295,6 @@ namespace bluetooth
         ownerService->bus.sendUnicast(
             std::make_shared<message::bluetooth::UnpairResult>(std::move(unpairedDevAddr), true), app::name_settings);
         return true;
-    }
-    auto GAP::isServiceSupportedByRemote(bd_addr_t addr, uint32_t typeOfService) -> bool
-    {
-        for (const auto &device : devices) {
-            if (bd_addr_cmp(device.address, addr) == 0) {
-                return (device.classOfDevice & typeOfService);
-            }
-        }
-        return false;
     }
     void GAP::respondPinCode(const std::string &pin)
     {
