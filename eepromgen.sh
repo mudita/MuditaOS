@@ -25,7 +25,7 @@ IMAGE_NAME=$(realpath "$1")
 #Find genlittlefs tool
 GENLFS=$(find $SDIR -type f -iname genlittlefs -executable -print -quit)
 if [ -z ${GENLFS} ]; then
-    echo "Error: Unable to find genlilttlefs..."
+    echo "Error: Unable to find genlittlefs..."
     exit 1
 fi
 

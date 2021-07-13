@@ -88,7 +88,7 @@ static void help(const char *name)
                                     "general options:\n"
                                     "    -h   --help              print help\n"
                                     "\n"
-                                    "genlilttlefs options:\n"
+                                    "genlittlefs options:\n"
                                     "    -i   --image             partition file image\n"
                                     "    -b   --block_size        logical block size, overrides the block device\n"
                                     "    -s   --filesystem_size   filesystem size when creating the new file\n"
