@@ -2,9 +2,9 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhoneNameWindow.hpp"
-#include "application-settings/ApplicationSettings.hpp"
-#include "application-settings/data/PhoneNameData.hpp"
-#include "widgets/InputBox.hpp"
+#include <application-settings/windows/WindowNames.hpp>
+#include <application-settings/data/PhoneNameData.hpp>
+#include <widgets/InputBox.hpp>
 
 #include <Utils.hpp>
 

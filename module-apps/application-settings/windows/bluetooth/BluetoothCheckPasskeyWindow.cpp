@@ -2,8 +2,8 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BluetoothCheckPasskeyWindow.hpp"
-#include "application-settings/ApplicationSettings.hpp"
-#include "application-settings/widgets/SettingsStyle.hpp"
+#include <application-settings/windows/WindowNames.hpp>
+#include <application-settings/widgets/SettingsStyle.hpp>
 #include <widgets/Text.hpp>
 #include <Image.hpp>
 

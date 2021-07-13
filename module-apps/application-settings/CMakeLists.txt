@@ -19,10 +19,10 @@ target_sources( ${PROJECT_NAME}
         models/bluetooth/BluetoothSettingsModel.cpp
         models/network/ApnSettingsModel.cpp
         models/network/NewApnModel.cpp
+        models/display-keypad/QuotesModel.cpp
+        models/display-keypad/CategoriesModel.cpp
         models/DateAndTimeModel.cpp
         models/FromTimeToTimeModel.cpp
-        models/QuotesModel.cpp
-        models/CategoriesModel.cpp
         models/SARInfoRepository.cpp
         models/FactoryData.cpp
         models/AudioSettingsModel.cpp
@@ -32,8 +32,8 @@ target_sources( ${PROJECT_NAME}
         widgets/advanced/ColorTestListItem.cpp
         widgets/advanced/ColorTestListView.cpp
         widgets/network/ApnInputWidget.cpp
-        widgets/QuoteWidget.cpp
-        widgets/CategoryWidget.cpp
+        widgets/display-keypad/QuoteWidget.cpp
+        widgets/display-keypad/CategoryWidget.cpp
         widgets/SettingsDateItem.cpp
         widgets/SettingsTimeItem.cpp
         widgets/SettingsSoundItem.cpp
@@ -52,13 +52,18 @@ target_sources( ${PROJECT_NAME}
         windows/network/SimCardsWindow.cpp
         windows/network/ApnSettingsWindow.cpp
         windows/network/ApnOptionsWindow.cpp
+        windows/display-keypad/DisplayAndKeypadWindow.cpp
+        windows/display-keypad/DisplayLightWindow.cpp
+        windows/display-keypad/FontSizeWindow.cpp
+        windows/display-keypad/WallpaperWindow.cpp
+        windows/display-keypad/QuotesMainWindow.cpp
+        windows/display-keypad/QuotesAddWindow.cpp
+        windows/display-keypad/QuotesOptionsWindow.cpp
+        windows/display-keypad/EditQuotesWindow.cpp
+        windows/display-keypad/QuoteCategoriesWindow.cpp
+        windows/display-keypad/KeypadLightWindow.cpp
+        windows/display-keypad/InputLanguageWindow.cpp
         windows/BaseSettingsWindow.cpp
-        windows/FontSizeWindow.cpp
-        windows/InputLanguageWindow.cpp
-        windows/DisplayLightWindow.cpp
-        windows/KeypadLightWindow.cpp
-        windows/LockedScreenWindow.cpp
-        windows/DisplayAndKeypadWindow.cpp
         windows/AppsAndToolsWindow.cpp
         windows/NightshiftWindow.cpp
         windows/OptionsWidgetMaker.cpp
@@ -68,22 +73,15 @@ target_sources( ${PROJECT_NAME}
         windows/SoundSelectWindow.cpp
         windows/AutolockWindow.cpp
         windows/TorchWindow.cpp
-        windows/WallpaperWindow.cpp
-        windows/QuotesMainWindow.cpp
-        windows/QuotesAddWindow.cpp
-        windows/QuotesOptionsWindow.cpp
         windows/SARInfoWindow.cpp
         windows/SecurityMainWindow.cpp
         windows/network/NewApnWindow.cpp
-        widgets/SpinBox.cpp
         widgets/SpinBoxOptionSettings.cpp
         windows/SystemMainWindow.cpp
         windows/LanguagesWindow.cpp
         windows/DateAndTimeMainWindow.cpp
         windows/ChangeTimeZone.cpp
         windows/ChangeDateAndTimeWindow.cpp
-        windows/EditQuotesWindow.cpp
-        windows/QuoteCategoriesWindow.cpp
         windows/ConnectionFrequencyWindow.cpp
         windows/DoNotDisturbWindow.cpp
         windows/OfflineWindow.cpp
@@ -100,8 +98,9 @@ target_sources( ${PROJECT_NAME}
         widgets/advanced/ColorTestListItem.hpp
         widgets/advanced/ColorTestListStyle.hpp
         widgets/network/ApnInputWidget.hpp
-        widgets/CategoryWidget.hpp
+        widgets/display-keypad/CategoryWidget.hpp
         windows/SettingsMainWindow.hpp
+        windows/WindowNames.hpp
         windows/advanced/AdvancedOptionsWindow.hpp
         windows/advanced/InformationWindow.hpp
         windows/advanced/UITestWindow.hpp
@@ -109,24 +108,23 @@ target_sources( ${PROJECT_NAME}
         windows/advanced/ColorTestWindow.hpp
         windows/network/SimCardsWindow.hpp
         windows/network/NewApnWindow.hpp
+        windows/display-keypad/DisplayAndKeypadWindow.hpp
+        windows/display-keypad/DisplayLightWindow.hpp
+        windows/display-keypad/FontSizeWindow.hpp
+        windows/display-keypad/WallpaperWindow.hpp
+        windows/display-keypad/EditQuotesWindow.hpp
+        windows/display-keypad/QuoteCategoriesWindow.hpp
+        windows/display-keypad/KeypadLightWindow.hpp
+        windows/display-keypad/InputLanguageWindow.hpp
         windows/BaseSettingsWindow.hpp
-        windows/FontSizeWindow.hpp
-        windows/InputLanguageWindow.hpp
-        windows/DisplayLightWindow.hpp
-        windows/KeypadLightWindow.hpp
-        windows/LockedScreenWindow.hpp
-        windows/DisplayAndKeypadWindow.hpp
         windows/AppsAndToolsWindow.hpp
         windows/MessagesWindow.hpp
         widgets/SettingsStyle.hpp
         windows/AutolockWindow.hpp
-        windows/WallpaperWindow.hpp
         windows/SystemMainWindow.hpp
         windows/LanguagesWindow.hpp
         windows/DateAndTimeMainWindow.hpp
         windows/ChangeDateAndTimeWindow.hpp
-        windows/EditQuotesWindow.hpp
-        windows/QuoteCategoriesWindow.hpp
         windows/AboutYourPureWindow.hpp
         windows/CertificationWindow.hpp
         windows/TechnicalInformationWindow.hpp

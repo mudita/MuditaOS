@@ -3,7 +3,7 @@
 
 #include "ApnOptionsWindow.hpp"
 
-#include <application-settings/ApplicationSettings.hpp>
+#include <application-settings/windows/WindowNames.hpp>
 #include <application-settings/data/SettingsItemData.hpp>
 #include <OptionSetting.hpp>
 

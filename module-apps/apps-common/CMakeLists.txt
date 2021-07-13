@@ -34,6 +34,7 @@ target_sources(apps-common
         widgets/DateWidget.cpp
         widgets/InputBox.cpp
         widgets/ModesBox.cpp
+        widgets/SpinBox.cpp
         widgets/TextWithIconsWidget.cpp
         widgets/TimeWidget.cpp
         widgets/WidgetsUtils.cpp

@@ -27,6 +27,7 @@ namespace utils
 
     const std::string &translate(const std::string &text);
     const std::string &getDisplayLanguage();
+    const std::string &getInputLanguage();
     const std::string &getInputLanguageFilename(const std::string &inputMode);
 
     bool setInputLanguage(const Language &lang);
