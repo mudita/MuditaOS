@@ -25,6 +25,9 @@ namespace bsp
         currentFrequency = freq;
     }
 
+    void LinuxLPM::SetHighestCoreVoltage()
+    {}
+
     uint32_t LinuxLPM::GetCpuFrequency() const noexcept
     {
         return 0;
