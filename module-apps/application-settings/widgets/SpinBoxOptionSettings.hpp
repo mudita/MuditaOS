@@ -3,11 +3,7 @@
 
 #pragma once
 
-#include "SpinBox.hpp"
-#include "OptionWindow.hpp"
-#include "Application.hpp"
-
-#include <apps-common/options/type/OptionSetting.hpp>
+#include <OptionSetting.hpp>
 
 namespace gui
 {

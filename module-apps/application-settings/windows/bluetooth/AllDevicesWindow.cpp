@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AllDevicesWindow.hpp"
-#include <application-settings/ApplicationSettings.hpp>
+#include <application-settings/windows/WindowNames.hpp>
 #include <application-settings/data/BondedDevicesData.hpp>
 #include <application-settings/data/PairingDeviceData.hpp>
 #include <application-settings/widgets/SettingsStyle.hpp>

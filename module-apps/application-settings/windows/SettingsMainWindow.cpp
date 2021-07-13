@@ -26,7 +26,10 @@ std::list<gui::Option> mainWindowOptionsNew(app::Application *app)
                                    gui::option::Arrow::Enabled});
     };
 
+#if DEVELOPER_SETTINGS_OPTIONS == 1
     addMenu(i18("app_settings_advanced"), gui::window::name::advanced);
+#endif // DEVELOPER_SETTINGS_OPTIONS
+
     addMenu(i18("app_settings_bt"), gui::window::name::bluetooth);
     addMenu(i18("app_settings_net"), gui::window::name::network);
     addMenu(i18("app_settings_disp_key"), gui::window::name::display_and_keypad);
