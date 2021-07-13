@@ -92,6 +92,11 @@ namespace bsp
         LOG_INFO("CPU frequency changed to %lu", CLOCK_GetFreq(kCLOCK_CpuClk));
     }
 
+    void RT1051LPM::SetHighestCoreVoltage()
+    {
+        CpuFreq->SetHighestCoreVoltage();
+    }
+
     uint32_t RT1051LPM::GetCpuFrequency() const noexcept
     {
         return CLOCK_GetCpuClkFreq();
