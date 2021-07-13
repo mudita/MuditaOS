@@ -75,13 +75,16 @@ namespace sys
         const auto freq = lowPowerControl->GetCurrentFrequencyLevel();
 
         if (freq == bsp::CpuFrequencyHz::Level_1) {
-            // switch osc source first
+            // Switch DCDC to full throttle during oscillator switch
+            lowPowerControl->SetHighestCoreVoltage();
+            // switch oscillator source
             lowPowerControl->SwitchOscillatorSource(bsp::LowPowerMode::OscillatorSource::External);
-
             // then switch external RAM clock source
             if (driverSEMC) {
                 driverSEMC->SwitchToPLL2ClockSource();
             }
+            // Add intermediate step in frequency
+            SetCpuFrequency(bsp::CpuFrequencyHz::Level_4);
         }
 
         // and increase frequency
