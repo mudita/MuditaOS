@@ -10,6 +10,7 @@ add_library(${PROJECT_NAME} STATIC)
 
 add_subdirectory(application-antenna)
 add_subdirectory(application-bell-main)
+add_subdirectory(application-bell-settings)
 add_subdirectory(application-calculator)
 add_subdirectory(application-call)
 add_subdirectory(application-desktop)

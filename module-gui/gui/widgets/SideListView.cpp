@@ -1,10 +1,10 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "Image.hpp"
+#include "InputEvent.hpp"
 #include "SideListView.hpp"
 #include "Style.hpp"
-#include "Image.hpp"
-#include <InputEvent.hpp>
 
 namespace gui
 {
@@ -30,17 +30,17 @@ namespace gui
         body = new HBox{bodyOverlay, 0, 0, 0, 0};
         body->setMinimumSize(w, bodyHeight);
         body->setAlignment(Alignment::Horizontal::Center);
-        body->setEdges(RectangleEdge::All);
+        body->setEdges(RectangleEdge::None);
         bodyOverlay->resizeItems();
 
         body->borderCallback = [this](const InputEvent &inputEvent) -> bool {
             if (!inputEvent.isShortRelease()) {
                 return false;
             }
-            if (inputEvent.is(KeyCode::KEY_LEFT) && pageLoaded) {
+            if (inputEvent.is(KeyCode::KEY_RF) && pageLoaded) {
                 return this->requestPreviousPage();
             }
-            else if (inputEvent.is(KeyCode::KEY_RIGHT) && pageLoaded) {
+            else if (inputEvent.is(KeyCode::KEY_ENTER) && pageLoaded) {
                 return this->requestNextPage();
             }
             else {
@@ -101,8 +101,8 @@ namespace gui
         arrowLeft->setEdges(RectangleEdge::None);
         arrowsOverlay->addWidget(arrowLeft);
 
-        auto arrowRight = new gui::Image(style::sidelistview::arrow_right_image);
-        arrowRight->setAlignment(Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Center));
+        auto arrowRight = new Image(style::sidelistview::arrow_right_image);
+        arrowRight->setAlignment(Alignment(Alignment::Horizontal::Right, Alignment::Vertical::Center));
         arrowRight->activeItem = false;
         arrowRight->setEdges(RectangleEdge::None);
 
@@ -130,6 +130,12 @@ namespace gui
 
     auto SideListView::onInput(const InputEvent &inputEvent) -> bool
     {
-        return body->onInput(inputEvent);
+        if (body->onInput(inputEvent)) {
+            return true;
+        }
+        if (body->borderCallback && body->borderCallback(inputEvent)) {
+            return true;
+        }
+        return false;
     }
 } /* namespace gui */
