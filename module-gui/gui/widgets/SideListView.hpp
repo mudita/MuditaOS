@@ -6,7 +6,7 @@
 #include "ListViewEngine.hpp"
 #include "ListItemProvider.hpp"
 #include "BoxLayout.hpp"
-#include <widgets/BarGraph.hpp>
+#include <apps-common/widgets/BarGraph.hpp>
 
 namespace gui
 {

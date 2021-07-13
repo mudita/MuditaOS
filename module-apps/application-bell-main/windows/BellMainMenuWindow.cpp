@@ -79,8 +79,8 @@ namespace gui
         addWinMenu(utils::translate("app_bellmain_power_nap"), gui::window::name::bell_main_menu_dialog);
         addWinMenu(utils::translate("app_bellmain_meditation_timer"), gui::window::name::bell_main_menu_dialog);
         addWinMenu(utils::translate("app_bellmain_media_library"), gui::window::name::bell_main_menu_dialog);
-        addWinMenu(utils::translate("app_bellmain_settings"), gui::window::name::bell_main_menu_dialog);
-        addWinMenu(utils::translate("Set Hour"), gui::window::name::bell_main_set_hour);
+
+        addAppMenu(utils::translate("app_bellmain_settings"), "ApplicationBellSettings");
 
         return menuOptionList;
     }
