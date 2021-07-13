@@ -2,11 +2,11 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AddDeviceWindow.hpp"
-#include <application-settings/ApplicationSettings.hpp>
+#include <application-settings/windows/WindowNames.hpp>
 #include <application-settings/data/DeviceData.hpp>
 #include <application-settings/data/PairingDeviceData.hpp>
 
-#include "OptionSetting.hpp"
+#include <OptionSetting.hpp>
 
 extern "C"
 {

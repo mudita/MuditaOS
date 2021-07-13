@@ -3,7 +3,7 @@
 
 #include "InformationWindow.hpp"
 
-#include <application-settings/ApplicationSettings.hpp>
+#include <application-settings/windows/WindowNames.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
 
 #include <source/version.hpp>

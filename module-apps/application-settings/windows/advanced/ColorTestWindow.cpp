@@ -3,7 +3,7 @@
 
 #include "ColorTestWindow.hpp"
 
-#include <application-settings/ApplicationSettings.hpp>
+#include <application-settings/windows/WindowNames.hpp>
 #include <application-settings/widgets/advanced/ColorTestListStyle.hpp>
 
 #include <service-gui/Common.hpp>

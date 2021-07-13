@@ -24,6 +24,7 @@ namespace utils
             const std::string &get(const std::string &str);
             using i18n::getDisplayLanguage;
             using i18n::getDisplayLanguagePath;
+            using i18n::getInputLanguage;
             using i18n::getInputLanguageFilename;
             using i18n::getInputLanguagePath;
             using i18n::resetAssetsPath;
@@ -162,6 +163,11 @@ namespace utils
     const std::string &getDisplayLanguage()
     {
         return utils::localize.getDisplayLanguage();
+    }
+
+    const std::string &getInputLanguage()
+    {
+        return utils::localize.getInputLanguage();
     }
 
     const std::string &getInputLanguageFilename(const std::string &inputMode)
