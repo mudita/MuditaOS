@@ -42,7 +42,7 @@ namespace audio
     std::unique_ptr<Tags> Decoder::fetchTags()
     {
         if (fd) {
-            auto inPos = std::ftell(fd);
+            const auto inPos = std::ftell(fd);
             std::rewind(fd);
             TagLib::FileStream fileStream(fd);
             TagLib::FileRef tagReader(&fileStream);
@@ -64,8 +64,6 @@ namespace audio
                 tag->num_channel      = properties->channels();
                 tag->bitrate          = properties->bitrate();
             }
-            std::rewind(fd);
-            fetchTagsSpecific();
             std::fseek(fd, inPos, SEEK_SET);
         }
 
