@@ -3,8 +3,7 @@
 
 #include "SpinBoxOptionSettings.hpp"
 
-#include <utility>
-#include "SpinBox.hpp"
+#include <widgets/SpinBox.hpp>
 
 namespace gui
 {

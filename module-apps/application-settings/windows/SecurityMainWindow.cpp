@@ -55,6 +55,17 @@ namespace gui
                 option::SettingRightItem::ArrowWhite));
         }
 
+        optionList.emplace_back(std::make_unique<gui::option::OptionSettings>(
+            utils::translate("app_settings_display_locked_screen_autolock"),
+            [=](gui::Item &item) {
+                this->application->switchWindow(gui::window::name::autolock, nullptr);
+                return true;
+            },
+            nullptr,
+            nullptr,
+            gui::option::SettingRightItem::ArrowWhite,
+            false));
+
         return optionList;
     }
 } // namespace gui
