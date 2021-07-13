@@ -3,7 +3,7 @@
 
 #include "NewApnWindow.hpp"
 
-#include <application-settings/ApplicationSettings.hpp>
+#include <application-settings/windows/WindowNames.hpp>
 #include <application-settings/widgets/SettingsStyle.hpp>
 
 namespace gui

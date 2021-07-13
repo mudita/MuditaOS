@@ -19,12 +19,17 @@
 #include <application-settings/windows/network/NewApnWindow.hpp>
 #include <application-settings/windows/network/ApnSettingsWindow.hpp>
 #include <application-settings/windows/network/ApnOptionsWindow.hpp>
-#include <application-settings/windows/DisplayAndKeypadWindow.hpp>
-#include <application-settings/windows/InputLanguageWindow.hpp>
-#include <application-settings/windows/LockedScreenWindow.hpp>
-#include <application-settings/windows/FontSizeWindow.hpp>
-#include <application-settings/windows/DisplayLightWindow.hpp>
-#include <application-settings/windows/KeypadLightWindow.hpp>
+#include <application-settings/windows/display-keypad/DisplayAndKeypadWindow.hpp>
+#include <application-settings/windows/display-keypad/DisplayLightWindow.hpp>
+#include <application-settings/windows/display-keypad/FontSizeWindow.hpp>
+#include <application-settings/windows/display-keypad/WallpaperWindow.hpp>
+#include <application-settings/windows/display-keypad/QuotesMainWindow.hpp>
+#include <application-settings/windows/display-keypad/QuotesAddWindow.hpp>
+#include <application-settings/windows/display-keypad/EditQuotesWindow.hpp>
+#include <application-settings/windows/display-keypad/QuoteCategoriesWindow.hpp>
+#include <application-settings/windows/display-keypad/QuotesOptionsWindow.hpp>
+#include <application-settings/windows/display-keypad/KeypadLightWindow.hpp>
+#include <application-settings/windows/display-keypad/InputLanguageWindow.hpp>
 #include <application-settings/windows/AppsAndToolsWindow.hpp>
 #include <application-settings/windows/NightshiftWindow.hpp>
 #include <application-settings/windows/PhoneWindow.hpp>
@@ -33,13 +38,7 @@
 #include <application-settings/windows/SoundSelectWindow.hpp>
 #include <application-settings/windows/AutolockWindow.hpp>
 #include <application-settings/windows/TorchWindow.hpp>
-#include <application-settings/windows/WallpaperWindow.hpp>
-#include <application-settings/windows/QuotesMainWindow.hpp>
-#include <application-settings/windows/QuotesAddWindow.hpp>
-#include <application-settings/windows/EditQuotesWindow.hpp>
-#include <application-settings/windows/QuoteCategoriesWindow.hpp>
 #include <application-settings/windows/SecurityMainWindow.hpp>
-#include <application-settings/windows/QuotesOptionsWindow.hpp>
 #include <application-settings/windows/SARInfoWindow.hpp>
 #include <application-settings/windows/SystemMainWindow.hpp>
 #include <application-settings/windows/LanguagesWindow.hpp>
@@ -62,7 +61,6 @@
 #include <application-settings/data/PhoneNameData.hpp>
 #include <application-settings/data/PINSettingsLockStateData.hpp>
 #include <application-settings/data/AutoLockData.hpp>
-
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
 #include <service-bluetooth/BluetoothMessage.hpp>
 #include <service-bluetooth/Constants.hpp>
@@ -338,6 +336,8 @@ namespace app
             return std::make_unique<gui::OptionWindow>(
                 app, utils::translate("app_settings_title_main"), mainWindowOptionsNew(app));
         });
+
+        // Advanced
         windowsFactory.attach(gui::window::name::advanced, [](Application *app, const std::string &name) {
             return std::make_unique<gui::OptionWindow>(
                 app, utils::translate("app_settings_advanced"), advancedOptions(app));
@@ -354,6 +354,8 @@ namespace app
         windowsFactory.attach(gui::window::name::color_test_window, [](Application *app, const std::string &name) {
             return std::make_unique<gui::ColorTestWindow>(app);
         });
+
+        // Bluetooth
         windowsFactory.attach(gui::window::name::bluetooth, [](Application *app, const std::string &name) {
             return std::make_unique<gui::BluetoothWindow>(app);
         });
@@ -370,45 +372,64 @@ namespace app
                               [](Application *app, const std::string &name) {
                                   return std::make_unique<gui::BluetoothCheckPasskeyWindow>(app);
                               });
+
+        // Network
         windowsFactory.attach(gui::window::name::network, [](Application *app, const std::string &name) {
             return std::make_unique<gui::NetworkWindow>(app, static_cast<ApplicationSettings *>(app));
         });
         windowsFactory.attach(gui::window::name::sim_cards, [](Application *app, const std::string &name) {
             return std::make_unique<gui::SimCardsWindow>(app, static_cast<ApplicationSettings *>(app));
         });
-        windowsFactory.attach(gui::window::name::dialog_settings, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::Dialog>(app, name);
+        windowsFactory.attach(gui::window::name::apn_settings, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::ApnSettingsWindow>(app);
         });
+        windowsFactory.attach(gui::window::name::apn_options, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::ApnOptionsWindow>(app);
+        });
+
+        // Display and keypad
         windowsFactory.attach(gui::window::name::display_and_keypad, [](Application *app, const std::string &name) {
             return std::make_unique<gui::DisplayAndKeypadWindow>(app);
         });
-        windowsFactory.attach(gui::window::name::input_language, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::InputLanguageWindow>(app);
-        });
-        windowsFactory.attach(gui::window::name::locked_screen, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::LockedScreenWindow>(app);
-        });
-        windowsFactory.attach(gui::window::name::keypad_light, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::KeypadLightWindow>(app, static_cast<ApplicationSettings *>(app));
+        windowsFactory.attach(gui::window::name::display_light, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::DisplayLightWindow>(app, static_cast<ApplicationSettings *>(app));
         });
         windowsFactory.attach(gui::window::name::font_size, [](Application *app, const std::string &name) {
             return std::make_unique<gui::FontSizeWindow>(app);
         });
-        windowsFactory.attach(gui::window::name::display_light, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::DisplayLightWindow>(app, static_cast<ApplicationSettings *>(app));
+        windowsFactory.attach(gui::window::name::wallpaper, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::WallpaperWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::quotes, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::QuotesMainWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::new_quote, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::QuoteAddEditWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::options_quote, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::QuotesOptionsWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::edit_quotes, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::EditQuotesWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::quote_categories, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::QuoteCategoriesWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::keypad_light, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::KeypadLightWindow>(app, static_cast<ApplicationSettings *>(app));
+        });
+        windowsFactory.attach(gui::window::name::input_language, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::InputLanguageWindow>(app);
+        });
+
+        windowsFactory.attach(gui::window::name::dialog_settings, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::Dialog>(app, name);
         });
         windowsFactory.attach(gui::window::name::apps_and_tools, [](Application *app, const std::string &name) {
             return std::make_unique<gui::AppsAndToolsWindow>(app);
         });
         windowsFactory.attach(gui::window::name::nightshift, [](Application *app, const std::string &name) {
             return std::make_unique<gui::NightshiftWindow>(app);
-        });
-
-        windowsFactory.attach(gui::window::name::apn_settings, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::ApnSettingsWindow>(app);
-        });
-        windowsFactory.attach(gui::window::name::apn_options, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::ApnOptionsWindow>(app);
         });
         windowsFactory.attach(gui::window::name::phone, [](Application *app, const std::string &name) {
             auto audioModel =
@@ -435,9 +456,7 @@ namespace app
         windowsFactory.attach(gui::window::name::torch, [](Application *app, const std::string &name) {
             return std::make_unique<gui::TorchWindow>(app);
         });
-        windowsFactory.attach(gui::window::name::wallpaper, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::WallpaperWindow>(app);
-        });
+
         windowsFactory.attach(gui::window::name::quotes_dialog_yes_no, [](Application *app, const std::string &name) {
             return std::make_unique<gui::DialogYesNo>(app, name);
         });
@@ -489,21 +508,6 @@ namespace app
         });
         windowsFactory.attach(gui::window::name::dialog_retry, [](Application *app, const std::string &name) {
             return std::make_unique<gui::DialogRetry>(app, name);
-        });
-        windowsFactory.attach(gui::window::name::quotes, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::QuotesMainWindow>(app);
-        });
-        windowsFactory.attach(gui::window::name::new_quote, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::QuoteAddEditWindow>(app);
-        });
-        windowsFactory.attach(gui::window::name::options_quote, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::QuotesOptionsWindow>(app);
-        });
-        windowsFactory.attach(gui::window::name::edit_quotes, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::EditQuotesWindow>(app);
-        });
-        windowsFactory.attach(gui::window::name::quote_categories, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::QuoteCategoriesWindow>(app);
         });
         windowsFactory.attach(gui::window::name::phone_modes, [](Application *app, const std::string &name) {
             return std::make_unique<gui::PhoneModesWindow>(
