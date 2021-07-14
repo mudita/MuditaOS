@@ -94,6 +94,12 @@ namespace app
             virtual void setAutoLockTime(std::chrono::seconds lockTime) = 0;
         };
 
+        class PhoneModeSettings
+        {
+          public:
+            virtual auto getCurrentPhoneMode() const noexcept -> sys::phone_modes::PhoneMode = 0;
+        };
+
     }; // namespace settingsInterface
 
     class ApplicationSettings : public app::Application,
@@ -105,6 +111,7 @@ namespace app
                                 public settingsInterface::OfflineSettings,
                                 public settingsInterface::ConnectionSettings,
                                 public settingsInterface::AutoLockSettings,
+                                public settingsInterface::PhoneModeSettings,
                                 public AsyncCallbackReceiver
     {
       public:
@@ -157,6 +164,8 @@ namespace app
 
         void getAutoLockTime() override;
         void setAutoLockTime(std::chrono::seconds lockTime) override;
+
+        auto getCurrentPhoneMode() const noexcept -> sys::phone_modes::PhoneMode override;
 
       private:
         void attachQuotesWindows();

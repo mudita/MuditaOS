@@ -2,20 +2,31 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhoneModesWindow.hpp"
-#include "application-settings/ApplicationSettings.hpp"
 
-#include "OptionSetting.hpp"
-
+#include <application-settings/ApplicationSettings.hpp>
+#include <OptionSetting.hpp>
 #include <i18n/i18n.hpp>
 
 namespace gui
 {
     PhoneModesWindow::PhoneModesWindow(app::Application *app,
-                                       app::settingsInterface::SimParams *simParams,
-                                       app::settingsInterface::OperatorsSettings *operatorsSettings)
-        : OptionWindow(app, gui::window::name::phone_modes), simParams(simParams), operatorsSettings(operatorsSettings)
+                                       app::settingsInterface::PhoneModeSettings *phoneModeSettings)
+        : OptionWindow(app, gui::window::name::phone_modes), phoneModeSettings(phoneModeSettings)
     {
         addOptions(modesOptList());
+
+        setTitle(utils::translate("app_settings_phone_modes"));
+    }
+
+    void PhoneModesWindow::onBeforeShow(ShowMode m, SwitchData *d)
+    {
+        auto selectedPhoneModeIndex = static_cast<unsigned int>(phoneModeSettings->getCurrentPhoneMode());
+
+        modifiedModesStrings = initialModesStrings;
+        modifiedModesStrings[selectedPhoneModeIndex] =
+            "<text><b>" + modifiedModesStrings[selectedPhoneModeIndex] + " </b></text>";
+
+        refreshOptions(modesOptList(), selectedPhoneModeIndex);
     }
 
     auto PhoneModesWindow::modesOptList() -> std::list<gui::Option>
@@ -23,7 +34,7 @@ namespace gui
         std::list<gui::Option> optList;
 
         optList.emplace_back(std::make_unique<gui::option::OptionSettings>(
-            utils::translate("app_settings_connected"),
+            modifiedModesStrings[0],
             [=](gui::Item &item) { return true; },
             [=](gui::Item &item) {
                 if (item.focus) {
@@ -34,7 +45,7 @@ namespace gui
             this));
 
         optList.emplace_back(std::make_unique<gui::option::OptionSettings>(
-            utils::translate("app_settings_title_do_not_disturb"),
+            modifiedModesStrings[1],
             [=](gui::Item &item) {
                 this->application->switchWindow(gui::window::name::do_not_disturb, nullptr);
                 return true;
@@ -49,7 +60,7 @@ namespace gui
             gui::option::SettingRightItem::ArrowWhite));
 
         optList.emplace_back(std::make_unique<gui::option::OptionSettings>(
-            utils::translate("app_settings_title_offline"),
+            modifiedModesStrings[2],
             [=](gui::Item &item) {
                 this->application->switchWindow(gui::window::name::offline, nullptr);
                 return true;
