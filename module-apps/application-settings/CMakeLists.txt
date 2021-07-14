@@ -63,6 +63,10 @@ target_sources( ${PROJECT_NAME}
         windows/display-keypad/QuoteCategoriesWindow.cpp
         windows/display-keypad/KeypadLightWindow.cpp
         windows/display-keypad/InputLanguageWindow.cpp
+        windows/phone-modes/PhoneModesWindow.cpp
+        windows/phone-modes/DoNotDisturbWindow.cpp
+        windows/phone-modes/OfflineWindow.cpp
+        windows/phone-modes/ConnectionFrequencyWindow.cpp
         windows/BaseSettingsWindow.cpp
         windows/AppsAndToolsWindow.cpp
         windows/NightshiftWindow.cpp
@@ -82,10 +86,6 @@ target_sources( ${PROJECT_NAME}
         windows/DateAndTimeMainWindow.cpp
         windows/ChangeTimeZone.cpp
         windows/ChangeDateAndTimeWindow.cpp
-        windows/ConnectionFrequencyWindow.cpp
-        windows/DoNotDisturbWindow.cpp
-        windows/OfflineWindow.cpp
-        windows/PhoneModesWindow.cpp
         windows/PINSettingsWindow.cpp
         windows/AboutYourPureWindow.cpp
         windows/CertificationWindow.cpp

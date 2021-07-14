@@ -2,10 +2,10 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "OfflineWindow.hpp"
-#include "application-settings/ApplicationSettings.hpp"
-#include "application-settings/widgets/SettingsStyle.hpp"
 
-#include "OptionSetting.hpp"
+#include <application-settings/ApplicationSettings.hpp>
+#include <application-settings/widgets/SettingsStyle.hpp>
+#include <OptionSetting.hpp>
 
 #include <i18n/i18n.hpp>
 
@@ -23,23 +23,23 @@ namespace gui
     {
         setTitle(utils::translate("app_settings_title_offline"));
         optionsList->setSize(optionsList->getWidth(),
-                             optionsList->getHeight() - style::settings::window::offline::body_offset);
+                             optionsList->getHeight() - style::settings::window::phone_modes::body_offset);
 
-        bar = new Rect(this,
-                       style::window::default_left_margin,
-                       style::settings::window::offline::bar_y,
-                       style::window::default_body_width,
-                       style::settings::window::offline::bar_h);
-        bar->setVisible(true);
-        descriptionText = new Text(this,
-                                   style::window::default_left_margin,
-                                   style::settings::window::offline::description_y,
-                                   style::window::default_body_width,
-                                   style::settings::window::offline::description_h);
+        descriptionText = new gui::Text(this,
+                                        style::window::default_left_margin,
+                                        style::settings::window::phone_modes::description_y,
+                                        style::window::default_body_width,
+                                        style::settings::window::phone_modes::description_h);
         descriptionText->setFont(style::window::font::medium);
+        descriptionText->setAlignment(gui::Alignment{gui::Alignment::Vertical::Top});
+        descriptionText->setEdges(gui::RectangleEdge::Top);
+        descriptionText->setPenWidth(style::window::default_border_rect_no_focus);
+        descriptionText->setPadding(gui::Padding(style::settings::window::phone_modes::description_vertical_padding,
+                                                 style::settings::window::phone_modes::description_top_padding,
+                                                 style::settings::window::phone_modes::description_vertical_padding,
+                                                 0));
         descriptionText->setText(utils::translate(isFlightMode ? "app_settings_info_offline_flight_mode"
                                                                : "app_settings_info_offline_messages_only"));
-        descriptionText->setVisible(true);
     }
 
     auto OfflineWindow::buildOptionsList() -> std::list<gui::Option>

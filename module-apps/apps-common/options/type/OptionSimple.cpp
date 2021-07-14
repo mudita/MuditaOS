@@ -41,8 +41,7 @@ namespace gui::option
         optionItem->activatedCallback = activatedCallback;
 
         if (arrow == Arrow::Enabled) {
-            auto arrowImage = new gui::Image(optionBodyHBox, 0, 0, 0, 0, "right_label_arrow");
-            arrowImage->setMargins(Margins(0, 0, window::option_right_margin, 0));
+            new gui::Image(optionBodyHBox, 0, 0, 0, 0, "arrow_right_empty_32px_W_G");
         }
 
         return optionItem;
