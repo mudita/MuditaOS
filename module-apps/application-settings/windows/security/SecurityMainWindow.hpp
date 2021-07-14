@@ -3,20 +3,19 @@
 
 #pragma once
 
-#include "BaseSettingsWindow.hpp"
+#include <application-settings/windows/BaseSettingsWindow.hpp>
 
 namespace gui
 {
-    class PINSettingsWindow : public BaseSettingsWindow
+    class SecurityMainWindow : public BaseSettingsWindow
     {
       public:
-        explicit PINSettingsWindow(app::Application *app);
+        explicit SecurityMainWindow(app::Application *app);
 
       private:
         auto buildOptionsList() -> std::list<Option> override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
-        void changePinState(bool &currentState);
 
-        bool pinIsOn = false;
+        bool isPhoneLockEnabled;
     };
 } // namespace gui

@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "AppsAndToolsWindow.hpp"
+#include "AppsWindow.hpp"
 
 #include <application-settings/windows/WindowNames.hpp>
 #include <i18n/i18n.hpp>
@@ -9,13 +9,13 @@
 
 namespace gui
 {
-    AppsAndToolsWindow::AppsAndToolsWindow(app::Application *app) : OptionWindow(app, gui::window::name::apps_and_tools)
+    AppsWindow::AppsWindow(app::Application *app) : OptionWindow(app, gui::window::name::apps)
     {
         addOptions(appsAndToolsOptionsList());
         setTitle(utils::translate("app_settings_apps"));
     }
 
-    std::list<Option> AppsAndToolsWindow::appsAndToolsOptionsList()
+    std::list<Option> AppsWindow::appsAndToolsOptionsList()
     {
         std::list<gui::Option> optionList;
 

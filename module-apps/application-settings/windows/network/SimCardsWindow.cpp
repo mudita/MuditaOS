@@ -74,7 +74,7 @@ namespace gui
             utils::translate("app_settings_network_pin_settings"),
             [=](gui::Item &item) {
                 auto pinSettingsData = std::make_unique<gui::PINSettingsSimData>(simStr);
-                this->application->switchWindow(gui::window::name::pin_settings, std::move(pinSettingsData));
+                this->application->switchWindow(gui::window::name::sim_pin_settings, std::move(pinSettingsData));
                 return true;
             },
             nullptr,

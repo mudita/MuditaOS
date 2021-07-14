@@ -3,12 +3,15 @@
 
 #pragma once
 
-#include "BaseSettingsWindow.hpp"
-#include <module-apps/application-settings/ApplicationSettings.hpp>
+#include <application-settings/windows/BaseSettingsWindow.hpp>
+
+namespace app::settingsInterface
+{
+    class AutoLockSettings;
+}; // namespace app::settingsInterface
 
 namespace gui
 {
-
     class AutolockWindow : public BaseSettingsWindow
     {
       public:

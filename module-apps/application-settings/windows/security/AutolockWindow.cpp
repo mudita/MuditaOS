@@ -2,6 +2,8 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AutolockWindow.hpp"
+
+#include <application-settings/ApplicationSettings.hpp>
 #include <application-settings/data/AutoLockData.hpp>
 #include <OptionSetting.hpp>
 #include <i18n/i18n.hpp>
@@ -23,7 +25,7 @@ namespace gui
     AutolockWindow::AutolockWindow(app::Application *app, app::settingsInterface::AutoLockSettings *autoLockSettings)
         : BaseSettingsWindow(app, window::name::autolock), autoLockSettings(autoLockSettings)
     {
-        setTitle(utils::translate("app_settings_display_locked_screen_autolock"));
+        setTitle(utils::translate("app_settings_display_security_autolock"));
     }
 
     auto AutolockWindow::buildOptionsList() -> std::list<gui::Option>
@@ -61,7 +63,13 @@ namespace gui
         else if (mode == ShowMode::GUI_SHOW_INIT) {
             autoLockSettings->getAutoLockTime();
         }
-        BaseSettingsWindow::onBeforeShow(mode, data);
+
+        auto it = std::find_if(
+            autoLockTimes.begin(), autoLockTimes.end(), [&](const std::pair<std::string, std::chrono::seconds> &elem) {
+                return elem.second == currentAutoLockTimeout;
+            });
+
+        refreshOptionsList(std::distance(autoLockTimes.begin(), it));
     }
 
 } // namespace gui

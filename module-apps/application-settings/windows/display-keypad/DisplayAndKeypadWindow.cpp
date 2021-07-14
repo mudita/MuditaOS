@@ -46,7 +46,7 @@ namespace gui
 
 #if DISABLED_SETTINGS_OPTIONS == 1
         addMenu(utils::translate("app_settings_display_font_size"), gui::window::name::font_size);
-        addMenu(utils::translate("app_settings_display_locked_screen_wallpaper"), gui::window::name::wallpaper);
+        addMenu(utils::translate("app_settings_display_wallpaper"), gui::window::name::wallpaper);
 #endif // DISABLED_SETTINGS_OPTIONS
 
         addMenu(utils::translate("app_settings_display_keypad_light"), gui::window::name::keypad_light);
