@@ -17,13 +17,14 @@ namespace gui::window::name
     inline constexpr auto add_device              = "AddDevice";
     inline constexpr auto bluetooth_check_passkey = "BluetoothCheckPasskey";
 
-    inline constexpr auto network         = "Network";
-    inline constexpr auto sim_cards       = "SimCards";
-    inline constexpr auto import_contacts = "ImportContacts";
-    inline constexpr auto all_operators   = "AllOperators";
-    inline constexpr auto apn_settings    = "APNSettings";
-    inline constexpr auto apn_options     = "APNOptions";
-    inline constexpr auto new_apn         = "NewApn";
+    inline constexpr auto network          = "Network";
+    inline constexpr auto sim_cards        = "SimCards";
+    inline constexpr auto sim_pin_settings = "SimPINSettings";
+    inline constexpr auto import_contacts  = "ImportContacts";
+    inline constexpr auto all_operators    = "AllOperators";
+    inline constexpr auto apn_settings     = "APNSettings";
+    inline constexpr auto apn_options      = "APNOptions";
+    inline constexpr auto new_apn          = "NewApn";
 
     inline constexpr auto display_and_keypad   = "DisplayAndKeypad";
     inline constexpr auto display_light        = "DisplayLight";
@@ -44,22 +45,18 @@ namespace gui::window::name
     inline constexpr auto offline              = "Offline";
     inline constexpr auto connection_frequency = "ConnectionFrequency";
 
-    inline constexpr auto apps_and_tools = "AppsAndTools";
-    inline constexpr auto security       = "Security";
-    inline constexpr auto system         = "System";
-
+    inline constexpr auto apps              = "Apps";
     inline constexpr auto phone             = "Phone";
     inline constexpr auto messages          = "Messages";
     inline constexpr auto message_templates = "MessageTemplates";
     inline constexpr auto alarm_clock       = "AlarmClock";
     inline constexpr auto sound_select      = "SoundSelect";
 
-    inline constexpr auto torch      = "Torch";
-    inline constexpr auto nightshift = "Nightshift";
-    inline constexpr auto autolock   = "Autolock";
+    inline constexpr auto security = "Security";
+    inline constexpr auto autolock = "Autolock";
 
+    inline constexpr auto system          = "System";
     inline constexpr auto change_settings = "ChangeSettings";
-    inline constexpr auto pin_settings    = "PINSettings";
     inline constexpr auto dialog_settings = "DialogSettings";
     inline constexpr auto change_passcode = "ChangePasscode";
 
