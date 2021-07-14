@@ -29,6 +29,7 @@ target_sources(BellHybrid
     PRIVATE
         ${TARGET_SOURCES}
         BellHybridMain.cpp
+        PlatformFactory.cpp
     )
 
 target_include_directories(BellHybrid
@@ -55,6 +56,7 @@ target_link_libraries(BellHybrid
         service-bluetooth
         service-desktop
         service-lwip
+        platform
         ${LWIP_LIBRARIES}
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_Linux>:iosyscalls>"
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_RT1051>:CrashCatcher::CrashCatcher>"

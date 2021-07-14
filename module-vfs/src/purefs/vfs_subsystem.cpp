@@ -117,16 +117,17 @@ namespace purefs::subsystem
 
     } // namespace
 
-    auto initialize() -> std::tuple<std::shared_ptr<blkdev::disk_manager>, std::shared_ptr<fs::filesystem>>
+    auto initialize(std::unique_ptr<DeviceFactory> deviceFactory)
+        -> std::tuple<std::shared_ptr<blkdev::disk_manager>, std::shared_ptr<fs::filesystem>>
     {
-        auto disk_mgr   = std::make_shared<blkdev::disk_manager>();
-        const auto bdev = internal::create_default_block_device();
-        auto err        = disk_mgr->register_device(bdev, default_blkdev_name);
+        auto disk_mgr                            = std::make_shared<blkdev::disk_manager>();
+        const std::shared_ptr<blkdev::disk> bdev = deviceFactory->makeDefaultBlockDevice();
+        auto err                                 = disk_mgr->register_device(bdev, default_blkdev_name);
         if (err) {
             LOG_FATAL("Unable to register block device with error %i", err);
             return {};
         }
-        const auto nvrom_bdev = internal::create_default_nvm_device();
+        const std::shared_ptr<blkdev::disk> nvrom_bdev = deviceFactory->makeDefaultNvmDevice();
         if (nvrom_bdev) {
             err = disk_mgr->register_device(nvrom_bdev, default_nvrom_name, blkdev::flags::no_parts_scan);
             if (err) {

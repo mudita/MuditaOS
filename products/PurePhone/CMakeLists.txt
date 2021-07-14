@@ -31,6 +31,7 @@ target_sources(PurePhone
     PRIVATE
         ${TARGET_SOURCES}
         PurePhoneMain.cpp
+        PlatformFactory.cpp
     )
 
 target_include_directories(PurePhone
@@ -66,6 +67,7 @@ target_link_libraries(PurePhone
         service-bluetooth
         service-desktop
         service-lwip
+        platform
         ${LWIP_LIBRARIES}
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_Linux>:iosyscalls>"
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_RT1051>:CrashCatcher::CrashCatcher>"

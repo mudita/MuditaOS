@@ -4,15 +4,15 @@
 #define CATCH_CONFIG_MAIN
 
 #include <catch2/catch.hpp>
-#include <purefs/vfs_subsystem.hpp>
+#include <platform/linux/LinuxPlatform.hpp>
 
 #include <filesystem>
 
 TEST_CASE("VFS linux support")
 {
-    auto vfs = purefs::subsystem::initialize();
-    auto err = purefs::subsystem::mount_defaults();
-    REQUIRE(err == 0);
+    auto platform = platform::linux::LinuxPlatform("PurePhone.img");
+
+    REQUIRE_NOTHROW(platform.init());
 
     static constexpr auto filenm = "assets/lang/English.json";
 
