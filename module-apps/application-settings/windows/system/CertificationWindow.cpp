@@ -2,10 +2,11 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CertificationWindow.hpp"
-#include <application-settings/ApplicationSettings.hpp>
-#include <widgets/Text.hpp>
-#include <widgets/Image.hpp>
+
+#include <application-settings/windows/WindowNames.hpp>
 #include <application-settings/widgets/SettingsStyle.hpp>
+#include <Text.hpp>
+#include <Image.hpp>
 
 inline constexpr auto certno = "XXXXXXXXXXXXXXXXXXX";
 
@@ -88,24 +89,5 @@ namespace gui
         canadaIcValue->setText(certno);
         europeCeText->setText(utils::translate("app_settings_europe"));
         europeCeValue->setText(certno);
-    }
-
-    void CertificationWindow::destroyInterface()
-    {
-        erase();
-        usFccIdText   = nullptr;
-        usFccIdValue  = nullptr;
-        usFccIdImage  = nullptr;
-        canadaIcText  = nullptr;
-        canadaIcValue = nullptr;
-        canadaIcImage = nullptr;
-        europeCeText  = nullptr;
-        europeCeValue = nullptr;
-        europeCeImage = nullptr;
-    };
-
-    CertificationWindow::~CertificationWindow()
-    {
-        destroyInterface();
     }
 } // namespace gui

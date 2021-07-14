@@ -1,11 +1,12 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <application-settings/widgets/SettingsDateItem.hpp>
-#include <application-settings/widgets/SettingsTimeItem.hpp>
 #include "DateAndTimeModel.hpp"
+
+#include <application-settings/widgets/system/SettingsDateItem.hpp>
+#include <application-settings/widgets/system/SettingsTimeItem.hpp>
+#include <widgets/DateAndTimeStyle.hpp>
 #include <ListView.hpp>
-#include <apps-common/widgets/DateAndTimeStyle.hpp>
 
 DateAndTimeModel::DateAndTimeModel(app::Application *application) : app(application)
 {}

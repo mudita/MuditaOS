@@ -2,8 +2,10 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SARInfoWindow.hpp"
-#include "application-settings/ApplicationSettings.hpp"
-#include "application-settings/widgets/SettingsStyle.hpp"
+
+#include <application-settings/windows/WindowNames.hpp>
+#include <application-settings/widgets/SettingsStyle.hpp>
+#include <i18n/i18n.hpp>
 
 namespace gui
 {
@@ -13,22 +15,6 @@ namespace gui
     {
         presenter->attach(this);
         buildInterface();
-    }
-
-    SARInfoWindow::~SARInfoWindow() noexcept
-    {
-        destroyInterface();
-    }
-
-    void SARInfoWindow::rebuild()
-    {
-        destroyInterface();
-        buildInterface();
-    }
-
-    void SARInfoWindow::destroyInterface()
-    {
-        erase();
     }
 
     void SARInfoWindow::buildInterface()

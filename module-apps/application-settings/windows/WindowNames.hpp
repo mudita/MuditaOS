@@ -55,20 +55,16 @@ namespace gui::window::name
     inline constexpr auto security = "Security";
     inline constexpr auto autolock = "Autolock";
 
-    inline constexpr auto system          = "System";
-    inline constexpr auto change_settings = "ChangeSettings";
-    inline constexpr auto dialog_settings = "DialogSettings";
-    inline constexpr auto change_passcode = "ChangePasscode";
-
+    inline constexpr auto system                = "System";
     inline constexpr auto languages             = "Languages";
     inline constexpr auto date_and_time         = "DateAndTime";
-    inline constexpr auto factory_reset         = "FactoryReset";
+    inline constexpr auto change_date_and_time  = "ChangeDateAndTime";
+    inline constexpr auto change_time_zone      = "ChangeTimeZone";
     inline constexpr auto about_your_pure       = "AboutYourPure";
     inline constexpr auto technical_information = "TechnicalInformation";
     inline constexpr auto certification         = "Certification";
     inline constexpr auto sar                   = "Sar";
+    inline constexpr auto factory_reset         = "FactoryReset";
 
-    inline constexpr auto change_date_and_time = "ChangeDateAndTime";
-    inline constexpr auto change_time_zone     = "ChangeTimeZone";
-
+    inline constexpr auto dialog_settings = "DialogSettings";
 } // namespace gui::window::name

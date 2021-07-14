@@ -3,9 +3,7 @@
 
 #include "SARInfoRepository.hpp"
 
-#include <gsl/util>
 #include <i18n/i18n.hpp>
-
 #include <fstream>
 
 SARInfoRepository::SARInfoRepository(std::filesystem::path certificationInfoPath, std::filesystem::path fileName)
