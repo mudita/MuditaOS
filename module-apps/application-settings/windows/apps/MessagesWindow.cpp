@@ -7,8 +7,6 @@
 #include <application-settings/ApplicationSettings.hpp>
 
 #include <i18n/i18n.hpp>
-#include <OptionWindow.hpp>
-#include <OptionSetting.hpp>
 
 namespace gui
 {
@@ -38,6 +36,7 @@ namespace gui
                 optionList, utils::translate("app_settings_message_sound"), [&]() { openMessageSoundWindow(); }, true);
         }
 
+#if DISABLED_SETTINGS_OPTIONS == 1
         mWidgetMaker.addSwitchOption(optionList,
                                      utils::translate("app_settings_show_unread_first"),
                                      mShowUnreadMessagesFirst,
@@ -45,6 +44,8 @@ namespace gui
 
         mWidgetMaker.addSelectOption(
             optionList, utils::translate("app_settings_Templates"), [&]() { openMessageTemplates(); });
+#endif // DISABLED_SETTINGS_OPTIONS
+
         return optionList;
     }
 

@@ -34,12 +34,12 @@
 #include <application-settings/windows/phone-modes/DoNotDisturbWindow.hpp>
 #include <application-settings/windows/phone-modes/OfflineWindow.hpp>
 #include <application-settings/windows/phone-modes/ConnectionFrequencyWindow.hpp>
-#include <application-settings/windows/AppsAndToolsWindow.hpp>
+#include <application-settings/windows/apps/AppsAndToolsWindow.hpp>
+#include <application-settings/windows/apps/PhoneWindow.hpp>
+#include <application-settings/windows/apps/MessagesWindow.hpp>
+#include <application-settings/windows/apps/AlarmClockWindow.hpp>
+#include <application-settings/windows/apps/SoundSelectWindow.hpp>
 #include <application-settings/windows/NightshiftWindow.hpp>
-#include <application-settings/windows/PhoneWindow.hpp>
-#include <application-settings/windows/MessagesWindow.hpp>
-#include <application-settings/windows/AlarmClockWindow.hpp>
-#include <application-settings/windows/SoundSelectWindow.hpp>
 #include <application-settings/windows/AutolockWindow.hpp>
 #include <application-settings/windows/TorchWindow.hpp>
 #include <application-settings/windows/SecurityMainWindow.hpp>
@@ -435,14 +435,9 @@ namespace app
             return std::make_unique<gui::ConnectionFrequencyWindow>(app, static_cast<ApplicationSettings *>(app));
         });
 
-        windowsFactory.attach(gui::window::name::dialog_settings, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::Dialog>(app, name);
-        });
+        // Apps
         windowsFactory.attach(gui::window::name::apps_and_tools, [](Application *app, const std::string &name) {
             return std::make_unique<gui::AppsAndToolsWindow>(app);
-        });
-        windowsFactory.attach(gui::window::name::nightshift, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::NightshiftWindow>(app);
         });
         windowsFactory.attach(gui::window::name::phone, [](Application *app, const std::string &name) {
             auto audioModel =
@@ -461,6 +456,13 @@ namespace app
         });
         windowsFactory.attach(gui::window::name::sound_select, [](Application *app, const std::string &name) {
             return std::make_unique<gui::SoundSelectWindow>(app, name);
+        });
+
+        windowsFactory.attach(gui::window::name::dialog_settings, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::Dialog>(app, name);
+        });
+        windowsFactory.attach(gui::window::name::nightshift, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::NightshiftWindow>(app);
         });
         windowsFactory.attach(gui::window::name::autolock, [](Application *app, const std::string &name) {
             return std::make_unique<gui::AutolockWindow>(app, static_cast<ApplicationSettings *>(app));

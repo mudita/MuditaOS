@@ -7,7 +7,6 @@
 
 #include <i18n/i18n.hpp>
 #include <OptionWindow.hpp>
-#include <OptionSetting.hpp>
 
 namespace gui
 {

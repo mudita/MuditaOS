@@ -25,6 +25,7 @@ namespace gui::window::name
     inline constexpr auto apn_options     = "APNOptions";
     inline constexpr auto new_apn         = "NewApn";
 
+    inline constexpr auto display_and_keypad   = "DisplayAndKeypad";
     inline constexpr auto display_light        = "DisplayLight";
     inline constexpr auto font_size            = "FontSize";
     inline constexpr auto wallpaper            = "Wallpaper";
@@ -52,16 +53,15 @@ namespace gui::window::name
     inline constexpr auto message_templates = "MessageTemplates";
     inline constexpr auto alarm_clock       = "AlarmClock";
     inline constexpr auto sound_select      = "SoundSelect";
-    inline constexpr auto torch             = "Torch";
-    inline constexpr auto nightshift        = "Nightshift";
 
-    inline constexpr auto autolock = "Autolock";
+    inline constexpr auto torch      = "Torch";
+    inline constexpr auto nightshift = "Nightshift";
+    inline constexpr auto autolock   = "Autolock";
 
-    inline constexpr auto display_and_keypad = "DisplayAndKeypad";
-    inline constexpr auto change_settings    = "ChangeSettings";
-    inline constexpr auto pin_settings       = "PINSettings";
-    inline constexpr auto dialog_settings    = "DialogSettings";
-    inline constexpr auto change_passcode    = "ChangePasscode";
+    inline constexpr auto change_settings = "ChangeSettings";
+    inline constexpr auto pin_settings    = "PINSettings";
+    inline constexpr auto dialog_settings = "DialogSettings";
+    inline constexpr auto change_passcode = "ChangePasscode";
 
     inline constexpr auto languages             = "Languages";
     inline constexpr auto date_and_time         = "DateAndTime";
