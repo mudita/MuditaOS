@@ -2,11 +2,10 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SoundSelectWindow.hpp"
-#include "application-settings/ApplicationSettings.hpp"
-#include "application-settings/models/SoundsModel.hpp"
-#include "application-settings/widgets/SettingsSoundItem.hpp"
-#include "application-settings/data/SoundSelectData.hpp"
-#include <gui/widgets/ListView.hpp>
+
+#include <application-settings/models/apps/SoundsModel.hpp>
+#include <application-settings/data/SoundSelectData.hpp>
+#include <ListView.hpp>
 #include <i18n/i18n.hpp>
 
 namespace gui

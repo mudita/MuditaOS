@@ -4,8 +4,8 @@
 #pragma once
 
 #include <ListItem.hpp>
-#include <TextFixedSize.hpp>
-#include <ImageBox.hpp>
+#include <BoxLayout.hpp>
+#include <Image.hpp>
 
 namespace gui
 {
@@ -16,9 +16,8 @@ namespace gui
         SettingsSoundItem(const std::string &soundName, bool selected);
 
       private:
-        HBox *mMainBox             = nullptr;
-        TextFixedSize *mSoundTitle = nullptr;
-        Image *mIsSelected         = nullptr;
+        HBox *mMainBox     = nullptr;
+        Image *mIsSelected = nullptr;
     };
 
 } /* namespace gui */
