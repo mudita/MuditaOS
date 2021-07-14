@@ -1,6 +1,7 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
-#include <purefs/blkdev/disk_eeprom.hpp>
+#include "disk_eeprom.hpp"
+
 #include "bsp/eeprom/eeprom.hpp"
 #include "board/rt1051/bsp/eeprom/M24256.hpp"
 #include "bsp/BoardDefinitions.hpp"

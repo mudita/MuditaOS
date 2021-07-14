@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "config.h"
+#include "PlatformFactory.hpp"
 
 // applications
 #include <application-antenna/ApplicationAntenna.hpp>
@@ -42,7 +43,6 @@
 #include <service-antenna/ServiceAntenna.hpp>
 #endif
 
-#include <bsp/bsp.hpp>
 #include <Application.hpp>
 #include <ApplicationLauncher.hpp>
 #include <log.hpp>
@@ -51,7 +51,6 @@
 #include <SystemManager/SystemManager.hpp>
 #include <SystemWatchdog/SystemWatchdog.hpp>
 #include <thread.hpp>
-#include <purefs/vfs_subsystem.hpp>
 
 #include <memory>
 #include <vector>
@@ -68,9 +67,9 @@ int main()
     SEGGER_SYSVIEW_Start();
 #endif
 
-    bsp::BoardInit();
+    auto platformFactory = purephone::PlatformFactory();
+    auto platform        = platformFactory.makePlatform();
 
-    purefs::subsystem::vfs_handle_t vfs;
     if (!sys::SystemWatchdog::getInstance().init()) {
         LOG_ERROR("System watchdog failed to initialize");
         // wait for the hardware watchdog (initialized in reset ISR) to reset the system
@@ -102,13 +101,15 @@ int main()
 
     auto sysmgr = std::make_shared<sys::SystemManager>(std::move(systemServices));
     sysmgr->StartSystem(
-        [&vfs]() {
-            vfs     = purefs::subsystem::initialize();
-            int err = purefs::subsystem::mount_defaults();
-            if (err) {
-                LOG_FATAL("VFS subystem fatal error %i", err);
-                std::abort();
+        [&platform]() {
+            try {
+                platform->init();
             }
+            catch (const std::runtime_error &e) {
+                LOG_FATAL("%s", e.what());
+                abort();
+            }
+
             Log::Logger::get().init();
             /// force initialization of PhonenumberUtil because of its stack usage
             /// otherwise we would end up with an init race and PhonenumberUtil could
@@ -177,8 +178,6 @@ int main()
     LOG_PRINTF("Launching PurePhone \n");
     LOG_PRINTF("commit: %s tag: %s branch: %s\n", GIT_REV, GIT_TAG, GIT_BRANCH);
     cpp_freertos::Thread::StartScheduler();
-
-    purefs::subsystem::unmount_all();
 
     return 0;
 }
