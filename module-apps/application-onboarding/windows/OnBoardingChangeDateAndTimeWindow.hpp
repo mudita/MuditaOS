@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include <application-settings/windows/ChangeDateAndTimeWindow.hpp>
-#include <application-settings/models/DateAndTimeModel.hpp>
+#include <application-settings/windows/system/ChangeDateAndTimeWindow.hpp>
+#include <application-settings/models/system/DateAndTimeModel.hpp>
 
 namespace app::onBoarding
 {

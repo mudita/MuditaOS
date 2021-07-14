@@ -23,21 +23,25 @@ target_sources( ${PROJECT_NAME}
         models/display-keypad/CategoriesModel.cpp
         models/apps/AudioSettingsModel.cpp
         models/apps/SoundsModel.cpp
-        models/DateAndTimeModel.cpp
-        models/SARInfoRepository.cpp
-        models/FactoryData.cpp
-        presenter/SARInfoWindowPresenter.cpp
-        presenter/TechnicalWindowPresenter.cpp
+        models/system/DateAndTimeModel.cpp
+        models/system/SARInfoRepository.cpp
+        models/system/FactoryData.cpp
+        models/system/TechnicalInformationModel.cpp
+        presenter/system/SARInfoWindowPresenter.cpp
+        presenter/system/TechnicalWindowPresenter.cpp
+        widgets/SpinBoxOptionSettings.cpp
         widgets/advanced/ColorTestListItem.cpp
         widgets/advanced/ColorTestListView.cpp
         widgets/network/ApnInputWidget.cpp
         widgets/display-keypad/QuoteWidget.cpp
         widgets/display-keypad/CategoryWidget.cpp
         widgets/apps/SettingsSoundItem.cpp
-        widgets/SettingsDateItem.cpp
-        widgets/SettingsTimeItem.cpp
-        widgets/SpinBoxOptionSettings.cpp
+        widgets/system/SettingsDateItem.cpp
+        widgets/system/SettingsTimeItem.cpp
+        widgets/system/TechnicalInformationItem.cpp
         windows/SettingsMainWindow.cpp
+        windows/BaseSettingsWindow.cpp
+        windows/OptionsWidgetMaker.cpp
         windows/advanced/AdvancedOptionsWindow.cpp
         windows/advanced/InformationWindow.cpp
         windows/advanced/UITestWindow.cpp
@@ -76,28 +80,26 @@ target_sources( ${PROJECT_NAME}
         windows/apps/SoundSelectWindow.cpp
         windows/security/SecurityMainWindow.cpp
         windows/security/AutolockWindow.cpp
-        windows/BaseSettingsWindow.cpp
-        windows/OptionsWidgetMaker.cpp
-        windows/SARInfoWindow.cpp
-        windows/SystemMainWindow.cpp
-        windows/LanguagesWindow.cpp
-        windows/DateAndTimeMainWindow.cpp
-        windows/ChangeTimeZone.cpp
-        windows/ChangeDateAndTimeWindow.cpp
-        windows/AboutYourPureWindow.cpp
-        windows/CertificationWindow.cpp
-        windows/TechnicalInformationWindow.cpp
+        windows/system/SystemMainWindow.cpp
+        windows/system/LanguagesWindow.cpp
+        windows/system/DateAndTimeMainWindow.cpp
+        windows/system/ChangeTimeZone.cpp
+        windows/system/ChangeDateAndTimeWindow.cpp
+        windows/system/SARInfoWindow.cpp
+        windows/system/CertificationWindow.cpp
+        windows/system/TechnicalInformationWindow.cpp
 
     PUBLIC
         ApplicationSettings.hpp
         models/advanced/ColorTestModel.hpp
+        widgets/SettingsStyle.hpp
         widgets/advanced/ColorTestListItem.hpp
         widgets/advanced/ColorTestListItem.hpp
         widgets/advanced/ColorTestListStyle.hpp
         widgets/network/ApnInputWidget.hpp
         widgets/display-keypad/CategoryWidget.hpp
-        widgets/SettingsStyle.hpp
         windows/SettingsMainWindow.hpp
+        windows/BaseSettingsWindow.hpp
         windows/WindowNames.hpp
         windows/advanced/AdvancedOptionsWindow.hpp
         windows/advanced/InformationWindow.hpp
@@ -117,14 +119,12 @@ target_sources( ${PROJECT_NAME}
         windows/apps/AppsWindow.hpp
         windows/apps/MessagesWindow.hpp
         windows/security/AutolockWindow.hpp
-        windows/BaseSettingsWindow.hpp
-        windows/SystemMainWindow.hpp
-        windows/LanguagesWindow.hpp
-        windows/DateAndTimeMainWindow.hpp
-        windows/ChangeDateAndTimeWindow.hpp
-        windows/AboutYourPureWindow.hpp
-        windows/CertificationWindow.hpp
-        windows/TechnicalInformationWindow.hpp
+        windows/system/SystemMainWindow.hpp
+        windows/system/LanguagesWindow.hpp
+        windows/system/DateAndTimeMainWindow.hpp
+        windows/system/ChangeDateAndTimeWindow.hpp
+        windows/system/CertificationWindow.hpp
+        windows/system/TechnicalInformationWindow.hpp
 )
 
 add_dependencies(${PROJECT_NAME} version)

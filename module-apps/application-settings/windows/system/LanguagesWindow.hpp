@@ -3,9 +3,8 @@
 
 #pragma once
 
-#include "application-settings/ApplicationSettings.hpp"
-#include "BaseSettingsWindow.hpp"
-#include <i18n/i18n.hpp>
+#include <application-settings/windows/WindowNames.hpp>
+#include <application-settings/windows/BaseSettingsWindow.hpp>
 
 namespace gui
 {

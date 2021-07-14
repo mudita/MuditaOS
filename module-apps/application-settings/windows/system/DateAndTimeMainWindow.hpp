@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "BaseSettingsWindow.hpp"
-#include "time/time_locale.hpp"
+#include <application-settings/windows/BaseSettingsWindow.hpp>
+#include <time/time_locale.hpp>
 
 namespace gui
 {

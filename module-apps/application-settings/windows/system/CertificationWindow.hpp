@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "BaseSettingsWindow.hpp"
+#include <application-settings/windows/BaseSettingsWindow.hpp>
 
 namespace gui
 {
@@ -11,8 +11,6 @@ namespace gui
     {
       public:
         explicit CertificationWindow(app::Application *app);
-        ~CertificationWindow() override;
-        void destroyInterface() override;
 
       private:
         void buildInterface() override;
