@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include "BaseSettingsWindow.hpp"
-#include "OptionsWidgetMaker.hpp"
-#include <application-settings/models/AudioSettingsModel.hpp>
+#include <application-settings/windows/BaseSettingsWindow.hpp>
+#include <application-settings/windows/OptionsWidgetMaker.hpp>
+#include <application-settings/models/apps/AudioSettingsModel.hpp>
 
 namespace gui
 {

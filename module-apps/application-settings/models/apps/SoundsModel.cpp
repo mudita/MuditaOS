@@ -1,13 +1,13 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 #include "SoundsModel.hpp"
 
-#include <ListView.hpp>
+#include <application-settings/widgets/apps/SettingsSoundItem.hpp>
+
 #include <purefs/filesystem_paths.hpp>
 #include <service-audio/AudioServiceAPI.hpp>
-#include <time/time_conversion.hpp>
-#include <Style.hpp>
-#include <filesystem>
+#include <ListView.hpp>
 
 unsigned int SoundsModel::requestRecordsCount()
 {

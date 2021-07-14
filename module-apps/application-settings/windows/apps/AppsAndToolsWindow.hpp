@@ -10,8 +10,7 @@ namespace gui
     class AppsAndToolsWindow : public OptionWindow
     {
       public:
-        AppsAndToolsWindow(app::Application *app);
-        ~AppsAndToolsWindow() override = default;
+        explicit AppsAndToolsWindow(app::Application *app);
 
       private:
         std::list<Option> appsAndToolsOptionsList();
