@@ -42,15 +42,14 @@
 #include <application-settings/windows/apps/SoundSelectWindow.hpp>
 #include <application-settings/windows/security/SecurityMainWindow.hpp>
 #include <application-settings/windows/security/AutolockWindow.hpp>
-#include <application-settings/windows/SARInfoWindow.hpp>
-#include <application-settings/windows/SystemMainWindow.hpp>
-#include <application-settings/windows/LanguagesWindow.hpp>
-#include <application-settings/windows/DateAndTimeMainWindow.hpp>
-#include <application-settings/windows/ChangeTimeZone.hpp>
-#include <application-settings/windows/ChangeDateAndTimeWindow.hpp>
-#include <application-settings/windows/AboutYourPureWindow.hpp>
-#include <application-settings/windows/CertificationWindow.hpp>
-#include <application-settings/windows/TechnicalInformationWindow.hpp>
+#include <application-settings/windows/system/SystemMainWindow.hpp>
+#include <application-settings/windows/system/LanguagesWindow.hpp>
+#include <application-settings/windows/system/DateAndTimeMainWindow.hpp>
+#include <application-settings/windows/system/ChangeTimeZone.hpp>
+#include <application-settings/windows/system/ChangeDateAndTimeWindow.hpp>
+#include <application-settings/windows/system/TechnicalInformationWindow.hpp>
+#include <application-settings/windows/system/CertificationWindow.hpp>
+#include <application-settings/windows/system/SARInfoWindow.hpp>
 #include <application-settings/data/ApnListData.hpp>
 #include <application-settings/data/BondedDevicesData.hpp>
 #include <application-settings/data/BluetoothStatusData.hpp>
@@ -473,12 +472,7 @@ namespace app
             return std::make_unique<gui::AutolockWindow>(app, static_cast<ApplicationSettings *>(app));
         });
 
-        windowsFactory.attach(gui::window::name::dialog_settings, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::Dialog>(app, name);
-        });
-        windowsFactory.attach(gui::window::name::dialog_confirm, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::DialogConfirm>(app, gui::window::name::dialog_confirm);
-        });
+        // System
         windowsFactory.attach(gui::window::name::system, [](Application *app, const std::string &name) {
             return std::make_unique<gui::SystemMainWindow>(app);
         });
@@ -488,30 +482,35 @@ namespace app
         windowsFactory.attach(gui::window::name::date_and_time, [](Application *app, const std::string &name) {
             return std::make_unique<gui::DateAndTimeMainWindow>(app, gui::window::name::date_and_time);
         });
-        windowsFactory.attach(gui::window::name::about_your_pure, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::AboutYourPureWindow>(app);
+        windowsFactory.attach(gui::window::name::change_time_zone, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::ChangeTimeZone>(app);
         });
-        windowsFactory.attach(gui::window::name::factory_reset, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::DialogYesNo>(app, name);
-        });
-        windowsFactory.attach(gui::window::name::certification, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::CertificationWindow>(app);
+        windowsFactory.attach(gui::window::name::change_date_and_time, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::ChangeDateAndTimeWindow>(app);
         });
         windowsFactory.attach(gui::window::name::technical_information, [&](Application *app, const std::string &name) {
             auto factoryData = std::make_unique<FactoryData>(*settings);
-            auto presenter   = std::make_unique<TechnicalWindowPresenter>(std::move(factoryData));
+            auto model       = std::make_unique<TechnicalInformationModel>(std::move(factoryData));
+            auto presenter   = std::make_unique<TechnicalWindowPresenter>(std::move(model));
             return std::make_unique<gui::TechnicalInformationWindow>(app, std::move(presenter));
+        });
+        windowsFactory.attach(gui::window::name::certification, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::CertificationWindow>(app);
         });
         windowsFactory.attach(gui::window::name::sar, [&](Application *app, const std::string &name) {
             auto sarInfoRepository = std::make_unique<SARInfoRepository>("assets/certification_info", "sar.txt");
             auto presenter         = std::make_unique<SARInfoWindowPresenter>(std::move(sarInfoRepository));
             return std::make_unique<gui::SARInfoWindow>(app, std::move(presenter));
         });
-        windowsFactory.attach(gui::window::name::change_time_zone, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::ChangeTimeZone>(app);
+        windowsFactory.attach(gui::window::name::factory_reset, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::DialogYesNo>(app, name);
         });
-        windowsFactory.attach(gui::window::name::change_date_and_time, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::ChangeDateAndTimeWindow>(app);
+
+        windowsFactory.attach(gui::window::name::dialog_settings, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::Dialog>(app, name);
+        });
+        windowsFactory.attach(gui::window::name::dialog_confirm, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::DialogConfirm>(app, gui::window::name::dialog_confirm);
         });
         windowsFactory.attach(gui::window::name::dialog_retry, [](Application *app, const std::string &name) {
             return std::make_unique<gui::DialogRetry>(app, name);

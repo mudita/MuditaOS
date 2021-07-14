@@ -1,12 +1,14 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "application-settings/ApplicationSettings.hpp"
-#include "OptionSetting.hpp"
 #include "SystemMainWindow.hpp"
-#include "DialogMetadataMessage.hpp"
+
+#include <application-settings/windows/WindowNames.hpp>
+
 #include <service-desktop/DesktopMessages.hpp>
 #include <service-desktop/ServiceDesktop.hpp>
+#include <OptionSetting.hpp>
+#include <DialogMetadataMessage.hpp>
 
 namespace gui
 {
@@ -53,9 +55,11 @@ namespace gui
                 option::SettingRightItem::Disabled));
         };
 
+        addOption("app_settings_about_your_pure", gui::window::name::technical_information);
         addOption("app_settings_language", gui::window::name::languages);
         addOption("app_settings_date_and_time", gui::window::name::date_and_time);
-        addOption("app_settings_about_your_pure", gui::window::name::about_your_pure);
+        addOption("app_settings_certification", gui::window::name::certification);
+        addOption("app_settings_sar", gui::window::name::sar);
         addFactoryResetOption("app_settings_factory_reset", gui::window::name::factory_reset);
 
         return optionList;
