@@ -21,12 +21,12 @@ target_sources( ${PROJECT_NAME}
         models/network/NewApnModel.cpp
         models/display-keypad/QuotesModel.cpp
         models/display-keypad/CategoriesModel.cpp
+        models/apps/AudioSettingsModel.cpp
+        models/apps/SoundsModel.cpp
         models/DateAndTimeModel.cpp
         models/FromTimeToTimeModel.cpp
         models/SARInfoRepository.cpp
         models/FactoryData.cpp
-        models/AudioSettingsModel.cpp
-        models/SoundsModel.cpp
         presenter/SARInfoWindowPresenter.cpp
         presenter/TechnicalWindowPresenter.cpp
         widgets/advanced/ColorTestListItem.cpp
@@ -34,9 +34,9 @@ target_sources( ${PROJECT_NAME}
         widgets/network/ApnInputWidget.cpp
         widgets/display-keypad/QuoteWidget.cpp
         widgets/display-keypad/CategoryWidget.cpp
+        widgets/apps/SettingsSoundItem.cpp
         widgets/SettingsDateItem.cpp
         widgets/SettingsTimeItem.cpp
-        widgets/SettingsSoundItem.cpp
         windows/SettingsMainWindow.cpp
         windows/advanced/AdvancedOptionsWindow.cpp
         windows/advanced/InformationWindow.cpp
@@ -67,14 +67,14 @@ target_sources( ${PROJECT_NAME}
         windows/phone-modes/DoNotDisturbWindow.cpp
         windows/phone-modes/OfflineWindow.cpp
         windows/phone-modes/ConnectionFrequencyWindow.cpp
+        windows/apps/AppsAndToolsWindow.cpp
+        windows/apps/PhoneWindow.cpp
+        windows/apps/MessagesWindow.cpp
+        windows/apps/AlarmClockWindow.cpp
+        windows/apps/SoundSelectWindow.cpp
         windows/BaseSettingsWindow.cpp
-        windows/AppsAndToolsWindow.cpp
         windows/NightshiftWindow.cpp
         windows/OptionsWidgetMaker.cpp
-        windows/PhoneWindow.cpp
-        windows/MessagesWindow.cpp
-        windows/AlarmClockWindow.cpp
-        windows/SoundSelectWindow.cpp
         windows/AutolockWindow.cpp
         windows/TorchWindow.cpp
         windows/SARInfoWindow.cpp
@@ -116,9 +116,9 @@ target_sources( ${PROJECT_NAME}
         windows/display-keypad/QuoteCategoriesWindow.hpp
         windows/display-keypad/KeypadLightWindow.hpp
         windows/display-keypad/InputLanguageWindow.hpp
+        windows/apps/AppsAndToolsWindow.hpp
+        windows/apps/MessagesWindow.hpp
         windows/BaseSettingsWindow.hpp
-        windows/AppsAndToolsWindow.hpp
-        windows/MessagesWindow.hpp
         widgets/SettingsStyle.hpp
         windows/AutolockWindow.hpp
         windows/SystemMainWindow.hpp

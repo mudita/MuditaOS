@@ -3,7 +3,7 @@
 
 #include "AppsAndToolsWindow.hpp"
 
-#include <application-settings/ApplicationSettings.hpp>
+#include <application-settings/windows/WindowNames.hpp>
 #include <i18n/i18n.hpp>
 #include <OptionWindow.hpp>
 
@@ -35,7 +35,10 @@ namespace gui
 
         addMenu(i18("app_settings_apps_phone"), gui::window::name::phone);
         addMenu(i18("app_settings_apps_messages"), gui::window::name::messages);
+
+#if DISABLED_SETTINGS_OPTIONS == 1
         addMenu(i18("app_settings_apps_alarm_clock"), gui::window::name::alarm_clock);
+#endif // DISABLED_SETTINGS_OPTIONS
 
         return optionList;
     }

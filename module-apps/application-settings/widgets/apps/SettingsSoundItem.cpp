@@ -2,7 +2,8 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SettingsSoundItem.hpp"
-#include "application-settings/data/SettingsInternals.hpp"
+
+#include <TextFixedSize.hpp>
 
 namespace gui
 {
