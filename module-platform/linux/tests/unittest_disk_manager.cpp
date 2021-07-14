@@ -3,7 +3,7 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 #include <purefs/blkdev/disk_manager.hpp>
-#include <purefs/blkdev/disk_image.hpp>
+#include <platform/linux/DiskImage.hpp>
 #include <filesystem>
 
 namespace

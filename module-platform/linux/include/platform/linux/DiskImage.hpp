@@ -11,8 +11,8 @@ namespace purefs::blkdev
 {
     class disk_image final : public disk
     {
-        static constexpr auto invalid_fd      = -1;
-        static constexpr auto syspart_size    = 32 * 1024UL * 1024UL;
+        static constexpr auto invalid_fd   = -1;
+        static constexpr auto syspart_size = 32 * 1024UL * 1024UL;
 
       public:
         explicit disk_image(std::string_view image_filename, std::size_t sector_size = 512, hwpart_t num_parts = 8);

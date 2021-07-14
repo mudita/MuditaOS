@@ -3,12 +3,13 @@
 
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
+
+#include <platform/linux/DiskImage.hpp>
+
 #include <purefs/fs/filesystem.hpp>
 #include <purefs/blkdev/disk_manager.hpp>
-#include <purefs/blkdev/disk_image.hpp>
 #include <purefs/fs/drivers/filesystem_vfat.hpp>
 #include <purefs/vfs_subsystem.hpp>
-#include <purefs/fs/thread_local_cwd.hpp>
 #include <sys/statvfs.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -359,13 +360,4 @@ TEST_CASE("Corefs: Autodetect filesystems")
     REQUIRE(ret == 0);
     REQUIRE(fscore->mount("emmc0part0", "/sys", "auto") == 0);
     REQUIRE(fscore->umount("/sys") == 0);
-}
-
-TEST_CASE("Corefs: Unittest integrated subsystem")
-{
-    auto [disk, vfs] = purefs::subsystem::initialize();
-    REQUIRE(purefs::subsystem::mount_defaults() == 0);
-    REQUIRE(purefs::fs::internal::get_thread_local_cwd_path() == "/sys/current");
-    REQUIRE(vfs->getcwd() == "/sys/current");
-    REQUIRE(purefs::subsystem::unmount_all() == 0);
 }

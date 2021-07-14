@@ -6,18 +6,10 @@ target_sources(module-vfs
     PRIVATE
         $<$<STREQUAL:${PROJECT_TARGET},TARGET_RT1051>:
             board/rt1051/newlib/vfs_io_syscalls.cpp
-            board/rt1051/purefs/include/purefs/blkdev/disk_eeprom.hpp
-            board/rt1051/purefs/include/purefs/blkdev/disk_emmc.hpp
-            board/rt1051/purefs/src/blkdev/disk_eeprom.cpp
-            board/rt1051/purefs/src/blkdev/disk_emmc.cpp
             board/rt1051/purefs/src/fs/thread_local_cwd.cpp
-            board/rt1051/purefs/src/vfs_subsystem_internal.cpp
         >
         $<$<STREQUAL:${PROJECT_TARGET},TARGET_Linux>:
-            board/linux/purefs/include/purefs/blkdev/disk_image.hpp
-            board/linux/purefs/src/blkdev/disk_image.cpp
             board/linux/purefs/src/fs/thread_local_cwd.cpp
-            board/linux/purefs/src/vfs_subsystem_internal.cpp
         >
 
         drivers/include/purefs/fs/drivers/directory_handle_littlefs.hpp
@@ -39,7 +31,6 @@ target_sources(module-vfs
 
         include/internal/purefs/blkdev/disk_handle.hpp
         include/internal/purefs/blkdev/partition_parser.hpp
-        include/internal/purefs/fs/filesystem_operations.hpp
         include/internal/purefs/fs/notifier.hpp
         include/internal/purefs/fs/thread_local_cwd.hpp
         include/internal/purefs/vfs_subsystem_internal.hpp
@@ -66,6 +57,7 @@ target_sources(module-vfs
         include/user/purefs/filesystem_paths.hpp
         include/user/purefs/fs/directory_handle.hpp
         include/user/purefs/fs/file_handle.hpp
+        include/user/purefs/fs/filesystem_operations.hpp
         include/user/purefs/fs/filesystem.hpp
         include/user/purefs/fs/fsnotify.hpp
         include/user/purefs/fs/handle_mapper.hpp
@@ -92,13 +84,15 @@ target_include_directories(module-vfs
         $<BUILD_INTERFACE:
             $<$<STREQUAL:${PROJECT_TARGET},TARGET_RT1051>:${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/purefs/include>
             $<$<STREQUAL:${PROJECT_TARGET},TARGET_Linux>:${CMAKE_CURRENT_SOURCE_DIR}/board/linux/purefs/include>
-            ${CMAKE_CURRENT_SOURCE_DIR}/drivers/include
             ${CMAKE_CURRENT_SOURCE_DIR}/drivers/include/thirdparty
             ${CMAKE_CURRENT_SOURCE_DIR}/drivers/include/thirdparty/fatfs
             ${CMAKE_CURRENT_SOURCE_DIR}/include/internal
         >
     PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/user/>
+        $<BUILD_INTERFACE:
+            ${CMAKE_CURRENT_SOURCE_DIR}/drivers/include
+            ${CMAKE_CURRENT_SOURCE_DIR}/include/user/
+        >
 )
 
 target_link_libraries(module-vfs 
