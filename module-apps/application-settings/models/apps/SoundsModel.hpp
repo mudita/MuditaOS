@@ -4,11 +4,9 @@
 #pragma once
 
 #include "AbstractSoundsModel.hpp"
-#include "application-settings/widgets/SettingsSoundItem.hpp"
 
-#include "InternalModel.hpp"
-#include "Application.hpp"
-
+#include <InternalModel.hpp>
+#include <Application.hpp>
 #include <Audio/decoder/Decoder.hpp>
 
 /// Simple SoundsModel
