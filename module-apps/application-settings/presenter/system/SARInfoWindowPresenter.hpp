@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "application-settings/models/SARInfoRepository.hpp"
-#include "BasePresenter.hpp"
+#include <application-settings/models/system/SARInfoRepository.hpp>
+#include <BasePresenter.hpp>
 
 class SARInfoWindowContract
 {

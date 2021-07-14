@@ -19,9 +19,9 @@
 #include "windows/OnBoardingChangeDateAndTimeWindow.hpp"
 
 #include <module-services/service-appmgr/service-appmgr/messages/GetCurrentDisplayLanguageResponse.hpp>
-#include <module-apps/application-settings/data/LanguagesData.hpp>
+#include <application-settings/data/LanguagesData.hpp>
+#include <application-settings/windows/system/ChangeTimeZone.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
-#include <module-apps/application-settings/windows/ChangeTimeZone.hpp>
 #include <apps-common/locks/data/PhoneLockMessages.hpp>
 #include <apps-common/locks/data/SimLockMessages.hpp>
 #include <service-appmgr/service-appmgr/model/ApplicationManager.hpp>
