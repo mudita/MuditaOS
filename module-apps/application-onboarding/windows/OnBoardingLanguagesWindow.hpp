@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <module-apps/application-settings/windows/LanguagesWindow.hpp>
+#include <application-settings/windows/system/LanguagesWindow.hpp>
 
 namespace app::onBoarding
 {

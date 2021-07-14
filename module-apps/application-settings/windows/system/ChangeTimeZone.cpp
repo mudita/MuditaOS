@@ -2,8 +2,9 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ChangeTimeZone.hpp"
-#include "OptionSetting.hpp"
 
+#include <application-settings/windows/WindowNames.hpp>
+#include <OptionSetting.hpp>
 #include <time/TimeZone.hpp>
 #include <service-time/service-time/TimeMessage.hpp>
 #include <service-time/Constants.hpp>

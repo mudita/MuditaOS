@@ -3,8 +3,9 @@
 
 #include "SettingsDateItem.hpp"
 #include "SettingsTimeItem.hpp"
-#include <apps-common/widgets/DateAndTimeStyle.hpp>
-#include <apps-common/widgets/WidgetsUtils.hpp>
+
+#include <widgets/DateAndTimeStyle.hpp>
+#include <widgets/WidgetsUtils.hpp>
 
 namespace date_and_time = style::window::date_and_time;
 
