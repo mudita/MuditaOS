@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "BaseSettingsWindow.hpp"
+#include <application-settings/windows/BaseSettingsWindow.hpp>
 
 #include <Text.hpp>
 
@@ -22,7 +22,6 @@ namespace gui
 
       private:
         app::settingsInterface::OfflineSettings *offlineSettings;
-        Rect *bar             = nullptr;
         Text *descriptionText = nullptr;
         auto buildOptionsList() -> std::list<Option> override;
         bool changeFlightMode(bool isFlightMode);

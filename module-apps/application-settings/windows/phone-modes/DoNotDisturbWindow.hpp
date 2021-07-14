@@ -3,8 +3,7 @@
 
 #pragma once
 
-#include "BaseSettingsWindow.hpp"
-
+#include <application-settings/windows/BaseSettingsWindow.hpp>
 #include <Text.hpp>
 
 namespace app::settingsInterface
@@ -14,12 +13,6 @@ namespace app::settingsInterface
 
 namespace gui
 {
-
-    namespace window
-    {
-        inline constexpr auto do_not_disturb_window = "DoNotDisturb";
-    };
-
     class DoNotDisturbWindow : public BaseSettingsWindow
     {
       public:
@@ -28,7 +21,6 @@ namespace gui
 
       private:
         app::settingsInterface::DndSettings *dndSettings = nullptr;
-        Rect *bar                                        = nullptr;
         Text *descriptionText                            = nullptr;
         auto buildOptionsList() -> std::list<Option> override;
     };
