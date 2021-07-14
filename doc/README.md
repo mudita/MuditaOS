@@ -31,6 +31,8 @@ firefox build/doc/html/index.html
     - [Running MuditaOS on a phone](running_on_phone.md)
     - [Windows and macOS - flashing Pure with image](flashing_win_macos.md)
     - [Test harness](../test/README.md)
+    - [Tethering](../tethering.md)
+
 - Developer Guides
     - Coding Guidelines
     - System architecture
