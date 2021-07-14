@@ -1,7 +1,8 @@
 # Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 import pytest
-import base64
+import binascii
+from harness import log
 from harness.interface.defs import status
 
 def setPasscode(harness, flag):
@@ -49,7 +50,7 @@ def test_get_invalid_chunks(harness):
     chunkSize = ret["body"]["chunkSize"]
 
     totalChunks = int(((fileSize + chunkSize - 1) / chunkSize))
-    print("totalChunks #: " + str(totalChunks))
+    log.info("totalChunks #: " + str(totalChunks))
 
     body = {"rxID" : rxID, "chunkNo": 0}
     ret = harness.endpoint_request("filesystem", "get", body)
@@ -60,6 +61,12 @@ def test_get_invalid_chunks(harness):
     ret = harness.endpoint_request("filesystem", "get", body)
 
     assert ret["status"] == status["BadRequest"]
+
+def validate_response_body(body):
+    assert body["rxID"] != 0
+    assert body["fileSize"] != 0
+    assert body["chunkSize"] != 0
+    assert body["fileCrc32"] != ""
 
 
 @pytest.mark.service_desktop_test
@@ -74,14 +81,17 @@ def test_get_file(harness):
     ret = harness.endpoint_request("filesystem", "get", body)
 
     assert ret["status"] == status["OK"]
-    assert ret["body"]["fileSize"] != 0
+
+    validate_response_body(ret["body"])
 
     rxID      = ret["body"]["rxID"]
     fileSize  = ret["body"]["fileSize"]
     chunkSize = ret["body"]["chunkSize"]
+    expectedCrc32 = ret["body"]["fileCrc32"]
 
     totalChunks = int(((fileSize + chunkSize - 1) / chunkSize))
-    print("totalChunks #: " + str(totalChunks))
+    log.info("totalChunks #: " + str(totalChunks))
+    log.info("Expected file CRC32: " + expectedCrc32)
 
     data = ""
 
@@ -96,9 +106,13 @@ def test_get_file(harness):
     file_64 = open(fileName + ".base64" , 'w')
     file_64.write(data)
 
-    file_64_decode = base64.standard_b64decode(data)
+    file_64_decode = binascii.a2b_base64(data)
     file_result = open(fileName, 'wb')
     file_result.write(file_64_decode)
+
+    actualCrc32 = format((binascii.crc32(file_64_decode) & 0xFFFFFFFF), '08x')
+    log.info("Actual file CRC32: " + actualCrc32)
+    assert expectedCrc32 == actualCrc32
 
 
 @pytest.mark.service_desktop_test
@@ -113,14 +127,16 @@ def test_get_invalid_rxID(harness):
     ret = harness.endpoint_request("filesystem", "get", body)
 
     assert ret["status"] == status["OK"]
-    assert ret["body"]["fileSize"] != 0
+
+    validate_response_body(ret["body"])
 
     rxID      = ret["body"]["rxID"]
     fileSize  = ret["body"]["fileSize"]
     chunkSize = ret["body"]["chunkSize"]
+    expectedCrc32 = ret["body"]["fileCrc32"]
 
     totalChunks = int(((fileSize + chunkSize - 1) / chunkSize))
-    print("totalChunks #: " + str(totalChunks))
+    log.info("totalChunks #: " + str(totalChunks))
 
     body = {"rxID" : int(rxID - 1), "chunkNo": 1}
     ret = harness.endpoint_request("filesystem", "get", body)
