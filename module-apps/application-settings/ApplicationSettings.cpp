@@ -15,6 +15,7 @@
 #include <application-settings/windows/bluetooth/PhoneNameWindow.hpp>
 #include <application-settings/windows/bluetooth/BluetoothCheckPasskeyWindow.hpp>
 #include <application-settings/windows/network/NetworkWindow.hpp>
+#include <application-settings/windows/network/SimPINSettingsWindow.hpp>
 #include <application-settings/windows/network/SimCardsWindow.hpp>
 #include <application-settings/windows/network/NewApnWindow.hpp>
 #include <application-settings/windows/network/ApnSettingsWindow.hpp>
@@ -34,22 +35,19 @@
 #include <application-settings/windows/phone-modes/DoNotDisturbWindow.hpp>
 #include <application-settings/windows/phone-modes/OfflineWindow.hpp>
 #include <application-settings/windows/phone-modes/ConnectionFrequencyWindow.hpp>
-#include <application-settings/windows/apps/AppsAndToolsWindow.hpp>
+#include <application-settings/windows/apps/AppsWindow.hpp>
 #include <application-settings/windows/apps/PhoneWindow.hpp>
 #include <application-settings/windows/apps/MessagesWindow.hpp>
 #include <application-settings/windows/apps/AlarmClockWindow.hpp>
 #include <application-settings/windows/apps/SoundSelectWindow.hpp>
-#include <application-settings/windows/NightshiftWindow.hpp>
-#include <application-settings/windows/AutolockWindow.hpp>
-#include <application-settings/windows/TorchWindow.hpp>
-#include <application-settings/windows/SecurityMainWindow.hpp>
+#include <application-settings/windows/security/SecurityMainWindow.hpp>
+#include <application-settings/windows/security/AutolockWindow.hpp>
 #include <application-settings/windows/SARInfoWindow.hpp>
 #include <application-settings/windows/SystemMainWindow.hpp>
 #include <application-settings/windows/LanguagesWindow.hpp>
 #include <application-settings/windows/DateAndTimeMainWindow.hpp>
 #include <application-settings/windows/ChangeTimeZone.hpp>
 #include <application-settings/windows/ChangeDateAndTimeWindow.hpp>
-#include <application-settings/windows/PINSettingsWindow.hpp>
 #include <application-settings/windows/AboutYourPureWindow.hpp>
 #include <application-settings/windows/CertificationWindow.hpp>
 #include <application-settings/windows/TechnicalInformationWindow.hpp>
@@ -279,7 +277,7 @@ namespace app
             auto simCardPinLockState = static_cast<cellular::msg::request::sim::GetLockState::Response *>(msg);
             auto pinSettingsLockStateData =
                 std::make_unique<gui::PINSettingsLockStateData>(simCardPinLockState->locked);
-            updateWindow(gui::window::name::pin_settings, std::move(pinSettingsLockStateData));
+            updateWindow(gui::window::name::sim_pin_settings, std::move(pinSettingsLockStateData));
             return sys::MessageNone{};
         });
 
@@ -379,6 +377,12 @@ namespace app
         windowsFactory.attach(gui::window::name::sim_cards, [](Application *app, const std::string &name) {
             return std::make_unique<gui::SimCardsWindow>(app, static_cast<ApplicationSettings *>(app));
         });
+        windowsFactory.attach(gui::window::name::sim_pin_settings, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::SimPINSettingsWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::new_apn, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::NewApnWindow>(app);
+        });
         windowsFactory.attach(gui::window::name::apn_settings, [](Application *app, const std::string &name) {
             return std::make_unique<gui::ApnSettingsWindow>(app);
         });
@@ -414,6 +418,9 @@ namespace app
         windowsFactory.attach(gui::window::name::quote_categories, [](Application *app, const std::string &name) {
             return std::make_unique<gui::QuoteCategoriesWindow>(app);
         });
+        windowsFactory.attach(gui::window::name::quotes_dialog_yes_no, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::DialogYesNo>(app, name);
+        });
         windowsFactory.attach(gui::window::name::keypad_light, [](Application *app, const std::string &name) {
             return std::make_unique<gui::KeypadLightWindow>(app, static_cast<ApplicationSettings *>(app));
         });
@@ -436,8 +443,8 @@ namespace app
         });
 
         // Apps
-        windowsFactory.attach(gui::window::name::apps_and_tools, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::AppsAndToolsWindow>(app);
+        windowsFactory.attach(gui::window::name::apps, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::AppsWindow>(app);
         });
         windowsFactory.attach(gui::window::name::phone, [](Application *app, const std::string &name) {
             auto audioModel =
@@ -458,35 +465,22 @@ namespace app
             return std::make_unique<gui::SoundSelectWindow>(app, name);
         });
 
-        windowsFactory.attach(gui::window::name::dialog_settings, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::Dialog>(app, name);
-        });
-        windowsFactory.attach(gui::window::name::nightshift, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::NightshiftWindow>(app);
+        // Security
+        windowsFactory.attach(gui::window::name::security, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::SecurityMainWindow>(app);
         });
         windowsFactory.attach(gui::window::name::autolock, [](Application *app, const std::string &name) {
             return std::make_unique<gui::AutolockWindow>(app, static_cast<ApplicationSettings *>(app));
         });
-        windowsFactory.attach(gui::window::name::torch, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::TorchWindow>(app);
-        });
-        windowsFactory.attach(gui::window::name::quotes_dialog_yes_no, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::DialogYesNo>(app, name);
-        });
-        windowsFactory.attach(gui::window::name::security, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::SecurityMainWindow>(app);
+
+        windowsFactory.attach(gui::window::name::dialog_settings, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::Dialog>(app, name);
         });
         windowsFactory.attach(gui::window::name::dialog_confirm, [](Application *app, const std::string &name) {
             return std::make_unique<gui::DialogConfirm>(app, gui::window::name::dialog_confirm);
         });
         windowsFactory.attach(gui::window::name::system, [](Application *app, const std::string &name) {
             return std::make_unique<gui::SystemMainWindow>(app);
-        });
-        windowsFactory.attach(gui::window::name::pin_settings, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::PINSettingsWindow>(app);
-        });
-        windowsFactory.attach(gui::window::name::new_apn, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::NewApnWindow>(app);
         });
         windowsFactory.attach(gui::window::name::languages, [](Application *app, const std::string &name) {
             return std::make_unique<gui::LanguagesWindow>(app);
