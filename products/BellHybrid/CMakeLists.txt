@@ -1,6 +1,6 @@
 add_executable(BellHybrid)
 
-add_custom_target(Bell
+add_custom_target(Bell ALL
     DEPENDS BellHybrid BellHybrid.img
     )
 
@@ -50,6 +50,8 @@ target_link_libraries(BellHybrid
         application-music-player
         messagetype
         module-apps
+        module-bsp
+        module-vfs
         service-bluetooth
         service-desktop
         service-lwip

@@ -36,11 +36,12 @@ add_library(${PROJECT_NAME} STATIC ${SOURCES})
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
+        application-desktop
+        json::json
+        module-audio
         service-cellular
         service-db
         service-gui
-        module-audio
-        json::json
     PUBLIC
         apps-common
         time

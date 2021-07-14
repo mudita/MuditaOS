@@ -249,7 +249,7 @@ auto DeveloperModeHelper::getKeyCode(int val) noexcept -> bsp::KeyCodes
 
 bool DeveloperModeHelper::sendKeypress(bsp::KeyCodes keyCode, gui::InputEvent::State state)
 {
-    RawKey key{.state = RawKey::State::Released, .key_code = keyCode};
+    RawKey key{.state = RawKey::State::Released, .keyCode = keyCode};
 
     gui::InputEvent event(key, state, static_cast<gui::KeyCode>(keyCode));
     auto message = std::make_shared<app::AppInputEventMessage>(event);

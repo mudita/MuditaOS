@@ -69,6 +69,8 @@ namespace gui
             return application;
         };
 
+        std::string getUniqueName() override;
+
         virtual bool onDatabaseMessage(sys::Message *msg);
 
         bool updateSim();

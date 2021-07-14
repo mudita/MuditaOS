@@ -18,6 +18,7 @@ def test_device_info(harness):
     assert ret["body"]["signalStrength"] is not None
     assert ret["body"]["accessTechnology"] is not None
     assert ret["body"]["networkStatus"] is not None
+    assert ret["body"]["networkOperatorName"] is not None
     assert ret["body"]["fsTotal"] is not None
     assert ret["body"]["fsFree"] is not None
     assert 0 < int(ret["body"]["fsFreePercent"]) <= 100

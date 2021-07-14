@@ -90,7 +90,6 @@ set(TARGET_DIR_INCLUDES
 
 set(BOARD_DIR_INCLUDES
         ${CMAKE_CURRENT_LIST_DIR}/board/rt1051/newlib/include
-        ${CMAKE_SOURCE_DIR}/module-vfs/include/internal
 )
 
 set(TARGET_LIBRARIES

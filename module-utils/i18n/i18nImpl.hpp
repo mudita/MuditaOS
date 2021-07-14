@@ -47,6 +47,10 @@ namespace utils
         {
             return currentDisplayLanguage;
         }
+        const std::string &getInputLanguage()
+        {
+            return inputLanguage;
+        }
         const std::string &getInputLanguageFilename(const std::string &inputMode);
         bool setInputLanguage(const Language &lang);
         bool setDisplayLanguage(const Language &lang);

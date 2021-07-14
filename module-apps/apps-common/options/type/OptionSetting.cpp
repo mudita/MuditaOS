@@ -39,10 +39,10 @@ namespace gui::option
 
         switch (rightItem) {
         case SettingRightItem::ArrowBlack:
-            imageName = "right_label_arrow";
+            imageName = "arrow_right_32px_W_G";
             break;
         case SettingRightItem::ArrowWhite:
-            imageName = "right_label_arrow_border";
+            imageName = "arrow_right_empty_32px_W_G";
             break;
         case SettingRightItem::On:
             button = new ButtonOnOff(optionBodyHBox, ButtonState::On);
@@ -65,14 +65,13 @@ namespace gui::option
         case SettingRightItem::Text: {
             auto optionTextRight = new TextFixedSize(optionBodyHBox, 0, 0, 0, 0);
             optionTextRight->setUnderline(false);
-            optionTextRight->setMinimumSize((textOnRightIsSmall) ? gui::option::window::option_right_min_size
-                                                                 : gui::option::window::option_rightbig_min_size,
-                                            style::window::label::big_h);
+            optionTextRight->setFont((textOnRightIsSmall) ? style::window::font::verysmall
+                                                          : style::window::font::medium);
+            optionTextRight->setMinimumWidthToFitText(textOnRight);
+            optionTextRight->setMinimumHeight(style::window::label::big_h);
             optionTextRight->setAlignment(
                 gui::Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Center));
             optionTextRight->setMargins(Margins(0, 0, window::option_right_margin, 0));
-            optionTextRight->setFont((textOnRightIsSmall) ? style::window::font::medium
-                                                          : style::window::font::verysmall);
             optionTextRight->setRichText(textOnRight);
             break;
         }
@@ -81,8 +80,7 @@ namespace gui::option
         }
 
         if (!imageName.empty()) {
-            auto image = new gui::Image(optionBodyHBox, 0, 0, 0, 0, imageName);
-            image->setMargins(Margins(0, 0, window::option_right_margin, 0));
+            new gui::Image(optionBodyHBox, 0, 0, 0, 0, imageName);
         }
 
         if (button) {

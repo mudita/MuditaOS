@@ -3,12 +3,12 @@
 
 #pragma once
 
-#include <vector>
-
 #include <AppWindow.hpp>
 #include <GridLayout.hpp>
-#include <widgets/Rect.hpp>
 #include <utf8/UTF8.hpp>
+#include <widgets/Rect.hpp>
+
+#include <vector>
 
 namespace app
 {

@@ -16,6 +16,7 @@ set(SOURCES
     endpoints/developerMode/DeveloperModeEndpoint.cpp
     endpoints/developerMode/DeveloperModeHelper.cpp
     endpoints/developerMode/Mode/UI_Helper.cpp
+    endpoints/developerMode/Mode/UpdateHelper.cpp
     endpoints/developerMode/event/DomRequest.cpp
     endpoints/developerMode/event/ATRequest.cpp
     endpoints/deviceInfo/DeviceInfoEndpoint.cpp
@@ -55,6 +56,7 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
+        application-desktop
         microtar
         module-utils
         service-cellular

@@ -1,18 +1,18 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "DBNotificationsHandler.hpp"
 #include "MenuWindow.hpp"
-#include "InputEvent.hpp"
-#include "Item.hpp"
-#include "Navigation.hpp"
-#include "service-appmgr/Controller.hpp"
-#include <application-desktop/widgets/DBNotificationsHandler.hpp>
 #include "Names.hpp"
 
-#include <tools/Common.hpp>
-#include <Style.hpp>
 #include <i18n/i18n.hpp>
 #include <Image.hpp>
+#include <InputEvent.hpp>
+#include <Item.hpp>
+#include <Navigation.hpp>
+#include <service-appmgr/Controller.hpp>
+#include <Style.hpp>
+#include <tools/Common.hpp>
 
 namespace style::design
 {
@@ -43,7 +43,6 @@ namespace
 
 namespace gui
 {
-    inline const auto APP_SETTINGS_NEW = "ApplicationSettingsNew";
     Tile::Tile(UTF8 icon,
                std::string title,
                std::function<bool(Item &)> activatedCallback,
@@ -234,11 +233,11 @@ namespace gui
                                       app::manager::actions::Launch,
                                       std::make_unique<app::ApplicationLaunchData>("ApplicationMeditation"));
                               }},
-                new gui::Tile{"menu_settings_W_G", "app_desktop_menu_settings_new", [=](gui::Item &item) {
+                new gui::Tile{"menu_settings_W_G", "app_desktop_menu_settings", [=](gui::Item &item) {
                                   return app::manager::Controller::sendAction(
                                       application,
                                       app::manager::actions::Launch,
-                                      std::make_unique<app::ApplicationLaunchData>(APP_SETTINGS_NEW));
+                                      std::make_unique<app::ApplicationLaunchData>("ApplicationSettings"));
                               }}});
 
         toolsMenu = new MenuPage(

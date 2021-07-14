@@ -115,7 +115,7 @@ namespace app
 
         longPressTimer = sys::TimerFactory::createPeriodicTimer(this,
                                                                 "LongPress",
-                                                                std::chrono::milliseconds{key_timer_ms},
+                                                                std::chrono::milliseconds{keyTimerMs},
                                                                 [this](sys::Timer &) { longPressTimerCallback(); });
 
         connect(typeid(AppRefreshMessage),
@@ -174,21 +174,18 @@ namespace app
 
     void Application::longPressTimerCallback()
     {
-        // TODO if(check widget type long press trigger)
-        uint32_t time = xTaskGetTickCount();
-        if (keyTranslator->timeout(time)) {
-            // previous key press was over standard keypress timeout - send long press
-            gui::InputEvent iev = keyTranslator->translate(time);
+        const auto actualTimeStamp = xTaskGetTickCount();
+        if (keyTranslator->isKeyPressTimedOut(actualTimeStamp)) {
+            gui::InputEvent iev = keyTranslator->translate(actualTimeStamp);
             messageInputEventApplication(this, this->GetName(), iev);
-            // clean previous key
-            keyTranslator->prev_key_press = {};
+            keyTranslator->resetPreviousKeyPress();
             longPressTimer.stop();
         }
     }
 
     void Application::clearLongPressTimeout()
     {
-        keyTranslator->prev_key_timedout = false;
+        keyTranslator->setPreviousKeyTimedOut(false);
     }
 
     void Application::render(gui::RefreshModes mode)
@@ -234,7 +231,8 @@ namespace app
 
     void Application::switchWindow(const std::string &windowName,
                                    gui::ShowMode cmd,
-                                   std::unique_ptr<gui::SwitchData> data)
+                                   std::unique_ptr<gui::SwitchData> data,
+                                   SwitchReason reason)
     {
 
         std::string window;
@@ -248,13 +246,13 @@ namespace app
         // case to handle returning to previous application
         if (windowName.empty()) {
             window = getCurrentWindow()->getName();
-            auto msg =
-                std::make_shared<AppSwitchWindowMessage>(window, getCurrentWindow()->getName(), std::move(data), cmd);
+            auto msg = std::make_shared<AppSwitchWindowMessage>(
+                window, getCurrentWindow()->getName(), std::move(data), cmd, reason);
             bus.sendUnicast(msg, this->GetName());
         }
         else {
             auto msg = std::make_shared<AppSwitchWindowMessage>(
-                windowName, getCurrentWindow() ? getCurrentWindow()->getName() : "", std::move(data), cmd);
+                windowName, getCurrentWindow() ? getCurrentWindow()->getName() : "", std::move(data), cmd, reason);
             bus.sendUnicast(msg, this->GetName());
         }
     }
@@ -507,7 +505,10 @@ namespace app
             }
             if (!isCurrentWindow(msg->getWindowName())) {
                 if (!windowsStack.isEmpty()) {
-                    getCurrentWindow()->onClose();
+                    const auto closeReason = msg->getReason() == SwitchReason::PhoneLock
+                                                 ? gui::Window::CloseReason::PhoneLock
+                                                 : gui::Window::CloseReason::WindowSwitch;
+                    getCurrentWindow()->onClose(closeReason);
                 }
                 setActiveWindow(msg->getWindowName());
             }
@@ -641,7 +642,7 @@ namespace app
 
         for (const auto &[windowName, window] : windowsStack) {
             LOG_INFO("Closing a window: %s", windowName.c_str());
-            window->onClose();
+            window->onClose(gui::Window::CloseReason::ApplicationClose);
         }
 
         windowsStack.windows.clear();
@@ -829,6 +830,10 @@ namespace app
                      audio::str(volumeParams->getAudioContext().second).c_str(),
                      std::to_string(volumeParams->getVolume()).c_str());
             handleVolumeChanged(volumeParams->getVolume(), volumeParams->getAudioContext());
+        }
+        else if (id == ID::PhoneLock) {
+            switchWindow(
+                gui::popup::resolveWindowName(id), gui::ShowMode::GUI_SHOW_INIT, nullptr, SwitchReason::PhoneLock);
         }
         else if (id == ID::PhoneLockInput || id == ID::PhoneLockChangeInfo) {
             auto popupParams = static_cast<const gui::PhoneUnlockInputRequestParams *>(params);

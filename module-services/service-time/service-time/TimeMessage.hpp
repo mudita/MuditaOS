@@ -162,4 +162,26 @@ namespace stm::message
       private:
         std::string timezone;
     };
+
+    class GetAutomaticDateAndTimeRequest : public sys::DataMessage
+    {
+      public:
+        explicit GetAutomaticDateAndTimeRequest() : sys::DataMessage(MessageType::MessageTypeUninitialized)
+        {}
+    };
+
+    class GetAutomaticDateAndTimeResponse : public sys::ResponseMessage
+    {
+      public:
+        explicit GetAutomaticDateAndTimeResponse(bool settingValue)
+            : sys::ResponseMessage(), isAutomaticDateAndTimeOn(settingValue)
+        {}
+        auto isAutomaticDateAndTime() const noexcept
+        {
+            return isAutomaticDateAndTimeOn;
+        }
+
+      private:
+        bool isAutomaticDateAndTimeOn = false;
+    };
 } // namespace stm::message

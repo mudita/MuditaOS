@@ -2,7 +2,8 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TetheringNotificationPopup.hpp"
-#include <module-apps/application-desktop/ApplicationDesktop.hpp>
+
+#include <Application.hpp>
 
 namespace gui
 {

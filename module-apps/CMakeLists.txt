@@ -11,6 +11,7 @@ add_library(${PROJECT_NAME} STATIC)
 add_subdirectory(application-antenna)
 add_subdirectory(application-bell-main)
 add_subdirectory(application-calculator)
+add_subdirectory(application-desktop)
 add_subdirectory(application-messages)
 add_subdirectory(application-music-player)
 add_subdirectory(application-phonebook)
@@ -19,9 +20,7 @@ add_subdirectory(apps-common)
 set(APPLICATIONS
     clock
     calendar
-    desktop
     settings
-    settings-new
     call
     notes
     onboarding
@@ -68,6 +67,16 @@ if(${ENABLE_VOLTE})
     target_compile_definitions(${PROJECT_NAME} PUBLIC ENABLE_VOLTE=1)
 endif()
 
+option(DISABLED_SETTINGS_OPTIONS "Enable Disabled Settings Options" OFF)
+if(${DISABLED_SETTINGS_OPTIONS})
+    target_compile_definitions(${PROJECT_NAME} PUBLIC DISABLED_SETTINGS_OPTIONS=1)
+endif()
+
+option(DEVELOPER_SETTINGS_OPTIONS "Enable Developer Settings Options" ON)
+if(${DEVELOPER_SETTINGS_OPTIONS})
+    target_compile_definitions(${PROJECT_NAME} PUBLIC DEVELOPER_SETTINGS_OPTIONS=1)
+endif()
+
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
         application-messages
@@ -84,6 +93,7 @@ target_link_libraries(${PROJECT_NAME}
         service-db
         service-evtmgr
         time
+        utils-bootconfig
     PUBLIC
         module-audio
         module-bsp

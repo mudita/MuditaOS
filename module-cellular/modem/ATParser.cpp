@@ -37,12 +37,11 @@ std::vector<ATParser::Urc> ATParser::parseUrc()
         if (pos != std::string::npos) {
             resp.push_back(el.second);
             maxPos = std::max(pos + el.first.length(), maxPos);
-            LOG_DEBUG("%s", ("[URC]: " + el.first).c_str());
+            LOG_SENSITIVE(LOGDEBUG, "%s", ("[URC]: " + el.first).c_str());
         }
     }
 
     if (urcBuffer.find("+QIND: \"FOTA\"") != std::string::npos) {
-        LOG_DEBUG("%s", urcBuffer.c_str());
         resp.push_back(ATParser::Urc::Fota);
         return resp;
     }
@@ -87,7 +86,7 @@ at::Result ATParser::processNewData(sys::Service *service, const bsp::cellular::
                 fotaData = std::string(urcBuffer);
                 urcBuffer.erase();
             }
-            LOG_DEBUG("parsing FOTA:\"%s\"", fotaData.c_str());
+            LOG_DEBUG("parsing FOTA");
             FotaService::API::sendRawProgress(service, fotaData);
         }
         else {

@@ -73,6 +73,7 @@
 #include <service-desktop/DesktopMessages.hpp>
 #include <service-desktop/DeveloperModeMessage.hpp>
 #include <service-appmgr/model/ApplicationManager.hpp>
+#include <service-time/service-time/TimeMessage.hpp>
 #include <task.h>
 #include <ucs2/UCS2.hpp>
 #include <utf8/UTF8.hpp>
@@ -160,7 +161,7 @@ ServiceCellular::ServiceCellular()
         LOG_DEBUG("Notifications callback called with %u data bytes", static_cast<unsigned int>(data.size()));
 
         std::string logStr = utils::removeNewLines(data);
-        LOG_DEBUG("Data: %s", logStr.c_str());
+        LOG_SENSITIVE(LOGDEBUG, "Data: %s", logStr.c_str());
         atURCStream.write(data);
         auto vUrc = atURCStream.getURCList();
 
@@ -182,12 +183,6 @@ ServiceCellular::ServiceCellular()
 ServiceCellular::~ServiceCellular()
 {
     LOG_INFO("[ServiceCellular] Cleaning resources");
-}
-
-// this static function will be replaced by Settings API
-static bool isSettingsAutomaticTimeSyncEnabled()
-{
-    return true;
 }
 
 void ServiceCellular::SleepTimerHandler()
@@ -302,6 +297,7 @@ void ServiceCellular::registerMessageHandlers()
     });
 
     priv->connectSimCard();
+    priv->connectNetworkTime();
 
     connect(typeid(CellularStartOperatorsScanMessage), [&](sys::Message *request) -> sys::MessagePointer {
         auto msg = static_cast<CellularStartOperatorsScanMessage *>(request);
@@ -386,6 +382,8 @@ void ServiceCellular::registerMessageHandlers()
         auto msg = static_cast<sdesktop::developerMode::DeveloperModeRequest *>(request);
         if (typeid(*msg->event.get()) == typeid(sdesktop::developerMode::CellularHotStartEvent)) {
             priv->simCard->setChannel(nullptr);
+            priv->networkTime->setChannel(nullptr);
+
             cmux->closeChannels();
             ///> change state - simulate hot start
             handle_power_up_request();
@@ -854,7 +852,7 @@ bool ServiceCellular::handle_audio_conf_procedure()
             LOG_DEBUG("[ServiceCellular] Modem is fully operational");
 
             priv->simCard->setChannel(cmux->get(CellularMux::Channel::Commands));
-
+            priv->networkTime->setChannel(cmux->get(CellularMux::Channel::Commands));
             // open channel - notifications
             DLCChannel *notificationsChannel = cmux->get(CellularMux::Channel::Notifications);
             if (notificationsChannel != nullptr) {
@@ -938,13 +936,13 @@ std::optional<std::shared_ptr<sys::Message>> ServiceCellular::identifyNotificati
     std::string str(data.begin(), data.end());
 
     std::string logStr = utils::removeNewLines(str);
-    LOG_DEBUG("Notification:: %s", logStr.c_str());
+    LOG_SENSITIVE(LOGDEBUG, "Notification:: %s", logStr.c_str());
 
     auto urc = at::urc::UrcFactory::Create(str);
     urc->Handle(urcHandler);
 
     if (!urc->isHandled()) {
-        LOG_WARN("Unhandled notification: %s", logStr.c_str());
+        LOG_SENSITIVE(LOGWARN, "Unhandled notification: %s", logStr.c_str());
     }
 
     return urcHandler.getResponse();
@@ -984,8 +982,9 @@ auto ServiceCellular::sendSMS(SMSRecord record) -> bool
                 else {
                     result = false;
                 }
-                if (!result)
-                    LOG_ERROR("Message to: %s send failure", receiver.c_str());
+                if (!result) {
+                    LOG_ERROR("Message send failure");
+                }
             }
         }
         // split text, and send concatenated messages
@@ -1397,10 +1396,9 @@ bool ServiceCellular::handle_URCReady()
 {
     auto channel = cmux->get(CellularMux::Channel::Commands);
     bool ret     = true;
-    if (isSettingsAutomaticTimeSyncEnabled()) {
-        ret = ret && channel->cmd(at::AT::ENABLE_TIME_ZONE_UPDATE);
-        ret = ret && channel->cmd(at::AT::SET_TIME_ZONE_REPORTING);
-    }
+
+    priv->requestNetworkTimeSettings();
+
     ret = ret && channel->cmd(at::AT::ENABLE_NETWORK_REGISTRATION_URC);
 
     bus.sendMulticast<cellular::msg::notification::ModemStateChanged>(cellular::api::ModemState::Ready);
@@ -1759,7 +1757,9 @@ std::shared_ptr<CellularGetCurrentOperatorResponse> ServiceCellular::handleCellu
 {
     LOG_INFO("CellularGetCurrentOperator handled");
     NetworkSettings networkSettings(*this);
-    return std::make_shared<CellularGetCurrentOperatorResponse>(networkSettings.getCurrentOperator());
+    const auto currentNetworkOperatorName = networkSettings.getCurrentOperator();
+    Store::GSM::get()->setNetworkOperatorName(currentNetworkOperatorName);
+    return std::make_shared<CellularGetCurrentOperatorResponse>(currentNetworkOperatorName);
 }
 
 std::shared_ptr<CellularGetAPNResponse> ServiceCellular::handleCellularGetAPNMessage(CellularGetAPNMessage *msg)
@@ -1853,14 +1853,15 @@ std::shared_ptr<CellularSetOperatorResponse> ServiceCellular::handleCellularSetO
 void ServiceCellular::volteChanged(const std::string &value)
 {
     if (!value.empty()) {
+        LOG_INFO("VoLTE setting state changed to '%s'.", value.c_str());
         volteOn = utils::getNumericValue<bool>(value);
     }
 }
 
 void ServiceCellular::apnListChanged(const std::string &value)
 {
-    LOG_DEBUG("apnListChanged");
     if (!value.empty()) {
+        LOG_INFO("apn_list setting state changed to '%s'.", value.c_str());
         packetData->loadAPNSettings(value);
     }
 }
@@ -1868,6 +1869,7 @@ void ServiceCellular::apnListChanged(const std::string &value)
 auto ServiceCellular::handleCellularAnswerIncomingCallMessage(CellularMessage *msg)
     -> std::shared_ptr<CellularResponseMessage>
 {
+    LOG_INFO("%s", __PRETTY_FUNCTION__);
     if (ongoingCall.getType() != CallType::CT_INCOMING) {
         return std::make_shared<CellularResponseMessage>(true);
     }
@@ -1891,6 +1893,7 @@ auto ServiceCellular::handleCellularAnswerIncomingCallMessage(CellularMessage *m
 auto ServiceCellular::handleCellularCallRequestMessage(CellularCallRequestMessage *msg)
     -> std::shared_ptr<CellularResponseMessage>
 {
+    LOG_INFO("%s", __PRETTY_FUNCTION__);
     auto channel = cmux->get(CellularMux::Channel::Commands);
     if (channel == nullptr) {
         return std::make_shared<CellularResponseMessage>(false);
@@ -1909,8 +1912,8 @@ auto ServiceCellular::handleCellularCallRequestMessage(CellularCallRequestMessag
 
 void ServiceCellular::handleCellularHangupCallMessage(CellularHangupCallMessage *msg)
 {
+    LOG_INFO("%s", __PRETTY_FUNCTION__);
     auto channel = cmux->get(CellularMux::Channel::Commands);
-    LOG_INFO("CellularHangupCall");
     if (channel) {
         if (channel->cmd(at::AT::ATH)) {
             callManager.hangUp();
@@ -2003,6 +2006,7 @@ auto ServiceCellular::handleCellularRingingMessage(CellularRingingMessage *msg) 
 
 auto ServiceCellular::handleCellularIncominCallMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
+    LOG_INFO("%s", __PRETTY_FUNCTION__);
     auto ret     = true;
     auto message = static_cast<CellularIncominCallMessage *>(msg);
     if (!ongoingCall.isValid()) {
@@ -2053,6 +2057,12 @@ auto ServiceCellular::handleCellularSelectAntennaMessage(sys::Message *msg) -> s
     cmux->selectAntenna(message->antenna);
     vTaskDelay(50); // sleep for 50 ms...
     auto actualAntenna  = cmux->getAntenna();
+    if (actualAntenna == bsp::cellular::antenna::lowBand) {
+        LOG_INFO("Low band antenna set");
+    }
+    else {
+        LOG_INFO("High band antenna set");
+    }
     bool changedAntenna = (actualAntenna == message->antenna);
 
     auto notification = std::make_shared<AntennaChangedMessage>();
@@ -2269,6 +2279,8 @@ auto ServiceCellular::handleCellularSendSMSMessage(sys::Message *msg) -> std::sh
 
 auto ServiceCellular::handleCellularRingNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
+    LOG_INFO("%s", __PRETTY_FUNCTION__);
+
     if (phoneModeObserver->isTetheringOn())
         return std::make_shared<CellularResponseMessage>(hangUpCall());
 

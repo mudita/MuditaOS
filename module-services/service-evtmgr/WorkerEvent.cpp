@@ -262,36 +262,34 @@ void WorkerEvent::processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code)
 {
     auto message = std::make_shared<sevm::KbdMessage>();
 
-    message->key.key_code = code;
+    message->key.keyCode = code;
 
-    if (event == bsp::KeyEvents::Pressed) {
+    switch (event) {
+    case bsp::KeyEvents::Pressed:
         if (lastState == bsp::KeyEvents::Pressed) {
             return;
         }
-
         message->key.state      = RawKey::State::Pressed;
-        message->key.time_press = xTaskGetTickCount();
-
-        // Slider sends only press, not release state so it would block the entire keyboard
-        if ((code != bsp::KeyCodes::SSwitchUp) && (code != bsp::KeyCodes::SSwitchMid) &&
-            (code != bsp::KeyCodes::SSwitchDown)) {
-            lastPressed = code;
-            lastState   = event;
-        }
-    }
-    else {
+        message->key.timePress  = xTaskGetTickCount();
+        lastPressed             = code;
+        lastState               = event;
+        break;
+    case bsp::KeyEvents::Released:
         if (lastState != bsp::KeyEvents::Pressed) {
             return;
         }
         if (lastPressed != code) {
             return;
         }
-
         lastState = bsp::KeyEvents::Released;
         {
             message->key.state        = RawKey::State::Released;
-            message->key.time_release = xTaskGetTickCount();
+            message->key.timeRelease  = xTaskGetTickCount();
         }
+        break;
+    case bsp::KeyEvents::Moved:
+        message->key.state = RawKey::State::Moved;
+        break;
     }
     service->bus.sendUnicast(message, service::name::evt_manager);
 }
@@ -306,7 +304,7 @@ void WorkerEvent::handleMagnetometerEvent()
 {
     if (const auto &key = bsp::magnetometer::WorkerEventHandler(); key.has_value()) {
         LOG_DEBUG("magneto IRQ handler: %s", c_str(*key));
-        processKeyEvent(bsp::KeyEvents::Pressed, *key);
+        processKeyEvent(bsp::KeyEvents::Moved, *key);
     }
 }
 

@@ -8,6 +8,7 @@
 #include <Audio/Operation/PlaybackOperation.hpp>
 #include <Bluetooth/audio/BluetoothAudioDevice.hpp>
 #include <module-audio/Audio/VolumeScaler.hpp>
+#include <module-sys/SystemManager/messages/SentinelRegistrationMessage.hpp>
 #include <service-bluetooth/Constants.hpp>
 #include <service-bluetooth/ServiceBluetoothCommon.hpp>
 #include <service-bluetooth/BluetoothMessage.hpp>
@@ -94,10 +95,14 @@ static constexpr std::initializer_list<std::pair<audio::DbPathElement, const cha
 ServiceAudio::ServiceAudio()
     : sys::Service(service::name::audio, "", audioServiceStackSize, sys::ServicePriority::Idle),
       audioMux([this](auto... params) { return this->AudioServicesCallback(params...); }),
+      cpuSentinel(std::make_shared<sys::CpuSentinel>(service::name::audio, this)),
       settingsProvider(std::make_unique<settings::Settings>())
 {
     LOG_INFO("[ServiceAudio] Initializing");
     bus.channels.push_back(sys::BusChannel::ServiceAudioNotifications);
+
+    auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuSentinel);
+    bus.sendUnicast(std::move(sentinelRegistrationMsg), ::service::name::system_manager);
 
     connect(typeid(A2DPDeviceVolumeChanged),
             [this](sys::Message *msg) -> sys::MessagePointer { return handleA2DPVolumeChangedOnBluetoothDevice(msg); });
@@ -595,6 +600,8 @@ sys::MessagePointer ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sy
     if (isBusy != curIsBusy) {
         auto broadMsg = std::make_shared<AudioNotificationMessage>(
             curIsBusy ? AudioNotificationMessage::Type::ServiceWakeUp : AudioNotificationMessage::Type::ServiceSleep);
+        curIsBusy ? cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyHz::Level_6)
+                  : cpuSentinel->ReleaseMinimumFrequency();
         bus.sendMulticast(broadMsg, sys::BusChannel::ServiceAudioNotifications);
     }
 

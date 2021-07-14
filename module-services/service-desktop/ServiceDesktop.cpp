@@ -15,7 +15,7 @@
 #include <Service/Worker.hpp>
 #include <json11.hpp>
 #include <log.hpp>
-#include <module-apps/application-desktop/ApplicationDesktop.hpp>
+#include <application-desktop/Constants.hpp>
 #include <service-db/service-db/Settings.hpp>
 #include <service-db/QueryMessage.hpp>
 #include <purefs/filesystem_paths.hpp>
@@ -286,6 +286,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
 
 sys::ReturnCodes ServiceDesktop::DeinitHandler()
 {
+    LOG_ERROR(".. deinit ..");
     settings->deinit();
     desktopWorker->deinit();
     return sys::ReturnCodes::Success;
@@ -293,6 +294,9 @@ sys::ReturnCodes ServiceDesktop::DeinitHandler()
 
 void ServiceDesktop::ProcessCloseReason(sys::CloseReason closeReason)
 {
+    LOG_ERROR(".. close with reason ..");
+    settings->deinit();
+    desktopWorker->deinit();
     sendCloseReadyMessage(this);
 }
 

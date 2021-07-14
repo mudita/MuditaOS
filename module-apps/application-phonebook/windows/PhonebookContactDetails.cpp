@@ -46,7 +46,7 @@ namespace gui
         erase();
     }
 
-    void PhonebookContactDetails::onClose()
+    void PhonebookContactDetails::onClose([[maybe_unused]] CloseReason reason)
     {
         contactDetailsModel->clearData();
     }

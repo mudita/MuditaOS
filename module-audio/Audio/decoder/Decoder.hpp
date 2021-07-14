@@ -120,7 +120,6 @@ namespace audio
 
       protected:
         virtual auto getBitWidth() -> unsigned int = 0;
-        virtual void fetchTagsSpecific(){};
 
         void convertmono2stereo(int16_t *pcm, uint32_t samplecount);
 

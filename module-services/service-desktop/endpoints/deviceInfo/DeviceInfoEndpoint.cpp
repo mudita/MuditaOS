@@ -54,6 +54,7 @@ auto DeviceInfoEndpoint::getDeviceInfo(Context &context) -> bool
          {json::signalStrength, std::to_string(static_cast<int>(Store::GSM::get()->getSignalStrength().rssiBar))},
          {json::accessTechnology, std::to_string(static_cast<int>(Store::GSM::get()->getNetwork().accessTechnology))},
          {json::networkStatus, std::to_string(static_cast<int>(Store::GSM::get()->getNetwork().status))},
+         {json::networkOperatorName, Store::GSM::get()->getNetworkOperatorName()},
          {json::fsTotal, std::to_string(totalMbytes)},
          {json::fsFree, std::to_string(freeMbytes)},
          {json::fsFreePercent, std::to_string(freePercent)},

@@ -4,8 +4,8 @@
 #pragma once
 
 #include <AppWindow.hpp>
-#include <Text.hpp>
 #include <popups/presenter/PowerOffPresenter.hpp>
+#include <Text.hpp>
 
 #include <vector>
 

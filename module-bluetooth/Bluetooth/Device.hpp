@@ -36,7 +36,7 @@ namespace TYPE_OF_SERVICE
     inline constexpr uint32_t INFORMATION     = 0x00800000;
 
     ///> At least one of this class has to be supported by remote device in order to establish connection
-    inline constexpr uint32_t REMOTE_SUPPORTED_SERVICES = (AUDIO | POSITIONING);
+    inline constexpr uint32_t REMOTE_SUPPORTED_SERVICES = (AUDIO | POSITIONING | RENDERING);
 
 } // namespace TYPE_OF_SERVICE
 
