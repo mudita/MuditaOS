@@ -53,9 +53,5 @@ target_link_libraries(
         phmap
 )
 
-
 target_compile_definitions( ${PROJECT_NAME} PUBLIC TARGET_Linux )
 
-if (${ENABLE_TESTS})
-    add_subdirectory(test)
-endif ()

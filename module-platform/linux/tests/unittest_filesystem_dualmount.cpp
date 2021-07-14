@@ -4,9 +4,10 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
+#include <platform/linux/DiskImage.hpp>
+
 #include <purefs/fs/filesystem.hpp>
 #include <purefs/blkdev/disk_manager.hpp>
-#include <purefs/blkdev/disk_image.hpp>
 #include <purefs/fs/drivers/filesystem_vfat.hpp>
 #include <purefs/fs/drivers/filesystem_littlefs.hpp>
 #include <sys/statvfs.h>

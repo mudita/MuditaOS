@@ -32,8 +32,6 @@ if (NOT ${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
     set(ENABLE_TESTS ON)
 endif()
 
-
-
 if (${ENABLE_TESTS})
     enable_testing()
     add_custom_target(check ${CMAKE_CTEST_COMMAND} -V)
@@ -64,6 +62,7 @@ endif()
 set(TOOLCHAIN_PATH "" CACHE STRING "Path to toolchain directory")
 
 add_compile_definitions(FSL_RTOS_FREE_RTOS
+    PLATFORM_${PROJECT_TARGET_NAME}
     USB_STACK_FREERTOS
     DEBUG_CONSOLE_TRANSFER_NON_BLOCKING
     FSL_SDK_ENABLE_DRIVER_CACHE_CONTROL=1
@@ -119,6 +118,7 @@ elseif(${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
 endif()
 
 add_subdirectory(source)
+add_subdirectory(module-platform)
 add_subdirectory(module-sys)
 add_subdirectory(module-utils)
 add_subdirectory(module-os)
