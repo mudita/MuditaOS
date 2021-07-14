@@ -1,9 +1,10 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "application-settings/ApplicationSettings.hpp"
 #include "DateAndTimeMainWindow.hpp"
-#include "OptionSetting.hpp"
+
+#include <application-settings/windows/WindowNames.hpp>
+#include <OptionSetting.hpp>
 #include <service-time/service-time/TimeMessage.hpp>
 #include <service-time/Constants.hpp>
 #include <service-time/api/TimeSettingsApi.hpp>

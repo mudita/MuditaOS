@@ -2,9 +2,10 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SettingsDateItem.hpp"
-#include <apps-common/widgets/DateAndTimeStyle.hpp>
-#include <apps-common/widgets/WidgetsUtils.hpp>
-#include <module-gui/gui/input/InputEvent.hpp>
+
+#include <widgets/DateAndTimeStyle.hpp>
+#include <widgets/WidgetsUtils.hpp>
+#include <InputEvent.hpp>
 
 namespace date_and_time = style::window::date_and_time;
 

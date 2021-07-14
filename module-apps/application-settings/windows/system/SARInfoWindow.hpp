@@ -3,13 +3,9 @@
 
 #pragma once
 
-#include "AppWindow.hpp"
-
-#include "application-settings/presenter/SARInfoWindowPresenter.hpp"
-
-#include <module-gui/gui/widgets/Label.hpp>
-#include <module-gui/gui/widgets/Text.hpp>
-#include <module-gui/gui/input/InputEvent.hpp>
+#include <application-settings/presenter/system/SARInfoWindowPresenter.hpp>
+#include <AppWindow.hpp>
+#include <Text.hpp>
 
 namespace gui
 {
@@ -18,13 +14,10 @@ namespace gui
       public:
         explicit SARInfoWindow(app::Application *app,
                                std::unique_ptr<SARInfoWindowContract::Presenter> &&windowPresenter);
-        ~SARInfoWindow() noexcept override;
 
       private:
         void onBeforeShow(gui::ShowMode mode, gui::SwitchData *data) override;
-        void rebuild() override;
         void buildInterface() override;
-        void destroyInterface() override;
 
         std::unique_ptr<SARInfoWindowContract::Presenter> presenter;
         gui::Text *sarInfoText = nullptr;

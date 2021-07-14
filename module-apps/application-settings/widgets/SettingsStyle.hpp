@@ -42,31 +42,6 @@ namespace style
 
         namespace window
         {
-            namespace languageChange
-            {
-                inline constexpr auto options_posX             = 17;
-                inline constexpr auto options_posY             = 100;
-                inline constexpr auto options_distance_between = 60;
-            } // namespace languageChange
-
-            namespace torch
-            {
-                inline constexpr auto body_offset = 155;
-
-                inline constexpr auto bar_y = 396;
-                inline constexpr auto bar_h = 1;
-
-                inline constexpr auto description_y = 425;
-                inline constexpr auto description_h = 100;
-            } // namespace torch
-
-            namespace nightshift
-            {
-                inline constexpr auto body_offset = style::window::default_vertical_pos + 16;
-
-                inline constexpr auto separator_h = 55;
-            } // namespace nightshift
-
             namespace newApn
             {
                 inline constexpr uint32_t x = style::window::default_left_margin;
@@ -215,9 +190,11 @@ namespace style
 
     } // namespace certification
 
-    namespace techinfo
+    namespace technical_info
     {
-        inline constexpr auto width  = 400;
-        inline constexpr auto height = 30;
-    } // namespace techinfo
+        inline constexpr auto width        = style::window::default_body_width;
+        inline constexpr auto height       = 60;
+        inline constexpr auto title_height = 27;
+        inline constexpr auto value_height = 33;
+    } // namespace technical_info
 } // namespace style
