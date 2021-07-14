@@ -12,7 +12,7 @@ namespace gui
 {
     WallpaperWindow::WallpaperWindow(app::Application *app) : BaseSettingsWindow(app, window::name::wallpaper)
     {
-        setTitle(utils::translate("app_settings_display_locked_screen_wallpaper"));
+        setTitle(utils::translate("app_settings_display_wallpaper"));
     }
 
     auto WallpaperWindow::buildOptionsList() -> std::list<gui::Option>

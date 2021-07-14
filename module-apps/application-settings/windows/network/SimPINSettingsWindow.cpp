@@ -1,24 +1,25 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "PINSettingsWindow.hpp"
-#include "application-settings/ApplicationSettings.hpp"
-#include "application-settings/data/PINSettingsLockStateData.hpp"
-#include "application-settings/data/PINSettingsSimData.hpp"
-#include "OptionSetting.hpp"
+#include "SimPINSettingsWindow.hpp"
+
+#include <application-settings/windows/WindowNames.hpp>
+#include <application-settings/data/PINSettingsLockStateData.hpp>
+#include <application-settings/data/PINSettingsSimData.hpp>
+#include <OptionSetting.hpp>
 
 #include <service-appmgr/Controller.hpp>
-#include <locks/data/SimLockMessages.hpp>
 #include <service-cellular-api>
 
 namespace gui
 {
-    PINSettingsWindow::PINSettingsWindow(app::Application *app) : BaseSettingsWindow(app, window::name::pin_settings)
+    SimPINSettingsWindow::SimPINSettingsWindow(app::Application *app)
+        : BaseSettingsWindow(app, window::name::sim_pin_settings)
     {
         app->bus.sendUnicast<cellular::msg::request::sim::GetLockState>();
     }
 
-    void PINSettingsWindow::onBeforeShow(ShowMode /*mode*/, SwitchData *data)
+    void SimPINSettingsWindow::onBeforeShow(ShowMode /*mode*/, SwitchData *data)
     {
         if (const auto pinSettingsSimData = dynamic_cast<PINSettingsSimData *>(data); pinSettingsSimData != nullptr) {
             setTitle(utils::translate("app_settings_network_pin_settings") + " (" + pinSettingsSimData->getSim() + ")");
@@ -30,7 +31,7 @@ namespace gui
         refreshOptionsList();
     }
 
-    auto PINSettingsWindow::buildOptionsList() -> std::list<Option>
+    auto SimPINSettingsWindow::buildOptionsList() -> std::list<Option>
     {
         std::list<Option> optionList;
 
@@ -67,7 +68,7 @@ namespace gui
         return optionList;
     }
 
-    void PINSettingsWindow::changePinState(bool &currentState)
+    void SimPINSettingsWindow::changePinState(bool &currentState)
     {
         currentState = !currentState;
         refreshOptionsList();

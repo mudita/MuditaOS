@@ -1,12 +1,10 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <locks/widgets/Lock.hpp>
-#include <locks/data/LockData.hpp>
-#include "application-settings/ApplicationSettings.hpp"
-#include "application-settings/data/ChangePasscodeData.hpp"
-#include "OptionSetting.hpp"
 #include "SecurityMainWindow.hpp"
+
+#include <application-settings/windows/WindowNames.hpp>
+#include <OptionSetting.hpp>
 
 namespace gui
 {
@@ -22,6 +20,17 @@ namespace gui
     auto SecurityMainWindow::buildOptionsList() -> std::list<Option>
     {
         std::list<Option> optionList;
+
+        optionList.emplace_back(std::make_unique<gui::option::OptionSettings>(
+            utils::translate("app_settings_display_security_autolock"),
+            [=](gui::Item &item) {
+                this->application->switchWindow(gui::window::name::autolock, nullptr);
+                return true;
+            },
+            nullptr,
+            nullptr,
+            gui::option::SettingRightItem::ArrowWhite,
+            false));
 
         optionList.emplace_back(std::make_unique<option::OptionSettings>(
             utils::translate("app_settings_security_phone_lock"),
@@ -51,19 +60,9 @@ namespace gui
                 },
                 nullptr,
                 nullptr,
-                option::SettingRightItem::ArrowWhite));
+                option::SettingRightItem::ArrowWhite,
+                true));
         }
-
-        optionList.emplace_back(std::make_unique<gui::option::OptionSettings>(
-            utils::translate("app_settings_display_locked_screen_autolock"),
-            [=](gui::Item &item) {
-                this->application->switchWindow(gui::window::name::autolock, nullptr);
-                return true;
-            },
-            nullptr,
-            nullptr,
-            gui::option::SettingRightItem::ArrowWhite,
-            false));
 
         return optionList;
     }

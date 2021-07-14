@@ -34,7 +34,7 @@ std::list<gui::Option> mainWindowOptionsNew(app::Application *app)
     addMenu(i18("app_settings_net"), gui::window::name::network);
     addMenu(i18("app_settings_disp_key"), gui::window::name::display_and_keypad);
     addMenu(i18("app_settings_phone_modes"), gui::window::name::phone_modes);
-    addMenu(i18("app_settings_apps"), gui::window::name::apps_and_tools);
+    addMenu(i18("app_settings_apps"), gui::window::name::apps);
     addMenu(i18("app_settings_security"), gui::window::name::security);
     addMenu(i18("app_settings_system"), gui::window::name::system);
     return l;
