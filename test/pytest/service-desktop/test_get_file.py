@@ -64,6 +64,12 @@ def test_get_invalid_chunks(harness):
     with pytest.raises(TransactionError, match=r".*" + str(Status.BadRequest.value) + ".*"):
         FsGetChunk(ret.rxID + 1, totalChunks + 1).run(harness)
 
+def validate_response_body(body):
+    assert body["rxID"] != 0
+    assert body["fileSize"] != 0
+    assert body["chunkSize"] != 0
+    assert body["fileCrc32"] != ""
+
 
 @pytest.mark.service_desktop_test
 @pytest.mark.usefixtures("phone_unlocked")

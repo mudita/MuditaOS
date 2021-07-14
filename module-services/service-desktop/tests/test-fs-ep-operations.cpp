@@ -130,6 +130,7 @@ TEST_CASE("Endpoint Filesystem Test")
         auto uuid        = 1103;
         auto fileToGet   = "\"/sys/user/data/applications/settings/quotes.json\"";
         auto fileSize    = 676u;
+        auto fileCrc32   = "37ef9a52";
         auto chunkSize   = 12288u;
         auto rxID        = 2u;
         auto testMessage = "{\"endpoint\":" + std::to_string(endpoint) +
@@ -157,6 +158,8 @@ TEST_CASE("Endpoint Filesystem Test")
         REQUIRE(fileSize == static_cast<uint32_t>(body[parserFSM::json::fileSize].int_value()));
         REQUIRE(chunkSize == static_cast<uint32_t>(body[parserFSM::json::filesystem::chunkSize].int_value()));
         REQUIRE(rxID == static_cast<uint32_t>(body[parserFSM::json::filesystem::rxID].int_value()));
+
+        REQUIRE_THAT(body[parserFSM::json::fileCrc32].string_value(), Catch::Matchers::Contains(fileCrc32));
     }
 
     SECTION("Request get file chunk")

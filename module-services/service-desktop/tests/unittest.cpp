@@ -48,14 +48,14 @@ TEST_CASE("Parser Test")
 
         testMessage = R"(int":1, "method":1, "body":{"test":"test"}})";
         parser.processMessage(std::move(testMessage));
-        REQUIRE(parser.getCurrentState() == State::ReceivedPayload);
+        REQUIRE(parser.getCurrentState() == State::NoMsg);
     }
 
     SECTION("Parse whole message")
     {
         std::string testMessage = R"(#000000050{"endpoint":1, "method":1, "body":{"test":"test"}})";
         parser.processMessage(std::move(testMessage));
-        REQUIRE(parser.getCurrentState() == State::ReceivedPayload);
+        REQUIRE(parser.getCurrentState() == State::NoMsg);
     }
 
     SECTION("Parse message with start char detached from mesage")
@@ -71,7 +71,7 @@ TEST_CASE("Parser Test")
 
         testMessage = R"(dpoint":1, "method":1, "body":{"test":"test"}})";
         parser.processMessage(std::move(testMessage));
-        REQUIRE(parser.getCurrentState() == State::ReceivedPayload);
+        REQUIRE(parser.getCurrentState() == State::NoMsg);
     }
 
     SECTION("Parse message with beginning of another one")
@@ -82,7 +82,7 @@ TEST_CASE("Parser Test")
 
         testMessage = R"(point":1, "method":1, "body":{"test":"test"}})";
         parser.processMessage(std::move(testMessage));
-        REQUIRE(parser.getCurrentState() == State::ReceivedPayload);
+        REQUIRE(parser.getCurrentState() == State::NoMsg);
     }
     SECTION("Parse junk message")
     {
@@ -313,18 +313,31 @@ TEST_CASE("FileOperations UT Test Get File")
 
     SECTION("Create receive id for file")
     {
-        auto filePath{"/sys/user/music/SMS-drum2-stereo.mp3"};
+        auto filePath{"/sys/user/data/applications/settings/quotes.json"};
 
         auto [rxID, fileSize] = fileOps.createReceiveIDForFile(filePath);
 
         REQUIRE(rxID == 1);
-        REQUIRE(fileSize == 49146);
+        REQUIRE(fileSize == 676);
+    }
+
+    SECTION("Create receive id for file")
+    {
+        auto filePath{"/sys/user/data/applications/settings/quotes.json"};
+
+        auto [rxID, fileSize] = fileOps.createReceiveIDForFile(filePath);
+
+        auto fileHash = fileOps.getFileHashForReceiveID(rxID);
+
+        auto fileCrc32{"37ef9a52"};
+
+        REQUIRE_THAT(fileHash, Catch::Matchers::Contains(fileCrc32));
     }
 }
 
-TEST_CASE("FileContext UT Test Valid Input")
+TEST_CASE("FileReadContext UT Test Valid Input")
 {
-    auto filePath{"/sys/user/MuditaOS.log"};
+    auto filePath{"/sys/user/data/applications/settings/quotes.json"};
     auto fileSize{1536u};
     auto fileOffset{128 * 6u};
     auto chunkSize{128 * 3u};
@@ -345,9 +358,9 @@ TEST_CASE("FileContext UT Test Valid Input")
     }
 }
 
-TEST_CASE("FileContext UT Test Invalid Input")
+TEST_CASE("FileReadContext UT Test Invalid Input")
 {
-    auto filePath{"/sys/user/music/SMS-drum2-stereo.mp3"};
+    auto filePath{"/sys/user/data/applications/settings/quotes.json"};
 
     SECTION("Create file context for file with invalid file size")
     {
@@ -359,7 +372,7 @@ TEST_CASE("FileContext UT Test Invalid Input")
 
     SECTION("Create file context for file with invalid chunk size")
     {
-        auto fileSize{49146u};
+        auto fileSize{676u};
         auto chunkSize{0u};
 
         REQUIRE_THROWS_WITH(FileReadContext(filePath, fileSize, chunkSize), "Invalid FileContext arguments");
@@ -372,33 +385,33 @@ TEST_CASE("FileOperations UT Test Send File")
 
     SECTION("Create receive id for file")
     {
-        auto filePath{"/sys/user/music/SMS-drum2-stereo.mp3"};
-        auto fileSize{49146};
-        auto fileCrc32{"efd73581"};
+        auto filePath{"/sys/user/data/applications/settings/quotes.json"};
+        auto fileSize{676u};
+        auto fileCrc32{"37ef9a52"};
 
         auto txID = fileOps.createTransmitIDForFile(filePath, fileSize, fileCrc32);
 
-        REQUIRE(txID == 1);
+        REQUIRE(txID != 0);
     }
 }
 
 TEST_CASE("FileContext UT Test Valid Input")
 {
-    auto filePath{"/sys/user/MuditaOS.log"};
-    auto fileSize{1536u};
-    auto fileOffset{128 * 6u};
+    auto filePath{"/sys/user/data/applications/settings/quotes.json"};
+    auto fileSize{676u};
+    auto fileOffset{128 * 3u};
     auto chunkSize{128 * 3u};
 
     SECTION("Create file context for file")
     {
         auto fileCtx = FileReadContext(filePath, fileSize, chunkSize, fileOffset);
 
-        REQUIRE(3 == fileCtx.expectedChunkInFile());
+        REQUIRE(2 == fileCtx.expectedChunkInFile());
 
-        REQUIRE(true == fileCtx.validateChunkRequest(3));
-        REQUIRE(false == fileCtx.validateChunkRequest(4));
+        REQUIRE(true == fileCtx.validateChunkRequest(2));
+        REQUIRE(false == fileCtx.validateChunkRequest(3));
 
-        REQUIRE(4 == fileCtx.totalChunksInFile());
+        REQUIRE(2 == fileCtx.totalChunksInFile());
 
         fileCtx.advanceFileOffset(fileSize - fileOffset);
         REQUIRE(true == fileCtx.reachedEOF());
