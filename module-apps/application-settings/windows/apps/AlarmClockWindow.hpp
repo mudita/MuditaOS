@@ -3,31 +3,30 @@
 
 #pragma once
 
-#include "BaseSettingsWindow.hpp"
-#include "OptionsWidgetMaker.hpp"
-#include <application-settings/models/AudioSettingsModel.hpp>
+#include <application-settings/windows/BaseSettingsWindow.hpp>
+#include <application-settings/windows/OptionsWidgetMaker.hpp>
+#include <application-settings/models/apps/AudioSettingsModel.hpp>
 
 namespace gui
 {
-    ///  @brief Phone (call) vibration and sound settings window
-    class PhoneWindow : public BaseSettingsWindow
+    ///  @brief AlarmClock vibration and volume settings
+    ///
+    class AlarmClockWindow : public BaseSettingsWindow
     {
       public:
         ///  Constructor
         ///  @app parent application pointer
-        ///  @audioModel audio settings model
-        explicit PhoneWindow(app::Application *app,
-                             std::unique_ptr<audio_settings::AbstractAudioSettingsModel> &&audioModel);
+        /// @audioModel audio settings model
+        explicit AlarmClockWindow(app::Application *app,
+                                  std::unique_ptr<audio_settings::AbstractAudioSettingsModel> &&audioModel);
 
       private:
-        ///  Switches phone vibration state
+        ///  Switches alarm vibration state
         void switchVibrationState();
 
-        ///  Switches phone sound state
-        void switchSoundState();
-
-        ///  Opens call ringtone selection window
-        void openRingtoneWindow();
+        ///  Sets the volume
+        ///  @param vol volume value
+        void setVolume(uint8_t vol);
 
         ///  Build the list of options to be drawn
         ///  @return list of options
@@ -38,9 +37,6 @@ namespace gui
 
         ///  Flag describing if phone vibration is enabled
         bool mVibrationsEnabled = false;
-
-        ///  Flag describing if phone sound is enabled
-        bool mSoundEnabled = true;
 
         /// Audio settings model
         std::unique_ptr<audio_settings::AbstractAudioSettingsModel> mAudioModel;
