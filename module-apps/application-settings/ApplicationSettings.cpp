@@ -30,6 +30,10 @@
 #include <application-settings/windows/display-keypad/QuotesOptionsWindow.hpp>
 #include <application-settings/windows/display-keypad/KeypadLightWindow.hpp>
 #include <application-settings/windows/display-keypad/InputLanguageWindow.hpp>
+#include <application-settings/windows/phone-modes/PhoneModesWindow.hpp>
+#include <application-settings/windows/phone-modes/DoNotDisturbWindow.hpp>
+#include <application-settings/windows/phone-modes/OfflineWindow.hpp>
+#include <application-settings/windows/phone-modes/ConnectionFrequencyWindow.hpp>
 #include <application-settings/windows/AppsAndToolsWindow.hpp>
 #include <application-settings/windows/NightshiftWindow.hpp>
 #include <application-settings/windows/PhoneWindow.hpp>
@@ -45,11 +49,7 @@
 #include <application-settings/windows/DateAndTimeMainWindow.hpp>
 #include <application-settings/windows/ChangeTimeZone.hpp>
 #include <application-settings/windows/ChangeDateAndTimeWindow.hpp>
-#include <application-settings/windows/PhoneModesWindow.hpp>
 #include <application-settings/windows/PINSettingsWindow.hpp>
-#include <application-settings/windows/DoNotDisturbWindow.hpp>
-#include <application-settings/windows/OfflineWindow.hpp>
-#include <application-settings/windows/ConnectionFrequencyWindow.hpp>
 #include <application-settings/windows/AboutYourPureWindow.hpp>
 #include <application-settings/windows/CertificationWindow.hpp>
 #include <application-settings/windows/TechnicalInformationWindow.hpp>
@@ -421,6 +421,20 @@ namespace app
             return std::make_unique<gui::InputLanguageWindow>(app);
         });
 
+        // Phone modes
+        windowsFactory.attach(gui::window::name::phone_modes, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::PhoneModesWindow>(app, static_cast<ApplicationSettings *>(app));
+        });
+        windowsFactory.attach(gui::window::name::do_not_disturb, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::DoNotDisturbWindow>(app, static_cast<ApplicationSettings *>(app));
+        });
+        windowsFactory.attach(gui::window::name::offline, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::OfflineWindow>(app, static_cast<ApplicationSettings *>(app));
+        });
+        windowsFactory.attach(gui::window::name::connection_frequency, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::ConnectionFrequencyWindow>(app, static_cast<ApplicationSettings *>(app));
+        });
+
         windowsFactory.attach(gui::window::name::dialog_settings, [](Application *app, const std::string &name) {
             return std::make_unique<gui::Dialog>(app, name);
         });
@@ -448,14 +462,12 @@ namespace app
         windowsFactory.attach(gui::window::name::sound_select, [](Application *app, const std::string &name) {
             return std::make_unique<gui::SoundSelectWindow>(app, name);
         });
-
         windowsFactory.attach(gui::window::name::autolock, [](Application *app, const std::string &name) {
             return std::make_unique<gui::AutolockWindow>(app, static_cast<ApplicationSettings *>(app));
         });
         windowsFactory.attach(gui::window::name::torch, [](Application *app, const std::string &name) {
             return std::make_unique<gui::TorchWindow>(app);
         });
-
         windowsFactory.attach(gui::window::name::quotes_dialog_yes_no, [](Application *app, const std::string &name) {
             return std::make_unique<gui::DialogYesNo>(app, name);
         });
@@ -507,19 +519,6 @@ namespace app
         });
         windowsFactory.attach(gui::window::name::dialog_retry, [](Application *app, const std::string &name) {
             return std::make_unique<gui::DialogRetry>(app, name);
-        });
-        windowsFactory.attach(gui::window::name::phone_modes, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::PhoneModesWindow>(
-                app, static_cast<ApplicationSettings *>(app), static_cast<ApplicationSettings *>(app));
-        });
-        windowsFactory.attach(gui::window::name::do_not_disturb, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::DoNotDisturbWindow>(app, static_cast<ApplicationSettings *>(app));
-        });
-        windowsFactory.attach(gui::window::name::offline, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::OfflineWindow>(app, static_cast<ApplicationSettings *>(app));
-        });
-        windowsFactory.attach(gui::window::name::connection_frequency, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::ConnectionFrequencyWindow>(app, static_cast<ApplicationSettings *>(app));
         });
 
         attachPopups({gui::popup::ID::Volume,
@@ -698,6 +697,11 @@ namespace app
     {
         bus.sendUnicast(std::make_shared<app::manager::GetAutoLockTimeoutRequest>(),
                         app::manager::ApplicationManager::ServiceName);
+    }
+
+    auto ApplicationSettings::getCurrentPhoneMode() const noexcept -> sys::phone_modes::PhoneMode
+    {
+        return phoneMode;
     }
 
     void ApplicationSettings::setAutoLockTime(std::chrono::seconds lockTime)

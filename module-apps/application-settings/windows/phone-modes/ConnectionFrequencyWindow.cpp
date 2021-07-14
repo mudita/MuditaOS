@@ -2,8 +2,9 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ConnectionFrequencyWindow.hpp"
-#include "application-settings/ApplicationSettings.hpp"
-#include "OptionSetting.hpp"
+
+#include <application-settings/ApplicationSettings.hpp>
+#include <OptionSetting.hpp>
 #include <i18n/i18n.hpp>
 
 namespace gui
@@ -11,15 +12,19 @@ namespace gui
     ConnectionFrequencyWindow::ConnectionFrequencyWindow(app::Application *app,
                                                          app::settingsInterface::ConnectionSettings *connectionSettings)
         : BaseSettingsWindow(app, gui::window::name::connection_frequency), connectionSettings(connectionSettings)
-    {}
+    {
+        setTitle(utils::translate("app_settings_title_connection_frequency"));
+    }
+
     void ConnectionFrequencyWindow::onBeforeShow(ShowMode m, SwitchData *d)
     {
-        rebuild();
+        refreshOptionsList(
+            std::distance(frequency.begin(),
+                          std::find(frequency.begin(), frequency.end(), connectionSettings->getConnectionFrequency())));
     }
     auto ConnectionFrequencyWindow::buildOptionsList() -> std::list<gui::Option>
     {
         std::list<gui::Option> optList;
-        std::vector<uint8_t> frequency{0, 15, 30, 45, 60};
 
         auto intervalText = [](uint8_t value) {
             if (value == 0) {
