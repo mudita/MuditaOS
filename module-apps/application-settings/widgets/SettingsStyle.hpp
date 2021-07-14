@@ -102,16 +102,15 @@ namespace style
                 }     // namespace passkey
             }         // namespace bluetooth
 
-            namespace offline
+            namespace phone_modes
             {
-                inline constexpr auto body_offset = 155;
+                inline constexpr auto body_offset = 155U;
 
-                inline constexpr auto bar_y = 396;
-                inline constexpr auto bar_h = 1;
-
-                inline constexpr auto description_y = 375;
-                inline constexpr auto description_h = 150;
-            } // namespace offline
+                inline constexpr auto description_top_padding      = 34;
+                inline constexpr auto description_vertical_padding = 10;
+                inline constexpr auto description_y                = 363U;
+                inline constexpr auto description_h                = 154U;
+            } // namespace phone_modes
 
             namespace sar
             {
@@ -143,11 +142,6 @@ namespace style
             inline constexpr auto Width  = style::listview::body_width_with_scroll;
             inline constexpr auto Height = style::window_height - Y - style::footer::height;
         } // namespace list
-
-        inline constexpr auto cross_x = 48;
-        inline constexpr auto cross_y = 55;
-        inline constexpr auto arrow_x = 30;
-        inline constexpr auto arrow_y = 62;
 
     } // namespace quotes::categories
 

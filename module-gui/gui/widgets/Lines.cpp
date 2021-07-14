@@ -38,6 +38,8 @@ namespace gui
     auto Lines::draw(BlockCursor &drawCursor, Length w, Length h, Position lineYPosition, Position lineXPosition)
         -> void
     {
+        Position initialTopPadding = lineYPosition;
+
         while (true) {
             auto textLine = gui::TextLine(drawCursor, w);
 
@@ -47,7 +49,7 @@ namespace gui
                 break;
             }
 
-            if (lineYPosition + textLine.height() > h) { // no more space for next line
+            if ((lineYPosition + textLine.height()) > (h + initialTopPadding)) { // no more space for next line
                 debug_text_lines("no more space for next text_line: %d + %" PRIu32 " > %" PRIu32,
                                  lineYPosition,
                                  textLine.height(),
@@ -74,6 +76,7 @@ namespace gui
                      Position lineXPosition,
                      unsigned int linesCount) -> void
     {
+        Position initialTopPadding = lineYPosition;
         Length initHeight = text->getTextFormat().getFont()->info.line_height;
 
         while (true) {
@@ -89,7 +92,7 @@ namespace gui
                 break;
             }
 
-            if (lineYPosition + initHeight > h) {
+            if ((lineYPosition + initHeight) > (h + initialTopPadding)) {
                 if ((textLine.length() == 0) && textLine.getLineEnd()) {
                     stopCondition = LinesDrawStop::OutOfText;
                     break;

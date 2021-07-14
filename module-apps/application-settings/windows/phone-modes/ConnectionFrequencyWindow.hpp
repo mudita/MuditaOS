@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "BaseSettingsWindow.hpp"
+#include <application-settings/windows/BaseSettingsWindow.hpp>
 
 namespace app::settingsInterface
 {
@@ -12,12 +12,6 @@ namespace app::settingsInterface
 
 namespace gui
 {
-
-    namespace window
-    {
-        inline constexpr auto connection_frequency_window = "ConnectionFrequency";
-    };
-
     class ConnectionFrequencyWindow : public BaseSettingsWindow
     {
       private:
@@ -25,6 +19,7 @@ namespace gui
         void rebuild() override;
         app::settingsInterface::ConnectionSettings *connectionSettings;
         void updateInterval(uint8_t value);
+        std::vector<uint8_t> frequency{0, 15, 30, 45, 60};
 
       public:
         ConnectionFrequencyWindow(app::Application *app,

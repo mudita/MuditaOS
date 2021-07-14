@@ -38,7 +38,11 @@ namespace gui::window::name
     inline constexpr auto keypad_light         = "KeypadLight";
     inline constexpr auto input_language       = "InputLanguage";
 
-    inline constexpr auto phone_modes    = "PhoneModes";
+    inline constexpr auto phone_modes          = "PhoneModes";
+    inline constexpr auto do_not_disturb       = "DoNotDisturb";
+    inline constexpr auto offline              = "Offline";
+    inline constexpr auto connection_frequency = "ConnectionFrequency";
+
     inline constexpr auto apps_and_tools = "AppsAndTools";
     inline constexpr auto security       = "Security";
     inline constexpr auto system         = "System";
@@ -56,9 +60,8 @@ namespace gui::window::name
     inline constexpr auto display_and_keypad = "DisplayAndKeypad";
     inline constexpr auto change_settings    = "ChangeSettings";
     inline constexpr auto pin_settings       = "PINSettings";
-
-    inline constexpr auto dialog_settings = "DialogSettings";
-    inline constexpr auto change_passcode = "ChangePasscode";
+    inline constexpr auto dialog_settings    = "DialogSettings";
+    inline constexpr auto change_passcode    = "ChangePasscode";
 
     inline constexpr auto languages             = "Languages";
     inline constexpr auto date_and_time         = "DateAndTime";
@@ -70,9 +73,5 @@ namespace gui::window::name
 
     inline constexpr auto change_date_and_time = "ChangeDateAndTime";
     inline constexpr auto change_time_zone     = "ChangeTimeZone";
-
-    inline constexpr auto do_not_disturb       = "DoNotDisturb";
-    inline constexpr auto offline              = "Offline";
-    inline constexpr auto connection_frequency = "ConnectionFrequency";
 
 } // namespace gui::window::name
