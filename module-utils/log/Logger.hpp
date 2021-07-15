@@ -11,6 +11,7 @@
 #include <map>
 #include <mutex.hpp>
 #include <string>
+#include <filesystem>
 
 namespace Log
 {
@@ -35,6 +36,7 @@ namespace Log
         auto log(logger_level level, const char *file, int line, const char *function, const char *fmt, va_list args)
             -> int;
         auto logAssert(const char *fmt, va_list args) -> int;
+        auto dumpToFile(std::filesystem::path logPath) -> int;
 
         static constexpr auto CRIT_STR = "CRIT";
         static constexpr auto IRQ_STR  = "IRQ";

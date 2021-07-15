@@ -109,12 +109,16 @@ class ServiceDesktop : public sys::Service
         return usbSecurityModel.get();
     }
 
+    auto requestLogsFlush() -> void;
+
   private:
     auto getSerialNumber() const -> std::string;
     std::unique_ptr<sdesktop::USBSecurityModel> usbSecurityModel;
     std::unique_ptr<settings::Settings> settings;
     sys::TimerHandle transferTimer;
     std::unique_ptr<sdesktop::bluetooth::BluetoothMessagesHandler> btMsgHandler;
+
+    static constexpr unsigned int DefaultLogFlushTimeoutInMs = 1000U;
 };
 
 namespace sys
