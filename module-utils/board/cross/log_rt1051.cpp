@@ -13,13 +13,6 @@
 /// - in critical seciton - return CRIT
 /// - in interrupt return - IRQ
 /// - else return thread name
-static inline const char *getTaskDesc()
-{
-    return xTaskGetCurrentTaskHandle() == nullptr
-               ? Log::Logger::CRIT_STR
-               : xPortIsInsideInterrupt() ? Log::Logger::IRQ_STR : pcTaskGetName(xTaskGetCurrentTaskHandle());
-}
-
 namespace Log
 {
     void Logger::addLogHeader(logger_level level, const char *file, int line, const char *function)
@@ -41,11 +34,6 @@ namespace Log
                                            function,
                                            line,
                                            logColors->resetColor.data());
-    }
-
-    bool Logger::filterLogs(logger_level level)
-    {
-        return getLogLevel(getTaskDesc()) <= level;
     }
 
     void Logger::logToDevice(const char *fmt, va_list args)
