@@ -6,6 +6,7 @@
 #include <gsl/util>
 #include "LockGuard.hpp"
 #include <Logger.hpp>
+#include <functional>
 #include "macros.h"
 
 namespace Log
@@ -19,12 +20,21 @@ namespace Log
                                                             {"ServiceFota", logger_level::LOGINFO},
                                                             {"ServiceEink", logger_level::LOGINFO},
                                                             {"ServiceDB", logger_level::LOGINFO},
+                                                            {"ServiceDesktop_w2", logger_level::LOGINFO},
+                                                            {"SysMgrService", logger_level::LOGERROR},
                                                             {CRIT_STR, logger_level::LOGTRACE},
                                                             {IRQ_STR, logger_level::LOGTRACE}};
     const char *Logger::levelNames[]                     = {"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"};
 
     Logger::Logger() : circularBuffer(circularBufferSize)
     {}
+
+    const char *Logger::getTaskDesc()
+    {
+        return xTaskGetCurrentTaskHandle() == nullptr
+                   ? Log::Logger::CRIT_STR
+                   : xPortIsInsideInterrupt() ? Log::Logger::IRQ_STR : pcTaskGetName(xTaskGetCurrentTaskHandle());
+    }
 
     void Logger::enableColors(bool enable)
     {
@@ -40,7 +50,24 @@ namespace Log
 
     auto Logger::getLogLevel(const std::string &name) -> logger_level
     {
+        LockGuard lock(mutex);
+        if (auto it = filtered.find(name); it != std::end(filtered)) {
+            return it->second;
+        }
+        filtered[name] = logger_level::LOGTRACE;
         return filtered[name];
+    }
+
+    bool Logger::setLogLevel(const std::string &name, logger_level level)
+    {
+        LockGuard lock(mutex);
+        filtered[name] = level;
+        return true;
+    }
+
+    bool Logger::filterLogs(logger_level level)
+    {
+        return getLogLevel(getTaskDesc()) <= level;
     }
 
     auto Logger::getLogs() -> std::string

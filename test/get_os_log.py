@@ -6,6 +6,7 @@ import sys
 import os.path
 import atexit
 
+from harness import log
 from harness.harness import Harness
 from harness.interface.error import TestError, Error
 from harness.api.developermode import PhoneModeLock
@@ -21,14 +22,13 @@ def set_passcode(harness: Harness, flag: bool):
 
 def main():
     if len(sys.argv) == 1:
-        print(
-            f'Please pass log storage directory as the parameter: \'python {sys.argv[0]} <log dir>\' ')
+        log.error(f'Please pass log storage directory as the parameter: \'python {sys.argv[0]} <log dir>\' ')
         raise TestError(Error.OTHER_ERROR)
 
     log_dir = str(sys.argv[1])
 
     if (not os.path.exists(log_dir)):
-        print(f'Log storage directory {log_dir} not found')
+        log.error(f'Log storage directory {log_dir} not found')
         raise TestError(Error.OTHER_ERROR)
 
     harness = Harness.from_detect()
@@ -43,5 +43,5 @@ if __name__ == "__main__":
     try:
         main()
     except TestError as err:
-        print(err)
+        log.error(err)
         exit(err.get_error_code())
