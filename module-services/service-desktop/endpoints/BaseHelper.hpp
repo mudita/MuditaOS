@@ -5,6 +5,7 @@
 
 #include <parser/HttpEnums.hpp>
 #include <endpoints/ResponseContext.hpp>
+#include <optional>
 
 namespace sys
 {
@@ -35,6 +36,24 @@ namespace parserFSM
       public:
         using ProcessResult = std::pair<sent, std::optional<endpoint::ResponseContext>>;
 
+        explicit BaseHelper(const std::string &name, sys::Service *p) : owner(p), p_name(name)
+        {}
+
+        /// generall processing function
+        ///
+        /// we should define processing functions, not copy switch cases
+        /// as we are super ambiguous how we should really handle responses
+        /// here we can either:
+        /// return true - to mark that we responded on this request
+        /// return false - and optionally respond that we didn't handle the request
+        /// pre and post processing is available on pre/post process method override
+        [[nodiscard]] auto process(http::Method method, Context &context) -> ProcessResult;
+
+        [[nodiscard]] auto name() const -> const std::string &
+        {
+            return p_name;
+        }
+
       protected:
         sys::Service *owner = nullptr;
         /// by default - result = not sent
@@ -50,18 +69,7 @@ namespace parserFSM
         /// post processing action - in case we want to do something after processing request
         virtual void postProcess(http::Method method, Context &context){};
 
-      public:
-        explicit BaseHelper(sys::Service *p) : owner(p)
-        {}
-
-        /// generall processing function
-        ///
-        /// we should define processing functions, not copy switch cases
-        /// as we are super ambiguous how we should really handle responses
-        /// here we can either:
-        /// return true - to mark that we responded on this request
-        /// return fale - and optionally respond that we didn't handle the request
-        /// pre and post processing is available on pre/post process method override
-        [[nodiscard]] auto process(http::Method method, Context &context) -> ProcessResult;
+      private:
+        std::string p_name;
     };
 }; // namespace parserFSM

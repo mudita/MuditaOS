@@ -58,7 +58,7 @@ extern "C" {
 #endif
 
 #include <unistd.h>
-#include <stdint.h>    
+#include <stdint.h>
 
 /*-----------------------------------------------------------
  * Port specific definitions.
@@ -149,7 +149,7 @@ extern void vPortExitCritical( void );
 
 #if configUSE_PORT_OPTIMISED_TASK_SELECTION == 1
 #error We are not supporting configUSE_PORT_OPTIMISED_TASK_SELECTION in the Linux Simulator.
-#endif 
+#endif
 
 
 /* Task function macros as described on the FreeRTOS.org WEB site. */
@@ -170,15 +170,17 @@ extern void vPortAddTaskHandle( void *pxTaskHandle );
 #define SIG_SUSPEND					SIGUSR1
 #define SIG_RESUME					SIGUSR2
 
-/* Enable the following hash defines to make use of the real-time tick where time progresses at real-time.*/ 
+/* Enable the following hash defines to make use of the real-time tick where time progresses at real-time.*/
 #define SIG_TICK					SIGALRM
-#define TIMER_TYPE					ITIMER_REAL 
+#define TIMER_TYPE					ITIMER_REAL
 /* Enable the following hash defines to make use of the process tick where time progresses only when the process is executing.
 #define SIG_TICK					SIGVTALRM
 #define TIMER_TYPE					ITIMER_VIRTUAL */
 /* Enable the following hash defines to make use of the profile tick where time progresses when the process or system calls are executing.
 #define SIG_TICK					SIGPROF
 #define TIMER_TYPE					ITIMER_PROF */
+
+#define xPortIsInsideInterrupt()			isIRQ()
 
 #ifdef __cplusplus
 }

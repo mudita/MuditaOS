@@ -28,7 +28,8 @@ class SecurityEndpoint : public parserFSM::Endpoint
 
   public:
     explicit SecurityEndpoint(sys::Service *ownerServicePtr)
-        : Endpoint(ownerServicePtr), helper(std::make_unique<parserFSM::SecurityEndpointHelper>(ownerServicePtr))
+        : Endpoint(ownerServicePtr),
+          helper(std::make_unique<parserFSM::SecurityEndpointHelper>("security", ownerServicePtr))
     {
         debugName = "SecurityEndpoint";
     }
