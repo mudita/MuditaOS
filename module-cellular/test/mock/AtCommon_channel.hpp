@@ -223,4 +223,133 @@ namespace at
             return result;
         }
     };
+
+    /// provides proper CPBS response
+    class CPBS_successChannel : public ChannelMock
+    {
+      public:
+        const std::string storage = "\"SM\"";
+        const std::string used    = "2";
+        const std::string total   = "500";
+        auto ResultMock() -> Result final
+        {
+            auto result     = Result();
+            result.code     = Result::Code::OK;
+            result.response = {"+CPBS: " + storage + "," + used + "," + total, "OK"};
+            return result;
+        }
+    };
+
+    /// provides invalid CPBS response
+    class CPBS_toManyTokens : public ChannelMock
+    {
+      public:
+        const std::string storage    = "\"SM\"";
+        const std::string used       = "2";
+        const std::string total      = "500";
+        const std::string additional = "500";
+
+        auto ResultMock() -> Result final
+        {
+            auto result     = Result();
+            result.code     = Result::Code::OK;
+            result.response = {"+CPBS: " + storage + "," + used + "," + total + "," + additional, "OK"};
+            return result;
+        }
+    };
+
+    /// provides invalid CPBS response
+    class CPBS_toLittleTokens : public ChannelMock
+    {
+      public:
+        const std::string storage = "\"SM\"";
+        const std::string used    = "2";
+
+        auto ResultMock() -> Result final
+        {
+            auto result     = Result();
+            result.code     = Result::Code::OK;
+            result.response = {"+CPBS: " + storage + "," + used, "OK"};
+            return result;
+        }
+    };
+
+    /// provides proper CPBR response
+    class CPBR_successChannel : public ChannelMock
+    {
+      public:
+        const std::string index1  = "1";
+        const std::string number1 = "123456789";
+        const std::string type1   = "161"; // proper type, national
+        const std::string text1   = "Mock1";
+
+        const std::string index2  = "2";
+        const std::string number2 = "+48123456789";
+        const std::string type2   = "145"; // proper type international
+        const std::string text2   = "Mock2";
+
+        auto ResultMock() -> Result final
+        {
+            auto result     = Result();
+            result.code     = Result::Code::OK;
+            result.response = {"+CPBR: " + index1 + "," + number1 + "," + type1 + "," + text1,
+                               "+CPBR: " + index2 + "," + number2 + "," + type2 + "," + text2,
+                               "OK"};
+            return result;
+        }
+    };
+
+    /// provides invalid CPBR response
+    class CPBR_toLittleTokens : public ChannelMock
+    {
+      public:
+        const std::string index1  = "1";
+        const std::string number1 = "1234";
+        const std::string type1   = "161"; // proper type, national
+
+        auto ResultMock() -> Result final
+        {
+            auto result     = Result();
+            result.code     = Result::Code::OK;
+            result.response = {"+CPBR: " + index1 + "," + number1 + "," + type1, "OK"};
+            return result;
+        }
+    };
+
+    /// provides invalid CPBR response
+    class CPBR_toManyTokens : public ChannelMock
+    {
+      public:
+        const std::string index1     = "1";
+        const std::string number1    = "1234";
+        const std::string type1      = "161"; // proper type, national
+        const std::string text1      = "Mock1";
+        const std::string additional = "500";
+
+        auto ResultMock() -> Result final
+        {
+            auto result     = Result();
+            result.code     = Result::Code::OK;
+            result.response = {"+CPBR: " + index1 + "," + number1 + "," + type1 + "," + text1, "," + additional, "OK"};
+            return result;
+        }
+    };
+
+    /// provides invalid CPBR response
+    class CPBR_invalidType : public ChannelMock
+    {
+      public:
+        const std::string index1  = "1";
+        const std::string number1 = "1234";
+        const std::string type1   = "7"; // invalid type
+        const std::string text1   = "Mock1";
+
+        auto ResultMock() -> Result final
+        {
+            auto result     = Result();
+            result.code     = Result::Code::OK;
+            result.response = {"+CPBR: " + index1 + "," + number1 + "," + type1 + "," + text1, "OK"};
+            return result;
+        }
+    };
 } // namespace at
