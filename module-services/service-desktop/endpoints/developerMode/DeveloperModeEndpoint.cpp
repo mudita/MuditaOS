@@ -9,6 +9,15 @@
 
 using namespace parserFSM;
 
+DeveloperModeEndpoint::DeveloperModeEndpoint(sys::Service *_ownerServicePtr) : Endpoint(_ownerServicePtr)
+{
+    debugName = "DeveloperModeEndpoint";
+    helpers.emplace_back(std::make_unique<DeveloperModeHelper>("base", ownerServicePtr));
+    helpers.emplace_back(std::make_unique<UI_Helper>("ui", ownerServicePtr));
+    helpers.emplace_back(std::make_unique<UpdateHelper>("update", ownerServicePtr));
+    helpers.emplace_back(std::make_unique<LogHelper>("log", ownerServicePtr));
+}
+
 auto DeveloperModeEndpoint::handle(Context &context) -> void
 {
     auto &p               = helperSwitcher(context);
@@ -34,11 +43,11 @@ auto DeveloperModeEndpoint::handle(Context &context) -> void
 
 auto DeveloperModeEndpoint::helperSwitcher(parserFSM::Context &ctx) -> parserFSM::BaseHelper &
 {
-    if (ctx.getBody()["ui"] == true) {
-        return *uiHelper;
+    std::string name = ctx.getBody().string_value();
+    if (auto s = std::find_if(
+            std::begin(helpers), std::end(helpers), [&name](const auto &val) { return val->name() == name; });
+        s != std::end(helpers)) {
+        return **s;
     }
-    if (ctx.getBody()["update"] == true) {
-        return *updateHelper;
-    }
-    return *helper;
+    return **helpers.begin();
 }
