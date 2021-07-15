@@ -81,6 +81,7 @@ set(BOARD_SOURCES ${BOARD_SOURCES}
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/keypad_backlight/keypad_backlight.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/eink_frontlight/eink_frontlight.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/light_sensor/light_sensor.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/rotary_encoder/rotary_encoder.cpp"
 
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/eeprom/eeprom.cpp"
 	CACHE INTERNAL ""

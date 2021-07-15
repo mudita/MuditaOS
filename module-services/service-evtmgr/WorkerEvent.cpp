@@ -178,6 +178,15 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
         handleMagnetometerEvent();
     }
 
+    if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueRotaryEncoder)) {
+        uint8_t notification;
+        if (!queue->Dequeue(&notification, 0)) {
+            return false;
+        }
+
+        handleRotaryEncoderEvent();
+    }
+
     if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueLightSensor)) {
         uint8_t notification;
         if (!queue->Dequeue(&notification, 0)) {
@@ -201,8 +210,20 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
 bool WorkerEvent::init(std::list<sys::WorkerQueueInfo> queuesList)
 {
     Worker::init(queuesList);
+    bsp::vibrator::init();
+    bsp::keyboard_Init(queues[static_cast<int32_t>(WorkerEventQueues::queueKeyboardIRQ)]->GetQueueHandle());
+    bsp::headset::Init(queues[static_cast<int32_t>(WorkerEventQueues::queueHeadsetIRQ)]->GetQueueHandle());
+    auto queueBatteryHandle = queues[static_cast<int32_t>(WorkerEventQueues::queueBattery)]->GetQueueHandle();
+    auto queueChargerDetect = queues[static_cast<int32_t>(WorkerEventQueues::queueChargerDetect)]->GetQueueHandle();
+    bsp::battery_charger::init(queueBatteryHandle, queueChargerDetect);
     bsp::rtc::init(queues[static_cast<int32_t>(WorkerEventQueues::queueRTC)]->GetQueueHandle());
+    bsp::cellular::init(queues[static_cast<int32_t>(WorkerEventQueues::queueCellular)]->GetQueueHandle());
+    bsp::magnetometer::init(queues[static_cast<int32_t>(WorkerEventQueues::queueMagnetometerIRQ)]->GetQueueHandle());
+    bsp::torch::init(queues[static_cast<int32_t>(WorkerEventQueues::queueTorch)]->GetQueueHandle());
+    bsp::keypad_backlight::init();
     bsp::eink_frontlight::init();
+    bsp::light_sensor::init(queues[static_cast<int32_t>(WorkerEventQueues::queueLightSensor)]->GetQueueHandle());
+    bsp::rotary_encoder::init(queues[static_cast<int32_t>(WorkerEventQueues::queueRotaryEncoder)]->GetQueueHandle());
 
     time_t timestamp;
     bsp::rtc::getCurrentTimestamp(&timestamp);
@@ -228,7 +249,16 @@ void WorkerEvent::init(std::list<sys::WorkerQueueInfo> queuesList, std::shared_p
 bool WorkerEvent::deinit(void)
 {
     Worker::deinit();
+    bsp::keyboard_Deinit();
+    bsp::headset::Deinit();
+    bsp::battery_charger::deinit();
+    bsp::torch::deinit();
+    bsp::keypad_backlight::deinit();
     bsp::eink_frontlight::deinit();
+    bsp::light_sensor::deinit();
+    bsp::vibrator::deinit();
+
+    battery_level_check::deinit();
 
     return true;
 }
@@ -242,7 +272,7 @@ void WorkerEvent::processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code)
 {
     auto message = std::make_shared<sevm::KbdMessage>();
 
-    message->key.keyCode = code;
+    message->key.key_code = code;
 
     switch (event) {
     case bsp::KeyEvents::Pressed:
@@ -250,7 +280,7 @@ void WorkerEvent::processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code)
             return;
         }
         message->key.state      = RawKey::State::Pressed;
-        message->key.timePress  = xTaskGetTickCount();
+        message->key.time_press = xTaskGetTickCount();
         lastPressed             = code;
         lastState               = event;
         break;
@@ -264,7 +294,7 @@ void WorkerEvent::processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code)
         lastState = bsp::KeyEvents::Released;
         {
             message->key.state        = RawKey::State::Released;
-            message->key.timeRelease  = xTaskGetTickCount();
+            message->key.time_release = xTaskGetTickCount();
         }
         break;
     case bsp::KeyEvents::Moved:
@@ -284,6 +314,14 @@ void WorkerEvent::handleMagnetometerEvent()
 {
     if (const auto &key = bsp::magnetometer::WorkerEventHandler(); key.has_value()) {
         LOG_DEBUG("magneto IRQ handler: %s", c_str(*key));
+        processKeyEvent(bsp::KeyEvents::Moved, *key);
+    }
+}
+
+void WorkerEvent::handleRotaryEncoderEvent()
+{
+    if (const auto &key = bsp::rotary_encoder::WorkerEventHandler(); key.has_value()) {
+        LOG_DEBUG("rotary_encoder handler: %s", c_str(*key));
         processKeyEvent(bsp::KeyEvents::Moved, *key);
     }
 }

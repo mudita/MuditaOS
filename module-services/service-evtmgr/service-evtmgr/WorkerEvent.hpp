@@ -42,7 +42,8 @@ enum class WorkerEventQueues
     queueMagnetometerNotify,
     queueTorch,
     queueLightSensor,
-    queueChargerDetect
+    queueChargerDetect,
+    queueRotaryEncoder
 };
 
 class WorkerEvent : public sys::Worker
@@ -95,4 +96,5 @@ class WorkerEvent : public sys::Worker
     void requestSliderPositionRead();
     void handleMagnetometerEvent();
     void checkBatteryChargerInterrupts();
+    void handleRotaryEncoderEvent();
 };
