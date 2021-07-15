@@ -24,6 +24,7 @@
 #include <bsp/torch/torch.hpp>
 #include <bsp/battery-charger/battery_charger.hpp>
 #include <bsp/keyboard/key_codes.hpp>
+#include <bsp/rotary_encoder/rotary_encoder.hpp>
 #include <log.hpp>
 #include <Logger.hpp>
 #include <service-appmgr/Controller.hpp>
@@ -83,6 +84,7 @@ EventManager::~EventManager()
         EventWorker->close();
     }
 }
+
 
 // Invoked upon receiving data message
 sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
@@ -356,7 +358,7 @@ void EventManager::handleKeyEvent(sys::Message *msg)
     message->key    = kbdMessage->key;
 
     if (message->key.state == RawKey::State::Pressed) {
-        const auto code = message->key.keyCode;
+        const auto code = message->key.key_code;
         if (code == bsp::KeyCodes::FnRight) {
             bus.sendUnicast(message, service::name::system_manager);
         }
@@ -377,8 +379,7 @@ void EventManager::handleKeyEvent(sys::Message *msg)
 
 void EventManager::handleKeyMoveEvent(RawKey key)
 {
-    if (isSliderKeyCode(key.keyCode)) {
-        LOG_INFO("Slider position: %s", magic_enum::enum_name(key.keyCode).data());
+    if (isSliderKeyCode(key.key_code)) {
         const auto mode = sys::SystemManager::translateSliderState(key);
         bus.sendUnicast(std::make_shared<sys::PhoneModeRequest>(mode), service::name::system_manager);
     }
