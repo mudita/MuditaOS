@@ -38,9 +38,28 @@ static bool isWritable(const fs::path &file)
     return static_cast<bool>(sf);
 }
 
+auto FilesystemEndpoint::requestLogsFlush() const -> void
+{
+    auto owner = dynamic_cast<ServiceDesktop *>(ownerServicePtr);
+    if (owner) {
+        owner->requestLogsFlush();
+    }
+}
+
 auto FilesystemEndpoint::startGetFile(Context &context) const -> sys::ReturnCodes
 {
     std::filesystem::path filePath = context.getBody()[parserFSM::json::fileName].string_value();
+
+    try {
+        requestLogsFlush();
+    }
+    catch (const std::runtime_error &e) {
+        LOG_ERROR("Logs flush exception: %s", e.what());
+
+        context.setResponseStatus(parserFSM::http::Code::InternalServerError);
+        context.setResponseBody(json11::Json::object({{json::reason, std::string(e.what())}}));
+        return sys::ReturnCodes::Failure;
+    }
 
     if (!std::filesystem::exists(filePath)) {
         LOG_ERROR("file not found");
