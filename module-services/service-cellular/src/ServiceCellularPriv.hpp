@@ -8,11 +8,13 @@
 
 #include "SimCard.hpp"
 #include "NetworkTime.hpp"
+#include "SimContacts.hpp"
 
 namespace cellular::internal
 {
     using service::NetworkTime;
     using service::SimCard;
+    using service::SimContacts;
     using service::State;
 
     class ServiceCellularPriv
@@ -22,7 +24,7 @@ namespace cellular::internal
         std::unique_ptr<SimCard> simCard;
         std::unique_ptr<State> state;
         std::unique_ptr<NetworkTime> networkTime;
-
+        std::unique_ptr<SimContacts> simContacts;
         State::PowerState nextPowerState = State::PowerState::Off;
 
       public:
@@ -30,6 +32,7 @@ namespace cellular::internal
 
         void connectSimCard();
         void connectNetworkTime();
+        void connectSimContacts();
 
         void requestNetworkTimeSettings();
 
