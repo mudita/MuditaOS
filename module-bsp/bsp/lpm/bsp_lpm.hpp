@@ -35,6 +35,7 @@ namespace bsp
         virtual int32_t Reboot(RebootType reason) = 0;
 
         virtual void SetCpuFrequency(CpuFrequencyHz freq) = 0;
+        virtual void SetHighestCoreVoltage() = 0;
         [[nodiscard]] CpuFrequencyHz GetCurrentFrequencyLevel() const noexcept;
         [[nodiscard]] virtual uint32_t GetCpuFrequency() const noexcept = 0;
 
