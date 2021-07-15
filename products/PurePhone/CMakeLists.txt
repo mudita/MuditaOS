@@ -90,6 +90,9 @@ add_image(PurePhone)
 include(AddHexTarget)
 add_hex_target(PurePhone)
 
+include(AddVersionJson)
+add_version_json(PurePhone)
+
 add_standalone_image(PurePhone)
 add_update_package(PurePhone)
 
