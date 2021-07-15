@@ -3,6 +3,7 @@ message( "${PROJECT_NAME}  ${CMAKE_CURRENT_LIST_DIR}" )
 
 set(SOURCES
     endpoints/BaseHelper.cpp
+    endpoints/Context.cpp
     endpoints/backup/BackupEndpoint.cpp
     endpoints/backup/BackupRestore.cpp
     endpoints/bluetooth/BluetoothEndpoint.cpp
@@ -17,6 +18,7 @@ set(SOURCES
     endpoints/developerMode/DeveloperModeHelper.cpp
     endpoints/developerMode/Mode/UI_Helper.cpp
     endpoints/developerMode/Mode/UpdateHelper.cpp
+    endpoints/developerMode/Mode/LogHelper.cpp
     endpoints/developerMode/event/DomRequest.cpp
     endpoints/developerMode/event/ATRequest.cpp
     endpoints/deviceInfo/DeviceInfoEndpoint.cpp

@@ -14,7 +14,7 @@ namespace parserFSM
     {
 
       public:
-        explicit UpdateHelper(sys::Service *p) : BaseHelper(p)
+        explicit UpdateHelper(const std::string &name, sys::Service *p) : BaseHelper(name, p)
         {}
 
         auto processPost(Context &context) -> ProcessResult final;

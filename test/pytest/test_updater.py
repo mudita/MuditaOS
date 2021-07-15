@@ -33,6 +33,8 @@ def disable_some_logs(harness: Harness):
 def test_update(harness: Harness):
     filename = "update.tar"
 
+    disable_some_logs(harness)
+
     log.info(get_version(harness))
     PhoneModeLock(False).run(harness)
     put_file(harness, filename, "/sys/user/")

@@ -14,7 +14,7 @@ namespace parserFSM
     {
 
       public:
-        explicit UI_Helper(sys::Service *p) : BaseHelper(p)
+        explicit UI_Helper(const std::string &name, sys::Service *p) : BaseHelper(name, p)
         {}
 
         /// returns DOM async
