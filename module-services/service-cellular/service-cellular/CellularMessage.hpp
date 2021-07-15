@@ -914,4 +914,34 @@ namespace cellular
         std::vector<std::string> data;
     };
 
+    class GetSimContactsRequest : public sys::DataMessage
+    {
+      public:
+        GetSimContactsRequest() : sys::DataMessage(MessageType::MessageTypeUninitialized){};
+    };
+
+    struct SimContact
+    {
+        std::string name;
+        std::string number;
+        SimContact(const std::string &name, const std::string &number) : name(name), number(number)
+        {}
+    };
+
+    class GetSimContactsResponse : public sys::ResponseMessage
+    {
+      public:
+        explicit GetSimContactsResponse(std::shared_ptr<std::vector<SimContact>> contacts)
+            : sys::ResponseMessage(sys::ReturnCodes::Success), contacts(contacts)
+        {}
+        GetSimContactsResponse() : sys::ResponseMessage(sys::ReturnCodes::Failure)
+        {}
+        auto getContacts() -> std::shared_ptr<std::vector<SimContact>>
+        {
+            return contacts;
+        }
+
+      private:
+        std::shared_ptr<std::vector<SimContact>> contacts;
+    };
 } // namespace cellular

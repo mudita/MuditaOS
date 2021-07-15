@@ -18,7 +18,7 @@ namespace cellular::internal
 {
     ServiceCellularPriv::ServiceCellularPriv(ServiceCellular *owner)
         : owner{owner}, simCard{std::make_unique<SimCard>()}, state{std::make_unique<State>(owner)},
-          networkTime{std::make_unique<NetworkTime>()}
+          networkTime{std::make_unique<NetworkTime>()}, simContacts{std::make_unique<SimContacts>()}
     {
         initSimCard();
     }
@@ -113,6 +113,18 @@ namespace cellular::internal
     void ServiceCellularPriv::requestNetworkTimeSettings()
     {
         owner->bus.sendUnicast(networkTime->createSettingsRequest(), service_time);
+    }
+
+    void ServiceCellularPriv::connectSimContacts()
+    {
+        owner->connect(typeid(cellular::GetSimContactsRequest), [&](sys::Message *request) -> sys::MessagePointer {
+            std::vector<cellular::SimContact> contacts;
+            if (simContacts->getContacts(contacts)) {
+                return std::make_shared<cellular::GetSimContactsResponse>(
+                    std::make_shared<std::vector<cellular::SimContact>>(contacts));
+            }
+            return std::make_shared<cellular::GetSimContactsResponse>();
+        });
     }
 
 } // namespace cellular::internal

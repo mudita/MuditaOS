@@ -10,6 +10,8 @@
 #include <at/cmd/CSCA.hpp>
 #include <at/cmd/QECCNUM.hpp>
 #include <at/cmd/CFUN.hpp>
+#include <at/cmd/CPBS.hpp>
+#include <at/cmd/CPBR.hpp>
 
 #include "mock/AtCommon_channel.hpp"
 #include "PhoneNumber.hpp"
@@ -416,6 +418,193 @@ TEST_CASE("CFUN set data")
         constexpr auto expectedResult = "AT+CFUN=4,1";
         cmd.setModifier(at::cmd::Modifier::Set);
         cmd.set(at::cfun::Functionality::DisableRF, at::cfun::Reset::ResetTheME);
+        REQUIRE(cmd.getCmd() == expectedResult);
+    }
+}
+
+TEST_CASE("CPBS parser")
+{
+    SECTION("Empty data")
+    {
+        at::cmd::CPBS cmd;
+        at::Result result;
+        auto response = cmd.parse(result);
+        REQUIRE(!response);
+    }
+
+    SECTION("Failing channel")
+    {
+        at::cmd::CPBS cmd;
+        at::FailingChannel channel;
+        auto base     = channel.cmd(cmd);
+        auto response = cmd.parse(base);
+        REQUIRE(!response);
+        REQUIRE(response.code == at::Result::Code::ERROR);
+    }
+
+    SECTION("Success - valid token")
+    {
+        at::cmd::CPBS cmd;
+        at::CPBS_successChannel channel;
+        auto base     = channel.cmd(cmd);
+        auto response = cmd.parse(base);
+        REQUIRE(response.storage == "\"SM\"");
+        REQUIRE(response.used == 2);
+        REQUIRE(response.total == 500);
+    }
+
+    SECTION("Failed - to little tokens")
+    {
+        at::cmd::CPBS cmd;
+        at::CPBS_toLittleTokens channel;
+        auto base     = channel.cmd(cmd);
+        auto response = cmd.parse(base);
+        REQUIRE(!response);
+        REQUIRE(response.code == at::Result::Code::PARSING_ERROR);
+    }
+
+    SECTION("Failed - to many tokens")
+    {
+        at::cmd::CPBS cmd;
+        at::CPBS_toManyTokens channel;
+        auto base     = channel.cmd(cmd);
+        auto response = cmd.parse(base);
+        REQUIRE(!response);
+        REQUIRE(response.code == at::Result::Code::PARSING_ERROR);
+    }
+}
+
+TEST_CASE("CPBS set data")
+{
+    at::cmd::CPBS cmd;
+    SECTION("None modifier set")
+    {
+        constexpr auto expectedResult = "AT+CPBS";
+        REQUIRE(cmd.getCmd() == expectedResult);
+    }
+
+    SECTION("Get modifier set")
+    {
+        constexpr auto expectedResult = "AT+CPBS?";
+        cmd.setModifier(at::cmd::Modifier::Get);
+        REQUIRE(cmd.getCmd() == expectedResult);
+    }
+
+    SECTION("Set modifier set")
+    {
+        constexpr auto expectedResult = "AT+CPBS=";
+        cmd.setModifier(at::cmd::Modifier::Set);
+        REQUIRE(cmd.getCmd() == expectedResult);
+    }
+
+    SECTION("Set commnad")
+    {
+        constexpr auto expectedResult = "AT+CPBS=\"SM\"";
+        cmd                           = at::cmd::CPBS(at::cmd::Modifier::Set);
+        cmd.set();
+        REQUIRE(cmd.getCmd() == expectedResult);
+    }
+}
+
+TEST_CASE("CPBR parser")
+{
+    SECTION("Empty data")
+    {
+        at::cmd::CPBR cmd;
+        at::Result result;
+        auto response = cmd.parse(result);
+        REQUIRE(!response);
+    }
+
+    SECTION("Failing channel")
+    {
+        at::cmd::CPBR cmd;
+        at::FailingChannel channel;
+        auto base     = channel.cmd(cmd);
+        auto response = cmd.parse(base);
+        REQUIRE(!response);
+        REQUIRE(response.code == at::Result::Code::ERROR);
+    }
+
+    SECTION("Success - valid token")
+    {
+        at::cmd::CPBR cmd;
+        at::CPBR_successChannel channel;
+        auto base     = channel.cmd(cmd);
+        auto response = cmd.parse(base);
+
+        REQUIRE(response.contacts.size() == 2);
+
+        REQUIRE(response.contacts[0].index == 1);
+        REQUIRE(response.contacts[0].number == "123456789");
+        REQUIRE(response.contacts[0].type == at::cpbr::ContactType::National);
+        REQUIRE(response.contacts[0].name == "Mock1");
+
+        REQUIRE(response.contacts[1].index == 2);
+        REQUIRE(response.contacts[1].number == "+48123456789");
+        REQUIRE(response.contacts[1].type == at::cpbr::ContactType::International);
+        REQUIRE(response.contacts[1].name == "Mock2");
+    }
+
+    SECTION("Failed - to little tokens")
+    {
+        at::cmd::CPBR cmd;
+        at::CPBR_toLittleTokens channel;
+        auto base     = channel.cmd(cmd);
+        auto response = cmd.parse(base);
+        REQUIRE(!response);
+        REQUIRE(response.code == at::Result::Code::PARSING_ERROR);
+    }
+
+    SECTION("Failed - to many tokens")
+    {
+        at::cmd::CPBR cmd;
+        at::CPBR_toManyTokens channel;
+        auto base     = channel.cmd(cmd);
+        auto response = cmd.parse(base);
+        REQUIRE(!response);
+        REQUIRE(response.code == at::Result::Code::PARSING_ERROR);
+    }
+
+    SECTION("Failed - invalid type")
+    {
+        at::cmd::CPBR cmd;
+        at::CPBR_invalidType channel;
+        auto base     = channel.cmd(cmd);
+        auto response = cmd.parse(base);
+        REQUIRE(!response);
+        REQUIRE(response.code == at::Result::Code::PARSING_ERROR);
+    }
+}
+
+TEST_CASE("CPBR set data")
+{
+    at::cmd::CPBR cmd;
+    SECTION("None modifier set")
+    {
+        constexpr auto expectedResult = "AT+CPBR";
+        REQUIRE(cmd.getCmd() == expectedResult);
+    }
+
+    SECTION("Get modifier set")
+    {
+        constexpr auto expectedResult = "AT+CPBR?";
+        cmd.setModifier(at::cmd::Modifier::Get);
+        REQUIRE(cmd.getCmd() == expectedResult);
+    }
+
+    SECTION("Set modifier set")
+    {
+        constexpr auto expectedResult = "AT+CPBR=";
+        cmd.setModifier(at::cmd::Modifier::Set);
+        REQUIRE(cmd.getCmd() == expectedResult);
+    }
+
+    SECTION("Set commnad")
+    {
+        constexpr auto expectedResult = "AT+CPBR=1,5";
+        cmd                           = at::cmd::CPBR(at::cmd::Modifier::Set);
+        cmd.setSimContactsReadRange(1, 5);
         REQUIRE(cmd.getCmd() == expectedResult);
     }
 }
