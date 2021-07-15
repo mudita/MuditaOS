@@ -36,6 +36,7 @@ target_compile_definitions(application-antenna
 target_link_libraries(application-antenna
     PRIVATE
         apps-common
+        service-antenna
         service-cellular
 )
 
