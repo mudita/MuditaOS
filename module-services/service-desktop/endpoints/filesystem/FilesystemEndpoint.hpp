@@ -31,5 +31,7 @@ class FilesystemEndpoint : public parserFSM::Endpoint
     auto startSendFile(parserFSM::Context &context) const -> sys::ReturnCodes;
     auto sendFileChunk(parserFSM::Context &context) const -> sys::ReturnCodes;
 
+    auto requestLogsFlush() const -> void;
+
     FileOperations &fileOps;
 };

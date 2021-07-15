@@ -118,4 +118,42 @@ namespace Log
 
         return loggerBufferCurrentPos;
     }
+
+    /// @param logPath: file path to store the log
+    /// @return: < 0 - error occured during log flush
+    /// @return:   0 - log flush did not happen
+    /// @return:   1 - log flush successflul
+    auto Logger::dumpToFile(std::filesystem::path logPath) -> int
+    {
+        int status = 0;
+        const bool dumpLog =
+            !(std::filesystem::exists(logPath) && std::filesystem::file_size(logPath) > MAX_LOG_FILE_SIZE);
+        if (!dumpLog) {
+            LOG_DEBUG("Flush skipped");
+            return 0;
+        }
+
+        {
+            status = 1;
+
+            const auto &logs = getLogs();
+
+            LockGuard lock(mutex);
+            std::fstream logFile(logPath, std::fstream::out | std::fstream::app);
+
+            if (!logFile.good()) {
+                status = -EIO;
+            }
+
+            logFile.write(logs.data(), logs.size());
+            if (logFile.bad()) {
+                status = -EIO;
+            }
+        }
+
+        LOG_DEBUG("Flush ended with status: %d", status);
+
+        return status;
+    }
+
 }; // namespace Log

@@ -79,7 +79,10 @@ class EventManager : public sys::Service
 
     sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final;
 
-    void dumpLogsToFile();
+    /// @return: < 0 - An error occurred during log flush
+    /// @return:   0 - Log file reached max size
+    /// @return:   1 - Logs flushed successflully
+    int dumpLogsToFile();
 
     /**
      * @brief Sends request to application manager to switch from current application to specific window in application
