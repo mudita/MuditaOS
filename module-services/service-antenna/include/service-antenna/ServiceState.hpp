@@ -3,9 +3,7 @@
 
 #pragma once
 
-#include "Service/Service.hpp"
-#include "Service/Message.hpp"
-#include "MessageType.hpp"
+#include <Service/Service.hpp>
 
 namespace state
 {

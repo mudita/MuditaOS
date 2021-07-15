@@ -1,25 +1,21 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "service-antenna/ServiceAntenna.hpp"
-#include "service-antenna/AntennaMessage.hpp"
-#include "service-antenna/AntennaServiceAPI.hpp"
-#include "service-antenna/ServiceState.hpp"
-
-#include <service-appmgr/model/ApplicationManager.hpp>
+#include <AntennaMessage.hpp>
+#include <AntennaServiceAPI.hpp>
+#include <ServiceAntenna.hpp>
+#include <ServiceState.hpp>
 
 #include <at/response.hpp>
-
-#include <log.hpp>
 #include <EventStore.hpp>
-
+#include <log.hpp>
 #include <MessageType.hpp>
-#include <projdefs.h>
 #include <module-sys/Timers/TimerFactory.hpp>
-#include <service-cellular/State.hpp>
-#include <service-cellular/CellularServiceAPI.hpp>
+#include <projdefs.h>
+#include <service-appmgr/model/ApplicationManager.hpp>
 #include <service-cellular/CellularMessage.hpp>
-
+#include <service-cellular/CellularServiceAPI.hpp>
+#include <service-cellular/State.hpp>
 #include <ticks.hpp>
 
 #include <algorithm>
