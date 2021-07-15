@@ -43,7 +43,6 @@ namespace gui
             optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
                 device.name,
                 [=](gui::Item & /*unused*/) {
-                    LOG_DEBUG("Device: %s", device.name.c_str());
                     auto pairingDeviceData = std::make_unique<PairingDeviceData>(device);
                     application->switchWindow(gui::window::name::all_devices, std::move(pairingDeviceData));
                     bluetoothSettingsModel->requestDevicePair(bd_addr_to_str(device.address));
