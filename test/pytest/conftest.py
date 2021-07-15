@@ -16,6 +16,7 @@ from harness import utils
 from harness.interface.error import TestError, Error
 from harness.interface.CDCSerial import Keytype, CDCSerial as serial
 from harness.interface.defs import key_codes
+from harness.rt_harness_discovery import get_rt1051_harness
 
 
 simulator_port = 'simulator'
@@ -68,16 +69,8 @@ def harness(request):
     try:
         if port_name is None:
             log.warning("no port provided! trying automatic detection")
-            harness = None
+            harness = get_rt1051_harness(TIMEOUT)
 
-            with utils.Timeout.limit(seconds=TIMEOUT):
-                while not harness:
-                    try:
-                        harness = Harness.from_detect()
-                    except TestError as e:
-                        if e.get_error_code() == Error.PORT_NOT_FOUND:
-                            log.info(f"waiting for a serial port… ({TIMEOUT- int(time.time() - timeout_started)})")
-                            time.sleep(RETRY_EVERY_SECONDS)
         else:
             assert '/dev' in port_name or simulator_port in port_name
 
