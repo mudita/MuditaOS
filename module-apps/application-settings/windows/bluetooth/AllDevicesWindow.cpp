@@ -123,7 +123,6 @@ namespace gui
             optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
                 device.name,
                 [=](gui::Item & /*item*/) {
-                    LOG_DEBUG("Device: %s", device.name.c_str());
                     return handleDeviceAction(newDevice);
                 },
                 [=](gui::Item &item) {
