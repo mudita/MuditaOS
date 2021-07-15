@@ -298,6 +298,7 @@ void ServiceCellular::registerMessageHandlers()
 
     priv->connectSimCard();
     priv->connectNetworkTime();
+    priv->connectSimContacts();
 
     connect(typeid(CellularStartOperatorsScanMessage), [&](sys::Message *request) -> sys::MessagePointer {
         auto msg = static_cast<CellularStartOperatorsScanMessage *>(request);
@@ -383,6 +384,7 @@ void ServiceCellular::registerMessageHandlers()
         if (typeid(*msg->event.get()) == typeid(sdesktop::developerMode::CellularHotStartEvent)) {
             priv->simCard->setChannel(nullptr);
             priv->networkTime->setChannel(nullptr);
+            priv->simContacts->setChannel(nullptr);
 
             cmux->closeChannels();
             ///> change state - simulate hot start
@@ -853,6 +855,7 @@ bool ServiceCellular::handle_audio_conf_procedure()
 
             priv->simCard->setChannel(cmux->get(CellularMux::Channel::Commands));
             priv->networkTime->setChannel(cmux->get(CellularMux::Channel::Commands));
+            priv->simContacts->setChannel(cmux->get(CellularMux::Channel::Commands));
             // open channel - notifications
             DLCChannel *notificationsChannel = cmux->get(CellularMux::Channel::Notifications);
             if (notificationsChannel != nullptr) {
@@ -1898,7 +1901,6 @@ auto ServiceCellular::handleCellularCallRequestMessage(CellularCallRequestMessag
     if (channel == nullptr) {
         return std::make_shared<CellularResponseMessage>(false);
     }
-
     cellular::RequestFactory factory(
         msg->number.getEntered(), *channel, msg->callMode, Store::GSM::get()->simCardInserted());
 
