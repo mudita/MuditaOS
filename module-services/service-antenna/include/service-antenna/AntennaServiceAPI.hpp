@@ -5,9 +5,6 @@
 
 #include "ServiceAntenna.hpp"
 
-#include <MessageType.hpp>
-#include <Service/Message.hpp>
-
 namespace sys
 {
     class Service;
@@ -15,7 +12,6 @@ namespace sys
 
 namespace AntennaServiceAPI
 {
-
     void CSQChange(sys::Service *serv);
     bool LockRequest(sys::Service *serv, antenna::lockState request);
     bool GetLockState(sys::Service *serv, antenna::lockState &state);

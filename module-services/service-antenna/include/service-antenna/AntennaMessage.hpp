@@ -5,9 +5,6 @@
 
 #include "ServiceAntenna.hpp"
 
-#include <MessageType.hpp>
-#include <Service/Message.hpp>
-
 class AntennaLockRequestMessage : public sys::DataMessage
 {
   public:

@@ -3,27 +3,12 @@
 
 #pragma once
 
+#include "ServiceState.hpp"
+
 #include <bsp/cellular/bsp_cellular.hpp>
-#include <MessageType.hpp>
-#include <Service/Common.hpp>
-#include <Service/Message.hpp>
-#include <Service/Service.hpp>
-#include <Service/Worker.hpp>
 #include <Timers/TimerHandle.hpp>
 #include <service-db/DBServiceName.hpp>
 #include <module-sys/PhoneModes/Observer.hpp>
-
-#include <algorithm>
-#include <cassert>
-#include <cstdint>
-#include <memory>
-
-#include "ServiceState.hpp"
-
-namespace state
-{
-    template <typename T> class State;
-} // namespace state
 
 namespace service::name
 {
