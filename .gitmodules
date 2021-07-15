@@ -1,95 +1,95 @@
-[submodule "module-lwip/lib/lwip"]
+[submodule "lwip"]
 	path = module-lwip/lib/lwip
 	url = ../lwip.git
 	shallow = true
-[submodule "module-utils/microtar"]
+[submodule "microtar"]
 	path = third-party/microtar/src
 	url = ../microtar.git
-[submodule "third-party/segger"]
+[submodule "segger"]
 	path = third-party/segger
 	url = ../segger-utils.git
-[submodule "module-utils/protobuf"]
+[submodule "protobuf"]
 	path = third-party/protobuf/src
 	url = ../protobuf.git
 	branch = rt1051
 	shallow = true
-[submodule "third-party/libphonenumber"]
+[submodule "libphonenumber"]
 	path = third-party/libphonenumber/src
 	url = ../libphonenumber.git
 	branch = rt1051
 	shallow = true
-[submodule "test/googletest"]
+[submodule "googletest"]
 	path = test/googletest
 	url = https://github.com/google/googletest
 	branch = 703bd9caab50b139428cea1aaff9974ebee5742e
-[submodule "test/Catch2"]
+[submodule "Catch2"]
 	path = test/Catch2
 	url = https://github.com/catchorg/Catch2
-[submodule "third-party/date"]
+[submodule "date"]
 	path = third-party/date
 	url = ../date.git
-[submodule "module-utils/taglib"]
+[submodule "taglib"]
 	path = third-party/taglib
 	url = ../taglib.git
 	branch = rt1051
-[submodule "module-bluetooth/lib/btstack"]
+[submodule "btstack"]
 	path = module-bluetooth/lib/btstack
 	url = ../btstack.git
-[submodule "module-utils/pugixml"]
+[submodule "pugixml"]
 	path = third-party/pugixml
 	url = ../pugixml.git
-[submodule "module-utils/magic_enum"]
+[submodule "magic_enum"]
 	path = third-party/magic_enum
 	url = https://github.com/Neargye/magic_enum.git
-[submodule "module-utils/tinyexpr"]
+[submodule "tinyexpr"]
 	path = third-party/tinyexpr/src
 	url = https://github.com/codeplea/tinyexpr.git
-[submodule "module-vfs/thirdparty/fatfs"]
+[submodule "fatfs"]
 	path = third-party/fatfs/src
 	url = ../fatfs.git
-[submodule "host-tools/littlefs-fuse/lfsfuse"]
+[submodule "lfsfuse"]
 	path = host-tools/littlefs-fuse/lfsfuse
 	url = https://github.com/littlefs-project/littlefs-fuse.git
-[submodule "third-party/sml"]
+[submodule "sml"]
 	path = third-party/sml/src
 	url = https://github.com/boost-ext/sml
-[submodule "tools/misc"]
+[submodule "misc"]
 	path = tools/misc
 	url = ../misc-tools.git
-[submodule "test/harness"]
+[submodule "harness"]
 	path = test/harness
 	url = ../QAMuditaHarness.git
 	shallow = true
-[submodule "third-party/CrashDebug"]
+[submodule "CrashDebug"]
 	path = third-party/CrashDebug/src
 	url = https://github.com/adamgreen/CrashDebug.git
-[submodule "third-party/minimp3/minimp3"]
+[submodule "minimp3"]
 	path = third-party/minimp3/minimp3
 	url = ../minimp3.git
 	branch = RT1051
-[submodule "third-party/parallel-hashmap/src"]
+[submodule "parallel-hashmap"]
 	path = third-party/parallel-hashmap/src
 	url = https://github.com/greg7mdp/parallel-hashmap.git
-[submodule "third-party/littlefs/src"]
+[submodule "littlefs"]
 	path = third-party/littlefs/src
 	url = https://github.com/littlefs-project/littlefs.git
-[submodule "third-party/gsl"]
+[submodule "gsl"]
 	path = third-party/gsl
 	url = https://github.com/microsoft/GSL.git
-[submodule "third-party/re2/src"]
+[submodule "re2"]
 	path = third-party/re2/src
 	url = ../re2.git
 	branch = rt1051
-[submodule "third-party/utz/src/utz"]
+[submodule "utz"]
 	path = third-party/utz/src/utz
 	url = https://github.com/mudita/utz.git
-[submodule "third-party/base64/src"]
+[submodule "base64"]
 	path = third-party/base64/src
 	url = https://github.com/rafagafe/base64.git
-[submodule "third-party/hash-library/src"]
+[submodule "hash-library"]
 	path = third-party/hash-library/src
 	url = https://github.com/mudita/hash-library.git
 	branch = rt1051
-[submodule "third-party/usb_stack"]
+[submodule "usb_stack"]
 	path = third-party/usb_stack
 	url = ../usb_stack.git
