@@ -8,7 +8,7 @@ function(fetch_ecoboot)
             COMMAND ${CMAKE_SOURCE_DIR}/tools/download_asset.py
             "$<$<BOOL:$ENV{ASSETS_LOGIN}>:-l$ENV{ASSETS_LOGIN}>"
             "$<$<BOOL:$ENV{ASSETS_TOKEN}>:-t$ENV{ASSETS_TOKEN}>"
-            -w ${CMAKE_BINARY_DIR} ecoboot download
+            -w ${CMAKE_BINARY_DIR} ecoboot download -a ${ECOBOOT_FILE}
             > ${ECOBOOT_DOWNLOAD_LOG}
             COMMENT "Downloading ${ECOBOOT_FILE}"
             BYPRODUCTS ${ECOBOOT_DOWNLOAD_LOG}

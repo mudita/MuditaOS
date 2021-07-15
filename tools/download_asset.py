@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 Download ecooboot.bin from repository
@@ -42,7 +42,6 @@ class Getter(object):
         self.restPrefix += '/'
         return self.restPrefix
 
-
     def getGitRoot(self):
         'Find git root directory'
         self.gitRepo = git.Repo(os.getcwd(), search_parent_directories=True)
@@ -57,7 +56,7 @@ class Getter(object):
         try:
             gitConfigReader = self.gitRepo.config_reader()
             self.apitoken = gitConfigReader.get_value("user", "apitoken")
-        except: 
+        except:
             pass
 
     def getGHLogin(self, args=None):
@@ -84,7 +83,7 @@ class Getter(object):
         self.getGHLogin(args)
         self.getApiToken(args)
         request = self.genRestPrefix() + "releases"
-        print ("Request:", request)
+        print("Request:", request)
         headers = {'accept': 'application/vnd.github.v3+json'}
         page = 0
         itemsOnPage = 100
@@ -108,7 +107,7 @@ class Getter(object):
             else:
                 releases.append(item)
         releases.sort(key=lambda r: r['published_at'], reverse=True)
-        self.releases=drafts
+        self.releases = drafts
         self.releases.extend(releases)
 
     def listReleases(self, args):
@@ -122,7 +121,10 @@ class Getter(object):
         print(sys._getframe().f_code.co_name)
         self.getReleases(args)
         print("tag:", args.tag)
-        print("asset:", args.asset)
+        if args.assetName is not None:
+            print("asset name:", args.assetName)
+        if args.idOfAsset is not None:
+            print("asset ID:", args.idOfAsset)
         release = None
         if args.tag is None:
             release = self.releases[0]
@@ -135,19 +137,23 @@ class Getter(object):
             print("No release with tag:", args.tag)
         print("release:", release['tag_name'])
         assets = release['assets']
-        if len(assets) > 1 and args.asset is None:
+        if len(assets) > 1 and args.assetName is None and args.idOfAsset is None:
             print("Available assets")
-            i=0
+            i = 0
             for asset in assets:
                 print(i, asset['name'])
-                i+=1
-            print("Use `-a <number>` to select file")
+                i += 1
+            print("Use one -a orn -n to select asset to download\n`-a <name>`\n`-i <number>`")
             return
-        if args.asset is not None:
-            self.downloadAsset(assets[int(args.asset)])
+        if args.assetName is not None:
+            for asset in assets:
+                if asset['name'] == args.assetName:
+                    self.downloadAsset(asset)
+                    return
+        elif args.idOfAsset is not None:
+            self.downloadAsset(assets[int(args.idOfAsset)])
         else:
             self.downloadAsset(assets[0])
-
 
     def downloadAsset(self, asset):
         self.createWorkdir()
@@ -205,7 +211,7 @@ def main():
     parser.set_defaults(func=getter.run)
     subparsers = parser.add_subparsers(title="commands",
                                        description="available commands")
-    listReleases_args = subparsers.add_parser('list', aliases=['ll'],
+    listReleases_args = subparsers.add_parser('list', aliases=['ls'],
                                               description="List public releases")
     listReleases_args.set_defaults(func=getter.listReleases)
 
@@ -213,7 +219,11 @@ def main():
                                              description="Download Release based on tag or the latest")
     getReleases_args.set_defaults(func=getter.downloadRelease)
     getReleases_args.add_argument('tag', help="Download release with selected tag", nargs='?')
-    getReleases_args.add_argument('-a', '--asset', help="Asset name to download, use asset number")
+    assetId_args = getReleases_args.add_mutually_exclusive_group()
+    assetId_args.add_argument('-a', '--assetName', help="Asset name to download")
+    assetId_args.add_argument('-i', '--idOfAsset',
+                                  help="Asset number (listed with `download` command) to download")
+    #getReleases_args.add_subparsers(assetId_args)
 
     args = parser.parse_args()
     getter.repo = args.repository
