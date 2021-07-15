@@ -139,38 +139,29 @@ namespace utils::time
         return Timestamp(lhs.duration + rhs.time);
     }
 
-    void DateTime::before_n_sec(time_t val)
-    {
-        local_time = time;
-        if (val) {
-            set_time(val);
-        }
-    }
-
     bool DateTime::isToday() const
     {
         auto timeinfo       = *std::localtime(&time);
-        auto newer_timeinfo = *localtime(&local_time);
+        auto newer_timeinfo = *std::localtime(&referenceTime);
         return (newer_timeinfo.tm_yday == timeinfo.tm_yday && isCurrentYear());
     }
 
     bool DateTime::isYesterday() const
     {
         auto timeinfo       = *std::localtime(&time);
-        auto newer_timeinfo = *localtime(&local_time);
-        bool is_leap_year   = (timeinfo.tm_year % 4 == 0 && timeinfo.tm_year % 100 != 0) || timeinfo.tm_year % 400 == 0;
+        auto newer_timeinfo = *std::localtime(&referenceTime);
 
-        return (((newer_timeinfo.tm_yday - timeinfo.tm_yday == 1) &&
-                 (newer_timeinfo.tm_year == timeinfo.tm_year)) // day difference
-                ||
-                (timeinfo.tm_year == 0 && newer_timeinfo.tm_year + 364 + is_leap_year) // day next year day difference
-        );
+        newer_timeinfo.tm_mday -= 1;
+        std::mktime(&newer_timeinfo);
+
+        return timeinfo.tm_year == newer_timeinfo.tm_year && timeinfo.tm_mon == newer_timeinfo.tm_mon &&
+               timeinfo.tm_mday == newer_timeinfo.tm_mday;
     }
 
     bool DateTime::isCurrentYear() const
     {
         auto timeinfo       = *std::localtime(&time);
-        auto newer_timeinfo = *localtime(&local_time);
+        auto newer_timeinfo = *std::localtime(&referenceTime);
         return (newer_timeinfo.tm_year == timeinfo.tm_year);
     }
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -126,23 +126,20 @@ namespace utils
         /// takes timestamp and can show time in past
         class DateTime : public Timestamp
         {
-            time_t local_time = 0;
-            /// converter -> returns time in past: (val) and stores localtime in ref_time
-            void before_n_sec(time_t val);
+            time_t referenceTime = 0;
 
           protected:
             const TimeSettingsInterface &timeSettings;
 
           public:
-            /// shows time in past
+            /// shows time in past in relation to reference value
             ///
-            /// @val - timestamp in seconds
+            /// @val - timestamp to show
+            /// @reference - reference timestamp
             /// @timeSettings - time settings interface
-            explicit DateTime(const TimeSettingsInterface &timeSettings, time_t val)
-                : Timestamp(std::time(nullptr)), timeSettings(timeSettings)
-            {
-                before_n_sec(val);
-            }
+            DateTime(const TimeSettingsInterface &timeSettings, time_t val, time_t reference = std::time(nullptr))
+                : Timestamp(val), referenceTime(reference), timeSettings(timeSettings)
+            {}
 
             friend std::ostream &operator<<(std::ostream &os, DateTime t)
             {
