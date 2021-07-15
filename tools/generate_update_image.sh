@@ -70,13 +70,7 @@ function linkInStageing(){
     ln -s ../sys/current/country-codes.db
     ln -s ../sys/current/Luts.bin
     ln -s ../ecoboot.bin
-    ln -s ../version.json
-    popd 1> /dev/null
-}
-
-function addChecksums() {
-    pushd ${STAGEING_DIR} 1> /dev/null
-    rhash -u checksums.txt -r .
+    ln -s ../${SOURCE_TARGET}-version.json version.json
     popd 1> /dev/null
 }
 
@@ -93,7 +87,6 @@ setVars "${1}" "${2}" "${3}"
 checkForDeps ${DEPS}
 cleanStagingDir ${STAGEING_DIR}
 linkInStageing
-addChecksums
 compress
 
 

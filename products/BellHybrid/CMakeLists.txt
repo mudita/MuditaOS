@@ -81,6 +81,9 @@ add_image(BellHybrid)
 include(AddHexTarget)
 add_hex_target(BellHybrid)
 
+include(AddVersionJson)
+add_version_json(BellHybrid)
+
 add_standalone_image(BellHybrid)
 add_update_package(BellHybrid)
 
