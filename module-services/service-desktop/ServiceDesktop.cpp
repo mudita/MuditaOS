@@ -18,6 +18,8 @@
 #include <application-desktop/Constants.hpp>
 #include <service-db/service-db/Settings.hpp>
 #include <service-db/QueryMessage.hpp>
+#include <service-evtmgr/EventManager.hpp>
+#include <service-evtmgr/EVMessages.hpp>
 #include <purefs/filesystem_paths.hpp>
 #include <module-sys/SystemManager/SystemManager.hpp>
 #include <module-sys/Timers/TimerFactory.hpp>
@@ -79,6 +81,25 @@ ServiceDesktop::~ServiceDesktop()
 auto ServiceDesktop::getSerialNumber() const -> std::string
 {
     return settings->getValue(std::string("factory_data/serial"), settings::SettingsScope::Global);
+}
+
+auto ServiceDesktop::requestLogsFlush() -> void
+{
+    int response = 0;
+    auto ret     = bus.sendUnicastSync(
+        std::make_shared<sevm::FlushLogsRequest>(), service::name::evt_manager, DefaultLogFlushTimeoutInMs);
+
+    if (ret.first == sys::ReturnCodes::Success) {
+        auto responseMsg = std::dynamic_pointer_cast<sevm::FlushLogsResponse>(ret.second);
+        if ((responseMsg != nullptr) && (responseMsg->retCode == true)) {
+            response = responseMsg->data;
+
+            LOG_DEBUG("Respone data: %d", response);
+        }
+    }
+    if (ret.first == sys::ReturnCodes::Failure || response < 0) {
+        throw std::runtime_error("Logs flush failed");
+    }
 }
 
 sys::ReturnCodes ServiceDesktop::InitHandler()
