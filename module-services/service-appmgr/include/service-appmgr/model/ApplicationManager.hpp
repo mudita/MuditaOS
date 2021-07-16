@@ -8,12 +8,12 @@
 #include "ActionsRegistry.hpp"
 #include "ApplicationStack.hpp"
 #include "OnActionPolicy.hpp"
+#include <service-appmgr/messages/Message.hpp>
 
 #include <apps-common/Application.hpp>
 #include <apps-common/ApplicationLauncher.hpp>
 
 #include <bsp/keypad_backlight/keypad_backlight.hpp>
-#include <service-appmgr/messages/Message.hpp>
 #include <Service/Common.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>

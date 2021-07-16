@@ -3,7 +3,7 @@
 
 #include "PhoneLockHandler.hpp"
 
-#include <service-appmgr/service-appmgr/Controller.hpp>
+#include <service-appmgr/Controller.hpp>
 #include <locks/widgets/LockHash.hpp>
 #include <Utils.hpp>
 #include <memory>

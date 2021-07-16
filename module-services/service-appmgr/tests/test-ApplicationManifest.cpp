@@ -3,7 +3,7 @@
 
 #include <catch2/catch.hpp>
 
-#include <module-services/service-appmgr/service-appmgr/ApplicationManifest.hpp>
+#include <service-appmgr/ApplicationManifest.hpp>
 
 using namespace app::manager;
 
