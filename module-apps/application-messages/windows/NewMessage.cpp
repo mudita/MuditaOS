@@ -7,6 +7,7 @@
 #include "SMSdata.hpp"
 
 #include <application-phonebook/windows/PhonebookSearchResults.hpp>
+#include <Span.hpp>
 #include <BoxLayout.hpp>
 #include <i18n/i18n.hpp>
 #include <module-db/queries/messages/sms/QuerySMSGetLastByThreadID.hpp>

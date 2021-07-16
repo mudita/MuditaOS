@@ -25,7 +25,7 @@ auto ContactDetailsModel::requestRecordsCount() -> unsigned int
     return internalData.size();
 }
 
-auto ContactDetailsModel::getMinimalItemHeight() const -> unsigned int
+auto ContactDetailsModel::getMinimalItemSpaceRequired() const -> unsigned int
 {
     return phonebookStyle::outputLinesTextWithLabelWidget::h;
 }

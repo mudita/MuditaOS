@@ -17,7 +17,7 @@ namespace gui
         return internalData.size();
     }
 
-    unsigned int ColorTestModel::getMinimalItemHeight() const
+    unsigned int ColorTestModel::getMinimalItemSpaceRequired() const
     {
         return style::colorTest::item::color::height;
     }

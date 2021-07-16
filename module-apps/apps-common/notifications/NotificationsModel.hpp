@@ -21,7 +21,7 @@ namespace gui
     class NotificationsModel : public app::InternalModel<gui::NotificationListItem *>, public gui::ListItemProvider
     {
         [[nodiscard]] unsigned int requestRecordsCount() final;
-        [[nodiscard]] unsigned int getMinimalItemHeight() const final;
+        [[nodiscard]] unsigned int getMinimalItemSpaceRequired() const final;
         ListItem *getItem(Order order) final;
         void requestRecords(uint32_t offset, uint32_t limit) final;
 

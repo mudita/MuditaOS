@@ -57,7 +57,7 @@ namespace gui
 
         [[nodiscard]] unsigned int requestRecordsCount() override;
 
-        unsigned int getMinimalItemHeight() const override;
+        unsigned int getMinimalItemSpaceRequired() const override;
 
         ListItem *getItem(Order order) override;
 

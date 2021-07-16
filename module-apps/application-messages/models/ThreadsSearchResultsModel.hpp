@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -16,7 +16,7 @@ namespace gui::model
       public:
         ThreadsSearchResultsModel(app::Application *app);
 
-        auto getMinimalItemHeight() const -> unsigned int override;
+        auto getMinimalItemSpaceRequired() const -> unsigned int override;
         auto getItem(Order order) -> ListItem * override;
         /// empty, size get in requestRecords
         void requestRecords(uint32_t offset, uint32_t limit) override;

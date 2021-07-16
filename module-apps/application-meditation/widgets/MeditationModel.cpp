@@ -19,7 +19,7 @@ auto MeditationModel::requestRecordsCount() -> unsigned int
     return internalData.size();
 }
 
-auto MeditationModel::getMinimalItemHeight() const -> unsigned int
+auto MeditationModel::getMinimalItemSpaceRequired() const -> unsigned int
 {
     return style::meditation::itemList::text::Height;
 }

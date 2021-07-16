@@ -17,7 +17,7 @@ auto NewApnModel::requestRecordsCount() -> unsigned int
     return internalData.size();
 }
 
-auto NewApnModel::getMinimalItemHeight() const -> unsigned int
+auto NewApnModel::getMinimalItemSpaceRequired() const -> unsigned int
 {
     return style::settings::widget::apnInputWidget::h;
 }

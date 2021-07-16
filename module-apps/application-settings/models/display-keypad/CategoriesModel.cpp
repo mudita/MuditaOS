@@ -31,7 +31,7 @@ namespace Quotes
         return false;
     }
 
-    auto CategoriesModel::getMinimalItemHeight() const -> unsigned int
+    auto CategoriesModel::getMinimalItemSpaceRequired() const -> unsigned int
     {
         return style::quotes::list::item_height;
     }
