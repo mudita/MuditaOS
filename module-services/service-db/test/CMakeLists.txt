@@ -10,13 +10,14 @@ add_catch2_executable(
             test-service-db-quotes.cpp
             test-factory-settings.cpp
         LIBS
-            module-sys
-            service-audio
-            module-vfs
-            module-audio
-            service-cellular
-            module-cellular
             iosyscalls
+            module-audio
+            module-cellular
+            module-sys
+            module-utils
+            module-vfs
+            service-audio
+            service-cellular
         DEPS
             PurePhone-disk-img
 )
