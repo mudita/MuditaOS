@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "service-appmgr/service-appmgr/messages/DOMRequest.hpp"
+#include "service-appmgr/messages/DOMRequest.hpp"
 #include "service-desktop/DesktopMessages.hpp"
 #include "service-desktop/ServiceDesktop.hpp"
 #include "service-desktop/WorkerDesktop.hpp"
@@ -22,7 +22,7 @@
 #include <module-sys/SystemManager/SystemManager.hpp>
 #include <module-sys/Timers/TimerFactory.hpp>
 
-#include <module-services/service-appmgr/service-appmgr/model/ApplicationManager.hpp>
+#include <service-appmgr/model/ApplicationManager.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <module-sys/SystemManager/Constants.hpp>
 #include <module-sys/SystemManager/messages/TetheringStateRequest.hpp>

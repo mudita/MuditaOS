@@ -5,6 +5,7 @@
 
 #include "BaseMessage.hpp"
 #include <service-appmgr/StartupType.hpp>
+
 namespace app::manager
 {
     class CheckIfStartAllowedMessage : public BaseMessage

@@ -7,6 +7,7 @@
 #include <messages/EinkModeMessage.hpp>
 #include <Application.hpp>
 #include <i18n/i18n.hpp>
+#include <service-eink/Common.hpp>
 
 namespace gui
 {

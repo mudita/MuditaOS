@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <module-services/service-appmgr/service-appmgr/Controller.hpp>
+#include <service-appmgr/Controller.hpp>
 #include "PhonebookNamecardOptions.hpp"
 #include "application-phonebook/ApplicationPhonebook.hpp"
 #include "application-phonebook/data/PhonebookItemData.hpp"

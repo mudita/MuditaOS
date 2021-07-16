@@ -6,7 +6,7 @@
 
 #include <locks/input/PhoneLockedKeysWhitelist.hpp>
 #include <application-desktop/data/DesktopStyle.hpp>
-#include <module-services/service-appmgr/service-appmgr/Controller.hpp>
+#include <service-appmgr/Controller.hpp>
 #include <time/time_conversion_factory.hpp>
 #include <service-time/ServiceTime.hpp>
 #include <service-time/TimeMessage.hpp>

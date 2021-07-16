@@ -3,7 +3,7 @@
 
 #include <catch2/catch.hpp>
 
-#include <module-services/service-appmgr/service-appmgr/model/ApplicationStack.hpp>
+#include <service-appmgr/model/ApplicationStack.hpp>
 
 using namespace app::manager;
 

@@ -78,6 +78,7 @@ target_link_libraries(${PROJECT_NAME}
         module-sys
         module-utils
         module-vfs
+        service-appmgr
         service-cellular
         service-eink
         service-fota

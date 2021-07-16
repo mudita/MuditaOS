@@ -4,7 +4,7 @@
 #include "SimLockSubject.hpp"
 
 #include <locks/data/PhoneLockMessages.hpp>
-#include <service-appmgr/service-appmgr/model/ApplicationManager.hpp>
+#include <service-appmgr/model/ApplicationManager.hpp>
 
 namespace locks
 {

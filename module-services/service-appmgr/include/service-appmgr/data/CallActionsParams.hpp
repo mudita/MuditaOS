@@ -3,7 +3,8 @@
 
 #pragma once
 
-#include <service-appmgr/service-appmgr/Actions.hpp>
+#include <service-appmgr/Actions.hpp>
+
 #include <PhoneNumber.hpp>
 
 namespace app::manager::actions

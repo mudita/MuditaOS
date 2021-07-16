@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <service-appmgr/messages/PreventBlockingRequest.hpp>
+#include "PreventBlockingRequest.hpp"
 
 namespace app::manager
 {

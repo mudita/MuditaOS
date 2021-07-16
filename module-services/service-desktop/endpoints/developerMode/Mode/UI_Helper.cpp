@@ -7,7 +7,7 @@
 #include "service-desktop/DeveloperModeMessage.hpp"
 #include <variant>
 #include <service-appmgr/model/ApplicationManager.hpp>
-#include <service-appmgr/service-appmgr/messages/DOMRequest.hpp>
+#include <service-appmgr/messages/DOMRequest.hpp>
 
 namespace parserFSM
 {

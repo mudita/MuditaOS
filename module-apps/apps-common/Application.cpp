@@ -22,7 +22,7 @@
 #include <service-evtmgr/BatteryMessages.hpp>
 #include <service-evtmgr/Constants.hpp>
 #include <service-evtmgr/EVMessages.hpp>
-#include <service-appmgr/service-appmgr/messages/DOMRequest.hpp>
+#include <service-appmgr/messages/DOMRequest.hpp>
 #include <service-appmgr/messages/UserPowerDownRequest.hpp>
 #include <service-appmgr/data/NotificationsChangedActionsParams.hpp>
 #include "service-gui/messages/DrawMessage.hpp" // for DrawMessage
