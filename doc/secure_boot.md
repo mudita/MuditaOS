@@ -110,6 +110,12 @@ required: the NXP elftosb and NXP Code-Signing Tool (CST). These are used by the
 MCUXpresso Secure Provisioning Tool so they can be found in its installation
 directory (`/opt/nxp/MCUX_Provi_v2.1/bin/tools/cst` on Linux).
 
+The latest version of the utility can be downloaded from the following locations:
+
+[CST tool](https://www.nxp.com/webapp/sps/download/license.jsp?colCode=IMX_CST_TOOL)
+
+[ELFTOSB](https://www.nxp.com/webapp/sps/download/license.jsp?colCode=elftosb_5.1.19)
+
 You can set the required CMake variables when configuring the project using the
 `configure.sh` script:
 ``` bash
