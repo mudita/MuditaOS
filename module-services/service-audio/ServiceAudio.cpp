@@ -1,21 +1,22 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "service-audio/AudioMessage.hpp"
-#include "service-audio/ServiceAudio.hpp"
+#include <AudioMessage.hpp>
+#include <ServiceAudio.hpp>
 
 #include <Audio/Operation/IdleOperation.hpp>
 #include <Audio/Operation/PlaybackOperation.hpp>
 #include <Bluetooth/audio/BluetoothAudioDevice.hpp>
 #include <module-audio/Audio/VolumeScaler.hpp>
 #include <module-sys/SystemManager/messages/SentinelRegistrationMessage.hpp>
-#include <service-bluetooth/Constants.hpp>
-#include <service-bluetooth/ServiceBluetoothCommon.hpp>
 #include <service-bluetooth/BluetoothMessage.hpp>
+#include <service-bluetooth/Constants.hpp>
 #include <service-bluetooth/messages/AudioRouting.hpp>
 #include <service-bluetooth/messages/Ring.hpp>
+#include <service-bluetooth/ServiceBluetoothCommon.hpp>
 #include <service-db/Settings.hpp>
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
+#include <Utils.hpp>
 
 #include <algorithm>
 #include <initializer_list>

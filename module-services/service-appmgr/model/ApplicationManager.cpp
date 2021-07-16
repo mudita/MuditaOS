@@ -27,7 +27,7 @@
 #include <i18n/i18n.hpp>
 #include <log/log.hpp>
 #include <module-db/queries/notifications/QueryNotificationsGetAll.hpp>
-#include <module-services/service-audio/service-audio/AudioMessage.hpp>
+#include <service-audio/AudioMessage.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <module-sys/Timers/TimerFactory.hpp>
 #include <module-utils/Utils.hpp>

@@ -6,8 +6,8 @@
 #include "AudioMessage.hpp"
 
 #include <Audio/AudioCommon.hpp>
-#include <Audio/Profiles/Profile.hpp>
 #include <Audio/decoder/Decoder.hpp>
+#include <Audio/Profiles/Profile.hpp>
 
 #include <memory>
 #include <optional>
