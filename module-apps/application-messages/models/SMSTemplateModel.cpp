@@ -26,7 +26,7 @@ bool SMSTemplateModel::updateRecords(std::vector<SMSTemplateRecord> records)
     return false;
 }
 
-unsigned int SMSTemplateModel::getMinimalItemHeight() const
+unsigned int SMSTemplateModel::getMinimalItemSpaceRequired() const
 {
     return style::smsTemplItem::h;
 }

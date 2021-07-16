@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -41,7 +41,7 @@ namespace app::alarmClock
         void loadRepeat(std::shared_ptr<AlarmsRecord> record) override;
         void createData();
 
-        [[nodiscard]] unsigned int getMinimalItemHeight() const override;
+        [[nodiscard]] unsigned int getMinimalItemSpaceRequired() const override;
         [[nodiscard]] unsigned int requestRecordsCount() override;
         [[nodiscard]] gui::ListItem *getItem(gui::Order order) override;
         void requestRecords(uint32_t offset, uint32_t limit) override;

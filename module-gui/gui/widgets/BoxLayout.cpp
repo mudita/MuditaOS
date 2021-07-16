@@ -154,6 +154,30 @@ namespace gui
         return reverseOrder;
     }
 
+    Length BoxLayout::getPrimarySize()
+    {
+        if (type == ItemType::HBOX) {
+            return getSize(Axis::X);
+        }
+        else if (type == ItemType::VBOX) {
+            return getSize(Axis::Y);
+        }
+
+        return 0;
+    }
+
+    Length BoxLayout::getPrimarySizeLeft()
+    {
+        if (type == ItemType::HBOX) {
+            return sizeLeft<Axis::X>(this, Area::Normal);
+        }
+        else if (type == ItemType::VBOX) {
+            return sizeLeft<Axis::Y>(this, Area::Normal);
+        }
+
+        return 0;
+    }
+
     void BoxLayout::addToOutOfDrawAreaList(Item *it)
     {
         if (it->visible) {
@@ -574,11 +598,6 @@ namespace gui
         return BoxLayout::handleRequestResize<Axis::X>(child, request_w, request_h);
     }
 
-    Length HBox::getSizeLeft()
-    {
-        return sizeLeft<Axis::X>(this, Area::Normal);
-    }
-
     VBox::VBox() : BoxLayout()
     {
         type = ItemType::VBOX;
@@ -604,10 +623,4 @@ namespace gui
     {
         return BoxLayout::handleRequestResize<Axis::Y>(child, request_w, request_h);
     }
-
-    Length VBox::getSizeLeft()
-    {
-        return sizeLeft<Axis::Y>(this, Area::Normal);
-    }
-
 } /* namespace gui */

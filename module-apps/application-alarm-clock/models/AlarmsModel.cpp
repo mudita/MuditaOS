@@ -31,7 +31,7 @@ namespace app::alarmClock
             });
     }
 
-    unsigned int AlarmsModel::getMinimalItemHeight() const
+    unsigned int AlarmsModel::getMinimalItemSpaceRequired() const
     {
         return style::alarmClock::window::item::height;
     }

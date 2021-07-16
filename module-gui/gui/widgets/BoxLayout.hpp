@@ -116,11 +116,14 @@ namespace gui
         /// callback for situaton when we reached top/bottom/left/right of box
         /// if we want to do sth special (i.e. request new items)
         std::function<bool(const InputEvent &inputEvent)> borderCallback = nullptr;
-        // set focus on specified box element
+        /// set focus on specified box element
         bool setFocusOnElement(unsigned int elementNumber);
         void setFocusOnLastElement();
         template <Axis axis> auto handleRequestResize(const Item *, Length request_w, Length request_h) -> Size;
         auto onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool override;
+        /// Get primary sizes used in axis dominant layouts
+        Length getPrimarySizeLeft();
+        Length getPrimarySize();
     };
 
     class HBox : public BoxLayout
@@ -132,7 +135,6 @@ namespace gui
         virtual ~HBox() = default;
         virtual void addWidget(Item *item) override;
         auto handleRequestResize(const Item *, Length request_w, Length request_h) -> Size override;
-        Length getSizeLeft();
     };
 
     class VBox : public BoxLayout
@@ -144,7 +146,6 @@ namespace gui
         virtual ~VBox() = default;
         virtual void addWidget(Item *item) override;
         auto handleRequestResize(const Item *, Length request_w, Length request_h) -> Size override;
-        Length getSizeLeft();
     };
 
 } /* namespace gui */

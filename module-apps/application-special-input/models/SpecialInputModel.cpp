@@ -13,7 +13,7 @@ auto SpecialInputModel::requestRecordsCount() -> unsigned int
     return internalData.size();
 }
 
-auto SpecialInputModel::getMinimalItemHeight() const -> unsigned int
+auto SpecialInputModel::getMinimalItemSpaceRequired() const -> unsigned int
 {
     return specialInputStyle::specialCharacterTableWidget::window_grid_h;
 }

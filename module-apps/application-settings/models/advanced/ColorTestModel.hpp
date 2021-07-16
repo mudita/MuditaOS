@@ -21,7 +21,7 @@ namespace gui
         explicit ColorTestModel(app::Application *app);
 
         [[nodiscard]] auto requestRecordsCount() -> unsigned int override;
-        [[nodiscard]] auto getMinimalItemHeight() const -> unsigned int override;
+        [[nodiscard]] auto getMinimalItemSpaceRequired() const -> unsigned int override;
         gui::ListItem *getItem(gui::Order order) override;
         void requestRecords(const uint32_t offset, const uint32_t limit) override;
         void createData();

@@ -51,7 +51,7 @@ void NotificationsModel::requestRecords(uint32_t offset, uint32_t limit)
     list->onProviderDataUpdate();
 }
 
-unsigned int NotificationsModel::getMinimalItemHeight() const
+unsigned int NotificationsModel::getMinimalItemSpaceRequired() const
 {
     return style::notifications::itemHeight;
 }

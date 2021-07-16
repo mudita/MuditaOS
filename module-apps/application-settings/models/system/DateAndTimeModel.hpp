@@ -23,7 +23,7 @@ class DateAndTimeModel : public app::InternalModel<gui::DateOrTimeListItem *>, p
     void saveData(std::shared_ptr<utils::time::FromTillDate> fromTillDate);
 
     gui::ListItem *getItem(gui::Order order) override;
-    [[nodiscard]] unsigned int getMinimalItemHeight() const override;
+    [[nodiscard]] unsigned int getMinimalItemSpaceRequired() const override;
     void requestRecords(const uint32_t offset, const uint32_t limit) override;
     [[nodiscard]] unsigned int requestRecordsCount() override;
 

@@ -24,7 +24,7 @@ namespace app::notes
         void requestRecords(std::uint32_t offset, std::uint32_t limit) override;
 
         [[nodiscard]] gui::ListItem *getItem(gui::Order order) override;
-        [[nodiscard]] unsigned int getMinimalItemHeight() const override;
+        [[nodiscard]] unsigned int getMinimalItemSpaceRequired() const override;
 
       protected:
         bool onNotesRetrieved(const std::vector<NotesRecord> &records, unsigned int notesRepoCount);
