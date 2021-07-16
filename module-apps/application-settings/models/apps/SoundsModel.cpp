@@ -14,7 +14,7 @@ unsigned int SoundsModel::requestRecordsCount()
     return internalData.size();
 }
 
-unsigned int SoundsModel::getMinimalItemHeight() const
+unsigned int SoundsModel::getMinimalItemSpaceRequired() const
 {
     return style::window::label::big_h + style::margins::big;
 }

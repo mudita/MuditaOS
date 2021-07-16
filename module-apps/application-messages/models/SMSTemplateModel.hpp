@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -21,7 +21,7 @@ class SMSTemplateModel : public app::DatabaseModel<SMSTemplateRecord>,
     bool updateRecords(std::vector<SMSTemplateRecord> records) override;
     void requestRecords(const uint32_t offset, const uint32_t limit) override;
 
-    unsigned int getMinimalItemHeight() const override;
+    unsigned int getMinimalItemSpaceRequired() const override;
     gui::ListItem *getItem(gui::Order order) override;
 
     auto handleQueryResponse(db::QueryResult *queryResult) -> bool;

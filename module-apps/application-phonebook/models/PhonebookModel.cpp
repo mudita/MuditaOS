@@ -108,7 +108,7 @@ auto PhonebookModel::updateRecords(std::vector<ContactRecord> records) -> bool
     return true;
 }
 
-auto PhonebookModel::getMinimalItemHeight() const -> unsigned int
+auto PhonebookModel::getMinimalItemSpaceRequired() const -> unsigned int
 {
     return phonebookStyle::contactItem::h;
 }

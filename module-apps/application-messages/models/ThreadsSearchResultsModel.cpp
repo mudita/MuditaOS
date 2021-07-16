@@ -18,7 +18,7 @@ namespace gui::model
         : BaseThreadsRecordModel(app), app::AsyncCallbackReceiver{app}
     {}
 
-    auto ThreadsSearchResultsModel::getMinimalItemHeight() const -> unsigned int
+    auto ThreadsSearchResultsModel::getMinimalItemSpaceRequired() const -> unsigned int
     {
         return style::messages::threadItem::sms_thread_item_h;
     }

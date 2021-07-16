@@ -19,7 +19,7 @@
 ThreadsModel::ThreadsModel(app::Application *app) : BaseThreadsRecordModel(app), app::AsyncCallbackReceiver{app}
 {}
 
-auto ThreadsModel::getMinimalItemHeight() const -> unsigned int
+auto ThreadsModel::getMinimalItemSpaceRequired() const -> unsigned int
 {
     return style::messages::threadItem::sms_thread_item_h;
 }

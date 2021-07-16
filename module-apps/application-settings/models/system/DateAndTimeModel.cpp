@@ -41,7 +41,7 @@ gui::ListItem *DateAndTimeModel::getItem(gui::Order order)
     return getRecord(order);
 }
 
-unsigned int DateAndTimeModel::getMinimalItemHeight() const
+unsigned int DateAndTimeModel::getMinimalItemSpaceRequired() const
 {
     return style::window::date_and_time::height;
 }

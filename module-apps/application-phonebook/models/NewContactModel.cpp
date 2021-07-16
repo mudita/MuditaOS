@@ -20,7 +20,7 @@ auto NewContactModel::requestRecordsCount() -> unsigned int
     return internalData.size();
 }
 
-auto NewContactModel::getMinimalItemHeight() const -> unsigned int
+auto NewContactModel::getMinimalItemSpaceRequired() const -> unsigned int
 {
     return phonebookStyle::inputLinesWithLabelWidget::h;
 }

@@ -20,7 +20,7 @@ auto TechnicalInformationModel::requestRecordsCount() -> unsigned int
     return internalData.size();
 }
 
-auto TechnicalInformationModel::getMinimalItemHeight() const -> unsigned int
+auto TechnicalInformationModel::getMinimalItemSpaceRequired() const -> unsigned int
 {
     return style::technical_info::height + 2 * style::margins::big;
 }
