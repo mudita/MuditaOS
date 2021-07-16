@@ -3,13 +3,12 @@
 
 #pragma once
 
+#include <apps-common/popups/data/PopupRequestParams.hpp>
 #include <Audio/AudioCommon.hpp>
 #include <Audio/decoder/Decoder.hpp>
 #include <MessageType.hpp>
-#include <service-appmgr/messages/ActionRequest.hpp>
 #include <service-appmgr/Actions.hpp>
-#include <apps-common/popups/data/PopupRequestParams.hpp>
-
+#include <service-appmgr/messages/ActionRequest.hpp>
 #include <Service/Message.hpp>
 
 #include <memory>

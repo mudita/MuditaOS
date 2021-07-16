@@ -7,14 +7,11 @@
 
 #include <Audio/Audio.hpp>
 #include <Audio/AudioMux.hpp>
-
 #include <MessageType.hpp>
-#include <Service/Service.hpp>
-#include <Utils.hpp>
-
 #include <service-db/DBServiceAPI.hpp>
 #include <service-db/DBServiceName.hpp>
 #include <service-db/QueryMessage.hpp>
+#include <Service/Service.hpp>
 
 #include <functional>
 

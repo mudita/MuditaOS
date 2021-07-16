@@ -54,6 +54,7 @@ target_link_libraries(BellHybrid
         module-apps
         module-bsp
         module-vfs
+        service-audio
         service-bluetooth
         service-desktop
         service-lwip

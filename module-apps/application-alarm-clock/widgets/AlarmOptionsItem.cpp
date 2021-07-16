@@ -6,7 +6,7 @@
 #include <InputEvent.hpp>
 #include <Style.hpp>
 #include <Utils.hpp>
-#include <module-services/service-audio/service-audio/AudioServiceAPI.hpp>
+#include <service-audio/AudioServiceAPI.hpp>
 #include <purefs/filesystem_paths.hpp>
 
 namespace gui
