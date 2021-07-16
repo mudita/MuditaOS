@@ -1,15 +1,15 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "service-appmgr/Controller.hpp"
+#include "Controller.hpp"
 
-#include "service-appmgr/model/ApplicationManager.hpp"
-#include "service-appmgr/messages/GetAllNotificationsRequest.hpp"
-#include "service-appmgr/messages/FinishRequest.hpp"
+#include "ApplicationManager.hpp"
+#include "FinishRequest.hpp"
+#include "GetAllNotificationsRequest.hpp"
 
 #include <Service/Service.hpp>
 
-#include <utility> // for move
+#include <utility>
 
 namespace app::manager
 {

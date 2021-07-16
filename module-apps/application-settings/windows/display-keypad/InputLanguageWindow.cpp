@@ -4,7 +4,7 @@
 #include "InputLanguageWindow.hpp"
 
 #include <application-settings/windows/WindowNames.hpp>
-#include <service-appmgr/service-appmgr/Controller.hpp>
+#include <service-appmgr/Controller.hpp>
 #include <OptionSetting.hpp>
 
 #include <i18n/i18n.hpp>

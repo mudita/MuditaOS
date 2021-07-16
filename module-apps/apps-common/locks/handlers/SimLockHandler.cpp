@@ -3,7 +3,7 @@
 
 #include "SimLockHandler.hpp"
 
-#include <service-appmgr/service-appmgr/Controller.hpp>
+#include <service-appmgr/Controller.hpp>
 #include <Utils.hpp>
 #include <memory>
 

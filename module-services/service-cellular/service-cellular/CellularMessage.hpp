@@ -18,10 +18,10 @@
 #include <memory>
 #include <string>
 
-#include <service-appmgr/service-appmgr/messages/ActionRequest.hpp>
-#include <service-appmgr/service-appmgr/Actions.hpp>
-#include <service-appmgr/service-appmgr/data/MmiActionsParams.hpp>
-#include <service-appmgr/service-appmgr/data/CallActionsParams.hpp>
+#include <service-appmgr/messages/ActionRequest.hpp>
+#include <service-appmgr/Actions.hpp>
+#include <service-appmgr/data/MmiActionsParams.hpp>
+#include <service-appmgr/data/CallActionsParams.hpp>
 
 #include <service-cellular/api/common.hpp>
 

@@ -62,8 +62,8 @@ target_link_libraries(${PROJECT_NAME}
         json::json
         time
     PUBLIC
-        utf8
         eventstore
+        utf8
     )
 
 if (${ENABLE_TESTS})

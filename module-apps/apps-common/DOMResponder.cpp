@@ -3,7 +3,7 @@
 
 #include "DOMResponder.hpp"
 #include "service-desktop/DeveloperModeMessage.hpp"
-#include <service-appmgr/service-appmgr/messages/DOMRequest.hpp>
+#include <service-appmgr/messages/DOMRequest.hpp>
 #include <module-gui/gui/dom/Item2JsonSerializer.hpp>
 #include <memory>
 #include <Item.hpp>

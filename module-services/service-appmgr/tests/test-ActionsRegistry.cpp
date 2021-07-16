@@ -3,7 +3,7 @@
 
 #include <catch2/catch.hpp>
 
-#include <module-services/service-appmgr/service-appmgr/model/ActionsRegistry.hpp>
+#include <service-appmgr/model/ActionsRegistry.hpp>
 
 using namespace app::manager;
 

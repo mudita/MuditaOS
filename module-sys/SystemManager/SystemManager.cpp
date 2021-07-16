@@ -21,7 +21,7 @@
 #include <service-cellular/CellularServiceAPI.hpp>
 #include <service-cellular/CellularMessage.hpp>
 #include <service-appmgr/model/ApplicationManager.hpp>
-#include <service-appmgr/service-appmgr/Controller.hpp>
+#include <service-appmgr/Controller.hpp>
 #include "messages/CpuFrequencyMessage.hpp"
 #include "messages/DeviceRegistrationMessage.hpp"
 #include "messages/SentinelRegistrationMessage.hpp"

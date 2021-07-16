@@ -4,9 +4,8 @@
 #pragma once
 
 #include "BaseMessage.hpp"
-
-#include <module-services/service-appmgr/service-appmgr/Actions.hpp>
-#include <module-services/service-appmgr/service-appmgr/ApplicationManifest.hpp>
+#include <service-appmgr/Actions.hpp>
+#include <service-appmgr/ApplicationManifest.hpp>
 
 namespace app::manager
 {

@@ -1,51 +1,48 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <service-appmgr/model/ApplicationManager.hpp>
-#include <service-appmgr/Controller.hpp>
+#include "ApplicationManager.hpp"
+#include "ApplicationStatus.hpp"
+#include "AutoLockRequests.hpp"
+#include "Controller.hpp"
+#include "DOMRequest.hpp"
+#include "FinishRequest.hpp"
+#include "GetAllNotificationsRequest.hpp"
+#include "Message.hpp"
 
-#include <apps-common/messages/AppMessage.hpp>
-#include <apps-common/popups/data/PhoneModeParams.hpp>
-#include <apps-common/popups/data/PopupRequestParams.hpp>
 #include <Common.hpp>
 #include <Service/Message.hpp>
-#include <module-sys/Timers/TimerFactory.hpp>
 #include <SystemManager/SystemManager.hpp>
 #include <SystemManager/messages/SystemManagerMessage.hpp>
-#include <SystemManager/messages/TetheringQuestionRequest.hpp>
 #include <SystemManager/messages/TetheringPhoneModeChangeProhibitedMessage.hpp>
-#include <application-special-input/ApplicationSpecialInput.hpp>
+#include <SystemManager/messages/TetheringQuestionRequest.hpp>
 #include <application-desktop/ApplicationDesktop.hpp>
 #include <application-onboarding/ApplicationOnBoarding.hpp>
 #include <application-onboarding/data/OnBoardingMessages.hpp>
+#include <application-special-input/ApplicationSpecialInput.hpp>
+#include <apps-common/messages/AppMessage.hpp>
+#include <apps-common/popups/data/PhoneModeParams.hpp>
+#include <apps-common/popups/data/PopupRequestParams.hpp>
+#include <event-manager-api>
 #include <i18n/i18n.hpp>
 #include <log/log.hpp>
-#include <service-cellular/CellularMessage.hpp>
-#include <service-appmgr/messages/Message.hpp>
-#include <service-evtmgr/EventManager.hpp>
-#include <service-evtmgr/EVMessages.hpp>
-#include <service-gui/ServiceGUI.hpp>
-#include <service-eink/ServiceEink.hpp>
-#include <service-desktop/DesktopMessages.hpp>
-#include <service-desktop/Constants.hpp>
-#include <service-appmgr/StartupType.hpp>
+#include <module-db/queries/notifications/QueryNotificationsGetAll.hpp>
 #include <module-services/service-audio/service-audio/AudioMessage.hpp>
+#include <module-services/service-db/agents/settings/SystemSettings.hpp>
+#include <module-sys/Timers/TimerFactory.hpp>
+#include <module-utils/Utils.hpp>
+#include <service-appmgr/StartupType.hpp>
+#include <service-cellular-api>
+#include <service-cellular/CellularMessage.hpp>
+#include <service-db/DBNotificationMessage.hpp>
+#include <service-desktop/Constants.hpp>
+#include <service-desktop/DesktopMessages.hpp>
+#include <service-eink/ServiceEink.hpp>
+#include <service-evtmgr/EVMessages.hpp>
+#include <service-evtmgr/EventManager.hpp>
 
 #include <algorithm>
-#include <limits>
 #include <utility>
-#include <module-utils/Utils.hpp>
-#include <module-services/service-db/agents/settings/SystemSettings.hpp>
-#include <service-appmgr/messages/DOMRequest.hpp>
-#include <service-appmgr/messages/GetAllNotificationsRequest.hpp>
-#include <service-appmgr/messages/AutoLockRequests.hpp>
-#include <service-appmgr/messages/FinishRequest.hpp>
-#include <service-db/DBNotificationMessage.hpp>
-#include <module-db/queries/notifications/QueryNotificationsGetAll.hpp>
-#include <service-cellular-api>
-
-#include "module-services/service-appmgr/service-appmgr/messages/ApplicationStatus.hpp"
-#include <event-manager-api>
 
 namespace app::manager
 {
