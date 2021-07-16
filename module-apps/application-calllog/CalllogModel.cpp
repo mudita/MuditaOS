@@ -54,7 +54,7 @@ bool CalllogModel::updateRecords(std::vector<CalllogRecord> records)
     return true;
 }
 
-unsigned int CalllogModel::getMinimalItemHeight() const
+unsigned int CalllogModel::getMinimalItemSpaceRequired() const
 {
     return gui::clItemStyle::h;
 }

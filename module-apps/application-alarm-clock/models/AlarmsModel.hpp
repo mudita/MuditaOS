@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -27,7 +27,7 @@ namespace app::alarmClock
         bool updateRecords(std::vector<AlarmsRecord> records) override;
 
         // virtual methods for ListViewProvider
-        [[nodiscard]] unsigned int getMinimalItemHeight() const override;
+        [[nodiscard]] unsigned int getMinimalItemSpaceRequired() const override;
         [[nodiscard]] gui::ListItem *getItem(gui::Order order) override;
         [[nodiscard]] unsigned int requestRecordsCount() override;
 

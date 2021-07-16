@@ -20,7 +20,7 @@ namespace app::alarmClock
         return internalData.size();
     }
 
-    unsigned int NewEditAlarmModel::getMinimalItemHeight() const
+    unsigned int NewEditAlarmModel::getMinimalItemSpaceRequired() const
     {
         return style::alarmClock::window::item::options::height;
     }

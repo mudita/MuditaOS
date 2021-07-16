@@ -24,7 +24,7 @@ class NewApnModel : public app::InternalModel<gui::ApnListItem *>, public gui::L
 
     [[nodiscard]] auto requestRecordsCount() -> unsigned int override;
 
-    [[nodiscard]] auto getMinimalItemHeight() const -> unsigned int override;
+    [[nodiscard]] auto getMinimalItemSpaceRequired() const -> unsigned int override;
 
     auto getItem(gui::Order order) -> gui::ListItem * override;
 

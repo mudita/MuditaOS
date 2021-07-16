@@ -16,7 +16,7 @@ auto SongsModel::requestRecordsCount() -> unsigned int
     return internalData.size();
 }
 
-auto SongsModel::getMinimalItemHeight() const -> unsigned int
+auto SongsModel::getMinimalItemSpaceRequired() const -> unsigned int
 {
     return musicPlayerStyle::songItem::h;
 }

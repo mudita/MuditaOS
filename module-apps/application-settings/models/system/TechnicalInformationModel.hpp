@@ -21,7 +21,7 @@ class TechnicalInformationModel : public app::InternalModel<gui::ListItem *>, pu
     void createData();
 
     [[nodiscard]] auto requestRecordsCount() -> unsigned int override;
-    [[nodiscard]] auto getMinimalItemHeight() const -> unsigned int override;
+    [[nodiscard]] auto getMinimalItemSpaceRequired() const -> unsigned int override;
     auto getItem(gui::Order order) -> gui::ListItem * override;
     void requestRecords(const uint32_t offset, const uint32_t limit) override;
 };

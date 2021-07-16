@@ -22,7 +22,7 @@ class SoundsModel : public app::InternalModel<gui::ListItem *>, public AbstractS
 
     [[nodiscard]] unsigned int requestRecordsCount() override;
 
-    [[nodiscard]] unsigned int getMinimalItemHeight() const override;
+    [[nodiscard]] unsigned int getMinimalItemSpaceRequired() const override;
 
     gui::ListItem *getItem(gui::Order order) override;
 

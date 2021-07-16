@@ -22,7 +22,7 @@ SMSThreadModel::~SMSThreadModel()
     delete smsInput;
 }
 
-unsigned int SMSThreadModel::getMinimalItemHeight() const
+unsigned int SMSThreadModel::getMinimalItemSpaceRequired() const
 {
     return style::messages::smsOutput::default_h;
 }
