@@ -9,7 +9,7 @@
 #include <memory>
 #include <string>
 
-#include <service-appmgr/service-appmgr/data/MmiActionsParams.hpp>
+#include <service-appmgr/data/MmiActionsParams.hpp>
 
 namespace at
 {

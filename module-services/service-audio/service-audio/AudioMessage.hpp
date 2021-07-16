@@ -6,8 +6,8 @@
 #include <Audio/AudioCommon.hpp>
 #include <Audio/decoder/Decoder.hpp>
 #include <MessageType.hpp>
-#include <service-appmgr/service-appmgr/messages/ActionRequest.hpp>
-#include <module-services/service-appmgr/service-appmgr/Actions.hpp>
+#include <service-appmgr/messages/ActionRequest.hpp>
+#include <service-appmgr/Actions.hpp>
 #include <apps-common/popups/data/PopupRequestParams.hpp>
 
 #include <Service/Message.hpp>

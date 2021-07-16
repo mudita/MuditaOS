@@ -75,8 +75,8 @@
 #include <module-services/service-evtmgr/service-evtmgr/ScreenLightControlMessage.hpp>
 #include <module-services/service-evtmgr/service-evtmgr/Constants.hpp>
 #include <module-services/service-evtmgr/service-evtmgr/EVMessages.hpp>
-#include <module-services/service-appmgr/service-appmgr/messages/Message.hpp>
-#include <module-services/service-appmgr/service-appmgr/model/ApplicationManager.hpp>
+#include <service-appmgr/messages/Message.hpp>
+#include <service-appmgr/model/ApplicationManager.hpp>
 #include <apps-common/messages/DialogMetadataMessage.hpp>
 #include <apps-common/windows/Dialog.hpp>
 

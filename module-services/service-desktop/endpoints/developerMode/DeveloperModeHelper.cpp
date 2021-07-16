@@ -23,7 +23,7 @@
 #include <service-db/DBServiceAPI.hpp>
 #include <service-desktop/parser/MessageHandler.hpp>
 #include <service-desktop/endpoints/developerMode/event/ATRequest.hpp>
-#include <service-appmgr/service-appmgr/Controller.hpp>
+#include <service-appmgr/Controller.hpp>
 
 #include <ctime>
 

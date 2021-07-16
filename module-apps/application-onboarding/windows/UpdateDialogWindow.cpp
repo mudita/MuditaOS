@@ -7,7 +7,7 @@
 #include <Style.hpp>
 
 #include <application-onboarding/ApplicationOnBoarding.hpp>
-#include <service-appmgr/service-appmgr/Controller.hpp>
+#include <service-appmgr/Controller.hpp>
 #include <source/version.hpp>
 
 namespace app::onBoarding

@@ -3,7 +3,7 @@
 
 #include "PhoneLockSubject.hpp"
 
-#include <service-appmgr/service-appmgr/model/ApplicationManager.hpp>
+#include <service-appmgr/model/ApplicationManager.hpp>
 #include <locks/data/PhoneLockMessages.hpp>
 
 namespace locks

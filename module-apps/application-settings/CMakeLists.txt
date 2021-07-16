@@ -134,5 +134,7 @@ target_link_libraries(${PROJECT_NAME}
         service-bluetooth
         eventstore
     PRIVATE
+        service-appmgr
+        service-eink
         service-time-api
 )

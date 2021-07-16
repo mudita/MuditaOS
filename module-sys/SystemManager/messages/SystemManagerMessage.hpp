@@ -8,7 +8,7 @@
 
 #include "SystemManager/Constants.hpp"
 #include "SystemManager/data/SystemManagerActionsParams.hpp"
-#include <service-appmgr/service-appmgr/Actions.hpp>
+#include <service-appmgr/Actions.hpp>
 
 namespace sys
 {

@@ -45,9 +45,3 @@ target_sources(${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/windows/NoSimSelectedDialogWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/style/OnBoardingStyle.hpp"
 		)
-
-target_include_directories(${PROJECT_NAME}
-    PRIVATE
-        service-db
-        json::json
-)

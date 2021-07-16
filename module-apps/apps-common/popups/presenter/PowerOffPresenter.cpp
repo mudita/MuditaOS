@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PowerOffPresenter.hpp"
-#include <module-services/service-appmgr/service-appmgr/messages/UserPowerDownRequest.hpp>
+#include <service-appmgr/messages/UserPowerDownRequest.hpp>
 #include <module-sys/SystemManager/Constants.hpp>
 
 namespace gui

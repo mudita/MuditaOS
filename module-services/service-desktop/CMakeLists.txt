@@ -59,6 +59,7 @@ target_link_libraries(${PROJECT_NAME}
         application-desktop
         microtar
         module-utils
+        service-appmgr
         service-cellular
         service-evtmgr
         utf8

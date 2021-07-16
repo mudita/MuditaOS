@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <service-appmgr/service-appmgr/Actions.hpp>
+#include <service-appmgr/Actions.hpp>
 
 namespace mmiactions = app::manager::actions;
 
