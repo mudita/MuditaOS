@@ -37,7 +37,7 @@ outputs:
     description: "Content of changelog.md"
 runs:
   using: 'docker'
-  image: 'docker://rwicik/pure_phone_build:v1.2'
+  image: 'docker://muditadocker/pure_phone_build:v1.2'
   args:
     - ${{ inputs.action }}
     - ${{ inputs.target }}
