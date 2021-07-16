@@ -1,13 +1,13 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "service-audio/AudioServiceAPI.hpp"
-#include "service-audio/ServiceAudio.hpp"
-#include "service-audio/AudioMessage.hpp"
+#include <AudioMessage.hpp>
+#include <AudioServiceAPI.hpp>
+#include <ServiceAudio.hpp>
 
 #include <Audio/decoder/Decoder.hpp>
-#include <Service/Common.hpp>
 #include <log.hpp>
+#include <Service/Common.hpp>
 
 #include <utility>
 
