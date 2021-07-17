@@ -38,7 +38,10 @@ function(add_standalone_image SOURCE_TARGET)
     add_custom_target(${PACKAGE_COMMON_NAME}-package-standalone
         COMMAND tar -ScJf ${STANDALONE_PKG} ${SOURCE_TARGET}.img
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-        DEPENDS ${BIN_FILE} ${ECOBOOT_FILE}-target ${VERSION_JSON_FILE}-target ${SOURCE_TARGET}.img
+        DEPENDS ${BIN_FILE}
+        DEPENDS ecoboot.bin-target
+        DEPENDS ${SOURCE_TARGET}-version.json-target
+        DEPENDS ${SOURCE_TARGET}.img
         )
 
     message("Adding stand alone target '${SOURCE_TARGET}-StandaloneImage'")
