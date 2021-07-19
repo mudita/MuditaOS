@@ -31,4 +31,7 @@ class UpdateEndpoint : public parserFSM::Endpoint
     auto handle(parserFSM::Context &context) -> void override;
     auto run(parserFSM::Context &context) -> sys::ReturnCodes;
     auto getUpdates(parserFSM::Context &context) -> sys::ReturnCodes;
+
+  private:
+    void preventBlockingDevice();
 };

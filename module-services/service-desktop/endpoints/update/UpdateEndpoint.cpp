@@ -7,7 +7,8 @@
 #include <service-desktop/DesktopMessages.hpp>
 #include <service-desktop/ServiceDesktop.hpp>
 #include <endpoints/Context.hpp>
-#include <endpoints/messages/MessageHelper.hpp>
+#include <service-appmgr/messages/PreventBlockingRequest.hpp>
+#include <service-appmgr/model/ApplicationManager.hpp>
 
 #include <json11.hpp>
 #include <purefs/filesystem_paths.hpp>
@@ -21,9 +22,11 @@ auto UpdateEndpoint::handle(Context &context) -> void
 {
     switch (context.getMethod()) {
     case http::Method::post:
+        preventBlockingDevice();
         run(context);
         break;
     case http::Method::get:
+        preventBlockingDevice();
         getUpdates(context);
         break;
     default:
@@ -103,4 +106,10 @@ auto UpdateEndpoint::getUpdates(Context &context) -> sys::ReturnCodes
     MessageHandler::putToSendQueue(context.createSimpleResponse());
 
     return sys::ReturnCodes::Success;
+}
+
+void UpdateEndpoint::preventBlockingDevice()
+{
+    auto msg = std::make_shared<app::manager::PreventBlockingRequest>(service::name::service_desktop);
+    ownerServicePtr->bus.sendUnicast(std::move(msg), app::manager::ApplicationManager::ServiceName);
 }
