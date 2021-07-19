@@ -16,3 +16,4 @@
 #define DEBUG_GUI_TEXT_CURSOR        0 /// show extended debug messages for gui::Text - cursor handling
 #define DEBUG_TIMER                  0 /// debug timers system utility
 #define DEBUG_SETTINGS_DB            0 /// show extensive settings logs for all applications
+#define DEBUG_SERVICE_CELLULAR       0 /// show various logs in cellular service
