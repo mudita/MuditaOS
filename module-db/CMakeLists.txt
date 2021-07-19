@@ -102,6 +102,8 @@ set(SOURCES
         queries/phonebook/QueryContactUpdate.cpp
         queries/phonebook/QueryContactRemove.cpp
         queries/phonebook/QueryNumberGetByID.cpp
+        queries/phonebook/QueryMergeContactsList.cpp
+        queries/phonebook/QueryCheckContactsListDuplicates.cpp
         queries/alarms/QueryAlarmsAdd.cpp
         queries/alarms/QueryAlarmsRemove.cpp
         queries/alarms/QueryAlarmsEdit.cpp

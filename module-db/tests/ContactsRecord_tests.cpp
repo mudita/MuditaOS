@@ -396,3 +396,189 @@ TEST_CASE("Contact record numbers update")
 
     Database::deinitialize();
 }
+
+TEST_CASE("Contacts list merge")
+{
+    Database::initialize();
+    const auto contactsPath = (std::filesystem::path{"sys/user"} / "contacts.db");
+    RemoveDbFiles(contactsPath.stem());
+
+    ContactsDB contactDB(contactsPath.c_str());
+    REQUIRE(contactDB.isInitialized());
+
+    // Preparation of DB initial state
+    auto records                                                          = ContactRecordInterface(&contactDB);
+    std::array<std::pair<std::string, std::string>, 3> rawContactsInitial = {
+        {{"600100100", "test1"}, {"600100200", "test2"}, {"600100300", "test3"}}};
+    for (auto &rawContact : rawContactsInitial) {
+        ContactRecord record;
+        record.primaryName = rawContact.second;
+        record.numbers = std::vector<ContactRecord::Number>({ContactRecord::Number(rawContact.first, std::string(""))});
+        REQUIRE(records.Add(record));
+    }
+
+    SECTION("Merge contacts without overlaps")
+    {
+        std::array<std::pair<std::string, std::string>, 3> rawContactsToAdd = {
+            {{"600100400", "test4"}, {"600100500", "test5"}, {"600100600", "test6"}}};
+
+        // Prepare contacts list to merge
+        std::vector<ContactRecord> contacts;
+        for (auto &rawContact : rawContactsToAdd) {
+            ContactRecord record;
+            record.primaryName = rawContact.second;
+            record.numbers =
+                std::vector<ContactRecord::Number>({ContactRecord::Number(rawContact.first, std::string(""))});
+            contacts.push_back(record);
+        }
+        REQUIRE(records.MergeContactsList(contacts));
+
+        // Validate if non-overlapping were appended to DB
+        REQUIRE(records.GetCount() == (rawContactsInitial.size() + rawContactsToAdd.size()));
+
+        auto validatationRecord = records.GetByID(1);
+        REQUIRE(validatationRecord.numbers[0].number.getEntered() == rawContactsInitial[0].first);
+        REQUIRE(validatationRecord.primaryName == rawContactsInitial[0].second);
+        validatationRecord = records.GetByID(2);
+        REQUIRE(validatationRecord.numbers[0].number.getEntered() == rawContactsInitial[1].first);
+        REQUIRE(validatationRecord.primaryName == rawContactsInitial[1].second);
+        validatationRecord = records.GetByID(3);
+        REQUIRE(validatationRecord.numbers[0].number.getEntered() == rawContactsInitial[2].first);
+        REQUIRE(validatationRecord.primaryName == rawContactsInitial[2].second);
+        validatationRecord = records.GetByID(4);
+        REQUIRE(validatationRecord.numbers[0].number.getEntered() == rawContactsToAdd[0].first);
+        REQUIRE(validatationRecord.primaryName == rawContactsToAdd[0].second);
+        validatationRecord = records.GetByID(5);
+        REQUIRE(validatationRecord.numbers[0].number.getEntered() == rawContactsToAdd[1].first);
+        REQUIRE(validatationRecord.primaryName == rawContactsToAdd[1].second);
+        validatationRecord = records.GetByID(6);
+        REQUIRE(validatationRecord.numbers[0].number.getEntered() == rawContactsToAdd[2].first);
+        REQUIRE(validatationRecord.primaryName == rawContactsToAdd[2].second);
+    }
+
+    SECTION("Merge contacts with numbers overlaps")
+    {
+        REQUIRE(records.GetCount() == rawContactsInitial.size());
+
+        std::array<std::pair<std::string, std::string>, 3> rawContactsOverlapping = {
+            {{rawContactsInitial[1].first, "test7"}, {"600100800", "test8"}, {rawContactsInitial[0].first, "test9"}}};
+        constexpr auto numberOfNewContacts = 1;
+
+        // Prepare contacts list to merge
+        std::vector<ContactRecord> contacts;
+        for (auto &rawContact : rawContactsOverlapping) {
+            ContactRecord record;
+            record.primaryName = rawContact.second;
+            record.numbers =
+                std::vector<ContactRecord::Number>({ContactRecord::Number(rawContact.first, std::string(""))});
+            contacts.push_back(record);
+        }
+        REQUIRE(records.MergeContactsList(contacts));
+
+        REQUIRE(records.GetCount() == (rawContactsInitial.size() + numberOfNewContacts));
+
+        // Overlapping contacts replaced with same ID
+        auto validatationRecord = records.GetByID(1);
+        REQUIRE(validatationRecord.numbers[0].number.getEntered() == rawContactsInitial[0].first);
+        REQUIRE(validatationRecord.primaryName == rawContactsOverlapping[2].second);
+        validatationRecord = records.GetByID(2);
+        REQUIRE(validatationRecord.numbers[0].number.getEntered() == rawContactsInitial[1].first);
+        REQUIRE(validatationRecord.primaryName == rawContactsOverlapping[0].second);
+        // Non-overlapping contact left untouched
+        validatationRecord = records.GetByID(3);
+        REQUIRE(validatationRecord.numbers[0].number.getEntered() == rawContactsInitial[2].first);
+        REQUIRE(validatationRecord.primaryName == rawContactsInitial[2].second);
+        // Non-overlapping new contact added
+        validatationRecord = records.GetByID(4);
+        REQUIRE(validatationRecord.numbers[0].number.getEntered() == rawContactsOverlapping[1].first);
+        REQUIRE(validatationRecord.primaryName == rawContactsOverlapping[1].second);
+    }
+
+    Database::deinitialize();
+}
+
+TEST_CASE("Contacts list merge - advanced cases")
+{
+    Database::initialize();
+    const auto contactsPath = (std::filesystem::path{"sys/user"} / "contacts.db");
+    RemoveDbFiles(contactsPath.stem());
+
+    ContactsDB contactDB(contactsPath.c_str());
+    REQUIRE(contactDB.isInitialized());
+
+    // Preparation of DB initial state
+    auto records = ContactRecordInterface(&contactDB);
+    // 3 numbers in single contact
+    std::array<std::string, 3> numbers = {"600100100", "600100200", "600100300"};
+    ContactRecord record;
+    record.primaryName = "test";
+    for (auto &number : numbers) {
+        record.numbers.push_back({ContactRecord::Number(number, std::string(""))});
+    }
+    REQUIRE(records.Add(record));
+
+    SECTION("Compared number is secondary number")
+    {
+        std::pair<std::string, std::string> rawContact = {"600100200", "test2"};
+        std::vector<ContactRecord> contacts;
+
+        // Prepare contacts list to merge
+        ContactRecord record;
+        record.primaryName = rawContact.second;
+        record.numbers = std::vector<ContactRecord::Number>({ContactRecord::Number(rawContact.first, std::string(""))});
+        contacts.push_back(record);
+        REQUIRE(records.MergeContactsList(contacts));
+
+        REQUIRE(records.GetCount() == 1);
+
+        // First contact replaced
+        auto validatationRecord = records.GetByID(1);
+        REQUIRE(validatationRecord.numbers[0].number.getEntered() == rawContact.first);
+        REQUIRE(validatationRecord.primaryName == rawContact.second);
+    }
+}
+
+TEST_CASE("Contacts list duplicates search")
+{
+    Database::initialize();
+    const auto contactsPath = (std::filesystem::path{"sys/user"} / "contacts.db");
+    RemoveDbFiles(contactsPath.stem());
+
+    ContactsDB contactDB(contactsPath.c_str());
+    REQUIRE(contactDB.isInitialized());
+
+    // Preparation of DB initial state
+    auto records                                                          = ContactRecordInterface(&contactDB);
+    std::array<std::pair<std::string, std::string>, 3> rawContactsInitial = {
+        {{"600100100", "test1"}, {"600100200", "test2"}, {"600100300", "test3"}}};
+    for (auto &rawContact : rawContactsInitial) {
+        ContactRecord record;
+        record.primaryName = rawContact.second;
+        record.numbers = std::vector<ContactRecord::Number>({ContactRecord::Number(rawContact.first, std::string(""))});
+        REQUIRE(records.Add(record));
+    }
+
+    // Prepare contacts list to compare with DB
+    std::array<std::pair<std::string, std::string>, 3> rawContactsToCheck = {
+        {rawContactsInitial[2], {"600100500", "test5"}, rawContactsInitial[0]}};
+    constexpr auto numOfDuplicatedContacts = 2;
+
+    std::vector<ContactRecord> contacts;
+    for (auto &rawContact : rawContactsToCheck) {
+        ContactRecord record;
+        record.primaryName = rawContact.second;
+        record.numbers = std::vector<ContactRecord::Number>({ContactRecord::Number(rawContact.first, std::string(""))});
+        contacts.push_back(record);
+    }
+    auto duplicates = records.CheckContactsListDuplicates(contacts);
+
+    REQUIRE(duplicates.size() == numOfDuplicatedContacts);
+
+    REQUIRE(duplicates[0].numbers[0].number.getEntered() == rawContactsToCheck[0].first);
+    REQUIRE(duplicates[0].primaryName == rawContactsToCheck[0].second);
+
+    REQUIRE(duplicates[1].numbers[0].number.getEntered() == rawContactsToCheck[2].first);
+    REQUIRE(duplicates[1].primaryName == rawContactsToCheck[2].second);
+
+    Database::deinitialize();
+}

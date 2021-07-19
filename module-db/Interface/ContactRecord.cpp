@@ -6,6 +6,8 @@
 #include "queries/phonebook/QueryContactGetByID.hpp"
 #include "queries/phonebook/QueryContactUpdate.hpp"
 #include "queries/phonebook/QueryContactRemove.hpp"
+#include "queries/phonebook/QueryMergeContactsList.hpp"
+#include "queries/phonebook/QueryCheckContactsListDuplicates.hpp"
 #include <Utils.hpp>
 
 #include <queries/phonebook/QueryContactGet.hpp>
@@ -158,6 +160,12 @@ auto ContactRecordInterface::runQuery(std::shared_ptr<db::Query> query) -> std::
     }
     else if (typeid(*query) == typeid(db::query::NumberGetByID)) {
         return numberGetByIdQuery(query);
+    }
+    else if (typeid(*query) == typeid(db::query::MergeContactsList)) {
+        return mergeContactsListQuery(query);
+    }
+    else if (typeid(*query) == typeid(db::query::CheckContactsListDuplicates)) {
+        return checkContactsListDuplicatesQuery(query);
     }
     else {
         error_db_data("Unexpected query type.");
@@ -353,6 +361,26 @@ auto ContactRecordInterface::numberGetByIdQuery(std::shared_ptr<db::Query> query
     auto numberQuery = static_cast<db::query::NumberGetByID *>(query.get());
     auto ret         = ContactRecordInterface::GetNumberById(numberQuery->getID());
     auto response    = std::make_unique<db::query::NumberGetByIDResult>(ret);
+    response->setRequestQuery(query);
+    return response;
+}
+
+auto ContactRecordInterface::mergeContactsListQuery(std::shared_ptr<db::Query> query)
+    -> std::unique_ptr<db::QueryResult>
+{
+    auto mergeQuery = static_cast<db::query::MergeContactsList *>(query.get());
+    auto ret        = ContactRecordInterface::MergeContactsList(mergeQuery->getContactsList());
+    auto response   = std::make_unique<db::query::MergeContactsListResult>(ret);
+    response->setRequestQuery(query);
+    return response;
+}
+
+auto ContactRecordInterface::checkContactsListDuplicatesQuery(std::shared_ptr<db::Query> query)
+    -> std::unique_ptr<db::QueryResult>
+{
+    auto mergeQuery = static_cast<db::query::CheckContactsListDuplicates *>(query.get());
+    auto response   = std::make_unique<db::query::CheckContactsListDuplicatesResult>(
+        std::move(ContactRecordInterface::CheckContactsListDuplicates(mergeQuery->getContactsList())));
     response->setRequestQuery(query);
     return response;
 }
@@ -1171,4 +1199,53 @@ auto ContactRecordInterface::GetNumbersIdsByContact(std::uint32_t contactId) -> 
         numbersIds.push_back(row.ID);
     }
     return numbersIds;
+}
+
+auto ContactRecordInterface::MergeContactsList(std::vector<ContactRecord> &contacts) -> bool
+{
+    std::vector<ContactNumberHolder> contactNumberHolders;
+    auto numberMatcher = buildNumberMatcher(contactNumberHolders);
+
+    for (auto &contact : contacts) {
+        // Important: Comparing only single number contacts
+        if (contact.numbers.size() > 1) {
+            LOG_WARN("Contact with multiple numbers detected - ignoring all numbers except first");
+        }
+        auto matchedNumber = numberMatcher.bestMatch(contact.numbers[0].number, utils::PhoneNumber::Match::POSSIBLE);
+
+        if (matchedNumber == numberMatcher.END) {
+            if (!Add(contact)) {
+                LOG_ERROR("Contacts list merge fail when adding the contact.");
+                return false;
+            }
+        }
+        else {
+            // Complete override of the contact data
+            contact.ID = matchedNumber->getContactID();
+            Update(contact);
+            // Rebuild number matcher
+            numberMatcher = buildNumberMatcher(contactNumberHolders);
+        }
+    }
+    return true;
+}
+
+auto ContactRecordInterface::CheckContactsListDuplicates(std::vector<ContactRecord> &contacts)
+    -> std::vector<ContactRecord>
+{
+    std::vector<ContactRecord> duplicates;
+    std::vector<ContactNumberHolder> contactNumberHolders;
+    auto numberMatcher = buildNumberMatcher(contactNumberHolders);
+
+    for (auto &contact : contacts) {
+        // Important: Comparing only single number contacts
+        if (contact.numbers.size() > 1) {
+            LOG_WARN("Contact with multiple numbers detected - ignoring all numbers except first");
+        }
+        auto matchedNumber = numberMatcher.bestMatch(contact.numbers[0].number, utils::PhoneNumber::Match::POSSIBLE);
+        if (matchedNumber != numberMatcher.END) {
+            duplicates.push_back(contact);
+        }
+    }
+    return duplicates;
 }
