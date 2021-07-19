@@ -2,10 +2,12 @@
 # Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
 BUILD_DIR=
 CRASH_DUMP=
 PURE_ELF=
-GDB=${GDB:-arm-none-eabi-gdb}
+GDB=${GDB:-arm-none-eabi-gdb-py}
+GDB_INIT=${GDB_INIT:-$SCRIPT_DIR/../.gdbinit-1051-dump}
 
 function perror()
 {
@@ -29,6 +31,9 @@ function print_usage()
     echo "ENV vars:"
     echo "  GDB        The gdb executable used to load the crash dump."
     echo "             'arm-none-eabi-gdb' by default."
+    echo
+    echo "  GDB_INIT   The gdb init script loaded at gdb startup."
+    echo "             'SOURCE_DIR/.gdinit-1051-dump' by default."
 }
 
 function parse_args()
@@ -79,7 +84,7 @@ function exec_gdb()
     local CRASH_DEBUG="$BUILD_DIR/third-party/CrashDebug/bin/CrashDebug"
 
     exec "$GDB" "$PURE_ELF"                                                             \
-        -ex "set target-charset ASCII"                                                  \
+        -x "$GDB_INIT"                                                                  \
         -ex "target remote | \"$CRASH_DEBUG\" --elf \"$PURE_ELF\" --dump \"$CRASH_DUMP\""
 }
 
