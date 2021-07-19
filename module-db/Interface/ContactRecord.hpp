@@ -220,6 +220,22 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
 
     auto GetNumbersIdsByContact(std::uint32_t contactId) -> std::vector<std::uint32_t>;
 
+    /**
+     * @brief Merge contacts list with overriding the duplicates in contacts DB
+     *
+     * @param contacts vector of contacts with single number
+     * @return boolean status
+     */
+    auto MergeContactsList(std::vector<ContactRecord> &contacts) -> bool;
+
+    /**
+     * @brief Check which contacts in vector are duplicating contacts in DB
+     *
+     * @param contacts vector of contacts with single number
+     * @return vector of contacts with numbers appearing in contacts DB
+     */
+    auto CheckContactsListDuplicates(std::vector<ContactRecord> &contacts) -> std::vector<ContactRecord>;
+
   private:
     ContactsDB *contactDB;
 
@@ -248,4 +264,6 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
     auto updateQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
     auto removeQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
     auto numberGetByIdQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
+    auto mergeContactsListQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
+    auto checkContactsListDuplicatesQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
 };
