@@ -6,6 +6,7 @@
 #include <service-cellular/ServiceCellular.hpp>
 #include <service-cellular/State.hpp>
 
+#include "SMSSendHandler.hpp"
 #include "SimCard.hpp"
 #include "NetworkTime.hpp"
 #include "SimContacts.hpp"
@@ -21,6 +22,7 @@ namespace cellular::internal
     {
         ServiceCellular *owner;
 
+        sms::SMSSendHandler outSMSHandler;
         std::unique_ptr<SimCard> simCard;
         std::unique_ptr<State> state;
         std::unique_ptr<NetworkTime> networkTime;
@@ -28,7 +30,7 @@ namespace cellular::internal
         State::PowerState nextPowerState = State::PowerState::Off;
 
       public:
-        ServiceCellularPriv(ServiceCellular *owner);
+        explicit ServiceCellularPriv(ServiceCellular *owner);
 
         void connectSimCard();
         void connectNetworkTime();
@@ -38,6 +40,12 @@ namespace cellular::internal
 
       private:
         void initSimCard();
+        void initSMSSendHandler();
+
+        /** Send SMS action used by the SMSSendHandler
+         * \param record SMS record to send
+         */
+        bool onSendSMS(SMSRecord &record);
 
         friend class ::ServiceCellular;
     };
