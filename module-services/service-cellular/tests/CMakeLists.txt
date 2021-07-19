@@ -18,6 +18,15 @@ add_catch2_executable(
         module-sys
 )
 
+add_catch2_executable(
+        NAME
+        cellular-smssendhandler
+        SRCS
+        unittest_smssendhandler.cpp
+        LIBS
+        module-cellular
+)
+
 
 add_catch2_executable(
         NAME
