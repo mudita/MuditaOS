@@ -842,14 +842,6 @@ class CellularCallRejectedByOfflineNotification : public CellularResponseMessage
     }
 };
 
-class CellularSendSMSMessage : public CellularMessage
-{
-  public:
-    explicit CellularSendSMSMessage(SMSRecord record) : CellularMessage(Type::SendSMS), record(record)
-    {}
-    SMSRecord record;
-};
-
 class CellularRingNotification : public CellularNotificationMessage
 {
   public:
