@@ -265,7 +265,6 @@ namespace style
             inline constexpr auto margin_top    = 10U;
             inline constexpr auto margin_right  = 0U;
             inline constexpr auto margin_bottom = 10U;
-            inline constexpr auto w             = window_width;
             inline constexpr auto h             = 50U;
         } // namespace progress_bar
         namespace top_message
