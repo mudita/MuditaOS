@@ -17,6 +17,7 @@
 #include <application-settings/windows/network/NetworkWindow.hpp>
 #include <application-settings/windows/network/SimPINSettingsWindow.hpp>
 #include <application-settings/windows/network/SimCardsWindow.hpp>
+#include <application-settings/windows/network/SimContactsImportWindow.hpp>
 #include <application-settings/windows/network/NewApnWindow.hpp>
 #include <application-settings/windows/network/ApnSettingsWindow.hpp>
 #include <application-settings/windows/network/ApnOptionsWindow.hpp>
@@ -379,6 +380,12 @@ namespace app
         windowsFactory.attach(gui::window::name::sim_pin_settings, [](Application *app, const std::string &name) {
             return std::make_unique<gui::SimPINSettingsWindow>(app);
         });
+        windowsFactory.attach(gui::window::name::import_contacts, [&](Application *app, const std::string &name) {
+            auto model     = std::make_unique<SimContactsImportModel>(this);
+            auto presenter = std::make_unique<SimContactsImportWindowPresenter>(std::move(model));
+            return std::make_unique<gui::SimContactsImportWindow>(app, std::move(presenter));
+        });
+
         windowsFactory.attach(gui::window::name::new_apn, [](Application *app, const std::string &name) {
             return std::make_unique<gui::NewApnWindow>(app);
         });

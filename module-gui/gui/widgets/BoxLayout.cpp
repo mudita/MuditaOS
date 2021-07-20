@@ -46,7 +46,7 @@ namespace gui
         else
             this->setFocusItem(nullptr);
         this->setNavigation();
-        if (this->focusChangedCallback) {
+        if (this->focusChangedCallback && state != focus) {
             this->focusChangedCallback(*this);
         }
         return true;

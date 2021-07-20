@@ -82,7 +82,6 @@ namespace gui
             gui::option::SettingRightItem::ArrowWhite,
             false));
 
-#if DISABLED_SETTINGS_OPTIONS == 1
         optList.emplace_back(std::make_unique<gui::option::OptionSettings>(
             utils::translate("app_settings_network_import_contacts_from_sim_card"),
             [=](gui::Item &item) {
@@ -90,8 +89,8 @@ namespace gui
                 return true;
             },
             nullptr,
-            nullptr));
-#endif // DISABLED_SETTINGS_OPTIONS
+            nullptr,
+            gui::option::SettingRightItem::ArrowWhite));
 
         bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::select));
 

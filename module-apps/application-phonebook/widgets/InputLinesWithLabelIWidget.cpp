@@ -60,15 +60,11 @@ namespace gui
         focusChangedCallback = [&](Item &item) {
             setFocusItem(focus ? vBox : nullptr);
 
-            auto tempText = inputText->getText();
-
             if (focus) {
                 inputText->setFont(style::window::font::mediumbold);
-                inputText->setText(tempText);
             }
             else {
                 inputText->setFont(style::window::font::medium);
-                inputText->setText(tempText);
             }
             return true;
         };

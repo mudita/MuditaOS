@@ -209,8 +209,7 @@ namespace gui
 
         if (format.getFont() != newFont) {
             format.setFont(newFont);
-            buildCursor();
-            drawLines();
+            buildDocument(getText());
         }
     }
 
