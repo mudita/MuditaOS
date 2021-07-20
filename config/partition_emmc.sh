@@ -96,18 +96,14 @@ if [ $? != 0 ]; then
 fi
 
 part1=$(sfdisk $dev --dump | grep bootable | awk '{print $1}')
-if [ "$product_name" == $PURE_PHONE_NAME ]; then
-	part2=$(sfdisk $dev --dump | tail -n 1 | awk '{print $1}')
-fi
+part2=$(sfdisk $dev --dump | tail -n 2 | head -n -1 | awk '{print $1}')
 
 echo "create FATs"
 echo "FAT: $MUDITAOS_PARTITION_PRIMARY $part1"
 mkfs.vfat -n $MUDITAOS_PARTITION_PRIMARY $part1
 
-if [ "$product_name" == $PURE_PHONE_NAME ]; then
-	echo "FAT: $MUDITAOS_PARTITION_RECOVERY $part2"
-	mkfs.vfat -n $MUDITAOS_PARTITION_RECOVERY $part2
-fi
+echo "FAT: $MUDITAOS_PARTITION_RECOVERY $part2"
+mkfs.vfat -n $MUDITAOS_PARTITION_RECOVERY $part2
 
 echo "probe new partitions to OS"
 partprobe

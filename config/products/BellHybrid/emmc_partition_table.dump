@@ -3,5 +3,6 @@ label-id: 0x09650eb4
 device: /dev/sda
 unit: sectors
 
-/dev/sda1 : start=       2048, size=  2097152, type=b, bootable
-/dev/sda2 : start=    2099200, size=  5306368, type=9e
+/dev/sda1 : start=       2048, size=  524288, type=b, bootable
+/dev/sda2 : start=     526336, size=  524288, type=9e
+/dev/sda3 : start=    1050624, size= 6354944, type=9e
