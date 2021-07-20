@@ -8,11 +8,13 @@
 #include <Bluetooth/Error.hpp>
 #include <service-evtmgr/Constants.hpp>
 #include <BluetoothWorker.hpp>
+#include <module-bluetooth/Bluetooth/interface/profiles/HSP/ScoUtils.hpp>
 #include <service-audio/AudioMessage.hpp>
 #include <service-bluetooth/Constants.hpp>
 #include <service-bluetooth/messages/AudioVolume.hpp>
 #include <service-cellular/service-cellular/CellularServiceAPI.hpp>
 #include <service-evtmgr/Constants.hpp>
+#include <service-audio/AudioServiceAPI.hpp>
 
 extern "C"
 {
@@ -32,6 +34,11 @@ namespace bluetooth
     bool CellularInterfaceImpl::hangupCall(sys::Service *service)
     {
         return CellularServiceAPI::HangupCall(service);
+    }
+
+    bool AudioInterfaceImpl::startAudioRouting(sys::Service *service)
+    {
+        return AudioServiceAPI::RoutingStart(service);
     }
 
     HSP::HSP() : pimpl(std::make_unique<HSPImpl>(HSPImpl()))
@@ -111,6 +118,7 @@ namespace bluetooth
     std::array<uint8_t, serviceBufferLength> HSP::HSPImpl::serviceBuffer;
     std::unique_ptr<SCO> HSP::HSPImpl::sco;
     std::unique_ptr<CellularInterface> HSP::HSPImpl::cellularInterface = nullptr;
+    std::unique_ptr<AudioInterface> HSP::HSPImpl::audioInterface       = nullptr;
     const sys::Service *HSP::HSPImpl::ownerService;
     std::string HSP::HSPImpl::agServiceName = "PurePhone HSP";
     bool HSP::HSPImpl::isConnected          = false;
@@ -150,6 +158,9 @@ namespace bluetooth
         case HCI_EVENT_SCO_CAN_SEND_NOW:
             if (audioDevice != nullptr) {
                 audioDevice->onDataSend(scoHandle);
+            }
+            else {
+                sco::utils::sendZeros(scoHandle);
             }
             break;
         case HCI_EVENT_HSP_META:
@@ -193,8 +204,8 @@ namespace bluetooth
             else {
                 scoHandle = hsp_subevent_audio_connection_complete_get_handle(event);
                 LOG_DEBUG("Audio connection established with SCO handle 0x%04x.\n", scoHandle);
+                audioInterface->startAudioRouting(const_cast<sys::Service *>(ownerService));
                 hci_request_sco_can_send_now_event();
-                RunLoop::trigger();
             }
             break;
         case HSP_SUBEVENT_AUDIO_DISCONNECTION_COMPLETE:
@@ -249,6 +260,7 @@ namespace bluetooth
         sco->init();
 
         cellularInterface = std::make_unique<CellularInterfaceImpl>();
+        audioInterface    = std::make_unique<AudioInterfaceImpl>();
 
         Profile::initL2cap();
         Profile::initSdp();
