@@ -11,6 +11,8 @@
 #include <Audio/VolumeScaler.hpp>
 #include <Audio/Stream.hpp>
 
+#include <module-bluetooth/Bluetooth/interface/profiles/HSP/ScoUtils.hpp>
+
 #include <chrono>
 #include <cassert>
 
@@ -88,6 +90,8 @@ void HSPAudioDevice::onDataSend()
 void HSPAudioDevice::onDataSend(std::uint16_t scoHandle)
 {
     if (!isOutputEnabled()) {
+        LOG_DEBUG("Output is disabled");
+        bluetooth::sco::utils::sendZeros(scoHandle);
         return;
     }
 
@@ -112,6 +116,7 @@ void HSPAudioDevice::onDataSend(std::uint16_t scoHandle)
 void HSPAudioDevice::receiveCVSD(audio::AbstractStream::Span receivedData)
 {
     if (!isInputEnabled()) {
+        LOG_DEBUG("Input is disabled");
         return;
     }
 
