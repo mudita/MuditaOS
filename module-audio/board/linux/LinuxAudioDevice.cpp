@@ -39,14 +39,14 @@ namespace audio
                 LOG_ERROR("Error (code %d) while terminating Portaudio: %s", errorCode, Pa_GetErrorText(errorCode));
             }
         }
-
-        PortAudio portAudio;
     } // namespace
 
     LinuxAudioDevice::LinuxAudioDevice()
         : supportedFormats(
               audio::AudioFormat::makeMatrix(supportedSampleRates, supportedBitWidths, supportedChannelModes))
-    {}
+    {
+        static PortAudio portAudio;
+    }
 
     LinuxAudioDevice::~LinuxAudioDevice()
     {

@@ -35,18 +35,50 @@ TEST_CASE("CallbackStorageTests")
 {
     CallbackStorage storage;
 
-    SECTION("Get callback")
+    SECTION("Get callback ")
     {
         constexpr auto MessageId = 1;
         sys::ResponseMessage response{};
         response.uniID = MessageId;
-
         TestReceiver receiver;
-        storage.registerCallback(MessageId, &receiver);
-        REQUIRE(storage.containsCallbackFor(&response));
 
-        [[maybe_unused]] auto callback = storage.getCallback(&response);
-        REQUIRE(!storage.containsCallbackFor(&response));
+        SECTION("Registration")
+        {
+            storage.registerCallback(MessageId, &receiver);
+            REQUIRE(storage.getCallbackEntryFor(&response));
+
+            [[maybe_unused]] auto callback = storage.getCallback(&response);
+            REQUIRE(!storage.getCallbackEntryFor(&response));
+        }
+
+        SECTION("NullCallback Type")
+        {
+            SECTION("no callback function")
+            {
+                storage.registerCallback(MessageId, &receiver, std::nullopt);
+                auto callback = storage.getCallback(&response);
+                REQUIRE(typeid(*callback) == typeid(NullCallback));
+            }
+            SECTION("no callback entry")
+            {
+                auto callback = storage.getCallback(&response);
+                REQUIRE(typeid(*callback) == typeid(NullCallback));
+            }
+        }
+        SECTION("AsyncResponseCallback Type")
+        {
+            storage.registerCallback(MessageId, &receiver, [](sys::ResponseMessage *) { return false; });
+            auto callback = storage.getCallback(&response);
+            REQUIRE(typeid(*callback) == typeid(AsyncResponseCallback));
+        }
+        SECTION("QueryCallback Type")
+        {
+            db::QueryResponse response{nullptr};
+            response.uniID = MessageId;
+            storage.registerCallback(MessageId, &receiver, [](sys::ResponseMessage *) { return false; });
+            auto callback = storage.getCallback(&response);
+            REQUIRE(typeid(*callback) == typeid(QueryCallback));
+        }
     }
 
     SECTION("Remove receiver")
@@ -60,10 +92,10 @@ TEST_CASE("CallbackStorageTests")
             TestReceiver receiver{&deleter};
 
             storage.registerCallback(MessageId, &receiver);
-            REQUIRE(storage.containsCallbackFor(&response));
+            REQUIRE(storage.getCallbackEntryFor(&response));
         }
 
-        REQUIRE(!storage.containsCallbackFor(&response));
+        REQUIRE(!storage.getCallbackEntryFor(&response));
         [[maybe_unused]] auto callback = storage.getCallback(&response);
         REQUIRE(callback->execute() == false);
     }
