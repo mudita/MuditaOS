@@ -63,7 +63,7 @@ def test_contacts(harness):
             "favourite": True,
             "numbers": ["547623521"],
             "priName": "Test"}
-    ret = harness.endpoint_request("contacts", "put", body)
+    ret = harness.endpoint_request("contacts", "post", body)
     assert ret["status"] == status["OK"]
     contact_id_to_update = ret["body"]["id"]
     assert contact_id_to_update
@@ -75,7 +75,7 @@ def test_contacts(harness):
             "favourite": True,
             "numbers": [],
             "priName": "Test"}
-    ret = harness.endpoint_request("contacts", "put", body)
+    ret = harness.endpoint_request("contacts", "post", body)
     assert ret["status"] == status["NotAcceptable"]
 
     # checking count after adding
@@ -92,7 +92,7 @@ def test_contacts(harness):
             "numbers": ["547623521"],
             "priName": "Test2",
             "id": contact_id_to_update}
-    ret = harness.endpoint_request("contacts", "post", body)
+    ret = harness.endpoint_request("contacts", "put", body)
     assert ret["status"] == status["NoContent"]
 
     # gathering updated contact
