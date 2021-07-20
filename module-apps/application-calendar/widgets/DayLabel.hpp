@@ -2,8 +2,9 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-#include "Application.hpp"
-#include <BoxLayout.hpp>
+
+#include <apps-common/Application.hpp>
+#include <gui/widgets/BoxLayout.hpp>
 
 namespace gui
 {

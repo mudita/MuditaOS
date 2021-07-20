@@ -12,6 +12,7 @@ add_subdirectory(application-antenna)
 add_subdirectory(application-bell-main)
 add_subdirectory(application-bell-settings)
 add_subdirectory(application-calculator)
+add_subdirectory(application-calendar)
 add_subdirectory(application-call)
 add_subdirectory(application-desktop)
 add_subdirectory(application-meditation)
@@ -25,7 +26,6 @@ add_subdirectory(apps-common)
 
 set(APPLICATIONS
     clock
-    calendar
     settings
     onboarding
     alarm-clock

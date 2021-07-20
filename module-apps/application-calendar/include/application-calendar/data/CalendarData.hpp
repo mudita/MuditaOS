@@ -4,8 +4,9 @@
 #pragma once
 
 #include "dateCommon.hpp"
+#include <application-calendar/widgets/CalendarStyle.hpp>
+
 #include <module-gui/gui/SwitchData.hpp>
-#include "application-calendar/widgets/CalendarStyle.hpp"
 
 enum class EventAction
 {

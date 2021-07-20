@@ -2,7 +2,9 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-#include <Style.hpp>
+
+#include <gui/widgets/Style.hpp>
+
 #include <string>
 
 namespace style::window::calendar
