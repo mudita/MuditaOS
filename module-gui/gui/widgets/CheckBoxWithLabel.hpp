@@ -1,36 +1,32 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-#include <CheckBox.hpp>
-#include <Label.hpp>
 
-namespace style::checkbox
-{
-    const inline int check_x           = 400;
-    const inline int check_y           = 25;
-    const inline int description_width = 380;
-    const inline int check_width       = 40;
-} // namespace style::checkbox
+#include "CheckBox.hpp"
+#include "Label.hpp"
+#include "BottomBar.hpp"
 
 namespace gui
 {
-    class CheckBoxWithLabel : public gui::Item
+    class CheckBoxWithLabel : public gui::HBox
     {
-      public:
-        CheckBoxWithLabel(Item *parent,
-                          int x,
-                          int y,
-                          UTF8 description,
-                          std::function<void(CheckBoxWithLabel &)> checkCallback = nullptr);
-
-        ~CheckBoxWithLabel() override = default;
-
-        void setChecked(bool state);
-        auto isChecked() const -> bool;
-
       private:
         gui::CheckBox *check = nullptr;
         gui::Label *label    = nullptr;
+
+      public:
+        CheckBoxWithLabel(Item *parent,
+                          uint32_t x,
+                          uint32_t y,
+                          uint32_t w,
+                          uint32_t h,
+                          const UTF8 &description,
+                          const std::function<void(const UTF8 &text)> &bottomBarTemporaryMode = nullptr,
+                          const std::function<void()> &bottomBarRestoreFromTemporaryMode      = nullptr,
+                          BottomBar::Side bottomBarSide                                       = BottomBar::Side::LEFT);
+
+        void setChecked(bool state);
+        auto isChecked() const -> bool;
     };
 } // namespace gui
