@@ -35,6 +35,8 @@ namespace app
         AsyncCallbacksDeleter *deleter;
     };
 
+    using CallbackFunction = std::function<bool(sys::ResponseMessage *)>;
+
     /**
      * Executes an operation on the sender's thread and saves the info about the receiver context for callback use.
      * Intended to use in order to avoid callbacks called on invalid receiver contexts.
@@ -49,7 +51,9 @@ namespace app
          * @param application       Application
          * @param receiverObject    The context of receiver
          */
-        void execute(Application *application, AsyncCallbackReceiver::Ptr receiverObject);
+        void execute(Application *application,
+                     AsyncCallbackReceiver::Ptr receiverObject,
+                     std::optional<std::function<bool(sys::ResponseMessage *)>> callback = std::nullopt);
 
       private:
         /**
@@ -81,6 +85,23 @@ namespace app
         db::Interface::Name target;
     };
 
+    class AsyncRequest : public AsyncTask
+    {
+      public:
+        [[nodiscard]] static auto createFromMessage(std::unique_ptr<sys::DataMessage> &&message,
+                                                    std::string serviceName) -> std::unique_ptr<AsyncRequest>;
+
+        AsyncRequest(std::unique_ptr<sys::DataMessage> &&message, std::string serviceName) noexcept;
+
+        void setCallback(std::function<bool> &&callback) noexcept;
+
+      private:
+        [[nodiscard]] auto onExecute(Application *application) -> RequestId override;
+
+        std::unique_ptr<sys::DataMessage> message;
+        std::string serviceName;
+    };
+
     class AsyncCallback
     {
       public:
@@ -103,6 +124,18 @@ namespace app
         [[nodiscard]] auto execute() -> bool override;
 
       private:
-        db::QueryResponse *response;
+        db::QueryResponse *response = nullptr;
+    };
+
+    class AsyncResponseCallback : public AsyncCallback
+    {
+      public:
+        AsyncResponseCallback(sys::ResponseMessage *response, CallbackFunction callbackFunction);
+
+        [[nodiscard]] auto execute() -> bool override;
+
+      private:
+        sys::ResponseMessage *response = nullptr;
+        CallbackFunction callbackFunction;
     };
 } // namespace app

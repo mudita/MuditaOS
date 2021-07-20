@@ -14,6 +14,9 @@ target_sources(application-music-player
     PRIVATE
         ApplicationMusicPlayer.cpp
         models/SongsModel.cpp
+        models/SongsRepository.cpp
+        presenters/AudioOperations.cpp
+        presenters/SongsPresenter.cpp
         widgets/Action.cpp
         widgets/SongItem.cpp
         windows/MusicPlayerAllSongsWindow.cpp
@@ -21,6 +24,10 @@ target_sources(application-music-player
     PRIVATE
         data/MusicPlayerStyle.hpp
         models/SongsModel.hpp
+        models/SongsRepository.hpp
+        models/SongsModelInterface.hpp
+        presenters/AudioOperations.hpp
+        presenters/SongsPresenter.hpp
         widgets/Action.hpp
         widgets/SongItem.hpp
         windows/MusicPlayerAllSongsWindow.hpp

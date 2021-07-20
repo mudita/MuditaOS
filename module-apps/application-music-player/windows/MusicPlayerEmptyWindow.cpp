@@ -72,18 +72,6 @@ namespace gui
         }
 
         if (inputEvent.is(gui::KeyCode::KEY_ENTER) || inputEvent.is(gui::KeyCode::HEADSET_OK)) {
-            if (inputEvent.isLongRelease()) {
-                auto app = dynamic_cast<app::ApplicationMusicPlayer *>(application);
-                assert(app);
-                app->stop();
-                return true;
-            }
-            else if (inputEvent.isShortRelease()) {
-                auto app = dynamic_cast<app::ApplicationMusicPlayer *>(application);
-                assert(app);
-                app->togglePlaying();
-                return true;
-            }
         }
 
         return false;

@@ -2,7 +2,8 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MusicPlayerAllSongsWindow.hpp"
-#include "application-music-player/ApplicationMusicPlayer.hpp"
+#include <application-music-player/ApplicationMusicPlayer.hpp>
+#include <data/MusicPlayerStyle.hpp>
 
 #include <Style.hpp>
 #include <cassert>
@@ -13,10 +14,11 @@
 namespace gui
 {
 
-    MusicPlayerAllSongsWindow::MusicPlayerAllSongsWindow(app::Application *app)
-        : AppWindow(app, gui::name::window::all_songs_window), songsModel{
-                                                                   std::make_shared<SongsModel>(this->application)}
+    MusicPlayerAllSongsWindow::MusicPlayerAllSongsWindow(
+        app::Application *app, std::shared_ptr<app::music_player::SongsContract::Presenter> windowPresenter)
+        : AppWindow(app, gui::name::window::all_songs_window), presenter{windowPresenter}
     {
+        presenter->attach(this);
         buildInterface();
     }
 
@@ -40,7 +42,7 @@ namespace gui
                                       musicPlayerStyle::allSongsWindow::y,
                                       musicPlayerStyle::allSongsWindow::w,
                                       musicPlayerStyle::allSongsWindow::h,
-                                      songsModel,
+                                      presenter->getMusicPlayerItemProvider(),
                                       listview::ScrollBarType::Fixed);
 
         setFocusItem(songsList);
@@ -53,11 +55,7 @@ namespace gui
 
     void MusicPlayerAllSongsWindow::onBeforeShow([[maybe_unused]] ShowMode mode, [[maybe_unused]] SwitchData *data)
     {
-        auto app = dynamic_cast<app::ApplicationMusicPlayer *>(application);
-        assert(app);
-
-        songsModel->createData(app->getMusicFilesList(),
-                               [app](const std::string &fileName) { return app->play(fileName); });
+        presenter->createData([this](const std::string &fileName) { return presenter->play(fileName); });
     }
 
 } /* namespace gui */
