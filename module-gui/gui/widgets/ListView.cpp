@@ -33,7 +33,7 @@ namespace gui
 
     void ListViewScroll::updateFixed(const ListViewScrollUpdateData &data)
     {
-        auto elementsOnPage = parent->widgetArea.h / data.elementMinimalHeight;
+        auto elementsOnPage = parent->widgetArea.h / data.elementMinimalSpaceRequired;
 
         pagesCount = data.elementsCount % elementsOnPage == 0 ? data.elementsCount / elementsOnPage
                                                               : data.elementsCount / elementsOnPage + 1;
@@ -127,7 +127,7 @@ namespace gui
                        listview::ScrollBarType scrollBarType)
         : Rect{parent, x, y, w, h}, ListViewEngine(prov)
     {
-        this->setBorderColor(ColorNoColor);
+        this->setEdges(RectangleEdge::None);
 
         body = new VBox{this, 0, 0, w, h};
         body->setAlignment(Alignment::Vertical::Top);
