@@ -40,6 +40,7 @@ namespace bluetooth
         static uint16_t scoHandle;
         static std::unique_ptr<SCO> sco;
         static std::unique_ptr<CellularInterface> cellularInterface;
+        static std::unique_ptr<AudioInterface> audioInterface;
         static std::array<char, commandBufferLength> ATcommandBuffer;
         static bd_addr_t deviceAddr;
         static const sys::Service *ownerService;

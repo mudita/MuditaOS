@@ -16,11 +16,22 @@ namespace bluetooth
         virtual bool answerIncomingCall(sys::Service *service) = 0;
         virtual bool hangupCall(sys::Service *service)         = 0;
     };
+    class AudioInterface
+    {
+      public:
+        virtual ~AudioInterface()                             = default;
+        virtual bool startAudioRouting(sys::Service *service) = 0;
+    };
     class CellularInterfaceImpl : public CellularInterface
     {
       public:
         bool answerIncomingCall(sys::Service *service) override;
         bool hangupCall(sys::Service *service) override;
+    };
+    class AudioInterfaceImpl : public AudioInterface
+    {
+      public:
+        bool startAudioRouting(sys::Service *service) override;
     };
     class HSP : public Profile
     {

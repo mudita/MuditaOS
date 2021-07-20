@@ -21,6 +21,7 @@ set(SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/A2DP/AVDTP.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/HSP/HSP.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/HSP/SCO.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/HSP/ScoUtils.cpp    
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/Profile.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/ProfileManager.cpp
 
