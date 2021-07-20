@@ -62,7 +62,7 @@ namespace gui
         const unsigned int startIndex;
         const unsigned int listPageSize;
         const unsigned int elementsCount;
-        const unsigned int elementMinimalHeight;
+        const unsigned int elementMinimalSpaceRequired;
         const listview::Direction direction;
         const Boundaries boundaries;
     };

@@ -107,11 +107,14 @@ namespace gui
             rectangles.clear();
         }
 
+        setMinimumHeight(rectAxisLengthFrom(numberOfRectangles));
         createRectangles();
 
         for (auto rect : rectangles) {
             addWidget(rect);
         }
+
+        resizeItems();
     }
 
     void VBarGraph::applyBarStyle(BarGraphStyle graphStyle)
@@ -150,11 +153,14 @@ namespace gui
             rectangles.clear();
         }
 
+        setMinimumWidth(rectAxisLengthFrom(numberOfRectangles));
         createRectangles();
 
         for (auto rect : rectangles) {
             addWidget(rect);
         }
+
+        resizeItems();
     }
 
     void HBarGraph::applyBarStyle(BarGraphStyle graphStyle)

@@ -3,38 +3,33 @@
 
 #pragma once
 
+#include "ListViewEngine.hpp"
+#include "ListItemProvider.hpp"
 #include "BoxLayout.hpp"
-#include "InputEvent.hpp"
-#include "Label.hpp"
-#include "SideListItemProvider.hpp"
-#include <apps-common/widgets/BarGraph.hpp>
+#include <widgets/BarGraph.hpp>
 
 namespace gui
 {
-    enum class Order;
-
-    class SideListView : public Rect
+    class SideListView : public Rect, public ListViewEngine
     {
       protected:
-        static constexpr auto progressbarStartValue = 1;
+        HBarGraph *pageBar  = nullptr;
+        HBox *arrowsOverlay = nullptr;
+        VBox *bodyOverlay   = nullptr;
 
-        std::shared_ptr<SideListItemProvider> provider = nullptr;
-        HBarGraph *progressbar                         = nullptr;
-        HBox *listItemBox                              = nullptr;
-
-        [[nodiscard]] auto slide(Order order) -> bool;
-        auto clear() -> void;
+        auto createArrowsOverlay(unsigned int x, unsigned y, unsigned int w, unsigned int h) -> void;
+        auto createPageBar() -> void;
+        auto setFocus() -> void override;
+        auto applyScrollCallbacks() -> void;
 
       public:
-        SideListView();
         SideListView(Item *parent,
                      unsigned int x,
                      unsigned int y,
                      unsigned int w,
                      unsigned int h,
-                     std::shared_ptr<SideListItemProvider> prov);
-        ~SideListView();
+                     std::shared_ptr<ListItemProvider> prov);
 
-        auto onInput(const gui::InputEvent &inputEvent) -> bool override;
+        auto onInput(const InputEvent &inputEvent) -> bool override;
     };
 } /* namespace gui */
