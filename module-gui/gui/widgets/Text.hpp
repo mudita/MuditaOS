@@ -87,6 +87,7 @@ namespace gui
         auto handleActivation(const InputEvent &inputEvent) -> bool;
         auto handleNavigation(const InputEvent &inputEvent) -> bool;
         auto handleRemovalChar(const InputEvent &inputEvent) -> bool;
+        auto handleWholeTextRemoval(const InputEvent &inputEvent) -> bool;
         auto handleDigitLongPress(const InputEvent &inputEvent) -> bool;
         auto handleAddChar(const InputEvent &inputEvent) -> bool;
 
