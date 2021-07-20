@@ -32,6 +32,14 @@ namespace app
             handleStopResponse(msg);
             return sys::MessageNone{};
         });
+
+        std::function<bool()> stateLockCallback = [this]() -> bool {
+            if (isTrackPlaying) {
+                LOG_DEBUG("Preventing autolock while playing track.");
+            }
+            return isTrackPlaying;
+        };
+        lockPolicyHandler.setPreventsAutoLockByStateCallback(std::move(stateLockCallback));
     }
 
     void ApplicationMusicPlayer::handlePlayResponse(sys::Message *msg)
