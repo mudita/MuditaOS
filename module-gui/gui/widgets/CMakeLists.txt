@@ -82,7 +82,6 @@ target_sources( ${PROJECT_NAME}
         "${CMAKE_CURRENT_LIST_DIR}/BoxLayout.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/Layout.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/SideListItem.hpp"
-        "${CMAKE_CURRENT_LIST_DIR}/SideListItemProvider.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/SideListView.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/Spinner.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/StatusBar.hpp"
