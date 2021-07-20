@@ -36,6 +36,7 @@ target_sources(apps-common
         widgets/ModesBox.cpp
         widgets/SpinBox.cpp
         widgets/TextWithIconsWidget.cpp
+        widgets/TimeSetSpinner.cpp
         widgets/TimeWidget.cpp
         widgets/WidgetsUtils.cpp
         windows/AppWindow.cpp
