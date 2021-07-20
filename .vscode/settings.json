@@ -87,6 +87,7 @@
         "span": "cpp",
         "assert": "cpp",
         "narrow": "cpp",
-        "util": "cpp"
+        "util": "cpp",
+        "filesystem": "cpp"
     },
 }
