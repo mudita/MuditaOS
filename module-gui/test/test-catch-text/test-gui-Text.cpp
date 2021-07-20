@@ -237,6 +237,28 @@ TEST_CASE("handle longpress for digit in ABC mode")
     REQUIRE(str == text.getText());
 }
 
+TEST_CASE("Handle backspace longpress")
+{
+    auto text          = gui::TestText();
+    auto key_backspace = gui::InputEvent({}, gui::InputEvent::State::keyReleasedLong, gui::KeyCode::KEY_PND);
+    text.setInputMode(new InputMode({InputMode::ABC}));
+
+    SECTION("Empty text")
+    {
+        REQUIRE(text.getText().empty());
+        auto input_handled = text.onInput(key_backspace);
+        REQUIRE(input_handled == false);
+    }
+
+    SECTION("Not empty text")
+    {
+        text.addText("test");
+        REQUIRE(text.getText() == "test");
+        text.onInput(key_backspace);
+        REQUIRE(text.getText().empty());
+    }
+}
+
 TEST_CASE("handle text expand")
 {
     mockup::fontManager();
