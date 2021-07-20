@@ -52,6 +52,7 @@ target_link_libraries(PurePhone
         application-antenna
         application-calculator
         application-calllog
+        application-calendar
         application-call
         application-desktop
         application-meditation

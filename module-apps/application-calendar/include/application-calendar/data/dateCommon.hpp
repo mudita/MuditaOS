@@ -4,10 +4,11 @@
 #ifndef DATECOMMON_H
 #define DATECOMMON_H
 
-#include <date/date.h>
 #include <time/time_conversion_factory.hpp>
-#include <Utils.hpp>
+#include <module-utils/Utils.hpp>
 #include <service-time/api/TimeSettingsApi.hpp>
+
+#include <date/date.h>
 
 #include <random>
 
@@ -260,7 +261,7 @@ inline std::string TimePointToString(const TimePoint &tp, date::years years)
 inline std::string TimePointToLocalizedDateString(const TimePoint &tp, const std::string format = "")
 {
     using namespace utils::time;
-    auto time = TimePointToTimeT(tp);
+    auto time      = TimePointToTimeT(tp);
     auto timestamp = TimestampFactory().createTimestamp(TimestampType::Date, time);
     return timestamp->str(format);
 }

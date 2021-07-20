@@ -2,12 +2,13 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DayLabel.hpp"
-#include "application-calendar/ApplicationCalendar.hpp"
-#include "application-calendar/widgets/CalendarStyle.hpp"
-#include "application-calendar/widgets/MonthBox.hpp"
-#include "application-calendar/data/CalendarData.hpp"
+#include "MonthBox.hpp"
+#include <application-calendar/ApplicationCalendar.hpp>
+#include <application-calendar/data/CalendarData.hpp>
+#include <application-calendar/widgets/CalendarStyle.hpp>
+
+#include <gui/widgets/Image.hpp>
 #include <time/time_conversion.hpp>
-#include <Image.hpp>
 
 namespace gui
 {
