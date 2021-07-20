@@ -14,8 +14,11 @@
 
 namespace gui
 {
-    BellMainWindow::BellMainWindow(app::Application *app) : AppWindow(app, gui::name::window::main_window)
+    BellMainWindow::BellMainWindow(app::Application *app,
+                                   std::unique_ptr<BellAlarmWindowContract::Presenter> &&windowPresenter)
+        : AppWindow(app, gui::name::window::main_window), presenter{std::move(windowPresenter)}
     {
+        presenter->attach(this);
         buildInterface();
     }
 
@@ -26,6 +29,66 @@ namespace gui
         statusBar->setVisible(false);
         header->setTitleVisibility(false);
         bottomBar->setVisible(false);
+
+        // for test purposes only - to be replaced by AlarmSetSpinner widget
+        // do not pay attention to magic numbers in gui primitives init
+
+        auto vBox = new gui::VBox(this,
+                                  style::window::default_left_margin,
+                                  45,
+                                  style::window::default_body_width,
+                                  style::window::default_body_height);
+        vBox->setEdges(gui::RectangleEdge::None);
+
+        auto hBox = new gui::HBox();
+        hBox->setEdges(gui::RectangleEdge::None);
+        hBox->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
+        hBox->setMinimumSize(style::window::default_body_width, 64);
+
+        auto leftArrow = new Image(hBox, 0, 0, "bell_arrow_left");
+        leftArrow->setAlignment(Alignment(gui::Alignment::Vertical::Center));
+        leftArrow->setMargins(Margins(0, 0, 5, 0));
+
+        Image *alarmImg;
+        auto alarmStatus = presenter->getAlarmStatus();
+        switch (alarmStatus) {
+        case BellAlarm::Status::ACTIVATED:
+            alarmImg = new Image(hBox, 0, 0, "bell_alarm_activated");
+            break;
+        case BellAlarm::Status::DEACTIVATED:
+            alarmImg = new Image(hBox, 0, 0, "bell_alarm_deactivated");
+            break;
+        case BellAlarm::Status::RINGING:
+            alarmImg = new Image(hBox, 0, 0, "bell_alarm_ringing");
+            break;
+        case BellAlarm::Status::SNOOZE:
+            alarmImg = new Image(hBox, 0, 0, "bell_alarm_snooze");
+            break;
+        case BellAlarm::Status::UNKNOWN:
+            alarmImg = new Image(hBox, 0, 0, "bell_alarm_deactivated");
+            break;
+        default:
+            alarmImg = new Image(hBox, 0, 0, "bell_alarm_deactivated");
+            break;
+        }
+
+        alarmImg->setAlignment(Alignment(gui::Alignment::Vertical::Center));
+        alarmImg->setMargins(Margins(0, 0, 5, 0));
+
+        auto TimeLabel = new gui::Label();
+        TimeLabel->setFont(style::window::font::largelight);
+        TimeLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
+        TimeLabel->setMinimumSize(200, 64);
+        TimeLabel->setEdges(gui::RectangleEdge::None);
+        hBox->addWidget(TimeLabel);
+
+        auto rightArrow = new Image(hBox, 0, 0, "bell_arrow_right");
+        rightArrow->setAlignment(Alignment(gui::Alignment::Vertical::Center));
+        rightArrow->setMargins(Margins(0, 0, 5, 0));
+
+        vBox->addWidget(hBox);
+        std::string timeString = std::to_string(presenter->getHour()) + ":" + std::to_string(presenter->getMinute());
+        TimeLabel->setText(timeString);
 
         namespace timeLabel = bellMainStyle::mainWindow::timeLabel;
         time = new gui::Label(this, timeLabel::posX, timeLabel::posY, timeLabel::width, timeLabel::height);

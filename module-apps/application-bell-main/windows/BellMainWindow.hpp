@@ -3,16 +3,19 @@
 
 #pragma once
 
+#include <presenter/BellAlarmPresenter.hpp>
+
 #include <AppWindow.hpp>
 #include <gui/widgets/Spinner.hpp>
 #include <BoxLayout.hpp>
 
 namespace gui
 {
-    class BellMainWindow : public AppWindow
+    class BellMainWindow : public AppWindow, public BellAlarmWindowContract::View
     {
       public:
-        explicit BellMainWindow(app::Application *app);
+        explicit BellMainWindow(app::Application *app,
+                                std::unique_ptr<BellAlarmWindowContract::Presenter> &&windowPresenter);
 
         void buildInterface() override;
         bool onInput(const InputEvent &inputEvent) override;
@@ -20,5 +23,8 @@ namespace gui
 
         gui::Label *time        = nullptr;
         gui::Label *temperature = nullptr;
+
+      private:
+        std::unique_ptr<BellAlarmWindowContract::Presenter> presenter;
     };
 } // namespace gui

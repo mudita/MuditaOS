@@ -30,8 +30,10 @@ namespace app
 
     void ApplicationBellMain::createUserInterface()
     {
-        windowsFactory.attach(gui::name::window::main_window, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::BellMainWindow>(app);
+        windowsFactory.attach(gui::name::window::main_window, [&](Application *app, const std::string &name) {
+            auto bellAlarmRepository = std::make_unique<BellAlarmRepository>();
+            auto presenter           = std::make_unique<BellAlarmPresenter>(std::move(bellAlarmRepository));
+            return std::make_unique<gui::BellMainWindow>(app, std::move(presenter));
         });
 
         windowsFactory.attach(gui::window::name::bell_main_menu, [](Application *app, const std::string &name) {

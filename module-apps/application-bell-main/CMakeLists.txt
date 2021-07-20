@@ -6,10 +6,14 @@ target_sources(application-bell-main
         windows/BellMainWindow.cpp
         windows/BellMainMenuWindow.cpp
         windows/BellMainSetHour.cpp
+        presenter/BellAlarmPresenter.cpp
+        models/BellAlarmRepository.cpp
  
         windows/BellMainWindow.hpp
         windows/BellMainMenuWindow.hpp
         windows/BellMainSetHour.hpp
+        presenter/BellAlarmPresenter.hpp
+        models/BellAlarmRepository.hpp
     PUBLIC
         include/application-bell-main/ApplicationBellMain.hpp
 )
