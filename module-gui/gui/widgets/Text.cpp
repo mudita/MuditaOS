@@ -265,6 +265,10 @@ namespace gui
             debug_text("handleBackspace");
             return true;
         }
+        if (handleWholeTextRemoval(evt)) {
+            debug_text("handleLongBackspace");
+            return true;
+        }
         if (handleAddChar(evt)) {
             debug_text("handleAddChar");
             return true;
@@ -548,6 +552,20 @@ namespace gui
                 onTextChanged();
             }
             return true;
+        }
+        return false;
+    }
+
+    bool Text::handleWholeTextRemoval(const InputEvent &inputEvent)
+    {
+        if (!isMode(EditMode::Edit)) {
+            return false;
+        }
+        if (inputEvent.isLongRelease(key_signs_remove)) {
+            if (!document->isEmpty()) {
+                clear();
+                return true;
+            }
         }
         return false;
     }
