@@ -1,8 +1,8 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "ApplicationCalendar.hpp"
-#include <application-calendar/windows/CalendarMainWindow.hpp>
+#include <application-calendar/ApplicationCalendar.hpp>
+#include <windows/CalendarMainWindow.hpp>
 
 namespace app
 {

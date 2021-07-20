@@ -2,9 +2,11 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-#include "Application.hpp"
+
+#include <models/MonthModel.hpp>
+
+#include <apps-common/Application.hpp>
 #include <gui/widgets/GridLayout.hpp>
-#include "application-calendar/models/MonthModel.hpp"
 
 namespace gui
 {

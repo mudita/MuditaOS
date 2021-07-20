@@ -3,13 +3,15 @@
 
 #pragma once
 
-#include "windows/AppWindow.hpp"
-#include "Application.hpp"
-#include "application-calendar/ApplicationCalendar.hpp"
-#include "application-calendar/models/MonthModel.hpp"
-#include "application-calendar/widgets/DayLabel.hpp"
-#include "application-calendar/widgets/MonthBox.hpp"
+#include <application-calendar/ApplicationCalendar.hpp>
+#include <models/MonthModel.hpp>
+#include <widgets/DayLabel.hpp>
+#include <widgets/MonthBox.hpp>
+
+#include <apps-common/Application.hpp>
+#include <apps-common/windows/AppWindow.hpp>
 #include <gui/widgets/GridLayout.hpp>
+
 #include <map>
 #include <vector>
 #include <string>

@@ -2,8 +2,9 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MonthModel.hpp"
-#include <time/time_locale.hpp>
+
 #include <time/time_constants.hpp>
+#include <time/time_locale.hpp>
 
 MonthModel::MonthModel(date::year_month_day yearMonthDay)
 {
