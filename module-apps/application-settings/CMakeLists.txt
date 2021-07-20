@@ -19,6 +19,7 @@ target_sources( ${PROJECT_NAME}
         models/bluetooth/BluetoothSettingsModel.cpp
         models/network/ApnSettingsModel.cpp
         models/network/NewApnModel.cpp
+        models/network/SimContactsImportModel.cpp
         models/display-keypad/QuotesModel.cpp
         models/display-keypad/CategoriesModel.cpp
         models/apps/AudioSettingsModel.cpp
@@ -27,12 +28,14 @@ target_sources( ${PROJECT_NAME}
         models/system/SARInfoRepository.cpp
         models/system/FactoryData.cpp
         models/system/TechnicalInformationModel.cpp
+        presenter/network/SimContactsImportWindowPresenter.cpp
         presenter/system/SARInfoWindowPresenter.cpp
         presenter/system/TechnicalWindowPresenter.cpp
         widgets/SpinBoxOptionSettings.cpp
         widgets/advanced/ColorTestListItem.cpp
         widgets/advanced/ColorTestListView.cpp
         widgets/network/ApnInputWidget.cpp
+        widgets/network/SimContactImportSelectWidget.cpp
         widgets/display-keypad/QuoteWidget.cpp
         widgets/display-keypad/CategoryWidget.cpp
         widgets/apps/SettingsSoundItem.cpp
@@ -55,6 +58,7 @@ target_sources( ${PROJECT_NAME}
         windows/network/NetworkWindow.cpp
         windows/network/SimCardsWindow.cpp
         windows/network/SimPINSettingsWindow.cpp
+        windows/network/SimContactsImportWindow.cpp
         windows/network/ApnSettingsWindow.cpp
         windows/network/ApnOptionsWindow.cpp
         windows/network/NewApnWindow.cpp
