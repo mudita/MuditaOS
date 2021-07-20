@@ -2,13 +2,11 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TimeWidget.hpp"
-#include "application-calendar/widgets/CalendarStyle.hpp"
 #include <ListView.hpp>
 #include <Style.hpp>
 #include <time/time_conversion.hpp>
 #include <time/time_date_validation.hpp>
 #include "DateAndTimeStyle.hpp"
-#include <module-apps/application-calendar/data/dateCommon.hpp>
 #include <time/TimeZone.hpp>
 
 namespace gui

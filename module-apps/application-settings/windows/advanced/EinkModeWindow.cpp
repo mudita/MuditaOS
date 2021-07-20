@@ -5,6 +5,7 @@
 
 #include <application-settings/windows/WindowNames.hpp>
 #include <messages/EinkModeMessage.hpp>
+#include <service-eink/Common.hpp>
 #include <Application.hpp>
 #include <i18n/i18n.hpp>
 #include <service-eink/Common.hpp>
