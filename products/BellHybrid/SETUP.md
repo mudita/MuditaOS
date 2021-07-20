@@ -9,7 +9,16 @@ In case of any problems Bell could be hard-reseted by pulling out the battery.
 ## Burn MCU fuses
 
 Use [D1_eMMC_FlashLoader](https://github.com/mudita/D1_eMMC_FlashLoader/)
-to burn MCU fuses on Bell device.
+to burn MCU fuses on Bell device
+and perform eMMC low-level partitioning:
+
+1. Download and install MCUXpresso Integrated Development Environment (IDE) from www.nxp.com
+2. Download, configure and install MCUXpresso Software Development Kit (SDK) from www.nxp.com (choose proper CPU model)
+3. Create a new project for [D1_eMMC_FlashLoader] in MCUXpresso
+4. Configure to debug with J-LINK
+5. Power up the device by connecting USB-C cable
+
+At the end USB MSC should be presented to the host.
 
 ## Flash bootloader
 
@@ -27,7 +36,7 @@ Use `lsblk` to check Bell device letter (e.g. `/dev/sda`)
 
 Use
 
-`sudo ./config/partition_emmc.sh /dev/sdX -f BellHybrid`
+`sudo ./config/partition_emmc.sh /dev/sdX -f -p BellHybrid`
 
 to partition Bell device.
 

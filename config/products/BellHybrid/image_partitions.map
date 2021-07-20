@@ -1,11 +1,1 @@
-# Partition sizes in sector 512 units
-PART1_START=2048
-PART1_SIZE=2097152
-PART2_START=$(($PART1_START + $PART1_SIZE))
-PART2_SIZE=5306368
-
-DEVICE_SECTORS="
-/dev/sdx1 : start=    $PART1_START,  size=    $PART1_SIZE, type=b, bootable
-/dev/sdx2 : start=    $PART2_START,  size=    $PART2_SIZE, type=9e"
-
-PARTITION_NUM=2
+PART1_SIZE=524288

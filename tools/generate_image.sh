@@ -21,8 +21,6 @@ fi
 IMAGE_NAME=$(realpath $1)
 PRODUCT_NAME=$(basename -s .img $1)
 
-source config/common.sh
-source config/products/$PRODUCT_NAME/image_partitions.map
 
 SYSROOT=$(realpath $2)
 BIN_FILE=$3
@@ -62,9 +60,24 @@ if [ -z ${GENLFS} ]; then
     exit -1
 fi
 
-#Number of sectors in the phone EMMC card
-DEVICE_BLK_COUNT=30621696
+# rel path as a temp solution for now
+source ../config/common.sh
+
+#Number of sectors in the EMMC card
+if [ "$PRODUCT_NAME" == $PURE_PHONE_NAME ]; then
+  DEVICE_BLK_COUNT=30621696
+else
+  DEVICE_BLK_COUNT=7403520
+fi
 DEVICE_BLK_SIZE=512
+
+# Partition sizes in sector 512 units
+PART1_START=2048
+source ../config/products/$PRODUCT_NAME/image_partitions.map # PART1_SIZE
+PART2_START=$(($PART1_START + $PART1_SIZE))
+PART2_SIZE=$PART1_SIZE
+PART3_START=$(($PART2_START + $PART2_SIZE))
+PART3_SIZE=$(($DEVICE_BLK_COUNT - $PART1_SIZE - $PART2_SIZE - $PART1_START))
 
 truncate -s $(($DEVICE_BLK_COUNT * $DEVICE_BLK_SIZE)) $IMAGE_NAME
 sfdisk $IMAGE_NAME << ==sfdisk
@@ -72,7 +85,9 @@ label: dos
 label-id: 0x09650eb4
 unit: sectors
 
-$DEVICE_SECTORS
+/dev/sdx1 : start=    $PART1_START,  size=    $PART1_SIZE, type=b, bootable
+/dev/sdx2 : start=    $PART2_START,  size=    $PART2_SIZE, type=9e
+/dev/sdx3 : start=    $PART3_START,  size=    $PART3_SIZE, type=9e
 ==sfdisk
 
 
@@ -80,11 +95,8 @@ $DEVICE_SECTORS
 PART1="$IMAGE_NAME@@$(($PART1_START * $DEVICE_BLK_SIZE))"
 mformat -i "$PART1" -F -T $PART1_SIZE -M $DEVICE_BLK_SIZE -v MUDITAOS
 
-
-if [ "$PRODUCT_NAME" == $PURE_PHONE_NAME ]; then
-	PART2="$IMAGE_NAME@@$(($PART2_START * $DEVICE_BLK_SIZE))"
-	mformat -i "$PART2" -F -T $PART2_SIZE -M $DEVICE_BLK_SIZE -v RECOVER
-fi
+PART2="$IMAGE_NAME@@$(($PART2_START * $DEVICE_BLK_SIZE))"
+mformat -i "$PART2" -F -T $PART2_SIZE -M $DEVICE_BLK_SIZE -v RECOVER
 
 if [ ! -d "${SYSROOT}/sys" ]; then
 	echo "Fatal! Image folder sys/ missing in build. Check build system."
@@ -128,8 +140,8 @@ mcopy -s -i "$PART1" .boot.json.crc32 ::
 
 #Littlefs generate image
 echo $(pwd)
-$GENLFS --image=$IMAGE_NAME --block_size=32768  --overwrite  --partition_num=3 -- user/*
-$GENLFS --image=$IMAGE_NAME --block_size=4096  --overwrite  --partition_num=2
+$GENLFS --image=$IMAGE_NAME --block_size=4096 --overwrite --partition_num=2
+$GENLFS --image=$IMAGE_NAME --block_size=32768 --overwrite --partition_num=3 -- user/*
 
 # back to previous dir
 cd -
