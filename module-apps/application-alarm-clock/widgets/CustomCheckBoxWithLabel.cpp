@@ -91,7 +91,7 @@ namespace gui
     {
         for (auto const &[key, dayName] : weekDays) {
             if (descriptionLabel->getText() == utils::translate(dayName)) {
-                checkBox->setImageVisible(checkBoxData.getData(static_cast<uint32_t>(key)));
+                checkBox->setCheck(checkBoxData.getData(static_cast<uint32_t>(key)));
             }
         }
     }

@@ -524,7 +524,7 @@ namespace gui::text
     {
         log_parser("parsing: %s", text.c_str());
         if (text.empty() || base_style == nullptr) {
-            LOG_ERROR("no: %s", text.empty() ? "text" : "base style");
+            log_parser("no: %s", text.empty() ? "text" : "base style");
             return nullptr;
         }
 
