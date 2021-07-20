@@ -4,6 +4,7 @@
 #pragma once
 
 #include "AudioMessage.hpp"
+#include "service-audio/AudioServiceName.hpp"
 
 #include <Audio/Audio.hpp>
 #include <Audio/AudioMux.hpp>
@@ -19,11 +20,6 @@ namespace settings
 {
     class Settings;
 }
-
-namespace service::name
-{
-    constexpr inline auto audio = "ServiceAudio";
-} // namespace service::name
 
 class ServiceAudio : public sys::Service
 {
