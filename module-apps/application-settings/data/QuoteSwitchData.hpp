@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include <application-settings/models/display-keypad/QuotesModel.hpp>
-#include <SwitchData.hpp>
+#include <gui/SwitchData.hpp>
+#include <service-db/service-db/QuotesMessages.hpp>
 
 namespace Quotes
 {

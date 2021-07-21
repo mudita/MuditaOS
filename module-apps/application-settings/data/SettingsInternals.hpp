@@ -3,8 +3,6 @@
 
 #pragma once
 
-#include <cstdint>
-
 namespace settingsInternals
 {
     enum class ListItemName

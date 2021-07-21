@@ -3,8 +3,8 @@
 
 #pragma once
 
+#include <gui/SwitchData.hpp>
 #include <service-bluetooth/messages/Status.hpp>
-#include <SwitchData.hpp>
 
 namespace gui
 {

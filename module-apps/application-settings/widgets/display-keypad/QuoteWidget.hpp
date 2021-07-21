@@ -3,9 +3,8 @@
 
 #pragma once
 
-#include "application-settings/data/QuoteSwitchData.hpp"
+#include <application-settings/data/QuoteSwitchData.hpp>
 
-#include <BoxLayout.hpp>
 #include <ImageBox.hpp>
 #include <Label.hpp>
 #include <ListItem.hpp>

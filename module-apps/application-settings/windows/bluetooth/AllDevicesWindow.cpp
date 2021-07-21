@@ -2,16 +2,14 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AllDevicesWindow.hpp"
-#include <application-settings/windows/WindowNames.hpp>
+
 #include <application-settings/data/BondedDevicesData.hpp>
 #include <application-settings/data/PairingDeviceData.hpp>
-#include <application-settings/widgets/SettingsStyle.hpp>
+#include <application-settings/windows/WindowNames.hpp>
 
 #include <DialogMetadataMessage.hpp>
-#include <OptionSetting.hpp>
-
 #include <InputEvent.hpp>
-#include <Image.hpp>
+#include <OptionSetting.hpp>
 #include <header/AddElementAction.hpp>
 
 namespace gui

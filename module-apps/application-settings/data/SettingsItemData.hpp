@@ -3,9 +3,8 @@
 
 #pragma once
 
+#include <gui/SwitchData.hpp>
 #include <service-cellular/service-cellular/PacketDataTypes.hpp>
-#include <ListItem.hpp>
-#include <SwitchData.hpp>
 
 class ApnItemData : public gui::SwitchData
 {

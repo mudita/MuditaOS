@@ -2,16 +2,12 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AddDeviceWindow.hpp"
-#include <application-settings/windows/WindowNames.hpp>
+
 #include <application-settings/data/DeviceData.hpp>
 #include <application-settings/data/PairingDeviceData.hpp>
+#include <application-settings/windows/WindowNames.hpp>
 
 #include <OptionSetting.hpp>
-
-extern "C"
-{
-#include <module-bluetooth/lib/btstack/src/btstack_util.h>
-}
 
 namespace gui
 {

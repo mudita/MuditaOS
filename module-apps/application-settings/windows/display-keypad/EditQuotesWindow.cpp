@@ -4,9 +4,8 @@
 #include "EditQuotesWindow.hpp"
 
 #include <application-settings/windows/WindowNames.hpp>
-#include <OptionSetting.hpp>
 
-#include <i18n/i18n.hpp>
+#include <OptionSetting.hpp>
 
 namespace gui
 {

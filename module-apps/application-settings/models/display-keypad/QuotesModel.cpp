@@ -3,8 +3,8 @@
 
 #include "QuotesModel.hpp"
 
-#include <application-settings/ApplicationSettings.hpp>
 #include <application-settings/widgets/display-keypad/QuoteWidget.hpp>
+#include <application-settings/windows/WindowNames.hpp>
 
 #include <InputEvent.hpp>
 #include <ListView.hpp>

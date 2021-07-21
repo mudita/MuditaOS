@@ -5,6 +5,8 @@
 
 #include <application-settings/data/SettingsItemData.hpp>
 
+#include <gui/widgets/ListItem.hpp>
+
 namespace gui
 {
     using ApnListItem = ListItemWithCallbacks<packet_data::APN::Config>;

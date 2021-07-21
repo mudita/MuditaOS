@@ -4,6 +4,7 @@
 #pragma once
 
 #include <application-settings/windows/BaseSettingsWindow.hpp>
+
 #include <Text.hpp>
 
 namespace app::settingsInterface

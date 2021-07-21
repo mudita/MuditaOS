@@ -2,8 +2,9 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-#include <string>
-#include <SwitchData.hpp>
+
+#include <gui/SwitchData.hpp>
+
 namespace gui
 {
     class PhoneNameData : public SwitchData

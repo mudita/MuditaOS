@@ -5,9 +5,9 @@
 
 #include <application-settings/widgets/apps/SettingsSoundItem.hpp>
 
+#include <ListView.hpp>
 #include <purefs/filesystem_paths.hpp>
 #include <service-audio/AudioServiceAPI.hpp>
-#include <ListView.hpp>
 
 unsigned int SoundsModel::requestRecordsCount()
 {

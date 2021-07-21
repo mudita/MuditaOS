@@ -3,9 +3,8 @@
 
 #pragma once
 
-#include <application-settings/windows/BaseSettingsWindow.hpp>
 #include <application-settings/models/display-keypad/CategoriesModel.hpp>
-#include <ListView.hpp>
+#include <application-settings/windows/BaseSettingsWindow.hpp>
 
 namespace gui
 {
