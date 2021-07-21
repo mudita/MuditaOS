@@ -40,7 +40,7 @@ namespace audio
         auto format = dec->getSourceFormat();
         LOG_DEBUG("Source format: %s", format.toString().c_str());
 
-        auto retCode = SwitchToPriorityProfile();
+        auto retCode = SwitchToPriorityProfile(playbackType);
         if (retCode != RetCode::Success) {
             throw AudioInitException("Failed to switch audio profile", retCode);
         }
@@ -133,17 +133,32 @@ namespace audio
         return dec->getCurrentPosition();
     }
 
+    audio::RetCode PlaybackOperation::SwitchToPriorityProfile(audio::PlaybackType playbackType)
+    {
+        for (const auto &p : supportedProfiles) {
+            const auto profileType = p.profile->GetType();
+            if (profileType == audio::Profile::Type::PlaybackBluetoothA2DP &&
+                playbackType == audio::PlaybackType::CallRingtone) {
+                continue;
+            }
+            if (p.isAvailable) {
+                return SwitchProfile(profileType);
+            }
+        }
+        return audio::RetCode::ProfileNotSet;
+    }
+
     audio::RetCode PlaybackOperation::SendEvent(std::shared_ptr<Event> evt)
     {
         auto isAvailable = evt->getDeviceState() == Event::DeviceState::Connected ? true : false;
         switch (evt->getType()) {
         case EventType::JackState:
             SetProfileAvailability({Profile::Type::PlaybackHeadphones}, isAvailable);
-            SwitchToPriorityProfile();
+            Operation::SwitchToPriorityProfile();
             break;
         case EventType::BlutoothA2DPDeviceState:
             SetProfileAvailability({Profile::Type::PlaybackBluetoothA2DP}, isAvailable);
-            SwitchToPriorityProfile();
+            Operation::SwitchToPriorityProfile();
             break;
         default:
             return RetCode::UnsupportedEvent;
@@ -156,6 +171,7 @@ namespace audio
     {
         auto newProfile = GetProfile(type);
         if (newProfile == nullptr) {
+            LOG_ERROR("Unsupported profile");
             return RetCode::UnsupportedProfile;
         }
 

@@ -114,8 +114,17 @@ namespace audio
         {
             return filePath;
         }
-
-        audio::RetCode SwitchToPriorityProfile();
+        /**
+         * @brief Switches operation to priority profile.
+         */
+        virtual audio::RetCode SwitchToPriorityProfile();
+        /**
+         * @brief Switches operation to priority profile.
+         *
+         * @param playbackType if it's callringtone and bluetooth a2dp is used then
+         * ignore priorities and change profile to the earpeaker. Not needed otherwise.
+         */
+        virtual audio::RetCode SwitchToPriorityProfile(audio::PlaybackType playbackType);
 
       protected:
         struct SupportedProfile
