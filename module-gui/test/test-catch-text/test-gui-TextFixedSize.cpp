@@ -165,7 +165,7 @@ TEST_CASE("TextFixedSize remove Char")
     SECTION("Remove char from last line on size limited space")
     {
         auto text = TestTextFixedSize();
-        text.setSize(210, 30);
+        text.setSize(220, 30);
 
         text.setFont(style::window::font::medium);
         text.setText(testStringLongLine);
@@ -181,7 +181,7 @@ TEST_CASE("TextFixedSize remove Char")
     SECTION("Remove char from last line on line limited space")
     {
         auto text = TestTextFixedSize();
-        text.setSize(210, 120);
+        text.setSize(220, 120);
 
         text.setFont(style::window::font::medium);
         text.setLines(1);
