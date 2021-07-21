@@ -69,6 +69,7 @@ target_include_directories(
 )
 
 target_link_libraries(${PROJECT_NAME}
+    application-settings
     ${BOARD_DIR_LIBRARIES}
     module-audio
     module-bsp

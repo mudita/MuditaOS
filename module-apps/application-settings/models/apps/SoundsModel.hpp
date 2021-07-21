@@ -6,8 +6,6 @@
 #include "AbstractSoundsModel.hpp"
 
 #include <InternalModel.hpp>
-#include <Application.hpp>
-#include <Audio/decoder/Decoder.hpp>
 
 /// Simple SoundsModel
 class SoundsModel : public app::InternalModel<gui::ListItem *>, public AbstractSoundsModel

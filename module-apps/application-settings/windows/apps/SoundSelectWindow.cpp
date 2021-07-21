@@ -3,10 +3,10 @@
 
 #include "SoundSelectWindow.hpp"
 
-#include <application-settings/models/apps/SoundsModel.hpp>
 #include <application-settings/data/SoundSelectData.hpp>
+#include <application-settings/models/apps/SoundsModel.hpp>
+
 #include <ListView.hpp>
-#include <i18n/i18n.hpp>
 
 namespace gui
 {

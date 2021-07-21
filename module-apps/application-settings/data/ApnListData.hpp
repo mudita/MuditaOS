@@ -3,10 +3,8 @@
 
 #pragma once
 
+#include <gui/SwitchData.hpp>
 #include <service-cellular/PacketDataTypes.hpp>
-#include <SwitchData.hpp>
-
-#include <vector>
 
 namespace gui
 {

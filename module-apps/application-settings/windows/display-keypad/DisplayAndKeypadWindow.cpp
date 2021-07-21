@@ -4,8 +4,8 @@
 #include "DisplayAndKeypadWindow.hpp"
 
 #include <application-settings/windows/WindowNames.hpp>
+
 #include <OptionSetting.hpp>
-#include <i18n/i18n.hpp>
 
 namespace gui
 {

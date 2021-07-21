@@ -1,8 +1,6 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <utility>
-
 #include "ApplicationOnBoarding.hpp"
 
 #include "data/OnBoardingMessages.hpp"
@@ -18,12 +16,8 @@
 #include "windows/OnBoardingDateAndTimeWindow.hpp"
 #include "windows/OnBoardingChangeDateAndTimeWindow.hpp"
 
-#include <service-appmgr/messages/GetCurrentDisplayLanguageResponse.hpp>
-#include <application-settings/data/LanguagesData.hpp>
 #include <application-settings/windows/system/ChangeTimeZone.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
-#include <apps-common/locks/data/PhoneLockMessages.hpp>
-#include <apps-common/locks/data/SimLockMessages.hpp>
 #include <service-appmgr/model/ApplicationManager.hpp>
 
 namespace app

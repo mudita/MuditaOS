@@ -5,10 +5,10 @@
 
 #include <application-settings/windows/WindowNames.hpp>
 
+#include <DialogMetadataMessage.hpp>
+#include <OptionSetting.hpp>
 #include <service-desktop/DesktopMessages.hpp>
 #include <service-desktop/ServiceDesktop.hpp>
-#include <OptionSetting.hpp>
-#include <DialogMetadataMessage.hpp>
 
 namespace gui
 {

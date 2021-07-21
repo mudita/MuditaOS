@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include <application-settings/windows/BaseSettingsWindow.hpp>
-#include <application-settings/models/display-keypad/QuotesModel.hpp>
 #include <application-settings/data/QuoteSwitchData.hpp>
+#include <application-settings/models/display-keypad/QuotesModel.hpp>
+#include <application-settings/windows/BaseSettingsWindow.hpp>
 
 namespace gui
 {

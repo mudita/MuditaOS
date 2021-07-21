@@ -3,8 +3,6 @@
 
 #include "LanguagesWindow.hpp"
 
-#include <application-settings/data/LanguagesData.hpp>
-
 #include <OptionSetting.hpp>
 #include <service-appmgr/Controller.hpp>
 

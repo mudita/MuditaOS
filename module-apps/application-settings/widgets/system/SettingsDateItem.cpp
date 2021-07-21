@@ -3,9 +3,9 @@
 
 #include "SettingsDateItem.hpp"
 
+#include <InputEvent.hpp>
 #include <widgets/DateAndTimeStyle.hpp>
 #include <widgets/WidgetsUtils.hpp>
-#include <InputEvent.hpp>
 
 namespace date_and_time = style::window::date_and_time;
 

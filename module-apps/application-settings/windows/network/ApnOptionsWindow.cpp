@@ -3,8 +3,9 @@
 
 #include "ApnOptionsWindow.hpp"
 
-#include <application-settings/windows/WindowNames.hpp>
 #include <application-settings/data/SettingsItemData.hpp>
+#include <application-settings/windows/WindowNames.hpp>
+
 #include <OptionSetting.hpp>
 
 namespace gui

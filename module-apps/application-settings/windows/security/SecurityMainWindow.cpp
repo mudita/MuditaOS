@@ -4,6 +4,7 @@
 #include "SecurityMainWindow.hpp"
 
 #include <application-settings/windows/WindowNames.hpp>
+
 #include <OptionSetting.hpp>
 
 namespace gui

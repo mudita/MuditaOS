@@ -4,9 +4,7 @@
 #include "QuotesAddWindow.hpp"
 
 #include <application-settings/windows/WindowNames.hpp>
-#include <application-settings/data/QuoteSwitchData.hpp>
 
-#include <i18n/i18n.hpp>
 #include <widgets/Text.hpp>
 
 namespace style

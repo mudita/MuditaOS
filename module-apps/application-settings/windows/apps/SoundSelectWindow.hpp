@@ -4,7 +4,6 @@
 #pragma once
 
 #include <application-settings/models/apps/AbstractSoundsModel.hpp>
-#include <AppWindow.hpp>
 
 namespace gui
 {

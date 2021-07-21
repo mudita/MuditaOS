@@ -4,9 +4,7 @@
 #include "MessagesWindow.hpp"
 
 #include <application-settings/data/SoundSelectData.hpp>
-#include <application-settings/ApplicationSettings.hpp>
-
-#include <i18n/i18n.hpp>
+#include <application-settings/windows/WindowNames.hpp>
 
 namespace gui
 {

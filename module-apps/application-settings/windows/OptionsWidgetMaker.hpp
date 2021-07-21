@@ -3,8 +3,7 @@
 
 #pragma once
 
-#include "Option.hpp"
-#include "OptionWindow.hpp"
+#include <OptionWindow.hpp>
 
 namespace gui
 {

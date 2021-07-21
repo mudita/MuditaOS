@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include <SwitchData.hpp>
 #include <service-appmgr/messages/AutoLockRequests.hpp>
 
 namespace gui

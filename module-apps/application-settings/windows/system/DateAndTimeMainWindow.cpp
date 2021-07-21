@@ -4,10 +4,11 @@
 #include "DateAndTimeMainWindow.hpp"
 
 #include <application-settings/windows/WindowNames.hpp>
+
 #include <OptionSetting.hpp>
-#include <service-time/service-time/TimeMessage.hpp>
 #include <service-time/Constants.hpp>
 #include <service-time/api/TimeSettingsApi.hpp>
+#include <service-time/service-time/TimeMessage.hpp>
 
 namespace gui
 {

@@ -2,8 +2,9 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BluetoothWindow.hpp"
-#include <application-settings/windows/WindowNames.hpp>
+
 #include <application-settings/data/BluetoothStatusData.hpp>
+#include <application-settings/windows/WindowNames.hpp>
 
 #include <OptionSetting.hpp>
 

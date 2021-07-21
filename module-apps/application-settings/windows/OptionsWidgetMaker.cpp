@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "OptionsWidgetMaker.hpp"
+
 #include <OptionSetting.hpp>
 
 namespace gui

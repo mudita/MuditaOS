@@ -60,7 +60,6 @@ namespace gui::window::name
     inline constexpr auto date_and_time         = "DateAndTime";
     inline constexpr auto change_date_and_time  = "ChangeDateAndTime";
     inline constexpr auto change_time_zone      = "ChangeTimeZone";
-    inline constexpr auto about_your_pure       = "AboutYourPure";
     inline constexpr auto technical_information = "TechnicalInformation";
     inline constexpr auto certification         = "Certification";
     inline constexpr auto sar                   = "Sar";

@@ -4,11 +4,12 @@
 #include "ChangeTimeZone.hpp"
 
 #include <application-settings/windows/WindowNames.hpp>
+
 #include <OptionSetting.hpp>
-#include <time/TimeZone.hpp>
-#include <service-time/service-time/TimeMessage.hpp>
 #include <service-time/Constants.hpp>
 #include <service-time/api/TimeSettingsApi.hpp>
+#include <service-time/service-time/TimeMessage.hpp>
+#include <time/TimeZone.hpp>
 
 namespace gui
 {

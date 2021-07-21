@@ -4,6 +4,7 @@
 #pragma once
 
 #include <application-settings/presenter/system/SARInfoWindowPresenter.hpp>
+
 #include <AppWindow.hpp>
 #include <Text.hpp>
 
