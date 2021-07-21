@@ -45,7 +45,7 @@ TEST_CASE("Endpoint Filesystem Test")
         auto fileToSend  = "\"/sys/user/data/applications/settings/quotes.json\"";
         auto fileSize    = 676u;
         auto fileCrc32   = "\"37ef9a52\"";
-        auto chunkSize   = 12288u;
+        auto chunkSize   = FileOperations::ChunkSize;
         auto txID        = 1u;
         auto testMessage = "{\"endpoint\":" + std::to_string(endpoint) +
                            ", \"method\": 3, \"uuid\":" + std::to_string(uuid) +
@@ -130,7 +130,7 @@ TEST_CASE("Endpoint Filesystem Test")
         auto uuid        = 1103;
         auto fileToGet   = "\"/sys/user/data/applications/settings/quotes.json\"";
         auto fileSize    = 676u;
-        auto chunkSize   = 12288u;
+        auto chunkSize   = FileOperations::ChunkSize;
         auto rxID        = 2u;
         auto testMessage = "{\"endpoint\":" + std::to_string(endpoint) +
                            ", \"method\":1, \"uuid\":" + std::to_string(uuid) +

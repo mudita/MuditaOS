@@ -4,7 +4,6 @@
 #pragma once
 
 #include <endpoints/developerMode/DeveloperModeEndpoint.hpp>
-#include <endpoints/update/UpdateOSTypes.hpp>
 #include <service-appmgr/Actions.hpp>
 #include <service-appmgr/messages/ActionRequest.hpp>
 #include <Service/Message.hpp>
@@ -14,35 +13,6 @@
 
 namespace sdesktop
 {
-    class UpdateOsMessage : public sys::DataMessage
-    {
-      public:
-        UpdateOsMessage(const std::string updateFilePath, const uint32_t requestUUID)
-            : sys::DataMessage(MessageType::UpdateOS)
-        {
-            updateStats.updateFile = updateFilePath;
-            updateStats.uuid       = requestUUID;
-        };
-
-        UpdateOsMessage() : sys::DataMessage(MessageType::UpdateOS)
-        {}
-
-        UpdateOsMessage(const updateos::UpdateMessageType updateMessageType)
-            : sys::DataMessage(MessageType::UpdateOS), messageType(updateMessageType)
-        {}
-
-        UpdateOsMessage(const updateos::UpdateMessageType updateMessageType, fs::path updateFileFoundOnBoot)
-            : sys::DataMessage(MessageType::UpdateOS), messageType(updateMessageType)
-        {
-            updateStats.updateFile = updateFileFoundOnBoot;
-        }
-
-        ~UpdateOsMessage() override = default;
-
-        updateos::UpdateStats updateStats       = {};
-        updateos::UpdateMessageType messageType = updateos::UpdateMessageType::UpdateNow;
-    };
-
     class BackupMessage : public sys::DataMessage
     {
       public:
@@ -138,23 +108,4 @@ namespace sdesktop
             explicit ScreenlockCheckEvent(bool isLocked);
         };
     } // namespace developerMode
-
-    namespace transfer
-    {
-        class TransferTimerState : public sys::DataMessage
-        {
-          public:
-            enum Request
-            {
-                None,
-                Start,
-                Reload,
-                Stop
-            };
-            enum Request req = Request::None;
-            TransferTimerState(enum Request req = None) : sys::DataMessage(MessageType::TransferTimer), req(req){};
-            ~TransferTimerState() override = default;
-        };
-    } // namespace transfer
-
 } // namespace sdesktop

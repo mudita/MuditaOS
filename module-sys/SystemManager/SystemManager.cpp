@@ -227,21 +227,6 @@ namespace sys
         return true;
     }
 
-    bool SystemManager::Update(Service *s, const std::string &updateOSVer, const std::string &currentOSVer)
-    {
-        // set update OS version (and also current os version) in Settings
-        storeOsVersion(s, updateOSVer, currentOSVer);
-
-        // close some services
-        s->bus.sendUnicast(std::make_shared<SystemManagerCmd>(Code::Update), service::name::system_manager);
-
-        // close some applications
-        auto msgCloseApplications = std::make_shared<app::manager::UpdateInProgress>(service::name::system_manager);
-        s->bus.sendUnicast(std::move(msgCloseApplications), app::manager::ApplicationManager::ServiceName);
-
-        return true;
-    }
-
     bool SystemManager::Restore(Service *s)
     {
         LOG_DEBUG("trying to enter restore state");
@@ -251,22 +236,7 @@ namespace sys
         if (ret.first != ReturnCodes::Success) {
             LOG_WARN("Can't stop all services, %d ms wait time", sys::constants::restoreTimeout);
         }
-        auto msgCloseApplications = std::make_shared<app::manager::UpdateInProgress>(service::name::system_manager);
-        ret                       = s->bus.sendUnicastSync(std::move(msgCloseApplications),
-                                     app::manager::ApplicationManager::ServiceName,
-                                     sys::constants::restoreTimeout);
-        if (ret.first != ReturnCodes::Success) {
-            LOG_WARN("Can't stop all applications, %d ms wait time", sys::constants::restoreTimeout);
-        }
         return true;
-    }
-
-    void SystemManager::storeOsVersion(Service *s, const std::string &updateOSVer, const std::string &currentOSVer)
-    {
-        // store OS version in Settings
-        auto msgSetUpdateVersion = std::make_shared<app::manager::SetOsUpdateVersion>(
-            service::name::system_manager, updateOSVer, currentOSVer);
-        s->bus.sendUnicast(std::move(msgSetUpdateVersion), app::manager::ApplicationManager::ServiceName);
     }
 
     bool SystemManager::Reboot(Service *s)
@@ -277,9 +247,8 @@ namespace sys
 
     bool SystemManager::RebootToUpdate(Service *s, UpdateReason updateReason)
     {
-        s->bus.sendUnicast(
-            std::make_shared<SystemManagerCmd>(Code::RebootToUpdate, CloseReason::RegularPowerDown, updateReason),
-            service::name::system_manager);
+        s->bus.sendUnicast(std::make_shared<SystemManagerCmd>(Code::RebootToUpdate, CloseReason::Reboot, updateReason),
+                           service::name::system_manager);
         return true;
     }
 
