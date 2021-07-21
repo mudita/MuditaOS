@@ -4,10 +4,9 @@
 #include "InformationWindow.hpp"
 
 #include <application-settings/windows/WindowNames.hpp>
-#include <service-cellular/CellularServiceAPI.hpp>
 
+#include <service-cellular/CellularServiceAPI.hpp>
 #include <source/version.hpp>
-#include <log.hpp>
 
 namespace gui
 {

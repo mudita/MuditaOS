@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <SwitchData.hpp>
+#include <gui/SwitchData.hpp>
 
 namespace gui
 {

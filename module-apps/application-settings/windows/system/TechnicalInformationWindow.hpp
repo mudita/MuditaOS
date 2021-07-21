@@ -3,9 +3,8 @@
 
 #pragma once
 
-#include <application-settings/windows/BaseSettingsWindow.hpp>
 #include <application-settings/presenter/system/TechnicalWindowPresenter.hpp>
-#include <application-settings/models/system/TechnicalInformationModel.hpp>
+#include <application-settings/windows/BaseSettingsWindow.hpp>
 
 namespace gui
 {

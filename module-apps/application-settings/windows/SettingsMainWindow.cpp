@@ -2,10 +2,9 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SettingsMainWindow.hpp"
-#include "application-settings/ApplicationSettings.hpp"
 
-#include <i18n/i18n.hpp>
-#include <log.hpp>
+#include <application-settings/windows/WindowNames.hpp>
+
 #include <service-appmgr/Controller.hpp>
 
 std::list<gui::Option> mainWindowOptionsNew(app::Application *app)

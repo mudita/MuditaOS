@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include <service-cellular/PacketDataTypes.hpp>
-#include <service-cellular/CellularServiceAPI.hpp>
 #include <apps-common/Application.hpp>
+#include <service-cellular/CellularServiceAPI.hpp>
+#include <service-cellular/PacketDataTypes.hpp>
 
 class ApnSettingsModel
 {

@@ -3,11 +3,10 @@
 
 #pragma once
 
-#include <OptionWindow.hpp>
 #include <application-settings/models/network/ApnSettingsModel.hpp>
 
 #include <Icon.hpp>
-#include <service-cellular/PacketDataTypes.hpp>
+#include <OptionWindow.hpp>
 
 namespace gui
 {

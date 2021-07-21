@@ -3,9 +3,8 @@
 
 #pragma once
 
-#include <application-settings/windows/WindowNames.hpp>
 #include <application-settings/models/system/DateAndTimeModel.hpp>
-#include <AppWindow.hpp>
+#include <application-settings/windows/WindowNames.hpp>
 
 namespace gui
 {

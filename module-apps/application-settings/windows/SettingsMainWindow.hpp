@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include "OptionWindow.hpp"
-#include "Application.hpp"
+#include <OptionWindow.hpp>
 
 std::list<gui::Option> mainWindowOptionsNew(app::Application *app);

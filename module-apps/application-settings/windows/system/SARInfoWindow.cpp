@@ -5,6 +5,7 @@
 
 #include <application-settings/windows/WindowNames.hpp>
 #include <application-settings/widgets/SettingsStyle.hpp>
+
 #include <i18n/i18n.hpp>
 
 namespace gui

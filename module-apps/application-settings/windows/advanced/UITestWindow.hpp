@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "AppWindow.hpp"
+#include <AppWindow.hpp>
 #include <Text.hpp>
 
 namespace gui

@@ -4,10 +4,9 @@
 #include "InputLanguageWindow.hpp"
 
 #include <application-settings/windows/WindowNames.hpp>
-#include <service-appmgr/Controller.hpp>
-#include <OptionSetting.hpp>
 
-#include <i18n/i18n.hpp>
+#include <OptionSetting.hpp>
+#include <service-appmgr/Controller.hpp>
 
 namespace gui
 {

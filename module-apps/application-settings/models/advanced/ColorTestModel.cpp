@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ColorTestModel.hpp"
+
 #include <application-settings/widgets/advanced/ColorTestListStyle.hpp>
 
 namespace gui

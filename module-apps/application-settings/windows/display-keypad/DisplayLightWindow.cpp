@@ -5,10 +5,6 @@
 
 #include <application-settings/windows/WindowNames.hpp>
 
-#include <OptionSetting.hpp>
-#include <service-evtmgr/screen-light-control/ScreenLightControl.hpp>
-#include <i18n/i18n.hpp>
-
 namespace gui
 {
     DisplayLightWindow::DisplayLightWindow(app::Application *app, app::settingsInterface::ScreenLightSettings *settings)

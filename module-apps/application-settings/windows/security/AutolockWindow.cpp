@@ -5,6 +5,8 @@
 
 #include <application-settings/ApplicationSettings.hpp>
 #include <application-settings/data/AutoLockData.hpp>
+#include <application-settings/windows/WindowNames.hpp>
+
 #include <OptionSetting.hpp>
 #include <i18n/i18n.hpp>
 

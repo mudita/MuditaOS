@@ -6,6 +6,7 @@
 #include "ApnListItem.hpp"
 
 #include <application-settings/data/SettingsInternals.hpp>
+
 #include <TextFixedSize.hpp>
 
 namespace gui

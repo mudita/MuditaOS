@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "Constants.hpp"
+#include <service-bluetooth/Constants.hpp>
 #include <Service/Common.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>

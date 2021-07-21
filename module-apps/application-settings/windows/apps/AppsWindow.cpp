@@ -4,8 +4,6 @@
 #include "AppsWindow.hpp"
 
 #include <application-settings/windows/WindowNames.hpp>
-#include <i18n/i18n.hpp>
-#include <OptionWindow.hpp>
 
 namespace gui
 {

@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "FactoryData.hpp"
-#include <service-db/Settings.hpp>
+
 #include <service-db/agents/settings/FactorySettings.hpp>
 
 FactoryData::FactoryData(settings::Settings &settings) : settings(settings)

@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 #pragma once
 
-#include "AppWindow.hpp"
+#include <AppWindow.hpp>
 
 namespace gui
 {
