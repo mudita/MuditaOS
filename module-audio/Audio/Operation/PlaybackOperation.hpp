@@ -40,6 +40,7 @@ namespace audio
         audio::RetCode SetInputGain(float gain) final;
 
         Position GetPosition() final;
+        audio::RetCode SwitchToPriorityProfile(audio::PlaybackType playbackType) final;
 
       private:
         static constexpr auto playbackTimeConstraint = 10ms;

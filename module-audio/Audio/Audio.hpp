@@ -112,7 +112,18 @@ namespace audio
         virtual audio::RetCode Mute();
 
       private:
+        void SendUpdateEventsToCurrentOperation();
+        /**
+         * @brief Sends update to the current operation and switches to priority profile.
+         */
         void UpdateProfiles();
+        /**
+         * @brief Sends update to the current operation and switches to priority profile.
+         *
+         * @param playbackType if it's callringtone and bluetooth a2dp is used then
+         * ignore priorities and change profile to the earpeaker. Not needed otherwise.
+         */
+        void UpdateProfiles(audio::PlaybackType playbackType);
 
         Muted muted = Muted::False;
         AudioSinkState audioSinkState;

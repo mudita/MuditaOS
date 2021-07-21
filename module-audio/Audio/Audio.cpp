@@ -90,7 +90,7 @@ namespace audio
                 break;
             }
             currentOperation = std::move(ret);
-            UpdateProfiles();
+            UpdateProfiles(playbackType);
         }
         catch (const AudioInitException &audioException) {
             // If creating operation failed fallback to IdleOperation which is guaranteed to work
@@ -159,13 +159,24 @@ namespace audio
         return SetOutputVolume(0);
     }
 
-    void Audio::UpdateProfiles()
+    void Audio::SendUpdateEventsToCurrentOperation()
     {
         auto updateEvents = audioSinkState.getUpdateEvents();
         for (auto &event : updateEvents) {
             currentOperation->SendEvent(event);
         }
+    }
+
+    void Audio::UpdateProfiles()
+    {
+        SendUpdateEventsToCurrentOperation();
         currentOperation->SwitchToPriorityProfile();
+    }
+
+    void Audio::UpdateProfiles(audio::PlaybackType playbackType)
+    {
+        SendUpdateEventsToCurrentOperation();
+        currentOperation->SwitchToPriorityProfile(playbackType);
     }
 
 } // namespace audio
