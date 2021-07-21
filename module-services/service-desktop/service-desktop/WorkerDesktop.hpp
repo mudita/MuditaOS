@@ -22,19 +22,9 @@ namespace constants
     constexpr auto usbSuspendTimeout = std::chrono::seconds{1};
 } // namespace constants
 
-class WorkerDesktop : public sys::Worker, public bsp::USBDeviceListener
+class WorkerDesktop : public sys::Worker
 {
   public:
-    enum TransferFailAction
-    {
-        doNothing,
-        removeDesitnationFile
-    };
-    enum class Command
-    {
-        CancelTransfer,
-    };
-
     WorkerDesktop(sys::Service *ownerServicePtr,
                   const sdesktop::USBSecurityModel &securityModel,
                   const std::string serialNumber);
@@ -50,36 +40,13 @@ class WorkerDesktop : public sys::Worker, public bsp::USBDeviceListener
         return receiveQueue;
     }
 
-    sys::ReturnCodes startDownload(const std::filesystem::path &destinationPath,
-                                   const uint32_t fileSize,
-                                   std::string fileCrc32);
-    void stopTransfer(const TransferFailAction action);
-
-    void cancelTransferOnTimeout();
-
-    void rawDataReceived(void *dataPtr, uint32_t dataLen) override;
-    bool getRawMode() const noexcept override;
-
   private:
-    void uploadFileFailedResponse();
-
-    void transferTimeoutHandler();
-
-    void startTransferTimer();
-    void stopTransferTimer();
-    void reloadTransferTimer();
     void suspendUsb();
 
     bool stateChangeWait();
 
     xQueueHandle receiveQueue;
     xQueueHandle irqQueue;
-    FILE *fileDes                  = nullptr;
-    uint32_t writeFileSizeExpected = 0;
-    uint32_t writeFileDataWritten  = 0;
-    std::string expectedFileCrc32;
-    std::filesystem::path filePath;
-    std::atomic<bool> rawModeEnabled = false;
     const sdesktop::USBSecurityModel &securityModel;
     const std::string serialNumber;
     sys::Service *ownerService = nullptr;
@@ -88,5 +55,4 @@ class WorkerDesktop : public sys::Worker, public bsp::USBDeviceListener
     bsp::USBDeviceStatus usbStatus = bsp::USBDeviceStatus::Disconnected;
 
     std::shared_ptr<sys::CpuSentinel> cpuSentinel;
-    CRC32 digestCrc32;
 };
