@@ -8,7 +8,6 @@
 #include "service-cellular/CellularMessage.hpp"
 #include "endpoints/factoryReset/FactoryReset.hpp"
 #include "endpoints/backup/BackupRestore.hpp"
-#include "endpoints/update/UpdateMuditaOS.hpp"
 
 #include <Common/Query.hpp>
 #include <MessageType.hpp>
@@ -69,8 +68,6 @@ ServiceDesktop::ServiceDesktop()
 {
     LOG_INFO("[ServiceDesktop] Initializing");
     bus.channels.push_back(sys::BusChannel::PhoneLockChanges);
-
-    updateOS         = std::make_unique<UpdateMuditaOS>(this);
 }
 
 ServiceDesktop::~ServiceDesktop()
@@ -128,12 +125,6 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
         desktopWorker->run();
     }
 
-    transferTimer =
-        sys::TimerFactory::createPeriodicTimer(this,
-                                               "WorkerDesktop file upload",
-                                               std::chrono::milliseconds{sdesktop::file_transfer_timeout},
-                                               [this](sys::Timer &) { desktopWorker->cancelTransferOnTimeout(); });
-
     connect(sdesktop::developerMode::DeveloperModeRequest(), [&](sys::Message *msg) {
         auto request = static_cast<sdesktop::developerMode::DeveloperModeRequest *>(msg);
         if (request->event != nullptr) {
@@ -186,62 +177,6 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
             // there is no umount() in SystemManager::CloseSystemHandler() -
             // this might theoretically cause filesystem corruption
             FactoryReset::Run(this);
-        }
-        return sys::MessageNone{};
-    });
-
-    connect(sdesktop::UpdateOsMessage(), [&](sys::Message *msg) {
-        sdesktop::UpdateOsMessage *updateOsMsg = dynamic_cast<sdesktop::UpdateOsMessage *>(msg);
-
-        if (updateOsMsg != nullptr &&
-            updateOsMsg->messageType == updateos::UpdateMessageType::UpdateCheckForUpdateOnce) {
-            fs::path file = UpdateMuditaOS::checkForUpdate();
-
-            if (file.has_filename()) {
-                /* send info to applicationDesktop that there is an update waiting */
-                auto msgToSend =
-                    std::make_shared<sdesktop::UpdateOsMessage>(updateos::UpdateMessageType::UpdateFoundOnBoot, file);
-                msgToSend->updateStats.versionInformation = UpdateMuditaOS::getVersionInfoFromFile(file);
-                bus.sendUnicast(msgToSend, app::name_desktop);
-            }
-        }
-
-        if (updateOsMsg != nullptr && updateOsMsg->messageType == updateos::UpdateMessageType::UpdateNow) {
-            LOG_DEBUG("ServiceDesktop::DataReceivedHandler file:%s uuid:%" PRIu32 "",
-                      updateOsMsg->updateStats.updateFile.c_str(),
-                      updateOsMsg->updateStats.uuid);
-
-            if (updateOS->setUpdateFile(purefs::dir::getUpdatesOSPath(), updateOsMsg->updateStats.updateFile) ==
-                updateos::UpdateError::NoError) {
-                RemountFS();
-                // Same possible issue as with FactoryReset::Run()
-                updateOS->runUpdate();
-            }
-        }
-
-        return sys::MessageNone{};
-    });
-
-    connect(sdesktop::transfer::TransferTimerState(), [&](sys::Message *msg) {
-        sdesktop::transfer::TransferTimerState *timerStateMsg =
-            dynamic_cast<sdesktop::transfer::TransferTimerState *>(msg);
-
-        if (timerStateMsg != nullptr && timerStateMsg->messageType == MessageType::TransferTimer) {
-            switch (timerStateMsg->req) {
-            case sdesktop::transfer::TransferTimerState::Start:
-                [[fallthrough]];
-            case sdesktop::transfer::TransferTimerState::Reload:
-                transferTimer.start();
-                break;
-            case sdesktop::transfer::TransferTimerState::Stop:
-                transferTimer.stop();
-                break;
-            case sdesktop::transfer::TransferTimerState::None:
-                [[fallthrough]];
-            default:
-                LOG_DEBUG("ServiceDesktop::SetTransferTimerState unhandled req:%u", timerStateMsg->req);
-                break;
-            }
         }
         return sys::MessageNone{};
     });
@@ -299,8 +234,6 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
         auto msgl = static_cast<message::bluetooth::ResponseVisibleDevices *>(msg);
         return btMsgHandler->handle(msgl);
     });
-    settings->registerValueChange(updateos::settings::history,
-                                  [this](const std::string &value) { updateOS->setInitialHistory(value); });
 
     return (sys::ReturnCodes::Success);
 }
@@ -346,11 +279,6 @@ sys::MessagePointer ServiceDesktop::DataReceivedHandler(sys::DataMessage *msg, s
     }
 
     return std::make_shared<sys::ResponseMessage>();
-}
-
-void ServiceDesktop::storeHistory(const std::string &historyValue)
-{
-    settings->setValue(updateos::settings::history, historyValue);
 }
 
 void ServiceDesktop::prepareBackupData()

@@ -355,15 +355,6 @@ namespace app::manager
         connect(typeid(GetCurrentDisplayLanguageRequest), [&](sys::Message *request) {
             return std::make_shared<GetCurrentDisplayLanguageResponse>(utils::getDisplayLanguage());
         });
-        connect(typeid(UpdateInProgress), [this](sys::Message *) {
-            closeApplicationsOnUpdate();
-            return sys::msgHandled();
-        });
-        connect(typeid(SetOsUpdateVersion), [this](sys::Message *request) {
-            auto msg = static_cast<SetOsUpdateVersion *>(request);
-            handleSetOsUpdateVersionChange(msg);
-            return sys::msgHandled();
-        });
         connect(typeid(GetAllNotificationsRequest), [&](sys::Message *request) {
             notificationProvider.requestNotSeenNotifications();
             notificationProvider.send();
@@ -1015,17 +1006,6 @@ namespace app::manager
         }
         settings->setValue(
             settings::SystemProperties::inputLanguage, requestedLanguage, settings::SettingsScope::Global);
-        return true;
-    }
-
-    auto ApplicationManager::handleSetOsUpdateVersionChange(SetOsUpdateVersion *msg) -> bool
-    {
-        LOG_DEBUG("[ApplicationManager::handleSetOsUpdateVersionChange] value ....");
-        settings->setValue(
-            settings::SystemProperties::osUpdateVersion, msg->osUpdateVer, settings::SettingsScope::Global);
-
-        settings->setValue(
-            settings::SystemProperties::osCurrentVersion, msg->osCurrentVer, settings::SettingsScope::Global);
         return true;
     }
 
