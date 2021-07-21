@@ -4,6 +4,7 @@
 #include "CategoriesModel.hpp"
 
 #include <application-settings/widgets/display-keypad/CategoryWidget.hpp>
+
 #include <ListView.hpp>
 
 namespace style::quotes::list

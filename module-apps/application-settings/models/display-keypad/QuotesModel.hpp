@@ -3,9 +3,7 @@
 
 #pragma once
 
-#include <Application.hpp>
 #include <DatabaseModel.hpp>
-#include <ListItemProvider.hpp>
 #include <service-db/QuotesMessages.hpp>
 
 namespace gui

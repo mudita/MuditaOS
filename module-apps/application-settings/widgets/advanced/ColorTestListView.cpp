@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ColorTestListView.hpp"
+
 #include <InputEvent.hpp>
 
 namespace gui

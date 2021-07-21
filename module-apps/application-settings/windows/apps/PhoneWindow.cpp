@@ -2,11 +2,9 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhoneWindow.hpp"
-#include <application-settings/data/SoundSelectData.hpp>
-#include <application-settings/ApplicationSettings.hpp>
 
-#include <i18n/i18n.hpp>
-#include <OptionWindow.hpp>
+#include <application-settings/data/SoundSelectData.hpp>
+#include <application-settings/windows/WindowNames.hpp>
 
 namespace gui
 {

@@ -5,9 +5,10 @@
 
 #include <application-settings/widgets/system/TechnicalInformationItem.hpp>
 #include <application-settings/widgets/SettingsStyle.hpp>
+
 #include <ListView.hpp>
-#include <source/version.hpp>
 #include <i18n/i18n.hpp>
+#include <source/version.hpp>
 
 TechnicalInformationModel::TechnicalInformationModel(std::unique_ptr<AbstractFactoryData> &&factoryData,
                                                      std::unique_ptr<AbstractTechnicalInformationRepository> repository)

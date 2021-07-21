@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApnSettingsModel.hpp"
+
 #include <service-cellular/PacketDataCellularMessage.hpp>
 #include <service-cellular/ServiceCellular.hpp>
 

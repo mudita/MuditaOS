@@ -3,13 +3,11 @@
 
 #include "QuotesMainWindow.hpp"
 
+#include <application-settings/data/QuoteSwitchData.hpp>
 #include <application-settings/windows/WindowNames.hpp>
-#include <application-settings/widgets/SettingsStyle.hpp>
 
-#include <OptionSetting.hpp>
-#include <header/AddElementAction.hpp>
 #include <InputEvent.hpp>
-#include <i18n/i18n.hpp>
+#include <header/AddElementAction.hpp>
 
 namespace style::quotes
 {

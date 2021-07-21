@@ -4,11 +4,10 @@
 #include "EinkModeWindow.hpp"
 
 #include <application-settings/windows/WindowNames.hpp>
-#include <messages/EinkModeMessage.hpp>
+
+#include <apps-common/Application.hpp>
 #include <service-eink/Common.hpp>
-#include <Application.hpp>
-#include <i18n/i18n.hpp>
-#include <service-eink/Common.hpp>
+#include <service-eink/messages/EinkModeMessage.hpp>
 
 namespace gui
 {

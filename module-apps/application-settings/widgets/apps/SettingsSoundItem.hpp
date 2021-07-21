@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include <ListItem.hpp>
 #include <BoxLayout.hpp>
 #include <Image.hpp>
+#include <ListItem.hpp>
 
 namespace gui
 {

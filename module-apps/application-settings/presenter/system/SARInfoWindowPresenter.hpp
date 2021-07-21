@@ -4,6 +4,7 @@
 #pragma once
 
 #include <application-settings/models/system/SARInfoRepository.hpp>
+
 #include <BasePresenter.hpp>
 
 class SARInfoWindowContract

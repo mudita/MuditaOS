@@ -5,9 +5,8 @@
 
 #include <application-settings/widgets/network/ApnListItem.hpp>
 
-#include <InternalModel.hpp>
 #include <Application.hpp>
-#include <ListItemProvider.hpp>
+#include <InternalModel.hpp>
 
 class NewApnModel : public app::InternalModel<gui::ApnListItem *>, public gui::ListItemProvider
 {

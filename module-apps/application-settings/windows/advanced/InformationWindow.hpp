@@ -3,8 +3,7 @@
 
 #pragma once
 
-#include "AppWindow.hpp"
-#include <BoxLayout.hpp>
+#include <AppWindow.hpp>
 
 namespace gui
 {

@@ -3,13 +3,12 @@
 
 #include "SimPINSettingsWindow.hpp"
 
-#include <application-settings/windows/WindowNames.hpp>
 #include <application-settings/data/PINSettingsLockStateData.hpp>
 #include <application-settings/data/PINSettingsSimData.hpp>
-#include <OptionSetting.hpp>
+#include <application-settings/windows/WindowNames.hpp>
 
+#include <OptionSetting.hpp>
 #include <service-appmgr/Controller.hpp>
-#include <service-cellular-api>
 
 namespace gui
 {

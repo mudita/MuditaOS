@@ -3,12 +3,8 @@
 
 #pragma once
 
-#include <application-settings/windows/BaseSettingsWindow.hpp>
-#include <application-settings/widgets/display-keypad/QuoteWidget.hpp>
 #include <application-settings/models/display-keypad/QuotesModel.hpp>
-
-#include <ListView.hpp>
-#include <InternalModel.hpp>
+#include <application-settings/windows/BaseSettingsWindow.hpp>
 
 namespace gui
 {

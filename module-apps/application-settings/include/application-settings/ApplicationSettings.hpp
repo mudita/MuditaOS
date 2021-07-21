@@ -5,11 +5,9 @@
 
 #include "Application.hpp"
 
-#include <application-settings/windows/WindowNames.hpp>
-#include <bsp/common.hpp>
+#include <EventStore.hpp>
 #include <bsp/keypad_backlight/keypad_backlight.hpp>
 #include <service-evtmgr/screen-light-control/ScreenLightControl.hpp>
-#include <EventStore.hpp>
 
 namespace app
 {

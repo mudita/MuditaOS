@@ -3,11 +3,11 @@
 
 #include "QuotesOptionsWindow.hpp"
 
+#include <application-settings/models/display-keypad/QuotesModel.hpp>
 #include <application-settings/windows/WindowNames.hpp>
-#include <application-settings/widgets/display-keypad/QuoteWidget.hpp>
+
 #include <DialogMetadataMessage.hpp>
 #include <OptionSetting.hpp>
-#include <i18n/i18n.hpp>
 #include <Text.hpp>
 
 namespace gui

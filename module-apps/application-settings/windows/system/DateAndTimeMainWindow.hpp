@@ -4,6 +4,7 @@
 #pragma once
 
 #include <application-settings/windows/BaseSettingsWindow.hpp>
+
 #include <time/time_locale.hpp>
 
 namespace gui

@@ -3,6 +3,8 @@
 
 #include "QuoteWidget.hpp"
 
+#include <i18n/i18n.hpp>
+
 namespace style::quotes
 {
     namespace widget

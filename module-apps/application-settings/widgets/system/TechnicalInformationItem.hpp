@@ -5,7 +5,6 @@
 
 #include <ListItem.hpp>
 #include <Text.hpp>
-#include <BoxLayout.hpp>
 
 namespace gui
 {

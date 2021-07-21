@@ -22,12 +22,12 @@ add_subdirectory(application-music-player)
 add_subdirectory(application-notes)
 add_subdirectory(application-phonebook)
 add_subdirectory(application-calllog)
+add_subdirectory(application-settings)
 add_subdirectory(application-special-input)
 add_subdirectory(apps-common)
 
 set(APPLICATIONS
     clock
-    settings
     onboarding
     alarm-clock
 )
@@ -82,6 +82,7 @@ endif()
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
         application-messages
+        application-settings
         apps-common
         date::date
         eventstore
