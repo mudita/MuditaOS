@@ -12,7 +12,6 @@ namespace parserFSM
 
     class UpdateHelper : public BaseHelper
     {
-
       public:
         explicit UpdateHelper(sys::Service *p) : BaseHelper(p)
         {}
