@@ -18,13 +18,11 @@ target_sources(service-appmgr
         messages/LanguageChangeRequest.cpp
         messages/PowerSaveModeInitRequest.cpp
         messages/PreventBlockingRequest.cpp
-        messages/SetOsUpdateVersion.cpp
         messages/ShutdownRequest.cpp
         messages/StartAllowedMessage.cpp
         messages/SwitchBackRequest.cpp
         messages/SwitchConfirmation.cpp
         messages/SwitchRequest.cpp
-        messages/UpdateInProgress.cpp
         model/ActionsRegistry.cpp
         model/ApplicationHandle.cpp
         model/ApplicationManager.cpp
@@ -55,13 +53,11 @@ target_sources(service-appmgr
         include/service-appmgr/messages/Message.hpp
         include/service-appmgr/messages/PowerSaveModeInitRequest.hpp
         include/service-appmgr/messages/PreventBlockingRequest.hpp
-        include/service-appmgr/messages/SetOsUpdateVersion.hpp
         include/service-appmgr/messages/ShutdownRequest.hpp
         include/service-appmgr/messages/StartAllowedMessage.hpp
         include/service-appmgr/messages/SwitchBackRequest.hpp
         include/service-appmgr/messages/SwitchConfirmation.hpp
         include/service-appmgr/messages/SwitchRequest.hpp
-        include/service-appmgr/messages/UpdateInProgress.hpp
         include/service-appmgr/messages/UserPowerDownRequest.hpp
         include/service-appmgr/model/ActionsRegistry.hpp
         include/service-appmgr/model/ApplicationHandle.hpp

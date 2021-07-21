@@ -37,8 +37,5 @@ auto DeveloperModeEndpoint::helperSwitcher(parserFSM::Context &ctx) -> parserFSM
     if (ctx.getBody()["ui"] == true) {
         return *uiHelper;
     }
-    if (ctx.getBody()["update"] == true) {
-        return *updateHelper;
-    }
     return *helper;
 }
