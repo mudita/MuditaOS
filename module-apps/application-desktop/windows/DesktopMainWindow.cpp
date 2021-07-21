@@ -95,9 +95,6 @@ namespace gui
         : AppWindow(app, app::window::name::desktop_main_window),
           notificationsModel(std::make_shared<ActiveNotificationsModel>(this))
     {
-        osUpdateVer  = getAppDesktop()->getOsUpdateVersion();
-        osCurrentVer = getAppDesktop()->getOsCurrentVersion();
-
         buildInterface();
 
         preBuildDrawListHook = [this](std::list<Command> &cmd) { updateTime(); };
@@ -106,14 +103,6 @@ namespace gui
     void DesktopMainWindow::setVisibleState()
     {
         setActiveState();
-
-        if (osUpdateVer == osCurrentVer && osUpdateVer != updateos::initSysVer &&
-            osCurrentVer != updateos::initSysVer) {
-            auto data = std::make_unique<CurrentOsVersion>();
-            data->setData(osCurrentVer);
-            application->switchWindow(app::window::name::desktop_post_update_window, std::move(data));
-            getAppDesktop()->setOsUpdateVersion(updateos::initSysVer);
-        }
     }
 
     void DesktopMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)

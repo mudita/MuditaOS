@@ -105,15 +105,11 @@ namespace sys
         // Invoke system close procedure
         static bool CloseSystem(Service *s);
 
-        static bool Update(Service *s, const std::string &updateOSVer, const std::string &currentOSVer);
-
         static bool Restore(Service *s);
 
         static bool Reboot(Service *s);
 
         static bool RebootToUpdate(Service *s, UpdateReason updateReason);
-
-        static void storeOsVersion(Service *s, const std::string &updateOSVer, const std::string &currentOSVer);
 
         static bool SuspendService(const std::string &name, Service *caller);
 

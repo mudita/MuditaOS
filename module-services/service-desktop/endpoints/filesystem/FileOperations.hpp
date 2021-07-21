@@ -48,8 +48,10 @@ class FileOperations
     static constexpr auto BinToBase64Factor = 4u;
     static constexpr auto Base64ToBinFactor = 3u;
     static constexpr auto Mod3MaxReminder   = 2u;
-    // ChunkSize must be a multiple of 3 and 4 so that ChunkSize % 12 == 0
-    static constexpr auto ChunkSize = Base64ToBinFactor * BinToBase64Factor * 1024u;
+    // SingleChunkSize must be a multiple of 3 and 4 so that SingleChunkSize % 12 == 0
+    static constexpr auto SingleChunkSize     = Base64ToBinFactor * BinToBase64Factor * 1024u; // 12KB
+    static constexpr auto ChunkSizeMultiplier = 12u;
+    static constexpr auto ChunkSize           = ChunkSizeMultiplier * SingleChunkSize;
 
     static FileOperations &instance();
 
