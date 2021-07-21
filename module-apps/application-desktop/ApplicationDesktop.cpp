@@ -11,10 +11,7 @@
 #include "MmiInternalMsgWindow.hpp"
 #include "MmiPullWindow.hpp"
 #include "MmiPushWindow.hpp"
-#include "PostUpdateWindow.hpp"
 #include "Reboot.hpp"
-#include "Update.hpp"
-#include "UpdateProgress.hpp"
 
 #include <apps-common/messages/AppMessage.hpp>
 #include <AppWindow.hpp>
@@ -95,16 +92,10 @@ namespace app
     // Invoked upon receiving data message
     sys::MessagePointer ApplicationDesktop::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
     {
-
         auto retMsg = Application::DataReceivedHandler(msgl);
         // if message was handled by application's template there is no need to process further.
         if (dynamic_cast<sys::ResponseMessage *>(retMsg.get())->retCode == sys::ReturnCodes::Success) {
             return retMsg;
-        }
-
-        if (auto msg = dynamic_cast<sdesktop::UpdateOsMessage *>(msgl)) {
-            handle(msg);
-            return sys::msgHandled();
         }
 
         return handleAsyncResponse(resp);
@@ -128,18 +119,6 @@ namespace app
         }
     }
 
-    auto ApplicationDesktop::handle(sdesktop::UpdateOsMessage *msg) -> bool
-    {
-        if (msg != nullptr && msg->messageType == updateos::UpdateMessageType::UpdateFoundOnBoot) {
-
-            if (msg->updateStats.updateFile.has_filename()) {
-                LOG_DEBUG("handle pending update found: %s", msg->updateStats.updateFile.c_str());
-            }
-        }
-
-        return true;
-    }
-
     void ApplicationDesktop::handleNotificationsChanged(std::unique_ptr<gui::SwitchData> notificationsParams)
     {
         if (auto window = getCurrentWindow()->getName();
@@ -159,7 +138,6 @@ namespace app
     // Invoked during initialization
     sys::ReturnCodes ApplicationDesktop::InitHandler()
     {
-
         auto ret = Application::InitHandler();
         if (ret != sys::ReturnCodes::Success) {
             return ret;
@@ -167,49 +145,11 @@ namespace app
 
         createUserInterface();
 
-        connect(sdesktop::UpdateOsMessage(), [&](sys::Message *msg) {
-            auto *updateMsg = dynamic_cast<sdesktop::UpdateOsMessage *>(msg);
-            if (updateMsg != nullptr && updateMsg->messageType == updateos::UpdateMessageType::UpdateFoundOnBoot) {
-
-                if (getWindow(app::window::name::desktop_update)) {
-                    std::unique_ptr<gui::UpdateSwitchData> data = std::make_unique<gui::UpdateSwitchData>(updateMsg);
-                    switchWindow(app::window::name::desktop_update, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
-                }
-            }
-
-            if (updateMsg != nullptr && updateMsg->messageType == updateos::UpdateMessageType::UpdateNow) {
-                auto data = std::make_unique<gui::UpdateSwitchData>(updateMsg);
-                switchWindow(app::window::name::desktop_update_progress, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
-            }
-
-            if (updateMsg != nullptr && updateMsg->messageType == updateos::UpdateMessageType::UpdateInform) {
-                if (getWindow(app::window::name::desktop_update)) {
-                    std::unique_ptr<gui::UpdateSwitchData> data = std::make_unique<gui::UpdateSwitchData>(updateMsg);
-                    getWindow(app::window::name::desktop_update)->handleSwitchData(data.get());
-                }
-            }
-            return sys::msgHandled();
-        });
-
         connect(typeid(db::NotificationMessage), [&](sys::Message *request) {
             auto notificationMessage = static_cast<db::NotificationMessage *>(request);
             dbNotificationHandler.handle(notificationMessage);
             return sys::MessageNone{};
         });
-
-        auto msgToSend =
-            std::make_shared<sdesktop::UpdateOsMessage>(updateos::UpdateMessageType::UpdateCheckForUpdateOnce);
-        bus.sendUnicast(msgToSend, service::name::service_desktop);
-
-        settings->registerValueChange(
-            settings::SystemProperties::osCurrentVersion,
-            [this](const std::string &value) { osCurrentVersionChanged(value); },
-            settings::SettingsScope::Global);
-
-        settings->registerValueChange(
-            settings::SystemProperties::osUpdateVersion,
-            [this](const std::string &value) { osUpdateVersionChanged(value); },
-            settings::SettingsScope::Global);
 
         dbNotificationHandler.initHandler();
 
@@ -242,15 +182,6 @@ namespace app
         windowsFactory.attach(desktop_reboot, [](Application *app, const std::string newname) {
             auto presenter = std::make_unique<gui::PowerOffPresenter>(app);
             return std::make_unique<gui::RebootWindow>(app, std::move(presenter));
-        });
-        windowsFactory.attach(desktop_update, [](Application *app, const std::string newname) {
-            return std::make_unique<gui::UpdateWindow>(app);
-        });
-        windowsFactory.attach(desktop_update_progress, [](Application *app, const std::string newname) {
-            return std::make_unique<gui::UpdateProgressWindow>(app);
-        });
-        windowsFactory.attach(desktop_post_update_window, [](Application *app, const std::string newname) {
-            return std::make_unique<gui::PostUpdateWindow>(app);
         });
         windowsFactory.attach(desktop_mmi_pull, [](Application *app, const std::string newname) {
             return std::make_unique<gui::MmiPullWindow>(app, desktop_mmi_pull);
@@ -306,32 +237,5 @@ namespace app
                 app::manager::Controller::sendAction(this, app::manager::actions::Home);
             }
         }
-    }
-
-    void ApplicationDesktop::osUpdateVersionChanged(const std::string &value)
-    {
-        LOG_DEBUG("[ApplicationDesktop::osUpdateVersionChanged] value=%s", value.c_str());
-        if (value.empty()) {
-            return;
-        }
-        osUpdateVersion = value;
-    }
-
-    void ApplicationDesktop::osCurrentVersionChanged(const std::string &value)
-    {
-        LOG_DEBUG("[ApplicationDesktop::osCurrentVersionChanged] value=%s", value.c_str());
-        if (value.empty()) {
-            return;
-        }
-        osCurrentVersion = value;
-    }
-    void ApplicationDesktop::setOsUpdateVersion(const std::string &value)
-    {
-        LOG_DEBUG("[ApplicationDesktop::setOsUpdateVersion] value=%s", value.c_str());
-        if (value.empty()) {
-            return;
-        }
-        osUpdateVersion = value;
-        settings->setValue(settings::SystemProperties::osUpdateVersion, value, settings::SettingsScope::Global);
     }
 } // namespace app
