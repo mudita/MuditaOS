@@ -43,14 +43,8 @@ target_sources(application-desktop
 		windows/MmiPullWindow.hpp
 		windows/MmiPushWindow.cpp
 		windows/MmiPushWindow.hpp
-		windows/PostUpdateWindow.cpp
-		windows/PostUpdateWindow.hpp
 		windows/Reboot.cpp
 		windows/Reboot.hpp
-		windows/Update.cpp
-		windows/Update.hpp
-		windows/UpdateProgress.cpp
-		windows/UpdateProgress.hpp
 	PUBLIC
 		include/application-desktop/ApplicationDesktop.hpp
 		include/application-desktop/Constants.hpp

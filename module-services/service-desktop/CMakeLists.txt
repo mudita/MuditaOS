@@ -18,7 +18,6 @@ set(SOURCES
     endpoints/developerMode/DeveloperModeEndpoint.cpp
     endpoints/developerMode/DeveloperModeHelper.cpp
     endpoints/developerMode/Mode/UI_Helper.cpp
-    endpoints/developerMode/Mode/UpdateHelper.cpp
     endpoints/developerMode/event/DomRequest.cpp
     endpoints/developerMode/event/ATRequest.cpp
     endpoints/deviceInfo/DeviceInfoEndpoint.cpp
@@ -28,7 +27,7 @@ set(SOURCES
     endpoints/messages/MessagesEndpoint.cpp
     endpoints/restore/RestoreEndpoint.cpp
     endpoints/update/UpdateEndpoint.cpp
-    endpoints/update/UpdateMuditaOS.cpp
+    endpoints/update/UpdateHelper.cpp
     endpoints/filesystem/FilesystemEndpoint.cpp
     endpoints/filesystem/FileOperations.cpp
     endpoints/filesystem/FileContext.cpp

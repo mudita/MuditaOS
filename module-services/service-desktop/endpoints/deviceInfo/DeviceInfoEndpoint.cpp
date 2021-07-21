@@ -3,7 +3,6 @@
 
 #include "DeviceInfoEndpoint.hpp"
 #include <endpoints/Context.hpp>
-#include <endpoints/update/UpdateMuditaOS.hpp>
 #include <parser/MessageHandler.hpp>
 
 #include <EventStore.hpp>
@@ -43,7 +42,6 @@ auto DeviceInfoEndpoint::getDeviceInfo(Context &context) -> bool
     if (ownerServicePtr == nullptr) {
         return false;
     }
-    json11::Json updateHistory   = static_cast<ServiceDesktop *>(ownerServicePtr)->updateOS->getUpdateHistory();
     std::unique_ptr<struct statvfs> vfstat = std::make_unique<struct statvfs>();
     if ((*statvfs)(purefs::dir::getRootDiskPath().c_str(), vfstat.get()) < 0) {
         return false;
@@ -68,7 +66,6 @@ auto DeviceInfoEndpoint::getDeviceInfo(Context &context) -> bool
          {json::gitRevision, (std::string)(GIT_REV)},
          {json::gitTag, (std::string)GIT_TAG},
          {json::gitBranch, (std::string)GIT_BRANCH},
-         {json::updateHistory, updateHistory},
          {json::currentRTCTime, std::to_string(static_cast<uint32_t>(std::time(nullptr)))},
          {json::version, std::string(VERSION)},
          {json::serialNumber, getSerialNumber()}}));

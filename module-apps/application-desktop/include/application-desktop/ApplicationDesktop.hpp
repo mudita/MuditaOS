@@ -44,26 +44,13 @@ namespace app
         // if there is modem notification and there is no default SIM selected, then we need to select if when unlock is
         // done
         void handle(cellular::msg::notification::ModemStateChanged *msg);
-        auto handle(sdesktop::UpdateOsMessage *msg) -> bool;
         void handleNotificationsChanged(std::unique_ptr<gui::SwitchData> notificationsParams) override;
 
-        std::string getOsUpdateVersion() const
-        {
-            return osUpdateVersion;
-        }
-        std::string getOsCurrentVersion() const
-        {
-            return osCurrentVersion;
-        }
         void setOsUpdateVersion(const std::string &value);
 
       private:
         bool refreshMenuWindow();
         void handleLowBatteryNotification(manager::actions::ActionParamsPtr &&data);
-        void osUpdateVersionChanged(const std::string &value);
-        void osCurrentVersionChanged(const std::string &value);
-        std::string osUpdateVersion{updateos::initSysVer};
-        std::string osCurrentVersion{updateos::initSysVer};
         DBNotificationsHandler dbNotificationHandler;
     };
 
