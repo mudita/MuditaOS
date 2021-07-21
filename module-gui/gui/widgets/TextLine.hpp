@@ -37,10 +37,12 @@ namespace gui
         bool lineEnd                        = false;
         bool lineVisible                    = true;
         bool breakLineDashAddition          = false;
+        bool removeTrailingSpace            = false;
         unsigned int lineStartBlockNumber   = text::npos;
         unsigned int lineStartBlockPosition = text::npos;
 
         unsigned int calculateSignsToShow(BlockCursor &localCursor, UTF8 &text, unsigned int space);
+        UTF8 textToPrint(unsigned int signsCountToShow, UTF8 &text);
         void createUnderline(unsigned int max_w, unsigned int max_height);
         void updateUnderline(const short &x, const short &y);
         void setLineStartConditions(unsigned int startBlockNumber, unsigned int startBlockPosition);
@@ -126,18 +128,6 @@ namespace gui
             return lineStartBlockPosition;
         }
 
-        [[nodiscard]] const Item *getElement(unsigned int pos) const noexcept
-        {
-            unsigned int local_pos = 0;
-            for (auto &el : lineContent) {
-                local_pos += el->getTextLength();
-                if (local_pos >= pos) {
-                    return el;
-                }
-            }
-            return nullptr;
-        }
-
         [[nodiscard]] int32_t getX() const noexcept
         {
             return lineContent.front()->area().pos(Axis::X);
@@ -153,6 +143,7 @@ namespace gui
         /// moves Text parts in Text. To not call n times callbacks on resize, call prior to setting parent
         void alignH(Alignment align, Length parent_length) const;
         void alignV(Alignment align, Length parent_length, Length lines_height);
+        [[nodiscard]] const Item *getElement(unsigned int pos) const noexcept;
         [[nodiscard]] auto getText(unsigned int pos) const -> UTF8;
     };
 } // namespace gui
