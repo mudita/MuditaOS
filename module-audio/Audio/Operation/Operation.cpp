@@ -65,6 +65,11 @@ namespace audio
         return audio::RetCode::ProfileNotSet;
     }
 
+    audio::RetCode Operation::SwitchToPriorityProfile([[maybe_unused]] audio::PlaybackType playbackType)
+    {
+        return SwitchToPriorityProfile();
+    }
+
     void Operation::SetProfileAvailability(std::vector<Profile::Type> profiles, bool available)
     {
         for (auto &p : supportedProfiles) {

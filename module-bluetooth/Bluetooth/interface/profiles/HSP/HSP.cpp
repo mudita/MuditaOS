@@ -179,6 +179,8 @@ namespace bluetooth
             if (hsp_subevent_rfcomm_connection_complete_get_status(event) != 0u) {
                 LOG_DEBUG("RFCOMM connection establishement failed with status %u\n",
                           hsp_subevent_rfcomm_connection_complete_get_status(event));
+                sendAudioEvent(audio::EventType::BlutoothHSPDeviceState, audio::Event::DeviceState::Disconnected);
+                isConnected = false;
                 break;
             }
             LOG_DEBUG("RFCOMM connection established.\n");
@@ -200,6 +202,8 @@ namespace bluetooth
             if (hsp_subevent_audio_connection_complete_get_status(event) != 0u) {
                 LOG_DEBUG("Audio connection establishment failed with status %u\n",
                           hsp_subevent_audio_connection_complete_get_status(event));
+                sendAudioEvent(audio::EventType::BlutoothHSPDeviceState, audio::Event::DeviceState::Disconnected);
+                isConnected = false;
             }
             else {
                 scoHandle = hsp_subevent_audio_connection_complete_get_handle(event);
@@ -210,9 +214,7 @@ namespace bluetooth
             break;
         case HSP_SUBEVENT_AUDIO_DISCONNECTION_COMPLETE:
             LOG_DEBUG("Audio connection released.\n\n");
-            sendAudioEvent(audio::EventType::BlutoothHSPDeviceState, audio::Event::DeviceState::Disconnected);
             scoHandle   = HCI_CON_HANDLE_INVALID;
-            isConnected = false;
             break;
         case HSP_SUBEVENT_MICROPHONE_GAIN_CHANGED:
             LOG_DEBUG("Received microphone gain change %d\n", hsp_subevent_microphone_gain_changed_get_gain(event));
