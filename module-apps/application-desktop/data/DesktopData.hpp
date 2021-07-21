@@ -11,22 +11,6 @@
 
 namespace gui
 {
-
-    class UpdateSwitchData : public gui::SwitchData
-    {
-      public:
-        explicit UpdateSwitchData(sdesktop::UpdateOsMessage *messageToCopyFrom) : updateOsMessage(*messageToCopyFrom)
-        {}
-
-        [[nodiscard]] const sdesktop::UpdateOsMessage &getUpdateOsMessage() const noexcept
-        {
-            return updateOsMessage;
-        }
-
-      private:
-        sdesktop::UpdateOsMessage updateOsMessage;
-    };
-
     class CurrentOsVersion : public gui::SwitchData
     {
         std::string osVersion;
