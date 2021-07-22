@@ -23,15 +23,14 @@ namespace locks
 
     class LockPolicyAccessInterface
     {
-        friend class app::ApplicationLauncher;
         AutoLockPolicy autoLockingPolicy = AutoLockPolicy::DetermineByWindow;
-        void set(AutoLockPolicy policy) noexcept;
 
       protected:
         [[nodiscard]] AutoLockPolicy get() const noexcept;
 
       public:
         virtual ~LockPolicyAccessInterface() = default;
+        void set(AutoLockPolicy policy) noexcept;
     };
 
     class LockPolicyHandlerInterface : public LockPolicyAccessInterface

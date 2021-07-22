@@ -25,6 +25,10 @@ namespace app::music_player
     bool SongsPresenter::play(const std::string &filePath)
     {
         songsModelInterface->setCurrentSongState(SongState::Playing);
+        if (changePlayingStateCallback != nullptr) {
+            changePlayingStateCallback(SongState::Playing);
+        }
+
         return audioOperations->play(filePath,
                                      [this](audio::Token token) { songsModelInterface->setCurrentFileToken(token); });
     }
@@ -34,6 +38,9 @@ namespace app::music_player
         auto currentFileToken = songsModelInterface->getCurrentFileToken();
         if (currentFileToken) {
             songsModelInterface->setCurrentSongState(SongState::NotPlaying);
+            if (changePlayingStateCallback != nullptr) {
+                changePlayingStateCallback(SongState::NotPlaying);
+            }
             return audioOperations->pause(currentFileToken.value());
         }
         return false;
@@ -44,6 +51,9 @@ namespace app::music_player
         auto currentFileToken = songsModelInterface->getCurrentFileToken();
         if (currentFileToken) {
             songsModelInterface->setCurrentSongState(SongState::Playing);
+            if (changePlayingStateCallback != nullptr) {
+                changePlayingStateCallback(SongState::Playing);
+            }
             return audioOperations->resume(currentFileToken.value());
         }
         return false;
@@ -54,6 +64,10 @@ namespace app::music_player
         auto currentFileToken = songsModelInterface->getCurrentFileToken();
         if (currentFileToken) {
             songsModelInterface->setCurrentSongState(SongState::NotPlaying);
+            if (changePlayingStateCallback != nullptr) {
+                changePlayingStateCallback(SongState::NotPlaying);
+            }
+
             return audioOperations->stop(currentFileToken.value(), [this](audio::Token token) {
                 if (token == songsModelInterface->getCurrentFileToken()) {
                     songsModelInterface->setCurrentFileToken(std::nullopt);
@@ -72,6 +86,11 @@ namespace app::music_player
         else {
             resume();
         }
+    }
+
+    void SongsPresenter::setPlayingStateCallback(std::function<void(SongState)> cb)
+    {
+        changePlayingStateCallback = std::move(cb);
     }
 
 } // namespace app::music_player

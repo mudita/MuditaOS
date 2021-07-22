@@ -8,6 +8,7 @@
 #include <presenters/SongsPresenter.hpp>
 #include <models/SongsRepository.hpp>
 #include <models/SongsModel.hpp>
+#include <service-appmgr/Controller.hpp>
 
 #include <filesystem>
 #include <log.hpp>
@@ -45,13 +46,23 @@ namespace app
         priv->songsPresenter =
             std::make_unique<app::music_player::SongsPresenter>(priv->songsModel, std::move(audioOperations));
 
-        std::function<bool()> stateLockCallback = [this]() -> bool {
-            auto isTrackPlaying = priv->songsModel->isSongPlaying();
-            if (isTrackPlaying) {
+        // callback used when playing state is changed
+        using SongState                                 = music_player::SongsModelInterface::SongState;
+        std::function<void(SongState)> autolockCallback = [this](SongState isPlaying) {
+            if (isPlaying == SongState::Playing) {
                 LOG_DEBUG("Preventing autolock while playing track.");
+                lockPolicyHandler.set(locks::AutoLockPolicy::DetermineByAppState);
             }
-            return isTrackPlaying;
+            else {
+                LOG_DEBUG("Autolock reenabled because track is no longer playing.");
+                lockPolicyHandler.set(locks::AutoLockPolicy::DetermineByWindow);
+                app::manager::Controller::preventBlockingDevice(this);
+            }
         };
+        priv->songsPresenter->setPlayingStateCallback(std::move(autolockCallback));
+
+        // callback used when track is not played and we are in DetermineByAppState
+        std::function<bool()> stateLockCallback = []() -> bool { return true; };
         lockPolicyHandler.setPreventsAutoLockByStateCallback(std::move(stateLockCallback));
     }
 
@@ -91,7 +102,8 @@ namespace app
 
     sys::ReturnCodes ApplicationMusicPlayer::DeinitHandler()
     {
-        return sys::ReturnCodes::Success;
+        priv->songsPresenter->stop();
+        return Application::DeinitHandler();
     }
 
     void ApplicationMusicPlayer::createUserInterface()

@@ -65,7 +65,7 @@ namespace app
         static auto GetManifest() -> manager::ApplicationManifest
         {
             return {{manager::actions::Launch, manager::actions::PhoneModeChanged},
-                    locks::AutoLockPolicy::DetermineByAppState};
+                    locks::AutoLockPolicy::DetermineByWindow};
         }
     };
 } /* namespace app */
