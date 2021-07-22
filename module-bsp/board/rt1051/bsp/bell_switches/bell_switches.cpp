@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "bsp/bell_switches/bell_switches.hpp"
+#include "bell_switches.hpp"
 
 #include <module-utils/Utils.hpp> // for byte conversion functions. it is included first because of magic enum define
 
