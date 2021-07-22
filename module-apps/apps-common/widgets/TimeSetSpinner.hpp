@@ -36,6 +36,6 @@ namespace gui
         auto onInput(const InputEvent &inputEvent) -> bool override;
         [[nodiscard]] auto getFontHeight() const noexcept -> uint16_t;
         [[nodiscard]] auto getWidestDigitWidth() const noexcept -> uint32_t;
-        [[nodiscard]] auto getColonDigitWidth() const noexcept -> uint32_t;
+        [[nodiscard]] auto getColonWidth() const noexcept -> uint32_t;
     };
 } /* namespace gui */
