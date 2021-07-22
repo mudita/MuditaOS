@@ -32,6 +32,8 @@ set(BOARD_SOURCES ${BOARD_SOURCES}
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/fsl_drivers/fsl_wdog.c"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/fsl_drivers/fsl_rtwdog.c"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/fsl_drivers/fsl_pwm.c"
+	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/fsl_drivers/fsl_enc.c"
+	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/fsl_drivers/fsl_xbara.c"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/irq/irq_gpio.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/audio.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/board.cpp"
@@ -82,6 +84,7 @@ set(BOARD_SOURCES ${BOARD_SOURCES}
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/eink_frontlight/eink_frontlight.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/light_sensor/light_sensor.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/rotary_encoder/rotary_encoder.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/bell_switches/bell_switches.cpp"
 
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/eeprom/eeprom.cpp"
 	CACHE INTERNAL ""

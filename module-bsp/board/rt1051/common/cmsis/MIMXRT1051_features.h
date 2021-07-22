@@ -605,5 +605,7 @@
 #define FSL_FEATURE_XBARA_OUTPUT_DMA_CH_MUX_REQ_94 (1)
 /* @brief DMA_CH_MUX_REQ_95. */
 #define FSL_FEATURE_XBARA_OUTPUT_DMA_CH_MUX_REQ_95 (1)
+/* @brief Number of interrupt requests. */
+#define FSL_FEATURE_XBARA_INTERRUPT_COUNT (4)
 
 #endif /* _MIMXRT1051_FEATURES_H_ */

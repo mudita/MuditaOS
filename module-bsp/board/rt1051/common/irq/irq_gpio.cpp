@@ -16,6 +16,7 @@
 #include "bsp/BoardDefinitions.hpp"
 #include "bsp/magnetometer/magnetometer.hpp"
 #include "bsp/light_sensor/light_sensor.hpp"
+#include "bsp/bell_switches/bell_switches.hpp"
 
 #if 0 // TODO:M.P implement the rest of BSP drivers
 
@@ -36,15 +37,18 @@ namespace bsp
         DisableIRQ(GPIO2_Combined_0_15_IRQn);
         DisableIRQ(GPIO2_Combined_16_31_IRQn);
         DisableIRQ(GPIO3_Combined_16_31_IRQn);
+        DisableIRQ(GPIO5_Combined_0_15_IRQn);
 
         GPIO_PortDisableInterrupts(GPIO1, UINT32_MAX);
         GPIO_PortDisableInterrupts(GPIO2, UINT32_MAX);
         GPIO_PortDisableInterrupts(GPIO3, UINT32_MAX);
+        GPIO_PortDisableInterrupts(GPIO5, UINT32_MAX);
 
         // Clear all IRQs
         GPIO_PortClearInterruptFlags(GPIO1, UINT32_MAX);
         GPIO_PortClearInterruptFlags(GPIO2, UINT32_MAX);
         GPIO_PortClearInterruptFlags(GPIO3, UINT32_MAX);
+        GPIO_PortClearInterruptFlags(GPIO5, UINT32_MAX);
 
         EnableIRQ(GPIO1_Combined_0_15_IRQn);
         NVIC_SetPriority(GPIO1_Combined_0_15_IRQn, configLIBRARY_LOWEST_INTERRUPT_PRIORITY);
@@ -60,6 +64,9 @@ namespace bsp
 
         EnableIRQ(GPIO3_Combined_16_31_IRQn);
         NVIC_SetPriority(GPIO3_Combined_16_31_IRQn, configLIBRARY_LOWEST_INTERRUPT_PRIORITY);
+
+        EnableIRQ(GPIO5_Combined_0_15_IRQn);
+        NVIC_SetPriority(GPIO5_Combined_0_15_IRQn, configLIBRARY_LOWEST_INTERRUPT_PRIORITY);
     }
 
     extern "C"
@@ -110,7 +117,7 @@ namespace bsp
             uint32_t irq_mask                   = GPIO_GetPinsInterruptFlags(GPIO2);
 
             if (irq_mask & (1 << BOARD_KEYBOARD_RF_BUTTON_PIN)) {
-                xHigherPriorityTaskWoken |= keyboard_right_functional_IRQHandler();
+                //xHigherPriorityTaskWoken |= keyboard_right_functional_IRQHandler();
             }
 
             if (irq_mask & (1 << BOARD_BATTERY_CHARGER_INOKB_PIN)) {}
@@ -127,6 +134,12 @@ namespace bsp
 
             if (irq_mask & (1 << static_cast<uint32_t>(BoardDefinitions::LIGHT_SENSOR_IRQ))) {
                 xHigherPriorityTaskWoken |= bsp::light_sensor::IRQHandler();
+            }
+
+            if (irq_mask & ((1 << static_cast<uint32_t>(BoardDefinitions::BELL_SWITCHES_CENTER))
+                             | (1 << static_cast<uint32_t>(BoardDefinitions::BELL_SWITCHES_RIGHT)) 
+                             | (1 << static_cast<uint32_t>(BoardDefinitions::BELL_SWITCHES_LATCH)))) {
+                xHigherPriorityTaskWoken |= bsp::bell_switches::bell_switches_Cent_Right_Latch_IRQHandler(irq_mask);
             }
 
             // Clear all IRQs
@@ -157,6 +170,10 @@ namespace bsp
                 bsp::cellular::ringIndicator::riIRQHandler();
             }
 
+            if (irq_mask & (1 << static_cast<uint32_t>(BoardDefinitions::BELL_SWITCHES_LEFT))) {
+                xHigherPriorityTaskWoken |= bsp::bell_switches::bell_switches_Left_IRQHandler();
+            }
+
             // Clear all IRQs
             GPIO_PortClearInterruptFlags(GPIO2, irq_mask);
 
@@ -176,6 +193,22 @@ namespace bsp
 
             // Clear all IRQs on the GPIO3 port
             GPIO_PortClearInterruptFlags(BOARD_EINK_BUSY_GPIO, irq_mask);
+
+            // Switch context if necessary
+            portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
+        }
+
+        void GPIO5_Combined_0_15_IRQHandler(void)
+        {
+            BaseType_t xHigherPriorityTaskWoken = 0;
+            uint32_t irq_mask                   = GPIO_GetPinsInterruptFlags(GPIO5);
+
+            if (irq_mask & (1 << static_cast<uint32_t>(BoardDefinitions::BELL_WAKEUP))) {
+                xHigherPriorityTaskWoken |= bsp::bell_switches::bell_wakeup_IRQHandler();
+            }
+
+            // Clear all IRQs on the GPIO3 port
+            GPIO_PortClearInterruptFlags(GPIO5, irq_mask);
 
             // Switch context if necessary
             portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);

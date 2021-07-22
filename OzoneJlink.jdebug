@@ -258,12 +258,13 @@ void OnProjectLoad (void) {
   Project.SetTargetIF ("SWD");
   Project.SetTIFSpeed ("1 MHz");
   Project.AddSvdFile ("$(InstallDir)/Config/CPU/Cortex-M7F.svd");
-  Project.AddPathSubstitute ("/home/mati/Software/Mudita/git/PurePhone", "$(ProjectDir)");
+  Project.AddPathSubstitute ("/home/home/crash/projects/mudita/MuditaOS", "$(ProjectDir)");
   Project.SetOSPlugin("FreeRTOSPlugin");
   //
   // User settings
   //
-  File.Open ("$(ProjectDir)/build/PurePhone.elf");
+  File.Open ("$(ProjectDir)/build-rt1051-RelWithDebInfo/BellHybrid.elf");
+  File.Open ("$(ProjectDir)/build-rt1051-RelWithDebInfo/BellHybrid.elf.debug");
 }
 
 /*********************************************************************

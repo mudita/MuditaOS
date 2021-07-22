@@ -43,7 +43,8 @@ enum class WorkerEventQueues
     queueTorch,
     queueLightSensor,
     queueChargerDetect,
-    queueRotaryEncoder
+    queueRotaryEncoder,
+    queueBellSwitches
 };
 
 class WorkerEvent : public sys::Worker
