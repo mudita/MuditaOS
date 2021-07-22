@@ -39,8 +39,10 @@ namespace gui
             new SideListView(this, 0U, 0U, this->getWidth(), this->getHeight(), presenter->getPagesProvider());
         sidelistview->setEdges(RectangleEdge::None);
 
-        presenter->loadData();
         sidelistview->rebuildList(listview::RebuildType::Full);
+
+        presenter->loadData();
+
         setFocusItem(sidelistview);
     }
 

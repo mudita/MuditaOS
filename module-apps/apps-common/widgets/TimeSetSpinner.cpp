@@ -30,14 +30,15 @@ namespace gui
         hour->setMinimumSize(doubleCharWidth, fontHeight);
         hour->setFont(fontName);
         hour->setAlignment(Alignment(Alignment::Horizontal::Right, Alignment::Vertical::Center));
-        hour->setCurrentValue(0);
         hour->setFixedFieldWidth(noOfDigits);
         hour->setEdges(RectangleEdge::None);
+        hour->setCurrentValue(0);
 
         addWidget(hour);
 
-        colon = new Label(this, 0U, 0U, style::time_set_spinner::colon::w, style::time_set_spinner::colon::h);
+        colon = new Label(this);
         colon->setFont(fontName);
+        colon->setMinimumSize(getColonDigitWidth(), fontHeight);
         colon->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         colon->setEdges(RectangleEdge::None);
         colon->activeItem = false;
@@ -47,8 +48,9 @@ namespace gui
         minute->setMinimumSize(doubleCharWidth, fontHeight);
         minute->setFont(fontName);
         minute->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Center));
-        minute->setCurrentValue(0);
         minute->setFixedFieldWidth(noOfDigits);
+        minute->setEdges(RectangleEdge::None);
+        minute->setCurrentValue(0);
         addWidget(minute);
 
         resizeItems();
@@ -100,6 +102,12 @@ namespace gui
         return maxWidth;
     }
 
+    uint32_t TimeSetSpinner::getColonDigitWidth() const noexcept
+    {
+        const RawFont *font = FontManager::getInstance().getFont(fontName);
+        return font->getCharPixelWidth(':');
+    }
+
     auto TimeSetSpinner::handleEnterKey() -> bool
     {
         if (focusItem == hour) {
@@ -135,14 +143,16 @@ namespace gui
         auto doubleCharWidth =
             (getWidestDigitWidth() * noOfDigits) + (1 * noOfDigits); // two digits + minimal space beetween
 
-        hour->setMinimumSize(doubleCharWidth, fontHeight);
         hour->setFont(fontName);
+        hour->setMinimumSize(doubleCharWidth, fontHeight);
         hour->setText(hour->getText());
         colon->setFont(fontName);
+        colon->setMinimumSize(getColonDigitWidth(), fontHeight);
         colon->setText(":");
-        minute->setMinimumSize(doubleCharWidth, fontHeight);
         minute->setFont(fontName);
+        minute->setMinimumSize(doubleCharWidth, fontHeight);
         minute->setText(minute->getText());
+        setMinimumSize(doubleCharWidth * 2 + getColonDigitWidth(), fontHeight);
         resizeItems();
     }
 
