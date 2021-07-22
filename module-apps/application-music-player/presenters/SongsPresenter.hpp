@@ -32,6 +32,8 @@ namespace app::music_player
             virtual bool resume()                          = 0;
             virtual bool stop()                            = 0;
             virtual void togglePlaying()                   = 0;
+
+            virtual void setPlayingStateCallback(std::function<void(SongsModelInterface::SongState)> cb) = 0;
         };
     };
 
@@ -50,9 +52,11 @@ namespace app::music_player
         bool resume() override;
         bool stop() override;
         void togglePlaying() override;
+        void setPlayingStateCallback(std::function<void(SongsModelInterface::SongState)> cb) override;
 
       private:
         std::shared_ptr<SongsModelInterface> songsModelInterface;
         std::unique_ptr<AbstractAudioOperations> audioOperations;
+        std::function<void(SongsModelInterface::SongState)> changePlayingStateCallback = nullptr;
     };
 } // namespace app::music_player
