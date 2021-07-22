@@ -20,10 +20,8 @@ namespace gui
 
     void Spinner::setCurrentValue(int newCurrentValue)
     {
-        if (currentValue != newCurrentValue) {
-            currentValue = newCurrentValue;
-            updateSpinner();
-        }
+        currentValue = newCurrentValue;
+        updateSpinner();
     }
 
     void Spinner::setFixedFieldWidth(unsigned char newFixedFieldWidth)
