@@ -28,6 +28,12 @@ namespace bellMainStyle
             inline constexpr auto degree = "\u00B0";
         } // namespace temperatureLabel
 
+        namespace body
+        {
+            inline constexpr auto posX = 20U;
+            inline constexpr auto posY = 45U;
+        } // namespace body
+
     } // namespace mainWindow
 
     namespace mainMenuWindow
