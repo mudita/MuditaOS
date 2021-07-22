@@ -131,6 +131,17 @@ enum class BoardDefinitions
 
     EEPROM_I2C = AUDIOCODEC_I2C,
     EEPROM_I2C_BAUDRATE = I2C_STD_BAUDRATE,
+
+     /* ******* BELL HYBRID ******* */
+
+    BELL_SWITCHES_GPIO      = static_cast<int>(drivers::GPIOInstances ::GPIO_2),
+    BELL_SWITCHES_CENTER    = 6,    //GPIO_B0_06
+    BELL_SWITCHES_LATCH     = 9,    //GPIO_B0_09
+    BELL_SWITCHES_LEFT      = 16,   //GPIO_B1_00
+    BELL_SWITCHES_RIGHT     = 11,   //GPIO_B0_11
+
+    BELL_WAKEUP_GPIO        = static_cast<int>(drivers::GPIOInstances ::GPIO_5),
+    BELL_WAKEUP             = 0,    //SNVS_WAKEUP_GPIO5_IO00
 };
 
 #endif //PUREPHONE_BOARDDEFINITIONS_HPP

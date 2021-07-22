@@ -91,10 +91,14 @@ int main()
         [sysmgr]() {
             // vector with launchers to applications
             std::vector<std::unique_ptr<app::ApplicationLauncher>> applications;
+            /*
             applications.push_back(
                 app::CreateLauncher<app::ApplicationBellMain>(app::applicationBellName, app::Closeable::False));
             applications.push_back(app::CreateLauncher<app::ApplicationBellSettings>(app::applicationBellSettingsName));
             applications.push_back(app::CreateLauncher<app::ApplicationBellAlarm>(app::applicationBellAlarmName));
+            */
+            /* Bell application disabled as it causes application stack smashing. This is due to default services/applications behabvior to update various items such as top bar, long press timer etc. 
+            ... and those doesn't exist in tic product */
             // start application manager
             return sysmgr->RunSystemService(
                 std::make_shared<app::manager::ApplicationManager>(

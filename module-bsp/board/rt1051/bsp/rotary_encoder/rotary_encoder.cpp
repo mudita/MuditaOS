@@ -9,6 +9,8 @@
 
 #include <fsl_common.h>
 #include <timers.h>
+#include "fsl_enc.h"
+#include "pin_mux.h"
 
 using namespace drivers;
 using namespace utils;
@@ -22,6 +24,7 @@ namespace bsp
 
         static TimerHandle_t timerHandle;
         static constexpr uint16_t ROTARY_ENCODER_POLL_INTERVAL_MS = 100;
+        static uint32_t encLastPosition = 0;
 
         static void TimerHandler(TimerHandle_t xTimer)
         {
@@ -34,12 +37,14 @@ namespace bsp
         int32_t init(xQueueHandle qHandle)
         {
             qHandleIrq = qHandle;
-            const enc_config_t encConfig;
+            enc_config_t encConfig;
 
             ENC_GetDefaultConfig(&encConfig);
             ENC_Init(SWITCHES_ENC_A_PERIPHERAL, &encConfig);
             
             ENC_DoSoftwareLoadInitialPositionValue(SWITCHES_ENC_A_PERIPHERAL);
+
+            encLastPosition = ENC_GetPositionValue(SWITCHES_ENC_A_PERIPHERAL);
 
             if (timerHandle == nullptr) {
                 timerHandle = xTimerCreate(
@@ -62,12 +67,20 @@ namespace bsp
 
         std::optional<bsp::KeyCodes> WorkerEventHandler()
         {
-            uint16_t encDiffValue = ENC_GetHoldPositionDifferenceValue(SWITCHES_ENC_A_PERIPHERAL);
+            uint32_t encCurrentPosition = ENC_GetPositionValue(SWITCHES_ENC_A_PERIPHERAL);
+            int32_t diff = 0;
+
+            if (encCurrentPosition >= encLastPosition)
+                diff = static_cast<int32_t>(encCurrentPosition - encLastPosition);
+            if (encCurrentPosition < encLastPosition)
+                diff = -1 * (static_cast<int32_t>(encLastPosition - encCurrentPosition));
+
+            encLastPosition = encCurrentPosition;
             
             // currently only single left/right keys are returned. TBD returning multiple "keypresses"
-            if (encDiffValue > 0)
+            if (diff > 0)
                 return bsp::KeyCodes::JoystickRight;
-            else if (endDiffValue < 0)
+            else if (diff < 0)
                 return bsp::KeyCodes::JoystickLeft;
             else
                 return std::nullopt;

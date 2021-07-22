@@ -21,6 +21,8 @@
 #include <bsp/light_sensor/light_sensor.hpp>
 #include <bsp/vibrator/vibrator.hpp>
 #include <bsp/eink_frontlight/eink_frontlight.hpp>
+#include <bsp/rotary_encoder/rotary_encoder.hpp>
+#include <bsp/bell_switches/bell_switches.hpp>
 #include <EventStore.hpp>
 
 #include <common_data/RawKey.hpp>
@@ -204,26 +206,28 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
         bsp::battery_charger::setUSBCurrentLimit(static_cast<bsp::battery_charger::batteryChargerType>(notification));
     }
 
+    if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueBellSwitches)) {
+        uint8_t notification;
+        if (!queue->Dequeue(&notification, 0)) {
+            return false;
+        }
+        uint8_t state, code;
+        bsp::bell_switches::bell_get_key(notification, state, code);
+
+        processKeyEvent(static_cast<bsp::KeyEvents>(state), static_cast<bsp::KeyCodes>(code));
+        LOG_DEBUG("Key %i : %s", static_cast<int>(code), static_cast<bsp::KeyEvents>(state) == bsp::KeyEvents::Pressed ? "Pressed" : "Released");
+    }
+
     return true;
 }
 
 bool WorkerEvent::init(std::list<sys::WorkerQueueInfo> queuesList)
 {
     Worker::init(queuesList);
-    bsp::vibrator::init();
-    bsp::keyboard_Init(queues[static_cast<int32_t>(WorkerEventQueues::queueKeyboardIRQ)]->GetQueueHandle());
-    bsp::headset::Init(queues[static_cast<int32_t>(WorkerEventQueues::queueHeadsetIRQ)]->GetQueueHandle());
-    auto queueBatteryHandle = queues[static_cast<int32_t>(WorkerEventQueues::queueBattery)]->GetQueueHandle();
-    auto queueChargerDetect = queues[static_cast<int32_t>(WorkerEventQueues::queueChargerDetect)]->GetQueueHandle();
-    bsp::battery_charger::init(queueBatteryHandle, queueChargerDetect);
     bsp::rtc::init(queues[static_cast<int32_t>(WorkerEventQueues::queueRTC)]->GetQueueHandle());
-    bsp::cellular::init(queues[static_cast<int32_t>(WorkerEventQueues::queueCellular)]->GetQueueHandle());
-    bsp::magnetometer::init(queues[static_cast<int32_t>(WorkerEventQueues::queueMagnetometerIRQ)]->GetQueueHandle());
-    bsp::torch::init(queues[static_cast<int32_t>(WorkerEventQueues::queueTorch)]->GetQueueHandle());
-    bsp::keypad_backlight::init();
     bsp::eink_frontlight::init();
-    bsp::light_sensor::init(queues[static_cast<int32_t>(WorkerEventQueues::queueLightSensor)]->GetQueueHandle());
     bsp::rotary_encoder::init(queues[static_cast<int32_t>(WorkerEventQueues::queueRotaryEncoder)]->GetQueueHandle());
+    bsp::bell_switches::init(queues[static_cast<int32_t>(WorkerEventQueues::queueBellSwitches)]->GetQueueHandle());
 
     time_t timestamp;
     bsp::rtc::getCurrentTimestamp(&timestamp);
@@ -249,16 +253,7 @@ void WorkerEvent::init(std::list<sys::WorkerQueueInfo> queuesList, std::shared_p
 bool WorkerEvent::deinit(void)
 {
     Worker::deinit();
-    bsp::keyboard_Deinit();
-    bsp::headset::Deinit();
-    bsp::battery_charger::deinit();
-    bsp::torch::deinit();
-    bsp::keypad_backlight::deinit();
     bsp::eink_frontlight::deinit();
-    bsp::light_sensor::deinit();
-    bsp::vibrator::deinit();
-
-    battery_level_check::deinit();
 
     return true;
 }
@@ -272,7 +267,7 @@ void WorkerEvent::processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code)
 {
     auto message = std::make_shared<sevm::KbdMessage>();
 
-    message->key.key_code = code;
+    message->key.keyCode = code;
 
     switch (event) {
     case bsp::KeyEvents::Pressed:
@@ -280,7 +275,7 @@ void WorkerEvent::processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code)
             return;
         }
         message->key.state      = RawKey::State::Pressed;
-        message->key.time_press = xTaskGetTickCount();
+        message->key.timePress = xTaskGetTickCount();
         lastPressed             = code;
         lastState               = event;
         break;
@@ -294,7 +289,7 @@ void WorkerEvent::processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code)
         lastState = bsp::KeyEvents::Released;
         {
             message->key.state        = RawKey::State::Released;
-            message->key.time_release = xTaskGetTickCount();
+            message->key.timeRelease = xTaskGetTickCount();
         }
         break;
     case bsp::KeyEvents::Moved:

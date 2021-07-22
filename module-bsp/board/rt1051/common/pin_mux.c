@@ -247,6 +247,7 @@ I2C_SDA_FXOS8700CQ;CSI_I2C_SDA}
 
 #include "fsl_common.h"
 #include "fsl_iomuxc.h"
+#include "fsl_xbara.h"
 #include "pin_mux.h"
 #include "board.h"
 
@@ -311,6 +312,7 @@ void PINMUX_InitBootPins(void)
     PINMUX_InitMagnetometer();
     PINMUX_InitEinkFrontlight();
     PINMUX_InitLightSensor();
+    PINMUX_InitSwitches();
 }
 
 /*
@@ -1497,6 +1499,80 @@ void PINMUX_InitLightSensor(void)
     IOMUXC_SetPinConfig(PINMUX_LIGHT_SENSOR_IRQ_PIN,
                         PAD_CONFIG_SLEW_RATE_SLOW | PAD_CONFIG_DRIVER_DISABLED | PAD_CONFIG_SPEED_SLOW_50MHz |
                             PAD_CONFIG_PULL_KEEPER_ENABLED | PAD_CONFIG_SELECT_PULL | PAD_CONFIG_PULL_UP_22kOhm);
+}
+
+/* FUNCTION ************************************************************************************************************
+ *
+ * Function Name : PINMUX_InitSwitches
+ * Description   : Configures pin routing and optionally pin electrical features.
+ *
+ * END ****************************************************************************************************************/
+void PINMUX_InitSwitches(void) {
+  CLOCK_EnableClock(kCLOCK_Iomuxc);           
+  CLOCK_EnableClock(kCLOCK_IomuxcSnvs);       
+  CLOCK_EnableClock(kCLOCK_Xbar1);            
+
+  /* GPIO configuration of PS_BUTTON on GPIO_B0_06 (pin A8) */
+  gpio_pin_config_t PS_BUTTON_config = {
+      .direction = kGPIO_DigitalInput,
+      .outputLogic = 0U,
+      .interruptMode = kGPIO_IntRisingOrFallingEdge
+  };
+  /* Initialize GPIO functionality on GPIO_B0_06 (pin A8) */
+  GPIO_PinInit(GPIO2, 6U, &PS_BUTTON_config);
+
+  /* GPIO configuration of SW_LATCH on GPIO_B0_09 (pin C9) */
+  gpio_pin_config_t SW_LATCH_config = {
+      .direction = kGPIO_DigitalInput,
+      .outputLogic = 0U,
+      .interruptMode = kGPIO_IntRisingOrFallingEdge
+  };
+  /* Initialize GPIO functionality on GPIO_B0_09 (pin C9) */
+  GPIO_PinInit(GPIO2, 9U, &SW_LATCH_config);
+
+  /* GPIO configuration of SW_RIGHT on GPIO_B0_11 (pin A10) */
+  gpio_pin_config_t SW_RIGHT_config = {
+      .direction = kGPIO_DigitalInput,
+      .outputLogic = 0U,
+      .interruptMode = kGPIO_IntRisingOrFallingEdge
+  };
+  /* Initialize GPIO functionality on GPIO_B0_11 (pin A10) */
+  GPIO_PinInit(GPIO2, 11U, &SW_RIGHT_config);
+
+  /* GPIO configuration of SW_LEFT on GPIO_B1_00 (pin A11) */
+  gpio_pin_config_t SW_LEFT_config = {
+      .direction = kGPIO_DigitalInput,
+      .outputLogic = 0U,
+      .interruptMode = kGPIO_IntRisingOrFallingEdge
+  };
+  /* Initialize GPIO functionality on GPIO_B1_00 (pin A11) */
+  GPIO_PinInit(GPIO2, 16U, &SW_LEFT_config);
+
+  /* GPIO configuration of MCU_WAKEUP on WAKEUP (pin L6) */
+  gpio_pin_config_t MCU_WAKEUP_config = {
+      .direction = kGPIO_DigitalInput,
+      .outputLogic = 0U,
+      .interruptMode = kGPIO_IntFallingEdge
+  };
+  /* Initialize GPIO functionality on WAKEUP (pin L6) */
+  GPIO_PinInit(GPIO5, 0U, &MCU_WAKEUP_config);
+
+  IOMUXC_SetPinMux(IOMUXC_GPIO_B0_06_GPIO2_IO06, 1U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_B0_09_GPIO2_IO09, 1U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_B0_11_GPIO2_IO11, 1U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_B1_00_GPIO2_IO16, 1U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_B1_14_XBAR1_IN02, 1U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_B1_15_XBAR1_IN03, 1U); 
+  IOMUXC_SetPinMux(IOMUXC_SNVS_WAKEUP_GPIO5_IO00, 1U); 
+  XBARA_SetSignalsConnection(XBARA1, kXBARA1_InputIomuxXbarIn02, kXBARA1_OutputEnc1PhaseAInput); 
+  XBARA_SetSignalsConnection(XBARA1, kXBARA1_InputIomuxXbarIn03, kXBARA1_OutputEnc1PhaseBInput); 
+  IOMUXC_SetPinConfig(IOMUXC_GPIO_B0_06_GPIO2_IO06, 0xB0B0U); 
+  IOMUXC_SetPinConfig(IOMUXC_GPIO_B0_09_GPIO2_IO09, 0xB0B0U); 
+  IOMUXC_SetPinConfig(IOMUXC_GPIO_B0_11_GPIO2_IO11, 0xB0B0U); 
+  IOMUXC_SetPinConfig(IOMUXC_GPIO_B1_00_GPIO2_IO16, 0xB0B0U); 
+  IOMUXC_SetPinConfig(IOMUXC_GPIO_B1_14_XBAR1_IN02, 0xB0B0U); 
+  IOMUXC_SetPinConfig(IOMUXC_GPIO_B1_15_XBAR1_IN03, 0xB0B0U); 
+  IOMUXC_SetPinConfig(IOMUXC_SNVS_WAKEUP_GPIO5_IO00, 0x01B0A0U); 
 }
 
 /***********************************************************************************************************************
