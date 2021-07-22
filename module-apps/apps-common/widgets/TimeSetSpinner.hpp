@@ -10,19 +10,6 @@
 
 #include <string>
 
-namespace style
-{
-    namespace time_set_spinner
-    {
-        namespace colon
-        {
-            inline constexpr auto w            = 32U;
-            inline constexpr auto h            = 100U;
-            inline constexpr auto default_font = style::window::font::supersizemelight;
-        } // namespace colon
-    }     // namespace time_set_spinner
-} // namespace style
-
 namespace gui
 {
     class TimeSetSpinner : public HBox
@@ -49,5 +36,6 @@ namespace gui
         auto onInput(const InputEvent &inputEvent) -> bool override;
         [[nodiscard]] auto getFontHeight() const noexcept -> uint16_t;
         [[nodiscard]] auto getWidestDigitWidth() const noexcept -> uint32_t;
+        [[nodiscard]] auto getColonDigitWidth() const noexcept -> uint32_t;
     };
 } /* namespace gui */
