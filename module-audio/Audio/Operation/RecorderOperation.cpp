@@ -44,8 +44,8 @@ namespace audio
         };
 
         // order defines priority
-        AddProfile(Profile::Type::RecordingBluetoothHSP, PlaybackType::None, false);
         AddProfile(Profile::Type::RecordingHeadphones, PlaybackType::None, false);
+        AddProfile(Profile::Type::RecordingBluetoothHSP, PlaybackType::None, false);
         AddProfile(Profile::Type::RecordingBuiltInMic, PlaybackType::None, true);
 
         auto defaultProfile = GetProfile(Profile::Type::PlaybackLoudspeaker);

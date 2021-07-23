@@ -90,11 +90,11 @@ namespace audio
 
         audio::Profile::Type GetPriorityPlaybackProfile() const
         {
-            if (audioSinkState.isConnected(EventType::BlutoothA2DPDeviceState)) {
-                return Profile::Type::PlaybackBluetoothA2DP;
-            }
             if (audioSinkState.isConnected(EventType::JackState)) {
                 return Profile::Type::PlaybackHeadphones;
+            }
+            if (audioSinkState.isConnected(EventType::BlutoothA2DPDeviceState)) {
+                return Profile::Type::PlaybackBluetoothA2DP;
             }
             return Profile::Type::PlaybackLoudspeaker;
         }
@@ -111,6 +111,9 @@ namespace audio
         virtual audio::RetCode Resume();
         virtual audio::RetCode Mute();
 
+      protected:
+        AudioSinkState audioSinkState;
+
       private:
         void SendUpdateEventsToCurrentOperation();
         /**
@@ -126,7 +129,6 @@ namespace audio
         void UpdateProfiles(audio::PlaybackType playbackType);
 
         Muted muted = Muted::False;
-        AudioSinkState audioSinkState;
 
         std::shared_ptr<BluetoothStreamData> btData;
 
