@@ -125,6 +125,8 @@ extern "C"
      */
     status_t LPUART_SendEDMA(LPUART_Type *base, lpuart_edma_handle_t *handle, lpuart_transfer_t *xfer);
 
+    status_t LPUART_IsEDMATxBusy(lpuart_edma_handle_t *handle);
+
     /*!
      * @brief Receives data using eDMA.
      *

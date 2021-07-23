@@ -216,6 +216,7 @@ namespace cellular::internal
                 }
                 else {
                     auto channel = owner->cmux->get(CellularMux::Channel::Commands);
+                    saveNewMultiPartSMSUIDCallback(multiPartSMSUID);
 
                     for (uint32_t i = 0; i < messagePartsCount; i++) {
 
@@ -225,9 +226,9 @@ namespace cellular::internal
                         }
                         UTF8 messagePart = record.body.substr(i * singleMessageLen, partLength);
 
-                        std::string command(at::factory(at::AT::QCMGS) + UCS2(UTF8(receiver)).str() + "\",120," +
-                                            std::to_string(i + 1) + "," + std::to_string(messagePartsCount));
-
+                        std::string command(at::factory(at::AT::QCMGS) + UCS2(UTF8(receiver)).str() + "\"," +
+                                            std::to_string(multiPartSMSUID) + "," + std::to_string(i + 1) + "," +
+                                            std::to_string(messagePartsCount));
                         if (owner->cmux->checkATCommandPrompt(
                                 channel->sendCommandPrompt(command.c_str(), 1, commandTimeout))) {
                             // prompt sign received, send data ended by "Ctrl+Z"
@@ -246,6 +247,7 @@ namespace cellular::internal
                             break;
                         }
                     }
+                    multiPartSMSUID++;
                 }
             }
         }
@@ -281,6 +283,11 @@ namespace cellular::internal
             }
             return std::make_shared<cellular::GetSimContactsResponse>();
         });
+    }
+
+    void ServiceCellularPriv::setInitialMultiPartSMSUID(std::uint8_t uid)
+    {
+        multiPartSMSUID = uid + 1;
     }
 
     void ServiceCellularPriv::connectImeiGetHandler()
