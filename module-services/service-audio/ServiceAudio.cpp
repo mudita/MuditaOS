@@ -341,7 +341,8 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const Operation:
 
     if (opType == Operation::Type::Playback) {
         auto input = audioMux.GetPlaybackInput(playbackType);
-        if (playbackType == audio::PlaybackType::CallRingtone && bluetoothHSPConnected) {
+        if (playbackType == audio::PlaybackType::CallRingtone && bluetoothHSPConnected && input &&
+            (*input)->audio->GetPriorityPlaybackProfile() == Profile::Type::PlaybackBluetoothA2DP) {
             LOG_DEBUG("Sending Bluetooth start ringing");
             bus.sendUnicast(std::make_shared<message::bluetooth::Ring>(message::bluetooth::Ring::State::Enable),
                             service::name::bluetooth);
