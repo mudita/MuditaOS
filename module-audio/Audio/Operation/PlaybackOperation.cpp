@@ -21,8 +21,8 @@ namespace audio
         : Operation(callback, playbackType), dec(nullptr)
     {
         // order defines priority
-        AddProfile(Profile::Type::PlaybackBluetoothA2DP, playbackType, false);
         AddProfile(Profile::Type::PlaybackHeadphones, playbackType, false);
+        AddProfile(Profile::Type::PlaybackBluetoothA2DP, playbackType, false);
         AddProfile(Profile::Type::PlaybackLoudspeaker, playbackType, true);
 
         endOfFileCallback = [this]() {
