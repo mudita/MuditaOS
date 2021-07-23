@@ -231,6 +231,14 @@ sys::ReturnCodes ServiceCellular::InitHandler()
         [this](const std::string &value) { apnListChanged(value); },
         ::settings::SettingsScope::Global);
 
+    priv->setInitialMultiPartSMSUID(static_cast<std::uint8_t>(utils::getNumericValue<int>(
+        settings->getValue(settings::Cellular::currentUID, settings::SettingsScope::Global))));
+
+    priv->saveNewMultiPartSMSUIDCallback = [this](std::uint8_t uid) -> void {
+        settings->setValue(
+            settings::Cellular::currentUID, std::to_string(static_cast<int>(uid)), settings::SettingsScope::Global);
+    };
+
     cpuSentinel = std::make_shared<sys::CpuSentinel>(serviceName, this);
     ongoingCall.setCpuSentinel(cpuSentinel);
 
