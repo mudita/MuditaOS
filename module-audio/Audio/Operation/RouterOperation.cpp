@@ -23,8 +23,8 @@ namespace audio
         : Operation(callback)
     {
         // order defines priority
-        AddProfile(Profile::Type::RoutingBluetoothHSP, PlaybackType::None, false);
         AddProfile(Profile::Type::RoutingHeadphones, PlaybackType::None, false);
+        AddProfile(Profile::Type::RoutingBluetoothHSP, PlaybackType::None, false);
         AddProfile(Profile::Type::RoutingEarspeaker, PlaybackType::None, true);
         AddProfile(Profile::Type::RoutingLoudspeaker, PlaybackType::None, true);
     }

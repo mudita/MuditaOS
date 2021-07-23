@@ -5,6 +5,7 @@
 
 #include <memory>
 #include <functional>
+#include <optional>
 
 #include <Audio/AudioCommon.hpp>
 #include <Audio/AudioDeviceFactory.hpp>
@@ -114,6 +115,7 @@ namespace audio
         {
             return filePath;
         }
+        std::optional<Profile::Type> GetPriorityProfile() const;
         /**
          * @brief Switches operation to priority profile.
          */
