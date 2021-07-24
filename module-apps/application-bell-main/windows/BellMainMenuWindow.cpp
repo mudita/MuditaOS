@@ -3,7 +3,9 @@
 
 #include "BellMainMenuWindow.hpp"
 
+#include <application-bell-alarm/include/application-bell-alarm/ApplicationBellAlarm.hpp>
 #include <application-bell-main/ApplicationBellMain.hpp>
+#include <application-bell-settings/include/application-bell-settings/ApplicationBellSettings.hpp>
 #include <data/BellMainStyle.hpp>
 
 #include <Dialog.hpp>
@@ -73,14 +75,14 @@ namespace gui
                 this));
         };
 
-        addAppMenu(utils::translate("app_bellmain_next_alarm"), "");
+        addAppMenu(utils::translate("app_bellmain_next_alarm"), app::applicationBellAlarmName);
 
         // for demo only - to be replaced by call o final window
         addWinMenu(utils::translate("app_bellmain_power_nap"), gui::window::name::bell_main_menu_dialog);
         addWinMenu(utils::translate("app_bellmain_meditation_timer"), gui::window::name::bell_main_menu_dialog);
         addWinMenu(utils::translate("app_bellmain_media_library"), gui::window::name::bell_main_menu_dialog);
 
-        addAppMenu(utils::translate("app_bellmain_settings"), "ApplicationBellSettings");
+        addAppMenu(utils::translate("app_bellmain_settings"), app::applicationBellSettingsName);
 
         return menuOptionList;
     }

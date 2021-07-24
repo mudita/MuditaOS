@@ -49,6 +49,7 @@ target_link_libraries(BellHybrid
     PRIVATE
         application-bell-main
         application-bell-settings
+        application-bell-alarm
         application-music-player
         messagetype
         module-apps

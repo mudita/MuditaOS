@@ -1,38 +1,31 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "config.h"
 #include "PlatformFactory.hpp"
 
 // applications
-#include <application-settings/ApplicationSettings.hpp>
-#include <application-music-player/ApplicationMusicPlayer.hpp>
-#include <application-alarm-clock/ApplicationAlarmClock.hpp>
-#include <application-onboarding/ApplicationOnBoarding.hpp>
+#include <application-bell-alarm/ApplicationBellAlarm.hpp>
 #include <application-bell-main/ApplicationBellMain.hpp>
 #include <application-bell-settings/ApplicationBellSettings.hpp>
 
 // services
+#include <module-services/service-eink/ServiceEink.hpp>
+#include <Service/ServiceCreator.hpp>
 #include <service-appmgr/model/ApplicationManager.hpp>
 #include <service-audio/ServiceAudio.hpp>
 #include <service-bluetooth/ServiceBluetooth.hpp>
 #include <service-db/ServiceDB.hpp>
+#include <service-desktop/ServiceDesktop.hpp>
 #include <service-evtmgr/EventManager.hpp>
+#include <service-fileindexer/Constants.hpp>
+#include <service-gui/ServiceGUI.hpp>
 #include <service-lwip/ServiceLwIP.hpp>
 #include <service-time/ServiceTime.hpp>
-#include <Service/ServiceCreator.hpp>
-#include <service-gui/ServiceGUI.hpp>
-#include <service-gui/Common.hpp>
-#include <module-services/service-eink/ServiceEink.hpp>
-#include <service-fileindexer/Constants.hpp>
-#include <service-fileindexer/ServiceFileIndexer.hpp>
-#include <service-desktop/ServiceDesktop.hpp>
 
-#include <bsp/bsp.hpp>
 #include <Application.hpp>
 #include <ApplicationLauncher.hpp>
-#include <log/log.hpp>
 #include <log/Logger.hpp>
+#include <log/log.hpp>
 #include <source/version.hpp>
 #include <SystemManager/SystemManager.hpp>
 #include <SystemWatchdog/SystemWatchdog.hpp>
@@ -101,6 +94,7 @@ int main()
             applications.push_back(
                 app::CreateLauncher<app::ApplicationBellMain>(app::applicationBellName, app::Closeable::False));
             applications.push_back(app::CreateLauncher<app::ApplicationBellSettings>(app::applicationBellSettingsName));
+            applications.push_back(app::CreateLauncher<app::ApplicationBellAlarm>(app::applicationBellAlarmName));
             // start application manager
             return sysmgr->RunSystemService(
                 std::make_shared<app::manager::ApplicationManager>(
