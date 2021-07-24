@@ -9,6 +9,7 @@ module_is_test_entity()
 add_library(${PROJECT_NAME} STATIC)
 
 add_subdirectory(application-antenna)
+add_subdirectory(application-bell-alarm)
 add_subdirectory(application-bell-main)
 add_subdirectory(application-bell-settings)
 add_subdirectory(application-calculator)
