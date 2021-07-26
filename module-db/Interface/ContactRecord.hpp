@@ -232,9 +232,10 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
      * @brief Check which contacts in vector are duplicating contacts in DB
      *
      * @param contacts vector of contacts with single number
-     * @return vector of contacts with numbers appearing in contacts DB
+     * @return first vector of contacts with unique numbers and second with duplicates appearing in contacts DB
      */
-    auto CheckContactsListDuplicates(std::vector<ContactRecord> &contacts) -> std::vector<ContactRecord>;
+    auto CheckContactsListDuplicates(std::vector<ContactRecord> &contacts)
+        -> std::pair<std::vector<ContactRecord>, std::vector<ContactRecord>>;
 
   private:
     ContactsDB *contactDB;

@@ -90,11 +90,14 @@ namespace app
         constexpr inline auto operators_on = "operators_on";
     } // namespace settings
 
+    static constexpr auto settingStackDepth = 1024 * 6; // 6Kb stack size
+
     ApplicationSettings::ApplicationSettings(std::string name,
                                              std::string parent,
                                              sys::phone_modes::PhoneMode mode,
                                              StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), mode, startInBackground), AsyncCallbackReceiver{this}
+        : Application(std::move(name), std::move(parent), mode, startInBackground, settingStackDepth),
+          AsyncCallbackReceiver{this}
     {
         CellularServiceAPI::SubscribeForOwnNumber(this, [&](const std::string &number) {
             selectedSimNumber = number;
@@ -132,6 +135,7 @@ namespace app
             if (auto command = callbackStorage->getCallback(resp); command->execute()) {
                 refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
             }
+            return sys::msgHandled();
         }
 
         return sys::MessageNone{};
@@ -381,8 +385,9 @@ namespace app
             return std::make_unique<gui::SimPINSettingsWindow>(app);
         });
         windowsFactory.attach(gui::window::name::import_contacts, [&](Application *app, const std::string &name) {
-            auto model     = std::make_unique<SimContactsImportModel>(this);
-            auto presenter = std::make_unique<SimContactsImportWindowPresenter>(std::move(model));
+            auto repository = std::make_unique<SimContactsRepository>(this);
+            auto model      = std::make_unique<SimContactsImportModel>(this, std::move(repository));
+            auto presenter  = std::make_unique<SimContactsImportWindowPresenter>(this, std::move(model));
             return std::make_unique<gui::SimContactsImportWindow>(app, std::move(presenter));
         });
 

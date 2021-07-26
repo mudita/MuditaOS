@@ -80,13 +80,14 @@ namespace gui
 
     void CheckBox::setCheck(bool state)
     {
+        checkState = state;
         image->setVisible(state);
         resizeItems();
     }
 
     bool CheckBox::isChecked()
     {
-        return image->visible;
+        return checkState;
     }
 
 } /* namespace gui */

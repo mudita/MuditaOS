@@ -1231,8 +1231,9 @@ auto ContactRecordInterface::MergeContactsList(std::vector<ContactRecord> &conta
 }
 
 auto ContactRecordInterface::CheckContactsListDuplicates(std::vector<ContactRecord> &contacts)
-    -> std::vector<ContactRecord>
+    -> std::pair<std::vector<ContactRecord>, std::vector<ContactRecord>>
 {
+    std::vector<ContactRecord> unique;
     std::vector<ContactRecord> duplicates;
     std::vector<ContactNumberHolder> contactNumberHolders;
     auto numberMatcher = buildNumberMatcher(contactNumberHolders);
@@ -1246,6 +1247,9 @@ auto ContactRecordInterface::CheckContactsListDuplicates(std::vector<ContactReco
         if (matchedNumber != numberMatcher.END) {
             duplicates.push_back(contact);
         }
+        else {
+            unique.push_back(contact);
+        }
     }
-    return duplicates;
+    return {unique, duplicates};
 }

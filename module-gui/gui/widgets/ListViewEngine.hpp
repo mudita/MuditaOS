@@ -177,7 +177,7 @@ namespace gui
         std::function<void()> prepareRebuildCallback;
 
         void reset();
-        void clear();
+        virtual void clear();
         void onClose();
 
         std::shared_ptr<ListItemProvider> getProvider();

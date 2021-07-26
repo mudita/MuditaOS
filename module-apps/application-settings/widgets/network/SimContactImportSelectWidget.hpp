@@ -14,9 +14,10 @@ namespace gui
         gui::CheckBoxWithLabel *checkBoxWithLabel = nullptr;
 
       public:
-        SimContactImportSelectWidget(std::string contactName,
+        SimContactImportSelectWidget(const std::string &contactName,
                                      const std::function<void(const UTF8 &text)> &bottomBarTemporaryMode = nullptr,
                                      const std::function<void()> &bottomBarRestoreFromTemporaryMode      = nullptr);
+        bool isChecked();
     };
 
 } /* namespace gui */
