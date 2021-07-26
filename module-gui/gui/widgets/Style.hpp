@@ -162,6 +162,7 @@ namespace style
             inline constexpr auto call           = "common_call";
             inline constexpr auto send           = "common_send";
             inline constexpr auto save           = "common_save";
+            inline constexpr auto import         = "common_import";
             inline constexpr auto confirm        = "common_confirm";
             inline constexpr auto select         = "common_select";
             inline constexpr auto use            = "common_use";
@@ -169,6 +170,7 @@ namespace style
             inline constexpr auto back           = "common_back";
             inline constexpr auto skip           = "common_skip";
             inline constexpr auto set            = "common_set";
+            inline constexpr auto show           = "common_show";
             inline constexpr auto yes            = "common_yes";
             inline constexpr auto no             = "common_no";
             inline constexpr auto check          = "common_check";
@@ -185,6 +187,7 @@ namespace style
             inline constexpr auto pause          = "common_pause";
             inline constexpr auto accept         = "common_accept";
             inline constexpr auto retry          = "common_retry";
+            inline constexpr auto replace        = "common_replace";
             inline constexpr auto abort          = "common_abort";
             inline constexpr auto adjust         = "common_adjust";
             // days

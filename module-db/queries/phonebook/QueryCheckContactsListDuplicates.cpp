@@ -20,9 +20,15 @@ std::vector<ContactRecord> &CheckContactsListDuplicates::getContactsList()
     return "CheckContactsListDuplicates";
 }
 
-CheckContactsListDuplicatesResult::CheckContactsListDuplicatesResult(std::vector<ContactRecord> duplicates)
-    : duplicates(std::move(duplicates))
+CheckContactsListDuplicatesResult::CheckContactsListDuplicatesResult(
+    std::pair<std::vector<ContactRecord>, std::vector<ContactRecord>> result)
+    : unique(std::move(result.first)), duplicates(std::move(result.second))
 {}
+
+std::vector<ContactRecord> &CheckContactsListDuplicatesResult::getUnique()
+{
+    return unique;
+}
 
 std::vector<ContactRecord> &CheckContactsListDuplicatesResult::getDuplicates()
 {

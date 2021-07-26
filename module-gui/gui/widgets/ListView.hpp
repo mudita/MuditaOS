@@ -51,6 +51,7 @@ namespace gui
                  listview::ScrollBarType scrollType = listview::ScrollBarType::Proportional);
 
         void setScrollTopMargin(int value);
+        void clear() override;
         void setAlignment(const Alignment &value) override;
 
         // virtual methods from Item
