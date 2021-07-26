@@ -53,21 +53,12 @@ HardFault_Handler:
     mrs     r1, msp
     ldr     sp, =(g_crashCatcherStack + 4 * CRASH_CATCHER_STACK_WORD_COUNT)
     push.w  {r1-r11,lr}
-    // Call oryginal console dump
+
+    // Call original console dump
     ldr r0,=crash_orig_stack
     str sp, [r0]
     mov sp, r1
 
-    // Call console crash handler
-    mrs r0, msp
-    mov sp, r0
-    tst lr, #4
-    ite eq
-    mrseq r0,msp
-    mrsne r0,psp
-    push {lr}
-    bl crashCatcherExtPrintConsoleHF
-    pop {lr}
     ldr r0,=crash_orig_stack
     ldr sp, [r0]
 
