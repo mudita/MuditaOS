@@ -1,8 +1,86 @@
 # MuditaOS changelog
 
+** Not suitable for the T7 hardware version. **
+
 To install the new version of MuditaOS please follow the steps described in this guide:
 - [Linux](https://github.com/mudita/MuditaOS/blob/master/doc/boot_and_update.md#creating-a-storage-partition)
 - [Windows and macOS](https://github.com/mudita/MuditaOS/blob/master/doc/flashing_win_macos.md)
+
+## [0.74.1 2021-07-26]
+
+* [BH-362] Move segger to a separate directory
+* [BH-375] Clean `module-utils/third-party`
+* [BH-377] Liberalize application special input
+* [BH-381] Turned application call into lib
+* [BH-382] Rebase and cleaning
+* [BH-384] Turned application desktop to library
+* [BH-385] Turned application meditation into lib
+* [BH-464] Fix make all
+* [BH-628] Cleaned up module-vfs cmake
+* [BH-655] Add SideListView
+* [BH-672] SideListView integration with ListViewEngine
+* [BH-674] TimeSetSpinner
+* [CP-215] Expose current operator name in service desktop API
+* [CP-254] Use Send File for Update package
+* [CP-260] Use gdb with py to debug crash dumps
+* [CP-264] Ensure bluetooth logging
+* [CP-265] Extend cellular logging
+* [CP-267] Ensure cellular logging
+* [CP-280] Implement send file procedure
+* [CP-281] Block restoration of mock messages
+* [CP-282] Add md5sums to the version.json file
+* [CP-282] Set correct standalone image dependencies
+* [CP-288] Update secureboot documentation
+* [CP-316] Tool to get MuditaOS log
+* [CP-319] Extends reboot reason code
+* [CP-325] Request reboot code adjusted to work with harness
+* [CP-326] Reformat recovery partition as littlefs
+* [CP-327] Fix UB in QueryResult
+* [CP-335] Fix formatting of SN
+* [CP-355] Pure update full flow implemented
+* [EGD-3171] Fix key shortRelease on app switch
+* [EGD-5006] Add French localizations
+* [EGD-5659] Cpu frequency for audio
+* [EGD-6212] Add tethering doc
+* [EGD-6609] Separated out sms logic
+* [EGD-6624] Audio support for linux simulator
+* [EGD-6672] Fix missing key after slider
+* [EGD-6889] Fix Fixed network time handling
+* [EGD-6928] Fix system powe instability
+* [EGD-6971] TextLine breaking on space or with dash
+* [EGD-6973] Fix Auto date is on by default
+* [EGD-7005] Removed sensitive data cellular
+* [EGD-7010] Remove sensitive data from logs
+* [EGD-7024] Keep the state of SMS on phone lock
+* [EGD-7036] Audio tracks updated
+* [EGD-7052] Generate unique window name
+* [EGD-7074] Fix date and time unit tests
+* [EGD-7088] SDRAM configuration on T7 board
+* [EGD-7096] Add reaction after changing BT device name
+* [EGD-7097] Introduce BT name length limit
+* [EGD-7108] Fix disconnecting all devices during unpairing
+* [EGD-7114] Updated reboot messages
+* [EGD-7120] Remove old settings application
+* [EGD-7124] Add import contacts from sim
+* [EGD-7130] Renamed settings application
+* [EGD-7131] Flashing instruction updated
+* [EGD-7133] Bluetooth setting cleanup
+* [EGD-7134] Network setting cleanup and fixes
+* [EGD-7135] Display and keypad setting cleanup and fixes
+* [EGD-7136] Apps setting cleanup and fixes
+* [EGD-7136] Phone modes setting cleanup and fixes
+* [EGD-7138] Security setting cleanup and fixes
+* [EGD-7139] System setting cleanup and fixes
+* [EGD-7141] Fix GUI googletest
+* [EGD-7142] Fix compilation issues with __PRETTY_FUNCTION__
+* [EGD-7145] Fix mp3 tags fetch
+* [EGD-7149] Fix connecting BT devices
+* [EGD-7162] Removed sensitive data from settings app
+* [EGD-7164] ListViewEngine separation from ListView
+* [EGD-7169] Changed genlfs path
+* [EGD-7176] Switch GH Actions docker image to company's one
+* [EGD-7187] Update docker maintainer
+* [EGD-7199] Switch weekly releases to T6
 
 ## [0.73.1 2021-07-09]
 
