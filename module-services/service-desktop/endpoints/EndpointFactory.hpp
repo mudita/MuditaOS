@@ -47,8 +47,10 @@ class EndpointFactory
             return std::make_unique<FactoryResetEndpoint>(ownerServicePtr);
         case parserFSM::EndpointType::calllog:
             return std::make_unique<CalllogEndpoint>(ownerServicePtr);
+#if ENABLE_DEVELOPER_MODE_ENDPOINT
         case parserFSM::EndpointType::developerMode:
             return std::make_unique<DeveloperModeEndpoint>(ownerServicePtr);
+#endif
         case parserFSM::EndpointType::bluetooth:
             return std::make_unique<BluetoothEndpoint>(ownerServicePtr);
         case parserFSM::EndpointType::usbSecurity:
@@ -58,7 +60,6 @@ class EndpointFactory
         }
     }
 };
-
 class SecuredEndpointFactory : public EndpointFactory
 {
     static constexpr auto Whitelist = {parserFSM::EndpointType::developerMode, parserFSM::EndpointType::usbSecurity};
