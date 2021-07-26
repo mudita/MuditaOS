@@ -3,11 +3,12 @@
 
 #pragma GCC optimize("Og")
 
-#include <CrashCatcher.h>
+#include <CrashCatcher/CrashCatcher.h>
 
 #include <log.hpp>
 #include <date/date.h>
 #include "crashdumpwriter.hpp"
+#include "consoledump.hpp"
 
 const CrashCatcherMemoryRegion *CrashCatcher_GetMemoryRegions(void)
 {
@@ -33,6 +34,7 @@ const CrashCatcherMemoryRegion *CrashCatcher_GetMemoryRegions(void)
 
 void CrashCatcher_DumpStart(const CrashCatcherInfo *pInfo)
 {
+    crashdump::printCrashInfo(pInfo);
     crashdump::CrashDumpWriter::instance().openDump();
 }
 
