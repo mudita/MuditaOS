@@ -1,6 +1,8 @@
 project(service-desktop)
 message( "${PROJECT_NAME}  ${CMAKE_CURRENT_LIST_DIR}" )
 
+option(ENABLE_DEVELOPER_MODE_ENDPOINT "Enable developer mode endpoint in service desktop" ON)
+
 set(SOURCES
     endpoints/BaseHelper.cpp
     endpoints/backup/BackupEndpoint.cpp
@@ -73,6 +75,13 @@ target_link_libraries(${PROJECT_NAME}
         eventstore
         hash-library::hash-library
 )
+
+target_compile_definitions(
+        ${PROJECT_NAME}
+    PRIVATE
+        ENABLE_DEVELOPER_MODE_ENDPOINT=$<BOOL:${ENABLE_DEVELOPER_MODE_ENDPOINT}>
+)
+
 
 if (${ENABLE_TESTS})
     add_subdirectory(tests)
