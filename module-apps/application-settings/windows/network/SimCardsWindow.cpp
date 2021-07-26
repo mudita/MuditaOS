@@ -85,7 +85,7 @@ namespace gui
         optList.emplace_back(std::make_unique<gui::option::OptionSettings>(
             utils::translate("app_settings_network_import_contacts_from_sim_card"),
             [=](gui::Item &item) {
-                this->application->switchWindow(gui::window::name::import_contacts, nullptr);
+                application->switchWindow(gui::window::name::import_contacts);
                 return true;
             },
             nullptr,

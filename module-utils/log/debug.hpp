@@ -10,6 +10,7 @@
 #define DEBUG_BLUETOOTH_HCI_BYTES    0 /// show communication with BT module - all the HCI bytes
 #define DEBUG_SERVICE_MESSAGES       0 /// show messages prior to handling in service
 #define DEBUG_DB_MODEL_DATA          0 /// show messages prior to handling in service
+#define DEBUG_SIM_IMPORT_DATA        0 /// show messages connected to sim data imports
 #define DEBUG_FONT                   0 /// show Font debug messages
 #define DEBUG_GUI_TEXT               0 /// show basic debug messages for gui::Text - warning this can be hard on cpu
 #define DEBUG_GUI_TEXT_LINES         0 /// show extended debug messages for gui::Text - lines building

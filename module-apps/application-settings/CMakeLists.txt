@@ -20,6 +20,7 @@ target_sources( ${PROJECT_NAME}
         models/network/ApnSettingsModel.cpp
         models/network/NewApnModel.cpp
         models/network/SimContactsImportModel.cpp
+        models/network/SimContactsRepository.cpp
         models/display-keypad/QuotesModel.cpp
         models/display-keypad/CategoriesModel.cpp
         models/apps/AudioSettingsModel.cpp
