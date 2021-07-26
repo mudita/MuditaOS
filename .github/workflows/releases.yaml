@@ -11,7 +11,7 @@ jobs:
     - name: "Check Out"
       uses: actions/checkout@v2
       with:
-        token: ${{ secrets.GitHub_PAT }}
+        token: ${{ secrets.RELEASE_TOKEN }}
         submodules: recursive
         fetch-depth: 0
     - name: "Style checking"
@@ -52,7 +52,7 @@ jobs:
       id: create_release
       uses: actions/create-release@v1
       env:
-        GITHUB_TOKEN: ${{ secrets.GitHub_PAT }}
+        GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
       with:
         tag_name: ${{ github.ref }}
         release_name: ${{ github.ref }}
@@ -63,7 +63,7 @@ jobs:
       id: upload-stanalone-package
       uses: actions/upload-release-asset@v1.0.2
       env:
-        GITHUB_TOKEN: ${{ secrets.GitHub_PAT }}
+        GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         # here we have to use relative path with starting "./"
@@ -74,7 +74,7 @@ jobs:
       id: upload-update-package
       uses: actions/upload-release-asset@v1.0.2
       env:
-        GITHUB_TOKEN: ${{ secrets.GitHub_PAT }}
+        GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         # here we have to use relative path with starting "./"
