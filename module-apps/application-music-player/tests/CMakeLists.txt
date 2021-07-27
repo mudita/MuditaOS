@@ -1,0 +1,12 @@
+add_gtest_executable(
+    NAME 
+        app-music-player
+    SRCS
+        unittest.cpp
+        unittest_songrepository.cpp
+        unittest_songsmodel.cpp
+    LIBS
+        application-music-player
+    INCLUDE
+        ${CMAKE_CURRENT_LIST_DIR}/..
+)

@@ -3,47 +3,67 @@
 
 #include "SongsRepository.hpp"
 
+#include <algorithm>
 #include <log.hpp>
 #include <service-audio/AudioServiceAPI.hpp>
 #include <service-audio/AudioServiceName.hpp>
 #include <time/ScopedTime.hpp>
-#include <purefs/filesystem_paths.hpp>
 #include <service-audio/AudioMessage.hpp>
 
 #include <filesystem>
 
 namespace app::music_player
 {
-    SongsRepository::SongsRepository(Application *application) : application(application)
+    ServiceAudioTagsFetcher::ServiceAudioTagsFetcher(Application *application) : application(application)
     {}
 
-    std::vector<audio::Tags> SongsRepository::getMusicFilesList()
+    std::optional<audio::Tags> ServiceAudioTagsFetcher::getFileTags(const std::string &filePath) const
     {
-        const auto musicFolder = purefs::dir::getUserDiskPath() / "music";
-        std::vector<audio::Tags> musicFiles;
-        LOG_INFO("Scanning music folder: %s", musicFolder.c_str());
+        return AudioServiceAPI::GetFileTags(application, filePath);
+    }
+
+    SongsRepository::SongsRepository(std::unique_ptr<AbstractTagsFetcher> tagsFetcher, std::string musicFolderName)
+        : tagsFetcher(std::move(tagsFetcher)), musicFolderName(std::move(musicFolderName))
+    {}
+
+    void SongsRepository::scanMusicFilesList()
+    {
+        musicFiles.clear();
+
+        LOG_INFO("Scanning music folder: %s", musicFolderName.c_str());
         {
             auto time = utils::time::Scoped("fetch tags time");
-            for (const auto &entry : std::filesystem::directory_iterator(musicFolder)) {
+            for (const auto &entry : std::filesystem::directory_iterator(musicFolderName)) {
                 if (!std::filesystem::is_directory(entry)) {
                     const auto &filePath = entry.path();
-                    const auto fileTags  = getFileTags(filePath);
+                    const auto fileTags  = tagsFetcher->getFileTags(filePath);
                     if (fileTags) {
                         musicFiles.push_back(*fileTags);
-                        LOG_DEBUG(" - file %s found", entry.path().c_str());
                     }
                     else {
-                        LOG_ERROR("Not an audio file %s", entry.path().c_str());
+                        LOG_ERROR("Scanned not an audio file, skipped");
                     }
                 }
             }
         }
         LOG_INFO("Total number of music files found: %u", static_cast<unsigned int>(musicFiles.size()));
+    }
+
+    std::vector<audio::Tags> SongsRepository::getMusicFilesList() const
+    {
         return musicFiles;
     }
 
-    std::optional<audio::Tags> SongsRepository::getFileTags(const std::string &filePath)
+    std::size_t SongsRepository::getFileIndex(const std::string &filePath) const
     {
-        return AudioServiceAPI::GetFileTags(application, filePath);
+        auto it = std::find_if(musicFiles.begin(), musicFiles.end(), [filePath](const auto &musicFile) {
+            return musicFile.filePath == filePath;
+        });
+
+        if (it != musicFiles.end()) {
+            return std::distance(musicFiles.begin(), it);
+        }
+
+        return std::numeric_limits<size_t>::max();
     }
 } // namespace app::music_player

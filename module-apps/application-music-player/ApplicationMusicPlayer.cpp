@@ -2,8 +2,10 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <application-music-player/ApplicationMusicPlayer.hpp>
+
+#include "AudioNotificationsHandler.hpp"
+
 #include <windows/MusicPlayerAllSongsWindow.hpp>
-#include <windows/MusicPlayerEmptyWindow.hpp>
 #include <presenters/AudioOperations.hpp>
 #include <presenters/SongsPresenter.hpp>
 #include <models/SongsRepository.hpp>
@@ -40,14 +42,17 @@ namespace app
     {
         LOG_INFO("ApplicationMusicPlayer::create");
 
-        auto songsRepository = std::make_unique<app::music_player::SongsRepository>(this);
+        bus.channels.push_back(sys::BusChannel::ServiceAudioNotifications);
+
+        auto tagsFetcher     = std::make_unique<app::music_player::ServiceAudioTagsFetcher>(this);
+        auto songsRepository = std::make_unique<app::music_player::SongsRepository>(std::move(tagsFetcher));
         priv->songsModel     = std::make_unique<app::music_player::SongsModel>(std::move(songsRepository));
         auto audioOperations = std::make_unique<app::music_player::AudioOperations>(this);
         priv->songsPresenter =
             std::make_unique<app::music_player::SongsPresenter>(priv->songsModel, std::move(audioOperations));
 
         // callback used when playing state is changed
-        using SongState                                 = music_player::SongsModelInterface::SongState;
+        using SongState                                 = app::music_player::SongState;
         std::function<void(SongState)> autolockCallback = [this](SongState isPlaying) {
             if (isPlaying == SongState::Playing) {
                 LOG_DEBUG("Preventing autolock while playing track.");
@@ -64,6 +69,12 @@ namespace app
         // callback used when track is not played and we are in DetermineByAppState
         std::function<bool()> stateLockCallback = []() -> bool { return true; };
         lockPolicyHandler.setPreventsAutoLockByStateCallback(std::move(stateLockCallback));
+
+        connect(typeid(AudioStopNotification), [&](sys::Message *msg) -> sys::MessagePointer {
+            auto notification = static_cast<AudioStopNotification *>(msg);
+            music_player::AudioNotificationsHandler audioNotificationHandler{priv->songsPresenter};
+            return audioNotificationHandler.handleAudioStopNotification(notification);
+        });
     }
 
     ApplicationMusicPlayer::~ApplicationMusicPlayer() = default;
@@ -96,23 +107,20 @@ namespace app
         }
 
         createUserInterface();
-
         return ret;
     }
 
     sys::ReturnCodes ApplicationMusicPlayer::DeinitHandler()
     {
+        priv->songsPresenter->getMusicPlayerItemProvider()->clearData();
         priv->songsPresenter->stop();
         return Application::DeinitHandler();
     }
 
     void ApplicationMusicPlayer::createUserInterface()
     {
-        windowsFactory.attach(gui::name::window::all_songs_window, [&](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::name::window::main_window, [&](Application *app, const std::string &name) {
             return std::make_unique<gui::MusicPlayerAllSongsWindow>(app, priv->songsPresenter);
-        });
-        windowsFactory.attach(gui::name::window::main_window, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::MusicPlayerEmptyWindow>(app);
         });
 
         attachPopups(

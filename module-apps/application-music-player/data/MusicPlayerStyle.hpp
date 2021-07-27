@@ -101,13 +101,13 @@ namespace musicPlayerStyle
         constexpr uint32_t w = style::window::default_body_width;
         constexpr uint32_t h = 100;
 
-        constexpr uint32_t bold_text_h = 24;
-        constexpr uint32_t text_h      = 22;
+        constexpr uint32_t bold_text_h = 33;
+        constexpr uint32_t text_h      = 33;
         constexpr uint32_t duration_w  = 50;
 
-        constexpr int32_t topMargin   = 18;
+        constexpr int32_t topMargin   = 16;
         constexpr int32_t leftMargin  = 10;
-        constexpr int32_t rightMargin = 10;
+        constexpr int32_t rightMargin = 4;
 
     } // namespace songItem
 
