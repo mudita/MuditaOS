@@ -100,7 +100,7 @@ typedef struct
 typedef struct
 {
     uint8_t unused1 : 2;
-    uint8_t inplev : 1
+    uint8_t inplev : 1;
     uint8_t unused2 : 1;
     uint8_t chsel : 2;
     uint8_t i2smd : 2;
@@ -113,7 +113,7 @@ typedef struct
 #define AW8898_REG_I2STXCFG     0x06
 typedef struct
 {
-    uint8_t sync_type : 1;
+    uint8_t fsync_type : 1;
     uint8_t slot_num : 1;
     uint8_t i2s_tx_slotvld : 2;
     uint8_t i2s_rx_slotvld : 4;
@@ -128,7 +128,7 @@ typedef struct
 #define AW8898_REG_PWMCTRL      0x08
 typedef struct
 {
-    uint8_t unused : 13;
+    uint16_t unused : 13;
     uint8_t hdcce : 1;
     uint8_t hmute : 1;
 } aw8898_reg_pwmctrl_t;
@@ -159,7 +159,7 @@ typedef struct
 #define AW8898_REG_HAGCCFG4     0x0C
 typedef struct
 {
-    uint8_t unused : 8
+    uint8_t unused : 8;
     uint8_t holdth : 8;
 } aw8898_reg_hagccfg4_t;
 // Hardware AGC Configuration Register 5
@@ -176,9 +176,19 @@ typedef struct
 
 // Hardware AGC Configuration Register 7
 #define AW8898_REG_HAGCCFG7     0x0F
+typedef struct
+{
+    uint8_t volume : 8;
+    uint8_t unused : 8;
+} aw8898_reg_hagccfg7_t;
 
 // 
 #define AW8898_REG_HAGCST       0x10
+typedef struct
+{
+    uint16_t unused : 12;
+    uint8_t bstvout : 4;
+} aw8898_reg_hagcst_t;
 
 //
 #define AW8898_REG_DBGCTRL      0x20
@@ -193,6 +203,13 @@ typedef struct
 
 //
 #define AW8898_REG_I2SSTAT      0x22
+typedef struct
+{
+    uint16_t unused : 13;
+    uint8_t dpstat : 1;
+    uint8_t i2srovs : 1;
+    uint8_t i2stovs : 1;
+} aw8898_reg_i2sstat_t;
 
 //
 #define AW8898_REG_I2SCAPCNT    0x23

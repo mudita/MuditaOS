@@ -13,12 +13,12 @@ class CodecParamsAW8898 : public CodecParams
     enum class Cmd
     {
         SetOutVolume,
-//        SetInGain,
+        SetInGain,
         SetMute,
         SetOutput,
-//        SetInput,
+        SetInput,
         Reset,
-// /        MicBiasCtrl,
+        MicBiasCtrl,
         None
     };
 
