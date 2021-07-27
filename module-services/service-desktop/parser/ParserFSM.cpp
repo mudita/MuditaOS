@@ -58,9 +58,7 @@ void StateMachine::parseHeader()
 
     auto messageStart = receivedMsg.find(message::endpointChar);
     if (messageStart == std::string::npos) {
-        std::string message = "This is not a valid endpoint message! Type=" + receivedMsg.at(0);
-        LOG_ERROR("%s", message.c_str());
-        messageHandler->putToSendQueue(Context().createErrorResponse(http::Code::BadRequest, message));
+        LOG_ERROR("This is not a valid endpoint message! Type=%c", receivedMsg.at(0));
         return;
     }
 
@@ -75,12 +73,12 @@ void StateMachine::parseHeader()
     payloadLength = message::calcPayloadLength(header);
     if (payloadLength == 0) // failed to obtain payload length from msg
     {
-        std::string message = "Damaged header!";
-        LOG_ERROR("%s", message.c_str());
-        messageHandler->putToSendQueue(Context().createErrorResponse(http::Code::BadRequest, message));
+        LOG_ERROR("Damaged header!");
         state = State::NoMsg;
         return;
     }
+
+    LOG_DEBUG("Payload length: %lu", payloadLength);
 
     message::removeHeader(receivedMsg);
     parseNewMessage();
