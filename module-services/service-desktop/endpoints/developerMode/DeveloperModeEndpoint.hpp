@@ -6,7 +6,6 @@
 #include "DeveloperModeHelper.hpp"
 #include "Mode/UI_Helper.hpp"
 #include "Mode/UpdateHelper.hpp"
-#include "Mode/LogHelper.hpp"
 #include <endpoints/Endpoint.hpp>
 #include <parser/ParserUtils.hpp>
 
@@ -27,10 +26,18 @@ namespace sys
 class DeveloperModeEndpoint : public parserFSM::Endpoint
 {
   private:
-    std::list<std::unique_ptr<parserFSM::BaseHelper>> helpers;
+    const std::unique_ptr<parserFSM::DeveloperModeHelper> helper;
+    const std::unique_ptr<parserFSM::UI_Helper> uiHelper;
+    const std::unique_ptr<parserFSM::UpdateHelper> updateHelper;
 
   public:
-    explicit DeveloperModeEndpoint(sys::Service *_ownerServicePtr);
+    explicit DeveloperModeEndpoint(sys::Service *_ownerServicePtr)
+        : Endpoint(_ownerServicePtr), helper(std::make_unique<parserFSM::DeveloperModeHelper>(ownerServicePtr)),
+          uiHelper(std::make_unique<parserFSM::UI_Helper>(ownerServicePtr)),
+          updateHelper(std::make_unique<parserFSM::UpdateHelper>(ownerServicePtr))
+    {
+        debugName = "DeveloperModeEndpoint";
+    }
 
     auto handle(parserFSM::Context &context) -> void override;
 
