@@ -1091,14 +1091,14 @@ void PINMUX_InitEINK(void)
 
 void PINMUX_InitBatteryCharger(void)
 {
-    IOMUXC_SetPinMux(PINUMX_BATTERY_CHARGER_CHGINT,
+    IOMUXC_SetPinMux(PINUMX_BATTERY_CHARGER_CHGOK,
                      0U); /* Software Input On Field: Input Path is determined by functionality */
 
     IOMUXC_SetPinMux(PINUMX_BATTERY_CHARGER_ACOK, 0U);
 
     IOMUXC_SetPinMux(PINUMX_BATTERY_CHARGER_CHGEN, 0U);
 
-    IOMUXC_SetPinConfig(PINUMX_BATTERY_CHARGER_CHGINT,
+    IOMUXC_SetPinConfig(PINUMX_BATTERY_CHARGER_CHGOK,
 
                         PAD_CONFIG_SLEW_RATE_SLOW | PAD_CONFIG_DRIVER_DISABLED | PAD_CONFIG_SPEED_SLOW_50MHz |
                             PAD_CONFIG_PULL_KEEPER_DISABLED | PAD_CONFIG_SELECT_PULL | PAD_CONFIG_PULL_UP_100kOhm);

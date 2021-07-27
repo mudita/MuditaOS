@@ -14,6 +14,7 @@
 #include <hal/key_input/KeyInput.hpp>
 #include "board/BoardDefinitions.hpp"
 #include "bsp/light_sensor/light_sensor.hpp"
+#include <hal/battery_charger/BatteryCharger.hpp>
 
 namespace bsp
 {
@@ -65,6 +66,10 @@ namespace bsp
             BaseType_t xHigherPriorityTaskWoken = 0;
             uint32_t irq_mask                   = GPIO_GetPinsInterruptFlags(GPIO1);
 
+            if (irq_mask & (1 << static_cast<uint32_t>(BoardDefinitions::BELL_BATTERY_CHARGER_CHGOK_PIN))) {
+                xHigherPriorityTaskWoken |= hal::battery::IRQHandler();
+            }
+
             // Clear all IRQs
             GPIO_PortClearInterruptFlags(GPIO1, irq_mask);
 
@@ -114,6 +119,10 @@ namespace bsp
                             (1 << static_cast<uint32_t>(BoardDefinitions::BELL_SWITCHES_LEFT)) |
                             (1 << static_cast<uint32_t>(BoardDefinitions::BELL_SWITCHES_LATCH)))) {
                 xHigherPriorityTaskWoken |= hal::key_input::generalIRQHandler(irq_mask);
+            }
+
+            if (irq_mask & (1 << static_cast<uint32_t>(BoardDefinitions::BELL_BATTERY_CHARGER_ACOK_PIN))) {
+                xHigherPriorityTaskWoken |= hal::battery::IRQHandler();
             }
 
             // Clear all IRQs
