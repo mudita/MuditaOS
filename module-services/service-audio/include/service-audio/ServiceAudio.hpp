@@ -67,12 +67,13 @@ class ServiceAudio : public sys::Service
         -> std::unique_ptr<AudioResponseMessage>;
     auto HandleStop(const std::vector<audio::PlaybackType> &stopTypes, const audio::Token &token)
         -> std::unique_ptr<AudioResponseMessage>;
+    auto StopInput(audio::AudioMux::Input *input) -> audio::RetCode;
     auto HandleSendEvent(std::shared_ptr<audio::Event> evt) -> std::unique_ptr<AudioResponseMessage>;
     auto HandlePause(const audio::Token &token) -> std::unique_ptr<AudioResponseMessage>;
     auto HandlePause(std::optional<audio::AudioMux::Input *> input) -> std::unique_ptr<AudioResponseMessage>;
     auto HandleResume(const audio::Token &token) -> std::unique_ptr<AudioResponseMessage>;
     auto HandleGetFileTags(const std::string &fileName) -> std::unique_ptr<AudioResponseMessage>;
-    void HandleNotification(const AudioNotificationMessage::Type &type, const audio::Token &token);
+    void HandleEOF(const audio::Token &token);
     auto HandleKeyPressed(const int step) -> sys::MessagePointer;
     void MuteCurrentOperation();
     void VibrationUpdate(const audio::PlaybackType &type               = audio::PlaybackType::None,
