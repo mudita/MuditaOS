@@ -3,30 +3,50 @@
 
 #pragma once
 
-#include "Tables/Record.hpp"
+#include "Record.hpp"
 
 #include <module-db/Common/Common.hpp>
+#include <Tables/Record.hpp>
+#include <Tables/EventsTable.hpp>
+
+#include <time/dateCommon.hpp>
 
 #include <utf8/UTF8.hpp>
 
 #include <stdint.h>
+#include <string>
 
 struct EventInfo
 {
     UTF8 name;
-    std::chrono::time_point<std::chrono::system_clock> startDate{TIME_POINT_INVALID};
-    std::chrono::time_point<std::chrono::system_clock> endDate{TIME_POINT_INVALID};
+    TimePoint startDate{TIME_POINT_INVALID};
+    TimePoint endDate{TIME_POINT_INVALID};
     uint32_t duration{0};
     bool isAllDay{false};
+
+    EventInfo(UTF8 name, TimePoint startDate, TimePoint endDate, uint32_t duration, bool isAllDay)
+        : name{name}, startDate{startDate}, endDate{endDate}, duration{duration}, isAllDay{isAllDay} {};
 };
 
 struct EventRecord : public Record, public EventInfo
 {
-    uint32_t id{0};
     std::string rrule{""};
+
+    EventRecord() = default;
+    EventRecord(uint32_t id,
+                UTF8 name,
+                TimePoint startDate,
+                TimePoint endDate,
+                uint32_t duration,
+                bool isAllDay,
+                std::string rrule)
+        : Record{id}, EventInfo{name, startDate, endDate, duration, isAllDay}, rrule{rrule} {};
 };
 
 struct SingleEventRecord : public Record, public EventInfo
 {
     std::shared_ptr<EventRecord> parent;
+
+    SingleEventRecord(std::shared_ptr<EventRecord> parent, TimePoint startDate, TimePoint endDate)
+        : EventInfo{parent->name, startDate, endDate, parent->duration, parent->isAllDay}, parent{parent} {};
 };
