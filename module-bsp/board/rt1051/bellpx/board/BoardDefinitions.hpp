@@ -153,4 +153,10 @@ enum class BoardDefinitions
 
     BELL_WAKEUP_GPIO = static_cast<int>(drivers::GPIOInstances ::GPIO_5),
     BELL_WAKEUP      = 0, // SNVS_WAKEUP_GPIO5_IO00
+
+    BELL_BATTERY_CHARGER_GPIO       = static_cast<int>(drivers::GPIOInstances ::GPIO_2),
+    BELL_BATTERY_CHARGER_CHGEN_PIN  = 23,
+    BELL_BATTERY_CHARGER_ACOK_PIN   = 22,
+    BELL_BATTERY_CHARGER_CHGOK_GPIO = static_cast<int>(drivers::GPIOInstances ::GPIO_1),
+    BELL_BATTERY_CHARGER_CHGOK_PIN  = 0,
 };
