@@ -513,6 +513,7 @@
   "app_meditation_minutes": "MINUTES",
   "app_music_player_all_songs": "All songs",
   "app_music_player_play": "PLAY",
+  "app_music_player_music_library_window_name": "Music Library",
   "app_music_player_music_library": "MUSIC LIBRARY",
   "app_music_player_quit": "QUIT",
   "app_music_player_music_empty_window_notification": "Press Music Library to choose\n a song from the library",

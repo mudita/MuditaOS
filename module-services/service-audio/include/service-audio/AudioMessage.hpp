@@ -56,13 +56,6 @@ class AudioNotificationMessage : public AudioMessage
     const audio::Token token;
 };
 
-class AudioPausedNotification : public AudioNotificationMessage
-{
-  public:
-    explicit AudioPausedNotification(audio::Token token) : AudioNotificationMessage{token}
-    {}
-};
-
 class AudioStopNotification : public AudioNotificationMessage
 {
   public:

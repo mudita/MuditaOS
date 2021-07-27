@@ -3,10 +3,10 @@
 
 #include "SongsPresenter.hpp"
 
+#include <service-audio/AudioMessage.hpp>
+
 namespace app::music_player
 {
-    using SongState = SongsModelInterface::SongState;
-
     SongsPresenter::SongsPresenter(std::shared_ptr<app::music_player::SongsModelInterface> songsModelInterface,
                                    std::unique_ptr<AbstractAudioOperations> &&audioOperations)
         : songsModelInterface{std::move(songsModelInterface)}, audioOperations{std::move(audioOperations)}
@@ -17,31 +17,54 @@ namespace app::music_player
         return songsModelInterface;
     }
 
-    void SongsPresenter::createData(std::function<bool(const std::string &fileName)> fn)
+    void SongsPresenter::createData()
     {
-        songsModelInterface->createData(fn);
+        songsModelInterface->createData([this](const std::string &fileName) { return requestAudioOperation(fileName); },
+                                        [this]() { stop(); },
+                                        [this](const UTF8 &text) { setViewBottomBarTemporaryMode(text); },
+                                        [this]() { restoreViewBottomBarFromTemporaryMode(); });
+        updateViewSongState();
     }
 
     bool SongsPresenter::play(const std::string &filePath)
     {
-        songsModelInterface->setCurrentSongState(SongState::Playing);
-        if (changePlayingStateCallback != nullptr) {
-            changePlayingStateCallback(SongState::Playing);
-        }
-
-        return audioOperations->play(filePath,
-                                     [this](audio::Token token) { songsModelInterface->setCurrentFileToken(token); });
+        return audioOperations->play(filePath, [this, filePath](audio::RetCode retCode, audio::Token token) {
+            if (retCode != audio::RetCode::Success || !token.IsValid()) {
+                LOG_ERROR("Playback audio operation failed, retcode = %s, token validity = %d",
+                          str(retCode).c_str(),
+                          token.IsValid());
+                return;
+            }
+            SongContext songToken{SongState::Playing, token, filePath};
+            songsModelInterface->setCurrentSongContext(songToken);
+            if (changePlayingStateCallback != nullptr) {
+                changePlayingStateCallback(SongState::Playing);
+            }
+            updateViewSongState();
+        });
     }
 
     bool SongsPresenter::pause()
     {
         auto currentFileToken = songsModelInterface->getCurrentFileToken();
         if (currentFileToken) {
-            songsModelInterface->setCurrentSongState(SongState::NotPlaying);
-            if (changePlayingStateCallback != nullptr) {
-                changePlayingStateCallback(SongState::NotPlaying);
-            }
-            return audioOperations->pause(currentFileToken.value());
+            return audioOperations->pause(currentFileToken.value(), [this](audio::RetCode retCode, audio::Token token) {
+                if (retCode != audio::RetCode::Success || !token.IsValid()) {
+                    LOG_ERROR("Pause audio operation failed, retcode = %s, token validity = %d",
+                              str(retCode).c_str(),
+                              token.IsValid());
+                    return;
+                }
+                if (token != songsModelInterface->getCurrentFileToken()) {
+                    LOG_ERROR("Pause audio operation failed, wrong token");
+                    return;
+                }
+                songsModelInterface->setCurrentSongState(SongState::NotPlaying);
+                if (changePlayingStateCallback != nullptr) {
+                    changePlayingStateCallback(SongState::NotPlaying);
+                }
+                updateViewSongState();
+            });
         }
         return false;
     }
@@ -50,11 +73,24 @@ namespace app::music_player
     {
         auto currentFileToken = songsModelInterface->getCurrentFileToken();
         if (currentFileToken) {
-            songsModelInterface->setCurrentSongState(SongState::Playing);
-            if (changePlayingStateCallback != nullptr) {
-                changePlayingStateCallback(SongState::Playing);
-            }
-            return audioOperations->resume(currentFileToken.value());
+            return audioOperations->resume(
+                currentFileToken.value(), [this](audio::RetCode retCode, audio::Token token) {
+                    if (retCode != audio::RetCode::Success || !token.IsValid()) {
+                        LOG_ERROR("Resume audio operation failed, retcode = %s, token validity = %d",
+                                  str(retCode).c_str(),
+                                  token.IsValid());
+                        return;
+                    }
+                    if (token != songsModelInterface->getCurrentFileToken()) {
+                        LOG_ERROR("Resume audio operation failed, wrong token");
+                        return;
+                    }
+                    songsModelInterface->setCurrentSongState(SongState::Playing);
+                    if (changePlayingStateCallback != nullptr) {
+                        changePlayingStateCallback(SongState::Playing);
+                    }
+                    updateViewSongState();
+                });
         }
         return false;
     }
@@ -63,29 +99,11 @@ namespace app::music_player
     {
         auto currentFileToken = songsModelInterface->getCurrentFileToken();
         if (currentFileToken) {
-            songsModelInterface->setCurrentSongState(SongState::NotPlaying);
-            if (changePlayingStateCallback != nullptr) {
-                changePlayingStateCallback(SongState::NotPlaying);
-            }
-
-            return audioOperations->stop(currentFileToken.value(), [this](audio::Token token) {
-                if (token == songsModelInterface->getCurrentFileToken()) {
-                    songsModelInterface->setCurrentFileToken(std::nullopt);
-                    songsModelInterface->setCurrentSongState(SongState::NotPlaying);
-                }
+            return audioOperations->stop(currentFileToken.value(), [](audio::RetCode, audio::Token) {
+                // The answer will come via multicast and will be handled in the application
             });
         }
         return false;
-    }
-
-    void SongsPresenter::togglePlaying()
-    {
-        if (songsModelInterface->isSongPlaying()) {
-            pause();
-        }
-        else {
-            resume();
-        }
     }
 
     void SongsPresenter::setPlayingStateCallback(std::function<void(SongState)> cb)
@@ -93,4 +111,55 @@ namespace app::music_player
         changePlayingStateCallback = std::move(cb);
     }
 
+    bool SongsPresenter::handleAudioStopNotifiaction(audio::Token token)
+    {
+        if (token == songsModelInterface->getCurrentFileToken()) {
+            songsModelInterface->clearCurrentSongContext();
+            if (changePlayingStateCallback != nullptr) {
+                changePlayingStateCallback(SongState::NotPlaying);
+            }
+            updateViewSongState();
+            refreshView();
+            return true;
+        }
+        return false;
+    }
+
+    bool SongsPresenter::requestAudioOperation(const std::string &filePath)
+    {
+        auto currentSongContext = songsModelInterface->getCurrentSongContext();
+
+        if (currentSongContext.isValid() && (filePath.empty() || currentSongContext.filePath == filePath)) {
+            return currentSongContext.isPlaying() ? pause() : resume();
+        }
+        return play(filePath);
+    }
+
+    void SongsPresenter::setViewBottomBarTemporaryMode(const std::string &text)
+    {
+        if (auto view = getView(); view != nullptr) {
+            view->setBottomBarTemporaryMode(text);
+        }
+    }
+
+    void SongsPresenter::restoreViewBottomBarFromTemporaryMode()
+    {
+        if (auto view = getView(); view != nullptr) {
+            view->restoreFromBottomBarTemporaryMode();
+        }
+    }
+
+    void SongsPresenter::updateViewSongState()
+    {
+        if (auto view = getView(); view != nullptr) {
+            view->updateSongsState();
+        }
+    }
+
+    void SongsPresenter::refreshView()
+    {
+        if (auto view = getView(); view != nullptr) {
+            view->refreshWindow();
+        }
+    }
 } // namespace app::music_player
