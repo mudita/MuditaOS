@@ -157,4 +157,19 @@ enum class MessageType
 
     // Quotes messages
     Quotes,
+
+    // Alarm messages
+    AlarmGetRequest,
+    AlarmGetResponse,
+    AlarmAddRequest,
+    AlarmAddResponse,
+    AlarmUpdateRequest,
+    AlarmUpdateResponse,
+    AlarmRemoveRequest,
+    AlarmRemoveResponse,
+    AlarmsGetInRangeRequest,
+    AlarmsGetInRangeResponse,
+    AlarmGetNextSingleEventsRequest,
+    AlarmGetNextSingleEventsResponse,
+
 };
