@@ -157,4 +157,8 @@ enum class MessageType
 
     // Quotes messages
     Quotes,
+
+    // Alarm messages
+    AlarmMessage
+
 };
