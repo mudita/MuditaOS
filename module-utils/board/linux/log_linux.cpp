@@ -28,6 +28,11 @@ namespace Log
                                            logColors->resetColor.data());
     }
 
+    bool Logger::filterLogs(logger_level _level)
+    {
+        return _level >= level;
+    }
+
     void Logger::logToDevice(const char *, va_list)
     {
         assert(false && "Not implemented");

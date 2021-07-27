@@ -39,25 +39,21 @@ namespace Log
         static constexpr auto CRIT_STR = "CRIT";
         static constexpr auto IRQ_STR  = "IRQ";
 
-        /// Filter out not interesting logs via thread Name
-        /// its' using fact that:
-        /// - TRACE is level 0, for undefined lookups it will be always trace
-        /// - it will be one time init for apps which doesn't tell what level they should have
-        /// - for others it will be o1 lookup so it's fine
-        /// this function appends to logged services list!
-        [[nodiscard]] auto getLogLevel(const std::string &name) -> logger_level;
-        bool setLogLevel(const std::string &name, logger_level);
-        void logToDevice(const char *fmt, va_list args);
-
       private:
         Logger();
 
-        const char *getTaskDesc();
         void addLogHeader(logger_level level,
                           const char *file     = nullptr,
                           int line             = -1,
                           const char *function = nullptr);
         [[nodiscard]] bool filterLogs(logger_level level);
+        /// Filter out not interesting logs via thread Name
+        /// its' using fact that:
+        /// - TRACE is level 0, for unedfined lookups it will be alvways trace
+        /// - it will be one time init for apps which doesn't tell what level they should have
+        /// - for others it will be o1 lookup so it's fine
+        [[nodiscard]] auto getLogLevel(const std::string &name) -> logger_level;
+        void logToDevice(const char *fmt, va_list args);
         void logToDevice(Device device, std::string_view logMsg, size_t length);
         [[nodiscard]] size_t loggerBufferSizeLeft() const noexcept
         {
