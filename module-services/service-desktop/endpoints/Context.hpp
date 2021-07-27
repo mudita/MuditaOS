@@ -82,8 +82,20 @@ namespace parserFSM
         }
         virtual ~Context() noexcept = default;
 
-        virtual auto createSimpleResponse(const std::string &entryTitle = json::entries) -> std::string;
-        auto createErrorResponse(http::Code code, const std::string &text) -> std::string;
+        virtual auto createSimpleResponse(const std::string &entryTitle = json::entries) -> std::string
+        {
+            json11::Json::object contextJsonObject =
+                json11::Json::object{{json::endpoint, static_cast<int>(getEndpoint())},
+                                     {json::status, static_cast<int>(responseContext.status)},
+                                     {json::uuid, getUuid()}};
+            if (!responseContext.body.is_null()) {
+                contextJsonObject[json::body] = responseContext.body;
+            }
+
+            const json11::Json responseJson{std::move(contextJsonObject)};
+
+            return buildResponseStr(responseJson.dump().size(), responseJson.dump());
+        }
 
         auto setResponse(endpoint::ResponseContext r)
         {

@@ -19,7 +19,7 @@ namespace parserFSM
     class SecurityEndpointHelper : public BaseHelper
     {
       public:
-        explicit SecurityEndpointHelper(const std::string &name, sys::Service *p) : BaseHelper(name, p)
+        explicit SecurityEndpointHelper(sys::Service *p) : BaseHelper(p)
         {}
 
         static constexpr auto PasscodeLength = 4;

@@ -190,7 +190,7 @@ namespace sys
 
         LOG_INFO("Order of system services initialization:");
         for (const auto &service : sortedServices) {
-            LOG_DEBUG("\t> %s", service.get().getName().c_str());
+            LOG_INFO("\t> %s", service.get().getName().c_str());
         }
         std::for_each(sortedServices.begin(), sortedServices.end(), [this](const auto &service) {
             const auto startTimeout = service.get().getStartTimeout().count();

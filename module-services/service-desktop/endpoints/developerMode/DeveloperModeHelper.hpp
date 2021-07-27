@@ -34,7 +34,7 @@ namespace parserFSM
         auto prepareSMS(Context &context) -> ProcessResult;
 
       public:
-        explicit DeveloperModeHelper(const std::string &name, sys::Service *p) : BaseHelper(name, p)
+        explicit DeveloperModeHelper(sys::Service *p) : BaseHelper(p)
         {}
 
       private:
