@@ -150,9 +150,7 @@ void ServiceAudio::ProcessCloseReason(sys::CloseReason closeReason)
 std::optional<std::string> ServiceAudio::AudioServicesCallback(const sys::Message *msg)
 {
     if (const auto *eof = dynamic_cast<const AudioServiceMessage::EndOfFile *>(msg); eof) {
-        auto newMsg =
-            std::make_shared<AudioNotificationMessage>(AudioNotificationMessage::Type::EndOfFile, eof->GetToken());
-        bus.sendMulticast(std::move(newMsg), sys::BusChannel::ServiceAudioNotifications);
+        bus.sendUnicast(std::make_shared<AudioInternalEOFNotificationMessage>(eof->GetToken()), service::name::audio);
     }
     else if (const auto *dbReq = dynamic_cast<const AudioServiceMessage::DbRequest *>(msg); dbReq) {
         std::string path = dbPath(dbReq->setting, dbReq->playback, dbReq->profile);
@@ -290,13 +288,11 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandlePause(std::optional<Au
         retCode  = audioInput->audio->Pause();
         retToken = audioInput->token;
         audioInput->DisableVibration();
+        bus.sendMulticast(std::make_shared<AudioPausedNotification>(audioInput->token),
+                          sys::BusChannel::ServiceAudioNotifications);
     }
     else {
-        retCode = audioInput->audio->Stop();
-        auto broadMsg =
-            std::make_shared<AudioNotificationMessage>(AudioNotificationMessage::Type::Stop, audioInput->token);
-        bus.sendMulticast(std::move(broadMsg), sys::BusChannel::ServiceAudioNotifications);
-        audioMux.ResetInput(audioInput);
+        retCode = StopInput(audioInput);
     }
 
     VibrationUpdate();
@@ -322,7 +318,7 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const Operation:
     auto AudioStart = [&](auto &input) {
         if (input) {
             for (auto &audioInput : audioMux.GetAllInputs()) {
-                HandlePause(&audioInput);
+                StopInput(&audioInput);
             }
             retToken = audioMux.ResetInput(input);
 
@@ -412,21 +408,9 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStop(const std::vector
 {
     std::vector<std::pair<Token, audio::RetCode>> retCodes;
 
-    auto stopInput = [this](auto inp) {
-        if (inp->audio->GetCurrentState() == Audio::State::Idle) {
-            return audio::RetCode::Success;
-        }
-        auto rCode = inp->audio->Stop();
-        // Send notification that audio file was stopped
-        auto msgStop = std::make_shared<AudioNotificationMessage>(AudioNotificationMessage::Type::Stop, inp->token);
-        bus.sendMulticast(msgStop, sys::BusChannel::ServiceAudioNotifications);
-        audioMux.ResetInput(inp);
-        return rCode;
-    };
-
     // stop by token
     if (auto tokenInput = audioMux.GetInput(token); token.IsValid() && tokenInput) {
-        retCodes.emplace_back(std::make_pair(token, stopInput(tokenInput.value())));
+        retCodes.emplace_back(std::make_pair(token, StopInput(tokenInput.value())));
     }
     else if (token.IsValid()) {
         return std::make_unique<AudioStopResponse>(RetCode::TokenNotFound, Token::MakeBadToken());
@@ -437,7 +421,7 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStop(const std::vector
             const auto &currentOperation = input.audio->GetCurrentOperation();
             if (std::find(stopTypes.begin(), stopTypes.end(), currentOperation.GetPlaybackType()) != stopTypes.end()) {
                 auto t = input.token;
-                retCodes.emplace_back(t, stopInput(&input));
+                retCodes.emplace_back(t, StopInput(&input));
             }
         }
     }
@@ -445,7 +429,7 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStop(const std::vector
     else if (token.IsUninitialized()) {
         for (auto &input : audioMux.GetAllInputs()) {
             auto t = input.token;
-            retCodes.emplace_back(t, stopInput(&input));
+            retCodes.emplace_back(t, StopInput(&input));
         }
     }
 
@@ -466,25 +450,32 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStop(const std::vector
     return std::make_unique<AudioStopResponse>(audio::RetCode::Success, token);
 }
 
-void ServiceAudio::HandleNotification(const AudioNotificationMessage::Type &type, const Token &token)
+auto ServiceAudio::StopInput(audio::AudioMux::Input *input) -> audio::RetCode
 {
-    if (type == AudioNotificationMessage::Type::EndOfFile) {
-        auto input = audioMux.GetInput(token);
-        if (input && ShouldLoop((*input)->audio->GetCurrentOperationPlaybackType())) {
+    if (input->audio->GetCurrentState() == Audio::State::Idle) {
+        return audio::RetCode::Success;
+    }
+    const auto rCode = input->audio->Stop();
+    // Send notification that audio file was stopped
+    auto msgStop = std::make_shared<AudioStopNotification>(input->token);
+    bus.sendMulticast(std::move(msgStop), sys::BusChannel::ServiceAudioNotifications);
+    audioMux.ResetInput(input);
+    VibrationUpdate();
+    return rCode;
+}
+
+void ServiceAudio::HandleEOF(const Token &token)
+{
+    if (const auto input = audioMux.GetInput(token); input) {
+        if (ShouldLoop((*input)->audio->GetCurrentOperationPlaybackType())) {
             (*input)->audio->Start();
             if ((*input)->audio->IsMuted()) {
                 (*input)->audio->Mute();
             }
         }
         else {
-            auto newMsg = std::make_shared<AudioStopRequest>(token);
-            bus.sendUnicast(newMsg, service::name::audio);
+            StopInput(*input);
         }
-        return;
-    }
-
-    if (type != AudioNotificationMessage::Type::Stop) {
-        LOG_DEBUG("Unhandled AudioNotificationMessage");
     }
 }
 
@@ -544,9 +535,9 @@ sys::MessagePointer ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sy
     const auto isBusy = IsBusy();
     auto &msgType     = typeid(*msgl);
 
-    if (msgType == typeid(AudioNotificationMessage)) {
-        auto *msg = static_cast<AudioNotificationMessage *>(msgl);
-        HandleNotification(msg->type, msg->token);
+    if (msgType == typeid(AudioInternalEOFNotificationMessage)) {
+        auto *msg = static_cast<AudioInternalEOFNotificationMessage *>(msgl);
+        HandleEOF(msg->token);
     }
     else if (msgType == typeid(AudioGetSetting)) {
         auto *msg   = static_cast<AudioGetSetting *>(msgl);
@@ -595,13 +586,9 @@ sys::MessagePointer ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sy
         responseMsg = HandleKeyPressed(msg->step);
     }
 
-    auto curIsBusy = IsBusy();
-    if (isBusy != curIsBusy) {
-        auto broadMsg = std::make_shared<AudioNotificationMessage>(
-            curIsBusy ? AudioNotificationMessage::Type::ServiceWakeUp : AudioNotificationMessage::Type::ServiceSleep);
+    if (const auto curIsBusy = IsBusy(); isBusy != curIsBusy) {
         curIsBusy ? cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyHz::Level_6)
                   : cpuSentinel->ReleaseMinimumFrequency();
-        bus.sendMulticast(broadMsg, sys::BusChannel::ServiceAudioNotifications);
     }
 
     if (responseMsg) {
@@ -655,7 +642,6 @@ std::string ServiceAudio::getSetting(const Setting &setting,
     }
 
     const auto path = dbPath(setting, targetPlayback, targetProfile);
-
     if (const auto set_it = settingsCache.find(path); settingsCache.end() != set_it) {
         LOG_INFO("Get audio setting %s = %s", path.c_str(), set_it->second.c_str());
         return set_it->second;
