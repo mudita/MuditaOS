@@ -288,8 +288,6 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandlePause(std::optional<Au
         retCode  = audioInput->audio->Pause();
         retToken = audioInput->token;
         audioInput->DisableVibration();
-        bus.sendMulticast(std::make_shared<AudioPausedNotification>(audioInput->token),
-                          sys::BusChannel::ServiceAudioNotifications);
     }
     else {
         retCode = StopInput(audioInput);

@@ -13,6 +13,8 @@ target_include_directories(application-music-player
 target_sources(application-music-player
     PRIVATE
         ApplicationMusicPlayer.cpp
+        AudioNotificationsHandler.cpp
+        models/SongContext.cpp
         models/SongsModel.cpp
         models/SongsRepository.cpp
         presenters/AudioOperations.cpp
@@ -20,9 +22,10 @@ target_sources(application-music-player
         widgets/Action.cpp
         widgets/SongItem.cpp
         windows/MusicPlayerAllSongsWindow.cpp
-        windows/MusicPlayerEmptyWindow.cpp
     PRIVATE
+        AudioNotificationsHandler.hpp
         data/MusicPlayerStyle.hpp
+        models/SongContext.hpp
         models/SongsModel.hpp
         models/SongsRepository.hpp
         models/SongsModelInterface.hpp
@@ -31,7 +34,6 @@ target_sources(application-music-player
         widgets/Action.hpp
         widgets/SongItem.hpp
         windows/MusicPlayerAllSongsWindow.hpp
-        windows/MusicPlayerEmptyWindow.hpp
     PUBLIC
         include/application-music-player/ApplicationMusicPlayer.hpp
 )
@@ -54,3 +56,7 @@ target_link_libraries(application-music-player
         apps-common
         module-audio
 )
+
+if (${ENABLE_TESTS})
+    add_subdirectory(tests)
+endif()

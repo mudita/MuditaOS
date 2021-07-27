@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SongsModel.hpp"
+#include "Style.hpp"
 #include "application-music-player/widgets/SongItem.hpp"
 
 #include <ListView.hpp>
@@ -22,7 +23,7 @@ namespace app::music_player
 
     auto SongsModel::getMinimalItemSpaceRequired() const -> unsigned int
     {
-        return musicPlayerStyle::songItem::h;
+        return musicPlayerStyle::songItem::h + style::margins::small * 2;
     }
 
     void SongsModel::requestRecords(const uint32_t offset, const uint32_t limit)
@@ -36,15 +37,31 @@ namespace app::music_player
         return getRecord(order);
     }
 
-    void SongsModel::createData(std::function<bool(const std::string &fileName)> func)
+    void SongsModel::createData(OnShortReleaseCallback shortReleaseCallback,
+                                OnLongPressCallback longPressCallback,
+                                OnSetBottomBarTemporaryCallback bottomBarTemporaryMode,
+                                OnRestoreBottomBarTemporaryCallback bottomBarRestoreFromTemporaryMode)
     {
+        songsRepository->scanMusicFilesList();
         auto songsList = songsRepository->getMusicFilesList();
         for (const auto &song : songsList) {
-            auto item = new gui::SongItem(song.artist, song.title, utils::time::Duration(song.total_duration_s).str());
+            auto item = new gui::SongItem(song.artist,
+                                          song.title,
+                                          utils::time::Duration(song.total_duration_s).str(),
+                                          bottomBarTemporaryMode,
+                                          bottomBarRestoreFromTemporaryMode);
 
             item->activatedCallback = [=](gui::Item &) {
-                func(song.filePath);
+                shortReleaseCallback(song.filePath);
                 return true;
+            };
+
+            item->inputCallback = [longPressCallback](gui::Item &, const gui::InputEvent &event) {
+                if (event.isLongRelease(gui::KeyCode::KEY_ENTER)) {
+                    longPressCallback();
+                    return true;
+                }
+                return false;
             };
 
             internalData.push_back(item);
@@ -53,34 +70,82 @@ namespace app::music_player
         for (auto &item : internalData) {
             item->deleteByList = false;
         }
+    }
 
-        list->rebuildList();
+    bool SongsModel::isSongPlaying() const noexcept
+    {
+        return songContext.currentSongState == SongState::Playing;
+    }
+
+    void SongsModel::setCurrentSongState(SongState songState) noexcept
+    {
+        songContext.currentSongState = songState;
+        updateCurrentItemState();
+    }
+
+    std::optional<audio::Token> SongsModel::getCurrentFileToken() const noexcept
+    {
+        return songContext.currentFileToken;
+    }
+
+    size_t SongsModel::getCurrentIndex() const
+    {
+        auto index = songsRepository->getFileIndex(songContext.filePath);
+        return index == std::numeric_limits<size_t>::max() ? 0 : index;
+    }
+
+    SongContext SongsModel::getCurrentSongContext() const noexcept
+    {
+        return songContext;
+    }
+
+    void SongsModel::setCurrentSongContext(SongContext context)
+    {
+        using namespace gui;
+        clearCurrentItemState();
+
+        songContext = context;
+
+        updateCurrentItemState();
+    }
+
+    void SongsModel::clearCurrentSongContext()
+    {
+        clearCurrentItemState();
+        songContext.clear();
+    }
+
+    void SongsModel::clearCurrentItemState()
+    {
+        using namespace gui;
+        const auto songIndex = getCurrentIndex();
+        if (songIndex < internalData.size()) {
+            internalData[songIndex]->setState(SongItem::ItemState::None);
+        }
+    }
+
+    void SongsModel::updateCurrentItemState()
+    {
+        using namespace gui;
+        const auto songIndex = getCurrentIndex();
+        if (songIndex >= internalData.size()) {
+            return;
+        }
+
+        if (songContext.isPlaying()) {
+            internalData[songIndex]->setState(SongItem::ItemState::Playing);
+        }
+        else if (songContext.isPaused()) {
+            internalData[songIndex]->setState(SongItem::ItemState::Paused);
+        }
+        else {
+            internalData[songIndex]->setState(SongItem::ItemState::None);
+        }
     }
 
     void SongsModel::clearData()
     {
         list->reset();
-
-        list->rebuildList();
-    }
-
-    bool SongsModel::isSongPlaying() const noexcept
-    {
-        return currentSongState == SongState::Playing;
-    }
-
-    void SongsModel::setCurrentSongState(SongState songState) noexcept
-    {
-        currentSongState = songState;
-    }
-
-    std::optional<audio::Token> SongsModel::getCurrentFileToken() const noexcept
-    {
-        return currentFileToken;
-    }
-
-    void SongsModel::setCurrentFileToken(std::optional<audio::Token> token) noexcept
-    {
-        currentFileToken = token;
+        eraseInternalData();
     }
 } // namespace app::music_player
