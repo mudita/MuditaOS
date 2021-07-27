@@ -19,8 +19,6 @@ class AudioMessage : public sys::DataMessage
   public:
     AudioMessage() : sys::DataMessage(MessageType::AudioMessage)
     {}
-
-    virtual ~AudioMessage() = default;
 };
 
 class AudioResponseMessage : public sys::ResponseMessage
@@ -35,30 +33,41 @@ class AudioResponseMessage : public sys::ResponseMessage
     AudioResponseMessage(audio::RetCode retCode, const std::string &val) : AudioResponseMessage(retCode, {}, val)
     {}
 
-    virtual ~AudioResponseMessage() = default;
-
     const audio::RetCode retCode = audio::RetCode::Success;
     audio::Tags tags             = {};
     std::string val;
 };
 
+class AudioInternalEOFNotificationMessage : public AudioMessage
+{
+  public:
+    explicit AudioInternalEOFNotificationMessage(audio::Token token) : token(token)
+    {}
+
+    const audio::Token token;
+};
+
 class AudioNotificationMessage : public AudioMessage
 {
   public:
-    // Audio service will send async notifications specified below
-    enum class Type
-    {
-        EndOfFile,
-        Stop,
-        ServiceWakeUp,
-        ServiceSleep,
-    };
-
-    explicit AudioNotificationMessage(Type type, const audio::Token token = audio::Token()) : type(type), token(token)
+    explicit AudioNotificationMessage(audio::Token token) : token{token}
     {}
 
-    const Type type;
     const audio::Token token;
+};
+
+class AudioPausedNotification : public AudioNotificationMessage
+{
+  public:
+    explicit AudioPausedNotification(audio::Token token) : AudioNotificationMessage{token}
+    {}
+};
+
+class AudioStopNotification : public AudioNotificationMessage
+{
+  public:
+    explicit AudioStopNotification(audio::Token token) : AudioNotificationMessage{token}
+    {}
 };
 
 class AudioSettingsMessage : public AudioMessage
@@ -69,8 +78,6 @@ class AudioSettingsMessage : public AudioMessage
                          const std::string &val = {})
         : AudioMessage{}, playbackType{playbackType}, setting{setting}, val{val}
     {}
-
-    ~AudioSettingsMessage() override = default;
 
     audio::PlaybackType playbackType = audio::PlaybackType::None;
     const audio::Setting setting;
@@ -83,8 +90,6 @@ class AudioGetSetting : public AudioSettingsMessage
     AudioGetSetting(const audio::PlaybackType &playbackType, const audio::Setting &setting)
         : AudioSettingsMessage{playbackType, setting}
     {}
-
-    ~AudioGetSetting() override = default;
 };
 
 class AudioSetSetting : public AudioSettingsMessage
@@ -93,17 +98,15 @@ class AudioSetSetting : public AudioSettingsMessage
     AudioSetSetting(const audio::PlaybackType &playbackType, const audio::Setting &setting, const std::string &val)
         : AudioSettingsMessage{playbackType, setting, val}
     {}
-
-    ~AudioSetSetting() override = default;
 };
 
 class AudioStopRequest : public AudioMessage
 {
   public:
-    AudioStopRequest(const std::vector<audio::PlaybackType> &stopVec = {}) : stopVec(stopVec)
+    explicit AudioStopRequest(const std::vector<audio::PlaybackType> &stopVec = {}) : stopVec(stopVec)
     {}
 
-    AudioStopRequest(const audio::Token &token) : token(token)
+    explicit AudioStopRequest(const audio::Token &token) : token(token)
     {}
 
     const std::vector<audio::PlaybackType> stopVec;
@@ -215,7 +218,7 @@ class AudioResumeResponse : public AudioResponseMessage
 class AudioGetFileTagsRequest : public AudioMessage
 {
   public:
-    AudioGetFileTagsRequest(const std::string &fileName) : fileName(fileName)
+    explicit AudioGetFileTagsRequest(const std::string &fileName) : fileName(fileName)
     {}
 
     const std::string fileName;
@@ -249,8 +252,9 @@ class AudioEventResponse : public AudioResponseMessage
 class AudioKeyPressedRequest : public AudioMessage
 {
   public:
-    AudioKeyPressedRequest(const int step) : AudioMessage{}, step{step}
+    explicit AudioKeyPressedRequest(const int step) : AudioMessage{}, step{step}
     {}
+
     const int step{};
 };
 
