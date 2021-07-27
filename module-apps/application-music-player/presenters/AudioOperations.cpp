@@ -28,7 +28,7 @@ namespace app::music_player
                 return false;
             }
             if (callback) {
-                callback(result->token);
+                callback(result->retCode, result->token);
             }
             return true;
         };
@@ -36,25 +36,48 @@ namespace app::music_player
         return true;
     }
 
-    bool AudioOperations::pause(const audio::Token &token)
+    bool AudioOperations::pause(const audio::Token &token, const OnPauseCallback &callback)
     {
-        return AudioServiceAPI::Pause(application, token);
-    }
-    bool AudioOperations::resume(const audio::Token &token)
-    {
-        return AudioServiceAPI::Resume(application, token);
-    }
-    bool AudioOperations::stop(const audio::Token &token, const OnStopCallback &callback)
-    {
-        auto msg  = std::make_unique<AudioStopRequest>(token);
+        auto msg  = std::make_unique<AudioPauseRequest>(token);
         auto task = app::AsyncRequest::createFromMessage(std::move(msg), service::name::audio);
         auto cb   = [callback](auto response) {
-            auto result = dynamic_cast<AudioStopResponse *>(response);
+            auto result = dynamic_cast<AudioPauseResponse *>(response);
             if (result == nullptr) {
                 return false;
             }
             if (callback) {
-                callback(result->token);
+                callback(result->retCode, result->token);
+            }
+            return true;
+        };
+        task->execute(application, this, cb);
+        return true;
+    }
+    bool AudioOperations::resume(const audio::Token &token, const OnResumeCallback &callback)
+    {
+        auto msg  = std::make_unique<AudioResumeRequest>(token);
+        auto task = app::AsyncRequest::createFromMessage(std::move(msg), service::name::audio);
+        auto cb   = [callback](auto response) {
+            auto result = dynamic_cast<AudioResumeResponse *>(response);
+            if (result == nullptr) {
+                return false;
+            }
+            if (callback) {
+                callback(result->retCode, result->token);
+            }
+            return true;
+        };
+        task->execute(application, this, cb);
+        return true;
+    }
+    bool AudioOperations::stop(const audio::Token &token, [[maybe_unused]] const OnStopCallback &callback)
+    {
+        auto msg  = std::make_unique<AudioStopRequest>(token);
+        auto task = app::AsyncRequest::createFromMessage(std::move(msg), service::name::audio);
+        auto cb   = [](auto response) {
+            auto result = dynamic_cast<AudioStopResponse *>(response);
+            if (result == nullptr) {
+                return false;
             }
             return true;
         };
