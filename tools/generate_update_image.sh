@@ -7,18 +7,18 @@
 function help() {
 cat <<- EOF
 	Create Update Image for the SOURCE_TARGET. This script should be run from build directory.
-	
+
 	${0} <SOURCE_TARGET> <VERSION> <PLATFORM>
-	
+
 	    SOURCE_TARGET    - Name of the target (usually PurePhone or BellHybrid)
 	    VERSION          - version number to attach to file name
 	    PLATFORM         - RT1051 or Linux
-	
+
     In the current work dir, the script will create update image named from this template:
 	<SOURCE_TARGET>-<VERSION>-<PLATFORM>-Update.tar
-	
-	
-	
+
+
+
 EOF
 }
 
@@ -46,7 +46,7 @@ function checkForDeps() {
     while [[ I -lt ${DEPS_COUNT} ]]; do
         ITEM=${DEPS[${I}]}
         if [[ ! -e "${ITEM}" ]]; then
-            echo "Couldn't find dependency: \"${ITEM}\"" 
+            echo "Couldn't find dependency: \"${ITEM}\""
             echo exti 2
         fi
         I=$(( I + 1))
@@ -74,6 +74,12 @@ function linkInStageing(){
     popd 1> /dev/null
 }
 
+function addChecksums() {
+    pushd ${STAGEING_DIR} 1> /dev/null
+    rhash -u checksums.txt -r .
+    popd 1> /dev/null
+}
+
 function compress() {
     tar chf ${PACKAGE_FILE} -C ${STAGEING_DIR} .
 }
@@ -87,6 +93,7 @@ setVars "${1}" "${2}" "${3}"
 checkForDeps ${DEPS}
 cleanStagingDir ${STAGEING_DIR}
 linkInStageing
+addChecksums
 compress
 
 
