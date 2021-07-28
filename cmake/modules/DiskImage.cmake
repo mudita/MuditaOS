@@ -19,7 +19,7 @@ function(add_image)
 
     if(HAS_BOOTFILE)
         set(BIN_FILE_TARGET ${_ARG_PRODUCT}-boot.bin)
-        set(BIN_FILE_PATH ${CMAKE_BINARY_DIR}/sys/current/${_ARG_PRODUCT}-boot.bin)
+        set(BIN_FILE_PATH ${CMAKE_BINARY_DIR}/sysroot/sys/current/${_ARG_PRODUCT}-boot.bin)
     else()
         set(BIN_FILE_PATH "")
     endif()

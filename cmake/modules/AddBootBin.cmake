@@ -1,5 +1,5 @@
 function(add_boot_bin SOURCE_TARGET)
-    set(BIN_FILE ${CMAKE_BINARY_DIR}/sys/current/${SOURCE_TARGET}-boot.bin)
+    set(BIN_FILE ${CMAKE_BINARY_DIR}/sysroot/sys/current/${SOURCE_TARGET}-boot.bin)
 
     if (ENABLE_SECURE_BOOT)
         set (SREC_FILE ${CMAKE_PROJECT_NAME}.srec)
