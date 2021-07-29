@@ -38,7 +38,7 @@ namespace gui
         std::string firmwareVersion;
         CellularServiceAPI::GetFirmwareVersion(getApplication(), firmwareVersion);
         addAlignedLabelWithValue(
-            box, "Modem Frimware:", (firmwareVersion.empty() ? utils::translate("not available") : firmwareVersion));
+            box, "Modem Firmware:", (firmwareVersion.empty() ? utils::translate("not available") : firmwareVersion));
     }
 
     void InformationWindow::addAlignedLabelWithValue(BoxLayout *layout,
