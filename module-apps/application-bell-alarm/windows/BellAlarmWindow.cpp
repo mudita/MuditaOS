@@ -10,7 +10,8 @@ namespace gui
     BellAlarmWindow::BellAlarmWindow(
         app::Application *app,
         std::unique_ptr<app::bell_alarm::BellAlarmWindowContract::Presenter> &&windowPresenter,
-        std::string name) : AppWindow(app, std::move(name)), presenter{std::move(windowPresenter)}
+        std::string name)
+        : AppWindow(app, std::move(name)), presenter{std::move(windowPresenter)}
     {
         presenter->attach(this);
         buildInterface();

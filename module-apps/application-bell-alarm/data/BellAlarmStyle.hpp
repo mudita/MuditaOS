@@ -9,9 +9,9 @@ namespace gui
     {
         namespace time_set_spinner_list_item
         {
-            inline constexpr auto font   = "gt_pressura_regular_90";
-            inline constexpr auto w = 450;
-            inline constexpr auto h = 250;
+            inline constexpr auto font = "gt_pressura_regular_90";
+            inline constexpr auto w    = 450;
+            inline constexpr auto h    = 250;
         } // namespace time_set_spinner_list_item
-    }     // namespace bell_settings_style
+    }     // namespace bell_alarm_style
 } // namespace gui

@@ -36,11 +36,11 @@ namespace app::bell_alarm
 
     void BellAlarmWindowModel::createData()
     {
-        timeSetWidget = new gui::TimeSetSpinnerListItem(
-            0U, 0U,
-            gui::bell_alarm_style::time_set_spinner_list_item::w,
-            gui::bell_alarm_style::time_set_spinner_list_item::h,
-            utils::translate("app_bell_settings_time_units_time_message"));
+        timeSetWidget = new gui::TimeSetSpinnerListItem(0U,
+                                                        0U,
+                                                        gui::bell_alarm_style::time_set_spinner_list_item::w,
+                                                        gui::bell_alarm_style::time_set_spinner_list_item::h,
+                                                        utils::translate("app_bell_settings_time_units_time_message"));
         timeSetWidget->timeSetFmtSpinner->setFont(gui::bell_alarm_style::time_set_spinner_list_item::font);
         internalData.push_back(timeSetWidget);
 

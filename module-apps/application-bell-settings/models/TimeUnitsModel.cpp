@@ -41,11 +41,11 @@ namespace app::bell_settings
 
     void TimeUnitsModel::createData()
     {
-        timeSetWidget = new gui::TimeSetSpinnerListItem(
-            0U, 0U,
-            gui::bell_settings_style::time_set_spinner_list_item::w,
-            gui::bell_settings_style::time_set_spinner_list_item::h,
-            utils::translate("app_bell_settings_time_units_time_message"));
+        timeSetWidget = new gui::TimeSetSpinnerListItem(0U,
+                                                        0U,
+                                                        gui::bell_settings_style::time_set_spinner_list_item::w,
+                                                        gui::bell_settings_style::time_set_spinner_list_item::h,
+                                                        utils::translate("app_bell_settings_time_units_time_message"));
         internalData.push_back(timeSetWidget);
 
         for (auto item : internalData) {

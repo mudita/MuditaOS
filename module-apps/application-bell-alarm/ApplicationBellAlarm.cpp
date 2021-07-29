@@ -30,7 +30,7 @@ namespace app
     void ApplicationBellAlarm::createUserInterface()
     {
         windowsFactory.attach(gui::name::window::main_window, [](Application *app, const std::string &name) {
-            auto model = std::make_shared<bell_alarm::BellAlarmWindowModel>(app);
+            auto model     = std::make_shared<bell_alarm::BellAlarmWindowModel>(app);
             auto presenter = std::make_unique<bell_alarm::BellAlarmWindowPresenter>(model);
             return std::make_unique<gui::BellAlarmWindow>(app, std::move(presenter));
         });
