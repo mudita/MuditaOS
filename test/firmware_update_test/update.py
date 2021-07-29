@@ -6,7 +6,10 @@ import sys
 import time
 import sys
 import os.path
+import atexit
 import json
+
+from tqdm import tqdm
 
 sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
@@ -16,14 +19,21 @@ from harness.harness import Harness
 from harness.interface.defs import key_codes, endpoint, method
 from harness.utils import Timeout
 from harness.interface.error import TestError, Error
+from harness.api.developermode import PhoneModeLock
 from functools import partial
+
+def set_passcode(harness: Harness, flag: bool):
+    '''
+    on exit -> restore PhoneModeLock
+    '''
+    PhoneModeLock(flag).run(harness)
 
 # uploaded file chunk size - according to
 # https://appnroll.atlassian.net/wiki/spaces/MFP/pages/656637953/Protocol+description
-CHUNK_SIZE = 1024 * 16
+CHUNK_SIZE = 1024 * 128
 
 # update performing timeout
-UPDATE_TIMEOUT = 90
+UPDATE_TIMEOUT = 300
 
 update_status_code = {
     0: "Initial",
@@ -50,9 +60,10 @@ def update(harness, update_filepath: str):
 
     log.info("Downloading update file to the target")
     with open(update_filepath, 'rb') as file:
-        for chunk in iter(partial(file.read, CHUNK_SIZE), b''):
-            print(".", end='', flush=True)
-            serial.write(chunk)
+        with tqdm(total=file_size, unit='B', unit_scale=True) as p_bar:
+            for chunk in iter(partial(file.read, CHUNK_SIZE), b''):
+                p_bar.update(CHUNK_SIZE)
+                serial.write(chunk)
     print(" ")
 
     body = {"fileName": filename}
@@ -67,7 +78,7 @@ def update(harness, update_filepath: str):
             log.error("Update timeout!")
             return False
         if serial.in_waiting > 0:
-            result = connection.read(10)
+            result = connection.read(10)[0]
             ret = json.loads(result)
             body = ret['body']
             if "status" in body:
@@ -111,6 +122,9 @@ def main():
                 harness = Harness.from_detect()
             except TestError:
                 pass
+
+    atexit.register(set_passcode, harness, True)
+    set_passcode(harness, False)
 
     update_filename = str(sys.argv[1])
     history, fails = get_update_list(harness)

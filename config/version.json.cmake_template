@@ -31,5 +31,11 @@
         "version": "@BOOT_VERSION@",
         "filename": "@BOOT_FILENAME@",
         "md5sum": "@BOOT_MD5SUM@"
+    },
+    "updater":
+    {
+        "version": "@UPDATER_VERSION@",
+        "filename": "@UPDATER_FILENAME@",
+        "md5sum": "@UPDATER_MD5SUM@"
     }
 }
