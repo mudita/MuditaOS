@@ -4,14 +4,15 @@
 
 usage() {
 cat << ==usage
-Usage: $(basename $0) image_path build_dir [boot.bin_file]
-    image_path    - Destination image path name e.g., PurePhone.img
-    sysroot       - product's system root e.g., build-rt1051-RelWithDebInfo/sysroot
-    boot.bin_file - optional for linux image - name of the boot.bin file (for different targets)
+Usage: $(basename $0) image_path build_dir [boot.bin_file] [updater.bin_file]
+    image_path       - Destination image path name e.g., PurePhone.img
+    sysroot          - product's system root e.g., build-rt1051-RelWithDebInfo/sysroot
+    boot.bin_file    - optional for linux image - name of the boot.bin file (for different targets)
+    updater.bin_file - optional for linux image - name of the updater.bin file
 ==usage
 }
 
-if [[ ( $# -ne 2 ) && ( $# -ne 3 ) ]]; then
+if [[ ( $# -ne 2 ) && ( $# -ne 4 ) ]]; then
 	echo "Error! Invalid argument count"
 	usage
 	exit -1
@@ -20,6 +21,7 @@ fi
 IMAGE_NAME=$(realpath $1)
 SYSROOT=$(realpath $2)
 BIN_FILE=$3
+UPDATER_FILE=$4
 
 if [ ! -d "$SYSROOT" ]; then
 	echo "Error! ${SYSROOT} is not a directory"
@@ -35,12 +37,12 @@ for cmd in $_REQ_CMDS; do
 done
 #mtools version
 _AWK_SCRIPT='
-/[0-9]/ { 
-	split($4,vers,"."); 
-	if(vers[1]>=4 && vers[2]>=0 && vers[3] >= 24) { 
-		print "true"; 
+/[0-9]/ {
+	split($4,vers,".");
+	if(vers[1]>=4 && vers[2]>=0 && vers[3] >= 24) {
+		print "true";
 	}
-	exit 0; 
+	exit 0;
 }'
 MTOOLS_OK=$(mtools --version | awk "${_AWK_SCRIPT}")
 
@@ -109,6 +111,13 @@ if [[ -n "${BIN_FILE}" && -f "${BIN_FILE}" ]]; then
 	mcopy -v -s -i "$PART1" ${BIN_FILE} ::/current/boot.bin
 else
 	echo "Warning! Missing boot.bin"
+	echo "(it's fine for a Linux build)"
+fi
+
+if [[ -n "${UPDATER_FILE}" && -f "${UPDATER_FILE}" ]]; then
+	mcopy -v -s -i "$PART1" ${UPDATER_FILE} ::/current/updater.bin
+else
+	echo "Warning! Missing updater.bin"
 	echo "(it's fine for a Linux build)"
 fi
 
