@@ -4,18 +4,27 @@
 #pragma once
 
 #include <application-bell-alarm/ApplicationBellAlarm.hpp>
+#include <application-bell-alarm/presenter/BellAlarmWindowPresenter.hpp>
 
 #include <apps-common/windows/AppWindow.hpp>
+#include <module-gui/gui/widgets/SideListView.hpp>
 
 namespace gui
 {
-    class BellAlarmWindow : public AppWindow
+    class BellAlarmWindow : public AppWindow, public app::bell_alarm::BellAlarmWindowContract::View
     {
       public:
-        explicit BellAlarmWindow(app::Application *app, std::string name = window::name::bellAlarm);
+        explicit BellAlarmWindow(
+            app::Application *app,
+            std::unique_ptr<app::bell_alarm::BellAlarmWindowContract::Presenter> &&windowPresenter,
+            std::string name = window::name::bellAlarm);
 
         void buildInterface() override;
         bool onInput(const InputEvent &inputEvent) override;
         void rebuild() override;
+
+      private:
+        SideListView *sidelistview = nullptr;
+        std::unique_ptr<app::bell_alarm::BellAlarmWindowContract::Presenter> presenter;
     };
 } /* namespace gui */

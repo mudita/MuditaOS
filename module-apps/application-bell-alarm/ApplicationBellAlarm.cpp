@@ -2,6 +2,8 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <application-bell-alarm/ApplicationBellAlarm.hpp>
+#include <application-bell-alarm/models/BellAlarmWindowModel.hpp>
+#include <application-bell-alarm/presenter/BellAlarmWindowPresenter.hpp>
 #include <application-bell-alarm/windows/BellAlarmWindow.hpp>
 
 namespace app
@@ -28,7 +30,9 @@ namespace app
     void ApplicationBellAlarm::createUserInterface()
     {
         windowsFactory.attach(gui::name::window::main_window, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::BellAlarmWindow>(app);
+            auto model = std::make_shared<bell_alarm::BellAlarmWindowModel>(app);
+            auto presenter = std::make_unique<bell_alarm::BellAlarmWindowPresenter>(model);
+            return std::make_unique<gui::BellAlarmWindow>(app, std::move(presenter));
         });
     }
 
