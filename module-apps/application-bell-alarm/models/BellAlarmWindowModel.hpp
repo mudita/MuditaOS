@@ -3,30 +3,33 @@
 
 #pragma once
 
-#include <apps-common/widgets/TimeSetSpinnerListItem.hpp>
-#include <apps-common/Application.hpp>
 #include <apps-common/InternalModel.hpp>
+#include <apps-common/widgets/TimeSetSpinnerListItem.hpp>
 
-namespace app::bell_alarm
+namespace app
 {
-    class BellAlarmWindowModel : public app::InternalModel<gui::ListItem *>, public gui::ListItemProvider
+class Application;
+namespace bell_alarm
+{
+    class BellAlarmWindowModel : public InternalModel<gui::ListItem *>, public gui::ListItemProvider
     {
       public:
-        explicit BellAlarmWindowModel(app::Application *app);
+        explicit BellAlarmWindowModel(Application *app);
         ~BellAlarmWindowModel();
 
         auto clearData() -> void;
         auto saveData() -> void;
         auto loadData() -> void;
         auto createData() -> void;
-        auto requestRecords(uint32_t offset, uint32_t limit) -> void;
+        auto requestRecords(uint32_t offset, uint32_t limit) -> void override;
 
         [[nodiscard]] auto getItem(gui::Order order) -> gui::ListItem * override;
         [[nodiscard]] auto requestRecordsCount() -> unsigned int override;
         [[nodiscard]] auto getMinimalItemSpaceRequired() const -> unsigned int override;
 
       private:
-        app::Application *application{nullptr};
+        Application *application{nullptr};
         gui::TimeSetSpinnerListItem *timeSetWidget{nullptr};
     };
-} // namespace app::bell_settings
+} // namespace bell_alarm
+} // namespace app

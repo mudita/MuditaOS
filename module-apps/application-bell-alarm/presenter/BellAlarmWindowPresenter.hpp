@@ -36,12 +36,12 @@ namespace app::bell_alarm
         explicit BellAlarmWindowPresenter(std::shared_ptr<BellAlarmWindowModel> pagesProvider);
 
         auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> override;
-        auto clearData() -> void;
-        auto saveData() -> void;
-        auto loadData() -> void;
-        auto createData() -> void;
+        auto clearData() -> void override;
+        auto saveData() -> void override;
+        auto loadData() -> void override;
+        auto createData() -> void override;
 
       private:
         std::shared_ptr<BellAlarmWindowModel> pagesProvider;
     };
-} // namespace app::bell_settings
+} // namespace app::bell_alarm

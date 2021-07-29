@@ -24,7 +24,7 @@ namespace gui
         void rebuild() override;
 
       private:
-        SideListView *sidelistview = nullptr;
+        SideListView *sidelistview{nullptr};
         std::unique_ptr<app::bell_alarm::BellAlarmWindowContract::Presenter> presenter;
     };
 } /* namespace gui */

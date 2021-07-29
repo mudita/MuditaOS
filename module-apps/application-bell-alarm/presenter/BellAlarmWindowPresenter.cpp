@@ -33,4 +33,4 @@ namespace app::bell_alarm
     {
         pagesProvider->createData();
     }
-} // namespace app::bell_settings
+} // namespace app::bell_alarm

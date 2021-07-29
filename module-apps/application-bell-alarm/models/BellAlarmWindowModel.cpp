@@ -5,18 +5,13 @@
 
 #include <application-bell-alarm/data/BellAlarmStyle.hpp>
 
+#include <apps-common/Application.hpp>
 #include <apps-common/widgets/TimeSetFmtSpinner.hpp>
 #include <gui/widgets/ListViewEngine.hpp>
-#include <gui/widgets/Style.hpp>
-#include <gui/widgets/Text.hpp>
-#include <service-time/Constants.hpp>
-#include <service-time/service-time/TimeMessage.hpp>
-
-#include <ctime>
 
 namespace app::bell_alarm
 {
-    BellAlarmWindowModel::BellAlarmWindowModel(app::Application *app) : application(app)
+    BellAlarmWindowModel::BellAlarmWindowModel(Application *app) : application(app)
     {}
 
     BellAlarmWindowModel::~BellAlarmWindowModel()
@@ -80,4 +75,4 @@ namespace app::bell_alarm
         setupModel(offset, limit);
         list->onProviderDataUpdate();
     }
-} // namespace app::bell_settings
+} // namespace app::bell_alarm
