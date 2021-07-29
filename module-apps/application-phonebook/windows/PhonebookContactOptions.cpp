@@ -55,55 +55,11 @@ namespace gui
                                              return true;
                                          },
                                          gui::option::Arrow::Enabled});
-        if (contact->isOnBlocked()) {
-            options.emplace_back(gui::Option{utils::translate("app_phonebook_options_unblock"), [=](gui::Item &item) {
-                                                 LOG_INFO("Unblocking contact!");
-                                                 return contactBlock(false);
-                                             }});
-        }
-        else {
-            options.emplace_back(gui::Option{utils::translate("app_phonebook_options_block"), [=](gui::Item &item) {
-                                                 LOG_INFO("Blocking contact!");
-                                                 return contactBlock(true);
-                                             }});
-        }
         options.emplace_back(gui::Option{utils::translate("app_phonebook_options_delete"), [=](gui::Item &item) {
                                              LOG_INFO("Deleting contact!");
                                              return contactRemove();
                                          }});
         return options;
-    }
-
-    auto PhonebookContactOptions::contactBlock(bool shouldBeBlocked) -> bool
-    {
-        LOG_DEBUG("Blocking contact: %" PRIu32, contact->ID);
-        std::string dialogText;
-
-        if (shouldBeBlocked) {
-            dialogText = utils::translate("app_phonebook_options_block_confirm");
-        }
-        else {
-            dialogText = utils::translate("app_phonebook_options_unblock_confirm");
-        }
-
-        auto contactRec = DBServiceAPI::ContactGetByID(this->application, contact->ID);
-        auto cont       = !contactRec->empty() ? contactRec->front() : ContactRecord{};
-
-        auto metaData = std::make_unique<gui::DialogMetadataMessage>(
-            gui::DialogMetadata{cont.getFormattedName(), "block_W_G", dialogText, "", [=]() -> bool {
-                                    contact->addToBlocked(shouldBeBlocked);
-                                    DBServiceAPI::ContactUpdate(this->application, *contact);
-                                    if (shouldBeBlocked) {
-                                        showNotification(NotificationType::Block);
-                                    }
-                                    else {
-                                        showNotification(NotificationType::Unblock);
-                                    }
-                                    return true;
-                                }});
-
-        application->switchWindow(gui::window::name::dialog_yes_no, std::move(metaData));
-        return true;
     }
 
     auto PhonebookContactOptions::contactRemove() -> bool
