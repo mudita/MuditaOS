@@ -30,13 +30,12 @@ namespace
     [[nodiscard]] auto createText(const std::string &text, const UTF8 &font)
     {
         auto textFixedSize = new TextFixedSize(nullptr, 0, 0, 0, 0);
-        textFixedSize->setUnderline(false);
+        textFixedSize->drawUnderline(false);
         textFixedSize->setMaximumSize(style::window::default_body_width, style::widgets::h);
         textFixedSize->setFont(font);
         textFixedSize->setEdges(gui::RectangleEdge::None);
         textFixedSize->setEditMode(EditMode::Browse);
         textFixedSize->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
-        textFixedSize->setMargins(Margins(style::widgets::leftMargin, 0, 0, 0));
         textFixedSize->setText(text);
         textFixedSize->activeItem = false;
         return textFixedSize;
@@ -46,6 +45,7 @@ namespace
     {
         auto snippet = new gui::Image(snippetName);
         snippet->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
+        snippet->setMargins(Margins(0, 0, style::widgets::rightMargin, 0));
         snippet->activeItem = false;
         return snippet;
     }

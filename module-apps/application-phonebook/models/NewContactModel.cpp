@@ -77,6 +77,8 @@ void NewContactModel::createData()
 
     internalData.push_back(new gui::InputBoxWithLabelAndIconWidget(phonebookInternals::ListItemName::SpeedDialKey));
 
+    internalData.back()->setMargins(gui::Margins(style::widgets::leftMargin, style::margins::very_big, 0, 0));
+
     internalData.push_back(new gui::InputBoxWithLabelAndIconWidget(
         phonebookInternals::ListItemName::AddToFavourites,
         [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
@@ -86,6 +88,9 @@ void NewContactModel::createData()
         phonebookInternals::ListItemName::AddToICE,
         [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); }));
+
+    internalData.back()->setMargins(
+        gui::Margins(style::widgets::leftMargin, style::margins::big, 0, style::margins::very_small));
 
     internalData.push_back(new gui::InputLinesWithLabelIWidget(
         phonebookInternals::ListItemName::Address,
