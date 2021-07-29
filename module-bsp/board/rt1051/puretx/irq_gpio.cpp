@@ -118,7 +118,8 @@ namespace bsp
             if (irq_mask & (1 << BOARD_BATTERY_CHARGER_WCINOKB_PIN)) {}
 
             if (irq_mask & (1 << BOARD_BATTERY_CHARGER_INTB_PIN)) {
-                xHigherPriorityTaskWoken |= hal::battery::IRQHandler();
+                xHigherPriorityTaskWoken |=
+                    hal::battery::IRQHandler(hal::battery::AbstractBatteryCharger::IRQSource::Any);
             }
 
             if (irq_mask & (1 << BSP_CELLULAR_SIM_TRAY_INSERTED_PIN)) {

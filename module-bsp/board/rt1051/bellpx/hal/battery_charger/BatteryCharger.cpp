@@ -6,6 +6,7 @@
 #include <hal/GenericFactory.hpp>
 #include <EventStore.hpp>
 #include <bsp/battery-charger/battery-charger.cpp>
+#include <bsp/fuel_gauge/fuel_gauge.hpp>
 
 namespace hal::battery
 {
@@ -16,9 +17,10 @@ namespace hal::battery
     void BatteryCharger::init(xQueueHandle queueBatteryHandle, xQueueHandle)
     {
         bsp::battery_charger::init(queueBatteryHandle);
-        // Mocking initial state to make system run
+        bsp::fuel_gauge::init(queueBatteryHandle);
+
         Store::Battery::modify().state = Store::Battery::State::Discharging;
-        Store::Battery::modify().level = getBatteryVoltage();
+        Store::Battery::modify().level = static_cast<unsigned int>(bsp::fuel_gauge::getBatteryLevel());
     }
 
     int BatteryCharger::getBatteryVoltage()
@@ -33,14 +35,29 @@ namespace hal::battery
     void BatteryCharger::processStateChangeNotification(std::uint8_t notification)
     {
         bsp::battery_charger::getChargeStatus();
+
+        if (notification == bsp::fuel_gauge::FuelGaugeAlert) {
+            Store::Battery::modify().levelState = Store::Battery::LevelState::CriticalNotCharging;
+        }
+
+        if (notification == bsp::fuel_gauge::FuelGaugeUpdate) {
+            Store::Battery::modify().level = bsp::fuel_gauge::getBatteryLevel();
+        }
     }
 
     void BatteryCharger::setChargingCurrentLimit(std::uint8_t)
     {}
 
-    BaseType_t IRQHandler()
+    BaseType_t IRQHandler(AbstractBatteryCharger::IRQSource source)
     {
-        return bsp::battery_charger::CHG_IRQHandler();
+        if (source == AbstractBatteryCharger::IRQSource::Charger) {
+            return bsp::battery_charger::CHG_IRQHandler();
+        }
+        if (source == AbstractBatteryCharger::IRQSource::FuelGauge) {
+            return bsp::fuel_gauge::ALRT_IRQHandler();
+        }
+
+        return 0;
     }
 
     extern "C"
