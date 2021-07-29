@@ -111,8 +111,9 @@ class ServiceDesktop : public sys::Service
 
     auto requestLogsFlush() -> void;
 
-  private:
     auto getSerialNumber() const -> std::string;
+
+  private:
     std::unique_ptr<sdesktop::USBSecurityModel> usbSecurityModel;
     std::unique_ptr<settings::Settings> settings;
     sys::TimerHandle transferTimer;

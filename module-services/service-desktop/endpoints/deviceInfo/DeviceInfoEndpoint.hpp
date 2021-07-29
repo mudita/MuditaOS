@@ -21,6 +21,7 @@ namespace sys
 
 class DeviceInfoEndpoint : public parserFSM::Endpoint
 {
+    auto getSerialNumber() -> std::string;
 
   public:
     explicit DeviceInfoEndpoint(sys::Service *ownerServicePtr) : Endpoint(ownerServicePtr)
