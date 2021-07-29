@@ -82,7 +82,7 @@ namespace gui
     bool TextSpinner::onFocus(bool state)
     {
         if (focus) {
-            setEdges(RectangleEdge::Top | RectangleEdge::Bottom);
+            setEdges(RectangleEdge::Bottom);
         }
         else {
             setEdges(RectangleEdge::None);
