@@ -9,9 +9,10 @@ function(add_image)
 
     if(NOT ${PROJECT_TARGET_NAME} STREQUAL "linux")
         set(HAS_BOOTFILE YES)
+        set(HAS_UPDATER YES)
     endif()
 
-    set(SCRIPT_PATH ${CMAKE_SOURCE_DIR}/generate_image.sh)
+    set(SCRIPT_PATH ${CMAKE_SOURCE_DIR}/tools/generate_image.sh)
 
     set(DISK_IMAGE_NAME ${_ARG_PRODUCT}.img)
     set(DISK_IMAGE_PATH ${CMAKE_BINARY_DIR}/${DISK_IMAGE_NAME})
@@ -23,6 +24,12 @@ function(add_image)
         set(BIN_FILE_PATH "")
     endif()
 
+    if(HAS_UPDATER)
+        set(UPDATER_FILE_PATH ${CMAKE_BINARY_DIR}/updater.bin)
+    else()
+        set(UPDATER_FILE_PATH "")
+    endif()
+
     set(COMMAND_DEPENDS "genlittlefs")
     list(APPEND COMMNDS_DEPENDS ${SCRIPT_PATH})
     if(_ARG_ASSETS)
@@ -30,6 +37,10 @@ function(add_image)
     endif()
     if(HAS_BOOTFILE)
         list(APPEND COMMAND_DEPENDS ${BIN_FILE_TARGET})
+    endif()
+
+    if(HAS_UPDATER)
+        list(APPEND COMMAND_DEPENDS updater.bin-target)
     endif()
 
     add_custom_command(
@@ -40,6 +51,7 @@ function(add_image)
             ${DISK_IMAGE_NAME}
             ${CMAKE_BINARY_DIR}/${_ARG_SYSROOT}
             "${BIN_FILE_PATH}"
+            "${UPDATER_FILE_PATH}"
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         COMMENT "Generate ${DISK_IMAGE_NAME}"
     )

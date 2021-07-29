@@ -36,6 +36,7 @@ function setVars() {
         "sysroot/sys/current/Luts.bin"
         "version.json"
         "ecoboot.bin"
+        "updater.bin"
         )
 }
 
@@ -70,6 +71,7 @@ function linkInStageing(){
     ln -s ../sysroot/sys/current/country-codes.db
     ln -s ../sysroot/sys/current/Luts.bin
     ln -s ../ecoboot.bin
+    ln -s ../updater.bin
     ln -s ../${SOURCE_TARGET}-version.json version.json
     popd 1> /dev/null
 }
