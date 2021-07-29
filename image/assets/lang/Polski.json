@@ -507,7 +507,6 @@
   "app_phonebook_options_delete": "Usuń",
   "app_phonebook_options_delete_confirm": "Czy na pewno chcesz usunąć\nten kontakt?",
   "app_phonebook_options_delete_notification": "Ten kontakt został pomyślnie\nusunięty.",
-  "app_phonebook_options_send_bt": "Wyślij przez Bluetooth",
   "app_phonebook_options_forward_namecard": "Prześlij dalej wizytówkę",
   "app_phonebook_options_send_sms": "Wyślij SMS-em",
   "app_phonebook_new_contact_first_name": "Imię",
