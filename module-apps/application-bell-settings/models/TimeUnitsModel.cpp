@@ -3,7 +3,7 @@
 
 #include "TimeUnitsModel.hpp"
 
-#include <apps-common/widgets/TimeSetSpinner.hpp>
+#include <apps-common/widgets/TimeSetFmtSpinner.hpp>
 #include <gui/widgets/ListViewEngine.hpp>
 #include <gui/widgets/Style.hpp>
 #include <gui/widgets/Text.hpp>
@@ -57,8 +57,8 @@ namespace app::bell_settings
     {
         std::time_t now         = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
         struct std::tm *newTime = std::localtime(&now);
-        newTime->tm_hour        = timeSetWidget->timeSetSpinner->getHour();
-        newTime->tm_min         = timeSetWidget->timeSetSpinner->getMinute();
+        newTime->tm_hour        = timeSetWidget->timeSetFmtSpinner->getHour();
+        newTime->tm_min         = timeSetWidget->timeSetFmtSpinner->getMinute();
         LOG_INFO("Setting new time: %d:%d", newTime->tm_hour, newTime->tm_min);
         sendRtcUpdateTimeMessage(std::mktime(newTime));
     }
@@ -66,8 +66,8 @@ namespace app::bell_settings
     void TimeUnitsModel::loadData()
     {
         std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-        timeSetWidget->timeSetSpinner->setHour(std::localtime(&now)->tm_hour);
-        timeSetWidget->timeSetSpinner->setMinute(std::localtime(&now)->tm_min);
+        timeSetWidget->timeSetFmtSpinner->setHour(std::localtime(&now)->tm_hour);
+        timeSetWidget->timeSetFmtSpinner->setMinute(std::localtime(&now)->tm_min);
     }
 
     auto TimeUnitsModel::requestRecords(uint32_t offset, uint32_t limit) -> void

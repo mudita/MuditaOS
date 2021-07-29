@@ -33,6 +33,7 @@ namespace gui
         hour->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         hour->setFixedFieldWidth(noOfDigits);
         hour->setEdges(RectangleEdge::None);
+        hour->setPenFocusWidth(style::time_set_spinner::focus::size);
         hour->setCurrentValue(0);
 
         addWidget(hour);
@@ -48,6 +49,7 @@ namespace gui
         minute = new Spinner(minuteMin, minuteMax, minuteStep, Boundaries::Continuous);
         minute->setMinimumSize(doubleCharWidth, fontHeight);
         minute->setFont(fontName);
+        minute->setPenFocusWidth(style::time_set_spinner::focus::size);
 
         minute->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         minute->setFixedFieldWidth(noOfDigits);
@@ -57,8 +59,15 @@ namespace gui
 
         resizeItems();
 
+        focusChangedCallback = [&](Item &) {
+            if (editMode != EditMode::Edit) {
+                return false;
+            }
+            setFocusItem(focus ? lastFocus : nullptr);
+            return true;
+        };
         if (editMode == EditMode::Edit) {
-            setFocusItem(hour);
+            updateFocus(hour);
         }
     }
 
@@ -113,7 +122,7 @@ namespace gui
     auto TimeSetSpinner::handleEnterKey() -> bool
     {
         if (focusItem == hour) {
-            setFocusItem(minute);
+            updateFocus(minute);
             return true;
         }
         return false;
@@ -122,7 +131,7 @@ namespace gui
     auto TimeSetSpinner::handleRightFunctionKey() -> bool
     {
         if (focusItem == minute) {
-            setFocusItem(hour);
+            updateFocus(hour);
             return true;
         }
         return false;
@@ -157,7 +166,7 @@ namespace gui
         minute->setMinimumSize(doubleCharWidth, fontHeight);
         minute->setText(minute->getText());
 
-        setMinimumSize(2 * doubleCharWidth + getColonWidth(), fontHeight);
+        setMinimumSize(noOfDigits * doubleCharWidth + getColonWidth(), fontHeight);
         resizeItems();
     }
 
@@ -165,7 +174,7 @@ namespace gui
     {
         this->editMode = editMode;
         if (editMode == EditMode::Edit) {
-            setFocusItem(hour);
+            updateFocus(hour);
         }
         else {
             setFocusItem(nullptr);
@@ -180,5 +189,25 @@ namespace gui
     auto TimeSetSpinner::getMinute() const noexcept -> int
     {
         return minute->getCurrentValue();
+    }
+    auto TimeSetSpinner::setHourMax(std::uint32_t newMax) noexcept -> void
+    {
+        hour->setMaxValue(newMax);
+    }
+    auto TimeSetSpinner::setHourMin(std::uint32_t newMin) noexcept -> void
+    {
+        hour->setMinValue(newMin);
+    }
+    void TimeSetSpinner::updateFocus(Item *newFocus)
+    {
+        setFocusItem(newFocus);
+        lastFocus = newFocus;
+    }
+    auto TimeSetSpinner::getMinimumSize() const noexcept -> std::pair<std::uint32_t, std::uint32_t>
+    {
+        constexpr auto spacer = 1U;
+        auto fontHeight       = getFontHeight();
+        auto doubleCharWidth  = (getWidestDigitWidth() * noOfDigits) + (spacer * noOfDigits);
+        return {noOfDigits * doubleCharWidth + getColonWidth(), fontHeight};
     }
 } /* namespace gui */

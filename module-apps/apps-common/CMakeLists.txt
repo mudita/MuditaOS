@@ -38,12 +38,15 @@ target_sources(apps-common
         widgets/TextWithIconsWidget.cpp
         widgets/TimeSetSpinner.cpp
         widgets/AlarmSetSpinner.cpp
+        widgets/TimeSetFmtSpinner.cpp
         widgets/TimeWidget.cpp
         widgets/WidgetsUtils.cpp
         windows/AppWindow.cpp
         windows/BrightnessWindow.cpp
         windows/Dialog.cpp
         windows/OptionWindow.cpp
+    PUBLIC
+        widgets/TimeSetFmtSpinner.hpp
 )
 
 add_subdirectory(popups)
