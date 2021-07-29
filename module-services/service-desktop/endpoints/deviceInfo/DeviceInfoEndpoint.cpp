@@ -32,6 +32,12 @@ auto DeviceInfoEndpoint::handle(Context &context) -> void
         break;
     }
 }
+
+auto DeviceInfoEndpoint::getSerialNumber() -> std::string
+{
+    return dynamic_cast<ServiceDesktop *>(ownerServicePtr)->getSerialNumber();
+}
+
 auto DeviceInfoEndpoint::getDeviceInfo(Context &context) -> bool
 {
     if (ownerServicePtr == nullptr) {
@@ -42,6 +48,7 @@ auto DeviceInfoEndpoint::getDeviceInfo(Context &context) -> bool
     if ((*statvfs)(purefs::dir::getRootDiskPath().c_str(), vfstat.get()) < 0) {
         return false;
     }
+
     unsigned long totalMbytes = (vfstat->f_frsize * vfstat->f_blocks) / 1024LLU / 1024LLU;
     unsigned long freeMbytes  = (vfstat->f_bfree * vfstat->f_bsize) / 1024LLU / 1024LLU;
     unsigned long freePercent = (freeMbytes * 100) / totalMbytes;
@@ -63,7 +70,8 @@ auto DeviceInfoEndpoint::getDeviceInfo(Context &context) -> bool
          {json::gitBranch, (std::string)GIT_BRANCH},
          {json::updateHistory, updateHistory},
          {json::currentRTCTime, std::to_string(static_cast<uint32_t>(std::time(nullptr)))},
-         {json::version, std::string(VERSION)}}));
+         {json::version, std::string(VERSION)},
+         {json::serialNumber, getSerialNumber()}}));
 
     MessageHandler::putToSendQueue(context.createSimpleResponse());
     return true;
