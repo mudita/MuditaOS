@@ -15,6 +15,7 @@
 #include "board/BoardDefinitions.hpp"
 #include "bsp/light_sensor/light_sensor.hpp"
 #include <hal/battery_charger/BatteryCharger.hpp>
+#include <bsp/fuel_gauge/fuel_gauge.hpp>
 
 namespace bsp
 {
@@ -67,7 +68,12 @@ namespace bsp
             uint32_t irq_mask                   = GPIO_GetPinsInterruptFlags(GPIO1);
 
             if (irq_mask & (1 << static_cast<uint32_t>(BoardDefinitions::BELL_BATTERY_CHARGER_CHGOK_PIN))) {
-                xHigherPriorityTaskWoken |= hal::battery::IRQHandler();
+                xHigherPriorityTaskWoken |=
+                    hal::battery::IRQHandler(hal::battery::AbstractBatteryCharger::IRQSource::Charger);
+            }
+            if (irq_mask & (1 << static_cast<uint32_t>(BoardDefinitions::BELL_FUELGAUGE_ALRT_PIN))) {
+                xHigherPriorityTaskWoken |=
+                    hal::battery::IRQHandler(hal::battery::AbstractBatteryCharger::IRQSource::FuelGauge);
             }
 
             // Clear all IRQs
@@ -99,7 +105,8 @@ namespace bsp
             if (irq_mask & (1 << BOARD_BATTERY_CHARGER_WCINOKB_PIN)) {}
 
             if (irq_mask & (1 << BOARD_BATTERY_CHARGER_INTB_PIN)) {
-                xHigherPriorityTaskWoken |= hal::battery::IRQHandler();
+                xHigherPriorityTaskWoken |=
+                    hal::battery::IRQHandler(hal::battery::AbstractBatteryCharger::IRQSource::Charger);
             }
 
             // Clear all IRQs
@@ -122,7 +129,8 @@ namespace bsp
             }
 
             if (irq_mask & (1 << static_cast<uint32_t>(BoardDefinitions::BELL_BATTERY_CHARGER_ACOK_PIN))) {
-                xHigherPriorityTaskWoken |= hal::battery::IRQHandler();
+                xHigherPriorityTaskWoken |=
+                    hal::battery::IRQHandler(hal::battery::AbstractBatteryCharger::IRQSource::Charger);
             }
 
             // Clear all IRQs
