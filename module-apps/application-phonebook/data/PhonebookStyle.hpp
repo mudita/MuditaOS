@@ -111,10 +111,11 @@ namespace phonebookStyle
     {
         inline constexpr uint32_t w                = style::window::default_body_width;
         inline constexpr uint32_t h                = 63;
-        inline constexpr uint32_t title_label_h    = 20;
-        inline constexpr uint32_t input_text_h     = 37;
+        inline constexpr uint32_t title_label_h    = 24;
+        inline constexpr uint32_t input_text_h     = 33;
         inline constexpr uint32_t span_size        = 6;
-        inline constexpr int32_t underline_padding = 4;
+        inline constexpr uint32_t line_spacing     = 15;
+        inline constexpr int32_t underline_padding = 2;
     } // namespace inputLinesWithLabelWidget
 
     namespace outputLinesTextWithLabelWidget

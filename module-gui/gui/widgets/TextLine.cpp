@@ -170,10 +170,7 @@ namespace gui
         widthUsed              = from.widthUsed;
         heightUsed             = from.heightUsed;
         underline              = from.underline;
-        drawUnderline          = from.drawUnderline;
-        drawUnderlineMode      = from.drawUnderlineMode;
-        underlinePadding       = from.underlinePadding;
-        underlineHeight        = from.underlineHeight;
+        underLineProperties    = from.underLineProperties;
         lineEnd                = from.lineEnd;
         end                    = from.end;
         maxWidth               = from.maxWidth;
@@ -227,7 +224,7 @@ namespace gui
 
         for (auto &el : lineContent) {
             auto scopedDisown = ScopedParentDisown(el);
-            el->setArea({lineXPosition, y - underlinePadding, el->getWidth(), el->getHeight()});
+            el->setArea({lineXPosition, y - underLineProperties.underLinePadding, el->getWidth(), el->getHeight()});
             lineXPosition += el->getWidth();
         }
     }
@@ -246,7 +243,7 @@ namespace gui
             return;
         }
 
-        createUnderline(maxWidth, underlineHeight);
+        createUnderline(maxWidth, underLineProperties.underlineHeight);
         parent->addWidget(underline);
 
         for (auto &el : lineContent) {
@@ -337,7 +334,7 @@ namespace gui
 
         if (xOffset >= 0) {
 
-            if (underline != nullptr && drawUnderlineMode == UnderlineDrawMode::Concurrent)
+            if (underline != nullptr && underLineProperties.drawUnderlineMode == UnderlineDrawMode::Concurrent)
                 underline->setPosition(underline->getPosition(Axis::X) + xOffset, Axis::X);
 
             for (auto &el : lineContent) {
@@ -368,12 +365,13 @@ namespace gui
 
     void TextLine::createUnderline(unsigned int width, unsigned int initHeight)
     {
-        if (drawUnderline) {
+        if (underLineProperties.draw) {
 
             underline = new Rect(nullptr, 0, 0, maxWidth, initHeight);
+            underline->setPenWidth(underLineProperties.thickness);
             underline->setEdges(RectangleEdge::Bottom);
 
-            if (drawUnderlineMode == UnderlineDrawMode::WholeLine) {
+            if (underLineProperties.drawUnderlineMode == UnderlineDrawMode::WholeLine) {
                 heightUsed = std::max(heightUsed, (Length)initHeight);
             }
         }
@@ -381,10 +379,10 @@ namespace gui
 
     void TextLine::updateUnderline(const short &x, const short &y)
     {
-        if (underline != nullptr && drawUnderlineMode == UnderlineDrawMode::WholeLine) {
+        if (underline != nullptr && underLineProperties.drawUnderlineMode == UnderlineDrawMode::WholeLine) {
             underline->setArea({x, y, underline->widgetArea.w, height()});
         }
-        else if (underline != nullptr && drawUnderlineMode == UnderlineDrawMode::Concurrent) {
+        else if (underline != nullptr && underLineProperties.drawUnderlineMode == UnderlineDrawMode::Concurrent) {
             underline->setArea({x, y, getWidth(), height()});
         }
     }

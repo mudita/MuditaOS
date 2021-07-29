@@ -22,9 +22,9 @@ namespace gui
         setMinimumSize(phonebookStyle::inputBoxWithLabelAndIconIWidget::w,
                        phonebookStyle::inputBoxWithLabelAndIconIWidget::h);
 
-        setMargins(gui::Margins(0, style::margins::big, 0, 0));
+        setMargins(gui::Margins(style::widgets::leftMargin, style::margins::big, 0, 0));
 
-        hBox = new gui::HBox(this, 0, 0, phonebookStyle::inputBoxWithLabelAndIconIWidget::w, 0);
+        hBox = new gui::HBox(this, 0, 0, 0, 0);
         hBox->setEdges(gui::RectangleEdge::None);
         hBox->setPenFocusWidth(style::window::default_border_focus_w);
         hBox->setPenWidth(style::window::default_border_rect_no_focus);
@@ -50,7 +50,7 @@ namespace gui
         tickImage->activeItem = false;
 
         descriptionLabel = new gui::Label(hBox, 0, 0, 0, 0);
-        descriptionLabel->setMinimumSize(phonebookStyle::inputBoxWithLabelAndIconIWidget::description_label_w,
+        descriptionLabel->setMaximumSize(phonebookStyle::inputBoxWithLabelAndIconIWidget::description_label_w,
                                          phonebookStyle::inputBoxWithLabelAndIconIWidget::description_label_h);
         descriptionLabel->setMargins(
             gui::Margins(0, 0, phonebookStyle::inputBoxWithLabelAndIconIWidget::description_label_right_margin, 0));
@@ -102,9 +102,11 @@ namespace gui
         focusChangedCallback = [&](gui::Item &item) {
             if (focus) {
                 setFocusItem(inputBoxLabel);
+                descriptionLabel->setFont(style::window::font::mediumbold);
             }
             else {
                 setFocusItem(nullptr);
+                descriptionLabel->setFont(style::window::font::medium);
             }
             return true;
         };
@@ -137,6 +139,7 @@ namespace gui
         focusChangedCallback = [&](gui::Item &item) {
             if (focus) {
                 setFocusItem(inputBoxLabel);
+                descriptionLabel->setFont(style::window::font::mediumbold);
                 if (tickImage->visible) {
                     bottomBarTemporaryMode(utils::translate("app_phonebook_uncheck"));
                 }
@@ -146,6 +149,7 @@ namespace gui
             }
             else {
                 setFocusItem(nullptr);
+                descriptionLabel->setFont(style::window::font::medium);
                 bottomBarRestoreFromTemporaryMode();
             }
             return true;
@@ -180,6 +184,7 @@ namespace gui
         focusChangedCallback = [&](gui::Item &item) {
             if (focus) {
                 setFocusItem(inputBoxLabel);
+                descriptionLabel->setFont(style::window::font::mediumbold);
                 if (tickImage->visible) {
                     bottomBarTemporaryMode(utils::translate("app_phonebook_uncheck"));
                 }
@@ -189,6 +194,7 @@ namespace gui
             }
             else {
                 setFocusItem(nullptr);
+                descriptionLabel->setFont(style::window::font::medium);
                 bottomBarRestoreFromTemporaryMode();
             }
             return true;
