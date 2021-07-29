@@ -46,6 +46,7 @@ namespace app::bell_alarm
             gui::bell_alarm_style::time_set_spinner_list_item::w,
             gui::bell_alarm_style::time_set_spinner_list_item::h,
             utils::translate("app_bell_settings_time_units_time_message"));
+        timeSetWidget->timeSetFmtSpinner->setFont(gui::bell_alarm_style::time_set_spinner_list_item::font);
         internalData.push_back(timeSetWidget);
 
         for (auto item : internalData) {
