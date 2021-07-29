@@ -118,6 +118,7 @@ namespace parserFSM
         inline constexpr auto pending             = "pending";
         inline constexpr auto location            = "location";
         inline constexpr auto reason              = "reason";
+        inline constexpr auto serialNumber        = "serialNumber";
 
         namespace filesystem
         {
