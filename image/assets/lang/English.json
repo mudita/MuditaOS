@@ -486,7 +486,6 @@
   "app_phonebook_options_delete": "Delete",
   "app_phonebook_options_delete_confirm": "Do you really want to delete\nthis contact?",
   "app_phonebook_options_delete_notification": "This contact has been deleted\nsuccessfully.",
-  "app_phonebook_options_send_bt": "Send via Bluetooth",
   "app_phonebook_options_forward_namecard": "Forward namecard",
   "app_phonebook_options_send_sms": "Send via SMS",
   "app_phonebook_new_contact_first_name": "First name",
