@@ -476,7 +476,6 @@
   "app_phonebook_options_delete": "Supprimer",
   "app_phonebook_options_delete_confirm": "Voulez-vous vraiment\nsupprimer ce contact ?",
   "app_phonebook_options_delete_notification": "Ce contact a été supprimé\navec succès.",
-  "app_phonebook_options_send_bt": "Envoyer via Bluetooth",
   "app_phonebook_options_forward_namecard": "Transférer la carte de visite",
   "app_phonebook_options_send_sms": "Envoyer via SMS",
   "app_phonebook_new_contact_first_name": "Pénom",
