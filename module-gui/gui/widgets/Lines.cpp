@@ -80,8 +80,7 @@ namespace gui
         Length initHeight = text->getTextFormat().getFont()->info.line_height;
 
         while (true) {
-            auto textLine =
-                gui::TextLine(drawCursor, w, initHeight, underLine, UnderlineDrawMode::WholeLine, underLinePadding);
+            auto textLine = gui::TextLine(drawCursor, w, initHeight, underLineProperties);
 
             if ((textLine.height() > 0) && initHeight != textLine.height()) {
                 initHeight = textLine.height();
@@ -122,7 +121,7 @@ namespace gui
             line.setParent(text);
             line.setPosition(lineXPosition, lineYPosition);
 
-            lineYPosition += line.height();
+            lineYPosition += line.height() + linesSpacing;
         }
     }
 

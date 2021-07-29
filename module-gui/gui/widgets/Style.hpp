@@ -280,10 +280,11 @@ namespace style
 
     namespace margins
     {
-        inline constexpr auto small    = 6U;
-        inline constexpr auto big      = 8U;
-        inline constexpr auto very_big = 12U;
-        inline constexpr auto huge     = 24U;
+        inline constexpr auto very_small = 3U;
+        inline constexpr auto small      = 6U;
+        inline constexpr auto big        = 8U;
+        inline constexpr auto very_big   = 12U;
+        inline constexpr auto huge       = 24U;
     } // namespace margins
 
     namespace padding
