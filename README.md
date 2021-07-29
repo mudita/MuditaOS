@@ -88,7 +88,7 @@ A fully detailed documentation can be build locally using [Doxygen](https://www.
 You can build code documentation with the following command:
 
 ```bash
-./configure linux Debug
+./configure.sh linux Debug
 cd build-linux-Debug
 make doc
 ```
@@ -96,7 +96,7 @@ If you prefer to build documentation always with `all` target instead, configure
 with `BUILD_DOC_WITH_ALL` option set to `ON`, e.g.:
 
 ```bash
-./configure <target> <build_type> -DBUILD_DOC_WITH_ALL=ON
+./configure.sh <target> <build_type> -DBUILD_DOC_WITH_ALL=ON
 ```
 
 Documentation is generated in the `doc/html` subdirectory of the build directory. To view it open `index.html` using a web browser, e.g.:
