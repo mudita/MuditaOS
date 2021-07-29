@@ -889,7 +889,7 @@ namespace app
                      static_cast<int>(std::distance(ret, windowsStack.stack.end())),
                      ret->c_str());
             windowsStack.stack.erase(std::next(ret), windowsStack.stack.end());
-            LOG_INFO("Curent window... %s vs %s", ret->c_str(), windowsStack.stack.back().c_str());
+            LOG_INFO("Current window... %s vs %s", ret->c_str(), windowsStack.stack.back().c_str());
             return true;
         }
         return false;
