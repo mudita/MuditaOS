@@ -98,7 +98,7 @@ namespace hal::battery
         }
     }
 
-    BaseType_t IRQHandler()
+    BaseType_t IRQHandler([[maybe_unused]] AbstractBatteryCharger::IRQSource source)
     {
         return bsp::battery_charger::INTB_IRQHandler();
     }

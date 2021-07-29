@@ -159,4 +159,9 @@ enum class BoardDefinitions
     BELL_BATTERY_CHARGER_ACOK_PIN   = 22,
     BELL_BATTERY_CHARGER_CHGOK_GPIO = static_cast<int>(drivers::GPIOInstances ::GPIO_1),
     BELL_BATTERY_CHARGER_CHGOK_PIN  = 0,
+
+    BELL_FUELGAUGE_I2C_BAUDRATE = I2C_STD_BAUDRATE,
+    BELL_FUELGAUGE_I2C          = static_cast<int>(drivers::I2CInstances ::I2C4),
+    BELL_FUELGAUGE_ALRT_GPIO    = static_cast<int>(drivers::GPIOInstances ::GPIO_1),
+    BELL_FUELGAUGE_ALRT_PIN     = 3,
 };

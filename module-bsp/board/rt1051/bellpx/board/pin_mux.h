@@ -181,6 +181,13 @@ extern "C"
 
     void PINMUX_InitI2C4(void);
 
+/**
+ * Fuel gauge GPIO
+ */
+#define PINUMX_FUEL_GAUGE_FG_INT IOMUXC_GPIO_AD_B0_03_GPIO1_IO03
+
+    void PINMUX_InitFuelGauge(void);
+
 #if defined(__cplusplus)
 }
 #endif
