@@ -87,7 +87,7 @@ namespace gui
     bool Spinner::onFocus(bool state)
     {
         if (focus) {
-            setEdges(RectangleEdge::Top | RectangleEdge::Bottom);
+            setEdges(RectangleEdge::Bottom);
         }
         else {
             setEdges(RectangleEdge::None);
@@ -104,6 +104,14 @@ namespace gui
         }
         outStream << currentValue;
         setText(outStream.str());
+    }
+    void Spinner::setMinValue(int newMinValue)
+    {
+        minValue = newMinValue;
+    }
+    void Spinner::setMaxValue(int newMaxValue)
+    {
+        maxValue = newMaxValue;
     }
 
 } // namespace gui

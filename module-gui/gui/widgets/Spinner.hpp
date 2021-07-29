@@ -15,6 +15,9 @@ namespace gui
         void setCurrentValue(int newCurrent);
         void setFixedFieldWidth(unsigned char newFixedFieldWidth);
 
+        void setMinValue(int newMinValue);
+        void setMaxValue(int newMaxValue);
+
         [[nodiscard]] int getCurrentValue() const noexcept;
         [[nodiscard]] unsigned char getFixedFieldWidth() const noexcept;
 
