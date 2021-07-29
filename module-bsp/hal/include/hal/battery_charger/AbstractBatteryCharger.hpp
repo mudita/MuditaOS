@@ -22,6 +22,13 @@ namespace hal::battery
             virtual void onStatusChanged() = 0;
         };
 
+        enum class IRQSource
+        {
+            Charger,
+            FuelGauge,
+            Any
+        };
+
         virtual ~AbstractBatteryCharger() = default;
 
         virtual void init(xQueueHandle, xQueueHandle)             = 0;
@@ -31,7 +38,7 @@ namespace hal::battery
         virtual int getBatteryVoltage()                           = 0;
     };
 
-    BaseType_t IRQHandler();
+    BaseType_t IRQHandler(AbstractBatteryCharger::IRQSource source);
     extern "C"
     {
         void USB_ChargerDetectedCB(std::uint8_t detectedType);
