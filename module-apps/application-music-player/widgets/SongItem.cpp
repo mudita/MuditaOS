@@ -38,7 +38,7 @@ namespace gui
         durationText->setMinimumSize(songItem::duration_w, songItem::text_h);
         durationText->setMargins(Margins(0, 0, songItem::rightMargin, 0));
         durationText->setEdges(RectangleEdge::None);
-        durationText->setUnderline(false);
+        durationText->drawUnderline(false);
         durationText->setFont(style::window::font::verysmall);
         durationText->setAlignment(Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Center));
         durationText->setEditMode(EditMode::Browse);
@@ -49,7 +49,7 @@ namespace gui
         songText->setMaximumWidth(songItem::w);
         songText->setMargins(Margins(songItem::leftMargin, 0, 0, 0));
         songText->setEdges(RectangleEdge::None);
-        songText->setUnderline(false);
+        songText->drawUnderline(false);
         songText->setFont(style::window::font::bigbold);
         songText->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
         songText->setEditMode(EditMode::Browse);
@@ -64,7 +64,7 @@ namespace gui
         authorText->setMaximumWidth(songItem::w);
         authorText->setMargins(Margins(songItem::leftMargin, 0, 0, 0));
         authorText->setEdges(RectangleEdge::None);
-        authorText->setUnderline(false);
+        authorText->drawUnderline(false);
         authorText->setFont(style::window::font::medium);
         authorText->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
         authorText->setEditMode(EditMode::Browse);

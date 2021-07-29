@@ -22,7 +22,7 @@ namespace gui
         soundTitle->setMaximumSize(style::window::default_body_width, style::window::label::big_h);
         soundTitle->setMargins(Margins(10, 0, 0, 0));
         soundTitle->setEdges(RectangleEdge::All);
-        soundTitle->setUnderline(false);
+        soundTitle->drawUnderline(false);
         soundTitle->setFont(style::window::font::big);
         soundTitle->setText(soundName); // setRichText??
 

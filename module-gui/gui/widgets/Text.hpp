@@ -134,7 +134,7 @@ namespace gui
         void setTextType(TextType type);
         void setTextLimitType(TextLimitType limitType, unsigned int val = 0);
         void clearTextLimits();
-        void setUnderline(bool val);
+        void drawUnderline(bool val);
         virtual void setText(const UTF8 &text);
         void setText(std::unique_ptr<TextDocument> &&document);
 

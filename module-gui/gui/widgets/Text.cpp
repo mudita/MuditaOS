@@ -113,10 +113,10 @@ namespace gui
         limitsList.clear();
     }
 
-    void Text::setUnderline(const bool val)
+    void Text::drawUnderline(bool val)
     {
-        if (lines->getUnderLine() != val) {
-            lines->setUnderLine(val);
+        if (lines->getUnderLineProperties().draw != val) {
+            lines->getUnderLineProperties().draw = val;
             drawLines();
         }
     }

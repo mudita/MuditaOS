@@ -19,6 +19,15 @@ namespace gui
         Concurrent
     };
 
+    struct UnderLineProperties
+    {
+        bool draw                           = false;
+        Position underLinePadding           = 0;
+        unsigned int thickness              = 1;
+        Length underlineHeight              = 0;
+        UnderlineDrawMode drawUnderlineMode = UnderlineDrawMode::WholeLine;
+    };
+
     /// interface element for TextDocument->getLine() <-- Text
     class TextLine
     {
@@ -27,11 +36,8 @@ namespace gui
         Length heightUsed             = 0;
         Length maxWidth               = 0;
         std::list<Label *> lineContent;
-        Rect *underline                     = nullptr;
-        bool drawUnderline                  = false;
-        UnderlineDrawMode drawUnderlineMode = UnderlineDrawMode::Concurrent;
-        Position underlinePadding           = 0;
-        Position underlineHeight            = 0;
+        Rect *underline = nullptr;
+        UnderLineProperties underLineProperties;
         TextBlock::End end                  = TextBlock::End::None;
         Position storedYOffset              = 0;
         bool lineEnd                        = false;
@@ -56,15 +62,11 @@ namespace gui
         TextLine(BlockCursor &cursor,
                  unsigned int max_width,
                  unsigned int init_height,
-                 bool drawUnderline,
-                 UnderlineDrawMode drawUnderlineMode,
-                 Position underlinePadding)
+                 UnderLineProperties underLineProperties)
             : TextLine(cursor, max_width)
         {
-            this->drawUnderline     = drawUnderline;
-            this->drawUnderlineMode = drawUnderlineMode;
-            this->underlinePadding  = underlinePadding;
-            this->underlineHeight   = init_height;
+            this->underLineProperties                 = underLineProperties;
+            this->underLineProperties.underlineHeight = init_height;
         }
 
         ~TextLine();
