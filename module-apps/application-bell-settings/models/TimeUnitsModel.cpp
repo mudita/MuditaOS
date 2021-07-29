@@ -3,6 +3,8 @@
 
 #include "TimeUnitsModel.hpp"
 
+#include <application-bell-settings/data/BellSettingsStyle.hpp>
+
 #include <apps-common/widgets/TimeSetFmtSpinner.hpp>
 #include <gui/widgets/ListViewEngine.hpp>
 #include <gui/widgets/Style.hpp>
@@ -40,7 +42,10 @@ namespace app::bell_settings
     void TimeUnitsModel::createData()
     {
         timeSetWidget = new gui::TimeSetSpinnerListItem(
-            0U, 0U, 0, 0, utils::translate("app_bell_settings_time_units_time_message"));
+            0U, 0U,
+            gui::bell_settings_style::time_set_spinner_list_item::w,
+            gui::bell_settings_style::time_set_spinner_list_item::h,
+            utils::translate("app_bell_settings_time_units_time_message"));
         internalData.push_back(timeSetWidget);
 
         for (auto item : internalData) {

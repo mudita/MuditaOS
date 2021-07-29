@@ -15,12 +15,12 @@ target_sources(apps-common
         notifications/NotificationData.cpp
         notifications/NotificationListItem.cpp
         notifications/NotificationProvider.cpp
-        notifications/NotificationsModel.cpp
-        notifications/NotificationsHandler.cpp
         notifications/NotificationsConfiguration.cpp
+        notifications/NotificationsHandler.cpp
+        notifications/NotificationsModel.cpp
         notifications/policies/CallNotificationPolicy.cpp
-        notifications/policies/SMSNotificationPolicy.cpp
         notifications/policies/NotificationsListPolicy.cpp
+        notifications/policies/SMSNotificationPolicy.cpp
         options/OptionsModel.cpp
         options/type/OptionCall.cpp
         options/type/OptionContact.cpp
@@ -28,6 +28,7 @@ target_sources(apps-common
         options/type/OptionSimple.cpp
         options/type/OptionWithActiveIcons.cpp
         widgets/ActiveIconFactory.cpp
+        widgets/AlarmSetSpinner.cpp
         widgets/BarGraph.cpp
         widgets/BrightnessBox.cpp
         widgets/ButtonOnOff.cpp
@@ -36,9 +37,9 @@ target_sources(apps-common
         widgets/ModesBox.cpp
         widgets/SpinBox.cpp
         widgets/TextWithIconsWidget.cpp
-        widgets/TimeSetSpinner.cpp
-        widgets/AlarmSetSpinner.cpp
         widgets/TimeSetFmtSpinner.cpp
+        widgets/TimeSetSpinner.cpp
+        widgets/TimeSetSpinnerListItem.cpp
         widgets/TimeWidget.cpp
         widgets/WidgetsUtils.cpp
         windows/AppWindow.cpp
@@ -47,6 +48,7 @@ target_sources(apps-common
         windows/OptionWindow.cpp
     PUBLIC
         widgets/TimeSetFmtSpinner.hpp
+        widgets/TimeSetSpinnerListItem.cpp
 )
 
 add_subdirectory(popups)

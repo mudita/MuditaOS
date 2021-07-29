@@ -3,10 +3,9 @@
 
 #pragma once
 
-#include "TimeSetSpinnerListItem.hpp"
-
 #include <apps-common/Application.hpp>
 #include <apps-common/InternalModel.hpp>
+#include <apps-common/widgets/TimeSetSpinnerListItem.hpp>
 
 namespace app::bell_settings
 {
