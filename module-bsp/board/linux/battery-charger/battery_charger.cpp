@@ -191,6 +191,9 @@ namespace bsp::battery_charger
         return nominalVoltage;
     }
 
+    void printFuelGaugeInfo()
+    {}
+
     BaseType_t INTB_IRQHandler()
     {
         return 1;
