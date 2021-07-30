@@ -93,3 +93,6 @@
 [submodule "usb_stack"]
 	path = third-party/usb_stack
 	url = ../usb_stack.git
+[submodule "libical"]
+	path = third-party/libical/libical
+	url = https://github.com/mudita/libical
