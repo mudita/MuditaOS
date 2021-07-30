@@ -48,7 +48,7 @@ target_sources(apps-common
         windows/OptionWindow.cpp
     PUBLIC
         widgets/TimeSetFmtSpinner.hpp
-        widgets/TimeSetSpinnerListItem.cpp
+        widgets/TimeSetSpinnerListItem.hpp
 )
 
 add_subdirectory(popups)
