@@ -25,12 +25,12 @@ namespace bsp::battery_charger
         constexpr auto registersToStore = 0xFF + 1;
 
         constexpr std::uint16_t ENABLE_CHG_FG_IRQ_MASK = 0xFC;
-        constexpr std::uint8_t UNLOCK_CHARGER       = 0x3 << 2;
+        constexpr std::uint8_t UNLOCK_CHARGER          = 0x3 << 2;
 
         constexpr std::uint8_t CHG_ON_OTG_OFF_BUCK_ON  = 0b00000101;
         constexpr std::uint8_t CHG_OFF_OTG_OFF_BUCK_ON = 0b00000100;
 
-        constexpr std::uint8_t VSYS_MIN              = 0x80; // 3.6V
+        constexpr std::uint8_t VSYS_MIN = 0x80; // 3.6V
 
         constexpr std::uint16_t nominalCapacitymAh = 1600;
 
@@ -41,6 +41,8 @@ namespace bsp::battery_charger
 
         constexpr auto currentSenseGain = 0.15625;  // mA
         constexpr auto voltageSenseGain = 0.078125; // mV
+
+        constexpr std::uint16_t maxMinMilliVoltGain = 20;
 
         // NTC calibration values
         constexpr std::uint16_t temperatureConversionGain   = 0xEE56;
@@ -468,7 +470,7 @@ namespace bsp::battery_charger
 
         int getCellTemperature()
         {
-            auto value      = fuelGaugeRead(Registers::TEMP_REG);
+            auto value = fuelGaugeRead(Registers::TEMP_REG);
             // Round to integer by stripping fractions
             std::uint8_t temperatureInt = value.second >> 8;
             return utils::twosComplimentToInt(temperatureInt);
@@ -733,9 +735,50 @@ namespace bsp::battery_charger
 
     int getVoltageFilteredMeasurement()
     {
-        auto [retCode, value] = fuelGaugeRead(Registers::AvgVCELL_REG);
+        const auto [_, value] = fuelGaugeRead(Registers::AvgVCELL_REG);
         int voltage           = value * voltageSenseGain;
         return voltage;
+    }
+
+    int getAvgCurrent()
+    {
+        const auto [_, value] = fuelGaugeRead(Registers::AvgCurrent_REG);
+        int current;
+        // 2's compliment into decimal
+        if (value & 0x8000) {
+            // negative numbers
+            std::bitset<16> currentBitset = std::bitset<16>(value - 1);
+            currentBitset.flip();
+            current = static_cast<int>((static_cast<std::uint16_t>(currentBitset.to_ulong()) * -1) * currentSenseGain);
+        }
+        else {
+            // positive numbers
+            current = static_cast<int>(value * currentSenseGain);
+        }
+        return current;
+    }
+
+    MaxMinVolt getMaxMinVolt()
+    {
+        MaxMinVolt ret;
+
+        const auto [_, value] = fuelGaugeRead(Registers::MaxMinVolt_REG);
+        ret.maxMilliVolt      = ((value & 0xFF00) >> 8) * maxMinMilliVoltGain;
+        ret.minMilliVolt      = (value & 0xFF) * maxMinMilliVoltGain;
+
+        return ret;
+    }
+
+    void printFuelGaugeInfo()
+    {
+        const auto maxMinVolt = getMaxMinVolt();
+
+        LOG_INFO("Fuel Gauge info:");
+        LOG_INFO("\tAvgVCell: %dmV", getVoltageFilteredMeasurement());
+        LOG_INFO("\tMaxVolt: %dmV", maxMinVolt.maxMilliVolt);
+        LOG_INFO("\tMinVolt: %dmV", maxMinVolt.minMilliVolt);
+        LOG_INFO("\tAvgCurrent: %dmA", getAvgCurrent());
+        LOG_INFO("\tLevel: %d%%", getBatteryLevel());
     }
 
     BaseType_t INTB_IRQHandler()
