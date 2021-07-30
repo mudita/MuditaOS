@@ -327,6 +327,7 @@ void WorkerEvent::checkBatteryChargerInterrupts()
                 static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::minVAlert));
         }
         if (status & static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::SOCOnePercentChange)) {
+            bsp::battery_charger::printFuelGaugeInfo();
             bsp::battery_charger::clearFuelGuageIRQ(
                 static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::SOCOnePercentChange));
             bsp::battery_charger::getBatteryLevel();
