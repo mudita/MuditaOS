@@ -134,21 +134,20 @@ TEST_CASE("Database initialization scripts")
                                       "FOREIGN KEY(album_id) 	REFERENCES albums(_id)"
                                       ");\n";
 
-    const std::string script_insert = "insert or ignore into artists(name) VALUES('%q');\n";
+    const std::string script_insert = "insert or ignore into tracks(name) VALUES('ala ma kota');\n";
 
-    const std::string script_comment = "--insert or ignore into artists(name) VALUES('%q');\n"
-                                       "insert or ignore into artists(name) VALUES('%q');\n"
-                                       "--insert or ignore into artists(name) VALUES('%q');\n"
-                                       "insert or ignore into artists(name) VALUES('%q');\n";
+    const std::string script_comment = "--insert or ignore into tracks(name) VALUES('ula');\n"
+                                       "insert or ignore into tracks(name) VALUES('ala ma kota');\n"
+                                       "--insert or ignore into tracks(name) VALUES('basia');\n"
+                                       "insert or ignore into tracks(name) VALUES('ala ma kota');\n";
 
-    const std::string script_invalid = "insert artists(name) VALUES('%q');\n";
+    const std::string script_invalid = "inserts error(name) VALUES('super');\n";
 
     SECTION("list files")
     {
         ScopedDir dir("scripts");
 
         auto file = std::fopen(dir("test_1.sql").c_str(), "w");
-        LOG_INFO("test file: %s", dir("test_1.sql").c_str());
         std::fclose(file);
 
         file = std::fopen(dir("test_021.sql").c_str(), "w");
@@ -157,7 +156,7 @@ TEST_CASE("Database initialization scripts")
         file = std::fopen(dir("test_011.sql").c_str(), "w");
         std::fclose(file);
 
-        file = std::fopen(dir("test_003.sql").c_str(), "w");
+        file = std::fopen(dir("test_013.sql").c_str(), "w");
         std::fclose(file);
 
         file = std::fopen(dir("noprefix_003.sql").c_str(), "w");
@@ -169,60 +168,12 @@ TEST_CASE("Database initialization scripts")
 
         REQUIRE(files.size() == 4);
         REQUIRE(files[0] == (std::filesystem::path{"scripts"} / "test_1.sql"));
-        REQUIRE(files[1] == (std::filesystem::path{"scripts"} / "test_003.sql"));
-        REQUIRE(files[2] == (std::filesystem::path{"scripts"} / "test_011.sql"));
+        REQUIRE(files[1] == (std::filesystem::path{"scripts"} / "test_011.sql"));
+        REQUIRE(files[2] == (std::filesystem::path{"scripts"} / "test_013.sql"));
         REQUIRE(files[3] == (std::filesystem::path{"scripts"} / "test_021.sql"));
     }
 
-    SECTION("read script files")
-    {
-        ScopedDir dir("scripts");
-        std::string test_file("read_script_test_1.sql");
-
-        auto file = std::fopen(dir(test_file).c_str(), "w");
-        std::fwrite(script_create.data(), sizeof(char), script_create.size(), file);
-        std::fwrite(script_insert.data(), sizeof(char), script_insert.size(), file);
-        std::fclose(file);
-
-        Database db(dir("test.db").c_str());
-        DatabaseInitializer initializer(&db);
-        auto commands = initializer.readCommands(dir(test_file));
-
-        REQUIRE(commands.size() == 2);
-    }
-
-    SECTION("read empty script files")
-    {
-        ScopedDir dir("scripts");
-        std::string test_file("read_empty_1.sql");
-
-        auto file = std::fopen(dir(test_file).c_str(), "w");
-        std::fclose(file);
-
-        Database db(dir("test.db").c_str());
-        DatabaseInitializer initializer(&db);
-        auto commands = initializer.readCommands(dir(test_file));
-
-        REQUIRE(commands.empty());
-    }
-
-    SECTION("read script file with comment")
-    {
-        ScopedDir dir("read_script_file_with_comment");
-        std::string test_file("test_001.sql");
-
-        auto file = std::fopen(dir(test_file).c_str(), "w");
-        std::fwrite(script_comment.data(), sizeof(char), script_comment.size(), file);
-        std::fclose(file);
-
-        Database db(dir("test.db").c_str());
-        DatabaseInitializer initializer(&db);
-        auto commands = initializer.readCommands(dir(test_file));
-
-        REQUIRE(commands.size() == 2);
-    }
-
-    SECTION("execute valid script")
+    SECTION("execute single valid script")
     {
         ScopedDir dir("execute_valid_script");
         std::string test_file("test_001.sql");
@@ -233,9 +184,89 @@ TEST_CASE("Database initialization scripts")
 
         Database db(dir("test.db").c_str());
         DatabaseInitializer initializer(&db);
-        bool r = initializer.run(dir());
+        auto commands = initializer.readCommands(dir(test_file));
+        REQUIRE(commands.size() == 1);
 
+        bool r = initializer.run(dir());
         REQUIRE(r == true);
+    }
+
+    SECTION("execute 2 valid script files")
+    {
+        ScopedDir dir("scripts");
+        std::string test_file("test_001.sql");
+
+        auto file = std::fopen(dir(test_file).c_str(), "w");
+        std::fwrite(script_create.data(), sizeof(char), script_create.size(), file);
+        std::fwrite(script_insert.data(), sizeof(char), script_insert.size(), file);
+        std::fclose(file);
+
+        Database db(dir("test.db").c_str());
+        DatabaseInitializer initializer(&db);
+        auto commands = initializer.readCommands(dir(test_file));
+        REQUIRE(commands.size() == 2);
+
+        bool result = initializer.run(dir());
+        REQUIRE(result == true);
+    }
+
+    SECTION("execute multiple valid script files")
+    {
+        ScopedDir dir("scripts");
+        std::string test_file("test_001.sql");
+
+        auto file = std::fopen(dir(test_file).c_str(), "w");
+        std::fwrite(script_create.data(), sizeof(char), script_create.size(), file);
+        std::fwrite(script_insert.data(), sizeof(char), script_insert.size(), file);
+        std::fwrite(script_insert.data(), sizeof(char), script_insert.size(), file);
+        std::fwrite(script_insert.data(), sizeof(char), script_insert.size(), file);
+        std::fwrite(script_insert.data(), sizeof(char), script_insert.size(), file);
+        std::fwrite(script_insert.data(), sizeof(char), script_insert.size(), file);
+        std::fclose(file);
+
+        Database db(dir("test.db").c_str());
+        DatabaseInitializer initializer(&db);
+        auto commands = initializer.readCommands(dir(test_file));
+        REQUIRE(commands.size() == 6);
+
+        bool result = initializer.run(dir());
+        REQUIRE(result == true);
+    }
+
+    SECTION("execute empty script files")
+    {
+        ScopedDir dir("scripts");
+        std::string test_file("test_001.sql");
+
+        auto file = std::fopen(dir(test_file).c_str(), "w");
+        std::fclose(file);
+
+        Database db(dir("test.db").c_str());
+        DatabaseInitializer initializer(&db);
+        auto commands = initializer.readCommands(dir(test_file));
+        REQUIRE(commands.empty());
+
+        bool result = initializer.run(dir());
+        REQUIRE(result == true);
+    }
+
+    SECTION("execute script file with comment")
+    {
+        ScopedDir dir("read_script_file_with_comment");
+        std::string test_file("test_001.sql");
+
+        auto file = std::fopen(dir(test_file).c_str(), "w");
+        std::fwrite(script_create.data(), sizeof(char), script_create.size(), file);
+        std::fwrite(script_comment.data(), sizeof(char), script_comment.size(), file);
+        std::fclose(file);
+
+        Database db(dir("test.db").c_str());
+        DatabaseInitializer initializer(&db);
+        auto commands = initializer.readCommands(dir(test_file));
+        REQUIRE(commands.size() == 3);
+
+        bool result = initializer.run(dir());
+        REQUIRE(result == true);
     }
 
     SECTION("execute invalid script")
@@ -244,13 +275,16 @@ TEST_CASE("Database initialization scripts")
         std::string test_file("test_001.sql");
 
         auto file = std::fopen(dir(test_file).c_str(), "w");
+        std::fwrite(script_create.data(), sizeof(char), script_create.size(), file);
         std::fwrite(script_invalid.data(), sizeof(char), script_invalid.size(), file);
         std::fclose(file);
 
         Database db(dir("test.db").c_str());
         DatabaseInitializer initializer(&db);
-        bool result = initializer.run(dir());
+        auto commands = initializer.readCommands(dir(test_file));
+        REQUIRE(commands.size() == 2);
 
+        bool result = initializer.run(dir());
         REQUIRE(result == false);
     }
 
