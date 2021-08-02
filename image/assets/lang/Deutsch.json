@@ -510,7 +510,7 @@
   "app_phonebook_options_forward_namecard": "Visitenkarte weiterleiten",
   "app_phonebook_options_send_sms": "Als SMS senden",
   "app_phonebook_new_contact_first_name": "Vorname",
-  "app_phonebook_new_contact_second_name": "Nachname",
+  "app_phonebook_new_contact_last_name": "Nachname",
   "app_phonebook_new_contact_number": "Nummer",
   "app_phonebook_new_contact_second_number": "Zweite Nummer",
   "app_phonebook_new_contact_email": "E-Mail",
