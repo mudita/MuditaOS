@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #define CATCH_CONFIG_MAIN
@@ -30,9 +30,9 @@ TEST_CASE("Test audio tags")
             REQUIRE(dec);
             auto tags = dec->fetchTags();
             REQUIRE(tags);
-            REQUIRE(tags->title == ext + " Test track title");
-            REQUIRE(tags->artist == ext + " Test artist name");
-            REQUIRE(tags->album == ext + " Test album title");
+            REQUIRE(tags->title == ext + " Test track title - łąki");
+            REQUIRE(tags->artist == ext + " Test artist name - łąki");
+            REQUIRE(tags->album == ext + " Test album title - łąki");
             REQUIRE(tags->year == "2020");
         }
     }
