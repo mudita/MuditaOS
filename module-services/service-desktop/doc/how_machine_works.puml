@@ -1,4 +1,5 @@
 @startuml
+skinparam BackgroundColor F0F0F0
 Worker -> Worker : get data
 Worker --> ServiceDesktop : pass frame
 ServiceDesktop -> ServiceDesktop :  parse payload{ data request }

@@ -1,4 +1,5 @@
 @startuml
+skinparam BackgroundColor F0F0F0
 (*) --> If "Ramp target reached?" then
     If "New target differs by \nhysteresis value from \nthe old one?" then
     -> [Yes] "update ramp" as ur
