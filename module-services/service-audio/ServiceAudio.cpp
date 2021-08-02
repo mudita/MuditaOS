@@ -194,7 +194,11 @@ constexpr bool ServiceAudio::IsResumable(const audio::PlaybackType &type) const
 
 constexpr bool ServiceAudio::ShouldLoop(const std::optional<audio::PlaybackType> &type) const
 {
-    return type.value_or(audio::PlaybackType::None) == audio::PlaybackType::CallRingtone;
+    return type.value_or(audio::PlaybackType::None) == audio::PlaybackType::CallRingtone
+#if ENABLE_PLAYBACK_AUTO_REPEAT == 1
+           || type.value_or(audio::PlaybackType::None) == audio::PlaybackType::Multimedia
+#endif
+        ;
 }
 
 bool ServiceAudio::IsVibrationEnabled(const audio::PlaybackType &type)
