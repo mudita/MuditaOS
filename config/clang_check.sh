@@ -41,8 +41,9 @@ get_files_to_check()
 # could be in better place than tmp
 get_compile_commands()
 {
-    [[ -f build-linux-Debug/compile_commands.json ]] || ./configure.sh linux debug -DCMAKE_EXPORT_COMPILE_COMMANDS=1 > /dev/null 2>&1
-    cp build-linux-Debug/compile_commands.json /tmp/compile_commands.json
+    product=$1
+    [[ -f build-$product-linux-Debug/compile_commands.json ]] || ./configure.sh $product linux debug -DCMAKE_EXPORT_COMPILE_COMMANDS=1 > /dev/null 2>&1
+    cp build-$product-linux-Debug/compile_commands.json /tmp/compile_commands.json
     sed -i 's|-static-libasan||g'     /tmp/compile_commands.json
     sed -i 's|-Wno-literal-suffix||g' /tmp/compile_commands.json
 }
@@ -70,7 +71,7 @@ main()
 
     # get the stage
     verify_clang_format_version
-    get_compile_commands
+    get_compile_commands purephone
     # run tidy
     git diff -U0 --no-color remotes/origin/master...HEAD $files_to_check | ${tool[*]} -p 1 -path=/tmp/
 }
