@@ -20,6 +20,11 @@ target_sources(service-audio
         include/service-audio/ServiceAudio.hpp
 )
 
+option(ENABLE_PLAYBACK_AUTO_REPEAT "Enable Playback auto repeat" OFF)
+if(${ENABLE_PLAYBACK_AUTO_REPEAT})
+    target_compile_definitions(${PROJECT_NAME} PUBLIC ENABLE_PLAYBACK_AUTO_REPEAT=1)
+endif()
+
 target_link_libraries(service-audio
     PRIVATE
         log
