@@ -114,6 +114,7 @@ namespace gui::status_bar
         centralBox = new HBox(this, 0, 0, 0, 0);
         centralBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Bottom));
         centralBox->setEdges(RectangleEdge::None);
+        centralBox->setMinimumWidth(boxes::center::minX);
         lock = new Lock(centralBox, 0, 0);
         lock->setMargins(Margins(0, 0, 0, margins::iconBottom));
         time = new Time(centralBox, 0, 0, 0, 0);
