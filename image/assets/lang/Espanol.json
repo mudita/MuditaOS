@@ -510,7 +510,7 @@
   "app_phonebook_options_forward_namecard": "Reenviar tarjeta de visita",
   "app_phonebook_options_send_sms": "Enviar por SMS",
   "app_phonebook_new_contact_first_name": "Nombre",
-  "app_phonebook_new_contact_second_name": "Apellido",
+  "app_phonebook_new_contact_last_name": "Apellido",
   "app_phonebook_new_contact_number": "Número",
   "app_phonebook_new_contact_second_number": "Número alternativo",
   "app_phonebook_new_contact_email": "Correo electrónico",

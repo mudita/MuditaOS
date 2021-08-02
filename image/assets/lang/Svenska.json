@@ -396,7 +396,7 @@
   "app_phonebook_options_forward_namecard": "Vidarebefordra kontaktuppgifter",
   "app_phonebook_options_send_sms": "Skicka över SMS",
   "app_phonebook_new_contact_first_name": "Förnamn",
-  "app_phonebook_new_contact_second_name": "Efternamn",
+  "app_phonebook_new_contact_last_name": "Efternamn",
   "app_phonebook_new_contact_number": "Nummer",
   "app_phonebook_new_contact_second_number": "Alternativnummer",
   "app_phonebook_new_contact_email": "Mail",
