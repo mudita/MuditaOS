@@ -6,6 +6,35 @@ To install the new version of MuditaOS please follow the steps described in this
 - [Linux](https://github.com/mudita/MuditaOS/blob/master/doc/boot_and_update.md#creating-a-storage-partition)
 - [Windows and macOS](https://github.com/mudita/MuditaOS/blob/master/doc/flashing_win_macos.md)
 
+## [0.75.1 2021-08-02]
+
+* [BH-380] Librarize application-calendar
+* [BH-564] Add Time&Units application
+* [BH-564] Time&Units scaling fix
+* [BH-663] Fix CMake in service-antenna
+* [BH-669] Fix CMake in service-appmgr
+* [BH-671] Fixed CMake in service-audio
+* [BH-675] Add TextSpinner
+* [BH-677] Add widget AlarmSetSpinner
+* [BH-700] Add minimal Alarm app
+* [CP-207] Add option to disable dev mode endpoint
+* [CP-225] Create contact using post method, and update it using put
+* [CP-261] Print crash occurences to log
+* [CP-371] Updater miscelanous developer mode and logs changes
+* [CP-434] Restore checksums.txt for legacy update
+* [EGD-6723] Music Player application skeleton
+* [EGD-6881] Fix HSP no sound
+* [EGD-7031] Remove UT deps to the production image
+* [EGD-7083] Fixed earspeaker bt HSP
+* [EGD-7127] Store imported contacts in DB
+* [EGD-7161] Remove image name reference in vfs
+* [EGD-7163] Disable auto locking when playing music
+* [EGD-7204] Revert of msp register and clear IRQ flags
+* [EGD-7204] Set msp register and clear IRQ flags
+* [EGD-7206] Fix audio profiles priorities
+* [EGD-7211] Sim contacts import selector UI part
+* [EGD-7227] Fix update package generation
+
 ## [0.74.1 2021-07-26]
 
 * [BH-362] Move segger to a separate directory
