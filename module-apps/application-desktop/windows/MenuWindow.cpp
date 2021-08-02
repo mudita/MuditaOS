@@ -260,6 +260,7 @@ namespace gui
                                       app::manager::actions::Launch,
                                       std::make_unique<app::ApplicationLaunchData>("ApplicationCalculator"));
                               }},
+#ifdef ENABLE_APP_ANTENNA
                 new gui::Tile{"menu_tools_recorder_W_G",
                               "app_desktop_tools_antenna",
                               [=](gui::Item &item) {
@@ -268,6 +269,7 @@ namespace gui
                                       app::manager::actions::Launch,
                                       std::make_unique<app::ApplicationLaunchData>("ApplicationAntenna"));
                               }},
+#endif
             });
 
         using namespace style::window;

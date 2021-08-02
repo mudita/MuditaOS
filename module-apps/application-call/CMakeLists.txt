@@ -36,13 +36,6 @@ target_sources(application-call
 		include/application-call/CallState.hpp
 )
 
-option(ENABLE_APP_CALL "Enable application call" ON)
-
-target_compile_definitions(application-call
-    INTERFACE
-        $<$<BOOL:${ENABLE_APP_CALL}>:ENABLE_APP_CALL>
-)
-
 target_link_libraries(application-call
     PRIVATE
 		i18n

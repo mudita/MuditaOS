@@ -38,13 +38,6 @@ target_sources(application-music-player
         include/application-music-player/ApplicationMusicPlayer.hpp
 )
 
-option(ENABLE_APP_MUSIC_PLAYER "Enable application music player" ON)
-
-target_compile_definitions(application-music-player
-    INTERFACE
-        $<$<BOOL:${ENABLE_APP_MUSIC_PLAYER}>:ENABLE_APP_MUSIC_PLAYER>
-)
-
 target_link_libraries(application-music-player
     PRIVATE
         i18n
