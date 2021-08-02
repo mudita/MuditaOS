@@ -1,4 +1,5 @@
 @startuml
+skinparam BackgroundColor F0F0F0
 participant "Service E Ink" as eink
 participant "Service GUI" as gui
 participant "Context Pool" as pool

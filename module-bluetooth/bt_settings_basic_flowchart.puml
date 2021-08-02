@@ -1,4 +1,5 @@
 @startuml
+skinparam BackgroundColor F0F0F0
 
 [Service DB] as srvcdb
 [Service Bluetooth] as srvcbt

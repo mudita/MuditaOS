@@ -1,4 +1,5 @@
 @startuml
+skinparam BackgroundColor F0F0F0
 
 [Service Cellular] as srvclr
 [Application Manager] as apmmgr

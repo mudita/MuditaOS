@@ -1,5 +1,5 @@
-
 @startuml
+skinparam BackgroundColor F0F0F0
 == Vol Change - from BT ==
 BT ->  EVM: Vol Change request (same key symualtion)
 EVM -> App: Vol Change request process Audio
