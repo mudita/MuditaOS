@@ -1,4 +1,4 @@
-option(PRODUCT "The product to be configured and built." PurePhone)
+set(PRODUCT "PurePhone" CACHE STRING "The product to be configured and built.")
 
 macro(validate_product_selection)
     # create list of valid products
