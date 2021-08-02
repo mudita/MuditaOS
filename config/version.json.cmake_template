@@ -16,7 +16,7 @@
     "version":
     {
         "major": "@CMAKE_PROJECT_VERSION_MAJOR@",
-                "minor": "@CMAKE_PROJECT_VERSION_MINOR@",
+        "minor": "@CMAKE_PROJECT_VERSION_MINOR@",
         "patch": "@CMAKE_PROJECT_VERSION_PATCH@",
         "string": "@CMAKE_PROJECT_VERSION@"
     },
@@ -28,6 +28,7 @@
     },
     "boot":
     {
+        "version": "@BOOT_VERSION@",
         "filename": "@BOOT_FILENAME@",
         "md5sum": "@BOOT_MD5SUM@"
     }
