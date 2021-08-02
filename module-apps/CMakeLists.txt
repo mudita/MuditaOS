@@ -8,42 +8,48 @@ module_is_test_entity()
 
 add_library(${PROJECT_NAME} STATIC)
 
-add_subdirectory(application-antenna)
-add_subdirectory(application-bell-alarm)
-add_subdirectory(application-bell-main)
-add_subdirectory(application-bell-settings)
-add_subdirectory(application-calculator)
-add_subdirectory(application-calendar)
-add_subdirectory(application-call)
-add_subdirectory(application-desktop)
-add_subdirectory(application-meditation)
-add_subdirectory(application-messages)
-add_subdirectory(application-music-player)
-add_subdirectory(application-notes)
-add_subdirectory(application-phonebook)
-add_subdirectory(application-calllog)
-add_subdirectory(application-special-input)
 add_subdirectory(apps-common)
 
+option(ENABLE_APP_ANTENNA "Enable application antenna" OFF)
+
 set(APPLICATIONS
-    clock
-    settings
-    onboarding
     alarm-clock
+    antenna
+    bell-alarm
+    bell-main
+    bell-settings
+    calculator
+    calendar
+    call
+    clock
+    desktop
+    meditation
+    messages
+    music-player
+    notes
+    onboarding
+    phonebook
+    calllog
+    special-input
+    settings
 )
 
 list(SORT APPLICATIONS)
 foreach(app IN LISTS APPLICATIONS)
     string(TOUPPER ${app} app_upper)
     string(REPLACE "-" "_" app_macro_name ${app_upper})
-    option(ENABLE_APP_${app_macro_name} "Enable application ${app}" ON)
-    
+    if (NOT DEFINED ENABLE_APP_${app_macro_name})
+        option(ENABLE_APP_${app_macro_name} "Enable application ${app}" ON)
+    endif()
+
     if(ENABLE_APP_${app_macro_name})
         message("Enabling application: ${app}")
-        add_subdirectory( application-${app} )
+        add_subdirectory(application-${app})
         list(APPEND ENABLED_APPS_DEFINES "ENABLE_APP_${app_macro_name}")
     endif()
 endforeach()
+
+target_compile_definitions(application-desktop PRIVATE "${ENABLED_APPS_DEFINES}")
 set(ENABLED_APPS_DEFINES ${ENABLED_APPS_DEFINES} PARENT_SCOPE)
 
 if(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
