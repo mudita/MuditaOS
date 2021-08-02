@@ -9,6 +9,7 @@ function(add_version_json SOURCE_TARGET)
             -DBOOTLOADER_VERSION_FILE=${CMAKE_BINARY_DIR}/ecoboot.version
             -DBOOT_FILENAME=boot.bin
             -DBOOT_FILE=$<TARGET_FILE:${SOURCE_TARGET}>
+            -DBOOT_VERSION=${CMAKE_PROJECT_VERSION}
             -B ${CMAKE_BINARY_DIR}
             -P ${CMAKE_SOURCE_DIR}/cmake/modules/ConfigureVersionJson.cmake
         DEPENDS ecoboot.bin-target
