@@ -1,4 +1,5 @@
 @startuml
+skinparam BackgroundColor F0F0F0
 (*) --> [initialization] "measurement" as meas
 "teperature range\n violation interrupt" -> meas
 If "Detected range" then
