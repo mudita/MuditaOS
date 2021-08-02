@@ -25,7 +25,7 @@ namespace gui
                            phonebookStyle::inputLinesWithLabelWidget::span_size +
                            phonebookStyle::inputLinesWithLabelWidget::input_text_h * lines +
                            (phonebookStyle::inputLinesWithLabelWidget::line_spacing * (lines - 1)));
-        setMargins(gui::Margins(style::widgets::leftMargin, style::margins::huge, 0, 0));
+        setMargins(gui::Margins(style::widgets::leftMargin, style::margins::large, 0, 0));
 
         vBox = new VBox(this, 0, 0, 0, 0);
         vBox->setEdges(RectangleEdge::None);
@@ -140,7 +140,7 @@ namespace gui
     }
     void InputLinesWithLabelIWidget::secondNameHandler()
     {
-        titleLabel->setText(utils::translate("app_phonebook_new_contact_second_name"));
+        titleLabel->setText(utils::translate("app_phonebook_new_contact_last_name"));
         inputText->setTextType(TextType::SingleLine);
 
         onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) {
