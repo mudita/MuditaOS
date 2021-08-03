@@ -18,7 +18,10 @@ namespace gui
 
       private:
         void buildInterface() override;
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        void imeiReady() noexcept override;
 
+        ListView *list = nullptr;
         std::shared_ptr<TechnicalWindowContract::Presenter> presenter;
     };
 
