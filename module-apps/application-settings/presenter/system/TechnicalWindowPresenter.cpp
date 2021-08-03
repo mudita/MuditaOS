@@ -3,11 +3,24 @@
 
 #include "TechnicalWindowPresenter.hpp"
 
-TechnicalWindowPresenter::TechnicalWindowPresenter(std::shared_ptr<gui::ListItemProvider> technicalInformationProvider)
-    : technicalInformationProvider{std::move(technicalInformationProvider)}
-{}
+TechnicalWindowPresenter::TechnicalWindowPresenter(
+    app::Application *application, std::shared_ptr<TechnicalInformationModel> technicalInformationProvider)
+    : application(application), technicalInformationProvider{std::move(technicalInformationProvider)}
+{
+    onImeiReady = [&]() {
+        this->technicalInformationProvider->clearData();
+        this->technicalInformationProvider->createData();
+        getView()->imeiReady();
+        this->application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+    };
+}
 
 std::shared_ptr<gui::ListItemProvider> TechnicalWindowPresenter::getTechnicalInformationProvider() const
 {
     return technicalInformationProvider;
+}
+
+void TechnicalWindowPresenter::requestImei()
+{
+    technicalInformationProvider->requestImei(onImeiReady);
 }
