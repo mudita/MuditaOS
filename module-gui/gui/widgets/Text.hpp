@@ -88,8 +88,8 @@ namespace gui
         auto handleNavigation(const InputEvent &inputEvent) -> bool;
         auto handleRemovalChar(const InputEvent &inputEvent) -> bool;
         auto handleWholeTextRemoval(const InputEvent &inputEvent) -> bool;
-        auto handleDigitLongPress(const InputEvent &inputEvent) -> bool;
         auto handleAddChar(const InputEvent &inputEvent) -> bool;
+        auto handleLongPressAddChar(const InputEvent &inputEvent) -> bool;
 
         [[nodiscard]] auto getSizeMinusPadding(Axis axis, Area val) -> Length;
         auto applyParentSizeRestrictions() -> void;
