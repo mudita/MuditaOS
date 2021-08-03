@@ -227,6 +227,8 @@ class ServiceCellular : public sys::Service
     uint32_t ussdTimeout = 0;
     void setUSSDTimer();
     bool handleUSSDRequest(CellularUSSDMessage::RequestType requestType, const std::string &request = "");
+    bool handleIMEIRequest();
+
     bool handleUSSDURC();
     void handleUSSDTimer();
 
