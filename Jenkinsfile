@@ -19,6 +19,7 @@ pipeline {
   agent {
     node {
       label 'jenkins-slave-ccache-ram'
+      customWorkspace "/home/jenkins/workspace/${JOB_NAME}/${BUILD_NUMBER}"
     }
   }
   options{
@@ -123,7 +124,7 @@ ccache --show-stats'''
             }
 
             steps {
-                echo "Build"
+                echo "Configure"
                 sh '''#!/bin/bash -e
 echo "JOBS=${JOBS}"
 pushd "${WORKSPACE}"
@@ -131,17 +132,9 @@ echo "./configure.sh pure linux Debug -G Ninja"
 
 ./configure.sh pure linux Debug -G Ninja
 
-pushd build-purephone-linux-Debug
-ninja -j ${JOBS}
-popd
-
 echo "./configure.sh bell linux Debug -G Ninja"
 
 ./configure.sh bell linux Debug -G Ninja
-
-pushd build-bell-linux-Debug
-ninja -j ${JOBS}
-popd
 
 popd'''
             echo "Clang Tidy check"
@@ -150,6 +143,21 @@ popd'''
 pushd ${WORKSPACE}
 ./config/clang_check.sh
 popd'''
+                echo "Build"
+                sh '''#!/bin/bash -e
+echo "JOBS=${JOBS}"
+pushd "${WORKSPACE}"
+
+pushd build-purephone-linux-Debug
+ninja -j ${JOBS}
+popd
+
+pushd build-bell-linux-Debug
+ninja -j ${JOBS}
+popd
+
+popd'''
+
                 echo "Build Unit Tests"
                 sh '''#!/bin/bash -e
 pushd "${WORKSPACE}"
@@ -201,8 +209,15 @@ popd'''
     }
   }
   post {
-    always {
-        cleanWs()
-    }
+      cleanup {
+          deleteDir()
+          dir("${workspace}@tmp") {
+              deleteDir()
+          }
+          dir("${workspace}@script") {
+              deleteDir()
+          }
+      }
   }
+
 }
