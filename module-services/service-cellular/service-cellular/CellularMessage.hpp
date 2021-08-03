@@ -936,4 +936,28 @@ namespace cellular
       private:
         std::shared_ptr<std::vector<SimContact>> contacts;
     };
+
+    class GetImeiRequest : public sys::DataMessage
+    {
+      public:
+        GetImeiRequest() : sys::DataMessage(MessageType::MessageTypeUninitialized){};
+    };
+
+    class GetImeiResponse : public sys::ResponseMessage
+    {
+      public:
+        explicit GetImeiResponse(std::shared_ptr<std::string> imei)
+            : sys::ResponseMessage(sys::ReturnCodes::Success), imei(imei)
+        {}
+        GetImeiResponse() : sys::ResponseMessage(sys::ReturnCodes::Failure)
+        {}
+        auto getImei() -> std::shared_ptr<std::string>
+        {
+            return imei;
+        }
+
+      private:
+        std::shared_ptr<std::string> imei;
+    };
+
 } // namespace cellular

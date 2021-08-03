@@ -502,8 +502,9 @@ namespace app
         });
         windowsFactory.attach(gui::window::name::technical_information, [&](Application *app, const std::string &name) {
             auto factoryData = std::make_unique<FactoryData>(*settings);
-            auto model       = std::make_unique<TechnicalInformationModel>(std::move(factoryData));
-            auto presenter   = std::make_unique<TechnicalWindowPresenter>(std::move(model));
+            auto repository  = std::make_unique<TechnicalInformationRepository>(this);
+            auto model     = std::make_unique<TechnicalInformationModel>(std::move(factoryData), std::move(repository));
+            auto presenter = std::make_unique<TechnicalWindowPresenter>(this, std::move(model));
             return std::make_unique<gui::TechnicalInformationWindow>(app, std::move(presenter));
         });
         windowsFactory.attach(gui::window::name::certification, [](Application *app, const std::string &name) {
