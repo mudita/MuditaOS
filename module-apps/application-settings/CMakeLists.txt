@@ -27,6 +27,7 @@ target_sources( ${PROJECT_NAME}
         models/apps/SoundsModel.cpp
         models/system/DateAndTimeModel.cpp
         models/system/SARInfoRepository.cpp
+        models/system/TechnicalInformationRepository.cpp
         models/system/FactoryData.cpp
         models/system/TechnicalInformationModel.cpp
         presenter/network/SimContactsImportWindowPresenter.cpp

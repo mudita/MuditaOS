@@ -26,7 +26,8 @@ namespace cellular::internal
 {
     ServiceCellularPriv::ServiceCellularPriv(ServiceCellular *owner)
         : owner{owner}, simCard{std::make_unique<SimCard>()}, state{std::make_unique<State>(owner)},
-          networkTime{std::make_unique<NetworkTime>()}, simContacts{std::make_unique<SimContacts>()}
+          networkTime{std::make_unique<NetworkTime>()}, simContacts{std::make_unique<SimContacts>()},
+          imeiGetHandler{std::make_unique<service::ImeiGetHandler>()}
     {
         initSimCard();
         initSMSSendHandler();
@@ -274,6 +275,17 @@ namespace cellular::internal
                     std::make_shared<std::vector<cellular::SimContact>>(contacts));
             }
             return std::make_shared<cellular::GetSimContactsResponse>();
+        });
+    }
+
+    void ServiceCellularPriv::connectImeiGetHandler()
+    {
+        owner->connect(typeid(cellular::GetImeiRequest), [&](sys::Message *request) -> sys::MessagePointer {
+            std::string imei;
+            if (imeiGetHandler->getImei(imei)) {
+                return std::make_shared<cellular::GetImeiResponse>(std::make_shared<std::string>(imei));
+            }
+            return std::make_shared<cellular::GetImeiResponse>();
         });
     }
 

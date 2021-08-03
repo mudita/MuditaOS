@@ -10,6 +10,7 @@
 #include "SimCard.hpp"
 #include "NetworkTime.hpp"
 #include "SimContacts.hpp"
+#include "ImeiGetHandler.hpp"
 
 namespace cellular::internal
 {
@@ -27,6 +28,7 @@ namespace cellular::internal
         std::unique_ptr<State> state;
         std::unique_ptr<NetworkTime> networkTime;
         std::unique_ptr<SimContacts> simContacts;
+        std::unique_ptr<service::ImeiGetHandler> imeiGetHandler;
         State::PowerState nextPowerState = State::PowerState::Off;
 
       public:
@@ -35,6 +37,7 @@ namespace cellular::internal
         void connectSimCard();
         void connectNetworkTime();
         void connectSimContacts();
+        void connectImeiGetHandler();
 
         void requestNetworkTimeSettings();
 
