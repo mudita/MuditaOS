@@ -273,7 +273,7 @@ namespace gui
             debug_text("handleAddChar");
             return true;
         }
-        if (handleDigitLongPress(evt)) {
+        if (handleLongPressAddChar(evt)) {
             debug_text("handleDigitLongPress");
             return true;
         }
@@ -600,19 +600,30 @@ namespace gui
         return false;
     }
 
-    bool Text::handleDigitLongPress(const InputEvent &inputEvent)
+    auto Text::handleLongPressAddChar(const InputEvent &inputEvent) -> bool
     {
         if (!inputEvent.isLongRelease()) {
             return false;
         }
-
-        if (!inputEvent.isDigit()) {
+        if (!isMode(EditMode::Edit)) {
             return false;
         }
 
-        if (const auto val = inputEvent.numericValue(); checkAdditionBounds(val) == AdditionBound::CanAddAll) {
+        // check input event handling accordingly to input mode
+        auto code = text::npos;
+
+        // phone mode
+        if (mode->is(InputMode::phone) && inputEvent.is(KeyCode::KEY_0)) {
+            code = '+';
+        }
+        // all other modes only handle digits
+        else if (inputEvent.isDigit()) {
+            code = intToAscii(inputEvent.numericValue());
+        }
+
+        if (code != text::npos && checkAdditionBounds(code) == AdditionBound::CanAddAll) {
             setCursorStartPosition(CursorStartPosition::Offset);
-            addChar(intToAscii(val));
+            addChar(code);
             onTextChanged();
             return true;
         }
