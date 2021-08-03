@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <application-settings/models/system/TechnicalInformationModel.hpp>
+
 #include <BasePresenter.hpp>
 #include <ListItemProvider.hpp>
 
@@ -13,6 +15,7 @@ class TechnicalWindowContract
     {
       public:
         virtual ~View() noexcept = default;
+        virtual void imeiReady() noexcept = 0;
     };
     class Presenter : public app::BasePresenter<TechnicalWindowContract::View>
     {
@@ -20,16 +23,21 @@ class TechnicalWindowContract
         virtual ~Presenter() noexcept = default;
 
         virtual std::shared_ptr<gui::ListItemProvider> getTechnicalInformationProvider() const = 0;
+        virtual void requestImei()                                                             = 0;
     };
 };
 
 class TechnicalWindowPresenter : public TechnicalWindowContract::Presenter
 {
   public:
-    explicit TechnicalWindowPresenter(std::shared_ptr<gui::ListItemProvider> technicalInformationProvider);
+    explicit TechnicalWindowPresenter(app::Application *application,
+                                      std::shared_ptr<TechnicalInformationModel> technicalInformationProvider);
 
     std::shared_ptr<gui::ListItemProvider> getTechnicalInformationProvider() const override;
+    void requestImei() override;
 
   private:
-    std::shared_ptr<gui::ListItemProvider> technicalInformationProvider;
+    app::Application *application{};
+    std::shared_ptr<TechnicalInformationModel> technicalInformationProvider;
+    std::function<void()> onImeiReady = nullptr;
 };

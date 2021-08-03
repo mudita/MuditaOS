@@ -9,8 +9,9 @@
 #include <source/version.hpp>
 #include <i18n/i18n.hpp>
 
-TechnicalInformationModel::TechnicalInformationModel(std::unique_ptr<AbstractFactoryData> &&factoryData)
-    : factoryData{std::move(factoryData)}
+TechnicalInformationModel::TechnicalInformationModel(std::unique_ptr<AbstractFactoryData> &&factoryData,
+                                                     std::unique_ptr<AbstractTechnicalInformationRepository> repository)
+    : factoryData{std::move(factoryData)}, technicalInformationRepository(std::move(repository))
 {
     createData();
 }
@@ -47,7 +48,8 @@ void TechnicalInformationModel::createData()
     internalData.push_back(
         new gui::TechnicalInformationItem(utils::translate("app_settings_tech_info_os_version"), std::string(VERSION)));
 
-    internalData.push_back(new gui::TechnicalInformationItem(utils::translate("app_settings_tech_info_imei"), imei));
+    internalData.push_back(new gui::TechnicalInformationItem(utils::translate("app_settings_tech_info_imei"),
+                                                             technicalInformationRepository->getImei()));
 
 #if DEVELOPER_SETTINGS_OPTIONS == 1
     internalData.push_back(new gui::TechnicalInformationItem(utils::translate("app_settings_tech_info_battery"),
@@ -69,4 +71,15 @@ void TechnicalInformationModel::createData()
     for (auto item : internalData) {
         item->deleteByList = false;
     }
+}
+
+void TechnicalInformationModel::clearData()
+{
+    list->reset();
+    eraseInternalData();
+}
+
+void TechnicalInformationModel::requestImei(std::function<void()> onImeiReadCallback)
+{
+    technicalInformationRepository->readImei(std::move(onImeiReadCallback));
 }

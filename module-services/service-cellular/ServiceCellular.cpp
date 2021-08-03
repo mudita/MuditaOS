@@ -299,6 +299,7 @@ void ServiceCellular::registerMessageHandlers()
     priv->connectSimCard();
     priv->connectNetworkTime();
     priv->connectSimContacts();
+    priv->connectImeiGetHandler();
 
     connect(typeid(CellularStartOperatorsScanMessage), [&](sys::Message *request) -> sys::MessagePointer {
         auto msg = static_cast<CellularStartOperatorsScanMessage *>(request);
@@ -385,6 +386,7 @@ void ServiceCellular::registerMessageHandlers()
             priv->simCard->setChannel(nullptr);
             priv->networkTime->setChannel(nullptr);
             priv->simContacts->setChannel(nullptr);
+            priv->imeiGetHandler->setChannel(nullptr);
 
             cmux->closeChannels();
             ///> change state - simulate hot start
@@ -853,6 +855,7 @@ bool ServiceCellular::handle_audio_conf_procedure()
             priv->simCard->setChannel(cmux->get(CellularMux::Channel::Commands));
             priv->networkTime->setChannel(cmux->get(CellularMux::Channel::Commands));
             priv->simContacts->setChannel(cmux->get(CellularMux::Channel::Commands));
+            priv->imeiGetHandler->setChannel(cmux->get(CellularMux::Channel::Commands));
             // open channel - notifications
             DLCChannel *notificationsChannel = cmux->get(CellularMux::Channel::Notifications);
             if (notificationsChannel != nullptr) {
