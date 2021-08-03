@@ -237,6 +237,16 @@ TEST_CASE("handle longpress for digit in ABC mode")
     REQUIRE(str == text.getText());
 }
 
+TEST_CASE("handle longpress for digit in phone mode")
+{
+    auto text  = gui::TestText();
+    auto str   = text.getText() + "+";
+    auto key_0 = gui::InputEvent({}, gui::InputEvent::State::keyReleasedLong, gui::KeyCode::KEY_0);
+    text.setInputMode(new InputMode({InputMode::phone}));
+    text.onInput(key_0);
+    REQUIRE(str == text.getText());
+}
+
 TEST_CASE("Handle backspace longpress")
 {
     auto text          = gui::TestText();
