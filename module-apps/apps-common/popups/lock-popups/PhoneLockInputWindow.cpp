@@ -59,6 +59,7 @@ namespace gui
         rebuild();
         lockBox = std::make_unique<PhoneLockBox>(this, phoneLockInputTypeAction);
         lockBox->buildLockBox(lock->getMaxInputSize());
+        lockBox->update(lock->getCharCount());
 
         setVisibleState();
     }
