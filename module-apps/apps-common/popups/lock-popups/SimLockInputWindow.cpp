@@ -68,6 +68,7 @@ namespace gui
         rebuild();
         lockBox = std::make_unique<SimLockBox>(this, simLockInputTypeAction);
         lockBox->buildLockBox(lock->getMaxInputSize());
+        lockBox->update(lock->getCharCount());
 
         setVisibleState();
     }

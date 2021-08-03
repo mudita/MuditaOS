@@ -30,6 +30,11 @@ namespace gui
         buildPinLabels(charNum + 1);
     }
 
+    void LockBoxAlternatingSize::update(unsigned int inputFilled)
+    {
+        buildPinLabels(inputFilled);
+    }
+
     void LockBoxAlternatingSize::buildPinLabels(unsigned int pinSize)
     {
         if (lockWindow->pinLabelsBox) {
