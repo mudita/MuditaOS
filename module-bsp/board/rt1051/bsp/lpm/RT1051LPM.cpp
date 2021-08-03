@@ -89,7 +89,6 @@ namespace bsp
             CpuFreq->SetCpuFrequency(CpuFreqLPM::CpuClock::CpuClock_Pll2_528_Mhz);
             break;
         }
-        LOG_INFO("CPU frequency changed to %lu", CLOCK_GetFreq(kCLOCK_CpuClk));
     }
 
     void RT1051LPM::SetHighestCoreVoltage()
