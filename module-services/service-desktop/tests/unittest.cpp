@@ -405,23 +405,3 @@ TEST_CASE("FileContext UT Test Valid Input")
     }
 }
 
-TEST_CASE("FileContext UT Test Invalid Input")
-{
-    auto filePath{"/sys/user/music/SMS-drum2-stereo.mp3"};
-
-    SECTION("Create file context for file with invalid file size")
-    {
-        auto fileSize{0u};
-        auto chunkSize{1024 * 3u};
-
-        REQUIRE_THROWS_WITH(FileReadContext(filePath, fileSize, chunkSize), "Invalid FileContext arguments");
-    }
-
-    SECTION("Create file context for file with invalid chunk size")
-    {
-        auto fileSize{49146u};
-        auto chunkSize{0u};
-
-        REQUIRE_THROWS_WITH(FileReadContext(filePath, fileSize, chunkSize), "Invalid FileContext arguments");
-    }
-}
