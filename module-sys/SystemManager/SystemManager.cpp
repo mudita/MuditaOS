@@ -219,6 +219,12 @@ namespace sys
         cpuStatisticsTimer = sys::TimerFactory::createPeriodicTimer(
             this, "cpuStatistics", constants::timerInitInterval, [this](sys::Timer &) { CpuStatisticsTimerHandler(); });
         cpuStatisticsTimer.start();
+
+        powerManagerEfficiencyTimer = sys::TimerFactory::createPeriodicTimer(
+            this, "logPowerManagerEfficiency", constants::powerManagerLogsTimerInterval, [this](sys::Timer &) {
+                powerManager->LogPowerManagerEfficiency();
+            });
+        powerManagerEfficiencyTimer.start();
     }
 
     bool SystemManager::CloseSystem(Service *s)

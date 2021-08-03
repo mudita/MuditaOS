@@ -8,6 +8,18 @@ The CPU frequency control is dependent on the CPU load measured from the time sp
 
 ![](./data/CpuFreqChangeAlgorithm.svg)
 
+**Examples:**
+
+1. Increasing CPU frequency
+     - On high CPU load
+     ![](./data/IncreasingCpuFreq.svg)
+     - On request
+     ![](./data/IncreasingImmediatelyCpuFreq.svg)
+     
+2. Decreasing CPU frequency
+
+   ![](./data/DecreasingCpuFreq.svg)
+
 ## Low Power synchronization
 
 Synchronization in Low Power mode covers 3 issues:
