@@ -17,40 +17,39 @@ namespace at
         CFUN::CFUN() noexcept : CFUN(at::cmd::Modifier::None)
         {}
 
-        result::CFUN &CFUN::parse(Result &base_result)
+        result::CFUN CFUN::parseCFUN(const Result &base_result)
         {
             auto constexpr responseHeader = "+CFUN: ";
 
-            auto *p = new result::CFUN(base_result);
-            result  = std::unique_ptr<result::CFUN>(p);
+            result::CFUN p{base_result};
             // use parent operator bool
-            if (p->Result::operator bool()) {
-                if (p->response.empty()) {
+            if (p.Result::operator bool()) {
+                if (p.response.empty()) {
                     LOG_ERROR("Can't parse - empty response");
-                    p->code = result::CFUN::Code::PARSING_ERROR;
+                    p.code = result::CFUN::Code::PARSING_ERROR;
                 }
                 else {
-                    std::string str = p->response[0];
+                    std::string str = p.response[0];
                     if (str.find(responseHeader) == std::string::npos) {
                         LOG_ERROR("Can't parse - bad header");
-                        p->code = result::CFUN::Code::PARSING_ERROR;
-                        return *p;
+                        p.code = result::CFUN::Code::PARSING_ERROR;
+                        return p;
                     }
                     utils::findAndReplaceAll(str, responseHeader, "");
                     utils::trim(str);
 
                     if (int func = 0;
                         utils::toNumeric(str, func) && magic_enum::enum_contains<at::cfun::Functionality>(func)) {
-                        p->functionality = static_cast<at::cfun::Functionality>(func);
+                        p.functionality = static_cast<at::cfun::Functionality>(func);
                     }
                     else {
                         LOG_ERROR("Can't parse - bad value");
-                        p->code = result::CFUN::Code::PARSING_ERROR;
+                        p.code = result::CFUN::Code::PARSING_ERROR;
                     }
                 }
             }
 
-            return *p;
+            return p;
         }
 
         void CFUN::set(at::cfun::Functionality fuctionality, at::cfun::Reset reset)

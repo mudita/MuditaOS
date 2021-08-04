@@ -34,7 +34,7 @@ namespace at
           public:
             CSCA() noexcept;
             explicit CSCA(at::cmd::Modifier mod) noexcept;
-            [[nodiscard]] auto parse(Result &base_result) -> result::CSCA & final;
+            [[nodiscard]] auto parseCSCA(const Result &base_result) -> result::CSCA;
             void set(const utils::PhoneNumber::View &smsCenterAddress, int smsTypeOfAddress);
         };
     } // namespace cmd

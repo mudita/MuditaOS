@@ -44,7 +44,7 @@ namespace cellular
     {
         at::cmd::QECCNUM cmd;
         auto qeccnumResult   = channel.cmd(cmd);
-        auto qeccnumResponse = cmd.parse(qeccnumResult);
+        auto qeccnumResponse = cmd.parseQECCNUM(qeccnumResult);
 
         auto isSimEmergency =
             std::find(qeccnumResponse.eccNumbersSim.begin(), qeccnumResponse.eccNumbersSim.end(), request) !=
