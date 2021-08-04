@@ -40,4 +40,14 @@ add_catch2_executable(
         module-audio
 )
 
+add_catch2_executable(
+    NAME
+        audio-equalizer
+    SRCS
+        unittest_equalizer.cpp
+    LIBS
+        module-audio
+        module-utils
+)
+
 file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/testfiles" DESTINATION "${CMAKE_BINARY_DIR}")
