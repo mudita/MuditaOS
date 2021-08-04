@@ -113,6 +113,83 @@ namespace at
         }
     };
 
+    class QNWINFO_badChannel : public ChannelMock
+    {
+        auto ResultMock() -> Result override
+        {
+            auto r     = Result();
+            r.code     = Result::Code::ERROR;
+            r.response = {"LOL", "XD", "OK"};
+            return r;
+        }
+    };
+
+    class QNWINFO_emptyData : public ChannelMock
+    {
+        auto ResultMock() -> Result override
+        {
+            auto r     = Result();
+            r.code     = Result::Code::OK;
+            r.response = {"+QNWINFO: \"\",,\"\",", "OK"};
+            return r;
+        }
+    };
+
+    class QNWINFO_successNoQuoteChannel : public ChannelMock
+    {
+      public:
+        std::string act  = "FDD LTE";
+        int op           = 46001;
+        std::string band = "LTE BAND 3";
+        int channel      = 1650;
+
+        auto ResultMock() -> Result override
+        {
+            auto r     = Result();
+            r.code     = Result::Code::OK;
+            r.response = {"+QNWINFO: " + act + "," + std::to_string(op) + "," + band + "," + std::to_string(channel),
+                          "OK"};
+            return r;
+        }
+    };
+
+    class QNWINFO_successWithQuoteChannel : public ChannelMock
+    {
+      public:
+        std::string act  = "FDD LTE";
+        int op           = 46001;
+        std::string band = "LTE BAND 3";
+        int channel      = 1650;
+
+        auto ResultMock() -> Result override
+        {
+            auto r     = Result();
+            r.code     = Result::Code::OK;
+            r.response = {"+QNWINFO: \"" + act + "\"," + std::to_string(op) + ",\"" + band + "\"," +
+                              std::to_string(channel),
+                          "OK"};
+            return r;
+        }
+    };
+
+    class QNWINFO_errorChannel : public ChannelMock
+    {
+      public:
+        std::string act  = "\"FDD LTE\"";
+        int op           = 46001;
+        std::string band = "\"LTE BAND 3\"";
+        int channel      = 1650;
+
+        auto ResultMock() -> Result override
+        {
+            auto r     = Result();
+            r.code     = Result::Code::ERROR;
+            r.response = {"+QNWINFO: " + act + "," + std::to_string(op) + "," + band + "," + std::to_string(channel),
+                          "ERROR"};
+            return r;
+        }
+    };
+
     /// provides proper CLCC response with one call on the list
     class CLCC_successChannel_oneCall : public ChannelMock
     {

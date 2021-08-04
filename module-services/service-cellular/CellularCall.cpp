@@ -33,7 +33,7 @@ namespace CellularCall
 
         clear();
         CalllogRecord callRec{type, number};
-        call                = startCallAction ? startCallAction(callRec) : CalllogRecord();
+        call = startCallAction ? startCallAction(callRec) : CalllogRecord();
         if (!call.isValid()) {
             LOG_ERROR("failed to obtain a call log record");
             clear();
@@ -53,8 +53,10 @@ namespace CellularCall
         if (isValid()) {
             startActiveTime = utils::time::getCurrentTimestamp();
             isActiveCall    = true;
+            LOG_INFO("set call active");
             return true;
         }
+        LOG_ERROR("no valid call to activate");
         return false;
     }
 
