@@ -54,9 +54,9 @@ namespace CellularServiceAPI
 
     /*
      * @brief Get current operator, result async in
-     * CellularGetCurrentOperatorResponse message
+     * CellularCurrentOperatorNameResponse message
      */
-    void GetCurrentOperator(sys::Service *serv);
+    void RequestCurrentOperatorName(sys::Service *serv);
     /*
      * @brief It calls service-cellulat to perform operators scan
      * @param serv pointer to caller service.
