@@ -6,12 +6,14 @@
 #include <string>
 #include <type_traits>
 #include <at/cmd/CFUN.hpp>
+#include <chrono>
 
 namespace at
 {
     namespace cmd
     {
-        CFUN::CFUN(at::cmd::Modifier mod) noexcept : Cmd("AT+CFUN", mod, at::default_timeout)
+        using namespace std::chrono_literals;
+        CFUN::CFUN(at::cmd::Modifier mod) noexcept : Cmd("AT+CFUN", mod, 150s)
         {}
 
         CFUN::CFUN() noexcept : CFUN(at::cmd::Modifier::None)
