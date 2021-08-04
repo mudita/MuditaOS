@@ -12,6 +12,7 @@
 #include <at/cmd/CFUN.hpp>
 #include <at/cmd/CPBS.hpp>
 #include <at/cmd/CPBR.hpp>
+#include <at/cmd/QNWINFO.hpp>
 
 #include "mock/AtCommon_channel.hpp"
 #include "PhoneNumber.hpp"
@@ -608,5 +609,75 @@ TEST_CASE("CPBR set data")
         cmd                           = at::cmd::CPBR(at::cmd::Modifier::Set);
         cmd.setSimContactsReadRange(1, 5);
         REQUIRE(cmd.getCmd() == expectedResult);
+    }
+}
+
+TEST_CASE("QNWINFO parser test")
+{
+    SECTION("empty failed data")
+    {
+        at::cmd::QNWINFO cmd;
+        at::Result base_result;
+        auto result = cmd.parseQNWINFO(base_result);
+        REQUIRE(!result);
+        REQUIRE(result.act.empty());
+        REQUIRE(result.op == 0);
+        REQUIRE(result.band.empty());
+        REQUIRE(result.channel == 0);
+    }
+
+    SECTION("failing channel")
+    {
+        at::cmd::QNWINFO cmd;
+        at::QNWINFO_badChannel channel;
+        auto base = channel.cmd(cmd);
+        auto resp = cmd.parseQNWINFO(base);
+        REQUIRE(!resp);
+        REQUIRE(resp.code == at::Result::Code::PARSING_ERROR);
+    }
+
+    SECTION("bad data")
+    {
+        at::cmd::QNWINFO cmd;
+        at::QNWINFO_emptyData channel;
+        auto base = channel.cmd(cmd);
+        auto resp = cmd.parseQNWINFO(base);
+        REQUIRE(!resp);
+        REQUIRE(resp.code == at::Result::Code::PARSING_ERROR);
+    }
+
+    SECTION("proper data no quotes")
+    {
+        at::cmd::QNWINFO cmd;
+        at::QNWINFO_successNoQuoteChannel channel;
+        auto base = channel.cmd(cmd);
+        auto resp = cmd.parseQNWINFO(base);
+        REQUIRE(resp);
+        REQUIRE(resp.act == channel.act);
+        REQUIRE(resp.op == channel.op);
+        REQUIRE(resp.band == channel.band);
+        REQUIRE(resp.channel == channel.channel);
+    }
+
+    SECTION("proper data with quotes")
+    {
+        at::cmd::QNWINFO cmd;
+        at::QNWINFO_successWithQuoteChannel channel;
+        auto base = channel.cmd(cmd);
+        auto resp = cmd.parseQNWINFO(base);
+        REQUIRE(resp);
+        REQUIRE(resp.act == channel.act);
+        REQUIRE(resp.op == channel.op);
+        REQUIRE(resp.band == channel.band);
+        REQUIRE(resp.channel == channel.channel);
+    }
+
+    SECTION("error data")
+    {
+        at::cmd::QNWINFO cmd;
+        at::QNWINFO_errorChannel channel;
+        auto base = channel.cmd(cmd);
+        auto resp = cmd.parseQNWINFO(base);
+        REQUIRE(!resp);
     }
 }

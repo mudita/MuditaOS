@@ -42,7 +42,7 @@ void CellularUrcHandler::Handle(Creg &urc)
                  utils::enumToString(status).c_str(),
                  utils::enumToString(accessTechnology).c_str());
 
-        CellularServiceAPI::GetCurrentOperator(&cellularService);
+        CellularServiceAPI::RequestCurrentOperatorName(&cellularService);
 
         Store::Network network{status, accessTechnology};
         Store::GSM::get()->setNetwork(network);
