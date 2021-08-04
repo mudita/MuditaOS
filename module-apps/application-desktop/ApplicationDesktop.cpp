@@ -304,7 +304,7 @@ namespace app
             auto currentWindow = getCurrentWindow();
             if (currentWindow->getName() == app::window::name::dead_battery ||
                 currentWindow->getName() == app::window::name::charging_battery) {
-                switchWindow(app::window::name::desktop_main_window);
+                app::manager::Controller::sendAction(this, app::manager::actions::Home);
             }
         }
     }
