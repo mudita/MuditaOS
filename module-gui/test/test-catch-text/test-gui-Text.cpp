@@ -201,7 +201,7 @@ TEST_CASE("handle input mode ABC/abc/1234")
 
     SECTION("ABC -> abc")
     {
-        auto time_long_enough_to_not_be_multipress = 1000;
+        auto time_long_enough_to_not_be_multipress = 1500;
         text.onInput(next_mode);
         auto rawKey_2 = key_2.getRawKey();
         rawKey_2.timeRelease += time_long_enough_to_not_be_multipress;
