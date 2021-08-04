@@ -40,7 +40,7 @@ namespace at
           public:
             CPBS() noexcept;
             explicit CPBS(at::cmd::Modifier mod) noexcept;
-            [[nodiscard]] auto parse(Result &base_result) -> result::CPBS & final;
+            [[nodiscard]] auto parseCPBS(const Result &base_result) -> result::CPBS;
             void set(const std::string &storage = cpbs::simStorage);
         };
     } // namespace cmd
