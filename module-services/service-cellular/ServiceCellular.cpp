@@ -190,8 +190,8 @@ void ServiceCellular::SleepTimerHandler()
     auto currentTime                = cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks());
     auto lastCommunicationTimestamp = cmux->getLastCommunicationTimestamp();
     auto timeOfInactivity           = currentTime >= lastCommunicationTimestamp
-                                ? currentTime - lastCommunicationTimestamp
-                                : std::numeric_limits<TickType_t>::max() - lastCommunicationTimestamp + currentTime;
+                                          ? currentTime - lastCommunicationTimestamp
+                                          : std::numeric_limits<TickType_t>::max() - lastCommunicationTimestamp + currentTime;
 
     if (!ongoingCall.isValid() && priv->state->get() == State::ST::Ready &&
         timeOfInactivity >= constants::enterSleepModeTime.count()) {
@@ -1847,7 +1847,7 @@ auto ServiceCellular::handleCellularListCallsMessage(CellularMessage *msg) -> st
 {
     at::cmd::CLCC cmd;
     auto base = cmux->get(CellularMux::Channel::Commands)->cmd(cmd);
-    if (auto response = cmd.parse(base); response) {
+    if (auto response = cmd.parseCLCC(base); response) {
         const auto &data = response.getData();
         auto it          = std::find_if(std::begin(data), std::end(data), [&](const auto &entry) {
             return entry.stateOfCall == ModemCall::CallState::Active && entry.mode == ModemCall::CallMode::Voice;
