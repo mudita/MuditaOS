@@ -391,7 +391,7 @@ TEST_CASE("Contact record numbers update")
         REQUIRE(validatationRecord.numbers[1].number.getEntered() == numbers[3]);
 
         validatationRecord = records.GetByID(2);
-        REQUIRE(validatationRecord.numbers.size() == 0);
+        REQUIRE(validatationRecord.numbers.empty());
     }
 
     Database::deinitialize();
@@ -588,6 +588,111 @@ TEST_CASE("Contacts list duplicates search")
 
     REQUIRE(duplicates[1].numbers[0].number.getEntered() == rawContactsToCheck[2].first);
     REQUIRE(duplicates[1].primaryName == rawContactsToCheck[2].second);
+
+    Database::deinitialize();
+}
+
+TEST_CASE("Check if new contact record can be recognised as a duplicate in DB")
+{
+    Database::initialize();
+    const auto contactsPath = (std::filesystem::path{"sys/user"} / "contacts.db");
+    RemoveDbFiles(contactsPath.stem());
+
+    ContactsDB contactDB(contactsPath.c_str());
+    REQUIRE(contactDB.isInitialized());
+
+    // Preparation of DB initial state
+    auto records = ContactRecordInterface(&contactDB);
+    ContactRecord testContactRecord;
+
+    testContactRecord.primaryName     = "PrimaryNameTest";
+    testContactRecord.alternativeName = "AlternativeNameTest";
+    testContactRecord.numbers         = std::vector<ContactRecord::Number>({
+        ContactRecord::Number("600123456", "+48600123456", ContactNumberType ::HOME),
+    });
+
+    REQUIRE(records.Add(testContactRecord));
+
+    SECTION("No duplicate")
+    {
+        ContactRecord noDuplicateContactRecord;
+        noDuplicateContactRecord.primaryName     = "PrimaryNameTest2";
+        noDuplicateContactRecord.alternativeName = "AlternativeNameTest2";
+        noDuplicateContactRecord.numbers         = std::vector<ContactRecord::Number>({
+            ContactRecord::Number("600123451", "+48600123451", ContactNumberType ::HOME),
+        });
+
+        REQUIRE(records.verifyDuplicate(noDuplicateContactRecord) == false);
+    }
+
+    SECTION("Duplicate")
+    {
+        ContactRecord duplicateContactRecord;
+
+        duplicateContactRecord.primaryName     = "PrimaryNameDuplicate";
+        duplicateContactRecord.alternativeName = "AlternativeNameDuplicate";
+        duplicateContactRecord.numbers         = std::vector<ContactRecord::Number>({
+            ContactRecord::Number("600123456", "+48600123456", ContactNumberType ::HOME),
+        });
+
+        REQUIRE(records.verifyDuplicate(duplicateContactRecord) == true);
+    }
+
+    Database::deinitialize();
+}
+
+TEST_CASE("Check if new contact record exists in DB as a temporary contact")
+{
+    Database::initialize();
+    const auto contactsPath = (std::filesystem::path{"sys/user"} / "contacts.db");
+    RemoveDbFiles(contactsPath.stem());
+
+    ContactsDB contactDB(contactsPath.c_str());
+    REQUIRE(contactDB.isInitialized());
+
+    // Preparation of DB initial state
+    auto records = ContactRecordInterface(&contactDB);
+    ContactRecord testContactRecord;
+
+    testContactRecord.primaryName     = "PrimaryNameTest";
+    testContactRecord.alternativeName = "AlternativeNameTest";
+    testContactRecord.numbers         = std::vector<ContactRecord::Number>({
+        ContactRecord::Number("600123456", "+48600123456", ContactNumberType ::HOME),
+    });
+
+    REQUIRE(records.Add(testContactRecord));
+
+    SECTION("No temporary contact exists")
+    {
+        ContactRecord anotherTestContactRecord;
+        anotherTestContactRecord.primaryName     = "PrimaryNameTest2";
+        anotherTestContactRecord.alternativeName = "AlternativeNameTest2";
+        anotherTestContactRecord.numbers         = std::vector<ContactRecord::Number>({
+            ContactRecord::Number("600123451", "+48600123451", ContactNumberType ::HOME),
+        });
+
+        REQUIRE(records.verifyTemporary(anotherTestContactRecord) == false);
+    }
+
+    SECTION("Temporary contact exists")
+    {
+        ContactRecord temporaryContactRecord;
+        temporaryContactRecord.numbers = std::vector<ContactRecord::Number>({
+            ContactRecord::Number("600123452", "+48600123452", ContactNumberType ::HOME),
+        });
+        temporaryContactRecord.addToGroup(ContactsDB::temporaryGroupId());
+
+        REQUIRE(records.Add(temporaryContactRecord));
+
+        ContactRecord noTemporaryContactRecord;
+        noTemporaryContactRecord.primaryName     = "PrimaryNameNoTemporary";
+        noTemporaryContactRecord.alternativeName = "AlternativeNameNoTemporary";
+        noTemporaryContactRecord.numbers         = std::vector<ContactRecord::Number>({
+            ContactRecord::Number("600123452", "+48600123452", ContactNumberType ::HOME),
+        });
+
+        REQUIRE(records.verifyTemporary(noTemporaryContactRecord) == true);
+    }
 
     Database::deinitialize();
 }
