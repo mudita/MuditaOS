@@ -16,108 +16,112 @@ def cancelPreviousBuilds() {
     }
 }
 pipeline {
-  agent {
-    node {
-      label 'jenkins-slave-ccache-ram'
-      customWorkspace "/home/jenkins/workspace/${JOB_NAME}/${BUILD_NUMBER}"
+    agent {
+        node {
+        label 'jenkins-slave-ccache-ram'
+        customWorkspace "/home/jenkins/workspace/${JOB_NAME}/${BUILD_NUMBER}"
+        }
     }
-  }
-  options{
-    ansiColor('xterm')
-    parallelsAlwaysFailFast()
-  }
-  environment {
-    JOBS=15
-  }
-  stages {
-    stage('Check for previous running builds') {
-        
-        steps {
-            script {
-                cancelPreviousBuilds()
+    options{
+        ansiColor('xterm')
+        parallelsAlwaysFailFast()
+    }
+    environment {
+        JOBS=15
+    }
+    stages {
+        stage('Check for previous running builds') {
+            steps {
+                script {
+                    cancelPreviousBuilds()
+                }
             }
         }
-    }
 
-    stage('Initial checks') {
-        when {
-            changeRequest()
-        }
-        environment {
-            GITHUB_BASE_REF="${pullRequest.base}"
-            GITHUB_HEAD_REF="${pullRequest.headRef}"
-        }
-        steps {
-            echo "Check if branch needs rebasing"
-            sh '''#!/bin/bash -e
-pushd ${WORKSPACE}
+        stage('Initial checks') {
+            when {
+                changeRequest()
+            }
+            environment {
+                GITHUB_BASE_REF="${pullRequest.base}"
+                GITHUB_HEAD_REF="${pullRequest.headRef}"
+            }
+            steps {
+                echo "Check if branch needs rebasing"
+                sh '''#!/bin/bash -e
+                pushd ${WORKSPACE}
 
-if [[ $(git log origin/${CHANGE_TARGET}..HEAD) ]]; then
-    echo "Branch OK"
-else
-    echo "Branch is not rebased. Exiting"
-    exit 1
-fi
+                if [[ $(git log origin/${CHANGE_TARGET}..HEAD) ]]; then
+                    echo "Branch OK"
+                else
+                    echo "Branch is not rebased. Exiting"
+                    exit 1
+                fi
+                popd'''
 
+                echo "Commit Message check"
+                sh '''#!/bin/bash -e
+                pushd ${WORKSPACE}
+                ./tools/check_commit_messages.py
+                popd'''
 
-popd'''
-            echo "Commit Message check"
-            sh '''#!/bin/bash -e
-pushd ${WORKSPACE}
-./tools/check_commit_messages.py
-popd'''
-            echo "Copyright notice check"
-            sh '''#!/bin/bash -e
-pushd ${WORKSPACE}
-./config/license_header_check.sh --ci --check-only
-popd'''
-            echo "Style checking"
-            sh '''#!/bin/bash -e
-pushd ${WORKSPACE}
-./config/style_check_hook.sh --last
-popd'''
-        }
-    }
-    stage('Build') {
-        when {
-            changeRequest()
-        }
-        stages{
+                echo "Copyright notice check"
+                sh '''#!/bin/bash -e
+                pushd ${WORKSPACE}
+                ./config/license_header_check.sh --ci --check-only
+                popd'''
+
+                echo "Style checking"
+                sh '''#!/bin/bash -e
+                pushd ${WORKSPACE}
+                ./config/style_check_hook.sh --last
+                popd'''
+                }
+            }
         stage('Build RT1051') {
             steps {
                 sh '''#!/bin/bash -e
-PATH="/usr/local/cmake-3.19.5-Linux-x86_64/bin:/usr/local/gcc-arm-none-eabi-10-2020-q4-major/bin:$PATH"
-export JOBS=${JOBS:-6}
-export CCACHE_DIR=/ccache/RT1051
+                PATH="/usr/local/cmake-3.19.5-Linux-x86_64/bin:/usr/local/gcc-arm-none-eabi-10-2020-q4-major/bin:$PATH"
+                export JOBS=${JOBS:-6}
+                export CCACHE_DIR=/ccache/RT1051
 
-echo "JOBS=${JOBS}"
-echo "\'workspace dir:${WORKSPACE}\'"
+                echo "JOBS=${JOBS}"
+                echo "\'workspace dir:${WORKSPACE}\'"
 
-pushd "${WORKSPACE}"
+                pushd "${WORKSPACE}"
 
-echo "./configure.sh pure rt1051 Release -G Ninja"
-./configure.sh pure rt1051 Release -G Ninja
+                echo "./configure.sh pure rt1051 Release -G Ninja"
+                ./configure.sh pure rt1051 Release -G Ninja
 
-pushd build-purephone-rt1051-Release
-ninja -j ${JOBS}
-popd
+                pushd build-purephone-rt1051-Release
+                ninja -j ${JOBS}
+                popd
+                rm -r build-purephone-rt1051-Release
 
-echo "./configure.sh bell rt1051 Release -G Ninja"
-./configure.sh bell rt1051 Release -G Ninja
+                echo "./configure.sh bell rt1051 Release -G Ninja"
+                ./configure.sh bell rt1051 Release -G Ninja
 
-pushd build-bell-rt1051-Release
-ninja -j ${JOBS}
-popd
+                pushd build-bell-rt1051-Release
+                ninja -j ${JOBS}
+                popd
 
-popd'''
+                echo "disk usage before removal:"
+                du -h --max-depth=1 .
+
+                rm -r build-bell-rt1051-Release
+
+                echo "disk usage after removal:"
+                du -h --max-depth=1 .
+
+                popd'''
                 echo "CCache stats"
                 sh '''#!/bin/bash
-export CCACHE_DIR=/ccache/RT1051
-ccache --show-stats'''
-            }
+                export CCACHE_DIR=/ccache/RT1051
+                ccache --show-stats'''
+                }
         }
 
-        stage('Build Linux') {
+        stage('Build Linux - Pure') {
             environment {
                 PATH="/usr/local/cmake-3.19.5-Linux-x86_64/bin:/usr/local/gcc-arm-none-eabi-10-2020-q4-major/bin:$PATH"
                 CCACHE_DIR="/ccache/Linux"
@@ -126,98 +130,170 @@ ccache --show-stats'''
             steps {
                 echo "Configure"
                 sh '''#!/bin/bash -e
-echo "JOBS=${JOBS}"
-pushd "${WORKSPACE}"
-echo "./configure.sh pure linux Debug -G Ninja"
+                echo "JOBS=${JOBS}"
+                pushd "${WORKSPACE}"
 
-./configure.sh pure linux Debug -G Ninja
+                echo "./configure.sh pure linux Debug -G Ninja"
+                ./configure.sh pure linux Debug -G Ninja
+                popd'''
 
-echo "./configure.sh bell linux Debug -G Ninja"
+                echo "Clang Tidy check"
+                /* requires compilation database - must be run after configuration */
+                sh '''#!/bin/bash -e
+                pushd ${WORKSPACE}
+                ./config/clang_check.sh
+                popd'''
 
-./configure.sh bell linux Debug -G Ninja
-
-popd'''
-            echo "Clang Tidy check"
-            /* requires compilation database - must be run after configuration */
-            sh '''#!/bin/bash -e
-pushd ${WORKSPACE}
-./config/clang_check.sh
-popd'''
                 echo "Build"
                 sh '''#!/bin/bash -e
-echo "JOBS=${JOBS}"
-pushd "${WORKSPACE}"
+                echo "JOBS=${JOBS}"
+                pushd "${WORKSPACE}"
 
-pushd build-purephone-linux-Debug
-ninja -j ${JOBS}
-popd
-
-pushd build-bell-linux-Debug
-ninja -j ${JOBS}
-popd
-
-popd'''
+                pushd build-purephone-linux-Debug
+                ninja -j ${JOBS}
+                popd
+                popd'''
 
                 echo "Build Unit Tests"
                 sh '''#!/bin/bash -e
-pushd "${WORKSPACE}"
-pushd build-purephone-linux-Debug
-ninja -j ${JOBS} unittests
-popd
-pushd "${WORKSPACE}"
-pushd build-bell-linux-Debug
-ninja -j ${JOBS} unittests
-popd
-popd'''
+                pushd "${WORKSPACE}"
+                pushd build-purephone-linux-Debug
+                ninja -j ${JOBS} unittests
+                popd'''
+
                 echo "CCache stats"
                 sh '''#!/bin/bash
-export CCACHE_DIR=/ccache/Linux
-ccache --show-stats'''
+                export CCACHE_DIR=/ccache/Linux
+                ccache --show-stats'''
+
                 echo "Check for Statics"
                 sh '''#!/bin/bash -e
-pushd "${WORKSPACE}"
-./tools/find_global_data.py build-purephone-linux-Debug/PurePhone.elf
-popd'''
+                pushd "${WORKSPACE}"
+                ./tools/find_global_data.py build-purephone-linux-Debug/PurePhone.elf
+                popd'''
+
                 echo "Run Unit Tests"
                 sh '''#!/bin/bash -e
-export JOBS=${JOBS:-6}
-echo "JOBS=${JOBS}"
-pushd "${WORKSPACE}"
-pushd build-purephone-linux-Debug
-ninja check -j ${JOBS}
-popd
+                export JOBS=${JOBS:-6}
+                echo "JOBS=${JOBS}"
 
-pushd build-bell-linux-Debug
-ninja check -j ${JOBS}
-popd
-popd'''
+                pushd "${WORKSPACE}"
+                pushd build-purephone-linux-Debug
+                ninja check -j ${JOBS}
+                popd
+
+                echo "disk usage before removal:"
+                du -h --max-depth=1 .
+
+                rm -r build-purephone-linux-Debug
+
+                echo "disk usage after removal:"
+                du -h --max-depth=1 .
+                popd'''
+                }
+            }
+
+
+        stage('Build Linux - Bell') {
+            environment {
+                PATH="/usr/local/cmake-3.19.5-Linux-x86_64/bin:/usr/local/gcc-arm-none-eabi-10-2020-q4-major/bin:$PATH"
+                CCACHE_DIR="/ccache/Linux"
+            }
+
+            steps {
+                echo "Configure"
+                sh '''#!/bin/bash -e
+                echo "JOBS=${JOBS}"
+                pushd "${WORKSPACE}"
+                echo "./configure.sh bell linux Debug -G Ninja"
+
+                ./configure.sh bell linux Debug -G Ninja
+
+                popd'''
+                echo "Clang Tidy check"
+                /* requires compilation database - must be run after configuration */
+                sh '''#!/bin/bash -e
+                pushd ${WORKSPACE}
+                ./config/clang_check.sh
+                popd'''
+
+                echo "Build"
+                sh '''#!/bin/bash -e
+                echo "JOBS=${JOBS}"
+                pushd "${WORKSPACE}"
+
+                pushd build-bell-linux-Debug
+                ninja -j ${JOBS}
+                popd
+
+                popd'''
+
+                echo "Build Unit Tests"
+                sh '''#!/bin/bash -e
+                pushd "${WORKSPACE}"
+
+                pushd "${WORKSPACE}"
+                pushd build-bell-linux-Debug
+                ninja -j ${JOBS} unittests
+                popd
+                popd'''
+
+                echo "CCache stats"
+                sh '''#!/bin/bash
+                export CCACHE_DIR=/ccache/Linux
+                ccache --show-stats'''
+
+                echo "Check for Statics"
+                sh '''#!/bin/bash -e
+                pushd "${WORKSPACE}"
+                ./tools/find_global_data.py build-bell-linux-Debug/BellHybrid.elf
+                popd'''
+
+                echo "Run Unit Tests"
+                sh '''#!/bin/bash -e
+                export JOBS=${JOBS:-6}
+                echo "JOBS=${JOBS}"
+                pushd "${WORKSPACE}"
+
+                pushd build-bell-linux-Debug
+                ninja check -j ${JOBS}
+                popd
+
+                echo "disk usage before removal:"
+                du -h --max-depth=1 .
+
+                rm -r build-bell-linux-Debug
+
+                echo "disk usage after removal:"
+                du -h --max-depth=1 .
+                popd'''
+                }
+            }
+
+        stage('master-jobs') {
+            when {
+                branch 'master'
+            }
+            steps {
+                echo "run some tests"
+                sh '''#!/bin/bash
+                    echo "HAL 9000 sleeps here."
+                '''
+            }
+        }
+
+    }
+    post {
+        cleanup {
+            deleteDir()
+            dir("${workspace}@tmp") {
+                deleteDir()
+            }
+            dir("${workspace}@script") {
+                deleteDir()
             }
         }
     }
-    }
-    stage('master-jobs') {
-        when {
-            branch 'master'
-        }
-        steps {
-            echo "run some tests"
-            sh '''#!/bin/bash
-                echo "HALL 9000 sleeps here."
-            '''
-            
-        }
-    }
-  }
-  post {
-      cleanup {
-          deleteDir()
-          dir("${workspace}@tmp") {
-              deleteDir()
-          }
-          dir("${workspace}@script") {
-              deleteDir()
-          }
-      }
-  }
 
 }
+
