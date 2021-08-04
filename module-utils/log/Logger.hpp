@@ -65,6 +65,7 @@ namespace Log
         }
 
         cpp_freertos::MutexStandard mutex;
+        cpp_freertos::MutexStandard flushMutex;
         logger_level level{LOGTRACE};
         const LogColors *logColors            = &logColorsOff;
         char loggerBuffer[LOGGER_BUFFER_SIZE] = {0};
