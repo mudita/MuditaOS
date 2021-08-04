@@ -29,7 +29,7 @@ jobs:
       run: |
         export JOBS=${JOBS:-$(nproc)} && \
         echo "JOBS=${JOBS}" &&  \
-        pushd build-linux-Debug && \
+        pushd build-purephone-linux-Debug && \
         ninja check -j ${JOBS} && \
         popd
     - name: "Build and package for RT1051"

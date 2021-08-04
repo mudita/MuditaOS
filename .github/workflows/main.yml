@@ -86,7 +86,7 @@ jobs:
           ./tools/run_unittests.sh enabled_unittests
       - name: Check for statics
         run: |
-          ./tools/find_global_data.py build-linux-Debug/PurePhone.elf
+          ./tools/find_global_data.py build-purephone-linux-Debug/PurePhone.elf
       - name: check if all Unit Tests where run
         run: |
           ./tools/check_unittests.sh enabled_unit_tests
