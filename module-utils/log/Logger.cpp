@@ -135,12 +135,10 @@ namespace Log
 
         {
             status = 1;
-
             const auto &logs = getLogs();
 
-            LockGuard lock(mutex);
+            LockGuard lock(flushMutex);
             std::fstream logFile(logPath, std::fstream::out | std::fstream::app);
-
             if (!logFile.good()) {
                 status = -EIO;
             }
