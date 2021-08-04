@@ -110,7 +110,8 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
         if (!queue->Dequeue(&notification, 0)) {
             return false;
         }
-        if (notification == static_cast<std::uint8_t>(bsp::battery_charger::batteryIRQSource::INTB)) {
+        if (notification == static_cast<std::uint8_t>(bsp::battery_charger::batteryIRQSource::INTB) ||
+            notification == static_cast<std::uint8_t>(bsp::battery_charger::batteryIRQSource::INOKB)) {
             checkBatteryChargerInterrupts();
         }
     }
