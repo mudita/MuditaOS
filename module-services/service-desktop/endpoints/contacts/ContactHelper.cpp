@@ -169,8 +169,15 @@ auto ContactHelper::createDBEntry(Context &context) -> sys::ReturnCodes
 
                 context.setResponseBody(
                     json11::Json::object({{json::contacts::id, static_cast<int>(contactResult->getID())}}));
-                context.setResponseStatus(contactResult->getResult() ? http::Code::OK
-                                                                     : http::Code::InternalServerError);
+                if (contactResult->getResult()) {
+                    context.setResponseStatus(http::Code::OK);
+                }
+                else if (contactResult->isDuplicated()) {
+                    context.setResponseStatus(http::Code::Conflict);
+                }
+                else {
+                    context.setResponseStatus(http::Code::InternalServerError);
+                }
                 MessageHandler::putToSendQueue(context.createSimpleResponse());
 
                 return true;

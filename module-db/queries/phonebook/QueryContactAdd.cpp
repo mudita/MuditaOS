@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "QueryContactAdd.hpp"
@@ -8,10 +8,11 @@
 
 using namespace db::query;
 
-ContactAdd::ContactAdd(const ContactRecord &rec) : Query(Query::Type::Read), rec(std::move(rec))
+ContactAdd::ContactAdd(const ContactRecord &rec) : Query(Query::Type::Read), rec(rec)
 {}
 
-ContactAddResult::ContactAddResult(bool result, unsigned int id) : result(result), id(id)
+ContactAddResult::ContactAddResult(bool result, unsigned int id, bool duplicated)
+    : result(result), duplicated(duplicated), id(id)
 {}
 
 [[nodiscard]] auto ContactAdd::debugInfo() const -> std::string

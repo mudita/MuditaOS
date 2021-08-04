@@ -70,6 +70,18 @@ def test_contacts(harness):
     contact_id_to_update = ret["body"]["id"]
     assert contact_id_to_update
 
+    # try to add duplicate
+    body = {"address": "6 Czeczota St.\n02600 Warsaw",
+            "altName": "Testowy",
+            "blocked": True,
+            "favourite": True,
+            "numbers": ["547623521"],
+            "priName": "Test"}
+    ret = harness.endpoint_request("contacts", "post", body)
+    assert ret["status"] == status["Conflict"]
+    contact_id_of_detected_duplicate = ret["body"]["id"]
+    assert contact_id_of_detected_duplicate == contact_id_to_update
+
     # adding new contact without number - should fail with 406
     body = {"address": "6 Czeczota St.\n02600 Warsaw",
             "altName": "Testowy",
