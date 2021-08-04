@@ -169,22 +169,22 @@ class CellularNotificationMessage : public CellularMessage
     std::string data;
 };
 
-class CellularGetCurrentOperatorMessage : public CellularMessage
+class CellularRequestCurrentOperatorNameMessage : public CellularMessage
 {
   public:
-    explicit CellularGetCurrentOperatorMessage() : CellularMessage(Type::Notification)
+    explicit CellularRequestCurrentOperatorNameMessage() : CellularMessage(Type::Notification)
     {}
 };
 
 class CellularSetOperatorAutoSelectMessage : public sys::DataMessage
 {};
 
-class CellularGetCurrentOperatorResponse : public CellularMessage
+class CellularCurrentOperatorNameResponse : public CellularMessage
 {
     std::string currentOperatorName;
 
   public:
-    explicit CellularGetCurrentOperatorResponse(std::string currentOperatorName)
+    explicit CellularCurrentOperatorNameResponse(const std::string &currentOperatorName)
         : CellularMessage(Type::Notification), currentOperatorName(currentOperatorName)
     {}
 

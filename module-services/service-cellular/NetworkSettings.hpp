@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -10,6 +10,8 @@
 #include "service-cellular/CellularServiceAPI.hpp"
 #include "service-cellular/ServiceCellular.hpp"
 #include "response.hpp"
+
+#include <at/cmd/QNWINFO.hpp>
 
 /**
  * Internal (Mudita) VoLTE state, based on on a few
@@ -55,13 +57,17 @@ class NetworkSettings
      */
     std::vector<std::string> scanOperators(bool fullInfoList = false);
     at::Result::Code setVoLTEState(VoLTEState state);
-    VoLTEState getVoLTEState();
+
+    /// This is information about configuration setup, not information
+    /// about whether the VoLTE actually works in the selected network
+    VoLTEState getVoLTEConfigurationState();
 
     at::Result::Code getPreferredVoiceDomain(VoiceDomainPreference &pref);
     at::Result::Code setPreferredVoiceDomain(VoiceDomainPreference pref);
 
     bool setOperatorAutoSelect();
-    std::string getCurrentOperator() const;
+    std::string getCurrentOperatorName() const;
+    std::optional<at::response::cops::Operator> getCurrentOperator() const;
     at::Result::Code getPreferredSMSDomain(SMSDomainPreference &pref);
     at::Result::Code setPreferredSMSDomain(SMSDomainPreference pref);
     bool setOperator(at::response::cops::CopsMode mode, at::response::cops::NameFormat format, const std::string &name);
@@ -70,6 +76,17 @@ class NetworkSettings
     std::optional<std::pair<at::response::qcfg_ims::IMSState, at::response::qcfg_ims::VoLTEIMSState>> getIMSState();
 
     std::string printVoLTEDebug();
+
+    enum class SimpleNAT
+    {
+        GSM,
+        UMTS,
+        LTE
+    };
+    std::optional<at::response::cops::AccessTechnology> getCurrentNAT() const;
+    std::optional<at::result::QNWINFO> getCurrentNetworkInfo() const;
+
+    static SimpleNAT toSimpleNAT(at::response::cops::AccessTechnology nat);
 
   private:
     ServiceCellular &cellularService;

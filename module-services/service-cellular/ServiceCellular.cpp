@@ -310,9 +310,9 @@ void ServiceCellular::registerMessageHandlers()
         return handleCellularGetActiveContextsMessage(msg);
     });
 
-    connect(typeid(CellularGetCurrentOperatorMessage), [&](sys::Message *request) -> sys::MessagePointer {
-        auto msg = static_cast<CellularGetCurrentOperatorMessage *>(request);
-        return handleCellularGetCurrentOperator(msg);
+    connect(typeid(CellularRequestCurrentOperatorNameMessage), [&](sys::Message *request) -> sys::MessagePointer {
+        auto msg = static_cast<CellularRequestCurrentOperatorNameMessage *>(request);
+        return handleCellularRequestCurrentOperatorName(msg);
     });
 
     connect(typeid(CellularGetAPNMessage), [&](sys::Message *request) -> sys::MessagePointer {
@@ -355,7 +355,7 @@ void ServiceCellular::registerMessageHandlers()
         volteOn  = msg->getVoLTEon();
         settings->setValue(settings::Cellular::volte_on, std::to_string(volteOn), settings::SettingsScope::Global);
         NetworkSettings networkSettings(*this);
-        auto vstate = networkSettings.getVoLTEState();
+        auto vstate = networkSettings.getVoLTEConfigurationState();
         if ((vstate != VoLTEState::On) && volteOn) {
             LOG_DEBUG("VoLTE On");
             networkSettings.setVoLTEState(VoLTEState::On);
@@ -1632,14 +1632,14 @@ bool ServiceCellular::handle_apn_conf_procedure()
     return true;
 }
 
-std::shared_ptr<CellularGetCurrentOperatorResponse> ServiceCellular::handleCellularGetCurrentOperator(
-    CellularGetCurrentOperatorMessage *msg)
+std::shared_ptr<CellularCurrentOperatorNameResponse> ServiceCellular::handleCellularRequestCurrentOperatorName(
+    CellularRequestCurrentOperatorNameMessage *msg)
 {
-    LOG_INFO("CellularGetCurrentOperator handled");
+    LOG_INFO("CellularRequestCurrentOperatorName handled");
     NetworkSettings networkSettings(*this);
-    const auto currentNetworkOperatorName = networkSettings.getCurrentOperator();
+    const auto currentNetworkOperatorName = networkSettings.getCurrentOperatorName();
     Store::GSM::get()->setNetworkOperatorName(currentNetworkOperatorName);
-    return std::make_shared<CellularGetCurrentOperatorResponse>(currentNetworkOperatorName);
+    return std::make_shared<CellularCurrentOperatorNameResponse>(currentNetworkOperatorName);
 }
 
 std::shared_ptr<CellularGetAPNResponse> ServiceCellular::handleCellularGetAPNMessage(CellularGetAPNMessage *msg)
@@ -1757,8 +1757,6 @@ auto ServiceCellular::handleCellularAnswerIncomingCallMessage(CellularMessage *m
     auto channel = cmux->get(CellularMux::Channel::Commands);
     auto ret     = false;
     if (channel) {
-        // TODO alek: check if your request isn't for 5 sec when you wait in command for 90000, it's exclusivelly
-        // set to 5000ms in command requesting...
         auto response = channel->cmd(at::AT::ATA);
         if (response) {
             // Propagate "CallActive" notification into system
@@ -2064,7 +2062,25 @@ auto ServiceCellular::handleStateRequestMessage(sys::Message *msg) -> std::share
 
 auto ServiceCellular::handleCallActiveNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
-    return std::make_shared<CellularResponseMessage>(ongoingCall.setActive());
+    auto ret = std::make_shared<CellularResponseMessage>(ongoingCall.setActive());
+    NetworkSettings networkSettings(*this);
+    auto currentNAT = networkSettings.getCurrentNAT();
+    if (currentNAT) {
+        auto currentSimpleNAT = NetworkSettings::toSimpleNAT(*currentNAT);
+        LOG_INFO("Current NAT %s(%s)",
+                 utils::enumToString(*currentNAT).c_str(),
+                 utils::enumToString(currentSimpleNAT).c_str());
+        if (currentSimpleNAT == NetworkSettings::SimpleNAT::LTE) {
+            LOG_INFO("VoLTE call");
+        }
+        else {
+            LOG_INFO("Non VoLTE call");
+        }
+    }
+    else {
+        LOG_WARN("Cannot get current NAT");
+    }
+    return ret;
 }
 auto ServiceCellular::handleCallAbortedNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
