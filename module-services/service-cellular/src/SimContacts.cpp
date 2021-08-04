@@ -30,7 +30,7 @@ namespace cellular::service
         auto command = at::cmd::CPBR(at::cmd::Modifier::Set);
         command.setSimContactsReadRange(firstIndex, contactsCount);
         auto response = channel->cmd(command);
-        auto result   = command.parse(response);
+        auto result   = command.parseCPBR(response);
 
         if (result.code != at::Result::Code::OK) {
             LOG_ERROR("Failed to get contacts list");
@@ -61,7 +61,7 @@ namespace cellular::service
 
         command     = at::cmd::CPBS(at::cmd::Modifier::Get);
         response    = channel->cmd(command);
-        auto result = command.parse(response);
+        auto result = command.parseCPBS(response);
 
         if (result.code != at::Result::Code::OK) {
             LOG_ERROR("Failed to get contacts count");

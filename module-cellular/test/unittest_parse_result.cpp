@@ -30,7 +30,7 @@ namespace at::cmd
             return CLCC::toUInt(text);
         }
 
-        template <typename T>[[nodiscard]] static auto toEnum(const std::string &text) -> std::optional<T>
+        template <typename T> [[nodiscard]] static auto toEnum(const std::string &text) -> std::optional<T>
         {
             return CLCC::toEnum<T>(text);
         }
@@ -43,10 +43,10 @@ TEST_CASE("CSCA parser test")
     {
         at::cmd::CSCA cmd;
         at::Result base_result; // normally returned from cmux->exec(), TODO getter for dumb result ala exe
-        auto &result = cmd.parse(base_result);
+        auto result = cmd.parseCSCA(base_result);
         REQUIRE(!result);
-        REQUIRE(result.smsCenterAddress == "");
-        REQUIRE(result.smsTypeOfAddress == "");
+        REQUIRE(result.smsCenterAddress.empty());
+        REQUIRE(result.smsTypeOfAddress.empty());
     }
 
     SECTION("failing channel")
@@ -54,7 +54,7 @@ TEST_CASE("CSCA parser test")
         at::cmd::CSCA cmd;
         at::CSCS_badChannel channel;
         auto base = channel.cmd(cmd);
-        auto resp = cmd.parse(base);
+        auto resp = cmd.parseCSCA(base);
         REQUIRE(!resp);
         REQUIRE(resp.code == at::Result::Code::ERROR);
     }
@@ -64,7 +64,7 @@ TEST_CASE("CSCA parser test")
         at::cmd::CSCA cmd(at::cmd::Modifier::Get);
         at::CSCA_emptyData channel;
         auto base = channel.cmd(cmd);
-        auto resp = cmd.parse(base);
+        auto resp = cmd.parseCSCA(base);
         REQUIRE(!resp);
         REQUIRE(resp.code == at::Result::Code::PARSING_ERROR);
     }
@@ -74,7 +74,7 @@ TEST_CASE("CSCA parser test")
         at::cmd::CSCA cmd;
         at::CSCS_successChannel channel;
         auto base = channel.cmd(cmd);
-        auto resp = cmd.parse(base);
+        auto resp = cmd.parseCSCA(base);
         REQUIRE(resp);
         REQUIRE(resp.smsCenterAddress == channel.smsCenterAddress);
         REQUIRE(resp.smsTypeOfAddress == channel.smsTypeOfAddress);
@@ -117,8 +117,8 @@ TEST_CASE("QECCNUM parser")
     {
         at::cmd::QECCNUM cmd;
         at::Result base_result;
-        auto &result = cmd.parse(base_result);
-        REQUIRE(!result);
+        auto resp = cmd.parseQECCNUM(base_result);
+        REQUIRE(!resp);
     }
 
     SECTION("no numbers")
@@ -126,7 +126,7 @@ TEST_CASE("QECCNUM parser")
         at::cmd::QECCNUM cmd;
         at::GenericChannel channel(at::Result::Code::OK, {"+QECCNUM: 1", "+QECCNUM: 2"});
         auto base = channel.cmd(cmd);
-        auto resp = cmd.parse(base);
+        auto resp = cmd.parseQECCNUM(base);
         REQUIRE(!resp);
     }
 
@@ -135,7 +135,7 @@ TEST_CASE("QECCNUM parser")
         at::cmd::QECCNUM cmd;
         at::GenericChannel channel(at::Result::Code::OK, {"+QECCNUM: 0,112,999", "+QECCNUM: 1"});
         auto base = channel.cmd(cmd);
-        auto resp = cmd.parse(base);
+        auto resp = cmd.parseQECCNUM(base);
         REQUIRE(resp);
         REQUIRE(resp.eccNumbersNoSim == std::vector<std::string>({"112", "999"}));
         REQUIRE(resp.eccNumbersSim.empty());
@@ -146,7 +146,7 @@ TEST_CASE("QECCNUM parser")
         at::cmd::QECCNUM cmd;
         at::GenericChannel channel(at::Result::Code::OK, {"+QECCNUM: 1,112,998"});
         auto base = channel.cmd(cmd);
-        auto resp = cmd.parse(base);
+        auto resp = cmd.parseQECCNUM(base);
         REQUIRE(resp);
         REQUIRE(resp.eccNumbersNoSim.empty());
         REQUIRE(resp.eccNumbersSim == std::vector<std::string>({"112", "998"}));
@@ -157,7 +157,7 @@ TEST_CASE("QECCNUM parser")
         at::cmd::QECCNUM cmd;
         at::GenericChannel channel(at::Result::Code::OK, {"+QECCNUM: 0,112,999", "+QECCNUM: 1,4564,25435,325454"});
         auto base = channel.cmd(cmd);
-        auto resp = cmd.parse(base);
+        auto resp = cmd.parseQECCNUM(base);
         REQUIRE(resp);
         REQUIRE(resp.eccNumbersNoSim == std::vector<std::string>({"112", "999"}));
         REQUIRE(resp.eccNumbersSim == std::vector<std::string>({"4564", "25435", "325454"}));
@@ -181,7 +181,7 @@ TEST_CASE("CLCC parser")
     {
         at::cmd::CLCC cmd;
         at::Result result;
-        auto response = cmd.parse(result);
+        auto response = cmd.parseCLCC(result);
         REQUIRE(!response);
     }
     SECTION("Failing channel")
@@ -189,7 +189,7 @@ TEST_CASE("CLCC parser")
         at::cmd::CLCC cmd;
         at::FailingChannel channel;
         auto base     = channel.cmd(cmd);
-        auto response = cmd.parse(base);
+        auto response = cmd.parseCLCC(base);
         REQUIRE(!response);
         REQUIRE(response.code == at::Result::Code::ERROR);
     }
@@ -198,7 +198,7 @@ TEST_CASE("CLCC parser")
         at::cmd::CLCC cmd;
         at::CLCC_successChannel_oneCall channel;
         auto base     = channel.cmd(cmd);
-        auto response = cmd.parse(base);
+        auto response = cmd.parseCLCC(base);
         REQUIRE(response);
         auto [idx, dir, stateOfCall, mode, multiparty, number, type, alpha, tokens] = response.getData()[0];
         REQUIRE(idx == 1);
@@ -216,7 +216,7 @@ TEST_CASE("CLCC parser")
         at::cmd::CLCC cmd;
         at::CLCC_successChannel_twoCalls channel;
         auto base     = channel.cmd(cmd);
-        auto response = cmd.parse(base);
+        auto response = cmd.parseCLCC(base);
         REQUIRE(response);
         SECTION("First entry")
         {
@@ -250,7 +250,7 @@ TEST_CASE("CLCC parser")
         at::cmd::CLCC cmd;
         at::CSCS_badChannel channel;
         auto base = channel.cmd(cmd);
-        auto resp = cmd.parse(base);
+        auto resp = cmd.parseCLCC(base);
         REQUIRE(!resp);
         REQUIRE(resp.code == at::Result::Code::ERROR);
     }
@@ -260,7 +260,7 @@ TEST_CASE("CLCC parser")
         at::cmd::CLCC cmd;
         at::OK_Channel channel;
         auto base     = channel.cmd(cmd);
-        auto response = cmd.parse(base);
+        auto response = cmd.parseCLCC(base);
         REQUIRE(response);
     }
 
@@ -269,7 +269,8 @@ TEST_CASE("CLCC parser")
         at::cmd::CLCC cmd;
         at::OG_Channel channel;
         auto base     = channel.cmd(cmd);
-        auto response = cmd.parse(base);
+        auto response = cmd.parseCLCC(base);
+        REQUIRE(!response);
         REQUIRE(response.code == at::Result::Code::ERROR);
     }
 }
@@ -348,7 +349,7 @@ TEST_CASE("CFUN parser")
     {
         at::cmd::CFUN cmd;
         at::Result result;
-        auto response = cmd.parse(result);
+        auto response = cmd.parseCFUN(result);
         REQUIRE(!response);
     }
 
@@ -357,7 +358,7 @@ TEST_CASE("CFUN parser")
         at::cmd::CFUN cmd;
         at::FailingChannel channel;
         auto base     = channel.cmd(cmd);
-        auto response = cmd.parse(base);
+        auto response = cmd.parseCFUN(base);
         REQUIRE(!response);
         REQUIRE(response.code == at::Result::Code::ERROR);
     }
@@ -367,7 +368,7 @@ TEST_CASE("CFUN parser")
         at::cmd::CFUN cmd;
         at::CFUN_successChannel channel;
         auto base     = channel.cmd(cmd);
-        auto response = cmd.parse(base);
+        auto response = cmd.parseCFUN(base);
         REQUIRE(response);
         REQUIRE(response.functionality == at::cfun::Functionality::Full);
     }
@@ -377,7 +378,7 @@ TEST_CASE("CFUN parser")
         at::cmd::CFUN cmd;
         at::CFUN_invalidTokenChannel channel;
         auto base     = channel.cmd(cmd);
-        auto response = cmd.parse(base);
+        auto response = cmd.parseCFUN(base);
         REQUIRE(!response);
     }
 }
@@ -428,7 +429,7 @@ TEST_CASE("CPBS parser")
     {
         at::cmd::CPBS cmd;
         at::Result result;
-        auto response = cmd.parse(result);
+        auto response = cmd.parseCPBS(result);
         REQUIRE(!response);
     }
 
@@ -437,7 +438,7 @@ TEST_CASE("CPBS parser")
         at::cmd::CPBS cmd;
         at::FailingChannel channel;
         auto base     = channel.cmd(cmd);
-        auto response = cmd.parse(base);
+        auto response = cmd.parseCPBS(base);
         REQUIRE(!response);
         REQUIRE(response.code == at::Result::Code::ERROR);
     }
@@ -447,7 +448,7 @@ TEST_CASE("CPBS parser")
         at::cmd::CPBS cmd;
         at::CPBS_successChannel channel;
         auto base     = channel.cmd(cmd);
-        auto response = cmd.parse(base);
+        auto response = cmd.parseCPBS(base);
         REQUIRE(response.storage == "\"SM\"");
         REQUIRE(response.used == 2);
         REQUIRE(response.total == 500);
@@ -458,7 +459,7 @@ TEST_CASE("CPBS parser")
         at::cmd::CPBS cmd;
         at::CPBS_toLittleTokens channel;
         auto base     = channel.cmd(cmd);
-        auto response = cmd.parse(base);
+        auto response = cmd.parseCPBS(base);
         REQUIRE(!response);
         REQUIRE(response.code == at::Result::Code::PARSING_ERROR);
     }
@@ -468,7 +469,7 @@ TEST_CASE("CPBS parser")
         at::cmd::CPBS cmd;
         at::CPBS_toManyTokens channel;
         auto base     = channel.cmd(cmd);
-        auto response = cmd.parse(base);
+        auto response = cmd.parseCPBS(base);
         REQUIRE(!response);
         REQUIRE(response.code == at::Result::Code::PARSING_ERROR);
     }
@@ -512,7 +513,7 @@ TEST_CASE("CPBR parser")
     {
         at::cmd::CPBR cmd;
         at::Result result;
-        auto response = cmd.parse(result);
+        auto response = cmd.parseCPBR(result);
         REQUIRE(!response);
     }
 
@@ -521,7 +522,7 @@ TEST_CASE("CPBR parser")
         at::cmd::CPBR cmd;
         at::FailingChannel channel;
         auto base     = channel.cmd(cmd);
-        auto response = cmd.parse(base);
+        auto response = cmd.parseCPBR(base);
         REQUIRE(!response);
         REQUIRE(response.code == at::Result::Code::ERROR);
     }
@@ -531,7 +532,8 @@ TEST_CASE("CPBR parser")
         at::cmd::CPBR cmd;
         at::CPBR_successChannel channel;
         auto base     = channel.cmd(cmd);
-        auto response = cmd.parse(base);
+        auto response = cmd.parseCPBR(base);
+        REQUIRE(response);
 
         REQUIRE(response.contacts.size() == 2);
 
@@ -551,7 +553,7 @@ TEST_CASE("CPBR parser")
         at::cmd::CPBR cmd;
         at::CPBR_toLittleTokens channel;
         auto base     = channel.cmd(cmd);
-        auto response = cmd.parse(base);
+        auto response = cmd.parseCPBR(base);
         REQUIRE(!response);
         REQUIRE(response.code == at::Result::Code::PARSING_ERROR);
     }
@@ -561,7 +563,7 @@ TEST_CASE("CPBR parser")
         at::cmd::CPBR cmd;
         at::CPBR_toManyTokens channel;
         auto base     = channel.cmd(cmd);
-        auto response = cmd.parse(base);
+        auto response = cmd.parseCPBR(base);
         REQUIRE(!response);
         REQUIRE(response.code == at::Result::Code::PARSING_ERROR);
     }
@@ -571,7 +573,7 @@ TEST_CASE("CPBR parser")
         at::cmd::CPBR cmd;
         at::CPBR_invalidType channel;
         auto base     = channel.cmd(cmd);
-        auto response = cmd.parse(base);
+        auto response = cmd.parseCPBR(base);
         REQUIRE(!response);
         REQUIRE(response.code == at::Result::Code::PARSING_ERROR);
     }

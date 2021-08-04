@@ -17,25 +17,24 @@ namespace at
         CPBS::CPBS() noexcept : CPBS(at::cmd::Modifier::None)
         {}
 
-        auto CPBS::parse(Result &base_result) -> result::CPBS &
+        auto CPBS::parseCPBS(const Result &base_result) -> result::CPBS
         {
 
             auto constexpr responseHeader = "+CPBS: ";
 
-            auto *parsed = new result::CPBS(base_result);
-            result       = std::unique_ptr<result::CPBS>(parsed);
+            result::CPBS parsed{base_result};
 
-            if (parsed->Result::operator bool()) {
-                if (parsed->response.empty()) {
+            if (parsed.Result::operator bool()) {
+                if (parsed.response.empty()) {
                     LOG_ERROR("Can't parse - empty response");
-                    parsed->code = result::CPBS::Code::PARSING_ERROR;
+                    parsed.code = result::CPBS::Code::PARSING_ERROR;
                 }
                 else {
-                    std::string str = parsed->response[0];
+                    std::string str = parsed.response[0];
                     if (str.find(responseHeader) == std::string::npos) {
                         LOG_ERROR("Can't parse - bad header");
-                        parsed->code = result::CPBS::Code::PARSING_ERROR;
-                        return *parsed;
+                        parsed.code = result::CPBS::Code::PARSING_ERROR;
+                        return parsed;
                     }
                     utils::findAndReplaceAll(str, responseHeader, "");
                     utils::trim(str);
@@ -44,25 +43,25 @@ namespace at
 
                     if (tokens.size() != cpbs::tokensCount) {
                         LOG_ERROR("Can't parse - invalid tokens count");
-                        parsed->code = result::CPBS::Code::PARSING_ERROR;
-                        return *parsed;
+                        parsed.code = result::CPBS::Code::PARSING_ERROR;
+                        return parsed;
                     }
 
                     int used  = 0;
                     int total = 0;
                     if (utils::toNumeric(tokens[static_cast<int>(cpbs::tokens::Used)], used) &&
                         utils::toNumeric(tokens[static_cast<int>(cpbs::tokens::Total)], total)) {
-                        parsed->used    = used;
-                        parsed->total   = total;
-                        parsed->storage = tokens[static_cast<int>(cpbs::tokens::Storage)];
+                        parsed.used    = used;
+                        parsed.total   = total;
+                        parsed.storage = tokens[static_cast<int>(cpbs::tokens::Storage)];
                     }
                     else {
                         LOG_ERROR("Can't parse - bad value");
-                        parsed->code = result::CPBS::Code::PARSING_ERROR;
+                        parsed.code = result::CPBS::Code::PARSING_ERROR;
                     }
                 }
             }
-            return *parsed;
+            return parsed;
         }
 
         void CPBS::set(const std::string &storage)

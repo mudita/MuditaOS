@@ -10,7 +10,7 @@
     auto success        = true;
     auto smsCenterCmd   = at::cmd::CSCA(at::cmd::Modifier::Get);
     auto resp           = channel.cmd(smsCenterCmd);
-    auto centerResponse = smsCenterCmd.parse(resp);
+    auto centerResponse = smsCenterCmd.parseCSCA(resp);
     if (!centerResponse) {
         success = false;
         if (centerResponse.code == at::Result::Code::PARSING_ERROR) {
