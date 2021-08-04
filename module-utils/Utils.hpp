@@ -12,6 +12,7 @@
 #include <cmath>
 #include <chrono>
 #include <random>
+#include <tuple>
 
 namespace utils
 {
@@ -218,6 +219,16 @@ namespace utils
     static inline void findAndReplaceAll(std::string &data, const std::string &toSearch, const std::string &replaceStr)
     {
         findAndReplaceAll(data, {{toSearch, replaceStr}});
+    }
+
+    static inline std::tuple<uint8_t, uint8_t, uint8_t> floatingPointConverter(float value)
+    {
+        int32_t decimal = value * (1 << 20); // multiply by 2^20
+
+        const uint32_t fractional = decimal & 0xFFFFF;
+        decimal >>= 20;
+
+        return std::make_tuple((decimal << 4) | (fractional >> 16), fractional >> 8, fractional & 0xFF);
     }
 
     static inline uint32_t swapBytes(uint32_t toSwap)
