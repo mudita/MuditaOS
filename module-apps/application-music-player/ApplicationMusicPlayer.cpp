@@ -6,7 +6,7 @@
 #include "AudioNotificationsHandler.hpp"
 
 #include <windows/MusicPlayerAllSongsWindow.hpp>
-#include <presenters/AudioOperations.hpp>
+#include <apps-common/AudioOperations.hpp>
 #include <presenters/SongsPresenter.hpp>
 #include <models/SongsRepository.hpp>
 #include <models/SongsModel.hpp>
@@ -47,7 +47,7 @@ namespace app
         auto tagsFetcher     = std::make_unique<app::music_player::ServiceAudioTagsFetcher>(this);
         auto songsRepository = std::make_unique<app::music_player::SongsRepository>(std::move(tagsFetcher));
         priv->songsModel     = std::make_unique<app::music_player::SongsModel>(std::move(songsRepository));
-        auto audioOperations = std::make_unique<app::music_player::AudioOperations>(this);
+        auto audioOperations = std::make_unique<app::AsyncAudioOperations>(this);
         priv->songsPresenter =
             std::make_unique<app::music_player::SongsPresenter>(priv->songsModel, std::move(audioOperations));
 

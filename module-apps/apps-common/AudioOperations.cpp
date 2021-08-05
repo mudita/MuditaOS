@@ -12,13 +12,13 @@
 
 #include <filesystem>
 
-namespace app::music_player
+namespace app
 {
-    AudioOperations::AudioOperations(Application *application)
+    AsyncAudioOperations::AsyncAudioOperations(Application *application)
         : app::AsyncCallbackReceiver{application}, application(application)
     {}
 
-    bool AudioOperations::play(const std::string &filePath, const OnPlayCallback &callback)
+    bool AsyncAudioOperations::play(const std::string &filePath, const OnPlayCallback &callback)
     {
         auto msg  = std::make_unique<AudioStartPlaybackRequest>(filePath, audio::PlaybackType::Multimedia);
         auto task = app::AsyncRequest::createFromMessage(std::move(msg), service::name::audio);
@@ -36,7 +36,7 @@ namespace app::music_player
         return true;
     }
 
-    bool AudioOperations::pause(const audio::Token &token, const OnPauseCallback &callback)
+    bool AsyncAudioOperations::pause(const audio::Token &token, const OnPauseCallback &callback)
     {
         auto msg  = std::make_unique<AudioPauseRequest>(token);
         auto task = app::AsyncRequest::createFromMessage(std::move(msg), service::name::audio);
@@ -53,7 +53,7 @@ namespace app::music_player
         task->execute(application, this, cb);
         return true;
     }
-    bool AudioOperations::resume(const audio::Token &token, const OnResumeCallback &callback)
+    bool AsyncAudioOperations::resume(const audio::Token &token, const OnResumeCallback &callback)
     {
         auto msg  = std::make_unique<AudioResumeRequest>(token);
         auto task = app::AsyncRequest::createFromMessage(std::move(msg), service::name::audio);
@@ -70,7 +70,7 @@ namespace app::music_player
         task->execute(application, this, cb);
         return true;
     }
-    bool AudioOperations::stop(const audio::Token &token, [[maybe_unused]] const OnStopCallback &callback)
+    bool AsyncAudioOperations::stop(const audio::Token &token, [[maybe_unused]] const OnStopCallback &callback)
     {
         auto msg  = std::make_unique<AudioStopRequest>(token);
         auto task = app::AsyncRequest::createFromMessage(std::move(msg), service::name::audio);
@@ -85,4 +85,4 @@ namespace app::music_player
         return true;
     }
 
-} // namespace app::music_player
+} // namespace app
