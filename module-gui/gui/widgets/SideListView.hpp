@@ -10,6 +10,12 @@
 
 namespace gui
 {
+    enum class PageBarType
+    {
+        None,
+        Round,
+    };
+
     class SideListView : public Rect, public ListViewEngine
     {
       protected:
@@ -28,9 +34,8 @@ namespace gui
                      unsigned int y,
                      unsigned int w,
                      unsigned int h,
-                     std::shared_ptr<ListItemProvider> prov);
-
-        auto setPageBarVisible(bool value) noexcept -> void;
+                     std::shared_ptr<ListItemProvider> prov,
+                     PageBarType pageBarType = PageBarType::None);
 
         auto onInput(const InputEvent &inputEvent) -> bool override;
     };

@@ -35,10 +35,9 @@ namespace gui
 
         presenter->createData();
 
-        sidelistview =
-            new SideListView(this, 0U, 0U, this->getWidth(), this->getHeight(), presenter->getPagesProvider());
+        sidelistview = new SideListView(
+            this, 0U, 0U, this->getWidth(), this->getHeight(), presenter->getPagesProvider(), PageBarType::None);
         sidelistview->setEdges(RectangleEdge::None);
-        sidelistview->setPageBarVisible(false);
 
         sidelistview->rebuildList(listview::RebuildType::Full);
 

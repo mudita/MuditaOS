@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <BoxLayout.hpp>
+#include <ThreeBox.hpp>
 #include <Label.hpp>
 #include <Image.hpp>
 
@@ -16,12 +16,9 @@ namespace gui::header
         Right
     };
 
-    class Header : public HBox
+    class Header : public HThreeBox<HBox, HBox, HBox>
     {
       private:
-        HBox *leftBox   = nullptr;
-        HBox *centerBox = nullptr;
-        HBox *rightBox  = nullptr;
         Label *title    = nullptr;
 
         Item *createTitle(const UTF8 &text);

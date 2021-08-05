@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <widgets/SideListItem.hpp>
+#include <widgets/BellSideListItem.hpp>
 
 #include <string>
 
@@ -11,14 +11,11 @@ namespace gui
 {
     class TimeSetFmtSpinner;
 
-    class TimeSetListItem : public SideListItem
+    class TimeSetListItem : public BellSideListItem
     {
       public:
         TimeSetFmtSpinner *timeSetFmtSpinner = nullptr;
 
         TimeSetListItem(gui::Length x, gui::Length y, gui::Length w, gui::Length h, std::string description);
-
-      private:
-        Margins calculateMargins() const noexcept;
     };
 } /* namespace gui */
