@@ -5,7 +5,7 @@
 
 #include <time/time_locale.hpp>
 #include <utf8/UTF8.hpp>
-#include <widgets/SideListItem.hpp>
+#include <widgets/BellSideListItem.hpp>
 
 #include <functional>
 
@@ -14,7 +14,7 @@ namespace gui
     class Spinner;
     class Label;
 
-    class TimeFormatSetListItem : public gui::SideListItem
+    class TimeFormatSetListItem : public gui::BellSideListItem
     {
       public:
         TimeFormatSetListItem() = delete;
@@ -29,7 +29,6 @@ namespace gui
         std::function<void(Item &)> onNextCallback;
 
       private:
-        Margins calculateMargins() const noexcept;
 
         Label *bottomDescription{};
         Spinner *timeFormat{};

@@ -13,7 +13,8 @@ namespace gui
                                unsigned int y,
                                unsigned int w,
                                unsigned int h,
-                               std::shared_ptr<ListItemProvider> prov)
+                               std::shared_ptr<ListItemProvider> prov,
+                               PageBarType pageBarType)
         : Rect{parent, x, y, w, h}, ListViewEngine(prov)
     {
         setEdges(RectangleEdge::All);
@@ -21,14 +22,13 @@ namespace gui
         bodyOverlay = new VBox{this, 0, 0, w, h};
         bodyOverlay->setEdges(RectangleEdge::None);
 
-        createPageBar();
-        applyScrollCallbacks();
-
-        auto bodyTopMargin = pageBar->widgetMinimumArea.h + pageBar->getMargins().getSumInAxis(Axis::Y);
-        auto bodyHeight    = h - bodyTopMargin;
+        if (pageBarType != PageBarType::None) {
+            createPageBar();
+            applyScrollCallbacks();
+        }
 
         body = new HBox{bodyOverlay, 0, 0, 0, 0};
-        body->setMinimumSize(w, bodyHeight);
+        body->setMaximumSize(w, h);
         body->setAlignment(Alignment::Horizontal::Center);
         body->setEdges(RectangleEdge::None);
         bodyOverlay->resizeItems();
@@ -58,7 +58,7 @@ namespace gui
             return true;
         };
 
-        createArrowsOverlay(0, bodyTopMargin, w, bodyHeight);
+        createArrowsOverlay(0, 0, w, h);
 
         type = gui::ItemType::LIST;
     }
@@ -137,9 +137,5 @@ namespace gui
             return true;
         }
         return false;
-    }
-    auto SideListView::setPageBarVisible(bool value) noexcept -> void
-    {
-        pageBar->setVisible(value);
     }
 } /* namespace gui */
