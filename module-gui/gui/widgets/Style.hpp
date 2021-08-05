@@ -273,8 +273,8 @@ namespace style
         namespace top_message
         {
             inline constexpr auto w    = window_width;
-            inline constexpr auto h    = 100U;
-            inline constexpr auto font = style::window::font::supersizemelight;
+            inline constexpr auto h    = 50U;
+            inline constexpr auto font = style::window::font::largelight;
         } // namespace top_message
     }     // namespace sidelistview
 

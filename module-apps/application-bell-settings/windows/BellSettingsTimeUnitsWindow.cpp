@@ -38,6 +38,7 @@ namespace gui
         sidelistview =
             new SideListView(this, 0U, 0U, this->getWidth(), this->getHeight(), presenter->getPagesProvider());
         sidelistview->setEdges(RectangleEdge::None);
+        sidelistview->setPageBarVisible(false);
 
         sidelistview->rebuildList(listview::RebuildType::Full);
 
@@ -53,7 +54,7 @@ namespace gui
         }
         if (inputEvent.isShortRelease(KeyCode::KEY_ENTER)) {
             presenter->saveData();
-            application->returnToPreviousWindow();
+            application->switchWindow(window::name::bellSettingsFinished);
             return true;
         }
         if (AppWindow::onInput(inputEvent)) {

@@ -13,7 +13,7 @@ namespace gui
     class TextSpinner : public Text
     {
       public:
-        using TextRange = std::vector<std::string>;
+        using TextRange = std::vector<UTF8>;
         using Position  = std::uint32_t;
         using Range     = std::pair<Position, Position>;
 

@@ -3,15 +3,16 @@
 
 #pragma once
 
-#include <data/BellAlarmData.hpp>
-#include <AppWindow.hpp>
-#include <gui/widgets/Spinner.hpp>
-#include <widgets/TimeSetSpinner.hpp>
-#include <widgets/AlarmSetSpinner.hpp>
-#include <BoxLayout.hpp>
+#include "data/BellAlarmData.hpp"
+
+#include <apps-common/windows/AppWindow.hpp>
 
 namespace gui
 {
+    class Label;
+    class AlarmSetSpinner;
+    class TimeSetFmtSpinner;
+
     class BellMainWindow : public AppWindow
     {
       public:
@@ -21,14 +22,14 @@ namespace gui
         bool onInput(const InputEvent &inputEvent) override;
         bool updateTime() override;
 
-        gui::Label *time        = nullptr;
-        gui::Label *temperature = nullptr;
-        AlarmSetSpinner *alarmSetSpinner = nullptr;
-
       private:
         auto handleEnterKey(const InputEvent &inputEvent) -> bool;
         auto handleEditModeEntry() -> void;
-        bool alarmEditMode            = false;
-        BellAlarm::Status alarmStatus = BellAlarm::Status::DEACTIVATED;
+
+        TimeSetFmtSpinner *time          = nullptr;
+        gui::Label *temperature          = nullptr;
+        AlarmSetSpinner *alarmSetSpinner = nullptr;
+        bool alarmEditMode               = false;
+        BellAlarm::Status alarmStatus    = BellAlarm::Status::DEACTIVATED;
     };
 } // namespace gui

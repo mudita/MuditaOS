@@ -2,7 +2,6 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TimeSetFmtSpinner.hpp"
-
 #include "TimeSetSpinner.hpp"
 
 #include <date/date.h>
@@ -47,7 +46,13 @@ namespace gui
         fmt->setEdges(RectangleEdge::Bottom);
 
         focusChangedCallback = [&](Item &) {
-            setFocusItem(focus ? timeSetSpinner : nullptr);
+            if (focus && editMode != EditMode::Browse) {
+                setFocusItem(timeSetSpinner);
+            }
+            else {
+                setFocusItem(nullptr);
+            }
+            setTimeFormat(this->timeFormat);
             return true;
         };
 
@@ -173,7 +178,8 @@ namespace gui
     }
     auto TimeSetFmtSpinner::handleEnterKey() -> bool
     {
-        if (focusItem == timeSetSpinner) {
+        using namespace utils::time;
+        if ((focusItem == timeSetSpinner) && (timeFormat == Locale::TimeFormat::FormatTime12H)) {
             setFocusItem(fmt);
             return true;
         }

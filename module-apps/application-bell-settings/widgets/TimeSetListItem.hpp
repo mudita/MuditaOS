@@ -11,11 +11,14 @@ namespace gui
 {
     class TimeSetFmtSpinner;
 
-    class TimeSetSpinnerListItem : public SideListItem
+    class TimeSetListItem : public SideListItem
     {
       public:
         TimeSetFmtSpinner *timeSetFmtSpinner = nullptr;
 
-        TimeSetSpinnerListItem(gui::Length x, gui::Length y, gui::Length w, gui::Length h, std::string description);
+        TimeSetListItem(gui::Length x, gui::Length y, gui::Length w, gui::Length h, std::string description);
+
+      private:
+        Margins calculateMargins() const noexcept;
     };
 } /* namespace gui */
