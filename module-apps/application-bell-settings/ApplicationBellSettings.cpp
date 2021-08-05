@@ -4,6 +4,7 @@
 #include "ApplicationBellSettings.hpp"
 #include "TimeUnitsPresenter.hpp"
 #include "windows/BellSettingsAdvancedWindow.hpp"
+#include "windows/BellSettingsFinishedWindow.hpp"
 #include "windows/BellSettingsTimeUnitsWindow.hpp"
 #include "windows/BellSettingsWindow.hpp"
 
@@ -43,6 +44,10 @@ namespace app
             auto timeUnitsProvider = std::make_shared<bell_settings::TimeUnitsModel>(app);
             auto presenter         = std::make_unique<bell_settings::TimeUnitsWindowPresenter>(timeUnitsProvider);
             return std::make_unique<gui::BellSettingsTimeUnitsWindow>(app, std::move(presenter));
+        });
+
+        windowsFactory.attach(gui::window::name::bellSettingsFinished, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::BellSettingsFinishedWindow>(app);
         });
     }
 
