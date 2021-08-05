@@ -30,6 +30,8 @@ namespace gui
                      unsigned int h,
                      std::shared_ptr<ListItemProvider> prov);
 
+        auto setPageBarVisible(bool value) noexcept -> void;
+
         auto onInput(const InputEvent &inputEvent) -> bool override;
     };
 } /* namespace gui */

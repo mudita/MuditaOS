@@ -87,12 +87,13 @@ namespace gui
     bool Spinner::onFocus(bool state)
     {
         if (focus) {
-            setEdges(RectangleEdge::Bottom);
+            setEdges(focusEdges);
         }
         else {
             setEdges(RectangleEdge::None);
         }
         showCursor(state);
+        updateSpinner();
         return true;
     }
 
@@ -112,6 +113,10 @@ namespace gui
     void Spinner::setMaxValue(int newMaxValue)
     {
         maxValue = newMaxValue;
+    }
+    void Spinner::setFocusEdges(RectangleEdge edges)
+    {
+        focusEdges = edges;
     }
 
 } // namespace gui

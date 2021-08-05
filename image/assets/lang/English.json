@@ -552,7 +552,10 @@
   "tethering_phone_mode_change_prohibited": "<text>Tethering is on.<br /><br />Other modes (Connected, DND,<br />Offline) are overriden by this mode<br />and are not working.</text>",
   "tethering_menu_access_decline": "<text>Tethering is on.<br /><br />To access menu,<br />turn tethering off.</text>",
 
+  "app_bell_settings_time_units_time_fmt_top_message": "Time format",
+  "app_bell_settings_time_units_time_fmt_bottom_message": "hours",
   "app_bell_settings_time_units_time_message": "Time",
+  "app_bell_settings_time_units_finished_message": "Time and units are set.",
   "app_bellmain_next_alarm": "Next alarm",
   "app_bellmain_power_nap": "Power nap",
   "app_bellmain_meditation_timer": "Meditation timer",

@@ -23,17 +23,23 @@ target_sources(application-bell-settings
         ApplicationBellSettings.cpp
         models/TimeUnitsModel.cpp
         presenter/TimeUnitsPresenter.cpp
-        widgets/TimeSetSpinnerListItem.cpp
+        widgets/TimeSetListItem.cpp
+        widgets/TimeFormatSetListItem.cpp
         windows/BellSettingsWindow.cpp
         windows/BellSettingsAdvancedWindow.cpp
         windows/BellSettingsTimeUnitsWindow.cpp
+        windows/BellSettingsFinishedWindow.cpp
 
         models/TimeUnitsModel.hpp
         presenter/TimeUnitsPresenter.hpp
-        widgets/TimeSetSpinnerListItem.hpp
+        widgets/TimeSetListItem.hpp
+        widgets/TimeFormatSetListItem.hpp
         windows/BellSettingsWindow.hpp
         windows/BellSettingsAdvancedWindow.hpp
         windows/BellSettingsTimeUnitsWindow.hpp
+
+    PRIVATE
+        windows/BellSettingsFinishedWindow.hpp
 
     PUBLIC
         include/application-bell-settings/ApplicationBellSettings.hpp
