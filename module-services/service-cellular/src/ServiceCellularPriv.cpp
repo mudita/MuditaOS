@@ -131,6 +131,16 @@ namespace cellular::internal
 
         outSMSHandler.onSend = [this](SMSRecord &record) -> bool { return this->onSendSMS(record); };
 
+        outSMSHandler.onSIMNotInitialized = [this]() -> bool {
+            bool ret = false;
+            if (!simCard->initialized()) {
+                owner->bus.sendUnicast(std::make_shared<CellularSmsNoSimRequestMessage>(),
+                                       app::manager::ApplicationManager::ServiceName);
+                ret = true;
+            }
+            return ret;
+        };
+
         outSMSHandler.onGetOfflineMode = [this]() -> bool {
             bool ret = false;
             if (owner->phoneModeObserver->isInMode(sys::phone_modes::PhoneMode::Offline)) {
@@ -151,15 +161,21 @@ namespace cellular::internal
         bool result                         = false;
         auto channel                        = owner->cmux->get(CellularMux::Channel::Commands);
         auto receiver                       = record.number.getEntered();
+        bool channelSetup                   = false;
+
         if (channel) {
+            channelSetup = true;
             if (!channel->cmd(at::AT::SET_SMS_TEXT_MODE_UCS2)) {
                 LOG_ERROR("Could not set UCS2 mode for SMS");
-                return false;
+                channelSetup = false;
             }
             if (!channel->cmd(at::AT::SMS_UCSC2)) {
                 LOG_ERROR("Could not set UCS2 charset mode for TE");
-                return false;
+                channelSetup = false;
             }
+        }
+
+        if (channelSetup) {
             // if text fit in single message send
             if (textLen < singleMessageLen) {
                 std::string command      = std::string(at::factory(at::AT::CMGS));
@@ -242,7 +258,7 @@ namespace cellular::internal
         DBServiceAPI::GetQuery(
             owner, db::Interface::Name::SMS, std::make_unique<db::query::SMSUpdate>(std::move(record)));
 
-        if (!channel->cmd(at::AT::SMS_GSM)) {
+        if (channel && !channel->cmd(at::AT::SMS_GSM)) {
             LOG_ERROR("Could not set GSM (default) charset mode for TE");
             return false;
         }
