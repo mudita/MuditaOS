@@ -319,6 +319,7 @@ namespace gui
 
         setTitle(page->title);
         setFocusItem(page);
+        application->refreshWindow(RefreshModes::GUI_REFRESH_DEEP);
     }
 
     void MenuWindow::refresh()
