@@ -301,6 +301,7 @@ namespace bluetooth
 
     void HSP::HSPImpl::disconnect()
     {
+        hsp_ag_release_audio_connection();
         hsp_ag_disconnect();
     }
 
