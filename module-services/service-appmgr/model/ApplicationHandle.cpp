@@ -42,9 +42,14 @@ namespace app::manager
         return launcher->preventsAutoLocking();
     }
 
+    auto ApplicationHandle::checkBlockClosing() const noexcept -> bool
+    {
+        return launcher->handle->getState() == Application::State::FINALIZING_CLOSE;
+    }
+
     auto ApplicationHandle::closeable() const noexcept -> bool
     {
-        return launcher->isCloseable() && !blockClosing;
+        return launcher->isCloseable() && !checkBlockClosing();
     }
 
     auto ApplicationHandle::started() const noexcept -> bool

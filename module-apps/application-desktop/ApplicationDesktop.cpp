@@ -102,26 +102,25 @@ namespace app
             return retMsg;
         }
 
-        bool handled = false;
         if (auto msg = dynamic_cast<sdesktop::UpdateOsMessage *>(msgl)) {
-            handled = handle(msg);
+            handle(msg);
+            return sys::msgHandled();
         }
 
-        // handle database response
+        return handleAsyncResponse(resp);
+    }
+
+    sys::MessagePointer ApplicationDesktop::handleAsyncResponse(sys::ResponseMessage *resp)
+    {
+        Application::handleAsyncResponse(resp);
+
         if (resp != nullptr) {
-            if (auto command = callbackStorage->getCallback(resp); command->execute()) {
-                handled = true;
-            }
-            else if (auto msg = dynamic_cast<db::QueryResponse *>(resp)) {
+            if (auto msg = dynamic_cast<db::QueryResponse *>(resp)) {
                 auto result = msg->getResult();
                 if (dbNotificationHandler.handle(result.get())) {
-                    handled = true;
                     refreshMenuWindow();
                 }
             }
-        }
-
-        if (handled) {
             return std::make_shared<sys::ResponseMessage>();
         }
         else {
@@ -335,5 +334,4 @@ namespace app
         osUpdateVersion = value;
         settings->setValue(settings::SystemProperties::osUpdateVersion, value, settings::SettingsScope::Global);
     }
-
 } // namespace app

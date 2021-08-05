@@ -47,6 +47,7 @@ enum class MessageType
     APMSwitchPrevApp,   ///< Request to switch to previous application.
     APMConfirmSwitch,   ///< Used when application confirms that it is loosing focus and also when application confirms
                         ///< that is has gained focus
+    APMFinalizingClose, ///< Sent by application to inform that it is waiting to finish tasks to close
     APMConfirmClose,    ///< Sent by application to confirm completion of the close procedure
     APMConfirmWindowSwitch, ///<
     APMRegister,       ///< when application finishes initHandler it is sending this messag to inform whether init was

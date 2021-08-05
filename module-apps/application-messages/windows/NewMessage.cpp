@@ -337,7 +337,7 @@ namespace gui
             }
             return addDraftToExistingThread(thread->ID, number, message->getText());
         });
-        task->execute(application, this);
+        task->execute(application, this, std::nullopt, app::ReceiverBehavior::WaitForResponseToClose);
         return true;
     }
 
@@ -358,7 +358,7 @@ namespace gui
             }
             return addDraftToExistingThread(thread.ID, number.getView(), message->getText());
         });
-        task->execute(application, this);
+        task->execute(application, this, std::nullopt, app::ReceiverBehavior::WaitForResponseToClose);
         return true;
     }
 
@@ -382,7 +382,7 @@ namespace gui
             storeMessageDraft(number, message->getText());
             return true;
         });
-        task->execute(application, this);
+        task->execute(application, this, std::nullopt, app::ReceiverBehavior::WaitForResponseToClose);
         return true;
     }
 

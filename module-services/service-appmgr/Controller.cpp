@@ -72,6 +72,12 @@ namespace app::manager
         return sender->bus.sendUnicast(msg, ApplicationManager::ServiceName);
     }
 
+    auto Controller::finalizingClose(sys::Service *sender) -> bool
+    {
+        auto msg = std::make_shared<app::manager::FinalizingClose>(sender->GetName());
+        return sender->bus.sendUnicast(msg, ApplicationManager::ServiceName);
+    }
+
     auto Controller::changeDisplayLanguage(sys::Service *sender, const Language &language) -> bool
     {
         auto msg = std::make_shared<app::manager::DisplayLanguageChangeRequest>(sender->GetName(), language);
