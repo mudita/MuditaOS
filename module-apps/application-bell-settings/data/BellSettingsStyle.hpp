@@ -17,16 +17,8 @@ namespace gui
             inline constexpr auto default_body_width    = 400;
         } // namespace settings_window
 
-        namespace time_set_spinner_list_item
-        {
-            inline constexpr auto w = 450;
-            inline constexpr auto h = 250;
-        } // namespace time_set_spinner_list_item
-
         namespace time_fmt_set_list_item
         {
-            inline constexpr auto w    = 129;
-            inline constexpr auto h    = 130;
             inline constexpr auto font = style::window::font::supersizemelight;
         } // namespace time_fmt_set_list_item
     }     // namespace bell_settings_style
