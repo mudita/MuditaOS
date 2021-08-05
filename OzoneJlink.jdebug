@@ -263,8 +263,8 @@ void OnProjectLoad (void) {
   //
   // User settings
   //
-  File.Open ("$(ProjectDir)/build-rt1051-RelWithDebInfo/BellHybrid.elf");
-  File.Open ("$(ProjectDir)/build-rt1051-RelWithDebInfo/BellHybrid.elf.debug");
+  File.Open ("$(ProjectDir)/build-bell-rt1051-RelWithDebInfo");
+  File.Open ("$(ProjectDir)/build-bell-rt1051-RelWithDebInfo/BellHybrid.elf.debug");
 }
 
 /*********************************************************************
