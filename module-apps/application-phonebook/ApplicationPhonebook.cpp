@@ -76,23 +76,7 @@ namespace app
             }
         }
 
-        // this variable defines whether message was processed.
-        bool handled = false;
-
-        // handle database response
-        if (resp != nullptr) {
-            handled = true;
-            if (auto command = callbackStorage->getCallback(resp); command->execute()) {
-                refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-            }
-        }
-
-        if (handled) {
-            return std::make_shared<sys::ResponseMessage>();
-        }
-        else {
-            return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
-        }
+        return handleAsyncResponse(resp);
     }
 
     // Invoked during initialization

@@ -21,3 +21,4 @@
 #include "GetCurrentDisplayLanguageResponse.hpp"
 #include "UpdateInProgress.hpp"
 #include "SetOsUpdateVersion.hpp"
+#include "FinalizingClose.hpp"

@@ -20,21 +20,25 @@ namespace app
           public:
             CallbackEntry(RequestId id,
                           AsyncCallbackReceiver::Ptr receiver,
-                          std::optional<CallbackFunction> callbackFunction) noexcept;
+                          std::optional<CallbackFunction> callbackFunction,
+                          ReceiverBehavior receiverBehavior = ReceiverBehavior::None) noexcept;
 
             RequestId id;
             AsyncCallbackReceiver::Ptr receiver;
             std::optional<CallbackFunction> callbackFunction;
+            ReceiverBehavior receiverBehavior;
         };
 
         [[nodiscard]] auto getCallback(sys::ResponseMessage *response) -> std::unique_ptr<AsyncCallback>;
 
         void registerCallback(RequestId id,
                               AsyncCallbackReceiver::Ptr receiver,
-                              std::optional<CallbackFunction> &&callback = std::nullopt);
+                              std::optional<CallbackFunction> &&callback = std::nullopt,
+                              ReceiverBehavior receiverBehavior          = ReceiverBehavior::None);
         void removeAll(AsyncCallbackReceiver::Ptr receiver);
         [[nodiscard]] auto getCallbackEntryFor(sys::ResponseMessage *response) const noexcept
             -> std::optional<CallbackEntry>;
+        bool checkBlockingCloseRequests() const noexcept;
 
       private:
         [[nodiscard]] static auto toCallback(sys::ResponseMessage *response,
