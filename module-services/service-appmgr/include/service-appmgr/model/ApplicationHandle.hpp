@@ -39,14 +39,11 @@ namespace app::manager
         std::unique_ptr<app::ApplicationLauncher> launcher; // Handle to the application's start function.
         std::unique_ptr<gui::SwitchData> switchData;
         std::string switchWindow;
-        bool blockClosing = false; //< Informs the application manager that this application mustn't be closed
-                                   // temporarily. This flag is used to prevent application closing when application
-                                   // is closeable and there is incoming call. This flag is also used when closeable
-                                   // application is on front and there is a timeout to block the application.
 
         StartupReason startupReason = StartupReason::Launch; // Informs application about startup reason.
 
       private:
+        auto checkBlockClosing() const noexcept -> bool;
         auto getManifest() const -> const ApplicationManifest &;
     };
 } // namespace app::manager

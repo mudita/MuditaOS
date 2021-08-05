@@ -45,6 +45,7 @@ namespace app::manager
         static auto switchBack(sys::Service *sender, std::unique_ptr<SwitchBackRequest> msg = nullptr) -> bool;
         static auto confirmSwitch(sys::Service *sender) -> bool;
         static auto closeApplication(sys::Service *sender, const ApplicationName &name) -> bool;
+        static auto finalizingClose(sys::Service *sender) -> bool;
         static auto confirmClose(sys::Service *sender) -> bool;
         static auto changeDisplayLanguage(sys::Service *sender, const Language &language) -> bool;
         static auto changeInputLanguage(sys::Service *sender, const Language &language) -> bool;
