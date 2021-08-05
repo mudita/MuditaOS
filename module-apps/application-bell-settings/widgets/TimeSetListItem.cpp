@@ -11,14 +11,11 @@ namespace gui
 {
     TimeSetListItem::TimeSetListItem(
         gui::Length x, gui::Length y, gui::Length w, gui::Length h, std::string description)
-        : SideListItem(std::move(description))
+        : BellSideListItem(std::move(description))
     {
         setMinimumSize(style::sidelistview::list_item::w, style::sidelistview::list_item::h);
-        timeSetFmtSpinner = new TimeSetFmtSpinner(body);
-        timeSetFmtSpinner->setMinimumSize(bell_settings_style::time_set_spinner_list_item::w,
-                                          bell_settings_style::time_set_spinner_list_item::h);
-
-        timeSetFmtSpinner->setMargins(calculateMargins());
+        timeSetFmtSpinner = new TimeSetFmtSpinner(body->centerBox);
+        timeSetFmtSpinner->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::h);
         setFocusItem(body);
 
         dimensionChangedCallback = [&](gui::Item &, const BoundingBox &newDim) -> bool {
@@ -32,13 +29,5 @@ namespace gui
         };
 
         inputCallback = [&](Item &, const InputEvent &inputEvent) -> bool { return body->onInput(inputEvent); };
-    }
-    Margins TimeSetListItem::calculateMargins() const noexcept
-    {
-        constexpr auto ratio = 4;
-        constexpr Position availableHeight =
-            style::sidelistview::list_item::h -
-            (bell_settings_style::time_fmt_set_list_item::h + style::sidelistview::top_message::h);
-        return Margins{0, availableHeight / ratio, 0, 0};
     }
 } /* namespace gui */

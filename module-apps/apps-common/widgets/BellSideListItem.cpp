@@ -3,21 +3,19 @@
 
 #include "Label.hpp"
 #include "ListItemWithDescription.hpp"
-#include "SideListItem.hpp"
+#include "BellSideListItem.hpp"
 #include "Style.hpp"
 
 namespace gui
 {
-    SideListItem::SideListItem(std::string description) : ListItemWithDescription(description)
+    BellSideListItem::BellSideListItem(const std::string &description) : ListItemWithDescription(description)
     {
         setEdges(RectangleEdge::None);
-        body = new VBox(this);
-        body->setMinimumSize(style::sidelistview::list_item::w, style::sidelistview::list_item::h);
-        body->setEdges(RectangleEdge::None);
+        body = new BellBaseLayout(this);
 
-        auto topMessage = new Label(body);
-        topMessage->setMinimumSize(style::sidelistview::top_message::w, style::sidelistview::top_message::h);
-        topMessage->setFont(style::sidelistview::top_message::font);
+        auto topMessage = new Label(body->firstBox);
+        topMessage->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::outer_layouts_h);
+        topMessage->setFont(style::bell_sidelist_item::description_font);
         topMessage->setEdges(gui::RectangleEdge::None);
         topMessage->activeItem = false;
         topMessage->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
