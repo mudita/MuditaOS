@@ -65,6 +65,7 @@ namespace app
         std::string osUpdateVersion{updateos::initSysVer};
         std::string osCurrentVersion{updateos::initSysVer};
         DBNotificationsHandler dbNotificationHandler;
+        sys::MessagePointer handleAsyncResponse(sys::ResponseMessage *resp) override;
     };
 
     template <> struct ManifestTraits<ApplicationDesktop>

@@ -65,12 +65,14 @@ TEST_CASE("CallbackStorageTests")
                 REQUIRE(typeid(*callback) == typeid(NullCallback));
             }
         }
+
         SECTION("AsyncResponseCallback Type")
         {
             storage.registerCallback(MessageId, &receiver, [](sys::ResponseMessage *) { return false; });
             auto callback = storage.getCallback(&response);
             REQUIRE(typeid(*callback) == typeid(AsyncResponseCallback));
         }
+
         SECTION("QueryCallback Type")
         {
             db::QueryResponse response{nullptr};
@@ -78,6 +80,28 @@ TEST_CASE("CallbackStorageTests")
             storage.registerCallback(MessageId, &receiver, [](sys::ResponseMessage *) { return false; });
             auto callback = storage.getCallback(&response);
             REQUIRE(typeid(*callback) == typeid(QueryCallback));
+        }
+
+        SECTION("ReceiverBehavior")
+        {
+            SECTION("None - default")
+            {
+                storage.registerCallback(MessageId, &receiver, [](sys::ResponseMessage *) { return false; });
+                REQUIRE_FALSE(storage.checkBlockingCloseRequests());
+                auto callback = storage.getCallback(&response);
+            }
+
+            SECTION("WaitForResponseToClose")
+            {
+                storage.registerCallback(
+                    MessageId,
+                    &receiver,
+                    [](sys::ResponseMessage *) { return false; },
+                    app::ReceiverBehavior::WaitForResponseToClose);
+                REQUIRE(storage.checkBlockingCloseRequests());
+                auto callback = storage.getCallback(&response);
+                REQUIRE_FALSE(storage.checkBlockingCloseRequests());
+            }
         }
     }
 

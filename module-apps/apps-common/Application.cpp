@@ -245,7 +245,7 @@ namespace app
 
         // case to handle returning to previous application
         if (windowName.empty()) {
-            window = getCurrentWindow()->getName();
+            window   = getCurrentWindow()->getName();
             auto msg = std::make_shared<AppSwitchWindowMessage>(
                 window, getCurrentWindow()->getName(), std::move(data), cmd, reason);
             bus.sendUnicast(msg, this->GetName());
@@ -334,6 +334,20 @@ namespace app
             return handleAppFocusLost(msgl);
         }
         return sys::msgNotHandled();
+    }
+
+    sys::MessagePointer Application::handleAsyncResponse(sys::ResponseMessage *resp)
+    {
+        if (resp != nullptr) {
+            if (auto command = callbackStorage->getCallback(resp); command->execute()) {
+                refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+                checkBlockingRequests();
+            }
+            return std::make_shared<sys::ResponseMessage>();
+        }
+        else {
+            return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
+        }
     }
 
     sys::MessagePointer Application::handleSignalStrengthUpdate(sys::Message *msgl)
@@ -552,8 +566,30 @@ namespace app
     sys::MessagePointer Application::handleAppClose(sys::Message *msgl)
     {
         setState(State::DEACTIVATING);
-        app::manager::Controller::confirmClose(this);
-        return sys::msgHandled();
+
+        for (const auto &[windowName, window] : windowsStack) {
+            LOG_INFO("Closing a window: %s", windowName.c_str());
+            window->onClose(gui::Window::CloseReason::ApplicationClose);
+        }
+
+        if (callbackStorage->checkBlockingCloseRequests()) {
+            setState(State::FINALIZING_CLOSE);
+            app::manager::Controller::finalizingClose(this);
+            return sys::msgHandled();
+        }
+        else {
+            app::manager::Controller::confirmClose(this);
+            return sys::msgHandled();
+        }
+    }
+
+    void Application::checkBlockingRequests()
+    {
+        if (getState() == State::FINALIZING_CLOSE && !callbackStorage->checkBlockingCloseRequests()) {
+            LOG_INFO("Blocking requests done for [%s]. Closing application.", GetName().c_str());
+            setState(State::DEACTIVATING);
+            app::manager::Controller::confirmClose(this);
+        }
     }
 
     sys::MessagePointer Application::handleAppRebuild(sys::Message *msgl)
@@ -639,12 +675,7 @@ namespace app
     {
         settings->deinit();
         LOG_INFO("Closing an application: %s", GetName().c_str());
-
-        for (const auto &[windowName, window] : windowsStack) {
-            LOG_INFO("Closing a window: %s", windowName.c_str());
-            window->onClose(gui::Window::CloseReason::ApplicationClose);
-        }
-
+        LOG_INFO("Deleting windows");
         windowsStack.windows.clear();
         return sys::ReturnCodes::Success;
     }
