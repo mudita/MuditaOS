@@ -138,4 +138,8 @@ namespace gui
         }
         return false;
     }
+    auto SideListView::setPageBarVisible(bool value) noexcept -> void
+    {
+        pageBar->setVisible(value);
+    }
 } /* namespace gui */

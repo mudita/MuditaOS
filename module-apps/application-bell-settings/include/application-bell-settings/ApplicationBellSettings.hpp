@@ -11,6 +11,7 @@ namespace gui::window::name
     inline constexpr auto bellSettingsAdvanced  = "BellSettingsAdvanced";
     inline constexpr auto bellSettingsTimeUnits = "BellSettingsTimeUnits";
     inline constexpr auto bellSettingsDialog    = "BellSettingsDialog";
+    inline constexpr auto bellSettingsFinished  = "BellSettingsFinished";
 
 } // namespace gui::window::name
 

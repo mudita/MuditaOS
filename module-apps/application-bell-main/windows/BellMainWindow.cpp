@@ -2,21 +2,30 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BellMainWindow.hpp"
+
 #include <application-bell-main/ApplicationBellMain.hpp>
 #include <data/BellMainStyle.hpp>
 #include <gui/input/InputEvent.hpp>
 #include <i18n/i18n.hpp>
 #include <log/log.hpp>
-#include <time/time_conversion.hpp>
+#include <service-time/api/TimeSettingsApi.hpp>
+#include <widgets/AlarmSetSpinner.hpp>
+#include <widgets/TimeSetFmtSpinner.hpp>
+#include <widgets/TimeSetSpinner.hpp>
 
-static constexpr uint32_t mockHour   = 10;
-static constexpr uint32_t mockMinute = 15;
+namespace
+{
+    constexpr uint32_t mockHour   = 10;
+    constexpr uint32_t mockMinute = 15;
+} // namespace
 
 namespace gui
 {
     BellMainWindow::BellMainWindow(app::Application *app) : AppWindow(app, gui::name::window::main_window)
     {
         buildInterface();
+
+        preBuildDrawListHook = [this](std::list<Command> &cmd) { updateTime(); };
     }
 
     void BellMainWindow::buildInterface()
@@ -47,11 +56,10 @@ namespace gui
         vBox->addWidget(alarmSetSpinner);
 
         namespace timeLabel = bellMainStyle::mainWindow::timeLabel;
-        time = new gui::Label(this, timeLabel::posX, timeLabel::posY, timeLabel::width, timeLabel::height);
-        time->setFilled(false);
-        time->setBorderColor(gui::ColorNoColor);
-        time->setFont(timeLabel::font);
+        time                = new TimeSetFmtSpinner(
+            this, timeLabel::posX, timeLabel::posY, timeLabel::width, timeLabel::height, stm::api::timeFormat());
         time->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
+        time->setEditMode(EditMode::Browse);
 
         namespace temperatureLabel = bellMainStyle::mainWindow::temperatureLabel;
         temperature                = new gui::Label(
@@ -90,7 +98,7 @@ namespace gui
     {
         if (alarmEditMode) {
             auto ret = AppWindow::onInput(inputEvent);
-            if (ret == false) {
+            if (not ret) {
                 // alarm setting finished
                 alarmEditMode = false;
                 setFocusItem(nullptr);
@@ -120,8 +128,10 @@ namespace gui
     bool BellMainWindow::updateTime()
     {
         if (time != nullptr) {
-            utils::time::Timestamp timestamp{std::time(nullptr)};
-            time->setText(timestamp.str("%H:%M"));
+            const auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+            time->setHour(std::localtime(&now)->tm_hour);
+            time->setMinute(std::localtime(&now)->tm_min);
+            time->setTimeFormat(stm::api::timeFormat());
             return true;
         }
 

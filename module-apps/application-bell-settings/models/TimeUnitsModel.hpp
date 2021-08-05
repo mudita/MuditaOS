@@ -3,10 +3,15 @@
 
 #pragma once
 
-#include "TimeSetSpinnerListItem.hpp"
-
 #include <apps-common/Application.hpp>
 #include <apps-common/InternalModel.hpp>
+#include <time/time_locale.hpp>
+
+namespace gui
+{
+    class TimeSetListItem;
+    class TimeFormatSetListItem;
+} // namespace gui
 
 namespace app::bell_settings
 {
@@ -27,9 +32,11 @@ namespace app::bell_settings
         [[nodiscard]] auto getMinimalItemSpaceRequired() const -> unsigned int override;
 
       private:
-        app::Application *application              = nullptr;
-        gui::TimeSetSpinnerListItem *timeSetWidget = nullptr;
+        app::Application *application                  = nullptr;
+        gui::TimeSetListItem *timeSetListItem          = nullptr;
+        gui::TimeFormatSetListItem *timeFmtSetListItem = nullptr;
 
         void sendRtcUpdateTimeMessage(time_t newTime);
+        void sendTimeFmtUpdateMessage(utils::time::Locale::TimeFormat newFmt);
     };
 } // namespace app::bell_settings
