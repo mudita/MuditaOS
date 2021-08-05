@@ -3,8 +3,7 @@
 
 #pragma once
 
-#include "AudioOperations.hpp"
-
+#include <apps-common/AudioOperations.hpp>
 #include <apps-common/BasePresenter.hpp>
 
 #include <module-apps/application-music-player/models/SongsModelInterface.hpp>

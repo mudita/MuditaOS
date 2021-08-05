@@ -8,7 +8,7 @@
 
 #include <AsyncTask.hpp>
 
-namespace app::music_player
+namespace app
 {
     class AbstractAudioOperations
     {
@@ -26,10 +26,10 @@ namespace app::music_player
         virtual bool stop(const audio::Token &token, const OnStopCallback &callback)     = 0;
     };
 
-    class AudioOperations : public AbstractAudioOperations, public app::AsyncCallbackReceiver
+    class AsyncAudioOperations : public AbstractAudioOperations, public app::AsyncCallbackReceiver
     {
       public:
-        explicit AudioOperations(Application *application);
+        explicit AsyncAudioOperations(Application *application);
 
         bool play(const std::string &filePath, const OnPlayCallback &callback) override;
         bool pause(const audio::Token &token, const OnPauseCallback &callback) override;
@@ -39,4 +39,4 @@ namespace app::music_player
       private:
         Application *application = nullptr;
     };
-} // namespace app::music_player
+} // namespace app
