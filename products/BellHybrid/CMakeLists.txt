@@ -59,7 +59,6 @@ target_link_libraries(BellHybrid
         ${LWIP_LIBRARIES}
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_Linux>:iosyscalls>"
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_RT1051>:CrashCatcher::CrashCatcher>"
-        "$<$<STREQUAL:${PROJECT_TARGET},TARGET_RT1051>:CrashCatcherARM>"
     )
 
 target_link_options(BellHybrid PRIVATE ${TARGET_LINK_OPTIONS})
