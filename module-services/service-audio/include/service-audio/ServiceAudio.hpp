@@ -67,7 +67,14 @@ class ServiceAudio : public sys::Service
         -> std::unique_ptr<AudioResponseMessage>;
     auto HandleStop(const std::vector<audio::PlaybackType> &stopTypes, const audio::Token &token)
         -> std::unique_ptr<AudioResponseMessage>;
-    auto StopInput(audio::AudioMux::Input *input) -> audio::RetCode;
+
+    enum class StopReason
+    {
+        Eof,
+        Other
+    };
+
+    auto StopInput(audio::AudioMux::Input *input, StopReason stopReason = StopReason::Other) -> audio::RetCode;
     auto HandleSendEvent(std::shared_ptr<audio::Event> evt) -> std::unique_ptr<AudioResponseMessage>;
     auto HandlePause(const audio::Token &token) -> std::unique_ptr<AudioResponseMessage>;
     auto HandlePause(std::optional<audio::AudioMux::Input *> input) -> std::unique_ptr<AudioResponseMessage>;
