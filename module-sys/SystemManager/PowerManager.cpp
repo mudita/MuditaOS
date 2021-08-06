@@ -97,9 +97,13 @@ namespace sys
             isFrequencyLoweringInProgress = false;
         }
 
-        if (aboveThresholdCounter >= maxAboveThresholdCount || minFrequencyRequested > currentCpuFreq) {
+        if (minFrequencyRequested > currentCpuFreq) {
             ResetFrequencyShiftCounter();
-            IncreaseCpuFrequency();
+            IncreaseCpuFrequency(minFrequencyRequested);
+        }
+        else if (aboveThresholdCounter >= maxAboveThresholdCount) {
+            ResetFrequencyShiftCounter();
+            IncreaseCpuFrequency(bsp::CpuFrequencyHz::Level_6);
         }
         else {
             if (belowThresholdCounter >=
@@ -111,7 +115,7 @@ namespace sys
         }
     }
 
-    void PowerManager::IncreaseCpuFrequency()
+    void PowerManager::IncreaseCpuFrequency(bsp::CpuFrequencyHz newFrequency)
     {
         const auto freq = lowPowerControl->GetCurrentFrequencyLevel();
 
@@ -125,12 +129,13 @@ namespace sys
                 driverSEMC->SwitchToPLL2ClockSource();
             }
             // Add intermediate step in frequency
-            SetCpuFrequency(bsp::CpuFrequencyHz::Level_4);
+            if (newFrequency > bsp::CpuFrequencyHz::Level_4)
+                SetCpuFrequency(bsp::CpuFrequencyHz::Level_4);
         }
 
         // and increase frequency
-        if (freq < bsp::CpuFrequencyHz::Level_6) {
-            SetCpuFrequency(bsp::CpuFrequencyHz::Level_6);
+        if (freq < newFrequency) {
+            SetCpuFrequency(newFrequency);
         }
     }
 
@@ -194,11 +199,7 @@ namespace sys
 
     void PowerManager::SetCpuFrequency(bsp::CpuFrequencyHz freq)
     {
-        const auto currentFreq = lowPowerControl->GetCurrentFrequencyLevel();
-        UpdateCpuFrequencyMonitor(
-            currentFreq == bsp::CpuFrequencyHz::Level_1
-                ? lowestLevelName
-                : (currentFreq == bsp::CpuFrequencyHz::Level_6 ? highestLevelName : middleLevelName));
+        UpdateCpuFrequencyMonitor(lowPowerControl->GetCurrentFrequencyLevel());
         lowPowerControl->SetCpuFrequency(freq);
         cpuGovernor->InformSentinelsAboutCpuFrequencyChange(freq);
     }
@@ -214,9 +215,12 @@ namespace sys
         return driverSEMC;
     }
 
-    void PowerManager::UpdateCpuFrequencyMonitor(const std::string levelName)
+    void PowerManager::UpdateCpuFrequencyMonitor(bsp::CpuFrequencyHz currentFreq)
     {
-        auto ticks = xTaskGetTickCount();
+        auto ticks     = xTaskGetTickCount();
+        auto levelName = currentFreq == bsp::CpuFrequencyHz::Level_1
+                             ? lowestLevelName
+                             : (currentFreq == bsp::CpuFrequencyHz::Level_6 ? highestLevelName : middleLevelName);
 
         for (auto &level : cpuFrequencyMonitor) {
             if (level.GetName() == levelName) {
@@ -230,6 +234,7 @@ namespace sys
     void PowerManager::LogPowerManagerEfficiency()
     {
         std::string log{"PowerManager Efficiency: "};
+        UpdateCpuFrequencyMonitor(lowPowerControl->GetCurrentFrequencyLevel());
 
         for (auto &level : cpuFrequencyMonitor) {
             log.append(level.GetName() + ": " + std::to_string(level.GetRuntimePercentage()) + "% ");

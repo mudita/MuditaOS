@@ -26,6 +26,7 @@ target_sources(BellHybrid
         ${TARGET_SOURCES}
         BellHybridMain.cpp
         PlatformFactory.cpp
+        EinkSentinelBell.cpp
     )
 
 target_include_directories(BellHybrid
