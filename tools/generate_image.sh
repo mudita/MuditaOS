@@ -4,24 +4,28 @@
 
 usage() {
 cat << ==usage
-Usage: $(basename $0) image_path build_dir [boot.bin_file] [updater.bin_file]
+Usage: $(basename $0) image_path image_partitions build_dir [boot.bin_file] [updater.bin_file]
     image_path       - Destination image path name e.g., PurePhone.img
+    image_partitions - Path to image_partitions.map product-specific file
     sysroot          - product's system root e.g., build-rt1051-RelWithDebInfo/sysroot
     boot.bin_file    - optional for linux image - name of the boot.bin file (for different targets)
     updater.bin_file - optional for linux image - name of the updater.bin file
 ==usage
 }
 
-if [[ ( $# -ne 2 ) && ( $# -ne 4 ) ]]; then
+if [[ ( $# -ne 3 ) && ( $# -ne 5 ) ]]; then
 	echo "Error! Invalid argument count"
 	usage
 	exit -1
 fi
 
 IMAGE_NAME=$(realpath $1)
-SYSROOT=$(realpath $2)
-BIN_FILE=$3
-UPDATER_FILE=$4
+PRODUCT_NAME=$(basename -s .img $1)
+IMAGE_PARTITIONS=$(realpath $2)
+
+SYSROOT=$(realpath $3)
+BIN_FILE=$4
+UPDATER_FILE=$5
 
 if [ ! -d "$SYSROOT" ]; then
 	echo "Error! ${SYSROOT} is not a directory"
@@ -57,12 +61,11 @@ if [ -z ${GENLFS} ]; then
     exit -1
 fi
 
-#Number of sectors in the phone EMMC card
-DEVICE_BLK_COUNT=30621696
+source ${IMAGE_PARTITIONS}
 DEVICE_BLK_SIZE=512
+
 # Partition sizes in sector 512 units
 PART1_START=2048
-PART1_SIZE=2097152
 PART2_START=$(($PART1_START + $PART1_SIZE))
 PART2_SIZE=$PART1_SIZE
 PART3_START=$(($PART2_START + $PART2_SIZE))
@@ -83,6 +86,9 @@ unit: sectors
 # Format FAT partitions
 PART1="$IMAGE_NAME@@$(($PART1_START * $DEVICE_BLK_SIZE))"
 mformat -i "$PART1" -F -T $PART1_SIZE -M $DEVICE_BLK_SIZE -v MUDITAOS
+
+PART2="$IMAGE_NAME@@$(($PART2_START * $DEVICE_BLK_SIZE))"
+mformat -i "$PART2" -F -T $PART2_SIZE -M $DEVICE_BLK_SIZE -v RECOVER
 
 if [ ! -d "${SYSROOT}/sys" ]; then
 	echo "Fatal! Image folder sys/ missing in build. Check build system."
@@ -126,8 +132,8 @@ mcopy -s -i "$PART1" .boot.json.crc32 ::
 
 #Littlefs generate image
 echo $(pwd)
-$GENLFS --image=$IMAGE_NAME --block_size=32768  --overwrite  --partition_num=3 -- user/*
-$GENLFS --image=$IMAGE_NAME --block_size=4096  --overwrite  --partition_num=2
+$GENLFS --image=$IMAGE_NAME --block_size=4096 --overwrite --partition_num=2
+$GENLFS --image=$IMAGE_NAME --block_size=32768 --overwrite --partition_num=3 -- user/*
 
 # back to previous dir
 cd -
