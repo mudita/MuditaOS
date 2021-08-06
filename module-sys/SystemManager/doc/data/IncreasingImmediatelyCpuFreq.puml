@@ -10,5 +10,5 @@ partition "**immediately **" {
 }
 
 
-#lightblue :528 MHz;
+#lightblue :minFrequencyRequested;
 @enduml

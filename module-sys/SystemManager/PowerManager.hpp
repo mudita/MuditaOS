@@ -47,14 +47,6 @@ namespace sys
         /// @param current cpu load
         void UpdateCpuFrequency(uint32_t cpuLoad);
 
-        /// called when the CPU frequency needs to be increased
-        /// @note the frequency is always increased to the maximum value
-        void IncreaseCpuFrequency();
-
-        /// called when the CPU frequency needs to be reduced
-        /// @note the frequency is always reduced by one step
-        void DecreaseCpuFrequency();
-
         [[nodiscard]] auto getExternalRamDevice() const noexcept -> std::shared_ptr<devices::Device>;
 
         void RegisterNewSentinel(std::shared_ptr<CpuSentinel> newSentinel) const;
@@ -63,10 +55,17 @@ namespace sys
         void LogPowerManagerEfficiency();
 
       private:
+        /// called when the CPU frequency needs to be increased
+        void IncreaseCpuFrequency(bsp::CpuFrequencyHz newFrequency);
+
+        /// called when the CPU frequency needs to be reduced
+        /// @note the frequency is always reduced by one step
+        void DecreaseCpuFrequency();
+
         void ResetFrequencyShiftCounter();
         void SetCpuFrequency(bsp::CpuFrequencyHz freq);
 
-        void UpdateCpuFrequencyMonitor(const std::string levelName);
+        void UpdateCpuFrequencyMonitor(bsp::CpuFrequencyHz currentFreq);
 
         uint32_t belowThresholdCounter{0};
         uint32_t aboveThresholdCounter{0};
