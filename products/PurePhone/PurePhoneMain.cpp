@@ -22,8 +22,9 @@
 #include <application-onboarding/ApplicationOnBoarding.hpp>
 
 // services
+#include <appmgr/ApplicationManager.hpp>
 #include <evtmgr/EventManager.hpp>
-#include <service-appmgr/model/ApplicationManager.hpp>
+#include <service-appmgr/Constants.hpp>
 #include <service-audio/ServiceAudio.hpp>
 #include <service-bluetooth/ServiceBluetooth.hpp>
 #include <service-db/ServiceDB.hpp>
@@ -169,10 +170,9 @@ int main()
             applications.push_back(app::CreateLauncher<app::ApplicationOnBoarding>(app::name_onboarding));
 #endif
             // start application manager
-            return sysmgr->RunSystemService(
-                std::make_shared<app::manager::ApplicationManager>(
-                    app::manager::ApplicationManager::ServiceName, std::move(applications), app::name_desktop),
-                sysmgr.get());
+            return sysmgr->RunSystemService(std::make_shared<app::manager::ApplicationManager>(
+                                                service::name::appmgr, std::move(applications), app::name_desktop),
+                                            sysmgr.get());
         });
 
     LOG_PRINTF("Launching PurePhone \n");

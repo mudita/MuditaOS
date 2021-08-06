@@ -15,7 +15,7 @@
 
 #include <at/ATFactory.hpp>
 #include <ucs2/UCS2.hpp>
-#include <service-appmgr/model/ApplicationManager.hpp>
+#include <service-appmgr/Constants.hpp>
 
 #include "service-cellular/MessageConstants.hpp"
 #include "checkSmsCenter.hpp"
@@ -136,7 +136,7 @@ namespace cellular::internal
             bool ret = false;
             if (owner->phoneModeObserver->isInMode(sys::phone_modes::PhoneMode::Offline)) {
                 owner->bus.sendUnicast(std::make_shared<CellularSMSRejectedByOfflineNotification>(),
-                                       app::manager::ApplicationManager::ServiceName);
+                                       ::service::name::appmgr);
                 ret = true;
             }
             return ret;

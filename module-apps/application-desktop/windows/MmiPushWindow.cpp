@@ -6,8 +6,8 @@
 
 #include <i18n/i18n.hpp>
 #include <Image.hpp>
+#include <apps-common/Application.hpp>
 #include <service-appmgr/data/MmiActionsParams.hpp>
-#include <service-appmgr/model/ApplicationManager.hpp>
 
 using namespace gui;
 

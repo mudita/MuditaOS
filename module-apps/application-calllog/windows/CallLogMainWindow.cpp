@@ -6,7 +6,6 @@
 #include "ApplicationCallLog.hpp"
 #include "widgets/CalllogItem.hpp"
 
-#include <service-appmgr/model/ApplicationManager.hpp>
 #include <service-db/DBCalllogMessage.hpp>
 #include <i18n/i18n.hpp>
 #include <Label.hpp>

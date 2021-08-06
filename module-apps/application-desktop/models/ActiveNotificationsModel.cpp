@@ -10,6 +10,7 @@
 #include <gsl/assert>
 #include <module-db/queries/notifications/QueryNotificationsClear.hpp>
 #include <queries/messages/threads/QueryThreadGetByNumber.hpp>
+#include <service-appmgr/Constants.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <service-appmgr/messages/SwitchRequest.hpp>
 
@@ -51,7 +52,7 @@ namespace
                 auto data    = std::make_unique<SMSThreadData>(std::make_shared<ThreadRecord>(result->getThread()));
                 auto request = std::make_shared<app::manager::SwitchRequest>(
                     app->GetName(), app::name_messages, gui::name::window::thread_view, std::move(data));
-                return app->bus.sendUnicast(std::move(request), app::manager::ApplicationManager::ServiceName);
+                return app->bus.sendUnicast(std::move(request), service::name::appmgr);
             };
             task->setCallback(std::move(queryCallback));
             task->execute(app, static_cast<app::ApplicationDesktop *>(app));

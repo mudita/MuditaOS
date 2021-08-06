@@ -9,6 +9,7 @@
 
 #include <service-antenna/AntennaServiceAPI.hpp>
 #include <service-evtmgr/Constants.hpp>
+#include <service-appmgr/Constants.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <service-time/Constants.hpp>
 
@@ -79,7 +80,7 @@ void CellularUrcHandler::Handle(Cusd &urc)
             cellularService.ussdState = ussd::State::pullResponseReceived;
             cellularService.setUSSDTimer();
             auto msg = std::make_shared<CellularMMIResponseMessage>(*message);
-            cellularService.bus.sendUnicast(msg, app::manager::ApplicationManager::ServiceName);
+            cellularService.bus.sendUnicast(msg, service::name::appmgr);
         }
     }
     else {
@@ -87,7 +88,7 @@ void CellularUrcHandler::Handle(Cusd &urc)
         cellularService.ussdState = ussd::State::sesionAborted;
         cellularService.setUSSDTimer();
         auto msg = std::make_shared<CellularMMIPushMessage>(*message);
-        cellularService.bus.sendUnicast(msg, app::manager::ApplicationManager::ServiceName);
+        cellularService.bus.sendUnicast(msg, service::name::appmgr);
     }
 
     urc.setHandled(true);

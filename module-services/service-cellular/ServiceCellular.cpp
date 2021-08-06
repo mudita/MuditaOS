@@ -63,6 +63,7 @@
 #include <service-antenna/AntennaMessage.hpp>
 #include <service-antenna/AntennaServiceAPI.hpp>
 #include <service-antenna/ServiceAntenna.hpp>
+#include <service-appmgr/Constants.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <service-db/DBServiceAPI.hpp>
 #include <service-db/DBNotificationMessage.hpp>
@@ -72,7 +73,6 @@
 #include <service-evtmgr/EVMessages.hpp>
 #include <service-desktop/DesktopMessages.hpp>
 #include <service-desktop/DeveloperModeMessage.hpp>
-#include <service-appmgr/model/ApplicationManager.hpp>
 #include <service-time/service-time/TimeMessage.hpp>
 #include <task.h>
 #include <ucs2/UCS2.hpp>
@@ -426,7 +426,7 @@ void ServiceCellular::registerMessageHandlers()
     connect(typeid(CellularCallRequestMessage), [&](sys::Message *request) -> sys::MessagePointer {
         if (phoneModeObserver->isInMode(sys::phone_modes::PhoneMode::Offline)) {
             this->bus.sendUnicast(std::make_shared<CellularCallRejectedByOfflineNotification>(),
-                                  app::manager::ApplicationManager::ServiceName);
+                                  ::service::name::appmgr);
             return std::make_shared<CellularResponseMessage>(true);
         }
 

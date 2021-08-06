@@ -9,7 +9,6 @@
 #include <log.hpp>
 #include <service-evtmgr/EVMessages.hpp>
 #include <service-evtmgr/EventManagerCommon.hpp>
-#include <service-appmgr/model/ApplicationManager.hpp>
 #include <module-sys/Timers/TimerFactory.hpp>
 // MessageType
 #include "MessageType.hpp"
