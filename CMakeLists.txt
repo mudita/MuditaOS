@@ -7,6 +7,12 @@ project(PureOS)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 
+include(Product)
+include(Board)
+
+validate_product_selection()
+select_board()
+
 include(Colours)
 include(CCacheConfig)
 include(ProjectConfig)
@@ -20,12 +26,11 @@ include(FetchBootloader)
 include(AddPureUpdater)
 include(DiskImage)
 include(AddPackage)
-include(Product)
-
-validate_product_selection()
 
 message("Selected product: ${PRODUCT}")
-message("PROJECT_TARGET: ${PROJECT_TARGET}")
+message("Selected board:   ${BOARD}")
+message("Board revision:   ${BOARD_REVISION}")
+message("PROJECT_TARGET:   ${PROJECT_TARGET}")
 message("TARGET_COMPILE_DEFINITIONS: ${TARGET_COMPILE_OPTIONS}")
 message("TARGET_LIBRARIES: ${TARGET_LIBRARIES}")
 message("TARGET_LINKER_FLAGS: ${TARGET_LINKER_FLAGS}")
@@ -156,9 +161,8 @@ add_custom_target(
         "Generating version info"
     )
 
-
 copy_updater_bin()
 copy_updater_ver()
 fetch_ecoboot()
-add_subdirectory(products)
 
+add_subdirectory(products)
