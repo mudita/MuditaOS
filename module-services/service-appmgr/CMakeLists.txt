@@ -25,13 +25,14 @@ target_sources(service-appmgr
         messages/SwitchRequest.cpp
         model/ActionsRegistry.cpp
         model/ApplicationHandle.cpp
-        model/ApplicationManager.cpp
+        model/ApplicationManagerCommon.cpp
         model/ApplicationStack.cpp
         model/ApplicationsRegistry.cpp
         model/OnActionPolicy.cpp
     PUBLIC
         include/service-appmgr/Actions.hpp
         include/service-appmgr/ApplicationManifest.hpp
+        include/service-appmgr/Constants.hpp
         include/service-appmgr/Controller.hpp
         include/service-appmgr/StartupType.hpp
         include/service-appmgr/data/CallActionsParams.hpp
@@ -61,7 +62,7 @@ target_sources(service-appmgr
         include/service-appmgr/messages/UserPowerDownRequest.hpp
         include/service-appmgr/model/ActionsRegistry.hpp
         include/service-appmgr/model/ApplicationHandle.hpp
-        include/service-appmgr/model/ApplicationManager.hpp
+        include/service-appmgr/model/ApplicationManagerCommon.hpp
         include/service-appmgr/model/ApplicationStack.hpp
         include/service-appmgr/model/ApplicationsRegistry.hpp
         include/service-appmgr/model/OnActionPolicy.hpp

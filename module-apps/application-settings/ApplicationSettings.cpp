@@ -63,8 +63,8 @@
 
 #include <Dialog.hpp>
 #include <messages/DialogMetadataMessage.hpp>
+#include <service-appmgr/Constants.hpp>
 #include <service-appmgr/messages/GetCurrentDisplayLanguageResponse.hpp>
-#include <service-appmgr/model/ApplicationManager.hpp>
 #include <service-bluetooth/BluetoothMessage.hpp>
 #include <service-bluetooth/Constants.hpp>
 #include <service-bluetooth/messages/BondedDevices.hpp>
@@ -703,8 +703,7 @@ namespace app
 
     void ApplicationSettings::getAutoLockTime()
     {
-        bus.sendUnicast(std::make_shared<app::manager::GetAutoLockTimeoutRequest>(),
-                        app::manager::ApplicationManager::ServiceName);
+        bus.sendUnicast(std::make_shared<app::manager::GetAutoLockTimeoutRequest>(), service::name::appmgr);
     }
 
     auto ApplicationSettings::getCurrentPhoneMode() const noexcept -> sys::phone_modes::PhoneMode
@@ -714,8 +713,7 @@ namespace app
 
     void ApplicationSettings::setAutoLockTime(std::chrono::seconds lockTime)
     {
-        bus.sendUnicast(std::make_shared<app::manager::SetAutoLockTimeoutRequest>(lockTime),
-                        app::manager::ApplicationManager::ServiceName);
+        bus.sendUnicast(std::make_shared<app::manager::SetAutoLockTimeoutRequest>(lockTime), service::name::appmgr);
     }
 
     void ApplicationSettings::switchToAllDevicesViaBtErrorPrompt(std::shared_ptr<sys::DataMessage> msg,

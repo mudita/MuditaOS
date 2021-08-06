@@ -9,10 +9,11 @@
 #include <application-bell-settings/ApplicationBellSettings.hpp>
 
 // services
+#include <appmgr/ApplicationManager.hpp>
 #include <evtmgr/EventManager.hpp>
 #include <module-services/service-eink/ServiceEink.hpp>
 #include <Service/ServiceCreator.hpp>
-#include <service-appmgr/model/ApplicationManager.hpp>
+#include <service-appmgr/Constants.hpp>
 #include <service-audio/ServiceAudio.hpp>
 #include <service-bluetooth/ServiceBluetooth.hpp>
 #include <service-db/ServiceDB.hpp>
@@ -98,7 +99,7 @@ int main()
             // start application manager
             return sysmgr->RunSystemService(
                 std::make_shared<app::manager::ApplicationManager>(
-                    app::manager::ApplicationManager::ServiceName, std::move(applications), app::applicationBellName),
+                    service::name::appmgr, std::move(applications), app::applicationBellName),
                 sysmgr.get());
         });
 

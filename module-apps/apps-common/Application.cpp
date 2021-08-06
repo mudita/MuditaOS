@@ -36,6 +36,7 @@
 #include <WindowsFactory.hpp>
 #include <service-gui/Common.hpp>
 #include <module-utils/Utils.hpp>
+#include <service-db/service-db/Settings.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
 #include <service-audio/AudioServiceAPI.hpp> // for GetOutputVolume
 

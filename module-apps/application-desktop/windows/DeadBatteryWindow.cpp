@@ -9,7 +9,6 @@
 #include <InputEvent.hpp>
 #include <log.hpp>
 #include <service-appmgr/Controller.hpp>
-#include <service-appmgr/model/ApplicationManager.hpp>
 
 namespace gui
 {

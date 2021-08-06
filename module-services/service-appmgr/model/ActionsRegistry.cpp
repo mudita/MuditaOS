@@ -84,6 +84,8 @@ namespace app::manager
                 it = actions.erase(it);
                 break;
             }
+            case ActionProcessStatus::NotHandled:
+                [[fallthrough]];
             case ActionProcessStatus::Skipped:
                 // Skip the action and check the next one.
                 ++it;

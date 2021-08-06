@@ -42,7 +42,8 @@ namespace app::manager
     {
         Accepted,
         Skipped,
-        Dropped
+        Dropped,
+        NotHandled
     };
 
     class ActionsRegistry

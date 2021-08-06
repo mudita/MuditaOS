@@ -40,6 +40,7 @@ target_link_libraries(BellHybrid
         application-bell-main
         application-bell-settings
         application-music-player
+        appmgr
         evtmgr
         messagetype
         module-apps

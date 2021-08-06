@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -96,14 +96,12 @@ namespace app::manager
         State state = State::Running;
     };
 
-    class ApplicationManager : public sys::Service, private ApplicationManagerBase
+    class ApplicationManagerCommon : public sys::Service, protected ApplicationManagerBase
     {
       public:
-        static constexpr auto ServiceName = "ApplicationManager";
-
-        ApplicationManager(const ApplicationName &serviceName,
-                           std::vector<std::unique_ptr<app::ApplicationLauncher>> &&launchers,
-                           const ApplicationName &_rootApplicationName);
+        ApplicationManagerCommon(const ApplicationName &serviceName,
+                                 std::vector<std::unique_ptr<app::ApplicationLauncher>> &&launchers,
+                                 const ApplicationName &_rootApplicationName);
 
         auto InitHandler() -> sys::ReturnCodes override;
         auto DeinitHandler() -> sys::ReturnCodes override;
@@ -111,9 +109,23 @@ namespace app::manager
         auto SwitchPowerModeHandler(const sys::ServicePowerMode mode) -> sys::ReturnCodes override;
         auto DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) -> sys::MessagePointer override;
 
+      protected:
+        virtual auto handleAction(ActionEntry &action) -> ActionProcessStatus;
+        auto handleMessageAsAction(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>;
+        virtual auto startApplication(ApplicationHandle &app) -> bool;
+        virtual auto resolveHomeWindow() -> std::string;
+        virtual auto resolveHomeApplication() -> std::string
+        {
+            return rootApplicationName;
+        }
+        auto checkOnBoarding() -> bool;
+        virtual void registerMessageHandlers();
+
+        ApplicationName rootApplicationName;
+        ActionsRegistry actionsRegistry;
+        std::shared_ptr<settings::Settings> settings;
+
       private:
-        auto startApplication(ApplicationHandle &app) -> bool;
-        void startBackgroundApplications();
         void rebuildActiveApplications();
         void suspendSystemServices();
         void closeNoLongerNeededApplications();
@@ -122,20 +134,11 @@ namespace app::manager
         void closeApplication(ApplicationHandle *application);
 
         // Message handlers
-        void registerMessageHandlers();
-        auto handleAction(ActionEntry &action) -> ActionProcessStatus;
         void handleActionRequest(ActionRequest *actionMsg);
         auto handleHomeAction(ActionEntry &action) -> ActionProcessStatus;
-        auto resolveHomeWindow() -> std::string;
         auto handleOnBoardingFinalize() -> sys::MessagePointer;
-        auto checkOnBoarding() -> bool;
-        auto resolveHomeApplication() -> std::string;
         auto handleLaunchAction(ActionEntry &action) -> ActionProcessStatus;
         auto handleActionOnFocusedApp(ActionEntry &action) -> ActionProcessStatus;
-        auto handlePhoneModeChangedAction(ActionEntry &action) -> ActionProcessStatus;
-        void handlePhoneModeChanged(sys::phone_modes::PhoneMode phoneMode);
-        void handleTetheringChanged(sys::phone_modes::Tethering tethering);
-        void changePhoneMode(sys::phone_modes::PhoneMode phoneMode, const ApplicationHandle *app);
         auto handleCustomAction(ActionEntry &action) -> ActionProcessStatus;
         auto handleCustomActionOnBackgroundApp(ApplicationHandle *app, ActionEntry &action) -> ActionProcessStatus;
         auto handleSwitchApplication(SwitchRequest *msg, bool closeCurrentlyFocusedApp = true) -> bool;
@@ -145,15 +148,11 @@ namespace app::manager
         auto handleInitApplication(ApplicationInitialised *msg) -> bool;
         auto handleDisplayLanguageChange(DisplayLanguageChangeRequest *msg) -> bool;
         auto handleInputLanguageChange(InputLanguageChangeRequest *msg) -> bool;
-        auto handleDBResponse(db::QueryResponse *msg) -> bool;
         auto handlePowerSavingModeInit() -> bool;
-        auto handleMessageAsAction(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>;
-        auto handleDeveloperModeRequest(sys::Message *request) -> sys::MessagePointer;
+        virtual auto handleDeveloperModeRequest(sys::Message *request) -> sys::MessagePointer;
         /// handles dom request by passing this request to application which should provide the dom
         auto handleDOMRequest(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>;
         void handleStart(StartAllowedMessage *msg);
-        auto handleAutoLockGetRequest(GetAutoLockTimeoutRequest *request) -> std::shared_ptr<sys::ResponseMessage>;
-        auto handleAutoLockSetRequest(SetAutoLockTimeoutRequest *request) -> std::shared_ptr<sys::ResponseMessage>;
 
         void requestApplicationClose(ApplicationHandle &app, bool isCloseable);
         void onApplicationSwitch(ApplicationHandle &nextApp,
@@ -165,49 +164,10 @@ namespace app::manager
         auto onSwitchConfirmed(ApplicationHandle &app) -> bool;
         void onLaunchFinished(ApplicationHandle &app);
         auto onCloseConfirmed(ApplicationHandle &app) -> bool;
-        /// @brief method is called on auto-locking timer tick event (blockTimer)
-        /// @detailed It sends AutoLock action to ApplicationDesktop to lock the screen.
-        /// @note AutoLock action is sent only if following conditions are met:
-        ///  - tethering is off
-        ///  - focused application is not preventing AutoLock
-        void onPhoneLocked();
 
-        ApplicationName rootApplicationName;
-        ActionsRegistry actionsRegistry;
         OnActionPolicy actionPolicy;
 
-        sys::TimerHandle autoLockTimer; //< auto-lock timer to count time from last user's activity.
-                                        // If it reaches time defined in settings database application
-                                        // manager is sending signal to Application Desktop in order to
-                                        // lock screen.
-        std::shared_ptr<settings::Settings> settings;
-        std::shared_ptr<sys::phone_modes::Observer> phoneModeObserver;
-
-        locks::PhoneLockHandler phoneLockHandler;
-        locks::SimLockHandler simLockHandler;
-
-        notifications::NotificationsConfiguration notificationsConfig;
-        notifications::NotificationsHandler notificationsHandler;
-        notifications::NotificationProvider notificationProvider;
-
         void displayLanguageChanged(std::string value);
-        void lockTimeChanged(std::string value);
         void inputLanguageChanged(std::string value);
-
-        void processKeypadBacklightState(bsp::keypad_backlight::State keypadLightState);
     };
 } // namespace app::manager
-
-namespace sys
-{
-    template <> struct ManifestTraits<app::manager::ApplicationManager>
-    {
-        static auto GetManifest() -> ServiceManifest
-        {
-            ServiceManifest manifest;
-            manifest.name         = app::manager::ApplicationManager::ServiceName;
-            manifest.dependencies = {service::name::db, service::name::gui, service::name::eink};
-            return manifest;
-        }
-    };
-} // namespace sys
