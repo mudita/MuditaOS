@@ -22,7 +22,7 @@
 #include <service-cellular/CellularMessage.hpp>
 #include <service-appmgr/model/ApplicationManager.hpp>
 #include <service-appmgr/Controller.hpp>
-#include "messages/CpuFrequencyMessage.hpp"
+#include "messages/SystemManagerMessage.hpp"
 #include "messages/DeviceRegistrationMessage.hpp"
 #include "messages/SentinelRegistrationMessage.hpp"
 #include "messages/RequestCpuFrequencyMessage.hpp"
@@ -546,21 +546,6 @@ namespace sys
         connect(ReadyToCloseMessage(), [&](Message *msg) {
             readyToCloseHandler(msg);
             return MessageNone{};
-        });
-
-        connect(typeid(sys::CpuFrequencyMessage), [this](sys::Message *message) -> sys::MessagePointer {
-            auto msg = static_cast<sys::CpuFrequencyMessage *>(message);
-
-            if (msg->getAction() == sys::CpuFrequencyMessage::Action::Increase) {
-                powerManager->IncreaseCpuFrequency();
-                cpuStatisticsTimer.start();
-            }
-            else if (msg->getAction() == sys::CpuFrequencyMessage::Action::Decrease) {
-                powerManager->DecreaseCpuFrequency();
-                cpuStatisticsTimer.start();
-            }
-
-            return sys::MessageNone{};
         });
 
         connect(typeid(sys::DeviceRegistrationMessage), [this](sys::Message *message) -> sys::MessagePointer {

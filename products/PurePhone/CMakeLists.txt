@@ -32,6 +32,7 @@ target_sources(PurePhone
         ${TARGET_SOURCES}
         PurePhoneMain.cpp
         PlatformFactory.cpp
+        EinkSentinelPure.cpp
     )
 
 target_include_directories(PurePhone
