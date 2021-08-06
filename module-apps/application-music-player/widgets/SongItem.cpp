@@ -87,7 +87,6 @@ namespace gui
                     break;
                 case ItemState::None:
                     bottorBarText = utils::translate("app_music_player_play");
-                    ;
                     break;
                 }
                 if (bottomBarTemporaryMode != nullptr) {
@@ -100,6 +99,7 @@ namespace gui
                     bottomBarRestoreFromTemporaryMode();
                 }
             }
+            setState(itemState);
             return true;
         };
     }

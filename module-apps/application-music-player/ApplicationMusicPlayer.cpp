@@ -75,6 +75,11 @@ namespace app
             music_player::AudioNotificationsHandler audioNotificationHandler{priv->songsPresenter};
             return audioNotificationHandler.handleAudioStopNotification(notification);
         });
+        connect(typeid(AudioEOFNotification), [&](sys::Message *msg) -> sys::MessagePointer {
+            auto notification = static_cast<AudioStopNotification *>(msg);
+            music_player::AudioNotificationsHandler audioNotificationHandler{priv->songsPresenter};
+            return audioNotificationHandler.handleAudioEofNotification(notification);
+        });
     }
 
     ApplicationMusicPlayer::~ApplicationMusicPlayer() = default;

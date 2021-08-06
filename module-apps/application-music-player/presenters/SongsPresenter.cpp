@@ -125,10 +125,29 @@ namespace app::music_player
         return false;
     }
 
-    bool SongsPresenter::requestAudioOperation(const std::string &filePath)
+    bool SongsPresenter::handleAudioEofNotification(audio::Token token)
     {
         auto currentSongContext = songsModelInterface->getCurrentSongContext();
 
+        if (token == currentSongContext.currentFileToken) {
+            songsModelInterface->clearCurrentSongContext();
+            if (changePlayingStateCallback != nullptr) {
+                changePlayingStateCallback(SongState::NotPlaying);
+            }
+            updateViewSongState();
+            refreshView();
+            auto nextSongToPlay = songsModelInterface->getNextFilePath(currentSongContext.filePath);
+            if (!nextSongToPlay.empty()) {
+                requestAudioOperation(nextSongToPlay);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    bool SongsPresenter::requestAudioOperation(const std::string &filePath)
+    {
+        auto currentSongContext = songsModelInterface->getCurrentSongContext();
         if (currentSongContext.isValid() && (filePath.empty() || currentSongContext.filePath == filePath)) {
             return currentSongContext.isPlaying() ? pause() : resume();
         }

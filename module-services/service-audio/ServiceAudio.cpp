@@ -452,15 +452,21 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStop(const std::vector
     return std::make_unique<AudioStopResponse>(audio::RetCode::Success, token);
 }
 
-auto ServiceAudio::StopInput(audio::AudioMux::Input *input) -> audio::RetCode
+auto ServiceAudio::StopInput(audio::AudioMux::Input *input, StopReason stopReason) -> audio::RetCode
 {
     if (input->audio->GetCurrentState() == Audio::State::Idle) {
         return audio::RetCode::Success;
     }
     const auto rCode = input->audio->Stop();
     // Send notification that audio file was stopped
-    auto msgStop = std::make_shared<AudioStopNotification>(input->token);
-    bus.sendMulticast(std::move(msgStop), sys::BusChannel::ServiceAudioNotifications);
+    std::shared_ptr<AudioNotificationMessage> msg;
+    if (stopReason == StopReason::Eof) {
+        msg = std::make_shared<AudioEOFNotification>(input->token);
+    }
+    else {
+        msg = std::make_shared<AudioStopNotification>(input->token);
+    }
+    bus.sendMulticast(std::move(msg), sys::BusChannel::ServiceAudioNotifications);
     audioMux.ResetInput(input);
     VibrationUpdate();
     return rCode;
@@ -476,7 +482,7 @@ void ServiceAudio::HandleEOF(const Token &token)
             }
         }
         else {
-            StopInput(*input);
+            StopInput(*input, StopReason::Eof);
         }
     }
 }
