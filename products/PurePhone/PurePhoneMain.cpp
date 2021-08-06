@@ -22,7 +22,7 @@
 #include <application-onboarding/ApplicationOnBoarding.hpp>
 
 // services
-#include <service-appmgr/model/ApplicationManager.hpp>
+#include <appmgr/PureApplicationManager.hpp>
 #include <service-audio/ServiceAudio.hpp>
 #include <service-bluetooth/ServiceBluetooth.hpp>
 #include <service-db/ServiceDB.hpp>
@@ -170,7 +170,7 @@ int main()
 #endif
             // start application manager
             return sysmgr->RunSystemService(
-                std::make_shared<app::manager::ApplicationManager>(
+                std::make_shared<app::manager::PureApplicationManager>(
                     app::manager::ApplicationManager::ServiceName, std::move(applications), app::name_desktop),
                 sysmgr.get());
         });

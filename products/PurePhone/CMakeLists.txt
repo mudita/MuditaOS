@@ -32,6 +32,8 @@ target_sources(PurePhone
         ${TARGET_SOURCES}
         PurePhoneMain.cpp
         PlatformFactory.cpp
+        services/appmgr/PureApplicationManager.cpp
+        services/appmgr/PureApplicationManager.hpp
     )
 
 target_include_directories(PurePhone
@@ -39,6 +41,7 @@ target_include_directories(PurePhone
         ${TARGET_DIR_INCLUDES}
         ${PROJECT_INCLUDES}
         ${CMAKE_BINARY_DIR}
+        services
     )
 
 set_target_properties(PurePhone

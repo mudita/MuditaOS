@@ -26,6 +26,8 @@ target_sources(BellHybrid
         ${TARGET_SOURCES}
         BellHybridMain.cpp
         PlatformFactory.cpp
+        services/appmgr/BellApplicationManager.cpp
+        services/appmgr/BellApplicationManager.hpp
     )
 
 target_include_directories(BellHybrid
@@ -33,6 +35,7 @@ target_include_directories(BellHybrid
         ${TARGET_DIR_INCLUDES}
         ${PROJECT_INCLUDES}
         ${CMAKE_BINARY_DIR}
+        services
 )
 
 set_target_properties(BellHybrid
@@ -89,4 +92,3 @@ add_version_json(BellHybrid)
 
 add_standalone_image(BellHybrid)
 add_update_package(BellHybrid)
-
