@@ -2,7 +2,7 @@ function(add_image)
     cmake_parse_arguments(
         _ARG
         ""
-        "PRODUCT;SYSROOT;ASSETS"
+        "PRODUCT;SYSROOT;ASSETS;IMAGE_PARTITIONS"
         ""
         ${ARGN}
     )
@@ -16,6 +16,11 @@ function(add_image)
 
     set(DISK_IMAGE_NAME ${_ARG_PRODUCT}.img)
     set(DISK_IMAGE_PATH ${CMAKE_BINARY_DIR}/${DISK_IMAGE_NAME})
+    if(DEFINED _ARG_IMAGE_PARTITIONS)
+        set(IMAGE_PARTITIONS ${_ARG_IMAGE_PARTITIONS})
+    else()
+        set(IMAGE_PARTITIONS ${CMAKE_SOURCE_DIR}/config/products/${_ARG_PRODUCT}/image_partitions.map)
+    endif()
 
     if(HAS_BOOTFILE)
         set(BIN_FILE_TARGET ${_ARG_PRODUCT}-boot.bin)
@@ -31,7 +36,7 @@ function(add_image)
     endif()
 
     set(COMMAND_DEPENDS "genlittlefs")
-    list(APPEND COMMNDS_DEPENDS ${SCRIPT_PATH})
+    list(APPEND COMMAND_DEPENDS ${SCRIPT_PATH})
     if(_ARG_ASSETS)
         list(APPEND COMMAND_DEPENDS ${_ARG_ASSETS})
     endif()
@@ -49,6 +54,7 @@ function(add_image)
         COMMAND
             ${SCRIPT_PATH}
             ${DISK_IMAGE_NAME}
+            ${IMAGE_PARTITIONS}
             ${CMAKE_BINARY_DIR}/${_ARG_SYSROOT}
             "${BIN_FILE_PATH}"
             "${UPDATER_FILE_PATH}"
