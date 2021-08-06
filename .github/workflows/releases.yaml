@@ -40,7 +40,7 @@ jobs:
       run: |
         export JOBS=${JOBS:-$(nproc)} && \
         echo "JOBS=${JOBS}" &&  \
-        ./configure.sh pure rt1051 RelWithDebInfo -DPURE_HW_TARGET=T6 -G Ninja && \
+        ./configure.sh pure rt1051 RelWithDebInfo -DWITH_BOARD_REVISION=6 -G Ninja && \
         pushd build-purephone-rt1051-RelWithDebInfo && \
         ninja -j ${JOBS} Pure&& \
         ninja -j ${JOBS} PurePhone-UpdatePackage && \
