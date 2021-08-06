@@ -3,7 +3,7 @@
 
 #include "SecurityEndpointHelper.hpp"
 #include <parser/ParserUtils.hpp>
-#include <service-appmgr/model/ApplicationManager.hpp>
+#include <service-appmgr/Constants.hpp>
 #include <service-appmgr/messages/PreventBlockingRequest.hpp>
 #include <service-desktop/service-desktop/ServiceDesktop.hpp>
 #include <apps-common/locks/data/PhoneLockMessages.hpp>
@@ -73,9 +73,8 @@ auto SecurityEndpointHelper::processConfiguration(Context &context) -> http::Cod
     if (passCode.size() == PasscodeLength) {
         try {
             auto msg = std::make_shared<locks::ExternalUnLockPhone>(passCodeArrayToVecOfInts(passCode));
-            status   = owner->bus.sendUnicast(std::move(msg), app::manager::ApplicationManager::ServiceName)
-                         ? http::Code::NoContent
-                         : http::Code::InternalServerError;
+            status   = owner->bus.sendUnicast(std::move(msg), service::name::appmgr) ? http::Code::NoContent
+                                                                                     : http::Code::InternalServerError;
         }
         catch (const std::exception &e) {
             LOG_ERROR("Passcode decoding exception");

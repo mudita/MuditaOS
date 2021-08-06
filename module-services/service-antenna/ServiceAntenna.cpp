@@ -12,7 +12,6 @@
 #include <MessageType.hpp>
 #include <module-sys/Timers/TimerFactory.hpp>
 #include <projdefs.h>
-#include <service-appmgr/model/ApplicationManager.hpp>
 #include <service-cellular/CellularMessage.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
 #include <service-cellular/State.hpp>

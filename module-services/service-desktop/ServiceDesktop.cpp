@@ -23,7 +23,8 @@
 #include <module-sys/SystemManager/SystemManager.hpp>
 #include <module-sys/Timers/TimerFactory.hpp>
 
-#include <service-appmgr/model/ApplicationManager.hpp>
+#include <locks/data/PhoneLockMessages.hpp>
+#include <service-appmgr/Constants.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <module-sys/SystemManager/Constants.hpp>
 #include <module-sys/SystemManager/messages/TetheringStateRequest.hpp>
@@ -159,7 +160,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
         if (usbSecurityModel->isSecurityEnabled()) {
             LOG_INFO("Endpoint security enabled, requesting passcode");
 
-            bus.sendUnicast(std::make_shared<locks::UnlockPhone>(), app::manager::ApplicationManager::ServiceName);
+            bus.sendUnicast(std::make_shared<locks::UnlockPhone>(), service::name::appmgr);
         }
 
         return sys::MessageNone{};
@@ -168,8 +169,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
     connect(sdesktop::usb::USBDisconnected(), [&](sys::Message *msg) {
         LOG_INFO("USB disconnected");
         if (usbSecurityModel->isSecurityEnabled()) {
-            bus.sendUnicast(std::make_shared<locks::CancelUnlockPhone>(),
-                            app::manager::ApplicationManager::ServiceName);
+            bus.sendUnicast(std::make_shared<locks::CancelUnlockPhone>(), service::name::appmgr);
         }
         bus.sendUnicast(std::make_shared<sys::TetheringStateRequest>(sys::phone_modes::Tethering::Off),
                         service::name::system_manager);

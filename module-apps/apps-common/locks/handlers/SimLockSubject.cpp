@@ -3,8 +3,9 @@
 
 #include "SimLockSubject.hpp"
 
-#include <locks/data/PhoneLockMessages.hpp>
-#include <service-appmgr/model/ApplicationManager.hpp>
+#include <apps-common/locks/data/PhoneLockMessages.hpp>
+#include <apps-common/locks/data/SimLockMessages.hpp>
+#include <service-appmgr/Constants.hpp>
 
 namespace locks
 {
@@ -17,27 +18,26 @@ namespace locks
 
     void SimLockSubject::setSim(cellular::api::SimSlot simSlot)
     {
-        owner->bus.sendUnicast(std::make_shared<locks::SetSim>(simSlot), app::manager::ApplicationManager::ServiceName);
+        owner->bus.sendUnicast(std::make_shared<locks::SetSim>(simSlot), service::name::appmgr);
     }
 
     void SimLockSubject::changeSimPin()
     {
-        owner->bus.sendUnicast(std::make_shared<locks::ChangeSimPin>(), app::manager::ApplicationManager::ServiceName);
+        owner->bus.sendUnicast(std::make_shared<locks::ChangeSimPin>(), service::name::appmgr);
     }
 
     void SimLockSubject::enableSimPin()
     {
-        owner->bus.sendUnicast(std::make_shared<locks::EnableSimPin>(), app::manager::ApplicationManager::ServiceName);
+        owner->bus.sendUnicast(std::make_shared<locks::EnableSimPin>(), service::name::appmgr);
     }
 
     void SimLockSubject::disableSimPin()
     {
-        owner->bus.sendUnicast(std::make_shared<locks::DisableSimPin>(), app::manager::ApplicationManager::ServiceName);
+        owner->bus.sendUnicast(std::make_shared<locks::DisableSimPin>(), service::name::appmgr);
     }
 
     void SimLockSubject::verifyInput(LockInput inputData)
     {
-        owner->bus.sendUnicast(std::make_shared<UnLockSimInput>(inputData),
-                               app::manager::ApplicationManager::ServiceName);
+        owner->bus.sendUnicast(std::make_shared<UnLockSimInput>(inputData), service::name::appmgr);
     }
 } // namespace locks

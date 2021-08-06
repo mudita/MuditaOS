@@ -15,7 +15,6 @@
 #include <log.hpp>
 #include <module-db/queries/messages/threads/QueryThreadGetByContactID.hpp>
 #include <module-db/queries/notifications/QueryNotificationsClear.hpp>
-#include <service-appmgr/model/ApplicationManager.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <service-db/DBServiceAPI.hpp>
 #include <Style.hpp>

@@ -3,9 +3,9 @@
 
 #include "Dialog.hpp"
 #include "DialogMetadataMessage.hpp"
-#include <service-appmgr/model/ApplicationManager.hpp>
 #include <i18n/i18n.hpp>
 #include <Image.hpp>
+#include <apps-common/Application.hpp>
 
 using namespace gui;
 

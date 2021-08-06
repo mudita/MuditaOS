@@ -5,7 +5,6 @@
 
 #include <service-appmgr/Actions.hpp>
 #include <service-appmgr/messages/Message.hpp>
-#include <service-appmgr/model/ApplicationManager.hpp>
 
 #include <module-sys/Service/Service.hpp>
 #include <SwitchData.hpp>

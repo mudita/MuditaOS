@@ -17,8 +17,10 @@
 #include "windows/OnBoardingChangeDateAndTimeWindow.hpp"
 
 #include <application-settings/windows/system/ChangeTimeZone.hpp>
+#include <apps-common/locks/data/PhoneLockMessages.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
-#include <service-appmgr/model/ApplicationManager.hpp>
+#include <service-appmgr/Constants.hpp>
+#include <service-appmgr/messages/GetCurrentDisplayLanguageResponse.hpp>
 
 namespace app
 {
@@ -102,8 +104,7 @@ namespace app
 
     void ApplicationOnBoarding::finalizeOnBoarding()
     {
-        bus.sendUnicast(std::make_shared<onBoarding::FinalizeOnBoarding>(),
-                        app::manager::ApplicationManager::ServiceName);
+        bus.sendUnicast(std::make_shared<onBoarding::FinalizeOnBoarding>(), service::name::appmgr);
     }
 
     sys::ReturnCodes ApplicationOnBoarding::DeinitHandler()

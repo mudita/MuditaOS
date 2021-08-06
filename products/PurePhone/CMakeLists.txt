@@ -55,6 +55,7 @@ target_link_libraries(PurePhone
         application-phonebook
         application-settings
         application-special-input
+        appmgr
         evtmgr
         messagetype
         module-apps

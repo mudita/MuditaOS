@@ -26,6 +26,7 @@
 #include <service-appmgr/Controller.hpp>
 
 #include <ctime>
+#include <locks/data/PhoneLockMessages.hpp>
 
 namespace parserFSM
 {
