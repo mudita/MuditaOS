@@ -6,7 +6,6 @@
 #include <functional>
 
 #include <OptionsWindow.hpp>
-#include <service-appmgr/model/ApplicationManager.hpp>
 #include "ApplicationCallLog.hpp"
 #include "data/CallLogInternals.hpp"
 #include "data/CallLogSwitchData.hpp"

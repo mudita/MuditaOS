@@ -22,7 +22,7 @@
 #include "service-cellular/requests/CallWaitingRequest.hpp"
 #include "service-cellular/requests/RejectRequest.hpp"
 
-#include <service-appmgr/model/ApplicationManager.hpp>
+#include <service-appmgr/Constants.hpp>
 
 #include <module-cellular/at/response.hpp>
 
@@ -42,7 +42,7 @@ void CellularRequestHandler::handle(cellular::ImeiRequest &request, at::Result &
     }
 
     auto msg = std::make_shared<CellularMMIResultMessage>(MMIResultParams::MMIResult::Success, response);
-    cellular.bus.sendUnicast(msg, app::manager::ApplicationManager::ServiceName);
+    cellular.bus.sendUnicast(msg, service::name::appmgr);
 }
 
 void CellularRequestHandler::handle(cellular::UssdRequest &request, at::Result &result)
@@ -77,11 +77,11 @@ void CellularRequestHandler::handle(cellular::RejectRequest &request, at::Result
 {
     if (request.getRejectReason() == cellular::RejectRequest::RejectReason::NoSim) {
         auto message = std::make_shared<CellularNoSimNotification>(request.getNumber());
-        cellular.bus.sendUnicast(message, app::manager::ApplicationManager::ServiceName);
+        cellular.bus.sendUnicast(message, service::name::appmgr);
     }
     else if (request.getRejectReason() == cellular::RejectRequest::RejectReason::NotAnEmergencyNumber) {
         auto message = std::make_shared<CellularNotAnEmergencyNotification>(request.getNumber());
-        cellular.bus.sendUnicast(message, app::manager::ApplicationManager::ServiceName);
+        cellular.bus.sendUnicast(message, service::name::appmgr);
     }
     request.setHandled(true);
 }
@@ -135,7 +135,7 @@ void CellularRequestHandler::handle(cellular::ClirRequest &request, at::Result &
         }
     }
     auto msg = std::make_shared<CellularMMIResultMessage>(MMIResultParams::MMIResult::Success, response);
-    cellular.bus.sendUnicast(msg, app::manager::ApplicationManager::ServiceName);
+    cellular.bus.sendUnicast(msg, ::service::name::appmgr);
     request.setHandled(requestHandled);
 }
 
@@ -200,7 +200,7 @@ void CellularRequestHandler::handle(cellular::CallForwardingRequest &request, at
         response->addMessage(IMMICustomResultParams::MMIResultMessage::CommonFailure);
     }
     auto msg = std::make_shared<CellularMMIResultMessage>(MMIResultParams::MMIResult::Success, response);
-    cellular.bus.sendUnicast(msg, app::manager::ApplicationManager::ServiceName);
+    cellular.bus.sendUnicast(msg, ::service::name::appmgr);
     request.setHandled(requestHandled);
 }
 
@@ -249,7 +249,7 @@ void CellularRequestHandler::handle(cellular::CallBarringRequest &request, at::R
     }
 
     auto msg = std::make_shared<CellularMMIResultMessage>(MMIResultParams::MMIResult::Success, response);
-    cellular.bus.sendUnicast(msg, app::manager::ApplicationManager::ServiceName);
+    cellular.bus.sendUnicast(msg, ::service::name::appmgr);
     request.setHandled(requestHandled);
 }
 
@@ -287,7 +287,7 @@ void CellularRequestHandler::handle(cellular::ClipRequest &request, at::Result &
     }
 
     auto msg = std::make_shared<CellularMMIResultMessage>(MMIResultParams::MMIResult::Success, response);
-    cellular.bus.sendUnicast(msg, app::manager::ApplicationManager::ServiceName);
+    cellular.bus.sendUnicast(msg, ::service::name::appmgr);
     request.setHandled(requestHandled);
 }
 
@@ -334,7 +334,7 @@ void CellularRequestHandler::handle(cellular::CallWaitingRequest &request, at::R
         response->addMessage(IMMICustomResultParams::MMIResultMessage::CommonFailure);
     }
     auto msg = std::make_shared<CellularMMIResultMessage>(MMIResultParams::MMIResult::Success, response);
-    cellular.bus.sendUnicast(msg, app::manager::ApplicationManager::ServiceName);
+    cellular.bus.sendUnicast(msg, ::service::name::appmgr);
     request.setHandled(requestHandled);
 }
 
@@ -344,5 +344,5 @@ void CellularRequestHandler::sendMmiResult(bool result)
 
     auto msg = std::make_shared<CellularMMIResultMessage>(result ? MMIResultParams::MMIResult::Success
                                                                  : MMIResultParams::MMIResult::Failed);
-    cellular.bus.sendUnicast(msg, app::manager::ApplicationManager::ServiceName);
+    cellular.bus.sendUnicast(msg, ::service::name::appmgr);
 }

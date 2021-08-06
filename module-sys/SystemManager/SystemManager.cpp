@@ -20,7 +20,7 @@
 #include <service-desktop/service-desktop/Constants.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
 #include <service-cellular/CellularMessage.hpp>
-#include <service-appmgr/model/ApplicationManager.hpp>
+#include <service-appmgr/Constants.hpp>
 #include <service-appmgr/Controller.hpp>
 #include "messages/CpuFrequencyMessage.hpp"
 #include "messages/DeviceRegistrationMessage.hpp"
@@ -34,6 +34,10 @@
 #include "Timers/TimerFactory.hpp"
 #include <service-appmgr/StartupType.hpp>
 #include <purefs/vfs_subsystem.hpp>
+#include <service-gui/Common.hpp>
+#include <service-db/DBServiceName.hpp>
+#include <module-gui/gui/Common.hpp>
+#include <service-eink/Common.hpp>
 
 const inline size_t systemManagerStack = 4096 * 2;
 
@@ -59,7 +63,7 @@ namespace sys
                                                      service::name::gui,
                                                      service::name::db,
                                                      service::name::eink,
-                                                     app::manager::ApplicationManager::ServiceName};
+                                                     service::name::appmgr};
         }
 
         namespace restore
@@ -68,7 +72,7 @@ namespace sys
                                                      service::name::evt_manager,
                                                      service::name::gui,
                                                      service::name::eink,
-                                                     app::manager::ApplicationManager::ServiceName};
+                                                     service::name::appmgr};
         }
 
         namespace regularClose
@@ -419,7 +423,7 @@ namespace sys
         LOG_INFO("Battery Critical Level reached!");
         CellularServiceAPI::ChangeModulePowerState(this, cellular::service::State::PowerState::Off);
         auto msg = std::make_shared<CriticalBatteryLevelNotification>(true, charging);
-        bus.sendUnicast(std::move(msg), app::manager::ApplicationManager::ServiceName);
+        bus.sendUnicast(std::move(msg), service::name::appmgr);
     }
 
     void SystemManager::batteryShutdownLevelAction()
@@ -433,7 +437,7 @@ namespace sys
         LOG_INFO("Battery level normal.");
         CellularServiceAPI::ChangeModulePowerState(this, cellular::service::State::PowerState::On);
         auto battNormalMsg = std::make_shared<CriticalBatteryLevelNotification>(false);
-        bus.sendUnicast(std::move(battNormalMsg), app::manager::ApplicationManager::ServiceName);
+        bus.sendUnicast(std::move(battNormalMsg), service::name::appmgr);
     }
 
     void SystemManager::readyToCloseHandler(Message *msg)
@@ -599,7 +603,7 @@ namespace sys
             switch (Store::Battery::get().levelState) {
             case Store::Battery::LevelState::Normal:
                 bus.sendUnicast(std::make_unique<app::manager::StartAllowedMessage>(app::manager::StartupType::Regular),
-                                app::manager::ApplicationManager::ServiceName);
+                                service::name::appmgr);
                 break;
             case Store::Battery::LevelState::Shutdown:
                 if (!lowBatteryShutdownDelay.isActive()) {
@@ -609,12 +613,12 @@ namespace sys
             case Store::Battery::LevelState::CriticalNotCharging:
                 bus.sendUnicast(
                     std::make_unique<app::manager::StartAllowedMessage>(app::manager::StartupType::LowBattery),
-                    app::manager::ApplicationManager::ServiceName);
+                    service::name::appmgr);
                 break;
             case Store::Battery::LevelState::CriticalCharging:
                 bus.sendUnicast(
                     std::make_unique<app::manager::StartAllowedMessage>(app::manager::StartupType::LowBatteryCharging),
-                    app::manager::ApplicationManager::ServiceName);
+                    service::name::appmgr);
                 break;
             }
             return sys::MessageNone{};
@@ -731,8 +735,7 @@ namespace sys
         if (phoneModeSubject->isTetheringEnabled()) {
             LOG_WARN("Changing phone mode when tethering is enabled!");
             // display popup
-            bus.sendUnicast(std::make_shared<TetheringPhoneModeChangeProhibitedMessage>(),
-                            app::manager::ApplicationManager::ServiceName);
+            bus.sendUnicast(std::make_shared<TetheringPhoneModeChangeProhibitedMessage>(), service::name::appmgr);
             return MessageNone{};
         }
         phoneModeSubject->setPhoneMode(request->getPhoneMode());
@@ -749,14 +752,12 @@ namespace sys
         }
 
         if (const auto requestedState = request->getTetheringState(); requestedState == phone_modes::Tethering::On) {
-            bus.sendUnicast(std::make_shared<TetheringQuestionRequest>(),
-                            app::manager::ApplicationManager::ServiceName);
+            bus.sendUnicast(std::make_shared<TetheringQuestionRequest>(), service::name::appmgr);
         }
         else {
             if (const auto tetheringChanged = phoneModeSubject->setTetheringMode(phone_modes::Tethering::Off);
                 !tetheringChanged) {
-                bus.sendUnicast(std::make_shared<TetheringQuestionAbort>(),
-                                app::manager::ApplicationManager::ServiceName);
+                bus.sendUnicast(std::make_shared<TetheringQuestionAbort>(), service::name::appmgr);
             }
             else {
                 // Turned on, disabling...

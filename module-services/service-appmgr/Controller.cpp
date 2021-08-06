@@ -3,11 +3,11 @@
 
 #include "Controller.hpp"
 
-#include "ApplicationManager.hpp"
 #include "FinishRequest.hpp"
 #include "GetAllNotificationsRequest.hpp"
 
 #include <Service/Service.hpp>
+#include <service-appmgr/Constants.hpp>
 
 #include <utility>
 
@@ -28,13 +28,13 @@ namespace app::manager
                                             StartInBackground startInBackground) -> bool
     {
         auto msg = std::make_shared<app::manager::ApplicationInitialised>(sender->GetName(), status, startInBackground);
-        return sender->bus.sendUnicast(msg, ApplicationManager::ServiceName);
+        return sender->bus.sendUnicast(msg, service::name::appmgr);
     }
 
     auto Controller::finish(sys::Service *sender) -> bool
     {
         auto msg = std::make_shared<app::manager::FinishRequest>(sender->GetName());
-        return sender->bus.sendUnicast(std::move(msg), ApplicationManager::ServiceName);
+        return sender->bus.sendUnicast(std::move(msg), service::name::appmgr);
     }
 
     auto Controller::sendAction(sys::Service *sender,
@@ -44,61 +44,61 @@ namespace app::manager
     {
         setOnSwitchBehaviour(data, onSwitchBehaviour);
         auto msg = std::make_shared<app::manager::ActionRequest>(sender->GetName(), actionId, std::move(data));
-        return sender->bus.sendUnicast(std::move(msg), ApplicationManager::ServiceName);
+        return sender->bus.sendUnicast(std::move(msg), service::name::appmgr);
     }
 
     auto Controller::switchBack(sys::Service *sender, std::unique_ptr<SwitchBackRequest> msg) -> bool
     {
         std::shared_ptr<SwitchBackRequest> switchMsg =
             msg ? std::move(msg) : std::make_shared<app::manager::SwitchBackRequest>(sender->GetName());
-        return sender->bus.sendUnicast(switchMsg, ApplicationManager::ServiceName);
+        return sender->bus.sendUnicast(switchMsg, service::name::appmgr);
     }
 
     auto Controller::confirmSwitch(sys::Service *sender) -> bool
     {
         auto msg = std::make_shared<app::manager::SwitchConfirmation>(sender->GetName());
-        return sender->bus.sendUnicast(msg, ApplicationManager::ServiceName);
+        return sender->bus.sendUnicast(msg, service::name::appmgr);
     }
 
     auto Controller::closeApplication(sys::Service *sender, const ApplicationName &name) -> bool
     {
         auto msg = std::make_shared<app::manager::ApplicationCloseRequest>(sender->GetName(), name);
-        return sender->bus.sendUnicast(msg, ApplicationManager::ServiceName);
+        return sender->bus.sendUnicast(msg, service::name::appmgr);
     }
 
     auto Controller::confirmClose(sys::Service *sender) -> bool
     {
         auto msg = std::make_shared<app::manager::CloseConfirmation>(sender->GetName());
-        return sender->bus.sendUnicast(msg, ApplicationManager::ServiceName);
+        return sender->bus.sendUnicast(msg, service::name::appmgr);
     }
 
     auto Controller::changeDisplayLanguage(sys::Service *sender, const Language &language) -> bool
     {
         auto msg = std::make_shared<app::manager::DisplayLanguageChangeRequest>(sender->GetName(), language);
-        return sender->bus.sendUnicast(msg, ApplicationManager::ServiceName);
+        return sender->bus.sendUnicast(msg, service::name::appmgr);
     }
 
     auto Controller::changeInputLanguage(sys::Service *sender, const Language &language) -> bool
     {
         auto msg = std::make_shared<app::manager::InputLanguageChangeRequest>(sender->GetName(), language);
-        return sender->bus.sendUnicast(msg, ApplicationManager::ServiceName);
+        return sender->bus.sendUnicast(msg, service::name::appmgr);
     }
 
     auto Controller::preventBlockingDevice(sys::Service *sender) -> bool
     {
         auto msg = std::make_shared<app::manager::PreventBlockingRequest>(sender->GetName());
-        return sender->bus.sendUnicast(msg, ApplicationManager::ServiceName);
+        return sender->bus.sendUnicast(msg, service::name::appmgr);
     }
 
     auto Controller::changePowerSaveMode(sys::Service *sender) -> bool
     {
         auto msg = std::make_shared<app::manager::PowerSaveModeInitRequest>(sender->GetName());
-        return sender->bus.sendUnicast(msg, ApplicationManager::ServiceName);
+        return sender->bus.sendUnicast(msg, service::name::appmgr);
     }
 
     auto Controller::requestNotifications(sys::Service *sender) -> bool
     {
         auto msg = std::make_shared<app::manager::GetAllNotificationsRequest>();
-        return sender->bus.sendUnicast(std::move(msg), ApplicationManager::ServiceName);
+        return sender->bus.sendUnicast(std::move(msg), service::name::appmgr);
     }
 } // namespace app::manager

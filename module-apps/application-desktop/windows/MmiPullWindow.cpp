@@ -7,7 +7,6 @@
 
 #include <i18n/i18n.hpp>
 #include <service-appmgr/data/MmiActionsParams.hpp>
-#include <service-appmgr/model/ApplicationManager.hpp>
 
 #include <string>
 

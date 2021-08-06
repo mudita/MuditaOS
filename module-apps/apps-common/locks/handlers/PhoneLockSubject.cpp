@@ -3,7 +3,7 @@
 
 #include "PhoneLockSubject.hpp"
 
-#include <service-appmgr/model/ApplicationManager.hpp>
+#include <service-appmgr/Constants.hpp>
 #include <locks/data/PhoneLockMessages.hpp>
 
 namespace locks
@@ -17,42 +17,41 @@ namespace locks
 
     void PhoneLockSubject::unlock()
     {
-        owner->bus.sendUnicast(std::make_shared<UnlockPhone>(), app::manager::ApplicationManager::ServiceName);
+        owner->bus.sendUnicast(std::make_shared<UnlockPhone>(), service::name::appmgr);
     }
 
     void PhoneLockSubject::lock()
     {
-        owner->bus.sendUnicast(std::make_shared<LockPhone>(), app::manager::ApplicationManager::ServiceName);
+        owner->bus.sendUnicast(std::make_shared<LockPhone>(), service::name::appmgr);
     }
 
     void PhoneLockSubject::enablePhoneLock()
     {
-        owner->bus.sendUnicast(std::make_shared<EnablePhoneLock>(), app::manager::ApplicationManager::ServiceName);
+        owner->bus.sendUnicast(std::make_shared<EnablePhoneLock>(), service::name::appmgr);
     }
 
     void PhoneLockSubject::disablePhoneLock()
     {
-        owner->bus.sendUnicast(std::make_shared<DisablePhoneLock>(), app::manager::ApplicationManager::ServiceName);
+        owner->bus.sendUnicast(std::make_shared<DisablePhoneLock>(), service::name::appmgr);
     }
 
     void PhoneLockSubject::changePhoneLock()
     {
-        owner->bus.sendUnicast(std::make_shared<ChangePhoneLock>(), app::manager::ApplicationManager::ServiceName);
+        owner->bus.sendUnicast(std::make_shared<ChangePhoneLock>(), service::name::appmgr);
     }
 
     void PhoneLockSubject::setPhoneLock()
     {
-        owner->bus.sendUnicast(std::make_shared<SetPhoneLock>(), app::manager::ApplicationManager::ServiceName);
+        owner->bus.sendUnicast(std::make_shared<SetPhoneLock>(), service::name::appmgr);
     }
 
     void PhoneLockSubject::skipSetPhoneLock()
     {
-        owner->bus.sendUnicast(std::make_shared<SkipSetPhoneLock>(), app::manager::ApplicationManager::ServiceName);
+        owner->bus.sendUnicast(std::make_shared<SkipSetPhoneLock>(), service::name::appmgr);
     }
 
     void PhoneLockSubject::verifyInput(LockInput inputData)
     {
-        owner->bus.sendUnicast(std::make_shared<UnLockPhoneInput>(inputData),
-                               app::manager::ApplicationManager::ServiceName);
+        owner->bus.sendUnicast(std::make_shared<UnLockPhoneInput>(inputData), service::name::appmgr);
     }
 } // namespace locks
