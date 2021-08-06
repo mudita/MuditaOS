@@ -1,6 +1,6 @@
 function(fetch_ecoboot)
     set(ECOBOOT_ASSET_NAME ecoboot.bin)
-    if(${PURE_HW_TARGET} STREQUAL "T6")
+    if(${BOARD} STREQUAL "puretx" AND ${BOARD_REVISION} LESS_EQUAL 6)
         set(ECOBOOT_ASSET_NAME ecoboot_T6.bin)
     endif()
 
