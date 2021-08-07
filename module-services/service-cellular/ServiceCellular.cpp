@@ -190,8 +190,8 @@ void ServiceCellular::SleepTimerHandler()
     auto currentTime                = cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks());
     auto lastCommunicationTimestamp = cmux->getLastCommunicationTimestamp();
     auto timeOfInactivity           = currentTime >= lastCommunicationTimestamp
-                                          ? currentTime - lastCommunicationTimestamp
-                                          : std::numeric_limits<TickType_t>::max() - lastCommunicationTimestamp + currentTime;
+                                ? currentTime - lastCommunicationTimestamp
+                                : std::numeric_limits<TickType_t>::max() - lastCommunicationTimestamp + currentTime;
 
     if (!ongoingCall.isValid() && priv->state->get() == State::ST::Ready &&
         timeOfInactivity >= constants::enterSleepModeTime.count()) {
