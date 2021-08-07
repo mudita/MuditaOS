@@ -81,7 +81,7 @@ namespace at
           protected:
             [[nodiscard]] static auto toBool(const std::string &text) -> bool;
             [[nodiscard]] static auto toUInt(const std::string &text) -> std::uint8_t;
-            template <typename T> [[nodiscard]] static auto toEnum(const std::string &text) -> std::optional<T>;
+            template <typename T>[[nodiscard]] static auto toEnum(const std::string &text) -> std::optional<T>;
 
           public:
             CLCC() noexcept;
