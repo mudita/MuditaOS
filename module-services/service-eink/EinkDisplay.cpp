@@ -3,9 +3,12 @@
 
 #include "EinkDisplay.hpp"
 
+#if defined(TARGET_RT1051)
+#include <bsp/BoardDefinitions.hpp>
+#endif
+
 #include <gui/core/Color.hpp>
 #include <gsl/util>
-#include <bsp/BoardDefinitions.hpp>
 #include <cstdio>
 #include <cstring>
 
@@ -46,8 +49,10 @@ namespace service::eink
         : size{screenSize}, currentWaveform{createDefaultWaveFormSettings(EinkWaveformGC16)},
           displayMode{EinkDisplayColorMode_e::EinkDisplayColorModeStandard}
     {
+#if defined(TARGET_RT1051)
         driverLPSPI = drivers::DriverLPSPI::Create(
             "EInk", static_cast<drivers::LPSPIInstances>(BoardDefinitions::EINK_LPSPI_INSTANCE));
+#endif
     }
 
     EinkDisplay::~EinkDisplay() noexcept

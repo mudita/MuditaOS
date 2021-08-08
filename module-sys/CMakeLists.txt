@@ -29,28 +29,15 @@ set(SOURCES
 
         )
 
-if(${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
-    include(targets/Target_RT1051.cmake)
-elseif(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
-    include(targets/Target_Linux.cmake)
-else()
-    message(FATAL_ERROR "Invalid target!")
-endif()
-
 add_library(bus STATIC ${BUS_IMPL_SOURCES})
 target_link_libraries(bus PRIVATE module-os)
 
 target_compile_definitions(bus PRIVATE ${PROJECT_CONFIG_DEFINITIONS})
 target_compile_definitions(bus PRIVATE ${PROJECT_TARGET})
-target_compile_definitions(bus PRIVATE ${TARGET_COMPILE_DEFINITIONS})
-target_compile_features(bus PRIVATE ${TARGET_COMPILE_FEATURES})
-target_compile_options(bus PRIVATE ${TARGET_COMPILE_OPTIONS})
-target_include_directories(bus PRIVATE ${BOARD_DIR_INCLUDES})
 target_include_directories(bus PRIVATE ${PROJECT_INCLUDES})
-target_link_options(bus PRIVATE ${TARGET_LINK_OPTIONS})
 
 add_library(module-sys)
-target_sources(module-sys PRIVATE ${SOURCES} ${BOARD_SOURCES})
+target_sources(module-sys PRIVATE ${SOURCES})
 
 target_link_libraries(module-sys
     PRIVATE
@@ -68,15 +55,8 @@ target_link_libraries(module-sys
 # Board specific compilation definitions,options,include directories and features
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_TARGET})
-target_compile_definitions(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_DEFINITIONS})
-target_include_directories(${PROJECT_NAME} PUBLIC ${BOARD_DIR_INCLUDES})
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_INCLUDES})
 target_include_directories(${PROJECT_NAME} PUBLIC ../module-services )
-target_compile_features(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_FEATURES})
-target_compile_options(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_OPTIONS})
-target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
-
-
 
 target_include_directories(${PROJECT_NAME}
         PUBLIC

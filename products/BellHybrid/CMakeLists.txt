@@ -5,13 +5,7 @@ target_link_directories(BellHybrid PRIVATE ${PROJECT_LIB_DIRECTORY})
 target_compile_definitions(BellHybrid
     PRIVATE
         ${PROJECT_CONFIG_DEFINITIONS}
-        ${TARGET_COMPILE_DEFINITIONS}
         ${PROJECT_TARGET}
-    )
-
-target_compile_features(BellHybrid
-    PRIVATE
-        ${TARGET_COMPILE_FEATURES}
     )
 
 target_compile_options(BellHybrid
@@ -23,7 +17,6 @@ target_compile_options(BellHybrid
 
 target_sources(BellHybrid
     PRIVATE
-        ${TARGET_SOURCES}
         BellHybridMain.cpp
         PlatformFactory.cpp
     )
@@ -60,8 +53,6 @@ target_link_libraries(BellHybrid
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_Linux>:iosyscalls>"
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_RT1051>:CrashCatcher::CrashCatcher>"
     )
-
-target_link_options(BellHybrid PRIVATE ${TARGET_LINK_OPTIONS})
 
 if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
     add_dependencies(BellHybrid service_renderer)
