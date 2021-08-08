@@ -7,12 +7,10 @@ cat << ==usage
 Usage: $(basename $0) image_path build_dir [boot.bin_file] [updater.bin_file]
     image_path       - Destination image path name e.g., PurePhone.img
     sysroot          - product's system root e.g., build-rt1051-RelWithDebInfo/sysroot
-    boot.bin_file    - optional for linux image - name of the boot.bin file (for different targets)
-    updater.bin_file - optional for linux image - name of the updater.bin file
 ==usage
 }
 
-if [[ ( $# -ne 2 ) && ( $# -ne 4 ) ]]; then
+if [[ $# -ne 2 ]]; then
 	echo "Error! Invalid argument count"
 	usage
 	exit -1
@@ -20,8 +18,6 @@ fi
 
 IMAGE_NAME=$(realpath $1)
 SYSROOT=$(realpath $2)
-BIN_FILE=$3
-UPDATER_FILE=$4
 
 if [ ! -d "$SYSROOT" ]; then
 	echo "Error! ${SYSROOT} is not a directory"
@@ -91,38 +87,27 @@ fi
 cd "${SYSROOT}/sys"
 
 #Copy FAT data
-CURRENT_DATA="assets country-codes.db Luts.bin"
+#CURRENT_DATA="assets country-codes.db Luts.bin"
+#
+#mmd -i "$PART1" ::/current
+#mmd -i "$PART1" ::/current/sys
+#mmd -i "$PART1" ::/updates
+#
+#for i in $CURRENT_DATA; do
+#	f="current/$i"
+#	if [ -f "$f" -o -d "$f" ]; then
+#		mcopy -s -i "$PART1" $f ::/current/
+#	else
+#		echo "Error! Unable to copy item: $f"
+#		exit 1
+#	fi
+#done
+#
+#mcopy -s -i "$PART1" .boot.json ::
+#mcopy -s -i "$PART1" .boot.json.crc32 ::
 
-mmd -i "$PART1" ::/current
-mmd -i "$PART1" ::/current/sys
+mcopy -s -i "$PART1" .* * ::
 mmd -i "$PART1" ::/updates
-
-for i in $CURRENT_DATA; do
-	f="current/$i"
-	if [ -f "$f" -o -d "$f" ]; then
-		mcopy -s -i "$PART1" $f ::/current/
-	else
-		echo "Error! Unable to copy item: $f"
-		exit 1
-	fi
-done
-
-if [[ -n "${BIN_FILE}" && -f "${BIN_FILE}" ]]; then
-	mcopy -v -s -i "$PART1" ${BIN_FILE} ::/current/boot.bin
-else
-	echo "Warning! Missing boot.bin"
-	echo "(it's fine for a Linux build)"
-fi
-
-if [[ -n "${UPDATER_FILE}" && -f "${UPDATER_FILE}" ]]; then
-	mcopy -v -s -i "$PART1" ${UPDATER_FILE} ::/current/updater.bin
-else
-	echo "Warning! Missing updater.bin"
-	echo "(it's fine for a Linux build)"
-fi
-
-mcopy -s -i "$PART1" .boot.json ::
-mcopy -s -i "$PART1" .boot.json.crc32 ::
 
 #Littlefs generate image
 echo $(pwd)

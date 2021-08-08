@@ -17,26 +17,30 @@ include(Catch)
 include(CMakeParseArguments)
 include(DiskImage)
 include(GoogleTest)
+include(Staging)
 
 add_custom_target(unittests)
 
 set(ROOT_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR} PARENT_SCOPE)
-set(TEST_ASSETS_DEST_DIR ${CMAKE_BINARY_DIR}/test-sysroot/sys)
-set(TEST_ASSETS_DEST_DIR ${TEST_ASSETS_DEST_DIR} PARENT_SCOPE)
+set(TEST_ASSETS_DEST_DIR ${CMAKE_BINARY_DIR}/test-sysroot/sys PARENT_SCOPE)
 
-add_assets_target(test-assets ${ASSETS_SOURCE_DIR} ${TEST_ASSETS_DEST_DIR})
-add_image(
-    PRODUCT Test
-    SYSROOT test-sysroot
-    ASSETS  test-assets
+target_assets(
+        unittests
+    SYSROOT
+        ${CMAKE_BINARY_DIR}/ntest-sysroot
+    ASSETS
+        lang/English.json
 )
+
+stage_product(unittests)
+add_image(unittests)
 
 macro(enable_test_filesystem)
     target_sources(${_TESTNAME} PRIVATE ${ROOT_TEST_DIR}/filesystem.cpp)
     list(APPEND _TEST_ARGS_LIBS iosyscalls)
     list(APPEND _TEST_ARGS_LIBS board)
     list(APPEND _TEST_ARGS_INCLUDE ${CMAKE_SOURCE_DIR}/module-vfs/include/user)
-    list(APPEND _TEST_ARGS_DEPS Test-disk-img)
+    list(APPEND _TEST_ARGS_DEPS unittests-disk-img)
 endmacro()
 
 function(add_gtest_executable)

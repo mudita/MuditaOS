@@ -10,6 +10,11 @@ function(copy_updater_bin)
     )
 
     add_custom_target(updater.bin-target DEPENDS updater.bin)
+    set_target_properties(
+            updater.bin-target
+        PROPERTIES
+            BIN_FILE ${CMAKE_BINARY_DIR}/updater.bin
+    )
 
     multicomp_install(PROGRAMS ${CMAKE_BINARY_DIR}/updater.bin DESTINATION "./"
         COMPONENTS Standalone Update)

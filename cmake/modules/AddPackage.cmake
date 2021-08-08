@@ -23,7 +23,7 @@ macro(set_cpack_vars)
 
 endmacro()
 
-function(add_standalone_image SOURCE_TARGET)
+function(add_standalone_package SOURCE_TARGET)
     if (NOT ${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
         return()
     endif()
@@ -35,20 +35,15 @@ function(add_standalone_image SOURCE_TARGET)
     set(PACKAGE_STANDALONE_FILE_NAME ${STANDALONE_PKG} PARENT_SCOPE)
     set(PACKAGE_STANDALONE_MIME "application/x-xz" PARENT_SCOPE)
 
-    add_custom_target(${PACKAGE_COMMON_NAME}-package-standalone
-        COMMAND tar -ScJf ${STANDALONE_PKG} ${SOURCE_TARGET}.img
+    add_custom_command(
+        OUTPUT ${STANDALONE_PKG}
+        COMMAND tar -ScJf ${STANDALONE_PKG} $<TARGET_PROPERTY:${SOURCE_TARGET},DISK_IMAGE>
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-        DEPENDS ${BIN_FILE}
-        DEPENDS ecoboot.bin-target
-        DEPENDS updater.bin-target
-        DEPENDS updater.ver-target
-        DEPENDS ${SOURCE_TARGET}-version.json-target
-        DEPENDS ${SOURCE_TARGET}.img
-        )
+        DEPENDS ${SOURCE_TARGET}-disk-img
+    )
 
-    message("Adding stand alone target '${SOURCE_TARGET}-StandaloneImage'")
-    add_custom_target(${SOURCE_TARGET}-StandaloneImage
-        DEPENDS ${PACKAGE_COMMON_NAME}-package-standalone)
+    add_custom_target(${SOURCE_TARGET}-StandalonePackage
+        DEPENDS ${STANDALONE_PKG})
 endfunction()
 
 
@@ -65,18 +60,12 @@ function(add_update_package SOURCE_TARGET)
 
     add_custom_command(
         OUTPUT ${UPDATE_PKG}
-        DEPENDS ${SOURCE_TARGET}
-        DEPENDS ${SOURCE_TARGET}-boot.bin
-        DEPENDS ${SOURCE_TARGET}-version.json-target
-        DEPENDS ecoboot.bin-target
-        DEPENDS updater.bin-target
-        DEPENDS updater.ver-target
-        DEPENDS assets
+        DEPENDS ${SOURCE_TARGET}-staging
         COMMAND ${CMAKE_SOURCE_DIR}/tools/generate_update_image.sh ${SOURCE_TARGET} ${CMAKE_PROJECT_VERSION} ${CPACK_SYSTEM_NAME}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         COMMENT "Generating update image"
     )
-    message("Adding '${SOURCE_TARGET}-UpdatePackage' target")
+
     add_custom_target(${SOURCE_TARGET}-UpdatePackage
         DEPENDS ${UPDATE_PKG}
     )

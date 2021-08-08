@@ -89,13 +89,26 @@ message_serial_status()
 
 add_dependencies(PurePhone version)
 
+include(Assets)
+target_assets(
+        PurePhone
+    SYSROOT
+        ${CMAKE_BINARY_DIR}/nsysroot
+    ASSETS
+        lang/Polski.json
+        lang/English.json
+)
+
+if(NOT ${PROJECT_TARGET_NAME} STREQUAL "linux")
+    target_assets(
+            PurePhone
+        PACKAGE_BOOT_BIN
+        PACKAGE_UPDATER_BIN
+    )
+endif()
+
 include(AddBootBin)
 add_boot_bin(PurePhone)
-add_image(
-    PRODUCT PurePhone
-    SYSROOT sysroot
-    ASSETS  assets
-)
 
 include(AddHexTarget)
 add_hex_target(PurePhone)
@@ -103,10 +116,13 @@ add_hex_target(PurePhone)
 include(AddVersionJson)
 add_version_json(PurePhone)
 
-add_standalone_image(PurePhone)
+include(Staging)
+stage_product(PurePhone)
+add_image(PurePhone)
+
+add_standalone_package(PurePhone)
 add_update_package(PurePhone)
 
 include(GitHubWorkerMessages)
 github_message_standalone()
 github_message_update()
-

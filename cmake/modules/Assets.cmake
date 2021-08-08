@@ -1,27 +1,40 @@
-set(ASSETS_SOURCE_DIR ${CMAKE_SOURCE_DIR}/image)
+function(target_assets)
+    set(TARGET ${ARGV0})
+    set(options PACKAGE_BOOT_BIN PACKAGE_UPDATER_BIN)
+    set(oneValueArgs SYSROOT)
+    set(multiValueArgs ASSETS)
+    cmake_parse_arguments(PARSE_ARGV 1 ARG "${options}" "${oneValueArgs}" "${multiValueArgs}")
+    message("target_assets() args: '${ARGV}'")
 
-macro(add_assets_target)
+    if(${ARG_PACKAGE_BOOT_BIN})
+        set_target_properties(
+                ${TARGET}
+            PROPERTIES
+                PACKAGE_BOOT_BIN ${ARG_PACKAGE_BOOT_BIN}
+        )
+    endif()
 
-    set(_ASSETS_TARGET ${ARGV0})
-    set(_ASSETS_SOURCE_DIR ${ARGV1})
-    set(_ASSETS_DEST_DIR ${ARGV2})
+    if(${ARG_PACKAGE_UPDATER_BIN})
+        set_target_properties(
+                ${TARGET}
+            PROPERTIES
+                PACKAGE_UPDATER_BIN ${ARG_PACKAGE_UPDATER_BIN}
+        )
+    endif()
 
-    add_custom_target(
-        ${_ASSETS_TARGET}
-        COMMAND mkdir -p ${_ASSETS_DEST_DIR}
-        COMMAND rsync -qravu --delete
-            ${_ASSETS_SOURCE_DIR}/.boot.json*
-            ${_ASSETS_SOURCE_DIR}/personalization.json
-            ${_ASSETS_DEST_DIR}
-        COMMAND rsync -qravu --delete
-            ${_ASSETS_SOURCE_DIR}/assets
-            ${_ASSETS_SOURCE_DIR}/Luts.bin
-            ${_ASSETS_SOURCE_DIR}/country-codes.db
-            ${_ASSETS_DEST_DIR}/current
-        COMMAND rsync -qravu --delete
-            ${_ASSETS_SOURCE_DIR}/user
-            ${_ASSETS_DEST_DIR}
-        COMMENT
-            "Copying assets.. (${_ASSETS_TARGET})"
-    )
-endmacro()
+    if(NOT ${ARG_SYSROOT} STREQUAL "")
+        set_target_properties(
+                ${TARGET}
+            PROPERTIES
+                SYSROOT ${ARG_SYSROOT}
+        )
+    endif()
+
+    if(NOT "${ARG_ASSETS}" STREQUAL "")
+        set_target_properties(
+                ${TARGET}
+            PROPERTIES
+                ASSETS "${ARG_ASSETS}"
+        )
+    endif()
+endfunction()

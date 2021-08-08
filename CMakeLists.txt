@@ -130,7 +130,6 @@ add_subdirectory(module-services)
 add_subdirectory(module-apps)
 add_subdirectory(module-bluetooth)
 add_subdirectory(module-lwip)
-add_subdirectory(image)
 add_subdirectory(host-tools)
 
 include(tools/clang-tidy.cmake)
@@ -161,4 +160,4 @@ copy_updater_bin()
 copy_updater_ver()
 fetch_ecoboot()
 add_subdirectory(products)
-
+add_subdirectory(image)
