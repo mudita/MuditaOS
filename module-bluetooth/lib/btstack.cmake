@@ -201,9 +201,6 @@ set(BOARD_DIR_SOURCES
     )
 
 if(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
-message("Linux specyfic sources")
-message("----------------------")
- include(${CMAKE_CURRENT_SOURCE_DIR}/targets/Target_Linux.cmake)
 list(APPEND BOARD_DIR_SOURCES
     # ${BOARD_SOURCES}
     ${BT_STACK_ROOT}/platform/posix/btstack_stdin_posix.c

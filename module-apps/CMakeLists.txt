@@ -113,14 +113,9 @@ target_link_libraries(${PROJECT_NAME}
 # Board specific compilation definitions,options,include directories and features
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_TARGET})
-target_compile_definitions(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_DEFINITIONS})
-target_include_directories(${PROJECT_NAME} PUBLIC ${BOARD_DIR_INCLUDES})
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_INCLUDES})
-target_compile_features(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_FEATURES})
-target_compile_options(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_OPTIONS})
 
 target_include_directories(${PROJECT_NAME}
-
         PUBLIC
 
         ${CMAKE_CURRENT_SOURCE_DIR}
