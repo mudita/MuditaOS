@@ -31,9 +31,6 @@ message("Selected product: ${PRODUCT}")
 message("Selected board:   ${BOARD}")
 message("Board revision:   ${BOARD_REVISION}")
 message("PROJECT_TARGET:   ${PROJECT_TARGET}")
-message("TARGET_COMPILE_DEFINITIONS: ${TARGET_COMPILE_OPTIONS}")
-message("TARGET_LIBRARIES: ${TARGET_LIBRARIES}")
-message("TARGET_LINKER_FLAGS: ${TARGET_LINKER_FLAGS}")
 
 string(REPLACE "TARGET_" "" PROJECT_TARGET_NAME ${PROJECT_TARGET})
 string(TOLOWER "${PROJECT_TARGET_NAME}" PROJECT_TARGET_NAME)
@@ -88,7 +85,7 @@ add_compile_definitions(FSL_RTOS_FREE_RTOS
     SKIP_SYSCLK_INIT
     _GNU_SOURCE)
 
-add_compile_options( ${TARGET_COMPILE_OPTIONS}
+add_compile_options(
     $<$<COMPILE_LANGUAGE:C>:-std=gnu11>
     -fsingle-precision-constant
     -ffunction-sections
@@ -96,7 +93,6 @@ add_compile_options( ${TARGET_COMPILE_OPTIONS}
     -MMD
     -MP
     -fno-builtin
-    -fno-diagnostics-color
     # warning flags
     -Wall -Wextra -Werror -Wno-unused-parameter -Wno-deprecated-declarations)
 

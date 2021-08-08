@@ -71,13 +71,8 @@ target_sources(module-vfs
 
 target_compile_definitions(module-vfs PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
 target_compile_definitions(module-vfs PUBLIC ${PROJECT_TARGET})
-target_compile_definitions(module-vfs PUBLIC ${TARGET_COMPILE_DEFINITIONS})
-target_include_directories(module-vfs PUBLIC ${BOARD_DIR_INCLUDES})
 target_include_directories(module-vfs PUBLIC ${PROJECT_INCLUDES})
 target_include_directories(module-vfs PUBLIC ${CMAKE_BINARY_DIR})
-target_compile_features(module-vfs PUBLIC ${TARGET_COMPILE_FEATURES})
-target_compile_options(module-vfs PUBLIC ${TARGET_COMPILE_OPTIONS})
-target_link_options(module-vfs PUBLIC ${TARGET_LINK_OPTIONS})
 
 target_include_directories(module-vfs
     PRIVATE
