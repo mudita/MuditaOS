@@ -3,10 +3,6 @@
 
 #include "bsp/torch/torch.hpp"
 
-#include "bsp/BoardDefinitions.hpp"
-
-using namespace drivers;
-
 static xQueueHandle qHandleIrq = NULL;
 
 namespace bsp

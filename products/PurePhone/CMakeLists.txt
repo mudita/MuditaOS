@@ -10,16 +10,10 @@ target_link_directories(PurePhone PUBLIC ${PROJECT_LIB_DIRECTORY})
 target_compile_definitions(PurePhone
     PRIVATE
         ${PROJECT_CONFIG_DEFINITIONS}
-        ${TARGET_COMPILE_DEFINITIONS}
         ${PROJECT_TARGET}
     )
 
 define_serial(PurePhone)
-
-target_compile_features(PurePhone
-    PRIVATE
-        ${TARGET_COMPILE_FEATURES}
-    )
 
 target_compile_options(PurePhone
     PRIVATE
@@ -29,7 +23,6 @@ target_compile_options(PurePhone
 
 target_sources(PurePhone
     PRIVATE
-        ${TARGET_SOURCES}
         PurePhoneMain.cpp
         PlatformFactory.cpp
     )
@@ -75,8 +68,6 @@ target_link_libraries(PurePhone
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_Linux>:iosyscalls>"
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_RT1051>:CrashCatcher::CrashCatcher>"
     )
-
-target_link_options(PurePhone PUBLIC ${TARGET_LINK_OPTIONS})
 
 if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
     add_dependencies(Pure service_renderer)
