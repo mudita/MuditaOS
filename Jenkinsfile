@@ -245,12 +245,6 @@ pipeline {
                 ./configure.sh bell linux Debug -G Ninja
 
                 popd'''
-                echo "Clang Tidy check"
-                /* requires compilation database - must be run after configuration */
-                sh '''#!/bin/bash -e
-                pushd ${WORKSPACE}
-                ./config/clang_check.sh
-                popd'''
 
                 echo "Build"
                 sh '''#!/bin/bash -e
