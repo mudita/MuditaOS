@@ -13,7 +13,11 @@ namespace app::manager
         BellApplicationManager(const ApplicationName &serviceName,
                                std::vector<std::unique_ptr<app::ApplicationLauncher>> &&launchers,
                                const ApplicationName &_rootApplicationName)
-            : ApplicationManager(std::move(serviceName), std::move(launchers), std::move(_rootApplicationName))
+            : ApplicationManager(serviceName, std::move(launchers), _rootApplicationName)
         {}
+
+      private:
+        auto startApplication(ApplicationHandle &app) -> bool override;
+        auto resolveHomeApplication() -> std::string override;
     };
 } // namespace app::manager

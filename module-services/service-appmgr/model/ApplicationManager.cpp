@@ -49,7 +49,6 @@ namespace app::manager
     namespace
     {
         constexpr auto ApplicationManagerStackDepth = 3072;
-        constexpr auto autoLockTimerName            = "AutoLockTimer";
     } // namespace
 
     ApplicationManagerBase::ApplicationManagerBase(std::vector<std::unique_ptr<app::ApplicationLauncher>> &&launchers)
@@ -120,16 +119,11 @@ namespace app::manager
                                            std::vector<std::unique_ptr<app::ApplicationLauncher>> &&launchers,
                                            const ApplicationName &_rootApplicationName)
         : Service{serviceName, {}, ApplicationManagerStackDepth},
-          ApplicationManagerBase(std::move(launchers)), rootApplicationName{_rootApplicationName},
+        ApplicationManagerBase(std::move(launchers)),
+        rootApplicationName{_rootApplicationName},
           actionsRegistry{[this](ActionEntry &action) { return handleAction(action); }},
-          settings(std::make_shared<settings::Settings>()),
-          phoneModeObserver(std::make_shared<sys::phone_modes::Observer>()),
-          phoneLockHandler(locks::PhoneLockHandler(this, settings)),
-          simLockHandler(this), notificationsConfig{phoneModeObserver, settings, phoneLockHandler},
-          notificationsHandler{this, notificationsConfig}, notificationProvider{this, notificationsConfig}
+          settings(std::make_shared<settings::Settings>())
     {
-        autoLockTimer = sys::TimerFactory::createSingleShotTimer(
-            this, autoLockTimerName, sys::timer::InfiniteTimeout, [this](sys::Timer &) { onPhoneLocked(); });
         bus.channels.push_back(sys::BusChannel::PhoneModeChanges);
         bus.channels.push_back(sys::BusChannel::ServiceAudioNotifications);
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
@@ -144,22 +138,6 @@ namespace app::manager
         utils::setDisplayLanguage(
             settings->getValue(settings::SystemProperties::displayLanguage, settings::SettingsScope::Global));
 
-        phoneLockHandler.enablePhoneLock((utils::getNumericValue<bool>(
-            settings->getValue(settings::SystemProperties::lockScreenPasscodeIsOn, settings::SettingsScope::Global))));
-
-        phoneLockHandler.setPhoneLockHash(
-            settings->getValue(settings::SystemProperties::lockPassHash, settings::SettingsScope::Global));
-
-        settings->registerValueChange(
-            settings::SystemProperties::lockScreenPasscodeIsOn,
-            [this](const std::string &value) { phoneLockHandler.enablePhoneLock(utils::getNumericValue<bool>(value)); },
-            settings::SettingsScope::Global);
-
-        settings->registerValueChange(
-            settings::SystemProperties::lockPassHash,
-            [this](const std::string &value) { phoneLockHandler.setPhoneLockHash(value); },
-            settings::SettingsScope::Global);
-
         settings->registerValueChange(
             settings::SystemProperties::displayLanguage,
             [this](std::string value) { displayLanguageChanged(std::move(value)); },
@@ -168,18 +146,6 @@ namespace app::manager
             settings::SystemProperties::inputLanguage,
             [this](std::string value) { inputLanguageChanged(std::move(value)); },
             settings::SettingsScope::Global);
-        settings->registerValueChange(
-            settings::SystemProperties::autoLockTimeInSec,
-            [this](std::string value) { lockTimeChanged(std::move(value)); },
-            settings::SettingsScope::Global);
-        settings->registerValueChange(
-            ::settings::KeypadLight::state,
-            [this](const std::string &value) {
-                const auto keypadLightState =
-                    static_cast<bsp::keypad_backlight::State>(utils::getNumericValue<int>(value));
-                processKeypadBacklightState(keypadLightState);
-            },
-            ::settings::SettingsScope::Global);
 
         startBackgroundApplications();
         bus.sendUnicast(std::make_unique<CheckIfStartAllowedMessage>(), service::name::system_manager);
@@ -212,15 +178,6 @@ namespace app::manager
     {
         sys::SystemManager::SuspendService(service::name::gui, this);
         sys::SystemManager::SuspendService(service::name::eink, this);
-    }
-
-    void ApplicationManager::startBackgroundApplications()
-    {
-        for (const auto &name : std::vector<ApplicationName>{app::special_input}) {
-            if (auto app = getApplication(name); app != nullptr) {
-                app->runInBackground(phoneModeObserver->getCurrentPhoneMode(), this);
-            }
-        }
     }
 
     sys::ReturnCodes ApplicationManager::DeinitHandler()
@@ -256,18 +213,6 @@ namespace app::manager
 
     void ApplicationManager::registerMessageHandlers()
     {
-        phoneModeObserver->connect(this);
-        phoneModeObserver->subscribe([this](sys::phone_modes::PhoneMode phoneMode) {
-            handlePhoneModeChanged(phoneMode);
-            actionsRegistry.enqueue(
-                ActionEntry{actions::ShowPopup, std::make_unique<gui::PhoneModePopupRequestParams>(phoneMode)});
-        });
-
-        phoneModeObserver->subscribe(
-            [this](sys::phone_modes::Tethering tethering) { handleTetheringChanged(tethering); });
-
-        notificationsHandler.registerMessageHandlers();
-
         connect(typeid(StartAllowedMessage), [this](sys::Message *request) {
             auto msg = static_cast<StartAllowedMessage *>(request);
             handleStart(msg);
@@ -280,12 +225,6 @@ namespace app::manager
         });
         connect(typeid(PowerSaveModeInitRequest), [this]([[maybe_unused]] sys::Message *msg) {
             handlePowerSavingModeInit();
-            return std::make_shared<sys::ResponseMessage>();
-        });
-        connect(typeid(PreventBlockingRequest), [this]([[maybe_unused]] sys::Message *msg) {
-            if (!phoneLockHandler.isPhoneLocked()) {
-                autoLockTimer.start();
-            }
             return std::make_shared<sys::ResponseMessage>();
         });
         connect(typeid(SwitchRequest), [this](sys::Message *request) {
@@ -350,176 +289,11 @@ namespace app::manager
         connect(typeid(GetCurrentDisplayLanguageRequest), [&](sys::Message *request) {
             return std::make_shared<GetCurrentDisplayLanguageResponse>(utils::getDisplayLanguage());
         });
-        connect(typeid(GetAllNotificationsRequest), [&](sys::Message *request) {
-            notificationProvider.requestNotSeenNotifications();
-            notificationProvider.send();
-            return sys::msgHandled();
-        });
-        connect(typeid(db::NotificationMessage), [&](sys::Message *msg) {
-            auto msgl = static_cast<db::NotificationMessage *>(msg);
-            notificationProvider.handle(msgl);
-            return sys::msgHandled();
-        });
         connect(typeid(db::QueryResponse), [&](sys::Message *msg) {
             auto response = static_cast<db::QueryResponse *>(msg);
             handleDBResponse(response);
             return sys::msgHandled();
         });
-
-        // PhoneLock connects
-        connect(typeid(locks::LockPhone),
-                [&](sys::Message *request) -> sys::MessagePointer { return phoneLockHandler.handleLockRequest(); });
-        connect(typeid(locks::UnlockPhone),
-                [&](sys::Message *request) -> sys::MessagePointer { return phoneLockHandler.handleUnlockRequest(); });
-        connect(typeid(locks::CancelUnlockPhone), [&](sys::Message *request) -> sys::MessagePointer {
-            return phoneLockHandler.handleUnlockCancelRequest();
-        });
-        connect(typeid(locks::UnLockPhoneInput), [&](sys::Message *request) -> sys::MessagePointer {
-            auto data = static_cast<locks::UnLockPhoneInput *>(request);
-            return phoneLockHandler.handlePhoneLockInput(data->getInputData());
-        });
-        connect(typeid(locks::EnablePhoneLock),
-                [&](sys::Message *request) -> sys::MessagePointer { return phoneLockHandler.handleEnablePhoneLock(); });
-        connect(typeid(locks::DisablePhoneLock), [&](sys::Message *request) -> sys::MessagePointer {
-            return phoneLockHandler.handleDisablePhoneLock();
-        });
-        connect(typeid(locks::UnlockedPhone), [&](sys::Message *request) -> sys::MessagePointer {
-            autoLockTimer.start();
-            return simLockHandler.releaseSimUnlockBlockOnLockedPhone();
-        });
-        connect(typeid(locks::ChangePhoneLock),
-                [&](sys::Message *request) -> sys::MessagePointer { return phoneLockHandler.handleChangePhoneLock(); });
-        connect(typeid(locks::SetPhoneLock),
-                [&](sys::Message *request) -> sys::MessagePointer { return phoneLockHandler.handleSetPhoneLock(); });
-        connect(typeid(locks::SkipSetPhoneLock), [&](sys::Message *request) -> sys::MessagePointer {
-            return phoneLockHandler.handleSkipSetPhoneLock();
-        });
-        connect(typeid(GetAutoLockTimeoutRequest), [&](sys::Message *request) -> sys::MessagePointer {
-            auto req = static_cast<GetAutoLockTimeoutRequest *>(request);
-            return handleAutoLockGetRequest(req);
-        });
-        connect(typeid(SetAutoLockTimeoutRequest), [&](sys::Message *request) -> sys::MessagePointer {
-            auto req = static_cast<SetAutoLockTimeoutRequest *>(request);
-            return handleAutoLockSetRequest(req);
-        });
-        connect(typeid(locks::ExternalUnLockPhone), [&](sys::Message *request) -> sys::MessagePointer {
-            auto data = static_cast<locks::ExternalUnLockPhone *>(request);
-            return phoneLockHandler.handleExternalUnlockRequest(data->getInputData());
-        });
-        connect(typeid(locks::ExternalPhoneLockAvailabilityChange), [&](sys::Message *request) -> sys::MessagePointer {
-            auto data = static_cast<locks::ExternalPhoneLockAvailabilityChange *>(request);
-            return phoneLockHandler.handleExternalAvailabilityChange(data->getAvailability());
-        });
-
-        // SimLock connects
-        connect(typeid(cellular::msg::notification::SimNeedPin), [&](sys::Message *request) -> sys::MessagePointer {
-            auto data = static_cast<cellular::msg::notification::SimNeedPin *>(request);
-            if (phoneLockHandler.isPhoneLocked()) {
-                simLockHandler.setSimUnlockBlockOnLockedPhone();
-            }
-            return simLockHandler.handleSimPinRequest(data->attempts);
-        });
-        connect(typeid(cellular::msg::request::sim::PinUnlock::Response),
-                [&](sys::Message *request) -> sys::MessagePointer {
-                    auto data = static_cast<cellular::msg::request::sim::PinUnlock::Response *>(request);
-                    if (data->retCode) {
-                        return simLockHandler.handleSimUnlockedMessage();
-                    }
-                    return sys::msgNotHandled();
-                });
-        connect(typeid(locks::UnLockSimInput), [&](sys::Message *request) -> sys::MessagePointer {
-            auto msg = static_cast<locks::UnLockSimInput *>(request);
-            return simLockHandler.verifySimLockInput(msg->getInputData());
-        });
-        connect(typeid(cellular::msg::notification::SimNeedPuk), [&](sys::Message *request) -> sys::MessagePointer {
-            auto data = static_cast<cellular::msg::notification::SimNeedPuk *>(request);
-            if (phoneLockHandler.isPhoneLocked()) {
-                simLockHandler.setSimUnlockBlockOnLockedPhone();
-            }
-            return simLockHandler.handleSimPukRequest(data->attempts);
-        });
-        connect(typeid(cellular::msg::request::sim::UnblockWithPuk::Response),
-                [&](sys::Message *request) -> sys::MessagePointer {
-                    auto data = static_cast<cellular::msg::request::sim::UnblockWithPuk::Response *>(request);
-                    if (data->retCode) {
-                        return simLockHandler.handleSimUnlockedMessage();
-                    }
-                    return sys::msgNotHandled();
-                });
-        connect(typeid(locks::ChangeSimPin), [&](sys::Message *request) -> sys::MessagePointer {
-            return simLockHandler.handleSimPinChangeRequest();
-        });
-        connect(typeid(cellular::msg::request::sim::ChangePin::Response),
-                [&](sys::Message *request) -> sys::MessagePointer {
-                    auto data = static_cast<cellular::msg::request::sim::ChangePin::Response *>(request);
-                    if (data->retCode) {
-                        return simLockHandler.handleSimPinChangedMessage();
-                    }
-                    else {
-                        return simLockHandler.handleSimPinChangeFailedRequest();
-                    }
-                });
-        connect(typeid(locks::EnableSimPin),
-                [&](sys::Message *request) -> sys::MessagePointer { return simLockHandler.handleSimEnableRequest(); });
-        connect(typeid(locks::DisableSimPin),
-                [&](sys::Message *request) -> sys::MessagePointer { return simLockHandler.handleSimDisableRequest(); });
-        connect(typeid(cellular::msg::request::sim::SetPinLock::Response),
-                [&](sys::Message *request) -> sys::MessagePointer {
-                    auto data = static_cast<cellular::msg::request::sim::SetPinLock::Response *>(request);
-                    if (data->retCode) {
-                        return simLockHandler.handleSimAvailabilityMessage();
-                    }
-                    else {
-                        if (data->lock == cellular::api::SimLockState::Enabled) {
-                            return simLockHandler.handleSimEnableRequest();
-                        }
-                        else {
-                            return simLockHandler.handleSimDisableRequest();
-                        }
-                    }
-                });
-        connect(typeid(cellular::msg::notification::SimBlocked), [&](sys::Message *request) -> sys::MessagePointer {
-            if (phoneLockHandler.isPhoneLocked()) {
-                simLockHandler.setSimUnlockBlockOnLockedPhone();
-            }
-            return simLockHandler.handleSimBlockedRequest();
-        });
-        connect(typeid(cellular::msg::notification::UnhandledCME), [&](sys::Message *request) -> sys::MessagePointer {
-            auto data = static_cast<cellular::msg::notification::UnhandledCME *>(request);
-            if (phoneLockHandler.isPhoneLocked()) {
-                simLockHandler.setSimUnlockBlockOnLockedPhone();
-            }
-            return simLockHandler.handleCMEErrorRequest(data->code);
-        });
-        connect(typeid(locks::SetSim), [&](sys::Message *request) -> sys::MessagePointer {
-            auto data = static_cast<locks::SetSim *>(request);
-            simLockHandler.setSim(data->getSimSlot());
-            return sys::msgHandled();
-        });
-        connect(typeid(cellular::msg::request::sim::SetActiveSim::Response),
-                [&](sys::Message *request) -> sys::MessagePointer {
-                    auto data = static_cast<cellular::msg::request::sim::SetActiveSim::Response *>(request);
-                    if (data->retCode) {
-                        settings->setValue(::settings::SystemProperties::activeSim,
-                                           utils::enumToString(Store::GSM::get()->selected),
-                                           ::settings::SettingsScope::Global);
-                        return sys::msgHandled();
-                    }
-                    return sys::msgNotHandled();
-                });
-        connect(typeid(cellular::msg::notification::SimReady),
-                [&](sys::Message *request) -> sys::MessagePointer { return simLockHandler.handleSimReadyMessage(); });
-        connect(typeid(cellular::msg::notification::ModemStateChanged),
-                [&](sys::Message *request) -> sys::MessagePointer {
-                    auto data = static_cast<cellular::msg::notification::ModemStateChanged *>(request);
-                    if (data->state == cellular::api::ModemState::Ready) {
-                        simLockHandler.setSimReady();
-                        simLockHandler.getSettingsSimSelect(
-                            settings->getValue(settings::SystemProperties::activeSim, settings::SettingsScope::Global));
-                        return sys::msgHandled();
-                    }
-                    return sys::msgNotHandled();
-                });
 
         connect(typeid(onBoarding::FinalizeOnBoarding),
                 [&](sys::Message *request) -> sys::MessagePointer { return handleOnBoardingFinalize(); });
@@ -530,23 +304,8 @@ namespace app::manager
         connect(typeid(app::manager::DOMRequest), [&](sys::Message *request) { return handleDOMRequest(request); });
 
         auto convertibleToActionHandler = [this](sys::Message *request) { return handleMessageAsAction(request); };
-        connect(typeid(CellularMMIResultMessage), convertibleToActionHandler);
-        connect(typeid(CellularMMIResponseMessage), convertibleToActionHandler);
-        connect(typeid(CellularMMIPushMessage), convertibleToActionHandler);
-        connect(typeid(CellularNoSimNotification), convertibleToActionHandler);
-        connect(typeid(CellularNotAnEmergencyNotification), convertibleToActionHandler);
         connect(typeid(sys::CriticalBatteryLevelNotification), convertibleToActionHandler);
-        connect(typeid(CellularSmsNoSimRequestMessage), convertibleToActionHandler);
-        connect(typeid(CellularSMSRejectedByOfflineNotification), convertibleToActionHandler);
-        connect(typeid(CellularCallRejectedByOfflineNotification), convertibleToActionHandler);
-        connect(typeid(sys::TetheringQuestionRequest), convertibleToActionHandler);
-        connect(typeid(sys::TetheringQuestionAbort), convertibleToActionHandler);
-        connect(typeid(sys::TetheringPhoneModeChangeProhibitedMessage), convertibleToActionHandler);
         connect(typeid(VolumeChanged), convertibleToActionHandler);
-        connect(typeid(CellularCallAbortedNotification), convertibleToActionHandler);
-        connect(typeid(CellularRingingMessage), convertibleToActionHandler);
-        connect(typeid(CellularCallActiveNotification), convertibleToActionHandler);
-        connect(typeid(CellularHangupCallMessage), convertibleToActionHandler);
     }
 
     sys::ReturnCodes ApplicationManager::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
@@ -561,7 +320,7 @@ namespace app::manager
         case sys::ServicePowerMode ::SuspendToRAM:
             [[fallthrough]];
         case sys::ServicePowerMode ::SuspendToNVM:
-            suspendSystemServices();
+            suspendSystemServices();s
             break;
         }
         return sys::ReturnCodes::Success;
@@ -574,12 +333,9 @@ namespace app::manager
             setState(State::AwaitingFocusConfirmation);
             app::Application::messageSwitchApplication(
                 this, app.name(), app.switchWindow, std::move(app.switchData), StartupReason::Launch);
+            return true;
         }
-        else {
-            LOG_INFO("Starting application %s", app.name().c_str());
-            app.run(phoneModeObserver->getCurrentPhoneMode(), this);
-        }
-        return true;
+        return false;
     }
 
     auto ApplicationManager::closeApplications() -> bool
@@ -712,25 +468,6 @@ namespace app::manager
         actionsRegistry.enqueue(std::move(entry));
     }
 
-    void ApplicationManager::handlePhoneModeChanged(sys::phone_modes::PhoneMode phoneMode)
-    {
-        for (const auto app : getStackedApplications()) {
-            changePhoneMode(phoneMode, app);
-        }
-    }
-
-    void ApplicationManager::changePhoneMode(sys::phone_modes::PhoneMode phoneMode, const ApplicationHandle *app)
-    {
-        ActionEntry action{actions::PhoneModeChanged, std::make_unique<gui::PhoneModeParams>(phoneMode)};
-        action.setTargetApplication(app->name());
-        actionsRegistry.enqueue(std::move(action));
-    }
-
-    void ApplicationManager::handleTetheringChanged(sys::phone_modes::Tethering tethering)
-    {
-        notificationProvider.handle(tethering);
-    }
-
     ActionProcessStatus ApplicationManager::handleAction(ActionEntry &action)
     {
         switch (action.actionId) {
@@ -761,8 +498,7 @@ namespace app::manager
 
     auto ApplicationManager::resolveHomeWindow() -> std::string
     {
-        return phoneLockHandler.isPhoneLocked() ? gui::popup::window::phone_lock_window
-                                                : gui::name::window::main_window;
+        return gui::name::window::main_window;
     }
 
     auto ApplicationManager::handleOnBoardingFinalize() -> sys::MessagePointer
@@ -775,15 +511,6 @@ namespace app::manager
     auto ApplicationManager::checkOnBoarding() -> bool
     {
         return not utils::getNumericValue<bool>(settings->getValue(settings::SystemProperties::onboardingDone));
-    }
-
-    auto ApplicationManager::resolveHomeApplication() -> std::string
-    {
-        if (checkOnBoarding()) {
-            phoneLockHandler.handleUnlockRequest();
-            return app::name_onboarding;
-        }
-        return rootApplicationName;
     }
 
     auto ApplicationManager::handleLaunchAction(ActionEntry &action) -> ActionProcessStatus
@@ -996,16 +723,6 @@ namespace app::manager
         return true;
     }
 
-    auto ApplicationManager::handleDBResponse(db::QueryResponse *msg) -> bool
-    {
-        auto result = msg->getResult();
-        if (auto response = dynamic_cast<db::query::notifications::GetAllResult *>(result.get())) {
-            notificationProvider.handle(response);
-            return true;
-        }
-        return false;
-    }
-
     void ApplicationManager::rebuildActiveApplications()
     {
         for (const auto &app : getApplications()) {
@@ -1122,65 +839,11 @@ namespace app::manager
         return std::make_shared<sys::ResponseMessage>();
     }
 
-    void ApplicationManager::onPhoneLocked()
-    {
-        if (phoneLockHandler.isPhoneLocked()) {
-            autoLockTimer.stop();
-            return;
-        }
-        if (auto focusedApp = getFocusedApplication(); focusedApp == nullptr || focusedApp->preventsAutoLocking()) {
-            autoLockTimer.start();
-            return;
-        }
-        if (phoneModeObserver->isTetheringOn()) {
-            autoLockTimer.start();
-            return;
-        }
-        if (event::service::api::isTorchOn()) {
-            autoLockTimer.start();
-            return;
-        }
-        phoneLockHandler.handleLockRequest();
-    }
-
     void ApplicationManager::displayLanguageChanged(std::string value)
     {
         if (utils::setDisplayLanguage(value)) {
             rebuildActiveApplications();
         }
-    }
-
-    void ApplicationManager::lockTimeChanged(std::string value)
-    {
-        if (value.empty()) {
-            LOG_ERROR("No value for auto-locking time period, request ignored");
-            return;
-        }
-        const auto interval = std::chrono::seconds{utils::getNumericValue<unsigned int>(value)};
-        if (interval.count() == 0) {
-            LOG_ERROR("Invalid auto-locking time period of 0s, request ignored");
-            return;
-        }
-        autoLockTimer.restart(interval);
-    }
-
-    auto ApplicationManager::handleAutoLockGetRequest([[maybe_unused]] GetAutoLockTimeoutRequest *request)
-        -> std::shared_ptr<sys::ResponseMessage>
-    {
-        auto intervalValue =
-            settings->getValue(settings::SystemProperties::autoLockTimeInSec, settings::SettingsScope::Global);
-        const auto interval = std::chrono::seconds{utils::getNumericValue<unsigned int>(intervalValue)};
-        return std::make_shared<GetAutoLockTimeoutResponse>(interval);
-    }
-    auto ApplicationManager::handleAutoLockSetRequest(SetAutoLockTimeoutRequest *request)
-        -> std::shared_ptr<sys::ResponseMessage>
-    {
-        auto interval = request->getValue();
-        settings->setValue(settings::SystemProperties::autoLockTimeInSec,
-                           utils::to_string(interval.count()),
-                           settings::SettingsScope::Global);
-        autoLockTimer.restart(interval);
-        return std::make_shared<sys::ResponseMessage>();
     }
 
     void ApplicationManager::inputLanguageChanged(std::string value)
@@ -1198,35 +861,5 @@ namespace app::manager
             return sys::MessageNone{};
         }
         return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
-    }
-
-    auto ApplicationManager::handleDeveloperModeRequest(sys::Message *request) -> sys::MessagePointer
-    {
-        if (auto msg = dynamic_cast<sdesktop::developerMode::DeveloperModeRequest *>(request)) {
-            if (dynamic_cast<sdesktop::developerMode::ScreenlockCheckEvent *>(msg->event.get())) {
-                auto response = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(
-                    std::make_unique<sdesktop::developerMode::ScreenlockCheckEvent>(phoneLockHandler.isPhoneLocked()));
-                bus.sendUnicast(std::move(response), service::name::service_desktop);
-                return sys::msgHandled();
-            }
-        }
-        return sys::msgNotHandled();
-    }
-
-    void ApplicationManager::processKeypadBacklightState(bsp::keypad_backlight::State keypadLightState)
-    {
-        auto action = bsp::keypad_backlight::Action::turnOff;
-        switch (keypadLightState) {
-        case bsp::keypad_backlight::State::on:
-            action = bsp::keypad_backlight::Action::turnOn;
-            break;
-        case bsp::keypad_backlight::State::activeMode:
-            action = bsp::keypad_backlight::Action::turnOnActiveMode;
-            break;
-        case bsp::keypad_backlight::State::off:
-            action = bsp::keypad_backlight::Action::turnOff;
-            break;
-        }
-        bus.sendUnicast(std::make_shared<sevm::KeypadBacklightMessage>(action), service::name::evt_manager);
     }
 } // namespace app::manager

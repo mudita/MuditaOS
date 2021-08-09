@@ -12,8 +12,43 @@ namespace app::manager
       public:
         PureApplicationManager(const ApplicationName &serviceName,
                                std::vector<std::unique_ptr<app::ApplicationLauncher>> &&launchers,
-                               const ApplicationName &_rootApplicationName)
-            : ApplicationManager(std::move(serviceName), std::move(launchers), std::move(_rootApplicationName))
-        {}
+                               const ApplicationName &_rootApplicationName);
+
+      private:
+        auto InitHandler() -> sys::ReturnCodes override;
+        void changePhoneMode(sys::phone_modes::PhoneMode phoneMode, const ApplicationHandle *app);
+        void handlePhoneModeChanged(sys::phone_modes::PhoneMode phoneMode);
+        void handleTetheringChanged(sys::phone_modes::Tethering tethering);
+        void processKeypadBacklightState(bsp::keypad_backlight::State keypadLightState);
+        void registerMessageHandlers() override;
+        void startBackgroundApplications() override;
+        auto handleAutoLockGetRequest(GetAutoLockTimeoutRequest *request) -> std::shared_ptr<sys::ResponseMessage>;
+        auto handleAutoLockSetRequest(SetAutoLockTimeoutRequest *request) -> std::shared_ptr<sys::ResponseMessage>;
+        auto handleDeveloperModeRequest(sys::Message *request) -> sys::MessagePointer override;
+        void lockTimeChanged(std::string value);
+        /// @brief method is called on auto-locking timer tick event (blockTimer)
+        /// @detailed It sends AutoLock action to ApplicationDesktop to lock the screen.
+        /// @note AutoLock action is sent only if following conditions are met:
+        ///  - tethering is off
+        ///  - focused application is not preventing AutoLock
+        void onPhoneLocked();
+        auto startApplication(ApplicationHandle &app) -> bool override;
+        auto resolveHomeWindow() -> std::string override;
+        auto resolveHomeApplication() -> std::string override;
+        auto handleDBResponse(db::QueryResponse *msg) -> bool override;
+
+        std::shared_ptr<sys::phone_modes::Observer> phoneModeObserver;
+        locks::PhoneLockHandler phoneLockHandler;
+        locks::SimLockHandler simLockHandler;
+
+        notifications::NotificationsConfiguration notificationsConfig;
+        notifications::NotificationsHandler notificationsHandler;
+        notifications::NotificationProvider notificationProvider;
+
+        //< auto-lock timer to count time from last user's activity.
+        // If it reaches time defined in settings database application
+        // manager is sending signal to Application Desktop in order to
+        // lock screen.
+        sys::TimerHandle autoLockTimer;
     };
 } // namespace app::manager
