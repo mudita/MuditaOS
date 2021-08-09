@@ -9,6 +9,7 @@
 #include <application-bell-settings/ApplicationBellSettings.hpp>
 
 // services
+#include <services/evtmgr/BellEventManager.hpp>
 #include <module-services/service-eink/ServiceEink.hpp>
 #include <Service/ServiceCreator.hpp>
 #include <service-appmgr/model/ApplicationManager.hpp>
@@ -16,7 +17,6 @@
 #include <service-bluetooth/ServiceBluetooth.hpp>
 #include <service-db/ServiceDB.hpp>
 #include <service-desktop/ServiceDesktop.hpp>
-#include <service-evtmgr/EventManager.hpp>
 #include <service-fileindexer/Constants.hpp>
 #include <service-gui/ServiceGUI.hpp>
 #include <service-lwip/ServiceLwIP.hpp>
@@ -57,7 +57,7 @@ int main()
     }
 
     std::vector<std::unique_ptr<sys::BaseServiceCreator>> systemServices;
-    systemServices.emplace_back(sys::CreatorFor<EventManager>());
+    systemServices.emplace_back(sys::CreatorFor<BellEventManager>());
 #if ENABLE_FILEINDEXER_SERVICE
     systemServices.emplace_back(sys::CreatorFor<service::ServiceFileIndexer>());
 #endif
