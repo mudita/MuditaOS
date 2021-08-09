@@ -23,7 +23,7 @@ namespace cellular::service
         return std::make_shared<stm::message::GetAutomaticDateAndTimeRequest>();
     }
 
-    void NetworkTime::processSettings(bool newValue)
+    void NetworkTime::processSettings(bool newValue, bool isOfflineModeOn)
     {
         if (isAutomaticDateAndTime == newValue) {
             return;
@@ -31,14 +31,14 @@ namespace cellular::service
         isAutomaticDateAndTime = newValue;
 
         if (isAutomaticDateAndTime) {
-            enableTimeReporting();
+            enableTimeReporting(isOfflineModeOn);
         }
         else {
             disableTimeReporting();
         }
     }
 
-    void NetworkTime::enableTimeReporting()
+    void NetworkTime::enableTimeReporting(bool isOfflineModeOn)
     {
         if (channel == nullptr) {
             LOG_ERROR("No channel provided. Request ignored");
@@ -46,8 +46,10 @@ namespace cellular::service
         }
         channel->cmd(at::AT::ENABLE_TIME_ZONE_UPDATE);
         channel->cmd(at::AT::SET_TIME_ZONE_REPORTING);
-        channel->cmd(at::AT::CFUN_DISABLE_TRANSMITTING);
-        channel->cmd(at::AT::CFUN_FULL_FUNCTIONALITY);
+        if (!isOfflineModeOn) {
+            channel->cmd(at::AT::CFUN_DISABLE_TRANSMITTING);
+            channel->cmd(at::AT::CFUN_FULL_FUNCTIONALITY);
+        }
     }
 
     void NetworkTime::disableTimeReporting()
