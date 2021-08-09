@@ -22,11 +22,11 @@
 #include <application-onboarding/ApplicationOnBoarding.hpp>
 
 // services
+#include <services/evtmgr/PureEventManager.hpp>
 #include <service-appmgr/model/ApplicationManager.hpp>
 #include <service-audio/ServiceAudio.hpp>
 #include <service-bluetooth/ServiceBluetooth.hpp>
 #include <service-db/ServiceDB.hpp>
-#include <service-evtmgr/EventManager.hpp>
 #include <service-lwip/ServiceLwIP.hpp>
 #include <service-time/ServiceTime.hpp>
 #include <Service/ServiceCreator.hpp>
@@ -78,7 +78,7 @@ int main()
     }
 
     std::vector<std::unique_ptr<sys::BaseServiceCreator>> systemServices;
-    systemServices.emplace_back(sys::CreatorFor<EventManager>());
+    systemServices.emplace_back(sys::CreatorFor<PureEventManager>());
 #if ENABLE_FILEINDEXER_SERVICE
     systemServices.emplace_back(sys::CreatorFor<service::ServiceFileIndexer>());
 #endif

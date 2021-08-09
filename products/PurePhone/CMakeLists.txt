@@ -25,6 +25,8 @@ target_sources(PurePhone
     PRIVATE
         PurePhoneMain.cpp
         PlatformFactory.cpp
+        services/evtmgr/PureEventManager.cpp
+        services/evtmgr/PureEventManager.hpp
     )
 
 target_include_directories(PurePhone
@@ -32,6 +34,7 @@ target_include_directories(PurePhone
         ${TARGET_DIR_INCLUDES}
         ${PROJECT_INCLUDES}
         ${CMAKE_BINARY_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}
     )
 
 set_target_properties(PurePhone
