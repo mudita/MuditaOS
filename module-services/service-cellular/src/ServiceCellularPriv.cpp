@@ -109,13 +109,18 @@ namespace cellular::internal
         owner->connect(typeid(stm::message::AutomaticDateAndTimeChangedMessage),
                        [&](sys::Message *request) -> sys::MessagePointer {
                            auto message = static_cast<stm::message::AutomaticDateAndTimeChangedMessage *>(request);
-                           networkTime->processSettings(message->getValue());
+
+                           networkTime->processSettings(
+                               message->getValue(),
+                               owner->phoneModeObserver->isInMode(sys::phone_modes::PhoneMode::Offline));
                            return sys::MessageNone{};
                        });
         owner->connect(typeid(stm::message::GetAutomaticDateAndTimeResponse),
                        [&](sys::Message *request) -> sys::MessagePointer {
                            auto message = static_cast<stm::message::GetAutomaticDateAndTimeResponse *>(request);
-                           networkTime->processSettings(message->isAutomaticDateAndTime());
+                           networkTime->processSettings(
+                               message->isAutomaticDateAndTime(),
+                               owner->phoneModeObserver->isInMode(sys::phone_modes::PhoneMode::Offline));
                            return sys::MessageNone{};
                        });
     }
