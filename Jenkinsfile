@@ -50,8 +50,7 @@ pipeline {
                 echo "Check if branch needs rebasing"
                 sh '''#!/bin/bash -e
                 pushd ${WORKSPACE}
-
-                if [[ $(git log origin/${CHANGE_TARGET}..HEAD) ]]; then
+                if [ $(git rev-list --count origin/${CHANGE_TARGET}...`(git merge-base ${GIT_COMMIT}  origin/${CHANGE_TARGET})`) = 0 ]; then
                     echo "Branch OK"
                 else
                     echo "Branch is not rebased. Exiting"
@@ -80,6 +79,17 @@ pipeline {
             }
         stage('Build RT1051') {
             steps {
+                echo "Check if branch needs rebasing"
+                sh '''#!/bin/bash -e
+                pushd ${WORKSPACE}
+                if [ $(git rev-list --count origin/${CHANGE_TARGET}...`(git merge-base ${GIT_COMMIT}  origin/${CHANGE_TARGET})`) = 0 ]; then
+                    echo "Branch OK"
+                else
+                    echo "Branch is not rebased. Exiting"
+                    exit 1
+                fi
+                popd'''
+
                 sh '''#!/bin/bash -e
                 PATH="/usr/local/cmake-3.19.5-Linux-x86_64/bin:/usr/local/gcc-arm-none-eabi-10-2020-q4-major/bin:$PATH"
                 export JOBS=${JOBS:-6}
@@ -125,9 +135,22 @@ pipeline {
             environment {
                 PATH="/usr/local/cmake-3.19.5-Linux-x86_64/bin:/usr/local/gcc-arm-none-eabi-10-2020-q4-major/bin:$PATH"
                 CCACHE_DIR="/ccache/Linux"
+                XDG_CACHE_HOME="/clang-cache"
+
             }
 
             steps {
+                echo "Check if branch needs rebasing"
+                sh '''#!/bin/bash -e
+                pushd ${WORKSPACE}
+                if [ $(git rev-list --count origin/${CHANGE_TARGET}...`(git merge-base ${GIT_COMMIT}  origin/${CHANGE_TARGET})`) = 0 ]; then
+                    echo "Branch OK"
+                else
+                    echo "Branch is not rebased. Exiting"
+                    exit 1
+                fi
+                popd'''
+
                 echo "Configure"
                 sh '''#!/bin/bash -e
                 echo "JOBS=${JOBS}"
@@ -198,9 +221,21 @@ pipeline {
             environment {
                 PATH="/usr/local/cmake-3.19.5-Linux-x86_64/bin:/usr/local/gcc-arm-none-eabi-10-2020-q4-major/bin:$PATH"
                 CCACHE_DIR="/ccache/Linux"
+                XDG_CACHE_HOME="/clang-cache"
             }
 
             steps {
+                echo "Check if branch needs rebasing"
+                sh '''#!/bin/bash -e
+                pushd ${WORKSPACE}
+                if [ $(git rev-list --count origin/${CHANGE_TARGET}...`(git merge-base ${GIT_COMMIT}  origin/${CHANGE_TARGET})`) = 0 ]; then
+                    echo "Branch OK"
+                else
+                    echo "Branch is not rebased. Exiting"
+                    exit 1
+                fi
+                popd'''
+
                 echo "Configure"
                 sh '''#!/bin/bash -e
                 echo "JOBS=${JOBS}"
