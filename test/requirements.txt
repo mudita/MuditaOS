@@ -8,3 +8,5 @@ pyserial==3.5
 pytest==6.1.2
 six==1.15.0
 toml==0.10.2
+inotify==0.2.10
+dataclasses_json==0.5.4

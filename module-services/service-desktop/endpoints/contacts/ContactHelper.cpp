@@ -41,9 +41,13 @@ auto ContactHelper::to_json(const ContactRecord &record) -> json11::Json
     auto recordEntry = json11::Json::object{{json::contacts::primaryName, record.primaryName.c_str()},
                                             {json::contacts::alternativeName, record.alternativeName.c_str()},
                                             {json::contacts::address, record.address.c_str()},
+                                            {json::contacts::mail, record.mail.c_str()},
+                                            {json::contacts::note, record.note.c_str()},
                                             {json::contacts::id, static_cast<int>(record.ID)},
                                             {json::contacts::isBlocked, record.isOnBlocked()},
                                             {json::contacts::isFavourite, record.isOnFavourites()},
+                                            {json::contacts::isICE, record.isOnIce()},
+                                            {json::contacts::speedDial, record.speeddial.c_str()},
                                             {json::contacts::numbers, numberArray}};
     return recordEntry;
 }
@@ -55,6 +59,9 @@ auto ContactHelper::from_json(const json11::Json &contactJSON) -> ContactRecord
     newRecord.ID              = contactJSON[json::contacts::id].int_value();
     newRecord.alternativeName = UTF8(contactJSON[json::contacts::alternativeName].string_value());
     newRecord.address         = UTF8(contactJSON[json::contacts::address].string_value());
+    newRecord.mail            = UTF8(contactJSON[json::contacts::mail].string_value());
+    newRecord.note            = UTF8(contactJSON[json::contacts::note].string_value());
+    newRecord.speeddial       = UTF8(contactJSON[json::contacts::speedDial].string_value());
 
     for (const auto &num : contactJSON[json::contacts::numbers].array_items()) {
         utils::PhoneNumber phoneNumber(num.string_value());
@@ -64,6 +71,7 @@ auto ContactHelper::from_json(const json11::Json &contactJSON) -> ContactRecord
 
     newRecord.addToBlocked(contactJSON[json::contacts::isBlocked].bool_value());
     newRecord.addToFavourites(contactJSON[json::contacts::isFavourite].bool_value());
+    newRecord.addToIce(contactJSON[json::contacts::isICE].bool_value());
     return newRecord;
 }
 
