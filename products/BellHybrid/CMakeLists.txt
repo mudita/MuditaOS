@@ -19,6 +19,8 @@ target_sources(BellHybrid
     PRIVATE
         BellHybridMain.cpp
         PlatformFactory.cpp
+        services/evtmgr/BellEventManager.cpp
+        services/evtmgr/BellEventManager.hpp
     )
 
 target_include_directories(BellHybrid
@@ -26,6 +28,7 @@ target_include_directories(BellHybrid
         ${TARGET_DIR_INCLUDES}
         ${PROJECT_INCLUDES}
         ${CMAKE_BINARY_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 set_target_properties(BellHybrid
