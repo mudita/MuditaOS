@@ -59,8 +59,10 @@ def test_contacts(harness):
     # adding new contact
     body = {"address": "6 Czeczota St.\n02600 Warsaw",
             "altName": "Testowy",
+            "email": "testowy.2@example.com",
             "blocked": True,
             "favourite": True,
+            "ice": False,
             "numbers": ["547623521"],
             "priName": "Test"}
     ret = harness.endpoint_request("contacts", "post", body)
@@ -87,10 +89,14 @@ def test_contacts(harness):
     # updating existing contact
     body = {"address": "6 Czeczota St.\n02600 Warsaw",
             "altName": "Testowy2",
-            "blocked": True,
+            "email": "testowy.2@example.com",
+            "blocked": False,
             "favourite": True,
+            "ice": True,
             "numbers": ["547623521"],
+            "speedDial": "7",
             "priName": "Test2",
+            "note": "this is a really cool guy",
             "id": contact_id_to_update}
     ret = harness.endpoint_request("contacts", "put", body)
     assert ret["status"] == status["NoContent"]
@@ -100,10 +106,14 @@ def test_contacts(harness):
     ret = harness.endpoint_request("contacts", "get", body)
     contact = {"address": "6 Czeczota St.\n02600 Warsaw",
                "altName": "Testowy2",
-               "blocked": True,
+               "email": "testowy.2@example.com",
+               "blocked": False,
                "favourite": True,
+               "ice": True,
                "numbers": ["547623521"],
+               "speedDial": "7",
                "priName": "Test2",
+               "note": "this is a really cool guy",
                "id": contact_id_to_update}
     assert ret["body"] == contact
 
