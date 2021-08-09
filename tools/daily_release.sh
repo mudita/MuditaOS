@@ -70,12 +70,12 @@ fi
 pushd ${WORK_DIR}
 
 if checkIfGit; then
-    git checkout master
+    git fetch
+    git checkout ${REPOSITORY_BRANCH}
     git pull --ff-only 
 else
     echo "not a git dir"
     git clone -b ${REPOSITORY_BRANCH} ${REPOSITORY_URL} .
-    git checkout master
 fi
 
 if [ ! -d ccache ]; then
