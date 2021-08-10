@@ -3,8 +3,11 @@ add_library(application-bell-alarm)
 target_sources(application-bell-alarm
     PRIVATE
         ApplicationBellAlarm.cpp
+        presenter/BellAlarmWindowPresenter.cpp
         windows/BellAlarmWindow.cpp
     PRIVATE
+        data/BellAlarmStyle.hpp
+        presenter/BellAlarmWindowPresenter.hpp
         windows/BellAlarmWindow.hpp
     PUBLIC
         include/application-bell-alarm/ApplicationBellAlarm.hpp

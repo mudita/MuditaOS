@@ -15,6 +15,7 @@ namespace gui
         : minValue(minValue), maxValue(maxValue), step(step), currentValue(minValue), boundaries(boundaries)
     {
         setEditMode(EditMode::Browse);
+        drawUnderline(false);
         updateSpinner();
     }
 
