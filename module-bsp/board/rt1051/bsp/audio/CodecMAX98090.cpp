@@ -373,7 +373,7 @@ CodecRetCode CodecMAX98090::SetOutputVolume(const float vol)
         // @note:
         // In order to pass certification max value is limited and taken from measurements 0x0B: -28dB
         // Be carefull when changing it !!!
-        constexpr auto scale_factor      = 1.1f;
+        constexpr auto scale_factor      = 1.24f;
         uint8_t volume                   = static_cast<float>(vol * scale_factor);
         max98090_reg_lhp_vol_ctrl_t lvol = {};
         max98090_reg_rhp_vol_ctrl_t rvol = {};
