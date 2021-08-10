@@ -4,8 +4,8 @@
 #include "AlarmItem.hpp"
 #include "AlarmClockStyle.hpp"
 #include "application-alarm-clock/data/AlarmsData.hpp"
-#include "application-calendar/data/dateCommon.hpp"
 #include <InputEvent.hpp>
+#include <time/dateCommon.hpp>
 #include <time/time_conversion.hpp>
 
 namespace gui

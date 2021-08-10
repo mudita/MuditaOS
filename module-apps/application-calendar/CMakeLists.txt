@@ -36,7 +36,6 @@ target_sources(application-calendar
 	PUBLIC
 		include/application-calendar/ApplicationCalendar.hpp
 		include/application-calendar/data/CalendarData.hpp
-		include/application-calendar/data/dateCommon.hpp
 		include/application-calendar/data/OptionParser.hpp
 )
 
