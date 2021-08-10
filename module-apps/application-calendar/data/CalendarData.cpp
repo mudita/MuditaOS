@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <application-calendar/data/CalendarData.hpp>
-#include <application-calendar/data/dateCommon.hpp>
+#include <time/dateCommon.hpp>
 
 WeekDaysRepeatData::WeekDaysRepeatData()
 {
