@@ -16,6 +16,7 @@ namespace gui
         void drawLines() override;
 
       public:
+        TextFixedSize();
         TextFixedSize(Item *parent, Position x, Position y, Length w, Length h);
 
         void setLines(unsigned int val);
