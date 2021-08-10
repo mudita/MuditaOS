@@ -3,11 +3,11 @@
 
 #pragma once
 
-#include "Text.hpp"
+#include "TextFixedSize.hpp"
 
 namespace gui
 {
-    class Spinner : public Text
+    class Spinner : public TextFixedSize
     {
       public:
         Spinner(int minValue, int maxValue, int step, Boundaries boundaries);
