@@ -14,7 +14,7 @@ namespace mockup
     {
         using namespace gui;
         auto &fontmanager = mockup::fontManager();
-        auto testfont     = fontmanager.getFont(0);
+        auto testfont     = fontmanager.getFont();
         auto document     = TextDocument({});
         return std::tuple{document, testfont};
     }
@@ -26,7 +26,7 @@ namespace mockup
         const auto no_lines = 3;
 
         auto &fontmanager = mockup::fontManager();
-        auto testfont     = fontmanager.getFont(0);
+        auto testfont     = fontmanager.getFont();
         std::string text  = mockup::multiLineString(no_lines);
         auto blocks       = textToTextBlocks(text, testfont, lineEnd);
         auto document     = TextDocument(blocks);
@@ -38,7 +38,7 @@ namespace mockup
         using namespace gui;
 
         auto &fontmanager = fontManager();
-        auto testfont     = fontmanager.getFont(0);
+        auto testfont     = fontmanager.getFont();
         auto blocks       = textToTextBlocks(text, testfont, gui::TextBlock::End::None);
         auto document     = TextDocument(blocks);
         return std::tuple{document, testfont};
@@ -48,7 +48,7 @@ namespace mockup
     {
         using namespace gui;
         auto &fontmanager = mockup::fontManager();
-        auto testfont     = fontmanager.getFont(0);
+        auto testfont     = fontmanager.getFont();
         std::list<TextBlock> blocks;
         for (auto el : source) {
             blocks.emplace_back(TextBlock(el, testfont, TextBlock::End::Newline));
@@ -61,7 +61,7 @@ namespace mockup
     {
         using namespace gui;
         auto &fontmanager = mockup::fontManager();
-        auto testfont     = fontmanager.getFont(0);
+        auto testfont     = fontmanager.getFont();
         return TextDocument({TextBlock("", testfont, TextBlock::End::Newline)});
     }
 } // namespace mockup
