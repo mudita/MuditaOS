@@ -84,3 +84,4 @@ add_standalone_image(BellHybrid)
 add_update_package(BellHybrid)
 
 add_subdirectory(services)
+add_subdirectory(alarms)
