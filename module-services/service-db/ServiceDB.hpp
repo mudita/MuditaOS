@@ -12,6 +12,7 @@
 #include "service-fileindexer/Constants.hpp"
 
 #include <Common/Query.hpp>
+#include <Interface/AlarmEventRecord.hpp>
 #include <Interface/AlarmsRecord.hpp>
 #include <Interface/BaseInterface.hpp>
 #include <Interface/CalllogRecord.hpp>
@@ -31,6 +32,7 @@
 
 class AlarmsDB;
 class AlarmsRecordInterface;
+class AlarmEventRecordInterface;
 class CalllogDB;
 class CalllogRecordInterface;
 class ContactRecordInterface;
@@ -38,6 +40,7 @@ class ContactsDB;
 class CountryCodeRecordInterface;
 class CountryCodesDB;
 class DatabaseAgent;
+class EventsDB;
 class NotesDB;
 class NotesRecordInterface;
 class NotificationsDB;
@@ -55,6 +58,7 @@ namespace Quotes
 class ServiceDB : public sys::Service
 {
   private:
+    std::unique_ptr<EventsDB> eventsDB;
     std::unique_ptr<SmsDB> smsDB;
     std::unique_ptr<ContactsDB> contactsDB;
     std::unique_ptr<AlarmsDB> alarmsDB;
@@ -64,6 +68,7 @@ class ServiceDB : public sys::Service
     std::unique_ptr<NotificationsDB> notificationsDB;
     std::unique_ptr<Database> quotesDB;
 
+    std::unique_ptr<AlarmEventRecordInterface> alarmEventRecordInterface;
     std::unique_ptr<SMSRecordInterface> smsRecordInterface;
     std::unique_ptr<ThreadRecordInterface> threadRecordInterface;
     std::unique_ptr<SMSTemplateRecordInterface> smsTemplateRecordInterface;

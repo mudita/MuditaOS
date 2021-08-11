@@ -4,9 +4,18 @@
 CREATE TABLE IF NOT EXISTS events(
                   _id INTEGER PRIMARY KEY,
                   name TEXT DEFAULT '',
-                  startDate DATETIME,
-                  endDate DATETIME,
+                  start_date DATETIME,
+                  end_date DATETIME,
                   duration INTEGER,
-                  isAllDay BOOLEAN,
-                  recurrenceRule TEXT DEFAULT ''
+                  is_all_day BOOLEAN,
+                  rrule TEXT DEFAULT ''
+);
+
+CREATE TABLE IF NOT EXISTS alarm_events(
+                  _id INTEGER PRIMARY KEY,
+                  event_id INTEGER,
+                  music_tone TEXT,
+                  enabled BOOLEAN,
+                  snooze_duration INTEGER,
+                  FOREIGN KEY (event_id) REFERENCES events (_id) ON DELETE CASCADE
 );

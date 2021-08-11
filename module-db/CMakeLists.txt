@@ -18,6 +18,7 @@ set(SOURCES
         ${SQLITE3_SOURCE}
 
         Databases/ContactsDB.cpp
+        Databases/EventsDB.cpp
         Databases/SmsDB.cpp
         Databases/AlarmsDB.cpp
         Databases/NotesDB.cpp
@@ -25,6 +26,7 @@ set(SOURCES
         Databases/CountryCodesDB.cpp
         Databases/NotificationsDB.cpp
 
+        Tables/AlarmEventsTable.cpp
         Tables/Table.cpp
         Tables/SMSTable.cpp
         Tables/ThreadsTable.cpp
@@ -42,6 +44,8 @@ set(SOURCES
         Tables/SMSTemplateTable.cpp
         Tables/NotificationsTable.cpp
 
+        Interface/AlarmEventRecord.cpp
+        Interface/EventRecord.cpp
         Interface/Record.cpp
         Interface/SMSRecord.cpp
         Interface/ContactRecord.cpp
@@ -53,6 +57,14 @@ set(SOURCES
         Interface/NotificationsRecord.cpp
 
         queries/RecordQuery.cpp
+        queries/alarm_events/QueryAlarmEventsAdd.cpp
+        queries/alarm_events/QueryAlarmEventsEdit.cpp
+        queries/alarm_events/QueryAlarmEventsGet.cpp
+        queries/alarm_events/QueryAlarmEventsGetRecurringBetweenDates.cpp
+        queries/alarm_events/QueryAlarmEventsGetLimited.cpp
+        queries/alarm_events/QueryAlarmEventsGetBetweenDates.cpp
+        queries/alarm_events/QueryAlarmEventsGetNext.cpp
+        queries/alarm_events/QueryAlarmEventsRemove.cpp
         queries/messages/sms/QuerySMSSearchByType.cpp
         queries/messages/sms/QuerySMSGet.cpp
         queries/messages/sms/QuerySMSGetCount.cpp
@@ -159,6 +171,7 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE
         application-calendar
         Microsoft.GSL::GSL
+        rrule
 )
 
 # Host target configuration(mainly used for unit testing)

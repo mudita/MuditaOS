@@ -21,6 +21,7 @@
 #include <Databases/CalllogDB.hpp>
 #include <Databases/ContactsDB.hpp>
 #include <Databases/CountryCodesDB.hpp>
+#include <Databases/EventsDB.hpp>
 #include <Databases/NotesDB.hpp>
 #include <Databases/NotificationsDB.hpp>
 #include <Databases/SmsDB.hpp>
@@ -51,6 +52,7 @@ ServiceDB::ServiceDB() : sys::Service(service::name::db, "", service_db_stack, s
 
 ServiceDB::~ServiceDB()
 {
+    eventsDB.reset();
     contactsDB.reset();
     smsDB.reset();
     alarmsDB.reset();
@@ -66,6 +68,8 @@ ServiceDB::~ServiceDB()
 db::Interface *ServiceDB::getInterface(db::Interface::Name interface)
 {
     switch (interface) {
+    case db::Interface::Name::AlarmEvents:
+        return alarmEventRecordInterface.get();
     case db::Interface::Name::SMS:
         return smsRecordInterface.get();
     case db::Interface::Name::SMSThread:
@@ -239,6 +243,7 @@ sys::ReturnCodes ServiceDB::InitHandler()
     }
 
     // Create databases
+    eventsDB        = std::make_unique<EventsDB>((purefs::dir::getUserDiskPath() / "events.db").c_str());
     contactsDB      = std::make_unique<ContactsDB>((purefs::dir::getUserDiskPath() / "contacts.db").c_str());
     smsDB           = std::make_unique<SmsDB>((purefs::dir::getUserDiskPath() / "sms.db").c_str());
     alarmsDB        = std::make_unique<AlarmsDB>((purefs::dir::getUserDiskPath() / "alarms.db").c_str());
@@ -249,6 +254,7 @@ sys::ReturnCodes ServiceDB::InitHandler()
     quotesDB        = std::make_unique<Database>((purefs::dir::getUserDiskPath() / "quotes.db").c_str());
 
     // Create record interfaces
+    alarmEventRecordInterface    = std::make_unique<AlarmEventRecordInterface>(eventsDB.get());
     contactRecordInterface       = std::make_unique<ContactRecordInterface>(contactsDB.get());
     smsRecordInterface           = std::make_unique<SMSRecordInterface>(smsDB.get(), contactsDB.get());
     threadRecordInterface        = std::make_unique<ThreadRecordInterface>(smsDB.get(), contactsDB.get());
@@ -296,6 +302,11 @@ void ServiceDB::sendUpdateNotification(db::Interface::Name interface, db::Query:
 
 bool ServiceDB::StoreIntoBackup(const std::filesystem::path &backupPath)
 {
+    if (eventsDB->storeIntoFile(backupPath / std::filesystem::path(eventsDB->getName()).filename()) == false) {
+        LOG_ERROR("eventsDB backup failed");
+        return false;
+    }
+
     if (contactsDB->storeIntoFile(backupPath / std::filesystem::path(contactsDB->getName()).filename()) == false) {
         LOG_ERROR("contactsDB backup failed");
         return false;

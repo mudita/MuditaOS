@@ -24,9 +24,12 @@ struct EventInfo
     uint32_t duration{0};
     bool isAllDay{false};
 
+    EventInfo() = default;
     EventInfo(UTF8 name, TimePoint startDate, TimePoint endDate, uint32_t duration, bool isAllDay)
         : name{name}, startDate{startDate}, endDate{endDate}, duration{duration}, isAllDay{isAllDay} {};
 };
+
+struct SingleEventRecord;
 
 struct EventRecord : public Record, public EventInfo
 {
@@ -39,14 +42,18 @@ struct EventRecord : public Record, public EventInfo
                 TimePoint endDate,
                 uint32_t duration,
                 bool isAllDay,
-                std::string rrule)
-        : Record{id}, EventInfo{name, startDate, endDate, duration, isAllDay}, rrule{rrule} {};
+                std::string rrule);
+    EventRecord(EventRecord *er);
+
+    std::vector<SingleEventRecord> generateSingleEvents(TimePoint from, TimePoint to, uint32_t count);
+    SingleEventRecord getNextSingleEvent(TimePoint from);
 };
 
 struct SingleEventRecord : public Record, public EventInfo
 {
     std::shared_ptr<EventRecord> parent;
 
+    SingleEventRecord() = default;
     SingleEventRecord(std::shared_ptr<EventRecord> parent, TimePoint startDate, TimePoint endDate)
         : EventInfo{parent->name, startDate, endDate, parent->duration, parent->isAllDay}, parent{parent} {};
 };

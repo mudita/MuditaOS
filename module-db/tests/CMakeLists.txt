@@ -2,6 +2,7 @@ add_catch2_executable(
     NAME
         db
     SRCS
+        AlarmEventRecord_tests.cpp
         AlarmsRecord_tests.cpp
         AlarmsTable_tests.cpp
         CalllogRecord_tests.cpp
@@ -14,6 +15,7 @@ add_catch2_executable(
         ContactsRingtonesTable_tests.cpp
         ContactsTable_tests.cpp
         DbInitializer.cpp
+        EventRecord_tests.cpp
         NotesRecord_tests.cpp
         NotesTable_tests.cpp
         NotificationsRecord_tests.cpp
