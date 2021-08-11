@@ -1,0 +1,11 @@
+﻿add_catch2_executable(
+    NAME
+        service-alarm-tests
+    SRCS
+        tests-main.cpp
+        tests-AlarmHandlerFactory.cpp
+        MockAlarmHandler.hpp
+    LIBS
+        service-alarm
+        module-db
+)
