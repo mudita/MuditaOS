@@ -4,9 +4,12 @@
 #pragma once
 
 #include <Database/Database.hpp>
+#include <Tables/AlarmEventsTable.hpp>
 
 class EventsDB : public Database
 {
   public:
     explicit EventsDB(const char *name);
+
+    AlarmEventsTable alarmEvents;
 };
