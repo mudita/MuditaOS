@@ -131,8 +131,8 @@ TEST_CASE("Text drawLines")
         auto testline            = mockup::multiLineString(lines_count);
         auto text                = TestText();
         text.setSize(300, 500);
-        text.setText(std::make_unique<TextDocument>(
-            textToTextBlocks(testline, fontmanager.getFont(0), TextBlock::End::Newline)));
+        text.setText(
+            std::make_unique<TextDocument>(textToTextBlocks(testline, fontmanager.getFont(), TextBlock::End::Newline)));
 
         text.drawLines();
         // Extra one line for empty newline at end
@@ -147,7 +147,7 @@ TEST_CASE("Text buildDrawList")
     auto &fontmanager = mockup::fontManager();
     auto lines_count  = 10;
     auto testline     = mockup::multiLineString(lines_count);
-    auto font         = fontmanager.getFont(0);
+    auto font         = fontmanager.getFont();
     auto text         = TestText();
     text.setSize(3000, 3000);
     text.setText(std::make_unique<TextDocument>(textToTextBlocks(testline, font, TextBlock::End::Newline)));
@@ -171,7 +171,7 @@ TEST_CASE("handle input mode ABC/abc/1234")
 {
     utils::setInputLanguage("English"); /// needed to load input mode
     auto &fontmanager = mockup::fontManager();
-    auto font         = fontmanager.getFont(0);
+    auto font         = fontmanager.getFont();
     auto text         = gui::TestText();
     auto modes        = {InputMode::ABC, InputMode::abc, InputMode::digit};
     auto str          = text.getText();
@@ -295,7 +295,7 @@ TEST_CASE("handle text block - moved cursor to end")
     std::string test_text = "text";
     std::string newline   = "\n";
     auto text             = gui::TestText();
-    text.addText(gui::TextBlock(test_text, mockup::fontManager().getFont(0), gui::TextBlock::End::None));
+    text.addText(gui::TextBlock(test_text, mockup::fontManager().getFont(), gui::TextBlock::End::None));
     REQUIRE(text.getText() == test_text);
     test_text = test_text + newline;
     text.addText(newline);

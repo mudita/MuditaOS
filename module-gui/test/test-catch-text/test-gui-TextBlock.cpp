@@ -23,8 +23,8 @@ TEST_CASE("TextBlock Ctor/Dtor ")
 
     SECTION("Text and font")
     {
-        REQUIRE(fontmanager.getFont(0) != nullptr);
-        auto block = TextBlock("lol", fontmanager.getFont(0), TextBlock::End::Newline);
+        REQUIRE(fontmanager.getFont() != nullptr);
+        auto block = TextBlock("lol", fontmanager.getFont(), TextBlock::End::Newline);
     }
 }
 
@@ -33,8 +33,8 @@ TEST_CASE("Text block - set/update/get text")
     using namespace gui;
     const std::string starting_text = "lol";
     auto &fontmanager               = mockup::fontManager();
-    REQUIRE(fontmanager.getFont(0) != nullptr);
-    auto block = TextBlock(starting_text, fontmanager.getFont(0), TextBlock::End::None);
+    REQUIRE(fontmanager.getFont() != nullptr);
+    auto block = TextBlock(starting_text, fontmanager.getFont(), TextBlock::End::None);
 
     SECTION("get")
     {
@@ -122,8 +122,8 @@ TEST_CASE("Text block - remove text")
     using namespace gui;
     const std::string starting_text = "lol";
     auto &fontmanager               = FontManager::getInstance();
-    REQUIRE(fontmanager.getFont(0) != nullptr);
-    auto block = TextBlock(starting_text, fontmanager.getFont(0), TextBlock::End::Newline);
+    REQUIRE(fontmanager.getFont() != nullptr);
+    auto block = TextBlock(starting_text, fontmanager.getFont(), TextBlock::End::Newline);
 
     SECTION("remove first char")
     {
@@ -168,8 +168,8 @@ TEST_CASE("Text block - get width")
     const std::string empty_text;
     auto &fontmanager = mockup::fontManager();
 
-    auto block_newline = TextBlock(empty_text, fontmanager.getFont(0), TextBlock::End::Newline);
-    auto block_empty   = TextBlock(empty_text, fontmanager.getFont(0), TextBlock::End::None);
+    auto block_newline = TextBlock(empty_text, fontmanager.getFont(), TextBlock::End::Newline);
+    auto block_empty   = TextBlock(empty_text, fontmanager.getFont(), TextBlock::End::None);
 
     SECTION("get width == 0 for text with newline")
     {
