@@ -3,5 +3,5 @@
 
 #include "EventsDB.hpp"
 
-EventsDB::EventsDB(const char *name) : Database(name)
+EventsDB::EventsDB(const char *name) : Database(name), alarmEvents(this)
 {}

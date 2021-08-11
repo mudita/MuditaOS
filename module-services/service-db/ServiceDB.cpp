@@ -68,6 +68,8 @@ ServiceDB::~ServiceDB()
 db::Interface *ServiceDB::getInterface(db::Interface::Name interface)
 {
     switch (interface) {
+    case db::Interface::Name::AlarmEvents:
+        return alarmEventRecordInterface.get();
     case db::Interface::Name::SMS:
         return smsRecordInterface.get();
     case db::Interface::Name::SMSThread:
@@ -252,6 +254,7 @@ sys::ReturnCodes ServiceDB::InitHandler()
     quotesDB        = std::make_unique<Database>((purefs::dir::getUserDiskPath() / "quotes.db").c_str());
 
     // Create record interfaces
+    alarmEventRecordInterface    = std::make_unique<AlarmEventRecordInterface>(eventsDB.get());
     contactRecordInterface       = std::make_unique<ContactRecordInterface>(contactsDB.get());
     smsRecordInterface           = std::make_unique<SMSRecordInterface>(smsDB.get(), contactsDB.get());
     threadRecordInterface        = std::make_unique<ThreadRecordInterface>(smsDB.get(), contactsDB.get());

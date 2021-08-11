@@ -22,7 +22,7 @@ struct EventsTableRow : public Record
     TimePoint endDate{TIME_POINT_INVALID};
     uint32_t duration{0};
     bool isAllDay{false};
-    std::string rrule{""};
+    std::string rruleText{""};
 
     EventsTableRow() = default;
     EventsTableRow(uint32_t id,
@@ -31,7 +31,7 @@ struct EventsTableRow : public Record
                    TimePoint endDate,
                    uint32_t duration,
                    bool isAllDay,
-                   std::string rrule)
+                   std::string rruleText)
         : Record{id}, name{name}, startDate{startDate}, endDate{endDate}, duration{duration}, isAllDay{isAllDay},
-          rrule{rrule} {};
+          rruleText{rruleText} {};
 };
