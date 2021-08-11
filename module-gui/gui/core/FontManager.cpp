@@ -134,12 +134,12 @@ namespace gui
         return instance;
     }
 
-    [[nodiscard]] auto FontManager::getFont(const std::string &name) const -> RawFont *
+    [[nodiscard]] auto FontManager::getFont(std::string_view name) const -> RawFont *
     {
         auto font = find(name);
         // default return first font
         if (font == nullptr && fonts.size() > 0) {
-            LOG_ERROR("=> font not found: %s using default", name.c_str());
+            LOG_ERROR("=> font not found: %s using default", name.data());
             return fonts[0];
         }
         return font;
@@ -156,9 +156,9 @@ namespace gui
         return fonts[num];
     }
 
-    auto FontManager::find(const std::string &name) const -> RawFont *
+    auto FontManager::find(std::string_view name) const -> RawFont *
     {
-        for (auto &font : fonts) {
+        for (const auto &font : fonts) {
             if (name.compare(font->info.face) == 0) {
                 return font;
             }

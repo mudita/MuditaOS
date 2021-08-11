@@ -53,11 +53,11 @@ TEST_CASE("Are fonts loaded")
     auto &fontmanager = gui::FontManager::getInstance();
     // check getInstance - getting even default font will result in nullptr
     // this is because no fonts are loaded
-    REQUIRE(fontmanager.getFont(0) == nullptr);
+    REQUIRE(fontmanager.getFont() == nullptr);
     // now initialize, from where is it taken? nobody knows from this foo
     fontmanager.init("sys/current/assets");
     // check if there is at least default font
-    REQUIRE(fontmanager.getFont(0) != nullptr);
+    REQUIRE(fontmanager.getFont() != nullptr);
 }
 
 TEST_CASE("Draw window with labels")
