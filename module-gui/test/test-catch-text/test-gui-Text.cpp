@@ -40,7 +40,8 @@ TEST_CASE("Text ctor")
     SECTION("one line")
     {
         auto testtext = "text0 text1 text2";
-        auto text     = Text(nullptr, 0, 0, 0, 0, testtext);
+        auto text     = Text(nullptr, 0, 0, 0, 0);
+        text.setText(testtext);
         REQUIRE(text.getText() == testtext);
     }
 }
@@ -277,8 +278,9 @@ TEST_CASE("handle text expand")
     Length h         = 100;
     BoxLayout layout = BoxLayout(nullptr, 0, 0, w, h);
     auto text        = new gui::TestText();
-    layout.addWidget(text);
     text->setMaximumSize(w, h);
+    text->setText("");
+    layout.addWidget(text);
     REQUIRE(text->area() != BoundingBox{0, 0, 0, 0});
 }
 

@@ -137,7 +137,7 @@ namespace gui
         if (document->isEmpty() && default_font != nullptr) {
             h += default_font->info.line_height;
             x = getAxisAlignmentValue(Axis::X, w);
-            y = getAxisAlignmentValue(Axis::Y, h);
+            y = getAxisAlignmentValue(Axis::Y, text->lines->calculateInitialCursorPosition(h));
         }
         else if (text != nullptr || text->lines->size() > 0) {
             auto [line, column, row] = getSelectedLine();

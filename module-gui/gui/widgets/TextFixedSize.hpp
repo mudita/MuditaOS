@@ -11,12 +11,13 @@ namespace gui
     class TextFixedSize : public Text
     {
       protected:
-        unsigned int linesCount   = style::text::maxTextLines;
+        unsigned int linesCount = style::text::maxTextLines;
 
         void drawLines() override;
 
       public:
-        TextFixedSize(Item *parent, Position x, Position y, Length w, Length h);
+        TextFixedSize();
+        explicit TextFixedSize(Item *parent, Position x = 0U, Position y = 0U, Length w = 0U, Length h = 0U);
 
         void setLines(unsigned int val);
         void setLinesSpacing(unsigned int val);
