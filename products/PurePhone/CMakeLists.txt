@@ -50,7 +50,6 @@ set_target_properties(PurePhone
 target_link_libraries(PurePhone
     PRIVATE
         $<$<BOOL:${ENABLE_APP_ANTENNA}>:application-antenna>
-        $<$<BOOL:${ENABLE_APP_ALARM_CLOCK}>:application-alarm-clock>
         application-calculator
         application-calllog
         application-calendar
