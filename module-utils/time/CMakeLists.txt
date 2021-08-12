@@ -26,12 +26,12 @@ target_include_directories(time PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_
 
 target_link_libraries(time 
     PRIVATE 
-        module-utils
         time-constants
         utz::utz
     PUBLIC
         i18n
         log
+        module-utils
         utf8
 )
 

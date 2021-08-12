@@ -100,6 +100,7 @@ enum class Repeat
 };
 
 inline constexpr TimePoint TIME_POINT_INVALID = date::sys_days{date::January / 1 / 1970};
+inline constexpr TimePoint TIME_POINT_MAX     = date::sys_days{date::April / 11 / 2262};
 inline constexpr uint32_t yearDigitsNumb = 4, monthDigitsNumb = 2, dayDigitsNumb = 2, HourDigitsNumb = 2,
                           MinDigitsNumb = 2, SecDigitsNumb = 2;
 

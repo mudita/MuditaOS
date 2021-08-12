@@ -13,6 +13,7 @@ target_include_directories(rrule PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE
 target_link_libraries(rrule
     PUBLIC
         date
+        time
     PRIVATE
         ical_cxx
 )
