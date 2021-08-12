@@ -19,3 +19,6 @@
 /cmake                                      @mudita/chapter-bsp
 /test/CMakeLists.txt                        @mudita/chapter-bsp
 
+# CenterPure comms
+/module-services/service-desktop            @mudita/chapter-bsp
+

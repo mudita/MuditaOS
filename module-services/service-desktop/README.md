@@ -1,5 +1,6 @@
 Service Desktop
 =================
+Test line.
 
 This service is handling communication between Mudita Desktop App and PurePhone.
 

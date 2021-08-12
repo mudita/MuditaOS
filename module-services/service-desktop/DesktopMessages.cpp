@@ -5,6 +5,8 @@
 #include "parser/MessageHandler.hpp"
 #include <module-bluetooth/Bluetooth/Device.hpp>
 
+// some comment
+
 namespace sdesktop
 {
     using namespace parserFSM;
