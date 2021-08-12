@@ -3,6 +3,8 @@
 
 #include "rrule.hpp"
 
+#include <time/dateCommon.hpp>
+
 extern "C"
 {
 #include <icalrecur.h>
@@ -22,13 +24,44 @@ namespace rrule
     template <typename arrayT, typename vectT>
     unsigned vectorToIcalArray(const std::vector<vectT> &vect, arrayT *array, unsigned max_size);
 
+    RRuleIter::RRuleIter(const RRule &rrule, const TimePoint eventStart)
+    {
+        auto icalEventStart = icaltime_from_timet_with_zone(std::chrono::system_clock::to_time_t(eventStart), 0, NULL);
+        iter                = icalrecur_iterator_new(RRuletoIcalRecurrenceType(rrule), icalEventStart);
+    }
+
+    RRuleIter::~RRuleIter()
+    {
+        icalrecur_iterator_free(iter);
+        iter = nullptr;
+    }
+
+    void RRuleIter::setRange(const TimePoint rangeStart, const TimePoint rangeEnd)
+    {
+        auto icalTimeStart = icaltime_from_timet_with_zone(std::chrono::system_clock::to_time_t(rangeStart), 0, NULL);
+        auto icalTimeEnd   = icaltime_from_timet_with_zone(std::chrono::system_clock::to_time_t(rangeEnd), 0, NULL);
+
+        icalrecur_iterator_set_range(iter, icalTimeStart, icalTimeEnd);
+    }
+
+    TimePoint RRuleIter::next()
+    {
+        icaltimetype nextIcal = icalrecur_iterator_next(iter);
+        if (icaltime_is_null_time(nextIcal)) {
+            return TIME_POINT_INVALID;
+        }
+        else {
+            return std::chrono::system_clock::from_time_t(icaltime_as_timet(nextIcal));
+        }
+    }
+
     void RRule::parseFromString(std::string_view str)
     {
         const auto icalRrule    = icalrecurrencetype_from_string(str.data());
         const time_t untilTimeT = icaltime_as_timet(icalRrule.until);
 
         if (untilTimeT == 0) {
-            until = TimePoint::min();
+            until = TIME_POINT_INVALID;
         }
         else {
             until = std::chrono::system_clock::from_time_t(untilTimeT);
@@ -57,29 +90,59 @@ namespace rrule
         return std::string{icalrecurrencetype_as_string(&icalRRule)};
     }
 
-    std::vector<TimePoint> RRule::generateEventTimePoints(const TimePoint start,
-                                                          const TimePoint end,
+    std::vector<TimePoint> RRule::generateEventTimePoints(const TimePoint eventStart,
+                                                          const TimePoint rangeStart,
+                                                          const TimePoint rangeEnd,
                                                           const unsigned int count)
     {
         std::vector<TimePoint> eventsTimePoints;
-        auto icalTimeStart   = icaltime_from_timet_with_zone(std::chrono::system_clock::to_time_t(start), 0, NULL);
-        auto icalTimeEnd     = icaltime_from_timet_with_zone(std::chrono::system_clock::to_time_t(end), 0, NULL);
         unsigned int counter = 0;
-        const icalrecurrencetype recur = RRuletoIcalRecurrenceType(*this);
 
-        auto ritr = icalrecur_iterator_new(recur, icalTimeStart);
-        icalrecur_iterator_set_range(ritr, icalTimeStart, icalTimeEnd);
-        icaltimetype next = icalrecur_iterator_next(ritr);
+        TimePoint singleEventTimePoint;
+        auto rruleIter = RRuleIter(*this, eventStart);
+        rruleIter.setRange(eventStart, rangeEnd);
 
-        while (!icaltime_is_null_time(next) && counter < count) {
-            auto singleEventTimePoint = std::chrono::system_clock::from_time_t(icaltime_as_timet(next));
-            next                      = icalrecur_iterator_next(ritr);
+        do {
+            singleEventTimePoint = rruleIter.next();
+            if (singleEventTimePoint < rangeStart) {
+                continue;
+            }
             eventsTimePoints.push_back(singleEventTimePoint);
             counter++;
+        } while (singleEventTimePoint != TIME_POINT_INVALID && singleEventTimePoint < rangeEnd && counter < count);
+
+        return eventsTimePoints;
+    }
+
+    TimePoint RRule::generateNextTimePoint(const TimePoint eventStart, const TimePoint rangeStart)
+    {
+        TimePoint singleEventTimePoint;
+        auto rruleIter = RRuleIter(*this, eventStart);
+
+        do {
+            singleEventTimePoint = rruleIter.next();
+
+        } while (singleEventTimePoint != TIME_POINT_INVALID && singleEventTimePoint < rangeStart);
+
+        return singleEventTimePoint;
+    }
+
+    TimePoint RRule::generateLastTimePoint(const TimePoint eventStart)
+    {
+        if (until == TIME_POINT_INVALID && count == 0) {
+            return TIME_POINT_MAX;
         }
 
-        icalrecur_iterator_free(ritr);
-        return eventsTimePoints;
+        auto lastValidEventTimePoint = TIME_POINT_MAX;
+        auto singleEventTimePoint    = TIME_POINT_MAX;
+        auto rruleIter               = RRuleIter(*this, eventStart);
+        do {
+            lastValidEventTimePoint = singleEventTimePoint;
+            singleEventTimePoint    = rruleIter.next();
+
+        } while (singleEventTimePoint != TIME_POINT_INVALID);
+
+        return lastValidEventTimePoint;
     }
 
     icalrecurrencetype RRuletoIcalRecurrenceType(const RRule &rrule)
@@ -89,7 +152,7 @@ namespace rrule
         icalRrule.freq  = RRuleFrequencyToIcalFrequency(rrule.freq);
         icalRrule.count = rrule.count;
 
-        if (rrule.until != TimePoint::min()) {
+        if (rrule.until != TIME_POINT_INVALID) {
             icalRrule.until = icaltime_from_timet_with_zone(std::chrono::system_clock::to_time_t(rrule.until), 0, NULL);
         }
         icalRrule.interval   = rrule.interval;
