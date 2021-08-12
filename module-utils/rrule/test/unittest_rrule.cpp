@@ -33,7 +33,7 @@ namespace rrule
                 rrule.parseFromString("FREQ=DAILY;INTERVAL=1");
                 REQUIRE(rrule.freq == RRule::RRuleFrequency::DAILY_RECURRENCE);
                 REQUIRE(rrule.count == 0);
-                REQUIRE(rrule.until == TimePoint::min());
+                REQUIRE(rrule.until == TIME_POINT_INVALID);
                 REQUIRE(rrule.interval == 1);
                 REQUIRE(rrule.weekStart == RRule::RRuleWeekday::MONDAY_WEEKDAY);
                 REQUIRE((rrule.bySecond.empty() && rrule.byMinute.empty() && rrule.byHour.empty() &&
@@ -47,7 +47,7 @@ namespace rrule
                 rrule.parseFromString("FREQ=MONTHLY;BYMONTHDAY=1;INTERVAL=1");
                 REQUIRE(rrule.freq == RRule::RRuleFrequency::MONTHLY_RECURRENCE);
                 REQUIRE(rrule.count == 0);
-                REQUIRE(rrule.until == TimePoint::min());
+                REQUIRE(rrule.until == TIME_POINT_INVALID);
                 REQUIRE(rrule.interval == 1);
                 REQUIRE(rrule.weekStart == RRule::RRuleWeekday::MONDAY_WEEKDAY);
                 REQUIRE(rrule.byMonthDay.size() == 1);
@@ -76,7 +76,7 @@ namespace rrule
                 rrule.parseFromString("FREQ=MONTHLY;BYSETPOS=4;BYDAY=TU;INTERVAL=2;COUNT=10");
                 REQUIRE(rrule.freq == RRule::RRuleFrequency::MONTHLY_RECURRENCE);
                 REQUIRE(rrule.count == 10);
-                REQUIRE(rrule.until == TimePoint::min());
+                REQUIRE(rrule.until == TIME_POINT_INVALID);
                 REQUIRE(rrule.interval == 2);
                 REQUIRE(rrule.weekStart == RRule::RRuleWeekday::MONDAY_WEEKDAY);
                 REQUIRE(rrule.byDay.size() == 1);
@@ -144,18 +144,21 @@ namespace rrule
         SECTION("Generate timestamps")
         {
             RRule rrule;
-            TimePoint start         = TimePointFromString("2020-01-01 12:00:00");
-            TimePoint end           = TimePointFromString("2020-02-01 12:00:00");
+            TimePoint eventStart = TimePointFromString("2020-01-01 12:00:00");
+            TimePoint rangeStart = TimePointFromString("2020-01-01 12:00:00");
+            TimePoint rangeEnd   = TimePointFromString("2020-02-01 12:00:00");
+
             const auto GENERATE_ALL = 99999;
 
             SECTION("Basic daily")
             {
                 const auto teststring = "FREQ=DAILY";
-                start                 = TimePointFromString("2020-01-01 12:00:00");
-                end                   = TimePointFromString("2020-02-01 12:00:00");
+                eventStart            = TimePointFromString("2020-01-01 12:00:00");
+                rangeStart            = TimePointFromString("2020-01-01 12:00:00");
+                rangeEnd              = TimePointFromString("2020-02-01 12:00:00");
                 rrule.parseFromString(teststring);
 
-                auto timestamps = rrule.generateEventTimePoints(start, end, GENERATE_ALL);
+                auto timestamps = rrule.generateEventTimePoints(eventStart, rangeStart, rangeEnd, GENERATE_ALL);
 
                 REQUIRE(timestamps.size() == 31);
                 REQUIRE(timestamps[0] == TimePointFromString("2020-01-01 12:00:00"));
@@ -165,16 +168,93 @@ namespace rrule
             SECTION("Basic hourly interval count")
             {
                 const auto teststring = "FREQ=HOURLY;INTERVAL=2;COUNT=10";
-                start                 = TimePointFromString("2020-01-01 12:00:00");
-                end                   = TimePointFromString("2020-02-01 12:00:00");
+                eventStart            = TimePointFromString("2020-01-01 12:00:00");
+                rangeStart            = TimePointFromString("2020-01-01 12:00:00");
+                rangeEnd              = TimePointFromString("2020-02-01 12:00:00");
                 rrule.parseFromString(teststring);
 
-                auto timestamps = rrule.generateEventTimePoints(start, end, GENERATE_ALL);
+                auto timestamps = rrule.generateEventTimePoints(eventStart, rangeStart, rangeEnd, GENERATE_ALL);
 
                 REQUIRE(timestamps.size() == 10);
                 REQUIRE(timestamps[0] == TimePointFromString("2020-01-01 12:00:00"));
                 REQUIRE(timestamps[1] == TimePointFromString("2020-01-01 14:00:00"));
                 REQUIRE(timestamps[9] == TimePointFromString("2020-01-02 06:00:00"));
+            }
+
+            SECTION("Basic hourly interval after 5 hours")
+            {
+                const auto teststring = "FREQ=HOURLY;INTERVAL=2";
+                eventStart            = TimePointFromString("2020-01-01 12:00:00");
+                rangeStart            = TimePointFromString("2020-01-01 16:30:00");
+                rangeEnd              = TimePointFromString("2020-01-01 21:30:00");
+                rrule.parseFromString(teststring);
+
+                auto timestamps = rrule.generateEventTimePoints(eventStart, rangeStart, rangeEnd, GENERATE_ALL);
+
+                REQUIRE(timestamps.size() == 2);
+                REQUIRE(timestamps[0] == TimePointFromString("2020-01-01 18:00:00"));
+                REQUIRE(timestamps[1] == TimePointFromString("2020-01-01 20:00:00"));
+            }
+
+            SECTION("Generate Next daily")
+            {
+                const auto teststring = "FREQ=DAILY";
+                eventStart            = TimePointFromString("2020-01-01 12:00:00");
+                rangeStart            = TimePointFromString("2020-01-07 12:00:00");
+                rrule.parseFromString(teststring);
+
+                auto timestamp = rrule.generateNextTimePoint(eventStart, rangeStart);
+                REQUIRE(timestamp == TimePointFromString("2020-01-07 12:00:00"));
+            }
+
+            SECTION("Generate Next hourly")
+            {
+                const auto teststring = "FREQ=HOURLY;INTERVAL=2;COUNT=10";
+                eventStart            = TimePointFromString("2020-01-01 12:00:00");
+                rangeStart            = TimePointFromString("2020-01-01 15:30:00");
+                rrule.parseFromString(teststring);
+
+                auto timestamp = rrule.generateNextTimePoint(eventStart, rangeStart);
+                REQUIRE(timestamp == TimePointFromString("2020-01-01 16:00:00"));
+            }
+            SECTION("Generate Next daily 5 days later")
+            {
+                const auto teststring = "FREQ=DAILY;INTERVAL=5";
+                eventStart            = TimePointFromString("2020-01-01 12:00:00");
+                rangeStart            = TimePointFromString("2020-01-3 12:00:00");
+
+                rrule.parseFromString(teststring);
+                auto timestamp = rrule.generateNextTimePoint(eventStart, rangeStart);
+                REQUIRE(timestamp == TimePointFromString("2020-01-06 12:00:00"));
+            }
+            SECTION("Generate Last daily")
+            {
+                const auto teststring = "FREQ=DAILY;COUNT=10";
+                eventStart            = TimePointFromString("2020-01-01 12:00:00");
+                rrule.parseFromString(teststring);
+
+                auto timestamp = rrule.generateLastTimePoint(eventStart);
+                REQUIRE(timestamp == TimePointFromString("2020-01-10 12:00:00"));
+            }
+
+            SECTION("Generate Last hourly")
+            {
+                const auto teststring = "FREQ=HOURLY;INTERVAL=2;COUNT=10";
+                eventStart            = TimePointFromString("2020-01-01 12:00:00");
+                rrule.parseFromString(teststring);
+
+                auto timestamp = rrule.generateLastTimePoint(eventStart);
+                REQUIRE(timestamp == TimePointFromString("2020-01-02 06:00:00"));
+            }
+
+            SECTION("Generate Last intinite")
+            {
+                const auto teststring = "FREQ=HOURLY;INTERVAL=2";
+                eventStart            = TimePointFromString("2020-01-01 12:00:00");
+                rrule.parseFromString(teststring);
+
+                auto timestamp = rrule.generateLastTimePoint(eventStart);
+                REQUIRE(timestamp == TIME_POINT_MAX);
             }
         }
     }
