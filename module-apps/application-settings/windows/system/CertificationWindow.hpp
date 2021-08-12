@@ -14,17 +14,18 @@ namespace gui
 
       private:
         void buildInterface() override;
-        void onBeforeShow(ShowMode mode, SwitchData *data) override;
 
-        gui::Text *usFccIdText    = nullptr;
-        gui::Text *usFccIdValue   = nullptr;
-        gui::Image *usFccIdImage  = nullptr;
-        gui::Text *canadaIcText   = nullptr;
-        gui::Text *canadaIcValue  = nullptr;
-        gui::Image *canadaIcImage = nullptr;
-        gui::Text *europeCeText   = nullptr;
-        gui::Text *europeCeValue  = nullptr;
-        gui::Image *europeCeImage = nullptr;
+        void createTitle(Item *parent, const std::string &title);
+        void createTitleAndImage(Item *parent, const std::string &title, const std::string &imageName);
+        void createEntryWithTextsAndImage(Item *parent,
+                                          const std::string &title,
+                                          const std::string &description,
+                                          const std::string &imageName);
+        void createEntryWithTitlesAndImages(Item *parent,
+                                            const std::string &title1,
+                                            const std::string &imageName1,
+                                            const std::string &title2,
+                                            const std::string &imageName2);
     };
 
 } // namespace gui

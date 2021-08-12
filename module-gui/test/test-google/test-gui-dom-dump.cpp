@@ -23,7 +23,10 @@ class Item2JsonSerializerTester : public ::testing::Test
         auto &fm = gui::FontManager::getInstance();
         fm.init("sys/current/assets");
 
-        root.addWidget(new gui::Text(nullptr, 0, 0, 0, 0, testTextValue1));
+        auto text = new gui::Text(nullptr, 0, 0, 0, 0);
+        text->setText(testTextValue1);
+
+        root.addWidget(text);
         root.addWidget(new gui::Label(nullptr, 0, 0, 0, 0, testTextValue2));
 
         serializer.traverse(root);

@@ -125,7 +125,6 @@ namespace gui
              const uint32_t &y,
              const uint32_t &w,
              const uint32_t &h,
-             const UTF8 &text      = "",
              ExpandMode expandMode = ExpandMode::None,
              TextType textType     = TextType::MultiLine);
         ~Text() override;
@@ -160,6 +159,7 @@ namespace gui
         void setFont(const UTF8 &fontName);
         void setFont(RawFont *font);
         void setMinimumWidthToFitText(const UTF8 &text);
+        void setMinimumHeightToFitText(unsigned int linesCount = 1);
 
         // virtual methods from Item
         bool onInput(const InputEvent &inputEvent) override;

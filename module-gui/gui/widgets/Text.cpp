@@ -54,7 +54,6 @@ namespace gui
                const uint32_t &y,
                const uint32_t &w,
                const uint32_t &h,
-               const UTF8 &text,
                ExpandMode expandMode,
                TextType textType)
         : Rect(parent, x, y, w, h), expandMode{expandMode}, textType{textType},
@@ -66,7 +65,7 @@ namespace gui
 
         setPenWidth(style::window::default_border_no_focus_w);
         setPenFocusWidth(style::window::default_border_focus_w);
-        buildDocument(text);
+        buildCursor();
 
         setBorderColor(gui::ColorFullBlack);
         setEdges(RectangleEdge::All);
@@ -226,6 +225,11 @@ namespace gui
                              : text;
 
         setMinimumWidth(format.getFont()->getPixelWidth(textToFit) + TextCursor::defaultWidth);
+    }
+
+    void Text::setMinimumHeightToFitText(unsigned int linesCount)
+    {
+        setMinimumHeight(format.getFont()->info.line_height * linesCount);
     }
 
     auto Text::setCursorStartPosition(CursorStartPosition val) -> void
