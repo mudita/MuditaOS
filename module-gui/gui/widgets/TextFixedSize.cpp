@@ -7,6 +7,9 @@
 
 namespace gui
 {
+    TextFixedSize::TextFixedSize() : TextFixedSize(nullptr, 0, 0, 0, 0)
+    {}
+
     TextFixedSize::TextFixedSize(Item *parent, Position x, Position y, Length w, Length h) : Text(parent, x, y, w, h)
     {
         setEditMode(EditMode::Edit);
