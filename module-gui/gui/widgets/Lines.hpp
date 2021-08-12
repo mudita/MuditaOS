@@ -105,10 +105,20 @@ namespace gui
             return w;
         }
 
+        Length calculateLineSpacingAddition() const noexcept
+        {
+            return empty() ? 0 : (size() - 1) * linesSpacing;
+        }
+
+        Length calculateInitialCursorPosition(Length initHeight) const noexcept
+        {
+            return (empty() ? initHeight : initHeight * size()) + calculateLineSpacingAddition() +
+                   underLineProperties.underLinePadding;
+        }
+
         [[nodiscard]] auto linesHeight() const noexcept
         {
-            auto lineSpacingAddition = empty() ? 0 : (size() - 1) * linesSpacing;
-            return lineSpacingAddition +
+            return calculateLineSpacingAddition() +
                    std::accumulate(lines.begin(), lines.end(), 0U, [](const auto sum, const auto &line) {
                        return line.isVisible() ? sum + line.height() : sum;
                    });
