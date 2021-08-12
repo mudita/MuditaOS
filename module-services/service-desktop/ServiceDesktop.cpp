@@ -36,32 +36,6 @@
 #include <cinttypes>
 #include <filesystem>
 
-namespace
-{
-    bool RemountFS(bool readOnly = false, std::string path = std::string(purefs::dir::getRootDiskPath()))
-    {
-        struct statvfs stat;
-        if (statvfs(path.c_str(), &stat)) {
-            LOG_ERROR("Failed reading statvfs!");
-            return false;
-        }
-        auto flags = stat.f_flag;
-        if ((readOnly && (flags & MS_RDONLY)) || (!readOnly && !(flags & MS_RDONLY))) {
-            LOG_WARN("Filesystem is already mounted in requested mode!");
-            return false;
-        }
-        if (readOnly) {
-            LOG_INFO("Remounting filesystem RO");
-            flags |= MS_RDONLY;
-        }
-        else {
-            LOG_INFO("Remounting filesystem R/W");
-            flags &= ~MS_RDONLY;
-        }
-        return !mount(NULL, path.c_str(), NULL, flags | MS_REMOUNT, NULL);
-    }
-} // namespace
-
 ServiceDesktop::ServiceDesktop()
     : sys::Service(service::name::service_desktop, "", sdesktop::service_stack),
       btMsgHandler(std::make_unique<sdesktop::bluetooth::BluetoothMessagesHandler>(this))
@@ -137,7 +111,6 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
     connect(sdesktop::BackupMessage(), [&](sys::Message *msg) {
         sdesktop::BackupMessage *backupMessage = dynamic_cast<sdesktop::BackupMessage *>(msg);
         if (backupMessage != nullptr) {
-            RemountFS();
 
             backupRestoreStatus.state = OperationState::Running;
             backupRestoreStatus.lastOperationResult =
@@ -152,7 +125,6 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
     connect(sdesktop::RestoreMessage(), [&](sys::Message *msg) {
         sdesktop::RestoreMessage *restoreMessage = dynamic_cast<sdesktop::RestoreMessage *>(msg);
         if (restoreMessage != nullptr) {
-            RemountFS();
             backupRestoreStatus.state = OperationState::Running;
             backupRestoreStatus.lastOperationResult =
                 BackupRestore::RestoreUserFiles(this, backupRestoreStatus.location);
@@ -172,10 +144,6 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
         auto *factoryMessage = dynamic_cast<sdesktop::FactoryMessage *>(msg);
         if (factoryMessage != nullptr) {
             LOG_DEBUG("ServiceDesktop: FactoryMessage received");
-            RemountFS();
-            // Factory reset calls SystemManager::Reboot(), but
-            // there is no umount() in SystemManager::CloseSystemHandler() -
-            // this might theoretically cause filesystem corruption
             FactoryReset::Run(this);
         }
         return sys::MessageNone{};
@@ -283,9 +251,9 @@ sys::MessagePointer ServiceDesktop::DataReceivedHandler(sys::DataMessage *msg, s
 
 void ServiceDesktop::prepareBackupData()
 {
-    backupRestoreStatus.operation = ServiceDesktop::Operation::Backup;
+    backupRestoreStatus.operation     = ServiceDesktop::Operation::Backup;
     backupRestoreStatus.task          = std::to_string(static_cast<uint32_t>(std::time(nullptr)));
-    backupRestoreStatus.state     = OperationState::Stopped;
+    backupRestoreStatus.state         = OperationState::Stopped;
     backupRestoreStatus.backupTempDir = purefs::dir::getTemporaryPath() / backupRestoreStatus.task;
 }
 
