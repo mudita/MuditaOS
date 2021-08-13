@@ -12,12 +12,15 @@ function(add_board_subdirectory)
     if(NOT DEFINED BOARD)
         message(FATAL_ERROR "Board is not defined")
     endif()
-
+    
     if (${BOARD} STREQUAL "bellpx" OR ${BOARD} STREQUAL "puretx")
         add_subdirectory_if_exists(${ROOT_DIR}/rt1051)
+    elseif (${BOARD} STREQUAL "linux")
+        add_subdirectory_if_exists(${ROOT_DIR}/${BOARD})
+    else ()
+        message(FATAL_ERROR "Board unsupported")
     endif ()
 
-    add_subdirectory_if_exists(${ROOT_DIR}/${BOARD})
 endfunction()
 
 macro(select_board)

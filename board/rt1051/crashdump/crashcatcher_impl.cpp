@@ -20,7 +20,7 @@ const CrashCatcherMemoryRegion *CrashCatcher_GetMemoryRegions(void)
         {0x20000000, 0x20070000, CRASH_CATCHER_BYTE},
     // intentionally skip text section
     // BOARD_SDRAM_HEAP
-#if defined(PURE_SDRAM_64_MB) && (PURE_SDRAM_64_MB == 1)
+#if defined(HW_SDRAM_64_MB) && (HW_SDRAM_64_MB == 1)
         {0x80620000, 0x84000000, CRASH_CATCHER_BYTE},
 #else
         {0x80620000, 0x81000000, CRASH_CATCHER_BYTE},
