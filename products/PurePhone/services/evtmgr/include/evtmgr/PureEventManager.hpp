@@ -7,11 +7,7 @@
 
 #include <backlight-handler/BacklightHandler.hpp>
 #include <bsp/vibrator/vibrator.hpp>
-
-namespace vibra_handle
-{
-    class Vibra;
-} // namespace vibra_handle
+#include <vibra/Vibra.hpp>
 
 class PureEventManager : public EventManager
 {

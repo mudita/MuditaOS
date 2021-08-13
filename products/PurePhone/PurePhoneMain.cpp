@@ -22,7 +22,7 @@
 #include <application-onboarding/ApplicationOnBoarding.hpp>
 
 // services
-#include <services/evtmgr/PureEventManager.hpp>
+#include <evtmgr/PureEventManager.hpp>
 #include <service-appmgr/model/ApplicationManager.hpp>
 #include <service-audio/ServiceAudio.hpp>
 #include <service-bluetooth/ServiceBluetooth.hpp>
