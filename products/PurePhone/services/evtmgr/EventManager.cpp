@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "PureEventManager.hpp"
+#include <evtmgr/EventManager.hpp>
 
 #include <bsp/magnetometer/magnetometer.hpp>
 #include <bsp/torch/torch.hpp>
@@ -23,7 +23,7 @@ namespace
     }
 } // namespace
 
-bool PureEventManager::processVibraRequest(bsp::vibrator::Action act, std::chrono::milliseconds RepetitionTime)
+bool EventManager::processVibraRequest(bsp::vibrator::Action act, std::chrono::milliseconds RepetitionTime)
 {
     switch (act) {
     case bsp::vibrator::Action::pulse:
@@ -42,9 +42,9 @@ bool PureEventManager::processVibraRequest(bsp::vibrator::Action act, std::chron
     return true;
 }
 
-sys::ReturnCodes PureEventManager::InitHandler()
+sys::ReturnCodes EventManager::InitHandler()
 {
-    EventManager::InitHandler();
+    EventManagerCommon::InitHandler();
 
     backlightHandler.init();
 
@@ -125,14 +125,14 @@ sys::ReturnCodes PureEventManager::InitHandler()
     return sys::ReturnCodes::Success;
 }
 
-void PureEventManager::toggleTorchOnOff()
+void EventManager::toggleTorchOnOff()
 {
     auto state    = bsp::torch::getState();
     auto newState = (state.second == bsp::torch::State::off) ? bsp::torch::State::on : bsp::torch::State::off;
     bsp::torch::turn(newState, bsp::torch::ColourTemperature::coldest);
 }
 
-void PureEventManager::toggleTorchColor()
+void EventManager::toggleTorchColor()
 {
     auto state = bsp::torch::getState();
     if (state.second == bsp::torch::State::on) {
@@ -143,11 +143,11 @@ void PureEventManager::toggleTorchColor()
     }
 }
 
-sys::MessagePointer PureEventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
+sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
 {
 
     auto responseMessage =
-        std::static_pointer_cast<sys::ResponseMessage>(EventManager::DataReceivedHandler(msgl, resp));
+        std::static_pointer_cast<sys::ResponseMessage>(EventManagerCommon::DataReceivedHandler(msgl, resp));
 
     if (responseMessage->retCode != sys::ReturnCodes::Unresolved) {
         return responseMessage;
@@ -186,9 +186,9 @@ sys::MessagePointer PureEventManager::DataReceivedHandler(sys::DataMessage *msgl
     }
 }
 
-void PureEventManager::handleKeyEvent(sys::Message *msg)
+void EventManager::handleKeyEvent(sys::Message *msg)
 {
-    EventManager::handleKeyEvent(msg);
+    EventManagerCommon::handleKeyEvent(msg);
 
     auto kbdMessage = dynamic_cast<sevm::KbdMessage *>(msg);
 
@@ -201,7 +201,7 @@ void PureEventManager::handleKeyEvent(sys::Message *msg)
     }
 }
 
-void PureEventManager::handleKeyMoveEvent(RawKey key)
+void EventManager::handleKeyMoveEvent(RawKey key)
 {
     if (isSliderKeyCode(key.keyCode)) {
         LOG_INFO("Slider position: %s", magic_enum::enum_name(key.keyCode).data());

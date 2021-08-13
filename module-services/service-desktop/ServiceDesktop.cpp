@@ -17,7 +17,7 @@
 #include <application-desktop/Constants.hpp>
 #include <service-db/service-db/Settings.hpp>
 #include <service-db/QueryMessage.hpp>
-#include <service-evtmgr/EventManager.hpp>
+#include <service-evtmgr/EventManagerCommon.hpp>
 #include <service-evtmgr/EVMessages.hpp>
 #include <purefs/filesystem_paths.hpp>
 #include <module-sys/SystemManager/SystemManager.hpp>

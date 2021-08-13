@@ -13,8 +13,7 @@ target_include_directories(evtmgr
 )
 
 target_link_libraries(evtmgr
-    PRIVATE
-        module-bsp
-        module-sys
+   PRIVATE
+        module-utils
         service-evtmgr
 )

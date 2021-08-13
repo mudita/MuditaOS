@@ -41,12 +41,8 @@ endif()
 
 if (${ENABLE_TESTS})
     enable_testing()
-    add_custom_target(unittests)
     add_custom_target(check ${CMAKE_CTEST_COMMAND} -V)
     add_subdirectory(test)
-    if (EXISTS products/${PRODUCT}/test)
-        add_subdirectory(products/${PRODUCT}/test)
-    endif ()
     include(PureCoverage)
 endif ()
 

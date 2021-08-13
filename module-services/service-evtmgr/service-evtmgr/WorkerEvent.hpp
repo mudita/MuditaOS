@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "EventManager.hpp"
+#include "EventManagerCommon.hpp"
 
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>

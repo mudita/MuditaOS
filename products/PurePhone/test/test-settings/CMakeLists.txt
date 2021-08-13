@@ -6,12 +6,12 @@ add_catch2_executable(
             main.cpp
             test-service-db-settings-api.cpp
         LIBS
+            evtmgr
             module-audio
             module-cellular
             module-vfs
             service-audio
             service-cellular
-            PurePhone-evtmgr
         DEPS
             module-sys
 )

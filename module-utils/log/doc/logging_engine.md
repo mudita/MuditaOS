@@ -25,7 +25,7 @@ In such a case, proper `lost message info` is added to `msg` received from the b
 
 ## Dumping to a file
 
-Logs from `Circular buffer` are dumped to a file named `MuditaOS.log` every 10 sec by `EventManager` timer.
+Logs from `Circular buffer` are dumped to a file named `MuditaOS.log` every 10 sec by `EventManagerCommon` timer.
 
 Current max log file size is 50 MB (after reaching this size no more logs are dumped).
 
