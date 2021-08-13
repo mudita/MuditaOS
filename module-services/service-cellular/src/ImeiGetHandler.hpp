@@ -6,7 +6,6 @@
 #include <service-cellular/service-cellular/CellularMessage.hpp>
 
 #include <memory>
-//#include <vector>
 
 namespace at
 {

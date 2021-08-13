@@ -113,6 +113,7 @@ namespace app::manager
 
       private:
         auto startApplication(ApplicationHandle &app) -> bool;
+        void startPendingApplicationOnCurrentClose();
         void startBackgroundApplications();
         void rebuildActiveApplications();
         void suspendSystemServices();
@@ -139,6 +140,7 @@ namespace app::manager
         auto handleCustomAction(ActionEntry &action) -> ActionProcessStatus;
         auto handleCustomActionOnBackgroundApp(ApplicationHandle *app, ActionEntry &action) -> ActionProcessStatus;
         auto handleSwitchApplication(SwitchRequest *msg, bool closeCurrentlyFocusedApp = true) -> bool;
+        void handleFinalizingClose(FinalizingClose *msg);
         auto handleCloseConfirmation(CloseConfirmation *msg) -> bool;
         auto handleSwitchConfirmation(SwitchConfirmation *msg) -> bool;
         auto handleSwitchBack(SwitchBackRequest *msg) -> bool;
@@ -164,6 +166,7 @@ namespace app::manager
         void onApplicationInitFailure(ApplicationHandle &app);
         auto onSwitchConfirmed(ApplicationHandle &app) -> bool;
         void onLaunchFinished(ApplicationHandle &app);
+        void onFinalizingClose();
         auto onCloseConfirmed(ApplicationHandle &app) -> bool;
         /// @brief method is called on auto-locking timer tick event (blockTimer)
         /// @detailed It sends AutoLock action to ApplicationDesktop to lock the screen.

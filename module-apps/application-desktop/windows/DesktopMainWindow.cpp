@@ -87,6 +87,7 @@ namespace gui
     status_bar::Configuration DesktopMainWindow::configureStatusBar(status_bar::Configuration appConfiguration)
     {
         appConfiguration.disable(status_bar::Indicator::NetworkAccessTechnology);
+        appConfiguration.disable(status_bar::Indicator::Time);
         appConfiguration.enable(status_bar::Indicator::PhoneMode);
         return appConfiguration;
     }

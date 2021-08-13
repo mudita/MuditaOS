@@ -52,20 +52,25 @@ namespace gui
                 application->bus.sendUnicast(
                     std::make_shared<stm::message::SetAutomaticDateAndTimeRequest>(automaticDateAndTimeIsOn),
                     service::name::service_time);
-                refreshOptionsList();
+                if (automaticDateAndTimeIsOn) {
+                    refreshOptionsList();
+                    return true;
+                }
+                LOG_DEBUG("switching to %s page", window::name::change_time_zone);
+                application->switchWindow(window::name::change_time_zone);
                 return true;
             },
             automaticDateAndTimeIsOn ? option::SettingRightItem::On : option::SettingRightItem::Off);
 
         if (!automaticDateAndTimeIsOn) {
             addOption(utils::translate("app_settings_date_and_time_change_date_and_time"), [=](Item &item) {
-                LOG_INFO("switching to %s page", changeDateAndTimeWindow.c_str());
-                application->switchWindow(changeDateAndTimeWindow, nullptr);
+                LOG_DEBUG("switching to %s page", changeDateAndTimeWindow.c_str());
+                application->switchWindow(changeDateAndTimeWindow);
                 return true;
             });
             addOption(utils::translate("app_settings_date_and_time_change_time_zone"), [=](Item &item) {
-                LOG_INFO("switching to %s page", window::name::change_time_zone);
-                application->switchWindow(window::name::change_time_zone, nullptr);
+                LOG_DEBUG("switching to %s page", window::name::change_time_zone);
+                application->switchWindow(window::name::change_time_zone);
                 return true;
             });
         }

@@ -52,6 +52,7 @@ namespace app
         bool refreshMenuWindow();
         void handleLowBatteryNotification(manager::actions::ActionParamsPtr &&data);
         DBNotificationsHandler dbNotificationHandler;
+        sys::MessagePointer handleAsyncResponse(sys::ResponseMessage *resp) override;
     };
 
     template <> struct ManifestTraits<ApplicationDesktop>

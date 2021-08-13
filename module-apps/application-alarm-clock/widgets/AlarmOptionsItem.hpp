@@ -1,10 +1,11 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 #include "Application.hpp"
 #include "AlarmInternalListItem.hpp"
 #include "application-alarm-clock/data/AlarmsData.hpp"
+#include <apps-common/AudioOperations.hpp>
 #include <Label.hpp>
 #include <Image.hpp>
 #include <BoxLayout.hpp>
@@ -32,7 +33,14 @@ namespace gui
         AlarmOptionItemName itemName;
         std::vector<std::string> optionsNames;
         std::vector<audio::Tags> songsList;
+
+        /// pointer to audio operations which allows to make audio preview
+        std::unique_ptr<app::AbstractAudioOperations> audioOperations;
+
         MusicStatus musicStatus        = MusicStatus::Stop;
+        audio::Token currentlyPreviewedToken;
+        std::string currentlyPreviewedPath;
+
         unsigned int actualVectorIndex = 0;
         uint32_t repeatOptionValue     = 0;
 
@@ -47,6 +55,12 @@ namespace gui
                          AlarmOptionItemName itemName,
                          std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr,
                          std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr);
+
+      protected:
+        bool playAudioPreview(const std::string &path);
+        bool pauseAudioPreview();
+        bool resumeAudioPreview();
+        bool stopAudioPreview();
     };
 
 } /* namespace gui */

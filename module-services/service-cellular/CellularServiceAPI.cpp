@@ -101,9 +101,10 @@ void CellularServiceAPI::GetNetworkInfo(sys::Service *serv)
     serv->bus.sendUnicast(msg, ServiceCellular::serviceName);
 }
 
-void CellularServiceAPI::GetCurrentOperator(sys::Service *serv)
+void CellularServiceAPI::RequestCurrentOperatorName(sys::Service *serv)
 {
-    std::shared_ptr<CellularGetCurrentOperatorMessage> msg = std::make_shared<CellularGetCurrentOperatorMessage>();
+    std::shared_ptr<CellularRequestCurrentOperatorNameMessage> msg =
+        std::make_shared<CellularRequestCurrentOperatorNameMessage>();
     serv->bus.sendUnicast(msg, ServiceCellular::serviceName);
 }
 

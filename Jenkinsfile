@@ -256,7 +256,6 @@ pipeline {
                 sh '''#!/bin/bash -e
                 echo "JOBS=${JOBS}"
                 pushd "${WORKSPACE}"
-
                 pushd build-bell-linux-Debug
                 ninja -j ${JOBS}
                 popd

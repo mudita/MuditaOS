@@ -9,6 +9,7 @@
 #include <Application.hpp>
 #include <InternalModel.hpp>
 #include <ListItemProvider.hpp>
+#include <Application.hpp>
 
 class TechnicalInformationModel : public app::InternalModel<gui::ListItem *>, public gui::ListItemProvider
 {

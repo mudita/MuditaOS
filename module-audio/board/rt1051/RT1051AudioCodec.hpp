@@ -85,6 +85,7 @@ namespace audio
         void InStart();
         void OutStop();
         void InStop();
+        void SetupEQ();
 
         CodecParamsMAX98090::InputPath getCodecInputPath(const audio::codec::Configuration &format);
         CodecParamsMAX98090::OutputPath getCodecOutputPath(const audio::codec::Configuration &format);

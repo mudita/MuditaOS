@@ -98,23 +98,20 @@ namespace app
             return retMsg;
         }
 
-        bool handled = false;
+        return handleAsyncResponse(resp);
+    }
 
-        // handle database response
+    sys::MessagePointer ApplicationDesktop::handleAsyncResponse(sys::ResponseMessage *resp)
+    {
+        Application::handleAsyncResponse(resp);
+
         if (resp != nullptr) {
-            if (auto command = callbackStorage->getCallback(resp); command->execute()) {
-                handled = true;
-            }
-            else if (auto msg = dynamic_cast<db::QueryResponse *>(resp)) {
+            if (auto msg = dynamic_cast<db::QueryResponse *>(resp)) {
                 auto result = msg->getResult();
                 if (dbNotificationHandler.handle(result.get())) {
-                    handled = true;
                     refreshMenuWindow();
                 }
             }
-        }
-
-        if (handled) {
             return std::make_shared<sys::ResponseMessage>();
         }
         else {
@@ -237,7 +234,7 @@ namespace app
             auto currentWindow = getCurrentWindow();
             if (currentWindow->getName() == app::window::name::dead_battery ||
                 currentWindow->getName() == app::window::name::charging_battery) {
-                switchWindow(app::window::name::desktop_main_window);
+                app::manager::Controller::sendAction(this, app::manager::actions::Home);
             }
         }
     }

@@ -69,7 +69,7 @@ namespace cellular::internal::sms
             return std::make_unique<IdleState>(context);
         }
 
-        if (context.onGetOfflineMode()) {
+        if (context.onGetOfflineMode() || context.onSIMNotInitialized()) {
             record->type = SMSType::FAILED;
             context.onSendQuery(db::Interface::Name::SMS, std::make_unique<db::query::SMSUpdate>(std::move(*record)));
         }

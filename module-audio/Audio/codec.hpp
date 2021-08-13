@@ -4,6 +4,7 @@
 #pragma once
 
 #include <cstdint>
+#include <module-audio/Audio/equalizer/Equalizer.hpp>
 
 namespace audio::codec
 {
@@ -40,6 +41,12 @@ namespace audio::codec
         float inputGain             = 0.0f;
         InputPath inputPath         = InputPath::None;
         OutputPath outputPath       = OutputPath::None;
+        audio::equalizer::Equalizer filterCoefficients = {
+            qfilter_CalculateCoeffs(audio::equalizer::FilterType::FilterNone, 100.2f, 44100, 0.701f, 0),
+            qfilter_CalculateCoeffs(audio::equalizer::FilterType::FilterNone, 17996.2f, 44100, 0.701f, 0),
+            qfilter_CalculateCoeffs(audio::equalizer::FilterType::FilterNone, 13984.7f, 44100, 0.701f, -10),
+            qfilter_CalculateCoeffs(audio::equalizer::FilterType::FilterNone, 200.4f, 44100, 0.701f, -10),
+            qfilter_CalculateCoeffs(audio::equalizer::FilterType::FilterNone, 0, 44100, 0.701f, -4)};
     };
 
 } // namespace audio::codec

@@ -32,6 +32,8 @@ TEST_CASE("SMSSendHandler functionality")
 
     outSMS.onGetOfflineMode = []() -> bool { return false; };
 
+    outSMS.onSIMNotInitialized = []() -> bool { return false; };
+
     SECTION("Schedule standard send SMS procedure")
     {
         auto record = buildValidSMSRecord();

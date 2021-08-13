@@ -27,10 +27,11 @@ def test_contacts(harness):
         assert ret["status"] == status["OK"]
         contacts = contacts + ret["body"]["entries"]
 
-    body = {"limit": reminder, "offset": count-reminder}
-    ret = harness.endpoint_request("contacts", "get", body)
-    assert ret["status"] == status["OK"]
-    contacts = contacts + ret["body"]["entries"]
+    if reminder != 0:
+        body = {"limit": reminder, "offset": count-reminder}
+        ret = harness.endpoint_request("contacts", "get", body)
+        assert ret["status"] == status["OK"]
+        contacts = contacts + ret["body"]["entries"]
 
     contacts_length = len(contacts)
     assert contacts_length
@@ -47,7 +48,10 @@ def test_contacts(harness):
         assert ret["status"] == status["OK"]
         contacts = contacts + ret["body"]["entries"]
 
-    body = {"limit": reminder, "offset": (count+10)-reminder}
+    if reminder !=0:
+        body = {"limit": reminder, "offset": (count+10)-reminder}
+    else:
+        body = {"limit": 10, "offset": count}
     ret = harness.endpoint_request("contacts", "get", body)
     assert ret["status"] == status["OK"]
     contacts = contacts + ret["body"]["entries"]

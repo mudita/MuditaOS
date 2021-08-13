@@ -94,6 +94,16 @@ namespace app::music_player
         return index == std::numeric_limits<size_t>::max() ? 0 : index;
     }
 
+    std::string SongsModel::getNextFilePath(const std::string &filePath) const
+    {
+        return songsRepository->getNextFilePath(filePath);
+    }
+
+    std::string SongsModel::getPreviousFilePath(const std::string &filePath) const
+    {
+        return songsRepository->getPreviousFilePath(filePath);
+    }
+
     SongContext SongsModel::getCurrentSongContext() const noexcept
     {
         return songContext;

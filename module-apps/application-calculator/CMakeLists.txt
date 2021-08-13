@@ -30,13 +30,6 @@ target_sources(application-calculator
        
 )
 
-option(ENABLE_APP_CALCULATOR "Enable application calculator" ON)
-
-target_compile_definitions(application-calculator
-    INTERFACE
-        $<$<BOOL:${ENABLE_APP_CALCULATOR}>:ENABLE_APP_CALCULATOR>
-)
-
 if (${ENABLE_TESTS})
     add_subdirectory(tests)
 endif()

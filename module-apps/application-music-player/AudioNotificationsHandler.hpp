@@ -14,6 +14,7 @@ namespace app::music_player
         explicit AudioNotificationsHandler(std::shared_ptr<app::music_player::SongsContract::Presenter> presenter);
 
         sys::MessagePointer handleAudioStopNotification(const AudioStopNotification *notification);
+        sys::MessagePointer handleAudioEofNotification(const AudioStopNotification *notification);
 
       private:
         std::shared_ptr<app::music_player::SongsContract::Presenter> presenter;

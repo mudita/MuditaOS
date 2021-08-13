@@ -25,6 +25,8 @@ target_sources(application-settings
         models/network/SimContactsImportModel.cpp
         models/network/SimContactsRepository.cpp
         models/system/DateAndTimeModel.cpp
+        models/system/SARInfoRepository.cpp
+        models/system/TechnicalInformationRepository.cpp
         models/system/FactoryData.cpp
         models/system/SARInfoRepository.cpp
         models/system/SARInfoRepository.cpp

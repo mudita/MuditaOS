@@ -45,6 +45,14 @@ namespace cellular
             return channel;
         }
 
+        bool SimCard::initialized() const
+        {
+            return (Store::GSM::get()->sim == Store::GSM::SIM::SIM1 &&
+                    Store::GSM::get()->selected == Store::GSM::SIM::SIM1) ||
+                   (Store::GSM::get()->sim == Store::GSM::SIM::SIM2 &&
+                    Store::GSM::get()->selected == Store::GSM::SIM::SIM2);
+        }
+
         void SimCard::setChannel(at::BaseChannel *channel)
         {
             this->channel = channel;

@@ -23,4 +23,13 @@ namespace app::music_player
         return presenter->handleAudioStopNotifiaction(notification->token) ? sys::msgNotHandled() : sys::msgHandled();
     }
 
+    sys::MessagePointer AudioNotificationsHandler::handleAudioEofNotification(const AudioStopNotification *notification)
+    {
+        if (notification == nullptr) {
+            return sys::msgNotHandled();
+        }
+
+        return presenter->handleAudioEofNotification(notification->token) ? sys::msgNotHandled() : sys::msgHandled();
+    }
+
 } // namespace app::music_player

@@ -303,6 +303,11 @@ namespace app::manager
             handleSwitchConfirmation(msg);
             return std::make_shared<sys::ResponseMessage>();
         });
+        connect(typeid(FinalizingClose), [this](sys::Message *request) {
+            auto msg = static_cast<FinalizingClose *>(request);
+            handleFinalizingClose(msg);
+            return std::make_shared<sys::ResponseMessage>();
+        });
         connect(typeid(CloseConfirmation), [this](sys::Message *request) {
             auto msg = static_cast<CloseConfirmation *>(request);
             handleCloseConfirmation(msg);
@@ -580,6 +585,14 @@ namespace app::manager
             app.run(phoneModeObserver->getCurrentPhoneMode(), this);
         }
         return true;
+    }
+
+    void ApplicationManager::startPendingApplicationOnCurrentClose()
+    {
+        if (const auto launchingApp = getLaunchingApplication();
+            launchingApp != nullptr && getState() == State::AwaitingCloseConfirmation) {
+            startApplication(*launchingApp);
+        }
     }
 
     auto ApplicationManager::closeApplications() -> bool
@@ -1033,7 +1046,6 @@ namespace app::manager
     auto ApplicationManager::onSwitchConfirmed(ApplicationHandle &app) -> bool
     {
         if (getState() == State::AwaitingFocusConfirmation || getState() == State::Running) {
-            app.blockClosing = false;
             app.setState(ApplicationHandle::State::ACTIVE_FORGROUND);
             setState(State::Running);
             EventManager::messageSetApplication(this, app.name());
@@ -1082,6 +1094,14 @@ namespace app::manager
         }
     }
 
+    void ApplicationManager::handleFinalizingClose(FinalizingClose *msg)
+    {
+        auto senderApp = getApplication(msg->getSenderName());
+        LOG_DEBUG("Waiting to close application [%s] - finalizing requests", senderApp->name().c_str());
+
+        onFinalizingClose();
+    }
+
     auto ApplicationManager::handleCloseConfirmation(CloseConfirmation *msg) -> bool
     {
         auto senderApp = getApplication(msg->getSenderName());
@@ -1091,6 +1111,11 @@ namespace app::manager
             return false;
         }
         return onCloseConfirmed(*senderApp);
+    }
+
+    void ApplicationManager::onFinalizingClose()
+    {
+        startPendingApplicationOnCurrentClose();
     }
 
     auto ApplicationManager::onCloseConfirmed(ApplicationHandle &app) -> bool
@@ -1103,10 +1128,7 @@ namespace app::manager
             app.setState(ApplicationHandle::State::ACTIVE_BACKGROUND);
         }
 
-        if (const auto launchingApp = getLaunchingApplication();
-            launchingApp != nullptr && getState() == State::AwaitingCloseConfirmation) {
-            startApplication(*launchingApp);
-        }
+        startPendingApplicationOnCurrentClose();
         return true;
     }
 

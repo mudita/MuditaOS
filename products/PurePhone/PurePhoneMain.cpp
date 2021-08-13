@@ -5,7 +5,12 @@
 #include "PlatformFactory.hpp"
 
 // applications
+#ifdef ENABLE_APP_ANTENNA
 #include <application-antenna/ApplicationAntenna.hpp>
+#endif
+#ifdef ENABLE_APP_ALARM_CLOCK
+#include <application-alarm-clock/ApplicationAlarmClock.hpp>
+#endif
 #include <application-call/ApplicationCall.hpp>
 #include <application-calllog/ApplicationCallLog.hpp>
 #include <application-desktop/ApplicationDesktop.hpp>
@@ -18,7 +23,6 @@
 #include <application-music-player/ApplicationMusicPlayer.hpp>
 #include <application-meditation/ApplicationMeditation.hpp>
 #include <application-calculator/ApplicationCalculator.hpp>
-#include <application-alarm-clock/ApplicationAlarmClock.hpp>
 #include <application-onboarding/ApplicationOnBoarding.hpp>
 
 // services

@@ -50,6 +50,7 @@ namespace gui
         if (inputEvent.isShortRelease(gui::KeyCode::KEY_ENTER)) {
             dateAndTimeModel->saveData(fromTillDate);
             sendRtcUpdateTimeMessage();
+            application->switchWindow(gui::window::name::date_and_time, nullptr);
             return true;
         }
 

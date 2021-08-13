@@ -47,19 +47,7 @@ namespace app
             return std::make_shared<sys::ResponseMessage>();
         }
 
-        // this variable defines whether message was processed.
-        bool handled = false;
-        // handle database response
-        if (resp != nullptr) {
-            handled = true;
-            if (auto command = callbackStorage->getCallback(resp); command->execute()) {
-                refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-            }
-        }
-        if (handled) {
-            return sys::msgHandled();
-        }
-        return sys::msgNotHandled();
+        return handleAsyncResponse(resp);
     }
 
     sys::ReturnCodes ApplicationAlarmClock::InitHandler()
