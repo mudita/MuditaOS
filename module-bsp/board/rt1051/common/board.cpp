@@ -155,7 +155,7 @@ namespace bsp
          * BOARD_SDRAM_TEXT
          */
         MPU->RBAR = ARM_MPU_RBAR(7, 0x80000000U);
-#if defined(PURE_SDRAM_64_MB) && (PURE_SDRAM_64_MB == 1)
+#if defined(HW_SDRAM_64_MB) && (HW_SDRAM_64_MB == 1)
         MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_RO, 0, 0, 1, 1, 0, ARM_MPU_REGION_SIZE_64MB);
 #else
         MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_RO, 0, 0, 1, 1, 0, ARM_MPU_REGION_SIZE_16MB);
@@ -173,11 +173,11 @@ namespace bsp
          * BOARD_SDRAM_HEAP
          */
         MPU->RBAR = ARM_MPU_RBAR(9, reinterpret_cast<std::uintptr_t>(__sdram_cached_start));
-#if defined(PURE_SDRAM_64_MB) && (PURE_SDRAM_64_MB == 1)
+#if defined(HW_SDRAM_64_MB) && (HW_SDRAM_64_MB == 1)
         MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 0, 0, 1, 1, 0, ARM_MPU_REGION_SIZE_64MB);
 #else
         MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 0, 0, 1, 1, 0, ARM_MPU_REGION_SIZE_16MB);
-#endif // PURE_SDRAM_64_MB
+#endif // HW_SDRAM_64_MB
 #endif // SDRAM_IS_SHAREABLE
 
         /* Enable MPU */
