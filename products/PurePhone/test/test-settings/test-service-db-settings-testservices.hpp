@@ -9,8 +9,7 @@ namespace settings
     {
       public:
         MyService(const std::string &name) : sys::Service(name)
-        {
-        }
+        {}
         std::shared_ptr<settings::Settings> mySettings;
         std::vector<std::string> valChanged;
         std::string whoRequestedNotifyOnChange;

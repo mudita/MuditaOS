@@ -34,5 +34,4 @@ add_catch2_executable(
             ${CMAKE_SOURCE_DIR}/module-services/service-db/
 )
 
-add_subdirectory(test-settings)
 add_subdirectory(test-settings-Settings)

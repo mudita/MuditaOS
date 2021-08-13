@@ -60,7 +60,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC ../module-services )
 
 target_include_directories(${PROJECT_NAME}
         PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_SOURCE_DIR}
 )
 
 if (${ENABLE_TESTS})
