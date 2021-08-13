@@ -39,7 +39,7 @@
 #include <service-desktop/DesktopMessages.hpp>
 #include <service-eink/ServiceEink.hpp>
 #include <service-evtmgr/EVMessages.hpp>
-#include <service-evtmgr/EventManager.hpp>
+#include <service-evtmgr/EventManagerCommon.hpp>
 
 #include <algorithm>
 #include <utility>
@@ -1036,7 +1036,7 @@ namespace app::manager
             app.blockClosing = false;
             app.setState(ApplicationHandle::State::ACTIVE_FORGROUND);
             setState(State::Running);
-            EventManager::messageSetApplication(this, app.name());
+            EventManagerCommon::messageSetApplication(this, app.name());
             onLaunchFinished(app);
             return true;
         }

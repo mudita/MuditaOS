@@ -1,13 +1,13 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "BellEventManager.hpp"
+#include <evtmgr/EventManager.hpp>
 
 #include <service-evtmgr/WorkerEvent.hpp>
 
-sys::ReturnCodes BellEventManager::InitHandler()
+sys::ReturnCodes EventManager::InitHandler()
 {
-    EventManager::InitHandler();
+    EventManagerCommon::InitHandler();
 
     using namespace std::string_literals;
     std::list<sys::WorkerQueueInfo> list;

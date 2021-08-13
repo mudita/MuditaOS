@@ -58,11 +58,6 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_TARGET})
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_INCLUDES})
 target_include_directories(${PROJECT_NAME} PUBLIC ../module-services )
 
-target_include_directories(${PROJECT_NAME}
-        PUBLIC
-        ${CMAKE_SOURCE_DIR}
-)
-
 if (${ENABLE_TESTS})
     add_subdirectory(SystemManager/tests)
     add_subdirectory(Service/tests)

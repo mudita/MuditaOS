@@ -4,7 +4,7 @@
 #include "service-time/RTCCommand.hpp"
 #include <service-time/TimeMessage.hpp>
 
-#include <service-evtmgr/service-evtmgr/EventManager.hpp>
+#include <service-evtmgr/service-evtmgr/EventManagerCommon.hpp>
 
 void RTCCommand::setTime(const struct tm &time)
 {

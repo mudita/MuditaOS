@@ -8,11 +8,11 @@
 #include <functional>
 #include <thread> // for Message_t, ResponseMessage, DataMessage, Message
 
+#include <evtmgr/EventManager.hpp>
 #include <module-services/service-db/ServiceDB.hpp>
 #include <module-sys/SystemManager/SystemManager.hpp>
 
 #include <service-evtmgr/Constants.hpp>
-#include <evtmgr/PureEventManager.hpp>
 
 #include "test-service-db-settings-testmsgs.hpp"
 #include "test-service-db-settings-testservices.hpp"
@@ -36,8 +36,8 @@ TEST_CASE("SettingsApi")
             testStart = std::make_shared<std::mutex>();
             testStart->lock();
             std::cout << "start thr_id: " << std::this_thread::get_id() << std::endl << std::flush;
-            auto ret = sys::SystemManager::RunSystemService(
-                std::make_shared<PureEventManager>(service::name::evt_manager), manager.get());
+            auto ret = sys::SystemManager::RunSystemService(std::make_shared<EventManager>(service::name::evt_manager),
+                                                            manager.get());
             ret &= sys::SystemManager::RunSystemService(std::make_shared<ServiceDB>(), manager.get());
 
             varWritter = std::make_shared<settings::MyService>("writterVar");

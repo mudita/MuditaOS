@@ -32,7 +32,6 @@ target_include_directories(PurePhone
         ${TARGET_DIR_INCLUDES}
         ${PROJECT_INCLUDES}
         ${CMAKE_BINARY_DIR}
-        ${CMAKE_CURRENT_SOURCE_DIR}
     )
 
 set_target_properties(PurePhone
@@ -45,9 +44,9 @@ target_link_libraries(PurePhone
     PRIVATE
         application-antenna
         application-calculator
-        application-calllog
         application-calendar
         application-call
+        application-calllog
         application-desktop
         application-meditation
         application-messages
@@ -56,16 +55,16 @@ target_link_libraries(PurePhone
         application-phonebook
         application-settings
         application-special-input
+        evtmgr
         messagetype
         module-apps
         module-bsp
         module-vfs
+        platform
         service-audio
         service-bluetooth
         service-desktop
         service-lwip
-        platform
-        PurePhone-evtmgr
         ${LWIP_LIBRARIES}
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_Linux>:iosyscalls>"
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_RT1051>:CrashCatcher::CrashCatcher>"
@@ -105,3 +104,7 @@ github_message_standalone()
 github_message_update()
 
 add_subdirectory(services)
+
+if (${ENABLE_TESTS})
+    add_subdirectory(test)
+endif ()
