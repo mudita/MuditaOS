@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include <service-evtmgr/EventManager.hpp>
+#include <service-evtmgr/EventManagerCommon.hpp>
 
-class BellEventManager : public EventManager
+class EventManager : public EventManagerCommon
 {
   private:
     sys::ReturnCodes InitHandler() override;
@@ -13,7 +13,7 @@ class BellEventManager : public EventManager
 
 namespace sys
 {
-    template <> struct ManifestTraits<BellEventManager>
+    template <> struct ManifestTraits<EventManager>
     {
         static auto GetManifest() -> ServiceManifest
         {

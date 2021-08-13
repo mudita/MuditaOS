@@ -3,17 +3,17 @@
 
 #pragma once
 
-#include <service-evtmgr/EventManager.hpp>
+#include <service-evtmgr/EventManagerCommon.hpp>
 
 #include <backlight-handler/BacklightHandler.hpp>
 #include <bsp/vibrator/vibrator.hpp>
 #include <vibra/Vibra.hpp>
 
-class PureEventManager : public EventManager
+class EventManager : public EventManagerCommon
 {
   public:
-    explicit PureEventManager(const std::string &name = service::name::evt_manager)
-        : EventManager(name), Vibra(std::make_unique<vibra_handle::Vibra>(this)), backlightHandler(settings, this)
+    explicit EventManager(const std::string &name = service::name::evt_manager)
+        : EventManagerCommon(name), Vibra(std::make_unique<vibra_handle::Vibra>(this)), backlightHandler(settings, this)
     {}
 
   private:
@@ -33,7 +33,7 @@ class PureEventManager : public EventManager
 
 namespace sys
 {
-    template <> struct ManifestTraits<PureEventManager>
+    template <> struct ManifestTraits<EventManager>
     {
         static auto GetManifest() -> ServiceManifest
         {

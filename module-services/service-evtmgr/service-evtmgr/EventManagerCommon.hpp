@@ -22,7 +22,7 @@
 
 class WorkerEvent;
 
-class EventManager : public sys::Service
+class EventManagerCommon : public sys::Service
 {
   private:
     static constexpr auto stackDepth = 4096;
@@ -52,8 +52,8 @@ class EventManager : public sys::Service
     bool alarmIsValid = false;
 
   public:
-    explicit EventManager(const std::string &name = service::name::evt_manager);
-    ~EventManager();
+    explicit EventManagerCommon(const std::string &name = service::name::evt_manager);
+    ~EventManagerCommon();
 
     sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
 

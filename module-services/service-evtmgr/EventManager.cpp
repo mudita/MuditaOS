@@ -5,7 +5,7 @@
 #include "service-evtmgr/EVMessages.hpp"
 #include "service-evtmgr/KbdMessage.hpp"
 #include "service-evtmgr/Constants.hpp"
-#include "service-evtmgr/EventManager.hpp"
+#include "service-evtmgr/EventManagerCommon.hpp"
 #include "service-evtmgr/WorkerEvent.hpp"
 
 #include "battery-level-check/BatteryLevelCheck.hpp"
@@ -47,7 +47,7 @@ namespace
     constexpr auto loggerTimerName      = "Logger";
 } // namespace
 
-EventManager::EventManager(const std::string &name)
+EventManagerCommon::EventManagerCommon(const std::string &name)
     : sys::Service(name, "", stackDepth), loggerTimer{sys::TimerFactory::createPeriodicTimer(
                                               this,
                                               loggerTimerName,
@@ -62,7 +62,7 @@ EventManager::EventManager(const std::string &name)
     loggerTimer.start();
 }
 
-EventManager::~EventManager()
+EventManagerCommon::~EventManagerCommon()
 {
     if (EventWorker != nullptr) {
         EventWorker->close();
@@ -70,7 +70,7 @@ EventManager::~EventManager()
 }
 
 // Invoked upon receiving data message
-sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
+sys::MessagePointer EventManagerCommon::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
 {
     bool handled = false;
 
@@ -114,7 +114,7 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
 }
 
 // Invoked during initialization
-sys::ReturnCodes EventManager::InitHandler()
+sys::ReturnCodes EventManagerCommon::InitHandler()
 {
     settings->init(service::ServiceProxy(shared_from_this()));
 
@@ -200,7 +200,7 @@ sys::ReturnCodes EventManager::InitHandler()
     return sys::ReturnCodes::Success;
 }
 
-sys::ReturnCodes EventManager::DeinitHandler()
+sys::ReturnCodes EventManagerCommon::DeinitHandler()
 {
     settings->deinit();
 
@@ -211,13 +211,13 @@ sys::ReturnCodes EventManager::DeinitHandler()
     return sys::ReturnCodes::Success;
 }
 
-void EventManager::ProcessCloseReason(sys::CloseReason closeReason)
+void EventManagerCommon::ProcessCloseReason(sys::CloseReason closeReason)
 {
     bsp::torch::turn(bsp::torch::State::off);
     sendCloseReadyMessage(this);
 }
 
-sys::ReturnCodes EventManager::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
+sys::ReturnCodes EventManagerCommon::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
 {
     LOG_FATAL("[ServiceEvtMgr] PowerModeHandler: %s", c_str(mode));
 
@@ -232,13 +232,13 @@ sys::ReturnCodes EventManager::SwitchPowerModeHandler(const sys::ServicePowerMod
     return sys::ReturnCodes::Success;
 }
 
-bool EventManager::messageSetApplication(sys::Service *sender, const std::string &applicationName)
+bool EventManagerCommon::messageSetApplication(sys::Service *sender, const std::string &applicationName)
 {
     auto msg = std::make_shared<sevm::EVMFocusApplication>(applicationName);
     return sender->bus.sendUnicast(msg, service::name::evt_manager);
 }
 
-void EventManager::handleKeyEvent(sys::Message *msg)
+void EventManagerCommon::handleKeyEvent(sys::Message *msg)
 {
     auto kbdMessage = dynamic_cast<sevm::KbdMessage *>(msg);
     auto message    = std::make_shared<sevm::KbdMessage>();
@@ -259,7 +259,7 @@ void EventManager::handleKeyEvent(sys::Message *msg)
     app::manager::Controller::preventBlockingDevice(this);
 }
 
-int EventManager::dumpLogsToFile()
+int EventManagerCommon::dumpLogsToFile()
 {
     const auto logPath = purefs::dir::getUserDiskPath() / LOG_FILE_NAME;
     const auto ts      = cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks());
@@ -269,7 +269,7 @@ int EventManager::dumpLogsToFile()
     return Log::Logger::get().dumpToFile(std::move(logPath));
 }
 
-void EventManager::handleMinuteUpdate(time_t timestamp)
+void EventManagerCommon::handleMinuteUpdate(time_t timestamp)
 {
     if (!targetApplication.empty()) {
         auto message       = std::make_shared<sevm::RtcMinuteAlarmMessage>(MessageType::EVMMinuteUpdated);
@@ -278,7 +278,7 @@ void EventManager::handleMinuteUpdate(time_t timestamp)
     }
 }
 
-void EventManager::processRTCFromTmRequest(struct tm &newTime)
+void EventManagerCommon::processRTCFromTmRequest(struct tm &newTime)
 {
     if (bsp::rtc::setDateTime(&newTime) != bsp::rtc::ErrorCode::OK) {
         LOG_ERROR("Setting RTC failed.");
@@ -290,7 +290,7 @@ void EventManager::processRTCFromTmRequest(struct tm &newTime)
     bus.sendMulticast(std::move(notification), sys::BusChannel::ServiceEvtmgrNotifications);
 }
 
-void EventManager::processRTCFromTimestampRequest(time_t &newTime)
+void EventManagerCommon::processRTCFromTimestampRequest(time_t &newTime)
 {
     if (bsp::rtc::setDateTimeFromTimestamp(newTime) != bsp::rtc::ErrorCode::OK) {
         LOG_ERROR("Setting RTC failed.");
@@ -301,7 +301,7 @@ void EventManager::processRTCFromTimestampRequest(time_t &newTime)
     bus.sendMulticast(std::move(notification), sys::BusChannel::ServiceEvtmgrNotifications);
 }
 
-void EventManager::processTimezoneRequest(const std::string &timezone)
+void EventManagerCommon::processTimezoneRequest(const std::string &timezone)
 {
     if (setenv("TZ", timezone.c_str(), 1) != 0) {
         LOG_ERROR("Setting timezone failed.");
