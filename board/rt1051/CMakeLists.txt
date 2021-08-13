@@ -1,3 +1,11 @@
+add_subdirectory(${BOARD})
+
+if (${MEMORY_LINKER_FILE_PATH} STREQUAL "")
+    message(FATAL_ERROR "Linker RAM layout not provided")
+endif()
+
+set (CMAKE_EXE_LINKER_FLAGS "-nostdlib -Xlinker --gc-sections -Xlinker --sort-section=alignment -mcpu=cortex-m7 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb -Xlinker -print-memory-usage -T ${LDSCRIPTSDIR}/libs.ld -T ${MEMORY_LINKER_FILE_PATH} -T ${LDSCRIPTSDIR}/sections.ld -nostartfiles" CACHE INTERNAL "")
+
 target_sources(board
     PRIVATE
         _exit.c
