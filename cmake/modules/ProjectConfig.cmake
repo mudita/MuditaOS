@@ -49,17 +49,6 @@ else()
     set (USB_DEVICE_PRODUCT_ID 0x0622 CACHE INTERNAL "Sets USB_DEVICE_PRODUCT_ID to Windows MTP Simulator Product ID")
 endif()
 
-if(${BOARD} STREQUAL "puretx" AND ${BOARD_REVISION} EQUAL 7)
-    message("Building for T7 - 64MB SDRAM")
-    set (MEMORY_LINKER_FILE "memory_T7.ld")
-    set (PROJECT_CONFIG_USER_DYNMEM_SIZE 28*1024*1024 CACHE INTERNAL "")
-    set (PURE_SDRAM_64_MB 1 CACHE INTERNAL "")
-else()
-    set (MEMORY_LINKER_FILE "memory_T6.ld")
-    set (PROJECT_CONFIG_USER_DYNMEM_SIZE 9*1024*1024 CACHE INTERNAL "")
-    set (PURE_SDRAM_64_MB 0 CACHE INTERNAL "")
-endif()
-
 #Config options described in README.md
 set(PROJECT_CONFIG_DEFINITIONS
         LOG_USE_COLOR=${LOG_USE_COLOR}
@@ -68,8 +57,6 @@ set(PROJECT_CONFIG_DEFINITIONS
         SYSTEM_VIEW_ENABLED=${SYSTEM_VIEW_ENABLED}
         USBCDC_ECHO_ENABLED=${USBCDC_ECHO_ENABLED}
         LOG_LUART_ENABLED=${LOG_LUART_ENABLED}
-        PROJECT_CONFIG_USER_DYNMEM_SIZE=${PROJECT_CONFIG_USER_DYNMEM_SIZE}
-        PURE_SDRAM_64_MB=${PURE_SDRAM_64_MB}
         USB_DEVICE_VENDOR_ID=${USB_DEVICE_VENDOR_ID}
         USB_DEVICE_PRODUCT_ID=${USB_DEVICE_PRODUCT_ID}
         MAGIC_ENUM_RANGE_MAX=256
@@ -78,7 +65,3 @@ set(PROJECT_CONFIG_DEFINITIONS
 
 message(STATUS "BlueKitchen selected")
 set(BT_STACK "BlueKitchen")
-
-if(${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
-set(CMAKE_EXE_LINKER_FLAGS "-nostdlib -Xlinker --gc-sections -Xlinker --sort-section=alignment -mcpu=cortex-m7 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb -Xlinker -print-memory-usage -T ${LDSCRIPTSDIR}/libs.ld -T ${LDSCRIPTSDIR}/${MEMORY_LINKER_FILE} -T ${LDSCRIPTSDIR}/sections.ld -nostartfiles" CACHE INTERNAL "")
-endif()
