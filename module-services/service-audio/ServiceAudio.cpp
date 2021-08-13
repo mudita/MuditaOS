@@ -516,7 +516,7 @@ auto ServiceAudio::HandleKeyPressed(const int step) -> sys::MessagePointer
         // update volume of currently active sound
         setSetting(Setting::Volume, std::to_string(newVolume));
     }
-    bus.sendMulticast(std::make_unique<VolumeChanged>(newVolume, context), sys::BusChannel::ServiceAudioNotifications);
+    bus.sendMulticast(std::make_shared<VolumeChanged>(newVolume, context), sys::BusChannel::ServiceAudioNotifications);
     return sys::msgHandled();
 }
 
@@ -748,7 +748,7 @@ void ServiceAudio::onVolumeChanged(Volume volume)
     const auto [profileType, playbackType] = getCurrentContext();
     settingsProvider->setValue(dbPath(Setting::Volume, playbackType, profileType), std::to_string(volume));
     settingsCache[dbPath(Setting::Volume, playbackType, profileType)] = std::to_string(volume);
-    bus.sendMulticast(std::make_unique<VolumeChanged>(volume, std::make_pair(profileType, playbackType)),
+    bus.sendMulticast(std::make_shared<VolumeChanged>(volume, std::make_pair(profileType, playbackType)),
                       sys::BusChannel::ServiceAudioNotifications);
 }
 
