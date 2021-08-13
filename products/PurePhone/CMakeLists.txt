@@ -25,8 +25,6 @@ target_sources(PurePhone
     PRIVATE
         PurePhoneMain.cpp
         PlatformFactory.cpp
-        services/evtmgr/PureEventManager.cpp
-        services/evtmgr/PureEventManager.hpp
     )
 
 target_include_directories(PurePhone
@@ -67,6 +65,7 @@ target_link_libraries(PurePhone
         service-desktop
         service-lwip
         platform
+        PurePhone-evtmgr
         ${LWIP_LIBRARIES}
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_Linux>:iosyscalls>"
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_RT1051>:CrashCatcher::CrashCatcher>"
@@ -105,3 +104,4 @@ include(GitHubWorkerMessages)
 github_message_standalone()
 github_message_update()
 
+add_subdirectory(services)

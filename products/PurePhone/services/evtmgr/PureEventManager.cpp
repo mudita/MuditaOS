@@ -11,7 +11,6 @@
 #include <service-evtmgr/ScreenLightControlMessage.hpp>
 #include <service-evtmgr/WorkerEvent.hpp>
 #include <SystemManager/messages/PhoneModeRequest.hpp>
-#include <vibra/Vibra.hpp>
 
 namespace
 {
