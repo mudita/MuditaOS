@@ -81,3 +81,8 @@ target_link_libraries(application-messages
         module-db
         module-utils
 )
+
+option(MESSAGE_TEXT_SEARCH "Enable message text search functionality" OFF)
+if(${MESSAGE_TEXT_SEARCH})
+    target_compile_definitions(application-messages PRIVATE MESSAGE_TEXT_SEARCH=1)
+endif()
