@@ -3,13 +3,15 @@
 
 #include <evtmgr/EventManager.hpp>
 
+#include "WorkerEvent.hpp"
+
 #include <bsp/magnetometer/magnetometer.hpp>
 #include <bsp/torch/torch.hpp>
 #include <screen-light-control/ScreenLightControl.hpp>
 #include <service-cellular/ServiceCellular.hpp>
 #include <service-evtmgr/EVMessages.hpp>
 #include <service-evtmgr/ScreenLightControlMessage.hpp>
-#include <service-evtmgr/WorkerEvent.hpp>
+#include <service-evtmgr/WorkerEventCommon.hpp>
 #include <SystemManager/messages/PhoneModeRequest.hpp>
 
 namespace
@@ -42,10 +44,13 @@ bool EventManager::processVibraRequest(bsp::vibrator::Action act, std::chrono::m
     return true;
 }
 
-sys::ReturnCodes EventManager::InitHandler()
+auto EventManager::createEventWorker() -> std::unique_ptr<WorkerEventCommon>
 {
-    EventManagerCommon::InitHandler();
+    return std::make_unique<purephone::WorkerEvent>(this);
+}
 
+void EventManager::initProductEvents()
+{
     backlightHandler.init();
 
     connect(sevm::KeypadBacklightMessage(bsp::keypad_backlight::Action::turnOff), [&](sys::Message *msgl) {
@@ -102,27 +107,10 @@ sys::ReturnCodes EventManager::InitHandler()
     });
 
     connect(sevm::RequestPhoneModeForceUpdate(), [&]([[maybe_unused]] sys::Message *msg) {
-        EventWorker->requestSliderPositionRead();
+        auto pureEventWorker = static_cast<purephone::WorkerEvent *>(EventWorker.get());
+        pureEventWorker->requestSliderPositionRead();
         return sys::MessageNone{};
     });
-
-    using namespace std::string_literals;
-    std::list<sys::WorkerQueueInfo> list;
-    list.emplace_back("qIrq"s, sizeof(uint8_t), 10);
-    list.emplace_back("qHeadset"s, sizeof(uint8_t), 10);
-    list.emplace_back("qBattery"s, sizeof(uint8_t), 10);
-    list.emplace_back("qRTC"s, sizeof(uint8_t), 20);
-    list.emplace_back("qSIM"s, sizeof(uint8_t), 5);
-    list.emplace_back("qMagnetometer"s, sizeof(uint8_t), 5);
-    list.emplace_back(WorkerEvent::MagnetometerNotifyQueue, sizeof(uint8_t), 1);
-    list.emplace_back("qTorch"s, sizeof(uint8_t), 5);
-    list.emplace_back("qLightSensor"s, sizeof(uint8_t), 5);
-    list.emplace_back("qChargerDetect"s, sizeof(uint8_t), 5);
-
-    EventWorker->init(list, settings);
-    EventWorker->run();
-
-    return sys::ReturnCodes::Success;
 }
 
 void EventManager::toggleTorchOnOff()

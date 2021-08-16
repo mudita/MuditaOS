@@ -34,21 +34,34 @@ enum class WorkerEventQueues
     queueService = 0,
     queueControl = 1,
     queueKeyboardIRQ,
-    queueHeadsetIRQ,
     queueBattery,
+    queueChargerDetect,
     queueRTC,
-    queueCellular,
-    queueMagnetometerIRQ,
-    queueMagnetometerNotify,
-    queueTorch,
-    queueLightSensor,
-    queueChargerDetect
 };
 
-class WorkerEvent : public sys::Worker
+class WorkerEventCommon : public sys::Worker
 {
+  protected:
+    virtual void addProductQueues(std::list<sys::WorkerQueueInfo> &queueList);
+    virtual void initProductHardware();
+    virtual void deinitProductHardware();
+
+    void processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code);
+
+    sys::Service *service = nullptr;
+
   private:
     static constexpr auto stackDepthBytes = 3072;
+
+    static constexpr auto keyboardQueueName = "qIrq";
+    static constexpr auto batteryQueueName  = "qBattery";
+    static constexpr auto chargerQueueName  = "qCharger";
+    static constexpr auto rtcQueueName      = "qRTC";
+
+    static constexpr auto keyboardQueueSize = 10;
+    static constexpr auto batteryQueueSize  = 10;
+    static constexpr auto chargerQueueSize  = 5;
+    static constexpr auto rtcQueueSize      = 20;
 
     /**
      * @brief This method is responsible for catch and process keyboard event.
@@ -56,15 +69,10 @@ class WorkerEvent : public sys::Worker
      * @param code key code
      * @note It sends message to service if event is processed successfully.
      */
-    void processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code);
-
-    /**
-     * @brief This method is responsible for translating a headset key to keyboard key code.
-     * @param code key code
-     */
-    bsp::KeyCodes headsetKeyToKeyboardKey(uint8_t code);
-
     void updateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyHz newFrequency);
+    bool initEventQueues();
+    bool initCommonHardwareComponents();
+
     /**
      * @brief list of keys with long press enabled. First item is key code, second is long press time.
      */
@@ -72,27 +80,19 @@ class WorkerEvent : public sys::Worker
     bool longPressTaskEnabled = false;
     bsp::KeyEvents lastState  = bsp::KeyEvents::Released;
     bsp::KeyCodes lastPressed = static_cast<bsp::KeyCodes>(0);
-    sys::Service *service     = nullptr;
     std::shared_ptr<sys::CpuSentinel> cpuSentinel;
     BatteryBrownoutDetector batteryBrownoutDetector;
 
   public:
-    WorkerEvent(sys::Service *service);
-    /**
-     * This function is responsible for creating all queues provided in the constructor.
-     * When all queues are created this method creates set of queues.
-     */
-    virtual bool init(std::list<sys::WorkerQueueInfo> queuesList) override;
+    explicit WorkerEventCommon(sys::Service *service);
+
+    void init(std::shared_ptr<settings::Settings> settings);
     virtual bool deinit() override;
 
-    void init(std::list<sys::WorkerQueueInfo> queuesList, std::shared_ptr<settings::Settings> settings);
-    static constexpr auto MagnetometerNotifyQueue = "qMagnetometerNotify";
     /**
      * This method is called from thread when new message arrives in queue.
      * @param queueID Index of the queue in the queues vector.
      */
-    bool handleMessage(uint32_t queueID) override final;
-    void requestSliderPositionRead();
-    void handleMagnetometerEvent();
+    bool handleMessage(uint32_t queueID) override;
     void checkBatteryChargerInterrupts();
 };
