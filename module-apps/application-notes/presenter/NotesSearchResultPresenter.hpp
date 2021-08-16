@@ -6,7 +6,7 @@
 #include <apps-common/BasePresenter.hpp>
 
 #include <module-apps/application-notes/model/NotesSearchListModel.hpp>
-#include <module-services/service-db/service-db/DBNotificationMessage.hpp>
+#include <service-db/DBNotificationMessage.hpp>
 
 namespace app::notes
 {

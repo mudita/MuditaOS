@@ -2,6 +2,9 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SettingsHolder.hpp"
+
+#include <service-db/agents/settings/SystemSettings.hpp>
+
 namespace bluetooth
 {
     std::map<Settings, std::string> SettingsHolder::settingString{

@@ -1,54 +1,30 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "ServiceDB.hpp"
+#include <db/ServiceDB.hpp>
 
-#include "service-db/DBCalllogMessage.hpp"
-#include "service-db/DBContactMessage.hpp"
-#include "service-db/DBNotificationMessage.hpp"
-#include "service-db/DBServiceMessage.hpp"
-#include "service-db/QueryMessage.hpp"
-#include "service-db/DatabaseAgent.hpp"
-#include "agents/quotes/QuotesAgent.cpp"
-#include "agents/settings/SettingsAgent.hpp"
-
-#include <AlarmsRecord.hpp>
-#include <CalllogRecord.hpp>
-#include <ContactRecord.hpp>
-#include <CountryCodeRecord.hpp>
-#include <Database/Database.hpp>
-#include <Databases/AlarmsDB.hpp>
-#include <Databases/CalllogDB.hpp>
-#include <Databases/ContactsDB.hpp>
-#include <Databases/CountryCodesDB.hpp>
-#include <Databases/EventsDB.hpp>
-#include <Databases/NotesDB.hpp>
-#include <Databases/NotificationsDB.hpp>
-#include <Databases/SmsDB.hpp>
-#include <MessageType.hpp>
-#include <NotesRecord.hpp>
-#include <NotificationsRecord.hpp>
+#include <module-db/Databases/AlarmsDB.hpp>
+#include <module-db/Databases/CountryCodesDB.hpp>
+#include <module-db/Databases/EventsDB.hpp>
+#include <module-db/Databases/NotificationsDB.hpp>
+#include <module-db/Databases/NotificationsDB.hpp>
+#include <module-db/Interface/AlarmEventRecord.hpp>
+#include <module-db/Interface/AlarmsRecord.hpp>
+#include <module-db/Interface/CalllogRecord.hpp>
+#include <module-db/Interface/CountryCodeRecord.hpp>
+#include <module-db/Interface/NotesRecord.hpp>
+#include <module-db/Interface/NotificationsRecord.hpp>
+#include <module-db/Interface/SMSRecord.hpp>
+#include <module-db/Interface/SMSTemplateRecord.hpp>
 #include <purefs/filesystem_paths.hpp>
-#include <SMSRecord.hpp>
-#include <SMSTemplateRecord.hpp>
-#include <Tables/Record.hpp>
-#include <ThreadRecord.hpp>
-#include <log.hpp>
+#include <service-db/DBCalllogMessage.hpp>
+#include <service-db/DBContactMessage.hpp>
+#include <service-db/DBServiceMessage.hpp>
+#include <service-db/QueryMessage.hpp>
+#include <service-db/agents/file_indexer/FileIndexerAgent.hpp>
+#include <service-db/agents/settings/SettingsAgent.hpp>
 #include <time/ScopedTime.hpp>
-
-#include <cassert>
-#include <cinttypes>
-#include <cstdint>
-#include <optional>
-#include <utility>
-#include <vector>
-
-static const auto service_db_stack = 1024 * 24;
-
-ServiceDB::ServiceDB() : sys::Service(service::name::db, "", service_db_stack, sys::ServicePriority::Idle)
-{
-    LOG_INFO("[ServiceDB] Initializing");
-}
+#include <service-db/agents/quotes/QuotesAgent.hpp>
 
 ServiceDB::~ServiceDB()
 {
@@ -94,11 +70,12 @@ db::Interface *ServiceDB::getInterface(db::Interface::Name interface)
     return nullptr;
 }
 
-// Invoked upon receiving data message
 sys::MessagePointer ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
 {
-
-    std::shared_ptr<sys::ResponseMessage> responseMsg;
+    auto responseMsg = std::static_pointer_cast<sys::ResponseMessage>(ServiceDBCommon::DataReceivedHandler(msgl, resp));
+    if (!responseMsg) {
+        return responseMsg;
+    }
     auto type = static_cast<MessageType>(msgl->messageType);
     switch (type) {
 
@@ -118,7 +95,7 @@ sys::MessagePointer ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::
         auto time             = utils::time::Scoped("DBContactGetByID");
         DBContactMessage *msg = reinterpret_cast<DBContactMessage *>(msgl);
         auto ret              = (msg->withTemporary ? contactRecordInterface->GetByIdWithTemporary(msg->record.ID)
-                                       : contactRecordInterface->GetByID(msg->record.ID));
+                                                    : contactRecordInterface->GetByID(msg->record.ID));
         auto records          = std::make_unique<std::vector<ContactRecord>>();
         records->push_back(ret);
         responseMsg = std::make_shared<DBContactResponseMessage>(
@@ -238,8 +215,8 @@ sys::MessagePointer ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::
 
 sys::ReturnCodes ServiceDB::InitHandler()
 {
-    if (const auto isSuccess = Database::initialize(); !isSuccess) {
-        return sys::ReturnCodes::Failure;
+    if (const auto returnCode = ServiceDBCommon::InitHandler(); returnCode != sys::ReturnCodes::Success) {
+        return returnCode;
     }
 
     // Create databases
@@ -254,18 +231,18 @@ sys::ReturnCodes ServiceDB::InitHandler()
     quotesDB        = std::make_unique<Database>((purefs::dir::getUserDiskPath() / "quotes.db").c_str());
 
     // Create record interfaces
-    alarmEventRecordInterface    = std::make_unique<AlarmEventRecordInterface>(eventsDB.get());
-    contactRecordInterface       = std::make_unique<ContactRecordInterface>(contactsDB.get());
-    smsRecordInterface           = std::make_unique<SMSRecordInterface>(smsDB.get(), contactsDB.get());
-    threadRecordInterface        = std::make_unique<ThreadRecordInterface>(smsDB.get(), contactsDB.get());
-    smsTemplateRecordInterface   = std::make_unique<SMSTemplateRecordInterface>(smsDB.get());
-    alarmsRecordInterface        = std::make_unique<AlarmsRecordInterface>(alarmsDB.get());
-    notesRecordInterface         = std::make_unique<NotesRecordInterface>(notesDB.get());
-    calllogRecordInterface       = std::make_unique<CalllogRecordInterface>(calllogDB.get(), contactsDB.get());
-    countryCodeRecordInterface   = std::make_unique<CountryCodeRecordInterface>(countryCodesDB.get());
+    alarmEventRecordInterface  = std::make_unique<AlarmEventRecordInterface>(eventsDB.get());
+    contactRecordInterface     = std::make_unique<ContactRecordInterface>(contactsDB.get());
+    smsRecordInterface         = std::make_unique<SMSRecordInterface>(smsDB.get(), contactsDB.get());
+    threadRecordInterface      = std::make_unique<ThreadRecordInterface>(smsDB.get(), contactsDB.get());
+    smsTemplateRecordInterface = std::make_unique<SMSTemplateRecordInterface>(smsDB.get());
+    alarmsRecordInterface      = std::make_unique<AlarmsRecordInterface>(alarmsDB.get());
+    notesRecordInterface       = std::make_unique<NotesRecordInterface>(notesDB.get());
+    calllogRecordInterface     = std::make_unique<CalllogRecordInterface>(calllogDB.get(), contactsDB.get());
+    countryCodeRecordInterface = std::make_unique<CountryCodeRecordInterface>(countryCodesDB.get());
     notificationsRecordInterface =
         std::make_unique<NotificationsRecordInterface>(notificationsDB.get(), contactRecordInterface.get());
-    quotesRecordInterface        = std::make_unique<Quotes::QuotesAgent>(quotesDB.get());
+    quotesRecordInterface = std::make_unique<Quotes::QuotesAgent>(quotesDB.get());
 
     databaseAgents.emplace(std::make_unique<SettingsAgent>(this));
     databaseAgents.emplace(std::make_unique<FileIndexerAgent>(this));
@@ -276,28 +253,6 @@ sys::ReturnCodes ServiceDB::InitHandler()
     }
 
     return sys::ReturnCodes::Success;
-}
-
-sys::ReturnCodes ServiceDB::DeinitHandler()
-{
-    return sys::ReturnCodes::Success;
-}
-
-void ServiceDB::ProcessCloseReason(sys::CloseReason closeReason)
-{
-    sendCloseReadyMessage(this);
-}
-
-sys::ReturnCodes ServiceDB::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
-{
-    LOG_FATAL("[%s] PowerModeHandler: %s", this->GetName().c_str(), c_str(mode));
-    return sys::ReturnCodes::Success;
-}
-
-void ServiceDB::sendUpdateNotification(db::Interface::Name interface, db::Query::Type type)
-{
-    auto notificationMessage = std::make_shared<db::NotificationMessage>(interface, type);
-    bus.sendMulticast(notificationMessage, sys::BusChannel::ServiceDBNotifications);
 }
 
 bool ServiceDB::StoreIntoBackup(const std::filesystem::path &backupPath)

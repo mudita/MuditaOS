@@ -16,7 +16,7 @@
 #include <service-appmgr/messages/GetAllNotificationsRequest.hpp>
 #include <service-cellular/service-cellular/CellularMessage.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
-#include <service-db/service-db/DBNotificationMessage.hpp>
+#include <service-db/DBNotificationMessage.hpp>
 #include <service-desktop/Constants.hpp>
 #include <service-desktop/DesktopMessages.hpp>
 #include <service-desktop/DeveloperModeMessage.hpp>

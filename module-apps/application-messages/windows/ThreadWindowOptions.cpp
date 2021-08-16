@@ -5,7 +5,6 @@
 
 #include <i18n/i18n.hpp>
 #include <log.hpp>
-#include <module-services/service-db/service-db/DBServiceAPI.hpp>
 #include <OptionCall.hpp>
 #include <OptionContact.hpp>
 #include <OptionWindow.hpp>

@@ -65,6 +65,7 @@
 #include <service-antenna/ServiceAntenna.hpp>
 #include <service-appmgr/Constants.hpp>
 #include <service-appmgr/Controller.hpp>
+#include <service-db/agents/settings/SystemSettings.hpp>
 #include <service-db/DBServiceAPI.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <service-db/QueryMessage.hpp>

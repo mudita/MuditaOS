@@ -20,6 +20,7 @@
 #include <module-sys/SystemManager/messages/TetheringStateRequest.hpp>
 #include <module-sys/SystemManager/Constants.hpp>
 
+#include <service-db/agents/settings/SystemSettings.hpp>
 #include <service-db/DBServiceAPI.hpp>
 #include <service-desktop/parser/MessageHandler.hpp>
 #include <service-desktop/endpoints/developerMode/event/ATRequest.hpp>
