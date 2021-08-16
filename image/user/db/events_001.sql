@@ -4,9 +4,10 @@
 CREATE TABLE IF NOT EXISTS events(
                   _id INTEGER PRIMARY KEY,
                   name TEXT DEFAULT '',
-                  startDate DATETIME,
-                  endDate DATETIME,
+                  start_date DATETIME,
+                  end_date DATETIME,
                   duration INTEGER,
-                  isAllDay BOOLEAN,
-                  recurrenceRule TEXT DEFAULT ''
+                  is_all_day BOOLEAN,
+                  rrule TEXT DEFAULT ''
 );
+
