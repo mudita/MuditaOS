@@ -5,7 +5,6 @@
 #include <string>
 #include <variant>
 #include <service-db/Settings.hpp>
-#include <agents/settings/SystemSettings.hpp>
 #include <module-utils/Utils.hpp>
 #include "SettingsSerializer.hpp"
 

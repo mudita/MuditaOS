@@ -15,7 +15,7 @@
 #include <header/SearchAction.hpp>
 #include <module-apps/application-notes/style/NotesListStyle.hpp>
 
-#include <module-services/service-db/service-db/DBNotificationMessage.hpp>
+#include <service-db/DBNotificationMessage.hpp>
 
 namespace app::notes
 {

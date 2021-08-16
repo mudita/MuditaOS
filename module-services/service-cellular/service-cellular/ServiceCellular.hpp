@@ -24,7 +24,6 @@
 #include <bsp/common.hpp>
 #include <utf8/UTF8.hpp>
 #include <service-db/Settings.hpp>
-#include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <module-sys/PhoneModes/Observer.hpp>
 #include <service-db/DBServiceName.hpp>
 #include <service-db/DBNotificationMessage.hpp>

@@ -20,7 +20,6 @@
 #include <time/time_conversion_factory.hpp>
 #include <time/TimeZone.hpp>
 #include <service-evtmgr/Constants.hpp>
-#include <service-db/service-db/Settings.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
 
 #include <memory>

@@ -2,7 +2,8 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
-#include <module-services/service-db/agents/settings/FactorySettings.hpp>
+#include <service-db/agents/settings/FactorySettings.hpp>
+#include <service-db/EntryPath.hpp>
 
 const std::string valid_json   = "{\"serial\" : \"00000000000000\", \"case_colour\" : \"nocase\"}";
 const std::string invalid_json = "{\"serial\" : \"00000000000000\", \"case_colour\" : \"nocase\"}}";

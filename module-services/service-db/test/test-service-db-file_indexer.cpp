@@ -6,9 +6,9 @@
 #include <Service/Service.hpp>
 #include <functional>
 #include <thread> // for Message_t, ResponseMessage, DataMessage, Message
-#include <service-db/ServiceDB.hpp>
+#include <service-db/ServiceDBCommon.hpp>
 
-#include <module-services/service-db/test/test-service-db-file_indexer.hpp>
+#include <service-db/test/test-service-db-file_indexer.hpp>
 #include <service-db/FileIndexerMessages.hpp>
 
 class ClientService : public sys::Service

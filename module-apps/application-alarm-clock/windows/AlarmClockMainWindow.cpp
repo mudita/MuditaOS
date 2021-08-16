@@ -9,7 +9,7 @@
 #include <InputEvent.hpp>
 #include <header/AddElementAction.hpp>
 #include <service-appmgr/Controller.hpp>
-#include <module-services/service-db/service-db/DBNotificationMessage.hpp>
+#include <service-db/DBNotificationMessage.hpp>
 
 namespace app::alarmClock
 {

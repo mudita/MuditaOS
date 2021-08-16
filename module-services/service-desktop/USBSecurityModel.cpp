@@ -7,8 +7,8 @@
 #include "service-desktop/DesktopMessages.hpp"
 #include "service-desktop/WorkerDesktop.hpp"
 
-#include <service-db/service-db/Settings.hpp>
-#include <module-services/service-db/agents/settings/SystemSettings.hpp>
+#include <service-db/Settings.hpp>
+#include <service-db/agents/settings/SystemSettings.hpp>
 
 namespace sdesktop
 {

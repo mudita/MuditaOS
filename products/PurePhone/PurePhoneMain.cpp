@@ -21,13 +21,24 @@
 #include <application-alarm-clock/ApplicationAlarmClock.hpp>
 #include <application-onboarding/ApplicationOnBoarding.hpp>
 
+// modules
+#include <module-db/Databases/AlarmsDB.hpp>
+#include <module-db/Databases/CountryCodesDB.hpp>
+#include <module-db/Databases/EventsDB.hpp>
+#include <module-db/Databases/NotificationsDB.hpp>
+#include <module-db/Interface/AlarmEventRecord.hpp>
+#include <module-db/Interface/AlarmsRecord.hpp>
+#include <module-db/Interface/CountryCodeRecord.hpp>
+#include <module-db/Interface/NotificationsRecord.hpp>
+
 // services
 #include <appmgr/ApplicationManager.hpp>
+#include <db/ServiceDB.hpp>
 #include <evtmgr/EventManager.hpp>
 #include <service-appmgr/Constants.hpp>
 #include <service-audio/ServiceAudio.hpp>
 #include <service-bluetooth/ServiceBluetooth.hpp>
-#include <service-db/ServiceDB.hpp>
+#include <service-db/agents/quotes/QuotesAgent.hpp>
 #include <service-lwip/ServiceLwIP.hpp>
 #include <service-time/ServiceTime.hpp>
 #include <Service/ServiceCreator.hpp>

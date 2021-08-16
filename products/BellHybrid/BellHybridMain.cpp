@@ -10,13 +10,13 @@
 
 // services
 #include <appmgr/ApplicationManager.hpp>
+#include <db/ServiceDB.hpp>
 #include <evtmgr/EventManager.hpp>
 #include <module-services/service-eink/ServiceEink.hpp>
 #include <Service/ServiceCreator.hpp>
 #include <service-appmgr/Constants.hpp>
 #include <service-audio/ServiceAudio.hpp>
 #include <service-bluetooth/ServiceBluetooth.hpp>
-#include <service-db/ServiceDB.hpp>
 #include <service-desktop/ServiceDesktop.hpp>
 #include <service-fileindexer/Constants.hpp>
 #include <service-gui/ServiceGUI.hpp>

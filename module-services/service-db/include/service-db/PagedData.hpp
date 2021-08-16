@@ -22,7 +22,7 @@ auto getList(unsigned int offset, unsigned int limit, std::shared_ptr<QueryResul
         pagedData->data.clear();
         return pagedData;
     }
-    pagedData->count   = query->getRowCount();
+    pagedData->count = query->getRowCount();
 
     // returns all records
     if (limit == 0) {

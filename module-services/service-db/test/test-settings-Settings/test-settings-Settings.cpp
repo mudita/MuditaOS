@@ -2,8 +2,8 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
-#include <module-services/service-db/service-db/Settings.hpp>
-#include "module-services/service-db/service-db/SettingsCache.hpp"
+#include <service-db/Settings.hpp>
+#include <service-db/SettingsCache.hpp>
 #include <utility>
 
 /// stub

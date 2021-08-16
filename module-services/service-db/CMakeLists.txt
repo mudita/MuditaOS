@@ -6,7 +6,7 @@ set(SOURCES
     DBServiceAPI.cpp
     DBServiceAPI_GetByQuery.cpp
     DatabaseAgent.cpp
-    ServiceDB.cpp
+    ServiceDBCommon.cpp
     EntryPath.cpp
     messages/DBCalllogMessage.cpp
     messages/DBContactMessage.cpp
@@ -25,8 +25,10 @@ set(SOURCES
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
 
 target_include_directories(${PROJECT_NAME}
+    PRIVATE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/agents>
     PUBLIC
-        ${CMAKE_CURRENT_LIST_DIR}
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
 
 target_link_libraries(${PROJECT_NAME}

@@ -11,8 +11,8 @@
 #include "windows/Dialog.hpp"
 #include "windows/AppWindow.hpp"
 #include "windows/OptionWindow.hpp"
-#include <module-services/service-db/service-db/DBNotificationMessage.hpp>
-#include <module-services/service-db/service-db/QueryMessage.hpp>
+#include <service-db/DBNotificationMessage.hpp>
+#include <service-db/QueryMessage.hpp>
 
 namespace app
 {
