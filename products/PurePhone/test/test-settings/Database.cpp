@@ -12,7 +12,7 @@
 #include <cstring>
 #include <memory>
 
-#include <module-services/service-db/agents/settings/Settings_queries.hpp>
+#include <service-db/agents/settings/Settings_queries.hpp>
 
 #include <map>
 #include <string>

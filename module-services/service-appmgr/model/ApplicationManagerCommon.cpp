@@ -28,7 +28,7 @@
 #include <log/log.hpp>
 #include <module-db/queries/notifications/QueryNotificationsGetAll.hpp>
 #include <service-audio/AudioMessage.hpp>
-#include <module-services/service-db/agents/settings/SystemSettings.hpp>
+#include <service-db/agents/settings/SystemSettings.hpp>
 #include <module-sys/Timers/TimerFactory.hpp>
 #include <module-utils/Utils.hpp>
 #include <service-appmgr/Constants.hpp>

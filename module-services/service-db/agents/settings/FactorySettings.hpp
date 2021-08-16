@@ -7,7 +7,6 @@
 #include <purefs/filesystem_paths.hpp>
 #include <json11.hpp>
 #include <fstream>
-#include <module-services/service-db/service-db/SettingsMessages.hpp>
 #include "Settings_queries.hpp"
 
 namespace settings

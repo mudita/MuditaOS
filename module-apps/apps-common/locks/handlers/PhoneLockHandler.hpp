@@ -7,7 +7,7 @@
 #include <locks/data/PhoneLockMessages.hpp>
 #include <locks/data/LockData.hpp>
 
-#include <service-db/service-db/Settings.hpp>
+#include <service-db/Settings.hpp>
 #include <module-sys/Service/Service.hpp>
 
 namespace locks

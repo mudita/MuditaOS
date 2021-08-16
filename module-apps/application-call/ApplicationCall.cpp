@@ -12,7 +12,6 @@
 #include <apps-common/windows/DialogMetadata.hpp>
 #include <log/log.hpp>
 #include <module-apps/application-phonebook/data/PhonebookItemData.hpp>
-#include <module-services/service-db/service-db/DBServiceAPI.hpp>
 #include <module-sys/Timers/TimerFactory.hpp>
 #include <PhoneNumber.hpp>
 #include <service-appmgr/Controller.hpp>

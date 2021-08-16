@@ -18,9 +18,9 @@
 
 #include <application-settings/windows/system/ChangeTimeZone.hpp>
 #include <apps-common/locks/data/PhoneLockMessages.hpp>
-#include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <service-appmgr/Constants.hpp>
 #include <service-appmgr/messages/GetCurrentDisplayLanguageResponse.hpp>
+#include <service-db/agents/settings/SystemSettings.hpp>
 
 namespace app
 {

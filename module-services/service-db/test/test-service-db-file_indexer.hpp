@@ -5,7 +5,7 @@
 
 #include <service-db/DatabaseAgent.hpp>
 #include <service-db/FileIndexerMessages.hpp>
-#include <module-services/service-db/agents/file_indexer/FileIndexerAgent.hpp>
+#include <service-db/agents/file_indexer/FileIndexerAgent.hpp>
 
 class FileIndexerTest : public FileIndexerAgent
 {

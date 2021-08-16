@@ -3,7 +3,7 @@
 
 #include "BacklightHandler.hpp"
 #include <service-db/agents/settings/SystemSettings.hpp>
-#include <service-db/service-db/Settings.hpp>
+#include <service-db/Settings.hpp>
 #include <Timers/TimerFactory.hpp>
 #include <Utils.hpp>
 
