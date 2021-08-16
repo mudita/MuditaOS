@@ -56,6 +56,9 @@ namespace rrule
         std::vector<std::uint8_t> byMonth;
         std::vector<std::uint16_t> bySetPos;
 
+        RRule() = default;
+        explicit RRule(std::string_view str);
+
         void parseFromString(std::string_view str);
         std::string parseToString();
         std::vector<TimePoint> generateEventTimePoints(const TimePoint eventStart,

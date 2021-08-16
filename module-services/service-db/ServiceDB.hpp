@@ -38,6 +38,7 @@ class ContactsDB;
 class CountryCodeRecordInterface;
 class CountryCodesDB;
 class DatabaseAgent;
+class EventsDB;
 class NotesDB;
 class NotesRecordInterface;
 class NotificationsDB;
@@ -55,6 +56,7 @@ namespace Quotes
 class ServiceDB : public sys::Service
 {
   private:
+    std::unique_ptr<EventsDB> eventsDB;
     std::unique_ptr<SmsDB> smsDB;
     std::unique_ptr<ContactsDB> contactsDB;
     std::unique_ptr<AlarmsDB> alarmsDB;

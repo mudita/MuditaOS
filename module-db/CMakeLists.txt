@@ -18,6 +18,7 @@ set(SOURCES
         ${SQLITE3_SOURCE}
 
         Databases/ContactsDB.cpp
+        Databases/EventsDB.cpp
         Databases/SmsDB.cpp
         Databases/AlarmsDB.cpp
         Databases/NotesDB.cpp
@@ -42,6 +43,7 @@ set(SOURCES
         Tables/SMSTemplateTable.cpp
         Tables/NotificationsTable.cpp
 
+        Interface/EventRecord.cpp
         Interface/Record.cpp
         Interface/SMSRecord.cpp
         Interface/ContactRecord.cpp
@@ -159,6 +161,7 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE
         application-calendar
         Microsoft.GSL::GSL
+        rrule
 )
 
 # Host target configuration(mainly used for unit testing)
