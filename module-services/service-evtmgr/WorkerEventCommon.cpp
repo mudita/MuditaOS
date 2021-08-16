@@ -5,7 +5,7 @@
 #include "service-evtmgr/EVMessages.hpp"
 #include "service-evtmgr/KbdMessage.hpp"
 #include "service-evtmgr/Constants.hpp"
-#include "service-evtmgr/WorkerEvent.hpp"
+#include "service-evtmgr/WorkerEventCommon.hpp"
 #include "battery-level-check/BatteryLevelCheck.hpp"
 
 #include <Audio/AudioCommon.hpp>
@@ -46,7 +46,7 @@ extern "C"
 #include <string>      // for string
 #include <vector>      // for vector
 
-WorkerEvent::WorkerEvent(sys::Service *service)
+WorkerEventCommon::WorkerEventCommon(sys::Service *service)
     : sys::Worker(service, stackDepthBytes), service(service),
       batteryBrownoutDetector(
           service,
@@ -58,9 +58,8 @@ WorkerEvent::WorkerEvent(sys::Service *service)
           [this]() { checkBatteryChargerInterrupts(); })
 {}
 
-bool WorkerEvent::handleMessage(uint32_t queueID)
+bool WorkerEventCommon::handleMessage(uint32_t queueID)
 {
-
     auto &queue = queues[queueID];
 
     // service queue
@@ -82,27 +81,6 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
         bsp::keyboard_get_data(notification, state, code);
 
         processKeyEvent(static_cast<bsp::KeyEvents>(state), static_cast<bsp::KeyCodes>(code));
-    }
-
-    if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueHeadsetIRQ)) {
-        uint8_t notification;
-        if (!queue->Dequeue(&notification, 0)) {
-            return false;
-        }
-        bool headsetState = false;
-        uint8_t headsetKeyEvent, headsetKeyCode;
-
-        if (bsp::headset::headset_get_data(headsetState, headsetKeyEvent, headsetKeyCode) ==
-            bsp::headset::HeadsetState::Changed) {
-
-            auto message = std::make_shared<AudioEventRequest>(audio::EventType::JackState,
-                                                               headsetState ? audio::Event::DeviceState::Connected
-                                                                            : audio::Event::DeviceState::Disconnected);
-            service->bus.sendUnicast(message, service::name::evt_manager);
-        }
-        else if (auto keyCode = headsetKeyToKeyboardKey(headsetKeyCode); keyCode != bsp::KeyCodes::Undefined) {
-            processKeyEvent(static_cast<bsp::KeyEvents>(headsetKeyEvent), keyCode);
-        }
     }
 
     if (queueID == static_cast<std::uint32_t>(WorkerEventQueues::queueBattery)) {
@@ -130,62 +108,6 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
         service->bus.sendUnicast(message, service::name::evt_manager);
     }
 
-    if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueCellular)) {
-        uint8_t notification;
-        if (!queue->Dequeue(&notification, 0)) {
-            return false;
-        }
-
-        if (notification == bsp::cellular::statusPin) {
-            auto GSMstatus = bsp::cellular::status::getStatus();
-            LOG_DEBUG("GSM Status pin change: %s",
-                      (GSMstatus == bsp::cellular::status::value::ACTIVE ? "ACTIVE" : "INACTIVE"));
-
-            auto message   = std::make_shared<sevm::StatusStateMessage>(MessageType::EVMModemStatus);
-            message->state = GSMstatus;
-            service->bus.sendUnicast(message, "EventManager");
-        }
-
-        if (notification == bsp::cellular::trayPin) {
-            Store::GSM::Tray pinstate = bsp::cellular::sim::getTray();
-            LOG_DEBUG("SIM state change: %d", static_cast<int>(pinstate));
-            service->bus.sendUnicast(std::make_shared<sevm::SIMTrayMessage>(), service::name::evt_manager);
-        }
-
-        if (notification == bsp::cellular::ringIndicatorPin) {
-            auto message = std::make_shared<sevm::StatusStateMessage>(MessageType::EVMRingIndicator);
-            service->bus.sendUnicast(message, "EventManager");
-        }
-    }
-
-    if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueMagnetometerNotify)) {
-        uint8_t notification;
-        if (!queue->Dequeue(&notification, 0)) {
-            return false;
-        }
-
-        bsp::magnetometer::resetCurrentParsedValue();
-        LOG_WARN("Received notify, current value reset!");
-        handleMagnetometerEvent();
-    }
-
-    if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueMagnetometerIRQ)) {
-        uint8_t notification;
-        if (!queue->Dequeue(&notification, 0)) {
-            return false;
-        }
-
-        handleMagnetometerEvent();
-    }
-
-    if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueLightSensor)) {
-        uint8_t notification;
-        if (!queue->Dequeue(&notification, 0)) {
-            return false;
-        }
-        LOG_DEBUG("Light sensor IRQ");
-    }
-
     if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueChargerDetect)) {
         std::uint8_t notification;
         if (!queue->Dequeue(&notification, 0)) {
@@ -198,22 +120,37 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
     return true;
 }
 
-bool WorkerEvent::init(std::list<sys::WorkerQueueInfo> queuesList)
+void WorkerEventCommon::addProductQueues(std::list<sys::WorkerQueueInfo> &queueList)
+{}
+
+void WorkerEventCommon::initProductHardware()
+{}
+
+void WorkerEventCommon::deinitProductHardware()
+{}
+
+bool WorkerEventCommon::initEventQueues()
 {
-    Worker::init(queuesList);
-    bsp::vibrator::init();
+    constexpr auto elementSize = sizeof(std::uint8_t);
+    std::list<sys::WorkerQueueInfo> queuesList;
+
+    queuesList.emplace_back(keyboardQueueName, elementSize, keyboardQueueSize);
+    queuesList.emplace_back(batteryQueueName, elementSize, batteryQueueSize);
+    queuesList.emplace_back(chargerQueueName, elementSize, rtcQueueSize);
+    queuesList.emplace_back(rtcQueueName, elementSize, rtcQueueSize);
+
+    addProductQueues(queuesList);
+
+    return Worker::init(queuesList);
+}
+
+bool WorkerEventCommon::initCommonHardwareComponents()
+{
     bsp::keyboard_Init(queues[static_cast<int32_t>(WorkerEventQueues::queueKeyboardIRQ)]->GetQueueHandle());
-    bsp::headset::Init(queues[static_cast<int32_t>(WorkerEventQueues::queueHeadsetIRQ)]->GetQueueHandle());
     auto queueBatteryHandle = queues[static_cast<int32_t>(WorkerEventQueues::queueBattery)]->GetQueueHandle();
     auto queueChargerDetect = queues[static_cast<int32_t>(WorkerEventQueues::queueChargerDetect)]->GetQueueHandle();
     bsp::battery_charger::init(queueBatteryHandle, queueChargerDetect);
     bsp::rtc::init(queues[static_cast<int32_t>(WorkerEventQueues::queueRTC)]->GetQueueHandle());
-    bsp::cellular::init(queues[static_cast<int32_t>(WorkerEventQueues::queueCellular)]->GetQueueHandle());
-    bsp::magnetometer::init(queues[static_cast<int32_t>(WorkerEventQueues::queueMagnetometerIRQ)]->GetQueueHandle());
-    bsp::torch::init(queues[static_cast<int32_t>(WorkerEventQueues::queueTorch)]->GetQueueHandle());
-    bsp::keypad_backlight::init();
-    bsp::eink_frontlight::init();
-    bsp::light_sensor::init(queues[static_cast<int32_t>(WorkerEventQueues::queueLightSensor)]->GetQueueHandle());
 
     time_t timestamp;
     bsp::rtc::getCurrentTimestamp(&timestamp);
@@ -227,38 +164,32 @@ bool WorkerEvent::init(std::list<sys::WorkerQueueInfo> queuesList)
     auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuSentinel);
     service->bus.sendUnicast(std::move(sentinelRegistrationMsg), service::name::system_manager);
 
+    initProductHardware();
+
     return true;
 }
 
-void WorkerEvent::init(std::list<sys::WorkerQueueInfo> queuesList, std::shared_ptr<settings::Settings> settings)
+void WorkerEventCommon::init(std::shared_ptr<settings::Settings> settings)
 {
-    init(queuesList);
+    initEventQueues();
+    initCommonHardwareComponents();
     battery_level_check::init(service, settings);
 }
 
-bool WorkerEvent::deinit(void)
+bool WorkerEventCommon::deinit(void)
 {
     Worker::deinit();
-    bsp::keyboard_Deinit();
-    bsp::headset::Deinit();
-    bsp::battery_charger::deinit();
-    bsp::torch::deinit();
-    bsp::keypad_backlight::deinit();
-    bsp::eink_frontlight::deinit();
-    bsp::light_sensor::deinit();
-    bsp::vibrator::deinit();
 
+    deinitProductHardware();
+
+    bsp::keyboard_Deinit();
+    bsp::battery_charger::deinit();
     battery_level_check::deinit();
 
     return true;
 }
 
-void WorkerEvent::updateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyHz newFrequency)
-{
-    bsp::eink_frontlight::updateClockFrequency(newFrequency);
-}
-
-void WorkerEvent::processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code)
+void WorkerEventCommon::processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code)
 {
     auto message = std::make_shared<sevm::KbdMessage>();
 
@@ -269,10 +200,10 @@ void WorkerEvent::processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code)
         if (lastState == bsp::KeyEvents::Pressed) {
             return;
         }
-        message->key.state      = RawKey::State::Pressed;
-        message->key.timePress  = xTaskGetTickCount();
-        lastPressed             = code;
-        lastState               = event;
+        message->key.state     = RawKey::State::Pressed;
+        message->key.timePress = xTaskGetTickCount();
+        lastPressed            = code;
+        lastState              = event;
         break;
     case bsp::KeyEvents::Released:
         if (lastState != bsp::KeyEvents::Pressed) {
@@ -283,8 +214,8 @@ void WorkerEvent::processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code)
         }
         lastState = bsp::KeyEvents::Released;
         {
-            message->key.state        = RawKey::State::Released;
-            message->key.timeRelease  = xTaskGetTickCount();
+            message->key.state       = RawKey::State::Released;
+            message->key.timeRelease = xTaskGetTickCount();
         }
         break;
     case bsp::KeyEvents::Moved:
@@ -293,22 +224,8 @@ void WorkerEvent::processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code)
     }
     service->bus.sendUnicast(message, service::name::evt_manager);
 }
-void WorkerEvent::requestSliderPositionRead()
-{
-    uint8_t request = 1;
-    if (auto queue = getQueueByName(WorkerEvent::MagnetometerNotifyQueue); !queue->Overwrite(&request)) {
-        LOG_ERROR("Unable to overwrite the request.");
-    }
-}
-void WorkerEvent::handleMagnetometerEvent()
-{
-    if (const auto &key = bsp::magnetometer::WorkerEventHandler(); key.has_value()) {
-        LOG_DEBUG("magneto IRQ handler: %s", c_str(*key));
-        processKeyEvent(bsp::KeyEvents::Moved, *key);
-    }
-}
 
-void WorkerEvent::checkBatteryChargerInterrupts()
+void WorkerEventCommon::checkBatteryChargerInterrupts()
 {
     auto topINT = bsp::battery_charger::getTopControllerINTSource();
     if (topINT & static_cast<std::uint8_t>(bsp::battery_charger::topControllerIRQsource::CHGR_INT)) {
@@ -352,17 +269,7 @@ void WorkerEvent::checkBatteryChargerInterrupts()
     }
 }
 
-bsp::KeyCodes WorkerEvent::headsetKeyToKeyboardKey(uint8_t headsetKeyCode)
+void WorkerEventCommon::updateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyHz newFrequency)
 {
-    switch (headsetKeyCode) {
-    case static_cast<uint8_t>(bsp::headset::KeyCode::Key1):
-        return bsp::KeyCodes::HeadsetOk;
-
-    case static_cast<uint8_t>(bsp::headset::KeyCode::Key3):
-        return bsp::KeyCodes::HeadsetVolUp;
-
-    case static_cast<uint8_t>(bsp::headset::KeyCode::Key4):
-        return bsp::KeyCodes::HeadsetVolDown;
-    }
-    return bsp::KeyCodes::Undefined;
+    bsp::eink_frontlight::updateClockFrequency(newFrequency);
 }

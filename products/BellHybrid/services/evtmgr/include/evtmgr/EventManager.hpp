@@ -6,10 +6,7 @@
 #include <service-evtmgr/EventManagerCommon.hpp>
 
 class EventManager : public EventManagerCommon
-{
-  private:
-    sys::ReturnCodes InitHandler() override;
-};
+{};
 
 namespace sys
 {

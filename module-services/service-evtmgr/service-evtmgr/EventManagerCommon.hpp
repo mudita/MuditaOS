@@ -20,7 +20,7 @@
 #include <sys/types.h>
 #include <service-db/Settings.hpp>
 
-class WorkerEvent;
+class WorkerEventCommon;
 
 class EventManagerCommon : public sys::Service
 {
@@ -36,9 +36,11 @@ class EventManagerCommon : public sys::Service
 
   protected:
     virtual void handleKeyEvent(sys::Message *msg);
+    virtual void initProductEvents();
+    virtual auto createEventWorker() -> std::unique_ptr<WorkerEventCommon>;
 
     std::shared_ptr<settings::Settings> settings;
-    std::unique_ptr<WorkerEvent> EventWorker;
+    std::unique_ptr<WorkerEventCommon> EventWorker;
     // application where key events are sent. This is also only application that is allowed to change keyboard long
     // press settings.
     std::string targetApplication;
@@ -58,7 +60,7 @@ class EventManagerCommon : public sys::Service
     sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
 
     // Invoked during initialization
-    sys::ReturnCodes InitHandler() override;
+    sys::ReturnCodes InitHandler() final;
 
     sys::ReturnCodes DeinitHandler() override;
 

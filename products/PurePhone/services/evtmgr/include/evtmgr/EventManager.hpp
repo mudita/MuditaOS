@@ -17,7 +17,6 @@ class EventManager : public EventManagerCommon
     {}
 
   private:
-    sys::ReturnCodes InitHandler() override;
     sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
     void toggleTorchOnOff();
     void toggleTorchColor();
@@ -26,6 +25,8 @@ class EventManager : public EventManagerCommon
 
     bool processVibraRequest(bsp::vibrator::Action act,
                              std::chrono::milliseconds RepetitionTime = std::chrono::milliseconds{1000});
+    void initProductEvents() final;
+    auto createEventWorker() -> std::unique_ptr<WorkerEventCommon> final;
 
     std::unique_ptr<vibra_handle::Vibra> Vibra;
     backlight::Handler backlightHandler;
