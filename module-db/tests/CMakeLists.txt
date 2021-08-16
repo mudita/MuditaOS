@@ -2,6 +2,7 @@ add_catch2_executable(
     NAME
         db
     SRCS
+        AlarmEventRecord_tests.cpp
         AlarmsRecord_tests.cpp
         AlarmsTable_tests.cpp
         CalllogRecord_tests.cpp
