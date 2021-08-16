@@ -15,7 +15,8 @@
 #include <json11.hpp>
 #include <log.hpp>
 #include <application-desktop/Constants.hpp>
-#include <service-db/service-db/Settings.hpp>
+#include <locks/data/PhoneLockMessages.hpp>
+#include <service-appmgr/Constants.hpp>
 #include <service-db/QueryMessage.hpp>
 #include <service-evtmgr/EventManagerCommon.hpp>
 #include <service-evtmgr/EVMessages.hpp>
@@ -23,9 +24,6 @@
 #include <module-sys/SystemManager/SystemManagerCommon.hpp>
 #include <module-sys/Timers/TimerFactory.hpp>
 
-#include <locks/data/PhoneLockMessages.hpp>
-#include <service-appmgr/Constants.hpp>
-#include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <module-sys/SystemManager/Constants.hpp>
 #include <module-sys/SystemManager/messages/TetheringStateRequest.hpp>
 #include <endpoints/bluetooth/BluetoothMessagesHandler.hpp>

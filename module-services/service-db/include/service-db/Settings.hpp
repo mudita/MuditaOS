@@ -23,8 +23,8 @@ namespace settings
     class Settings
     {
       public:
-        using ValueChangedCallback           = std::function<void(const std::string &)>;
-        using ValueChangedCallbackWithName   = std::function<void(const std::string &, const std::string &value)>;
+        using ValueChangedCallback         = std::function<void(const std::string &)>;
+        using ValueChangedCallbackWithName = std::function<void(const std::string &, const std::string &value)>;
 
         Settings() = default;
         virtual ~Settings();

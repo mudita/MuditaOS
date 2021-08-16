@@ -14,8 +14,8 @@
 
 namespace FileIndexer
 {
-    constexpr unsigned int FILE_ID_NOT_EXISTS       = 0;
-    constexpr unsigned int FILE_RECORD_COLUMN_COUNT = 7;
+    constexpr unsigned int FILE_ID_NOT_EXISTS               = 0;
+    constexpr unsigned int FILE_RECORD_COLUMN_COUNT         = 7;
     constexpr unsigned int NOTIFICATION_RECORD_COLUMN_COUNT = 3;
 
     // refers to file_tab

@@ -16,7 +16,7 @@
 #include <cassert>
 #include <functional>
 #include <memory>
-#include <module-services/service-db/service-db/DBNotificationMessage.hpp>
+#include <service-db/DBNotificationMessage.hpp>
 
 using namespace style;
 using namespace callLogStyle;

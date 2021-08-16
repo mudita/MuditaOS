@@ -3,7 +3,6 @@
 
 #include "CallLogOptionsWindow.hpp"
 #include <i18n/i18n.hpp>
-#include <module-services/service-db/service-db/DBServiceAPI.hpp>
 #include <OptionContact.hpp>
 
 /// below just for apps names...

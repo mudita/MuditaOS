@@ -4,7 +4,7 @@
 #pragma once
 
 #include <gui/SwitchData.hpp>
-#include <service-db/service-db/QuotesMessages.hpp>
+#include <service-db/QuotesMessages.hpp>
 
 namespace Quotes
 {
