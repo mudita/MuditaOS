@@ -55,6 +55,11 @@ namespace rrule
         }
     }
 
+    RRule::RRule(std::string_view str)
+    {
+        parseFromString(str);
+    }
+
     void RRule::parseFromString(std::string_view str)
     {
         const auto icalRrule    = icalrecurrencetype_from_string(str.data());
