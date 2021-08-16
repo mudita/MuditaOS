@@ -29,8 +29,8 @@ INSTALL_PACKAGES="
         build-essential \
         ca-certificates \
         ccache \
-        clang-format-10 \
-        clang-tidy \
+        clang-format-12 \
+        clang-tidy-12 \
         curl \
         doxygen \
         g++-10 \
