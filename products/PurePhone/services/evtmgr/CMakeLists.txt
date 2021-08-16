@@ -3,11 +3,15 @@ add_library(evtmgr STATIC)
 target_sources(evtmgr
     PRIVATE
         EventManager.cpp
+	WorkerEvent.cpp
+	WorkerEvent.hpp
     PUBLIC
         include/evtmgr/EventManager.hpp
 )
 
 target_include_directories(evtmgr
+    PRIVATE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )

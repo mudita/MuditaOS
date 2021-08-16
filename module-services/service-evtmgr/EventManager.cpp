@@ -6,7 +6,7 @@
 #include "service-evtmgr/KbdMessage.hpp"
 #include "service-evtmgr/Constants.hpp"
 #include "service-evtmgr/EventManagerCommon.hpp"
-#include "service-evtmgr/WorkerEvent.hpp"
+#include "service-evtmgr/WorkerEventCommon.hpp"
 
 #include "battery-level-check/BatteryLevelCheck.hpp"
 
@@ -43,8 +43,8 @@
 
 namespace
 {
-    constexpr auto loggerDelayMs        = 1000 * 60 * 5;
-    constexpr auto loggerTimerName      = "Logger";
+    constexpr auto loggerDelayMs   = 1000 * 60 * 5;
+    constexpr auto loggerTimerName = "Logger";
 } // namespace
 
 EventManagerCommon::EventManagerCommon(const std::string &name)
@@ -194,10 +194,22 @@ sys::ReturnCodes EventManagerCommon::InitHandler()
         }
         return std::make_shared<sevm::FlushLogsResponse>(false);
     });
-    // initialize keyboard worker
-    EventWorker = std::make_unique<WorkerEvent>(this);
+
+    initProductEvents();
+
+    EventWorker = createEventWorker();
+    EventWorker->init(settings);
+    EventWorker->run();
 
     return sys::ReturnCodes::Success;
+}
+
+void EventManagerCommon::initProductEvents()
+{}
+
+auto EventManagerCommon::createEventWorker() -> std::unique_ptr<WorkerEventCommon>
+{
+    return std::make_unique<WorkerEventCommon>(this);
 }
 
 sys::ReturnCodes EventManagerCommon::DeinitHandler()
