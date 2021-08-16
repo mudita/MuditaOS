@@ -1,4 +1,4 @@
-FROM wearemudita/mudita_os_builder:1.11
+FROM wearemudita/mudita_os_builder:1.12
 
 MAINTAINER ops@mudita.com
 # Docker runner for MuditaOS builds
