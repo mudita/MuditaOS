@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -7,7 +7,7 @@
 #include "application-alarm-clock/models/NewEditAlarmModel.hpp"
 #include "application-alarm-clock/presenter/AlarmClockEditWindowPresenter.hpp"
 #include "application-alarm-clock/data/AlarmsData.hpp"
-#include "windows/AppWindow.hpp"
+#include <AppWindow.hpp>
 #include "Application.hpp"
 #include <InputEvent.hpp>
 #include <ListView.hpp>

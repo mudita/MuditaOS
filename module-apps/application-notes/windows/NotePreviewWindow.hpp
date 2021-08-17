@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "AppWindow.hpp"
+#include <AppWindow.hpp>
 
 #include <module-db/Interface/NotesRecord.hpp>
 #include <module-apps/application-notes/presenter/NotePreviewWindowPresenter.hpp>

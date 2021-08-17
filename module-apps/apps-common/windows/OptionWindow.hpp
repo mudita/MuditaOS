@@ -4,7 +4,7 @@
 #pragma once
 
 #include "Application.hpp"
-#include "AppWindow.hpp"
+#include <AppWindow.hpp>
 #include "ListView.hpp"
 #include <functional>
 #include "Option.hpp"

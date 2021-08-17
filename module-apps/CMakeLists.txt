@@ -8,6 +8,12 @@ module_is_test_entity()
 
 add_library(${PROJECT_NAME} STATIC)
 
+if(${PRODUCT} STREQUAL "PurePhone")
+    include(../products/PurePhone/AppSelector.cmake)
+elseif(${PRODUCT} STREQUAL "BellHybrid")
+    include(../products/BellHybrid/AppSelector.cmake)
+endif()
+
 add_subdirectory(apps-common)
 
 option(ENABLE_APP_ANTENNA "Enable application antenna" OFF)
@@ -39,7 +45,7 @@ foreach(app IN LISTS APPLICATIONS)
     string(TOUPPER ${app} app_upper)
     string(REPLACE "-" "_" app_macro_name ${app_upper})
     if (NOT DEFINED ENABLE_APP_${app_macro_name})
-        option(ENABLE_APP_${app_macro_name} "Enable application ${app}" ON)
+        option(ENABLE_APP_${app_macro_name} "Enable application ${app}" OFF)
     endif()
 
     if(ENABLE_APP_${app_macro_name})
@@ -87,8 +93,6 @@ endif()
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
-        application-messages
-        application-settings
         apps-common
         date::date
         eventstore

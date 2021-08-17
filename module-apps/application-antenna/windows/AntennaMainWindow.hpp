@@ -1,10 +1,10 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include <apps-common/Application.hpp>
-#include <apps-common/windows/AppWindow.hpp>
+#include <AppWindow.hpp>
 #include <module-gui/gui/widgets/Text.hpp>
 #include <service-antenna/ServiceAntenna.hpp>
 

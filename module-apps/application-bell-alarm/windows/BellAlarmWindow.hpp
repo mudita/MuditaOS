@@ -6,7 +6,7 @@
 #include <application-bell-alarm/ApplicationBellAlarm.hpp>
 #include <application-bell-alarm/presenter/BellAlarmWindowPresenter.hpp>
 
-#include <apps-common/windows/AppWindow.hpp>
+#include <AppWindow.hpp>
 
 namespace gui
 {

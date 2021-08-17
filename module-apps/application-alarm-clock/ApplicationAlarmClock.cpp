@@ -9,7 +9,7 @@
 #include "application-alarm-clock/presenter/AlarmClockMainWindowPresenter.hpp"
 #include "application-alarm-clock/presenter/CustomRepeatWindowPresenter.hpp"
 #include "windows/Dialog.hpp"
-#include "windows/AppWindow.hpp"
+#include <AppWindow.hpp>
 #include "windows/OptionWindow.hpp"
 #include <service-db/DBNotificationMessage.hpp>
 #include <service-db/QueryMessage.hpp>

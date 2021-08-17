@@ -169,7 +169,6 @@ target_link_libraries(${PROJECT_NAME}
         module-vfs
         utf8
     PRIVATE
-        application-calendar
         Microsoft.GSL::GSL
         rrule
 )

@@ -27,7 +27,7 @@
 #include <service-appmgr/data/NotificationsChangedActionsParams.hpp>
 #include "service-gui/messages/DrawMessage.hpp" // for DrawMessage
 #include "task.h"                               // for xTaskGetTic...
-#include "windows/AppWindow.hpp"                // for AppWindow
+#include <AppWindow.hpp>                        // for AppWindow
 #include "DOMResponder.hpp"
 #include <Text.hpp>    // for Text
 #include <algorithm>   // for find

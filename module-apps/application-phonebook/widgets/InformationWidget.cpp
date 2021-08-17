@@ -3,7 +3,7 @@
 
 #include "InformationWidget.hpp"
 
-#include "AppWindow.hpp"
+#include <AppWindow.hpp>
 #include "application-phonebook/data/PhonebookStyle.hpp"
 #include "widgets/TextWithIconsWidget.hpp"
 #include "widgets/ActiveIconFactory.hpp"

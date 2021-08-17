@@ -8,7 +8,6 @@
 #include <service-bluetooth/messages/ResponseVisibleDevices.hpp>
 #include <service-bluetooth/messages/Unpair.hpp>
 #include <service-bluetooth/messages/Passkey.hpp>
-#include <application-settings/ApplicationSettings.hpp>
 extern "C"
 {
 #include "btstack.h"
@@ -85,7 +84,7 @@ namespace bluetooth
     {
         auto msg = std::make_shared<message::bluetooth::ResponseVisibleDevices>(devices);
         ownerService->bus.sendUnicast(msg, "ApplicationSettings");
-        ownerService->bus.sendUnicast(std::move(msg), app::name_settings);
+        ownerService->bus.sendUnicast(std::move(msg), "");
     }
 
     auto GAP::startScan() -> int
@@ -209,7 +208,7 @@ namespace bluetooth
 
         auto msg = std::make_shared<BluetoothPairResultMessage>(currentlyProcessedDeviceAddr, result == 0u);
         currentlyProcessedDeviceAddr.clear();
-        ownerService->bus.sendUnicast(std::move(msg), app::name_settings);
+        ownerService->bus.sendUnicast(std::move(msg), "");
     }
     /* @text In ACTIVE, the following events are processed:
      *  - GAP Inquiry result event: BTstack provides a unified inquiry result that contain
@@ -262,7 +261,7 @@ namespace bluetooth
             LOG_DEBUG("PIN code request!");
             hci_event_pin_code_request_get_bd_addr(packet, address);
             auto msg = std::make_shared<::message::bluetooth::RequestPasskey>();
-            ownerService->bus.sendUnicast(std::move(msg), app::name_settings);
+            ownerService->bus.sendUnicast(std::move(msg), "");
         }
         const auto eventType = hci_event_packet_get_type(packet);
         switch (state) {
@@ -293,7 +292,7 @@ namespace bluetooth
         LOG_INFO("Device unpaired");
         std::string unpairedDevAddr{bd_addr_to_str(addr)};
         ownerService->bus.sendUnicast(
-            std::make_shared<message::bluetooth::UnpairResult>(std::move(unpairedDevAddr), true), app::name_settings);
+            std::make_shared<message::bluetooth::UnpairResult>(std::move(unpairedDevAddr), true), "");
         return true;
     }
     void GAP::respondPinCode(const std::string &pin)

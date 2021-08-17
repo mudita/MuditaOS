@@ -5,7 +5,7 @@
 
 #include <cstdint>
 
-#include "AppWindow.hpp"
+#include <AppWindow.hpp>
 
 #include <module-db/Interface/NotesRecord.hpp>
 

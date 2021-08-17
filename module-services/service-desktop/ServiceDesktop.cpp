@@ -14,7 +14,6 @@
 #include <Service/Worker.hpp>
 #include <json11.hpp>
 #include <log.hpp>
-#include <application-desktop/Constants.hpp>
 #include <locks/data/PhoneLockMessages.hpp>
 #include <service-appmgr/Constants.hpp>
 #include <service-db/QueryMessage.hpp>
