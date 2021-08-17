@@ -16,7 +16,6 @@ namespace gui
 
         void buildInterface() override;
         bool onInput(const InputEvent &inputEvent) override;
-        status_bar::Configuration configureStatusBar(status_bar::Configuration appConfiguration) override;
 
       private:
         gui::Spinner *spinnerHour   = nullptr;

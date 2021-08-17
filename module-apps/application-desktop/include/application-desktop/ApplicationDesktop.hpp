@@ -26,10 +26,12 @@ namespace app
     class ApplicationDesktop : public Application, public AsyncCallbackReceiver
     {
       public:
-        explicit ApplicationDesktop(std::string name                    = name_desktop,
-                                    std::string parent                  = {},
-                                    sys::phone_modes::PhoneMode mode    = sys::phone_modes::PhoneMode::Connected,
-                                    StartInBackground startInBackground = {false});
+        explicit ApplicationDesktop(
+            std::string name                            = name_desktop,
+            std::string parent                          = {},
+            sys::phone_modes::PhoneMode phoneMode       = sys::phone_modes::PhoneMode::Connected,
+            sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled,
+            StartInBackground startInBackground         = {false});
 
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
@@ -68,6 +70,7 @@ namespace app
                      manager::actions::SystemBrownout,
                      manager::actions::DisplayLogoAtExit,
                      manager::actions::PhoneModeChanged,
+                     manager::actions::BluetoothModeChanged,
                      manager::actions::NotificationsChanged}};
         }
     };

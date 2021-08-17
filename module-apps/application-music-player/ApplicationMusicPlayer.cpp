@@ -35,9 +35,15 @@ namespace app
 
     ApplicationMusicPlayer::ApplicationMusicPlayer(std::string name,
                                                    std::string parent,
-                                                   sys::phone_modes::PhoneMode mode,
+                                                   sys::phone_modes::PhoneMode phoneMode,
+                                                   sys::bluetooth::BluetoothMode bluetoothMode,
                                                    StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), mode, startInBackground, applicationMusicPlayerStackSize),
+        : Application(std::move(name),
+                      std::move(parent),
+                      phoneMode,
+                      bluetoothMode,
+                      startInBackground,
+                      applicationMusicPlayerStackSize),
           priv{std::make_unique<music_player::internal::MusicPlayerPriv>()}
     {
         LOG_INFO("ApplicationMusicPlayer::create");

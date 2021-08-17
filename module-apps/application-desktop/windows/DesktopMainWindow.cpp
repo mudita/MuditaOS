@@ -89,6 +89,10 @@ namespace gui
         appConfiguration.disable(status_bar::Indicator::NetworkAccessTechnology);
         appConfiguration.disable(status_bar::Indicator::Time);
         appConfiguration.enable(status_bar::Indicator::PhoneMode);
+        appConfiguration.enable(status_bar::Indicator::Battery);
+        appConfiguration.enable(status_bar::Indicator::Signal);
+        appConfiguration.enable(status_bar::Indicator::SimCard);
+        appConfiguration.enable(status_bar::Indicator::Bluetooth);
         return appConfiguration;
     }
 

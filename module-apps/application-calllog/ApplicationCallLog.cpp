@@ -24,9 +24,10 @@ namespace app
 {
     ApplicationCallLog::ApplicationCallLog(std::string name,
                                            std::string parent,
-                                           sys::phone_modes::PhoneMode mode,
+                                           sys::phone_modes::PhoneMode phoneMode,
+                                           sys::bluetooth::BluetoothMode bluetoothMode,
                                            StartInBackground startInBackground)
-        : Application(name, parent, mode, startInBackground, 4096)
+        : Application(name, parent, phoneMode, bluetoothMode, startInBackground, 4096)
     {
         addActionReceiver(manager::actions::ShowCallLog, [this](auto &&data) {
             switchWindow(gui::name::window::main_window, std::move(data));

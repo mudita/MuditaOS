@@ -38,14 +38,13 @@ namespace app
 {
     ApplicationDesktop::ApplicationDesktop(std::string name,
                                            std::string parent,
-                                           sys::phone_modes::PhoneMode mode,
+                                           sys::phone_modes::PhoneMode phoneMode,
+                                           sys::bluetooth::BluetoothMode bluetoothMode,
                                            StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), mode, startInBackground), AsyncCallbackReceiver(this),
-          dbNotificationHandler(this)
+        : Application(std::move(name), std::move(parent), phoneMode, bluetoothMode, startInBackground),
+          AsyncCallbackReceiver(this), dbNotificationHandler(this)
     {
         using namespace gui::status_bar;
-        statusBarManager->enableIndicators(
-            {Indicator::Signal, Indicator::Time, Indicator::Battery, Indicator::SimCard});
         statusBarManager->set(Indicator::SimCard,
                               std::make_shared<SIMConfiguration>(SIMConfiguration::DisplayMode::OnlyInactiveState));
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);

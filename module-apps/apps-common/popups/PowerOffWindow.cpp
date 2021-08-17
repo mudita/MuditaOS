@@ -10,19 +10,7 @@ namespace gui
 {
     PowerOffWindow::PowerOffWindow(app::Application *app, std::unique_ptr<PowerOffPresenter> &&presenter)
         : DialogYesNo(app, popup::window::power_off_window), presenter(std::move(presenter))
-    {
-        statusBar->configure(configureStatusBar(application->getStatusBarConfiguration()));
-    }
-
-    status_bar::Configuration PowerOffWindow::configureStatusBar(status_bar::Configuration appConfiguration)
-    {
-        appConfiguration.enable(status_bar::Indicator::Time);
-        appConfiguration.disable(status_bar::Indicator::Lock);
-        appConfiguration.disable(status_bar::Indicator::Battery);
-        appConfiguration.disable(status_bar::Indicator::Signal);
-        appConfiguration.disable(status_bar::Indicator::SimCard);
-        return appConfiguration;
-    }
+    {}
 
     void PowerOffWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {

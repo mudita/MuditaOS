@@ -9,9 +9,10 @@ namespace app
 {
     ApplicationCalculator::ApplicationCalculator(std::string name,
                                                  std::string parent,
-                                                 sys::phone_modes::PhoneMode mode,
+                                                 sys::phone_modes::PhoneMode phoneMode,
+                                                 sys::bluetooth::BluetoothMode bluetoothMode,
                                                  StartInBackground startInBackground)
-        : Application(name, parent, mode, startInBackground, stack_size)
+        : Application(name, parent, phoneMode, bluetoothMode, startInBackground, stack_size)
     {}
 
     sys::MessagePointer ApplicationCalculator::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
