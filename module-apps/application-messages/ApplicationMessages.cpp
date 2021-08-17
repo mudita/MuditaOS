@@ -40,9 +40,11 @@ namespace app
 
     ApplicationMessages::ApplicationMessages(std::string name,
                                              std::string parent,
-                                             sys::phone_modes::PhoneMode mode,
+                                             sys::phone_modes::PhoneMode phoneMode,
+                                             sys::bluetooth::BluetoothMode bluetoothMode,
                                              StartInBackground startInBackground)
-        : Application(name, parent, mode, startInBackground, messagesStackDepth), AsyncCallbackReceiver{this}
+        : Application(name, parent, phoneMode, bluetoothMode, startInBackground, messagesStackDepth),
+          AsyncCallbackReceiver{this}
     {
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         addActionReceiver(manager::actions::CreateSms, [this](auto &&data) {

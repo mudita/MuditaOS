@@ -8,9 +8,10 @@ namespace app
 {
     ApplicationBellAlarm::ApplicationBellAlarm(std::string name,
                                                std::string parent,
-                                               sys::phone_modes::PhoneMode mode,
+                                               sys::phone_modes::PhoneMode phoneMode,
+                                               sys::bluetooth::BluetoothMode bluetoothMode,
                                                StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), mode, startInBackground)
+        : Application(std::move(name), std::move(parent), phoneMode, bluetoothMode, startInBackground)
     {}
 
     sys::ReturnCodes ApplicationBellAlarm::InitHandler()

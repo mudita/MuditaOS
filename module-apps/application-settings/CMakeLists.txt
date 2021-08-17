@@ -52,6 +52,7 @@ target_sources( ${PROJECT_NAME}
         windows/advanced/UITestWindow.cpp
         windows/advanced/EinkModeWindow.cpp
         windows/advanced/ColorTestWindow.cpp
+        windows/advanced/StatusBarImageTypeWindow.cpp
         windows/bluetooth/AddDeviceWindow.cpp
         windows/bluetooth/AllDevicesWindow.cpp
         windows/bluetooth/BluetoothWindow.cpp

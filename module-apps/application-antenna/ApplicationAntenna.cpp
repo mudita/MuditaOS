@@ -37,9 +37,10 @@ namespace app
 
     ApplicationAntenna::ApplicationAntenna(std::string name,
                                            std::string parent,
-                                           sys::phone_modes::PhoneMode mode,
+                                           sys::phone_modes::PhoneMode phoneMode,
+                                           sys::bluetooth::BluetoothMode bluetoothMode,
                                            StartInBackground startInBackground)
-        : Application(name, parent, mode, startInBackground, antennaApplicationStackSize)
+        : Application(name, parent, phoneMode, bluetoothMode, startInBackground, antennaApplicationStackSize)
     {
         bus.channels.push_back(sys::BusChannel::AntennaNotifications);
         appTimer = sys::TimerFactory::createPeriodicTimer(

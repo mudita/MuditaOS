@@ -95,11 +95,4 @@ namespace gui
         // check if any of the lower inheritance onInput methods catch the event
         return AppWindow::onInput(inputEvent);
     }
-
-    status_bar::Configuration BellMainSetHour::configureStatusBar(status_bar::Configuration appConfiguration)
-    {
-        appConfiguration.disable(gui::status_bar::Indicator::Time);
-        return appConfiguration;
-    }
-
 } // namespace gui

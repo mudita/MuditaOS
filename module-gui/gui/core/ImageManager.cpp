@@ -204,7 +204,7 @@ namespace gui
 
         LOG_INFO("Scanning %s  %s images folder: %s", ext1.c_str(), ext2.c_str(), mapFolder.c_str());
 
-        for (const auto &entry : std::filesystem::directory_iterator(mapFolder)) {
+        for (const auto &entry : std::filesystem::recursive_directory_iterator(mapFolder)) {
             if (!entry.is_directory()) {
                 if (entry.path().extension() == ext1) {
                     ext1MapFiles.push_back(entry.path().string());
@@ -242,15 +242,27 @@ namespace gui
         }
         return imageMaps[id];
     }
-    uint32_t ImageManager::getImageMapID(const std::string &name)
+    uint32_t ImageManager::getImageMapID(const std::string &name, ImageTypeSpecifier specifier)
     {
+        auto searchName = checkAndAddSpecifierToName(name, specifier);
+
         for (uint32_t i = 0; i < imageMaps.size(); ++i) {
-            if (imageMaps[i]->getName() == name) {
+            if (imageMaps[i]->getName() == searchName) {
                 return i;
             }
         }
         LOG_ERROR("Unable to find an image: %s , using deafult fallback image instead.", name.c_str());
         return fallbackImageId;
+    }
+
+    std::string ImageManager::checkAndAddSpecifierToName(const std::string &name, ImageTypeSpecifier specifier)
+    {
+        if (specifier != ImageTypeSpecifier::None) {
+            return name + specifierMap[specifier];
+        }
+        else {
+            return name;
+        }
     }
 
 } /* namespace gui */

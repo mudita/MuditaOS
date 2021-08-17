@@ -133,8 +133,11 @@ namespace app::manager
         auto resolveHomeApplication() -> std::string;
         auto handleLaunchAction(ActionEntry &action) -> ActionProcessStatus;
         auto handleActionOnFocusedApp(ActionEntry &action) -> ActionProcessStatus;
-        auto handlePhoneModeChangedAction(ActionEntry &action) -> ActionProcessStatus;
+        auto handleActionOnActiveApps(ActionEntry &action) -> ActionProcessStatus;
         void handlePhoneModeChanged(sys::phone_modes::PhoneMode phoneMode);
+        auto handleBluetoothModeChangedAction(ActionEntry &action) -> ActionProcessStatus;
+        void handleBluetoothModeChanged(sys::bluetooth::BluetoothMode mode);
+        void changeBluetoothMode(const ApplicationHandle *app);
         void handleTetheringChanged(sys::phone_modes::Tethering tethering);
         void changePhoneMode(sys::phone_modes::PhoneMode phoneMode, const ApplicationHandle *app);
         auto handleCustomAction(ActionEntry &action) -> ActionProcessStatus;
@@ -185,6 +188,7 @@ namespace app::manager
                                         // lock screen.
         std::shared_ptr<settings::Settings> settings;
         std::shared_ptr<sys::phone_modes::Observer> phoneModeObserver;
+        sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled;
 
         locks::PhoneLockHandler phoneLockHandler;
         locks::SimLockHandler simLockHandler;
