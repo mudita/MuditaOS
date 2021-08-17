@@ -21,6 +21,7 @@
 #include "service-bluetooth/messages/Unpair.hpp"
 #include "service-bluetooth/messages/SetDeviceName.hpp"
 #include "service-bluetooth/messages/Ring.hpp"
+#include "service-bluetooth/messages/BluetoothModeChanged.hpp"
 
 #include "SystemManager/messages/SentinelRegistrationMessage.hpp"
 
@@ -173,10 +174,16 @@ auto ServiceBluetooth::handle(message::bluetooth::SetStatus *msg) -> std::shared
     case BluetoothStatus::State::On:
         cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyHz::Level_3);
         sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::PowerOn));
+        bus.sendMulticast(
+            std::make_shared<sys::bluetooth::BluetoothModeChanged>(sys::bluetooth::BluetoothMode::Enabled),
+            sys::BusChannel::BluetoothModeChanges);
         break;
     case BluetoothStatus::State::Off:
         sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::PowerOff));
         cpuSentinel->ReleaseMinimumFrequency();
+        bus.sendMulticast(
+            std::make_shared<sys::bluetooth::BluetoothModeChanged>(sys::bluetooth::BluetoothMode::Disabled),
+            sys::BusChannel::BluetoothModeChanges);
         break;
     default:
         break;
@@ -239,6 +246,9 @@ auto ServiceBluetooth::handle(message::bluetooth::ConnectResult *msg) -> std::sh
     if (msg->isSucceed()) {
         settingsHolder->setValue(bluetooth::Settings::ConnectedDevice, msg->getAddr());
         startTimeoutTimer();
+        bus.sendMulticast(
+            std::make_shared<sys::bluetooth::BluetoothModeChanged>(sys::bluetooth::BluetoothMode::Connected),
+            sys::BusChannel::BluetoothModeChanges);
     }
     bus.sendUnicast(std::make_shared<message::bluetooth::ConnectResult>(*msg), nameSettings);
     return sys::MessageNone{};
@@ -253,6 +263,8 @@ auto ServiceBluetooth::handle([[maybe_unused]] message::bluetooth::Disconnect *m
 auto ServiceBluetooth::handle(message::bluetooth::DisconnectResult *msg) -> std::shared_ptr<sys::Message>
 {
     settingsHolder->setValue(bluetooth::Settings::ConnectedDevice, std::string());
+    bus.sendMulticast(std::make_shared<sys::bluetooth::BluetoothModeChanged>(sys::bluetooth::BluetoothMode::Enabled),
+                      sys::BusChannel::BluetoothModeChanges);
     auto bondedDevicesStr =
         std::visit(bluetooth::StringVisitor(), this->settingsHolder->getValue(bluetooth::Settings::BondedDevices));
     bus.sendUnicast(std::make_shared<message::bluetooth::ResponseBondedDevices>(

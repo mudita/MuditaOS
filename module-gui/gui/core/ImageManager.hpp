@@ -6,12 +6,19 @@
 #include <vector>
 #include <string>
 #include <cstdint>
+#include <map>
 
 namespace gui
 {
     class ImageManager
     {
       private:
+        std::map<ImageTypeSpecifier, std::string> specifierMap = {{ImageTypeSpecifier::None, "None"},
+                                                                  {ImageTypeSpecifier::W_G, "_W_G"},
+                                                                  {ImageTypeSpecifier::B_G, "_B_G"},
+                                                                  {ImageTypeSpecifier::W_M, "_W_M"},
+                                                                  {ImageTypeSpecifier::B_M, "_B_M"}};
+        std::string checkAndAddSpecifierToName(const std::string &name, ImageTypeSpecifier specifier);
         ImageMap *createFallbackImage();
         std::uint32_t fallbackImageId{0};
 
@@ -38,7 +45,7 @@ namespace gui
         virtual ~ImageManager();
 
         ImageMap *getImageMap(uint32_t id);
-        uint32_t getImageMapID(const std::string &name);
+        uint32_t getImageMapID(const std::string &name, ImageTypeSpecifier specifier = ImageTypeSpecifier::None);
         void clear();
     };
 

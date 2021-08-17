@@ -23,8 +23,12 @@ namespace app::manager
         explicit ApplicationHandle(std::unique_ptr<app::ApplicationLauncher> &&_launcher);
 
         void setState(State state) noexcept;
-        void run(sys::phone_modes::PhoneMode mode, sys::Service *caller);
-        void runInBackground(sys::phone_modes::PhoneMode mode, sys::Service *caller);
+        void run(sys::phone_modes::PhoneMode phoneMode,
+                 sys::bluetooth::BluetoothMode bluetoothMode,
+                 sys::Service *caller);
+        void runInBackground(sys::phone_modes::PhoneMode phoneMode,
+                             sys::bluetooth::BluetoothMode bluetoothMode,
+                             sys::Service *caller);
         void close() noexcept;
 
         auto valid() const noexcept -> bool;

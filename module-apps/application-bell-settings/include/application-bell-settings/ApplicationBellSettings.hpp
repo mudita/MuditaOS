@@ -21,10 +21,11 @@ namespace app
     class ApplicationBellSettings : public Application
     {
       public:
-        ApplicationBellSettings(std::string name                    = applicationBellSettingsName,
-                                std::string parent                  = "",
-                                sys::phone_modes::PhoneMode mode    = sys::phone_modes::PhoneMode::Offline,
-                                StartInBackground startInBackground = {false});
+        ApplicationBellSettings(std::string name                            = applicationBellSettingsName,
+                                std::string parent                          = "",
+                                sys::phone_modes::PhoneMode mode            = sys::phone_modes::PhoneMode::Offline,
+                                sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled,
+                                StartInBackground startInBackground         = {false});
 
         sys::ReturnCodes InitHandler() override;
 

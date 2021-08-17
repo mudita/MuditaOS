@@ -17,10 +17,12 @@ namespace app
     class ApplicationBellAlarm : public Application
     {
       public:
-        explicit ApplicationBellAlarm(std::string name                    = applicationBellAlarmName,
-                                      std::string parent                  = "",
-                                      sys::phone_modes::PhoneMode mode    = sys::phone_modes::PhoneMode::Offline,
-                                      StartInBackground startInBackground = {false});
+        explicit ApplicationBellAlarm(
+            std::string name                            = applicationBellAlarmName,
+            std::string parent                          = "",
+            sys::phone_modes::PhoneMode mode            = sys::phone_modes::PhoneMode::Offline,
+            sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled,
+            StartInBackground startInBackground         = {false});
 
         sys::ReturnCodes InitHandler() override;
 

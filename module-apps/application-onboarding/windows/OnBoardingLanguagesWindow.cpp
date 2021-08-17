@@ -12,7 +12,12 @@ namespace app::onBoarding
 {
     OnBoardingLanguagesWindow::OnBoardingLanguagesWindow(app::Application *app, const std::string &name)
         : LanguagesWindow(app, name)
-    {}
+    {
+        applyToStatusBar([](gui::status_bar::Configuration configuration) {
+            configuration.setIndicator(gui::status_bar::Indicator::SimCard, false);
+            return configuration;
+        });
+    }
 
     void OnBoardingLanguagesWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
     {

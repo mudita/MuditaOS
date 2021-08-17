@@ -70,6 +70,15 @@ namespace gui
         }
     }
 
+    bool AppWindow::updateBluetooth(sys::bluetooth::BluetoothMode mode)
+    {
+        if (statusBar == nullptr) {
+            return false;
+        }
+
+        return statusBar->updateBluetooth(mode);
+    }
+
     bool AppWindow::updateSim()
     {
         if (statusBar == nullptr) {

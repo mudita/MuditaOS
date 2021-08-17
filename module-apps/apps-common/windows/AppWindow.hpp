@@ -73,6 +73,7 @@ namespace gui
 
         virtual bool onDatabaseMessage(sys::Message *msg);
 
+        bool updateBluetooth(sys::bluetooth::BluetoothMode mode);
         bool updateSim();
         bool updateBatteryStatus();
         bool updateSignalStrength();

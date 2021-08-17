@@ -18,6 +18,5 @@ namespace gui
 
         void buildInterface() override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
-        status_bar::Configuration configureStatusBar(status_bar::Configuration appConfiguration) override;
     };
 } /* namespace gui */

@@ -36,8 +36,13 @@ namespace gui
     status_bar::Configuration PhoneLockInputWindow::configureStatusBar(status_bar::Configuration appConfiguration)
     {
         if (phoneLockInputTypeAction == locks::PhoneLockInputTypeAction::Unlock) {
-            appConfiguration.enable(status_bar::Indicator::Lock);
             appConfiguration.disable(status_bar::Indicator::Time);
+            appConfiguration.enable(status_bar::Indicator::Lock);
+            appConfiguration.enable(status_bar::Indicator::PhoneMode);
+            appConfiguration.enable(status_bar::Indicator::Battery);
+            appConfiguration.enable(status_bar::Indicator::Signal);
+            appConfiguration.enable(status_bar::Indicator::SimCard);
+            appConfiguration.enable(status_bar::Indicator::Bluetooth);
         }
         else {
             appConfiguration.enable(status_bar::Indicator::Time);

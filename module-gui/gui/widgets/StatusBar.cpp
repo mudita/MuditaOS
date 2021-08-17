@@ -13,10 +13,15 @@
 #include "status-bar/SignalStrengthText.hpp"
 #include "status-bar/NetworkAccessTechnology.hpp"
 #include "status-bar/PhoneMode.hpp"
+#include "status-bar/BT.hpp"
 #include "status-bar/SIM.hpp"
 #include "status-bar/Time.hpp"
 #include "status-bar/Lock.hpp"
 #include <EventStore.hpp>
+
+#if DEVELOPER_SETTINGS_OPTIONS == 1
+gui::ImageTypeSpecifier style::status_bar::imageTypeSpecifier = gui::ImageTypeSpecifier::W_G;
+#endif
 
 namespace gui::status_bar
 {
@@ -59,6 +64,16 @@ namespace gui::status_bar
     void Configuration::setPhoneMode(sys::phone_modes::PhoneMode phoneMode)
     {
         mPhoneMode = phoneMode;
+    }
+
+    auto Configuration::getBluetoothMode() const noexcept -> sys::bluetooth::BluetoothMode
+    {
+        return mBluetoothMode;
+    }
+
+    void Configuration::setBluetoothMode(sys::bluetooth::BluetoothMode bluetoothMode)
+    {
+        mBluetoothMode = bluetoothMode;
     }
 
     auto Configuration::isEnabled(Indicator indicator) const -> bool
@@ -118,7 +133,7 @@ namespace gui::status_bar
         lock = new Lock(centralBox, 0, 0);
         lock->setMargins(Margins(0, 0, 0, margins::iconBottom));
         time = new Time(centralBox, 0, 0, 0, 0);
-        time->setPadding(gui::Padding(0, 0, 0, time::bottomPadding));
+        time->setMargins(gui::Margins(0, 0, 0, time::bottomPadding));
         time->setMaximumSize(time::maxX, this->drawArea.h);
 
         // right
@@ -132,6 +147,8 @@ namespace gui::status_bar
         battery->setMargins(gui::Margins(0, 0, margins::between, margins::iconBottom));
         sim = new SimType(rightBox, 0, 0);
         sim->setMargins(gui::Margins(0, 0, margins::between, margins::iconBottom));
+        bluetooth = new BT(rightBox, 0, 0);
+        bluetooth->setMargins(gui::Margins(0, 0, margins::between, margins::iconBottom));
 
         updateSignalStrength();
         updateNetworkAccessTechnology();
@@ -158,6 +175,10 @@ namespace gui::status_bar
 
         if (config.isEnabled(Indicator::PhoneMode)) {
             phoneMode->setPhoneMode(config.getPhoneMode());
+        }
+
+        if (config.isEnabled(Indicator::Bluetooth)) {
+            bluetooth->setBluetoothMode(config.getBluetoothMode());
         }
 
         for (auto &[indicator, modifier] : config.getIndicatorsModifiers()) {
@@ -191,6 +212,9 @@ namespace gui::status_bar
         case Indicator::SimCard:
             showSim(enabled);
             break;
+        case Indicator::Bluetooth:
+            showBluetooth(enabled);
+            break;
         case Indicator::NetworkAccessTechnology:
             showNetworkAccessTechnology(enabled);
             break;
@@ -222,6 +246,17 @@ namespace gui::status_bar
         enabled ? battery->show() : battery->hide();
     }
 
+    void StatusBar::showBluetooth(bool enabled)
+    {
+        if (enabled && configuration.getBluetoothMode() != sys::bluetooth::BluetoothMode::Disabled) {
+            bluetooth->show();
+        }
+        else {
+            bluetooth->hide();
+        }
+        rightBox->resizeItems();
+    }
+
     void StatusBar::showSim(bool enabled)
     {
         if (enabled) {
@@ -231,6 +266,18 @@ namespace gui::status_bar
         else {
             sim->hide();
         }
+        rightBox->resizeItems();
+    }
+
+    bool StatusBar::updateBluetooth(sys::bluetooth::BluetoothMode mode)
+    {
+        if (bluetooth == nullptr || !configuration.isEnabled(Indicator::Bluetooth)) {
+            return false;
+        }
+        configuration.setBluetoothMode(mode);
+        bluetooth->setBluetoothMode(mode);
+        rightBox->resizeItems();
+        return true;
     }
 
     bool StatusBar::updateSim()
