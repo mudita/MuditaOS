@@ -10,9 +10,10 @@ namespace app
 {
     ApplicationBellMain::ApplicationBellMain(std::string name,
                                              std::string parent,
-                                             sys::phone_modes::PhoneMode mode,
+                                             sys::phone_modes::PhoneMode phoneMode,
+                                             sys::bluetooth::BluetoothMode bluetoothMode,
                                              StartInBackground startInBackground)
-        : Application(name, parent, mode, startInBackground)
+        : Application(name, parent, phoneMode, bluetoothMode, startInBackground)
     {}
 
     sys::ReturnCodes ApplicationBellMain::InitHandler()

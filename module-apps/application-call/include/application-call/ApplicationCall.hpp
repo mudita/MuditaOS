@@ -71,10 +71,11 @@ namespace app
         call::State callState = call::State::IDLE;
 
       public:
-        ApplicationCall(std::string name                    = name_call,
-                        std::string parent                  = {},
-                        sys::phone_modes::PhoneMode mode    = sys::phone_modes::PhoneMode::Connected,
-                        StartInBackground startInBackground = {false});
+        explicit ApplicationCall(std::string name                            = name_call,
+                                 std::string parent                          = {},
+                                 sys::phone_modes::PhoneMode phoneMode       = sys::phone_modes::PhoneMode::Connected,
+                                 sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled,
+                                 StartInBackground startInBackground         = {false});
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
         sys::ReturnCodes DeinitHandler() override;
@@ -135,13 +136,13 @@ namespace app
                      manager::actions::NotAnEmergencyNotification,
                      manager::actions::NoSimNotification,
                      manager::actions::CallRejectedByOfflineNotification,
-                     manager::actions::PhoneModeChanged,
                      manager::actions::ActivateCall,
                      {manager::actions::AbortCall, manager::actions::ActionFlag::AcceptWhenInBackground},
                      manager::actions::HandleOutgoingCall,
                      manager::actions::HandleIncomingCall,
                      manager::actions::HandleCallerId,
-                     manager::actions::HandleCallerId},
+                     manager::actions::HandleCallerId,
+                     manager::actions::BluetoothModeChanged},
                     locks::AutoLockPolicy::PreventPermanently};
         }
     };

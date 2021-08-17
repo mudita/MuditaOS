@@ -42,6 +42,7 @@ target_sources( ${PROJECT_NAME}
         "${CMAKE_CURRENT_LIST_DIR}/status-bar/PhoneMode.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/status-bar/Time.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/status-bar/Lock.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/status-bar/BT.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/Text.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/TextBlock.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/TextDocument.cpp"

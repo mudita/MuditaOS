@@ -198,11 +198,12 @@ namespace app
         void clearLongPressTimeout();
 
         explicit Application(std::string name,
-                             std::string parent                  = "",
-                             sys::phone_modes::PhoneMode mode    = sys::phone_modes::PhoneMode::Connected,
-                             StartInBackground startInBackground = {false},
-                             uint32_t stackDepth                 = 4096,
-                             sys::ServicePriority priority       = sys::ServicePriority::Idle);
+                             std::string parent                          = "",
+                             sys::phone_modes::PhoneMode phoneMode       = sys::phone_modes::PhoneMode::Connected,
+                             sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled,
+                             StartInBackground startInBackground         = {false},
+                             uint32_t stackDepth                         = 4096,
+                             sys::ServicePriority priority               = sys::ServicePriority::Idle);
 
         virtual ~Application() noexcept;
 
@@ -414,6 +415,7 @@ namespace app
         /// application's settings
         std::unique_ptr<settings::Settings> settings;
         sys::phone_modes::PhoneMode phoneMode;
+        sys::bluetooth::BluetoothMode bluetoothMode;
 
         locks::PhoneLockSubject phoneLockSubject;
         locks::LockPolicyHandler lockPolicyHandler;

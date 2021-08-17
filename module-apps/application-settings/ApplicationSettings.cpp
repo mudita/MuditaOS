@@ -9,6 +9,7 @@
 #include <application-settings/windows/advanced/UITestWindow.hpp>
 #include <application-settings/windows/advanced/EinkModeWindow.hpp>
 #include <application-settings/windows/advanced/ColorTestWindow.hpp>
+#include <application-settings/windows/advanced/StatusBarImageTypeWindow.hpp>
 #include <application-settings/windows/bluetooth/BluetoothWindow.hpp>
 #include <application-settings/windows/bluetooth/AddDeviceWindow.hpp>
 #include <application-settings/windows/bluetooth/AllDevicesWindow.hpp>
@@ -94,9 +95,11 @@ namespace app
 
     ApplicationSettings::ApplicationSettings(std::string name,
                                              std::string parent,
-                                             sys::phone_modes::PhoneMode mode,
+                                             sys::phone_modes::PhoneMode phoneMode,
+                                             sys::bluetooth::BluetoothMode bluetoothMode,
                                              StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), mode, startInBackground, settingStackDepth),
+        : Application(
+              std::move(name), std::move(parent), phoneMode, bluetoothMode, startInBackground, settingStackDepth),
           AsyncCallbackReceiver{this}
     {
         CellularServiceAPI::SubscribeForOwnNumber(this, [&](const std::string &number) {
@@ -346,6 +349,9 @@ namespace app
         });
         windowsFactory.attach(gui::window::name::color_test_window, [](Application *app, const std::string &name) {
             return std::make_unique<gui::ColorTestWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::status_bar_img_type, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::StatusBarImageTypeWindow>(app);
         });
 
         // Bluetooth
