@@ -1829,7 +1829,10 @@ void ServiceCellular::handleCellularHangupCallMessage(CellularHangupCallMessage 
 
 void ServiceCellular::handleCellularDismissCallMessage(sys::Message *msg)
 {
+    LOG_INFO("%s", __PRETTY_FUNCTION__);
+
     auto message = static_cast<CellularDismissCallMessage *>(msg);
+
     hangUpCall();
     if (message->addNotificationRequired()) {
         handleCallAbortedNotification(msg);
@@ -1890,6 +1893,7 @@ auto ServiceCellular::handleDBNotificationMessage(db::NotificationMessage *msg) 
 
 auto ServiceCellular::handleCellularRingingMessage(CellularRingingMessage *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
+    LOG_INFO("%s", __PRETTY_FUNCTION__);
     return std::make_shared<CellularResponseMessage>(ongoingCall.startCall(msg->number, CallType::CT_OUTGOING));
 }
 
@@ -1898,6 +1902,7 @@ auto ServiceCellular::handleCellularIncomingCallMessage(sys::Message *msg) -> st
     LOG_INFO("%s", __PRETTY_FUNCTION__);
     auto ret     = true;
     auto message = static_cast<CellularIncominCallMessage *>(msg);
+
     if (!ongoingCall.isValid()) {
         ret = ongoingCall.startCall(message->number, CallType::CT_INCOMING);
     }
@@ -1906,7 +1911,6 @@ auto ServiceCellular::handleCellularIncomingCallMessage(sys::Message *msg) -> st
 
 auto ServiceCellular::handleCellularCallerIdMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
-
     auto message = static_cast<CellularCallerIdMessage *>(msg);
     ongoingCall.setNumber(message->number);
     return sys::MessageNone{};
@@ -2171,8 +2175,9 @@ auto ServiceCellular::handleCellularRingNotification(sys::Message *msg) -> std::
 {
     LOG_INFO("%s", __PRETTY_FUNCTION__);
 
-    if (phoneModeObserver->isTetheringOn())
+    if (phoneModeObserver->isTetheringOn() || connectionManager->forceDismissCalls()) {
         return std::make_shared<CellularResponseMessage>(hangUpCall());
+    }
 
     if (!callManager.isIncomingCallPropagated()) {
         auto message = static_cast<CellularRingNotification *>(msg);
@@ -2185,6 +2190,10 @@ auto ServiceCellular::handleCellularRingNotification(sys::Message *msg) -> std::
 
 auto ServiceCellular::handleCellularCallerIdNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
+    if (connectionManager->forceDismissCalls()) {
+        return std::make_shared<CellularResponseMessage>(hangUpCall());
+    }
+
     auto message = static_cast<CellularCallerIdNotification *>(msg);
     if (phoneModeObserver->isTetheringOn()) {
         tetheringCalllog.push_back(CalllogRecord{CallType::CT_MISSED, message->getNubmer()});
