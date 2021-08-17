@@ -51,6 +51,11 @@ class ConnectionManager
      */
     void onTimerTick();
 
+    /// Should we always dismiss incoming calls?
+    /// @return true or false depending on state of forceDismissCallsMode flag
+    /// @see forceDismissCallsMode
+    auto forceDismissCalls() -> bool;
+
   private:
     bool isFlightMode;
     std::chrono::minutes connectionInterval{0};
@@ -58,6 +63,11 @@ class ConnectionManager
     std::chrono::minutes minutesOnlineElapsed{0};
     std::shared_ptr<ConnectionManagerCellularCommandsInterface> cellular;
     bool onlinePeriod = false;
+
+    /// Flag determining if we should always dismiss incoming calls - even when
+    /// we are in offline mode (messages only) and we connect to network to poll
+    /// for new messages
+    bool forceDismissCallsFlag = false;
 
     /**
      * @brief Checks if flightMode and connection interval are set as Messages only mode
