@@ -20,6 +20,10 @@ __dtcm_ram_end = ORIGIN(SRAM_DTC) + LENGTH(SRAM_DTC);
 __sdram_cached_start = ORIGIN(BOARD_SDRAM_HEAP);
 __sdram_cached_end = ORIGIN(BOARD_SDRAM_HEAP) + LENGTH(BOARD_SDRAM_HEAP);
 
+EXTERN(image_vector_table);
+EXTERN(boot_data);
+EXTERN(hyperflash_config);
+
 SECTIONS
 {
     /* Image Vector Table and Boot Data for booting from external flash */
