@@ -1,10 +1,17 @@
 set(ASSETS_SOURCE_DIR ${CMAKE_SOURCE_DIR}/image)
 
-macro(add_assets_target)
+function(add_assets_target)
+    cmake_parse_arguments(
+        _ASSETS
+        "DEVEL"
+        "TARGET;SOURCE_DIR;DEST_DIR"
+        ""
+        ${ARGN}
+    )
 
-    set(_ASSETS_TARGET ${ARGV0})
-    set(_ASSETS_SOURCE_DIR ${ARGV1})
-    set(_ASSETS_DEST_DIR ${ARGV2})
+    if(NOT ${_ASSETS_DEVEL})
+        set(EXCLUDED --exclude \"*-devel*\")
+    endif()
 
     add_custom_target(
         ${_ASSETS_TARGET}
@@ -18,10 +25,11 @@ macro(add_assets_target)
             ${_ASSETS_SOURCE_DIR}/Luts.bin
             ${_ASSETS_SOURCE_DIR}/country-codes.db
             ${_ASSETS_DEST_DIR}/current
-        COMMAND rsync -qravu --delete
+        COMMAND rsync -qravu --delete ${EXCLUDED}
             ${_ASSETS_SOURCE_DIR}/user
             ${_ASSETS_DEST_DIR}
+        COMMAND find ${_ASSETS_DEST_DIR} -name "*-devel*" | sed "\"s,\\(.*\\)-devel\\(.*\\),& \\1\\2,\"" | xargs --no-run-if-empty -L1 mv
         COMMENT
             "Copying assets.. (${_ASSETS_TARGET})"
     )
-endmacro()
+endfunction()
