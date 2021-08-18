@@ -5,12 +5,13 @@
 
 #include <service-db/DBServiceAPI.hpp>
 #include <service-db/QueryMessage.hpp>
+#include <Service/Message.hpp>
 
 #include <cstdint>
 
-namespace app
+namespace sys
 {
-    class Application; // Forward declaration
+    class Service;
 
     using RequestId = std::uint64_t;
     class AsyncCallbackReceiver;
@@ -47,21 +48,21 @@ namespace app
         virtual ~AsyncTask() noexcept = default;
 
         /**
-         * Executes a task in application's thread and saves the receiver object.
-         * @param application       Application
+         * Executes a task in service's thread and saves the receiver object.
+         * @param service       Service
          * @param receiverObject    The context of receiver
          */
-        void execute(Application *application,
+        void execute(sys::Service *service,
                      AsyncCallbackReceiver::Ptr receiverObject,
                      std::optional<std::function<bool(sys::ResponseMessage *)>> callback = std::nullopt);
 
       private:
         /**
          * The specific operation that is to be executed by a task.
-         * @param application   Application
+         * @param service   Service
          * @return Request identifier, to be matched with a response.
          */
-        [[nodiscard]] virtual auto onExecute(Application *application) -> RequestId = 0;
+        [[nodiscard]] virtual auto onExecute(sys::Service *service) -> RequestId = 0;
     };
 
     /**
@@ -79,7 +80,7 @@ namespace app
         void setCallback(std::unique_ptr<db::QueryListener> &&listener) noexcept;
 
       private:
-        [[nodiscard]] auto onExecute(Application *application) -> RequestId override;
+        [[nodiscard]] auto onExecute(sys::Service *service) -> RequestId override;
 
         std::unique_ptr<db::Query> query;
         db::Interface::Name target;
@@ -96,7 +97,7 @@ namespace app
         void setCallback(std::function<bool> &&callback) noexcept;
 
       private:
-        [[nodiscard]] auto onExecute(Application *application) -> RequestId override;
+        [[nodiscard]] auto onExecute(sys::Service *service) -> RequestId override;
 
         std::unique_ptr<sys::DataMessage> message;
         std::string serviceName;
@@ -138,4 +139,4 @@ namespace app
         sys::ResponseMessage *response = nullptr;
         CallbackFunction callbackFunction;
     };
-} // namespace app
+} // namespace sys

@@ -3,6 +3,7 @@ add_catch2_executable(
         system_messages-tests
     SRCS
         tests-main.cpp
+        test-CallbackStorage.cpp
         test-system_messages.cpp
     LIBS
         module-sys

@@ -5,6 +5,7 @@
 
 #include "ServiceForward.hpp"
 #include "BusProxy.hpp"
+#include "CallbackStorage.hpp"
 #include "Common.hpp"  // for ReturnCodes, ServicePriority, BusChannels
 #include "Mailbox.hpp" // for Mailbox
 #include "Message.hpp" // for MessagePointer
@@ -26,7 +27,9 @@
 
 namespace sys
 {
-    class Service : public cpp_freertos::Thread, public std::enable_shared_from_this<Service>
+    class Service : public cpp_freertos::Thread,
+                    public std::enable_shared_from_this<Service>,
+                    public sys::AsyncCallbacksDeleter
     {
       public:
         Service(std::string name,
@@ -94,6 +97,11 @@ namespace sys
 
         std::map<std::type_index, MessageHandler> message_handlers;
 
+        /// Storage for asynchronous tasks callbacks.
+        std::unique_ptr<CallbackStorage> callbackStorage;
+        friend class AsyncTask; // Async tasks need access to application internals, e.g. callback storage, to make
+                                // their API simple.
+
       private:
         /// first point of enttry on messages - actually used method in run
         /// First calls message_handlers
@@ -131,6 +139,8 @@ namespace sys
         }
 
         auto TimerHandle(SystemMessage &message) -> ReturnCodes;
+
+        void cancelCallbacks(AsyncCallbackReceiver::Ptr receiver) override;
     };
 
     /// proxy has one objective - be friend for Service, so that Message which is not a friend could access

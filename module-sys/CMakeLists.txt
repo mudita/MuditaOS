@@ -8,7 +8,9 @@ set(BUS_IMPL_SOURCES
 )
 
 set(SOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/Service/AsyncTask.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Service/BusProxy.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Service/CallbackStorage.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Service/Worker.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Service/Message.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Service/Service.cpp

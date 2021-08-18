@@ -3,11 +3,10 @@
 
 #pragma once
 
-#include "AsyncTask.hpp"
 #include "Audio/AudioCommon.hpp"      // for Volume, Play...
 #include "Audio/Profiles/Profile.hpp" // for Profile, Pro...
-#include "CallbackStorage.hpp"
 
+#include "Service/AsyncTask.hpp"
 #include "Service/Common.hpp"  // for ReturnCodes
 #include "Service/Message.hpp" // for MessagePointer
 #include "Service/Service.hpp" // for Service
@@ -122,7 +121,7 @@ namespace app
     /// This is template for creating new applications. Main difference between Application and service is that:
     /// 1. Application has access to GUI and Input
     /// 2. Application lifetime is managed with app::manager::ApplicationManager
-    class Application : public sys::Service, public AsyncCallbacksDeleter
+    class Application : public sys::Service
     {
       public:
         /// state in which application is right now
@@ -300,8 +299,6 @@ namespace app
 
         void toggleTorchColor();
 
-        void cancelCallbacks(AsyncCallbackReceiver::Ptr receiver) override;
-
         /// @defgroup Application Application static functions
         /// All this functions are meant to be used in ApplicationManager only
         /// @note consider moving these as private elements of ApplicationManager i.e. under names
@@ -389,10 +386,6 @@ namespace app
         bool suspendInProgress = false;
 
         bool systemCloseInProgress = false;
-        /// Storage for asynchronous tasks callbacks.
-        std::unique_ptr<CallbackStorage> callbackStorage;
-        friend class AsyncTask; // Async tasks need access to application internals, e.g. callback storage, to make
-                                // their API simple.
 
         /// informs self that there was key press
         /// used to provide a way for long press/multipress handling in application

@@ -2,9 +2,9 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AsyncTask.hpp"
-#include "Application.hpp"
+#include "Service.hpp"
 
-namespace app
+namespace sys
 {
     AsyncCallbackReceiver::AsyncCallbackReceiver(AsyncCallbacksDeleter *deleter) noexcept : deleter{deleter}
     {}
@@ -16,12 +16,12 @@ namespace app
         }
     }
 
-    void AsyncTask::execute(Application *application,
+    void AsyncTask::execute(Service *service,
                             AsyncCallbackReceiver::Ptr receiverObject,
                             std::optional<std::function<bool(sys::ResponseMessage *)>> callback)
     {
-        const auto requestId = onExecute(application);
-        application->callbackStorage->registerCallback(requestId, receiverObject, std::move(callback));
+        const auto requestId = onExecute(service);
+        service->callbackStorage->registerCallback(requestId, receiverObject, std::move(callback));
     }
 
     std::unique_ptr<AsyncQuery> AsyncQuery::createFromQuery(std::unique_ptr<db::Query> &&query,
@@ -44,9 +44,9 @@ namespace app
         query->setQueryListener(db::QueryCallback::fromFunction(std::move(callback)));
     }
 
-    RequestId AsyncQuery::onExecute(Application *application)
+    RequestId AsyncQuery::onExecute(Service *service)
     {
-        const auto [_, id] = DBServiceAPI::GetQuery(application, target, std::move(query));
+        const auto [_, id] = DBServiceAPI::GetQuery(service, target, std::move(query));
         return id;
     }
 
@@ -60,10 +60,10 @@ namespace app
         : message{std::move(message)}, serviceName{serviceName}
     {}
 
-    auto AsyncRequest::onExecute(Application *application) -> RequestId
+    auto AsyncRequest::onExecute(Service *service) -> RequestId
     {
         std::shared_ptr<sys::DataMessage> msg{std::move(message)};
-        application->bus.sendUnicast(msg, serviceName);
+        service->bus.sendUnicast(msg, serviceName);
         return msg->uniID;
     }
 
@@ -93,4 +93,4 @@ namespace app
     {
         return callbackFunction(response);
     }
-} // namespace app
+} // namespace sys

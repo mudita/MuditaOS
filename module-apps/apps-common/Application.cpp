@@ -103,9 +103,9 @@ namespace app
                              uint32_t stackDepth,
                              sys::ServicePriority priority)
         : Service(std::move(name), std::move(parent), stackDepth, priority),
-          default_window(gui::name::window::main_window), windowsStack(this),
-          keyTranslator{std::make_unique<gui::KeyInputSimpleTranslation>()}, startInBackground{startInBackground},
-          callbackStorage{std::make_unique<CallbackStorage>()}, statusBarManager{std::make_unique<StatusBarManager>()},
+          default_window(gui::name::window::main_window),
+          windowsStack(this), keyTranslator{std::make_unique<gui::KeyInputSimpleTranslation>()},
+          startInBackground{startInBackground}, statusBarManager{std::make_unique<StatusBarManager>()},
           settings(std::make_unique<settings::Settings>()), phoneMode{mode}, phoneLockSubject(this),
           lockPolicyHandler(this), simLockSubject(this)
     {
@@ -963,11 +963,6 @@ namespace app
         if (auto window = getCurrentWindow()->getName(); window == gui::popup::window::phone_lock_window) {
             switchWindow(window, std::move(notificationsParams));
         }
-    }
-
-    void Application::cancelCallbacks(AsyncCallbackReceiver::Ptr receiver)
-    {
-        callbackStorage->removeAll(receiver);
     }
 
     auto Application::getPhoneLockSubject() noexcept -> locks::PhoneLockSubject &

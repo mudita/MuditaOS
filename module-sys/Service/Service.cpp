@@ -69,7 +69,7 @@ namespace sys
         std::string name, std::string parent, uint32_t stackDepth, ServicePriority priority, Watchdog &watchdog)
         : cpp_freertos::Thread(name, stackDepth / 4 /* Stack depth in bytes */, static_cast<UBaseType_t>(priority)),
           parent(parent), bus(this, watchdog), mailbox(this), watchdog(watchdog), pingTimestamp(UINT32_MAX),
-          isReady(false), enableRunLoop(false)
+          isReady(false), enableRunLoop(false), callbackStorage{std::make_unique<CallbackStorage>()}
     {}
 
     Service::~Service()
@@ -258,6 +258,11 @@ namespace sys
     {
         auto msg = std::make_shared<sys::ReadyToCloseMessage>();
         service->bus.sendUnicast(std::move(msg), service::name::system_manager);
+    }
+
+    void Service::cancelCallbacks(AsyncCallbackReceiver::Ptr receiver)
+    {
+        callbackStorage->removeAll(receiver);
     }
 
     auto Proxy::handleMessage(Service *service, Message *message, ResponseMessage *response) -> MessagePointer

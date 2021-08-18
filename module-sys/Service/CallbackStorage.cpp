@@ -7,7 +7,7 @@
 
 #include <algorithm>
 
-namespace app
+namespace sys
 {
     CallbackStorage::CallbackEntry::CallbackEntry(RequestId id,
                                                   AsyncCallbackReceiver::Ptr receiver,
@@ -69,4 +69,4 @@ namespace app
             entries.begin(), entries.end(), [receiver](const auto &entry) { return entry->receiver == receiver; });
         entries.erase(it, entries.end());
     }
-} // namespace app
+} // namespace sys

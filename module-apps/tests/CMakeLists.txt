@@ -3,7 +3,6 @@ add_catch2_executable(
         apps-common
     SRCS
         tests-main.cpp
-        test-CallbackStorage.cpp
         test-PhoneModesPolicies.cpp
     LIBS
         module-apps

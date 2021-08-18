@@ -10,7 +10,7 @@
 #include <memory>
 #include <list>
 
-namespace app
+namespace sys
 {
     class CallbackStorage
     {
@@ -44,4 +44,4 @@ namespace app
 
         std::list<std::unique_ptr<CallbackEntry>> entries;
     };
-} // namespace app
+} // namespace sys

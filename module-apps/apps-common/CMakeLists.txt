@@ -6,8 +6,6 @@ add_library(apps-common STATIC)
 target_sources(apps-common
     PRIVATE
         Application.cpp
-        AsyncTask.cpp
-        CallbackStorage.cpp
         DOMResponder.cpp
         GuiTimer.cpp
         StatusBarManager.cpp
