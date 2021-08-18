@@ -1,7 +1,10 @@
 project(service-desktop)
 message( "${PROJECT_NAME}  ${CMAKE_CURRENT_LIST_DIR}" )
 
-option(ENABLE_DEVELOPER_MODE_ENDPOINT "Enable developer mode endpoint in service desktop" ON)
+option(ENABLE_DEVELOPER_MODE_ENDPOINT
+    "Enable developer mode endpoint in service desktop"
+    ${ENABLE_DEVELOPER_MODE_ENDPOINT_DEFAULT}
+)
 
 set(SOURCES
     endpoints/BaseHelper.cpp
@@ -81,8 +84,6 @@ target_compile_definitions(
         ENABLE_DEVELOPER_MODE_ENDPOINT=$<BOOL:${ENABLE_DEVELOPER_MODE_ENDPOINT}>
 )
 
-
-if (${ENABLE_TESTS})
+if ($<BOOL:${ENABLE_TESTS}> AND ${ENABLE_DEVELOPER_MODE_ENDPOINT})
     add_subdirectory(tests)
 endif ()
-
