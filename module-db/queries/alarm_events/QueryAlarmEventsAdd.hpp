@@ -27,7 +27,7 @@ namespace db::query::alarmEvents
 
       public:
         explicit AddResult(bool ret);
-        [[nodiscard]] auto succeed() const -> bool;
+        [[nodiscard]] auto getResult() const -> bool;
         [[nodiscard]] auto debugInfo() const -> std::string override;
     };
 

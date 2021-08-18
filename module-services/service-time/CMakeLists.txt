@@ -3,6 +3,7 @@ message( "${PROJECT_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}" )
 
 set(SOURCES
     AlarmHandlerFactory.cpp
+    AlarmEventsDBRepository.cpp
     ServiceTime.cpp
     TimeManager.cpp
     RTCcommand.cpp
@@ -21,6 +22,7 @@ target_include_directories(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
         time
+        service-db
         service-time-api
         module-sys
         module-apps

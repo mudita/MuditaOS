@@ -34,6 +34,7 @@ struct AlarmEventRecord : public EventRecord
     bool enabled{false};
     uint32_t snoozeDuration{0};
 
+    AlarmEventRecord() = default;
     AlarmEventRecord(uint32_t id,
                      const UTF8 &name,
                      TimePoint startDate,
