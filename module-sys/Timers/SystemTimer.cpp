@@ -101,6 +101,9 @@ namespace sys::timer
             return;
         }
         log_debug("Timer %s runs callback", name.c_str());
+        if (type == timer::Type::SingleShot) {
+            stop();
+        }
         callback(*this);
     }
 

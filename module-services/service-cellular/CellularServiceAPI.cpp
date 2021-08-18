@@ -50,7 +50,8 @@ bool CellularServiceAPI::HangupCall(sys::Service *serv)
 bool CellularServiceAPI::DismissCall(sys::Service *serv, bool addNotificationToDB)
 {
     auto msg = std::make_shared<CellularDismissCallMessage>(addNotificationToDB);
-    return serv->bus.sendUnicast(msg, ServiceCellular::serviceName);
+    serv->bus.sendMulticast(std::move(msg), sys::BusChannel::ServiceCellularNotifications);
+    return true;
 }
 
 std::string CellularServiceAPI::GetIMSI(sys::Service *serv, bool getFullIMSINumber)
