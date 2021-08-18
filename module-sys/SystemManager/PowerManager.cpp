@@ -243,4 +243,9 @@ namespace sys
         LOG_INFO("%s", log.c_str());
     }
 
+    void PowerManager::SetBootSuccess()
+    {
+        lowPowerControl->SetBootSuccess();
+    }
+
 } // namespace sys

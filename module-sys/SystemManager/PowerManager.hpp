@@ -53,6 +53,7 @@ namespace sys
         void SetCpuFrequencyRequest(std::string sentinelName, bsp::CpuFrequencyHz request);
         void ResetCpuFrequencyRequest(std::string sentinelName);
         void LogPowerManagerEfficiency();
+        void SetBootSuccess();
 
       private:
         /// called when the CPU frequency needs to be increased
