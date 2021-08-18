@@ -50,7 +50,7 @@ namespace audio
             virtual UniqueStreamBuffer allocate(std::size_t size) = 0;
         };
 
-        static constexpr auto defaultBufferingSize = 4U;
+        static constexpr auto defaultBufferingSize = 32U;
 
         Stream(AudioFormat format,
                Allocator &allocator,
