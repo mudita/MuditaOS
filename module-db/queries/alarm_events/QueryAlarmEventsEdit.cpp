@@ -21,7 +21,7 @@ namespace db::query::alarmEvents
     EditResult::EditResult(bool ret) : ret(ret)
     {}
 
-    auto EditResult::succeed() const -> bool
+    auto EditResult::getResult() const -> bool
     {
         return ret;
     }
