@@ -36,4 +36,7 @@ namespace bsp
     void LinuxLPM::SwitchOscillatorSource(bsp::LowPowerMode::OscillatorSource source)
     {}
 
+    void LinuxLPM::SetBootSuccess()
+    {}
+
 } // namespace bsp
