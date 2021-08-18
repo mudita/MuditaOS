@@ -123,6 +123,10 @@ ServiceCellular::ServiceCellular()
 
     callStateTimer = sys::TimerFactory::createPeriodicTimer(
         this, "call_state", std::chrono::milliseconds{1000}, [this](sys::Timer &) { CallStateTimerHandler(); });
+    callEndedRecentlyTimer = sys::TimerFactory::createSingleShotTimer(
+        this, "callEndedRecentlyTimer", std::chrono::seconds{3}, [this](sys::Timer &timer) {
+            priv->outSMSHandler.sendMessageIfDelayed();
+        });
     stateTimer = sys::TimerFactory::createPeriodicTimer(
         this, "state", std::chrono::milliseconds{1000}, [&](sys::Timer &) { handleStateTimer(); });
     ussdTimer = sys::TimerFactory::createPeriodicTimer(
@@ -912,7 +916,7 @@ auto ServiceCellular::handle(db::query::SMSSearchByTypeResult *response) -> bool
     else {
         for (auto &rec : response->getResults()) {
             if (rec.type == SMSType::QUEUED) {
-                priv->outSMSHandler.handleIncomingDbRecord(rec);
+                priv->outSMSHandler.handleIncomingDbRecord(rec, callEndedRecentlyTimer.isActive());
             }
         }
     }
@@ -1805,8 +1809,8 @@ void ServiceCellular::handleCellularHangupCallMessage(CellularHangupCallMessage 
     if (channel) {
         if (channel->cmd(at::AT::ATH)) {
             callManager.hangUp();
-            AntennaServiceAPI::LockRequest(this, antenna::lockState::unlocked);
             callStateTimer.stop();
+            callEndedRecentlyTimer.start();
             if (!ongoingCall.endCall(CellularCall::Forced::True)) {
                 LOG_ERROR("Failed to end ongoing call");
             }

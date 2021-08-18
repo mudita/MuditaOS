@@ -63,8 +63,9 @@ namespace cellular::internal::sms
          * External action events
          */
         void handleDBNotification();
-        void handleIncomingDbRecord(SMSRecord &record);
+        void handleIncomingDbRecord(SMSRecord &record, bool onDelay);
         void handleNoMoreDbRecords();
+        void sendMessageIfDelayed();
 
         /**
          * User defined callbacks/events
@@ -83,6 +84,8 @@ namespace cellular::internal::sms
         void handleStateChange(OptionalState state);
 
         std::unique_ptr<State> currentState;
+        std::function<void()> actionOnDelay;
+        bool delayedMessage;
     };
 
 } // namespace cellular::internal::sms
