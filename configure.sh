@@ -4,14 +4,17 @@
 
 if [[ $BASH_VERSINFO -lt 4 ]]; then
     echo "Please update your bash to at last version 4"
-	echo "your is: ${BASH_VERSINFO}"
+    echo "your is: ${BASH_VERSINFO}"
     exit 4
 fi
 
 function help() {
     echo -e "Use this script for faster configuring build types"
     echo -e "ussage:"
-    echo -e "\t$0 <product> <target> <build_type> [other cmake options]"
+    echo -e "\t$0 [-dh] <product> <target> <build_type> [other cmake options]"
+    echo -e "options:"
+    echo -e "\t\t\td\t\t- turn on development features"
+    echo -e "\t\t\th\t\t- print this help"
     echo -e "available products are:"
     echo -e "\t\t\tpure"
     echo -e "\t\t\tbell"
@@ -20,7 +23,7 @@ function help() {
     echo -e "available build types:"
     echo -e "\t\t\tDebug\t\t- standard debug build"
     echo -e "\t\t\tRelease\t\t- release build (not for debugging)"
-    echo -e "\t\t\tRelWithDebInfo\t - release with debug info in separate file"
+    echo -e "\t\t\tRelWithDebInfo\t- release with debug info in separate file"
     echo -e "\n\e[1m\e[31mThis script will delete previous build dir!\e[0m"
 }
 
@@ -78,6 +81,24 @@ function github_return_build_dir() {
     fi
 }
 
+DEVELOPMENT_FEATURES="OFF"
+while getopts ":d" o; do
+    case "${o}" in
+    d)
+        DEVELOPMENT_FEATURES="ON"
+        ;;
+    h)
+        help
+        exit 0
+	;;
+    *)
+        help
+        exit 1
+        ;;
+    esac
+done
+shift $((OPTIND-1))
+
 PRODUCT=$1
 TARGET=$2
 BUILD_TYPE=$3
@@ -102,6 +123,7 @@ if validate_product_selection && check_target && check_build_type ; then
                     -DCMAKE_TOOLCHAIN_FILE=${SRC_DIR}/${CMAKE_TOOLCHAIN_FILE} \
                     -DPRODUCT=${PRODUCT} \
                     -DCMAKE_EXPORT_COMPILE_COMMANDS=1 \
+                    -DWITH_DEVELOPMENT_FEATURES=${DEVELOPMENT_FEATURES} \
                     $@ \
                     ${SRC_DIR} "
         echo -e "\e[32m${CMAKE_CMD}\e[0m" | tr -s " "
