@@ -4,6 +4,7 @@
 #include "RT1051LPM.hpp"
 
 #include "board.h"
+#include "reboot_codes.hpp"
 #include <log.hpp>
 #include "bsp/BoardDefinitions.hpp"
 #include "bsp/watchdog/watchdog.hpp"
@@ -41,25 +42,18 @@ namespace bsp
 
     int32_t RT1051LPM::Reboot(RebootType reason)
     {
-        enum rebootCode : std::uint32_t
-        {
-            rebootNormalCode       = std::uint32_t{0},
-            rebootToUpdateCode     = std::uint32_t{0xdead0000},
-            rebootToRecoveryCode   = std::uint32_t{0xdead0001},
-            rebootToFactoryRstCode = std::uint32_t{0xdead0002}
-        };
         switch (reason) {
         case RebootType::GoToUpdaterUpdate:
-            SNVS->LPGPR[0] = rebootToUpdateCode;
+            SNVS->LPGPR[0] = bsp::rebootCode::rebootToUpdateCode;
             break;
         case RebootType::GoToUpdaterRecovery:
-            SNVS->LPGPR[0] = rebootToRecoveryCode;
+            SNVS->LPGPR[0] = bsp::rebootCode::rebootToRecoveryCode;
             break;
         case RebootType::GoToUpdaterFactoryReset:
-            SNVS->LPGPR[0] = rebootToFactoryRstCode;
+            SNVS->LPGPR[0] = bsp::rebootCode::rebootToFactoryRstCode;
             break;
         case RebootType::NormalRestart:
-            SNVS->LPGPR[0] = rebootNormalCode;
+            SNVS->LPGPR[0] = bsp::rebootCode::rebootNormalCode;
             break;
         }
         NVIC_SystemReset();
@@ -113,6 +107,11 @@ namespace bsp
             bsp::EnableExternalOscillator();
             cpp_freertos::CriticalSection::Exit();
         }
+    }
+
+    void RT1051LPM::SetBootSuccess()
+    {
+        SNVS->LPGPR[0] = bsp::rebootCode::rebootNormalCode;
     }
 
 } // namespace bsp

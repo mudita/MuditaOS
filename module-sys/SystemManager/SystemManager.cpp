@@ -178,6 +178,8 @@ namespace sys
         if (userInit) {
             userInit();
         }
+
+        powerManager->SetBootSuccess();
     }
 
     void SystemManager::StartSystemServices()
