@@ -110,6 +110,7 @@ class ServiceCellular : public sys::Service
 
     // used for polling for call state
     sys::TimerHandle callStateTimer;
+    sys::TimerHandle callEndedRecentlyTimer;
     sys::TimerHandle stateTimer;
     sys::TimerHandle ussdTimer;
 

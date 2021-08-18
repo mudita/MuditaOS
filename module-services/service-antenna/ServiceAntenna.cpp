@@ -126,7 +126,9 @@ sys::MessagePointer ServiceAntenna::DataReceivedHandler(sys::DataMessage *msgl, 
                                                                        antenna::lockState::locked);
             bus.sendUnicast(std::move(message), service::name::antenna);
         } break;
-        case CellularMessage::Type::HangupCall: {
+        case CellularMessage::Type::HangupCall:
+            [[fallthrough]];
+        case CellularMessage::Type::DismissCall: {
             auto message = std::make_shared<AntennaLockRequestMessage>(MessageType::AntennaLockService,
                                                                        antenna::lockState::unlocked);
             bus.sendUnicast(std::move(message), service::name::antenna);

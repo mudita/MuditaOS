@@ -13,7 +13,7 @@
 
 namespace cellular::internal::sms
 {
-    SMSSendHandler::SMSSendHandler() : currentState(std::make_unique<IdleState>(*this))
+    SMSSendHandler::SMSSendHandler() : currentState(std::make_unique<IdleState>(*this)), delayedMessage{false}
     {}
 
     void SMSSendHandler::handleStateChange(OptionalState state)
@@ -28,9 +28,23 @@ namespace cellular::internal::sms
     {
         handleStateChange(currentState->handle({}));
     }
-    void SMSSendHandler::handleIncomingDbRecord(SMSRecord &record)
+    void SMSSendHandler::handleIncomingDbRecord(SMSRecord &record, bool onDelay)
     {
-        handleStateChange(currentState->handle(record));
+        if (!onDelay) {
+            handleStateChange(currentState->handle(record));
+        }
+        else {
+            delayedMessage = true;
+            actionOnDelay  = [=]() -> void { handleStateChange(currentState->handle(record)); };
+        }
+    }
+
+    void SMSSendHandler::sendMessageIfDelayed()
+    {
+        if (delayedMessage) {
+            delayedMessage = false;
+            actionOnDelay();
+        }
     }
 
     void SMSSendHandler::handleNoMoreDbRecords()
