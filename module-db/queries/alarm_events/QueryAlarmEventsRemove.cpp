@@ -16,7 +16,7 @@ namespace db::query::alarmEvents
     RemoveResult::RemoveResult(const bool ret) : ret(ret)
     {}
 
-    auto RemoveResult::succeed() const -> bool
+    auto RemoveResult::getResult() const -> bool
     {
         return ret;
     }

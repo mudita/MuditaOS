@@ -21,7 +21,7 @@ namespace db::query::alarmEvents
     AddResult::AddResult(bool ret) : ret(ret)
     {}
 
-    auto AddResult::succeed() const -> bool
+    auto AddResult::getResult() const -> bool
     {
         return ret;
     }
