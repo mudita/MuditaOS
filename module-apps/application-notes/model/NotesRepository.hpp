@@ -29,7 +29,7 @@ namespace app::notes
         virtual void remove(const NotesRecord &note, const OnRemoveCallback &callback)             = 0;
     };
 
-    class NotesDBRepository : public AbstractNotesRepository, public app::AsyncCallbackReceiver
+    class NotesDBRepository : public AbstractNotesRepository, public sys::AsyncCallbackReceiver
     {
       public:
         explicit NotesDBRepository(Application *application);

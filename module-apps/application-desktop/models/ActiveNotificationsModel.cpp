@@ -43,7 +43,7 @@ namespace
         Expects(not record.numbers.empty());
         return [app, number = record.numbers[0].number]([[maybe_unused]] gui::Item &_item) {
             auto query = std::make_unique<db::query::ThreadGetByNumber>(number);
-            auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::SMSThread);
+            auto task  = sys::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::SMSThread);
 
             auto queryCallback = [app](db::QueryResult *msg) -> bool {
                 Expects(typeid(*msg) == typeid(db::query::ThreadGetByNumberResult));

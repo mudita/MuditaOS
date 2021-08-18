@@ -9,7 +9,7 @@
 #include <module-db/queries/messages/templates/QuerySMSTemplateGetForList.hpp>
 #include <service-db/DBServiceAPI.hpp>
 
-SMSTemplateModel::SMSTemplateModel(app::Application *app) : DatabaseModel(app), app::AsyncCallbackReceiver{app}
+SMSTemplateModel::SMSTemplateModel(app::Application *app) : DatabaseModel(app), sys::AsyncCallbackReceiver{app}
 {}
 
 unsigned int SMSTemplateModel::requestRecordsCount()
@@ -57,7 +57,7 @@ gui::ListItem *SMSTemplateModel::getItem(gui::Order order)
 void SMSTemplateModel::requestRecords(const uint32_t offset, const uint32_t limit)
 {
     auto query = std::make_unique<db::query::SMSTemplateGetForList>(offset, limit);
-    auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::SMSTemplate);
+    auto task  = sys::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::SMSTemplate);
     task->setCallback([this](auto response) { return handleQueryResponse(response); });
     task->execute(application, this);
 }

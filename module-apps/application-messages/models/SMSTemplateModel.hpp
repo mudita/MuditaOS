@@ -11,7 +11,7 @@
 
 class SMSTemplateModel : public app::DatabaseModel<SMSTemplateRecord>,
                          public gui::ListItemProvider,
-                         public app::AsyncCallbackReceiver
+                         public sys::AsyncCallbackReceiver
 {
   public:
     SMSTemplateModel() = delete;

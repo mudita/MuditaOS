@@ -15,7 +15,7 @@ namespace gui::model
 {
 
     ThreadsSearchResultsModel::ThreadsSearchResultsModel(app::Application *app)
-        : BaseThreadsRecordModel(app), app::AsyncCallbackReceiver{app}
+        : BaseThreadsRecordModel(app), sys::AsyncCallbackReceiver{app}
     {}
 
     auto ThreadsSearchResultsModel::getMinimalItemSpaceRequired() const -> unsigned int
@@ -47,7 +47,7 @@ namespace gui::model
     {
         if (std::string(textToSearch).compare("") != 0) {
             auto query = std::make_unique<db::query::ThreadsSearchForList>(textToSearch, offset, limit);
-            auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::SMSThread);
+            auto task  = sys::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::SMSThread);
             task->setCallback([this](auto response) { return handleQueryResponse(response); });
             task->execute(application, this);
         }

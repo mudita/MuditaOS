@@ -14,7 +14,7 @@
 
 namespace gui
 {
-    class SMSThreadViewWindow : public AppWindow, public app::AsyncCallbackReceiver
+    class SMSThreadViewWindow : public AppWindow, public sys::AsyncCallbackReceiver
     {
       private:
         std::shared_ptr<SMSThreadModel> smsModel;

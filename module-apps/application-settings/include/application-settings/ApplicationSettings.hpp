@@ -110,7 +110,7 @@ namespace app
                                 public settingsInterface::ConnectionSettings,
                                 public settingsInterface::AutoLockSettings,
                                 public settingsInterface::PhoneModeSettings,
-                                public AsyncCallbackReceiver
+                                public sys::AsyncCallbackReceiver
     {
       public:
         explicit ApplicationSettings(std::string name                    = name_settings,

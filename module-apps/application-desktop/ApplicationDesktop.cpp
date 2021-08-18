@@ -40,7 +40,7 @@ namespace app
                                            std::string parent,
                                            sys::phone_modes::PhoneMode mode,
                                            StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), mode, startInBackground), AsyncCallbackReceiver(this),
+        : Application(std::move(name), std::move(parent), mode, startInBackground), sys::AsyncCallbackReceiver(this),
           dbNotificationHandler(this)
     {
         using namespace gui::status_bar;

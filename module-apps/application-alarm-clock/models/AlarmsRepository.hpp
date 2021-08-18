@@ -23,7 +23,7 @@ namespace app::alarmClock
         virtual void turnOffAll(const OnResultCallback &callback)                                         = 0;
     };
 
-    class AlarmsDBRepository : public AbstractAlarmsRepository, public AsyncCallbackReceiver
+    class AlarmsDBRepository : public AbstractAlarmsRepository, public sys::AsyncCallbackReceiver
     {
       public:
         explicit AlarmsDBRepository(Application *app);

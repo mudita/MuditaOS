@@ -15,7 +15,7 @@ namespace style::quotes::list
 namespace Quotes
 {
     CategoriesModel::CategoriesModel(app::Application *application)
-        : DatabaseModel(application), app::AsyncCallbackReceiver{application}, app(application)
+        : DatabaseModel(application), sys::AsyncCallbackReceiver{application}, app(application)
     {}
 
     auto CategoriesModel::requestRecordsCount() -> unsigned int
@@ -42,7 +42,7 @@ namespace Quotes
         LOG_DEBUG(
             "Request categories: offset = %u, limit = %u", static_cast<unsigned>(offset), static_cast<unsigned>(limit));
         auto query = std::make_unique<Messages::GetCategoryListRequest>(offset, limit);
-        auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Quotes);
+        auto task  = sys::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Quotes);
         task->setCallback([this](auto response) { return handleQueryResponse(response); });
         task->execute(app, this);
     }
@@ -80,7 +80,7 @@ namespace Quotes
                           enable);
 
                 auto query = std::make_unique<Messages::EnableCategoryByIdRequest>(category.category_id, enable);
-                auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Quotes);
+                auto task  = sys::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Quotes);
                 task->execute(app, this);
             },
             [app = app](const UTF8 &text) {

@@ -15,7 +15,7 @@ namespace Quotes
 {
     class QuotesModel : public app::DatabaseModel<QuoteRecord>,
                         public gui::ListItemProvider,
-                        public app::AsyncCallbackReceiver
+                        public sys::AsyncCallbackReceiver
     {
       public:
         explicit QuotesModel(app::Application *application);

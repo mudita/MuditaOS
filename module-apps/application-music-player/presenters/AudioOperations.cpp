@@ -15,13 +15,13 @@
 namespace app::music_player
 {
     AudioOperations::AudioOperations(Application *application)
-        : app::AsyncCallbackReceiver{application}, application(application)
+        : sys::AsyncCallbackReceiver{application}, application(application)
     {}
 
     bool AudioOperations::play(const std::string &filePath, const OnPlayCallback &callback)
     {
         auto msg  = std::make_unique<AudioStartPlaybackRequest>(filePath, audio::PlaybackType::Multimedia);
-        auto task = app::AsyncRequest::createFromMessage(std::move(msg), service::name::audio);
+        auto task = sys::AsyncRequest::createFromMessage(std::move(msg), service::name::audio);
         auto cb   = [callback](auto response) {
             auto result = dynamic_cast<AudioStartPlaybackResponse *>(response);
             if (result == nullptr) {
@@ -39,7 +39,7 @@ namespace app::music_player
     bool AudioOperations::pause(const audio::Token &token, const OnPauseCallback &callback)
     {
         auto msg  = std::make_unique<AudioPauseRequest>(token);
-        auto task = app::AsyncRequest::createFromMessage(std::move(msg), service::name::audio);
+        auto task = sys::AsyncRequest::createFromMessage(std::move(msg), service::name::audio);
         auto cb   = [callback](auto response) {
             auto result = dynamic_cast<AudioPauseResponse *>(response);
             if (result == nullptr) {
@@ -56,7 +56,7 @@ namespace app::music_player
     bool AudioOperations::resume(const audio::Token &token, const OnResumeCallback &callback)
     {
         auto msg  = std::make_unique<AudioResumeRequest>(token);
-        auto task = app::AsyncRequest::createFromMessage(std::move(msg), service::name::audio);
+        auto task = sys::AsyncRequest::createFromMessage(std::move(msg), service::name::audio);
         auto cb   = [callback](auto response) {
             auto result = dynamic_cast<AudioResumeResponse *>(response);
             if (result == nullptr) {
@@ -73,7 +73,7 @@ namespace app::music_player
     bool AudioOperations::stop(const audio::Token &token, [[maybe_unused]] const OnStopCallback &callback)
     {
         auto msg  = std::make_unique<AudioStopRequest>(token);
-        auto task = app::AsyncRequest::createFromMessage(std::move(msg), service::name::audio);
+        auto task = sys::AsyncRequest::createFromMessage(std::move(msg), service::name::audio);
         auto cb   = [](auto response) {
             auto result = dynamic_cast<AudioStopResponse *>(response);
             if (result == nullptr) {

@@ -16,7 +16,7 @@
 #include <OptionWindow.hpp>
 #include <service-db/DBServiceAPI.hpp>
 
-ThreadsModel::ThreadsModel(app::Application *app) : BaseThreadsRecordModel(app), app::AsyncCallbackReceiver{app}
+ThreadsModel::ThreadsModel(app::Application *app) : BaseThreadsRecordModel(app), sys::AsyncCallbackReceiver{app}
 {}
 
 auto ThreadsModel::getMinimalItemSpaceRequired() const -> unsigned int
@@ -67,7 +67,7 @@ auto ThreadsModel::getItem(gui::Order order) -> gui::ListItem *
 void ThreadsModel::requestRecords(uint32_t offset, uint32_t limit)
 {
     auto query = std::make_unique<db::query::ThreadsGetForList>(offset, limit);
-    auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::SMSThread);
+    auto task  = sys::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::SMSThread);
     task->setCallback([this](auto response) { return handleQueryResponse(response); });
     task->execute(getApplication(), this);
 }

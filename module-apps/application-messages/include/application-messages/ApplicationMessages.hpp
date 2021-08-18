@@ -21,7 +21,7 @@ namespace gui
 namespace app
 {
 
-    class ApplicationMessages : public app::Application, public app::AsyncCallbackReceiver
+    class ApplicationMessages : public app::Application, public sys::AsyncCallbackReceiver
     {
       public:
         explicit ApplicationMessages(std::string name                    = name_messages,

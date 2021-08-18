@@ -12,7 +12,7 @@
 
 class SMSThreadModel : public app::DatabaseModel<SMSRecord>,
                        public gui::ListItemProvider,
-                       public app::AsyncCallbackReceiver
+                       public sys::AsyncCallbackReceiver
 {
   public:
     unsigned int smsThreadID      = 0;

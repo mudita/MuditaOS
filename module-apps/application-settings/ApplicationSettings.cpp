@@ -97,7 +97,7 @@ namespace app
                                              sys::phone_modes::PhoneMode mode,
                                              StartInBackground startInBackground)
         : Application(std::move(name), std::move(parent), mode, startInBackground, settingStackDepth),
-          AsyncCallbackReceiver{this}
+          sys::AsyncCallbackReceiver{this}
     {
         CellularServiceAPI::SubscribeForOwnNumber(this, [&](const std::string &number) {
             selectedSimNumber = number;

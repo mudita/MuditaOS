@@ -6,16 +6,16 @@
 #include <chrono>
 #include <string>
 
-#include <AsyncTask.hpp>
 #include <AppWindow.hpp>
 #include <PhoneNumber.hpp>
+#include <Service/AsyncTask.hpp>
 #include <widgets/Text.hpp>
 #include <module-db/Interface/SMSRecord.hpp>
 #include <module-db/Interface/ContactRecord.hpp>
 
 namespace gui
 {
-    class NewMessageWindow : public AppWindow, public app::AsyncCallbackReceiver
+    class NewMessageWindow : public AppWindow, public sys::AsyncCallbackReceiver
     {
       public:
         explicit NewMessageWindow(app::Application *app);

@@ -12,7 +12,7 @@
 
 class CalllogModel : public app::DatabaseModel<CalllogRecord>,
                      public gui::ListItemProvider,
-                     public app::AsyncCallbackReceiver
+                     public sys::AsyncCallbackReceiver
 {
   public:
     explicit CalllogModel(app::Application *app);

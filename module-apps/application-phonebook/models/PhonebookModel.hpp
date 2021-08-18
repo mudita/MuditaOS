@@ -19,7 +19,7 @@
 
 class PhonebookModel : public app::DatabaseModel<ContactRecord>,
                        public gui::ListItemProvider,
-                       public app::AsyncCallbackReceiver
+                       public sys::AsyncCallbackReceiver
 {
   private:
     std::string queryFilter;

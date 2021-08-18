@@ -6,7 +6,7 @@
 #include <apps-common/Application.hpp>
 #include <Audio/decoder/Decoder.hpp>
 
-#include <AsyncTask.hpp>
+#include <Service/AsyncTask.hpp>
 
 namespace app::music_player
 {
@@ -26,7 +26,7 @@ namespace app::music_player
         virtual bool stop(const audio::Token &token, const OnStopCallback &callback)     = 0;
     };
 
-    class AudioOperations : public AbstractAudioOperations, public app::AsyncCallbackReceiver
+    class AudioOperations : public AbstractAudioOperations, public sys::AsyncCallbackReceiver
     {
       public:
         explicit AudioOperations(Application *application);

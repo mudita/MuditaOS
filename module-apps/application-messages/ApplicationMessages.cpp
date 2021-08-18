@@ -197,7 +197,7 @@ namespace app
         LOG_DEBUG("Removing thread: %" PRIu32, record->ID);
 
         auto query = std::make_unique<ContactGetByID>(record->contactID, true);
-        auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Contact);
+        auto task  = sys::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Contact);
         task->setCallback([this, record](auto response) {
             auto result = dynamic_cast<ContactGetByIDResult *>(response);
             if (result != nullptr) {
@@ -223,7 +223,7 @@ namespace app
         using db::query::ThreadRemoveResult;
 
         auto query = std::make_unique<ThreadRemove>(record.ID);
-        auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::SMSThread);
+        auto task  = sys::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::SMSThread);
         task->setCallback([this, threadId = record.ID](auto response) {
             const auto result = dynamic_cast<ThreadRemoveResult *>(response);
             if ((result != nullptr) && result->success()) {
@@ -258,12 +258,12 @@ namespace app
         using db::query::ThreadGetByIDResult;
 
         auto query = std::make_unique<SMSRemove>(record.ID);
-        auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::SMS);
+        auto task  = sys::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::SMS);
         task->setCallback([this, record](auto response) {
             auto result = dynamic_cast<SMSRemoveResult *>(response);
             if (result != nullptr && result->getResults()) {
                 auto query = std::make_unique<ThreadGetByID>(record.threadID);
-                auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::SMSThread);
+                auto task  = sys::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::SMSThread);
                 task->setCallback([this](auto response) {
                     const auto result = dynamic_cast<ThreadGetByIDResult *>(response);
                     if (result != nullptr) {

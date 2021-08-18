@@ -23,7 +23,7 @@ namespace gui
 
 namespace app
 {
-    class ApplicationDesktop : public Application, public AsyncCallbackReceiver
+    class ApplicationDesktop : public Application, public sys::AsyncCallbackReceiver
     {
       public:
         explicit ApplicationDesktop(std::string name                    = name_desktop,

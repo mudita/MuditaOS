@@ -23,7 +23,7 @@ namespace db
 
 namespace gui
 {
-    class CalendarMainWindow : public gui::AppWindow, public app::AsyncCallbackReceiver
+    class CalendarMainWindow : public gui::AppWindow, public sys::AsyncCallbackReceiver
     {
         std::array<bool, 31> isDayEmpty;
         std::uint32_t offsetFromTop = 0;

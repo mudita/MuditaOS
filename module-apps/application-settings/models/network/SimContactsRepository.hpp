@@ -24,7 +24,7 @@ class AbstractSimContactsRepository
     virtual void findDuplicates(const std::vector<bool> &selectedContacts, OnDupplicatesCheckCallback callback) = 0;
 };
 
-class SimContactsRepository : public AbstractSimContactsRepository, public app::AsyncCallbackReceiver
+class SimContactsRepository : public AbstractSimContactsRepository, public sys::AsyncCallbackReceiver
 {
   public:
     explicit SimContactsRepository(app::Application *application);

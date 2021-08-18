@@ -15,7 +15,7 @@ class AbstractTechnicalInformationRepository
     virtual std::string getImei()                              = 0;
 };
 
-class TechnicalInformationRepository : public AbstractTechnicalInformationRepository, public app::AsyncCallbackReceiver
+class TechnicalInformationRepository : public AbstractTechnicalInformationRepository, public sys::AsyncCallbackReceiver
 {
   public:
     explicit TechnicalInformationRepository(app::Application *application);

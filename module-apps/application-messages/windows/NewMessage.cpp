@@ -53,7 +53,7 @@ namespace gui
         std::make_unique<NewMessageWindow::MessageMemento>();
 
     NewMessageWindow::NewMessageWindow(app::Application *app)
-        : AppWindow(app, name::window::new_sms), app::AsyncCallbackReceiver{app}
+        : AppWindow(app, name::window::new_sms), sys::AsyncCallbackReceiver{app}
     {
         buildInterface();
     }
@@ -145,7 +145,7 @@ namespace gui
     bool NewMessageWindow::switchToThreadWindow(const utils::PhoneNumber::View &number)
     {
         auto query = std::make_unique<db::query::ThreadGetByNumber>(number);
-        auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::SMSThread);
+        auto task  = sys::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::SMSThread);
         task->setCallback([this](auto response) {
             const auto result = dynamic_cast<db::query::ThreadGetByNumberResult *>(response);
             if (result == nullptr) {
@@ -323,7 +323,7 @@ namespace gui
     {
         auto number = contactRecord.numbers.front().number;
         auto query  = std::make_unique<db::query::ThreadGetByContactID>(contactRecord.ID);
-        auto task   = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::SMSThread);
+        auto task   = sys::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::SMSThread);
         task->setCallback([this, number](auto response) {
             const auto result = dynamic_cast<db::query::ThreadGetByContactIDResult *>(response);
             if (result == nullptr) {
@@ -344,7 +344,7 @@ namespace gui
     auto NewMessageWindow::addDraft(const utils::PhoneNumber &number) -> bool
     {
         auto query = std::make_unique<db::query::ThreadGetByNumber>(number.getView());
-        auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::SMSThread);
+        auto task  = sys::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::SMSThread);
         task->setCallback([this, number](auto response) {
             const auto result = dynamic_cast<db::query::ThreadGetByNumberResult *>(response);
             if (result == nullptr) {
@@ -367,7 +367,7 @@ namespace gui
                                                     const UTF8 &text) -> bool
     {
         auto query = std::make_unique<db::query::SMSGetLastByThreadID>(threadId);
-        auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::SMS);
+        auto task  = sys::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::SMS);
         task->setCallback([this, number](auto response) {
             const auto result = dynamic_cast<db::query::SMSGetLastByThreadIDResult *>(response);
             if (result == nullptr) {

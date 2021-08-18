@@ -6,7 +6,7 @@
 #include <module-db/Interface/ContactRecord.hpp>
 #include "BaseThreadsRecordModel.hpp"
 
-class ThreadsModel : public BaseThreadsRecordModel, public app::AsyncCallbackReceiver
+class ThreadsModel : public BaseThreadsRecordModel, public sys::AsyncCallbackReceiver
 {
   public:
     explicit ThreadsModel(app::Application *app);

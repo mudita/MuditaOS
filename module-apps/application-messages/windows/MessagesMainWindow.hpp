@@ -17,7 +17,7 @@
 
 namespace gui
 {
-    class MessagesMainWindow : public AppWindow, public app::AsyncCallbackReceiver
+    class MessagesMainWindow : public AppWindow, public sys::AsyncCallbackReceiver
     {
       protected:
         Icon *emptyListIcon                        = nullptr;

@@ -17,7 +17,7 @@ namespace style::quotes::list
 namespace Quotes
 {
     QuotesModel::QuotesModel(app::Application *application)
-        : DatabaseModel(application), app::AsyncCallbackReceiver{application}, app(application)
+        : DatabaseModel(application), sys::AsyncCallbackReceiver{application}, app(application)
     {}
 
     auto QuotesModel::requestRecordsCount() -> unsigned int
@@ -44,7 +44,7 @@ namespace Quotes
         LOG_DEBUG(
             "Request quotes: offset = %u, limit = %u", static_cast<unsigned>(offset), static_cast<unsigned>(limit));
         auto query = std::make_unique<Messages::GetQuotesListFromCustomCategoryRequest>(offset, limit);
-        auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Quotes);
+        auto task  = sys::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Quotes);
         task->setCallback([this](auto response) { return handleQueryResponse(response); });
         task->execute(app, this);
     }
@@ -82,7 +82,7 @@ namespace Quotes
                           enable);
 
                 auto query = std::make_unique<Messages::EnableQuoteByIdRequest>(quote.quote_id, enable);
-                auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Quotes);
+                auto task  = sys::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Quotes);
                 task->execute(app, this);
             },
             [app = app](const UTF8 &text) {
@@ -105,7 +105,7 @@ namespace Quotes
     {
         LOG_DEBUG("Adding quote: lang_id = %u", static_cast<unsigned>(record.lang_id));
         auto query = std::make_unique<Messages::AddQuoteRequest>(record.lang_id, record.quote, record.author, true);
-        auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Quotes);
+        auto task  = sys::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Quotes);
         task->execute(app, this);
     }
 
@@ -115,7 +115,7 @@ namespace Quotes
 
         auto query = std::make_unique<Messages::WriteQuoteRequest>(
             record.quote_id, record.lang_id, record.quote, record.author, record.enabled);
-        auto task = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Quotes);
+        auto task = sys::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Quotes);
         task->execute(app, this);
     }
 
@@ -124,7 +124,7 @@ namespace Quotes
         LOG_DEBUG("Removing quote: lang_id = %u", static_cast<unsigned>(record.lang_id));
 
         auto query = std::make_unique<Messages::DeleteQuoteRequest>(record.quote_id);
-        auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Quotes);
+        auto task  = sys::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Quotes);
         task->execute(app, this);
     }
 

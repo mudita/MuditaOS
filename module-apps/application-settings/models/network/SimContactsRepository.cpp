@@ -10,7 +10,7 @@
 #include <application-settings/ApplicationSettings.hpp>
 
 SimContactsRepository::SimContactsRepository(app::Application *application)
-    : app::AsyncCallbackReceiver{application}, application{application}
+    : sys::AsyncCallbackReceiver{application}, application{application}
 {}
 
 const std::vector<ContactRecord> &SimContactsRepository::getImportedRecords()
@@ -45,7 +45,7 @@ void SimContactsRepository::findDuplicates(const std::vector<bool> &selectedCont
 #endif
 
     auto query = std::make_unique<db::query::CheckContactsListDuplicates>(recordsToSave);
-    auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Contact);
+    auto task  = sys::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Contact);
     task->setCallback([&, callback](auto response) {
         auto result = dynamic_cast<db::query::CheckContactsListDuplicatesResult *>(response);
         if (result == nullptr) {
@@ -87,7 +87,7 @@ void SimContactsRepository::save(const std::vector<bool> &selectedContacts,
 #endif
 
     auto query = std::make_unique<db::query::MergeContactsList>(recordsToSave);
-    auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Contact);
+    auto task  = sys::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Contact);
     task->setCallback([&, callback](auto response) {
         auto result = dynamic_cast<db::query::MergeContactsListResult *>(response);
         if (result == nullptr) {
@@ -107,7 +107,7 @@ void SimContactsRepository::read(AbstractSimContactsRepository::OnReadCallback r
         [&](const std::vector<cellular::SimContact> &simData) { updateImportedRecords(simData); };
 
     auto msg  = std::make_unique<cellular::GetSimContactsRequest>();
-    auto task = app::AsyncRequest::createFromMessage(std::move(msg), cellular::service::name);
+    auto task = sys::AsyncRequest::createFromMessage(std::move(msg), cellular::service::name);
     auto cb   = [callback, readDoneCallback](auto response) {
         auto result = dynamic_cast<cellular::GetSimContactsResponse *>(response);
         if (result != nullptr && result->retCode == sys::ReturnCodes::Success) {

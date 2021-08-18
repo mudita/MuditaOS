@@ -13,7 +13,7 @@ namespace gui
 {
 
     CalendarMainWindow::CalendarMainWindow(app::Application *app, const std::string &name)
-        : AppWindow(app, name), app::AsyncCallbackReceiver{app}
+        : AppWindow(app, name), sys::AsyncCallbackReceiver{app}
     {
         std::chrono::system_clock::time_point tp = std::chrono::system_clock::now();
         this->actualDate = date::year_month_day{date::floor<date::days>(tp)};

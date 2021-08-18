@@ -6,7 +6,7 @@
 #include <application-settings/ApplicationSettings.hpp>
 
 TechnicalInformationRepository::TechnicalInformationRepository(app::Application *application)
-    : app::AsyncCallbackReceiver{application}, application{application}
+    : sys::AsyncCallbackReceiver{application}, application{application}
 {}
 
 void TechnicalInformationRepository::readImei(AbstractTechnicalInformationRepository::OnReadCallback readDoneCallback)
@@ -15,7 +15,7 @@ void TechnicalInformationRepository::readImei(AbstractTechnicalInformationReposi
     std::function<void(const std::string &imei)> callback = [&](const std::string &imei) { imeiStr = imei; };
 
     auto msg  = std::make_unique<cellular::GetImeiRequest>();
-    auto task = app::AsyncRequest::createFromMessage(std::move(msg), cellular::service::name);
+    auto task = sys::AsyncRequest::createFromMessage(std::move(msg), cellular::service::name);
     auto cb   = [callback, readDoneCallback](auto response) {
         auto result = dynamic_cast<cellular::GetImeiResponse *>(response);
         if (result != nullptr && result->retCode == sys::ReturnCodes::Success) {

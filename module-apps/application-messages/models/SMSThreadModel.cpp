@@ -12,7 +12,7 @@
 #include <service-db/DBServiceAPI.hpp>
 #include <service-db/QueryMessage.hpp>
 
-SMSThreadModel::SMSThreadModel(app::Application *app) : DatabaseModel(app), app::AsyncCallbackReceiver{app}
+SMSThreadModel::SMSThreadModel(app::Application *app) : DatabaseModel(app), sys::AsyncCallbackReceiver{app}
 {
     smsInput = new gui::SMSInputWidget(application);
 }
@@ -52,7 +52,7 @@ unsigned int SMSThreadModel::requestRecordsCount()
 void SMSThreadModel::requestRecords(uint32_t offset, uint32_t limit)
 {
     auto query = std::make_unique<db::query::SMSGetForList>(smsThreadID, offset, limit, numberID);
-    auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::SMS);
+    auto task  = sys::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::SMS);
     task->setCallback([this](auto response) { return handleQueryResponse(response); });
     task->execute(application, this);
 }

@@ -9,7 +9,7 @@
 #include <module-db/queries/alarms/QueryAlarmsTurnOffAll.hpp>
 #include <service-db/DBServiceAPI.hpp>
 
-#include "AsyncTask.hpp"
+#include <Service/AsyncTask.hpp>
 
 namespace app::alarmClock
 {
@@ -20,7 +20,7 @@ namespace app::alarmClock
     void AlarmsDBRepository::getLimited(std::uint32_t offset, std::uint32_t limit, const OnGetCallback &callback)
     {
         auto query = std::make_unique<db::query::alarms::GetLimited>(offset, limit);
-        auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Alarms);
+        auto task  = sys::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Alarms);
         task->setCallback([callback](auto response) {
             auto result = dynamic_cast<db::query::alarms::GetLimitedResult *>(response);
             if (result == nullptr) {
@@ -38,7 +38,7 @@ namespace app::alarmClock
     void AlarmsDBRepository::GetQuery(std::unique_ptr<QueryType> query,
                                       const AbstractAlarmsRepository::OnResultCallback &callback)
     {
-        auto task = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Alarms);
+        auto task = sys::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Alarms);
         task->setCallback([callback](auto response) {
             auto result = dynamic_cast<ResultType *>(response);
             if (result == nullptr) {

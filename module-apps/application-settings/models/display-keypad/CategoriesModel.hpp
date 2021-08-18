@@ -10,7 +10,7 @@ namespace Quotes
 {
     class CategoriesModel : public app::DatabaseModel<CategoryRecord>,
                             public gui::ListItemProvider,
-                            public app::AsyncCallbackReceiver
+                            public sys::AsyncCallbackReceiver
     {
       public:
         explicit CategoriesModel(app::Application *app);

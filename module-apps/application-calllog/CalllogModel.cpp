@@ -15,7 +15,7 @@
 
 using namespace calllog;
 
-CalllogModel::CalllogModel(app::Application *app) : DatabaseModel(app), app::AsyncCallbackReceiver(app)
+CalllogModel::CalllogModel(app::Application *app) : DatabaseModel(app), sys::AsyncCallbackReceiver(app)
 {}
 
 unsigned int CalllogModel::requestRecordsCount()
@@ -26,7 +26,7 @@ unsigned int CalllogModel::requestRecordsCount()
 void CalllogModel::requestRecords(uint32_t offset, uint32_t limit)
 {
     auto query = std::make_unique<db::query::CalllogGet>(limit, offset);
-    auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Calllog);
+    auto task  = sys::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Calllog);
     task->setCallback([this](auto response) {
         auto result = dynamic_cast<db::query::CalllogGetResult *>(response);
         if (result == nullptr) {

@@ -5,7 +5,7 @@
 
 #include <service-alarm/AlarmMessage.hpp>
 
-#include <apps-common/AsyncTask.hpp>
+#include <module-sys/Service/AsyncTask.hpp>
 #include <module-sys/Service/Service.hpp>
 
 #include <ctime>
@@ -108,7 +108,7 @@ namespace alarmEvents
         virtual unsigned int getAlarmsFromNowCount(OnGetAlarmsFromNowCallback callback) = 0;
     };
 
-    class AlarmEventsRepository : public AbstractAlarmEventsRepository, public app::AsyncCallbackReceiver
+    class AlarmEventsRepository : public AbstractAlarmEventsRepository, public sys::AsyncCallbackReceiver
     {
       public:
         AlarmEventsRepository(sys::Service *service);

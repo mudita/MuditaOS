@@ -3,7 +3,7 @@
 
 #include <application-phonebook/ApplicationPhonebook.hpp>
 #include <application-phonebook/windows/PhonebookContactDetails.hpp>
-#include <AsyncTask.hpp>
+#include <Service/AsyncTask.hpp>
 
 #include "ListView.hpp"
 #include "PhonebookModel.hpp"
@@ -26,7 +26,7 @@ PhonebookModel::PhonebookModel(app::Application *app,
                                std::string filter,
                                std::uint32_t groupFilter,
                                std::uint32_t displayMode)
-    : DatabaseModel(app), app::AsyncCallbackReceiver{app}, queryFilter(std::move(filter)),
+    : DatabaseModel(app), sys::AsyncCallbackReceiver{app}, queryFilter(std::move(filter)),
       queryGroupFilter(std::move(groupFilter)), queryDisplayMode(std::move(displayMode))
 {}
 
@@ -62,7 +62,7 @@ void PhonebookModel::requestRecords(const uint32_t offset, const uint32_t limit)
 {
     auto query =
         std::make_unique<db::query::ContactGet>(limit, offset, queryFilter, queryGroupFilter, queryDisplayMode);
-    auto task = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Contact);
+    auto task = sys::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Contact);
     task->setCallback([this](auto response) { return handleQueryResponse(response); });
     task->execute(application, this);
 }

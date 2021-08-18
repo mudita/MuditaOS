@@ -26,7 +26,7 @@
 namespace gui
 {
     MessagesMainWindow::MessagesMainWindow(app::Application *app)
-        : AppWindow(app, gui::name::window::main_window), app::AsyncCallbackReceiver{app}
+        : AppWindow(app, gui::name::window::main_window), sys::AsyncCallbackReceiver{app}
     {
         buildInterface();
     }
@@ -106,7 +106,7 @@ namespace gui
             if (pdata != nullptr) {
                 using db::query::ThreadGetByContactID;
                 auto query = std::make_unique<ThreadGetByContactID>(pdata->result->ID);
-                auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Contact);
+                auto task  = sys::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Contact);
                 task->setCallback([app = application](auto response) {
                     using db::query::ThreadGetByContactIDResult;
                     const auto result = dynamic_cast<ThreadGetByContactIDResult *>(response);
