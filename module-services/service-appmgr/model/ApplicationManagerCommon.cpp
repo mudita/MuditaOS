@@ -116,7 +116,6 @@ namespace app::manager
         settings->init(service::ServiceProxy(shared_from_this()));
         utils::setDisplayLanguage(
             settings->getValue(settings::SystemProperties::displayLanguage, settings::SettingsScope::Global));
-
         settings->registerValueChange(
             settings::SystemProperties::displayLanguage,
             [this](std::string value) { displayLanguageChanged(std::move(value)); },

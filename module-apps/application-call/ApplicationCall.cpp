@@ -54,7 +54,7 @@ namespace app
                 returnToPreviousWindow();
                 return true;
             };
-            constexpr auto iconNoEmergency = "emergency_W_G";
+            constexpr auto iconNoEmergency = "error_W_G";
             auto textNoEmergency           = utils::translate("app_call_wrong_emergency");
             utils::findAndReplaceAll(textNoEmergency, "$NUMBER", data->getDescription());
             showNotification(buttonAction, iconNoEmergency, textNoEmergency);
