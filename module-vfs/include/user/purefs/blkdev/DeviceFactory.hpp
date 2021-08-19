@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "blkdev/disk.hpp"
+#include "disk.hpp"
 
 #include <memory>
 
