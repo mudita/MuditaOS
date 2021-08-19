@@ -90,7 +90,7 @@ namespace gui
         LockWindow->setBottomBarWidgetsActive(false, true, true);
     }
 
-    void SimLockBox::setVisibleStateBlocked()
+    void SimLockBox::setVisibleStateBlocked(unsigned int value)
     {
         LockWindow->setText("sim_puk_blocked", LockInputWindow::TextType::Primary);
         LockWindow->setImage("sim_card_W_G");
