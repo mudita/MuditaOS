@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "SystemManager.hpp"
+#include "SystemManagerCommon.hpp"
 
 #include "DependencyGraph.hpp"
 #include "graph/TopologicalSort.hpp"
@@ -91,13 +91,13 @@ namespace sys
     using namespace std;
     using namespace sys;
 
-    void SystemManager::set(enum State state)
+    void SystemManagerCommon::set(enum State state)
     {
         LOG_DEBUG("System manager state: [%s] -> [%s]", c_str(this->state), c_str(state));
         this->state = state;
     }
 
-    SystemManager::SystemManager(std::vector<std::unique_ptr<BaseServiceCreator>> &&creators)
+    SystemManagerCommon::SystemManagerCommon(std::vector<std::unique_ptr<BaseServiceCreator>> &&creators)
         : Service(service::name::system_manager, "", systemManagerStack), systemServiceCreators{std::move(creators)}
     {
         // Specify list of channels which System Manager is registered to
@@ -108,12 +108,12 @@ namespace sys
             });
     }
 
-    SystemManager::~SystemManager()
+    SystemManagerCommon::~SystemManagerCommon()
     {
         LOG_DEBUG("%s", (GetName() + ":destructor").c_str());
     }
 
-    void SystemManager::Run()
+    void SystemManagerCommon::Run()
     {
         initialize();
 
@@ -170,7 +170,7 @@ namespace sys
         }
     }
 
-    void SystemManager::initialize()
+    void SystemManagerCommon::initialize()
     {
         utils::time::Scoped timer{"Initialize"};
         InitHandler();
@@ -184,7 +184,7 @@ namespace sys
         }
     }
 
-    void SystemManager::StartSystemServices()
+    void SystemManagerCommon::StartSystemServices()
     {
         DependencyGraph depGraph{graph::nodesFrom(systemServiceCreators), std::make_unique<graph::TopologicalSort>()};
         const auto &sortedServices = [&depGraph]() {
@@ -207,7 +207,7 @@ namespace sys
         postStartRoutine();
     }
 
-    void SystemManager::StartSystem(InitFunction sysInit, InitFunction appSpaceInit)
+    void SystemManagerCommon::StartSystem(InitFunction sysInit, InitFunction appSpaceInit)
     {
         powerManager     = std::make_unique<PowerManager>();
         cpuStatistics    = std::make_unique<CpuStatistics>();
@@ -225,13 +225,13 @@ namespace sys
         cpuStatisticsTimer.start();
     }
 
-    bool SystemManager::CloseSystem(Service *s)
+    bool SystemManagerCommon::CloseSystem(Service *s)
     {
         s->bus.sendUnicast(std::make_shared<SystemManagerCmd>(Code::CloseSystem), service::name::system_manager);
         return true;
     }
 
-    bool SystemManager::Restore(Service *s)
+    bool SystemManagerCommon::Restore(Service *s)
     {
         LOG_DEBUG("trying to enter restore state");
         auto ret = s->bus.sendUnicastSync(std::make_shared<SystemManagerCmd>(Code::Restore),
@@ -243,20 +243,20 @@ namespace sys
         return true;
     }
 
-    bool SystemManager::Reboot(Service *s)
+    bool SystemManagerCommon::Reboot(Service *s)
     {
         s->bus.sendUnicast(std::make_shared<SystemManagerCmd>(Code::Reboot), service::name::system_manager);
         return true;
     }
 
-    bool SystemManager::RebootToUpdate(Service *s, UpdateReason updateReason)
+    bool SystemManagerCommon::RebootToUpdate(Service *s, UpdateReason updateReason)
     {
         s->bus.sendUnicast(std::make_shared<SystemManagerCmd>(Code::RebootToUpdate, CloseReason::Reboot, updateReason),
                            service::name::system_manager);
         return true;
     }
 
-    bool SystemManager::SuspendService(const std::string &name, sys::Service *caller)
+    bool SystemManagerCommon::SuspendService(const std::string &name, sys::Service *caller)
     {
         auto ret = caller->bus.sendUnicastSync(
             std::make_shared<SystemMessage>(SystemMessageType::SwitchPowerMode, ServicePowerMode::SuspendToRAM),
@@ -270,7 +270,7 @@ namespace sys
         return true;
     }
 
-    bool SystemManager::ResumeService(const std::string &name, sys::Service *caller)
+    bool SystemManagerCommon::ResumeService(const std::string &name, sys::Service *caller)
     {
         auto ret = caller->bus.sendUnicastSync(
             std::make_shared<SystemMessage>(SystemMessageType::SwitchPowerMode, ServicePowerMode::Active), name, 1000);
@@ -282,7 +282,7 @@ namespace sys
         return true;
     }
 
-    bool SystemManager::RunService(std::shared_ptr<Service> service, Service *caller, TickType_t timeout)
+    bool SystemManagerCommon::RunService(std::shared_ptr<Service> service, Service *caller, TickType_t timeout)
     {
         service->StartService();
 
@@ -296,7 +296,7 @@ namespace sys
         return false;
     }
 
-    bool SystemManager::RunSystemService(std::shared_ptr<Service> service, Service *caller, TickType_t timeout)
+    bool SystemManagerCommon::RunSystemService(std::shared_ptr<Service> service, Service *caller, TickType_t timeout)
     {
         CriticalSection::Enter();
         servicesList.push_back(service);
@@ -305,7 +305,7 @@ namespace sys
         return RunService(std::move(service), caller, timeout);
     }
 
-    bool SystemManager::RunApplication(std::shared_ptr<app::Application> app, Service *caller, TickType_t timeout)
+    bool SystemManagerCommon::RunApplication(std::shared_ptr<app::Application> app, Service *caller, TickType_t timeout)
     {
         CriticalSection::Enter();
         applicationsList.push_back(app);
@@ -314,7 +314,7 @@ namespace sys
         return RunService(std::move(app), caller, timeout);
     }
 
-    bool SystemManager::RequestServiceClose(const std::string &name, Service *caller, TickType_t timeout)
+    bool SystemManagerCommon::RequestServiceClose(const std::string &name, Service *caller, TickType_t timeout)
     {
         auto msg  = std::make_shared<SystemMessage>(SystemMessageType::Exit);
         auto ret  = caller->bus.sendUnicastSync(msg, name, timeout);
@@ -331,7 +331,7 @@ namespace sys
         return true;
     }
 
-    template <typename T> void SystemManager::DestroyServices(const T &whitelist)
+    template <typename T> void SystemManagerCommon::DestroyServices(const T &whitelist)
     {
         cpp_freertos::LockGuard lck(serviceDestroyMutex);
         for (auto service = servicesList.begin(); service != servicesList.end();) {
@@ -349,7 +349,7 @@ namespace sys
         }
     }
 
-    bool SystemManager::DestroySystemService(const std::string &name, Service *caller)
+    bool SystemManagerCommon::DestroySystemService(const std::string &name, Service *caller)
     {
         cpp_freertos::LockGuard lck(serviceDestroyMutex);
         if (RequestServiceClose(name, caller)) {
@@ -366,7 +366,7 @@ namespace sys
         return false;
     }
 
-    bool SystemManager::DestroyApplication(const std::string &name, Service *caller)
+    bool SystemManagerCommon::DestroyApplication(const std::string &name, Service *caller)
     {
         cpp_freertos::LockGuard lck(appDestroyMutex);
         if (RequestServiceClose(name, caller)) {
@@ -384,7 +384,7 @@ namespace sys
         return false;
     }
 
-    void SystemManager::preCloseRoutine(CloseReason closeReason)
+    void SystemManagerCommon::preCloseRoutine(CloseReason closeReason)
     {
         for (const auto &service : servicesList) {
             auto msg = std::make_shared<ServiceCloseReasonMessage>(closeReason);
@@ -397,7 +397,7 @@ namespace sys
         servicesPreShutdownRoutineTimeout.start();
     }
 
-    void SystemManager::postStartRoutine()
+    void SystemManagerCommon::postStartRoutine()
     {
         connect(sevm::BatteryStateChangeMessage(), [&](Message *) {
             switch (Store::Battery::get().levelState) {
@@ -418,7 +418,7 @@ namespace sys
         });
     }
 
-    void SystemManager::batteryCriticalLevelAction(bool charging)
+    void SystemManagerCommon::batteryCriticalLevelAction(bool charging)
     {
         LOG_INFO("Battery Critical Level reached!");
         CellularServiceAPI::ChangeModulePowerState(this, cellular::service::State::PowerState::Off);
@@ -426,13 +426,13 @@ namespace sys
         bus.sendUnicast(std::move(msg), service::name::appmgr);
     }
 
-    void SystemManager::batteryShutdownLevelAction()
+    void SystemManagerCommon::batteryShutdownLevelAction()
     {
         LOG_INFO("Battery level too low - shutting down the system...");
         CloseSystemHandler(CloseReason::LowBattery);
     }
 
-    void SystemManager::batteryNormalLevelAction()
+    void SystemManagerCommon::batteryNormalLevelAction()
     {
         LOG_INFO("Battery level normal.");
         CellularServiceAPI::ChangeModulePowerState(this, cellular::service::State::PowerState::On);
@@ -440,7 +440,7 @@ namespace sys
         bus.sendUnicast(std::move(battNormalMsg), service::name::appmgr);
     }
 
-    void SystemManager::readyToCloseHandler(Message *msg)
+    void SystemManagerCommon::readyToCloseHandler(Message *msg)
     {
         if (!readyForCloseRegister.empty() && servicesPreShutdownRoutineTimeout.isActive()) {
             auto message = static_cast<ReadyToCloseMessage *>(msg);
@@ -458,7 +458,7 @@ namespace sys
         }
     }
 
-    void SystemManager::kill(std::shared_ptr<Service> const &toKill)
+    void SystemManagerCommon::kill(std::shared_ptr<Service> const &toKill)
     {
         auto ret = toKill->DeinitHandler();
         if (ret != sys::ReturnCodes::Success) {
@@ -467,7 +467,7 @@ namespace sys
         toKill->CloseHandler();
     }
 
-    ReturnCodes SystemManager::InitHandler()
+    ReturnCodes SystemManagerCommon::InitHandler()
     {
         isReady = true;
 
@@ -640,12 +640,12 @@ namespace sys
         return ReturnCodes::Success;
     }
 
-    MessagePointer SystemManager::DataReceivedHandler(DataMessage * /*msg*/, ResponseMessage * /*resp*/)
+    MessagePointer SystemManagerCommon::DataReceivedHandler(DataMessage * /*msg*/, ResponseMessage * /*resp*/)
     {
         return std::make_shared<ResponseMessage>();
     }
 
-    void SystemManager::CloseSystemHandler(CloseReason closeReason)
+    void SystemManagerCommon::CloseSystemHandler(CloseReason closeReason)
     {
         LOG_DEBUG("Invoking closing procedure...");
 
@@ -660,7 +660,7 @@ namespace sys
         preCloseRoutine(closeReason);
     }
 
-    void SystemManager::CloseServices()
+    void SystemManagerCommon::CloseServices()
     {
         for (const auto &element : readyForCloseRegister) {
             LOG_INFO("Service: %s did not reported before timeout", element.c_str());
@@ -673,7 +673,7 @@ namespace sys
         set(State::Shutdown);
     }
 
-    void SystemManager::RestoreSystemHandler()
+    void SystemManagerCommon::RestoreSystemHandler()
     {
         LOG_INFO("Entering restore system state");
 
@@ -687,7 +687,7 @@ namespace sys
         LOG_INFO("entered restore state");
     }
 
-    void SystemManager::UpdateSystemHandler()
+    void SystemManagerCommon::UpdateSystemHandler()
     {
         LOG_DEBUG("Starting system update procedure...");
 
@@ -699,7 +699,7 @@ namespace sys
         DestroyServices(sys::state::update::whitelist);
     }
 
-    void SystemManager::RebootHandler(State state, std::optional<UpdateReason> updateReason)
+    void SystemManagerCommon::RebootHandler(State state, std::optional<UpdateReason> updateReason)
     {
         CloseSystemHandler(CloseReason::Reboot);
         set(state);
@@ -708,7 +708,7 @@ namespace sys
         }
     }
 
-    void SystemManager::CpuStatisticsTimerHandler()
+    void SystemManagerCommon::CpuStatisticsTimerHandler()
     {
         if (!cpuStatisticsTimerInit) {
             cpuStatisticsTimerInit = true;
@@ -719,7 +719,7 @@ namespace sys
         powerManager->UpdateCpuFrequency(cpuStatistics->GetPercentageCpuLoad());
     }
 
-    phone_modes::PhoneMode SystemManager::translateSliderState(const RawKey &key)
+    phone_modes::PhoneMode SystemManagerCommon::translateSliderState(const RawKey &key)
     {
         const auto code = key.keyCode;
         if (code != bsp::KeyCodes::SSwitchUp && code != bsp::KeyCodes::SSwitchMid &&
@@ -729,7 +729,7 @@ namespace sys
         return SliderStateToPhoneModeMapping.at(code);
     }
 
-    MessagePointer SystemManager::handlePhoneModeRequest(PhoneModeRequest *request)
+    MessagePointer SystemManagerCommon::handlePhoneModeRequest(PhoneModeRequest *request)
     {
         LOG_INFO("Phone mode change requested.");
         if (phoneModeSubject->isTetheringEnabled()) {
@@ -742,7 +742,7 @@ namespace sys
         return MessageNone{};
     }
 
-    MessagePointer SystemManager::handleTetheringStateRequest(TetheringStateRequest *request)
+    MessagePointer SystemManagerCommon::handleTetheringStateRequest(TetheringStateRequest *request)
     {
         LOG_INFO("Tethering state change requested");
 
@@ -768,13 +768,13 @@ namespace sys
         return MessageNone{};
     }
 
-    MessagePointer SystemManager::enableTethering([[maybe_unused]] TetheringEnabledResponse *response)
+    MessagePointer SystemManagerCommon::enableTethering([[maybe_unused]] TetheringEnabledResponse *response)
     {
         phoneModeSubject->setTetheringMode(phone_modes::Tethering::On);
         return MessageNone{};
     }
 
-    void SystemManager::UpdateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyHz newFrequency)
+    void SystemManagerCommon::UpdateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyHz newFrequency)
     {
         if (newFrequency == bsp::CpuFrequencyHz::Level_1) {
             purefs::subsystem::disk_mgr()->pm_control(purefs::blkdev::pm_state::suspend);
@@ -784,12 +784,12 @@ namespace sys
         }
     }
 
-    std::vector<std::shared_ptr<Service>> SystemManager::servicesList;
-    std::vector<std::shared_ptr<app::Application>> SystemManager::applicationsList;
-    cpp_freertos::MutexStandard SystemManager::serviceDestroyMutex;
-    cpp_freertos::MutexStandard SystemManager::appDestroyMutex;
-    std::unique_ptr<PowerManager> SystemManager::powerManager;
-    std::unique_ptr<CpuStatistics> SystemManager::cpuStatistics;
-    std::unique_ptr<DeviceManager> SystemManager::deviceManager;
+    std::vector<std::shared_ptr<Service>> SystemManagerCommon::servicesList;
+    std::vector<std::shared_ptr<app::Application>> SystemManagerCommon::applicationsList;
+    cpp_freertos::MutexStandard SystemManagerCommon::serviceDestroyMutex;
+    cpp_freertos::MutexStandard SystemManagerCommon::appDestroyMutex;
+    std::unique_ptr<PowerManager> SystemManagerCommon::powerManager;
+    std::unique_ptr<CpuStatistics> SystemManagerCommon::cpuStatistics;
+    std::unique_ptr<DeviceManager> SystemManagerCommon::deviceManager;
 
 } // namespace sys

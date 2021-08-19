@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "FactoryReset.hpp"
-#include <SystemManager/SystemManager.hpp>
+#include <SystemManager/SystemManagerCommon.hpp>
 #include <log.hpp>
 #include <service-db/DBServiceName.hpp>
 #include <Utils.hpp>
@@ -51,13 +51,13 @@ namespace FactoryReset
         if (ownerService != nullptr) {
             LOG_INFO("Closing ServiceDB...");
             std::string dbServiceName = service::name::db;
-            sys::SystemManager::DestroySystemService(dbServiceName, ownerService);
+            sys::SystemManagerCommon::DestroySystemService(dbServiceName, ownerService);
         }
 
         DeleteSelectedUserFiles(userOSPath);
 
         LOG_INFO("Rebooting...");
-        sys::SystemManager::Reboot(ownerService);
+        sys::SystemManagerCommon::Reboot(ownerService);
         return true;
     }
 

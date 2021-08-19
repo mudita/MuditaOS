@@ -3,7 +3,7 @@
 
 #include "UpdateHelper.hpp"
 #include <log.hpp>
-#include <SystemManager/SystemManager.hpp>
+#include <SystemManager/SystemManagerCommon.hpp>
 #include <purefs/filesystem_paths.hpp>
 
 #include <filesystem>
@@ -29,7 +29,7 @@ namespace parserFSM
             return {sent::no, endpoint::ResponseContext{.status = http::Code::NotFound}};
         }
 
-        if (sys::SystemManager::RebootToUpdate(owner, sys::UpdateReason::Update)) {
+        if (sys::SystemManagerCommon::RebootToUpdate(owner, sys::UpdateReason::Update)) {
             return {sent::no, endpoint::ResponseContext{.status = http::Code::NoContent}};
         }
 

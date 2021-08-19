@@ -3,7 +3,7 @@
 
 #include "BackupRestore.hpp"
 
-#include <SystemManager/SystemManager.hpp>
+#include <SystemManager/SystemManagerCommon.hpp>
 #include <log.hpp>
 #include <microtar.hpp>
 #include <purefs/filesystem_paths.hpp>
@@ -136,7 +136,7 @@ bool BackupRestore::RestoreUserFiles(sys::Service *ownerService, const std::file
         return false;
     }
 
-    if (sys::SystemManager::Restore(ownerService) == false) {
+    if (sys::SystemManagerCommon::Restore(ownerService) == false) {
         LOG_ERROR("Can't enter update system state");
         return false;
     }
