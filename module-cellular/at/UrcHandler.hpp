@@ -16,6 +16,7 @@ namespace at::urc
     class Ring;
     class PoweredDown;
     class UrcResponse;
+    class QSimstat;
 
     class UrcHandler
     {
@@ -31,5 +32,6 @@ namespace at::urc
         virtual void Handle(Ring &urc)        = 0;
         virtual void Handle(PoweredDown &urc) = 0;
         virtual void Handle(UrcResponse &urc) = 0;
+        virtual void Handle(QSimstat &urc)    = 0;
     };
 } // namespace at::urc
