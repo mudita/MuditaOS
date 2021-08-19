@@ -297,7 +297,7 @@
   "app_onboarding_no_configuration": "<text>Your Mudita Pure has not been<br></br>configured. You can go to<br></br>Settings to set it up.</text>",
   "app_onboarding_update_info": "<text>The current version of MuditaOS is <br></br> <token>$VERSION</token>. Updates with new <br></br> features and fixes appear often. <br></br>To update your Phone please <br></br> visit: </text><text font='gt_pressura' weight='bold' size='27'>www.mudita.com/updateos</text><br></br><text>and follow the instructions.</text>",
   "app_settings_title_main": "Settings",
-  "app_settings_advanced" : "Advanced",
+  "app_settings_advanced": "Advanced",
   "app_settings_bt": "Bluetooth",
   "app_settings_bluetooth_add_device": "Add device",
   "app_settings_bluetooth_all_devices": "All devices",
@@ -551,7 +551,6 @@
   "tethering_enable_question": "<text>You're connected to the computer.<br />Turn tethering on?<br /><text color='9'>(some functions may be disabled)</text></text>",
   "tethering_phone_mode_change_prohibited": "<text>Tethering is on.<br /><br />Other modes (Connected, DND,<br />Offline) are overriden by this mode<br />and are not working.</text>",
   "tethering_menu_access_decline": "<text>Tethering is on.<br /><br />To access menu,<br />turn tethering off.</text>",
-
   "app_bell_settings_time_units_time_fmt_top_message": "Time format",
   "app_bell_settings_time_units_time_fmt_bottom_message": "hours",
   "app_bell_settings_time_units_time_message": "Time",
@@ -563,5 +562,7 @@
   "app_bellmain_settings": "Settings",
   "app_bellmain_main_window_title": "Bell Hybrid+",
   "app_bell_settings_advanced": "Advanced",
-  "app_bell_settings_advanced_time_units": "Time & units"
+  "app_bell_settings_advanced_time_units": "Time & units",
+  "app_bellmain_home_screen_bottom_desc": "Next alarm will ring in",
+  "app_bellmain_home_screen_bottom_desc_dp": "Deep press to activate"
 }

@@ -19,10 +19,10 @@ namespace app
     class ApplicationBellMain : public Application
     {
       public:
-        ApplicationBellMain(std::string name                    = applicationBellName,
-                            std::string parent                  = "",
-                            sys::phone_modes::PhoneMode mode    = sys::phone_modes::PhoneMode::Offline,
-                            StartInBackground startInBackground = {false});
+        explicit ApplicationBellMain(std::string name                    = applicationBellName,
+                                     std::string parent                  = "",
+                                     sys::phone_modes::PhoneMode mode    = sys::phone_modes::PhoneMode::Offline,
+                                     StartInBackground startInBackground = {false});
 
         sys::ReturnCodes InitHandler() override;
 

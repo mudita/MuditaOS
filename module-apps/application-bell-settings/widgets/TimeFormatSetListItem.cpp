@@ -32,7 +32,7 @@ namespace gui
         timeFormat->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::h);
         timeFormat->setFont(bell_settings_style::time_fmt_set_list_item::font);
 
-        timeFormat->setAlignment(Alignment(Alignment::Horizontal::Center));
+        timeFormat->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         timeFormat->setFixedFieldWidth(2);
         timeFormat->setEdges(RectangleEdge::None);
         timeFormat->setCurrentValue(fmtSpinnerMin);

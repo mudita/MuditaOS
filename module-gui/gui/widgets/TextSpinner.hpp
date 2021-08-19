@@ -3,14 +3,14 @@
 
 #pragma once
 
-#include "Text.hpp"
+#include "TextFixedSize.hpp"
 
 #include <string>
 #include <vector>
 
 namespace gui
 {
-    class TextSpinner : public Text
+    class TextSpinner : public TextFixedSize
     {
       public:
         using TextRange = std::vector<UTF8>;
