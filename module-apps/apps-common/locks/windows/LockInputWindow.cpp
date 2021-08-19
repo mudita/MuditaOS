@@ -203,7 +203,7 @@ namespace gui
             lockBox->setVisibleStateInputInvalid(LockBox::InputErrorType::InvalidInput, lock->getAttemptsLeft());
             break;
         case locks::Lock::LockState::Blocked:
-            lockBox->setVisibleStateBlocked();
+            lockBox->setVisibleStateBlocked(lock->getNextUnlockAttemptCooldownTimeMinutes());
             break;
         case locks::Lock::LockState::NewInputRequired:
             lockBox->setVisibleStateInputRequired(LockBox::InputActionType::ProvideNewInput);

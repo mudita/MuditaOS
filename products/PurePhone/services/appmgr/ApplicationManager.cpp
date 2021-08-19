@@ -63,6 +63,15 @@ namespace app::manager
         phoneLockHandler.setPhoneLockHash(
             settings->getValue(settings::SystemProperties::lockPassHash, settings::SettingsScope::Global));
 
+        phoneLockHandler.setPhoneLockTime(utils::getNumericValue<time_t>(
+            settings->getValue(settings::SystemProperties::unlockBlockTime, settings::SettingsScope::Global)));
+
+        phoneLockHandler.setNextUnlockAttemptCooldownTime(utils::getNumericValue<time_t>(settings->getValue(
+            settings::SystemProperties::unlockAttemptCooldownTime, settings::SettingsScope::Global)));
+
+        phoneLockHandler.setNoCooldownAttemptsLeft(utils::getNumericValue<unsigned int>(
+            settings->getValue(settings::SystemProperties::noCooldownAttemptsLeft, settings::SettingsScope::Global)));
+
         settings->registerValueChange(
             settings::SystemProperties::lockScreenPasscodeIsOn,
             [this](const std::string &value) { phoneLockHandler.enablePhoneLock(utils::getNumericValue<bool>(value)); },
