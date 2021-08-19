@@ -210,3 +210,14 @@ void CellularUrcHandler::Handle(UrcResponse &urc)
         }
     }
 }
+
+void CellularUrcHandler::Handle(QSimstat &urc)
+{
+    if (urc.isValid()) {
+        auto inserted = urc.getInsertedStatus();
+        if (inserted.has_value()) {
+            response = std::make_unique<cellular::SimInsertedNotication>(inserted.value());
+            urc.setHandled(true);
+        }
+    }
+}

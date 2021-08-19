@@ -13,6 +13,7 @@
 #include <at/cmd/CPBS.hpp>
 #include <at/cmd/CPBR.hpp>
 #include <at/cmd/QNWINFO.hpp>
+#include <at/cmd/QSIMSTAT.hpp>
 
 #include "mock/AtCommon_channel.hpp"
 #include "PhoneNumber.hpp"
@@ -679,5 +680,77 @@ TEST_CASE("QNWINFO parser test")
         auto base = channel.cmd(cmd);
         auto resp = cmd.parseQNWINFO(base);
         REQUIRE(!resp);
+    }
+}
+
+TEST_CASE("QSIMSTAT parser")
+{
+    SECTION("Empty data")
+    {
+        at::cmd::QSIMSTAT cmd;
+        at::Result result;
+        auto response = cmd.parseQSIMSTAT(result);
+        REQUIRE(!response);
+    }
+
+    SECTION("Failing channel")
+    {
+        at::cmd::QSIMSTAT cmd;
+        at::FailingChannel channel;
+        auto base     = channel.cmd(cmd);
+        auto response = cmd.parseQSIMSTAT(base);
+        REQUIRE(!response);
+        REQUIRE(response.code == at::Result::Code::ERROR);
+    }
+
+    SECTION("Success - valid token")
+    {
+        at::cmd::QSIMSTAT cmd;
+        at::QSIMSTAT_successChannel channel;
+        auto base     = channel.cmd(cmd);
+        auto response = cmd.parseQSIMSTAT(base);
+        REQUIRE(response);
+        REQUIRE(response.enabled == at::SimInsertedStatusEnable::Enable);
+        REQUIRE(response.status == at::SimInsertedStatus::Inserted);
+    }
+
+    SECTION("to little tokens")
+    {
+        at::cmd::QSIMSTAT cmd;
+        at::QSIMSTAT_toLittleTokens channel;
+        auto base     = channel.cmd(cmd);
+        auto response = cmd.parseQSIMSTAT(base);
+        REQUIRE(!response);
+        REQUIRE(response.code == at::Result::Code::PARSING_ERROR);
+    }
+
+    SECTION("Failed - to many tokens")
+    {
+        at::cmd::QSIMSTAT cmd;
+        at::QSIMSTAT_toManyTokens channel;
+        auto base     = channel.cmd(cmd);
+        auto response = cmd.parseQSIMSTAT(base);
+        REQUIRE(!response);
+        REQUIRE(response.code == at::Result::Code::PARSING_ERROR);
+    }
+
+    SECTION("Failed - invalid enabled oken")
+    {
+        at::cmd::QSIMSTAT cmd;
+        at::QSIMSTAT_invalidEnabled channel;
+        auto base     = channel.cmd(cmd);
+        auto response = cmd.parseQSIMSTAT(base);
+        REQUIRE(!response);
+        REQUIRE(response.code == at::Result::Code::PARSING_ERROR);
+    }
+
+    SECTION("Failed - invalid status token")
+    {
+        at::cmd::QSIMSTAT cmd;
+        at::QSIMSTAT_invalidStatus channel;
+        auto base     = channel.cmd(cmd);
+        auto response = cmd.parseQSIMSTAT(base);
+        REQUIRE(!response);
+        REQUIRE(response.code == at::Result::Code::PARSING_ERROR);
     }
 }
