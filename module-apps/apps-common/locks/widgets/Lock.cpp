@@ -28,7 +28,7 @@ namespace locks
 
     void Lock::popChar()
     {
-        if (inputValue.size() > 0) {
+        if (!inputValue.empty()) {
             inputValue.pop_back();
         }
     }
@@ -36,6 +36,11 @@ namespace locks
     void Lock::clearAttempt() noexcept
     {
         inputValue.clear();
+    }
+
+    void Lock::setNextUnlockAttemptCooldownTimeMinutes(const unsigned int time)
+    {
+        nextUnlockAttemptCooldownTimeMinutes = time;
     }
 
 } // namespace locks
