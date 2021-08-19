@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <service-alarm/AlarmMessage.hpp>
+#include <service-time/AlarmMessage.hpp>
 
 #include <apps-common/AsyncTask.hpp>
 #include <module-sys/Service/Service.hpp>

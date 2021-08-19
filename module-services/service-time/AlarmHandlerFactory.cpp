@@ -4,8 +4,8 @@
 #include <map>
 #include <memory>
 
-#include "include/service-alarm/AlarmHandler.hpp"
-#include "include/service-alarm/AlarmHandlerFactory.hpp"
+#include <service-time/AlarmHandler.hpp>
+#include <service-time/AlarmHandlerFactory.hpp>
 
 namespace alarms
 {
