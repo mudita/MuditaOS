@@ -17,5 +17,5 @@ target_include_directories(alarms
 target_link_libraries(alarms
    PUBLIC
         module-db
-        service-alarm
+        service-time
 )

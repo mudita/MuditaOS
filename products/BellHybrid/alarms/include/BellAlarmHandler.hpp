@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <service-alarm/AlarmHandler.hpp>
+#include <service-time/AlarmHandler.hpp>
 
 namespace alarms
 {

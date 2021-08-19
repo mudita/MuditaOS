@@ -3,7 +3,7 @@
 
 #include "MockAlarmHandler.hpp"
 
-#include <service-alarm/AlarmHandlerFactory.hpp>
+#include <service-time/AlarmHandlerFactory.hpp>
 
 #include <catch2/catch.hpp>
 

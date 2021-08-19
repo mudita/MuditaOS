@@ -7,7 +7,6 @@ include(${CMAKE_SOURCE_DIR}/module-lwip/lwip-includes.cmake)
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
 
-add_subdirectory( service-alarm )
 add_subdirectory( service-antenna )
 add_subdirectory( service-appmgr )
 add_subdirectory( service-audio )
