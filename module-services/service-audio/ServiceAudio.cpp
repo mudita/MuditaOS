@@ -240,11 +240,40 @@ ServiceAudio::VibrationType ServiceAudio::GetVibrationType(const audio::Playback
 
 void ServiceAudio::VibrationUpdate(const audio::PlaybackType &type, std::optional<AudioMux::Input *> input)
 {
-    auto curVibrationType = GetVibrationType(type);
-    if (curVibrationType == VibrationType::OneShot && !IsVibrationMotorOn()) {
+    switch (const auto curVibrationType = GetVibrationType(type); curVibrationType) {
+    case VibrationType::None:
+        DisableVibration(input);
+        break;
+    case VibrationType::OneShot:
+        EnableOneShotVibration();
+        break;
+    case VibrationType::Continuous:
+        EnableContinuousVibration(input);
+        break;
+    }
+}
+
+void ServiceAudio::DisableVibration(std::optional<audio::AudioMux::Input *> input)
+{
+    if (IsVibrationMotorOn()) {
+        EventManagerServiceAPI::vibraStop(this);
+        vibrationMotorStatus = AudioMux::VibrationStatus::Off;
+    }
+    if (input) {
+        input.value()->DisableVibration();
+    }
+}
+
+void ServiceAudio::EnableOneShotVibration()
+{
+    if (!IsVibrationMotorOn()) {
         EventManagerServiceAPI::vibraPulseOnce(this);
     }
-    else if (input && curVibrationType == VibrationType::Continuous) {
+}
+
+void ServiceAudio::EnableContinuousVibration(std::optional<audio::AudioMux::Input *> input)
+{
+    if (input) {
         input.value()->EnableVibration();
     }
 
@@ -255,10 +284,6 @@ void ServiceAudio::VibrationUpdate(const audio::PlaybackType &type, std::optiona
     if (anyOfInputsOn && !IsVibrationMotorOn()) {
         EventManagerServiceAPI::vibraPulseRepeatUntilStop(this);
         vibrationMotorStatus = AudioMux::VibrationStatus::On;
-    }
-    else if ((!anyOfInputsOn && IsVibrationMotorOn()) || (anyOfInputsOn && IsVibrationMotorOn())) {
-        EventManagerServiceAPI::vibraStop(this);
-        vibrationMotorStatus = AudioMux::VibrationStatus::Off;
     }
 }
 
