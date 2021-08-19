@@ -429,4 +429,84 @@ namespace at
             return result;
         }
     };
+
+    /// provides proper QSIMSTAT response
+    class QSIMSTAT_successChannel : public ChannelMock
+    {
+      public:
+        const std::string enabled = "1";
+        const std::string status  = "1";
+
+        auto ResultMock() -> Result final
+        {
+            auto result     = Result();
+            result.code     = Result::Code::OK;
+            result.response = {"+QSIMSTAT: " + enabled + "," + status, "OK"};
+            return result;
+        }
+    };
+
+    /// provides invalid QSIMSTAT response
+    class QSIMSTAT_toLittleTokens : public ChannelMock
+    {
+      public:
+        const std::string enabled = "1";
+
+        auto ResultMock() -> Result final
+        {
+            auto result     = Result();
+            result.code     = Result::Code::OK;
+            result.response = {"+QSIMSTAT: " + enabled, "OK"};
+            return result;
+        }
+    };
+
+    /// provides invalid QSIMSTAT response
+    class QSIMSTAT_toManyTokens : public ChannelMock
+    {
+      public:
+        const std::string enabled = "1";
+        const std::string status  = "1";
+        const std::string bad     = "1";
+
+        auto ResultMock() -> Result final
+        {
+            auto result     = Result();
+            result.code     = Result::Code::OK;
+            result.response = {"+QSIMSTAT: " + enabled + "," + status + "," + bad, "OK"};
+            return result;
+        }
+    };
+
+    /// provides invalid QSIMSTAT response
+    class QSIMSTAT_invalidEnabled : public ChannelMock
+    {
+      public:
+        const std::string enabled = "78";
+        const std::string status  = "1";
+
+        auto ResultMock() -> Result final
+        {
+            auto result     = Result();
+            result.code     = Result::Code::OK;
+            result.response = {"+QSIMSTAT: " + enabled + "," + status, "OK"};
+            return result;
+        }
+    };
+
+    /// provides invalid QSIMSTAT response
+    class QSIMSTAT_invalidStatus : public ChannelMock
+    {
+      public:
+        const std::string enabled = "1";
+        const std::string status  = "98";
+
+        auto ResultMock() -> Result final
+        {
+            auto result     = Result();
+            result.code     = Result::Code::OK;
+            result.response = {"+QSIMSTAT: " + enabled + "," + status, "OK"};
+            return result;
+        }
+    };
 } // namespace at
