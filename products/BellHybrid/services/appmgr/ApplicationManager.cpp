@@ -3,8 +3,6 @@
 
 #include <appmgr/ApplicationManager.hpp>
 
-#include <application-onboarding/ApplicationOnBoarding.hpp>
-
 namespace app::manager
 {
     auto ApplicationManager::startApplication(ApplicationHandle &app) -> bool
@@ -18,9 +16,6 @@ namespace app::manager
 
     auto ApplicationManager::resolveHomeApplication() -> std::string
     {
-        if (checkOnBoarding()) {
-            return app::name_onboarding;
-        }
         return rootApplicationName;
     }
 } // namespace app::manager
