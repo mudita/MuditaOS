@@ -3,11 +3,27 @@ add_library(application-bell-main)
 target_sources(application-bell-main
     PRIVATE
         ApplicationBellMain.cpp
-        windows/BellMainWindow.cpp
+        windows/BellHomeScreenWindow.cpp
         windows/BellMainMenuWindow.cpp
+
+        models/AlarmModel.cpp
+        models/TemperatureModel.cpp
+        models/TimeModel.cpp
+
+        presenters/HomeScreenPresenter.cpp
+        presenters/StateController.cpp
  
-        windows/BellMainWindow.hpp
+        windows/BellHomeScreenWindow.hpp
         windows/BellMainMenuWindow.hpp
+
+        models/AlarmModel.hpp
+        models/TemperatureModel.hpp
+        models/TimeModel.hpp
+
+        presenters/HomeScreenPresenter.hpp
+        presenters/KeyMap.hpp
+        presenters/StateController.hpp
+
     PUBLIC
         include/application-bell-main/ApplicationBellMain.hpp
 )
