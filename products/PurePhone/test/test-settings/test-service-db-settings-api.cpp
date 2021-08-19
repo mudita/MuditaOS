@@ -10,7 +10,7 @@
 
 #include <evtmgr/EventManager.hpp>
 #include <module-services/service-db/ServiceDB.hpp>
-#include <module-sys/SystemManager/SystemManager.hpp>
+#include <module-sys/SystemManager/SystemManagerCommon.hpp>
 
 #include <service-evtmgr/Constants.hpp>
 
@@ -23,7 +23,8 @@ TEST_CASE("SettingsApi")
 {
     SECTION("variable/profile/mode register/set/get/unregister")
     {
-        auto manager = std::make_shared<sys::SystemManager>(std::vector<std::unique_ptr<sys::BaseServiceCreator>>{});
+        auto manager =
+            std::make_shared<sys::SystemManagerCommon>(std::vector<std::unique_ptr<sys::BaseServiceCreator>>{});
         std::shared_ptr<settings::MyService> varWritter;
         std::shared_ptr<settings::MyService> varReader;
         std::shared_ptr<settings::AppTest> testVar;
@@ -36,20 +37,20 @@ TEST_CASE("SettingsApi")
             testStart = std::make_shared<std::mutex>();
             testStart->lock();
             std::cout << "start thr_id: " << std::this_thread::get_id() << std::endl << std::flush;
-            auto ret = sys::SystemManager::RunSystemService(std::make_shared<EventManager>(service::name::evt_manager),
-                                                            manager.get());
-            ret &= sys::SystemManager::RunSystemService(std::make_shared<ServiceDB>(), manager.get());
+            auto ret = sys::SystemManagerCommon::RunSystemService(
+                std::make_shared<EventManager>(service::name::evt_manager), manager.get());
+            ret &= sys::SystemManagerCommon::RunSystemService(std::make_shared<ServiceDB>(), manager.get());
 
             varWritter = std::make_shared<settings::MyService>("writterVar");
             varReader  = std::make_shared<settings::MyService>("readerVar");
 
             postMortemSetting = varWritter->getSettings();
 
-            ret &= sys::SystemManager::RunSystemService(varWritter, manager.get());
-            ret &= sys::SystemManager::RunSystemService(varReader, manager.get());
+            ret &= sys::SystemManagerCommon::RunSystemService(varWritter, manager.get());
+            ret &= sys::SystemManagerCommon::RunSystemService(varReader, manager.get());
 
             testVar = std::make_shared<settings::AppTest>("appTest", varWritter, varReader, testStart);
-            ret &= sys::SystemManager::RunSystemService(testVar, manager.get());
+            ret &= sys::SystemManagerCommon::RunSystemService(testVar, manager.get());
 
             std::cout << "koniec start thr_id: " << std::this_thread::get_id() << std::endl << std::flush;
             testStart->unlock();

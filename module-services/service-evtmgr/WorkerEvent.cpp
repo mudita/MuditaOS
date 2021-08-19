@@ -29,7 +29,7 @@
 #include <service-audio/AudioMessage.hpp>
 #include <service-desktop/Constants.hpp>
 #include <service-desktop/DesktopMessages.hpp>
-#include <SystemManager/SystemManager.hpp>
+#include <SystemManager/SystemManagerCommon.hpp>
 #include <SystemManager/messages/SentinelRegistrationMessage.hpp>
 
 extern "C"
