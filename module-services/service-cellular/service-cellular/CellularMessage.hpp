@@ -12,6 +12,7 @@
 #include <module-bsp/bsp/cellular/bsp_cellular.hpp>
 #include <utf8/UTF8.hpp>
 #include <SimState.hpp>
+#include <module-cellular/at/SimInsertedState.hpp>
 
 #include <response.hpp>
 
@@ -958,6 +959,21 @@ namespace cellular
 
       private:
         std::shared_ptr<std::string> imei;
+    };
+
+    class SimInsertedNotication : public sys::DataMessage
+    {
+      public:
+        explicit SimInsertedNotication(at::SimInsertedStatus status)
+            : sys::DataMessage(MessageType::MessageTypeUninitialized), insertedStatus(status)
+        {}
+        auto getInsertedStatus() -> at::SimInsertedStatus
+        {
+            return insertedStatus;
+        }
+
+      private:
+        at::SimInsertedStatus insertedStatus;
     };
 
 } // namespace cellular

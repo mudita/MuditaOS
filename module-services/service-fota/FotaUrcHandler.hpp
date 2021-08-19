@@ -28,6 +28,7 @@ class FotaUrcHandler : public at::urc::UrcHandler
     virtual void Handle(at::urc::Ring &urc){};
     virtual void Handle(at::urc::PoweredDown &urc){};
     virtual void Handle(at::urc::UrcResponse &urc){};
+    virtual void Handle(at::urc::QSimstat &urc){};
 
   private:
     FotaService::Service &fotaService;
