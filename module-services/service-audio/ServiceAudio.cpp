@@ -13,6 +13,7 @@
 #include <service-bluetooth/Constants.hpp>
 #include <service-bluetooth/messages/AudioRouting.hpp>
 #include <service-bluetooth/messages/Ring.hpp>
+#include <service-bluetooth/messages/AudioNotify.hpp>
 #include <service-bluetooth/ServiceBluetoothCommon.hpp>
 #include <service-db/Settings.hpp>
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
@@ -109,6 +110,10 @@ ServiceAudio::ServiceAudio()
             [this](sys::Message *msg) -> sys::MessagePointer { return handleA2DPVolumeChangedOnBluetoothDevice(msg); });
     connect(typeid(HSPDeviceVolumeChanged),
             [this](sys::Message *msg) -> sys::MessagePointer { return handleHSPVolumeChangedOnBluetoothDevice(msg); });
+    connect(typeid(message::bluetooth::AudioPause),
+            [this](sys::Message *msg) -> sys::MessagePointer { return handleA2DPAudioPause(); });
+    connect(typeid(message::bluetooth::AudioStart),
+            [this](sys::Message *msg) -> sys::MessagePointer { return handleA2DPAudioStart(); });
 }
 
 ServiceAudio::~ServiceAudio()
@@ -403,15 +408,21 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleSendEvent(std::shared_
 {
     // update bluetooth state
     if (evt->getType() == EventType::BlutoothA2DPDeviceState) {
-        auto newState = evt->getDeviceState() == Event::DeviceState::Connected;
+        const auto newState = evt->getDeviceState() == Event::DeviceState::Connected;
         if (newState != bluetoothA2DPConnected) {
             LOG_DEBUG("Bluetooth connection status changed: %s", newState ? "connected" : "disconnected");
             bluetoothA2DPConnected = newState;
-            HandleStop({audio::PlaybackType::Alarm,
-                        audio::PlaybackType::Meditation,
-                        audio::PlaybackType::Notifications,
-                        audio::PlaybackType::TextMessageRingtone},
-                       audio::Token());
+            const auto playbacksToBeStopped{
+                (bluetoothA2DPConnected) ? std::vector<audio::PlaybackType>{audio::PlaybackType::Alarm,
+                                                                            audio::PlaybackType::Meditation,
+                                                                            audio::PlaybackType::Notifications,
+                                                                            audio::PlaybackType::TextMessageRingtone}
+                                         : std::vector<audio::PlaybackType>{audio::PlaybackType::Alarm,
+                                                                            audio::PlaybackType::Meditation,
+                                                                            audio::PlaybackType::Multimedia,
+                                                                            audio::PlaybackType::Notifications,
+                                                                            audio::PlaybackType::TextMessageRingtone}};
+            HandleStop(playbacksToBeStopped, audio::Token());
         }
     }
     else if (evt->getType() == EventType::BlutoothHSPDeviceState) {
@@ -792,5 +803,24 @@ auto ServiceAudio::handleHSPVolumeChangedOnBluetoothDevice(sys::Message *msgl) -
     assert(hspMsg != nullptr);
     const auto volume = volume::scaler::hsp::toSystemVolume(hspMsg->getVolume());
     onVolumeChanged(volume);
+    return sys::msgHandled();
+}
+auto ServiceAudio::handleA2DPAudioPause() -> sys::MessagePointer
+{
+    if (auto input = audioMux.GetPlaybackInput(audio::PlaybackType::Multimedia);
+        input && (*input)->audio->Pause() == RetCode::Success) {
+        bus.sendMulticast(std::make_shared<AudioPausedNotification>((*input)->token),
+                          sys::BusChannel::ServiceAudioNotifications);
+    }
+    return sys::msgHandled();
+}
+
+auto ServiceAudio::handleA2DPAudioStart() -> sys::MessagePointer
+{
+    if (auto input = audioMux.GetPlaybackInput(audio::PlaybackType::Multimedia);
+        input && (*input)->audio->Resume() == RetCode::Success) {
+        bus.sendMulticast(std::make_shared<AudioResumedNotification>((*input)->token),
+                          sys::BusChannel::ServiceAudioNotifications);
+    }
     return sys::msgHandled();
 }

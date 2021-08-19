@@ -3,8 +3,10 @@
 
 #include "AVRCP.hpp"
 
+#include <service-audio/AudioServiceName.hpp>
 #include <service-bluetooth/Constants.hpp>
 #include <service-bluetooth/messages/AudioVolume.hpp>
+#include <service-bluetooth/messages/AudioNotify.hpp>
 
 namespace bluetooth
 {
@@ -110,14 +112,18 @@ namespace bluetooth
         case AVRCP_SUBEVENT_OPERATION: {
             auto operation_id = (avrcp_operation_id_t)avrcp_subevent_operation_get_operation_id(packet);
             switch (operation_id) {
-            case AVRCP_OPERATION_ID_PLAY:
+            case AVRCP_OPERATION_ID_PLAY: {
                 LOG_INFO("AVRCP Target: PLAY\n");
-                status = a2dp_source_start_stream(AVRCP::mediaTracker.a2dp_cid, AVRCP::mediaTracker.local_seid);
-                break;
-            case AVRCP_OPERATION_ID_PAUSE:
+                auto &busProxy = AVRCP::ownerService->bus;
+                busProxy.sendUnicast(std::make_shared<message::bluetooth::AudioStart>(), service::name::audio);
+                return;
+            } break;
+            case AVRCP_OPERATION_ID_PAUSE: {
                 LOG_INFO("AVRCP Target: PAUSE\n");
-                status = a2dp_source_pause_stream(AVRCP::mediaTracker.a2dp_cid, AVRCP::mediaTracker.local_seid);
-                break;
+                auto &busProxy = AVRCP::ownerService->bus;
+                busProxy.sendUnicast(std::make_shared<message::bluetooth::AudioPause>(), service::name::audio);
+                return;
+            } break;
             case AVRCP_OPERATION_ID_STOP:
                 LOG_INFO("AVRCP Target: STOP\n");
                 status = a2dp_source_disconnect(AVRCP::mediaTracker.a2dp_cid);

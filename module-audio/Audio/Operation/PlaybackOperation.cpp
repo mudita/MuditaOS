@@ -96,22 +96,25 @@ namespace audio
 
     audio::RetCode PlaybackOperation::Pause()
     {
-        if (state == State::Paused || state == State::Idle) {
+        if (state == State::Paused || state == State::Idle || outputConnection == nullptr) {
             return RetCode::InvokedInIncorrectState;
         }
-        state = State::Paused;
-        outputConnection->disable();
-        return audio::RetCode::Success;
+        const auto retCode = GetDeviceError(audioDevice->Pause());
+        if (retCode == audio::RetCode::Success) {
+            state = State::Paused;
+            outputConnection->disable();
+        }
+        return retCode;
     }
 
     audio::RetCode PlaybackOperation::Resume()
     {
-        if (state == State::Active || state == State::Idle) {
+        if (state == State::Active || state == State::Idle || outputConnection == nullptr) {
             return RetCode::InvokedInIncorrectState;
         }
         state = State::Active;
         outputConnection->enable();
-        return audio::RetCode::Success;
+        return GetDeviceError(audioDevice->Resume());
     }
 
     audio::RetCode PlaybackOperation::SetOutputVolume(float vol)
