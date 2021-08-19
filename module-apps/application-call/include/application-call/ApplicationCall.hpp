@@ -11,7 +11,7 @@
 #include <service-evtmgr/Constants.hpp>
 #include <service-evtmgr/EVMessages.hpp>
 #include <Service/Message.hpp>
-#include <SystemManager/SystemManager.hpp>
+#include <SystemManager/SystemManagerCommon.hpp>
 
 namespace app
 {

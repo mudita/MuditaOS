@@ -87,7 +87,7 @@ namespace app
             parent = (caller == nullptr ? "" : caller->GetName());
             handle = std::make_shared<T>(name, parent, mode);
             setAutoLockPolicy();
-            return sys::SystemManager::RunApplication(handle, caller);
+            return sys::SystemManagerCommon::RunApplication(handle, caller);
         }
 
         bool runBackground(sys::phone_modes::PhoneMode mode, sys::Service *caller) override
@@ -95,7 +95,7 @@ namespace app
             parent = (caller == nullptr ? "" : caller->GetName());
             handle = std::make_shared<T>(name, parent, mode, true);
             setAutoLockPolicy();
-            return sys::SystemManager::RunApplication(handle, caller);
+            return sys::SystemManagerCommon::RunApplication(handle, caller);
         }
     };
 

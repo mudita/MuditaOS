@@ -5,7 +5,7 @@
 
 #include "Application.hpp"
 #include "Service/Message.hpp"
-#include "SystemManager/SystemManager.hpp"
+#include <SystemManager/SystemManagerCommon.hpp>
 
 namespace app
 {

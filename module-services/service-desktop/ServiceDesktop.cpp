@@ -20,7 +20,7 @@
 #include <service-evtmgr/EventManagerCommon.hpp>
 #include <service-evtmgr/EVMessages.hpp>
 #include <purefs/filesystem_paths.hpp>
-#include <module-sys/SystemManager/SystemManager.hpp>
+#include <module-sys/SystemManager/SystemManagerCommon.hpp>
 #include <module-sys/Timers/TimerFactory.hpp>
 
 #include <locks/data/PhoneLockMessages.hpp>
@@ -132,7 +132,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
 
             backupRestoreStatus.state = OperationState::Stopped;
             if (backupRestoreStatus.lastOperationResult == true) {
-                sys::SystemManager::Reboot(this);
+                sys::SystemManagerCommon::Reboot(this);
             }
             else {
                 LOG_ERROR("Restore failed");

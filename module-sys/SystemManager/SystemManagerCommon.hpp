@@ -75,7 +75,7 @@ namespace sys
         UpdateReason updateReason;
     };
 
-    class SystemManager : public Service
+    class SystemManagerCommon : public Service
     {
       private:
         UpdateReason updateReason{UpdateReason::Update};
@@ -93,8 +93,8 @@ namespace sys
             RebootToUpdate
         } state = State::Running;
 
-        explicit SystemManager(std::vector<std::unique_ptr<BaseServiceCreator>> &&creators);
-        ~SystemManager() override;
+        explicit SystemManagerCommon(std::vector<std::unique_ptr<BaseServiceCreator>> &&creators);
+        ~SystemManagerCommon() override;
 
         void set(enum State state);
 
@@ -230,20 +230,20 @@ namespace sys
     };
 } // namespace sys
 
-inline const char *c_str(sys::SystemManager::State state)
+inline const char *c_str(sys::SystemManagerCommon::State state)
 {
     switch (state) {
-    case sys::SystemManager::State::Running:
+    case sys::SystemManagerCommon::State::Running:
         return "Running";
-    case sys::SystemManager::State::Suspend:
+    case sys::SystemManagerCommon::State::Suspend:
         return "Suspend";
-    case sys::SystemManager::State::Shutdown:
+    case sys::SystemManagerCommon::State::Shutdown:
         return "Shutdown";
-    case sys::SystemManager::State::Reboot:
+    case sys::SystemManagerCommon::State::Reboot:
         return "Reboot";
-    case sys::SystemManager::State::RebootToUpdate:
+    case sys::SystemManagerCommon::State::RebootToUpdate:
         return "RebootToUpdate";
-    case sys::SystemManager::State::ShutdownReady:
+    case sys::SystemManagerCommon::State::ShutdownReady:
         return "ShutdownReady";
     }
     return "";

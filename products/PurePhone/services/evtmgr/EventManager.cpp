@@ -205,7 +205,7 @@ void EventManager::handleKeyMoveEvent(RawKey key)
 {
     if (isSliderKeyCode(key.keyCode)) {
         LOG_INFO("Slider position: %s", magic_enum::enum_name(key.keyCode).data());
-        const auto mode = sys::SystemManager::translateSliderState(key);
+        const auto mode = sys::SystemManagerCommon::translateSliderState(key);
         bus.sendUnicast(std::make_shared<sys::PhoneModeRequest>(mode), service::name::system_manager);
     }
 }
