@@ -43,6 +43,16 @@ namespace audio
             return RetCode::Success;
         }
 
+        virtual RetCode Pause()
+        {
+            return RetCode::Success;
+        }
+
+        virtual RetCode Resume()
+        {
+            return RetCode::Success;
+        }
+
         /// Set device output volume
         /// @param vol desired volume from 0 to 10
         /// @return RetCode::Success if OK, or RetCode::Failure otherwise
