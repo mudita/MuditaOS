@@ -296,6 +296,9 @@ namespace app::manager
             }
             return simLockHandler.handleCMEErrorRequest(data->code);
         });
+        connect(typeid(cellular::msg::notification::SimNotInserted), [&](sys::Message *request) -> sys::MessagePointer {
+            return simLockHandler.handleSimNotInsertedMessage();
+        });
         connect(typeid(locks::SetSim), [&](sys::Message *request) -> sys::MessagePointer {
             auto data = static_cast<locks::SetSim *>(request);
             simLockHandler.setSim(data->getSimSlot());
