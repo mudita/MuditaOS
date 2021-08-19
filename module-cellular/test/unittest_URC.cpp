@@ -22,8 +22,10 @@
 #include "UrcRing.hpp"
 #include "UrcPoweredDown.hpp"
 #include "UrcResponse.hpp"
+#include <at/UrcQSimstat.hpp>
 #include "UrcFactory.hpp"
 #include "SimState.hpp"
+#include <at/SimInsertedState.hpp>
 
 template <typename urcType> static auto getURC(std::unique_ptr<at::urc::Urc> &urc) -> std::shared_ptr<urcType>
 {
@@ -923,5 +925,58 @@ TEST_CASE("RING")
             REQUIRE(!ring->isValid());
             REQUIRE(!ring->getType());
         }
+    }
+}
+
+TEST_CASE("QSimstat")
+{
+    SECTION("Valid parameter, inserted")
+    {
+        auto urc      = at::urc::UrcFactory::Create("+QSIMSTAT: 1,1");
+        auto qsimstat = getURC<at::urc::QSimstat>(urc);
+
+        REQUIRE(qsimstat);
+        REQUIRE(qsimstat->getInsertedStatus() == at::SimInsertedStatus::Inserted);
+        REQUIRE(qsimstat->getEnabled() == at::SimInsertedStatusEnable::Enable);
+    }
+
+    SECTION("Valid parameter, removed")
+    {
+        auto urc      = at::urc::UrcFactory::Create("+QSIMSTAT: 1,0");
+        auto qsimstat = getURC<at::urc::QSimstat>(urc);
+
+        REQUIRE(qsimstat);
+        REQUIRE(qsimstat->getInsertedStatus() == at::SimInsertedStatus::Removed);
+        REQUIRE(qsimstat->getEnabled() == at::SimInsertedStatusEnable::Enable);
+    }
+
+    SECTION("Valid parameter, unknown")
+    {
+        auto urc      = at::urc::UrcFactory::Create("+QSIMSTAT: 0,2");
+        auto qsimstat = getURC<at::urc::QSimstat>(urc);
+
+        REQUIRE(qsimstat);
+        REQUIRE(qsimstat->getInsertedStatus() == at::SimInsertedStatus::Unknown);
+        REQUIRE(qsimstat->getEnabled() == at::SimInsertedStatusEnable::Disable);
+    }
+
+    SECTION("Invalid parameter, wrong Enable token")
+    {
+        auto urc      = at::urc::UrcFactory::Create("+QSIMSTAT: 5,2");
+        auto qsimstat = getURC<at::urc::QSimstat>(urc);
+
+        REQUIRE(qsimstat);
+        REQUIRE(qsimstat->getInsertedStatus() == at::SimInsertedStatus::Unknown);
+        REQUIRE(qsimstat->getEnabled() == std::nullopt);
+    }
+
+    SECTION("Invalid parameter, wrong Inserted Status token")
+    {
+        auto urc      = at::urc::UrcFactory::Create("+QSIMSTAT: 0,7");
+        auto qsimstat = getURC<at::urc::QSimstat>(urc);
+
+        REQUIRE(qsimstat);
+        REQUIRE(qsimstat->getInsertedStatus() == std::nullopt);
+        REQUIRE(qsimstat->getEnabled() == at::SimInsertedStatusEnable::Disable);
     }
 }
