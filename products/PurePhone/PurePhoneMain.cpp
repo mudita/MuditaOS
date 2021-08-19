@@ -49,7 +49,7 @@
 #include <log.hpp>
 #include <Logger.hpp>
 #include <source/version.hpp>
-#include <SystemManager/SystemManager.hpp>
+#include <SystemManager/SystemManagerCommon.hpp>
 #include <SystemWatchdog/SystemWatchdog.hpp>
 #include <thread.hpp>
 
@@ -100,7 +100,7 @@ int main()
     systemServices.emplace_back(sys::CreatorFor<service::eink::ServiceEink>());
     systemServices.emplace_back(sys::CreatorFor<service::gui::ServiceGUI>());
 
-    auto sysmgr = std::make_shared<sys::SystemManager>(std::move(systemServices));
+    auto sysmgr = std::make_shared<sys::SystemManagerCommon>(std::move(systemServices));
     sysmgr->StartSystem(
         [&platform]() {
             try {

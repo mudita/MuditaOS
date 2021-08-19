@@ -12,7 +12,7 @@
 
 #include <Common.hpp>
 #include <Service/Message.hpp>
-#include <SystemManager/SystemManager.hpp>
+#include <SystemManager/SystemManagerCommon.hpp>
 #include <SystemManager/messages/SystemManagerMessage.hpp>
 #include <SystemManager/messages/TetheringPhoneModeChangeProhibitedMessage.hpp>
 #include <SystemManager/messages/TetheringQuestionRequest.hpp>
@@ -173,8 +173,8 @@ namespace app::manager
 
     void ApplicationManagerCommon::suspendSystemServices()
     {
-        sys::SystemManager::SuspendService(service::name::gui, this);
-        sys::SystemManager::SuspendService(service::name::eink, this);
+        sys::SystemManagerCommon::SuspendService(service::name::gui, this);
+        sys::SystemManagerCommon::SuspendService(service::name::eink, this);
     }
 
     sys::ReturnCodes ApplicationManagerCommon::DeinitHandler()
@@ -307,8 +307,8 @@ namespace app::manager
 
         switch (mode) {
         case sys::ServicePowerMode ::Active:
-            sys::SystemManager::ResumeService(service::name::eink, this);
-            sys::SystemManager::ResumeService(service::name::gui, this);
+            sys::SystemManagerCommon::ResumeService(service::name::eink, this);
+            sys::SystemManagerCommon::ResumeService(service::name::gui, this);
             break;
         case sys::ServicePowerMode ::SuspendToRAM:
             [[fallthrough]];
@@ -376,7 +376,7 @@ namespace app::manager
             return;
         }
 
-        if (sys::SystemManager::DestroyApplication(application->name(), this)) {
+        if (sys::SystemManagerCommon::DestroyApplication(application->name(), this)) {
             LOG_INFO("Application %s closed", application->name().c_str());
         }
         else {

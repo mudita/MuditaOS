@@ -18,7 +18,7 @@
 #include <service-eink/messages/EinkMessage.hpp>
 #include <service-eink/messages/PrepareDisplayEarlyRequest.hpp>
 #include <Timers/TimerFactory.hpp>
-#include <SystemManager/SystemManager.hpp>
+#include <SystemManager/SystemManagerCommon.hpp>
 
 #include <gsl/util>
 #include <purefs/filesystem_paths.hpp>
