@@ -131,7 +131,7 @@ namespace purefs::subsystem
         if (nvrom_bdev) {
             err = disk_mgr->register_device(nvrom_bdev, default_nvrom_name, blkdev::flags::no_parts_scan);
             if (err) {
-                LOG_WARN("Unable to register NVROM device err %i. Maybe running on rev>T7", err);
+                LOG_WARN("Unable to register NVROM device err %i. Possible: NVROM unavailable", err);
             }
         }
         else {
@@ -220,7 +220,7 @@ namespace purefs::subsystem
                          fs::mount_flags::read_only,
                          &nvrom_lfs_block_size);
         if (err) {
-            LOG_WARN("Unable to mount NVROM partition err %i. Maybe running on rev>T7", err);
+            LOG_WARN("Unable to mount NVROM partition err %i. Possible: NVROM unavailable", err);
             err = 0;
         }
         return err;
