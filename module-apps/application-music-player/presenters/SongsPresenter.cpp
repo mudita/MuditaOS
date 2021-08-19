@@ -145,6 +145,32 @@ namespace app::music_player
         return false;
     }
 
+    bool SongsPresenter::handleAudioPausedNotification(audio::Token token)
+    {
+        if (token == songsModelInterface->getCurrentFileToken()) {
+            songsModelInterface->setCurrentSongState(SongState::NotPlaying);
+            if (changePlayingStateCallback != nullptr) {
+                changePlayingStateCallback(SongState::NotPlaying);
+            }
+            updateViewSongState();
+            return true;
+        }
+        return false;
+    }
+
+    bool SongsPresenter::handleAudioResumedNotification(audio::Token token)
+    {
+        if (token == songsModelInterface->getCurrentFileToken()) {
+            songsModelInterface->setCurrentSongState(SongState::Playing);
+            if (changePlayingStateCallback != nullptr) {
+                changePlayingStateCallback(SongState::Playing);
+            }
+            updateViewSongState();
+            return true;
+        }
+        return false;
+    }
+
     bool SongsPresenter::requestAudioOperation(const std::string &filePath)
     {
         auto currentSongContext = songsModelInterface->getCurrentSongContext();
