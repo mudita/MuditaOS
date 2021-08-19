@@ -18,6 +18,7 @@
 #include <module-cellular/at/UrcResponse.hpp>
 #include <module-cellular/at/UrcQiurc.hpp>
 #include <module-cellular/at/UrcRing.hpp>
+#include <module-cellular/at/UrcQSimstat.hpp>
 
 /**
  * ServiceCellular helper for handling Urc messages
@@ -39,6 +40,7 @@ class CellularUrcHandler : public at::urc::UrcHandler
     void Handle(at::urc::Ring &urc) final;
     void Handle(at::urc::PoweredDown &urc) final;
     void Handle(at::urc::UrcResponse &urc) final;
+    void Handle(at::urc::QSimstat &urc) final;
 
     /**
      * Gets the response that should be returned after handling Urc

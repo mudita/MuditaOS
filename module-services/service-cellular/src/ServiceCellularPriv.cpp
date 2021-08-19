@@ -62,27 +62,53 @@ namespace cellular::internal
          */
         owner->connect(typeid(request::sim::SetActiveSim), [&](sys::Message *request) -> sys::MessagePointer {
             auto msg = static_cast<request::sim::SetActiveSim *>(request);
-            return std::make_shared<request::sim::SetActiveSim::Response>(simCard->handleSetActiveSim(msg->sim));
+            simCard->clearSimInsertedStatus();
+            auto result = simCard->handleSetActiveSim(msg->sim);
+            vTaskDelay(1000);
+            if (!simCard->isSimCardInserted()) {
+                owner->bus.sendMulticast<notification::SimNotInserted>();
+            }
+            return std::make_shared<request::sim::SetActiveSim::Response>(result);
         });
         owner->connect(typeid(request::sim::GetLockState), [&](sys::Message *) -> sys::MessagePointer {
+            if (!simCard->isSimCardInserted()) {
+                owner->bus.sendMulticast<notification::SimNotInserted>();
+                return sys::MessageNone{};
+            }
             return std::make_shared<request::sim::GetLockState::Response>(simCard->handleIsPinLocked());
         });
         owner->connect(typeid(request::sim::ChangePin), [&](sys::Message *request) -> sys::MessagePointer {
             auto msg = static_cast<request::sim::ChangePin *>(request);
+            if (!simCard->isSimCardInserted()) {
+                owner->bus.sendMulticast<notification::SimNotInserted>();
+                return sys::MessageNone{};
+            }
             return std::make_shared<request::sim::ChangePin::Response>(simCard->handleChangePin(msg->oldPin, msg->pin));
         });
         owner->connect(typeid(request::sim::UnblockWithPuk), [&](sys::Message *request) -> sys::MessagePointer {
             auto msg = static_cast<request::sim::UnblockWithPuk *>(request);
+            if (!simCard->isSimCardInserted()) {
+                owner->bus.sendMulticast<notification::SimNotInserted>();
+                return sys::MessageNone{};
+            }
             return std::make_shared<request::sim::UnblockWithPuk::Response>(
                 simCard->handleUnblockWithPuk(msg->puk, msg->pin));
         });
         owner->connect(typeid(request::sim::SetPinLock), [&](sys::Message *request) -> sys::MessagePointer {
             auto msg = static_cast<request::sim::SetPinLock *>(request);
+            if (!simCard->isSimCardInserted()) {
+                owner->bus.sendMulticast<notification::SimNotInserted>();
+                return sys::MessageNone{};
+            }
             return std::make_shared<request::sim::SetPinLock::Response>(simCard->handleSetPinLock(msg->pin, msg->lock),
                                                                         msg->lock);
         });
         owner->connect(typeid(request::sim::PinUnlock), [&](sys::Message *request) -> sys::MessagePointer {
             auto msg = static_cast<request::sim::PinUnlock *>(request);
+            if (!simCard->isSimCardInserted()) {
+                owner->bus.sendMulticast<notification::SimNotInserted>();
+                return sys::MessageNone{};
+            }
             return std::make_shared<request::sim::PinUnlock::Response>(simCard->handlePinUnlock(msg->pin));
         });
 
@@ -91,6 +117,19 @@ namespace cellular::internal
          */
         owner->connect(typeid(sevm::SIMTrayMessage), [&](sys::Message *request) -> sys::MessagePointer {
             simCard->handleTrayState();
+            return sys::MessageNone{};
+        });
+        owner->connect(typeid(cellular::SimInsertedNotication), [&](sys::Message *request) -> sys::MessagePointer {
+            auto message = static_cast<cellular::SimInsertedNotication *>(request);
+
+            if (auto actual = simCard->getSimInsertedStatus();
+                actual.has_value() && actual != message->getInsertedStatus()) {
+                simCard->setSimInserted(message->getInsertedStatus());
+                if (message->getInsertedStatus() == at::SimInsertedStatus::Removed) {
+                    owner->bus.sendMulticast<notification::SimNotInserted>();
+                }
+            }
+            //
             return sys::MessageNone{};
         });
 
