@@ -14,7 +14,8 @@
 namespace locks
 {
     PhoneLockHandler::PhoneLockHandler(sys::Service *owner, std::shared_ptr<settings::Settings> settings)
-        : owner(owner), lock(Lock::LockState::InputRequired), settings(std::move(settings))
+        : owner(owner), lock(Lock::LockState::InputRequired, initialNoCooldownAttemptsLeft),
+          settings(std::move(settings))
     {}
 
     void PhoneLockHandler::enablePhoneLock(bool _phoneLockEnabled)
@@ -32,11 +33,26 @@ namespace locks
         }
     }
 
+    void PhoneLockHandler::setPhoneLockTime(const time_t time)
+    {
+        lockedTill = time;
+    }
+
+    void PhoneLockHandler::setNextUnlockAttemptCooldownTime(const time_t time)
+    {
+        nextUnlockAttemptCooldownTime = time;
+    }
+
+    void PhoneLockHandler::setNoCooldownAttemptsLeft(const unsigned int attemptsNumber)
+    {
+        lock.attemptsLeft = attemptsNumber;
+    }
+
     void PhoneLockHandler::setPhoneLockInputTypeAction(PhoneLockInputTypeAction _phoneLockInputTypeAction)
     {
         if (phoneLockInputTypeAction != _phoneLockInputTypeAction) {
             phoneLockInputTypeAction = _phoneLockInputTypeAction;
-            lock.attemptsLeft        = Lock::unlimitedNumOfAttempts;
+            lock.attemptsLeft        = initialNoCooldownAttemptsLeft;
             storedInputData.clear();
         }
     }
@@ -144,6 +160,34 @@ namespace locks
         settings->setValue(settings::SystemProperties::lockScreenPasscodeIsOn,
                            std::to_string(phoneLockEnabled),
                            settings::SettingsScope::Global);
+    }
+
+    void PhoneLockHandler::savePhoneLockTime()
+    {
+        settings->setValue(::settings::SystemProperties::unlockBlockTime,
+                           std::to_string(lockedTill),
+                           ::settings::SettingsScope::Global);
+    }
+
+    void PhoneLockHandler::saveNextUnlockAttemptCooldownTime()
+    {
+        settings->setValue(::settings::SystemProperties::unlockAttemptCooldownTime,
+                           std::to_string(nextUnlockAttemptCooldownTime),
+                           ::settings::SettingsScope::Global);
+    }
+
+    void PhoneLockHandler::saveNoCooldownAttemptsLeft()
+    {
+        settings->setValue(::settings::SystemProperties::noCooldownAttemptsLeft,
+                           std::to_string(lock.attemptsLeft),
+                           ::settings::SettingsScope::Global);
+    }
+
+    void PhoneLockHandler::storePhoneLockInformation()
+    {
+        savePhoneLockTime();
+        saveNextUnlockAttemptCooldownTime();
+        saveNoCooldownAttemptsLeft();
     }
 
     sys::MessagePointer PhoneLockHandler::handleUnlockRequest()
@@ -262,14 +306,19 @@ namespace locks
 
         if (phoneLockHash == hash) {
             lock.lockState    = Lock::LockState::Unlocked;
-            lock.attemptsLeft = Lock::unlimitedNumOfAttempts;
+            lock.attemptsLeft = initialNoCooldownAttemptsLeft;
+            resetLockTime();
         }
         else if (lock.attemptsLeft > 0) {
             lock.lockState = Lock::LockState::InputInvalid;
+            resetLockTime();
         }
         else {
+            increaseLockTime();
             lock.lockState = Lock::LockState::Blocked;
         }
+        storePhoneLockInformation();
+        lock.setNextUnlockAttemptCooldownTimeMinutes(nextUnlockAttemptCooldownTime / 60);
     }
 
     sys::MessagePointer PhoneLockHandler::verifyPhoneUnlockInput(LockInput inputData)
@@ -367,4 +416,19 @@ namespace locks
     {
         return phoneState == PhoneState::Locked;
     }
+
+    void PhoneLockHandler::increaseLockTime() noexcept
+    {
+        if (lockedTill != 0) {
+            nextUnlockAttemptCooldownTime *= 2;
+        }
+        lockedTill = std::time(nullptr) + nextUnlockAttemptCooldownTime;
+    }
+
+    void PhoneLockHandler::resetLockTime() noexcept
+    {
+        lockedTill                    = 0;
+        nextUnlockAttemptCooldownTime = initialCooldownTime;
+    }
+
 } // namespace locks

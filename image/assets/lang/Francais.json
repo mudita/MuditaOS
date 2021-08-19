@@ -410,8 +410,6 @@
   "app_settings_display_security_autolock": "Verrouillage automatique",
   "app_settings_security_change_phone_lock": "Changer de code d'accès",
   "phone_lock_unlock": "<text>Entrez le code d'accès pour<br></br>déverrouiller l'appareil :</text>",
-  "phone_lock_unlock_last_attempt": "<text>Mauvais code d'accès.<br></br>Il vous reste une seule tentative.</text>",
-  "phone_lock_unlock_last_attempt_warning": "<text>Si le code d'accès est erroné cette fois-ci,<br></br>vous devrez attendre <token>$MINUTES</token> minutes<br></br>avant de réessayer.</text>",
   "phone_lock_unlock_invalid": "<text>Mauvais code d'accès.</text>",
   "phone_lock_blocked": "Désolé, le téléphone est bloqué",
   "phone_lock_current": "Entrez votre code d'accès actuel",

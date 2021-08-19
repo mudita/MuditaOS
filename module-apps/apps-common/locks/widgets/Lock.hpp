@@ -64,6 +64,11 @@ namespace locks
         {
             return lockName;
         }
+        [[nodiscard]] unsigned int getNextUnlockAttemptCooldownTimeMinutes() const noexcept
+        {
+            return nextUnlockAttemptCooldownTimeMinutes;
+        }
+        void setNextUnlockAttemptCooldownTimeMinutes(const unsigned int time);
 
         void putNextChar(unsigned int c);
         /// removes a last character passed to Lock via putNextChar. The last character can not be popped
@@ -72,7 +77,6 @@ namespace locks
         void clearAttempt() noexcept;
         /// consumes LockState::InputInvalid state and LockState::NewInputInvalid
         void consumeState() noexcept;
-        /// calls
 
         explicit Lock(LockState state, unsigned int attemptsLeft = unlimitedNumOfAttempts)
             : lockState{state}, attemptsLeft{attemptsLeft}
@@ -80,8 +84,9 @@ namespace locks
 
       private:
         std::string lockName;
-        LockState lockState       = LockState::Unlocked;
-        unsigned int attemptsLeft = 0;
+        LockState lockState                               = LockState::Unlocked;
+        unsigned int attemptsLeft                         = 0;
+        unsigned int nextUnlockAttemptCooldownTimeMinutes = 0;
 
         std::vector<unsigned int> inputValue;
         unsigned int maxInputSize = defaultInputSize;

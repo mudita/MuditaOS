@@ -29,7 +29,7 @@ namespace gui
 
         virtual void setVisibleStateInputRequired(InputActionType type)                   = 0;
         virtual void setVisibleStateInputInvalid(InputErrorType type, unsigned int value) = 0;
-        virtual void setVisibleStateBlocked()                                             = 0;
+        virtual void setVisibleStateBlocked(unsigned int value)                           = 0;
         virtual void setVisibleStateError(unsigned int errorCode)                         = 0;
 
         virtual void buildLockBox(unsigned int inputSize) = 0;
