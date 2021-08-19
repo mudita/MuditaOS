@@ -9,6 +9,7 @@ namespace gui
         : textRange{range}, boundaries(boundaries)
     {
         setEditMode(EditMode::Browse);
+        drawUnderline(false);
         update();
     }
     void TextSpinner::setTextRange(const TextSpinner::TextRange &range)
