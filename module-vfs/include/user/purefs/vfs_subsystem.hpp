@@ -5,7 +5,7 @@
 
 #include <purefs/fs/filesystem.hpp>
 #include <purefs/blkdev/disk_manager.hpp>
-#include <purefs/DeviceFactory.hpp>
+#include <purefs/blkdev/DeviceFactory.hpp>
 
 #include <memory>
 
