@@ -62,40 +62,45 @@ namespace gui
     auto TimeSetFmtSpinner::setTimeFormat(utils::time::Locale::TimeFormat newFormat) noexcept -> void
     {
         using namespace utils;
-        timeFormat = newFormat;
-        switch (timeFormat) {
+
+        switch (newFormat) {
         case utils::time::Locale::TimeFormat::FormatTime12H: {
             fmt->setVisible(true);
             timeSetSpinner->setHourMax(time::Locale::max_hour_12H_mode);
             timeSetSpinner->setHourMin(time::Locale::min_hour_12H_mode);
 
-            auto hours = std::chrono::hours(timeSetSpinner->getHour());
-            timeSetSpinner->setHour(date::make12(hours).count());
-            if (date::is_pm(hours)) {
-                fmt->setCurrentPosition(fmtSpinnerPMPos);
+            if (timeFormat != newFormat) {
+                auto hours = std::chrono::hours(timeSetSpinner->getHour());
+                timeSetSpinner->setHour(date::make12(hours).count());
+                if (date::is_pm(hours)) {
+                    fmt->setCurrentPosition(fmtSpinnerPMPos);
+                }
+                else {
+                    fmt->setCurrentPosition(fmtSpinnerAMPos);
+                }
             }
-            else {
-                fmt->setCurrentPosition(fmtSpinnerAMPos);
-            }
+
         } break;
         case utils::time::Locale::TimeFormat::FormatTime24H: {
             fmt->setVisible(false);
             timeSetSpinner->setHourMax(time::Locale::max_hour_24H_mode);
             timeSetSpinner->setHourMin(time::Locale::min_hour_24H_mode);
 
-            auto hours = std::chrono::hours(timeSetSpinner->getHour());
-            timeSetSpinner->setHour(date::make24(hours, isPm(fmt->getCurrentText())).count());
+            if (newFormat != timeFormat) {
+                auto hours = std::chrono::hours(timeSetSpinner->getHour());
+                timeSetSpinner->setHour(date::make24(hours, isPM()).count());
+
+                if (focusItem == fmt) {
+                    setFocusItem(timeSetSpinner);
+                }
+            }
         } break;
         default:
             break;
         }
 
+        timeFormat = newFormat;
         resizeItems();
-
-        // If we make 12->24 switch while focused on fmt then change focus to hour
-        if (focusItem == fmt) {
-            setFocusItem(timeSetSpinner);
-        }
     }
 
     auto TimeSetFmtSpinner::setMinute(int value) noexcept -> void
@@ -108,6 +113,7 @@ namespace gui
         editMode = newEditMode;
         if (editMode == EditMode::Edit) {
             setFocusItem(timeSetSpinner);
+            timeSetSpinner->setEditMode(editMode);
         }
         else {
             setFocusItem(nullptr);
@@ -194,8 +200,41 @@ namespace gui
 
         return false;
     }
-    auto TimeSetFmtSpinner::isPm(const std::string_view str) const noexcept -> bool
+    auto TimeSetFmtSpinner::isPM() const noexcept -> bool
     {
-        return str == utils::time::Locale::getPM().c_str();
+        return fmt->getCurrentText() == utils::time::Locale::getPM().c_str();
+    }
+    auto TimeSetFmtSpinner::setTime(std::time_t time) noexcept -> void
+    {
+        using namespace utils::time;
+        if (timeFormat == Locale::TimeFormat::FormatTime24H) {
+            const auto t = std::localtime(&time);
+            timeSetSpinner->setHour(t->tm_hour);
+            timeSetSpinner->setMinute(t->tm_min);
+        }
+        else {
+            const auto t       = std::localtime(&time);
+            const auto hours   = std::chrono::hours{t->tm_hour};
+            const auto time12H = date::make12(hours);
+            const auto isPM    = date::is_pm(hours);
+            timeSetSpinner->setHour(time12H.count());
+            timeSetSpinner->setMinute(t->tm_min);
+            fmt->setCurrentPosition(isPM ? fmtSpinnerPMPos : fmtSpinnerAMPos);
+        }
+    }
+    auto TimeSetFmtSpinner::getTime() const noexcept -> std::time_t
+    {
+        using namespace utils::time;
+        const auto now     = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+        const auto newTime = std::localtime(&now);
+        if (timeFormat == Locale::TimeFormat::FormatTime24H) {
+            newTime->tm_hour = timeSetSpinner->getHour();
+        }
+        else {
+            newTime->tm_hour = date::make24(std::chrono::hours{timeSetSpinner->getHour()}, isPM()).count();
+        }
+        newTime->tm_min = timeSetSpinner->getMinute();
+
+        return std::mktime(newTime);
     }
 } // namespace gui

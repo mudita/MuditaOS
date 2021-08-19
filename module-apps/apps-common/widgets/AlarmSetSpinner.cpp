@@ -5,10 +5,13 @@
 #include <FontManager.hpp>
 #include <RawFont.hpp>
 #include <gui/widgets/Label.hpp>
+#include <gui/widgets/ImageBox.hpp>
+#include <apps-common/widgets/TimeSetFmtSpinner.hpp>
 
 namespace gui
 {
-    AlarmSetSpinner::AlarmSetSpinner(Item *parent, Length x, Length y, Length w, Length h) : HBox(parent, x, y, w, h)
+    AlarmSetSpinner::AlarmSetSpinner(Item *parent, Position x, Position y, Length w, Length h)
+        : HBox(parent, x, y, w, h)
     {
         setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         setEdges(RectangleEdge::None);
@@ -23,12 +26,11 @@ namespace gui
         alarmImg->setMargins(Margins(0, 0, 0, 0));
         alarmImg->setMinimumSize(style::alarm_set_spinner::arrow::w, style::alarm_set_spinner::arrow::h);
 
-        timeSpinner = new TimeSetSpinner(this, 0, 0, 0, 0);
+        timeSpinner = new TimeSetFmtSpinner(this);
         timeSpinner->setFont(style::window::font::largelight);
-        timeSpinner->setEditMode(EditMode::Scroll);
+        timeSpinner->setEditMode(EditMode::Browse);
         timeSpinner->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         timeSpinner->setMargins(Margins(0, 0, 0, 0));
-        timeSpinner->setMinimumHeight(style::alarm_set_spinner::h);
 
         rightArrow = new ImageBox(this, 0, 0, 0, 0, new Image("bell_arrow_right"));
         rightArrow->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
@@ -37,25 +39,24 @@ namespace gui
 
         resizeItems();
 
-        if (editMode == EditMode::Edit) {
-            setFocusItem(timeSpinner);
-        }
+        focusChangedCallback = [&](Item &) {
+            if (focus && editMode == EditMode::Edit) {
+                setFocusItem(timeSpinner);
+            }
+            else {
+                setFocusItem(nullptr);
+            }
+            return true;
+        };
     }
 
     auto AlarmSetSpinner::onInput(const InputEvent &inputEvent) -> bool
     {
-        LOG_INFO("Bell AlarmSetSpinner Input");
+        // Ignore input event when not in edit mode
+        if (editMode != EditMode::Edit) {
+            return false;
+        }
         return this->focusItem->onInput(inputEvent);
-    }
-
-    auto AlarmSetSpinner::setHour(int value) noexcept -> void
-    {
-        timeSpinner->setHour(value);
-    }
-
-    auto AlarmSetSpinner::setMinute(int value) noexcept -> void
-    {
-        timeSpinner->setMinute(value);
     }
 
     auto AlarmSetSpinner::setFont(std::string newFontName) noexcept -> void
@@ -68,7 +69,6 @@ namespace gui
     {
         editMode = mode;
         if (editMode == EditMode::Edit) {
-            setFocusItem(timeSpinner);
             leftArrow->setVisible(true);
             rightArrow->setVisible(true);
         }
@@ -77,8 +77,7 @@ namespace gui
             leftArrow->setVisible(false);
             rightArrow->setVisible(false);
         }
-
-        timeSpinner->setEditMode(editMode);
+        resizeItems();
     }
 
     auto AlarmSetSpinner::getHour() const noexcept -> int
@@ -91,35 +90,58 @@ namespace gui
         return timeSpinner->getMinute();
     }
 
-    auto AlarmSetSpinner::setAlarmStatus(BellAlarm::Status status) noexcept -> void
+    auto AlarmSetSpinner::setAlarmStatus(Status status) noexcept -> void
     {
         alarmStatus = status;
 
         switch (alarmStatus) {
-        case BellAlarm::Status::ACTIVATED:
+        case Status::ACTIVATED:
             alarmImg->setImage("bell_alarm_activated");
             break;
-        case BellAlarm::Status::DEACTIVATED:
+        case Status::DEACTIVATED:
             alarmImg->setImage("bell_alarm_deactivated");
             break;
-        case BellAlarm::Status::RINGING:
+        case Status::RINGING:
             alarmImg->setImage("bell_alarm_ringing");
             break;
-        case BellAlarm::Status::SNOOZE:
+        case Status::SNOOZE:
             alarmImg->setImage("bell_alarm_snooze");
             break;
-        case BellAlarm::Status::UNKNOWN:
+        case Status::UNKNOWN:
             alarmImg->setImage("bell_alarm_deactivated");
             break;
         default:
             alarmImg->setImage("bell_alarm_deactivated");
             break;
         }
+        resizeItems();
     }
 
-    auto AlarmSetSpinner::getAlarmStatus() noexcept -> BellAlarm::Status
+    auto AlarmSetSpinner::setTimeFormat(utils::time::Locale::TimeFormat fmt) noexcept -> void
+    {
+        timeSpinner->setTimeFormat(fmt);
+        resizeItems();
+    }
+
+    auto AlarmSetSpinner::getAlarmStatus() const noexcept -> Status
     {
         return alarmStatus;
+    }
+    auto AlarmSetSpinner::isPM() const noexcept -> bool
+    {
+        return timeSpinner->isPM();
+    }
+    auto AlarmSetSpinner::setTime(std::time_t time) noexcept -> void
+    {
+        timeSpinner->setTime(time);
+    }
+    auto AlarmSetSpinner::getTime() const noexcept -> std::time_t
+    {
+        return timeSpinner->getTime();
+    }
+    auto AlarmSetSpinner::setMinute(std::uint8_t minute) noexcept -> void
+    {
+        timeSpinner->setMinute(minute);
     }
 
 } /* namespace gui */

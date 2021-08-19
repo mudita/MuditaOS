@@ -3,13 +3,10 @@
 
 #pragma once
 
-#include "Rect.hpp"
-#include <application-bell-main/data/BellAlarmData.hpp>
-#include "TimeSetSpinner.hpp"
-#include <gui/widgets/Spinner.hpp>
+#include <gui/widgets/BoxLayout.hpp>
 #include <gui/widgets/Style.hpp>
 #include <gui/widgets/TextConstants.hpp>
-#include <gui/widgets/ImageBox.hpp>
+#include <time/time_locale.hpp>
 #include <string>
 
 namespace style::alarm_set_spinner
@@ -26,29 +23,45 @@ namespace style::alarm_set_spinner
 
 namespace gui
 {
+    class TimeSetFmtSpinner;
+    class ImageBox;
+
     class AlarmSetSpinner : public HBox
     {
       public:
-        AlarmSetSpinner(Item *parent, Length x, Length y, Length w, Length h);
+        enum class Status
+        {
+            UNKNOWN,
+            RINGING,
+            ACTIVATED,
+            DEACTIVATED,
+            SNOOZE
+        };
 
-        auto setHour(int value) noexcept -> void;
-        auto setMinute(int value) noexcept -> void;
+        explicit AlarmSetSpinner(
+            Item *parent = nullptr, Position x = 0U, Position y = 0U, Length w = 0U, Length h = 0U);
+
+        auto setTime(std::time_t time) noexcept -> void;
         auto setFont(std::string newFontName) noexcept -> void;
         auto setEditMode(EditMode mode) noexcept -> void;
-        auto setAlarmStatus(BellAlarm::Status status) noexcept -> void;
-        auto getAlarmStatus() noexcept -> BellAlarm::Status;
+        auto setTimeFormat(utils::time::Locale::TimeFormat fmt) noexcept -> void;
+        auto setAlarmStatus(Status status) noexcept -> void;
+        auto setMinute(std::uint8_t minute) noexcept -> void;
+        auto getAlarmStatus() const noexcept -> Status;
+        auto getTime() const noexcept -> std::time_t;
         [[nodiscard]] auto getHour() const noexcept -> int;
         [[nodiscard]] auto getMinute() const noexcept -> int;
+        [[nodiscard]] auto isPM() const noexcept -> bool;
 
       private:
-        TimeSetSpinner *timeSpinner = nullptr;
-        ImageBox *leftArrow         = nullptr;
-        ImageBox *rightArrow        = nullptr;
-        ImageBox *alarmImg          = nullptr;
+        TimeSetFmtSpinner *timeSpinner = nullptr;
+        ImageBox *leftArrow            = nullptr;
+        ImageBox *rightArrow           = nullptr;
+        ImageBox *alarmImg             = nullptr;
 
-        EditMode editMode             = EditMode::Edit;
-        BellAlarm::Status alarmStatus = BellAlarm::Status::DEACTIVATED;
-        std::string fontName          = style::window::font::largelight;
+        EditMode editMode    = EditMode::Edit;
+        Status alarmStatus   = Status::DEACTIVATED;
+        std::string fontName = style::window::font::largelight;
         auto onInput(const InputEvent &inputEvent) -> bool override;
     };
 } /* namespace gui */
