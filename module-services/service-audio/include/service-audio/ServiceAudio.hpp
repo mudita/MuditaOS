@@ -85,6 +85,10 @@ class ServiceAudio : public sys::Service
     void MuteCurrentOperation();
     void VibrationUpdate(const audio::PlaybackType &type               = audio::PlaybackType::None,
                          std::optional<audio::AudioMux::Input *> input = std::nullopt);
+    void DisableVibration(std::optional<audio::AudioMux::Input *> input = std::nullopt);
+    void EnableOneShotVibration();
+    void EnableContinuousVibration(std::optional<audio::AudioMux::Input *> input = std::nullopt);
+
     auto GetVibrationType(const audio::PlaybackType &type) -> VibrationType;
 
     auto IsVibrationEnabled(const audio::PlaybackType &type) -> bool;
