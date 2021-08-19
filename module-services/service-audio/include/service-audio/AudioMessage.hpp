@@ -70,6 +70,20 @@ class AudioEOFNotification : public AudioNotificationMessage
     {}
 };
 
+class AudioPausedNotification : public AudioNotificationMessage
+{
+  public:
+    explicit AudioPausedNotification(audio::Token token) : AudioNotificationMessage{token}
+    {}
+};
+
+class AudioResumedNotification : public AudioNotificationMessage
+{
+  public:
+    explicit AudioResumedNotification(audio::Token token) : AudioNotificationMessage{token}
+    {}
+};
+
 class AudioSettingsMessage : public AudioMessage
 {
   public:
