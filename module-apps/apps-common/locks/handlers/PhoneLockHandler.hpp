@@ -29,12 +29,20 @@ namespace locks
         PhoneLockInputTypeAction phoneLockInputTypeAction = PhoneLockInputTypeAction::Unlock;
         std::shared_ptr<settings::Settings> settings;
         std::vector<unsigned int> storedInputData;
+        static constexpr unsigned int initialNoCooldownAttemptsLeft = 3;
+        time_t lockedTill                                           = 0;
+        static constexpr time_t initialCooldownTime                 = 60;
+        time_t nextUnlockAttemptCooldownTime                        = initialCooldownTime;
 
         void setPhoneLockInputTypeAction(PhoneLockInputTypeAction _phoneLockInputTypeAction);
         bool checkPhoneLockInputTypeAction(PhoneLockInputTypeAction _phoneLockInputTypeAction);
 
         void setPhoneLockInSettings();
         void setPhoneLockAvailabilityInSettings(bool value);
+        void savePhoneLockTime();
+        void saveNextUnlockAttemptCooldownTime();
+        void saveNoCooldownAttemptsLeft();
+        void storePhoneLockInformation();
 
         void phoneLockAction();
         void phoneUnlockAction();
@@ -71,7 +79,12 @@ namespace locks
 
         void enablePhoneLock(bool _phoneLockEnabled);
         void setPhoneLockHash(const std::string &value);
+        void setPhoneLockTime(time_t time);
+        void setNextUnlockAttemptCooldownTime(time_t time);
+        void setNoCooldownAttemptsLeft(unsigned int attemptsNumber);
         [[nodiscard]] bool isPhoneLocked() const noexcept;
+        void increaseLockTime() noexcept;
+        void resetLockTime() noexcept;
     };
 
 } // namespace locks

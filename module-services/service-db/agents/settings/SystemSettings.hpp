@@ -7,21 +7,24 @@ namespace settings
 {
     namespace SystemProperties
     {
-        constexpr inline auto activeSim                = "gs_active_sim";
-        constexpr inline auto lockPassHash             = "gs_lock_pass_hash";
-        constexpr inline auto lockScreenPasscodeIsOn   = "gs_lock_screen_passcode_is_on";
-        constexpr inline auto autoLockTimeInSec        = "gs_lock_time";
-        constexpr inline auto displayLanguage          = "gs_display_language";
-        constexpr inline auto inputLanguage            = "gs_input_language";
-        constexpr inline auto automaticDateAndTimeIsOn = "gs_automatic_date_and_time_is_on";
-        constexpr inline auto timeFormat               = "gs_time_format";
-        constexpr inline auto dateFormat               = "gs_date_format";
-        constexpr inline auto onboardingDone           = "gs_onboarding_done";
-        constexpr inline auto eulaAccepted             = "gs_eula_accepted";
-        constexpr inline auto osCurrentVersion         = "gs_os_current_version";
-        constexpr inline auto osUpdateVersion          = "gs_os_update_version";
-        constexpr inline auto currentTimezoneName      = "gs_current_timezone_name";
-        constexpr inline auto currentTimezoneRules     = "gs_current_timezone_rules";
+        constexpr inline auto activeSim                 = "gs_active_sim";
+        constexpr inline auto lockPassHash              = "gs_lock_pass_hash";
+        constexpr inline auto lockScreenPasscodeIsOn    = "gs_lock_screen_passcode_is_on";
+        constexpr inline auto autoLockTimeInSec         = "gs_auto_lock_time";
+        constexpr inline auto unlockBlockTime           = "gs_unlock_block_time";
+        constexpr inline auto unlockAttemptCooldownTime = "gs_unlock_attempt_cooldown_time";
+        constexpr inline auto noCooldownAttemptsLeft    = "gs_no_cooldown_attempts_left";
+        constexpr inline auto displayLanguage           = "gs_display_language";
+        constexpr inline auto inputLanguage             = "gs_input_language";
+        constexpr inline auto automaticDateAndTimeIsOn  = "gs_automatic_date_and_time_is_on";
+        constexpr inline auto timeFormat                = "gs_time_format";
+        constexpr inline auto dateFormat                = "gs_date_format";
+        constexpr inline auto onboardingDone            = "gs_onboarding_done";
+        constexpr inline auto eulaAccepted              = "gs_eula_accepted";
+        constexpr inline auto osCurrentVersion          = "gs_os_current_version";
+        constexpr inline auto osUpdateVersion           = "gs_os_update_version";
+        constexpr inline auto currentTimezoneName       = "gs_current_timezone_name";
+        constexpr inline auto currentTimezoneRules      = "gs_current_timezone_rules";
     } // namespace SystemProperties
     namespace Bluetooth
     {
@@ -42,8 +45,8 @@ namespace settings
 
     namespace Cellular
     {
-        constexpr inline auto volte_on = "cl_volte_on";
-        constexpr inline auto apn_list = "cl_apn_list";
+        constexpr inline auto volte_on    = "cl_volte_on";
+        constexpr inline auto apn_list    = "cl_apn_list";
         constexpr inline auto offlineMode = "cl_offline_mode";
     } // namespace Cellular
 
@@ -63,4 +66,4 @@ namespace settings
     {
         constexpr inline auto state = "keypad_light_state";
     } // namespace KeypadLight
-}; // namespace settings
+};    // namespace settings

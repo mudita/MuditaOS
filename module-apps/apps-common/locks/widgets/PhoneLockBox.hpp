@@ -22,7 +22,7 @@ namespace gui
 
       private:
         void buildLockBox(unsigned int pinSize) final;
-        void setVisibleStateBlocked() final;
+        void setVisibleStateBlocked(unsigned int value) final;
         void setVisibleStateError(unsigned int errorCode) final;
         void setVisibleStateInputRequired(InputActionType type) final;
         void setVisibleStateInputInvalid(InputErrorType type, unsigned int value) final;
