@@ -19,8 +19,8 @@ namespace gui
         std::string mapFolder;
         std::vector<ImageMap *> imageMaps;
 
-        std::vector<std::string> getImageMapList(std::string ext);
-
+        auto getImageMapList(std::string ext1, std::string ext2)
+            -> std::pair<std::vector<std::string>, std::vector<std::string>>;
         ImageMap *loadPixMap(std::string filename);
         ImageMap *loadVecMap(std::string filename);
         void addFallbackImage();
