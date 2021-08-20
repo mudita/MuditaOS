@@ -51,6 +51,7 @@ target_link_libraries(BellHybrid
         service-bluetooth
         service-desktop
         service-lwip
+        sys
         platform
         ${LWIP_LIBRARIES}
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_Linux>:iosyscalls>"
@@ -86,3 +87,4 @@ add_update_package(BellHybrid)
 
 add_subdirectory(services)
 add_subdirectory(alarms)
+add_subdirectory(sys)
