@@ -3,6 +3,7 @@
 
 #include "ServiceCellularPriv.hpp"
 #include "messages.hpp"
+#include "SMSPartsHandler.hpp"
 
 #include <service-cellular-api>
 
@@ -160,10 +161,7 @@ namespace cellular::internal
 
     bool ServiceCellularPriv::onSendSMS(SMSRecord &record)
     {
-        uint32_t textLen = record.body.length();
-
         auto commandTimeout                 = at::factory(at::AT::CMGS).getTimeout();
-        constexpr uint32_t singleMessageLen = msgConstants::singleMessageMaxLen;
         bool result                         = false;
         auto channel                        = owner->cmux->get(CellularMux::Channel::Commands);
         auto receiver                       = record.number.getEntered();
@@ -182,8 +180,8 @@ namespace cellular::internal
         }
 
         if (channelSetup) {
-            // if text fit in single message send
-            if (textLen < singleMessageLen) {
+            auto partHandler = sms::SMSPartsHandler(record.body);
+            if (partHandler.isSinglePartSMS()) {
                 std::string command      = std::string(at::factory(at::AT::CMGS));
                 std::string body         = UCS2(UTF8(receiver)).str();
                 std::string suffix       = "\"";
@@ -191,7 +189,7 @@ namespace cellular::internal
                 if (owner->cmux->checkATCommandPrompt(
                         channel->sendCommandPrompt(command_data.c_str(), 1, commandTimeout))) {
 
-                    if (channel->cmd((UCS2(record.body).str() + "\032").c_str(), commandTimeout)) {
+                    if (channel->cmd((partHandler.getNextSmsPart() + "\032").c_str(), commandTimeout)) {
                         result = true;
                     }
                     else {
@@ -202,37 +200,26 @@ namespace cellular::internal
                     }
                 }
             }
-            // split text, and send concatenated messages
             else {
-                const uint32_t maxConcatenatedCount = msgConstants::maxConcatenatedCount;
-                uint32_t messagePartsCount          = textLen / singleMessageLen;
-                if ((textLen % singleMessageLen) != 0) {
-                    messagePartsCount++;
-                }
-
-                if (messagePartsCount > maxConcatenatedCount) {
-                    LOG_ERROR("Message to long");
+                if (partHandler.isPartsCountAboveLimit()) {
+                    LOG_ERROR("Message too long.");
                     result = false;
                 }
                 else {
                     auto channel = owner->cmux->get(CellularMux::Channel::Commands);
                     saveNewMultiPartSMSUIDCallback(multiPartSMSUID);
 
-                    for (uint32_t i = 0; i < messagePartsCount; i++) {
-
-                        uint32_t partLength = singleMessageLen;
-                        if (i * singleMessageLen + singleMessageLen > record.body.length()) {
-                            partLength = record.body.length() - i * singleMessageLen;
-                        }
-                        UTF8 messagePart = record.body.substr(i * singleMessageLen, partLength);
+                    for (unsigned i = 0; i < partHandler.getPartsCount(); i++) {
 
                         std::string command(at::factory(at::AT::QCMGS) + UCS2(UTF8(receiver)).str() + "\"," +
                                             std::to_string(multiPartSMSUID) + "," + std::to_string(i + 1) + "," +
-                                            std::to_string(messagePartsCount));
+                                            std::to_string(partHandler.getPartsCount()));
+
                         if (owner->cmux->checkATCommandPrompt(
                                 channel->sendCommandPrompt(command.c_str(), 1, commandTimeout))) {
                             // prompt sign received, send data ended by "Ctrl+Z"
-                            if (channel->cmd(UCS2(messagePart).str() + "\032", commandTimeout, 2)) {
+
+                            if (channel->cmd(partHandler.getNextSmsPart() + "\032", commandTimeout, 2)) {
                                 result = true;
                             }
                             else {
