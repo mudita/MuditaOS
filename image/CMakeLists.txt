@@ -8,6 +8,7 @@ add_assets_target(
     TARGET assets
     SOURCE_DIR ${ASSETS_SOURCE_DIR}
     DEST_DIR ${ASSETS_DEST_DIR}
+    DEVEL ${WITH_DEVELOPMENT_FEATURES}
 )
 
 multicomp_install(

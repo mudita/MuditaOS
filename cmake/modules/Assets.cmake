@@ -3,8 +3,8 @@ set(ASSETS_SOURCE_DIR ${CMAKE_SOURCE_DIR}/image)
 function(add_assets_target)
     cmake_parse_arguments(
         _ASSETS
-        "DEVEL"
-        "TARGET;SOURCE_DIR;DEST_DIR"
+        ""
+        "TARGET;SOURCE_DIR;DEST_DIR;DEVEL"
         ""
         ${ARGN}
     )

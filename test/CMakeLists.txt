@@ -28,7 +28,7 @@ add_assets_target(
     TARGET test-assets
     SOURCE_DIR ${ASSETS_SOURCE_DIR}
     DEST_DIR ${TEST_ASSETS_DEST_DIR}
-    DEVEL
+    DEVEL ON
 )
 
 add_image(
