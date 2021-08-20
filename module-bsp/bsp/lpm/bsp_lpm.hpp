@@ -42,6 +42,9 @@ namespace bsp
         virtual void SwitchOscillatorSource(OscillatorSource source) = 0;
         virtual void SetBootSuccess() = 0;
 
+        virtual void EnableDcdcPowerSaveMode() = 0;
+        virtual void DisableDcdcPowerSaveMode() = 0;
+
       protected:
         CpuFrequencyHz currentFrequency = CpuFrequencyHz::Level_6;
     };

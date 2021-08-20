@@ -120,6 +120,8 @@ namespace sys
         const auto freq = lowPowerControl->GetCurrentFrequencyLevel();
 
         if (freq == bsp::CpuFrequencyHz::Level_1) {
+            // turn off power save mode for DCDC inverter
+            lowPowerControl->DisableDcdcPowerSaveMode();
             // Switch DCDC to full throttle during oscillator switch
             lowPowerControl->SetHighestCoreVoltage();
             // switch oscillator source
@@ -177,6 +179,9 @@ namespace sys
             if (driverSEMC) {
                 driverSEMC->SwitchToPeripheralClockSource();
             }
+
+            // turn on power save mode for DCDC inverter
+            lowPowerControl->EnableDcdcPowerSaveMode();
         }
 
         isFrequencyLoweringInProgress = true;
