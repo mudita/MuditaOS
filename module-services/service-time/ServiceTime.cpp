@@ -1,17 +1,20 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "AlarmMessageHandler.hpp"
 #include "ServiceTime.hpp"
-#include "service-time/TimeMessage.hpp"
-#include "service-time/RTCCommand.hpp"
+#include <service-time/AlarmMessage.hpp>
 #include <service-time/internal/StaticData.hpp>
+#include <service-time/RTCCommand.hpp>
+#include <service-time/TimeMessage.hpp>
 #include <service-time/TimeSettings.hpp>
 #include <service-time/TimezoneHandler.hpp>
 
 #include <BaseInterface.hpp>
 #include <Common/Query.hpp>
-#include <MessageType.hpp>
 #include <log.hpp>
+#include <MessageType.hpp>
+#include <module-db/Interface/EventRecord.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <service-db/QueryMessage.hpp>
 #include <service-cellular/service-cellular/CellularMessage.hpp>
@@ -37,6 +40,10 @@ namespace stm
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
 
         timeManager = std::make_unique<TimeManager>(std::make_unique<RTCCommand>(this));
+
+        auto alarmEventsRepo = std::make_unique<alarms::AlarmEventsDBRepository>(this);
+        auto alarmOperations = std::make_unique<alarms::AlarmOperations>(std::move(alarmEventsRepo));
+        alarmMessageHandler  = std::make_unique<alarms::AlarmMessageHandler>(this, std::move(alarmOperations));
     }
 
     ServiceTime::~ServiceTime()
@@ -105,6 +112,28 @@ namespace stm
         });
         connect(typeid(stm::message::GetAutomaticDateAndTimeRequest),
                 [&](sys::Message *request) -> sys::MessagePointer { return handleGetAutomaticDateAndTimeRequest(); });
+
+        connect(typeid(alarms::AlarmGetRequestMessage), [&](sys::Message *request) -> sys::MessagePointer {
+            return alarmMessageHandler->handleGetAlarm(static_cast<alarms::AlarmGetRequestMessage *>(request));
+        });
+        connect(typeid(alarms::AlarmAddRequestMessage), [&](sys::Message *request) -> sys::MessagePointer {
+            return alarmMessageHandler->handleAddAlarm(static_cast<alarms::AlarmAddRequestMessage *>(request));
+        });
+        connect(typeid(alarms::AlarmUpdateRequestMessage), [&](sys::Message *request) -> sys::MessagePointer {
+            return alarmMessageHandler->handleUpdateAlarm(static_cast<alarms::AlarmUpdateRequestMessage *>(request));
+        });
+        connect(typeid(alarms::AlarmRemoveRequestMessage), [&](sys::Message *request) -> sys::MessagePointer {
+            return alarmMessageHandler->handleRemoveAlarm(static_cast<alarms::AlarmRemoveRequestMessage *>(request));
+        });
+        connect(typeid(alarms::AlarmsGetInRangeRequestMessage), [&](sys::Message *request) -> sys::MessagePointer {
+            return alarmMessageHandler->handleGetAlarmsInRange(
+                static_cast<alarms::AlarmsGetInRangeRequestMessage *>(request));
+        });
+        connect(typeid(alarms::AlarmGetNextSingleEventsRequestMessage),
+                [&](sys::Message *request) -> sys::MessagePointer {
+                    return alarmMessageHandler->handleGetNextSingleEvents(
+                        static_cast<alarms::AlarmGetNextSingleEventsRequestMessage *>(request));
+                });
     }
 
     auto ServiceTime::handleSetAutomaticDateAndTimeRequest(sys::Message *request)

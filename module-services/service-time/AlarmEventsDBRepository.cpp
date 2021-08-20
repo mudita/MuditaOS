@@ -13,7 +13,7 @@
 #include <module-db/queries/alarm_events/QueryAlarmEventsGetRecurringBetweenDates.hpp>
 #include <module-db/queries/alarm_events/QueryAlarmEventsRemove.hpp>
 
-namespace alarmEvents
+namespace alarms
 {
     AlarmEventsDBRepository::AlarmEventsDBRepository(sys::Service *service) : service{service}
     {}
@@ -108,4 +108,4 @@ namespace alarmEvents
         DBServiceAPI::GetQuery(service, db::Interface::Name::AlarmEvents, std::move(query));
     }
 
-} // namespace alarmEvents
+} // namespace alarms

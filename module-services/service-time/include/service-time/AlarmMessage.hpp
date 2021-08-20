@@ -25,29 +25,28 @@ namespace alarms
     {
       public:
         AlarmGetRequestMessage(const unsigned int id = 1) : id(id){};
-        unsigned int id;
+        const unsigned int id;
     };
 
     class AlarmGetResponseMessage : public AlarmMessage
     {
       public:
-        AlarmGetResponseMessage(const std::vector<AlarmEventRecord> alarms = std::vector<AlarmEventRecord>())
-            : alarms(alarms){};
-        std::vector<AlarmEventRecord> alarms;
+        AlarmGetResponseMessage(const AlarmEventRecord alarm = AlarmEventRecord{}) : alarm(alarm){};
+        const AlarmEventRecord alarm;
     };
 
     class AlarmAddRequestMessage : public AlarmMessage
     {
       public:
         AlarmAddRequestMessage(const AlarmEventRecord &alarmEvent = AlarmEventRecord()) : alarmEvent(alarmEvent){};
-        AlarmEventRecord alarmEvent;
+        const AlarmEventRecord alarmEvent;
     };
 
     class AlarmAddResponseMessage : public AlarmMessage
     {
       public:
-        AlarmAddResponseMessage(const AlarmEventRecord &alarmEvent = AlarmEventRecord()) : alarmEvent(alarmEvent){};
-        AlarmEventRecord alarmEvent;
+        AlarmAddResponseMessage(const bool success = false) : success(success){};
+        const bool success;
     };
 
     class AlarmUpdateRequestMessage : public AlarmMessage
@@ -60,22 +59,22 @@ namespace alarms
     class AlarmUpdateResponseMessage : public AlarmMessage
     {
       public:
-        AlarmUpdateResponseMessage(const AlarmEventRecord &alarmEvent = AlarmEventRecord()) : alarmEvent(alarmEvent){};
-        AlarmEventRecord alarmEvent;
+        AlarmUpdateResponseMessage(const bool success = false) : success(success){};
+        const bool success;
     };
 
     class AlarmRemoveRequestMessage : public AlarmMessage
     {
       public:
         AlarmRemoveRequestMessage(const unsigned int id = 0) : id(id){};
-        unsigned int id;
+        const unsigned int id;
     };
 
     class AlarmRemoveResponseMessage : public AlarmMessage
     {
       public:
         AlarmRemoveResponseMessage(const bool success = false) : success(success){};
-        bool success;
+        const bool success;
     };
 
     class AlarmsGetInRangeRequestMessage : public AlarmMessage
@@ -83,10 +82,14 @@ namespace alarms
       public:
         AlarmsGetInRangeRequestMessage(
             const std::chrono::time_point<std::chrono::system_clock> start = TIME_POINT_INVALID,
-            const std::chrono::time_point<std::chrono::system_clock> end   = TIME_POINT_INVALID)
-            : start(start), end(end){};
-        std::chrono::time_point<std::chrono::system_clock> start;
-        std::chrono::time_point<std::chrono::system_clock> end;
+            const std::chrono::time_point<std::chrono::system_clock> end   = TIME_POINT_INVALID,
+            std::uint32_t offset                                           = 0,
+            std::uint32_t limit                                            = 0)
+            : start(start), end(end), offset(offset), limit(limit){};
+        const std::chrono::time_point<std::chrono::system_clock> start;
+        const std::chrono::time_point<std::chrono::system_clock> end;
+        const std::uint32_t offset;
+        const std::uint32_t limit;
     };
 
     class AlarmsGetInRangeResponseMessage : public AlarmMessage
