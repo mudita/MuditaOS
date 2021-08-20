@@ -22,8 +22,12 @@ namespace bsp
         void SwitchOscillatorSource(OscillatorSource source) final;
         void SetBootSuccess() override;
 
+        void EnableDcdcPowerSaveMode() final;
+        void DisableDcdcPowerSaveMode() final;
+
       private:
-        std::shared_ptr<drivers::DriverGPIO> gpio;
+        std::shared_ptr<drivers::DriverGPIO> gpio_1;
+        std::shared_ptr<drivers::DriverGPIO> gpio_2;
         std::unique_ptr<bsp::CpuFreqLPM> CpuFreq;
     };
 

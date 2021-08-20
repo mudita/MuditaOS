@@ -39,4 +39,10 @@ namespace bsp
     void LinuxLPM::SetBootSuccess()
     {}
 
+    void LinuxLPM::EnableDcdcPowerSaveMode()
+    {}
+
+    void LinuxLPM::DisableDcdcPowerSaveMode()
+    {}
+
 } // namespace bsp
