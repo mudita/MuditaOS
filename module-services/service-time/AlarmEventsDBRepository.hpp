@@ -1,12 +1,14 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#pragma once
+
 #include "AlarmRepository.hpp"
 
 #include <Service/Service.hpp>
 #include <time/dateCommon.hpp>
 
-namespace alarmEvents
+namespace alarms
 {
     class AlarmEventsDBRepository : public AbstractAlarmEventsRepository
     {
@@ -41,4 +43,4 @@ namespace alarmEvents
         template <typename requestT, typename responseT, typename callbackT, typename... Types>
         void sendQueryWithCallback(const callbackT &callback, Types... queryArgs);
     };
-} // namespace alarmEvents
+} // namespace alarms

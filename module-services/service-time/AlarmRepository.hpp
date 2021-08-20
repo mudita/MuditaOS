@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include <service-time/AlarmMessage.hpp>
 
 #include <module-sys/Service/Service.hpp>
 #include <time/dateCommon.hpp>
@@ -18,21 +17,19 @@ class AlarmEventRecord;
 /**
  * @brief Basic interface alarm API
  */
-namespace alarmEvents
+namespace alarms
 {
+    using OnGetAlarmEventCallback          = std::function<void(AlarmEventRecord)>;
+    using OnGetAlarmEventsCallback         = std::function<void(std::vector<AlarmEventRecord>)>;
+    using OnGetAlarmEventsInRangeCallback  = std::function<void(std::vector<AlarmEventRecord>)>;
+    using OnAddAlarmEventCallback          = std::function<void(bool)>;
+    using OnUpdateAlarmEventCallback       = std::function<void(bool)>;
+    using OnRemoveAlarmEventCallback       = std::function<void(bool)>;
+    using OnGetNextCallback                = std::function<void(std::vector<AlarmEventRecord>)>;
+    using OnGetAlarmEventsRecurringInRange = std::function<void(std::vector<AlarmEventRecord>)>;
 
     class AbstractAlarmEventsRepository
     {
-      public:
-        using OnGetAlarmEventCallback          = std::function<void(AlarmEventRecord)>;
-        using OnGetAlarmEventsCallback         = std::function<void(std::vector<AlarmEventRecord>)>;
-        using OnGetAlarmEventsInRangeCallback  = std::function<void(std::vector<AlarmEventRecord>)>;
-        using OnAddAlarmEventCallback          = std::function<void(bool)>;
-        using OnUpdateAlarmEventCallback       = std::function<void(bool)>;
-        using OnRemoveAlarmEventCallback       = std::function<void(bool)>;
-        using OnGetNextCallback                = std::function<void(std::vector<AlarmEventRecord>)>;
-        using OnGetAlarmEventsRecurringInRange = std::function<void(std::vector<AlarmEventRecord>)>;
-
       public:
         /**
          * Default destructor
@@ -112,4 +109,4 @@ namespace alarmEvents
                                                     std::uint32_t limit,
                                                     const OnGetAlarmEventsRecurringInRange &callback) = 0;
     };
-} // namespace alarmEvents
+} // namespace alarms

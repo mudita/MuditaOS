@@ -19,3 +19,15 @@ add_catch2_executable(
         service-time
         module-db
 )
+
+add_gtest_executable(
+    NAME 
+        service-time-alarm-operations
+    SRCS
+        tests-AlarmOperations.cpp
+    LIBS
+        module-sys
+        service-time
+    INCLUDE
+        $<TARGET_PROPERTY:service-time,INCLUDE_DIRECTORIES>
+)
