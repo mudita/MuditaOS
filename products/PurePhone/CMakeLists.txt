@@ -67,6 +67,7 @@ target_link_libraries(PurePhone
         service-bluetooth
         service-desktop
         service-lwip
+        sys
         ${LWIP_LIBRARIES}
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_Linux>:iosyscalls>"
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_RT1051>:CrashCatcher::CrashCatcher>"
@@ -106,6 +107,7 @@ github_message_standalone()
 github_message_update()
 
 add_subdirectory(services)
+add_subdirectory(sys)
 
 if (${ENABLE_TESTS})
     add_subdirectory(test)
