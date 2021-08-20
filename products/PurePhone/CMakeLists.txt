@@ -67,6 +67,7 @@ target_link_libraries(PurePhone
         service-bluetooth
         service-desktop
         service-lwip
+        service-time
         sys
         ${LWIP_LIBRARIES}
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_Linux>:iosyscalls>"

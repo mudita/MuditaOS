@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include "AlarmEventsDBRepository.hpp"
+#include "AlarmMessageHandler.hpp"
 #include "Constants.hpp"
 #include "service-time/TimeManager.hpp"
 #include "service-time/ServiceTime.hpp"
@@ -33,6 +35,8 @@ namespace stm
 
         std::unique_ptr<settings::Settings> settings;
 
+        std::unique_ptr<alarms::AlarmMessageHandler> alarmMessageHandler;
+
         void registerMessageHandlers();
         auto handleSetAutomaticDateAndTimeRequest(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>;
         auto handleSetTimeFormatRequest(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>;
@@ -40,6 +44,7 @@ namespace stm
         auto handleSetTimezoneRequest(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>;
         auto handleCellularTimeNotificationMessage(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>;
         auto handleGetAutomaticDateAndTimeRequest() -> std::shared_ptr<sys::ResponseMessage>;
+
         void initStaticData();
 
       public:
