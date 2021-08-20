@@ -294,6 +294,7 @@ void PINMUX_InitBootPins(void)
 {
     PINMUX_InitDEBUG_UART();
     PINMUX_InitPowerButton();
+    PINMUX_InitDcdcInverter();
     PINMUX_InitEMMC();
     PINMUX_InitKeyboard();
     PINMUX_InitAudioCodec();
@@ -1134,29 +1135,12 @@ void PINMUX_InitUSBC(void)
 
     IOMUXC_SetPinMux(PINMUX_USBC_CONTROLLER_NINT, /* GPIO_AD_B0_01 is configured as LPSPI1_SDO */
                      0U);                       /* Software Input On Field: Input Path is determined by functionality */
-    IOMUXC_SetPinMux(PINMUX_USBC_CONTROLLER_ID, /* GPIO_AD_B0_02 is configured as LPSPI1_SDI */
-                     0U);                       /* Software Input On Field: Input Path is determined by functionality */
-    IOMUXC_SetPinMux(PINMUX_USBC_CONTROLLER_PORT, /* GPIO_AD_B0_02 is configured as LPSPI1_SDI */
-                     0U); /* Software Input On Field: Input Path is determined by functionality */
+
     IOMUXC_SetPinMux(PINMUX_USB_FUNCTION_MUX_SELECT, 1U);
 
     IOMUXC_SetPinConfig(PINMUX_USBC_CONTROLLER_NINT, /* GPIO_AD_B0_03 PAD functional properties : */
                         IOMUXC_SW_PAD_CTL_PAD_ODE(1) | PAD_CONFIG_PULL_KEEPER_ENABLED | PAD_CONFIG_SELECT_PULL |
                             PAD_CONFIG_PULL_UP_100kOhm); /* Open drain enable with internal 100k pullup */
-
-    IOMUXC_SetPinConfig(PINMUX_USBC_CONTROLLER_ID, /* GPIO_AD_B0_03 PAD functional properties : */
-                        IOMUXC_SW_PAD_CTL_PAD_ODE(1) | PAD_CONFIG_PULL_KEEPER_ENABLED | PAD_CONFIG_SELECT_PULL |
-                            PAD_CONFIG_PULL_UP_100kOhm); /* Open drain enable with internal 100k pullup */
-
-    IOMUXC_SetPinConfig(PINMUX_USBC_CONTROLLER_PORT, /* GPIO_AD_B0_03 PAD functional properties : */
-                        0x10B0u);                    /* Slew Rate Field: Slow Slew Rate
-                                                      Drive Strength Field: R0/6
-                                                      Speed Field: medium(100MHz)
-                                                      Open Drain Enable Field: Open Drain Disabled
-                                                      Pull / Keep Enable Field: Pull/Keeper Enabled
-                                                      Pull / Keep Select Field: Keeper
-                                                      Pull Up / Down Config. Field: 100K Ohm Pull Down
-                                                      Hyst. Enable Field: Hysteresis Disabled */
 
     IOMUXC_SetPinConfig(PINMUX_USB_FUNCTION_MUX_SELECT,
                         PAD_CONFIG_SLEW_RATE_SLOW | PAD_CONFIG_DRIVER_STRENGTH_LVL_1 | PAD_CONFIG_SPEED_SLOW_50MHz |
@@ -1497,6 +1481,13 @@ void PINMUX_InitLightSensor(void)
     IOMUXC_SetPinConfig(PINMUX_LIGHT_SENSOR_IRQ_PIN,
                         PAD_CONFIG_SLEW_RATE_SLOW | PAD_CONFIG_DRIVER_DISABLED | PAD_CONFIG_SPEED_SLOW_50MHz |
                             PAD_CONFIG_PULL_KEEPER_ENABLED | PAD_CONFIG_SELECT_PULL | PAD_CONFIG_PULL_UP_22kOhm);
+}
+
+void PINMUX_InitDcdcInverter(void)
+{
+    IOMUXC_SetPinMux(PINMUX_DCDC_MODE_PIN, 0U);
+    IOMUXC_SetPinConfig(PINMUX_DCDC_MODE_PIN, PAD_CONFIG_SLEW_RATE_SLOW | PAD_CONFIG_DRIVER_STRENGTH_LVL_1 | PAD_CONFIG_SPEED_SLOW_50MHz |
+    		PAD_CONFIG_PULL_KEEPER_ENABLED | PAD_CONFIG_SELECT_KEEPER | PAD_CONFIG_HYSTERESIS_DISABLED);
 }
 
 /***********************************************************************************************************************
