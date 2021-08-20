@@ -51,6 +51,7 @@ target_link_libraries(BellHybrid
         service-bluetooth
         service-desktop
         service-lwip
+        service-time
         sys
         platform
         ${LWIP_LIBRARIES}
