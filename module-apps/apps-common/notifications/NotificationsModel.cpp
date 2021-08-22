@@ -29,6 +29,15 @@ namespace
         });
         return it != std::end(notifications);
     }
+
+    bool hasPhoneLockTime(app::manager::actions::NotificationsChangedParams *params)
+    {
+        const auto &notifications = params->getNotifications();
+        const auto it = std::find_if(std::begin(notifications), std::end(notifications), [](const auto &notification) {
+            return notification->getType() == notifications::NotificationType::PhoneLock;
+        });
+        return it != std::end(notifications);
+    }
 } // namespace
 
 NotificationsModel::NotificationsModel(NotificationsListPlacement listPlacement)
@@ -105,6 +114,15 @@ auto NotificationsModel::create(const notifications::TetheringNotification *noti
     return item;
 }
 
+auto NotificationsModel::create(const notifications::PhoneLockNotification *notification) -> NotificationListItem *
+{
+    auto item = new NotificationListItem(notifications::NotificationType::PhoneLock);
+
+    item->setName(utils::translate("phone_lock_notification"), true, {{"$TIME", notification->getTime()}});
+    item->deleteByList = false;
+    return item;
+}
+
 void NotificationsModel::updateData(app::manager::actions::NotificationsChangedParams *params)
 {
     if (list == nullptr) {
@@ -121,6 +139,8 @@ void NotificationsModel::updateData(app::manager::actions::NotificationsChangedP
     const auto showOnLocked =
         (listPlacement == NotificationsListPlacement::LockedScreen) && params->showNotificationsWhenLocked();
 
+    phoneTimeLock = hasPhoneLockTime(params);
+
     if ((listPlacement == NotificationsListPlacement::Desktop) || showOnLocked) {
         tetheringOn = hasTetheringNotification(params);
         for (const auto &notification : params->getNotifications()) {
@@ -135,6 +155,10 @@ void NotificationsModel::updateData(app::manager::actions::NotificationsChangedP
             else if (typeid(*notification) == typeid(notifications::TetheringNotification)) {
                 auto tethering = static_cast<const notifications::TetheringNotification *>(notification.get());
                 internalData.push_back(create(tethering));
+            }
+            else if (typeid(*notification) == typeid(notifications::PhoneLockNotification)) {
+                auto phoneLock = static_cast<const notifications::PhoneLockNotification *>(notification.get());
+                internalData.push_back(create(phoneLock));
             }
         }
     }
@@ -152,4 +176,9 @@ void NotificationsModel::clearAll()
 bool NotificationsModel::isTetheringOn() const noexcept
 {
     return tetheringOn;
+}
+
+bool NotificationsModel::isPhoneTimeLock() const noexcept
+{
+    return phoneTimeLock;
 }

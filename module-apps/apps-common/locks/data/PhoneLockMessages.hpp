@@ -49,12 +49,27 @@ namespace locks
         std::vector<unsigned int> inputData;
 
       public:
-        explicit UnLockPhoneInput(std::vector<unsigned int> inputData) : DataMessage{}, inputData(std::move(inputData))
+        explicit UnLockPhoneInput(std::vector<unsigned int> inputData) : inputData(std::move(inputData))
         {}
 
         [[nodiscard]] auto getInputData() const noexcept
         {
             return inputData;
+        }
+    };
+
+    class PhoneLockTimeUpdate : public sys::DataMessage
+    {
+      private:
+        std::string formattedTime;
+
+      public:
+        explicit PhoneLockTimeUpdate(std::string formattedTime) : formattedTime(std::move(formattedTime))
+        {}
+
+        [[nodiscard]] const auto &getTime() const noexcept
+        {
+            return formattedTime;
         }
     };
 
@@ -86,7 +101,7 @@ namespace locks
         unsigned int attemptsLeft;
 
       public:
-        explicit ExternalUnLockPhoneInfo(unsigned int attemptsLeft) : DataMessage{}, attemptsLeft(attemptsLeft)
+        explicit ExternalUnLockPhoneInfo(unsigned int attemptsLeft) : attemptsLeft(attemptsLeft)
         {}
 
         [[nodiscard]] auto getAttemptsLeft() const noexcept

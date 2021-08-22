@@ -31,7 +31,7 @@ namespace gui
         {
             Sim,
             Attempts,
-            Mins,
+            Time,
             CmeCode,
             PinType
         };
