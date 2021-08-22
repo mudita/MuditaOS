@@ -57,6 +57,17 @@ auto NotificationWithContact::getValue() const noexcept -> unsigned
     return value;
 }
 
+NotificationWithTime::NotificationWithTime(NotificationType type,
+                                           NotificationPriority priorityType,
+                                           std::string formattedTime)
+    : Notification(type, priorityType), formattedTime(std::move(formattedTime))
+{}
+
+auto NotificationWithTime::getTime() const noexcept -> const std::string &
+{
+    return formattedTime;
+}
+
 NotSeenSMSNotification::NotSeenSMSNotification(unsigned value, std::optional<ContactRecord> record)
     : NotificationWithContact(NotificationType::NotSeenSms, value, std::move(record))
 {}
@@ -66,4 +77,8 @@ NotSeenCallNotification::NotSeenCallNotification(unsigned value, std::optional<C
 {}
 
 TetheringNotification::TetheringNotification() : Notification(NotificationType::Tethering)
+{}
+
+PhoneLockNotification::PhoneLockNotification(std::string formattedTime)
+    : NotificationWithTime(NotificationType::PhoneLock, NotificationPriority::Highest, std::move(formattedTime))
 {}

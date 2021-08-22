@@ -64,13 +64,13 @@ namespace app::manager
             settings->getValue(settings::SystemProperties::lockPassHash, settings::SettingsScope::Global));
 
         phoneLockHandler.setPhoneLockTime(utils::getNumericValue<time_t>(
-            settings->getValue(settings::SystemProperties::unlockBlockTime, settings::SettingsScope::Global)));
+            settings->getValue(settings::SystemProperties::unlockLockTime, settings::SettingsScope::Global)));
 
-        phoneLockHandler.setNextUnlockAttemptCooldownTime(utils::getNumericValue<time_t>(settings->getValue(
-            settings::SystemProperties::unlockAttemptCooldownTime, settings::SettingsScope::Global)));
+        phoneLockHandler.setNextUnlockAttemptLockTime(utils::getNumericValue<time_t>(
+            settings->getValue(settings::SystemProperties::unlockAttemptLockTime, settings::SettingsScope::Global)));
 
-        phoneLockHandler.setNoCooldownAttemptsLeft(utils::getNumericValue<unsigned int>(
-            settings->getValue(settings::SystemProperties::noCooldownAttemptsLeft, settings::SettingsScope::Global)));
+        phoneLockHandler.setNoLockTimeAttemptsLeft(utils::getNumericValue<unsigned int>(
+            settings->getValue(settings::SystemProperties::noLockTimeAttemptsLeft, settings::SettingsScope::Global)));
 
         settings->registerValueChange(
             settings::SystemProperties::lockScreenPasscodeIsOn,
@@ -185,6 +185,11 @@ namespace app::manager
                 [&](sys::Message *request) -> sys::MessagePointer { return phoneLockHandler.handleSetPhoneLock(); });
         connect(typeid(locks::SkipSetPhoneLock), [&](sys::Message *request) -> sys::MessagePointer {
             return phoneLockHandler.handleSkipSetPhoneLock();
+        });
+        connect(typeid(locks::PhoneLockTimeUpdate), [&](sys::Message *request) -> sys::MessagePointer {
+            auto req = static_cast<locks::PhoneLockTimeUpdate *>(request);
+            notificationProvider.handle(req);
+            return sys::msgHandled();
         });
         connect(typeid(GetAutoLockTimeoutRequest), [&](sys::Message *request) -> sys::MessagePointer {
             auto req = static_cast<GetAutoLockTimeoutRequest *>(request);

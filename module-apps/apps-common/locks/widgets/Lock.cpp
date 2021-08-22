@@ -38,9 +38,9 @@ namespace locks
         inputValue.clear();
     }
 
-    void Lock::setNextUnlockAttemptCooldownTimeMinutes(const unsigned int time)
+    void Lock::setNextUnlockAttemptFormattedTime(const std::string &time)
     {
-        nextUnlockAttemptCooldownTimeMinutes = time;
+        nextUnlockAttemptFormattedTime = time;
     }
 
 } // namespace locks
