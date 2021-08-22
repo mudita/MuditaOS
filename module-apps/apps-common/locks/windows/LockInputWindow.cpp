@@ -183,8 +183,8 @@ namespace gui
         else if (token == Token::Attempts) {
             return "$ATTEMPTS";
         }
-        else if (token == Token::Mins) {
-            return "$MINUTES";
+        else if (token == Token::Time) {
+            return "$TIME";
         }
         else if (token == Token::CmeCode) {
             return "$CMECODE";
@@ -203,7 +203,7 @@ namespace gui
             lockBox->setVisibleStateInputInvalid(LockBox::InputErrorType::InvalidInput, lock->getAttemptsLeft());
             break;
         case locks::Lock::LockState::Blocked:
-            lockBox->setVisibleStateBlocked(lock->getNextUnlockAttemptCooldownTimeMinutes());
+            lockBox->setVisibleStateBlocked(lock->getNextUnlockAttemptFormattedTime());
             break;
         case locks::Lock::LockState::NewInputRequired:
             lockBox->setVisibleStateInputRequired(LockBox::InputActionType::ProvideNewInput);

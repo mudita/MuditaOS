@@ -9,7 +9,6 @@
 #include <service-appmgr/Controller.hpp>
 #include <time/time_conversion_factory.hpp>
 #include <service-time/ServiceTime.hpp>
-#include <service-time/TimeMessage.hpp>
 
 namespace gui
 {
@@ -68,11 +67,22 @@ namespace gui
         }
         else {
             app::manager::Controller::requestNotifications(application);
+            bottomBar->setActive(BottomBar::Side::LEFT, false);
+            bottomBar->setActive(BottomBar::Side::CENTER, false);
+            bottomBar->setActive(BottomBar::Side::RIGHT, false);
+            return;
         }
 
-        bottomBar->setActive(BottomBar::Side::RIGHT, false);
-        bottomBar->setText(BottomBar::Side::CENTER, utils::translate("app_desktop_unlock"));
-        bottomBar->setActive(BottomBar::Side::LEFT, false);
+        if (notificationsModel->isPhoneTimeLock()) {
+            bottomBar->setText(BottomBar::Side::LEFT, utils::translate("app_desktop_emergency"));
+            bottomBar->setActive(BottomBar::Side::CENTER, false);
+            bottomBar->setActive(BottomBar::Side::RIGHT, false);
+        }
+        else {
+            bottomBar->setActive(BottomBar::Side::LEFT, false);
+            bottomBar->setText(BottomBar::Side::CENTER, utils::translate("app_desktop_unlock"));
+            bottomBar->setActive(BottomBar::Side::RIGHT, false);
+        }
     }
 
     bool PhoneLockedWindow::processLongReleaseEvent(const InputEvent &inputEvent)
@@ -94,12 +104,18 @@ namespace gui
         if (inputEvent.isLongRelease()) {
             return processLongReleaseEvent(inputEvent);
         }
-        else if (inputEvent.isShortRelease()) {
+        else if (inputEvent.isShortRelease() && bottomBar->isActive(BottomBar::Side::CENTER)) {
             const auto requiredStage = (inputEvent.is(KeyCode::KEY_ENTER)) ? PhoneLockedInfoData::Stage::Waiting
                                                                            : PhoneLockedInfoData::Stage::Idle;
             application->switchWindow(gui::popup::window::phone_lock_info_window,
                                       std::make_unique<PhoneLockedInfoData>(requiredStage));
             return true;
+        }
+        else if (inputEvent.isShortRelease(KeyCode::KEY_LF) && bottomBar->isActive(BottomBar::Side::LEFT)) {
+            app::manager::Controller::sendAction(application,
+                                                 app::manager::actions::EmergencyDial,
+                                                 std::make_unique<SwitchData>(),
+                                                 app::manager::OnSwitchBehaviour::RunInBackground);
         }
         return true;
     }
@@ -107,9 +123,9 @@ namespace gui
     bool PhoneLockedWindow::updateTime()
     {
         using namespace utils::time;
-        auto ret       = AppWindow::updateTime();
-        auto clock     = TimestampFactory().createTimestamp(TimestampType::Clock, std::time(nullptr));
-        auto date      = TimestampFactory().createTimestamp(TimestampType::DateText, std::time(nullptr));
+        auto ret   = AppWindow::updateTime();
+        auto clock = TimestampFactory().createTimestamp(TimestampType::Clock, std::time(nullptr));
+        auto date  = TimestampFactory().createTimestamp(TimestampType::DateText, std::time(nullptr));
         if (time != nullptr) {
             time->setText(clock->str());
         }
