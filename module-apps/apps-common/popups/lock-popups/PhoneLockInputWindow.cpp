@@ -104,7 +104,7 @@ namespace gui
         }
         else if (inputEvent.is(KeyCode::KEY_ENTER) && bottomBar->isActive(BottomBar::Side::CENTER)) {
             if (lock->isState(locks::Lock::LockState::Blocked)) {
-                application->returnToPreviousWindow();
+                application->switchWindow(popup::window::phone_lock_window);
             }
             else {
                 lock->consumeState();

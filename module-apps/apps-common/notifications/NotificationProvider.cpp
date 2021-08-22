@@ -36,6 +36,24 @@ bool NotificationProvider::handleNotSeenWithCounter(NotificationsRecord &&record
     return false;
 }
 
+void NotificationProvider::handle(locks::PhoneLockTimeUpdate *msg)
+{
+    assert(msg);
+
+    if (const auto &formattedTime = msg->getTime(); !formattedTime.empty()) {
+        notifications[NotificationType::PhoneLock] = std::make_shared<PhoneLockNotification>(formattedTime);
+    }
+    else {
+        notifications.erase(NotificationType::PhoneLock);
+    }
+
+    notifcationConfig.updateCurrentList(listPolicy);
+
+    if (listPolicy.updateListAllowed()) {
+        send();
+    }
+}
+
 void NotificationProvider::handle(db::query::notifications::GetAllResult *msg)
 {
     assert(msg);

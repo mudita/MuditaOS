@@ -48,11 +48,11 @@ namespace gui
         }
     }
 
-    void PhoneLockBox::setVisibleStateBlocked(const unsigned int value)
+    void PhoneLockBox::setVisibleStateBlocked(const std::string &formattedTime)
     {
         LockWindow->setText("phone_lock_blocked_information",
                             LockInputWindow::TextType::Primary,
-                            {{LockWindow->getToken(LockInputWindow::Token::Mins), static_cast<int>(value)}});
+                            {{LockWindow->getToken(LockInputWindow::Token::Time), formattedTime}});
         LockWindow->setImage("error_W_G");
         LockWindow->setBottomBarWidgetsActive(false, true, false);
     }

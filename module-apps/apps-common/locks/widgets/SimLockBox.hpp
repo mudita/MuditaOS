@@ -27,7 +27,7 @@ namespace gui
         void buildLockBox(unsigned int pinSize) final;
         void setVisibleStateInputRequired(InputActionType type) final;
         void setVisibleStateInputInvalid(InputErrorType type, unsigned int value) final;
-        void setVisibleStateBlocked(unsigned int value) final;
+        void setVisibleStateBlocked(const std::string &formattedTime) final;
         void setVisibleStateError(unsigned int errorCode) final;
         void applyLockActionText(locks::SimInputTypeAction simLockInputTypeAction);
 

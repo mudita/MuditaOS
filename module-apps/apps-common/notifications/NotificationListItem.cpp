@@ -85,7 +85,8 @@ namespace
     std::map<notifications::NotificationType, UTF8> typeToIcon{
         {notifications::NotificationType::NotSeenSms, "messages_notification_icon"},
         {notifications::NotificationType::NotSeenCall, "calls_notification_icon"},
-        {notifications::NotificationType::Tethering, "tethering_notification_icon"}};
+        {notifications::NotificationType::Tethering, "tethering_notification_icon"},
+        {notifications::NotificationType::PhoneLock, "lock_notification_icon_W_G"}};
 } // namespace
 
 NotificationListItem::NotificationListItem(NotificationType type) : type{type}

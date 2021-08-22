@@ -9,9 +9,15 @@
 
 #include <service-db/service-db/Settings.hpp>
 #include <module-sys/Service/Service.hpp>
+#include <Timers/TimerHandle.hpp>
 
 namespace locks
 {
+    constexpr auto phoneLockTimerName                    = "PhoneLockTimer";
+    constexpr unsigned int initialNoLockTimeAttemptsLeft = 3;
+    constexpr time_t initialLockTime                     = 15;
+    constexpr unsigned int phoneLockTimeMultiplier       = 2;
+
     class PhoneLockHandler
     {
       private:
@@ -21,28 +27,36 @@ namespace locks
             Unlocked,
         };
 
+        enum class LockTimerState
+        {
+            Start,
+            Stop,
+        };
+
         sys::Service *owner;
+        std::shared_ptr<settings::Settings> settings;
         Lock lock;
-        bool phoneLockEnabled                             = true;
-        unsigned int phoneLockHash                        = std::numeric_limits<unsigned>::max();
+        bool phoneLockEnabled = true;
+
         PhoneState phoneState                             = PhoneState::Locked;
         PhoneLockInputTypeAction phoneLockInputTypeAction = PhoneLockInputTypeAction::Unlock;
-        std::shared_ptr<settings::Settings> settings;
+
+        unsigned int phoneLockHash = std::numeric_limits<unsigned>::max();
         std::vector<unsigned int> storedInputData;
-        static constexpr unsigned int initialNoCooldownAttemptsLeft = 3;
-        time_t lockedTill                                           = 0;
-        static constexpr time_t initialCooldownTime                 = 60;
-        time_t nextUnlockAttemptCooldownTime                        = initialCooldownTime;
+
+        sys::TimerHandle phoneLockTimer;
+        time_t lockedTill                = 0;
+        time_t nextUnlockAttemptLockTime = initialLockTime;
 
         void setPhoneLockInputTypeAction(PhoneLockInputTypeAction _phoneLockInputTypeAction);
         bool checkPhoneLockInputTypeAction(PhoneLockInputTypeAction _phoneLockInputTypeAction);
 
         void setPhoneLockInSettings();
         void setPhoneLockAvailabilityInSettings(bool value);
+        void setPhoneLockTimeInformationInSettings();
         void savePhoneLockTime();
-        void saveNextUnlockAttemptCooldownTime();
-        void saveNoCooldownAttemptsLeft();
-        void storePhoneLockInformation();
+        void saveNextUnlockAttemptLockTime();
+        void saveNoLockTimeAttemptsLeft();
 
         void phoneLockAction();
         void phoneUnlockAction();
@@ -54,6 +68,7 @@ namespace locks
         void phoneUnlockPopupsCloseAction();
         void phoneLockChangeInfoAction();
         void phoneExternalUnlockInfoAction();
+        void phoneLockTimeUpdateInfoAction(LockTimerState state);
 
         void checkNewPhoneLock();
         void resolvePhoneLockAction();
@@ -79,10 +94,11 @@ namespace locks
 
         void enablePhoneLock(bool _phoneLockEnabled);
         void setPhoneLockHash(const std::string &value);
-        void setPhoneLockTime(time_t time);
-        void setNextUnlockAttemptCooldownTime(time_t time);
-        void setNoCooldownAttemptsLeft(unsigned int attemptsNumber);
         [[nodiscard]] bool isPhoneLocked() const noexcept;
+
+        void setPhoneLockTime(time_t time);
+        void setNextUnlockAttemptLockTime(time_t time);
+        void setNoLockTimeAttemptsLeft(unsigned int attemptsNumber);
         void increaseLockTime() noexcept;
         void resetLockTime() noexcept;
     };

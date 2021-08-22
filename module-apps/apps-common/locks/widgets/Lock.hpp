@@ -64,11 +64,11 @@ namespace locks
         {
             return lockName;
         }
-        [[nodiscard]] unsigned int getNextUnlockAttemptCooldownTimeMinutes() const noexcept
+        [[nodiscard]] const std::string &getNextUnlockAttemptFormattedTime() const noexcept
         {
-            return nextUnlockAttemptCooldownTimeMinutes;
+            return nextUnlockAttemptFormattedTime;
         }
-        void setNextUnlockAttemptCooldownTimeMinutes(const unsigned int time);
+        void setNextUnlockAttemptFormattedTime(const std::string &time);
 
         void putNextChar(unsigned int c);
         /// removes a last character passed to Lock via putNextChar. The last character can not be popped
@@ -84,9 +84,9 @@ namespace locks
 
       private:
         std::string lockName;
-        LockState lockState                               = LockState::Unlocked;
-        unsigned int attemptsLeft                         = 0;
-        unsigned int nextUnlockAttemptCooldownTimeMinutes = 0;
+        LockState lockState       = LockState::Unlocked;
+        unsigned int attemptsLeft = 0;
+        std::string nextUnlockAttemptFormattedTime;
 
         std::vector<unsigned int> inputValue;
         unsigned int maxInputSize = defaultInputSize;
