@@ -124,7 +124,7 @@ ServiceCellular::ServiceCellular()
     callStateTimer = sys::TimerFactory::createPeriodicTimer(
         this, "call_state", std::chrono::milliseconds{1000}, [this](sys::Timer &) { CallStateTimerHandler(); });
     callEndedRecentlyTimer = sys::TimerFactory::createSingleShotTimer(
-        this, "callEndedRecentlyTimer", std::chrono::seconds{3}, [this](sys::Timer &timer) {
+        this, "callEndedRecentlyTimer", std::chrono::seconds{5}, [this](sys::Timer &timer) {
             priv->outSMSHandler.sendMessageIfDelayed();
         });
     stateTimer = sys::TimerFactory::createPeriodicTimer(
