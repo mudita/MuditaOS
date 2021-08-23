@@ -32,7 +32,7 @@ namespace bluetooth
 
         auto init() -> Error::Code;
 
-        auto connect(bd_addr_t address) -> Error::Code;
+        auto connect(const Devicei &device) -> Error::Code;
 
         auto disconnect() -> Error::Code;
 
@@ -43,7 +43,7 @@ namespace bluetooth
         auto startRinging() -> Error::Code;
         auto stopRinging() -> Error::Code;
         auto initializeCall() -> Error::Code;
-        auto isAddressActuallyUsed(bd_addr_t address) -> bool;
+        auto isAddressActuallyUsed(const bd_addr_t address) -> bool;
 
         auto setAudioDevice(std::shared_ptr<BluetoothAudioDevice> device) -> Error::Code;
 

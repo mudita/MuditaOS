@@ -30,11 +30,11 @@ class DriverMock : public AbstractDriver
     {}
     void setVisibility(bool visibility) override
     {}
-    bool pair(uint8_t *addr, std::uint8_t protectionLevel = 0) override
+    bool pair(Devicei device, std::uint8_t protectionLevel = 0) override
     {
         return true;
     }
-    bool unpair(uint8_t *addr) override
+    bool unpair(Devicei device) override
     {
         return true;
     }

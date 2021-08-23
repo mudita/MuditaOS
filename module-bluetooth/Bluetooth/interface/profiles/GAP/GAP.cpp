@@ -8,7 +8,6 @@
 #include <service-bluetooth/messages/ResponseVisibleDevices.hpp>
 #include <service-bluetooth/messages/Unpair.hpp>
 #include <service-bluetooth/messages/Passkey.hpp>
-#include <application-settings/ApplicationSettings.hpp>
 extern "C"
 {
 #include "btstack.h"
@@ -16,7 +15,7 @@ extern "C"
 };
 namespace bluetooth
 {
-    std::string GAP::currentlyProcessedDeviceAddr;
+    Devicei GAP::currentlyProccesedDevice;
     sys::Service *GAP::ownerService = nullptr;
     std::vector<Devicei> GAP::devices;
     btstack_packet_callback_registration_t GAP::cb_handler;
@@ -59,16 +58,18 @@ namespace bluetooth
         LOG_INFO("Visibility: %s", visibility ? "true" : "false");
     }
 
-    auto GAP::pair(std::uint8_t *addr, std::uint8_t protectionLevel) -> bool
+    auto GAP::pair(const Devicei &device, std::uint8_t protectionLevel) -> bool
     {
         if (hci_get_state() == HCI_STATE_WORKING) {
-            currentlyProcessedDeviceAddr = bd_addr_to_str(addr);
-            return gap_dedicated_bonding(addr, protectionLevel) == 0;
+            auto devIndex            = getDeviceIndexForAddress(devices, device.address);
+            currentlyProccesedDevice = devices.at(devIndex);
+
+            return gap_dedicated_bonding(const_cast<uint8_t *>(device.address), protectionLevel) == 0;
         }
         return false;
     }
 
-    auto getDeviceIndexForAddress(const std::vector<Devicei> &devs, bd_addr_t addr) -> int
+    auto GAP::getDeviceIndexForAddress(const std::vector<Devicei> &devs, const bd_addr_t addr) -> int
     {
         auto result = std::find_if(std::begin(devs), std::end(devs), [addr](const Devicei &device) {
             return bd_addr_cmp(addr, device.address) == 0;
@@ -84,8 +85,7 @@ namespace bluetooth
     void GAP::sendDevices()
     {
         auto msg = std::make_shared<message::bluetooth::ResponseVisibleDevices>(devices);
-        ownerService->bus.sendUnicast(msg, "ApplicationSettings");
-        ownerService->bus.sendUnicast(std::move(msg), app::name_settings);
+        ownerService->bus.sendMulticast(std::move(msg), sys::BusChannel::BluetoothNotifications);
     }
 
     auto GAP::startScan() -> int
@@ -207,9 +207,8 @@ namespace bluetooth
     {
         auto result = packet[2];
 
-        auto msg = std::make_shared<BluetoothPairResultMessage>(currentlyProcessedDeviceAddr, result == 0u);
-        currentlyProcessedDeviceAddr.clear();
-        ownerService->bus.sendUnicast(std::move(msg), app::name_settings);
+        auto msg = std::make_shared<BluetoothPairResultMessage>(currentlyProccesedDevice, result == 0u);
+        ownerService->bus.sendUnicast(std::move(msg), "ServiceBluetooth");
     }
     /* @text In ACTIVE, the following events are processed:
      *  - GAP Inquiry result event: BTstack provides a unified inquiry result that contain
@@ -262,7 +261,7 @@ namespace bluetooth
             LOG_DEBUG("PIN code request!");
             hci_event_pin_code_request_get_bd_addr(packet, address);
             auto msg = std::make_shared<::message::bluetooth::RequestPasskey>();
-            ownerService->bus.sendUnicast(std::move(msg), app::name_settings);
+            ownerService->bus.sendMulticast(std::move(msg), sys::BusChannel::BluetoothNotifications);
         }
         const auto eventType = hci_event_packet_get_type(packet);
         switch (state) {
@@ -285,21 +284,18 @@ namespace bluetooth
     {
         return devices;
     }
-    auto GAP::unpair(uint8_t *addr) -> bool
+    auto GAP::unpair(const Devicei &device) -> bool
     {
         LOG_INFO("Unpairing device");
-        gap_drop_link_key_for_bd_addr(addr);
+        gap_drop_link_key_for_bd_addr(const_cast<uint8_t *>(device.address));
 
         LOG_INFO("Device unpaired");
-        std::string unpairedDevAddr{bd_addr_to_str(addr)};
-        ownerService->bus.sendUnicast(
-            std::make_shared<message::bluetooth::UnpairResult>(std::move(unpairedDevAddr), true), app::name_settings);
+        ownerService->bus.sendMulticast(std::make_shared<message::bluetooth::UnpairResult>(device, true),
+                                        sys::BusChannel::BluetoothNotifications);
         return true;
     }
     void GAP::respondPinCode(const std::string &pin)
     {
-        bd_addr_t address{};
-        sscanf_bd_addr(currentlyProcessedDeviceAddr.c_str(), address);
-        gap_pin_code_response(address, pin.c_str());
+        gap_pin_code_response(currentlyProccesedDevice.address, pin.c_str());
     }
 } // namespace bluetooth

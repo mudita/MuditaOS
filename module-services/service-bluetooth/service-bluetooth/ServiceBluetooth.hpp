@@ -12,6 +12,7 @@
 #include <service-audio/ServiceAudio.hpp>
 #include <module-bluetooth/Bluetooth/CommandHandler.hpp>
 #include "ProfileManager.hpp"
+#include "BluetoothDevicesModel.hpp"
 #include <Service/CpuSentinel.hpp>
 #include <Timers/TimerHandle.hpp>
 
@@ -52,6 +53,7 @@ namespace message::bluetooth
     class HSPVolume;
     class Ring;
     class StartAudioRouting;
+    class GetBluetoothDevicesModel;
 } // namespace message::bluetooth
 
 class ServiceBluetooth : public sys::Service
@@ -75,6 +77,7 @@ class ServiceBluetooth : public sys::Service
     std::unique_ptr<BluetoothWorker> worker;
     std::shared_ptr<sys::CpuSentinel> cpuSentinel;
     sys::TimerHandle connectionTimeoutTimer;
+    std::shared_ptr<BluetoothDevicesModel> bluetoothDevicesModel{};
 
     void startTimeoutTimer();
     void stopTimeoutTimer();
@@ -88,6 +91,7 @@ class ServiceBluetooth : public sys::Service
     [[nodiscard]] auto handle(message::bluetooth::RequestStatus *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(message::bluetooth::SetStatus *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(BluetoothPairMessage *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(BluetoothPairResultMessage *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(message::bluetooth::Unpair *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(message::bluetooth::RequestDeviceName *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(message::bluetooth::SetDeviceName *msg) -> std::shared_ptr<sys::Message>;
@@ -104,6 +108,7 @@ class ServiceBluetooth : public sys::Service
     [[nodiscard]] auto handle(message::bluetooth::Ring *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(message::bluetooth::StartAudioRouting *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(message::bluetooth::ResponsePasskey *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(message::bluetooth::GetBluetoothDevicesModel *msg) -> std::shared_ptr<sys::Message>;
 };
 
 namespace sys

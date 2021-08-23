@@ -12,6 +12,7 @@
 #include <service-audio/AudioMessage.hpp>
 #include <service-bluetooth/Constants.hpp>
 #include <service-bluetooth/messages/AudioVolume.hpp>
+#include <service-bluetooth/messages/Disconnect.hpp>
 #include <service-cellular/service-cellular/CellularServiceAPI.hpp>
 #include <service-evtmgr/Constants.hpp>
 #include <service-audio/AudioServiceAPI.hpp>
@@ -46,9 +47,9 @@ namespace bluetooth
         return pimpl->init();
     }
 
-    void HSP::setDeviceAddress(uint8_t *addr)
+    void HSP::setDevice(const Devicei &device)
     {
-        pimpl->setDeviceAddress(addr);
+        pimpl->setDevice(device);
     }
 
     void HSP::setOwnerService(const sys::Service *service)
@@ -98,7 +99,6 @@ namespace bluetooth
     HSP::~HSP() = default;
 
     uint16_t HSP::HSPImpl::scoHandle = HCI_CON_HANDLE_INVALID;
-    bd_addr_t HSP::HSPImpl::deviceAddr;
     std::array<char, commandBufferLength> HSP::HSPImpl::ATcommandBuffer;
     std::array<uint8_t, serviceBufferLength> HSP::HSPImpl::serviceBuffer;
     std::unique_ptr<SCO> HSP::HSPImpl::sco;
@@ -110,6 +110,7 @@ namespace bluetooth
     bool HSP::HSPImpl::callAnswered         = false;
     bool HSP::HSPImpl::isRinging            = false;
     std::shared_ptr<HSPAudioDevice> HSP::HSPImpl::audioDevice;
+    Devicei HSP::HSPImpl::device;
 
     void HSP::HSPImpl::sendAudioEvent(audio::EventType event, audio::Event::DeviceState state)
     {
@@ -303,7 +304,7 @@ namespace bluetooth
         if (isConnected) {
             disconnect();
         }
-        hsp_ag_connect(deviceAddr);
+        hsp_ag_connect(device.address);
     }
 
     void HSP::HSPImpl::disconnect()
@@ -312,10 +313,10 @@ namespace bluetooth
         hsp_ag_disconnect();
     }
 
-    void HSP::HSPImpl::setDeviceAddress(bd_addr_t addr)
+    void HSP::HSPImpl::setDevice(const Devicei &dev)
     {
-        bd_addr_copy(deviceAddr, addr);
-        LOG_DEBUG("Address set!");
+        device = dev;
+        LOG_INFO("Device set!");
     }
 
     void HSP::HSPImpl::setOwnerService(const sys::Service *service)

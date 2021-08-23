@@ -39,12 +39,11 @@ namespace bluetooth
         return Error::Success;
     }
 
-    auto ProfileManager::connect(bd_addr_t address) -> Error::Code
+    auto ProfileManager::connect(const Devicei &device) -> Error::Code
     {
-        bd_addr_copy(remoteAddr, address);
         for (auto &[profileName, ptr] : profilesList) {
             if (ptr != nullptr) {
-                ptr->setDeviceAddress(remoteAddr);
+                ptr->setDevice(device);
                 ptr->connect();
             }
         }
@@ -117,7 +116,7 @@ namespace bluetooth
         profilesList[profileType]->setAudioDevice(device);
         return switchProfile(profileType);
     }
-    auto ProfileManager::isAddressActuallyUsed(bd_addr_t address) -> bool
+    auto ProfileManager::isAddressActuallyUsed(const bd_addr_t address) -> bool
     {
         return !static_cast<bool>(bd_addr_cmp(address, remoteAddr));
     }

@@ -158,7 +158,9 @@ auto BluetoothWorker::handleCommand(QueueHandle_t queue) -> bool
         break;
     case bluetooth::Command::Unpair:
         controller->processCommand(command);
-        removeFromBoundDevices(command.getAddress());
+        removeFromBoundDevices(command.getDevice().address);
+        break;
+    case bluetooth::Command::None:
         break;
     default:
         controller->processCommand(command);
