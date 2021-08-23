@@ -3,43 +3,25 @@
 
 #include "ApplicationManagerCommon.hpp"
 #include "ApplicationStatus.hpp"
-#include "AutoLockRequests.hpp"
 #include "Controller.hpp"
 #include "DOMRequest.hpp"
 #include "FinishRequest.hpp"
-#include "GetAllNotificationsRequest.hpp"
 #include "Message.hpp"
 
-#include <Common.hpp>
 #include <Service/Message.hpp>
 #include <SystemManager/SystemManagerCommon.hpp>
 #include <SystemManager/messages/SystemManagerMessage.hpp>
-#include <SystemManager/messages/TetheringPhoneModeChangeProhibitedMessage.hpp>
-#include <SystemManager/messages/TetheringQuestionRequest.hpp>
-#include <application-desktop/ApplicationDesktop.hpp>
-#include <application-onboarding/ApplicationOnBoarding.hpp>
 #include <application-onboarding/data/OnBoardingMessages.hpp>
-#include <application-special-input/ApplicationSpecialInput.hpp>
 #include <apps-common/messages/AppMessage.hpp>
-#include <apps-common/popups/data/PhoneModeParams.hpp>
-#include <apps-common/popups/data/PopupRequestParams.hpp>
-#include <event-manager-api>
 #include <i18n/i18n.hpp>
 #include <log/log.hpp>
-#include <module-db/queries/notifications/QueryNotificationsGetAll.hpp>
 #include <service-audio/AudioMessage.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
-#include <module-sys/Timers/TimerFactory.hpp>
 #include <module-utils/Utils.hpp>
 #include <service-appmgr/Constants.hpp>
-#include <service-appmgr/StartupType.hpp>
-#include <service-cellular-api>
-#include <service-cellular/CellularMessage.hpp>
-#include <service-db/DBNotificationMessage.hpp>
 #include <service-desktop/Constants.hpp>
 #include <service-desktop/DesktopMessages.hpp>
 #include <service-eink/ServiceEink.hpp>
-#include <service-evtmgr/EVMessages.hpp>
 #include <service-evtmgr/EventManagerCommon.hpp>
 
 #include <algorithm>
@@ -151,23 +133,8 @@ namespace app::manager
 
     void ApplicationManagerCommon::handleStart(StartAllowedMessage *msg)
     {
-        switch (msg->getStartupType()) {
-        case StartupType::Regular:
-            if (auto app = getApplication(rootApplicationName); app != nullptr) {
-                Controller::sendAction(this, actions::Home);
-            }
-            break;
-        case StartupType::LowBattery:
-            handleSwitchApplication(std::make_unique<SwitchRequest>(
-                                        service::name::appmgr, app::name_desktop, window::name::dead_battery, nullptr)
-                                        .get());
-            break;
-        case StartupType::LowBatteryCharging:
-            handleSwitchApplication(
-                std::make_unique<SwitchRequest>(
-                    service::name::appmgr, app::name_desktop, window::name::charging_battery, nullptr)
-                    .get());
-            break;
+        if (auto app = getApplication(rootApplicationName); app != nullptr) {
+            Controller::sendAction(this, actions::Home);
         }
     }
 
@@ -353,23 +320,6 @@ namespace app::manager
         }
     }
 
-    auto ApplicationManagerCommon::closeApplicationsOnUpdate() -> bool
-    {
-        for (const auto &app : getApplications()) {
-            if (app->started()) {
-                auto appName = app->name();
-                if (appName == app::name_desktop) {
-                    LOG_DEBUG("Delay closing %s", app::name_desktop);
-                    continue;
-                }
-                LOG_INFO("Closing application on Update %s", appName.c_str());
-                closeApplication(app.get());
-                app->setState(ApplicationHandle::State::DEACTIVATED);
-            }
-        }
-        return true;
-    }
-
     void ApplicationManagerCommon::closeApplication(ApplicationHandle *application)
     {
         if (application == nullptr) {
@@ -468,8 +418,6 @@ namespace app::manager
             return handleHomeAction(action);
         case actions::Launch:
             return handleLaunchAction(action);
-        case actions::PhoneModeChanged:
-            return ActionProcessStatus::NotHandled;
         case actions::ShowPopup:
             [[fallthrough]];
         case actions::AbortPopup:

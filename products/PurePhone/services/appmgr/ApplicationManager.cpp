@@ -3,6 +3,7 @@
 
 #include <appmgr/ApplicationManager.hpp>
 
+#include <application-desktop/ApplicationDesktop.hpp>
 #include <application-onboarding/ApplicationOnBoarding.hpp>
 #include <application-onboarding/data/OnBoardingMessages.hpp>
 #include <application-special-input/ApplicationSpecialInput.hpp>
@@ -12,17 +13,18 @@
 #include <module-sys/SystemManager/messages/TetheringPhoneModeChangeProhibitedMessage.hpp>
 #include <module-sys/SystemManager/messages/TetheringQuestionRequest.hpp>
 #include <module-sys/Timers/TimerFactory.hpp>
-#include <service-appmgr/include/service-appmgr/messages/AutoLockRequests.hpp>
+#include <service-appmgr/Constants.hpp>
+#include <service-appmgr/messages/AutoLockRequests.hpp>
 #include <service-appmgr/messages/GetAllNotificationsRequest.hpp>
-#include <service-cellular/service-cellular/CellularMessage.hpp>
-#include <service-db/agents/settings/SystemSettings.hpp>
+#include <service-cellular/CellularMessage.hpp>
 #include <service-db/DBNotificationMessage.hpp>
+#include <service-db/agents/settings/SystemSettings.hpp>
 #include <service-desktop/Constants.hpp>
 #include <service-desktop/DesktopMessages.hpp>
 #include <service-desktop/DeveloperModeMessage.hpp>
 #include <service-evtmgr/EVMessages.hpp>
-#include <service-evtmgr/service-evtmgr/Constants.hpp>
-#include <service-evtmgr/service-evtmgr/torch.hpp>
+#include <service-evtmgr/Constants.hpp>
+#include <service-evtmgr/torch.hpp>
 
 namespace app::manager
 {
@@ -464,15 +466,31 @@ namespace app::manager
 
     auto ApplicationManager::handleAction(ActionEntry &action) -> ActionProcessStatus
     {
-        const auto status = ApplicationManagerCommon::handleAction(action);
-        if (status != ActionProcessStatus::NotHandled) {
-            return status;
-        }
         switch (action.actionId) {
         case actions::PhoneModeChanged:
             return handlePhoneModeChangedAction(action);
         default:
-            return ActionProcessStatus::NotHandled;
+            return ApplicationManagerCommon::handleAction(action);
+        }
+    }
+
+    void ApplicationManager::handleStart(StartAllowedMessage *msg)
+    {
+        switch (msg->getStartupType()) {
+        case StartupType::Regular:
+            ApplicationManagerCommon::handleStart(msg);
+            break;
+        case StartupType::LowBattery:
+            handleSwitchApplication(std::make_unique<SwitchRequest>(
+                                        service::name::appmgr, app::name_desktop, window::name::dead_battery, nullptr)
+                                        .get());
+            break;
+        case StartupType::LowBatteryCharging:
+            handleSwitchApplication(
+                std::make_unique<SwitchRequest>(
+                    service::name::appmgr, app::name_desktop, window::name::charging_battery, nullptr)
+                    .get());
+            break;
         }
     }
 } // namespace app::manager
