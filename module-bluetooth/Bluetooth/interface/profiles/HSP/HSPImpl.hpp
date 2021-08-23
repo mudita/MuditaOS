@@ -24,7 +24,7 @@ namespace bluetooth
         void initializeCall() const noexcept;
         void connect();
         void disconnect();
-        void setDeviceAddress(bd_addr_t addr);
+        void setDevice(const Devicei &dev);
         void setOwnerService(const sys::Service *service);
         auto getStreamData() -> std::shared_ptr<BluetoothStreamData>;
         void setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice);
@@ -42,11 +42,11 @@ namespace bluetooth
         static std::unique_ptr<CellularInterface> cellularInterface;
         static std::unique_ptr<AudioInterface> audioInterface;
         static std::array<char, commandBufferLength> ATcommandBuffer;
-        static bd_addr_t deviceAddr;
         static const sys::Service *ownerService;
         static bool isConnected;
         static bool callAnswered;
         static bool isRinging;
         static std::shared_ptr<HSPAudioDevice> audioDevice;
+        static Devicei device;
     };
 } // namespace bluetooth

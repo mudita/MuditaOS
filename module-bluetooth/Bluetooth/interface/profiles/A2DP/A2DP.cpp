@@ -64,9 +64,9 @@ namespace bluetooth
         return pimpl->init();
     }
 
-    void A2DP::setDeviceAddress(uint8_t *addr)
+    void A2DP::setDevice(const Devicei &device)
     {
-        pimpl->setDeviceAddress(addr);
+        pimpl->setDevice(device);
     }
 
     void A2DP::setOwnerService(const sys::Service *service)
@@ -118,7 +118,6 @@ namespace bluetooth
     const sys::Service *A2DP::A2DPImpl::ownerService;
     QueueHandle_t A2DP::A2DPImpl::sourceQueue = nullptr;
     QueueHandle_t A2DP::A2DPImpl::sinkQueue   = nullptr;
-    bd_addr_t A2DP::A2DPImpl::deviceAddr;
     DeviceMetadata_t A2DP::A2DPImpl::metadata;
     btstack_packet_callback_registration_t A2DP::A2DPImpl::hciEventCallbackRegistration;
     std::array<uint8_t, 150> A2DP::A2DPImpl::sdpSourceServiceBuffer;
@@ -130,6 +129,7 @@ namespace bluetooth
     std::shared_ptr<BluetoothAudioDevice> A2DP::A2DPImpl::audioDevice;
 
     bool A2DP::A2DPImpl::isConnected = false;
+    Devicei A2DP::A2DPImpl::device;
     /* LISTING_START(MainConfiguration): Setup Audio Source and AVRCP Target services */
 
     auto A2DP::A2DPImpl::init() -> Error::Code
@@ -329,9 +329,8 @@ namespace bluetooth
                 AVRCP::mediaTracker.a2dp_cid = 0;
 
                 auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
-                busProxy.sendUnicast(
-                    std::make_shared<message::bluetooth::ConnectResult>(std::move(deviceAddress), false),
-                    service::name::bluetooth);
+                busProxy.sendUnicast(std::make_shared<message::bluetooth::ConnectResult>(device, false),
+                                     service::name::bluetooth);
                 break;
             }
             AVRCP::mediaTracker.a2dp_cid = cid;
@@ -342,7 +341,7 @@ namespace bluetooth
                      AVRCP::mediaTracker.local_seid);
             isConnected    = true;
             auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
-            busProxy.sendUnicast(std::make_shared<message::bluetooth::ConnectResult>(std::move(deviceAddress), true),
+            busProxy.sendUnicast(std::make_shared<message::bluetooth::ConnectResult>(device, true),
                                  service::name::bluetooth);
             break;
         }
@@ -550,7 +549,9 @@ namespace bluetooth
 
                 avrcp_target_set_playback_status(AVRCP::mediaTracker.avrcp_cid, AVRCP_PLAYBACK_STATUS_STOPPED);
             }
-
+            auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
+            busProxy.sendUnicast(std::make_shared<message::bluetooth::DisconnectResult>(device),
+                                 service::name::bluetooth);
             stopTimer(&AVRCP::mediaTracker);
             break;
         }
@@ -560,9 +561,6 @@ namespace bluetooth
                 AVRCP::mediaTracker.avrcp_cid = 0;
                 AVRCP::mediaTracker.a2dp_cid  = 0;
                 LOG_INFO("A2DP Source: Signaling released.\n\n");
-                auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
-                busProxy.sendUnicast(std::make_shared<message::bluetooth::DisconnectResult>(),
-                                     service::name::bluetooth);
             }
             isConnected = false;
             break;
@@ -577,19 +575,21 @@ namespace bluetooth
             disconnect();
         }
         LOG_INFO("Starting playback");
-        a2dp_source_establish_stream(deviceAddr, &AVRCP::mediaTracker.a2dp_cid);
+        a2dp_source_establish_stream(device.address, &AVRCP::mediaTracker.a2dp_cid);
     }
 
     void A2DP::A2DPImpl::disconnect()
     {
         LOG_INFO("Stopping playback");
         a2dp_source_disconnect(AVRCP::mediaTracker.a2dp_cid);
+        auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
+        busProxy.sendUnicast(std::make_shared<message::bluetooth::DisconnectResult>(device), service::name::bluetooth);
     }
 
-    void A2DP::A2DPImpl::setDeviceAddress(bd_addr_t addr)
+    void A2DP::A2DPImpl::setDevice(const Devicei &dev)
     {
-        bd_addr_copy(deviceAddr, addr);
-        LOG_INFO("Address set!");
+        device = dev;
+        LOG_INFO("Device set!");
     }
 
     void A2DP::A2DPImpl::setOwnerService(const sys::Service *service)

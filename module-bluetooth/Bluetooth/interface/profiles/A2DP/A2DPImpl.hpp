@@ -34,7 +34,6 @@ namespace bluetooth
         static constexpr int MEDIA_CAP_SIZE         = 4;
 
         static std::array<uint8_t, SDP_BUFFER_LENGTH> sdpSourceServiceBuffer;
-        static bd_addr_t deviceAddr;
         static btstack_packet_callback_registration_t hciEventCallbackRegistration;
         static std::array<uint8_t, MEDIA_CAP_SIZE> mediaSbcCodecCapabilities;
         static const sys::Service *ownerService;
@@ -51,6 +50,7 @@ namespace bluetooth
         static void sendAudioEvent(audio::EventType event, audio::Event::DeviceState state);
         static bool isConnected;
         static std::shared_ptr<BluetoothAudioDevice> audioDevice;
+        static Devicei device;
 
       public:
         auto init() -> Error::Code;
@@ -58,7 +58,7 @@ namespace bluetooth
         void disconnect();
         void start();
         void stop();
-        void setDeviceAddress(bd_addr_t addr);
+        void setDevice(const Devicei &dev);
         void setOwnerService(const sys::Service *service);
         auto getStreamData() -> std::shared_ptr<BluetoothStreamData>;
         void setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice);

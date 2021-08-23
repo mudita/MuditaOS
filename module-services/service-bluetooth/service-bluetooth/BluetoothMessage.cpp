@@ -9,10 +9,13 @@ extern "C"
 }
 #include <utility>
 
-BluetoothAddrMessage::BluetoothAddrMessage(std::string addr) : sys::DataMessage(MessageType::BluetoothAddrResult)
-{
-    sscanf_bd_addr(addr.c_str(), this->addr);
-}
-BluetoothPairMessage::BluetoothPairMessage(std::string addr)
-    : sys::DataMessage(MessageType::BluetoothPairResult), addr(std::move(addr))
+BluetoothAddrMessage::BluetoothAddrMessage(Devicei device)
+    : sys::DataMessage(MessageType::BluetoothAddrResult), device(device)
 {}
+BluetoothPairMessage::BluetoothPairMessage(Devicei device)
+    : sys::DataMessage(MessageType::BluetoothPairResult), device(device)
+{}
+auto BluetoothPairMessage::getDevice() const noexcept -> Devicei
+{
+    return device;
+}

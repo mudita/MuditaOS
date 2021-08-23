@@ -42,6 +42,7 @@ namespace bluetooth
         static void processNameRequestComplete(std::uint8_t *packet, bd_addr_t &addr);
         static void processDedicatedBondingCompleted(std::uint8_t *packet, bd_addr_t &addr);
         static void initStateHandler(std::uint8_t eventType, std::uint8_t *packet);
+        static auto getDeviceIndexForAddress(const std::vector<Devicei> &devs, const bd_addr_t addr) -> int;
 
       public:
         /// THIS have to be called prior to Bt system start!
@@ -49,13 +50,12 @@ namespace bluetooth
         auto scan() -> Error;
         void stopScan();
         void setVisibility(bool visibility);
-        auto pair(uint8_t *addr, std::uint8_t protectionLevel = 0) -> bool;
-        auto unpair(uint8_t *addr) -> bool;
+        auto pair(const Devicei &device, std::uint8_t protectionLevel = 0) -> bool;
+        auto unpair(const Devicei &device) -> bool;
         static auto getDevicesList() -> const std::vector<Devicei> &;
-        static auto isServiceSupportedByRemote(bd_addr_t addr, uint32_t typeOfService) -> bool;
         static void respondPinCode(const std::string &pin);
 
-        static std::string currentlyProcessedDeviceAddr;
+        static Devicei currentlyProccesedDevice;
         explicit GAP(sys::Service *owner);
     };
 } // namespace bluetooth
