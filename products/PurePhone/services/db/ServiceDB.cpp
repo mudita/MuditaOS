@@ -73,7 +73,7 @@ db::Interface *ServiceDB::getInterface(db::Interface::Name interface)
 sys::MessagePointer ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
 {
     auto responseMsg = std::static_pointer_cast<sys::ResponseMessage>(ServiceDBCommon::DataReceivedHandler(msgl, resp));
-    if (!responseMsg) {
+    if (responseMsg) {
         return responseMsg;
     }
     auto type = static_cast<MessageType>(msgl->messageType);
@@ -180,18 +180,6 @@ sys::MessagePointer ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::
         auto ret              = calllogRecordInterface->Update(msg->record);
         responseMsg           = std::make_shared<DBCalllogResponseMessage>(nullptr, ret);
         sendUpdateNotification(db::Interface::Name::Calllog, db::Query::Type::Update);
-    } break;
-
-    case MessageType::DBQuery: {
-        auto msg = dynamic_cast<db::QueryMessage *>(msgl);
-        assert(msg);
-        db::Interface *interface = getInterface(msg->getInterface());
-        assert(interface != nullptr);
-        auto query     = msg->getQuery();
-        auto queryType = query->type;
-        auto result    = interface->runQuery(std::move(query));
-        responseMsg    = std::make_shared<db::QueryResponse>(std::move(result));
-        sendUpdateNotification(msg->getInterface(), queryType);
     } break;
 
     case MessageType::DBServiceBackup: {
