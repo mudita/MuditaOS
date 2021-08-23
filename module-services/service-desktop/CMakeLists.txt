@@ -16,7 +16,7 @@ set(SOURCES
     endpoints/contacts/ContactHelper.cpp
     endpoints/contacts/ContactsEndpoint.cpp
     endpoints/developerMode/DeveloperModeEndpoint.cpp
-    endpoints/developerMode/DeveloperModeHelper.cpp
+    endpoints/developerMode/DeveloperModeHelperCommon.cpp
     endpoints/developerMode/Mode/UI_Helper.cpp
     endpoints/developerMode/event/DomRequest.cpp
     endpoints/developerMode/event/ATRequest.cpp
