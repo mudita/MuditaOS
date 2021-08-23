@@ -70,14 +70,17 @@ namespace app
         task->execute(application, this, cb);
         return true;
     }
-    bool AsyncAudioOperations::stop(const audio::Token &token, [[maybe_unused]] const OnStopCallback &callback)
+    bool AsyncAudioOperations::stop(const audio::Token &token, const OnStopCallback &callback)
     {
         auto msg  = std::make_unique<AudioStopRequest>(token);
         auto task = app::AsyncRequest::createFromMessage(std::move(msg), service::name::audio);
-        auto cb   = [](auto response) {
+        auto cb   = [callback](auto response) {
             auto result = dynamic_cast<AudioStopResponse *>(response);
             if (result == nullptr) {
                 return false;
+            }
+            if (callback) {
+                callback(result->retCode, result->token);
             }
             return true;
         };

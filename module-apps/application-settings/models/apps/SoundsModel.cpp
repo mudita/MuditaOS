@@ -10,6 +10,9 @@
 #include <service-audio/AudioServiceAPI.hpp>
 #include <ListView.hpp>
 
+SoundsModel::SoundsModel(std::shared_ptr<AbstractSoundsPlayer> soundsPlayer) : soundsPlayer{std::move(soundsPlayer)}
+{}
+
 unsigned int SoundsModel::requestRecordsCount()
 {
     return internalData.size();
@@ -35,9 +38,6 @@ void SoundsModel::createData(app::Application *app, audio_settings::AbstractAudi
 {
     assert(model);
     assert(app);
-
-    // create audioOperations to allow shounds preview
-    audioOperations = std::make_unique<app::AsyncAudioOperations>(app);
 
     // configure according to type
     std::filesystem::path folder = getSoundPath(model);
@@ -126,7 +126,7 @@ void SoundsModel::applyItems(const std::vector<std::filesystem::path> &sounds,
                 auto fileRelativePath = sound.lexically_relative(purefs::dir::getCurrentOSPath());
                 LOG_INFO("Setting sound to %s", fileRelativePath.c_str());
                 model->setSound(fileRelativePath);
-                stopAudioPreview();
+                soundsPlayer->stop();
                 app->returnToPreviousWindow();
                 return true;
             };
@@ -136,22 +136,18 @@ void SoundsModel::applyItems(const std::vector<std::filesystem::path> &sounds,
                 auto fileRelativePath = sound.lexically_relative(purefs::dir::getCurrentOSPath());
 
                 if (event.isShortRelease(gui::KeyCode::KEY_RF)) {
-                    stopAudioPreview();
+                    soundsPlayer->stop();
                 }
-
                 else if (event.isShortRelease(gui::KeyCode::KEY_LF)) {
-                    if (!currentlyPreviewedToken.IsValid() || fileRelativePath != currentlyPreviewedPath) {
-                        return playAudioPreview(fileRelativePath);
+                    if (!soundsPlayer->previouslyPlayed(fileRelativePath) ||
+                        soundsPlayer->isInState(AbstractSoundsPlayer::State::Stopped)) {
+                        return soundsPlayer->play(fileRelativePath);
                     }
-
-                    else if (currentlyPreviewedToken.IsValid() && fileRelativePath == currentlyPreviewedPath &&
-                             myPreviewState == PreviewState::Playing) {
-                        return pauseAudioPreview();
+                    else if (soundsPlayer->isInState(AbstractSoundsPlayer::State::Playing)) {
+                        return soundsPlayer->pause();
                     }
-
-                    else if (currentlyPreviewedToken.IsValid() && fileRelativePath == currentlyPreviewedPath &&
-                             myPreviewState == PreviewState::NotPlaying) {
-                        return resumeAudioPreview();
+                    else if (soundsPlayer->isInState(AbstractSoundsPlayer::State::Paused)) {
+                        return soundsPlayer->resume();
                     }
                 }
 
@@ -177,65 +173,4 @@ void SoundsModel::applyItems(const std::vector<std::filesystem::path> &sounds,
     }
 
     list->rebuildList(gui::listview::RebuildType::OnPageElement, selectedItemIndex);
-}
-
-bool SoundsModel::playAudioPreview(const std::string &path)
-{
-    return audioOperations->play(path, [this, path](audio::RetCode retCode, audio::Token token) {
-        if (retCode != audio::RetCode::Success || !token.IsValid()) {
-            LOG_ERROR("Audio preview callback failed with retcode = %s. Token validity: %d",
-                      str(retCode).c_str(),
-                      token.IsValid());
-            return;
-        }
-        myPreviewState          = PreviewState::Playing;
-        currentlyPreviewedToken = token;
-        currentlyPreviewedPath  = path;
-    });
-}
-
-bool SoundsModel::pauseAudioPreview()
-{
-    return audioOperations->pause(currentlyPreviewedToken, [this](audio::RetCode retCode, audio::Token token) {
-        if (token != currentlyPreviewedToken) {
-            LOG_ERROR("Audio preview pause failed: wrong token");
-            return;
-        }
-        if (retCode != audio::RetCode::Success || !token.IsValid()) {
-            LOG_ERROR("Audio preview pause failed with retcode = %s. Token validity: %d",
-                      str(retCode).c_str(),
-                      token.IsValid());
-            return;
-        }
-        myPreviewState = PreviewState::NotPlaying;
-    });
-}
-
-bool SoundsModel::resumeAudioPreview()
-{
-    return audioOperations->resume(currentlyPreviewedToken, [this](audio::RetCode retCode, audio::Token token) {
-        if (token != currentlyPreviewedToken) {
-            LOG_ERROR("Audio preview resume failed: wrong token");
-            return;
-        }
-
-        if (retCode != audio::RetCode::Success || !token.IsValid()) {
-            LOG_ERROR("Audio preview pause failed with retcode = %s. Token validity: %d",
-                      str(retCode).c_str(),
-                      token.IsValid());
-            return;
-        }
-
-        myPreviewState = PreviewState::Playing;
-    });
-}
-
-bool SoundsModel::stopAudioPreview()
-{
-    if (currentlyPreviewedToken.IsValid()) {
-        return audioOperations->stop(currentlyPreviewedToken, [](audio::RetCode, audio::Token) {
-            // do nothing as we are about to be closed
-        });
-    }
-    return false;
 }

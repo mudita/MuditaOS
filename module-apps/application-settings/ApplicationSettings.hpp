@@ -6,10 +6,13 @@
 #include "Application.hpp"
 
 #include <application-settings/windows/WindowNames.hpp>
+#include <application-settings/models/apps/SoundsPlayer.hpp>
 #include <bsp/common.hpp>
 #include <bsp/keypad_backlight/keypad_backlight.hpp>
 #include <service-evtmgr/screen-light-control/ScreenLightControl.hpp>
 #include <EventStore.hpp>
+
+class AudioStopNotification; // Forward declaration
 
 namespace app
 {
@@ -173,6 +176,9 @@ namespace app
         void attachQuotesWindows();
         void switchToAllDevicesViaBtErrorPrompt(std::shared_ptr<sys::DataMessage> msg, const std::string &errorMsg);
 
+        auto handleAudioStop(AudioStopNotification *notification) -> sys::MessagePointer;
+
+        std::shared_ptr<SoundsPlayer> soundsPlayer;
         Store::GSM::SIM selectedSim   = Store::GSM::get()->selected;
         std::string selectedSimNumber = {};
         bsp::Board board              = bsp::Board::none;

@@ -25,6 +25,7 @@ target_sources( ${PROJECT_NAME}
         models/display-keypad/CategoriesModel.cpp
         models/apps/AudioSettingsModel.cpp
         models/apps/SoundsModel.cpp
+        models/apps/SoundsPlayer.cpp
         models/system/DateAndTimeModel.cpp
         models/system/SARInfoRepository.cpp
         models/system/TechnicalInformationRepository.cpp
