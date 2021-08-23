@@ -5,6 +5,10 @@
 
 #include <service-appmgr/model/ApplicationManagerCommon.hpp>
 
+#include <apps-common/locks/handlers/PhoneLockHandler.hpp>
+#include <apps-common/locks/handlers/SimLockHandler.hpp>
+#include <bsp/keypad_backlight/keypad_backlight.hpp>
+
 namespace app::manager
 {
     class ApplicationManager : public ApplicationManagerCommon
@@ -38,6 +42,7 @@ namespace app::manager
         auto handleDBResponse(db::QueryResponse *msg) -> bool;
         auto handlePhoneModeChangedAction(ActionEntry &action) -> ActionProcessStatus;
         auto handleAction(ActionEntry &action) -> ActionProcessStatus override;
+        void handleStart(StartAllowedMessage *msg) override;
 
         std::shared_ptr<sys::phone_modes::Observer> phoneModeObserver;
         locks::PhoneLockHandler phoneLockHandler;

@@ -14,6 +14,7 @@ target_include_directories(appmgr
 
 target_link_libraries(appmgr
     PRIVATE
+        application-desktop
         application-special-input
         apps-common
         module-apps

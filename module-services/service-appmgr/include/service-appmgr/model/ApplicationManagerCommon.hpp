@@ -13,13 +13,10 @@
 #include <apps-common/Application.hpp>
 #include <apps-common/ApplicationLauncher.hpp>
 
-#include <bsp/keypad_backlight/keypad_backlight.hpp>
 #include <Service/Common.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
 #include <Timers/TimerHandle.hpp>
-#include <PhoneModes/Observer.hpp>
-#include <SwitchData.hpp>
 
 #include <deque>
 #include <memory>
@@ -33,8 +30,6 @@
 #include <service-eink/Common.hpp>
 
 #include <notifications/NotificationProvider.hpp>
-#include <apps-common/locks/handlers/PhoneLockHandler.hpp>
-#include <apps-common/locks/handlers/SimLockHandler.hpp>
 #include <apps-common/notifications/NotificationsHandler.hpp>
 #include <apps-common/notifications/NotificationsConfiguration.hpp>
 
@@ -43,13 +38,6 @@ namespace app
     class ApplicationLauncher;
     namespace manager
     {
-        class APMAction;
-        class APMChangeLanguage;
-        class APMConfirmClose;
-        class APMConfirmSwitch;
-        class APMRegister;
-        class APMSwitch;
-        class APMSwitchPrevApp;
         class GetAutoLockTimeoutRequest;
         class SetAutoLockTimeoutRequest;
     } // namespace manager
@@ -120,6 +108,8 @@ namespace app::manager
         }
         auto checkOnBoarding() -> bool;
         virtual void registerMessageHandlers();
+        auto handleSwitchApplication(SwitchRequest *msg, bool closeCurrentlyFocusedApp = true) -> bool;
+        virtual void handleStart(StartAllowedMessage *msg);
 
         ApplicationName rootApplicationName;
         ActionsRegistry actionsRegistry;
@@ -130,7 +120,6 @@ namespace app::manager
         void suspendSystemServices();
         void closeNoLongerNeededApplications();
         auto closeApplications() -> bool;
-        auto closeApplicationsOnUpdate() -> bool;
         void closeApplication(ApplicationHandle *application);
 
         // Message handlers
@@ -141,7 +130,6 @@ namespace app::manager
         auto handleActionOnFocusedApp(ActionEntry &action) -> ActionProcessStatus;
         auto handleCustomAction(ActionEntry &action) -> ActionProcessStatus;
         auto handleCustomActionOnBackgroundApp(ApplicationHandle *app, ActionEntry &action) -> ActionProcessStatus;
-        auto handleSwitchApplication(SwitchRequest *msg, bool closeCurrentlyFocusedApp = true) -> bool;
         auto handleCloseConfirmation(CloseConfirmation *msg) -> bool;
         auto handleSwitchConfirmation(SwitchConfirmation *msg) -> bool;
         auto handleSwitchBack(SwitchBackRequest *msg) -> bool;
@@ -152,7 +140,6 @@ namespace app::manager
         virtual auto handleDeveloperModeRequest(sys::Message *request) -> sys::MessagePointer;
         /// handles dom request by passing this request to application which should provide the dom
         auto handleDOMRequest(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>;
-        void handleStart(StartAllowedMessage *msg);
 
         void requestApplicationClose(ApplicationHandle &app, bool isCloseable);
         void onApplicationSwitch(ApplicationHandle &nextApp,
