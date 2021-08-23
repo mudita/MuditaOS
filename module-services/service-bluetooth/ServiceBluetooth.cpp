@@ -21,6 +21,7 @@
 #include "service-bluetooth/messages/Unpair.hpp"
 #include "service-bluetooth/messages/SetDeviceName.hpp"
 #include "service-bluetooth/messages/Ring.hpp"
+#include "service-bluetooth/BluetoothDevicesModel.hpp"
 #include "service-bluetooth/messages/BluetoothModeChanged.hpp"
 
 #include "SystemManager/messages/SentinelRegistrationMessage.hpp"
@@ -56,14 +57,15 @@ ServiceBluetooth::~ServiceBluetooth()
     LOG_INFO("[ServiceBluetooth] Cleaning resources");
 }
 
-// This code is experimental:
-// this means it is an init point of bluetooth feature handling
 sys::ReturnCodes ServiceBluetooth::InitHandler()
 {
     auto settings = std::make_unique<settings::Settings>();
     settings->init(service::ServiceProxy(shared_from_this()));
     settingsHolder                  = std::make_shared<bluetooth::SettingsHolder>(std::move(settings));
+    bluetoothDevicesModel           = std::make_shared<BluetoothDevicesModel>(this);
     bluetooth::KeyStorage::settings = settingsHolder;
+
+    bus.channels.push_back(sys::BusChannel::BluetoothNotifications);
 
     worker = std::make_unique<BluetoothWorker>(this);
     worker->run();
@@ -83,6 +85,7 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
     connectHandler<BluetoothAudioStartMessage>();
     connectHandler<BluetoothMessage>();
     connectHandler<BluetoothPairMessage>();
+    connectHandler<BluetoothPairResultMessage>();
     connectHandler<message::bluetooth::A2DPVolume>();
     connectHandler<message::bluetooth::HSPVolume>();
     connectHandler<message::bluetooth::Ring>();
@@ -147,14 +150,14 @@ auto ServiceBluetooth::handle(BluetoothAudioStartMessage *msg) -> std::shared_pt
 auto ServiceBluetooth::handle([[maybe_unused]] message::bluetooth::RequestBondedDevices *msg)
     -> std::shared_ptr<sys::Message>
 {
-    LOG_INFO("Requested bonded devices!");
     auto bondedDevicesStr =
         std::visit(bluetooth::StringVisitor(), this->settingsHolder->getValue(bluetooth::Settings::BondedDevices));
-    auto connectedAddress =
-        std::visit(bluetooth::StringVisitor(), this->settingsHolder->getValue(bluetooth::Settings::ConnectedDevice));
+    bluetoothDevicesModel->mergeDevicesList(SettingsSerializer::fromString(bondedDevicesStr));
 
-    return std::make_shared<message::bluetooth::ResponseBondedDevices>(SettingsSerializer::fromString(bondedDevicesStr),
-                                                                       std::move(connectedAddress));
+    bus.sendMulticast(
+        std::make_shared<message::bluetooth::ResponseBondedDevices>(bluetoothDevicesModel->getDevices(), ""),
+        sys::BusChannel::BluetoothNotifications);
+    return sys::MessageNone{};
 }
 
 auto ServiceBluetooth::handle([[maybe_unused]] message::bluetooth::RequestStatus *msg) -> std::shared_ptr<sys::Message>
@@ -163,7 +166,9 @@ auto ServiceBluetooth::handle([[maybe_unused]] message::bluetooth::RequestStatus
     auto visibility = std::visit(bluetooth::BoolVisitor(), settingsHolder->getValue(bluetooth::Settings::Visibility));
 
     BluetoothStatus status{static_cast<BluetoothStatus::State>(state), status.visibility = visibility};
-    return std::make_shared<message::bluetooth::ResponseStatus>(status);
+    bus.sendMulticast(std::make_shared<message::bluetooth::ResponseStatus>(status),
+                      sys::BusChannel::BluetoothNotifications);
+    return sys::MessageNone{};
 }
 
 auto ServiceBluetooth::handle(message::bluetooth::SetStatus *msg) -> std::shared_ptr<sys::Message>
@@ -177,6 +182,12 @@ auto ServiceBluetooth::handle(message::bluetooth::SetStatus *msg) -> std::shared
         bus.sendMulticast(
             std::make_shared<sys::bluetooth::BluetoothModeChanged>(sys::bluetooth::BluetoothMode::Enabled),
             sys::BusChannel::BluetoothModeChanges);
+        {
+            auto bondedDevicesStr = std::visit(bluetooth::StringVisitor(),
+                                               this->settingsHolder->getValue(bluetooth::Settings::BondedDevices));
+            bluetoothDevicesModel->mergeDevicesList(SettingsSerializer::fromString(bondedDevicesStr));
+            bluetoothDevicesModel->syncDevicesWithApp();
+        }
         break;
     case BluetoothStatus::State::Off:
         sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::PowerOff));
@@ -196,19 +207,41 @@ auto ServiceBluetooth::handle(message::bluetooth::SetStatus *msg) -> std::shared
 
 auto ServiceBluetooth::handle(BluetoothPairMessage *msg) -> std::shared_ptr<sys::Message>
 {
-    const auto addrString = msg->addr;
-    bd_addr_t addr;
-    sscanf_bd_addr(addrString.c_str(), addr);
-    sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::Pair, addr));
+    auto device = msg->getDevice();
+    bluetoothDevicesModel->removeDevice(device);
+    sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::Pair, device));
+
+    device.deviceState = DeviceState::Pairing;
+    bluetoothDevicesModel->insertDevice(device);
+
+    bluetoothDevicesModel->syncDevicesWithApp();
+
+    return sys::MessageNone{};
+}
+
+auto ServiceBluetooth::handle(BluetoothPairResultMessage *msg) -> std::shared_ptr<sys::Message>
+{
+    auto device = msg->getDevice();
+    if (msg->isSucceed()) {
+        bluetoothDevicesModel->setInternalDeviceState(device, DeviceState::Paired);
+    }
+    else {
+        bluetoothDevicesModel->removeDevice(device);
+    }
+
+    bluetoothDevicesModel->syncDevicesWithApp();
+
+    bus.sendMulticast(std::make_shared<BluetoothPairResultMessage>(msg->getDevice(), msg->isSucceed()),
+                      sys::BusChannel::BluetoothNotifications);
+
     return sys::MessageNone{};
 }
 
 auto ServiceBluetooth::handle(message::bluetooth::Unpair *msg) -> std::shared_ptr<sys::Message>
 {
-    const auto addrString = msg->getAddr();
-    bd_addr_t addr;
-    sscanf_bd_addr(addrString.c_str(), addr);
-    sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::Unpair, addr));
+    sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::Unpair, msg->getDevice()));
+    bluetoothDevicesModel->removeDevice(msg->getDevice());
+
     return sys::MessageNone{};
 }
 
@@ -218,7 +251,9 @@ auto ServiceBluetooth::handle([[maybe_unused]] message::bluetooth::RequestDevice
     auto deviceNameString =
         std::visit(bluetooth::StringVisitor(), this->settingsHolder->getValue(bluetooth::Settings::DeviceName));
 
-    return std::make_shared<message::bluetooth::ResponseDeviceName>(std::move(deviceNameString));
+    bus.sendMulticast(std::make_shared<message::bluetooth::ResponseDeviceName>(std::move(deviceNameString)),
+                      sys::BusChannel::BluetoothNotifications);
+    return sys::MessageNone{};
 }
 
 auto ServiceBluetooth::handle(message::bluetooth::SetDeviceName *msg) -> std::shared_ptr<sys::Message>
@@ -233,24 +268,36 @@ auto ServiceBluetooth::handle(message::bluetooth::SetDeviceName *msg) -> std::sh
 
 auto ServiceBluetooth::handle(message::bluetooth::Connect *msg) -> std::shared_ptr<sys::Message>
 {
-    const auto addrString = msg->getAddr();
-    LOG_DEBUG("Connecting with %s", addrString.c_str());
-    bd_addr_t addr;
-    sscanf_bd_addr(addrString.c_str(), addr);
-    sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::ConnectAudio, addr));
+    auto device = msg->getDevice();
+    sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::ConnectAudio, device));
+
+    bluetoothDevicesModel->setInternalDeviceState(device, DeviceState::Connecting);
+    bluetoothDevicesModel->syncDevicesWithApp();
     return sys::MessageNone{};
 }
 
 auto ServiceBluetooth::handle(message::bluetooth::ConnectResult *msg) -> std::shared_ptr<sys::Message>
 {
     if (msg->isSucceed()) {
-        settingsHolder->setValue(bluetooth::Settings::ConnectedDevice, msg->getAddr());
+        auto device = msg->getDevice();
+        bluetoothDevicesModel->setInternalDeviceState(device, DeviceState::Connected);
+
+        settingsHolder->setValue(bluetooth::Settings::ConnectedDevice, bd_addr_to_str(device.address));
         startTimeoutTimer();
         bus.sendMulticast(
             std::make_shared<sys::bluetooth::BluetoothModeChanged>(sys::bluetooth::BluetoothMode::Connected),
             sys::BusChannel::BluetoothModeChanges);
     }
-    bus.sendUnicast(std::make_shared<message::bluetooth::ConnectResult>(*msg), nameSettings);
+
+    for (auto &device : bluetoothDevicesModel->getDevices()) {
+        if (device.deviceState == DeviceState::Connecting) {
+            device.deviceState = DeviceState::Paired;
+        }
+    }
+
+    bluetoothDevicesModel->syncDevicesWithApp();
+    bus.sendMulticast(std::make_shared<message::bluetooth::ConnectResult>(*msg),
+                      sys::BusChannel::BluetoothNotifications);
     return sys::MessageNone{};
 }
 
@@ -262,14 +309,20 @@ auto ServiceBluetooth::handle([[maybe_unused]] message::bluetooth::Disconnect *m
 
 auto ServiceBluetooth::handle(message::bluetooth::DisconnectResult *msg) -> std::shared_ptr<sys::Message>
 {
+    auto deviceAddr =
+        std::visit(bluetooth::StringVisitor(), this->settingsHolder->getValue(bluetooth::Settings::ConnectedDevice));
+
+    auto device = bluetoothDevicesModel->getDeviceByAddress(deviceAddr);
+    if (device.has_value()) {
+        device.value().get().deviceState = DeviceState::Paired;
+    }
+    bluetoothDevicesModel->syncDevicesWithApp();
     settingsHolder->setValue(bluetooth::Settings::ConnectedDevice, std::string());
     bus.sendMulticast(std::make_shared<sys::bluetooth::BluetoothModeChanged>(sys::bluetooth::BluetoothMode::Enabled),
                       sys::BusChannel::BluetoothModeChanges);
-    auto bondedDevicesStr =
-        std::visit(bluetooth::StringVisitor(), this->settingsHolder->getValue(bluetooth::Settings::BondedDevices));
-    bus.sendUnicast(std::make_shared<message::bluetooth::ResponseBondedDevices>(
-                        SettingsSerializer::fromString(bondedDevicesStr), std::string()),
-                    nameSettings);
+
+    bus.sendMulticast(std::make_shared<message::bluetooth::DisconnectResult>(msg->getDevice()),
+                      sys::BusChannel::BluetoothNotifications);
     stopTimeoutTimer();
 
     return sys::MessageNone{};
@@ -342,9 +395,7 @@ auto ServiceBluetooth::handle(BluetoothMessage *msg) -> std::shared_ptr<sys::Mes
 
 auto ServiceBluetooth::handle(BluetoothAddrMessage *msg) -> std::shared_ptr<sys::Message>
 {
-    std::string addrString{bd_addr_to_str(msg->addr)};
-    LOG_INFO("Connecting with %s", addrString.c_str());
-    sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::ConnectAudio, msg->addr));
+    sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::ConnectAudio, msg->device));
     return std::make_shared<sys::ResponseMessage>();
 }
 

@@ -51,12 +51,12 @@ class BluetoothMessage : public sys::DataMessage
 class BluetoothPairResultMessage : public sys::DataMessage
 {
   public:
-    explicit BluetoothPairResultMessage(std::string addr, bool succeed)
-        : sys::DataMessage(MessageType::BluetoothPairResult), addr(std::move(addr)), succeed(succeed)
+    explicit BluetoothPairResultMessage(const Devicei device, bool succeed)
+        : sys::DataMessage(MessageType::BluetoothPairResult), device(device), succeed(succeed)
     {}
-    [[nodiscard]] auto getAddr() const -> std::string
+    [[nodiscard]] auto getDevice() const -> Devicei
     {
-        return addr;
+        return device;
     }
     [[nodiscard]] auto isSucceed() const noexcept -> bool
     {
@@ -64,24 +64,24 @@ class BluetoothPairResultMessage : public sys::DataMessage
     }
 
   private:
-    std::string addr;
-    std::string name;
+    Devicei device;
     bool succeed;
 };
 
 class BluetoothAddrMessage : public sys::DataMessage
 {
   public:
-    bd_addr_t addr;
-    explicit BluetoothAddrMessage(std::string addr);
+    Devicei device;
+    explicit BluetoothAddrMessage(Devicei device);
     ~BluetoothAddrMessage() override = default;
 };
 
 class BluetoothPairMessage : public sys::DataMessage
 {
   public:
-    std::string addr;
-    explicit BluetoothPairMessage(std::string addr);
+    Devicei device;
+    explicit BluetoothPairMessage(Devicei device);
+    [[nodiscard]] auto getDevice() const noexcept -> Devicei;
     ~BluetoothPairMessage() override = default;
 };
 

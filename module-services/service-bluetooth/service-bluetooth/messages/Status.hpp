@@ -4,7 +4,7 @@
 #pragma once
 
 #include "service-bluetooth/BluetoothMessage.hpp"
-
+#include <Bluetooth/interface/profiles/AudioProfile.hpp>
 namespace message::bluetooth
 {
 
@@ -23,5 +23,25 @@ namespace message::bluetooth
 
       private:
         BluetoothStatus status;
+    };
+
+    class ProfileStatus : public BluetoothMessage
+    {
+      public:
+        ProfileStatus(::bluetooth::AudioProfile profile, bool isConnected) : isConnected(isConnected), profile(profile)
+        {}
+
+        [[nodiscard]] auto getProfile() const noexcept -> ::bluetooth::AudioProfile
+        {
+            return profile;
+        }
+        [[nodiscard]] auto isProfileConnected() const noexcept -> bool
+        {
+            return isConnected;
+        }
+
+      private:
+        bool isConnected;
+        ::bluetooth::AudioProfile profile;
     };
 } // namespace message::bluetooth

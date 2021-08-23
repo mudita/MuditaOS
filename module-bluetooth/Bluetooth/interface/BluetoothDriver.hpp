@@ -4,6 +4,7 @@
 #pragma once
 
 #include <functional>
+#include "Device.hpp"
 #include "Error.hpp"
 
 namespace bluetooth
@@ -20,8 +21,8 @@ namespace bluetooth
         [[nodiscard]] virtual auto scan() -> Error                                               = 0;
         virtual void stopScan()                                                                  = 0;
         virtual void setVisibility(bool visibility)                                              = 0;
-        [[nodiscard]] virtual auto pair(uint8_t *addr, std::uint8_t protectionLevel = 0) -> bool = 0;
-        [[nodiscard]] virtual auto unpair(uint8_t *addr) -> bool                                 = 0;
+        [[nodiscard]] virtual auto pair(Devicei device, std::uint8_t protectionLevel = 0) -> bool = 0;
+        [[nodiscard]] virtual auto unpair(Devicei device) -> bool                                 = 0;
 
         virtual void registerErrorCallback(const ErrorCallback &newCallback) = 0;
     };

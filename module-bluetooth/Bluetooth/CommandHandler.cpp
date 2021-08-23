@@ -52,15 +52,15 @@ namespace bluetooth
         case bluetooth::Command::StartPan:
             return startPan();
         case bluetooth::Command::Pair:
-            return pair(command.getAddress());
+            return pair(command.getDevice());
         case bluetooth::Command::Unpair:
-            return unpair(command.getAddress());
+            return unpair(command.getDevice());
         case bluetooth::Command::VisibilityOn:
             return setVisibility(true);
         case bluetooth::Command::VisibilityOff:
             return setVisibility(false);
         case bluetooth::Command::ConnectAudio:
-            return establishAudioConnection(command.getAddress());
+            return establishAudioConnection(command.getDevice());
         case bluetooth::Command::DisconnectAudio:
             return disconnectAudioConnection();
         case bluetooth::Command::PowerOff:
@@ -122,11 +122,11 @@ namespace bluetooth
         return Error::Success;
     }
 
-    Error::Code CommandHandler::establishAudioConnection(uint8_t *addr)
+    Error::Code CommandHandler::establishAudioConnection(const Devicei &device)
     {
         profileManager->init();
         LOG_INFO("Connecting audio");
-        profileManager->connect(addr);
+        profileManager->connect(device);
         return Error::Success;
     }
 
@@ -136,10 +136,10 @@ namespace bluetooth
         profileManager->disconnect();
         return Error::Success;
     }
-    Error::Code CommandHandler::pair(bd_addr_t addr)
+    Error::Code CommandHandler::pair(const Devicei &device)
     {
         LOG_INFO("Pairing...");
-        const auto error_code = driver->pair(addr) ? Error::Success : Error::LibraryError;
+        const auto error_code = driver->pair(device) ? Error::Success : Error::LibraryError;
         LOG_INFO("Pairing result: %s", magic_enum::enum_name(error_code).data());
         return error_code;
     }
@@ -157,13 +157,13 @@ namespace bluetooth
         profileManager->switchProfile(profile);
         return Error::Success;
     }
-    Error::Code CommandHandler::unpair(uint8_t *addr)
+    Error::Code CommandHandler::unpair(const Devicei &device)
     {
         LOG_INFO("Unpairing...");
-        if (profileManager->isAddressActuallyUsed(addr)) {
+        if (profileManager->isAddressActuallyUsed(device.address)) {
             profileManager->disconnect();
         }
-        const auto error_code = driver->unpair(addr) ? Error::Success : Error::LibraryError;
+        const auto error_code = driver->unpair(device) ? Error::Success : Error::LibraryError;
         LOG_INFO("Unpairing result: %s", magic_enum::enum_name(error_code).data());
         return error_code;
     }

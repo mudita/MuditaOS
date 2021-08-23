@@ -10,25 +10,25 @@ namespace message::bluetooth
     class Unpair : public BluetoothMessage
     {
       public:
-        explicit Unpair(std::string addr) : addr(std::move(addr))
+        explicit Unpair(Devicei device) : device(device)
         {}
-        [[nodiscard]] auto getAddr() const -> std::string
+        [[nodiscard]] auto getDevice() const -> Devicei
         {
-            return addr;
+            return device;
         }
 
       private:
-        std::string addr;
+        Devicei device;
     };
 
     class UnpairResult : public BluetoothMessage
     {
       public:
-        explicit UnpairResult(std::string addr, bool succeed) : addr(std::move(addr)), succeed(succeed)
+        explicit UnpairResult(Devicei device, bool succeed) : device(device), succeed(succeed)
         {}
-        [[nodiscard]] auto getAddr() const -> std::string
+        [[nodiscard]] auto getDevice() const -> Devicei
         {
-            return addr;
+            return device;
         }
         [[nodiscard]] auto isSucceed() const noexcept -> bool
         {
@@ -36,7 +36,7 @@ namespace message::bluetooth
         }
 
       private:
-        std::string addr;
+        Devicei device;
         bool succeed;
     };
 } // namespace message::bluetooth

@@ -23,7 +23,7 @@ namespace bluetooth
         auto operator=(A2DP &&other) noexcept -> A2DP &;
 
         auto init() -> Error::Code override;
-        void setDeviceAddress(uint8_t *addr) override;
+        void setDevice(const Devicei &device) override;
         void setOwnerService(const sys::Service *service) override;
 
         void connect() override;

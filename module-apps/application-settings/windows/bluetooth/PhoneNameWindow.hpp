@@ -3,7 +3,6 @@
 #pragma once
 
 #include <application-settings/models/bluetooth/BluetoothSettingsModel.hpp>
-
 #include <Text.hpp>
 
 namespace gui

@@ -73,10 +73,10 @@
 #include <service-bluetooth/messages/ResponseVisibleDevices.hpp>
 #include <service-bluetooth/messages/Status.hpp>
 #include <service-bluetooth/messages/Unpair.hpp>
-#include <service-db/agents/settings/SystemSettings.hpp>
+#include <service-bluetooth/messages/Disconnect.hpp>
 #include <service-db/Settings.hpp>
+#include <service-db/agents/settings/SystemSettings.hpp>
 #include <module-services/service-appmgr/include/service-appmgr/Constants.hpp>
-#include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <module-services/service-evtmgr/service-evtmgr/ScreenLightControlMessage.hpp>
 #include <module-services/service-evtmgr/service-evtmgr/Constants.hpp>
 #include <module-services/service-evtmgr/service-evtmgr/EVMessages.hpp>
@@ -86,6 +86,7 @@
 #include <apps-common/windows/Dialog.hpp>
 
 #include <i18n/i18n.hpp>
+#include <service-bluetooth/messages/SyncDevices.hpp>
 
 namespace app
 {
@@ -106,6 +107,7 @@ namespace app
           AsyncCallbackReceiver{this}, soundsPlayer{std::make_shared<SoundsPlayer>(this)}
     {
         bus.channels.push_back(sys::BusChannel::ServiceAudioNotifications);
+        bus.channels.push_back(sys::BusChannel::BluetoothNotifications);
 
         CellularServiceAPI::SubscribeForOwnNumber(this, [&](const std::string &number) {
             selectedSimNumber = number;
@@ -115,6 +117,7 @@ namespace app
             Store::GSM::get()->sim == selectedSim) {
             CellularServiceAPI::RequestForOwnNumber(this);
         }
+        bluetoothSettingsModel = std::make_shared<BluetoothSettingsModel>(this);
     }
 
     ApplicationSettings::~ApplicationSettings()
@@ -179,12 +182,21 @@ namespace app
             return sys::MessageNone{};
         });
 
-        connect(typeid(::message::bluetooth::ResponseBondedDevices), [&](sys::Message *msg) {
-            auto responseBondedDevicesMsg = static_cast<::message::bluetooth::ResponseBondedDevices *>(msg);
+        connect(typeid(::message::bluetooth::SyncDevices), [&](sys::Message *msg) {
+            auto message = static_cast<::message::bluetooth::SyncDevices *>(msg);
+            bluetoothSettingsModel->replaceDevicesList(message->getDevices());
+
             if (gui::window::name::all_devices == getCurrentWindow()->getName()) {
-                auto bondedDevicesData = std::make_unique<gui::BondedDevicesData>(
-                    responseBondedDevicesMsg->getDevices(), responseBondedDevicesMsg->getAddressOfConnectedDevice());
-                switchWindow(gui::window::name::all_devices, std::move(bondedDevicesData));
+                switchWindow(gui::window::name::all_devices);
+            }
+            return sys::MessageNone{};
+        });
+        connect(typeid(::message::bluetooth::ResponseBondedDevices), [&](sys::Message *msg) {
+            auto message = static_cast<::message::bluetooth::ResponseBondedDevices *>(msg);
+            bluetoothSettingsModel->replaceDevicesList(message->getDevices());
+
+            if (gui::window::name::all_devices == getCurrentWindow()->getName()) {
+                switchWindow(gui::window::name::all_devices);
             }
             return sys::MessageNone{};
         });
@@ -204,13 +216,12 @@ namespace app
 
         connect(typeid(BluetoothPairResultMessage), [&](sys::Message *msg) {
             auto bluetoothPairResultMsg = static_cast<BluetoothPairResultMessage *>(msg);
+            auto device                 = bluetoothPairResultMsg->getDevice();
             if (bluetoothPairResultMsg->isSucceed()) {
-                bus.sendUnicast(std::make_shared<::message::bluetooth::RequestBondedDevices>(),
-                                service::name::bluetooth);
                 return sys::MessageNone{};
             }
-            auto addr    = bluetoothPairResultMsg->getAddr();
-            auto message = std::make_shared<BluetoothPairMessage>(std::move(addr));
+            auto message = std::make_shared<BluetoothPairMessage>(device);
+
             switchToAllDevicesViaBtErrorPrompt(std::move(message), "app_settings_bluetooth_pairing_error_message");
 
             return sys::MessageNone{};
@@ -221,31 +232,37 @@ namespace app
             return sys::MessageNone{};
         });
 
+        connect(typeid(::message::bluetooth::ProfileStatus), [&](sys::Message *msg) { return sys::MessageNone{}; });
+
         connect(typeid(::message::bluetooth::UnpairResult), [&](sys::Message *msg) {
             auto unpairResultMsg = static_cast<::message::bluetooth::UnpairResult *>(msg);
             if (unpairResultMsg->isSucceed()) {
                 return sys::MessageNone{};
             }
-            auto addr = unpairResultMsg->getAddr();
-            bus.sendUnicast(std::make_shared<::message::bluetooth::RequestBondedDevices>(), service::name::bluetooth);
-            auto message = std::make_shared<message::bluetooth::Unpair>(std::move(addr));
+            auto device  = unpairResultMsg->getDevice();
+            auto message = std::make_shared<message::bluetooth::Unpair>(device);
             switchToAllDevicesViaBtErrorPrompt(std::move(message), "app_settings_bluetooth_unpairing_error_message");
             return sys::MessageNone{};
         });
 
         connect(typeid(::message::bluetooth::ConnectResult), [&](sys::Message *msg) {
             auto connectResultMsg = static_cast<::message::bluetooth::ConnectResult *>(msg);
+            auto device           = connectResultMsg->getDevice();
+
             if (connectResultMsg->isSucceed()) {
-                bus.sendUnicast(std::make_shared<::message::bluetooth::RequestBondedDevices>(),
-                                service::name::bluetooth);
                 return sys::MessageNone{};
             }
-            auto addr    = connectResultMsg->getAddr();
-            auto message = std::make_shared<message::bluetooth::Connect>(std::move(addr));
+
+            auto message = std::make_shared<message::bluetooth::Connect>(device);
             switchToAllDevicesViaBtErrorPrompt(std::move(message), "app_settings_bluetooth_connecting_error_message");
             return sys::MessageNone{};
         });
-
+        connect(typeid(::message::bluetooth::DisconnectResult), [&](sys::Message *msg) {
+            if (gui::window::name::all_devices == getCurrentWindow()->getName()) {
+                switchWindow(gui::window::name::all_devices);
+            }
+            return sys::MessageNone{};
+        });
         connect(typeid(::message::bluetooth::InitializationResult), [&](sys::Message *msg) {
             auto initializationResultMsg = static_cast<::message::bluetooth::InitializationResult *>(msg);
             if (initializationResultMsg->isSucceed()) {
@@ -339,6 +356,7 @@ namespace app
             [this](const std::string &value) { notificationsWhenLocked = utils::getNumericValue<bool>(value); },
             ::settings::SettingsScope::Global);
 
+        bluetoothSettingsModel->requestBondedDevices();
         return ret;
     }
 
@@ -374,11 +392,11 @@ namespace app
         windowsFactory.attach(gui::window::name::bluetooth, [](Application *app, const std::string &name) {
             return std::make_unique<gui::BluetoothWindow>(app);
         });
-        windowsFactory.attach(gui::window::name::add_device, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::AddDeviceWindow>(app);
+        windowsFactory.attach(gui::window::name::add_device, [this](Application *app, const std::string &name) {
+            return std::make_unique<gui::AddDeviceWindow>(app, bluetoothSettingsModel);
         });
-        windowsFactory.attach(gui::window::name::all_devices, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::AllDevicesWindow>(app);
+        windowsFactory.attach(gui::window::name::all_devices, [this](Application *app, const std::string &name) {
+            return std::make_unique<gui::AllDevicesWindow>(app, bluetoothSettingsModel);
         });
         windowsFactory.attach(gui::window::name::phone_name, [](Application *app, const std::string &name) {
             return std::make_unique<gui::PhoneNameWindow>(app);

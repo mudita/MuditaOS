@@ -48,6 +48,7 @@ namespace app::manager
             this, autoLockTimerName, sys::timer::InfiniteTimeout, [this](sys::Timer &) { onPhoneLocked(); });
 
         bus.channels.push_back(sys::BusChannel::BluetoothModeChanges);
+        bus.channels.push_back(sys::BusChannel::BluetoothNotifications);
         bus.channels.push_back(sys::BusChannel::PhoneModeChanges);
         bus.channels.push_back(sys::BusChannel::PhoneLockChanges);
         bus.channels.push_back(sys::BusChannel::ServiceCellularNotifications);
