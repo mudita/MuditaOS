@@ -21,7 +21,7 @@ namespace sys
 namespace parserFSM
 {
 
-    class DeveloperModeHelper : public BaseHelper
+    class DeveloperModeHelperCommon : public BaseHelper
     {
         static auto getKeyCode(int val) noexcept -> bsp::KeyCodes;
         bool sendKeypress(bsp::KeyCodes keyCode, gui::InputEvent::State state);
@@ -34,7 +34,7 @@ namespace parserFSM
         auto prepareSMS(Context &context) -> ProcessResult;
 
       public:
-        explicit DeveloperModeHelper(sys::Service *p) : BaseHelper(p)
+        explicit DeveloperModeHelperCommon(sys::Service *p) : BaseHelper(p)
         {}
 
       private:
@@ -68,8 +68,8 @@ namespace parserFSM
         } // namespace switchData
 
         /// values for getInfo cmd
-        inline constexpr auto simStateInfo      = "simState";
-        inline constexpr auto cellularStateInfo = "cellularState";
+        inline constexpr auto simStateInfo          = "simState";
+        inline constexpr auto cellularStateInfo     = "cellularState";
         inline constexpr auto cellularSleepModeInfo = "cellularSleepMode";
 
         /// values for smsCommand
