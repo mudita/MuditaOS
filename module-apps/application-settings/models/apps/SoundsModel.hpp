@@ -4,6 +4,7 @@
 #pragma once
 
 #include "AbstractSoundsModel.hpp"
+#include "AbstractSoundsPlayer.hpp"
 
 #include <apps-common/AudioOperations.hpp>
 #include <Audio/decoder/Decoder.hpp>
@@ -14,11 +15,8 @@
 class SoundsModel : public app::InternalModel<gui::ListItem *>, public AbstractSoundsModel
 {
   public:
-    enum class PreviewState
-    {
-        NotPlaying,
-        Playing
-    };
+    explicit SoundsModel(std::shared_ptr<AbstractSoundsPlayer> soundsPlayer);
+
     /// Creates data for model
     /// @param app pointer to current application
     /// @param model audio settings model
@@ -48,15 +46,5 @@ class SoundsModel : public app::InternalModel<gui::ListItem *>, public AbstractS
                     app::Application *app,
                     audio_settings::AbstractAudioSettingsModel *model);
 
-    bool playAudioPreview(const std::string &path);
-    bool pauseAudioPreview();
-    bool resumeAudioPreview();
-    bool stopAudioPreview();
-
-    /// pointer to audio operations which allows to make audio preview
-    std::unique_ptr<app::AbstractAudioOperations> audioOperations;
-
-    PreviewState myPreviewState = PreviewState::NotPlaying;
-    audio::Token currentlyPreviewedToken;
-    std::string currentlyPreviewedPath;
+    std::shared_ptr<AbstractSoundsPlayer> soundsPlayer;
 };

@@ -10,8 +10,10 @@
 
 namespace gui
 {
-    SoundSelectWindow::SoundSelectWindow(app::Application *app, std::string name)
-        : AppWindow(app, name), mSoundsModel{std::make_shared<SoundsModel>()}
+    SoundSelectWindow::SoundSelectWindow(app::Application *app,
+                                         std::string name,
+                                         std::shared_ptr<AbstractSoundsModel> model)
+        : AppWindow(app, name), mSoundsModel{std::move(model)}
     {
         buildInterface();
     }
