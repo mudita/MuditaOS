@@ -10,15 +10,7 @@
 /*! @brief The board name */
 #define BOARD_NAME "IMXRT1050-EVKB"
 
-// Pure Phone
-#define BOARD_EINK_DISPLAY_RES_X 480U
-#define BOARD_EINK_DISPLAY_RES_Y 600U
-
-/*
-// Bell Hybrid
-#define BOARD_EINK_DISPLAY_RES_X 600U
-#define BOARD_EINK_DISPLAY_RES_Y 480U
-*/
+#include <eink-config.h>
 
 #if defined(__cplusplus)
 extern "C"
