@@ -70,7 +70,6 @@ target_sources(service-appmgr
 
 target_link_libraries(service-appmgr
     PRIVATE
-        application-desktop
         application-special-input
         json::json
         module-audio
