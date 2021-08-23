@@ -1,3 +1,4 @@
+configure_file(eink/config.h.in eink-config.h)
 
 target_sources(module-bsp
         PRIVATE
@@ -22,6 +23,8 @@ target_sources(module-bsp
                 vibrator/vibrator.cpp
                 watchdog/software_watchdog.cpp
                 watchdog/watchdog.cpp
+
+                ${CMAKE_CURRENT_BINARY_DIR}/eink-config.h
 )
 
 target_include_directories(
@@ -33,6 +36,8 @@ target_include_directories(
                         ${CMAKE_CURRENT_SOURCE_DIR}/common
                         ${CMAKE_CURRENT_SOURCE_DIR}/eink
                         ${CMAKE_CURRENT_SOURCE_DIR}/pwr
+
+                        ${CMAKE_CURRENT_BINARY_DIR}
 
                         ${CMAKE_SOURCE_DIR}/module-bluetooth/Bluetooth
                         ${CMAKE_SOURCE_DIR}/module-sys/

@@ -105,3 +105,5 @@ set_source_files_properties(
 )
 
 target_compile_definitions(module-bsp PUBLIC USB_STACK_FREERTOS)
+
+add_subdirectory(${BOARD})
