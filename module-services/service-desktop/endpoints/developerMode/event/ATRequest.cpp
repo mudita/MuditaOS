@@ -1,5 +1,5 @@
 #include "ATRequest.hpp"
-#include <service-desktop/endpoints/developerMode/DeveloperModeHelper.hpp>
+#include <service-desktop/endpoints/developerMode/DeveloperModeHelperCommon.hpp>
 
 namespace sdesktop::developerMode
 {
