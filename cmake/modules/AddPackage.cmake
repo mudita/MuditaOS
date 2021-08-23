@@ -76,8 +76,22 @@ function(add_update_package SOURCE_TARGET)
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         COMMENT "Generating update image"
     )
-    message("Adding '${SOURCE_TARGET}-UpdatePackage' target")
-    add_custom_target(${SOURCE_TARGET}-UpdatePackage
+
+    add_custom_command(
+        OUTPUT ${UPDATE_PKG}.sig
         DEPENDS ${UPDATE_PKG}
+        COMMAND ${CMAKE_SOURCE_DIR}/tools/secureboot_sign_package.sh ${CST_PATH} ${ELFTOSB_PATH} ${SRK_TABLE} ${CSF_KEY} ${IMG_KEY} ${UPDATE_PKG}
+        COMMENT "Generating update signature"
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )
+    message("Adding '${SOURCE_TARGET}-UpdatePackage' target")
+    if(ENABLE_SECURE_BOOT)
+        add_custom_target(${SOURCE_TARGET}-UpdatePackage
+            DEPENDS ${UPDATE_PKG}.sig
+        )
+    else()
+        add_custom_target(${SOURCE_TARGET}-UpdatePackage
+            DEPENDS ${UPDATE_PKG}
+        )
+    endif()
 endfunction()
