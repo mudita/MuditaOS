@@ -11,6 +11,7 @@ include(Product)
 include(Board)
 
 validate_product_selection()
+include(products/${PRODUCT}/config.cmake)
 select_board()
 
 include(Colours)
