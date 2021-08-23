@@ -31,6 +31,7 @@ target_sources(application-settings
         models/system/SARInfoRepository.cpp
         models/system/TechnicalInformationModel.cpp
         models/system/TechnicalInformationRepository.cpp
+        models/bluetooth/BluetoothSettingsModel.cpp
         presenter/network/SimContactsImportWindowPresenter.cpp
         presenter/system/SARInfoWindowPresenter.cpp
         presenter/system/TechnicalWindowPresenter.cpp

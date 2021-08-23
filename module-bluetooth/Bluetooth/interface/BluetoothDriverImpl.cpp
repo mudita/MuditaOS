@@ -203,12 +203,13 @@ namespace bluetooth
     {
         gap->setVisibility(visibility);
     }
-    auto Driver::pair(uint8_t *addr, std::uint8_t protectionLevel) -> bool
+    auto Driver::pair(Devicei device, std::uint8_t protectionLevel) -> bool
     {
-        return gap->pair(addr, protectionLevel);
+        LOG_FATAL("Device: %s, addr: %s", device.name.c_str(), device.address_str());
+        return gap->pair(device, protectionLevel);
     }
-    auto Driver::unpair(uint8_t *addr) -> bool
+    auto Driver::unpair(Devicei device) -> bool
     {
-        return gap->unpair(addr);
+        return gap->unpair(device);
     }
 } // namespace bluetooth

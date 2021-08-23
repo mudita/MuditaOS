@@ -44,13 +44,10 @@ namespace bluetooth
             None,
         };
 
-        explicit Command(Command::Type type, std::optional<uint8_t *> addr = std::nullopt) : type(type)
+        explicit Command(Command::Type type, std::optional<Devicei> dev = std::nullopt) : type(type)
         {
-            if (addr) {
-                bd_addr_copy(address, addr.value());
-            }
-            else {
-                memset(address, 0, sizeof(bd_addr_t));
+            if (dev.has_value()) {
+                device = dev.value();
             }
         }
 
@@ -59,13 +56,13 @@ namespace bluetooth
             return type;
         }
 
-        auto getAddress() -> uint8_t *
+        auto getDevice() const noexcept -> Devicei
         {
-            return address;
+            return device;
         }
 
       private:
-        bd_addr_t address{};
+        Devicei device{};
         Type type;
     };
 
@@ -92,10 +89,10 @@ namespace bluetooth
         Error::Code stopScan();
         Error::Code startPan();
         Error::Code setVisibility(bool visibility);
-        Error::Code establishAudioConnection(bd_addr_t addr);
+        Error::Code establishAudioConnection(const Devicei &device);
         Error::Code disconnectAudioConnection();
-        Error::Code pair(bd_addr_t addr);
-        Error::Code unpair(bd_addr_t addr);
+        Error::Code pair(const Devicei &device);
+        Error::Code unpair(const Devicei &device);
         Error::Code availableDevices();
         Error::Code switchAudioProfile();
         sys::Service *service;

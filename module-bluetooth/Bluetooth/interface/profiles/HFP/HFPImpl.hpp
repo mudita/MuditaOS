@@ -24,7 +24,7 @@ namespace bluetooth
         void initializeCall() const noexcept;
         void connect();
         void disconnect();
-        void setDeviceAddress(bd_addr_t addr);
+        void setDevice(Devicei device);
         void setOwnerService(const sys::Service *service);
         auto getStreamData() -> std::shared_ptr<BluetoothStreamData>;
 
@@ -54,5 +54,6 @@ namespace bluetooth
         static const char *call_hold_services[5];
         [[maybe_unused]] static int hf_indicators_nr;
         [[maybe_unused]] static hfp_generic_status_indicator_t hf_indicators[2];
+        static Devicei device;
     };
 } // namespace bluetooth

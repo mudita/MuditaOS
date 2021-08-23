@@ -7,20 +7,17 @@
 
 namespace message::bluetooth
 {
-    class Disconnect : public BluetoothMessage
-    {};
-
-    class DisconnectResult : public BluetoothMessage
+    class SyncDevices : public BluetoothMessage
     {
       public:
-        explicit DisconnectResult(Devicei device) : device(device)
+        explicit SyncDevices(std::vector<Devicei> devices) : devices(std::move(devices))
         {}
-        [[nodiscard]] auto getDevice() const -> Devicei
+        [[nodiscard]] auto getDevices() const noexcept -> std::vector<Devicei>
         {
-            return device;
+            return devices;
         }
 
       private:
-        Devicei device;
+        std::vector<Devicei> devices;
     };
 } // namespace message::bluetooth

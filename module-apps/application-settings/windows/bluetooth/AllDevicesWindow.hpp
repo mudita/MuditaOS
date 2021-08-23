@@ -2,52 +2,29 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 #pragma once
 
-#include <application-settings/models/bluetooth/BluetoothSettingsModel.hpp>
 #include <application-settings/windows/BaseSettingsWindow.hpp>
-
-#include <Device.hpp>
+#include <application-settings/models/bluetooth/BluetoothSettingsModel.hpp>
 
 namespace gui
 {
     class Image;
 
-    class ActiveDevice
-    {
-      public:
-        explicit ActiveDevice(std::string address) : address(std::move(address))
-        {}
-        ActiveDevice() = default;
-        enum class DeviceState
-        {
-            Connected,
-            Connecting,
-            Pairing,
-            Paired,
-            Unknown
-        };
-        DeviceState state = DeviceState::Unknown;
-        std::string address;
-    };
-
     class AllDevicesWindow : public BaseSettingsWindow
     {
       public:
-        explicit AllDevicesWindow(app::Application *app);
+        AllDevicesWindow(app::Application *app, std::shared_ptr<BluetoothSettingsModel> bluetoothSettingsModel);
 
       private:
         void buildInterface() override;
         auto buildOptionsList() -> std::list<Option> override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         auto onInput(const InputEvent &inputEvent) -> bool override;
-        UTF8 getTextOnCenter(const ActiveDevice::DeviceState &) const;
-        UTF8 getTextOnRight(const ActiveDevice::DeviceState &) const;
-        option::SettingRightItem getRightItem(const ActiveDevice::DeviceState &) const;
-        auto handleDeviceAction(const ActiveDevice &) -> bool;
+        UTF8 getTextOnCenter(const DeviceState &) const;
+        UTF8 getTextOnRight(const DeviceState &) const;
+        option::SettingRightItem getRightItem(const DeviceState &) const;
+        auto handleDeviceAction(const Devicei &) -> bool;
 
-        ActiveDevice activeDevice;
-        std::vector<Devicei> devices{};
-        std::string addressOfDeviceSelected;
-        std::unique_ptr<BluetoothSettingsModel> bluetoothSettingsModel{};
+        std::shared_ptr<BluetoothSettingsModel> bluetoothSettingsModel{};
     };
 
 } // namespace gui

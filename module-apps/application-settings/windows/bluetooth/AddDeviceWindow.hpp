@@ -13,14 +13,14 @@ namespace gui
     class AddDeviceWindow : public BaseSettingsWindow
     {
       public:
-        explicit AddDeviceWindow(app::Application *app);
+        AddDeviceWindow(app::Application *app, std::shared_ptr<BluetoothSettingsModel> bluetoothSettingsModel);
 
       private:
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         void onClose(CloseReason reason) override;
         auto buildOptionsList() -> std::list<Option> override;
 
-        std::unique_ptr<BluetoothSettingsModel> bluetoothSettingsModel;
+        std::shared_ptr<BluetoothSettingsModel> bluetoothSettingsModel{};
         std::vector<Devicei> devices;
     };
 }; // namespace gui
