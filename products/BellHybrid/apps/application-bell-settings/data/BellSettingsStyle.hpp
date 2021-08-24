@@ -12,9 +12,9 @@ namespace gui
     {
         namespace settings_window
         {
-            inline constexpr auto options_list_margin_x = 40;
-            inline constexpr auto options_list_margin_y = 85;
-            inline constexpr auto default_body_width    = 400;
+            inline constexpr auto options_list_margin_x = 100U;
+            inline constexpr auto options_list_margin_y = 55U;
+            inline constexpr auto default_body_width    = 400U;
         } // namespace settings_window
 
         namespace time_fmt_set_list_item
