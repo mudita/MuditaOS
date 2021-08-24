@@ -8,6 +8,12 @@
 #include <application-bell-main/ApplicationBellMain.hpp>
 #include <application-bell-settings/ApplicationBellSettings.hpp>
 
+// modules
+#include <module-db/Databases/AlarmsDB.hpp>
+#include <module-db/Databases/EventsDB.hpp>
+#include <module-db/Interface/AlarmEventRecord.hpp>
+#include <module-db/Interface/AlarmsRecord.hpp>
+
 // services
 #include <appmgr/ApplicationManager.hpp>
 #include <db/ServiceDB.hpp>

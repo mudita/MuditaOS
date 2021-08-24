@@ -14,6 +14,6 @@ target_include_directories(db
 
 target_link_libraries(db
    PRIVATE
-        module-utils
+        module-db
         service-db
 )
