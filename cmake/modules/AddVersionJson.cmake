@@ -17,7 +17,6 @@ function(add_version_json SOURCE_TARGET)
             -P ${CMAKE_SOURCE_DIR}/cmake/modules/ConfigureVersionJson.cmake
         DEPENDS ecoboot.bin-target
         DEPENDS updater.bin-target
-        DEPENDS updater.ver-target
         DEPENDS ${SOURCE_TARGET}-boot.bin
     )
 

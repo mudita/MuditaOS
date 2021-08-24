@@ -17,7 +17,7 @@ include(CopyGdbInit)
 include(Utils)
 include(ModuleUtils)
 include(FetchBootloader)
-include(AddPureUpdater)
+include(FetchPureUpdater)
 include(DiskImage)
 include(AddPackage)
 include(Product)
@@ -156,9 +156,8 @@ add_custom_target(
         "Generating version info"
     )
 
-
-copy_updater_bin()
-copy_updater_ver()
 fetch_ecoboot()
+fetch_updater()
+
 add_subdirectory(products)
 
