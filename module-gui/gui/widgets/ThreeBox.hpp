@@ -21,7 +21,7 @@ namespace gui
     template <class First, class Center, class Last> class HThreeBox : public ThreeBox<HBox, First, Center, Last>
     {
       public:
-        explicit HThreeBox(Item *parent, Position x = 0, Position y = 0, Length w = 0, Length = 0);
+        explicit HThreeBox(Item *parent, Position x = 0, Position y = 0, Length w = 0, Length h = 0);
     };
 
     template <class First, class Center, class Last> class VThreeBox : public ThreeBox<VBox, First, Center, Last>

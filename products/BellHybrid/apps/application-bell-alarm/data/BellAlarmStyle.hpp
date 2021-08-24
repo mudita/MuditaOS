@@ -9,7 +9,12 @@ namespace gui
     {
         namespace time_set_fmt_spinner
         {
-            inline constexpr auto font = "gt_pressura_regular_90";
+            inline constexpr auto font = "gt_pressura_light_90";
         } // namespace time_set_fmt_spinner
-    }     // namespace bell_alarm_style
+
+        namespace top_text
+        {
+            inline constexpr auto font = "gt_pressura_light_46";
+        }
+    } // namespace bell_alarm_style
 } // namespace gui

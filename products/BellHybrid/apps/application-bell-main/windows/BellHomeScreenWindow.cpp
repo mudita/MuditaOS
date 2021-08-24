@@ -84,7 +84,7 @@ namespace gui
         header->setTitleVisibility(false);
         bottomBar->setVisible(false);
 
-        body = new BellBaseLayout(this, 0, 0, style::window_width, style::window_height);
+        body = new BellBaseLayout(this, 0, 0, style::window_width, style::window_height, false);
 
         alarm = new AlarmSetSpinner(body->firstBox);
         alarm->setMinimumSize(mainWindow::alarmSetSpinner::width, mainWindow::alarmSetSpinner::height);
@@ -94,7 +94,8 @@ namespace gui
         alarm->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
         time = new TimeSetFmtSpinner(body->centerBox);
-        time->setMaximumSize(mainWindow::time::width, mainWindow::time::height);
+        time->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::h);
+        time->setFont(bellMainStyle::mainWindow::time::font);
         time->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         time->setEditMode(EditMode::Browse);
         time->setFont(mainWindow::time::font);
