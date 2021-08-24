@@ -37,6 +37,8 @@ target_include_directories(application-bell-main
 
 target_link_libraries(application-bell-main
     PRIVATE
+        application-bell-alarm
+        application-bell-settings
         apps-common
         bellgui
         i18n

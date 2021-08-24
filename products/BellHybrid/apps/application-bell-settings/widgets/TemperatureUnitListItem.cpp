@@ -23,7 +23,8 @@ namespace gui
         temperatureUnit->setFont(bell_settings_style::time_fmt_set_list_item::font);
         temperatureUnit->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         temperatureUnit->setFocusEdges(RectangleEdge::None);
-        body->centerBox->addWidget(temperatureUnit);
+
+        body->getCenterBox()->addWidget(temperatureUnit);
 
         dimensionChangedCallback = [&](Item &, const BoundingBox &newDim) -> bool {
             body->setArea({0, 0, newDim.w, newDim.h});

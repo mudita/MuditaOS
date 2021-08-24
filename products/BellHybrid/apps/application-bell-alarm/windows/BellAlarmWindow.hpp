@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include <application-bell-alarm/ApplicationBellAlarm.hpp>
-#include <application-bell-alarm/presenter/BellAlarmWindowPresenter.hpp>
+#include "ApplicationBellAlarm.hpp"
+#include "presenter/BellAlarmWindowPresenter.hpp"
 
 #include <apps-common/windows/AppWindow.hpp>
 
@@ -12,6 +12,7 @@ namespace gui
 {
     class BellBaseLayout;
     class TimeSetFmtSpinner;
+
     class BellAlarmWindow : public AppWindow, public app::bell_alarm::BellAlarmWindowContract::View
     {
       public:
@@ -25,6 +26,7 @@ namespace gui
 
       private:
         BellBaseLayout *body{nullptr};
+        Label *topText{nullptr};
         TimeSetFmtSpinner *timeSetFmtSpinner{nullptr};
         std::unique_ptr<app::bell_alarm::BellAlarmWindowContract::Presenter> presenter;
     };

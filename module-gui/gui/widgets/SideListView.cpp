@@ -58,8 +58,6 @@ namespace gui
             return true;
         };
 
-        createArrowsOverlay(0, 0, w, h);
-
         type = gui::ItemType::LIST;
     }
 
@@ -81,8 +79,8 @@ namespace gui
             if (pageBar != nullptr) {
                 auto elementsOnPage = body->widgetArea.w / data.elementMinimalSpaceRequired;
                 auto pagesCount     = data.elementsCount % elementsOnPage == 0 ? data.elementsCount / elementsOnPage
-                                                                           : data.elementsCount / elementsOnPage + 1;
-                auto currentPage = data.startIndex / elementsOnPage + 1;
+                                                                               : data.elementsCount / elementsOnPage + 1;
+                auto currentPage    = data.startIndex / elementsOnPage + 1;
 
                 pageBar->setMaximum(pagesCount);
                 pageBar->createGraph();
