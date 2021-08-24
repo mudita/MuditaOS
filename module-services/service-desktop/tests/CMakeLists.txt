@@ -19,6 +19,8 @@ add_catch2_executable(
         unittest.cpp
         tests-main.cpp
     LIBS
+        service-cellular
+        module-cellular
         service-desktop
         module-utils
         module-apps
@@ -32,6 +34,8 @@ add_catch2_executable(
         tests-main.cpp
         test-contacts.cpp
     LIBS
+        service-cellular
+        module-cellular
         service-desktop
         module-utils
         module-apps
@@ -45,6 +49,8 @@ add_catch2_executable(
         tests-main.cpp
         test-fs-ep-operations.cpp
     LIBS
+        service-cellular
+        module-cellular
         service-desktop
         module-utils
         module-apps

@@ -4,10 +4,18 @@
 #include "DeveloperModeEndpoint.hpp"
 #include <log.hpp>
 
+#include <desktop/DeveloperModeHelper.hpp>
 #include <endpoints/Context.hpp>
 #include <service-desktop/parser/MessageHandler.hpp>
 
 using namespace parserFSM;
+
+DeveloperModeEndpoint::DeveloperModeEndpoint(sys::Service *_ownerServicePtr)
+    : Endpoint(_ownerServicePtr), helper(std::make_unique<parserFSM::DeveloperModeHelper>(ownerServicePtr)),
+      uiHelper(std::make_unique<parserFSM::UI_Helper>(ownerServicePtr))
+{
+    debugName = "DeveloperModeEndpoint";
+}
 
 auto DeveloperModeEndpoint::handle(Context &context) -> void
 {

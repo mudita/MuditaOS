@@ -29,12 +29,7 @@ class DeveloperModeEndpoint : public parserFSM::Endpoint
     const std::unique_ptr<parserFSM::UI_Helper> uiHelper;
 
   public:
-    explicit DeveloperModeEndpoint(sys::Service *_ownerServicePtr)
-        : Endpoint(_ownerServicePtr), helper(std::make_unique<parserFSM::DeveloperModeHelperCommon>(ownerServicePtr)),
-          uiHelper(std::make_unique<parserFSM::UI_Helper>(ownerServicePtr))
-    {
-        debugName = "DeveloperModeEndpoint";
-    }
+    explicit DeveloperModeEndpoint(sys::Service *_ownerServicePtr);
 
     auto handle(parserFSM::Context &context) -> void override;
 

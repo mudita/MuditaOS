@@ -36,6 +36,8 @@ set_target_properties(BellHybrid
 
 target_link_libraries(BellHybrid
     PRIVATE
+        service-cellular # temporary workaround
+        module-cellular # temporary workaround
         application-bell-alarm
         application-bell-main
         application-bell-settings
