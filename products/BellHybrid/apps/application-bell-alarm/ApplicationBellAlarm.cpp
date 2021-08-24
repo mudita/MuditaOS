@@ -1,9 +1,9 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <application-bell-alarm/ApplicationBellAlarm.hpp>
-#include <application-bell-alarm/presenter/BellAlarmWindowPresenter.hpp>
-#include <application-bell-alarm/windows/BellAlarmWindow.hpp>
+#include "ApplicationBellAlarm.hpp"
+#include "presenter/BellAlarmWindowPresenter.hpp"
+#include "windows/BellAlarmWindow.hpp"
 
 namespace app
 {

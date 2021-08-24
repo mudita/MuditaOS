@@ -29,15 +29,15 @@ namespace gui
         setFocusItem(body);
 
         timeFormat = new Spinner(fmtSpinnerMin, fmtSpinnerMax, fmtSpinnerStep, Boundaries::Continuous);
-        timeFormat->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::h);
+        timeFormat->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::centerbox::h);
         timeFormat->setFont(bell_settings_style::time_fmt_set_list_item::font);
-
         timeFormat->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         timeFormat->setFixedFieldWidth(2);
         timeFormat->setEdges(RectangleEdge::None);
-        timeFormat->setCurrentValue(fmtSpinnerMin);
         timeFormat->setFocusEdges(RectangleEdge::None);
-        body->centerBox->addWidget(timeFormat);
+        timeFormat->setCurrentValue(fmtSpinnerMin);
+
+        body->getCenterBox()->addWidget(timeFormat);
 
         bottomDescription = new Label(body->lastBox);
         bottomDescription->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::outer_layouts_h);
