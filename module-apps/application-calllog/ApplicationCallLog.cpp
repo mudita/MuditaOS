@@ -29,6 +29,7 @@ namespace app
                                            StartInBackground startInBackground)
         : Application(name, parent, phoneMode, bluetoothMode, startInBackground, 4096)
     {
+        bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         addActionReceiver(manager::actions::ShowCallLog, [this](auto &&data) {
             switchWindow(gui::name::window::main_window, std::move(data));
             return actionHandled();
@@ -76,7 +77,7 @@ namespace app
 
     sys::ReturnCodes ApplicationCallLog::DeinitHandler()
     {
-        return sys::ReturnCodes::Success;
+        return Application::DeinitHandler();
     }
 
     void ApplicationCallLog::createUserInterface()
