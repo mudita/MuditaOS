@@ -104,7 +104,7 @@ pipeline {
                 ./configure.sh pure rt1051 Release -G Ninja
 
                 pushd build-purephone-rt1051-Release
-                ninja -j ${JOBS}
+                ninja -j ${JOBS} PurePhone-boot.bin
                 popd
                 rm -r build-purephone-rt1051-Release
 
@@ -112,7 +112,7 @@ pipeline {
                 ./configure.sh bell rt1051 Release -G Ninja
 
                 pushd build-bell-rt1051-Release
-                ninja -j ${JOBS}
+                ninja -j ${JOBS} BellHybrid-boot.bin
                 popd
 
                 echo "disk usage before removal:"
@@ -173,7 +173,7 @@ pipeline {
                 pushd "${WORKSPACE}"
 
                 pushd build-purephone-linux-Debug
-                ninja -j ${JOBS}
+                ninja -j ${JOBS} PurePhone-boot.bin
                 popd
                 popd'''
 
@@ -258,7 +258,7 @@ pipeline {
                 pushd "${WORKSPACE}"
 
                 pushd build-bell-linux-Debug
-                ninja -j ${JOBS}
+                ninja -j ${JOBS} BellHybrid-boot.bin
                 popd
 
                 popd'''
@@ -331,4 +331,3 @@ pipeline {
     }
 
 }
-
