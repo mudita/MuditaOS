@@ -40,7 +40,7 @@ function(add_image)
     endif()
 
     if(HAS_UPDATER)
-        list(APPEND COMMAND_DEPENDS updater.bin-target updater.ver-target)
+        list(APPEND COMMAND_DEPENDS updater.bin-target)
     endif()
 
     add_custom_command(
