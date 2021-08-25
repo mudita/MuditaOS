@@ -6,9 +6,12 @@
 #include "TimeUnitsModel.hpp"
 
 #include <apps-common/BasePresenter.hpp>
+#include <apps-common/Temperature.hpp>
 
 namespace app::bell_settings
 {
+    class AbstractTemperatureUnitModel;
+
     class TimeUnitsWindowContract
     {
       public:
@@ -33,7 +36,8 @@ namespace app::bell_settings
     class TimeUnitsWindowPresenter : public TimeUnitsWindowContract::Presenter
     {
       public:
-        explicit TimeUnitsWindowPresenter(std::shared_ptr<TimeUnitsModel> pagesProvider);
+        explicit TimeUnitsWindowPresenter(std::shared_ptr<TimeUnitsModel> pagesProvider,
+                                          std::unique_ptr<AbstractTemperatureUnitModel> temperatureUnitModel);
 
         auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> override;
         auto clearData() -> void;
@@ -43,5 +47,6 @@ namespace app::bell_settings
 
       private:
         std::shared_ptr<TimeUnitsModel> pagesProvider;
+        std::unique_ptr<AbstractTemperatureUnitModel> temperatureUnitModel;
     };
 } // namespace app::bell_settings

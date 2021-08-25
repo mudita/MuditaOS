@@ -35,7 +35,7 @@ namespace gui
         void incAlarmMinute() override;
         void decAlarmMinute() override;
 
-        void setTemperature(app::home_screen::TemperatureModel::Temperature newTemp) override;
+        void setTemperature(gui::temperature::Temperature newTemp) override;
         void setBottomDescription(const UTF8 &desc) override;
         void setTime(std::time_t newTime) override;
         void setTimeFormat(utils::time::Locale::TimeFormat fmt) override;
