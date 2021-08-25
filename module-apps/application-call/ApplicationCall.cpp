@@ -74,7 +74,7 @@ namespace app
         });
         addActionReceiver(manager::actions::CallRejectedByOfflineNotification, [this](auto &&data) {
             auto buttonAction = [=]() -> bool {
-                returnToPreviousWindow();
+                app::manager::Controller::switchBack(this);
                 return true;
             };
             constexpr auto icon    = "info_big_circle_W_G";
