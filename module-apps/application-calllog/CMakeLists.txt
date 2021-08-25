@@ -35,13 +35,6 @@ target_sources( application-calllog
 		include/application-calllog/ApplicationCallLog.hpp
 )
 
-option(ENABLE_APP_CALLLOG "Enable application calllog" ON)
-
-target_compile_definitions(application-calllog
-    INTERFACE
-        $<$<BOOL:${ENABLE_APP_CALLLOG}>:ENABLE_APP_CALLLOG>
-)
-
 target_link_libraries( application-calllog
 
 	PRIVATE

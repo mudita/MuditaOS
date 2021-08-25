@@ -5,7 +5,9 @@
 #include "PlatformFactory.hpp"
 
 // applications
+#ifdef ENABLE_APP_ANTENNA
 #include <application-antenna/ApplicationAntenna.hpp>
+#endif
 #include <application-call/ApplicationCall.hpp>
 #include <application-calllog/ApplicationCallLog.hpp>
 #include <application-desktop/ApplicationDesktop.hpp>
