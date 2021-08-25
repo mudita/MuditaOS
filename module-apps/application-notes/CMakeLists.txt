@@ -54,14 +54,6 @@ target_sources(application-notes
 		include/application-notes/ApplicationNotes.hpp
 )
 
-
-option(ENABLE_APP_NOTES "Enable application notes" ON)
-
-target_compile_definitions(application-notes
-    INTERFACE
-        $<$<BOOL:${ENABLE_APP_NOTES}>:ENABLE_APP_NOTES>
-)
-
 target_link_libraries(application-notes
 	PRIVATE
 		apps-common

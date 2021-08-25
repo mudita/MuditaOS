@@ -27,13 +27,6 @@ target_sources(application-special-input
                 include/application-special-input/ApplicationSpecialInput.hpp
 )
 
-option(ENABLE_APP_SPECIAL_INPUT "Enable application special-input" ON)
-
-target_compile_definitions(application-special-input
-        INTERFACE
-                $<$<BOOL:${ENABLE_APP_SPECIAL_INPUT}>:ENABLE_APP_SPECIAL_INPUT>
-)
-
 target_link_libraries(application-special-input
     PRIVATE
         apps-common
