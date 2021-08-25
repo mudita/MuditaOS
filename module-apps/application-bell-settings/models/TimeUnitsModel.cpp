@@ -2,8 +2,9 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TimeUnitsModel.hpp"
-#include "TimeFormatSetListItem.hpp"
-#include "TimeSetListItem.hpp"
+#include "widgets/TimeFormatSetListItem.hpp"
+#include "widgets/TimeSetListItem.hpp"
+#include "widgets/TemperatureUnitListItem.hpp"
 
 #include <gui/widgets/ListViewEngine.hpp>
 #include <gui/widgets/Style.hpp>
@@ -60,6 +61,10 @@ namespace app::bell_settings
             timeSetListItem->timeSetFmtSpinner->setTimeFormat(timeFmtSetListItem->getTimeFmt());
         };
 
+        temperatureUnitListItem =
+            new gui::TemperatureUnitListItem(utils::translate("app_bell_settings_advanced_temp_scale"));
+        internalData.push_back(temperatureUnitListItem);
+
         for (auto item : internalData) {
             item->deleteByList = false;
         }
@@ -107,10 +112,15 @@ namespace app::bell_settings
         auto msg = std::make_shared<stm::message::TimeChangeRequestMessage>(newTime);
         application->bus.sendUnicast(std::move(msg), service::name::service_time);
     }
+
     void TimeUnitsModel::sendTimeFmtUpdateMessage(utils::time::Locale::TimeFormat newFmt)
     {
         auto msg = std::make_shared<stm::message::SetTimeFormatRequest>(newFmt);
         application->bus.sendUnicast(std::move(msg), service::name::service_time);
     }
 
+    auto TimeUnitsModel::getTemperatureUnit() -> gui::temperature::Temperature::Unit
+    {
+        return *gui::temperature::strToUnit(temperatureUnitListItem->getUnitAsStr());
+    }
 } // namespace app::bell_settings
