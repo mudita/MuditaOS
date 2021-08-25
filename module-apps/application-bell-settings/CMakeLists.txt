@@ -26,6 +26,7 @@ target_sources(application-bell-settings
         presenter/TimeUnitsPresenter.cpp
         widgets/TimeSetListItem.cpp
         widgets/TimeFormatSetListItem.cpp
+        widgets/TemperatureUnitListItem.cpp
         windows/BellSettingsWindow.cpp
         windows/BellSettingsAdvancedWindow.cpp
         windows/BellSettingsTimeUnitsWindow.cpp
@@ -36,6 +37,7 @@ target_sources(application-bell-settings
         presenter/TimeUnitsPresenter.hpp
         widgets/TimeSetListItem.hpp
         widgets/TimeFormatSetListItem.hpp
+        widgets/TemperatureUnitListItem.hpp
         windows/BellSettingsWindow.hpp
         windows/BellSettingsAdvancedWindow.hpp
         windows/BellSettingsTimeUnitsWindow.hpp

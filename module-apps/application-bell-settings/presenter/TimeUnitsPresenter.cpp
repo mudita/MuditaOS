@@ -25,6 +25,7 @@ namespace app::bell_settings
     auto TimeUnitsWindowPresenter::saveData() -> void
     {
         pagesProvider->saveData();
+        temperatureUnitModel->set(pagesProvider->getTemperatureUnit());
     }
 
     auto TimeUnitsWindowPresenter::loadData() -> void

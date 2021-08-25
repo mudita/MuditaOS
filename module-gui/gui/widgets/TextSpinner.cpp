@@ -25,7 +25,7 @@ namespace gui
         update();
     }
 
-    std::string TextSpinner::getCurrentText() const noexcept
+    UTF8 TextSpinner::getCurrentText() const noexcept
     {
         return textRange[currentPosition];
     }
@@ -83,7 +83,7 @@ namespace gui
     bool TextSpinner::onFocus(bool state)
     {
         if (focus) {
-            setEdges(RectangleEdge::Bottom);
+            setEdges(focusEdges);
         }
         else {
             setEdges(RectangleEdge::None);
@@ -102,6 +102,10 @@ namespace gui
     TextSpinner::Range TextSpinner::getValidRange() const noexcept
     {
         return Range{getRangeDownLimit(), getRangeUpLimit()};
+    }
+    void TextSpinner::setFocusEdges(RectangleEdge edges)
+    {
+        focusEdges = edges;
     }
 
 } // namespace gui

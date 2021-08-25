@@ -18,8 +18,10 @@ namespace app::bell_settings
     class AbstractTemperatureUnitModel
     {
       public:
-        virtual ~AbstractTemperatureUnitModel()                    = default;
-        virtual gui::temperature::Temperature::Unit get() const    = 0;
+        virtual ~AbstractTemperatureUnitModel() = default;
+
+        virtual gui::temperature::Temperature::Unit get() const = 0;
+
         virtual void set(gui::temperature::Temperature::Unit unit) = 0;
     };
 
@@ -27,7 +29,9 @@ namespace app::bell_settings
     {
       public:
         explicit TemperatureUnitModel(Application *app);
+
         gui::temperature::Temperature::Unit get() const override;
+
         void set(gui::temperature::Temperature::Unit unit) override;
 
       private:

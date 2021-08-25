@@ -4,13 +4,16 @@
 #pragma once
 
 #include <cstdint>
+#include <optional>
 #include <string>
 
 namespace gui::temperature
 {
-    inline constexpr auto celsiusDegreeSymbol    = "C";
-    inline constexpr auto fahrenheitDegreeSymbol = "F";
+    inline constexpr auto celsiusSymbol          = "C";
+    inline constexpr auto fahrenheitSymbol       = "F";
     inline constexpr auto degree                 = "\u00B0";
+    inline constexpr auto celsiusDegreeSymbol    = "\u00B0C";
+    inline constexpr auto fahrenheitDegreeSymbol = "\u00B0F";
 
     struct Temperature
     {
@@ -25,6 +28,18 @@ namespace gui::temperature
 
     inline std::string toStr(Temperature::Unit unit)
     {
-        return unit == Temperature::Unit::Celsius ? celsiusDegreeSymbol : fahrenheitDegreeSymbol;
+        return unit == Temperature::Unit::Celsius ? celsiusSymbol : fahrenheitSymbol;
+    }
+
+    inline std::optional<Temperature::Unit> strToUnit(std::string_view str)
+    {
+        if (str == gui::temperature::celsiusDegreeSymbol) {
+            return gui::temperature::Temperature::Unit::Celsius;
+        }
+        else if (str == gui::temperature::fahrenheitDegreeSymbol) {
+            return gui::temperature::Temperature::Unit::Fahrenheit;
+        }
+
+        return {};
     }
 } // namespace gui::temperature
