@@ -1,23 +1,32 @@
-#ifndef PUREPHONE_KEYBOARD_HPP
-#define PUREPHONE_KEYBOARD_HPP
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <stdint.h>
+#pragma once
 
-#include "bsp/common.hpp"
 #include "key_codes.hpp"
 
-namespace bsp {
+#include <bsp/common.hpp>
 
-	void keyboard_get_data(const uint8_t& notification, uint8_t& event, uint8_t& code);
+#include <cstdint>
+#include <vector>
 
-	int32_t keyboard_Init(xQueueHandle qHandle);
+namespace bsp::keyboard 
+{
+	struct KeyEvent
+	{
+		KeyCodes code;
+		KeyEvents event;
+	};
 
-	int32_t keyboard_Deinit(void);
+	std::vector<KeyEvent> getKeyEvents(std::uint8_t notification);
 
-	BaseType_t keyboard_IRQHandler(void);
+	std::int32_t init(xQueueHandle qHandle);
 
-	BaseType_t keyboard_right_functional_IRQHandler(void);
-}
+	std::int32_t deinit();
+
+	BaseType_t IRQHandler();
+
+	BaseType_t rightFunctionalIRQHandler();
+} // namespace bsp::keyboard
 
 
-#endif //PUREPHONE_KEYBOARD_HPP
