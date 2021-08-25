@@ -6,7 +6,6 @@
 #include "DependencyGraph.hpp"
 #include "graph/TopologicalSort.hpp"
 
-#include <EventStore.hpp>
 #include "thread.hpp"
 #include "ticks.hpp"
 #include "critical.hpp"
@@ -18,18 +17,12 @@
 #include <service-evtmgr/EVMessages.hpp>
 #include <service-appmgr/messages/UserPowerDownRequest.hpp>
 #include <service-desktop/service-desktop/Constants.hpp>
-#include <service-cellular/CellularServiceAPI.hpp>
-#include <service-cellular/CellularMessage.hpp>
 #include <service-appmgr/Constants.hpp>
 #include <service-appmgr/Controller.hpp>
 #include "messages/CpuFrequencyMessage.hpp"
 #include "messages/DeviceRegistrationMessage.hpp"
 #include "messages/SentinelRegistrationMessage.hpp"
 #include "messages/RequestCpuFrequencyMessage.hpp"
-#include "messages/PhoneModeRequest.hpp"
-#include "messages/TetheringStateRequest.hpp"
-#include "messages/TetheringQuestionRequest.hpp"
-#include "messages/TetheringPhoneModeChangeProhibitedMessage.hpp"
 #include <time/ScopedTime.hpp>
 #include "Timers/TimerFactory.hpp"
 #include <service-appmgr/StartupType.hpp>
@@ -45,11 +38,6 @@ namespace sys
 {
     namespace
     {
-        const std::map<bsp::KeyCodes, phone_modes::PhoneMode> SliderStateToPhoneModeMapping = {
-            {bsp::KeyCodes::SSwitchUp, phone_modes::PhoneMode::Connected},
-            {bsp::KeyCodes::SSwitchMid, phone_modes::PhoneMode::DoNotDisturb},
-            {bsp::KeyCodes::SSwitchDown, phone_modes::PhoneMode::Offline}};
-
         constexpr std::chrono::milliseconds preShutdownRoutineTimeout{1500};
         constexpr std::chrono::milliseconds lowBatteryShutdownDelayTime{5000};
     } // namespace
@@ -212,7 +200,6 @@ namespace sys
         powerManager     = std::make_unique<PowerManager>();
         cpuStatistics    = std::make_unique<CpuStatistics>();
         deviceManager    = std::make_unique<DeviceManager>();
-        phoneModeSubject = std::make_unique<phone_modes::Subject>(this);
 
         systemInit = std::move(sysInit);
         userInit   = std::move(appSpaceInit);
@@ -223,12 +210,6 @@ namespace sys
         cpuStatisticsTimer = sys::TimerFactory::createPeriodicTimer(
             this, "cpuStatistics", constants::timerInitInterval, [this](sys::Timer &) { CpuStatisticsTimerHandler(); });
         cpuStatisticsTimer.start();
-    }
-
-    bool SystemManagerCommon::CloseSystem(Service *s)
-    {
-        s->bus.sendUnicast(std::make_shared<SystemManagerCmd>(Code::CloseSystem), service::name::system_manager);
-        return true;
     }
 
     bool SystemManagerCommon::Restore(Service *s)
@@ -421,9 +402,6 @@ namespace sys
     void SystemManagerCommon::batteryCriticalLevelAction(bool charging)
     {
         LOG_INFO("Battery Critical Level reached!");
-        CellularServiceAPI::ChangeModulePowerState(this, cellular::service::State::PowerState::Off);
-        auto msg = std::make_shared<CriticalBatteryLevelNotification>(true, charging);
-        bus.sendUnicast(std::move(msg), service::name::appmgr);
     }
 
     void SystemManagerCommon::batteryShutdownLevelAction()
@@ -435,9 +413,6 @@ namespace sys
     void SystemManagerCommon::batteryNormalLevelAction()
     {
         LOG_INFO("Battery level normal.");
-        CellularServiceAPI::ChangeModulePowerState(this, cellular::service::State::PowerState::On);
-        auto battNormalMsg = std::make_shared<CriticalBatteryLevelNotification>(false);
-        bus.sendUnicast(std::move(battNormalMsg), service::name::appmgr);
     }
 
     void SystemManagerCommon::readyToCloseHandler(Message *msg)
@@ -520,22 +495,6 @@ namespace sys
             return MessageNone{};
         });
 
-        connect(CellularCheckIfStartAllowedMessage(), [&](Message *) {
-            switch (Store::Battery::get().levelState) {
-            case Store::Battery::LevelState::Normal:
-                CellularServiceAPI::ChangeModulePowerState(this, cellular::service::State::PowerState::On);
-                break;
-            case Store::Battery::LevelState::CriticalCharging:
-                [[fallthrough]];
-            case Store::Battery::LevelState::CriticalNotCharging:
-                CellularServiceAPI::ChangeModulePowerState(this, cellular::service::State::PowerState::Off);
-                break;
-            case Store::Battery::LevelState::Shutdown:
-                break;
-            }
-            return MessageNone{};
-        });
-
         connect(app::UserPowerDownRequest(), [&](Message *) {
             CloseSystemHandler(CloseReason::RegularPowerDown);
             return MessageNone{};
@@ -589,16 +548,6 @@ namespace sys
             return sys::MessageNone{};
         });
 
-        connect(typeid(PhoneModeRequest), [this](sys::Message *message) -> sys::MessagePointer {
-            auto request = static_cast<PhoneModeRequest *>(message);
-            return handlePhoneModeRequest(request);
-        });
-
-        connect(typeid(TetheringStateRequest), [this](sys::Message *message) -> sys::MessagePointer {
-            auto request = static_cast<TetheringStateRequest *>(message);
-            return handleTetheringStateRequest(request);
-        });
-
         connect(typeid(app::manager::CheckIfStartAllowedMessage), [this](sys::Message *) -> sys::MessagePointer {
             switch (Store::Battery::get().levelState) {
             case Store::Battery::LevelState::Normal:
@@ -622,11 +571,6 @@ namespace sys
                 break;
             }
             return sys::MessageNone{};
-        });
-
-        connect(typeid(TetheringEnabledResponse), [this](sys::Message *message) -> sys::MessagePointer {
-            auto response = static_cast<TetheringEnabledResponse *>(message);
-            return enableTethering(response);
         });
 
         deviceManager->RegisterNewDevice(powerManager->getExternalRamDevice());
@@ -717,61 +661,6 @@ namespace sys
 
         cpuStatistics->Update();
         powerManager->UpdateCpuFrequency(cpuStatistics->GetPercentageCpuLoad());
-    }
-
-    phone_modes::PhoneMode SystemManagerCommon::translateSliderState(const RawKey &key)
-    {
-        const auto code = key.keyCode;
-        if (code != bsp::KeyCodes::SSwitchUp && code != bsp::KeyCodes::SSwitchMid &&
-            code != bsp::KeyCodes::SSwitchDown) {
-            throw std::invalid_argument{"Invalid key code passed."};
-        }
-        return SliderStateToPhoneModeMapping.at(code);
-    }
-
-    MessagePointer SystemManagerCommon::handlePhoneModeRequest(PhoneModeRequest *request)
-    {
-        LOG_INFO("Phone mode change requested.");
-        if (phoneModeSubject->isTetheringEnabled()) {
-            LOG_WARN("Changing phone mode when tethering is enabled!");
-            // display popup
-            bus.sendUnicast(std::make_shared<TetheringPhoneModeChangeProhibitedMessage>(), service::name::appmgr);
-            return MessageNone{};
-        }
-        phoneModeSubject->setPhoneMode(request->getPhoneMode());
-        return MessageNone{};
-    }
-
-    MessagePointer SystemManagerCommon::handleTetheringStateRequest(TetheringStateRequest *request)
-    {
-        LOG_INFO("Tethering state change requested");
-
-        if (Store::Battery::get().levelState != Store::Battery::LevelState::Normal) {
-            LOG_INFO("Tethering state change refused - battery too low");
-            return MessageNone{};
-        }
-
-        if (const auto requestedState = request->getTetheringState(); requestedState == phone_modes::Tethering::On) {
-            bus.sendUnicast(std::make_shared<TetheringQuestionRequest>(), service::name::appmgr);
-        }
-        else {
-            if (const auto tetheringChanged = phoneModeSubject->setTetheringMode(phone_modes::Tethering::Off);
-                !tetheringChanged) {
-                bus.sendUnicast(std::make_shared<TetheringQuestionAbort>(), service::name::appmgr);
-            }
-            else {
-                // Turned on, disabling...
-                LOG_INFO("Disabling tethering");
-                bus.sendUnicast(std::make_shared<sevm::RequestPhoneModeForceUpdate>(), service::name::evt_manager);
-            }
-        }
-        return MessageNone{};
-    }
-
-    MessagePointer SystemManagerCommon::enableTethering([[maybe_unused]] TetheringEnabledResponse *response)
-    {
-        phoneModeSubject->setTetheringMode(phone_modes::Tethering::On);
-        return MessageNone{};
     }
 
     void SystemManagerCommon::UpdateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyHz newFrequency)
