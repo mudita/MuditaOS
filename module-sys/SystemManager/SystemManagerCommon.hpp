@@ -1,15 +1,7 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-/*
- * Service.hpp
- *
- *  Created on: Mar 7, 2019
- *      Author: mati
- */
-
-#ifndef SYSTEMMANAGER_SYSTEMMANAGER_HPP_
-#define SYSTEMMANAGER_SYSTEMMANAGER_HPP_
+#pragma once
 
 #include <functional>
 #include <stdexcept>
@@ -21,7 +13,6 @@
 #include "Service/ServiceCreator.hpp"
 #include "Timers/TimerHandle.hpp"
 #include "PowerManager.hpp"
-#include "PhoneModes/Subject.hpp"
 #include <common_data/RawKey.hpp>
 #include "Constants.hpp"
 #include "CpuStatistics.hpp"
@@ -39,10 +30,6 @@ namespace sys
         inline constexpr std::chrono::milliseconds timerPeriodInterval{100ms};
         inline constexpr auto restoreTimeout{5000};
     } // namespace constants
-
-    class PhoneModeRequest;         // Forward declaration
-    class TetheringStateRequest;    // Forward declaration
-    class TetheringEnabledResponse; // Forward declaration
 
     enum class Code
     {
@@ -100,10 +87,7 @@ namespace sys
 
         void initialize();
 
-        void StartSystem(InitFunction sysInit, InitFunction appSpaceInit);
-
-        // Invoke system close procedure
-        static bool CloseSystem(Service *s);
+        virtual void StartSystem(InitFunction sysInit, InitFunction appSpaceInit);
 
         static bool Restore(Service *s);
 
@@ -126,11 +110,6 @@ namespace sys
         /// Destroy existing application
         static bool DestroyApplication(const std::string &name, Service *caller);
 
-        /// Translates a slider state into a phone mode.
-        /// \param key  Slider button state
-        /// \return Phone mode.
-        static phone_modes::PhoneMode translateSliderState(const RawKey &key);
-
         /// Kill service
         /// @note - this is final, it straight takes service, calls it's close callback and it's gone
         /// please mind that services & apps not registered in SystemManager cant be killed - these should be handled by
@@ -141,10 +120,13 @@ namespace sys
         /// instead
         void kill(std::shared_ptr<Service> const &toKill);
 
+      protected:
+        ReturnCodes InitHandler() override;
+        virtual void batteryNormalLevelAction();
+        virtual void batteryCriticalLevelAction(bool charging);
+
       private:
         MessagePointer DataReceivedHandler(DataMessage *msg, ResponseMessage *resp) override;
-
-        ReturnCodes InitHandler() override;
 
         ReturnCodes DeinitHandler() override
         {
@@ -185,26 +167,12 @@ namespace sys
 
         void RebootHandler(State state, std::optional<UpdateReason> updateReason = std::nullopt);
 
-        /// loop to handle prior to full system close
-        /// for now for rt1051 we need to
-        /// 1. check if we have power plug in
-        /// 2. if power is in, if we didn't get request for poweron ( this triggers reboot)
-        /// this is needed as we can't just shutdown phone with power in - it would end in phone unable to boot (as
-        /// red key won't work to power it on. For more information follow up with schematics
-        bool PreShutdownLoop();
-
         /// periodic update of cpu statistics
         void CpuStatisticsTimerHandler();
 
         /// used for power management control for the filesystem
         void UpdateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyHz newFrequency);
 
-        MessagePointer handlePhoneModeRequest(PhoneModeRequest *request);
-        MessagePointer handleTetheringStateRequest(TetheringStateRequest *request);
-        MessagePointer enableTethering(TetheringEnabledResponse *response);
-
-        void batteryCriticalLevelAction(bool charging);
-        void batteryNormalLevelAction();
         void batteryShutdownLevelAction();
 
         bool cpuStatisticsTimerInit{false};
@@ -213,7 +181,6 @@ namespace sys
         sys::TimerHandle cpuStatisticsTimer;
         sys::TimerHandle servicesPreShutdownRoutineTimeout;
         sys::TimerHandle lowBatteryShutdownDelay;
-        std::unique_ptr<phone_modes::Subject> phoneModeSubject;
         InitFunction userInit;
         InitFunction systemInit;
         std::vector<std::string> readyForCloseRegister;
@@ -248,5 +215,3 @@ inline const char *c_str(sys::SystemManagerCommon::State state)
     }
     return "";
 }
-
-#endif /* SYSTEMMANAGER_SYSTEMMANAGER_HPP_ */

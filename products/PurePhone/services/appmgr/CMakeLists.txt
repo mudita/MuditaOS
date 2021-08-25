@@ -25,4 +25,5 @@ target_link_libraries(appmgr
         service-db
         service-desktop
         service-evtmgr
+        sys
 )
