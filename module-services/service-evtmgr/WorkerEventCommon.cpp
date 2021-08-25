@@ -77,10 +77,9 @@ bool WorkerEventCommon::handleMessage(uint32_t queueID)
         if (!queue->Dequeue(&notification, 0)) {
             return false;
         }
-        uint8_t state, code;
-        bsp::keyboard_get_data(notification, state, code);
-
-        processKeyEvent(static_cast<bsp::KeyEvents>(state), static_cast<bsp::KeyCodes>(code));
+        for (const auto &key : bsp::keyboard::getKeyEvents(notification)) {
+            processKeyEvent(key.event, key.code);
+        }
     }
 
     if (queueID == static_cast<std::uint32_t>(WorkerEventQueues::queueBattery)) {
@@ -146,7 +145,7 @@ bool WorkerEventCommon::initEventQueues()
 
 bool WorkerEventCommon::initCommonHardwareComponents()
 {
-    bsp::keyboard_Init(queues[static_cast<int32_t>(WorkerEventQueues::queueKeyboardIRQ)]->GetQueueHandle());
+    bsp::keyboard::init(queues[static_cast<int32_t>(WorkerEventQueues::queueKeyboardIRQ)]->GetQueueHandle());
     auto queueBatteryHandle = queues[static_cast<int32_t>(WorkerEventQueues::queueBattery)]->GetQueueHandle();
     auto queueChargerDetect = queues[static_cast<int32_t>(WorkerEventQueues::queueChargerDetect)]->GetQueueHandle();
     bsp::battery_charger::init(queueBatteryHandle, queueChargerDetect);
@@ -182,7 +181,7 @@ bool WorkerEventCommon::deinit(void)
 
     deinitProductHardware();
 
-    bsp::keyboard_Deinit();
+    bsp::keyboard::deinit();
     bsp::battery_charger::deinit();
     battery_level_check::deinit();
 
