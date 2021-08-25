@@ -12,7 +12,7 @@ target_sources(application-bell-main
 
         presenters/HomeScreenPresenter.cpp
         presenters/StateController.cpp
- 
+
         windows/BellHomeScreenWindow.hpp
         windows/BellMainMenuWindow.hpp
 
@@ -38,6 +38,7 @@ target_link_libraries(application-bell-main
     PRIVATE
         application-bell-alarm
         application-bell-settings
+        application-bell-powernap
         apps-common
         bellgui
         i18n
