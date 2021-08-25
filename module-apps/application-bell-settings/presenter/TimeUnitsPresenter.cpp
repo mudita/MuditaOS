@@ -1,12 +1,15 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "TemperatureUnitModel.hpp"
 #include "TimeUnitsPresenter.hpp"
 
 namespace app::bell_settings
 {
-    TimeUnitsWindowPresenter::TimeUnitsWindowPresenter(std::shared_ptr<TimeUnitsModel> pagesProvider)
-        : pagesProvider(std::move(pagesProvider))
+    TimeUnitsWindowPresenter::TimeUnitsWindowPresenter(
+        std::shared_ptr<TimeUnitsModel> pagesProvider,
+        std::unique_ptr<AbstractTemperatureUnitModel> temperatureUnitModel)
+        : pagesProvider(std::move(pagesProvider)), temperatureUnitModel{std::move(temperatureUnitModel)}
     {}
 
     auto TimeUnitsWindowPresenter::getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider>

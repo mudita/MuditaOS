@@ -126,11 +126,10 @@ namespace gui
         }
     }
 
-    void BellHomeScreenWindow::setTemperature(app::home_screen::TemperatureModel::Temperature newTemp)
+    void BellHomeScreenWindow::setTemperature(gui::temperature::Temperature newTemp)
     {
-        constexpr auto degreeSign{bellMainStyle::mainWindow::temperatureLabel::degree};
-        bottomText->setText(std::to_string(newTemp.value) + degreeSign +
-                            app::home_screen::AbstractTemperatureModel::unitToStr(newTemp.unit));
+        constexpr auto degreeSign{gui::temperature::degree};
+        bottomText->setText(std::to_string(newTemp.value) + degreeSign + gui::temperature::toStr(newTemp.unit));
     }
     void BellHomeScreenWindow::setBottomDescription(const UTF8 &desc)
     {

@@ -3,6 +3,7 @@
 
 #include "ApplicationBellSettings.hpp"
 #include "TimeUnitsPresenter.hpp"
+#include "models/TemperatureUnitModel.hpp"
 #include "windows/BellSettingsAdvancedWindow.hpp"
 #include "windows/BellSettingsFinishedWindow.hpp"
 #include "windows/BellSettingsTimeUnitsWindow.hpp"
@@ -26,7 +27,6 @@ namespace app
             return ret;
         }
         createUserInterface();
-
         return sys::ReturnCodes::Success;
     }
 
@@ -41,8 +41,10 @@ namespace app
         });
 
         windowsFactory.attach(gui::window::name::bellSettingsTimeUnits, [](Application *app, const std::string &name) {
-            auto timeUnitsProvider = std::make_shared<bell_settings::TimeUnitsModel>(app);
-            auto presenter         = std::make_unique<bell_settings::TimeUnitsWindowPresenter>(timeUnitsProvider);
+            auto temperatureUnitModel = std::make_unique<bell_settings::TemperatureUnitModel>(app);
+            auto timeUnitsProvider    = std::make_shared<bell_settings::TimeUnitsModel>(app);
+            auto presenter            = std::make_unique<bell_settings::TimeUnitsWindowPresenter>(timeUnitsProvider,
+                                                                                       std::move(temperatureUnitModel));
             return std::make_unique<gui::BellSettingsTimeUnitsWindow>(app, std::move(presenter));
         });
 

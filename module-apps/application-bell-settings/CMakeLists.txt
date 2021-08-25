@@ -22,6 +22,7 @@ target_sources(application-bell-settings
     PRIVATE
         ApplicationBellSettings.cpp
         models/TimeUnitsModel.cpp
+        models/TemperatureUnitModel.cpp
         presenter/TimeUnitsPresenter.cpp
         widgets/TimeSetListItem.cpp
         widgets/TimeFormatSetListItem.cpp
@@ -31,6 +32,7 @@ target_sources(application-bell-settings
         windows/BellSettingsFinishedWindow.cpp
 
         models/TimeUnitsModel.hpp
+        models/TemperatureUnitModel.hpp
         presenter/TimeUnitsPresenter.hpp
         widgets/TimeSetListItem.hpp
         widgets/TimeFormatSetListItem.hpp
