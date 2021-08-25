@@ -39,6 +39,7 @@ target_link_libraries(BellHybrid
         application-bell-alarm
         application-bell-main
         application-bell-settings
+        application-bell-powernap
         application-music-player
         appmgr
         db
