@@ -3,9 +3,10 @@ add_library(evtmgr STATIC)
 target_sources(evtmgr
     PRIVATE
         EventManager.cpp
-	WorkerEvent.cpp
-	WorkerEvent.hpp
+        WorkerEvent.cpp
+        WorkerEvent.hpp
     PUBLIC
+        include/evtmgr/EVMessages.hpp
         include/evtmgr/EventManager.hpp
 )
 
@@ -21,4 +22,5 @@ target_link_libraries(evtmgr
         module-bsp
         module-sys
         service-evtmgr
+        sys
 )

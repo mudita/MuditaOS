@@ -7,12 +7,14 @@
 
 #include <bsp/magnetometer/magnetometer.hpp>
 #include <bsp/torch/torch.hpp>
+#include <evtmgr/EVMessages.hpp>
 #include <screen-light-control/ScreenLightControl.hpp>
 #include <service-cellular/ServiceCellular.hpp>
 #include <service-evtmgr/EVMessages.hpp>
 #include <service-evtmgr/ScreenLightControlMessage.hpp>
 #include <service-evtmgr/WorkerEventCommon.hpp>
-#include <SystemManager/messages/PhoneModeRequest.hpp>
+#include <sys/SystemManager.hpp>
+#include <sys/messages/PhoneModeRequest.hpp>
 
 namespace
 {
@@ -193,7 +195,7 @@ void EventManager::handleKeyMoveEvent(RawKey key)
 {
     if (isSliderKeyCode(key.keyCode)) {
         LOG_INFO("Slider position: %s", magic_enum::enum_name(key.keyCode).data());
-        const auto mode = sys::SystemManagerCommon::translateSliderState(key);
+        const auto mode = sys::SystemManager::translateSliderState(key);
         bus.sendUnicast(std::make_shared<sys::PhoneModeRequest>(mode), service::name::system_manager);
     }
 }
