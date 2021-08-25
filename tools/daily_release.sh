@@ -6,6 +6,8 @@
 
 #this script should be run in docker container
 
+set -e
+
 LOGIN=${LOGIN}
 TOKEN=${TOKEN}
 IMAGE_NAME=${IMAGE_NAME:-wearemudita/mudita_os_builder:1.9}
@@ -70,12 +72,14 @@ fi
 pushd ${WORK_DIR}
 
 if checkIfGit; then
-    git fetch --tags
-    git checkout ${REPOSITORY_BRANCH}
-    git pull --ff-only --tags
+    git clean -ffdx                                   &>/dev/null
+    git fetch --tags --force                          &>/dev/null
+    git checkout ${REPOSITORY_BRANCH} -f
+    git reset origin/${REPOSITORY_BRANCH} --hard      &>/dev/null
+    git submodule update --init --recursive --force   &>/dev/null
 else
     echo "not a git dir"
-    git clone -b ${REPOSITORY_BRANCH} ${REPOSITORY_URL} .
+    git clone --recurse-submodules -b ${REPOSITORY_BRANCH} ${REPOSITORY_URL} .
 fi
 
 if [ ! -d ccache ]; then
@@ -95,7 +99,7 @@ echo "Creating release with: $VERSION"
 addTokens
 git submodule update --init --recursive
 git tag -f daily-${VERSION}
-git push origin daily-${VERSION}
+git push -f origin daily-${VERSION}
 ./configure.sh ${PRODUCT} rt1051 RelWithDebInfo -G Ninja
 cd build-${PRODUCT,,}-rt1051-RelWithDebInfo
 ninja
@@ -108,4 +112,5 @@ echo "Copy assets to ${ARTIFACTS_DIR}"
 cp *-image.tar.xz ${ARTIFACTS_DIR}/${PKG_NAME_PREFIX}-${DATE}-image.tar.xz
 cp *-Update.tar ${ARTIFACTS_DIR}/${PKG_NAME_PREFIX}-${DATE}-Update.tar
 
+/scripts/upload_release.sh tag="daily-${VERSION}" token="$TOKEN" repo="MuditaOS" files="${ARTIFACTS_DIR}/${PKG_NAME_PREFIX}-${DATE}-image.tar.xz,${ARTIFACTS_DIR}/${PKG_NAME_PREFIX}-${DATE}-Update.tar,PurePhone.elf" || { echo "upload failed!"; exit 1; }
 popd
