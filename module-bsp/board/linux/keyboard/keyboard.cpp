@@ -25,7 +25,7 @@
 
 #include "bsp/keyboard/keyboard.hpp"
 
-namespace bsp
+namespace bsp::keyboard
 {
     namespace
     {
@@ -96,13 +96,15 @@ namespace bsp
         }
     } // namespace
 
-    void keyboard_get_data(const uint8_t &notification, uint8_t &event, uint8_t &code)
+    std::vector<KeyEvent> getKeyEvents(std::uint8_t notification)
     {
-        event = kevent;
-        code  = kcode;
+        KeyEvent keyEvent;
+        keyEvent.code  = static_cast<KeyCodes>(kcode);
+        keyEvent.event = static_cast<KeyEvents>(kevent);
+        return std::vector<KeyEvent>{keyEvent};
     }
 
-    int32_t keyboard_Init(xQueueHandle qHandle)
+    std::int32_t init(xQueueHandle qHandle)
     {
 
         if (xTaskCreate(linux_keyboard_worker, "keyboard", 512, qHandle, 0, &linux_keyboard_worker_handle) != pdPASS) {
@@ -111,11 +113,11 @@ namespace bsp
         return 0;
     }
 
-    int32_t keyboard_Deinit(void)
+    std::int32_t deinit()
     {
         vTaskDelete(linux_keyboard_worker_handle);
         close(fd);
         return 0;
     }
 
-} // namespace bsp
+} // namespace bsp::keyboard
