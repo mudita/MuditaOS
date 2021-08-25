@@ -42,7 +42,7 @@ set_target_properties(PurePhone
 
 target_link_libraries(PurePhone
     PRIVATE
-        application-antenna
+        $<$<BOOL:${ENABLE_APP_ANTENNA}>:application-antenna>
         application-calculator
         application-calendar
         application-call

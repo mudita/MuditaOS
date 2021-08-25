@@ -52,13 +52,6 @@ target_sources(application-desktop
 		include/application-desktop/Names.hpp
 )
 
-option(ENABLE_APP_DESKTOP "Enable application desktop" ON)
-
-target_compile_definitions(application-desktop
-    INTERFACE
-        $<$<BOOL:${ENABLE_APP_DESKTOP}>:ENABLE_APP_DESKTOP>
-)
-
 target_link_libraries(application-desktop
     PRIVATE
 		application-messages

@@ -39,13 +39,6 @@ target_sources(application-calendar
 		include/application-calendar/data/OptionParser.hpp
 )
 
-option(ENABLE_APP_CALENDAR "Enable application calendar" ON)
-
-target_compile_definitions(application-calendar
-	INTERFACE
-		$<$<BOOL:${ENABLE_APP_CALENDAR}>:ENABLE_APP_CALENDAR>
-)
-
 target_link_libraries(application-calendar
 	PUBLIC
 		apps-common
