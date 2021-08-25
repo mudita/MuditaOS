@@ -22,7 +22,6 @@ namespace bellMainStyle
         namespace temperatureLabel
         {
             inline constexpr auto font   = style::window::font::largelight;
-            inline constexpr auto degree = "\u00B0";
         } // namespace temperatureLabel
     }     // namespace mainWindow
 
