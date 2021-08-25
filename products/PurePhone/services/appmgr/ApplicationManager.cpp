@@ -10,7 +10,6 @@
 #include <apps-common/popups/data/PhoneModeParams.hpp>
 #include <apps-common/popups/data/PopupRequestParams.hpp>
 #include <module-db/queries/notifications/QueryNotificationsGetAll.hpp>
-#include <module-sys/SystemManager/messages/TetheringPhoneModeChangeProhibitedMessage.hpp>
 #include <module-sys/SystemManager/messages/TetheringQuestionRequest.hpp>
 #include <module-sys/Timers/TimerFactory.hpp>
 #include <service-appmgr/Constants.hpp>
@@ -25,6 +24,7 @@
 #include <service-evtmgr/EVMessages.hpp>
 #include <service-evtmgr/Constants.hpp>
 #include <service-evtmgr/torch.hpp>
+#include <sys/messages/TetheringPhoneModeChangeProhibitedMessage.hpp>
 
 namespace app::manager
 {

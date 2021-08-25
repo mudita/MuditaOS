@@ -107,9 +107,6 @@ namespace sevm
     class ToggleTorchColorMessage : public sys::DataMessage
     {};
 
-    class RequestPhoneModeForceUpdate : public sys::DataMessage
-    {};
-
     class KeypadBacklightMessage : public sys::DataMessage
     {
       public:

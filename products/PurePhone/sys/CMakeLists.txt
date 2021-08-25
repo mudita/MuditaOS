@@ -5,6 +5,8 @@ target_sources(sys
         SystemManager.cpp
     PUBLIC
         include/sys/SystemManager.hpp
+        include/sys/messages/PhoneModeRequest.hpp
+        include/sys/messages/TetheringPhoneModeChangeProhibitedMessage.hpp
 )
 
 target_include_directories(sys
@@ -14,5 +16,9 @@ target_include_directories(sys
 
 target_link_libraries(sys
     PRIVATE
+        apps-common
+        evtmgr
+        module-utils
         module-sys
+        service-appmgr
 )
