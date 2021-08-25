@@ -5,12 +5,16 @@
 
 #include <apps-common/Application.hpp>
 #include <apps-common/InternalModel.hpp>
+#include <apps-common/Temperature.hpp>
 #include <time/time_locale.hpp>
 
 namespace gui
 {
     class TimeSetListItem;
+
     class TimeFormatSetListItem;
+
+    class TemperatureUnitListItem;
 } // namespace gui
 
 namespace app::bell_settings
@@ -19,24 +23,35 @@ namespace app::bell_settings
     {
       public:
         explicit TimeUnitsModel(app::Application *app);
+
         ~TimeUnitsModel();
 
         auto clearData() -> void;
+
         auto saveData() -> void;
+
         auto loadData() -> void;
+
         auto createData() -> void;
+
         auto requestRecords(uint32_t offset, uint32_t limit) -> void;
 
         [[nodiscard]] auto getItem(gui::Order order) -> gui::ListItem * override;
+
         [[nodiscard]] auto requestRecordsCount() -> unsigned int override;
+
         [[nodiscard]] auto getMinimalItemSpaceRequired() const -> unsigned int override;
 
+        [[nodiscard]] auto getTemperatureUnit() -> gui::temperature::Temperature::Unit;
+
       private:
-        app::Application *application                  = nullptr;
-        gui::TimeSetListItem *timeSetListItem          = nullptr;
-        gui::TimeFormatSetListItem *timeFmtSetListItem = nullptr;
+        app::Application *application{};
+        gui::TimeSetListItem *timeSetListItem{};
+        gui::TimeFormatSetListItem *timeFmtSetListItem{};
+        gui::TemperatureUnitListItem *temperatureUnitListItem{};
 
         void sendRtcUpdateTimeMessage(time_t newTime);
+
         void sendTimeFmtUpdateMessage(utils::time::Locale::TimeFormat newFmt);
     };
 } // namespace app::bell_settings
