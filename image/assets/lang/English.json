@@ -563,6 +563,7 @@
   "app_bellmain_main_window_title": "Bell Hybrid+",
   "app_bell_settings_advanced": "Advanced",
   "app_bell_settings_advanced_time_units": "Time & units",
+  "app_bell_settings_advanced_temp_scale": "Temperature scale",
   "app_bellmain_home_screen_bottom_desc": "Next alarm will ring in",
   "app_bellmain_home_screen_bottom_desc_dp": "Deep press to activate"
 }

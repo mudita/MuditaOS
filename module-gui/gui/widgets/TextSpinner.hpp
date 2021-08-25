@@ -24,8 +24,9 @@ namespace gui
         void setTextRange(const TextRange &range);
         /// Sets current position. Must be within valid @ref Range that can be checked by @ref getValidRange
         void setCurrentPosition(Position pos);
+        void setFocusEdges(RectangleEdge edges);
 
-        [[nodiscard]] std::string getCurrentText() const noexcept;
+        [[nodiscard]] UTF8 getCurrentText() const noexcept;
         [[nodiscard]] Range getValidRange() const noexcept;
 
         void stepUp();
@@ -39,6 +40,7 @@ namespace gui
         TextRange textRange;
         Position currentPosition = 0;
         Boundaries boundaries    = Boundaries::Continuous;
+        RectangleEdge focusEdges = RectangleEdge::Bottom;
 
         void update();
         Position getRangeUpLimit() const;

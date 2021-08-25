@@ -63,4 +63,9 @@ namespace settings
     {
         constexpr inline auto state = "keypad_light_state";
     } // namespace KeypadLight
-}; // namespace settings
+
+    namespace Temperature
+    {
+        constexpr inline auto unit = "temperature_unit";
+    } // namespace Temperature
+};    // namespace settings
