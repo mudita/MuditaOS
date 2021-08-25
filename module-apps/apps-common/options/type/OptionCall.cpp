@@ -22,8 +22,10 @@ namespace gui::option
         activatedCallback = [app, contact](gui::Item &item) {
             if (!contact.numbers.empty()) {
                 const auto &phoneNumber = contact.numbers.front().number;
-                return app::manager::Controller::sendAction(
-                    app, app::manager::actions::Call, std::make_unique<app::ExecuteCallData>(phoneNumber));
+                return app::manager::Controller::sendAction(app,
+                                                            app::manager::actions::Call,
+                                                            std::make_unique<app::ExecuteCallData>(phoneNumber),
+                                                            app::manager::OnSwitchBehaviour::RunInBackground);
             }
             return false;
         };
