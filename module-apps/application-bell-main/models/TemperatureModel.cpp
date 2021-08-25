@@ -3,26 +3,14 @@
 
 #include "TemperatureModel.hpp"
 
-namespace
-{
-    inline constexpr auto celsiusDegreeSymbol    = "C";
-    inline constexpr auto fahrenheitDegreeSymbol = "F";
-} // namespace
-
 namespace app::home_screen
 {
 
     home_screen::TemperatureModel::TemperatureModel(app::Application *)
     {}
-    AbstractTemperatureModel::Temperature TemperatureModel::getTemperature() const
+    gui::temperature::Temperature TemperatureModel::getTemperature() const
     {
         // This is just a placeholder for missing functionality
-        return {AbstractTemperatureModel::Temperature::Unit::Celsius, 25};
-    }
-
-    std::string AbstractTemperatureModel::unitToStr(Temperature::Unit unit)
-    {
-        return unit == AbstractTemperatureModel::Temperature::Unit::Celsius ? celsiusDegreeSymbol
-                                                                            : fahrenheitDegreeSymbol;
+        return {gui::temperature::Temperature::Unit::Celsius, 25};
     }
 } // namespace app::home_screen

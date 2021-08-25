@@ -6,6 +6,7 @@
 #include "models/TemperatureModel.hpp"
 
 #include <apps-common/BasePresenter.hpp>
+#include <apps-common/Temperature.hpp>
 #include <gui/input/InputEvent.hpp>
 #include <module-sys/Timers/TimerHandle.hpp>
 #include <time/time_locale.hpp>
@@ -49,7 +50,7 @@ namespace app::home_screen
         virtual void setTimeFormat(utils::time::Locale::TimeFormat fmt) = 0;
 
         /// Bottom box related API(description or time)
-        virtual void setTemperature(TemperatureModel::Temperature newTemp) = 0;
+        virtual void setTemperature(gui::temperature::Temperature newTemp) = 0;
         virtual void setBottomDescription(const UTF8 &desc)                = 0;
 
         /// Various
