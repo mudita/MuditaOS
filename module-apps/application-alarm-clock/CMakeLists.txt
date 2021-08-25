@@ -18,6 +18,7 @@ target_sources( ${PROJECT_NAME}
         "${CMAKE_CURRENT_LIST_DIR}/presenter/AlarmClockEditWindowPresenter.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/presenter/CustomRepeatWindowPresenter.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/data/AlarmsData.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/data/CalendarData.cpp"
     PUBLIC
         "${CMAKE_CURRENT_LIST_DIR}/ApplicationAlarmClock.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/widgets/AlarmClockStyle.hpp"

@@ -38,7 +38,7 @@ string(TOLOWER "${PROJECT_TARGET_NAME}" PROJECT_TARGET_NAME)
 message("Project target name: ${PROJECT_TARGET_NAME}")
 if (NOT ${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
     set(ENABLE_TESTS ON)
-endif ()
+endif()
 
 if (${ENABLE_TESTS})
     enable_testing()
@@ -56,7 +56,7 @@ if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
     set(CMAKE_CXX_FLAGS_DEBUG "-ggdb3 -DDEBUG")
     set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
     set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -ggdb3 -DNDEBUG")
-else ()
+else()
     set(CMAKE_C_FLAGS_DEBUG "-ggdb3 -DDEBUG")
     set(CMAKE_C_FLAGS_RELEASE "-O2 -DNDEBUG")
     set(CMAKE_C_FLAGS_RELWITHDEBINFO "-O2 -ggdb3 -DNDEBUG")
@@ -65,43 +65,43 @@ else ()
     set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
     set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -ggdb3 -DNDEBUG")
 
-endif ()
+endif()
 
 set(TOOLCHAIN_PATH "" CACHE STRING "Path to toolchain directory")
 
 add_compile_definitions(FSL_RTOS_FREE_RTOS
-        PLATFORM_${PROJECT_TARGET_NAME}
-        USB_STACK_FREERTOS
-        DEBUG_CONSOLE_TRANSFER_NON_BLOCKING
-        FSL_SDK_ENABLE_DRIVER_CACHE_CONTROL=1
-        __STARTUP_INITIALIZE_NONCACHEDATA
-        SDK_OS_FREE_RTOS
-        XIP_EXTERNAL_FLASH=0
-        CPU_MIMXRT1051DVL6B_cm7
-        CPU_MIMXRT1051DVL6B
-        SDK_DEBUGCONSOLE=0
-        __MCUXPRESSO
-        __USE_CMSIS
-        __NEWLIB__
-        SKIP_SYSCLK_INIT
-        _GNU_SOURCE)
+    PLATFORM_${PROJECT_TARGET_NAME}
+    USB_STACK_FREERTOS
+    DEBUG_CONSOLE_TRANSFER_NON_BLOCKING
+    FSL_SDK_ENABLE_DRIVER_CACHE_CONTROL=1
+    __STARTUP_INITIALIZE_NONCACHEDATA
+    SDK_OS_FREE_RTOS
+    XIP_EXTERNAL_FLASH=0
+    CPU_MIMXRT1051DVL6B_cm7
+    CPU_MIMXRT1051DVL6B
+    SDK_DEBUGCONSOLE=0
+    __MCUXPRESSO
+    __USE_CMSIS
+    __NEWLIB__
+    SKIP_SYSCLK_INIT
+    _GNU_SOURCE)
 
 add_compile_options(
-        $<$<COMPILE_LANGUAGE:C>:-std=gnu11>
-        -fsingle-precision-constant
-        -ffunction-sections
-        -fdata-sections
-        -MMD
-        -MP
-        -fno-builtin
-        # warning flags
-        -Wall -Wextra -Werror -Wno-unused-parameter -Wno-deprecated-declarations)
+    $<$<COMPILE_LANGUAGE:C>:-std=gnu11>
+    -fsingle-precision-constant
+    -ffunction-sections
+    -fdata-sections
+    -MMD
+    -MP
+    -fno-builtin
+    # warning flags
+    -Wall -Wextra -Werror -Wno-unused-parameter -Wno-deprecated-declarations)
 
 include_directories(${CMAKE_SOURCE_DIR})
 
-option(GENERATE_STACK_USAGE "Generate stack usage report" OFF)
+option (GENERATE_STACK_USAGE "Generate stack usage report" OFF)
 if (GENERATE_STACK_USAGE)
-    add_compile_options(-fstack-usage)
+    add_compile_options (-fstack-usage)
 endif ()
 
 include(SecureBoot)
@@ -110,10 +110,12 @@ if (NOT ENABLE_SECURE_BOOT)
     # Only enable the build-time boot header in a non-secure configuration,
     # a header for Secure Boot is added post-build when signing the binary
     add_compile_definitions(
-            XIP_BOOT_HEADER_ENABLE=1
-            XIP_BOOT_HEADER_DCD_ENABLE=0
-    )
+        XIP_BOOT_HEADER_ENABLE=1
+        XIP_BOOT_HEADER_DCD_ENABLE=0
+        )
 endif ()
+
+include(products/${PRODUCT}/AppSelector.cmake)
 
 add_subdirectory(third-party)
 add_subdirectory(board)
@@ -138,25 +140,25 @@ add_subdirectory(host-tools)
 include(tools/clang-tidy.cmake)
 
 install(
-        FILES ${PROJECT_SOURCE_DIR}/changelog.md
-        DESTINATION "./"
-        COMPONENT Standalone
-)
+    FILES ${PROJECT_SOURCE_DIR}/changelog.md
+    DESTINATION "./"
+    COMPONENT Standalone
+    )
 
-option(BUILD_DOC_WITH_ALL "Build documentation" OFF)
-include(GenDoxygenDoc)
+option (BUILD_DOC_WITH_ALL "Build documentation" OFF)
+include (GenDoxygenDoc)
 
 include(Version)
 
 add_custom_target(
-        version ALL
-        COMMAND ${CMAKE_COMMAND}
-        -DSRC_DIR=${CMAKE_SOURCE_DIR}
-        -B ${CMAKE_BINARY_DIR}
-        -P ${CMAKE_SOURCE_DIR}/cmake/modules/GenVersionHpp.cmake
-        COMMENT
+    version ALL
+    COMMAND ${CMAKE_COMMAND}
+    -DSRC_DIR=${CMAKE_SOURCE_DIR}
+    -B ${CMAKE_BINARY_DIR}
+    -P ${CMAKE_SOURCE_DIR}/cmake/modules/GenVersionHpp.cmake
+    COMMENT
         "Generating version info"
-)
+    )
 
 fetch_ecoboot()
 fetch_updater()

@@ -8,15 +8,7 @@ module_is_test_entity()
 
 add_library(${PROJECT_NAME} STATIC)
 
-if(${PRODUCT} STREQUAL "PurePhone")
-    include(../products/PurePhone/AppSelector.cmake)
-elseif(${PRODUCT} STREQUAL "BellHybrid")
-    include(../products/BellHybrid/AppSelector.cmake)
-endif()
-
 add_subdirectory(apps-common)
-
-option(ENABLE_APP_ANTENNA "Enable application antenna" OFF)
 
 set(APPLICATIONS
     alarm-clock
@@ -55,8 +47,7 @@ foreach(app IN LISTS APPLICATIONS)
     endif()
 endforeach()
 
-target_compile_definitions(application-desktop PRIVATE "${ENABLED_APPS_DEFINES}")
-set(ENABLED_APPS_DEFINES ${ENABLED_APPS_DEFINES} PARENT_SCOPE)
+set(ENABLED_APPS_DEFINES ${ENABLED_APPS_DEFINES} PARENT_SCOPE INTERNAL)
 
 if(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
     set(OPTIMIZE_APPS_DEBUG_DEFAULT OFF)

@@ -34,8 +34,6 @@ set_target_properties(BellHybrid
         LINK_FLAGS "-Xlinker -Map=${CMAKE_BINARY_DIR}/BellHybrid.map "
     )
 
-option(ENABLE_APP_CALLLOG "Enable application callog" OFF)
-
 target_link_libraries(BellHybrid
     PRIVATE
         application-bell-alarm

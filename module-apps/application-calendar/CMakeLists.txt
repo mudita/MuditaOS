@@ -22,6 +22,7 @@ target_sources(application-calendar
 	PRIVATE
 		ApplicationCalendar.cpp
 		data/CalendarData.cpp
+		data/OptionParser.hpp
 		models/MonthModel.cpp
 		widgets/DayLabel.cpp
 		widgets/MonthBox.cpp
@@ -35,8 +36,6 @@ target_sources(application-calendar
 		
 	PUBLIC
 		include/application-calendar/ApplicationCalendar.hpp
-		include/application-calendar/data/CalendarData.hpp
-		include/application-calendar/data/OptionParser.hpp
 )
 
 target_link_libraries(application-calendar

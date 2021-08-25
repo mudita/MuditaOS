@@ -64,7 +64,7 @@ target_link_libraries(apps-common
         service-cellular
         service-evtmgr
         service-time
- PUBLIC
+    PUBLIC
         module-audio
         module-bsp
         module-db
