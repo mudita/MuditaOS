@@ -33,10 +33,10 @@ namespace gui::temperature
 
     inline std::optional<Temperature::Unit> strToUnit(std::string_view str)
     {
-        if (str == gui::temperature::celsiusDegreeSymbol) {
+        if ((str == gui::temperature::celsiusDegreeSymbol) || (str == celsiusSymbol)) {
             return gui::temperature::Temperature::Unit::Celsius;
         }
-        else if (str == gui::temperature::fahrenheitDegreeSymbol) {
+        else if ((str == gui::temperature::fahrenheitDegreeSymbol) || (str == fahrenheitSymbol)) {
             return gui::temperature::Temperature::Unit::Fahrenheit;
         }
 

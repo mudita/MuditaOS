@@ -35,6 +35,7 @@ class EventManagerCommon : public sys::Service
     sys::TimerHandle loggerTimer;
 
   protected:
+    std::function<void(const time_t)> onMinuteTick;
     virtual void handleKeyEvent(sys::Message *msg);
     virtual void initProductEvents();
     virtual auto createEventWorker() -> std::unique_ptr<WorkerEventCommon>;
