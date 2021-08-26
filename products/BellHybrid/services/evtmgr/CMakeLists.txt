@@ -1,19 +1,28 @@
 add_library(evtmgr STATIC)
+add_library(bell::evtmgr ALIAS evtmgr)
 
 target_sources(evtmgr
     PRIVATE
         EventManager.cpp
+        internal/StaticData.cpp
+        internal/TemperatureApi.cpp
+
+        internal/StaticData.hpp
     PUBLIC
         include/evtmgr/EventManager.hpp
+        include/evtmgr/api/TemperatureApi.hpp
 )
 
 target_include_directories(evtmgr
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
 
 target_link_libraries(evtmgr
    PRIVATE
+        module-bsp
         module-utils
         service-evtmgr
 )
