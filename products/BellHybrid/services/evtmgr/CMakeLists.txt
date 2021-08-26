@@ -4,6 +4,8 @@ add_library(bell::evtmgr ALIAS evtmgr)
 target_sources(evtmgr
     PRIVATE
         EventManager.cpp
+        WorkerEvent.cpp
+        WorkerEvent.hpp
         internal/StaticData.cpp
         internal/TemperatureApi.cpp
 
