@@ -20,8 +20,11 @@ namespace gui
         void buildInterface() override;
         bool onInput(const InputEvent &inputEvent) override;
         void rebuild() override;
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
 
         Icon *icon{};
+
+        std::string message;
     };
 
 } // namespace gui

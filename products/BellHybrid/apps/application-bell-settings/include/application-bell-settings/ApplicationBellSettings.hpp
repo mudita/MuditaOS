@@ -4,14 +4,16 @@
 #pragma once
 
 #include <apps-common/Application.hpp>
+#include <service-evtmgr/screen-light-control/ScreenLightControl.hpp>
 
 namespace gui::window::name
 {
-    inline constexpr auto bellSettings          = "BellSettings";
-    inline constexpr auto bellSettingsAdvanced  = "BellSettingsAdvanced";
-    inline constexpr auto bellSettingsTimeUnits = "BellSettingsTimeUnits";
-    inline constexpr auto bellSettingsDialog    = "BellSettingsDialog";
-    inline constexpr auto bellSettingsFinished  = "BellSettingsFinished";
+    inline constexpr auto bellSettings           = "BellSettings";
+    inline constexpr auto bellSettingsAdvanced   = "BellSettingsAdvanced";
+    inline constexpr auto bellSettingsTimeUnits  = "BellSettingsTimeUnits";
+    inline constexpr auto bellSettingsDialog     = "BellSettingsDialog";
+    inline constexpr auto bellSettingsFinished   = "BellSettingsFinished";
+    inline constexpr auto bellSettingsFrontlight = "BellSettingsFrontlight";
 
 } // namespace gui::window::name
 
@@ -19,7 +21,26 @@ namespace app
 {
     inline constexpr auto applicationBellSettingsName = "ApplicationBellSettings";
 
-    class ApplicationBellSettings : public Application
+    namespace settingsInterface
+    {
+        class BellScreenLightSettings
+        {
+          public:
+            struct Values
+            {
+                bool lightOn;
+                screen_light_control::ScreenLightMode mode;
+                screen_light_control::ManualModeParameters parameters;
+            };
+
+            virtual ~BellScreenLightSettings()                  = default;
+            virtual void setBrightness(float brightnessValue)   = 0;
+            virtual void setMode(bool isAutoLightSwitchOn)      = 0;
+            virtual void setStatus(bool isDisplayLightSwitchOn) = 0;
+        };
+    }; // namespace settingsInterface
+
+    class ApplicationBellSettings : public Application, public settingsInterface::BellScreenLightSettings
     {
       public:
         ApplicationBellSettings(std::string name                            = applicationBellSettingsName,
@@ -40,6 +61,10 @@ namespace app
         {
             return sys::ReturnCodes::Success;
         }
+
+        void setBrightness(float brightnessValue) override;
+        void setMode(bool isAutoLightSwitchOn) override;
+        void setStatus(bool isDisplayLightSwitchOn) override;
     };
 
     template <> struct ManifestTraits<ApplicationBellSettings>

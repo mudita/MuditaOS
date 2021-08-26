@@ -3,13 +3,20 @@
 
 #include "ApplicationBellSettings.hpp"
 #include "TimeUnitsPresenter.hpp"
+#include "FrontlightPresenter.hpp"
 #include "models/TemperatureUnitModel.hpp"
+#include "models/FrontlightModel.hpp"
 #include "windows/BellSettingsAdvancedWindow.hpp"
 #include "windows/BellSettingsFinishedWindow.hpp"
 #include "windows/BellSettingsTimeUnitsWindow.hpp"
 #include "windows/BellSettingsWindow.hpp"
+#include "windows/BellSettingsFrontlight.hpp"
 
 #include <apps-common/windows/Dialog.hpp>
+#include <apps-common/AsyncTask.hpp>
+#include <service-evtmgr/Constants.hpp>
+#include <service-evtmgr/EventManagerServiceAPI.hpp>
+#include <service-evtmgr/ScreenLightControlMessage.hpp>
 
 namespace app
 {
@@ -28,6 +35,7 @@ namespace app
             return ret;
         }
         createUserInterface();
+
         return sys::ReturnCodes::Success;
     }
 
@@ -49,6 +57,13 @@ namespace app
             return std::make_unique<gui::BellSettingsTimeUnitsWindow>(app, std::move(presenter));
         });
 
+        windowsFactory.attach(gui::window::name::bellSettingsFrontlight, [](Application *app, const std::string &name) {
+            auto model =
+                std::make_shared<bell_settings::FrontlightModel>(app, static_cast<ApplicationBellSettings *>(app));
+            auto presenter = std::make_unique<bell_settings::FrontlightWindowPresenter>(std::move(model));
+            return std::make_unique<gui::BellSettingsFrontlightWindow>(app, std::move(presenter));
+        });
+
         windowsFactory.attach(gui::window::name::bellSettingsFinished, [](Application *app, const std::string &name) {
             return std::make_unique<gui::BellSettingsFinishedWindow>(app);
         });
@@ -60,6 +75,36 @@ namespace app
         if (dynamic_cast<sys::ResponseMessage *>(retMsg.get())->retCode == sys::ReturnCodes::Success) {
             return retMsg;
         }
+
+        // handle database response
+        if (resp != nullptr) {
+            if (auto command = callbackStorage->getCallback(resp); command->execute()) {
+                refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+            }
+            return sys::msgHandled();
+        }
         return std::make_shared<sys::ResponseMessage>();
+    }
+
+    void ApplicationBellSettings::setBrightness(bsp::eink_frontlight::BrightnessPercentage value)
+    {
+        screen_light_control::ManualModeParameters parameters{value};
+        bus.sendUnicast(std::make_shared<sevm::ScreenLightSetManualModeParams>(parameters), service::name::evt_manager);
+    }
+
+    void ApplicationBellSettings::setMode(bool isAutoLightSwitchOn)
+    {
+        bus.sendUnicast(std::make_shared<sevm::ScreenLightControlMessage>(
+                            isAutoLightSwitchOn ? screen_light_control::Action::enableAutomaticMode
+                                                : screen_light_control::Action::disableAutomaticMode),
+                        service::name::evt_manager);
+    }
+
+    void ApplicationBellSettings::setStatus(bool isDisplayLightSwitchOn)
+    {
+        bus.sendUnicast(std::make_shared<sevm::ScreenLightControlMessage>(isDisplayLightSwitchOn
+                                                                              ? screen_light_control::Action::turnOn
+                                                                              : screen_light_control::Action::turnOff),
+                        service::name::evt_manager);
     }
 } // namespace app
