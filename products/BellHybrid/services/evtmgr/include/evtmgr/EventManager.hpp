@@ -5,6 +5,8 @@
 
 #include <service-evtmgr/EventManagerCommon.hpp>
 
+#include <backlight-handler/BacklightHandler.hpp>
+
 namespace hal::temperature
 {
     class AbstractTemperatureSource;
@@ -17,9 +19,11 @@ class EventManager : public EventManagerCommon
 
   private:
     void handleKeyEvent(sys::Message *msg) override;
-
-  private:
+    sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
+    void initProductEvents() final;
+    auto createEventWorker() -> std::unique_ptr<WorkerEventCommon> final;
     std::shared_ptr<hal::temperature::AbstractTemperatureSource> temperatureSource;
+    backlight::Handler backlightHandler;
 };
 
 namespace sys

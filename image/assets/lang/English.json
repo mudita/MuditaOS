@@ -571,5 +571,8 @@
   "app_bellmain_home_screen_bottom_desc": "Next alarm will ring in",
   "app_bellmain_home_screen_bottom_desc_dp": "Deep press to activate",
   "app_bell_alarm_deactivated": "Alarm deactivated",
-  "app_bell_alarm_ringing_deactivated": "Good morning!\nRise and shine"
+  "app_bell_alarm_ringing_deactivated": "Good morning!\nRise and shine",
+  "app_bell_settings_advanced_frontlight": "Frontlight",
+  "app_bell_settings_frontlight_top_message": "Frontlight intensity",
+  "app_bell_settings_frontlight_finished_message": "Frontlight is set"
 }

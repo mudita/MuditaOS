@@ -57,6 +57,8 @@ namespace gui
 
         addWinSettings(utils::translate("app_bell_settings_advanced_time_units"),
                        gui::window::name::bellSettingsTimeUnits);
+        addWinSettings(utils::translate("app_bell_settings_advanced_frontlight"),
+                       gui::window::name::bellSettingsFrontlight);
 
         return settingsOptionList;
     }

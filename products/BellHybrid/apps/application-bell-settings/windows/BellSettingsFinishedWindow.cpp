@@ -2,9 +2,11 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BellSettingsFinishedWindow.hpp"
+#include "data/FinishedWindowMessageData.hpp"
 
 #include <gui/input/InputEvent.hpp>
 #include <gui/widgets/Icon.hpp>
+#include <log.hpp>
 
 namespace
 {
@@ -32,13 +34,7 @@ namespace gui
         header->setTitleVisibility(false);
         bottomBar->setVisible(false);
 
-        icon = new Icon(this,
-                        0,
-                        0,
-                        style::window_width,
-                        style::window_height,
-                        "circle_success",
-                        utils::translate("app_bell_settings_time_units_finished_message"));
+        icon = new Icon(this, 0, 0, style::window_width, style::window_height, "circle_success", message);
     }
     bool BellSettingsFinishedWindow::onInput(const InputEvent &inputEvent)
     {
@@ -56,6 +52,19 @@ namespace gui
     {
         erase();
         buildInterface();
+    }
+
+    void BellSettingsFinishedWindow::onBeforeShow(ShowMode mode, SwitchData *data)
+    {
+        WindowWithTimer::onBeforeShow(mode, data);
+        auto messageData = dynamic_cast<FinishedWindowMessageData *>(data);
+        if (messageData != nullptr) {
+            message = messageData->getMessage();
+            icon->text->setRichText(message);
+        }
+        else {
+            LOG_ERROR("Received empty icon label message !");
+        }
     }
 
 } // namespace gui
