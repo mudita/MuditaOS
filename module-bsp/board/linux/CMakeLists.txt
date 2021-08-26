@@ -23,6 +23,7 @@ target_sources(module-bsp
                 vibrator/vibrator.cpp
                 watchdog/software_watchdog.cpp
                 watchdog/watchdog.cpp
+                hal/temperature_source/TemperatureSource.cpp
 
                 ${CMAKE_CURRENT_BINARY_DIR}/eink-config.h
 )
