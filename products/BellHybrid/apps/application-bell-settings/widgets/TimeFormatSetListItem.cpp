@@ -29,7 +29,7 @@ namespace gui
         setFocusItem(body);
 
         timeFormat = new Spinner(fmtSpinnerMin, fmtSpinnerMax, fmtSpinnerStep, Boundaries::Continuous);
-        timeFormat->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::centerbox::h);
+        timeFormat->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::center_layout_h);
         timeFormat->setFont(bell_settings_style::time_fmt_set_list_item::font);
         timeFormat->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         timeFormat->setFixedFieldWidth(2);

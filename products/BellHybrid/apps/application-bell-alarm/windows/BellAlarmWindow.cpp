@@ -34,8 +34,7 @@ namespace gui
         header->setTitleVisibility(true);
         bottomBar->setVisible(false);
 
-        body           = new BellBaseLayout(this, 0, 0, style::window_width, style::window_height);
-        auto centerBox = dynamic_cast<HBox *>(body->getCenterBox());
+        body = new BellBaseLayout(this, 0, 0, style::window_width, style::window_height);
 
         topText = new Label(body->firstBox);
         topText->setMinimumSize(style::bell_base_layout::w, style::bell_base_layout::outer_layouts_h);
@@ -45,15 +44,13 @@ namespace gui
         topText->activeItem = false;
         topText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
-        timeSetFmtSpinner = new TimeSetFmtSpinner(centerBox);
-        timeSetFmtSpinner->setFont(bell_alarm_style::time_set_fmt_spinner::font);
+        timeSetFmtSpinner = new TimeSetFmtSpinner(body->getCenterBox());
+        timeSetFmtSpinner->setFont(bell_alarm_style::time_set_fmt_spinner::focusFont,
+                                   bell_alarm_style::time_set_fmt_spinner::noFocusFont);
         timeSetFmtSpinner->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::h);
         timeSetFmtSpinner->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
-        body->resizeItems();
-        body->firstBox->resizeItems();
-        centerBox->resizeItems();
-        body->lastBox->resizeItems();
+        body->resize();
 
         setFocusItem(body);
     }

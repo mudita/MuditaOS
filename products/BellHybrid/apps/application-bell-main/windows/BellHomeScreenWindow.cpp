@@ -92,7 +92,7 @@ namespace gui
         body = new BellBaseLayout(this, 0, 0, style::window_width, style::window_height, false);
 
         alarm = new AlarmSetSpinner(body->firstBox);
-        alarm->setMinimumSize(mainWindow::alarmSetSpinner::width, mainWindow::alarmSetSpinner::height);
+        alarm->setMinimumSize(style::bell_base_layout::outer_layouts_w, style::bell_base_layout::outer_layouts_h);
         alarm->setFont(mainWindow::alarmSetSpinner::font);
         alarm->setEditMode(EditMode::Browse);
         alarm->setAlarmStatus(AlarmSetSpinner::Status::DEACTIVATED);
@@ -107,18 +107,15 @@ namespace gui
         time->activeItem = false;
 
         bottomText = new TextFixedSize(body->lastBox, 0, 0, 0, 0);
-        bottomText->setMinimumSize(mainWindow::bottomDescription::width, mainWindow::bottomDescription::height);
-        bottomText->setFont(mainWindow::bottomDescription::font);
+        bottomText->setMinimumSize(style::bell_base_layout::outer_layouts_w, style::bell_base_layout::outer_layouts_h);
+        bottomText->setFont(mainWindow::bottomDescription::font_small);
+        bottomText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
         bottomText->setEdges(RectangleEdge::None);
         bottomText->activeItem = false;
-        bottomText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         bottomText->drawUnderline(false);
         bottomText->setLines(2);
 
-        body->resizeItems();
-        body->firstBox->resizeItems();
-        body->centerBox->resizeItems();
-        body->lastBox->resizeItems();
+        body->resize();
     }
 
     void BellHomeScreenWindow::setAlarmTriggered()
@@ -153,17 +150,22 @@ namespace gui
 
     void BellHomeScreenWindow::setTemperature(utils::temperature::Temperature newTemp)
     {
+        bottomText->setFont(bellMainStyle::mainWindow::bottomDescription::font_normal);
+        bottomText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         bottomText->setText(utils::temperature::tempToStrDec(newTemp));
     }
 
     void BellHomeScreenWindow::setBottomDescription(const UTF8 &desc)
     {
+        bottomText->setFont(bellMainStyle::mainWindow::bottomDescription::font_small);
+        bottomText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
         bottomText->setText(desc);
     }
 
     void BellHomeScreenWindow::setTime(std::time_t newTime)
     {
         time->setTime(newTime);
+        time->setTimeFormatSpinnerVisibility(false);
     }
 
     void BellHomeScreenWindow::setTimeFormat(utils::time::Locale::TimeFormat fmt)
