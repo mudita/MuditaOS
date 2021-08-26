@@ -29,6 +29,10 @@ namespace alarms
             -> std::shared_ptr<AlarmsGetInRangeResponseMessage>;
         auto handleGetNextSingleEvents(AlarmGetNextSingleEventsRequestMessage *request)
             -> std::shared_ptr<AlarmGetNextSingleEventsResponseMessage>;
+        auto handleMinuteUpdated() -> void;
+
+        auto addAlarmExecutionHandler(const alarms::AlarmType type, const std::shared_ptr<alarms::AlarmHandler> handler)
+            -> void;
 
       private:
         stm::ServiceTime *service = nullptr;

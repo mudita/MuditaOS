@@ -42,7 +42,8 @@ namespace stm
         timeManager = std::make_unique<TimeManager>(std::make_unique<RTCCommand>(this));
 
         auto alarmEventsRepo = std::make_unique<alarms::AlarmEventsDBRepository>(this);
-        auto alarmOperations = std::make_unique<alarms::AlarmOperations>(std::move(alarmEventsRepo));
+        auto alarmOperations = std::make_unique<alarms::AlarmOperations>(std::move(alarmEventsRepo), TimePointNow);
+        alarmOperations->updateEventsCache(TimePointNow());
         alarmMessageHandler  = std::make_unique<alarms::AlarmMessageHandler>(this, std::move(alarmOperations));
     }
 
@@ -93,8 +94,21 @@ namespace stm
                 }
             }
         }
-        return std::make_shared<sys::ResponseMessage>();
+        if (msgl->messageType == MessageType::EVMMinuteUpdated) {
+            alarmMessageHandler->handleMinuteUpdated();
+            return std::make_shared<sys::ResponseMessage>();
+        }
+        else {
+            return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
+        }
     }
+
+    void ServiceTime::addAlarmExecutionHandler(const alarms::AlarmType type,
+                                               const std::shared_ptr<alarms::AlarmHandler> handler)
+    {
+        alarmMessageHandler->addAlarmExecutionHandler(type, handler);
+    }
+
     void ServiceTime::registerMessageHandlers()
     {
         connect(typeid(CellularTimeNotificationMessage), [&](sys::Message *request) -> sys::MessagePointer {
