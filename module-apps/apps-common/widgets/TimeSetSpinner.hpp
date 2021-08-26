@@ -14,7 +14,7 @@ namespace style::time_set_spinner
 {
     namespace focus
     {
-        inline constexpr auto size = 3U;
+        inline constexpr auto size = 6U;
     } // namespace focus
 } // namespace style::time_set_spinner
 
@@ -27,14 +27,15 @@ namespace gui
 
         auto setHour(int value) noexcept -> void;
         auto setMinute(int value) noexcept -> void;
-        auto setFont(std::string newFontName) noexcept -> void;
+        auto setFont(const std::string &newFontName) noexcept -> void;
+        auto setFont(std::string newFocusFontName, std::string newNoFocusFontName) noexcept -> void;
+        auto updateFont(TextFixedSize *elem, const std::string &fontName) noexcept -> void;
+        auto updateColon(const std::string &fontName) noexcept -> void;
         auto setEditMode(EditMode editMode) noexcept -> void;
         auto setHourMax(std::uint32_t newMax) noexcept -> void;
         auto setHourMin(std::uint32_t newMin) noexcept -> void;
         [[nodiscard]] auto getHour() const noexcept -> int;
         [[nodiscard]] auto getMinute() const noexcept -> int;
-
-        auto getMinimumSize() const noexcept -> std::pair<std::uint32_t, std::uint32_t>;
 
       private:
         Spinner *hour        = nullptr;
@@ -42,14 +43,15 @@ namespace gui
         Spinner *minute      = nullptr;
         EditMode editMode    = EditMode::Edit;
         Item *lastFocus      = nullptr;
-        std::string fontName = style::window::font::supersizemelight;
+        std::string focusFontName   = style::window::font::supersizeme;
+        std::string noFocusFontName = style::window::font::supersizemelight;
 
         void updateFocus(Item *newFocus);
         auto handleEnterKey() -> bool;
         auto handleRightFunctionKey() -> bool;
         auto onInput(const InputEvent &inputEvent) -> bool override;
-        [[nodiscard]] auto getFontHeight() const noexcept -> uint16_t;
-        [[nodiscard]] auto getWidestDigitWidth() const noexcept -> uint32_t;
-        [[nodiscard]] auto getColonWidth() const noexcept -> uint32_t;
+        [[nodiscard]] auto getFontHeight(const std::string &fontName) const noexcept -> uint16_t;
+        [[nodiscard]] auto getWidestDigitWidth(const std::string &fontName) const noexcept -> uint32_t;
+        [[nodiscard]] auto getColonWidth(const std::string &fontName) const noexcept -> uint32_t;
     };
 } /* namespace gui */

@@ -22,13 +22,8 @@ namespace gui
         setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         setEdges(RectangleEdge::None);
 
-        auto fontHeight = getFontHeight();
-        auto doubleCharWidth =
-            (getWidestDigitWidth() * noOfDigits) + (1 * noOfDigits); // two digits + minimal space beetween
-
         hour = new Spinner(hourMin, hourMax, hourStep, Boundaries::Continuous);
-        hour->setMinimumSize(doubleCharWidth, fontHeight);
-        hour->setFont(fontName);
+        updateFont(hour, noFocusFontName);
 
         hour->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         hour->setFixedFieldWidth(noOfDigits);
@@ -39,16 +34,14 @@ namespace gui
         addWidget(hour);
 
         colon = new Label(this);
-        colon->setFont(fontName);
-        colon->setMinimumSize(getColonWidth(), fontHeight);
+        updateColon(noFocusFontName);
         colon->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         colon->setEdges(RectangleEdge::None);
         colon->activeItem = false;
         colon->setText(":");
 
         minute = new Spinner(minuteMin, minuteMax, minuteStep, Boundaries::Continuous);
-        minute->setMinimumSize(doubleCharWidth, fontHeight);
-        minute->setFont(fontName);
+        updateFont(minute, noFocusFontName);
         minute->setPenFocusWidth(style::time_set_spinner::focus::size);
 
         minute->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
@@ -63,7 +56,8 @@ namespace gui
             if (editMode != EditMode::Edit) {
                 return false;
             }
-            setFocusItem(focus ? lastFocus : nullptr);
+
+            updateFocus(lastFocus != nullptr ? lastFocus : hour);
             return true;
         };
         if (editMode == EditMode::Edit) {
@@ -94,13 +88,13 @@ namespace gui
         return false;
     }
 
-    uint16_t TimeSetSpinner::getFontHeight() const noexcept
+    uint16_t TimeSetSpinner::getFontHeight(const std::string &fontName) const noexcept
     {
         const RawFont *font = FontManager::getInstance().getFont(fontName);
         return font->info.line_height;
     }
 
-    uint32_t TimeSetSpinner::getWidestDigitWidth() const noexcept
+    uint32_t TimeSetSpinner::getWidestDigitWidth(const std::string &fontName) const noexcept
     {
         const RawFont *font = FontManager::getInstance().getFont(fontName);
         uint32_t maxWidth   = 0;
@@ -113,7 +107,7 @@ namespace gui
         return maxWidth;
     }
 
-    uint32_t TimeSetSpinner::getColonWidth() const noexcept
+    uint32_t TimeSetSpinner::getColonWidth(const std::string &fontName) const noexcept
     {
         const RawFont *font = FontManager::getInstance().getFont(fontName);
         return font->getCharPixelWidth(':');
@@ -147,27 +141,41 @@ namespace gui
         minute->setCurrentValue(value);
     }
 
-    auto TimeSetSpinner::setFont(std::string newFontName) noexcept -> void
+    auto TimeSetSpinner::setFont(const std::string &newFontName) noexcept -> void
     {
-        fontName        = std::move(newFontName);
-        auto fontHeight = getFontHeight();
-        auto doubleCharWidth =
-            (getWidestDigitWidth() * noOfDigits) + (1 * noOfDigits); // two digits + minimal space beetween
+        setFont(newFontName, newFontName);
+    }
 
-        hour->setFont(fontName);
-        hour->setMinimumSize(doubleCharWidth, fontHeight);
-        hour->setText(hour->getText());
+    auto TimeSetSpinner::setFont(std::string newFocusFontName, std::string newNoFocusFontName) noexcept -> void
+    {
+        focusFontName   = std::move(newFocusFontName);
+        noFocusFontName = std::move(newNoFocusFontName);
 
-        colon->setFont(fontName);
-        colon->setMinimumSize(getColonWidth(), fontHeight);
-        colon->setText(":");
+        updateFont(hour, noFocusFontName);
+        updateColon(noFocusFontName);
+        updateFont(minute, noFocusFontName);
 
-        minute->setFont(fontName);
-        minute->setMinimumSize(doubleCharWidth, fontHeight);
-        minute->setText(minute->getText());
-
-        setMinimumSize(noOfDigits * doubleCharWidth + getColonWidth(), fontHeight);
+        setMinimumSize(hour->widgetMinimumArea.w + getColonWidth(noFocusFontName) + minute->widgetMinimumArea.w,
+                       getFontHeight(noFocusFontName));
         resizeItems();
+    }
+
+    auto TimeSetSpinner::updateFont(TextFixedSize *elem, const std::string &fontName) noexcept -> void
+    {
+        auto fontHeight = getFontHeight(fontName);
+        auto doubleCharWidth =
+            (getWidestDigitWidth(fontName) * noOfDigits) + (1 * noOfDigits); // two digits + minimal space beetween
+
+        elem->setFont(fontName);
+        elem->setMinimumSize(doubleCharWidth, fontHeight);
+        elem->setText(elem->getText());
+    }
+
+    auto TimeSetSpinner::updateColon(const std::string &fontName) noexcept -> void
+    {
+        colon->setFont(fontName);
+        colon->setMinimumSize(getColonWidth(fontName), getFontHeight(fontName));
+        colon->setText(":");
     }
 
     auto TimeSetSpinner::setEditMode(EditMode editMode) noexcept -> void
@@ -190,24 +198,36 @@ namespace gui
     {
         return minute->getCurrentValue();
     }
+
     auto TimeSetSpinner::setHourMax(std::uint32_t newMax) noexcept -> void
     {
         hour->setMaxValue(newMax);
     }
+
     auto TimeSetSpinner::setHourMin(std::uint32_t newMin) noexcept -> void
     {
         hour->setMinValue(newMin);
     }
+
     void TimeSetSpinner::updateFocus(Item *newFocus)
     {
-        setFocusItem(newFocus);
-        lastFocus = newFocus;
-    }
-    auto TimeSetSpinner::getMinimumSize() const noexcept -> std::pair<std::uint32_t, std::uint32_t>
-    {
-        constexpr auto spacer = 1U;
-        auto fontHeight       = getFontHeight();
-        auto doubleCharWidth  = (getWidestDigitWidth() * noOfDigits) + (spacer * noOfDigits);
-        return {noOfDigits * doubleCharWidth + getColonWidth(), fontHeight};
+        if (focus) {
+            setFocusItem(newFocus);
+            lastFocus = newFocus;
+
+            if (minute->focus) {
+                updateFont(minute, focusFontName);
+                updateFont(hour, noFocusFontName);
+            }
+            else if (hour->focus) {
+                updateFont(hour, focusFontName);
+                updateFont(minute, noFocusFontName);
+            }
+        }
+        else {
+            updateFont(hour, noFocusFontName);
+            updateFont(minute, noFocusFontName);
+            setFocusItem(nullptr);
+        }
     }
 } /* namespace gui */

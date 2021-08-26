@@ -22,15 +22,13 @@ namespace gui
         setEdges(RectangleEdge::None);
 
         timeSetSpinner = new TimeSetSpinner(this, 0, 0, 0, 0);
-        timeSetSpinner->setFont(fontName);
+        timeSetSpinner->setFont(focusFontName, noFocusFontName);
         timeSetSpinner->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         timeSetSpinner->setMargins(Margins(0, 0, 0, 0));
 
-        auto minSize   = getMinimumFmtSize();
         auto textRange = UTF8Spinner::Range{time::Locale::getAM(), time::Locale::getPM()};
         fmt            = new UTF8Spinner(textRange, Boundaries::Continuous);
-        fmt->setMinimumSize(minSize.first, minSize.second);
-        fmt->setFont(fontName);
+        updateFmtFont(noFocusFontName);
         fmt->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         fmt->setEdges(RectangleEdge::None);
         fmt->setVisible(false);
@@ -46,6 +44,16 @@ namespace gui
                 setFocusItem(nullptr);
             }
             setTimeFormat(this->timeFormat);
+            return true;
+        };
+
+        fmt->focusChangedCallback = [&](Item &) {
+            if (fmt->focus) {
+                updateFmtFont(focusFontName);
+            }
+            else {
+                updateFmtFont(noFocusFontName);
+            }
             return true;
         };
 
@@ -112,43 +120,53 @@ namespace gui
             setFocusItem(nullptr);
         }
     }
+
     auto TimeSetFmtSpinner::getHour() const noexcept -> int
     {
         return timeSetSpinner->getHour();
     }
+
     auto TimeSetFmtSpinner::getMinute() const noexcept -> int
     {
         return timeSetSpinner->getMinute();
     }
 
-    auto TimeSetFmtSpinner::getFontHeight() const noexcept -> uint16_t
-    {
-        const auto font = FontManager::getInstance().getFont(fontName);
-        return font->info.line_height;
-    }
-    auto TimeSetFmtSpinner::getMinimumFmtSize() const noexcept -> std::pair<Length, Length>
+    auto TimeSetFmtSpinner::getMinimumFmtWidth(const std::string &fontName) const noexcept -> Length
     {
         constexpr auto spacer = 5U; // space between two chars
         const auto font       = FontManager::getInstance().getFont(fontName);
-        return {font->getPixelWidth(utils::time::Locale::getAM()) + spacer, font->info.line_height};
+        return font->getPixelWidth(utils::time::Locale::getAM()) + spacer;
     }
+
     auto TimeSetFmtSpinner::setHour(int value) noexcept -> void
     {
         timeSetSpinner->setHour(value);
     }
+
     auto TimeSetFmtSpinner::setFont(std::string newFontName) noexcept -> void
     {
-        fontName        = std::move(newFontName);
-        auto fontHeight = getFontHeight();
-        auto minFmtSize = getMinimumFmtSize();
+        setFont(newFontName, newFontName);
+    }
 
-        timeSetSpinner->setFont(fontName);
-        fmt->setFont(fontName);
-        fmt->setMinimumSize(minFmtSize.first, minFmtSize.second);
-        fmt->setText(fmt->getText());
+    auto TimeSetFmtSpinner::setFont(std::string newFocusFontName, std::string newNoFocusFontName) noexcept -> void
+    {
+        focusFontName   = std::move(newFocusFontName);
+        noFocusFontName = std::move(newNoFocusFontName);
 
-        setMinimumSize(timeSetSpinner->getMinimumSize().first + minFmtSize.first, fontHeight);
+        timeSetSpinner->setFont(focusFontName, noFocusFontName);
+        updateFmtFont(noFocusFontName);
+
+        setMinimumSize(timeSetSpinner->widgetMinimumArea.w + fmt->widgetMinimumArea.w,
+                       timeSetSpinner->widgetMinimumArea.h);
         resizeItems();
+    }
+
+    auto TimeSetFmtSpinner::updateFmtFont(const std::string &fontName) noexcept -> void
+    {
+        fmt->setFont(fontName);
+        fmt->setMinimumWidth(getMinimumFmtWidth(fontName));
+        fmt->setMinimumHeightToFitText();
+        fmt->setText(fmt->getText());
     }
 
     auto TimeSetFmtSpinner::onInput(const InputEvent &inputEvent) -> bool
@@ -175,6 +193,7 @@ namespace gui
         }
         return false;
     }
+
     auto TimeSetFmtSpinner::handleEnterKey() -> bool
     {
         using namespace utils::time;
@@ -184,6 +203,7 @@ namespace gui
         }
         return false;
     }
+
     auto TimeSetFmtSpinner::handleRightFunctionKey() -> bool
     {
         if (focusItem == fmt) {
@@ -193,10 +213,12 @@ namespace gui
 
         return false;
     }
+
     auto TimeSetFmtSpinner::isPM() const noexcept -> bool
     {
         return fmt->getCurrentValue() == utils::time::Locale::getPM().c_str();
     }
+
     auto TimeSetFmtSpinner::setTime(std::time_t time) noexcept -> void
     {
         using namespace utils::time;
@@ -215,6 +237,13 @@ namespace gui
             fmt->setCurrentValue(isPM ? utils::time::Locale::getPM() : utils::time::Locale::getAM());
         }
     }
+
+    auto TimeSetFmtSpinner::setTimeFormatSpinnerVisibility(bool visibility) noexcept -> void
+    {
+        fmt->setVisible(visibility);
+        resizeItems();
+    }
+
     auto TimeSetFmtSpinner::getTime() const noexcept -> std::time_t
     {
         using namespace utils::time;

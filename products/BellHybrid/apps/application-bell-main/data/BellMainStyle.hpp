@@ -11,23 +11,19 @@ namespace bellMainStyle
     {
         namespace time
         {
-            inline constexpr auto font   = style::window::font::huge;
-            inline constexpr auto width  = 504U;
-            inline constexpr auto height = 198U;
+            inline constexpr auto font = style::window::font::huge;
         } // namespace time
 
         namespace alarmSetSpinner
         {
-            inline constexpr auto font   = style::window::font::largelight;
-            inline constexpr auto width  = 380U;
-            inline constexpr auto height = 102U;
+            inline constexpr auto font = style::window::font::largelight;
         } // namespace alarmSetSpinner
 
         namespace bottomDescription
         {
-            inline constexpr auto font   = style::window::font::largelight;
-            inline constexpr auto width  = 380U;
-            inline constexpr auto height = 102U;
+            inline constexpr auto font_normal = style::window::font::largelight;
+            inline constexpr auto font_small  = style::window::font::verybiglight;
+
         } // namespace bottomDescription
     }     // namespace mainWindow
 

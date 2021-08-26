@@ -48,12 +48,9 @@ namespace gui
         topText->activeItem = false;
         topText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
-        auto centerBox = dynamic_cast<HBox *>(body->getCenterBox());
-        centerBox->addWidget(presenter->getPagesProvider()->getSpinner());
-        body->resizeItems();
-        body->firstBox->resizeItems();
-        centerBox->resizeItems();
-        body->lastBox->resizeItems();
+        body->getCenterBox()->addWidget(presenter->getPagesProvider()->getSpinner());
+
+        body->resize();
 
         presenter->loadData();
 
