@@ -3,15 +3,24 @@
 
 #pragma once
 
+#include <memory>
 #include <optional>
 
-namespace bsp::hal
+namespace hal::temperature
 {
-    class TemperatureSource
+    class AbstractTemperatureSource
     {
       public:
-        using Temperature     = float; ///< Celsius degrees
-        using Result          = std::optional<Temperature>;
+        struct Factory
+        {
+            static std::shared_ptr<AbstractTemperatureSource> create();
+        };
+
+        virtual ~AbstractTemperatureSource() = default;
+
+        using Temperature = float; ///< Celsius degrees
+        using Result      = std::optional<Temperature>;
+
         virtual Result read() = 0;
     };
-} // namespace bsp::hal
+} // namespace hal::temperature
