@@ -8,6 +8,10 @@ target_include_directories(
 
 target_sources(
         module-bsp
+
+    PRIVATE
+        hal/temperature_source/TemperatureSource.cpp
+
     PUBLIC
         eink-config.h
 )
