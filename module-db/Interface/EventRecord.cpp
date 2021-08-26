@@ -62,9 +62,14 @@ std::vector<SingleEventRecord> EventRecord::generateSingleEvents(TimePoint from,
     return singleEvents;
 }
 
+std::shared_ptr<EventRecord> EventRecord::getCopy()
+{
+    return std::make_shared<EventRecord>(*this);
+}
+
 SingleEventRecord EventRecord::getNextSingleEvent(TimePoint from)
 {
-    auto parentEvent = std::make_shared<EventRecord>(this);
+    auto parentEvent = getCopy();
 
     if (rruleText.empty()) {
         if (startDate < from) {

@@ -10,9 +10,9 @@
 #include <ctime>
 #include <vector>
 
-class EventRecord;
-class SingleEvent;
-class AlarmEventRecord;
+struct EventRecord;
+struct SingleEvent;
+struct AlarmEventRecord;
 
 /**
  * @brief Basic interface alarm API

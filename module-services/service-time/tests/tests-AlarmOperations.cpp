@@ -3,11 +3,18 @@
 
 #include <AlarmOperations.hpp>
 #include <AlarmRepository.hpp>
+#include <service-time/AlarmHandler.hpp>
+
 #include <module-db/Interface/AlarmEventRecord.hpp>
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
+class MockAlarmHandler : public alarms::AlarmHandler
+{
+  public:
+    MOCK_METHOD(bool, handle, (const AlarmEventRecord &record), ());
+};
 class MockAlarmEventsRepository : public alarms::AbstractAlarmEventsRepository
 {
   public:
@@ -30,18 +37,47 @@ class MockAlarmEventsRepository : public alarms::AbstractAlarmEventsRepository
                  std::uint32_t limit,
                  const alarms::OnGetAlarmEventsInRangeCallback &callback),
                 ());
-    MOCK_METHOD(void,
-                addAlarmEvent,
-                (const AlarmEventRecord &alarmEvent, const alarms::OnAddAlarmEventCallback &callback),
-                ());
-    MOCK_METHOD(void,
-                updateAlarmEvent,
-                (const AlarmEventRecord &alarmEvent, const alarms::OnUpdateAlarmEventCallback &callback),
-                ());
-    MOCK_METHOD(void,
-                removeAlarmEvent,
-                (const std::uint32_t id, const alarms::OnRemoveAlarmEventCallback &callback),
-                ());
+
+    auto addAlarmEvent(const AlarmEventRecord &alarmEvent, const alarms::OnAddAlarmEventCallback &callback) -> void
+    {
+        addSingleEvent(alarmEvent);
+        if (!alarmEvent.rruleText.empty()) {
+            addRecurringEvent(alarmEvent);
+        }
+        callback({true});
+    }
+
+    auto updateAlarmEvent(const AlarmEventRecord &alarmEvent, const alarms::OnAddAlarmEventCallback &callback) -> void
+    {
+        nextRecords.erase(std::remove_if(nextRecords.begin(),
+                                         nextRecords.end(),
+                                         [&alarmEvent](const AlarmEventRecord &ae) { return ae.ID == alarmEvent.ID; }),
+                          nextRecords.end());
+        recurringRecords.erase(
+            std::remove_if(recurringRecords.begin(),
+                           recurringRecords.end(),
+                           [&alarmEvent](const AlarmEventRecord &ae) { return ae.ID == alarmEvent.ID; }),
+            recurringRecords.end());
+
+        addSingleEvent(alarmEvent);
+        if (!alarmEvent.rruleText.empty()) {
+            addRecurringEvent(alarmEvent);
+        }
+        callback({true});
+    }
+    auto removeAlarmEvent(const std::uint32_t alarmId, const alarms::OnRemoveAlarmEventCallback &callback) -> void
+    {
+        nextRecords.erase(std::remove_if(nextRecords.begin(),
+                                         nextRecords.end(),
+                                         [&alarmId](const AlarmEventRecord &ae) { return ae.ID == alarmId; }),
+                          nextRecords.end());
+        recurringRecords.erase(std::remove_if(recurringRecords.begin(),
+                                              recurringRecords.end(),
+                                              [&alarmId](const AlarmEventRecord &ae) { return ae.ID == alarmId; }),
+                               recurringRecords.end());
+        callback({true});
+    }
+
     void getAlarmEventsRecurringInRange(TimePoint start,
                                         TimePoint end,
                                         std::uint32_t offset,
@@ -68,12 +104,15 @@ class MockAlarmEventsRepository : public alarms::AbstractAlarmEventsRepository
     }
 };
 
+alarms::IAlarmOperations::GetCurrentTime timeInjector = []() { return TimePointFromString("2022-11-11 05:00:00"); };
+alarms::IAlarmOperations::OnUpdateAlarmProcessed universalBoolCallback = [](bool success) { EXPECT_EQ(success, true); };
+
 class AlarmOperationsFixture : public ::testing::Test
 {
   protected:
     auto getMockedAlarmOperations(std::unique_ptr<MockAlarmEventsRepository> &alarmRepo)
     {
-        return std::make_unique<alarms::AlarmOperations>(std::move(alarmRepo));
+        return std::make_unique<alarms::AlarmOperations>(std::move(alarmRepo), timeInjector);
     }
 };
 
@@ -365,4 +404,301 @@ TEST_F(AlarmOperationsFixture, getNextMultipleEventsWithRecursive)
 
     auto alarmOperations = getMockedAlarmOperations(alarmRepoMock);
     alarmOperations->getNextSingleEvents(TimePointFromString("2022-01-01 00:00:00"), callback);
+}
+
+TEST_F(AlarmOperationsFixture, handleFirstEvent)
+{
+    alarms::IAlarmOperations::OnGetNextSingleProcessed callback = [](std::vector<SingleEventRecord> records) {
+        EXPECT_EQ(records.size(), 1);
+        EXPECT_EQ(records[0].startDate, TimePointFromString("2022-11-11 09:00:00"));
+        EXPECT_EQ(records[0].parent->ID, 1);
+    };
+
+    auto alarmRepoMock = std::make_unique<MockAlarmEventsRepository>();
+    alarmRepoMock->nextRecords.push_back(AlarmEventRecord(1,
+                                                          defName,
+                                                          TimePointFromString("2022-11-11 11:00:00"),
+                                                          defDuration,
+                                                          defAllDay,
+                                                          defRRule,
+                                                          defMusic,
+                                                          defEnabled,
+                                                          defSnooze));
+    alarmRepoMock->nextRecords.push_back(AlarmEventRecord(2,
+                                                          defName,
+                                                          TimePointFromString("2022-11-11 09:00:00"),
+                                                          defDuration,
+                                                          defAllDay,
+                                                          defRRule,
+                                                          defMusic,
+                                                          defEnabled,
+                                                          defSnooze));
+
+    auto alarmOperations = getMockedAlarmOperations(alarmRepoMock);
+    alarmOperations->updateEventsCache(TimePointFromString("2022-11-11 09:00:00"));
+    auto handler = std::make_shared<MockAlarmHandler>();
+    EXPECT_CALL(*handler, handle(testing::_)).Times(1);
+    alarmOperations->addAlarmExecutionHandler(alarms::AlarmType::Clock, handler);
+    alarmOperations->minuteUpdated(TimePointFromString("2022-11-11 09:00:00"));
+}
+
+TEST_F(AlarmOperationsFixture, handleEventAfterAddCacheChanged)
+{
+    auto alarmRepoMock = std::make_unique<MockAlarmEventsRepository>();
+    alarmRepoMock->nextRecords.push_back(AlarmEventRecord(1,
+                                                          defName,
+                                                          TimePointFromString("2022-11-11 15:00:00"),
+                                                          defDuration,
+                                                          defAllDay,
+                                                          defRRule,
+                                                          defMusic,
+                                                          defEnabled,
+                                                          defSnooze));
+
+    auto alarmOperations = getMockedAlarmOperations(alarmRepoMock);
+    alarmOperations->updateEventsCache(TimePointFromString("2022-11-11 09:00:00"));
+    alarmOperations->addAlarm(AlarmEventRecord(2,
+                                               defName,
+                                               TimePointFromString("2022-11-11 11:00:00"),
+                                               defDuration,
+                                               defAllDay,
+                                               defRRule,
+                                               defMusic,
+                                               defEnabled,
+                                               defSnooze),
+                              universalBoolCallback);
+    auto handler = std::make_shared<MockAlarmHandler>();
+    EXPECT_CALL(*handler, handle(testing::_)).Times(1);
+    alarmOperations->addAlarmExecutionHandler(alarms::AlarmType::Clock, handler);
+    alarmOperations->minuteUpdated(TimePointFromString("2022-11-11 11:00:00"));
+}
+
+TEST_F(AlarmOperationsFixture, handleEventAfterAddCacheNotChanged)
+{
+    auto alarmRepoMock = std::make_unique<MockAlarmEventsRepository>();
+    alarmRepoMock->nextRecords.push_back(AlarmEventRecord(1,
+                                                          defName,
+                                                          TimePointFromString("2022-11-11 15:00:00"),
+                                                          defDuration,
+                                                          defAllDay,
+                                                          defRRule,
+                                                          defMusic,
+                                                          defEnabled,
+                                                          defSnooze));
+
+    auto alarmOperations = getMockedAlarmOperations(alarmRepoMock);
+    alarmOperations->updateEventsCache(TimePointFromString("2022-11-11 09:00:00"));
+    alarmOperations->addAlarm(AlarmEventRecord(2,
+                                               defName,
+                                               TimePointFromString("2022-11-11 17:00:00"),
+                                               defDuration,
+                                               defAllDay,
+                                               defRRule,
+                                               defMusic,
+                                               defEnabled,
+                                               defSnooze),
+                              universalBoolCallback);
+    auto handler = std::make_shared<MockAlarmHandler>();
+    EXPECT_CALL(*handler, handle(testing::_)).Times(1);
+    alarmOperations->addAlarmExecutionHandler(alarms::AlarmType::Clock, handler);
+    alarmOperations->minuteUpdated(TimePointFromString("2022-11-11 15:00:00"));
+}
+
+TEST_F(AlarmOperationsFixture, handleEventAfterAddCacheNotChanged2)
+{
+    auto alarmRepoMock = std::make_unique<MockAlarmEventsRepository>();
+    alarmRepoMock->nextRecords.push_back(AlarmEventRecord(1,
+                                                          defName,
+                                                          TimePointFromString("2022-11-11 15:00:00"),
+                                                          defDuration,
+                                                          defAllDay,
+                                                          defRRule,
+                                                          defMusic,
+                                                          defEnabled,
+                                                          defSnooze));
+
+    auto alarmOperations = getMockedAlarmOperations(alarmRepoMock);
+    alarmOperations->updateEventsCache(TimePointFromString("2022-11-11 09:00:00"));
+    alarmOperations->addAlarm(AlarmEventRecord(2,
+                                               defName,
+                                               TimePointFromString("2022-11-10 12:00:00"),
+                                               defDuration,
+                                               defAllDay,
+                                               defRRule,
+                                               defMusic,
+                                               defEnabled,
+                                               defSnooze),
+                              universalBoolCallback);
+    auto handler = std::make_shared<MockAlarmHandler>();
+    EXPECT_CALL(*handler, handle(testing::_)).Times(1);
+    alarmOperations->addAlarmExecutionHandler(alarms::AlarmType::Clock, handler);
+    alarmOperations->minuteUpdated(TimePointFromString("2022-11-11 15:00:00"));
+}
+
+TEST_F(AlarmOperationsFixture, handleEventAfterAddDisabled)
+{
+    auto alarmRepoMock = std::make_unique<MockAlarmEventsRepository>();
+    alarmRepoMock->nextRecords.push_back(AlarmEventRecord(1,
+                                                          defName,
+                                                          TimePointFromString("2022-11-11 15:00:00"),
+                                                          defDuration,
+                                                          defAllDay,
+                                                          defRRule,
+                                                          defMusic,
+                                                          defEnabled,
+                                                          defSnooze));
+
+    auto alarmOperations = getMockedAlarmOperations(alarmRepoMock);
+    alarmOperations->updateEventsCache(TimePointFromString("2022-11-11 09:00:00"));
+    alarmOperations->addAlarm(AlarmEventRecord(2,
+                                               defName,
+                                               TimePointFromString("2022-11-11 11:00:00"),
+                                               defDuration,
+                                               defAllDay,
+                                               defRRule,
+                                               defMusic,
+                                               false,
+                                               defSnooze),
+                              universalBoolCallback);
+    auto handler = std::make_shared<MockAlarmHandler>();
+    EXPECT_CALL(*handler, handle(testing::_)).Times(1);
+    alarmOperations->addAlarmExecutionHandler(alarms::AlarmType::Clock, handler);
+    alarmOperations->minuteUpdated(TimePointFromString("2022-11-11 15:00:00"));
+}
+
+TEST_F(AlarmOperationsFixture, handleAfterRemoveNearest)
+{
+    auto alarmRepoMock = std::make_unique<MockAlarmEventsRepository>();
+    alarmRepoMock->nextRecords.push_back(AlarmEventRecord(1,
+                                                          defName,
+                                                          TimePointFromString("2022-11-11 11:00:00"),
+                                                          defDuration,
+                                                          defAllDay,
+                                                          defRRule,
+                                                          defMusic,
+                                                          defEnabled,
+                                                          defSnooze));
+    alarmRepoMock->nextRecords.push_back(AlarmEventRecord(2,
+                                                          defName,
+                                                          TimePointFromString("2022-11-11 09:00:00"),
+                                                          defDuration,
+                                                          defAllDay,
+                                                          defRRule,
+                                                          defMusic,
+                                                          defEnabled,
+                                                          defSnooze));
+
+    auto alarmOperations = getMockedAlarmOperations(alarmRepoMock);
+    alarmOperations->updateEventsCache(TimePointFromString("2022-11-11 09:00:00"));
+
+    alarmOperations->removeAlarm(2, universalBoolCallback);
+
+    auto handler = std::make_shared<MockAlarmHandler>();
+    EXPECT_CALL(*handler, handle(testing::_)).Times(1);
+    alarmOperations->addAlarmExecutionHandler(alarms::AlarmType::Clock, handler);
+    alarmOperations->minuteUpdated(TimePointFromString("2022-11-11 11:00:00"));
+}
+
+TEST_F(AlarmOperationsFixture, handleAfterRemoveNotNearest)
+{
+    auto alarmRepoMock = std::make_unique<MockAlarmEventsRepository>();
+    alarmRepoMock->nextRecords.push_back(AlarmEventRecord(1,
+                                                          defName,
+                                                          TimePointFromString("2022-11-11 11:00:00"),
+                                                          defDuration,
+                                                          defAllDay,
+                                                          defRRule,
+                                                          defMusic,
+                                                          defEnabled,
+                                                          defSnooze));
+    alarmRepoMock->nextRecords.push_back(AlarmEventRecord(2,
+                                                          defName,
+                                                          TimePointFromString("2022-11-11 09:00:00"),
+                                                          defDuration,
+                                                          defAllDay,
+                                                          defRRule,
+                                                          defMusic,
+                                                          defEnabled,
+                                                          defSnooze));
+
+    auto alarmOperations = getMockedAlarmOperations(alarmRepoMock);
+    alarmOperations->updateEventsCache(TimePointFromString("2022-11-11 09:00:00"));
+
+    alarmOperations->removeAlarm(1, universalBoolCallback);
+
+    auto handler = std::make_shared<MockAlarmHandler>();
+    EXPECT_CALL(*handler, handle(testing::_)).Times(1);
+    alarmOperations->addAlarmExecutionHandler(alarms::AlarmType::Clock, handler);
+    alarmOperations->minuteUpdated(TimePointFromString("2022-11-11 09:00:00"));
+}
+
+TEST_F(AlarmOperationsFixture, handleAfterUpdateNearestDelayed)
+{
+    auto alarmRepoMock = std::make_unique<MockAlarmEventsRepository>();
+    alarmRepoMock->nextRecords.push_back(AlarmEventRecord(1,
+                                                          defName,
+                                                          TimePointFromString("2022-11-11 11:00:00"),
+                                                          defDuration,
+                                                          defAllDay,
+                                                          defRRule,
+                                                          defMusic,
+                                                          defEnabled,
+                                                          defSnooze));
+    auto nearestAlarm = AlarmEventRecord(2,
+                                         defName,
+                                         TimePointFromString("2022-11-11 09:00:00"),
+                                         defDuration,
+                                         defAllDay,
+                                         defRRule,
+                                         defMusic,
+                                         defEnabled,
+                                         defSnooze);
+    alarmRepoMock->nextRecords.push_back(nearestAlarm);
+
+    auto alarmOperations = getMockedAlarmOperations(alarmRepoMock);
+    alarmOperations->updateEventsCache(TimePointFromString("2022-11-11 09:00:00"));
+
+    nearestAlarm.startDate = TimePointFromString("2022-11-11 15:00:00");
+    alarmOperations->updateAlarm(nearestAlarm, universalBoolCallback);
+
+    auto handler = std::make_shared<MockAlarmHandler>();
+    EXPECT_CALL(*handler, handle(testing::_)).Times(1);
+    alarmOperations->addAlarmExecutionHandler(alarms::AlarmType::Clock, handler);
+    alarmOperations->minuteUpdated(TimePointFromString("2022-11-11 11:00:00"));
+}
+
+TEST_F(AlarmOperationsFixture, handleAfterUpdateSecondGetsFirst)
+{
+    auto alarmRepoMock = std::make_unique<MockAlarmEventsRepository>();
+    auto secondAlarm   = AlarmEventRecord(1,
+                                        defName,
+                                        TimePointFromString("2022-11-11 11:00:00"),
+                                        defDuration,
+                                        defAllDay,
+                                        defRRule,
+                                        defMusic,
+                                        defEnabled,
+                                        defSnooze);
+    alarmRepoMock->nextRecords.push_back(secondAlarm);
+
+    alarmRepoMock->nextRecords.push_back(AlarmEventRecord(2,
+                                                          defName,
+                                                          TimePointFromString("2022-11-11 09:00:00"),
+                                                          defDuration,
+                                                          defAllDay,
+                                                          defRRule,
+                                                          defMusic,
+                                                          defEnabled,
+                                                          defSnooze));
+
+    auto alarmOperations = getMockedAlarmOperations(alarmRepoMock);
+    alarmOperations->updateEventsCache(TimePointFromString("2022-11-11 09:00:00"));
+
+    secondAlarm.startDate = TimePointFromString("2022-11-11 7:00:00");
+    alarmOperations->updateAlarm(secondAlarm, universalBoolCallback);
+
+    auto handler = std::make_shared<MockAlarmHandler>();
+    EXPECT_CALL(*handler, handle(testing::_)).Times(1);
+    alarmOperations->addAlarmExecutionHandler(alarms::AlarmType::Clock, handler);
+    alarmOperations->minuteUpdated(TimePointFromString("2022-11-11 7:00:00"));
 }
