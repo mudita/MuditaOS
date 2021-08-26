@@ -8,7 +8,7 @@
 #include <Bluetooth/Error.hpp>
 #include <service-evtmgr/Constants.hpp>
 #include <BluetoothWorker.hpp>
-#include <module-bluetooth/Bluetooth/interface/profiles/HSP/ScoUtils.hpp>
+#include <module-bluetooth/Bluetooth/interface/profiles/SCO/ScoUtils.hpp>
 #include <service-audio/AudioMessage.hpp>
 #include <service-bluetooth/Constants.hpp>
 #include <service-bluetooth/messages/AudioVolume.hpp>
@@ -26,21 +26,6 @@ extern "C"
 
 namespace bluetooth
 {
-    bool CellularInterfaceImpl::answerIncomingCall(sys::Service *service)
-    {
-        return CellularServiceAPI::AnswerIncomingCall(service);
-    }
-
-    bool CellularInterfaceImpl::hangupCall(sys::Service *service)
-    {
-        return CellularServiceAPI::HangupCall(service);
-    }
-
-    bool AudioInterfaceImpl::startAudioRouting(sys::Service *service)
-    {
-        return AudioServiceAPI::RoutingStart(service);
-    }
-
     HSP::HSP() : pimpl(std::make_unique<HSPImpl>(HSPImpl()))
     {}
 

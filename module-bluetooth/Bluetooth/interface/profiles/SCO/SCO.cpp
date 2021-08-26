@@ -29,6 +29,7 @@ namespace bluetooth
         static void send(hci_con_handle_t scoHandle);
         static void receive(uint8_t *packet, uint16_t size);
         void setOwnerService(const sys::Service *service);
+        void setCodec(uint8_t codec);
         auto getStreamData() -> std::shared_ptr<BluetoothStreamData>;
 
       private:
@@ -44,6 +45,7 @@ namespace bluetooth
         static QueueHandle_t sourceQueue;
         static DeviceMetadata_t metadata;
         static const sys::Service *ownerService;
+        static uint8_t negotiated_codec;
 
         static auto audioInitialize(int sampleRate) -> Error;
         static void initCvsd();
@@ -89,9 +91,13 @@ namespace bluetooth
     {
         pimpl->setOwnerService(service);
     }
+    void SCO::setCodec(SCOCodec codec)
+    {
+        pimpl->setCodec(static_cast<uint8_t>(codec));
+    }
 
     SCO::~SCO() = default;
-} // namespace Bt
+} // namespace bluetooth
 
 using namespace bluetooth;
 
@@ -100,11 +106,12 @@ QueueHandle_t SCO::SCOImpl::sinkQueue;
 QueueHandle_t SCO::SCOImpl::sourceQueue;
 const sys::Service *SCO::SCOImpl::ownerService = nullptr;
 DeviceMetadata_t SCO::SCOImpl::metadata;
+uint8_t SCO::SCOImpl::negotiated_codec;
 
 void SCO::SCOImpl::sendEvent(audio::EventType event, audio::Event::DeviceState state)
 {
-    auto evt = std::make_shared<audio::Event>(event, state);
-    auto msg = std::make_shared<AudioEventRequest>(std::move(evt));
+    auto evt       = std::make_shared<audio::Event>(event, state);
+    auto msg       = std::make_shared<AudioEventRequest>(std::move(evt));
     auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
     busProxy.sendUnicast(std::move(msg), service::name::evt_manager);
 }
@@ -246,4 +253,20 @@ auto SCO::SCOImpl::getStreamData() -> std::shared_ptr<BluetoothStreamData>
 void SCO::SCOImpl::setOwnerService(const sys::Service *service)
 {
     ownerService = service;
+}
+
+void SCO::SCOImpl::setCodec(uint8_t codec)
+{
+    if (negotiated_codec == codec) {
+        return;
+    }
+    negotiated_codec = codec;
+
+    if (negotiated_codec == HFP_CODEC_MSBC) {
+        // btstack_sbc_decoder_init(&decoder_state, SBC_MODE_mSBC, &handle_pcm_data, NULL);
+        hfp_msbc_init();
+    }
+    else {
+        initCvsd();
+    }
 }
