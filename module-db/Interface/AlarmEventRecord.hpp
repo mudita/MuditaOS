@@ -45,8 +45,9 @@ struct AlarmEventRecord : public EventRecord
                      bool enabled,
                      uint32_t snoozeDuration);
 
-    AlarmEventRecord(const AlarmEventsTableRow &aeRow);
+    explicit AlarmEventRecord(const AlarmEventsTableRow &aeRow);
 
+    std::shared_ptr<EventRecord> getCopy() override;
     auto isValid() const -> bool;
 };
 
