@@ -11,6 +11,7 @@ target_sources(
 
     PRIVATE
         hal/temperature_source/TemperatureSource.cpp
+        hal/battery_charger/BatteryCharger.cpp
 
     PUBLIC
         eink-config.h

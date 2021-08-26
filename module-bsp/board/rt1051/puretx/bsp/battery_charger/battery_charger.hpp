@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include "MAX77818.hpp"
+
 #include <cstdint>
 extern "C"
 {
@@ -16,6 +18,16 @@ extern "C"
 namespace bsp::battery_charger
 {
     using StateOfCharge = std::uint8_t;
+
+    enum class batteryChargerType
+    {
+        DcdTimeOut = 0x00U, /*!< Dcd detect result is timeout */
+        DcdUnknownType,     /*!< Dcd detect result is unknown type */
+        DcdError,           /*!< Dcd detect result is error*/
+        DcdSDP,             /*!< The SDP facility is detected */
+        DcdCDP,             /*!< The CDP facility is detected */
+        DcdDCP,             /*!< The DCP facility is detected */
+    };
 
     enum class batteryRetval
     {
@@ -48,16 +60,6 @@ namespace bsp::battery_charger
         all                 = 0xFFFF
     };
 
-    enum class batteryChargerType
-    {
-        DcdTimeOut = 0x00U, /*!< Dcd detect result is timeout */
-        DcdUnknownType,     /*!< Dcd detect result is unknown type */
-        DcdError,           /*!< Dcd detect result is error*/
-        DcdSDP,             /*!< The SDP facility is detected */
-        DcdCDP,             /*!< The CDP facility is detected */
-        DcdDCP,             /*!< The DCP facility is detected */
-    };
-
     struct MaxMinVolt
     {
         unsigned minMilliVolt{0};
@@ -82,7 +84,7 @@ namespace bsp::battery_charger
 
     std::uint8_t getTopControllerINTSource();
 
-    void setUSBCurrentLimit(batteryChargerType chargerType);
+    void setMaxBusCurrent(USBCurrentLimit limit);
 
     void actionIfChargerUnplugged();
 
@@ -96,8 +98,6 @@ namespace bsp::battery_charger
 
     BaseType_t INTB_IRQHandler();
 
-    extern "C"
-    {
-        void USB_ChargerDetectedCB(std::uint8_t detectedType);
-    }
+    void USBChargerDetectedHandler(std::uint8_t detectedType);
+
 } // namespace bsp::battery_charger
