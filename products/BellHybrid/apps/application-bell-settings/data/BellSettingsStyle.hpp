@@ -21,5 +21,10 @@ namespace gui
         {
             inline constexpr auto font = style::window::font::supersizemelight;
         } // namespace time_fmt_set_list_item
+
+        namespace top_text
+        {
+            inline constexpr auto font = "gt_pressura_light_46";
+        }
     }     // namespace bell_settings_style
 } // namespace gui

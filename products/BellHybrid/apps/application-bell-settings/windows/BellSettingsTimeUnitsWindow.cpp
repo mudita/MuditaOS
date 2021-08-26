@@ -4,6 +4,7 @@
 #include "application-bell-settings/ApplicationBellSettings.hpp"
 #include "BellSettingsStyle.hpp"
 #include "BellSettingsTimeUnitsWindow.hpp"
+#include "data/FinishedWindowMessageData.hpp"
 
 #include <gui/input/InputEvent.hpp>
 #include <apps-common/options/OptionStyle.hpp>
@@ -53,7 +54,9 @@ namespace gui
         }
         if (inputEvent.isShortRelease(KeyCode::KEY_ENTER)) {
             presenter->saveData();
-            application->switchWindow(window::name::bellSettingsFinished);
+            auto finishedMessageData = std::make_unique<FinishedWindowMessageData>(
+                utils::translate("app_bell_settings_time_units_finished_message"));
+            application->switchWindow(window::name::bellSettingsFinished, std::move(finishedMessageData));
             return true;
         }
         if (AppWindow::onInput(inputEvent)) {
