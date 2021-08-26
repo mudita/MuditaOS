@@ -35,11 +35,15 @@ namespace gui
 
         /// Switches currently displayed time format
         auto setTimeFormat(utils::time::Locale::TimeFormat fmt) noexcept -> void;
+        auto setTimeFormatSpinnerVisibility(bool visibility) noexcept -> void;
         auto setHour(int value) noexcept -> void;
         auto setMinute(int value) noexcept -> void;
         auto setTime(std::time_t time) noexcept -> void;
         auto setEditMode(EditMode newEditMode) noexcept -> void;
         auto setFont(std::string newFontName) noexcept -> void;
+        auto setFont(std::string newFocusFontName, std::string newNoFocusFontName) noexcept -> void;
+        auto updateFmtFont(const std::string &fontName) noexcept -> void;
+
         [[nodiscard]] auto getTime() const noexcept -> std::time_t;
         [[nodiscard]] auto getHour() const noexcept -> int;
         [[nodiscard]] auto getMinute() const noexcept -> int;
@@ -52,17 +56,18 @@ namespace gui
             Right
         };
 
-        [[nodiscard]] auto getFontHeight() const noexcept -> uint16_t;
-        [[nodiscard]] auto getMinimumFmtSize() const noexcept -> std::pair<Length, Length>;
+        [[nodiscard]] auto getMinimumFmtWidth(const std::string &fontName) const noexcept -> Length;
 
         auto onInput(const InputEvent &inputEvent) -> bool override;
         auto handleEnterKey() -> bool;
         auto handleRightFunctionKey() -> bool;
 
-        TimeSetSpinner *timeSetSpinner             = nullptr;
-        UTF8Spinner *fmt                           = nullptr;
-        EditMode editMode                          = EditMode::Edit;
-        std::string fontName                       = style::window::font::supersizemelight;
+        TimeSetSpinner *timeSetSpinner = nullptr;
+        UTF8Spinner *fmt               = nullptr;
+        EditMode editMode              = EditMode::Edit;
+        std::string focusFontName      = style::window::font::supersizeme;
+        std::string noFocusFontName    = style::window::font::supersizemelight;
+
         utils::time::Locale::TimeFormat timeFormat = utils::time::Locale::TimeFormat::FormatTime12H;
     };
 

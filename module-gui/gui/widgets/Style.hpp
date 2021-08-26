@@ -69,11 +69,11 @@ namespace style
         inline constexpr auto default_rect_yaps            = 10U;
         namespace font
         {
-            inline constexpr auto thehugest        = "gt_pressura_regular_190";
-            inline constexpr auto huge             = "gt_pressura_regular_90";
+            inline constexpr auto huge             = "gt_pressura_regular_190";
+            inline constexpr auto supersizeme      = "gt_pressura_regular_90";
             inline constexpr auto supersizemelight = "gt_pressura_light_90";
             inline constexpr auto largelight       = "gt_pressura_light_46";
-            inline constexpr auto verybigbold      = "gt_pressura_bold_32";
+            inline constexpr auto verybiglight     = "gt_pressura_light_38";
             inline constexpr auto bigbold          = "gt_pressura_bold_30";
             inline constexpr auto big              = "gt_pressura_regular_30";
             inline constexpr auto biglight         = "gt_pressura_light_30";
@@ -261,7 +261,7 @@ namespace style
             inline constexpr auto h             = 50U;
         } // namespace progress_bar
 
-    }     // namespace sidelistview
+    } // namespace sidelistview
 
     namespace margins
     {
