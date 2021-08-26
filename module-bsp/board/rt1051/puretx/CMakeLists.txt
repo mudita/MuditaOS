@@ -8,6 +8,11 @@ target_include_directories(
 
 target_sources(
         module-bsp
+
+    PRIVATE
+        hal/battery_charger/BatteryCharger.cpp
+        bsp/battery_charger/battery_charger.cpp
+        
     PUBLIC
         eink-config.h
 )

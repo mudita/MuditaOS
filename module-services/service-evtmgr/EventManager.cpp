@@ -18,7 +18,6 @@
 #include <SystemManager/SystemManagerCommon.hpp>
 #include <bsp/common.hpp>
 #include <bsp/rtc/rtc.hpp>
-#include <bsp/battery-charger/battery_charger.hpp>
 #include <bsp/keyboard/key_codes.hpp>
 #include <log.hpp>
 #include <Logger.hpp>

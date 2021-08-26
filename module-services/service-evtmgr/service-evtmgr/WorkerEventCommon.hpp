@@ -12,7 +12,7 @@
 #include <bsp/keyboard/key_codes.hpp>
 #include <bsp/keyboard/key_codes.hpp>
 #include <Service/CpuSentinel.hpp>
-#include <module-services/service-evtmgr/battery-brownout-detector/BatteryBrownoutDetector.hpp>
+#include <hal/battery_charger/AbstractBatteryCharger.hpp>
 
 #include <cstdint>
 #include <list>
@@ -81,7 +81,7 @@ class WorkerEventCommon : public sys::Worker
     bsp::KeyEvents lastState  = bsp::KeyEvents::Released;
     bsp::KeyCodes lastPressed = static_cast<bsp::KeyCodes>(0);
     std::shared_ptr<sys::CpuSentinel> cpuSentinel;
-    BatteryBrownoutDetector batteryBrownoutDetector;
+    std::shared_ptr<hal::battery::AbstractBatteryCharger> batteryCharger;
 
   public:
     explicit WorkerEventCommon(sys::Service *service);
@@ -94,5 +94,4 @@ class WorkerEventCommon : public sys::Worker
      * @param queueID Index of the queue in the queues vector.
      */
     bool handleMessage(uint32_t queueID) override;
-    void checkBatteryChargerInterrupts();
 };

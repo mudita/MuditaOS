@@ -4,7 +4,6 @@ target_sources(module-bsp
         PRIVATE
                 board.cpp
 
-                battery-charger/battery_charger.cpp
                 bluetooth/Bluetooth.cpp
                 bluetooth/test/bsp_bt.cpp
                 cellular/linux_cellular.cpp
@@ -24,6 +23,7 @@ target_sources(module-bsp
                 watchdog/software_watchdog.cpp
                 watchdog/watchdog.cpp
                 hal/temperature_source/TemperatureSource.cpp
+                hal/battery_charger/BatteryCharger.cpp
 
                 ${CMAKE_CURRENT_BINARY_DIR}/eink-config.h
 )
