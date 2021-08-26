@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "service-evtmgr/BatteryMessages.hpp"
 #include "service-evtmgr/EVMessages.hpp"
 #include "service-evtmgr/KbdMessage.hpp"
 #include "service-evtmgr/Constants.hpp"
@@ -11,7 +10,6 @@
 #include <Audio/AudioCommon.hpp>
 #include <MessageType.hpp>
 #include <Service/Worker.hpp>
-#include <bsp/battery-charger/battery_charger.hpp>
 #include <bsp/cellular/bsp_cellular.hpp>
 #include <bsp/keyboard/keyboard.hpp>
 #include <bsp/magnetometer/magnetometer.hpp>
@@ -47,15 +45,8 @@ extern "C"
 #include <vector>      // for vector
 
 WorkerEventCommon::WorkerEventCommon(sys::Service *service)
-    : sys::Worker(service, stackDepthBytes), service(service),
-      batteryBrownoutDetector(
-          service,
-          []() { return bsp::battery_charger::getVoltageFilteredMeasurement(); },
-          [service]() {
-              auto messageBrownout = std::make_shared<sevm::BatteryBrownoutMessage>();
-              service->bus.sendUnicast(std::move(messageBrownout), service::name::system_manager);
-          },
-          [this]() { checkBatteryChargerInterrupts(); })
+    : sys::Worker(service, stackDepthBytes),
+      service(service), batteryCharger{hal::battery::AbstractBatteryCharger::Factory::create(service)}
 {}
 
 bool WorkerEventCommon::handleMessage(uint32_t queueID)
@@ -87,9 +78,16 @@ bool WorkerEventCommon::handleMessage(uint32_t queueID)
         if (!queue->Dequeue(&notification, 0)) {
             return false;
         }
-        if (notification == static_cast<std::uint8_t>(bsp::battery_charger::batteryIRQSource::INTB)) {
-            checkBatteryChargerInterrupts();
+        batteryCharger->processStateChangeNotification(notification);
+    }
+
+    if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueChargerDetect)) {
+        std::uint8_t notification;
+        if (!queue->Dequeue(&notification, 0)) {
+            return false;
         }
+        LOG_DEBUG("USB charger type: %d", notification);
+        batteryCharger->setChargingCurrentLimit(notification);
     }
 
     if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueRTC)) {
@@ -107,14 +105,6 @@ bool WorkerEventCommon::handleMessage(uint32_t queueID)
         service->bus.sendUnicast(message, service::name::evt_manager);
     }
 
-    if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueChargerDetect)) {
-        std::uint8_t notification;
-        if (!queue->Dequeue(&notification, 0)) {
-            return false;
-        }
-        LOG_DEBUG("USB charger type: %d", notification);
-        bsp::battery_charger::setUSBCurrentLimit(static_cast<bsp::battery_charger::batteryChargerType>(notification));
-    }
 
     return true;
 }
@@ -148,7 +138,7 @@ bool WorkerEventCommon::initCommonHardwareComponents()
     bsp::keyboard::init(queues[static_cast<int32_t>(WorkerEventQueues::queueKeyboardIRQ)]->GetQueueHandle());
     auto queueBatteryHandle = queues[static_cast<int32_t>(WorkerEventQueues::queueBattery)]->GetQueueHandle();
     auto queueChargerDetect = queues[static_cast<int32_t>(WorkerEventQueues::queueChargerDetect)]->GetQueueHandle();
-    bsp::battery_charger::init(queueBatteryHandle, queueChargerDetect);
+    batteryCharger->init(queueBatteryHandle, queueChargerDetect);
     bsp::rtc::init(queues[static_cast<int32_t>(WorkerEventQueues::queueRTC)]->GetQueueHandle());
 
     time_t timestamp;
@@ -182,7 +172,7 @@ bool WorkerEventCommon::deinit(void)
     deinitProductHardware();
 
     bsp::keyboard::deinit();
-    bsp::battery_charger::deinit();
+    batteryCharger->deinit();
     battery_level_check::deinit();
 
     return true;
@@ -222,50 +212,6 @@ void WorkerEventCommon::processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code
         break;
     }
     service->bus.sendUnicast(message, service::name::evt_manager);
-}
-
-void WorkerEventCommon::checkBatteryChargerInterrupts()
-{
-    auto topINT = bsp::battery_charger::getTopControllerINTSource();
-    if (topINT & static_cast<std::uint8_t>(bsp::battery_charger::topControllerIRQsource::CHGR_INT)) {
-        bsp::battery_charger::getChargeStatus();
-        bsp::battery_charger::actionIfChargerUnplugged();
-        auto message = std::make_shared<sevm::BatteryStatusChangeMessage>();
-        service->bus.sendUnicast(std::move(message), service::name::evt_manager);
-        battery_level_check::checkBatteryLevel();
-        bsp::battery_charger::clearAllChargerIRQs();
-    }
-    if (topINT & static_cast<std::uint8_t>(bsp::battery_charger::topControllerIRQsource::FG_INT)) {
-        const auto status = bsp::battery_charger::getStatusRegister();
-        if (status & static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::minVAlert)) {
-            batteryBrownoutDetector.startDetection();
-            bsp::battery_charger::clearFuelGuageIRQ(
-                static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::minVAlert));
-        }
-        if (status & static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::SOCOnePercentChange)) {
-            bsp::battery_charger::printFuelGaugeInfo();
-            bsp::battery_charger::clearFuelGuageIRQ(
-                static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::SOCOnePercentChange));
-            bsp::battery_charger::getBatteryLevel();
-            auto message = std::make_shared<sevm::BatteryStatusChangeMessage>();
-            service->bus.sendUnicast(std::move(message), service::name::evt_manager);
-            battery_level_check::checkBatteryLevel();
-        }
-        if (status & static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::maxTemp) ||
-            status & static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::minTemp)) {
-            bsp::battery_charger::clearFuelGuageIRQ(
-                static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::maxTemp) |
-                static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::minTemp));
-            bsp::battery_charger::checkTemperatureRange();
-            bsp::battery_charger::getChargeStatus();
-            auto message = std::make_shared<sevm::BatteryStatusChangeMessage>();
-            service->bus.sendUnicast(std::move(message), service::name::evt_manager);
-            battery_level_check::checkBatteryLevel();
-        }
-        // Clear other unsupported IRQ sources just in case
-        bsp::battery_charger::clearFuelGuageIRQ(
-            static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::all));
-    }
 }
 
 void WorkerEventCommon::updateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyHz newFrequency)
