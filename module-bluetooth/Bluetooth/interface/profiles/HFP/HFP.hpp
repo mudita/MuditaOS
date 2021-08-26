@@ -1,27 +1,28 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include "Profile.hpp"
+#include <interface/profiles/PhoneInterface.hpp>
 #include <service-bluetooth/BluetoothMessage.hpp>
 #include <btstack_run_loop.h>
-#include <module-bluetooth/Bluetooth/interface/profiles/PhoneInterface.hpp>
 
 namespace bluetooth
 {
-    class HSP : public Profile
+
+    class HFP : public Profile
     {
-        static constexpr auto CLASS_OF_DEVICE = 0x400204;
+        // static constexpr auto CLASS_OF_DEVICE = 0x400204;
         // Service class: Telephony, Major device class: Phone, Minor device class: Cellular
       public:
-        HSP();
-        ~HSP() override;
+        HFP();
+        ~HFP() override;
 
-        HSP(const HSP &other) = delete;
-        auto operator=(const HSP &rhs) -> HSP & = delete;
-        HSP(HSP &&other) noexcept;
-        auto operator=(HSP &&other) noexcept -> HSP &;
+        HFP(const HFP &other) = delete;
+        auto operator=(const HFP &rhs) -> HFP & = delete;
+        HFP(HFP &&other) noexcept;
+        auto operator=(HFP &&other) noexcept -> HFP &;
 
         auto init() -> Error::Code override;
         void setDeviceAddress(uint8_t *addr) override;
@@ -43,11 +44,12 @@ namespace bluetooth
         /// @return Success
         [[nodiscard]] auto initializeCall() const noexcept -> Error::Code override;
 
-        void setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice) override;
+        void setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice) override
+        {}
 
       private:
-        class HSPImpl;
-        std::unique_ptr<HSPImpl> pimpl;
+        class HFPImpl;
+        std::unique_ptr<HFPImpl> pimpl;
         const sys::Service *ownerService{};
         btstack_run_loop *runLoopInstance{};
     };
