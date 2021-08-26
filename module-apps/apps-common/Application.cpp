@@ -541,7 +541,7 @@ namespace app
             getCurrentWindow()->handleSwitchData(switchData.get());
 
             auto ret = dynamic_cast<gui::SwitchSpecialChar *>(switchData.get());
-            if (ret != nullptr && switchData != nullptr) {
+            if (ret != nullptr && ret->type == gui::SwitchSpecialChar::Type::Response) {
                 auto text = dynamic_cast<gui::Text *>(getCurrentWindow()->getFocusItem());
                 if (text != nullptr) {
                     text->addText(ret->getDescription());
