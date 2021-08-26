@@ -12,8 +12,6 @@ namespace gui
     {
         setMinimumSize(style::sidelistview::list_item::w, style::sidelistview::list_item::h);
         setEdges(RectangleEdge::None);
-        setFocusItem(body);
-
         body = new BellBaseLayout(this);
 
         auto topMessage = new TextFixedSize(body->firstBox);

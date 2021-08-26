@@ -3,18 +3,21 @@
 
 #pragma once
 
+#include <Style.hpp>
+
 namespace gui
 {
     namespace bell_alarm_style
     {
         namespace time_set_fmt_spinner
         {
-            inline constexpr auto font = "gt_pressura_light_90";
+            inline constexpr auto focusFont   = style::window::font::supersizeme;
+            inline constexpr auto noFocusFont = style::window::font::supersizemelight;
         } // namespace time_set_fmt_spinner
 
         namespace top_text
         {
-            inline constexpr auto font = "gt_pressura_light_46";
+            inline constexpr auto font = style::window::font::largelight;
         }
     } // namespace bell_alarm_style
 } // namespace gui
