@@ -8,7 +8,6 @@ target_sources(module-bsp
 		bluetooth/BluetoothCommon.cpp
 		bsp/audio/CodecMAX98090.cpp
 		bsp/audio/qfilter.c
-		bsp/battery-charger/battery_charger.cpp
 		bsp/cellular/rt1051_cellular.cpp
 		bsp/eeprom/eeprom.cpp
 		bsp/eink_frontlight/eink_frontlight.cpp

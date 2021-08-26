@@ -1,19 +1,19 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "bsp/battery-charger/battery_charger.hpp"
-#include "MAX77818.hpp"
-#include "fsl_common.h"
+#include "battery_charger.hpp"
+#include "battery_charger_utils.hpp"
 
-#include "bsp/BoardDefinitions.hpp"
+#include <fsl_common.h>
+#include <bsp/BoardDefinitions.hpp>
 #include <EventStore.hpp>
-#include "drivers/gpio/DriverGPIO.hpp"
-#include "drivers/i2c/DriverI2C.hpp"
+#include <drivers/gpio/DriverGPIO.hpp>
+#include <drivers/i2c/DriverI2C.hpp>
 #include <purefs/filesystem_paths.hpp>
+
 #include <utility>
 #include <fstream>
 #include <map>
-#include "battery_charger_utils.hpp"
 
 namespace bsp::battery_charger
 {
@@ -221,14 +221,6 @@ namespace bsp::battery_charger
         {
             if (chargerWrite(Registers::CHG_CNFG_00, CHG_OFF_OTG_OFF_BUCK_ON) != kStatus_Success) {
                 LOG_ERROR("Charge disable fail");
-            }
-        }
-
-        void setMaxBusCurrent(USBCurrentLimit limit)
-        {
-            const auto value = static_cast<std::uint8_t>(limit);
-            if (chargerWrite(Registers::CHG_CNFG_09, value) != kStatus_Success) {
-                LOG_ERROR("Maximum usb current write fail");
             }
         }
 
@@ -705,24 +697,11 @@ namespace bsp::battery_charger
         return value.second;
     }
 
-    void setUSBCurrentLimit(batteryChargerType chargerType)
+    void setMaxBusCurrent(USBCurrentLimit limit)
     {
-        switch (chargerType) {
-        case batteryChargerType::DcdTimeOut:
-            [[fallthrough]];
-        case batteryChargerType::DcdUnknownType:
-            [[fallthrough]];
-        case batteryChargerType::DcdError:
-            [[fallthrough]];
-        case batteryChargerType::DcdSDP:
-            resetUSBCurrrentLimit();
-            break;
-        case batteryChargerType::DcdCDP:
-            [[fallthrough]];
-        case batteryChargerType::DcdDCP:
-            LOG_INFO("USB current limit set to 1000mA");
-            setMaxBusCurrent(USBCurrentLimit::lim1000mA);
-            break;
+        const auto value = static_cast<std::uint8_t>(limit);
+        if (chargerWrite(Registers::CHG_CNFG_09, value) != kStatus_Success) {
+            LOG_ERROR("Maximum usb current write fail");
         }
     }
 
@@ -791,14 +770,11 @@ namespace bsp::battery_charger
         return xHigherPriorityTaskWoken;
     }
 
-    extern "C"
+    void USBChargerDetectedHandler(std::uint8_t detectedType)
     {
-        void USB_ChargerDetectedCB(std::uint8_t detectedType)
-        {
-            if (DCDQueueHandle != nullptr) {
-                std::uint8_t val = static_cast<std::uint8_t>(detectedType);
-                xQueueSend(DCDQueueHandle, &val, portMAX_DELAY);
-            }
+        if (DCDQueueHandle != nullptr) {
+            std::uint8_t val = static_cast<std::uint8_t>(detectedType);
+            xQueueSend(DCDQueueHandle, &val, portMAX_DELAY);
         }
     }
 } // namespace bsp::battery_charger

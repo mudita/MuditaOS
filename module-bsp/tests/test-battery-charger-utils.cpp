@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
-#include <module-bsp/board/rt1051/bsp/battery-charger/battery_charger_utils.hpp>
+#include <module-bsp/board/rt1051/puretx/bsp/battery_charger/battery_charger_utils.hpp>
 
 TEST_CASE("BatteryChargerUtilsTest")
 {
