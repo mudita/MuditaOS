@@ -44,11 +44,15 @@ struct EventRecord : public Record, public EventInfo
                 uint32_t duration,
                 bool isAllDay,
                 const std::string &rruleText);
+
+    virtual ~EventRecord(){};
     explicit EventRecord(EventRecord *record);
 
     auto generateSingleEvents(TimePoint from, TimePoint to, uint32_t count) -> std::vector<SingleEventRecord>;
     auto getNextSingleEvent(TimePoint from) -> SingleEventRecord;
     auto isValid() const -> bool;
+
+    virtual std::shared_ptr<EventRecord> getCopy();
 };
 
 struct SingleEventRecord : public Record, public EventInfo

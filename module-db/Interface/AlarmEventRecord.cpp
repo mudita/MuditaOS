@@ -173,3 +173,8 @@ std::vector<AlarmEventRecord> generateRecordsVector(const std::vector<AlarmEvent
     }
     return recordVector;
 }
+
+std::shared_ptr<EventRecord> AlarmEventRecord::getCopy()
+{
+    return std::make_shared<AlarmEventRecord>(*this);
+}

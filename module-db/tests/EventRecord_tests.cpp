@@ -3,6 +3,7 @@
 
 #include "common.hpp"
 
+#include <Interface/AlarmEventRecord.hpp>
 #include <Interface/EventRecord.hpp>
 
 #include <time/dateCommon.hpp>
@@ -116,5 +117,24 @@ TEST_CASE("EventRecord tests")
         event = eventRecord.getNextSingleEvent(TimePointFromString("2021-02-28 17:00:00"));
         REQUIRE(event.startDate == TimePointFromString("2021-03-01 12:00:00"));
         REQUIRE(event.endDate == TimePointFromString("2021-03-01 13:00:00"));
+    }
+
+    SECTION("Generate next AlarmEvent daily")
+    {
+        AlarmEventRecord eventRecord(
+            1, testName, testEventStart, testDuration, testIsAllDay, "FREQ=DAILY", "", true, 15);
+
+        auto event = eventRecord.getNextSingleEvent(TimePointFromString("2000-01-01 00:00:00"));
+        REQUIRE(event.name == eventRecord.name);
+        REQUIRE(event.startDate == eventRecord.startDate);
+        REQUIRE(event.endDate == TimePointFromString("2020-01-11 13:00:00"));
+        REQUIRE(event.duration == eventRecord.duration);
+        REQUIRE(event.isAllDay == eventRecord.isAllDay);
+        REQUIRE(event.parent != nullptr);
+        auto parent = std::dynamic_pointer_cast<AlarmEventRecord>(event.parent);
+        REQUIRE(parent->ID == eventRecord.ID);
+        REQUIRE(parent->musicTone == eventRecord.musicTone);
+        REQUIRE(parent->enabled == eventRecord.enabled);
+        REQUIRE(parent->snoozeDuration == eventRecord.snoozeDuration);
     }
 }

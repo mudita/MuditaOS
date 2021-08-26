@@ -57,6 +57,9 @@ namespace stm
         sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final;
 
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp = nullptr) override;
+
+        void addAlarmExecutionHandler(const alarms::AlarmType type,
+                                      const std::shared_ptr<alarms::AlarmHandler> handler);
     };
 
 } /* namespace stm */
