@@ -266,6 +266,8 @@ namespace app::manager
                 ActionEntry{actions::ShowPopup, std::make_unique<gui::PhoneModePopupRequestParams>(phoneMode)});
         });
 
+        phoneModeObserver->subscribe(
+            [this](sys::phone_modes::Tethering tethering) { handleTetheringChanged(tethering); });
 
         notificationsHandler.registerMessageHandlers();
 
