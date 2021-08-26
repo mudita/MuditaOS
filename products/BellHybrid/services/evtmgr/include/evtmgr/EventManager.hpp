@@ -5,8 +5,19 @@
 
 #include <service-evtmgr/EventManagerCommon.hpp>
 
+namespace hal::temperature
+{
+    class AbstractTemperatureSource;
+}
+
 class EventManager : public EventManagerCommon
-{};
+{
+  public:
+    explicit EventManager(const std::string &name = service::name::evt_manager);
+
+  private:
+    std::shared_ptr<hal::temperature::AbstractTemperatureSource> temperatureSource;
+};
 
 namespace sys
 {
