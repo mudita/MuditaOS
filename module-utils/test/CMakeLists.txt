@@ -38,6 +38,17 @@ add_catch2_executable(
         module-utils
 )
 
+# Log dumps tests
+add_catch2_executable(
+    NAME
+        utils-logdumps
+    SRCS
+        test_logDumps.cpp
+    LIBS
+        module-utils
+    USE_FS
+)
+
 # Logger buffer tests
 add_catch2_executable(
     NAME
