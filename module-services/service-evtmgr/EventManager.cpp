@@ -283,6 +283,9 @@ int EventManagerCommon::dumpLogsToFile()
 
 void EventManagerCommon::handleMinuteUpdate(time_t timestamp)
 {
+    if (onMinuteTick) {
+        onMinuteTick(timestamp);
+    }
     if (!targetApplication.empty()) {
         auto message       = std::make_shared<sevm::RtcMinuteAlarmMessage>(MessageType::EVMMinuteUpdated);
         message->timestamp = timestamp;
