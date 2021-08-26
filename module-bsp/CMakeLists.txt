@@ -23,6 +23,9 @@ target_sources(
         drivers/pwm/DriverPWM.cpp
         drivers/semc/DriverSEMC.cpp
         drivers/usdhc/DriverUSDHC.cpp
+
+    PUBLIC
+        hal/temperature_source/TemperatureSource.hpp
 )
 add_board_subdirectory(board)
 
