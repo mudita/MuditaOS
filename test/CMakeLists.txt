@@ -144,10 +144,12 @@ function(add_catch2_executable)
     target_link_options(${_TESTNAME} PUBLIC "-fsanitize=address")
 
     # disable logs in unit tests
-    if (NOT ${ENABLE_TEST_LOGS} AND NOT ${_TESTNAME} STREQUAL "catch2-utils-log")
-        target_sources(${_TESTNAME} PRIVATE ${ROOT_TEST_DIR}/mock-logs.cpp)
-        target_sources(${_TESTNAME} PRIVATE ${ROOT_TEST_DIR}/mock-freertos-tls.cpp)
-    endif (NOT ${ENABLE_TEST_LOGS} AND NOT ${_TESTNAME} STREQUAL "catch2-utils-log")
+    if (NOT ${ENABLE_TEST_LOGS})
+        if (NOT ${_TESTNAME} STREQUAL "catch2-utils-log" AND NOT ${_TESTNAME} STREQUAL "catch2-utils-logdumps")
+            target_sources(${_TESTNAME} PRIVATE ${ROOT_TEST_DIR}/mock-logs.cpp)
+            target_sources(${_TESTNAME} PRIVATE ${ROOT_TEST_DIR}/mock-freertos-tls.cpp)
+        endif(NOT ${_TESTNAME} STREQUAL "catch2-utils-log" AND NOT ${_TESTNAME} STREQUAL "catch2-utils-logdumps")
+    endif (NOT ${ENABLE_TEST_LOGS})
 
     set(_TEST_LABELS "")
     if(_TEST_ARGS_USE_FS)
