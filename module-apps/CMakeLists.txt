@@ -37,7 +37,7 @@ foreach(app IN LISTS APPLICATIONS)
     string(TOUPPER ${app} app_upper)
     string(REPLACE "-" "_" app_macro_name ${app_upper})
     if (NOT DEFINED ENABLE_APP_${app_macro_name})
-        option(ENABLE_APP_${app_macro_name} "Enable application ${app}" OFF)
+        set(ENABLE_APP_${app_macro_name} OFF CACHE INTERNAL "Enable application ${app}")
     endif()
 
     if(ENABLE_APP_${app_macro_name})
@@ -47,7 +47,7 @@ foreach(app IN LISTS APPLICATIONS)
     endif()
 endforeach()
 
-set(ENABLED_APPS_DEFINES ${ENABLED_APPS_DEFINES} PARENT_SCOPE INTERNAL)
+set(ENABLED_APPS_DEFINES ${ENABLED_APPS_DEFINES} PARENT_SCOPE)
 
 if(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
     set(OPTIMIZE_APPS_DEBUG_DEFAULT OFF)
