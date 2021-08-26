@@ -16,7 +16,7 @@ namespace bluetooth
         if (!initialized) {
             profilesList = {{AudioProfile::A2DP, std::make_shared<bluetooth::A2DP>()},
                             {AudioProfile::HSP, std::make_shared<bluetooth::HSP>()},
-                            {AudioProfile::HFP, nullptr},
+                            {AudioProfile::HFP, std::make_shared<bluetooth::HFP>()},
                             {AudioProfile::None, nullptr}};
 
             for (auto &[profileName, ptr] : profilesList) {
@@ -25,6 +25,10 @@ namespace bluetooth
                     ptr->init();
                 }
             }
+            // TODO profile selection based on capabilities and priority?
+            // audio & capa cell & HSP & HFP  & A2DP-> HFP
+            // audio & capa cell & HSP  & A2DP-> HSP
+            // audio & HSP & HFP & A2DP -> A2DP
             currentProfilePtr = profilesList[AudioProfile::A2DP].get();
 
             if (auto serviceBt = dynamic_cast<ServiceBluetooth *>(ownerService); serviceBt != nullptr) {

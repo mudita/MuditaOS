@@ -94,6 +94,7 @@ namespace audio
         // HW state change notifications
         JackState,               //!< jack input plugged / unplugged event
         BlutoothHSPDeviceState,  //!< BT device connected / disconnected event (Headset Profile)
+        BlutoothHFPDeviceState,  //!< BT device connected / disconnected event (Headset Profile)
         BlutoothA2DPDeviceState, //!< BT device connected / disconnected event (Advanced Audio Distribution Profile)
 
         // call control

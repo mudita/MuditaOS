@@ -5,13 +5,12 @@
 
 #include <interface/profiles/A2DP/AVDTP.hpp>
 #include <interface/profiles/A2DP/AVRCP.hpp>
-#include <interface/profiles/HSP/SCO.hpp>
+#include <interface/profiles/SCO/SCO.hpp>
+#include <interface/profiles/SCO/ScoUtils.hpp>
 
 #include <Audio/AudioCommon.hpp>
 #include <Audio/VolumeScaler.hpp>
 #include <Audio/Stream.hpp>
-
-#include <module-bluetooth/Bluetooth/interface/profiles/HSP/ScoUtils.hpp>
 
 #include <chrono>
 #include <cassert>
