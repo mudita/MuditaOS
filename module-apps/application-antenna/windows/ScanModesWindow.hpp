@@ -4,7 +4,7 @@
 #pragma once
 
 #include <apps-common/Application.hpp>
-#include <apps-common/windows/AppWindow.hpp>
+#include <AppWindow.hpp>
 #include <module-gui/gui/widgets/Text.hpp>
 
 namespace gui
