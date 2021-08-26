@@ -9,6 +9,7 @@
 #include "AudioProfile.hpp"
 #include "interface/profiles/A2DP/A2DP.hpp"
 #include "interface/profiles/HSP/HSP.hpp"
+#include "interface/profiles/HFP/HFP.hpp"
 #include "audio/BluetoothAudioDevice.hpp"
 
 #include <memory>
