@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <AppWindow.hpp>
+#include "AppWindow.hpp"
 
 #include <apps-common/Application.hpp>
 #include <module-apps/application-notes/presenter/SearchEngineWindowPresenter.hpp>

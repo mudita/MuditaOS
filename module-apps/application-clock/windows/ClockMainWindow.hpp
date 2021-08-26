@@ -4,7 +4,7 @@
 #pragma once
 
 // module-gui
-#include <AppWindow.hpp>
+#include "AppWindow.hpp"
 #include "gui/widgets/Item.hpp"
 #include "gui/widgets/Image.hpp"
 #include "gui/widgets/Label.hpp"

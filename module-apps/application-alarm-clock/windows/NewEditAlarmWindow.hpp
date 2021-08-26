@@ -7,7 +7,7 @@
 #include "application-alarm-clock/models/NewEditAlarmModel.hpp"
 #include "application-alarm-clock/presenter/AlarmClockEditWindowPresenter.hpp"
 #include "application-alarm-clock/data/AlarmsData.hpp"
-#include <AppWindow.hpp>
+#include "windows/AppWindow.hpp"
 #include "Application.hpp"
 #include <InputEvent.hpp>
 #include <ListView.hpp>

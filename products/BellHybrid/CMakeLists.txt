@@ -39,7 +39,7 @@ target_link_libraries(BellHybrid
         application-bell-alarm
         application-bell-main
         application-bell-settings
-        app-window
+        application-music-player
         appmgr
         db
         evtmgr
@@ -88,4 +88,3 @@ add_update_package(BellHybrid)
 add_subdirectory(services)
 add_subdirectory(alarms)
 add_subdirectory(sys)
-add_subdirectory(app-window)

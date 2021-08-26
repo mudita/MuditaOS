@@ -83,8 +83,7 @@ namespace bluetooth
     void GAP::sendDevices()
     {
         auto msg = std::make_shared<message::bluetooth::ResponseVisibleDevices>(devices);
-        ownerService->bus.sendUnicast(msg, "ApplicationSettings");
-        ownerService->bus.sendUnicast(std::move(msg), "");
+        ownerService->bus.sendUnicast(std::move(msg), "ApplicationSettings");
     }
 
     auto GAP::startScan() -> int
@@ -208,7 +207,7 @@ namespace bluetooth
 
         auto msg = std::make_shared<BluetoothPairResultMessage>(currentlyProcessedDeviceAddr, result == 0u);
         currentlyProcessedDeviceAddr.clear();
-        ownerService->bus.sendUnicast(std::move(msg), "");
+        ownerService->bus.sendUnicast(std::move(msg), "ApplicationSettings");
     }
     /* @text In ACTIVE, the following events are processed:
      *  - GAP Inquiry result event: BTstack provides a unified inquiry result that contain
@@ -261,7 +260,7 @@ namespace bluetooth
             LOG_DEBUG("PIN code request!");
             hci_event_pin_code_request_get_bd_addr(packet, address);
             auto msg = std::make_shared<::message::bluetooth::RequestPasskey>();
-            ownerService->bus.sendUnicast(std::move(msg), "");
+            ownerService->bus.sendUnicast(std::move(msg), "ApplicationSettings");
         }
         const auto eventType = hci_event_packet_get_type(packet);
         switch (state) {
@@ -292,7 +291,8 @@ namespace bluetooth
         LOG_INFO("Device unpaired");
         std::string unpairedDevAddr{bd_addr_to_str(addr)};
         ownerService->bus.sendUnicast(
-            std::make_shared<message::bluetooth::UnpairResult>(std::move(unpairedDevAddr), true), "");
+            std::make_shared<message::bluetooth::UnpairResult>(std::move(unpairedDevAddr), true),
+            "ApplicationSettings");
         return true;
     }
     void GAP::respondPinCode(const std::string &pin)

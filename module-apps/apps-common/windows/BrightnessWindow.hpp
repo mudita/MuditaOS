@@ -4,7 +4,7 @@
 #pragma once
 
 #include <apps-common/Application.hpp>
-#include <AppWindow.hpp>
+#include "AppWindow.hpp"
 #include "apps-common/widgets/BarGraph.hpp"
 #include "apps-common/widgets/BightnessBox.hpp"
 #include <functional>

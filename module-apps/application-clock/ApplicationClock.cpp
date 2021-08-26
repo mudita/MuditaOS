@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 // module-gui
-#include <AppWindow.hpp>
+#include "AppWindow.hpp"
 #include "gui/widgets/Window.hpp"
 
 // module-utils

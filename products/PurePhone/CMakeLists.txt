@@ -58,7 +58,6 @@ target_link_libraries(PurePhone
         appmgr
         db
         evtmgr
-        app-window
         messagetype
         module-apps
         module-bsp
@@ -109,7 +108,6 @@ github_message_update()
 
 add_subdirectory(services)
 add_subdirectory(sys)
-add_subdirectory(app-window)
 
 if (${ENABLE_TESTS})
     add_subdirectory(test)

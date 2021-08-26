@@ -7,7 +7,7 @@
 #include "TimeUnitsPresenter.hpp"
 #include "TimeUnitsModel.hpp"
 
-#include <AppWindow.hpp>
+#include <apps-common/windows/AppWindow.hpp>
 #include <widgets/SideListView.hpp>
 
 namespace gui

@@ -43,6 +43,7 @@ target_sources(apps-common
         widgets/TimeSetFmtSpinner.cpp
         widgets/TimeWidget.cpp
         widgets/WidgetsUtils.cpp
+        windows/AppWindow.cpp
         windows/BrightnessWindow.cpp
         windows/Dialog.cpp
         windows/OptionWindow.cpp
@@ -73,7 +74,6 @@ target_link_libraries(apps-common
         module-services
         module-sys
         module-utils
-        app-window
         time
         utf8
 )

@@ -5,7 +5,7 @@
 
 #include <application-antenna/ApplicationAntenna.hpp>
 #include <apps-common/Application.hpp>
-#include <AppWindow.hpp>
+#include <apps-common/windows/AppWindow.hpp>
 #include <module-gui/gui/widgets/Text.hpp>
 
 namespace gui

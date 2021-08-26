@@ -6,7 +6,7 @@
 #include <string>
 #include <functional>
 
-#include <AppWindow.hpp>
+#include "AppWindow.hpp"
 #include "gui/widgets/Label.hpp"
 #include "gui/widgets/Image.hpp"
 #include "gui/widgets/Window.hpp"

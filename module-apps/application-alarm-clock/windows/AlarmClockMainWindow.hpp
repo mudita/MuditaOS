@@ -5,7 +5,7 @@
 
 #include "application-alarm-clock/models/AlarmsModel.hpp"
 #include "application-alarm-clock/presenter/AlarmClockMainWindowPresenter.hpp"
-#include <AppWindow.hpp>
+#include "windows/AppWindow.hpp"
 #include "Application.hpp"
 #include <ListView.hpp>
 #include <Icon.hpp>

@@ -9,7 +9,7 @@
 #include <widgets/MonthBox.hpp>
 
 #include <apps-common/Application.hpp>
-#include <AppWindow.hpp>
+#include <apps-common/windows/AppWindow.hpp>
 #include <gui/widgets/GridLayout.hpp>
 
 #include <map>

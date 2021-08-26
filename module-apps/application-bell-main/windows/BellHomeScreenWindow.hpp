@@ -7,7 +7,7 @@
 #include "presenters/HomeScreenPresenter.hpp"
 
 #include <apps-common/GuiTimer.hpp>
-#include <AppWindow.hpp>
+#include <apps-common/windows/AppWindow.hpp>
 
 namespace gui
 {
