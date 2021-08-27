@@ -106,7 +106,7 @@ namespace bsp::keyboard
                                           .pin      = static_cast<uint32_t>(BoardDefinitions::KEYBOARD_IRQ_PIN)});
 
         std::uint32_t reg = 0;
-        status_t error = 0;
+        status_t error    = 0;
 
         gpio->WritePin(static_cast<std::uint32_t>(BoardDefinitions::KEYBOARD_RESET_PIN), 0);
         vTaskDelay(1);

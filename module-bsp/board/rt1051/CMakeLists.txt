@@ -19,7 +19,6 @@ target_sources(module-bsp
 		bsp/eMMC/fsl_sdmmc_event.c
 		bsp/eMMC/fsl_sdmmc_host.c
 		bsp/headset/headset.cpp
-		bsp/keyboard/keyboard.cpp
 		bsp/keypad_backlight/keypad_backlight.cpp
 		bsp/light_sensor/light_sensor.cpp
 		bsp/lpm/ClockState.cpp
