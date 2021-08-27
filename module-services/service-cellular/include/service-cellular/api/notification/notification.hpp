@@ -45,7 +45,4 @@ namespace cellular::msg::notification
         const api::ModemState state;
     };
 
-    struct SimNotInserted : public msg::Notification
-    {};
-
 } // namespace cellular::msg::notification

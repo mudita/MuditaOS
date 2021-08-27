@@ -9,7 +9,6 @@
 #include <at/ATFactory.hpp>
 #include <at/UrcFactory.hpp>
 #include <at/UrcCpin.hpp>
-#include <at/cmd/QSIMSTAT.hpp>
 
 namespace cellular
 {
@@ -302,33 +301,6 @@ namespace cellular
             }
 
             return sim::Result::OK;
-        }
-
-        bool SimCard::isSimCardInserted()
-        {
-            if (simInserted == std::nullopt) {
-                if (simInserted = readSimCardInsertStatus(); !simInserted) {
-                    return false;
-                }
-            }
-
-            if (simInserted == at::SimInsertedStatus::Inserted || simInserted == at::SimInsertedStatus::Unknown) {
-                return true;
-            }
-            return false;
-        }
-
-        std::optional<at::SimInsertedStatus> SimCard::readSimCardInsertStatus()
-        {
-            auto command  = at::cmd::QSIMSTAT(at::cmd::Modifier::Get);
-            auto response = channel->cmd(command);
-            auto result   = command.parseQSIMSTAT(response);
-
-            if (result.code != at::Result::Code::OK) {
-                LOG_ERROR("Can't read SIM insertion status.");
-                return std::nullopt;
-            }
-            return result.status;
         }
     } // namespace service
 } // namespace cellular

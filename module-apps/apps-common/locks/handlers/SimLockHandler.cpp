@@ -17,11 +17,17 @@ namespace locks
     constexpr unsigned int default_attempts           = 4;
     constexpr unsigned int max_input_size             = 8;
     constexpr unsigned int min_input_size             = 4;
+    constexpr unsigned int sim_not_responding_timeout = 3;
 
     SimLockHandler::SimLockHandler(sys::Service *owner)
         : owner(owner), lock(Lock::LockState::Unlocked, default_attempts)
     {
         lock.setInputSizeBounds(min_input_size, max_input_size);
+
+        simResponseTimer = sys::TimerFactory::createSingleShotTimer(
+            owner, simResponseTimerName, std::chrono::seconds{sim_not_responding_timeout}, [this](sys::Timer &) {
+                handleSimNotRespondingMessage();
+            });
     }
 
     void SimLockHandler::clearStoredInputs()
@@ -32,6 +38,8 @@ namespace locks
 
     void SimLockHandler::setSimInputTypeAction(SimInputTypeAction _simInputTypeAction)
     {
+        simResponseTimer.stop();
+
         if (simInputTypeAction != _simInputTypeAction) {
             simInputTypeAction = _simInputTypeAction;
             lock.lockState     = Lock::LockState::Unlocked;
@@ -99,6 +107,7 @@ namespace locks
     void SimLockHandler::setSim(cellular::api::SimSlot simSlot)
     {
         if (simReady) {
+            simResponseTimer.start();
             Store::GSM::get()->selected = static_cast<Store::GSM::SIM>(simSlot);
             owner->bus.sendUnicast<cellular::msg::request::sim::SetActiveSim>(simSlot);
         }
@@ -262,13 +271,8 @@ namespace locks
 
     sys::MessagePointer SimLockHandler::handleSimReadyMessage()
     {
-        setSimReady();
+        simResponseTimer.stop();
         return sys::msgHandled();
-    }
-
-    sys::MessagePointer SimLockHandler::handleSimNotInsertedMessage()
-    {
-        return handleSimNotRespondingMessage();
     }
 
     sys::MessagePointer SimLockHandler::handleSimNotRespondingMessage()

@@ -7,8 +7,6 @@
 #include <at/SimState.hpp>
 #include <service-cellular/api/common.hpp>
 
-#include <module-cellular/at/SimInsertedState.hpp>
-
 namespace at
 {
     class Cmd;
@@ -101,36 +99,6 @@ namespace cellular::service
         void handleATSimStateChange(at::SimState state);
 
         /**
-         * Check if sim card is present in slot
-         * @return true if sim card is present in slot
-         */
-        bool isSimCardInserted();
-
-        /**
-         * Set new sim inserted status
-         * @param newStatus
-         */
-        void setSimInserted(at::SimInsertedStatus newStatus)
-        {
-            simInserted = newStatus;
-        }
-
-        /**
-         * Gets sim inserted status
-         * @return actual value of sim inserted status
-         */
-        std::optional<at::SimInsertedStatus> getSimInsertedStatus()
-        {
-            return simInserted;
-        }
-        /**
-         * Clears sim inserted status
-         */
-        void clearSimInsertedStatus()
-        {
-            simInserted = std::nullopt;
-        }
-        /**
          * Notification events
          */
         std::function<void()> onSimReady;
@@ -200,15 +168,8 @@ namespace cellular::service
 
         void handleSimState(at::SimState state);
 
-        /**
-         * Read sim card insert status
-         * @return sim card inserted status
-         */
-        std::optional<at::SimInsertedStatus> readSimCardInsertStatus();
-
         at::BaseChannel *channel        = nullptr;
         std::optional<api::SimSlot> sim = std::nullopt;
-        std::optional<at::SimInsertedStatus> simInserted = std::nullopt;
     };
 
 } // namespace cellular::service
