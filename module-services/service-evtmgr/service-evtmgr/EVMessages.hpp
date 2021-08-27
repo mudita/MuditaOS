@@ -12,7 +12,7 @@
 #include <SwitchData.hpp>
 #include <bsp/cellular/bsp_cellular.hpp>
 #include <bsp/common.hpp>
-#include <bsp/keyboard/key_codes.hpp>
+#include <hal/key_input/KeyEventDefinitions.hpp>
 #include <bsp/torch/torch.hpp>
 #include <bsp/keypad_backlight/keypad_backlight.hpp>
 #include <vibra/Vibra.hpp>

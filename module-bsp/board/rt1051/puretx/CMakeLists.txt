@@ -12,7 +12,9 @@ target_sources(
     PRIVATE
         hal/battery_charger/BatteryCharger.cpp
         bsp/battery_charger/battery_charger.cpp
-        pin_mux.c
+        hal/key_input/KeyInput.cpp
+        bsp/keyboard/keyboard.cpp
+	    pin_mux.c
         clock_config.cpp
         irq_gpio.cpp
         

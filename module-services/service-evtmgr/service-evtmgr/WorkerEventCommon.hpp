@@ -9,10 +9,9 @@
 #include <Service/Service.hpp>
 #include <Service/Worker.hpp>
 #include <bsp/common.hpp>
-#include <bsp/keyboard/key_codes.hpp>
-#include <bsp/keyboard/key_codes.hpp>
 #include <Service/CpuSentinel.hpp>
 #include <hal/battery_charger/AbstractBatteryCharger.hpp>
+#include <hal/key_input/AbstractKeyInput.hpp>
 
 #include <cstdint>
 #include <list>
@@ -82,6 +81,7 @@ class WorkerEventCommon : public sys::Worker
     bsp::KeyCodes lastPressed = static_cast<bsp::KeyCodes>(0);
     std::shared_ptr<sys::CpuSentinel> cpuSentinel;
     std::shared_ptr<hal::battery::AbstractBatteryCharger> batteryCharger;
+    std::shared_ptr<hal::key_input::AbstractKeyInput> keyInput;
 
   public:
     explicit WorkerEventCommon(sys::Service *service);

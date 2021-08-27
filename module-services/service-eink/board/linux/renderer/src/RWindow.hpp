@@ -5,7 +5,7 @@
 
 #include "RArea.hpp"
 
-#include <module-bsp/bsp/keyboard/key_codes.hpp>
+#include <hal/key_input/KeyEventDefinitions.hpp>
 
 #include <gdk/gdk.h>
 #include <gtkmm.h>

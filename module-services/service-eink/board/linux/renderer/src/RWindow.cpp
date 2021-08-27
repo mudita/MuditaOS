@@ -5,7 +5,7 @@
 #include <module-bsp/board/linux/board.h>
 
 #include <module-bsp/bsp/common.hpp>
-#include <module-bsp/bsp/keyboard/key_codes.hpp>
+#include <hal/key_input/KeyEventDefinitions.hpp>
 #include <module-services/service-eink/board/linux/renderer/src/RArea.hpp>
 
 #include <glibmm/signalproxy.h>
