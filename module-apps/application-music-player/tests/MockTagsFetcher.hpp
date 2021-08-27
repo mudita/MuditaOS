@@ -15,6 +15,6 @@ namespace testing::app::music_player
     class MockTagsFetcher : public ::app::music_player::AbstractTagsFetcher
     {
       public:
-        MOCK_METHOD(std::optional<audio::Tags>, getFileTags, (const std::string &filePath), (const override));
+        MOCK_METHOD(std::optional<tags::fetcher::Tags>, getFileTags, (const std::string &filePath), (const override));
     };
 }; // namespace testing::app::music_player

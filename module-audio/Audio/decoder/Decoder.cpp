@@ -11,13 +11,13 @@
 #include "fileref.h"
 #include "tag.h"
 #include "tfilestream.h"
+#include <tags_fetcher/TagsFetcher.hpp>
 
 namespace audio
 {
     Decoder::Decoder(const char *fileName)
-        : filePath(fileName), workerBuffer(std::make_unique<int16_t[]>(workerBufferSize)), tag(std::make_unique<Tags>())
+        : filePath(fileName), workerBuffer(std::make_unique<int16_t[]>(workerBufferSize))
     {
-
         fd = std::fopen(fileName, "r");
         if (fd == NULL) {
             return;
@@ -26,6 +26,8 @@ namespace audio
         std::fseek(fd, 0, SEEK_END);
         fileSize = std::ftell(fd);
         std::rewind(fd);
+
+        tags = fetchTags();
     }
 
     Decoder::~Decoder()
@@ -39,46 +41,9 @@ namespace audio
         }
     }
 
-    std::unique_ptr<Tags> Decoder::fetchTags()
+    std::unique_ptr<tags::fetcher::Tags> Decoder::fetchTags()
     {
-        if (fd) {
-            const auto inPos = std::ftell(fd);
-            std::rewind(fd);
-            TagLib::FileStream fileStream(fd);
-            TagLib::FileRef tagReader(&fileStream);
-            if (!tagReader.isNull() && tagReader.tag()) {
-                TagLib::Tag *tags                   = tagReader.tag();
-                TagLib::AudioProperties *properties = tagReader.audioProperties();
-
-                constexpr auto unicode = true;
-                tag->title             = tags->title().to8Bit(unicode);
-                tag->artist            = tags->artist().to8Bit(unicode);
-                tag->album             = tags->album().to8Bit(unicode);
-                tag->genre             = tags->genre().to8Bit(unicode);
-                tag->year   = std::to_string(tags->year());
-
-                tag->total_duration_s = properties->length();
-                tag->duration_min     = tag->total_duration_s / utils::secondsInMinute;
-                tag->duration_hour    = tag->duration_min / utils::secondsInMinute;
-                tag->duration_sec     = tag->total_duration_s % utils::secondsInMinute;
-                tag->sample_rate      = properties->sampleRate();
-                tag->num_channel      = properties->channels();
-                tag->bitrate          = properties->bitrate();
-            }
-            std::fseek(fd, inPos, SEEK_SET);
-        }
-
-        tag->filePath.append(filePath);
-        // If title tag empty fill it with raw file name
-        if (tag->title.size() == 0) {
-            if (const auto pos = filePath.rfind("/"); pos == std::string::npos) {
-                tag->title.append(filePath);
-            }
-            else {
-                tag->title.append(&filePath[pos + 1]);
-            }
-        }
-        return std::make_unique<Tags>(*tag);
+        return std::make_unique<tags::fetcher::Tags>(tags::fetcher::fetchTags(filePath));
     }
 
     std::unique_ptr<Decoder> Decoder::Create(const char *file)
@@ -127,8 +92,8 @@ namespace audio
                 std::make_unique<DecoderWorker>(_stream,
                                                 this,
                                                 endOfFileCallback,
-                                                tag->num_channel == 1 ? DecoderWorker::ChannelMode::ForceStereo
-                                                                      : DecoderWorker::ChannelMode::NoConversion);
+                                                tags->num_channel == 1 ? DecoderWorker::ChannelMode::ForceStereo
+                                                                       : DecoderWorker::ChannelMode::NoConversion);
             audioWorker->init();
             audioWorker->run();
         }
@@ -162,7 +127,6 @@ namespace audio
 
     auto Decoder::getSourceFormat() -> AudioFormat
     {
-        auto tags     = fetchTags();
         auto bitWidth = getBitWidth();
         // this is a decoder mono to stereo hack, will be removed when proper
         // transcoding implementation is added

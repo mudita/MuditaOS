@@ -24,17 +24,11 @@ class AudioMessage : public sys::DataMessage
 class AudioResponseMessage : public sys::ResponseMessage
 {
   public:
-    explicit AudioResponseMessage(audio::RetCode retCode  = audio::RetCode::Success,
-                                  const audio::Tags &tags = {},
-                                  const std::string &val  = {})
-        : sys::ResponseMessage(), retCode(retCode), tags(tags), val(val)
-    {}
-
-    AudioResponseMessage(audio::RetCode retCode, const std::string &val) : AudioResponseMessage(retCode, {}, val)
+    explicit AudioResponseMessage(audio::RetCode retCode = audio::RetCode::Success, const std::string &val = {})
+        : sys::ResponseMessage(), retCode(retCode), val(val)
     {}
 
     const audio::RetCode retCode = audio::RetCode::Success;
-    audio::Tags tags             = {};
     std::string val;
 };
 
@@ -227,15 +221,6 @@ class AudioResumeResponse : public AudioResponseMessage
     {}
 
     const audio::Token token;
-};
-
-class AudioGetFileTagsRequest : public AudioMessage
-{
-  public:
-    explicit AudioGetFileTagsRequest(const std::string &fileName) : fileName(fileName)
-    {}
-
-    const std::string fileName;
 };
 
 class AudioEventRequest : public AudioMessage

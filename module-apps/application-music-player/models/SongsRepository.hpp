@@ -4,7 +4,7 @@
 #pragma once
 
 #include <apps-common/Application.hpp>
-#include <Audio/decoder/Decoder.hpp>
+#include <tags_fetcher/TagsFetcher.hpp>
 #include <purefs/filesystem_paths.hpp>
 
 #include <memory>
@@ -21,7 +21,7 @@ namespace app::music_player
       public:
         virtual ~AbstractTagsFetcher() noexcept = default;
 
-        virtual std::optional<audio::Tags> getFileTags(const std::string &filePath) const = 0;
+        virtual std::optional<tags::fetcher::Tags> getFileTags(const std::string &filePath) const = 0;
     };
 
     class ServiceAudioTagsFetcher : public AbstractTagsFetcher
@@ -29,7 +29,7 @@ namespace app::music_player
       public:
         explicit ServiceAudioTagsFetcher(Application *application);
 
-        std::optional<audio::Tags> getFileTags(const std::string &filePath) const final;
+        std::optional<tags::fetcher::Tags> getFileTags(const std::string &filePath) const final;
 
       private:
         Application *application = nullptr;
@@ -41,7 +41,7 @@ namespace app::music_player
         virtual ~AbstractSongsRepository() noexcept = default;
 
         virtual void scanMusicFilesList()                                          = 0;
-        virtual std::vector<audio::Tags> getMusicFilesList() const                 = 0;
+        virtual std::vector<tags::fetcher::Tags> getMusicFilesList() const         = 0;
         virtual std::size_t getFileIndex(const std::string &filePath) const        = 0;
         virtual std::string getNextFilePath(const std::string &filePath) const     = 0;
         virtual std::string getPreviousFilePath(const std::string &filePath) const = 0;
@@ -56,7 +56,7 @@ namespace app::music_player
                                  std::string musicFolderName = purefs::dir::getUserDiskPath() / musicSubfolderName);
 
         void scanMusicFilesList() override;
-        std::vector<audio::Tags> getMusicFilesList() const override;
+        std::vector<tags::fetcher::Tags> getMusicFilesList() const override;
         std::size_t getFileIndex(const std::string &filePath) const override;
         std::string getNextFilePath(const std::string &filePath) const override;
         std::string getPreviousFilePath(const std::string &filePath) const override;
@@ -64,6 +64,6 @@ namespace app::music_player
       private:
         std::unique_ptr<AbstractTagsFetcher> tagsFetcher;
         std::string musicFolderName;
-        std::vector<audio::Tags> musicFiles;
+        std::vector<tags::fetcher::Tags> musicFiles;
     };
 } // namespace app::music_player
