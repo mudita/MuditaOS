@@ -49,7 +49,7 @@
  *
  */
 
-#include "clock_config.h"
+#include "board/clock_config.h"
 #include "board.h"
 #include "fsl_iomuxc.h"
 #include "fsl_dcdc.h"
@@ -1108,7 +1108,6 @@ void PrintSystemClocks()
     LOG_PRINTF("PerphSourceClock_SAI1: %lu\r\n", GetPerphSourceClock(PerphClock_SAI1));
     LOG_PRINTF("PerphSourceClock_SAI2: %lu\r\n", GetPerphSourceClock(PerphClock_SAI2));
     LOG_PRINTF("PerphSourceClock_USDHC2: %lu\r\n", GetPerphSourceClock(PerphClock_USDHC2));
-
 }
 
 #define CLOCK_CCM_HANDSHAKE_WAIT()                                                                                     \

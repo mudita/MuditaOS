@@ -7,7 +7,7 @@
 #include <log.hpp>
 #include "bsp/BoardDefinitions.hpp"
 #include "bsp/watchdog/watchdog.hpp"
-#include <clock_config.h>
+#include <board/clock_config.h>
 #include <fsl_clock.h>
 #include "ClockState.hpp"
 #include "Oscillator.hpp"

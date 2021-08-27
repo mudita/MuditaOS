@@ -1,3 +1,6 @@
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 /*
  * The Clear BSD License
  * Copyright 2017-2018 NXP
@@ -247,7 +250,7 @@ I2C_SDA_FXOS8700CQ;CSI_I2C_SDA}
 
 #include "fsl_common.h"
 #include "fsl_iomuxc.h"
-#include "pin_mux.h"
+#include "board/pin_mux.h"
 #include "board.h"
 
 #define PAD_CONFIG_SLEW_RATE_SLOW (0 << 0)
