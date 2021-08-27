@@ -18,7 +18,7 @@
 #include <SystemManager/SystemManagerCommon.hpp>
 #include <bsp/common.hpp>
 #include <bsp/rtc/rtc.hpp>
-#include <bsp/keyboard/key_codes.hpp>
+#include <hal/key_input/KeyEventDefinitions.hpp>
 #include <log.hpp>
 #include <Logger.hpp>
 #include <service-appmgr/Controller.hpp>

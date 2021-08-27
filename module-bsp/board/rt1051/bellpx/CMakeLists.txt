@@ -12,9 +12,11 @@ target_sources(
     PRIVATE
         hal/temperature_source/TemperatureSource.cpp
         hal/battery_charger/BatteryCharger.cpp
+	    hal/key_input/KeyInput.cpp
         pin_mux.c
         clock_config.cpp
         irq_gpio.cpp
+
 
     PUBLIC
         eink-config.h

@@ -4,7 +4,7 @@
 #pragma once
 
 #include <cstdint>
-#include <bsp/keyboard/key_codes.hpp>
+#include <hal/key_input/KeyEventDefinitions.hpp>
 
 /// default application timer trigger
 const inline uint32_t keyTimerMs = 200;

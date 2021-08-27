@@ -13,8 +13,8 @@
 #include "Service/Service.hpp" // for Service
 #include "Timers/TimerHandle.hpp"
 #include "SwitchData.hpp"                  // for SwitchData
-#include "SystemManager/SystemManagerCommon.hpp" // for SystemManager
-#include "bsp/keyboard/key_codes.hpp"      // for bsp
+#include <SystemManager/SystemManagerCommon.hpp>
+#include <hal/key_input/KeyEventDefinitions.hpp>
 #include "gui/Common.hpp"                  // for ShowMode
 #include "projdefs.h"                      // for pdMS_TO_TICKS
 #include <PhoneModes/Observer.hpp>

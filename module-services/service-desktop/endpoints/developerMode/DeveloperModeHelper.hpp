@@ -8,7 +8,7 @@
 #include <Common/Query.hpp>
 #include <Service/Common.hpp>
 #include <Service/Service.hpp>
-#include <bsp/keyboard/key_codes.hpp>
+#include <hal/key_input/KeyEventDefinitions.hpp>
 #include <input/InputEvent.hpp>
 #include <module-db/Interface/SMSRecord.hpp>
 #include <endpoints/BaseHelper.hpp>

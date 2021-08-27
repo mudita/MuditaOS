@@ -11,7 +11,6 @@
 #include <MessageType.hpp>
 #include <Service/Worker.hpp>
 #include <bsp/cellular/bsp_cellular.hpp>
-#include <bsp/keyboard/keyboard.hpp>
 #include <bsp/magnetometer/magnetometer.hpp>
 #include <bsp/rtc/rtc.hpp>
 #include <bsp/torch/torch.hpp>
@@ -46,7 +45,8 @@ extern "C"
 
 WorkerEventCommon::WorkerEventCommon(sys::Service *service)
     : sys::Worker(service, stackDepthBytes),
-      service(service), batteryCharger{hal::battery::AbstractBatteryCharger::Factory::create(service)}
+      service(service), batteryCharger{hal::battery::AbstractBatteryCharger::Factory::create(service)},
+      keyInput{hal::key_input::AbstractKeyInput::Factory::create()}
 {}
 
 bool WorkerEventCommon::handleMessage(uint32_t queueID)
@@ -68,7 +68,7 @@ bool WorkerEventCommon::handleMessage(uint32_t queueID)
         if (!queue->Dequeue(&notification, 0)) {
             return false;
         }
-        for (const auto &key : bsp::keyboard::getKeyEvents(notification)) {
+        for (const auto &key : keyInput->getKeyEvents(notification)) {
             processKeyEvent(key.event, key.code);
         }
     }
@@ -135,7 +135,7 @@ bool WorkerEventCommon::initEventQueues()
 
 bool WorkerEventCommon::initCommonHardwareComponents()
 {
-    bsp::keyboard::init(queues[static_cast<int32_t>(WorkerEventQueues::queueKeyboardIRQ)]->GetQueueHandle());
+    keyInput->init(queues[static_cast<int32_t>(WorkerEventQueues::queueKeyboardIRQ)]->GetQueueHandle());
     auto queueBatteryHandle = queues[static_cast<int32_t>(WorkerEventQueues::queueBattery)]->GetQueueHandle();
     auto queueChargerDetect = queues[static_cast<int32_t>(WorkerEventQueues::queueChargerDetect)]->GetQueueHandle();
     batteryCharger->init(queueBatteryHandle, queueChargerDetect);
@@ -171,7 +171,7 @@ bool WorkerEventCommon::deinit(void)
 
     deinitProductHardware();
 
-    bsp::keyboard::deinit();
+    keyInput->deinit();
     batteryCharger->deinit();
     battery_level_check::deinit();
 
