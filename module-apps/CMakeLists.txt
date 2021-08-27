@@ -15,9 +15,6 @@ option(ENABLE_APP_ANTENNA "Enable application antenna" OFF)
 set(APPLICATIONS
     alarm-clock
     antenna
-    bell-alarm
-    bell-main
-    bell-settings
     calculator
     calendar
     call
