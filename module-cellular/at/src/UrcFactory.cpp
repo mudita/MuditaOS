@@ -14,7 +14,6 @@
 #include <UrcCpin.hpp>
 #include <UrcQiurc.hpp>
 #include <UrcRing.hpp>
-#include <UrcQSimstat.hpp>
 
 using namespace at::urc;
 
@@ -60,9 +59,6 @@ std::unique_ptr<Urc> UrcFactory::Create(const std::string &urcMessage)
     }
     else if (Qiurc::isURC(head)) {
         return std::make_unique<Qiurc>(body);
-    }
-    else if (QSimstat::isURC(head)) {
-        return std::make_unique<QSimstat>(body);
     }
 
     return std::make_unique<Urc>(body, head);

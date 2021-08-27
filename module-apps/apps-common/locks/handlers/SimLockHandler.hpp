@@ -13,6 +13,7 @@
 namespace locks
 {
     using StoredLockInput               = std::vector<unsigned int>;
+    constexpr auto simResponseTimerName = "SimResponseTimer";
 
     class SimLockHandler
     {
@@ -26,6 +27,8 @@ namespace locks
         bool simReady                         = false;
         StoredLockInput storedFirstInput;
         StoredLockInput storedSecondInput;
+
+        sys::TimerHandle simResponseTimer;
 
         void clearStoredInputs();
         void setSimInputTypeAction(SimInputTypeAction _simInputTypeAction);
@@ -67,7 +70,6 @@ namespace locks
         sys::MessagePointer handleSimPinChangedMessage();
         sys::MessagePointer handleSimAvailabilityMessage();
         sys::MessagePointer handleSimReadyMessage();
-        sys::MessagePointer handleSimNotInsertedMessage();
         sys::MessagePointer handleSimNotRespondingMessage();
 
         void getSettingsSimSelect(const std::string &settingsSim);

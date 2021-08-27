@@ -517,9 +517,6 @@ namespace app::manager
                 });
         connect(typeid(cellular::msg::notification::SimReady),
                 [&](sys::Message *request) -> sys::MessagePointer { return simLockHandler.handleSimReadyMessage(); });
-        connect(typeid(cellular::msg::notification::SimNotInserted), [&](sys::Message *request) -> sys::MessagePointer {
-            return simLockHandler.handleSimNotInsertedMessage();
-        });
         connect(typeid(cellular::msg::notification::ModemStateChanged),
                 [&](sys::Message *request) -> sys::MessagePointer {
                     auto data = static_cast<cellular::msg::notification::ModemStateChanged *>(request);
