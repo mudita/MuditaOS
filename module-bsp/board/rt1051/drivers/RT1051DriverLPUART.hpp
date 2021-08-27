@@ -5,7 +5,7 @@
 
 #include "drivers/lpuart/DriverLPUART.hpp"
 #include "RT1051DriverOscillator.hpp"
-#include "board/rt1051/common/clock_config.h"
+#include "board/clock_config.h"
 
 namespace drivers
 {

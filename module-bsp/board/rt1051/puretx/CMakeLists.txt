@@ -12,7 +12,13 @@ target_sources(
     PRIVATE
         hal/battery_charger/BatteryCharger.cpp
         bsp/battery_charger/battery_charger.cpp
+        pin_mux.c
+        clock_config.cpp
+        irq_gpio.cpp
         
     PUBLIC
         eink-config.h
+        board/pin_mux.h
+        board/clock_config.h
+        board/irq_gpio.hpp
 )

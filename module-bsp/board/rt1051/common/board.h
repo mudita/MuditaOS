@@ -34,7 +34,7 @@
 #ifndef _BOARD_H_
 #define _BOARD_H_
 
-#include "clock_config.h"
+#include "board/clock_config.h"
 #include "fsl_clock.h"
 #include "fsl_common.h"
 #include "fsl_gpio.h"

@@ -35,7 +35,6 @@ target_sources(module-bsp
 		common/audio.cpp
 		common/board.cpp
 		common/chip.cpp
-		common/clock_config.cpp
 		common/fsl_drivers/fsl_adc.c
 		common/fsl_drivers/fsl_cache.c
 		common/fsl_drivers/fsl_clock.c
@@ -65,8 +64,6 @@ target_sources(module-bsp
 		common/fsl_drivers/fsl_src.c
 		common/fsl_drivers/fsl_usdhc.c
 		common/fsl_drivers/fsl_wdog.c
-		common/irq/irq_gpio.cpp
-		common/pin_mux.c
 		common/startup_mimxrt1052.cpp
 		common/system_MIMXRT1051.c
 		drivers/RT1051DriverDMA.cpp
