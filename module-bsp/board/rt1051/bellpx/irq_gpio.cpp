@@ -10,7 +10,7 @@
 
 #include "board/rt1051/bsp/eink/bsp_eink.h"
 #include <hal/battery_charger/AbstractBatteryCharger.hpp>
-#include "bsp/keyboard/keyboard.hpp"
+#include <hal/key_input/AbstractKeyInput.hpp>
 #include "bsp/BoardDefinitions.hpp"
 #include "bsp/light_sensor/light_sensor.hpp"
 
@@ -107,7 +107,7 @@ namespace bsp
             uint32_t irq_mask                   = GPIO_GetPinsInterruptFlags(GPIO2);
 
             if (irq_mask & (1 << BOARD_KEYBOARD_IRQ_GPIO_PIN)) {
-                xHigherPriorityTaskWoken |= bsp::keyboard::IRQHandler();
+                xHigherPriorityTaskWoken |= hal::key_input::generalIRQHandler();
             }
 
             // Clear all IRQs

@@ -5,7 +5,6 @@
 
 #include "InputEvent.hpp"
 #include "Profile.hpp"
-#include <bsp/keyboard/key_codes.hpp>
 #include <common_data/RawKey.hpp>
 #include <cstdint>
 #include <map>

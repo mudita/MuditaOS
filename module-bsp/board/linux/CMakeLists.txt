@@ -11,7 +11,6 @@ target_sources(module-bsp
                 eink_frontlight/eink_frontlight.cpp
                 eink/ED028TC1.c
                 headset/headset.cpp
-                keyboard/keyboard.cpp
                 keypad_backlight/keypad_backlight.cpp
                 light_sensor/light_sensor.cpp
                 lpm/LinuxLPM.cpp
@@ -24,6 +23,7 @@ target_sources(module-bsp
                 watchdog/watchdog.cpp
                 hal/temperature_source/TemperatureSource.cpp
                 hal/battery_charger/BatteryCharger.cpp
+                hal/key_input/KeyInput.cpp
 
                 ${CMAKE_CURRENT_BINARY_DIR}/eink-config.h
 )

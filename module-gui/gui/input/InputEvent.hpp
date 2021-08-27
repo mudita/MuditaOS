@@ -6,7 +6,6 @@
 #include <sstream>
 #include <cstdint>
 #include <type_traits>
-#include "bsp/keyboard/key_codes.hpp"
 #include "common_data/RawKey.hpp"
 
 namespace gui
