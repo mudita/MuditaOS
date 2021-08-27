@@ -21,7 +21,7 @@ namespace sys
 namespace parserFSM
 {
 
-    class DeveloperModeHelperCommon : public BaseHelper
+    class DeveloperModeHelper : public BaseHelper
     {
         static auto getKeyCode(int val) noexcept -> bsp::KeyCodes;
         bool sendKeypress(bsp::KeyCodes keyCode, gui::InputEvent::State state);
@@ -34,7 +34,7 @@ namespace parserFSM
         auto prepareSMS(Context &context) -> ProcessResult;
 
       public:
-        explicit DeveloperModeHelperCommon(sys::Service *p) : BaseHelper(p)
+        explicit DeveloperModeHelper(sys::Service *p) : BaseHelper(p)
         {}
 
       private:

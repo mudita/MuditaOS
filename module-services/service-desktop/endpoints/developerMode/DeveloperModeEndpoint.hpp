@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "DeveloperModeHelperCommon.hpp"
+#include "DeveloperModeHelper.hpp"
 #include "Mode/UI_Helper.hpp"
 #include <endpoints/Endpoint.hpp>
 #include <parser/ParserUtils.hpp>
@@ -25,12 +25,12 @@ namespace sys
 class DeveloperModeEndpoint : public parserFSM::Endpoint
 {
   private:
-    const std::unique_ptr<parserFSM::DeveloperModeHelperCommon> helper;
+    const std::unique_ptr<parserFSM::DeveloperModeHelper> helper;
     const std::unique_ptr<parserFSM::UI_Helper> uiHelper;
 
   public:
     explicit DeveloperModeEndpoint(sys::Service *_ownerServicePtr)
-        : Endpoint(_ownerServicePtr), helper(std::make_unique<parserFSM::DeveloperModeHelperCommon>(ownerServicePtr)),
+        : Endpoint(_ownerServicePtr), helper(std::make_unique<parserFSM::DeveloperModeHelper>(ownerServicePtr)),
           uiHelper(std::make_unique<parserFSM::UI_Helper>(ownerServicePtr))
     {
         debugName = "DeveloperModeEndpoint";
