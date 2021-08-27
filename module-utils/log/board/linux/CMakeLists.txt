@@ -1,5 +1,5 @@
 target_sources(
-    board
+    log
 PRIVATE
     log_linux.cpp
 )

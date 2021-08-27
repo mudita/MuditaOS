@@ -29,20 +29,6 @@ struct HCI;
 
 namespace bluetooth
 {
-    enum Message : std::uint8_t
-    {
-        /// asynchronous messages to use on event from irq
-        EvtSending,        /// Bt stack ordered a write transaction and it is pending
-        EvtSent,           /// trigger Bt stack wrote, enable writting in HCI in BluetoothWorker task
-        EvtSendingError,   /// bsp error on send
-        EvtReceiving,      /// Bt stack requested a receive transaction and it is pending
-        EvtReceived,       /// trigger Bt stack received, start processing HCI in BluetoothWorker task
-        EvtRecUnwanted,    /// not requested recieve - probably receive came to fast from sent...
-        EvtReceivingError, /// bsp error on receive
-        EvtUartError,      /// generic uart error
-        EvtErrorRec,       /// there was error o queue receive
-    };
-
     inline const char *MessageCstr(Message what)
     {
         switch (what) {

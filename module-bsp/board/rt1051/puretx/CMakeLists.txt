@@ -19,7 +19,7 @@ target_sources(
         clock_config.cpp
         irq_gpio.cpp
         debug_console.cpp
-        
+
     PUBLIC
         eink-config.h
         board/pin_mux.h

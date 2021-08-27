@@ -15,5 +15,19 @@ elseif (${BOARD_REVISION} EQUAL 6)
         HW_SDRAM_64_MB=0
     )
 else ()
-    message (FATAL_ERROR "Unsupported board revision selected!") 
+    message (FATAL_ERROR "Unsupported board revision selected!")
 endif ()
+
+target_include_directories(
+        board
+    PUBLIC
+        $<BUILD_INTERFACE:
+            ${CMAKE_CURRENT_SOURCE_DIR}
+        >
+)
+
+target_sources(
+	board
+		PRIVATE
+	eink-config.h
+)

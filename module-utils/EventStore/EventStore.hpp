@@ -10,7 +10,6 @@
 // it's not meant to serve as polling interface - rather to serve data
 
 #include <cstddef>
-#include <service-cellular/api/common.hpp>
 #include <string>
 
 namespace cpp_freertos
@@ -110,6 +109,12 @@ namespace Store
         GSM(const GSM &) = delete;
         GSM &operator=(const GSM &) = delete;
 
+        enum class SimSlot
+        {
+            SIM1 = 0,
+            SIM2 = 1
+        };
+
         enum class Tray
         {
             OUT,
@@ -119,8 +124,8 @@ namespace Store
         /// selected - tray selection settings settable sim tray
         enum class SIM
         {
-            SIM1 = static_cast<int>(cellular::api::SimSlot::SIM1),
-            SIM2 = static_cast<int>(cellular::api::SimSlot::SIM2),
+            SIM1 = static_cast<int>(SimSlot::SIM1),
+            SIM2 = static_cast<int>(SimSlot::SIM2),
             SIM_FAIL,
             SIM_UNKNOWN,
             NONE,

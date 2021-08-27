@@ -12,7 +12,6 @@ extern "C"
 #include "fsl_lpuart.h"
 #endif
 }
-#include "audio.hpp"
 #include "chip.hpp"
 #include "board/irq_gpio.hpp"
 #include "reboot_codes.hpp"
