@@ -7,7 +7,7 @@
 #include "MockTagsFetcher.hpp"
 
 #include <models/SongsRepository.hpp>
-
+#include <tags_fetcher/TagsFetcher.hpp>
 #include <filesystem>
 #include <fstream>
 #include <stdexcept>
@@ -101,11 +101,8 @@ TEST_F(SongsRepositoryFixture, ScanWithTagsReturn)
     auto rawMock         = tagsFetcherMock.get();
     auto repo = std::make_unique<app::music_player::SongsRepository>(std::move(tagsFetcherMock), musicDirPath);
 
-    auto fooTags = ::audio::Tags();
-    auto barTags = ::audio::Tags();
-
-    fooTags.title = "foo";
-    barTags.title = "bar";
+    auto fooTags = tags::fetcher::Tags{"foo"};
+    auto barTags = tags::fetcher::Tags{"foo"};
 
     ON_CALL(*rawMock, getFileTags(fs::path(musicDirPath / "foo").c_str())).WillByDefault(Return(fooTags));
     ON_CALL(*rawMock, getFileTags(fs::path(musicDirPath / "bar").c_str())).WillByDefault(Return(barTags));
@@ -125,14 +122,8 @@ TEST_F(SongsRepositoryFixture, FileIndex)
     auto fooPath = musicDirPath / "foo";
     auto barPath = musicDirPath / "bar";
 
-    auto fooTags = ::audio::Tags();
-    auto barTags = ::audio::Tags();
-
-    fooTags.title    = "foo";
-    fooTags.filePath = fooPath.c_str();
-
-    barTags.title    = "bar";
-    barTags.filePath = barPath.c_str();
+    auto fooTags = tags::fetcher::Tags(fooPath);
+    auto barTags = tags::fetcher::Tags(barPath);
 
     ON_CALL(*rawMock, getFileTags(fs::path(musicDirPath / "foo").c_str())).WillByDefault(Return(fooTags));
     ON_CALL(*rawMock, getFileTags(fs::path(musicDirPath / "bar").c_str())).WillByDefault(Return(barTags));

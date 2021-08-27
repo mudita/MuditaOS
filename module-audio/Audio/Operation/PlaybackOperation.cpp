@@ -36,7 +36,6 @@ namespace audio
         if (dec == nullptr) {
             throw AudioInitException("Error during initializing decoder", RetCode::FileDoesntExist);
         }
-        tags        = dec->fetchTags();
         auto format = dec->getSourceFormat();
         LOG_DEBUG("Source format: %s", format.toString().c_str());
 
@@ -183,7 +182,7 @@ namespace audio
         }
 
         // adjust new profile with information from file's tags
-        newProfile->SetSampleRate(tags->sample_rate);
+        newProfile->SetSampleRate(dec->getSourceFormat().getSampleRate());
         newProfile->SetInOutFlags(static_cast<uint32_t>(audio::codec::Flags::OutputStereo));
 
         /// profile change - (re)create output device; stop audio first by

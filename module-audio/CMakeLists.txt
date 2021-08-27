@@ -72,7 +72,10 @@ target_link_libraries(${PROJECT_NAME}
                 minimp3::minimp3
         PRIVATE
                 math
+                tagsfetcher
 )
+
+add_subdirectory(tags_fetcher)
 
 if (${ENABLE_TESTS})
     add_subdirectory(Audio/test)

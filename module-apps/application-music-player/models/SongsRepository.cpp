@@ -9,6 +9,7 @@
 #include <service-audio/AudioServiceName.hpp>
 #include <time/ScopedTime.hpp>
 #include <service-audio/AudioMessage.hpp>
+#include <tags_fetcher/TagsFetcher.hpp>
 
 #include <filesystem>
 
@@ -17,9 +18,9 @@ namespace app::music_player
     ServiceAudioTagsFetcher::ServiceAudioTagsFetcher(Application *application) : application(application)
     {}
 
-    std::optional<audio::Tags> ServiceAudioTagsFetcher::getFileTags(const std::string &filePath) const
+    std::optional<tags::fetcher::Tags> ServiceAudioTagsFetcher::getFileTags(const std::string &filePath) const
     {
-        return AudioServiceAPI::GetFileTags(application, filePath);
+        return tags::fetcher::fetchTags(filePath);
     }
 
     SongsRepository::SongsRepository(std::unique_ptr<AbstractTagsFetcher> tagsFetcher, std::string musicFolderName)
@@ -45,14 +46,15 @@ namespace app::music_player
                     }
                 }
             }
-            std::sort(musicFiles.begin(), musicFiles.end(), [](audio::Tags t1, audio::Tags t2) {
-                return t1.filePath < t2.filePath;
-            });
+            std::sort(
+                musicFiles.begin(), musicFiles.end(), [](const tags::fetcher::Tags &t1, const tags::fetcher::Tags &t2) {
+                    return t1.filePath < t2.filePath;
+                });
         }
         LOG_INFO("Total number of music files found: %u", static_cast<unsigned int>(musicFiles.size()));
     }
 
-    std::vector<audio::Tags> SongsRepository::getMusicFilesList() const
+    std::vector<tags::fetcher::Tags> SongsRepository::getMusicFilesList() const
     {
         return musicFiles;
     }

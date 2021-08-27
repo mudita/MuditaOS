@@ -242,7 +242,7 @@ namespace gui
         onLoadCallback = [&](std::shared_ptr<AlarmsRecord> alarm) {
             switch (itemName) {
             case AlarmOptionItemName::Sound: {
-                auto it = std::find_if(songsList.begin(), songsList.end(), [alarm](const audio::Tags &tag) {
+                auto it = std::find_if(songsList.begin(), songsList.end(), [alarm](const tags::fetcher::Tags &tag) {
                     return tag.filePath == alarm->path.c_str();
                 });
                 if (it == songsList.end()) {
@@ -308,22 +308,17 @@ namespace gui
         };
     }
 
-    std::vector<audio::Tags> AlarmOptionsItem::getMusicFilesList()
+    std::vector<tags::fetcher::Tags> AlarmOptionsItem::getMusicFilesList()
     {
         const auto musicFolder = (purefs::dir::getUserDiskPath() / "music").string();
-        std::vector<audio::Tags> musicFiles;
+        std::vector<tags::fetcher::Tags> musicFiles;
         LOG_INFO("Scanning music folder: %s", musicFolder.c_str());
         for (const auto &ent : std::filesystem::directory_iterator(musicFolder)) {
             if (!ent.is_directory()) {
                 const auto filePath = std::string(musicFolder) + "/" + ent.path().filename().c_str();
-                auto fileTags       = AudioServiceAPI::GetFileTags(application, filePath);
-                if (fileTags) {
-                    musicFiles.push_back(*fileTags);
-                    LOG_DEBUG("file: %s found", ent.path().filename().c_str());
-                }
-                else {
-                    LOG_ERROR("Not an audio file %s", ent.path().filename().c_str());
-                }
+                auto fileTags       = tags::fetcher::fetchTags(filePath);
+                musicFiles.push_back(fileTags);
+                LOG_DEBUG("file: %s found", ent.path().filename().c_str());
             }
         }
         LOG_INFO("Total number of music files found: %u", static_cast<unsigned int>(musicFiles.size()));

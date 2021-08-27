@@ -46,6 +46,7 @@ target_link_libraries(application-music-player
     PUBLIC
         apps-common
         module-audio
+        tagsfetcher
 )
 
 if (${ENABLE_TESTS})
