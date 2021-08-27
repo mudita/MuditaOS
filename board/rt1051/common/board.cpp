@@ -12,9 +12,8 @@ extern "C"
 #include "fsl_lpuart.h"
 #endif
 }
-#include "audio.hpp"
 #include "chip.hpp"
-#include "irq/irq_gpio.hpp"
+#include "irq_gpio.hpp"
 
 #include <cstdint>
 

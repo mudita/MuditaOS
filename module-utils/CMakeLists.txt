@@ -48,7 +48,6 @@ if (${ENABLE_TESTS})
     add_subdirectory( test )
 endif()
 
-add_subdirectory(board)
 add_subdirectory(bootconfig)
 add_subdirectory(Clipboard)
 add_subdirectory(EventStore)

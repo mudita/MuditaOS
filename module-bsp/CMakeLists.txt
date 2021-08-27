@@ -58,6 +58,11 @@ target_compile_definitions(${PROJECT_NAME}
         )
 
 target_include_directories(${PROJECT_NAME}
+        PRIVATE
+        $<BUILD_INTERFACE:
+            ${CMAKE_CURRENT_SOURCE_DIR}/common
+        >
+
         PUBLIC
         $<BUILD_INTERFACE:
             ${CMAKE_CURRENT_SOURCE_DIR}
@@ -71,10 +76,11 @@ target_link_libraries(${PROJECT_NAME}
     PUBLIC
         eventstore
         module-os
-        service-bluetooth
-        ${TARGET_LIBRARIES}
     PRIVATE
         time-constants
+        magic_enum
+        messagetype
+        board
 )
 
 if (${ENABLE_TESTS})

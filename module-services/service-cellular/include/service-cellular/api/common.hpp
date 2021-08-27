@@ -26,12 +26,6 @@ namespace cellular
             Disabled
         };
 
-        enum class SimSlot
-        {
-            SIM1 = 0,
-            SIM2 = 1
-        };
-
         enum class ModemState
         {
             Startup,

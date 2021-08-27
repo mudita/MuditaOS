@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "module-bsp/board/rt1051/common/fsl_drivers/fsl_common.h"
+#include "fsl_common.h"
 
 static inline bool PWM_GetPwmGeneratorState(PWM_Type *base, uint8_t subModulesToStop)
 {

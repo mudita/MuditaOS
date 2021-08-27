@@ -13,5 +13,6 @@ target_include_directories(eventstore
 target_link_libraries(eventstore
    PRIVATE
       module-os
+      log-api
 )
 

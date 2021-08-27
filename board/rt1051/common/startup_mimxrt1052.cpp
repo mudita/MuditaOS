@@ -453,7 +453,6 @@ extern "C"
 
 #include "MIMXRT1051.h"
 #include "macros.h"
-#include <log.hpp>
 #include <cinttypes>
 #include <cstdlib>
 #include <cstdint>

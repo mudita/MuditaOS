@@ -17,15 +17,6 @@
 #include "bsp/magnetometer/magnetometer.hpp"
 #include "bsp/light_sensor/light_sensor.hpp"
 
-#if 0 // TODO:M.P implement the rest of BSP drivers
-
-#include "bsp_cellular.h"
-
-#include "bsp_usbc.h"
-#include "log.h"
-
-#endif
-
 namespace bsp
 {
 
