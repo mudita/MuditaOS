@@ -9,6 +9,7 @@
 #include <ListView.hpp>
 #include <purefs/filesystem_paths.hpp>
 #include <service-audio/AudioServiceAPI.hpp>
+#include <tags_fetcher/TagsFetcher.hpp>
 
 SoundsModel::SoundsModel(std::shared_ptr<AbstractSoundsPlayer> soundsPlayer) : soundsPlayer{std::move(soundsPlayer)}
 {}
@@ -105,10 +106,8 @@ void SoundsModel::applyItems(const std::vector<std::filesystem::path> &sounds,
         }
 
         std::string itemTitle;
-        auto fileTags = AudioServiceAPI::GetFileTags(app, sound);
-        if (fileTags) {
-            itemTitle = fileTags->title;
-        }
+        auto fileTags = tags::fetcher::fetchTags(sound);
+        itemTitle     = fileTags.title;
 
         if (itemTitle.empty()) {
             itemTitle = sound.filename();

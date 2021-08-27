@@ -136,10 +136,6 @@ User should be aware of following constraints:
 Failing to adhere will end in returning appropriate error.  
 
 
-##### std::optional<Tags> GetFileTags(const char *filename);
-
-Fetches metadata of specified audio file. It can be invoked in any time. If file exists and is supported, audio meta tags structure will be returned.
-
 # Missing features
 #### Bluetooth audio device support
 Currently support for BT audio devices is marginal. There are some code parts related to BT but they absolutely cannot be treated as target implementation. Adding BT support in my opinion should be split into several steps:

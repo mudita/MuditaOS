@@ -47,7 +47,6 @@ namespace audio
 
         std::unique_ptr<Stream> dataStreamOut;
         std::unique_ptr<Decoder> dec;
-        std::unique_ptr<Tags> tags;
         std::unique_ptr<StreamConnection> outputConnection;
 
         DecoderWorker::EndOfFileCallback endOfFileCallback;

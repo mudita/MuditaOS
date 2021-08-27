@@ -17,6 +17,7 @@
 
 #include <cstring>
 #include <cstdint>
+#include <tags_fetcher/TagsFetcher.hpp>
 
 namespace audio
 {
@@ -25,53 +26,6 @@ namespace audio
         constexpr inline auto monoSound   = 1;
         constexpr inline auto stereoSound = 2;
     } // namespace channel
-
-    struct Tags
-    {
-
-        /* Total audio duration in seconds */
-        uint32_t total_duration_s = 0;
-        /* Audio duration - hours part */
-        uint32_t duration_hour = 0;
-        /* Audio duration - minutes part */
-        uint32_t duration_min = 0;
-        /* Audio duration - seconds part */
-        uint32_t duration_sec = 0;
-
-        /* Sample rate */
-        uint32_t sample_rate = 0;
-        /* Number of channels */
-        uint32_t num_channel = 0;
-        /* bitrate */
-        uint32_t bitrate = 0;
-
-        std::string artist   = "";
-        std::string genre    = "";
-        std::string title    = "";
-        std::string album    = "";
-        std::string year     = "";
-        std::string filePath = "";
-
-        Tags()
-        {}
-
-        // Copy constructor
-        Tags(const Tags &p2)
-        {
-            total_duration_s = p2.total_duration_s;
-            duration_hour    = p2.duration_hour;
-            duration_min     = p2.duration_min;
-            duration_sec     = p2.duration_sec;
-            sample_rate      = p2.sample_rate;
-            num_channel      = p2.num_channel;
-            artist           = p2.artist;
-            genre            = p2.genre;
-            title            = p2.title;
-            album            = p2.album;
-            year             = p2.year;
-            filePath         = p2.filePath;
-        }
-    };
 
     class Decoder : public Source
     {
@@ -82,8 +36,6 @@ namespace audio
         virtual ~Decoder();
 
         virtual uint32_t decode(uint32_t samplesToRead, int16_t *pcmData) = 0;
-
-        std::unique_ptr<Tags> fetchTags();
 
         // Range 0 - 1
         virtual void setPosition(float pos) = 0;
@@ -120,6 +72,7 @@ namespace audio
 
       protected:
         virtual auto getBitWidth() -> unsigned int = 0;
+        virtual std::unique_ptr<tags::fetcher::Tags> fetchTags();
 
         void convertmono2stereo(int16_t *pcm, uint32_t samplecount);
 
@@ -135,7 +88,7 @@ namespace audio
 
         // Worker buffer used for converting mono stream to stereo
         std::unique_ptr<int16_t[]> workerBuffer;
-        std::unique_ptr<Tags> tag;
+        std::unique_ptr<tags::fetcher::Tags> tags;
         bool isInitialized = false;
 
         // decoding worker

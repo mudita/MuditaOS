@@ -9,7 +9,7 @@
 #include <Label.hpp>
 #include <Image.hpp>
 #include <BoxLayout.hpp>
-#include <Audio/decoder/Decoder.hpp>
+#include <tags_fetcher/TagsFetcher.hpp>
 
 namespace gui
 {
@@ -32,12 +32,11 @@ namespace gui
         gui::Image *rightArrow        = nullptr;
         AlarmOptionItemName itemName;
         std::vector<std::string> optionsNames;
-        std::vector<audio::Tags> songsList;
-
         /// pointer to audio operations which allows to make audio preview
         std::unique_ptr<app::AbstractAudioOperations> audioOperations;
 
-        MusicStatus musicStatus        = MusicStatus::Stop;
+        std::vector<tags::fetcher::Tags> songsList;
+        MusicStatus musicStatus = MusicStatus::Stop;
         audio::Token currentlyPreviewedToken;
         std::string currentlyPreviewedPath;
 
@@ -48,7 +47,7 @@ namespace gui
         std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr;
         void prepareOptionsNames();
         void applyCallbacks();
-        std::vector<audio::Tags> getMusicFilesList();
+        std::vector<tags::fetcher::Tags> getMusicFilesList();
 
       public:
         AlarmOptionsItem(app::Application *app,

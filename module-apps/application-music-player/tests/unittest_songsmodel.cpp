@@ -41,6 +41,6 @@ TEST(SongsModel, createDataNoSongs)
     auto model    = SongsModel(mockRepo);
 
     EXPECT_CALL(*mockRepo, scanMusicFilesList);
-    EXPECT_CALL(*mockRepo, getMusicFilesList).WillRepeatedly(Return(std::vector<audio::Tags>()));
+    EXPECT_CALL(*mockRepo, getMusicFilesList).WillRepeatedly(Return(std::vector<tags::fetcher::Tags>()));
     model.createData([](const std::string &) { return true; }, []() {}, [](const UTF8 &) {}, []() {});
 }

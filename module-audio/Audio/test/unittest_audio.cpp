@@ -20,21 +20,24 @@
 
 using namespace audio;
 
-TEST_CASE("Test audio tags")
+TEST_CASE("Audio Decoder")
 {
-    SECTION(" Encoder tests ")
-    {
-        std::vector<std::string> testExtensions = {"flac", "wav", "mp3"};
-        for (auto ext : testExtensions) {
-            auto dec = audio::Decoder::Create(("testfiles/audio." + ext).c_str());
-            REQUIRE(dec);
-            auto tags = dec->fetchTags();
-            REQUIRE(tags);
-            REQUIRE(tags->title == ext + " Test track title - łąki");
-            REQUIRE(tags->artist == ext + " Test artist name - łąki");
-            REQUIRE(tags->album == ext + " Test album title - łąki");
-            REQUIRE(tags->year == "2020");
-        }
+    std::vector<std::string> testExtensions = {"flac", "wav", "mp3"};
+    for (auto ext : testExtensions) {
+        auto dec = audio::Decoder::Create(("testfiles/audio." + ext).c_str());
+        REQUIRE(dec);
+    }
+}
+
+TEST_CASE(" Tags fetcher ")
+{
+    std::vector<std::string> testExtensions = {"flac", "wav", "mp3"};
+    for (auto ext : testExtensions) {
+        auto tags = tags::fetcher::fetchTags(("testfiles/audio." + ext).c_str());
+        REQUIRE(tags.title == ext + " Test track title - łąki");
+        REQUIRE(tags.artist == ext + " Test artist name - łąki");
+        REQUIRE(tags.album == ext + " Test album title - łąki");
+        REQUIRE(tags.year == "2020");
     }
 }
 

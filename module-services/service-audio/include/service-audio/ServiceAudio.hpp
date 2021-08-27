@@ -79,7 +79,6 @@ class ServiceAudio : public sys::Service
     auto HandlePause(const audio::Token &token) -> std::unique_ptr<AudioResponseMessage>;
     auto HandlePause(std::optional<audio::AudioMux::Input *> input) -> std::unique_ptr<AudioResponseMessage>;
     auto HandleResume(const audio::Token &token) -> std::unique_ptr<AudioResponseMessage>;
-    auto HandleGetFileTags(const std::string &fileName) -> std::unique_ptr<AudioResponseMessage>;
     void HandleEOF(const audio::Token &token);
     auto HandleKeyPressed(const int step) -> sys::MessagePointer;
     void MuteCurrentOperation();
