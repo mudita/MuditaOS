@@ -7,14 +7,14 @@ extern "C"
 #include "fsl_dcdc.h"
 #include "fsl_snvs_hp.h"
 #include "fsl_snvs_lp.h"
-#include "pin_mux.h"
+#include "board/pin_mux.h"
 #if LOG_LUART_ENABLED
 #include "fsl_lpuart.h"
 #endif
 }
 #include "audio.hpp"
 #include "chip.hpp"
-#include "irq/irq_gpio.hpp"
+#include "board/irq_gpio.hpp"
 
 #include <cstdint>
 
@@ -88,7 +88,7 @@ namespace bsp
 
         /* Disable MPU */
         ARM_MPU_Disable();
-
+        
         /* MPU configure:
          * Use ARM_MPU_RASR(DisableExec, AccessPermission, TypeExtField, IsShareable, IsCacheable, IsBufferable, SubRegionDisable, Size)
          * API in core_cm7.h.
@@ -113,6 +113,7 @@ namespace bsp
          * param SubRegionDisable  Sub-region disable field. 0=sub-region is enabled, 1=sub-region is disabled.
          * param Size              Region size of the region to be configured. use ARM_MPU_REGION_SIZE_xxx MACRO in core_cm7.h.
          */
+
 
         /* Region 0 setting: Memory with Device type, not shareable, non-cacheable. */
         MPU->RBAR = ARM_MPU_RBAR(0, 0xC0000000U);
@@ -193,7 +194,6 @@ namespace bsp
     void BoardInit()
     {
         PINMUX_InitBootPins();
-
         BOARD_InitBootClocks();
         BOARD_ConfigMPU();
 
