@@ -122,14 +122,6 @@ namespace AudioServiceAPI
     bool SendEvent(sys::Service *serv,
                    audio::EventType evt,
                    audio::Event::DeviceState state = audio::Event::DeviceState::Connected);
-    /**
-     * @brief Attempts to parse audio file for metatags.
-     *
-     * @param serv Requesting service.
-     * @param fileName Path to file to be parsed.
-     * @return audio::Tags on success, std::nullopt on failure
-     */
-    std::optional<audio::Tags> GetFileTags(sys::Service *serv, const std::string &fileName);
 
     /** @brief Sets vibrations setting state
      *

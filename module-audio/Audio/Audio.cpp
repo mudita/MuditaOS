@@ -25,17 +25,6 @@ namespace audio
         return currentOperation->GetPosition();
     }
 
-    std::optional<Tags> Audio::GetFileTags(const char *filename)
-    {
-        auto ret = Decoder::Create(filename);
-        if (ret == nullptr) {
-            return {};
-        }
-        else {
-            return *ret->fetchTags();
-        };
-    }
-
     audio::RetCode Audio::SendEvent(std::shared_ptr<Event> evt)
     {
         audioSinkState.UpdateState(evt);

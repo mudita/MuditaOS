@@ -292,14 +292,6 @@ void ServiceAudio::EnableContinuousVibration(std::optional<audio::AudioMux::Inpu
     }
 }
 
-std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleGetFileTags(const std::string &fileName)
-{
-    if (auto tag = Audio::GetFileTags(fileName.c_str())) {
-        return std::make_unique<AudioResponseMessage>(RetCode::Success, tag.value());
-    }
-    return std::make_unique<AudioResponseMessage>(RetCode::FileDoesntExist);
-}
-
 std::unique_ptr<AudioResponseMessage> ServiceAudio::HandlePause(const Token &token)
 {
     auto input = audioMux.GetInput(token);
@@ -616,10 +608,6 @@ sys::MessagePointer ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sy
     else if (msgType == typeid(AudioResumeRequest)) {
         auto *msg   = static_cast<AudioResumeRequest *>(msgl);
         responseMsg = HandleResume(msg->token);
-    }
-    else if (msgType == typeid(AudioGetFileTagsRequest)) {
-        auto *msg   = static_cast<AudioGetFileTagsRequest *>(msgl);
-        responseMsg = HandleGetFileTags(msg->fileName);
     }
     else if (msgType == typeid(AudioEventRequest)) {
         auto *msg   = static_cast<AudioEventRequest *>(msgl);

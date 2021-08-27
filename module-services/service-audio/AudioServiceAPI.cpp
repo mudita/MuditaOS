@@ -200,19 +200,6 @@ namespace AudioServiceAPI
         }
     }
 
-    std::optional<Tags> GetFileTags(sys::Service *serv, const std::string &fileName)
-    {
-        auto msg = std::make_shared<AudioGetFileTagsRequest>(fileName);
-
-        auto resp = SendAudioRequest(serv, msg);
-        if (resp->retCode == audio::RetCode::Success) {
-            return resp->tags;
-        }
-        else {
-            return std::nullopt;
-        }
-    }
-
     bool KeyPressed(sys::Service *serv, const int step)
     {
         auto msg = std::make_shared<AudioKeyPressedRequest>(step);

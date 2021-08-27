@@ -18,7 +18,7 @@ namespace testing::app::music_player
     {
       public:
         MOCK_METHOD(void, scanMusicFilesList, (), (override));
-        MOCK_METHOD(std::vector<audio::Tags>, getMusicFilesList, (), (const override));
+        MOCK_METHOD(std::vector<tags::fetcher::Tags>, getMusicFilesList, (), (const override));
         MOCK_METHOD(std::size_t, getFileIndex, (const std::string &filePath), (const override));
         MOCK_METHOD(std::string, getNextFilePath, (const std::string &filePath), (const override));
         MOCK_METHOD(std::string, getPreviousFilePath, (const std::string &filePath), (const override));
