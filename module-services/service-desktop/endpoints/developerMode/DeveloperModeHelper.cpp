@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "DeveloperModeHelperCommon.hpp"
+#include "DeveloperModeHelper.hpp"
 #include "service-db/SettingsMessages.hpp"
 #include <service-desktop/DesktopMessages.hpp>
 #include <parser/ParserUtils.hpp>
@@ -46,7 +46,7 @@ namespace
     }
 } // namespace
 
-auto DeveloperModeHelperCommon::processPut(Context &context) -> ProcessResult
+auto DeveloperModeHelper::processPut(Context &context) -> ProcessResult
 {
     auto body = context.getBody();
     auto code = http::Code::BadRequest;
@@ -151,7 +151,7 @@ auto DeveloperModeHelperCommon::processPut(Context &context) -> ProcessResult
     return {sent::no, endpoint::ResponseContext{.status = code}};
 }
 
-auto DeveloperModeHelperCommon::processGet(Context &context) -> ProcessResult
+auto DeveloperModeHelper::processGet(Context &context) -> ProcessResult
 {
     auto body = context.getBody();
     if (body[json::developerMode::getInfo].is_string()) {
@@ -190,7 +190,7 @@ auto DeveloperModeHelperCommon::processGet(Context &context) -> ProcessResult
     }
 }
 
-auto DeveloperModeHelperCommon::getKeyCode(int val) noexcept -> bsp::KeyCodes
+auto DeveloperModeHelper::getKeyCode(int val) noexcept -> bsp::KeyCodes
 {
     switch (val) {
     case 0:
@@ -249,7 +249,7 @@ auto DeveloperModeHelperCommon::getKeyCode(int val) noexcept -> bsp::KeyCodes
     };
 }
 
-bool DeveloperModeHelperCommon::sendKeypress(bsp::KeyCodes keyCode, gui::InputEvent::State state)
+bool DeveloperModeHelper::sendKeypress(bsp::KeyCodes keyCode, gui::InputEvent::State state)
 {
     RawKey key{.state = RawKey::State::Released, .keyCode = keyCode};
 
@@ -259,14 +259,14 @@ bool DeveloperModeHelperCommon::sendKeypress(bsp::KeyCodes keyCode, gui::InputEv
     return owner->bus.sendUnicast(std::move(message), service::name::evt_manager);
 }
 
-void DeveloperModeHelperCommon::requestSimChange(const int simSelected)
+void DeveloperModeHelper::requestSimChange(const int simSelected)
 {
     auto arg = (simSelected == static_cast<int>(cellular::api::SimSlot::SIM2)) ? cellular::api::SimSlot::SIM2
                                                                                : cellular::api::SimSlot::SIM1;
     owner->bus.sendUnicast<cellular::msg::request::sim::SetActiveSim>(arg);
 }
 
-bool DeveloperModeHelperCommon::requestCellularPowerStateChange(const int cellularState)
+bool DeveloperModeHelper::requestCellularPowerStateChange(const int cellularState)
 {
     bool res = false;
     if (cellularState == 1) {
@@ -282,7 +282,7 @@ bool DeveloperModeHelperCommon::requestCellularPowerStateChange(const int cellul
     }
     return res;
 }
-auto DeveloperModeHelperCommon::smsRecordFromJson(const json11::Json &msgJson) -> SMSRecord
+auto DeveloperModeHelper::smsRecordFromJson(const json11::Json &msgJson) -> SMSRecord
 {
     auto record = SMSRecord();
 
@@ -294,7 +294,7 @@ auto DeveloperModeHelperCommon::smsRecordFromJson(const json11::Json &msgJson) -
     return record;
 }
 
-auto DeveloperModeHelperCommon::prepareSMS(Context &context) -> ProcessResult
+auto DeveloperModeHelper::prepareSMS(Context &context) -> ProcessResult
 {
     SMSRecord record = smsRecordFromJson(context.getBody());
 
@@ -323,14 +323,14 @@ auto DeveloperModeHelperCommon::prepareSMS(Context &context) -> ProcessResult
     return {sent::delayed, std::nullopt};
 }
 
-bool DeveloperModeHelperCommon::requestServiceStateInfo(sys::Service *serv)
+bool DeveloperModeHelper::requestServiceStateInfo(sys::Service *serv)
 {
     auto event = std::make_unique<sdesktop::developerMode::CellularStateInfoRequestEvent>();
     auto msg   = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
     return serv->bus.sendUnicast(std::move(msg), ServiceCellular::serviceName);
 }
 
-bool DeveloperModeHelperCommon::requestCellularSleepModeInfo(sys::Service *serv)
+bool DeveloperModeHelper::requestCellularSleepModeInfo(sys::Service *serv)
 {
     auto event = std::make_unique<sdesktop::developerMode::CellularSleepModeInfoRequestEvent>();
     auto msg   = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
