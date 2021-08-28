@@ -72,6 +72,8 @@
   "common_results_prefix": "Results: ",
   "common_search": "SEARCH",
   "common_accept": "ACCEPT",
+  "common_minute_lower": "minute",
+  "common_minutes_lower": "minutes",
   "locale_12hour_min": "%I:%M %p",
   "locale_12hour_min_short": "%I:%M",
   "locale_24hour_min": "%H:%M",
