@@ -15,10 +15,16 @@ target_include_directories(application-bell-powernap
 target_sources(application-bell-powernap
     PRIVATE
         ApplicationBellPowerNap.cpp
+        presenter/PowerNapMainWindowPresenter.cpp
         windows/PowerNapMainWindow.cpp
+        data/PowerNapListItem.cpp
+        models/PowerNapModel.cpp
 
         presenter/PowerNapMainWindowPresenter.hpp
         windows/PowerNapMainWindow.hpp
+        data/PowerNapListItem.hpp
+        data/PowerNapStyle.hpp
+        models/PowerNapModel.hpp
 
     PUBLIC
         include/application-bell-powernap/ApplicationBellPowerNap.hpp

@@ -28,8 +28,8 @@ namespace app
 
     void ApplicationBellPowerNap::createUserInterface()
     {
-        windowsFactory.attach(gui::name::window::main_window, [](Application *app, const std::string &name) {
-            auto presenter = std::make_unique<powernap::PowerNapMainWindowPresenter>();
+        windowsFactory.attach(gui::name::window::main_window, [this](Application *app, const std::string &name) {
+            auto presenter = std::make_unique<powernap::PowerNapMainWindowPresenter>(app, settings.get());
             return std::make_unique<gui::PowerNapMainWindow>(app, std::move(presenter));
         });
     }
