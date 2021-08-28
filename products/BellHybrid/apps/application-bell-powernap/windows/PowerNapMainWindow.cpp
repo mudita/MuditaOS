@@ -2,7 +2,9 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PowerNapMainWindow.hpp"
-
+#include <Style.hpp>
+#include <SideListView.hpp>
+#include <gui/input/InputEvent.hpp>
 namespace gui
 {
     PowerNapMainWindow::PowerNapMainWindow(
@@ -13,4 +15,33 @@ namespace gui
         buildInterface();
     }
 
+    void PowerNapMainWindow::buildInterface()
+    {
+        AppWindow::buildInterface();
+
+        sideListView = new gui::SideListView(
+            this, 0, 0, style::window_width, style::window_height, windowPresenter->getNapTimeProvider());
+        windowPresenter->loadNapTimeList();
+        sideListView->rebuildList(listview::RebuildType::Full);
+        setFocusItem(sideListView);
+    }
+
+    bool PowerNapMainWindow::onInput(const gui::InputEvent &inputEvent)
+    {
+        if (sideListView->onInput(inputEvent)) {
+            return true;
+        }
+        if (inputEvent.isShortRelease(KeyCode::KEY_ENTER)) {
+            windowPresenter->activate();
+            return true;
+        }
+
+        return AppWindow::onInput(inputEvent);
+    }
+
+    status_bar::Configuration PowerNapMainWindow::configureStatusBar(status_bar::Configuration appConfiguration)
+    {
+        appConfiguration.disable(status_bar::Indicator::Time);
+        return appConfiguration;
+    }
 } // namespace gui
