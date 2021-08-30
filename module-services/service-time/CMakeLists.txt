@@ -6,6 +6,7 @@ set(SOURCES
     AlarmEventsDBRepository.cpp
     AlarmMessageHandler.cpp
     AlarmOperations.cpp
+    AlarmServiceAPI.cpp
     ServiceTime.cpp
     TimeManager.cpp
     RTCcommand.cpp
