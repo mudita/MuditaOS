@@ -46,6 +46,7 @@ namespace gui
         auto setEditMode(EditMode mode) noexcept -> void;
         auto setTimeFormat(utils::time::Locale::TimeFormat fmt) noexcept -> void;
         auto setAlarmStatus(Status status) noexcept -> void;
+        auto setAlarmTimeVisible(bool value) noexcept -> void;
         auto setMinute(std::uint8_t minute) noexcept -> void;
         auto getAlarmStatus() const noexcept -> Status;
         auto getTime() const noexcept -> std::time_t;
