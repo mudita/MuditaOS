@@ -3,8 +3,19 @@
 
 #include <appmgr/ApplicationManager.hpp>
 
+#include <evtmgr/messages/AlarmMessage.hpp>
+
 namespace app::manager
 {
+    ApplicationManager::ApplicationManager(const ApplicationName &serviceName,
+                                           std::vector<std::unique_ptr<app::ApplicationLauncher>> &&launchers,
+                                           const ApplicationName &_rootApplicationName)
+        : ApplicationManagerCommon(serviceName, std::move(launchers), _rootApplicationName)
+    {
+        bus.channels.push_back(sys::BusChannel::AlarmChanges);
+        registerMessageHandlers();
+    }
+
     auto ApplicationManager::startApplication(ApplicationHandle &app) -> bool
     {
         if (not ApplicationManagerCommon::startApplication(app)) {
@@ -17,5 +28,12 @@ namespace app::manager
     auto ApplicationManager::resolveHomeApplication() -> std::string
     {
         return rootApplicationName;
+    }
+    void ApplicationManager::registerMessageHandlers()
+    {
+        ApplicationManagerCommon::registerMessageHandlers();
+
+        auto convertibleToActionHandler = [this](sys::Message *request) { return handleMessageAsAction(request); };
+        connect(typeid(AlarmActivated), convertibleToActionHandler);
     }
 } // namespace app::manager

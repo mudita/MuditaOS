@@ -21,7 +21,6 @@ target_sources(application-bell-main
         models/TimeModel.hpp
 
         presenters/HomeScreenPresenter.hpp
-        presenters/KeyMap.hpp
         presenters/StateController.hpp
 
     PUBLIC
@@ -42,6 +41,7 @@ target_link_libraries(application-bell-main
         apps-common
         bellgui
         i18n
+        keymap
         module-gui
         service-gui
         time

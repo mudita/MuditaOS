@@ -14,6 +14,8 @@ target_include_directories(appmgr
 
 target_link_libraries(appmgr
    PRIVATE
+        alarms
+        evtmgr
         module-apps
         service-appmgr
 )

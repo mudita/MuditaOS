@@ -36,6 +36,10 @@ namespace app
         {
             return sys::ReturnCodes::Success;
         }
+
+      private:
+        void showPopup(gui::popup::ID id, const gui::PopupRequestParams *params) override;
+        auto isHomeScreenFocused() -> bool;
     };
 
     template <> struct ManifestTraits<ApplicationBellMain>

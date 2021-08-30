@@ -16,6 +16,9 @@ class EventManager : public EventManagerCommon
     explicit EventManager(const std::string &name = service::name::evt_manager);
 
   private:
+    void handleKeyEvent(sys::Message *msg) override;
+
+  private:
     std::shared_ptr<hal::temperature::AbstractTemperatureSource> temperatureSource;
 };
 

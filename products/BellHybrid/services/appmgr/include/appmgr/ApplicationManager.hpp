@@ -12,14 +12,11 @@ namespace app::manager
       public:
         ApplicationManager(const ApplicationName &serviceName,
                            std::vector<std::unique_ptr<app::ApplicationLauncher>> &&launchers,
-                           const ApplicationName &_rootApplicationName)
-            : ApplicationManagerCommon(serviceName, std::move(launchers), _rootApplicationName)
-        {
-            registerMessageHandlers();
-        }
+                           const ApplicationName &_rootApplicationName);
 
       private:
         auto startApplication(ApplicationHandle &app) -> bool override;
         auto resolveHomeApplication() -> std::string override;
+        void registerMessageHandlers() override;
     };
 } // namespace app::manager

@@ -62,4 +62,21 @@ namespace app
         }
         return std::make_shared<sys::ResponseMessage>();
     }
+
+    void ApplicationBellMain::showPopup(gui::popup::ID id, const gui::PopupRequestParams *params)
+    {
+        if (id == gui::popup::ID::AlarmActivated) {
+            if (not isHomeScreenFocused()) {
+                switchWindow(gui::popup::resolveWindowName(id));
+            }
+        }
+        else {
+            Application::showPopup(id, params);
+        }
+    }
+
+    auto ApplicationBellMain::isHomeScreenFocused() -> bool
+    {
+        return GetName() == app::applicationBellName && getCurrentWindow()->getName() == gui::name::window::main_window;
+    }
 } // namespace app
