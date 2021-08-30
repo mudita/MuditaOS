@@ -117,6 +117,12 @@ namespace gui
         resizeItems();
     }
 
+    auto AlarmSetSpinner::setAlarmTimeVisible(bool value) noexcept -> void
+    {
+        timeSpinner->setVisible(value);
+        timeSpinner->setFocusItem(nullptr);
+    }
+
     auto AlarmSetSpinner::setTimeFormat(utils::time::Locale::TimeFormat fmt) noexcept -> void
     {
         timeSpinner->setTimeFormat(fmt);

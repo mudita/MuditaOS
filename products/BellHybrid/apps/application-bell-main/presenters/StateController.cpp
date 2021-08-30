@@ -23,6 +23,8 @@ namespace app::home_screen
             auto switchToMenu         = [](AbstractView &view) { view.switchToMenu(); };
             auto makeAlarmEditable    = [](AbstractView &view) { view.setAlarmEdit(true); };
             auto makeAlarmNonEditable = [](AbstractView &view) { view.setAlarmEdit(false); };
+            auto hideAlarmTime        = [](AbstractView &view) { view.setAlarmTimeVisible(false); };
+            auto showAlarmTime        = [](AbstractView &view) { view.setAlarmTimeVisible(true); };
             auto updateTemperature    = [](AbstractView &view, AbstractTemperatureModel &temperatureModel) {
                 view.setTemperature(temperatureModel.getTemperature());
             };
@@ -52,6 +54,8 @@ namespace app::home_screen
             {};
             struct DeepUpPress
             {};
+            struct DeepDownPress
+            {};
             struct AlarmInput
             {};
             struct Timer
@@ -69,6 +73,19 @@ namespace app::home_screen
                 view.setTemperature(temperatureModel.getTemperature());
             };
         } // namespace Deactivated
+
+        namespace DeactivatedWait
+        {
+            auto entry = [](AbstractView &view,
+                            AbstractPresenter &presenter,
+                            AbstractAlarmModel &alarmModel,
+                            AbstractTimeModel &timeModel) {
+                presenter.spawnTimer();
+                view.setBottomDescription(utils::translate("app_bell_alarm_deactivated"));
+                view.setAlarmActive(false);
+            };
+            auto exit = [](AbstractPresenter &presenter) { presenter.detachTimer(); };
+        } // namespace DeactivatedWait
 
         namespace AlarmEdit
         {
@@ -137,8 +154,13 @@ namespace app::home_screen
                 return make_transition_table(*"Deactivated"_s + event<Events::LightPress>/ Helpers::switchToMenu = "Deactivated"_s,
                                              "Deactivated"_s + sml::on_entry<_> / Deactivated::entry,
                                              "Deactivated"_s + event<Events::RotateRightPress> / Helpers::makeAlarmEditable = "DeactivatedEdit"_s,
-                                             "Deactivated"_s + event<Events::DeepUpPress> = "ActivatedWait"_s,
+                                             "Deactivated"_s + event<Events::DeepUpPress> / Helpers::showAlarmTime = "ActivatedWait"_s,
                                              "Deactivated"_s + event<Events::TimeUpdate> / Helpers::updateTemperature,
+
+                                             "DeactivatedWait"_s + sml::on_entry<_> / DeactivatedWait::entry,
+                                             "DeactivatedWait"_s + sml::on_exit<_> / DeactivatedWait::exit,
+                                             "DeactivatedWait"_s + event<Events::Timer> = "Deactivated"_s,
+                                             "DeactivatedWait"_s + event<Events::LightPress>/ Helpers::switchToMenu = "Deactivated"_s,
 
                                              "DeactivatedEdit"_s + sml::on_entry<_> / AlarmEdit::entry,
                                              "DeactivatedEdit"_s + sml::on_exit<_> / AlarmEdit::exit,
@@ -157,11 +179,13 @@ namespace app::home_screen
                                              "ActivatedWait"_s + sml::on_entry<_> / ActivatedWait::entry,
                                              "ActivatedWait"_s + sml::on_exit<_> / ActivatedWait::exit,
                                              "ActivatedWait"_s + event<Events::Timer> / Helpers::makeAlarmNonEditable = "Activated"_s,
+                                             "ActivatedWait"_s + event<Events::LightPress>/ Helpers::switchToMenu = "Activated"_s,
 
                                              "Activated"_s + sml::on_entry<_> / Activated::entry,
                                              "Activated"_s + event<Events::LightPress>/ Helpers::switchToMenu = "Activated"_s,
                                              "Activated"_s + event<Events::RotateRightPress> / Helpers::makeAlarmEditable = "ActivatedEdit"_s,
                                              "Activated"_s + event<Events::TimeUpdate> / Helpers::updateTemperature,
+                                             "Activated"_s + event<Events::DeepDownPress> / Helpers::hideAlarmTime  = "DeactivatedWait"_s,
 
                                              "ActivatedEdit"_s + sml::on_entry<_> / AlarmEdit::entry,
                                              "ActivatedEdit"_s + sml::on_exit<_> / AlarmEdit::exit,
@@ -218,6 +242,9 @@ namespace app::home_screen
             break;
         case KeyMap::DeepPressUp:
             pimpl->sm.process_event(Events::DeepUpPress{});
+            break;
+        case KeyMap::DeepPressDown:
+            pimpl->sm.process_event(Events::DeepDownPress{});
             break;
         default:
             break;
