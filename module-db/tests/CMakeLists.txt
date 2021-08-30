@@ -16,6 +16,7 @@ add_catch2_executable(
         ContactsTable_tests.cpp
         DbInitializer.cpp
         EventRecord_tests.cpp
+        MultimediaFilesTable_tests.cpp
         NotesRecord_tests.cpp
         NotesTable_tests.cpp
         NotificationsRecord_tests.cpp
