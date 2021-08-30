@@ -92,6 +92,8 @@ namespace app::home_screen
             auto entry = [](AbstractView &view, AbstractPresenter &presenter) {
                 presenter.spawnTimer();
                 view.setAlarmEdit(true);
+                view.setAlarmTimeVisible(true);
+                view.setAlarmVisible(true);
             };
             auto exit = [](AbstractView &view, AbstractPresenter &presenter) { view.setAlarmEdit(false); };
 
