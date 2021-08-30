@@ -65,6 +65,7 @@ namespace app::home_screen
             auto entry = [](AbstractView &view, AbstractTemperatureModel &temperatureModel) {
                 view.setAlarmEdit(false);
                 view.setAlarmActive(false);
+                view.setAlarmVisible(false);
                 view.setTemperature(temperatureModel.getTemperature());
             };
         } // namespace Deactivated
@@ -112,6 +113,7 @@ namespace app::home_screen
                 view.setBottomDescription(
                     Helpers::setBottomDescription(Helpers::calculateTimeDifference(view, timeModel)));
                 view.setAlarmActive(true);
+                view.setAlarmVisible(true);
             };
             auto exit = [](AbstractPresenter &presenter) { presenter.detachTimer(); };
         } // namespace ActivatedWait
@@ -121,6 +123,7 @@ namespace app::home_screen
             auto entry = [](AbstractView &view, AbstractTemperatureModel &temperatureModel) {
                 view.setTemperature(temperatureModel.getTemperature());
                 view.setAlarmActive(true);
+                view.setAlarmVisible(true);
             };
         } // namespace Activated
 
@@ -134,6 +137,7 @@ namespace app::home_screen
                 return make_transition_table(*"Deactivated"_s + event<Events::LightPress>/ Helpers::switchToMenu = "Deactivated"_s,
                                              "Deactivated"_s + sml::on_entry<_> / Deactivated::entry,
                                              "Deactivated"_s + event<Events::RotateRightPress> / Helpers::makeAlarmEditable = "DeactivatedEdit"_s,
+                                             "Deactivated"_s + event<Events::DeepUpPress> = "ActivatedWait"_s,
                                              "Deactivated"_s + event<Events::TimeUpdate> / Helpers::updateTemperature,
 
                                              "DeactivatedEdit"_s + sml::on_entry<_> / AlarmEdit::entry,
