@@ -10,21 +10,28 @@
 namespace gui
 {
     class ListView;
+    class Icon;
     class MusicPlayerAllSongsWindow : public AppWindow, public app::music_player::SongsContract::View
     {
         std::shared_ptr<app::music_player::SongsContract::Presenter> presenter;
         ListView *songsList = nullptr;
+        Icon *emptyListIcon = nullptr;
 
       public:
         explicit MusicPlayerAllSongsWindow(app::Application *app,
                                            std::shared_ptr<app::music_player::SongsContract::Presenter> presenter);
 
-        // virtual methods
         void onBeforeShow([[maybe_unused]] ShowMode mode, [[maybe_unused]] SwitchData *data) override;
 
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;
+        bool onInput(const InputEvent &inputEvent) override;
+
+        void updateSongsState() override;
+        void refreshWindow() override;
+        void setBottomBarTemporaryMode(const std::string &text) override;
+        void restoreFromBottomBarTemporaryMode() override;
     };
 
 } /* namespace gui */

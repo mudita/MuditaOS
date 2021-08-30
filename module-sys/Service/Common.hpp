@@ -23,7 +23,8 @@ namespace sys
         AntennaNotifications,
         ServiceEvtmgrNotifications,
         PhoneModeChanges,
-        PhoneLockChanges,
+        BluetoothModeChanges,
+        PhoneLockChanges
     };
 
     enum class ServicePriority
@@ -119,6 +120,8 @@ inline const char *c_str(sys::BusChannel channel)
         return "ServiceEvtmgrNotifications";
     case sys::BusChannel::PhoneModeChanges:
         return "PhoneModeChanges";
+    case sys::BusChannel::BluetoothModeChanges:
+        return "BluetoothModeChanges";
     case sys::BusChannel::PhoneLockChanges:
         return "PhoneLockChanges";
     }

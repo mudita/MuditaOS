@@ -41,15 +41,16 @@
 #include <list>
 #include <ctime>
 #include <apps-common/messages/AppMessage.hpp>
-#include <SystemManager/messages/CpuFrequencyMessage.hpp>
 #include <EventStore.hpp>
 #include <SystemManager/messages/PhoneModeRequest.hpp>
 #include <vibra/Vibra.hpp>
+#include <ticks.hpp>
+#include <purefs/filesystem_paths.hpp>
 
 namespace
 {
-    constexpr auto loggerDelayMs   = 1000 * 60 * 5;
-    constexpr auto loggerTimerName = "Logger";
+    constexpr auto loggerDelayMs        = 1000 * 60 * 5;
+    constexpr auto loggerTimerName      = "Logger";
     constexpr std::array sliderKeyCodes = {
         bsp::KeyCodes::SSwitchUp, bsp::KeyCodes::SSwitchMid, bsp::KeyCodes::SSwitchDown};
 
@@ -281,6 +282,13 @@ sys::ReturnCodes EventManager::InitHandler()
         processTimezoneRequest(message->getTimezone());
         return sys::MessageNone{};
     });
+
+    connect(typeid(sevm::FlushLogsRequest), [&]([[maybe_unused]] sys::Message *msg) {
+        if (auto ret = dumpLogsToFile(); ret >= 0) {
+            return std::make_shared<sevm::FlushLogsResponse>(true, ret);
+        }
+        return std::make_shared<sevm::FlushLogsResponse>(false);
+    });
     // initialize keyboard worker
     EventWorker = std::make_unique<WorkerEvent>(this);
 
@@ -376,15 +384,14 @@ void EventManager::handleKeyMoveEvent(RawKey key)
     }
 }
 
-void EventManager::dumpLogsToFile()
+int EventManager::dumpLogsToFile()
 {
     const auto logPath = purefs::dir::getUserDiskPath() / LOG_FILE_NAME;
-    const bool dumpLog = !(std::filesystem::exists(logPath) && std::filesystem::file_size(logPath) > MAX_LOG_FILE_SIZE);
-    if (dumpLog) {
-        const auto &logs = Log::Logger::get().getLogs();
-        std::fstream logFile(logPath, std::fstream::out | std::fstream::app);
-        logFile.write(logs.data(), logs.size());
-    }
+    const auto ts      = cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks());
+
+    LOG_DEBUG("Log flush timestamp: %d", static_cast<unsigned>(ts));
+
+    return Log::Logger::get().dumpToFile(std::move(logPath));
 }
 
 void EventManager::handleMinuteUpdate(time_t timestamp)

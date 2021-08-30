@@ -20,12 +20,15 @@ target_sources( ${PROJECT_NAME}
         models/network/ApnSettingsModel.cpp
         models/network/NewApnModel.cpp
         models/network/SimContactsImportModel.cpp
+        models/network/SimContactsRepository.cpp
         models/display-keypad/QuotesModel.cpp
         models/display-keypad/CategoriesModel.cpp
         models/apps/AudioSettingsModel.cpp
         models/apps/SoundsModel.cpp
+        models/apps/SoundsPlayer.cpp
         models/system/DateAndTimeModel.cpp
         models/system/SARInfoRepository.cpp
+        models/system/TechnicalInformationRepository.cpp
         models/system/FactoryData.cpp
         models/system/TechnicalInformationModel.cpp
         presenter/network/SimContactsImportWindowPresenter.cpp
@@ -50,6 +53,7 @@ target_sources( ${PROJECT_NAME}
         windows/advanced/UITestWindow.cpp
         windows/advanced/EinkModeWindow.cpp
         windows/advanced/ColorTestWindow.cpp
+        windows/advanced/StatusBarImageTypeWindow.cpp
         windows/bluetooth/AddDeviceWindow.cpp
         windows/bluetooth/AllDevicesWindow.cpp
         windows/bluetooth/BluetoothWindow.cpp

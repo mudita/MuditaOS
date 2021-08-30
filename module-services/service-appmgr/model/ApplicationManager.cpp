@@ -22,6 +22,7 @@
 #include <application-special-input/ApplicationSpecialInput.hpp>
 #include <apps-common/messages/AppMessage.hpp>
 #include <apps-common/popups/data/PhoneModeParams.hpp>
+#include <apps-common/popups/data/BluetoothModeParams.hpp>
 #include <apps-common/popups/data/PopupRequestParams.hpp>
 #include <event-manager-api>
 #include <i18n/i18n.hpp>
@@ -29,6 +30,7 @@
 #include <module-db/queries/notifications/QueryNotificationsGetAll.hpp>
 #include <service-audio/AudioMessage.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
+#include <service-bluetooth/service-bluetooth/messages/BluetoothModeChanged.hpp>
 #include <module-sys/Timers/TimerFactory.hpp>
 #include <module-utils/Utils.hpp>
 #include <service-appmgr/StartupType.hpp>
@@ -131,6 +133,7 @@ namespace app::manager
         autoLockTimer = sys::TimerFactory::createSingleShotTimer(
             this, autoLockTimerName, sys::timer::InfiniteTimeout, [this](sys::Timer &) { onPhoneLocked(); });
         bus.channels.push_back(sys::BusChannel::PhoneModeChanges);
+        bus.channels.push_back(sys::BusChannel::BluetoothModeChanges);
         bus.channels.push_back(sys::BusChannel::ServiceAudioNotifications);
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         bus.channels.push_back(sys::BusChannel::PhoneLockChanges);
@@ -218,7 +221,7 @@ namespace app::manager
     {
         for (const auto &name : std::vector<ApplicationName>{app::special_input}) {
             if (auto app = getApplication(name); app != nullptr) {
-                app->runInBackground(phoneModeObserver->getCurrentPhoneMode(), this);
+                app->runInBackground(phoneModeObserver->getCurrentPhoneMode(), bluetoothMode, this);
             }
         }
     }
@@ -303,6 +306,11 @@ namespace app::manager
             handleSwitchConfirmation(msg);
             return std::make_shared<sys::ResponseMessage>();
         });
+        connect(typeid(FinalizingClose), [this](sys::Message *request) {
+            auto msg = static_cast<FinalizingClose *>(request);
+            handleFinalizingClose(msg);
+            return std::make_shared<sys::ResponseMessage>();
+        });
         connect(typeid(CloseConfirmation), [this](sys::Message *request) {
             auto msg = static_cast<CloseConfirmation *>(request);
             handleCloseConfirmation(msg);
@@ -349,15 +357,6 @@ namespace app::manager
         });
         connect(typeid(GetCurrentDisplayLanguageRequest), [&](sys::Message *request) {
             return std::make_shared<GetCurrentDisplayLanguageResponse>(utils::getDisplayLanguage());
-        });
-        connect(typeid(UpdateInProgress), [this](sys::Message *) {
-            closeApplicationsOnUpdate();
-            return sys::msgHandled();
-        });
-        connect(typeid(SetOsUpdateVersion), [this](sys::Message *request) {
-            auto msg = static_cast<SetOsUpdateVersion *>(request);
-            handleSetOsUpdateVersionChange(msg);
-            return sys::msgHandled();
         });
         connect(typeid(GetAllNotificationsRequest), [&](sys::Message *request) {
             notificationProvider.requestNotSeenNotifications();
@@ -530,6 +529,11 @@ namespace app::manager
                     return sys::msgNotHandled();
                 });
 
+        connect(typeid(sys::bluetooth::BluetoothModeChanged), [&](sys::Message *request) -> sys::MessagePointer {
+            auto data = static_cast<sys::bluetooth::BluetoothModeChanged *>(request);
+            handleBluetoothModeChanged(data->getBluetoothMode());
+            return sys::msgHandled();
+        });
         connect(typeid(onBoarding::FinalizeOnBoarding),
                 [&](sys::Message *request) -> sys::MessagePointer { return handleOnBoardingFinalize(); });
 
@@ -586,9 +590,17 @@ namespace app::manager
         }
         else {
             LOG_INFO("Starting application %s", app.name().c_str());
-            app.run(phoneModeObserver->getCurrentPhoneMode(), this);
+            app.run(phoneModeObserver->getCurrentPhoneMode(), bluetoothMode, this);
         }
         return true;
+    }
+
+    void ApplicationManager::startPendingApplicationOnCurrentClose()
+    {
+        if (const auto launchingApp = getLaunchingApplication();
+            launchingApp != nullptr && getState() == State::AwaitingCloseConfirmation) {
+            startApplication(*launchingApp);
+        }
     }
 
     auto ApplicationManager::closeApplications() -> bool
@@ -735,6 +747,21 @@ namespace app::manager
         actionsRegistry.enqueue(std::move(action));
     }
 
+    void ApplicationManager::handleBluetoothModeChanged(sys::bluetooth::BluetoothMode mode)
+    {
+        bluetoothMode = mode;
+        for (const auto app : getStackedApplications()) {
+            changeBluetoothMode(app);
+        }
+    }
+
+    void ApplicationManager::changeBluetoothMode(const ApplicationHandle *app)
+    {
+        ActionEntry action{actions::BluetoothModeChanged, std::make_unique<gui::BluetoothModeParams>(bluetoothMode)};
+        action.setTargetApplication(app->name());
+        actionsRegistry.enqueue(std::move(action));
+    }
+
     void ApplicationManager::handleTetheringChanged(sys::phone_modes::Tethering tethering)
     {
         notificationProvider.handle(tethering);
@@ -748,7 +775,8 @@ namespace app::manager
         case actions::Launch:
             return handleLaunchAction(action);
         case actions::PhoneModeChanged:
-            return handlePhoneModeChangedAction(action);
+        case actions::BluetoothModeChanged:
+            return handleActionOnActiveApps(action);
         case actions::ShowPopup:
             [[fallthrough]];
         case actions::AbortPopup:
@@ -809,11 +837,11 @@ namespace app::manager
         return handleSwitchApplication(&switchRequest) ? ActionProcessStatus::Accepted : ActionProcessStatus::Dropped;
     }
 
-    auto ApplicationManager::handlePhoneModeChangedAction(ActionEntry &action) -> ActionProcessStatus
+    auto ApplicationManager::handleActionOnActiveApps(ActionEntry &action) -> ActionProcessStatus
     {
         const auto &targetName = action.target;
         auto targetApp         = getApplication(targetName);
-        if (targetApp == nullptr || !targetApp->handles(action.actionId)) {
+        if (targetApp == nullptr || (!targetApp->handles(action.actionId))) {
             return ActionProcessStatus::Dropped;
         }
 
@@ -1005,17 +1033,6 @@ namespace app::manager
         return true;
     }
 
-    auto ApplicationManager::handleSetOsUpdateVersionChange(SetOsUpdateVersion *msg) -> bool
-    {
-        LOG_DEBUG("[ApplicationManager::handleSetOsUpdateVersionChange] value ....");
-        settings->setValue(
-            settings::SystemProperties::osUpdateVersion, msg->osUpdateVer, settings::SettingsScope::Global);
-
-        settings->setValue(
-            settings::SystemProperties::osCurrentVersion, msg->osCurrentVer, settings::SettingsScope::Global);
-        return true;
-    }
-
     auto ApplicationManager::handleDBResponse(db::QueryResponse *msg) -> bool
     {
         auto result = msg->getResult();
@@ -1053,7 +1070,6 @@ namespace app::manager
     auto ApplicationManager::onSwitchConfirmed(ApplicationHandle &app) -> bool
     {
         if (getState() == State::AwaitingFocusConfirmation || getState() == State::Running) {
-            app.blockClosing = false;
             app.setState(ApplicationHandle::State::ACTIVE_FORGROUND);
             setState(State::Running);
             EventManager::messageSetApplication(this, app.name());
@@ -1102,6 +1118,14 @@ namespace app::manager
         }
     }
 
+    void ApplicationManager::handleFinalizingClose(FinalizingClose *msg)
+    {
+        auto senderApp = getApplication(msg->getSenderName());
+        LOG_DEBUG("Waiting to close application [%s] - finalizing requests", senderApp->name().c_str());
+
+        onFinalizingClose();
+    }
+
     auto ApplicationManager::handleCloseConfirmation(CloseConfirmation *msg) -> bool
     {
         auto senderApp = getApplication(msg->getSenderName());
@@ -1111,6 +1135,11 @@ namespace app::manager
             return false;
         }
         return onCloseConfirmed(*senderApp);
+    }
+
+    void ApplicationManager::onFinalizingClose()
+    {
+        startPendingApplicationOnCurrentClose();
     }
 
     auto ApplicationManager::onCloseConfirmed(ApplicationHandle &app) -> bool
@@ -1123,10 +1152,7 @@ namespace app::manager
             app.setState(ApplicationHandle::State::ACTIVE_BACKGROUND);
         }
 
-        if (const auto launchingApp = getLaunchingApplication();
-            launchingApp != nullptr && getState() == State::AwaitingCloseConfirmation) {
-            startApplication(*launchingApp);
-        }
+        startPendingApplicationOnCurrentClose();
         return true;
     }
 

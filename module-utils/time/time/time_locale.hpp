@@ -65,9 +65,12 @@ namespace utils
           public:
             static constexpr int max_hour_24H_mode = 23;
             static constexpr int max_hour_12H_mode = 12;
-            static constexpr int max_minutes       = 59;
-            static constexpr int max_years         = 2038;
-            static constexpr int min_years         = 1970;
+            static constexpr int min_hour_24H_mode = 0;
+            static constexpr int min_hour_12H_mode = 1;
+
+            static constexpr int max_minutes = 59;
+            static constexpr int max_years   = 2038;
+            static constexpr int min_years   = 1970;
 
             enum Day
             {

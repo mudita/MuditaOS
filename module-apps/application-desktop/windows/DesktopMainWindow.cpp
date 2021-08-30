@@ -87,7 +87,12 @@ namespace gui
     status_bar::Configuration DesktopMainWindow::configureStatusBar(status_bar::Configuration appConfiguration)
     {
         appConfiguration.disable(status_bar::Indicator::NetworkAccessTechnology);
+        appConfiguration.disable(status_bar::Indicator::Time);
         appConfiguration.enable(status_bar::Indicator::PhoneMode);
+        appConfiguration.enable(status_bar::Indicator::Battery);
+        appConfiguration.enable(status_bar::Indicator::Signal);
+        appConfiguration.enable(status_bar::Indicator::SimCard);
+        appConfiguration.enable(status_bar::Indicator::Bluetooth);
         return appConfiguration;
     }
 
@@ -95,9 +100,6 @@ namespace gui
         : AppWindow(app, app::window::name::desktop_main_window),
           notificationsModel(std::make_shared<ActiveNotificationsModel>(this))
     {
-        osUpdateVer  = getAppDesktop()->getOsUpdateVersion();
-        osCurrentVer = getAppDesktop()->getOsCurrentVersion();
-
         buildInterface();
 
         preBuildDrawListHook = [this](std::list<Command> &cmd) { updateTime(); };
@@ -106,14 +108,6 @@ namespace gui
     void DesktopMainWindow::setVisibleState()
     {
         setActiveState();
-
-        if (osUpdateVer == osCurrentVer && osUpdateVer != updateos::initSysVer &&
-            osCurrentVer != updateos::initSysVer) {
-            auto data = std::make_unique<CurrentOsVersion>();
-            data->setData(osCurrentVer);
-            application->switchWindow(app::window::name::desktop_post_update_window, std::move(data));
-            getAppDesktop()->setOsUpdateVersion(updateos::initSysVer);
-        }
     }
 
     void DesktopMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)

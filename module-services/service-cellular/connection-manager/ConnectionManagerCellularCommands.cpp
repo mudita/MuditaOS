@@ -42,7 +42,7 @@ auto ConnectionManagerCellularCommands::isConnectedToNetwork() -> bool
         auto cmd      = at::cmd::CFUN(at::cmd::Modifier::Get);
         auto response = channel->cmd(cmd);
         if (response.code == at::Result::Code::OK) {
-            auto result = cmd.parse(response);
+            auto result = cmd.parseCFUN(response);
             if (result.code == at::Result::Code::OK) {
                 return result.functionality == Functionality::Full;
             }

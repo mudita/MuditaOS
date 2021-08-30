@@ -19,10 +19,11 @@ namespace app
       public:
         std::string requester = "";
 
-        ApplicationSpecialInput(std::string name                    = special_input,
-                                std::string parent                  = {},
-                                sys::phone_modes::PhoneMode mode    = sys::phone_modes::PhoneMode::Connected,
-                                StartInBackground startInBackground = {true});
+        ApplicationSpecialInput(std::string name                            = special_input,
+                                std::string parent                          = {},
+                                sys::phone_modes::PhoneMode phoneMode       = sys::phone_modes::PhoneMode::Connected,
+                                sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled,
+                                StartInBackground startInBackground         = {true});
         virtual ~ApplicationSpecialInput() = default;
 
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
@@ -40,7 +41,9 @@ namespace app
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {
-            return {{manager::actions::ShowSpecialInput, manager::actions::PhoneModeChanged}};
+            return {{manager::actions::ShowSpecialInput,
+                     manager::actions::PhoneModeChanged,
+                     manager::actions::BluetoothModeChanged}};
         }
     };
 }; // namespace app

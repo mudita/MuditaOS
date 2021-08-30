@@ -28,9 +28,10 @@ namespace app
 {
     ApplicationCall::ApplicationCall(std::string name,
                                      std::string parent,
-                                     sys::phone_modes::PhoneMode mode,
+                                     sys::phone_modes::PhoneMode phoneMode,
+                                     sys::bluetooth::BluetoothMode bluetoothMode,
                                      StartInBackground startInBackground)
-        : Application(name, parent, mode, startInBackground, app::call_stack_size)
+        : Application(name, parent, phoneMode, bluetoothMode, startInBackground, app::call_stack_size)
     {
         using namespace gui::status_bar;
         statusBarManager->enableIndicators(
@@ -73,7 +74,7 @@ namespace app
         });
         addActionReceiver(manager::actions::CallRejectedByOfflineNotification, [this](auto &&data) {
             auto buttonAction = [=]() -> bool {
-                returnToPreviousWindow();
+                app::manager::Controller::switchBack(this);
                 return true;
             };
             constexpr auto icon    = "info_big_circle_W_G";

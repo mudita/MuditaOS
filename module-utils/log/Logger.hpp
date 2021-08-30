@@ -11,6 +11,7 @@
 #include <map>
 #include <mutex.hpp>
 #include <string>
+#include <filesystem>
 
 namespace Log
 {
@@ -19,6 +20,15 @@ namespace Log
         DEFAULT,
         SEGGER_RTT
     };
+
+    struct Application
+    {
+        std::string name;
+        std::string revision;
+        std::string tag;
+        std::string branch;
+    };
+    std::ostream &operator<<(std::ostream &stream, const Application &application);
 
     class Logger
     {
@@ -30,11 +40,12 @@ namespace Log
             return logger;
         }
         auto getLogs() -> std::string;
-        void init();
+        void init(Application app, size_t fileSize = MAX_LOG_FILE_SIZE, int filesCount = MAX_LOG_FILES_COUNT);
         auto log(Device device, const char *fmt, va_list args) -> int;
         auto log(logger_level level, const char *file, int line, const char *function, const char *fmt, va_list args)
             -> int;
         auto logAssert(const char *fmt, va_list args) -> int;
+        auto dumpToFile(std::filesystem::path logPath) -> int;
 
         static constexpr auto CRIT_STR = "CRIT";
         static constexpr auto IRQ_STR  = "IRQ";
@@ -62,12 +73,21 @@ namespace Log
             return sizeLeft;
         }
 
+        void addFileHeader(std::ofstream &file) const;
+        void rotateLogFile(const std::filesystem::path &logPath);
+        void onLogRotationFinished() noexcept;
+
         cpp_freertos::MutexStandard mutex;
+        cpp_freertos::MutexStandard logFileMutex;
         logger_level level{LOGTRACE};
         const LogColors *logColors            = &logColorsOff;
         char loggerBuffer[LOGGER_BUFFER_SIZE] = {0};
         size_t loggerBufferCurrentPos         = 0;
+        size_t maxFileSize                    = MAX_LOG_FILE_SIZE;
+        int currentRotationIndex              = 0;
+        int maxRotationIndex                  = 0;
 
+        Application application;
         LoggerBuffer circularBuffer;
         static constexpr size_t circularBufferSize = 1000;
 

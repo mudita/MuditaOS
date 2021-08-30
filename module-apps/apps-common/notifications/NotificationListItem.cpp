@@ -40,7 +40,7 @@ namespace
         text->setMaximumSize(style::notifications::textMaxWidth, Axis::X);
         text->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
         text->setPenWidth(style::window::default_border_no_focus_w);
-        text->setUnderline(false);
+        text->drawUnderline(false);
         text->setFont(style::window::font::medium);
         text->activeItem = false;
         text->setTextLimitType(TextLimitType::MaxLines, 1);

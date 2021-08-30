@@ -8,7 +8,9 @@ set(SOURCES
     src/CallManager.cpp
     src/NetworkTime.cpp
     src/SimContacts.cpp
+    src/SMSPartsHandler.cpp
     src/SMSSendHandler.cpp
+    src/ImeiGetHandler.cpp
 
     CellularCall.cpp
     CellularServiceAPI.cpp

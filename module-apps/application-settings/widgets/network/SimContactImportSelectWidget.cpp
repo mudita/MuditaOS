@@ -6,7 +6,7 @@
 namespace gui
 {
     SimContactImportSelectWidget::SimContactImportSelectWidget(
-        std::string contactName,
+        const std::string &contactName,
         const std::function<void(const UTF8 &text)> &bottomBarTemporaryMode,
         const std::function<void()> &bottomBarRestoreFromTemporaryMode)
     {
@@ -37,5 +37,10 @@ namespace gui
             checkBoxWithLabel->setArea({0, 0, newDim.w, newDim.h});
             return true;
         };
+    }
+
+    bool SimContactImportSelectWidget::isChecked()
+    {
+        return checkBoxWithLabel->isChecked();
     }
 } /* namespace gui */

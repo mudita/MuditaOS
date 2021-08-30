@@ -6,11 +6,12 @@ import pytest
 import logging
 from harness import log
 from harness.interface.defs import Method, Endpoint
-from harness.request import Transaction, Request,TransactionError
+from harness.request import Transaction, Request, TransactionError
 from harness.rt_harness_discovery import get_rt1051_harness
 from harness.harness import Harness
 from harness.api.filesystem import put_file, get_file
-from harness.api.developermode import PhoneModeLock, PhoneReboot, Reboot
+from harness.api.developermode import PhoneModeLock
+from harness.api.update import PhoneReboot, Reboot
 
 
 def get_version(harness: Harness):
@@ -35,13 +36,13 @@ def test_update(harness: Harness):
 
     log.info(get_version(harness))
     PhoneModeLock(False).run(harness)
-    put_file(harness, filename, "/sys/user/")
+    put_file(harness, filename, "/sys/user")
     PhoneReboot(Reboot.UPDATE).run(harness)
-    assert harness.connection.watch_port_reboot(60)
+    assert harness.connection.watch_port_reboot(300)
 
-    harness = get_rt1051_harness(60)
+    harness = get_rt1051_harness(300)
     import time
-    time.sleep(10)
+    time.sleep(15)
     harness.unlock_phone()
     PhoneModeLock(False).run(harness)
 

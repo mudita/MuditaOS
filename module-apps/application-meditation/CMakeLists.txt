@@ -42,13 +42,6 @@ target_sources(application-meditation
         include/application-meditation/OptionsData.hpp
 )
 
-option(ENABLE_APP_MEDITATION "Enable application meditation" ON)
-
-target_compile_definitions(application-meditation
-    INTERFACE
-        $<$<BOOL:${ENABLE_APP_MEDITATION}>:ENABLE_APP_MEDITATION>
-)
-
 target_link_libraries(application-meditation
     PRIVATE
         i18n

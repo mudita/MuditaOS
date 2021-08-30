@@ -29,9 +29,7 @@ namespace calc
                 output = getValueThatFitsOnScreen(result);
             }
             if (symbols::strings::decimal_separator_str() == symbols::strings::comma) {
-                output.replace(output.find(symbols::strings::full_stop),
-                               std::size(std::string_view(symbols::strings::full_stop)),
-                               symbols::strings::comma);
+                output = replaceAllOccurrences(output, symbols::strings::full_stop, symbols::strings::comma);
             }
             return Result{source, output, false};
         }

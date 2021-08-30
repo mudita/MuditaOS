@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "UpdateHelper.hpp"
 #include <endpoints/Endpoint.hpp>
 #include <parser/ParserUtils.hpp>
 
@@ -22,13 +23,16 @@ namespace sys
 
 class UpdateEndpoint : public parserFSM::Endpoint
 {
+  private:
+    const std::unique_ptr<parserFSM::UpdateHelper> updateHelper;
 
   public:
-    explicit UpdateEndpoint(sys::Service *ownerServicePtr) : Endpoint(ownerServicePtr)
+    explicit UpdateEndpoint(sys::Service *ownerServicePtr)
+        : Endpoint(ownerServicePtr), updateHelper(std::make_unique<parserFSM::UpdateHelper>(ownerServicePtr))
     {
         debugName = "UpdateEndpoint";
     }
     auto handle(parserFSM::Context &context) -> void override;
-    auto run(parserFSM::Context &context) -> sys::ReturnCodes;
-    auto getUpdates(parserFSM::Context &context) -> sys::ReturnCodes;
+
+    [[nodiscard]] auto helperSwitcher(parserFSM::Context &ctx) -> parserFSM::BaseHelper &;
 };

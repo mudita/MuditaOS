@@ -21,15 +21,15 @@ jobs:
       run: |
         export JOBS=${JOBS:-$(nproc)} && \
         echo "JOBS=${JOBS}" &&  \
-        ./configure.sh linux Debug -G Ninja && \
-        pushd build-linux-Debug && \
+        ./configure.sh pure linux Debug -G Ninja && \
+        pushd build-purephone-linux-Debug && \
         ninja unittests && \
         popd
     - name: Run unit tests
       run: |
         export JOBS=${JOBS:-$(nproc)} && \
         echo "JOBS=${JOBS}" &&  \
-        pushd build-linux-Debug && \
+        pushd build-purephone-linux-Debug && \
         ninja check -j ${JOBS} && \
         popd
     - name: "Build and package for RT1051"
@@ -40,8 +40,8 @@ jobs:
       run: |
         export JOBS=${JOBS:-$(nproc)} && \
         echo "JOBS=${JOBS}" &&  \
-        ./configure.sh rt1051 RelWithDebInfo -DPURE_HW_TARGET=T6 -G Ninja && \
-        pushd build-rt1051-RelWithDebInfo && \
+        ./configure.sh pure rt1051 RelWithDebInfo -DPURE_HW_TARGET=T6 -G Ninja && \
+        pushd build-purephone-rt1051-RelWithDebInfo && \
         ninja -j ${JOBS} Pure&& \
         ninja -j ${JOBS} PurePhone-UpdatePackage && \
         ninja -j ${JOBS} PurePhone-StandaloneImage && \

@@ -95,6 +95,15 @@ TEST_CASE("Calculator utilities")
         REQUIRE(!result.isError);
     }
 
+    SECTION("Fraction with comma - crash case [EGD-7021]")
+    {
+        utils::setDisplayLanguage("Polski");
+        auto result = calculator.calculate("30");
+        REQUIRE(result.value == "30");
+        REQUIRE(result.equation == "30");
+        REQUIRE(!result.isError);
+    }
+
     SECTION("Division by 0")
     {
         auto result = calculator.calculate("15+5÷0");

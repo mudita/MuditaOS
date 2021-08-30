@@ -44,7 +44,7 @@ namespace gui
         item->setPenWidth(::style::window::default_border_rect_no_focus);
         item->setEditMode(gui::EditMode::Browse);
         item->setCursorStartPosition(CursorStartPosition::DocumentBegin);
-        item->setUnderline(false);
+        item->drawUnderline(false);
         return item;
     }
 

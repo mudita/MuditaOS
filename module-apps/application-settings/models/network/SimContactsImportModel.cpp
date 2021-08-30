@@ -5,12 +5,11 @@
 
 #include <application-settings/widgets/network/SimContactImportSelectWidget.hpp>
 #include <ListView.hpp>
-#include <i18n/i18n.hpp>
 
-SimContactsImportModel::SimContactsImportModel(app::Application *app) : application(app)
-{
-    createData();
-}
+SimContactsImportModel::SimContactsImportModel(app::Application *app,
+                                               std::unique_ptr<AbstractSimContactsRepository> contactsRepository)
+    : application(app), contactsRepository(std::move(contactsRepository))
+{}
 
 auto SimContactsImportModel::requestRecordsCount() -> unsigned int
 {
@@ -33,8 +32,32 @@ auto SimContactsImportModel::getItem(gui::Order order) -> gui::ListItem *
     return getRecord(order);
 }
 
-void SimContactsImportModel::createData()
+void SimContactsImportModel::createSimImported()
 {
+    createData(contactsRepository->getImportedRecords());
+}
+
+void SimContactsImportModel::createDuplicates()
+{
+    createData(contactsRepository->getDuplicatedRecords());
+}
+
+unsigned int SimContactsImportModel::getDuplicatesCount()
+{
+    return contactsRepository->getDuplicatedRecords().size();
+}
+
+void SimContactsImportModel::createData(const std::vector<ContactRecord> &importedRecords)
+{
+    auto app = application;
+
+    for (const auto &record : importedRecords) {
+        internalData.push_back(new gui::SimContactImportSelectWidget(
+            record.primaryName + " " + record.alternativeName,
+            [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
+            [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); }));
+    }
+
     for (auto item : internalData) {
         item->deleteByList = false;
     }
@@ -44,4 +67,35 @@ void SimContactsImportModel::clearData()
 {
     list->reset();
     eraseInternalData();
+}
+
+void SimContactsImportModel::eraseData()
+{
+    clearData();
+    contactsRepository->clear();
+}
+
+std::vector<bool> SimContactsImportModel::getSelectedContacts()
+{
+    std::vector<bool> selectedContacts;
+    for (const auto &item : internalData) {
+        selectedContacts.push_back(item->isChecked());
+    }
+    return selectedContacts;
+}
+
+void SimContactsImportModel::findDuplicates(std::function<void(bool)> onDuplicatesCheckCallback)
+{
+    contactsRepository->findDuplicates(getSelectedContacts(), std::move(onDuplicatesCheckCallback));
+}
+
+void SimContactsImportModel::saveData(std::function<void()> onSaveCallback)
+{
+    auto duplicatesFound = getDuplicatesCount() != 0;
+    contactsRepository->save(getSelectedContacts(), duplicatesFound, std::move(onSaveCallback));
+}
+
+void SimContactsImportModel::requestSimContacts(std::function<void()> onSimContactsReadCallback)
+{
+    contactsRepository->read(std::move(onSimContactsReadCallback));
 }

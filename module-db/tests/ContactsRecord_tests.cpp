@@ -559,8 +559,10 @@ TEST_CASE("Contacts list duplicates search")
     }
 
     // Prepare contacts list to compare with DB
+    std::pair<std::string, std::string> uniqueContact                     = {"600100500", "test5"};
     std::array<std::pair<std::string, std::string>, 3> rawContactsToCheck = {
-        {rawContactsInitial[2], {"600100500", "test5"}, rawContactsInitial[0]}};
+        {rawContactsInitial[2], uniqueContact, rawContactsInitial[0]}};
+    constexpr auto numOfUniqueContacts     = 1;
     constexpr auto numOfDuplicatedContacts = 2;
 
     std::vector<ContactRecord> contacts;
@@ -570,7 +572,14 @@ TEST_CASE("Contacts list duplicates search")
         record.numbers = std::vector<ContactRecord::Number>({ContactRecord::Number(rawContact.first, std::string(""))});
         contacts.push_back(record);
     }
-    auto duplicates = records.CheckContactsListDuplicates(contacts);
+    auto results    = records.CheckContactsListDuplicates(contacts);
+    auto unique     = results.first;
+    auto duplicates = results.second;
+
+    REQUIRE(unique.size() == numOfUniqueContacts);
+
+    REQUIRE(unique[0].numbers[0].number.getEntered() == uniqueContact.first);
+    REQUIRE(unique[0].primaryName == uniqueContact.second);
 
     REQUIRE(duplicates.size() == numOfDuplicatedContacts);
 

@@ -207,6 +207,14 @@ namespace gui
         };
     }
 
+    void ListView::clear()
+    {
+        if (scroll) {
+            scroll->setVisible(false);
+        }
+        ListViewEngine::clear();
+    }
+
     void ListView::setFocus()
     {
         if (!focus) {

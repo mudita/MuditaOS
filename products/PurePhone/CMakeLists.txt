@@ -32,6 +32,7 @@ target_sources(PurePhone
         ${TARGET_SOURCES}
         PurePhoneMain.cpp
         PlatformFactory.cpp
+        EinkSentinelPure.cpp
     )
 
 target_include_directories(PurePhone
@@ -49,7 +50,7 @@ set_target_properties(PurePhone
 
 target_link_libraries(PurePhone
     PRIVATE
-        application-antenna
+        $<$<BOOL:${ENABLE_APP_ANTENNA}>:application-antenna>
         application-calculator
         application-calllog
         application-calendar

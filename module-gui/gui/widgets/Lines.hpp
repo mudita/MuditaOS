@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -24,9 +24,8 @@ namespace gui
     {
         Text *text = nullptr;
         std::list<TextLine> lines;
-
-        bool underLine            = false;
-        Position underLinePadding = 0;
+        UnderLineProperties underLineProperties;
+        unsigned int linesSpacing = 0;
 
         void addToInvisibleLines(TextLine line);
 
@@ -106,11 +105,23 @@ namespace gui
             return w;
         }
 
+        Length calculateLineSpacingAddition() const noexcept
+        {
+            return empty() ? 0 : (size() - 1) * linesSpacing;
+        }
+
+        Length calculateInitialCursorPosition(Length initHeight) const noexcept
+        {
+            return (empty() ? initHeight : initHeight * size()) + calculateLineSpacingAddition() +
+                   underLineProperties.underLinePadding;
+        }
+
         [[nodiscard]] auto linesHeight() const noexcept
         {
-            return std::accumulate(lines.begin(), lines.end(), 0U, [](const auto sum, const auto &line) {
-                return line.isVisible() ? sum + line.height() : sum;
-            });
+            return calculateLineSpacingAddition() +
+                   std::accumulate(lines.begin(), lines.end(), 0U, [](const auto sum, const auto &line) {
+                       return line.isVisible() ? sum + line.height() : sum;
+                   });
         }
 
         [[nodiscard]] auto linesLength() const noexcept
@@ -120,24 +131,19 @@ namespace gui
             });
         }
 
-        auto setUnderLine(bool val) -> void
+        auto setUnderLineProperties(UnderLineProperties val) -> void
         {
-            underLine = val;
+            underLineProperties = val;
         }
 
-        [[nodiscard]] auto getUnderLine() const noexcept
+        [[nodiscard]] UnderLineProperties &getUnderLineProperties() noexcept
         {
-            return underLine;
+            return underLineProperties;
         }
 
-        auto setUnderLinePadding(Position val) -> void
+        auto setLineSpacing(unsigned int val) -> void
         {
-            underLinePadding = val;
-        }
-
-        [[nodiscard]] auto getUnderLinePadding() const noexcept
-        {
-            return underLinePadding;
+            linesSpacing = val;
         }
 
         auto draw(BlockCursor &drawCursor, Length w, Length h, Position lineYPosition, Position lineXPosition) -> void;

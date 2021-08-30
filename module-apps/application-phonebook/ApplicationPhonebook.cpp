@@ -22,9 +22,11 @@ namespace app
 {
     ApplicationPhonebook::ApplicationPhonebook(std::string name,
                                                std::string parent,
-                                               sys::phone_modes::PhoneMode mode,
+                                               sys::phone_modes::PhoneMode phoneMode,
+                                               sys::bluetooth::BluetoothMode bluetoothMode,
                                                StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), mode, startInBackground, phonebook_stack_size)
+        : Application(
+              std::move(name), std::move(parent), phoneMode, bluetoothMode, startInBackground, phonebook_stack_size)
     {
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         addActionReceiver(manager::actions::ShowContacts, [this](auto &&data) {
@@ -76,23 +78,7 @@ namespace app
             }
         }
 
-        // this variable defines whether message was processed.
-        bool handled = false;
-
-        // handle database response
-        if (resp != nullptr) {
-            handled = true;
-            if (auto command = callbackStorage->getCallback(resp); command->execute()) {
-                refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-            }
-        }
-
-        if (handled) {
-            return std::make_shared<sys::ResponseMessage>();
-        }
-        else {
-            return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
-        }
+        return handleAsyncResponse(resp);
     }
 
     // Invoked during initialization

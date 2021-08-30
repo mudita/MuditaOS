@@ -43,26 +43,13 @@ target_sources(application-desktop
 		windows/MmiPullWindow.hpp
 		windows/MmiPushWindow.cpp
 		windows/MmiPushWindow.hpp
-		windows/PostUpdateWindow.cpp
-		windows/PostUpdateWindow.hpp
 		windows/Reboot.cpp
 		windows/Reboot.hpp
-		windows/Update.cpp
-		windows/Update.hpp
-		windows/UpdateProgress.cpp
-		windows/UpdateProgress.hpp
 	PUBLIC
 		include/application-desktop/ApplicationDesktop.hpp
 		include/application-desktop/Constants.hpp
 		include/application-desktop/DBNotificationsHandler.hpp
 		include/application-desktop/Names.hpp
-)
-
-option(ENABLE_APP_DESKTOP "Enable application desktop" ON)
-
-target_compile_definitions(application-desktop
-    INTERFACE
-        $<$<BOOL:${ENABLE_APP_DESKTOP}>:ENABLE_APP_DESKTOP>
 )
 
 target_link_libraries(application-desktop

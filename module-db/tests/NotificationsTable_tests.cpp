@@ -32,11 +32,11 @@ TEST_CASE("Notifications Table tests")
     REQUIRE(notificationsTbl.count() == 0);
 
     NotificationsTableRow callsRow{
-        {.ID = DB_ID_NONE}, .key = static_cast<uint32_t>(NotificationsRecord::Key::Calls), .value = 0};
+        Record(DB_ID_NONE), .key = static_cast<uint32_t>(NotificationsRecord::Key::Calls), .value = 0};
     REQUIRE(notificationsTbl.add(callsRow));
 
     NotificationsTableRow smsRow{
-        {.ID = DB_ID_NONE}, .key = static_cast<uint32_t>(NotificationsRecord::Key::Sms), .value = 0};
+        Record(DB_ID_NONE), .key = static_cast<uint32_t>(NotificationsRecord::Key::Sms), .value = 0};
     REQUIRE(notificationsTbl.add(smsRow));
 
     REQUIRE(notificationsTbl.count() == 2); // it already got some entries Calls(1) and Sms(2)
@@ -51,8 +51,8 @@ TEST_CASE("Notifications Table tests")
         REQUIRE_FALSE(testRow.isValid());
     }
 
-    REQUIRE(notificationsTbl.add({{.ID = 0}, .key = 3, .value = 8}));
-    REQUIRE(notificationsTbl.add({{.ID = 0}, .key = 4, .value = 16, .contactID = 100}));
+    REQUIRE(notificationsTbl.add({Record(0), .key = 3, .value = 8}));
+    REQUIRE(notificationsTbl.add({Record(0), .key = 4, .value = 16, .contactID = 100}));
 
     REQUIRE(notificationsTbl.count() == 4);
 
@@ -93,7 +93,7 @@ TEST_CASE("Notifications Table tests")
 
     SECTION("Entry update")
     {
-        REQUIRE(notificationsTbl.update({{.ID = 3}, .key = 100, .value = 200, .contactID = 300}));
+        REQUIRE(notificationsTbl.update({Record(3), .key = 100, .value = 200, .contactID = 300}));
         auto entry = notificationsTbl.getById(3);
         REQUIRE(entry.ID == 3);
         REQUIRE(entry.key == 100);
@@ -161,7 +161,7 @@ TEST_CASE("Notifications Table tests")
 
     SECTION("Check uniqueness")
     {
-        REQUIRE(notificationsTbl.add({{.ID = 0}, .key = 3, .value = 100, .contactID = 200}));
+        REQUIRE(notificationsTbl.add({Record(0), .key = 3, .value = 100, .contactID = 200}));
         REQUIRE(notificationsTbl.count() == 4);
         auto entry = notificationsTbl.getByKey(3);
         REQUIRE(entry.isValid());
