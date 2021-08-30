@@ -39,6 +39,7 @@ namespace app::home_screen
         virtual void setAlarmTriggered()                                     = 0;
         virtual void setAlarmActive(bool)                                    = 0;
         virtual void setAlarmEdit(bool)                                      = 0;
+        virtual void setAlarmVisible(bool)                                   = 0;
         virtual std::time_t getAlarmTime() const                             = 0;
         virtual void setAlarmTime(std::time_t time)                          = 0;
         virtual void setAlarmTimeFormat(utils::time::Locale::TimeFormat fmt) = 0;
