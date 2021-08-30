@@ -4,7 +4,7 @@
     "cmake.configureSettings": {
         "COLOR_OUTPUT": "OFF"
     },
-    "testMate.cpp.test.executables": "build-linux-Debug/{googletest,catch2}-*",
+    "testMate.cpp.test.executables": "build-purephone-linux-Debug/{googletest,catch2}-*",
     "files.associations": {
         "*.inc": "cpp",
         "*.tcc": "cpp",
@@ -90,4 +90,5 @@
         "util": "cpp",
         "filesystem": "cpp"
     },
+    "favorites.sortDirection": "ASC",
 }
