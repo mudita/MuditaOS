@@ -3,9 +3,10 @@
 
 #include "StateController.hpp"
 #include "HomeScreenPresenter.hpp"
-#include "KeyMap.hpp"
 #include "models/AlarmModel.hpp"
 #include "models/TimeModel.hpp"
+
+#include <keymap/KeyMap.hpp>
 
 #include <boost/sml.hpp>
 #include <time/time_conversion.hpp>

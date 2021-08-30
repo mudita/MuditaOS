@@ -23,6 +23,7 @@ namespace gui
             SimLock,
             SimInfo,
             SimNotReady,
+            AlarmActivated
         };
 
         namespace window
@@ -41,6 +42,7 @@ namespace gui
             inline constexpr auto sim_unlock_window                 = "SimUnlockPopup";
             inline constexpr auto sim_info_window                   = "SimInfoPopup";
             inline constexpr auto sim_not_ready_window              = "SimNotReadyPopup";
+            inline constexpr auto alarm_activated_window            = "AlarmActivatedPopup";
         } // namespace window
 
         std::string resolveWindowName(ID id);
