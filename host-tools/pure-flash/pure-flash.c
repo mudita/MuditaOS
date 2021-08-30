@@ -15,13 +15,10 @@
 
 #include <linux/fs.h>
 #include <linux/fiemap.h>
-#include <mntent.h>
-#include <sys/sysmacros.h>
 
 static void syntax(char **argv)
 {
-    fprintf(stderr, "%s [--force] filename blkdev\n", argv[0]);
-    fprintf(stderr, "\t--force Skip device sanity checks (optional)\n");
+    fprintf(stderr, "%s filename blkdev\n", argv[0]);
 }
 
 static struct fiemap *read_fiemap(int fd)
@@ -144,40 +141,6 @@ static off_t copy_extent(int fd_dest, int fd_src, off_t start_offs, size_t len)
     return 0;
 }
 
-static int device_is_mounted(const char *block_device, char *mntpath, size_t mntpath_len)
-{
-    struct mntent *ent;
-    FILE *fil = setmntent("/proc/mounts", "r");
-    if (!fil) {
-        return -1;
-    }
-    int major_blk;
-    {
-        struct stat blkinfo;
-        if (lstat(block_device, &blkinfo)) {
-            return -1;
-        }
-        major_blk = gnu_dev_major(blkinfo.st_rdev);
-    }
-    while ((ent = getmntent(fil)) != NULL) {
-        struct stat info;
-        if (lstat(ent->mnt_dir, &info)) {
-            if (errno == EACCES)
-                continue;
-            else
-                return -1;
-        }
-        const int mnt_major_dev = gnu_dev_major(info.st_dev);
-        if (major_blk == mnt_major_dev) {
-            strncpy(mntpath, ent->mnt_dir, mntpath_len - 1);
-            mntpath[mntpath_len - 1] = '\0';
-            return 1;
-        }
-    }
-    endmntent(fil);
-    return 0;
-}
-
 static int verify_image(const char *image_file, const char *block_device)
 {
     int fd_sparse, fd_block;
@@ -225,7 +188,7 @@ static int verify_image(const char *image_file, const char *block_device)
     return (result ? EXIT_FAILURE : EXIT_SUCCESS);
 }
 
-static int write_image(const char *image_file, const char *block_device, bool force)
+static int write_image(const char *image_file, const char *block_device)
 {
     struct stat sbuf;
     if (stat(image_file, &sbuf)) {
@@ -243,24 +206,6 @@ static int write_image(const char *image_file, const char *block_device, bool fo
     if (!S_ISBLK(sbuf.st_mode)) {
         fprintf(stderr, "Error: %s is not a block device\n", block_device);
         return EXIT_FAILURE;
-    }
-    if (gnu_dev_minor(sbuf.st_rdev) && !force) {
-        fprintf(stderr, "Error: %s is partition device not a disc\n", block_device);
-        fprintf(stderr, "Please specify disk device instead of a partition\n");
-        return EXIT_FAILURE;
-    }
-    if (!force) {
-        char mntpath[FILENAME_MAX];
-        const int err = device_is_mounted(block_device, mntpath, sizeof mntpath);
-        if (err > 0) {
-            fprintf(stderr, "Error: Block device %s is already mounted at %s\n", block_device, mntpath);
-            fprintf(stderr, "Please umount device first before flashing\n");
-            return EXIT_FAILURE;
-        }
-        else if (err < 0) {
-            perror("System error (check mount):");
-            return EXIT_FAILURE;
-        }
     }
     int fd_sparse, fd_block;
     if ((fd_sparse = open(image_file, O_RDONLY)) < 0) {
@@ -310,14 +255,7 @@ static int write_image(const char *image_file, const char *block_device, bool fo
 int main(int argc, char **argv)
 {
     const char *img_file, *blk_dev;
-    bool force;
-    if (argc == 4 && !strcmp(argv[1], "--force")) {
-        force    = true;
-        img_file = argv[2];
-        blk_dev  = argv[3];
-    }
-    else if (argc == 3) {
-        force    = false;
+    if (argc == 3) {
         img_file = argv[1];
         blk_dev  = argv[2];
     }
@@ -325,7 +263,7 @@ int main(int argc, char **argv)
         syntax(argv);
         return EXIT_FAILURE;
     }
-    if (write_image(img_file, blk_dev, force)) {
+    if (write_image(img_file, blk_dev)) {
         return EXIT_FAILURE;
     }
     int result = verify_image(img_file, blk_dev);

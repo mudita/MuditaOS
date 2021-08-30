@@ -6,10 +6,8 @@ The tool works only in the Linux system.
 ## Howto use
 For invoke PureFlash we need to provide following arguments:
 ```
-./pureflash [--force] filename blkdev
-        --force Skip device sanity checks (optional)
+./pureflash filename blkdev
 ```
-* --force - Is a optional argument, for skip sanity checking of the source and target
 * filename - Is a path to the purephone image 
 * blkdev - Is a major block device of the purephone.
 
