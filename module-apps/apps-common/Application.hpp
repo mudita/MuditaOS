@@ -348,7 +348,7 @@ namespace app
 
         /// Method used to attach popups windows to application
         void attachPopups(const std::vector<gui::popup::ID> &popupsList);
-        void showPopup(gui::popup::ID id, const gui::PopupRequestParams *params);
+        virtual void showPopup(gui::popup::ID id, const gui::PopupRequestParams *params);
         void abortPopup(gui::popup::ID id);
 
       public:
