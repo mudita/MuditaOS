@@ -814,6 +814,9 @@ namespace app
                     return std::make_unique<gui::SimNotReadyWindow>(app, window::sim_not_ready_window);
                 });
                 break;
+            case ID::AlarmActivated:
+                LOG_DEBUG("TODO");
+                break;
             }
         }
     }

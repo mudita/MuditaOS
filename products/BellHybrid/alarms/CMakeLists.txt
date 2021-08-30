@@ -4,6 +4,10 @@ target_sources(alarms
     PRIVATE
         BellAlarmHandler.cpp
         AlarmHandlerActions.cpp
+        include/AlarmHandlerActions.hpp
+        include/BellAlarmHandler.hpp
+    PUBLIC
+        include/popups/AlarmPopupRequestParams.hpp
 )
 
 target_include_directories(alarms
