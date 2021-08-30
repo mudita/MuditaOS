@@ -19,10 +19,11 @@ namespace app
 
     ApplicationAlarmClock::ApplicationAlarmClock(std::string name,
                                                  std::string parent,
-                                                 sys::phone_modes::PhoneMode mode,
+                                                 sys::phone_modes::PhoneMode phoneMode,
+                                                 sys::bluetooth::BluetoothMode bluetoothMode,
                                                  uint32_t stackDepth,
                                                  sys::ServicePriority priority)
-        : Application(name, parent, mode, false, stackDepth, priority)
+        : Application(name, parent, phoneMode, bluetoothMode, false, stackDepth, priority)
     {
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
     }
@@ -47,19 +48,7 @@ namespace app
             return std::make_shared<sys::ResponseMessage>();
         }
 
-        // this variable defines whether message was processed.
-        bool handled = false;
-        // handle database response
-        if (resp != nullptr) {
-            handled = true;
-            if (auto command = callbackStorage->getCallback(resp); command->execute()) {
-                refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-            }
-        }
-        if (handled) {
-            return sys::msgHandled();
-        }
-        return sys::msgNotHandled();
+        return handleAsyncResponse(resp);
     }
 
     sys::ReturnCodes ApplicationAlarmClock::InitHandler()

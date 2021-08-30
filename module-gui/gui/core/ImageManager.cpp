@@ -29,8 +29,7 @@ namespace gui
     void ImageManager::loadImageMaps(std::string baseDirectory)
     {
         mapFolder                            = baseDirectory + "/images";
-        std::vector<std::string> pixMapFiles = getImageMapList(".mpi");
-        std::vector<std::string> vecMapFiles = getImageMapList(".vpi");
+        auto [pixMapFiles, vecMapFiles]      = getImageMapList(".mpi", ".vpi");
 
         for (std::string mapName : pixMapFiles) {
             loadPixMap(mapName);
@@ -197,22 +196,26 @@ namespace gui
         return new PixMap(squareWidth, squareWidth, renderContext->getData());
     }
 
-    std::vector<std::string> ImageManager::getImageMapList(std::string ext)
+    auto ImageManager::getImageMapList(std::string ext1, std::string ext2)
+        -> std::pair<std::vector<std::string>, std::vector<std::string>>
     {
+        std::vector<std::string> ext1MapFiles;
+        std::vector<std::string> ext2MapFiles;
 
-        std::vector<std::string> mapFiles;
+        LOG_INFO("Scanning %s  %s images folder: %s", ext1.c_str(), ext2.c_str(), mapFolder.c_str());
 
-        LOG_INFO("Scanning %s images folder: %s", ext.c_str(), mapFolder.c_str());
-
-        for (const auto &entry : std::filesystem::directory_iterator(mapFolder)) {
-            if (!entry.is_directory() && entry.path().extension() == ext) {
-                mapFiles.push_back(entry.path().string());
+        for (const auto &entry : std::filesystem::recursive_directory_iterator(mapFolder)) {
+            if (!entry.is_directory()) {
+                if (entry.path().extension() == ext1) {
+                    ext1MapFiles.push_back(entry.path().string());
+                }
+                else if (entry.path().extension() == ext2) {
+                    ext2MapFiles.push_back(entry.path().string());
+                }
             }
         }
-
-        LOG_INFO("Total number of images: %u", static_cast<unsigned int>(mapFiles.size()));
-
-        return mapFiles;
+        LOG_INFO("Total number of images: %u", static_cast<unsigned int>(ext2MapFiles.size() + ext1MapFiles.size()));
+        return {ext1MapFiles, ext2MapFiles};
     }
 
     bool ImageManager::init(std::string baseDirectory)
@@ -239,15 +242,27 @@ namespace gui
         }
         return imageMaps[id];
     }
-    uint32_t ImageManager::getImageMapID(const std::string &name)
+    uint32_t ImageManager::getImageMapID(const std::string &name, ImageTypeSpecifier specifier)
     {
+        auto searchName = checkAndAddSpecifierToName(name, specifier);
+
         for (uint32_t i = 0; i < imageMaps.size(); ++i) {
-            if (imageMaps[i]->getName() == name) {
+            if (imageMaps[i]->getName() == searchName) {
                 return i;
             }
         }
         LOG_ERROR("Unable to find an image: %s , using deafult fallback image instead.", name.c_str());
         return fallbackImageId;
+    }
+
+    std::string ImageManager::checkAndAddSpecifierToName(const std::string &name, ImageTypeSpecifier specifier)
+    {
+        if (specifier != ImageTypeSpecifier::None) {
+            return name + specifierMap[specifier];
+        }
+        else {
+            return name;
+        }
     }
 
 } /* namespace gui */

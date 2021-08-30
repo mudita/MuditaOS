@@ -24,8 +24,16 @@ if (
   belowThresholdCounter = 0
   aboveThresholdCounter = 0;
 else (no) 
+
+   note right
+   <b>*</b> If, after lowering the frequency by one level,
+   the cpuLoad is still lower than the threshold,
+   then we compare it with the value of 
+   maxBelowThresholdInRowCount - to accelerate the reduction 
+   end note
+
    if (
-   belowThresholdCounter >= maxBelowThresholdCount
+   belowThresholdCounter >= maxBelowThresholdCount<b>*</b>
    and
    currentCpuFreq > minFrequencyRequested
    ) then (yes)

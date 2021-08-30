@@ -22,7 +22,7 @@
 #include <service-cellular/CellularMessage.hpp>
 #include <service-appmgr/model/ApplicationManager.hpp>
 #include <service-appmgr/Controller.hpp>
-#include "messages/CpuFrequencyMessage.hpp"
+#include "messages/SystemManagerMessage.hpp"
 #include "messages/DeviceRegistrationMessage.hpp"
 #include "messages/SentinelRegistrationMessage.hpp"
 #include "messages/RequestCpuFrequencyMessage.hpp"
@@ -178,6 +178,8 @@ namespace sys
         if (userInit) {
             userInit();
         }
+
+        powerManager->SetBootSuccess();
     }
 
     void SystemManager::StartSystemServices()
@@ -219,26 +221,17 @@ namespace sys
         cpuStatisticsTimer = sys::TimerFactory::createPeriodicTimer(
             this, "cpuStatistics", constants::timerInitInterval, [this](sys::Timer &) { CpuStatisticsTimerHandler(); });
         cpuStatisticsTimer.start();
+
+        powerManagerEfficiencyTimer = sys::TimerFactory::createPeriodicTimer(
+            this, "logPowerManagerEfficiency", constants::powerManagerLogsTimerInterval, [this](sys::Timer &) {
+                powerManager->LogPowerManagerEfficiency();
+            });
+        powerManagerEfficiencyTimer.start();
     }
 
     bool SystemManager::CloseSystem(Service *s)
     {
         s->bus.sendUnicast(std::make_shared<SystemManagerCmd>(Code::CloseSystem), service::name::system_manager);
-        return true;
-    }
-
-    bool SystemManager::Update(Service *s, const std::string &updateOSVer, const std::string &currentOSVer)
-    {
-        // set update OS version (and also current os version) in Settings
-        storeOsVersion(s, updateOSVer, currentOSVer);
-
-        // close some services
-        s->bus.sendUnicast(std::make_shared<SystemManagerCmd>(Code::Update), service::name::system_manager);
-
-        // close some applications
-        auto msgCloseApplications = std::make_shared<app::manager::UpdateInProgress>(service::name::system_manager);
-        s->bus.sendUnicast(std::move(msgCloseApplications), app::manager::ApplicationManager::ServiceName);
-
         return true;
     }
 
@@ -251,22 +244,7 @@ namespace sys
         if (ret.first != ReturnCodes::Success) {
             LOG_WARN("Can't stop all services, %d ms wait time", sys::constants::restoreTimeout);
         }
-        auto msgCloseApplications = std::make_shared<app::manager::UpdateInProgress>(service::name::system_manager);
-        ret                       = s->bus.sendUnicastSync(std::move(msgCloseApplications),
-                                     app::manager::ApplicationManager::ServiceName,
-                                     sys::constants::restoreTimeout);
-        if (ret.first != ReturnCodes::Success) {
-            LOG_WARN("Can't stop all applications, %d ms wait time", sys::constants::restoreTimeout);
-        }
         return true;
-    }
-
-    void SystemManager::storeOsVersion(Service *s, const std::string &updateOSVer, const std::string &currentOSVer)
-    {
-        // store OS version in Settings
-        auto msgSetUpdateVersion = std::make_shared<app::manager::SetOsUpdateVersion>(
-            service::name::system_manager, updateOSVer, currentOSVer);
-        s->bus.sendUnicast(std::move(msgSetUpdateVersion), app::manager::ApplicationManager::ServiceName);
     }
 
     bool SystemManager::Reboot(Service *s)
@@ -277,9 +255,8 @@ namespace sys
 
     bool SystemManager::RebootToUpdate(Service *s, UpdateReason updateReason)
     {
-        s->bus.sendUnicast(
-            std::make_shared<SystemManagerCmd>(Code::RebootToUpdate, CloseReason::RegularPowerDown, updateReason),
-            service::name::system_manager);
+        s->bus.sendUnicast(std::make_shared<SystemManagerCmd>(Code::RebootToUpdate, CloseReason::Reboot, updateReason),
+                           service::name::system_manager);
         return true;
     }
 
@@ -571,21 +548,6 @@ namespace sys
         connect(ReadyToCloseMessage(), [&](Message *msg) {
             readyToCloseHandler(msg);
             return MessageNone{};
-        });
-
-        connect(typeid(sys::CpuFrequencyMessage), [this](sys::Message *message) -> sys::MessagePointer {
-            auto msg = static_cast<sys::CpuFrequencyMessage *>(message);
-
-            if (msg->getAction() == sys::CpuFrequencyMessage::Action::Increase) {
-                powerManager->IncreaseCpuFrequency();
-                cpuStatisticsTimer.start();
-            }
-            else if (msg->getAction() == sys::CpuFrequencyMessage::Action::Decrease) {
-                powerManager->DecreaseCpuFrequency();
-                cpuStatisticsTimer.start();
-            }
-
-            return sys::MessageNone{};
         });
 
         connect(typeid(sys::DeviceRegistrationMessage), [this](sys::Message *message) -> sys::MessagePointer {

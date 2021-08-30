@@ -14,17 +14,6 @@ PhoneLockChangeInfoWindow::PhoneLockChangeInfoWindow(app::Application *app, cons
     buildInterface();
 }
 
-status_bar::Configuration PhoneLockChangeInfoWindow::configureStatusBar(status_bar::Configuration appConfiguration)
-{
-    appConfiguration.enable(status_bar::Indicator::NetworkAccessTechnology);
-    appConfiguration.enable(status_bar::Indicator::Time);
-    appConfiguration.enable(status_bar::Indicator::PhoneMode);
-    appConfiguration.enable(status_bar::Indicator::Battery);
-    appConfiguration.enable(status_bar::Indicator::Signal);
-    appConfiguration.enable(status_bar::Indicator::SimCard);
-    return appConfiguration;
-}
-
 void PhoneLockChangeInfoWindow::onBeforeShow(ShowMode mode, SwitchData *data)
 {
     WindowWithTimer::onBeforeShow(mode, data);

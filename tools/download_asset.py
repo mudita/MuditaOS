@@ -14,17 +14,18 @@ import json
 import os
 import requests
 import sys
+
 from tqdm import tqdm
 import time
 
 
 class Getter(object):
-    '''Download latest ecooboot.bin image'''
+    '''Download latest ecooboot.bin/updater.bin images'''
 
     def __init__(self):
         self.host = 'https://api.github.com/repos'
         self.organisation = 'mudita'
-        self.repo = 'ecoboot'
+        self.repo = ''
         self.apitoken = None
         self.ghLogin = None
         self.getGitRoot()
@@ -38,6 +39,8 @@ class Getter(object):
         self.restPrefix += '/'
         self.restPrefix += self.organisation
         self.restPrefix += '/'
+        if self.repo == '':
+            raise ValueError("Repository must be set")
         self.restPrefix += self.repo
         self.restPrefix += '/'
         return self.restPrefix
@@ -57,7 +60,7 @@ class Getter(object):
         try:
             gitConfigReader = self.gitRepo.config_reader()
             self.apitoken = gitConfigReader.get_value("user", "apitoken")
-        except: 
+        except:
             pass
 
     def getGHLogin(self, args=None):
@@ -175,6 +178,7 @@ class Getter(object):
 
 
 def main():
+
     getter = Getter()
 
     parser = argparse.ArgumentParser(description="Download ecooboot")

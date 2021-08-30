@@ -18,6 +18,7 @@ namespace gui
 
         void showImage(bool show);
         void setImage(const UTF8 &name);
+        void setMinimumSizeToFitImage();
 
       private:
         Image *image;

@@ -171,7 +171,7 @@ TEST_CASE("Contact Groups tests")
 void addSomeContacts(ContactsDB &contactsDb)
 {
     ContactsTableRow testRow1 = {
-        {.ID = 0}, .nameID = 0, .numbersID = "0 1 2 3 4", .ringID = 0, .addressID = 0, .speedDial = "666"
+        Record(0), .nameID = 0, .numbersID = "0 1 2 3 4", .ringID = 0, .addressID = 0, .speedDial = "666"
 
     };
 

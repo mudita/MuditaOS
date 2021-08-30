@@ -27,10 +27,12 @@ namespace app
     class ApplicationOnBoarding : public Application
     {
       public:
-        explicit ApplicationOnBoarding(std::string name                    = name_onboarding,
-                                       std::string parent                  = {},
-                                       sys::phone_modes::PhoneMode mode    = sys::phone_modes::PhoneMode::Connected,
-                                       StartInBackground startInBackground = {false});
+        explicit ApplicationOnBoarding(
+            std::string name                            = name_onboarding,
+            std::string parent                          = {},
+            sys::phone_modes::PhoneMode phoneMode       = sys::phone_modes::PhoneMode::Connected,
+            sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled,
+            StartInBackground startInBackground         = {false});
 
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
@@ -48,8 +50,9 @@ namespace app
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {
-            return {{manager::actions::Launch, manager::actions::PhoneModeChanged},
-                    locks::AutoLockPolicy::PreventPermanently};
+            return {
+                {manager::actions::Launch, manager::actions::PhoneModeChanged, manager::actions::BluetoothModeChanged},
+                locks::AutoLockPolicy::PreventPermanently};
         }
     };
 } // namespace app

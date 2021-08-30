@@ -9,6 +9,7 @@
 #include <application-settings/windows/advanced/UITestWindow.hpp>
 #include <application-settings/windows/advanced/EinkModeWindow.hpp>
 #include <application-settings/windows/advanced/ColorTestWindow.hpp>
+#include <application-settings/windows/advanced/StatusBarImageTypeWindow.hpp>
 #include <application-settings/windows/bluetooth/BluetoothWindow.hpp>
 #include <application-settings/windows/bluetooth/AddDeviceWindow.hpp>
 #include <application-settings/windows/bluetooth/AllDevicesWindow.hpp>
@@ -59,7 +60,9 @@
 #include <application-settings/data/PhoneNameData.hpp>
 #include <application-settings/data/PINSettingsLockStateData.hpp>
 #include <application-settings/data/AutoLockData.hpp>
+#include <application-settings/models/apps/SoundsModel.hpp>
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
+#include <service-audio/AudioServiceAPI.hpp>
 #include <service-bluetooth/BluetoothMessage.hpp>
 #include <service-bluetooth/Constants.hpp>
 #include <service-bluetooth/messages/Status.hpp>
@@ -90,12 +93,19 @@ namespace app
         constexpr inline auto operators_on = "operators_on";
     } // namespace settings
 
+    static constexpr auto settingStackDepth = 1024 * 6; // 6Kb stack size
+
     ApplicationSettings::ApplicationSettings(std::string name,
                                              std::string parent,
-                                             sys::phone_modes::PhoneMode mode,
+                                             sys::phone_modes::PhoneMode phoneMode,
+                                             sys::bluetooth::BluetoothMode bluetoothMode,
                                              StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), mode, startInBackground), AsyncCallbackReceiver{this}
+        : Application(
+              std::move(name), std::move(parent), phoneMode, bluetoothMode, startInBackground, settingStackDepth),
+          AsyncCallbackReceiver{this}, soundsPlayer{std::make_shared<SoundsPlayer>(this)}
     {
+        bus.channels.push_back(sys::BusChannel::ServiceAudioNotifications);
+
         CellularServiceAPI::SubscribeForOwnNumber(this, [&](const std::string &number) {
             selectedSimNumber = number;
             LOG_DEBUG("Sim number changed");
@@ -127,14 +137,7 @@ namespace app
             }
         }
 
-        // handle database response
-        if (resp != nullptr) {
-            if (auto command = callbackStorage->getCallback(resp); command->execute()) {
-                refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-            }
-        }
-
-        return sys::MessageNone{};
+        return handleAsyncResponse(resp);
     }
 
     // Invoked during initialization
@@ -298,6 +301,17 @@ namespace app
             updateWindow(gui::window::name::autolock, std::move(data));
             return sys::MessageNone{};
         });
+
+        connect(typeid(AudioStopNotification), [&](sys::Message *msg) -> sys::MessagePointer {
+            auto notification = static_cast<AudioStopNotification *>(msg);
+            return handleAudioStop(notification);
+        });
+
+        connect(typeid(AudioEOFNotification), [&](sys::Message *msg) -> sys::MessagePointer {
+            auto notification = static_cast<AudioStopNotification *>(msg);
+            return handleAudioStop(notification);
+        });
+
         createUserInterface();
 
         settings->registerValueChange(settings::operators_on,
@@ -351,6 +365,9 @@ namespace app
         windowsFactory.attach(gui::window::name::color_test_window, [](Application *app, const std::string &name) {
             return std::make_unique<gui::ColorTestWindow>(app);
         });
+        windowsFactory.attach(gui::window::name::status_bar_img_type, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::StatusBarImageTypeWindow>(app);
+        });
 
         // Bluetooth
         windowsFactory.attach(gui::window::name::bluetooth, [](Application *app, const std::string &name) {
@@ -381,8 +398,9 @@ namespace app
             return std::make_unique<gui::SimPINSettingsWindow>(app);
         });
         windowsFactory.attach(gui::window::name::import_contacts, [&](Application *app, const std::string &name) {
-            auto model     = std::make_unique<SimContactsImportModel>(this);
-            auto presenter = std::make_unique<SimContactsImportWindowPresenter>(std::move(model));
+            auto repository = std::make_unique<SimContactsRepository>(this);
+            auto model      = std::make_unique<SimContactsImportModel>(this, std::move(repository));
+            auto presenter  = std::make_unique<SimContactsImportWindowPresenter>(this, std::move(model));
             return std::make_unique<gui::SimContactsImportWindow>(app, std::move(presenter));
         });
 
@@ -467,8 +485,9 @@ namespace app
                 std::make_unique<audio_settings::AudioSettingsModel>(app, audio_settings::PlaybackType::Alarm);
             return std::make_unique<gui::AlarmClockWindow>(app, std::move(audioModel));
         });
-        windowsFactory.attach(gui::window::name::sound_select, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::SoundSelectWindow>(app, name);
+        windowsFactory.attach(gui::window::name::sound_select, [this](Application *app, const std::string &name) {
+            auto model = std::make_shared<SoundsModel>(soundsPlayer);
+            return std::make_unique<gui::SoundSelectWindow>(app, name, std::move(model));
         });
 
         // Security
@@ -497,8 +516,9 @@ namespace app
         });
         windowsFactory.attach(gui::window::name::technical_information, [&](Application *app, const std::string &name) {
             auto factoryData = std::make_unique<FactoryData>(*settings);
-            auto model       = std::make_unique<TechnicalInformationModel>(std::move(factoryData));
-            auto presenter   = std::make_unique<TechnicalWindowPresenter>(std::move(model));
+            auto repository  = std::make_unique<TechnicalInformationRepository>(this);
+            auto model     = std::make_unique<TechnicalInformationModel>(std::move(factoryData), std::move(repository));
+            auto presenter = std::make_unique<TechnicalWindowPresenter>(this, std::move(model));
             return std::make_unique<gui::TechnicalInformationWindow>(app, std::move(presenter));
         });
         windowsFactory.attach(gui::window::name::certification, [](Application *app, const std::string &name) {
@@ -727,5 +747,11 @@ namespace app
                                                  switchWindow(gui::window::name::all_devices);
                                                  return true;
                                              }}));
+    }
+
+    auto ApplicationSettings::handleAudioStop(AudioStopNotification *notification) -> sys::MessagePointer
+    {
+        soundsPlayer->stop(notification->token);
+        return sys::MessageNone{};
     }
 } /* namespace app */

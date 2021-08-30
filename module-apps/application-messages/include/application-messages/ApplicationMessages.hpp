@@ -24,10 +24,12 @@ namespace app
     class ApplicationMessages : public app::Application, public app::AsyncCallbackReceiver
     {
       public:
-        explicit ApplicationMessages(std::string name                    = name_messages,
-                                     std::string parent                  = {},
-                                     sys::phone_modes::PhoneMode mode    = sys::phone_modes::PhoneMode::Connected,
-                                     StartInBackground startInBackground = {false});
+        explicit ApplicationMessages(
+            std::string name                            = name_messages,
+            std::string parent                          = {},
+            sys::phone_modes::PhoneMode phoneMode       = sys::phone_modes::PhoneMode::Connected,
+            sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled,
+            StartInBackground startInBackground         = {false});
 
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
@@ -75,7 +77,8 @@ namespace app
                      manager::actions::ShowSmsTemplates,
                      manager::actions::SmsRejectNoSim,
                      manager::actions::SMSRejectedByOfflineNotification,
-                     manager::actions::PhoneModeChanged}};
+                     manager::actions::PhoneModeChanged,
+                     manager::actions::BluetoothModeChanged}};
         }
     };
 } /* namespace app */

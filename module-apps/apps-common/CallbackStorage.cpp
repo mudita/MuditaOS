@@ -11,8 +11,9 @@ namespace app
 {
     CallbackStorage::CallbackEntry::CallbackEntry(RequestId id,
                                                   AsyncCallbackReceiver::Ptr receiver,
-                                                  std::optional<CallbackFunction> callbackFunction) noexcept
-        : id{id}, receiver{receiver}, callbackFunction(callbackFunction)
+                                                  std::optional<CallbackFunction> callbackFunction,
+                                                  ReceiverBehavior receiverBehavior) noexcept
+        : id{id}, receiver{receiver}, callbackFunction(callbackFunction), receiverBehavior(receiverBehavior)
     {}
 
     auto CallbackStorage::getCallback(sys::ResponseMessage *response) -> std::unique_ptr<AsyncCallback>
@@ -58,9 +59,10 @@ namespace app
 
     void CallbackStorage::registerCallback(RequestId id,
                                            AsyncCallbackReceiver::Ptr receiver,
-                                           std::optional<CallbackFunction> &&callback)
+                                           std::optional<CallbackFunction> &&callback,
+                                           ReceiverBehavior receiverBehavior)
     {
-        entries.push_back(std::make_unique<CallbackEntry>(id, receiver, std::move(callback)));
+        entries.push_back(std::make_unique<CallbackEntry>(id, receiver, std::move(callback), receiverBehavior));
     }
 
     void CallbackStorage::removeAll(AsyncCallbackReceiver::Ptr receiver)
@@ -68,5 +70,12 @@ namespace app
         const auto it = std::remove_if(
             entries.begin(), entries.end(), [receiver](const auto &entry) { return entry->receiver == receiver; });
         entries.erase(it, entries.end());
+    }
+
+    bool CallbackStorage::checkBlockingCloseRequests() const noexcept
+    {
+        return std::any_of(entries.begin(), entries.end(), [](const auto &request) {
+            return request->receiverBehavior == ReceiverBehavior::WaitForResponseToClose;
+        });
     }
 } // namespace app

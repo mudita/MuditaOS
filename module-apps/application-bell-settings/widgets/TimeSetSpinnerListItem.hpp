@@ -9,12 +9,12 @@
 
 namespace gui
 {
-    class TimeSetSpinner;
+    class TimeSetFmtSpinner;
 
     class TimeSetSpinnerListItem : public SideListItem
     {
       public:
-        TimeSetSpinner *timeSetSpinner = nullptr;
+        TimeSetFmtSpinner *timeSetFmtSpinner = nullptr;
 
         TimeSetSpinnerListItem(gui::Length x, gui::Length y, gui::Length w, gui::Length h, std::string description);
     };

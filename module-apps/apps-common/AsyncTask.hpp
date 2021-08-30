@@ -15,6 +15,12 @@ namespace app
     using RequestId = std::uint64_t;
     class AsyncCallbackReceiver;
 
+    enum class ReceiverBehavior
+    {
+        None,
+        WaitForResponseToClose
+    };
+
     class AsyncCallbacksDeleter
     {
       public:
@@ -53,7 +59,8 @@ namespace app
          */
         void execute(Application *application,
                      AsyncCallbackReceiver::Ptr receiverObject,
-                     std::optional<std::function<bool(sys::ResponseMessage *)>> callback = std::nullopt);
+                     std::optional<std::function<bool(sys::ResponseMessage *)>> callback = std::nullopt,
+                     ReceiverBehavior receiverBehavior                                   = ReceiverBehavior::None);
 
       private:
         /**

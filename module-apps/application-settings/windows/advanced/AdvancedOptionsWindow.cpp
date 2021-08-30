@@ -4,6 +4,7 @@
 #include "AdvancedOptionsWindow.hpp"
 
 #include <application-settings/windows/WindowNames.hpp>
+#include <status-bar/Style.hpp>
 
 std::list<gui::Option> advancedOptions(app::Application *app)
 {
@@ -26,6 +27,7 @@ std::list<gui::Option> advancedOptions(app::Application *app)
     addMenu("UI Test", gui::window::name::ui_test);
     addMenu("Eink Mode", gui::window::name::eink_mode);
     addMenu("Color Test", gui::window::name::color_test_window);
+    addMenu("Statusbar Image Test", gui::window::name::status_bar_img_type);
 
     return l;
 }

@@ -18,6 +18,10 @@ namespace bsp
         void SetHighestCoreVoltage() final;
         [[nodiscard]] uint32_t GetCpuFrequency() const noexcept final;
         void SwitchOscillatorSource(OscillatorSource source) final;
+        void SetBootSuccess() override;
+
+        void EnableDcdcPowerSaveMode() final;
+        void DisableDcdcPowerSaveMode() final;
     };
 
 } // namespace bsp

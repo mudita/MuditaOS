@@ -5,9 +5,12 @@
 #include "FileOperations.hpp"
 #include "service-desktop/DesktopMessages.hpp"
 #include "service-desktop/ServiceDesktop.hpp"
+#include <purefs/filesystem_paths.hpp>
+
 #include <filesystem>
 
 using namespace parserFSM;
+namespace fs = std::filesystem;
 
 auto FilesystemEndpoint::handle(Context &context) -> void
 {
@@ -29,18 +32,29 @@ auto FilesystemEndpoint::handle(Context &context) -> void
     }
     LOG_DEBUG("returnCode: %u", static_cast<unsigned>(returnCode));
 }
-static bool isWritable(const fs::path &file)
+
+auto FilesystemEndpoint::requestLogsFlush() const -> void
 {
-    auto lamb = [](std::FILE *stream) { std::fclose(stream); };
-
-    std::unique_ptr<std::FILE, decltype(lamb)> sf(std::fopen(file.c_str(), "w"), lamb);
-
-    return static_cast<bool>(sf);
+    auto owner = dynamic_cast<ServiceDesktop *>(ownerServicePtr);
+    if (owner) {
+        owner->requestLogsFlush();
+    }
 }
 
 auto FilesystemEndpoint::startGetFile(Context &context) const -> sys::ReturnCodes
 {
     std::filesystem::path filePath = context.getBody()[parserFSM::json::fileName].string_value();
+
+    try {
+        requestLogsFlush();
+    }
+    catch (const std::runtime_error &e) {
+        LOG_ERROR("Logs flush exception: %s", e.what());
+
+        context.setResponseStatus(parserFSM::http::Code::InternalServerError);
+        context.setResponseBody(json11::Json::object({{json::reason, std::string(e.what())}}));
+        return sys::ReturnCodes::Failure;
+    }
 
     if (!std::filesystem::exists(filePath)) {
         LOG_ERROR("file not found");
@@ -151,30 +165,7 @@ auto FilesystemEndpoint::runPost(Context &context) -> sys::ReturnCodes
     context.setResponseBody(
         json11::Json::object({{json::status, std::to_string(static_cast<int>(sys::ReturnCodes::Failure))}}));
 
-    auto owner = static_cast<ServiceDesktop *>(ownerServicePtr);
-
-    if (cmd == parserFSM::json::filesystem::commands::download) {
-        fs::path filePath    = context.getBody()[parserFSM::json::fileName].string_value();
-        fs::path tmpFilePath = purefs::dir::getUpdatesOSPath() / filePath;
-
-        const uint32_t fileSize = context.getBody()[parserFSM::json::fileSize].int_value();
-        const auto fileCrc32    = context.getBody()[parserFSM::json::fileCrc32].string_value();
-
-        LOG_DEBUG("got owner for tmp file");
-
-        if (isWritable(tmpFilePath)) {
-            LOG_INFO("download %" PRIu32 " bytes to tmp file", fileSize);
-
-            if (owner->desktopWorker->startDownload(tmpFilePath, fileSize, fileCrc32) == sys::ReturnCodes::Success) {
-                context.setResponseStatus(parserFSM::http::Code::Accepted);
-                returnCode = sys::ReturnCodes::Success;
-            }
-        }
-        else {
-            LOG_ERROR("download command failed, can't write %" PRIu32 " bytes to tmp file", fileSize);
-        }
-    }
-    else if (cmd == parserFSM::json::filesystem::commands::checkFile) {
+    if (cmd == parserFSM::json::filesystem::commands::checkFile) {
         fs::path filePath = context.getBody()[parserFSM::json::fileName].string_value();
         LOG_DEBUG("Checking file");
 

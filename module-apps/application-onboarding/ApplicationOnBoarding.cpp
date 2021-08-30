@@ -35,9 +35,11 @@ namespace app
 
     ApplicationOnBoarding::ApplicationOnBoarding(std::string name,
                                                  std::string parent,
-                                                 sys::phone_modes::PhoneMode mode,
+                                                 sys::phone_modes::PhoneMode phoneMode,
+                                                 sys::bluetooth::BluetoothMode bluetoothMode,
                                                  StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), mode, startInBackground, OnBoardingStackSize)
+        : Application(
+              std::move(name), std::move(parent), phoneMode, bluetoothMode, startInBackground, OnBoardingStackSize)
     {
         using namespace gui::status_bar;
         statusBarManager->enableIndicators(

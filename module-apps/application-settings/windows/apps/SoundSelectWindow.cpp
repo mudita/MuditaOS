@@ -10,8 +10,10 @@
 
 namespace gui
 {
-    SoundSelectWindow::SoundSelectWindow(app::Application *app, std::string name)
-        : AppWindow(app, name), mSoundsModel{std::make_shared<SoundsModel>()}
+    SoundSelectWindow::SoundSelectWindow(app::Application *app,
+                                         std::string name,
+                                         std::shared_ptr<AbstractSoundsModel> model)
+        : AppWindow(app, name), mSoundsModel{std::move(model)}
     {
         buildInterface();
     }
@@ -25,6 +27,7 @@ namespace gui
     void SoundSelectWindow::buildInterface()
     {
         AppWindow::buildInterface();
+        bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::play_pause));
         bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::select));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 

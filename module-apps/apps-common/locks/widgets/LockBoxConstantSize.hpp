@@ -17,6 +17,7 @@ namespace gui
         void clear() final;
         void popChar(unsigned int charNum) final;
         void putChar(unsigned int charNum) final;
+        void update(unsigned int inputFilled) final;
 
       protected:
         explicit LockBoxConstantSize(LockInputWindow *lockBaseWindow) : lockWindow(lockBaseWindow)

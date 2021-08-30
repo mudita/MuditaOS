@@ -78,10 +78,9 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
         if (!queue->Dequeue(&notification, 0)) {
             return false;
         }
-        uint8_t state, code;
-        bsp::keyboard_get_data(notification, state, code);
-
-        processKeyEvent(static_cast<bsp::KeyEvents>(state), static_cast<bsp::KeyCodes>(code));
+        for (const auto &key : bsp::keyboard::getKeyEvents(notification)) {
+            processKeyEvent(key.event, key.code);
+        }
     }
 
     if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueHeadsetIRQ)) {
@@ -110,7 +109,8 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
         if (!queue->Dequeue(&notification, 0)) {
             return false;
         }
-        if (notification == static_cast<std::uint8_t>(bsp::battery_charger::batteryIRQSource::INTB)) {
+        if (notification == static_cast<std::uint8_t>(bsp::battery_charger::batteryIRQSource::INTB) ||
+            notification == static_cast<std::uint8_t>(bsp::battery_charger::batteryIRQSource::INOKB)) {
             checkBatteryChargerInterrupts();
         }
     }
@@ -202,7 +202,7 @@ bool WorkerEvent::init(std::list<sys::WorkerQueueInfo> queuesList)
 {
     Worker::init(queuesList);
     bsp::vibrator::init();
-    bsp::keyboard_Init(queues[static_cast<int32_t>(WorkerEventQueues::queueKeyboardIRQ)]->GetQueueHandle());
+    bsp::keyboard::init(queues[static_cast<int32_t>(WorkerEventQueues::queueKeyboardIRQ)]->GetQueueHandle());
     bsp::headset::Init(queues[static_cast<int32_t>(WorkerEventQueues::queueHeadsetIRQ)]->GetQueueHandle());
     auto queueBatteryHandle = queues[static_cast<int32_t>(WorkerEventQueues::queueBattery)]->GetQueueHandle();
     auto queueChargerDetect = queues[static_cast<int32_t>(WorkerEventQueues::queueChargerDetect)]->GetQueueHandle();
@@ -239,7 +239,7 @@ void WorkerEvent::init(std::list<sys::WorkerQueueInfo> queuesList, std::shared_p
 bool WorkerEvent::deinit(void)
 {
     Worker::deinit();
-    bsp::keyboard_Deinit();
+    bsp::keyboard::deinit();
     bsp::headset::Deinit();
     bsp::battery_charger::deinit();
     bsp::torch::deinit();
@@ -327,6 +327,7 @@ void WorkerEvent::checkBatteryChargerInterrupts()
                 static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::minVAlert));
         }
         if (status & static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::SOCOnePercentChange)) {
+            bsp::battery_charger::printFuelGaugeInfo();
             bsp::battery_charger::clearFuelGuageIRQ(
                 static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::SOCOnePercentChange));
             bsp::battery_charger::getBatteryLevel();

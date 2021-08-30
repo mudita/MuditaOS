@@ -273,3 +273,17 @@ auto HSPAudioDevice::getSourceFormat() -> ::audio::AudioFormat
 {
     return AudioFormat{bluetooth::SCO::CVSD_SAMPLE_RATE, supportedBitWidth, supportedChannels};
 }
+
+audio::AudioDevice::RetCode A2DPAudioDevice::Pause()
+{
+    return (a2dp_source_pause_stream(AVRCP::mediaTracker.a2dp_cid, AVRCP::mediaTracker.local_seid) == 0)
+               ? audio::AudioDevice::RetCode::Success
+               : audio::AudioDevice::RetCode::Failure;
+}
+
+audio::AudioDevice::RetCode A2DPAudioDevice::Resume()
+{
+    return (a2dp_source_start_stream(AVRCP::mediaTracker.a2dp_cid, AVRCP::mediaTracker.local_seid) == 0)
+               ? audio::AudioDevice::RetCode::Success
+               : audio::AudioDevice::RetCode::Failure;
+}

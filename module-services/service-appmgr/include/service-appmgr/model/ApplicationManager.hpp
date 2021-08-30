@@ -113,6 +113,7 @@ namespace app::manager
 
       private:
         auto startApplication(ApplicationHandle &app) -> bool;
+        void startPendingApplicationOnCurrentClose();
         void startBackgroundApplications();
         void rebuildActiveApplications();
         void suspendSystemServices();
@@ -132,20 +133,23 @@ namespace app::manager
         auto resolveHomeApplication() -> std::string;
         auto handleLaunchAction(ActionEntry &action) -> ActionProcessStatus;
         auto handleActionOnFocusedApp(ActionEntry &action) -> ActionProcessStatus;
-        auto handlePhoneModeChangedAction(ActionEntry &action) -> ActionProcessStatus;
+        auto handleActionOnActiveApps(ActionEntry &action) -> ActionProcessStatus;
         void handlePhoneModeChanged(sys::phone_modes::PhoneMode phoneMode);
+        auto handleBluetoothModeChangedAction(ActionEntry &action) -> ActionProcessStatus;
+        void handleBluetoothModeChanged(sys::bluetooth::BluetoothMode mode);
+        void changeBluetoothMode(const ApplicationHandle *app);
         void handleTetheringChanged(sys::phone_modes::Tethering tethering);
         void changePhoneMode(sys::phone_modes::PhoneMode phoneMode, const ApplicationHandle *app);
         auto handleCustomAction(ActionEntry &action) -> ActionProcessStatus;
         auto handleCustomActionOnBackgroundApp(ApplicationHandle *app, ActionEntry &action) -> ActionProcessStatus;
         auto handleSwitchApplication(SwitchRequest *msg, bool closeCurrentlyFocusedApp = true) -> bool;
+        void handleFinalizingClose(FinalizingClose *msg);
         auto handleCloseConfirmation(CloseConfirmation *msg) -> bool;
         auto handleSwitchConfirmation(SwitchConfirmation *msg) -> bool;
         auto handleSwitchBack(SwitchBackRequest *msg) -> bool;
         auto handleInitApplication(ApplicationInitialised *msg) -> bool;
         auto handleDisplayLanguageChange(DisplayLanguageChangeRequest *msg) -> bool;
         auto handleInputLanguageChange(InputLanguageChangeRequest *msg) -> bool;
-        auto handleSetOsUpdateVersionChange(SetOsUpdateVersion *msg) -> bool;
         auto handleDBResponse(db::QueryResponse *msg) -> bool;
         auto handlePowerSavingModeInit() -> bool;
         auto handleMessageAsAction(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>;
@@ -165,6 +169,7 @@ namespace app::manager
         void onApplicationInitFailure(ApplicationHandle &app);
         auto onSwitchConfirmed(ApplicationHandle &app) -> bool;
         void onLaunchFinished(ApplicationHandle &app);
+        void onFinalizingClose();
         auto onCloseConfirmed(ApplicationHandle &app) -> bool;
         /// @brief method is called on auto-locking timer tick event (blockTimer)
         /// @detailed It sends AutoLock action to ApplicationDesktop to lock the screen.
@@ -183,6 +188,7 @@ namespace app::manager
                                         // lock screen.
         std::shared_ptr<settings::Settings> settings;
         std::shared_ptr<sys::phone_modes::Observer> phoneModeObserver;
+        sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled;
 
         locks::PhoneLockHandler phoneLockHandler;
         locks::SimLockHandler simLockHandler;

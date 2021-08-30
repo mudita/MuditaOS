@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SignalStrengthBar.hpp"
+#include "Style.hpp"
 #include <string>
 #include <Image.hpp>
 #include <unordered_map>
@@ -10,19 +11,19 @@ namespace gui::status_bar
 {
     namespace
     {
-        constexpr auto signal_none = "signal_noconn";
+        constexpr auto signal_none = "gsm_0_noconnection";
 
-        constexpr auto signal0 = "signal0";
-        constexpr auto signal1 = "signal1";
-        constexpr auto signal2 = "signal2";
-        constexpr auto signal3 = "signal3";
-        constexpr auto signal4 = "signal4";
+        constexpr auto signal0 = "gsm_0";
+        constexpr auto signal1 = "gsm_1";
+        constexpr auto signal2 = "gsm_2";
+        constexpr auto signal3 = "gsm_3";
+        constexpr auto signal4 = "gsm_4";
 
-        constexpr auto signal0_roaming = "signal0_roaming";
-        constexpr auto signal1_roaming = "signal1_roaming";
-        constexpr auto signal2_roaming = "signal2_roaming";
-        constexpr auto signal3_roaming = "signal3_roaming";
-        constexpr auto signal4_roaming = "signal4_roaming";
+        constexpr auto signal0_roaming = "gsm_0_roaming";
+        constexpr auto signal1_roaming = "gsm_1_roaming";
+        constexpr auto signal2_roaming = "gsm_2_roaming";
+        constexpr auto signal3_roaming = "gsm_3_roaming";
+        constexpr auto signal4_roaming = "gsm_4_roaming";
 
         using SignalMap = std::unordered_map<Store::RssiBar, std::string>;
 
@@ -42,7 +43,7 @@ namespace gui::status_bar
     SignalStrengthBar::SignalStrengthBar(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h)
         : SignalStrengthBase(parent, x, y, w, h)
     {
-        img = new Image(this, signal_none);
+        img = new Image(this, signal_none, style::status_bar::imageTypeSpecifier);
         setMinimumSize(img->getWidth(), style::status_bar::height);
     }
 
@@ -55,13 +56,13 @@ namespace gui::status_bar
             }
 
             if (status == Store::Network::Status::RegisteredRoaming) {
-                img->set(signalMapRoaming.at(signal.rssiBar));
+                img->set(signalMapRoaming.at(signal.rssiBar), style::status_bar::imageTypeSpecifier);
             }
             else if (status == Store::Network::Status::RegisteredHomeNetwork) {
-                img->set(signalMapHomeCon.at(signal.rssiBar));
+                img->set(signalMapHomeCon.at(signal.rssiBar), style::status_bar::imageTypeSpecifier);
             }
             else {
-                img->set(signal_none);
+                img->set(signal_none, style::status_bar::imageTypeSpecifier);
             }
         }
         catch (const std::exception &exception) {

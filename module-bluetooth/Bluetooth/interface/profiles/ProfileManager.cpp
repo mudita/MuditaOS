@@ -115,7 +115,7 @@ namespace bluetooth
     }
     auto ProfileManager::isAddressActuallyUsed(bd_addr_t address) -> bool
     {
-        return static_cast<bool>(bd_addr_cmp(address, remoteAddr));
+        return !static_cast<bool>(bd_addr_cmp(address, remoteAddr));
     }
 
 } // namespace bluetooth

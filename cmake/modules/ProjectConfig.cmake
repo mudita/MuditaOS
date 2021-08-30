@@ -32,15 +32,20 @@ else()
     set (USBCDC_ECHO_ENABLED 0 CACHE INTERNAL "")
 endif()
 
-#add Debug LUART enable option
+# add Debug LUART enable option
 if (${LOG_REDIRECT} STREQUAL "RTT_LUART")
     set (LOG_LUART_ENABLED 1 CACHE INTERNAL "")
 else()
     set (LOG_LUART_ENABLED 0 CACHE INTERNAL "")
 endif()
 
+# add Development Configuration option
+option(WITH_DEVELOPMENT_FEATURES "Include development features" OFF)
+set(DEVELOPER_SETTINGS_OPTIONS_DEFAULT ${WITH_DEVELOPMENT_FEATURES} CACHE INTERNAL "")
+set(ENABLE_DEVELOPER_MODE_ENDPOINT_DEFAULT ${WITH_DEVELOPMENT_FEATURES} CACHE INTERNAL "")
+
 # add Mudita USB Vendor/Product IDs
-option(MUDITA_USB_ID "Enables using Mudita registered USB Vendor ID and Pure Phone USB Product ID" OFF)
+option(MUDITA_USB_ID "Enables using Mudita registered USB Vendor ID and Pure Phone USB Product ID" ON)
 if (MUDITA_USB_ID)
     set (USB_DEVICE_VENDOR_ID  0x3310 CACHE INTERNAL "Sets USB_DEVICE_VENDOR_ID to Mudita Vendor ID")
     set (USB_DEVICE_PRODUCT_ID 0x0100 CACHE INTERNAL "Sets USB_DEVICE_PRODUCT_ID to Mudita Pure Product ID")

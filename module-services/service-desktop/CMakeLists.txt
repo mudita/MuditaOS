@@ -1,7 +1,10 @@
 project(service-desktop)
 message( "${PROJECT_NAME}  ${CMAKE_CURRENT_LIST_DIR}" )
 
-option(ENABLE_DEVELOPER_MODE_ENDPOINT "Enable developer mode endpoint in service desktop" ON)
+option(ENABLE_DEVELOPER_MODE_ENDPOINT
+    "Enable developer mode endpoint in service desktop"
+    ${ENABLE_DEVELOPER_MODE_ENDPOINT_DEFAULT}
+)
 
 set(SOURCES
     endpoints/BaseHelper.cpp
@@ -18,7 +21,6 @@ set(SOURCES
     endpoints/developerMode/DeveloperModeEndpoint.cpp
     endpoints/developerMode/DeveloperModeHelper.cpp
     endpoints/developerMode/Mode/UI_Helper.cpp
-    endpoints/developerMode/Mode/UpdateHelper.cpp
     endpoints/developerMode/event/DomRequest.cpp
     endpoints/developerMode/event/ATRequest.cpp
     endpoints/deviceInfo/DeviceInfoEndpoint.cpp
@@ -28,7 +30,7 @@ set(SOURCES
     endpoints/messages/MessagesEndpoint.cpp
     endpoints/restore/RestoreEndpoint.cpp
     endpoints/update/UpdateEndpoint.cpp
-    endpoints/update/UpdateMuditaOS.cpp
+    endpoints/update/UpdateHelper.cpp
     endpoints/filesystem/FilesystemEndpoint.cpp
     endpoints/filesystem/FileOperations.cpp
     endpoints/filesystem/FileContext.cpp
@@ -82,8 +84,6 @@ target_compile_definitions(
         ENABLE_DEVELOPER_MODE_ENDPOINT=$<BOOL:${ENABLE_DEVELOPER_MODE_ENDPOINT}>
 )
 
-
-if (${ENABLE_TESTS})
+if ($<BOOL:${ENABLE_TESTS}> AND ${ENABLE_DEVELOPER_MODE_ENDPOINT})
     add_subdirectory(tests)
 endif ()
-

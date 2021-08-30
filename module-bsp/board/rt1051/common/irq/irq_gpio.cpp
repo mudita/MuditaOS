@@ -110,10 +110,12 @@ namespace bsp
             uint32_t irq_mask                   = GPIO_GetPinsInterruptFlags(GPIO2);
 
             if (irq_mask & (1 << BOARD_KEYBOARD_RF_BUTTON_PIN)) {
-                xHigherPriorityTaskWoken |= keyboard_right_functional_IRQHandler();
+                xHigherPriorityTaskWoken |= bsp::keyboard::rightFunctionalIRQHandler();
             }
 
-            if (irq_mask & (1 << BOARD_BATTERY_CHARGER_INOKB_PIN)) {}
+            if (irq_mask & (1 << BOARD_BATTERY_CHARGER_INOKB_PIN)) {
+                xHigherPriorityTaskWoken |= bsp::battery_charger::INOKB_IRQHandler();
+            }
 
             if (irq_mask & (1 << BOARD_BATTERY_CHARGER_WCINOKB_PIN)) {}
 
@@ -142,7 +144,7 @@ namespace bsp
             uint32_t irq_mask                   = GPIO_GetPinsInterruptFlags(GPIO2);
 
             if (irq_mask & (1 << BOARD_KEYBOARD_IRQ_GPIO_PIN)) {
-                xHigherPriorityTaskWoken |= keyboard_IRQHandler();
+                xHigherPriorityTaskWoken |= bsp::keyboard::IRQHandler();
             }
 
             if (irq_mask & (1 << BOARD_USBC_NINT_PIN)) {
