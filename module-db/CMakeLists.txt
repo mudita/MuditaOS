@@ -17,14 +17,15 @@ set(SOURCES
         Database/sqlite3vfs.cpp
         ${SQLITE3_SOURCE}
 
-        Databases/ContactsDB.cpp
-        Databases/EventsDB.cpp
-        Databases/SmsDB.cpp
         Databases/AlarmsDB.cpp
-        Databases/NotesDB.cpp
         Databases/CalllogDB.cpp
+        Databases/ContactsDB.cpp
         Databases/CountryCodesDB.cpp
+        Databases/EventsDB.cpp
+        Databases/MultimediaFilesDB.cpp
+        Databases/NotesDB.cpp
         Databases/NotificationsDB.cpp
+        Databases/SmsDB.cpp
 
         Tables/AlarmEventsTable.cpp
         Tables/Table.cpp
@@ -43,6 +44,7 @@ set(SOURCES
         Tables/CountryCodesTable.cpp
         Tables/SMSTemplateTable.cpp
         Tables/NotificationsTable.cpp
+        Tables/MultimediaFilesTable.cpp
 
         Interface/AlarmEventRecord.cpp
         Interface/EventRecord.cpp
