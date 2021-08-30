@@ -118,6 +118,7 @@ namespace gui
     {
         alarm->setAlarmStatus(AlarmSetSpinner::Status::RINGING);
     }
+
     void BellHomeScreenWindow::setAlarmActive(bool val)
     {
         if (val) {
@@ -126,6 +127,11 @@ namespace gui
         else {
             alarm->setAlarmStatus(AlarmSetSpinner::Status::DEACTIVATED);
         }
+    }
+
+    void BellHomeScreenWindow::setAlarmVisible(bool val)
+    {
+        alarm->setVisible(val);
     }
 
     void BellHomeScreenWindow::setTemperature(utils::temperature::Temperature newTemp)
