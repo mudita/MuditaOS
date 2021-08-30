@@ -78,8 +78,7 @@ namespace gui
             }
 
             // create item for show and update Line data
-            auto item =
-                buildUITextPart(text.substr(0, signsCountToShow) + (breakLineDashAddition ? "-" : ""), textFormat);
+            auto item = buildUITextPart(textToPrint(signsCountToShow, text), textFormat);
             shownLetterCount += signsCountToShow;
             widthUsed += item->getTextNeedSpace();
             heightUsed = std::max(heightUsed, item->getTextHeight());
@@ -88,6 +87,11 @@ namespace gui
             setLineStartConditions(localCursor.getBlockNumber(), localCursor.getPosition());
 
             localCursor += signsCountToShow;
+
+            if (removeTrailingSpace) {
+                end = TextBlock::End::Newline;
+                return;
+            }
 
             if (localCursor.checkAndInvalidateBlockChanged() && localCursor.checkPreviousBlockNewLine()) {
                 end = TextBlock::End::Newline;
@@ -124,8 +128,14 @@ namespace gui
 
         // check if space found and no newline at end
         if (spacePos != UTF8::npos && newlinePos == UTF8::npos) {
+            // if line ends on space remove it when drawing
+            if (spacePos >= signsCountToShow) {
+                removeTrailingSpace = true;
+            }
+
             // add one to include space in the line
-            signsCountToShow      = spacePos + 1;
+            signsCountToShow = spacePos + 1;
+
             breakLineDashAddition = false;
         }
         // if sings still left in text add dash sign
@@ -138,6 +148,21 @@ namespace gui
         return signsCountToShow;
     }
 
+    UTF8 TextLine::textToPrint(unsigned int signsCountToShow, UTF8 &text)
+    {
+        auto textToPrint = text.substr(0, signsCountToShow);
+
+        if (removeTrailingSpace) {
+            textToPrint = text.substr(0, signsCountToShow - 1);
+        }
+
+        if (breakLineDashAddition) {
+            textToPrint = textToPrint + "-";
+        }
+
+        return textToPrint;
+    }
+
     TextLine::TextLine(TextLine &&from) noexcept
     {
         lineContent            = std::move(from.lineContent);
@@ -145,14 +170,12 @@ namespace gui
         widthUsed              = from.widthUsed;
         heightUsed             = from.heightUsed;
         underline              = from.underline;
-        drawUnderline          = from.drawUnderline;
-        drawUnderlineMode      = from.drawUnderlineMode;
-        underlinePadding       = from.underlinePadding;
-        underlineHeight        = from.underlineHeight;
+        underLineProperties    = from.underLineProperties;
         lineEnd                = from.lineEnd;
         end                    = from.end;
         maxWidth               = from.maxWidth;
         breakLineDashAddition  = from.breakLineDashAddition;
+        removeTrailingSpace    = from.removeTrailingSpace;
         lineStartBlockNumber   = from.lineStartBlockNumber;
         lineStartBlockPosition = from.lineStartBlockPosition;
         lineVisible            = from.lineVisible;
@@ -201,7 +224,7 @@ namespace gui
 
         for (auto &el : lineContent) {
             auto scopedDisown = ScopedParentDisown(el);
-            el->setArea({lineXPosition, y - underlinePadding, el->getWidth(), el->getHeight()});
+            el->setArea({lineXPosition, y - underLineProperties.underLinePadding, el->getWidth(), el->getHeight()});
             lineXPosition += el->getWidth();
         }
     }
@@ -220,7 +243,7 @@ namespace gui
             return;
         }
 
-        createUnderline(maxWidth, underlineHeight);
+        createUnderline(maxWidth, underLineProperties.underlineHeight);
         parent->addWidget(underline);
 
         for (auto &el : lineContent) {
@@ -258,6 +281,18 @@ namespace gui
             currentPos += el->getTextLength();
         }
         return width;
+    }
+
+    const Item *TextLine::getElement(unsigned int pos) const noexcept
+    {
+        unsigned int local_pos = 0;
+        for (auto &el : lineContent) {
+            local_pos += el->getTextLength();
+            if (local_pos >= pos) {
+                return el;
+            }
+        }
+        return nullptr;
     }
 
     UTF8 TextLine::getText(unsigned int pos) const
@@ -299,7 +334,7 @@ namespace gui
 
         if (xOffset >= 0) {
 
-            if (underline != nullptr && drawUnderlineMode == UnderlineDrawMode::Concurrent)
+            if (underline != nullptr && underLineProperties.drawUnderlineMode == UnderlineDrawMode::Concurrent)
                 underline->setPosition(underline->getPosition(Axis::X) + xOffset, Axis::X);
 
             for (auto &el : lineContent) {
@@ -330,12 +365,13 @@ namespace gui
 
     void TextLine::createUnderline(unsigned int width, unsigned int initHeight)
     {
-        if (drawUnderline) {
+        if (underLineProperties.draw) {
 
             underline = new Rect(nullptr, 0, 0, maxWidth, initHeight);
+            underline->setPenWidth(underLineProperties.thickness);
             underline->setEdges(RectangleEdge::Bottom);
 
-            if (drawUnderlineMode == UnderlineDrawMode::WholeLine) {
+            if (underLineProperties.drawUnderlineMode == UnderlineDrawMode::WholeLine) {
                 heightUsed = std::max(heightUsed, (Length)initHeight);
             }
         }
@@ -343,10 +379,10 @@ namespace gui
 
     void TextLine::updateUnderline(const short &x, const short &y)
     {
-        if (underline != nullptr && drawUnderlineMode == UnderlineDrawMode::WholeLine) {
+        if (underline != nullptr && underLineProperties.drawUnderlineMode == UnderlineDrawMode::WholeLine) {
             underline->setArea({x, y, underline->widgetArea.w, height()});
         }
-        else if (underline != nullptr && drawUnderlineMode == UnderlineDrawMode::Concurrent) {
+        else if (underline != nullptr && underLineProperties.drawUnderlineMode == UnderlineDrawMode::Concurrent) {
             underline->setArea({x, y, getWidth(), height()});
         }
     }

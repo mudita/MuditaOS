@@ -11,6 +11,7 @@ namespace gui
 {
     class CheckBox : public HBox
     {
+        bool checkState                                              = false;
         Image *image                                                 = nullptr;
         std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr;
         std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr;

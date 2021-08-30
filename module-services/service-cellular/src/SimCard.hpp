@@ -63,10 +63,15 @@ namespace cellular::service
     class SimCard
     {
       public:
-        /** Check if sim card slot has been selected and cmd channel is set
+        /** Check if cmd channel is set
          * @return true if ready to communicate
          */
         bool ready() const;
+
+        /** Check if card is fully initialized
+         * @return true in card is fully operational
+         */
+        bool initialized() const;
 
         /** Set cmd channel
          * \param channel channel (or nullptr to block communication)

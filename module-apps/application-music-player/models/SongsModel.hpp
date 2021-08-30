@@ -5,6 +5,7 @@
 
 #include "module-apps/application-music-player/data/MusicPlayerStyle.hpp"
 
+#include "SongContext.hpp"
 #include "SongsRepository.hpp"
 #include "SongsModelInterface.hpp"
 
@@ -17,8 +18,10 @@ namespace app::music_player
       public:
         explicit SongsModel(std::shared_ptr<AbstractSongsRepository> songsRepository);
 
-        void clearData();
-        void createData(std::function<bool(const std::string &fileName)>) override;
+        void createData(OnShortReleaseCallback shortReleaseCallback,
+                        OnLongPressCallback longPressCallback,
+                        OnSetBottomBarTemporaryCallback bottomBarTemporaryMode,
+                        OnRestoreBottomBarTemporaryCallback bottomBarRestoreFromTemporaryMode) override;
 
         [[nodiscard]] auto requestRecordsCount() -> unsigned int override;
 
@@ -26,17 +29,27 @@ namespace app::music_player
 
         auto getItem(gui::Order order) -> gui::ListItem * override;
 
-        void requestRecords(const uint32_t offset, const uint32_t limit) override;
+        void requestRecords(uint32_t offset, uint32_t limit) override;
+
+        size_t getCurrentIndex() const override;
+        std::string getNextFilePath(const std::string &filePath) const override;
+        std::string getPreviousFilePath(const std::string &filePath) const override;
 
         bool isSongPlaying() const noexcept override;
         void setCurrentSongState(SongState songState) noexcept override;
         std::optional<audio::Token> getCurrentFileToken() const noexcept override;
-        void setCurrentFileToken(std::optional<audio::Token> token) noexcept override;
 
-      protected:
-        SongState currentSongState = SongState::NotPlaying;
+        SongContext getCurrentSongContext() const noexcept override;
+        void setCurrentSongContext(SongContext context) override;
+        void clearCurrentSongContext() override;
 
-        std::optional<audio::Token> currentFileToken;
+        void clearData() override;
+
+      private:
+        void clearCurrentItemState();
+        void updateCurrentItemState();
+        SongContext songContext;
+
         std::shared_ptr<AbstractSongsRepository> songsRepository;
     };
 } // namespace app::music_player

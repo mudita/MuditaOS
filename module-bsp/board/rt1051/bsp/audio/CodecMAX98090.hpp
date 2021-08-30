@@ -152,10 +152,19 @@ class CodecMAX98090 : public Codec
 
     CodecRetCode Ioctrl(const CodecParams &param) override final;
 
+    void SetEqualizerParameters(float b0, float b1, float b2, float a1, float a2, std::size_t band);
+    void EnableFilterBands(std::size_t bandsCount);
+
   private:
     std::shared_ptr<drivers::DriverI2C> i2c;
     drivers::I2CAddress i2cAddr;
     CodecParamsMAX98090 currentParams;
+
+    enum class FilterMode : bool
+    {
+        Voice,
+        Music
+    };
 
     CodecRetCode SetOutputVolume(const float vol);
     CodecRetCode SetInputGain(const float gain);
@@ -163,10 +172,17 @@ class CodecMAX98090 : public Codec
     CodecRetCode SetInputPath(const CodecParamsMAX98090::InputPath path);
     CodecRetCode SetOutputPath(const CodecParamsMAX98090::OutputPath path);
     CodecRetCode MicBias(const bool enable);
-    CodecRetCode SetupEarspeakerEqualizer();
-    CodecRetCode SetupLoudspeakerEqualizer();
     CodecRetCode WriteFilterCoeff(const float coeff, const uint8_t basereg);
     CodecRetCode Reset();
+    /**
+     * @brief Set playback path parameters.
+     *
+     * @param coarse Coarse gain [0;3].
+     * @param playbackType Fine attenuation [0;15].
+     *
+     */
+    void SetPlaybackPath(uint8_t coarse, uint8_t fine);
+    void SetFilterMode(FilterMode mode);
 };
 
 #endif // PUREPHONE_CODECMAX98090_HPP

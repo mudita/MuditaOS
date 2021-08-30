@@ -5,7 +5,12 @@
 #include "PlatformFactory.hpp"
 
 // applications
+#ifdef ENABLE_APP_ANTENNA
 #include <application-antenna/ApplicationAntenna.hpp>
+#endif
+#ifdef ENABLE_APP_ALARM_CLOCK
+#include <application-alarm-clock/ApplicationAlarmClock.hpp>
+#endif
 #include <application-call/ApplicationCall.hpp>
 #include <application-calllog/ApplicationCallLog.hpp>
 #include <application-desktop/ApplicationDesktop.hpp>
@@ -18,7 +23,6 @@
 #include <application-music-player/ApplicationMusicPlayer.hpp>
 #include <application-meditation/ApplicationMeditation.hpp>
 #include <application-calculator/ApplicationCalculator.hpp>
-#include <application-alarm-clock/ApplicationAlarmClock.hpp>
 #include <application-onboarding/ApplicationOnBoarding.hpp>
 
 // services
@@ -57,6 +61,7 @@
 
 int main()
 {
+    constexpr auto ApplicationName = "PurePhone";
 
 #if SYSTEM_VIEW_ENABLED
     SEGGER_SYSVIEW_Conf();
@@ -110,7 +115,7 @@ int main()
                 abort();
             }
 
-            Log::Logger::get().init();
+            Log::Logger::get().init(Log::Application{ApplicationName, GIT_REV, GIT_TAG, GIT_BRANCH});
             /// force initialization of PhonenumberUtil because of its stack usage
             /// otherwise we would end up with an init race and PhonenumberUtil could
             /// be initiated in a task with stack not big enough to handle it
@@ -175,7 +180,7 @@ int main()
                 sysmgr.get());
         });
 
-    LOG_PRINTF("Launching PurePhone \n");
+    LOG_PRINTF("Launching %s \n", ApplicationName);
     LOG_PRINTF("commit: %s tag: %s branch: %s\n", GIT_REV, GIT_TAG, GIT_BRANCH);
     cpp_freertos::Thread::StartScheduler();
 

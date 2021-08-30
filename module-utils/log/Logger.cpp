@@ -6,10 +6,26 @@
 #include <gsl/util>
 #include "LockGuard.hpp"
 #include <Logger.hpp>
+#include <module-utils/Utils.hpp>
 #include "macros.h"
 
 namespace Log
 {
+    namespace
+    {
+        std::string getRotatedLogFileExtension(int count)
+        {
+            return ".log." + utils::to_string(count);
+        }
+
+        std::filesystem::path getRotatedFilePath(const std::filesystem::path &source, int rotationCount)
+        {
+            auto path = source;
+            path.replace_extension(getRotatedLogFileExtension(rotationCount));
+            return path;
+        }
+    } // namespace
+
     std::map<std::string, logger_level> Logger::filtered = {{"ApplicationManager", logger_level::LOGINFO},
                                                             {"CellularMux", logger_level::LOGINFO},
                                                             {"ServiceCellular", logger_level::LOGINFO},
@@ -22,6 +38,13 @@ namespace Log
                                                             {CRIT_STR, logger_level::LOGTRACE},
                                                             {IRQ_STR, logger_level::LOGTRACE}};
     const char *Logger::levelNames[]                     = {"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"};
+
+    std::ostream &operator<<(std::ostream &stream, const Application &application)
+    {
+        stream << application.name << ' ' << application.revision << ", " << application.tag << ", "
+               << application.branch << '\n';
+        return stream;
+    }
 
     Logger::Logger() : circularBuffer(circularBufferSize)
     {}
@@ -57,8 +80,11 @@ namespace Log
         return logs;
     }
 
-    void Logger::init()
+    void Logger::init(Application app, size_t fileSize, int filesCount)
     {
+        application      = std::move(app);
+        maxFileSize      = fileSize;
+        maxRotationIndex = filesCount - 1;
 #if LOG_USE_COLOR == 1
         enableColors(true);
 #else
@@ -118,4 +144,73 @@ namespace Log
 
         return loggerBufferCurrentPos;
     }
-}; // namespace Log
+
+    /// @param logPath: file path to store the log
+    /// @return: < 0 - error occured during log flush
+    /// @return:   0 - log flush did not happen
+    /// @return:   1 - log flush successflul
+    auto Logger::dumpToFile(std::filesystem::path logPath) -> int
+    {
+        auto firstDump = !std::filesystem::exists(logPath);
+        if (const bool maxSizeExceeded = !firstDump && std::filesystem::file_size(logPath) > maxFileSize;
+            maxSizeExceeded) {
+            LOG_DEBUG("Max log file size exceeded. Rotating log files...");
+            {
+                LockGuard lock(logFileMutex);
+                rotateLogFile(logPath);
+            }
+            firstDump = true;
+        }
+
+        int status = 1;
+        {
+            const auto &logs = getLogs();
+
+            LockGuard lock(logFileMutex);
+            std::ofstream logFile(logPath, std::fstream::out | std::fstream::app);
+            if (!logFile.good()) {
+                status = -EIO;
+            }
+
+            if (firstDump) {
+                addFileHeader(logFile);
+            }
+            logFile.write(logs.data(), logs.size());
+            if (logFile.bad()) {
+                status = -EIO;
+            }
+        }
+
+        LOG_DEBUG("Flush ended with status: %d", status);
+
+        return status;
+    }
+
+    void Logger::rotateLogFile(const std::filesystem::path &logPath)
+    {
+        for (int i = currentRotationIndex; i > 0; --i) {
+            std::filesystem::path src = getRotatedFilePath(logPath, i);
+            if (i == maxRotationIndex) {
+                std::filesystem::remove(src);
+                continue;
+            }
+            std::filesystem::path dest = getRotatedFilePath(logPath, i + 1);
+            std::filesystem::rename(src, dest);
+        }
+        auto rotatedLogPath = getRotatedFilePath(logPath, 1);
+        std::filesystem::rename(logPath, rotatedLogPath);
+        onLogRotationFinished();
+    }
+
+    void Logger::onLogRotationFinished() noexcept
+    {
+        if (currentRotationIndex < maxRotationIndex) {
+            ++currentRotationIndex;
+        }
+    }
+
+    void Logger::addFileHeader(std::ofstream &file) const
+    {
+        file << application;
+    }
+} // namespace Log

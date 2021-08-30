@@ -73,7 +73,7 @@ namespace gui
 
         void addNextListHeader(gui::Item *parent, const std::string &text)
         {
-            parent->addWidget(new TextWithSnippet(text, style::window::font::small));
+            parent->addWidget(decorate(new TextWithSnippet(text, style::window::font::small)));
         }
     } // namespace
 

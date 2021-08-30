@@ -82,7 +82,7 @@ bool CalllogRecordInterface::Add(const CalllogRecord &rec)
         LOG_DEBUG("Adding private call entry to call log record.");
     }
 
-    return calllogDB->calls.add(CalllogTableRow{{.ID = localRec.ID}, // this is only to remove warning
+    return calllogDB->calls.add(CalllogTableRow{Record(localRec.ID), // this is only to remove warning
                                                 .number       = localRec.phoneNumber.getEntered(),
                                                 .e164number   = localRec.phoneNumber.getE164(),
                                                 .presentation = localRec.presentation,
@@ -161,7 +161,7 @@ bool CalllogRecordInterface::Update(const CalllogRecord &rec)
         }
     }
 
-    return calllogDB->calls.update(CalllogTableRow{{.ID = rec.ID},
+    return calllogDB->calls.update(CalllogTableRow{Record(rec.ID),
                                                    .number       = rec.phoneNumber.getEntered(),
                                                    .e164number   = rec.phoneNumber.getE164(),
                                                    .presentation = presentation,

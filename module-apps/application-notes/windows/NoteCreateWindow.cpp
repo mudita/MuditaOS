@@ -3,8 +3,15 @@
 
 #include "NoteCreateWindow.hpp"
 
+#include <application-notes/ApplicationNotes.hpp>
+
 namespace app::notes
 {
+    NoteCreateWindow::NoteCreateWindow(app::Application *app,
+                                       std::unique_ptr<NoteEditWindowContract::Presenter> &&windowPresenter)
+        : NoteEditWindow(app, std::move(windowPresenter), gui::name::window::note_create)
+    {}
+
     bool NoteCreateWindow::onInput(const gui::InputEvent &inputEvent)
     {
         if (inputEvent.isShortRelease(gui::KeyCode::KEY_ENTER)) {

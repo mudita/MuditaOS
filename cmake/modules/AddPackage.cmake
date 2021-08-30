@@ -40,6 +40,7 @@ function(add_standalone_image SOURCE_TARGET)
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         DEPENDS ${BIN_FILE}
         DEPENDS ecoboot.bin-target
+        DEPENDS updater.bin-target
         DEPENDS ${SOURCE_TARGET}-version.json-target
         DEPENDS ${SOURCE_TARGET}.img
         )
@@ -67,6 +68,7 @@ function(add_update_package SOURCE_TARGET)
         DEPENDS ${SOURCE_TARGET}-boot.bin
         DEPENDS ${SOURCE_TARGET}-version.json-target
         DEPENDS ecoboot.bin-target
+        DEPENDS updater.bin-target
         DEPENDS assets
         COMMAND ${CMAKE_SOURCE_DIR}/tools/generate_update_image.sh ${SOURCE_TARGET} ${CMAKE_PROJECT_VERSION} ${CPACK_SYSTEM_NAME}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}

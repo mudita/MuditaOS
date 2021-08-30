@@ -23,3 +23,8 @@ void ImageBox::setImage(const UTF8 &name)
 {
     image->set(name);
 }
+
+void ImageBox::setMinimumSizeToFitImage()
+{
+    setMinimumSize(image->getWidth(), image->getHeight());
+}

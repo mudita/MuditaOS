@@ -67,16 +67,28 @@ class ServiceAudio : public sys::Service
         -> std::unique_ptr<AudioResponseMessage>;
     auto HandleStop(const std::vector<audio::PlaybackType> &stopTypes, const audio::Token &token)
         -> std::unique_ptr<AudioResponseMessage>;
+
+    enum class StopReason
+    {
+        Eof,
+        Other
+    };
+
+    auto StopInput(audio::AudioMux::Input *input, StopReason stopReason = StopReason::Other) -> audio::RetCode;
     auto HandleSendEvent(std::shared_ptr<audio::Event> evt) -> std::unique_ptr<AudioResponseMessage>;
     auto HandlePause(const audio::Token &token) -> std::unique_ptr<AudioResponseMessage>;
     auto HandlePause(std::optional<audio::AudioMux::Input *> input) -> std::unique_ptr<AudioResponseMessage>;
     auto HandleResume(const audio::Token &token) -> std::unique_ptr<AudioResponseMessage>;
     auto HandleGetFileTags(const std::string &fileName) -> std::unique_ptr<AudioResponseMessage>;
-    void HandleNotification(const AudioNotificationMessage::Type &type, const audio::Token &token);
+    void HandleEOF(const audio::Token &token);
     auto HandleKeyPressed(const int step) -> sys::MessagePointer;
     void MuteCurrentOperation();
     void VibrationUpdate(const audio::PlaybackType &type               = audio::PlaybackType::None,
                          std::optional<audio::AudioMux::Input *> input = std::nullopt);
+    void DisableVibration(std::optional<audio::AudioMux::Input *> input = std::nullopt);
+    void EnableOneShotVibration();
+    void EnableContinuousVibration(std::optional<audio::AudioMux::Input *> input = std::nullopt);
+
     auto GetVibrationType(const audio::PlaybackType &type) -> VibrationType;
 
     auto IsVibrationEnabled(const audio::PlaybackType &type) -> bool;
@@ -106,6 +118,8 @@ class ServiceAudio : public sys::Service
     void onVolumeChanged(audio::Volume volume);
     auto handleA2DPVolumeChangedOnBluetoothDevice(sys::Message *msgl) -> sys::MessagePointer;
     auto handleHSPVolumeChangedOnBluetoothDevice(sys::Message *msgl) -> sys::MessagePointer;
+    auto handleA2DPAudioPause() -> sys::MessagePointer;
+    auto handleA2DPAudioStart() -> sys::MessagePointer;
 };
 
 namespace sys

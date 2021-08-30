@@ -6,6 +6,7 @@
 #include <BoxLayout.hpp>
 
 #include <PhoneModes/Common.hpp>
+#include <service-bluetooth/Constants.hpp>
 
 #include <vector>
 #include <map>
@@ -21,6 +22,7 @@ namespace gui
         class PhoneMode;
         class BatteryBase;
         class NetworkAccessTechnology;
+        class BT;
         class SIM;
         class Time;
         class Lock;
@@ -40,6 +42,7 @@ namespace gui::status_bar
         Time,                    /// digital clock
         Lock,                    /// is phone locked
         Battery,                 /// battery status
+        Bluetooth,               /// bluetooth status
         SimCard,                 /// sim card info
         NetworkAccessTechnology, /// NAT (eg 3G, 4G, LTE)
         PhoneMode,               /// phone mode
@@ -74,6 +77,10 @@ namespace gui::status_bar
         /// @param phoneMode desired phone mode configuration
         void setPhoneMode(sys::phone_modes::PhoneMode phoneMode);
 
+        /// Set bluetooth mode
+        /// @param bluetoothMode desired bluetooth mode configuration
+        void setBluetoothMode(sys::bluetooth::BluetoothMode bluetoothMode);
+
         /// Set a configuration modifier to the specified indicator
         /// @param indicator indicator type
         /// @param config desired indicator's configuration
@@ -82,6 +89,10 @@ namespace gui::status_bar
         /// Get the phone mode configuration
         /// @return phone mode
         [[nodiscard]] auto getPhoneMode() const noexcept -> sys::phone_modes::PhoneMode;
+
+        /// Get the bluetooth mode configuration
+        /// @return bluetooth mode
+        [[nodiscard]] auto getBluetoothMode() const noexcept -> sys::bluetooth::BluetoothMode;
 
         /// Check if the specified indicator is enabled
         /// @param indicator indicator to be checked
@@ -103,11 +114,15 @@ namespace gui::status_bar
                                                {Indicator::Time, false},
                                                {Indicator::Lock, false},
                                                {Indicator::Battery, false},
+                                               {Indicator::Bluetooth, false},
                                                {Indicator::SimCard, false},
                                                {Indicator::NetworkAccessTechnology, false}};
 
         /// Phone mode
         sys::phone_modes::PhoneMode mPhoneMode = sys::phone_modes::PhoneMode::Connected;
+
+        /// Bluetooth mode
+        sys::bluetooth::BluetoothMode mBluetoothMode = sys::bluetooth::BluetoothMode::Disabled;
 
         /// Indicator modifiers:
         IndicatorsModifiers indicatorsModifiers;
@@ -138,6 +153,9 @@ namespace gui::status_bar
         [[nodiscard]] auto getConfiguration() const noexcept -> const Configuration &;
 
         /// Update sim card status widget state depending on the current configuration
+        bool updateBluetooth(sys::bluetooth::BluetoothMode mode);
+
+        /// Update sim card status widget state depending on the current configuration
         bool updateSim();
 
         /// Update clock widget state depending on the current configuration
@@ -161,6 +179,10 @@ namespace gui::status_bar
       protected:
         /// Set up and add all the widgets to the status bar
         void prepareWidget();
+
+        /// Show/hide bluetooth status widget
+        /// @param enabled true to show false to hide the widget
+        void showBluetooth(bool enabled);
 
         /// Show/hide sim card status widget
         /// @param enabled true to show false to hide the widget
@@ -214,6 +236,9 @@ namespace gui::status_bar
 
         /// Pointer to widget showing lock status
         Lock *lock = nullptr;
+
+        /// Pointer to widget with bluetooth status
+        BT *bluetooth = nullptr;
 
         /// Pointer to widget with sim card status
         SIM *sim = nullptr;

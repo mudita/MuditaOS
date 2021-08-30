@@ -29,20 +29,9 @@ namespace bsp
         Configured
     };
 
-    class USBDeviceListener
-    {
-      public:
-        virtual bool getRawMode() const noexcept
-        {
-            return false;
-        }
-        virtual void rawDataReceived(void *dataPtr, uint32_t dataLen) = 0;
-    };
-
     struct usbInitParams {
         xQueueHandle queueHandle;
         xQueueHandle irqQueueHandle;
-        USBDeviceListener *deviceListener;
         const char *serialNumber;
     };
 

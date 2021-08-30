@@ -40,7 +40,8 @@ TEST_CASE("Text ctor")
     SECTION("one line")
     {
         auto testtext = "text0 text1 text2";
-        auto text     = Text(nullptr, 0, 0, 0, 0, testtext);
+        auto text     = Text(nullptr, 0, 0, 0, 0);
+        text.setText(testtext);
         REQUIRE(text.getText() == testtext);
     }
 }
@@ -201,7 +202,7 @@ TEST_CASE("handle input mode ABC/abc/1234")
 
     SECTION("ABC -> abc")
     {
-        auto time_long_enough_to_not_be_multipress = 1000;
+        auto time_long_enough_to_not_be_multipress = 1500;
         text.onInput(next_mode);
         auto rawKey_2 = key_2.getRawKey();
         rawKey_2.timeRelease += time_long_enough_to_not_be_multipress;
@@ -237,6 +238,38 @@ TEST_CASE("handle longpress for digit in ABC mode")
     REQUIRE(str == text.getText());
 }
 
+TEST_CASE("handle longpress for digit in phone mode")
+{
+    auto text  = gui::TestText();
+    auto str   = text.getText() + "+";
+    auto key_0 = gui::InputEvent({}, gui::InputEvent::State::keyReleasedLong, gui::KeyCode::KEY_0);
+    text.setInputMode(new InputMode({InputMode::phone}));
+    text.onInput(key_0);
+    REQUIRE(str == text.getText());
+}
+
+TEST_CASE("Handle backspace longpress")
+{
+    auto text          = gui::TestText();
+    auto key_backspace = gui::InputEvent({}, gui::InputEvent::State::keyReleasedLong, gui::KeyCode::KEY_PND);
+    text.setInputMode(new InputMode({InputMode::ABC}));
+
+    SECTION("Empty text")
+    {
+        REQUIRE(text.getText().empty());
+        auto input_handled = text.onInput(key_backspace);
+        REQUIRE(input_handled == false);
+    }
+
+    SECTION("Not empty text")
+    {
+        text.addText("test");
+        REQUIRE(text.getText() == "test");
+        text.onInput(key_backspace);
+        REQUIRE(text.getText().empty());
+    }
+}
+
 TEST_CASE("handle text expand")
 {
     mockup::fontManager();
@@ -245,8 +278,9 @@ TEST_CASE("handle text expand")
     Length h         = 100;
     BoxLayout layout = BoxLayout(nullptr, 0, 0, w, h);
     auto text        = new gui::TestText();
-    layout.addWidget(text);
     text->setMaximumSize(w, h);
+    text->setText("");
+    layout.addWidget(text);
     REQUIRE(text->area() != BoundingBox{0, 0, 0, 0});
 }
 

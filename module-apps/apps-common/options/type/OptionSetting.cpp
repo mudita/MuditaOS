@@ -27,7 +27,7 @@ namespace gui::option
         };
 
         auto optionText = new TextFixedSize(optionBodyHBox, 0, 0, 0, 0);
-        optionText->setUnderline(false);
+        optionText->drawUnderline(false);
         optionText->setAlignment(gui::Alignment::Vertical::Center);
         optionText->setMaximumSize(style::window::default_body_width, style::window::label::big_h);
         optionText->setMargins(Margins(window::option_left_margin, 0, 0, 0));
@@ -64,7 +64,7 @@ namespace gui::option
             break;
         case SettingRightItem::Text: {
             auto optionTextRight = new TextFixedSize(optionBodyHBox, 0, 0, 0, 0);
-            optionTextRight->setUnderline(false);
+            optionTextRight->drawUnderline(false);
             optionTextRight->setFont((textOnRightIsSmall) ? style::window::font::verysmall
                                                           : style::window::font::medium);
             optionTextRight->setMinimumWidthToFitText(textOnRight);

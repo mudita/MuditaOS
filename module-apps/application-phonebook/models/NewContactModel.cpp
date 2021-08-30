@@ -75,17 +75,20 @@ void NewContactModel::createData()
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); },
         [this]() { this->ContactDataChanged(); }));
 
-    internalData.push_back(new gui::InputBoxWithLabelAndIconWidget(phonebookInternals::ListItemName::SpeedDialKey));
-
     internalData.push_back(new gui::InputBoxWithLabelAndIconWidget(
         phonebookInternals::ListItemName::AddToFavourites,
         [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); }));
 
+    internalData.back()->setMargins(gui::Margins(style::widgets::leftMargin, style::margins::very_big, 0, 0));
+
     internalData.push_back(new gui::InputBoxWithLabelAndIconWidget(
         phonebookInternals::ListItemName::AddToICE,
         [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); }));
+
+    internalData.back()->setMargins(
+        gui::Margins(style::widgets::leftMargin, style::margins::big, 0, style::margins::very_small));
 
     internalData.push_back(new gui::InputLinesWithLabelIWidget(
         phonebookInternals::ListItemName::Address,
@@ -99,7 +102,9 @@ void NewContactModel::createData()
         phonebookInternals::ListItemName::Note,
         [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
-        [app]() { app->getCurrentWindow()->selectSpecialCharacter(); }));
+        [app]() { app->getCurrentWindow()->selectSpecialCharacter(); },
+        nullptr,
+        2));
 
     for (auto item : internalData) {
         item->deleteByList = false;

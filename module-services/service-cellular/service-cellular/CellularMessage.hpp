@@ -169,22 +169,22 @@ class CellularNotificationMessage : public CellularMessage
     std::string data;
 };
 
-class CellularGetCurrentOperatorMessage : public CellularMessage
+class CellularRequestCurrentOperatorNameMessage : public CellularMessage
 {
   public:
-    explicit CellularGetCurrentOperatorMessage() : CellularMessage(Type::Notification)
+    explicit CellularRequestCurrentOperatorNameMessage() : CellularMessage(Type::Notification)
     {}
 };
 
 class CellularSetOperatorAutoSelectMessage : public sys::DataMessage
 {};
 
-class CellularGetCurrentOperatorResponse : public CellularMessage
+class CellularCurrentOperatorNameResponse : public CellularMessage
 {
     std::string currentOperatorName;
 
   public:
-    explicit CellularGetCurrentOperatorResponse(std::string currentOperatorName)
+    explicit CellularCurrentOperatorNameResponse(const std::string &currentOperatorName)
         : CellularMessage(Type::Notification), currentOperatorName(currentOperatorName)
     {}
 
@@ -936,4 +936,28 @@ namespace cellular
       private:
         std::shared_ptr<std::vector<SimContact>> contacts;
     };
+
+    class GetImeiRequest : public sys::DataMessage
+    {
+      public:
+        GetImeiRequest() : sys::DataMessage(MessageType::MessageTypeUninitialized){};
+    };
+
+    class GetImeiResponse : public sys::ResponseMessage
+    {
+      public:
+        explicit GetImeiResponse(std::shared_ptr<std::string> imei)
+            : sys::ResponseMessage(sys::ReturnCodes::Success), imei(imei)
+        {}
+        GetImeiResponse() : sys::ResponseMessage(sys::ReturnCodes::Failure)
+        {}
+        auto getImei() -> std::shared_ptr<std::string>
+        {
+            return imei;
+        }
+
+      private:
+        std::shared_ptr<std::string> imei;
+    };
+
 } // namespace cellular

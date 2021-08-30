@@ -29,7 +29,7 @@ TEST_CASE("SMS Templates Table tests")
 
     auto &templatesTbl = smsDb.templates;
 
-    SMSTemplateTableRow testRow = {{.ID = 0}, .text = "Test text", .lastUsageTimestamp = 100};
+    SMSTemplateTableRow testRow = {Record(0), .text = "Test text", .lastUsageTimestamp = 100};
 
     const auto templatesCount = templatesTbl.count() + 1;
     // clear sms table

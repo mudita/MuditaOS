@@ -28,12 +28,15 @@ namespace db::query
     class CheckContactsListDuplicatesResult : public QueryResult
     {
       public:
-        CheckContactsListDuplicatesResult(std::vector<ContactRecord> duplicates);
+        explicit CheckContactsListDuplicatesResult(
+            std::pair<std::vector<ContactRecord>, std::vector<ContactRecord>> result);
+        std::vector<ContactRecord> &getUnique();
         std::vector<ContactRecord> &getDuplicates();
 
         [[nodiscard]] auto debugInfo() const -> std::string override;
 
       private:
+        std::vector<ContactRecord> unique;
         std::vector<ContactRecord> duplicates;
     };
 

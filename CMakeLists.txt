@@ -17,9 +17,14 @@ include(CopyGdbInit)
 include(Utils)
 include(ModuleUtils)
 include(FetchBootloader)
+include(FetchPureUpdater)
 include(DiskImage)
 include(AddPackage)
+include(Product)
 
+validate_product_selection()
+
+message("Selected product: ${PRODUCT}")
 message("PROJECT_TARGET: ${PROJECT_TARGET}")
 message("TARGET_COMPILE_DEFINITIONS: ${TARGET_COMPILE_OPTIONS}")
 message("TARGET_LIBRARIES: ${TARGET_LIBRARIES}")
@@ -108,11 +113,8 @@ if (NOT ENABLE_SECURE_BOOT)
         )
 endif ()
 
-
 add_subdirectory(third-party)
-
 add_subdirectory(board)
-
 add_subdirectory(source)
 add_subdirectory(module-platform)
 add_subdirectory(module-sys)
@@ -155,5 +157,7 @@ add_custom_target(
     )
 
 fetch_ecoboot()
+fetch_updater()
+
 add_subdirectory(products)
 

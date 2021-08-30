@@ -33,8 +33,8 @@ namespace gui
                         style::window::default_left_margin,
                         text_y_offset,
                         style::window_width - style::window::default_left_margin * 2,
-                        text_height,
-                        utils::translate("phone_needs_rebooting"));
+                        text_height);
+        text->setText(utils::translate("phone_needs_rebooting"));
         text->setFilled(false);
         text->setBorderColor(gui::ColorFullBlack);
         text->setFont(style::header::font::title);

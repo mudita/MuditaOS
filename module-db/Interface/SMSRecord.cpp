@@ -64,7 +64,7 @@ bool SMSRecordInterface::Add(const SMSRecord &rec)
     auto thread = (*threadRec)[0];
 
     // Create SMS
-    if (!smsDB->sms.add(SMSTableRow{{.ID = DB_ID_NONE}, // the entry is not yet in the DB
+    if (!smsDB->sms.add(SMSTableRow{Record(DB_ID_NONE), // the entry is not yet in the DB
                                     .threadID  = thread.ID,
                                     .contactID = contactID,
                                     .date      = rec.date,
@@ -170,7 +170,7 @@ bool SMSRecordInterface::Update(const SMSRecord &recUpdated)
         return false;
     }
 
-    smsDB->sms.update(SMSTableRow{{.ID = recCurrent.ID},
+    smsDB->sms.update(SMSTableRow{Record(recCurrent.ID),
                                   .threadID  = recCurrent.threadID,
                                   .contactID = recCurrent.contactID,
                                   .date      = recUpdated.date,

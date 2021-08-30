@@ -102,25 +102,36 @@ sys::MessagePointer ServiceAntenna::DataReceivedHandler(sys::DataMessage *msgl, 
     bool handled = false;
 
     if (auto msg = dynamic_cast<CellularMessage *>(msgl)) {
+
         switch (msg->type) {
         case CellularMessage::Type::Notification: {
 
             if (auto notif = dynamic_cast<CellularNotificationMessage *>(msg)) {
                 if (notif->content == CellularNotificationMessage::Content::CallAborted) {
-                    AntennaServiceAPI::LockRequest(this, antenna::lockState::unlocked);
+                    auto message = std::make_shared<AntennaLockRequestMessage>(MessageType::AntennaLockService,
+                                                                               antenna::lockState::unlocked);
+                    bus.sendUnicast(std::move(message), service::name::antenna);
                 }
             }
             handled = true;
             break;
         }
         case CellularMessage::Type::IncomingCall: {
-            AntennaServiceAPI::LockRequest(this, antenna::lockState::locked);
+            auto message = std::make_shared<AntennaLockRequestMessage>(MessageType::AntennaLockService,
+                                                                       antenna::lockState::locked);
+            bus.sendUnicast(std::move(message), service::name::antenna);
         } break;
         case CellularMessage::Type::Ringing: {
-            AntennaServiceAPI::LockRequest(this, antenna::lockState::locked);
+            auto message = std::make_shared<AntennaLockRequestMessage>(MessageType::AntennaLockService,
+                                                                       antenna::lockState::locked);
+            bus.sendUnicast(std::move(message), service::name::antenna);
         } break;
-        case CellularMessage::Type::HangupCall: {
-            AntennaServiceAPI::LockRequest(this, antenna::lockState::unlocked);
+        case CellularMessage::Type::HangupCall:
+            [[fallthrough]];
+        case CellularMessage::Type::DismissCall: {
+            auto message = std::make_shared<AntennaLockRequestMessage>(MessageType::AntennaLockService,
+                                                                       antenna::lockState::unlocked);
+            bus.sendUnicast(std::move(message), service::name::antenna);
         } break;
         default:
             break;

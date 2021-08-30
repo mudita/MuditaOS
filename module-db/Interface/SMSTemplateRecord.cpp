@@ -27,7 +27,7 @@ SMSTemplateRecordInterface::SMSTemplateRecordInterface(SmsDB *smsDb) : smsDB(sms
 bool SMSTemplateRecordInterface::Add(const SMSTemplateRecord &rec)
 {
     return smsDB->templates.add(
-        SMSTemplateTableRow{{.ID = rec.ID}, .text = rec.text, .lastUsageTimestamp = rec.lastUsageTimestamp});
+        SMSTemplateTableRow{Record(rec.ID), .text = rec.text, .lastUsageTimestamp = rec.lastUsageTimestamp});
 }
 uint32_t SMSTemplateRecordInterface::GetCount()
 {
@@ -57,7 +57,7 @@ bool SMSTemplateRecordInterface::Update(const SMSTemplateRecord &rec)
     }
 
     return smsDB->templates.update(
-        SMSTemplateTableRow{{.ID = rec.ID}, .text = rec.text, .lastUsageTimestamp = rec.lastUsageTimestamp});
+        SMSTemplateTableRow{Record(rec.ID), .text = rec.text, .lastUsageTimestamp = rec.lastUsageTimestamp});
 }
 
 bool SMSTemplateRecordInterface::RemoveByID(uint32_t id)

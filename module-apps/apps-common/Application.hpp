@@ -147,8 +147,11 @@ namespace app
             ACTIVATING,
             /// Application is working and has focus and can render
             ACTIVE_FORGROUND,
-            /// Applicatino lost focus but it is still working
+            /// Application lost focus but it is still working
             ACTIVE_BACKGROUND,
+            /// Application: Close request message has been received but there are still pending tasks to be resolved
+            /// before closure. Application informs Application Manager that it can switch application if needed.
+            FINALIZING_CLOSE,
             /// Application: Close request message has been received. As a response application must send close request
             /// acknowledge message. Application must start closing all workers and releasing resources. After all
             /// workers are closed and resources released application sends to application manager CLOSING_FINISHED
@@ -195,11 +198,12 @@ namespace app
         void clearLongPressTimeout();
 
         explicit Application(std::string name,
-                             std::string parent                  = "",
-                             sys::phone_modes::PhoneMode mode    = sys::phone_modes::PhoneMode::Connected,
-                             StartInBackground startInBackground = {false},
-                             uint32_t stackDepth                 = 4096,
-                             sys::ServicePriority priority       = sys::ServicePriority::Idle);
+                             std::string parent                          = "",
+                             sys::phone_modes::PhoneMode phoneMode       = sys::phone_modes::PhoneMode::Connected,
+                             sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled,
+                             StartInBackground startInBackground         = {false},
+                             uint32_t stackDepth                         = 4096,
+                             sys::ServicePriority priority               = sys::ServicePriority::Idle);
 
         virtual ~Application() noexcept;
 
@@ -391,6 +395,9 @@ namespace app
         bool systemCloseInProgress = false;
         /// Storage for asynchronous tasks callbacks.
         std::unique_ptr<CallbackStorage> callbackStorage;
+        void checkBlockingRequests();
+        virtual sys::MessagePointer handleAsyncResponse(sys::ResponseMessage *resp);
+
         friend class AsyncTask; // Async tasks need access to application internals, e.g. callback storage, to make
                                 // their API simple.
 
@@ -408,6 +415,7 @@ namespace app
         /// application's settings
         std::unique_ptr<settings::Settings> settings;
         sys::phone_modes::PhoneMode phoneMode;
+        sys::bluetooth::BluetoothMode bluetoothMode;
 
         locks::PhoneLockSubject phoneLockSubject;
         locks::LockPolicyHandler lockPolicyHandler;

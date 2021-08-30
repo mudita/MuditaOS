@@ -4,10 +4,14 @@
 #include "SoundsModel.hpp"
 
 #include <application-settings/widgets/apps/SettingsSoundItem.hpp>
+#include <module-gui/gui/input/InputEvent.hpp>
 
 #include <purefs/filesystem_paths.hpp>
 #include <service-audio/AudioServiceAPI.hpp>
 #include <ListView.hpp>
+
+SoundsModel::SoundsModel(std::shared_ptr<AbstractSoundsPlayer> soundsPlayer) : soundsPlayer{std::move(soundsPlayer)}
+{}
 
 unsigned int SoundsModel::requestRecordsCount()
 {
@@ -33,6 +37,7 @@ gui::ListItem *SoundsModel::getItem(gui::Order order)
 void SoundsModel::createData(app::Application *app, audio_settings::AbstractAudioSettingsModel *model)
 {
     assert(model);
+    assert(app);
 
     // configure according to type
     std::filesystem::path folder = getSoundPath(model);
@@ -116,13 +121,39 @@ void SoundsModel::applyItems(const std::vector<std::filesystem::path> &sounds,
         case audio::PlaybackType::CallRingtone:
         case audio::PlaybackType::TextMessageRingtone:
         case audio::PlaybackType::Notifications:
+            // callback when user selects the sound
             item->activatedCallback = [=](gui::Item &) {
                 auto fileRelativePath = sound.lexically_relative(purefs::dir::getCurrentOSPath());
                 LOG_INFO("Setting sound to %s", fileRelativePath.c_str());
                 model->setSound(fileRelativePath);
+                soundsPlayer->stop();
                 app->returnToPreviousWindow();
                 return true;
             };
+
+            // callback to handle preview of the sound
+            item->inputCallback = [=](gui::Item &item, const gui::InputEvent &event) {
+                auto fileRelativePath = sound.lexically_relative(purefs::dir::getCurrentOSPath());
+
+                if (event.isShortRelease(gui::KeyCode::KEY_RF)) {
+                    soundsPlayer->stop();
+                }
+                else if (event.isShortRelease(gui::KeyCode::KEY_LF)) {
+                    if (!soundsPlayer->previouslyPlayed(fileRelativePath) ||
+                        soundsPlayer->isInState(AbstractSoundsPlayer::State::Stopped)) {
+                        return soundsPlayer->play(fileRelativePath);
+                    }
+                    else if (soundsPlayer->isInState(AbstractSoundsPlayer::State::Playing)) {
+                        return soundsPlayer->pause();
+                    }
+                    else if (soundsPlayer->isInState(AbstractSoundsPlayer::State::Paused)) {
+                        return soundsPlayer->resume();
+                    }
+                }
+
+                return false;
+            };
+
             break;
 
         default:

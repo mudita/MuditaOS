@@ -32,12 +32,15 @@ TEST_CASE("SMSSendHandler functionality")
 
     outSMS.onGetOfflineMode = []() -> bool { return false; };
 
+    outSMS.onSIMNotInitialized = []() -> bool { return false; };
+
     SECTION("Schedule standard send SMS procedure")
     {
         auto record = buildValidSMSRecord();
+        constexpr auto sendOnDelay = false;
 
         outSMS.handleDBNotification();
-        outSMS.handleIncomingDbRecord(record);
+        outSMS.handleIncomingDbRecord(record, sendOnDelay);
         outSMS.handleNoMoreDbRecords();
 
         CHECK(wasOnSendInvoked == 1);
@@ -47,10 +50,11 @@ TEST_CASE("SMSSendHandler functionality")
     SECTION("Schedule non-standard send SMS procedure")
     {
         auto record = buildValidSMSRecord();
+        constexpr auto sendOnDelay = false;
 
         outSMS.handleDBNotification();
         outSMS.handleDBNotification();
-        outSMS.handleIncomingDbRecord(record);
+        outSMS.handleIncomingDbRecord(record, sendOnDelay);
         outSMS.handleDBNotification();
         outSMS.handleNoMoreDbRecords();
 
@@ -60,12 +64,13 @@ TEST_CASE("SMSSendHandler functionality")
     SECTION("Schedule queued send SMS procedure")
     {
         auto record = buildValidSMSRecord();
+        constexpr auto sendOnDelay = false;
 
         outSMS.handleDBNotification();
         outSMS.handleDBNotification();
-        outSMS.handleIncomingDbRecord(record);
+        outSMS.handleIncomingDbRecord(record, sendOnDelay);
         outSMS.handleDBNotification();
-        outSMS.handleIncomingDbRecord(record);
+        outSMS.handleIncomingDbRecord(record, sendOnDelay);
         outSMS.handleDBNotification();
         outSMS.handleDBNotification();
         outSMS.handleNoMoreDbRecords();
@@ -78,11 +83,40 @@ TEST_CASE("SMSSendHandler functionality")
     {
         outSMS.onGetOfflineMode = []() -> bool { return true; };
         auto record             = buildValidSMSRecord();
+        constexpr auto sendOnDelay = false;
 
         outSMS.handleDBNotification();
-        outSMS.handleIncomingDbRecord(record);
+        outSMS.handleIncomingDbRecord(record, sendOnDelay);
 
         CHECK(wasOnSendInvoked == 0);
         CHECK(wasOnSendQueryInvoked == 3);
+    }
+
+    SECTION("Delayed send - positive flow")
+    {
+        auto record                = buildValidSMSRecord();
+        constexpr auto sendOnDelay = true;
+
+        outSMS.handleDBNotification();
+        outSMS.handleIncomingDbRecord(record, sendOnDelay);
+        CHECK(wasOnSendInvoked == 0);
+        CHECK(wasOnSendQueryInvoked == 1);
+        outSMS.sendMessageIfDelayed();
+        CHECK(wasOnSendInvoked == 1);
+        CHECK(wasOnSendQueryInvoked == 2);
+    }
+
+    SECTION("Delayed send - negative flow")
+    {
+        auto record                = buildValidSMSRecord();
+        constexpr auto sendOnDelay = false;
+
+        outSMS.handleDBNotification();
+        outSMS.handleIncomingDbRecord(record, sendOnDelay);
+        CHECK(wasOnSendInvoked == 1);
+        CHECK(wasOnSendQueryInvoked == 2);
+        outSMS.sendMessageIfDelayed();
+        CHECK(wasOnSendInvoked == 1);
+        CHECK(wasOnSendQueryInvoked == 2);
     }
 }

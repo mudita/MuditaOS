@@ -15,75 +15,91 @@ extern "C"
 
 namespace bsp::battery_charger
 {
-	using StateOfCharge = std::uint8_t;
+    using StateOfCharge = std::uint8_t;
 
-	enum class batteryRetval{
-		OK,
-		ChargerError,
-		ChargerNotCharging,
-		ChargerCharging
-	};
+    enum class batteryRetval
+    {
+        OK,
+        ChargerError,
+        ChargerNotCharging,
+        ChargerCharging
+    };
 
-	enum class batteryIRQSource{
-		INTB = 0x01,
-		INOKB = 0x02
-	};
+    enum class batteryIRQSource
+    {
+        INTB  = 0x01,
+        INOKB = 0x02
+    };
 
-	enum class topControllerIRQsource{
-		CHGR_INT = (1 << 0),
-		FG_INT = (1 << 1),
-		SYS_INT = (1 << 2)
-	};
+    enum class topControllerIRQsource
+    {
+        CHGR_INT = (1 << 0),
+        FG_INT   = (1 << 1),
+        SYS_INT  = (1 << 2)
+    };
 
-	enum class batteryINTBSource{
-		maxTemp = 1 << 13,
-		minSOCAlert = 1 << 10,
-		minTemp = 1 << 9,
-		minVAlert = 1 << 8,
-		SOCOnePercentChange = 1 << 7,
-		all = 0xFFFF
-	};
+    enum class batteryINTBSource
+    {
+        maxTemp             = 1 << 13,
+        minSOCAlert         = 1 << 10,
+        minTemp             = 1 << 9,
+        minVAlert           = 1 << 8,
+        SOCOnePercentChange = 1 << 7,
+        all                 = 0xFFFF
+    };
 
-	enum class batteryChargerType{
-		DcdTimeOut = 0x00U,     /*!< Dcd detect result is timeout */
-		DcdUnknownType,         /*!< Dcd detect result is unknown type */
-		DcdError,               /*!< Dcd detect result is error*/
-		DcdSDP,                 /*!< The SDP facility is detected */
-		DcdCDP,                 /*!< The CDP facility is detected */
-		DcdDCP,                 /*!< The DCP facility is detected */
-	};
+    enum class batteryChargerType
+    {
+        DcdTimeOut = 0x00U, /*!< Dcd detect result is timeout */
+        DcdUnknownType,     /*!< Dcd detect result is unknown type */
+        DcdError,           /*!< Dcd detect result is error*/
+        DcdSDP,             /*!< The SDP facility is detected */
+        DcdCDP,             /*!< The CDP facility is detected */
+        DcdDCP,             /*!< The DCP facility is detected */
+    };
 
-	int init(xQueueHandle irqQueueHandle, xQueueHandle dcdQueueHandle);
+    struct MaxMinVolt
+    {
+        unsigned minMilliVolt{0};
+        unsigned maxMilliVolt{0};
+    };
 
-	void deinit();
+    int init(xQueueHandle irqQueueHandle, xQueueHandle dcdQueueHandle);
 
-	StateOfCharge getBatteryLevel();
+    void deinit();
 
-	bool getChargeStatus();
+    StateOfCharge getBatteryLevel();
 
-	void clearAllChargerIRQs();
+    bool getChargeStatus();
 
-	void clearFuelGuageIRQ(std::uint16_t intToClear);
+    void clearAllChargerIRQs();
 
-	std::uint16_t getStatusRegister();
+    void clearFuelGuageIRQ(std::uint16_t intToClear);
 
-	void checkTemperatureRange();
+    std::uint16_t getStatusRegister();
 
-	std::uint8_t getTopControllerINTSource();
+    void checkTemperatureRange();
 
-	void setUSBCurrentLimit(batteryChargerType chargerType);
+    std::uint8_t getTopControllerINTSource();
 
-	void actionIfChargerUnplugged();
+    void setUSBCurrentLimit(batteryChargerType chargerType);
 
-	int getVoltageFilteredMeasurement();
+    void actionIfChargerUnplugged();
 
-	BaseType_t INTB_IRQHandler();
+    int getVoltageFilteredMeasurement();
 
-	extern "C"
-	{
-	void USB_ChargerDetectedCB(std::uint8_t detectedType);
-	}
-} // bsp::battery_charger
+    int getAvgCurrent();
 
+    MaxMinVolt getMaxMinVolt();
 
+    void printFuelGaugeInfo();
 
+    BaseType_t INTB_IRQHandler();
+
+    BaseType_t INOKB_IRQHandler();
+
+    extern "C"
+    {
+        void USB_ChargerDetectedCB(std::uint8_t detectedType);
+    }
+} // namespace bsp::battery_charger
