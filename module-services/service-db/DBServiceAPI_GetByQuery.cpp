@@ -5,7 +5,6 @@
 #include "service-db/DBServiceName.hpp"
 #include "service-db/QueryMessage.hpp"
 
-#include <BaseInterface.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
 
@@ -34,4 +33,10 @@ sys::SendResult DBServiceAPI::GetQueryWithReply(sys::Service *serv,
 {
     auto msg = std::make_shared<db::QueryMessage>(database, std::move(query));
     return serv->bus.sendUnicastSync(msg, service::name::db, timeout);
+}
+std::pair<bool, std::uint64_t> GetQuery(sys::Service *serv, std::unique_ptr<db::MultiQuery> query)
+{
+    auto msg             = std::make_shared<db::MultiQueryMessage>(std::move(query));
+    const auto isSuccess = serv->bus.sendUnicast(msg, service::name::db);
+    return std::make_pair(isSuccess, msg->uniID);
 }

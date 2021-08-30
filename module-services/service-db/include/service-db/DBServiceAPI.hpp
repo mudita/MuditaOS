@@ -62,6 +62,8 @@ class DBServiceAPI
                                   std::unique_ptr<db::Query> query,
                                   std::uint32_t timeout) -> sys::SendResult;
 
+    static auto GetQuery(sys::Service *serv, std::unique_ptr<db::MultiQuery> query) -> std::pair<bool, std::uint64_t>;
+
     /**
      * @brief Function is checking if new contact can be added to database. Function is blocking.
      * @param serv Pointer to Service based object that is sending request.

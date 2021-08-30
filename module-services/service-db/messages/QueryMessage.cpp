@@ -31,6 +31,19 @@ namespace db
         return std::move(query);
     }
 
+    MultiQueryMessage::MultiQueryMessage(std::unique_ptr<MultiQuery> query)
+        : DBMessage(MessageType::DBMultiQuery), query(std::move(query))
+    {}
+
+    std::unique_ptr<MultiQuery> MultiQueryMessage::getQuery()
+    {
+        if (query == nullptr) {
+            throw std::runtime_error("Invalid query (already moved from)");
+        }
+
+        return std::move(query);
+    }
+
     QueryResponse::QueryResponse(std::unique_ptr<db::QueryResult> result)
         : DBResponseMessage(0, 0, MessageType::DBQuery), result(std::move(result))
     {}
@@ -39,4 +52,14 @@ namespace db
     {
         return std::move(result);
     }
+
+    MultiQueryResponse::MultiQueryResponse(std::unique_ptr<MultiQueryResult> result)
+        : DBResponseMessage(0, 0, MessageType::DBMultiQuery), result(std::move(result))
+    {}
+
+    std::unique_ptr<MultiQueryResult> MultiQueryResponse::getResult()
+    {
+        return std::move(result);
+    }
+
 } // namespace db

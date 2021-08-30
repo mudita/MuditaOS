@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -23,6 +23,15 @@ namespace db
         [[nodiscard]] auto getQuery() -> std::unique_ptr<db::Query>;
     };
 
+    class MultiQueryMessage : public DBMessage
+    {
+        std::unique_ptr<db::MultiQuery> query;
+
+      public:
+        MultiQueryMessage(std::unique_ptr<db::MultiQuery> query);
+        [[nodiscard]] auto getQuery() -> std::unique_ptr<db::MultiQuery>;
+    };
+
     ///@note please see that this message might carry more information than just result
     /// it might be useful to tell to what query response that is - not needed now, so not added
     class QueryResponse : public DBResponseMessage
@@ -32,5 +41,14 @@ namespace db
       public:
         QueryResponse(std::unique_ptr<db::QueryResult> result);
         [[nodiscard]] auto getResult() -> std::unique_ptr<db::QueryResult>;
+    };
+
+    class MultiQueryResponse : public DBResponseMessage
+    {
+        std::unique_ptr<db::MultiQueryResult> result;
+
+      public:
+        MultiQueryResponse(std::unique_ptr<db::MultiQueryResult> result);
+        [[nodiscard]] auto getResult() -> std::unique_ptr<db::MultiQueryResult>;
     };
 } // namespace db

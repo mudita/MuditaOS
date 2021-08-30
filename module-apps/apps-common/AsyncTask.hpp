@@ -127,6 +127,17 @@ namespace app
         db::QueryResponse *response = nullptr;
     };
 
+    class MultiQueryCallback : public AsyncCallback
+    {
+      public:
+        explicit MultiQueryCallback(db::MultiQueryResponse *response);
+
+        [[nodiscard]] auto execute() -> bool override;
+
+      private:
+        db::MultiQueryResponse *response = nullptr;
+    };
+
     class AsyncResponseCallback : public AsyncCallback
     {
       public:

@@ -49,6 +49,12 @@ namespace app
             }
         }
 
+        if (response->responseTo == MessageType::DBMultiQuery) {
+            if (auto queryResponse = dynamic_cast<db::MultiQueryResponse *>(response); queryResponse != nullptr) {
+                return std::make_unique<MultiQueryCallback>(queryResponse);
+            }
+        }
+
         if (callbackFunction) {
             return std::make_unique<AsyncResponseCallback>(response, *callbackFunction);
         }

@@ -85,6 +85,18 @@ namespace app
         return false;
     }
 
+    MultiQueryCallback::MultiQueryCallback(db::MultiQueryResponse *response) : response{response}
+    {}
+
+    bool MultiQueryCallback::execute()
+    {
+        const auto result = response->getResult();
+        if (result != nullptr && result->hasListener()) {
+            return result->handle();
+        }
+        return false;
+    }
+
     AsyncResponseCallback::AsyncResponseCallback(sys::ResponseMessage *response, CallbackFunction callbackFunction)
         : response{response}, callbackFunction(callbackFunction)
     {}
@@ -93,4 +105,5 @@ namespace app
     {
         return callbackFunction(response);
     }
+
 } // namespace app

@@ -21,20 +21,28 @@ bool QueryCallback::handleQueryResponse(QueryResult *response)
     return callback(response);
 }
 
+std::unique_ptr<MultiQueryCallback> MultiQueryCallback::fromFunction(MultiQueryCallbackFunction &&callbackFunction)
+{
+    return std::make_unique<MultiQueryCallback>(std::move(callbackFunction));
+}
+
+MultiQueryCallback::MultiQueryCallback(MultiQueryCallbackFunction &&_callback) : callback(std::move(_callback))
+{}
+
+bool MultiQueryCallback::handleQueryResponse(MultiQueryResult *response)
+{
+    return callback(response);
+}
+
 EndpointListener::EndpointListener(EndpointQueryCallbackFunction &&_callback, parserFSM::Context &_context)
     : callback{std::move(_callback)}, context(_context)
 {}
 
-EndpointListenerWithPages::EndpointListenerWithPages(EndpointQueryCallbackFunctionWithPages &&_callback,
-                                                     const parserFSM::PagedContext &_context)
-    : callback{std::move(_callback)}, context(_context)
-{}
-
-bool EndpointListener::handleQueryResponse(db::QueryResult *response)
+bool EndpointListener::handleQueryResponse(db::QueryResult *result)
 {
     if (callback) {
         LOG_DEBUG("Executing callback...");
-        const auto ret = callback(response, context);
+        const auto ret = callback(result, context);
         LOG_DEBUG("Callback finished");
         return ret;
     }
@@ -43,11 +51,52 @@ bool EndpointListener::handleQueryResponse(db::QueryResult *response)
     return false;
 }
 
-bool EndpointListenerWithPages::handleQueryResponse(db::QueryResult *response)
+MultiEndpointListener::MultiEndpointListener(EndpointMultiQueryCallbackFunction &&_callback,
+                                             parserFSM::Context &_context)
+    : callback{std::move(_callback)}, context(_context)
+{}
+
+bool MultiEndpointListener::handleQueryResponse(MultiQueryResult *result)
 {
     if (callback) {
         LOG_DEBUG("Executing callback...");
-        const auto ret = callback(response, context);
+        const auto ret = callback(result, context);
+        LOG_DEBUG("Callback finished");
+        return ret;
+    }
+
+    LOG_ERROR("callback is nullptr!");
+    return false;
+}
+
+EndpointListenerWithPages::EndpointListenerWithPages(EndpointQueryCallbackFunctionWithPages &&_callback,
+                                                     const parserFSM::PagedContext &_context)
+    : callback{std::move(_callback)}, context(_context)
+{}
+
+bool EndpointListenerWithPages::handleQueryResponse(db::QueryResult *result)
+{
+    if (callback) {
+        LOG_DEBUG("Executing callback...");
+        const auto ret = callback(result, context);
+        LOG_DEBUG("Callback finished");
+        return ret;
+    }
+
+    LOG_ERROR("callback is nullptr!");
+    return false;
+}
+
+MultiEndpointListenerWithPages::MultiEndpointListenerWithPages(EndpointMultiQueryCallbackFunctionWithPages &&_callback,
+                                                               const parserFSM::PagedContext &_context)
+    : callback{std::move(_callback)}, context(_context)
+{}
+
+bool MultiEndpointListenerWithPages::handleQueryResponse(MultiQueryResult *result)
+{
+    if (callback) {
+        LOG_DEBUG("Executing callback...");
+        const auto ret = callback(result, context);
         LOG_DEBUG("Callback finished");
         return ret;
     }
@@ -67,6 +116,26 @@ QueryListener *Query::getQueryListener() const noexcept
 void Query::setQueryListener(std::unique_ptr<QueryListener> &&listener) noexcept
 {
     queryListener = std::move(listener);
+}
+
+MultiQueryListener *MultiQuery::getQueryListener() const noexcept
+{
+    return queryListener.get();
+}
+
+void MultiQuery::setQueryListener(std::unique_ptr<MultiQueryListener> &&listener) noexcept
+{
+    queryListener = std::move(listener);
+}
+
+void MultiQuery::addQuery(Interface::Name database, std::unique_ptr<Query> query) noexcept
+{
+    queries.emplace_back(database, std::move(query));
+}
+
+MultiQuery::Queries MultiQuery::getQueries() noexcept
+{
+    return std::move(queries);
 }
 
 QueryResult::QueryResult(std::shared_ptr<Query> requestQuery) : requestQuery(std::move(requestQuery))
@@ -93,4 +162,40 @@ bool QueryResult::handle()
         throw std::runtime_error("No listener to handle query");
     }
     return requestQuery->getQueryListener()->handleQueryResponse(this);
+}
+
+MultiQueryResult::MultiQueryResult(std::shared_ptr<MultiQuery> requestQuery) : requestQuery(std::move(requestQuery))
+{}
+
+void MultiQueryResult::setRequestQuery(const std::shared_ptr<MultiQuery> &requestQueryToSet)
+{
+    requestQuery = requestQueryToSet;
+}
+
+std::shared_ptr<MultiQuery> MultiQueryResult::getRequestQuery() const noexcept
+{
+    return requestQuery;
+}
+
+void MultiQueryResult::addResult(std::unique_ptr<QueryResult> &&result) noexcept
+{
+    results.emplace_back(std::move(result));
+}
+
+MultiQueryResult::Results MultiQueryResult::getResults() noexcept
+{
+    return std::move(results);
+}
+
+bool MultiQueryResult::handle()
+{
+    if (!hasListener()) {
+        throw std::runtime_error("No listener to handle query");
+    }
+    return requestQuery->getQueryListener()->handleQueryResponse(this);
+}
+
+bool MultiQueryResult::hasListener() const noexcept
+{
+    return requestQuery && (requestQuery->getQueryListener() != nullptr);
 }

@@ -20,6 +20,7 @@ add_catch2_executable(
         NotesTable_tests.cpp
         NotificationsRecord_tests.cpp
         NotificationsTable_tests.cpp
+        MultiQueryInterface.cpp
         QueryInterface.cpp
         SMSRecord_tests.cpp
         SMSTable_tests.cpp

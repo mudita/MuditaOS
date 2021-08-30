@@ -36,6 +36,22 @@ sys::MessagePointer ServiceDBCommon::DataReceivedHandler(sys::DataMessage *msgl,
         sendUpdateNotification(msg->getInterface(), queryType);
     } break;
 
+    case MessageType::DBMultiQuery: {
+        auto msg = dynamic_cast<db::MultiQueryMessage *>(msgl);
+        assert(msg);
+        auto multiResult = std::make_unique<db::MultiQueryResult>(msg->getQuery());
+
+        for (auto &entry : msg->getQuery()->getQueries()) {
+            db::Interface *interface = getInterface(entry.database);
+            assert(interface != nullptr);
+            const auto queryType = entry.query->type;
+            multiResult->addResult(interface->runQuery(std::move(entry.query)));
+            sendUpdateNotification(entry.database, queryType);
+        }
+
+        responseMsg = std::make_shared<db::MultiQueryResponse>(std::move(multiResult));
+    } break;
+
     default:
         break;
     }

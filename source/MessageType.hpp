@@ -30,6 +30,7 @@ enum class MessageType
     DBContactUpdate [[deprecated]], ///< Update contact remove
 
     DBQuery,
+    DBMultiQuery,
 
     DBCalllogAdd [[deprecated]],    ///< Add new note's record
     DBCalllogRemove [[deprecated]], ///< Remove selected note's record

@@ -4,20 +4,38 @@
 #pragma once
 
 #include <functional>
+#include <BaseInterface.hpp>
 #include <module-services/service-desktop/endpoints/Context.hpp>
 
 namespace db
 {
-    class QueryResult; // Forward declaration
-    using QueryCallbackFunction         = std::function<bool(db::QueryResult *)>;
-    using EndpointQueryCallbackFunction = std::function<bool(db::QueryResult *, parserFSM::Context &)>;
+    class QueryResult;
+    class MultiQueryResult;
+
+    using QueryCallbackFunction      = std::function<bool(db::QueryResult *)>;
+    using MultiQueryCallbackFunction = std::function<bool(db::MultiQueryResult *)>;
+
+    using EndpointQueryCallbackFunction      = std::function<bool(db::QueryResult *, parserFSM::Context &)>;
+    using EndpointMultiQueryCallbackFunction = std::function<bool(db::MultiQueryResult *, parserFSM::Context &)>;
+
     using EndpointQueryCallbackFunctionWithPages = std::function<bool(db::QueryResult *, parserFSM::PagedContext &)>;
+    using EndpointMultiQueryCallbackFunctionWithPages =
+        std::function<bool(db::MultiQueryResult *, parserFSM::PagedContext &)>;
+
     class QueryListener
     {
       public:
         virtual ~QueryListener() = default;
 
         virtual bool handleQueryResponse(QueryResult *response) = 0;
+    };
+
+    class MultiQueryListener
+    {
+      public:
+        virtual ~MultiQueryListener() = default;
+
+        virtual bool handleQueryResponse(MultiQueryResult *response) = 0;
     };
 
     class QueryCallback : public db::QueryListener
@@ -33,6 +51,19 @@ namespace db
         QueryCallbackFunction callback;
     };
 
+    class MultiQueryCallback : public db::MultiQueryListener
+    {
+      public:
+        static std::unique_ptr<MultiQueryCallback> fromFunction(MultiQueryCallbackFunction &&callbackFunction);
+
+        explicit MultiQueryCallback(MultiQueryCallbackFunction &&_callback);
+
+        bool handleQueryResponse(MultiQueryResult *response) override;
+
+      private:
+        MultiQueryCallbackFunction callback;
+    };
+
     class EndpointListener : public db::QueryListener
     {
       public:
@@ -43,6 +74,19 @@ namespace db
 
       private:
         EndpointQueryCallbackFunction callback;
+        parserFSM::Context context;
+    };
+
+    class MultiEndpointListener : public db::MultiQueryListener
+    {
+      public:
+        MultiEndpointListener() = default;
+        MultiEndpointListener(EndpointMultiQueryCallbackFunction &&_callback, parserFSM::Context &_context);
+
+        bool handleQueryResponse(db::MultiQueryResult *result) override;
+
+      private:
+        EndpointMultiQueryCallbackFunction callback;
         parserFSM::Context context;
     };
 
@@ -60,7 +104,20 @@ namespace db
         parserFSM::PagedContext context;
     };
 
-    /// virtual query input interface
+    class MultiEndpointListenerWithPages : public MultiEndpointListener
+    {
+      public:
+        MultiEndpointListenerWithPages() = default;
+        MultiEndpointListenerWithPages(EndpointMultiQueryCallbackFunctionWithPages &&_callback,
+                                       const parserFSM::PagedContext &_context);
+
+        bool handleQueryResponse(db::MultiQueryResult *result) override;
+
+      private:
+        EndpointMultiQueryCallbackFunctionWithPages callback;
+        parserFSM::PagedContext context;
+    };
+
     class Query
     {
       public:
@@ -86,7 +143,34 @@ namespace db
         std::unique_ptr<QueryListener> queryListener;
     };
 
-    /// virtual query output (result) interface
+    class MultiQuery
+    {
+      public:
+        struct QueryEntry
+        {
+            QueryEntry(db::Interface::Name database, std::unique_ptr<Query> query)
+                : database{database}, query{std::move(query)}
+            {}
+            db::Interface::Name database;
+            std::unique_ptr<Query> query;
+        };
+
+        using Queries = std::vector<QueryEntry>;
+
+        ~MultiQuery() = default;
+
+        MultiQueryListener *getQueryListener() const noexcept;
+        void setQueryListener(std::unique_ptr<MultiQueryListener> &&listener) noexcept;
+
+        void addQuery(db::Interface::Name database, std::unique_ptr<Query> query) noexcept;
+
+        Queries getQueries() noexcept;
+
+      private:
+        std::unique_ptr<MultiQueryListener> queryListener;
+        Queries queries;
+    };
+
     class QueryResult
     {
       public:
@@ -103,6 +187,29 @@ namespace db
 
       protected:
         std::shared_ptr<Query> requestQuery;
+    };
+
+    class MultiQueryResult
+    {
+      public:
+        using Results = std::vector<std::unique_ptr<QueryResult>>;
+
+        explicit MultiQueryResult(std::shared_ptr<MultiQuery> requestQuery = nullptr);
+        virtual ~MultiQueryResult() = default;
+
+        void setRequestQuery(const std::shared_ptr<MultiQuery> &requestQueryToSet);
+        std::shared_ptr<MultiQuery> getRequestQuery() const noexcept;
+
+        void addResult(std::unique_ptr<QueryResult> &&result) noexcept;
+        Results getResults() noexcept;
+
+        bool handle();
+
+        [[nodiscard]] bool hasListener() const noexcept;
+
+      protected:
+        std::shared_ptr<MultiQuery> requestQuery;
+        Results results;
     };
 
 } // namespace db
