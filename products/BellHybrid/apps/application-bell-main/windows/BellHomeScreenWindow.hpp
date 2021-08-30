@@ -31,6 +31,7 @@ namespace gui
         void setAlarmActive(bool val) override;
         void setAlarmEdit(bool val) override;
         void setAlarmVisible(bool val) override;
+        void setAlarmTimeVisible(bool val) override;
         std::time_t getAlarmTime() const override;
         void setAlarmTime(std::time_t newTime) override;
         void incAlarmMinute() override;

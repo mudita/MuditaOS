@@ -134,6 +134,11 @@ namespace gui
         alarm->setVisible(val);
     }
 
+    void BellHomeScreenWindow::setAlarmTimeVisible(bool val)
+    {
+        alarm->setAlarmTimeVisible(val);
+    }
+
     void BellHomeScreenWindow::setTemperature(utils::temperature::Temperature newTemp)
     {
         bottomText->setText(utils::temperature::tempToStrDec(newTemp));
