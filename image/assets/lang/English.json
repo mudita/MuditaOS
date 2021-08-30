@@ -565,5 +565,6 @@
   "app_bell_settings_advanced_time_units": "Time & units",
   "app_bell_settings_advanced_temp_scale": "Temperature scale",
   "app_bellmain_home_screen_bottom_desc": "Next alarm will ring in",
-  "app_bellmain_home_screen_bottom_desc_dp": "Deep press to activate"
+  "app_bellmain_home_screen_bottom_desc_dp": "Deep press to activate",
+  "app_bell_alarm_deactivated": "Alarm deactivated"
 }
