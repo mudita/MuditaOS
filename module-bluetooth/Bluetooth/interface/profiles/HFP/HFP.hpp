@@ -44,8 +44,7 @@ namespace bluetooth
         /// @return Success
         [[nodiscard]] auto initializeCall() const noexcept -> Error::Code override;
 
-        void setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice) override
-        {}
+        void setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice) override;
 
       private:
         class HFPImpl;

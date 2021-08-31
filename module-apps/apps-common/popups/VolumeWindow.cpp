@@ -75,6 +75,7 @@ namespace gui
             showMultimediaPlayback();
         }
         else if (profileType == audio::Profile::Type::RoutingBluetoothHSP ||
+                 profileType == audio::Profile::Type::RoutingBluetoothHFP ||
                  profileType == audio::Profile::Type::RoutingEarspeaker ||
                  profileType == audio::Profile::Type::RoutingHeadphones ||
                  profileType == audio::Profile::Type::RoutingLoudspeaker) {
