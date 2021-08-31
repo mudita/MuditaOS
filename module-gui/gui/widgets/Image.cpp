@@ -25,10 +25,11 @@ namespace gui
         setPosition(x, y);
     }
 
-    Image::Image(Item *parent, const UTF8 &imageName) : Rect(parent, 0, 0, 0, 0), imageMap{nullptr}
+    Image::Image(Item *parent, const UTF8 &imageName, ImageTypeSpecifier specifier)
+        : Rect(parent, 0, 0, 0, 0), imageMap{nullptr}
     {
         type = ItemType::IMAGE;
-        set(imageName);
+        set(imageName, specifier);
     }
 
     Image::Image(const UTF8 &imageName) : imageMap{nullptr}
@@ -54,13 +55,13 @@ namespace gui
         return true;
     }
 
-    void Image::set(const UTF8 &name)
+    void Image::set(const UTF8 &name, ImageTypeSpecifier specifier)
     {
         if (name.empty()) {
             return;
         }
 
-        const auto id = ImageManager::getInstance().getImageMapID(name);
+        const auto id = ImageManager::getInstance().getImageMapID(name, specifier);
         set(id);
     }
 
@@ -75,10 +76,10 @@ namespace gui
         // image
         img->origin = {drawArea.x, drawArea.y};
         // cmd part
-        img->areaX = img->origin.x;
-        img->areaY = img->origin.y;
-        img->areaW = drawArea.w;
-        img->areaH = drawArea.h;
+        img->areaX   = img->origin.x;
+        img->areaY   = img->origin.y;
+        img->areaW   = drawArea.w;
+        img->areaH   = drawArea.h;
         img->imageID = this->imageMap->getID();
 
         commands.emplace_back(std::move(img));

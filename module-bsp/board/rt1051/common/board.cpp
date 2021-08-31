@@ -15,6 +15,7 @@ extern "C"
 #include "audio.hpp"
 #include "chip.hpp"
 #include "board/irq_gpio.hpp"
+#include "reboot_codes.hpp"
 
 #include <cstdint>
 
@@ -205,6 +206,9 @@ namespace bsp
         SNVS_LP_Init(SNVS);
         SNVS_HP_Init(SNVS);
         SNVS_HP_ChangeSSMState(SNVS);
+
+        // Default flag set on start in non-volatile memory to detect boot fault
+        SNVS->LPGPR[0] = rebootCode::rebootFailedToBoot;
 
         // Set internal DCDC to DCM mode. Switching between DCM and CCM mode will be done automatically.
         DCDC_BootIntoDCM(DCDC);

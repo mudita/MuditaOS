@@ -11,8 +11,7 @@ namespace gui::status_bar
     Time::Time(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h)
         : StatusBarWidgetBase(parent, x, y, w, h), time{}
     {
-        setFilled(false);
-        setBorderColor(gui::ColorNoColor);
+        setEdges(RectangleEdge::None);
         setFont(style::status_bar::time::font);
         setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Bottom));
         using namespace utils::time;

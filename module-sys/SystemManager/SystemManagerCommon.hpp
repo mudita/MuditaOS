@@ -28,6 +28,7 @@ namespace sys
         using namespace std::chrono_literals;
         inline constexpr std::chrono::milliseconds timerInitInterval{30s};
         inline constexpr std::chrono::milliseconds timerPeriodInterval{100ms};
+        inline constexpr std::chrono::milliseconds powerManagerLogsTimerInterval{1h};
         inline constexpr auto restoreTimeout{5000};
     } // namespace constants
 
@@ -181,6 +182,7 @@ namespace sys
         sys::TimerHandle cpuStatisticsTimer;
         sys::TimerHandle servicesPreShutdownRoutineTimeout;
         sys::TimerHandle lowBatteryShutdownDelay;
+        sys::TimerHandle powerManagerEfficiencyTimer;
         InitFunction userInit;
         InitFunction systemInit;
         std::vector<std::string> readyForCloseRegister;

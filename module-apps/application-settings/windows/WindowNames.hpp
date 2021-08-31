@@ -10,6 +10,7 @@ namespace gui::window::name
     inline constexpr auto ui_test           = "UI Test";
     inline constexpr auto eink_mode         = "Change Eink Mode";
     inline constexpr auto color_test_window = "Color Test";
+    inline constexpr auto status_bar_img_type = "StatusBarImgType";
 
     inline constexpr auto bluetooth               = "Bluetooth";
     inline constexpr auto all_devices             = "AllDevices";

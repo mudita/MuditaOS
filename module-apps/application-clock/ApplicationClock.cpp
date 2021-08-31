@@ -20,11 +20,12 @@ namespace app
 {
     ApplicationClock::ApplicationClock(std::string name,
                                        std::string parent,
-                                       sys::phone_modes::PhoneMode mode,
+                                       sys::phone_modes::PhoneMode phoneMode,
+                                       sys::bluetooth::BluetoothMode bluetoothMode,
                                        StartInBackground startInBackground,
                                        uint32_t stackDepth,
                                        sys::ServicePriority priority)
-        : Application(name, parent, mode, startInBackground, stackDepth, priority)
+        : Application(name, parent, phoneMode, bluetoothMode, startInBackground, stackDepth, priority)
     {
         timerClock = sys::TimerFactory::createPeriodicTimer(
             this, "Clock", std::chrono::milliseconds{1000}, [&](sys::Timer &) { timerClockCallback(); });

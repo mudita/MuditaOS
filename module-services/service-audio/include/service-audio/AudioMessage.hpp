@@ -63,6 +63,27 @@ class AudioStopNotification : public AudioNotificationMessage
     {}
 };
 
+class AudioEOFNotification : public AudioNotificationMessage
+{
+  public:
+    explicit AudioEOFNotification(audio::Token token) : AudioNotificationMessage{token}
+    {}
+};
+
+class AudioPausedNotification : public AudioNotificationMessage
+{
+  public:
+    explicit AudioPausedNotification(audio::Token token) : AudioNotificationMessage{token}
+    {}
+};
+
+class AudioResumedNotification : public AudioNotificationMessage
+{
+  public:
+    explicit AudioResumedNotification(audio::Token token) : AudioNotificationMessage{token}
+    {}
+};
+
 class AudioSettingsMessage : public AudioMessage
 {
   public:

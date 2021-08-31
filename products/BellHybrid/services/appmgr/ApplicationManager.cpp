@@ -20,7 +20,7 @@ namespace app::manager
     {
         if (not ApplicationManagerCommon::startApplication(app)) {
             LOG_INFO("Starting application %s", app.name().c_str());
-            app.run(sys::phone_modes::PhoneMode::Offline, this);
+            app.run(sys::phone_modes::PhoneMode::Offline, sys::bluetooth::BluetoothMode::Disabled, this);
         }
         return true;
     }

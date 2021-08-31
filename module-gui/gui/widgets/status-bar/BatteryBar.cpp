@@ -3,22 +3,20 @@
 
 #include "BatteryBar.hpp"
 #include "Style.hpp"
-#include "Utils.hpp"
-#include "visitor/GuiVisitor.hpp"
 #include <Image.hpp>
 
 namespace gui::status_bar
 {
     namespace
     {
-        constexpr auto batteryLow           = "battery_low_W_M";
-        constexpr auto batteryCharging      = "battery_charging_W_M";
-        constexpr auto batteryChargingReady = "battery_charging_ready_W_M";
-        constexpr auto battery1             = "battery1_W_M";
-        constexpr auto battery2             = "battery2_W_M";
-        constexpr auto battery3             = "battery3_W_M";
-        constexpr auto battery4             = "battery4_W_M";
-        constexpr auto battery5             = "battery5_W_M";
+        constexpr auto batteryLow           = "battery_low";
+        constexpr auto batteryCharging      = "battery_charging";
+        constexpr auto batteryChargingReady = "battery_charging_ready";
+        constexpr auto battery1             = "battery_1";
+        constexpr auto battery2             = "battery_2";
+        constexpr auto battery3             = "battery_3";
+        constexpr auto battery4             = "battery_4";
+        constexpr auto battery5             = "battery_5";
 
         constexpr auto level1Threshold = 15;
         constexpr auto level2Threshold = 35;
@@ -30,7 +28,7 @@ namespace gui::status_bar
     BatteryBar::BatteryBar(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h)
         : BatteryBase(parent, x, y, w, h)
     {
-        img = new Image(this, battery1);
+        img = new Image(this, battery1, style::status_bar::imageTypeSpecifier);
 
         setMinimumSize(img->getWidth(), style::status_bar::height);
     }
@@ -38,33 +36,33 @@ namespace gui::status_bar
     void BatteryBar::showBatteryLevel(std::uint32_t percentage)
     {
         if (percentage < level1Threshold) {
-            img->set(batteryLow);
+            img->set(batteryLow, style::status_bar::imageTypeSpecifier);
         }
         else if (percentage < level2Threshold) {
-            img->set(battery1);
+            img->set(battery1, style::status_bar::imageTypeSpecifier);
         }
         else if (percentage < level3Threshold) {
-            img->set(battery2);
+            img->set(battery2, style::status_bar::imageTypeSpecifier);
         }
         else if (percentage < level4Threshold) {
-            img->set(battery3);
+            img->set(battery3, style::status_bar::imageTypeSpecifier);
         }
         else if (percentage < level5Threshold) {
-            img->set(battery4);
+            img->set(battery4, style::status_bar::imageTypeSpecifier);
         }
         else {
-            img->set(battery5);
+            img->set(battery5, style::status_bar::imageTypeSpecifier);
         }
     }
 
     void BatteryBar::showBatteryCharging()
     {
-        img->set(batteryCharging);
+        img->set(batteryCharging, style::status_bar::imageTypeSpecifier);
     }
 
     void BatteryBar::showBatteryChargingDone()
     {
-        img->set(batteryChargingReady);
+        img->set(batteryChargingReady, style::status_bar::imageTypeSpecifier);
     }
 
 } // namespace gui::status_bar

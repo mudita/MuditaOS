@@ -77,7 +77,7 @@ if(${DISABLED_SETTINGS_OPTIONS})
     target_compile_definitions(${PROJECT_NAME} PUBLIC DISABLED_SETTINGS_OPTIONS=1)
 endif()
 
-option(DEVELOPER_SETTINGS_OPTIONS "Enable Developer Settings Options" ON)
+option(DEVELOPER_SETTINGS_OPTIONS "Enable Developer Settings Options" ${DEVELOPER_SETTINGS_OPTIONS_DEFAULT})
 if(${DEVELOPER_SETTINGS_OPTIONS})
     target_compile_definitions(${PROJECT_NAME} PUBLIC DEVELOPER_SETTINGS_OPTIONS=1)
 endif()

@@ -24,7 +24,13 @@ set(ROOT_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR} PARENT_SCOPE)
 set(TEST_ASSETS_DEST_DIR ${CMAKE_BINARY_DIR}/test-sysroot/sys)
 set(TEST_ASSETS_DEST_DIR ${TEST_ASSETS_DEST_DIR} PARENT_SCOPE)
 
-add_assets_target(test-assets ${ASSETS_SOURCE_DIR} ${TEST_ASSETS_DEST_DIR})
+add_assets_target(
+    TARGET test-assets
+    SOURCE_DIR ${ASSETS_SOURCE_DIR}
+    DEST_DIR ${TEST_ASSETS_DEST_DIR}
+    DEVEL ON
+)
+
 add_image(
     PRODUCT Test
     SYSROOT test-sysroot
@@ -115,11 +121,11 @@ endfunction()
 
 function(add_catch2_executable)
     cmake_parse_arguments(
-            _TEST_ARGS
-            "USE_FS"
-            "NAME"
-            "SRCS;INCLUDE;LIBS;DEFS;DEPS"
-            ${ARGN}
+        _TEST_ARGS
+        "USE_FS"
+        "NAME"
+        "SRCS;INCLUDE;LIBS;DEFS;DEPS"
+        ${ARGN}
     )
 
     if(NOT _TEST_ARGS_NAME)
@@ -139,10 +145,12 @@ function(add_catch2_executable)
     target_link_options(${_TESTNAME} PUBLIC "-fsanitize=address")
 
     # disable logs in unit tests
-    if (NOT ${ENABLE_TEST_LOGS} AND NOT ${_TESTNAME} STREQUAL "catch2-utils-log")
-        target_sources(${_TESTNAME} PRIVATE ${ROOT_TEST_DIR}/mock-logs.cpp)
-        target_sources(${_TESTNAME} PRIVATE ${ROOT_TEST_DIR}/mock-freertos-tls.cpp)
-    endif (NOT ${ENABLE_TEST_LOGS} AND NOT ${_TESTNAME} STREQUAL "catch2-utils-log")
+    if (NOT ${ENABLE_TEST_LOGS})
+        if (NOT ${_TESTNAME} STREQUAL "catch2-utils-log" AND NOT ${_TESTNAME} STREQUAL "catch2-utils-logdumps")
+            target_sources(${_TESTNAME} PRIVATE ${ROOT_TEST_DIR}/mock-logs.cpp)
+            target_sources(${_TESTNAME} PRIVATE ${ROOT_TEST_DIR}/mock-freertos-tls.cpp)
+        endif(NOT ${_TESTNAME} STREQUAL "catch2-utils-log" AND NOT ${_TESTNAME} STREQUAL "catch2-utils-logdumps")
+    endif (NOT ${ENABLE_TEST_LOGS})
 
     set(_TEST_LABELS "")
     if(_TEST_ARGS_USE_FS)
@@ -174,9 +182,9 @@ function(add_catch2_executable)
     endif()
 
     catch_discover_tests(${_TESTNAME}
-            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-            PROPERTIES LABELS ${_TEST_LABELS}
-            )
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        PROPERTIES LABELS ${_TEST_LABELS}
+    )
 endfunction()
 
 function(add_test_entity)

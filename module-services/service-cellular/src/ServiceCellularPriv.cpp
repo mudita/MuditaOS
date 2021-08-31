@@ -3,6 +3,7 @@
 
 #include "ServiceCellularPriv.hpp"
 #include "messages.hpp"
+#include "SMSPartsHandler.hpp"
 
 #include <service-cellular-api>
 
@@ -109,15 +110,19 @@ namespace cellular::internal
         owner->connect(typeid(stm::message::AutomaticDateAndTimeChangedMessage),
                        [&](sys::Message *request) -> sys::MessagePointer {
                            auto message = static_cast<stm::message::AutomaticDateAndTimeChangedMessage *>(request);
-                           networkTime->processSettings(message->getValue());
+
+                           networkTime->processSettings(
+                               message->getValue(),
+                               owner->phoneModeObserver->isInMode(sys::phone_modes::PhoneMode::Offline));
                            return sys::MessageNone{};
                        });
-        owner->connect(typeid(stm::message::GetAutomaticDateAndTimeResponse),
-                       [&](sys::Message *request) -> sys::MessagePointer {
-                           auto message = static_cast<stm::message::GetAutomaticDateAndTimeResponse *>(request);
-                           networkTime->processSettings(message->isAutomaticDateAndTime());
-                           return sys::MessageNone{};
-                       });
+        owner->connect(
+            typeid(stm::message::GetAutomaticDateAndTimeResponse), [&](sys::Message *request) -> sys::MessagePointer {
+                auto message = static_cast<stm::message::GetAutomaticDateAndTimeResponse *>(request);
+                networkTime->processSettings(message->isAutomaticDateAndTime(),
+                                             owner->phoneModeObserver->isInMode(sys::phone_modes::PhoneMode::Offline));
+                return sys::MessageNone{};
+            });
     }
 
     void ServiceCellularPriv::requestNetworkTimeSettings()
@@ -132,6 +137,15 @@ namespace cellular::internal
 
         outSMSHandler.onSend = [this](SMSRecord &record) -> bool { return this->onSendSMS(record); };
 
+        outSMSHandler.onSIMNotInitialized = [this]() -> bool {
+            bool ret = false;
+            if (!simCard->initialized()) {
+                owner->bus.sendUnicast(std::make_shared<CellularSmsNoSimRequestMessage>(), ::service::name::appmgr);
+                ret = true;
+            }
+            return ret;
+        };
+
         outSMSHandler.onGetOfflineMode = [this]() -> bool {
             bool ret = false;
             if (owner->phoneModeObserver->isInMode(sys::phone_modes::PhoneMode::Offline)) {
@@ -145,24 +159,27 @@ namespace cellular::internal
 
     bool ServiceCellularPriv::onSendSMS(SMSRecord &record)
     {
-        uint32_t textLen = record.body.length();
+        auto commandTimeout = at::factory(at::AT::CMGS).getTimeout();
+        bool result         = false;
+        auto channel        = owner->cmux->get(CellularMux::Channel::Commands);
+        auto receiver       = record.number.getEntered();
+        bool channelSetup   = false;
 
-        auto commandTimeout                 = at::factory(at::AT::CMGS).getTimeout();
-        constexpr uint32_t singleMessageLen = msgConstants::singleMessageMaxLen;
-        bool result                         = false;
-        auto channel                        = owner->cmux->get(CellularMux::Channel::Commands);
-        auto receiver                       = record.number.getEntered();
         if (channel) {
+            channelSetup = true;
             if (!channel->cmd(at::AT::SET_SMS_TEXT_MODE_UCS2)) {
                 LOG_ERROR("Could not set UCS2 mode for SMS");
-                return false;
+                channelSetup = false;
             }
             if (!channel->cmd(at::AT::SMS_UCSC2)) {
                 LOG_ERROR("Could not set UCS2 charset mode for TE");
-                return false;
+                channelSetup = false;
             }
-            // if text fit in single message send
-            if (textLen < singleMessageLen) {
+        }
+
+        if (channelSetup) {
+            auto partHandler = sms::SMSPartsHandler(record.body);
+            if (partHandler.isSinglePartSMS()) {
                 std::string command      = std::string(at::factory(at::AT::CMGS));
                 std::string body         = UCS2(UTF8(receiver)).str();
                 std::string suffix       = "\"";
@@ -170,7 +187,7 @@ namespace cellular::internal
                 if (owner->cmux->checkATCommandPrompt(
                         channel->sendCommandPrompt(command_data.c_str(), 1, commandTimeout))) {
 
-                    if (channel->cmd((UCS2(record.body).str() + "\032").c_str(), commandTimeout)) {
+                    if (channel->cmd((partHandler.getNextSmsPart() + "\032").c_str(), commandTimeout)) {
                         result = true;
                     }
                     else {
@@ -181,36 +198,26 @@ namespace cellular::internal
                     }
                 }
             }
-            // split text, and send concatenated messages
             else {
-                const uint32_t maxConcatenatedCount = msgConstants::maxConcatenatedCount;
-                uint32_t messagePartsCount          = textLen / singleMessageLen;
-                if ((textLen % singleMessageLen) != 0) {
-                    messagePartsCount++;
-                }
-
-                if (messagePartsCount > maxConcatenatedCount) {
-                    LOG_ERROR("Message to long");
+                if (partHandler.isPartsCountAboveLimit()) {
+                    LOG_ERROR("Message too long.");
                     result = false;
                 }
                 else {
                     auto channel = owner->cmux->get(CellularMux::Channel::Commands);
+                    saveNewMultiPartSMSUIDCallback(multiPartSMSUID);
 
-                    for (uint32_t i = 0; i < messagePartsCount; i++) {
+                    for (unsigned i = 0; i < partHandler.getPartsCount(); i++) {
 
-                        uint32_t partLength = singleMessageLen;
-                        if (i * singleMessageLen + singleMessageLen > record.body.length()) {
-                            partLength = record.body.length() - i * singleMessageLen;
-                        }
-                        UTF8 messagePart = record.body.substr(i * singleMessageLen, partLength);
-
-                        std::string command(at::factory(at::AT::QCMGS) + UCS2(UTF8(receiver)).str() + "\",120," +
-                                            std::to_string(i + 1) + "," + std::to_string(messagePartsCount));
+                        std::string command(at::factory(at::AT::QCMGS) + UCS2(UTF8(receiver)).str() + "\"," +
+                                            std::to_string(multiPartSMSUID) + "," + std::to_string(i + 1) + "," +
+                                            std::to_string(partHandler.getPartsCount()));
 
                         if (owner->cmux->checkATCommandPrompt(
                                 channel->sendCommandPrompt(command.c_str(), 1, commandTimeout))) {
                             // prompt sign received, send data ended by "Ctrl+Z"
-                            if (channel->cmd(UCS2(messagePart).str() + "\032", commandTimeout, 2)) {
+
+                            if (channel->cmd(partHandler.getNextSmsPart() + "\032", commandTimeout, 2)) {
                                 result = true;
                             }
                             else {
@@ -225,6 +232,7 @@ namespace cellular::internal
                             break;
                         }
                     }
+                    multiPartSMSUID++;
                 }
             }
         }
@@ -243,7 +251,7 @@ namespace cellular::internal
         DBServiceAPI::GetQuery(
             owner, db::Interface::Name::SMS, std::make_unique<db::query::SMSUpdate>(std::move(record)));
 
-        if (!channel->cmd(at::AT::SMS_GSM)) {
+        if (channel && !channel->cmd(at::AT::SMS_GSM)) {
             LOG_ERROR("Could not set GSM (default) charset mode for TE");
             return false;
         }
@@ -260,6 +268,11 @@ namespace cellular::internal
             }
             return std::make_shared<cellular::GetSimContactsResponse>();
         });
+    }
+
+    void ServiceCellularPriv::setInitialMultiPartSMSUID(std::uint8_t uid)
+    {
+        multiPartSMSUID = uid + 1;
     }
 
     void ServiceCellularPriv::connectImeiGetHandler()

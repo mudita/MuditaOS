@@ -23,6 +23,7 @@ status_bar::Configuration SimNotReadyWindow::configureStatusBar(status_bar::Conf
     appConfiguration.enable(status_bar::Indicator::Battery);
     appConfiguration.enable(status_bar::Indicator::Signal);
     appConfiguration.enable(status_bar::Indicator::SimCard);
+    appConfiguration.enable(status_bar::Indicator::Bluetooth);
     return appConfiguration;
 }
 

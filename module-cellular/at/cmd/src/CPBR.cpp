@@ -17,33 +17,31 @@ namespace at
         CPBR::CPBR() noexcept : CPBR(at::cmd::Modifier::None)
         {}
 
-        auto CPBR::parse(Result &base_result) -> result::CPBR &
+        auto CPBR::parseCPBR(const Result &base_result) -> result::CPBR
         {
-
             auto constexpr responseHeader = "+CPBR: ";
 
-            auto *parsed = new result::CPBR(base_result);
-            result       = std::unique_ptr<result::CPBR>(parsed);
+            result::CPBR parsed{base_result};
 
-            if (parsed->Result::operator bool()) {
-                if (parsed->response.empty()) {
+            if (parsed.Result::operator bool()) {
+                if (parsed.response.empty()) {
                     LOG_ERROR("Can't parse - empty response");
-                    parsed->code = result::CPBR::Code::PARSING_ERROR;
+                    parsed.code = result::CPBR::Code::PARSING_ERROR;
                 }
                 else {
 
-                    for (auto token : parsed->response) {
+                    for (auto token : parsed.response) {
 
                         if (token == "OK") {
-                            parsed->code = result::CPBR::Code::OK;
-                            return *parsed;
+                            parsed.code = result::CPBR::Code::OK;
+                            return parsed;
                         }
 
                         std::string str = token;
                         if (str.find(responseHeader) == std::string::npos) {
                             LOG_ERROR("Can't parse - bad header");
-                            parsed->code = result::CPBR::Code::PARSING_ERROR;
-                            return *parsed;
+                            parsed.code = result::CPBR::Code::PARSING_ERROR;
+                            return parsed;
                         }
 
                         utils::findAndReplaceAll(str, responseHeader, "");
@@ -52,8 +50,8 @@ namespace at
                         std::vector<std::string> tokens = utils::split(str, ',');
                         if (tokens.size() != cpbr::tokensCount) {
                             LOG_ERROR("Can't parse - invalid tokens count");
-                            parsed->code = result::CPBR::Code::PARSING_ERROR;
-                            return *parsed;
+                            parsed.code = result::CPBR::Code::PARSING_ERROR;
+                            return parsed;
                         }
                         int index = 0;
                         int type  = 0;
@@ -69,17 +67,17 @@ namespace at
                             contact.type   = static_cast<at::cpbr::ContactType>(type);
                             contact.number = tokens[static_cast<int>(cpbr::Tokens::Number)];
                             contact.name   = tokens[static_cast<int>(cpbr::Tokens::Name)];
-                            parsed->contacts.push_back(contact);
+                            parsed.contacts.push_back(contact);
                         }
                         else {
                             LOG_ERROR("Can't parse - bad value");
-                            parsed->code = result::CPBR::Code::PARSING_ERROR;
-                            return *parsed;
+                            parsed.code = result::CPBR::Code::PARSING_ERROR;
+                            return parsed;
                         }
                     }
                 }
             }
-            return *parsed;
+            return parsed;
         }
 
         void CPBR::setSimContactsReadRange(int firstIndex, int lastIndex)

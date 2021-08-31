@@ -40,6 +40,10 @@ namespace bsp
         [[nodiscard]] virtual uint32_t GetCpuFrequency() const noexcept = 0;
 
         virtual void SwitchOscillatorSource(OscillatorSource source) = 0;
+        virtual void SetBootSuccess()                                = 0;
+
+        virtual void EnableDcdcPowerSaveMode()  = 0;
+        virtual void DisableDcdcPowerSaveMode() = 0;
 
       protected:
         CpuFrequencyHz currentFrequency = CpuFrequencyHz::Level_6;

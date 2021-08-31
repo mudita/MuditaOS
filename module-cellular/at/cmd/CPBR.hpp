@@ -52,7 +52,7 @@ namespace at
           public:
             CPBR() noexcept;
             explicit CPBR(at::cmd::Modifier mod) noexcept;
-            [[nodiscard]] auto parse(Result &base_result) -> result::CPBR & final;
+            [[nodiscard]] auto parseCPBR(const Result &base_result) -> result::CPBR;
             void setSimContactsReadRange(int firstIndex, int lastIndex);
         };
     } // namespace cmd

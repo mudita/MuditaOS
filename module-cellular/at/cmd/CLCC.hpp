@@ -86,7 +86,7 @@ namespace at
           public:
             CLCC() noexcept;
             explicit CLCC(at::cmd::Modifier mod) noexcept;
-            [[nodiscard]] auto parse(Result &base_result) -> result::CLCC & final;
+            [[nodiscard]] auto parseCLCC(const Result &base_result) -> result::CLCC;
         };
     } // namespace cmd
 } // namespace at

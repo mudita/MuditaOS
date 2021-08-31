@@ -46,6 +46,7 @@ target_sources(
                 ${CMAKE_CURRENT_SOURCE_DIR}/Audio/transcode/TransformComposite.cpp
                 ${CMAKE_CURRENT_SOURCE_DIR}/Audio/transcode/TransformFactory.cpp
                 ${CMAKE_CURRENT_SOURCE_DIR}/Audio/VolumeScaler.cpp
+                ${CMAKE_CURRENT_SOURCE_DIR}/Audio/equalizer/Equalizer.cpp
 )
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})

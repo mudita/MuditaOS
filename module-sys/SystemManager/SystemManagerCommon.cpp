@@ -170,6 +170,8 @@ namespace sys
         if (userInit) {
             userInit();
         }
+
+        powerManager->SetBootSuccess();
     }
 
     void SystemManagerCommon::StartSystemServices()
@@ -197,9 +199,9 @@ namespace sys
 
     void SystemManagerCommon::StartSystem(InitFunction sysInit, InitFunction appSpaceInit)
     {
-        powerManager     = std::make_unique<PowerManager>();
-        cpuStatistics    = std::make_unique<CpuStatistics>();
-        deviceManager    = std::make_unique<DeviceManager>();
+        powerManager  = std::make_unique<PowerManager>();
+        cpuStatistics = std::make_unique<CpuStatistics>();
+        deviceManager = std::make_unique<DeviceManager>();
 
         systemInit = std::move(sysInit);
         userInit   = std::move(appSpaceInit);
@@ -210,6 +212,12 @@ namespace sys
         cpuStatisticsTimer = sys::TimerFactory::createPeriodicTimer(
             this, "cpuStatistics", constants::timerInitInterval, [this](sys::Timer &) { CpuStatisticsTimerHandler(); });
         cpuStatisticsTimer.start();
+
+        powerManagerEfficiencyTimer = sys::TimerFactory::createPeriodicTimer(
+            this, "logPowerManagerEfficiency", constants::powerManagerLogsTimerInterval, [this](sys::Timer &) {
+                powerManager->LogPowerManagerEfficiency();
+            });
+        powerManagerEfficiencyTimer.start();
     }
 
     bool SystemManagerCommon::Restore(Service *s)
@@ -503,21 +511,6 @@ namespace sys
         connect(ReadyToCloseMessage(), [&](Message *msg) {
             readyToCloseHandler(msg);
             return MessageNone{};
-        });
-
-        connect(typeid(sys::CpuFrequencyMessage), [this](sys::Message *message) -> sys::MessagePointer {
-            auto msg = static_cast<sys::CpuFrequencyMessage *>(message);
-
-            if (msg->getAction() == sys::CpuFrequencyMessage::Action::Increase) {
-                powerManager->IncreaseCpuFrequency();
-                cpuStatisticsTimer.start();
-            }
-            else if (msg->getAction() == sys::CpuFrequencyMessage::Action::Decrease) {
-                powerManager->DecreaseCpuFrequency();
-                cpuStatisticsTimer.start();
-            }
-
-            return sys::MessageNone{};
         });
 
         connect(typeid(sys::DeviceRegistrationMessage), [this](sys::Message *message) -> sys::MessagePointer {

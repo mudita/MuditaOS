@@ -97,17 +97,6 @@ namespace gui
         setFocusItem(optionsList);
     }
 
-    status_bar::Configuration OptionWindow::configureStatusBar(status_bar::Configuration appConfiguration)
-    {
-        appConfiguration.enable(status_bar::Indicator::NetworkAccessTechnology);
-        appConfiguration.enable(status_bar::Indicator::Time);
-        appConfiguration.enable(status_bar::Indicator::PhoneMode);
-        appConfiguration.enable(status_bar::Indicator::Battery);
-        appConfiguration.enable(status_bar::Indicator::Signal);
-        appConfiguration.enable(status_bar::Indicator::SimCard);
-        return appConfiguration;
-    }
-
     void OptionWindow::onClose([[maybe_unused]] CloseReason reason)
     {
         optionsList->onClose();

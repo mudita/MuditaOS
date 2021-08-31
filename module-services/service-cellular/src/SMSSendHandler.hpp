@@ -63,8 +63,9 @@ namespace cellular::internal::sms
          * External action events
          */
         void handleDBNotification();
-        void handleIncomingDbRecord(SMSRecord &record);
+        void handleIncomingDbRecord(SMSRecord &record, bool onDelay);
         void handleNoMoreDbRecords();
+        void sendMessageIfDelayed();
 
         /**
          * User defined callbacks/events
@@ -76,11 +77,15 @@ namespace cellular::internal::sms
         std::function<bool(SMSRecord &record)> onSend;
         /// Called when SMSSendHandler wants to check phone mode
         std::function<bool()> onGetOfflineMode;
+        /// Called when SMSSendHandler wants to check SIM state
+        std::function<bool()> onSIMNotInitialized;
 
       private:
         void handleStateChange(OptionalState state);
 
         std::unique_ptr<State> currentState;
+        std::function<void()> actionOnDelay;
+        bool delayedMessage;
     };
 
 } // namespace cellular::internal::sms

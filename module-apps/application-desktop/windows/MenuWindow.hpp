@@ -28,9 +28,20 @@ namespace gui
 
         bool onNotificationsChange(gui::RefreshModes);
 
+      protected:
+        gui::Label *description = nullptr;
+
       private:
         std::function<bool(gui::RefreshModes)> onNotificationsChangeCallback = nullptr;
         gui::Image *notificationThumbnail                                    = nullptr;
+    };
+
+    struct DisabledTile : public Tile
+    {
+        DisabledTile(UTF8 icon,
+                     std::string title,
+                     std::function<bool(Item &)> activatedCallback,
+                     std::function<bool()> hasNotificationsCallback = nullptr);
     };
 
     class MenuPage : public gui::GridLayout
@@ -69,6 +80,11 @@ namespace gui
       private:
         const app::DBNotificationsBaseHandler &dbNotifications;
         void invalidate() noexcept;
+        gui::Tile *createApplicationTile(UTF8 icon,
+                                         std::string title,
+                                         std::function<bool(Item &)> activatedCallback,
+                                         std::function<bool()> hasNotificationsCallback = nullptr);
+        gui::Tile *createDisabledApplicationTile(UTF8 icon, std::string title);
     };
 
 } /* namespace gui */

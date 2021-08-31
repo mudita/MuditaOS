@@ -2,69 +2,67 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <application-settings/ApplicationSettings.hpp>
-#include <application-settings/data/ApnListData.hpp>
-#include <application-settings/data/AutoLockData.hpp>
-#include <application-settings/data/BluetoothStatusData.hpp>
-#include <application-settings/data/BondedDevicesData.hpp>
-#include <application-settings/data/DeviceData.hpp>
-#include <application-settings/data/LanguagesData.hpp>
-#include <application-settings/data/PINSettingsLockStateData.hpp>
-#include <application-settings/data/PhoneNameData.hpp>
-#include <application-settings/models/system/FactoryData.hpp>
-#include <application-settings/models/system/TechnicalInformationModel.hpp>
+
 #include <application-settings/windows/SettingsMainWindow.hpp>
 #include <application-settings/windows/advanced/AdvancedOptionsWindow.hpp>
-#include <application-settings/windows/advanced/ColorTestWindow.hpp>
-#include <application-settings/windows/advanced/EinkModeWindow.hpp>
 #include <application-settings/windows/advanced/InformationWindow.hpp>
 #include <application-settings/windows/advanced/UITestWindow.hpp>
-#include <application-settings/windows/apps/AlarmClockWindow.hpp>
-#include <application-settings/windows/apps/AppsWindow.hpp>
-#include <application-settings/windows/apps/MessagesWindow.hpp>
-#include <application-settings/windows/apps/PhoneWindow.hpp>
-#include <application-settings/windows/apps/SoundSelectWindow.hpp>
+#include <application-settings/windows/advanced/EinkModeWindow.hpp>
+#include <application-settings/windows/advanced/ColorTestWindow.hpp>
+#include <application-settings/windows/advanced/StatusBarImageTypeWindow.hpp>
+#include <application-settings/windows/bluetooth/BluetoothWindow.hpp>
 #include <application-settings/windows/bluetooth/AddDeviceWindow.hpp>
 #include <application-settings/windows/bluetooth/AllDevicesWindow.hpp>
-#include <application-settings/windows/bluetooth/BluetoothCheckPasskeyWindow.hpp>
-#include <application-settings/windows/bluetooth/BluetoothWindow.hpp>
 #include <application-settings/windows/bluetooth/PhoneNameWindow.hpp>
-#include <application-settings/windows/display-keypad/DisplayAndKeypadWindow.hpp>
-#include <application-settings/windows/display-keypad/DisplayLightWindow.hpp>
-#include <application-settings/windows/display-keypad/EditQuotesWindow.hpp>
-#include <application-settings/windows/display-keypad/FontSizeWindow.hpp>
-#include <application-settings/windows/display-keypad/InputLanguageWindow.hpp>
-#include <application-settings/windows/display-keypad/KeypadLightWindow.hpp>
-#include <application-settings/windows/display-keypad/QuoteCategoriesWindow.hpp>
-#include <application-settings/windows/display-keypad/QuotesAddWindow.hpp>
-#include <application-settings/windows/display-keypad/QuotesMainWindow.hpp>
-#include <application-settings/windows/display-keypad/QuotesOptionsWindow.hpp>
-#include <application-settings/windows/display-keypad/WallpaperWindow.hpp>
-#include <application-settings/windows/network/ApnOptionsWindow.hpp>
-#include <application-settings/windows/network/ApnSettingsWindow.hpp>
+#include <application-settings/windows/bluetooth/BluetoothCheckPasskeyWindow.hpp>
 #include <application-settings/windows/network/NetworkWindow.hpp>
-#include <application-settings/windows/network/NewApnWindow.hpp>
+#include <application-settings/windows/network/SimPINSettingsWindow.hpp>
 #include <application-settings/windows/network/SimCardsWindow.hpp>
 #include <application-settings/windows/network/SimContactsImportWindow.hpp>
-#include <application-settings/windows/network/SimPINSettingsWindow.hpp>
-#include <application-settings/windows/phone-modes/ConnectionFrequencyWindow.hpp>
+#include <application-settings/windows/network/NewApnWindow.hpp>
+#include <application-settings/windows/network/ApnSettingsWindow.hpp>
+#include <application-settings/windows/network/ApnOptionsWindow.hpp>
+#include <application-settings/windows/display-keypad/DisplayAndKeypadWindow.hpp>
+#include <application-settings/windows/display-keypad/DisplayLightWindow.hpp>
+#include <application-settings/windows/display-keypad/FontSizeWindow.hpp>
+#include <application-settings/windows/display-keypad/WallpaperWindow.hpp>
+#include <application-settings/windows/display-keypad/QuotesMainWindow.hpp>
+#include <application-settings/windows/display-keypad/QuotesAddWindow.hpp>
+#include <application-settings/windows/display-keypad/EditQuotesWindow.hpp>
+#include <application-settings/windows/display-keypad/QuoteCategoriesWindow.hpp>
+#include <application-settings/windows/display-keypad/QuotesOptionsWindow.hpp>
+#include <application-settings/windows/display-keypad/KeypadLightWindow.hpp>
+#include <application-settings/windows/display-keypad/InputLanguageWindow.hpp>
+#include <application-settings/windows/phone-modes/PhoneModesWindow.hpp>
 #include <application-settings/windows/phone-modes/DoNotDisturbWindow.hpp>
 #include <application-settings/windows/phone-modes/OfflineWindow.hpp>
-#include <application-settings/windows/phone-modes/PhoneModesWindow.hpp>
-#include <application-settings/windows/security/AutolockWindow.hpp>
+#include <application-settings/windows/phone-modes/ConnectionFrequencyWindow.hpp>
+#include <application-settings/windows/apps/AppsWindow.hpp>
+#include <application-settings/windows/apps/PhoneWindow.hpp>
+#include <application-settings/windows/apps/MessagesWindow.hpp>
+#include <application-settings/windows/apps/AlarmClockWindow.hpp>
+#include <application-settings/windows/apps/SoundSelectWindow.hpp>
 #include <application-settings/windows/security/SecurityMainWindow.hpp>
-#include <application-settings/windows/system/CertificationWindow.hpp>
-#include <application-settings/windows/system/ChangeDateAndTimeWindow.hpp>
-#include <application-settings/windows/system/ChangeTimeZone.hpp>
-#include <application-settings/windows/system/DateAndTimeMainWindow.hpp>
-#include <application-settings/windows/system/LanguagesWindow.hpp>
-#include <application-settings/windows/system/SARInfoWindow.hpp>
+#include <application-settings/windows/security/AutolockWindow.hpp>
 #include <application-settings/windows/system/SystemMainWindow.hpp>
+#include <application-settings/windows/system/LanguagesWindow.hpp>
+#include <application-settings/windows/system/DateAndTimeMainWindow.hpp>
+#include <application-settings/windows/system/ChangeTimeZone.hpp>
+#include <application-settings/windows/system/ChangeDateAndTimeWindow.hpp>
 #include <application-settings/windows/system/TechnicalInformationWindow.hpp>
-
-#include <Dialog.hpp>
-#include <messages/DialogMetadataMessage.hpp>
-#include <service-appmgr/Constants.hpp>
-#include <service-appmgr/messages/GetCurrentDisplayLanguageResponse.hpp>
+#include <application-settings/windows/system/CertificationWindow.hpp>
+#include <application-settings/windows/system/SARInfoWindow.hpp>
+#include <application-settings/data/ApnListData.hpp>
+#include <application-settings/data/BondedDevicesData.hpp>
+#include <application-settings/data/BluetoothStatusData.hpp>
+#include <application-settings/data/DeviceData.hpp>
+#include <application-settings/data/LanguagesData.hpp>
+#include <application-settings/data/PhoneNameData.hpp>
+#include <application-settings/data/PINSettingsLockStateData.hpp>
+#include <application-settings/data/AutoLockData.hpp>
+#include <application-settings/models/apps/SoundsModel.hpp>
+#include <service-evtmgr/EventManagerServiceAPI.hpp>
+#include <service-audio/AudioServiceAPI.hpp>
 #include <service-bluetooth/BluetoothMessage.hpp>
 #include <service-bluetooth/Constants.hpp>
 #include <service-bluetooth/messages/BondedDevices.hpp>
@@ -75,11 +73,17 @@
 #include <service-bluetooth/messages/ResponseVisibleDevices.hpp>
 #include <service-bluetooth/messages/Status.hpp>
 #include <service-bluetooth/messages/Unpair.hpp>
-#include <service-db/Settings.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
-#include <service-evtmgr/Constants.hpp>
-#include <service-evtmgr/EventManagerServiceAPI.hpp>
-#include <service-evtmgr/ScreenLightControlMessage.hpp>
+#include <service-db/Settings.hpp>
+#include <module-services/service-appmgr/include/service-appmgr/Constants.hpp>
+#include <module-services/service-db/agents/settings/SystemSettings.hpp>
+#include <module-services/service-evtmgr/service-evtmgr/ScreenLightControlMessage.hpp>
+#include <module-services/service-evtmgr/service-evtmgr/Constants.hpp>
+#include <module-services/service-evtmgr/service-evtmgr/EVMessages.hpp>
+#include <service-appmgr/messages/Message.hpp>
+#include <service-appmgr/model/ApplicationManagerCommon.hpp>
+#include <apps-common/messages/DialogMetadataMessage.hpp>
+#include <apps-common/windows/Dialog.hpp>
 
 #include <i18n/i18n.hpp>
 
@@ -94,11 +98,15 @@ namespace app
 
     ApplicationSettings::ApplicationSettings(std::string name,
                                              std::string parent,
-                                             sys::phone_modes::PhoneMode mode,
+                                             sys::phone_modes::PhoneMode phoneMode,
+                                             sys::bluetooth::BluetoothMode bluetoothMode,
                                              StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), mode, startInBackground, settingStackDepth),
-          AsyncCallbackReceiver{this}
+        : Application(
+              std::move(name), std::move(parent), phoneMode, bluetoothMode, startInBackground, settingStackDepth),
+          AsyncCallbackReceiver{this}, soundsPlayer{std::make_shared<SoundsPlayer>(this)}
     {
+        bus.channels.push_back(sys::BusChannel::ServiceAudioNotifications);
+
         CellularServiceAPI::SubscribeForOwnNumber(this, [&](const std::string &number) {
             selectedSimNumber = number;
             LOG_DEBUG("Sim number changed");
@@ -130,15 +138,7 @@ namespace app
             }
         }
 
-        // handle database response
-        if (resp != nullptr) {
-            if (auto command = callbackStorage->getCallback(resp); command->execute()) {
-                refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-            }
-            return sys::msgHandled();
-        }
-
-        return sys::MessageNone{};
+        return handleAsyncResponse(resp);
     }
 
     // Invoked during initialization
@@ -302,6 +302,17 @@ namespace app
             updateWindow(gui::window::name::autolock, std::move(data));
             return sys::MessageNone{};
         });
+
+        connect(typeid(AudioStopNotification), [&](sys::Message *msg) -> sys::MessagePointer {
+            auto notification = static_cast<AudioStopNotification *>(msg);
+            return handleAudioStop(notification);
+        });
+
+        connect(typeid(AudioEOFNotification), [&](sys::Message *msg) -> sys::MessagePointer {
+            auto notification = static_cast<AudioStopNotification *>(msg);
+            return handleAudioStop(notification);
+        });
+
         createUserInterface();
 
         settings->registerValueChange(settings::operators_on,
@@ -354,6 +365,9 @@ namespace app
         });
         windowsFactory.attach(gui::window::name::color_test_window, [](Application *app, const std::string &name) {
             return std::make_unique<gui::ColorTestWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::status_bar_img_type, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::StatusBarImageTypeWindow>(app);
         });
 
         // Bluetooth
@@ -472,8 +486,9 @@ namespace app
                 std::make_unique<audio_settings::AudioSettingsModel>(app, audio_settings::PlaybackType::Alarm);
             return std::make_unique<gui::AlarmClockWindow>(app, std::move(audioModel));
         });
-        windowsFactory.attach(gui::window::name::sound_select, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::SoundSelectWindow>(app, name);
+        windowsFactory.attach(gui::window::name::sound_select, [this](Application *app, const std::string &name) {
+            auto model = std::make_shared<SoundsModel>(soundsPlayer);
+            return std::make_unique<gui::SoundSelectWindow>(app, name, std::move(model));
         });
 
         // Security
@@ -731,5 +746,11 @@ namespace app
                                                  switchWindow(gui::window::name::all_devices);
                                                  return true;
                                              }}));
+    }
+
+    auto ApplicationSettings::handleAudioStop(AudioStopNotification *notification) -> sys::MessagePointer
+    {
+        soundsPlayer->stop(notification->token);
+        return sys::MessageNone{};
     }
 } /* namespace app */

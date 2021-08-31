@@ -20,6 +20,7 @@ namespace app::onBoarding
                                    std::unique_ptr<EULALicenseWindowContract::Presenter> &&windowPresenter);
         ~EULALicenseWindow() noexcept override;
 
+        gui::status_bar::Configuration configureStatusBar(gui::status_bar::Configuration appConfiguration) override;
         void onBeforeShow(gui::ShowMode mode, gui::SwitchData *data) override;
         bool onInput(const gui::InputEvent &inputEvent) override;
 

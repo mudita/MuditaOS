@@ -19,12 +19,13 @@ namespace app
         void timerClockCallback();
 
       public:
-        ApplicationClock(std::string name                    = name_clock,
-                         std::string parent                  = {},
-                         sys::phone_modes::PhoneMode mode    = sys::phone_modes::PhoneMode::Connected,
-                         StartInBackground startInBackground = {false},
-                         uint32_t stackDepth                 = 4096,
-                         sys::ServicePriority priority       = sys::ServicePriority::Idle);
+        explicit ApplicationClock(std::string name                            = name_clock,
+                                  std::string parent                          = {},
+                                  sys::phone_modes::PhoneMode phoneMode       = sys::phone_modes::PhoneMode::Connected,
+                                  sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled,
+                                  StartInBackground startInBackground         = {false},
+                                  uint32_t stackDepth                         = 4096,
+                                  sys::ServicePriority priority               = sys::ServicePriority::Idle);
 
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
@@ -43,7 +44,8 @@ namespace app
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {
-            return {{manager::actions::Launch, manager::actions::PhoneModeChanged}};
+            return {
+                {manager::actions::Launch, manager::actions::PhoneModeChanged, manager::actions::BluetoothModeChanged}};
         }
     };
 } /* namespace app */

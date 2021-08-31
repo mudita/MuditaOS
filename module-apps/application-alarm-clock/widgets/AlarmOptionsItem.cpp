@@ -22,6 +22,9 @@ namespace gui
         application = app;
         assert(app != nullptr);
 
+        // create audioOperations to allow shounds preview
+        audioOperations = std::make_unique<app::AsyncAudioOperations>(app);
+
         setMinimumSize(style::window::default_body_width, style::alarmClock::window::item::options::height);
 
         setEdges(RectangleEdge::Bottom);
@@ -121,7 +124,7 @@ namespace gui
                 rightArrow->setVisible(true);
                 hBox->resizeItems();
                 if (itemName == AlarmOptionItemName::Sound) {
-                    bottomBarTemporaryMode(utils::translate("app_alarm_clock_play_pause"));
+                    bottomBarTemporaryMode(utils::translate(style::strings::common::play_pause));
                 }
                 if (itemName == AlarmOptionItemName::Repeat && actualVectorIndex == optionsNames.size() - 1) {
                     bottomBarTemporaryMode(utils::translate("app_alarm_clock_edit"));
@@ -134,6 +137,11 @@ namespace gui
                 rightArrow->setVisible(false);
                 hBox->resizeItems();
                 bottomBarRestoreFromTemporaryMode();
+            }
+
+            // stop preview playback when we loose focus
+            if (itemName == AlarmOptionItemName::Sound && musicStatus == MusicStatus::Play) {
+                stopAudioPreview();
             }
             return true;
         };
@@ -185,15 +193,21 @@ namespace gui
             }
 
             if (event.is(gui::KeyCode::KEY_LF) && itemName == AlarmOptionItemName::Sound) {
-                if (musicStatus == MusicStatus::Stop) {
-                    musicStatus = MusicStatus::Play;
-                    AudioServiceAPI::PlaybackStart(
-                        application, audio::PlaybackType::Alarm, songsList[actualVectorIndex].filePath);
+                if (songsList[actualVectorIndex].filePath != currentlyPreviewedPath) {
+                    playAudioPreview(songsList[actualVectorIndex].filePath);
                 }
-                else if (musicStatus == MusicStatus::Play) {
-                    musicStatus = MusicStatus::Stop;
-                    AudioServiceAPI::StopAll(application);
+                else if (musicStatus == MusicStatus::Stop) {
+                    resumeAudioPreview();
                 }
+                else {
+                    pauseAudioPreview();
+                }
+            }
+
+            // stop preview playback when we go back
+            if (itemName == AlarmOptionItemName::Sound && musicStatus == MusicStatus::Play &&
+                event.is(gui::KeyCode::KEY_RF)) {
+                stopAudioPreview();
             }
             return false;
         };
@@ -201,6 +215,10 @@ namespace gui
         onSaveCallback = [&](std::shared_ptr<AlarmsRecord> alarm) {
             switch (itemName) {
             case AlarmOptionItemName::Sound: {
+                // stop preview playback if it is played
+                if (musicStatus == MusicStatus::Play) {
+                    stopAudioPreview();
+                }
                 alarm->path = songsList[actualVectorIndex].filePath;
                 break;
             }
@@ -310,5 +328,65 @@ namespace gui
         }
         LOG_INFO("Total number of music files found: %u", static_cast<unsigned int>(musicFiles.size()));
         return musicFiles;
+    }
+
+    bool AlarmOptionsItem::playAudioPreview(const std::string &path)
+    {
+        return audioOperations->play(path, [this, path](audio::RetCode retCode, audio::Token token) {
+            if (retCode != audio::RetCode::Success || !token.IsValid()) {
+                LOG_ERROR("Audio preview callback failed with retcode = %s. Token validity: %d",
+                          str(retCode).c_str(),
+                          token.IsValid());
+                return;
+            }
+            musicStatus             = MusicStatus::Play;
+            currentlyPreviewedToken = token;
+            currentlyPreviewedPath  = path;
+        });
+    }
+
+    bool AlarmOptionsItem::pauseAudioPreview()
+    {
+        return audioOperations->pause(currentlyPreviewedToken, [this](audio::RetCode retCode, audio::Token token) {
+            if (token != currentlyPreviewedToken) {
+                LOG_ERROR("Audio preview pause failed: wrong token");
+                return;
+            }
+            if (retCode != audio::RetCode::Success || !token.IsValid()) {
+                LOG_ERROR("Audio preview pause failed with retcode = %s. Token validity: %d",
+                          str(retCode).c_str(),
+                          token.IsValid());
+                return;
+            }
+            musicStatus = MusicStatus::Stop;
+        });
+    }
+
+    bool AlarmOptionsItem::resumeAudioPreview()
+    {
+        return audioOperations->resume(currentlyPreviewedToken, [this](audio::RetCode retCode, audio::Token token) {
+            if (token != currentlyPreviewedToken) {
+                LOG_ERROR("Audio preview resume failed: wrong token");
+                return;
+            }
+
+            if (retCode != audio::RetCode::Success || !token.IsValid()) {
+                LOG_ERROR("Audio preview pause failed with retcode = %s. Token validity: %d",
+                          str(retCode).c_str(),
+                          token.IsValid());
+                return;
+            }
+            musicStatus = MusicStatus::Play;
+        });
+    }
+
+    bool AlarmOptionsItem::stopAudioPreview()
+    {
+        if (currentlyPreviewedToken.IsValid()) {
+            musicStatus            = MusicStatus::Stop;
+            currentlyPreviewedPath = "";
+            return audioOperations->stop(currentlyPreviewedToken, [](audio::RetCode, audio::Token) {});
+        }
+        return false;
     }
 } /* namespace gui */

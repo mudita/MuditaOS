@@ -25,8 +25,7 @@ namespace bluetooth
     {
         settingsMap[newSetting] = value;
 
-        settingsProvider->setValue(
-            settingString[newSetting], std::visit(StringVisitor(), value), ::settings::SettingsScope::Global);
+        settingsProvider->setValue(settingString[newSetting], std::visit(StringVisitor(), value));
         LOG_INFO("setting %s set", settingString[newSetting].c_str());
     }
     SettingsHolder::SettingsHolder(std::unique_ptr<settings::Settings> settingsPtr)

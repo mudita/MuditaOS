@@ -9,15 +9,9 @@ namespace app::onBoarding
     SkipDialogWindow::SkipDialogWindow(app::Application *app)
         : gui::DialogYesNo(app, gui::window::name::onBoarding_skip)
     {
-        statusBar->configure(configureStatusBar(application->getStatusBarConfiguration()));
-    }
-
-    gui::status_bar::Configuration SkipDialogWindow::configureStatusBar(gui::status_bar::Configuration appConfiguration)
-    {
-        appConfiguration.setIndicator(gui::status_bar::Indicator::Time, true);
-        appConfiguration.setIndicator(gui::status_bar::Indicator::Battery, false);
-        appConfiguration.setIndicator(gui::status_bar::Indicator::SimCard, false);
-        appConfiguration.setIndicator(gui::status_bar::Indicator::Signal, false);
-        return appConfiguration;
+        applyToStatusBar([](gui::status_bar::Configuration configuration) {
+            configuration.setIndicator(gui::status_bar::Indicator::SimCard, false);
+            return configuration;
+        });
     }
 } // namespace app::onBoarding

@@ -15,6 +15,11 @@ namespace app::onBoarding
     {
         bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(style::strings::common::ok));
         bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
+
+        applyToStatusBar([](gui::status_bar::Configuration configuration) {
+            configuration.setIndicator(gui::status_bar::Indicator::SimCard, false);
+            return configuration;
+        });
     }
 
     bool NoSimSelectedDialogWindow::onInput(const gui::InputEvent &inputEvent)
