@@ -4,6 +4,7 @@
 #pragma once
 
 #include "SongContext.hpp"
+#include <string>
 #include <widgets/SongItem.hpp>
 #include <InternalModel.hpp>
 #include <ListItemProvider.hpp>
@@ -40,5 +41,7 @@ namespace app::music_player
         virtual SongContext getCurrentSongContext() const noexcept               = 0;
         virtual void setCurrentSongContext(SongContext context)                  = 0;
         virtual void clearCurrentSongContext()                                   = 0;
+        virtual std::string getNextFilePath(const std::string &filePath) const     = 0;
+        virtual std::string getPreviousFilePath(const std::string &filePath) const = 0;
     };
 } // namespace app::music_player

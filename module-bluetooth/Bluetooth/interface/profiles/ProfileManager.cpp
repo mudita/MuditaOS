@@ -16,7 +16,7 @@ namespace bluetooth
         if (!initialized) {
             profilesList = {{AudioProfile::A2DP, std::make_shared<bluetooth::A2DP>()},
                             {AudioProfile::HSP, std::make_shared<bluetooth::HSP>()},
-                            {AudioProfile::HFP, std::make_shared<bluetooth::HFP>()},
+                            {AudioProfile::HFP, nullptr},
                             {AudioProfile::None, nullptr}};
 
             for (auto &[profileName, ptr] : profilesList) {
@@ -119,7 +119,7 @@ namespace bluetooth
     }
     auto ProfileManager::isAddressActuallyUsed(bd_addr_t address) -> bool
     {
-        return static_cast<bool>(bd_addr_cmp(address, remoteAddr));
+        return !static_cast<bool>(bd_addr_cmp(address, remoteAddr));
     }
 
 } // namespace bluetooth

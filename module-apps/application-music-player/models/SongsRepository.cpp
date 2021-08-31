@@ -45,6 +45,9 @@ namespace app::music_player
                     }
                 }
             }
+            std::sort(musicFiles.begin(), musicFiles.end(), [](audio::Tags t1, audio::Tags t2) {
+                return t1.filePath < t2.filePath;
+            });
         }
         LOG_INFO("Total number of music files found: %u", static_cast<unsigned int>(musicFiles.size()));
     }
@@ -65,5 +68,25 @@ namespace app::music_player
         }
 
         return std::numeric_limits<size_t>::max();
+    }
+
+    std::string SongsRepository::getNextFilePath(const std::string &filePath) const
+    {
+        const auto currentIndex = getFileIndex(filePath);
+
+        if (currentIndex == std::numeric_limits<size_t>::max() || currentIndex == musicFiles.size() - 1) {
+            return "";
+        }
+        return musicFiles[currentIndex + 1].filePath;
+    }
+
+    std::string SongsRepository::getPreviousFilePath(const std::string &filePath) const
+    {
+        const auto currentIndex = getFileIndex(filePath);
+
+        if (currentIndex == std::numeric_limits<size_t>::max() || currentIndex == 0) {
+            return "";
+        }
+        return musicFiles[currentIndex - 1].filePath;
     }
 } // namespace app::music_player

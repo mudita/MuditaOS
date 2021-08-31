@@ -42,6 +42,9 @@ namespace service::eink
 
         connect(typeid(PrepareDisplayEarlyRequest),
                 [this](sys::Message *request) -> sys::MessagePointer { return handlePrepareEarlyRequest(request); });
+
+        eInkSentinel = std::make_shared<EinkSentinel>(name::eink, this);
+        display.setEinkSentinel(eInkSentinel);
     }
 
     sys::MessagePointer ServiceEink::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *response)
@@ -60,10 +63,7 @@ namespace service::eink
         auto deviceRegistrationMsg = std::make_shared<sys::DeviceRegistrationMessage>(display.getDevice());
         bus.sendUnicast(deviceRegistrationMsg, service::name::system_manager);
 
-        cpuSentinel = std::make_shared<sys::CpuSentinel>(name::eink, this);
-        display.setCpuSentinel(cpuSentinel);
-
-        auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuSentinel);
+        auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(eInkSentinel);
         bus.sendUnicast(sentinelRegistrationMsg, service::name::system_manager);
 
         display.powerOn();

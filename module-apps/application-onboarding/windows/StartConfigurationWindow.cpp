@@ -41,6 +41,13 @@ namespace app::onBoarding
                       utils::translate("app_onboarding_start_configuration"));
     }
 
+    gui::status_bar::Configuration StartConfigurationWindow::configureStatusBar(
+        gui::status_bar::Configuration appConfiguration)
+    {
+        appConfiguration.setIndicator(gui::status_bar::Indicator::SimCard, false);
+        return appConfiguration;
+    }
+
     bool StartConfigurationWindow::onInput(const gui::InputEvent &inputEvent)
     {
         if (inputEvent.isShortRelease()) {
@@ -88,5 +95,4 @@ namespace app::onBoarding
         }
         return AppWindow::onInput(inputEvent);
     }
-
 } // namespace app::onBoarding

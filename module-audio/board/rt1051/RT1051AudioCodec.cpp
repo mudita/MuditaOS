@@ -45,7 +45,7 @@ namespace audio
 
     CodecParamsMAX98090::OutputPath RT1051AudioCodec::getCodecOutputPath(const Configuration &format)
     {
-        auto mono = (format.flags & static_cast<std::uint32_t>(audio::codec::Flags::OutputMono)) != 0;
+        const auto mono = (format.flags & static_cast<std::uint32_t>(audio::codec::Flags::OutputMono)) != 0;
 
         switch (format.outputPath) {
         case audio::codec::OutputPath::Headphones:
@@ -108,6 +108,7 @@ namespace audio
         codecParams.outputPath = getCodecOutputPath(currentFormat);
         codecParams.outVolume  = currentFormat.outputVolume;
         codecParams.inGain     = currentFormat.inputGain;
+        SetupEQ();
         codec.Start(codecParams);
 
         state = State::Running;
@@ -261,6 +262,17 @@ namespace audio
             SAI_TransferAbortReceiveEDMA(BOARD_AUDIOCODEC_SAIx, &rxHandle);
         }
         memset(&rxHandle, 0, sizeof(rxHandle));
+    }
+
+    void RT1051AudioCodec::SetupEQ()
+    {
+        const auto bands = currentFormat.filterCoefficients.size();
+        for (std::size_t band = 0; band < bands; band++) {
+            const auto &filterParams = currentFormat.filterCoefficients.at(band);
+            codec.SetEqualizerParameters(
+                filterParams.b0, filterParams.b1, filterParams.b2, filterParams.a1, filterParams.a2, band);
+        }
+        codec.EnableFilterBands(bands);
     }
 
     auto RT1051AudioCodec::getSupportedFormats() -> std::vector<AudioFormat>

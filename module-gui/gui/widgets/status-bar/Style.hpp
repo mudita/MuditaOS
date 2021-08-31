@@ -7,17 +7,23 @@
 
 namespace style::status_bar
 {
+#if DEVELOPER_SETTINGS_OPTIONS == 1
+    extern gui::ImageTypeSpecifier imageTypeSpecifier;
+#else
+    inline constexpr auto imageTypeSpecifier = gui::ImageTypeSpecifier::W_G;
+#endif
+
     namespace margins
     {
         inline constexpr auto iconBottom = 4u;
-        inline constexpr auto textBottom = 5u;
+        inline constexpr auto textBottom = 4u;
         inline constexpr auto between    = 10u;
     }; // namespace margins
     namespace time
     {
         inline constexpr auto font          = "gt_pressura_regular_24";
         inline constexpr auto maxX          = 100u;
-        inline constexpr auto bottomPadding = 7u;
+        inline constexpr auto bottomPadding = 5u;
     }; // namespace time
     namespace nat
     {

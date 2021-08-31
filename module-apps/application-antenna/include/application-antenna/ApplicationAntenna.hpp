@@ -38,10 +38,11 @@ namespace app
         uint32_t lastFreq = 0;
 
       public:
-        ApplicationAntenna(std::string name                    = name_antenna,
-                           std::string parent                  = {},
-                           sys::phone_modes::PhoneMode mode    = sys::phone_modes::PhoneMode::Connected,
-                           StartInBackground startInBackground = {false});
+        ApplicationAntenna(std::string name                            = name_antenna,
+                           std::string parent                          = {},
+                           sys::phone_modes::PhoneMode phoneMode       = sys::phone_modes::PhoneMode::Connected,
+                           sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled,
+                           StartInBackground startInBackground         = {false});
         virtual ~ApplicationAntenna();
 
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
@@ -74,7 +75,8 @@ namespace app
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {
-            return {{manager::actions::Launch, manager::actions::PhoneModeChanged}};
+            return {
+                {manager::actions::Launch, manager::actions::PhoneModeChanged, manager::actions::BluetoothModeChanged}};
         }
     };
 } /* namespace app */

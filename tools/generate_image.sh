@@ -71,6 +71,9 @@ PART2_SIZE=$PART1_SIZE
 PART3_START=$(($PART2_START + $PART2_SIZE))
 PART3_SIZE=$(($DEVICE_BLK_COUNT - $PART1_SIZE - $PART2_SIZE - $PART1_START))
 
+echo "Remove previous image file"
+rm -f $IMAGE_NAME
+
 truncate -s $(($DEVICE_BLK_COUNT * $DEVICE_BLK_SIZE)) $IMAGE_NAME
 sfdisk $IMAGE_NAME << ==sfdisk
 label: dos

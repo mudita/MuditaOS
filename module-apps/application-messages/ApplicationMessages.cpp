@@ -40,9 +40,11 @@ namespace app
 
     ApplicationMessages::ApplicationMessages(std::string name,
                                              std::string parent,
-                                             sys::phone_modes::PhoneMode mode,
+                                             sys::phone_modes::PhoneMode phoneMode,
+                                             sys::bluetooth::BluetoothMode bluetoothMode,
                                              StartInBackground startInBackground)
-        : Application(name, parent, mode, startInBackground, messagesStackDepth), AsyncCallbackReceiver{this}
+        : Application(name, parent, phoneMode, bluetoothMode, startInBackground, messagesStackDepth),
+          AsyncCallbackReceiver{this}
     {
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         addActionReceiver(manager::actions::CreateSms, [this](auto &&data) {
@@ -97,21 +99,7 @@ namespace app
             }
         }
 
-        // this variable defines whether message was processed.
-        bool handled = false;
-
-        // handle database response
-        if (resp != nullptr) {
-            handled = true;
-            if (auto command = callbackStorage->getCallback(resp); command->execute()) {
-                refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-            }
-        }
-
-        if (handled) {
-            return std::make_shared<sys::ResponseMessage>();
-        }
-        return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
+        return handleAsyncResponse(resp);
     }
 
     // Invoked during initialization

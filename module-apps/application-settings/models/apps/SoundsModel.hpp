@@ -4,13 +4,19 @@
 #pragma once
 
 #include "AbstractSoundsModel.hpp"
+#include "AbstractSoundsPlayer.hpp"
 
+#include <apps-common/AudioOperations.hpp>
+#include <Audio/decoder/Decoder.hpp>
 #include <InternalModel.hpp>
+#include <Application.hpp>
 
 /// Simple SoundsModel
 class SoundsModel : public app::InternalModel<gui::ListItem *>, public AbstractSoundsModel
 {
   public:
+    explicit SoundsModel(std::shared_ptr<AbstractSoundsPlayer> soundsPlayer);
+
     /// Creates data for model
     /// @param app pointer to current application
     /// @param model audio settings model
@@ -39,4 +45,6 @@ class SoundsModel : public app::InternalModel<gui::ListItem *>, public AbstractS
     void applyItems(const std::vector<std::filesystem::path> &sounds,
                     app::Application *app,
                     audio_settings::AbstractAudioSettingsModel *model);
+
+    std::shared_ptr<AbstractSoundsPlayer> soundsPlayer;
 };

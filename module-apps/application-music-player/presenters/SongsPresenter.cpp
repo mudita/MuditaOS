@@ -125,10 +125,55 @@ namespace app::music_player
         return false;
     }
 
-    bool SongsPresenter::requestAudioOperation(const std::string &filePath)
+    bool SongsPresenter::handleAudioEofNotification(audio::Token token)
     {
         auto currentSongContext = songsModelInterface->getCurrentSongContext();
 
+        if (token == currentSongContext.currentFileToken) {
+            songsModelInterface->clearCurrentSongContext();
+            if (changePlayingStateCallback != nullptr) {
+                changePlayingStateCallback(SongState::NotPlaying);
+            }
+            updateViewSongState();
+            refreshView();
+            auto nextSongToPlay = songsModelInterface->getNextFilePath(currentSongContext.filePath);
+            if (!nextSongToPlay.empty()) {
+                requestAudioOperation(nextSongToPlay);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    bool SongsPresenter::handleAudioPausedNotification(audio::Token token)
+    {
+        if (token == songsModelInterface->getCurrentFileToken()) {
+            songsModelInterface->setCurrentSongState(SongState::NotPlaying);
+            if (changePlayingStateCallback != nullptr) {
+                changePlayingStateCallback(SongState::NotPlaying);
+            }
+            updateViewSongState();
+            return true;
+        }
+        return false;
+    }
+
+    bool SongsPresenter::handleAudioResumedNotification(audio::Token token)
+    {
+        if (token == songsModelInterface->getCurrentFileToken()) {
+            songsModelInterface->setCurrentSongState(SongState::Playing);
+            if (changePlayingStateCallback != nullptr) {
+                changePlayingStateCallback(SongState::Playing);
+            }
+            updateViewSongState();
+            return true;
+        }
+        return false;
+    }
+
+    bool SongsPresenter::requestAudioOperation(const std::string &filePath)
+    {
+        auto currentSongContext = songsModelInterface->getCurrentSongContext();
         if (currentSongContext.isValid() && (filePath.empty() || currentSongContext.filePath == filePath)) {
             return currentSongContext.isPlaying() ? pause() : resume();
         }

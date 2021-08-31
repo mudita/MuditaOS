@@ -4,7 +4,12 @@ include(Utils)
 set(SYSROOT ${CMAKE_BINARY_DIR}/sysroot)
 set(ASSETS_DEST_DIR ${SYSROOT}/sys)
 
-add_assets_target(assets ${ASSETS_SOURCE_DIR} ${ASSETS_DEST_DIR})
+add_assets_target(
+    TARGET assets
+    SOURCE_DIR ${ASSETS_SOURCE_DIR}
+    DEST_DIR ${ASSETS_DEST_DIR}
+    DEVEL ${WITH_DEVELOPMENT_FEATURES}
+)
 
 multicomp_install(
     FILES

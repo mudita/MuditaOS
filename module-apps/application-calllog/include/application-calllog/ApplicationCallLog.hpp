@@ -15,10 +15,11 @@ namespace app
     class ApplicationCallLog : public Application
     {
       public:
-        ApplicationCallLog(std::string name                    = CallLogAppStr,
-                           std::string parent                  = {},
-                           sys::phone_modes::PhoneMode mode    = sys::phone_modes::PhoneMode::Connected,
-                           StartInBackground startInBackground = {false});
+        ApplicationCallLog(std::string name                            = CallLogAppStr,
+                           std::string parent                          = {},
+                           sys::phone_modes::PhoneMode phoneMode       = sys::phone_modes::PhoneMode::Connected,
+                           sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled,
+                           StartInBackground startInBackground         = {false});
         ~ApplicationCallLog() override;
 
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
@@ -42,7 +43,10 @@ namespace app
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {
-            return {{manager::actions::Launch, manager::actions::ShowCallLog, manager::actions::PhoneModeChanged}};
+            return {{manager::actions::Launch,
+                     manager::actions::ShowCallLog,
+                     manager::actions::PhoneModeChanged,
+                     manager::actions::BluetoothModeChanged}};
         }
     };
 } /* namespace app */

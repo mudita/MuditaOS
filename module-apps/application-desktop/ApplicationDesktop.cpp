@@ -37,14 +37,13 @@ namespace app
 {
     ApplicationDesktop::ApplicationDesktop(std::string name,
                                            std::string parent,
-                                           sys::phone_modes::PhoneMode mode,
+                                           sys::phone_modes::PhoneMode phoneMode,
+                                           sys::bluetooth::BluetoothMode bluetoothMode,
                                            StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), mode, startInBackground), AsyncCallbackReceiver(this),
-          dbNotificationHandler(this)
+        : Application(std::move(name), std::move(parent), phoneMode, bluetoothMode, startInBackground),
+          AsyncCallbackReceiver(this), dbNotificationHandler(this)
     {
         using namespace gui::status_bar;
-        statusBarManager->enableIndicators(
-            {Indicator::Signal, Indicator::Time, Indicator::Battery, Indicator::SimCard});
         statusBarManager->set(Indicator::SimCard,
                               std::make_shared<SIMConfiguration>(SIMConfiguration::DisplayMode::OnlyInactiveState));
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
@@ -97,23 +96,20 @@ namespace app
             return retMsg;
         }
 
-        bool handled = false;
+        return handleAsyncResponse(resp);
+    }
 
-        // handle database response
+    sys::MessagePointer ApplicationDesktop::handleAsyncResponse(sys::ResponseMessage *resp)
+    {
+        Application::handleAsyncResponse(resp);
+
         if (resp != nullptr) {
-            if (auto command = callbackStorage->getCallback(resp); command->execute()) {
-                handled = true;
-            }
-            else if (auto msg = dynamic_cast<db::QueryResponse *>(resp)) {
+            if (auto msg = dynamic_cast<db::QueryResponse *>(resp)) {
                 auto result = msg->getResult();
                 if (dbNotificationHandler.handle(result.get())) {
-                    handled = true;
                     refreshMenuWindow();
                 }
             }
-        }
-
-        if (handled) {
             return std::make_shared<sys::ResponseMessage>();
         }
         else {
@@ -236,7 +232,7 @@ namespace app
             auto currentWindow = getCurrentWindow();
             if (currentWindow->getName() == app::window::name::dead_battery ||
                 currentWindow->getName() == app::window::name::charging_battery) {
-                switchWindow(app::window::name::desktop_main_window);
+                app::manager::Controller::sendAction(this, app::manager::actions::Home);
             }
         }
     }

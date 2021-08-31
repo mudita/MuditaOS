@@ -30,17 +30,19 @@ namespace cellular::service
         std::shared_ptr<sys::Message> createSettingsRequest();
         /**
          * Handles settings related to Network Time synchronisation change
-         * @param newValue Autoamitc Date and Time setting value
+         * @param newValue Automatic Date and Time setting value
+         * @param isOfflineModeOn is Offline mode currently enabled
          */
-        void processSettings(bool newValue);
+        void processSettings(bool newValue, bool isOfflineModeOn);
 
       private:
         at::BaseChannel *channel    = nullptr;
         bool isAutomaticDateAndTime = false;
         /**
          * It enables Network Time reporting
+         * @param isOfflineModeOn is Offline mode currently enabled
          */
-        void enableTimeReporting();
+        void enableTimeReporting(bool isOfflineModeOn);
         /**
          * It disables Network Time reporting
          */

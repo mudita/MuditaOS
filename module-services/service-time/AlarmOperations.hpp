@@ -20,6 +20,8 @@ namespace alarms
         using OnRemoveAlarmProcessed      = std::function<void(bool)>;
         using OnGetNextSingleProcessed    = std::function<void(std::vector<SingleEventRecord>)>;
 
+        virtual ~IAlarmOperations() noexcept = default;
+
         virtual void getAlarm(const std::uint32_t alarmId, OnGetAlarmProcessed callback)       = 0;
         virtual void addAlarm(AlarmEventRecord record, OnAddAlarmProcessed callback)           = 0;
         virtual void updateAlarm(AlarmEventRecord record, OnUpdateAlarmProcessed callback)     = 0;

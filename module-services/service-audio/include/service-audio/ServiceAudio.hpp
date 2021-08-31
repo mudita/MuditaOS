@@ -67,7 +67,14 @@ class ServiceAudio : public sys::Service
         -> std::unique_ptr<AudioResponseMessage>;
     auto HandleStop(const std::vector<audio::PlaybackType> &stopTypes, const audio::Token &token)
         -> std::unique_ptr<AudioResponseMessage>;
-    auto StopInput(audio::AudioMux::Input *input) -> audio::RetCode;
+
+    enum class StopReason
+    {
+        Eof,
+        Other
+    };
+
+    auto StopInput(audio::AudioMux::Input *input, StopReason stopReason = StopReason::Other) -> audio::RetCode;
     auto HandleSendEvent(std::shared_ptr<audio::Event> evt) -> std::unique_ptr<AudioResponseMessage>;
     auto HandlePause(const audio::Token &token) -> std::unique_ptr<AudioResponseMessage>;
     auto HandlePause(std::optional<audio::AudioMux::Input *> input) -> std::unique_ptr<AudioResponseMessage>;
@@ -78,6 +85,10 @@ class ServiceAudio : public sys::Service
     void MuteCurrentOperation();
     void VibrationUpdate(const audio::PlaybackType &type               = audio::PlaybackType::None,
                          std::optional<audio::AudioMux::Input *> input = std::nullopt);
+    void DisableVibration(std::optional<audio::AudioMux::Input *> input = std::nullopt);
+    void EnableOneShotVibration();
+    void EnableContinuousVibration(std::optional<audio::AudioMux::Input *> input = std::nullopt);
+
     auto GetVibrationType(const audio::PlaybackType &type) -> VibrationType;
 
     auto IsVibrationEnabled(const audio::PlaybackType &type) -> bool;
@@ -107,6 +118,8 @@ class ServiceAudio : public sys::Service
     void onVolumeChanged(audio::Volume volume);
     auto handleA2DPVolumeChangedOnBluetoothDevice(sys::Message *msgl) -> sys::MessagePointer;
     auto handleHSPVolumeChangedOnBluetoothDevice(sys::Message *msgl) -> sys::MessagePointer;
+    auto handleA2DPAudioPause() -> sys::MessagePointer;
+    auto handleA2DPAudioStart() -> sys::MessagePointer;
 };
 
 namespace sys

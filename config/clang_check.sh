@@ -27,8 +27,7 @@ get_files_to_check()
     local files
     local endlist=()
     local file_with_ignores="$1"
-
-    files=$(git diff -U0 --name-only remotes/origin/master...HEAD --diff-filter='d')
+    files=$(git diff -U0 --name-only remotes/origin/${CHANGE_TARGET}...HEAD --diff-filter='d')
     for file in ${files}; do
         if [[ ${file} =~ ^.*\.(cpp|hpp|c|h|cxx|gcc|cc)$ ]] && shouldnt_ignore "${file}" > "$file_with_ignores"; then
             endlist+=("$file")
@@ -56,6 +55,7 @@ main()
     fi
     local tool
     tool=$(get_clang_tidy)
+    echo "Target branch: ${CHANGE_TARGET}"
 
     local files_to_check
     local ignore_files
@@ -73,7 +73,7 @@ main()
     verify_clang_format_version
     get_compile_commands purephone
     # run tidy
-    git diff -U0 --no-color remotes/origin/master...HEAD $files_to_check | ${tool[*]} -p 1 -path=/tmp/
+    git diff -U0 --no-color remotes/origin/${CHANGE_TARGET}...HEAD $files_to_check | ${tool[*]} -p 1 -path=/tmp/
 }
 
 main

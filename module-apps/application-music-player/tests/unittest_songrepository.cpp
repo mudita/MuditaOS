@@ -143,11 +143,21 @@ TEST_F(SongsRepositoryFixture, FileIndex)
     auto barIndex = repo->getFileIndex(barPath);
 
     EXPECT_NE(fooIndex, static_cast<std::size_t>(-1));
-    EXPECT_LT(fooIndex, 2);
+    EXPECT_EQ(fooIndex, 1);
 
     EXPECT_NE(barIndex, static_cast<std::size_t>(-1));
-    EXPECT_LT(barIndex, 2);
+    EXPECT_EQ(barIndex, 0);
 
     auto bazIndex = repo->getFileIndex("baz");
     EXPECT_EQ(bazIndex, static_cast<std::size_t>(-1));
+
+    EXPECT_EQ(repo->getNextFilePath(barTags.filePath), fooTags.filePath);
+    EXPECT_EQ(repo->getNextFilePath(fooTags.filePath), "");
+    EXPECT_EQ(repo->getNextFilePath("rand"), "");
+    EXPECT_EQ(repo->getNextFilePath(""), "");
+
+    EXPECT_EQ(repo->getPreviousFilePath(barTags.filePath), "");
+    EXPECT_EQ(repo->getPreviousFilePath(fooTags.filePath), barTags.filePath);
+    EXPECT_EQ(repo->getPreviousFilePath("rand"), "");
+    EXPECT_EQ(repo->getPreviousFilePath(""), "");
 }

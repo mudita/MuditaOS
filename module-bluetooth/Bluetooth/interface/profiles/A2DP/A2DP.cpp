@@ -534,7 +534,6 @@ namespace bluetooth
             AVRCP::playInfo.status = AVRCP_PLAYBACK_STATUS_STOPPED;
             cid                    = a2dp_subevent_stream_released_get_a2dp_cid(packet);
             local_seid             = a2dp_subevent_stream_released_get_local_seid(packet);
-
             LOG_INFO(
                 "A2DP Source: Stream released: a2dp_cid [expected 0x%02x, received 0x%02x], local_seid [expected %d, "
                 "received %d]\n",

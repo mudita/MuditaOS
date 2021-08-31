@@ -23,6 +23,7 @@ target_sources(service-appmgr
         messages/SwitchBackRequest.cpp
         messages/SwitchConfirmation.cpp
         messages/SwitchRequest.cpp
+        messages/FinalizingClose.cpp
         model/ActionsRegistry.cpp
         model/ApplicationHandle.cpp
         model/ApplicationManagerCommon.cpp
@@ -60,6 +61,7 @@ target_sources(service-appmgr
         include/service-appmgr/messages/SwitchConfirmation.hpp
         include/service-appmgr/messages/SwitchRequest.hpp
         include/service-appmgr/messages/UserPowerDownRequest.hpp
+        include/service-appmgr/messages/FinalizingClose.hpp
         include/service-appmgr/model/ActionsRegistry.hpp
         include/service-appmgr/model/ApplicationHandle.hpp
         include/service-appmgr/model/ApplicationManagerCommon.hpp

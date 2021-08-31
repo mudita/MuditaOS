@@ -4,6 +4,7 @@
 #include "RT1051LPM.hpp"
 
 #include "board.h"
+#include "reboot_codes.hpp"
 #include <log.hpp>
 #include "bsp/BoardDefinitions.hpp"
 #include "bsp/watchdog/watchdog.hpp"
@@ -20,46 +21,47 @@ namespace bsp
 
     RT1051LPM::RT1051LPM()
     {
-        gpio = DriverGPIO::Create(static_cast<GPIOInstances>(BoardDefinitions::POWER_SWITCH_HOLD_GPIO),
-                                  DriverGPIOParams{});
+        gpio_1 = DriverGPIO::Create(static_cast<GPIOInstances>(BoardDefinitions::POWER_SWITCH_HOLD_GPIO),
+                                    DriverGPIOParams{});
+        gpio_2 = DriverGPIO::Create(static_cast<GPIOInstances>(BoardDefinitions::DCDC_INVERTER_MODE_GPIO),
+                                    DriverGPIOParams{});
 
-        gpio->ConfPin(DriverGPIOPinParams{.dir      = DriverGPIOPinParams::Direction::Output,
-                                          .irqMode  = DriverGPIOPinParams::InterruptMode::NoIntmode,
-                                          .defLogic = 1,
-                                          .pin = static_cast<uint32_t>(BoardDefinitions::POWER_SWITCH_HOLD_BUTTON)});
+        gpio_1->ConfPin(DriverGPIOPinParams{.dir      = DriverGPIOPinParams::Direction::Output,
+                                            .irqMode  = DriverGPIOPinParams::InterruptMode::NoIntmode,
+                                            .defLogic = 1,
+                                            .pin = static_cast<uint32_t>(BoardDefinitions::POWER_SWITCH_HOLD_BUTTON)});
 
-        gpio->WritePin(static_cast<uint32_t>(BoardDefinitions::POWER_SWITCH_HOLD_BUTTON), 1);
+        gpio_2->ConfPin(DriverGPIOPinParams{.dir      = DriverGPIOPinParams::Direction::Output,
+                                            .irqMode  = DriverGPIOPinParams::InterruptMode::NoIntmode,
+                                            .defLogic = 0,
+                                            .pin = static_cast<uint32_t>(BoardDefinitions::DCDC_INVERTER_MODE_PIN)});
+
+        gpio_1->WritePin(static_cast<uint32_t>(BoardDefinitions::POWER_SWITCH_HOLD_BUTTON), 1);
+        DisableDcdcPowerSaveMode();
 
         CpuFreq = std::make_unique<CpuFreqLPM>();
     }
 
     int32_t RT1051LPM::PowerOff()
     {
-        gpio->WritePin(static_cast<uint32_t>(BoardDefinitions::POWER_SWITCH_HOLD_BUTTON), 0);
+        gpio_1->WritePin(static_cast<uint32_t>(BoardDefinitions::POWER_SWITCH_HOLD_BUTTON), 0);
         return 0;
     }
 
     int32_t RT1051LPM::Reboot(RebootType reason)
     {
-        enum rebootCode : std::uint32_t
-        {
-            rebootNormalCode       = std::uint32_t{0},
-            rebootToUpdateCode     = std::uint32_t{0xdead0000},
-            rebootToRecoveryCode   = std::uint32_t{0xdead0001},
-            rebootToFactoryRstCode = std::uint32_t{0xdead0002}
-        };
         switch (reason) {
         case RebootType::GoToUpdaterUpdate:
-            SNVS->LPGPR[0] = rebootToUpdateCode;
+            SNVS->LPGPR[0] = bsp::rebootCode::rebootToUpdateCode;
             break;
         case RebootType::GoToUpdaterRecovery:
-            SNVS->LPGPR[0] = rebootToRecoveryCode;
+            SNVS->LPGPR[0] = bsp::rebootCode::rebootToRecoveryCode;
             break;
         case RebootType::GoToUpdaterFactoryReset:
-            SNVS->LPGPR[0] = rebootToFactoryRstCode;
+            SNVS->LPGPR[0] = bsp::rebootCode::rebootToFactoryRstCode;
             break;
         case RebootType::NormalRestart:
-            SNVS->LPGPR[0] = rebootNormalCode;
+            SNVS->LPGPR[0] = bsp::rebootCode::rebootNormalCode;
             break;
         }
         NVIC_SystemReset();
@@ -114,6 +116,21 @@ namespace bsp
             bsp::EnableExternalOscillator();
             cpp_freertos::CriticalSection::Exit();
         }
+    }
+
+    void RT1051LPM::SetBootSuccess()
+    {
+        SNVS->LPGPR[0] = bsp::rebootCode::rebootNormalCode;
+    }
+
+    void RT1051LPM::EnableDcdcPowerSaveMode()
+    {
+        gpio_2->WritePin(static_cast<uint32_t>(BoardDefinitions::DCDC_INVERTER_MODE_PIN), 0);
+    }
+
+    void RT1051LPM::DisableDcdcPowerSaveMode()
+    {
+        gpio_2->WritePin(static_cast<uint32_t>(BoardDefinitions::DCDC_INVERTER_MODE_PIN), 1);
     }
 
 } // namespace bsp

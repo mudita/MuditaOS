@@ -64,6 +64,13 @@ namespace app::onBoarding
         setFocusItem(eulaText);
     }
 
+    gui::status_bar::Configuration EULALicenseWindow::configureStatusBar(
+        gui::status_bar::Configuration appConfiguration)
+    {
+        appConfiguration.setIndicator(gui::status_bar::Indicator::SimCard, false);
+        return appConfiguration;
+    }
+
     void EULALicenseWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
     {
         eulaText->setRichText(presenter->getEULA());
