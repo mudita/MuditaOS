@@ -117,6 +117,7 @@ class ServiceDesktop : public sys::Service
     std::unique_ptr<sdesktop::bluetooth::BluetoothMessagesHandler> btMsgHandler;
 
     static constexpr unsigned int DefaultLogFlushTimeoutInMs = 1000U;
+    bool initialized                                         = false;
 };
 
 namespace sys
