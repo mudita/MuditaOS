@@ -134,6 +134,9 @@ enum class BoardDefinitions
     LIGHT_SENSOR_IRQ_GPIO     = static_cast<int>(drivers::GPIOInstances::GPIO_2),
     LIGHT_SENSOR_IRQ          = 15, // GPIO_B0_15
 
+    DCDC_INVERTER_MODE_GPIO = static_cast<int>(drivers::GPIOInstances ::GPIO_2),
+    DCDC_INVERTER_MODE_PIN  = 26,
+
     EEPROM_I2C          = AUDIOCODEC_I2C,
     EEPROM_I2C_BAUDRATE = I2C_STD_BAUDRATE,
 };

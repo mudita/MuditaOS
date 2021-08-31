@@ -57,6 +57,9 @@ namespace bluetooth
         auto getSupportedFormats() -> std::vector<audio::AudioFormat> override;
         auto getTraits() const -> Traits override;
         auto getSourceFormat() -> ::audio::AudioFormat override;
+
+        audio::AudioDevice::RetCode Pause() override;
+        audio::AudioDevice::RetCode Resume() override;
     };
 
     class HSPAudioDevice : public BluetoothAudioDevice

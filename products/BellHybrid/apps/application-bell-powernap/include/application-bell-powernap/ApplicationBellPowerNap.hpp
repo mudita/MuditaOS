@@ -12,10 +12,11 @@ namespace app
     class ApplicationBellPowerNap : public Application
     {
       public:
-        ApplicationBellPowerNap(std::string name                    = applicationBellPowerNapName,
-                                std::string parent                  = "",
-                                sys::phone_modes::PhoneMode mode    = sys::phone_modes::PhoneMode::Offline,
-                                StartInBackground startInBackground = {false});
+        ApplicationBellPowerNap(std::string name                            = applicationBellPowerNapName,
+                                std::string parent                          = "",
+                                sys::phone_modes::PhoneMode mode            = sys::phone_modes::PhoneMode::Offline,
+                                sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled,
+                                StartInBackground startInBackground         = {false});
 
         sys::ReturnCodes InitHandler() override;
 

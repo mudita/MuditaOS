@@ -7,6 +7,8 @@ target_sources(apps-common
     PRIVATE
         Application.cpp
         AsyncTask.cpp
+        AudioOperations.cpp
+        AudioOperations.hpp
         CallbackStorage.cpp
         DOMResponder.cpp
         GuiTimer.cpp

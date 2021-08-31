@@ -17,8 +17,9 @@ namespace app
     ApplicationBellMain::ApplicationBellMain(std::string name,
                                              std::string parent,
                                              sys::phone_modes::PhoneMode mode,
+                                             sys::bluetooth::BluetoothMode bluetoothMode,
                                              StartInBackground startInBackground)
-        : Application(name, parent, mode, startInBackground)
+        : Application(name, parent, mode, bluetoothMode, startInBackground)
     {}
 
     sys::ReturnCodes ApplicationBellMain::InitHandler()

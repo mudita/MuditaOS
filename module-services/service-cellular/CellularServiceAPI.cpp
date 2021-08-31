@@ -50,7 +50,8 @@ bool CellularServiceAPI::HangupCall(sys::Service *serv)
 bool CellularServiceAPI::DismissCall(sys::Service *serv, bool addNotificationToDB)
 {
     auto msg = std::make_shared<CellularDismissCallMessage>(addNotificationToDB);
-    return serv->bus.sendUnicast(msg, ServiceCellular::serviceName);
+    serv->bus.sendMulticast(std::move(msg), sys::BusChannel::ServiceCellularNotifications);
+    return true;
 }
 
 std::string CellularServiceAPI::GetIMSI(sys::Service *serv, bool getFullIMSINumber)
@@ -101,9 +102,10 @@ void CellularServiceAPI::GetNetworkInfo(sys::Service *serv)
     serv->bus.sendUnicast(msg, ServiceCellular::serviceName);
 }
 
-void CellularServiceAPI::GetCurrentOperator(sys::Service *serv)
+void CellularServiceAPI::RequestCurrentOperatorName(sys::Service *serv)
 {
-    std::shared_ptr<CellularGetCurrentOperatorMessage> msg = std::make_shared<CellularGetCurrentOperatorMessage>();
+    std::shared_ptr<CellularRequestCurrentOperatorNameMessage> msg =
+        std::make_shared<CellularRequestCurrentOperatorNameMessage>();
     serv->bus.sendUnicast(msg, ServiceCellular::serviceName);
 }
 

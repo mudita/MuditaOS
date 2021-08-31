@@ -75,15 +75,25 @@ namespace Store
 
         enum class AccessTechnology
         {
-            Gsm   = 0x00,
-            Utran = 0x02,
+            Gsm   = 0,
+            Utran = 2,
             GsmWEgprs,
             UtranWHsdpa,
             UtranWHsupa,
             UtranWHsdpaAndWHsupa,
             EUtran,
-            Unknown = 0xFF
+            Cdma    = 100,
+            Unknown = 255
         } accessTechnology = AccessTechnology::Unknown;
+
+        inline bool operator==(const Network &rhs)
+        {
+            return this->status == rhs.status && this->accessTechnology == rhs.accessTechnology;
+        }
+        inline bool operator!=(const Network &rhs)
+        {
+            return !(*this == rhs);
+        }
     };
 
     struct GSM

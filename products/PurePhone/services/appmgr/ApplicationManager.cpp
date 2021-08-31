@@ -3,6 +3,7 @@
 
 #include <appmgr/ApplicationManager.hpp>
 
+#include <apps-common/popups/data/BluetoothModeParams.hpp>
 #include <application-desktop/ApplicationDesktop.hpp>
 #include <application-onboarding/ApplicationOnBoarding.hpp>
 #include <application-onboarding/data/OnBoardingMessages.hpp>
@@ -15,6 +16,7 @@
 #include <service-appmgr/Constants.hpp>
 #include <service-appmgr/messages/AutoLockRequests.hpp>
 #include <service-appmgr/messages/GetAllNotificationsRequest.hpp>
+#include <service-bluetooth/messages/BluetoothModeChanged.hpp>
 #include <service-cellular/CellularMessage.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
@@ -45,6 +47,7 @@ namespace app::manager
         autoLockTimer = sys::TimerFactory::createSingleShotTimer(
             this, autoLockTimerName, sys::timer::InfiniteTimeout, [this](sys::Timer &) { onPhoneLocked(); });
 
+        bus.channels.push_back(sys::BusChannel::BluetoothModeChanges);
         bus.channels.push_back(sys::BusChannel::PhoneModeChanges);
         bus.channels.push_back(sys::BusChannel::PhoneLockChanges);
         bus.channels.push_back(sys::BusChannel::ServiceCellularNotifications);
@@ -120,7 +123,7 @@ namespace app::manager
     {
         for (const auto &name : std::vector<ApplicationName>{app::special_input}) {
             if (auto app = getApplication(name); app != nullptr) {
-                app->runInBackground(phoneModeObserver->getCurrentPhoneMode(), this);
+                app->runInBackground(phoneModeObserver->getCurrentPhoneMode(), bluetoothMode, this);
             }
         }
     }
@@ -155,6 +158,11 @@ namespace app::manager
         connect(typeid(db::NotificationMessage), [&](sys::Message *msg) {
             auto msgl = static_cast<db::NotificationMessage *>(msg);
             notificationProvider.handle(msgl);
+            return sys::msgHandled();
+        });
+        connect(typeid(db::QueryResponse), [&](sys::Message *msg) {
+            auto response = static_cast<db::QueryResponse *>(msg);
+            handleDBResponse(response);
             return sys::msgHandled();
         });
 
@@ -317,9 +325,10 @@ namespace app::manager
                     }
                     return sys::msgNotHandled();
                 });
-        connect(typeid(db::QueryResponse), [&](sys::Message *msg) {
-            auto response = static_cast<db::QueryResponse *>(msg);
-            handleDBResponse(response);
+
+        connect(typeid(sys::bluetooth::BluetoothModeChanged), [&](sys::Message *request) -> sys::MessagePointer {
+            auto data = static_cast<sys::bluetooth::BluetoothModeChanged *>(request);
+            handleBluetoothModeChanged(data->getBluetoothMode());
             return sys::msgHandled();
         });
 
@@ -351,6 +360,21 @@ namespace app::manager
     void ApplicationManager::changePhoneMode(sys::phone_modes::PhoneMode phoneMode, const ApplicationHandle *app)
     {
         ActionEntry action{actions::PhoneModeChanged, std::make_unique<gui::PhoneModeParams>(phoneMode)};
+        action.setTargetApplication(app->name());
+        actionsRegistry.enqueue(std::move(action));
+    }
+
+    void ApplicationManager::handleBluetoothModeChanged(sys::bluetooth::BluetoothMode mode)
+    {
+        bluetoothMode = mode;
+        for (const auto app : getStackedApplications()) {
+            changeBluetoothMode(app);
+        }
+    }
+
+    void ApplicationManager::changeBluetoothMode(const ApplicationHandle *app)
+    {
+        ActionEntry action{actions::BluetoothModeChanged, std::make_unique<gui::BluetoothModeParams>(bluetoothMode)};
         action.setTargetApplication(app->name());
         actionsRegistry.enqueue(std::move(action));
     }
@@ -432,7 +456,7 @@ namespace app::manager
     {
         if (not ApplicationManagerCommon::startApplication(app)) {
             LOG_INFO("Starting application %s", app.name().c_str());
-            app.run(phoneModeObserver->getCurrentPhoneMode(), this);
+            app.run(phoneModeObserver->getCurrentPhoneMode(), bluetoothMode, this);
         }
         return true;
     }
@@ -481,8 +505,9 @@ namespace app::manager
     auto ApplicationManager::handleAction(ActionEntry &action) -> ActionProcessStatus
     {
         switch (action.actionId) {
+        case actions::BluetoothModeChanged:
         case actions::PhoneModeChanged:
-            return handlePhoneModeChangedAction(action);
+            return handleActionOnActiveApps(action);
         default:
             return ApplicationManagerCommon::handleAction(action);
         }

@@ -9,7 +9,7 @@
 /// default application timer trigger
 const inline uint32_t keyTimerMs = 200;
 /// default time key press will be counted as press again
-const inline uint32_t keyTimeCycleMs = 500;
+const inline uint32_t keyTimeCycleMs = 1200;
 /// default long press time
 const inline uint32_t keyTimeLongpressMs = 1000;
 

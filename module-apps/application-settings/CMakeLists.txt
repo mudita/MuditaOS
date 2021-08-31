@@ -15,6 +15,7 @@ target_sources(application-settings
         models/apps/AudioSettingsModel.cpp
         models/apps/SoundsModel.cpp
         models/apps/SoundsModel.cpp
+        models/apps/SoundsPlayer.cpp
         models/bluetooth/BluetoothSettingsModel.cpp
         models/display-keypad/CategoriesModel.cpp
         models/display-keypad/CategoriesModel.cpp
@@ -52,6 +53,7 @@ target_sources(application-settings
         windows/advanced/EinkModeWindow.cpp
         windows/advanced/InformationWindow.cpp
         windows/advanced/UITestWindow.cpp
+        windows/advanced/StatusBarImageTypeWindow.cpp
         windows/apps/AlarmClockWindow.cpp
         windows/apps/AppsWindow.cpp
         windows/apps/MessagesWindow.cpp
@@ -110,6 +112,7 @@ target_sources(application-settings
         windows/advanced/EinkModeWindow.hpp
         windows/advanced/InformationWindow.hpp
         windows/advanced/UITestWindow.hpp
+        windows/advanced/StatusBarImageTypeWindow.hpp
         windows/apps/AppsWindow.hpp
         windows/apps/MessagesWindow.hpp
         windows/display-keypad/DisplayAndKeypadWindow.hpp

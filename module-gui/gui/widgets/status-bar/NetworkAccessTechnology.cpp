@@ -32,6 +32,7 @@ namespace gui::status_bar
         case Store::Network::AccessTechnology::UtranWHsdpa:
         case Store::Network::AccessTechnology::UtranWHsupa:
         case Store::Network::AccessTechnology::UtranWHsdpaAndWHsupa:
+        case Store::Network::AccessTechnology::Cdma:
             setText(text3g);
             break;
         case Store::Network::AccessTechnology::EUtran:

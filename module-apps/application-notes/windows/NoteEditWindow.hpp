@@ -32,6 +32,9 @@ namespace app::notes
         void destroyInterface() override;
 
       protected:
+        NoteEditWindow(app::Application *app,
+                       std::unique_ptr<NoteEditWindowContract::Presenter> &&windowPresenter,
+                       const std::string &windowName);
         virtual void onCharactersCountChanged(std::uint32_t count);
 
       private:

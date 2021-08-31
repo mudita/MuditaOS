@@ -19,6 +19,7 @@ target_sources(BellHybrid
     PRIVATE
         BellHybridMain.cpp
         PlatformFactory.cpp
+        EinkSentinelBell.cpp
     )
 
 target_include_directories(BellHybrid

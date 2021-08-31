@@ -44,7 +44,7 @@ namespace at
           public:
             CFUN() noexcept;
             explicit CFUN(at::cmd::Modifier mod) noexcept;
-            [[nodiscard]] auto parse(Result &base_result) -> result::CFUN & final;
+            [[nodiscard]] auto parseCFUN(const Result &base_result) -> result::CFUN;
             void set(at::cfun::Functionality fuctionality, at::cfun::Reset reset = at::cfun::Reset::DoNotReset);
         };
     } // namespace cmd

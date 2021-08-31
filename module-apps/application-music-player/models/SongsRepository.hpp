@@ -40,9 +40,11 @@ namespace app::music_player
       public:
         virtual ~AbstractSongsRepository() noexcept = default;
 
-        virtual void scanMusicFilesList()                                   = 0;
-        virtual std::vector<audio::Tags> getMusicFilesList() const          = 0;
-        virtual std::size_t getFileIndex(const std::string &filePath) const = 0;
+        virtual void scanMusicFilesList()                                          = 0;
+        virtual std::vector<audio::Tags> getMusicFilesList() const                 = 0;
+        virtual std::size_t getFileIndex(const std::string &filePath) const        = 0;
+        virtual std::string getNextFilePath(const std::string &filePath) const     = 0;
+        virtual std::string getPreviousFilePath(const std::string &filePath) const = 0;
     };
 
     class SongsRepository : public AbstractSongsRepository
@@ -56,6 +58,8 @@ namespace app::music_player
         void scanMusicFilesList() override;
         std::vector<audio::Tags> getMusicFilesList() const override;
         std::size_t getFileIndex(const std::string &filePath) const override;
+        std::string getNextFilePath(const std::string &filePath) const override;
+        std::string getPreviousFilePath(const std::string &filePath) const override;
 
       private:
         std::unique_ptr<AbstractTagsFetcher> tagsFetcher;

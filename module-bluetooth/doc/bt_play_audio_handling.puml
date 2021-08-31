@@ -1,0 +1,23 @@
+@startuml
+
+actor User
+participant "A2DP Sink" as sink
+participant "Source's AVRCP event handler" as source
+participant "Service Bluetooth" as bt
+participant "Service Audio" as audio
+participant "Application music player" as app 
+
+
+User -> sink : Play button pressed
+sink -> source : AVRCP event play 
+source -> bt : Event play message
+bt -> audio : Stream resume message
+==Handle play message==
+hnote over audio
+    Resume stream
+endhnote
+== ==
+audio -> app : Audio resumed
+app -> User : Show state playing
+
+@enduml

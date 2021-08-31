@@ -206,6 +206,11 @@ namespace app::manager
             handleSwitchConfirmation(msg);
             return std::make_shared<sys::ResponseMessage>();
         });
+        connect(typeid(FinalizingClose), [this](sys::Message *request) {
+            auto msg = static_cast<FinalizingClose *>(request);
+            handleFinalizingClose(msg);
+            return std::make_shared<sys::ResponseMessage>();
+        });
         connect(typeid(CloseConfirmation), [this](sys::Message *request) {
             auto msg = static_cast<CloseConfirmation *>(request);
             handleCloseConfirmation(msg);
@@ -295,6 +300,14 @@ namespace app::manager
             return true;
         }
         return false;
+    }
+
+    void ApplicationManagerCommon::startPendingApplicationOnCurrentClose()
+    {
+        if (const auto launchingApp = getLaunchingApplication();
+            launchingApp != nullptr && getState() == State::AwaitingCloseConfirmation) {
+            startApplication(*launchingApp);
+        }
     }
 
     auto ApplicationManagerCommon::closeApplications() -> bool
@@ -465,6 +478,22 @@ namespace app::manager
         action.setTargetApplication(targetApp->name());
         SwitchRequest switchRequest(service::name::appmgr, targetApp->name(), gui::name::window::main_window, nullptr);
         return handleSwitchApplication(&switchRequest) ? ActionProcessStatus::Accepted : ActionProcessStatus::Dropped;
+    }
+
+    auto ApplicationManagerCommon::handleActionOnActiveApps(ActionEntry &action) -> ActionProcessStatus
+    {
+        const auto &targetName = action.target;
+        auto targetApp         = getApplication(targetName);
+        if (targetApp == nullptr || (!targetApp->handles(action.actionId))) {
+            return ActionProcessStatus::Dropped;
+        }
+
+        if (targetApp->state() == ApplicationHandle::State::ACTIVE_FORGROUND ||
+            targetApp->state() == ApplicationHandle::State::ACTIVE_BACKGROUND) {
+            app::Application::requestAction(this, targetName, action.actionId, std::move(action.params));
+            return ActionProcessStatus::Accepted;
+        }
+        return ActionProcessStatus::Skipped;
     }
 
     auto ApplicationManagerCommon::handleActionOnFocusedApp(ActionEntry &action) -> ActionProcessStatus
@@ -674,7 +703,6 @@ namespace app::manager
     auto ApplicationManagerCommon::onSwitchConfirmed(ApplicationHandle &app) -> bool
     {
         if (getState() == State::AwaitingFocusConfirmation || getState() == State::Running) {
-            app.blockClosing = false;
             app.setState(ApplicationHandle::State::ACTIVE_FORGROUND);
             setState(State::Running);
             EventManagerCommon::messageSetApplication(this, app.name());
@@ -723,6 +751,14 @@ namespace app::manager
         }
     }
 
+    void ApplicationManagerCommon::handleFinalizingClose(FinalizingClose *msg)
+    {
+        auto senderApp = getApplication(msg->getSenderName());
+        LOG_DEBUG("Waiting to close application [%s] - finalizing requests", senderApp->name().c_str());
+
+        onFinalizingClose();
+    }
+
     auto ApplicationManagerCommon::handleCloseConfirmation(CloseConfirmation *msg) -> bool
     {
         auto senderApp = getApplication(msg->getSenderName());
@@ -732,6 +768,11 @@ namespace app::manager
             return false;
         }
         return onCloseConfirmed(*senderApp);
+    }
+
+    void ApplicationManagerCommon::onFinalizingClose()
+    {
+        startPendingApplicationOnCurrentClose();
     }
 
     auto ApplicationManagerCommon::onCloseConfirmed(ApplicationHandle &app) -> bool

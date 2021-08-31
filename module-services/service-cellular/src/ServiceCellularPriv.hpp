@@ -30,6 +30,7 @@ namespace cellular::internal
         std::unique_ptr<SimContacts> simContacts;
         std::unique_ptr<service::ImeiGetHandler> imeiGetHandler;
         State::PowerState nextPowerState = State::PowerState::Off;
+        std::uint8_t multiPartSMSUID     = 0;
 
       public:
         explicit ServiceCellularPriv(ServiceCellular *owner);
@@ -40,6 +41,8 @@ namespace cellular::internal
         void connectImeiGetHandler();
 
         void requestNetworkTimeSettings();
+        void setInitialMultiPartSMSUID(std::uint8_t uid);
+        std::function<void(std::uint8_t uid)> saveNewMultiPartSMSUIDCallback;
 
       private:
         void initSimCard();
