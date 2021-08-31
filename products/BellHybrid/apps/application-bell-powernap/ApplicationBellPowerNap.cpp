@@ -10,8 +10,9 @@ namespace app
     ApplicationBellPowerNap::ApplicationBellPowerNap(std::string name,
                                                      std::string parent,
                                                      sys::phone_modes::PhoneMode mode,
+                                                     sys::bluetooth::BluetoothMode bluetoothMode,
                                                      StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), mode, startInBackground)
+        : Application(std::move(name), std::move(parent), mode, bluetoothMode, startInBackground)
     {}
 
     sys::ReturnCodes ApplicationBellPowerNap::InitHandler()

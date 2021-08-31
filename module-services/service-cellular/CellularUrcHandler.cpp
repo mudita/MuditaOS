@@ -43,11 +43,13 @@ void CellularUrcHandler::Handle(Creg &urc)
                  utils::enumToString(status).c_str(),
                  utils::enumToString(accessTechnology).c_str());
 
-        CellularServiceAPI::GetCurrentOperator(&cellularService);
+        CellularServiceAPI::RequestCurrentOperatorName(&cellularService);
 
         Store::Network network{status, accessTechnology};
-        Store::GSM::get()->setNetwork(network);
-        response = std::make_unique<CellularNetworkStatusUpdateNotification>();
+        if (Store::GSM::get()->getNetwork() != network) {
+            Store::GSM::get()->setNetwork(network);
+            response = std::make_unique<CellularNetworkStatusUpdateNotification>();
+        }
         urc.setHandled(true);
     }
     else {
@@ -100,9 +102,9 @@ void CellularUrcHandler::Handle(Ctze &urc)
         return;
     }
 
-        auto msg = std::make_shared<CellularTimeNotificationMessage>(
-            urc.getGMTTime(), urc.getTimeZoneOffset(), urc.getTimeZoneString());
-        cellularService.bus.sendUnicast(msg, service::name::service_time);
+    auto msg = std::make_shared<CellularTimeNotificationMessage>(
+        urc.getGMTTime(), urc.getTimeZoneOffset(), urc.getTimeZoneString());
+    cellularService.bus.sendUnicast(msg, service::name::service_time);
 
     urc.setHandled(true);
 }
@@ -128,17 +130,26 @@ void CellularUrcHandler::Handle(Qind &urc)
         }
         urc.setHandled(true);
     }
+    if (urc.isAct()) {
+        auto nat     = urc.getAccessTechnology();
+        auto network = Store::GSM::get()->getNetwork();
+        if (network.accessTechnology != nat) {
+            network.accessTechnology = nat;
+            Store::GSM::get()->setNetwork(network);
+            response = std::make_unique<CellularNetworkStatusUpdateNotification>();
+        }
+        urc.setHandled(true);
+    }
     else if (urc.isFota()) {
         std::string httpSuccess = "0";
         if (urc.getFotaStage() == Qind::FotaStage::HTTPEND && urc.getFotaParameter() == httpSuccess) {
             LOG_DEBUG("Fota UPDATE, switching to AT mode");
             cellularService.cmux->setMode(CellularMux::Mode::AT);
-            urc.setHandled(true);
         }
+        urc.setHandled(true);
     }
     else if (urc.isSmsDone()) {
         response = std::make_unique<CellularSmsDoneNotification>();
-
         urc.setHandled(true);
     }
 }

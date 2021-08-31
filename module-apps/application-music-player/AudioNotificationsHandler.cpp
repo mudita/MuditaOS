@@ -20,7 +20,39 @@ namespace app::music_player
             return sys::msgNotHandled();
         }
 
-        return presenter->handleAudioStopNotifiaction(notification->token) ? sys::msgNotHandled() : sys::msgHandled();
+        presenter->handleAudioStopNotifiaction(notification->token);
+        return sys::msgHandled();
     }
 
+    sys::MessagePointer AudioNotificationsHandler::handleAudioEofNotification(const AudioStopNotification *notification)
+    {
+        if (notification == nullptr) {
+            return sys::msgNotHandled();
+        }
+
+        presenter->handleAudioEofNotification(notification->token);
+        return sys::msgHandled();
+    }
+
+    sys::MessagePointer AudioNotificationsHandler::handleAudioPausedNotification(
+        const AudioPausedNotification *notification)
+    {
+        if (notification == nullptr) {
+            return sys::msgNotHandled();
+        }
+
+        presenter->handleAudioPausedNotification(notification->token);
+        return sys::msgHandled();
+    }
+
+    sys::MessagePointer AudioNotificationsHandler::handleAudioResumedNotification(
+        const AudioResumedNotification *notification)
+    {
+        if (notification == nullptr) {
+            return sys::msgNotHandled();
+        }
+
+        presenter->handleAudioResumedNotification(notification->token);
+        return sys::msgHandled();
+    }
 } // namespace app::music_player

@@ -6,7 +6,7 @@
 #include "AudioNotificationsHandler.hpp"
 
 #include <windows/MusicPlayerAllSongsWindow.hpp>
-#include <presenters/AudioOperations.hpp>
+#include <apps-common/AudioOperations.hpp>
 #include <presenters/SongsPresenter.hpp>
 #include <models/SongsRepository.hpp>
 #include <models/SongsModel.hpp>
@@ -35,9 +35,15 @@ namespace app
 
     ApplicationMusicPlayer::ApplicationMusicPlayer(std::string name,
                                                    std::string parent,
-                                                   sys::phone_modes::PhoneMode mode,
+                                                   sys::phone_modes::PhoneMode phoneMode,
+                                                   sys::bluetooth::BluetoothMode bluetoothMode,
                                                    StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), mode, startInBackground, applicationMusicPlayerStackSize),
+        : Application(std::move(name),
+                      std::move(parent),
+                      phoneMode,
+                      bluetoothMode,
+                      startInBackground,
+                      applicationMusicPlayerStackSize),
           priv{std::make_unique<music_player::internal::MusicPlayerPriv>()}
     {
         LOG_INFO("ApplicationMusicPlayer::create");
@@ -47,7 +53,7 @@ namespace app
         auto tagsFetcher     = std::make_unique<app::music_player::ServiceAudioTagsFetcher>(this);
         auto songsRepository = std::make_unique<app::music_player::SongsRepository>(std::move(tagsFetcher));
         priv->songsModel     = std::make_unique<app::music_player::SongsModel>(std::move(songsRepository));
-        auto audioOperations = std::make_unique<app::music_player::AudioOperations>(this);
+        auto audioOperations = std::make_unique<app::AsyncAudioOperations>(this);
         priv->songsPresenter =
             std::make_unique<app::music_player::SongsPresenter>(priv->songsModel, std::move(audioOperations));
 
@@ -75,6 +81,21 @@ namespace app
             music_player::AudioNotificationsHandler audioNotificationHandler{priv->songsPresenter};
             return audioNotificationHandler.handleAudioStopNotification(notification);
         });
+        connect(typeid(AudioEOFNotification), [&](sys::Message *msg) -> sys::MessagePointer {
+            auto notification = static_cast<AudioStopNotification *>(msg);
+            music_player::AudioNotificationsHandler audioNotificationHandler{priv->songsPresenter};
+            return audioNotificationHandler.handleAudioEofNotification(notification);
+        });
+        connect(typeid(AudioPausedNotification), [&](sys::Message *msg) -> sys::MessagePointer {
+            auto notification = static_cast<AudioPausedNotification *>(msg);
+            music_player::AudioNotificationsHandler audioNotificationHandler{priv->songsPresenter};
+            return audioNotificationHandler.handleAudioPausedNotification(notification);
+        });
+        connect(typeid(AudioResumedNotification), [&](sys::Message *msg) -> sys::MessagePointer {
+            auto notification = static_cast<AudioResumedNotification *>(msg);
+            music_player::AudioNotificationsHandler audioNotificationHandler{priv->songsPresenter};
+            return audioNotificationHandler.handleAudioResumedNotification(notification);
+        });
     }
 
     ApplicationMusicPlayer::~ApplicationMusicPlayer() = default;
@@ -88,14 +109,7 @@ namespace app
             return retMsg;
         }
 
-        if (resp != nullptr) {
-            if (auto command = callbackStorage->getCallback(resp); command->execute()) {
-                refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-            }
-            return sys::msgHandled();
-        }
-
-        return sys::msgNotHandled();
+        return handleAsyncResponse(resp);
     }
 
     // Invoked during initialization

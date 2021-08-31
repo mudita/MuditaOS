@@ -18,10 +18,12 @@ namespace app
 
     void AsyncTask::execute(Application *application,
                             AsyncCallbackReceiver::Ptr receiverObject,
-                            std::optional<std::function<bool(sys::ResponseMessage *)>> callback)
+                            std::optional<std::function<bool(sys::ResponseMessage *)>> callback,
+                            ReceiverBehavior receiverBehavior)
     {
         const auto requestId = onExecute(application);
-        application->callbackStorage->registerCallback(requestId, receiverObject, std::move(callback));
+        application->callbackStorage->registerCallback(
+            requestId, receiverObject, std::move(callback), receiverBehavior);
     }
 
     std::unique_ptr<AsyncQuery> AsyncQuery::createFromQuery(std::unique_ptr<db::Query> &&query,

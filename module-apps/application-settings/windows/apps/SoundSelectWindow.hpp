@@ -4,6 +4,8 @@
 #pragma once
 
 #include <application-settings/models/apps/AbstractSoundsModel.hpp>
+#include <application-settings/models/apps/AbstractSoundsPlayer.hpp>
+#include <AppWindow.hpp>
 
 namespace gui
 {
@@ -16,7 +18,7 @@ namespace gui
         ///  Constructor
         ///  @param app pointer to application
         ///  @param name window name
-        explicit SoundSelectWindow(app::Application *app, std::string name);
+        explicit SoundSelectWindow(app::Application *app, std::string name, std::shared_ptr<AbstractSoundsModel> model);
 
         ///  Called before the window is shown
         ///  @param mode show mode

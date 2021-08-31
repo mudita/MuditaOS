@@ -7,3 +7,13 @@ namespace service::name
 {
     inline constexpr auto bluetooth = "ServiceBluetooth";
 } // namespace service::name
+
+namespace sys::bluetooth
+{
+    enum class BluetoothMode
+    {
+        Disabled,
+        Enabled,
+        Connected
+    };
+}

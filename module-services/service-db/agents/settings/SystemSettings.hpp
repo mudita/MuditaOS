@@ -48,6 +48,7 @@ namespace settings
         constexpr inline auto volte_on    = "cl_volte_on";
         constexpr inline auto apn_list    = "cl_apn_list";
         constexpr inline auto offlineMode = "cl_offline_mode";
+        constexpr inline auto currentUID  = "cl_current_uid";
     } // namespace Cellular
 
     namespace Battery

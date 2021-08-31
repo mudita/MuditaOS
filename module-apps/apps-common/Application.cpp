@@ -56,6 +56,7 @@
 #include <popups/data/PopupData.hpp>
 #include <popups/data/PopupRequestParams.hpp>
 #include <popups/data/PhoneModeParams.hpp>
+#include <popups/data/BluetoothModeParams.hpp>
 #include <locks/data/LockData.hpp>
 
 namespace gui
@@ -99,7 +100,8 @@ namespace app
 
     Application::Application(std::string name,
                              std::string parent,
-                             sys::phone_modes::PhoneMode mode,
+                             sys::phone_modes::PhoneMode phoneMode,
+                             sys::bluetooth::BluetoothMode bluetoothMode,
                              StartInBackground startInBackground,
                              uint32_t stackDepth,
                              sys::ServicePriority priority)
@@ -107,8 +109,8 @@ namespace app
           default_window(gui::name::window::main_window), windowsStack(this),
           keyTranslator{std::make_unique<gui::KeyInputSimpleTranslation>()}, startInBackground{startInBackground},
           callbackStorage{std::make_unique<CallbackStorage>()}, statusBarManager{std::make_unique<StatusBarManager>()},
-          settings(std::make_unique<settings::Settings>()), phoneMode{mode}, phoneLockSubject(this),
-          lockPolicyHandler(this), simLockSubject(this)
+          settings(std::make_unique<settings::Settings>()), phoneMode{phoneMode}, bluetoothMode(bluetoothMode),
+          phoneLockSubject(this), lockPolicyHandler(this), simLockSubject(this)
     {
         statusBarManager->enableIndicators({gui::status_bar::Indicator::Time});
 
@@ -132,7 +134,15 @@ namespace app
         addActionReceiver(app::manager::actions::PhoneModeChanged, [this](auto &&params) {
             if (params != nullptr) {
                 auto modeParams = static_cast<gui::PhoneModeParams *>(params.get());
-                phoneMode       = modeParams->getPhoneMode();
+                this->phoneMode = modeParams->getPhoneMode();
+            }
+            return actionHandled();
+        });
+        addActionReceiver(app::manager::actions::BluetoothModeChanged, [this](auto &&params) {
+            if (params != nullptr) {
+                auto modeParams     = static_cast<gui::BluetoothModeParams *>(params.get());
+                this->bluetoothMode = modeParams->getBluetoothMode();
+                refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
             }
             return actionHandled();
         });
@@ -200,6 +210,7 @@ namespace app
         if (state == State::ACTIVE_FORGROUND) {
             auto window = getCurrentWindow();
             window->updateBatteryStatus();
+            window->updateBluetooth(bluetoothMode);
             window->updateSim();
             window->updateSignalStrength();
             window->updateNetworkAccessTechnology();
@@ -246,7 +257,7 @@ namespace app
 
         // case to handle returning to previous application
         if (windowName.empty()) {
-            window = getCurrentWindow()->getName();
+            window   = getCurrentWindow()->getName();
             auto msg = std::make_shared<AppSwitchWindowMessage>(
                 window, getCurrentWindow()->getName(), std::move(data), cmd, reason);
             bus.sendUnicast(msg, this->GetName());
@@ -335,6 +346,20 @@ namespace app
             return handleAppFocusLost(msgl);
         }
         return sys::msgNotHandled();
+    }
+
+    sys::MessagePointer Application::handleAsyncResponse(sys::ResponseMessage *resp)
+    {
+        if (resp != nullptr) {
+            if (auto command = callbackStorage->getCallback(resp); command->execute()) {
+                refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+                checkBlockingRequests();
+            }
+            return std::make_shared<sys::ResponseMessage>();
+        }
+        else {
+            return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
+        }
     }
 
     sys::MessagePointer Application::handleSignalStrengthUpdate(sys::Message *msgl)
@@ -517,7 +542,7 @@ namespace app
             getCurrentWindow()->handleSwitchData(switchData.get());
 
             auto ret = dynamic_cast<gui::SwitchSpecialChar *>(switchData.get());
-            if (ret != nullptr && switchData != nullptr) {
+            if (ret != nullptr && ret->type == gui::SwitchSpecialChar::Type::Response) {
                 auto text = dynamic_cast<gui::Text *>(getCurrentWindow()->getFocusItem());
                 if (text != nullptr) {
                     text->addText(ret->getDescription());
@@ -553,8 +578,30 @@ namespace app
     sys::MessagePointer Application::handleAppClose(sys::Message *msgl)
     {
         setState(State::DEACTIVATING);
-        app::manager::Controller::confirmClose(this);
-        return sys::msgHandled();
+
+        for (const auto &[windowName, window] : windowsStack) {
+            LOG_INFO("Closing a window: %s", windowName.c_str());
+            window->onClose(gui::Window::CloseReason::ApplicationClose);
+        }
+
+        if (callbackStorage->checkBlockingCloseRequests()) {
+            setState(State::FINALIZING_CLOSE);
+            app::manager::Controller::finalizingClose(this);
+            return sys::msgHandled();
+        }
+        else {
+            app::manager::Controller::confirmClose(this);
+            return sys::msgHandled();
+        }
+    }
+
+    void Application::checkBlockingRequests()
+    {
+        if (getState() == State::FINALIZING_CLOSE && !callbackStorage->checkBlockingCloseRequests()) {
+            LOG_INFO("Blocking requests done for [%s]. Closing application.", GetName().c_str());
+            setState(State::DEACTIVATING);
+            app::manager::Controller::confirmClose(this);
+        }
     }
 
     sys::MessagePointer Application::handleAppRebuild(sys::Message *msgl)
@@ -640,12 +687,7 @@ namespace app
     {
         settings->deinit();
         LOG_INFO("Closing an application: %s", GetName().c_str());
-
-        for (const auto &[windowName, window] : windowsStack) {
-            LOG_INFO("Closing a window: %s", windowName.c_str());
-            window->onClose(gui::Window::CloseReason::ApplicationClose);
-        }
-
+        LOG_INFO("Deleting windows");
         windowsStack.windows.clear();
         return sys::ReturnCodes::Success;
     }

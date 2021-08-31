@@ -35,6 +35,15 @@ namespace gui
         }
     }
 
+    void LockBoxConstantSize::update(unsigned int inputFilled)
+    {
+        if (inputFilled < inputLabels.size()) {
+            for (unsigned int i = 0; i < inputFilled; i++) {
+                inputLabels[i]->setVisibleState(true);
+            }
+        }
+    }
+
     void LockBoxConstantSize::buildPinLabels(unsigned int pinSize)
     {
         using namespace style::window::lock_input;

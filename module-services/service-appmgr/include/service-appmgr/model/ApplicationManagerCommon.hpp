@@ -99,6 +99,7 @@ namespace app::manager
 
       protected:
         virtual auto handleAction(ActionEntry &action) -> ActionProcessStatus;
+        auto handleActionOnActiveApps(ActionEntry &action) -> ActionProcessStatus;
         auto handleMessageAsAction(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>;
         virtual auto startApplication(ApplicationHandle &app) -> bool;
         virtual auto resolveHomeWindow() -> std::string;
@@ -116,6 +117,7 @@ namespace app::manager
         std::shared_ptr<settings::Settings> settings;
 
       private:
+        void startPendingApplicationOnCurrentClose();
         void rebuildActiveApplications();
         void suspendSystemServices();
         void closeNoLongerNeededApplications();
@@ -130,6 +132,7 @@ namespace app::manager
         auto handleActionOnFocusedApp(ActionEntry &action) -> ActionProcessStatus;
         auto handleCustomAction(ActionEntry &action) -> ActionProcessStatus;
         auto handleCustomActionOnBackgroundApp(ApplicationHandle *app, ActionEntry &action) -> ActionProcessStatus;
+        void handleFinalizingClose(FinalizingClose *msg);
         auto handleCloseConfirmation(CloseConfirmation *msg) -> bool;
         auto handleSwitchConfirmation(SwitchConfirmation *msg) -> bool;
         auto handleSwitchBack(SwitchBackRequest *msg) -> bool;
@@ -150,6 +153,7 @@ namespace app::manager
         void onApplicationInitFailure(ApplicationHandle &app);
         auto onSwitchConfirmed(ApplicationHandle &app) -> bool;
         void onLaunchFinished(ApplicationHandle &app);
+        void onFinalizingClose();
         auto onCloseConfirmed(ApplicationHandle &app) -> bool;
 
         OnActionPolicy actionPolicy;

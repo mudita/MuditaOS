@@ -29,9 +29,10 @@ namespace app
 
     ApplicationNotes::ApplicationNotes(std::string name,
                                        std::string parent,
-                                       sys::phone_modes::PhoneMode mode,
+                                       sys::phone_modes::PhoneMode phoneMode,
+                                       sys::bluetooth::BluetoothMode bluetoothMode,
                                        StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), mode, startInBackground, NotesStackSize)
+        : Application(std::move(name), std::move(parent), phoneMode, bluetoothMode, startInBackground, NotesStackSize)
     {
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
     }
@@ -57,13 +58,7 @@ namespace app
             }
         }
 
-        if (resp != nullptr) {
-            if (auto command = callbackStorage->getCallback(resp); command->execute()) {
-                refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-            }
-            return sys::msgHandled();
-        }
-        return sys::msgNotHandled();
+        return handleAsyncResponse(resp);
     }
 
     sys::ReturnCodes ApplicationNotes::InitHandler()

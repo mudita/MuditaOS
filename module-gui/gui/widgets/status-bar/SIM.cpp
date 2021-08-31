@@ -2,41 +2,37 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SIM.hpp"
+#include "Style.hpp"
 
 namespace gui::status_bar
 {
     using namespace Store;
 
-    constexpr auto sim1       = "sim1_status"; // sim 1 indicator
-    constexpr auto sim2       = "sim2_status"; // sim 2 indicator
-    constexpr auto simunknown = "simunknown";  // sim - unknown sim state indicator (i.e. no initialization was done)
-    constexpr auto simfailed  = "simfail";     // sim - notification for sim failure
+    constexpr auto sim1   = "sim_1_status";  // sim 1 indicator
+    constexpr auto sim2   = "sim_2_status";  // sim 2 indicator
+    constexpr auto no_sim = "no_sim_status"; // sim - notification for sim failure
 
     SIM::SIM(Item *parent, uint32_t x, uint32_t y) : StatusBarWidgetBase(parent, x, y, 0, 0)
     {
-        set(simunknown);
+        set(no_sim, style::status_bar::imageTypeSpecifier);
     }
 
     void SIM::update()
     {
-        if (current == Store::GSM::get()->sim) {
-            return;
-        }
         current = Store::GSM::get()->sim;
         switch (current) {
         case GSM::SIM::SIM1:
-            set(sim1);
+            set(sim1, style::status_bar::imageTypeSpecifier);
             break;
         case GSM::SIM::SIM2:
-            set(sim2);
+            set(sim2, style::status_bar::imageTypeSpecifier);
             break;
         case GSM::SIM::SIM_FAIL:
-            set(simfailed);
-            break;
+            [[fallthrough]];
         case GSM::SIM::NONE:
             [[fallthrough]];
         case GSM::SIM::SIM_UNKNOWN:
-            set(simunknown);
+            set(no_sim, style::status_bar::imageTypeSpecifier);
             break;
         }
     }

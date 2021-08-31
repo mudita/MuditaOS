@@ -29,7 +29,7 @@ using testing::audio::MockStreamEventListener;
 using namespace std::chrono_literals;
 
 constexpr std::size_t defaultBlockSize = 64U;
-constexpr std::size_t defaultBuffering = 4U;
+constexpr std::size_t defaultBuffering = 32U;
 constexpr audio::AudioFormat format    = audio::AudioFormat(44100, 16, 2);
 
 static std::uint8_t testData[defaultBuffering][defaultBlockSize];
@@ -140,11 +140,10 @@ TEST(Stream, Push)
     Stream s(format, a, defaultBlockSize);
     auto block = testData[0];
 
-    EXPECT_TRUE(s.push(block, defaultBlockSize));
-    EXPECT_TRUE(s.push(block, defaultBlockSize));
-    EXPECT_TRUE(s.push(block, defaultBlockSize));
-    EXPECT_TRUE(s.push(block, defaultBlockSize));
-    EXPECT_EQ(s.getUsedBlockCount(), 4);
+    for (std::size_t i = 0; i < defaultBuffering; i++) {
+        EXPECT_TRUE(s.push(block, defaultBlockSize));
+    }
+    EXPECT_EQ(s.getUsedBlockCount(), defaultBuffering);
     EXPECT_FALSE(s.push(block, defaultBlockSize));
 }
 
@@ -494,7 +493,7 @@ TEST(Factory, TimeConstraints)
 
     auto stream = factory.makeStream(mockSource, mockSink, ::audio::AudioFormat(44100, 16, 2));
 
-    EXPECT_EQ(stream->getBlockCount(), 16);
+    EXPECT_EQ(stream->getBlockCount(), defaultBuffering * 4);
     EXPECT_EQ(stream->getOutputTraits().blockSize, 512);
 }
 

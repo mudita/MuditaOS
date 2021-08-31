@@ -24,10 +24,12 @@ namespace app
 {
     ApplicationCallLog::ApplicationCallLog(std::string name,
                                            std::string parent,
-                                           sys::phone_modes::PhoneMode mode,
+                                           sys::phone_modes::PhoneMode phoneMode,
+                                           sys::bluetooth::BluetoothMode bluetoothMode,
                                            StartInBackground startInBackground)
-        : Application(name, parent, mode, startInBackground, 4096)
+        : Application(name, parent, phoneMode, bluetoothMode, startInBackground, 4096)
     {
+        bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         addActionReceiver(manager::actions::ShowCallLog, [this](auto &&data) {
             switchWindow(gui::name::window::main_window, std::move(data));
             return actionHandled();
@@ -56,14 +58,7 @@ namespace app
             return sys::msgHandled();
         }
 
-        if (resp != nullptr) {
-            if (auto command = callbackStorage->getCallback(resp); command->execute()) {
-                refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-                return sys::msgHandled();
-            }
-        }
-
-        return sys::msgNotHandled();
+        return handleAsyncResponse(resp);
     }
 
     // Invoked during initialization
@@ -82,7 +77,7 @@ namespace app
 
     sys::ReturnCodes ApplicationCallLog::DeinitHandler()
     {
-        return sys::ReturnCodes::Success;
+        return Application::DeinitHandler();
     }
 
     void ApplicationCallLog::createUserInterface()

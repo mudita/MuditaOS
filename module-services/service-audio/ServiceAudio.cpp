@@ -13,6 +13,7 @@
 #include <service-bluetooth/Constants.hpp>
 #include <service-bluetooth/messages/AudioRouting.hpp>
 #include <service-bluetooth/messages/Ring.hpp>
+#include <service-bluetooth/messages/AudioNotify.hpp>
 #include <service-bluetooth/ServiceBluetoothCommon.hpp>
 #include <service-db/Settings.hpp>
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
@@ -109,6 +110,10 @@ ServiceAudio::ServiceAudio()
             [this](sys::Message *msg) -> sys::MessagePointer { return handleA2DPVolumeChangedOnBluetoothDevice(msg); });
     connect(typeid(HSPDeviceVolumeChanged),
             [this](sys::Message *msg) -> sys::MessagePointer { return handleHSPVolumeChangedOnBluetoothDevice(msg); });
+    connect(typeid(message::bluetooth::AudioPause),
+            [this](sys::Message *msg) -> sys::MessagePointer { return handleA2DPAudioPause(); });
+    connect(typeid(message::bluetooth::AudioStart),
+            [this](sys::Message *msg) -> sys::MessagePointer { return handleA2DPAudioStart(); });
 }
 
 ServiceAudio::~ServiceAudio()
@@ -194,7 +199,11 @@ constexpr bool ServiceAudio::IsResumable(const audio::PlaybackType &type) const
 
 constexpr bool ServiceAudio::ShouldLoop(const std::optional<audio::PlaybackType> &type) const
 {
-    return type.value_or(audio::PlaybackType::None) == audio::PlaybackType::CallRingtone;
+    return type.value_or(audio::PlaybackType::None) == audio::PlaybackType::CallRingtone
+#if ENABLE_PLAYBACK_AUTO_REPEAT == 1
+           || type.value_or(audio::PlaybackType::None) == audio::PlaybackType::Multimedia
+#endif
+        ;
 }
 
 bool ServiceAudio::IsVibrationEnabled(const audio::PlaybackType &type)
@@ -236,11 +245,40 @@ ServiceAudio::VibrationType ServiceAudio::GetVibrationType(const audio::Playback
 
 void ServiceAudio::VibrationUpdate(const audio::PlaybackType &type, std::optional<AudioMux::Input *> input)
 {
-    auto curVibrationType = GetVibrationType(type);
-    if (curVibrationType == VibrationType::OneShot && !IsVibrationMotorOn()) {
+    switch (const auto curVibrationType = GetVibrationType(type); curVibrationType) {
+    case VibrationType::None:
+        DisableVibration(input);
+        break;
+    case VibrationType::OneShot:
+        EnableOneShotVibration();
+        break;
+    case VibrationType::Continuous:
+        EnableContinuousVibration(input);
+        break;
+    }
+}
+
+void ServiceAudio::DisableVibration(std::optional<audio::AudioMux::Input *> input)
+{
+    if (IsVibrationMotorOn()) {
+        EventManagerServiceAPI::vibraStop(this);
+        vibrationMotorStatus = AudioMux::VibrationStatus::Off;
+    }
+    if (input) {
+        input.value()->DisableVibration();
+    }
+}
+
+void ServiceAudio::EnableOneShotVibration()
+{
+    if (!IsVibrationMotorOn()) {
         EventManagerServiceAPI::vibraPulseOnce(this);
     }
-    else if (input && curVibrationType == VibrationType::Continuous) {
+}
+
+void ServiceAudio::EnableContinuousVibration(std::optional<audio::AudioMux::Input *> input)
+{
+    if (input) {
         input.value()->EnableVibration();
     }
 
@@ -251,10 +289,6 @@ void ServiceAudio::VibrationUpdate(const audio::PlaybackType &type, std::optiona
     if (anyOfInputsOn && !IsVibrationMotorOn()) {
         EventManagerServiceAPI::vibraPulseRepeatUntilStop(this);
         vibrationMotorStatus = AudioMux::VibrationStatus::On;
-    }
-    else if ((!anyOfInputsOn && IsVibrationMotorOn()) || (anyOfInputsOn && IsVibrationMotorOn())) {
-        EventManagerServiceAPI::vibraStop(this);
-        vibrationMotorStatus = AudioMux::VibrationStatus::Off;
     }
 }
 
@@ -374,15 +408,21 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleSendEvent(std::shared_
 {
     // update bluetooth state
     if (evt->getType() == EventType::BlutoothA2DPDeviceState) {
-        auto newState = evt->getDeviceState() == Event::DeviceState::Connected;
+        const auto newState = evt->getDeviceState() == Event::DeviceState::Connected;
         if (newState != bluetoothA2DPConnected) {
             LOG_DEBUG("Bluetooth connection status changed: %s", newState ? "connected" : "disconnected");
             bluetoothA2DPConnected = newState;
-            HandleStop({audio::PlaybackType::Alarm,
-                        audio::PlaybackType::Meditation,
-                        audio::PlaybackType::Notifications,
-                        audio::PlaybackType::TextMessageRingtone},
-                       audio::Token());
+            const auto playbacksToBeStopped{
+                (bluetoothA2DPConnected) ? std::vector<audio::PlaybackType>{audio::PlaybackType::Alarm,
+                                                                            audio::PlaybackType::Meditation,
+                                                                            audio::PlaybackType::Notifications,
+                                                                            audio::PlaybackType::TextMessageRingtone}
+                                         : std::vector<audio::PlaybackType>{audio::PlaybackType::Alarm,
+                                                                            audio::PlaybackType::Meditation,
+                                                                            audio::PlaybackType::Multimedia,
+                                                                            audio::PlaybackType::Notifications,
+                                                                            audio::PlaybackType::TextMessageRingtone}};
+            HandleStop(playbacksToBeStopped, audio::Token());
         }
     }
     else if (evt->getType() == EventType::BlutoothHSPDeviceState) {
@@ -448,15 +488,21 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStop(const std::vector
     return std::make_unique<AudioStopResponse>(audio::RetCode::Success, token);
 }
 
-auto ServiceAudio::StopInput(audio::AudioMux::Input *input) -> audio::RetCode
+auto ServiceAudio::StopInput(audio::AudioMux::Input *input, StopReason stopReason) -> audio::RetCode
 {
     if (input->audio->GetCurrentState() == Audio::State::Idle) {
         return audio::RetCode::Success;
     }
     const auto rCode = input->audio->Stop();
     // Send notification that audio file was stopped
-    auto msgStop = std::make_shared<AudioStopNotification>(input->token);
-    bus.sendMulticast(std::move(msgStop), sys::BusChannel::ServiceAudioNotifications);
+    std::shared_ptr<AudioNotificationMessage> msg;
+    if (stopReason == StopReason::Eof) {
+        msg = std::make_shared<AudioEOFNotification>(input->token);
+    }
+    else {
+        msg = std::make_shared<AudioStopNotification>(input->token);
+    }
+    bus.sendMulticast(std::move(msg), sys::BusChannel::ServiceAudioNotifications);
     audioMux.ResetInput(input);
     VibrationUpdate();
     return rCode;
@@ -472,7 +518,7 @@ void ServiceAudio::HandleEOF(const Token &token)
             }
         }
         else {
-            StopInput(*input);
+            StopInput(*input, StopReason::Eof);
         }
     }
 }
@@ -506,7 +552,7 @@ auto ServiceAudio::HandleKeyPressed(const int step) -> sys::MessagePointer
         // update volume of currently active sound
         setSetting(Setting::Volume, std::to_string(newVolume));
     }
-    bus.sendMulticast(std::make_unique<VolumeChanged>(newVolume, context), sys::BusChannel::ServiceAudioNotifications);
+    bus.sendMulticast(std::make_shared<VolumeChanged>(newVolume, context), sys::BusChannel::ServiceAudioNotifications);
     return sys::msgHandled();
 }
 
@@ -738,7 +784,7 @@ void ServiceAudio::onVolumeChanged(Volume volume)
     const auto [profileType, playbackType] = getCurrentContext();
     settingsProvider->setValue(dbPath(Setting::Volume, playbackType, profileType), std::to_string(volume));
     settingsCache[dbPath(Setting::Volume, playbackType, profileType)] = std::to_string(volume);
-    bus.sendMulticast(std::make_unique<VolumeChanged>(volume, std::make_pair(profileType, playbackType)),
+    bus.sendMulticast(std::make_shared<VolumeChanged>(volume, std::make_pair(profileType, playbackType)),
                       sys::BusChannel::ServiceAudioNotifications);
 }
 
@@ -757,5 +803,24 @@ auto ServiceAudio::handleHSPVolumeChangedOnBluetoothDevice(sys::Message *msgl) -
     assert(hspMsg != nullptr);
     const auto volume = volume::scaler::hsp::toSystemVolume(hspMsg->getVolume());
     onVolumeChanged(volume);
+    return sys::msgHandled();
+}
+auto ServiceAudio::handleA2DPAudioPause() -> sys::MessagePointer
+{
+    if (auto input = audioMux.GetPlaybackInput(audio::PlaybackType::Multimedia);
+        input && (*input)->audio->Pause() == RetCode::Success) {
+        bus.sendMulticast(std::make_shared<AudioPausedNotification>((*input)->token),
+                          sys::BusChannel::ServiceAudioNotifications);
+    }
+    return sys::msgHandled();
+}
+
+auto ServiceAudio::handleA2DPAudioStart() -> sys::MessagePointer
+{
+    if (auto input = audioMux.GetPlaybackInput(audio::PlaybackType::Multimedia);
+        input && (*input)->audio->Resume() == RetCode::Success) {
+        bus.sendMulticast(std::make_shared<AudioResumedNotification>((*input)->token),
+                          sys::BusChannel::ServiceAudioNotifications);
+    }
     return sys::msgHandled();
 }

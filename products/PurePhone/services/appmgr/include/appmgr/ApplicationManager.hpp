@@ -22,6 +22,9 @@ namespace app::manager
         auto InitHandler() -> sys::ReturnCodes override;
         void changePhoneMode(sys::phone_modes::PhoneMode phoneMode, const ApplicationHandle *app);
         void handlePhoneModeChanged(sys::phone_modes::PhoneMode phoneMode);
+        auto handleBluetoothModeChangedAction(ActionEntry &action) -> ActionProcessStatus;
+        void handleBluetoothModeChanged(sys::bluetooth::BluetoothMode mode);
+        void changeBluetoothMode(const ApplicationHandle *app);
         void handleTetheringChanged(sys::phone_modes::Tethering tethering);
         void processKeypadBacklightState(bsp::keypad_backlight::State keypadLightState);
         void registerMessageHandlers() override;
@@ -45,6 +48,7 @@ namespace app::manager
         void handleStart(StartAllowedMessage *msg) override;
 
         std::shared_ptr<sys::phone_modes::Observer> phoneModeObserver;
+        sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled;
         locks::PhoneLockHandler phoneLockHandler;
         locks::SimLockHandler simLockHandler;
 

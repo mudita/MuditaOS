@@ -3,8 +3,7 @@
 
 #pragma once
 
-#include "AudioOperations.hpp"
-
+#include <apps-common/AudioOperations.hpp>
 #include <apps-common/BasePresenter.hpp>
 
 #include <module-apps/application-music-player/models/SongsModelInterface.hpp>
@@ -40,6 +39,9 @@ namespace app::music_player
 
             virtual void setPlayingStateCallback(OnPlayingStateChangeCallback cb) = 0;
             virtual bool handleAudioStopNotifiaction(audio::Token token)          = 0;
+            virtual bool handleAudioEofNotification(audio::Token token)           = 0;
+            virtual bool handleAudioPausedNotification(audio::Token token)        = 0;
+            virtual bool handleAudioResumedNotification(audio::Token token)       = 0;
         };
     };
 
@@ -60,6 +62,9 @@ namespace app::music_player
 
         void setPlayingStateCallback(std::function<void(SongState)> cb) override;
         bool handleAudioStopNotifiaction(audio::Token token) override;
+        bool handleAudioEofNotification(audio::Token token) override;
+        bool handleAudioPausedNotification(audio::Token token) override;
+        bool handleAudioResumedNotification(audio::Token token) override;
 
       private:
         void updateViewSongState();

@@ -19,3 +19,4 @@
 #include "ShutdownRequest.hpp"
 #include "GetCurrentDisplayLanguageRequest.hpp"
 #include "GetCurrentDisplayLanguageResponse.hpp"
+#include "FinalizingClose.hpp"
