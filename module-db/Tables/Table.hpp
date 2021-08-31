@@ -1,17 +1,19 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
+#include <Database/Database.hpp>
+
+#include <functional>
 #include <stdint.h>
 #include <vector>
-#include "Database/Database.hpp"
 
 template <typename T, typename F> class Table
 {
 
   protected:
-    Table(Database *db) : db(db)
+    explicit Table(Database *db) : db(db)
     {}
 
     virtual ~Table()
@@ -24,9 +26,9 @@ template <typename T, typename F> class Table
         return false;
     }
     virtual bool removeById(uint32_t id) = 0;
-    virtual bool removeByField(F field, const char *str)
+    virtual bool removeByField([[maybe_unused]] F field, [[maybe_unused]] const char *str)
     {
-        return true;
+        return false;
     }
     virtual bool update(T entry)                                                                            = 0;
     virtual T getById(uint32_t id)                                                                          = 0;
@@ -40,5 +42,20 @@ template <typename T, typename F> class Table
         return db->getLastInsertRowId();
     }
 
-    Database *db;
+    virtual std::vector<T> retQueryUnpack(std::unique_ptr<QueryResult> retQuery) const
+    {
+        if ((retQuery == nullptr) || (retQuery->getRowCount() == 0) || (createTableRow == nullptr)) {
+            return {};
+        }
+
+        std::vector<T> outVector;
+
+        do {
+            outVector.push_back(createTableRow(*retQuery));
+        } while (retQuery->nextRow());
+        return outVector;
+    }
+
+    Database *db                                               = nullptr;
+    std::function<T(const QueryResult &result)> createTableRow = nullptr;
 };
