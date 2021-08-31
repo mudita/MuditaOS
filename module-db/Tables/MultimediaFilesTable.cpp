@@ -7,46 +7,33 @@
 #include <Utils.hpp>
 #include <magic_enum.hpp>
 
-MultimediaFilesTableRow CreateMultimediaFilesTableRow(const QueryResult &result)
-{
-    if (result.getFieldCount() != magic_enum::enum_count<MultimediaFilesTableFields>() + 1) {
-        return MultimediaFilesTableRow{};
-    }
-
-    return MultimediaFilesTableRow{
-        result[0].getUInt32(),    // ID
-        result[1].getString(),    // path
-        result[2].getString(),    // mediaType
-        result[3].getUInt32(),    // size
-        {result[4].getString(),   // title
-         result[5].getString(),   // artist
-         result[6].getString(),   // album
-         result[7].getString(),   // comment
-         result[8].getString(),   // genre
-         result[9].getUInt32(),   // year
-         result[10].getUInt32()}, // track
-        {result[11].getUInt32(),  // songLength
-         result[12].getUInt32(),  // bitrate
-         result[13].getUInt32(),  // sample rate
-         result[14].getUInt32()}, // channels
-    };
-}
-
 namespace
 {
-    std::vector<MultimediaFilesTableRow> retQueryUnpack(std::unique_ptr<QueryResult> retQuery)
+    MultimediaFilesTableRow CreateMultimediaFilesTableRow(const QueryResult &result)
     {
-        if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
-            return {};
+        if (result.getFieldCount() != magic_enum::enum_count<MultimediaFilesTableFields>() + 1) {
+            return MultimediaFilesTableRow{};
         }
 
-        std::vector<MultimediaFilesTableRow> outVector;
-
-        do {
-            outVector.push_back(CreateMultimediaFilesTableRow(*retQuery));
-        } while (retQuery->nextRow());
-        return outVector;
+        return MultimediaFilesTableRow{
+            result[0].getUInt32(),    // ID
+            result[1].getString(),    // path
+            result[2].getString(),    // mediaType
+            result[3].getUInt32(),    // size
+            {result[4].getString(),   // title
+             result[5].getString(),   // artist
+             result[6].getString(),   // album
+             result[7].getString(),   // comment
+             result[8].getString(),   // genre
+             result[9].getUInt32(),   // year
+             result[10].getUInt32()}, // track
+            {result[11].getUInt32(),  // songLength
+             result[12].getUInt32(),  // bitrate
+             result[13].getUInt32(),  // sample rate
+             result[14].getUInt32()}, // channels
+        };
     }
+
 } // namespace
 
 auto MultimediaFilesTableRow::isValid() const -> bool
@@ -55,7 +42,9 @@ auto MultimediaFilesTableRow::isValid() const -> bool
 }
 
 MultimediaFilesTable::MultimediaFilesTable(Database *db) : Table(db)
-{}
+{
+    createTableRow = CreateMultimediaFilesTableRow;
+}
 
 bool MultimediaFilesTable::create()
 {
@@ -139,7 +128,7 @@ MultimediaFilesTableRow MultimediaFilesTable::getById(uint32_t id)
 
 std::vector<MultimediaFilesTableRow> MultimediaFilesTable::getLimitOffset(uint32_t offset, uint32_t limit)
 {
-    auto retQuery = db->query("SELECT * from files LIMIT %lu OFFSET %lu;", limit, offset);
+    auto retQuery = db->query("SELECT * from files ORDER BY title ASC LIMIT %lu OFFSET %lu;", limit, offset);
 
     return retQueryUnpack(std::move(retQuery));
 }
@@ -156,8 +145,11 @@ std::vector<MultimediaFilesTableRow> MultimediaFilesTable::getLimitOffsetByField
         return {};
     }
 
-    retQuery =
-        db->query("SELECT * FROM files WHERE %q = '%q' LIMIT %lu OFFSET %lu;", fieldName.c_str(), str, limit, offset);
+    retQuery = db->query("SELECT * FROM files WHERE %q = '%q' ORDER BY title ASC LIMIT %lu OFFSET %lu;",
+                         fieldName.c_str(),
+                         str,
+                         limit,
+                         offset);
 
     return retQueryUnpack(std::move(retQuery));
 }

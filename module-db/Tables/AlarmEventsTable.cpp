@@ -1,11 +1,9 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmEventsTable.hpp"
 
 #include <Interface/AlarmEventRecord.hpp>
-
-std::vector<AlarmEventsTableRow> retQueryUnpack(std::unique_ptr<QueryResult> retQuery);
 
 AlarmEventsTableRow::AlarmEventsTableRow(uint32_t id,
                                          const UTF8 &name,
@@ -51,7 +49,9 @@ auto AlarmEventsTableRow::isValid() const -> bool
 }
 
 AlarmEventsTable::AlarmEventsTable(Database *db) : Table(db)
-{}
+{
+    createTableRow = [](const QueryResult &retQuery) { return AlarmEventsTableRow(retQuery); };
+}
 
 bool AlarmEventsTable::create()
 {
@@ -283,18 +283,4 @@ std::string AlarmEventsTable::getFieldName(AlarmEventsTableFields field)
     default:
         return "";
     }
-}
-
-std::vector<AlarmEventsTableRow> retQueryUnpack(std::unique_ptr<QueryResult> retQuery)
-{
-    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
-        return {};
-    }
-
-    std::vector<AlarmEventsTableRow> outVector;
-
-    do {
-        outVector.push_back(AlarmEventsTableRow(*retQuery));
-    } while (retQuery->nextRow());
-    return outVector;
 }
