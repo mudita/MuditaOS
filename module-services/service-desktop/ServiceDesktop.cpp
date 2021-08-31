@@ -241,16 +241,17 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
 sys::ReturnCodes ServiceDesktop::DeinitHandler()
 {
     LOG_ERROR(".. deinit ..");
-    settings->deinit();
-    desktopWorker->deinit();
+    if (initialized) {
+        settings->deinit();
+        desktopWorker->deinit();
+    }
     return sys::ReturnCodes::Success;
 }
 
 void ServiceDesktop::ProcessCloseReason(sys::CloseReason closeReason)
 {
     LOG_ERROR(".. close with reason ..");
-    settings->deinit();
-    desktopWorker->deinit();
+    DeinitHandler();
     sendCloseReadyMessage(this);
 }
 
