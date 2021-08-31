@@ -46,7 +46,7 @@ namespace bluetooth
         static bool isConnected;
         static bool callAnswered;
         static bool isRinging;
-        static std::shared_ptr<HSPAudioDevice> audioDevice;
+        static std::shared_ptr<CVSDAudioDevice> audioDevice;
         static Devicei device;
     };
 } // namespace bluetooth

@@ -18,7 +18,7 @@
 using audio::AudioFormat;
 using bluetooth::A2DPAudioDevice;
 using bluetooth::BluetoothAudioDevice;
-using bluetooth::HSPAudioDevice;
+using bluetooth::CVSDAudioDevice;
 
 using namespace std::chrono_literals;
 
@@ -73,7 +73,7 @@ void A2DPAudioDevice::onDataSend()
 void A2DPAudioDevice::onDataReceive()
 {}
 
-auto HSPAudioDevice::setOutputVolume(float vol) -> audio::AudioDevice::RetCode
+auto CVSDAudioDevice::setOutputVolume(float vol) -> audio::AudioDevice::RetCode
 {
     const auto volumeToSet = audio::volume::scaler::hsp::toHSPGain(vol);
     hsp_ag_set_speaker_gain(volumeToSet);
@@ -83,13 +83,13 @@ auto HSPAudioDevice::setOutputVolume(float vol) -> audio::AudioDevice::RetCode
     return audio::AudioDevice::RetCode::Success;
 }
 
-void HSPAudioDevice::onDataSend()
+void CVSDAudioDevice::onDataSend()
 {}
 
-void HSPAudioDevice::onDataSend(std::uint16_t scoHandle)
+void CVSDAudioDevice::onDataSend(std::uint16_t scoHandle)
 {
     if (!isOutputEnabled()) {
-        LOG_DEBUG("Output is disabled");
+        LOG_WARN("Output is disabled");
         bluetooth::sco::utils::sendZeros(scoHandle);
         return;
     }
@@ -112,7 +112,7 @@ void HSPAudioDevice::onDataSend(std::uint16_t scoHandle)
     hci_request_sco_can_send_now_event();
 }
 
-void HSPAudioDevice::receiveCVSD(audio::AbstractStream::Span receivedData)
+void CVSDAudioDevice::receiveCVSD(audio::AbstractStream::Span receivedData)
 {
     if (!isInputEnabled()) {
         LOG_DEBUG("Input is disabled");
@@ -153,7 +153,7 @@ void HSPAudioDevice::receiveCVSD(audio::AbstractStream::Span receivedData)
     }
 }
 
-auto HSPAudioDevice::decodeCVSD(audio::AbstractStream::Span dataToDecode) -> audio::AbstractStream::Span
+auto CVSDAudioDevice::decodeCVSD(audio::AbstractStream::Span dataToDecode) -> audio::AbstractStream::Span
 {
     auto decodedData = dataToDecode;
     std::array<std::int16_t, scratchBufferSize> scratchBuffer;
@@ -177,7 +177,7 @@ auto HSPAudioDevice::decodeCVSD(audio::AbstractStream::Span dataToDecode) -> aud
     return decodedData;
 }
 
-void HSPAudioDevice::onDataReceive()
+void CVSDAudioDevice::onDataReceive()
 {}
 
 void BluetoothAudioDevice::enableInput()
@@ -202,12 +202,11 @@ void BluetoothAudioDevice::disableOutput()
     outputEnabled = false;
 }
 
-void HSPAudioDevice::enableInput()
+void CVSDAudioDevice::enableInput()
 {
     auto blockSize = Source::_stream->getInputTraits().blockSize;
     rxLeftovers    = std::make_unique<std::uint8_t[]>(blockSize);
     decoderBuffer  = std::make_unique<std::int16_t[]>(scratchBufferSize);
-    btstack_cvsd_plc_init(&cvsdPlcState);
     BluetoothAudioDevice::enableInput();
 }
 
@@ -248,7 +247,7 @@ auto A2DPAudioDevice::getSupportedFormats() -> std::vector<audio::AudioFormat>
                                                 static_cast<unsigned>(AVDTP::sbcConfig.numChannels)}};
 }
 
-auto HSPAudioDevice::getSupportedFormats() -> std::vector<audio::AudioFormat>
+auto CVSDAudioDevice::getSupportedFormats() -> std::vector<audio::AudioFormat>
 {
     return std::vector<AudioFormat>{getSourceFormat()};
 }
@@ -258,7 +257,7 @@ auto A2DPAudioDevice::getTraits() const -> ::audio::Endpoint::Traits
     return Traits{.usesDMA = false, .blockSizeConstraint = 512U, .timeConstraint = 10ms};
 }
 
-auto HSPAudioDevice::getTraits() const -> ::audio::Endpoint::Traits
+auto CVSDAudioDevice::getTraits() const -> ::audio::Endpoint::Traits
 {
     return Traits{.usesDMA = false, .blockSizeConstraint = 32U, .timeConstraint = 16ms};
 }
@@ -268,7 +267,7 @@ auto A2DPAudioDevice::getSourceFormat() -> ::audio::AudioFormat
     return audio::nullFormat;
 }
 
-auto HSPAudioDevice::getSourceFormat() -> ::audio::AudioFormat
+auto CVSDAudioDevice::getSourceFormat() -> ::audio::AudioFormat
 {
     return AudioFormat{bluetooth::SCO::CVSD_SAMPLE_RATE, supportedBitWidth, supportedChannels};
 }
