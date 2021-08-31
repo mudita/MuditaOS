@@ -27,6 +27,7 @@ namespace bluetooth
         void setDevice(Devicei device);
         void setOwnerService(const sys::Service *service);
         auto getStreamData() -> std::shared_ptr<BluetoothStreamData>;
+        void setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice);
 
       private:
         static void sendAudioEvent(audio::EventType event, audio::Event::DeviceState state);
@@ -54,6 +55,7 @@ namespace bluetooth
         static const char *call_hold_services[5];
         [[maybe_unused]] static int hf_indicators_nr;
         [[maybe_unused]] static hfp_generic_status_indicator_t hf_indicators[2];
+        static std::shared_ptr<CVSDAudioDevice> audioDevice;
         static Devicei device;
     };
 } // namespace bluetooth
