@@ -109,7 +109,7 @@ namespace bluetooth
     bool HSP::HSPImpl::isConnected          = false;
     bool HSP::HSPImpl::callAnswered         = false;
     bool HSP::HSPImpl::isRinging            = false;
-    std::shared_ptr<HSPAudioDevice> HSP::HSPImpl::audioDevice;
+    std::shared_ptr<CVSDAudioDevice> HSP::HSPImpl::audioDevice;
     Devicei HSP::HSPImpl::device;
 
     void HSP::HSPImpl::sendAudioEvent(audio::EventType event, audio::Event::DeviceState state)
@@ -368,6 +368,6 @@ namespace bluetooth
 
     void HSP::HSPImpl::setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice)
     {
-        HSP::HSPImpl::audioDevice = std::static_pointer_cast<HSPAudioDevice>(audioDevice);
+        HSP::HSPImpl::audioDevice = std::static_pointer_cast<CVSDAudioDevice>(audioDevice);
     }
 } // namespace bluetooth

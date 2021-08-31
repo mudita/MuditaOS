@@ -62,11 +62,13 @@ namespace bluetooth
         audio::AudioDevice::RetCode Resume() override;
     };
 
-    class HSPAudioDevice : public BluetoothAudioDevice
+    class CVSDAudioDevice : public BluetoothAudioDevice
     {
       public:
-        explicit HSPAudioDevice() : BluetoothAudioDevice(AudioProfile::HSP)
-        {}
+        explicit CVSDAudioDevice(const AudioProfile &profile) : BluetoothAudioDevice(profile)
+        {
+            btstack_cvsd_plc_init(&cvsdPlcState);
+        }
 
         auto setOutputVolume(float vol) -> audio::AudioDevice::RetCode override;
         void onDataSend() override;

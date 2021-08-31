@@ -28,11 +28,13 @@ namespace audio
             RoutingHeadphones,
             RoutingEarspeaker,
             RoutingBluetoothHSP,
+            RoutingBluetoothHFP,
 
             // Recording profiles
             RecordingBuiltInMic,
             RecordingHeadphones,
             RecordingBluetoothHSP,
+            RecordingBluetoothHFP,
 
             // Profiles used by music player
             PlaybackLoudspeaker,

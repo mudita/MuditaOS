@@ -28,7 +28,8 @@ namespace audio
             Audiocodec,
             Cellular,
             BluetoothA2DP,
-            BluetoothHSP
+            BluetoothHSP,
+            BluetoothHFP
         };
 
         virtual ~AudioDevice() = default;
