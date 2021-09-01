@@ -60,6 +60,7 @@ namespace gui
 
         auto setValue(unsigned int value) -> bool override;
         void setMaximum(unsigned int value) final;
+        [[nodiscard]] int getMaximum() const noexcept final;
     };
 
     class VBarGraph : public VBox, public BarGraph
