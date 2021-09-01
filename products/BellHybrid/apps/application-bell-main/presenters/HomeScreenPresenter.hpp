@@ -37,6 +37,7 @@ namespace app::home_screen
 
         /// Alarm widget related API
         virtual void setAlarmTriggered()                                     = 0;
+        virtual void setAlarmSnoozed()                                       = 0;
         virtual void setAlarmActive(bool)                                    = 0;
         virtual void setAlarmEdit(bool)                                      = 0;
         virtual void setAlarmVisible(bool)                                   = 0;
@@ -70,6 +71,7 @@ namespace app::home_screen
         virtual void refreshWindow()                                                = 0;
         virtual void spawnTimer(std::chrono::milliseconds timeout = defaultTimeout) = 0;
         virtual void detachTimer()                                                  = 0;
+        virtual void handleAlarmRingingEvent()                                      = 0;
 
         static constexpr auto defaultTimeout = std::chrono::milliseconds{5000};
     };
@@ -96,6 +98,7 @@ namespace app::home_screen
 
         void spawnTimer(std::chrono::milliseconds timeout) override;
         void detachTimer() override;
+        void handleAlarmRingingEvent() override;
 
       private:
         void setDefaultAlarmTime();

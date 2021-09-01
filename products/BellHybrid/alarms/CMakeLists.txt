@@ -19,6 +19,8 @@ target_include_directories(alarms
 )
 
 target_link_libraries(alarms
+   PRIVATE
+        application-bell-main
    PUBLIC
         module-db
         service-time

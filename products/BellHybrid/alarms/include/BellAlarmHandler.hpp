@@ -5,13 +5,24 @@
 
 #include <service-time/AlarmHandler.hpp>
 
+namespace stm
+{
+    class ServiceTime;
+}
+
 namespace alarms
 {
 
     class BellAlarmClockHandler : public AlarmHandler
     {
       public:
+        explicit BellAlarmClockHandler(stm::ServiceTime *serviceTime);
         auto handle(const AlarmEventRecord &record) -> bool;
+
+        static constexpr auto name = "BellAlarmClockHandler";
+
+      private:
+        stm::ServiceTime *serviceTime;
     };
 
     class EveningReminderHandler : public AlarmHandler
