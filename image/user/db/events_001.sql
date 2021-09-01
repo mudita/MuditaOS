@@ -19,4 +19,3 @@ CREATE TABLE IF NOT EXISTS alarm_events(
                   snooze_duration INTEGER,
                   FOREIGN KEY (event_id) REFERENCES events (_id) ON DELETE CASCADE
 );
-
