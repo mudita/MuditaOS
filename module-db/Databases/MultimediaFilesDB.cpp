@@ -3,5 +3,8 @@
 
 #include "MultimediaFilesDB.hpp"
 
-MultimediaFilesDB::MultimediaFilesDB(const char *name) : Database(name), files(this)
-{}
+namespace db::multimedia_files
+{
+    MultimediaFilesDB::MultimediaFilesDB(const char *name) : Database(name), files(this)
+    {}
+} // namespace db::multimedia_files
