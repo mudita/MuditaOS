@@ -83,12 +83,9 @@ namespace alarms
         const std::function<void(RequestType *request, std::function<void(CallbackParamType)>)>
             &alarmOperationsCallback) -> std::shared_ptr<ResponseType>
     {
-        auto uniID    = request->uniID;
-        auto sender   = request->sender;
-        auto callback = [&, uniID, sender](CallbackParamType param) {
+        auto callback = [&, requestPtr = std::make_shared<RequestType>(*request)](CallbackParamType param) {
             auto response   = std::make_shared<ResponseType>(param);
-            response->uniID = uniID;
-            service->bus.sendUnicast(response, sender);
+            service->bus.sendResponse(response, requestPtr);
         };
 
         alarmOperationsCallback(request, callback);
