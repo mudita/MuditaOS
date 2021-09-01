@@ -7,8 +7,15 @@
 #include <GuiTimer.hpp>
 #include <purefs/filesystem_paths.hpp>
 #include <service-audio/AudioServiceAPI.hpp>
-#include <time/time_conversion.hpp>
+#include <apps-common/widgets/ProgressTimerImpl.hpp>
 
+#include <gsl/assert>
+
+namespace
+{
+    inline constexpr auto meditationTimerName = "MeditationTimer";
+    inline constexpr std::chrono::seconds timerTick{1};
+} // namespace
 namespace gui
 {
     namespace
@@ -42,36 +49,21 @@ namespace gui
             .setFocusPenWidth(timerStyle::PenWidth);
         progressBar = new CircularProgressBar(this, params);
 
-        timer = new Text(progressBar, 0, 0, getWidth(), getHeight());
-        timer->setEdges(RectangleEdge::None);
-        timer->setFont(style::window::font::supersizemelight);
-        timer->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-        timer->setEditMode(EditMode::Browse);
+        text = new Text(progressBar, 0, 0, getWidth(), getHeight());
+        text->setEdges(RectangleEdge::None);
+        text->setFont(style::window::font::supersizemelight);
+        text->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
+        text->setEditMode(EditMode::Browse);
 
-        onReset();
-    }
-
-    void MeditationTimer::onReset()
-    {
-        updateTimer();
-        progressBar->setMaximum(duration.count());
-        progressBar->setValue(0);
-    }
-
-    void MeditationTimer::update()
-    {
-        updateTimer();
-        progressBar->setPercentageValue(calculatePercentageValue());
-        application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
-    }
-
-    void MeditationTimer::updateTimer()
-    {
-        using utils::time::Duration;
-
-        const auto secondsRemaining = duration - elapsed;
-        const Duration remainingDuration{std::time_t{secondsRemaining.count()}};
-        timer->setText(remainingDuration.str(Duration::DisplayedFormat::Fixed0M0S));
+        timer = std::make_unique<app::ProgressTimerImpl>(application, this, meditationTimerName, timerTick);
+        timer->attach(progressBar);
+        timer->attach(text);
+        auto intervalCallback = [app = application] {
+            AudioServiceAPI::PlaybackStart(app,
+                                           audio::PlaybackType::Meditation,
+                                           purefs::dir::getCurrentOSPath() / "assets/audio/meditation/gong.mp3");
+        };
+        timer->registerOnIntervalCallback(std::move(intervalCallback));
     }
 
     auto MeditationTimer::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool
@@ -81,89 +73,19 @@ namespace gui
         return true;
     }
 
-    void MeditationTimer::reset(std::chrono::seconds _duration, std::chrono::seconds _intervalPeriod) noexcept
-    {
-        assert(_duration != std::chrono::seconds::zero()); // Pre-condition check.
-
-        duration       = _duration;
-        elapsed        = std::chrono::seconds::zero();
-        intervalPeriod = _intervalPeriod;
-        hasInterval    = _intervalPeriod != std::chrono::seconds::zero();
-        onReset();
-    }
-
-    void MeditationTimer::start()
-    {
-        startTimer();
-        isRunning = true;
-    }
-
-    void MeditationTimer::startTimer()
-    {
-        assert(application != nullptr);
-        timerCallback = [this](Item &it, sys::Timer &task) { return onTimerTimeout(it, task); };
-        timerTask     = app::GuiTimerFactory::createPeriodicTimer(application, this, "MeditationTimer", TimerInterval);
-        timerTask.start();
-    }
-
-    auto MeditationTimer::onTimerTimeout(Item &self, sys::Timer &task) -> bool
-    {
-        if (isStopped() || isFinished()) {
-            task.stop();
-            if (isFinished() && timeoutCallback != nullptr) {
-                timeoutCallback();
-            }
-            return true;
-        }
-
-        ++elapsed;
-        if (intervalReached() || isFinished()) {
-            onInterval();
-        }
-        update();
-        return true;
-    }
-
-    auto MeditationTimer::isFinished() const noexcept -> bool
-    {
-        return duration <= elapsed;
-    }
-
-    auto MeditationTimer::isStopped() const noexcept -> bool
-    {
-        return !isRunning;
-    }
-
-    auto MeditationTimer::intervalReached() const noexcept -> bool
-    {
-        return hasInterval && (elapsed.count() % intervalPeriod.count()) == 0;
-    }
-
-    auto MeditationTimer::calculatePercentageValue() const noexcept -> unsigned int
-    {
-        const auto percentage = static_cast<float>(elapsed.count()) / duration.count();
-        return std::lround(percentage * 100);
-    }
-
-    void MeditationTimer::stop()
-    {
-        isRunning = false;
-    }
-
     void MeditationTimer::setCounterVisible(bool isVisible) noexcept
     {
-        timer->setVisible(isVisible);
+        text->setVisible(isVisible);
     }
 
-    void MeditationTimer::onInterval() const
+    app::ProgressTimer &MeditationTimer::getTimer() noexcept
     {
-        AudioServiceAPI::PlaybackStart(application,
-                                       audio::PlaybackType::Meditation,
-                                       purefs::dir::getCurrentOSPath() / "assets/audio/meditation/gong.mp3");
+        Expects(timer != nullptr);
+        return *timer;
     }
-
-    void MeditationTimer::registerTimeoutCallback(const std::function<void()> &cb)
+    gui::Progress &MeditationTimer::getProgress() noexcept
     {
-        timeoutCallback = cb;
+        Expects(progressBar != nullptr);
+        return *progressBar;
     }
 } // namespace gui
