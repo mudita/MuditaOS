@@ -8,15 +8,13 @@
 #include <gui/widgets/BoxLayout.hpp>
 #include <gui/widgets/ProgressBar.hpp>
 #include <gui/widgets/Text.hpp>
-#include <GuiTimer.hpp>
-
-#include <atomic>
-#include <chrono>
+#include <apps-common/widgets/ProgressTimer.hpp>
 
 namespace gui
 {
     class MeditationTimer : public HBox
     {
+
       public:
         MeditationTimer(std::uint32_t x,
                         std::uint32_t y,
@@ -27,37 +25,16 @@ namespace gui
 
         [[nodiscard]] auto onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool override;
 
-        void start();
-        void stop();
-        void reset(std::chrono::seconds _duration, std::chrono::seconds period = std::chrono::seconds::zero()) noexcept;
-        [[nodiscard]] auto isStopped() const noexcept -> bool;
-        void onInterval() const;
         void setCounterVisible(bool isVisible) noexcept;
-        void registerTimeoutCallback(const std::function<void()> &);
+        [[nodiscard]] app::ProgressTimer &getTimer() noexcept;
+        [[nodiscard]] gui::Progress &getProgress() noexcept;
 
       private:
         void build();
-        void update();
-        void updateTimer();
-        void onReset();
 
-        void startTimer();
-        [[nodiscard]] auto onTimerTimeout(Item &self, sys::Timer &timerTask) -> bool;
-        [[nodiscard]] auto isFinished() const noexcept -> bool;
-        [[nodiscard]] auto intervalReached() const noexcept -> bool;
-        [[nodiscard]] auto calculatePercentageValue() const noexcept -> unsigned int;
-
-        std::atomic_bool isRunning{false};
-        std::chrono::seconds duration{std::chrono::seconds::zero()};
-        std::chrono::seconds elapsed{std::chrono::seconds::zero()};
-        std::chrono::seconds intervalPeriod{std::chrono::seconds::zero()};
-        bool hasInterval = false;
-
-        sys::TimerHandle timerTask;
         app::ApplicationMeditation *application = nullptr;
         CircularProgressBar *progressBar        = nullptr;
-        Text *timer                             = nullptr;
-
-        std::function<void()> timeoutCallback = nullptr;
+        Text *text                              = nullptr;
+        std::unique_ptr<app::ProgressTimer> timer;
     };
 } // namespace gui

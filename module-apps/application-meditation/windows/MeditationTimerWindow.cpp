@@ -80,15 +80,17 @@ void MeditationTimerWindow::onBeforeShow(ShowMode mode, SwitchData *data)
                 setVisibleMeditationEnd();
                 application->refreshWindow(RefreshModes::GUI_REFRESH_DEEP);
             };
-            timer->registerTimeoutCallback(onMeditationEnd);
-            timer->reset(meditationTime, meditationIntervalPeriod);
-            timer->start();
+            timer->getTimer().registerOnFinishedCallback(onMeditationEnd);
+            timer->getTimer().reset(meditationTime, meditationIntervalPeriod);
+            timer->getTimer().start();
+            timer->getProgress().setMaximum(meditationTime.count());
             application->refreshWindow(RefreshModes::GUI_REFRESH_DEEP);
         };
-        timer->registerTimeoutCallback(onPreparation);
+        timer->getTimer().registerOnFinishedCallback(onPreparation);
+        timer->getTimer().reset(timerData->getPreparationTime());
+        timer->getTimer().start();
+        timer->getProgress().setMaximum(timerData->getPreparationTime().count());
         timer->setCounterVisible(timerData->isCounterEnabled());
-        timer->reset(timerData->getPreparationTime());
-        timer->start();
     }
 }
 
@@ -101,17 +103,17 @@ auto MeditationTimerWindow::onInput(const InputEvent &inputEvent) -> bool
             return true;
         }
         if (inputEvent.is(KeyCode::KEY_RF) && bottomBar->isActive(BottomBar::Side::RIGHT)) {
-            timer->stop();
+            timer->getTimer().stop();
             setVisibleMeditationEnd();
             return true;
         }
         if (inputEvent.is(KeyCode::KEY_ENTER) && bottomBar->isActive(BottomBar::Side::CENTER)) {
-            if (timer->isStopped()) {
-                timer->start();
+            if (timer->getTimer().isStopped()) {
+                timer->getTimer().start();
                 setVisibleRunning();
             }
             else {
-                timer->stop();
+                timer->getTimer().stop();
                 setVisiblePaused();
             }
             return true;

@@ -70,6 +70,10 @@ namespace gui
             currentLevel = numberOfRectangles;
         }
     }
+    int BarGraph::getMaximum() const noexcept
+    {
+        return numberOfRectangles;
+    }
 
     void BarGraph::applyBarStyle(BarGraphStyle graphStyle)
     {
