@@ -12,7 +12,6 @@ target_sources( ${PROJECT_NAME}
 	PRIVATE
 	"ServiceFileIndexer.cpp"
 	"StartupIndexer.cpp"
-	"notesIndexer.cpp"
 )
 
 
