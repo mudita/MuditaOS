@@ -9,8 +9,12 @@
 #include "windows/BellSettingsAdvancedWindow.hpp"
 #include "windows/BellSettingsFinishedWindow.hpp"
 #include "windows/BellSettingsTimeUnitsWindow.hpp"
-#include "windows/BellSettingsWindow.hpp"
+#include "windows/BellSettingsAlarmSettingsWindow.hpp"
+#include "windows/BellSettingsBedtimeToneWindow.hpp"
 #include "windows/BellSettingsFrontlight.hpp"
+#include "windows/BellSettingsHomeViewWindow.hpp"
+#include "windows/BellSettingsTurnOffWindow.hpp"
+#include "windows/BellSettingsWindow.hpp"
 
 #include <apps-common/windows/Dialog.hpp>
 #include <apps-common/AsyncTask.hpp>
@@ -66,6 +70,24 @@ namespace app
 
         windowsFactory.attach(gui::window::name::bellSettingsFinished, [](Application *app, const std::string &name) {
             return std::make_unique<gui::BellSettingsFinishedWindow>(app);
+        });
+
+        windowsFactory.attach(gui::window::name::bellSettingsHomeView, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::BellSettingsHomeViewWindow>(app);
+        });
+
+        windowsFactory.attach(gui::window::name::bellSettingsAlarmSettings,
+                              [](Application *app, const std::string &name) {
+                                  return std::make_unique<gui::BellSettingsAlarmSettingsWindow>(app);
+                              });
+
+        windowsFactory.attach(gui::window::name::bellSettingsBedtimeTone,
+                              [](Application *app, const std::string &name) {
+                                  return std::make_unique<gui::BellSettingsBedtimeToneWindow>(app);
+                              });
+
+        windowsFactory.attach(gui::window::name::bellSettingsTurnOff, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::BellSettingsTurnOffWindow>(app);
         });
     }
 
