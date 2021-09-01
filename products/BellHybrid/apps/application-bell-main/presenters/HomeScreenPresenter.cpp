@@ -28,15 +28,23 @@ namespace app::home_screen
         : app{app}, alarmModel{std::move(alarmModel)},
           temperatureModel{std::move(temperatureModel)}, timeModel{std::move(timeModel)}
     {}
+
     void HomeScreenPresenter::handleUpdateTimeEvent()
     {
         getView()->setTime(timeModel->getCurrentTime());
         stateController->handleTimeUpdateEvent();
     }
+
+    void HomeScreenPresenter::handleAlarmRingingEvent()
+    {
+        stateController->handleAlarmRingingEvent();
+    }
+
     bool HomeScreenPresenter::handleInputEvent(const gui::InputEvent &inputEvent)
     {
         return stateController->handleInputEvent(inputEvent);
     }
+
     void HomeScreenPresenter::spawnTimer(std::chrono::milliseconds timeout)
     {
         if (not timer.isValid()) {
@@ -46,6 +54,7 @@ namespace app::home_screen
         timer.stop();
         timer.start();
     }
+
     void HomeScreenPresenter::detachTimer()
     {
         if (timer.isValid()) {
@@ -53,10 +62,12 @@ namespace app::home_screen
             timer.reset();
         }
     }
+
     HomeScreenPresenter::~HomeScreenPresenter()
     {
         detachTimer();
     }
+
     void HomeScreenPresenter::onBeforeShow()
     {
         getView()->setTimeFormat(timeModel->getTimeFormat());
@@ -64,6 +75,7 @@ namespace app::home_screen
         getView()->setAlarmTimeFormat(timeModel->getTimeFormat());
         getView()->setTemperature(temperatureModel->getTemperature());
     }
+
     void HomeScreenPresenter::setDefaultAlarmTime()
     {
         const auto now     = timeModel->getCurrentTime();
@@ -77,12 +89,14 @@ namespace app::home_screen
         }
         getView()->setAlarmTime(alarmTime);
     }
+
     void HomeScreenPresenter::createData()
     {
         setDefaultAlarmTime();
         stateController =
             std::make_unique<StateController>(*getView(), *this, *temperatureModel, *alarmModel, *timeModel);
     }
+
     void HomeScreenPresenter::refreshWindow()
     {
         app->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);

@@ -25,6 +25,7 @@ target_sources(application-bell-main
 
     PUBLIC
         include/application-bell-main/ApplicationBellMain.hpp
+        include/application-bell-main/data/AlarmRingingSwitchData.hpp
 )
 
 target_include_directories(application-bell-main

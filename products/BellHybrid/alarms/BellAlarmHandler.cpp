@@ -3,9 +3,12 @@
 
 #include <BellAlarmHandler.hpp>
 #include <AlarmHandlerActions.hpp>
+#include <service-time/ServiceTime.hpp>
 
 namespace alarms
 {
+    BellAlarmClockHandler::BellAlarmClockHandler(stm::ServiceTime *serviceTime) : serviceTime(serviceTime)
+    {}
 
     auto BellAlarmClockHandler::handle(const AlarmEventRecord &record) -> bool
     {
@@ -16,7 +19,7 @@ namespace alarms
         if (record.enabled) {
             result = playAlarmSound(record.musicTone);
             result = turnOnFrontlight();
-            result = displayAlarmPopup();
+            result = displayAlarmPopup(serviceTime);
             return result;
         }
 
