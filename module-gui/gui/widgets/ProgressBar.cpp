@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <log.hpp>
@@ -46,6 +46,10 @@ namespace gui
         const auto percent       = static_cast<float>(value) / 100.0f;
         const auto absoluteValue = std::lround(static_cast<float>(maxValue) * percent);
         setValue(absoluteValue);
+    }
+    int ProgressBar::getMaximum() const noexcept
+    {
+        return maxValue;
     }
 
     void ProgressBar::buildDrawListImplementation(std::list<Command> &commands)
@@ -117,6 +121,10 @@ namespace gui
         const auto percent       = static_cast<float>(value) / 100.0f;
         const auto absoluteValue = std::lround(static_cast<float>(maxValue) * percent);
         setValue(absoluteValue);
+    }
+    int CircularProgressBar::getMaximum() const noexcept
+    {
+        return maxValue;
     }
 
     float CircularProgressBar::getPercentageValue() const

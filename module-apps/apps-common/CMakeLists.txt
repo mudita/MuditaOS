@@ -45,6 +45,7 @@ target_sources(apps-common
         widgets/TimeSetFmtSpinner.cpp
         widgets/TimeWidget.cpp
         widgets/WidgetsUtils.cpp
+        widgets/ProgressTimerImpl.cpp
         windows/AppWindow.cpp
         windows/BrightnessWindow.cpp
         windows/Dialog.cpp
