@@ -21,6 +21,9 @@ namespace alarms
         AlarmMessage() : sys::DataMessage(MessageType::AlarmMessage){};
     };
 
+    class AlarmResponse : public sys::ResponseMessage
+    {};
+
     class AlarmGetRequestMessage : public AlarmMessage
     {
       public:
@@ -28,7 +31,7 @@ namespace alarms
         const unsigned int id;
     };
 
-    class AlarmGetResponseMessage : public AlarmMessage
+    class AlarmGetResponseMessage : public AlarmResponse
     {
       public:
         AlarmGetResponseMessage(const AlarmEventRecord alarm = AlarmEventRecord{}) : alarm(alarm){};
@@ -42,7 +45,7 @@ namespace alarms
         const AlarmEventRecord alarmEvent;
     };
 
-    class AlarmAddResponseMessage : public AlarmMessage
+    class AlarmAddResponseMessage : public AlarmResponse
     {
       public:
         AlarmAddResponseMessage(const bool success = false) : success(success){};
@@ -56,7 +59,7 @@ namespace alarms
         AlarmEventRecord alarmEvent;
     };
 
-    class AlarmUpdateResponseMessage : public AlarmMessage
+    class AlarmUpdateResponseMessage : public AlarmResponse
     {
       public:
         AlarmUpdateResponseMessage(const bool success = false) : success(success){};
@@ -70,7 +73,7 @@ namespace alarms
         const unsigned int id;
     };
 
-    class AlarmRemoveResponseMessage : public AlarmMessage
+    class AlarmRemoveResponseMessage : public AlarmResponse
     {
       public:
         AlarmRemoveResponseMessage(const bool success = false) : success(success){};
@@ -92,7 +95,7 @@ namespace alarms
         const std::uint32_t limit;
     };
 
-    class AlarmsGetInRangeResponseMessage : public AlarmMessage
+    class AlarmsGetInRangeResponseMessage : public AlarmResponse
     {
       public:
         AlarmsGetInRangeResponseMessage(std::vector<AlarmEventRecord> alarms = std::vector<AlarmEventRecord>())
@@ -106,7 +109,7 @@ namespace alarms
         AlarmGetNextSingleEventsRequestMessage(){};
     };
 
-    class AlarmGetNextSingleEventsResponseMessage : public AlarmMessage
+    class AlarmGetNextSingleEventsResponseMessage : public AlarmResponse
     {
       public:
         AlarmGetNextSingleEventsResponseMessage(

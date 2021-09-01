@@ -83,6 +83,16 @@ namespace stm
 
     sys::MessagePointer ServiceTime::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
     {
+        if (resp != nullptr && resp->responseTo == MessageType::DBQuery) {
+            if (auto queryResponse = dynamic_cast<db::QueryResponse *>(resp)) {
+                auto result = queryResponse->getResult();
+                if (result != nullptr) {
+                    if (result->hasListener()) {
+                        result->handle();
+                    }
+                }
+            }
+        }
         return std::make_shared<sys::ResponseMessage>();
     }
     void ServiceTime::registerMessageHandlers()
