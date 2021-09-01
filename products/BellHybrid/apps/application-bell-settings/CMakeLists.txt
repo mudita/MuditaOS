@@ -33,7 +33,11 @@ target_sources(application-bell-settings
         windows/BellSettingsAdvancedWindow.cpp
         windows/BellSettingsTimeUnitsWindow.cpp
         windows/BellSettingsFinishedWindow.cpp
+        windows/BellSettingsAlarmSettingsWindow.cpp
+        windows/BellSettingsBedtimeToneWindow.cpp
         windows/BellSettingsFrontlight.cpp
+        windows/BellSettingsHomeViewWindow.cpp
+        windows/BellSettingsTurnOffWindow.cpp
 
         models/TimeUnitsModel.hpp
         models/TemperatureUnitModel.hpp
@@ -45,8 +49,12 @@ target_sources(application-bell-settings
         widgets/TemperatureUnitListItem.hpp
         windows/BellSettingsWindow.hpp
         windows/BellSettingsAdvancedWindow.hpp
-        windows/BellSettingsTimeUnitsWindow.hpp
+        windows/BellSettingsAlarmSettingsWindow.hpp
+        windows/BellSettingsBedtimeToneWindow.hpp
         windows/BellSettingsFrontlight.hpp
+        windows/BellSettingsHomeViewWindow.hpp
+        windows/BellSettingsTimeUnitsWindow.hpp
+        windows/BellSettingsTurnOffWindow.hpp
 
     PRIVATE
         windows/BellSettingsFinishedWindow.hpp
