@@ -5,6 +5,7 @@
 #include "data/BellMainStyle.hpp"
 
 #include <application-bell-main/ApplicationBellMain.hpp>
+#include <application-bell-main/data/AlarmRingingSwitchData.hpp>
 #include <apps-common/widgets/BellBaseLayout.hpp>
 #include <gui/input/InputEvent.hpp>
 #include <gui/widgets/TextFixedSize.hpp>
@@ -32,6 +33,7 @@ namespace
             tm.tm_min = 0;
         }
     }
+
     void decreaseHour(struct tm &tm)
     {
         if (tm.tm_hour <= Locale::min_hour_24H_mode) {
@@ -43,6 +45,7 @@ namespace
             tm.tm_min = utils::time::Locale::max_minutes;
         }
     }
+
     void handleMinuteIncrease(struct tm &tm)
     {
         if (tm.tm_min >= Locale::max_minutes) {
@@ -52,6 +55,7 @@ namespace
             tm.tm_min++;
         }
     }
+
     void handleMinuteDecrease(struct tm &tm)
     {
         if (tm.tm_min <= 0) {
@@ -115,9 +119,15 @@ namespace gui
         body->centerBox->resizeItems();
         body->lastBox->resizeItems();
     }
+
     void BellHomeScreenWindow::setAlarmTriggered()
     {
         alarm->setAlarmStatus(AlarmSetSpinner::Status::RINGING);
+    }
+
+    void BellHomeScreenWindow::setAlarmSnoozed()
+    {
+        alarm->setAlarmStatus(AlarmSetSpinner::Status::SNOOZE);
     }
 
     void BellHomeScreenWindow::setAlarmActive(bool val)
@@ -144,22 +154,27 @@ namespace gui
     {
         bottomText->setText(utils::temperature::tempToStrDec(newTemp));
     }
+
     void BellHomeScreenWindow::setBottomDescription(const UTF8 &desc)
     {
         bottomText->setText(desc);
     }
+
     void BellHomeScreenWindow::setTime(std::time_t newTime)
     {
         time->setTime(newTime);
     }
+
     void BellHomeScreenWindow::setTimeFormat(utils::time::Locale::TimeFormat fmt)
     {
         time->setTimeFormat(fmt);
     }
+
     void BellHomeScreenWindow::setAlarmTimeFormat(utils::time::Locale::TimeFormat fmt)
     {
         alarm->setTimeFormat(fmt);
     }
+
     void BellHomeScreenWindow::setAlarmEdit(bool val)
     {
         if (not val) {
@@ -169,10 +184,12 @@ namespace gui
             alarm->setEditMode(EditMode::Edit);
         };
     }
+
     void BellHomeScreenWindow::switchToMenu()
     {
         application->switchWindow(window::name::bell_main_menu, nullptr);
     }
+
     bool BellHomeScreenWindow::onInput(const InputEvent &inputEvent)
     {
         if (inputEvent.isShortRelease()) {
@@ -180,10 +197,16 @@ namespace gui
         }
         return false;
     }
-    void BellHomeScreenWindow::onBeforeShow(ShowMode, SwitchData *)
+
+    void BellHomeScreenWindow::onBeforeShow(ShowMode, SwitchData *data)
     {
         presenter->onBeforeShow();
+        const auto alarmRingingSwitchData = dynamic_cast<alarms::AlarmRingingSwitchData *>(data);
+        if (alarmRingingSwitchData != nullptr) {
+            presenter->handleAlarmRingingEvent();
+        }
     }
+
     std::time_t BellHomeScreenWindow::getAlarmTime() const
     {
         const auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
@@ -193,10 +216,12 @@ namespace gui
         }
         return alarmTime;
     }
+
     void BellHomeScreenWindow::setAlarmTime(std::time_t newTime)
     {
         alarm->setTime(newTime);
     }
+
     bool BellHomeScreenWindow::updateTime()
     {
         if (presenter) {
@@ -204,6 +229,7 @@ namespace gui
         }
         return true;
     }
+
     void BellHomeScreenWindow::incAlarmMinute()
     {
         const auto alarmTime = alarm->getTime();
@@ -211,6 +237,7 @@ namespace gui
         handleMinuteIncrease(*newTime);
         alarm->setTime(std::mktime(newTime));
     }
+
     void BellHomeScreenWindow::decAlarmMinute()
     {
         const auto alarmTime = alarm->getTime();

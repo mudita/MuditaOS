@@ -28,6 +28,7 @@ namespace gui
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
 
         void setAlarmTriggered() override;
+        void setAlarmSnoozed() override;
         void setAlarmActive(bool val) override;
         void setAlarmEdit(bool val) override;
         void setAlarmVisible(bool val) override;
