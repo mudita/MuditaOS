@@ -6,10 +6,13 @@
 #include <Database/Database.hpp>
 #include <Tables/MultimediaFilesTable.hpp>
 
-class MultimediaFilesDB : public Database
+namespace db::multimedia_files
 {
-  public:
-    explicit MultimediaFilesDB(const char *name);
+    class MultimediaFilesDB : public Database
+    {
+      public:
+        explicit MultimediaFilesDB(const char *name);
 
-    MultimediaFilesTable files;
-};
+        MultimediaFilesTable files;
+    };
+} // namespace db::multimedia_files

@@ -47,83 +47,90 @@ set(SOURCES
         Tables/MultimediaFilesTable.cpp
 
         Interface/AlarmEventRecord.cpp
+        Interface/AlarmsRecord.cpp
+        Interface/CalllogRecord.cpp
+        Interface/ContactRecord.cpp
         Interface/EventRecord.cpp
+        Interface/MultimediaFilesRecord.cpp
+        Interface/NotesRecord.cpp
+        Interface/NotificationsRecord.cpp
         Interface/Record.cpp
         Interface/SMSRecord.cpp
-        Interface/ContactRecord.cpp
-        Interface/ThreadRecord.cpp
-        Interface/AlarmsRecord.cpp
-        Interface/NotesRecord.cpp
-        Interface/CalllogRecord.cpp
         Interface/SMSTemplateRecord.cpp
-        Interface/NotificationsRecord.cpp
+        Interface/ThreadRecord.cpp
 
         queries/RecordQuery.cpp
         queries/alarm_events/QueryAlarmEventsAdd.cpp
         queries/alarm_events/QueryAlarmEventsEdit.cpp
         queries/alarm_events/QueryAlarmEventsGet.cpp
-        queries/alarm_events/QueryAlarmEventsGetRecurringBetweenDates.cpp
-        queries/alarm_events/QueryAlarmEventsGetLimited.cpp
         queries/alarm_events/QueryAlarmEventsGetBetweenDates.cpp
+        queries/alarm_events/QueryAlarmEventsGetLimited.cpp
         queries/alarm_events/QueryAlarmEventsGetNext.cpp
+        queries/alarm_events/QueryAlarmEventsGetRecurringBetweenDates.cpp
         queries/alarm_events/QueryAlarmEventsRemove.cpp
-        queries/messages/sms/QuerySMSSearchByType.cpp
-        queries/messages/sms/QuerySMSGet.cpp
-        queries/messages/sms/QuerySMSGetCount.cpp
-        queries/messages/sms/QuerySMSGetCountByThreadID.cpp
-        queries/messages/sms/QuerySMSGetLastByThreadID.cpp
-        queries/messages/sms/QuerySMSGetByID.cpp
-        queries/messages/sms/QuerySMSGetByContactID.cpp
-        queries/messages/sms/QuerySMSGetByThreadID.cpp
-        queries/messages/sms/QuerySMSGetForList.cpp
-        queries/messages/sms/QuerySMSGetByText.cpp
-        queries/messages/sms/QuerySMSAdd.cpp
-        queries/messages/sms/QuerySMSRemove.cpp
-        queries/messages/sms/QuerySMSUpdate.cpp
-        queries/messages/templates/QuerySMSTemplateAdd.cpp
-        queries/messages/templates/QuerySMSTemplateGetByID.cpp
-        queries/messages/templates/QuerySMSTemplateGet.cpp
-        queries/messages/templates/QuerySMSTemplateGetForList.cpp
-        queries/messages/templates/QuerySMSTemplateGetCount.cpp
-        queries/messages/templates/QuerySMSTemplateRemove.cpp
-        queries/messages/templates/QuerySMSTemplateUpdate.cpp
-        queries/messages/threads/QueryThreadsSearchForList.cpp
-        queries/messages/threads/QueryThreadsGet.cpp
-        queries/messages/threads/QueryThreadsGetForList.cpp
-        queries/messages/threads/QueryThreadGetByID.cpp
-        queries/messages/threads/QueryThreadGetByNumber.cpp
-        queries/messages/threads/QueryThreadGetByContactID.cpp
-        queries/messages/threads/QueryThreadRemove.cpp
-        queries/messages/threads/QueryThreadMarkAsRead.cpp
-        queries/messages/threads/QueryThreadsGetCount.cpp
-        queries/notes/QueryNotesGet.cpp
-        queries/notes/QueryNotesGetByText.cpp
-        queries/notes/QueryNoteStore.cpp
-        queries/notes/QueryNoteRemove.cpp
-        queries/calllog/QueryCalllogSetAllRead.cpp
-        queries/calllog/QueryCalllogGet.cpp
-        queries/calllog/QueryCalllogGetCount.cpp
-        queries/calllog/QueryCalllogRemove.cpp
-        queries/calllog/QueryCalllogGetByContactID.cpp
-        queries/notifications/QueryNotificationsGet.cpp
-        queries/notifications/QueryNotificationsIncrement.cpp
-        queries/notifications/QueryNotificationsMultipleIncrement.cpp
-        queries/notifications/QueryNotificationsClear.cpp
-        queries/notifications/QueryNotificationsGetAll.cpp
-        queries/phonebook/QueryContactGet.cpp
-        queries/phonebook/QueryContactGetByID.cpp
-        queries/phonebook/QueryContactAdd.cpp
-        queries/phonebook/QueryContactUpdate.cpp
-        queries/phonebook/QueryContactRemove.cpp
-        queries/phonebook/QueryNumberGetByID.cpp
-        queries/phonebook/QueryMergeContactsList.cpp
-        queries/phonebook/QueryCheckContactsListDuplicates.cpp
         queries/alarms/QueryAlarmsAdd.cpp
-        queries/alarms/QueryAlarmsRemove.cpp
         queries/alarms/QueryAlarmsEdit.cpp
         queries/alarms/QueryAlarmsGet.cpp
         queries/alarms/QueryAlarmsGetLimited.cpp
+        queries/alarms/QueryAlarmsRemove.cpp
         queries/alarms/QueryAlarmsTurnOffAll.cpp
+        queries/calllog/QueryCalllogGet.cpp
+        queries/calllog/QueryCalllogGetByContactID.cpp
+        queries/calllog/QueryCalllogGetCount.cpp
+        queries/calllog/QueryCalllogRemove.cpp
+        queries/calllog/QueryCalllogSetAllRead.cpp
+        queries/messages/sms/QuerySMSAdd.cpp
+        queries/messages/sms/QuerySMSGet.cpp
+        queries/messages/sms/QuerySMSGetByContactID.cpp
+        queries/messages/sms/QuerySMSGetByID.cpp
+        queries/messages/sms/QuerySMSGetByText.cpp
+        queries/messages/sms/QuerySMSGetByThreadID.cpp
+        queries/messages/sms/QuerySMSGetCount.cpp
+        queries/messages/sms/QuerySMSGetCountByThreadID.cpp
+        queries/messages/sms/QuerySMSGetForList.cpp
+        queries/messages/sms/QuerySMSGetLastByThreadID.cpp
+        queries/messages/sms/QuerySMSRemove.cpp
+        queries/messages/sms/QuerySMSSearchByType.cpp
+        queries/messages/sms/QuerySMSUpdate.cpp
+        queries/messages/templates/QuerySMSTemplateAdd.cpp
+        queries/messages/templates/QuerySMSTemplateGet.cpp
+        queries/messages/templates/QuerySMSTemplateGetByID.cpp
+        queries/messages/templates/QuerySMSTemplateGetCount.cpp
+        queries/messages/templates/QuerySMSTemplateGetForList.cpp
+        queries/messages/templates/QuerySMSTemplateRemove.cpp
+        queries/messages/templates/QuerySMSTemplateUpdate.cpp
+        queries/messages/threads/QueryThreadGetByContactID.cpp
+        queries/messages/threads/QueryThreadGetByID.cpp
+        queries/messages/threads/QueryThreadGetByNumber.cpp
+        queries/messages/threads/QueryThreadMarkAsRead.cpp
+        queries/messages/threads/QueryThreadRemove.cpp
+        queries/messages/threads/QueryThreadsGet.cpp
+        queries/messages/threads/QueryThreadsGetCount.cpp
+        queries/messages/threads/QueryThreadsGetForList.cpp
+        queries/messages/threads/QueryThreadsSearchForList.cpp
+        queries/multimedia_files/QueryMultimediaFilesAdd.cpp
+        queries/multimedia_files/QueryMultimediaFilesEdit.cpp
+        queries/multimedia_files/QueryMultimediaFilesGet.cpp
+        queries/multimedia_files/QueryMultimediaFilesGetLimited.cpp
+        queries/multimedia_files/QueryMultimediaFilesRemove.cpp
+        queries/multimedia_files/QueryMultimediaFilesCount.cpp
+        queries/notes/QueryNoteRemove.cpp
+        queries/notes/QueryNotesGet.cpp
+        queries/notes/QueryNotesGetByText.cpp
+        queries/notes/QueryNoteStore.cpp
+        queries/notifications/QueryNotificationsClear.cpp
+        queries/notifications/QueryNotificationsGet.cpp
+        queries/notifications/QueryNotificationsGetAll.cpp
+        queries/notifications/QueryNotificationsIncrement.cpp
+        queries/notifications/QueryNotificationsMultipleIncrement.cpp
+        queries/phonebook/QueryCheckContactsListDuplicates.cpp
+        queries/phonebook/QueryContactAdd.cpp
+        queries/phonebook/QueryContactGet.cpp
+        queries/phonebook/QueryContactGetByID.cpp
+        queries/phonebook/QueryContactRemove.cpp
+        queries/phonebook/QueryContactUpdate.cpp
+        queries/phonebook/QueryMergeContactsList.cpp
+        queries/phonebook/QueryNumberGetByID.cpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
