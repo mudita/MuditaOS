@@ -21,6 +21,7 @@ namespace app::home_screen
         virtual bool handleInputEvent(const gui::InputEvent &inputEvent) = 0;
         virtual bool handleTimerEvent()                                  = 0;
         virtual bool handleTimeUpdateEvent()                             = 0;
+        virtual bool handleAlarmRingingEvent()                           = 0;
     };
 
     class StateController : public AbstractController
@@ -35,6 +36,7 @@ namespace app::home_screen
         bool handleInputEvent(const gui::InputEvent &inputEvent) override;
         bool handleTimerEvent() override;
         bool handleTimeUpdateEvent() override;
+        bool handleAlarmRingingEvent() override;
 
       private:
         class Impl;
