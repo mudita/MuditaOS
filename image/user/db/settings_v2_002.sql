@@ -31,7 +31,7 @@ INSERT OR IGNORE INTO settings_tab (path, value) VALUES
     ('\ServiceBluetooth\\bt_device_name', 'PurePhone'),
     ('\ServiceBluetooth\\bt_bonded_devices', ''),
     ('battery_critical_level', '10'),
-    ('cl_offline_mode', '0'),
+    ('cl_offline_mode', '1'),
     ('cl_current_uid', '0'),
     ('off_connection_frequency', '0'),
     ('off_notifications_when_locked', '0'),
