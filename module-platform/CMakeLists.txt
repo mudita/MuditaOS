@@ -14,6 +14,7 @@ target_sources(
 
     PUBLIC
         include/Platform.hpp
+        CommonPlatform.cpp
 )
 
 target_link_libraries(
@@ -24,6 +25,7 @@ target_link_libraries(
 
     PRIVATE
         module-bsp
+        purefs-paths
 )
 
 add_subdirectory(${PROJECT_TARGET_NAME})
