@@ -7,7 +7,6 @@
 
 #include <bsp/bsp.hpp>
 #include <purefs/vfs_subsystem.hpp>
-
 #include <exception>
 
 using platform::rt1051::BlockDeviceFactory;
@@ -28,6 +27,7 @@ RT1051Platform::~RT1051Platform()
 void RT1051Platform::init()
 {
     initFilesystem();
+    ::platform::Platform::initCommonUserFolders();
 }
 
 void RT1051Platform::initFilesystem()

@@ -14,6 +14,8 @@ namespace
     constexpr inline auto PATH_TMP      = "tmp";
     constexpr inline auto PATH_BACKUP   = "backup";
     constexpr inline auto PATH_FACTORY  = "factory";
+    constexpr inline auto PATH_LOGS        = "logs";
+    constexpr inline auto PATH_CRASH_DUMPS = "crash_dumps";
     constexpr inline auto eMMC_disk     = PATH_SYS;
 } // namespace
 
@@ -69,6 +71,16 @@ namespace purefs
         std::filesystem::path getFactoryOSPath() noexcept
         {
             return std::filesystem::path{eMMC_disk} / PATH_FACTORY;
+        }
+
+        std::filesystem::path getLogsPath() noexcept
+        {
+            return getUserDiskPath() / PATH_LOGS;
+        }
+
+        std::filesystem::path getCrashDumpsPath() noexcept
+        {
+            return getUserDiskPath() / PATH_CRASH_DUMPS;
         }
     } // namespace dir
 } // namespace purefs

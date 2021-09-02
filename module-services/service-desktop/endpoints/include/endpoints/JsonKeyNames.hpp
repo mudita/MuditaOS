@@ -46,6 +46,8 @@ namespace sdesktop::endpoints::json
     inline constexpr auto reason              = "reason";
     inline constexpr auto serialNumber        = "serialNumber";
     inline constexpr auto caseColour          = "caseColour";
+    inline constexpr auto fileList            = "fileList";
+    inline constexpr auto files               = "files";
 
     namespace filesystem
     {
