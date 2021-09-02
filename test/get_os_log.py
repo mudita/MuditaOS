@@ -9,7 +9,8 @@ import atexit
 from harness.harness import Harness
 from harness.interface.error import TestError, Error
 from harness.api.developermode import PhoneModeLock
-from harness.api.filesystem import get_log_file
+from harness.api.filesystem import get_log_file, get_log_file_with_path
+from harness.api.device_info import *
 
 
 def set_passcode(harness: Harness, flag: bool):
@@ -18,6 +19,18 @@ def set_passcode(harness: Harness, flag: bool):
     '''
     PhoneModeLock(flag).run(harness)
 
+def get_log_files(harness: Harness, fileList: DiagnosticsFileList, log_save_dir: str):
+    '''
+    Get list of log files and get them one by one
+    '''
+    ret = GetDiagnosticFilesList(fileList).run(harness)
+    if not ret.files:
+        print("No files to download")
+        return
+
+    for diag_file in ret.files:
+        print(f'Downloading {diag_file} file:')
+        get_log_file_with_path(harness, diag_file, log_save_dir)
 
 def main():
     if len(sys.argv) == 1:
@@ -25,17 +38,18 @@ def main():
             f'Please pass log storage directory as the parameter: \'python {sys.argv[0]} <log dir>\' ')
         raise TestError(Error.OTHER_ERROR)
 
-    log_dir = str(sys.argv[1])
+    log_save_dir = str(sys.argv[1])
 
-    if (not os.path.exists(log_dir)):
-        print(f'Log storage directory {log_dir} not found')
+    if (not os.path.exists(log_save_dir)):
+        print(f'Log storage directory {log_save_dir} not found')
         raise TestError(Error.OTHER_ERROR)
 
     harness = Harness.from_detect()
 
     atexit.register(set_passcode, harness, True)
     set_passcode(harness, False)
-    get_log_file(harness, log_dir)
+    get_log_files(harness, DiagnosticsFileList.LOGS, log_save_dir)
+    get_log_files(harness, DiagnosticsFileList.CRASH_DUMPS, log_save_dir)
     exit(0)
 
 

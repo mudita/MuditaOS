@@ -6,20 +6,23 @@
 #include <log/log.hpp>
 #include <fcntl.h>
 #include "purefs/vfs_subsystem.hpp"
+#include <purefs/filesystem_paths.hpp>
 
 namespace crashdump
 {
     void CrashDumpWriterVFS::openDump()
     {
-        std::array<char, 64> crashDumpFileName;
+        std::array<char, 64> crashDumpFileName{0};
         formatCrashDumpFileName(crashDumpFileName);
 
+        const auto crashDumpFilePath = purefs::dir::getCrashDumpsPath() / crashDumpFileName.data();
+
         vfs    = purefs::subsystem::vfs_core();
-        dumpFd = vfs->open(crashDumpFileName.data(), O_WRONLY | O_CREAT | O_TRUNC, 0666);
+        dumpFd = vfs->open(crashDumpFilePath.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0666);
 
         if (dumpFd < 0) {
             LOG_FATAL("Failed to open crash dump file [%s]. Won't be able to save crash info.",
-                      crashDumpFileName.data());
+                      crashDumpFilePath.c_str());
         }
     }
 

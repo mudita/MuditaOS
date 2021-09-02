@@ -29,7 +29,7 @@ def test_get_not_existing_file(harness):
 
     fileName = "Unknown.file"
     with pytest.raises(TransactionError, match=r".*" + str(Status.NotFound.value) + ".*"):
-        get_file(harness, fileName, "./", "/sys/user/")
+        get_file(harness, fileName, "./", "/sys/user/logs/")
 
 
 @pytest.mark.service_desktop_test
@@ -45,7 +45,7 @@ def test_get_invalid_chunks(harness):
        - rxID != current rxID transfer
     """
     fileName = "MuditaOS.log"
-    ret = FsInitGet("/sys/user/", fileName).run(harness)
+    ret = FsInitGet("/sys/user/logs/", fileName).run(harness)
 
     assert ret.fileSize != 0
 
@@ -73,4 +73,4 @@ def test_get_file(harness):
     Get file MuditaOS.log file - whole transfer
     """
 
-    get_file(harness, "MuditaOS.log", "./")
+    get_file(harness, "MuditaOS.log", "./", "/sys/user/logs/")

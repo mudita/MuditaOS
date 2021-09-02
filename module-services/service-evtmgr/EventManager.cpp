@@ -296,8 +296,7 @@ void EventManagerCommon::handleKeyEvent(sys::Message *msg)
 
 int EventManagerCommon::dumpLogsToFile()
 {
-    EventManagerSentinel dumpSentinel(cpuSentinel, bsp::CpuFrequencyHz::Level_3);
-    const auto logPath = purefs::dir::getUserDiskPath() / LOG_FILE_NAME;
+    const auto logPath = purefs::dir::getLogsPath() / LOG_FILE_NAME;
     const auto ts      = cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks());
 
     LOG_DEBUG("Log flush timestamp: %d", static_cast<unsigned>(ts));
