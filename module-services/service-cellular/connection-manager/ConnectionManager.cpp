@@ -8,8 +8,10 @@
 auto ConnectionManager::onPhoneModeChange(sys::phone_modes::PhoneMode mode) -> bool
 {
     if (mode == sys::phone_modes::PhoneMode::Offline) {
+        forceDismissCallsFlag = true;
         return handleModeChangeToCommonOffline();
     }
+    forceDismissCallsFlag = false;
     return handleModeChangeToConnected();
 }
 
@@ -104,4 +106,9 @@ auto ConnectionManager::handleModeChangeToConnected() -> bool
         cellular->connectToNetwork();
     }
     return true;
+}
+
+auto ConnectionManager::forceDismissCalls() -> bool
+{
+    return forceDismissCallsFlag;
 }
