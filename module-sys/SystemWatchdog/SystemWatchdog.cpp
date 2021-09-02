@@ -12,7 +12,7 @@ namespace sys
 {
     using namespace cpp_freertos;
 
-    static constexpr uint16_t stackDepthWords = 64;
+    static constexpr uint16_t stackDepthWords = 256;
 
     SystemWatchdog::SystemWatchdog()
         : Thread(threadName, stackDepthWords, static_cast<UBaseType_t>(ServicePriority::High))
