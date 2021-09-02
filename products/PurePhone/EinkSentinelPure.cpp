@@ -10,7 +10,7 @@ namespace service::eink
 {
     namespace
     {
-        constexpr auto RedrawLockedEinkCpuFrequency   = bsp::CpuFrequencyHz::Level_3;
+        constexpr auto RedrawLockedEinkCpuFrequency   = bsp::CpuFrequencyHz::Level_4;
         constexpr auto RedrawUnlockedEinkCpuFrequency = bsp::CpuFrequencyHz::Level_6;
     } // namespace
 
