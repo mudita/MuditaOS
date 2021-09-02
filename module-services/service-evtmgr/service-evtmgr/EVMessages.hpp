@@ -107,9 +107,6 @@ namespace sevm
     class ToggleTorchColorMessage : public sys::DataMessage
     {};
 
-    class RequestPhoneModeForceUpdate : public sys::DataMessage
-    {};
-
     class KeypadBacklightMessage : public sys::DataMessage
     {
       public:
@@ -136,6 +133,20 @@ namespace sevm
 
         bsp::vibrator::Action action;
         std::chrono::milliseconds repetitionTime;
+    };
+
+    class FlushLogsRequest : public sys::DataMessage
+    {};
+
+    class FlushLogsResponse : public sys::ResponseMessage
+    {
+      public:
+        FlushLogsResponse(bool retCode, int retData = 0)
+            : sys::ResponseMessage(sys::ReturnCodes::Success, MessageType::MessageTypeUninitialized), retCode(retCode),
+              data(retData){};
+
+        const bool retCode{};
+        const int data{};
     };
 
 } /* namespace sevm*/

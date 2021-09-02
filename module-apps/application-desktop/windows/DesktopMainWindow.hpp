@@ -3,12 +3,12 @@
 
 #pragma once
 
-#include <application-desktop/models/ActiveNotificationsModel.hpp>
+#include "ActiveNotificationsModel.hpp"
 
 #include <AppWindow.hpp>
 #include <gui/widgets/Label.hpp>
-#include <Translator.hpp>
 #include <ListView.hpp>
+#include <Translator.hpp>
 
 namespace app
 {
@@ -53,8 +53,6 @@ namespace gui
         bool resolveDialAction(const std::string &number);
         bool showInformationPopup(std::function<bool()> action, const std::string &notification);
         void invalidate() noexcept;
-        std::string osUpdateVer;
-        std::string osCurrentVer;
 
         gui::KeyInputMappedTranslation translator;
     };

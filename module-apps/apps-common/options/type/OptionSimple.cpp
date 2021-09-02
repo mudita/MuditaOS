@@ -26,7 +26,7 @@ namespace gui::option
 
         auto optionText = new TextFixedSize(optionBodyHBox, 0, 0, 0, 0);
         optionText->setMargins(Margins(window::option_left_margin, 0, 0, 0));
-        optionText->setUnderline(false);
+        optionText->drawUnderline(false);
         optionText->setAlignment(gui::Alignment::Vertical::Center);
         optionText->setMaximumSize(style::window::default_body_width, style::window::label::big_h);
         optionText->setFont(style::window::font::big);
@@ -41,8 +41,7 @@ namespace gui::option
         optionItem->activatedCallback = activatedCallback;
 
         if (arrow == Arrow::Enabled) {
-            auto arrowImage = new gui::Image(optionBodyHBox, 0, 0, 0, 0, "right_label_arrow");
-            arrowImage->setMargins(Margins(0, 0, window::option_right_margin, 0));
+            new gui::Image(optionBodyHBox, 0, 0, 0, 0, "arrow_right_empty_32px_W_G");
         }
 
         return optionItem;

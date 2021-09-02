@@ -18,18 +18,20 @@ target_sources(time
         time/TimeRangeParser.cpp
         time/TimeZone.cpp
         time/time_conversion_factory.cpp
+
+        time/dateCommon.hpp
 )
 
 target_include_directories(time PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
 
 target_link_libraries(time 
     PRIVATE 
-        module-utils
         time-constants
         utz::utz
     PUBLIC
         i18n
         log
+        module-utils
         utf8
 )
 

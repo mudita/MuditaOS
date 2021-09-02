@@ -801,7 +801,7 @@ bool CellularMux::searchATCommandResponse(const std::vector<std::string> &respon
         resp.append(s);
     }
 
-    LOG_CUSTOM(level, "Invalid response: %s", resp.c_str());
+    LOG_SENSITIVE(level, "Invalid response: %s", resp.c_str());
     // numberOfExpectedTokens == 0, means do not validate number of tokens
     LOG_CUSTOM(level,
                " - Number of tokens %u, number of expected tokens %u",

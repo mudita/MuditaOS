@@ -116,6 +116,7 @@ namespace app
         std::string window;
         std::string senderWindow;
         gui::ShowMode command;
+        SwitchReason reason;
         std::unique_ptr<gui::SwitchData> data;
 
       public:
@@ -124,9 +125,10 @@ namespace app
         AppSwitchWindowMessage(const std::string &window,
                                const std::string senderWindow,
                                std::unique_ptr<gui::SwitchData> data,
-                               const gui::ShowMode command = gui::ShowMode::GUI_SHOW_INIT)
+                               gui::ShowMode command = gui::ShowMode::GUI_SHOW_INIT,
+                               SwitchReason reason   = SwitchReason::SwitchRequest)
             : AppMessage(MessageType::AppSwitchWindow), window{window},
-              senderWindow{senderWindow}, command{command}, data{std::move(data)} {};
+              senderWindow{senderWindow}, command{command}, reason{reason}, data{std::move(data)} {};
         virtual ~AppSwitchWindowMessage() = default;
 
         const std::string &getWindowName() const
@@ -141,6 +143,10 @@ namespace app
         {
             return command;
         };
+        [[nodiscard]] SwitchReason getReason() const noexcept
+        {
+            return reason;
+        }
         std::unique_ptr<gui::SwitchData> &getData()
         {
             return data;
@@ -204,8 +210,8 @@ namespace app
             std::stringstream ss;
             ss << "{ ";
             ss << "state:   " << c_str(event.getState()) << ", ";
-            ss << "RawKey:  " << c_str(rawKey.key_code) << "}";
-            ss << "t0: " << rawKey.time_press << ", t1: " << rawKey.time_release;
+            ss << "RawKey:  " << c_str(rawKey.keyCode) << "}";
+            ss << "t0: " << rawKey.timePress << ", t1: " << rawKey.timeRelease;
             ss << " }";
             return ss.str().c_str();
         }

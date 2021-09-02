@@ -6,22 +6,10 @@
 #include "Profile.hpp"
 #include <service-bluetooth/BluetoothMessage.hpp>
 #include <btstack_run_loop.h>
+#include <module-bluetooth/Bluetooth/interface/profiles/PhoneInterface.hpp>
 
 namespace bluetooth
 {
-    class CellularInterface
-    {
-      public:
-        virtual ~CellularInterface()                           = default;
-        virtual bool answerIncomingCall(sys::Service *service) = 0;
-        virtual bool hangupCall(sys::Service *service)         = 0;
-    };
-    class CellularInterfaceImpl : public CellularInterface
-    {
-      public:
-        bool answerIncomingCall(sys::Service *service) override;
-        bool hangupCall(sys::Service *service) override;
-    };
     class HSP : public Profile
     {
         static constexpr auto CLASS_OF_DEVICE = 0x400204;

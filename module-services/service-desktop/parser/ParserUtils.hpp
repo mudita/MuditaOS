@@ -79,44 +79,46 @@ namespace parserFSM
 
     namespace json
     {
-        inline constexpr auto batteryLevel     = "batteryLevel";
-        inline constexpr auto batteryState     = "batteryState";
-        inline constexpr auto selectedSim      = "selectedSim";
-        inline constexpr auto sim              = "sim";
-        inline constexpr auto trayState        = "trayState";
-        inline constexpr auto signalStrength   = "signalStrength";
-        inline constexpr auto fsTotal          = "fsTotal";
-        inline constexpr auto fsFreePercent    = "fsFreePercent";
-        inline constexpr auto fsFree           = "fsFree";
-        inline constexpr auto gitRevision      = "gitRevision";
-        inline constexpr auto gitBranch        = "gitBranch";
-        inline constexpr auto gitTag           = "gitTag";
-        inline constexpr auto currentRTCTime   = "currentRTCTime";
-        inline constexpr auto updateReady      = "updateReady";
-        inline constexpr auto updateFileList   = "updateFileList";
-        inline constexpr auto factoryRequest   = "factoryRequest";
-        inline constexpr auto networkStatus    = "networkStatus";
-        inline constexpr auto accessTechnology = "accessTechnology";
-        inline constexpr auto fileName         = "fileName";
-        inline constexpr auto fileSize         = "fileSize";
-        inline constexpr auto fileCrc32        = "fileCrc32";
-        inline constexpr auto update           = "update";
-        inline constexpr auto updateInfo       = "updateInfo";
-        inline constexpr auto updateError      = "updateError";
-        inline constexpr auto errorCode        = "errorCode";
-        inline constexpr auto statusCode       = "statusCode";
-        inline constexpr auto updateHistory    = "updateHistory";
-        inline constexpr auto versionString    = "string";
-        inline constexpr auto fileExists       = "fileExists";
-        inline constexpr auto version          = "version";
-        inline constexpr auto task             = "task";
-        inline constexpr auto state            = "state";
-        inline constexpr auto success          = "success";
-        inline constexpr auto request          = "request";
-        inline constexpr auto finished         = "finished";
-        inline constexpr auto pending          = "pending";
-        inline constexpr auto location         = "location";
-        inline constexpr auto reason           = "reason";
+        inline constexpr auto batteryLevel        = "batteryLevel";
+        inline constexpr auto batteryState        = "batteryState";
+        inline constexpr auto selectedSim         = "selectedSim";
+        inline constexpr auto sim                 = "sim";
+        inline constexpr auto trayState           = "trayState";
+        inline constexpr auto signalStrength      = "signalStrength";
+        inline constexpr auto fsTotal             = "fsTotal";
+        inline constexpr auto fsFreePercent       = "fsFreePercent";
+        inline constexpr auto fsFree              = "fsFree";
+        inline constexpr auto gitRevision         = "gitRevision";
+        inline constexpr auto gitBranch           = "gitBranch";
+        inline constexpr auto gitTag              = "gitTag";
+        inline constexpr auto currentRTCTime      = "currentRTCTime";
+        inline constexpr auto updateReady         = "updateReady";
+        inline constexpr auto updateFileList      = "updateFileList";
+        inline constexpr auto factoryRequest      = "factoryRequest";
+        inline constexpr auto networkStatus       = "networkStatus";
+        inline constexpr auto networkOperatorName = "networkOperatorName";
+        inline constexpr auto accessTechnology    = "accessTechnology";
+        inline constexpr auto fileName            = "fileName";
+        inline constexpr auto fileSize            = "fileSize";
+        inline constexpr auto fileCrc32           = "fileCrc32";
+        inline constexpr auto update              = "update";
+        inline constexpr auto updateInfo          = "updateInfo";
+        inline constexpr auto updateError         = "updateError";
+        inline constexpr auto errorCode           = "errorCode";
+        inline constexpr auto statusCode          = "statusCode";
+        inline constexpr auto updateHistory       = "updateHistory";
+        inline constexpr auto versionString       = "string";
+        inline constexpr auto fileExists          = "fileExists";
+        inline constexpr auto version             = "version";
+        inline constexpr auto task                = "task";
+        inline constexpr auto state               = "state";
+        inline constexpr auto success             = "success";
+        inline constexpr auto request             = "request";
+        inline constexpr auto finished            = "finished";
+        inline constexpr auto pending             = "pending";
+        inline constexpr auto location            = "location";
+        inline constexpr auto reason              = "reason";
+        inline constexpr auto serialNumber        = "serialNumber";
 
         namespace filesystem
         {
@@ -139,7 +141,7 @@ namespace parserFSM
             {
                 inline constexpr auto fileDoesNotExist = "file does not exist";
             }
-        }     // namespace filesystem
+        } // namespace filesystem
 
         namespace updateprocess
         {
@@ -185,10 +187,10 @@ namespace parserFSM
 
         namespace usb
         {
-            inline constexpr auto config   = "config";
-            inline constexpr auto locked   = "locked";
-            inline constexpr auto unlocked = "unlocked";
-            inline constexpr auto security = "usbSecurity";
+            inline constexpr auto config        = "config";
+            inline constexpr auto locked        = "locked";
+            inline constexpr auto unlocked      = "unlocked";
+            inline constexpr auto security      = "usbSecurity";
             inline constexpr auto phoneLockCode = "phoneLockCode";
         } // namespace usb
 

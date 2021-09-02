@@ -111,6 +111,7 @@ namespace gui
         appConfiguration.enable(status_bar::Indicator::Battery);
         appConfiguration.enable(status_bar::Indicator::Signal);
         appConfiguration.enable(status_bar::Indicator::SimCard);
+        appConfiguration.enable(status_bar::Indicator::Bluetooth);
         return appConfiguration;
     }
 
@@ -183,8 +184,8 @@ namespace gui
         else if (token == Token::Attempts) {
             return "$ATTEMPTS";
         }
-        else if (token == Token::Mins) {
-            return "$MINUTES";
+        else if (token == Token::Time) {
+            return "$TIME";
         }
         else if (token == Token::CmeCode) {
             return "$CMECODE";
@@ -203,7 +204,7 @@ namespace gui
             lockBox->setVisibleStateInputInvalid(LockBox::InputErrorType::InvalidInput, lock->getAttemptsLeft());
             break;
         case locks::Lock::LockState::Blocked:
-            lockBox->setVisibleStateBlocked();
+            lockBox->setVisibleStateBlocked(lock->getNextUnlockAttemptFormattedTime());
             break;
         case locks::Lock::LockState::NewInputRequired:
             lockBox->setVisibleStateInputRequired(LockBox::InputActionType::ProvideNewInput);

@@ -94,10 +94,8 @@ class ServiceDesktop : public sys::Service
     sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override;
     sys::MessagePointer DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp) override;
 
-    std::unique_ptr<UpdateMuditaOS> updateOS;
     std::unique_ptr<WorkerDesktop> desktopWorker;
 
-    void storeHistory(const std::string &historyValue);
     void prepareBackupData();
     void prepareRestoreData(const std::filesystem::path &restoreLocation);
     const BackupRestoreStatus getBackupRestoreStatus()
@@ -109,12 +107,16 @@ class ServiceDesktop : public sys::Service
         return usbSecurityModel.get();
     }
 
-  private:
+    auto requestLogsFlush() -> void;
+
     auto getSerialNumber() const -> std::string;
+
+  private:
     std::unique_ptr<sdesktop::USBSecurityModel> usbSecurityModel;
     std::unique_ptr<settings::Settings> settings;
-    sys::TimerHandle transferTimer;
     std::unique_ptr<sdesktop::bluetooth::BluetoothMessagesHandler> btMsgHandler;
+
+    static constexpr unsigned int DefaultLogFlushTimeoutInMs = 1000U;
 };
 
 namespace sys

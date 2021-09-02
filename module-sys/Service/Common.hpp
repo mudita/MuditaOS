@@ -24,6 +24,8 @@ namespace sys
         ServiceEvtmgrNotifications,
         PhoneModeChanges,
         PhoneLockChanges,
+        AlarmChanges,
+        BluetoothModeChanges
     };
 
     enum class ServicePriority
@@ -48,6 +50,14 @@ namespace sys
         Reboot,
         SystemBrownout,
         LowBattery
+    };
+
+    // Updater reason code
+    enum class UpdateReason
+    {
+        Update,
+        Recovery,
+        FactoryReset
     };
 
 } // namespace sys
@@ -111,8 +121,12 @@ inline const char *c_str(sys::BusChannel channel)
         return "ServiceEvtmgrNotifications";
     case sys::BusChannel::PhoneModeChanges:
         return "PhoneModeChanges";
+    case sys::BusChannel::BluetoothModeChanges:
+        return "BluetoothModeChanges";
     case sys::BusChannel::PhoneLockChanges:
         return "PhoneLockChanges";
+    case sys::BusChannel::AlarmChanges:
+        return "AlarmChanges";
     }
     return "";
 }

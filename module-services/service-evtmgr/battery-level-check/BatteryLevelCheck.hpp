@@ -4,7 +4,7 @@
 #pragma once
 
 #include <Service/Service.hpp>
-#include <service-db/service-db/Settings.hpp>
+#include <service-db/Settings.hpp>
 
 namespace sys
 {

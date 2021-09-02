@@ -1,29 +1,41 @@
 {
-	"git":
-	{
-		"git_branch": "@GIT_BRANCH@",
-		"git_commit": "@GIT_REV@",
-		"git_tag": "@GIT_TAG@"
-	},
-	"misc":
-	{
-		"codename": "@VERSION_CODENAME@",
-		"kernel": "@KERNEL_VERSION@",
-		"buildon": "@BUILD_HOST@",
-		"builddate": "@BUILD_DATE@",
-		"builduser": "@BUILD_USER@"
-	},
-	"version":
-	{
-		"major": "@CMAKE_PROJECT_VERSION_MAJOR@",
-		"minor": "@CMAKE_PROJECT_VERSION_MINOR@",
-		"patch": "@CMAKE_PROJECT_VERSION_PATCH@",
-		"string": "@CMAKE_PROJECT_VERSION@"
-	},
-	"bootloader":
-	{
-		"included": "@BOOTLOADER_INCLUDED@",
-		"version": "@BOOTLOADER_VERSION@",
-		"filename": "@BOOTLOADER_FILENAME@"
-	}
+    "git":
+    {
+        "git_branch": "@GIT_BRANCH@",
+        "git_commit": "@GIT_REV@",
+        "git_tag": "@GIT_TAG@"
+    },
+    "misc":
+    {
+        "codename": "@VERSION_CODENAME@",
+        "kernel": "@KERNEL_VERSION@",
+        "buildon": "@BUILD_HOST@",
+        "builddate": "@BUILD_DATE@",
+        "builduser": "@BUILD_USER@"
+    },
+    "version":
+    {
+        "major": "@CMAKE_PROJECT_VERSION_MAJOR@",
+        "minor": "@CMAKE_PROJECT_VERSION_MINOR@",
+        "patch": "@CMAKE_PROJECT_VERSION_PATCH@",
+        "string": "@CMAKE_PROJECT_VERSION@"
+    },
+    "bootloader":
+    {
+        "version": "@BOOTLOADER_VERSION@",
+        "filename": "@BOOTLOADER_FILENAME@",
+        "md5sum": "@BOOTLOADER_MD5SUM@"
+    },
+    "boot":
+    {
+        "version": "@BOOT_VERSION@",
+        "filename": "@BOOT_FILENAME@",
+        "md5sum": "@BOOT_MD5SUM@"
+    },
+    "updater":
+    {
+        "version": "@UPDATER_VERSION@",
+        "filename": "@UPDATER_FILENAME@",
+        "md5sum": "@UPDATER_MD5SUM@"
+    }
 }

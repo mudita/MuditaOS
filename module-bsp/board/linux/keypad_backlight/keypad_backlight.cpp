@@ -2,9 +2,6 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "bsp/keypad_backlight/keypad_backlight.hpp"
-#include "bsp/BoardDefinitions.hpp"
-
-using namespace drivers;
 
 namespace bsp::keypad_backlight
 {

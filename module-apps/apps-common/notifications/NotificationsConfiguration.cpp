@@ -3,7 +3,7 @@
 
 #include "NotificationsConfiguration.hpp"
 #include <Utils.hpp>
-#include <agents/settings/SystemSettings.hpp>
+#include <service-db/agents/settings/SystemSettings.hpp>
 
 using namespace notifications;
 

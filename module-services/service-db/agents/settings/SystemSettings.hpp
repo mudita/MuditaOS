@@ -10,7 +10,10 @@ namespace settings
         constexpr inline auto activeSim                = "gs_active_sim";
         constexpr inline auto lockPassHash             = "gs_lock_pass_hash";
         constexpr inline auto lockScreenPasscodeIsOn   = "gs_lock_screen_passcode_is_on";
-        constexpr inline auto autoLockTimeInSec        = "gs_lock_time";
+        constexpr inline auto autoLockTimeInSec        = "gs_auto_lock_time";
+        constexpr inline auto unlockLockTime           = "gs_unlock_lock_time";
+        constexpr inline auto unlockAttemptLockTime    = "gs_unlock_attempt_lock_time";
+        constexpr inline auto noLockTimeAttemptsLeft   = "gs_no_lock_time_attempts_left";
         constexpr inline auto displayLanguage          = "gs_display_language";
         constexpr inline auto inputLanguage            = "gs_input_language";
         constexpr inline auto automaticDateAndTimeIsOn = "gs_automatic_date_and_time_is_on";
@@ -42,9 +45,10 @@ namespace settings
 
     namespace Cellular
     {
-        constexpr inline auto volte_on = "cl_volte_on";
-        constexpr inline auto apn_list = "cl_apn_list";
+        constexpr inline auto volte_on    = "cl_volte_on";
+        constexpr inline auto apn_list    = "cl_apn_list";
         constexpr inline auto offlineMode = "cl_offline_mode";
+        constexpr inline auto currentUID  = "cl_current_uid";
     } // namespace Cellular
 
     namespace Battery
@@ -63,4 +67,9 @@ namespace settings
     {
         constexpr inline auto state = "keypad_light_state";
     } // namespace KeypadLight
-}; // namespace settings
+
+    namespace Temperature
+    {
+        constexpr inline auto unit = "temperature_unit";
+    } // namespace Temperature
+};    // namespace settings

@@ -1,10 +1,11 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "ApplicationDesktop.hpp"
 #include "Reboot.hpp"
-#include "../ApplicationDesktop.hpp"
-#include <Style.hpp>
+
 #include <i18n/i18n.hpp>
+#include <Style.hpp>
 
 namespace gui
 {
@@ -32,8 +33,8 @@ namespace gui
                         style::window::default_left_margin,
                         text_y_offset,
                         style::window_width - style::window::default_left_margin * 2,
-                        text_height,
-                        utils::translate("phone_needs_rebooting"));
+                        text_height);
+        text->setText(utils::translate("phone_needs_rebooting"));
         text->setFilled(false);
         text->setBorderColor(gui::ColorFullBlack);
         text->setFont(style::header::font::title);

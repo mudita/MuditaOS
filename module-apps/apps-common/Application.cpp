@@ -22,7 +22,7 @@
 #include <service-evtmgr/BatteryMessages.hpp>
 #include <service-evtmgr/Constants.hpp>
 #include <service-evtmgr/EVMessages.hpp>
-#include <service-appmgr/service-appmgr/messages/DOMRequest.hpp>
+#include <service-appmgr/messages/DOMRequest.hpp>
 #include <service-appmgr/messages/UserPowerDownRequest.hpp>
 #include <service-appmgr/data/NotificationsChangedActionsParams.hpp>
 #include "service-gui/messages/DrawMessage.hpp" // for DrawMessage
@@ -36,6 +36,7 @@
 #include <WindowsFactory.hpp>
 #include <service-gui/Common.hpp>
 #include <module-utils/Utils.hpp>
+#include <service-db/Settings.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
 #include <service-audio/AudioServiceAPI.hpp> // for GetOutputVolume
 
@@ -55,6 +56,7 @@
 #include <popups/data/PopupData.hpp>
 #include <popups/data/PopupRequestParams.hpp>
 #include <popups/data/PhoneModeParams.hpp>
+#include <popups/data/BluetoothModeParams.hpp>
 #include <locks/data/LockData.hpp>
 
 namespace gui
@@ -98,7 +100,8 @@ namespace app
 
     Application::Application(std::string name,
                              std::string parent,
-                             sys::phone_modes::PhoneMode mode,
+                             sys::phone_modes::PhoneMode phoneMode,
+                             sys::bluetooth::BluetoothMode bluetoothMode,
                              StartInBackground startInBackground,
                              uint32_t stackDepth,
                              sys::ServicePriority priority)
@@ -106,8 +109,8 @@ namespace app
           default_window(gui::name::window::main_window), windowsStack(this),
           keyTranslator{std::make_unique<gui::KeyInputSimpleTranslation>()}, startInBackground{startInBackground},
           callbackStorage{std::make_unique<CallbackStorage>()}, statusBarManager{std::make_unique<StatusBarManager>()},
-          settings(std::make_unique<settings::Settings>()), phoneMode{mode}, phoneLockSubject(this),
-          lockPolicyHandler(this), simLockSubject(this)
+          settings(std::make_unique<settings::Settings>()), phoneMode{phoneMode}, bluetoothMode(bluetoothMode),
+          phoneLockSubject(this), lockPolicyHandler(this), simLockSubject(this)
     {
         statusBarManager->enableIndicators({gui::status_bar::Indicator::Time});
 
@@ -115,7 +118,7 @@ namespace app
 
         longPressTimer = sys::TimerFactory::createPeriodicTimer(this,
                                                                 "LongPress",
-                                                                std::chrono::milliseconds{key_timer_ms},
+                                                                std::chrono::milliseconds{keyTimerMs},
                                                                 [this](sys::Timer &) { longPressTimerCallback(); });
 
         connect(typeid(AppRefreshMessage),
@@ -131,7 +134,15 @@ namespace app
         addActionReceiver(app::manager::actions::PhoneModeChanged, [this](auto &&params) {
             if (params != nullptr) {
                 auto modeParams = static_cast<gui::PhoneModeParams *>(params.get());
-                phoneMode       = modeParams->getPhoneMode();
+                this->phoneMode = modeParams->getPhoneMode();
+            }
+            return actionHandled();
+        });
+        addActionReceiver(app::manager::actions::BluetoothModeChanged, [this](auto &&params) {
+            if (params != nullptr) {
+                auto modeParams     = static_cast<gui::BluetoothModeParams *>(params.get());
+                this->bluetoothMode = modeParams->getBluetoothMode();
+                refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
             }
             return actionHandled();
         });
@@ -174,21 +185,18 @@ namespace app
 
     void Application::longPressTimerCallback()
     {
-        // TODO if(check widget type long press trigger)
-        uint32_t time = xTaskGetTickCount();
-        if (keyTranslator->timeout(time)) {
-            // previous key press was over standard keypress timeout - send long press
-            gui::InputEvent iev = keyTranslator->translate(time);
+        const auto actualTimeStamp = xTaskGetTickCount();
+        if (keyTranslator->isKeyPressTimedOut(actualTimeStamp)) {
+            gui::InputEvent iev = keyTranslator->translate(actualTimeStamp);
             messageInputEventApplication(this, this->GetName(), iev);
-            // clean previous key
-            keyTranslator->prev_key_press = {};
+            keyTranslator->resetPreviousKeyPress();
             longPressTimer.stop();
         }
     }
 
     void Application::clearLongPressTimeout()
     {
-        keyTranslator->prev_key_timedout = false;
+        keyTranslator->setPreviousKeyTimedOut(false);
     }
 
     void Application::render(gui::RefreshModes mode)
@@ -202,6 +210,7 @@ namespace app
         if (state == State::ACTIVE_FORGROUND) {
             auto window = getCurrentWindow();
             window->updateBatteryStatus();
+            window->updateBluetooth(bluetoothMode);
             window->updateSim();
             window->updateSignalStrength();
             window->updateNetworkAccessTechnology();
@@ -234,7 +243,8 @@ namespace app
 
     void Application::switchWindow(const std::string &windowName,
                                    gui::ShowMode cmd,
-                                   std::unique_ptr<gui::SwitchData> data)
+                                   std::unique_ptr<gui::SwitchData> data,
+                                   SwitchReason reason)
     {
 
         std::string window;
@@ -247,14 +257,14 @@ namespace app
 
         // case to handle returning to previous application
         if (windowName.empty()) {
-            window = getCurrentWindow()->getName();
-            auto msg =
-                std::make_shared<AppSwitchWindowMessage>(window, getCurrentWindow()->getName(), std::move(data), cmd);
+            window   = getCurrentWindow()->getName();
+            auto msg = std::make_shared<AppSwitchWindowMessage>(
+                window, getCurrentWindow()->getName(), std::move(data), cmd, reason);
             bus.sendUnicast(msg, this->GetName());
         }
         else {
             auto msg = std::make_shared<AppSwitchWindowMessage>(
-                windowName, getCurrentWindow() ? getCurrentWindow()->getName() : "", std::move(data), cmd);
+                windowName, getCurrentWindow() ? getCurrentWindow()->getName() : "", std::move(data), cmd, reason);
             bus.sendUnicast(msg, this->GetName());
         }
     }
@@ -336,6 +346,20 @@ namespace app
             return handleAppFocusLost(msgl);
         }
         return sys::msgNotHandled();
+    }
+
+    sys::MessagePointer Application::handleAsyncResponse(sys::ResponseMessage *resp)
+    {
+        if (resp != nullptr) {
+            if (auto command = callbackStorage->getCallback(resp); command->execute()) {
+                refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+                checkBlockingRequests();
+            }
+            return std::make_shared<sys::ResponseMessage>();
+        }
+        else {
+            return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
+        }
     }
 
     sys::MessagePointer Application::handleSignalStrengthUpdate(sys::Message *msgl)
@@ -507,7 +531,10 @@ namespace app
             }
             if (!isCurrentWindow(msg->getWindowName())) {
                 if (!windowsStack.isEmpty()) {
-                    getCurrentWindow()->onClose();
+                    const auto closeReason = msg->getReason() == SwitchReason::PhoneLock
+                                                 ? gui::Window::CloseReason::PhoneLock
+                                                 : gui::Window::CloseReason::WindowSwitch;
+                    getCurrentWindow()->onClose(closeReason);
                 }
                 setActiveWindow(msg->getWindowName());
             }
@@ -515,7 +542,7 @@ namespace app
             getCurrentWindow()->handleSwitchData(switchData.get());
 
             auto ret = dynamic_cast<gui::SwitchSpecialChar *>(switchData.get());
-            if (ret != nullptr && switchData != nullptr) {
+            if (ret != nullptr && ret->type == gui::SwitchSpecialChar::Type::Response) {
                 auto text = dynamic_cast<gui::Text *>(getCurrentWindow()->getFocusItem());
                 if (text != nullptr) {
                     text->addText(ret->getDescription());
@@ -551,8 +578,30 @@ namespace app
     sys::MessagePointer Application::handleAppClose(sys::Message *msgl)
     {
         setState(State::DEACTIVATING);
-        app::manager::Controller::confirmClose(this);
-        return sys::msgHandled();
+
+        for (const auto &[windowName, window] : windowsStack) {
+            LOG_INFO("Closing a window: %s", windowName.c_str());
+            window->onClose(gui::Window::CloseReason::ApplicationClose);
+        }
+
+        if (callbackStorage->checkBlockingCloseRequests()) {
+            setState(State::FINALIZING_CLOSE);
+            app::manager::Controller::finalizingClose(this);
+            return sys::msgHandled();
+        }
+        else {
+            app::manager::Controller::confirmClose(this);
+            return sys::msgHandled();
+        }
+    }
+
+    void Application::checkBlockingRequests()
+    {
+        if (getState() == State::FINALIZING_CLOSE && !callbackStorage->checkBlockingCloseRequests()) {
+            LOG_INFO("Blocking requests done for [%s]. Closing application.", GetName().c_str());
+            setState(State::DEACTIVATING);
+            app::manager::Controller::confirmClose(this);
+        }
     }
 
     sys::MessagePointer Application::handleAppRebuild(sys::Message *msgl)
@@ -638,12 +687,7 @@ namespace app
     {
         settings->deinit();
         LOG_INFO("Closing an application: %s", GetName().c_str());
-
-        for (const auto &[windowName, window] : windowsStack) {
-            LOG_INFO("Closing a window: %s", windowName.c_str());
-            window->onClose();
-        }
-
+        LOG_INFO("Deleting windows");
         windowsStack.windows.clear();
         return sys::ReturnCodes::Success;
     }
@@ -812,6 +856,9 @@ namespace app
                     return std::make_unique<gui::SimNotReadyWindow>(app, window::sim_not_ready_window);
                 });
                 break;
+            case ID::AlarmActivated:
+                LOG_DEBUG("TODO");
+                break;
             }
         }
     }
@@ -829,6 +876,10 @@ namespace app
                      audio::str(volumeParams->getAudioContext().second).c_str(),
                      std::to_string(volumeParams->getVolume()).c_str());
             handleVolumeChanged(volumeParams->getVolume(), volumeParams->getAudioContext());
+        }
+        else if (id == ID::PhoneLock) {
+            switchWindow(
+                gui::popup::resolveWindowName(id), gui::ShowMode::GUI_SHOW_INIT, nullptr, SwitchReason::PhoneLock);
         }
         else if (id == ID::PhoneLockInput || id == ID::PhoneLockChangeInfo) {
             auto popupParams = static_cast<const gui::PhoneUnlockInputRequestParams *>(params);

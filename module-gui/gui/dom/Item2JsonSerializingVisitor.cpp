@@ -74,7 +74,7 @@ void Item2JsonSerializingVisitor::visit(gui::Window &item)
     if (itemName.empty()) {
         itemName = magic_enum::enum_name(visitor::Names::Window);
     }
-    sink.emplace(magic_enum::enum_name(visitor::Window::WindowName), std::string{item.getName()});
+    sink.emplace(magic_enum::enum_name(visitor::Window::WindowName), std::string{item.getUniqueName()});
     visit(static_cast<gui::Item &>(item));
 }
 

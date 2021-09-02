@@ -16,10 +16,14 @@ namespace app
         }
     }
 
-    void AsyncTask::execute(Application *application, AsyncCallbackReceiver::Ptr receiverObject)
+    void AsyncTask::execute(Application *application,
+                            AsyncCallbackReceiver::Ptr receiverObject,
+                            std::optional<std::function<bool(sys::ResponseMessage *)>> callback,
+                            ReceiverBehavior receiverBehavior)
     {
         const auto requestId = onExecute(application);
-        application->callbackStorage->registerCallback(requestId, receiverObject);
+        application->callbackStorage->registerCallback(
+            requestId, receiverObject, std::move(callback), receiverBehavior);
     }
 
     std::unique_ptr<AsyncQuery> AsyncQuery::createFromQuery(std::unique_ptr<db::Query> &&query,
@@ -48,6 +52,23 @@ namespace app
         return id;
     }
 
+    auto AsyncRequest::createFromMessage(std::unique_ptr<sys::DataMessage> &&message, std::string serviceName)
+        -> std::unique_ptr<AsyncRequest>
+    {
+        return std::make_unique<AsyncRequest>(std::move(message), serviceName);
+    }
+
+    AsyncRequest::AsyncRequest(std::unique_ptr<sys::DataMessage> &&message, std::string serviceName) noexcept
+        : message{std::move(message)}, serviceName{serviceName}
+    {}
+
+    auto AsyncRequest::onExecute(Application *application) -> RequestId
+    {
+        std::shared_ptr<sys::DataMessage> msg{std::move(message)};
+        application->bus.sendUnicast(msg, serviceName);
+        return msg->uniID;
+    }
+
     auto NullCallback::execute() -> bool
     {
         // Nothing to do.
@@ -64,5 +85,14 @@ namespace app
             return result->handle();
         }
         return false;
+    }
+
+    AsyncResponseCallback::AsyncResponseCallback(sys::ResponseMessage *response, CallbackFunction callbackFunction)
+        : response{response}, callbackFunction(callbackFunction)
+    {}
+
+    auto AsyncResponseCallback::execute() -> bool
+    {
+        return callbackFunction(response);
     }
 } // namespace app

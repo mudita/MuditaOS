@@ -24,7 +24,7 @@ namespace app::notes
         ~NoteEditWindow() noexcept override;
 
         void onBeforeShow(gui::ShowMode mode, gui::SwitchData *data) override;
-        void onClose() override;
+        void onClose(CloseReason reason) override;
         bool onInput(const gui::InputEvent &inputEvent) override;
 
         void rebuild() override;
@@ -32,6 +32,9 @@ namespace app::notes
         void destroyInterface() override;
 
       protected:
+        NoteEditWindow(app::Application *app,
+                       std::unique_ptr<NoteEditWindowContract::Presenter> &&windowPresenter,
+                       const std::string &windowName);
         virtual void onCharactersCountChanged(std::uint32_t count);
 
       private:

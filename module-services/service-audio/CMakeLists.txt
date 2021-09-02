@@ -1,26 +1,42 @@
-﻿project(service-audio)
-message( "${PROJECT_NAME}  ${CMAKE_CURRENT_LIST_DIR}" )
+﻿# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+# For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+add_library(service-audio STATIC)
 
-set(SOURCES
-    ServiceAudio.cpp
-    AudioServiceAPI.cpp
-)
-
-add_library(${PROJECT_NAME} STATIC ${SOURCES})
-
-target_link_libraries(${PROJECT_NAME}
-    service-bluetooth
-    service-db
-    module-bluetooth
-    module-audio
-    module-utils
-    module-services
-)
-
-
-target_include_directories(${PROJECT_NAME}
+target_include_directories(service-audio
+    PRIVATE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/service-audio>
     PUBLIC
-       ${CMAKE_CURRENT_LIST_DIR}
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
 
+target_sources(service-audio
+    PRIVATE
+        AudioServiceAPI.cpp
+        ServiceAudio.cpp
+    PUBLIC
+        include/service-audio/AudioMessage.hpp
+        include/service-audio/AudioServiceAPI.hpp
+        include/service-audio/ServiceAudio.hpp
+)
+
+option(ENABLE_PLAYBACK_AUTO_REPEAT "Enable Playback auto repeat" OFF)
+if(${ENABLE_PLAYBACK_AUTO_REPEAT})
+    target_compile_definitions(${PROJECT_NAME} PUBLIC ENABLE_PLAYBACK_AUTO_REPEAT=1)
+endif()
+
+target_link_libraries(service-audio
+    PRIVATE
+        log
+        module-bluetooth
+        module-utils
+        service-bluetooth
+        service-evtmgr
+    PUBLIC
+        apps-common
+        messagetype
+        module-audio
+        module-sys
+        service-appmgr
+        service-db
+)

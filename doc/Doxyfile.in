@@ -886,15 +886,11 @@ RECURSIVE              = YES
 # run.
 
 EXCLUDE                = @PROJECT_SOURCE_DIR@/module-bluetooth/lib \
-                         @PROJECT_SOURCE_DIR@/module-utils/tinyfsm \
-                         @PROJECT_SOURCE_DIR@/module-utils/segger \
-                         @PROJECT_SOURCE_DIR@/module-utils/sbini \
                          @PROJECT_SOURCE_DIR@/module-utils/test \
                          @PROJECT_SOURCE_DIR@/module-db/tests \
                          @PROJECT_SOURCE_DIR@/module-db/Database/sqlite3.c \
                          @PROJECT_SOURCE_DIR@/module-cellular/tests \
                          @PROJECT_SOURCE_DIR@/module-cellular/Modem/TS0710/tests \
-                         @PROJECT_SOURCE_DIR@/module-utils/test \
                          @PROJECT_SOURCE_DIR@/module-sys/tests \
                          @PROJECT_SOURCE_DIR@/module-bsp/tests \
                          @PROJECT_SOURCE_DIR@/module-audio/tests \

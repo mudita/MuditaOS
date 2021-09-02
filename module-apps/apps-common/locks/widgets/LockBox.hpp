@@ -4,6 +4,7 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 
 namespace gui
 {
@@ -23,13 +24,14 @@ namespace gui
             NewInputConfirmFailed,
         };
 
-        virtual void popChar(unsigned int charNum) = 0;
-        virtual void putChar(unsigned int charNum) = 0;
-        virtual void clear()                       = 0;
+        virtual void popChar(unsigned int charNum)    = 0;
+        virtual void putChar(unsigned int charNum)    = 0;
+        virtual void update(unsigned int inputFilled) = 0;
+        virtual void clear()                          = 0;
 
         virtual void setVisibleStateInputRequired(InputActionType type)                   = 0;
         virtual void setVisibleStateInputInvalid(InputErrorType type, unsigned int value) = 0;
-        virtual void setVisibleStateBlocked()                                             = 0;
+        virtual void setVisibleStateBlocked(const std::string &formattedTime)             = 0;
         virtual void setVisibleStateError(unsigned int errorCode)                         = 0;
 
         virtual void buildLockBox(unsigned int inputSize) = 0;

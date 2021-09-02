@@ -54,7 +54,7 @@ bool CalllogModel::updateRecords(std::vector<CalllogRecord> records)
     return true;
 }
 
-unsigned int CalllogModel::getMinimalItemHeight() const
+unsigned int CalllogModel::getMinimalItemSpaceRequired() const
 {
     return gui::clItemStyle::h;
 }
@@ -66,8 +66,8 @@ gui::ListItem *CalllogModel::getItem(gui::Order order)
         return nullptr;
     }
 
-    auto contact = DBServiceAPI::ContactGetByIDWithTemporary(application, call->getContactId());
-    call->name   = contact->front().getFormattedName();
+    auto contact = DBServiceAPI::MatchContactByPhoneNumber(application, call->phoneNumber);
+    call->name   = contact ? contact->getFormattedName() : UTF8(call->phoneNumber.getFormatted());
 
     auto item = new gui::CalllogItem(this);
 

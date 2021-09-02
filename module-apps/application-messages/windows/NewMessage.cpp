@@ -7,6 +7,7 @@
 #include "SMSdata.hpp"
 
 #include <application-phonebook/windows/PhonebookSearchResults.hpp>
+#include <Span.hpp>
 #include <BoxLayout.hpp>
 #include <i18n/i18n.hpp>
 #include <module-db/queries/messages/sms/QuerySMSGetLastByThreadID.hpp>
@@ -207,7 +208,7 @@ namespace gui
         recipientHBox->setPenWidth(style::window::default_border_rect_no_focus);
 
         recipient = new gui::Text(
-            recipientHBox, 0, 0, body->getWidth() - msgStyle::recipientImg::w, msgStyle::text::h, "", ExpandMode::None);
+            recipientHBox, 0, 0, body->getWidth() - msgStyle::recipientImg::w, msgStyle::text::h, ExpandMode::None);
         recipient->setEdges(gui::RectangleEdge::None);
         recipient->setInputMode(new InputMode({InputMode::phone}));
         recipient->setFont(style::window::font::mediumbold);
@@ -247,7 +248,7 @@ namespace gui
         labelMessage->setFont(style::window::font::small);
         labelMessage->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom));
 
-        message = new gui::Text(nullptr, 0, 0, body->getWidth(), msgStyle::text::h, "", ExpandMode::Up);
+        message = new gui::Text(nullptr, 0, 0, body->getWidth(), msgStyle::text::h, ExpandMode::Up);
         message->setMaximumSize(body->getWidth(), msgStyle::text::maxH);
         message->setTextLimitType(gui::TextLimitType::MaxSignsCount, msgConstants::maxConcatenatedLen);
         message->setEdges(gui::RectangleEdge::Bottom);
@@ -290,10 +291,16 @@ namespace gui
         setFocusItem(body);
     }
 
-    void NewMessageWindow::onClose()
+    void NewMessageWindow::onClose(CloseReason reason)
     {
         if (message->getText().empty()) {
             // Nothing to do if text is empty.
+            return;
+        }
+
+        if (reason == CloseReason::PhoneLock) {
+            memento->setState(message);
+            message->clear();
             return;
         }
         if (const auto handled = handleMessageText(); !handled) {
@@ -330,7 +337,7 @@ namespace gui
             }
             return addDraftToExistingThread(thread->ID, number, message->getText());
         });
-        task->execute(application, this);
+        task->execute(application, this, std::nullopt, app::ReceiverBehavior::WaitForResponseToClose);
         return true;
     }
 
@@ -351,7 +358,7 @@ namespace gui
             }
             return addDraftToExistingThread(thread.ID, number.getView(), message->getText());
         });
-        task->execute(application, this);
+        task->execute(application, this, std::nullopt, app::ReceiverBehavior::WaitForResponseToClose);
         return true;
     }
 
@@ -375,7 +382,7 @@ namespace gui
             storeMessageDraft(number, message->getText());
             return true;
         });
-        task->execute(application, this);
+        task->execute(application, this, std::nullopt, app::ReceiverBehavior::WaitForResponseToClose);
         return true;
     }
 

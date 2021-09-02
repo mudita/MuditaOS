@@ -37,7 +37,7 @@ namespace purefs::blkdev
         cpp_freertos::LockGuard _lck(*m_lock);
         const auto ret = m_dev_map.find(std::string(device_name));
         if (ret != std::end(m_dev_map)) {
-            LOG_ERROR("Disc: %s already registered.", std::string(device_name).c_str());
+            LOG_ERROR("Disc with same name already registered");
             return -EEXIST;
         }
         else {
@@ -62,7 +62,7 @@ namespace purefs::blkdev
         cpp_freertos::LockGuard _lck(*m_lock);
         auto it = m_dev_map.find(std::string(device_name));
         if (it == std::end(m_dev_map)) {
-            LOG_ERROR("Disc: %s doesn't exists in manager.", std::string(device_name).c_str());
+            LOG_ERROR("Disc with given name doesn't exists in manager");
             return -ENOENT;
         }
         auto ret = it->second->cleanup();
@@ -245,7 +245,7 @@ namespace purefs::blkdev
         for (const auto &disk : m_dev_map) {
             auto err = disk.second->pm_control(target_state);
             if (err) {
-                LOG_ERROR("Unable to change PM state for device %s errno: %i", disk.first.c_str(), err);
+                LOG_ERROR("Unable to change PM state for specified device. Errno: %i", err);
                 last_err = err;
             }
         }

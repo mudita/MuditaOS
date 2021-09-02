@@ -20,12 +20,14 @@
 #include <module-sys/SystemManager/messages/TetheringStateRequest.hpp>
 #include <module-sys/SystemManager/Constants.hpp>
 
+#include <service-db/agents/settings/SystemSettings.hpp>
 #include <service-db/DBServiceAPI.hpp>
 #include <service-desktop/parser/MessageHandler.hpp>
 #include <service-desktop/endpoints/developerMode/event/ATRequest.hpp>
-#include <service-appmgr/service-appmgr/Controller.hpp>
+#include <service-appmgr/Controller.hpp>
 
 #include <ctime>
+#include <locks/data/PhoneLockMessages.hpp>
 
 namespace parserFSM
 {
@@ -59,7 +61,7 @@ auto DeveloperModeHelper::processPut(Context &context) -> ProcessResult
         using namespace sdesktop::developerMode;
         auto cmd     = body[json::developerMode::AT].string_value();
         auto timeout = std::chrono::milliseconds(body[json::developerMode::timeout].int_value());
-        LOG_DEBUG("at request send >%s\n< with timeout >%d<", cmd.c_str(), int(timeout.count()));
+        LOG_DEBUG("at request sent with timeout >%d<", int(timeout.count()));
         auto event = std::make_unique<ATResponseEvent>(cmd, timeout);
         auto msg   = std::make_shared<DeveloperModeRequest>(std::move(event));
         code       = toCode(owner->bus.sendUnicast(msg, ServiceCellular::serviceName));
@@ -85,7 +87,7 @@ auto DeveloperModeHelper::processPut(Context &context) -> ProcessResult
         path.scope    = settings::SettingsScope::Global;
         auto msg      = std::make_shared<settings::Messages::SetVariable>(std::move(path), std::move(value));
         code          = owner->bus.sendUnicast(std::move(msg), service::name::db) ? http::Code::NoContent
-                                                                         : http::Code::InternalServerError;
+                                                                                  : http::Code::InternalServerError;
 
         return {sent::no, endpoint::ResponseContext{.status = code}};
     }
@@ -122,7 +124,7 @@ auto DeveloperModeHelper::processPut(Context &context) -> ProcessResult
         auto phoneLockState = body[json::developerMode::phoneLockCodeEnabled].bool_value();
         auto msg            = std::make_shared<locks::ExternalPhoneLockAvailabilityChange>(phoneLockState);
         code                = owner->bus.sendUnicast(std::move(msg), "ApplicationManager") ? http::Code::NoContent
-                                                                            : http::Code::InternalServerError;
+                                                                                           : http::Code::InternalServerError;
     }
     else if (auto switchData = body[json::developerMode::switchApplication].object_items(); !switchData.empty()) {
         auto msg = std::make_shared<app::manager::SwitchRequest>(
@@ -249,10 +251,9 @@ auto DeveloperModeHelper::getKeyCode(int val) noexcept -> bsp::KeyCodes
 
 bool DeveloperModeHelper::sendKeypress(bsp::KeyCodes keyCode, gui::InputEvent::State state)
 {
-    RawKey key{.state = RawKey::State::Released, .key_code = keyCode};
+    RawKey key{.state = RawKey::State::Released, .keyCode = keyCode};
 
     gui::InputEvent event(key, state, static_cast<gui::KeyCode>(keyCode));
-    LOG_INFO("Sending %s", event.str().c_str());
     auto message = std::make_shared<app::AppInputEventMessage>(event);
 
     return owner->bus.sendUnicast(std::move(message), service::name::evt_manager);

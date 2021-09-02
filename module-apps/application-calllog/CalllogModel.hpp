@@ -21,7 +21,7 @@ class CalllogModel : public app::DatabaseModel<CalllogRecord>,
     [[nodiscard]] bool updateRecords(std::vector<CalllogRecord> records) override;
     void requestRecords(uint32_t offset, uint32_t limit) override;
 
-    [[nodiscard]] unsigned int getMinimalItemHeight() const override;
+    [[nodiscard]] unsigned int getMinimalItemSpaceRequired() const override;
     [[nodiscard]] gui::ListItem *getItem(gui::Order order) override;
 
   private:

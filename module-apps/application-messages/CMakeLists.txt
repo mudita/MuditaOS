@@ -66,13 +66,6 @@ target_sources(application-messages
         include/application-messages/Constants.hpp
 )
 
-option(ENABLE_APP_MESSAGES "Enable application messages" ON)
-
-target_compile_definitions(application-messages
-    INTERFACE
-        $<$<BOOL:${ENABLE_APP_MESSAGES}>:ENABLE_APP_MESSAGES>
-)
-
 target_link_libraries(application-messages
     PRIVATE
         clipboard
@@ -88,3 +81,8 @@ target_link_libraries(application-messages
         module-db
         module-utils
 )
+
+option(MESSAGE_TEXT_SEARCH "Enable message text search functionality" OFF)
+if(${MESSAGE_TEXT_SEARCH})
+    target_compile_definitions(application-messages PRIVATE MESSAGE_TEXT_SEARCH=1)
+endif()

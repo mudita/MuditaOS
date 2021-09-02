@@ -21,12 +21,13 @@ namespace gui
     class NotificationsModel : public app::InternalModel<gui::NotificationListItem *>, public gui::ListItemProvider
     {
         [[nodiscard]] unsigned int requestRecordsCount() final;
-        [[nodiscard]] unsigned int getMinimalItemHeight() const final;
+        [[nodiscard]] unsigned int getMinimalItemSpaceRequired() const final;
         ListItem *getItem(Order order) final;
         void requestRecords(uint32_t offset, uint32_t limit) final;
 
       protected:
         bool tetheringOn = false;
+        bool phoneTimeLock = false;
         const NotificationsListPlacement listPlacement;
         [[nodiscard]] virtual auto create(const notifications::NotSeenSMSNotification *notification)
             -> NotificationListItem *;
@@ -34,12 +35,15 @@ namespace gui
             -> NotificationListItem *;
         [[nodiscard]] virtual auto create(const notifications::TetheringNotification *notification)
             -> NotificationListItem *;
+        [[nodiscard]] virtual auto create(const notifications::PhoneLockNotification *notification)
+            -> NotificationListItem *;
 
       public:
         explicit NotificationsModel(NotificationsListPlacement listPlacement = NotificationsListPlacement::Desktop);
         [[nodiscard]] bool isEmpty() const noexcept;
         [[nodiscard]] bool hasDismissibleNotification() const noexcept;
         [[nodiscard]] bool isTetheringOn() const noexcept;
+        [[nodiscard]] bool isPhoneTimeLock() const noexcept;
 
         void updateData(app::manager::actions::NotificationsChangedParams *params);
         void dismissAll(const InputEvent &event);

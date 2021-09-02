@@ -18,10 +18,10 @@
 #include <memory>
 #include <string>
 
-#include <service-appmgr/service-appmgr/messages/ActionRequest.hpp>
-#include <service-appmgr/service-appmgr/Actions.hpp>
-#include <service-appmgr/service-appmgr/data/MmiActionsParams.hpp>
-#include <service-appmgr/service-appmgr/data/CallActionsParams.hpp>
+#include <service-appmgr/messages/ActionRequest.hpp>
+#include <service-appmgr/Actions.hpp>
+#include <service-appmgr/data/MmiActionsParams.hpp>
+#include <service-appmgr/data/CallActionsParams.hpp>
 
 #include <service-cellular/api/common.hpp>
 
@@ -169,22 +169,22 @@ class CellularNotificationMessage : public CellularMessage
     std::string data;
 };
 
-class CellularGetCurrentOperatorMessage : public CellularMessage
+class CellularRequestCurrentOperatorNameMessage : public CellularMessage
 {
   public:
-    explicit CellularGetCurrentOperatorMessage() : CellularMessage(Type::Notification)
+    explicit CellularRequestCurrentOperatorNameMessage() : CellularMessage(Type::Notification)
     {}
 };
 
 class CellularSetOperatorAutoSelectMessage : public sys::DataMessage
 {};
 
-class CellularGetCurrentOperatorResponse : public CellularMessage
+class CellularCurrentOperatorNameResponse : public CellularMessage
 {
     std::string currentOperatorName;
 
   public:
-    explicit CellularGetCurrentOperatorResponse(std::string currentOperatorName)
+    explicit CellularCurrentOperatorNameResponse(const std::string &currentOperatorName)
         : CellularMessage(Type::Notification), currentOperatorName(currentOperatorName)
     {}
 
@@ -842,14 +842,6 @@ class CellularCallRejectedByOfflineNotification : public CellularResponseMessage
     }
 };
 
-class CellularSendSMSMessage : public CellularMessage
-{
-  public:
-    explicit CellularSendSMSMessage(SMSRecord record) : CellularMessage(Type::SendSMS), record(record)
-    {}
-    SMSRecord record;
-};
-
 class CellularRingNotification : public CellularNotificationMessage
 {
   public:
@@ -912,6 +904,60 @@ namespace cellular
         RawCommandRespAsync(Type type) : CellularMessage(type){};
         virtual ~RawCommandRespAsync() = default;
         std::vector<std::string> data;
+    };
+
+    class GetSimContactsRequest : public sys::DataMessage
+    {
+      public:
+        GetSimContactsRequest() : sys::DataMessage(MessageType::MessageTypeUninitialized){};
+    };
+
+    struct SimContact
+    {
+        std::string name;
+        std::string number;
+        SimContact(const std::string &name, const std::string &number) : name(name), number(number)
+        {}
+    };
+
+    class GetSimContactsResponse : public sys::ResponseMessage
+    {
+      public:
+        explicit GetSimContactsResponse(std::shared_ptr<std::vector<SimContact>> contacts)
+            : sys::ResponseMessage(sys::ReturnCodes::Success), contacts(contacts)
+        {}
+        GetSimContactsResponse() : sys::ResponseMessage(sys::ReturnCodes::Failure)
+        {}
+        auto getContacts() -> std::shared_ptr<std::vector<SimContact>>
+        {
+            return contacts;
+        }
+
+      private:
+        std::shared_ptr<std::vector<SimContact>> contacts;
+    };
+
+    class GetImeiRequest : public sys::DataMessage
+    {
+      public:
+        GetImeiRequest() : sys::DataMessage(MessageType::MessageTypeUninitialized){};
+    };
+
+    class GetImeiResponse : public sys::ResponseMessage
+    {
+      public:
+        explicit GetImeiResponse(std::shared_ptr<std::string> imei)
+            : sys::ResponseMessage(sys::ReturnCodes::Success), imei(imei)
+        {}
+        GetImeiResponse() : sys::ResponseMessage(sys::ReturnCodes::Failure)
+        {}
+        auto getImei() -> std::shared_ptr<std::string>
+        {
+            return imei;
+        }
+
+      private:
+        std::shared_ptr<std::string> imei;
     };
 
 } // namespace cellular

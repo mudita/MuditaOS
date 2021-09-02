@@ -15,7 +15,7 @@ namespace gui
 {
     InformationWidget::InformationWidget(app::Application *app)
     {
-        setMargins(gui::Margins(0, style::margins::huge, 0, 0));
+        setMargins(gui::Margins(style::widgets::leftMargin, style::margins::huge, 0, 0));
 
         setMinimumSize(phonebookStyle::informationWidget::w,
                        phonebookStyle::informationWidget::title_label_h + style::margins::huge);

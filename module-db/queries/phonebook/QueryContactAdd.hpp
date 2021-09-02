@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -16,7 +16,7 @@ namespace db::query
     class ContactAdd : public Query
     {
       public:
-        ContactAdd(const ContactRecord &rec);
+        explicit ContactAdd(const ContactRecord &rec);
         ContactRecord rec;
         [[nodiscard]] auto debugInfo() const -> std::string override;
     };
@@ -24,10 +24,14 @@ namespace db::query
     class ContactAddResult : public QueryResult
     {
       public:
-        ContactAddResult(bool result, unsigned int id);
+        ContactAddResult(bool result, unsigned int id, bool duplicated = false);
         [[nodiscard]] auto getResult() const noexcept -> bool
         {
             return result;
+        }
+        [[nodiscard]] auto isDuplicated() const noexcept -> bool
+        {
+            return duplicated;
         }
         [[nodiscard]] auto getID() const noexcept -> unsigned int
         {
@@ -37,6 +41,7 @@ namespace db::query
 
       private:
         bool result;
+        bool duplicated;
         unsigned int id;
     };
 

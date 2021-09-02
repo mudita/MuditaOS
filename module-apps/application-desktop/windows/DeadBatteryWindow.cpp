@@ -2,13 +2,13 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DeadBatteryWindow.hpp"
-#include "InputEvent.hpp"
-#include "gui/widgets/Image.hpp"
-#include <log.hpp>
-#include <application-desktop/windows/Names.hpp>
-#include <service-appmgr/model/ApplicationManager.hpp>
-#include <service-appmgr/Controller.hpp>
+#include "Names.hpp"
+
+#include <gui/widgets/Image.hpp>
 #include <Image.hpp>
+#include <InputEvent.hpp>
+#include <log.hpp>
+#include <service-appmgr/Controller.hpp>
 
 namespace gui
 {

@@ -16,7 +16,7 @@ namespace gui
     {
         setMinimumSize(phonebookStyle::outputLinesTextWithLabelWidget::w,
                        phonebookStyle::outputLinesTextWithLabelWidget::title_label_h);
-        setMargins(gui::Margins(0, style::margins::huge, 0, 0));
+        setMargins(gui::Margins(style::widgets::leftMargin, style::margins::huge, 0, 0));
 
         vBox = new VBox(this, 0, 0, 0, 0);
         vBox->setEdges(RectangleEdge::None);

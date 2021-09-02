@@ -42,7 +42,7 @@ namespace audio
     std::unique_ptr<Tags> Decoder::fetchTags()
     {
         if (fd) {
-            auto inPos = std::ftell(fd);
+            const auto inPos = std::ftell(fd);
             std::rewind(fd);
             TagLib::FileStream fileStream(fd);
             TagLib::FileRef tagReader(&fileStream);
@@ -50,10 +50,11 @@ namespace audio
                 TagLib::Tag *tags                   = tagReader.tag();
                 TagLib::AudioProperties *properties = tagReader.audioProperties();
 
-                tag->title  = tags->title().to8Bit();
-                tag->artist = tags->artist().to8Bit();
-                tag->album  = tags->album().to8Bit();
-                tag->genre  = tags->genre().to8Bit();
+                constexpr auto unicode = true;
+                tag->title             = tags->title().to8Bit(unicode);
+                tag->artist            = tags->artist().to8Bit(unicode);
+                tag->album             = tags->album().to8Bit(unicode);
+                tag->genre             = tags->genre().to8Bit(unicode);
                 tag->year   = std::to_string(tags->year());
 
                 tag->total_duration_s = properties->length();
@@ -64,8 +65,6 @@ namespace audio
                 tag->num_channel      = properties->channels();
                 tag->bitrate          = properties->bitrate();
             }
-            std::rewind(fd);
-            fetchTagsSpecific();
             std::fseek(fd, inPos, SEEK_SET);
         }
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -9,7 +9,7 @@
 #include <memory>
 #include <string>
 
-#include <service-appmgr/service-appmgr/data/MmiActionsParams.hpp>
+#include <service-appmgr/data/MmiActionsParams.hpp>
 
 namespace at
 {
@@ -45,7 +45,6 @@ namespace at
             };
             enum class AccessTechnology
             {
-
                 GSM                     = 0,
                 UTRAN                   = 2,
                 GSM_W_EGPRS             = 3,

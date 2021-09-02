@@ -1,6 +1,6 @@
 {
     "cmake.sourceDirectory": "${workspaceFolder}",
-    "cmake.buildDirectory": "${workspaceFolder}/build-${buildKit}-${buildType}",
+    "cmake.buildDirectory": "${workspaceFolder}/build-${variant:product}-${variant:target}-${buildType}",
     "cmake.configureSettings": {
         "COLOR_OUTPUT": "OFF"
     },
@@ -87,6 +87,7 @@
         "span": "cpp",
         "assert": "cpp",
         "narrow": "cpp",
-        "util": "cpp"
+        "util": "cpp",
+        "filesystem": "cpp"
     },
 }

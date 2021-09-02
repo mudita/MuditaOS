@@ -2,9 +2,15 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "config.h"
+#include "PlatformFactory.hpp"
 
 // applications
+#ifdef ENABLE_APP_ANTENNA
 #include <application-antenna/ApplicationAntenna.hpp>
+#endif
+#ifdef ENABLE_APP_ALARM_CLOCK
+#include <application-alarm-clock/ApplicationAlarmClock.hpp>
+#endif
 #include <application-call/ApplicationCall.hpp>
 #include <application-calllog/ApplicationCallLog.hpp>
 #include <application-desktop/ApplicationDesktop.hpp>
@@ -12,21 +18,31 @@
 #include <application-notes/ApplicationNotes.hpp>
 #include <application-phonebook/ApplicationPhonebook.hpp>
 #include <application-settings/ApplicationSettings.hpp>
-#include <application-settings-new/ApplicationSettings.hpp>
 #include <application-special-input/ApplicationSpecialInput.hpp>
 #include <application-calendar/ApplicationCalendar.hpp>
 #include <application-music-player/ApplicationMusicPlayer.hpp>
 #include <application-meditation/ApplicationMeditation.hpp>
 #include <application-calculator/ApplicationCalculator.hpp>
-#include <application-alarm-clock/ApplicationAlarmClock.hpp>
 #include <application-onboarding/ApplicationOnBoarding.hpp>
 
+// modules
+#include <module-db/Databases/AlarmsDB.hpp>
+#include <module-db/Databases/CountryCodesDB.hpp>
+#include <module-db/Databases/EventsDB.hpp>
+#include <module-db/Databases/NotificationsDB.hpp>
+#include <module-db/Interface/AlarmEventRecord.hpp>
+#include <module-db/Interface/AlarmsRecord.hpp>
+#include <module-db/Interface/CountryCodeRecord.hpp>
+#include <module-db/Interface/NotificationsRecord.hpp>
+
 // services
-#include <service-appmgr/model/ApplicationManager.hpp>
+#include <appmgr/ApplicationManager.hpp>
+#include <db/ServiceDB.hpp>
+#include <evtmgr/EventManager.hpp>
+#include <service-appmgr/Constants.hpp>
 #include <service-audio/ServiceAudio.hpp>
 #include <service-bluetooth/ServiceBluetooth.hpp>
-#include <service-db/ServiceDB.hpp>
-#include <service-evtmgr/EventManager.hpp>
+#include <service-db/agents/quotes/QuotesAgent.hpp>
 #include <service-lwip/ServiceLwIP.hpp>
 #include <service-time/ServiceTime.hpp>
 #include <Service/ServiceCreator.hpp>
@@ -43,22 +59,21 @@
 #include <service-antenna/ServiceAntenna.hpp>
 #endif
 
-#include <bsp/bsp.hpp>
 #include <Application.hpp>
 #include <ApplicationLauncher.hpp>
 #include <log.hpp>
 #include <Logger.hpp>
 #include <source/version.hpp>
-#include <SystemManager/SystemManager.hpp>
+#include <sys/SystemManager.hpp>
 #include <SystemWatchdog/SystemWatchdog.hpp>
 #include <thread.hpp>
-#include <purefs/vfs_subsystem.hpp>
 
 #include <memory>
 #include <vector>
 
 int main()
 {
+    constexpr auto ApplicationName = "PurePhone";
 
 #if SYSTEM_VIEW_ENABLED
     SEGGER_SYSVIEW_Conf();
@@ -69,9 +84,9 @@ int main()
     SEGGER_SYSVIEW_Start();
 #endif
 
-    bsp::BoardInit();
+    auto platformFactory = purephone::PlatformFactory();
+    auto platform        = platformFactory.makePlatform();
 
-    purefs::subsystem::vfs_handle_t vfs;
     if (!sys::SystemWatchdog::getInstance().init()) {
         LOG_ERROR("System watchdog failed to initialize");
         // wait for the hardware watchdog (initialized in reset ISR) to reset the system
@@ -103,14 +118,16 @@ int main()
 
     auto sysmgr = std::make_shared<sys::SystemManager>(std::move(systemServices));
     sysmgr->StartSystem(
-        [&vfs]() {
-            vfs     = purefs::subsystem::initialize();
-            int err = purefs::subsystem::mount_defaults();
-            if (err) {
-                LOG_FATAL("VFS subystem fatal error %i", err);
-                std::abort();
+        [&platform]() {
+            try {
+                platform->init();
             }
-            Log::Logger::get().init();
+            catch (const std::runtime_error &e) {
+                LOG_FATAL("%s", e.what());
+                abort();
+            }
+
+            Log::Logger::get().init(Log::Application{ApplicationName, GIT_REV, GIT_TAG, GIT_BRANCH});
             /// force initialization of PhonenumberUtil because of its stack usage
             /// otherwise we would end up with an init race and PhonenumberUtil could
             /// be initiated in a task with stack not big enough to handle it
@@ -129,9 +146,6 @@ int main()
 #endif
 #ifdef ENABLE_APP_SETTINGS
             applications.push_back(app::CreateLauncher<app::ApplicationSettings>(app::name_settings));
-#endif
-#ifdef ENABLE_APP_SETTINGS_NEW
-            applications.push_back(app::CreateLauncher<app::ApplicationSettingsNew>(app::name_settings_new));
 #endif
 #ifdef ENABLE_APP_NOTES
             applications.push_back(app::CreateLauncher<app::ApplicationNotes>(app::name_notes));
@@ -172,17 +186,14 @@ int main()
             applications.push_back(app::CreateLauncher<app::ApplicationOnBoarding>(app::name_onboarding));
 #endif
             // start application manager
-            return sysmgr->RunSystemService(
-                std::make_shared<app::manager::ApplicationManager>(
-                    app::manager::ApplicationManager::ServiceName, std::move(applications), app::name_desktop),
-                sysmgr.get());
+            return sysmgr->RunSystemService(std::make_shared<app::manager::ApplicationManager>(
+                                                service::name::appmgr, std::move(applications), app::name_desktop),
+                                            sysmgr.get());
         });
 
-    LOG_PRINTF("Launching PurePhone \n");
+    LOG_PRINTF("Launching %s \n", ApplicationName);
     LOG_PRINTF("commit: %s tag: %s branch: %s\n", GIT_REV, GIT_TAG, GIT_BRANCH);
     cpp_freertos::Thread::StartScheduler();
-
-    purefs::subsystem::unmount_all();
 
     return 0;
 }

@@ -6,11 +6,10 @@
 #include <functional>
 
 #include <OptionsWindow.hpp>
-#include <service-appmgr/model/ApplicationManager.hpp>
-#include <application-calllog/ApplicationCallLog.hpp>
-#include <application-calllog/data/CallLogInternals.hpp>
-#include <application-calllog/data/CallLogSwitchData.hpp>
-#include <application-calllog/windows/CallLogOptionsWindow.hpp>
+#include "ApplicationCallLog.hpp"
+#include "data/CallLogInternals.hpp"
+#include "data/CallLogSwitchData.hpp"
+#include "windows/CallLogOptionsWindow.hpp"
 #include <widgets/TextWithIconsWidget.hpp>
 #include <widgets/ActiveIconFactory.hpp>
 
@@ -73,7 +72,7 @@ namespace gui
 
         void addNextListHeader(gui::Item *parent, const std::string &text)
         {
-            parent->addWidget(new TextWithSnippet(text, style::window::font::small));
+            parent->addWidget(decorate(new TextWithSnippet(text, style::window::font::small)));
         }
     } // namespace
 

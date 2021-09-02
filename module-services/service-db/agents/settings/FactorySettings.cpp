@@ -3,6 +3,9 @@
 
 #include "FactorySettings.hpp"
 
+#include <log.hpp>
+#include <service-db/SettingsMessages.hpp>
+
 namespace settings
 {
 

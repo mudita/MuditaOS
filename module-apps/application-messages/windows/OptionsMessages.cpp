@@ -7,7 +7,6 @@
 #include <apps-common/options/type/OptionContact.hpp>
 #include <Clipboard.hpp>
 #include <i18n/i18n.hpp>
-#include <module-services/service-db/service-db/DBServiceAPI.hpp>
 #include <Option.hpp>
 #include <OptionsMessages.hpp>
 #include <Text.hpp>

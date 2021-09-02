@@ -5,7 +5,8 @@
 
 #include <interface/profiles/A2DP/AVDTP.hpp>
 #include <interface/profiles/A2DP/AVRCP.hpp>
-#include <interface/profiles/HSP/SCO.hpp>
+#include <interface/profiles/SCO/SCO.hpp>
+#include <interface/profiles/SCO/ScoUtils.hpp>
 
 #include <Audio/AudioCommon.hpp>
 #include <Audio/VolumeScaler.hpp>
@@ -88,6 +89,8 @@ void HSPAudioDevice::onDataSend()
 void HSPAudioDevice::onDataSend(std::uint16_t scoHandle)
 {
     if (!isOutputEnabled()) {
+        LOG_DEBUG("Output is disabled");
+        bluetooth::sco::utils::sendZeros(scoHandle);
         return;
     }
 
@@ -112,6 +115,7 @@ void HSPAudioDevice::onDataSend(std::uint16_t scoHandle)
 void HSPAudioDevice::receiveCVSD(audio::AbstractStream::Span receivedData)
 {
     if (!isInputEnabled()) {
+        LOG_DEBUG("Input is disabled");
         return;
     }
 
@@ -267,4 +271,18 @@ auto A2DPAudioDevice::getSourceFormat() -> ::audio::AudioFormat
 auto HSPAudioDevice::getSourceFormat() -> ::audio::AudioFormat
 {
     return AudioFormat{bluetooth::SCO::CVSD_SAMPLE_RATE, supportedBitWidth, supportedChannels};
+}
+
+audio::AudioDevice::RetCode A2DPAudioDevice::Pause()
+{
+    return (a2dp_source_pause_stream(AVRCP::mediaTracker.a2dp_cid, AVRCP::mediaTracker.local_seid) == 0)
+               ? audio::AudioDevice::RetCode::Success
+               : audio::AudioDevice::RetCode::Failure;
+}
+
+audio::AudioDevice::RetCode A2DPAudioDevice::Resume()
+{
+    return (a2dp_source_start_stream(AVRCP::mediaTracker.a2dp_cid, AVRCP::mediaTracker.local_seid) == 0)
+               ? audio::AudioDevice::RetCode::Success
+               : audio::AudioDevice::RetCode::Failure;
 }

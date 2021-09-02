@@ -11,6 +11,7 @@
 
 #include <cstddef>
 #include <service-cellular/api/common.hpp>
+#include <string>
 
 namespace cpp_freertos
 {
@@ -74,15 +75,25 @@ namespace Store
 
         enum class AccessTechnology
         {
-            Gsm   = 0x00,
-            Utran = 0x02,
+            Gsm   = 0,
+            Utran = 2,
             GsmWEgprs,
             UtranWHsdpa,
             UtranWHsupa,
             UtranWHsdpaAndWHsupa,
             EUtran,
-            Unknown = 0xFF
+            Cdma    = 100,
+            Unknown = 255
         } accessTechnology = AccessTechnology::Unknown;
+
+        inline bool operator==(const Network &rhs)
+        {
+            return this->status == rhs.status && this->accessTechnology == rhs.accessTechnology;
+        }
+        inline bool operator!=(const Network &rhs)
+        {
+            return !(*this == rhs);
+        }
     };
 
     struct GSM
@@ -91,6 +102,7 @@ namespace Store
         GSM() = default;
         SignalStrength signalStrength;
         Network network;
+        std::string networkOperatorName;
 
         static cpp_freertos::MutexStandard mutex;
 
@@ -131,6 +143,9 @@ namespace Store
 
         void setNetwork(const Network &signalStrength);
         Network getNetwork() const;
+
+        void setNetworkOperatorName(const std::string &newNetworkOperatorName);
+        std::string getNetworkOperatorName() const;
 
         static GSM *get();
     };

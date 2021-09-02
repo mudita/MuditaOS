@@ -61,12 +61,16 @@ namespace app
             return (handle == nullptr || handle->getLockPolicyHandler().preventsAutoLocking());
         }
 
-        virtual bool run(sys::phone_modes::PhoneMode mode, sys::Service *caller = nullptr)
+        virtual bool run(sys::phone_modes::PhoneMode phoneMode,
+                         sys::bluetooth::BluetoothMode bluetoothMode,
+                         sys::Service *caller = nullptr)
         {
             return false;
         }
 
-        virtual bool runBackground(sys::phone_modes::PhoneMode mode, sys::Service *caller = nullptr)
+        virtual bool runBackground(sys::phone_modes::PhoneMode phoneMode,
+                                   sys::bluetooth::BluetoothMode bluetoothMode,
+                                   sys::Service *caller = nullptr)
         {
             return false;
         }
@@ -82,20 +86,24 @@ namespace app
             : ApplicationLauncher(std::move(name), std::move(manifest), isCloseable)
         {}
 
-        bool run(sys::phone_modes::PhoneMode mode, sys::Service *caller) override
+        bool run(sys::phone_modes::PhoneMode phoneMode,
+                 sys::bluetooth::BluetoothMode bluetoothMode,
+                 sys::Service *caller) override
         {
             parent = (caller == nullptr ? "" : caller->GetName());
-            handle = std::make_shared<T>(name, parent, mode);
+            handle = std::make_shared<T>(name, parent, phoneMode, bluetoothMode);
             setAutoLockPolicy();
-            return sys::SystemManager::RunApplication(handle, caller);
+            return sys::SystemManagerCommon::RunApplication(handle, caller);
         }
 
-        bool runBackground(sys::phone_modes::PhoneMode mode, sys::Service *caller) override
+        bool runBackground(sys::phone_modes::PhoneMode phoneMode,
+                           sys::bluetooth::BluetoothMode bluetoothMode,
+                           sys::Service *caller) override
         {
             parent = (caller == nullptr ? "" : caller->GetName());
-            handle = std::make_shared<T>(name, parent, mode, true);
+            handle = std::make_shared<T>(name, parent, phoneMode, bluetoothMode, true);
             setAutoLockPolicy();
-            return sys::SystemManager::RunApplication(handle, caller);
+            return sys::SystemManagerCommon::RunApplication(handle, caller);
         }
     };
 

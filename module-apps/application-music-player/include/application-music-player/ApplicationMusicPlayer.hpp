@@ -23,19 +23,24 @@ namespace gui
 
 namespace app
 {
+    namespace music_player::internal
+    {
+        class MusicPlayerPriv;
+    }
+
     inline constexpr auto name_music_player = "ApplicationMusicPlayer";
 
     class ApplicationMusicPlayer : public Application
     {
-        std::optional<audio::Token> currentFileToken;
-
-        std::atomic_bool isTrackPlaying = false;
 
       public:
-        explicit ApplicationMusicPlayer(std::string name                    = name_music_player,
-                                        std::string parent                  = {},
-                                        sys::phone_modes::PhoneMode mode    = sys::phone_modes::PhoneMode::Connected,
-                                        StartInBackground startInBackground = {false});
+        explicit ApplicationMusicPlayer(
+            std::string name                            = name_music_player,
+            std::string parent                          = {},
+            sys::phone_modes::PhoneMode phoneMode       = sys::phone_modes::PhoneMode::Connected,
+            sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled,
+            StartInBackground startInBackground         = {false});
+        ~ApplicationMusicPlayer() override;
 
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl,
                                                 [[maybe_unused]] sys::ResponseMessage *resp) override;
@@ -50,25 +55,20 @@ namespace app
         void createUserInterface() final;
         void destroyUserInterface() final;
 
-        std::vector<audio::Tags> getMusicFilesList();
-        bool play(const std::string &fileName);
-        bool pause();
-        bool resume();
-        bool stop();
-        void startPlaying();
-        void togglePlaying();
-
-        std::optional<audio::Tags> getFileTags(const std::string &filePath);
-
         void handlePlayResponse(sys::Message *msg);
         void handleStopResponse(sys::Message *msg);
+
+      private:
+        std::unique_ptr<music_player::internal::MusicPlayerPriv> priv;
     };
 
     template <> struct ManifestTraits<ApplicationMusicPlayer>
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {
-            return {{manager::actions::Launch, manager::actions::PhoneModeChanged}};
+            return {
+                {manager::actions::Launch, manager::actions::PhoneModeChanged, manager::actions::BluetoothModeChanged},
+                locks::AutoLockPolicy::DetermineByWindow};
         }
     };
 } /* namespace app */

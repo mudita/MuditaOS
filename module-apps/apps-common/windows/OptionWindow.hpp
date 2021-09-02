@@ -37,9 +37,8 @@ namespace gui
         OptionWindow(app::Application *app, const std::string &name, std::list<Option> options);
 
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
-        void onClose() override;
+        void onClose(CloseReason reason) override;
         void rebuild() override;
         void buildInterface() override;
-        status_bar::Configuration configureStatusBar(status_bar::Configuration appConfiguration) override;
     };
 }; // namespace gui

@@ -18,6 +18,7 @@ set(SOURCES
         ${SQLITE3_SOURCE}
 
         Databases/ContactsDB.cpp
+        Databases/EventsDB.cpp
         Databases/SmsDB.cpp
         Databases/AlarmsDB.cpp
         Databases/NotesDB.cpp
@@ -25,6 +26,7 @@ set(SOURCES
         Databases/CountryCodesDB.cpp
         Databases/NotificationsDB.cpp
 
+        Tables/AlarmEventsTable.cpp
         Tables/Table.cpp
         Tables/SMSTable.cpp
         Tables/ThreadsTable.cpp
@@ -42,6 +44,8 @@ set(SOURCES
         Tables/SMSTemplateTable.cpp
         Tables/NotificationsTable.cpp
 
+        Interface/AlarmEventRecord.cpp
+        Interface/EventRecord.cpp
         Interface/Record.cpp
         Interface/SMSRecord.cpp
         Interface/ContactRecord.cpp
@@ -53,6 +57,14 @@ set(SOURCES
         Interface/NotificationsRecord.cpp
 
         queries/RecordQuery.cpp
+        queries/alarm_events/QueryAlarmEventsAdd.cpp
+        queries/alarm_events/QueryAlarmEventsEdit.cpp
+        queries/alarm_events/QueryAlarmEventsGet.cpp
+        queries/alarm_events/QueryAlarmEventsGetRecurringBetweenDates.cpp
+        queries/alarm_events/QueryAlarmEventsGetLimited.cpp
+        queries/alarm_events/QueryAlarmEventsGetBetweenDates.cpp
+        queries/alarm_events/QueryAlarmEventsGetNext.cpp
+        queries/alarm_events/QueryAlarmEventsRemove.cpp
         queries/messages/sms/QuerySMSSearchByType.cpp
         queries/messages/sms/QuerySMSGet.cpp
         queries/messages/sms/QuerySMSGetCount.cpp
@@ -102,6 +114,8 @@ set(SOURCES
         queries/phonebook/QueryContactUpdate.cpp
         queries/phonebook/QueryContactRemove.cpp
         queries/phonebook/QueryNumberGetByID.cpp
+        queries/phonebook/QueryMergeContactsList.cpp
+        queries/phonebook/QueryCheckContactsListDuplicates.cpp
         queries/alarms/QueryAlarmsAdd.cpp
         queries/alarms/QueryAlarmsRemove.cpp
         queries/alarms/QueryAlarmsEdit.cpp
@@ -110,27 +124,15 @@ set(SOURCES
         queries/alarms/QueryAlarmsTurnOffAll.cpp
 )
 
-if(NOT ${PROJECT_TARGET} STREQUAL "TARGET_Linux")
-    include(targets/Target_Cross.cmake)
-else()
-    include(targets/Target_Linux.cmake)
-endif()
-
-add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
+add_library(${PROJECT_NAME} STATIC ${SOURCES})
 
 # Board specific compilation definitions,options,include directories and features
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_TARGET})
-target_compile_definitions(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_DEFINITIONS})
-target_include_directories(${PROJECT_NAME} PUBLIC ${BOARD_DIR_INCLUDES})
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_INCLUDES})
-target_compile_features(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_FEATURES})
-target_compile_options(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_OPTIONS})
-target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
-
 
 set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/Database/sqlite3vfs.cpp PROPERTIES COMPILE_FLAGS -Wno-overflow)
-set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/Database/sqlite3.c PROPERTIES COMPILE_FLAGS -DSQLITE_DEFAULT_WAL_AUTOCHECKPOINT=1)
+set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/Database/sqlite3.c PROPERTIES COMPILE_FLAGS "-DSQLITE_DEFAULT_WAL_AUTOCHECKPOINT=1 -Wno-misleading-indentation")
 
 target_compile_definitions(${PROJECT_NAME}
 
@@ -167,7 +169,9 @@ target_link_libraries(${PROJECT_NAME}
         module-vfs
         utf8
     PRIVATE
+        application-calendar
         Microsoft.GSL::GSL
+        rrule
 )
 
 # Host target configuration(mainly used for unit testing)

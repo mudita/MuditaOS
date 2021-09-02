@@ -1,10 +1,11 @@
 @startuml
+skinparam BackgroundColor F0F0F0
 participant ServiceCellular as cellular
 participant ServiceTime as time
 participant TimeManager as manager
 participant SettingsApp as settings
 participant SettingsDB as db
-participant EventManager as event
+participant EventManagerCommon as event
 participant bspRTC as rtc
 participant OS as os
 

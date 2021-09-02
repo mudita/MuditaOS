@@ -7,14 +7,15 @@ extern "C"
 #include "fsl_dcdc.h"
 #include "fsl_snvs_hp.h"
 #include "fsl_snvs_lp.h"
-#include "pin_mux.h"
+#include "board/pin_mux.h"
 #if LOG_LUART_ENABLED
 #include "fsl_lpuart.h"
 #endif
 }
 #include "audio.hpp"
 #include "chip.hpp"
-#include "irq/irq_gpio.hpp"
+#include "board/irq_gpio.hpp"
+#include "reboot_codes.hpp"
 
 #include <cstdint>
 
@@ -88,7 +89,7 @@ namespace bsp
 
         /* Disable MPU */
         ARM_MPU_Disable();
-
+        
         /* MPU configure:
          * Use ARM_MPU_RASR(DisableExec, AccessPermission, TypeExtField, IsShareable, IsCacheable, IsBufferable, SubRegionDisable, Size)
          * API in core_cm7.h.
@@ -113,6 +114,7 @@ namespace bsp
          * param SubRegionDisable  Sub-region disable field. 0=sub-region is enabled, 1=sub-region is disabled.
          * param Size              Region size of the region to be configured. use ARM_MPU_REGION_SIZE_xxx MACRO in core_cm7.h.
          */
+
 
         /* Region 0 setting: Memory with Device type, not shareable, non-cacheable. */
         MPU->RBAR = ARM_MPU_RBAR(0, 0xC0000000U);
@@ -155,7 +157,11 @@ namespace bsp
          * BOARD_SDRAM_TEXT
          */
         MPU->RBAR = ARM_MPU_RBAR(7, 0x80000000U);
+#if defined(HW_SDRAM_64_MB) && (HW_SDRAM_64_MB == 1)
+        MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_RO, 0, 0, 1, 1, 0, ARM_MPU_REGION_SIZE_64MB);
+#else
         MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_RO, 0, 0, 1, 1, 0, ARM_MPU_REGION_SIZE_16MB);
+#endif
 
         /* The define sets the cacheable memory to shareable,
          * this suggestion is referred from chapter 2.2.1 Memory regions,
@@ -169,8 +175,12 @@ namespace bsp
          * BOARD_SDRAM_HEAP
          */
         MPU->RBAR = ARM_MPU_RBAR(9, reinterpret_cast<std::uintptr_t>(__sdram_cached_start));
+#if defined(HW_SDRAM_64_MB) && (HW_SDRAM_64_MB == 1)
+        MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 0, 0, 1, 1, 0, ARM_MPU_REGION_SIZE_64MB);
+#else
         MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 0, 0, 1, 1, 0, ARM_MPU_REGION_SIZE_16MB);
-#endif
+#endif // HW_SDRAM_64_MB
+#endif // SDRAM_IS_SHAREABLE
 
         /* Enable MPU */
         ARM_MPU_Enable(MPU_CTRL_PRIVDEFENA_Msk);
@@ -185,7 +195,6 @@ namespace bsp
     void BoardInit()
     {
         PINMUX_InitBootPins();
-
         BOARD_InitBootClocks();
         BOARD_ConfigMPU();
 
@@ -197,6 +206,9 @@ namespace bsp
         SNVS_LP_Init(SNVS);
         SNVS_HP_Init(SNVS);
         SNVS_HP_ChangeSSMState(SNVS);
+
+        // Default flag set on start in non-volatile memory to detect boot fault
+        SNVS->LPGPR[0] = rebootCode::rebootFailedToBoot;
 
         // Set internal DCDC to DCM mode. Switching between DCM and CCM mode will be done automatically.
         DCDC_BootIntoDCM(DCDC);

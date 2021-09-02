@@ -3,12 +3,12 @@
 
 #pragma once
 
+#include "CalllogModel.hpp"
+#include "data/CallLogInternals.hpp"
 #include <BoxLayout.hpp>
-#include "Label.hpp"
-#include "Image.hpp"
-#include "ListItem.hpp"
-#include "../data/CallLogInternals.hpp"
-#include "../CalllogModel.hpp"
+#include <Label.hpp>
+#include <Image.hpp>
+#include <ListItem.hpp>
 
 namespace gui
 {

@@ -146,6 +146,15 @@ namespace gui
         Continuous ///< Continuous - will continue to beginning or end on first or last elements on
                    ///< appropriate top or bottom directions.
     };
+
+    enum class ImageTypeSpecifier
+    {
+        None,
+        W_G,
+        B_G,
+        W_M,
+        B_M
+    };
 } // namespace gui
 
 inline const char *c_str(gui::RefreshModes refresh)

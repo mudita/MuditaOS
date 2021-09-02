@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <module-services/service-appmgr/service-appmgr/Controller.hpp>
+#include <service-appmgr/Controller.hpp>
 #include "PhonebookNamecardOptions.hpp"
 #include "application-phonebook/ApplicationPhonebook.hpp"
 #include "application-phonebook/data/PhonebookItemData.hpp"
@@ -51,20 +51,9 @@ namespace gui
                                                     app::manager::OnSwitchBehaviour::RunInBackground);
     }
 
-    void PhonebookNamecardOptions::sendViaBluetooth()
-    {
-        const UTF8 contactData = contact->getAsString();
-    }
-
     auto PhonebookNamecardOptions::namecardOptionsList() -> std::list<gui::Option>
     {
         std::list<gui::Option> l;
-
-        l.emplace_back(gui::Option{utils::translate("app_phonebook_options_send_bt"), [=](gui::Item &item) {
-                                       LOG_INFO("Sending namecard via bluetooth!");
-                                       sendViaBluetooth();
-                                       return true;
-                                   }});
         l.emplace_back(gui::Option{utils::translate("app_phonebook_options_send_sms"), [=](gui::Item &item) {
                                        LOG_INFO("Sending namecard via SMS!");
                                        sendViaSms();

@@ -167,6 +167,7 @@ void StateMachine::parsePayload()
     }
 
     messageHandler->processMessage();
+    state = State::NoMsg;
 }
 
 void StateMachine::setMessageHandler(std::unique_ptr<MessageHandler> handler)

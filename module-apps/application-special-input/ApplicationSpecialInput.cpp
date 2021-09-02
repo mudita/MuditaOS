@@ -2,8 +2,8 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationSpecialInput.hpp"
-#include "messages/AppMessage.hpp"
-#include "windows/SpecialInputMainWindow.hpp"
+#include "SpecialInputMainWindow.hpp"
+#include <messages/AppMessage.hpp>
 
 using namespace app;
 
@@ -14,9 +14,10 @@ namespace
 
 ApplicationSpecialInput::ApplicationSpecialInput(std::string name,
                                                  std::string parent,
-                                                 sys::phone_modes::PhoneMode mode,
+                                                 sys::phone_modes::PhoneMode phoneMode,
+                                                 sys::bluetooth::BluetoothMode bluetoothMode,
                                                  StartInBackground startInBackground)
-    : Application(name, parent, mode, startInBackground, SpecialInputAppStackDepth)
+    : Application(name, parent, phoneMode, bluetoothMode, startInBackground, SpecialInputAppStackDepth)
 {
     addActionReceiver(manager::actions::ShowSpecialInput, [this](auto &&data) {
         switchWindow(app::char_select, std::move(data));

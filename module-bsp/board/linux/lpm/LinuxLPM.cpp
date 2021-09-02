@@ -25,12 +25,24 @@ namespace bsp
         currentFrequency = freq;
     }
 
+    void LinuxLPM::SetHighestCoreVoltage()
+    {}
+
     uint32_t LinuxLPM::GetCpuFrequency() const noexcept
     {
         return 0;
     }
 
     void LinuxLPM::SwitchOscillatorSource(bsp::LowPowerMode::OscillatorSource source)
+    {}
+
+    void LinuxLPM::SetBootSuccess()
+    {}
+
+    void LinuxLPM::EnableDcdcPowerSaveMode()
+    {}
+
+    void LinuxLPM::DisableDcdcPowerSaveMode()
     {}
 
 } // namespace bsp

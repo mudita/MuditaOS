@@ -19,7 +19,7 @@ namespace app::alarmClock
         return internalData.size();
     }
 
-    unsigned int CustomRepeatModel::getMinimalItemHeight() const
+    unsigned int CustomRepeatModel::getMinimalItemSpaceRequired() const
     {
         return style::alarmClock::window::item::checkBox::height;
     }

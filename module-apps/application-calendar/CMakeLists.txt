@@ -1,20 +1,55 @@
-﻿target_sources( ${PROJECT_NAME}
+﻿# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+# For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+add_library(application-calendar STATIC)
+
+target_include_directories(application-calendar
 	PRIVATE
-		"${CMAKE_CURRENT_LIST_DIR}/ApplicationCalendar.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/data/CalendarData.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/models/MonthModel.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/CalendarMainWindow.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/widgets/DayLabel.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/widgets/MonthBox.cpp"
+		$<BUILD_INTERFACE:
+			${CMAKE_CURRENT_SOURCE_DIR}
+			data
+			include/
+			models
+			widgets
+			windows
+		>
 	PUBLIC
-		"${CMAKE_CURRENT_LIST_DIR}/ApplicationCalendar.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/models/MonthModel.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/data/OptionParser.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/data/CalendarData.hpp"
+		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
 
-target_link_libraries(${PROJECT_NAME}
-    PUBLIC
-        service-db
-    )
+target_sources(application-calendar
+
+	PRIVATE
+		ApplicationCalendar.cpp
+		data/CalendarData.cpp
+		models/MonthModel.cpp
+		widgets/DayLabel.cpp
+		widgets/MonthBox.cpp
+		windows/CalendarMainWindow.cpp
+
+	PRIVATE
+		models/MonthModel.hpp
+		widgets/DayLabel.hpp
+		widgets/MonthBox.hpp
+		windows/CalendarMainWindow.hpp
+		
+	PUBLIC
+		include/application-calendar/ApplicationCalendar.hpp
+		include/application-calendar/data/CalendarData.hpp
+		include/application-calendar/data/OptionParser.hpp
+)
+
+target_link_libraries(application-calendar
+	PUBLIC
+		apps-common
+		date::date
+		module-gui
+		module-sys
+		module-utils
+		time-constants
+
+	PRIVATE
+		service-appmgr
+		service-db
+		service-time
+)

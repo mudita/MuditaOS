@@ -3,9 +3,12 @@
 
 #include "EinkDisplay.hpp"
 
+#if defined(TARGET_RT1051)
+#include <bsp/BoardDefinitions.hpp>
+#endif
+
 #include <gui/core/Color.hpp>
 #include <gsl/util>
-#include <bsp/BoardDefinitions.hpp>
 #include <cstdio>
 #include <cstring>
 
@@ -46,8 +49,10 @@ namespace service::eink
         : size{screenSize}, currentWaveform{createDefaultWaveFormSettings(EinkWaveformGC16)},
           displayMode{EinkDisplayColorMode_e::EinkDisplayColorModeStandard}
     {
+#if defined(TARGET_RT1051)
         driverLPSPI = drivers::DriverLPSPI::Create(
             "EInk", static_cast<drivers::LPSPIInstances>(BoardDefinitions::EINK_LPSPI_INSTANCE));
+#endif
     }
 
     EinkDisplay::~EinkDisplay() noexcept
@@ -71,8 +76,8 @@ namespace service::eink
         if (driverLPSPI) {
             driverLPSPI->Enable();
         }
-        if (cpuSentinel) {
-            cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyHz::Level_6);
+        if (eInkSentinel) {
+            eInkSentinel->HoldMinimumFrequency();
         }
         EinkPowerOn();
     }
@@ -83,8 +88,8 @@ namespace service::eink
         if (driverLPSPI) {
             driverLPSPI->Disable();
         }
-        if (cpuSentinel) {
-            cpuSentinel->ReleaseMinimumFrequency();
+        if (eInkSentinel) {
+            eInkSentinel->ReleaseMinimumFrequency();
         }
     }
 
@@ -267,9 +272,9 @@ namespace service::eink
         return driverLPSPI;
     }
 
-    void EinkDisplay::setCpuSentinel(std::shared_ptr<sys::CpuSentinel> sentinel)
+    void EinkDisplay::setEinkSentinel(std::shared_ptr<EinkSentinel> sentinel)
     {
-        cpuSentinel = std::move(sentinel);
+        eInkSentinel = std::move(sentinel);
     }
 
 } // namespace service::eink

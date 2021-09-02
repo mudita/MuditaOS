@@ -4,7 +4,7 @@
 #include "BatteryLevelCheck.hpp"
 #include "service-evtmgr/BatteryMessages.hpp"
 #include "SystemManager/Constants.hpp"
-#include <agents/settings/SystemSettings.hpp>
+#include <service-db/agents/settings/SystemSettings.hpp>
 #include <EventStore.hpp>
 #include <Utils.hpp>
 

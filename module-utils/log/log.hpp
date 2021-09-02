@@ -76,6 +76,11 @@ extern "C"
 #define LOG_ERROR(...)               log_Log(LOGERROR, __FILENAME__, __LINE__, __func__, __VA_ARGS__)
 #define LOG_FATAL(...)               log_Log(LOGFATAL, __FILENAME__, __LINE__, __func__, __VA_ARGS__)
 #define LOG_CUSTOM(loggerLevel, ...) log_Log(loggerLevel, __FILENAME__, __LINE__, __func__, __VA_ARGS__)
+#if LOG_SENSITIVE_DATA_ENABLED
+#define LOG_SENSITIVE(loggerLevel, ...) log_Log(loggerLevel, __FILENAME__, __LINE__, __func__, __VA_ARGS__)
+#else
+#define LOG_SENSITIVE(loggerLevel, ...)
+#endif
 
 #ifdef __cplusplus
 }
@@ -85,7 +90,8 @@ extern "C"
 #pragma GCC diagnostic ignored "-Wunused-variable"
 static const size_t LOGGER_BUFFER_SIZE  = 8192;
 static const char *LOG_FILE_NAME        = "MuditaOS.log";
-static const size_t MAX_LOG_FILE_SIZE   = 1024 * 1024 * 50; // 50 MB
+static const int MAX_LOG_FILES_COUNT    = 3;
+static const size_t MAX_LOG_FILE_SIZE   = 1024 * 1024 * 15; // 15 MB
 #pragma GCC diagnostic pop
 
 #endif /* LOG_LOG_H_ */

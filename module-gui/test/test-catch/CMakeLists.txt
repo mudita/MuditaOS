@@ -10,14 +10,12 @@ add_catch2_executable(
                 test-gui-image.cpp
                 ../mock/TestWindow.cpp
                 ../mock/InitializedFontManager.cpp
-        test-language-input-parser.cpp
+                test-language-input-parser.cpp
+                test-key-translator.cpp
         INCLUDE
                 ..
         LIBS
                 module-sys
-                iosyscalls
                 module-gui
-        DEPS
-                assets
-                PurePhone-disk-img
+	USE_FS
 )

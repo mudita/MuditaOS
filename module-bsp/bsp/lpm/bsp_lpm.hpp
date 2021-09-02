@@ -18,9 +18,12 @@ namespace bsp
             External,
             Internal
         };
-        enum class RebootType {
+        enum class RebootType
+        {
             NormalRestart,
-            GoToUpdater,
+            GoToUpdaterUpdate,       //! Goto updater into the update mode
+            GoToUpdaterFactoryReset, //! GOto updater into the factory reset mode
+            GoToUpdaterRecovery      //! Goto to updater into recovery mode
         };
 
         LowPowerMode()          = default;
@@ -28,14 +31,19 @@ namespace bsp
 
         static std::optional<std::unique_ptr<LowPowerMode>> Create();
 
-        virtual int32_t PowerOff()              = 0;
+        virtual int32_t PowerOff()                = 0;
         virtual int32_t Reboot(RebootType reason) = 0;
 
         virtual void SetCpuFrequency(CpuFrequencyHz freq) = 0;
+        virtual void SetHighestCoreVoltage() = 0;
         [[nodiscard]] CpuFrequencyHz GetCurrentFrequencyLevel() const noexcept;
         [[nodiscard]] virtual uint32_t GetCpuFrequency() const noexcept = 0;
 
         virtual void SwitchOscillatorSource(OscillatorSource source) = 0;
+        virtual void SetBootSuccess()                                = 0;
+
+        virtual void EnableDcdcPowerSaveMode()  = 0;
+        virtual void DisableDcdcPowerSaveMode() = 0;
 
       protected:
         CpuFrequencyHz currentFrequency = CpuFrequencyHz::Level_6;

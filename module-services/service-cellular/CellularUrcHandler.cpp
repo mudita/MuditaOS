@@ -9,16 +9,12 @@
 
 #include <service-antenna/AntennaServiceAPI.hpp>
 #include <service-evtmgr/Constants.hpp>
+#include <service-appmgr/Constants.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <service-time/Constants.hpp>
 
 using namespace at::urc;
 
-// this static function will be replaced by Settings API
-static bool isSettingsAutomaticTimeSyncEnabled()
-{
-    return true;
-}
 
 void CellularUrcHandler::Handle(Clip &urc)
 {
@@ -47,10 +43,13 @@ void CellularUrcHandler::Handle(Creg &urc)
                  utils::enumToString(status).c_str(),
                  utils::enumToString(accessTechnology).c_str());
 
-        Store::Network network{status, accessTechnology};
+        CellularServiceAPI::RequestCurrentOperatorName(&cellularService);
 
-        Store::GSM::get()->setNetwork(network);
-        response = std::make_unique<CellularNetworkStatusUpdateNotification>();
+        Store::Network network{status, accessTechnology};
+        if (Store::GSM::get()->getNetwork() != network) {
+            Store::GSM::get()->setNetwork(network);
+            response = std::make_unique<CellularNetworkStatusUpdateNotification>();
+        }
         urc.setHandled(true);
     }
     else {
@@ -83,7 +82,7 @@ void CellularUrcHandler::Handle(Cusd &urc)
             cellularService.ussdState = ussd::State::pullResponseReceived;
             cellularService.setUSSDTimer();
             auto msg = std::make_shared<CellularMMIResponseMessage>(*message);
-            cellularService.bus.sendUnicast(msg, app::manager::ApplicationManager::ServiceName);
+            cellularService.bus.sendUnicast(msg, service::name::appmgr);
         }
     }
     else {
@@ -91,7 +90,7 @@ void CellularUrcHandler::Handle(Cusd &urc)
         cellularService.ussdState = ussd::State::sesionAborted;
         cellularService.setUSSDTimer();
         auto msg = std::make_shared<CellularMMIPushMessage>(*message);
-        cellularService.bus.sendUnicast(msg, app::manager::ApplicationManager::ServiceName);
+        cellularService.bus.sendUnicast(msg, service::name::appmgr);
     }
 
     urc.setHandled(true);
@@ -103,14 +102,10 @@ void CellularUrcHandler::Handle(Ctze &urc)
         return;
     }
 
-    if (isSettingsAutomaticTimeSyncEnabled()) {
-        auto msg = std::make_shared<CellularTimeNotificationMessage>(
-            urc.getGMTTime(), urc.getTimeZoneOffset(), urc.getTimeZoneString());
-        cellularService.bus.sendUnicast(msg, service::name::service_time);
-    }
-    else {
-        LOG_DEBUG("Timezone sync disabled.");
-    }
+    auto msg = std::make_shared<CellularTimeNotificationMessage>(
+        urc.getGMTTime(), urc.getTimeZoneOffset(), urc.getTimeZoneString());
+    cellularService.bus.sendUnicast(msg, service::name::service_time);
+
     urc.setHandled(true);
 }
 
@@ -129,6 +124,20 @@ void CellularUrcHandler::Handle(Qind &urc)
             Store::GSM::get()->setSignalStrength(signalStrength.data);
             response = std::make_unique<CellularSignalStrengthUpdateNotification>(urc.getUrcBody());
         }
+        auto ber = urc.getBER();
+        if (ber.has_value()) {
+            LOG_INFO("BER value: %d", ber.value());
+        }
+        urc.setHandled(true);
+    }
+    if (urc.isAct()) {
+        auto nat     = urc.getAccessTechnology();
+        auto network = Store::GSM::get()->getNetwork();
+        if (network.accessTechnology != nat) {
+            network.accessTechnology = nat;
+            Store::GSM::get()->setNetwork(network);
+            response = std::make_unique<CellularNetworkStatusUpdateNotification>();
+        }
         urc.setHandled(true);
     }
     else if (urc.isFota()) {
@@ -136,12 +145,11 @@ void CellularUrcHandler::Handle(Qind &urc)
         if (urc.getFotaStage() == Qind::FotaStage::HTTPEND && urc.getFotaParameter() == httpSuccess) {
             LOG_DEBUG("Fota UPDATE, switching to AT mode");
             cellularService.cmux->setMode(CellularMux::Mode::AT);
-            urc.setHandled(true);
         }
+        urc.setHandled(true);
     }
     else if (urc.isSmsDone()) {
         response = std::make_unique<CellularSmsDoneNotification>();
-
         urc.setHandled(true);
     }
 }

@@ -120,7 +120,7 @@ struct __attribute__((packed)) abfsr_t
 
 struct __attribute__((packed)) syslog_t
 {
-    syslog_exception_stack_frame_t stackFrame;
+    CrashCatcherStackedRegisters stackFrame;
     struct
     {
         hfsr_t hfsr;         /// Hard Fault Fault Status Register
@@ -134,9 +134,9 @@ struct __attribute__((packed)) syslog_t
 
 namespace
 {
-    static void printHardFaultInfo(const syslog_t &syslog)
+    void printCrashInfo(const syslog_t &syslog)
     {
-        LOG_FATAL("!!! HardFault Detected !!!");
+        LOG_FATAL("!!! Crash Occured !!!");
         LOG_FATAL("* Stack Frame:");
         LOG_FATAL("R0  = 0x%0" PRIX32, syslog.stackFrame.r0);
         LOG_FATAL("R1  = 0x%0" PRIX32, syslog.stackFrame.r1);
@@ -225,16 +225,26 @@ namespace
         if (abfsr.eppb)
             LOG_FATAL(" - EPPB: Asynchronous fault on EPPB interface");
     }
+
+    syslog_t syslogFrom(const CrashCatcherInfo *info)
+    {
+        syslog_t syslog;
+
+        syslog.stackFrame          = *info->pSP;
+        syslog.registers.hfsr.all  = SCB->HFSR;
+        syslog.registers.cfsr.all  = SCB->CFSR;
+        syslog.registers.mmfar     = SCB->MMFAR;
+        syslog.registers.bfar      = SCB->BFAR;
+        syslog.registers.abfsr.all = SCB->ABFSR;
+
+        return syslog;
+    }
 } // namespace
 
-extern "C" void crashCatcherExtPrintConsoleHF(uint32_t sp)
+namespace crashdump
 {
-    static syslog_t syslog     = {};
-    syslog.stackFrame          = *(reinterpret_cast<syslog_exception_stack_frame_t *>(sp));
-    syslog.registers.hfsr.all  = SCB->HFSR;
-    syslog.registers.cfsr.all  = SCB->CFSR;
-    syslog.registers.mmfar     = SCB->MMFAR;
-    syslog.registers.bfar      = SCB->BFAR;
-    syslog.registers.abfsr.all = SCB->ABFSR;
-    printHardFaultInfo(syslog);
-}
+    void printCrashInfo(const CrashCatcherInfo *info)
+    {
+        ::printCrashInfo(syslogFrom(info));
+    }
+} // namespace crashdump

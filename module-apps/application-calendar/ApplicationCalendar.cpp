@@ -1,18 +1,19 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "ApplicationCalendar.hpp"
-#include <application-calendar/windows/CalendarMainWindow.hpp>
+#include <application-calendar/ApplicationCalendar.hpp>
+#include <windows/CalendarMainWindow.hpp>
 
 namespace app
 {
     ApplicationCalendar::ApplicationCalendar(std::string name,
                                              std::string parent,
-                                             sys::phone_modes::PhoneMode mode,
+                                             sys::phone_modes::PhoneMode phoneMode,
+                                             sys::bluetooth::BluetoothMode bluetoothMode,
                                              StartInBackground startInBackground,
                                              uint32_t stackDepth,
                                              sys::ServicePriority priority)
-        : Application(name, parent, mode, startInBackground, stackDepth, priority)
+        : Application(name, parent, phoneMode, bluetoothMode, startInBackground, stackDepth, priority)
     {}
 
     sys::MessagePointer ApplicationCalendar::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
@@ -27,7 +28,7 @@ namespace app
 
     sys::ReturnCodes ApplicationCalendar::InitHandler()
     {
-        auto ret             = Application::InitHandler();
+        auto ret = Application::InitHandler();
         createUserInterface();
         return ret;
     }

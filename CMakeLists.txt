@@ -7,6 +7,13 @@ project(PureOS)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 
+include(Product)
+include(Board)
+
+validate_product_selection()
+include(products/${PRODUCT}/config.cmake)
+select_board()
+
 include(Colours)
 include(CCacheConfig)
 include(ProjectConfig)
@@ -17,13 +24,14 @@ include(CopyGdbInit)
 include(Utils)
 include(ModuleUtils)
 include(FetchBootloader)
+include(FetchPureUpdater)
 include(DiskImage)
 include(AddPackage)
 
-message("PROJECT_TARGET: ${PROJECT_TARGET}")
-message("TARGET_COMPILE_DEFINITIONS: ${TARGET_COMPILE_OPTIONS}")
-message("TARGET_LIBRARIES: ${TARGET_LIBRARIES}")
-message("TARGET_LINKER_FLAGS: ${TARGET_LINKER_FLAGS}")
+message("Selected product: ${PRODUCT}")
+message("Selected board:   ${BOARD}")
+message("Board revision:   ${BOARD_REVISION}")
+message("PROJECT_TARGET:   ${PROJECT_TARGET}")
 
 string(REPLACE "TARGET_" "" PROJECT_TARGET_NAME ${PROJECT_TARGET})
 string(TOLOWER "${PROJECT_TARGET_NAME}" PROJECT_TARGET_NAME)
@@ -31,8 +39,6 @@ message("Project target name: ${PROJECT_TARGET_NAME}")
 if (NOT ${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
     set(ENABLE_TESTS ON)
 endif()
-
-
 
 if (${ENABLE_TESTS})
     enable_testing()
@@ -64,6 +70,7 @@ endif()
 set(TOOLCHAIN_PATH "" CACHE STRING "Path to toolchain directory")
 
 add_compile_definitions(FSL_RTOS_FREE_RTOS
+    PLATFORM_${PROJECT_TARGET_NAME}
     USB_STACK_FREERTOS
     DEBUG_CONSOLE_TRANSFER_NON_BLOCKING
     FSL_SDK_ENABLE_DRIVER_CACHE_CONTROL=1
@@ -79,7 +86,7 @@ add_compile_definitions(FSL_RTOS_FREE_RTOS
     SKIP_SYSCLK_INIT
     _GNU_SOURCE)
 
-add_compile_options( ${TARGET_COMPILE_OPTIONS}
+add_compile_options(
     $<$<COMPILE_LANGUAGE:C>:-std=gnu11>
     -fsingle-precision-constant
     -ffunction-sections
@@ -87,7 +94,6 @@ add_compile_options( ${TARGET_COMPILE_OPTIONS}
     -MMD
     -MP
     -fno-builtin
-    -fno-diagnostics-color
     # warning flags
     -Wall -Wextra -Werror -Wno-unused-parameter -Wno-deprecated-declarations)
 
@@ -109,16 +115,10 @@ if (NOT ENABLE_SECURE_BOOT)
         )
 endif ()
 
-
 add_subdirectory(third-party)
-
-if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
-    add_subdirectory(board/linux/libiosyscalls)
-elseif(${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
-    add_subdirectory(board/rt1051)
-endif()
-
+add_subdirectory(board)
 add_subdirectory(source)
+add_subdirectory(module-platform)
 add_subdirectory(module-sys)
 add_subdirectory(module-utils)
 add_subdirectory(module-os)
@@ -159,5 +159,6 @@ add_custom_target(
     )
 
 fetch_ecoboot()
-add_subdirectory(products)
+fetch_updater()
 
+add_subdirectory(products)

@@ -12,7 +12,7 @@ auto OptionsModel::requestRecordsCount() -> unsigned int
     return internalData.size();
 }
 
-auto OptionsModel::getMinimalItemHeight() const -> unsigned int
+auto OptionsModel::getMinimalItemSpaceRequired() const -> unsigned int
 {
     return style::window::label::big_h + gui::option::window::option_bottom_margin;
 }

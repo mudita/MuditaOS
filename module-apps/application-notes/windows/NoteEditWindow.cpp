@@ -26,7 +26,13 @@ namespace app::notes
 
     NoteEditWindow::NoteEditWindow(app::Application *app,
                                    std::unique_ptr<NoteEditWindowContract::Presenter> &&windowPresenter)
-        : gui::AppWindow(app, gui::name::window::note_edit), presenter{std::move(windowPresenter)}
+        : NoteEditWindow(app, std::move(windowPresenter), gui::name::window::note_edit)
+    {}
+
+    NoteEditWindow::NoteEditWindow(app::Application *app,
+                                   std::unique_ptr<NoteEditWindowContract::Presenter> &&windowPresenter,
+                                   const std::string &windowName)
+        : gui::AppWindow{app, windowName}, presenter{std::move(windowPresenter)}
     {
         presenter->attach(this);
         buildInterface();
@@ -120,7 +126,7 @@ namespace app::notes
         setNoteText(notesRecord->snippet);
     }
 
-    void NoteEditWindow::onClose()
+    void NoteEditWindow::onClose([[maybe_unused]] CloseReason reason)
     {
         if (presenter->isAutoSaveApproved()) {
             saveNote();

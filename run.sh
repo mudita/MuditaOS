@@ -20,12 +20,14 @@ Script accepts two parameters:
         ~/gcc-arm-none-eabi-8-2019-q3-update/bin/arm-none-eabi-gdb-py
     default: gdb from your PATH
 
+    --product PARAM
+        product to run [PurePhone|BellHybrid]
+
 examples:
-./run.sh build-rt1051-RelWithDebInfo/ --gdb ~/gcc-arm-none-eabi-8-2019-q3-update/bin/arm-none-eabi-gdb-py   // full specification
-./run.sh build-rt1051-RelWithDebInfo                                                                        // binary for gdb specified
-./run.sh --gdb ~/gcc-arm-none-eabi-8-2019-q3-update/bin/arm-none-eabi-gdb-py                                // gdb binary specified
-./run.sh                                                                                                    // full defaults
-./run.sh --help                                                                                             // help
+./run.sh --product PurePhone  build-purephone-rt1051-RelWithDebInfo/ --gdb ~/gcc-arm-none-eabi-8-2019-q3-update/bin/arm-none-eabi-gdb-py // full specification
+./run.sh --product BellHybrid build-bell-rt1051-RelWithDebInfo                                                                           // binary for gdb specified
+./run.sh --product BellHybrid --gdb ~/gcc-arm-none-eabi-8-2019-q3-update/bin/arm-none-eabi-gdb-py                                        // gdb binary specified
+./run.sh --help                                                                                                                          // help
 EOF
 }
 
@@ -38,6 +40,11 @@ while [[ $# -gt 0 ]]; do
         --gdb)
             GDB_ARM="$2"
             echo "Loaded $GDB_ARM"
+            shift
+            ;;
+        --product)
+            PRODUCT_NAME="$2"
+            echo "Product $PRODUCT_NAME"
             shift
             ;;
         --help)
@@ -54,6 +61,12 @@ while [[ $# -gt 0 ]]; do
     shift
 done
 
-check_target_rt1051 "${BIN_DIR}"
+if [ -z "${PRODUCT_NAME}" ]; then
+    echo "ERROR! Product param not provided"
+    help
+    exit 1
+fi
 
-${GDB_ARM} "${BIN_DIR}"/PurePhone.elf -x .gdbinit-1051
+check_target_rt1051 "${BIN_DIR}" "${PRODUCT_NAME}"
+
+${GDB_ARM} "${BIN_DIR}"/"${PRODUCT_NAME}".elf -x .gdbinit-1051

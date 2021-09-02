@@ -15,15 +15,14 @@ namespace gui
         : minValue(minValue), maxValue(maxValue), step(step), currentValue(minValue), boundaries(boundaries)
     {
         setEditMode(EditMode::Browse);
+        drawUnderline(false);
         updateSpinner();
     }
 
     void Spinner::setCurrentValue(int newCurrentValue)
     {
-        if (currentValue != newCurrentValue) {
-            currentValue = newCurrentValue;
-            updateSpinner();
-        }
+        currentValue = newCurrentValue;
+        updateSpinner();
     }
 
     void Spinner::setFixedFieldWidth(unsigned char newFixedFieldWidth)
@@ -75,26 +74,27 @@ namespace gui
             switch (inputEvent.getKeyCode()) {
             case KeyCode::KEY_UP:
                 stepUp();
-                break;
+                return true;
             case KeyCode::KEY_DOWN:
                 stepDown();
-                break;
+                return true;
             default:
                 break;
             }
         }
-        return true;
+        return false;
     }
 
     bool Spinner::onFocus(bool state)
     {
         if (focus) {
-            setEdges(RectangleEdge::Top | RectangleEdge::Bottom);
+            setEdges(focusEdges);
         }
         else {
             setEdges(RectangleEdge::None);
         }
         showCursor(state);
+        updateSpinner();
         return true;
     }
 
@@ -106,6 +106,18 @@ namespace gui
         }
         outStream << currentValue;
         setText(outStream.str());
+    }
+    void Spinner::setMinValue(int newMinValue)
+    {
+        minValue = newMinValue;
+    }
+    void Spinner::setMaxValue(int newMaxValue)
+    {
+        maxValue = newMaxValue;
+    }
+    void Spinner::setFocusEdges(RectangleEdge edges)
+    {
+        focusEdges = edges;
     }
 
 } // namespace gui

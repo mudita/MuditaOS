@@ -28,9 +28,6 @@ if(COVERAGE_ENABLE)
         module-db/Database/sqlite3.c
         module-lwip/lib/.*
         module-os/.*
-        module-utils/gsl/.*
-        module-utils/json/.*
-        module-utils/segger/.*
         source/main.cpp
         test/.*
     )

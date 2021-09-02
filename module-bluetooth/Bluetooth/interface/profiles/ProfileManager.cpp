@@ -25,6 +25,10 @@ namespace bluetooth
                     ptr->init();
                 }
             }
+            // TODO profile selection based on capabilities and priority?
+            // audio & capa cell & HSP & HFP  & A2DP-> HFP
+            // audio & capa cell & HSP  & A2DP-> HSP
+            // audio & HSP & HFP & A2DP -> A2DP
             currentProfilePtr = profilesList[AudioProfile::A2DP].get();
 
             if (auto serviceBt = dynamic_cast<ServiceBluetooth *>(ownerService); serviceBt != nullptr) {
@@ -38,23 +42,13 @@ namespace bluetooth
     auto ProfileManager::connect(bd_addr_t address) -> Error::Code
     {
         bd_addr_copy(remoteAddr, address);
-        ///> connect to remote only if we are sure that remote side supports our profiles
-        if (GAP::isServiceSupportedByRemote(address, TYPE_OF_SERVICE::RENDERING)) {
-            auto profilePtr = profilesList[AudioProfile::A2DP].get();
-            if (profilePtr != nullptr) {
-                LOG_DEBUG("Connecting device to A2DP");
-                profilePtr->setDeviceAddress(remoteAddr);
-                profilePtr->connect();
+        for (auto &[profileName, ptr] : profilesList) {
+            if (ptr != nullptr) {
+                ptr->setDeviceAddress(remoteAddr);
+                ptr->connect();
             }
         }
-        if (GAP::isServiceSupportedByRemote(address, TYPE_OF_SERVICE::AUDIO)) {
-            auto profilePtr = profilesList[AudioProfile::HSP].get();
-            if (profilePtr != nullptr) {
-                LOG_DEBUG("Connecting device to HSP");
-                profilePtr->setDeviceAddress(remoteAddr);
-                profilePtr->connect();
-            }
-        }
+
         return Error::Success;
     }
 
@@ -123,4 +117,9 @@ namespace bluetooth
         profilesList[profileType]->setAudioDevice(device);
         return switchProfile(profileType);
     }
+    auto ProfileManager::isAddressActuallyUsed(bd_addr_t address) -> bool
+    {
+        return !static_cast<bool>(bd_addr_cmp(address, remoteAddr));
+    }
+
 } // namespace bluetooth

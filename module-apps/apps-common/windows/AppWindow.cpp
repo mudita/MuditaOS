@@ -70,6 +70,15 @@ namespace gui
         }
     }
 
+    bool AppWindow::updateBluetooth(sys::bluetooth::BluetoothMode mode)
+    {
+        if (statusBar == nullptr) {
+            return false;
+        }
+
+        return statusBar->updateBluetooth(mode);
+    }
+
     bool AppWindow::updateSim()
     {
         if (statusBar == nullptr) {
@@ -273,6 +282,12 @@ namespace gui
     void AppWindow::accept(GuiVisitor &visitor)
     {
         visitor.visit(*this);
+    }
+
+    std::string AppWindow::getUniqueName()
+    {
+        constexpr auto separator = "/";
+        return application->GetName() + separator + getName();
     }
 
 } /* namespace gui */

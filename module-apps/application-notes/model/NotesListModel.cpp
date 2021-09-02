@@ -33,7 +33,7 @@ namespace app::notes
         return true;
     }
 
-    unsigned int NotesListModel::getMinimalItemHeight() const
+    unsigned int NotesListModel::getMinimalItemSpaceRequired() const
     {
         return style::list::item::Height;
     }

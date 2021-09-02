@@ -20,8 +20,10 @@ namespace CellularCall
 {
     bool CellularCall::startCall(const utils::PhoneNumber::View &number, const CallType type)
     {
+        LOG_INFO("starting call");
+
         if (isValid()) {
-            LOG_ERROR("call already set");
+            LOG_ERROR("call already established");
             return false;
         }
 
@@ -31,16 +33,18 @@ namespace CellularCall
 
         clear();
         CalllogRecord callRec{type, number};
-        call                = startCallAction ? startCallAction(callRec) : CalllogRecord();
+        call = startCallAction ? startCallAction(callRec) : CalllogRecord();
         if (!call.isValid()) {
-            LOG_ERROR("startCallAction failed");
+            LOG_ERROR("failed to obtain a call log record");
             clear();
             if (cpuSentinel) {
                 cpuSentinel->ReleaseMinimumFrequency();
             }
+            LOG_INFO("failed to start call");
             return false;
         }
 
+        LOG_INFO("call started");
         return true;
     }
 
@@ -49,15 +53,18 @@ namespace CellularCall
         if (isValid()) {
             startActiveTime = utils::time::getCurrentTimestamp();
             isActiveCall    = true;
+            LOG_INFO("set call active");
             return true;
         }
+        LOG_ERROR("no valid call to activate");
         return false;
     }
 
     bool CellularCall::endCall(Forced forced)
     {
+        LOG_INFO("ending call");
         if (!isValid()) {
-            LOG_ERROR("Trying to update invalid call");
+            LOG_ERROR("no call to end");
             return false;
         }
 
@@ -100,6 +107,7 @@ namespace CellularCall
         // Calllog entry was updated, ongoingCall can be cleared
         clear();
 
+        LOG_INFO("call ended");
         return true;
     }
 

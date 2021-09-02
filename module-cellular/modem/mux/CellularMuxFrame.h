@@ -136,8 +136,7 @@ class CellularMuxFrame
             }
             if (serData[3] == 0xFF) // ugly hack for Quectel misimplementation of the standard
                 Length = myLen - 6;
-            // LOG_DEBUG("[Frame] %s Addr: 0x%02X, Ctrl: 0x%02X, Len: %i",
-            // TypeOfFrame_text[static_cast<TypeOfFrame_e>(Control)].c_str(), Address, Control, Length);
+
             data.clear();
             data.insert(data.begin(),
                         serData.begin() + 4,
@@ -164,10 +163,10 @@ class CellularMuxFrame
             if ((FCS != 0xCF) && (serData[3] != 0xFF) &&
                 (Control !=
                  static_cast<uint8_t>(
-                     TypeOfFrame_e::UA))) { // error - but fuck FCS check if it's faulty Quectel UIH frame or UA frame
+                     TypeOfFrame_e::UA))) { // error - but ignore FCS check if it's faulty Quectel UIH frame or UA frame
                 LOG_PRINTF("\n{");
-                for (auto el : serData) {
-                    LOG_PRINTF("%02X ", el);
+                for ([[maybe_unused]] const auto &el : serData) {
+                    LOG_SENSITIVE(LOGDEBUG, "%02X ", el);
                 }
                 LOG_PRINTF("}\n");
 
@@ -188,14 +187,12 @@ class CellularMuxFrame
   public:
     explicit CellularMuxFrame(frame_t frame)
     {
-        // LOG_DEBUG("Serializing given frame");
         pv_serData = frame.serialize();
         pv_frame   = frame;
     }
 
     explicit CellularMuxFrame(const std::vector<uint8_t> &serData)
     {
-        // LOG_DEBUG("Deserializing serData");
         pv_frame.deserialize(serData);
         pv_serData = serData;
     }

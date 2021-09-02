@@ -6,8 +6,6 @@
 
 namespace gui
 {
-    constexpr auto timeToUnlock = 10;
-
     void PhoneLockBox::buildLockBox(unsigned int pinSize)
     {
         LockBoxConstantSize::buildLockBox(pinSize);
@@ -50,10 +48,12 @@ namespace gui
         }
     }
 
-    void PhoneLockBox::setVisibleStateBlocked()
+    void PhoneLockBox::setVisibleStateBlocked(const std::string &formattedTime)
     {
-        LockWindow->setText("phone_lock_blocked", LockInputWindow::TextType::Primary);
-        LockWindow->setImage("info_icon_W_G");
+        LockWindow->setText("phone_lock_blocked_information",
+                            LockInputWindow::TextType::Primary,
+                            {{LockWindow->getToken(LockInputWindow::Token::Time), formattedTime}});
+        LockWindow->setImage("error_W_G");
         LockWindow->setBottomBarWidgetsActive(false, true, false);
     }
 
@@ -88,18 +88,11 @@ namespace gui
     {
         switch (type) {
         case LockBox::InputErrorType::InvalidInput:
-            if (value == 1) {
-                LockWindow->setText("phone_lock_unlock_last_attempt", LockInputWindow::TextType::Primary);
-                LockWindow->setText("phone_lock_unlock_last_attempt_warning",
-                                    LockInputWindow::TextType::Secondary,
-                                    {{LockWindow->getToken(LockInputWindow::Token::Mins), timeToUnlock}});
-            }
-            else {
-                LockWindow->setText(
-                    textForInvalidInput,
-                    LockInputWindow::TextType::Primary,
-                    {{LockWindow->getToken(LockInputWindow::Token::Attempts), static_cast<int>(value)}});
-            }
+
+            LockWindow->setText(textForInvalidInput,
+                                LockInputWindow::TextType::Primary,
+                                {{LockWindow->getToken(LockInputWindow::Token::Attempts), static_cast<int>(value)}});
+
             break;
 
         case LockBox::InputErrorType::NewInputConfirmFailed:

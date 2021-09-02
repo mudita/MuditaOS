@@ -54,7 +54,6 @@ namespace gui
                const uint32_t &y,
                const uint32_t &w,
                const uint32_t &h,
-               const UTF8 &text,
                ExpandMode expandMode,
                TextType textType)
         : Rect(parent, x, y, w, h), expandMode{expandMode}, textType{textType},
@@ -66,7 +65,7 @@ namespace gui
 
         setPenWidth(style::window::default_border_no_focus_w);
         setPenFocusWidth(style::window::default_border_focus_w);
-        buildDocument(text);
+        buildCursor();
 
         setBorderColor(gui::ColorFullBlack);
         setEdges(RectangleEdge::All);
@@ -113,10 +112,10 @@ namespace gui
         limitsList.clear();
     }
 
-    void Text::setUnderline(const bool val)
+    void Text::drawUnderline(bool val)
     {
-        if (lines->getUnderLine() != val) {
-            lines->setUnderLine(val);
+        if (lines->getUnderLineProperties().draw != val) {
+            lines->getUnderLineProperties().draw = val;
             drawLines();
         }
     }
@@ -209,8 +208,7 @@ namespace gui
 
         if (format.getFont() != newFont) {
             format.setFont(newFont);
-            buildCursor();
-            drawLines();
+            buildDocument(getText());
         }
     }
 
@@ -218,6 +216,20 @@ namespace gui
     {
         format.setFont(font);
         buildCursor();
+    }
+
+    void Text::setMinimumWidthToFitText(const UTF8 &text)
+    {
+        auto textToFit = !text::RichTextParser().parse(text, &format)->getText().empty()
+                             ? text::RichTextParser().parse(text, &format)->getText()
+                             : text;
+
+        setMinimumWidth(format.getFont()->getPixelWidth(textToFit) + TextCursor::defaultWidth);
+    }
+
+    void Text::setMinimumHeightToFitText(unsigned int linesCount)
+    {
+        setMinimumHeight(format.getFont()->info.line_height * linesCount);
     }
 
     auto Text::setCursorStartPosition(CursorStartPosition val) -> void
@@ -257,11 +269,15 @@ namespace gui
             debug_text("handleBackspace");
             return true;
         }
+        if (handleWholeTextRemoval(evt)) {
+            debug_text("handleLongBackspace");
+            return true;
+        }
         if (handleAddChar(evt)) {
             debug_text("handleAddChar");
             return true;
         }
-        if (handleDigitLongPress(evt)) {
+        if (handleLongPressAddChar(evt)) {
             debug_text("handleDigitLongPress");
             return true;
         }
@@ -544,6 +560,20 @@ namespace gui
         return false;
     }
 
+    bool Text::handleWholeTextRemoval(const InputEvent &inputEvent)
+    {
+        if (!isMode(EditMode::Edit)) {
+            return false;
+        }
+        if (inputEvent.isLongRelease(key_signs_remove)) {
+            if (!document->isEmpty()) {
+                clear();
+                return true;
+            }
+        }
+        return false;
+    }
+
     bool Text::handleAddChar(const InputEvent &inputEvent)
     {
         if (!inputEvent.isShortRelease() || !isMode(EditMode::Edit)) {
@@ -574,19 +604,30 @@ namespace gui
         return false;
     }
 
-    bool Text::handleDigitLongPress(const InputEvent &inputEvent)
+    auto Text::handleLongPressAddChar(const InputEvent &inputEvent) -> bool
     {
         if (!inputEvent.isLongRelease()) {
             return false;
         }
-
-        if (!inputEvent.isDigit()) {
+        if (!isMode(EditMode::Edit)) {
             return false;
         }
 
-        if (const auto val = inputEvent.numericValue(); checkAdditionBounds(val) == AdditionBound::CanAddAll) {
+        // check input event handling accordingly to input mode
+        auto code = text::npos;
+
+        // phone mode
+        if (mode->is(InputMode::phone) && inputEvent.is(KeyCode::KEY_0)) {
+            code = '+';
+        }
+        // all other modes only handle digits
+        else if (inputEvent.isDigit()) {
+            code = intToAscii(inputEvent.numericValue());
+        }
+
+        if (code != text::npos && checkAdditionBounds(code) == AdditionBound::CanAddAll) {
             setCursorStartPosition(CursorStartPosition::Offset);
-            addChar(intToAscii(val));
+            addChar(code);
             onTextChanged();
             return true;
         }

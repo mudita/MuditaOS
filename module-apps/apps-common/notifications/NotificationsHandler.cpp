@@ -5,7 +5,7 @@
 #include <service-db/DBServiceAPI.hpp>
 #include <log.hpp>
 #include <service-cellular/service-cellular/CellularMessage.hpp>
-#include <service-appmgr/service-appmgr/Controller.hpp>
+#include <service-appmgr/Controller.hpp>
 #include <service-audio/AudioServiceAPI.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
 

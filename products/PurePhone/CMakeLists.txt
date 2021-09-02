@@ -1,6 +1,6 @@
 add_executable(PurePhone)
 
-add_custom_target(Pure
+add_custom_target(Pure ALL
     DEPENDS PurePhone PurePhone.img
     )
 
@@ -10,16 +10,10 @@ target_link_directories(PurePhone PUBLIC ${PROJECT_LIB_DIRECTORY})
 target_compile_definitions(PurePhone
     PRIVATE
         ${PROJECT_CONFIG_DEFINITIONS}
-        ${TARGET_COMPILE_DEFINITIONS}
         ${PROJECT_TARGET}
     )
 
 define_serial(PurePhone)
-
-target_compile_features(PurePhone
-    PRIVATE
-        ${TARGET_COMPILE_FEATURES}
-    )
 
 target_compile_options(PurePhone
     PRIVATE
@@ -29,8 +23,9 @@ target_compile_options(PurePhone
 
 target_sources(PurePhone
     PRIVATE
-        ${TARGET_SOURCES}
         PurePhoneMain.cpp
+        PlatformFactory.cpp
+        EinkSentinelPure.cpp
     )
 
 target_include_directories(PurePhone
@@ -48,24 +43,37 @@ set_target_properties(PurePhone
 
 target_link_libraries(PurePhone
     PRIVATE
-        application-antenna
+        $<$<BOOL:${ENABLE_APP_ANTENNA}>:application-antenna>
         application-calculator
+        application-calendar
+        application-call
+        application-calllog
+        application-desktop
+        application-meditation
         application-messages
         application-music-player
-        application-phonebook
         application-notes
+        application-phonebook
+        application-settings
+        application-special-input
+        appmgr
+        db
+        evtmgr
         messagetype
         module-apps
+        module-bsp
+        module-vfs
+        platform
+        service-audio
         service-bluetooth
         service-desktop
         service-lwip
+        service-time
+        sys
         ${LWIP_LIBRARIES}
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_Linux>:iosyscalls>"
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_RT1051>:CrashCatcher::CrashCatcher>"
-        "$<$<STREQUAL:${PROJECT_TARGET},TARGET_RT1051>:CrashCatcherARM>"
     )
-
-target_link_options(PurePhone PUBLIC ${TARGET_LINK_OPTIONS})
 
 if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
     add_dependencies(Pure service_renderer)
@@ -81,10 +89,17 @@ add_dependencies(PurePhone version)
 
 include(AddBootBin)
 add_boot_bin(PurePhone)
-add_image(PurePhone)
+add_image(
+    PRODUCT PurePhone
+    SYSROOT sysroot
+    ASSETS  assets
+)
 
 include(AddHexTarget)
 add_hex_target(PurePhone)
+
+include(AddVersionJson)
+add_version_json(PurePhone)
 
 add_standalone_image(PurePhone)
 add_update_package(PurePhone)
@@ -93,3 +108,9 @@ include(GitHubWorkerMessages)
 github_message_standalone()
 github_message_update()
 
+add_subdirectory(services)
+add_subdirectory(sys)
+
+if (${ENABLE_TESTS})
+    add_subdirectory(test)
+endif ()

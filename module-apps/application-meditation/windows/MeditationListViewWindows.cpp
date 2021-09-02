@@ -2,13 +2,12 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MeditationListViewWindows.hpp"
-
-#include "application-meditation/widgets/MeditationModel.hpp"
-#include "application-meditation/data/Style.hpp"
+#include "MeditationModel.hpp"
 #include "Names.hpp"
+#include "Style.hpp"
 
-#include "ListView.hpp"
-#include "Label.hpp"
+#include <gui/widgets/Label.hpp>
+#include <gui/widgets/ListView.hpp>
 #include <i18n/i18n.hpp>
 
 using namespace gui;

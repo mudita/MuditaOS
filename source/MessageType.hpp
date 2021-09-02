@@ -49,6 +49,7 @@ enum class MessageType
                         ///< that is has gained focus
     APMConfirmClose,    ///< Sent by application to confirm completion of the close procedure
     APMConfirmWindowSwitch, ///<
+    APMFinalizingClose,
     APMRegister,       ///< when application finishes initHandler it is sending this messag to inform whether init was
                        ///< successful or not.
     APMInit,           ///< Send by application to confirm completion its initialisation process
@@ -157,4 +158,8 @@ enum class MessageType
 
     // Quotes messages
     Quotes,
+
+    // Alarm messages
+    AlarmMessage
+
 };

@@ -1,25 +1,20 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "service-antenna/ServiceAntenna.hpp"
-#include "service-antenna/AntennaMessage.hpp"
-#include "service-antenna/AntennaServiceAPI.hpp"
-#include "service-antenna/ServiceState.hpp"
-
-#include <service-appmgr/model/ApplicationManager.hpp>
+#include <AntennaMessage.hpp>
+#include <AntennaServiceAPI.hpp>
+#include <ServiceAntenna.hpp>
+#include <ServiceState.hpp>
 
 #include <at/response.hpp>
-
-#include <log.hpp>
 #include <EventStore.hpp>
-
+#include <log.hpp>
 #include <MessageType.hpp>
-#include <projdefs.h>
 #include <module-sys/Timers/TimerFactory.hpp>
-#include <service-cellular/State.hpp>
-#include <service-cellular/CellularServiceAPI.hpp>
+#include <projdefs.h>
 #include <service-cellular/CellularMessage.hpp>
-
+#include <service-cellular/CellularServiceAPI.hpp>
+#include <service-cellular/State.hpp>
 #include <ticks.hpp>
 
 #include <algorithm>
@@ -68,7 +63,7 @@ ServiceAntenna::ServiceAntenna()
             timer.stop();
             auto stateToSet = state->get();
             if (state->timeoutOccured(cpp_freertos::Ticks::GetTicks())) {
-                LOG_WARN("State [ %s ] timeout occured, setting [ %s ] state",
+                LOG_WARN("State [ %s ] timeout occurred, setting [ %s ] state",
                          c_str(state->get()),
                          c_str(state->getTimeoutState()));
                 stateToSet = state->getTimeoutState();
@@ -335,7 +330,9 @@ bool ServiceAntenna::signalCheckStateHandler(void)
     if (CellularServiceAPI::GetCSQ(this, csq)) {
         at::response::parseCSQ(csq, csqValue);
         if (csqValue <= antenna::signalTreshold) {
-            LOG_INFO("Signal strength below treshold. Switch antenna");
+            LOG_INFO("Signal strength below the threshold (CSQ = %" PRIu32 ", Threshold = %" PRIu32 "). Switch antenna",
+                     csqValue,
+                     antenna::signalTreshold);
             state->set(antenna::State::switchAntenna);
             return true;
         }
@@ -350,12 +347,13 @@ bool ServiceAntenna::bandCheckStateHandler(void)
 {
     std::string cellularResponse;
     if (CellularServiceAPI::GetQNWINFO(this, cellularResponse)) {
-        std::string band;
-        at::response::parseQNWINFO(cellularResponse, band);
-
-        auto bandFrequency     = at::response::qnwinfo::parseNetworkFrequency(band);
+        std::string qnwinfo;
+        at::response::parseQNWINFO(cellularResponse, qnwinfo);
+        LOG_INFO("QNWINFO: %s", qnwinfo.c_str());
+        const auto bandFrequency = at::response::qnwinfo::parseNetworkFrequency(qnwinfo);
+        LOG_INFO("Band frequency: %" PRIu32, bandFrequency);
         constexpr uint32_t GHz = 1000;
-        bool isBandSubGHz      = bandFrequency < GHz ? true : false;
+        const bool isBandSubGHz = bandFrequency < GHz;
         if (currentAntenna == bsp::cellular::antenna::highBand) {
             LOG_INFO("High band antenna.");
             if (isBandSubGHz) {
@@ -405,12 +403,13 @@ bool ServiceAntenna::csqChangeStateHandler(void)
 
     auto nextState = antenna::State::idle;
     if (lastCsq != currentCsq || currentCsq == notValidCsq) {
-        LOG_INFO("CSQ change occurent, check connection.");
+        LOG_INFO("CSQ change occurrence, check connection.");
         nextState = antenna::State::connectionStatus;
     }
     if (currentCsq != notValidCsq) {
         lastCsq = currentCsq;
     }
+    LOG_INFO("CSQ value:  %" PRIu32, currentCsq);
 
     state->set(nextState);
     return true;

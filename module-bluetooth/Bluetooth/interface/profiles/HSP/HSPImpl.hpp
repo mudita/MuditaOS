@@ -4,7 +4,7 @@
 #pragma once
 #include "HSP.hpp"
 #include "Error.hpp"
-#include "SCO.hpp"
+#include <interface/profiles/SCO/SCO.hpp>
 #include <Audio/AudioCommon.hpp>
 
 namespace bluetooth
@@ -40,10 +40,13 @@ namespace bluetooth
         static uint16_t scoHandle;
         static std::unique_ptr<SCO> sco;
         static std::unique_ptr<CellularInterface> cellularInterface;
+        static std::unique_ptr<AudioInterface> audioInterface;
         static std::array<char, commandBufferLength> ATcommandBuffer;
         static bd_addr_t deviceAddr;
         static const sys::Service *ownerService;
         static bool isConnected;
+        static bool callAnswered;
+        static bool isRinging;
         static std::shared_ptr<HSPAudioDevice> audioDevice;
     };
 } // namespace bluetooth

@@ -7,6 +7,8 @@ target_sources(apps-common
     PRIVATE
         Application.cpp
         AsyncTask.cpp
+        AudioOperations.cpp
+        AudioOperations.hpp
         CallbackStorage.cpp
         DOMResponder.cpp
         GuiTimer.cpp
@@ -31,16 +33,24 @@ target_sources(apps-common
         widgets/BarGraph.cpp
         widgets/BrightnessBox.cpp
         widgets/ButtonOnOff.cpp
+        widgets/BellBaseLayout.cpp
+        widgets/BellSideListItem.cpp
         widgets/DateWidget.cpp
         widgets/InputBox.cpp
         widgets/ModesBox.cpp
+        widgets/SpinBox.cpp
         widgets/TextWithIconsWidget.cpp
+        widgets/TimeSetSpinner.cpp
+        widgets/AlarmSetSpinner.cpp
+        widgets/TimeSetFmtSpinner.cpp
         widgets/TimeWidget.cpp
         widgets/WidgetsUtils.cpp
         windows/AppWindow.cpp
         windows/BrightnessWindow.cpp
         windows/Dialog.cpp
         windows/OptionWindow.cpp
+    PUBLIC
+        widgets/TimeSetFmtSpinner.hpp
 )
 
 add_subdirectory(popups)
@@ -73,11 +83,7 @@ target_link_libraries(apps-common
 # Board specific compilation definitions,options,include directories and features
 target_compile_definitions(apps-common PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
 target_compile_definitions(apps-common PUBLIC ${PROJECT_TARGET})
-target_compile_definitions(apps-common PUBLIC ${TARGET_COMPILE_DEFINITIONS})
-target_include_directories(apps-common PUBLIC ${BOARD_DIR_INCLUDES})
 target_include_directories(apps-common PUBLIC ${PROJECT_INCLUDES})
-target_compile_features(apps-common PUBLIC ${TARGET_COMPILE_FEATURES})
-target_compile_options(apps-common PUBLIC ${TARGET_COMPILE_OPTIONS})
 
 target_include_directories(apps-common
 

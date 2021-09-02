@@ -13,7 +13,7 @@
 #include "Service/Service.hpp" // for Service
 #include "Timers/TimerHandle.hpp"
 #include "SwitchData.hpp"                  // for SwitchData
-#include "SystemManager/SystemManager.hpp" // for SystemManager
+#include "SystemManager/SystemManagerCommon.hpp" // for SystemManager
 #include "bsp/keyboard/key_codes.hpp"      // for bsp
 #include "gui/Common.hpp"                  // for ShowMode
 #include "projdefs.h"                      // for pdMS_TO_TICKS
@@ -76,6 +76,12 @@ namespace app
         Launch,   // Default startup causing application MainWindow to be added to stack.
         OnAction, // Switch to application  was caused by action. Enum is used to prevent called applications to
         // switch to main window on application switch and allow declared handler to switch to desired window.
+    };
+
+    enum class SwitchReason
+    {
+        SwitchRequest,
+        PhoneLock
     };
 
     struct StartInBackground
@@ -141,8 +147,11 @@ namespace app
             ACTIVATING,
             /// Application is working and has focus and can render
             ACTIVE_FORGROUND,
-            /// Applicatino lost focus but it is still working
+            /// Application lost focus but it is still working
             ACTIVE_BACKGROUND,
+            /// Application: Close request message has been received but there are still pending tasks to be resolved
+            /// before closure. Application informs Application Manager that it can switch application if needed.
+            FINALIZING_CLOSE,
             /// Application: Close request message has been received. As a response application must send close request
             /// acknowledge message. Application must start closing all workers and releasing resources. After all
             /// workers are closed and resources released application sends to application manager CLOSING_FINISHED
@@ -189,11 +198,12 @@ namespace app
         void clearLongPressTimeout();
 
         explicit Application(std::string name,
-                             std::string parent                  = "",
-                             sys::phone_modes::PhoneMode mode    = sys::phone_modes::PhoneMode::Connected,
-                             StartInBackground startInBackground = {false},
-                             uint32_t stackDepth                 = 4096,
-                             sys::ServicePriority priority       = sys::ServicePriority::Idle);
+                             std::string parent                          = "",
+                             sys::phone_modes::PhoneMode phoneMode       = sys::phone_modes::PhoneMode::Connected,
+                             sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled,
+                             StartInBackground startInBackground         = {false},
+                             uint32_t stackDepth                         = 4096,
+                             sys::ServicePriority priority               = sys::ServicePriority::Idle);
 
         virtual ~Application() noexcept;
 
@@ -225,7 +235,8 @@ namespace app
         ///        that we dont want to close app calling
         void switchWindow(const std::string &windowName,
                           gui::ShowMode cmd                     = gui::ShowMode::GUI_SHOW_INIT,
-                          std::unique_ptr<gui::SwitchData> data = nullptr);
+                          std::unique_ptr<gui::SwitchData> data = nullptr,
+                          SwitchReason reason                   = SwitchReason::SwitchRequest);
 
         /// Same as switchWindow above
         inline void switchWindow(const std::string &windowName, std::unique_ptr<gui::SwitchData> data)
@@ -341,7 +352,7 @@ namespace app
 
         /// Method used to attach popups windows to application
         void attachPopups(const std::vector<gui::popup::ID> &popupsList);
-        void showPopup(gui::popup::ID id, const gui::PopupRequestParams *params);
+        virtual void showPopup(gui::popup::ID id, const gui::PopupRequestParams *params);
         void abortPopup(gui::popup::ID id);
 
       public:
@@ -384,8 +395,11 @@ namespace app
         bool systemCloseInProgress = false;
         /// Storage for asynchronous tasks callbacks.
         std::unique_ptr<CallbackStorage> callbackStorage;
+        void checkBlockingRequests();
+        virtual sys::MessagePointer handleAsyncResponse(sys::ResponseMessage *resp);
+
         friend class AsyncTask; // Async tasks need access to application internals, e.g. callback storage, to make
-                                // their API simple.
+        // their API simple.
 
         /// informs self that there was key press
         /// used to provide a way for long press/multipress handling in application
@@ -401,6 +415,7 @@ namespace app
         /// application's settings
         std::unique_ptr<settings::Settings> settings;
         sys::phone_modes::PhoneMode phoneMode;
+        sys::bluetooth::BluetoothMode bluetoothMode;
 
         locks::PhoneLockSubject phoneLockSubject;
         locks::LockPolicyHandler lockPolicyHandler;

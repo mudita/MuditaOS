@@ -3,12 +3,12 @@
 
 #pragma once
 
-#include <vector>
-
 #include <AppWindow.hpp>
 #include <GridLayout.hpp>
-#include <widgets/Rect.hpp>
 #include <utf8/UTF8.hpp>
+#include <widgets/Rect.hpp>
+
+#include <vector>
 
 namespace app
 {
@@ -28,9 +28,20 @@ namespace gui
 
         bool onNotificationsChange(gui::RefreshModes);
 
+      protected:
+        gui::Label *description = nullptr;
+
       private:
         std::function<bool(gui::RefreshModes)> onNotificationsChangeCallback = nullptr;
         gui::Image *notificationThumbnail                                    = nullptr;
+    };
+
+    struct DisabledTile : public Tile
+    {
+        DisabledTile(UTF8 icon,
+                     std::string title,
+                     std::function<bool(Item &)> activatedCallback,
+                     std::function<bool()> hasNotificationsCallback = nullptr);
     };
 
     class MenuPage : public gui::GridLayout
@@ -38,7 +49,7 @@ namespace gui
       public:
         bool first_time_selection = true;
         /// position of element which should be selected on start
-        const unsigned int first_time_selected = 3;
+        const unsigned int first_time_selected = 4;
 
         UTF8 title;
         MenuPage(gui::Item *parent, UTF8 title, std::vector<Tile *> tiles);
@@ -69,6 +80,11 @@ namespace gui
       private:
         const app::DBNotificationsBaseHandler &dbNotifications;
         void invalidate() noexcept;
+        gui::Tile *createApplicationTile(UTF8 icon,
+                                         std::string title,
+                                         std::function<bool(Item &)> activatedCallback,
+                                         std::function<bool()> hasNotificationsCallback = nullptr);
+        gui::Tile *createDisabledApplicationTile(UTF8 icon, std::string title);
     };
 
 } /* namespace gui */

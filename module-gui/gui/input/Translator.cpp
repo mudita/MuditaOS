@@ -16,47 +16,66 @@ namespace gui
         constexpr auto special = "special";
     } // namespace filetype
 
-    void recon_long_press(InputEvent &evt, const RawKey &key, const RawKey &prev_key_press, uint32_t time)
-    {
-        if (key.state == RawKey::State::Released && prev_key_press.key_code == key.key_code) {
-            // determine long press
-            if (key.time_release - prev_key_press.time_press >= key_time_longpress_ms) {
-                evt.setState(InputEvent::State::keyReleasedLong);
-            }
-        }
-    }
-
     InputEvent KeyBaseTranslation::set(RawKey key)
     {
         gui::InputEvent evt(key);
-        if (key.state == RawKey::State::Pressed) {
+        switch (key.state) {
+        case RawKey::State::Pressed:
             evt.setState(InputEvent::State::keyPressed);
+            break;
+        case RawKey::State::Released:
+            translateRelease(evt, key);
+            break;
+        case RawKey::State::Moved:
+            evt.setState(InputEvent::State::keyMoved);
+            break;
+        case RawKey::State::Undefined:
+            evt.setState(InputEvent::State::Undefined);
+            break;
         }
-        else if (key.state == RawKey::State::Released) {
-            evt.setState(InputEvent::State::keyReleasedShort);
-        }
-        recon_long_press(evt, key, prev_key_press, key_time_longpress_ms);
         // store last key press/release
         if (key.state == RawKey::State::Pressed) {
-            prev_key_press = key;
+            previousKeyPress = key;
         }
-        if (key.state != RawKey::State::Released) {
-            prev_key_released = false;
-        }
-        else {
-            prev_key_released = true;
-        }
+        isPreviousKeyPressed = (key.state == RawKey::State::Pressed);
+
         return evt;
     }
 
-    bool KeyBaseTranslation::timeout(uint32_t time)
+    void KeyBaseTranslation::translateRelease(InputEvent &evt, const RawKey &key)
     {
-        if (!prev_key_released && (prev_key_press.time_press != 0) &&
-            (time - prev_key_press.time_press >= key_time_longpress_ms)) {
-            prev_key_timedout = true;
+        if (!isPreviousKeyPressed) {
+            // Release can only happen after Press
+            evt.setState(InputEvent::State::Undefined);
+            return;
+        }
+        if ((previousKeyPress.keyCode == key.keyCode) &&
+            (key.timeRelease - previousKeyPress.timePress >= keyTimeLongpressMs)) {
+            evt.setState(InputEvent::State::keyReleasedLong);
+        }
+        else {
+            evt.setState(InputEvent::State::keyReleasedShort);
+        }
+    }
+
+    bool KeyBaseTranslation::isKeyPressTimedOut(uint32_t actualTimeStamp)
+    {
+        if (isPreviousKeyPressed && (previousKeyPress.timePress != 0) &&
+            (actualTimeStamp - previousKeyPress.timePress >= keyTimeLongpressMs)) {
+            isPreviousKeyTimedOut = true;
             return true;
         }
         return false;
+    }
+
+    void KeyBaseTranslation::resetPreviousKeyPress()
+    {
+        previousKeyPress = {};
+    }
+
+    void KeyBaseTranslation::setPreviousKeyTimedOut(bool status)
+    {
+        isPreviousKeyTimedOut = status;
     }
 
     gui::KeyCode getKeyCode(bsp::KeyCodes code)
@@ -141,6 +160,7 @@ namespace gui
             return gui::KeyCode::HEADSET_OK;
 
         case bsp::KeyCodes::HeadsetVolUp:
+            void resetPreviousKeyPress();
             return gui::KeyCode::HEADSET_VOLUP;
 
         case bsp::KeyCodes::HeadsetVolDown:
@@ -156,29 +176,28 @@ namespace gui
     {
         auto evt = KeyBaseTranslation::set(key);
         // when last action timed out we don't want to handle key release
-        if (prev_key_timedout && key.state == RawKey::State::Released) {
+        if (isPreviousKeyTimedOut && key.state == RawKey::State::Released) {
             evt.setState(InputEvent::State::Undefined);
-            prev_key_timedout = false;
+            isPreviousKeyTimedOut = false;
         }
-        evt.setKeyCode(getKeyCode(key.key_code));
+        evt.setKeyCode(getKeyCode(key.keyCode));
         return evt;
     }
 
     InputEvent KeyInputSimpleTranslation::translate(uint32_t timeout)
     {
-        RawKey key{RawKey::State::Released, prev_key_press.key_code, 0, timeout};
-        return InputEvent{key, InputEvent::State::keyReleasedLong, getKeyCode(key.key_code)};
+        RawKey key{RawKey::State::Released, previousKeyPress.keyCode, 0, timeout};
+        return InputEvent{key, InputEvent::State::keyReleasedLong, getKeyCode(key.keyCode)};
     }
 
     uint32_t KeyInputMappedTranslation::handle(RawKey key, const std::string &keymap)
     {
         // get shortpress
-        if (prev_key_press.key_code != key.key_code) {
+        if (previousKeyPress.keyCode != key.keyCode) {
             times = 0;
         }
         else if (key.state == RawKey::State::Released) {
-            /// TODO use key_time_cycle_ms from keymap (if exists in keymap...)
-            if (key.time_release - prev_key_press.time_release < key_time_cycle_ms) {
+            if (key.timeRelease - previousKeyPress.timeRelease < keyTimeCycleMs) {
                 ++times;
             }
             else {
@@ -186,9 +205,9 @@ namespace gui
             }
         }
         if (key.state == RawKey::State::Released) {
-            prev_key_press = key;
+            previousKeyPress = key;
         }
-        return profiles.get(keymap).getCharKey(key.key_code, times);
+        return profiles.get(keymap).getCharKey(key.keyCode, times);
     }
 
     uint32_t KeyInputMappedTranslation::getTimes() const noexcept

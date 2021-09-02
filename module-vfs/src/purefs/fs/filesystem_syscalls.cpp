@@ -145,13 +145,13 @@ namespace purefs::fs
         const auto abspath     = absolute_path(path);
         auto [mountp, pathpos] = find_mount_point(abspath);
         if (!mountp) {
-            LOG_ERROR("VFS: Unable to find mount point: %s", std::string(path).c_str());
+            LOG_ERROR("VFS: Unable to find specified mount point");
             return -ENOENT;
         }
         auto fsops = mountp->fs_ops();
         if (fsops) {
             if ((flags & O_ACCMODE) != O_RDONLY && (mountp->flags() & mount_flags::read_only)) {
-                LOG_ERROR("Trying to open file %.*s with WR... flag on RO filesystem", int(path.size()), path.data());
+                LOG_ERROR("Trying to open file with WR... flag on RO filesystem");
                 return -EACCES;
             }
             auto fh = fsops->open(mountp, abspath, flags, mode);
@@ -188,7 +188,7 @@ namespace purefs::fs
         const auto abspath     = absolute_path(path);
         auto [mountp, pathpos] = find_mount_point(abspath);
         if (!mountp) {
-            LOG_ERROR("VFS: Unable to find mount point: %s", std::string(path).c_str());
+            LOG_ERROR("VFS: Unable to find specified mount point");
             return std::make_shared<internal::directory_handle>(nullptr, -ENOENT);
         }
         auto fsops = mountp->fs_ops();

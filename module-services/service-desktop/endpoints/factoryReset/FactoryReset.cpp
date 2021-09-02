@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "FactoryReset.hpp"
-#include <SystemManager/SystemManager.hpp>
+#include <SystemManager/SystemManagerCommon.hpp>
 #include <log.hpp>
 #include <service-db/DBServiceName.hpp>
 #include <Utils.hpp>
@@ -51,13 +51,13 @@ namespace FactoryReset
         if (ownerService != nullptr) {
             LOG_INFO("Closing ServiceDB...");
             std::string dbServiceName = service::name::db;
-            sys::SystemManager::DestroySystemService(dbServiceName, ownerService);
+            sys::SystemManagerCommon::DestroySystemService(dbServiceName, ownerService);
         }
 
         DeleteSelectedUserFiles(userOSPath);
 
         LOG_INFO("Rebooting...");
-        sys::SystemManager::Reboot(ownerService);
+        sys::SystemManagerCommon::Reboot(ownerService);
         return true;
     }
 
@@ -98,20 +98,20 @@ namespace FactoryReset
 
             if (std::filesystem::is_directory(direntry)) {
                 if (direntry.path().string() != purefs::dir::getFactoryOSPath()) {
-                    LOG_INFO("FactoryReset: recursively deleting dir %s...", delpath.c_str());
+                    LOG_INFO("FactoryReset: recursively deleting dir...");
                     try {
                         std::filesystem::remove_all(delpath.c_str());
                     }
                     catch (const std::filesystem::filesystem_error &e) {
-                        LOG_ERROR("FactoryReset: error deleting dir %s, aborting...", delpath.c_str());
+                        LOG_ERROR("FactoryReset: error deleting dir, aborting...");
                         return false;
                     }
                 }
             }
             else {
-                LOG_INFO("FactoryReset: deleting file %s...", delpath.c_str());
+                LOG_INFO("FactoryReset: deleting file...");
                 if (std::filesystem::remove(delpath.c_str())) {
-                    LOG_ERROR("FactoryReset: error deleting file %s, aborting...", delpath.c_str());
+                    LOG_ERROR("FactoryReset: error deleting file, aborting...");
                     return false;
                 }
             }
@@ -123,9 +123,8 @@ namespace FactoryReset
     bool CopyDirContent(const std::string &sourcedir, const std::string &targetdir)
     {
         if (recurseDepth >= max_recurse_depth) {
-            LOG_ERROR("FactoryReset: recurse level %d (too high), error assumed, skipping restore of dir %s",
-                      recurseDepth,
-                      sourcedir.c_str());
+            LOG_ERROR("FactoryReset: recurse level %d (too high), error assumed, skipping restore of dir",
+                      recurseDepth);
             return false;
         }
 
@@ -148,7 +147,7 @@ namespace FactoryReset
             if ((sourcepath.size() >= max_filepath_length) || (targetpath.size() >= max_filepath_length)) {
                 LOG_ERROR("FactoryReset: path length (source or target) exceeds system limit of %d",
                           max_filepath_length);
-                LOG_ERROR("FactoryReset: skipping restore of dir %s into %s", sourcepath.c_str(), targetpath.c_str());
+                LOG_ERROR("FactoryReset: skipping restore of directory");
                 return false;
             }
 
@@ -157,16 +156,16 @@ namespace FactoryReset
                     continue;
                 }
 
-                LOG_INFO("FactoryReset: restoring dir  %s into %s...", sourcepath.c_str(), targetpath.c_str());
+                LOG_INFO("FactoryReset: restoring directory");
 
                 try {
                     if (std::filesystem::create_directory(targetpath.c_str())) {
-                        LOG_ERROR("FactoryReset: create dir %s failed", targetpath.c_str());
+                        LOG_ERROR("FactoryReset: create dir failed");
                         return false;
                     }
                 }
                 catch (const std::filesystem::filesystem_error &err) {
-                    LOG_FATAL("Exception while creating dir %s", targetpath.c_str());
+                    LOG_FATAL("Exception while creating dir");
                     return false;
                 }
 
@@ -180,7 +179,7 @@ namespace FactoryReset
                 recurseDepth--;
             }
             else {
-                LOG_INFO("FactoryReset: restoring file %s into %s...", sourcepath.c_str(), targetpath.c_str());
+                LOG_INFO("FactoryReset: restoring file");
 
                 if (!CopyFile(sourcepath, targetpath)) {
                     return false;
@@ -212,13 +211,13 @@ namespace FactoryReset
                     }
 
                     if (std::fread(buffer.get(), 1, readsize, sf.get()) != readsize) {
-                        LOG_ERROR("FactoryReset: read from sourcefile %s failed", sourcefile.c_str());
+                        LOG_ERROR("FactoryReset: read from sourcefile failed");
                         ret = false;
                         break;
                     }
 
                     if (std::fwrite(buffer.get(), 1, readsize, tf.get()) != readsize) {
-                        LOG_ERROR("FactoryReset: write to targetfile %s failed", targetfile.c_str());
+                        LOG_ERROR("FactoryReset: write to targetfile failed");
                         ret = false;
                         break;
                     }

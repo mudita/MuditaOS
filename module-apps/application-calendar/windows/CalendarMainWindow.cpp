@@ -2,11 +2,12 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CalendarMainWindow.hpp"
-#include "application-calendar/ApplicationCalendar.hpp"
-#include "application-calendar/models/MonthModel.hpp"
-#include "application-calendar/widgets/CalendarStyle.hpp"
+
+#include <application-calendar/ApplicationCalendar.hpp>
+#include <application-calendar/widgets/CalendarStyle.hpp>
+
+#include <gui/input/InputEvent.hpp>
 #include <time/time_conversion.hpp>
-#include <InputEvent.hpp>
 
 namespace gui
 {

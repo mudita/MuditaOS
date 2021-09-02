@@ -2,16 +2,17 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ActiveNotificationsModel.hpp"
-#include <application-desktop/ApplicationDesktop.hpp>
-#include <module-db/queries/notifications/QueryNotificationsClear.hpp>
-#include <service-appmgr/Controller.hpp>
-#include <application-call/data/CallSwitchData.hpp>
-#include <queries/messages/threads/QueryThreadGetByNumber.hpp>
-#include <application-messages/data/SMSdata.hpp>
-#include <application-messages/Constants.hpp>
-#include <service-appmgr/messages/SwitchRequest.hpp>
+#include "ApplicationDesktop.hpp"
 
+#include <application-call/data/CallSwitchData.hpp>
+#include <application-messages/Constants.hpp>
+#include <application-messages/data/SMSdata.hpp>
 #include <gsl/assert>
+#include <module-db/queries/notifications/QueryNotificationsClear.hpp>
+#include <queries/messages/threads/QueryThreadGetByNumber.hpp>
+#include <service-appmgr/Constants.hpp>
+#include <service-appmgr/Controller.hpp>
+#include <service-appmgr/messages/SwitchRequest.hpp>
 
 using namespace gui;
 
@@ -51,7 +52,7 @@ namespace
                 auto data    = std::make_unique<SMSThreadData>(std::make_shared<ThreadRecord>(result->getThread()));
                 auto request = std::make_shared<app::manager::SwitchRequest>(
                     app->GetName(), app::name_messages, gui::name::window::thread_view, std::move(data));
-                return app->bus.sendUnicast(std::move(request), app::manager::ApplicationManager::ServiceName);
+                return app->bus.sendUnicast(std::move(request), service::name::appmgr);
             };
             task->setCallback(std::move(queryCallback));
             task->execute(app, static_cast<app::ApplicationDesktop *>(app));

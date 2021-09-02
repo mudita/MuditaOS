@@ -46,7 +46,7 @@ void DLCChannel::sendData(std::vector<uint8_t> &data)
 
 bool DLCChannel::establish()
 {
-    LOG_DEBUG("Sending %s frame to DLCI %i", TypeOfFrame_text[chanParams.TypeOfFrame].c_str(), DLCI);
+    LOG_SENSITIVE(LOGDEBUG, "Sending %s frame to DLCI %i", TypeOfFrame_text[chanParams.TypeOfFrame].c_str(), DLCI);
 
     CellularMuxFrame frame_c(CellularMuxFrame::frame_t(static_cast<uint8_t>(DLCI << 2) | (1 << 1),
                                                        static_cast<uint8_t>(chanParams.TypeOfFrame)));

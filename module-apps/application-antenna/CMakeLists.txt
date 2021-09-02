@@ -26,16 +26,10 @@ target_sources(application-antenna
         include/application-antenna/ApplicationAntenna.hpp
 )
 
-option(ENABLE_APP_ANTENNA "Enable application antenna" ON)
-
-target_compile_definitions(application-antenna
-    INTERFACE
-        $<$<BOOL:${ENABLE_APP_ANTENNA}>:ENABLE_APP_ANTENNA>
-)
-
 target_link_libraries(application-antenna
     PRIVATE
         apps-common
+        service-antenna
         service-cellular
 )
 

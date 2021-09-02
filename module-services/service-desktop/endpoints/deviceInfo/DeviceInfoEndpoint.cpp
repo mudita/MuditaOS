@@ -3,7 +3,6 @@
 
 #include "DeviceInfoEndpoint.hpp"
 #include <endpoints/Context.hpp>
-#include <endpoints/update/UpdateMuditaOS.hpp>
 #include <parser/MessageHandler.hpp>
 
 #include <EventStore.hpp>
@@ -32,16 +31,22 @@ auto DeviceInfoEndpoint::handle(Context &context) -> void
         break;
     }
 }
+
+auto DeviceInfoEndpoint::getSerialNumber() -> std::string
+{
+    return dynamic_cast<ServiceDesktop *>(ownerServicePtr)->getSerialNumber();
+}
+
 auto DeviceInfoEndpoint::getDeviceInfo(Context &context) -> bool
 {
     if (ownerServicePtr == nullptr) {
         return false;
     }
-    json11::Json updateHistory   = static_cast<ServiceDesktop *>(ownerServicePtr)->updateOS->getUpdateHistory();
     std::unique_ptr<struct statvfs> vfstat = std::make_unique<struct statvfs>();
     if ((*statvfs)(purefs::dir::getRootDiskPath().c_str(), vfstat.get()) < 0) {
         return false;
     }
+
     unsigned long totalMbytes = (vfstat->f_frsize * vfstat->f_blocks) / 1024LLU / 1024LLU;
     unsigned long freeMbytes  = (vfstat->f_bfree * vfstat->f_bsize) / 1024LLU / 1024LLU;
     unsigned long freePercent = (freeMbytes * 100) / totalMbytes;
@@ -54,15 +59,16 @@ auto DeviceInfoEndpoint::getDeviceInfo(Context &context) -> bool
          {json::signalStrength, std::to_string(static_cast<int>(Store::GSM::get()->getSignalStrength().rssiBar))},
          {json::accessTechnology, std::to_string(static_cast<int>(Store::GSM::get()->getNetwork().accessTechnology))},
          {json::networkStatus, std::to_string(static_cast<int>(Store::GSM::get()->getNetwork().status))},
+         {json::networkOperatorName, Store::GSM::get()->getNetworkOperatorName()},
          {json::fsTotal, std::to_string(totalMbytes)},
          {json::fsFree, std::to_string(freeMbytes)},
          {json::fsFreePercent, std::to_string(freePercent)},
          {json::gitRevision, (std::string)(GIT_REV)},
          {json::gitTag, (std::string)GIT_TAG},
          {json::gitBranch, (std::string)GIT_BRANCH},
-         {json::updateHistory, updateHistory},
          {json::currentRTCTime, std::to_string(static_cast<uint32_t>(std::time(nullptr)))},
-         {json::version, std::string(VERSION)}}));
+         {json::version, std::string(VERSION)},
+         {json::serialNumber, getSerialNumber()}}));
 
     MessageHandler::putToSendQueue(context.createSimpleResponse());
     return true;

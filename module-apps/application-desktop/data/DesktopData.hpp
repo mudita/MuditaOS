@@ -3,29 +3,14 @@
 
 #pragma once
 
-#include "gui/SwitchData.hpp"
+#include <gui/SwitchData.hpp>
 #include <service-desktop/DesktopMessages.hpp>
+
 #include <filesystem>
 #include <utility>
 
 namespace gui
 {
-
-    class UpdateSwitchData : public gui::SwitchData
-    {
-      public:
-        explicit UpdateSwitchData(sdesktop::UpdateOsMessage *messageToCopyFrom) : updateOsMessage(*messageToCopyFrom)
-        {}
-
-        [[nodiscard]] const sdesktop::UpdateOsMessage &getUpdateOsMessage() const noexcept
-        {
-            return updateOsMessage;
-        }
-
-      private:
-        sdesktop::UpdateOsMessage updateOsMessage;
-    };
-
     class CurrentOsVersion : public gui::SwitchData
     {
         std::string osVersion;

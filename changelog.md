@@ -1,8 +1,167 @@
 # MuditaOS changelog
 
+** Not suitable for the T7 hardware version. **
+
 To install the new version of MuditaOS please follow the steps described in this guide:
 - [Linux](https://github.com/mudita/MuditaOS/blob/master/doc/boot_and_update.md#creating-a-storage-partition)
 - [Windows and macOS](https://github.com/mudita/MuditaOS/blob/master/doc/flashing_win_macos.md)
+
+## [0.75.1 2021-08-02]
+
+* [BH-380] Librarize application-calendar
+* [BH-564] Add Time&Units application
+* [BH-564] Time&Units scaling fix
+* [BH-663] Fix CMake in service-antenna
+* [BH-669] Fix CMake in service-appmgr
+* [BH-671] Fixed CMake in service-audio
+* [BH-675] Add TextSpinner
+* [BH-677] Add widget AlarmSetSpinner
+* [BH-700] Add minimal Alarm app
+* [CP-207] Add option to disable dev mode endpoint
+* [CP-225] Create contact using post method, and update it using put
+* [CP-261] Print crash occurences to log
+* [CP-371] Updater miscelanous developer mode and logs changes
+* [CP-434] Restore checksums.txt for legacy update
+* [EGD-6723] Music Player application skeleton
+* [EGD-6881] Fix HSP no sound
+* [EGD-7031] Remove UT deps to the production image
+* [EGD-7083] Fixed earspeaker bt HSP
+* [EGD-7127] Store imported contacts in DB
+* [EGD-7161] Remove image name reference in vfs
+* [EGD-7163] Disable auto locking when playing music
+* [EGD-7204] Revert of msp register and clear IRQ flags
+* [EGD-7204] Set msp register and clear IRQ flags
+* [EGD-7206] Fix audio profiles priorities
+* [EGD-7211] Sim contacts import selector UI part
+* [EGD-7227] Fix update package generation
+
+## [0.74.1 2021-07-26]
+
+* [BH-362] Move segger to a separate directory
+* [BH-375] Clean `module-utils/third-party`
+* [BH-377] Liberalize application special input
+* [BH-381] Turned application call into lib
+* [BH-382] Rebase and cleaning
+* [BH-384] Turned application desktop to library
+* [BH-385] Turned application meditation into lib
+* [BH-464] Fix make all
+* [BH-628] Cleaned up module-vfs cmake
+* [BH-655] Add SideListView
+* [BH-672] SideListView integration with ListViewEngine
+* [BH-674] TimeSetSpinner
+* [CP-215] Expose current operator name in service desktop API
+* [CP-254] Use Send File for Update package
+* [CP-260] Use gdb with py to debug crash dumps
+* [CP-264] Ensure bluetooth logging
+* [CP-265] Extend cellular logging
+* [CP-267] Ensure cellular logging
+* [CP-280] Implement send file procedure
+* [CP-281] Block restoration of mock messages
+* [CP-282] Add md5sums to the version.json file
+* [CP-282] Set correct standalone image dependencies
+* [CP-288] Update secureboot documentation
+* [CP-316] Tool to get MuditaOS log
+* [CP-319] Extends reboot reason code
+* [CP-325] Request reboot code adjusted to work with harness
+* [CP-326] Reformat recovery partition as littlefs
+* [CP-327] Fix UB in QueryResult
+* [CP-335] Fix formatting of SN
+* [CP-355] Pure update full flow implemented
+* [EGD-3171] Fix key shortRelease on app switch
+* [EGD-5006] Add French localizations
+* [EGD-5659] Cpu frequency for audio
+* [EGD-6212] Add tethering doc
+* [EGD-6609] Separated out sms logic
+* [EGD-6624] Audio support for linux simulator
+* [EGD-6672] Fix missing key after slider
+* [EGD-6889] Fix Fixed network time handling
+* [EGD-6928] Fix system powe instability
+* [EGD-6971] TextLine breaking on space or with dash
+* [EGD-6973] Fix Auto date is on by default
+* [EGD-7005] Removed sensitive data cellular
+* [EGD-7010] Remove sensitive data from logs
+* [EGD-7024] Keep the state of SMS on phone lock
+* [EGD-7036] Audio tracks updated
+* [EGD-7052] Generate unique window name
+* [EGD-7074] Fix date and time unit tests
+* [EGD-7088] SDRAM configuration on T7 board
+* [EGD-7096] Add reaction after changing BT device name
+* [EGD-7097] Introduce BT name length limit
+* [EGD-7108] Fix disconnecting all devices during unpairing
+* [EGD-7114] Updated reboot messages
+* [EGD-7120] Remove old settings application
+* [EGD-7124] Add import contacts from sim
+* [EGD-7130] Renamed settings application
+* [EGD-7131] Flashing instruction updated
+* [EGD-7133] Bluetooth setting cleanup
+* [EGD-7134] Network setting cleanup and fixes
+* [EGD-7135] Display and keypad setting cleanup and fixes
+* [EGD-7136] Apps setting cleanup and fixes
+* [EGD-7136] Phone modes setting cleanup and fixes
+* [EGD-7138] Security setting cleanup and fixes
+* [EGD-7139] System setting cleanup and fixes
+* [EGD-7141] Fix GUI googletest
+* [EGD-7142] Fix compilation issues with __PRETTY_FUNCTION__
+* [EGD-7145] Fix mp3 tags fetch
+* [EGD-7149] Fix connecting BT devices
+* [EGD-7162] Removed sensitive data from settings app
+* [EGD-7164] ListViewEngine separation from ListView
+* [EGD-7169] Changed genlfs path
+* [EGD-7176] Switch GH Actions docker image to company's one
+* [EGD-7187] Update docker maintainer
+* [EGD-7199] Switch weekly releases to T6
+
+## [0.73.1 2021-07-09]
+
+* [BH-386] Turned app messages into lib
+* [CP-312] Add reboot to update function
+* [CP-314] Allow genlittlefs to create empty part
+* [CP-315] Remove old fat only partition layout
+* [EGD-6697] Fix DateTime::isYesterday() tests
+* [EGD-6955] Add calls notifications in DND
+* [EGD-6956] Add offline calls notifications
+* [EGD-6957] Add sms notifications in DnD
+* [EGD-7006] Removed sensitive data from db
+* [EGD-7007] Removed sensitive data from gui
+* [EGD-7026] Fix nullptr calls and unlock behaviour
+* [EGD-7040] Notes autosave
+* [EGD-7043] Added 3 localizations
+* [EGD-7043] Fixes in German JSON
+* [EGD-7043] Fixes in Polish localization
+* [EGD-7043] Reverted the decimal separator for Polish
+* [EGD-7044] Strip down calendar code
+* [EGD-7047] Fixed navigation down through input texts
+* [EGD-7048] Remove "Automatic time zone" from settings
+* [EGD-7050] Fixed reboot copy
+* [EGD-7051] Fixed saving multiple notes at once
+* [EGD-7071] Text paste fixed
+* [EGD-7074] Removed incorrect and failing unit tests
+* [EGD-7077] Don't allow for connecting more than 1 BT device at once
+* [EGD-7081] Disconnect forgotten BT device
+* [EGD-7084] No scrollbar on All devices list
+* [EGD-7089] Fix torch color change when locked
+* [EGD-7091] Forgetting forgets incorrect BT device
+* [EGD-7100] Fix shuttered audio
+* [EGD-7105] Fix window with timeout
+* [EGD-7111] Restore calendarEvents endpoint number
+
+## [0.72.1 2021-07-05]
+
+* [BH-363] Move libphonenumber to a separate directory
+* [BH-379] Librarize application-calculator
+* [BH-390] Turned notes app into library
+* [BH-464] Moved USB stack to third-party dir
+* [BH-591] Add Spinner Widget
+* [CP-183] Do not log sensitive data in service-desktop
+* [CP-248] Harness script to transfer Update package to Pure
+* [CP-253] Add checksum to package transfer
+* [CP-270] Replace CRC32 library
+* [EGD-6697] Fix DateTime tests
+* [EGD-6699] Add timezone selecting window
+* [EGD-6978] Outgoing calls fixes
+* [EGD-6990] No autolock when battery is low
+* [EGD-7003] Removed sensitive data bt
+* [EGD-7004] Removed sensitive data
 
 ## [0.71.1 2021-06-30]
 

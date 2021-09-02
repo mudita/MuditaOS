@@ -1,8 +1,6 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <utility>
-
 #include "ApplicationOnBoarding.hpp"
 
 #include "data/OnBoardingMessages.hpp"
@@ -18,13 +16,11 @@
 #include "windows/OnBoardingDateAndTimeWindow.hpp"
 #include "windows/OnBoardingChangeDateAndTimeWindow.hpp"
 
-#include <module-services/service-appmgr/service-appmgr/messages/GetCurrentDisplayLanguageResponse.hpp>
-#include <module-apps/application-settings-new/data/LanguagesData.hpp>
-#include <module-services/service-db/agents/settings/SystemSettings.hpp>
-#include <module-apps/application-settings-new/windows/ChangeTimeZone.hpp>
+#include <application-settings/windows/system/ChangeTimeZone.hpp>
 #include <apps-common/locks/data/PhoneLockMessages.hpp>
-#include <apps-common/locks/data/SimLockMessages.hpp>
-#include <service-appmgr/service-appmgr/model/ApplicationManager.hpp>
+#include <service-appmgr/Constants.hpp>
+#include <service-appmgr/messages/GetCurrentDisplayLanguageResponse.hpp>
+#include <service-db/agents/settings/SystemSettings.hpp>
 
 namespace app
 {
@@ -35,9 +31,11 @@ namespace app
 
     ApplicationOnBoarding::ApplicationOnBoarding(std::string name,
                                                  std::string parent,
-                                                 sys::phone_modes::PhoneMode mode,
+                                                 sys::phone_modes::PhoneMode phoneMode,
+                                                 sys::bluetooth::BluetoothMode bluetoothMode,
                                                  StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), mode, startInBackground, OnBoardingStackSize)
+        : Application(
+              std::move(name), std::move(parent), phoneMode, bluetoothMode, startInBackground, OnBoardingStackSize)
     {
         using namespace gui::status_bar;
         statusBarManager->enableIndicators(
@@ -108,8 +106,7 @@ namespace app
 
     void ApplicationOnBoarding::finalizeOnBoarding()
     {
-        bus.sendUnicast(std::make_shared<onBoarding::FinalizeOnBoarding>(),
-                        app::manager::ApplicationManager::ServiceName);
+        bus.sendUnicast(std::make_shared<onBoarding::FinalizeOnBoarding>(), service::name::appmgr);
     }
 
     sys::ReturnCodes ApplicationOnBoarding::DeinitHandler()

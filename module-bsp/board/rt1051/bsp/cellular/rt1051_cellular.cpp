@@ -210,7 +210,25 @@ namespace bsp
 
     ssize_t RT1051Cellular::write(void *buf, size_t nbytes)
     {
-        static uint8_t txBuffer[128];
+        constexpr size_t txBufferSize = 150;
+        static uint8_t txBuffer[txBufferSize];
+
+        if (nbytes > txBufferSize) {
+            LOG_ERROR("TX buffer too small for given number of bytes to send!");
+            assert(false);
+        }
+
+        constexpr auto maxTXCheckRetires = 5;
+        if (LPUART_IsEDMATxBusy(&uartDmaHandle)) {
+            for (int i = 0; i < maxTXCheckRetires; ++i) {
+                LOG_INFO("Waiting for TX free %d", i);
+                ulTaskNotifyTake(pdFALSE, 100);
+                if (!LPUART_IsEDMATxBusy(&uartDmaHandle)) {
+                    break;
+                }
+            }
+        }
+
         memcpy(txBuffer, buf, nbytes);
 
         lpuart_transfer_t sendXfer;
@@ -225,8 +243,10 @@ namespace bsp
 
         enableTx();
 
-        if (LPUART_SendEDMA(CELLULAR_UART_BASE, &uartDmaHandle, &sendXfer) != kStatus_Success) {
-            LOG_ERROR("Cellular: TX Failed!");
+        auto status = LPUART_SendEDMA(CELLULAR_UART_BASE, &uartDmaHandle, &sendXfer);
+
+        if (status != kStatus_Success) {
+            LOG_ERROR("Cellular: TX Failed! , status: %d", static_cast<int>(status));
             disableTx();
             return -1;
         }
@@ -737,12 +757,10 @@ namespace bsp
 
             void simSelect()
             {
-                if (Store::GSM::get()->selected == Store::GSM::SIM::SIM2) {
-                    GPIO_PinWrite(BSP_CELLULAR_SIM_CARD_PRESENCE_PORT, BSP_CELLULAR_SIMSEL_PIN, 1);
-                }
-                else {
-                    GPIO_PinWrite(BSP_CELLULAR_SIM_CARD_PRESENCE_PORT, BSP_CELLULAR_SIMSEL_PIN, 0);
-                }
+                GPIO_PinWrite(BSP_CELLULAR_SIM_CARD_PRESENCE_PORT,
+                              BSP_CELLULAR_SIMSEL_PIN,
+                              static_cast<uint8_t>(Store::GSM::get()->selected));
+                LOG_INFO("%s slot selected", magic_enum::enum_name(Store::GSM::get()->selected).data());
             }
         } // namespace sim
 

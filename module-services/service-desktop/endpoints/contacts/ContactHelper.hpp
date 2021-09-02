@@ -49,10 +49,14 @@ namespace parserFSM
         inline constexpr auto primaryName     = "priName";
         inline constexpr auto alternativeName = "altName";
         inline constexpr auto address         = "address";
+        inline constexpr auto note            = "note";
+        inline constexpr auto mail            = "email";
         inline constexpr auto id              = "id";
         inline constexpr auto numbers         = "numbers";
         inline constexpr auto isBlocked       = "blocked";
         inline constexpr auto isFavourite     = "favourite";
+        inline constexpr auto isICE           = "ice";
+        inline constexpr auto speedDial       = "speedDial";
         inline constexpr auto count           = "count";
 
     } // namespace json::contacts

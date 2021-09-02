@@ -36,8 +36,13 @@ namespace gui
     status_bar::Configuration PhoneLockInputWindow::configureStatusBar(status_bar::Configuration appConfiguration)
     {
         if (phoneLockInputTypeAction == locks::PhoneLockInputTypeAction::Unlock) {
-            appConfiguration.enable(status_bar::Indicator::Lock);
             appConfiguration.disable(status_bar::Indicator::Time);
+            appConfiguration.enable(status_bar::Indicator::Lock);
+            appConfiguration.enable(status_bar::Indicator::PhoneMode);
+            appConfiguration.enable(status_bar::Indicator::Battery);
+            appConfiguration.enable(status_bar::Indicator::Signal);
+            appConfiguration.enable(status_bar::Indicator::SimCard);
+            appConfiguration.enable(status_bar::Indicator::Bluetooth);
         }
         else {
             appConfiguration.enable(status_bar::Indicator::Time);
@@ -59,6 +64,7 @@ namespace gui
         rebuild();
         lockBox = std::make_unique<PhoneLockBox>(this, phoneLockInputTypeAction);
         lockBox->buildLockBox(lock->getMaxInputSize());
+        lockBox->update(lock->getCharCount());
 
         setVisibleState();
     }
@@ -104,7 +110,7 @@ namespace gui
         }
         else if (inputEvent.is(KeyCode::KEY_ENTER) && bottomBar->isActive(BottomBar::Side::CENTER)) {
             if (lock->isState(locks::Lock::LockState::Blocked)) {
-                application->returnToPreviousWindow();
+                application->switchWindow(popup::window::phone_lock_window);
             }
             else {
                 lock->consumeState();

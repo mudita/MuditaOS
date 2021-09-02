@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -40,7 +40,7 @@ class PhonebookModel : public app::DatabaseModel<ContactRecord>,
     auto requestLetterMap() -> ContactsMapData;
 
     // virtual methods for ListViewProvider
-    [[nodiscard]] auto getMinimalItemHeight() const -> unsigned int override;
+    [[nodiscard]] auto getMinimalItemSpaceRequired() const -> unsigned int override;
     auto getItem(gui::Order order) -> gui::ListItem * override;
 
     auto handleQueryResponse(db::QueryResult *) -> bool;

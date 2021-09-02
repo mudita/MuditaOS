@@ -69,8 +69,11 @@ namespace gui
             return application;
         };
 
+        std::string getUniqueName() override;
+
         virtual bool onDatabaseMessage(sys::Message *msg);
 
+        bool updateBluetooth(sys::bluetooth::BluetoothMode mode);
         bool updateSim();
         bool updateBatteryStatus();
         bool updateSignalStrength();

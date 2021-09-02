@@ -8,27 +8,27 @@
 
 namespace gui::header
 {
-    Header::Header(Item *parent, Position x, Position y, Length w, Length h) : HBox(parent, x, y, w, h)
+    Header::Header(Item *parent, Position x, Position y, Length w, Length h) : HThreeBox(parent, x, y, w, h)
     {
         setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         setEdges(RectangleEdge::None);
 
-        leftBox = new HBox(this, 0, 0, 0, 0);
-        leftBox->setMinimumSize(style::header::navigation_indicator::box_width, h);
-        leftBox->setAlignment(Alignment(Alignment::Vertical::Top));
-        leftBox->setEdges(RectangleEdge::None);
-        leftBox->setVisible(false);
+        firstBox = new HBox(this, 0, 0, 0, 0);
+        firstBox->setMinimumSize(style::header::navigation_indicator::box_width, h);
+        firstBox->setAlignment(Alignment(Alignment::Vertical::Top));
+        firstBox->setEdges(RectangleEdge::None);
+        firstBox->setVisible(false);
 
         centerBox = new HBox(this, 0, 0, 0, 0);
         centerBox->setEdges(RectangleEdge::None);
         centerBox->setAlignment(Alignment(gui::Alignment::Horizontal::Center));
         centerBox->setMaximumSize(w, h);
 
-        rightBox = new HBox(this, 0, 0, 0, 0);
-        rightBox->setMinimumSize(style::header::navigation_indicator::box_width, h);
-        rightBox->setAlignment(Alignment(Alignment::Vertical::Top));
-        rightBox->setEdges(RectangleEdge::None);
-        rightBox->setVisible(false);
+        lastBox = new HBox(this, 0, 0, 0, 0);
+        lastBox->setMinimumSize(style::header::navigation_indicator::box_width, h);
+        lastBox->setAlignment(Alignment(Alignment::Vertical::Top));
+        lastBox->setEdges(RectangleEdge::None);
+        lastBox->setVisible(false);
     }
 
     Item *Header::createTitle(const UTF8 &text)
@@ -47,26 +47,26 @@ namespace gui::header
 
     void Header::showOuterBoxes()
     {
-        leftBox->setVisible(true);
-        rightBox->setVisible(true);
+        firstBox->setVisible(true);
+        lastBox->setVisible(true);
         resizeItems();
     }
 
     void Header::hideOuterBoxes()
     {
-        if (rightBox->empty() && leftBox->empty()) {
-            rightBox->setVisible(false);
-            leftBox->setVisible(false);
+        if (lastBox->empty() && firstBox->empty()) {
+            lastBox->setVisible(false);
+            firstBox->setVisible(false);
         }
     }
 
     void Header::addToLeftBox(Item *item)
     {
-        leftBox->erase();
+        firstBox->erase();
         showOuterBoxes();
-        leftBox->addWidget(item);
+        firstBox->addWidget(item);
 
-        leftBox->resizeItems();
+        firstBox->resizeItems();
     }
 
     void Header::addToCenterBox(Item *item)
@@ -79,11 +79,11 @@ namespace gui::header
 
     void Header::addToRightBox(Item *item)
     {
-        rightBox->erase();
+        lastBox->erase();
         showOuterBoxes();
-        rightBox->addWidget(item);
+        lastBox->addWidget(item);
 
-        rightBox->resizeItems();
+        lastBox->resizeItems();
     }
 
     void Header::setTitle(const UTF8 &text)
@@ -128,13 +128,13 @@ namespace gui::header
     {
         switch (boxSelection) {
         case BoxSelection::Left:
-            leftBox->erase();
+            firstBox->erase();
             break;
         case BoxSelection::Center:
             centerBox->erase();
             break;
         case BoxSelection::Right:
-            rightBox->erase();
+            lastBox->erase();
             break;
         }
 
@@ -146,11 +146,11 @@ namespace gui::header
     {
         switch (boxSelection) {
         case BoxSelection::Left:
-            return leftBox->visible;
+            return firstBox->visible;
         case BoxSelection::Center:
             return centerBox->visible;
         case BoxSelection::Right:
-            return rightBox->visible;
+            return lastBox->visible;
         }
         return false;
     }

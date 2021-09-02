@@ -26,7 +26,7 @@ namespace gui::option
         };
 
         auto optionText = new TextFixedSize(optionBodyHBox, 0, 0, 0, 0);
-        optionText->setUnderline(false);
+        optionText->drawUnderline(false);
         optionText->setAlignment(gui::Alignment::Vertical::Center);
         optionText->setAlignment(gui::Alignment::Horizontal::Center);
         optionText->setMaximumSize(bell::window::default_text_width, style::window::label::big_h);

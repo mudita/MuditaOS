@@ -307,7 +307,7 @@ TEST_CASE("Secured Endpoint Factory test")
     }
 }
 
-TEST_CASE("FileOperations UT Test")
+TEST_CASE("FileOperations UT Test Get File")
 {
     auto &fileOps = FileOperations::instance();
 
@@ -331,7 +331,7 @@ TEST_CASE("FileContext UT Test Valid Input")
 
     SECTION("Create file context for file")
     {
-        auto fileCtx = FileContext(filePath, fileSize, fileOffset, chunkSize);
+        auto fileCtx = FileReadContext(filePath, fileSize, chunkSize, fileOffset);
 
         REQUIRE(3 == fileCtx.expectedChunkInFile());
 
@@ -348,14 +348,13 @@ TEST_CASE("FileContext UT Test Valid Input")
 TEST_CASE("FileContext UT Test Invalid Input")
 {
     auto filePath{"/sys/user/music/SMS-drum2-stereo.mp3"};
-    auto fileOffset{0u};
 
     SECTION("Create file context for file with invalid file size")
     {
         auto fileSize{0u};
         auto chunkSize{1024 * 3u};
 
-        REQUIRE_THROWS_WITH(FileContext(filePath, fileSize, fileOffset, chunkSize), "Invalid FileContext arguments");
+        REQUIRE_THROWS_WITH(FileReadContext(filePath, fileSize, chunkSize), "Invalid FileContext arguments");
     }
 
     SECTION("Create file context for file with invalid chunk size")
@@ -363,6 +362,46 @@ TEST_CASE("FileContext UT Test Invalid Input")
         auto fileSize{49146u};
         auto chunkSize{0u};
 
-        REQUIRE_THROWS_WITH(FileContext(filePath, fileSize, fileOffset, chunkSize), "Invalid FileContext arguments");
+        REQUIRE_THROWS_WITH(FileReadContext(filePath, fileSize, chunkSize), "Invalid FileContext arguments");
     }
 }
+
+TEST_CASE("FileOperations UT Test Send File")
+{
+    auto &fileOps = FileOperations::instance();
+
+    SECTION("Create receive id for file")
+    {
+        auto filePath{"/sys/user/music/SMS-drum2-stereo.mp3"};
+        auto fileSize{49146};
+        auto fileCrc32{"efd73581"};
+
+        auto txID = fileOps.createTransmitIDForFile(filePath, fileSize, fileCrc32);
+
+        REQUIRE(txID == 1);
+    }
+}
+
+TEST_CASE("FileContext UT Test Valid Input")
+{
+    auto filePath{"/sys/user/MuditaOS.log"};
+    auto fileSize{1536u};
+    auto fileOffset{128 * 6u};
+    auto chunkSize{128 * 3u};
+
+    SECTION("Create file context for file")
+    {
+        auto fileCtx = FileReadContext(filePath, fileSize, chunkSize, fileOffset);
+
+        REQUIRE(3 == fileCtx.expectedChunkInFile());
+
+        REQUIRE(true == fileCtx.validateChunkRequest(3));
+        REQUIRE(false == fileCtx.validateChunkRequest(4));
+
+        REQUIRE(4 == fileCtx.totalChunksInFile());
+
+        fileCtx.advanceFileOffset(fileSize - fileOffset);
+        REQUIRE(true == fileCtx.reachedEOF());
+    }
+}
+

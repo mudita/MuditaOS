@@ -25,8 +25,8 @@ inline constexpr auto uploadFailedMessage = "file upload terminated before all d
 WorkerDesktop::WorkerDesktop(sys::Service *ownerServicePtr,
                              const sdesktop::USBSecurityModel &securityModel,
                              const std::string serialNumber)
-    : sys::Worker(ownerServicePtr, sdesktop::worker_stack), fileDes(nullptr), securityModel(securityModel),
-      serialNumber(serialNumber), ownerService(ownerServicePtr), parser(ownerServicePtr)
+    : sys::Worker(ownerServicePtr, sdesktop::worker_stack), securityModel(securityModel), serialNumber(serialNumber),
+      ownerService(ownerServicePtr), parser(ownerServicePtr)
 {}
 
 bool WorkerDesktop::init(std::list<sys::WorkerQueueInfo> queues)
@@ -44,19 +44,21 @@ bool WorkerDesktop::init(std::list<sys::WorkerQueueInfo> queues)
     usbSuspendTimer = sys::TimerFactory::createSingleShotTimer(
         ownerService, "usbSuspend", constants::usbSuspendTimeout, [this](sys::Timer &) { suspendUsb(); });
 
-    bsp::usbInitParams initParams = {receiveQueue, irqQueue, this, serialNumber.c_str()};
+    bsp::usbInitParams initParams = {receiveQueue, irqQueue, serialNumber.c_str()};
 
     return (bsp::usbInit(initParams) < 0) ? false : true;
 }
 
 bool WorkerDesktop::deinit(void)
 {
-    LOG_DEBUG("deinit");
-
-    if (fileDes != nullptr) {
-        LOG_DEBUG("deinit close opened fileDes");
-        fclose(fileDes);
+    unsigned int maxcount = 10;
+    while (parser.getCurrentState() != parserFSM::State::NoMsg && --maxcount > 0) {
+        vTaskDelay(300);
     }
+    LOG_INFO("we can deinit worker now");
+
+    /// additional wait to flush on serial - we should wait for data sent...
+    vTaskDelay(3000);
 
     bsp::usbDeinit();
 
@@ -111,11 +113,10 @@ bool WorkerDesktop::handleMessage(uint32_t queueID)
         sys::WorkerCommand cmd;
 
         if (serviceQueue.Dequeue(&cmd, 0)) {
-            switch (static_cast<Command>(cmd.command)) {
-            case Command::CancelTransfer:
-                transferTimeoutHandler();
-                break;
-            }
+            LOG_DEBUG("Received cmd: %d", static_cast<int>(cmd.command));
+#if defined(DEBUG)
+            assert(false);
+#endif
         }
         else {
             LOG_ERROR("handleMessage xQueueReceive failed for %s.", SERVICE_QUEUE_NAME.c_str());
@@ -162,172 +163,6 @@ bool WorkerDesktop::handleMessage(uint32_t queueID)
     }
 
     return true;
-}
-
-sys::ReturnCodes WorkerDesktop::startDownload(const std::filesystem::path &destinationPath,
-                                              uint32_t fileSize,
-                                              std::string fileCrc32)
-{
-    filePath = destinationPath;
-    fileDes  = fopen(filePath.c_str(), "w");
-
-    if (fileDes == nullptr)
-        return sys::ReturnCodes::Failure;
-
-    if (fileSize <= 0)
-        return sys::ReturnCodes::Failure;
-
-    startTransferTimer();
-
-    writeFileSizeExpected = fileSize;
-    expectedFileCrc32     = fileCrc32;
-    rawModeEnabled        = true;
-
-    digestCrc32.reset();
-
-    LOG_DEBUG("startDownload all checks passed starting download");
-    return sys::ReturnCodes::Success;
-}
-
-void WorkerDesktop::startTransferTimer()
-{
-    auto msg = std::make_shared<sdesktop::transfer::TransferTimerState>(
-        sdesktop::transfer::TransferTimerState::Request::Start);
-    ownerService->bus.sendUnicast(std::move(msg), service::name::service_desktop);
-}
-
-void WorkerDesktop::stopTransferTimer()
-{
-    auto msg =
-        std::make_shared<sdesktop::transfer::TransferTimerState>(sdesktop::transfer::TransferTimerState::Request::Stop);
-    ownerService->bus.sendUnicast(std::move(msg), service::name::service_desktop);
-}
-void WorkerDesktop::reloadTransferTimer()
-{
-    auto msg = std::make_shared<sdesktop::transfer::TransferTimerState>(
-        sdesktop::transfer::TransferTimerState::Request::Reload);
-    ownerService->bus.sendUnicast(std::move(msg), service::name::service_desktop);
-}
-
-void WorkerDesktop::stopTransfer(const TransferFailAction action)
-{
-    parser.setState(parserFSM::State::NoMsg);
-    rawModeEnabled = false;
-
-    auto removeFile     = (action == TransferFailAction::removeDesitnationFile);
-    auto responseStatus = removeFile ? parserFSM::http::Code::NotAcceptable : parserFSM::http::Code::Accepted;
-
-    const auto fileCrc32  = digestCrc32.getHash();
-    const auto crc32Match = expectedFileCrc32.empty() ? true : (expectedFileCrc32.compare(fileCrc32) == 0);
-
-    if (!crc32Match && !removeFile) {
-        responseStatus = parserFSM::http::Code::NotAcceptable;
-        removeFile     = true;
-
-        LOG_ERROR("File %s transfer CRC32 mismatch, expected: %s, actual: %s",
-                  filePath.c_str(),
-                  expectedFileCrc32.c_str(),
-                  fileCrc32.c_str());
-    }
-
-    parserFSM::Context responseContext;
-    responseContext.setResponseStatus(responseStatus);
-    responseContext.setEndpoint(parserFSM::EndpointType::filesystemUpload);
-    json11::Json responseJson = json11::Json::object{{parserFSM::json::fileSize, std::to_string(writeFileDataWritten)},
-                                                     {parserFSM::json::fileName, filePath.filename().c_str()},
-                                                     {parserFSM::json::fileCrc32, fileCrc32.c_str()}};
-    responseContext.setResponseBody(responseJson);
-
-    // close the file descriptor
-    std::fclose(fileDes);
-
-    // stop the timeout timer
-    stopTransferTimer();
-
-    // reset all counters
-    writeFileSizeExpected = 0;
-    writeFileDataWritten  = 0;
-
-    if (removeFile) {
-        try {
-            if (!std::filesystem::remove(filePath)) {
-                LOG_ERROR("stopTransfer can't delete  %s", filePath.c_str());
-            }
-            LOG_DEBUG("Deleted file(requested) %s", filePath.c_str());
-        }
-        catch (const std::filesystem::filesystem_error &fsError) {
-            LOG_ERROR("remove on %s, error %s", filePath.c_str(), fsError.what());
-        }
-    }
-
-    parserFSM::MessageHandler::putToSendQueue(responseContext.createSimpleResponse());
-}
-
-void WorkerDesktop::rawDataReceived(void *dataPtr, uint32_t dataLen)
-{
-    if (getRawMode()) {
-        reloadTransferTimer();
-
-        if (dataPtr == nullptr || dataLen == 0) {
-            LOG_ERROR("transferDataReceived invalid data");
-            return;
-        }
-
-        digestCrc32.add(dataPtr, dataLen);
-
-        const uint32_t bytesWritten = std::fwrite(dataPtr, 1, dataLen, fileDes);
-
-        if (bytesWritten != dataLen) {
-            LOG_ERROR("transferDataReceived write failed bytesWritten=%" PRIu32 " != dataLen=%" PRIu32,
-                      bytesWritten,
-                      dataLen);
-            return;
-        }
-
-        writeFileDataWritten += dataLen;
-
-        if (writeFileDataWritten >= writeFileSizeExpected) {
-            LOG_INFO("transferDataReceived all data transferred, stop now");
-            stopTransfer(TransferFailAction::doNothing);
-        }
-    }
-    else {
-        LOG_DEBUG("transferDataReceived not in a transfer state");
-    }
-}
-
-void WorkerDesktop::cancelTransferOnTimeout()
-{
-    LOG_DEBUG("timeout timer: run");
-    sendCommand({.command = static_cast<uint32_t>(Command::CancelTransfer), .data = nullptr});
-}
-
-void WorkerDesktop::transferTimeoutHandler()
-{
-    if (getRawMode()) {
-        LOG_DEBUG("timeout timer: stopping transfer");
-        uploadFileFailedResponse();
-        stopTransfer(TransferFailAction::removeDesitnationFile);
-    }
-}
-
-bool WorkerDesktop::getRawMode() const noexcept
-{
-    return rawModeEnabled;
-}
-
-void WorkerDesktop::uploadFileFailedResponse()
-{
-    LOG_ERROR("Upload file failed, timeout");
-    parserFSM::Context responseContext;
-    responseContext.setResponseStatus(parserFSM::http::Code::InternalServerError);
-    responseContext.setEndpoint(parserFSM::EndpointType::filesystemUpload);
-
-    json11::Json responseJson = json11::Json::object{
-        {parserFSM::json::status, uploadFailedMessage},
-    };
-    responseContext.setResponseBody(responseJson);
-    parserFSM::MessageHandler::putToSendQueue(responseContext.createSimpleResponse());
 }
 
 void WorkerDesktop::suspendUsb()

@@ -15,7 +15,6 @@
 #include <log.hpp>
 #include <module-db/queries/messages/threads/QueryThreadGetByContactID.hpp>
 #include <module-db/queries/notifications/QueryNotificationsClear.hpp>
-#include <service-appmgr/model/ApplicationManager.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <service-db/DBServiceAPI.hpp>
 #include <Style.hpp>
@@ -66,7 +65,9 @@ namespace gui
 
         setTitle(utils::translate("app_messages_title_main"));
         header->navigationIndicatorAdd(new gui::header::AddElementAction(), gui::header::BoxSelection::Left);
+#if MESSAGE_TEXT_SEARCH == 1
         header->navigationIndicatorAdd(new gui::header::SearchAction(), gui::header::BoxSelection::Right);
+#endif
 
         emptyListIcon = new Icon(this,
                                  0,
@@ -130,9 +131,6 @@ namespace gui
 
     bool MessagesMainWindow::onInput(const InputEvent &inputEvent)
     {
-        auto app = dynamic_cast<app::ApplicationMessages *>(application);
-        assert(app);
-
         // check if any of the lower inheritance onInput methods catch the event
         if (AppWindow::onInput(inputEvent)) {
             return true;
@@ -142,9 +140,11 @@ namespace gui
             case gui::KeyCode::KEY_LEFT:
                 application->switchWindow(gui::name::window::new_sms, nullptr);
                 return true;
+#if MESSAGE_TEXT_SEARCH == 1
             case gui::KeyCode::KEY_RIGHT:
-                app->switchWindow(gui::name::window::thread_sms_search, nullptr);
+                application->switchWindow(gui::name::window::thread_sms_search, nullptr);
                 return true;
+#endif
             default:
                 LOG_DEBUG("SMS main window not handled key: %s", c_str(inputEvent.getKeyCode()));
                 break;

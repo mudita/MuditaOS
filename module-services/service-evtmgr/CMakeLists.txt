@@ -3,7 +3,7 @@ message( "${PROJECT_NAME}  ${CMAKE_CURRENT_LIST_DIR}" )
 
 set(SOURCES
         EventManager.cpp
-        WorkerEvent.cpp
+        WorkerEventCommon.cpp
         api/EventManagerServiceAPI.cpp
         api/torch.cpp
         battery-level-check/BatteryLevelCheck.cpp

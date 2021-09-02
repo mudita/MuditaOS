@@ -7,18 +7,18 @@
 function help() {
 cat <<- EOF
 	Create Update Image for the SOURCE_TARGET. This script should be run from build directory.
-	
+
 	${0} <SOURCE_TARGET> <VERSION> <PLATFORM>
-	
+
 	    SOURCE_TARGET    - Name of the target (usually PurePhone or BellHybrid)
 	    VERSION          - version number to attach to file name
 	    PLATFORM         - RT1051 or Linux
-	
+
     In the current work dir, the script will create update image named from this template:
 	<SOURCE_TARGET>-<VERSION>-<PLATFORM>-Update.tar
-	
-	
-	
+
+
+
 EOF
 }
 
@@ -29,13 +29,14 @@ function setVars() {
     STAGEING_DIR="${SOURCE_TARGET}-${VERSION}-${PLATFORM}-Update"
     PACKAGE_FILE="${STAGEING_DIR}.tar"
     DEPS=(
-        "sys/current/assets"
-        "sys/user"
-        "sys/current/${SOURCE_TARGET}-boot.bin"
-        "sys/current/country-codes.db"
-        "sys/current/Luts.bin"
+        "sysroot/sys/current/assets"
+        "sysroot/sys/user"
+        "sysroot/sys/current/${SOURCE_TARGET}-boot.bin"
+        "sysroot/sys/current/country-codes.db"
+        "sysroot/sys/current/Luts.bin"
         "version.json"
         "ecoboot.bin"
+        "updater.bin"
         )
 }
 
@@ -46,7 +47,7 @@ function checkForDeps() {
     while [[ I -lt ${DEPS_COUNT} ]]; do
         ITEM=${DEPS[${I}]}
         if [[ ! -e "${ITEM}" ]]; then
-            echo "Couldn't find dependency: \"${ITEM}\"" 
+            echo "Couldn't find dependency: \"${ITEM}\""
             echo exti 2
         fi
         I=$(( I + 1))
@@ -64,13 +65,14 @@ function cleanStagingDir(){
 
 function linkInStageing(){
     pushd ${STAGEING_DIR} 1> /dev/null
-    ln -s ../sys/current/assets
-    ln -s ../sys/user
-    ln -s ../sys/current/${SOURCE_TARGET}-boot.bin boot.bin
-    ln -s ../sys/current/country-codes.db
-    ln -s ../sys/current/Luts.bin
+    ln -s ../sysroot/sys/current/assets
+    ln -s ../sysroot/sys/user
+    ln -s ../sysroot/sys/current/${SOURCE_TARGET}-boot.bin boot.bin
+    ln -s ../sysroot/sys/current/country-codes.db
+    ln -s ../sysroot/sys/current/Luts.bin
     ln -s ../ecoboot.bin
-    ln -s ../version.json
+    ln -s ../updater.bin
+    ln -s ../${SOURCE_TARGET}-version.json version.json
     popd 1> /dev/null
 }
 

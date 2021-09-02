@@ -1,5 +1,5 @@
 
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <module-gui/gui/core/RawFont.hpp>
@@ -7,10 +7,13 @@
 
 namespace gui
 {
+    TextFixedSize::TextFixedSize() : TextFixedSize(nullptr, 0, 0, 0, 0)
+    {}
+
     TextFixedSize::TextFixedSize(Item *parent, Position x, Position y, Length w, Length h) : Text(parent, x, y, w, h)
     {
         setEditMode(EditMode::Edit);
-        lines->setUnderLine(true);
+        drawUnderline(true);
     }
 
     void TextFixedSize::setLines(const unsigned int val)
@@ -21,10 +24,24 @@ namespace gui
         }
     }
 
+    void TextFixedSize::setLinesSpacing(unsigned int val)
+    {
+        lines->setLineSpacing(val);
+        drawLines();
+    }
+
     void TextFixedSize::setUnderlinePadding(Position val)
     {
-        if (lines->getUnderLinePadding() != val) {
-            lines->setUnderLinePadding(val);
+        if (lines->getUnderLineProperties().underLinePadding != val) {
+            lines->getUnderLineProperties().underLinePadding = val;
+            drawLines();
+        }
+    }
+
+    void TextFixedSize::setUnderlineThickness(unsigned int val)
+    {
+        if (lines->getUnderLineProperties().thickness != val) {
+            lines->getUnderLineProperties().thickness = val;
             drawLines();
         }
     }

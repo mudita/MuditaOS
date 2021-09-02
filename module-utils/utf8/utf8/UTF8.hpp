@@ -94,6 +94,10 @@ class UTF8
     {
         return c_str();
     }
+    operator std::string_view() const
+    {
+        return c_str();
+    }
     friend std::ostream &operator<<(std::ostream &os, const UTF8 &el);
 
     /**

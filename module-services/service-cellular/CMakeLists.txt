@@ -6,6 +6,11 @@ set(SOURCES
     src/State.cpp
     src/SimCard.cpp
     src/CallManager.cpp
+    src/NetworkTime.cpp
+    src/SimContacts.cpp
+    src/SMSPartsHandler.cpp
+    src/SMSSendHandler.cpp
+    src/ImeiGetHandler.cpp
 
     CellularCall.cpp
     CellularServiceAPI.cpp
@@ -59,8 +64,8 @@ target_link_libraries(${PROJECT_NAME}
         json::json
         time
     PUBLIC
-        utf8
         eventstore
+        utf8
     )
 
 if (${ENABLE_TESTS})

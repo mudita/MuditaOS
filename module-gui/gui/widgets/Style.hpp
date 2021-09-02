@@ -69,6 +69,8 @@ namespace style
         inline constexpr auto default_rect_yaps            = 10U;
         namespace font
         {
+            inline constexpr auto thehugest        = "gt_pressura_regular_190";
+            inline constexpr auto huge             = "gt_pressura_regular_90";
             inline constexpr auto supersizemelight = "gt_pressura_light_90";
             inline constexpr auto largelight       = "gt_pressura_light_46";
             inline constexpr auto verybigbold      = "gt_pressura_bold_32";
@@ -162,6 +164,7 @@ namespace style
             inline constexpr auto call           = "common_call";
             inline constexpr auto send           = "common_send";
             inline constexpr auto save           = "common_save";
+            inline constexpr auto import         = "common_import";
             inline constexpr auto confirm        = "common_confirm";
             inline constexpr auto select         = "common_select";
             inline constexpr auto use            = "common_use";
@@ -169,6 +172,7 @@ namespace style
             inline constexpr auto back           = "common_back";
             inline constexpr auto skip           = "common_skip";
             inline constexpr auto set            = "common_set";
+            inline constexpr auto show           = "common_show";
             inline constexpr auto yes            = "common_yes";
             inline constexpr auto no             = "common_no";
             inline constexpr auto check          = "common_check";
@@ -185,8 +189,10 @@ namespace style
             inline constexpr auto pause          = "common_pause";
             inline constexpr auto accept         = "common_accept";
             inline constexpr auto retry          = "common_retry";
+            inline constexpr auto replace        = "common_replace";
             inline constexpr auto abort          = "common_abort";
             inline constexpr auto adjust         = "common_adjust";
+            inline constexpr auto play_pause     = "common_play_pause";
             // days
             inline constexpr auto Monday    = "common_monday";
             inline constexpr auto Tuesday   = "common_tuesday";
@@ -235,12 +241,36 @@ namespace style
 
     } // namespace listview
 
+    namespace sidelistview
+    {
+        inline auto arrow_left_image  = "arrow_left_24px_W_G";
+        inline auto arrow_right_image = "arrow_right_24px_W_G";
+
+        namespace list_item
+        {
+            inline constexpr auto w = window_width;
+            inline constexpr auto h = window_height;
+        } // namespace list_item
+
+        namespace progress_bar
+        {
+            inline constexpr auto margin_left   = 0U;
+            inline constexpr auto margin_top    = 10U;
+            inline constexpr auto margin_right  = 0U;
+            inline constexpr auto margin_bottom = 10U;
+            inline constexpr auto h             = 50U;
+        } // namespace progress_bar
+
+    }     // namespace sidelistview
+
     namespace margins
     {
-        inline constexpr auto small    = 6U;
-        inline constexpr auto big      = 8U;
-        inline constexpr auto very_big = 12U;
-        inline constexpr auto huge     = 24U;
+        inline constexpr auto very_small = 3U;
+        inline constexpr auto small      = 6U;
+        inline constexpr auto big        = 8U;
+        inline constexpr auto very_big   = 12U;
+        inline constexpr auto large      = 20U;
+        inline constexpr auto huge       = 24U;
     } // namespace margins
 
     namespace padding

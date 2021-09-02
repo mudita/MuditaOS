@@ -20,18 +20,42 @@ fi
 
 source config/common.sh
 is_root=`id -u`
-if [ "$1" == "" ] || [ $is_root != 0 ]; then
-	echo "Refuse to work with no device. Runme as root [uid=$is_root]"
-	echo -e "$0 <dev> [-f]\n"
+if [ $is_root != 0 ]; then
+	echo "Runme as root [uid=$is_root]"
 	exit 1
-else
-	dev=$1
 fi
 
-if [ "$2" == "-f" ]; then
-	use_the_force=1
-else
-	use_the_force=0
+usage() { echo "Usage: $0 -d /dev/sdX -p <PurePhone|BellHybrid> [-f]" 1>&2; exit 1; }
+
+use_the_force=0
+while getopts "d:p:f" o; do
+    case $o in
+        d)
+            dev=${OPTARG}
+            ;;
+        p)
+            product_name=${OPTARG}
+            ;;
+        f)
+            use_the_force=1
+            ;;
+        *)
+            usage
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+if [ -z "${product_name}" ]; then
+    usage
+fi
+
+echo "Using product: $product_name"
+
+emmc_partition_table_dump_path=config/products/$product_name/emmc_partition_table.dump
+if [ ! -f "$emmc_partition_table_dump_path" ]; then
+	echo "ERROR! File \"config/products/$product_name/emmc_partition_table.dump\" not exist!"
+	exit 1
 fi
 
 pcount=$(sfdisk --dump $dev | grep "start=" | wc -l)
@@ -68,7 +92,7 @@ sleep 1
 partprobe
 
 echo "write partition table"
-sfdisk --wipe always $dev < config/emmc_partition_table.dump
+sfdisk --wipe always $dev < "$emmc_partition_table_dump_path"
 
 if [ $? != 0 ]; then
 	echo "partitioning device $dev failed"
@@ -76,11 +100,12 @@ if [ $? != 0 ]; then
 fi
 
 part1=$(sfdisk $dev --dump | grep bootable | awk '{print $1}')
-part2=$(sfdisk $dev --dump | tail -n 1 | awk '{print $1}')
+part2=$(sfdisk $dev --dump | tail -n 2 | head -n -1 | awk '{print $1}')
 
 echo "create FATs"
 echo "FAT: $MUDITAOS_PARTITION_PRIMARY $part1"
 mkfs.vfat -n $MUDITAOS_PARTITION_PRIMARY $part1
+
 echo "FAT: $MUDITAOS_PARTITION_RECOVERY $part2"
 mkfs.vfat -n $MUDITAOS_PARTITION_RECOVERY $part2
 

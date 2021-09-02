@@ -38,7 +38,11 @@ function(add_standalone_image SOURCE_TARGET)
     add_custom_target(${PACKAGE_COMMON_NAME}-package-standalone
         COMMAND tar -ScJf ${STANDALONE_PKG} ${SOURCE_TARGET}.img
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-        DEPENDS ${BIN_FILE} ${ECOBOOT_FILE}-target ${VERSION_JSON_FILE}-target ${SOURCE_TARGET}.img
+        DEPENDS ${BIN_FILE}
+        DEPENDS ecoboot.bin-target
+        DEPENDS updater.bin-target
+        DEPENDS ${SOURCE_TARGET}-version.json-target
+        DEPENDS ${SOURCE_TARGET}.img
         )
 
     message("Adding stand alone target '${SOURCE_TARGET}-StandaloneImage'")
@@ -62,15 +66,30 @@ function(add_update_package SOURCE_TARGET)
         OUTPUT ${UPDATE_PKG}
         DEPENDS ${SOURCE_TARGET}
         DEPENDS ${SOURCE_TARGET}-boot.bin
+        DEPENDS ${SOURCE_TARGET}-version.json-target
         DEPENDS ecoboot.bin-target
-        DEPENDS version.json-target
+        DEPENDS updater.bin-target
         DEPENDS assets
         COMMAND ${CMAKE_SOURCE_DIR}/tools/generate_update_image.sh ${SOURCE_TARGET} ${CMAKE_PROJECT_VERSION} ${CPACK_SYSTEM_NAME}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         COMMENT "Generating update image"
-        )
-    message("Adding '${SOURCE_TARGET}-UpdatePackage' target")
-    add_custom_target(${SOURCE_TARGET}-UpdatePackage
+    )
+
+    add_custom_command(
+        OUTPUT ${UPDATE_PKG}.sig
         DEPENDS ${UPDATE_PKG}
+        COMMAND ${CMAKE_SOURCE_DIR}/tools/secureboot_sign_package.sh ${CST_PATH} ${ELFTOSB_PATH} ${SRK_TABLE} ${CSF_KEY} ${IMG_KEY} ${UPDATE_PKG}
+        COMMENT "Generating update signature"
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    )
+    message("Adding '${SOURCE_TARGET}-UpdatePackage' target")
+    if(ENABLE_SECURE_BOOT)
+        add_custom_target(${SOURCE_TARGET}-UpdatePackage
+            DEPENDS ${UPDATE_PKG}.sig
         )
+    else()
+        add_custom_target(${SOURCE_TARGET}-UpdatePackage
+            DEPENDS ${UPDATE_PKG}
+        )
+    endif()
 endfunction()

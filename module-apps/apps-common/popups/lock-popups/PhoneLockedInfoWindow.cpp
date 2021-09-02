@@ -5,7 +5,6 @@
 
 #include <locks/input/PhoneLockedKeysWhitelist.hpp>
 #include <service-appmgr/Controller.hpp>
-#include <application-desktop/data/DesktopStyle.hpp>
 
 #include <i18n/i18n.hpp>
 
@@ -100,6 +99,7 @@ status_bar::Configuration PhoneLockedInfoWindow::configureStatusBar(status_bar::
     appConfiguration.enable(status_bar::Indicator::Battery);
     appConfiguration.enable(status_bar::Indicator::Signal);
     appConfiguration.enable(status_bar::Indicator::SimCard);
+    appConfiguration.enable(status_bar::Indicator::Bluetooth);
     return appConfiguration;
 }
 

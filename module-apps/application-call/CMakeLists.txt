@@ -1,38 +1,56 @@
-﻿
-include_directories( ${CMAKE_PROJECT_NAME}
+﻿# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+# For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-	PUBLIC
-		"${CMAKE_CURRENT_LIST_DIR}"
-		"${CMAKE_CURRENT_LIST_DIR}/data"
-)
+add_library(application-call STATIC)
 
-include_directories( ${PROJECT_NAME}
-
-	PUBLIC
-		"${CMAKE_CURRENT_LIST_DIR}"
-		"${CMAKE_CURRENT_LIST_DIR}/data"
-)
-
-target_sources( ${PROJECT_NAME}
-
+target_include_directories(application-call
 	PRIVATE
-		"${CMAKE_CURRENT_LIST_DIR}/ApplicationCall.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/EnterNumberWindow.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/EmergencyCallWindow.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/CallWindow.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/widgets/StateIcons.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/NumberWindow.cpp"
-		PUBLIC
-		"${CMAKE_CURRENT_LIST_DIR}/ApplicationCall.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/EnterNumberWindow.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/EmergencyCallWindow.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/CallWindow.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/data/CallSwitchData.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/NumberWindow.hpp"
-		)
+		$<BUILD_INTERFACE:
+			${CMAKE_CURRENT_SOURCE_DIR}/data
+			${CMAKE_CURRENT_SOURCE_DIR}/widgets
+			${CMAKE_CURRENT_SOURCE_DIR}/windows
+			${CMAKE_CURRENT_SOURCE_DIR}/include/application-call
+		>
+	PUBLIC
+		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+)
 
-target_link_libraries(${PROJECT_NAME}
+target_sources(application-call
+	PRIVATE
+		ApplicationCall.cpp
+		data/CallAppStyle.hpp
+		data/CallSwitchData.hpp
+		widgets/StateIcon.hpp
+		widgets/StateIcons.cpp
+		widgets/StateIcons.hpp
+		windows/CallWindow.cpp
+		windows/CallWindow.hpp
+		windows/EmergencyCallWindow.cpp
+		windows/EmergencyCallWindow.hpp
+		windows/EnterNumberWindow.cpp
+		windows/EnterNumberWindow.hpp
+		windows/NumberWindow.cpp
+		windows/NumberWindow.hpp
+	PUBLIC
+		include/application-call/ApplicationCall.hpp
+		include/application-call/CallState.hpp
+)
+
+target_link_libraries(application-call
     PRIVATE
-        service-audio
-        service-cellular
+		i18n
+		libphonenumber::libphonenumber
+		log
+		magic_enum
+		module-gui
+		module-utils
+		service-appmgr
+		service-audio
+		service-db
+		time
+	PUBLIC
+		apps-common
+		module-sys
+		service-cellular
+		service-evtmgr
 )

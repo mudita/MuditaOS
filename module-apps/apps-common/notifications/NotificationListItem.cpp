@@ -40,7 +40,7 @@ namespace
         text->setMaximumSize(style::notifications::textMaxWidth, Axis::X);
         text->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
         text->setPenWidth(style::window::default_border_no_focus_w);
-        text->setUnderline(false);
+        text->drawUnderline(false);
         text->setFont(style::window::font::medium);
         text->activeItem = false;
         text->setTextLimitType(TextLimitType::MaxLines, 1);
@@ -85,7 +85,8 @@ namespace
     std::map<notifications::NotificationType, UTF8> typeToIcon{
         {notifications::NotificationType::NotSeenSms, "messages_notification_icon"},
         {notifications::NotificationType::NotSeenCall, "calls_notification_icon"},
-        {notifications::NotificationType::Tethering, "tethering_notification_icon"}};
+        {notifications::NotificationType::Tethering, "tethering_notification_icon"},
+        {notifications::NotificationType::PhoneLock, "lock_notification_icon_W_G"}};
 } // namespace
 
 NotificationListItem::NotificationListItem(NotificationType type) : type{type}

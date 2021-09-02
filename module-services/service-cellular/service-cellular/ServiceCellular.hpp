@@ -24,7 +24,6 @@
 #include <bsp/common.hpp>
 #include <utf8/UTF8.hpp>
 #include <service-db/Settings.hpp>
-#include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <module-sys/PhoneModes/Observer.hpp>
 #include <service-db/DBServiceName.hpp>
 #include <service-db/DBNotificationMessage.hpp>
@@ -87,9 +86,6 @@ class ServiceCellular : public sys::Service
 
     static const char *serviceName;
 
-    auto sendSMS(SMSRecord record) -> bool;
-    auto receiveSMS(std::string messageNumber) -> bool;
-
     /**
      * @brief Its getting selected SIM card own number.
      * @param destination Reference to destination string.
@@ -113,6 +109,7 @@ class ServiceCellular : public sys::Service
 
     // used for polling for call state
     sys::TimerHandle callStateTimer;
+    sys::TimerHandle callEndedRecentlyTimer;
     sys::TimerHandle stateTimer;
     sys::TimerHandle ussdTimer;
 
@@ -230,6 +227,8 @@ class ServiceCellular : public sys::Service
     uint32_t ussdTimeout = 0;
     void setUSSDTimer();
     bool handleUSSDRequest(CellularUSSDMessage::RequestType requestType, const std::string &request = "");
+    bool handleIMEIRequest();
+
     bool handleUSSDURC();
     void handleUSSDTimer();
 
@@ -238,8 +237,8 @@ class ServiceCellular : public sys::Service
 
     std::shared_ptr<CellularSetOperatorAutoSelectResponse> handleCellularSetOperatorAutoSelect(
         CellularSetOperatorAutoSelectMessage *msg);
-    std::shared_ptr<CellularGetCurrentOperatorResponse> handleCellularGetCurrentOperator(
-        CellularGetCurrentOperatorMessage *msg);
+    std::shared_ptr<CellularCurrentOperatorNameResponse> handleCellularRequestCurrentOperatorName(
+        CellularRequestCurrentOperatorNameMessage *msg);
     std::shared_ptr<CellularGetAPNResponse> handleCellularGetAPNMessage(CellularGetAPNMessage *msg);
     std::shared_ptr<CellularSetAPNResponse> handleCellularSetAPNMessage(CellularSetAPNMessage *msg);
     std::shared_ptr<CellularNewAPNResponse> handleCellularNewAPNMessage(CellularNewAPNMessage *msg);
@@ -256,6 +255,7 @@ class ServiceCellular : public sys::Service
         CellularGetActiveContextsMessage *msg);
     friend class CellularUrcHandler;
     friend class SimCard;
+    friend class cellular::internal::ServiceCellularPriv;
     friend class CellularRequestHandler;
     friend class NetworkSettings;
     friend class packet_data::PDPContext;
@@ -272,9 +272,9 @@ class ServiceCellular : public sys::Service
     void handleCellularDismissCallMessage(sys::Message *msg);
     auto handleDBQueryResponseMessage(db::QueryResponse *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularListCallsMessage(CellularMessage *msg) -> std::shared_ptr<sys::ResponseMessage>;
-    auto handleDBNotificatioMessage(db::NotificationMessage *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleDBNotificationMessage(db::NotificationMessage *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularRingingMessage(CellularRingingMessage *msg) -> std::shared_ptr<sys::ResponseMessage>;
-    auto handleCellularIncominCallMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularIncomingCallMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularCallerIdMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularGetIMSIMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularGetOwnNumberMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
@@ -306,10 +306,11 @@ class ServiceCellular : public sys::Service
     auto handleUrcIncomingNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularSetFlightModeMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularSetRadioOnOffMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
-    auto handleCellularSendSMSMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularRingNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularCallerIdNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularSetConnectionFrequencyMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+
+    auto receiveSMS(std::string messageNumber) -> bool;
 
     auto hangUpCall() -> bool;
     auto hangUpCallBusy() -> bool;

@@ -14,7 +14,8 @@ namespace notifications
     {
         NotSeenSms,
         NotSeenCall,
-        Tethering
+        Tethering,
+        PhoneLock
     };
 
     enum class NotificationPriority
@@ -57,6 +58,17 @@ namespace notifications
         [[nodiscard]] auto getValue() const noexcept -> unsigned;
     };
 
+    class NotificationWithTime : public Notification
+    {
+        std::string formattedTime;
+
+      protected:
+        NotificationWithTime(NotificationType type, NotificationPriority priorityType, std::string formattedTime);
+
+      public:
+        [[nodiscard]] auto getTime() const noexcept -> const std::string &;
+    };
+
     class NotSeenSMSNotification : public NotificationWithContact
     {
       public:
@@ -73,6 +85,12 @@ namespace notifications
     {
       public:
         TetheringNotification();
+    };
+
+    class PhoneLockNotification : public NotificationWithTime
+    {
+      public:
+        explicit PhoneLockNotification(std::string formattedTime);
     };
 
 } // namespace notifications

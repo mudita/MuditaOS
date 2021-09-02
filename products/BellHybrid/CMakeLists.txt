@@ -1,21 +1,11 @@
 add_executable(BellHybrid)
 
-add_custom_target(Bell
-    DEPENDS BellHybrid BellHybrid.img
-    )
-
 target_link_directories(BellHybrid PRIVATE ${PROJECT_LIB_DIRECTORY})
 
 target_compile_definitions(BellHybrid
     PRIVATE
         ${PROJECT_CONFIG_DEFINITIONS}
-        ${TARGET_COMPILE_DEFINITIONS}
         ${PROJECT_TARGET}
-    )
-
-target_compile_features(BellHybrid
-    PRIVATE
-        ${TARGET_COMPILE_FEATURES}
     )
 
 target_compile_options(BellHybrid
@@ -27,8 +17,9 @@ target_compile_options(BellHybrid
 
 target_sources(BellHybrid
     PRIVATE
-        ${TARGET_SOURCES}
         BellHybridMain.cpp
+        PlatformFactory.cpp
+        EinkSentinelBell.cpp
     )
 
 target_include_directories(BellHybrid
@@ -46,39 +37,59 @@ set_target_properties(BellHybrid
 
 target_link_libraries(BellHybrid
     PRIVATE
+        application-bell-alarm
         application-bell-main
+        application-bell-settings
+        application-bell-powernap
         application-music-player
+        appmgr
+        db
+        evtmgr
         messagetype
         module-apps
+        module-bsp
+        module-vfs
+        service-audio
         service-bluetooth
         service-desktop
         service-lwip
+        service-time
+        sys
+        platform
         ${LWIP_LIBRARIES}
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_Linux>:iosyscalls>"
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_RT1051>:CrashCatcher::CrashCatcher>"
     )
 
-target_link_options(BellHybrid PRIVATE ${TARGET_LINK_OPTIONS})
-
 if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
-    add_dependencies(Bell service_renderer)
+    add_dependencies(BellHybrid service_renderer)
 endif()
 
 set_source_files_properties(BellHybridMain.cpp PROPERTIES COMPILE_DEFINITIONS "${ENABLED_APPS_DEFINES}")
 
-
 strip_executable(BellHybrid)
-
 
 add_dependencies(BellHybrid version)
 
 include(AddBootBin)
 add_boot_bin(BellHybrid)
-add_image(BellHybrid)
+add_image(
+    PRODUCT BellHybrid
+    SYSROOT sysroot
+    ASSETS  assets
+)
 
 include(AddHexTarget)
 add_hex_target(BellHybrid)
 
+include(AddVersionJson)
+add_version_json(BellHybrid)
+
 add_standalone_image(BellHybrid)
 add_update_package(BellHybrid)
 
+add_subdirectory(alarms)
+add_subdirectory(apps)
+add_subdirectory(keymap)
+add_subdirectory(services)
+add_subdirectory(sys)

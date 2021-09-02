@@ -9,6 +9,7 @@
 #include "AudioProfile.hpp"
 #include "interface/profiles/A2DP/A2DP.hpp"
 #include "interface/profiles/HSP/HSP.hpp"
+#include "interface/profiles/HFP/HFP.hpp"
 #include "audio/BluetoothAudioDevice.hpp"
 
 #include <memory>
@@ -42,6 +43,7 @@ namespace bluetooth
         auto startRinging() -> Error::Code;
         auto stopRinging() -> Error::Code;
         auto initializeCall() -> Error::Code;
+        auto isAddressActuallyUsed(bd_addr_t address) -> bool;
 
         auto setAudioDevice(std::shared_ptr<BluetoothAudioDevice> device) -> Error::Code;
 

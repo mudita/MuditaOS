@@ -94,3 +94,7 @@ GLIBC_2.33 {
                 lstat64;
                 fstat64;
 };
+IOSYSCALLS_1.0 {
+        global:
+                iosyscalls_*;
+};

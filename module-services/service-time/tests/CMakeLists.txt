@@ -7,3 +7,27 @@ add_catch2_executable(
         service-time
         module-sys
 )
+
+add_catch2_executable(
+    NAME
+        service-time-alarm-tests
+    SRCS
+        tests-main.cpp
+        tests-AlarmHandlerFactory.cpp
+        MockAlarmHandler.hpp
+    LIBS
+        service-time
+        module-db
+)
+
+add_gtest_executable(
+    NAME 
+        service-time-alarm-operations
+    SRCS
+        tests-AlarmOperations.cpp
+    LIBS
+        module-sys
+        service-time
+    INCLUDE
+        $<TARGET_PROPERTY:service-time,INCLUDE_DIRECTORIES>
+)

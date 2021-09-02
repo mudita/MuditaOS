@@ -1,5 +1,11 @@
 function(add_boot_bin SOURCE_TARGET)
-    set(BIN_FILE ${CMAKE_BINARY_DIR}/sys/current/${SOURCE_TARGET}-boot.bin)
+    set(BIN_FILE ${CMAKE_BINARY_DIR}/sysroot/sys/current/${SOURCE_TARGET}-boot.bin)
+
+    set_target_properties(
+            ${SOURCE_TARGET}
+        PROPERTIES
+            BIN_FILE ${BIN_FILE}
+    )
 
     if (ENABLE_SECURE_BOOT)
         set (SREC_FILE ${CMAKE_PROJECT_NAME}.srec)
@@ -35,5 +41,4 @@ function(add_boot_bin SOURCE_TARGET)
     message("Adding '${SOURCE_TARGET}-boot.bin' target")
     add_custom_target(${SOURCE_TARGET}-boot.bin
         DEPENDS ${BIN_FILE})
-    set_target_properties(${SOURCE_TARGET}-boot.bin PROPERTIES BIN_FILE ${BIN_FILE})
 endfunction()

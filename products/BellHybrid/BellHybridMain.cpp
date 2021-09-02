@@ -1,54 +1,50 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "config.h"
+#include "PlatformFactory.hpp"
 
 // applications
-#include <application-call/ApplicationCall.hpp>
-#include <application-calllog/ApplicationCallLog.hpp>
-#include <application-desktop/ApplicationDesktop.hpp>
-#include <application-settings/ApplicationSettings.hpp>
-#include <application-settings-new/ApplicationSettings.hpp>
-#include <application-special-input/ApplicationSpecialInput.hpp>
-#include <application-calendar/ApplicationCalendar.hpp>
-#include <application-music-player/ApplicationMusicPlayer.hpp>
-#include <application-meditation/ApplicationMeditation.hpp>
-#include <application-alarm-clock/ApplicationAlarmClock.hpp>
-#include <application-onboarding/ApplicationOnBoarding.hpp>
+#include <application-bell-alarm/ApplicationBellAlarm.hpp>
 #include <application-bell-main/ApplicationBellMain.hpp>
+#include <application-bell-settings/ApplicationBellSettings.hpp>
+#include <application-bell-powernap/ApplicationBellPowerNap.hpp>
+
+// modules
+#include <module-db/Databases/AlarmsDB.hpp>
+#include <module-db/Databases/EventsDB.hpp>
+#include <module-db/Interface/AlarmEventRecord.hpp>
+#include <module-db/Interface/AlarmsRecord.hpp>
 
 // services
-#include <service-appmgr/model/ApplicationManager.hpp>
+#include <appmgr/ApplicationManager.hpp>
+#include <db/ServiceDB.hpp>
+#include <evtmgr/EventManager.hpp>
+#include <module-services/service-eink/ServiceEink.hpp>
+#include <Service/ServiceCreator.hpp>
+#include <service-appmgr/Constants.hpp>
 #include <service-audio/ServiceAudio.hpp>
 #include <service-bluetooth/ServiceBluetooth.hpp>
-#include <service-db/ServiceDB.hpp>
-#include <service-evtmgr/EventManager.hpp>
+#include <service-desktop/ServiceDesktop.hpp>
+#include <service-fileindexer/Constants.hpp>
+#include <service-gui/ServiceGUI.hpp>
 #include <service-lwip/ServiceLwIP.hpp>
 #include <service-time/ServiceTime.hpp>
-#include <Service/ServiceCreator.hpp>
-#include <service-gui/ServiceGUI.hpp>
-#include <service-gui/Common.hpp>
-#include <module-services/service-eink/ServiceEink.hpp>
-#include <service-fileindexer/Constants.hpp>
-#include <service-fileindexer/ServiceFileIndexer.hpp>
-#include <service-desktop/ServiceDesktop.hpp>
 
-#include <bsp/bsp.hpp>
 #include <Application.hpp>
 #include <ApplicationLauncher.hpp>
-#include <log/log.hpp>
 #include <log/Logger.hpp>
+#include <log/log.hpp>
 #include <source/version.hpp>
-#include <SystemManager/SystemManager.hpp>
+#include <sys/SystemManager.hpp>
 #include <SystemWatchdog/SystemWatchdog.hpp>
 #include <thread.hpp>
-#include <purefs/vfs_subsystem.hpp>
 
 #include <memory>
 #include <vector>
 
 int main()
 {
+    constexpr auto ApplicationName = "BellHybrid";
 
 #if SYSTEM_VIEW_ENABLED
     SEGGER_SYSVIEW_Conf();
@@ -59,9 +55,9 @@ int main()
     SEGGER_SYSVIEW_Start();
 #endif
 
-    bsp::BoardInit();
+    auto platformFactory = bellhybrid::PlatformFactory();
+    auto platform        = platformFactory.makePlatform();
 
-    purefs::subsystem::vfs_handle_t vfs;
     if (!sys::SystemWatchdog::getInstance().init()) {
         LOG_ERROR("System watchdog failed to initialize");
         // wait for the hardware watchdog (initialized in reset ISR) to reset the system
@@ -85,14 +81,16 @@ int main()
 
     auto sysmgr = std::make_shared<sys::SystemManager>(std::move(systemServices));
     sysmgr->StartSystem(
-        [&vfs]() {
-            vfs     = purefs::subsystem::initialize();
-            int err = purefs::subsystem::mount_defaults();
-            if (err) {
-                LOG_FATAL("VFS subystem fatal error %i", err);
-                std::abort();
+        [&platform]() {
+            try {
+                platform->init();
             }
-            Log::Logger::get().init();
+            catch (const std::runtime_error &e) {
+                LOG_FATAL("%s", e.what());
+                abort();
+            }
+
+            Log::Logger::get().init(Log::Application{ApplicationName, GIT_REV, GIT_TAG, GIT_BRANCH});
             /// force initialization of PhonenumberUtil because of its stack usage
             /// otherwise we would end up with an init race and PhonenumberUtil could
             /// be initiated in a task with stack not big enough to handle it
@@ -104,18 +102,19 @@ int main()
             std::vector<std::unique_ptr<app::ApplicationLauncher>> applications;
             applications.push_back(
                 app::CreateLauncher<app::ApplicationBellMain>(app::applicationBellName, app::Closeable::False));
+            applications.push_back(app::CreateLauncher<app::ApplicationBellSettings>(app::applicationBellSettingsName));
+            applications.push_back(app::CreateLauncher<app::ApplicationBellAlarm>(app::applicationBellAlarmName));
+            applications.push_back(app::CreateLauncher<app::ApplicationBellPowerNap>(app::applicationBellPowerNapName));
             // start application manager
             return sysmgr->RunSystemService(
                 std::make_shared<app::manager::ApplicationManager>(
-                    app::manager::ApplicationManager::ServiceName, std::move(applications), app::applicationBellName),
+                    service::name::appmgr, std::move(applications), app::applicationBellName),
                 sysmgr.get());
         });
 
-    LOG_PRINTF("Launching BellHybrid \n");
+    LOG_PRINTF("Launching %s \n", ApplicationName);
     LOG_PRINTF("commit: %s tag: %s branch: %s\n", GIT_REV, GIT_TAG, GIT_BRANCH);
     cpp_freertos::Thread::StartScheduler();
-
-    purefs::subsystem::unmount_all();
 
     return 0;
 }

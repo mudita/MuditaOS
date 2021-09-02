@@ -215,7 +215,7 @@ namespace audio
         [[nodiscard]] virtual auto getInputTraits() const noexcept -> Traits = 0;
 
         /**
-         * @brief Get the traits of the stream's input.
+         * @brief Get the traits of the stream's output.
          *
          * @return Traits
          */

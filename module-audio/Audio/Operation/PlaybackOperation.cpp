@@ -21,8 +21,8 @@ namespace audio
         : Operation(callback, playbackType), dec(nullptr)
     {
         // order defines priority
-        AddProfile(Profile::Type::PlaybackBluetoothA2DP, playbackType, false);
         AddProfile(Profile::Type::PlaybackHeadphones, playbackType, false);
+        AddProfile(Profile::Type::PlaybackBluetoothA2DP, playbackType, false);
         AddProfile(Profile::Type::PlaybackLoudspeaker, playbackType, true);
 
         endOfFileCallback = [this]() {
@@ -40,7 +40,7 @@ namespace audio
         auto format = dec->getSourceFormat();
         LOG_DEBUG("Source format: %s", format.toString().c_str());
 
-        auto retCode = SwitchToPriorityProfile();
+        auto retCode = SwitchToPriorityProfile(playbackType);
         if (retCode != RetCode::Success) {
             throw AudioInitException("Failed to switch audio profile", retCode);
         }
@@ -96,22 +96,25 @@ namespace audio
 
     audio::RetCode PlaybackOperation::Pause()
     {
-        if (state == State::Paused || state == State::Idle) {
+        if (state == State::Paused || state == State::Idle || outputConnection == nullptr) {
             return RetCode::InvokedInIncorrectState;
         }
-        state = State::Paused;
-        outputConnection->disable();
-        return audio::RetCode::Success;
+        const auto retCode = GetDeviceError(audioDevice->Pause());
+        if (retCode == audio::RetCode::Success) {
+            state = State::Paused;
+            outputConnection->disable();
+        }
+        return retCode;
     }
 
     audio::RetCode PlaybackOperation::Resume()
     {
-        if (state == State::Active || state == State::Idle) {
+        if (state == State::Active || state == State::Idle || outputConnection == nullptr) {
             return RetCode::InvokedInIncorrectState;
         }
         state = State::Active;
         outputConnection->enable();
-        return audio::RetCode::Success;
+        return GetDeviceError(audioDevice->Resume());
     }
 
     audio::RetCode PlaybackOperation::SetOutputVolume(float vol)
@@ -133,17 +136,32 @@ namespace audio
         return dec->getCurrentPosition();
     }
 
+    audio::RetCode PlaybackOperation::SwitchToPriorityProfile(audio::PlaybackType playbackType)
+    {
+        for (const auto &p : supportedProfiles) {
+            const auto profileType = p.profile->GetType();
+            if (profileType == audio::Profile::Type::PlaybackBluetoothA2DP &&
+                playbackType == audio::PlaybackType::CallRingtone) {
+                continue;
+            }
+            if (p.isAvailable) {
+                return SwitchProfile(profileType);
+            }
+        }
+        return audio::RetCode::ProfileNotSet;
+    }
+
     audio::RetCode PlaybackOperation::SendEvent(std::shared_ptr<Event> evt)
     {
         auto isAvailable = evt->getDeviceState() == Event::DeviceState::Connected ? true : false;
         switch (evt->getType()) {
         case EventType::JackState:
             SetProfileAvailability({Profile::Type::PlaybackHeadphones}, isAvailable);
-            SwitchToPriorityProfile();
+            Operation::SwitchToPriorityProfile();
             break;
         case EventType::BlutoothA2DPDeviceState:
             SetProfileAvailability({Profile::Type::PlaybackBluetoothA2DP}, isAvailable);
-            SwitchToPriorityProfile();
+            Operation::SwitchToPriorityProfile();
             break;
         default:
             return RetCode::UnsupportedEvent;
@@ -156,6 +174,7 @@ namespace audio
     {
         auto newProfile = GetProfile(type);
         if (newProfile == nullptr) {
+            LOG_ERROR("Unsupported profile");
             return RetCode::UnsupportedProfile;
         }
 

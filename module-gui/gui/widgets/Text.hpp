@@ -87,8 +87,9 @@ namespace gui
         auto handleActivation(const InputEvent &inputEvent) -> bool;
         auto handleNavigation(const InputEvent &inputEvent) -> bool;
         auto handleRemovalChar(const InputEvent &inputEvent) -> bool;
-        auto handleDigitLongPress(const InputEvent &inputEvent) -> bool;
+        auto handleWholeTextRemoval(const InputEvent &inputEvent) -> bool;
         auto handleAddChar(const InputEvent &inputEvent) -> bool;
+        auto handleLongPressAddChar(const InputEvent &inputEvent) -> bool;
 
         [[nodiscard]] auto getSizeMinusPadding(Axis axis, Area val) -> Length;
         auto applyParentSizeRestrictions() -> void;
@@ -124,7 +125,6 @@ namespace gui
              const uint32_t &y,
              const uint32_t &w,
              const uint32_t &h,
-             const UTF8 &text      = "",
              ExpandMode expandMode = ExpandMode::None,
              TextType textType     = TextType::MultiLine);
         ~Text() override;
@@ -133,7 +133,7 @@ namespace gui
         void setTextType(TextType type);
         void setTextLimitType(TextLimitType limitType, unsigned int val = 0);
         void clearTextLimits();
-        void setUnderline(bool val);
+        void drawUnderline(bool val);
         virtual void setText(const UTF8 &text);
         void setText(std::unique_ptr<TextDocument> &&document);
 
@@ -158,6 +158,8 @@ namespace gui
         virtual bool saveText(UTF8 path);
         void setFont(const UTF8 &fontName);
         void setFont(RawFont *font);
+        void setMinimumWidthToFitText(const UTF8 &text);
+        void setMinimumHeightToFitText(unsigned int linesCount = 1);
 
         // virtual methods from Item
         bool onInput(const InputEvent &inputEvent) override;

@@ -2,8 +2,11 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-#include <module-apps/application-calendar/data/dateCommon.hpp>
+
+#include <time/dateCommon.hpp>
+
 #include <json11.hpp>
+
 #include <memory>
 
 /**

@@ -1,0 +1,25 @@
+target_sources(board
+    PRIVATE
+        log_rt1051.cpp
+        time_syscalls.cpp
+)
+
+if (${LOG_REDIRECT} STREQUAL "RTT_JLINK")
+    target_sources(
+        board
+    PRIVATE
+        log_writeRTT.cpp
+    )
+elseif (${LOG_REDIRECT} STREQUAL "RTT_LUART")
+    target_sources(
+        board
+    PRIVATE    
+        log_writeLUART.cpp
+    )
+elseif ((${LOG_REDIRECT} STREQUAL "RTT_SYSTEMVIEW") AND (${SYSTEM_VIEW_ENABLED} EQUAL 1))
+    target_sources(
+        board
+    PRIVATE
+        log_writeSYSTEMVIEW.cpp
+    )
+endif ()

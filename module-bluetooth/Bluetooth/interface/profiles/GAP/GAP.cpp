@@ -8,7 +8,7 @@
 #include <service-bluetooth/messages/ResponseVisibleDevices.hpp>
 #include <service-bluetooth/messages/Unpair.hpp>
 #include <service-bluetooth/messages/Passkey.hpp>
-#include <application-settings-new/ApplicationSettings.hpp>
+#include <application-settings/ApplicationSettings.hpp>
 extern "C"
 {
 #include "btstack.h"
@@ -85,7 +85,7 @@ namespace bluetooth
     {
         auto msg = std::make_shared<message::bluetooth::ResponseVisibleDevices>(devices);
         ownerService->bus.sendUnicast(msg, "ApplicationSettings");
-        ownerService->bus.sendUnicast(std::move(msg), app::name_settings_new);
+        ownerService->bus.sendUnicast(std::move(msg), app::name_settings);
     }
 
     auto GAP::startScan() -> int
@@ -176,6 +176,7 @@ namespace bluetooth
             return; // already in our list
         }
         uint32_t classOfDevice = gap_event_inquiry_result_get_class_of_device(packet);
+        LOG_INFO("Device CoD: %" PRIx32 "", classOfDevice);
         ///> Device has to support services: AUDIO for HFP and HSP profiles, and RENDERING for SNK of A2DP profile
         if (!(classOfDevice & TYPE_OF_SERVICE::REMOTE_SUPPORTED_SERVICES)) {
             LOG_INFO("Ignoring device with incompatible services: %s, ",
@@ -208,7 +209,7 @@ namespace bluetooth
 
         auto msg = std::make_shared<BluetoothPairResultMessage>(currentlyProcessedDeviceAddr, result == 0u);
         currentlyProcessedDeviceAddr.clear();
-        ownerService->bus.sendUnicast(std::move(msg), app::name_settings_new);
+        ownerService->bus.sendUnicast(std::move(msg), app::name_settings);
     }
     /* @text In ACTIVE, the following events are processed:
      *  - GAP Inquiry result event: BTstack provides a unified inquiry result that contain
@@ -261,7 +262,7 @@ namespace bluetooth
             LOG_DEBUG("PIN code request!");
             hci_event_pin_code_request_get_bd_addr(packet, address);
             auto msg = std::make_shared<::message::bluetooth::RequestPasskey>();
-            ownerService->bus.sendUnicast(std::move(msg), app::name_settings_new);
+            ownerService->bus.sendUnicast(std::move(msg), app::name_settings);
         }
         const auto eventType = hci_event_packet_get_type(packet);
         switch (state) {
@@ -292,18 +293,8 @@ namespace bluetooth
         LOG_INFO("Device unpaired");
         std::string unpairedDevAddr{bd_addr_to_str(addr)};
         ownerService->bus.sendUnicast(
-            std::make_shared<message::bluetooth::UnpairResult>(std::move(unpairedDevAddr), true),
-            app::name_settings_new);
+            std::make_shared<message::bluetooth::UnpairResult>(std::move(unpairedDevAddr), true), app::name_settings);
         return true;
-    }
-    auto GAP::isServiceSupportedByRemote(bd_addr_t addr, uint32_t typeOfService) -> bool
-    {
-        for (const auto &device : devices) {
-            if (bd_addr_cmp(device.address, addr) == 0) {
-                return (device.classOfDevice & typeOfService);
-            }
-        }
-        return false;
     }
     void GAP::respondPinCode(const std::string &pin)
     {

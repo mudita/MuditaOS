@@ -1,11 +1,8 @@
-if (NOT IS_SYMLINK "${CMAKE_BINARY_DIR}/sys/user")
-    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/sys/user")
-endif()
-
 add_catch2_executable(
     NAME
         db
     SRCS
+        AlarmEventRecord_tests.cpp
         AlarmsRecord_tests.cpp
         AlarmsTable_tests.cpp
         CalllogRecord_tests.cpp
@@ -18,6 +15,7 @@ add_catch2_executable(
         ContactsRingtonesTable_tests.cpp
         ContactsTable_tests.cpp
         DbInitializer.cpp
+        EventRecord_tests.cpp
         NotesRecord_tests.cpp
         NotesTable_tests.cpp
         NotificationsRecord_tests.cpp
@@ -34,11 +32,8 @@ add_catch2_executable(
         
     LIBS
         module-sys
-        iosyscalls
         module-db
         json::json
-    DEPS
-        assets
-        PurePhone-disk-img
+    USE_FS
 )
 add_subdirectory(test-initializer)

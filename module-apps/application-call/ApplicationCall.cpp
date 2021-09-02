@@ -2,37 +2,35 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationCall.hpp"
-
-#include "data/CallSwitchData.hpp"
-#include "windows/CallWindow.hpp"
-#include "windows/EmergencyCallWindow.hpp"
-#include "windows/EnterNumberWindow.hpp"
+#include "CallSwitchData.hpp"
+#include "CallWindow.hpp"
+#include "EmergencyCallWindow.hpp"
+#include "EnterNumberWindow.hpp"
 
 #include <apps-common/messages/DialogMetadataMessage.hpp>
 #include <apps-common/windows/Dialog.hpp>
 #include <apps-common/windows/DialogMetadata.hpp>
-
 #include <log/log.hpp>
 #include <module-apps/application-phonebook/data/PhonebookItemData.hpp>
-#include <module-services/service-db/service-db/DBServiceAPI.hpp>
 #include <module-sys/Timers/TimerFactory.hpp>
 #include <PhoneNumber.hpp>
-#include <service-cellular/CellularServiceAPI.hpp>
-#include <service-audio/AudioServiceAPI.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <service-appmgr/data/MmiActionsParams.hpp>
+#include <service-audio/AudioServiceAPI.hpp>
+#include <service-cellular/CellularServiceAPI.hpp>
 #include <time/time_conversion.hpp>
 
-#include <memory>
 #include <cassert>
+#include <memory>
 
 namespace app
 {
     ApplicationCall::ApplicationCall(std::string name,
                                      std::string parent,
-                                     sys::phone_modes::PhoneMode mode,
+                                     sys::phone_modes::PhoneMode phoneMode,
+                                     sys::bluetooth::BluetoothMode bluetoothMode,
                                      StartInBackground startInBackground)
-        : Application(name, parent, mode, startInBackground, app::call_stack_size)
+        : Application(name, parent, phoneMode, bluetoothMode, startInBackground, app::call_stack_size)
     {
         using namespace gui::status_bar;
         statusBarManager->enableIndicators(
@@ -57,7 +55,7 @@ namespace app
                 returnToPreviousWindow();
                 return true;
             };
-            constexpr auto iconNoEmergency = "emergency_W_G";
+            constexpr auto iconNoEmergency = "error_W_G";
             auto textNoEmergency           = utils::translate("app_call_wrong_emergency");
             utils::findAndReplaceAll(textNoEmergency, "$NUMBER", data->getDescription());
             showNotification(buttonAction, iconNoEmergency, textNoEmergency);
@@ -75,7 +73,7 @@ namespace app
         });
         addActionReceiver(manager::actions::CallRejectedByOfflineNotification, [this](auto &&data) {
             auto buttonAction = [=]() -> bool {
-                returnToPreviousWindow();
+                app::manager::Controller::switchBack(this);
                 return true;
             };
             constexpr auto icon    = "info_big_circle_W_G";

@@ -1,24 +1,23 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <memory>
-
+#include "ApplicationDesktop.hpp"
+#include "DesktopData.hpp"
 #include "DesktopMainWindow.hpp"
-#include <application-desktop/ApplicationDesktop.hpp>
-#include <application-desktop/data/DesktopStyle.hpp>
-#include <application-desktop/data/DesktopData.hpp>
-#include <application-call/data/CallSwitchData.hpp>
+#include "DesktopStyle.hpp"
 
+#include <application-call/data/CallSwitchData.hpp>
+#include <log.hpp>
+#include <messages/DialogMetadataMessage.hpp>
+#include <notifications/NotificationsModel.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <service-time/ServiceTime.hpp>
 #include <service-time/TimeMessage.hpp>
-#include <notifications/NotificationsModel.hpp>
+#include <time/time_conversion_factory.hpp>
 #include <windows/Dialog.hpp>
 #include <windows/DialogMetadata.hpp>
-#include <messages/DialogMetadataMessage.hpp>
-#include <time/time_conversion_factory.hpp>
 
-#include <log.hpp>
+#include <memory>
 
 namespace gui
 {
@@ -88,7 +87,12 @@ namespace gui
     status_bar::Configuration DesktopMainWindow::configureStatusBar(status_bar::Configuration appConfiguration)
     {
         appConfiguration.disable(status_bar::Indicator::NetworkAccessTechnology);
+        appConfiguration.disable(status_bar::Indicator::Time);
         appConfiguration.enable(status_bar::Indicator::PhoneMode);
+        appConfiguration.enable(status_bar::Indicator::Battery);
+        appConfiguration.enable(status_bar::Indicator::Signal);
+        appConfiguration.enable(status_bar::Indicator::SimCard);
+        appConfiguration.enable(status_bar::Indicator::Bluetooth);
         return appConfiguration;
     }
 
@@ -96,9 +100,6 @@ namespace gui
         : AppWindow(app, app::window::name::desktop_main_window),
           notificationsModel(std::make_shared<ActiveNotificationsModel>(this))
     {
-        osUpdateVer  = getAppDesktop()->getOsUpdateVersion();
-        osCurrentVer = getAppDesktop()->getOsCurrentVersion();
-
         buildInterface();
 
         preBuildDrawListHook = [this](std::list<Command> &cmd) { updateTime(); };
@@ -107,14 +108,6 @@ namespace gui
     void DesktopMainWindow::setVisibleState()
     {
         setActiveState();
-
-        if (osUpdateVer == osCurrentVer && osUpdateVer != updateos::initSysVer &&
-            osCurrentVer != updateos::initSysVer) {
-            auto data = std::make_unique<CurrentOsVersion>();
-            data->setData(osCurrentVer);
-            application->switchWindow(app::window::name::desktop_post_update_window, std::move(data));
-            getAppDesktop()->setOsUpdateVersion(updateos::initSysVer);
-        }
     }
 
     void DesktopMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)

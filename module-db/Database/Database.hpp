@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -37,7 +37,9 @@ class Database
     bool storeIntoFile(const std::filesystem::path &backupPath);
 
     uint32_t getLastInsertRowId();
-    void pragmaQuery(const std::string &pragmaStatemnt);
+    void pragmaQuery(const std::string &pragmaStatement);
+
+    auto pragmaQueryForValue(const std::string &pragmaStatement, const std::int32_t value) -> bool;
 
     [[nodiscard]] bool isInitialized() const noexcept
     {
@@ -55,6 +57,8 @@ class Database
 
     void initQueryStatementBuffer();
     void clearQueryStatementBuffer();
+
+    void populateDbAppId();
 
     /*
      * Arguments:

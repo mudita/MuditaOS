@@ -25,7 +25,8 @@ namespace cellular
 
         at::Cmd command() final
         {
-            return at::Cmd(std::string());
+            constexpr std::chrono::milliseconds immediateTimeout{0};
+            return at::Cmd(std::string(), immediateTimeout);
         }
 
         void handle(RequestHandler &h, at::Result &result)

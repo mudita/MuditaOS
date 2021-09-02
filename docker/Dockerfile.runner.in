@@ -1,6 +1,6 @@
 FROM ubuntu:focal
 
-MAINTAINER radoslaw.wicik@mudiata.com
+MAINTAINER ops@mudita.com
 # Docker runner for MuditaOS builds
 
 RUN ln -fs /usr/share/zoneinfo/@DOCKER_TIMEZONE@ /etc/localtime

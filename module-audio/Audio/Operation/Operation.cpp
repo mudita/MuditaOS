@@ -55,14 +55,27 @@ namespace audio
         }
     }
 
-    audio::RetCode Operation::SwitchToPriorityProfile()
+    std::optional<Profile::Type> Operation::GetPriorityProfile() const
     {
         for (auto &p : supportedProfiles) {
             if (p.isAvailable == true) {
-                return SwitchProfile(p.profile->GetType());
+                return p.profile->GetType();
             }
         }
+        return {};
+    }
+
+    audio::RetCode Operation::SwitchToPriorityProfile()
+    {
+        if (const auto priorityProfile = GetPriorityProfile(); priorityProfile.has_value()) {
+            return SwitchProfile(priorityProfile.value());
+        }
         return audio::RetCode::ProfileNotSet;
+    }
+
+    audio::RetCode Operation::SwitchToPriorityProfile([[maybe_unused]] audio::PlaybackType playbackType)
+    {
+        return SwitchToPriorityProfile();
     }
 
     void Operation::SetProfileAvailability(std::vector<Profile::Type> profiles, bool available)

@@ -3,11 +3,12 @@
 
 #pragma GCC optimize("Og")
 
-#include <CrashCatcher.h>
+#include <CrashCatcher/CrashCatcher.h>
 
 #include <log.hpp>
 #include <date/date.h>
 #include "crashdumpwriter.hpp"
+#include "consoledump.hpp"
 
 const CrashCatcherMemoryRegion *CrashCatcher_GetMemoryRegions(void)
 {
@@ -17,9 +18,13 @@ const CrashCatcherMemoryRegion *CrashCatcher_GetMemoryRegions(void)
         {0x20200000, 0x20210000, CRASH_CATCHER_BYTE},
         // SRAM_DTC
         {0x20000000, 0x20070000, CRASH_CATCHER_BYTE},
-        // intentionally skip text section
-        // BOARD_SDRAM_HEAP
+    // intentionally skip text section
+    // BOARD_SDRAM_HEAP
+#if defined(HW_SDRAM_64_MB) && (HW_SDRAM_64_MB == 1)
+        {0x80620000, 0x84000000, CRASH_CATCHER_BYTE},
+#else
         {0x80620000, 0x81000000, CRASH_CATCHER_BYTE},
+#endif
         // end tag
         {0xFFFFFFFF, 0xFFFFFFFF, CRASH_CATCHER_BYTE},
     };
@@ -29,6 +34,7 @@ const CrashCatcherMemoryRegion *CrashCatcher_GetMemoryRegions(void)
 
 void CrashCatcher_DumpStart(const CrashCatcherInfo *pInfo)
 {
+    crashdump::printCrashInfo(pInfo);
     crashdump::CrashDumpWriter::instance().openDump();
 }
 

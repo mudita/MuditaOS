@@ -68,8 +68,8 @@ namespace parserFSM
         } // namespace switchData
 
         /// values for getInfo cmd
-        inline constexpr auto simStateInfo      = "simState";
-        inline constexpr auto cellularStateInfo = "cellularState";
+        inline constexpr auto simStateInfo          = "simState";
+        inline constexpr auto cellularStateInfo     = "cellularState";
         inline constexpr auto cellularSleepModeInfo = "cellularSleepMode";
 
         /// values for smsCommand
