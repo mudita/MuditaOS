@@ -49,7 +49,7 @@ void NotificationsHandler::incomingCallHandler(sys::Message *request)
 
 void NotificationsHandler::callerIdHandler(sys::Message *request)
 {
-    auto msg = static_cast<CellularIncominCallMessage *>(request);
+    auto msg = static_cast<CellularCallerIdMessage *>(request);
 
     if (currentCallPolicy.isNumberCheckRequired()) {
         policyNumberCheck(msg->number);

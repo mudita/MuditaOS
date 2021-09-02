@@ -12,7 +12,7 @@ using namespace testing;
 class MockCellular : public ConnectionManagerCellularCommandsInterface
 {
   public:
-    MOCK_METHOD(bool, disconnectFromNetwork, ());
+    MOCK_METHOD(bool, disconnectFromNetwork, (), (override));
     MOCK_METHOD(bool, connectToNetwork, (), (override));
     MOCK_METHOD(bool, isConnectedToNetwork, (), (override));
     MOCK_METHOD(bool, clearNetworkIndicator, (), (override));
