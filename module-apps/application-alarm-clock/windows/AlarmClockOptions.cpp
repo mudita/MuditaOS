@@ -19,7 +19,7 @@ namespace app::alarmClock
             options.emplace_back(utils::translate(translationId), onClickCallback);
         }
 
-        void removeAlarm(const AlarmsRecord &record,
+        void removeAlarm(const AlarmEventRecord &record,
                          Application *application,
                          AbstractAlarmsRepository &alarmsRepository)
         {
@@ -39,14 +39,14 @@ namespace app::alarmClock
     } // namespace
 
     std::list<gui::Option> alarmsListOptions(Application *application,
-                                             const AlarmsRecord &record,
+                                             const AlarmEventRecord &record,
                                              AbstractAlarmsRepository &alarmsRepository)
     {
         std::list<gui::Option> options;
         addOption(
             {"app_alarm_clock_options_edit"},
             [application, record](gui::Item &) {
-                auto rec  = std::make_unique<AlarmsRecord>(record);
+                auto rec  = std::make_unique<AlarmEventRecord>(record);
                 auto data = std::make_unique<AlarmRecordData>(std::move(rec));
                 data->setDescription(style::alarmClock::editAlarm);
                 application->switchWindow(style::alarmClock::window::name::newEditAlarm, std::move(data));

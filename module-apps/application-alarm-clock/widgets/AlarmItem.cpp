@@ -10,7 +10,7 @@
 
 namespace gui
 {
-    AlarmItem::AlarmItem(std::shared_ptr<AlarmsRecord> record) : alarm(std::move(record))
+    AlarmItem::AlarmItem(std::shared_ptr<AlarmEventRecord> record) : alarm(std::move(record))
     {
         assert(alarm != nullptr);
         setMinimumSize(style::window::default_body_width, style::alarmClock::window::item::height);
@@ -52,19 +52,11 @@ namespace gui
 
     void AlarmItem::setAlarm()
     {
-        timeLabel->setText(TimePointToLocalizedTimeString(alarm->time));
-        if (alarm->status == AlarmStatus::Off) {
+        timeLabel->setText(TimePointToLocalizedTimeString(alarm->startDate));
+        if (alarm->enabled) {
             onOffImage->switchState(ButtonState::Off);
         }
-        if (alarm->repeat == static_cast<uint32_t>(AlarmRepeat::everyday)) {
-            periodLabel->setText(utils::translate("app_alarm_clock_repeat_everyday"));
-        }
-        else if (alarm->repeat == static_cast<uint32_t>(AlarmRepeat::weekDays)) {
-            periodLabel->setText(utils::translate("app_alarm_clock_repeat_week_days"));
-        }
-        else if (alarm->repeat != static_cast<uint32_t>(AlarmRepeat::never)) {
-            periodLabel->setText(CustomRepeatValueParser(alarm->repeat).getWeekDaysText());
-        }
+        if (alarm->rruleText != "") {}
 
         if (periodLabel->getText().empty()) {
             periodLabel->setMaximumSize(0, 0);

@@ -3,6 +3,7 @@
 
 #include "AsyncTask.hpp"
 #include "Application.hpp"
+#include "log.hpp"
 
 namespace app
 {
@@ -48,7 +49,10 @@ namespace app
 
     RequestId AsyncQuery::onExecute(Application *application)
     {
-        const auto [_, id] = DBServiceAPI::GetQuery(application, target, std::move(query));
+        const auto [result, id] = DBServiceAPI::GetQuery(application, target, std::move(query));
+        if (!result) {
+            LOG_FATAL("cant request!");
+        }
         return id;
     }
 
@@ -65,7 +69,10 @@ namespace app
     auto AsyncRequest::onExecute(Application *application) -> RequestId
     {
         std::shared_ptr<sys::DataMessage> msg{std::move(message)};
-        application->bus.sendUnicast(msg, serviceName);
+        bool result = application->bus.sendUnicast(msg, serviceName);
+        if (!result) {
+            LOG_FATAL("cant request!");
+        }
         return msg->uniID;
     }
 

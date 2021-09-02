@@ -1,11 +1,11 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-#include <module-db/Interface/AlarmsRecord.hpp>
+#include <module-db/Interface/AlarmEventRecord.hpp>
 #include <ListItem.hpp>
 
 namespace gui
 {
-    using AlarmInternalListItem = ListItemWithCallbacks<AlarmsRecord>;
+    using AlarmInternalListItem = ListItemWithCallbacks<AlarmEventRecord>;
 } /* namespace gui */

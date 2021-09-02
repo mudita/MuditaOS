@@ -7,12 +7,12 @@
 #include "Application.hpp"
 #include <ListItemProvider.hpp>
 #include <DatabaseModel.hpp>
-#include <module-db/Interface/AlarmsRecord.hpp>
+#include <module-db/Interface/AlarmEventRecord.hpp>
 #include <module-db/Common/Query.hpp>
 
 namespace app::alarmClock
 {
-    class AlarmsListItemProvider : public app::DatabaseModel<AlarmsRecord>, public gui::ListItemProvider
+    class AlarmsListItemProvider : public app::DatabaseModel<AlarmEventRecord>, public gui::ListItemProvider
     {
       public:
         explicit AlarmsListItemProvider(app::Application *app);
@@ -24,7 +24,7 @@ namespace app::alarmClock
         AlarmsModel(app::Application *app, std::shared_ptr<AbstractAlarmsRepository> alarmsRepository);
 
         void requestRecords(uint32_t offset, uint32_t limit) override;
-        bool updateRecords(std::vector<AlarmsRecord> records) override;
+        bool updateRecords(std::vector<AlarmEventRecord> records) override;
 
         // virtual methods for ListViewProvider
         [[nodiscard]] unsigned int getMinimalItemSpaceRequired() const override;
@@ -32,7 +32,7 @@ namespace app::alarmClock
         [[nodiscard]] unsigned int requestRecordsCount() override;
 
       private:
-        bool onAlarmsRetrieved(const std::vector<AlarmsRecord> &records, unsigned int alarmsRepoCount);
+        bool onAlarmsRetrieved(const std::vector<AlarmEventRecord> &records, unsigned int alarmsRepoCount);
         std::shared_ptr<AbstractAlarmsRepository> alarmsRepository;
     };
 } // namespace app::alarmClock
