@@ -85,7 +85,7 @@ namespace CellularCall
 
         bool isValid() const
         {
-            return call.ID != 0;
+            return call.ID != DB_ID_NONE;
         }
 
         bool isActive() const
