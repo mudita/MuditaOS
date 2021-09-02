@@ -116,7 +116,7 @@ auto ContactRecordInterface::RemoveByID(uint32_t id) -> bool
                 contactDB->groups.removeContactFromGroup(id, group.ID);
             }
             contact.speedDial = "";
-            //            contactDB->name.removeById(contact.nameID);
+            contactDB->name.removeById(contact.nameID);
             contactDB->address.removeById(contact.addressID);
             contactDB->ringtones.removeById(contact.ringID);
             contactDB->contacts.update(contact);

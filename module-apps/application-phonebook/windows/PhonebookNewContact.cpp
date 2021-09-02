@@ -172,7 +172,6 @@ namespace gui
                         }
                     }
                 }
-                return false;
             }
         }
         else {

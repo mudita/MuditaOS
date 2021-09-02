@@ -13,11 +13,12 @@ std::list<gui::Option> calllogWindowOptions(app::ApplicationCallLog *app, const 
     std::list<gui::Option> options;
     if (record.presentation != PresentationType::PR_UNKNOWN) {
         auto searchResults = DBServiceAPI::ContactGetByIDWithTemporary(app, record.getContactId());
-
         if (searchResults->empty() || !searchResults->front().isValid() || searchResults->front().isTemporary()) {
             // add option - add contact
-            options.emplace_back(gui::Option{std::make_unique<gui::option::Contact>(
-                app, gui::option::ContactOperation::Add, searchResults->front())});
+            ContactRecord contact;
+            contact.numbers.emplace_back(record.phoneNumber);
+            options.emplace_back(
+                gui::Option{std::make_unique<gui::option::Contact>(app, gui::option::ContactOperation::Add, contact)});
         }
         else {
             // add option - contact details
