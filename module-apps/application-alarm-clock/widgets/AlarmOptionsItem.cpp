@@ -212,38 +212,31 @@ namespace gui
             return false;
         };
 
-        onSaveCallback = [&](std::shared_ptr<AlarmsRecord> alarm) {
+        onSaveCallback = [&](std::shared_ptr<AlarmEventRecord> alarm) {
             switch (itemName) {
             case AlarmOptionItemName::Sound: {
                 // stop preview playback if it is played
                 if (musicStatus == MusicStatus::Play) {
                     stopAudioPreview();
                 }
-                alarm->path = songsList[actualVectorIndex].filePath;
+                alarm->musicTone = songsList[actualVectorIndex].filePath;
                 break;
             }
             case AlarmOptionItemName::Snooze: {
-                alarm->snooze = static_cast<uint32_t>(snoozeOptions[actualVectorIndex]);
+                alarm->snoozeDuration = static_cast<uint32_t>(snoozeOptions[actualVectorIndex]);
                 break;
             }
             case AlarmOptionItemName::Repeat: {
-                if (alarm->repeat < optionsNames.size() - 1 && actualVectorIndex != optionsNames.size() - 1) {
-                    alarm->repeat = actualVectorIndex;
-                }
-                else if (alarm->repeat == optionsNames.size() - 1 ||
-                         optionsNames[optionsNames.size() - 1] == utils::translate("app_alarm_clock_repeat_custom")) {
-                    alarm->repeat = static_cast<uint32_t>(AlarmRepeat::never);
-                }
                 break;
             }
             }
         };
 
-        onLoadCallback = [&](std::shared_ptr<AlarmsRecord> alarm) {
+        onLoadCallback = [&](std::shared_ptr<AlarmEventRecord> alarm) {
             switch (itemName) {
             case AlarmOptionItemName::Sound: {
                 auto it = std::find_if(songsList.begin(), songsList.end(), [alarm](const tags::fetcher::Tags &tag) {
-                    return tag.filePath == alarm->path.c_str();
+                    return tag.filePath == alarm->musicTone.c_str();
                 });
                 if (it == songsList.end()) {
                     LOG_DEBUG("No such song in the list");
@@ -255,8 +248,8 @@ namespace gui
                 break;
             }
             case AlarmOptionItemName::Snooze: {
-                auto it =
-                    std::find(snoozeOptions.begin(), snoozeOptions.end(), static_cast<AlarmSnooze>(alarm->snooze));
+                auto it = std::find(
+                    snoozeOptions.begin(), snoozeOptions.end(), static_cast<AlarmSnooze>(alarm->snoozeDuration));
                 if (it == snoozeOptions.end()) {
                     actualVectorIndex = 0;
                 }
@@ -266,36 +259,6 @@ namespace gui
                 break;
             }
             case AlarmOptionItemName::Repeat: {
-                if (alarm->repeat < optionsNames.size() - 1) {
-                    actualVectorIndex = alarm->repeat;
-                    if (alarm->repeat == static_cast<uint32_t>(AlarmRepeat::never)) {
-                        optionsNames[optionsNames.size() - 1] = utils::translate("app_alarm_clock_repeat_custom");
-                    }
-                    bottomBarRestoreFromTemporaryMode();
-                }
-                else {
-                    auto parser = CustomRepeatValueParser(alarm->repeat);
-                    if (parser.isCustomValueEveryday()) {
-                        actualVectorIndex = static_cast<uint32_t>(AlarmRepeat::everyday);
-                        alarm->repeat     = actualVectorIndex;
-                        bottomBarRestoreFromTemporaryMode();
-                        optionsNames[optionsNames.size() - 1] = utils::translate("app_alarm_clock_repeat_custom");
-                    }
-                    else if (parser.isCustomValueWeekDays()) {
-                        actualVectorIndex = static_cast<uint32_t>(AlarmRepeat::weekDays);
-                        alarm->repeat     = actualVectorIndex;
-                        bottomBarRestoreFromTemporaryMode();
-                        optionsNames[optionsNames.size() - 1] = utils::translate("app_alarm_clock_repeat_custom");
-                    }
-                    else {
-                        actualVectorIndex                     = optionsNames.size() - 1;
-                        optionsNames[optionsNames.size() - 1] = parser.getWeekDaysText();
-                        if (this->focus) {
-                            bottomBarTemporaryMode(utils::translate("app_alarm_clock_edit"));
-                        }
-                    }
-                }
-                repeatOptionValue = alarm->repeat;
                 break;
             }
             }
