@@ -14,6 +14,7 @@ add_catch2_executable(
         ${CMAKE_CURRENT_LIST_DIR}/unittest_disk_manager.cpp
     LIBS
         platform
+        purefs-paths
     DEPS
         test_disk_image
     USE_FS
