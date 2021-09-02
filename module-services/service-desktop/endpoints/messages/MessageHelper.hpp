@@ -34,7 +34,7 @@ namespace parserFSM
         auto deleteDBEntry(Context &context) -> sys::ReturnCodes override;
 
         static auto toJson(const SMSRecord &record) -> json11::Json;
-        static auto toJson(const ThreadRecord &record) -> json11::Json;
+        static auto toJson(const ThreadRecord &thread, const utils::PhoneNumber::View &number) -> json11::Json;
         static auto toJson(const SMSTemplateRecord &record) -> json11::Json;
         static auto fromJson(const json11::Json &msgJson) -> SMSTemplateRecord;
 

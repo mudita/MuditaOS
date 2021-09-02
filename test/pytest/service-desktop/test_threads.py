@@ -12,19 +12,6 @@ def test_threads(harness):
     ret = harness.endpoint_request("messages", "get", body)
     assert ret["status"] == status["OK"]
 
-    # Check if all fields are present and have proper type
-    message_types = [1, 2, 4, 8, 16, 18, 255]
-    for thread in ret["body"]["entries"]:
-        assert type(thread["contactID"]) == int
-        assert type(thread["isUnread"]) == bool
-        assert type(thread["lastUpdatedAt"]) == int
-        assert type(thread["messageCount"]) == int
-        assert type(thread["messageSnippet"]) == str
-        assert type(thread["messageType"]) == int
-        assert type(thread["numberID"]) == int
-        assert type(thread["threadID"]) == int
-        assert thread["messageType"] in message_types
-
     # getting a number of threads
     number_of_requested_threads = 3
     if ret["body"]["totalCount"] < number_of_requested_threads:
@@ -36,6 +23,21 @@ def test_threads(harness):
     threads = ret["body"]["entries"]  # getting entries
     threads_count = len(threads)
     assert threads_count == number_of_requested_threads
+
+    # Check if all fields are present and have proper type
+    message_types = [1, 2, 4, 8, 16, 18, 255]
+    print(ret["body"])
+    for thread in ret["body"]["entries"]:
+        print(thread)
+        assert type(thread["contactID"]) == int
+        assert type(thread["isUnread"]) == bool
+        assert type(thread["lastUpdatedAt"]) == int
+        assert type(thread["messageCount"]) == int
+        assert type(thread["messageSnippet"]) == str
+        assert type(thread["messageType"]) == int
+        assert type(thread["number"]) == str
+        assert type(thread["threadID"]) == int
+        assert thread["messageType"] in message_types
 
     # set thread as read
     body = {"category": "thread", "threadID": 1, "isUnread": False}

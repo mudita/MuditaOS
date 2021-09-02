@@ -176,6 +176,7 @@ namespace parserFSM
             inline constexpr auto lastUpdatedAt      = "lastUpdatedAt";
             inline constexpr auto isUnread           = "isUnread";
             inline constexpr auto contactID          = "contactID";
+            inline constexpr auto number             = "number";
             inline constexpr auto numberID           = "numberID";
             inline constexpr auto threadID           = "threadID";
             inline constexpr auto messageSnippet     = "messageSnippet";
