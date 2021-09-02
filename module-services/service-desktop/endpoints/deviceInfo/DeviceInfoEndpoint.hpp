@@ -21,7 +21,19 @@ namespace sys
 
 class DeviceInfoEndpoint : public parserFSM::Endpoint
 {
+  public:
+    enum class DiagnosticsFileList
+    {
+        LOGS,
+        CRASH_DUMPS
+    };
+
     auto getSerialNumber() -> std::string;
+    auto handleGet(parserFSM::Context &context) -> void;
+    auto gatherListOfDiagnostics(parserFSM::Context &context, DiagnosticsFileList diagDataType) -> void;
+    auto listDirectory(std::string path) -> std::vector<std::string>;
+    auto fileListToJsonObject(const std::vector<std::string> &fileList) const -> json11::Json::object const;
+    auto requestLogsFlush() const -> void;
 
   public:
     explicit DeviceInfoEndpoint(sys::Service *ownerServicePtr) : Endpoint(ownerServicePtr)

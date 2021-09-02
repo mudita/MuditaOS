@@ -10,5 +10,6 @@ namespace platform
       public:
         virtual ~Platform() = default;
         virtual void init() = 0;
+        virtual void initDiagnosticFolders();
     };
 } // namespace platform

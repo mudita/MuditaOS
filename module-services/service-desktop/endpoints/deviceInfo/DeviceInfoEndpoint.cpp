@@ -12,6 +12,7 @@
 
 #include <cstdint>
 #include <string>
+#include <vector>
 #include <sys/statvfs.h>
 #include <purefs/filesystem_paths.hpp>
 
@@ -23,13 +24,103 @@ auto DeviceInfoEndpoint::handle(Context &context) -> void
 {
     switch (context.getMethod()) {
     case http::Method::get:
-        getDeviceInfo(context);
+        handleGet(context);
         break;
     default:
         context.setResponseStatus(http::Code::BadRequest);
-        MessageHandler::putToSendQueue(context.createSimpleResponse());
         break;
     }
+
+    MessageHandler::putToSendQueue(context.createSimpleResponse());
+}
+
+auto DeviceInfoEndpoint::handleGet(Context &context) -> void
+{
+    const auto &requestBody = context.getBody();
+
+    if (requestBody.is_null()) {
+        context.setResponseStatus(parserFSM::http::Code::NotFound);
+    }
+
+    if (requestBody[json::fileList].is_number()) {
+
+        auto diagFileList = static_cast<DiagnosticsFileList>(requestBody[json::fileList].int_value());
+
+        if (!magic_enum::enum_contains<DiagnosticsFileList>(diagFileList)) {
+            LOG_ERROR("Bad diagnostic type %d requested", static_cast<unsigned>(diagFileList));
+
+            context.setResponseStatus(parserFSM::http::Code::BadRequest);
+            return;
+        }
+
+        gatherListOfDiagnostics(context, diagFileList);
+    }
+    else {
+        getDeviceInfo(context);
+    }
+}
+
+auto DeviceInfoEndpoint::gatherListOfDiagnostics(Context &context, DiagnosticsFileList diagFileList) -> void
+{
+    std::vector<std::string> fileList;
+    auto status = http::Code::NoContent;
+
+    try {
+        requestLogsFlush();
+    }
+    catch (const std::runtime_error &e) {
+        LOG_ERROR("Logs flush exception: %s", e.what());
+    }
+
+    switch (diagFileList) {
+    case DiagnosticsFileList::LOGS: {
+        fileList = listDirectory(purefs::dir::getLogsPath());
+        break;
+    }
+
+    case DiagnosticsFileList::CRASH_DUMPS: {
+        fileList = listDirectory(purefs::dir::getCrashDumpsPath());
+        break;
+    }
+    }
+
+    if (!fileList.empty()) {
+        status = http::Code::OK;
+        context.setResponseBody(fileListToJsonObject(fileList));
+    }
+
+    context.setResponseStatus(status);
+}
+
+auto DeviceInfoEndpoint::requestLogsFlush() const -> void
+{
+    auto owner = dynamic_cast<ServiceDesktop *>(ownerServicePtr);
+    if (owner) {
+        owner->requestLogsFlush();
+    }
+}
+
+auto DeviceInfoEndpoint::fileListToJsonObject(const std::vector<std::string> &fileList) const
+    -> json11::Json::object const
+{
+    json11::Json::array fileArray;
+
+    for (const auto &file : fileList) {
+        fileArray.push_back(file);
+    }
+
+    return json11::Json::object{{json::files, fileArray}};
+}
+
+auto DeviceInfoEndpoint::listDirectory(std::string path) -> std::vector<std::string>
+{
+    std::vector<std::string> entries;
+
+    for (const auto &entry : std::filesystem::directory_iterator(path)) {
+        entries.push_back(entry.path());
+    }
+
+    return entries;
 }
 
 auto DeviceInfoEndpoint::getSerialNumber() -> std::string
@@ -70,6 +161,5 @@ auto DeviceInfoEndpoint::getDeviceInfo(Context &context) -> bool
          {json::version, std::string(VERSION)},
          {json::serialNumber, getSerialNumber()}}));
 
-    MessageHandler::putToSendQueue(context.createSimpleResponse());
     return true;
 }

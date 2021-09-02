@@ -16,7 +16,7 @@ namespace purefs::fs
 
 namespace crashdump
 {
-    constexpr inline auto CrashDumpFileNameFormat = "/sys/user/crashdump-%FT%TZ.hex";
+    constexpr inline auto CrashDumpFileNameFormat = "crashdump-%FT%TZ.hex";
 
     class CrashDumpWriterVFS : public CrashDumpWriter
     {

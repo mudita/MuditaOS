@@ -120,6 +120,9 @@ namespace parserFSM
         inline constexpr auto reason              = "reason";
         inline constexpr auto serialNumber        = "serialNumber";
 
+        inline constexpr auto fileList = "fileList";
+        inline constexpr auto files    = "files";
+
         namespace filesystem
         {
             inline constexpr auto command   = "command";
