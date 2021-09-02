@@ -24,7 +24,7 @@
 #include <queries/messages/templates/QuerySMSTemplateGetCount.hpp>
 #include <queries/messages/templates/QuerySMSTemplateRemove.hpp>
 #include <queries/messages/templates/QuerySMSTemplateUpdate.hpp>
-#include <queries/messages/threads/QueryThreadsGet.hpp>
+#include <queries/messages/threads/QueryThreadsGetForList.hpp>
 #include <queries/messages/threads/QueryThreadMarkAsRead.hpp>
 #include <service-db/DBServiceAPI.hpp>
 #include <utf8/UTF8.hpp>
@@ -58,17 +58,17 @@ namespace parserFSM
         return recordEntry;
     }
 
-    auto MessageHelper::toJson(const ThreadRecord &record) -> json11::Json
+    auto MessageHelper::toJson(const ThreadRecord &thread, const utils::PhoneNumber::View &number) -> json11::Json
     {
 
-        auto recordEntry = json11::Json::object{{json::messages::contactID, static_cast<int>(record.contactID)},
-                                                {json::messages::numberID, static_cast<int>(record.numberID)},
-                                                {json::messages::lastUpdatedAt, static_cast<int>(record.date)},
-                                                {json::messages::messageCount, static_cast<int>(record.msgCount)},
-                                                {json::messages::threadID, static_cast<int>(record.ID)},
-                                                {json::messages::messageSnippet, record.snippet.c_str()},
-                                                {json::messages::isUnread, record.isUnread()},
-                                                {json::messages::messageType, static_cast<int>(record.type)}};
+        auto recordEntry = json11::Json::object{{json::messages::contactID, static_cast<int>(thread.contactID)},
+                                                {json::messages::number, number.getFormatted()},
+                                                {json::messages::lastUpdatedAt, static_cast<int>(thread.date)},
+                                                {json::messages::messageCount, static_cast<int>(thread.msgCount)},
+                                                {json::messages::threadID, static_cast<int>(thread.ID)},
+                                                {json::messages::messageSnippet, thread.snippet.c_str()},
+                                                {json::messages::isUnread, thread.isUnread()},
+                                                {json::messages::messageType, static_cast<int>(thread.type)}};
         return recordEntry;
     }
 
@@ -327,20 +327,20 @@ namespace parserFSM
             const std::size_t offset = ctx.getBody()[json::messages::offset].int_value();
             ctx.setRequestedLimit(limit);
             ctx.setRequestedOffset(offset);
-            auto query =
-                std::make_unique<db::query::ThreadsGetWithTotalCount>(offset, std::min(ctx.getPageSize(), limit));
+            auto query = std::make_unique<db::query::ThreadsGetForList>(offset, std::min(ctx.getPageSize(), limit));
 
             auto listener = std::make_unique<db::EndpointListenerWithPages>(
                 [](db::QueryResult *result, PagedContext &context) {
-                    if (auto threadsResults = dynamic_cast<db::query::ThreadsGetResultsWithTotalCount *>(result)) {
+                    if (auto threadsResults = dynamic_cast<db::query::ThreadsGetForListResults *>(result)) {
                         json11::Json::array threadsArray;
-                        auto theResults = threadsResults->getResults();
-                        threadsArray.reserve(theResults.size());
-                        for (auto &record : theResults) {
-                            threadsArray.emplace_back(MessageHelper::toJson(record));
+                        const auto threads = threadsResults->getResults();
+                        const auto numbers = threadsResults->getNumbers();
+                        threadsArray.reserve(threads.size());
+                        for (std::size_t i = 0; i < threads.size(); ++i) {
+                            threadsArray.emplace_back(MessageHelper::toJson(threads[i], numbers[i]));
                         }
                         context.setResponseBody(std::move(threadsArray));
-                        context.setTotalCount(threadsResults->getTotalCount());
+                        context.setTotalCount(threadsResults->getCount());
                         MessageHandler::putToSendQueue(context.createSimpleResponse());
                         return true;
                     }
