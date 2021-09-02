@@ -4,7 +4,7 @@
 #include "NewEditAlarmWindow.hpp"
 #include "application-alarm-clock/data/AlarmsData.hpp"
 #include "application-calendar/data/OptionParser.hpp"
-#include <module-db/Interface/AlarmsRecord.hpp>
+#include <module-db/Interface/AlarmEventRecord.hpp>
 
 namespace app::alarmClock
 {

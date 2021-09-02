@@ -69,7 +69,7 @@ namespace app::alarmClock
         }
     }
 
-    void NewEditAlarmModel::loadData(std::shared_ptr<AlarmsRecord> record)
+    void NewEditAlarmModel::loadData(std::shared_ptr<AlarmEventRecord> record)
     {
         list->reset();
         eraseInternalData();
@@ -85,14 +85,14 @@ namespace app::alarmClock
         list->rebuildList();
     }
 
-    void NewEditAlarmModel::loadRepeat(std::shared_ptr<AlarmsRecord> record)
+    void NewEditAlarmModel::loadRepeat(std::shared_ptr<AlarmEventRecord> record)
     {
         if (repeatOption->onLoadCallback) {
             repeatOption->onLoadCallback(std::move(record));
         }
     }
 
-    void NewEditAlarmModel::saveData(std::shared_ptr<AlarmsRecord> alarm, AlarmAction action)
+    void NewEditAlarmModel::saveData(std::shared_ptr<AlarmEventRecord> alarm, AlarmAction action)
     {
         for (auto &item : internalData) {
             if (item->onSaveCallback) {

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -17,7 +17,7 @@ namespace app::alarmClock
 {
     class NewEditAlarmWindow : public gui::AppWindow, public AlarmClockEditWindowContract::View
     {
-        std::shared_ptr<AlarmsRecord> alarmRecord;
+        std::shared_ptr<AlarmEventRecord> alarmRecord;
         gui::ListView *list     = nullptr;
         AlarmAction alarmAction = AlarmAction::Add;
         std::unique_ptr<AlarmClockEditWindowContract::Presenter> presenter;

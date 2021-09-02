@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -23,10 +23,10 @@ namespace app::alarmClock
             virtual ~Presenter() noexcept = default;
 
             [[nodiscard]] virtual std::shared_ptr<gui::ListItemProvider> getAlarmsItemProvider() const = 0;
-            virtual void loadData(std::shared_ptr<AlarmsRecord> record)                                = 0;
-            virtual void saveData(std::shared_ptr<AlarmsRecord> record, AlarmAction action)            = 0;
-            virtual void loadRepeat(std::shared_ptr<AlarmsRecord> record)                              = 0;
-            virtual void updateRepeat(std::shared_ptr<AlarmsRecord> record, WeekDaysRepeatData data)   = 0;
+            virtual void loadData(std::shared_ptr<AlarmEventRecord> record)                              = 0;
+            virtual void saveData(std::shared_ptr<AlarmEventRecord> record, AlarmAction action)          = 0;
+            virtual void loadRepeat(std::shared_ptr<AlarmEventRecord> record)                            = 0;
+            virtual void updateRepeat(std::shared_ptr<AlarmEventRecord> record, WeekDaysRepeatData data) = 0;
         };
     };
 
@@ -36,10 +36,10 @@ namespace app::alarmClock
         explicit AlarmClockEditWindowPresenter(std::shared_ptr<AlarmsInternalListItemProvider> itemProvider);
 
         [[nodiscard]] std::shared_ptr<gui::ListItemProvider> getAlarmsItemProvider() const override;
-        void loadData(std::shared_ptr<AlarmsRecord> record) override;
-        void saveData(std::shared_ptr<AlarmsRecord> record, AlarmAction action) override;
-        void loadRepeat(std::shared_ptr<AlarmsRecord> record) override;
-        void updateRepeat(std::shared_ptr<AlarmsRecord> record, WeekDaysRepeatData data) override;
+        void loadData(std::shared_ptr<AlarmEventRecord> record) override;
+        void saveData(std::shared_ptr<AlarmEventRecord> record, AlarmAction action) override;
+        void loadRepeat(std::shared_ptr<AlarmEventRecord> record) override;
+        void updateRepeat(std::shared_ptr<AlarmEventRecord> record, WeekDaysRepeatData data) override;
 
       private:
         std::shared_ptr<AlarmsInternalListItemProvider> alarmFieldsProvider;
