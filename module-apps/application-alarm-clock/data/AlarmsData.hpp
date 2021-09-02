@@ -1,10 +1,10 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include "application-calendar/data/OptionParser.hpp"
-#include <module-db/Interface/AlarmsRecord.hpp>
+#include <module-db/Interface/AlarmEventRecord.hpp>
 #include <SwitchData.hpp>
 
 enum class AlarmRepeat
@@ -49,16 +49,16 @@ enum class WeekDayIso
 class AlarmRecordData : public gui::SwitchData
 {
   protected:
-    std::shared_ptr<AlarmsRecord> record;
+    std::shared_ptr<AlarmEventRecord> record;
 
   public:
-    explicit AlarmRecordData(std::shared_ptr<AlarmsRecord> record) : record{std::move(record)}
+    explicit AlarmRecordData(std::shared_ptr<AlarmEventRecord> record) : record{std::move(record)}
     {}
-    std::shared_ptr<AlarmsRecord> getData()
+    std::shared_ptr<AlarmEventRecord> getData()
     {
         return record;
     }
-    void setData(std::shared_ptr<AlarmsRecord> rec)
+    void setData(std::shared_ptr<AlarmEventRecord> rec)
     {
         record = std::move(rec);
     }

@@ -26,7 +26,7 @@ namespace app::alarmClock
     void AlarmsModel::requestRecords(uint32_t offset, uint32_t limit)
     {
         alarmsRepository->getLimited(
-            offset, limit, [this](const std::vector<AlarmsRecord> &records, unsigned int alarmsRepoCount) {
+            offset, limit, [this](const std::vector<AlarmEventRecord> &records, unsigned int alarmsRepoCount) {
                 return onAlarmsRetrieved(records, alarmsRepoCount);
             });
     }
@@ -46,11 +46,11 @@ namespace app::alarmClock
 
         auto item               = new gui::AlarmItem(record);
         item->activatedCallback = [this, record](gui::Item &) {
-            if (record->status == AlarmStatus::Off) {
-                record->status = AlarmStatus::On;
+            if (record->enabled) {
+                record->enabled = false;
             }
             else {
-                record->status = AlarmStatus::Off;
+                record->enabled = false;
             }
             alarmsRepository->update(*record, nullptr);
             return true;
@@ -66,14 +66,14 @@ namespace app::alarmClock
         return item;
     }
 
-    bool AlarmsModel::updateRecords(std::vector<AlarmsRecord> records)
+    bool AlarmsModel::updateRecords(std::vector<AlarmEventRecord> records)
     {
         DatabaseModel::updateRecords(std::move(records));
         list->onProviderDataUpdate();
         return true;
     }
 
-    bool AlarmsModel::onAlarmsRetrieved(const std::vector<AlarmsRecord> &records, unsigned int alarmsRepoCount)
+    bool AlarmsModel::onAlarmsRetrieved(const std::vector<AlarmEventRecord> &records, unsigned int alarmsRepoCount)
     {
         if (recordsCount != alarmsRepoCount) {
             recordsCount = alarmsRepoCount;

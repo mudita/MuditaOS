@@ -111,14 +111,14 @@ namespace gui
             return false;
         };
 
-        onSaveCallback = [&](std::shared_ptr<AlarmsRecord> record) {
+        onSaveCallback = [&](std::shared_ptr<AlarmEventRecord> record) {
             validateHour();
             auto hours   = std::chrono::hours(std::stoi(hourInput->getText().c_str()));
             auto minutes = std::chrono::minutes(std::stoi(minuteInput->getText().c_str()));
             if (!mode24H) {
                 hours = date::make24(hours, isPm(mode12hInput->getText()));
             }
-            record->time = TimePointFromYearMonthDay(TimePointToYearMonthDay(TimePointNow())) + hours + minutes;
+            record->startDate = TimePointFromYearMonthDay(TimePointToYearMonthDay(TimePointNow())) + hours + minutes;
         };
 
         onInputCallback(*hourInput);
@@ -186,10 +186,10 @@ namespace gui
             hourInput->setMinimumSize(timeItem::timeInput12h, timeItem::height - timeItem::separator);
             minuteInput->setMinimumSize(timeItem::timeInput12h, timeItem::height - timeItem::separator);
 
-            onLoadCallback = [&](std::shared_ptr<AlarmsRecord> alarm) {
-                hourInput->setText(TimePointToHourString12H(alarm->time));
-                minuteInput->setText(TimePointToMinutesString(alarm->time));
-                if (date::is_am(TimePointToHourMinSec(alarm->time).hours())) {
+            onLoadCallback = [&](std::shared_ptr<AlarmEventRecord> alarm) {
+                hourInput->setText(TimePointToHourString12H(alarm->startDate));
+                minuteInput->setText(TimePointToMinutesString(alarm->startDate));
+                if (date::is_am(TimePointToHourMinSec(alarm->startDate).hours())) {
                     mode12hInput->setText(utils::translate(utils::time::Locale::getAM()));
                 }
                 else {
@@ -201,9 +201,9 @@ namespace gui
             hourInput->setMinimumSize(timeItem::timeInput24h, timeItem::height - timeItem::separator);
             minuteInput->setMinimumSize(timeItem::timeInput24h, timeItem::height - timeItem::separator);
 
-            onLoadCallback = [&](std::shared_ptr<AlarmsRecord> alarm) {
-                hourInput->setText(TimePointToHourString24H(alarm->time));
-                minuteInput->setText(TimePointToMinutesString(alarm->time));
+            onLoadCallback = [&](std::shared_ptr<AlarmEventRecord> alarm) {
+                hourInput->setText(TimePointToHourString24H(alarm->startDate));
+                minuteInput->setText(TimePointToMinutesString(alarm->startDate));
             };
         }
     }
