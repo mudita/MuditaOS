@@ -30,7 +30,6 @@ namespace service
         auto inotify = dynamic_cast<purefs::fs::message::inotify *>(msg);
         if (inotify) {
             int err;
-            LOG_ERROR("Inotify event %s %08x", inotify->name.c_str(), int(inotify->flags));
             if (inotify->flags && (purefs::fs::inotify_flags::close_write | purefs::fs::inotify_flags::move_dst)) {
                 err = onUpdateOrCreate(inotify->name);
                 if (err) {
@@ -62,10 +61,6 @@ namespace service
     // Initialize data notification handler
     sys::ReturnCodes ServiceFileIndexer::InitHandler()
     {
-        /*
-        mStartupIndexer.start(shared_from_this(), service::name::file_indexer);
-        */
-
         mfsNotifier = purefs::fs::inotify_create(shared_from_this());
         if (!mfsNotifier) {
             LOG_ERROR("Unable to create inotify object");
@@ -80,6 +75,8 @@ namespace service
             LOG_ERROR("Unable to create inotify watch errno: %i", err);
             return sys::ReturnCodes::Failure;
         }
+        // Start the initial indexer
+        mStartupIndexer.start(shared_from_this(), service::name::file_indexer);
         return sys::ReturnCodes::Success;
     }
 
