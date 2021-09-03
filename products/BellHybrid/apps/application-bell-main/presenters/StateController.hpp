@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <common/models/AbstractAlarmModel.hpp>
 #include <gui/input/InputEvent.hpp>
 #include <memory>
 
@@ -11,7 +12,6 @@ namespace app::home_screen
     class AbstractView;
     class AbstractPresenter;
     class AbstractTemperatureModel;
-    class AbstractAlarmModel;
     class AbstractTimeModel;
     class AbstractController
     {
