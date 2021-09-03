@@ -102,11 +102,7 @@ namespace service::detail
     //  Check if lock file exists
     auto StartupIndexer::hasLockFile() -> bool
     {
-#if 0
         std::error_code ec;
         return fs::is_regular_file(lock_file_name, ec);
-#else
-        return false;
-#endif
     }
 } // namespace service::detail
