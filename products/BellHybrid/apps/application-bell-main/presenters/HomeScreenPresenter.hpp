@@ -14,6 +14,7 @@
 #include <utf8/UTF8.hpp>
 
 #include <chrono>
+#include <functional>
 
 namespace app
 {
@@ -79,6 +80,7 @@ namespace app::home_screen
         virtual void spawnTimer(std::chrono::milliseconds timeout = defaultTimeout) = 0;
         virtual void detachTimer()                                                  = 0;
         virtual void handleAlarmRingingEvent()                                      = 0;
+        virtual void handleAlarmModelReady()                                        = 0;
 
         static constexpr auto defaultTimeout = std::chrono::milliseconds{5000};
     };
@@ -104,9 +106,10 @@ namespace app::home_screen
         void onDatabaseMessage(db::NotificationMessage *msg) override;
         void refreshWindow() override;
 
-        void spawnTimer(std::chrono::milliseconds timeout) override;
+        void spawnTimer(std::chrono::milliseconds timeout = defaultTimeout) override;
         void detachTimer() override;
         void handleAlarmRingingEvent() override;
+        void handleAlarmModelReady() override;
 
       private:
         Application *app;

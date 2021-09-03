@@ -14,4 +14,12 @@ namespace bell::settings
         constexpr inline auto duration = "ringing_duration";
         constexpr inline auto tone     = "ringing_tone";
     } // namespace Ringing
+    namespace Snooze
+    {
+        constexpr inline auto active   = "snooze_active";
+        constexpr inline auto length   = "snooze_length";
+        constexpr inline auto interval = "snooze_interval";
+        constexpr inline auto tone     = "snooze_tone";
+        constexpr inline auto volume   = "snooze_volume";
+    } // namespace Snooze
 };    // namespace bell::settings

@@ -14,4 +14,8 @@ namespace alarms
     {
         return service.bus.sendUnicast(std::make_shared<app::actions::AlarmTriggeredAction>(), service::name::appmgr);
     }
+    bool NotifyGUIAction::turnOff()
+    {
+        return true;
+    }
 } // namespace alarms

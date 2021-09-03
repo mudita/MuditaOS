@@ -28,6 +28,7 @@ target_link_libraries(application-bell-common
         apps-common
 
     PRIVATE
+        bell::db
         module-gui
         service-time
 )

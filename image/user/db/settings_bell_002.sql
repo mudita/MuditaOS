@@ -40,6 +40,10 @@ INSERT OR IGNORE INTO settings_tab (path, value) VALUES
     ('\ServiceTime\\gs_automatic_date_and_time_is_on', '1'),
     ('temperature_unit', 'C'),
     ('ringing_duration', '10000'),
-    ('ringing_tone', 'Nick_Lewis_-_Kristies_Elephant.mp3');
-
+    ('ringing_tone', 'Nick_Lewis_-_Kristies_Elephant.mp3'),
+    ('snooze_active', '1'),
+    ('snooze_length','10'),
+    ('snooze_interval','1'),
+    ('snooze_tone','Meditative surprises'),
+    ('snooze_volume','10');
 

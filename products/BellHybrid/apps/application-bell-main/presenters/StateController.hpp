@@ -5,10 +5,15 @@
 
 #include <common/models/AbstractAlarmModel.hpp>
 #include <gui/input/InputEvent.hpp>
+
+#include <chrono>
 #include <memory>
 
 namespace app::home_screen
 {
+
+    inline constexpr auto defaultAlarmRingingTime = std::chrono::minutes(5);
+
     class AbstractView;
     class AbstractPresenter;
     class AbstractTemperatureModel;
@@ -22,6 +27,7 @@ namespace app::home_screen
         virtual bool handleTimerEvent()                                  = 0;
         virtual bool handleTimeUpdateEvent()                             = 0;
         virtual bool handleAlarmRingingEvent()                           = 0;
+        virtual bool handleAlarmModelReady()                             = 0;
     };
 
     class StateController : public AbstractController
@@ -37,6 +43,7 @@ namespace app::home_screen
         bool handleTimerEvent() override;
         bool handleTimeUpdateEvent() override;
         bool handleAlarmRingingEvent() override;
+        bool handleAlarmModelReady() override;
 
       private:
         class Impl;

@@ -4,6 +4,7 @@
 #pragma once
 
 #include "AlarmRepository.hpp"
+#include "SnoozedAlarmEventRecord.hpp"
 
 #include <service-time/AlarmHandlerFactory.hpp>
 
@@ -21,6 +22,8 @@ namespace alarms
         using OnUpdateAlarmProcessed      = std::function<void(bool)>;
         using OnRemoveAlarmProcessed      = std::function<void(bool)>;
         using OnGetNextSingleProcessed    = std::function<void(std::vector<SingleEventRecord>)>;
+        using OnSnoozeRingingAlarm        = std::function<void(bool)>;
+        using OnTurnOffRingingAlarm       = std::function<void(bool)>;
 
         virtual ~IAlarmOperations() noexcept = default;
 
@@ -38,6 +41,10 @@ namespace alarms
                                       std::uint32_t limit,
                                       OnGetAlarmsInRangeProcessed callback)                    = 0;
         virtual void getNextSingleEvents(TimePoint start, OnGetNextSingleProcessed callback)   = 0;
+        virtual void turnOffRingingAlarm(const std::uint32_t id, OnTurnOffRingingAlarm callback)   = 0;
+        virtual void snoozeRingingAlarm(const std::uint32_t id,
+                                        const TimePoint nextAlarmTime,
+                                        OnSnoozeRingingAlarm callback)                             = 0;
         virtual void minuteUpdated(TimePoint now)                                                  = 0;
         virtual void addAlarmExecutionHandler(const alarms::AlarmType type,
                                               const std::shared_ptr<alarms::AlarmHandler> handler) = 0;
@@ -61,6 +68,10 @@ namespace alarms
                               std::uint32_t limit,
                               OnGetAlarmsInRangeProcessed callback) override;
         void getNextSingleEvents(TimePoint start, OnGetNextSingleProcessed callback) override;
+        void turnOffRingingAlarm(const std::uint32_t id, OnTurnOffRingingAlarm callback) override;
+        void snoozeRingingAlarm(const std::uint32_t id,
+                                const TimePoint nextAlarmTime,
+                                OnSnoozeRingingAlarm callback) override;
         void minuteUpdated(TimePoint now) override;
         void addAlarmExecutionHandler(const alarms::AlarmType type,
                                       const std::shared_ptr<alarms::AlarmHandler> handler) override;
@@ -70,7 +81,9 @@ namespace alarms
         AlarmHandlerFactory alarmHandlerFactory;
 
         // Events we are waiting for (on one timepoint)
-        std::vector<SingleEventRecord> nextSingleEvents;
+        std::vector<std::unique_ptr<SingleEventRecord>> nextSingleEvents;
+        std::vector<std::unique_ptr<SingleEventRecord>> ongoingSingleEvents;
+        std::vector<std::unique_ptr<SnoozedAlarmEventRecord>> snoozedSingleEvents;
 
         GetCurrentTime getCurrentTimeCallback;
 
@@ -89,7 +102,10 @@ namespace alarms
                                                std::vector<AlarmEventRecord> records);
 
         void checkAndUpdateCache(AlarmEventRecord record);
-        void executeAlarm(const SingleEventRecord &singleAlarmEvent);
+        void switchAlarmExecution(const SingleEventRecord &singleAlarmEvent, bool newStateOn);
+        void processNextEventsQueue(const TimePoint now);
+        void processSnoozedEventsQueue(const TimePoint now);
+
         TimePoint getCurrentTime();
     };
 } // namespace alarms
