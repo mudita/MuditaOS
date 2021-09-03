@@ -27,6 +27,7 @@
 #include <service-db/DBNotificationMessage.hpp>
 #include <service-desktop/Constants.hpp>
 #include <service-desktop/DesktopMessages.hpp>
+#include <service-time/Constants.hpp>
 #include <service-time/service-time/TimeMessage.hpp>
 
 #include <cassert>
@@ -289,6 +290,7 @@ void EventManagerCommon::handleMinuteUpdate(time_t timestamp)
         auto message       = std::make_shared<sevm::RtcMinuteAlarmMessage>(MessageType::EVMMinuteUpdated);
         message->timestamp = timestamp;
         bus.sendUnicast(message, targetApplication);
+        bus.sendUnicast(message, service::name::service_time);
     }
 }
 
