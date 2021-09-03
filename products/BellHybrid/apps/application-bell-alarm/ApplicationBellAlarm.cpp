@@ -12,7 +12,7 @@ namespace app
                                                sys::phone_modes::PhoneMode mode,
                                                sys::bluetooth::BluetoothMode bluetoothMode,
                                                StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), mode, bluetoothMode, startInBackground)
+        : ApplicationBell(std::move(name), std::move(parent), mode, bluetoothMode, startInBackground)
     {}
 
     sys::ReturnCodes ApplicationBellAlarm::InitHandler()
@@ -33,6 +33,8 @@ namespace app
             auto presenter = std::make_unique<bell_alarm::BellAlarmWindowPresenter>();
             return std::make_unique<gui::BellAlarmWindow>(app, std::move(presenter));
         });
+
+        attachPopups({gui::popup::ID::AlarmActivated});
     }
 
     sys::MessagePointer ApplicationBellAlarm::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
