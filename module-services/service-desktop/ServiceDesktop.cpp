@@ -85,12 +85,12 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
 
     desktopWorker = std::make_unique<WorkerDesktop>(this, *usbSecurityModel.get(), serialNumber);
 
-    const bool ret =
+    initialized =
         desktopWorker->init({{sdesktop::RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_len},
                              {sdesktop::SEND_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_object_size},
                              {sdesktop::IRQ_QUEUE_BUFFER_NAME, 1, sdesktop::irq_queue_object_size}});
 
-    if (ret == false) {
+    if (initialized == false) {
         LOG_ERROR("!!! service-desktop InitHandler failed to initialize worker, service-desktop won't work");
         return sys::ReturnCodes::Failure;
     }
@@ -207,16 +207,17 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
 sys::ReturnCodes ServiceDesktop::DeinitHandler()
 {
     LOG_ERROR(".. deinit ..");
-    settings->deinit();
-    desktopWorker->deinit();
+    if (initialized) {
+        settings->deinit();
+        desktopWorker->deinit();
+    }
     return sys::ReturnCodes::Success;
 }
 
 void ServiceDesktop::ProcessCloseReason(sys::CloseReason closeReason)
 {
     LOG_ERROR(".. close with reason ..");
-    settings->deinit();
-    desktopWorker->deinit();
+    DeinitHandler();
     sendCloseReadyMessage(this);
 }
 

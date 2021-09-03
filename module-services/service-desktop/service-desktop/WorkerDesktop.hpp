@@ -44,7 +44,7 @@ class WorkerDesktop : public sys::Worker
     void suspendUsb();
 
     bool stateChangeWait();
-
+    bool initialized = false;
     xQueueHandle receiveQueue;
     xQueueHandle irqQueue;
     const sdesktop::USBSecurityModel &securityModel;
