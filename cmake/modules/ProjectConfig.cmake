@@ -6,8 +6,9 @@ else()
 endif()
 
 # add LOG_SENSITIVE_DATA enable option
-option(LOG_SENSITIVE_DATA "LOG_SENSITIVE_DATA" OFF)
+option(LOG_SENSITIVE_DATA "LOG_SENSITIVE_DATA" ON)
 if (${LOG_SENSITIVE_DATA} STREQUAL "ON")
+    message("Sensitive data logging enabled.")
     set (LOG_SENSITIVE_DATA_ENABLED 1 CACHE INTERNAL "")
 else()
     set (LOG_SENSITIVE_DATA_ENABLED 0 CACHE INTERNAL "")
