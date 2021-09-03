@@ -31,8 +31,22 @@ auto SecurityEndpointHelper::processPut(Context &context) -> ProcessResult
 
 auto SecurityEndpointHelper::processGet(Context &context) -> ProcessResult
 {
-    auto code = processStatus(context);
-    return {sent::no, endpoint::ResponseContext{.status = code}};
+    if (context.getBody()[json::messages::category].string_value() == json::usb::phoneLockStatus) {
+        return {sent::no, endpoint::ResponseContext{.status = processStatus(context)}};
+    }
+    if (context.getBody()[json::messages::category].string_value() == json::usb::phoneLockTime) {
+        if (auto phoneLockTime = getPhoneLockTime(context); phoneLockTime > std::time(nullptr)) {
+            context.setResponseBody(
+                json11::Json::object({{json::usb::phoneLockTime, static_cast<int>(phoneLockTime)}}));
+            context.setResponseStatus(http::Code::OK);
+        }
+        else {
+            context.setResponseStatus(http::Code::UnprocessableEntity);
+        }
+        MessageHandler::putToSendQueue(context.createSimpleResponse());
+        return {sent::yes, std::nullopt};
+    }
+    return {sent::no, endpoint::ResponseContext{.status = http::Code::BadRequest}};
 }
 
 auto SecurityEndpointHelper::processStatus(Context &context) -> http::Code
@@ -45,6 +59,12 @@ auto SecurityEndpointHelper::processStatus(Context &context) -> http::Code
     }
 
     return security == EndpointSecurity::Allow ? http::Code::NoContent : http::Code::Forbidden;
+}
+
+auto SecurityEndpointHelper::getPhoneLockTime(Context &context) -> time_t
+{
+    auto desktopService = static_cast<ServiceDesktop *>(owner);
+    return desktopService->getSecurity()->getPhoneLockTime();
 }
 
 auto SecurityEndpointHelper::passCodeArrayToVecOfInts(const json11::Json::array &passCode) -> std::vector<unsigned int>

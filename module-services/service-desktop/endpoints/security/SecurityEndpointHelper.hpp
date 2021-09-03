@@ -30,6 +30,7 @@ namespace parserFSM
         auto processGet(Context &context) -> ProcessResult final;
 
         auto processStatus(Context &context) -> http::Code;
+        auto getPhoneLockTime(Context &context) -> time_t;
         auto processConfiguration(Context &context) -> http::Code;
 
         auto passCodeArrayToVecOfInts(const json11::Json::array &passCode) -> std::vector<unsigned int>;
