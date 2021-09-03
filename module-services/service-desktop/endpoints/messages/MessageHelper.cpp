@@ -26,6 +26,7 @@
 #include <queries/messages/templates/QuerySMSTemplateUpdate.hpp>
 #include <queries/messages/threads/QueryThreadsGetForList.hpp>
 #include <queries/messages/threads/QueryThreadMarkAsRead.hpp>
+#include <service-cellular/service-cellular/MessageConstants.hpp>
 #include <service-db/DBServiceAPI.hpp>
 #include <utf8/UTF8.hpp>
 
@@ -165,8 +166,38 @@ namespace parserFSM
 
     auto MessageHelper::createSMS(Context &context) -> sys::ReturnCodes
     {
-        context.setResponseStatus(http::Code::NotImplemented);
-        MessageHandler::putToSendQueue(context.createSimpleResponse());
+        const auto smsNumber = context.getBody()[json::messages::number].string_value();
+        const auto smsBody   = context.getBody()[json::messages::messageBody].string_value();
+
+        if (smsBody.size() > msgConstants::maxConcatenatedLen) {
+            context.setResponseStatus(http::Code::BadRequest);
+            MessageHandler::putToSendQueue(context.createSimpleResponse());
+            return sys::ReturnCodes::Success;
+        }
+
+        SMSRecord smsRecord;
+        smsRecord.number = utils::PhoneNumber(smsNumber).getView();
+        smsRecord.body   = smsBody;
+        smsRecord.type   = SMSType::QUEUED;
+        smsRecord.date   = std::time(nullptr);
+
+        auto listener = std::make_unique<db::EndpointListener>(
+            [=](db::QueryResult *result, Context &context) {
+                const auto smsAddResult = dynamic_cast<db::query::SMSAddResult *>(result);
+                if (!smsAddResult) {
+                    LOG_ERROR("Received invalid SMS add result");
+                    return false;
+                }
+
+                context.setResponseStatus(http::Code::OK);
+                context.setResponseBody(toJson(smsAddResult->record));
+                MessageHandler::putToSendQueue(context.createSimpleResponse());
+                return true;
+            },
+            context);
+
+        DBServiceAPI::AddSMS(ownerServicePtr, smsRecord, std::move(listener));
+
         return sys::ReturnCodes::Success;
     }
 
