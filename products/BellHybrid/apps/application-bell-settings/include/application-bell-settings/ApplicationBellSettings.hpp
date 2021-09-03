@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <apps-common/Application.hpp>
+#include <common/ApplicationBell.hpp>
 #include <service-evtmgr/screen-light-control/ScreenLightControl.hpp>
 
 namespace gui::window::name
@@ -46,7 +46,7 @@ namespace app
         };
     }; // namespace settingsInterface
 
-    class ApplicationBellSettings : public Application, public settingsInterface::BellScreenLightSettings
+    class ApplicationBellSettings : public ApplicationBell, public settingsInterface::BellScreenLightSettings
     {
       public:
         ApplicationBellSettings(std::string name                            = applicationBellSettingsName,
