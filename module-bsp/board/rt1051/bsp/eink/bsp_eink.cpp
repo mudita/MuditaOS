@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "bsp_eink.h"
@@ -7,6 +7,7 @@
 #include "fsl_lpspi_edma.h"
 #include "fsl_common.h"
 #include "dma_config.h"
+#include "bsp/eink/eink_pin_config.hpp"
 
 #include "FreeRTOS.h"
 #include "semphr.h"
@@ -145,7 +146,7 @@ static void s_LPSPI_MasterEdmaCallback(LPSPI_Type *base,
 
 status_t BSP_EinkInit(bsp_eink_BusyEvent event)
 {
-    bsp_eink_driver_t *lpspi           = &BSP_EINK_LPSPI_EdmaDriverState;
+    bsp_eink_driver_t *lpspi = &BSP_EINK_LPSPI_EdmaDriverState;
     // lpspi_edma_resource_t *dmaResource = lpspi->dmaResource;
 
     // If was already created - free it
@@ -175,29 +176,11 @@ status_t BSP_EinkInit(bsp_eink_BusyEvent event)
         return kStatus_Fail;
     }
 
-    // pll = DriverPLL::Create(static_cast<PLLInstances >(BoardDefinitions ::EINK_PLL),DriverPLLParams{});
-
     lpspi->eventRegister = EventWaitNotRegistered;
 
     gpio = DriverGPIO::Create(static_cast<GPIOInstances>(BoardDefinitions::EINK_GPIO), DriverGPIOParams{});
 
-    gpio->ConfPin(DriverGPIOPinParams{.dir      = DriverGPIOPinParams::Direction::Output,
-                                      .irqMode  = DriverGPIOPinParams::InterruptMode::NoIntmode,
-                                      .defLogic = 1,
-                                      .pin      = static_cast<uint32_t>(BoardDefinitions::EINK_CS_PIN)});
-
-    gpio->ConfPin(DriverGPIOPinParams{.dir      = DriverGPIOPinParams::Direction::Output,
-                                      .irqMode  = DriverGPIOPinParams::InterruptMode::NoIntmode,
-                                      .defLogic = 0,
-                                      .pin      = static_cast<uint32_t>(BoardDefinitions::EINK_RESET_PIN)});
-
-    gpio->ConfPin(DriverGPIOPinParams{.dir      = DriverGPIOPinParams::Direction::Input,
-                                      .irqMode  = DriverGPIOPinParams::InterruptMode::IntRisingEdge,
-                                      .defLogic = 0,
-                                      .pin      = static_cast<uint32_t>(BoardDefinitions::EINK_BUSY_PIN)});
-
-    gpio->ClearPortInterrupts(1 << static_cast<uint32_t>(BoardDefinitions::EINK_BUSY_PIN));
-    gpio->DisableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::EINK_BUSY_PIN));
+    bsp::eink::eink_configure_gpio_pins();
 
     s_eink_lpspi_master_config.baudRate     = BSP_EINK_TRANSFER_WRITE_CLOCK;
     s_eink_lpspi_master_config.bitsPerFrame = 8;
@@ -320,8 +303,8 @@ status_t BSP_EinkWriteData(void *txBuffer, uint32_t len, eink_spi_cs_config_e cs
     gpio->ClearPortInterrupts(1 << static_cast<uint32_t>(BoardDefinitions::EINK_BUSY_PIN));
     // Enable the BUSY Pin IRQ
     gpio->EnableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::EINK_BUSY_PIN));
-    // Take the BUSY semaphore without timeout just in case the transmission makes the BUSY pin state change. It enables
-    // the driver to block then on the bsp_eink_busySemaphore until the BUSY pin is deasserted
+    // Take the BUSY semaphore without timeout just in case the transmission makes the BUSY pin state change. It
+    // enables the driver to block then on the bsp_eink_busySemaphore until the BUSY pin is deasserted
     xSemaphoreTake(bsp_eink_busySemaphore, 0);
 
     // The MAJOR loop of the DMA can be maximum of value 32767
@@ -402,8 +385,8 @@ status_t BSP_EinkReadData(void *rxBuffer, uint32_t len, eink_spi_cs_config_e cs)
     gpio->ClearPortInterrupts(1 << static_cast<uint32_t>(BoardDefinitions::EINK_BUSY_PIN));
     // Enable the BUSY Pin IRQ
     gpio->EnableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::EINK_BUSY_PIN));
-    // Take the BUSY semaphore without timeout just in case the transmission makes the BUSY pin state change. It enables
-    // the driver to block then on the bsp_eink_busySemaphore until the BUSY pin is deasserted
+    // Take the BUSY semaphore without timeout just in case the transmission makes the BUSY pin state change. It
+    // enables the driver to block then on the bsp_eink_busySemaphore until the BUSY pin is deasserted
     xSemaphoreTake(bsp_eink_busySemaphore, 0);
 
     status = LPSPI_MasterTransferEDMA(
