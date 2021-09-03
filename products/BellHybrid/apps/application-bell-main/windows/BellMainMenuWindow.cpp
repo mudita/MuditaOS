@@ -78,14 +78,11 @@ namespace gui
         };
 
         addAppMenu(utils::translate("app_bellmain_alarm"), app::applicationBellAlarmName);
-
-        // for demo only - to be replaced by call o final window
-        addWinMenu(utils::translate("app_bellmain_bedtime"), gui::window::name::bell_main_menu_dialog);
-        addAppMenu(utils::translate("app_bellmain_next_alarm"), app::applicationBellAlarmName);
         addAppMenu(utils::translate("app_bellmain_power_nap"), app::applicationBellPowerNapName);
         // for demo only - to be replaced by call o final window
         addWinMenu(utils::translate("app_bellmain_meditation_timer"), gui::window::name::bell_main_menu_dialog);
         addWinMenu(utils::translate("app_bellmain_background_sounds"), gui::window::name::bell_main_menu_dialog);
+        addWinMenu(utils::translate("app_bellmain_bedtime"), gui::window::name::bell_main_menu_dialog);
 
         addAppMenu(utils::translate("app_bellmain_settings"), app::applicationBellSettingsName);
 
