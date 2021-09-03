@@ -68,9 +68,9 @@ target_sources(application-bell-settings
 target_link_libraries(application-bell-settings
     PRIVATE
         bellgui
+        bell::app-common
         bell::db
         service-appmgr
     PUBLIC
-        apps-common
         module-gui
 )

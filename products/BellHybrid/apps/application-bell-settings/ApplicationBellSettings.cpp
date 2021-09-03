@@ -29,7 +29,7 @@ namespace app
                                                      sys::phone_modes::PhoneMode mode,
                                                      sys::bluetooth::BluetoothMode bluetoothMode,
                                                      StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), mode, bluetoothMode, startInBackground)
+        : ApplicationBell(std::move(name), std::move(parent), mode, bluetoothMode, startInBackground)
     {}
 
     sys::ReturnCodes ApplicationBellSettings::InitHandler()
@@ -89,6 +89,8 @@ namespace app
         windowsFactory.attach(gui::window::name::bellSettingsTurnOff, [](Application *app, const std::string &name) {
             return std::make_unique<gui::BellSettingsTurnOffWindow>(app);
         });
+
+        attachPopups({gui::popup::ID::AlarmActivated});
     }
 
     sys::MessagePointer ApplicationBellSettings::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)

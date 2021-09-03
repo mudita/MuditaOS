@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <Application.hpp>
+#include <common/ApplicationBell.hpp>
 
 namespace gui::window::name
 {
@@ -16,7 +16,7 @@ namespace app
 {
     inline constexpr auto applicationBellName = "ApplicationBell";
 
-    class ApplicationBellMain : public Application
+    class ApplicationBellMain : public ApplicationBell
     {
       public:
         explicit ApplicationBellMain(
