@@ -9,45 +9,8 @@
 #include <SEGGER_RTT.h>
 #include <ticks.hpp>
 
-/// get string description:
-/// - in critical seciton - return CRIT
-/// - in interrupt return - IRQ
-/// - else return thread name
-static inline const char *getTaskDesc()
-{
-    return xTaskGetCurrentTaskHandle() == nullptr
-               ? Log::Logger::CRIT_STR
-               : xPortIsInsideInterrupt() ? Log::Logger::IRQ_STR : pcTaskGetName(xTaskGetCurrentTaskHandle());
-}
-
 namespace Log
 {
-    void Logger::addLogHeader(logger_level level, const char *file, int line, const char *function)
-    {
-        loggerBufferCurrentPos += snprintf(&loggerBuffer[loggerBufferCurrentPos],
-                                           loggerBufferSizeLeft(),
-                                           "%lu ms ",
-                                           cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks()));
-
-        loggerBufferCurrentPos += snprintf(&loggerBuffer[loggerBufferCurrentPos],
-                                           loggerBufferSizeLeft(),
-                                           "%s%-5s %s[%s] %s%s:%s:%d:%s ",
-                                           logColors->levelColors[level].data(),
-                                           levelNames[level],
-                                           logColors->serviceNameColor.data(),
-                                           getTaskDesc(),
-                                           logColors->callerInfoColor.data(),
-                                           file,
-                                           function,
-                                           line,
-                                           logColors->resetColor.data());
-    }
-
-    bool Logger::filterLogs(logger_level level)
-    {
-        return getLogLevel(getTaskDesc()) <= level;
-    }
-
     void Logger::logToDevice(const char *fmt, va_list args)
     {
         loggerBufferCurrentPos = 0;
