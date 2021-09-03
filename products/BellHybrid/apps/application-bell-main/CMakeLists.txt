@@ -44,10 +44,11 @@ target_link_libraries(application-bell-main
         time
         bell::db
         bell::evtmgr
-        bell::app-common
         bell::app-alarm
         bell::app-settings
         bell::app-powernap
         bell::keymap
         ${TARGET_LIBRARIES}
+    PUBLIC
+        bell::app-common
 )

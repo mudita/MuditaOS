@@ -37,11 +37,12 @@ set_target_properties(BellHybrid
 
 target_link_libraries(BellHybrid
     PRIVATE
-        bell::app-alarm
-        bell::app-main
-        bell::app-settings
-        bell::app-powernap
         appmgr
+        bell::app-alarm
+        bell::app-common
+        bell::app-main
+        bell::app-powernap
+        bell::app-settings
         bell::db
         evtmgr
         messagetype

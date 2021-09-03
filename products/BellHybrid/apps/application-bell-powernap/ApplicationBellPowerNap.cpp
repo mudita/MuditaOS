@@ -16,7 +16,7 @@ namespace app
                                                      sys::phone_modes::PhoneMode mode,
                                                      sys::bluetooth::BluetoothMode bluetoothMode,
                                                      StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), mode, bluetoothMode, startInBackground)
+        : ApplicationBell(std::move(name), std::move(parent), mode, bluetoothMode, startInBackground)
     {}
 
     sys::ReturnCodes ApplicationBellPowerNap::InitHandler()
@@ -44,6 +44,8 @@ namespace app
             auto presenter = std::make_unique<powernap::PowerNapSessionEndPresenter>(app);
             return std::make_unique<gui::PowerNapSessionEndedWindow>(app, std::move(presenter));
         });
+
+        attachPopups({gui::popup::ID::AlarmActivated});
     }
 
     sys::MessagePointer ApplicationBellPowerNap::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)

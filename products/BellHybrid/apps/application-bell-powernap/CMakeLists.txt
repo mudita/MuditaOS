@@ -42,9 +42,9 @@ target_sources(application-bell-powernap
 
 target_link_libraries(application-bell-powernap
     PRIVATE
+        bell::app-common
         bell::app-main
 
     PUBLIC
-        apps-common
         module-gui
 )

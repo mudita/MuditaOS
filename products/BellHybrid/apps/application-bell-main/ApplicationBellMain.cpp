@@ -20,7 +20,7 @@ namespace app
                                              sys::phone_modes::PhoneMode mode,
                                              sys::bluetooth::BluetoothMode bluetoothMode,
                                              StartInBackground startInBackground)
-        : Application(name, parent, mode, bluetoothMode, startInBackground)
+        : ApplicationBell(name, parent, mode, bluetoothMode, startInBackground)
     {
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         addActionReceiver(manager::actions::ShowAlarm, [this](auto &&data) {
@@ -60,6 +60,8 @@ namespace app
         windowsFactory.attach(gui::window::name::bell_main_menu_dialog, [](Application *app, const std::string &name) {
             return std::make_unique<gui::Dialog>(app, name);
         });
+
+        attachPopups({gui::popup::ID::AlarmActivated});
     }
 
     sys::MessagePointer ApplicationBellMain::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)

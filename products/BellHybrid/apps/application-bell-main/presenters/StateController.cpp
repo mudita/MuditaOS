@@ -5,6 +5,8 @@
 #include "HomeScreenPresenter.hpp"
 #include "models/TimeModel.hpp"
 
+#include <common/TimeUtils.hpp>
+
 #include <keymap/KeyMap.hpp>
 
 #include <boost/sml.hpp>
@@ -34,19 +36,6 @@ namespace app::home_screen
             auto showAlarmTime        = [](AbstractView &view) { view.setAlarmTimeVisible(true); };
             auto updateTemperature    = [](AbstractView &view, AbstractTemperatureModel &temperatureModel) {
                 view.setTemperature(temperatureModel.getTemperature());
-            };
-
-            auto calculateTimeDifference = [](AbstractView &view, AbstractTimeModel &timeModel) {
-                const auto now       = timeModel.getCurrentTime();
-                const auto alarmTime = view.getAlarmTime();
-                return utils::time::Duration{alarmTime, now}.get();
-            };
-
-            auto setBottomDescription = [](std::time_t timestamp) {
-                const auto duration = utils::time::Duration{timestamp};
-                const auto prefix   = utils::translate("app_bellmain_home_screen_bottom_desc");
-                return UTF8(prefix + " " + std::to_string(duration.getHours()) + " hrs & " +
-                            std::to_string(duration.getMinutes()) + " min");
             };
 
             auto setDefaultAlarmTime =
@@ -161,8 +150,8 @@ namespace app::home_screen
                 alarmModel.setAlarmTime(view.getAlarmTime());
                 alarmModel.activate(true);
                 presenter.spawnTimer();
-                view.setBottomDescription(
-                    Helpers::setBottomDescription(Helpers::calculateTimeDifference(view, timeModel)));
+                view.setBottomDescription(utils::time::getBottomDescription(
+                    utils::time::calculateTimeDifference(view.getAlarmTime(), timeModel.getCurrentTime())));
                 view.setAlarmActive(true);
                 view.setAlarmVisible(true);
             };
