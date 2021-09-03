@@ -6,6 +6,7 @@
 #include "models/TemperatureModel.hpp"
 
 #include <apps-common/BasePresenter.hpp>
+#include <common/models/AbstractAlarmModel.hpp>
 #include <gui/input/InputEvent.hpp>
 #include <module-sys/Timers/TimerHandle.hpp>
 #include <module-utils/Temperature.hpp>
@@ -27,8 +28,8 @@ namespace gui
 namespace app::home_screen
 {
     class AbstractTimeModel;
-    class AbstractAlarmModel;
     class AbstractController;
+    class AbstractTemperatureModel;
 
     class AbstractView
     {
@@ -101,8 +102,6 @@ namespace app::home_screen
         void handleAlarmRingingEvent() override;
 
       private:
-        void setDefaultAlarmTime();
-
         Application *app;
         sys::TimerHandle timer;
         std::unique_ptr<AbstractAlarmModel> alarmModel;

@@ -2,6 +2,7 @@
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 add_library(application-bell-settings STATIC)
+add_library(bell::app-settings ALIAS application-bell-settings)
 
 target_include_directories(application-bell-settings
     PRIVATE

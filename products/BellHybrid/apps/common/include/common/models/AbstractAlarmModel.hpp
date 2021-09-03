@@ -3,26 +3,19 @@
 
 #pragma once
 
-#include <service-time/api/TimeSettingsApi.hpp>
-
-#include <functional>
+#include <ctime>
 
 namespace app
-{
-    class Application;
-}
-
-namespace app::home_screen
 {
     class AbstractAlarmModel
     {
       public:
         virtual ~AbstractAlarmModel() noexcept = default;
+
+        virtual bool isActive() const          = 0;
+        virtual void setAlarmTime(time_t time) = 0;
+        virtual time_t getAlarmTime() const    = 0;
+        virtual void activate(bool value)      = 0;
     };
 
-    class AlarmModel : public AbstractAlarmModel
-    {
-      public:
-        explicit AlarmModel(Application *app);
-    };
-} // namespace app::home_screen
+} // namespace app
