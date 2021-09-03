@@ -7,6 +7,8 @@
 #include "LockGuard.hpp"
 #include <Logger.hpp>
 #include <module-utils/Utils.hpp>
+#include <portmacro.h>
+#include <ticks.hpp>
 #include "macros.h"
 
 namespace Log
@@ -213,4 +215,38 @@ namespace Log
     {
         file << application;
     }
+
+    const char *getTaskDesc()
+    {
+        return xTaskGetCurrentTaskHandle() == nullptr ? Log::Logger::CRIT_STR
+               : xPortIsInsideInterrupt()             ? Log::Logger::IRQ_STR
+                                                      : pcTaskGetName(xTaskGetCurrentTaskHandle());
+    }
+
+    bool Logger::filterLogs(logger_level level)
+    {
+        return getLogLevel(getTaskDesc()) <= level;
+    }
+
+    void Logger::addLogHeader(logger_level level, const char *file, int line, const char *function)
+    {
+        loggerBufferCurrentPos += snprintf(&loggerBuffer[loggerBufferCurrentPos],
+                                           LOGGER_BUFFER_SIZE - loggerBufferCurrentPos,
+                                           "%" PRIu32 " ms ",
+                                           cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks()));
+
+        loggerBufferCurrentPos += snprintf(&loggerBuffer[loggerBufferCurrentPos],
+                                           LOGGER_BUFFER_SIZE - loggerBufferCurrentPos,
+                                           "%s%-5s %s[%s] %s%s:%s:%d:%s ",
+                                           logColors->levelColors[level].data(),
+                                           levelNames[level],
+                                           logColors->serviceNameColor.data(),
+                                           getTaskDesc(),
+                                           logColors->callerInfoColor.data(),
+                                           file,
+                                           function,
+                                           line,
+                                           logColors->resetColor.data());
+    }
+
 } // namespace Log
