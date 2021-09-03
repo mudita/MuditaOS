@@ -1,9 +1,9 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "bsp/light_sensor/light_sensor.hpp"
 #include "LTR303ALS.hpp"
-#include "bsp/BoardDefinitions.hpp"
+#include "board/BoardDefinitions.hpp"
 #include "drivers/i2c/DriverI2C.hpp"
 #include "drivers/gpio/DriverGPIO.hpp"
 

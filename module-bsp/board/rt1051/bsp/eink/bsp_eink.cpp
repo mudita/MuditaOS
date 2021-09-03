@@ -17,7 +17,7 @@
 #include "drivers/dmamux/DriverDMAMux.hpp"
 #include "drivers/dma/DriverDMA.hpp"
 #include "drivers/gpio/DriverGPIO.hpp"
-#include "bsp/BoardDefinitions.hpp"
+#include "board/BoardDefinitions.hpp"
 
 #define BSP_EINK_LPSPI_PCS_TO_SCK_DELAY       1000
 #define BSP_EINK_LPSPI_SCK_TO_PSC_DELAY       1000

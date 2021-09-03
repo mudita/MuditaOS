@@ -3,7 +3,7 @@
 
 #include "M24256.hpp"
 #include "bsp/eeprom/eeprom.hpp"
-#include "bsp/BoardDefinitions.hpp"
+#include "board/BoardDefinitions.hpp"
 #include "drivers/i2c/DriverI2C.hpp"
 
 #include "fsl_common.h"

@@ -6,7 +6,7 @@
 #include <module-utils/Utils.hpp> // for byte conversion functions. it is included first because of magic enum define
 
 #include "ALS31300.hpp"
-#include "bsp/BoardDefinitions.hpp"
+#include "board/BoardDefinitions.hpp"
 
 #include "drivers/i2c/DriverI2C.hpp"
 

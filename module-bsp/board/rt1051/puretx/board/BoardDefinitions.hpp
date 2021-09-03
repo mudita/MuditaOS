@@ -1,8 +1,7 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#ifndef PUREPHONE_BOARDDEFINITIONS_HPP
-#define PUREPHONE_BOARDDEFINITIONS_HPP
+#pragma once
 
 #include "drivers/dmamux/DriverDMAMux.hpp"
 #include "drivers/dma/DriverDMA.hpp"
@@ -95,8 +94,6 @@ enum class BoardDefinitions
     EINK_BUSY_PIN       = 17,
     EINK_PLL            = static_cast<int>(drivers::PLLInstances::PLL2_PFD2),
     EINK_LPSPI_INSTANCE = static_cast<int>(drivers::LPSPIInstances::LPSPI_1),
-    EINK_BELL_PWR_GPIO  = static_cast<int>(drivers::GPIOInstances ::GPIO_1),
-    EINK_BELL_PWR_PIN   = 19,
 
     BLUETOOTH_DMA            = static_cast<int>(drivers::DMAInstances ::DMA_0),
     BLUETOOTH_DMAMUX         = static_cast<int>(drivers::DMAMuxInstances ::DMAMUX0),
@@ -142,5 +139,3 @@ enum class BoardDefinitions
     EEPROM_I2C          = AUDIOCODEC_I2C,
     EEPROM_I2C_BAUDRATE = I2C_STD_BAUDRATE,
 };
-
-#endif // PUREPHONE_BOARDDEFINITIONS_HPP

@@ -13,7 +13,7 @@
 #include <hal/key_input/AbstractKeyInput.hpp>
 #include "bsp/cellular/bsp_cellular.hpp"
 #include "bsp/headset/headset.hpp"
-#include "bsp/BoardDefinitions.hpp"
+#include "board/BoardDefinitions.hpp"
 #include "bsp/magnetometer/magnetometer.hpp"
 #include "bsp/light_sensor/light_sensor.hpp"
 

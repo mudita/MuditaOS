@@ -28,7 +28,7 @@
 #include "drivers/pll/DriverPLL.hpp"
 #include "drivers/dmamux/DriverDMAMux.hpp"
 #include "drivers/dma/DriverDMA.hpp"
-#include "bsp/BoardDefinitions.hpp"
+#include "board/BoardDefinitions.hpp"
 
 #define EPD_BOOSTER_START_PERIOD_10MS 0
 #define EPD_BOOSTER_START_PERIOD_20MS 1

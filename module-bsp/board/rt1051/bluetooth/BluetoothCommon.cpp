@@ -7,7 +7,7 @@
 #include "FreeRTOS.h"
 #include "board.h"
 #include "fsl_lpuart_edma.h"
-#include <bsp/BoardDefinitions.hpp>
+#include <board/BoardDefinitions.hpp>
 
 #if DEBUG_BLUETOOTH_HCI_COMS == 1
 #define logHciComs(...) LOG_DEBUG(__VA_ARGS__)

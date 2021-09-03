@@ -3,7 +3,7 @@
 
 #include "headset.hpp"
 
-#include "BoardDefinitions.hpp"
+#include "board/BoardDefinitions.hpp"
 #include "DriverI2C.hpp"
 #include "DriverGPIO.hpp"
 #include "fsl_common.h"
