@@ -31,6 +31,10 @@ WorkerDesktop::WorkerDesktop(sys::Service *ownerServicePtr,
 
 bool WorkerDesktop::init(std::list<sys::WorkerQueueInfo> queues)
 {
+    if (initialized) {
+        return true;
+    }
+
     Worker::init(queues);
 
     irqQueue     = Worker::getQueueHandleByName(sdesktop::IRQ_QUEUE_BUFFER_NAME);
@@ -46,11 +50,17 @@ bool WorkerDesktop::init(std::list<sys::WorkerQueueInfo> queues)
 
     bsp::usbInitParams initParams = {receiveQueue, irqQueue, serialNumber.c_str()};
 
-    return (bsp::usbInit(initParams) < 0) ? false : true;
+    initialized = (bsp::usbInit(initParams) < 0) ? false : true;
+
+    return initialized;
 }
 
 bool WorkerDesktop::deinit(void)
 {
+    if (!initialized) {
+        return false;
+    }
+
     unsigned int maxcount = 10;
     while (parser.getCurrentState() != parserFSM::State::NoMsg && --maxcount > 0) {
         vTaskDelay(300);
@@ -65,6 +75,8 @@ bool WorkerDesktop::deinit(void)
     Worker::deinit();
 
     LOG_DEBUG("deinit end");
+    initialized = false;
+
     return true;
 }
 
