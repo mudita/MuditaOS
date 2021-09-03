@@ -11,7 +11,7 @@
 #include "board/rt1051/bsp/eink/bsp_eink.h"
 #include <hal/battery_charger/AbstractBatteryCharger.hpp>
 #include <hal/key_input/AbstractKeyInput.hpp>
-#include "bsp/BoardDefinitions.hpp"
+#include "board/BoardDefinitions.hpp"
 #include "bsp/light_sensor/light_sensor.hpp"
 
 namespace bsp

@@ -6,7 +6,7 @@
 #include "dma_config.h"
 #include <log.hpp>
 
-#include "bsp/BoardDefinitions.hpp"
+#include "board/BoardDefinitions.hpp"
 
 namespace audio
 {

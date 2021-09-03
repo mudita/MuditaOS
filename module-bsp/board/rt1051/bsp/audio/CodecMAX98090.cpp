@@ -3,7 +3,7 @@
 
 #include "CodecMAX98090.hpp"
 #include "max98090_regs.hpp"
-#include "bsp/BoardDefinitions.hpp"
+#include "board/BoardDefinitions.hpp"
 
 #include <module-utils/Utils.hpp>
 

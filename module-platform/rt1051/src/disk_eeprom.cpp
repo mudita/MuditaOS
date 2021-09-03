@@ -4,7 +4,7 @@
 
 #include "bsp/eeprom/eeprom.hpp"
 #include "board/rt1051/bsp/eeprom/M24256.hpp"
-#include "bsp/BoardDefinitions.hpp"
+#include "board/BoardDefinitions.hpp"
 
 namespace purefs::blkdev
 {

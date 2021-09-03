@@ -3,7 +3,7 @@
 
 #include "bsp/vibrator/vibrator.hpp"
 
-#include <bsp/BoardDefinitions.hpp>
+#include <board/BoardDefinitions.hpp>
 #include <drivers/gpio/DriverGPIO.hpp>
 
 static std::shared_ptr<drivers::DriverGPIO> port;

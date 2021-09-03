@@ -8,7 +8,7 @@
 #include <task.h>
 #include <timers.h>
 #include <bsp/keyboard/keyboard.hpp>
-#include <bsp/BoardDefinitions.hpp>
+#include <board/BoardDefinitions.hpp>
 #include <board.h>
 #include <fsl_common.h>
 
