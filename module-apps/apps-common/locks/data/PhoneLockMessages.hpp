@@ -73,6 +73,22 @@ namespace locks
         }
     };
 
+    class NextPhoneUnlockAttemptLockTime : public sys::DataMessage
+    {
+      private:
+        time_t nextPhoneUnlockAttemptLockTime;
+
+      public:
+        explicit NextPhoneUnlockAttemptLockTime(time_t nextPhoneUnlockAttemptLockTime)
+            : nextPhoneUnlockAttemptLockTime(nextPhoneUnlockAttemptLockTime)
+        {}
+
+        [[nodiscard]] const auto &getTime() const noexcept
+        {
+            return nextPhoneUnlockAttemptLockTime;
+        }
+    };
+
     class ExternalUnLockPhone : public UnLockPhoneInput
     {
       public:
