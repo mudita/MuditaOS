@@ -6,7 +6,7 @@
 #include "board.h"
 #include "reboot_codes.hpp"
 #include <log.hpp>
-#include "bsp/BoardDefinitions.hpp"
+#include "board/BoardDefinitions.hpp"
 #include "bsp/watchdog/watchdog.hpp"
 #include <board/clock_config.h>
 #include <fsl_clock.h>

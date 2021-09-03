@@ -4,7 +4,7 @@
 #include "bsp/keypad_backlight/keypad_backlight.hpp"
 #include "LP55281.hpp"
 
-#include "bsp/BoardDefinitions.hpp"
+#include "board/BoardDefinitions.hpp"
 #include "drivers/i2c/DriverI2C.hpp"
 
 #include "fsl_common.h"

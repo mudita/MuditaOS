@@ -13,7 +13,7 @@
 
 #include "bsp/cellular/bsp_cellular.hpp"
 #include "bsp/cellular/CellularResult.hpp"
-#include "bsp/BoardDefinitions.hpp"
+#include "board/BoardDefinitions.hpp"
 
 #include "drivers/pll/DriverPLL.hpp"
 #include "drivers/dmamux/DriverDMAMux.hpp"

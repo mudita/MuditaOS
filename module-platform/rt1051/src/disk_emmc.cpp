@@ -5,7 +5,7 @@
 
 #include <bsp/common.hpp>
 #include "board/rt1051/bsp/eMMC/fsl_mmc.h"
-#include "bsp/BoardDefinitions.hpp"
+#include "board/BoardDefinitions.hpp"
 
 #include <unistd.h>
 #include <cstring>
