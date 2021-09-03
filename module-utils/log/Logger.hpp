@@ -94,4 +94,6 @@ namespace Log
         static const char *levelNames[];
         static std::map<std::string, logger_level> filtered;
     };
+
+    const char *getTaskDesc();
 } // namespace Log

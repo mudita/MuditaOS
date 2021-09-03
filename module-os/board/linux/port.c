@@ -915,3 +915,9 @@ unsigned long ulPortGetTimerValue( void )
      */
     return ( unsigned long ) xTimes.tms_utime;
 }
+
+
+BaseType_t xPortIsInsideInterrupt(void)
+{
+    return pdFALSE;
+}
