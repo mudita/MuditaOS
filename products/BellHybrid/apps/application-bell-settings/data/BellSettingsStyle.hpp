@@ -13,7 +13,7 @@ namespace gui
         namespace settings_window
         {
             inline constexpr auto options_list_margin_x = 100U;
-            inline constexpr auto options_list_margin_y = 55U;
+            inline constexpr auto options_list_margin_y = 50U;
             inline constexpr auto default_body_width    = 400U;
         } // namespace settings_window
 
@@ -26,5 +26,5 @@ namespace gui
         {
             inline constexpr auto font = "gt_pressura_light_46";
         }
-    }     // namespace bell_settings_style
+    } // namespace bell_settings_style
 } // namespace gui
