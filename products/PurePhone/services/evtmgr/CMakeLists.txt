@@ -5,6 +5,7 @@ target_sources(evtmgr
         EventManager.cpp
         WorkerEvent.cpp
         WorkerEvent.hpp
+        screen-light-control/ScreenLightControl.cpp
     PUBLIC
         include/evtmgr/EVMessages.hpp
         include/evtmgr/EventManager.hpp
