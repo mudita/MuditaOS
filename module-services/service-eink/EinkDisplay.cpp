@@ -4,7 +4,7 @@
 #include "EinkDisplay.hpp"
 
 #if defined(TARGET_RT1051)
-#include <bsp/BoardDefinitions.hpp>
+#include <board/BoardDefinitions.hpp>
 #endif
 
 #include <gui/core/Color.hpp>

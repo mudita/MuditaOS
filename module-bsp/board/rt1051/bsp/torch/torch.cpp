@@ -4,7 +4,7 @@
 #include "bsp/torch/torch.hpp"
 #include "AL3644TT.hpp"
 
-#include "bsp/BoardDefinitions.hpp"
+#include "board/BoardDefinitions.hpp"
 #include "drivers/i2c/DriverI2C.hpp"
 
 #include "fsl_common.h"

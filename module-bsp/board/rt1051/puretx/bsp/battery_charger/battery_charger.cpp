@@ -5,7 +5,7 @@
 #include "battery_charger_utils.hpp"
 
 #include <fsl_common.h>
-#include <bsp/BoardDefinitions.hpp>
+#include <board/BoardDefinitions.hpp>
 #include <EventStore.hpp>
 #include <drivers/gpio/DriverGPIO.hpp>
 #include <drivers/i2c/DriverI2C.hpp>

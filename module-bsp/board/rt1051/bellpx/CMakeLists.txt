@@ -17,6 +17,7 @@ target_sources(
         pin_mux.c
         clock_config.cpp
         irq_gpio.cpp
+        debug_console.cpp
 
 
     PUBLIC
