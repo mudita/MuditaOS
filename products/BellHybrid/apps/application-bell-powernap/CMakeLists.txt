@@ -2,6 +2,7 @@
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 add_library(application-bell-powernap STATIC)
+add_library(bell::app-powernap ALIAS application-bell-powernap)
 
 target_include_directories(application-bell-powernap
     PRIVATE
