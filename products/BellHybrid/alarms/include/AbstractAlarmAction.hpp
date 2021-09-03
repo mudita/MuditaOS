@@ -10,5 +10,6 @@ namespace alarms
       public:
         virtual ~AbstractAlarmAction() = default;
         virtual bool execute()         = 0;
+        virtual bool turnOff()         = 0;
     };
 } // namespace alarms

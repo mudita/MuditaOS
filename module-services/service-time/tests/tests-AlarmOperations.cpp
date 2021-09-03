@@ -14,6 +14,7 @@ class MockAlarmHandler : public alarms::AlarmHandler
 {
   public:
     MOCK_METHOD(bool, handle, (const AlarmEventRecord &record), ());
+    MOCK_METHOD(bool, handleOff, (const AlarmEventRecord &record), ());
 };
 class MockAlarmEventsRepository : public alarms::AbstractAlarmEventsRepository
 {

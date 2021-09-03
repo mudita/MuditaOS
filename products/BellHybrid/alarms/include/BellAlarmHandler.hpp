@@ -14,6 +14,7 @@ namespace alarms
       public:
         explicit BellAlarmClockHandler(sys::Service *service);
         auto handle(const AlarmEventRecord &record) -> bool;
+        auto handleOff(const AlarmEventRecord &record) -> bool;
 
         static constexpr auto name = "BellAlarmClockHandler";
 
@@ -26,5 +27,6 @@ namespace alarms
     {
       public:
         auto handle(const AlarmEventRecord &record) -> bool;
+        auto handleOff(const AlarmEventRecord &record) -> bool;
     };
 } // namespace alarms

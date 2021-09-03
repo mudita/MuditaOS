@@ -12,6 +12,7 @@ namespace alarms
     {
       public:
         bool execute() override;
+        bool turnOff() override;
     };
 
 } // namespace alarms

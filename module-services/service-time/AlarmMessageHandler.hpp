@@ -29,6 +29,10 @@ namespace alarms
             -> std::shared_ptr<AlarmsGetInRangeResponseMessage>;
         auto handleGetNextSingleEvents(AlarmGetNextSingleEventsRequestMessage *request)
             -> std::shared_ptr<AlarmGetNextSingleEventsResponseMessage>;
+        auto handleTurnOffRingingAlarm(RingingAlarmTurnOffRequestMessage *request)
+            -> std::shared_ptr<RingingAlarmTurnOffResponseMessage>;
+        auto handleSnoozeRingingAlarm(RingingAlarmSnoozeRequestMessage *request)
+            -> std::shared_ptr<RingingAlarmSnoozeResponseMessage>;
         auto handleMinuteUpdated() -> void;
 
         auto addAlarmExecutionHandler(const alarms::AlarmType type, const std::shared_ptr<alarms::AlarmHandler> handler)

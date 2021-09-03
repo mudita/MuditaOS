@@ -6,7 +6,7 @@
 
 #include <application-bell-main/ApplicationBellMain.hpp>
 #include <apps-common/widgets/BellBaseLayout.hpp>
-#include <apps-common/actions/AlarmTriggeredAction.hpp>
+#include <apps-common/actions/AlarmRingingData.hpp>
 #include <gui/input/InputEvent.hpp>
 #include <gui/widgets/TextFixedSize.hpp>
 #include <gui/widgets/Style.hpp>

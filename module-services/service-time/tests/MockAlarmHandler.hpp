@@ -16,5 +16,10 @@ namespace alarms
             LOG_DEBUG("MockAlarmHandler");
             return true;
         }
+        auto handleOff(const AlarmEventRecord &record) -> bool
+        {
+            LOG_DEBUG("MockAlarmHandler");
+            return true;
+        }
     };
 } // namespace alarms
