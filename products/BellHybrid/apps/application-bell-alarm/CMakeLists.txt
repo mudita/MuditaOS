@@ -1,4 +1,5 @@
 add_library(application-bell-alarm)
+add_library(bell::app-alarm ALIAS application-bell-alarm)
 
 target_sources(application-bell-alarm
     PRIVATE

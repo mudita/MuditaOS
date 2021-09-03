@@ -1,4 +1,5 @@
 add_library(keymap INTERFACE)
+add_library(bell::keymap ALIAS keymap)
 
 target_sources(keymap
     PUBLIC

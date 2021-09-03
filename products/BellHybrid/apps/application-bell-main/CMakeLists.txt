@@ -1,4 +1,5 @@
-add_library(application-bell-main)
+add_library(application-bell-main STATIC)
+add_library(bell::app-main ALIAS application-bell-main)
 
 target_sources(application-bell-main
     PRIVATE
@@ -6,7 +7,6 @@ target_sources(application-bell-main
         windows/BellHomeScreenWindow.cpp
         windows/BellMainMenuWindow.cpp
 
-        models/AlarmModel.cpp
         models/TemperatureModel.cpp
         models/TimeModel.cpp
 
@@ -16,7 +16,6 @@ target_sources(application-bell-main
         windows/BellHomeScreenWindow.hpp
         windows/BellMainMenuWindow.hpp
 
-        models/AlarmModel.hpp
         models/TemperatureModel.hpp
         models/TimeModel.hpp
 
@@ -37,16 +36,17 @@ target_include_directories(application-bell-main
 
 target_link_libraries(application-bell-main
     PRIVATE
-        application-bell-alarm
-        application-bell-settings
-        application-bell-powernap
         apps-common
         bellgui
         i18n
-        keymap
         module-gui
         service-gui
         time
         bell::evtmgr
+        bell::app-common
+        bell::app-alarm
+        bell::app-settings
+        bell::app-powernap
+        bell::keymap
         ${TARGET_LIBRARIES}
 )

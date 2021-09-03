@@ -37,11 +37,10 @@ set_target_properties(BellHybrid
 
 target_link_libraries(BellHybrid
     PRIVATE
-        application-bell-alarm
-        application-bell-main
-        application-bell-settings
-        application-bell-powernap
-        application-music-player
+        bell::app-alarm
+        bell::app-main
+        bell::app-settings
+        bell::app-powernap
         appmgr
         db
         evtmgr

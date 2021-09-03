@@ -3,13 +3,13 @@
 
 #include "StateController.hpp"
 #include "HomeScreenPresenter.hpp"
-#include "models/AlarmModel.hpp"
 #include "models/TimeModel.hpp"
 
 #include <keymap/KeyMap.hpp>
 
 #include <boost/sml.hpp>
 #include <time/time_conversion.hpp>
+#include <time/time_constants.hpp>
 
 namespace app::home_screen
 {
@@ -42,6 +42,23 @@ namespace app::home_screen
                             std::to_string(duration.getMinutes()) + " min");
             };
 
+            auto setDefaultAlarmTime = [](AbstractView &view, AbstractTimeModel &timeModel) {
+                constexpr auto defaultAlarmTimeHour = 7U;
+                constexpr auto defaultAlarmTimeMin  = 0U;
+                const auto now                      = timeModel.getCurrentTime();
+                const auto newTime                  = std::localtime(&now);
+                newTime->tm_hour                    = defaultAlarmTimeHour;
+                newTime->tm_min                     = defaultAlarmTimeMin;
+                auto alarmTime                      = std::mktime(newTime);
+
+                if (alarmTime < now) {
+                    alarmTime += utils::time::secondsInDay;
+                }
+                view.setAlarmTime(alarmTime);
+            };
+
+            auto isAlarmActive = [](AbstractAlarmModel &alarmModel) -> bool { return alarmModel.isActive(); };
+
         } // namespace Helpers
 
         namespace Events
@@ -68,17 +85,20 @@ namespace app::home_screen
 
         namespace Deactivated
         {
-            auto entry = [](AbstractView &view, AbstractTemperatureModel &temperatureModel) {
-                view.setAlarmEdit(false);
-                view.setAlarmActive(false);
-                view.setAlarmVisible(false);
-                view.setTemperature(temperatureModel.getTemperature());
-            };
+            auto entry =
+                [](AbstractView &view, AbstractTemperatureModel &temperatureModel, AbstractTimeModel &timeModel) {
+                    Helpers::setDefaultAlarmTime(view, timeModel);
+                    view.setAlarmEdit(false);
+                    view.setAlarmActive(false);
+                    view.setAlarmVisible(false);
+                    view.setTemperature(temperatureModel.getTemperature());
+                };
         } // namespace Deactivated
 
         namespace DeactivatedWait
         {
-            auto entry = [](AbstractView &view, AbstractPresenter &presenter) {
+            auto entry = [](AbstractView &view, AbstractPresenter &presenter, AbstractAlarmModel &alarmModel) {
+                alarmModel.activate(false);
                 presenter.spawnTimer();
                 view.setBottomDescription(utils::translate("app_bell_alarm_deactivated"));
                 view.setAlarmActive(false);
@@ -94,7 +114,10 @@ namespace app::home_screen
                 view.setAlarmTimeVisible(true);
                 view.setAlarmVisible(true);
             };
-            auto exit = [](AbstractView &view) { view.setAlarmEdit(false); };
+            auto exit = [](AbstractView &view, AbstractAlarmModel &alarmModel) {
+                view.setAlarmEdit(false);
+                alarmModel.setAlarmTime(view.getAlarmTime());
+            };
 
             auto processRotateLeft = [](AbstractView &view, AbstractPresenter &presenter) {
                 presenter.spawnTimer();
@@ -125,7 +148,9 @@ namespace app::home_screen
         {
             auto entry = [](AbstractView &view,
                             AbstractPresenter &presenter,
+                            AbstractAlarmModel &alarmModel,
                             AbstractTimeModel &timeModel) {
+                alarmModel.activate(true);
                 presenter.spawnTimer();
                 view.setBottomDescription(
                     Helpers::setBottomDescription(Helpers::calculateTimeDifference(view, timeModel)));
@@ -137,11 +162,13 @@ namespace app::home_screen
 
         namespace Activated
         {
-            auto entry = [](AbstractView &view, AbstractTemperatureModel &temperatureModel) {
-                view.setTemperature(temperatureModel.getTemperature());
-                view.setAlarmActive(true);
-                view.setAlarmVisible(true);
-            };
+            auto entry =
+                [](AbstractView &view, AbstractAlarmModel &alarmModel, AbstractTemperatureModel &temperatureModel) {
+                    view.setAlarmTime(alarmModel.getAlarmTime());
+                    view.setTemperature(temperatureModel.getTemperature());
+                    view.setAlarmActive(true);
+                    view.setAlarmVisible(true);
+                };
         } // namespace Activated
 
         namespace AlarmRinging
@@ -198,6 +225,7 @@ namespace app::home_screen
                 // clang-format off
                 return make_transition_table(*"Deactivated"_s + event<Events::LightPress>/ Helpers::switchToMenu = "Deactivated"_s,
                                              "Deactivated"_s + sml::on_entry<_> / Deactivated::entry,
+                                             "Deactivated"_s [Helpers::isAlarmActive] = "Activated"_s,
                                              "Deactivated"_s + event<Events::RotateRightPress> / Helpers::makeAlarmEditable = "DeactivatedEdit"_s,
                                              "Deactivated"_s + event<Events::DeepUpPress> / Helpers::showAlarmTime = "ActivatedWait"_s,
                                              "Deactivated"_s + event<Events::TimeUpdate> / Helpers::updateTemperature,

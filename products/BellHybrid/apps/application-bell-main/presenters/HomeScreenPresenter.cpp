@@ -3,7 +3,6 @@
 
 #include "HomeScreenPresenter.hpp"
 #include "StateController.hpp"
-#include "models/AlarmModel.hpp"
 #include "models/TemperatureModel.hpp"
 #include "models/TimeModel.hpp"
 
@@ -11,13 +10,6 @@
 #include <module-sys/Timers/SystemTimer.hpp>
 #include <module-sys/Timers/TimerFactory.hpp>
 #include <time/time_constants.hpp>
-#include <time/time_conversion.hpp>
-
-namespace
-{
-    constexpr auto defaultAlarmTimeHour = 7U;
-    constexpr auto defaultAlarmTimeMin  = 0U;
-} // namespace
 
 namespace app::home_screen
 {
@@ -75,24 +67,8 @@ namespace app::home_screen
         getView()->setAlarmTimeFormat(timeModel->getTimeFormat());
         getView()->setTemperature(temperatureModel->getTemperature());
     }
-
-    void HomeScreenPresenter::setDefaultAlarmTime()
-    {
-        const auto now     = timeModel->getCurrentTime();
-        const auto newTime = std::localtime(&now);
-        newTime->tm_hour   = defaultAlarmTimeHour;
-        newTime->tm_min    = defaultAlarmTimeMin;
-        auto alarmTime     = std::mktime(newTime);
-
-        if (alarmTime < now) {
-            alarmTime += utils::time::secondsInDay;
-        }
-        getView()->setAlarmTime(alarmTime);
-    }
-
     void HomeScreenPresenter::createData()
     {
-        setDefaultAlarmTime();
         stateController =
             std::make_unique<StateController>(*getView(), *this, *temperatureModel, *alarmModel, *timeModel);
     }
