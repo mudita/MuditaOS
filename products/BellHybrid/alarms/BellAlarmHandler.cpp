@@ -30,10 +30,24 @@ namespace alarms
         return result;
     }
 
-    auto EveningReminderHandler::handle(const AlarmEventRecord &record) -> bool
+    auto BellAlarmClockHandler::handleOff([[maybe_unused]] const AlarmEventRecord &record) -> bool
     {
-        LOG_DEBUG("EveningReminderHandler");
+        auto result{true};
+        for (const auto &action : actions) {
+            result &= action->turnOff();
+        }
+
+        return result;
+    }
+
+    auto EveningReminderHandler::handle([[maybe_unused]] const AlarmEventRecord &record) -> bool
+    {
         // implement this alarm type handling here
+        return true;
+    }
+
+    auto EveningReminderHandler::handleOff([[maybe_unused]] const AlarmEventRecord &record) -> bool
+    {
         return true;
     }
 

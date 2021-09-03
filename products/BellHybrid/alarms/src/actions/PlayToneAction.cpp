@@ -32,6 +32,11 @@ namespace alarms
         return AudioServiceAPI::PlaybackStart(&service, audio::PlaybackType::Alarm, tonePath);
     }
 
+    bool alarms::PlayToneAction::turnOff()
+    {
+        return true;
+    }
+
     void PlayToneAction::detachTimer()
     {
         if (timer.isValid()) {

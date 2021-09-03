@@ -119,4 +119,34 @@ namespace alarms
         std::vector<SingleEventRecord> singleEvents;
     };
 
+    class RingingAlarmTurnOffRequestMessage : public AlarmMessage
+    {
+      public:
+        explicit RingingAlarmTurnOffRequestMessage(const std::uint32_t id = 0) : id(id){};
+        const std::uint32_t id;
+    };
+
+    class RingingAlarmTurnOffResponseMessage : public AlarmResponse
+    {
+      public:
+        explicit RingingAlarmTurnOffResponseMessage(const bool success = false) : success(success){};
+        const bool success;
+    };
+
+    class RingingAlarmSnoozeRequestMessage : public AlarmMessage
+    {
+      public:
+        RingingAlarmSnoozeRequestMessage(const std::uint32_t id, const TimePoint nextAlarmTime = TIME_POINT_INVALID)
+            : id(id), nextAlarmTime(nextAlarmTime){};
+        const std::uint32_t id;
+        const TimePoint nextAlarmTime;
+    };
+
+    class RingingAlarmSnoozeResponseMessage : public AlarmResponse
+    {
+      public:
+        explicit RingingAlarmSnoozeResponseMessage(const bool success = false) : success(success){};
+        const bool success;
+    };
+
 } // namespace alarms

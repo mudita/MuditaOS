@@ -21,5 +21,6 @@ namespace alarms
         virtual ~AlarmHandler() = default;
 
         virtual auto handle(const AlarmEventRecord &record) -> bool = 0;
+        virtual auto handleOff(const AlarmEventRecord &record) -> bool = 0;
     };
 } // namespace alarms

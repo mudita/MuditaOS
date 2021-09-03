@@ -158,6 +158,14 @@ namespace stm
                     return alarmMessageHandler->handleGetNextSingleEvents(
                         static_cast<alarms::AlarmGetNextSingleEventsRequestMessage *>(request));
                 });
+        connect(typeid(alarms::RingingAlarmTurnOffRequestMessage), [&](sys::Message *request) -> sys::MessagePointer {
+            return alarmMessageHandler->handleTurnOffRingingAlarm(
+                static_cast<alarms::RingingAlarmTurnOffRequestMessage *>(request));
+        });
+        connect(typeid(alarms::RingingAlarmSnoozeRequestMessage), [&](sys::Message *request) -> sys::MessagePointer {
+            return alarmMessageHandler->handleSnoozeRingingAlarm(
+                static_cast<alarms::RingingAlarmSnoozeRequestMessage *>(request));
+        });
     }
 
     auto ServiceTime::handleSetAutomaticDateAndTimeRequest(sys::Message *request)

@@ -59,6 +59,8 @@ struct SingleEventRecord : public Record, public EventInfo
 {
     std::shared_ptr<EventRecord> parent;
 
+    virtual ~SingleEventRecord() = default;
+
     SingleEventRecord() = default;
     SingleEventRecord(std::shared_ptr<EventRecord> parent, TimePoint startDate, TimePoint endDate)
         : EventInfo{parent->name, startDate, endDate, parent->duration, parent->isAllDay}, parent{parent} {};

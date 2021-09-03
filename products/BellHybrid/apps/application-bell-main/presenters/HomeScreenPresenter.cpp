@@ -42,7 +42,7 @@ namespace app::home_screen
     {
         if (not timer.isValid()) {
             auto callback = [this](sys::Timer &) { stateController->handleTimerEvent(); };
-            timer         = sys::TimerFactory::createSingleShotTimer(app, timerName, defaultTimeout, callback);
+            timer         = sys::TimerFactory::createSingleShotTimer(app, timerName, timeout, callback);
         }
         timer.stop();
         timer.start();
@@ -83,5 +83,10 @@ namespace app::home_screen
         if (msg->interface == db::Interface::Name::AlarmEvents && msg->type == db::Query::Type::Update) {
             alarmModel->update();
         }
+    }
+    void HomeScreenPresenter::handleAlarmModelReady()
+    {
+        getView()->setAlarmTime(alarmModel->getAlarmTime());
+        stateController->handleAlarmModelReady();
     }
 } // namespace app::home_screen

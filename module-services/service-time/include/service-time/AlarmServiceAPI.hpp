@@ -27,6 +27,8 @@ namespace alarms
         bool requestGetAlarmsInRange(
             sys::Service *serv, TimePoint start, TimePoint end, unsigned int offset, unsigned int limit);
         bool requestGetNextSingleEvents(sys::Service *serv);
+        bool requestTurnOffRingingAlarm(sys::Service *serv, const std::uint32_t id);
+        bool requestSnoozeRingingAlarm(sys::Service *serv, const std::uint32_t id, const TimePoint nextAlarmTime);
     }; // namespace AlarmServiceAPI
 
 } // namespace alarms

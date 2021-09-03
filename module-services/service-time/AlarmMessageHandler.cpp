@@ -77,6 +77,24 @@ namespace alarms
             });
     }
 
+    auto AlarmMessageHandler::handleTurnOffRingingAlarm(RingingAlarmTurnOffRequestMessage *request)
+        -> std::shared_ptr<RingingAlarmTurnOffResponseMessage>
+    {
+        return handleWithCallback<RingingAlarmTurnOffRequestMessage, RingingAlarmTurnOffResponseMessage, bool>(
+            request, [&](RingingAlarmTurnOffRequestMessage *request, IAlarmOperations::OnTurnOffRingingAlarm callback) {
+                alarmOperations->turnOffRingingAlarm(request->id, callback);
+            });
+    }
+
+    auto AlarmMessageHandler::handleSnoozeRingingAlarm(RingingAlarmSnoozeRequestMessage *request)
+        -> std::shared_ptr<RingingAlarmSnoozeResponseMessage>
+    {
+        return handleWithCallback<RingingAlarmSnoozeRequestMessage, RingingAlarmSnoozeResponseMessage, bool>(
+            request, [&](RingingAlarmSnoozeRequestMessage *request, IAlarmOperations::OnSnoozeRingingAlarm callback) {
+                alarmOperations->snoozeRingingAlarm(request->id, request->nextAlarmTime, callback);
+            });
+    }
+
     auto AlarmMessageHandler::handleMinuteUpdated() -> void
     {
         alarmOperations->minuteUpdated(TimePointNow());
