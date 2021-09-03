@@ -1,14 +1,13 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "ScreenLightControl.hpp"
-#include "ScreenLightControlParameters.hpp"
+#include <service-evtmgr/screen-light-control/ScreenLightControl.hpp>
+#include <service-evtmgr/screen-light-control/ScreenLightControlParameters.hpp>
 #include <module-sys/Timers/TimerFactory.hpp>
 #include <Service/Service.hpp>
 
 namespace screen_light_control
 {
-
     ScreenLightControl::ScreenLightControl(sys::Service *parent)
     {
         controlTimer = sys::TimerFactory::createPeriodicTimer(parent,
@@ -67,7 +66,7 @@ namespace screen_light_control
 
     void ScreenLightControl::readoutTimerCallback()
     {
-        functions::calculateBrightness(bsp::light_sensor::readout());
+        functions::calculateBrightness(brightnessValue);
     }
 
     auto ScreenLightControl::getAutoModeState() const noexcept -> ScreenLightMode
@@ -136,7 +135,6 @@ namespace screen_light_control
     void ScreenLightControl::turnOn()
     {
         bsp::eink_frontlight::turnOn();
-        bsp::light_sensor::wakeup();
         if (automaticMode == ScreenLightMode::Automatic) {
             enableTimers();
         }
@@ -151,8 +149,8 @@ namespace screen_light_control
     void ScreenLightControl::turnOff()
     {
         bsp::eink_frontlight::turnOff();
-        bsp::light_sensor::standby();
         disableTimers();
         lightOn = false;
     }
+
 } // namespace screen_light_control
