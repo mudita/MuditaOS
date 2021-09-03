@@ -10,4 +10,10 @@ namespace alarms
         // turnOnFrontlight after it will be implemented [BH-756]
         return true;
     }
+
+    bool FrontlightAction::turnOff()
+    {
+        // turnOffFrontlight after it will be implemented [BH-756]
+        return true;
+    }
 } // namespace alarms

@@ -15,6 +15,7 @@ namespace alarms
       public:
         explicit PlayToneAction(sys::Service &service);
         bool execute() override;
+        bool turnOff() override;
 
       private:
         void spawnTimer(std::chrono::seconds timeout);

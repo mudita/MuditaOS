@@ -17,5 +17,6 @@ CREATE TABLE IF NOT EXISTS alarm_events(
                   music_tone TEXT,
                   enabled BOOLEAN,
                   snooze_duration INTEGER,
-                  FOREIGN KEY (event_id) REFERENCES events (_id) ON DELETE CASCADE
+                  FOREIGN KEY (event_id) REFERENCES events (_id)
 );
+

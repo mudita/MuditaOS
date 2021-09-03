@@ -14,6 +14,7 @@ namespace alarms
       public:
         explicit NotifyGUIAction(sys::Service &service);
         bool execute() override;
+        bool turnOff() override;
 
       private:
         sys::Service &service;

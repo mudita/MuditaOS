@@ -13,6 +13,7 @@
 #include <SystemManager/messages/SystemManagerMessage.hpp>
 #include <application-onboarding/data/OnBoardingMessages.hpp>
 #include <apps-common/messages/AppMessage.hpp>
+#include <apps-common/actions/AlarmTriggeredAction.hpp>
 #include <i18n/i18n.hpp>
 #include <log/log.hpp>
 #include <service-audio/AudioMessage.hpp>
@@ -270,6 +271,7 @@ namespace app::manager
         auto convertibleToActionHandler = [this](sys::Message *request) { return handleMessageAsAction(request); };
         connect(typeid(sys::CriticalBatteryLevelNotification), convertibleToActionHandler);
         connect(typeid(VolumeChanged), convertibleToActionHandler);
+        connect(typeid(app::actions::AlarmTriggeredAction), convertibleToActionHandler);
     }
 
     sys::ReturnCodes ApplicationManagerCommon::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
