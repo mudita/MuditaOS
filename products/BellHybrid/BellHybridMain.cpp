@@ -72,8 +72,6 @@ int main()
 #endif
     systemServices.emplace_back(sys::CreatorFor<ServiceDB>());
     systemServices.emplace_back(sys::CreatorFor<ServiceAudio>());
-    systemServices.emplace_back(sys::CreatorFor<ServiceBluetooth>());
-    systemServices.emplace_back(sys::CreatorFor<ServiceLwIP>());
     systemServices.emplace_back(sys::CreatorFor<ServiceDesktop>());
     systemServices.emplace_back(sys::CreatorFor<stm::ServiceTime>());
     systemServices.emplace_back(sys::CreatorFor<service::eink::ServiceEink>());
