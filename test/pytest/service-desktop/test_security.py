@@ -10,7 +10,7 @@ from harness.interface.defs import status
 @pytest.mark.service_desktop_test
 @pytest.mark.usefixtures("phone_unlocked")
 def test_security_phone_unlocked(harness):
-    body = {}
+    body = {"category": "phoneLockStatus"}
 
     ret = harness.endpoint_request("usbSecurity", "get", body)
     assert ret["status"] == status["NoContent"]
@@ -19,7 +19,7 @@ def test_security_phone_unlocked(harness):
 @pytest.mark.service_desktop_test
 @pytest.mark.usefixtures("phone_locked")
 def test_security_phone_locked_with_code(harness):
-    body = {}
+    body = {"category": "phoneLockStatus"}
 
     ret = harness.endpoint_request("usbSecurity", "get", body)
     assert ret["status"] == status["Forbidden"]
@@ -69,7 +69,7 @@ def test_security_phone_locked_without_code(harness):
 
     time.sleep(.1)
 
-    body = {}
+    body = {"category": "phoneLockStatus"}
     ret = harness.endpoint_request("usbSecurity", "get", body)
     assert ret["status"] == status["NoContent"]
 
@@ -80,7 +80,7 @@ def test_security_phone_locked_without_code(harness):
     harness.lock_phone()
     time.sleep(.1)
 
-    body = {}
+    body = {"category": "phoneLockStatus"}
     ret = harness.endpoint_request("usbSecurity", "get", body)
     assert ret["status"] == status["Forbidden"]
 
@@ -99,7 +99,7 @@ def test_security_unlock_phone(harness):
 
     time.sleep(.1)
 
-    body = {}
+    body = {"category": "phoneLockStatus"}
     ret = harness.endpoint_request("usbSecurity", "get", body)
     assert ret["status"] == status["Forbidden"]
 
@@ -111,7 +111,7 @@ def test_security_unlock_phone(harness):
 
     time.sleep(.1)
 
-    body = {}
+    body = {"category": "phoneLockStatus"}
     ret = harness.endpoint_request("usbSecurity", "get", body)
     assert ret["status"] == status["Forbidden"]
 
@@ -126,7 +126,7 @@ def test_security_unlock_phone(harness):
 
     time.sleep(.1)
 
-    body = {}
+    body = {"category": "phoneLockStatus"}
     ret = harness.endpoint_request("usbSecurity", "get", body)
     assert ret["status"] == status["Forbidden"]
 
@@ -145,3 +145,145 @@ def test_security_unlock_phone(harness):
     body = {}
     ret = harness.endpoint_request("deviceInfo", "get", body)
     assert ret["status"] == status["OK"]
+
+
+@pytest.mark.service_desktop_test
+@pytest.mark.usefixtures("phone_locked")
+def test_security_time_lock(harness):
+    harness.lock_phone()
+
+    """
+    First attempt unlocking with wrong passcode: 1111
+    """
+    body = {"phoneLockCode": [1, 1, 1, 1]}
+    ret = harness.endpoint_request("usbSecurity", "put", body)
+    assert ret["status"] == status["NoContent"]
+
+    time.sleep(.1)
+
+    body = {"category": "phoneLockStatus"}
+    ret = harness.endpoint_request("usbSecurity", "get", body)
+    assert ret["status"] == status["Forbidden"]
+
+    time.sleep(.1)
+
+    body = {"category": "phoneLockTime"}
+    ret = harness.endpoint_request("usbSecurity", "get", body)
+    assert ret["status"] == status["UnprocessableEntity"]
+
+    time.sleep(.1)
+
+    """
+    Second attempt unlocking with wrong passcode: 1111
+    """
+    body = {"phoneLockCode": [1, 1, 1, 1]}
+    ret = harness.endpoint_request("usbSecurity", "put", body)
+    assert ret["status"] == status["NoContent"]
+
+    time.sleep(.1)
+
+    body = {"category": "phoneLockStatus"}
+    ret = harness.endpoint_request("usbSecurity", "get", body)
+    assert ret["status"] == status["Forbidden"]
+
+    time.sleep(.1)
+
+    body = {"category": "phoneLockTime"}
+    ret = harness.endpoint_request("usbSecurity", "get", body)
+    assert ret["status"] == status["UnprocessableEntity"]
+
+    time.sleep(.1)
+
+    """
+    Third attempt unlocking with wrong passcode: 1111
+    """
+    body = {"phoneLockCode": [1, 1, 1, 1]}
+    ret = harness.endpoint_request("usbSecurity", "put", body)
+    assert ret["status"] == status["NoContent"]
+
+    time.sleep(.1)
+
+    body = {"category": "phoneLockStatus"}
+    ret = harness.endpoint_request("usbSecurity", "get", body)
+    assert ret["status"] == status["Forbidden"]
+
+    time.sleep(.1)
+
+    body = {"category": "phoneLockTime"}
+    ret = harness.endpoint_request("usbSecurity", "get", body)
+    assert ret["status"] == status["OK"]
+    assert time.time() < ret["body"]["phoneLockTime"] <= time.time() + 30
+
+    time.sleep(.1)
+
+    """
+    Attempt unlocking with correct passcode while phone is time locked
+    """
+    body = {"phoneLockCode": [3, 3, 3, 3]}
+    ret = harness.endpoint_request("usbSecurity", "put", body)
+    assert ret["status"] == status["NoContent"]
+
+    time.sleep(.1)
+
+    body = {"category": "phoneLockStatus"}
+    ret = harness.endpoint_request("usbSecurity", "get", body)
+    assert ret["status"] == status["Forbidden"]
+
+    """
+    Waiting 16 seconds to make sure time lock is no longer active
+    """
+    time.sleep(16)
+
+    """
+    Check if time lock is no longer active
+    """
+    body = {"category": "phoneLockTime"}
+    ret = harness.endpoint_request("usbSecurity", "get", body)
+    assert ret["status"] == status["UnprocessableEntity"]
+
+    time.sleep(.1)
+
+    """
+    Fourth attempt unlocking with wrong passcode: 1111
+    """
+    body = {"phoneLockCode": [1, 1, 1, 1]}
+    ret = harness.endpoint_request("usbSecurity", "put", body)
+    assert ret["status"] == status["NoContent"]
+
+    time.sleep(.1)
+
+    body = {"category": "phoneLockStatus"}
+    ret = harness.endpoint_request("usbSecurity", "get", body)
+    assert ret["status"] == status["Forbidden"]
+
+    time.sleep(.1)
+
+    body = {"category": "phoneLockTime"}
+    ret = harness.endpoint_request("usbSecurity", "get", body)
+    assert ret["status"] == status["OK"]
+    assert time.time() < ret["body"]["phoneLockTime"] <= time.time() + 30
+
+    """
+    Waiting 31 seconds to make sure time lock is no longer active
+    """
+    time.sleep(31)
+
+    """
+    Check if time lock is no longer active
+    """
+    body = {"category": "phoneLockTime"}
+    ret = harness.endpoint_request("usbSecurity", "get", body)
+    assert ret["status"] == status["UnprocessableEntity"]
+
+    """
+    Attempt unlocking when time lock is no longer active
+    """
+    body = {"phoneLockCode": [3, 3, 3, 3]}
+    ret = harness.endpoint_request("usbSecurity", "put", body)
+    assert ret["status"] == status["NoContent"]
+
+    time.sleep(.1)
+
+    body = {"category": "phoneLockStatus"}
+    ret = harness.endpoint_request("usbSecurity", "get", body)
+    assert ret["status"] == status["NoContent"]

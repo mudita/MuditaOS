@@ -101,6 +101,7 @@ namespace locks
         void setNoLockTimeAttemptsLeft(unsigned int attemptsNumber);
         void increaseLockTime() noexcept;
         void resetLockTime() noexcept;
+        void broadcastLockTime() noexcept;
     };
 
 } // namespace locks

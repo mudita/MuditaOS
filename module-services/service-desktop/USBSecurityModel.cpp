@@ -53,4 +53,14 @@ namespace sdesktop
             return EndpointSecurity::Allow;
         }
     }
+
+    auto USBSecurityModel::updatePhoneLockTime(const time_t newPhoneLockTime) -> void
+    {
+        phoneLockTime = newPhoneLockTime;
+    }
+
+    auto USBSecurityModel::getPhoneLockTime() const -> time_t
+    {
+        return phoneLockTime;
+    }
 } // namespace sdesktop

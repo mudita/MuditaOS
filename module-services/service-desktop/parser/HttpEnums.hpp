@@ -21,6 +21,7 @@ namespace parserFSM::http
         NotFound            = 404,
         NotAcceptable       = 406,
         Conflict            = 409,
+        UnprocessableEntity = 422,
         InternalServerError = 500,
         NotImplemented      = 501
     };
