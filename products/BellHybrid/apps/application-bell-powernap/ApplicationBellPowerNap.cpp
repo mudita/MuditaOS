@@ -3,7 +3,9 @@
 
 #include "ApplicationBellPowerNap.hpp"
 #include "presenter/PowerNapMainWindowPresenter.hpp"
+#include "presenter/PowerNapProgressPresenter.hpp"
 #include "windows/PowerNapMainWindow.hpp"
+#include "windows/PowerNapProgressWindow.hpp"
 
 namespace app
 {
@@ -31,6 +33,10 @@ namespace app
         windowsFactory.attach(gui::name::window::main_window, [this](Application *app, const std::string &name) {
             auto presenter = std::make_unique<powernap::PowerNapMainWindowPresenter>(app, settings.get());
             return std::make_unique<gui::PowerNapMainWindow>(app, std::move(presenter));
+        });
+        windowsFactory.attach(gui::window::name::powernapProgress, [this](Application *app, const std::string &name) {
+            auto presenter = std::make_unique<powernap::PowerNapProgressPresenter>(app, settings.get());
+            return std::make_unique<gui::PowerNapProgressWindow>(app, std::move(presenter));
         });
     }
 
