@@ -18,15 +18,19 @@ target_sources(application-bell-powernap
         ApplicationBellPowerNap.cpp
         presenter/PowerNapMainWindowPresenter.cpp
         presenter/PowerNapProgressPresenter.cpp
+        presenter/PowerNapSessionEndedPresenter.cpp
         windows/PowerNapMainWindow.cpp
         windows/PowerNapProgressWindow.cpp
+        windows/PowerNapSessionEndedWindow.cpp
         data/PowerNapListItem.cpp
         models/PowerNapModel.cpp
 
         presenter/PowerNapMainWindowPresenter.hpp
         presenter/PowerNapProgressPresenter.hpp
+        presenter/PowerNapSessionEndedPresenter.hpp
         windows/PowerNapMainWindow.hpp
         windows/PowerNapProgressWindow.hpp
+        windows/PowerNapSessionEndedWindow.hpp
         data/PowerNapListItem.hpp
         data/PowerNapStyle.hpp
         data/PowerNapCommon.hpp
@@ -38,6 +42,7 @@ target_sources(application-bell-powernap
 
 target_link_libraries(application-bell-powernap
     PRIVATE
+        bell::app-main
 
     PUBLIC
         apps-common

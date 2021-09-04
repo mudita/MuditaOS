@@ -18,9 +18,12 @@ namespace gui
 
         void buildInterface() override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        auto onInput(const InputEvent &inputEvent) -> bool override;
 
         void buildLayout();
         void configureTimer();
+
+        void switchWindow() override;
 
       public:
         PowerNapProgressWindow(app::Application *app,
