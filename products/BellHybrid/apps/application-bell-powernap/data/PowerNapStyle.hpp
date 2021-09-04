@@ -20,4 +20,9 @@ namespace gui::powerNapStyle
         inline constexpr auto bottomDescTopMargin = 20U;
         inline constexpr auto boxesCount          = 16;
     } // namespace progress
+
+    namespace sessionEnd
+    {
+        inline constexpr auto textH = 200U;
+    }
 } // namespace gui::powerNapStyle

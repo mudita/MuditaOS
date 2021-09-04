@@ -4,6 +4,7 @@
 #include "PowerNapProgressWindow.hpp"
 #include "application-bell-powernap/ApplicationBellPowerNap.hpp"
 #include "data/PowerNapStyle.hpp"
+#include "data/PowerNapSwitchData.hpp"
 #include <apps-common/widgets/BellBaseLayout.hpp>
 #include <apps-common/widgets/BarGraph.hpp>
 #include <apps-common/GuiTimer.hpp>
@@ -86,5 +87,20 @@ namespace gui
         presenter->initTimer(this);
         presenter->getUIConfigurator().attach(progressBar);
         presenter->getUIConfigurator().attach(timerText);
+    }
+
+    auto PowerNapProgressWindow::onInput(const InputEvent &inputEvent) -> bool
+    {
+        if (inputEvent.isShortRelease()) {
+            if (inputEvent.is(KeyCode::KEY_RF) || inputEvent.is(KeyCode::KEY_ENTER)) {
+                switchWindow();
+                return true;
+            }
+        }
+        return AppWindow::onInput(inputEvent);
+    }
+    void PowerNapProgressWindow::switchWindow()
+    {
+        application->switchWindow(gui::window::name::powernapSessionEnded, std::make_unique<gui::PowerNapSwitchData>());
     }
 } // namespace gui
