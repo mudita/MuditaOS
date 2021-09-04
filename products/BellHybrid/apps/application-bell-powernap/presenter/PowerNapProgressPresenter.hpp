@@ -5,6 +5,7 @@
 
 #include <apps-common/BasePresenter.hpp>
 #include <apps-common/widgets/ProgressTimer.hpp>
+#include <Timers/TimerHandle.hpp>
 #include <memory>
 namespace app
 {
@@ -28,6 +29,7 @@ namespace app::powernap
         {
           public:
             ~View() = default;
+            virtual void switchWindow() = 0;
         };
 
         class Presenter : public BasePresenter<PowerNapProgressContract::View>
@@ -44,10 +46,14 @@ namespace app::powernap
         app::Application *app        = nullptr;
         settings::Settings *settings = nullptr;
         std::unique_ptr<app::ProgressTimer> timer;
+        sys::TimerHandle napAlarmTimer;
 
         void initTimer(gui::Item *parent) override;
-        void activate() override;
         app::ProgressTimerUIConfigurator &getUIConfigurator() noexcept override;
+        void activate() override;
+
+        void onNapFinished();
+        void onNapAlarmFinished();
 
       public:
         PowerNapProgressPresenter(app::Application *app, settings::Settings *settings);
