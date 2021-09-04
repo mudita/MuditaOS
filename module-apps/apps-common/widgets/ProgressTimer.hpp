@@ -14,6 +14,15 @@ namespace gui
 
 namespace app
 {
+    class ProgressTimerUIConfigurator
+    {
+
+      public:
+        virtual ~ProgressTimerUIConfigurator()       = default;
+        virtual void attach(gui::Progress *progress) = 0;
+        virtual void attach(gui::Text *clock)        = 0;
+    };
+
     /** ProgressTimer provides an interface that connect Timer's features to UI representation.
      * The Timer's features consists of:
      * 1) counting time down,
@@ -23,11 +32,9 @@ namespace app
      * 1) ability to present time left on attached Text
      * 2) ability to present timer's progress on attached class realising Progress interface.
      */
-    class ProgressTimer
+    class ProgressTimer : public ProgressTimerUIConfigurator
     {
       public:
-        virtual ~ProgressTimer() = default;
-
         [[nodiscard]] virtual auto isStopped() const noexcept -> bool                    = 0;
         virtual void reset(std::chrono::seconds duration,
                            std::chrono::seconds interval = std::chrono::seconds::zero()) = 0;

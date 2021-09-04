@@ -7,11 +7,17 @@
 
 namespace gui::powerNapStyle
 {
-    inline constexpr auto descriptionFont = style::bell_sidelist_item::description_font;
+    inline constexpr auto descriptionFont = style::window::font::largelight;
     inline constexpr auto napPeriodFont   = style::window::font::supersizemelight;
     namespace listItem
     {
         inline constexpr auto timeUnitSingular = "common_minute_lower";
         inline constexpr auto timeUnitPlural   = "common_minutes_lower";
     } // namespace listItem
+
+    namespace progress
+    {
+        inline constexpr auto bottomDescTopMargin = 20U;
+        inline constexpr auto boxesCount          = 16;
+    } // namespace progress
 } // namespace gui::powerNapStyle
