@@ -51,9 +51,24 @@ namespace db::multimedia_files
 
     bool MultimediaFilesTable::add(TableRow entry)
     {
-        return db->execute("INSERT or ignore INTO files (path, media_type, size, title, artist, album,"
-                           "comment, genre, year, track, song_length, bitrate, sample_rate, channels)"
-                           "VALUES('%q', '%q', %lu, '%q', '%q', '%q', '%q', '%q', %lu, %lu, %lu, %lu, %lu, %lu);",
+        return db->execute("INSERT INTO files (path, media_type, size, title, artist, album, "
+                           "comment, genre, year, track, song_length, bitrate, sample_rate, channels) "
+                           "VALUES('%q', '%q', %lu, '%q', '%q', '%q', '%q', '%q', %lu, %lu, %lu, %lu, %lu, %lu) "
+                           "ON CONFLICT(path) DO UPDATE SET "
+                           "path = excluded.path, "
+                           "media_type = excluded.media_type, "
+                           "size = excluded.size, "
+                           "title = excluded.title, "
+                           "artist = excluded.artist, "
+                           "album = excluded.album, "
+                           "comment = excluded.comment, "
+                           "genre = excluded.genre, "
+                           "year = excluded.year, "
+                           "track = excluded.track, "
+                           "song_length = excluded.song_length, "
+                           "bitrate = excluded.bitrate, "
+                           "sample_rate = excluded.sample_rate, "
+                           "channels = excluded.channels;",
                            entry.fileInfo.path.c_str(),
                            entry.fileInfo.mediaType.c_str(),
                            entry.fileInfo.size,
@@ -113,9 +128,48 @@ namespace db::multimedia_files
                            entry.ID);
     }
 
+    bool MultimediaFilesTable::addOrUpdate(TableRow entry, std::string oldPath)
+    {
+        auto path = oldPath.empty() ? entry.fileInfo.path : oldPath;
+
+        return db->execute("BEGIN TRANSACTION; "
+                           "INSERT OR IGNORE INTO files (path) VALUES ('%q'); "
+                           "UPDATE files SET path = '%q', media_type = '%q', size = %lu, title = '%q', artist = '%q', "
+                           "album = '%q', comment = '%q', genre = '%q', year = %lu, track = %lu, song_length = %lu, "
+                           "bitrate = %lu, sample_rate = %lu, channels = %lu WHERE path = '%q'; "
+                           "COMMIT;",
+                           path.c_str(),
+                           entry.fileInfo.path.c_str(),
+                           entry.fileInfo.mediaType.c_str(),
+                           entry.fileInfo.size,
+                           entry.tags.title.c_str(),
+                           entry.tags.album.artist.c_str(),
+                           entry.tags.album.title.c_str(),
+                           entry.tags.comment.c_str(),
+                           entry.tags.genre.c_str(),
+                           entry.tags.year,
+                           entry.tags.track,
+                           entry.audioProperties.songLength,
+                           entry.audioProperties.bitrate,
+                           entry.audioProperties.sampleRate,
+                           entry.audioProperties.channels,
+                           path.c_str());
+    }
+
     TableRow MultimediaFilesTable::getById(uint32_t id)
     {
         auto retQuery = db->query("SELECT * FROM files WHERE _id = %lu;", id);
+
+        if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
+            return TableRow();
+        }
+
+        return CreateTableRow(*retQuery);
+    }
+
+    TableRow MultimediaFilesTable::getByPath(std::string path)
+    {
+        auto retQuery = db->query("SELECT * FROM files WHERE path = '%q';", path.c_str());
 
         if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
             return TableRow();

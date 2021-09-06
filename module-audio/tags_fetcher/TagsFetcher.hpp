@@ -32,9 +32,11 @@ namespace tags::fetcher
         std::string artist;
         std::string genre;
         std::string album;
-        std::string year;
+        uint32_t year = 0;
         std::string filePath;
         std::string title;
+        std::string comment;
+        uint32_t track = 0;
 
         Tags() = default;
         Tags(uint32_t total_duration_s,
@@ -48,11 +50,14 @@ namespace tags::fetcher
              std::string genre,
              std::string title,
              std::string album,
-             std::string year,
-             std::string filePath)
+             uint32_t year,
+             std::string filePath,
+             std::string comment,
+             uint32_t track)
             : total_duration_s{total_duration_s}, duration_hour{duration_hour}, duration_min{duration_min},
-              duration_sec{duration_sec}, sample_rate{sample_rate}, num_channel{num_channel}, bitrate{bitrate},
-              artist{artist}, genre{genre}, album{album}, year{year}, filePath{filePath}, title{title}
+              duration_sec{duration_sec}, sample_rate{sample_rate},
+              num_channel{num_channel}, bitrate{bitrate}, artist{artist}, genre{genre}, album{album}, year{year},
+              filePath{filePath}, title{title}, comment{comment}, track{track}
         {}
 
         explicit Tags(std::string filePath) : filePath{filePath}, title{filePath}

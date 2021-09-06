@@ -16,7 +16,6 @@ add_subdirectory( service-db )
 add_subdirectory( service-desktop )
 add_subdirectory( service-eink )
 add_subdirectory( service-evtmgr )
-add_subdirectory( service-fileindexer )
 add_subdirectory( service-fota )
 add_subdirectory( service-gui )
 add_subdirectory( service-lwip )
@@ -35,7 +34,6 @@ target_link_libraries(${PROJECT_NAME}
         module-db
         module-cellular
         module-audio
-        service-fileindexer
         service-antenna
         ${TARGET_LIBRARIES}
     PRIVATE

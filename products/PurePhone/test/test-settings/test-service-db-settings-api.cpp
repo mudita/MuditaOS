@@ -21,10 +21,12 @@
 
 #include <module-db/Databases/CountryCodesDB.hpp>
 #include <module-db/Databases/EventsDB.hpp>
+#include <module-db/Databases/MultimediaFilesDB.hpp>
 #include <module-db/Databases/NotesDB.hpp>
 #include <module-db/Databases/NotificationsDB.hpp>
 #include <module-db/Interface/AlarmEventRecord.hpp>
 #include <module-db/Interface/CountryCodeRecord.hpp>
+#include <module-db/Interface/MultimediaFilesRecord.hpp>
 #include <module-db/Interface/NotesRecord.hpp>
 #include <module-db/Interface/NotificationsRecord.hpp>
 #include <service-db/agents/quotes/QuotesAgent.hpp>

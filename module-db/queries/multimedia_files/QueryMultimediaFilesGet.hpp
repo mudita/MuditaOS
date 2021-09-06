@@ -31,4 +31,13 @@ namespace db::multimedia_files::query
         [[nodiscard]] auto debugInfo() const -> std::string override;
     };
 
+    class GetByPath : public Query
+    {
+      public:
+        const std::string path;
+        explicit GetByPath(const std::string &path);
+
+        [[nodiscard]] auto debugInfo() const -> std::string override;
+    };
+
 } // namespace db::multimedia_files::query

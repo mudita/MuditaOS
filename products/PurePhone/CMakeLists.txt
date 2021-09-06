@@ -67,6 +67,7 @@ target_link_libraries(PurePhone
         service-audio
         service-bluetooth
         service-desktop
+        service-fileindexer
         service-lwip
         service-time
         sys

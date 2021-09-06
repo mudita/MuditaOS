@@ -37,7 +37,7 @@ TEST_CASE(" Tags fetcher ")
         REQUIRE(tags.title == ext + " Test track title - łąki");
         REQUIRE(tags.artist == ext + " Test artist name - łąki");
         REQUIRE(tags.album == ext + " Test album title - łąki");
-        REQUIRE(tags.year == "2020");
+        REQUIRE(tags.year == 2020);
     }
 }
 
