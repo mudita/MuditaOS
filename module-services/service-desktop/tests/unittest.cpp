@@ -5,7 +5,6 @@
 #include <endpoints/EndpointFactory.hpp>
 #include <endpoints/contacts/ContactHelper.hpp>
 #include <endpoints/contacts/ContactsEndpoint.hpp>
-#include <endpoints/factoryReset/FactoryReset.hpp>
 #include <endpoints/messages/MessageHelper.hpp>
 #include <endpoints/filesystem/FileContext.hpp>
 #include <endpoints/filesystem/FileOperations.hpp>
