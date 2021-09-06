@@ -103,7 +103,6 @@ namespace musicPlayerStyle
 
         constexpr uint32_t bold_text_h = 33;
         constexpr uint32_t text_h      = 33;
-        constexpr uint32_t duration_w  = 50;
 
         constexpr int32_t topMargin   = 16;
         constexpr int32_t leftMargin  = 10;
