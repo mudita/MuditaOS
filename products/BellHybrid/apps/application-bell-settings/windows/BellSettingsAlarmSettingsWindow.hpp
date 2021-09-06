@@ -15,6 +15,10 @@ namespace gui
         explicit BellSettingsAlarmSettingsWindow(app::Application *app,
                                                  std::string name = gui::window::name::bellSettingsAlarmSettings);
 
+      private:
+        static constexpr auto title = "Alarm settings";
+
+        std::list<Option> alarmSettingsOptionsList();
         void buildInterface() override;
         void rebuild() override;
     };
