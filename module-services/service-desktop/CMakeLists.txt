@@ -22,7 +22,6 @@ set(SOURCES
     endpoints/developerMode/event/DomRequest.cpp
     endpoints/developerMode/event/ATRequest.cpp
     endpoints/deviceInfo/DeviceInfoEndpoint.cpp
-    endpoints/factoryReset/FactoryReset.cpp
     endpoints/factoryReset/FactoryResetEndpoint.cpp
     endpoints/messages/MessageHelper.cpp
     endpoints/messages/MessagesEndpoint.cpp
