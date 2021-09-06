@@ -2,16 +2,16 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CustomRepeatModel.hpp"
-#include "application-alarm-clock/widgets/CustomCheckBoxWithLabel.hpp"
-#include "application-alarm-clock/widgets/AlarmClockStyle.hpp"
+
+#include <application-alarm-clock/widgets/AlarmClockStyle.hpp>
 #include <ListView.hpp>
+#include <time/time_locale.hpp>
 
 namespace app::alarmClock
 {
-
     CustomRepeatModel::CustomRepeatModel(app::ApplicationCommon *app,
-                                         std::shared_ptr<AbstractAlarmsRepository> alarmsRepository)
-        : application(app), alarmsRepository{std::move(alarmsRepository)}
+                                         std::shared_ptr<alarmClock::AlarmRRulePresenter> rRulePresenter)
+        : application(app), rRulePresenter(rRulePresenter)
     {}
 
     unsigned int CustomRepeatModel::requestRecordsCount()
@@ -21,7 +21,7 @@ namespace app::alarmClock
 
     unsigned int CustomRepeatModel::getMinimalItemSpaceRequired() const
     {
-        return style::alarmClock::window::item::checkBox::height;
+        return style::window::label::big_h + style::margins::big;
     }
 
     void CustomRepeatModel::requestRecords(uint32_t offset, uint32_t limit)
@@ -35,10 +35,15 @@ namespace app::alarmClock
         return getRecord(order);
     }
 
-    void CustomRepeatModel::createData(const WeekDaysRepeatData &data)
+    void CustomRepeatModel::createData()
     {
-        for (auto const &[key, dayName] : gui::CustomCheckBoxWithLabel::weekDays) {
-            internalData.push_back(new gui::CustomCheckBoxWithLabel(application, utils::translate(dayName), data));
+        auto app = application;
+        for (auto const &[day, selected] : rRulePresenter->getCustomDays()) {
+            internalData.push_back(new gui::CustomCheckBoxWithLabel(
+                utils::translate(day),
+                selected,
+                [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
+                [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); }));
         }
 
         for (auto &item : internalData) {
@@ -46,30 +51,33 @@ namespace app::alarmClock
         }
     }
 
-    void CustomRepeatModel::loadData(const WeekDaysRepeatData &data)
+    void CustomRepeatModel::loadData()
     {
         list->reset();
         eraseInternalData();
 
-        createData(data);
+        createData();
 
         list->rebuildList();
     }
 
-    std::vector<bool> CustomRepeatModel::getIsCheckedData()
+    void CustomRepeatModel::saveCheckedData()
     {
-        std::vector<bool> isCheckedData;
-        isCheckedData.reserve(internalData.size());
-        for (const auto &item : internalData) {
-            if (item->onContentChangedCallback) {
-                isCheckedData.push_back(item->onContentChangedCallback());
-            }
-            else {
-                isCheckedData.push_back(false);
+        std::list<utl::Day> days = {};
+
+        for (unsigned int i = 0; i < internalData.size(); i++) {
+            if (internalData[i]->isChecked()) {
+                days.emplace_back(magic_enum::enum_cast<utl::Day>(i).value());
             }
         }
 
-        return isCheckedData;
+        rRulePresenter->setOption(AlarmRRulePresenter::RRuleOptions::Custom, days);
+    }
+
+    void CustomRepeatModel::eraseData()
+    {
+        list->reset();
+        eraseInternalData();
     }
 
 } // namespace app::alarmClock

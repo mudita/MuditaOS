@@ -569,7 +569,7 @@ namespace gui
         resizeItems();
         setNavigation();
 
-        return true;
+        return Item::onDimensionChanged(oldDim, newDim);
     }
 
     HBox::HBox() : BoxLayout()

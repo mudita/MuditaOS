@@ -10,6 +10,8 @@ namespace gui
     template <typename ValueT, typename StringT> class NumWithString
     {
       public:
+        NumWithString() = default;
+
         NumWithString(ValueT value, StringT string) : value{value}, string{string}
         {}
 

@@ -5,10 +5,9 @@
 
 #include <gui/Common.hpp>
 
-#include <utf8/UTF8.hpp>
-
-#include <cstdint>
 #include <vector>
+#include <cstdint>
+#include <utf8/UTF8.hpp>
 
 namespace gui
 {
@@ -23,12 +22,12 @@ namespace gui
 
         ValType get() const
         {
-            return range[pos];
+            return pos < range.size() ? range[pos] : ValType{};
         }
 
         UTF8 str() const
         {
-            return range[pos];
+            return pos < range.size() ? range[pos] : UTF8{};
         }
 
         void set(ValType val)
@@ -71,13 +70,21 @@ namespace gui
             }
         }
 
+        void updateRange(Range newRange)
+        {
+            if (range != newRange) {
+                range = newRange;
+                pos   = 0;
+            }
+        }
+
       private:
         std::uint32_t upRange() const
         {
             return range.size() - 1;
         }
 
-        const Range range;
+        Range range;
         std::uint32_t pos{};
         const Boundaries boundaries{};
     };
@@ -141,8 +148,16 @@ namespace gui
             }
         }
 
+        void updateRange(Range newRange)
+        {
+            if (range != newRange) {
+                range        = newRange;
+                currentValue = 0;
+            }
+        }
+
       private:
-        const Range range;
+        Range range;
         ValType currentValue{};
         const Boundaries boundaries{};
     };
