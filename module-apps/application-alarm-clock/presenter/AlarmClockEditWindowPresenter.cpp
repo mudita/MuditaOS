@@ -25,12 +25,4 @@ namespace app::alarmClock
         alarmFieldsProvider->saveData(std::move(record), action);
     }
 
-    void AlarmClockEditWindowPresenter::loadRepeat(std::shared_ptr<AlarmEventRecord> record)
-    {
-        alarmFieldsProvider->loadRepeat(std::move(record));
-    }
-
-    void AlarmClockEditWindowPresenter::updateRepeat(std::shared_ptr<AlarmEventRecord> record, WeekDaysRepeatData data)
-    {
-    }
 } // namespace app::alarmClock

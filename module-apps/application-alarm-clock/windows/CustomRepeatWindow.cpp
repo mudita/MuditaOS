@@ -3,6 +3,11 @@
 
 #include "CustomRepeatWindow.hpp"
 
+#include <application-alarm-clock/data/AlarmsData.hpp>
+#include <application-alarm-clock/widgets/AlarmClockStyle.hpp>
+
+#include <InputEvent.hpp>
+
 namespace app::alarmClock
 {
 
@@ -34,15 +39,16 @@ namespace app::alarmClock
         setFocusItem(list);
     }
 
+    void CustomRepeatWindow::onClose(gui::Window::CloseReason reason)
+    {
+        if (reason != CloseReason::PhoneLock) {
+            presenter->eraseProviderData();
+        }
+    }
+
     void CustomRepeatWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
     {
-        if (auto receivedData = dynamic_cast<WeekDaysRepeatData *>(data); receivedData != nullptr) {
-            weekDaysOptData = *receivedData;
-        }
-        else {
-            weekDaysOptData = WeekDaysRepeatData();
-        }
-        presenter->loadData(weekDaysOptData);
+        presenter->loadData();
     }
 
     bool CustomRepeatWindow::onInput(const gui::InputEvent &inputEvent)
@@ -52,10 +58,8 @@ namespace app::alarmClock
         }
 
         if (inputEvent.isShortRelease(gui::KeyCode::KEY_ENTER)) {
-            weekDaysOptData = presenter->getWeekDaysRepeatData();
-            application->switchWindow(style::alarmClock::window::name::newEditAlarm,
-                                      gui::ShowMode::GUI_SHOW_RETURN,
-                                      std::make_unique<WeekDaysRepeatData>(weekDaysOptData));
+            presenter->saveData();
+            application->switchWindow(style::alarmClock::window::name::newEditAlarm);
             return true;
         }
         return false;

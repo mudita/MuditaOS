@@ -21,43 +21,33 @@ namespace style::alarmClock
         {
             inline constexpr auto newEditAlarm = "NewEditWindow";
             inline constexpr auto customRepeat = "CustomRepeat";
-            inline constexpr auto dialogYesNo = "DialogYesNo";
-        }
+            inline constexpr auto dialogYesNo  = "DialogYesNo";
+        } // namespace name
 
         namespace item
         {
             inline constexpr auto height         = 100;
-            inline constexpr auto vBoxWidth      = 200;
             inline constexpr auto botMargin      = 4;
-            inline constexpr auto vBoxLeftMargin = 10;
             inline constexpr auto imageMargin    = 150;
             inline constexpr auto timeHeight     = 60 - style::margins::small;
             inline constexpr auto periodHeight   = 40;
 
             namespace time
             {
-                inline constexpr auto height       = 106;
-                inline constexpr auto margin       = 21;
-                inline constexpr auto marginBot    = 15;
+                inline constexpr auto width        = style::listview::item_width_with_without_scroll;
+                inline constexpr auto height       = 80;
+                inline constexpr auto marginTop    = 32;
+                inline constexpr auto marginBot    = 20;
                 inline constexpr auto separator    = 30;
-                inline constexpr auto timeInput12h = 120;
-                inline constexpr auto timeInput24h = 195;
             } // namespace time
 
             namespace options
             {
-                inline constexpr auto height    = 63;
-                inline constexpr auto label_h   = 30;
-                inline constexpr auto arrow_w_h = 20;
+                inline constexpr auto spinner_h = 40;
+                inline constexpr auto label_h   = 27;
+                inline constexpr auto h         = spinner_h + label_h;
             } // namespace options
 
-            namespace checkBox
-            {
-                inline constexpr auto height        = 44;
-                inline constexpr auto marginTop     = 18;
-                inline constexpr auto inputBox_w    = style::window::label::big_h;
-                inline constexpr auto description_w = 280;
-            } // namespace checkBox
         } // namespace item
 
     } // namespace window

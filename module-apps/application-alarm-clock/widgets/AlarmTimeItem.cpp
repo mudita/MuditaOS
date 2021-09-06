@@ -18,10 +18,11 @@ namespace gui
         : mode24H{mode24H}, bottomBarTemporaryMode(std::move(bottomBarTemporaryMode)),
           bottomBarRestoreFromTemporaryMode(std::move(bottomBarRestoreFromTemporaryMode))
     {
-        setMinimumSize(style::window::default_body_width, timeItem::height);
+        setMinimumSize(timeItem::width, timeItem::height);
 
         setEdges(RectangleEdge::None);
-        setMargins(gui::Margins(style::margins::small, timeItem::margin, 0, timeItem::marginBot));
+        setMargins(gui::Margins(
+            style::widgets::leftMargin, timeItem::marginTop, style::widgets::rightMargin, timeItem::marginBot));
 
         hBox = new gui::HBox(this, 0, 0, 0, 0);
         hBox->setEdges(gui::RectangleEdge::None);
@@ -31,7 +32,7 @@ namespace gui
         applyItemSpecificProperties(hourInput);
 
         colonLabel = new gui::Label(hBox, 0, 0, 0, 0);
-        colonLabel->setMinimumSize(timeItem::separator, timeItem::height - timeItem::separator);
+        colonLabel->setMinimumSize(timeItem::separator, timeItem::height);
         colonLabel->setEdges(gui::RectangleEdge::None);
         colonLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
         colonLabel->setFont(style::window::font::medium);
@@ -181,10 +182,11 @@ namespace gui
                 return true;
             };
 
-            mode12hInput->setMinimumSize(timeItem::timeInput12h, timeItem::height - timeItem::separator);
+            auto elemWidth = (timeItem::width - (2 * timeItem::separator)) / 3;
+            mode12hInput->setMinimumSize(elemWidth, timeItem::height);
             mode12hInput->setMargins(gui::Margins(timeItem::separator, 0, 0, 0));
-            hourInput->setMinimumSize(timeItem::timeInput12h, timeItem::height - timeItem::separator);
-            minuteInput->setMinimumSize(timeItem::timeInput12h, timeItem::height - timeItem::separator);
+            hourInput->setMinimumSize(elemWidth, timeItem::height);
+            minuteInput->setMinimumSize(elemWidth, timeItem::height);
 
             onLoadCallback = [&](std::shared_ptr<AlarmEventRecord> alarm) {
                 hourInput->setText(TimePointToHourString12H(alarm->startDate));
@@ -198,8 +200,9 @@ namespace gui
             };
         }
         else {
-            hourInput->setMinimumSize(timeItem::timeInput24h, timeItem::height - timeItem::separator);
-            minuteInput->setMinimumSize(timeItem::timeInput24h, timeItem::height - timeItem::separator);
+            auto elemWidth = (timeItem::width - timeItem::separator) / 2;
+            hourInput->setMinimumSize(elemWidth, timeItem::height);
+            minuteInput->setMinimumSize(elemWidth, timeItem::height);
 
             onLoadCallback = [&](std::shared_ptr<AlarmEventRecord> alarm) {
                 hourInput->setText(TimePointToHourString24H(alarm->startDate));
