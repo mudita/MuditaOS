@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -23,8 +23,9 @@ namespace app::alarmClock
             virtual ~Presenter() noexcept = default;
 
             [[nodiscard]] virtual std::shared_ptr<gui::ListItemProvider> getItemProvider() = 0;
-            virtual void loadData(const WeekDaysRepeatData &data)                          = 0;
-            virtual WeekDaysRepeatData getWeekDaysRepeatData()                             = 0;
+            virtual void loadData()                                                        = 0;
+            virtual void saveData()                                                        = 0;
+            virtual void eraseProviderData()                                               = 0;
         };
     };
 
@@ -34,8 +35,9 @@ namespace app::alarmClock
         explicit CustomRepeatWindowPresenter(std::shared_ptr<CustomRepeatListItemProvider> itemProvider);
 
         [[nodiscard]] std::shared_ptr<gui::ListItemProvider> getItemProvider() override;
-        void loadData(const WeekDaysRepeatData &data) override;
-        WeekDaysRepeatData getWeekDaysRepeatData() override;
+        void loadData() override;
+        void saveData() override;
+        void eraseProviderData() override;
 
       private:
         std::shared_ptr<CustomRepeatListItemProvider> customRepeatProvider;

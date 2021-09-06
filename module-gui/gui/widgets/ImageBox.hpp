@@ -11,8 +11,8 @@ namespace gui
     class ImageBox : public HBox
     {
       public:
-        ImageBox(
-            Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w, const uint32_t &h, Image *image);
+        ImageBox(Item *parent, const Position &x, const Position &y, const Length &w, const Length &h, Image *image);
+        ImageBox(Item *parent, Image *image);
 
         ~ImageBox() override = default;
 

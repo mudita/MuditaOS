@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CustomRepeatWindowPresenter.hpp"
@@ -15,20 +15,18 @@ namespace app::alarmClock
         return customRepeatProvider;
     }
 
-    void CustomRepeatWindowPresenter::loadData(const WeekDaysRepeatData &data)
+    void CustomRepeatWindowPresenter::loadData()
     {
-        customRepeatProvider->loadData(data);
+        customRepeatProvider->loadData();
     }
 
-    WeekDaysRepeatData CustomRepeatWindowPresenter::getWeekDaysRepeatData()
+    void CustomRepeatWindowPresenter::eraseProviderData()
     {
-        auto weekDaysOptData = WeekDaysRepeatData();
-        auto isCheckedData   = customRepeatProvider->getIsCheckedData();
-        uint32_t i           = 0;
-        for (const auto &checked : isCheckedData) {
-            weekDaysOptData.setData(i, checked);
-            ++i;
-        }
-        return weekDaysOptData;
+        customRepeatProvider->eraseData();
+    }
+
+    void CustomRepeatWindowPresenter::saveData()
+    {
+        customRepeatProvider->saveCheckedData();
     }
 } // namespace app::alarmClock

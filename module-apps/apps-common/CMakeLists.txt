@@ -40,6 +40,7 @@ target_sources(apps-common
         widgets/InputBox.cpp
         widgets/ModesBox.cpp
         widgets/SpinBox.cpp
+        widgets/TextSpinnerBox.cpp
         widgets/TextWithIconsWidget.cpp
         widgets/TimeSetSpinner.cpp
         widgets/AlarmSetSpinner.cpp

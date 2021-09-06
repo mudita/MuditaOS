@@ -38,7 +38,7 @@ uint32_t MonthModel::getFirstWeekOffset()
         return 6;
     }
     else {
-        return this->firstWeekDayNumb - 1;
+        return this->firstWeekDayNumb;
     }
 }
 
