@@ -24,7 +24,6 @@ namespace sys
         ServiceEvtmgrNotifications,
         PhoneModeChanges,
         PhoneLockChanges,
-        AlarmChanges,
         BluetoothModeChanges,
         BluetoothNotifications
     };
@@ -129,8 +128,6 @@ inline const char *c_str(sys::BusChannel channel)
         return "BluetoothNotifications";
     case sys::BusChannel::PhoneLockChanges:
         return "PhoneLockChanges";
-    case sys::BusChannel::AlarmChanges:
-        return "AlarmChanges";
     }
     return "";
 }

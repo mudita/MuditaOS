@@ -5,14 +5,14 @@
 
 #include "WorkerEvent.hpp"
 #include <evtmgr/EventManager.hpp>
-#include <evtmgr/messages/AlarmMessage.hpp>
 #include <keymap/KeyMap.hpp>
 #include <module-bsp/hal/temperature_source/TemperatureSource.hpp>
-#include <service-evtmgr/KbdMessage.hpp>
+#include <module-sys/SystemManager/Constants.hpp>
 #include <screen-light-control/ScreenLightControl.hpp>
-#include <service-evtmgr/EVMessages.hpp>
+#include <service-evtmgr/KbdMessage.hpp>
 #include <service-evtmgr/ScreenLightControlMessage.hpp>
 #include <service-evtmgr/WorkerEventCommon.hpp>
+#include <sys/messages/AlarmActivationStatusChangeRequest.hpp>
 
 namespace
 {
@@ -47,8 +47,17 @@ void EventManager::handleKeyEvent(sys::Message *msg)
 
     auto key = mapKey(static_cast<gui::KeyCode>(kbdMessage->key.keyCode));
 
-    if (key == KeyMap::DeepPressUp && kbdMessage->key.state == RawKey::State::Released) {
-        bus.sendMulticast(std::make_unique<AlarmActivated>(), sys::BusChannel::AlarmChanges);
+    if (kbdMessage->key.state == RawKey::State::Released) {
+        if (key == KeyMap::DeepPressUp) {
+            bus.sendUnicast(
+                std::make_shared<sys::AlarmActivationStatusChangeRequest>(sys::AlarmActivationStatus::ACTIVATED),
+                service::name::system_manager);
+        }
+        else if (key == KeyMap::DeepPressDown) {
+            bus.sendUnicast(
+                std::make_shared<sys::AlarmActivationStatusChangeRequest>(sys::AlarmActivationStatus::DEACTIVATED),
+                service::name::system_manager);
+        }
     }
 }
 
