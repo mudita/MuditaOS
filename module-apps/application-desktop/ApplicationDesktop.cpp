@@ -154,11 +154,6 @@ namespace app
         return sys::ReturnCodes::Success;
     }
 
-    sys::ReturnCodes ApplicationDesktop::DeinitHandler()
-    {
-        return sys::ReturnCodes::Success;
-    }
-
     void ApplicationDesktop::createUserInterface()
     {
         using namespace app::window::name;

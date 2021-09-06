@@ -148,11 +148,6 @@ namespace app
         return ret;
     }
 
-    sys::ReturnCodes ApplicationCall::DeinitHandler()
-    {
-        return sys::ReturnCodes::Success;
-    }
-
     void ApplicationCall::createUserInterface()
     {
         windowsFactory.attach(app::window::name_enterNumber, [](Application *app, const std::string newname) {

@@ -36,7 +36,6 @@ namespace app
 
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
-        sys::ReturnCodes DeinitHandler() override;
         sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override;
 
         void acceptEULA();
