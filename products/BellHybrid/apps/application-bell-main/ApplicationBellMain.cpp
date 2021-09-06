@@ -83,7 +83,7 @@ namespace app
 
     void ApplicationBellMain::showPopup(gui::popup::ID id, const gui::PopupRequestParams *params)
     {
-        if (id == gui::popup::ID::AlarmActivated) {
+        if (id == gui::popup::ID::AlarmActivated || id == gui::popup::ID::AlarmDeactivated) {
             if (not isHomeScreenFocused()) {
                 switchWindow(gui::popup::resolveWindowName(id));
             }

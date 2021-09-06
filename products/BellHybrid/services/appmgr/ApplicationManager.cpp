@@ -3,7 +3,7 @@
 
 #include <appmgr/ApplicationManager.hpp>
 
-#include <evtmgr/messages/AlarmMessage.hpp>
+#include <appmgr/messages/AlarmMessage.hpp>
 
 namespace app::manager
 {
@@ -12,7 +12,6 @@ namespace app::manager
                                            const ApplicationName &_rootApplicationName)
         : ApplicationManagerCommon(serviceName, std::move(launchers), _rootApplicationName)
     {
-        bus.channels.push_back(sys::BusChannel::AlarmChanges);
         registerMessageHandlers();
     }
 
@@ -35,5 +34,6 @@ namespace app::manager
 
         auto convertibleToActionHandler = [this](sys::Message *request) { return handleMessageAsAction(request); };
         connect(typeid(AlarmActivated), convertibleToActionHandler);
+        connect(typeid(AlarmDeactivated), convertibleToActionHandler);
     }
 } // namespace app::manager
