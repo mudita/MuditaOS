@@ -62,11 +62,6 @@ namespace app
         return ret;
     }
 
-    sys::ReturnCodes ApplicationAlarmClock::DeinitHandler()
-    {
-        return sys::ReturnCodes::Success;
-    }
-
     void ApplicationAlarmClock::createUserInterface()
     {
         windowsFactory.attach(gui::name::window::main_window, [](Application *app, const std::string &name) {

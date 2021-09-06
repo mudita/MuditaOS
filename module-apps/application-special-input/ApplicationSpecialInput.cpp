@@ -59,8 +59,3 @@ void ApplicationSpecialInput::createUserInterface()
 
 void ApplicationSpecialInput::destroyUserInterface()
 {}
-
-sys::ReturnCodes ApplicationSpecialInput::DeinitHandler()
-{
-    return sys::ReturnCodes::Success;
-}

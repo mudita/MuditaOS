@@ -23,8 +23,6 @@ namespace app
 
         sys::ReturnCodes InitHandler() override;
 
-        sys::ReturnCodes DeinitHandler() override;
-
         sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override
         {
             return sys::ReturnCodes::Success;
