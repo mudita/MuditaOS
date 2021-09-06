@@ -14,7 +14,8 @@ target_sources(alarms
         src/actions/FrontlightAction.hpp
         src/actions/NotifyGUIAction.hpp
     PUBLIC
-        include/popups/AlarmPopupRequestParams.hpp
+        include/popups/AlarmActivatedPopupRequestParams.hpp
+        include/popups/AlarmDeactivatedPopupRequestParams.hpp
 )
 
 target_include_directories(alarms
