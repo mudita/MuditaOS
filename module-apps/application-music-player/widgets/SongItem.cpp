@@ -35,7 +35,8 @@ namespace gui
         secondHBox->setEdges(RectangleEdge::None);
 
         durationText = new TextFixedSize(firstHBox, 0, 0, 0, 0);
-        durationText->setMinimumSize(songItem::duration_w, songItem::text_h);
+        durationText->setMinimumWidthToFitText(duration);
+        durationText->setMinimumHeight(songItem::text_h);
         durationText->setMargins(Margins(0, 0, songItem::rightMargin, 0));
         durationText->setEdges(RectangleEdge::None);
         durationText->drawUnderline(false);
