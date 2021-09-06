@@ -9,4 +9,7 @@ pytest==6.1.2
 six==1.15.0
 toml==0.10.2
 inotify==0.2.10
+dataclasses==0.6
 dataclasses_json==0.5.4
+tqdm=4.62.2
+eyed3=0.9.6
