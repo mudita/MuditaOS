@@ -39,6 +39,11 @@ else()
     set (LOG_LUART_ENABLED 0 CACHE INTERNAL "")
 endif()
 
+# add Development Configuration option
+option(WITH_DEVELOPMENT_FEATURES "Include development features" OFF)
+set(DEVELOPER_SETTINGS_OPTIONS_DEFAULT ${WITH_DEVELOPMENT_FEATURES} CACHE INTERNAL "")
+set(ENABLE_DEVELOPER_MODE_ENDPOINT_DEFAULT ${WITH_DEVELOPMENT_FEATURES} CACHE INTERNAL "")
+
 # add Mudita USB Vendor/Product IDs
 option(MUDITA_USB_ID "Enables using Mudita registered USB Vendor ID and Pure Phone USB Product ID" ON)
 
