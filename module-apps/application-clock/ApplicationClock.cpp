@@ -78,7 +78,7 @@ namespace app
     sys::ReturnCodes ApplicationClock::DeinitHandler()
     {
         timerClock.stop();
-        return sys::ReturnCodes::Success;
+        return Application::DeinitHandler();
     }
 
     void ApplicationClock::createUserInterface()

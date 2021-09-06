@@ -148,11 +148,6 @@ namespace app
         return ret;
     }
 
-    sys::ReturnCodes ApplicationAntenna::DeinitHandler()
-    {
-        return sys::ReturnCodes::Success;
-    }
-
     void ApplicationAntenna::createUserInterface()
     {
         using namespace gui::name::window;
