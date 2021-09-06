@@ -9,11 +9,11 @@
 #include <ListItem.hpp>
 #include <BoxLayout.hpp>
 #include <Label.hpp>
-#include <application-alarm-clock/presenter/AlarmPresenter.hpp>
+#include <application-alarm-clock/presenter/AlarmRRulePresenter.hpp>
 
 namespace gui
 {
-    class AlarmItem : public ListItem, public app::alarmClock::AlarmEventItem
+    class AlarmItem : public ListItem, public app::alarmClock::AlarmRRuleItem
     {
         gui::HBox *hBox              = nullptr;
         gui::VBox *vBox              = nullptr;
@@ -23,6 +23,6 @@ namespace gui
         void setAlarm();
 
       public:
-        explicit AlarmItem(app::alarmClock::AlarmPresenter);
+        explicit AlarmItem(std::shared_ptr<app::alarmClock::AlarmRRulePresenter>);
     };
 } // namespace gui

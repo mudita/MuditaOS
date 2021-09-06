@@ -125,11 +125,6 @@ namespace gui
         setOnInputCallback(*dayInput);
         setOnInputCallback(*monthInput);
         setOnInputCallback(*yearInput);
-
-        dimensionChangedCallback = [&](gui::Item &, const BoundingBox &newDim) -> bool {
-            vBox->setArea({0, 0, newDim.w, newDim.h});
-            return true;
-        };
     }
 
     date::year_month_day DateWidget::validateDate()

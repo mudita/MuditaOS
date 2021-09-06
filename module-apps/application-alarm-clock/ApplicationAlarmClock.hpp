@@ -16,7 +16,7 @@ namespace app
                               std::string parent,
                               sys::phone_modes::PhoneMode phoneMode       = sys::phone_modes::PhoneMode::Connected,
                               sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled,
-                              uint32_t stackDepth                         = 4096,
+                              uint32_t stackDepth                         = 4096 * 2,
                               sys::ServicePriority priority               = sys::ServicePriority::Idle);
 
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;

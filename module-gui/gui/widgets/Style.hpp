@@ -165,6 +165,7 @@ namespace style
             inline constexpr auto call           = "common_call";
             inline constexpr auto send           = "common_send";
             inline constexpr auto save           = "common_save";
+            inline constexpr auto edit           = "common_edit";
             inline constexpr auto import         = "common_import";
             inline constexpr auto confirm        = "common_confirm";
             inline constexpr auto select         = "common_select";
@@ -237,6 +238,8 @@ namespace style
 
         inline constexpr auto item_width_with_scroll =
             style::window::default_body_width - style::listview::scroll::item_margin;
+        inline constexpr auto item_width_with_without_scroll =
+            style::window::default_body_width - 2 * style::listview::scroll::item_margin;
         inline constexpr auto body_width_with_scroll =
             style::window::default_body_width + style::listview::scroll::margin;
 

@@ -10,7 +10,8 @@
 
 namespace gui
 {
-    AlarmItem::AlarmItem(app::alarmClock::AlarmPresenter p) : AlarmEventItem(p)
+    AlarmItem::AlarmItem(std::shared_ptr<app::alarmClock::AlarmRRulePresenter> presenter)
+        : AlarmRRuleItem(std::move(presenter))
     {
         setMinimumSize(style::window::default_body_width, style::alarmClock::window::item::height);
         setMargins(gui::Margins(0, style::margins::small, 0, style::alarmClock::window::item::botMargin));
@@ -20,26 +21,24 @@ namespace gui
 
         vBox = new gui::VBox(hBox, 0, 0, 0, 0);
         vBox->setEdges(gui::RectangleEdge::None);
-        vBox->setMinimumSize(style::alarmClock::window::item::vBoxWidth, style::alarmClock::window::item::height);
-        vBox->setMargins(gui::Margins(style::alarmClock::window::item::vBoxLeftMargin, 0, 0, 0));
+        vBox->setMaximumSize(style::window::default_body_width, style::alarmClock::window::item::height);
+        vBox->setMargins(gui::Margins(style::widgets::leftMargin, 0, 0, 0));
 
         timeLabel = new gui::Label(vBox, 0, 0, 0, 0);
         timeLabel->setEdges(gui::RectangleEdge::None);
-        timeLabel->setMinimumSize(style::alarmClock::window::item::vBoxWidth,
-                                  style::alarmClock::window::item::timeHeight);
+        timeLabel->setMaximumSize(style::window::default_body_width, style::alarmClock::window::item::timeHeight);
         timeLabel->setMargins(gui::Margins(0, style::margins::small, 0, 0));
         timeLabel->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
         timeLabel->setFont(style::window::font::largelight);
 
         periodLabel = new gui::Label(vBox, 0, 0, 0, 0);
         periodLabel->setEdges(gui::RectangleEdge::None);
-        periodLabel->setMinimumSize(style::alarmClock::window::item::vBoxWidth,
-                                    style::alarmClock::window::item::periodHeight);
+        periodLabel->setMaximumSize(style::window::default_body_width, style::alarmClock::window::item::periodHeight);
         periodLabel->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top});
         periodLabel->setFont(style::window::font::small);
 
         onOffImage = new gui::ButtonOnOff(hBox, ButtonState::On);
-        onOffImage->setMargins(gui::Margins(style::alarmClock::window::item::imageMargin, 0, 0, 0));
+        onOffImage->setMargins(gui::Margins(0, 0, style::widgets::rightMargin, 0));
 
         setAlarm();
 
@@ -51,16 +50,16 @@ namespace gui
 
     void AlarmItem::setAlarm()
     {
-        timeLabel->setText(TimePointToLocalizedTimeString(presenter().getAlarm()->startDate));
-        onOffImage->switchState(presenter().getAlarm()->enabled ? ButtonState::Off : ButtonState::On);
+        timeLabel->setText(TimePointToLocalizedTimeString(getPresenter()->getAlarm()->startDate));
+        onOffImage->switchState(getPresenter()->getAlarm()->enabled ? ButtonState::Off : ButtonState::On);
 
-        if (presenter().hasRecurrence()) {
-            periodLabel->setText(presenter().getDescription());
+        if (getPresenter()->hasRecurrence()) {
+            periodLabel->setText(getPresenter()->getDescription());
         }
 
         if (periodLabel->getText().empty()) {
             periodLabel->setMaximumSize(0, 0);
-            timeLabel->setMinimumSize(style::alarmClock::window::item::vBoxWidth,
+            timeLabel->setMaximumSize(style::window::default_body_width,
                                       style::alarmClock::window::item::timeHeight +
                                           style::alarmClock::window::item::periodHeight);
             vBox->resizeItems();
