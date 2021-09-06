@@ -109,11 +109,6 @@ namespace app
         bus.sendUnicast(std::make_shared<onBoarding::FinalizeOnBoarding>(), service::name::appmgr);
     }
 
-    sys::ReturnCodes ApplicationOnBoarding::DeinitHandler()
-    {
-        return sys::ReturnCodes::Success;
-    }
-
     sys::ReturnCodes ApplicationOnBoarding::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
     {
         return sys::ReturnCodes::Success;
