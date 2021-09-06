@@ -36,43 +36,43 @@ const std::vector<Album> albums = {{.artist = artists[0], .title = {}},
 
 const std::vector<TableRow> records = {
     {Record{DB_ID_NONE},
-     .fileInfo        = {.path = "user/music", .mediaType = "audio/mp3", .size = 100},
+     .fileInfo        = {.path = "user/music/file1.mp3", .mediaType = "audio/mp3", .size = 100},
      .tags            = {.title = song1, .album = albums[3], .comment = "", .genre = "", .year = 2011, .track = 1},
      .audioProperties = {.songLength = 300, .bitrate = 320, .sampleRate = 44100, .channels = 1}},
     {Record{DB_ID_NONE},
-     .fileInfo        = {.path = "user/music", .mediaType = "audio/mp3", .size = 100},
+     .fileInfo        = {.path = "user/music/file2.mp3", .mediaType = "audio/mp3", .size = 100},
      .tags            = {.title = song2, .album = albums[3], .comment = "", .genre = "", .year = 2011, .track = 1},
      .audioProperties = {.songLength = 300, .bitrate = 320, .sampleRate = 44100, .channels = 1}},
     {Record{DB_ID_NONE},
-     .fileInfo        = {.path = "user/music", .mediaType = "audio/mp3", .size = 100},
+     .fileInfo        = {.path = "user/music/file3.mp3", .mediaType = "audio/mp3", .size = 100},
      .tags            = {.title = song2, .album = albums[4], .comment = "", .genre = "", .year = 2011, .track = 1},
      .audioProperties = {.songLength = 300, .bitrate = 320, .sampleRate = 44100, .channels = 1}},
     {Record{DB_ID_NONE},
-     .fileInfo        = {.path = "user/music", .mediaType = "audio/mp3", .size = 100},
+     .fileInfo        = {.path = "user/music/file4.mp3", .mediaType = "audio/mp3", .size = 100},
      .tags            = {.title = song2, .album = albums[5], .comment = "", .genre = "", .year = 2011, .track = 1},
      .audioProperties = {.songLength = 300, .bitrate = 320, .sampleRate = 44100, .channels = 1}},
     {Record{DB_ID_NONE},
-     .fileInfo        = {.path = "user/music", .mediaType = "audio/mp3", .size = 100},
+     .fileInfo        = {.path = "user/music/file5.mp3", .mediaType = "audio/mp3", .size = 100},
      .tags            = {.title = song3, .album = albums[0], .comment = "", .genre = "", .year = 2011, .track = 1},
      .audioProperties = {.songLength = 300, .bitrate = 320, .sampleRate = 44100, .channels = 1}},
     {Record{DB_ID_NONE},
-     .fileInfo        = {.path = "user/music", .mediaType = "audio/mp3", .size = 100},
+     .fileInfo        = {.path = "user/music/file6.mp3", .mediaType = "audio/mp3", .size = 100},
      .tags            = {.title = song3, .album = albums[7], .comment = "", .genre = "", .year = 2011, .track = 1},
      .audioProperties = {.songLength = 300, .bitrate = 320, .sampleRate = 44100, .channels = 1}},
     {Record{DB_ID_NONE},
-     .fileInfo        = {.path = "user/music", .mediaType = "audio/mp3", .size = 100},
+     .fileInfo        = {.path = "user/music/file7.mp3", .mediaType = "audio/mp3", .size = 100},
      .tags            = {.title = song3, .album = albums[5], .comment = "", .genre = "", .year = 2011, .track = 1},
      .audioProperties = {.songLength = 300, .bitrate = 320, .sampleRate = 44100, .channels = 1}},
     {Record{DB_ID_NONE},
-     .fileInfo        = {.path = "user/music", .mediaType = "audio/mp3", .size = 100},
+     .fileInfo        = {.path = "user/file1.mp3", .mediaType = "audio/mp3", .size = 100},
      .tags            = {.title = song3, .album = albums[2], .comment = "", .genre = "", .year = 2011, .track = 1},
      .audioProperties = {.songLength = 300, .bitrate = 320, .sampleRate = 44100, .channels = 1}},
     {Record{DB_ID_NONE},
-     .fileInfo        = {.path = "user/music", .mediaType = "audio/mp3", .size = 100},
+     .fileInfo        = {.path = "user/file2.mp3", .mediaType = "audio/mp3", .size = 100},
      .tags            = {.title = song3, .album = albums[1], .comment = "", .genre = "", .year = 2011, .track = 1},
      .audioProperties = {.songLength = 300, .bitrate = 320, .sampleRate = 44100, .channels = 1}},
     {Record{DB_ID_NONE},
-     .fileInfo        = {.path = "user/music", .mediaType = "audio/mp3", .size = 100},
+     .fileInfo        = {.path = "user/file3.mp3", .mediaType = "audio/mp3", .size = 100},
      .tags            = {.title = song3, .album = albums[6], .comment = "", .genre = "", .year = 2011, .track = 1},
      .audioProperties = {.songLength = 300, .bitrate = 320, .sampleRate = 44100, .channels = 1}}};
 
@@ -150,6 +150,15 @@ TEST_CASE("Multimedia DB tests")
             REQUIRE(db.files.count() == 0);
         }
 
+        SECTION("Add for existing path")
+        {
+            auto resultPre               = db.files.getById(2);
+            resultPre.fileInfo.mediaType = "bla bla";
+            REQUIRE(db.files.add(resultPre));
+            auto resultPost = db.files.getById(2);
+            REQUIRE((resultPre.ID == resultPost.ID && resultPre.fileInfo.mediaType == resultPost.fileInfo.mediaType));
+        }
+
         SECTION("Update")
         {
             auto resultPre               = db.files.getById(2);
@@ -157,6 +166,53 @@ TEST_CASE("Multimedia DB tests")
             REQUIRE(db.files.update(resultPre));
             auto resultPost = db.files.getById(2);
             REQUIRE((resultPre.ID == resultPost.ID && resultPre.fileInfo.mediaType == resultPost.fileInfo.mediaType));
+        }
+
+        SECTION("Add or Update")
+        {
+            REQUIRE(db.files.removeAll());
+            REQUIRE(db.files.count() == 0);
+
+            for (const auto &record : records) {
+                REQUIRE(db.files.addOrUpdate(record));
+            }
+
+            REQUIRE(db.files.count() == records.size());
+
+            auto oldPath           = records[1].fileInfo.path;
+            auto resultPre         = db.files.getByPath(oldPath);
+            const auto referenceID = resultPre.ID;
+            resultPre.ID           = 10;
+
+            SECTION("No changes")
+            {
+                REQUIRE(db.files.addOrUpdate(resultPre));
+                REQUIRE(db.files.count() == records.size());
+                auto resultPost = db.files.getByPath(oldPath);
+                REQUIRE(resultPost.isValid());
+                REQUIRE((resultPost.ID == referenceID && resultPre.fileInfo.path == resultPost.fileInfo.path));
+            }
+            SECTION("change path")
+            {
+                auto newPath            = "user/newPath";
+                resultPre.fileInfo.path = newPath;
+                REQUIRE(db.files.addOrUpdate(resultPre, oldPath));
+                REQUIRE(db.files.count() == records.size());
+                auto notExistingEntry = db.files.getByPath(oldPath);
+                REQUIRE(!notExistingEntry.isValid());
+                auto resultPost = db.files.getByPath(newPath);
+                REQUIRE(resultPost.isValid());
+                REQUIRE((resultPost.ID == referenceID && resultPre.fileInfo.path == resultPost.fileInfo.path));
+            }
+            SECTION("change any field")
+            {
+                resultPre.fileInfo.mediaType = "bla bla";
+                REQUIRE(db.files.addOrUpdate(resultPre));
+                auto resultPost = db.files.getByPath(oldPath);
+                REQUIRE(resultPost.isValid());
+                REQUIRE((resultPost.ID == referenceID && resultPre.fileInfo.path == resultPost.fileInfo.path &&
+                         resultPre.fileInfo.mediaType == resultPost.fileInfo.mediaType));
+            }
         }
 
         SECTION("getLimitOffset")
@@ -256,8 +312,24 @@ TEST_CASE("Multimedia DB tests")
             REQUIRE(result->getResult());
         };
 
+        auto addOrUpdateQuery = [&](const MultimediaFilesRecord &record, std::string oldPath = "") {
+            auto query  = std::make_shared<db::multimedia_files::query::AddOrEdit>(record, oldPath);
+            auto ret    = multimediaFilesRecordInterface.runQuery(query);
+            auto result = dynamic_cast<db::multimedia_files::query::AddOrEditResult *>(ret.get());
+            REQUIRE(result != nullptr);
+            REQUIRE(result->getResult());
+        };
+
         auto getQuery = [&](uint32_t id) {
             auto query  = std::make_shared<db::multimedia_files::query::Get>(id);
+            auto ret    = multimediaFilesRecordInterface.runQuery(query);
+            auto result = dynamic_cast<db::multimedia_files::query::GetResult *>(ret.get());
+            REQUIRE(result != nullptr);
+            return result->getResult();
+        };
+
+        auto getByPathQuery = [&](std::string path) {
+            auto query  = std::make_shared<db::multimedia_files::query::GetByPath>(path);
             auto ret    = multimediaFilesRecordInterface.runQuery(query);
             auto result = dynamic_cast<db::multimedia_files::query::GetResult *>(ret.get());
             REQUIRE(result != nullptr);
@@ -297,10 +369,18 @@ TEST_CASE("Multimedia DB tests")
             REQUIRE(result->getResult());
         };
 
+        auto removeByPathQuery = [&](const std::string &path) {
+            const auto query  = std::make_shared<db::multimedia_files::query::RemoveByPath>(path);
+            const auto ret    = multimediaFilesRecordInterface.runQuery(query);
+            const auto result = dynamic_cast<db::multimedia_files::query::RemoveResult *>(ret.get());
+            REQUIRE(result != nullptr);
+            REQUIRE(result->getResult());
+        };
+
         auto removeAllQuery = [&]() {
             const auto query  = std::make_shared<db::multimedia_files::query::RemoveAll>();
             const auto ret    = multimediaFilesRecordInterface.runQuery(query);
-            const auto result = dynamic_cast<db::multimedia_files::query::RemoveAllResult *>(ret.get());
+            const auto result = dynamic_cast<db::multimedia_files::query::RemoveResult *>(ret.get());
             REQUIRE(result != nullptr);
             REQUIRE(result->getResult());
         };
@@ -392,6 +472,13 @@ TEST_CASE("Multimedia DB tests")
                 auto result = getQuery(1);
                 REQUIRE(!result.isValid());
             }
+            SECTION("Remove by Path")
+            {
+                removeByPathQuery(path);
+                REQUIRE(getCountQuery() == 0);
+                auto result = getQuery(1);
+                REQUIRE(!result.isValid());
+            }
         }
 
         for (const auto &record : records) {
@@ -405,6 +492,15 @@ TEST_CASE("Multimedia DB tests")
             REQUIRE(getCountQuery() == 0);
         }
 
+        SECTION("Add for existing path")
+        {
+            auto resultPre               = getQuery(2);
+            resultPre.fileInfo.mediaType = "bla bla";
+            addQuery(resultPre);
+            auto resultPost = getQuery(2);
+            REQUIRE((resultPre.ID == resultPost.ID && resultPre.fileInfo.mediaType == resultPost.fileInfo.mediaType));
+        }
+
         SECTION("Update")
         {
             auto resultPre               = getQuery(2);
@@ -412,6 +508,53 @@ TEST_CASE("Multimedia DB tests")
             updateQuery(resultPre);
             auto resultPost = getQuery(2);
             REQUIRE((resultPre.ID == resultPost.ID && resultPre.fileInfo.mediaType == resultPost.fileInfo.mediaType));
+        }
+
+        SECTION("Add or Update")
+        {
+            removeAllQuery();
+            REQUIRE(getCountQuery() == 0);
+
+            for (const auto &record : records) {
+                addOrUpdateQuery(record);
+            }
+
+            REQUIRE(getCountQuery() == records.size());
+
+            auto oldPath           = records[1].fileInfo.path;
+            auto resultPre         = getByPathQuery(oldPath);
+            const auto referenceID = resultPre.ID;
+            resultPre.ID           = 10;
+
+            SECTION("No changes")
+            {
+                addOrUpdateQuery(resultPre);
+                REQUIRE(getCountQuery() == records.size());
+                auto resultPost = getByPathQuery(oldPath);
+                REQUIRE(resultPost.isValid());
+                REQUIRE((resultPost.ID == referenceID && resultPre.fileInfo.path == resultPost.fileInfo.path));
+            }
+            SECTION("change path")
+            {
+                auto newPath            = "user/newPath";
+                resultPre.fileInfo.path = newPath;
+                addOrUpdateQuery(resultPre, oldPath);
+                REQUIRE(getCountQuery() == records.size());
+                auto notExistingEntry = getByPathQuery(oldPath);
+                REQUIRE(!notExistingEntry.isValid());
+                auto resultPost = getByPathQuery(newPath);
+                REQUIRE(resultPost.isValid());
+                REQUIRE((resultPost.ID == referenceID && resultPre.fileInfo.path == resultPost.fileInfo.path));
+            }
+            SECTION("change any field")
+            {
+                resultPre.fileInfo.mediaType = "bla bla";
+                addOrUpdateQuery(resultPre);
+                auto resultPost = getByPathQuery(oldPath);
+                REQUIRE(resultPost.isValid());
+                REQUIRE((resultPost.ID == referenceID && resultPre.fileInfo.path == resultPost.fileInfo.path &&
+                         resultPre.fileInfo.mediaType == resultPost.fileInfo.mediaType));
+            }
         }
 
         SECTION("getLimitOffset")

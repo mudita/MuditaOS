@@ -14,16 +14,16 @@ namespace db::multimedia_files
     using Artist = std::string;
     struct Album
     {
-        Artist artist;
-        std::string title;
+        Artist artist{};
+        std::string title{};
     };
 
     struct Tags
     {
-        std::string title;
-        Album album;
-        std::string comment;
-        std::string genre;
+        std::string title{};
+        Album album{};
+        std::string comment{};
+        std::string genre{};
         unsigned year{};
         unsigned track{};
     };
@@ -38,16 +38,16 @@ namespace db::multimedia_files
 
     struct FileInfo
     {
-        std::string path;
-        std::string mediaType; /// mime type e.g. "audio/mp3"
-        std::size_t size{};    /// in bytes
+        std::string path{};
+        std::string mediaType{}; /// mime type e.g. "audio/mp3"
+        std::size_t size{};      /// in bytes
     };
 
     struct TableRow : public Record
     {
-        FileInfo fileInfo;
-        Tags tags;
-        AudioProperties audioProperties;
+        FileInfo fileInfo{};
+        Tags tags{};
+        AudioProperties audioProperties{};
 
         auto isValid() const -> bool;
     };
@@ -100,6 +100,11 @@ namespace db::multimedia_files
 
         auto getLimitOffset(const Album &album, uint32_t offset, uint32_t limit) -> std::vector<TableRow>;
         auto count(const Album &album) -> uint32_t;
+
+        TableRow getByPath(std::string path);
+
+        /// @note entry.ID is skipped
+        bool addOrUpdate(TableRow entry, std::string oldPath = "");
 
       private:
         auto getFieldName(TableFields field) -> std::string;

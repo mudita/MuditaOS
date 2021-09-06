@@ -16,6 +16,8 @@ namespace db::multimedia_files
 namespace db::multimedia_files::query
 {
     class Add;
+    class AddOrEdit;
+    class AddOrEditResult;
     class AddResult;
     class Edit;
     class EditResult;
@@ -24,6 +26,7 @@ namespace db::multimedia_files::query
     class GetAlbumsLimitedResult;
     class GetArtistsLimited;
     class GetArtistsLimitedResult;
+    class GetByPath;
     class GetCount;
     class GetCountAlbums;
     class GetCountArtists;
@@ -37,7 +40,8 @@ namespace db::multimedia_files::query
     class GetResult;
     class Remove;
     class RemoveAll;
-    class RemoveAllResult;
+    class RemoveAll;
+    class RemoveByPath;
     class RemoveResult;
 } // namespace db::multimedia_files::query
 
@@ -60,13 +64,15 @@ namespace db::multimedia_files
             const std::shared_ptr<db::multimedia_files::query::Add> &query);
         std::unique_ptr<db::multimedia_files::query::EditResult> runQueryImplEdit(
             const std::shared_ptr<db::multimedia_files::query::Edit> &query);
+        std::unique_ptr<db::multimedia_files::query::AddOrEditResult> runQueryImplAddOrEdit(
+            const std::shared_ptr<db::multimedia_files::query::AddOrEdit> &query);
         std::unique_ptr<db::multimedia_files::query::GetResult> runQueryImplGet(
             const std::shared_ptr<db::multimedia_files::query::Get> &query);
         std::unique_ptr<db::multimedia_files::query::GetLimitedResult> runQueryImplGetLimited(
             const std::shared_ptr<db::multimedia_files::query::GetLimited> &query);
         std::unique_ptr<db::multimedia_files::query::RemoveResult> runQueryImplRemove(
             const std::shared_ptr<db::multimedia_files::query::Remove> &query);
-        std::unique_ptr<db::multimedia_files::query::RemoveAllResult> runQueryImplRemoveAll(
+        std::unique_ptr<db::multimedia_files::query::RemoveResult> runQueryImplRemoveAll(
             const std::shared_ptr<db::multimedia_files::query::RemoveAll> &query);
         std::unique_ptr<db::multimedia_files::query::GetCountResult> runQueryImplGetCount(
             const std::shared_ptr<db::multimedia_files::query::GetCount> &query);
@@ -86,8 +92,11 @@ namespace db::multimedia_files
             const std::shared_ptr<db::multimedia_files::query::GetLimitedForAlbum> &query);
         std::unique_ptr<db::multimedia_files::query::GetCountResult> runQueryImplGetCount(
             const std::shared_ptr<db::multimedia_files::query::GetCountForAlbum> &query);
+        std::unique_ptr<db::multimedia_files::query::GetResult> runQueryImplGetByPath(
+            const std::shared_ptr<db::multimedia_files::query::GetByPath> &query);
+        std::unique_ptr<db::multimedia_files::query::RemoveResult> runQueryImplRemoveByPath(
+            const std::shared_ptr<db::multimedia_files::query::RemoveByPath> &query);
 
-      private:
         MultimediaFilesDB *database = nullptr;
     };
 } // namespace db::multimedia_files

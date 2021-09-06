@@ -31,7 +31,7 @@
 
 namespace stm
 {
-    constexpr auto automaticTimezoneName = "";
+    constexpr auto automaticTimezoneName  = "";
     constexpr auto automaticTimezoneRules = "UTC0";
 
     ServiceTime::ServiceTime() : sys::Service(service::name::service_time, "", StackDepth)
@@ -44,7 +44,7 @@ namespace stm
         auto alarmEventsRepo = std::make_unique<alarms::AlarmEventsDBRepository>(this);
         auto alarmOperations = std::make_unique<alarms::AlarmOperations>(std::move(alarmEventsRepo), TimePointNow);
         alarmOperations->updateEventsCache(TimePointNow());
-        alarmMessageHandler  = std::make_unique<alarms::AlarmMessageHandler>(this, std::move(alarmOperations));
+        alarmMessageHandler = std::make_unique<alarms::AlarmMessageHandler>(this, std::move(alarmOperations));
     }
 
     ServiceTime::~ServiceTime()
@@ -213,7 +213,7 @@ namespace stm
 
     auto ServiceTime::handleSetTimezoneRequest(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>
     {
-        auto message = static_cast<stm::message::SetTimezoneRequest *>(request);
+        auto message       = static_cast<stm::message::SetTimezoneRequest *>(request);
         auto timeZoneName  = message->getTimezoneName();
         auto timeZoneRules = utils::time::getTimeZoneRules(timeZoneName);
 
@@ -230,7 +230,7 @@ namespace stm
     auto ServiceTime::handleCellularTimeNotificationMessage(sys::Message *request)
         -> std::shared_ptr<sys::ResponseMessage>
     {
-        auto message  = static_cast<CellularTimeNotificationMessage *>(request);
+        auto message       = static_cast<CellularTimeNotificationMessage *>(request);
         auto timezoneRules = TimezoneHandler(std::chrono::duration_cast<std::chrono::minutes>(
                                                  std::chrono::seconds{message->getTimeZoneOffset().value()}))
                                  .getTimezone();

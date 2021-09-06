@@ -28,6 +28,7 @@ namespace db
             CountryCodes,
             Notifications,
             Quotes,
+            MultimediaFiles
         };
     };
 }; // namespace db
@@ -55,6 +56,8 @@ constexpr const char *c_str(enum db::Interface::Name db)
         return "Notifications";
     case db::Interface::Name::Quotes:
         return "Quotes";
+    case db::Interface::Name::MultimediaFiles:
+        return "MultimediaFiles";
     };
     return "";
 }

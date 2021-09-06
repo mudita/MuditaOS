@@ -7,11 +7,7 @@
 
 #include "Constants.hpp"
 #include "StartupIndexer.hpp"
-
-namespace purefs::fs
-{
-    class inotify;
-}
+#include "InotifyHandler.hpp"
 
 namespace service
 {
@@ -29,13 +25,7 @@ namespace service
         sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override;
 
       private:
-        // On update or create content
-        auto onUpdateOrCreate(std::string_view path) -> int;
-        // On remove content
-        auto onRemove(std::string_view path) -> int;
-
-      private:
-        std::shared_ptr<purefs::fs::inotify> mfsNotifier;
+        detail::InotifyHandler mInotifyHandler;
         detail::StartupIndexer mStartupIndexer;
     };
 
