@@ -1,11 +1,13 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "StartupIndexer.hpp"
+#include <service-fileindexer/StartupIndexer.hpp>
+#include <service-fileindexer/Constants.hpp>
+
 #include <Timers/TimerFactory.hpp>
 #include <purefs/filesystem_paths.hpp>
 #include <purefs/fs/inotify_message.hpp>
-#include "Constants.hpp"
+
 #include <filesystem>
 #include <fstream>
 

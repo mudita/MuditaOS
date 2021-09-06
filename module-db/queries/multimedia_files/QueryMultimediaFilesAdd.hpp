@@ -31,4 +31,28 @@ namespace db::multimedia_files::query
         [[nodiscard]] auto debugInfo() const -> std::string override;
     };
 
+    class AddOrEdit : public Query
+    {
+        const MultimediaFilesRecord record;
+        const std::string oldPath;
+
+      public:
+        /// @param record record with modifications @note ID is skipped
+        /// @param oldPath record old path (when changed), empty if not related
+        explicit AddOrEdit(const MultimediaFilesRecord &record, std::string oldPath = "");
+        [[nodiscard]] auto getRecord() const -> MultimediaFilesRecord;
+        [[nodiscard]] auto getOldPath() const -> std::string;
+        [[nodiscard]] auto debugInfo() const -> std::string override;
+    };
+
+    class AddOrEditResult : public QueryResult
+    {
+        const bool ret = false;
+
+      public:
+        explicit AddOrEditResult(bool ret);
+        [[nodiscard]] auto getResult() const -> bool;
+        [[nodiscard]] auto debugInfo() const -> std::string override;
+    };
+
 } // namespace db::multimedia_files::query
