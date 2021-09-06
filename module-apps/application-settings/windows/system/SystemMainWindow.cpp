@@ -41,9 +41,7 @@ namespace gui
                                             utils::translate("app_settings_display_factory_reset_confirmation"),
                                             "",
                                             [this]() {
-                                                auto msg = std::make_shared<sdesktop::FactoryMessage>();
-                                                application->bus.sendUnicast(msg, service::name::service_desktop);
-                                                application->returnToPreviousWindow(2);
+                                                sys::SystemManagerCommon::FactoryReset(application);
                                                 return true;
                                             }});
                     LOG_INFO("switching to %s page", window.c_str());

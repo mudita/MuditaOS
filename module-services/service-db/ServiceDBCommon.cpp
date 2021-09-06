@@ -6,6 +6,8 @@
 #include <service-db/ServiceDBCommon.hpp>
 #include <service-db/agents/quotes/QuotesAgent.cpp>
 
+#include <purefs/filesystem_paths.hpp>
+
 static const auto service_db_stack = 1024 * 24;
 
 ServiceDBCommon::ServiceDBCommon() : sys::Service(service::name::db, "", service_db_stack, sys::ServicePriority::Idle)
@@ -63,7 +65,29 @@ sys::ReturnCodes ServiceDBCommon::DeinitHandler()
 
 void ServiceDBCommon::ProcessCloseReason(sys::CloseReason closeReason)
 {
+    if (closeReason == sys::CloseReason::FactoryReset) {
+        factoryReset();
+    }
     sendCloseReadyMessage(this);
+}
+
+void ServiceDBCommon::factoryReset() const
+{
+    constexpr std::array fileExtensions = {".db", ".db-journal", ".db-wal"};
+
+    LOG_INFO("Performing DB factory reset...");
+    const auto userOSPath = purefs::dir::getUserDiskPath();
+    for (const auto &f : std::filesystem::directory_iterator(userOSPath)) {
+        if (const auto it = std::find(fileExtensions.begin(), fileExtensions.end(), f.path().extension());
+            it != fileExtensions.end()) {
+            if (const auto removeStatus = std::filesystem::remove(f.path()); !removeStatus) {
+                LOG_ERROR("Unable to delete file: %s", f.path().c_str());
+            }
+            else {
+                LOG_INFO("File deleted: %s", f.path().c_str());
+            }
+        }
+    }
 }
 
 sys::ReturnCodes ServiceDBCommon::SwitchPowerModeHandler(const sys::ServicePowerMode mode)

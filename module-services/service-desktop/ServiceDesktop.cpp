@@ -6,7 +6,6 @@
 #include "service-desktop/ServiceDesktop.hpp"
 #include "service-desktop/WorkerDesktop.hpp"
 #include "service-cellular/CellularMessage.hpp"
-#include "endpoints/factoryReset/FactoryReset.hpp"
 #include "endpoints/backup/BackupRestore.hpp"
 
 #include <Common/Query.hpp>
@@ -143,7 +142,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
         auto *factoryMessage = dynamic_cast<sdesktop::FactoryMessage *>(msg);
         if (factoryMessage != nullptr) {
             LOG_DEBUG("ServiceDesktop: FactoryMessage received");
-            FactoryReset::Run(this);
+            sys::SystemManagerCommon::FactoryReset(this);
         }
         return sys::MessageNone{};
     });
