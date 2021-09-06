@@ -7,10 +7,10 @@
 
 namespace gui
 {
-    class AlarmPopupRequestParams : public PopupRequestParams
+    class AlarmActivatedPopupRequestParams : public PopupRequestParams
     {
       public:
-        AlarmPopupRequestParams() : PopupRequestParams{gui::popup::ID::AlarmActivated}
+        AlarmActivatedPopupRequestParams() : PopupRequestParams{gui::popup::ID::AlarmActivated}
         {}
     };
 } // namespace gui

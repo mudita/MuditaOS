@@ -4,6 +4,7 @@ target_sources(appmgr
     PRIVATE
         ApplicationManager.cpp
     PUBLIC
+        include/appmgr/messages/AlarmMessage.hpp
         include/appmgr/ApplicationManager.hpp
 )
 
@@ -14,8 +15,8 @@ target_include_directories(appmgr
 
 target_link_libraries(appmgr
    PRIVATE
-        alarms
-        evtmgr
         module-apps
         service-appmgr
+   PUBLIC
+        alarms
 )

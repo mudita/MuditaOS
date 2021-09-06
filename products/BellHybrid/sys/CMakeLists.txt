@@ -4,6 +4,7 @@ target_sources(sys
     PRIVATE
         SystemManager.cpp
     PUBLIC
+        include/sys/messages/AlarmActivationStatusChangeRequest.hpp
         include/sys/SystemManager.hpp
 )
 
@@ -14,5 +15,6 @@ target_include_directories(sys
 
 target_link_libraries(sys
     PRIVATE
+        appmgr
         module-sys
 )
