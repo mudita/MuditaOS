@@ -39,6 +39,7 @@ namespace sys
         Restore,
         Reboot,
         RebootToUpdate,
+        FactoryReset,
         None,
     };
 
@@ -91,6 +92,8 @@ namespace sys
         virtual void StartSystem(InitFunction sysInit, InitFunction appSpaceInit);
 
         static bool Restore(Service *s);
+
+        static bool FactoryReset(Service *s);
 
         static bool Reboot(Service *s);
 

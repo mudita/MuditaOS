@@ -232,9 +232,16 @@ namespace sys
         return true;
     }
 
+    bool SystemManagerCommon::FactoryReset(Service *s)
+    {
+        return s->bus.sendUnicast(std::make_shared<SystemManagerCmd>(Code::FactoryReset, CloseReason::FactoryReset),
+                                  service::name::system_manager);
+    }
+
     bool SystemManagerCommon::Reboot(Service *s)
     {
-        s->bus.sendUnicast(std::make_shared<SystemManagerCmd>(Code::Reboot), service::name::system_manager);
+        s->bus.sendUnicast(std::make_shared<SystemManagerCmd>(Code::Reboot, CloseReason::Reboot),
+                           service::name::system_manager);
         return true;
     }
 
@@ -473,6 +480,9 @@ namespace sys
                     break;
                 case Code::RebootToUpdate:
                     RebootHandler(State::RebootToUpdate, data->updateReason);
+                    break;
+                case Code::FactoryReset:
+                    CloseSystemHandler(CloseReason::FactoryReset);
                     break;
                 case Code::None:
                     break;
