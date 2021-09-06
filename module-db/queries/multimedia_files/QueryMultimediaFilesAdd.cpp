@@ -30,4 +30,37 @@ namespace db::multimedia_files::query
     {
         return std::string{"AddResult"};
     }
+
+    AddOrEdit::AddOrEdit(const MultimediaFilesRecord &record, std::string oldPath)
+        : Query(Query::Type::Create), record(record), oldPath(oldPath)
+    {}
+
+    auto AddOrEdit::getRecord() const -> MultimediaFilesRecord
+    {
+        return record;
+    }
+
+    auto AddOrEdit::getOldPath() const -> std::string
+    {
+        return oldPath;
+    }
+
+    auto AddOrEdit::debugInfo() const -> std::string
+    {
+        return std::string{"AddOrEdit"};
+    }
+
+    AddOrEditResult::AddOrEditResult(bool ret) : ret(ret)
+    {}
+
+    auto AddOrEditResult::getResult() const -> bool
+    {
+        return ret;
+    }
+
+    auto AddOrEditResult::debugInfo() const -> std::string
+    {
+        return std::string{"AddResult"};
+    }
+
 } // namespace db::multimedia_files::query

@@ -22,7 +22,6 @@
 #include <service-appmgr/Constants.hpp>
 #include <service-audio/ServiceAudio.hpp>
 #include <service-desktop/ServiceDesktop.hpp>
-#include <service-fileindexer/Constants.hpp>
 #include <service-gui/ServiceGUI.hpp>
 #include <service-time/ServiceTime.hpp>
 
@@ -63,9 +62,6 @@ int main()
 
     std::vector<std::unique_ptr<sys::BaseServiceCreator>> systemServices;
     systemServices.emplace_back(sys::CreatorFor<EventManager>());
-#if ENABLE_FILEINDEXER_SERVICE
-    systemServices.emplace_back(sys::CreatorFor<service::ServiceFileIndexer>());
-#endif
     systemServices.emplace_back(sys::CreatorFor<ServiceDB>());
     systemServices.emplace_back(sys::CreatorFor<ServiceAudio>());
     systemServices.emplace_back(sys::CreatorFor<ServiceDesktop>());

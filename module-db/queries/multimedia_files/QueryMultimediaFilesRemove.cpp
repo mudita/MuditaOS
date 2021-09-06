@@ -34,16 +34,12 @@ namespace db::multimedia_files::query
         return std::string{"RemoveAll"};
     }
 
-    RemoveAllResult::RemoveAllResult(const bool ret) : ret(ret)
+    RemoveByPath::RemoveByPath(const std::string &path) : Query(Query::Type::Delete), path(path)
     {}
 
-    auto RemoveAllResult::getResult() const -> bool
+    auto RemoveByPath::debugInfo() const -> std::string
     {
-        return ret;
+        return std::string{"RemoveByPath"};
     }
 
-    auto RemoveAllResult::debugInfo() const -> std::string
-    {
-        return std::string{"RemoveAllResult"};
-    }
 } // namespace db::multimedia_files::query
