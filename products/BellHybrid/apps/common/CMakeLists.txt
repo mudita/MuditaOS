@@ -15,7 +15,6 @@ target_sources(application-bell-common
         PUBLIC
         include/common/models/AlarmModel.hpp
         include/common/models/AbstractAlarmModel.hpp
-
         )
 
 

@@ -5,7 +5,7 @@
 
 #include <apps-common/Application.hpp>
 #include <service-db/Settings.hpp>
-#include <service-db/agents/settings/SystemSettings.hpp>
+#include <db/SystemSettings.hpp>
 #include <evtmgr/api/TemperatureApi.hpp>
 
 namespace app::home_screen
@@ -16,7 +16,7 @@ namespace app::home_screen
     }
     utils::temperature::Temperature TemperatureModel::getTemperature() const
     {
-        const auto unitStr = settings.getValue(settings::Temperature::unit, settings::SettingsScope::Global);
+        const auto unitStr = settings.getValue(bell::settings::Temperature::unit, settings::SettingsScope::Global);
         const auto unit    = *utils::temperature::strToUnit(unitStr);
         auto temperature   = evtmgr::api::getCurrentTemperature();
 

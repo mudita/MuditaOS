@@ -52,6 +52,8 @@ target_sources(apps-common
         windows/OptionWindow.cpp
     PUBLIC
         widgets/TimeSetFmtSpinner.hpp
+        actions/AlarmRingingData.hpp
+        actions/AlarmTriggeredAction.hpp
 )
 
 add_subdirectory(popups)
