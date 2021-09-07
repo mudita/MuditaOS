@@ -3,26 +3,23 @@
 
 #pragma once
 
+#include "AbstractAlarmAction.hpp"
 #include <service-time/AlarmHandler.hpp>
-
-namespace stm
-{
-    class ServiceTime;
-}
+#include <Service/Service.hpp>
 
 namespace alarms
 {
-
     class BellAlarmClockHandler : public AlarmHandler
     {
       public:
-        explicit BellAlarmClockHandler(stm::ServiceTime *serviceTime);
+        explicit BellAlarmClockHandler(sys::Service *service);
         auto handle(const AlarmEventRecord &record) -> bool;
 
         static constexpr auto name = "BellAlarmClockHandler";
 
       private:
-        stm::ServiceTime *serviceTime;
+        sys::Service *service{};
+        std::vector<std::unique_ptr<AbstractAlarmAction>> actions;
     };
 
     class EveningReminderHandler : public AlarmHandler

@@ -20,7 +20,12 @@ namespace app
                                              sys::bluetooth::BluetoothMode bluetoothMode,
                                              StartInBackground startInBackground)
         : Application(name, parent, mode, bluetoothMode, startInBackground)
-    {}
+    {
+        addActionReceiver(manager::actions::ShowAlarm, [this](auto &&data) {
+            switchWindow(gui::name::window::main_window, std::move(data));
+            return actionHandled();
+        });
+    }
 
     sys::ReturnCodes ApplicationBellMain::InitHandler()
     {

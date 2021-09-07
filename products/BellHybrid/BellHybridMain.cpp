@@ -23,11 +23,9 @@
 #include <Service/ServiceCreator.hpp>
 #include <service-appmgr/Constants.hpp>
 #include <service-audio/ServiceAudio.hpp>
-#include <service-bluetooth/ServiceBluetooth.hpp>
 #include <service-desktop/ServiceDesktop.hpp>
 #include <service-fileindexer/Constants.hpp>
 #include <service-gui/ServiceGUI.hpp>
-#include <service-lwip/ServiceLwIP.hpp>
 #include <service-time/ServiceTime.hpp>
 
 #include <Application.hpp>

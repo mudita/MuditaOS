@@ -5,11 +5,11 @@
 
 #include <apps-common/Application.hpp>
 #include <service-db/Settings.hpp>
-#include <service-db/agents/settings/SystemSettings.hpp>
+#include <db/SystemSettings.hpp>
 
 namespace
 {
-    constexpr auto temperatureUnit = settings::Temperature::unit;
+    constexpr auto temperatureUnit = bell::settings::Temperature::unit;
 } // namespace
 
 namespace app::bell_settings
