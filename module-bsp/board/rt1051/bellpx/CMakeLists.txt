@@ -14,6 +14,7 @@ target_sources(
         hal/battery_charger/BatteryCharger.cpp
 	    hal/key_input/KeyInput.cpp
 	    bsp/eink/eink_pin_config.cpp
+        bsp/rotary_encoder/rotary_encoder.cpp
         bsp/bell_temp_sensor/bell_temp_sensor.cpp
         pin_mux.c
         clock_config.cpp
