@@ -20,7 +20,7 @@ namespace gui
 
     void ListViewEngine::setElementsCount(unsigned int count)
     {
-        if (elementsCount != count) {
+        if (elementsCount != count || elementsCount == 0) {
             elementsCount = count;
             onElementsCountChanged();
         }
@@ -223,8 +223,9 @@ namespace gui
 
         // Check if there were queued rebuild Requests - if so rebuild list again.
         if (!rebuildRequests.empty()) {
-            rebuildList(rebuildRequests.back().first, rebuildRequests.back().second);
+            auto request = rebuildRequests.back();
             rebuildRequests.pop_back();
+            rebuildList(request.first, request.second);
         }
 
         fillFirstPage();

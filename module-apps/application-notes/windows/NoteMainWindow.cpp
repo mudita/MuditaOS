@@ -76,12 +76,8 @@ namespace app::notes
                           ::style::window::default_vertical_pos,
                           ::style::window_width,
                           ::style::window_height - ::style::window::default_vertical_pos - ::style::footer::height,
-                          "phonebook_empty_grey_circle_W_G",
+                          "empty_list_add_W_G",
                           utils::translate("app_notes_no_notes"));
-        emptyListIcon->focusChangedCallback = [this]([[maybe_unused]] gui::Item &item) {
-            onEmptyList();
-            return true;
-        };
 
         list->emptyListCallback    = [this]() { onEmptyList(); };
         list->notEmptyListCallback = [this]() { onListFilled(); };
@@ -92,8 +88,8 @@ namespace app::notes
     void NoteMainWindow::destroyInterface()
     {
         erase();
-        list            = nullptr;
-        emptyListIcon   = nullptr;
+        list          = nullptr;
+        emptyListIcon = nullptr;
     }
 
     void NoteMainWindow::onEmptyList()
@@ -101,7 +97,6 @@ namespace app::notes
         bottomBar->setActive(gui::BottomBar::Side::LEFT, false);
         bottomBar->setActive(gui::BottomBar::Side::CENTER, false);
         emptyListIcon->setVisible(true);
-        header->navigationIndicatorRemove(gui::header::BoxSelection::Left);
         header->navigationIndicatorRemove(gui::header::BoxSelection::Right);
     }
 
@@ -110,7 +105,6 @@ namespace app::notes
         bottomBar->setActive(gui::BottomBar::Side::LEFT, true);
         bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
         emptyListIcon->setVisible(false);
-        header->navigationIndicatorAdd(new gui::header::AddElementAction(), gui::header::BoxSelection::Left);
         header->navigationIndicatorAdd(new gui::header::SearchAction(), gui::header::BoxSelection::Right);
     }
 
@@ -121,7 +115,8 @@ namespace app::notes
                 application->switchWindow(gui::name::window::note_create,
                                           std::make_unique<NoteSwitchData>(std::make_shared<NotesRecord>()));
             }
-            else if (inputEvent.is(gui::KeyCode::KEY_RIGHT)) {
+            else if (inputEvent.is(gui::KeyCode::KEY_RIGHT) &&
+                     header->navigationIndicatorVisible(gui::header::BoxSelection::Right)) {
                 application->switchWindow(gui::name::window::notes_search);
             }
         }
