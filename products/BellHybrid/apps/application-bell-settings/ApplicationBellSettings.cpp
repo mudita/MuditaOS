@@ -2,22 +2,24 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationBellSettings.hpp"
-#include "TimeUnitsPresenter.hpp"
 #include "FrontlightPresenter.hpp"
-#include "models/TemperatureUnitModel.hpp"
+#include "PrewakeUpPresenter.hpp"
+#include "TimeUnitsPresenter.hpp"
 #include "models/FrontlightModel.hpp"
+#include "models/PrewakeUpModel.hpp"
+#include "models/TemperatureUnitModel.hpp"
 #include "windows/BellSettingsAdvancedWindow.hpp"
-#include "windows/BellSettingsFinishedWindow.hpp"
-#include "windows/BellSettingsTimeUnitsWindow.hpp"
 #include "windows/BellSettingsAlarmSettingsWindow.hpp"
 #include "windows/BellSettingsBedtimeToneWindow.hpp"
+#include "windows/BellSettingsFinishedWindow.hpp"
 #include "windows/BellSettingsFrontlight.hpp"
 #include "windows/BellSettingsHomeViewWindow.hpp"
+#include "windows/BellSettingsPrewakeUpWindow.hpp"
+#include "windows/BellSettingsTimeUnitsWindow.hpp"
 #include "windows/BellSettingsTurnOffWindow.hpp"
 #include "windows/BellSettingsWindow.hpp"
 
 #include <apps-common/windows/Dialog.hpp>
-#include <apps-common/AsyncTask.hpp>
 #include <service-evtmgr/Constants.hpp>
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
 #include <service-evtmgr/ScreenLightControlMessage.hpp>
@@ -89,6 +91,13 @@ namespace app
         windowsFactory.attach(gui::window::name::bellSettingsTurnOff, [](Application *app, const std::string &name) {
             return std::make_unique<gui::BellSettingsTurnOffWindow>(app);
         });
+
+        windowsFactory.attach(
+            gui::window::name::bellSettingsAlarmSettingsPrewakeUp, [](Application *app, const std::string &name) {
+                auto model     = std::make_shared<bell_settings::PrewakeUpModel>(app);
+                auto presenter = std::make_unique<bell_settings::PrewakeUpWindowPresenter>(std::move(model));
+                return std::make_unique<gui::BellSettingsPrewakeUpWindow>(app, std::move(presenter));
+            });
 
         attachPopups({gui::popup::ID::AlarmActivated});
     }
