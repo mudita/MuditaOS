@@ -25,6 +25,9 @@ namespace bsp
 
         void DisconnectInternalLoadResistor() final;
         void ConnectInternalLoadResistor() final;
+
+        void SwitchToRegularModeLDO() final;
+        void SwitchToLowPowerModeLDO() final;
     };
 
 } // namespace bsp

@@ -48,6 +48,9 @@ namespace bsp
         virtual void DisconnectInternalLoadResistor()  = 0;
         virtual void ConnectInternalLoadResistor() = 0;
 
+        virtual void SwitchToRegularModeLDO()  = 0;
+        virtual void SwitchToLowPowerModeLDO() = 0;
+
       protected:
         CpuFrequencyHz currentFrequency = CpuFrequencyHz::Level_6;
     };

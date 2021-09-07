@@ -28,6 +28,9 @@ namespace bsp
         void DisconnectInternalLoadResistor() final;
         void ConnectInternalLoadResistor() final;
 
+        void SwitchToRegularModeLDO() final;
+        void SwitchToLowPowerModeLDO() final;
+
       private:
         std::shared_ptr<drivers::DriverGPIO> gpio_1;
         std::shared_ptr<drivers::DriverGPIO> gpio_2;
