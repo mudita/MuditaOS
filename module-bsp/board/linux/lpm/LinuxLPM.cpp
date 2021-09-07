@@ -51,4 +51,10 @@ namespace bsp
     void LinuxLPM::ConnectInternalLoadResistor()
     {}
 
+    void LinuxLPM::SwitchToRegularModeLDO()
+    {}
+
+    void LinuxLPM::SwitchToLowPowerModeLDO()
+    {}
+
 } // namespace bsp
