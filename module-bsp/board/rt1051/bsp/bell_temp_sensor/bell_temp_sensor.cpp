@@ -26,7 +26,7 @@ namespace bsp::bell_temp_sensor
         bool writeSingleRegister(std::uint32_t address, std::uint16_t *to_send)
         {
             addr.subAddress          = address;
-            const auto write_success = i2c->Write(addr, reinterpret_cast<uint8_t*>(to_send), 2);
+            const auto write_success = i2c->Write(addr, reinterpret_cast<uint8_t *>(to_send), 2);
 
             return write_success == 1;
         }
@@ -34,13 +34,13 @@ namespace bsp::bell_temp_sensor
         ssize_t readSingleRegister(std::uint32_t address, std::uint16_t *readout)
         {
             addr.subAddress = address;
-            return i2c->Read(addr, reinterpret_cast<uint8_t*>(readout), 2);
+            return i2c->Read(addr, reinterpret_cast<uint8_t *>(readout), 2);
         }
 
         ssize_t readMeasurementRegisters(std::uint16_t *readout)
         {
             addr.subAddress = static_cast<std::uint32_t>(CT7117_Registers::Temp);
-            return i2c->Read(addr, reinterpret_cast<uint8_t*>(readout), 2);
+            return i2c->Read(addr, reinterpret_cast<uint8_t *>(readout), 2);
         }
 
     } // namespace
@@ -51,9 +51,8 @@ namespace bsp::bell_temp_sensor
 
         LOG_DEBUG("Initializing Bell temperature sensor");
 
-        if (isInitiated)
-        {
-            return isPresent() ? kStatus_Success : kStatus_Fail;    
+        if (isInitiated) {
+            return isPresent() ? kStatus_Success : kStatus_Fail;
         }
 
         drivers::DriverI2CParams i2cParams;
@@ -92,16 +91,18 @@ namespace bsp::bell_temp_sensor
     Temperature readout()
     {
         uint8_t reg[2] = {0, 0};
-        float temp = 0.0;
+        float temp     = 0.0;
 
-        readSingleRegister(static_cast<uint32_t>(CT7117_Registers::Temp), reinterpret_cast<uint16_t*>(&reg[0]));
-        uint16_t reg16 = (static_cast<uint16_t>(reg[0])<<8) | (static_cast<uint16_t>(reg[1]) & 0xFFE0);  //0.25 C resolution
+        readSingleRegister(static_cast<uint32_t>(CT7117_Registers::Temp), reinterpret_cast<uint16_t *>(&reg[0]));
+        uint16_t reg16 =
+            (static_cast<uint16_t>(reg[0]) << 8) | (static_cast<uint16_t>(reg[1]) & 0xFFE0); // 0.25 C resolution
 
-        uint16_t integer = (reg16 & 0x7FFF) >> 7;           //remove sign bit and shift to lower byte
-        uint16_t fractional = ((reg16 >> 5) & 0x3) * 25;    //shift fractional part to correct decimal position and limit resolution to 0.25 C
+        uint16_t integer = (reg16 & 0x7FFF) >> 7; // remove sign bit and shift to lower byte
+        uint16_t fractional = ((reg16 >> 5) & 0x3) *
+                              25; // shift fractional part to correct decimal position and limit resolution to 0.25 C
 
         temp = static_cast<float>(integer) + static_cast<float>(fractional) / 100.0;
-        if (reg16 & 0x8000) //sign bit present
+        if (reg16 & 0x8000) // sign bit present
             temp *= -1.0;
         if (isFahrenheit)
             temp = (temp * 1.8) + 32.00;
@@ -113,10 +114,10 @@ namespace bsp::bell_temp_sensor
     {
         std::uint8_t readout;
         addr.subAddress = static_cast<uint8_t>(CT7117_Registers::ID);
-        i2c->Read(addr, reinterpret_cast<uint8_t*>(&readout), 1);
+        i2c->Read(addr, reinterpret_cast<uint8_t *>(&readout), 1);
 
         LOG_DEBUG("Bell temperature sensor %s", (readout == CT7117_DEVICE_ID) ? "present" : "error !");
-        
+
         return readout == CT7117_DEVICE_ID;
     }
 
