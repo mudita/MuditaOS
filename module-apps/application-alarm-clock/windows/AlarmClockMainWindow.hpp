@@ -17,8 +17,6 @@ namespace app::alarmClock
         gui::Icon *emptyListIcon   = nullptr;
         gui::ListView *alarmsList  = nullptr;
         std::unique_ptr<AlarmClockMainWindowContract::Presenter> presenter;
-        void showEmptyIcon();
-        void showList();
         void onEmptyList();
         void onListFilled();
 
@@ -29,7 +27,6 @@ namespace app::alarmClock
 
         bool onDatabaseMessage(sys::Message *msgl) override;
         bool onInput(const gui::InputEvent &inputEvent) override;
-        void onBeforeShow(gui::ShowMode mode, gui::SwitchData *data) override;
         void buildInterface() override;
         void destroyInterface() override;
     };

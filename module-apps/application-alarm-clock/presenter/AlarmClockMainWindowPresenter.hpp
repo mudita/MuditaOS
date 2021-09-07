@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -22,7 +22,6 @@ namespace app::alarmClock
             virtual ~Presenter() noexcept = default;
 
             [[nodiscard]] virtual std::shared_ptr<gui::ListItemProvider> getAlarmsItemProvider() const = 0;
-            virtual bool isAlarmsListEmpty()                                                           = 0;
         };
     };
 
@@ -32,7 +31,6 @@ namespace app::alarmClock
         explicit AlarmClockMainWindowPresenter(std::shared_ptr<AlarmsListItemProvider> alarmsListItemProvider);
 
         [[nodiscard]] std::shared_ptr<gui::ListItemProvider> getAlarmsItemProvider() const override;
-        bool isAlarmsListEmpty() override;
 
       private:
         std::shared_ptr<AlarmsListItemProvider> alarmsProvider;
