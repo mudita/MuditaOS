@@ -3,14 +3,12 @@
 
 #pragma once
 
-#include <SwitchData.hpp>
-
 namespace alarms
 {
-    class AlarmRingingSwitchData : public gui::SwitchData
+    class AbstractAlarmAction
     {
       public:
-        AlarmRingingSwitchData() : SwitchData()
-        {}
+        virtual ~AbstractAlarmAction() = default;
+        virtual bool execute()         = 0;
     };
 } // namespace alarms

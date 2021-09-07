@@ -232,7 +232,7 @@ sys::ReturnCodes ServiceDB::InitHandler()
         std::make_unique<NotificationsRecordInterface>(notificationsDB.get(), contactRecordInterface.get());
     quotesRecordInterface = std::make_unique<Quotes::QuotesAgent>(quotesDB.get());
 
-    databaseAgents.emplace(std::make_unique<SettingsAgent>(this));
+    databaseAgents.emplace(std::make_unique<SettingsAgent>(this, "settings_v2.db"));
     databaseAgents.emplace(std::make_unique<FileIndexerAgent>(this));
 
     for (auto &dbAgent : databaseAgents) {
