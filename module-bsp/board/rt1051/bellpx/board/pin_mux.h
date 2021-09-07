@@ -167,6 +167,14 @@ extern "C"
 #define PINMUX_WDOG_B IOMUXC_GPIO_B1_13_GPIO2_IO29
     void PINMUX_WDOG_B_Init(void);
 
+/**
+ * I2C4 pins init
+ */
+#define PINMUX_I2C4_SCL IOMUXC_GPIO_AD_B0_12_LPI2C4_SCL
+#define PINMUX_I2C4_SDA IOMUXC_GPIO_AD_B0_13_LPI2C4_SDA
+
+    void PINMUX_InitI2C4(void);
+
 #if defined(__cplusplus)
 }
 #endif

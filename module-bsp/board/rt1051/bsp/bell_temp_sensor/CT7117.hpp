@@ -7,10 +7,8 @@
 
 namespace bsp::bell_temp_sensor
 {
-    constexpr inline auto CT7117_DEVICE_ADDR = 0x90;
+    constexpr inline auto CT7117_DEVICE_ADDR = (0x90 >> 1);
     constexpr inline auto CT7117_DEVICE_ID = 0x59;
-
-    constexpr inline auto CT7117_Temperature_LSB = 0.0078125;
 
     enum class CT7117_Registers
     {

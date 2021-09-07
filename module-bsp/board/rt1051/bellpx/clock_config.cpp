@@ -699,6 +699,8 @@ void clkLPI2Csetup(uint8_t instance, uint8_t enabled)
             CLOCK_EnableClock(kCLOCK_Lpi2c2);
         if ((instance == 3) || (instance == 0))
             CLOCK_EnableClock(kCLOCK_Lpi2c3);
+        if ((instance == 4) || (instance == 0))
+            CLOCK_EnableClock(kCLOCK_Lpi2c4);
     }
     else {
         /* LPI2C */
@@ -709,6 +711,8 @@ void clkLPI2Csetup(uint8_t instance, uint8_t enabled)
             CLOCK_DisableClock(kCLOCK_Lpi2c2);
         if ((instance == 3) || (instance == 0))
             CLOCK_DisableClock(kCLOCK_Lpi2c3);
+        if ((instance == 4) || (instance == 0))
+            CLOCK_DisableClock(kCLOCK_Lpi2c4);
     }
 }
 
