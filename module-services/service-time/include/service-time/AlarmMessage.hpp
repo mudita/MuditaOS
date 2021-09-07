@@ -98,9 +98,10 @@ namespace alarms
     class AlarmsGetInRangeResponseMessage : public AlarmResponse
     {
       public:
-        AlarmsGetInRangeResponseMessage(std::vector<AlarmEventRecord> alarms = std::vector<AlarmEventRecord>())
-            : alarms(alarms){};
+        explicit AlarmsGetInRangeResponseMessage(std::pair<std::vector<AlarmEventRecord>, std::uint32_t> p)
+            : alarms(std::move(p.first)), count(p.second){};
         std::vector<AlarmEventRecord> alarms;
+        const std::uint32_t count = 0;
     };
 
     class AlarmGetNextSingleEventsRequestMessage : public AlarmMessage

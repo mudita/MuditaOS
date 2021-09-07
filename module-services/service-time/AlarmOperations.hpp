@@ -16,7 +16,7 @@ namespace alarms
     {
       public:
         using OnGetAlarmProcessed         = std::function<void(AlarmEventRecord)>;
-        using OnGetAlarmsInRangeProcessed = std::function<void(std::vector<AlarmEventRecord>)>;
+        using OnGetAlarmsInRangeProcessed = std::function<void(std::pair<std::vector<AlarmEventRecord>, uint32_t>)>;
         using OnAddAlarmProcessed         = std::function<void(bool)>;
         using OnUpdateAlarmProcessed      = std::function<void(bool)>;
         using OnRemoveAlarmProcessed      = std::function<void(bool)>;
