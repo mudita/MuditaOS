@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "Record.hpp"
 #include <Database/Database.hpp>
 
 #include <functional>
@@ -49,6 +50,7 @@ template <typename T, typename F> class Table
         }
 
         std::vector<T> outVector;
+        outVector.reserve(retQuery->getRowCount());
 
         do {
             outVector.push_back(createTableRow(*retQuery));

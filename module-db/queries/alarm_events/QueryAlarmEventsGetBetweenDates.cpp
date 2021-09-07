@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "QueryAlarmEventsGetBetweenDates.hpp"
@@ -7,7 +7,7 @@
 
 namespace db::query::alarmEvents
 {
-    GetBetweenDates::GetBetweenDates(TimePoint start, TimePoint end, uint32_t offset, uint32_t limit)
+    GetBetweenDates::GetBetweenDates(TimePoint start, TimePoint end, std::uint32_t offset, std::uint32_t limit)
         : Query(Query::Type::Read), start(start), end(end), offset(offset), limit(limit)
     {}
 
@@ -16,12 +16,13 @@ namespace db::query::alarmEvents
         return std::string{"GetBetweenDates"};
     }
 
-    GetBetweenDatesResult::GetBetweenDatesResult(std::vector<AlarmEventRecord> records) : records(std::move(records))
+    GetBetweenDatesResult::GetBetweenDatesResult(std::vector<AlarmEventRecord> records, std::uint32_t count)
+        : records(std::move(records)), count(count)
     {}
 
-    auto GetBetweenDatesResult::getResult() const -> std::vector<AlarmEventRecord>
+    auto GetBetweenDatesResult::getResult() const -> std::pair<std::vector<AlarmEventRecord>, std::uint32_t>
     {
-        return records;
+        return {records, count};
     }
 
     auto GetBetweenDatesResult::debugInfo() const -> std::string

@@ -28,7 +28,7 @@ namespace app::alarmClock
                 return false;
             }
             if (callback) {
-                callback(result->alarms, result->alarms.size());
+                callback(result->alarms, result->count);
             }
             return true;
         };
