@@ -126,6 +126,8 @@ namespace sys
             lowPowerControl->DisableDcdcPowerSaveMode();
             // Switch DCDC to full throttle during oscillator switch
             lowPowerControl->SetHighestCoreVoltage();
+            // Enable regular 2P5 and 1P1 LDO and Turn off weak 2P5 and 1P1 LDO
+            lowPowerControl->SwitchToRegularModeLDO();
             // switch oscillator source
             lowPowerControl->SwitchOscillatorSource(bsp::LowPowerMode::OscillatorSource::External);
             // then switch external RAM clock source
@@ -174,6 +176,9 @@ namespace sys
         }
 
         if (level == bsp::CpuFrequencyHz::Level_1) {
+            // Enable weak 2P5 and 1P1 LDO and Turn off regular 2P5 and 1P1 LDO
+            lowPowerControl->SwitchToLowPowerModeLDO();
+
             // then switch osc source
             lowPowerControl->SwitchOscillatorSource(bsp::LowPowerMode::OscillatorSource::Internal);
 
