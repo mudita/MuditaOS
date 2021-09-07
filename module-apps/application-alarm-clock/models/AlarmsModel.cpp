@@ -77,7 +77,7 @@ namespace app::alarmClock
     {
         if (recordsCount != alarmsRepoCount) {
             recordsCount = alarmsRepoCount;
-            list->rebuildList(gui::listview::RebuildType::Full, 0, true);
+            list->reSendLastRebuildRequest();
             return false;
         }
 

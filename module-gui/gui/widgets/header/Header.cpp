@@ -146,11 +146,11 @@ namespace gui::header
     {
         switch (boxSelection) {
         case BoxSelection::Left:
-            return firstBox->visible;
+            return firstBox->visible && !firstBox->empty();
         case BoxSelection::Center:
-            return centerBox->visible;
+            return centerBox->visible && !centerBox->empty();
         case BoxSelection::Right:
-            return lastBox->visible;
+            return lastBox->visible && !lastBox->empty();
         }
         return false;
     }

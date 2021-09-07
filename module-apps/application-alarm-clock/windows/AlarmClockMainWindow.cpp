@@ -40,13 +40,14 @@ namespace app::alarmClock
         setTitle(utils::translate("app_alarm_clock_title_main"));
         header->navigationIndicatorAdd(new gui::header::AddElementAction(), gui::header::BoxSelection::Left);
 
-        alarmsList                       = new gui::ListView(this,
+        alarmsList = new gui::ListView(this,
                                        style::alarmClock::window::listView_x,
                                        style::alarmClock::window::listView_y,
                                        style::alarmClock::window::listView_w,
                                        style::alarmClock::window::listView_h,
                                        presenter->getAlarmsItemProvider(),
                                        gui::listview::ScrollBarType::Fixed);
+
         alarmsList->focusChangedCallback = [this](gui::Item &) {
             onListFilled();
             return true;
@@ -59,13 +60,11 @@ namespace app::alarmClock
                           style::window::default_vertical_pos,
                           style::window_width,
                           style::window_height - ::style::window::default_vertical_pos - ::style::footer::height,
-                          "phonebook_empty_grey_circle_W_G",
+                          "empty_list_add_W_G",
                           utils::translate("app_alarm_clock_no_alarms_information"));
-        emptyListIcon->focusChangedCallback = [this](gui::Item &) {
-            onEmptyList();
-            return true;
-        };
-        emptyListIcon->setVisible(false);
+
+        alarmsList->emptyListCallback    = [this]() { onEmptyList(); };
+        alarmsList->notEmptyListCallback = [this]() { onListFilled(); };
 
         setFocusItem(alarmsList);
     }
@@ -75,16 +74,6 @@ namespace app::alarmClock
         erase();
         alarmsList    = nullptr;
         emptyListIcon = nullptr;
-    }
-
-    void AlarmClockMainWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
-    {
-        if (presenter->isAlarmsListEmpty()) {
-            showEmptyIcon();
-        }
-        else {
-            showList();
-        }
     }
 
     bool AlarmClockMainWindow::onInput(const gui::InputEvent &inputEvent)
@@ -113,43 +102,22 @@ namespace app::alarmClock
         if (msgNotification != nullptr && msgNotification->interface == db::Interface::Name::AlarmEvents) {
             if (msgNotification->dataModified()) {
                 alarmsList->rebuildList(gui::listview::RebuildType::InPlace);
+                return true;
             }
-            if (presenter->isAlarmsListEmpty()) {
-                showEmptyIcon();
-            }
-            else {
-                alarmsList->setVisible(true);
-                emptyListIcon->setVisible(false);
-                setFocusItem(alarmsList);
-            }
-            return true;
         }
         return false;
     }
 
-    void AlarmClockMainWindow::showEmptyIcon()
-    {
-        alarmsList->setVisible(false);
-        emptyListIcon->setVisible(true);
-        setFocusItem(emptyListIcon);
-    }
-
-    void AlarmClockMainWindow::showList()
-    {
-        alarmsList->rebuildList();
-        alarmsList->setVisible(true);
-        emptyListIcon->setVisible(false);
-        setFocusItem(alarmsList);
-    }
-
     void AlarmClockMainWindow::onEmptyList()
     {
+        emptyListIcon->setVisible(true);
         bottomBar->setActive(gui::BottomBar::Side::LEFT, false);
         bottomBar->setActive(gui::BottomBar::Side::CENTER, false);
     }
 
     void AlarmClockMainWindow::onListFilled()
     {
+        emptyListIcon->setVisible(false);
         bottomBar->setActive(gui::BottomBar::Side::LEFT, true);
         bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
     }
