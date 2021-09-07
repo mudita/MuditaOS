@@ -42,20 +42,16 @@ target_link_libraries(BellHybrid
         bell::app-settings
         bell::app-powernap
         appmgr
-        db
+        bell::db
         evtmgr
         messagetype
-        module-apps
         module-bsp
         module-vfs
         service-audio
-        service-bluetooth
         service-desktop
-        service-lwip
         service-time
         sys
         platform
-        ${LWIP_LIBRARIES}
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_Linux>:iosyscalls>"
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_RT1051>:CrashCatcher::CrashCatcher>"
     )

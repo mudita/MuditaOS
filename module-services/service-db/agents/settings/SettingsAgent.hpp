@@ -26,7 +26,7 @@ namespace sys
 class SettingsAgent : public DatabaseAgent
 {
   public:
-    SettingsAgent(sys::Service *parentService, settings::SettingsCache *cache = nullptr);
+    SettingsAgent(sys::Service *parentService, const std::string dbName, settings::SettingsCache *cache = nullptr);
     ~SettingsAgent() = default;
 
     void initDb() override;
@@ -44,6 +44,7 @@ class SettingsAgent : public DatabaseAgent
     using SetOfRecipents = std::set<std::string>;
     SetOfRecipents profileChangedRecipients;
     SetOfRecipents modeChangeRecipients;
+    const std::string dbName;
 
     // db operations
     auto dbGetValue(const settings::EntryPath &path) -> std::optional<std::string>;

@@ -19,8 +19,8 @@ namespace settings
 
 } // namespace settings
 
-SettingsAgent::SettingsAgent(sys::Service *parentService, settings::SettingsCache *cache)
-    : DatabaseAgent(parentService), cache(cache), factorySettings(settings::factory::path)
+SettingsAgent::SettingsAgent(sys::Service *parentService, const std::string dbName, settings::SettingsCache *cache)
+    : DatabaseAgent(parentService), cache(cache), factorySettings(settings::factory::path), dbName{dbName}
 {
     if (nullptr == cache) {
         this->cache = settings::SettingsCache::getInstance();
@@ -74,7 +74,7 @@ auto SettingsAgent::getDbInitString() -> const std::string
 
 auto SettingsAgent::getDbFilePath() -> const std::string
 {
-    return (purefs::dir::getUserDiskPath() / "settings_v2.db").string();
+    return (purefs::dir::getUserDiskPath() / dbName).string();
 }
 auto SettingsAgent::getAgentName() -> const std::string
 {

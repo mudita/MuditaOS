@@ -24,7 +24,6 @@ target_sources(application-bell-main
 
     PUBLIC
         include/application-bell-main/ApplicationBellMain.hpp
-        include/application-bell-main/data/AlarmRingingSwitchData.hpp
 )
 
 target_include_directories(application-bell-main
@@ -42,6 +41,7 @@ target_link_libraries(application-bell-main
         module-gui
         service-gui
         time
+        bell::db
         bell::evtmgr
         bell::app-common
         bell::app-alarm

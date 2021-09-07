@@ -5,8 +5,8 @@
 #include "data/BellMainStyle.hpp"
 
 #include <application-bell-main/ApplicationBellMain.hpp>
-#include <application-bell-main/data/AlarmRingingSwitchData.hpp>
 #include <apps-common/widgets/BellBaseLayout.hpp>
+#include <apps-common/actions/AlarmTriggeredAction.hpp>
 #include <gui/input/InputEvent.hpp>
 #include <gui/widgets/TextFixedSize.hpp>
 #include <gui/widgets/Style.hpp>
@@ -201,7 +201,7 @@ namespace gui
     void BellHomeScreenWindow::onBeforeShow(ShowMode, SwitchData *data)
     {
         presenter->onBeforeShow();
-        const auto alarmRingingSwitchData = dynamic_cast<alarms::AlarmRingingSwitchData *>(data);
+        const auto alarmRingingSwitchData = dynamic_cast<app::actions::AlarmRingingData *>(data);
         if (alarmRingingSwitchData != nullptr) {
             presenter->handleAlarmRingingEvent();
         }

@@ -74,7 +74,7 @@ sys::ReturnCodes ServiceDB::InitHandler()
     // Create record interfaces
     alarmEventRecordInterface = std::make_unique<AlarmEventRecordInterface>(eventsDB.get());
 
-    databaseAgents.emplace(std::make_unique<SettingsAgent>(this));
+    databaseAgents.emplace(std::make_unique<SettingsAgent>(this, "settings_bell.db"));
 
     for (auto &dbAgent : databaseAgents) {
         dbAgent->initDb();
