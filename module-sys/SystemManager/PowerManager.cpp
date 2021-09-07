@@ -120,6 +120,8 @@ namespace sys
         const auto freq = lowPowerControl->GetCurrentFrequencyLevel();
 
         if (freq == bsp::CpuFrequencyHz::Level_1) {
+            // connect internal the load resistor
+            lowPowerControl->ConnectInternalLoadResistor();
             // turn off power save mode for DCDC inverter
             lowPowerControl->DisableDcdcPowerSaveMode();
             // Switch DCDC to full throttle during oscillator switch
@@ -182,6 +184,9 @@ namespace sys
 
             // turn on power save mode for DCDC inverter
             lowPowerControl->EnableDcdcPowerSaveMode();
+
+            // disconnect internal the load resistor
+            lowPowerControl->DisconnectInternalLoadResistor();
         }
 
         isFrequencyLoweringInProgress = true;
