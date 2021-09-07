@@ -21,7 +21,8 @@ namespace alarms
 {
     using OnGetAlarmEventCallback          = std::function<void(AlarmEventRecord)>;
     using OnGetAlarmEventsCallback         = std::function<void(std::vector<AlarmEventRecord>)>;
-    using OnGetAlarmEventsInRangeCallback  = std::function<void(std::vector<AlarmEventRecord>)>;
+    using OnGetAlarmEventsInRangeCallback =
+        std::function<void(std::pair<std::vector<AlarmEventRecord>, std::uint32_t>)>;
     using OnAddAlarmEventCallback          = std::function<void(bool)>;
     using OnUpdateAlarmEventCallback       = std::function<void(bool)>;
     using OnRemoveAlarmEventCallback       = std::function<void(bool)>;

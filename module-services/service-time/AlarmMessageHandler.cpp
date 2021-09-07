@@ -57,11 +57,11 @@ namespace alarms
     {
         return handleWithCallback<AlarmsGetInRangeRequestMessage,
                                   AlarmsGetInRangeResponseMessage,
-                                  std::vector<AlarmEventRecord>>(
+                                  std::pair<std::vector<AlarmEventRecord>, std::uint32_t>>(
             request,
             [&](AlarmsGetInRangeRequestMessage *request, IAlarmOperations::OnGetAlarmsInRangeProcessed callback) {
                 alarmOperations->getAlarmsInRange(
-                    request->start, request->end, request->offset, request->limit, callback);
+                    request->start, request->end, request->offset, request->limit, std::move(callback));
             });
     }
 
