@@ -133,4 +133,14 @@ namespace bsp
         gpio_2->WritePin(static_cast<uint32_t>(BoardDefinitions::DCDC_INVERTER_MODE_PIN), 1);
     }
 
+    void RT1051LPM::DisconnectInternalLoadResistor()
+    {
+        DCDC->REG1 &= ~DCDC_REG1_REG_RLOAD_SW_MASK;
+    }
+
+    void RT1051LPM::ConnectInternalLoadResistor()
+    {
+        DCDC->REG1 |= DCDC_REG1_REG_RLOAD_SW_MASK;
+    }
+
 } // namespace bsp
