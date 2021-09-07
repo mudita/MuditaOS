@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationMeditation.hpp"
-#include "MeditationListViewWindows.hpp"
+#include "MeditationOptionsWindows.hpp"
 #include "MeditationTimerWindow.hpp"
 #include "MeditationWindow.hpp"
 #include "Names.hpp"
