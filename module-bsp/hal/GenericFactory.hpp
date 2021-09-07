@@ -16,7 +16,7 @@ namespace hal::impl
         static std::weak_ptr<TDerived> singleton;
         auto inst = singleton.lock();
         if (not inst) {
-            inst      = std::make_shared<TDerived>(args...);
+            inst      = std::make_shared<TDerived>(std::forward<Args>(args)...);
             singleton = inst;
         }
         return inst;

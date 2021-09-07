@@ -14,9 +14,13 @@ namespace hal::battery
     class AbstractBatteryCharger
     {
       public:
-        struct Factory
+        class BatteryChargerEvents
         {
-            static std::shared_ptr<AbstractBatteryCharger> create(sys::Service *service);
+          public:
+            virtual ~BatteryChargerEvents() = default;
+
+            virtual void onBrownout()      = 0;
+            virtual void onStatusChanged() = 0;
         };
 
         virtual ~AbstractBatteryCharger() = default;
@@ -25,6 +29,7 @@ namespace hal::battery
         virtual void deinit()                                     = 0;
         virtual void processStateChangeNotification(std::uint8_t) = 0;
         virtual void setChargingCurrentLimit(std::uint8_t)        = 0;
+        virtual int getBatteryVoltage()                           = 0;
     };
 
     BaseType_t IRQHandler();

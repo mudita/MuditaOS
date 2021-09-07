@@ -2,6 +2,8 @@ add_library(module-vfs STATIC)
 
 module_is_test_entity()
 
+add_subdirectory(paths)
+
 target_sources(module-vfs
     PRIVATE
         $<$<STREQUAL:${PROJECT_TARGET},TARGET_RT1051>:
@@ -39,7 +41,6 @@ target_sources(module-vfs
         src/purefs/blkdev/disk_manager.cpp
         src/purefs/blkdev/disk.cpp
         src/purefs/blkdev/partition_parser.cpp
-        src/purefs/filesystem_paths.cpp
         src/purefs/fs/filesystem_cwd.cpp
         src/purefs/fs/filesystem_operations.cpp
         src/purefs/fs/filesystem_syscalls.cpp
@@ -54,7 +55,6 @@ target_sources(module-vfs
         include/user/purefs/blkdev/disk_manager.hpp
         include/user/purefs/blkdev/disk.hpp
         include/user/purefs/blkdev/partition.hpp
-        include/user/purefs/filesystem_paths.hpp
         include/user/purefs/fs/directory_handle.hpp
         include/user/purefs/fs/file_handle.hpp
         include/user/purefs/fs/filesystem_operations.hpp
@@ -99,6 +99,7 @@ target_link_libraries(module-vfs
         module-os
         module-utils
     PUBLIC 
+        purefs-paths
         module-sys
 )
 

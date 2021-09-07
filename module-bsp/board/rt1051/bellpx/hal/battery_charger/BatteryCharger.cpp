@@ -5,26 +5,25 @@
 
 #include <hal/GenericFactory.hpp>
 #include <EventStore.hpp>
-#include <service-evtmgr/battery-level-check/BatteryLevelCheck.hpp>
-#include <service-evtmgr/BatteryMessages.hpp>
-#include <service-evtmgr/EventManagerCommon.hpp>
+
 namespace hal::battery
 {
-    std::shared_ptr<AbstractBatteryCharger> AbstractBatteryCharger::Factory::create(sys::Service *service)
-    {
-        return hal::impl::factory<BatteryCharger, AbstractBatteryCharger>(service);
-    }
-
-    BatteryCharger::BatteryCharger(sys::Service *service) : service{service}
+    BatteryCharger::BatteryCharger(AbstractBatteryCharger::BatteryChargerEvents &eventsHandler)
+        : eventsHandler(eventsHandler)
     {}
 
     void BatteryCharger::init(xQueueHandle queueBatteryHandle, xQueueHandle)
     {
         // Mocking initial state to make system run
         Store::Battery::modify().state = Store::Battery::State::Discharging;
-        Store::Battery::modify().level = 100;
-        auto message                   = std::make_shared<sevm::BatteryStatusChangeMessage>();
-        service->bus.sendUnicast(std::move(message), service::name::evt_manager);
+        Store::Battery::modify().level = getBatteryVoltage();
+        eventsHandler.onStatusChanged();
+    }
+
+    int BatteryCharger::getBatteryVoltage()
+    {
+        constexpr auto dummyBatteryLevel = 100;
+        return dummyBatteryLevel;
     }
 
     void BatteryCharger::BatteryCharger::deinit()

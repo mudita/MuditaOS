@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PlayToneAction.hpp"
-#include <module-vfs/include/user/purefs/filesystem_paths.hpp>
+#include <purefs/filesystem_paths.hpp>
 #include <service-audio/AudioServiceAPI.hpp>
 #include <service-time/ServiceTime.hpp>
 #include <db/SystemSettings.hpp>

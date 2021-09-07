@@ -3,26 +3,23 @@
 
 #pragma once
 
-#include <module-bsp/hal/battery_charger/AbstractBatteryCharger.hpp>
-#include <service-evtmgr/battery-brownout-detector/BatteryBrownoutDetector.hpp>
-
-#include <memory>
+#include <hal/battery_charger/AbstractBatteryCharger.hpp>
 
 namespace hal::battery
 {
     class BatteryCharger : public AbstractBatteryCharger
     {
       public:
-        explicit BatteryCharger(sys::Service *service);
+        explicit BatteryCharger(AbstractBatteryCharger::BatteryChargerEvents &eventsHandler);
         void init(xQueueHandle queueBatteryHandle, xQueueHandle queueChargerDetect) final;
         void deinit() final;
         void processStateChangeNotification(std::uint8_t notification) final;
         void setChargingCurrentLimit(std::uint8_t chargerType) final;
+        int getBatteryVoltage() final;
 
       private:
         void checkBatteryChargerInterrupts();
 
-        sys::Service *service;
-        BatteryBrownoutDetector batteryBrownoutDetector;
+        AbstractBatteryCharger::BatteryChargerEvents &eventsHandler;
     };
 } // namespace hal::battery

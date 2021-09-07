@@ -3,8 +3,11 @@
 
 #pragma once
 
+#include <hal/battery_charger/AbstractBatteryCharger.hpp>
 #include <Service/Service.hpp>
 #include <Timers/TimerHandle.hpp>
+
+#include <memory>
 
 namespace sys
 {
@@ -14,20 +17,16 @@ namespace sys
 class BatteryBrownoutDetector
 {
   public:
-    BatteryBrownoutDetector(sys::Service *service,
-                            std::function<int()> getMeasurementCallback,
-                            std::function<void()> positiveResultCallback,
-                            std::function<void()> negativeResultCallback);
+    BatteryBrownoutDetector(sys::Service *service, std::shared_ptr<hal::battery::AbstractBatteryCharger> charger);
     void startDetection();
 
   private:
     void checkBrownout();
 
     sys::Service *parentService;
-    const std::function<int()> getMeasurementCallback;
-    const std::function<void()> positiveResultCallback;
-    const std::function<void()> negativeResultCallback;
-    bool detectionOngoing;
-    unsigned measurementCount;
+    std::shared_ptr<hal::battery::AbstractBatteryCharger> charger;
+
+    bool detectionOngoing     = false;
+    unsigned measurementCount = 0;
     sys::TimerHandle measurementTick;
 };

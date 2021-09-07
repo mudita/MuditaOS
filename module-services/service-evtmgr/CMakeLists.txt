@@ -1,11 +1,12 @@
 ﻿project(service-evtmgr)
-message( "${PROJECT_NAME}  ${CMAKE_CURRENT_LIST_DIR}" )
 
 set(SOURCES
         EventManager.cpp
         WorkerEventCommon.cpp
         api/EventManagerServiceAPI.cpp
         api/torch.cpp
+        battery/BatteryController.cpp
+        battery/BatteryController.hpp
         battery-level-check/BatteryLevelCheck.cpp
         backlight-handler/BacklightHandler.cpp
         battery-brownout-detector/BatteryBrownoutDetector.cpp
@@ -14,7 +15,9 @@ set(SOURCES
         vibra/Vibra.cpp
 )
 
-add_library(${PROJECT_NAME} STATIC ${SOURCES})
+add_library(service-evtmgr STATIC)
+
+target_sources(service-evtmgr PRIVATE ${SOURCES})
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC
