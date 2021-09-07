@@ -138,8 +138,4 @@ enum class BoardDefinitions
 
     EEPROM_I2C          = AUDIOCODEC_I2C,
     EEPROM_I2C_BAUDRATE = I2C_STD_BAUDRATE,
-
-    // Added here because driver subsystem is not separated and without these defines it won't compile
-    BELL_TEMP_SENSOR_I2C          = static_cast<int>(drivers::I2CInstances ::I2C4),
-    BELL_TEMP_SENSOR_I2C_BAUDRATE = I2C_STD_BAUDRATE,
 };
