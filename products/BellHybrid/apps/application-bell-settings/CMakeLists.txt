@@ -22,40 +22,46 @@ target_include_directories(application-bell-settings
 target_sources(application-bell-settings
     PRIVATE
         ApplicationBellSettings.cpp
-        models/TimeUnitsModel.cpp
-        models/TemperatureUnitModel.cpp
         models/FrontlightModel.cpp
-        presenter/TimeUnitsPresenter.cpp
+        models/PrewakeUpModel.cpp
+        models/TemperatureUnitModel.cpp
+        models/TimeUnitsModel.cpp
         presenter/FrontlightPresenter.cpp
-        widgets/TimeSetListItem.cpp
-        widgets/TimeFormatSetListItem.cpp
+        presenter/PrewakeUpPresenter.cpp
+        presenter/TimeUnitsPresenter.cpp
         widgets/TemperatureUnitListItem.cpp
-        windows/BellSettingsWindow.cpp
+        widgets/TimeFormatSetListItem.cpp
+        widgets/TimeSetListItem.cpp
         windows/BellSettingsAdvancedWindow.cpp
-        windows/BellSettingsTimeUnitsWindow.cpp
-        windows/BellSettingsFinishedWindow.cpp
         windows/BellSettingsAlarmSettingsWindow.cpp
         windows/BellSettingsBedtimeToneWindow.cpp
+        windows/BellSettingsFinishedWindow.cpp
         windows/BellSettingsFrontlight.cpp
         windows/BellSettingsHomeViewWindow.cpp
+        windows/BellSettingsPrewakeUpWindow.cpp
+        windows/BellSettingsTimeUnitsWindow.cpp
         windows/BellSettingsTurnOffWindow.cpp
+        windows/BellSettingsWindow.cpp
 
-        models/TimeUnitsModel.hpp
-        models/TemperatureUnitModel.hpp
         models/FrontlightModel.hpp
-        presenter/TimeUnitsPresenter.hpp
+        models/PrewakeUpModel.hpp
+        models/TemperatureUnitModel.hpp
+        models/TimeUnitsModel.hpp
         presenter/FrontlightPresenter.hpp
-        widgets/TimeSetListItem.hpp
-        widgets/TimeFormatSetListItem.hpp
+        presenter/PrewakeUpPresenter.hpp
+        presenter/TimeUnitsPresenter.hpp
         widgets/TemperatureUnitListItem.hpp
-        windows/BellSettingsWindow.hpp
+        widgets/TimeFormatSetListItem.hpp
+        widgets/TimeSetListItem.hpp
         windows/BellSettingsAdvancedWindow.hpp
         windows/BellSettingsAlarmSettingsWindow.hpp
         windows/BellSettingsBedtimeToneWindow.hpp
         windows/BellSettingsFrontlight.hpp
         windows/BellSettingsHomeViewWindow.hpp
+        windows/BellSettingsPrewakeUpWindow.hpp
         windows/BellSettingsTimeUnitsWindow.hpp
         windows/BellSettingsTurnOffWindow.hpp
+        windows/BellSettingsWindow.hpp
 
     PRIVATE
         windows/BellSettingsFinishedWindow.hpp
