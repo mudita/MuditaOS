@@ -31,6 +31,8 @@ target_sources(module-bsp
 		bsp/torch/torch.cpp
 		bsp/vibrator/vibrator.cpp
 		bsp/watchdog/watchdog.cpp
+		bsp/bell_temp_sensor/bell_temp_sensor.cpp
+		bsp/bell_temp_sensor/TemperatureSource.cpp
 		common/audio.cpp
 		common/board.cpp
 		common/chip.cpp

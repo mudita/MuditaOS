@@ -3,12 +3,13 @@
 
 #include "bsp/bell_temp_sensor/bell_temp_sensor.hpp"
 #include "CT7117.hpp"
-#include "bsp/BoardDefinitions.hpp"
+#include <board/BoardDefinitions.hpp>
 #include "drivers/i2c/DriverI2C.hpp"
 #include "drivers/gpio/DriverGPIO.hpp"
 
 #include "fsl_common.h"
 #include <log.hpp>
+#include <sstream>
 
 namespace bsp::bell_temp_sensor
 {
@@ -47,26 +48,12 @@ namespace bsp::bell_temp_sensor
     {
         isFahrenheit = Fahrenheit;
 
-        drivers::DriverI2CParams i2cParams;
-        i2cParams.baudrate = static_cast<std::uint32_t>(BoardDefinitions::LIGHT_SENSOR_I2C_BAUDRATE);
-        i2c = drivers::DriverI2C::Create(static_cast<drivers::I2CInstances>(BoardDefinitions::LIGHT_SENSOR_I2C),
-                                         i2cParams);
+        LOG_DEBUG("Initializing Bell temperature sensor");
 
-        //configure to default values
-        uint16_t config = 0x00C0;
-        /*
-        OTS = 0             : No over temp alert flag
-        F1, F0 = 00         ; Number subsequent conversion failures - 1
-        ALTM = 0            ; Over temp alert mode - compactor mode
-        SD = 0              ; No shutdown
-        EM = 1              ; 16-bit format
-        RES1, RES0 = 10     ; 16-bit, 0,0078125 degC/bit
-        TO = 0              ; Timeout enable
-        PEC = 0             : disable PEC (parity error check)
-        CR1, CR0 = 00       ; conversion rate = 0,25Hz
-        OS = 0              ; No one shot conv
-        */
-        writeSingleRegister(static_cast<uint32_t>(CT7117_Registers::Config), &config);
+        drivers::DriverI2CParams i2cParams;
+        i2cParams.baudrate = static_cast<std::uint32_t>(BoardDefinitions::BELL_TEMP_SENSOR_I2C_BAUDRATE);
+        i2c = drivers::DriverI2C::Create(static_cast<drivers::I2CInstances>(BoardDefinitions::BELL_TEMP_SENSOR_I2C),
+                                         i2cParams);
 
         wakeup();
 
@@ -96,11 +83,18 @@ namespace bsp::bell_temp_sensor
 
     Temperature readout()
     {
-        uint16_t reg;
+        uint8_t reg[2] = {0, 0};
         float temp = 0.0;
-        readSingleRegister(static_cast<uint32_t>(CT7117_Registers::Temp), &reg);
 
-        temp = static_cast<float>(reg) * CT7117_Temperature_LSB;
+        readSingleRegister(static_cast<uint32_t>(CT7117_Registers::Temp), reinterpret_cast<uint16_t*>(&reg[0]));
+        uint16_t reg16 = (static_cast<uint16_t>(reg[0])<<8) | (static_cast<uint16_t>(reg[1]) & 0xFFE0);  //0.25 C resolution
+
+        uint16_t integer = (reg16 & 0x7FFF) >> 7;           //remove sign bit and shift to lower byte
+        uint16_t fractional = ((reg16 >> 5) & 0x3) * 25;    //shift fractional part to correct decimal position and limit resolution to 0.25 C
+
+        temp = static_cast<float>(integer) + static_cast<float>(fractional) / 100.0;
+        if (reg16 & 0x8000) //sign bit present
+            temp *= -1.0;
         if (isFahrenheit)
             temp = (temp * 1.8) + 32.00;
 
@@ -112,6 +106,8 @@ namespace bsp::bell_temp_sensor
         std::uint8_t readout;
         addr.subAddress = static_cast<uint8_t>(CT7117_Registers::ID);
         i2c->Read(addr, reinterpret_cast<uint8_t*>(&readout), 1);
+
+        LOG_DEBUG("Bell temperature sensor %s", (readout == CT7117_DEVICE_ID) ? "present" : "error !");
         
         return readout == CT7117_DEVICE_ID;
     }
