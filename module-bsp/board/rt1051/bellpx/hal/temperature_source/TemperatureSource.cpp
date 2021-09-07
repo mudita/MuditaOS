@@ -3,21 +3,26 @@
 
 #include <module-bsp/hal/temperature_source/TemperatureSource.hpp>
 #include <hal/GenericFactory.hpp>
+#include "bsp/bell_temp_sensor/bell_temp_sensor.hpp"
 
 namespace hal::temperature
 {
-
-    class RT1051TemperatureSource : public AbstractTemperatureSource
+    class BellTemperatureSource : public AbstractTemperatureSource
     {
       public:
-        Result read() override
+        Result read()
         {
-            return hal::temperature::AbstractTemperatureSource::Result();
+            temperature = bsp::bell_temp_sensor::readout();
+            return temperature;
         }
+
+      private:
+        AbstractTemperatureSource::Temperature temperature{};
     };
 
     std::shared_ptr<AbstractTemperatureSource> AbstractTemperatureSource::Factory::create()
     {
-        return hal::impl::factory<RT1051TemperatureSource, AbstractTemperatureSource>();
+        bsp::bell_temp_sensor::init();
+        return hal::impl::factory<BellTemperatureSource, AbstractTemperatureSource>();
     }
 } // namespace hal::temperature
