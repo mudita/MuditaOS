@@ -17,5 +17,13 @@ namespace bell
         void initProductHardware() final;
         void deinitProductHardware() final;
         bool handleMessage(std::uint32_t queueID) override;
+        void handleRotaryEncoderEvent();
+        enum class EventQueues
+        {
+            queueHeadsetIRQ = static_cast<int>(WorkerEventQueues::queueRTC) + 1,
+            queueRotaryEncoder,
+        };
+        static constexpr auto rotaryEncoderQueueSize = 64U;
+        static constexpr auto rotaryEncoderQueueName = "qRotaryEncoder";
     };
 } // namespace bell

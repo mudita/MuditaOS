@@ -63,6 +63,7 @@ target_sources(module-bsp
 		common/fsl_drivers/fsl_src.c
 		common/fsl_drivers/fsl_usdhc.c
 		common/fsl_drivers/fsl_wdog.c
+		common/fsl_drivers/fsl_qtmr.c
 		common/startup_mimxrt1052.cpp
 		common/system_MIMXRT1051.c
 		drivers/RT1051DriverDMA.cpp
