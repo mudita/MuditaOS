@@ -2,6 +2,9 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BatteryBrownoutDetector.hpp"
+
+#include <service-evtmgr/BatteryMessages.hpp>
+#include <SystemManager/Constants.hpp>
 #include <Timers/TimerFactory.hpp>
 
 namespace
@@ -13,14 +16,12 @@ namespace
 } // namespace
 
 BatteryBrownoutDetector::BatteryBrownoutDetector(sys::Service *service,
-                                                 std::function<int()> getMeasurementCallback,
-                                                 std::function<void()> positiveResultCallback,
-                                                 std::function<void()> negativeResultCallback)
-    : parentService(service), getMeasurementCallback(std::move(getMeasurementCallback)),
-      positiveResultCallback(std::move(positiveResultCallback)),
-      negativeResultCallback(std::move(negativeResultCallback)), detectionOngoing{false}, measurementCount{0},
-      measurementTick{sys::TimerFactory::createSingleShotTimer(
-          service, measurementTickName, measurementTickTime, [this](sys::Timer &) { checkBrownout(); })}
+                                                 std::shared_ptr<hal::battery::AbstractBatteryCharger> charger)
+    : parentService(service),
+      charger(std::move(charger)), measurementTick{sys::TimerFactory::createSingleShotTimer(
+                                       service, measurementTickName, measurementTickTime, [this](sys::Timer &) {
+                                           checkBrownout();
+                                       })}
 {}
 
 void BatteryBrownoutDetector::startDetection()
@@ -36,9 +37,12 @@ void BatteryBrownoutDetector::startDetection()
 
 void BatteryBrownoutDetector::checkBrownout()
 {
-    if (getMeasurementCallback() < brownoutLevelVoltage) {
+    if (charger->getBatteryVoltage() < brownoutLevelVoltage) {
         LOG_DEBUG("Battery Brownout detected");
-        positiveResultCallback();
+
+        auto messageBrownout = std::make_shared<sevm::BatteryBrownoutMessage>();
+        parentService->bus.sendUnicast(std::move(messageBrownout), service::name::system_manager);
+
         return;
     }
 
@@ -49,6 +53,5 @@ void BatteryBrownoutDetector::checkBrownout()
     else {
         LOG_DEBUG("Battery Brownout detection window finish with negative result");
         detectionOngoing = false;
-        negativeResultCallback();
     }
 }
