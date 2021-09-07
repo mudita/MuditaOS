@@ -77,6 +77,7 @@ target_link_libraries(${PROJECT_NAME}
         magic_enum
         ${TARGET_LIBRARIES}
     PRIVATE
+        purefs-paths
         time-constants
 )
 
