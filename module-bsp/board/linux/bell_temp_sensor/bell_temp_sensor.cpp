@@ -7,6 +7,8 @@
 namespace bsp::bell_temp_sensor
 {
     bool isFahrenheit = false;
+    constexpr auto celsius_temperature_mock = 21.0;
+    constexpr auto fahrenheit_temperature_mock = (celsius_temperature_mock * 1.8) + 32;
 
     std::int32_t init(bool Fahrenheit)
     {
@@ -32,12 +34,10 @@ namespace bsp::bell_temp_sensor
 
     Temperature readout()
     {
-        float temp = 21.0;
-    
         if (isFahrenheit)
-            temp = (temp * 1.8) + 32.00;
-
-        return temp;
+            return fahrenheit_temperature_mock;
+        else
+            return celsius_temperature_mock;
     }
 
     bool isPresent()

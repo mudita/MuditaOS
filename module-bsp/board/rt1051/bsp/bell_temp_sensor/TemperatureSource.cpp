@@ -7,7 +7,6 @@
 
 namespace hal::temperature
 {
-
     class BellTemperatureSource : public AbstractTemperatureSource
     {
       public:
