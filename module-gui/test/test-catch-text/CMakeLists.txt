@@ -1,4 +1,4 @@
-﻿# gui tests
+# gui tests
 add_catch2_executable(
         NAME
                 gui-text
@@ -8,6 +8,7 @@ add_catch2_executable(
                 ../mock/multi-line-string.cpp
                 ../mock/InitializedFontManager.cpp
                 test-gui-Text.cpp
+                test-gui-TextFixedSize.cpp
                 test-gui-TextBlock.cpp
                 test-gui-TextBlockCursor.cpp
                 test-gui-TextDocument.cpp
@@ -19,10 +20,7 @@ add_catch2_executable(
                 ..
                 ../mock/
         LIBS
-                module-vfs
+                module-sys
                 module-gui
-                iosyscalls
-        DEPS
-                assets
-                PurePhone.img-target
+	USE_FS
 )

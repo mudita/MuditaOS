@@ -1,10 +1,10 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "DayLabel.hpp"
 #include "MonthBox.hpp"
-#include "application-calendar/widgets/CalendarStyle.hpp"
-#include "application-calendar/windows/CalendarMainWindow.hpp"
-#include "application-calendar/widgets/DayLabel.hpp"
+#include <application-calendar/widgets/CalendarStyle.hpp>
+#include <windows/CalendarMainWindow.hpp>
 
 namespace gui
 {
@@ -19,8 +19,6 @@ namespace gui
                        std::array<bool, 31> &isDayEmpty)
         : GridLayout(parent, style::window::default_left_margin, offsetTop, width, height, {dayWidth, dayHeight})
     {
-        LOG_DEBUG("Call MonthBox constructor");
-
         assert(parent);
         parent->addWidget(this);
         month            = model->getMonthText();
@@ -55,29 +53,12 @@ namespace gui
                 addWidget(day);
             }
         }
-        auto mainWindow = dynamic_cast<CalendarMainWindow *>(parent);
-        if (mainWindow->returnedFromWindow) {
+        date::year_month_day actualDate = TimePointToYearMonthDay(TimePointNow());
+        if (model->getYear() == actualDate.year() && model->getMonth() == actualDate.month()) {
             focusChangedCallback = [=](Item &item) {
-                calendar::YearMonthDay date = monthFilterValue.year() / monthFilterValue.month() / date::last;
-                if (unsigned(date.day()) < mainWindow->dayFocusedBefore) {
-                    setFocusOnElement(unsigned(date.day()) - 1);
-                }
-                else {
-                    setFocusOnElement(mainWindow->dayFocusedBefore - 1);
-                }
+                setFocusOnElement(unsigned(actualDate.day()) - 1);
                 return true;
             };
         }
-        else {
-            date::year_month_day actualDate = TimePointToYearMonthDay(TimePointNow());
-            if (model->getYear() == actualDate.year() && model->getMonth() == actualDate.month()) {
-                focusChangedCallback = [=](Item &item) {
-                    setFocusOnElement(unsigned(actualDate.day()) - 1);
-                    return true;
-                };
-            }
-        }
-
-        LOG_DEBUG("MonthBox constructor Completed Successfully!");
     }
 } /* namespace gui */

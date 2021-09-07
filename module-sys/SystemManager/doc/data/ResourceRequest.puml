@@ -1,4 +1,5 @@
 @startuml
+skinparam BackgroundColor F0F0F0
 
 service_eInk -> eInkSentinel : SetFrequencyValueRequest
 eInkSentinel -> PowerManager : RequestCpuFrequencyMessage

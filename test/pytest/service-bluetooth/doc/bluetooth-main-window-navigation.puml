@@ -1,4 +1,5 @@
 @startuml
+skinparam BackgroundColor F0F0F0
 if (is on desktop main) then (no)
   :navigate to desktop main;
 else (yes)

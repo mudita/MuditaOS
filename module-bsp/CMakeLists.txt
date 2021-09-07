@@ -1,61 +1,42 @@
 ﻿# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-cmake_minimum_required(VERSION 3.12)
-
 project(module-bsp VERSION 1.0
-        DESCRIPTION "VFS module library")
+        DESCRIPTION "BSP module library")
 
-set(SOURCES
-        "${CMAKE_CURRENT_SOURCE_DIR}/bsp/cellular/bsp_cellular.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/bsp/lpm/bsp_lpm.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/drivers/pll/DriverPLL.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/drivers/dmamux/DriverDMAMux.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/drivers/dma/DriverDMA.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/drivers/i2c/DriverI2C.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/drivers/pwm/DriverPWM.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/drivers/lpspi/DriverLPSPI.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/drivers/usdhc/DriverUSDHC.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/drivers/semc/DriverSEMC.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/drivers/gpio/DriverGPIO.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/bsp/bluetooth/Bluetooth.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/bsp/common.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/devices/Device.cpp"    
-        )
+add_library(${PROJECT_NAME} STATIC)
+target_sources(
+        module-bsp
+    PRIVATE
+        bsp/bluetooth/Bluetooth.cpp
+        bsp/cellular/bsp_cellular.cpp
+        bsp/common.cpp
+        bsp/lpm/bsp_lpm.cpp
+        devices/Device.cpp
+        drivers/dma/DriverDMA.cpp
+        drivers/dmamux/DriverDMAMux.cpp
+        drivers/gpio/DriverGPIO.cpp
+        drivers/i2c/DriverI2C.cpp
+        drivers/lpspi/DriverLPSPI.cpp
+        drivers/lpuart/DriverLPUART.cpp
+        drivers/pll/DriverPLL.cpp
+        drivers/pwm/DriverPWM.cpp
+        drivers/semc/DriverSEMC.cpp
+        drivers/usdhc/DriverUSDHC.cpp
 
-if (NOT ${PROJECT_TARGET} STREQUAL "TARGET_Linux")
-    include(targets/Target_Cross.cmake)
-endif ()
-
-if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
-    include(targets/Target_RT1051.cmake)
-elseif (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
-    include(targets/Target_Linux.cmake)
-else ()
-    message(FATAL_ERROR "Invalid target!")
-endif ()
-
-add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
-
-
-if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
-    target_compile_options(${PROJECT_NAME} PUBLIC "-Wno-unused-result")
-endif()
-
-if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
-    target_compile_definitions (${PROJECT_NAME} PUBLIC USB_STACK_FREERTOS)
-endif()
+    PUBLIC
+        hal/temperature_source/TemperatureSource.hpp
+        hal/battery_charger/AbstractBatteryCharger.hpp
+        hal/key_input/AbstractKeyInput.hpp
+        hal/key_input/KeyEventDefinitions.hpp
+)
+add_board_subdirectory(board)
 
 # Board specific compilation definitions,options,include directories and features
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_TARGET})
-target_compile_definitions(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_DEFINITIONS})
-target_include_directories(${PROJECT_NAME} PUBLIC ${BOARD_DIR_INCLUDES}) #M.P: fix me, should be declared as PRIVATE
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_INCLUDES})
-target_compile_features(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_FEATURES})
 target_compile_options(${PROJECT_NAME}
-    PUBLIC
-    ${TARGET_COMPILE_OPTIONS}
     PRIVATE
     -Wno-sign-compare
     -Wno-missing-field-initializers
@@ -67,7 +48,6 @@ target_compile_options(${PROJECT_NAME}
     # C only flags
     $<$<COMPILE_LANGUAGE:C>:-Wno-old-style-declaration>
 )
-target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
 
 target_compile_definitions(${PROJECT_NAME}
 
@@ -80,16 +60,25 @@ target_compile_definitions(${PROJECT_NAME}
         )
 
 target_include_directories(${PROJECT_NAME}
-		PUBLIC
-
-		${CMAKE_CURRENT_SOURCE_DIR}
+        PUBLIC
+        $<BUILD_INTERFACE:
+            ${CMAKE_CURRENT_SOURCE_DIR}
+            ${CMAKE_CURRENT_SOURCE_DIR}/bsp/headset
+            ${CMAKE_CURRENT_SOURCE_DIR}/drivers/gpio
+            ${CMAKE_CURRENT_SOURCE_DIR}/drivers/i2c
+        >
 )
-
-set_source_files_properties(${BOARD_SOURCE_FILES_PROPERTIES})
 
 target_link_libraries(${PROJECT_NAME}
-    module-os
-    service-bluetooth
-    ${TARGET_LIBRARIES}
+    PUBLIC
+        eventstore
+        module-os
+        service-bluetooth
+        ${TARGET_LIBRARIES}
+    PRIVATE
+        time-constants
 )
 
+if (${ENABLE_TESTS})
+    add_subdirectory(tests)
+endif ()

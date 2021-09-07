@@ -1,22 +1,25 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MusicPlayerAllSongsWindow.hpp"
-#include "application-music-player/ApplicationMusicPlayer.hpp"
+#include <application-music-player/ApplicationMusicPlayer.hpp>
+#include <data/MusicPlayerStyle.hpp>
 
 #include <Style.hpp>
 #include <cassert>
 #include <i18n/i18n.hpp>
-#include <log/log.hpp>
 #include <service-audio/AudioServiceAPI.hpp>
+#include <gui/widgets/ListView.hpp>
+#include <gui/widgets/Icon.hpp>
 
 namespace gui
 {
 
-    MusicPlayerAllSongsWindow::MusicPlayerAllSongsWindow(app::Application *app)
-        : AppWindow(app, gui::name::window::all_songs_window), songsModel{
-                                                                   std::make_shared<SongsModel>(this->application)}
+    MusicPlayerAllSongsWindow::MusicPlayerAllSongsWindow(
+        app::Application *app, std::shared_ptr<app::music_player::SongsContract::Presenter> windowPresenter)
+        : AppWindow(app, gui::name::window::all_songs_window), presenter{windowPresenter}
     {
+        presenter->attach(this);
         buildInterface();
     }
 
@@ -26,71 +29,35 @@ namespace gui
         buildInterface();
     }
 
-    auto MusicPlayerAllSongsWindow::setCurrentVolume(const std::function<void(const audio::Volume &)> &successCallback,
-                                                     const std::function<void(const audio::Volume &)> &errCallback)
-        -> bool
-    {
-        audio::Volume volume;
-        const auto ret = application->getCurrentVolume(volume);
-        if (ret == audio::RetCode::Success) {
-            if (successCallback != nullptr) {
-                successCallback(volume);
-            }
-        }
-        else {
-            if (errCallback != nullptr) {
-                errCallback(volume);
-            }
-        }
-        return ret == audio::RetCode::Success;
-    }
-
     void MusicPlayerAllSongsWindow::buildInterface()
     {
         AppWindow::buildInterface();
 
-        setTitle(utils::localize.get("app_music_player_all_songs"));
-
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_music_player_play"));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate("app_music_player_music_library"));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate("app_music_player_quit"));
 
         songsList = new gui::ListView(this,
                                       musicPlayerStyle::allSongsWindow::x,
                                       musicPlayerStyle::allSongsWindow::y,
                                       musicPlayerStyle::allSongsWindow::w,
                                       musicPlayerStyle::allSongsWindow::h,
-                                      songsModel,
-                                      style::listview::ScrollBarType::Fixed);
+                                      presenter->getMusicPlayerItemProvider(),
+                                      listview::ScrollBarType::Fixed);
 
-        auto successCallback = [this](const audio::Volume &volume) {
-            auto volumeText = audio::GetVolumeText(volume);
-            soundLabel      = new gui::Label(this,
-                                        musicPlayerStyle::volumeLabel::x,
-                                        musicPlayerStyle::volumeLabel::y,
-                                        musicPlayerStyle::volumeLabel::w,
-                                        musicPlayerStyle::volumeLabel::h,
-                                        volumeText);
+        emptyListIcon = new gui::Icon(this,
+                                      ::style::window::default_left_margin,
+                                      ::style::window::default_vertical_pos,
+                                      ::style::window::default_body_width,
+                                      ::style::window::default_body_height,
+                                      "note",
+                                      utils::translate("app_music_player_music_empty_window_notification"));
+
+        emptyListIcon->setAlignment(Alignment::Horizontal::Center);
+        songsList->emptyListCallback    = [this]() { emptyListIcon->setVisible(true); };
+        songsList->notEmptyListCallback = [this]() {
+            emptyListIcon->setVisible(false);
+            setTitle(utils::translate("app_music_player_music_library_window_name"));
         };
-        auto errCallback = [this](const audio::Volume &volume) {
-            soundLabel = new gui::Label(this,
-                                        musicPlayerStyle::volumeLabel::x,
-                                        musicPlayerStyle::volumeLabel::y,
-                                        musicPlayerStyle::volumeLabel::w,
-                                        musicPlayerStyle::volumeLabel::h,
-                                        musicPlayerStyle::volumeLabel::defaultVolumeLabelText);
-        };
-        setCurrentVolume(successCallback, errCallback);
-
-        soundLabel->setMargins(gui::Margins(musicPlayerStyle::volumeLabel::leftMargin,
-                                            musicPlayerStyle::volumeLabel::topMargin,
-                                            musicPlayerStyle::volumeLabel::rightMargin,
-                                            musicPlayerStyle::volumeLabel::bottomMargin));
-        soundLabel->setFilled(false);
-        soundLabel->setPenFocusWidth(style::window::default_border_focus_w);
-        soundLabel->setPenWidth(style::window::default_border_no_focus_w);
-        soundLabel->setFont(style::window::font::medium);
-        soundLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
-
         setFocusItem(songsList);
     }
 
@@ -99,32 +66,45 @@ namespace gui
         erase();
     }
 
-    void MusicPlayerAllSongsWindow::onBeforeShow(ShowMode mode, SwitchData *data)
+    void MusicPlayerAllSongsWindow::onBeforeShow([[maybe_unused]] ShowMode mode, [[maybe_unused]] SwitchData *data)
     {
-        auto app = dynamic_cast<app::ApplicationMusicPlayer *>(application);
-        assert(app);
+        presenter->attach(this);
+        auto index = presenter->getMusicPlayerItemProvider()->getCurrentIndex();
 
-        songsModel->createData(app->getMusicFilesList(),
-                               [app](const std::string &fileName) { return app->play(fileName); });
+        songsList->rebuildList(listview::RebuildType::OnPageElement, index);
     }
 
-    bool MusicPlayerAllSongsWindow::onDatabaseMessage(sys::Message *msgl)
+    void MusicPlayerAllSongsWindow::updateSongsState()
     {
-        return false;
+        songsList->rebuildList(gui::listview::RebuildType::InPlace);
+    }
+
+    void MusicPlayerAllSongsWindow::refreshWindow()
+    {
+        application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+    }
+
+    void MusicPlayerAllSongsWindow::setBottomBarTemporaryMode(const std::string &text)
+    {
+        bottomBarTemporaryMode(text, BottomBar::Side::CENTER, false);
+    }
+
+    void MusicPlayerAllSongsWindow::restoreFromBottomBarTemporaryMode()
+    {
+        bottomBarRestoreFromTemporaryMode();
     }
 
     bool MusicPlayerAllSongsWindow::onInput(const InputEvent &inputEvent)
     {
-        auto ret           = AppWindow::onInput(inputEvent);
-        const auto keyCode = inputEvent.keyCode;
-        if (keyCode == KeyCode::KEY_VOLUP || keyCode == KeyCode::KEY_VOLDN || keyCode == KeyCode::KEY_ENTER) {
-            auto successCallback = [this](const audio::Volume &volume) {
-                auto volumeText = audio::GetVolumeText(volume);
-                soundLabel->setText(volumeText);
-            };
-            return setCurrentVolume(successCallback, nullptr);
+        if (AppWindow::onInput(inputEvent)) {
+            return true;
         }
-        return ret;
-    }
 
+        if (inputEvent.isShortRelease(gui::KeyCode::KEY_ENTER)) {
+            presenter->createData();
+            return true;
+        }
+
+        return false;
+    }
 } /* namespace gui */

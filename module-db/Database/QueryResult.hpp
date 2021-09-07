@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -27,17 +27,15 @@ class QueryResult
 
     uint32_t getFieldCount() const
     {
-        return fieldCount;
+        return rows[currentRow].size();
     }
 
     uint32_t getRowCount() const
     {
-        return rowCount;
+        return rows.size();
     }
 
   private:
     uint32_t currentRow;
     std::vector<std::vector<Field>> rows;
-    uint32_t fieldCount;
-    uint32_t rowCount;
 };

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -25,12 +25,14 @@ namespace db::query
     class NoteStoreResult : public QueryResult
     {
       public:
-        explicit NoteStoreResult(bool isSuccess);
+        NoteStoreResult(bool isSuccess, std::uint32_t noteId);
 
         [[nodiscard]] bool succeed() const noexcept;
+        [[nodiscard]] std::uint32_t getNoteId() const noexcept;
         [[nodiscard]] std::string debugInfo() const override;
 
       private:
         bool isSuccess;
+        std::uint32_t noteId;
     };
 } // namespace db::query

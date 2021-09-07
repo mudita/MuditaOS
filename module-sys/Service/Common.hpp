@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include "FreeRTOSConfig.h"
 #include "SystemReturnCodes.hpp"
 
 namespace sys
@@ -11,6 +10,7 @@ namespace sys
 
     enum class BusChannel
     {
+        Unknown,
         System,
         SystemManagerRequests,
         PowerManagerRequests,
@@ -22,8 +22,10 @@ namespace sys
         ServiceFotaNotifications,
         AntennaNotifications,
         ServiceEvtmgrNotifications,
-        CalendarNotifications,
         PhoneModeChanges,
+        PhoneLockChanges,
+        AlarmChanges,
+        BluetoothModeChanges
     };
 
     enum class ServicePriority
@@ -41,6 +43,23 @@ namespace sys
         SuspendToRAM,
         SuspendToNVM
     };
+
+    enum class CloseReason
+    {
+        RegularPowerDown,
+        Reboot,
+        SystemBrownout,
+        LowBattery
+    };
+
+    // Updater reason code
+    enum class UpdateReason
+    {
+        Update,
+        Recovery,
+        FactoryReset
+    };
+
 } // namespace sys
 
 inline const char *c_str(sys::ReturnCodes code)
@@ -76,6 +95,8 @@ inline const char *c_str(sys::ServicePowerMode code)
 inline const char *c_str(sys::BusChannel channel)
 {
     switch (channel) {
+    case sys::BusChannel::Unknown:
+        return "Unknown";
     case sys::BusChannel::System:
         return "System";
     case sys::BusChannel::SystemManagerRequests:
@@ -98,10 +119,14 @@ inline const char *c_str(sys::BusChannel channel)
         return "AntennaNotifications";
     case sys::BusChannel::ServiceEvtmgrNotifications:
         return "ServiceEvtmgrNotifications";
-    case sys::BusChannel::CalendarNotifications:
-        return "CalendarNotifications";
     case sys::BusChannel::PhoneModeChanges:
         return "PhoneModeChanges";
+    case sys::BusChannel::BluetoothModeChanges:
+        return "BluetoothModeChanges";
+    case sys::BusChannel::PhoneLockChanges:
+        return "PhoneLockChanges";
+    case sys::BusChannel::AlarmChanges:
+        return "AlarmChanges";
     }
     return "";
 }

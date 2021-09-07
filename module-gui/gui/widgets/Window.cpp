@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /*
@@ -23,7 +23,7 @@ namespace gui
     void Window::onBeforeShow(ShowMode mode, SwitchData *data)
     {}
 
-    void Window::onClose()
+    void Window::onClose(CloseReason reason)
     {}
 
     void Window::getRefreshArea(uint16_t &x, uint16_t &y, uint16_t &w, uint16_t &h)
@@ -56,8 +56,7 @@ namespace gui
         if (handleNavigation(inputEvent)) {
             return true;
         }
-        return inputEvent.state == InputEvent::State::keyReleasedShort &&
-               inputEvent.keyCode == gui::KeyCode::KEY_ENTER && onActivated(nullptr);
+        return inputEvent.isShortRelease(gui::KeyCode::KEY_ENTER) && onActivated(nullptr);
     }
 
     void Window::accept(GuiVisitor &visitor)

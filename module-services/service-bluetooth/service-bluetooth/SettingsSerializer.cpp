@@ -3,7 +3,7 @@
 
 #include "SettingsSerializer.hpp"
 #include "btstack_util.h"
-#include <log/log.hpp>
+#include <log.hpp>
 
 namespace strings
 {

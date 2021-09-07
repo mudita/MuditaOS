@@ -15,6 +15,7 @@ namespace app::onBoarding
       public:
         explicit StartConfigurationWindow(app::Application *app);
 
+        gui::status_bar::Configuration configureStatusBar(gui::status_bar::Configuration appConfiguration) override;
         bool onInput(const gui::InputEvent &inputEvent) override;
 
         void buildInterface() override;

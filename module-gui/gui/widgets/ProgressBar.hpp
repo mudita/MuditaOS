@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -18,19 +18,19 @@ namespace gui
 
         virtual void setMaximum(unsigned int value)         = 0;
         virtual auto setValue(unsigned int value) -> bool   = 0;
-        virtual auto update(int value = 1) -> bool          = 0;
         virtual void setPercentageValue(unsigned int value) = 0;
+        [[nodiscard]] virtual int getMaximum() const        = 0;
     };
 
     class ProgressBar : public Rect, public Progress
     {
       public:
-        ProgressBar(Item *parent, std::uint32_t x, std::uint32_t y, std::uint32_t w, std::uint32_t h);
+        [[deprecated]] ProgressBar(Item *parent, std::uint32_t x, std::uint32_t y, std::uint32_t w, std::uint32_t h);
 
         void setMaximum(unsigned int value) noexcept override;
         auto setValue(unsigned int value) noexcept -> bool override;
-        auto update(int value = 1) noexcept -> bool override;
         void setPercentageValue(unsigned int value) noexcept override;
+        [[nodiscard]] int getMaximum() const noexcept override;
 
         void buildDrawListImplementation(std::list<Command> &commands) override;
         bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
@@ -50,8 +50,8 @@ namespace gui
 
         void setMaximum(unsigned int value) noexcept override;
         auto setValue(unsigned int value) noexcept -> bool override;
-        auto update(int value = 1) noexcept -> bool override;
         void setPercentageValue(unsigned int value) noexcept override;
+        [[nodiscard]] int getMaximum() const noexcept override;
 
         void buildDrawListImplementation(std::list<Command> &commands) override;
         auto onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool override;

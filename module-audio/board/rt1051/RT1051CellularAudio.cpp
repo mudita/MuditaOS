@@ -4,11 +4,9 @@
 #include "RT1051CellularAudio.hpp"
 #include "board.h"
 #include "dma_config.h"
-#include "log/log.hpp"
+#include <log.hpp>
 
-#include "bsp/BoardDefinitions.hpp"
-
-#include <mutex.hpp>
+#include "board/BoardDefinitions.hpp"
 
 namespace audio
 {
@@ -18,11 +16,8 @@ namespace audio
     sai_edma_handle_t RT1051CellularAudio::txHandle = {};
     sai_edma_handle_t RT1051CellularAudio::rxHandle = {};
 
-    RT1051CellularAudio::RT1051CellularAudio()
-        : SAIAudioDevice(BOARD_CELLULAR_AUDIO_SAIx, &rxHandle, &txHandle), saiInFormat{}, saiOutFormat{}, config{}
-    {
-        isInitialized = true;
-    }
+    RT1051CellularAudio::RT1051CellularAudio() : SAIAudioDevice(BOARD_CELLULAR_AUDIO_SAIx, &rxHandle, &txHandle)
+    {}
 
     RT1051CellularAudio::~RT1051CellularAudio()
     {
@@ -30,47 +25,16 @@ namespace audio
         Deinit();
     }
 
-    AudioDevice::RetCode RT1051CellularAudio::Start(const AudioDevice::Format &format)
+    AudioDevice::RetCode RT1051CellularAudio::Start()
     {
-        cpp_freertos::LockGuard lock(mutex);
-
         if (state == State::Running) {
             LOG_ERROR("Audio device already running");
             return AudioDevice::RetCode::Failure;
         }
 
         Init();
-
-        saiInFormat.bitWidth      = format.bitWidth;
-        saiInFormat.sampleRate_Hz = format.sampleRate_Hz;
-
-        saiOutFormat.bitWidth      = format.bitWidth;
-        saiOutFormat.sampleRate_Hz = format.sampleRate_Hz;
-
-        if (format.flags & static_cast<uint32_t>(AudioDevice::Flags::InputLeft)) {
-            saiInFormat.stereo = kSAI_MonoLeft;
-            InStart();
-        }
-        else if (format.flags & static_cast<uint32_t>(AudioDevice::Flags::InputRight)) {
-            saiInFormat.stereo = kSAI_MonoRight;
-            InStart();
-        }
-        else if (format.flags & static_cast<uint32_t>(AudioDevice::Flags::InputStereo)) {
-            saiInFormat.stereo = kSAI_Stereo;
-            InStart();
-        }
-
-        if (format.flags & static_cast<uint32_t>(AudioDevice::Flags::OutputMono)) {
-            saiOutFormat.stereo = kSAI_MonoLeft;
-            OutStart();
-        }
-        else if (format.flags & static_cast<uint32_t>(AudioDevice::Flags::OutputStereo)) {
-            saiOutFormat.stereo = kSAI_Stereo;
-            OutStart();
-        }
-
-        // Store format passed
-        currentFormat = format;
+        InStart();
+        OutStart();
 
         state = State::Running;
 
@@ -79,8 +43,6 @@ namespace audio
 
     AudioDevice::RetCode RT1051CellularAudio::Stop()
     {
-        cpp_freertos::LockGuard lock(mutex);
-
         if (state == State::Stopped) {
             return AudioDevice::RetCode::Failure;
         }
@@ -88,42 +50,20 @@ namespace audio
         InStop();
         OutStop();
 
-        currentFormat = {};
-        state         = State::Stopped;
+        state = State::Stopped;
 
         return AudioDevice::RetCode::Success;
     }
 
-    AudioDevice::RetCode RT1051CellularAudio::OutputVolumeCtrl(float vol)
+    AudioDevice::RetCode RT1051CellularAudio::setOutputVolume(float vol)
     {
-        currentFormat.outputVolume = vol;
         return AudioDevice::RetCode::Success;
     }
 
-    AudioDevice::RetCode RT1051CellularAudio::InputGainCtrl(float gain)
+    AudioDevice::RetCode RT1051CellularAudio::setInputGain(float gain)
     {
-        currentFormat.inputGain = gain;
         return AudioDevice::RetCode::Success;
     }
-
-    AudioDevice::RetCode RT1051CellularAudio::InputPathCtrl(InputPath inputPath)
-    {
-        currentFormat.inputPath = inputPath;
-        return AudioDevice::RetCode::Success;
-    }
-
-    AudioDevice::RetCode RT1051CellularAudio::OutputPathCtrl(OutputPath outputPath)
-    {
-        currentFormat.outputPath = outputPath;
-        return AudioDevice::RetCode::Success;
-    }
-
-    bool RT1051CellularAudio::IsFormatSupported(const AudioDevice::Format &format)
-    {
-        return true;
-    }
-
-    // INTERNALS
 
     void RT1051CellularAudio::Init()
     {
@@ -175,13 +115,13 @@ namespace audio
         sai_transfer_format_t sai_format = {};
 
         /* Configure the audio format */
-        sai_format.bitWidth           = saiInFormat.bitWidth;
+        sai_format.bitWidth           = supportedBitWidth;
         sai_format.channel            = 0U;
-        sai_format.sampleRate_Hz      = saiInFormat.sampleRate_Hz;
+        sai_format.sampleRate_Hz      = supportedSampleRate;
         sai_format.masterClockHz      = mclkSourceClockHz;
         sai_format.isFrameSyncCompact = false;
         sai_format.protocol           = config.protocol;
-        sai_format.stereo             = saiInFormat.stereo;
+        sai_format.stereo             = kSAI_MonoLeft;
 #if defined(FSL_FEATURE_SAI_FIFO_COUNT) && (FSL_FEATURE_SAI_FIFO_COUNT > 1)
         sai_format.watermark = FSL_FEATURE_SAI_FIFO_COUNT / 2U;
 #endif
@@ -206,13 +146,13 @@ namespace audio
         sai_transfer_format_t sai_format;
 
         /* Configure the audio format */
-        sai_format.bitWidth           = saiOutFormat.bitWidth;
+        sai_format.bitWidth           = supportedBitWidth;
         sai_format.channel            = 0U;
-        sai_format.sampleRate_Hz      = saiOutFormat.sampleRate_Hz;
+        sai_format.sampleRate_Hz      = supportedSampleRate;
         sai_format.masterClockHz      = mclkSourceClockHz;
         sai_format.isFrameSyncCompact = false;
         sai_format.protocol           = config.protocol;
-        sai_format.stereo             = saiOutFormat.stereo;
+        sai_format.stereo             = kSAI_MonoLeft;
 #if defined(FSL_FEATURE_SAI_FIFO_COUNT) && (FSL_FEATURE_SAI_FIFO_COUNT > 1)
         sai_format.watermark = FSL_FEATURE_SAI_FIFO_COUNT / 2U;
 #endif
@@ -247,6 +187,21 @@ namespace audio
             SAI_TransferAbortReceiveEDMA(BOARD_CELLULAR_AUDIO_SAIx, &rxHandle);
         }
         memset(&rxHandle, 0, sizeof(rxHandle));
+    }
+
+    auto RT1051CellularAudio::getSupportedFormats() -> std::vector<AudioFormat>
+    {
+        return std::vector<AudioFormat>{getSourceFormat()};
+    }
+
+    auto RT1051CellularAudio::getSourceFormat() -> AudioFormat
+    {
+        return AudioFormat(supportedSampleRate, supportedBitWidth, supportedChannels);
+    }
+
+    auto RT1051CellularAudio::getTraits() const -> Traits
+    {
+        return Traits{.usesDMA = true};
     }
 
     void rxCellularCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData)

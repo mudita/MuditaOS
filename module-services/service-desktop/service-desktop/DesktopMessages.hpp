@@ -4,13 +4,8 @@
 #pragma once
 
 #include <endpoints/developerMode/DeveloperModeEndpoint.hpp>
-#include <endpoints/bluetooth/BluetoothEndpoint.hpp>
-#include <endpoints/update/UpdateMuditaOS.hpp>
-
 #include <service-appmgr/Actions.hpp>
 #include <service-appmgr/messages/ActionRequest.hpp>
-#include <service-appmgr/data/SimActionsParams.hpp>
-#include <service-appmgr/data/UsbActionsParams.hpp>
 #include <Service/Message.hpp>
 #include <MessageType.hpp>
 #include <service-desktop/DeveloperModeMessage.hpp>
@@ -18,35 +13,6 @@
 
 namespace sdesktop
 {
-    class UpdateOsMessage : public sys::DataMessage
-    {
-      public:
-        UpdateOsMessage(const std::string updateFilePath, const uint32_t requestUUID)
-            : sys::DataMessage(MessageType::UpdateOS)
-        {
-            updateStats.updateFile = updateFilePath;
-            updateStats.uuid       = requestUUID;
-        };
-
-        UpdateOsMessage() : sys::DataMessage(MessageType::UpdateOS)
-        {}
-
-        UpdateOsMessage(const updateos::UpdateMessageType updateMessageType)
-            : sys::DataMessage(MessageType::UpdateOS), messageType(updateMessageType)
-        {}
-
-        UpdateOsMessage(const updateos::UpdateMessageType updateMessageType, fs::path updateFileFoundOnBoot)
-            : sys::DataMessage(MessageType::UpdateOS), messageType(updateMessageType)
-        {
-            updateStats.updateFile = updateFileFoundOnBoot;
-        }
-
-        ~UpdateOsMessage() override = default;
-
-        updateos::UpdateStats updateStats       = {};
-        updateos::UpdateMessageType messageType = updateos::UpdateMessageType::UpdateNow;
-    };
-
     class BackupMessage : public sys::DataMessage
     {
       public:
@@ -73,6 +39,12 @@ namespace sdesktop
 
     namespace usb
     {
+        enum class USBConfigurationType
+        {
+            firstConfiguration,
+            reconfiguration
+        };
+
         class USBConnected : public sys::DataMessage
         {
           public:
@@ -84,9 +56,13 @@ namespace sdesktop
         class USBConfigured : public sys::DataMessage
         {
           public:
-            USBConfigured() : sys::DataMessage(MessageType::USBConfigured)
-            {}
+            explicit USBConfigured(
+                USBConfigurationType configurationType = sdesktop::usb::USBConfigurationType::firstConfiguration);
             ~USBConfigured() override = default;
+            USBConfigurationType getConfigurationType() const noexcept;
+
+          private:
+            USBConfigurationType configurationType;
         };
 
         class USBDisconnected : public sys::DataMessage
@@ -95,50 +71,12 @@ namespace sdesktop
             USBDisconnected() : sys::DataMessage(MessageType::USBDisconnected)
             {}
             ~USBDisconnected() override = default;
-        };
+        }; // namespace usb
 
     } // namespace usb
 
-    namespace passcode
-    {
-        class ScreenPasscodeRequest : public sys::DataMessage, public app::manager::actions::ConvertibleToAction
-        {
-            static constexpr auto passcodeName = "ScreenPasscode";
-
-          public:
-            explicit ScreenPasscodeRequest(bool cancel = false)
-                : sys::DataMessage(MessageType::ScreenPasscodeRequest), cancel(cancel)
-            {}
-
-            [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
-            {
-                return std::make_unique<app::manager::ActionRequest>(
-                    sender,
-                    app::manager::actions::RequestScreenPasscode,
-                    std::make_unique<app::manager::actions::ScreenPasscodeParams>(cancel));
-            }
-
-          private:
-            bool cancel = false;
-        };
-
-        class ScreenPasscodeUnlocked : public sys::DataMessage
-        {
-          public:
-            explicit ScreenPasscodeUnlocked() : sys::DataMessage(MessageType::ScreenPasscodeUnlocked)
-            {}
-        }; // namespace sdesktop
-    }      // namespace passcode
-
     namespace developerMode
     {
-
-        class ATResponseEvent : public Event
-        {
-          public:
-            explicit ATResponseEvent(std::vector<std::string> resp);
-        };
-
         class AppFocusChangeEvent : public Event
         {
           public:
@@ -157,6 +95,12 @@ namespace sdesktop
             CellularStateInfoRequestEvent() = default;
             explicit CellularStateInfoRequestEvent(std::string stateStr);
         };
+        class CellularSleepModeInfoRequestEvent : public Event
+        {
+          public:
+            CellularSleepModeInfoRequestEvent() = default;
+            explicit CellularSleepModeInfoRequestEvent(bool isInSleepMode);
+        };
         class ScreenlockCheckEvent : public Event
         {
           public:
@@ -164,43 +108,4 @@ namespace sdesktop
             explicit ScreenlockCheckEvent(bool isLocked);
         };
     } // namespace developerMode
-
-    namespace bluetooth
-    {
-        class BluetoothStatusRequestEvent : public Event
-        {
-          public:
-            BluetoothStatusRequestEvent() = default;
-            explicit BluetoothStatusRequestEvent(int state);
-        };
-        class ScanStartedEvent : public Event
-        {
-          public:
-            ScanStartedEvent();
-        };
-        class ScanStoppedEvent : public Event
-        {
-          public:
-            ScanStoppedEvent();
-        };
-
-    } // namespace bluetooth
-
-    namespace transfer
-    {
-        class TransferTimerState : public sys::DataMessage
-        {
-          public:
-            enum Request
-            {
-                None,
-                Start,
-                Reload,
-                Stop
-            };
-            enum Request req = Request::None;
-            TransferTimerState(enum Request req = None) : sys::DataMessage(MessageType::TransferTimer), req(req){};
-            ~TransferTimerState() override = default;
-        };
-    } // namespace transfer
 } // namespace sdesktop

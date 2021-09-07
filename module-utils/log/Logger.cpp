@@ -3,29 +3,57 @@
 
 #include "critical.hpp"
 #include <fstream>
-#include <gsl/gsl_util>
-#include "Logger.hpp"
+#include <gsl/util>
+#include "LockGuard.hpp"
+#include <Logger.hpp>
+#include <module-utils/Utils.hpp>
+#include <portmacro.h>
+#include <ticks.hpp>
 #include "macros.h"
 
 namespace Log
 {
+    namespace
+    {
+        std::string getRotatedLogFileExtension(int count)
+        {
+            return ".log." + utils::to_string(count);
+        }
+
+        std::filesystem::path getRotatedFilePath(const std::filesystem::path &source, int rotationCount)
+        {
+            auto path = source;
+            path.replace_extension(getRotatedLogFileExtension(rotationCount));
+            return path;
+        }
+    } // namespace
+
     std::map<std::string, logger_level> Logger::filtered = {{"ApplicationManager", logger_level::LOGINFO},
-                                                            {"TS0710Worker", logger_level::LOGINFO},
+                                                            {"CellularMux", logger_level::LOGINFO},
                                                             {"ServiceCellular", logger_level::LOGINFO},
                                                             {"ServiceAntenna", logger_level::LOGINFO},
+                                                            {"ServiceAudio", logger_level::LOGINFO},
+                                                            {"ServiceBluetooth", logger_level::LOGINFO},
                                                             {"ServiceFota", logger_level::LOGINFO},
                                                             {"ServiceEink", logger_level::LOGINFO},
                                                             {"ServiceDB", logger_level::LOGINFO},
                                                             {CRIT_STR, logger_level::LOGTRACE},
                                                             {IRQ_STR, logger_level::LOGTRACE}};
-    const char *Logger::level_names[]                    = {"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"};
+    const char *Logger::levelNames[]                     = {"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"};
+
+    std::ostream &operator<<(std::ostream &stream, const Application &application)
+    {
+        stream << application.name << ' ' << application.revision << ", " << application.tag << ", "
+               << application.branch << '\n';
+        return stream;
+    }
+
+    Logger::Logger() : circularBuffer(circularBufferSize)
+    {}
 
     void Logger::enableColors(bool enable)
     {
-        if (!lock()) {
-            return;
-        }
-        auto _ = gsl::finally([this] { unlock(); });
+        LockGuard lock(mutex);
 
         if (enable) {
             logColors = &logColorsOn;
@@ -35,24 +63,30 @@ namespace Log
         }
     }
 
-    auto Logger::GetLogLevel(const std::string &name) -> logger_level
+    auto Logger::getLogLevel(const std::string &name) -> logger_level
     {
         return filtered[name];
     }
 
-    bool Logger::lock()
+    auto Logger::getLogs() -> std::string
     {
-        if (isIRQ()) {
-            bt = cpp_freertos::CriticalSection::EnterFromISR();
+        LockGuard lock(mutex);
+
+        std::string logs;
+        while (!circularBuffer.isEmpty()) {
+            const auto [result, msg] = circularBuffer.get();
+            if (result) {
+                logs += msg;
+            }
         }
-        else {
-            return mutex.Lock();
-        }
-        return true;
+        return logs;
     }
 
-    void Logger::init()
+    void Logger::init(Application app, size_t fileSize, int filesCount)
     {
+        application      = std::move(app);
+        maxFileSize      = fileSize;
+        maxRotationIndex = filesCount - 1;
 #if LOG_USE_COLOR == 1
         enableColors(true);
 #else
@@ -62,58 +96,157 @@ namespace Log
 
     auto Logger::log(Device device, const char *fmt, va_list args) -> int
     {
-        if (!lock()) {
-            return -1;
-        }
-        auto _ = gsl::finally([this] { unlock(); });
+        LockGuard lock(mutex);
 
         loggerBufferCurrentPos = 0;
-        loggerBufferCurrentPos += vsnprintf(&loggerBuffer[loggerBufferCurrentPos], loggerBufferSizeLeft(), fmt, args);
-        logToDevice(device, loggerBuffer, loggerBufferCurrentPos);
 
-        return loggerBufferCurrentPos;
+        const auto sizeLeft = loggerBufferSizeLeft();
+        const auto result   = vsnprintf(&loggerBuffer[loggerBufferCurrentPos], sizeLeft, fmt, args);
+        if (0 <= result) {
+            const auto numOfBytesAddedToBuffer = static_cast<size_t>(result);
+            loggerBufferCurrentPos += (numOfBytesAddedToBuffer < sizeLeft) ? numOfBytesAddedToBuffer : (sizeLeft - 1);
+
+            logToDevice(device, loggerBuffer, loggerBufferCurrentPos);
+            circularBuffer.put(std::string(loggerBuffer, loggerBufferCurrentPos));
+            return loggerBufferCurrentPos;
+        }
+        return -1;
     }
 
-    void Logger::log(
-        logger_level level, const char *file, int line, const char *function, const char *fmt, va_list args)
+    auto Logger::log(
+        logger_level level, const char *file, int line, const char *function, const char *fmt, va_list args) -> int
     {
         if (!filterLogs(level)) {
-            return;
+            return -1;
         }
-
-        if (!lock()) {
-            return;
-        }
-        auto _ = gsl::finally([this] { unlock(); });
+        LockGuard lock(mutex);
 
         loggerBufferCurrentPos = 0;
         addLogHeader(level, file, line, function);
 
-        loggerBufferCurrentPos += vsnprintf(&loggerBuffer[loggerBufferCurrentPos], loggerBufferSizeLeft(), fmt, args);
-        loggerBufferCurrentPos += snprintf(&loggerBuffer[loggerBufferCurrentPos], loggerBufferSizeLeft(), "\n");
+        const auto sizeLeft = loggerBufferSizeLeft();
+        const auto result   = vsnprintf(&loggerBuffer[loggerBufferCurrentPos], sizeLeft, fmt, args);
+        if (0 <= result) {
+            const auto numOfBytesAddedToBuffer = static_cast<size_t>(result);
+            loggerBufferCurrentPos += (numOfBytesAddedToBuffer < sizeLeft) ? numOfBytesAddedToBuffer : (sizeLeft - 1);
+            loggerBufferCurrentPos += snprintf(&loggerBuffer[loggerBufferCurrentPos], loggerBufferSizeLeft(), "\n");
 
-        logToDevice(Device::DEFAULT, loggerBuffer, loggerBufferCurrentPos);
+            logToDevice(Device::DEFAULT, loggerBuffer, loggerBufferCurrentPos);
+            circularBuffer.put(std::string(loggerBuffer, loggerBufferCurrentPos));
+            return loggerBufferCurrentPos;
+        }
+        return -1;
     }
 
     auto Logger::logAssert(const char *fmt, va_list args) -> int
     {
-        if (!lock()) {
-            return -1;
-        }
-        auto _ = gsl::finally([this] { unlock(); });
+        LockGuard lock(mutex);
 
         logToDevice(fmt, args);
 
         return loggerBufferCurrentPos;
     }
 
-    void Logger::unlock()
+    /// @param logPath: file path to store the log
+    /// @return: < 0 - error occured during log flush
+    /// @return:   0 - log flush did not happen
+    /// @return:   1 - log flush successflul
+    auto Logger::dumpToFile(std::filesystem::path logPath) -> int
     {
-        if (isIRQ()) {
-            cpp_freertos::CriticalSection::ExitFromISR(bt);
+        auto firstDump = !std::filesystem::exists(logPath);
+        if (const bool maxSizeExceeded = !firstDump && std::filesystem::file_size(logPath) > maxFileSize;
+            maxSizeExceeded) {
+            LOG_DEBUG("Max log file size exceeded. Rotating log files...");
+            {
+                LockGuard lock(logFileMutex);
+                rotateLogFile(logPath);
+            }
+            firstDump = true;
         }
-        else {
-            mutex.Unlock();
+
+        int status = 1;
+        {
+            const auto &logs = getLogs();
+
+            LockGuard lock(logFileMutex);
+            std::ofstream logFile(logPath, std::fstream::out | std::fstream::app);
+            if (!logFile.good()) {
+                status = -EIO;
+            }
+
+            if (firstDump) {
+                addFileHeader(logFile);
+            }
+            logFile.write(logs.data(), logs.size());
+            if (logFile.bad()) {
+                status = -EIO;
+            }
+        }
+
+        LOG_DEBUG("Flush ended with status: %d", status);
+
+        return status;
+    }
+
+    void Logger::rotateLogFile(const std::filesystem::path &logPath)
+    {
+        for (int i = currentRotationIndex; i > 0; --i) {
+            std::filesystem::path src = getRotatedFilePath(logPath, i);
+            if (i == maxRotationIndex) {
+                std::filesystem::remove(src);
+                continue;
+            }
+            std::filesystem::path dest = getRotatedFilePath(logPath, i + 1);
+            std::filesystem::rename(src, dest);
+        }
+        auto rotatedLogPath = getRotatedFilePath(logPath, 1);
+        std::filesystem::rename(logPath, rotatedLogPath);
+        onLogRotationFinished();
+    }
+
+    void Logger::onLogRotationFinished() noexcept
+    {
+        if (currentRotationIndex < maxRotationIndex) {
+            ++currentRotationIndex;
         }
     }
-}; // namespace Log
+
+    void Logger::addFileHeader(std::ofstream &file) const
+    {
+        file << application;
+    }
+
+    const char *getTaskDesc()
+    {
+        return xTaskGetCurrentTaskHandle() == nullptr ? Log::Logger::CRIT_STR
+               : xPortIsInsideInterrupt()             ? Log::Logger::IRQ_STR
+                                                      : pcTaskGetName(xTaskGetCurrentTaskHandle());
+    }
+
+    bool Logger::filterLogs(logger_level level)
+    {
+        return getLogLevel(getTaskDesc()) <= level;
+    }
+
+    void Logger::addLogHeader(logger_level level, const char *file, int line, const char *function)
+    {
+        loggerBufferCurrentPos += snprintf(&loggerBuffer[loggerBufferCurrentPos],
+                                           LOGGER_BUFFER_SIZE - loggerBufferCurrentPos,
+                                           "%" PRIu32 " ms ",
+                                           cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks()));
+
+        loggerBufferCurrentPos += snprintf(&loggerBuffer[loggerBufferCurrentPos],
+                                           LOGGER_BUFFER_SIZE - loggerBufferCurrentPos,
+                                           "%s%-5s %s[%s] %s%s:%s:%d:%s ",
+                                           logColors->levelColors[level].data(),
+                                           levelNames[level],
+                                           logColors->serviceNameColor.data(),
+                                           getTaskDesc(),
+                                           logColors->callerInfoColor.data(),
+                                           file,
+                                           function,
+                                           line,
+                                           logColors->resetColor.data());
+    }
+
+} // namespace Log

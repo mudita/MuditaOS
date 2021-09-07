@@ -9,11 +9,6 @@
 
 using namespace gui;
 
-namespace style::icon
-{
-    inline constexpr gui::Length image_bottom_margin = 30;
-} // namespace style::icon
-
 Icon::Icon(Item *parent,
            const uint32_t &x,
            const uint32_t &y,
@@ -24,18 +19,17 @@ Icon::Icon(Item *parent,
     : VBox(parent, x, y, w, h)
 {
     setEdges(RectangleEdge::None);
-    setPenFocusWidth(style::window::default_border_no_focus_w);
-    setPenWidth(style::window::default_border_no_focus_w);
     setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
-    auto image = new Image(this, imageName);
-    image->setMargins(Margins(0, 0, 0, style::icon::image_bottom_margin));
+    image = new Image(this, imageName);
+    image->setMargins(Margins(0, icon::image_top_margin, 0, icon::image_bottom_margin));
 
-    auto text = new Text(this, 0, 0, 0, 0);
+    text = new Text(this, 0, 0, 0, 0);
     text->setMaximumSize(w, h);
     text->setTextType(TextType::MultiLine);
     text->setEditMode(EditMode::Browse);
     text->setEdges(RectangleEdge::None);
     text->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
+    text->setFont(style::window::font::medium);
     text->setRichText(str);
 }

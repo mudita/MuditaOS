@@ -40,9 +40,6 @@ GLIBC_2.2.5 {
 # posix
                 link;
                 unlink;
-                stat;
-                lstat;
-                fstat;
                 fcntl;
                 fcntl64;
                 chdir;
@@ -71,7 +68,6 @@ GLIBC_2.2.5 {
                 mount;
                 umount;
                 statvfs;
-
 # posix - dirent
                 opendir;
                 closedir;
@@ -88,4 +84,17 @@ GLIBC_2.4 {
         global:
                 __fxstatat;
                 __fxstatat64;
+};
+GLIBC_2.33 {
+        global:
+                stat;
+                lstat;
+                fstat;
+                stat64;
+                lstat64;
+                fstat64;
+};
+IOSYSCALLS_1.0 {
+        global:
+                iosyscalls_*;
 };

@@ -9,13 +9,23 @@
 #include "bsp/lpm/bsp_lpm.hpp"
 #include "drivers/semc/DriverSEMC.hpp"
 #include "CpuGovernor.hpp"
+#include <vector>
 
 namespace sys
 {
-    inline constexpr uint32_t frequencyShiftLowerThreshold{40};
-    inline constexpr uint32_t frequencyShiftUpperThreshold{60};
-    inline constexpr uint32_t maxBelowThresholdCount{50};
-    inline constexpr uint32_t maxAboveThresholdCount{3};
+    class CpuFrequencyMonitor
+    {
+      public:
+        explicit CpuFrequencyMonitor(const std::string name);
+
+        [[nodiscard]] auto GetName() const noexcept -> std::string;
+        [[nodiscard]] auto GetRuntimePercentage() const noexcept -> std::uint32_t;
+        void IncreaseTicks(TickType_t ticks);
+
+      private:
+        std::string levelName;
+        TickType_t totalTicksCount{0};
+    };
 
     class PowerManager
     {
@@ -26,6 +36,7 @@ namespace sys
 
         int32_t PowerOff();
         int32_t Reboot();
+        int32_t RebootToUpdate(UpdateReason reason);
 
         /// called periodically to calculate the CPU requirement
         ///
@@ -36,25 +47,33 @@ namespace sys
         /// @param current cpu load
         void UpdateCpuFrequency(uint32_t cpuLoad);
 
-        /// called when the CPU frequency needs to be increased
-        /// @note the frequency is always increased to the maximum value
-        void IncreaseCpuFrequency() const;
-
-        /// called when the CPU frequency needs to be reduced
-        /// @note the frequency is always reduced by one step
-        void DecreaseCpuFrequency() const;
-
         [[nodiscard]] auto getExternalRamDevice() const noexcept -> std::shared_ptr<devices::Device>;
 
         void RegisterNewSentinel(std::shared_ptr<CpuSentinel> newSentinel) const;
-        void SetCpuFrequencyRequest(std::string sentinelName, bsp::CpuFrequencyHz request) const;
+        void SetCpuFrequencyRequest(std::string sentinelName, bsp::CpuFrequencyHz request);
+        void ResetCpuFrequencyRequest(std::string sentinelName);
+        void LogPowerManagerEfficiency();
+        void SetBootSuccess();
 
       private:
+        /// called when the CPU frequency needs to be increased
+        void IncreaseCpuFrequency(bsp::CpuFrequencyHz newFrequency);
+
+        /// called when the CPU frequency needs to be reduced
+        /// @note the frequency is always reduced by one step
+        void DecreaseCpuFrequency();
+
         void ResetFrequencyShiftCounter();
-        void SetCpuFrequency(bsp::CpuFrequencyHz freq) const;
+        void SetCpuFrequency(bsp::CpuFrequencyHz freq);
+
+        void UpdateCpuFrequencyMonitor(bsp::CpuFrequencyHz currentFreq);
 
         uint32_t belowThresholdCounter{0};
         uint32_t aboveThresholdCounter{0};
+        TickType_t lastCpuFrequencyChangeTimestamp{0};
+        bool isFrequencyLoweringInProgress{false};
+
+        std::vector<CpuFrequencyMonitor> cpuFrequencyMonitor;
 
         std::unique_ptr<bsp::LowPowerMode> lowPowerControl;
         std::shared_ptr<drivers::DriverSEMC> driverSEMC;

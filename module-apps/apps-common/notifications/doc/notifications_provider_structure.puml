@@ -1,0 +1,28 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+skinparam linetype ortho
+
+node "Notifications" as notifs {
+    class "Notification" as notif
+
+    class "ConcreteNotification_A" as smsNotif
+    class "ConcreteNotification_B" as callNotif
+
+    notif <|-u-- smsNotif
+    notif <|-u-- callNotif
+}
+
+node "Provider" as provider {
+    class "NotificationProvider" as notProvider
+    class "NotificationsChangedParams" as params
+    notProvider -u..>params
+}
+
+
+notProvider "0..1"..> smsNotif
+notProvider "0..1"..> callNotif
+notProvider *-- notif
+
+params *-->notif
+
+@enduml

@@ -1,7 +1,9 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <service-appmgr/model/ApplicationHandle.hpp>
+#include "ApplicationHandle.hpp"
+
+#include <apps-common/ApplicationLauncher.hpp>
 
 namespace app::manager
 {
@@ -35,14 +37,19 @@ namespace app::manager
         }
     }
 
-    auto ApplicationHandle::preventsBlocking() const noexcept -> bool
+    auto ApplicationHandle::preventsAutoLocking() const noexcept -> bool
     {
-        return launcher->isBlocking();
+        return launcher->preventsAutoLocking();
+    }
+
+    auto ApplicationHandle::checkBlockClosing() const noexcept -> bool
+    {
+        return launcher->handle->getState() == Application::State::FINALIZING_CLOSE;
     }
 
     auto ApplicationHandle::closeable() const noexcept -> bool
     {
-        return launcher->isCloseable();
+        return launcher->isCloseable() && !checkBlockClosing();
     }
 
     auto ApplicationHandle::started() const noexcept -> bool
@@ -58,14 +65,24 @@ namespace app::manager
         return manifest.contains(action);
     }
 
-    void ApplicationHandle::run(sys::Service *caller)
+    auto ApplicationHandle::actionFlag(actions::ActionId action) const noexcept -> actions::ActionFlag
     {
-        launcher->run(caller);
+        const auto manifest = getManifest();
+        return manifest.getActionFlag(action);
     }
 
-    void ApplicationHandle::runInBackground(sys::Service *caller)
+    void ApplicationHandle::run(sys::phone_modes::PhoneMode phoneMode,
+                                sys::bluetooth::BluetoothMode bluetoothMode,
+                                sys::Service *caller)
     {
-        launcher->runBackground(caller);
+        launcher->run(phoneMode, bluetoothMode, caller);
+    }
+
+    void ApplicationHandle::runInBackground(sys::phone_modes::PhoneMode phoneMode,
+                                            sys::bluetooth::BluetoothMode bluetoothMode,
+                                            sys::Service *caller)
+    {
+        launcher->runBackground(phoneMode, bluetoothMode, caller);
     }
 
     void ApplicationHandle::close() noexcept

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -139,7 +139,22 @@ namespace gui
         BottomLeft  = 0x40,
         BottomRight = 0x80,
     };
+    enum class Boundaries
+    {
+        Fixed,     ///< Fixed - will stop scrolling on first or last elements on appropriate top or bottom
+                   ///< directions.
+        Continuous ///< Continuous - will continue to beginning or end on first or last elements on
+                   ///< appropriate top or bottom directions.
+    };
 
+    enum class ImageTypeSpecifier
+    {
+        None,
+        W_G,
+        B_G,
+        W_M,
+        B_M
+    };
 } // namespace gui
 
 inline const char *c_str(gui::RefreshModes refresh)

@@ -1,12 +1,13 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "ApplicationMessages.hpp"
+#include "SMSTemplateItem.hpp"
 #include "SMSTemplateModel.hpp"
-#include "ListView.hpp"
-#include "application-messages/widgets/SMSTemplateItem.hpp"
-#include "application-messages/ApplicationMessages.hpp"
-#include <service-db/DBServiceAPI.hpp>
+
+#include <ListView.hpp>
 #include <module-db/queries/messages/templates/QuerySMSTemplateGetForList.hpp>
+#include <service-db/DBServiceAPI.hpp>
 
 SMSTemplateModel::SMSTemplateModel(app::Application *app) : DatabaseModel(app), app::AsyncCallbackReceiver{app}
 {}
@@ -25,7 +26,7 @@ bool SMSTemplateModel::updateRecords(std::vector<SMSTemplateRecord> records)
     return false;
 }
 
-unsigned int SMSTemplateModel::getMinimalItemHeight() const
+unsigned int SMSTemplateModel::getMinimalItemSpaceRequired() const
 {
     return style::smsTemplItem::h;
 }

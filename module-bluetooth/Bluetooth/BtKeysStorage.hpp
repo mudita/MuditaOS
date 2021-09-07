@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -6,7 +6,7 @@
 #include <btstack_link_key_db_memory.h>
 #include <btstack_util.h>
 
-#include <json/json11.hpp>
+#include <json11.hpp>
 #include <service-bluetooth/SettingsHolder.hpp>
 
 namespace bluetooth

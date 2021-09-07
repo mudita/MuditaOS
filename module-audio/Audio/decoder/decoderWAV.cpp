@@ -5,6 +5,8 @@
 
 #include "Audio/AudioCommon.hpp"
 
+#include "riff/wav/wavfile.h"
+
 namespace audio
 {
 
@@ -75,6 +77,13 @@ namespace audio
         std::fseek(fd, (fileSize * pos) + sizeof(WAVE_FormatTypeDef), SEEK_SET);
         // Calculate new position
         position = (float)((float)(std::ftell(fd) / sizeof(int16_t) / chanNumber) / (float)(sampleRate));
+    }
+
+    auto decoderWAV::getBitWidth() -> unsigned int
+    {
+        TagLib::RIFF::WAV::File wavFile(filePath.c_str());
+        auto properties = wavFile.audioProperties();
+        return properties->bitsPerSample();
     }
 
 } // namespace audio

@@ -886,27 +886,19 @@ RECURSIVE              = YES
 # run.
 
 EXCLUDE                = @PROJECT_SOURCE_DIR@/module-bluetooth/lib \
-                         @PROJECT_SOURCE_DIR@/module-utils/tinyfsm \
-                         @PROJECT_SOURCE_DIR@/module-utils/microtar \
-                         @PROJECT_SOURCE_DIR@/module-utils/segger \
-                         @PROJECT_SOURCE_DIR@/module-utils/crc32 \
-                         @PROJECT_SOURCE_DIR@/module-utils/sbini \
-                         @PROJECT_SOURCE_DIR@/module-utils/re2 \
-                         @PROJECT_SOURCE_DIR@/module-utils/protobuf \
-                         @PROJECT_SOURCE_DIR@/module-utils/libphonenumber \
                          @PROJECT_SOURCE_DIR@/module-utils/test \
                          @PROJECT_SOURCE_DIR@/module-db/tests \
                          @PROJECT_SOURCE_DIR@/module-db/Database/sqlite3.c \
                          @PROJECT_SOURCE_DIR@/module-cellular/tests \
                          @PROJECT_SOURCE_DIR@/module-cellular/Modem/TS0710/tests \
-                         @PROJECT_SOURCE_DIR@/module-utils/test \
                          @PROJECT_SOURCE_DIR@/module-sys/tests \
                          @PROJECT_SOURCE_DIR@/module-bsp/tests \
                          @PROJECT_SOURCE_DIR@/module-audio/tests \
                          @PROJECT_SOURCE_DIR@/module-vfs/tests \
                          @PROJECT_SOURCE_DIR@/module-vfs/board \
                          @PROJECT_SOURCE_DIR@/module-bsp/board/rt1051/common \
-                         @PROJECT_SOURCE_DIR@/module-audio/Audio/decoder/taglib
+                         @PROJECT_SOURCE_DIR@/module-audio/Audio/decoder/taglib \
+                         @PROJECT_SOURCE_DIR@/third-party
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
 # directories that are symbolic links (a Unix file system feature) are excluded

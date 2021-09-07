@@ -1,0 +1,60 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+
+participant "Connection manager " as manager
+participant "Service cellular" as cellular
+participant "Phone mode observer " as mode
+
+== Phone is connected to the GSM network==
+
+mode ->cellular : Phone mode change to Connected/ Do not Disturb
+cellular -> manager : onPhoneMode()
+manager -> cellular :isConnectedToTheNetwork() AT+CFUN?
+cellular -> manager : +CFUN: 1
+
+mode ->cellular : Phone mode change to Offline / Message only
+cellular -> manager : onPhoneMode()
+manager -> cellular :isConnectedToTheNetwork() AT+CFUN?
+cellular -> manager : +CFUN: 1
+manager -> cellular :hangUpOngoingCall()
+manager -> cellular :disconnectFromNetwork() AT+CFUN=4
+manager -> cellular :clearNetworkIndicator()
+manager->manager : handle switch to selected oflline mode
+
+== Phone is not connected to the GSM network==
+
+mode ->cellular : Phone mode change to CConnected/ Do not Disturb
+cellular -> manager : onPhoneMode()
+manager -> cellular :isConnectedToTheNetwork() AT+CFUN?
+cellular -> manager : +CFUN: 4
+manager -> cellular :connectToTheNetwork() AT+CFUN=1
+
+mode ->cellular : Phone mode change to Offline / Message only
+cellular -> manager : onPhoneMode()
+manager -> cellular :isConnectedToTheNetwork() AT+CFUN?
+cellular -> manager : +CFUN: 4
+manager->manager : handle switch to selected oflline mode
+
+==handle switch to selected oflline mode==
+
+==handleModeChangeToOfflineMode()==
+manager -> cellular : isConnectionTimerActive()
+cellular -> manager : timer is active
+manager -> cellular : stopConnectionTimer()
+
+==handleModeChangeToOfflineMode()==
+manager -> cellular : isConnectionTimerActive()
+cellular -> manager : timer is not active
+manager -> cellular : startonnectionTimer()
+
+==Connection manager in Messages only mode==
+cellular -> manager : service timer tick (60 seconds)
+manager -> manager : offline period not expired, online period not expired
+
+manager -> manager : offline period expired onTimTick()
+manager -> cellular : connectToNetwork()
+
+manager -> manager : online period expired onTimTick()
+manager -> cellular : disconnectFromNetwork()
+manager -> cellular :clearNetworkIndicator()
+@enduml

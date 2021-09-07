@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /*
@@ -45,9 +45,9 @@ namespace gui
 
         // if boxes overlap copy part defined by result from current context to the new context.
         if (BoundingBox::intersect(currentBox, newBox, resultBox)) {
-            uint32_t sourceOffset = resultBox.y * w + resultBox.x;
-            uint32_t destOffset   = (resultBox.y - gy) * width + (resultBox.x - gx);
-            for (int32_t h = 0; h < resultBox.h; h++) {
+            Length sourceOffset = resultBox.y * w + resultBox.x;
+            Length destOffset   = (resultBox.y - gy) * width + (resultBox.x - gx);
+            for (Length h = 0; h < resultBox.h; h++) {
                 memcpy(retContext->data + destOffset, data + sourceOffset, resultBox.w);
                 sourceOffset += w;
                 destOffset += width;
@@ -67,9 +67,9 @@ namespace gui
 
         // if boxes overlap copy part defined by result from current context to the new context.
         if (BoundingBox::intersect(currentBox, insertBox, resultBox)) {
-            uint32_t sourceOffset = (resultBox.y - iy) * context->w + (resultBox.x - ix);
-            uint32_t destOffset   = (resultBox.y) * w + (resultBox.x);
-            for (int32_t h = 0; h < resultBox.h; h++) {
+            Length sourceOffset = (resultBox.y - iy) * context->w + (resultBox.x - ix);
+            Length destOffset   = (resultBox.y) * w + (resultBox.x);
+            for (Length h = 0; h < resultBox.h; h++) {
                 memcpy(data + destOffset, context->data + sourceOffset, resultBox.w);
                 sourceOffset += context->w;
                 destOffset += w;
@@ -93,9 +93,9 @@ namespace gui
                 xBoxOffset = iareaX;
             if (iareaY < 0)
                 yBoxOffset = iareaY;
-            uint32_t sourceOffset = (resultBox.y - iy - yBoxOffset) * context->w + (resultBox.x - ix - xBoxOffset);
-            uint32_t destOffset   = (resultBox.y) * w + (resultBox.x);
-            for (int32_t h = 0; h < resultBox.h; h++) {
+            Length sourceOffset = (resultBox.y - iy - yBoxOffset) * context->w + (resultBox.x - ix - xBoxOffset);
+            Length destOffset   = (resultBox.y) * w + (resultBox.x);
+            for (Length h = 0; h < resultBox.h; h++) {
                 memcpy(data + destOffset, context->data + sourceOffset, resultBox.w);
                 sourceOffset += context->w;
                 destOffset += w;

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -6,10 +6,10 @@
 #include "Profile.hpp"
 #include <service-bluetooth/BluetoothMessage.hpp>
 #include <btstack_run_loop.h>
+#include <module-bluetooth/Bluetooth/interface/profiles/PhoneInterface.hpp>
 
 namespace bluetooth
 {
-
     class HSP : public Profile
     {
         static constexpr auto CLASS_OF_DEVICE = 0x400204;
@@ -25,13 +25,25 @@ namespace bluetooth
 
         auto init() -> Error::Code override;
         void setDeviceAddress(uint8_t *addr) override;
-        auto getStreamData() -> std::shared_ptr<BluetoothStreamData> override;
         void setOwnerService(const sys::Service *service) override;
 
         void connect() override;
         void disconnect() override;
         void start() override;
         void stop() override;
+        /// @brief Starts ring
+        /// @return Success
+        [[nodiscard]] auto startRinging() const noexcept -> Error::Code override;
+        /// @brief Stops ring
+        /// @return Success
+        [[nodiscard]] auto stopRinging() const noexcept -> Error::Code override;
+        /// @brief Initializes bluetooth audio call which is divided into two parts:
+        /// - Ring stop
+        /// - SCO link establishment
+        /// @return Success
+        [[nodiscard]] auto initializeCall() const noexcept -> Error::Code override;
+
+        void setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice) override;
 
       private:
         class HSPImpl;
@@ -40,4 +52,4 @@ namespace bluetooth
         btstack_run_loop *runLoopInstance{};
     };
 
-} // namespace Bt
+} // namespace bluetooth

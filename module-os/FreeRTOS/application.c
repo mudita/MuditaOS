@@ -1,6 +1,6 @@
 #include "FreeRTOS.h"
 #include "task.h"
-#include "log/log.hpp"
+#include <log.hpp>
 
 #include <assert.h>
 #include <stdlib.h>
@@ -58,14 +58,18 @@ static StackType_t uxTimerTaskStack[ configTIMER_TASK_STACK_DEPTH ];
     *pulTimerTaskStackSize = configTIMER_TASK_STACK_DEPTH;
 }
 
+#if( configUSE_MALLOC_FAILED_HOOK == 1 )
 /**
  * @brief Redefinition of FreeRTOS malloc failed hook.
  */
 void vApplicationMallocFailedHook( void )
 {
-    //LOG_ERROR("Task %s malloc failed ! \n", pcTaskGetName(NULL));
+    //LOG_FATAL("Task %s malloc failed ! \n", pcTaskGetName(NULL));
+    abort();
 }
+#endif
 
+#if(  configCHECK_FOR_STACK_OVERFLOW > 0 )
 /**
  * @brief Redefinition of FreeRTOS stack overflow hook.
  * Log error condition and invoke system restart procedure.
@@ -78,9 +82,9 @@ void vApplicationStackOverflowHook( TaskHandle_t xTask,
 {
     (void)xTask;
     LOG_FATAL("Stack overflow:%s",pcTaskName);
-    // TODO: add better error handling and logging here
     abort();
 }
+#endif
 
 void vApplicationTickHook()
 {

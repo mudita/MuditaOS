@@ -1,17 +1,14 @@
-﻿if (NOT IS_SYMLINK "${CMAKE_BINARY_DIR}/sys/user")
-    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/sys/user")
-endif()
-
-add_catch2_executable(
+﻿add_catch2_executable(
     NAME
         calculator
     SRCS
-        "${CMAKE_CURRENT_SOURCE_DIR}/CalculatorUtility_tests.cpp"
+        tests-main.cpp
+        CalculatorInput_tests.cpp
+        CalculatorUtility_tests.cpp
     LIBS
-        module-apps
-        module-utils
-        module-vfs
-        iosyscalls
-    DEPS
-        PurePhone.img-target
+        application-calculator
+        module-sys
+    USE_FS
 )
+
+target_include_directories(catch2-calculator PRIVATE $<TARGET_PROPERTY:application-calculator,INCLUDE_DIRECTORIES>)

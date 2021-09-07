@@ -1,0 +1,40 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+skinparam linetype ortho
+
+node "Provider" as provider {
+    class "NotificationProvider" as notProvider
+}
+node "Model" as model{
+    class "NotificationsModel" as notModel{
+        {method} update(NotificationsChangedParams *)
+    }
+    interface "gui::Provider" as guiProv
+}
+node View {
+    class ListView
+}
+class "NotificationListItem" as item
+class "NotificationsChangedParams" as params
+interface "APM Controller" as system {
+    {method} sendAction(...)
+}
+
+notProvider "use"--> params
+notModel "use"-->params
+notModel "use"-->item
+ListView "use"-->item
+
+guiProv <|-r-- notModel
+ListView "use"-->guiProv
+guiProv "use"-->ListView
+
+
+notProvider "use"-d-->system
+system "use"--> notModel
+
+model -[hidden]r- View
+model -[hidden]d- notProvider
+
+
+@enduml

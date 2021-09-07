@@ -1,40 +1,37 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include "application-music-player/models/SongsModel.hpp"
-#include "AppWindow.hpp"
-#include "ListView.hpp"
+#include <application-music-player/presenters/SongsPresenter.hpp>
+#include <AppWindow.hpp>
 #include <TextFixedSize.hpp>
-
-#include <vector>
-#include <string>
 
 namespace gui
 {
-
-    class MusicPlayerAllSongsWindow : public AppWindow
+    class ListView;
+    class Icon;
+    class MusicPlayerAllSongsWindow : public AppWindow, public app::music_player::SongsContract::View
     {
-        std::shared_ptr<SongsModel> songsModel = nullptr;
-
+        std::shared_ptr<app::music_player::SongsContract::Presenter> presenter;
         ListView *songsList = nullptr;
-        Label *soundLabel   = nullptr;
-
-        auto setCurrentVolume(const std::function<void(const audio::Volume &)> &successCallback,
-                              const std::function<void(const audio::Volume &)> &errCallback = nullptr) -> bool;
+        Icon *emptyListIcon = nullptr;
 
       public:
-        MusicPlayerAllSongsWindow(app::Application *app);
+        explicit MusicPlayerAllSongsWindow(app::Application *app,
+                                           std::shared_ptr<app::music_player::SongsContract::Presenter> presenter);
 
-        // virtual methods
-        void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        void onBeforeShow([[maybe_unused]] ShowMode mode, [[maybe_unused]] SwitchData *data) override;
 
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;
-        bool onDatabaseMessage(sys::Message *msg) override;
-        bool onInput(const InputEvent &inputEvent) final;
+        bool onInput(const InputEvent &inputEvent) override;
+
+        void updateSongsState() override;
+        void refreshWindow() override;
+        void setBottomBarTemporaryMode(const std::string &text) override;
+        void restoreFromBottomBarTemporaryMode() override;
     };
 
 } /* namespace gui */

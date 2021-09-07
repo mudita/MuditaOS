@@ -20,6 +20,8 @@ namespace audio
         void setPosition(float pos) override;
 
       private:
+        auto getBitWidth() -> unsigned int override;
+
         using WAVE_FormatTypeDef = struct
         {
             uint32_t ChunkID;       /* 0 */

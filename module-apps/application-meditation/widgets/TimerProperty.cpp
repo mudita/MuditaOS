@@ -1,8 +1,9 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "Style.hpp"
 #include "TimerProperty.hpp"
-#include <application-meditation/data/Style.hpp>
+
 #include <i18n/i18n.hpp>
 #include <module-utils/Utils.hpp>
 
@@ -48,7 +49,7 @@ void TimerProperty::build()
     timeUnitLabel->setFont(style::window::font::verysmall);
     timeUnitLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
     timeUnitLabel->setEdges(RectangleEdge::None);
-    timeUnitLabel->setText(utils::localize.get("app_meditation_minutes"));
+    timeUnitLabel->setText(utils::translate("app_meditation_minutes"));
 }
 
 bool TimerProperty::onFocus(bool isFocused)
@@ -67,9 +68,9 @@ bool TimerProperty::onFocus(bool isFocused)
 bool TimerProperty::onInput(const InputEvent &inputEvent)
 {
     bool handled = false;
-    if (inputEvent.isShortPress()) {
-        if (0 <= gui::toNumeric(inputEvent.keyCode) && gui::toNumeric(inputEvent.keyCode) <= 9) {
-            state.putNumericValue(gui::toNumeric(inputEvent.keyCode));
+    if (inputEvent.isShortRelease()) {
+        if (inputEvent.isDigit()) {
+            state.putNumericValue(inputEvent.numericValue());
             handled = true;
         }
         else if (inputEvent.is(KeyCode::KEY_LEFT)) {
@@ -93,10 +94,10 @@ void TimerProperty::setMeditationTime()
     const auto meditationTime = static_cast<int>(state.getTime().count());
     timeLabel->setText(utils::to_string(meditationTime));
     if (meditationTime == 1) {
-        timeUnitLabel->setText(utils::localize.get("app_meditation_minute"));
+        timeUnitLabel->setText(utils::translate("app_meditation_minute"));
     }
     else {
-        timeUnitLabel->setText(utils::localize.get("app_meditation_minutes"));
+        timeUnitLabel->setText(utils::translate("app_meditation_minutes"));
     }
 }
 

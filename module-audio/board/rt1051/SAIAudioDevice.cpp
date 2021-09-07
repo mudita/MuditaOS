@@ -3,10 +3,12 @@
 
 #include "SAIAudioDevice.hpp"
 
+#include <Audio/Stream.hpp>
+
 using namespace audio;
 
 SAIAudioDevice::SAIAudioDevice(I2S_Type *base, sai_edma_handle_t *rxHandle, sai_edma_handle_t *txHandle)
-    : AudioDevice(saiCapabilities, saiCapabilities), _base(base), rx(rxHandle), tx(txHandle)
+    : _base(base), rx(rxHandle), tx(txHandle)
 {}
 
 void SAIAudioDevice::initiateRxTransfer()
@@ -14,14 +16,17 @@ void SAIAudioDevice::initiateRxTransfer()
     audio::Stream::Span dataSpan;
 
     Source::_stream->reserve(dataSpan);
+    LOG_DEBUG("Initiate rx transfer with %u bytes", dataSpan.dataSize);
     auto xfer = sai_transfer_t{.data = dataSpan.data, .dataSize = dataSpan.dataSize};
     SAI_TransferReceiveEDMA(_base, rx, &xfer);
 }
 
 void SAIAudioDevice::initiateTxTransfer()
 {
-    auto nullSpan = Sink::_stream->getNullSpan();
-    auto xfer     = sai_transfer_t{.data = nullSpan.data, .dataSize = nullSpan.dataSize};
+    audio::Stream::Span dataToSend;
+    Sink::_stream->peek(dataToSend);
+
+    auto xfer = sai_transfer_t{.data = dataToSend.data, .dataSize = dataToSend.dataSize};
     SAI_TransferSendEDMA(_base, tx, &xfer);
 }
 

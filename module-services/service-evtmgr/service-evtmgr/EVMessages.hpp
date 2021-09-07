@@ -12,11 +12,10 @@
 #include <SwitchData.hpp>
 #include <bsp/cellular/bsp_cellular.hpp>
 #include <bsp/common.hpp>
-#include <bsp/keyboard/key_codes.hpp>
+#include <hal/key_input/KeyEventDefinitions.hpp>
 #include <bsp/torch/torch.hpp>
 #include <bsp/keypad_backlight/keypad_backlight.hpp>
 #include <vibra/Vibra.hpp>
-#include <Timer.hpp>
 
 #include <string>
 
@@ -24,48 +23,29 @@ namespace sevm
 {
     namespace message
     {
-        class GPIO : public Message
+        class GPIO : public sys::DataMessage
         {
           public:
-            GPIO() : Message(MessageType::EVM_GPIO)
+            GPIO() : DataMessage(MessageType::EVM_GPIO)
             {}
             uint32_t num = 0, port = 0, state = 0;
         };
     } // namespace message
 
-    class RtcMinuteAlarmMessage : public Message
+    class RtcMinuteAlarmMessage : public sys::DataMessage
     {
       public:
-        RtcMinuteAlarmMessage(MessageType messageType) : Message(messageType)
-        {
-            type = Type::Data;
-        }
+        RtcMinuteAlarmMessage(MessageType messageType) : DataMessage(messageType)
+        {}
         uint32_t timestamp = 0;
     };
 
-    class RtcUpdateTimeMessage : public sys::Message
+    class SIMTrayMessage : public sys::DataMessage
     {
       public:
-        explicit RtcUpdateTimeMessage(time_t time) : time(time)
+        SIMTrayMessage() : DataMessage(MessageType::SIMTrayEvent)
         {}
-        [[nodiscard]] time_t getTime() const noexcept
-        {
-            return time;
-        }
-
-      private:
-        const time_t time = 0;
     };
-
-    class SIMMessage : public sys::DataMessage
-    {
-      public:
-        SIMMessage() : DataMessage(MessageType::SIMTrayEvent)
-        {
-            type = Type::Data;
-        }
-    };
-
     /*
      * @brief Template for all messages that go to application manager
      */
@@ -113,35 +93,21 @@ namespace sevm
         bsp::Board board = bsp::Board::none;
     };
 
-    class StatusStateMessage : public Message
+    class StatusStateMessage : public sys::DataMessage
     {
       public:
-        StatusStateMessage(MessageType messageType) : Message(messageType)
-        {
-            type = Type::Data;
-        }
+        explicit StatusStateMessage(MessageType messageType) : DataMessage(messageType)
+        {}
         bsp::cellular::status::value state = bsp::cellular::status::value::INACTIVE;
     };
 
-    class TorchStateMessage : public Message
-    {
-      public:
-        TorchStateMessage(bsp::torch::Action direction) : Message(MessageType::EVMTorchStateMessage), action(direction)
-        {}
-        bsp::torch::Action action;
-        bsp::torch::State state                  = bsp::torch::State::off;
-        bsp::torch::ColourTemperature colourTemp = bsp::torch::ColourTemperature::no_change;
-    };
+    class ToggleTorchOnOffMessage : public sys::DataMessage
+    {};
 
-    class TorchStateResultMessage : public TorchStateMessage
-    {
-      public:
-        TorchStateResultMessage(bsp::torch::Action direction) : TorchStateMessage(direction)
-        {}
-        bool success = false;
-    };
+    class ToggleTorchColorMessage : public sys::DataMessage
+    {};
 
-    class KeypadBacklightMessage : public sys::Message
+    class KeypadBacklightMessage : public sys::DataMessage
     {
       public:
         explicit KeypadBacklightMessage(bsp::keypad_backlight::Action action) : action(action)
@@ -150,23 +116,37 @@ namespace sevm
         bsp::keypad_backlight::Action action;
     };
 
-    class KeypadBacklightResponseMessage : public sys::Message
+    class KeypadBacklightResponseMessage : public sys::DataMessage
     {
       public:
-        KeypadBacklightResponseMessage()
-        {}
         bool success;
     };
 
-    class VibraMessage : public Message
+    class VibraMessage : public sys::DataMessage
     {
       public:
-        VibraMessage(bsp::vibrator::Action act, sys::ms rptTime = bsp::vibrator::defaultVibraPauseMs)
-            : Message(MessageType::VibraPulseMessage), action(act), repetitionTime(rptTime)
+        explicit VibraMessage(
+            bsp::vibrator::Action act,
+            std::chrono::milliseconds rptTime = std::chrono::milliseconds{bsp::vibrator::defaultVibraPauseMs})
+            : DataMessage(MessageType::VibraPulseMessage), action(act), repetitionTime(rptTime)
         {}
 
         bsp::vibrator::Action action;
-        sys::ms repetitionTime;
+        std::chrono::milliseconds repetitionTime;
+    };
+
+    class FlushLogsRequest : public sys::DataMessage
+    {};
+
+    class FlushLogsResponse : public sys::ResponseMessage
+    {
+      public:
+        FlushLogsResponse(bool retCode, int retData = 0)
+            : sys::ResponseMessage(sys::ReturnCodes::Success, MessageType::MessageTypeUninitialized), retCode(retCode),
+              data(retData){};
+
+        const bool retCode{};
+        const int data{};
     };
 
 } /* namespace sevm*/

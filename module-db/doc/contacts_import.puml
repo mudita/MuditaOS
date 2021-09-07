@@ -1,0 +1,31 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+
+participant "Application" as app
+participant "ContactRecord" as rec
+participant "contacts DB" as db
+
+== Checking for duplicates ==
+
+app -> rec : contacts to check\n(query::CheckContactsListDuplicates)
+rec -> db : get numbers
+db -> rec
+rec -> rec : numbers comparison
+rec -> app : duplicated contacts
+
+== Merging contacts list to DB ==
+
+app -> rec : contacts to merge\n(query::MergeContactsList)
+rec -> db : get numbers
+db -> rec
+rec -> rec : numbers comparison
+
+group number not found
+    rec -> db : Add contact
+end
+group number found in db
+    rec -> db : Update contact by overriding old data
+end
+rec -> app : status response
+
+@enduml

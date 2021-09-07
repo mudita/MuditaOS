@@ -1,7 +1,9 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
+
+#include <gui/widgets/Style.hpp>
 
 namespace style::meditation
 {
@@ -9,9 +11,9 @@ namespace style::meditation
     namespace body
     {
         constexpr auto Width  = style::window_width;
-        constexpr auto Height = style::window_height - style::header::height - style::footer::height - 1;
+        constexpr auto Height = style::window_height - style::window::default_vertical_pos - style::footer::height - 1;
         constexpr auto X      = 1;
-        constexpr auto Y      = style::header::height;
+        constexpr auto Y      = style::window::default_vertical_pos;
     } // namespace body
 
     namespace timer
@@ -29,7 +31,7 @@ namespace style::meditation
         namespace setterValueLabel
         {
             constexpr auto X      = 100;
-            constexpr auto Y      = 110;
+            constexpr auto Y      = 100;
             constexpr auto Width  = timer::Width - 2 * X;
             constexpr auto Height = timer::Height - 2 * Y;
         } // namespace setterValueLabel
@@ -112,7 +114,7 @@ namespace style::meditation
         namespace window
         {
             constexpr auto X      = style::window::default_left_margin;
-            constexpr auto Y      = style::header::height;
+            constexpr auto Y      = style::window::default_vertical_pos;
             constexpr auto Width  = style::listview::body_width_with_scroll;
             constexpr auto Height = style::window_height - Y - style::footer::height;
         } // namespace window

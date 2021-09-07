@@ -1,28 +1,26 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "ApplicationMessages.hpp"
 #include "MessagesMainWindow.hpp"
+#include "MessagesStyle.hpp"
+#include "SearchStart.hpp"
+#include "SMSdata.hpp"
+#include "ThreadItem.hpp"
 
-#include "application-messages/ApplicationMessages.hpp"
-#include "application-messages/data/MessagesStyle.hpp"
-#include "application-messages/data/SMSdata.hpp"
-#include "application-messages/widgets/ThreadItem.hpp"
-#include "application-messages/windows/SearchStart.hpp"
-
-#include <service-db/DBServiceAPI.hpp>
-#include <service-db/DBNotificationMessage.hpp>
-
-#include <service-appmgr/model/ApplicationManager.hpp>
-#include <i18n/i18n.hpp>
 #include <application-phonebook/data/PhonebookItemData.hpp>
-#include <Style.hpp>
-#include <log/log.hpp>
-
-#include <module-db/queries/notifications/QueryNotificationsClear.hpp>
+#include <header/AddElementAction.hpp>
+#include <header/SearchAction.hpp>
+#include <i18n/i18n.hpp>
+#include <log.hpp>
 #include <module-db/queries/messages/threads/QueryThreadGetByContactID.hpp>
+#include <module-db/queries/notifications/QueryNotificationsClear.hpp>
+#include <service-db/DBNotificationMessage.hpp>
+#include <service-db/DBServiceAPI.hpp>
+#include <Style.hpp>
 
-#include <memory>
 #include <cassert>
+#include <memory>
 
 namespace gui
 {
@@ -37,7 +35,7 @@ namespace gui
         if (list == nullptr) {
             return;
         }
-        list->rebuildList(style::listview::RebuildType::InPlace);
+        list->rebuildList(gui::listview::RebuildType::InPlace);
     }
 
     void MessagesMainWindow::buildInterface()
@@ -54,38 +52,35 @@ namespace gui
                                  msgThreadStyle::listWidth,
                                  msgThreadStyle::listHeight,
                                  threadsModel,
-                                 style::listview::ScrollBarType::Fixed);
+                                 listview::ScrollBarType::Fixed);
         list->setScrollTopMargin(style::margins::small);
         list->rebuildList();
 
         bottomBar->setActive(BottomBar::Side::LEFT, true);
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(style::strings::common::options));
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::open));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::options));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::open));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
-        setTitle(utils::localize.get("app_messages_title_main"));
-
-        leftArrowImage  = new gui::Image(this, 30, 62, 0, 0, "arrow_left");
-        rightArrowImage = new gui::Image(this, 480 - 30 - 13, 62, 0, 0, "arrow_right");
-        newMessageImage = new gui::Image(this, 48, 55, 0, 0, "cross");
-        searchImage     = new gui::Image(this, 480 - 48 - 26, 55, 0, 0, "search");
+        setTitle(utils::translate("app_messages_title_main"));
+        header->navigationIndicatorAdd(new gui::header::AddElementAction(), gui::header::BoxSelection::Left);
+#if MESSAGE_TEXT_SEARCH == 1
+        header->navigationIndicatorAdd(new gui::header::SearchAction(), gui::header::BoxSelection::Right);
+#endif
 
         emptyListIcon = new Icon(this,
                                  0,
-                                 style::header::height,
+                                 style::window::default_vertical_pos,
                                  style::window_width,
-                                 style::window_height - style::header::height - style::footer::height,
+                                 style::window_height - style::window::default_vertical_pos - style::footer::height,
                                  "phonebook_empty_grey_circle_W_G",
-                                 utils::localize.get("app_messages_no_messages"));
+                                 utils::translate("app_messages_no_messages"));
 
         list->setVisible(true);
         list->focusChangedCallback = [this]([[maybe_unused]] gui::Item &item) {
             bottomBar->setActive(BottomBar::Side::LEFT, true);
             bottomBar->setActive(BottomBar::Side::CENTER, true);
-            rightArrowImage->setVisible(true);
-            searchImage->setVisible(true);
             return true;
         };
 
@@ -136,23 +131,22 @@ namespace gui
 
     bool MessagesMainWindow::onInput(const InputEvent &inputEvent)
     {
-        auto app = dynamic_cast<app::ApplicationMessages *>(application);
-        assert(app);
-
         // check if any of the lower inheritance onInput methods catch the event
         if (AppWindow::onInput(inputEvent)) {
             return true;
         }
-        if (inputEvent.state == InputEvent::State::keyReleasedShort) {
-            switch (inputEvent.keyCode) {
+        if (inputEvent.isShortRelease()) {
+            switch (inputEvent.getKeyCode()) {
             case gui::KeyCode::KEY_LEFT:
                 application->switchWindow(gui::name::window::new_sms, nullptr);
                 return true;
+#if MESSAGE_TEXT_SEARCH == 1
             case gui::KeyCode::KEY_RIGHT:
-                app->switchWindow(gui::name::window::thread_sms_search, nullptr);
+                application->switchWindow(gui::name::window::thread_sms_search, nullptr);
                 return true;
+#endif
             default:
-                LOG_DEBUG("SMS main window not handled key: %d", static_cast<int>(inputEvent.keyCode));
+                LOG_DEBUG("SMS main window not handled key: %s", c_str(inputEvent.getKeyCode()));
                 break;
             }
         }

@@ -1,17 +1,15 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlgoParamsWindow.hpp"
-#include "gui/widgets/BoxLayout.hpp"
-#include "gui/widgets/Item.hpp"
-#include "gui/widgets/Label.hpp"
-#include "gui/widgets/Window.hpp"
-
+#include <AntennaAppStyle.hpp>
+#include <application-antenna/ApplicationAntenna.hpp>
+#include <module-gui/gui/widgets/BoxLayout.hpp>
+#include <module-gui/gui/widgets/Item.hpp>
+#include <module-gui/gui/widgets/Label.hpp>
+#include <module-gui/gui/widgets/Style.hpp>
+#include <module-gui/gui/widgets/Window.hpp>
 #include <i18n/i18n.hpp>
-#include <Style.hpp>
-#include "gui/widgets/BoxLayout.hpp"
-#include "../AntennaAppStyle.hpp"
-#include "../ApplicationAntenna.hpp"
 #include <service-cellular/CellularServiceAPI.hpp>
 
 using StringList = std::list<std::string>;
@@ -36,10 +34,10 @@ namespace gui
         bottomBar->setActive(BottomBar::Side::LEFT, true);
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::open));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::open));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
-        setTitle(utils::localize.get("app_desktop_tools_antenna"));
+        setTitle(utils::translate("app_desktop_tools_antenna"));
 
         lowBandBox  = new gui::VBox(this,
                                    antenna::algo_window::leftColumnXPos,

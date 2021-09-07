@@ -1,9 +1,9 @@
-# Download Assets 
+# Download Assets
 
 Building update packages requires some external assets.
-For now we need only `ecoboot.bin`.
-This file may be manually downloaded from [ecoboot releases page](https://github.com/mudita/ecoboot/releases),
-from the "Assets" section. This requires the user to log in to GitHub and click inside the web browser, which is a "no go" for automated builds.
+For now we need only `ecoboot.bin` and `PureUpdater_RT.bin`.
+The files may be downloaded manually from [ecoboot](https://github.com/mudita/ecoboot/releases) and [PureUpdater](https://github.com/mudita/PureUpdater/releases) release pages, respectively, from the "Assets" section.
+This requires the user to log in to GitHub and click inside the web browser, which is a "no go" for automated builds.
 To automate this process we have introduced a tool `tools/download_asset.py`.
 
 ## GitHub API token

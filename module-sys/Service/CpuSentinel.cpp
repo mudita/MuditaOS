@@ -20,8 +20,20 @@ namespace sys
 
     void CpuSentinel::HoldMinimumFrequency(bsp::CpuFrequencyHz frequencyToHold)
     {
-        auto msg = std::make_shared<sys::RequestCpuFrequencyMessage>(GetName(), frequencyToHold);
-        owner->bus.sendUnicast(msg, service::name::system_manager);
+        if (currentFrequencyToHold != frequencyToHold) {
+            auto msg = std::make_shared<sys::HoldCpuFrequencyMessage>(GetName(), frequencyToHold);
+            owner->bus.sendUnicast(std::move(msg), service::name::system_manager);
+            currentFrequencyToHold = frequencyToHold;
+        }
+    }
+
+    void CpuSentinel::ReleaseMinimumFrequency()
+    {
+        if (currentFrequencyToHold != bsp::CpuFrequencyHz::Level_1) {
+            auto msg = std::make_shared<sys::ReleaseCpuFrequencyMessage>(GetName());
+            owner->bus.sendUnicast(std::move(msg), service::name::system_manager);
+            currentFrequencyToHold = bsp::CpuFrequencyHz::Level_1;
+        }
     }
 
     void CpuSentinel::CpuFrequencyHasChanged(bsp::CpuFrequencyHz newFrequency)

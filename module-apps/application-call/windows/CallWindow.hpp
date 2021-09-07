@@ -3,29 +3,39 @@
 
 #pragma once
 
-#include "application-call/ApplicationCall.hpp"
-#include "application-call/widgets/StateIcons.hpp"
-#include "application-call/data/CallState.hpp"
+#include "ApplicationCall.hpp"
+#include "CallState.hpp"
+#include "StateIcons.hpp"
 
-#include <gui/input/Translator.hpp>
-#include <Rect.hpp>
-#include <Image.hpp>
 #include <AppWindow.hpp>
+#include <gui/input/Translator.hpp>
+#include <Image.hpp>
+#include <Rect.hpp>
+#include <time/time_conversion.hpp>
 
 namespace gui
 {
     class CallWindow : public AppWindow
     {
       private:
+        enum class CallEndType
+        {
+            None,
+            Ended,
+            Rejected,
+        } callEndType = CallEndType::None;
+
         gui::KeyInputMappedTranslation translator;
-        std::chrono::seconds callDuration                   = std::chrono::seconds().zero();
-        bool stop_timer                                     = false;
-        static constexpr inline sys::ms callDelayedStopTime = 3000;
+        sys::TimerHandle callTimer;
+        sys::TimerHandle delayedExitTimer;
+        std::chrono::seconds callDuration                = std::chrono::seconds().zero();
+        static constexpr inline auto callDelayedStopTime = std::chrono::milliseconds{3000};
 
         [[nodiscard]] auto getDelayedStopTime() const
         {
             return callDelayedStopTime;
         }
+        void setCallEndMessage();
 
       protected:
         app::CallWindowInterface *interface = nullptr;
@@ -44,6 +54,7 @@ namespace gui
 
         bool handleLeftButton();
         bool handleRightButton();
+        bool handleHeadsetOkButton();
         void setState(app::call::State state);
         [[nodiscard]] auto getState() const noexcept -> app::call::State;
 
@@ -60,6 +71,8 @@ namespace gui
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;
+        status_bar::Configuration configureStatusBar(status_bar::Configuration appConfiguration) override;
+
         bool handleDigit(const uint32_t digit);
         void connectTimerOnExit();
         void runCallTimer();

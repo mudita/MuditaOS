@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 import time
@@ -20,13 +20,13 @@ from harness.interface.defs import key_codes
 
 simulator_port = 'simulator'
 
-
 def pytest_addoption(parser):
     parser.addoption("--port", type=str, action="store", required=False)
     parser.addoption("--timeout", type=int, action="store", default=15)
     parser.addoption("--phone_number", type=int, action="store")
     parser.addoption("--call_duration", type=int, action="store", default=30)
     parser.addoption("--sms_text", type=str, action="store", default='')
+    parser.addoption("--bt_device", type=str, action="store", default='')
 
 
 @pytest.fixture(scope='session')
@@ -49,6 +49,10 @@ def sms_text(request):
     assert sms_text != ''
     return sms_text
 
+@pytest.fixture(scope='session')
+def bt_device(request):
+    bt_device = request.config.option.bt_device
+    return bt_device
 
 @pytest.fixture(scope='session')
 def harness(request):
@@ -127,21 +131,18 @@ def harnesses():
 @pytest.fixture(scope='session')
 def phone_unlocked(harness):
     harness.unlock_phone()
-    assert harness.is_phone_unlocked
+    assert not harness.is_phone_locked()
 
 @pytest.fixture(scope='session')
-def usb_unlocked(harness):
-    harness.unlock_usb()
-
-@pytest.fixture(scope='session')
-def usb_locked(harness):
-    harness.lock_usb()
+def phone_locked(harness):
+    harness.lock_phone()
+    assert harness.is_phone_locked()
 
 @pytest.fixture(scope='session')
 def phones_unlocked(harnesses):
     for harness in harnesses:
         harness.unlock_phone()
-        assert harness.is_phone_unlocked
+        assert not harness.is_phone_locked()
 
 
 @pytest.fixture(scope='session')
@@ -155,6 +156,36 @@ def phone_in_desktop(harness):
     # assert that we are in ApplicationDesktop
     assert harness.get_application_name() == "ApplicationDesktop"
 
+@pytest.fixture(scope='function')
+def phone_ends_test_in_desktop(harness):
+    yield
+    target_application = "ApplicationDesktop"
+    target_window     = "MainWindow"
+    log.info(f"returning to {target_window} of {target_application} ...")
+    time.sleep(1)
+
+    if harness.get_application_name() != target_application :
+        body = {"switchApplication" : {"applicationName": target_application, "windowName" : target_window }}
+        harness.endpoint_request("developerMode", "put", body)
+        time.sleep(1)
+
+        max_retry_counter = 5
+        while harness.get_application_name() != target_application:
+            max_retry_counter -= 1
+            if max_retry_counter == 0:
+                break
+
+            log.info(f"Not in {target_application}, {max_retry_counter} attempts left...")
+            time.sleep(1)
+    else :
+        # switching window in case ApplicationDesktop is not on MainWindow:
+        body = {"switchWindow" : {"applicationName": target_application, "windowName" : target_window }}
+        harness.endpoint_request("developerMode", "put", body)
+        time.sleep(1)
+
+    # assert that we are in ApplicationDesktop
+    assert harness.get_application_name() == target_application
+    time.sleep(1)
 
 def pytest_configure(config):
     config.addinivalue_line("markers",
@@ -165,3 +196,7 @@ def pytest_configure(config):
                             "usb_cdc_echo: mark test if it's intended for usb-cdc echo mode")
     config.addinivalue_line("markers",
                             "two_sim_cards: mark test in case when two sim cards are required")
+    config.addinivalue_line("markers",
+                            "backup: subset of backup user data tests")
+    config.addinivalue_line("markers",
+                            "restore: subset of restore user data tests")

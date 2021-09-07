@@ -1,11 +1,7 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "bsp/torch/torch.hpp"
-
-#include "bsp/BoardDefinitions.hpp"
-
-using namespace drivers;
 
 static xQueueHandle qHandleIrq = NULL;
 
@@ -15,7 +11,7 @@ namespace bsp
     namespace torch
     {
         State state_simulated               = State::off;
-        ColourTemperature currentColourTemp = warmest;
+        ColourTemperature currentColourTemp = ColourTemperature::warmest;
 
         int32_t init(xQueueHandle qHandle)
         {
@@ -38,7 +34,7 @@ namespace bsp
         bool turn(State state, ColourTemperature colourTemp)
         {
             state_simulated = state;
-            if (colourTemp != no_change) {
+            if (colourTemp != ColourTemperature::noChange) {
                 currentColourTemp = colourTemp;
             }
 

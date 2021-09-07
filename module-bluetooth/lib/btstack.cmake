@@ -168,6 +168,9 @@ set(BOARD_DIR_SOURCES
     ${BT_STACK_ROOT}/src/classic/sdp_client.c
     ${BT_STACK_ROOT}/src/classic/avrcp_target.c
     ${BT_STACK_ROOT}/src/classic/hsp_ag.c
+    ${BT_STACK_ROOT}/src/classic/hfp.c
+    ${BT_STACK_ROOT}/src/classic/hfp_gsm_model.c
+    ${BT_STACK_ROOT}/src/classic/hfp_ag.c
     ${BT_STACK_ROOT}/src/classic/hfp_msbc.c
     ${BT_STACK_ROOT}/src/classic/btstack_cvsd_plc.c
     ${BT_STACK_ROOT}/src/classic/btstack_sbc_plc.c
@@ -201,13 +204,10 @@ set(BOARD_DIR_SOURCES
     )
 
 if(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
-message("Linux specyfic sources")
-message("----------------------")
-# include(${CMAKE_CURRENT_SOURCE_DIR}/targets/Target_Linux.cmake)
 list(APPEND BOARD_DIR_SOURCES
     # ${BOARD_SOURCES}
     ${BT_STACK_ROOT}/platform/posix/btstack_stdin_posix.c
-    ${BT_STACK_ROOT}/platform/posix/btstack_uart_block_posix.c
+    ${BT_STACK_ROOT}/platform/posix/btstack_uart_posix.c
     ${BT_STACK_ROOT}/platform/posix/btstack_run_loop_posix.c
     ${BT_STACK_ROOT}/platform/posix/btstack_tlv_posix.c
     )

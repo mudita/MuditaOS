@@ -1,6 +1,10 @@
 @startuml
+skinparam BackgroundColor F0F0F0
 
 hide footbox
+
+participant "Key pressed" as kp
+participant "Timer" as t
 
 box "500ms" #LightBlue
 participant "Light Measurement" as lm
@@ -13,9 +17,15 @@ participant "Current ramp value \ncalculation with hysteresis" as rc
 participant "Light driver duty cycle \nupdate with Gamma Correction" as ld
 end box
 
+kp -> lm : turn on backlight
 lm -> bc : measurement
 bc -> ru : brightness \nvalue
 ru -> rc : ramp target
 rc -> ld : current ramp \nvalue
+kp -> t  : start timer
+
+alt timeout
+t -> t : turn off backlight
+end
 
 @enduml

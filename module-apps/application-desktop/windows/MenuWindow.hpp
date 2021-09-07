@@ -1,21 +1,23 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
+#include <AppWindow.hpp>
+#include <GridLayout.hpp>
+#include <utf8/UTF8.hpp>
+#include <widgets/Rect.hpp>
+
 #include <vector>
 
-#include "AppWindow.hpp"
-#include "GridLayout.hpp"
-#include "widgets/BottomBar.hpp"
-#include "widgets/Label.hpp"
-#include "widgets/Rect.hpp"
-#include "widgets/TopBar.hpp"
-
-#include "utf8/UTF8.hpp"
+namespace app
+{
+    class DBNotificationsBaseHandler;
+}
 
 namespace gui
 {
+    class Image;
     /// icon, description, name of application to run
     struct Tile : public Rect
     {
@@ -26,9 +28,20 @@ namespace gui
 
         bool onNotificationsChange(gui::RefreshModes);
 
+      protected:
+        gui::Label *description = nullptr;
+
       private:
         std::function<bool(gui::RefreshModes)> onNotificationsChangeCallback = nullptr;
         gui::Image *notificationThumbnail                                    = nullptr;
+    };
+
+    struct DisabledTile : public Tile
+    {
+        DisabledTile(UTF8 icon,
+                     std::string title,
+                     std::function<bool(Item &)> activatedCallback,
+                     std::function<bool()> hasNotificationsCallback = nullptr);
     };
 
     class MenuPage : public gui::GridLayout
@@ -36,7 +49,7 @@ namespace gui
       public:
         bool first_time_selection = true;
         /// position of element which should be selected on start
-        const unsigned int first_time_selected = 3;
+        const unsigned int first_time_selected = 4;
 
         UTF8 title;
         MenuPage(gui::Item *parent, UTF8 title, std::vector<Tile *> tiles);
@@ -53,7 +66,7 @@ namespace gui
         MenuPage *toolsMenu = nullptr;
 
       public:
-        MenuWindow(app::Application *app);
+        MenuWindow(app::Application *app, const app::DBNotificationsBaseHandler &accessor);
 
         bool onInput(const InputEvent &inputEvent) override;
 
@@ -65,7 +78,13 @@ namespace gui
         void refresh();
 
       private:
+        const app::DBNotificationsBaseHandler &dbNotifications;
         void invalidate() noexcept;
+        gui::Tile *createApplicationTile(UTF8 icon,
+                                         std::string title,
+                                         std::function<bool(Item &)> activatedCallback,
+                                         std::function<bool()> hasNotificationsCallback = nullptr);
+        gui::Tile *createDisabledApplicationTile(UTF8 icon, std::string title);
     };
 
 } /* namespace gui */

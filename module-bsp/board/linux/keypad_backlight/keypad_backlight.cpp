@@ -1,10 +1,7 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "bsp/keypad_backlight/keypad_backlight.hpp"
-#include "bsp/BoardDefinitions.hpp"
-
-using namespace drivers;
 
 namespace bsp::keypad_backlight
 {
@@ -24,6 +21,16 @@ namespace bsp::keypad_backlight
     bool turnOnAll()
     {
         diodesState = true;
+        return true;
+    }
+
+    bool turnOnFunctionKeysBacklight()
+    {
+        return true;
+    }
+
+    bool turnOnNumericKeysBacklight()
+    {
         return true;
     }
 

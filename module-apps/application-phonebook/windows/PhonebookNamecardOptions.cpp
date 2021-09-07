@@ -1,7 +1,7 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <module-services/service-appmgr/service-appmgr/Controller.hpp>
+#include <service-appmgr/Controller.hpp>
 #include "PhonebookNamecardOptions.hpp"
 #include "application-phonebook/ApplicationPhonebook.hpp"
 #include "application-phonebook/data/PhonebookItemData.hpp"
@@ -14,9 +14,7 @@ namespace gui
     PhonebookNamecardOptions::PhonebookNamecardOptions(app::Application *app)
         : OptionWindow(app, gui::window::name::namecard_options)
     {
-        buildInterface();
-        options = namecardOptionsList();
-        addOptions(options);
+        addOptions(namecardOptionsList());
     }
 
     auto PhonebookNamecardOptions::handleSwitchData(SwitchData *data) -> bool
@@ -33,14 +31,14 @@ namespace gui
 
     auto PhonebookNamecardOptions::onInput(const InputEvent &inputEvent) -> bool
     {
-        if (inputEvent.keyCode == KeyCode::KEY_RF && (inputEvent.state == InputEvent::State::keyReleasedShort)) {
+        if (inputEvent.isShortRelease(KeyCode::KEY_RF)) {
             std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
             application->switchWindow(
                 gui::window::name::contact_options, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
             return true;
         }
 
-        return (AppWindow::onInput(inputEvent));
+        return AppWindow::onInput(inputEvent);
     }
 
     auto PhonebookNamecardOptions::sendViaSms() -> bool
@@ -53,21 +51,10 @@ namespace gui
                                                     app::manager::OnSwitchBehaviour::RunInBackground);
     }
 
-    void PhonebookNamecardOptions::sendViaBluetooth()
-    {
-        const UTF8 contactData = contact->getAsString();
-    }
-
     auto PhonebookNamecardOptions::namecardOptionsList() -> std::list<gui::Option>
     {
         std::list<gui::Option> l;
-
-        l.emplace_back(gui::Option{utils::localize.get("app_phonebook_options_send_bt"), [=](gui::Item &item) {
-                                       LOG_INFO("Sending namecard via bluetooth!");
-                                       sendViaBluetooth();
-                                       return true;
-                                   }});
-        l.emplace_back(gui::Option{utils::localize.get("app_phonebook_options_send_sms"), [=](gui::Item &item) {
+        l.emplace_back(gui::Option{utils::translate("app_phonebook_options_send_sms"), [=](gui::Item &item) {
                                        LOG_INFO("Sending namecard via SMS!");
                                        sendViaSms();
                                        return true;

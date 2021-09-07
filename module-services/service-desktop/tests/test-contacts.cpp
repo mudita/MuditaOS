@@ -5,7 +5,7 @@
 #include <endpoints/EndpointFactory.hpp>
 
 #include <catch2/catch.hpp>
-#include <json/json11.hpp>
+#include <json11.hpp>
 #include <purefs/filesystem_paths.hpp>
 #include <utf8/UTF8.hpp>
 
@@ -34,16 +34,6 @@ std::pair<bool, std::uint64_t> DBServiceAPI::GetQuery(sys::Service *serv,
     queryListener->handleQueryResponse(result.get());
 
     return std::make_pair(true, 0);
-}
-auto DBServiceAPI::ThreadGetByNumber(sys::Service *serv,
-                                     const utils::PhoneNumber::View &phoneNumber,
-                                     std::uint32_t timeout) -> std::unique_ptr<ThreadRecord>
-{
-    return nullptr;
-}
-auto DBServiceAPI::ThreadGetCount(sys::Service *serv, EntryState state) -> uint32_t
-{
-    return 0;
 }
 
 auto DBServiceAPI::GetQueryWithReply(sys::Service *serv,
@@ -77,11 +67,6 @@ auto DBServiceAPI::ContactGetBySpeeddial(sys::Service *serv, UTF8 speeddial)
 {
     return nullptr;
 }
-auto DBServiceAPI::ContactGetByPhoneNumber(sys::Service *serv, UTF8 phoneNumber)
-    -> std::unique_ptr<std::vector<ContactRecord>>
-{
-    return nullptr;
-}
 auto DBServiceAPI::MatchContactByPhoneNumber(sys::Service *serv, const utils::PhoneNumber::View &numberView)
     -> std::unique_ptr<ContactRecord>
 {
@@ -99,11 +84,6 @@ auto DBServiceAPI::ContactUpdate(sys::Service *serv, const ContactRecord &rec) -
 {
     return false;
 }
-auto DBServiceAPI::ContactSearch(sys::Service *serv, UTF8 primaryName, UTF8 alternativeName, UTF8 number)
-    -> std::unique_ptr<std::vector<ContactRecord>>
-{
-    return nullptr;
-}
 auto DBServiceAPI::CalllogAdd(sys::Service *serv, const CalllogRecord &rec) -> CalllogRecord
 {
     return {};
@@ -115,18 +95,6 @@ auto DBServiceAPI::CalllogRemove(sys::Service *serv, uint32_t id) -> bool
 auto DBServiceAPI::CalllogUpdate(sys::Service *serv, const CalllogRecord &rec) -> bool
 {
     return false;
-}
-auto DBServiceAPI::CalllogGetCount(sys::Service *serv, EntryState state) -> uint32_t
-{
-    return 0;
-}
-auto DBServiceAPI::CalllogGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit) -> bool
-{
-    return false;
-}
-auto DBServiceAPI::GetCountryCodeByMCC(sys::Service *serv, uint32_t mcc) -> uint32_t
-{
-    return 0;
 }
 auto DBServiceAPI::DBBackup(sys::Service *serv, std::string backupPath) -> bool
 {
@@ -171,9 +139,10 @@ TEST_CASE("Endpoint Contacts Test")
     {
         auto count       = 29; // requested number of record to return
         auto endpoint    = 7;
-        auto uuid        = "1103";
+        auto uuid        = 1103;
         auto totalCount  = contactsDb->contacts.count();
-        auto testMessage = "{\"endpoint\":" + std::to_string(endpoint) + ", \"method\":1, \"uuid\":" + uuid +
+        auto testMessage = "{\"endpoint\":" + std::to_string(endpoint) +
+                           ", \"method\":1, \"uuid\":" + std::to_string(uuid) +
                            ", \"body\":{\"limit\":" + std::to_string(count) + ", \"offset\":20}}";
         std::string err;
         auto msgJson = json11::Json::parse(testMessage, err);
@@ -191,7 +160,7 @@ TEST_CASE("Endpoint Contacts Test")
         auto retJson = json11::Json::parse(msg.substr(10), err); // string length and go to real data
 
         REQUIRE(err.empty());
-        REQUIRE(uuid == retJson[parserFSM::json::uuid].string_value());
+        REQUIRE(uuid == retJson[parserFSM::json::uuid].int_value());
         REQUIRE(endpoint == retJson[parserFSM::json::endpoint].int_value());
 
         auto body = retJson[parserFSM::json::body];

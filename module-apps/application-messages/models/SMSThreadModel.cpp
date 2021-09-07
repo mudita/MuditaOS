@@ -1,16 +1,16 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <service-db/QueryMessage.hpp>
-#include <service-db/DBServiceAPI.hpp>
+#include "ApplicationMessages.hpp"
+#include "MessagesStyle.hpp"
+#include "SMSOutputWidget.hpp"
+#include "SMSThreadModel.hpp"
+
+#include <ListView.hpp>
 #include <module-db/queries/messages/sms/QuerySMSGetCountByThreadID.hpp>
 #include <module-db/queries/messages/sms/QuerySMSGetForList.hpp>
-
-#include <application-messages/widgets/SMSOutputWidget.hpp>
-#include <module-apps/application-messages/ApplicationMessages.hpp>
-#include "application-messages/data/MessagesStyle.hpp"
-#include "SMSThreadModel.hpp"
-#include "ListView.hpp"
+#include <service-db/DBServiceAPI.hpp>
+#include <service-db/QueryMessage.hpp>
 
 SMSThreadModel::SMSThreadModel(app::Application *app) : DatabaseModel(app), app::AsyncCallbackReceiver{app}
 {
@@ -22,7 +22,7 @@ SMSThreadModel::~SMSThreadModel()
     delete smsInput;
 }
 
-unsigned int SMSThreadModel::getMinimalItemHeight() const
+unsigned int SMSThreadModel::getMinimalItemSpaceRequired() const
 {
     return style::messages::smsOutput::default_h;
 }

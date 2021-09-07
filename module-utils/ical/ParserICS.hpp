@@ -1,9 +1,12 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-#include <module-apps/application-calendar/data/dateCommon.hpp>
-#include "json/json11.hpp"
+
+#include <time/dateCommon.hpp>
+
+#include <json11.hpp>
+
 #include <memory>
 
 /**

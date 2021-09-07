@@ -16,6 +16,7 @@ if ("${GIT_REV}" STREQUAL "")
     set(GIT_DIFF "")
     set(GIT_TAG "N/A")
     set(GIT_BRANCH "N/A")
+    set(GIT_DAILY_TAG "N/A")
 else()
     execute_process(
         COMMAND bash -c "git diff --quiet --exit-code || echo +"
@@ -24,9 +25,9 @@ else()
         WORKING_DIRECTORY ${SRC_DIR}
         )
     execute_process(
-        COMMAND git describe --tags
+        COMMAND git describe --tags --match "release*" HEAD
         RESULT_VARIABLE ret
-        OUTPUT_VARIABLE GIT_TAG  
+        OUTPUT_VARIABLE GIT_TAG
         OUTPUT_STRIP_TRAILING_WHITESPACE
         WORKING_DIRECTORY ${SRC_DIR}
         ERROR_QUIET
@@ -34,6 +35,14 @@ else()
         if(NOT ret EQUAL "0")
             set(GIT_TAG "none")
         endif()
+    execute_process(
+        COMMAND git tag --points-at HEAD 
+        RESULT_VARIABLE ret
+        OUTPUT_VARIABLE GIT_DAILY_TAG
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        WORKING_DIRECTORY ${SRC_DIR}
+        ERROR_QUIET
+        )
     execute_process(
         COMMAND git rev-parse --abbrev-ref HEAD
         OUTPUT_VARIABLE GIT_BRANCH
@@ -63,7 +72,20 @@ else()
         )
 endif()
 
-string(REGEX MATCH "release-([0-9]*).([0-9]*).([0-9]*)" VERSION_RAW ${GIT_TAG})
+if (GIT_DAILY_TAG)
+    string(REPLACE "\n" ";" GIT_DAILY_TAG_LIST ${GIT_DAILY_TAG})
+    list(LENGTH GIT_DAILY_TAG_LIST DAILY_LEN)
+    foreach(TAG_ITEM IN LISTS GIT_DAILY_TAG_LIST)
+        if(${TAG_ITEM} MATCHES "release-([0-9]+).([0-9]+).([0-9]+)")
+            break()
+        elseif(${TAG_ITEM} MATCHES "daily-([0-9]+).([0-9]+).([0-9]+)")
+            continue()
+        endif()
+    endforeach()
+else()
+    string(REGEX MATCH "release-([0-9]+).([0-9]+).([0-9]+)" VERSION_RAW ${GIT_TAG})
+endif()
+
 set(CMAKE_PROJECT_VERSION_MAJOR "${CMAKE_MATCH_1}")
 set(CMAKE_PROJECT_VERSION_MINOR "${CMAKE_MATCH_2}")
 set(CMAKE_PROJECT_VERSION_PATCH "${CMAKE_MATCH_3}")

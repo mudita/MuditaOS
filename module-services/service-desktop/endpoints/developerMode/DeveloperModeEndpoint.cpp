@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DeveloperModeEndpoint.hpp"
-#include "log/log.hpp"
+#include <log.hpp>
 
 #include <endpoints/Context.hpp>
 #include <service-desktop/parser/MessageHandler.hpp>

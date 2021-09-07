@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /*
@@ -8,22 +8,21 @@
  *      Author: kuba
  */
 
-#include "ApplicationAntenna.hpp"
-#include "Service/Timer.hpp"
-#include "module-cellular/at/response.hpp"
+#include <application-antenna/ApplicationAntenna.hpp>
+#include <windows/AntennaMainWindow.hpp>
+#include <windows/ScanModesWindow.hpp>
+#include <windows/AlgoParamsWindow.hpp>
+#include <module-cellular/at/response.hpp>
+#include <module-sys/Timers/TimerFactory.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
-
-#include "windows/AntennaMainWindow.hpp"
-#include "windows/ScanModesWindow.hpp"
-#include "windows/AlgoParamsWindow.hpp"
-
 #include <ticks.hpp>
+
 namespace app
 {
 
     void ApplicationAntenna::timerHandler(void)
     {
-        auto win = getCurrentWindow();
+        auto win        = getCurrentWindow();
         auto windowName = win->getName();
         if ((windowName == gui::name::window::main_window) || (windowName == gui::name::window::algo_window)) {
             if (!cellularRequestInProgress) {
@@ -34,13 +33,19 @@ namespace app
         }
     }
 
-    ApplicationAntenna::ApplicationAntenna(std::string name, std::string parent, StartInBackground startInBackground)
-        : Application(name, parent, startInBackground, 4096 * 2)
+    inline constexpr auto antennaApplicationStackSize = 1024 * 3;
+
+    ApplicationAntenna::ApplicationAntenna(std::string name,
+                                           std::string parent,
+                                           sys::phone_modes::PhoneMode phoneMode,
+                                           sys::bluetooth::BluetoothMode bluetoothMode,
+                                           StartInBackground startInBackground)
+        : Application(name, parent, phoneMode, bluetoothMode, startInBackground, antennaApplicationStackSize)
     {
         bus.channels.push_back(sys::BusChannel::AntennaNotifications);
-        appTimer = std::make_unique<sys::Timer>("Antena", this, 2000);
-        appTimer->connect([=](sys::Timer &) { timerHandler(); });
-        appTimer->start();
+        appTimer = sys::TimerFactory::createPeriodicTimer(
+            this, "Antena", std::chrono::milliseconds{2000}, [this](sys::Timer &) { timerHandler(); });
+        appTimer.start();
     }
 
     ApplicationAntenna::~ApplicationAntenna()
@@ -57,56 +62,43 @@ namespace app
 
         // this variable defines whether message was processed.
         bool handled = false;
-        if (msgl->messageType == MessageType::CellularOperatorsScanResult) {
-            auto msg = dynamic_cast<cellular::RawCommandRespAsync *>(msgl);
-            if (msg != nullptr) {
+        if (auto msg = dynamic_cast<cellular::RawCommandRespAsync *>(msgl)) {
+            switch (msg->type) {
+            case CellularMessage::Type::OperatorsScanResult: {
                 auto win = getCurrentWindow();
-
                 if (win->getName() == gui::name::window::main_window) {
-                    auto window = dynamic_cast<gui::AntennaMainWindow *>(win);
-                    if (window != nullptr) {
-
+                    if (auto window = dynamic_cast<gui::AntennaMainWindow *>(win)) {
                         window->updateOperatorsScan(msg->data);
                     }
                 }
                 cellularRequestInProgress = false;
-            }
-            handled = true;
-        }
-        if (msgl->messageType == MessageType::CellularNetworkInfoResult) {
-            auto msg = dynamic_cast<cellular::RawCommandRespAsync *>(msgl);
-            if (msg != nullptr) {
+                handled                   = true;
+            } break;
+            case CellularMessage::Type::NetworkInfoResult: {
                 handleNetworkParams(msg->data);
                 auto win = getCurrentWindow();
-
                 if (win->getName() == gui::name::window::main_window) {
-                    auto window = dynamic_cast<gui::AntennaMainWindow *>(win);
-                    if (window != nullptr) {
-
+                    if (auto window = dynamic_cast<gui::AntennaMainWindow *>(win)) {
                         window->updateDebugInfo(msg->data);
                     }
                 }
-
                 cellularRequestInProgress = false;
-            }
-            handled = true;
-        }
-        if (msgl->messageType == MessageType::CellularGetScanModeResult) {
-            auto msg = dynamic_cast<cellular::RawCommandRespAsync *>(msgl);
-            if (msg != nullptr) {
-                auto win = windowsStack.get(gui::name::window::scan_window);
-
-                if (win->getName() == gui::name::window::scan_window) {
-                    auto window = dynamic_cast<gui::ScanModesWindow *>(win);
-                    if (window != nullptr) {
-
+                handled                   = true;
+            } break;
+            case CellularMessage::Type::GetScanModeResult: {
+                if (auto win = windowsStack.get(gui::name::window::scan_window)) {
+                    if (auto window = dynamic_cast<gui::ScanModesWindow *>(win)) {
                         window->updateCurrentMode(msg->data[0]);
                     }
                 }
                 cellularRequestInProgress = false;
+                handled                   = true;
+            } break;
+            default:
+                break;
             }
-            handled = true;
         }
+
         if (msgl->messageType == MessageType::AntennaChanged) {
 
             CellularServiceAPI::GetAntenna(this, antenna);
@@ -151,8 +143,6 @@ namespace app
 
         createUserInterface();
 
-        setActiveWindow(gui::name::window::main_window);
-
         CellularServiceAPI::GetAntenna(this, antenna);
 
         return ret;
@@ -175,6 +165,9 @@ namespace app
         windowsFactory.attach(algo_window, [](Application *app, const std::string &name) {
             return std::make_unique<gui::AlgoParamsWindow>(app);
         });
+
+        attachPopups(
+            {gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes, gui::popup::ID::PhoneLock});
     }
 
     void ApplicationAntenna::destroyUserInterface()

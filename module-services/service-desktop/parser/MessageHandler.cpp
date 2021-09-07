@@ -7,10 +7,9 @@
 #include <endpoints/EndpointFactory.hpp>
 
 #include <FreeRTOS.h>
-#include <log/log.hpp>
+#include <log.hpp>
 
 #include <bits/exception.h>
-#include <cinttypes>
 #include <memory>
 
 namespace sys
@@ -40,11 +39,10 @@ void MessageHandler::processMessage()
 {
     auto context = ContextFactory::create(messageJson);
 
-    LOG_DEBUG("[MsgHandler]\nmethod: %d\nendpoint: %d\nuuid: %" PRIu32 "\nbody: %s\n",
+    LOG_DEBUG("[MsgHandler]\nmethod: %d\nendpoint: %d\nuuid: %d\n",
               static_cast<int>(context->getMethod()),
               static_cast<int>(context->getEndpoint()),
-              context->getUuid(),
-              context->getBody().dump().c_str());
+              context->getUuid());
 
     auto handler = endpointFactory->create(*context, OwnerServicePtr);
 

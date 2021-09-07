@@ -10,7 +10,7 @@
 #include "queries/messages/templates/QuerySMSTemplateUpdate.hpp"
 #include <queries/messages/templates/QuerySMSTemplateGetForList.hpp>
 
-#include <log/log.hpp>
+#include <log.hpp>
 
 #include <cassert>
 
@@ -27,7 +27,7 @@ SMSTemplateRecordInterface::SMSTemplateRecordInterface(SmsDB *smsDb) : smsDB(sms
 bool SMSTemplateRecordInterface::Add(const SMSTemplateRecord &rec)
 {
     return smsDB->templates.add(
-        SMSTemplateTableRow{{.ID = rec.ID}, .text = rec.text, .lastUsageTimestamp = rec.lastUsageTimestamp});
+        SMSTemplateTableRow{Record(rec.ID), .text = rec.text, .lastUsageTimestamp = rec.lastUsageTimestamp});
 }
 uint32_t SMSTemplateRecordInterface::GetCount()
 {
@@ -57,7 +57,7 @@ bool SMSTemplateRecordInterface::Update(const SMSTemplateRecord &rec)
     }
 
     return smsDB->templates.update(
-        SMSTemplateTableRow{{.ID = rec.ID}, .text = rec.text, .lastUsageTimestamp = rec.lastUsageTimestamp});
+        SMSTemplateTableRow{Record(rec.ID), .text = rec.text, .lastUsageTimestamp = rec.lastUsageTimestamp});
 }
 
 bool SMSTemplateRecordInterface::RemoveByID(uint32_t id)
@@ -92,6 +92,9 @@ std::unique_ptr<db::QueryResult> SMSTemplateRecordInterface::runQuery(std::share
     else if (typeid(*query) == typeid(db::query::SMSTemplateGet)) {
         return getQuery(query);
     }
+    else if (typeid(*query) == typeid(db::query::SMSTemplateGetWithTotalCount)) {
+        return getQueryWithTotalCount(query);
+    }
     else if (typeid(*query) == typeid(db::query::SMSTemplateGetForList)) {
         return getForListQuery(query);
     }
@@ -121,13 +124,28 @@ std::unique_ptr<db::QueryResult> SMSTemplateRecordInterface::getByIDQuery(const 
     response->setRequestQuery(query);
     return response;
 }
-std::unique_ptr<db::QueryResult> SMSTemplateRecordInterface::getQuery(const std::shared_ptr<db::Query> &query)
+
+auto SMSTemplateRecordInterface::getQueryRecords(const std::shared_ptr<db::Query> &query)
+    -> std::vector<SMSTemplateRecord>
 {
     const auto localQuery = static_cast<const db::query::SMSTemplateGet *>(query.get());
     auto dbResult         = smsDB->templates.getLimitOffset(localQuery->offset, localQuery->limit);
 
-    auto recordVector = std::vector<SMSTemplateRecord>(dbResult.begin(), dbResult.end());
-    auto response     = std::make_unique<db::query::SMSTemplateGetResult>(std::move(recordVector));
+    return std::vector<SMSTemplateRecord>(dbResult.begin(), dbResult.end());
+}
+
+auto SMSTemplateRecordInterface::getQuery(const std::shared_ptr<db::Query> &query) -> std::unique_ptr<db::QueryResult>
+{
+    auto response = std::make_unique<db::query::SMSTemplateGetResult>(getQueryRecords(query));
+    response->setRequestQuery(query);
+    return response;
+}
+
+auto SMSTemplateRecordInterface::getQueryWithTotalCount(const std::shared_ptr<db::Query> &query)
+    -> std::unique_ptr<db::QueryResult>
+{
+    auto response = std::make_unique<db::query::SMSTemplateGetResultWithTotalCount>(getQueryRecords(query),
+                                                                                    smsDB->templates.count());
     response->setRequestQuery(query);
     return response;
 }
@@ -169,9 +187,9 @@ std::unique_ptr<db::QueryResult> SMSTemplateRecordInterface::removeQuery(const s
 }
 std::unique_ptr<db::QueryResult> SMSTemplateRecordInterface::updateQuery(const std::shared_ptr<db::Query> &query)
 {
-    const auto localQuery = static_cast<const db::query::SMSTemplateAdd *>(query.get());
+    const auto localQuery = static_cast<const db::query::SMSTemplateUpdate *>(query.get());
     auto ret              = SMSTemplateRecordInterface::Update(localQuery->rec);
-    auto response         = std::make_unique<db::query::SMSTemplateAddResult>(ret);
+    auto response         = std::make_unique<db::query::SMSTemplateUpdateResult>(ret);
     response->setRequestQuery(query);
     return response;
 }

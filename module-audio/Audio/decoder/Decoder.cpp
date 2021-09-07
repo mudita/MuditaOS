@@ -11,15 +11,13 @@
 #include "fileref.h"
 #include "tag.h"
 #include "tfilestream.h"
+#include <tags_fetcher/TagsFetcher.hpp>
 
 namespace audio
 {
-
     Decoder::Decoder(const char *fileName)
-        : Source(Endpoint::Capabilities{.maxBlockSize = workerBufferSize * sizeof(int16_t)}), filePath(fileName),
-          workerBuffer(std::make_unique<int16_t[]>(workerBufferSize)), tag(std::make_unique<Tags>())
+        : filePath(fileName), workerBuffer(std::make_unique<int16_t[]>(workerBufferSize))
     {
-
         fd = std::fopen(fileName, "r");
         if (fd == NULL) {
             return;
@@ -28,6 +26,8 @@ namespace audio
         std::fseek(fd, 0, SEEK_END);
         fileSize = std::ftell(fd);
         std::rewind(fd);
+
+        tags = fetchTags();
     }
 
     Decoder::~Decoder()
@@ -41,47 +41,9 @@ namespace audio
         }
     }
 
-    std::unique_ptr<Tags> Decoder::fetchTags()
+    std::unique_ptr<tags::fetcher::Tags> Decoder::fetchTags()
     {
-        if (fd) {
-            auto inPos = std::ftell(fd);
-            std::rewind(fd);
-            TagLib::FileStream fileStream(fd);
-            TagLib::FileRef tagReader(&fileStream);
-            if (!tagReader.isNull() && tagReader.tag()) {
-                TagLib::Tag *tags                   = tagReader.tag();
-                TagLib::AudioProperties *properties = tagReader.audioProperties();
-
-                tag->title  = tags->title().to8Bit();
-                tag->artist = tags->artist().to8Bit();
-                tag->album  = tags->album().to8Bit();
-                tag->genre  = tags->genre().to8Bit();
-                tag->year   = std::to_string(tags->year());
-
-                tag->total_duration_s = properties->length();
-                tag->duration_min     = tag->total_duration_s / utils::secondsInMinute;
-                tag->duration_hour    = tag->duration_min / utils::secondsInMinute;
-                tag->duration_sec     = tag->total_duration_s % utils::secondsInMinute;
-                tag->sample_rate      = properties->sampleRate();
-                tag->num_channel      = properties->channels();
-                tag->bitrate          = properties->bitrate();
-            }
-            std::rewind(fd);
-            fetchTagsSpecific();
-            std::fseek(fd, inPos, SEEK_SET);
-        }
-
-        tag->filePath.append(filePath);
-        // If title tag empty fill it with raw file name
-        if (tag->title.size() == 0) {
-            if (const auto pos = filePath.rfind("/"); pos == std::string::npos) {
-                tag->title.append(filePath);
-            }
-            else {
-                tag->title.append(&filePath[pos + 1]);
-            }
-        }
-        return std::make_unique<Tags>(*tag);
+        return std::make_unique<tags::fetcher::Tags>(tags::fetcher::fetchTags(filePath));
     }
 
     std::unique_ptr<Decoder> Decoder::Create(const char *file)
@@ -126,7 +88,12 @@ namespace audio
     {
         assert(_stream != nullptr);
         if (!audioWorker) {
-            audioWorker = std::make_unique<DecoderWorker>(_stream, this, endOfFileCallback);
+            audioWorker =
+                std::make_unique<DecoderWorker>(_stream,
+                                                this,
+                                                endOfFileCallback,
+                                                tags->num_channel == 1 ? DecoderWorker::ChannelMode::ForceStereo
+                                                                       : DecoderWorker::ChannelMode::NoConversion);
             audioWorker->init();
             audioWorker->run();
         }
@@ -156,6 +123,26 @@ namespace audio
     void Decoder::disableInput()
     {
         audioWorker->disablePlayback();
+    }
+
+    auto Decoder::getSourceFormat() -> AudioFormat
+    {
+        auto bitWidth = getBitWidth();
+        // this is a decoder mono to stereo hack, will be removed when proper
+        // transcoding implementation is added
+        auto channels = tags->num_channel == 1 ? 2U : tags->num_channel;
+
+        return AudioFormat{tags->sample_rate, bitWidth, channels};
+    }
+
+    auto Decoder::getSupportedFormats() -> std::vector<AudioFormat>
+    {
+        return std::vector<AudioFormat>{getSourceFormat()};
+    }
+
+    auto Decoder::getTraits() const -> Endpoint::Traits
+    {
+        return Endpoint::Traits{};
     }
 
 } // namespace audio

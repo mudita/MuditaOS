@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -11,7 +11,7 @@ TEST_CASE("Contacts Table tests")
 {
     Database::initialize();
 
-    const auto contactsPath = (std::filesystem::path{"user"} / "contacts.db");
+    const auto contactsPath = (std::filesystem::path{"sys/user"} / "contacts.db");
     if (std::filesystem::exists(contactsPath)) {
         REQUIRE(std::filesystem::remove(contactsPath));
     }
@@ -19,7 +19,7 @@ TEST_CASE("Contacts Table tests")
     ContactsDB contactsdb{contactsPath.c_str()};
     REQUIRE(contactsdb.isInitialized());
 
-    ContactsTableRow testRow1 = {{.ID = DB_ID_NONE},
+    ContactsTableRow testRow1 = {Record(DB_ID_NONE),
                                  .nameID    = DB_ID_NONE,
                                  .numbersID = "0 1 2 3 4",
                                  .ringID    = DB_ID_NONE,

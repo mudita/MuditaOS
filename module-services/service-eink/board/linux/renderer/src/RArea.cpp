@@ -1,7 +1,8 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RArea.hpp"
+#include <module-bsp/board/linux/board.h>
 
 #include <cairomm/context.h>
 #include <cairomm/refptr.h>
@@ -21,12 +22,12 @@ bool RArea::on_draw(const Cairo::RefPtr<Cairo::Context> &cr)
 {
     if (data != nullptr) {
         Glib::RefPtr<Gdk::Pixbuf> image = Gdk::Pixbuf::create_from_data(reinterpret_cast<guchar *>(data),
-                                                                        Gdk::COLORSPACE_RGB, // GdkColorspace
-                                                                        false,               // has_alpha
-                                                                        8,                   // bits_per_sample
-                                                                        480,                 // width
-                                                                        600,                 // height,
-                                                                        3 * 480);            // rowstride,
+                                                                        Gdk::COLORSPACE_RGB,      // GdkColorspace
+                                                                        false,                    // has_alpha
+                                                                        8,                        // bits_per_sample
+                                                                        BOARD_EINK_DISPLAY_RES_X, // width
+                                                                        BOARD_EINK_DISPLAY_RES_Y, // height,
+                                                                        3 * BOARD_EINK_DISPLAY_RES_X); // rowstride,
 
         Gtk::Allocation allocation = get_allocation();
         const int width            = allocation.get_width();

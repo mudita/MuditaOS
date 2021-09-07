@@ -10,7 +10,7 @@
 #include "Audio/Profiles/ProfileRecordingOnBoardMic.hpp"
 #include "Audio/AudioCommon.hpp"
 
-#include "log/log.hpp"
+#include <log.hpp>
 #include "FreeRTOS.h"
 #include "task.h"
 
@@ -20,8 +20,6 @@ namespace audio
     using namespace utils;
 
 #define PERF_STATS_ON 0
-
-    using namespace bsp;
 
     RecorderOperation::RecorderOperation(const char *file, AudioServiceMessage::Callback callback) : Operation(callback)
     {
@@ -46,8 +44,8 @@ namespace audio
         };
 
         // order defines priority
-        AddProfile(Profile::Type::RecordingBluetoothHSP, PlaybackType::None, false);
         AddProfile(Profile::Type::RecordingHeadphones, PlaybackType::None, false);
+        AddProfile(Profile::Type::RecordingBluetoothHSP, PlaybackType::None, false);
         AddProfile(Profile::Type::RecordingBuiltInMic, PlaybackType::None, true);
 
         auto defaultProfile = GetProfile(Profile::Type::PlaybackLoudspeaker);
@@ -57,11 +55,11 @@ namespace audio
         currentProfile = defaultProfile;
 
         uint32_t channels = 0;
-        if ((currentProfile->GetInOutFlags() & static_cast<uint32_t>(AudioDevice::Flags::InputLeft)) ||
-            (currentProfile->GetInOutFlags() & static_cast<uint32_t>(AudioDevice::Flags::InputRight))) {
+        if ((currentProfile->GetInOutFlags() & static_cast<uint32_t>(audio::codec::Flags::InputLeft)) ||
+            (currentProfile->GetInOutFlags() & static_cast<uint32_t>(audio::codec::Flags::InputRight))) {
             channels = 1;
         }
-        else if (currentProfile->GetInOutFlags() & static_cast<uint32_t>(AudioDevice::Flags::InputStereo)) {
+        else if (currentProfile->GetInOutFlags() & static_cast<uint32_t>(audio::codec::Flags::InputStereo)) {
             channels = 2;
         }
 
@@ -85,8 +83,8 @@ namespace audio
         operationToken = token;
         state          = State::Active;
 
-        if (audioDevice->IsFormatSupported(currentProfile->GetAudioFormat())) {
-            auto ret = audioDevice->Start(currentProfile->GetAudioFormat());
+        if (audioDevice->isFormatSupportedBySource(currentProfile->getAudioFormat())) {
+            auto ret = audioDevice->Start();
             return GetDeviceError(ret);
         }
         else {
@@ -124,7 +122,7 @@ namespace audio
         }
 
         state    = State::Active;
-        auto ret = audioDevice->Start(currentProfile->GetAudioFormat());
+        auto ret = audioDevice->Start();
         return GetDeviceError(ret);
     }
 
@@ -158,7 +156,7 @@ namespace audio
             return RetCode::UnsupportedProfile;
         }
 
-        audioDevice = CreateDevice(currentProfile->GetAudioDeviceType());
+        audioDevice = CreateDevice(*currentProfile);
         if (audioDevice == nullptr) {
             LOG_ERROR("Error creating AudioDevice");
             return RetCode::Failed;
@@ -181,14 +179,14 @@ namespace audio
     audio::RetCode RecorderOperation::SetOutputVolume(float vol)
     {
         currentProfile->SetOutputVolume(vol);
-        auto ret = audioDevice->OutputVolumeCtrl(vol);
+        auto ret = audioDevice->setOutputVolume(vol);
         return GetDeviceError(ret);
     }
 
     audio::RetCode RecorderOperation::SetInputGain(float gain)
     {
         currentProfile->SetInputGain(gain);
-        auto ret = audioDevice->InputGainCtrl(gain);
+        auto ret = audioDevice->setInputGain(gain);
         return GetDeviceError(ret);
     }
 

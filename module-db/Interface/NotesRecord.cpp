@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NotesRecord.hpp"
@@ -105,15 +105,17 @@ std::vector<NotesRecord> NotesRecordInterface::getNotes(std::uint32_t offset, st
     return records;
 }
 
-std::vector<NotesRecord> NotesRecordInterface::getNotesByText(const std::string &text) const
+std::pair<std::vector<NotesRecord>, unsigned int> NotesRecordInterface::getNotesByText(const std::string &text,
+                                                                                       unsigned int offset,
+                                                                                       unsigned int limit) const
 {
     std::vector<NotesRecord> records;
-    const auto &notes = notesDB->notes.getByText(text);
+    auto [notes, count] = notesDB->notes.getByText(text, offset, limit);
     for (const auto &note : notes) {
         NotesRecord record{note.ID, note.date, note.snippet};
         records.push_back(std::move(record));
     }
-    return records;
+    return {records, count};
 }
 
 std::unique_ptr<db::QueryResult> NotesRecordInterface::runQuery(std::shared_ptr<db::Query> query)
@@ -145,25 +147,32 @@ std::unique_ptr<db::QueryResult> NotesRecordInterface::getQuery(const std::share
 std::unique_ptr<db::QueryResult> NotesRecordInterface::getByTextQuery(const std::shared_ptr<db::Query> &query)
 {
     const auto localQuery = static_cast<db::query::QueryNotesGetByText *>(query.get());
-    const auto &records   = getNotesByText(localQuery->getText());
-    auto response         = std::make_unique<db::query::NotesGetByTextResult>(records);
+    auto [records, count] = getNotesByText(localQuery->getText(), localQuery->getOffset(), localQuery->getLimit());
+    auto response         = std::make_unique<db::query::NotesGetByTextResult>(records, count);
     response->setRequestQuery(query);
     return response;
 }
 
 std::unique_ptr<db::QueryResult> NotesRecordInterface::storeQuery(const std::shared_ptr<db::Query> &query)
 {
-    const auto localQuery = static_cast<db::query::QueryNoteStore *>(query.get());
-    const auto &record    = localQuery->getRecord();
-    bool isSuccess        = false;
-    if (const auto exists = notesDB->notes.getById(record.ID).ID != DB_ID_NONE; exists) {
+    const auto localQuery  = static_cast<db::query::QueryNoteStore *>(query.get());
+    const auto &record     = localQuery->getRecord();
+    bool isSuccess         = false;
+    std::uint32_t resultId = DB_ID_NONE;
+
+    if (const auto id = notesDB->notes.getById(record.ID).ID; id != DB_ID_NONE) {
+        // Already exists in the DB.
         isSuccess = Update(record);
+        resultId  = id;
     }
     else {
         isSuccess = Add(record);
+        if (isSuccess) {
+            resultId = notesDB->getLastInsertRowId();
+        }
     }
 
-    auto response = std::make_unique<db::query::NoteStoreResult>(isSuccess);
+    auto response = std::make_unique<db::query::NoteStoreResult>(isSuccess, resultId);
     response->setRequestQuery(query);
     return response;
 }

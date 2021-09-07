@@ -34,7 +34,7 @@
 #ifndef _BOARD_H_
 #define _BOARD_H_
 
-#include "clock_config.h"
+#include "board/clock_config.h"
 #include "fsl_clock.h"
 #include "fsl_common.h"
 #include "fsl_gpio.h"
@@ -146,8 +146,7 @@
 #define BOARD_EINK_BUSY_IRQ         GPIO3_Combined_16_31_IRQn
 #define BOARD_EINK_BUSY_IRQ_HANDLER GPIO3_Combined_16_31_IRQHandler
 
-#define BOARD_EINK_DISPLAY_RES_X 480
-#define BOARD_EINK_DISPLAY_RES_Y 600
+#include <eink-config.h>
 
 #define CELLULAR_UART_BASE   LPUART1        ///< This macro indicate port to which GSM module is connected
 #define CELLULAR_UART_CLKSRC kCLOCK_PllUsb1 ///< This macro indicate LPUART clock source
@@ -192,9 +191,9 @@
 #define BSP_CELLULAR_WAKEUP_PIN  22
 #define BSP_CELLULAR_WAKEUP_PAD  GPIO_B1_06
 
-#define BSP_CELLULAR_SIM_TRAY_INSERTED_PORT   GPIO2
-#define BSP_CELLULAR_SIM_TRAY_INSERTED_PIN    11
-#define BSP_CELLULAR_SIM_CARD_1_INSERTED_PAD  GPIO_B0_11
+#define BSP_CELLULAR_SIM_TRAY_INSERTED_PORT  GPIO2
+#define BSP_CELLULAR_SIM_TRAY_INSERTED_PIN   11
+#define BSP_CELLULAR_SIM_CARD_1_INSERTED_PAD GPIO_B0_11
 
 #define BSP_CELLULAR_SIM_CARD_PRESENCE_PORT GPIO2
 #define BSP_CELLULAR_SIM_CARD_PRESENCE_PIN  9

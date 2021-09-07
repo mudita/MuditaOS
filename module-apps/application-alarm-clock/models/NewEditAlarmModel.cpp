@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NewEditAlarmModel.hpp"
@@ -20,7 +20,7 @@ namespace app::alarmClock
         return internalData.size();
     }
 
-    unsigned int NewEditAlarmModel::getMinimalItemHeight() const
+    unsigned int NewEditAlarmModel::getMinimalItemSpaceRequired() const
     {
         return style::alarmClock::window::item::options::height;
     }
@@ -69,9 +69,9 @@ namespace app::alarmClock
         }
     }
 
-    void NewEditAlarmModel::loadData(std::shared_ptr<AlarmsRecord> record)
+    void NewEditAlarmModel::loadData(std::shared_ptr<AlarmEventRecord> record)
     {
-        list->clear();
+        list->reset();
         eraseInternalData();
 
         createData();
@@ -85,14 +85,14 @@ namespace app::alarmClock
         list->rebuildList();
     }
 
-    void NewEditAlarmModel::loadRepeat(std::shared_ptr<AlarmsRecord> record)
+    void NewEditAlarmModel::loadRepeat(std::shared_ptr<AlarmEventRecord> record)
     {
         if (repeatOption->onLoadCallback) {
             repeatOption->onLoadCallback(std::move(record));
         }
     }
 
-    void NewEditAlarmModel::saveData(std::shared_ptr<AlarmsRecord> alarm, AlarmAction action)
+    void NewEditAlarmModel::saveData(std::shared_ptr<AlarmEventRecord> alarm, AlarmAction action)
     {
         for (auto &item : internalData) {
             if (item->onSaveCallback) {
@@ -107,7 +107,7 @@ namespace app::alarmClock
         else {
             alarmsRepository->add(*alarm, [this](bool) { application->returnToPreviousWindow(); });
         }
-        list->clear();
+        list->reset();
         eraseInternalData();
     }
 } // namespace app::alarmClock

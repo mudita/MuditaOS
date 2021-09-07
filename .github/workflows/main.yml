@@ -20,6 +20,7 @@ jobs:
           fetch-depth: 0
       - name: check commit messages
         run: ./tools/check_commit_messages.py
+
   check_copyright_and_style:
     name: check copyright and style
     if: github.event.pull_request.draft == false
@@ -35,6 +36,8 @@ jobs:
         run: config/license_header_check.sh --ci --check-only
       - name: Style checking
         run: ./config/style_check_hook.sh --last
+      - name: Clang tidy check
+        run: ./config/clang_check.sh
 
   build_rt1051_binary:
     name: build rt1051 binary
@@ -52,8 +55,8 @@ jobs:
         run: |
           export JOBS=${JOBS:-$(nproc)} && \
           echo "JOBS=${JOBS}" &&  \
-          ./configure.sh rt1051 Release -G Ninja && \
-          pushd build-rt1051-Release && \
+          ./configure.sh pure rt1051 Release -G Ninja && \
+          pushd build-purephone-rt1051-Release && \
           ninja -j ${JOBS} && \
           popd 
 
@@ -69,90 +72,22 @@ jobs:
         with:
           token: ${{ secrets.GitHub_PAT }}
           submodules: recursive
-      - name: build linux binary
+      - name: build Linux Debug
         run: |
           export JOBS=${JOBS:-$(nproc)} && \
           echo "JOBS=${JOBS}" &&  \
-          ./configure.sh linux Debug -G Ninja && \
-          pushd build-linux-Debug && \
-          ninja -j ${JOBS} && \
-          popd
-      - name: Check for statics
-        run: ./tools/find_global_data.py build-linux-Debug/PurePhone.elf
-      - name: build unit tests
-        run: |
-          export JOBS=${JOBS:-$(nproc)} && \
-          echo "JOBS=${JOBS}" &&  \
-          pushd build-linux-Debug && \
+          ./configure.sh pure linux Debug -G Ninja && \
+          pushd build-purephone-linux-Debug && \
           ninja -j ${JOBS} unittests && \
+          ninja -j ${JOBS} && \
           popd
       - name: run unit tests
         run: |
           ./tools/run_unittests.sh enabled_unittests
-      - name: store build artefact
+      - name: Check for statics
         run: |
-          tar -S -cf /artefacts/build-${GITHUB_SHA}.tar build-linux-Debug
-      - name: start emulator
-        run: |
-          rm -f /tmp/purephone_pts_name
-          ./run_emulator_on_filesystem_image.sh > emulator.log 2>&1 &
-          echo $! > emulator.pid
-      - name: run tests
-        run: pytest ./pytest -rP -s --port=simulator --timeout=120 -m 'not rt1051'
-        working-directory: test
-      - name: kill emulator
-        run: |
-          kill $(cat emulator.pid)
-          rm emulator.pid
-        if: always()
-      - name: print emulator logs
-        run: cat emulator.log
-        if: always()
-
-  #emulator_on_off_test:
-  #Enable this test in "Clean artefacts"
-  #  name: emulator on-off test
-  #  if: github.event.pull_request.draft == false
-  #  runs-on: self-hosted
-  #  needs:
-  #    - build_linux_binary_and_run_tests
-  #  steps:
-  #    - name: clone repository
-  #      uses: actions/checkout@v2
-  #      with:
-  #        token: ${{ secrets.GitHub_PAT }}
-  #        submodules: recursive
-  #    - name: get artefacts
-  #      run: |
-  #        tar xf /artefacts/build-$(git rev-parse --short HEAD).tar
-  #    - name: start emulator on-off test
-  #      run: ./phone_on_off_test.sh
-  #      working-directory: test
-  #    - name: print emulator logs
-  #      run: cat emulator.log
-  #      if: always()
-
-  check_run_unit_tests:
-    name: Check run unit tests
-    needs:
-      - build_linux_binary_and_run_tests
-    runs-on: self-hosted
-    steps:
-      - name: get artefacts
-        run: |
-          tar xf /artefacts/build-${GITHUB_SHA}.tar
+          ./tools/find_global_data.py build-purephone-linux-Debug/PurePhone.elf
       - name: check if all Unit Tests where run
         run: |
           ./tools/check_unittests.sh enabled_unit_tests
-
-  clean_artefacts:
-    name: Clean Artefacts
-    if: always()
-    #needs: [ build_linux_binary_and_run_tests, emulator_on_off_test, check_run_unit_tests ]
-    needs: [ build_linux_binary_and_run_tests, check_run_unit_tests ]
-    runs-on: self-hosted
-    steps:
-      - name: Delete Artefact
-        run: |
-          rm -f /artefacts/build-${GITHUB_SHA}.tar
 

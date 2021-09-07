@@ -6,19 +6,22 @@
 #include "Operation.hpp"
 
 #include <Audio/AudioDevice.hpp>
-#include <Audio/encoder/Encoder.hpp>
 #include <Audio/AudioCommon.hpp>
 #include <Audio/Profiles/Profile.hpp>
 #include <Audio/Endpoint.hpp>
+#include <Audio/Stream.hpp>
 
 #include <mutex.hpp>
 
-#include <memory>
+#include <chrono>
 #include <functional>
+#include <memory>
 #include <string>
 #include <vector>
 
 #include <cstdint>
+
+using namespace std::chrono_literals;
 
 namespace audio
 {
@@ -27,6 +30,17 @@ namespace audio
         using AudioCallback =
             std::function<std::int32_t(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer)>;
         static const std::size_t INPUT_BUFFER_START_SIZE = 1024;
+        enum class Mute : bool
+        {
+            Enabled,
+            Disabled
+        };
+
+        enum class JackState : bool
+        {
+            Plugged,
+            Unplugged
+        };
 
       public:
         RouterOperation(const char *file, AudioServiceMessage::Callback callback);
@@ -44,19 +58,20 @@ namespace audio
         Position GetPosition() final;
 
       private:
-        static constexpr auto minimumBlockSize = 64U;
-        static constexpr auto maximumBlockSize = 64U;
-        static constexpr Endpoint::Capabilities routerCapabilities{.minBlockSize = minimumBlockSize,
-                                                                   .maxBlockSize = maximumBlockSize};
+        static constexpr auto callTimeConstraint = 2ms;
 
-        bool Mute(bool enable);
+        Mute mute           = Mute::Disabled;
+        JackState jackState = JackState::Unplugged;
 
-        std::unique_ptr<Stream> dataStreamOut;
-        std::unique_ptr<Stream> dataStreamIn;
-        std::unique_ptr<Encoder> enc;
+        void Mute();
+        void Unmute();
+        [[nodiscard]] auto IsMuted() const noexcept -> bool;
+
+        std::unique_ptr<AbstractStream> dataStreamOut;
+        std::unique_ptr<AbstractStream> dataStreamIn;
         std::shared_ptr<AudioDevice> audioDeviceCellular;
-        std::unique_ptr<StreamConnection> outputConnection;
-        std::unique_ptr<StreamConnection> inputConnection;
+        std::unique_ptr<StreamConnection> voiceOutputConnection;
+        std::unique_ptr<StreamConnection> voiceInputConnection;
     };
 
 } // namespace audio

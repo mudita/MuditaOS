@@ -1,49 +1,165 @@
-﻿
-include_directories( ${CMAKE_PROJECT_NAME}
+﻿add_library(application-settings STATIC)
 
+target_include_directories(application-settings
+    PRIVATE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     PUBLIC
-        "${CMAKE_CURRENT_LIST_DIR}"
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
 
-include_directories( ${PROJECT_NAME}
-
-    PUBLIC
-        ${CMAKE_CURRENT_LIST_DIR}
-)
-
-target_sources( ${PROJECT_NAME}
-
+target_sources(application-settings
     PRIVATE
         ApplicationSettings.cpp
+        models/advanced/ColorTestModel.cpp
+        models/apps/AudioSettingsModel.cpp
+        models/apps/AudioSettingsModel.cpp
+        models/apps/SoundsModel.cpp
+        models/apps/SoundsModel.cpp
+        models/apps/SoundsPlayer.cpp
+        models/bluetooth/BluetoothSettingsModel.cpp
+        models/display-keypad/CategoriesModel.cpp
+        models/display-keypad/CategoriesModel.cpp
+        models/display-keypad/QuotesModel.cpp
+        models/display-keypad/QuotesModel.cpp
+        models/network/ApnSettingsModel.cpp
+        models/network/NewApnModel.cpp
+        models/network/SimContactsImportModel.cpp
+        models/network/SimContactsRepository.cpp
+        models/system/DateAndTimeModel.cpp
+        models/system/FactoryData.cpp
+        models/system/SARInfoRepository.cpp
+        models/system/SARInfoRepository.cpp
+        models/system/TechnicalInformationModel.cpp
+        models/system/TechnicalInformationRepository.cpp
+        presenter/network/SimContactsImportWindowPresenter.cpp
+        presenter/system/SARInfoWindowPresenter.cpp
+        presenter/system/TechnicalWindowPresenter.cpp
+        widgets/advanced/ColorTestListItem.cpp
+        widgets/advanced/ColorTestListView.cpp
+        widgets/SpinBoxOptionSettings.cpp
+        widgets/apps/SettingsSoundItem.cpp
+        widgets/display-keypad/CategoryWidget.cpp
+        widgets/display-keypad/QuoteWidget.cpp
+        widgets/network/ApnInputWidget.cpp
+        widgets/network/SimContactImportSelectWidget.cpp
+        widgets/system/SettingsDateItem.cpp
+        widgets/system/SettingsTimeItem.cpp
+        widgets/system/TechnicalInformationItem.cpp
+        windows/BaseSettingsWindow.cpp
+        windows/OptionsWidgetMaker.cpp
         windows/SettingsMainWindow.cpp
-        windows/LanguageWindow.cpp
-        windows/BtWindow.cpp
-        windows/BtScanWindow.cpp
-        windows/UITestWindow.cpp
-        windows/Info.cpp
-        windows/SimSelectWindow.cpp
-        windows/DateTimeWindow.cpp
-        windows/CellularPassthroughWindow.cpp
-        windows/FotaWindow.cpp
-        windows/Fota.cpp
-        windows/EinkModeWindow.cpp
-        windows/ColorTestWindow.cpp
-        widgets/ColorTestListItem.cpp
-        widgets/ColorTestListView.cpp
-        models/ColorTestModel.cpp
-
-    PUBLIC
-        ApplicationSettings.hpp
+        windows/advanced/AdvancedOptionsWindow.cpp
+        windows/advanced/ColorTestWindow.cpp
+        windows/advanced/EinkModeWindow.cpp
+        windows/advanced/InformationWindow.cpp
+        windows/advanced/UITestWindow.cpp
+        windows/advanced/StatusBarImageTypeWindow.cpp
+        windows/apps/AlarmClockWindow.cpp
+        windows/apps/AppsWindow.cpp
+        windows/apps/MessagesWindow.cpp
+        windows/apps/PhoneWindow.cpp
+        windows/apps/SoundSelectWindow.cpp
+        windows/bluetooth/AddDeviceWindow.cpp
+        windows/bluetooth/AllDevicesWindow.cpp
+        windows/bluetooth/BluetoothCheckPasskeyWindow.cpp
+        windows/bluetooth/BluetoothWindow.cpp
+        windows/bluetooth/PhoneNameWindow.cpp
+        windows/display-keypad/DisplayAndKeypadWindow.cpp
+        windows/display-keypad/DisplayLightWindow.cpp
+        windows/display-keypad/EditQuotesWindow.cpp
+        windows/display-keypad/FontSizeWindow.cpp
+        windows/display-keypad/InputLanguageWindow.cpp
+        windows/display-keypad/KeypadLightWindow.cpp
+        windows/display-keypad/QuoteCategoriesWindow.cpp
+        windows/display-keypad/QuotesAddWindow.cpp
+        windows/display-keypad/QuotesMainWindow.cpp
+        windows/display-keypad/QuotesOptionsWindow.cpp
+        windows/display-keypad/WallpaperWindow.cpp
+        windows/network/ApnOptionsWindow.cpp
+        windows/network/ApnSettingsWindow.cpp
+        windows/network/NetworkWindow.cpp
+        windows/network/NewApnWindow.cpp
+        windows/network/SimCardsWindow.cpp
+        windows/network/SimContactsImportWindow.cpp
+        windows/network/SimPINSettingsWindow.cpp
+        windows/phone-modes/ConnectionFrequencyWindow.cpp
+        windows/phone-modes/DoNotDisturbWindow.cpp
+        windows/phone-modes/OfflineWindow.cpp
+        windows/phone-modes/PhoneModesWindow.cpp
+        windows/security/AutolockWindow.cpp
+        windows/security/SecurityMainWindow.cpp
+        windows/system/CertificationWindow.cpp
+        windows/system/ChangeDateAndTimeWindow.cpp
+        windows/system/ChangeTimeZone.cpp
+        windows/system/DateAndTimeMainWindow.cpp
+        windows/system/LanguagesWindow.cpp
+        windows/system/SARInfoWindow.cpp
+        windows/system/SystemMainWindow.cpp
+        windows/system/TechnicalInformationWindow.cpp
+    PRIVATE
+        models/advanced/ColorTestModel.hpp
+        widgets/SettingsStyle.hpp
+        widgets/advanced/ColorTestListItem.hpp
+        widgets/advanced/ColorTestListStyle.hpp
+        widgets/advanced/ColorTestListView.hpp
+        widgets/display-keypad/CategoryWidget.hpp
+        widgets/network/ApnInputWidget.hpp
+        windows/BaseSettingsWindow.hpp
         windows/SettingsMainWindow.hpp
-        windows/LanguageWindow.hpp
-        windows/DateTimeWindow.hpp
+        windows/WindowNames.hpp
+        windows/advanced/AdvancedOptionsWindow.hpp
+        windows/advanced/ColorTestWindow.hpp
+        windows/advanced/EinkModeWindow.hpp
+        windows/advanced/InformationWindow.hpp
+        windows/advanced/UITestWindow.hpp
+        windows/advanced/StatusBarImageTypeWindow.hpp
+        windows/apps/AppsWindow.hpp
+        windows/apps/MessagesWindow.hpp
+        windows/display-keypad/DisplayAndKeypadWindow.hpp
+        windows/display-keypad/DisplayLightWindow.hpp
+        windows/display-keypad/EditQuotesWindow.hpp
+        windows/display-keypad/FontSizeWindow.hpp
+        windows/display-keypad/InputLanguageWindow.hpp
+        windows/display-keypad/KeypadLightWindow.hpp
+        windows/display-keypad/QuoteCategoriesWindow.hpp
+        windows/display-keypad/WallpaperWindow.hpp
+        windows/network/NewApnWindow.hpp
+        windows/network/SimCardsWindow.hpp
+        windows/security/AutolockWindow.hpp
+        windows/system/CertificationWindow.hpp
+        windows/system/ChangeDateAndTimeWindow.hpp
+        windows/system/DateAndTimeMainWindow.hpp
+        windows/system/LanguagesWindow.hpp
+        windows/system/SystemMainWindow.hpp
+        windows/system/TechnicalInformationWindow.hpp
+    PUBLIC
+        include/application-settings/ApplicationSettings.hpp
 )
 
-add_dependencies(${PROJECT_NAME} version)
-
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(application-settings
     PRIVATE
+        apps-common
+        eventstore
+        module-bluetooth
+        module-bsp
+        module-gui
+        module-utils
+        module-vfs
+        service-appmgr
+        service-audio
         service-bluetooth
+        service-cellular
+        service-db
+        service-desktop
         service-evtmgr
-        service-fota
+        service-time
+)
+
+add_dependencies(application-settings version)
+
+option(ENABLE_APP_SETTINGS "Enable application settings" ON)
+
+target_compile_definitions(application-settings
+    INTERFACE
+        $<$<BOOL:${ENABLE_APP_SETTINGS}>:ENABLE_APP_SETTINGS>
 )

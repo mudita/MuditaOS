@@ -38,7 +38,6 @@ declare -A FileTypes=(
             ["shell"]="sh;bashChecker;"
             ["sqlite"]="sql;sqlChecker;"
         )
-declare -a paths_to_ignore
 
 function addEmptyLine() {
     LINE=$1
@@ -161,8 +160,6 @@ function excludePathFromFind(){
         path=${ignore_paths[$I]}
         if [[ -d ${path} ]]; then
             NOT_PATH="${NOT_PATH} -not ( -path ${path%*/} -prune )"
-        else
-            paths_to_ignore+=("${path}")
         fi
         I=$(( $I + 1 ))
     done
@@ -170,12 +167,12 @@ function excludePathFromFind(){
 
 function findFiles() {
     # find files except submodule directories
-    readarray -d '' FILES_TO_CHECK < <(find . ${NOT_PATH} -iname \"*.${FILE_EXT}\" -printf \"%P\0\")
+    readarray -d '' FILES_TO_CHECK < <(find . ${NOT_PATH} -iname "*.${FILE_EXT}" -printf "%P\0")
 }
 
 function shouldnt_ignore() {
     FILE=$1
-    for el in ${paths_to_ignore[@]}; do
+    for el in ${ignore_paths[@]}; do
         if [[ ${FILE}  =~ ^${el}.* ]]; then
             echo -e "${ORANGE}Ignore: ${FILE} checking due to: $el match!\e[0m"
             return 1
@@ -187,7 +184,7 @@ function shouldnt_ignore() {
 function help() {
     cat <<END
     check and update header files with copyright notice
-    ussage:
+    usage:
         $0 [--help | --check-only]
         $0 --hook [ --check-only]
                 Run as git "pre-commith.hook", checks against files in stash
@@ -205,14 +202,10 @@ function hookMain() {
     parseArgs $@
     readarray -d '' FILES_TO_CHECK < <( ${GET_FILES_CMD} )
 
-    NOT_PATH=""
-    excludePathFromFind
-
     for FILE_TYPE in "${!FileTypes[@]}" 
     do
         echo "=== ${FILE_TYPE} ==="
         extractValues ${FILE_TYPE}
-        findFiles
         I=0
         while [[ $I -lt ${#FILES_TO_CHECK[@]} ]]
         do

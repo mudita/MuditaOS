@@ -3,11 +3,11 @@
 
 #include "BluetoothWorker.hpp"
 #include "bsp/bluetooth/Bluetooth.hpp"
-#include "log/log.hpp"
+#include <log.hpp>
 #include "FreeRTOS.h"
 #include "board.h"
 #include "fsl_lpuart_edma.h"
-#include <bsp/BoardDefinitions.hpp>
+#include <board/BoardDefinitions.hpp>
 
 #if DEBUG_BLUETOOTH_HCI_COMS == 1
 #define logHciComs(...) LOG_DEBUG(__VA_ARGS__)
@@ -37,8 +37,7 @@ BluetoothCommon::BluetoothCommon()
     GPIO_PinInit(BSP_BLUETOOTH_SHUTDOWN_PORT, BSP_BLUETOOTH_SHUTDOWN_PIN, &gpio_init_structure);
 }
 
-BluetoothCommon::~BluetoothCommon()
-{}
+BluetoothCommon::~BluetoothCommon() = default;
 
 void BluetoothCommon::open()
 {
@@ -174,6 +173,8 @@ BTdev::Error BluetoothCommon::set_baudrate(uint32_t bd)
         LOG_ERROR("BT error: baudrate [%lu] set err: %d", bd, err);
         ret = ErrorBSP;
     }
+    BSP_BLUETOOTH_UART_BASE->FIFO |= LPUART_FIFO_RXFLUSH_MASK; // flush fifo
+    BSP_BLUETOOTH_UART_BASE->FIFO &= ~LPUART_FIFO_RXFE_MASK;   // disable fifo
     return ret;
 }
 
@@ -323,10 +324,10 @@ extern "C"
         bsp::BlueKitchen *bt = bsp::BlueKitchen::getInstance();
 
         if (isrReg & kLPUART_RxDataRegFullFlag) {
-            LOG_WARN("LPUART IRQ RX full");
+            LOG_WARN("Bluetooth IRQ RX full");
         }
         if (isrReg & kLPUART_RxOverrunFlag) {
-            LOG_WARN("LPUART IRQ RX overrun");
+            LOG_WARN("Bluetooth IRQ RX overrun");
             val = bluetooth::Message::EvtUartError;
             xQueueSendFromISR(bt->qHandle, &val, &taskwoken);
         }

@@ -1,17 +1,13 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <service-db/DBCalllogMessage.hpp>
-#include <service-db/DBMessage.hpp>
 
 #include <CalllogRecord.hpp>
 
 #include <utility> // for move
 DBCalllogMessage::DBCalllogMessage(MessageType messageType, const CalllogRecord &rec)
     : DBMessage(messageType), record(rec)
-{}
-
-DBCalllogGetCount::DBCalllogGetCount(EntryState state) : DBCalllogMessage(MessageType::DBCalllogGetCount), state(state)
 {}
 
 DBCalllogResponseMessage ::DBCalllogResponseMessage(std::unique_ptr<std::vector<CalllogRecord>> rec,

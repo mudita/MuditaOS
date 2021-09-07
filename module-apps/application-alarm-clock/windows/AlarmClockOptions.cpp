@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmClockOptions.hpp"
@@ -16,37 +16,37 @@ namespace app::alarmClock
                        std::function<bool(gui::Item &)> onClickCallback,
                        std::list<gui::Option> &options)
         {
-            options.emplace_back(utils::localize.get(translationId), onClickCallback);
+            options.emplace_back(utils::translate(translationId), onClickCallback);
         }
 
-        void removeAlarm(const AlarmsRecord &record,
+        void removeAlarm(const AlarmEventRecord &record,
                          Application *application,
                          AbstractAlarmsRepository &alarmsRepository)
         {
-            gui::DialogMetadata meta;
-            meta.text   = utils::localize.get("app_alarm_clock_delete_confirmation");
-            meta.title  = utils::localize.get("app_alarm_clock_title_main");
-            meta.icon   = "phonebook_contact_delete_trashcan";
-            meta.action = [record, application, &alarmsRepository] {
-                alarmsRepository.remove(
-                    record, [application](bool) { application->switchWindow(gui::name::window::main_window); });
-                return true;
-            };
-
-            application->switchWindow(style::alarmClock::window::name::dialogYesNo,
-                                      std::make_unique<gui::DialogMetadataMessage>(meta));
+            auto metaData = std::make_unique<gui::DialogMetadataMessage>(
+                gui::DialogMetadata{utils::translate("app_alarm_clock_title_main"),
+                                    "phonebook_contact_delete_trashcan",
+                                    utils::translate("app_alarm_clock_delete_confirmation"),
+                                    "",
+                                    [record, application, &alarmsRepository] {
+                                        alarmsRepository.remove(record, [application](bool) {
+                                            application->switchWindow(gui::name::window::main_window);
+                                        });
+                                        return true;
+                                    }});
+            application->switchWindow(style::alarmClock::window::name::dialogYesNo, std::move(metaData));
         }
     } // namespace
 
     std::list<gui::Option> alarmsListOptions(Application *application,
-                                             const AlarmsRecord &record,
+                                             const AlarmEventRecord &record,
                                              AbstractAlarmsRepository &alarmsRepository)
     {
         std::list<gui::Option> options;
         addOption(
             {"app_alarm_clock_options_edit"},
             [application, record](gui::Item &) {
-                auto rec  = std::make_unique<AlarmsRecord>(record);
+                auto rec  = std::make_unique<AlarmEventRecord>(record);
                 auto data = std::make_unique<AlarmRecordData>(std::move(rec));
                 data->setDescription(style::alarmClock::editAlarm);
                 application->switchWindow(style::alarmClock::window::name::newEditAlarm, std::move(data));

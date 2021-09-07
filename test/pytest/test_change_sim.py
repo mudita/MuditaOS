@@ -19,7 +19,7 @@ def test_change_sim(harness, phone_number, sms_text):
     # change sim to SIM1
     body = {"changeSim": simCard["SIM1"]}
     ret = harness.endpoint_request("developerMode", "put", body)
-    assert ret["status"] == status["OK"]
+    assert ret["status"] == status["NoContent"]
 
     # time to change sim card in pure phone, value is experimentally chosen, no idea how to do it right
     time.sleep(2)
@@ -37,7 +37,7 @@ def test_change_sim(harness, phone_number, sms_text):
     # change sim to SIM2
     body = {"changeSim": simCard["SIM2"]}
     ret = harness.endpoint_request("developerMode", "put", body)
-    assert ret["status"] == status["OK"]
+    assert ret["status"] == status["NoContent"]
 
     # time to change sim card in pure phone, value is experimentally chosen, no idea how to do it right
     time.sleep(2)

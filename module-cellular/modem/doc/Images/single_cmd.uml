@@ -1,0 +1,25 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+title Single cmd processing
+
+participant IRQ order 1
+participant BSP order 2
+participant CellularWorker order 3
+participant Channel order 4
+participant Service order 5
+
+CellularWorker -> BSP: Read()
+rnote over CellularWorker: Wait for data in MessageBuffer
+Service -> Channel: cmd()
+activate CellularWorker
+Channel -> BSP : Write()
+rnote over Channel: Wait for cmd response in MessageBuffer
+activate Channel
+rnote over IRQ: DMA received data
+IRQ -> CellularWorker: MessageBufferSendFromISR()
+rnote over CellularWorker: processData()
+CellularWorker -> Channel: MessageBufferSend()
+rnote over Channel: Parse response
+deactivate Channel
+Channel -> Service: Result
+@enduml

@@ -27,8 +27,10 @@ struct CalllogRecord : public Record
     bool isRead                          = true;
 
     friend std::ostream &operator<<(std::ostream &out, const CalllogRecord &point);
+    [[nodiscard]] std::string str() const;
 
-    CalllogRecord()  = default;
+    CalllogRecord() = default;
+    CalllogRecord(const CallType type, const utils::PhoneNumber::View &number);
     CalllogRecord(const CalllogTableRow &tableRow);
 
     uint32_t getContactId() const;

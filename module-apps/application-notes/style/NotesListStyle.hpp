@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -8,8 +8,8 @@
 namespace app::notes::style::list
 {
     constexpr inline auto X      = ::style::window::default_left_margin;
-    constexpr inline auto Y      = ::style::header::height + ::style::margins::small - 1;
-    constexpr inline auto Width  = ::style::window::default_body_width;
+    constexpr inline auto Y      = ::style::window::default_vertical_pos + ::style::margins::small - 1;
+    constexpr inline auto Width  = ::style::listview::body_width_with_scroll;
     constexpr inline auto Height = ::style::window::default_body_height - ::style::margins::small;
 
     constexpr inline auto PenWidth        = 0;

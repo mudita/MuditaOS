@@ -5,7 +5,7 @@
 
 #include <string>
 #include <cstdint>
-#include <module-utils/math/Math.hpp>
+#include <Math.hpp>
 #include <utf8/UTF8.hpp>
 #include <gui/Common.hpp>
 

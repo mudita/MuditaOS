@@ -1,0 +1,71 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+Title CMUX Mode
+
+state CellularBSP {
+  UartIrq: Reads data with DMA to static buffer
+  UartIrq: and packs them into struct with result code.
+  UartIrq --> SendToWorker
+  SendToWorker: Puts structured data into workers MessageBuffer.
+  SendToWorker --> output
+
+  state output <<exitPoint>>
+}
+
+state CellularWorker{
+  state DMAMessageBuffer <<expansionInput>> 
+
+  DMAMessageBuffer --> ATParser
+  ATParser: Parses URC packages.
+  ATParser --> CmdAwaitingResponse
+  
+  state CmdAwaitingResponse <<choice>>
+  CmdAwaitingResponse ----> workerOutput : True
+  CmdAwaitingResponse --> callback : False
+
+  state workerOutput <<exitPoint>>
+}
+
+state Notifications {
+  state input1 <<expansionInput>>
+  
+  input1 --> ATStream1 
+  
+  ATStream1 --> output1
+
+  state output1 <<exitPoint>>
+}
+
+state Commands {
+  state input2 <<expansionInput>>
+  
+  input2 --> ATStream2 
+  
+  ATStream2 --> output2
+
+  state output2 <<exitPoint>>
+}
+
+state Data {
+  state input3 <<expansionInput>>
+  
+  input3 --> ATStream3 
+
+  ATStream3 --> output3
+
+  state output3 <<exitPoint>>
+}
+
+state channelsFork <<fork>>
+state channelsJoin <<join>>
+
+output --> DMAMessageBuffer : Result{data,resultCode}
+workerOutput --> channelsFork
+channelsFork --> input1
+channelsFork --> input2
+channelsFork --> input3
+output1 --> channelsJoin
+output2 --> channelsJoin
+output3 --> channelsJoin
+channelsJoin --> ServiceCellular : Result{parsedData,resultCode}
+@enduml

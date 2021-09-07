@@ -18,6 +18,7 @@
 #include <RawFont.hpp>
 #include "Font.hpp"
 #include "RichTextParser.hpp"
+#include "TextFixedSize.hpp"
 
 TEST_CASE("Text ctor")
 {
@@ -39,7 +40,8 @@ TEST_CASE("Text ctor")
     SECTION("one line")
     {
         auto testtext = "text0 text1 text2";
-        auto text     = Text(nullptr, 0, 0, 0, 0, testtext);
+        auto text     = Text(nullptr, 0, 0, 0, 0);
+        text.setText(testtext);
         REQUIRE(text.getText() == testtext);
     }
 }
@@ -130,8 +132,8 @@ TEST_CASE("Text drawLines")
         auto testline            = mockup::multiLineString(lines_count);
         auto text                = TestText();
         text.setSize(300, 500);
-        text.setText(std::make_unique<TextDocument>(
-            textToTextBlocks(testline, fontmanager.getFont(0), TextBlock::End::Newline)));
+        text.setText(
+            std::make_unique<TextDocument>(textToTextBlocks(testline, fontmanager.getFont(), TextBlock::End::Newline)));
 
         text.drawLines();
         // Extra one line for empty newline at end
@@ -146,7 +148,7 @@ TEST_CASE("Text buildDrawList")
     auto &fontmanager = mockup::fontManager();
     auto lines_count  = 10;
     auto testline     = mockup::multiLineString(lines_count);
-    auto font         = fontmanager.getFont(0);
+    auto font         = fontmanager.getFont();
     auto text         = TestText();
     text.setSize(3000, 3000);
     text.setText(std::make_unique<TextDocument>(textToTextBlocks(testline, font, TextBlock::End::Newline)));
@@ -168,9 +170,9 @@ TEST_CASE("Text buildDrawList")
 
 TEST_CASE("handle input mode ABC/abc/1234")
 {
-    utils::localize.setInputLanguage("English"); /// needed to load input mode
+    utils::setInputLanguage("English"); /// needed to load input mode
     auto &fontmanager = mockup::fontManager();
-    auto font         = fontmanager.getFont(0);
+    auto font         = fontmanager.getFont();
     auto text         = gui::TestText();
     auto modes        = {InputMode::ABC, InputMode::abc, InputMode::digit};
     auto str          = text.getText();
@@ -200,16 +202,17 @@ TEST_CASE("handle input mode ABC/abc/1234")
 
     SECTION("ABC -> abc")
     {
-        auto time_long_enough_to_not_be_multipress = 1000;
+        auto time_long_enough_to_not_be_multipress = 1500;
         text.onInput(next_mode);
-        key_2.key.time_release += time_long_enough_to_not_be_multipress;
+        auto rawKey_2 = key_2.getRawKey();
+        rawKey_2.timeRelease += time_long_enough_to_not_be_multipress;
         REQUIRE(text.getInputMode()->is(InputMode::abc));
-        text.onInput(key_2);
-        key_2.key.time_release += time_long_enough_to_not_be_multipress;
+        text.onInput(gui::InputEvent{rawKey_2, key_2.getState()});
+        rawKey_2.timeRelease += time_long_enough_to_not_be_multipress;
         str += "a";
         REQUIRE(str == text.getText());
 
-        text.onInput(key_2);
+        text.onInput(gui::InputEvent{rawKey_2, key_2.getState()});
         str += "a";
         REQUIRE(str == text.getText());
     }
@@ -235,6 +238,38 @@ TEST_CASE("handle longpress for digit in ABC mode")
     REQUIRE(str == text.getText());
 }
 
+TEST_CASE("handle longpress for digit in phone mode")
+{
+    auto text  = gui::TestText();
+    auto str   = text.getText() + "+";
+    auto key_0 = gui::InputEvent({}, gui::InputEvent::State::keyReleasedLong, gui::KeyCode::KEY_0);
+    text.setInputMode(new InputMode({InputMode::phone}));
+    text.onInput(key_0);
+    REQUIRE(str == text.getText());
+}
+
+TEST_CASE("Handle backspace longpress")
+{
+    auto text          = gui::TestText();
+    auto key_backspace = gui::InputEvent({}, gui::InputEvent::State::keyReleasedLong, gui::KeyCode::KEY_PND);
+    text.setInputMode(new InputMode({InputMode::ABC}));
+
+    SECTION("Empty text")
+    {
+        REQUIRE(text.getText().empty());
+        auto input_handled = text.onInput(key_backspace);
+        REQUIRE(input_handled == false);
+    }
+
+    SECTION("Not empty text")
+    {
+        text.addText("test");
+        REQUIRE(text.getText() == "test");
+        text.onInput(key_backspace);
+        REQUIRE(text.getText().empty());
+    }
+}
+
 TEST_CASE("handle text expand")
 {
     mockup::fontManager();
@@ -243,8 +278,9 @@ TEST_CASE("handle text expand")
     Length h         = 100;
     BoxLayout layout = BoxLayout(nullptr, 0, 0, w, h);
     auto text        = new gui::TestText();
-    layout.addWidget(text);
     text->setMaximumSize(w, h);
+    text->setText("");
+    layout.addWidget(text);
     REQUIRE(text->area() != BoundingBox{0, 0, 0, 0});
 }
 
@@ -271,7 +307,7 @@ TEST_CASE("handle text block - moved cursor to end")
     std::string test_text = "text";
     std::string newline   = "\n";
     auto text             = gui::TestText();
-    text.addText(gui::TextBlock(test_text, mockup::fontManager().getFont(0), gui::TextBlock::End::None));
+    text.addText(gui::TextBlock(test_text, mockup::fontManager().getFont(), gui::TextBlock::End::None));
     REQUIRE(text.getText() == test_text);
     test_text = test_text + newline;
     text.addText(newline);
@@ -984,7 +1020,7 @@ TEST_CASE("Text addition bounds - multiple limits tests")
     std::string testStringTwoLines = "Test String 1\nTest String 2";
 
     std::string richTextTwoLines =
-        "<text font='gt_pressura' color='12' size='30'>Test </text><text size='25'>String </text><text size='20' "
+        "<text font='gt_pressura' color='12' size='30'>Test </text><text size='20'>String </text><text size='27' "
         "weight='bold'>1</text><br></br><text>Test String 2</text>";
 
     SECTION("Adding text to lower limit set to signs count and size and lines on higher limit")
@@ -1201,6 +1237,31 @@ TEST_CASE("Text newline navigation and deletion tests")
         REQUIRE(text->linesSize() == 0);
         REQUIRE(text->linesGet().empty());
     }
+
+    SECTION("Empty new block at end and delete from text beginning")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = std::make_unique<gui::TestText>();
+        text->setMaximumSize(600, 200);
+
+        text->addRichText("<text>" + testStringBlock1 + emptyParagraph + "</text>");
+
+        REQUIRE(text->linesSize() == 2);
+        REQUIRE((*text->lineGet(0)).getText(0) == testStringBlock1 + "\n");
+        REQUIRE((*text->lineGet(1)).getText(0) == "");
+
+        text->moveCursor(gui::NavigationDirection::LEFT, testStringBlock1.length());
+        text->removeNCharacters(testStringBlock1.length());
+
+        REQUIRE(text->linesSize() == 2);
+        REQUIRE((*text->lineGet(0)).getText(0) == "\n");
+        REQUIRE((*text->lineGet(1)).getText(0) == "");
+
+        text->removeNCharacters(1);
+        REQUIRE(text->linesSize() == 0);
+        REQUIRE(text->linesGet().empty());
+    }
 }
 
 TEST_CASE("RichText newline and empty lines tests")
@@ -1302,5 +1363,109 @@ TEST_CASE("RichText newline and empty lines tests")
         REQUIRE((*text->lineGet(0)).getText(0) == "\n");
         REQUIRE((*text->lineGet(1)).getText(0) == testStringBlock1 + "\n");
         REQUIRE((*text->lineGet(2)).getText(0) == "");
+    }
+}
+
+TEST_CASE("Navigating down between input texts")
+{
+    using namespace gui;
+    const InputEvent keyDown{{}, InputEvent::State::keyReleasedShort, KeyCode::KEY_DOWN};
+
+    mockup::fontManager();
+    SECTION("Empty texts")
+    {
+        auto layout                 = VBox(nullptr, 0, 0, 100, 200);
+        [[maybe_unused]] auto text1 = new TextFixedSize(&layout, 0, 0, 100, 150);
+        [[maybe_unused]] auto text2 = new TextFixedSize(&layout, 0, 150, 100, 50);
+        layout.setFocus(true);
+
+        REQUIRE(layout.getFocusItemIndex() == 0);
+
+        layout.onInput(keyDown);
+        REQUIRE(layout.getFocusItemIndex() == 1);
+    }
+
+    SECTION("Non-empty texts and no new line at the end [EGD-7047]")
+    {
+        constexpr auto testString = "Test String";
+
+        auto layout = VBox(nullptr, 0, 0, 100, 200);
+        auto text1  = new TextFixedSize(&layout, 0, 0, 100, 150);
+        text1->addText(TextBlock(testString, Font(27).raw(), TextBlock::End::None));
+        text1->setCursorStartPosition(CursorStartPosition::DocumentBegin);
+
+        [[maybe_unused]] auto text2 = new TextFixedSize(&layout, 0, 150, 100, 50);
+        layout.setFocus(true);
+
+        REQUIRE(layout.getFocusItemIndex() == 0);
+
+        layout.onInput(keyDown);
+        REQUIRE(layout.getFocusItemIndex() == 1);
+    }
+}
+
+TEST_CASE("Text word line breaking tests")
+{
+    std::string testStringBlock1 = "Test ";
+    std::string testStringBlock2 = "String ";
+    std::string testStringBlock3 = "LongLongLong";
+    std::string testStringBlock4 = testStringBlock1 + testStringBlock3 + testStringBlock2;
+    std::string testStringBlock5 = testStringBlock1 + testStringBlock2;
+    std::string emptyParagraph   = "<p></p>";
+
+    SECTION("Breaking lines on space on whole words with long words")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = std::make_unique<gui::TestText>();
+        text->setMaximumSize(300, 200);
+
+        text->addRichText("<text>" + testStringBlock4 + testStringBlock5 + "</text>");
+
+        REQUIRE(text->linesSize() == 2);
+        REQUIRE((*text->lineGet(0)).getText(0) == testStringBlock4);
+        REQUIRE((*text->lineGet(1)).getText(0) == testStringBlock5);
+    }
+
+    SECTION("Breaking lines on space on whole words with short word")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = std::make_unique<gui::TestText>();
+        text->setMaximumSize(250, 200);
+
+        text->addRichText("<text>" + testStringBlock5 + testStringBlock5 + testStringBlock5 + "</text>");
+
+        REQUIRE(text->linesSize() == 2);
+        REQUIRE((*text->lineGet(0)).getText(0) == testStringBlock5 + testStringBlock5);
+        REQUIRE((*text->lineGet(1)).getText(0) == testStringBlock5);
+    }
+
+    SECTION("Breaking lines on newline before breaking it on space")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = std::make_unique<gui::TestText>();
+        text->setMaximumSize(250, 200);
+
+        text->addRichText("<text>" + testStringBlock5 + emptyParagraph + testStringBlock5 + "</text>");
+
+        REQUIRE(text->linesSize() == 2);
+        REQUIRE((*text->lineGet(0)).getText(0) == testStringBlock5 + "\n");
+        REQUIRE((*text->lineGet(1)).getText(0) == testStringBlock5);
+    }
+
+    SECTION("Breaking lines by splitting word with dash")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = std::make_unique<gui::TestText>();
+        text->setMaximumSize(220, 200);
+
+        text->addRichText("<text>" + testStringBlock4 + "</text>");
+
+        REQUIRE(text->linesSize() == 2);
+        REQUIRE((*text->lineGet(0)).getText(0) == testStringBlock1 + testStringBlock3 + "-");
+        REQUIRE((*text->lineGet(1)).getText(0) == testStringBlock2);
     }
 }

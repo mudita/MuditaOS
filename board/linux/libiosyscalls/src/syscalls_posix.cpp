@@ -1,19 +1,19 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <iosyscalls.hpp>
+#include "iosyscalls-internal.hpp"
 
-#include <unistd.h>
-#include <sys/types.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <limits.h> // for PATH_MAX
+#include <poll.h>
+#include <stdarg.h> // for va_*
+#include <sys/ioctl.h>
+#include <sys/mount.h>
 #include <sys/stat.h>
 #include <sys/statvfs.h>
-#include <sys/mount.h>
-#include <sys/ioctl.h>
-#include <poll.h>
-#include <fcntl.h>
-#include <errno.h>
-#include <stdarg.h> // for va_*
-#include <limits.h> // for PATH_MAX
+#include <sys/types.h>
+#include <unistd.h>
 
 #include "syscalls_real.hpp"
 
@@ -28,8 +28,9 @@ namespace
         __REAL_DECL(symlink);
 
         __REAL_DECL(fcntl);
+#if __GLIBC__ > 2 || ((__GLIBC__ == 2) && (__GLIBC_MINOR__ >= 28))
         __REAL_DECL(fcntl64);
-
+#endif
         __REAL_DECL(chdir);
         __REAL_DECL(fchdir);
 
@@ -47,6 +48,15 @@ namespace
         __REAL_DECL(fsync);
         __REAL_DECL(fdatasync);
 
+#if __GLIBC__ > 2 || ((__GLIBC__ == 2) && (__GLIBC_MINOR__ >= 33))
+        __REAL_DECL(stat);
+        __REAL_DECL(lstat);
+        __REAL_DECL(fstat);
+
+        __REAL_DECL(stat64);
+        __REAL_DECL(lstat64);
+        __REAL_DECL(fstat64);
+#else
         __REAL_DECL(__xstat);
         __REAL_DECL(__lxstat);
         __REAL_DECL(__fxstat);
@@ -54,7 +64,7 @@ namespace
         __REAL_DECL(__xstat64);
         __REAL_DECL(__lxstat64);
         __REAL_DECL(__fxstat64);
-
+#endif
         __REAL_DECL(read);
         __REAL_DECL(write);
         __REAL_DECL(lseek);
@@ -75,8 +85,9 @@ namespace
         __REAL_DLSYM(symlink);
 
         __REAL_DLSYM(fcntl);
+#if __GLIBC__ > 2 || ((__GLIBC__ == 2) && (__GLIBC_MINOR__ >= 28))
         __REAL_DLSYM(fcntl64);
-
+#endif
         __REAL_DLSYM(chdir);
         __REAL_DLSYM(fchdir);
 
@@ -90,6 +101,15 @@ namespace
         __REAL_DLSYM(fsync);
         __REAL_DLSYM(fdatasync);
 
+#if __GLIBC__ > 2 || ((__GLIBC__ == 2) && (__GLIBC_MINOR__ >= 33))
+        __REAL_DLSYM(stat);
+        __REAL_DLSYM(lstat);
+        __REAL_DLSYM(fstat);
+
+        __REAL_DLSYM(stat64);
+        __REAL_DLSYM(lstat64);
+        __REAL_DLSYM(fstat64);
+#else
         __REAL_DLSYM(__xstat);
         __REAL_DLSYM(__lxstat);
         __REAL_DLSYM(__fxstat);
@@ -97,7 +117,7 @@ namespace
         __REAL_DLSYM(__xstat64);
         __REAL_DLSYM(__lxstat64);
         __REAL_DLSYM(__fxstat64);
-
+#endif
         __REAL_DLSYM(read);
         __REAL_DLSYM(write);
         __REAL_DLSYM(lseek);
@@ -110,11 +130,20 @@ namespace
         __REAL_DLSYM(poll);
         __REAL_DLSYM(statvfs);
 
-        if (!(real::link && real::unlink && real::symlink && real::fcntl && real::fcntl64 && real::chdir &&
-              real::fchdir && real::getcwd && real::getwd && real::get_current_dir_name && real::mkdir && real::chmod &&
-              real::fchmod && real::fsync && real::fdatasync && real::__xstat && real::__lxstat && real::__fxstat &&
-              real::__xstat64 && real::__lxstat64 && real::__fxstat64 && real::read && real::write && real::lseek &&
-              real::lseek64 && real::mount && real::umount && real::ioctl && real::poll && real::statvfs)) {
+        if (!(real::link && real::unlink && real::symlink && real::fcntl && real::chdir && real::fchdir &&
+              real::getcwd && real::getwd && real::get_current_dir_name && real::mkdir && real::chmod && real::fchmod &&
+              real::fsync && real::fdatasync && real::read && real::write && real::lseek && real::lseek64 &&
+              real::mount && real::umount && real::ioctl && real::poll && real::statvfs
+#if __GLIBC__ > 2 || ((__GLIBC__ == 2) && (__GLIBC_MINOR__ >= 28))
+              && real::fcntl64
+#endif
+#if __GLIBC__ > 2 || ((__GLIBC__ == 2) && (__GLIBC_MINOR__ >= 33))
+              && real::stat && real::lstat && real::fstat && real::stat64 && real::lstat64 && real::fstat64
+#else
+              && real::__xstat && real::__lxstat && real::__fxstat && real::__xstat64 && real::__lxstat64 &&
+              real::__fxstat64
+#endif
+              )) {
             abort();
         }
     }
@@ -257,49 +286,6 @@ extern "C"
     }
     __asm__(".symver _iosys_unlink,unlink@GLIBC_2.2.5");
 
-    int _iosys_stat(const char *file, struct stat *pstat)
-    {
-        if (vfs::redirect_to_image(file)) {
-            TRACE_SYSCALLN("(%s) -> VFS", file);
-            return vfs::invoke_fs(&fs::stat, file, *pstat);
-        }
-        else {
-            TRACE_SYSCALLN("(%s) -> linux fs", file);
-            char tmp[PATH_MAX];
-            const auto newfile = vfs::npath_translate(file, tmp);
-            return real::__xstat(1, newfile, pstat);
-        }
-    }
-    __asm__(".symver _iosys_stat,stat@GLIBC_2.2.5");
-
-    int _iosys_lstat(const char *pathname, struct stat *statbuf)
-    {
-        if (vfs::redirect_to_image(pathname)) {
-            TRACE_SYSCALLN("(%s) -> VFS", pathname);
-            return vfs::invoke_fs(&fs::stat, pathname, *statbuf);
-        }
-        else {
-            TRACE_SYSCALLN("(%s) -> linux fs", pathname);
-            char tmp[PATH_MAX];
-            const auto newpath = vfs::npath_translate(pathname, tmp);
-            return real::__lxstat(1, newpath, statbuf);
-        }
-    }
-    __asm__(".symver _iosys_lstat,lstat@GLIBC_2.2.5");
-
-    int _iosys_fstat(int fd, struct stat *pstat)
-    {
-        if (vfs::is_image_fd(fd)) {
-            TRACE_SYSCALLN("(%d) -> VFS", fd);
-            return vfs::invoke_fs(&fs::fstat, vfs::to_image_fd(fd), *pstat);
-        }
-        else {
-            TRACE_SYSCALLN("(%d) -> linux fs", fd);
-            return real::__fxstat(1, fd, pstat);
-        }
-    }
-    __asm__(".symver _iosys_fstat,fstat@GLIBC_2.2.5");
-
     int _iosys_fcntl(int fd, int cmd, ... /* arg */)
     {
         if (vfs::is_image_fd(fd)) {
@@ -321,6 +307,7 @@ extern "C"
     }
     __asm__(".symver _iosys_fcntl,fcntl@GLIBC_2.2.5");
 
+#if __GLIBC__ > 2 || ((__GLIBC__ == 2) && (__GLIBC_MINOR__ >= 28))
     int _iosys_fcntl64(int fd, int cmd, ... /* arg */)
     {
         if (vfs::is_image_fd(fd)) {
@@ -341,6 +328,7 @@ extern "C"
         }
     }
     __asm__(".symver _iosys_fcntl64,fcntl64@GLIBC_2.2.5");
+#endif
 
     int _iosys_chdir(const char *path)
     {
@@ -519,6 +507,94 @@ extern "C"
     }
     __asm__(".symver _iosys_symlink,symlink@GLIBC_2.2.5");
 
+#if __GLIBC__ > 2 || ((__GLIBC__ == 2) && (__GLIBC_MINOR__ >= 33))
+    int _iosys_stat(const char *file, struct stat *pstat)
+    {
+        if (vfs::redirect_to_image(file)) {
+            TRACE_SYSCALLN("(%s) -> VFS", file);
+            return vfs::invoke_fs(&fs::stat, file, *pstat);
+        }
+        else {
+            TRACE_SYSCALLN("(%s) -> linux fs", file);
+            char tmp[PATH_MAX];
+            const auto newfile = vfs::npath_translate(file, tmp);
+            return real::stat(newfile, pstat);
+        }
+    }
+    __asm__(".symver _iosys_stat,stat@GLIBC_2.33");
+
+    int _iosys_lstat(const char *pathname, struct stat *statbuf)
+    {
+        if (vfs::redirect_to_image(pathname)) {
+            TRACE_SYSCALLN("(%s) -> VFS", pathname);
+            return vfs::invoke_fs(&fs::stat, pathname, *statbuf);
+        }
+        else {
+            TRACE_SYSCALLN("(%s) -> linux fs", pathname);
+            char tmp[PATH_MAX];
+            const auto newpath = vfs::npath_translate(pathname, tmp);
+            return real::lstat(newpath, statbuf);
+        }
+    }
+    __asm__(".symver _iosys_lstat,lstat@GLIBC_2.33");
+
+    int _iosys_fstat(int fd, struct stat *pstat)
+    {
+        if (vfs::is_image_fd(fd)) {
+            TRACE_SYSCALLN("(%d) -> VFS", fd);
+            return vfs::invoke_fs(&fs::fstat, vfs::to_image_fd(fd), *pstat);
+        }
+        else {
+            TRACE_SYSCALLN("(%d) -> linux fs", fd);
+            return real::fstat(fd, pstat);
+        }
+    }
+    __asm__(".symver _iosys_fstat,fstat@GLIBC_2.33");
+
+    int _iosys_stat64(const char *file, struct stat64 *pstat)
+    {
+        if (vfs::redirect_to_image(file)) {
+            TRACE_SYSCALLN("(%s) -> VFS", file);
+            return stat(file, (struct stat *)pstat);
+        }
+        else {
+            TRACE_SYSCALLN("(%s) -> linux fs", file);
+            char tmp[PATH_MAX];
+            const auto newfile = vfs::npath_translate(file, tmp);
+            return real::stat64(newfile, pstat);
+        }
+    }
+    __asm__(".symver _iosys_stat64,stat64@GLIBC_2.33");
+
+    int _iosys_lstat64(const char *pathname, struct stat64 *statbuf)
+    {
+        if (vfs::redirect_to_image(pathname)) {
+            TRACE_SYSCALLN("(%s) -> VFS", pathname);
+            return lstat(pathname, (struct stat *)statbuf);
+        }
+        else {
+            TRACE_SYSCALLN("(%s) -> linux fs", pathname);
+            char tmp[PATH_MAX];
+            const auto newpath = vfs::npath_translate(pathname, tmp);
+            return real::lstat64(newpath, statbuf);
+        }
+    }
+    __asm__(".symver _iosys_lstat64,lstat64@GLIBC_2.33");
+
+    int _iosys_fstat64(int fd, struct stat64 *pstat)
+    {
+        if (vfs::is_image_fd(fd)) {
+            TRACE_SYSCALLN("(%d) -> VFS", fd);
+            return fstat(fd, (struct stat *)pstat);
+        }
+        else {
+            TRACE_SYSCALLN("(%d) -> linux fs", fd);
+            return real::fstat64(fd, pstat);
+        }
+    }
+    __asm__(".symver _iosys_fstat64,fstat64@GLIBC_2.33");
+
+#else
     int _iosys_xstat(int ver, const char *path, struct stat *stat_buf)
     {
         if (vfs::redirect_to_image(path)) {
@@ -562,14 +638,6 @@ extern "C"
     }
     __asm__(".symver _iosys_fxstat,__fxstat@GLIBC_2.2.5");
 
-    int _iosys_fxstatat(int vers, int fd, const char *filename, struct stat *buf, int flag)
-    {
-        errno = ENOSYS;
-        std::cerr << "Unsupported syscall " << __PRETTY_FUNCTION__ << std::endl;
-        return -1;
-    }
-    __asm__(".symver _iosys_fxstatat,__fxstatat@GLIBC_2.4");
-
     int _iosys_xstat64(int ver, const char *path, struct stat64 *stat_buf)
     {
         if (vfs::redirect_to_image(path)) {
@@ -612,6 +680,15 @@ extern "C"
         }
     }
     __asm__(".symver _iosys_fxstat64,__fxstat64@GLIBC_2.2.5");
+#endif
+
+    int _iosys_fxstatat(int vers, int fd, const char *filename, struct stat *buf, int flag)
+    {
+        errno = ENOSYS;
+        std::cerr << "Unsupported syscall " << __PRETTY_FUNCTION__ << std::endl;
+        return -1;
+    }
+    __asm__(".symver _iosys_fxstatat,__fxstatat@GLIBC_2.4");
 
     int _iosys_fxstatat64(int vers, int fd, const char *filename, struct stat64 *buf, int flag)
     {

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -22,6 +22,7 @@
 #include "TextLine.hpp"
 #include "Translator.hpp"
 #include "TextLineCursor.hpp"
+#include "RichTextParser.hpp"
 
 namespace gui
 {
@@ -86,8 +87,9 @@ namespace gui
         auto handleActivation(const InputEvent &inputEvent) -> bool;
         auto handleNavigation(const InputEvent &inputEvent) -> bool;
         auto handleRemovalChar(const InputEvent &inputEvent) -> bool;
-        auto handleDigitLongPress(const InputEvent &inputEvent) -> bool;
+        auto handleWholeTextRemoval(const InputEvent &inputEvent) -> bool;
         auto handleAddChar(const InputEvent &inputEvent) -> bool;
+        auto handleLongPressAddChar(const InputEvent &inputEvent) -> bool;
 
         [[nodiscard]] auto getSizeMinusPadding(Axis axis, Area val) -> Length;
         auto applyParentSizeRestrictions() -> void;
@@ -123,7 +125,6 @@ namespace gui
              const uint32_t &y,
              const uint32_t &w,
              const uint32_t &h,
-             const UTF8 &text      = "",
              ExpandMode expandMode = ExpandMode::None,
              TextType textType     = TextType::MultiLine);
         ~Text() override;
@@ -132,7 +133,7 @@ namespace gui
         void setTextType(TextType type);
         void setTextLimitType(TextLimitType limitType, unsigned int val = 0);
         void clearTextLimits();
-        void setUnderline(bool val);
+        void drawUnderline(bool val);
         virtual void setText(const UTF8 &text);
         void setText(std::unique_ptr<TextDocument> &&document);
 
@@ -146,9 +147,9 @@ namespace gui
         /// @defgroup richtext can be virtualized by parametrized RichTextParser virtual api ( as second param )
         /// @{
         /// set rich text with default RichTextParser - please see RichTextParser documentation on how to use format
-        void setRichText(const UTF8 &text);
+        void setRichText(const UTF8 &text, text::RichTextParser::TokenMap &&tokens = text::RichTextParser::TokenMap{});
         /// add rich text with default RichTextParser - please see RichTextParser documentation on how to use format
-        void addRichText(const UTF8 &text);
+        void addRichText(const UTF8 &text, text::RichTextParser::TokenMap &&tokens = text::RichTextParser::TokenMap{});
         /// @}
         virtual void clear();
         bool isEmpty();
@@ -157,6 +158,8 @@ namespace gui
         virtual bool saveText(UTF8 path);
         void setFont(const UTF8 &fontName);
         void setFont(RawFont *font);
+        void setMinimumWidthToFitText(const UTF8 &text);
+        void setMinimumHeightToFitText(unsigned int linesCount = 1);
 
         // virtual methods from Item
         bool onInput(const InputEvent &inputEvent) override;

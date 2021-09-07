@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "dma_config.h"
@@ -28,7 +28,7 @@
 #include "drivers/pll/DriverPLL.hpp"
 #include "drivers/dmamux/DriverDMAMux.hpp"
 #include "drivers/dma/DriverDMA.hpp"
-#include "bsp/BoardDefinitions.hpp"
+#include "board/BoardDefinitions.hpp"
 
 #define EPD_BOOSTER_START_PERIOD_10MS 0
 #define EPD_BOOSTER_START_PERIOD_20MS 1
@@ -56,6 +56,22 @@
 #define EPD_BOOSTER_OFF_TIME_GDR_6_58uS 7
 #define EPD_BOOSTER_OFF_TIME_GDR_POS    0
 
+#if defined(EINK_ROTATE_90_CLOCKWISE)
+#define EINK_DISPLAY_RES_X         (BOARD_EINK_DISPLAY_RES_Y)
+#define EINK_DISPLAY_RES_Y         (BOARD_EINK_DISPLAY_RES_X)
+#define EINK_DISPLAY_X_AXIS        (BOARD_EINK_DISPLAY_RES_Y - Y - H)
+#define EINK_DISPLAY_Y_AXIS        (BOARD_EINK_DISPLAY_RES_X - X - W)
+#define EINK_DISPLAY_WINDOW_WIDTH  (H)
+#define EINK_DISPLAY_WINDOW_HEIGHT (W)
+#else
+#define EINK_DISPLAY_RES_X         (BOARD_EINK_DISPLAY_RES_X)
+#define EINK_DISPLAY_RES_Y         (BOARD_EINK_DISPLAY_RES_Y)
+#define EINK_DISPLAY_X_AXIS        (BOARD_EINK_DISPLAY_RES_X - X - W)
+#define EINK_DISPLAY_Y_AXIS        (BOARD_EINK_DISPLAY_RES_Y - Y - H)
+#define EINK_DISPLAY_WINDOW_WIDTH  (W)
+#define EINK_DISPLAY_WINDOW_HEIGHT (H)
+#endif
+
 #define EINK_BLACK_PIXEL_MASK      0x00 // This is the mask for the black pixel value
 #define EINK_1BPP_WHITE_PIXEL_MASK 0x01 // This is the mask for the white pixel in 1bpp mode
 #define EINK_2BPP_WHITE_PIXEL_MASK 0x03 // This is the mask for the white pixel in 2bpp mode
@@ -64,12 +80,6 @@
 #define ED028TC1_BUSY_STATE_TIMEOUT_MS 2000 // Time after the display should for sure exit the busy state
 
 #define _delay_ms(ms) vTaskDelay(pdMS_TO_TICKS(ms))
-
-//#define EINK_DEBUG_LOG  1
-//
-//#if EINK_DEBUG_LOG == 1
-//#define EINK_DEBUG_PRINTF(...)	LOG_INFO(__VA_ARGS__)
-//#endif
 
 /// This is DMA handle for internal frame buffer memory-to-memory copying operation
 static edma_handle_t s_einkMemcpyDma_handle __attribute__((used));
@@ -83,7 +93,7 @@ static std::shared_ptr<drivers::DriverDMAMux> dmamux;
 static uint8_t s_einkIsPoweredOn = false; //  Variable which contains the state of the power of the EPD display
 
 static EinkWaveforms_e s_einkConfiguredWaveform =
-    EinkWaveformGC16;                          //  This variable contains the current waveform set in the display
+    EinkWaveformGC16; //  This variable contains the current waveform set in the display
 
 static CACHEABLE_SECTION_SDRAM(uint8_t s_einkServiceRotatedBuf[BOARD_EINK_DISPLAY_RES_X * BOARD_EINK_DISPLAY_RES_Y / 2 +
                                                                2]); // Plus 2 for the EPD command and BPP config
@@ -488,11 +498,17 @@ static uint8_t *s_EinkTransformAnimationFrameCoordinateSystem_3Bpp(uint8_t *data
  *
  * @return
  */
-static uint8_t *s_EinkTransformAnimationFrameCoordinateSystem_4Bpp(uint8_t *dataIn,
-                                                                   uint16_t windowWidthPx,
-                                                                   uint16_t windowHeightPx,
-                                                                   uint8_t *dataOut,
-                                                                   EinkDisplayColorMode_e invertColors);
+
+/*
+ * Not rotating version of s_EinkTransformAnimationFrameCoordinateSystem_4Bpp.
+ * It is used when EINK_ROTATE_90_CLOCKWISE is not defined.
+ */
+
+static uint8_t *s_EinkTransformFrameCoordinateSystemNoRotation_4Bpp(uint8_t *dataIn,
+                                                                    uint16_t windowWidthPx,
+                                                                    uint16_t windowHeightPx,
+                                                                    uint8_t *dataOut,
+                                                                    EinkDisplayColorMode_e invertColors);
 
 /* Function bodies */
 
@@ -522,7 +538,6 @@ void EinkChangeDisplayUpdateTimings(EinkDisplayTimingsMode_e timingsMode)
     }
 
     if (BSP_EinkWriteData(tmpbuf, 4, SPI_AUTOMATIC_CS) != 0) {
-        //        LOG_ERROR("Changing the display timings FAILED");
         EinkResetAndInitialize();
         return;
     }
@@ -538,7 +553,6 @@ void EinkPowerOn()
     if (!s_einkIsPoweredOn) {
         uint8_t cmd = EinkPowerON; // 0x04
         if (BSP_EinkWriteData(&cmd, sizeof(cmd), SPI_AUTOMATIC_CS) != 0) {
-            //            LOG_ERROR("Powering on the display FAILED");
             EinkResetAndInitialize();
             return;
         }
@@ -553,7 +567,6 @@ void EinkPowerOff()
     if (s_einkIsPoweredOn) {
         uint8_t cmd = EinkPowerOFF; // 0x02
         if (BSP_EinkWriteData(&cmd, sizeof(cmd), SPI_AUTOMATIC_CS) != 0) {
-            //            LOG_ERROR("Powering off the display FAILED");
             EinkResetAndInitialize();
             return;
         }
@@ -579,7 +592,6 @@ int16_t EinkGetTemperatureInternal()
     BSP_EinkWriteCS(BSP_Eink_CS_Clr);
 
     if (BSP_EinkWriteData(cmd, sizeof(cmd), SPI_MANUAL_CS) != 0) {
-        //        LOG_ERROR("Requesting the temperature FAILED");
         BSP_EinkWriteCS(BSP_Eink_CS_Set);
         EinkResetAndInitialize();
         return -1;
@@ -588,7 +600,6 @@ int16_t EinkGetTemperatureInternal()
     BSP_EinkWaitUntilDisplayBusy(pdMS_TO_TICKS(BSP_EinkBusyTimeout));
 
     if (BSP_EinkReadData(temp, sizeof(temp), SPI_MANUAL_CS) != 0) {
-        //        LOG_ERROR("Requesting the temperature FAILED");
         BSP_EinkWriteCS(BSP_Eink_CS_Set);
         EinkResetAndInitialize();
         return -1;
@@ -614,7 +625,6 @@ static void s_EinkSetGateOrder()
     buf[1] = 0x02; // Magic value required by the ED028TC1 display manufacturer
     buf[2] = 0x00;
     if (BSP_EinkWriteData(buf, 3, SPI_AUTOMATIC_CS) != 0) {
-        //       LOG_ERROR("Setting the gate order for the Eink failed");
         EinkResetAndInitialize();
         return;
     }
@@ -631,7 +641,6 @@ static void s_EinkSetInitialConfig()
     tmpbuf[3] = 0x00; // 0x06
     tmpbuf[4] = 0x00;
     if (BSP_EinkWriteData(tmpbuf, 5, SPI_AUTOMATIC_CS) != 0) {
-        //         LOG_ERROR("Setting the initial configuration for the Eink failed");
         return;
     }
 
@@ -640,21 +649,18 @@ static void s_EinkSetInitialConfig()
                                        // If 0x35 (DM - 1 is used (2bpp)) the SPI speed can be 25MHz
     tmpbuf[2] = 0x00;
     if (BSP_EinkWriteData(tmpbuf, 3, SPI_AUTOMATIC_CS) != 0) {
-        //         LOG_ERROR("Setting the initial configuration for the Eink failed");
         return;
     }
 
     tmpbuf[0] = EinkPowerSaving; // 0x26
     tmpbuf[1] = 0x82;            // B2
     if (BSP_EinkWriteData(tmpbuf, 2, SPI_AUTOMATIC_CS) != 0) {
-        //         LOG_ERROR("Setting the initial configuration for the Eink failed");
         return;
     }
 
     tmpbuf[0] = EinkPowerOFFSequenceSetting; // 0x03
     tmpbuf[1] = 0x01;                        // 0x00;//0x03;
     if (BSP_EinkWriteData(tmpbuf, 2, SPI_AUTOMATIC_CS) != 0) {
-        //         LOG_ERROR("Setting the initial configuration for the Eink failed");
         return;
     }
 
@@ -671,14 +677,12 @@ static void s_EinkSetInitialConfig()
                 (EPD_BOOSTER_DRIVING_STRENGTH_7 << EPD_BOOSTER_DRIVING_STRENGTH_POS) |
                 (EPD_BOOSTER_START_PERIOD_10MS << EPD_BOOSTER_START_PERIOD_POS);
     if (BSP_EinkWriteData(tmpbuf, 4, SPI_AUTOMATIC_CS) != 0) {
-        //         LOG_ERROR("Setting the initial configuration for the Eink failed");
         return;
     }
 
     tmpbuf[0] = EinkPLLControl; // 0x30
     tmpbuf[1] = 0x0E;
     if (BSP_EinkWriteData(tmpbuf, 2, SPI_AUTOMATIC_CS) != 0) {
-        //         LOG_ERROR("Setting the initial configuration for the Eink failed");
         return;
     }
 
@@ -686,7 +690,6 @@ static void s_EinkSetInitialConfig()
     tmpbuf[1] = EINK_TEMPERATURE_SENSOR_USE_INTERNAL | 0x00; // Temperature offset
     tmpbuf[2] = 0x00;                                        // Host forced temperature value
     if (BSP_EinkWriteData(tmpbuf, 3, SPI_AUTOMATIC_CS) != 0) {
-        //         LOG_ERROR("Setting the initial configuration for the Eink failed");
         return;
     }
 
@@ -694,7 +697,6 @@ static void s_EinkSetInitialConfig()
     tmpbuf[1] = DDX;                            // 0x01;   // 0x0D
     tmpbuf[2] = 0x00;                           // 0x22;
     if (BSP_EinkWriteData(tmpbuf, 3, SPI_AUTOMATIC_CS) != 0) {
-        //         LOG_ERROR("Setting the initial configuration for the Eink failed");
         return;
     }
 
@@ -703,7 +705,6 @@ static void s_EinkSetInitialConfig()
     tmpbuf[2] = 0x09;
     tmpbuf[3] = 0x2D;
     if (BSP_EinkWriteData(tmpbuf, 4, SPI_AUTOMATIC_CS) != 0) {
-        //         LOG_ERROR("Setting the initial configuration for the Eink failed");
         return;
     }
 
@@ -713,23 +714,18 @@ static void s_EinkSetInitialConfig()
     tmpbuf[3] = 0x01;                  // 0x01
     tmpbuf[4] = 0xE0;                  // 0xE0
     if (BSP_EinkWriteData(tmpbuf, 5, SPI_AUTOMATIC_CS) != 0) {
-        //         LOG_ERROR("Setting the initial configuration for the Eink failed");
         return;
     }
 
     tmpbuf[0] = EinkVCM_DCSetting; // 0x82
     tmpbuf[1] = 0x30;
     if (BSP_EinkWriteData(tmpbuf, 2, SPI_AUTOMATIC_CS) != 0) {
-        //         LOG_ERROR("Setting the initial configuration for the Eink failed");
         return;
     }
-
-    //     LOG_DEBUG("Eink Display configured");
 }
 
 EinkStatus_e EinkResetAndInitialize()
 {
-    //    LOG_INFO("Resetting the SPI peripheral, Eink display and setting init configuration");
     // Initialize the synchronization resources, SPI and GPIOs for the Eink BSP
     BSP_EinkInit(NULL);
     // Reset the display
@@ -769,14 +765,12 @@ static EinkStatus_e s_EinkReadFlagsRegister(uint16_t *flags)
 
     if (BSP_EinkWriteData(&cmd, sizeof(cmd), SPI_MANUAL_CS) != 0) {
         BSP_EinkWriteCS(BSP_Eink_CS_Set);
-        //        LOG_ERROR("Eink: request for the temperature failed");
         EinkResetAndInitialize();
         return EinkSPIErr;
     }
 
     if (BSP_EinkReadData(flags, sizeof(uint16_t), SPI_MANUAL_CS) != 0) {
         BSP_EinkWriteCS(BSP_Eink_CS_Set);
-        //        LOG_ERROR("Eink: request for the temperature failed");
         EinkResetAndInitialize();
         return EinkSPIErr;
     }
@@ -805,7 +799,6 @@ EinkStatus_e EinkDitherDisplay()
     uint8_t cmdWithArgs[2] = {EinkDPC, EINK_DITHER_4BPP_MODE | EINK_DITHER_START};
 
     if (BSP_EinkWriteData(cmdWithArgs, sizeof(cmdWithArgs), SPI_AUTOMATIC_CS) != 0) {
-        //        LOG_ERROR("Eink: dithering the display failed");
         EinkResetAndInitialize();
         return EinkSPIErr;
     }
@@ -837,17 +830,19 @@ EinkStatus_e EinkUpdateFrame(
         case Eink1Bpp: {
             s_EinkTransformAnimationFrameCoordinateSystem_1Bpp(buffer, W, H, s_einkServiceRotatedBuf + 2, invertColors);
         } break;
-
         case Eink2Bpp: {
             s_EinkTransformAnimationFrameCoordinateSystem_2Bpp(buffer, W, H, s_einkServiceRotatedBuf + 2, invertColors);
         } break;
-
         case Eink3Bpp: {
             s_EinkTransformAnimationFrameCoordinateSystem_3Bpp(buffer, W, H, s_einkServiceRotatedBuf + 2, invertColors);
         } break;
-
         case Eink4Bpp: {
-            s_EinkTransformAnimationFrameCoordinateSystem_4Bpp(buffer, W, H, s_einkServiceRotatedBuf + 2, invertColors);
+#if defined(EINK_ROTATE_90_CLOCKWISE)
+            s_EinkTransformFrameCoordinateSystem_4Bpp(buffer, W, H, s_einkServiceRotatedBuf + 2, invertColors);
+#else
+            s_EinkTransformFrameCoordinateSystemNoRotation_4Bpp(
+                buffer, W, H, s_einkServiceRotatedBuf + 2, invertColors);
+#endif
         } break;
         }
     }
@@ -856,43 +851,42 @@ EinkStatus_e EinkUpdateFrame(
         case Eink1Bpp: {
             s_EinkTransformFrameCoordinateSystem_1Bpp(buffer, W, H, s_einkServiceRotatedBuf + 2, invertColors);
         } break;
-
         case Eink2Bpp: {
             s_EinkTransformFrameCoordinateSystem_2Bpp(buffer, W, H, s_einkServiceRotatedBuf + 2, invertColors);
         } break;
-
         case Eink3Bpp: {
             s_EinkTransformFrameCoordinateSystem_3Bpp(buffer, W, H, s_einkServiceRotatedBuf + 2, invertColors);
         } break;
-
         case Eink4Bpp: {
+#if defined(EINK_ROTATE_90_CLOCKWISE)
             s_EinkTransformFrameCoordinateSystem_4Bpp(buffer, W, H, s_einkServiceRotatedBuf + 2, invertColors);
+#else
+            s_EinkTransformFrameCoordinateSystemNoRotation_4Bpp(
+                buffer, W, H, s_einkServiceRotatedBuf + 2, invertColors);
+#endif
         } break;
         }
     }
 
-    buf[0] = EinkDataStartTransmissionWindow; // set display window
-    buf[1] =
-        (uint8_t)((BOARD_EINK_DISPLAY_RES_Y - Y - H) >> 8); // MSB of the X axis in the EPD display. Value converted
-                                                            // from the standard GUI coords system to the ED028TC1 one
-    buf[2] = (uint8_t)BOARD_EINK_DISPLAY_RES_Y - Y - H; // LSB of the X axis in the EPD display. Value converted from
+    buf[0] = EinkDataStartTransmissionWindow;           // set display window
+    buf[1] = (uint8_t)(EINK_DISPLAY_X_AXIS >> 8);       // MSB of the X axis in the EPD display. Value converted
+                                                        // from the standard GUI coords system to the ED028TC1 one
+    buf[2] = (uint8_t)EINK_DISPLAY_X_AXIS;              // LSB of the X axis in the EPD display. Value converted from
                                                         // the standard GUI coords system to the ED028TC1 one
-    buf[3] =
-        (uint8_t)((BOARD_EINK_DISPLAY_RES_X - X - W) >> 8); // MSB of the Y axis in the EPD display. Value converted
-                                                            // from the standard GUI coords system to the ED028TC1 one
-    buf[4] = (uint8_t)BOARD_EINK_DISPLAY_RES_X - X - W; // LSB of the Y axis in the EPD display. Value converted from
+    buf[3] = (uint8_t)(EINK_DISPLAY_Y_AXIS >> 8);       // MSB of the Y axis in the EPD display. Value converted
+                                                        // from the standard GUI coords system to the ED028TC1 one
+    buf[4] = (uint8_t)EINK_DISPLAY_Y_AXIS;              // LSB of the Y axis in the EPD display. Value converted from
                                                         // the standard GUI coords system to the ED028TC1 one
-    buf[5] = (uint8_t)(H >> 8); // MSB of the window height in the EPD display. Value converted from the standard GUI
-                                // coords system to the ED028TC1 one
-    buf[6] = (uint8_t)H; // LSB of the window height in the EPD display. Value converted from the standard GUI coords
-                         // system to the ED028TC1 one
-    buf[7] = (uint8_t)(W >> 8); // MSB of the window width in the EPD display. Value converted from the standard GUI
-                                // coords system to the ED028TC1 one
-    buf[8] = (uint8_t)W; // LSB of the window width in the EPD display. Value converted from the standard GUI coords
-                         // system to the ED028TC1 one
+    buf[5] = (uint8_t)(EINK_DISPLAY_WINDOW_WIDTH >> 8); // MSB of the window height in the EPD display. Value converted
+                                                        // from the standard GUI coords system to the ED028TC1 one
+    buf[6] = (uint8_t)EINK_DISPLAY_WINDOW_WIDTH; // LSB of the window height in the EPD display. Value converted from
+                                                 // the standard GUI coords system to the ED028TC1 one
+    buf[7] = (uint8_t)(EINK_DISPLAY_WINDOW_HEIGHT >> 8); // MSB of the window width in the EPD display. Value converted
+                                                         // from the standard GUI coords system to the ED028TC1 one
+    buf[8] = (uint8_t)EINK_DISPLAY_WINDOW_HEIGHT; // LSB of the window width in the EPD display. Value converted from
+                                                  // the standard GUI coords system to the ED028TC1 one
 
     if (BSP_EinkWriteData(buf, 9, SPI_AUTOMATIC_CS) != 0) {
-        //        LOG_ERROR("Eink: transmitting the display update header FAILED");
         EinkResetAndInitialize();
         return EinkSPIErr;
     }
@@ -902,7 +896,6 @@ EinkStatus_e EinkUpdateFrame(
     // Send the part of the image to the display memory
 
     if (BSP_EinkWriteData(s_einkServiceRotatedBuf, msgSize, SPI_AUTOMATIC_CS) != 0) {
-        //        LOG_ERROR("Eink: transmitting the display update image FAILED");
         EinkResetAndInitialize();
         return EinkSPIErr;
     }
@@ -920,13 +913,12 @@ EinkStatus_e EinkFillScreenWithColor(EinkDisplayColorFilling_e colorFill)
     buf[2] = 0x00;
     buf[3] = 0x00;
     buf[4] = 0x00;
-    buf[5] = (BOARD_EINK_DISPLAY_RES_Y & 0xFF00) >> 8;
-    buf[6] = BOARD_EINK_DISPLAY_RES_Y & 0x00FF;
-    buf[7] = (BOARD_EINK_DISPLAY_RES_X & 0xFF00) >> 8;
-    buf[8] = BOARD_EINK_DISPLAY_RES_X & 0x00FF;
+    buf[5] = (EINK_DISPLAY_RES_X & 0xFF00) >> 8;
+    buf[6] = EINK_DISPLAY_RES_X & 0x00FF;
+    buf[7] = (EINK_DISPLAY_RES_Y & 0xFF00) >> 8;
+    buf[8] = EINK_DISPLAY_RES_Y & 0x00FF;
 
     if (BSP_EinkWriteData(buf, 9, SPI_AUTOMATIC_CS) != 0) {
-        //        LOG_ERROR("Eink: transmitting the display update header FAILED");
         EinkResetAndInitialize();
         return EinkSPIErr;
     }
@@ -936,7 +928,6 @@ EinkStatus_e EinkFillScreenWithColor(EinkDisplayColorFilling_e colorFill)
     buf[0] = EinkDataStartTransmission1; // 0x10
     buf[1] = Eink1Bpp - 1;
     if (BSP_EinkWriteData(buf, 2, SPI_MANUAL_CS) != 0) {
-        //        LOG_ERROR("Eink: transmitting the display update image FAILED");
         BSP_EinkWriteCS(BSP_Eink_CS_Set);
         EinkResetAndInitialize();
         return EinkSPIErr;
@@ -956,7 +947,6 @@ EinkStatus_e EinkFillScreenWithColor(EinkDisplayColorFilling_e colorFill)
     memset(bg.get(), background, BOARD_EINK_DISPLAY_RES_Y * BOARD_EINK_DISPLAY_RES_X / 8);
 
     if (BSP_EinkWriteData(bg.get(), BOARD_EINK_DISPLAY_RES_Y * BOARD_EINK_DISPLAY_RES_X / 8, SPI_MANUAL_CS) != 0) {
-        //        LOG_ERROR("Eink: transmitting the display update image FAILED");
         BSP_EinkWriteCS(BSP_Eink_CS_Set);
         EinkResetAndInitialize();
         return EinkSPIErr;
@@ -981,27 +971,24 @@ EinkStatus_e EinkRefreshImage(
     buf[0] = EinkDisplayRefresh;
     buf[1] = UPD_CPY_TO_PRE;
 
-    buf[2] =
-        (uint8_t)((BOARD_EINK_DISPLAY_RES_Y - Y - H) >> 8); // MSB of the X axis in the EPD display. Value converted
-                                                            // from the standard GUI coords system to the ED028TC1 one
-    buf[3] = (uint8_t)BOARD_EINK_DISPLAY_RES_Y - Y - H; // LSB of the X axis in the EPD display. Value converted from
+    buf[2] = (uint8_t)(EINK_DISPLAY_X_AXIS >> 8);       // MSB of the X axis in the EPD display. Value converted
+                                                        // from the standard GUI coords system to the ED028TC1 one
+    buf[3] = (uint8_t)EINK_DISPLAY_X_AXIS;              // LSB of the X axis in the EPD display. Value converted from
                                                         // the standard GUI coords system to the ED028TC1 one
-    buf[4] =
-        (uint8_t)((BOARD_EINK_DISPLAY_RES_X - X - W) >> 8); // MSB of the Y axis in the EPD display. Value converted
-                                                            // from the standard GUI coords system to the ED028TC1 one
-    buf[5] = (uint8_t)BOARD_EINK_DISPLAY_RES_X - X - W; // LSB of the Y axis in the EPD display. Value converted from
+    buf[4] = (uint8_t)(EINK_DISPLAY_Y_AXIS >> 8);       // MSB of the Y axis in the EPD display. Value converted
+                                                        // from the standard GUI coords system to the ED028TC1 one
+    buf[5] = (uint8_t)EINK_DISPLAY_Y_AXIS;              // LSB of the Y axis in the EPD display. Value converted from
                                                         // the standard GUI coords system to the ED028TC1 one
-    buf[6] = (uint8_t)(H >> 8); // MSB of the window height in the EPD display. Value converted from the standard GUI
-                                // coords system to the ED028TC1 one
-    buf[7] = (uint8_t)H; // LSB of the window height in the EPD display. Value converted from the standard GUI coords
-                         // system to the ED028TC1 one
-    buf[8] = (uint8_t)(W >> 8); // MSB of the window width in the EPD display. Value converted from the standard GUI
-                                // coords system to the ED028TC1 one
-    buf[9] = (uint8_t)W; // LSB of the window width in the EPD display. Value converted from the standard GUI coords
-                         // system to the ED028TC1 one
+    buf[6] = (uint8_t)(EINK_DISPLAY_WINDOW_WIDTH >> 8); // MSB of the window height in the EPD display. Value converted
+                                                        // from the standard GUI coords system to the ED028TC1 one
+    buf[7] = (uint8_t)EINK_DISPLAY_WINDOW_WIDTH; // LSB of the window height in the EPD display. Value converted from
+                                                 // the standard GUI coords system to the ED028TC1 one
+    buf[8] = (uint8_t)(EINK_DISPLAY_WINDOW_HEIGHT >> 8); // MSB of the window width in the EPD display. Value converted
+                                                         // from the standard GUI coords system to the ED028TC1 one
+    buf[9] = (uint8_t)EINK_DISPLAY_WINDOW_HEIGHT; // LSB of the window width in the EPD display. Value converted from
+                                                  // the standard GUI coords system to the ED028TC1 one
 
     if (BSP_EinkWriteData(buf, sizeof(buf), SPI_AUTOMATIC_CS) != 0) {
-        //        LOG_ERROR("Eink: transmitting the refresh request image FAILED");
         EinkResetAndInitialize();
         return EinkSPIErr;
     }
@@ -1152,54 +1139,6 @@ __attribute__((optimize("O1"))) static uint8_t *s_EinkTransformFrameCoordinateSy
     return s_EinkTransformFrameCoordinateSystem_4Bpp(dataIn, windowWidthPx, windowHeightPx, dataOut, invertColors);
 }
 
-__attribute__((optimize("O1"))) static uint8_t *s_EinkTransformFrameCoordinateSystem_4Bpp(
-    uint8_t *dataIn,
-    uint16_t windowWidthPx,
-    uint16_t windowHeightPx,
-    uint8_t *dataOut,
-    EinkDisplayColorMode_e invertColors)
-{
-    // In 3bpp and 4bpp modes there are 2 pixels in the byte. Using 8bpp to process the whole uint32_t at once for
-    // faster execution
-    const uint8_t pixelsInByte = 8;
-
-    uint32_t pixels    = 0;
-    uint32_t *outArray = (uint32_t *)dataOut;
-
-    for (int32_t inputCol = windowWidthPx - 1; inputCol >= 0; --inputCol) {
-        for (int32_t inputRow = windowHeightPx - 1; inputRow >= 7; inputRow -= pixelsInByte) {
-            // HACK: Did not create the loop for accessing pixels and merging them in the single byte for better
-            // performance.
-            //       Wanted to avoid unneeded loop count increasing and jump operations which for large amount of data
-            //       take considerable amount of time. Using 8 pixels at a time for better performance
-            uint32_t index = inputRow * BOARD_EINK_DISPLAY_RES_X + inputCol;
-
-            // Get 4x 2 adjacent pixels to process them as uint32_t for better execution timings
-            uint8_t firstPixel =
-                (dataIn[index - 0 * BOARD_EINK_DISPLAY_RES_X] << 4) | dataIn[index - 1 * BOARD_EINK_DISPLAY_RES_X];
-            uint8_t thirdPixel =
-                (dataIn[index - 2 * BOARD_EINK_DISPLAY_RES_X] << 4) | dataIn[index - 3 * BOARD_EINK_DISPLAY_RES_X];
-            uint8_t fifthPixel =
-                (dataIn[index - 4 * BOARD_EINK_DISPLAY_RES_X] << 4) | dataIn[index - 5 * BOARD_EINK_DISPLAY_RES_X];
-            uint8_t seventhPixel =
-                (dataIn[index - 6 * BOARD_EINK_DISPLAY_RES_X] << 4) | dataIn[index - 7 * BOARD_EINK_DISPLAY_RES_X];
-
-            // Put the pixels in the uint32_t for faster processing
-            pixels = firstPixel | (thirdPixel << 8) | (fifthPixel << 16) | (seventhPixel << 24);
-
-            if (invertColors) {
-                pixels = ~pixels;
-            }
-
-            // Put the pixels in order: Most left positioned pixel at the most significant side of byte
-            *outArray = pixels;
-            ++outArray;
-        }
-    }
-
-    return dataOut;
-}
-
 __attribute__((optimize("O1"))) static uint8_t *s_EinkTransformAnimationFrameCoordinateSystem_1Bpp(
     uint8_t *dataIn,
     uint16_t windowWidthPx,
@@ -1304,11 +1243,10 @@ __attribute__((optimize("O3"))) static uint8_t *s_EinkTransformAnimationFrameCoo
     EinkDisplayColorMode_e invertColors)
 {
     // The 4bpp is coded the same way as the 3bpp
-    return s_EinkTransformAnimationFrameCoordinateSystem_4Bpp(
-        dataIn, windowWidthPx, windowHeightPx, dataOut, invertColors);
+    return s_EinkTransformFrameCoordinateSystem_4Bpp(dataIn, windowWidthPx, windowHeightPx, dataOut, invertColors);
 }
 
-__attribute__((optimize("O1"))) static uint8_t *s_EinkTransformAnimationFrameCoordinateSystem_4Bpp(
+__attribute__((optimize("O1"))) static uint8_t *s_EinkTransformFrameCoordinateSystem_4Bpp(
     uint8_t *dataIn,
     uint16_t windowWidthPx,
     uint16_t windowHeightPx,
@@ -1341,6 +1279,52 @@ __attribute__((optimize("O1"))) static uint8_t *s_EinkTransformAnimationFrameCoo
 
             // Put the pixels in the uint32_t for faster processing
             pixels = firstPixelPair | (secondPixelPair << 8) | (thirdPixelPair << 16) | (fourthPixelPair << 24);
+
+            if (invertColors) {
+                pixels = ~pixels;
+            }
+
+            // Put the pixels in order: Most left positioned pixel at the most significant side of byte
+            *outArray = pixels;
+            ++outArray;
+        }
+    }
+
+    return dataOut;
+}
+
+__attribute__((optimize("O1"))) static uint8_t *s_EinkTransformFrameCoordinateSystemNoRotation_4Bpp(
+    uint8_t *dataIn,
+    uint16_t windowWidthPx,
+    uint16_t windowHeightPx,
+    uint8_t *dataOut,
+    EinkDisplayColorMode_e invertColors)
+{
+    // In 3bpp and 4bpp modes there are 2 pixels in the byte. Using 8bpp to process the whole uint32_t at once for
+    // faster execution
+    const uint8_t pixelsInByte = 8;
+
+    uint32_t pixels    = 0;
+    uint32_t *outArray = (uint32_t *)dataOut;
+    int32_t inputRow   = 0;
+    int32_t inputCol   = 0;
+
+    for (inputRow = windowHeightPx - 1; inputRow >= 0; --inputRow) {
+        for (inputCol = 0; inputCol < windowWidthPx - 7; inputCol += pixelsInByte) {
+            // HACK: Did not create the loop for accessing pixels and merging them in the single byte for better
+            // performance.
+            //       Wanted to avoid unneeded loop count increasing and jump operations which for large amount of data
+            //       take considerable amount of time. Using 8 pixels at a time for better performance
+            uint32_t index = inputRow * BOARD_EINK_DISPLAY_RES_X + inputCol;
+
+            // Get 4x 2 adjacent pixels to process them as uint32_t for better execution timings
+            uint8_t firstPixelPair  = (dataIn[index] << 4) | dataIn[index + 1];
+            uint8_t secondPixelPair = (dataIn[index + 2] << 4) | dataIn[index + 3];
+            uint8_t thirdPixelPair  = (dataIn[index + 4] << 4) | dataIn[index + 5];
+            uint8_t fourthPixelPair = (dataIn[index + 6] << 4) | dataIn[index + 7];
+
+            // Put the pixels in the uint32_t for faster processing
+            pixels = (firstPixelPair) | (secondPixelPair << 8) | (thirdPixelPair << 16) | (fourthPixelPair << 24);
 
             if (invertColors) {
                 pixels = ~pixels;

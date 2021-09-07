@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -12,7 +12,7 @@
 #include <Service/Common.hpp>
 #include <Service/Service.hpp>
 #include <ThreadRecord.hpp>
-#include <json/json11.hpp>
+#include <json11.hpp>
 
 namespace sys
 {
@@ -34,7 +34,7 @@ namespace parserFSM
         auto deleteDBEntry(Context &context) -> sys::ReturnCodes override;
 
         static auto toJson(const SMSRecord &record) -> json11::Json;
-        static auto toJson(const ThreadRecord &record) -> json11::Json;
+        static auto toJson(const ThreadRecord &thread, const utils::PhoneNumber::View &number) -> json11::Json;
         static auto toJson(const SMSTemplateRecord &record) -> json11::Json;
         static auto fromJson(const json11::Json &msgJson) -> SMSTemplateRecord;
 
@@ -51,6 +51,16 @@ namespace parserFSM
         auto createTemplate(Context &context) -> sys::ReturnCodes;
         auto updateTemplate(Context &context) -> sys::ReturnCodes;
         auto deleteTemplate(Context &context) -> sys::ReturnCodes;
+
+        void requestCount(Context &context);
+        void getMessageById(Context &context);
+        auto getMessagesByThreadID(Context &context) -> sys::ReturnCodes;
+        void getByMessageBody(Context &context);
+        auto getMessages(Context &context) -> sys::ReturnCodes;
+
+        void getTemplatesCount(Context &context);
+        void getTemplateByID(Context &context);
+        auto getMessagesTemplates(Context &context) -> sys::ReturnCodes;
 
         json11::Json receivedJson;
 

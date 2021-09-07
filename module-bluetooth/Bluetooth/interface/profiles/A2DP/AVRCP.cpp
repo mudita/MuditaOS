@@ -1,7 +1,12 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AVRCP.hpp"
+
+#include <service-audio/AudioServiceName.hpp>
+#include <service-bluetooth/Constants.hpp>
+#include <service-bluetooth/messages/AudioVolume.hpp>
+#include <service-bluetooth/messages/AudioNotify.hpp>
 
 namespace bluetooth
 {
@@ -11,6 +16,7 @@ namespace bluetooth
     MediaContext AVRCP::mediaTracker;
     std::array<uint8_t, 200> AVRCP::sdpTargetServiceBuffer;
     std::array<uint8_t, 200> AVRCP::sdpControllerServiceBuffer;
+    sys::Service *AVRCP::ownerService = nullptr;
 
     void AVRCP::packetHandler(uint8_t packetType, uint16_t channel, uint8_t *packet, uint16_t size)
     {
@@ -64,10 +70,11 @@ namespace bluetooth
         }
     }
 
-    void AVRCP::targetPacketHandler(uint8_t packetType, uint16_t channel, uint8_t *packet, uint16_t size)
+    void AVRCP::targetPacketHandler(uint8_t packetType,
+                                    [[maybe_unused]] uint16_t channel,
+                                    uint8_t *packet,
+                                    [[maybe_unused]] uint16_t size)
     {
-        UNUSED(channel);
-        UNUSED(size);
         uint8_t status = ERROR_CODE_SUCCESS;
 
         if (packetType != HCI_EVENT_PACKET) {
@@ -102,20 +109,21 @@ namespace bluetooth
                                               AVRCP::playInfo.song_position_ms,
                                               AVRCP::playInfo.status);
             break;
-            // case AVRCP_SUBEVENT_NOW_PLAYING_INFO_QUERY:
-            //     status = avrcp_target_now_playing_info(avrcp_cid);
-            //     break;
         case AVRCP_SUBEVENT_OPERATION: {
             auto operation_id = (avrcp_operation_id_t)avrcp_subevent_operation_get_operation_id(packet);
             switch (operation_id) {
-            case AVRCP_OPERATION_ID_PLAY:
+            case AVRCP_OPERATION_ID_PLAY: {
                 LOG_INFO("AVRCP Target: PLAY\n");
-                status = a2dp_source_start_stream(AVRCP::mediaTracker.a2dp_cid, AVRCP::mediaTracker.local_seid);
-                break;
-            case AVRCP_OPERATION_ID_PAUSE:
+                auto &busProxy = AVRCP::ownerService->bus;
+                busProxy.sendUnicast(std::make_shared<message::bluetooth::AudioStart>(), service::name::audio);
+                return;
+            } break;
+            case AVRCP_OPERATION_ID_PAUSE: {
                 LOG_INFO("AVRCP Target: PAUSE\n");
-                status = a2dp_source_pause_stream(AVRCP::mediaTracker.a2dp_cid, AVRCP::mediaTracker.local_seid);
-                break;
+                auto &busProxy = AVRCP::ownerService->bus;
+                busProxy.sendUnicast(std::make_shared<message::bluetooth::AudioPause>(), service::name::audio);
+                return;
+            } break;
             case AVRCP_OPERATION_ID_STOP:
                 LOG_INFO("AVRCP Target: STOP\n");
                 status = a2dp_source_disconnect(AVRCP::mediaTracker.a2dp_cid);
@@ -136,10 +144,11 @@ namespace bluetooth
         }
     }
 
-    void AVRCP::controllerPacketHandler(uint8_t packetType, uint16_t channel, uint8_t *packet, uint16_t size)
+    void AVRCP::controllerPacketHandler(uint8_t packetType,
+                                        [[maybe_unused]] uint16_t channel,
+                                        [[maybe_unused]] uint8_t *packet,
+                                        uint16_t size)
     {
-        UNUSED(channel);
-        UNUSED(size);
         uint8_t status = 0xFF;
 
         if (packetType != HCI_EVENT_PACKET) {
@@ -160,10 +169,12 @@ namespace bluetooth
         }
 
         switch (packet[2]) {
-        case AVRCP_SUBEVENT_NOTIFICATION_VOLUME_CHANGED:
-            LOG_INFO("AVRCP Controller: notification absolute volume changed %d %%\n",
-                     avrcp_subevent_notification_volume_changed_get_absolute_volume(packet) * 100 / 127);
-            break;
+        case AVRCP_SUBEVENT_NOTIFICATION_VOLUME_CHANGED: {
+            const auto volume = avrcp_subevent_notification_volume_changed_get_absolute_volume(packet);
+            auto &busProxy    = AVRCP::ownerService->bus;
+            busProxy.sendUnicast(std::make_shared<message::bluetooth::A2DPVolume>(volume), service::name::bluetooth);
+            LOG_INFO("AVRCP Controller: notification absolute volume changed %d %%\n", volume * 100 / 127);
+        } break;
         case AVRCP_SUBEVENT_GET_CAPABILITY_EVENT_ID:
             LOG_INFO("Remote supports EVENT_ID 0x%02x\n", avrcp_subevent_get_capability_event_id_get_event_id(packet));
             break;
@@ -176,8 +187,9 @@ namespace bluetooth
             break;
         }
     }
-    void AVRCP::init()
+    void AVRCP::init(sys::Service *service)
     {
+        AVRCP::ownerService = service;
         // Initialize AVRCP Service.
         avrcp_init();
         avrcp_register_packet_handler(&packetHandler);
@@ -189,4 +201,4 @@ namespace bluetooth
         avrcp_controller_register_packet_handler(&controllerPacketHandler);
     }
 
-} // namespace Bt
+} // namespace bluetooth

@@ -3,12 +3,15 @@
 
 #include "PacketData.hpp"
 
+#include <service-cellular/ServiceCellular.hpp>
+
 #include <optional>
 #include <algorithm>
 #include <iterator>
-
 #include <response.hpp>
 #include <Utils.hpp>
+#include <at/ATFactory.hpp>
+
 namespace at
 {
     namespace response
@@ -106,7 +109,7 @@ namespace packet_data
 
     PDPContext::PDPContext(ServiceCellular &cellularService) : cellularService(cellularService)
     {
-        channel = cellularService.cmux->get(TS0710::Channel::Commands);
+        channel = cellularService.cmux->get(CellularMux::Channel::Commands);
     }
 
     std::shared_ptr<APN::Config> PDPContext::getConfiguration(std::uint8_t contextId)
@@ -216,7 +219,7 @@ namespace packet_data
         PDPContext pdpCtx(cellularService);
         std::shared_ptr<APN::Config> apnConfig;
         std::shared_ptr<APN::Config> modemApn;
-        if (!((modemApn = pdpCtx.getConfiguration(ctxId)) && (modemApn != nullptr))) {
+        if (!(modemApn = pdpCtx.getConfiguration(ctxId))) {
             return at::Result::Code::ERROR;
         }
         auto phoneApn = contextMap.find(ctxId);
@@ -260,7 +263,9 @@ namespace packet_data
     void PacketData::setupAPNSettings()
     {
         for (std::uint8_t ctxId = MINContextId; ctxId <= MAXContextId; ctxId++) {
-            updateAPNSettings(ctxId);
+            if (updateAPNSettings(ctxId) != at::Result::Code::OK) {
+                LOG_ERROR("Failed update APN settings for context %d", ctxId);
+            }
         }
     }
 

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -6,9 +6,9 @@
 #include <Service/Service.hpp>
 #include <functional>
 #include <thread> // for Message_t, ResponseMessage, DataMessage, Message
-#include <service-db/ServiceDB.hpp>
+#include <service-db/ServiceDBCommon.hpp>
 
-#include <module-services/service-db/test/test-service-db-file_indexer.hpp>
+#include <service-db/test/test-service-db-file_indexer.hpp>
 #include <service-db/FileIndexerMessages.hpp>
 
 class ClientService : public sys::Service
@@ -140,23 +140,23 @@ TEST_CASE("FileIndexer")
 
     SECTION("List dir - support for listview")
     {
-        FileIndexer::ListDirData inputData{};
+        FileIndexer::ListDir inputData{};
         std::cout << "List dir - support for listview" << std::endl << std::flush;
 
         // GetListDir
         inputData.directory   = "mp3";
-        inputData.list_offset = 1;
-        inputData.list_limit  = 2;
+        inputData.offset      = 1;
+        inputData.limit       = 2;
 
-        auto recordPtr = std::make_unique<FileIndexer::ListDirData>(inputData);
-        auto getMsg    = std::make_shared<FileIndexer::Messages::GetListDirMessage>(std::move(recordPtr));
+        auto recordPtr = std::make_unique<FileIndexer::ListDir>(inputData);
+        auto getMsg    = std::make_shared<FileIndexer::Messages::GetListDirRequest>(std::move(recordPtr));
         std::unique_ptr<FileIndexerTest> fiAgentTest{new FileIndexerTest(&file_indexer_client_service)};
         sys::MessagePointer recMsg = fiAgentTest->handleListDirTest(getMsg.get());
-        auto msg                   = dynamic_cast<FileIndexer::Messages::GetListDirResponseMessage *>(recMsg.get());
+        auto msg                   = dynamic_cast<FileIndexer::Messages::GetListDirResponse *>(recMsg.get());
         auto fileCount             = msg->getCount();
         auto fileList              = msg->getResults();
         LOG_INFO("Total number of files in %s = %d", inputData.directory.c_str(), fileCount);
-        LOG_INFO("Limit= %d Offset= %d", inputData.list_limit, inputData.list_offset);
+        LOG_INFO("Limit= %d Offset= %d", inputData.limit, inputData.offset);
         for (auto fileRec : fileList) {
             LOG_INFO("file id= %d file path= %s  size = %d  mime= %d  mtime = %d directory= %s ftype= %d",
                      fileRec.file_id,
@@ -167,7 +167,7 @@ TEST_CASE("FileIndexer")
                      fileRec.directory.c_str(),
                      fileRec.file_type);
         }
-        REQUIRE(fileList.size() == inputData.list_limit);
+        REQUIRE(fileList.size() == inputData.limit);
         REQUIRE(fileList[0].directory == inputData.directory);
     }
 
@@ -227,7 +227,7 @@ TEST_CASE("FileIndexer")
 
     SECTION("DeleteFile /DeleteAllFilesInDir")
     {
-        FileIndexer::ListDirData inputData{};
+        FileIndexer::ListDir inputData{};
         FileIndexer::FileRecord record{};
         std::cout << "DeleteFile /DeleteAllFilesInDir" << std::endl << std::flush;
 
@@ -256,16 +256,16 @@ TEST_CASE("FileIndexer")
 
         std::cout << "Get listDir" << std::endl << std::flush;
         inputData.directory   = "wav";
-        inputData.list_offset = 0;
-        inputData.list_limit  = 10;
-        auto inputDataPtr     = std::make_unique<FileIndexer::ListDirData>(inputData);
-        auto getListDirMsg    = std::make_shared<FileIndexer::Messages::GetListDirMessage>(std::move(inputDataPtr));
+        inputData.offset      = 0;
+        inputData.limit       = 10;
+        auto inputDataPtr     = std::make_unique<FileIndexer::ListDir>(inputData);
+        auto getListDirMsg    = std::make_shared<FileIndexer::Messages::GetListDirRequest>(std::move(inputDataPtr));
         recMsg                = fiAgentTest->handleListDirTest(getListDirMsg.get());
-        auto msg              = dynamic_cast<FileIndexer::Messages::GetListDirResponseMessage *>(recMsg.get());
+        auto msg              = dynamic_cast<FileIndexer::Messages::GetListDirResponse *>(recMsg.get());
         auto fileCount        = msg->getCount();
         auto fileList         = msg->getResults();
         LOG_INFO("Total number of files in %s = %d", inputData.directory.c_str(), fileCount);
-        LOG_INFO("Limit= %d Offset= %d", inputData.list_limit, inputData.list_offset);
+        LOG_INFO("Limit= %d Offset= %d", inputData.limit, inputData.offset);
         for (auto fileRec : fileList) {
             LOG_INFO("file id= %d file path= %s  size = %d  mime= %d  mtime = %d directory= %s ftype= %d",
                      fileRec.file_id,
@@ -286,12 +286,12 @@ TEST_CASE("FileIndexer")
         auto delRecMsg   = fiAgentTest->handleDeleteFileTest(delMsg.get());
 
         inputData.directory    = "wav";
-        inputData.list_offset  = 0;
-        inputData.list_limit   = 10;
-        inputDataPtr           = std::make_unique<FileIndexer::ListDirData>(inputData);
-        getListDirMsg          = std::make_shared<FileIndexer::Messages::GetListDirMessage>(std::move(inputDataPtr));
+        inputData.offset       = 0;
+        inputData.limit        = 10;
+        inputDataPtr           = std::make_unique<FileIndexer::ListDir>(inputData);
+        getListDirMsg          = std::make_shared<FileIndexer::Messages::GetListDirRequest>(std::move(inputDataPtr));
         recMsg                 = fiAgentTest->handleListDirTest(getListDirMsg.get());
-        msg                    = dynamic_cast<FileIndexer::Messages::GetListDirResponseMessage *>(recMsg.get());
+        msg                    = dynamic_cast<FileIndexer::Messages::GetListDirResponse *>(recMsg.get());
         auto fileCountAfterDel = msg->getCount();
         REQUIRE(fileCountAfterDel == fileCount - 1);
 
@@ -303,12 +303,12 @@ TEST_CASE("FileIndexer")
         delRecMsg         = fiAgentTest->handleDeleteAllFilesInDirTest(delAllMsg.get());
 
         inputData.directory   = "wav";
-        inputData.list_offset = 0;
-        inputData.list_limit  = 10;
-        inputDataPtr          = std::make_unique<FileIndexer::ListDirData>(inputData);
-        getListDirMsg         = std::make_shared<FileIndexer::Messages::GetListDirMessage>(std::move(inputDataPtr));
+        inputData.offset      = 0;
+        inputData.limit       = 10;
+        inputDataPtr          = std::make_unique<FileIndexer::ListDir>(inputData);
+        getListDirMsg         = std::make_shared<FileIndexer::Messages::GetListDirRequest>(std::move(inputDataPtr));
         recMsg                = fiAgentTest->handleListDirTest(getListDirMsg.get());
-        msg                   = dynamic_cast<FileIndexer::Messages::GetListDirResponseMessage *>(recMsg.get());
+        msg                   = dynamic_cast<FileIndexer::Messages::GetListDirResponse *>(recMsg.get());
         fileCountAfterDel     = msg->getCount();
         REQUIRE(fileCountAfterDel == 0);
         std::cout << "DeleteFile /DeleteAllFilesInDir  finished" << std::endl << std::flush;

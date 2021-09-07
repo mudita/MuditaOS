@@ -6,7 +6,7 @@
 #include <re2/re2.h>
 
 #include <at/Commands.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 
 #include "service-cellular/requests/CallRequest.hpp"
 #include "service-cellular/requests/SupplementaryServicesRequest.hpp"
@@ -16,16 +16,16 @@
 #include "service-cellular/requests/UssdRequest.hpp"
 #include "service-cellular/requests/RejectRequest.hpp"
 
-#include <common_data/EventStore.hpp>
+#include <EventStore.hpp>
 #include <cmd/QECCNUM.hpp>
 
 namespace cellular
 {
     RequestFactory::RequestFactory(const std::string &data,
                                    at::BaseChannel &channel,
-                                   CellularCallRequestMessage::RequestMode requestMode,
-                                   SimStatus simCardStatus)
-        : request(data), channel(channel), requestMode(requestMode), simStatus(simCardStatus)
+                                   cellular::api::CallMode callMode,
+                                   bool simInserted)
+        : request(data), channel(channel), callMode(callMode), simInserted(simInserted)
     {
         registerRequest(ImeiRegex, ImeiRequest::create);
         registerRequest(PasswordRegistrationRegex, PasswordRegistrationRequest::create);
@@ -44,7 +44,7 @@ namespace cellular
     {
         at::cmd::QECCNUM cmd;
         auto qeccnumResult   = channel.cmd(cmd);
-        auto qeccnumResponse = cmd.parse(qeccnumResult);
+        auto qeccnumResponse = cmd.parseQECCNUM(qeccnumResult);
 
         auto isSimEmergency =
             std::find(qeccnumResponse.eccNumbersSim.begin(), qeccnumResponse.eccNumbersSim.end(), request) !=
@@ -54,14 +54,14 @@ namespace cellular
             qeccnumResponse.eccNumbersNoSim.end();
 
         if (isSimEmergency || isNoSimEmergency) {
-            if (simStatus == SimStatus::SimInsterted || isNoSimEmergency) {
+            if (simInserted || isNoSimEmergency) {
                 return std::make_unique<CallRequest>(request);
             }
             else {
                 return std::make_unique<RejectRequest>(RejectRequest::RejectReason::NoSim, request);
             }
         }
-        else if (requestMode == CellularCallRequestMessage::RequestMode::Emergency) {
+        else if (callMode == cellular::api::CallMode::Emergency) {
             return std::make_unique<RejectRequest>(RejectRequest::RejectReason::NotAnEmergencyNumber, request);
         }
         return nullptr;
@@ -116,7 +116,7 @@ namespace cellular
             }
         }
 
-        if (simStatus == SimStatus::SimSlotEmpty) {
+        if (!simInserted) {
             return std::make_unique<RejectRequest>(RejectRequest::RejectReason::NoSim, request);
         }
         return std::make_unique<CallRequest>(request);

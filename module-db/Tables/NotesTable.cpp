@@ -1,7 +1,9 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NotesTable.hpp"
+#include <log.hpp>
+#include <string>
 
 NotesTable::NotesTable(Database *db) : Table(db)
 {}
@@ -117,11 +119,23 @@ std::vector<NotesTableRow> NotesTable::getLimitOffsetByField(std::uint32_t offse
     return ret;
 }
 
-std::vector<NotesTableRow> NotesTable::getByText(const std::string &text)
+std::pair<std::vector<NotesTableRow>, int> NotesTable::getByText(const std::string &text,
+                                                                 unsigned int offset,
+                                                                 unsigned int limit)
 {
-    auto retQuery = db->query("SELECT *, INSTR(snippet,'%s') pos FROM notes WHERE pos > 0;", text.c_str());
+
+    unsigned int count = 0;
+    auto queryRet      = db->query("SELECT COUNT(*), INSTR(snippet,'%q') pos FROM notes WHERE pos > 0;", text.c_str());
+    if (queryRet && queryRet->getRowCount() != 0) {
+        count = (*queryRet)[0].getUInt32();
+    }
+
+    std::string queryText = "SELECT *, INSTR(snippet,'" + text + "') pos FROM notes WHERE pos > 0 LIMIT " +
+                            std::to_string(limit) + " offset " + std::to_string(offset) + " ;";
+    auto retQuery = db->query(queryText.c_str());
+
     if (retQuery == nullptr || retQuery->getRowCount() == 0) {
-        return {};
+        return {{}, count};
     }
 
     std::vector<NotesTableRow> records;
@@ -133,7 +147,8 @@ std::vector<NotesTableRow> NotesTable::getByText(const std::string &text)
         };
         records.push_back(std::move(row));
     } while (retQuery->nextRow());
-    return records;
+
+    return {records, count};
 }
 
 std::uint32_t NotesTable::count()

@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "Modem/ATCommon.hpp"
-#include "Modem/BaseChannel.hpp"
+#include "modem/ATCommon.hpp"
+#include "modem/BaseChannel.hpp"
 
 namespace at
 {
@@ -32,16 +32,16 @@ namespace at
             return ResultMock();
         }
 
-        void cmd_init() override
+        void cmdInit() override
         {}
 
-        void cmd_send(std::string cmd) override
+        void cmdSend(std::string cmd) override
         {}
 
-        void cmd_post() override
+        void cmdPost() override
         {}
 
-        std::string cmd_receive() override
+        size_t cmdReceive(std::uint8_t *buffer, std::chrono::milliseconds timeoutMs) override
         {
             return {};
         }
@@ -49,7 +49,7 @@ namespace at
 
     class FailingChannel : public ChannelMock
     {
-        virtual Result ResultMock()
+        auto ResultMock() -> Result override
         {
             auto r = Result();
             r.code = Result::Code::ERROR;
@@ -75,7 +75,7 @@ namespace at
     /// provides CSCS bad response
     class CSCS_badChannel : public ChannelMock
     {
-        virtual Result ResultMock()
+        auto ResultMock() -> Result override
         {
             auto r     = Result();
             r.code     = Result::Code::ERROR;
@@ -87,7 +87,7 @@ namespace at
     /// standard bad CSCA values I get from modem (with result OK)
     class CSCA_emptyData : public ChannelMock
     {
-        virtual Result ResultMock()
+        auto ResultMock() -> Result override
         {
             auto r     = Result();
             r.code     = Result::Code::OK;
@@ -109,6 +109,83 @@ namespace at
             r.code = Result::Code::OK;
             // space below side to CSCS matters
             r.response = {"+CSCA: " + smsCenterAddress + "," + smsTypeOfAddress, "OK"};
+            return r;
+        }
+    };
+
+    class QNWINFO_badChannel : public ChannelMock
+    {
+        auto ResultMock() -> Result override
+        {
+            auto r     = Result();
+            r.code     = Result::Code::ERROR;
+            r.response = {"LOL", "XD", "OK"};
+            return r;
+        }
+    };
+
+    class QNWINFO_emptyData : public ChannelMock
+    {
+        auto ResultMock() -> Result override
+        {
+            auto r     = Result();
+            r.code     = Result::Code::OK;
+            r.response = {"+QNWINFO: \"\",,\"\",", "OK"};
+            return r;
+        }
+    };
+
+    class QNWINFO_successNoQuoteChannel : public ChannelMock
+    {
+      public:
+        std::string act  = "FDD LTE";
+        int op           = 46001;
+        std::string band = "LTE BAND 3";
+        int channel      = 1650;
+
+        auto ResultMock() -> Result override
+        {
+            auto r     = Result();
+            r.code     = Result::Code::OK;
+            r.response = {"+QNWINFO: " + act + "," + std::to_string(op) + "," + band + "," + std::to_string(channel),
+                          "OK"};
+            return r;
+        }
+    };
+
+    class QNWINFO_successWithQuoteChannel : public ChannelMock
+    {
+      public:
+        std::string act  = "FDD LTE";
+        int op           = 46001;
+        std::string band = "LTE BAND 3";
+        int channel      = 1650;
+
+        auto ResultMock() -> Result override
+        {
+            auto r     = Result();
+            r.code     = Result::Code::OK;
+            r.response = {"+QNWINFO: \"" + act + "\"," + std::to_string(op) + ",\"" + band + "\"," +
+                              std::to_string(channel),
+                          "OK"};
+            return r;
+        }
+    };
+
+    class QNWINFO_errorChannel : public ChannelMock
+    {
+      public:
+        std::string act  = "\"FDD LTE\"";
+        int op           = 46001;
+        std::string band = "\"LTE BAND 3\"";
+        int channel      = 1650;
+
+        auto ResultMock() -> Result override
+        {
+            auto r     = Result();
+            r.code     = Result::Code::ERROR;
+            r.response = {"+QNWINFO: " + act + "," + std::to_string(op) + "," + band + "," + std::to_string(channel),
+                          "ERROR"};
             return r;
         }
     };
@@ -190,6 +267,165 @@ namespace at
             auto result     = Result();
             result.code     = Result::Code::OK;
             result.response = {"OG"};
+            return result;
+        }
+    };
+
+    /// provides proper CFUN response
+    class CFUN_successChannel : public ChannelMock
+    {
+      public:
+        const std::string token = "1";
+
+        auto ResultMock() -> Result final
+        {
+            auto result     = Result();
+            result.code     = Result::Code::OK;
+            result.response = {"+CFUN: " + token, "OK"};
+            return result;
+        }
+    };
+
+    /// provides invalid CFUN response
+    class CFUN_invalidTokenChannel : public ChannelMock
+    {
+      public:
+        const std::string token = "7";
+
+        auto ResultMock() -> Result final
+        {
+            auto result     = Result();
+            result.code     = Result::Code::OK;
+            result.response = {"+CFUN: " + token, "OK"};
+            return result;
+        }
+    };
+
+    /// provides proper CPBS response
+    class CPBS_successChannel : public ChannelMock
+    {
+      public:
+        const std::string storage = "\"SM\"";
+        const std::string used    = "2";
+        const std::string total   = "500";
+        auto ResultMock() -> Result final
+        {
+            auto result     = Result();
+            result.code     = Result::Code::OK;
+            result.response = {"+CPBS: " + storage + "," + used + "," + total, "OK"};
+            return result;
+        }
+    };
+
+    /// provides invalid CPBS response
+    class CPBS_toManyTokens : public ChannelMock
+    {
+      public:
+        const std::string storage    = "\"SM\"";
+        const std::string used       = "2";
+        const std::string total      = "500";
+        const std::string additional = "500";
+
+        auto ResultMock() -> Result final
+        {
+            auto result     = Result();
+            result.code     = Result::Code::OK;
+            result.response = {"+CPBS: " + storage + "," + used + "," + total + "," + additional, "OK"};
+            return result;
+        }
+    };
+
+    /// provides invalid CPBS response
+    class CPBS_toLittleTokens : public ChannelMock
+    {
+      public:
+        const std::string storage = "\"SM\"";
+        const std::string used    = "2";
+
+        auto ResultMock() -> Result final
+        {
+            auto result     = Result();
+            result.code     = Result::Code::OK;
+            result.response = {"+CPBS: " + storage + "," + used, "OK"};
+            return result;
+        }
+    };
+
+    /// provides proper CPBR response
+    class CPBR_successChannel : public ChannelMock
+    {
+      public:
+        const std::string index1  = "1";
+        const std::string number1 = "123456789";
+        const std::string type1   = "161"; // proper type, national
+        const std::string text1   = "Mock1";
+
+        const std::string index2  = "2";
+        const std::string number2 = "+48123456789";
+        const std::string type2   = "145"; // proper type international
+        const std::string text2   = "Mock2";
+
+        auto ResultMock() -> Result final
+        {
+            auto result     = Result();
+            result.code     = Result::Code::OK;
+            result.response = {"+CPBR: " + index1 + "," + number1 + "," + type1 + "," + text1,
+                               "+CPBR: " + index2 + "," + number2 + "," + type2 + "," + text2,
+                               "OK"};
+            return result;
+        }
+    };
+
+    /// provides invalid CPBR response
+    class CPBR_toLittleTokens : public ChannelMock
+    {
+      public:
+        const std::string index1  = "1";
+        const std::string number1 = "1234";
+        const std::string type1   = "161"; // proper type, national
+
+        auto ResultMock() -> Result final
+        {
+            auto result     = Result();
+            result.code     = Result::Code::OK;
+            result.response = {"+CPBR: " + index1 + "," + number1 + "," + type1, "OK"};
+            return result;
+        }
+    };
+
+    /// provides invalid CPBR response
+    class CPBR_toManyTokens : public ChannelMock
+    {
+      public:
+        const std::string index1     = "1";
+        const std::string number1    = "1234";
+        const std::string type1      = "161"; // proper type, national
+        const std::string text1      = "Mock1";
+        const std::string additional = "500";
+
+        auto ResultMock() -> Result final
+        {
+            auto result     = Result();
+            result.code     = Result::Code::OK;
+            result.response = {"+CPBR: " + index1 + "," + number1 + "," + type1 + "," + text1, "," + additional, "OK"};
+            return result;
+        }
+    };
+
+    /// provides invalid CPBR response
+    class CPBR_invalidType : public ChannelMock
+    {
+      public:
+        const std::string index1  = "1";
+        const std::string number1 = "1234";
+        const std::string type1   = "7"; // invalid type
+        const std::string text1   = "Mock1";
+
+        auto ResultMock() -> Result final
+        {
+            auto result     = Result();
+            result.code     = Result::Code::OK;
+            result.response = {"+CPBR: " + index1 + "," + number1 + "," + type1 + "," + text1, "OK"};
             return result;
         }
     };

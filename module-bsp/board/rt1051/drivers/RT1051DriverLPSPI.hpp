@@ -5,7 +5,7 @@
 
 #include "drivers/lpspi/DriverLPSPI.hpp"
 #include "RT1051DriverPLL2.hpp"
-#include "board/rt1051/common/clock_config.h"
+#include "board/clock_config.h"
 
 namespace drivers
 {

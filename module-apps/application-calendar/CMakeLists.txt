@@ -1,46 +1,55 @@
-﻿target_sources( ${PROJECT_NAME}
+﻿# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+# For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+add_library(application-calendar STATIC)
+
+target_include_directories(application-calendar
 	PRIVATE
-		"${CMAKE_CURRENT_LIST_DIR}/ApplicationCalendar.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/data/CalendarData.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/models/MonthModel.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/CalendarMainWindow.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/DayEventsWindow.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/CalendarEventsOptionsWindow.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/AllEventsWindow.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/EventDetailWindow.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/NewEditEventWindow.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/CustomRepeatWindow.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/models/AllEventsModel.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/models/EventDetailModel.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/EventDetailWindow.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/EventReminderWindow.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/models/CustomRepeatModel.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/models/NewEditEventModel.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/models/DayEventsModel.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/widgets/DayEventsItem.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/widgets/AllEventsItem.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/widgets/CalendarListView.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/widgets/EventDetailDescriptionItem.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/widgets/RepeatAndReminderItem.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/widgets/CheckBoxWithLabelItem.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/widgets/SeveralOptionsItem.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/widgets/TextWithLabelItem.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/widgets/NewEventCheckBoxWithLabel.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/widgets/DayLabel.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/widgets/MonthBox.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/widgets/CalendarDateItem.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/widgets/CalendarTimeItem.cpp"
+		$<BUILD_INTERFACE:
+			${CMAKE_CURRENT_SOURCE_DIR}
+			data
+			include/
+			models
+			widgets
+			windows
+		>
 	PUBLIC
-		"${CMAKE_CURRENT_LIST_DIR}/ApplicationCalendar.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/models/MonthModel.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/widgets/CalendarListItem.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/widgets/CalendarStyle.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/data/OptionParser.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/data/CalendarData.hpp"
+		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
 
-target_link_libraries(${PROJECT_NAME}
-    PUBLIC
-        service-db
-    )
+target_sources(application-calendar
+
+	PRIVATE
+		ApplicationCalendar.cpp
+		data/CalendarData.cpp
+		models/MonthModel.cpp
+		widgets/DayLabel.cpp
+		widgets/MonthBox.cpp
+		windows/CalendarMainWindow.cpp
+
+	PRIVATE
+		models/MonthModel.hpp
+		widgets/DayLabel.hpp
+		widgets/MonthBox.hpp
+		windows/CalendarMainWindow.hpp
+		
+	PUBLIC
+		include/application-calendar/ApplicationCalendar.hpp
+		include/application-calendar/data/CalendarData.hpp
+		include/application-calendar/data/OptionParser.hpp
+)
+
+target_link_libraries(application-calendar
+	PUBLIC
+		apps-common
+		date::date
+		module-gui
+		module-sys
+		module-utils
+		time-constants
+
+	PRIVATE
+		service-appmgr
+		service-db
+		service-time
+)

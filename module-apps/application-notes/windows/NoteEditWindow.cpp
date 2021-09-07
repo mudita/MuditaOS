@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NoteEditWindow.hpp"
@@ -7,17 +7,15 @@
 
 #include <Style.hpp>
 
-#include <module-apps/application-notes/ApplicationNotes.hpp>
+#include <application-notes/ApplicationNotes.hpp>
 #include <module-apps/application-notes/windows/NotesOptions.hpp>
 #include <module-apps/application-notes/data/NoteSwitchData.hpp>
 #include <module-apps/application-notes/style/NoteEditStyle.hpp>
-#include <module-apps/messages/OptionsWindow.hpp>
+#include <apps-common/messages/OptionsWindow.hpp>
 
 #include <i18n/i18n.hpp>
-#include <module-utils/time/time_conversion.hpp>
 
-#include <module-gui/gui/widgets/BottomBar.hpp>
-#include <module-gui/gui/widgets/TopBar.hpp>
+#include <ctime>
 
 namespace app::notes
 {
@@ -28,7 +26,13 @@ namespace app::notes
 
     NoteEditWindow::NoteEditWindow(app::Application *app,
                                    std::unique_ptr<NoteEditWindowContract::Presenter> &&windowPresenter)
-        : gui::AppWindow(app, gui::name::window::note_edit), presenter{std::move(windowPresenter)}
+        : NoteEditWindow(app, std::move(windowPresenter), gui::name::window::note_edit)
+    {}
+
+    NoteEditWindow::NoteEditWindow(app::Application *app,
+                                   std::unique_ptr<NoteEditWindowContract::Presenter> &&windowPresenter,
+                                   const std::string &windowName)
+        : gui::AppWindow{app, windowName}, presenter{std::move(windowPresenter)}
     {
         presenter->attach(this);
         buildInterface();
@@ -49,7 +53,7 @@ namespace app::notes
     {
         AppWindow::buildInterface();
 
-        setTitle(utils::localize.get("app_notes_edit_new_note"));
+        setTitle(utils::translate("app_notes_edit_new_note"));
 
         namespace editStyle = app::notes::style::edit;
         charactersCounter   = new gui::Label(
@@ -73,17 +77,21 @@ namespace app::notes
             [=](const UTF8 &text) { bottomBarTemporaryMode(text); },
             [=]() { bottomBarRestoreFromTemporaryMode(); },
             [=]() { selectSpecialCharacter(); }));
-        edit->setTextChangedCallback([this](Item &, const UTF8 &text) { setCharactersCount(text.length()); });
+        edit->setTextChangedCallback([this](Item &, const UTF8 &text) {
+            const auto count = text.length();
+            setCharactersCount(count);
+            onCharactersCountChanged(count);
+        });
         edit->setTextLimitType(gui::TextLimitType::MaxSignsCount, MaxCharactersCount);
 
         bottomBar->setActive(gui::BottomBar::Side::LEFT, true);
-        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::localize.get(::style::strings::common::options));
+        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::translate(::style::strings::common::options));
 
         bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get(::style::strings::common::save));
+        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(::style::strings::common::save));
 
         bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
-        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(::style::strings::common::back));
+        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(::style::strings::common::back));
 
         setFocusItem(edit);
     }
@@ -93,6 +101,11 @@ namespace app::notes
         std::ostringstream counterText;
         counterText << count << '/' << MaxCharactersCount;
         charactersCounter->setText(counterText.str());
+    }
+
+    void NoteEditWindow::onCharactersCountChanged([[maybe_unused]] std::uint32_t count)
+    {
+        presenter->onNoteChanged();
     }
 
     void NoteEditWindow::destroyInterface()
@@ -109,8 +122,15 @@ namespace app::notes
             return;
         }
 
-        notesRecord = std::make_unique<NotesRecord>(editData->getRecord());
+        notesRecord = editData->getRecord();
         setNoteText(notesRecord->snippet);
+    }
+
+    void NoteEditWindow::onClose([[maybe_unused]] CloseReason reason)
+    {
+        if (presenter->isAutoSaveApproved()) {
+            saveNote();
+        }
     }
 
     void NoteEditWindow::setNoteText(const UTF8 &text)
@@ -120,16 +140,16 @@ namespace app::notes
 
     bool NoteEditWindow::onInput(const gui::InputEvent &inputEvent)
     {
-        if (inputEvent.isShortPress()) {
+        if (inputEvent.isShortRelease()) {
             if (inputEvent.is(gui::KeyCode::KEY_ENTER)) {
                 saveNote();
-                auto switchData                        = std::make_unique<NoteSwitchData>(*notesRecord);
+                auto switchData                        = std::make_unique<NoteSwitchData>(notesRecord);
                 switchData->ignoreCurrentWindowOnStack = true;
                 application->switchWindow(gui::name::window::note_preview, std::move(switchData));
             }
             if (inputEvent.is(gui::KeyCode::KEY_LF)) {
                 application->switchWindow(
-                    utils::localize.get("app_phonebook_options_title"),
+                    utils::translate("app_phonebook_options_title"),
                     std::make_unique<gui::OptionsWindowOptions>(noteEditOptions(application, *notesRecord, edit)));
             }
         }
@@ -138,8 +158,14 @@ namespace app::notes
 
     void NoteEditWindow::saveNote()
     {
-        notesRecord->date    = utils::time::getCurrentTimestamp().getTime();
+        notesRecord->date    = std::time(nullptr);
         notesRecord->snippet = edit->getText();
-        presenter->save(*notesRecord);
+        presenter->save(notesRecord);
+        LOG_INFO("Note saved.");
+    }
+
+    bool NoteEditWindow::isNoteEmpty() const noexcept
+    {
+        return edit != nullptr ? edit->isEmpty() : true;
     }
 } // namespace app::notes

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "gtest/gtest.h"
@@ -11,7 +11,8 @@
 #include "Label.hpp"
 #include "Window.hpp"
 #include "BottomBar.hpp"
-#include "TopBar.hpp"
+#include "StatusBar.hpp"
+#include "ListItem.hpp"
 
 using ::testing::Matcher;
 using ::testing::Ref;
@@ -25,7 +26,8 @@ class VisitorMock : public gui::GuiVisitor
     MOCK_METHOD1(visit, void(gui::Window &item));
     MOCK_METHOD1(visit, void(gui::Label &item));
     MOCK_METHOD1(visit, void(gui::BottomBar &item));
-    MOCK_METHOD1(visit, void(gui::top_bar::TopBar &item));
+    MOCK_METHOD1(visit, void(gui::status_bar::StatusBar &item));
+    MOCK_METHOD1(visit, void(gui::ListItem &item));
 };
 
 class CustomRect : public gui::Rect

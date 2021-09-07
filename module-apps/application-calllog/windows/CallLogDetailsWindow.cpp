@@ -5,39 +5,27 @@
 #include <memory>
 #include <functional>
 
-#include "OptionsWindow.hpp"
-#include <service-appmgr/model/ApplicationManager.hpp>
-#include <service-appmgr/Controller.hpp>
+#include <OptionsWindow.hpp>
+#include "ApplicationCallLog.hpp"
+#include "data/CallLogInternals.hpp"
+#include "data/CallLogSwitchData.hpp"
+#include "windows/CallLogOptionsWindow.hpp"
+#include <widgets/TextWithIconsWidget.hpp>
+#include <widgets/ActiveIconFactory.hpp>
 
-#include "bsp/rtc/rtc.hpp"
-
-#include "../ApplicationCallLog.hpp"
-
-#include <service-db/DBMessage.hpp>
+#include <gsl/assert>
 #include <i18n/i18n.hpp>
-
-#include "../data/CallLogInternals.hpp" // TODO: alek: add easier paths
-#include "../data/CallLogSwitchData.hpp"
-#include "../windows/CallLogOptionsWindow.hpp"
-#include "Label.hpp"
-#include "Margins.hpp"
-#include "application-call/ApplicationCall.hpp"
-#include <application-call/data/CallSwitchData.hpp>
-#include "time/time_conversion.hpp"
+#include <time/time_conversion_factory.hpp>
 #include <Style.hpp>
 #include <cassert>
-#include <module-apps/application-messages/data/SMSdata.hpp>
 
-using namespace calllog;
-using namespace callLogStyle::detailsWindow;
-
+namespace detailsWindow = callLogStyle::detailsWindow;
 namespace gui
 {
 
     CallLogDetailsWindow::CallLogDetailsWindow(app::Application *app)
         : AppWindow(app, calllog::settings::DetailsWindowStr)
     {
-
         buildInterface();
     }
 
@@ -47,145 +35,103 @@ namespace gui
         buildInterface();
     }
 
-    Label *CallLogDetailsWindow::decorateLabel(Label *label)
+    namespace
     {
-        if (label == nullptr) {
-            LOG_ERROR("label is nullptr");
-            return label;
+        Rect *decorate(Rect *rect)
+        {
+            Expects(rect != nullptr);
+            rect->setEdges(RectangleEdge::None);
+            rect->activeItem = false;
+            return rect;
         }
-        style::window::decorate(label);
-        label->setFont(style::window::font::small);
-        label->setSize(label->widgetArea.w, style::window::label::big_h);
-        label->setLineMode(true);
 
-        return label;
+        [[nodiscard]] auto createText(const std::string &text, const UTF8 &font)
+        {
+            auto textWidget = new gui::Text();
+            textWidget->setEdges(RectangleEdge::None);
+            textWidget->setMaximumSize(detailsWindow::w, detailsWindow::widget::h);
+            textWidget->setMinimumSize(detailsWindow::widget::h, Axis::Y);
+            textWidget->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Center));
+            textWidget->setFont(font);
+            textWidget->setText(text);
+            return textWidget;
+        }
+
+        void addSnippetWithText(gui::Item *parent, const UTF8 &image, const std::string &text, const Margins &margins)
+        {
+            auto textHBox = decorate(new gui::HBox(parent, 0, 0, parent->getWidth(), detailsWindow::widget::h));
+            textHBox->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Center));
+
+            const auto font  = style::window::font::medium;
+            auto imageWidget = new gui::Image(image);
+            imageWidget->setMargins(margins);
+            textHBox->addWidget(imageWidget);
+            textHBox->addWidget(createText(text, font));
+            parent->addWidget(new TextWithSnippet(text, font, image));
+        }
+
+        void addNextListHeader(gui::Item *parent, const std::string &text)
+        {
+            parent->addWidget(decorate(new TextWithSnippet(text, style::window::font::small)));
+        }
+    } // namespace
+
+    void CallLogDetailsWindow::buildNumberWidget(gui::Item *parent)
+    {
+        Expects(parent != nullptr);
+        addNextListHeader(parent, utils::translate(style::strings::common::information));
+        numberHBox = new TextWithIconsWidget(parent);
     }
 
-    Label *CallLogDetailsWindow::decorateData(Label *label)
+    void CallLogDetailsWindow::buildCallDataWidget(gui::Item *parent)
     {
-        if (label == nullptr) {
-            LOG_ERROR("label is nullptr");
-            return label;
-        }
-        style::window::decorate(label);
-        label->setFont(style::window::font::medium);
-        label->setSize(label->widgetArea.w, style::window::label::small_h);
+        Expects(parent != nullptr);
+        auto callBox = decorate(
+            new gui::VBox(parent, 0, 0, parent->getWidth() / detailsWindow::callData::columns, parent->getHeight()));
+        addNextListHeader(callBox, utils::translate("app_calllog_type"));
+        typeHBox = new gui::HBox(callBox, 0, 0, callBox->getWidth(), detailsWindow::widget::h);
+        typeHBox->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Center));
+        decorate(typeHBox);
+    }
 
-        return label;
+    void CallLogDetailsWindow::buildCallDurationWidget(gui::Item *parent)
+    {
+        Expects(parent != nullptr);
+        auto durationBox = decorate(
+            new gui::VBox(parent, 0, 0, parent->getWidth() / detailsWindow::callData::columns, parent->getHeight()));
+        addNextListHeader(durationBox, utils::translate("app_calllog_duration"));
+        durationData = createText("", style::window::font::medium);
+        durationBox->addWidget(durationData);
+    }
+
+    void CallLogDetailsWindow::buildDateWidgets(gui::Item *parent)
+    {
+        Expects(parent != nullptr);
+        addNextListHeader(parent, utils::translate("app_calllog_date"));
+        auto dateBox = decorate(new gui::VBox(parent, 0, 0, parent->getWidth(), detailsWindow::date::h));
+        dateBox->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Bottom));
+        dateDay  = new Text(dateBox, 0, 0, dateBox->getWidth(), detailsWindow::widget::smallH);
+        dateDate = new Text(dateBox, 0, 0, dateBox->getWidth(), detailsWindow::widget::smallH);
+        dateDay->setFont(style::window::font::medium);
+        dateDate->setFont(style::window::font::medium);
     }
 
     void CallLogDetailsWindow::buildInterface()
     {
         AppWindow::buildInterface();
 
-        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(style::strings::common::options));
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::call));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::options));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
-        // NOTE: height of all labels is set using decorators
+        auto vBox = new VBox(this, detailsWindow::x + 10, detailsWindow::y, detailsWindow::w, detailsWindow::h);
+        vBox->setEdges(RectangleEdge::None);
+        buildNumberWidget(vBox);
 
-        // Information
-        informationLabel = decorateLabel(new gui::Label(this,
-                                                        information::label::x,
-                                                        information::label::y,
-                                                        information::label::w,
-                                                        0,
-                                                        utils::localize.get(style::strings::common::information)));
-        number           = decorateData(
-            new gui::Label(this, information::number::x, information::number::y, information::number::w, 0));
-        number->setFont(style::window::font::mediumbold);
+        auto callDataDurationBox = decorate(new gui::HBox(vBox, 0, 0, vBox->getWidth(), detailsWindow::callData::h));
+        buildCallDataWidget(callDataDurationBox);
+        buildCallDurationWidget(callDataDurationBox);
 
-        for (uint32_t i = 0; i < 2; ++i) {
-            rects[i] = new gui::Rect(this, 0, 0, information::imgs::w, information::imgs::h);
-            rects[i]->setFilled(false);
-            rects[i]->setEdges(RectangleEdge::Bottom | RectangleEdge::Top);
-            rects[i]->setPenFocusWidth(style::window::default_border_focus_w);
-            rects[i]->setPenWidth(style::window::default_border_no_focus_w);
-        }
-
-        rects[static_cast<uint32_t>(FocusRects::Call)]->setPosition(information::imgs::call::x, information::imgs::y);
-        rects[static_cast<uint32_t>(FocusRects::Sms)]->setPosition(information::imgs::sms::x, information::imgs::y);
-
-        // TODO: alek: phone ringing seems to be to small
-        callImg = new gui::Image(rects[FocusRects::Call],
-                                 information::imgs::call::icon::x,
-                                 information::imgs::call::icon::y,
-                                 0,
-                                 0,
-                                 "phonebook_phone_ringing");
-        smsImg  = new gui::Image(
-            rects[FocusRects::Sms], information::imgs::sms::icon::x, information::imgs::call::icon::y, 0, 0, "mail");
-
-        // define navigation between labels
-        rects[static_cast<uint32_t>(FocusRects::Call)]->setNavigationItem(
-            NavigationDirection::LEFT, rects[static_cast<uint32_t>(FocusRects::Sms)]);
-        rects[static_cast<uint32_t>(FocusRects::Call)]->setNavigationItem(
-            NavigationDirection::RIGHT, rects[static_cast<uint32_t>(FocusRects::Sms)]);
-
-        rects[static_cast<uint32_t>(FocusRects::Sms)]->setNavigationItem(
-            NavigationDirection::LEFT, rects[static_cast<uint32_t>(FocusRects::Call)]);
-        rects[static_cast<uint32_t>(FocusRects::Sms)]->setNavigationItem(
-            NavigationDirection::RIGHT, rects[static_cast<uint32_t>(FocusRects::Call)]);
-
-        // focus callbacks
-        rects[static_cast<uint32_t>(FocusRects::Call)]->focusChangedCallback = [=](gui::Item &item) {
-            bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::call));
-            return true;
-        };
-
-        rects[static_cast<uint32_t>(FocusRects::Sms)]->focusChangedCallback = [=](gui::Item &item) {
-            bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::send));
-            return true;
-        };
-
-        // activated callbacks
-        rects[FocusRects::Call]->activatedCallback = [=](gui::Item &item) {
-            LOG_INFO("call %s", record.phoneNumber.getE164().c_str());
-            return app::manager::Controller::sendAction(application,
-                                                        app::manager::actions::Dial,
-                                                        std::make_unique<app::ExecuteCallData>(record.phoneNumber),
-                                                        app::manager::OnSwitchBehaviour::RunInBackground);
-        };
-
-        rects[FocusRects::Sms]->activatedCallback = [=](gui::Item &item) {
-            LOG_INFO("sms %s", record.phoneNumber.getE164().c_str());
-            auto data                        = std::make_unique<SMSSendRequest>(record.phoneNumber, std::string{});
-            data->ignoreCurrentWindowOnStack = true;
-            return app::manager::Controller::sendAction(application,
-                                                        app::manager::actions::CreateSms,
-                                                        std::move(data),
-                                                        app::manager::OnSwitchBehaviour::RunInBackground);
-        };
-
-        // Type
-        typeLabel = decorateLabel(new gui::Label(
-            this, type::label::x, type::label::y, type::label::w, 0, utils::localize.get("app_calllog_type")));
-        typeData  = decorateData(new gui::Label(this, type::data::x, type::data::y, type::data::w, 0));
-
-        // TODO: alek: it is used in the code at least twice, possibly create one common function for this
-        auto newImg = [=](const UTF8 imageName) -> gui::Image * {
-            auto img = new gui::Image(this, type::img::x, type::img::y, 0, 0, imageName);
-            img->setVisible(false);
-            return img;
-        };
-        callTypeImg[calllog::CallLogCallType::IN]     = newImg("calllog_arrow_in");
-        callTypeImg[calllog::CallLogCallType::OUT]    = newImg("calllog_arrow_out");
-        callTypeImg[calllog::CallLogCallType::MISSED] = newImg("calllog_arrow_den");
-
-        // Duration
-        durationLabel = decorateLabel(new gui::Label(this,
-                                                     duration::label::x,
-                                                     duration::label::y,
-                                                     duration::label::w,
-                                                     0,
-                                                     utils::localize.get("app_calllog_duration")));
-        durationData  = decorateData(new gui::Label(this, duration::data::x, duration::data::y, duration::data::w, 0));
-
-        // Date
-        dateLabel = decorateLabel(new gui::Label(
-            this, date::label::x, date::label::y, date::label::w, 0, utils::localize.get("app_calllog_date")));
-        dateDay   = decorateData(new gui::Label(this, date::dataDay::x, date::dataDay::y, date::dataDay::w, 0));
-        dateDate  = decorateData(new gui::Label(this, date::dataDate::x, date::dataDate::y, date::dataDate::w, 0));
+        buildDateWidgets(vBox);
     }
 
     void CallLogDetailsWindow::destroyInterface()
@@ -193,95 +139,98 @@ namespace gui
         erase();
     }
 
-    CallLogDetailsWindow::~CallLogDetailsWindow()
+    void CallLogDetailsWindow::initNumberWidget()
     {
-        destroyInterface();
+        Expects(numberHBox != nullptr);
+        numberHBox->erase();
+        ActiveIconFactory factory(this->application);
+        const auto &numberView = record.phoneNumber;
+        if (record.presentation == PresentationType::PR_UNKNOWN) {
+            numberHBox->addText(callLogStyle::strings::privateNumber, style::window::font::mediumbold);
+        }
+        else {
+            numberHBox->addText(numberView.getFormatted(), style::window::font::mediumbold);
+            numberHBox->addIcon(factory.makeCallIcon(numberView));
+            numberHBox->addIcon(factory.makeSMSIcon(numberView));
+            setFocusItem(numberHBox);
+        }
+    }
+
+    void CallLogDetailsWindow::initCallDataWidget()
+    {
+        Expects(typeHBox != nullptr);
+        typeHBox->erase();
+        UTF8 callIconName, callTypeStr;
+        switch (record.type) {
+        case CallType::CT_INCOMING:
+            callTypeStr  = utils::translate("app_calllog_incoming_call");
+            callIconName = "calllog_arrow_in";
+            break;
+        case CallType::CT_OUTGOING:
+            callTypeStr  = utils::translate("app_calllog_outgoing_call");
+            callIconName = "calllog_arrow_out";
+            break;
+        case CallType::CT_MISSED:
+            callTypeStr  = utils::translate("app_calllog_missed_call");
+            callIconName = "calllog_arrow_den";
+            break;
+        case CallType::CT_REJECTED:
+            callTypeStr  = utils::translate("app_calllog_rejected_call");
+            callIconName = "calllog_arrow_den";
+            break;
+        default:
+            break;
+        }
+        addSnippetWithText(
+            typeHBox, callIconName, callTypeStr, Margins(style::margins::big, 0, style::margins::big, 0));
+    }
+
+    void CallLogDetailsWindow::initCallDurationWidget()
+    {
+        Expects(durationData != nullptr);
+        durationData->setText(utils::time::Duration(record.duration).str());
+    }
+
+    void CallLogDetailsWindow::initDateWidgets()
+    {
+        Expects(dateDay != nullptr && dateDate != nullptr);
+        using namespace utils::time;
+        auto date = TimestampFactory().createTimestamp(TimestampType::Date, record.date);
+        auto time = TimestampFactory().createTimestamp(TimestampType::Time, record.date);
+
+        dateDay->setText(date->day() + ",");
+
+        dateDate->setText(date->str() + ", " + time->str());
     }
 
     void CallLogDetailsWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        if (data != nullptr && data->getDescription() == calllog::CALLLOG_SWITCH_DATA_STR) {
-            auto switchData = reinterpret_cast<calllog::CallLogSwitchData *>(data);
-            record          = switchData->getRecord();
+        if (mode == ShowMode::GUI_SHOW_RETURN) {
+            return;
+        }
 
+        if (auto switchData = dynamic_cast<calllog::CallLogSwitchData *>(data); data != nullptr) {
+            record = switchData->getRecord();
             setTitle(record.name);
-
-            auto callType = toCallLogCallType(record.type);
-            for (auto &img : callTypeImg) {
-                img->setVisible(false);
-            }
-            callTypeImg[callType]->setVisible(true);
-
-            UTF8 callTypeStr;
-            switch (record.type) {
-            case CallType::CT_INCOMING:
-                callTypeStr = utils::localize.get("app_calllog_incoming_call");
-                break;
-            case CallType::CT_OUTGOING:
-                callTypeStr = utils::localize.get("app_calllog_outgoing_call");
-                break;
-            case CallType::CT_MISSED:
-                callTypeStr = utils::localize.get("app_calllog_missed_call");
-                break;
-            case CallType::CT_REJECTED:
-                callTypeStr = utils::localize.get("app_calllog_rejected_call");
-                break;
-            default:
-                break;
-            }
-            typeData->setText(callTypeStr);
-
-            durationData->setText(utils::time::Duration(record.duration).str());
-
-            utils::time::Timestamp t(record.date);
-            dateDay->setText(t.day() + ",");
-            dateDate->setText(t.str(utils::localize.get("locale_date_full") + ", " +
-                                    utils::localize.get("locale_12hour_min"))); // TODO: alek 12/24 h
-        }
-
-        if (mode == ShowMode::GUI_SHOW_INIT)
-            setFocusItem(rects[static_cast<uint32_t>(FocusRects::Call)]);
-
-        if (record.presentation == PresentationType::PR_UNKNOWN) {
-            rects[FocusRects::Call]->setVisible(false);
-            rects[FocusRects::Call]->activatedCallback    = nullptr;
-            rects[FocusRects::Call]->focusChangedCallback = nullptr;
-            rects[FocusRects::Sms]->setVisible(false);
-            rects[FocusRects::Sms]->activatedCallback    = nullptr;
-            rects[FocusRects::Sms]->focusChangedCallback = nullptr;
-            number->setText(utils::localize.get(callLogStyle::strings::privateNumber));
-            bottomBar->setActive(BottomBar::Side::CENTER, false);
-        }
-        else {
-            number->setText(record.phoneNumber.getFormatted());
+            initNumberWidget();
+            initCallDataWidget();
+            initCallDurationWidget();
+            initDateWidgets();
         }
     }
 
     bool CallLogDetailsWindow::onInput(const InputEvent &inputEvent)
     {
-        // check if any of the lower inheritance onInput methods catch the event
-        if (AppWindow::onInput(inputEvent)) {
-            // refresh window only when key is other than enter
-            if (inputEvent.keyCode != KeyCode::KEY_ENTER) {
-                application->render(RefreshModes::GUI_REFRESH_FAST);
-            }
-
-            return true;
-        }
-
-        // process only if key is released
-        if (((inputEvent.state == InputEvent::State::keyReleasedShort) ||
-             ((inputEvent.state == InputEvent::State::keyReleasedLong))) &&
-            (inputEvent.keyCode == KeyCode::KEY_LF)) {
+        if (inputEvent.isShortRelease(KeyCode::KEY_LF)) {
             auto app = dynamic_cast<app::ApplicationCallLog *>(application);
             assert(app != nullptr);
-            app->switchWindow(utils::localize.get("app_phonebook_options_title"),
+            app->switchWindow(utils::translate("app_phonebook_options_title"),
                               std::make_unique<gui::OptionsWindowOptions>(calllogWindowOptions(app, record)));
 
             return true;
         }
-
-        return false;
+        // check if any of the lower inheritance onInput methods catch the event
+        return AppWindow::onInput(inputEvent);
     }
 
 } /* namespace gui */

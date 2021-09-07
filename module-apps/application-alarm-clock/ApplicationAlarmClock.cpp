@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationAlarmClock.hpp"
@@ -11,17 +11,19 @@
 #include "windows/Dialog.hpp"
 #include "windows/AppWindow.hpp"
 #include "windows/OptionWindow.hpp"
-#include <module-services/service-db/service-db/DBNotificationMessage.hpp>
-#include <module-services/service-db/service-db/QueryMessage.hpp>
+#include <service-db/DBNotificationMessage.hpp>
+#include <service-db/QueryMessage.hpp>
 
 namespace app
 {
 
     ApplicationAlarmClock::ApplicationAlarmClock(std::string name,
                                                  std::string parent,
+                                                 sys::phone_modes::PhoneMode phoneMode,
+                                                 sys::bluetooth::BluetoothMode bluetoothMode,
                                                  uint32_t stackDepth,
                                                  sys::ServicePriority priority)
-        : Application(name, parent, false, stackDepth, priority)
+        : Application(name, parent, phoneMode, bluetoothMode, false, stackDepth, priority)
     {
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
     }
@@ -36,7 +38,7 @@ namespace app
 
         auto msg = dynamic_cast<db::NotificationMessage *>(msgl);
         if (msg != nullptr) {
-            LOG_DEBUG("Received notification");
+            LOG_DEBUG("Received notification: %s", msg->to_string().c_str());
             // window-specific actions
             if (msg->interface == db::Interface::Name::Alarms) {
                 for (auto &[name, window] : windowsStack.windows) {
@@ -46,19 +48,7 @@ namespace app
             return std::make_shared<sys::ResponseMessage>();
         }
 
-        // this variable defines whether message was processed.
-        bool handled = false;
-        // handle database response
-        if (resp != nullptr) {
-            handled = true;
-            if (auto command = callbackStorage->getCallback(resp); command->execute()) {
-                refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-            }
-        }
-        if (handled) {
-            return msgHandled();
-        }
-        return msgNotHandled();
+        return handleAsyncResponse(resp);
     }
 
     sys::ReturnCodes ApplicationAlarmClock::InitHandler()
@@ -69,7 +59,6 @@ namespace app
         }
 
         createUserInterface();
-        setActiveWindow(gui::name::window::main_window);
         return ret;
     }
 
@@ -101,12 +90,15 @@ namespace app
                 return std::make_unique<alarmClock::CustomRepeatWindow>(app, std::move(presenter));
             });
         windowsFactory.attach(
-            utils::localize.get("app_alarm_clock_options_title"),
+            utils::translate("app_alarm_clock_options_title"),
             [](Application *app, const std::string &name) { return std::make_unique<gui::OptionWindow>(app, name); });
 
         windowsFactory.attach(
             style::alarmClock::window::name::dialogYesNo,
             [](Application *app, const std::string &name) { return std::make_unique<gui::DialogYesNo>(app, name); });
+
+        attachPopups(
+            {gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes, gui::popup::ID::PhoneLock});
     }
 
     void ApplicationAlarmClock::destroyUserInterface()

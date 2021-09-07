@@ -1,6 +1,6 @@
 FROM ubuntu:focal
 
-MAINTAINER radoslaw.wicik@mudiata.com
+MAINTAINER ops@mudita.com
 # Docker runner for MuditaOS builds
 
 RUN ln -fs /usr/share/zoneinfo/@DOCKER_TIMEZONE@ /etc/localtime
@@ -8,7 +8,9 @@ RUN export DEBIAN_FRONTEND=noninteractive
 RUN apt-get update 
 RUN apt-get full-upgrade -y 
 RUN apt-get install -y \
-        @INSTALL_PACKAGES@ 
+        @INSTALL_PACKAGES@
+RUN apt-get -qy autoremove
+RUN apt-get -qy clean
 RUN ln -fs /usr/bin/python3 /usr/bin/python
 RUN locale-gen pl_PL.UTF-8 \
                en_US.UTF-8 \

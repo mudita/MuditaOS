@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <endpoints/Endpoint.hpp>
@@ -7,7 +7,8 @@
 #include <endpoints/contacts/ContactsEndpoint.hpp>
 #include <endpoints/factoryReset/FactoryReset.hpp>
 #include <endpoints/messages/MessageHelper.hpp>
-#include <endpoints/update/UpdateMuditaOS.hpp>
+#include <endpoints/filesystem/FileContext.hpp>
+#include <endpoints/filesystem/FileOperations.hpp>
 #include <parser/ParserFSM.hpp>
 #include <parser/ParserUtils.hpp>
 
@@ -17,30 +18,13 @@
 #include <SMSRecord.hpp>
 #include <SMSTemplateRecord.hpp>
 #include <catch2/catch.hpp>
-#include <json/json11.hpp>
+#include <json11.hpp>
 #include <purefs/filesystem_paths.hpp>
 #include <utf8/UTF8.hpp>
 #include <memory>
 #include <filesystem>
 #include <string>
 #include <vector>
-
-TEST_CASE("System Update Tests")
-{
-    UpdateMuditaOS updateOS(nullptr);
-
-    updateos::UpdateError err = updateOS.prepareTempDirForUpdate(std::filesystem::path{"user"} / "tmp",
-                                                                 std::filesystem::path{"sys"} / "updates");
-    REQUIRE(err == updateos::UpdateError::NoError);
-
-    updateOS.setUpdateFile(std::filesystem::path{"sys"} / "updates", "muditaos-unittest.tar");
-
-    err = updateOS.unpackUpdate();
-    REQUIRE(err == updateos::UpdateError::NoError);
-
-    err = updateOS.verifyChecksums();
-    REQUIRE(err == updateos::UpdateError::NoError);
-}
 
 using namespace parserFSM;
 
@@ -205,7 +189,6 @@ TEST_CASE("DB Helpers test - json encoding (messages)")
     message->body      = "test message";
     message->contactID = 1;
     message->date      = 12345;
-    message->dateSent  = 54321;
     message->errorCode = 0;
     message->number    = contactNum.number;
     message->threadID  = 1;
@@ -216,8 +199,7 @@ TEST_CASE("DB Helpers test - json encoding (messages)")
 
     REQUIRE(messageJson[json::messages::messageBody] == "test message");
     REQUIRE(messageJson[json::messages::contactID] == 1);
-    REQUIRE(messageJson[json::messages::receivedAt] == 12345);
-    REQUIRE(messageJson[json::messages::sentAt] == 54321);
+    REQUIRE(messageJson[json::messages::createdAt] == 12345);
     REQUIRE(messageJson[json::messages::threadID] == 1);
     REQUIRE(messageJson[json::messages::messageID] == 10);
 
@@ -246,16 +228,15 @@ TEST_CASE("Context class test")
         REQUIRE(context.getMethod() == http::Method::get);
         REQUIRE(context.getUuid() == 12345);
         REQUIRE(context.getEndpoint() == EndpointType::contacts);
-        REQUIRE(context.createSimpleResponse() ==
-                R"(#000000061{"body": null, "endpoint": 7, "status": 200, "uuid": "12345"})");
+        REQUIRE(context.createSimpleResponse() == R"(#000000045{"endpoint": 7, "status": 200, "uuid": 12345})");
 
         context.setResponseBody(context.getBody());
         REQUIRE(context.createSimpleResponse() ==
-                R"(#000000073{"body": {"test": "test"}, "endpoint": 7, "status": 200, "uuid": "12345"})");
+                R"(#000000071{"body": {"test": "test"}, "endpoint": 7, "status": 200, "uuid": 12345})");
     }
     SECTION("Invalid message")
     {
-        auto testMessage = R"({"endpoint":25, "method":8, "uuid":"0", "body":{"te":"test"}})";
+        auto testMessage = R"({"endpoint":25, "method":8, "uuid":0, "body":{"te":"test"}})";
         std::string err;
         auto msgJson = json11::Json::parse(testMessage, err);
         REQUIRE(err.empty());
@@ -285,7 +266,7 @@ TEST_CASE("Endpoint Factory test")
 
     SECTION("Wrong endpoint")
     {
-        auto testMessage = R"({"endpoint":25, "method":8, "uuid":"12345", "body":{"te":"test"}})";
+        auto testMessage = R"({"endpoint":25, "method":8, "uuid":12345, "body":{"te":"test"}})";
         std::string err;
         auto msgJson = json11::Json::parse(testMessage, err);
         REQUIRE(err.empty());
@@ -314,7 +295,7 @@ TEST_CASE("Secured Endpoint Factory test")
 
     SECTION("Secured endpoint")
     {
-        auto testMessage = R"({"endpoint":25, "method":8, "uuid":"12345", "body":{"te":"test"}})";
+        auto testMessage = R"({"endpoint":25, "method":8, "uuid":12345, "body":{"te":"test"}})";
         std::string err;
         auto msgJson = json11::Json::parse(testMessage, err);
         REQUIRE(err.empty());
@@ -325,3 +306,102 @@ TEST_CASE("Secured Endpoint Factory test")
         REQUIRE(dynamic_cast<SecuredEndpoint *>(handler.get()));
     }
 }
+
+TEST_CASE("FileOperations UT Test Get File")
+{
+    auto &fileOps = FileOperations::instance();
+
+    SECTION("Create receive id for file")
+    {
+        auto filePath{"/sys/user/music/SMS-drum2-stereo.mp3"};
+
+        auto [rxID, fileSize] = fileOps.createReceiveIDForFile(filePath);
+
+        REQUIRE(rxID == 1);
+        REQUIRE(fileSize == 49146);
+    }
+}
+
+TEST_CASE("FileContext UT Test Valid Input")
+{
+    auto filePath{"/sys/user/MuditaOS.log"};
+    auto fileSize{1536u};
+    auto fileOffset{128 * 6u};
+    auto chunkSize{128 * 3u};
+
+    SECTION("Create file context for file")
+    {
+        auto fileCtx = FileReadContext(filePath, fileSize, chunkSize, fileOffset);
+
+        REQUIRE(3 == fileCtx.expectedChunkInFile());
+
+        REQUIRE(true == fileCtx.validateChunkRequest(3));
+        REQUIRE(false == fileCtx.validateChunkRequest(4));
+
+        REQUIRE(4 == fileCtx.totalChunksInFile());
+
+        fileCtx.advanceFileOffset(fileSize - fileOffset);
+        REQUIRE(true == fileCtx.reachedEOF());
+    }
+}
+
+TEST_CASE("FileContext UT Test Invalid Input")
+{
+    auto filePath{"/sys/user/music/SMS-drum2-stereo.mp3"};
+
+    SECTION("Create file context for file with invalid file size")
+    {
+        auto fileSize{0u};
+        auto chunkSize{1024 * 3u};
+
+        REQUIRE_THROWS_WITH(FileReadContext(filePath, fileSize, chunkSize), "Invalid FileContext arguments");
+    }
+
+    SECTION("Create file context for file with invalid chunk size")
+    {
+        auto fileSize{49146u};
+        auto chunkSize{0u};
+
+        REQUIRE_THROWS_WITH(FileReadContext(filePath, fileSize, chunkSize), "Invalid FileContext arguments");
+    }
+}
+
+TEST_CASE("FileOperations UT Test Send File")
+{
+    auto &fileOps = FileOperations::instance();
+
+    SECTION("Create receive id for file")
+    {
+        auto filePath{"/sys/user/music/SMS-drum2-stereo.mp3"};
+        auto fileSize{49146};
+        auto fileCrc32{"efd73581"};
+
+        auto txID = fileOps.createTransmitIDForFile(filePath, fileSize, fileCrc32);
+
+        REQUIRE(txID == 1);
+    }
+}
+
+TEST_CASE("FileContext UT Test Valid Input")
+{
+    auto filePath{"/sys/user/MuditaOS.log"};
+    auto fileSize{1536u};
+    auto fileOffset{128 * 6u};
+    auto chunkSize{128 * 3u};
+
+    SECTION("Create file context for file")
+    {
+        auto fileCtx = FileReadContext(filePath, fileSize, chunkSize, fileOffset);
+
+        REQUIRE(3 == fileCtx.expectedChunkInFile());
+
+        REQUIRE(true == fileCtx.validateChunkRequest(3));
+        REQUIRE(false == fileCtx.validateChunkRequest(4));
+
+        REQUIRE(4 == fileCtx.totalChunksInFile());
+
+        fileCtx.advanceFileOffset(fileSize - fileOffset);
+        REQUIRE(true == fileCtx.reachedEOF());
+    }
+}
+

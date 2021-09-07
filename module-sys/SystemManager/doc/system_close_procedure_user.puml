@@ -1,0 +1,33 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+
+actor User
+participant "PowerOffWindow" as poff
+participant "Application" as app
+participant "System Manager" as sysmgr
+participant "All services" as srv
+participant "Application Manager" as appmgr
+participant "Service GUI" as gui
+participant "service EINK" as eink
+
+User -> poff : confirm close
+poff -> app : GUI off switch
+app -> sysmgr : UserPowerDownRequest
+sysmgr -> srv : preCloseRoutine
+
+srv -> appmgr : processCloseReason
+appmgr -> appmgr : switchWindowAtClose(logo)
+eink -> gui : last sreen show
+gui -> srv : ready to close
+
+srv -> sysmgr : readyToClose
+alt timeout
+sysmgr -> sysmgr : closeServices
+end
+sysmgr -> srv : SystemMessageType::Exit
+srv -> sysmgr : MsgHandled
+alt timeout
+sysmgr -> sysmgr : kill service
+end
+
+@enduml

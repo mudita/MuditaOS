@@ -1,0 +1,27 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+
+participant "AutoLock Timer" as timer
+participant "PhoneLock Handler" as lock
+participant "Application Manger" as apm
+participant "Event Manager" as evnt
+actor "User" as user
+
+user -> evnt : key press/release
+activate evnt
+evnt->evnt : process event
+evnt->apm : PreventBlockingRequest
+deactivate evnt
+activate apm
+
+apm->lock : isLocked
+activate lock
+lock-->apm : response
+deactivate lock
+
+alt [ Not locked ]
+apm -> timer : (re)start
+activate timer
+end
+
+@enduml

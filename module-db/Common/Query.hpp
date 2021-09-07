@@ -3,10 +3,7 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
 #include <functional>
-#include <log/log.hpp>
 #include <module-services/service-desktop/endpoints/Context.hpp>
 
 namespace db

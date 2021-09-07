@@ -12,7 +12,7 @@ TEST_CASE("Notes Table tests")
 {
     Database::initialize();
 
-    const auto notesDbPath = std::filesystem::path{"user"} / "notes.db";
+    const auto notesDbPath = std::filesystem::path{"sys/user"} / "notes.db";
     NotesDB notesDb{notesDbPath.c_str()};
     REQUIRE(notesDb.isInitialized());
 
@@ -38,7 +38,7 @@ TEST_CASE("Notes Table tests")
     SECTION("Get notes by text query")
     {
         constexpr auto testSearch = "TEST";
-        const auto &records       = table.getByText(testSearch);
+        const auto [records, count] = table.getByText(testSearch, 0, 1);
         REQUIRE(records.size() == 1);
         REQUIRE(records[0].snippet == testSnippet);
     }

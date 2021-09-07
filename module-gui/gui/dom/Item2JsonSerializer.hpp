@@ -4,7 +4,7 @@
 #pragma once
 
 #include "Item2JsonSerializingVisitor.hpp"
-#include <module-utils/json/json11.hpp>
+#include <json11.hpp>
 #include <list>
 
 namespace gui

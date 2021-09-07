@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NotesListModel.hpp"
@@ -7,7 +7,7 @@
 #include "module-apps/application-notes/style/NotesListStyle.hpp"
 #include "module-apps/application-notes/windows/NotesOptions.hpp"
 #include "module-apps/application-notes/data/NoteSwitchData.hpp"
-#include <module-apps/messages/OptionsWindow.hpp>
+#include <apps-common/messages/OptionsWindow.hpp>
 
 #include <module-gui/gui/widgets/ListView.hpp>
 #include <module-gui/gui/input/InputEvent.hpp>
@@ -33,7 +33,7 @@ namespace app::notes
         return true;
     }
 
-    unsigned int NotesListModel::getMinimalItemHeight() const
+    unsigned int NotesListModel::getMinimalItemSpaceRequired() const
     {
         return style::list::item::Height;
     }
@@ -46,14 +46,14 @@ namespace app::notes
         }
 
         auto item               = new gui::NotesItem(note);
-        item->activatedCallback = [this, note = note.get()](gui::Item &) {
-            application->switchWindow(gui::name::window::note_preview, std::make_unique<NoteSwitchData>(*note));
+        item->activatedCallback = [this, note](gui::Item &) {
+            application->switchWindow(gui::name::window::note_preview, std::make_unique<NoteSwitchData>(note));
             return true;
         };
         item->inputCallback = [this, note = note.get()](gui::Item &, const gui::InputEvent &event) {
-            if (event.isShortPress() && event.is(gui::KeyCode::KEY_LF)) {
+            if (event.isShortRelease(gui::KeyCode::KEY_LF)) {
                 application->switchWindow(
-                    utils::localize.get("app_phonebook_options_title"),
+                    utils::translate("app_phonebook_options_title"),
                     std::make_unique<gui::OptionsWindowOptions>(noteListOptions(application, *note, *notesRepository)));
             }
             return false;

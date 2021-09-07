@@ -1,16 +1,15 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 // module-gui
 #include "AppWindow.hpp"
-#include "Service/Timer.hpp"
 #include "gui/widgets/Window.hpp"
 
 // module-utils
-#include "log/log.hpp"
+#include <log.hpp>
 #include <service-evtmgr/EVMessages.hpp>
-#include <service-evtmgr/EventManager.hpp>
-#include <service-appmgr/model/ApplicationManager.hpp>
+#include <service-evtmgr/EventManagerCommon.hpp>
+#include <module-sys/Timers/TimerFactory.hpp>
 // MessageType
 #include "MessageType.hpp"
 // this module
@@ -21,14 +20,16 @@ namespace app
 {
     ApplicationClock::ApplicationClock(std::string name,
                                        std::string parent,
+                                       sys::phone_modes::PhoneMode phoneMode,
+                                       sys::bluetooth::BluetoothMode bluetoothMode,
                                        StartInBackground startInBackground,
                                        uint32_t stackDepth,
                                        sys::ServicePriority priority)
-        : Application(name, parent, startInBackground, stackDepth, priority)
+        : Application(name, parent, phoneMode, bluetoothMode, startInBackground, stackDepth, priority)
     {
-        timerClock = std::make_unique<sys::Timer>("Clock", this, 1000);
-        timerClock->connect([&](sys::Timer &) { timerClockCallback(); });
-        timerClock->start();
+        timerClock = sys::TimerFactory::createPeriodicTimer(
+            this, "Clock", std::chrono::milliseconds{1000}, [&](sys::Timer &) { timerClockCallback(); });
+        timerClock.start();
     }
 
     void ApplicationClock::timerClockCallback()
@@ -76,7 +77,7 @@ namespace app
 
     sys::ReturnCodes ApplicationClock::DeinitHandler()
     {
-        timerClock->stop();
+        timerClock.stop();
         return sys::ReturnCodes::Success;
     }
 
@@ -85,6 +86,9 @@ namespace app
         windowsFactory.attach(gui::name::window::main_window, [](Application *app, const std::string &name) {
             return std::make_unique<gui::ClockMainWindow>(app, name);
         });
+
+        attachPopups(
+            {gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes, gui::popup::ID::PhoneLock});
     }
 
     void ApplicationClock::destroyUserInterface()

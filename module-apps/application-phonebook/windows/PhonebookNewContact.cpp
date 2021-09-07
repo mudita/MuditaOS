@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhonebookNewContact.hpp"
@@ -30,10 +30,10 @@ namespace gui
     {
         AppWindow::buildInterface();
 
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::save));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::save));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
-        setTitle(utils::localize.get("app_phonebook_contact_title"));
+        setTitle(utils::translate("app_phonebook_contact_title"));
 
         list = new gui::ListView(this,
                                  phonebookStyle::newContactWindow::newContactsList::x,
@@ -41,7 +41,7 @@ namespace gui
                                  phonebookStyle::newContactWindow::newContactsList::w,
                                  phonebookStyle::newContactWindow::newContactsList::h,
                                  newContactModel,
-                                 style::listview::ScrollBarType::PreRendered);
+                                 listview::ScrollBarType::PreRendered);
         setFocusItem(list);
     }
 
@@ -65,10 +65,10 @@ namespace gui
             break;
         case ContactAction::Add:
         case ContactAction::EditTemporary:
-            setTitle(utils::localize.get("app_phonebook_contact_title"));
+            setTitle(utils::translate("app_phonebook_contact_title"));
             break;
         case ContactAction::Edit:
-            setTitle(utils::localize.get("app_phonebook_options_edit"));
+            setTitle(utils::translate("app_phonebook_options_edit"));
             break;
         }
 
@@ -120,11 +120,11 @@ namespace gui
             return true;
         }
 
-        if (inputEvent.state != InputEvent::State::keyReleasedShort) {
+        if (!inputEvent.isShortRelease()) {
             return false;
         }
 
-        if (inputEvent.keyCode == gui::KeyCode::KEY_ENTER) {
+        if (inputEvent.is(gui::KeyCode::KEY_ENTER)) {
             auto tmpId  = contact->ID;
             contact     = std::make_shared<ContactRecord>();
             contact->ID = tmpId;
@@ -162,8 +162,8 @@ namespace gui
             case DBServiceAPI::ContactVerificationResult::temporaryContactExists:
                 std::unique_ptr<ContactRecord> tempContact;
                 assert(!contact->numbers.empty());
-                for (auto number : contact->numbers) {
-                    if (number.number.getEntered().size() > 0) {
+                for (const auto &number : contact->numbers) {
+                    if (!number.number.getEntered().empty()) {
                         tempContact = DBServiceAPI::MatchContactByPhoneNumber(application, number.number);
                         if (tempContact != nullptr) {
                             contact->ID   = tempContact->ID;
@@ -181,7 +181,7 @@ namespace gui
 
         // perform actual add/update operation
         if (contactAction == ContactAction::Add) {
-            if (DBServiceAPI::ContactAdd(application, *contact) == false) {
+            if (!DBServiceAPI::ContactAdd(application, *contact)) {
                 LOG_ERROR("verifyAndSave failed to ADD contact");
                 return false;
             }
@@ -192,10 +192,12 @@ namespace gui
 
             contact->groups.erase(ContactsDB::temporaryGroupId());
 
-            if (DBServiceAPI::ContactUpdate(application, *contact) == false) {
+            if (!DBServiceAPI::ContactUpdate(application, *contact)) {
                 LOG_ERROR("verifyAndSave failed to UPDATE contact");
                 return false;
             }
+            application->switchWindow(gui::window::name::contact, std::move(data));
+            return true;
         }
 
         application->switchWindow(gui::name::window::main_window);
@@ -204,7 +206,6 @@ namespace gui
 
     void PhonebookNewContact::showDialogDuplicatedNumber(const utils::PhoneNumber::View &duplicatedNumber)
     {
-        DialogMetadata meta;
         auto matchedContact   = DBServiceAPI::MatchContactByPhoneNumber(application, duplicatedNumber);
         auto oldContactRecord = (matchedContact != nullptr) ? *matchedContact : ContactRecord{};
 
@@ -212,20 +213,19 @@ namespace gui
             contact->ID = oldContactRecord.ID;
         }
 
-        meta.action = [=]() -> bool {
-            if (!DBServiceAPI::ContactUpdate(application, *contact)) {
-                LOG_ERROR("Contact id=%" PRIu32 " update failed", contact->ID);
-                return false;
-            }
-            application->switchWindow(gui::name::window::main_window);
-            return true;
-        };
-        std::string duplicatedNumberPhrase = utils::localize.get("app_phonebook_duplicate_numbers");
+        std::string duplicatedNumberPhrase = utils::translate("app_phonebook_duplicate_numbers");
         phonebookUtils::fillContactData(duplicatedNumberPhrase, oldContactRecord);
-        meta.text  = duplicatedNumberPhrase;
-        meta.title = duplicatedNumber.getFormatted();
-        meta.icon  = "info_big_circle_W_G";
-        application->switchWindow(gui::window::name::dialog_yes_no, std::make_unique<gui::DialogMetadataMessage>(meta));
+
+        auto metaData = std::make_unique<gui::DialogMetadataMessage>(gui::DialogMetadata{
+            duplicatedNumber.getFormatted(), "info_big_circle_W_G", duplicatedNumberPhrase, "", [=]() -> bool {
+                if (!DBServiceAPI::ContactUpdate(application, *contact)) {
+                    LOG_ERROR("Contact id=%" PRIu32 " update failed", contact->ID);
+                    return false;
+                }
+                application->switchWindow(gui::name::window::main_window);
+                return true;
+            }});
+        application->switchWindow(gui::window::name::dialog_yes_no, std::move(metaData));
     }
 
     void PhonebookNewContact::showDialogDuplicatedSpeedDialNumber()
@@ -237,26 +237,25 @@ namespace gui
             contact->ID = oldContactRecord.ID;
         }
 
-        DialogMetadata metadata;
-        metadata.action = [=]() -> bool {
-            if (!DBServiceAPI::ContactUpdate(application, *contact)) {
-                LOG_ERROR("Contact id=%" PRIu32 " update failed", contact->ID);
-                return false;
-            }
-            application->switchWindow(gui::name::window::main_window);
-            return true;
-        };
-        std::string duplicatedSpeedDialPhrase = utils::localize.get("app_phonebook_duplicate_numbers");
+        std::string duplicatedSpeedDialPhrase = utils::translate("app_phonebook_duplicate_numbers");
         phonebookUtils::fillContactData(duplicatedSpeedDialPhrase, oldContactRecord);
-        std::string duplicatedSpeedDialTitle = utils::localize.get("app_phonebook_duplicate_speed_dial_title");
+        std::string duplicatedSpeedDialTitle = utils::translate("app_phonebook_duplicate_speed_dial_title");
         phonebookUtils::fillContactData(duplicatedSpeedDialTitle, oldContactRecord);
-        metadata.text     = duplicatedSpeedDialPhrase;
-        metadata.title    = duplicatedSpeedDialTitle;
-        metadata.icon     = "phonebook_empty_grey_circle_speed_dial";
-        metadata.iconText = contact->speeddial;
 
-        application->switchWindow(gui::window::name::dialog_yes_no_icon_txt,
-                                  std::make_unique<gui::DialogMetadataMessage>(metadata));
+        auto metaData = std::make_unique<gui::DialogMetadataMessage>(
+            gui::DialogMetadata{duplicatedSpeedDialTitle,
+                                "phonebook_empty_grey_circle_speed_dial",
+                                duplicatedSpeedDialPhrase,
+                                contact->speeddial,
+                                [=]() -> bool {
+                                    if (!DBServiceAPI::ContactUpdate(application, *contact)) {
+                                        LOG_ERROR("Contact id=%" PRIu32 " update failed", contact->ID);
+                                        return false;
+                                    }
+                                    application->switchWindow(gui::name::window::main_window);
+                                    return true;
+                                }});
+        application->switchWindow(gui::window::name::dialog_yes_no_icon_txt, std::move(metaData));
     }
 
 } // namespace gui

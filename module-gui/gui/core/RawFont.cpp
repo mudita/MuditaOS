@@ -8,7 +8,7 @@
 #include "FontKerning.hpp"   // for FontKerning
 #include "Renderer.hpp"      // for Renderer
 #include "TextConstants.hpp" // for newline
-#include "log/log.hpp"       // for LOG_ERROR
+#include <log.hpp>           // for LOG_ERROR
 #include "utf8/UTF8.hpp"     // for UTF8
 #include <cstring>           // for memcpy
 #include <utility>           // for pair
@@ -47,11 +47,6 @@ namespace gui
         offset += sizeof(uint32_t);
         // id of the font assigned by the font manager
         id = 1;
-
-        //	LOG_INFO("font: %s glyphs: %d, kern: %d", info.face.c_str(), glyph_count, kern_count );
-        //	LOG_INFO("glyph offset: %d", glyph_data_offset );
-        //	LOG_INFO("kerning offset: %d", kern_data_offset );
-        //	LOG_INFO("image offset: %d", image_data_offset );
 
         // load glyphs
         uint32_t glyphOffset = glyph_data_offset;

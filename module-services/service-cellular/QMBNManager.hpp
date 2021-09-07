@@ -4,7 +4,9 @@
 #pragma once
 
 #include "Result.hpp"
-#include "service-cellular/ServiceCellular.hpp"
+
+class DLCChannel;
+
 namespace nv_paths
 {
 
@@ -53,10 +55,10 @@ namespace at
 class QMBNManager
 {
   private:
-    DLC_channel *channel = nullptr;
+    DLCChannel *channel = nullptr;
 
   public:
-    explicit QMBNManager(DLC_channel *channel) : channel(channel)
+    explicit QMBNManager(DLCChannel *channel) : channel(channel)
     {}
 
     at::Result::Code list(std::vector<at::response::qmbncfg::MBNConfig> &ret);

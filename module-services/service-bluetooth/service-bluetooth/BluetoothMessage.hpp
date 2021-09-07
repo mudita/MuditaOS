@@ -6,8 +6,8 @@
 #include "ServiceBluetoothCommon.hpp"
 
 #include <Bluetooth/Device.hpp>
+#include <Bluetooth/audio/BluetoothAudioDevice.hpp>
 #include <Service/Message.hpp>
-#include <Audio/Stream.hpp>
 #include <MessageType.hpp>
 
 #include <utility>
@@ -34,6 +34,7 @@ class BluetoothMessage : public sys::DataMessage
         Start,
         Scan,
         StopScan,
+        getDevicesAvailable,
         PAN,
         Visible,
         Play,
@@ -42,37 +43,30 @@ class BluetoothMessage : public sys::DataMessage
         Disconnect
     };
     enum Request req = Request::None;
-    BluetoothMessage(enum Request req = None) : sys::DataMessage(MessageType::BluetoothRequest), req(req){};
+    BluetoothMessage(enum Request req = None) : sys::DataMessage(MessageType::BluetoothRequest), req(req)
+    {}
     ~BluetoothMessage() override = default;
-};
-
-class BluetoothScanResultMessage : public sys::DataMessage
-{
-  public:
-    std::vector<Devicei> devices;
-    BluetoothScanResultMessage(std::vector<Devicei> devices)
-        : sys::DataMessage(MessageType::BluetoothScanResult), devices(std::move(devices)){};
-    ~BluetoothScanResultMessage() override = default;
 };
 
 class BluetoothPairResultMessage : public sys::DataMessage
 {
   public:
+    explicit BluetoothPairResultMessage(std::string addr, bool succeed)
+        : sys::DataMessage(MessageType::BluetoothPairResult), addr(std::move(addr)), succeed(succeed)
+    {}
+    [[nodiscard]] auto getAddr() const -> std::string
+    {
+        return addr;
+    }
+    [[nodiscard]] auto isSucceed() const noexcept -> bool
+    {
+        return succeed;
+    }
+
+  private:
     std::string addr;
     std::string name;
-    bool status;
-    explicit BluetoothPairResultMessage(std::string addr, std::string name, bool status)
-        : sys::DataMessage(MessageType::BluetoothPairResult), addr(std::move(addr)), name(std::move(name)),
-          status(status){};
-};
-
-class BluetoothScanMessage : public sys::DataMessage
-{
-  public:
-    std::vector<Devicei> devices;
-    BluetoothScanMessage(std::vector<Devicei> devices)
-        : sys::DataMessage(MessageType::BluetoothScanResult), devices(std::move(devices)){};
-    ~BluetoothScanMessage() override = default;
+    bool succeed;
 };
 
 class BluetoothAddrMessage : public sys::DataMessage
@@ -91,45 +85,18 @@ class BluetoothPairMessage : public sys::DataMessage
     ~BluetoothPairMessage() override = default;
 };
 
-class BluetoothAudioRegisterMessage : public sys::DataMessage
+class BluetoothAudioStartMessage : public sys::DataMessage
 {
   public:
-    QueueHandle_t audioSourceQueue;
-    QueueHandle_t audioSinkQueue;
-    BluetoothAudioRegisterMessage(QueueHandle_t audioSourceQueue, QueueHandle_t audioSinkQueue)
-        : sys::DataMessage(MessageType::BluetoothAudioRegister), audioSourceQueue(audioSourceQueue),
-          audioSinkQueue(audioSinkQueue){};
-    ~BluetoothAudioRegisterMessage() override = default;
-};
+    explicit BluetoothAudioStartMessage(std::shared_ptr<bluetooth::BluetoothAudioDevice> device)
+        : DataMessage(MessageType::BluetoothAudioStart), device(std::move(device))
+    {}
 
-class BluetoothDeviceMetadataMessage : public sys::DataMessage
-{
-  public:
-    DeviceMetadata_t metadata;
-    BluetoothDeviceMetadataMessage(DeviceMetadata_t metadata)
-        : DataMessage(MessageType::BluetoothDeviceMetadata), metadata(std::move(metadata)){};
-    ~BluetoothDeviceMetadataMessage() override = default;
-};
-
-class BluetoothRequestStreamMessage : public sys::DataMessage
-{
-  public:
-    BluetoothRequestStreamMessage() : DataMessage(MessageType::BluetoothRequestStream){};
-    ~BluetoothRequestStreamMessage() override = default;
-};
-
-class BluetoothRequestStreamResultMessage : public sys::DataMessage
-{
-  public:
-    BluetoothRequestStreamResultMessage(std::shared_ptr<BluetoothStreamData> data)
-        : DataMessage(MessageType::BluetoothRequestStream), data(data){};
-    ~BluetoothRequestStreamResultMessage() override = default;
-
-    std::shared_ptr<BluetoothStreamData> getData()
+    auto getAudioDevice() const -> std::shared_ptr<bluetooth::BluetoothAudioDevice>
     {
-        return data;
+        return device;
     }
 
   private:
-    std::shared_ptr<BluetoothStreamData> data;
+    std::shared_ptr<bluetooth::BluetoothAudioDevice> device;
 };

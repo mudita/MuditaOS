@@ -34,7 +34,7 @@ namespace cellular
 
         static std::unique_ptr<PinChangeRequest> create(const std::string &data, GroupMatch matchGroups);
 
-        auto command() -> std::string final;
+        auto command() -> at::Cmd final;
         void handle(RequestHandler &h, at::Result &result) final;
         auto isValid() const noexcept -> bool final;
 

@@ -6,7 +6,6 @@
 #include "Endpoint.hpp"
 
 #include "Service/Service.hpp"
-#include "calendarEvents/CalendarEventsEndpoint.hpp"
 #include "backup/BackupEndpoint.hpp"
 #include "deviceInfo/DeviceInfoEndpoint.hpp"
 #include "update/UpdateEndpoint.hpp"
@@ -19,6 +18,7 @@
 #include "restore/RestoreEndpoint.hpp"
 #include "update/UpdateEndpoint.hpp"
 #include <endpoints/bluetooth/BluetoothEndpoint.hpp>
+#include "security/SecurityEndpoint.hpp"
 
 class EndpointFactory
 {
@@ -32,7 +32,7 @@ class EndpointFactory
         case parserFSM::EndpointType::update:
             return std::make_unique<UpdateEndpoint>(ownerServicePtr);
         case parserFSM::EndpointType::filesystemUpload:
-            return std::make_unique<FilesystemEndpoint>(ownerServicePtr);
+            return FilesystemEndpoint::createInstance(ownerServicePtr);
         case parserFSM::EndpointType::backup:
             return std::make_unique<BackupEndpoint>(ownerServicePtr);
         case parserFSM::EndpointType::deviceInfo:
@@ -47,27 +47,22 @@ class EndpointFactory
             return std::make_unique<FactoryResetEndpoint>(ownerServicePtr);
         case parserFSM::EndpointType::calllog:
             return std::make_unique<CalllogEndpoint>(ownerServicePtr);
+#if ENABLE_DEVELOPER_MODE_ENDPOINT
         case parserFSM::EndpointType::developerMode:
             return std::make_unique<DeveloperModeEndpoint>(ownerServicePtr);
-        case parserFSM::EndpointType::calendarEvents:
-            return std::make_unique<CalendarEventsEndpoint>(ownerServicePtr);
+#endif
         case parserFSM::EndpointType::bluetooth:
             return std::make_unique<BluetoothEndpoint>(ownerServicePtr);
+        case parserFSM::EndpointType::usbSecurity:
+            return std::make_unique<SecurityEndpoint>(ownerServicePtr);
         default:
             return nullptr;
         }
     }
 };
-
-enum class EndpointSecurity
-{
-    Allow = 0,
-    Block = 1
-};
-
 class SecuredEndpointFactory : public EndpointFactory
 {
-    static constexpr auto Whitelist = {parserFSM::EndpointType::developerMode};
+    static constexpr auto Whitelist = {parserFSM::EndpointType::developerMode, parserFSM::EndpointType::usbSecurity};
 
   public:
     explicit SecuredEndpointFactory(EndpointSecurity security) : endpointSecurity(security)

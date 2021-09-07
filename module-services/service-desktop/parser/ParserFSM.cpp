@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MessageHandler.hpp"
@@ -10,8 +10,7 @@ namespace sys
 } // namespace sys
 
 #include <service-desktop/ServiceDesktop.hpp>
-#include <log/log.hpp>
-#include <json/json11.hpp>
+#include <log.hpp>
 #include <memory>
 #include <string>
 
@@ -31,7 +30,6 @@ StateMachine::StateMachine(sys::Service *OwnerService) : OwnerServicePtr(OwnerSe
 void StateMachine::processMessage(std::string &&msg)
 {
     receivedMsg = std::move(msg);
-    LOG_DEBUG("Msg: %s", receivedMsg.c_str());
 
     switch (state) {
     case State::ReceivedPayload:
@@ -152,7 +150,6 @@ void StateMachine::parsePartialMessage()
 
 void StateMachine::parsePayload()
 {
-    LOG_DEBUG("Payload: %s", payload.c_str());
     if (payload.empty()) {
         LOG_ERROR("Empty payload!");
         state = State::NoMsg;
@@ -164,12 +161,13 @@ void StateMachine::parsePayload()
     messageHandler->parseMessage(payload);
 
     if (!messageHandler->isValid() || messageHandler->isJSONNull()) {
-        LOG_DEBUG("JsonErr: %s", messageHandler->getErrorString().c_str());
+        LOG_DEBUG("Error parsing JSON");
         state = State::NoMsg;
         return;
     }
 
     messageHandler->processMessage();
+    state = State::NoMsg;
 }
 
 void StateMachine::setMessageHandler(std::unique_ptr<MessageHandler> handler)

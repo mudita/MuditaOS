@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 import pytest
 from harness.interface.defs import status
@@ -6,6 +6,7 @@ import copy
 import time
 
 @pytest.mark.service_desktop_test
+@pytest.mark.usefixtures("phone_unlocked")
 def test_calendar(harness):
     # add events
     add_body = {
@@ -35,43 +36,32 @@ def test_calendar(harness):
 
     UIDS = []
     ret = harness.endpoint_request("events", "put", add_body)
-    assert ret["status"] == status["OK"]
-    print(ret)
+    assert ret["status"] == status["NoContent"]
     UIDS.insert(0,ret["body"]["UID"])
     event_count = 15
     for new_event_counter  in range(2,event_count+1):
         new_event = copy.deepcopy(add_body)
         new_event["calendar_events"][0]["SUMMARY"] = "Test" + str(new_event_counter)
         ret = harness.endpoint_request("events", "put", new_event)
-        assert ret["status"] == status["OK"]
-        print(ret)
+        assert ret["status"] == status["NoContent"]
         UIDS.insert(new_event_counter-1,ret["body"]["UID"])
-    print('\n')
 
     # get events limit < pageSize - pagination not used
-    print("get events without pagination")
     limit =  2
     offset=  2
-    print("limit =",limit, "offset =",offset)
     get_body = {"limit": limit, "offset": offset}
     ret = harness.endpoint_request("events", "get", get_body)
-    print(ret)
-    print('\n')
     assert ret["status"] == status["OK"]
 
     # get events limit > pageSize - pagination used - basic scenario
-    print("get events with pagination")
     limit = 12
     offset=  1
-    print("limit =",limit, "offset =",offset)
     get_body = {"limit": limit, "offset": offset}
     ret = harness.endpoint_request("events", "get", get_body)
-    print(ret)
-    print('\n')
     assert ret["status"] == status["OK"]
 
+
     # get events limit > pageSize - pagination used - get all events
-    print("get all events with pagination")
     count = ret["body"]["totalCount"]
     batch_size = 10
     divider = int(count / batch_size)
@@ -85,18 +75,15 @@ def test_calendar(harness):
     body = {"limit": reminder, "offset": count-reminder}
     ret = harness.endpoint_request("events", "get", body)
     assert ret["status"] == status["OK"]
-    print("status =",ret["status"])
     events = events + ret["body"]["calendar_events"]
     events_length = len(events)
     assert events_length
     assert events_length == count
 
     # remove all added events - clean up
-    print("\n")
-    print("remove all added events")
     for ev in range(0,event_count):
         del_body = {"UID": UIDS[ev]}
         ret = harness.endpoint_request("events", "del", del_body)
-        assert ret["status"] == status["OK"]
+        assert ret["status"] == status["NoContent"]
 
 

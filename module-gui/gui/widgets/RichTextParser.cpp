@@ -9,10 +9,10 @@
 #include <sstream>
 #include <string>
 #include <map>
-#include <log/log.hpp>
+#include <log.hpp>
 #include "TextFormat.hpp"
 
-#include <module-utils/pugixml/src/pugixml.hpp>
+#include <pugixml.hpp>
 #include <module-utils/Utils.hpp>
 #include <utility>
 
@@ -223,12 +223,12 @@ namespace text
             for (auto &attr : attrs) {
                 if (attr->is(name)) {
                     if (!attr->visit(format, value)) {
-                        LOG_ERROR("Attribute %s parsing error, default set", name.c_str());
+                        LOG_ERROR("Attribute parsing error, default set");
                     }
                     return true;
                 }
             }
-            LOG_ERROR("Attr: %s not found", name.c_str());
+            LOG_ERROR("Attribute not found");
             return false;
         }
 
@@ -267,7 +267,7 @@ namespace text
                                                                                     : attribute.second);
             }
             catch (const std::out_of_range &) {
-                LOG_ERROR("ShortTextNode: %s not found", nodeName);
+                LOG_ERROR("ShortTextNode not found");
                 return {};
             }
         }
@@ -308,7 +308,7 @@ namespace text
                     std::move(token));
             }
             catch (const std::out_of_range &) {
-                LOG_ERROR("Tokens: %s not found", contentName.c_str());
+                LOG_ERROR("Tokens not found");
             }
             return std::nullopt;
         }
@@ -524,7 +524,7 @@ namespace gui::text
     {
         log_parser("parsing: %s", text.c_str());
         if (text.empty() || base_style == nullptr) {
-            LOG_ERROR("no: %s", text.empty() ? "text" : "base style");
+            log_parser("no: %s", text.empty() ? "text" : "base style");
             return nullptr;
         }
 

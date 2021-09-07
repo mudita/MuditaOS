@@ -15,7 +15,7 @@
 #include "TextDocument.hpp"
 #include "TextLine.hpp"
 #include "TextParse.hpp"
-#include "log/log.hpp"
+#include <log.hpp>
 #include "utf8/UTF8.hpp"
 #include <Style.hpp>
 #include <cassert>
@@ -54,7 +54,6 @@ namespace gui
                const uint32_t &y,
                const uint32_t &w,
                const uint32_t &h,
-               const UTF8 &text,
                ExpandMode expandMode,
                TextType textType)
         : Rect(parent, x, y, w, h), expandMode{expandMode}, textType{textType},
@@ -66,7 +65,7 @@ namespace gui
 
         setPenWidth(style::window::default_border_no_focus_w);
         setPenFocusWidth(style::window::default_border_focus_w);
-        buildDocument(text);
+        buildCursor();
 
         setBorderColor(gui::ColorFullBlack);
         setEdges(RectangleEdge::All);
@@ -113,10 +112,10 @@ namespace gui
         limitsList.clear();
     }
 
-    void Text::setUnderline(const bool val)
+    void Text::drawUnderline(bool val)
     {
-        if (lines->getUnderLine() != val) {
-            lines->setUnderLine(val);
+        if (lines->getUnderLineProperties().draw != val) {
+            lines->getUnderLineProperties().draw = val;
             drawLines();
         }
     }
@@ -155,15 +154,15 @@ namespace gui
         drawLines();
     }
 
-    void Text::setRichText(const UTF8 &text)
+    void Text::setRichText(const UTF8 &text, text::RichTextParser::TokenMap &&tokenMap)
     {
         setText("");
-        addRichText(text);
+        addRichText(text, std::move(tokenMap));
     }
 
-    void Text::addRichText(const UTF8 &text)
+    void Text::addRichText(const UTF8 &text, text::RichTextParser::TokenMap &&tokenMap)
     {
-        auto tmp_document = text::RichTextParser().parse(text, &format);
+        auto tmp_document = text::RichTextParser().parse(text, &format, std::move(tokenMap));
 
         if (!tmp_document || tmp_document->isEmpty()) {
 
@@ -206,14 +205,31 @@ namespace gui
     void Text::setFont(const UTF8 &fontName)
     {
         RawFont *newFont = FontManager::getInstance().getFont(fontName);
-        format.setFont(newFont);
-        buildCursor();
+
+        if (format.getFont() != newFont) {
+            format.setFont(newFont);
+            buildDocument(getText());
+        }
     }
 
     void Text::setFont(RawFont *font)
     {
         format.setFont(font);
         buildCursor();
+    }
+
+    void Text::setMinimumWidthToFitText(const UTF8 &text)
+    {
+        auto textToFit = !text::RichTextParser().parse(text, &format)->getText().empty()
+                             ? text::RichTextParser().parse(text, &format)->getText()
+                             : text;
+
+        setMinimumWidth(format.getFont()->getPixelWidth(textToFit) + TextCursor::defaultWidth);
+    }
+
+    void Text::setMinimumHeightToFitText(unsigned int linesCount)
+    {
+        setMinimumHeight(format.getFont()->info.line_height * linesCount);
     }
 
     auto Text::setCursorStartPosition(CursorStartPosition val) -> void
@@ -253,11 +269,15 @@ namespace gui
             debug_text("handleBackspace");
             return true;
         }
+        if (handleWholeTextRemoval(evt)) {
+            debug_text("handleLongBackspace");
+            return true;
+        }
         if (handleAddChar(evt)) {
             debug_text("handleAddChar");
             return true;
         }
-        if (handleDigitLongPress(evt)) {
+        if (handleLongPressAddChar(evt)) {
             debug_text("handleDigitLongPress");
             return true;
         }
@@ -310,7 +330,7 @@ namespace gui
 
     auto Text::getSizeMinusPadding(Axis axis, Area val) -> Length
     {
-        auto size = area(val).size(axis);
+        int size = area(val).size(axis);
 
         if (size <= padding.getSumInAxis(axis)) {
             size = 0;
@@ -453,7 +473,7 @@ namespace gui
 
     auto Text::handleRotateInputMode(const InputEvent &inputEvent) -> bool
     {
-        if (mode != nullptr && inputEvent.isShortPress() && inputEvent.keyCode == gui::KeyCode::KEY_AST) {
+        if (mode != nullptr && inputEvent.isShortRelease(gui::KeyCode::KEY_AST)) {
             mode->next();
             return true;
         }
@@ -470,7 +490,7 @@ namespace gui
 
     auto Text::handleSelectSpecialChar(const InputEvent &inputEvent) -> bool
     {
-        if (mode != nullptr && inputEvent.isLongPress() && inputEvent.keyCode == gui::KeyCode::KEY_AST) {
+        if (mode != nullptr && inputEvent.isLongRelease() && inputEvent.is(gui::KeyCode::KEY_AST)) {
             mode->select_special_char();
             return true;
         }
@@ -479,12 +499,12 @@ namespace gui
 
     auto Text::handleActivation(const InputEvent &inputEvent) -> bool
     {
-        return inputEvent.isShortPress() && inputEvent.is(KeyCode::KEY_AST) && Rect::onActivated(nullptr);
+        return inputEvent.isShortRelease(KeyCode::KEY_AST) && Rect::onActivated(nullptr);
     }
 
     auto Text::handleNavigation(const InputEvent &inputEvent) -> bool
     {
-        if (!inputEvent.isShortPress()) {
+        if (!inputEvent.isShortRelease()) {
             return false;
         }
 
@@ -528,7 +548,7 @@ namespace gui
         if (!isMode(EditMode::Edit)) {
             return false;
         }
-        if (inputEvent.isShortPress() && inputEvent.is(key_signs_remove)) {
+        if (inputEvent.isShortRelease(key_signs_remove)) {
 
             setCursorStartPosition(CursorStartPosition::Offset);
 
@@ -540,13 +560,27 @@ namespace gui
         return false;
     }
 
+    bool Text::handleWholeTextRemoval(const InputEvent &inputEvent)
+    {
+        if (!isMode(EditMode::Edit)) {
+            return false;
+        }
+        if (inputEvent.isLongRelease(key_signs_remove)) {
+            if (!document->isEmpty()) {
+                clear();
+                return true;
+            }
+        }
+        return false;
+    }
+
     bool Text::handleAddChar(const InputEvent &inputEvent)
     {
-        if (!inputEvent.isShortPress() || !isMode(EditMode::Edit)) {
+        if (!inputEvent.isShortRelease() || !isMode(EditMode::Edit)) {
             return false;
         }
 
-        auto code = translator.handle(inputEvent.key, mode ? mode->get() : "");
+        auto code = translator.handle(inputEvent.getRawKey(), mode ? mode->get() : "");
 
         if (code != Profile::none_key && checkAdditionBounds(code) == AdditionBound::CanAddAll) {
 
@@ -570,18 +604,30 @@ namespace gui
         return false;
     }
 
-    bool Text::handleDigitLongPress(const InputEvent &inputEvent)
+    auto Text::handleLongPressAddChar(const InputEvent &inputEvent) -> bool
     {
-        if (!inputEvent.isLongPress()) {
+        if (!inputEvent.isLongRelease()) {
+            return false;
+        }
+        if (!isMode(EditMode::Edit)) {
             return false;
         }
 
-        auto val = toNumeric(inputEvent.keyCode);
+        // check input event handling accordingly to input mode
+        auto code = text::npos;
 
-        if (val != InvalidNumericKeyCode && checkAdditionBounds(val) == AdditionBound::CanAddAll) {
+        // phone mode
+        if (mode->is(InputMode::phone) && inputEvent.is(KeyCode::KEY_0)) {
+            code = '+';
+        }
+        // all other modes only handle digits
+        else if (inputEvent.isDigit()) {
+            code = intToAscii(inputEvent.numericValue());
+        }
 
+        if (code != text::npos && checkAdditionBounds(code) == AdditionBound::CanAddAll) {
             setCursorStartPosition(CursorStartPosition::Offset);
-            addChar(intToAscii(val));
+            addChar(code);
             onTextChanged();
             return true;
         }

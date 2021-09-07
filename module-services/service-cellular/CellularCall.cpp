@@ -6,10 +6,10 @@
 #include <CalllogRecord.hpp>
 #include <PhoneNumber.hpp>
 #include <Utils.hpp>
-#include <log/log.hpp>
-#include <time/time_conversion.hpp>
+#include <log.hpp>
 
 #include <cinttypes>
+#include <ctime>
 #include <optional>
 #include <sstream>
 #include <stdexcept>
@@ -20,46 +20,60 @@ namespace CellularCall
 {
     bool CellularCall::startCall(const utils::PhoneNumber::View &number, const CallType type)
     {
+        LOG_INFO("starting call");
+
         if (isValid()) {
-            LOG_ERROR("call already set");
+            LOG_ERROR("call already established");
             return false;
+        }
+
+        if (cpuSentinel) {
+            cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyHz::Level_6);
         }
 
         clear();
-        CalllogRecord callRec;
-        callRec.type        = type;
-        callRec.date        = utils::time::Timestamp().getTime();
-        callRec.presentation = PresentationType::PR_UNKNOWN;
-        callRec.phoneNumber  = number;
-        call                = startCallAction ? startCallAction(callRec) : CalllogRecord();
+        CalllogRecord callRec{type, number};
+        call = startCallAction ? startCallAction(callRec) : CalllogRecord();
         if (!call.isValid()) {
-            LOG_ERROR("startCallAction failed");
+            LOG_ERROR("failed to obtain a call log record");
             clear();
+            if (cpuSentinel) {
+                cpuSentinel->ReleaseMinimumFrequency();
+            }
+            LOG_INFO("failed to start call");
             return false;
         }
 
+        LOG_INFO("call started");
         return true;
     }
 
     bool CellularCall::setActive()
     {
         if (isValid()) {
-            startActiveTime = utils::time::Timestamp();
+            startActiveTime = utils::time::getCurrentTimestamp();
             isActiveCall    = true;
+            LOG_INFO("set call active");
             return true;
         }
+        LOG_ERROR("no valid call to activate");
         return false;
     }
 
     bool CellularCall::endCall(Forced forced)
     {
+        LOG_INFO("ending call");
         if (!isValid()) {
-            LOG_ERROR("Trying to update invalid call");
+            LOG_ERROR("no call to end");
             return false;
         }
 
+        if (cpuSentinel) {
+            cpuSentinel->ReleaseMinimumFrequency();
+        }
+
         if (isActiveCall) {
-            auto endTime  = utils::time::Timestamp();
+            auto endTime  = utils::time::getCurrentTimestamp();
             call.duration = (endTime - startActiveTime).get();
         }
         else {
@@ -93,6 +107,7 @@ namespace CellularCall
         // Calllog entry was updated, ongoingCall can be cleared
         clear();
 
+        LOG_INFO("call ended");
         return true;
     }
 
@@ -101,4 +116,10 @@ namespace CellularCall
         call.presentation = number.getFormatted().empty() ? PresentationType::PR_UNKNOWN : PresentationType::PR_ALLOWED;
         call.phoneNumber  = number;
     }
+
+    void CellularCall::setCpuSentinel(std::shared_ptr<sys::CpuSentinel> sentinel)
+    {
+        cpuSentinel = std::move(sentinel);
+    }
+
 } // namespace CellularCall

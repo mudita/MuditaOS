@@ -7,9 +7,17 @@
 
 namespace gui::window::name
 {
-    inline constexpr auto onBoarding_languages           = "OnBoardingLanguages";
-    inline constexpr auto onBoarding_start_configuration = "OnBoardingStartingConfiguration";
-    inline constexpr auto onBoarding_eula                = "OnBoardingEula";
+    inline constexpr auto onBoarding_languages                = "OnBoardingLanguages";
+    inline constexpr auto onBoarding_start_configuration      = "OnBoardingStartingConfiguration";
+    inline constexpr auto onBoarding_eula                     = "OnBoardingEula";
+    inline constexpr auto onBoarding_configuration_successful = "OnBoardingConfigurationSuccessful";
+    inline constexpr auto onBoarding_no_configuration         = "OnBoardingNoConfiguration";
+    inline constexpr auto onBoarding_update                   = "OnBoardingUpdate";
+    inline constexpr auto onBoarding_skip                     = "OnBoardingSkipConfirm";
+    inline constexpr auto onBoarding_date_and_time            = "OnBoardingDateAndTime";
+    inline constexpr auto onBoarding_change_date_and_time     = "OnBoardingChangeDateAndTime";
+    inline constexpr auto onBoarding_sim_select               = "OnBoardingSimSelect";
+    inline constexpr auto onBoarding_no_sim_selected          = "OnBoardingNoSimSelected";
 } // namespace gui::window::name
 
 namespace app
@@ -19,9 +27,12 @@ namespace app
     class ApplicationOnBoarding : public Application
     {
       public:
-        explicit ApplicationOnBoarding(std::string name                    = name_onboarding,
-                                       std::string parent                  = {},
-                                       StartInBackground startInBackground = {false});
+        explicit ApplicationOnBoarding(
+            std::string name                            = name_onboarding,
+            std::string parent                          = {},
+            sys::phone_modes::PhoneMode phoneMode       = sys::phone_modes::PhoneMode::Connected,
+            sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled,
+            StartInBackground startInBackground         = {false});
 
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
@@ -29,6 +40,7 @@ namespace app
         sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override;
 
         void acceptEULA();
+        void finalizeOnBoarding();
 
         void createUserInterface() override;
         void destroyUserInterface() override;
@@ -38,7 +50,9 @@ namespace app
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {
-            return {{manager::actions::Launch}};
+            return {
+                {manager::actions::Launch, manager::actions::PhoneModeChanged, manager::actions::BluetoothModeChanged},
+                locks::AutoLockPolicy::PreventPermanently};
         }
     };
 } // namespace app

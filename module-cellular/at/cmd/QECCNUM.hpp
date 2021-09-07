@@ -44,7 +44,7 @@ namespace at
             QECCNUM() noexcept;
             explicit QECCNUM(Mode mode, NumberType numberType, const std::vector<std::string> &number) noexcept;
 
-            [[nodiscard]] auto parse(Result &base_result) -> result::QECCNUM & final;
+            [[nodiscard]] auto parseQECCNUM(const Result &base_result) -> result::QECCNUM;
 
           private:
             void setRequestParameters(Mode mode, NumberType numberType, const std::vector<std::string> &numbers);

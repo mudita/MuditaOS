@@ -1,6 +1,7 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "common.hpp"
 #include <catch2/catch.hpp>
 
 #include "Database/Database.hpp"
@@ -17,12 +18,8 @@
 TEST_CASE("Notifications Table tests")
 {
     Database::initialize();
-
-    const auto notificationsPath = (std::filesystem::path{"user"} / "notifications.db");
-    if (std::filesystem::exists(notificationsPath)) {
-        REQUIRE(std::filesystem::remove(notificationsPath));
-    }
-
+    const auto notificationsPath = (std::filesystem::path{"sys/user"} / "notifications.db");
+    RemoveDbFiles(notificationsPath.stem());
     NotificationsDB notificationsDb{notificationsPath.c_str()};
     REQUIRE(notificationsDb.isInitialized());
 
@@ -35,11 +32,11 @@ TEST_CASE("Notifications Table tests")
     REQUIRE(notificationsTbl.count() == 0);
 
     NotificationsTableRow callsRow{
-        {.ID = DB_ID_NONE}, .key = static_cast<uint32_t>(NotificationsRecord::Key::Calls), .value = 0};
+        Record(DB_ID_NONE), .key = static_cast<uint32_t>(NotificationsRecord::Key::Calls), .value = 0};
     REQUIRE(notificationsTbl.add(callsRow));
 
     NotificationsTableRow smsRow{
-        {.ID = DB_ID_NONE}, .key = static_cast<uint32_t>(NotificationsRecord::Key::Sms), .value = 0};
+        Record(DB_ID_NONE), .key = static_cast<uint32_t>(NotificationsRecord::Key::Sms), .value = 0};
     REQUIRE(notificationsTbl.add(smsRow));
 
     REQUIRE(notificationsTbl.count() == 2); // it already got some entries Calls(1) and Sms(2)
@@ -50,11 +47,12 @@ TEST_CASE("Notifications Table tests")
         REQUIRE(testRow.ID == DB_ID_NONE);
         REQUIRE(testRow.key == 0);
         REQUIRE(testRow.value == 0);
+        REQUIRE(testRow.contactID == DB_ID_NONE);
         REQUIRE_FALSE(testRow.isValid());
     }
 
-    REQUIRE(notificationsTbl.add({{.ID = 0}, .key = 3, .value = 8}));
-    REQUIRE(notificationsTbl.add({{.ID = 0}, .key = 4, .value = 16}));
+    REQUIRE(notificationsTbl.add({Record(0), .key = 3, .value = 8}));
+    REQUIRE(notificationsTbl.add({Record(0), .key = 4, .value = 16, .contactID = 100}));
 
     REQUIRE(notificationsTbl.count() == 4);
 
@@ -64,6 +62,7 @@ TEST_CASE("Notifications Table tests")
         REQUIRE(entry.ID == 4);
         REQUIRE(entry.key == 4);
         REQUIRE(entry.value == 16);
+        REQUIRE(entry.contactID == 100);
         REQUIRE(entry.isValid());
     }
 
@@ -73,6 +72,7 @@ TEST_CASE("Notifications Table tests")
         REQUIRE(entry.ID == 3);
         REQUIRE(entry.key == 3);
         REQUIRE(entry.value == 8);
+        REQUIRE(entry.contactID == DB_ID_NONE);
         REQUIRE(entry.isValid());
     }
 
@@ -93,11 +93,12 @@ TEST_CASE("Notifications Table tests")
 
     SECTION("Entry update")
     {
-        REQUIRE(notificationsTbl.update({{.ID = 3}, .key = 100, .value = 200}));
+        REQUIRE(notificationsTbl.update({Record(3), .key = 100, .value = 200, .contactID = 300}));
         auto entry = notificationsTbl.getById(3);
         REQUIRE(entry.ID == 3);
         REQUIRE(entry.key == 100);
         REQUIRE(entry.value == 200);
+        REQUIRE(entry.contactID == 300);
     }
 
     SECTION("Get entry - invalid ID")
@@ -107,14 +108,16 @@ TEST_CASE("Notifications Table tests")
         REQUIRE(entry.ID == DB_ID_NONE);
         REQUIRE(entry.key == 0);
         REQUIRE(entry.value == 0);
+        REQUIRE(entry.ID == DB_ID_NONE);
     }
 
     SECTION("Get by invalid key")
     {
-        auto entry = notificationsTbl.getById(100);
+        auto entry = notificationsTbl.getByKey(100);
         REQUIRE(entry.ID == DB_ID_NONE);
         REQUIRE(entry.key == 0);
         REQUIRE(entry.value == 0);
+        REQUIRE(entry.ID == DB_ID_NONE);
         REQUIRE_FALSE(entry.isValid());
     }
 
@@ -158,13 +161,14 @@ TEST_CASE("Notifications Table tests")
 
     SECTION("Check uniqueness")
     {
-        REQUIRE(notificationsTbl.add({{.ID = 0}, .key = 3, .value = 100}));
+        REQUIRE(notificationsTbl.add({Record(0), .key = 3, .value = 100, .contactID = 200}));
         REQUIRE(notificationsTbl.count() == 4);
-        auto entry = notificationsTbl.getById(3);
+        auto entry = notificationsTbl.getByKey(3);
+        REQUIRE(entry.isValid());
         REQUIRE(entry.ID == 3);
         REQUIRE(entry.key == 3);
         REQUIRE(entry.value == 8);
-        REQUIRE(entry.isValid());
+        REQUIRE(entry.contactID == DB_ID_NONE);
     }
 
     Database::deinitialize();

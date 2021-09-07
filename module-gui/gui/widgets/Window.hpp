@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -10,13 +10,12 @@
 
 namespace gui
 {
-
     /// Base window for all UI windows
     ///
     /// It consists of:
-    /// 1. TopBar
+    /// 1. StatusBar
     /// 2. BottomBar
-    /// 3. Body defined per window between TopBar and BottomBar
+    /// 3. Body defined per window between StatusBar and BottomBar
     ///
     /// All window switches are done based on Window::name and SwitchData
     /// All windows are statically build at start of application, and removed on application end
@@ -34,6 +33,13 @@ namespace gui
         std::string name;
 
       public:
+        enum class CloseReason
+        {
+            ApplicationClose,
+            WindowSwitch,
+            PhoneLock
+        };
+
         Window() = delete;
         explicit Window(std::string name);
 
@@ -41,7 +47,7 @@ namespace gui
         /// switch data to show
         /// @note this is most likely being duplicated by handleSwitchData
         virtual void onBeforeShow(ShowMode mode, SwitchData *data);
-        virtual void onClose();
+        virtual void onClose(CloseReason reason);
         virtual void getRefreshArea(uint16_t &x, uint16_t &y, uint16_t &w, uint16_t &h);
 
         /// run prior to onBeforeShow
@@ -61,10 +67,17 @@ namespace gui
 
         void buildDrawListImplementation(std::list<Command> &commands) override;
 
+        /// used for window switching purposes
         std::string getName()
         {
             return name;
         };
+
+        /// used for fetching unique name of window
+        virtual std::string getUniqueName()
+        {
+            return name;
+        }
     };
 
 } /* namespace gui */

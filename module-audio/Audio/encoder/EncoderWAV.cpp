@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "EncoderWAV.hpp"
-#include "log/log.hpp"
+#include <log.hpp>
 
 namespace audio
 {

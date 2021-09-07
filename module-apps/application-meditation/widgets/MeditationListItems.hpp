@@ -1,11 +1,11 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include "ListItem.hpp"
-#include "Label.hpp"
-#include "Image.hpp"
+#include <gui/widgets/Image.hpp>
+#include <gui/widgets/Label.hpp>
+#include <gui/widgets/ListItem.hpp>
 
 #include <chrono>
 

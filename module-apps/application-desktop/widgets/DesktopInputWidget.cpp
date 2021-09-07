@@ -1,13 +1,13 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DesktopInputWidget.hpp"
-#include "AppWindow.hpp"
-#include "application-messages/data/MessagesStyle.hpp"
-#include <service-cellular/CellularServiceAPI.hpp>
 
-#include <Style.hpp>
+#include <AppWindow.hpp>
 #include <Font.hpp>
+#include <service-cellular/CellularServiceAPI.hpp>
+#include <Style.hpp>
+
 #include <algorithm>
 
 namespace style::desktop
@@ -49,7 +49,7 @@ namespace gui
         body = new HBox(this, 0, 0, 0, 0);
         body->setEdges(RectangleEdge::Bottom);
         body->setMaximumSize(style::window::default_body_width, style::desktop::body::body_height);
-        inputText = new gui::Text(body, 0, 0, 0, 0, "", ExpandMode::None);
+        inputText = new gui::Text(body, 0, 0, 0, 0, ExpandMode::None);
         inputText->setMaximumSize(style::desktop::inputText::default_input_w, style::desktop::inputText::max_input_h);
         inputText->setMinimumSize(style::desktop::inputText::default_input_w,
                                   style::desktop::inputText::default_input_h);
@@ -82,9 +82,8 @@ namespace gui
         };
     }
 
-    auto DesktopInputWidget::handleRequestResize([[maybe_unused]] const Item *child,
-                                                 unsigned short request_w,
-                                                 unsigned short request_h) -> Size
+    auto DesktopInputWidget::handleRequestResize([[maybe_unused]] const Item *child, Length request_w, Length request_h)
+        -> Size
     {
         request_h = std::clamp(
             static_cast<Length>(request_h), style::desktop::inputWidget::min_h, style::desktop::inputWidget::max_h);

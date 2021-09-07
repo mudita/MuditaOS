@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #define CATCH_CONFIG_MAIN
@@ -16,23 +16,28 @@
 #include "Audio/AudioMux.hpp"
 #include "Audio/Audio.hpp"
 #include "Audio/Operation/Operation.hpp"
+#include <Audio/Operation/RouterOperation.hpp>
 
+using namespace audio;
 
-TEST_CASE("Test audio tags")
+TEST_CASE("Audio Decoder")
 {
-    SECTION(" Encoder tests ")
-    {
-        std::vector<std::string> testExtensions = {"flac", "wav", "mp3"};
-        for (auto ext : testExtensions) {
-            auto dec = audio::Decoder::Create(("testfiles/audio." + ext).c_str());
-            REQUIRE(dec);
-            auto tags = dec->fetchTags();
-            REQUIRE(tags);
-            REQUIRE(tags->title == ext + " Test track title");
-            REQUIRE(tags->artist == ext + " Test artist name");
-            REQUIRE(tags->album == ext + " Test album title");
-            REQUIRE(tags->year == "2020");
-        }
+    std::vector<std::string> testExtensions = {"flac", "wav", "mp3"};
+    for (auto ext : testExtensions) {
+        auto dec = audio::Decoder::Create(("testfiles/audio." + ext).c_str());
+        REQUIRE(dec);
+    }
+}
+
+TEST_CASE(" Tags fetcher ")
+{
+    std::vector<std::string> testExtensions = {"flac", "wav", "mp3"};
+    for (auto ext : testExtensions) {
+        auto tags = tags::fetcher::fetchTags(("testfiles/audio." + ext).c_str());
+        REQUIRE(tags.title == ext + " Test track title - łąki");
+        REQUIRE(tags.artist == ext + " Test artist name - łąki");
+        REQUIRE(tags.album == ext + " Test album title - łąki");
+        REQUIRE(tags.year == "2020");
     }
 }
 
@@ -40,41 +45,76 @@ TEST_CASE("Audio settings string creation")
 {
     SECTION("Create volume string for playback loudspeaker, multimedia")
     {
-        const auto str = audio::dbPath(sys::phone_modes::PhoneMode::Connected,
-                                       audio::Setting::Volume,
-                                       audio::PlaybackType::Multimedia,
-                                       audio::Profile::Type::PlaybackLoudspeaker);
+        const auto str = audio::dbPath(
+            audio::Setting::Volume, audio::PlaybackType::Multimedia, audio::Profile::Type::PlaybackLoudspeaker);
         REQUIRE_FALSE(str.empty());
-        REQUIRE(str == "audio/Connected/PlaybackLoudspeaker/Multimedia/Volume");
+        REQUIRE(str == "audio/PlaybackLoudspeaker/Multimedia/Volume");
     }
 
     SECTION("Create volume string for routing speakerphone")
     {
-        const auto str = audio::dbPath(sys::phone_modes::PhoneMode::Offline,
-                                       audio::Setting::Volume,
-                                       audio::PlaybackType::None,
-                                       audio::Profile::Type::RoutingLoudspeaker);
+        const auto str =
+            audio::dbPath(audio::Setting::Volume, audio::PlaybackType::None, audio::Profile::Type::RoutingLoudspeaker);
         REQUIRE_FALSE(str.empty());
-        REQUIRE(str == "audio/Offline/RoutingLoudspeaker/Volume");
+        REQUIRE(str == "audio/RoutingLoudspeaker/Volume");
     }
 
     SECTION("Create gain string for recording built-in microphone")
     {
-        const auto str = audio::dbPath(sys::phone_modes::PhoneMode::DoNotDisturb,
-                                       audio::Setting::Gain,
-                                       audio::PlaybackType::None,
-                                       audio::Profile::Type::RecordingBuiltInMic);
+        const auto str =
+            audio::dbPath(audio::Setting::Gain, audio::PlaybackType::None, audio::Profile::Type::RecordingBuiltInMic);
         REQUIRE_FALSE(str.empty());
-        REQUIRE(str == "audio/DoNotDisturb/RecordingBuiltInMic/Gain");
+        REQUIRE(str == "audio/RecordingBuiltInMic/Gain");
     }
 
     SECTION("Create empty volume string when Idle")
     {
-        const auto str = audio::dbPath(sys::phone_modes::PhoneMode::Offline,
-                                       audio::Setting::Volume,
-                                       audio::PlaybackType::None,
-                                       audio::Profile::Type::Idle);
+        const auto str = audio::dbPath(audio::Setting::Volume, audio::PlaybackType::None, audio::Profile::Type::Idle);
         REQUIRE(str.empty());
+    }
+
+    SECTION("System settings change")
+    {
+        struct TestCase
+        {
+            PlaybackType playbackType;
+            Setting setting;
+            std::string path;
+        };
+
+        std::vector<TestCase> testCases = {
+            // system volume
+            {PlaybackType::System, Setting::Volume, "audio/RecordingBuiltInMic/Notifications/Volume"},
+            {PlaybackType::Meditation, Setting::Volume, "audio/RecordingBuiltInMic/Notifications/Volume"},
+            {PlaybackType::CallRingtone, Setting::Volume, "audio/RecordingBuiltInMic/Notifications/Volume"},
+            {PlaybackType::KeypadSound, Setting::Volume, "audio/RecordingBuiltInMic/Notifications/Volume"},
+            {PlaybackType::TextMessageRingtone, Setting::Volume, "audio/RecordingBuiltInMic/Notifications/Volume"},
+            {PlaybackType::Notifications, Setting::Volume, "audio/RecordingBuiltInMic/Notifications/Volume"},
+            // other types volume
+            {PlaybackType::Alarm, Setting::Volume, "audio/RecordingBuiltInMic/Alarm/Volume"},
+            {PlaybackType::Multimedia, Setting::Volume, "audio/RecordingBuiltInMic/Multimedia/Volume"},
+            {PlaybackType::None, Setting::Volume, "audio/RecordingBuiltInMic/Volume"},
+
+            // EnableSound
+            {PlaybackType::System, Setting::EnableSound, "audio/RecordingBuiltInMic/Notifications/EnableSound"},
+            {PlaybackType::Meditation, Setting::EnableSound, "audio/RecordingBuiltInMic/Meditation/EnableSound"},
+            {PlaybackType::CallRingtone, Setting::EnableSound, "audio/RecordingBuiltInMic/CallRingtone/EnableSound"},
+            {PlaybackType::KeypadSound, Setting::EnableSound, "audio/RecordingBuiltInMic/KeypadSound/EnableSound"},
+            {PlaybackType::TextMessageRingtone,
+             Setting::EnableSound,
+             "audio/RecordingBuiltInMic/TextMessageRingtone/EnableSound"},
+            {PlaybackType::Notifications, Setting::EnableSound, "audio/RecordingBuiltInMic/Notifications/EnableSound"},
+            {PlaybackType::Alarm, Setting::EnableSound, "audio/RecordingBuiltInMic/Alarm/EnableSound"},
+            {PlaybackType::Multimedia, Setting::EnableSound, "audio/RecordingBuiltInMic/Multimedia/EnableSound"},
+            {PlaybackType::None, Setting::EnableSound, "audio/RecordingBuiltInMic/EnableSound"},
+        };
+
+        for (auto &testCase : testCases) {
+            const auto str =
+                audio::dbPath(testCase.setting, testCase.playbackType, audio::Profile::Type::RecordingBuiltInMic);
+            REQUIRE_FALSE(str.empty());
+            REQUIRE(str == testCase.path);
+        }
     }
 }
 
@@ -102,9 +142,55 @@ class MockAudio : public audio::Audio
         return state;
     }
 
+    void setConnected(EventType deviceUpdateEvent)
+    {
+        audioSinkState.setConnected(deviceUpdateEvent, true);
+    }
+
+    void setDisconnected(EventType deviceUpdateEvent)
+    {
+        audioSinkState.setConnected(deviceUpdateEvent, false);
+    }
+
     State state = State::Idle;
     audio::PlaybackType plbckType;
     audio::Operation::State opState;
+};
+
+class MockRouterOperation : public RouterOperation
+{
+    bool loudspeakerEnabled = false;
+
+    bool isLoudspeakerOn() const
+    {
+        return std::find_if(supportedProfiles.begin(), supportedProfiles.end(), [this](const SupportedProfile &s) {
+                   return (s.profile->GetType() == Profile::Type::RoutingLoudspeaker) && s.isAvailable &&
+                          loudspeakerEnabled;
+               }) != std::end(supportedProfiles);
+    }
+
+  public:
+    /* value - volume and gain value */
+    explicit MockRouterOperation(AudioServiceMessage::Callback callback) : RouterOperation(nullptr, callback)
+    {}
+
+    std::optional<Profile::Type> getPriorityProfile() const
+    {
+        if (isLoudspeakerOn()) {
+            return Profile::Type::RoutingLoudspeaker;
+        }
+        return Operation::GetPriorityProfile();
+    }
+
+    void enableLoudspeaker() noexcept
+    {
+        loudspeakerEnabled = true;
+    }
+
+    void disableLoudspeaker() noexcept
+    {
+        loudspeakerEnabled = false;
+    }
 };
 
 TEST_CASE("Test AudioMux")
@@ -411,6 +497,172 @@ TEST_CASE("Test AudioMux")
                 auto retInput = aMux.GetRoutingInput(true);
                 REQUIRE(retInput != std::nullopt);
                 REQUIRE((*retInput)->token == Token(tkId));
+            }
+        }
+    }
+}
+
+SCENARIO("Profile playback priorities tests")
+{
+    GIVEN("Audio idle instance")
+    {
+        MockAudio audio{Audio::State::Idle, PlaybackType::None, Operation::State::Idle};
+        WHEN("All audio devices are connected")
+        {
+            audio.setConnected(EventType::JackState);
+            audio.setConnected(EventType::BlutoothA2DPDeviceState);
+            THEN("Headphones are prioritized")
+            {
+                REQUIRE(audio.GetPriorityPlaybackProfile() == Profile::Type::PlaybackHeadphones);
+            }
+            AND_WHEN("Bluetooth is disconnected")
+            {
+                audio.setDisconnected(EventType::BlutoothA2DPDeviceState);
+                THEN("Headphones are prioritized")
+                {
+                    REQUIRE(audio.GetPriorityPlaybackProfile() == Profile::Type::PlaybackHeadphones);
+                }
+            }
+            AND_WHEN("Headphones are disconnected")
+            {
+                audio.setDisconnected(EventType::JackState);
+                THEN("Bluetooth is prioritized")
+                {
+                    REQUIRE(audio.GetPriorityPlaybackProfile() == Profile::Type::PlaybackBluetoothA2DP);
+                }
+            }
+        }
+        WHEN("Only bluetooth device is connected")
+        {
+            audio.setConnected(EventType::BlutoothA2DPDeviceState);
+            THEN("Bluetooth is prioritized")
+            {
+                REQUIRE(audio.GetPriorityPlaybackProfile() == Profile::Type::PlaybackBluetoothA2DP);
+            }
+        }
+        WHEN("Only headphones are connected")
+        {
+            audio.setConnected(EventType::JackState);
+            THEN("Headphones are prioritized")
+            {
+                REQUIRE(audio.GetPriorityPlaybackProfile() == Profile::Type::PlaybackHeadphones);
+            }
+        }
+        WHEN("All audio devices are disconnected")
+        {
+            THEN("Loudspeaker is prioritized")
+            {
+                REQUIRE(audio.GetPriorityPlaybackProfile() == Profile::Type::PlaybackLoudspeaker);
+            }
+        }
+    }
+}
+
+SCENARIO("Router playback priorities tests")
+{
+    GIVEN("Router operation instance")
+    {
+        MockRouterOperation routerOperation([](const sys::Message *e) { return "1"; });
+        WHEN("All audio devices are disconnected, loudspeaker is off")
+        {
+            routerOperation.SendEvent(std::make_shared<Event>(audio::EventType::CallLoudspeakerOff));
+            THEN("Earspeaker is prioritized")
+            {
+                REQUIRE(routerOperation.getPriorityProfile() == Profile::Type::RoutingEarspeaker);
+            }
+            AND_WHEN("Loudspeaker is on")
+            {
+                routerOperation.SendEvent(std::make_shared<Event>(audio::EventType::CallLoudspeakerOn));
+                routerOperation.enableLoudspeaker();
+                THEN("Loudspeaker is prioritized")
+                {
+                    REQUIRE(routerOperation.getPriorityProfile() == Profile::Type::RoutingLoudspeaker);
+                }
+            }
+        }
+
+        WHEN("All audio devices are connected, loudspeaker is off")
+        {
+            routerOperation.SendEvent(
+                std::make_shared<Event>(audio::EventType::BlutoothHSPDeviceState, Event::DeviceState::Connected));
+            routerOperation.SendEvent(
+                std::make_shared<Event>(audio::EventType::JackState, Event::DeviceState::Connected));
+            routerOperation.SendEvent(std::make_shared<Event>(audio::EventType::CallLoudspeakerOff));
+
+            THEN("Headphones are prioritized")
+            {
+                REQUIRE(routerOperation.getPriorityProfile() == Profile::Type::RoutingHeadphones);
+            }
+            AND_WHEN("Loudspeaker is on")
+            {
+                routerOperation.SendEvent(std::make_shared<Event>(audio::EventType::CallLoudspeakerOn));
+                routerOperation.enableLoudspeaker();
+                THEN("Loudspeaker is prioritized")
+                {
+                    REQUIRE(routerOperation.getPriorityProfile() == Profile::Type::RoutingLoudspeaker);
+                }
+            }
+
+            WHEN("Headphones are disconnected")
+            {
+                routerOperation.SendEvent(
+                    std::make_shared<Event>(audio::EventType::JackState, Event::DeviceState::Disconnected));
+
+                THEN("Bluetooth HSP is prioritized")
+                {
+                    REQUIRE(routerOperation.getPriorityProfile() == Profile::Type::RoutingBluetoothHSP);
+                }
+                AND_WHEN("Loudspeaker is on")
+                {
+                    routerOperation.SendEvent(std::make_shared<Event>(audio::EventType::CallLoudspeakerOn));
+                    routerOperation.enableLoudspeaker();
+                    THEN("Loudspeaker is prioritized")
+                    {
+                        REQUIRE(routerOperation.getPriorityProfile() == Profile::Type::RoutingLoudspeaker);
+                    }
+                }
+            }
+        }
+
+        WHEN("Only bluetooth HSP is connected, loudspeaker is off")
+        {
+            routerOperation.SendEvent(
+                std::make_shared<Event>(audio::EventType::BlutoothHSPDeviceState, Event::DeviceState::Connected));
+            routerOperation.SendEvent(std::make_shared<Event>(audio::EventType::CallLoudspeakerOff));
+
+            THEN("Bluetooth HSP is prioritized")
+            {
+                REQUIRE(routerOperation.getPriorityProfile() == Profile::Type::RoutingBluetoothHSP);
+            }
+            AND_WHEN("Loudspeaker is on")
+            {
+                routerOperation.SendEvent(std::make_shared<Event>(audio::EventType::CallLoudspeakerOn));
+                routerOperation.enableLoudspeaker();
+                THEN("Loudspeaker is prioritized")
+                {
+                    REQUIRE(routerOperation.getPriorityProfile() == Profile::Type::RoutingLoudspeaker);
+                }
+            }
+        }
+
+        WHEN("Only headphones are connected, loudspeaker is off")
+        {
+            routerOperation.SendEvent(
+                std::make_shared<Event>(audio::EventType::JackState, Event::DeviceState::Connected));
+            routerOperation.SendEvent(std::make_shared<Event>(audio::EventType::CallLoudspeakerOff));
+
+            THEN("Headphones are prioritized")
+            {
+                REQUIRE(routerOperation.getPriorityProfile() == Profile::Type::RoutingHeadphones);
+            }
+            AND_WHEN("Loudspeaker is on")
+            {
+                routerOperation.SendEvent(std::make_shared<Event>(audio::EventType::CallLoudspeakerOn));
+                routerOperation.enableLoudspeaker();
+                THEN("Loudspeaker is prioritized")
+                {
+                    REQUIRE(routerOperation.getPriorityProfile() == Profile::Type::RoutingLoudspeaker);
+                }
             }
         }
     }

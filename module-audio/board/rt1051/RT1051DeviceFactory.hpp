@@ -4,14 +4,18 @@
 #pragma once
 
 #include <Audio/AudioDeviceFactory.hpp>
+#include <Audio/Profiles/Profile.hpp>
 
 namespace audio
 {
 
     class RT1051DeviceFactory : public AudioDeviceFactory
     {
+      public:
+        std::shared_ptr<AudioDevice> createCellularAudioDevice() override final;
+
       protected:
-        std::shared_ptr<AudioDevice> getDeviceFromType(AudioDevice::Type deviceType) override;
+        std::shared_ptr<AudioDevice> getDevice(const Profile &audioProfile) override;
     };
 
 }; // namespace audio

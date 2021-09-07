@@ -1,44 +1,55 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <iosyscalls.hpp>
+#include "iosyscalls-internal.hpp"
+
+#include <debug.hpp>
+#include <parallel_hashmap/phmap.h>
+
+#include <dirent.h>
+#include <dlfcn.h>
+#include <pthread.h>
+
+#include <algorithm>
+
+#include <cassert>
+#include <cstdarg>
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <pthread.h>
-#include <parallel_hashmap/phmap.h>
-#include <stdio.h>
-#include <dlfcn.h>
-#include <stdarg.h>
-#include <debug.hpp>
-#include <dirent.h>
 
 namespace
 {
     constexpr auto ENV_NAME       = "IOSYSCALLS_REDIRECT_TO_IMAGE";
     constexpr auto FIRST_FILEDESC = 64'566'756;
+    constexpr auto SYSROOT        = "sysroot";
     bool g_evaluated              = false;
     bool g_redirect               = false;
 
-    constexpr const char *LINUX_PATHS[]{"/dev/",
-                                        "/etc/",
-                                        "/usr/share",
-                                        "/run/user",
-                                        "/home",
-                                        "/proc",
-                                        "PurePhone.img",
-                                        "MuditaOS.log",
-                                        "/tmp",
-                                        nullptr};
+    constexpr const char *LINUX_PATHS[]{
+        "/dev/", "/etc/", "/lib", "/usr/share", "/run/user", "/home", "/proc", "/tmp", "MuditaOS.log", nullptr};
 
-    constexpr const char *IMAGE_PATHS[]{"/sys", nullptr};
+    constexpr const char *IMAGE_PATHS[]{"/sys", "/mfgconf", "sys", "assets", "country-codes.db", "Luts.bin", nullptr};
 
     pthread_mutex_t g_lock = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
     phmap::flat_hash_set<vfsn::linux::internal::FILEX *> g_fdlist;
     phmap::flat_hash_set<DIR *> g_dirlist;
+    std::string imageFileName;
+    std::string sysroot = SYSROOT;
 } // namespace
 
 namespace vfsn::linux::internal
 {
+    void set_sysroot(const char *newSysroot)
+    {
+        sysroot = newSysroot;
+    }
+
+    void set_image_path(const char *newImageName)
+    {
+        imageFileName = std::string(newImageName);
+    }
+
     bool redirect_to_image()
     {
         if (!g_evaluated) {
@@ -51,23 +62,58 @@ namespace vfsn::linux::internal
 
     bool redirect_to_image(const char *inpath)
     {
-        if (!redirect_to_image())
+        if (!redirect_to_image()) {
             return false;
+        }
 
-        for (auto path = LINUX_PATHS; *path; ++path)
-            if (std::strstr(inpath, *path) == inpath)
+        if (std::strstr(inpath, imageFileName.c_str()) == inpath) {
+            return false;
+        }
+
+        for (auto path = LINUX_PATHS; *path; ++path) {
+            if (std::strstr(inpath, *path) == inpath) {
                 return false;
+            }
+        }
 
         return true;
     }
 
     const char *npath_translate(const char *inpath, char *buffer)
     {
-        for (auto path = IMAGE_PATHS; *path; ++path)
+        auto inputPath = std::string(inpath);
+
+        for (auto path = IMAGE_PATHS; *path != 0; ++path) {
             if (std::strstr(inpath, *path) == inpath) {
-                std::strncpy(buffer, inpath + 1, PATH_MAX);
+                std::string outpath;
+
+                if (std::strcmp(*path, "/mfgconf") == 0) {
+                    outpath = sysroot;
+                    outpath += "/sys/";
+                    outpath += inputPath;
+                }
+                else if (std::strcmp(*path, "sys") == 0) {
+                    outpath = sysroot;
+                    outpath += "/";
+                    outpath += inputPath;
+                }
+                else if (*inpath == '/') {
+                    outpath = sysroot + inputPath;
+                }
+                else {
+                    outpath = sysroot;
+                    outpath += "/sys/current/";
+                    outpath += inputPath;
+                }
+
+                assert(outpath.size() < PATH_MAX);
+                std::copy_n(std::begin(outpath), outpath.size(), buffer);
+                buffer[outpath.size()] = '\0';
+
                 return buffer;
             }
+        }
+
         return inpath;
     }
 

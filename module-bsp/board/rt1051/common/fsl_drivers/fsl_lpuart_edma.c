@@ -275,6 +275,11 @@ status_t LPUART_SendEDMA(LPUART_Type *base, lpuart_edma_handle_t *handle, lpuart
     return status;
 }
 
+status_t LPUART_IsEDMATxBusy(lpuart_edma_handle_t *handle)
+{
+    return (kLPUART_TxBusy == handle->txState);
+}
+
 status_t LPUART_ReceiveEDMA(LPUART_Type *base, lpuart_edma_handle_t *handle, lpuart_transfer_t *xfer)
 {
     assert(handle);

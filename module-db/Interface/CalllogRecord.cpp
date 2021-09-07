@@ -4,7 +4,7 @@
 #include "CalllogRecord.hpp"
 
 #include <ContactRecord.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <Tables/CalllogTable.hpp>
 #include <PhoneNumber.hpp>
 #include <Utils.hpp>
@@ -25,6 +25,10 @@ CalllogRecord::CalllogRecord(const CalllogTableRow &tableRow)
       phoneNumber(utils::PhoneNumber(tableRow.number, tableRow.e164number).getView()), isRead(tableRow.isRead)
 {}
 
+CalllogRecord::CalllogRecord(const CallType type, const utils::PhoneNumber::View &number)
+    : presentation(PresentationType::PR_UNKNOWN), date(std::time(nullptr)), type(type), phoneNumber(number)
+{}
+
 uint32_t CalllogRecord::getContactId() const
 {
     return contactId;
@@ -41,19 +45,26 @@ std::ostream &operator<<(std::ostream &out, const CalllogRecord &rec)
     return out;
 }
 
+[[nodiscard]] std::string CalllogRecord::str() const
+{
+    std::ostringstream ss;
+    ss << *this;
+    return ss.str();
+}
+
 CalllogRecordInterface::CalllogRecordInterface(CalllogDB *calllogDb, ContactsDB *contactsDb)
     : calllogDB(calllogDb), contactsDB(contactsDb)
 {}
 
 bool CalllogRecordInterface::Add(const CalllogRecord &rec)
 {
-    auto localRec      = rec;
+    auto localRec = rec;
     if (!rec.phoneNumber.getFormatted().empty()) {
         ContactRecordInterface contactInterface(contactsDB);
         auto contactMatch =
             contactInterface.MatchByNumber(rec.phoneNumber, ContactRecordInterface::CreateTempContact::True);
         if (!contactMatch) {
-            LOG_ERROR("Cannot get contact, for number %s", rec.phoneNumber.getNonEmpty().c_str());
+            LOG_ERROR("Cannot get contact, for id %" PRIu32, rec.contactId);
             return false;
         }
         auto &contactRec = contactMatch->contact;
@@ -63,7 +74,7 @@ bool CalllogRecordInterface::Add(const CalllogRecord &rec)
         if (localRec.presentation == PresentationType::PR_UNKNOWN) {
             localRec.presentation = PresentationType::PR_ALLOWED;
         }
-        LOG_DEBUG("Adding call log record %s", utils::to_string(localRec).c_str());
+        LOG_DEBUG("Adding call log record");
     }
     else {
         // private number so do not add contact just call log entry
@@ -71,7 +82,7 @@ bool CalllogRecordInterface::Add(const CalllogRecord &rec)
         LOG_DEBUG("Adding private call entry to call log record.");
     }
 
-    return calllogDB->calls.add(CalllogTableRow{{.ID = localRec.ID}, // this is only to remove warning
+    return calllogDB->calls.add(CalllogTableRow{Record(localRec.ID), // this is only to remove warning
                                                 .number       = localRec.phoneNumber.getEntered(),
                                                 .e164number   = localRec.phoneNumber.getE164(),
                                                 .presentation = localRec.presentation,
@@ -141,7 +152,7 @@ bool CalllogRecordInterface::Update(const CalllogRecord &rec)
         auto contactMatch =
             contactInterface.MatchByNumber(rec.phoneNumber, ContactRecordInterface::CreateTempContact::True);
         if (!contactMatch) {
-            LOG_ERROR("Cannot get or create temporary contact for number %s", rec.phoneNumber.getNonEmpty().c_str());
+            LOG_ERROR("Cannot get or create temporary contact for id %" PRIu32, rec.contactId);
             return false;
         }
         contactID = contactMatch->contact.ID;
@@ -150,7 +161,7 @@ bool CalllogRecordInterface::Update(const CalllogRecord &rec)
         }
     }
 
-    return calllogDB->calls.update(CalllogTableRow{{.ID = rec.ID},
+    return calllogDB->calls.update(CalllogTableRow{Record(rec.ID),
                                                    .number       = rec.phoneNumber.getEntered(),
                                                    .e164number   = rec.phoneNumber.getE164(),
                                                    .presentation = presentation,
@@ -274,7 +285,8 @@ std::unique_ptr<db::QueryResult> CalllogRecordInterface::getQuery(std::shared_pt
         record.ID           = calllog.ID;
         recordVector.emplace_back(record);
     }
-    auto response = std::make_unique<db::query::CalllogGetResult>(recordVector);
+
+    auto response = std::make_unique<db::query::CalllogGetResult>(std::move(recordVector), GetCount());
     response->setRequestQuery(query);
     return response;
 }
@@ -299,8 +311,9 @@ std::unique_ptr<db::QueryResult> CalllogRecordInterface::setAllReadQuery(std::sh
 
 std::unique_ptr<db::QueryResult> CalllogRecordInterface::getCountQuery(std::shared_ptr<db::Query> query)
 {
-    auto count    = CalllogRecordInterface::GetCount();
-    auto response = std::make_unique<db::query::CalllogGetCountResult>(count);
+    auto localQuery = static_cast<db::query::CalllogGetCount *>(query.get());
+    auto count      = GetCount(localQuery->getState());
+    auto response   = std::make_unique<db::query::CalllogGetCountResult>(localQuery->getState(), count);
     response->setRequestQuery(query);
     return response;
 }

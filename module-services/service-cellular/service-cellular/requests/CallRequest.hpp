@@ -14,7 +14,7 @@ namespace cellular
     {
       public:
         CallRequest(const std::string &data) : Request(data){};
-        std::string command() final;
+        at::Cmd command() final;
         std::string getNumber() const
         {
             return request;

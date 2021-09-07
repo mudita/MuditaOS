@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -19,6 +19,15 @@ namespace gui
         Concurrent
     };
 
+    struct UnderLineProperties
+    {
+        bool draw                           = false;
+        Position underLinePadding           = 0;
+        unsigned int thickness              = 1;
+        Length underlineHeight              = 0;
+        UnderlineDrawMode drawUnderlineMode = UnderlineDrawMode::WholeLine;
+    };
+
     /// interface element for TextDocument->getLine() <-- Text
     class TextLine
     {
@@ -27,18 +36,19 @@ namespace gui
         Length heightUsed             = 0;
         Length maxWidth               = 0;
         std::list<Label *> lineContent;
-        Rect *underline                     = nullptr;
-        bool drawUnderline                  = false;
-        UnderlineDrawMode drawUnderlineMode = UnderlineDrawMode::Concurrent;
-        Position underlinePadding           = 0;
-        Position underlineHeight            = 0;
+        Rect *underline = nullptr;
+        UnderLineProperties underLineProperties;
         TextBlock::End end                  = TextBlock::End::None;
         Position storedYOffset              = 0;
         bool lineEnd                        = false;
         bool lineVisible                    = true;
+        bool breakLineDashAddition          = false;
+        bool removeTrailingSpace            = false;
         unsigned int lineStartBlockNumber   = text::npos;
         unsigned int lineStartBlockPosition = text::npos;
 
+        unsigned int calculateSignsToShow(BlockCursor &localCursor, UTF8 &text, unsigned int space);
+        UTF8 textToPrint(unsigned int signsCountToShow, UTF8 &text);
         void createUnderline(unsigned int max_w, unsigned int max_height);
         void updateUnderline(const short &x, const short &y);
         void setLineStartConditions(unsigned int startBlockNumber, unsigned int startBlockPosition);
@@ -52,15 +62,11 @@ namespace gui
         TextLine(BlockCursor &cursor,
                  unsigned int max_width,
                  unsigned int init_height,
-                 bool drawUnderline,
-                 UnderlineDrawMode drawUnderlineMode,
-                 Position underlinePadding)
+                 UnderLineProperties underLineProperties)
             : TextLine(cursor, max_width)
         {
-            this->drawUnderline     = drawUnderline;
-            this->drawUnderlineMode = drawUnderlineMode;
-            this->underlinePadding  = underlinePadding;
-            this->underlineHeight   = init_height;
+            this->underLineProperties                 = underLineProperties;
+            this->underLineProperties.underlineHeight = init_height;
         }
 
         ~TextLine();
@@ -124,18 +130,6 @@ namespace gui
             return lineStartBlockPosition;
         }
 
-        [[nodiscard]] const Item *getElement(unsigned int pos) const noexcept
-        {
-            unsigned int local_pos = 0;
-            for (auto &el : lineContent) {
-                local_pos += el->getTextLength();
-                if (local_pos >= pos) {
-                    return el;
-                }
-            }
-            return nullptr;
-        }
-
         [[nodiscard]] int32_t getX() const noexcept
         {
             return lineContent.front()->area().pos(Axis::X);
@@ -151,6 +145,7 @@ namespace gui
         /// moves Text parts in Text. To not call n times callbacks on resize, call prior to setting parent
         void alignH(Alignment align, Length parent_length) const;
         void alignV(Alignment align, Length parent_length, Length lines_height);
+        [[nodiscard]] const Item *getElement(unsigned int pos) const noexcept;
         [[nodiscard]] auto getText(unsigned int pos) const -> UTF8;
     };
 } // namespace gui

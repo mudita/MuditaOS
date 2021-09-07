@@ -1,22 +1,19 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "ApplicationMessages.hpp"
+#include "MessagesStyle.hpp"
+#include "SMSdata.hpp"
 #include "SMSThreadViewWindow.hpp"
 
-#include "application-messages/ApplicationMessages.hpp"
-#include "application-messages/data/SMSdata.hpp"
-#include "application-messages/data/MessagesStyle.hpp"
-
-#include "OptionsMessages.hpp"
-#include "Service/Message.hpp"
-
-#include <TextBubble.hpp>
-#include <service-db/DBServiceAPI.hpp>
-#include <service-db/DBNotificationMessage.hpp>
+#include <log.hpp>
 #include <module-db/queries/phonebook/QueryContactGetByID.hpp>
-
-#include <log/log.hpp>
+#include <OptionsMessages.hpp>
+#include <service-db/DBNotificationMessage.hpp>
+#include <service-db/DBServiceAPI.hpp>
+#include <Service/Message.hpp>
 #include <Style.hpp>
+#include <TextBubble.hpp>
 
 #include <cassert>
 
@@ -28,9 +25,9 @@ namespace gui
           smsModel{std::make_shared<SMSThreadModel>(app)}
     {
         AppWindow::buildInterface();
-        setTitle(utils::localize.get("app_messages_title_main"));
-        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(style::strings::common::options));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        setTitle(utils::translate("app_messages_title_main"));
+        bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::options));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
         smsList = new gui::ListView(this,
                                     style::messages::smsList::x,
@@ -38,8 +35,8 @@ namespace gui
                                     style::messages::smsList::w,
                                     style::messages::smsList::h,
                                     smsModel,
-                                    style::listview::ScrollBarType::Proportional);
-        smsList->setOrientation(style::listview::Orientation::BottomTop);
+                                    listview::ScrollBarType::Proportional);
+        smsList->setOrientation(listview::Orientation::BottomTop);
 
         setFocusItem(smsList);
     }
@@ -85,7 +82,7 @@ namespace gui
         }
         if (auto pdata = dynamic_cast<SMSTextData *>(data)) {
             auto txt = pdata->text;
-            LOG_INFO("received sms templates data \"%s\"", txt.c_str());
+            LOG_INFO("received sms templates data");
             pdata->concatenate == SMSTextData::Concatenate::True ? smsModel->smsInput->inputText->addText(txt)
                                                                  : smsModel->smsInput->inputText->setText(txt);
         }
@@ -96,7 +93,7 @@ namespace gui
         return AppWindow::onInput(inputEvent);
     }
 
-    void SMSThreadViewWindow::onClose()
+    void SMSThreadViewWindow::onClose([[maybe_unused]] CloseReason reason)
     {
         smsModel->handleDraftMessage();
     }

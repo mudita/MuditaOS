@@ -22,7 +22,7 @@ reap() {
 }
 
 pushd ..
-background './run_emulator_on_filesystem_image.sh 2>&1 > emulator.log & echo $! > emulator.pid'
+background './run_simulator_on_filesystem_image.sh 2>&1 > simulator.log & echo $! > simulator.pid'
 popd
 sleep 1
 eval 'python3 phone_off.py -rP --port=simulator --timeout=20 -m "not rt1051"'

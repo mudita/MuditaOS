@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -17,7 +17,7 @@ TEST_CASE("Notes Record tests")
 {
     Database::initialize();
 
-    const auto notesDbPath = std::filesystem::path{"user"} / "notes.db";
+    const auto notesDbPath = std::filesystem::path{"sys/user"} / "notes.db";
     NotesDB notesDb{notesDbPath.c_str()};
     REQUIRE(notesDb.isInitialized());
 
@@ -46,7 +46,7 @@ TEST_CASE("Notes Record tests")
     SECTION("Get notes by text query")
     {
         constexpr auto testSearch = "TEST";
-        auto query                = std::make_unique<db::query::QueryNotesGetByText>(testSearch);
+        auto query                = std::make_unique<db::query::QueryNotesGetByText>(testSearch, 0, 3);
         auto response             = notesRecordInterface.runQuery(std::move(query));
         auto getResult            = static_cast<db::query::NotesGetByTextResult *>(response.get());
 
@@ -64,7 +64,25 @@ TEST_CASE("Notes Record tests")
         auto addResult = static_cast<db::query::NoteStoreResult *>(response.get());
 
         REQUIRE(addResult->succeed());
+        REQUIRE(addResult->getNoteId() == 2);
         REQUIRE(notesRecordInterface.GetCount() == 2);
+    }
+
+    SECTION("Update a note")
+    {
+        constexpr auto testId = 1;
+
+        NotesRecord record;
+        record.ID      = testId;
+        record.snippet = testSnippet;
+
+        auto query        = std::make_unique<db::query::QueryNoteStore>(record);
+        auto response     = notesRecordInterface.runQuery(std::move(query));
+        auto updateResult = static_cast<db::query::NoteStoreResult *>(response.get());
+
+        REQUIRE(updateResult->succeed());
+        REQUIRE(updateResult->getNoteId() == testId);
+        REQUIRE(notesRecordInterface.GetCount() == 1);
     }
 
     SECTION("Remove a note")

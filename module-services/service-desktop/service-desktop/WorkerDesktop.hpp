@@ -3,84 +3,56 @@
 
 #pragma once
 
-#include <filesystem>
-#include <atomic>
 #include "Service/Message.hpp"
 #include "Service/Service.hpp"
 #include "Service/Worker.hpp"
-#include "Service/Timer.hpp"
+#include "Service/CpuSentinel.hpp"
 #include "parser/ParserFSM.hpp"
 #include "endpoints/EndpointFactory.hpp"
 #include "bsp/usb/usb.hpp"
+#include "USBSecurityModel.hpp"
 
-class WorkerDesktop : public sys::Worker, public bsp::USBDeviceListener
+#include <crc32.h>
+
+#include <filesystem>
+#include <atomic>
+
+namespace constants
+{
+    constexpr auto usbSuspendTimeout = std::chrono::seconds{1};
+} // namespace constants
+
+class WorkerDesktop : public sys::Worker
 {
   public:
-    enum TransferFailAction
-    {
-        doNothing,
-        removeDesitnationFile
-    };
-    enum class Command
-    {
-        CancelTransfer,
-    };
-
-    WorkerDesktop(sys::Service *ownerServicePtr);
+    WorkerDesktop(sys::Service *ownerServicePtr,
+                  const sdesktop::USBSecurityModel &securityModel,
+                  const std::string serialNumber);
 
     virtual bool init(std::list<sys::WorkerQueueInfo> queues) override;
     virtual bool deinit() override;
-    bool handleMessage(uint32_t queueID) override final;
+    bool reinit(const std::filesystem::path &path);
 
-    sys::Service *ownerService = nullptr;
-    parserFSM::StateMachine parser;
+    bool handleMessage(uint32_t queueID) override final;
 
     xQueueHandle getReceiveQueue()
     {
         return receiveQueue;
     }
 
-    sys::ReturnCodes startDownload(const std::filesystem::path &destinationPath, const uint32_t fileSize);
-    void stopTransfer(const TransferFailAction action);
-
-    void cancelTransferOnTimeout();
-
-    void rawDataReceived(void *dataPtr, uint32_t dataLen) override;
-    bool getRawMode() const noexcept override;
-
-    void setEndpointSecurity(EndpointSecurity security)
-    {
-        endpointSecurity = security;
-    }
-
-    void enableEndpointSecurity(bool enable)
-    {
-        endpointSecurityEnabled = enable;
-    }
-
-    bool isEndpointSecurityEnabled()
-    {
-        return endpointSecurityEnabled;
-    }
-
   private:
-    void uploadFileFailedResponse();
-
-    void transferTimeoutHandler();
-
-    void startTransferTimer();
-    void stopTransferTimer();
-    void reloadTransferTimer();
+    void suspendUsb();
 
     bool stateChangeWait();
-
+    bool initialized = false;
     xQueueHandle receiveQueue;
     xQueueHandle irqQueue;
-    FILE *fileDes                  = nullptr;
-    uint32_t writeFileSizeExpected = 0;
-    uint32_t writeFileDataWritten  = 0;
-    std::filesystem::path filePath;
-    std::atomic<bool> rawModeEnabled = false;
-    bool endpointSecurityEnabled     = true;
-    EndpointSecurity endpointSecurity;
+    const sdesktop::USBSecurityModel &securityModel;
+    const std::string serialNumber;
+    sys::Service *ownerService = nullptr;
+    parserFSM::StateMachine parser;
+    sys::TimerHandle usbSuspendTimer;
+    bsp::USBDeviceStatus usbStatus = bsp::USBDeviceStatus::Disconnected;
+
+    std::shared_ptr<sys::CpuSentinel> cpuSentinel;
 };

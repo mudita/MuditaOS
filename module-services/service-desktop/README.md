@@ -1,11 +1,11 @@
 Service Desktop
 =================
 
-This service is handling communication between Mudita Deskatop App and PurePhone.
+This service is handling communication between Mudita Desktop App and PurePhone.
 
 **Note:
 Service desktop is disabled by default.
-To turn it on, please uncomment this line in mail.cpp:**
+To turn it on, please uncomment this line in main.cpp:**
 
 `        ret |= sys::SystemManager::CreateService(std::make_shared<ServiceDesktop>(), sysmgr.get());
 `
@@ -148,18 +148,18 @@ response:
 
 ### Service documentation
 
-#### Hi level view
+#### High level view
 
 ![Flowchart](./doc/how_machine_works.svg)
 <img src="./doc/how_machine_works.svg">
 
 #### System asynchronous calls synchronization
 
-Calls from outside world are REST like. This means that:
-- for one request 
-- there is one response
+Calls from the outside world are REST-like. This means that:
+- each call contains single request 
+- for each call event there is a single response
 
-To provide synchronous response for asynchronous system calls we have special mechanism.
+To provide a synchronous response for a asynchronous system call we have special mechanism.
 
 1. Send: `DeveloperModeRequest` message with special `Event` Data
 2. Process `DeveloperModeRequest` in system, fill in `Event` Data

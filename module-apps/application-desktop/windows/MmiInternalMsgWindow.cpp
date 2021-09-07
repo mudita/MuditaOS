@@ -1,12 +1,12 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "MmiPushWindow.hpp"
+#include "Mmi.hpp"
 #include "MmiInternalMsgWindow.hpp"
-#include <service-appmgr/model/ApplicationManager.hpp>
-#include <service-appmgr/data/MmiActionsParams.hpp>
-#include <application-desktop/data/Mmi.hpp>
+#include "MmiPushWindow.hpp"
+
 #include <i18n/i18n.hpp>
+#include <service-appmgr/data/MmiActionsParams.hpp>
 
 using namespace gui;
 
@@ -36,10 +36,10 @@ void MmiInternalMsgWindow::handleInternalMessages(mmiactions::MMIResultParams *m
     auto result = metadata->getData();
     switch (result) {
     case mmiactions::MMIResultParams::MMIResult::Success:
-        text->setText(displayMessage + utils::localize.get("app_desktop_info_mmi_result_success"));
+        text->setText(displayMessage + utils::translate("app_desktop_info_mmi_result_success"));
         break;
     case mmiactions::MMIResultParams::MMIResult::Failed:
-        text->setText(displayMessage + utils::localize.get("app_desktop_info_mmi_result_failed"));
+        text->setText(displayMessage + utils::translate("app_desktop_info_mmi_result_failed"));
         break;
     default:
         text->clear();

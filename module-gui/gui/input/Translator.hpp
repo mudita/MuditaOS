@@ -1,46 +1,40 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include "InputEvent.hpp"
 #include "Profile.hpp"
-#include "bsp/keyboard/key_codes.hpp"
+#include <common_data/RawKey.hpp>
 #include <cstdint>
 #include <map>
 #include <memory>
 #include <string>
 #include <vector>
-#include <common_data/RawKey.hpp>
 
 namespace gui
 {
-
-    // TODO if neccessary `custom` keymap can be added her
-    enum class Keymaps
-    {
-        ABC,
-        abc,
-        digit,
-    };
-
     class KeyBaseTranslation
     {
       public:
-        // previous pressed key (only for pressed keys), used for shortpress and longpress
-        RawKey prev_key_press = {};
-        // was previous key released? used for longpress only
-        bool prev_key_released = true;
-        // did previous key already timed out (and send longpress as a result)
-        bool prev_key_timedout = false;
+        /// RawKey to Input Event translation
         InputEvent set(RawKey key);
-        /// timeout keypress (only press) - returns true on timeout'ed keypress
-        bool timeout(uint32_t time);
+        /// Check if keyPress is timed out for particular timestamp
+        bool isKeyPressTimedOut(uint32_t actualTimeStamp);
+        /// Reset previous key press status
+        void resetPreviousKeyPress();
+        /// Set previous key press timeout status
+        void setPreviousKeyTimedOut(bool status);
+
+      protected:
+        RawKey previousKeyPress    = {};
+        bool isPreviousKeyPressed  = false;
+        bool isPreviousKeyTimedOut = false;
+
+      private:
+        void translateRelease(InputEvent &evt, const RawKey &key);
     };
 
-    /// KeyPress translator
-    /// simplest 1:1 keys handling, used when application needs simplest key parsing possible
-    /// no keys behaviour analysis done here - just mapping
     class KeyInputSimpleTranslation : public KeyBaseTranslation
     {
       public:

@@ -1,8 +1,8 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <module-utils/log/log.hpp>
-#include <module-utils/math/Math.hpp>
+#include <log.hpp>
+#include <Math.hpp>
 
 #include "DrawCommand.hpp"
 #include "ProgressBar.hpp"
@@ -41,16 +41,15 @@ namespace gui
         return currentValue == value;
     }
 
-    bool ProgressBar::update(int value) noexcept
-    {
-        return setValue(currentValue + value);
-    }
-
     void ProgressBar::setPercentageValue(unsigned int value) noexcept
     {
         const auto percent       = static_cast<float>(value) / 100.0f;
         const auto absoluteValue = std::lround(static_cast<float>(maxValue) * percent);
         setValue(absoluteValue);
+    }
+    int ProgressBar::getMaximum() const noexcept
+    {
+        return maxValue;
     }
 
     void ProgressBar::buildDrawListImplementation(std::list<Command> &commands)
@@ -117,16 +116,15 @@ namespace gui
         return value == currentValue;
     }
 
-    bool CircularProgressBar::update(int value) noexcept
-    {
-        return setValue(currentValue + value);
-    }
-
     void CircularProgressBar::setPercentageValue(unsigned int value) noexcept
     {
         const auto percent       = static_cast<float>(value) / 100.0f;
         const auto absoluteValue = std::lround(static_cast<float>(maxValue) * percent);
         setValue(absoluteValue);
+    }
+    int CircularProgressBar::getMaximum() const noexcept
+    {
+        return maxValue;
     }
 
     float CircularProgressBar::getPercentageValue() const

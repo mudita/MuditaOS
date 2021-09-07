@@ -22,10 +22,6 @@ As for now, it consists of the following methods that can be used during writing
 
    returns a `CDCSerial` object - wrapper for Python's `Serial`
    
-* `get_window_name()`
-
-   returns current application(window) name
-   
 * `with_phone_unlocked(func)`
 
     decorator allowing to call a function with an unlocked operating system
@@ -106,8 +102,7 @@ To execute pyTest test cases make sure that you have installed the `pyTest` pack
 recommended to execute those tests in a virtual environment (eg. in `test` dir):
 
 ```shell script
-pip3 install virtualenv 
-virtualenv -p python3 test_env
+python3 -m venv test_venv
 source test_env/bin/activate
 pip3 install -r requirements.txt
 ```

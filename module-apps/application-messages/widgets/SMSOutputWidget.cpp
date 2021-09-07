@@ -1,15 +1,15 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <application-messages/ApplicationMessages.hpp>
-#include "application-messages/windows/OptionsMessages.hpp"
-#include <OptionWindow.hpp>
+#include "ApplicationMessages.hpp"
+#include "MessagesStyle.hpp"
+#include "OptionsMessages.hpp"
 #include "SMSOutputWidget.hpp"
-#include "application-messages/data/MessagesStyle.hpp"
 
-#include <Style.hpp>
-#include <time/time_conversion.hpp>
 #include <OptionsWindow.hpp>
+#include <OptionWindow.hpp>
+#include <Style.hpp>
+#include <time/time_conversion_factory.hpp>
 
 namespace gui
 {
@@ -83,11 +83,11 @@ namespace gui
         inputCallback = [&]([[maybe_unused]] Item &item, const InputEvent &event) { return smsBubble->onInput(event); };
 
         smsBubble->inputCallback = [application, record](Item &, const InputEvent &event) {
-            if (event.state == InputEvent::State::keyReleasedShort && event.keyCode == KeyCode::KEY_LF) {
+            if (event.isShortRelease(KeyCode::KEY_LF)) {
                 LOG_INFO("Message activated!");
                 auto app = dynamic_cast<app::ApplicationMessages *>(application);
                 assert(app != nullptr);
-                app->switchWindow(utils::localize.get("app_phonebook_options_title"),
+                app->switchWindow(utils::translate("app_phonebook_options_title"),
                                   std::make_unique<gui::OptionsWindowOptions>(smsWindowOptions(app, *record)));
                 return true;
             }
@@ -127,7 +127,8 @@ namespace gui
         timeLabel             = new gui::Label(body, 0, 0, 0, 0);
         timeLabel->activeItem = false;
         timeLabel->setFont(style::window::font::verysmall);
-        timeLabel->setText(utils::time::Time(timestamp));
+        using namespace utils::time;
+        timeLabel->setText(*TimestampFactory().createTimestamp(TimestampType::Time, timestamp));
         timeLabel->setVisible(false);
         timeLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
         timeLabel->setEdges(RectangleEdge::None);
@@ -145,9 +146,8 @@ namespace gui
         body->addWidget(errorIcon);
     }
 
-    auto SMSOutputWidget::handleRequestResize([[maybe_unused]] const Item *child,
-                                              unsigned short request_w,
-                                              unsigned short request_h) -> Size
+    auto SMSOutputWidget::handleRequestResize([[maybe_unused]] const Item *child, Length request_w, Length request_h)
+        -> Size
     {
         setMinimumHeight(request_h);
         return Size(request_w, request_h);

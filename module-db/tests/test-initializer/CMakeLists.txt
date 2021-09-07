@@ -1,7 +1,3 @@
-﻿if (NOT IS_SYMLINK "${CMAKE_BINARY_DIR}/sys/user")
-    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/sys/user")
-endif()
-
 add_catch2_executable(
     NAME
         db-initializer
@@ -10,9 +6,8 @@ add_catch2_executable(
         "${CMAKE_CURRENT_SOURCE_DIR}/tests-main.cpp"
         
     LIBS
+        module-sys
         module-db
-        module-vfs
-        iosyscalls
-    DEPS
-        PurePhone.img-target
+    
+    USE_FS
 )

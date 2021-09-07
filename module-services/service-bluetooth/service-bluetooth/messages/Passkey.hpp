@@ -15,7 +15,7 @@ namespace message::bluetooth
       public:
         explicit ResponsePasskey(std::string passkey) : passkey(std::move(passkey))
         {}
-        [[nodiscard]] auto getName() const -> std::string
+        [[nodiscard]] auto getPasskey() const -> std::string
         {
             return passkey;
         }

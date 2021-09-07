@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="355px" preserveAspectRatio="none" style="width:486px;height:355px;background:#F0F0F0;" version="1.1" viewBox="0 0 486 355" width="486px" zoomAndPan="magnify"><defs><filter height="300%" id="f14s4o9w3lgo4h" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><!--MD5=[3ca9e735c0b7f202d6f5b2c01a367c29]
+cluster owner--><polygon fill="#F0F0F0" filter="url(#f14s4o9w3lgo4h)" points="224.5,42,234.5,32,464.5,32,464.5,250,454.5,260,224.5,260,224.5,42" style="stroke: #000000; stroke-width: 1.5;"/><line style="stroke: #000000; stroke-width: 1.5;" x1="454.5" x2="463.5" y1="42" y2="33"/><line style="stroke: #000000; stroke-width: 1.5;" x1="224.5" x2="454.5" y1="42" y2="42"/><line style="stroke: #000000; stroke-width: 1.5;" x1="454.5" x2="454.5" y1="42" y2="260"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="121" x="280" y="57.9951">Owner Window</text><!--MD5=[e118600b95a503869b202f0316652035]
+class AppWindow--><rect fill="#FEFECE" filter="url(#f14s4o9w3lgo4h)" height="48" id="AppWindow" style="stroke: #A80036; stroke-width: 1.5;" width="103" x="253" y="80"/><ellipse cx="268" cy="96" fill="#ADD1B2" rx="11" ry="11" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M270.9688,101.6406 Q270.3906,101.9375 269.75,102.0781 Q269.1094,102.2344 268.4063,102.2344 Q265.9063,102.2344 264.5781,100.5938 Q263.2656,98.9375 263.2656,95.8125 Q263.2656,92.6875 264.5781,91.0313 Q265.9063,89.375 268.4063,89.375 Q269.1094,89.375 269.75,89.5313 Q270.4063,89.6875 270.9688,89.9844 L270.9688,92.7031 Q270.3438,92.125 269.75,91.8594 Q269.1563,91.5781 268.5313,91.5781 Q267.1875,91.5781 266.5,92.6563 Q265.8125,93.7188 265.8125,95.8125 Q265.8125,97.9063 266.5,98.9844 Q267.1875,100.0469 268.5313,100.0469 Q269.1563,100.0469 269.75,99.7813 Q270.3438,99.5 270.9688,98.9219 L270.9688,101.6406 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="71" x="282" y="100.1543">AppWindow</text><line style="stroke: #A80036; stroke-width: 1.5;" x1="254" x2="355" y1="112" y2="112"/><line style="stroke: #A80036; stroke-width: 1.5;" x1="254" x2="355" y1="120" y2="120"/><!--MD5=[8b93d8d7ddbc93341a08601ecae410ec]
+class notifWindow--><rect fill="#FEFECE" filter="url(#f14s4o9w3lgo4h)" height="48" id="notifWindow" style="stroke: #A80036; stroke-width: 1.5;" width="184" x="248.5" y="188"/><ellipse cx="263.5" cy="204" fill="#ADD1B2" rx="11" ry="11" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M266.4688,209.6406 Q265.8906,209.9375 265.25,210.0781 Q264.6094,210.2344 263.9063,210.2344 Q261.4063,210.2344 260.0781,208.5938 Q258.7656,206.9375 258.7656,203.8125 Q258.7656,200.6875 260.0781,199.0313 Q261.4063,197.375 263.9063,197.375 Q264.6094,197.375 265.25,197.5313 Q265.9063,197.6875 266.4688,197.9844 L266.4688,200.7031 Q265.8438,200.125 265.25,199.8594 Q264.6563,199.5781 264.0313,199.5781 Q262.6875,199.5781 262,200.6563 Q261.3125,201.7188 261.3125,203.8125 Q261.3125,205.9063 262,206.9844 Q262.6875,208.0469 264.0313,208.0469 Q264.6563,208.0469 265.25,207.7813 Q265.8438,207.5 266.4688,206.9219 L266.4688,209.6406 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="152" x="277.5" y="208.1543">WindowWithNotifications</text><line style="stroke: #A80036; stroke-width: 1.5;" x1="249.5" x2="431.5" y1="220" y2="220"/><line style="stroke: #A80036; stroke-width: 1.5;" x1="249.5" x2="431.5" y1="228" y2="228"/><!--MD5=[fe6c9d02a96023c72576ec13ad8882e8]
+class model--><rect fill="#FEFECE" filter="url(#f14s4o9w3lgo4h)" height="48" id="model" style="stroke: #A80036; stroke-width: 1.5;" width="147" x="6" y="80"/><ellipse cx="21" cy="96" fill="#ADD1B2" rx="11" ry="11" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M23.9688,101.6406 Q23.3906,101.9375 22.75,102.0781 Q22.1094,102.2344 21.4063,102.2344 Q18.9063,102.2344 17.5781,100.5938 Q16.2656,98.9375 16.2656,95.8125 Q16.2656,92.6875 17.5781,91.0313 Q18.9063,89.375 21.4063,89.375 Q22.1094,89.375 22.75,89.5313 Q23.4063,89.6875 23.9688,89.9844 L23.9688,92.7031 Q23.3438,92.125 22.75,91.8594 Q22.1563,91.5781 21.5313,91.5781 Q20.1875,91.5781 19.5,92.6563 Q18.8125,93.7188 18.8125,95.8125 Q18.8125,97.9063 19.5,98.9844 Q20.1875,100.0469 21.5313,100.0469 Q22.1563,100.0469 22.75,99.7813 Q23.3438,99.5 23.9688,98.9219 L23.9688,101.6406 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="115" x="35" y="100.1543">NotificationsModel</text><line style="stroke: #A80036; stroke-width: 1.5;" x1="7" x2="152" y1="112" y2="112"/><line style="stroke: #A80036; stroke-width: 1.5;" x1="7" x2="152" y1="120" y2="120"/><!--MD5=[bab795b3e255e4ea4a2af0f54c137233]
+class ListView--><rect fill="#FEFECE" filter="url(#f14s4o9w3lgo4h)" height="48" id="ListView" style="stroke: #A80036; stroke-width: 1.5;" width="81" x="300" y="296"/><ellipse cx="315" cy="312" fill="#ADD1B2" rx="11" ry="11" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M317.9688,317.6406 Q317.3906,317.9375 316.75,318.0781 Q316.1094,318.2344 315.4063,318.2344 Q312.9063,318.2344 311.5781,316.5938 Q310.2656,314.9375 310.2656,311.8125 Q310.2656,308.6875 311.5781,307.0313 Q312.9063,305.375 315.4063,305.375 Q316.1094,305.375 316.75,305.5313 Q317.4063,305.6875 317.9688,305.9844 L317.9688,308.7031 Q317.3438,308.125 316.75,307.8594 Q316.1563,307.5781 315.5313,307.5781 Q314.1875,307.5781 313.5,308.6563 Q312.8125,309.7188 312.8125,311.8125 Q312.8125,313.9063 313.5,314.9844 Q314.1875,316.0469 315.5313,316.0469 Q316.1563,316.0469 316.75,315.7813 Q317.3438,315.5 317.9688,314.9219 L317.9688,317.6406 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="49" x="329" y="316.1543">ListView</text><line style="stroke: #A80036; stroke-width: 1.5;" x1="301" x2="380" y1="328" y2="328"/><line style="stroke: #A80036; stroke-width: 1.5;" x1="301" x2="380" y1="336" y2="336"/><!--MD5=[fcafaac8fae46b258d2b04c97a886e87]
+reverse link AppWindow to notifWindow--><path d="M304.5,148.24 C304.5,148.24 304.5,187.84 304.5,187.84 " fill="none" id="AppWindow&lt;-notifWindow" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="none" points="297.5,148.24,304.5,128.24,311.5,148.24,297.5,148.24" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[98ceb399decb08f1ac58d4207201bed8]
+link ListView to owner--><!--MD5=[2b0940797c26dd600f44167c7fba0e5e]
+link model to owner--><!--MD5=[0816630f7573f824353e1deae3cd1068]
+link notifWindow to ListView--><path d="M340.5,248.24 C340.5,248.24 340.5,282.84 340.5,282.84 " fill="none" id="notifWindow-ListView" style="stroke: #A80036; stroke-width: 1.0; stroke-dasharray: 7.0,7.0;"/><polygon fill="#A80036" points="340.5,295.84,344.5,286.84,340.5,290.84,336.5,286.84,340.5,295.84" style="stroke: #A80036; stroke-width: 1.0;"/><line style="stroke: #A80036; stroke-width: 1.0;" x1="340.5" x2="340.5" y1="290.84" y2="282.84"/><polygon fill="#A80036" points="340.5,236.24,336.5,242.24,340.5,248.24,344.5,242.24,340.5,236.24" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="41" x="294.2469" y="284.811">create</text><!--MD5=[6905442473c110f33896166ecdb82cb9]
+reverse link model to ListView--><path d="M55,133.36 C55,133.36 55,320 55,320 C55,320 221.08,320 299.9,320 " fill="none" id="model&lt;-ListView" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="55,128.36,51,137.36,55,133.36,59,137.36,55,128.36" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="23" x="268.9222" y="315.9286">use</text><!--MD5=[14d14e498b41648e8d4026ce8d0bf0b6]
+link notifWindow to model--><path d="M236.39,212 C236.39,212 104,212 104,212 C104,212 104,141.24 104,141.24 " fill="none" id="notifWindow-model" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="104,128.24,100,137.24,104,133.24,108,137.24,104,128.24" style="stroke: #A80036; stroke-width: 1.0;"/><line style="stroke: #A80036; stroke-width: 1.0;" x1="104" x2="104" y1="133.24" y2="141.24"/><polygon fill="#A80036" points="248.39,212,242.39,208,236.39,212,242.39,216,248.39,212" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[c4c46f4af1aa0a0ef99241e1a25d8c85]
+link model to AppWindow--><path d="M153.17,104 C153.17,104 247.75,104 247.75,104 " fill="none" id="model-&gt;AppWindow" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="252.75,104,243.75,100,247.75,104,243.75,108,252.75,104" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="23" x="161.0216" y="100.3816">use</text><!--MD5=[6bca3c958c885ffc59d9bf262f978774]
+@startuml
+skinparam BackgroundColor F0F0F0
+
+skinparam linetype ortho
+skinparam nodesep 100
+
+class "NotificationsModel" as model
+class ListView
+
+node "Owner Window" as owner {
+    class AppWindow
+    class "WindowWithNotifications" as notifWindow
+
+    AppWindow <|- - notifWindow
+}
+
+ListView -[hidden]- owner
+model -[hidden]r- owner
+
+notifWindow "create"*..>ListView
+ListView "use"-u- ->model
+notifWindow *- ->model
+model "use"- -> AppWindow
+
+
+
+
+@enduml
+
+PlantUML version 1.2020.02(Sun Mar 01 05:22:07 EST 2020)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Java Version: 11.0.12+7-post-Debian-2
+Operating System: Linux
+Default Encoding: UTF-8
+Language: en
+Country: US
+--></g></svg>

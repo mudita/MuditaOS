@@ -15,7 +15,7 @@ namespace bsp
         return 0;
     }
 
-    int32_t LinuxLPM::Reboot()
+    int32_t LinuxLPM::Reboot(RebootType)
     {
         return 0;
     }
@@ -25,14 +25,24 @@ namespace bsp
         currentFrequency = freq;
     }
 
+    void LinuxLPM::SetHighestCoreVoltage()
+    {}
+
     uint32_t LinuxLPM::GetCpuFrequency() const noexcept
     {
         return 0;
     }
 
     void LinuxLPM::SwitchOscillatorSource(bsp::LowPowerMode::OscillatorSource source)
-    {
-        currentOscSource = source;
-    }
+    {}
+
+    void LinuxLPM::SetBootSuccess()
+    {}
+
+    void LinuxLPM::EnableDcdcPowerSaveMode()
+    {}
+
+    void LinuxLPM::DisableDcdcPowerSaveMode()
+    {}
 
 } // namespace bsp

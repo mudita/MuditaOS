@@ -1,10 +1,10 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "bsp/keypad_backlight/keypad_backlight.hpp"
 #include "LP55281.hpp"
 
-#include "bsp/BoardDefinitions.hpp"
+#include "board/BoardDefinitions.hpp"
 #include "drivers/i2c/DriverI2C.hpp"
 
 #include "fsl_common.h"
@@ -53,7 +53,7 @@ namespace bsp::keypad_backlight
         using SingleDiode = std::pair<LP55281_Registers, DiodeIntensity>;
         using RGBdiode    = std::array<SingleDiode, rgbChannelsNum>;
 
-        // Channels intesivity according to design specification
+        // Channels intensity according to design specification
         constexpr RGBdiode rightRed = {
             std::make_pair(LP55281_Registers::RED2, gammaCorrection(255)), // Red right button
             std::make_pair(LP55281_Registers::GREEN2, gammaCorrection(68)),
@@ -108,18 +108,15 @@ namespace bsp::keypad_backlight
         shutdown();
     }
 
-    bool turnOnAll()
+    bool configureDiodes()
     {
         constexpr DiodeIntensity intensity = 1.0f; // Maximum brightness
-        Diode_Reg diode_reg                = {.max_current = MAX_DIODE_CURRENT_LIMIT,
-                               .current     = encode_diode_brightness_to_6bits(intensity)};
+        Diode_Reg diodeReg                 = {.max_current = MAX_DIODE_CURRENT_LIMIT,
+                              .current     = encode_diode_brightness_to_6bits(intensity)};
 
-        wakeup();
-        configureModule();
-
-        for (auto &diode : usedSingleOutputs) {
-            std::uint32_t address = static_cast<std::uint32_t>(diode);
-            if (!writeSingleRegister(address, reinterpret_cast<std::uint8_t *>(&diode_reg))) {
+        for (const auto &diode : usedSingleOutputs) {
+            const auto address = static_cast<std::uint32_t>(diode);
+            if (!writeSingleRegister(address, reinterpret_cast<std::uint8_t *>(&diodeReg))) {
                 return false;
             }
         }
@@ -127,26 +124,46 @@ namespace bsp::keypad_backlight
         std::vector<const RGBdiode *> rgbDiodes = {&rightRed, &leftGreen};
         for (const auto &diodes : rgbDiodes) {
             for (const auto &diode : *diodes) {
-                std::uint32_t address = static_cast<std::uint32_t>(diode.first);
-                diode_reg.current     = encode_diode_brightness_to_6bits(diode.second);
-                if (!writeSingleRegister(address, reinterpret_cast<std::uint8_t *>(&diode_reg))) {
+                const auto address = static_cast<std::uint32_t>(diode.first);
+                diodeReg.current   = encode_diode_brightness_to_6bits(diode.second);
+                if (!writeSingleRegister(address, reinterpret_cast<std::uint8_t *>(&diodeReg))) {
                     return false;
                 }
             }
         }
-
         return true;
     }
 
-    bool configureModule()
+    bool turnOnAll()
     {
-        std::uint8_t reg_val = BOOST_OUTPUT_4V;
-        if (!writeSingleRegister(static_cast<std::uint32_t>(LP55281_Registers::BOOST_CTRL), &reg_val)) {
+        wakeup();
+        configureModule(ALL_PORTS_EN);
+        return configureDiodes();
+    }
+
+    bool turnOnFunctionKeysBacklight()
+    {
+        wakeup();
+        configureModule(FUNCTION_KEYS_PORTS_EN);
+        return configureDiodes();
+    }
+
+    bool turnOnNumericKeysBacklight()
+    {
+        wakeup();
+        configureModule(NUMERIC_KEYS_PORT_EN);
+        return configureDiodes();
+    }
+
+    bool configureModule(std::uint8_t enablesRegisterValue)
+    {
+        std::uint8_t boostControlRegisterValue = BOOST_OUTPUT_4V;
+        if (!writeSingleRegister(static_cast<std::uint32_t>(LP55281_Registers::BOOST_CTRL),
+                                 &boostControlRegisterValue)) {
             return false;
         }
 
-        reg_val = WAKEUP;
-        if (!writeSingleRegister(static_cast<std::uint32_t>(LP55281_Registers::ENABLES), &reg_val)) {
+        if (!writeSingleRegister(static_cast<std::uint32_t>(LP55281_Registers::ENABLES), &enablesRegisterValue)) {
             return false;
         }
 

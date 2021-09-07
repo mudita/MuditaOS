@@ -1,11 +1,11 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TextBlockCursor.hpp"
 #include "TextBlock.hpp"
 #include "TextDocument.hpp"
 #include "TextParse.hpp"
-#include "log/log.hpp"
+#include <log.hpp>
 #include <cassert>
 
 static const int last_char_inclusive = 0; // if then -1 / else 0
@@ -15,7 +15,7 @@ static const int last_char_inclusive = 0; // if then -1 / else 0
 
 namespace gui
 {
-    auto BlockCursor::currentBlock() const -> std::_List_iterator<TextBlock>
+    auto BlockCursor::currentBlock() const -> std::list<TextBlock>::iterator
     {
         if (currentBlockNumber == text::npos) {
             return document->blocks.end();
@@ -23,12 +23,12 @@ namespace gui
         return std::next(document->blocks.begin(), currentBlockNumber);
     }
 
-    auto BlockCursor::blocksEnd() const -> std::_List_iterator<TextBlock>
+    auto BlockCursor::blocksEnd() const -> std::list<TextBlock>::iterator
     {
         return std::end(document->blocks);
     }
 
-    auto BlockCursor::blocksBegin() const -> std::_List_iterator<TextBlock>
+    auto BlockCursor::blocksBegin() const -> std::list<TextBlock>::iterator
     {
         return std::begin(document->blocks);
     }
@@ -267,7 +267,7 @@ namespace gui
             return false;
         }
 
-        if (nextBlock != blocksEnd() && nextBlock->isEmpty()) {
+        if (checkIfNextBlockEmpty(nextBlock)) {
             debug_cursor("Next empty block removed");
             document->removeBlock(nextBlock);
         }
@@ -280,12 +280,27 @@ namespace gui
 
         block->removeChar(pos);
 
-        if (block->isEmpty() && block == blocksBegin()) {
-            debug_cursor("Current empty block removed");
+        if (checkIfBlockFirstAndEmpty(block)) {
+            debug_cursor("First empty block removed");
             document->removeBlock(block);
+
+            if (checkIfNextBlockEmpty(nextBlock)) {
+                debug_cursor("Next empty block removed");
+                document->removeBlock(nextBlock);
+            }
         }
 
         return true;
+    }
+
+    auto BlockCursor::checkIfBlockFirstAndEmpty(std::list<TextBlock>::iterator block) -> bool
+    {
+        return block == blocksBegin() && block->isEmpty();
+    }
+
+    auto BlockCursor::checkIfNextBlockEmpty(std::list<TextBlock>::iterator nextBlock) -> bool
+    {
+        return nextBlock != blocksEnd() && nextBlock->isEmpty() && checkCurrentBlockNoNewLine();
     }
 
     const TextBlock &BlockCursor::operator*()
@@ -323,5 +338,4 @@ namespace gui
     {
         return document->blocks.end();
     }
-
 } // namespace gui

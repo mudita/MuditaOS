@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhonebookContactDetails.hpp"
@@ -26,8 +26,8 @@ namespace gui
     {
         AppWindow::buildInterface();
 
-        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(style::strings::common::options));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::options));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
         contactFlagsWidget = new ContactFlagsWidget(this);
 
@@ -37,7 +37,7 @@ namespace gui
                                      phonebookStyle::contactDetailsWindow::contactDetailsList::w,
                                      phonebookStyle::contactDetailsWindow::contactDetailsList::h,
                                      contactDetailsModel,
-                                     style::listview::ScrollBarType::PreRendered);
+                                     gui::listview::ScrollBarType::PreRendered);
         setFocusItem(bodyList);
     }
 
@@ -46,7 +46,7 @@ namespace gui
         erase();
     }
 
-    void PhonebookContactDetails::onClose()
+    void PhonebookContactDetails::onClose([[maybe_unused]] CloseReason reason)
     {
         contactDetailsModel->clearData();
     }
@@ -82,13 +82,13 @@ namespace gui
         contactFlagsWidget->setBlocked(contact->isOnBlocked());
         contactFlagsWidget->setFavourites(contact->isOnFavourites());
         if (contactFlagsWidget->visible) {
-            title->setEdges(RectangleEdge::None);
+            header->setEdges(RectangleEdge::None);
             bodyList->setY(phonebookStyle::contactDetailsWindow::contactDetailsList::y);
             bodyList->setSize(phonebookStyle::contactDetailsWindow::contactDetailsList::w,
                               phonebookStyle::contactDetailsWindow::contactDetailsList::h);
         }
         else {
-            title->setEdges(RectangleEdge::Bottom);
+            header->setEdges(RectangleEdge::Bottom);
             bodyList->setY(phonebookStyle::contactDetailsWindow::contactDetailsListNoFlags::y);
             bodyList->setSize(phonebookStyle::contactDetailsWindow::contactDetailsListNoFlags::w,
                               phonebookStyle::contactDetailsWindow::contactDetailsListNoFlags::h);
@@ -122,11 +122,7 @@ namespace gui
             return true;
         }
 
-        if (inputEvent.state != InputEvent::State::keyReleasedShort) {
-            return false;
-        }
-
-        if (inputEvent.keyCode == KeyCode::KEY_LF) {
+        if (inputEvent.isShortRelease(KeyCode::KEY_LF)) {
             std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
             application->switchWindow(
                 gui::window::name::contact_options, gui::ShowMode::GUI_SHOW_INIT, std::move(data));

@@ -3,6 +3,7 @@
 You can quickstart the project by going through one of the following guides:
 
 - [Introduction](#introduction)
+- [CMake options](#CMake-options)
 - [Quickstart on Linux](#quickstart-on-linux)
 - [Quickstart with unit tests](#quickstart-with-unit-tests)
 - [Quickstart on the phone](#quickstart-on-the-phone)
@@ -16,6 +17,13 @@ You can quickstart the project by going through one of the following guides:
 Run the provisioning script `./config/bootstrap.sh` to install all dependencies. The script is written for Ubuntu and tested on 20.04.
 
 To run the script execute the following command: `cd config && ./bootstrap.sh 0-`
+Note that this downloads a shellscript from `get.docker.com` and runs it with sudo for Docker installation.
+
+This script also installs few required packages (`cat config/bootstrap_config`) which also require root privileges.
+
+Installation of `GCCv10` and `CMake` is done to `$HOME` directory.
+
+Running the script without parameters will display a list of steps.
 
 After running provisioning you are ready to checkout and build project for both linux and RT1051. Please follow these steps:
 
@@ -36,7 +44,27 @@ git pull --recurse-submodules
 cd build-[rt1051|linux]-[release|debug|relwithdebinfo]
 make
 ```
+### CMake options
+Before configuring the project with `./configure.sh` you can tune it by enabling/disabling options to suite your needs.
+This can be done manually, by editing the `.cmake` files (not recommended though) or by CLI/GUI tool like `ccmake`.
 
+| Option                        | Description                                                               | Default value |
+| ------------------------------|:-------------------------------------------------------------------------:|:-------------:|
+| `COVERAGE_ENABLE`             | Enable code coverage report generation                                    | OFF           |
+| `COLOR_OUTPUT`                | Use colored output in RTT logs and compiler diagnostics                   | ON            |
+| `SYSTEMVIEW`                  | Enable usage of Segger's SystemView                                       | OFF           |
+| `USBCDC_ECHO`                 | Enable echoing through USB-CDC                                            | OFF           |
+| `MUDITA_USB_ID`               | Enable using Mudita registered USB Vendor ID and Pure Phone USB Product ID| OFF           |
+| `ENABLE_APP_X`                | Build and enable application X                                            | ON            |
+| `OPTIMIZE_APP_X`              | Optimize application X in debug build                                     | ON            |
+| `LINUX_ENABLE_SANITIZER`      | Enable address sanitizer for Linux                                        | ON            |
+| `ENABLE_SECURE_BOOT`          | Build signed binary for Secure Boot                                       | OFF           |
+| `THIRD_PARTY_DEBUG_OPTIMIZE`  | Optimize third party in debug                                             | ON            |
+| `ENABLE_TEST_LOGS`            | Enable logs in unit tests                                                 | OFF           |
+| `GENERATE_STACK_USAGE`        | Generate stack usage report                                               | OFF           |
+| `BUILD_DOC_WITH_ALL`          | Build documentation with `all` target                                     | OFF           |
+
+By using `ENABLE_APP_X` (where `X` is the name of the application) you can enable/disable any application.
 ### Quickstart on Linux
 
 Here's the bare minimum that will enable you to bootstrap the environment on Linux.
@@ -46,14 +74,14 @@ git submodule update --init --recursive                        # initialize subm
 cd ./config/ && ./bootstrap.sh 0- && cd ../                    # bootstrap requirements
 ./configure.sh rt1051|linux Debug|Release|RelWithDebInfo       # configure build
 cd <build-dir>                                                 # build dir depends on configuration
-make -j                                                        # build
-./PurePhone                                                    # run PurePhone - emulator screen will pop up (on the Linux filesystem)
+make Pure                                               # build
+./PurePhone.elf                                                # run PurePhone - simulator screen will pop up (on the Linux filesystem)
 ```
 
-If you want to run the emulator with image and our VFS implementation
+If you want to run the simulator with image and our VFS implementation
 you need to run the image through the script:
 ```bash
-./run_emulator_on_filesystem_image.sh
+./run_simulator_on_filesystem_image.sh
 ```
 
 ### Quickstart with unit tests
@@ -77,7 +105,7 @@ git submodule update --init --recursive
 cd ./config/ && ./bootstrap.sh 0- && cd ../
 ./configure.sh rt1051 RelWithDebInfo
 cd build-arm-RelWithDebInfo
-make -j
+make Pure
 
 ```
 
@@ -242,13 +270,21 @@ Please be aware that when building custom image you'll have to give it some tag 
 
 ## Preparing packages
 
-If you need a package, containing everything needed to run the application (on target device or Linux), in the build directory run the following command: `make package`
+If you need a package, containing everything needed to run the application, please check (build_targests.md)[./doc/build_targests.md] document.
 
-After executing this command, the name of the package that was created will be displayed on the screen.
+## Generating code coverage reports
 
-Package name is: `PurePhone-<version>-<target>.<extension>`
-where:
+To generate code coverage reports for unit tests, you have to configure the project
+with `COVERAGE_ENABLE=ON`. Please note, that code coverage report generation
+works for the Linux/Debug configuration only.
+Code coverage reports are generated with the `gcovr` application. You can
+install it with:
+```
+pip3 install gcovr
+```
 
-- `<version>`   - is read from the latest "release-x.y.z" tag
-- `<target>`    - RT1051 or Linux 
-- `<extension>` - `zip` for RT1051 and `tar.gz` for Linux
+Following targets related to coverage report generation are available:
+* `coverage-all-html` - run `ctest` and generate a detailed HTML report.
+* `coverage-html` - generate detailed HTML report based on the data collected during last execution of a unit test. The report
+will be generated in the `coverage-html` subdirectory of a build directory.
+* `coverage` - same as above, but generate an XML Cobertura report instead of an HTML.

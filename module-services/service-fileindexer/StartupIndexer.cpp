@@ -1,12 +1,13 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "StartupIndexer.hpp"
-#include "messages/FileChangeMessage.hpp"
-#include <filesystem>
-//#include <ff_stdio_listdir_recursive.h>
+#include <Timers/TimerFactory.hpp>
 #include <purefs/filesystem_paths.hpp>
+#include <purefs/fs/inotify_message.hpp>
 #include "Constants.hpp"
+#include <filesystem>
+#include <fstream>
 
 namespace service::detail
 {
@@ -16,60 +17,92 @@ namespace service::detail
     {
         using namespace std::string_literals;
         // File extensions indexing allow list
-        const std::vector<std::pair<std::string_view, mimeType>> allowed_exts{
-            {".txt", mimeType::text}, {".wav", mimeType::audio}, {".mp3", mimeType::audio}, {".flac", mimeType::audio}};
+        static constexpr const char *allowed_exts[]{".wav", ".mp3", ".flac"};
 
         // List of initial dirs for scan
-        const std::vector<std::string> start_dirs{purefs::dir::getUserDiskPath(), purefs::dir::getCurrentOSPath()};
+        const std::vector<std::string> start_dirs{purefs::dir::getUserDiskPath() / "music"};
+        // Lock file name
+        const auto lock_file_name = purefs::dir::getUserDiskPath() / ".directory_is_indexed";
+        // Time for indexing first unit
+        constexpr auto timer_indexing_delay = 400;
+        // Time for initial delay after start
+        constexpr auto timer_run_delay = 10000;
     } // namespace
 
-    auto StartupIndexer::getFileType(std::string_view path) -> mimeType
+    // Process single entry
+    auto StartupIndexer::processEntry(std::shared_ptr<sys::Service> svc,
+                                      const std::filesystem::recursive_directory_iterator::value_type &entry) -> void
     {
-        for (const auto &ext : allowed_exts) {
-            if (fs::path(path).extension() == ext.first) {
-                return ext.second;
-            }
-        }
-        return mimeType::_none_;
-    }
-
-    // Collect startup files when service starts
-    auto StartupIndexer::collectStartupFiles() -> void
-    {
-        /*
-        using namespace std::string_literals;
-        auto searcher_cb = [](void *ctx, const char *path, bool isDir) {
-            auto _this = reinterpret_cast<StartupIndexer *>(ctx);
-            if (!isDir) {
-                for (const auto &ext : allowed_exts) {
-                    if (fs::path(path).extension() == ext.first) {
-                        _this->mMsgs.emplace_back(std::make_shared<msg::FileChangeMessage>(
-                            path, msg::FileChangeMessage::evt_t::modified, ""s));
-                        LOG_DEBUG("Initial indexing file added %s", path);
-                    }
+        using namespace std::string_view_literals;
+        if (fs::is_regular_file(entry)) {
+            for (const auto &ext : allowed_exts) {
+                if (fs::path(entry).extension() == ext) {
+                    const auto abspath    = fs::absolute(entry).string();
+                    const auto inotifyMsg = std::make_shared<purefs::fs::message::inotify>(
+                        purefs::fs::inotify_flags::close_write, abspath, ""sv);
+                    svc->bus.sendUnicast(inotifyMsg, std::string(service::name::file_indexer));
                 }
             }
-        };
-        for (const auto &path : start_dirs) {
-            ff_stdio_listdir_recursive(path.c_str(), searcher_cb, this);
         }
-        */
     }
+    // On timer timeout
+    auto StartupIndexer::onTimerTimeout(std::shared_ptr<sys::Service> svc) -> void
+    {
+        if (!mStarted) {
+            mIdxTimer.restart(std::chrono::milliseconds{timer_indexing_delay});
+            mStarted = true;
+        }
+        if (mSubDirIterator == std::filesystem::recursive_directory_iterator()) {
+            if (mTopDirIterator == std::cend(start_dirs)) {
+                createLockFile();
+                LOG_INFO("Initial startup indexer - Finished ...");
+                mIdxTimer.stop();
+            }
+            else {
+                mSubDirIterator = fs::recursive_directory_iterator(*mTopDirIterator);
+                mTopDirIterator++;
+            }
+        }
+        else {
+            processEntry(svc, *mSubDirIterator);
+            mSubDirIterator++;
+        }
+    }
+
     // Setup timers for notification
     auto StartupIndexer::setupTimers(std::shared_ptr<sys::Service> svc, std::string_view svc_name) -> void
     {
-        if (!mIdxTimer) {
-            mIdxTimer = std::make_unique<sys::Timer>("file_indexing", svc.get(), timer_indexing_time);
-            mIdxTimer->connect([this, svc](sys::Timer &) {
-                if (!mMsgs.empty()) {
-                    svc->bus.sendUnicast(mMsgs.front(), std::string(service::name::file_indexer));
-                    mMsgs.pop_front();
-                }
-                else {
-                    mIdxTimer->stop();
-                }
-            });
-            mIdxTimer->start();
+        mIdxTimer = sys::TimerFactory::createPeriodicTimer(svc.get(),
+                                                           "file_indexing",
+                                                           std::chrono::milliseconds{timer_run_delay},
+                                                           [this, svc](sys::Timer &) { onTimerTimeout(svc); });
+        mIdxTimer.start();
+    }
+
+    // Start the initial file indexing
+    auto StartupIndexer::start(std::shared_ptr<sys::Service> svc, std::string_view svc_name) -> void
+    {
+        if (!hasLockFile()) {
+            LOG_INFO("Initial startup indexer - Started...");
+            mTopDirIterator = std::begin(start_dirs);
+            setupTimers(svc, svc_name);
         }
+        else {
+            LOG_INFO("Initial startup indexer - Not needed...");
+        }
+    }
+
+    // Create lock file
+    auto StartupIndexer::createLockFile() -> bool
+    {
+        std::ofstream ofs(lock_file_name);
+        ofs << time(nullptr);
+        return ofs.good();
+    }
+    //  Check if lock file exists
+    auto StartupIndexer::hasLockFile() -> bool
+    {
+        std::error_code ec;
+        return fs::is_regular_file(lock_file_name, ec);
     }
 } // namespace service::detail

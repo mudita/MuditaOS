@@ -1,42 +1,48 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CheckBoxWithLabel.hpp"
 
 namespace gui
 {
-    CheckBoxWithLabel::CheckBoxWithLabel(
-        Item *parent, int x, int y, UTF8 description, std::function<void(CheckBoxWithLabel &)> clickCallback)
+    CheckBoxWithLabel::CheckBoxWithLabel(Item *parent,
+                                         uint32_t x,
+                                         uint32_t y,
+                                         uint32_t w,
+                                         uint32_t h,
+                                         const UTF8 &description,
+                                         const std::function<void(const UTF8 &text)> &bottomBarTemporaryMode,
+                                         const std::function<void()> &bottomBarRestoreFromTemporaryMode,
+                                         gui::BottomBar::Side textSide)
+        : HBox{parent, x, y, w, h}
     {
-        auto body = new gui::HBox(nullptr, x, y, style::window::default_body_width, style::window::label::big_h);
-        body->setEdges(gui::RectangleEdge::None);
+        setEdges(gui::RectangleEdge::None);
 
-        label =
-            new gui::Label(nullptr, 0, 0, style::checkbox::description_width, style::window::label::big_h, description);
-        check = new gui::CheckBox(nullptr,
-                                  style::checkbox::check_x,
-                                  style::checkbox::check_y,
-                                  style::checkbox::check_width,
-                                  style::window::label::small_h);
+        check =
+            new gui::CheckBox(this, 0, 0, 0, 0, bottomBarTemporaryMode, bottomBarRestoreFromTemporaryMode, textSide);
         check->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
+        check->setMinimumSize(60, style::window::label::big_h);
+        setChecked(true);
 
-        label->activatedCallback = [=](Item &item) {
-            setChecked(!check->isChecked());
-            if (clickCallback) {
-                clickCallback(*this);
+        label = new gui::Label(this, 0, 0, 0, 0, description);
+        label->setEdges(RectangleEdge::None);
+        label->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
+        label->setMargins(gui::Margins(style::window::default_left_margin, 0, 0, 0));
+        label->setFont(style::window::font::big);
+        label->setMinimumHeight(style::window::label::big_h);
+        label->setMaximumWidth(style::window::default_body_width);
+
+        focusChangedCallback = [&](Item &item) {
+            if (focus) {
+                label->setFont(style::window::font::bigbold);
+            }
+            else {
+                label->setFont(style::window::font::big);
             }
             return true;
         };
 
-        style::window::decorateOption(label);
-        style::window::decorate(check);
-
-        /*
-         * We need to add widgets after decorate to correctly redraw them
-         */
-        parent->addWidget(body);
-        body->addWidget(label);
-        body->addWidget(check);
+        resizeItems();
     }
 
     bool CheckBoxWithLabel::isChecked() const
@@ -46,6 +52,6 @@ namespace gui
 
     void CheckBoxWithLabel::setChecked(bool state)
     {
-        check->setImageVisible(state);
+        check->setCheck(state);
     }
 } // namespace gui

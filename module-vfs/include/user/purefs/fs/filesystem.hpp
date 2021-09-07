@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -15,6 +15,7 @@
 #include <purefs/fs/directory_handle.hpp>
 #include <purefs/fs/mount_point.hpp>
 #include <purefs/fs/mount_flags.hpp>
+#include <purefs/fs/fsnotify.hpp>
 #include <type_traits>
 
 struct statvfs;
@@ -30,6 +31,11 @@ namespace cpp_freertos
     class MutexRecursive;
 }
 
+namespace sys
+{
+    class Service;
+}
+
 namespace purefs::fs
 {
     /** This is the filesystem class layer
@@ -41,6 +47,7 @@ namespace purefs::fs
     namespace internal
     {
         class directory_handle;
+        class notifier;
     }
     class filesystem
     {
@@ -141,6 +148,9 @@ namespace purefs::fs
 
         auto getcwd() noexcept -> std::string_view;
         auto chdir(std::string_view name) noexcept -> int;
+
+        /** Inotify API */
+        [[nodiscard]] auto inotify_create(std::shared_ptr<sys::Service> svc) -> std::shared_ptr<inotify>;
 
       private:
         /** Unregister filesystem driver
@@ -271,7 +281,6 @@ namespace purefs::fs
                 }
             }
         }
-
       private:
         std::weak_ptr<blkdev::disk_manager> m_diskmm;
         std::unordered_map<std::string, std::shared_ptr<filesystem_operations>> m_fstypes;
@@ -279,5 +288,6 @@ namespace purefs::fs
         std::unordered_set<std::string> m_partitions;
         internal::handle_mapper<fsfile> m_fds;
         std::unique_ptr<cpp_freertos::MutexRecursive> m_lock;
+        std::shared_ptr<internal::notifier> m_notifier;
     };
 } // namespace purefs::fs

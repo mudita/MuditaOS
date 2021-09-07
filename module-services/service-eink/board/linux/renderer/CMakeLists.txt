@@ -21,6 +21,7 @@ install(TARGETS ${PROJECT_NAME} DESTINATION "./" COMPONENT Standalone)
 target_link_libraries( ${PROJECT_NAME}  ${GTKMM_LIBRARIES}  )
 target_include_directories(${PROJECT_NAME} PUBLIC ${GTKMM_LIBRARY_DIRS} )
 target_include_directories( ${PROJECT_NAME}  PUBLIC ${GTKMM_INCLUDE_DIRS}  )
+target_link_libraries( ${PROJECT_NAME} module-bsp )
 target_link_libraries( ${PROJECT_NAME} ${LIBRT} rt pthread )
 
 #key_code
@@ -42,3 +43,4 @@ if(_target_link_flags)
 	list(REMOVE_ITEM _target_link_flags -fsanitize=address)
 	set_target_properties(${PROJECT_NAME} PROPERTIES LINK_OPTIONS "${_target_link_flags}")
 endif()
+

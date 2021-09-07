@@ -1,7 +1,7 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <catch2/catch.hpp>
+#include "common.hpp"
 
 #include "Database/Database.hpp"
 #include "Databases/AlarmsDB.hpp"
@@ -13,6 +13,8 @@
 #include "queries/alarms/QueryAlarmsAdd.hpp"
 #include "queries/alarms/QueryAlarmsTurnOffAll.hpp"
 
+#include <catch2/catch.hpp>
+
 #include <algorithm>
 #include <cstdint>
 #include <cstdio>
@@ -23,41 +25,42 @@ TEST_CASE("Alarms Record tests")
 {
     Database::initialize();
 
-    const auto alarmsPath = (std::filesystem::path{"user"} / "alarms.db");
-    if (std::filesystem::exists(alarmsPath)) {
-        REQUIRE(std::filesystem::remove(alarmsPath));
-    }
+    const auto alarmsPath = (std::filesystem::path{"sys/user"} / "alarms.db");
+    RemoveDbFiles(alarmsPath.stem());
 
     AlarmsDB alarmsDB(alarmsPath.c_str());
     REQUIRE(alarmsDB.isInitialized());
 
-    SECTION("Default Constructor")
-    {
-        AlarmsRecord test;
-        REQUIRE(test.snooze == 0);
-        REQUIRE(test.status == AlarmStatus::On);
-        REQUIRE(test.repeat == 0);
-        REQUIRE(test.path == "");
-    }
+    AlarmsRecordInterface alarmsRecordInterface(&alarmsDB);
 
     auto time = TimePointFromString("2020-11-11 15:15:00");
-    SECTION("Constructor from AlarmsTableRow")
-    {
-        AlarmsTableRow tableRow(1, time, 0, AlarmStatus::On, 0, "musicFile.mp3");
-        AlarmsRecord test(tableRow);
-        REQUIRE(test.time == time);
-        REQUIRE(test.snooze == 0);
-        REQUIRE(test.status == AlarmStatus::On);
-        REQUIRE(test.repeat == 0);
-        REQUIRE(test.path == "musicFile.mp3");
-        REQUIRE(test.isValid());
-    }
 
-    AlarmsRecord test;
-    AlarmsRecordInterface alarmsRecordInterface(&alarmsDB);
+    auto getQuery = [&](uint32_t id,
+                        TimePoint alarmTime,
+                        uint32_t snooze,
+                        AlarmStatus status,
+                        uint32_t repeat,
+                        const std::string &path) {
+        auto query  = std::make_shared<db::query::alarms::Get>(id);
+        auto ret    = alarmsRecordInterface.runQuery(query);
+        auto result = dynamic_cast<db::query::alarms::GetResult *>(ret.get());
+        REQUIRE(result != nullptr);
+        auto alarmRec = result->getResult();
+        REQUIRE(alarmRec.ID == id);
+        REQUIRE(alarmRec.time == alarmTime);
+        REQUIRE(alarmRec.snooze == snooze);
+        REQUIRE(alarmRec.status == status);
+        REQUIRE(alarmRec.repeat == repeat);
+        REQUIRE(alarmRec.path == path);
+
+        return alarmRec;
+    };
+
     auto recordsNumber = alarmsRecordInterface.GetCount();
-    REQUIRE(recordsNumber == 0);
+    REQUIRE(alarmsDB.alarms.count() == 0);
+    REQUIRE(recordsNumber == 0); // database should be empty after init
 
+    // add initial record for tests
     AlarmsTableRow tableRow(1, time, 2, AlarmStatus::Off, 3, "musicFile.mp3");
     auto rec = AlarmsRecord(tableRow);
     REQUIRE(rec.time == time);
@@ -71,6 +74,32 @@ TEST_CASE("Alarms Record tests")
 
     recordsNumber = alarmsRecordInterface.GetCount();
     REQUIRE(recordsNumber == 1);
+
+    SECTION("Default Constructor")
+    {
+        AlarmsRecord test;
+        REQUIRE(test.snooze == 0);
+        REQUIRE(test.status == AlarmStatus::On);
+        REQUIRE(test.repeat == 0);
+        REQUIRE(test.path == "");
+    }
+
+    SECTION("Constructor from AlarmsTableRow")
+    {
+        AlarmsTableRow tableRow(1, time, 0, AlarmStatus::On, 0, "musicFile.mp3");
+        AlarmsRecord test(tableRow);
+        REQUIRE(test.time == time);
+        REQUIRE(test.snooze == 0);
+        REQUIRE(test.status == AlarmStatus::On);
+        REQUIRE(test.repeat == 0);
+        REQUIRE(test.path == "musicFile.mp3");
+        REQUIRE(test.isValid());
+    }
+
+    SECTION("Get record by id with query")
+    {
+        getQuery(1, time, 2, AlarmStatus::Off, 3, "musicFile.mp3");
+    }
 
     SECTION("Get entry by ID")
     {
@@ -182,26 +211,7 @@ TEST_CASE("Alarms Record tests")
         REQUIRE(alarmsRecordInterface.GetCount() == 0);
     }
 
-    auto getQuery = [&](uint32_t id,
-                        TimePoint alarmTime,
-                        uint32_t snooze,
-                        AlarmStatus status,
-                        uint32_t repeat,
-                        const std::string &path) {
-        auto query  = std::make_shared<db::query::alarms::Get>(id);
-        auto ret    = alarmsRecordInterface.runQuery(query);
-        auto result = dynamic_cast<db::query::alarms::GetResult *>(ret.get());
-        REQUIRE(result != nullptr);
-        auto alarmRec = result->getResult();
-        REQUIRE(alarmRec.ID == id);
-        REQUIRE(alarmRec.time == alarmTime);
-        REQUIRE(alarmRec.snooze == snooze);
-        REQUIRE(alarmRec.status == status);
-        REQUIRE(alarmRec.repeat == repeat);
-        REQUIRE(alarmRec.path == path);
 
-        return alarmRec;
-    };
 
     SECTION("Get all available records with query")
     {
@@ -224,11 +234,6 @@ TEST_CASE("Alarms Record tests")
         auto results = result->getResult();
         REQUIRE(results.size() == 3);
         REQUIRE(result->getCountResult() == alarmsRecordInterface.GetCount());
-    }
-
-    SECTION("Get record by id with query")
-    {
-        getQuery(1, time, 2, AlarmStatus::Off, 3, "musicFile.mp3");
     }
 
     SECTION("Remove records with query")

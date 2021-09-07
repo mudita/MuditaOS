@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmsModel.hpp"
@@ -26,12 +26,12 @@ namespace app::alarmClock
     void AlarmsModel::requestRecords(uint32_t offset, uint32_t limit)
     {
         alarmsRepository->getLimited(
-            offset, limit, [this](const std::vector<AlarmsRecord> &records, unsigned int alarmsRepoCount) {
+            offset, limit, [this](const std::vector<AlarmEventRecord> &records, unsigned int alarmsRepoCount) {
                 return onAlarmsRetrieved(records, alarmsRepoCount);
             });
     }
 
-    unsigned int AlarmsModel::getMinimalItemHeight() const
+    unsigned int AlarmsModel::getMinimalItemSpaceRequired() const
     {
         return style::alarmClock::window::item::height;
     }
@@ -46,18 +46,18 @@ namespace app::alarmClock
 
         auto item               = new gui::AlarmItem(record);
         item->activatedCallback = [this, record](gui::Item &) {
-            if (record->status == AlarmStatus::Off) {
-                record->status = AlarmStatus::On;
+            if (record->enabled) {
+                record->enabled = false;
             }
             else {
-                record->status = AlarmStatus::Off;
+                record->enabled = false;
             }
             alarmsRepository->update(*record, nullptr);
             return true;
         };
         item->inputCallback = [this, record = record.get()](gui::Item &, const gui::InputEvent &event) {
-            if (event.isShortPress() && event.is(gui::KeyCode::KEY_LF)) {
-                application->switchWindow(utils::localize.get("app_alarm_clock_options_title"),
+            if (event.isShortRelease(gui::KeyCode::KEY_LF)) {
+                application->switchWindow(utils::translate("app_alarm_clock_options_title"),
                                           std::make_unique<gui::OptionsWindowOptions>(
                                               alarmsListOptions(application, *record, *alarmsRepository)));
             }
@@ -66,18 +66,18 @@ namespace app::alarmClock
         return item;
     }
 
-    bool AlarmsModel::updateRecords(std::vector<AlarmsRecord> records)
+    bool AlarmsModel::updateRecords(std::vector<AlarmEventRecord> records)
     {
         DatabaseModel::updateRecords(std::move(records));
         list->onProviderDataUpdate();
         return true;
     }
 
-    bool AlarmsModel::onAlarmsRetrieved(const std::vector<AlarmsRecord> &records, unsigned int alarmsRepoCount)
+    bool AlarmsModel::onAlarmsRetrieved(const std::vector<AlarmEventRecord> &records, unsigned int alarmsRepoCount)
     {
         if (recordsCount != alarmsRepoCount) {
             recordsCount = alarmsRepoCount;
-            list->rebuildList(style::listview::RebuildType::Full, 0, true);
+            list->rebuildList(gui::listview::RebuildType::Full, 0, true);
             return false;
         }
 

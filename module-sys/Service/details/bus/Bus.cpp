@@ -1,9 +1,6 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
-// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
-
 #include "Bus.hpp"
 
 #include "module-sys/Service/Service.hpp"
@@ -20,8 +17,8 @@ namespace sys
 {
     namespace
     {
-        std::uint64_t uniqueMsgId  = 0;
-        std::uint64_t unicastMsgId = 0;
+        MessageUID uniqueMsgId;
+        MessageUID unicastMsgId;
 
         std::map<BusChannel, std::set<Service *>> channels;
         std::map<std::string, Service *> servicesRegistered;
@@ -54,13 +51,27 @@ namespace sys
         assert(request != nullptr);
         assert(sender != nullptr);
 
-        {
-            cpp_freertos::CriticalSectionGuard guard;
-            response->id    = uniqueMsgId++;
-            response->uniID = request->uniID;
-        }
         response->sender    = sender->GetName();
         response->transType = Message::TransmissionType::Unicast;
+
+        if (request->transType == Message::TransmissionType::Unicast) {
+            {
+                cpp_freertos::CriticalSectionGuard guard;
+                response->id    = uniqueMsgId.getNext();
+                response->uniID = request->uniID;
+            }
+
+            response->ValidateUnicastMessage();
+        }
+        else {
+            {
+                cpp_freertos::CriticalSectionGuard guard;
+                response->id = uniqueMsgId.getNext();
+            }
+
+            response->ValidateResponseMessage();
+        }
+
         if (auto it = servicesRegistered.find(request->sender); it != servicesRegistered.end()) {
             const auto targetService = it->second;
             targetService->mailbox.push(response);
@@ -71,11 +82,14 @@ namespace sys
     {
         {
             cpp_freertos::CriticalSectionGuard guard;
-            message->id    = uniqueMsgId++;
-            message->uniID = unicastMsgId++;
+            message->id    = uniqueMsgId.getNext();
+            message->uniID = unicastMsgId.getNext();
         }
+
         message->sender    = sender->GetName();
         message->transType = Message::TransmissionType::Unicast;
+
+        message->ValidateUnicastMessage();
 
         if (auto it = servicesRegistered.find(targetName); it != servicesRegistered.end()) {
             const auto targetService = it->second;
@@ -87,22 +101,26 @@ namespace sys
         return false;
     }
 
-    SendResult Bus::SendUnicast(std::shared_ptr<Message> message,
-                                const std::string &targetName,
-                                Service *sender,
-                                std::uint32_t timeout)
+    SendResult Bus::SendUnicastSync(std::shared_ptr<Message> message,
+                                    const std::string &targetName,
+                                    Service *sender,
+                                    std::uint32_t timeout)
     {
         std::vector<std::shared_ptr<Message>> tempMsg;
         tempMsg.reserve(4); // reserve space for 4 elements to avoid costly memory allocations
 
-        uint64_t unicastID = unicastMsgId;
+        MessageUIDType unicastID = unicastMsgId.get();
+
         {
             cpp_freertos::CriticalSectionGuard guard;
-            message->id    = uniqueMsgId++;
-            message->uniID = unicastMsgId++;
+            message->id    = uniqueMsgId.getNext();
+            message->uniID = unicastMsgId.getNext();
         }
+
         message->sender    = sender->GetName();
         message->transType = Message::TransmissionType ::Unicast;
+
+        message->ValidateUnicastMessage();
 
         auto ele = servicesRegistered.find(targetName);
         if (ele != servicesRegistered.end()) {
@@ -183,12 +201,15 @@ namespace sys
     {
         {
             cpp_freertos::CriticalSectionGuard guard;
-            message->id = uniqueMsgId++;
+            message->id = uniqueMsgId.getNext();
         }
 
         message->channel   = channel;
         message->transType = Message::TransmissionType::Multicast;
         message->sender    = sender->GetName();
+
+        message->ValidateMulticastMessage();
+
         for (const auto &target : channels[channel]) {
             target->mailbox.push(message);
         }
@@ -198,11 +219,14 @@ namespace sys
     {
         {
             cpp_freertos::CriticalSectionGuard guard;
-            message->id = uniqueMsgId++;
+            message->id = uniqueMsgId.getNext();
         }
 
         message->transType = Message::TransmissionType ::Broadcast;
         message->sender    = sender->GetName();
+
+        message->ValidateBroadcastMessage();
+
         for (const auto &target : servicesRegistered) {
             const auto targetService = target.second;
             targetService->mailbox.push(message);

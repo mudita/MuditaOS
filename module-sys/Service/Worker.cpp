@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Worker.hpp"
@@ -76,13 +76,14 @@ namespace sys
         vTaskDelete(nullptr);
     }
 
-    Worker::Worker(sys::Service *service) : name(service->GetName()), priority(service->GetPriority())
+    Worker::Worker(sys::Service *service, std::uint16_t stackDepth)
+        : name(service->GetName()), priority(service->GetPriority()), stackDepth(stackDepth)
     {
         constructName();
     }
 
-    Worker::Worker(std::string workerNamePrefix, UBaseType_t priority)
-        : name(std::move(workerNamePrefix)), priority(priority)
+    Worker::Worker(std::string workerNamePrefix, UBaseType_t priority, std::uint16_t stackDepth)
+        : name(std::move(workerNamePrefix)), priority(priority), stackDepth(stackDepth)
     {
         constructName();
     }
@@ -211,7 +212,8 @@ namespace sys
         runnerTask = xTaskGetCurrentTaskHandle();
 
         BaseType_t task_error = 0;
-        task_error = xTaskCreate(Worker::taskAdapter, name.c_str(), defaultStackSize, this, priority, &taskHandle);
+        task_error            = xTaskCreate(
+            Worker::taskAdapter, name.c_str(), stackDepth / sizeof(StackType_t), this, priority, &taskHandle);
 
         if (task_error != pdPASS) {
             LOG_ERROR("Failed to start the task");

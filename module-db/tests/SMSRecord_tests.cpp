@@ -1,8 +1,7 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <catch2/catch.hpp>
-
+#include "common.hpp"
 #include <Database/Database.hpp>
 #include <Databases/ContactsDB.hpp>
 #include <Databases/SmsDB.hpp>
@@ -12,6 +11,8 @@
 
 #include <country.hpp>
 #include <PhoneNumber.hpp>
+
+#include <catch2/catch.hpp>
 
 #include <algorithm>
 #include <filesystem>
@@ -30,20 +31,15 @@ TEST_CASE("SMS Record tests")
 {
     Database::initialize();
 
-    const auto contactsPath = (std::filesystem::path{"user"} / "contacts.db");
-    const auto smsPath      = (std::filesystem::path{"user"} / "sms.db");
-    if (std::filesystem::exists(contactsPath)) {
-        REQUIRE(std::filesystem::remove(contactsPath));
-    }
-    if (std::filesystem::exists(smsPath)) {
-        REQUIRE(std::filesystem::remove(smsPath));
-    }
+    const auto contactsPath = (std::filesystem::path{"sys/user"} / "contacts.db");
+    const auto smsPath      = (std::filesystem::path{"sys/user"} / "sms.db");
+    RemoveDbFiles(contactsPath.stem());
+    RemoveDbFiles(smsPath.stem());
 
     ContactsDB contactsDB(contactsPath.c_str());
     SmsDB smsDB(smsPath.c_str());
 
     const uint32_t dateTest      = 123456789;
-    const uint32_t dateSentTest  = 987654321;
     const uint32_t errorCodeTest = 555;
     auto numberTest              = utils::PhoneNumber("+48600123456", utils::country::Id::UNKNOWN).getView();
     auto numberTest2             = utils::PhoneNumber("222333444", utils::country::Id::UNKNOWN).getView();
@@ -55,7 +51,6 @@ TEST_CASE("SMS Record tests")
 
     SMSRecord recordIN;
     recordIN.date      = dateTest;
-    recordIN.dateSent  = dateSentTest;
     recordIN.errorCode = errorCodeTest;
     recordIN.number    = numberTest;
     recordIN.body      = bodyTest;
@@ -188,7 +183,7 @@ TEST_CASE("SMS Record tests")
         }
         ThreadRecord threadRec = threadRecordInterface.GetByID(1);
         REQUIRE(threadRec.isValid());
-        ThreadsTableRow threadRaw{{.ID = threadRec.ID},
+        ThreadsTableRow threadRaw{Record(threadRec.ID),
                                   .date           = threadRec.date,
                                   .msgCount       = threadRec.msgCount,
                                   .unreadMsgCount = threadRec.unreadMsgCount,

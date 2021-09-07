@@ -1,0 +1,8 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+object CellularDMAResultStruct {
+  CellularResultCode resultCode
+  size_t dataSize
+  uint8_t data[CellularResultStructMaxDataSize]
+}
+@enduml

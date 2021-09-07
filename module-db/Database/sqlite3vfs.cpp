@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /*
@@ -128,7 +128,6 @@
 #include <Utils.hpp>
 #include <dirent.h>
 
-//#include <log/log.hpp> //left for future debug
 
 /*
  ** Size of the write buffer used by journal files in bytes.
@@ -157,19 +156,118 @@ struct EcophoneFile
     char *aBuffer;             /* Pointer to malloc'd buffer */
     int nBuffer;               /* Valid bytes of data in zBuffer */
     sqlite3_int64 iBufferOfst; /* Offset in file of zBuffer[0] */
-};
 
-static std::uintmax_t file_size(std::FILE *file) noexcept
-{
-    if (file == nullptr) {
-        return 0;
+    /* Current state */
+    long _size = -1;
+    long _pos  = -1;
+
+    /* Basic operations */
+    auto size()
+    {
+        if (_size < 0) {
+            _pos = std::ftell(fd);
+            std::fseek(fd, 0, SEEK_END);
+            _size = std::ftell(fd);
+            std::fseek(fd, _pos, SEEK_SET);
+        }
+        return _size;
     }
-    const auto startPosition = std::ftell(file);
-    std::fseek(file, 0, SEEK_END);
-    const auto endPosition = std::ftell(file);
-    std::fseek(file, startPosition, SEEK_SET);
-    return endPosition;
-}
+
+    auto seek(long off, int dir)
+    {
+        int res{0};
+        switch (dir) {
+        case SEEK_SET:
+            if (off == _pos)
+                return 0;
+            res  = std::fseek(fd, off, dir);
+            _pos = (res) ? (-1) : (off);
+            break;
+        case SEEK_CUR:
+            res = std::fseek(fd, off, dir);
+            if (res)
+                _pos = -1;
+            else
+                _pos += off;
+            break;
+        case SEEK_END:
+            if ((_pos >= 0) && (_pos == _size) && !off)
+                return 0;
+            res = std::fseek(fd, off, dir);
+            if (res)
+                _pos = -1;
+            else {
+                /* Use this jump to ensure integrity */
+                _size = _pos = std::ftell(fd);
+            }
+            break;
+        }
+        return res;
+    }
+
+    ssize_t read(void *buf, size_t size)
+    {
+        auto s = std::fread(buf, 1, size, fd);
+        if (std::ferror(fd)) {
+            _pos = -1;
+            return -1;
+        }
+        _pos += s;
+        return s;
+    }
+
+    ssize_t write(const void *buf, size_t size)
+    {
+        auto s = std::fwrite(buf, 1, size, fd);
+        if (std::ferror(fd)) {
+            _pos  = -1;
+            _size = -1;
+            return -1;
+        }
+        _pos += s;
+        if (_size >= 0 && _pos > _size)
+            _size = _pos;
+        return s;
+    }
+
+    /* Common routines */
+    auto seekOrEnd(long off)
+    {
+        if (!off || off < size()) {
+            if (seek(off, SEEK_SET) != 0)
+                return SQLITE_IOERR_WRITE;
+            return SQLITE_OK;
+        }
+
+        if (seek(0, SEEK_END) != 0) {
+            return SQLITE_IOERR_READ;
+        }
+
+        return SQLITE_OK;
+    }
+
+    auto seekOrAppend(long off)
+    {
+        if (!off || off < size()) {
+            if (seek(off, SEEK_SET) != 0)
+                return SQLITE_IOERR_WRITE;
+            return SQLITE_OK;
+        }
+        else {
+            if (seek(0, SEEK_END) != 0) {
+                return SQLITE_IOERR_WRITE;
+            }
+
+            auto bytesLeft = off - size();
+            auto zero_buf  = std::make_unique<char[]>(bytesLeft);
+            auto ret       = std::fwrite(zero_buf.get(), 1, bytesLeft, fd);
+            if (ret != bytesLeft) {
+                return SQLITE_IOERR_WRITE;
+            }
+        }
+        return SQLITE_OK;
+    }
+};
 
 /*
  ** Write directly to the file passed as the first argument. Even if the
@@ -181,48 +279,12 @@ static int ecophoneDirectWrite(EcophoneFile *p,   /* File handle */
                                sqlite_int64 iOfst /* File offset to write to */
 )
 {
-    size_t nWrite; /* Return value from write() */
-    const auto fileSize = file_size(p->fd);
-    // vfs_fseek doesn't like offset to be > file size
-    if (iOfst < fileSize) {
-        if (std::fseek(p->fd, iOfst, SEEK_SET) != 0) {
-            return SQLITE_IOERR_WRITE;
-        }
-    }
-    else {
-        if (std::fseek(p->fd, fileSize, SEEK_SET) != 0) {
-            return SQLITE_IOERR_WRITE;
-        }
-        // Zero fill if outside the buffer
-        auto bytesLeft                     = iOfst - fileSize;
-        static constexpr auto zerobuf_size = 512U;
-        auto zero_buf                      = std::make_unique<char[]>(zerobuf_size);
-        std::memset(zero_buf.get(), 0, zerobuf_size);
-        while (bytesLeft > 0) {
-            unsigned long bytesToWrite;
-            if ((fileSize % zerobuf_size) != 0) {
-                bytesToWrite = zerobuf_size - (fileSize % zerobuf_size);
-                if (bytesToWrite > bytesLeft) {
-                    bytesToWrite = bytesLeft;
-                }
-            }
-            else {
-                bytesToWrite = bytesLeft;
+    ssize_t nWrite;
 
-                if (bytesToWrite > zerobuf_size) {
-                    bytesToWrite = zerobuf_size;
-                }
-            }
-            auto ret = std::fwrite(zero_buf.get(), sizeof(char), bytesToWrite, p->fd);
-            if (ret != bytesToWrite) {
-                return SQLITE_IOERR_WRITE;
-            }
-            bytesLeft -= bytesToWrite;
-        }
-    }
+    p->seekOrAppend(iOfst);
+    nWrite = p->write(zBuf, iAmt);
 
-    nWrite = std::fwrite(zBuf, 1, iAmt, p->fd);
-    if ((int)nWrite != iAmt) {
+    if (nWrite != iAmt) {
         return SQLITE_IOERR_WRITE;
     }
     if (std::fflush(p->fd) != 0) {
@@ -265,9 +327,9 @@ static int ecophoneClose(sqlite3_file *pFile)
  */
 static int ecophoneRead(sqlite3_file *pFile, void *zBuf, int iAmt, sqlite_int64 iOfst)
 {
+    ssize_t nRead;
+
     EcophoneFile *p = (EcophoneFile *)pFile;
-    int nRead; /* Return value from read() */
-    int rc;    /* Return code from ecophoneFlushBuffer() */
 
     /* Flush any data in the write buffer to disk in case this operation
      ** is trying to read data the file-region currently cached in the buffer.
@@ -275,24 +337,13 @@ static int ecophoneRead(sqlite3_file *pFile, void *zBuf, int iAmt, sqlite_int64 
      ** unnecessary write here, but in practice SQLite will rarely read from
      ** a journal file when there is data cached in the write-buffer.
      */
-    rc = ecophoneFlushBuffer(p);
+    auto rc = ecophoneFlushBuffer(p);
     if (rc != SQLITE_OK) {
         return rc;
     }
+    p->seekOrEnd(iOfst);
 
-    auto fileSize = file_size(p->fd);
-
-    if (p->fd != nullptr) {
-        if (iOfst >= fileSize) {
-            iOfst = fileSize;
-        }
-    }
-
-    if (std::fseek(p->fd, iOfst, SEEK_SET) != 0) {
-        return SQLITE_IOERR_READ;
-    }
-
-    nRead = std::fread(zBuf, 1, iAmt, p->fd);
+    nRead = p->read(zBuf, iAmt);
 
     if (nRead == iAmt) {
         return SQLITE_OK;
@@ -381,9 +432,10 @@ static int ecophoneSync(sqlite3_file *pFile, int flags)
     if (rc != SQLITE_OK) {
         return rc;
     }
-
-    // rc = fflush(p->fd);  //FF doesn't have this function
-    rc = SQLITE_OK;
+    rc = fileno(p->fd);
+    if (rc > 0) {
+        rc = fsync(rc);
+    }
     return (rc == 0 ? SQLITE_OK : SQLITE_IOERR_FSYNC);
 }
 
@@ -405,7 +457,7 @@ static int ecophoneFileSize(sqlite3_file *pFile, sqlite_int64 *pSize)
         return rc;
     }
 
-    *pSize = file_size(p->fd);
+    *pSize = p->size();
 
     return SQLITE_OK;
 }
@@ -535,6 +587,7 @@ static int ecophoneOpen(sqlite3_vfs *pVfs,   /* VFS */
     }
 
     memset(p, 0, sizeof(EcophoneFile));
+    p->_size = p->_pos = -1;
 
     std::string oflags;
     if (flags & SQLITE_OPEN_READONLY) {

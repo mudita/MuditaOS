@@ -1,16 +1,15 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "SpecialInputTableWidget.hpp"
+#include "ApplicationSpecialInput.hpp"
+#include "SpecialCharactersTableStyle.hpp"
+#include <service-appmgr/Controller.hpp>
+#include <messages/AppMessage.hpp>
+#include <Style.hpp>
+#include <cassert>
 #include <locale>
 #include <codecvt>
-#include "module-apps/application-special-input/widgets/SpecialInputTableWidget.hpp"
-#include "application-special-input/data/SpecialCharactersTableStyle.hpp"
-#include <cassert>
-#include <module-apps/application-special-input/ApplicationSpecialInput.hpp>
-#include <service-appmgr/Controller.hpp>
-
-#include "Style.hpp"
-#include "messages/AppMessage.hpp"
 
 namespace gui
 {
@@ -35,7 +34,7 @@ namespace gui
         }
         addWidget(box);
         inputCallback = [&](gui::Item &item, const gui::InputEvent &event) {
-            if (event.state != gui::InputEvent::State::keyReleasedShort) {
+            if (!event.isShortRelease()) {
                 return false;
             }
             return box->onInput(event);
@@ -44,7 +43,7 @@ namespace gui
         auto defaultBorderCallback = box->borderCallback;
 
         box->borderCallback = [defaultBorderCallback](const InputEvent &inputEvent) -> bool {
-            if (!inputEvent.isShortPress()) {
+            if (!inputEvent.isShortRelease()) {
                 return false;
             }
             if (inputEvent.is(KeyCode::KEY_UP) || inputEvent.is(KeyCode::KEY_DOWN)) {

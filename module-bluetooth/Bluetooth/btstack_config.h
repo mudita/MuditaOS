@@ -1,3 +1,6 @@
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 //
 // btstack_config.h for generic POSIX H4 port
 //
@@ -25,14 +28,14 @@
 // #define ENABLE_LE_DATA_CHANNELS
 // #define ENABLE_LE_DATA_LENGTH_EXTENSION
 #define ENABLE_ATT_DELAYED_RESPONSE
-#define ENABLE_USER_LOG
-#define ENABLE_LOG_ERROR
-#define ENABLE_LOG_INFO
-#define ENABLE_LOG_WARNING
-#define ENABLE_LOG_DEBUG
+// #define ENABLE_USER_LOG
+// #define ENABLE_LOG_ERROR
+// #define ENABLE_LOG_INFO
+// #define ENABLE_LOG_WARNING
+// #define ENABLE_LOG_DEBUG
 #define ENABLE_SCO_OVER_HCI
 #define ENABLE_SDP_DES_DUMP
-// #define ENABLE_EHCILL
+#define ENABLE_EHCILL
 
 // BTstack configuration. buffers, sizes, ...
 #define HCI_INCOMING_PRE_BUFFER_SIZE 14 // sizeof benep heade, avoid memcpy

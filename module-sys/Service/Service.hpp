@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "ServiceForward.hpp"
 #include "BusProxy.hpp"
 #include "Common.hpp"  // for ReturnCodes, ServicePriority, BusChannels
 #include "Mailbox.hpp" // for Mailbox
@@ -25,17 +26,6 @@
 
 namespace sys
 {
-    class Timer;
-} // namespace sys
-namespace sys
-{
-    struct Proxy;
-} // namespace sys
-
-namespace sys
-{
-    using MessageHandler = std::function<MessagePointer(Message *)>;
-
     class Service : public cpp_freertos::Thread, public std::enable_shared_from_this<Service>
     {
       public:
@@ -66,6 +56,8 @@ namespace sys
          */
         virtual ReturnCodes DeinitHandler() = 0;
 
+        virtual auto ProcessCloseReason(CloseReason closeReason) -> void;
+
         virtual ReturnCodes SwitchPowerModeHandler(const ServicePowerMode mode) = 0;
 
         /**
@@ -91,6 +83,9 @@ namespace sys
         bool connect(const std::type_info &type, MessageHandler handler);
         bool connect(Message *msg, MessageHandler handler);
         bool connect(Message &&msg, MessageHandler handler);
+        bool disconnect(const std::type_info &type);
+
+        void sendCloseReadyMessage(Service *service);
 
       protected:
         bool enableRunLoop;
@@ -117,33 +112,16 @@ namespace sys
 
         class Timers
         {
-
-            friend Timer;
+            friend timer::SystemTimer;
 
           private:
-            std::vector<Timer *> list;
-            auto attach(Timer *timer)
-            {
-                list.push_back(timer);
-            }
-
-            void detach(Timer *timer)
-            {
-                list.erase(std::find(list.begin(), list.end(), timer));
-            }
+            std::vector<timer::SystemTimer *> list;
+            void attach(timer::SystemTimer *timer);
+            void detach(timer::SystemTimer *timer);
 
           public:
             void stop();
-
-            [[nodiscard]] auto get(Timer *timer) const
-            {
-                return std::find(list.begin(), list.end(), timer);
-            }
-
-            [[nodiscard]] auto noTimer() const
-            {
-                return std::end(list);
-            }
+            [[nodiscard]] auto get(timer::SystemTimer *timer) noexcept -> timer::SystemTimer *;
         } timers;
 
       public:

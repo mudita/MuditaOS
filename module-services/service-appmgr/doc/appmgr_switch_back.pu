@@ -1,4 +1,5 @@
 @startuml
+skinparam BackgroundColor F0F0F0
 participant "Application" as app
 participant "Application Manager" as appmgr
 participant "Previous Application" as prev

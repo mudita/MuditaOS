@@ -3,8 +3,6 @@
 
 #pragma once
 
-#include <log/log.hpp>
-
 namespace settings::Statements
 {
     constexpr auto getValue = R"sql(

@@ -1,14 +1,14 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include "Table.hpp"
-#include "Record.hpp"
-#include "Database/Database.hpp"
 #include "Common/Common.hpp"
-#include <module-utils/utf8/UTF8.hpp>
-#include <module-apps/application-calendar/data/dateCommon.hpp>
+#include "Database/Database.hpp"
+#include "Record.hpp"
+#include "Table.hpp"
+#include <time/dateCommon.hpp>
+#include <utf8/UTF8.hpp>
 
 struct AlarmsRecord;
 

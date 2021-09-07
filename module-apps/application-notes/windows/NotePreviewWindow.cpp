@@ -1,21 +1,18 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NotePreviewWindow.hpp"
 
-#include <module-apps/application-notes/ApplicationNotes.hpp>
+#include <application-notes/ApplicationNotes.hpp>
 #include <module-apps/application-notes/data/NoteSwitchData.hpp>
 #include <module-apps/application-notes/style/NotePreviewStyle.hpp>
 #include <module-apps/application-notes/windows/NotesOptions.hpp>
-#include <module-apps/messages/OptionsWindow.hpp>
+#include <apps-common/messages/OptionsWindow.hpp>
 
 #include <i18n/i18n.hpp>
-#include <module-utils/time/time_conversion.hpp>
+#include <time/time_conversion_factory.hpp>
 
 #include <Style.hpp>
-
-#include <module-gui/gui/widgets/BottomBar.hpp>
-#include <module-gui/gui/widgets/TopBar.hpp>
 
 namespace app::notes
 {
@@ -49,7 +46,7 @@ namespace app::notes
     {
         AppWindow::buildInterface();
 
-        setTitle(utils::localize.get("app_notes_title_main"));
+        setTitle(utils::translate("app_notes_title_main"));
 
         namespace previewStyle = app::notes::style::preview;
         date                   = new gui::Label(
@@ -71,13 +68,13 @@ namespace app::notes
         note->setCursorStartPosition(gui::CursorStartPosition::DocumentBegin);
 
         bottomBar->setActive(gui::BottomBar::Side::LEFT, true);
-        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::localize.get(::style::strings::common::options));
+        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::translate(::style::strings::common::options));
 
         bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get("app_notes_edit"));
+        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate("app_notes_edit"));
 
         bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
-        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(::style::strings::common::back));
+        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(::style::strings::common::back));
 
         setFocusItem(note);
     }
@@ -86,37 +83,55 @@ namespace app::notes
     {
         auto previewData = dynamic_cast<NoteSwitchData *>(data);
         if (previewData == nullptr) {
+            if (mode == gui::ShowMode::GUI_SHOW_RETURN) {
+                updatePreview();
+            }
             return;
         }
 
-        notesRecord = std::make_unique<NotesRecord>(previewData->getRecord());
-        setEditDateText(notesRecord->date);
-        note->setText(notesRecord->snippet);
+        notesRecord = previewData->getRecord();
+        updatePreview();
+    }
+
+    void NotePreviewWindow::updatePreview()
+    {
+        if (notesRecord) {
+            setEditDateText(notesRecord->date);
+            note->setText(notesRecord->snippet);
+        }
+        else {
+            LOG_ERROR("Unable to update the preview: the note does not exist.");
+        }
     }
 
     void NotePreviewWindow::setEditDateText(std::uint32_t timestamp)
     {
-        utils::time::DateTime dt{timestamp};
+        using namespace utils::time;
+        auto dateTime = TimestampFactory().createTimestamp(TimestampType::DateTime, timestamp);
+        auto dt       = dynamic_cast<DateTime *>(dateTime.get());
+        if (dt == nullptr) {
+            return;
+        }
         std::ostringstream dateText;
-        dateText << utils::localize.get("app_notes_edited") << ": ";
-        if (dt.isToday()) {
-            dateText << utils::localize.get("common_today") << ", ";
+        dateText << utils::translate("app_notes_edited") << ": ";
+        if (dt->isToday()) {
+            dateText << utils::translate("common_today") << ", ";
         }
-        else if (dt.isYesterday()) {
-            dateText << utils::localize.get("common_yesterday") << ", ";
+        else if (dt->isYesterday()) {
+            dateText << utils::translate("common_yesterday") << ", ";
         }
-        dateText << dt;
+        dateText << *dt;
         date->setText(dateText.str());
     }
 
     bool NotePreviewWindow::onInput(const gui::InputEvent &inputEvent)
     {
-        if (inputEvent.isShortPress()) {
+        if (inputEvent.isShortRelease()) {
             if (inputEvent.is(gui::KeyCode::KEY_ENTER)) {
-                application->switchWindow(gui::name::window::note_edit, std::make_unique<NoteSwitchData>(*notesRecord));
+                application->switchWindow(gui::name::window::note_edit, std::make_unique<NoteSwitchData>(notesRecord));
             }
             else if (inputEvent.is(gui::KeyCode::KEY_LF)) {
-                application->switchWindow(utils::localize.get("app_phonebook_options_title"),
+                application->switchWindow(utils::translate("app_phonebook_options_title"),
                                           std::make_unique<gui::OptionsWindowOptions>(notePreviewOptions(
                                               application, *notesRecord, presenter->getRepository(), note)));
             }

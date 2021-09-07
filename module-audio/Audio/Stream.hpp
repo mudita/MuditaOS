@@ -1,7 +1,10 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
+
+#include "AbstractStream.hpp"
+#include "AudioFormat.hpp"
 
 #include <memory/NonCachedMemAllocator.hpp>
 #include <CriticalSectionGuard.hpp>
@@ -15,18 +18,11 @@
 
 namespace audio
 {
-    class Stream
+    class Stream : public AbstractStream
     {
       public:
         using UniqueStreamBuffer = std::unique_ptr<std::uint8_t[], std::function<void(uint8_t[])>>;
-
-        struct Span
-        {
-            std::uint8_t *data   = nullptr;
-            std::size_t dataSize = 0;
-
-            std::uint8_t *dataEnd() const noexcept;
-        };
+        using AbstractStream::Span;
 
         class RawBlockIterator
         {
@@ -54,72 +50,56 @@ namespace audio
             virtual UniqueStreamBuffer allocate(std::size_t size) = 0;
         };
 
-        enum class Event
-        {
-            NoEvent,
-            StreamFull,
-            StreamHalfUsed,
-            StreamEmpty,
-            StreamOverflow,
-            StreamUnderFlow
-        };
+        static constexpr auto defaultBufferingSize = 32U;
 
-        enum class EventSourceMode
-        {
-            ISR,
-            Thread
-        };
+        Stream(AudioFormat format,
+               Allocator &allocator,
+               std::size_t blockSize,
+               unsigned int bufferingSize = defaultBufferingSize);
 
-        class EventListener
-        {
-          public:
-            virtual void onEvent(Stream *stream, Event event, EventSourceMode source) = 0;
-        };
-
-        static constexpr auto defaultBufferingSize = 4U;
-
-        Stream(Allocator &allocator, std::size_t blockSize, unsigned int bufferingSize = defaultBufferingSize);
+        void registerListener(AbstractStream::EventListener *listener) override;
+        void unregisterListeners(AbstractStream::EventListener *listener) override;
 
         /// push
-        bool push(void *data, std::size_t dataSize);
-        bool push(const Span &span);
-        bool push();
+        bool push(void *data, std::size_t dataSize) override;
+        bool push(const Span &span) override;
+        bool push() override;
 
         /// pop
-        bool pop(Span &span);
+        bool pop(Span &span) override;
 
         /// zero copy write
-        bool reserve(Span &span);
-        void commit();
-        void release();
+        bool reserve(Span &span) override;
+        void commit() override;
+        void release() override;
 
         /// zero copy read
-        bool peek(Span &span);
-        void consume();
-        void unpeek();
+        bool peek(Span &span) override;
+        void consume() override;
+        void unpeek() override;
+
+        void reset() override;
 
         /// get empty data span
         Span getNullSpan() const noexcept;
 
-        void reset();
+        [[nodiscard]] auto getInputTraits() const noexcept -> Traits override;
+        [[nodiscard]] auto getOutputTraits() const noexcept -> Traits override;
+        [[nodiscard]] bool isEmpty() const noexcept override;
+        [[nodiscard]] bool isFull() const noexcept override;
 
-        [[nodiscard]] std::size_t getBlockSize() const noexcept;
         [[nodiscard]] std::size_t getBlockCount() const noexcept;
         [[nodiscard]] std::size_t getUsedBlockCount() const noexcept;
         [[nodiscard]] std::size_t getPeekedCount() const noexcept;
         [[nodiscard]] std::size_t getReservedCount() const noexcept;
-        [[nodiscard]] bool isEmpty() const noexcept;
-        [[nodiscard]] bool isFull() const noexcept;
         [[nodiscard]] bool blocksAvailable() const noexcept;
-
-        void registerListener(EventListener *listener);
-        void unregisterListeners(EventListener *listener);
 
       private:
         using LockGuard = cpp_freertos::CriticalSectionGuard;
 
         void broadcastEvent(Event event);
         void broadcastStateEvents();
+        auto getIOTraits() const noexcept -> Traits;
 
         Allocator &_allocator;
         std::size_t _blockSize    = 0;
@@ -127,9 +107,10 @@ namespace audio
         std::size_t _blocksUsed   = 0;
         std::size_t _peekCount    = 0;
         std::size_t _reserveCount = 0;
+        AudioFormat _format       = nullFormat;
         UniqueStreamBuffer _buffer;
         UniqueStreamBuffer _emptyBuffer;
-        std::list<EventListener *> listeners;
+        std::list<AbstractStream::EventListener *> listeners;
 
         RawBlockIterator _dataStart;
         RawBlockIterator _dataEnd;

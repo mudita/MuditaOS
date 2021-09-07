@@ -1,0 +1,23 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+
+actor User
+participant "A2DP Sink" as sink
+participant "Source's AVRCP event handler" as source
+participant "Service Bluetooth" as bt
+participant "Service Audio" as audio
+participant "Settings" as settings
+participant "Application" as app 
+
+
+User -> sink : Volume button pressed
+==A2DP==
+sink -> source : AVRCP volume changed 
+== ==
+source -> bt : Volume changed message
+bt -> audio : Volume changed message
+audio -> settings : Set appropriate value
+audio -> app : Current volume changed
+app -> User : Show current volume level
+
+@enduml

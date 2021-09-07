@@ -1,7 +1,9 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <service-appmgr/model/ApplicationsRegistry.hpp>
+#include "ApplicationsRegistry.hpp"
+
+#include <apps-common/ApplicationLauncher.hpp>
 
 namespace app::manager
 {

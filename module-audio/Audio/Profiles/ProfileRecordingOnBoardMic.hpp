@@ -11,17 +11,18 @@ namespace audio
     {
       public:
         ProfileRecordingOnBoardMic(Gain gain)
-            : Profile("Recording On Board Microphone",
-                      Type::RecordingBuiltInMic,
-                      AudioDevice::Format{.sampleRate_Hz = 44100,
-                                          .bitWidth      = 16,
-                                          .flags         = static_cast<uint32_t>(
-                                              AudioDevice::Flags::InputLeft), // microphone use left audio channel
-                                          .outputVolume = 0,
-                                          .inputGain    = static_cast<float>(gain),
-                                          .inputPath    = AudioDevice::InputPath::Microphone,
-                                          .outputPath   = AudioDevice::OutputPath::None},
-                      AudioDevice::Type::Audiocodec)
+            : Profile(
+                  "Recording On Board Microphone",
+                  Type::RecordingBuiltInMic,
+                  audio::codec::Configuration{.sampleRate_Hz = 44100,
+                                              .bitWidth      = 16,
+                                              .flags         = static_cast<uint32_t>(
+                                                  audio::codec::Flags::InputLeft), // microphone use left audio channel
+                                              .outputVolume = 0,
+                                              .inputGain    = static_cast<float>(gain),
+                                              .inputPath    = audio::codec::InputPath::Microphone,
+                                              .outputPath   = audio::codec::OutputPath::None},
+                  AudioDevice::Type::Audiocodec)
         {}
     };
 

@@ -5,6 +5,7 @@
 
 #include <at/Commands.hpp>
 #include <Utils.hpp>
+#include <at/ATFactory.hpp>
 
 #include "service-cellular/requests/ClirRequest.hpp"
 
@@ -23,23 +24,21 @@ namespace cellular
         }
     }
 
-    auto ClirRequest::command() -> std::string
+    auto ClirRequest::command() -> at::Cmd
     {
         switch (procedureType) {
         case ProcedureType::Deactivation:
-            return std::string(at::factory(at::AT::CLIR_DISABLE));
+            return at::factory(at::AT::CLIR_DISABLE);
         case ProcedureType::Activation:
-            return std::string(at::factory(at::AT::CLIR_ENABLE));
+            return at::factory(at::AT::CLIR_ENABLE);
         case ProcedureType::Interrogation:
-            return std::string(at::factory(at::AT::CLIR_GET));
+            return at::factory(at::AT::CLIR_GET);
         case ProcedureType::Registration:
-            // not supported
-            return std::string();
         case ProcedureType::Erasure:
             // not supported
-            return std::string();
+            break;
         }
-        return std::string();
+        return at::Cmd("");
     }
 
     void ClirRequest::handle(RequestHandler &h, at::Result &result)

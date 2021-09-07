@@ -23,27 +23,38 @@ namespace sys::phone_modes
     class PhoneModeChanged : public DataMessage
     {
       public:
-        PhoneModeChanged(PhoneMode phoneMode, Tethering tetheringMode)
-            : DataMessage{MessageType::MessageTypeUninitialized}, phoneMode{phoneMode}, tethering{tetheringMode}
+        explicit PhoneModeChanged(PhoneMode phoneMode)
+            : DataMessage{MessageType::MessageTypeUninitialized}, phoneMode{phoneMode}
         {}
 
         [[nodiscard]] auto getPhoneMode() const noexcept
         {
             return phoneMode;
         }
+
+      private:
+        PhoneMode phoneMode;
+    };
+
+    class TetheringChanged : public DataMessage
+    {
+      public:
+        explicit TetheringChanged(Tethering tetheringMode)
+            : DataMessage{MessageType::MessageTypeUninitialized}, tethering{tetheringMode}
+        {}
+
         [[nodiscard]] auto getTetheringMode() const noexcept
         {
             return tethering;
         }
 
       private:
-        PhoneMode phoneMode;
         Tethering tethering;
     };
 
-    class PhoneModeChangedSuccessfully : public ResponseMessage
+    class ChangedSuccessfully : public ResponseMessage
     {};
 
-    class PhoneModeChangeFailed : public ResponseMessage
+    class ChangeFailed : public ResponseMessage
     {};
 } // namespace sys::phone_modes

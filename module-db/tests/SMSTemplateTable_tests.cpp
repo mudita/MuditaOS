@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -19,7 +19,7 @@ TEST_CASE("SMS Templates Table tests")
 {
     Database::initialize();
 
-    const auto smsPath = (std::filesystem::path{"user"} / "sms.db");
+    const auto smsPath = (std::filesystem::path{"sys/user"} / "sms.db");
     if (std::filesystem::exists(smsPath)) {
         REQUIRE(std::filesystem::remove(smsPath));
     }
@@ -29,7 +29,7 @@ TEST_CASE("SMS Templates Table tests")
 
     auto &templatesTbl = smsDb.templates;
 
-    SMSTemplateTableRow testRow = {{.ID = 0}, .text = "Test text", .lastUsageTimestamp = 100};
+    SMSTemplateTableRow testRow = {Record(0), .text = "Test text", .lastUsageTimestamp = 100};
 
     const auto templatesCount = templatesTbl.count() + 1;
     // clear sms table

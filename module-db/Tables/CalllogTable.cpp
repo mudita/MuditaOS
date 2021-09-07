@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CalllogTable.hpp"
-#include "log/log.hpp"
+#include <log.hpp>
 #include <Utils.hpp>
 
 CalllogTable::CalllogTable(Database *db) : Table(db)

@@ -2,6 +2,9 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SettingsHolder.hpp"
+
+#include <service-db/agents/settings/SystemSettings.hpp>
+
 namespace bluetooth
 {
     std::map<Settings, std::string> SettingsHolder::settingString{
@@ -10,6 +13,8 @@ namespace bluetooth
         {Settings::State, settings::Bluetooth::state},
         {Settings::BondedDevices, settings::Bluetooth::bondedDevices},
         {Settings::BtKeys, settings::Bluetooth::btKeys},
+        {Settings::ConnectedDevice, settings::Bluetooth::connectedDevice},
+
     };
 
     auto SettingsHolder::getValue(const Settings setting) -> SettingEntry
@@ -20,9 +25,8 @@ namespace bluetooth
     {
         settingsMap[newSetting] = value;
 
-        settingsProvider->setValue(
-            settingString[newSetting], std::visit(StringVisitor(), value), ::settings::SettingsScope::Global);
-        LOG_INFO("setting %s set: %s", settingString[newSetting].c_str(), std::visit(StringVisitor(), value).c_str());
+        settingsProvider->setValue(settingString[newSetting], std::visit(StringVisitor(), value));
+        LOG_INFO("setting %s set", settingString[newSetting].c_str());
     }
     SettingsHolder::SettingsHolder(std::unique_ptr<settings::Settings> settingsPtr)
         : settingsProvider(std::move(settingsPtr))
@@ -50,5 +54,10 @@ namespace bluetooth
                 onStateChange();
             }
         });
+    }
+
+    void SettingsHolder::deinit()
+    {
+        settingsProvider->deinit();
     }
 } // namespace Bluetooth

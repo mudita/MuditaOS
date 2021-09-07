@@ -1,4 +1,5 @@
 @startuml
+skinparam BackgroundColor F0F0F0
 participant "Application 1" as app1
 participant "Application Manager" as appmgr
 participant "Application 2" as app2

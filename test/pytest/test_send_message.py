@@ -2,10 +2,30 @@
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 import time
 import pytest
+import copy
 
 from harness.interface.defs import key_codes, SMSType, status
 from harness.interface.CDCSerial import Keytype
 
+# time for  message to leave the sending queue
+extra_time_to_send_message  = 50
+
+def check_for_sent(old_messages,harness, sms_text, phone_number,timeout):
+    local_timeout = copy.deepcopy(timeout)
+    while local_timeout != 0:
+
+        new_messages = get_message_by_text(harness, sms_text, str(phone_number))
+        diff_messages = []
+
+        for message in new_messages:
+            if message not in old_messages:
+                diff_messages.append(message)
+
+        if len(diff_messages) > 0 and SMSType(diff_messages[0]["messageType"]) == SMSType.OUTBOX:
+            return diff_messages
+        local_timeout -=1
+        time.sleep(1)
+    pytest.fail("Message send timeout!")
 
 def erase_all_templates(harness):
     # getting the templates count
@@ -15,32 +35,33 @@ def erase_all_templates(harness):
     count = ret["body"]["count"]
 
     # getting all templates
-    body = {"category": "template", "limit": count}
+    body = {"category": "template", "limit": count, "offset": 0}
     ret = harness.endpoint_request("messages", "get", body)
     assert ret["status"] == status["OK"]
-    assert len(ret["body"]["entries"]) == count
+
+    assert ret["body"]["totalCount"] == count
 
     for template in ret["body"]["entries"]:
         body = {"category": "template", "templateID": template["templateID"]}
         del_res = harness.endpoint_request("messages", "del", body)
-        assert del_res["status"] == status["OK"]
+        assert del_res["status"] == status["NoContent"]
 
 
 def add_new_template(harness, template_text: str):
     # adding new template
     body = {"category": "template", "templateBody": template_text}
     ret = harness.endpoint_request("messages", "post", body)
-    assert ret["status"] == status["OK"]
+    assert ret["status"] == status["NoContent"]
 
 
 def get_all_contacts(harness):
-    body = {"limit": True}
+    body = {"count": True}
     ret = harness.endpoint_request("contacts", "get", body)
 
     assert ret["status"] == status["OK"]
 
     contacts = []
-    count = ret["body"]["limit"]
+    count = ret["body"]["count"]
     if count == 0:
         return contacts
 
@@ -76,7 +97,7 @@ def erase_contacts_by_name(harness, name):
         # removing added contact
         body = {"id": identifier}
         ret = harness.endpoint_request("contacts", "del", body)
-        assert ret["status"] == status["OK"]
+        assert ret["status"] == status["NoContent"]
 
 
 def erase_contacts_by_phone_number(harness, phone_number):
@@ -96,7 +117,7 @@ def erase_contacts_by_phone_number(harness, phone_number):
         # removing added contact
         body = {"id": identifier}
         ret = harness.endpoint_request("contacts", "del", body)
-        assert ret["status"] == status["OK"]
+        assert ret["status"] == status["NoContent"]
 
 
 def get_message_by_text(harness, message: str, phone_number: str):
@@ -124,6 +145,7 @@ def compare_messages(old_messages, new_messages, sms_type: SMSType = SMSType.OUT
 
     assert len(diff_messages) == 1
     assert SMSType(diff_messages[0]["messageType"]) == sms_type
+    return diff_messages
 
 
 def enter_messages_menu(harness):
@@ -140,6 +162,13 @@ def enter_contacts_menu(harness):
     if harness.get_application_name() != "ApplicationPhonebook":
         time.sleep(2)
         assert harness.get_application_name() == "ApplicationPhonebook"
+
+
+def remove_added_messages(harness, diff_messages):
+    for  message in diff_messages:
+        body = {"category": "message", "messageID": message["messageID"]}
+        del_res = harness.endpoint_request("messages", "del", body)
+        assert del_res["status"] == status["NoContent"]
 
 
 @pytest.mark.rt1051
@@ -167,25 +196,35 @@ def test_send_message(harness, phone_number, sms_text):
         harness.connection.send_key_code(key_codes["fnRight"])
 
     time.sleep(3)
+
     # check if we back to ApplicationDesktop
     assert harness.get_application_name() == "ApplicationDesktop"
-    new_messages = get_message_by_text(harness, sms_text, str(phone_number))
-    compare_messages(old_messages, new_messages)
+
+    diff_messages = check_for_sent(old_messages,harness,sms_text,phone_number,extra_time_to_send_message)
+    # cleaning
+    remove_added_messages(harness,diff_messages)
+
 
 
 @pytest.mark.rt1051
 @pytest.mark.usefixtures("phone_unlocked")
 @pytest.mark.usefixtures("phone_in_desktop")
-def test_send_prepared_message(harness, phone_number, sms_text):
+def test_send_prepared_message(harness, phone_number, sms_text, clean = True):
     old_messages = get_message_by_text(harness, sms_text, str(phone_number))
 
     # prepare sms and send it (add sms to sending queue)
     prepare_sms(harness, sms_text, str(phone_number), SMSType.QUEUED.value)
     # time to send message
     time.sleep(3)
-    # check whether message was sent
-    new_messages = get_message_by_text(harness, sms_text, str(phone_number))
-    compare_messages(old_messages, new_messages)
+
+    diff_messages = check_for_sent(old_messages, harness, sms_text, phone_number, extra_time_to_send_message)
+
+    # cleaning
+    if(clean == True):
+        remove_added_messages(harness,diff_messages)
+    return diff_messages
+
+
 
 
 testdata = [
@@ -218,9 +257,11 @@ def test_send_prepared_draft_message(harness, phone_number, sms_text):
     time.sleep(3)
     assert harness.get_application_name() == "ApplicationDesktop"
 
-    # check whether message was sent
-    new_messages = get_message_by_text(harness, sms_text, str(phone_number))
-    compare_messages(old_messages, new_messages)
+    diff_messages = check_for_sent(old_messages, harness, sms_text, phone_number, extra_time_to_send_message)
+
+    # cleaning
+    remove_added_messages(harness,diff_messages)
+
 
 
 @pytest.mark.rt1051
@@ -256,9 +297,10 @@ def test_send_message_from_template(harness, phone_number, sms_text):
     time.sleep(3)
     assert harness.get_application_name() == "ApplicationDesktop"
 
-    # check whether message was sent
-    new_messages = get_message_by_text(harness, sms_text, str(phone_number))
-    compare_messages(old_messages, new_messages)
+    diff_messages = check_for_sent(old_messages, harness, sms_text, phone_number, extra_time_to_send_message)
+
+    # cleaning
+    remove_added_messages(harness,diff_messages)
 
 
 @pytest.mark.rt1051
@@ -266,7 +308,7 @@ def test_send_message_from_template(harness, phone_number, sms_text):
 @pytest.mark.usefixtures("phone_in_desktop")
 def test_forward_message(harness, phone_number, sms_text):
     # send first message in order to forward it
-    test_send_prepared_message(harness, phone_number, sms_text)
+    diff_messages_org = test_send_prepared_message(harness, phone_number, sms_text, False)
 
     old_messages = get_message_by_text(harness, sms_text, str(phone_number))
 
@@ -298,9 +340,11 @@ def test_forward_message(harness, phone_number, sms_text):
     time.sleep(3)
     assert harness.get_application_name() == "ApplicationDesktop"
 
-    # check whether message was sent
-    new_messages = get_message_by_text(harness, sms_text, str(phone_number))
-    compare_messages(old_messages, new_messages)
+    diff_messages = check_for_sent(old_messages, harness, sms_text, phone_number, extra_time_to_send_message)
+
+    # cleaning
+    remove_added_messages(harness,diff_messages)
+    remove_added_messages(harness,diff_messages_org)
 
 
 @pytest.mark.rt1051
@@ -330,9 +374,11 @@ def test_resend_message(harness, phone_number, sms_text):
     # check if we back to ApplicationDesktop
     assert harness.get_application_name() == "ApplicationDesktop"
 
-    # check whether message was sent
-    new_messages = get_message_by_text(harness, sms_text, str(phone_number))
-    compare_messages(old_messages, new_messages)
+    diff_messages = check_for_sent(old_messages, harness, sms_text, phone_number, extra_time_to_send_message)
+
+    # cleaning
+    remove_added_messages(harness,diff_messages)
+
 
 
 @pytest.mark.rt1051
@@ -353,7 +399,7 @@ def test_send_message_from_phonebook(harness, phone_number, sms_text):
             "numbers": [str(phone_number)],
             "priName": "Test"}
     ret = harness.endpoint_request("contacts", "put", body)
-    assert ret["status"] == status["OK"]
+    assert ret["status"] == status["NoContent"]
     added_contact_id = ret["body"]["id"]
 
     # enter contacts (phonebook) menu
@@ -388,14 +434,16 @@ def test_send_message_from_phonebook(harness, phone_number, sms_text):
     time.sleep(3)
     # check if we back to ApplicationDesktop
     assert harness.get_application_name() == "ApplicationDesktop"
-    new_messages = get_message_by_text(harness, sms_text, str(phone_number))
-    compare_messages(old_messages, new_messages)
+
+    diff_messages = check_for_sent(old_messages, harness, sms_text, phone_number, extra_time_to_send_message)
+
+    # cleaning
+    remove_added_messages(harness,diff_messages)
 
     # removing added contact
     body = {"id": added_contact_id}
     ret = harness.endpoint_request("contacts", "del", body)
-    assert ret["status"] == status["OK"]
-
+    assert ret["status"] == status["NoContent"]
 
 @pytest.mark.rt1051
 @pytest.mark.usefixtures("phone_unlocked")
@@ -415,7 +463,7 @@ def test_send_message_using_phonebook(harness, phone_number, sms_text):
             "numbers": [str(phone_number)],
             "priName": "Test"}
     ret = harness.endpoint_request("contacts", "put", body)
-    assert ret["status"] == status["OK"]
+    assert ret["status"] == status["NoContent"]
     added_contact_id = ret["body"]["id"]
 
     # enter messages menu
@@ -459,10 +507,15 @@ def test_send_message_using_phonebook(harness, phone_number, sms_text):
     time.sleep(3)
     # check if we back to ApplicationDesktop
     assert harness.get_application_name() == "ApplicationDesktop"
-    new_messages = get_message_by_text(harness, sms_text, str(phone_number))
-    compare_messages(old_messages, new_messages)
+
+    diff_messages = check_for_sent(old_messages, harness, sms_text, phone_number, extra_time_to_send_message)
+
+    # cleaning
+    remove_added_messages(harness,diff_messages)
 
     # removing added contact
     body = {"id": added_contact_id}
     ret = harness.endpoint_request("contacts", "del", body)
-    assert ret["status"] == status["OK"]
+    assert ret["status"] == status["NoContent"]
+
+

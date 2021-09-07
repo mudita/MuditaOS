@@ -161,7 +161,7 @@ EinkStatus_e EinkUpdateFrame(
 EinkStatus_e EinkFillScreenWithColor(EinkDisplayColorFilling_e colorFill)
 {
     if (shared_buffer && shared_header) {
-        memset(shared_buffer, colorFill, shared_header->width * shared_header->height);
+        memset(shared_buffer, colorFill, shared_buffer_size);
         return EinkOK;
     }
 

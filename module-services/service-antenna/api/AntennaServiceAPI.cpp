@@ -1,17 +1,8 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <service-antenna/AntennaServiceAPI.hpp>
-
-#include <service-antenna/AntennaMessage.hpp>
-#include <service-antenna/ServiceAntenna.hpp>
-
-#include <MessageType.hpp>
-#include <Service/Common.hpp>
-#include <Service/Message.hpp>
-
-#include <memory>
-#include <utility>
+#include "AntennaMessage.hpp"
+#include "AntennaServiceAPI.hpp"
 
 namespace sys
 {
@@ -29,7 +20,7 @@ namespace AntennaServiceAPI
     bool LockRequest(sys::Service *serv, antenna::lockState request)
     {
         auto msg = std::make_shared<AntennaLockRequestMessage>(MessageType::AntennaLockService, request);
-        auto ret = serv->bus.sendUnicast(msg, service::name::antenna, 5000);
+        auto ret = serv->bus.sendUnicastSync(msg, service::name::antenna, 5000);
         if (ret.first == sys::ReturnCodes::Success) {
 
             return true;
@@ -40,7 +31,7 @@ namespace AntennaServiceAPI
     bool GetLockState(sys::Service *serv, antenna::lockState &response)
     {
         auto msg = std::make_shared<AntennaLockRequestMessage>(MessageType::AntennaGetLockState);
-        auto ret = serv->bus.sendUnicast(msg, service::name::antenna, 5000);
+        auto ret = serv->bus.sendUnicastSync(msg, service::name::antenna, 5000);
         if (ret.first == sys::ReturnCodes::Success) {
             auto responseMsg = dynamic_cast<AntennaLockRequestResponse *>(ret.second.get());
             if (responseMsg != nullptr) {

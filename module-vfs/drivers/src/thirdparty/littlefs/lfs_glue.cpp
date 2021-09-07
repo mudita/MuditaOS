@@ -1,10 +1,10 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 #include <littlefs/volume_mapper.hpp>
-#include <littlefs/lfs.h>
+#include <lfs.h>
 #include <purefs/blkdev/disk_handle.hpp>
 #include <purefs/blkdev/disk_manager.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <mutex.hpp>
 #include <errno.h>
 
@@ -20,12 +20,16 @@ namespace purefs::fs::drivers::littlefs::internal
             class io_context
             {
               public:
-                io_context(std::shared_ptr<blkdev::disk_manager> diskmm, blkdev::disk_fd diskh, size_t _sector_size)
-                    : disk(diskmm), disk_h(diskh), sector_size(_sector_size)
+                io_context(std::shared_ptr<blkdev::disk_manager> diskmm,
+                           blkdev::disk_fd diskh,
+                           size_t _sector_size,
+                           size_t _erase_block)
+                    : disk(diskmm), disk_h(diskh), sector_size(_sector_size), erase_block(_erase_block)
                 {}
                 const std::weak_ptr<blkdev::disk_manager> disk;
                 const blkdev::disk_fd disk_h;
                 const size_t sector_size;
+                const size_t erase_block;
                 mutable cpp_freertos::MutexRecursive mutex;
             };
 
@@ -65,7 +69,6 @@ namespace purefs::fs::drivers::littlefs::internal
             }
             int read(const struct lfs_config *lfsc, lfs_block_t block, lfs_off_t off, void *buffer, lfs_size_t size)
             {
-                // LOG_DEBUG("lfs_read_req(block=%u off=%u size=%u", unsigned(block), unsigned(off), unsigned(size));
                 auto ctx = reinterpret_cast<io_context *>(lfsc->context);
                 if (!ctx) {
                     return LFS_ERR_IO;
@@ -121,6 +124,10 @@ namespace purefs::fs::drivers::littlefs::internal
                 if (!ctx) {
                     return LFS_ERR_IO;
                 }
+                if (ctx->erase_block == 0) {
+                    // Erase not supported
+                    return LFS_ERR_OK;
+                }
                 auto diskmm = ctx->disk.lock();
                 if (!diskmm) {
                     return LFS_ERR_IO;
@@ -173,7 +180,12 @@ namespace purefs::fs::drivers::littlefs::internal
             LOG_ERROR("Unable to get sector size %li", long(sect_size));
             return sect_size;
         }
-        auto ctx      = new lfs_io::io_context(diskmm, diskh, sect_size);
+        const auto erase_size = diskmm->get_info(diskh, blkdev::info_type::erase_block);
+        if (erase_size < 0) {
+            LOG_ERROR("Unable to get erase block size %li", long(erase_size));
+            return erase_size;
+        }
+        auto ctx      = new lfs_io::io_context(diskmm, diskh, sect_size, erase_size);
         lfsc->context = ctx;
         lfsc->read    = lfs_io::read;
         lfsc->prog    = lfs_io::prog;

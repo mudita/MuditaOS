@@ -1,8 +1,8 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-#include <module-utils/json/json11.hpp>
+#include <json11.hpp>
 #include <string>
 #include <filesystem>
 
@@ -63,7 +63,6 @@ namespace boot
 
       private:
         bool loadBootConfig(const std::filesystem::path &bootJsonPath);
-        void updateBootJson(const std::filesystem::path &bootJsonPath);
         std::filesystem::path getCurrentBootJSON();
 
       private:

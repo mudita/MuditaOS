@@ -1,87 +1,52 @@
 ﻿# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-cmake_minimum_required(VERSION 3.14)
-
 project(module-apps VERSION 1.0
         DESCRIPTION "Library with all applications.")
 
-if(${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
-    include(targets/Target_RT1051.cmake)
-elseif(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
-    include(targets/Target_Linux.cmake)
-else()
-    message(FATAL_ERROR "Invalid target!")
-endif()
+module_is_test_entity()
 
-set( SOURCES 
-    "Application.cpp"
-    "GuiTimer.cpp"
-    "DOMResponder.cpp"
-    "WindowsFactory.cpp"
-    "TopBarManager.cpp"
-    "AsyncTask.cpp"
-    "CallbackStorage.cpp"
-    "windows/AppWindow.cpp"
-    "windows/OptionWindow.cpp"
-    "windows/Dialog.cpp"
-    "windows/NoEvents.cpp"
-    "widgets/ButtonOnOff.cpp"
-    "widgets/InputBox.cpp"
-    "windows/VolumeWindow.cpp"
-    "windows/BrightnessWindow.cpp"
-    "windows/HomeModesWindow.cpp"
-    "widgets/BrightnessBox.cpp"
-    "widgets/ModesBox.cpp"
-    "widgets/BarGraph.cpp"
-    "widgets/ActiveIconFactory.cpp"
-    "widgets/TextWithIconsWidget.cpp"
-    "widgets/DateWidget.cpp"
-    "widgets/TimeWidget.cpp"
-    "widgets/WidgetsUtils.cpp"
-    "options/OptionsModel.cpp"
-    "options/type/OptionSimple.cpp"
-    "options/type/OptionCall.cpp"
-    "options/type/OptionContact.cpp"
-    "options/type/OptionSetting.cpp"
-    "options/type/OptionChangePin.cpp"
-    "options/type/OptionWithActiveIcons.cpp"
-    "application-desktop/windows/UpdateProgress.cpp")
+add_library(${PROJECT_NAME} STATIC)
 
-add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
+add_subdirectory(apps-common)
+
+option(ENABLE_APP_ANTENNA "Enable application antenna" OFF)
 
 set(APPLICATIONS
-    clock
+    alarm-clock
+    antenna
+    calculator
     calendar
-    desktop
-    settings
-    settings-new
     call
+    clock
+    desktop
+    meditation
+    messages
+    music-player
     notes
     onboarding
     phonebook
-    messages
     calllog
     special-input
-    antenna
-    music-player
-    meditation
-    calculator
-    alarm-clock
+    settings
 )
 
 list(SORT APPLICATIONS)
 foreach(app IN LISTS APPLICATIONS)
     string(TOUPPER ${app} app_upper)
     string(REPLACE "-" "_" app_macro_name ${app_upper})
-    option(ENABLE_APP_${app_macro_name} "Enable application ${app}" ON)
-    
+    if (NOT DEFINED ENABLE_APP_${app_macro_name})
+        option(ENABLE_APP_${app_macro_name} "Enable application ${app}" ON)
+    endif()
+
     if(ENABLE_APP_${app_macro_name})
         message("Enabling application: ${app}")
-        add_subdirectory( application-${app} )
+        add_subdirectory(application-${app})
         list(APPEND ENABLED_APPS_DEFINES "ENABLE_APP_${app_macro_name}")
     endif()
 endforeach()
+
+target_compile_definitions(application-desktop PRIVATE "${ENABLED_APPS_DEFINES}")
 set(ENABLED_APPS_DEFINES ${ENABLED_APPS_DEFINES} PARENT_SCOPE)
 
 if(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
@@ -102,61 +67,63 @@ if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
     endforeach()
 endif()
 
-include_directories( ../module-sys )
-include_directories( ../module-utils )
-include_directories( ../module-services )
-include_directories( ../module-gui )
-include_directories( ../module-os )
-include_directories( ../module-bsp )
-include_directories( ../module-db )
+option(ENABLE_VOLTE "Enable VoLTE" OFF)
+if(${ENABLE_VOLTE})
+    target_compile_definitions(${PROJECT_NAME} PUBLIC ENABLE_VOLTE=1)
+endif()
+
+option(DISABLED_SETTINGS_OPTIONS "Enable Disabled Settings Options" OFF)
+if(${DISABLED_SETTINGS_OPTIONS})
+    target_compile_definitions(${PROJECT_NAME} PUBLIC DISABLED_SETTINGS_OPTIONS=1)
+endif()
+
+option(DEVELOPER_SETTINGS_OPTIONS "Enable Developer Settings Options" ${DEVELOPER_SETTINGS_OPTIONS_DEFAULT})
+if(${DEVELOPER_SETTINGS_OPTIONS})
+    target_compile_definitions(${PROJECT_NAME} PUBLIC DEVELOPER_SETTINGS_OPTIONS=1)
+endif()
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
-        service-appmgr
+        application-messages
+        application-settings
+        apps-common
+        date::date
+        eventstore
+        i18n
+        libphonenumber::libphonenumber
+        Microsoft.GSL::GSL
         service-antenna
+        service-appmgr
         service-audio
         service-cellular
         service-db
         service-evtmgr
+        time
+        utils-bootconfig
     PUBLIC
         module-audio
         module-bsp
+        module-db
+        module-gui
         module-os
+        module-services
         module-sys
         module-utils
-        module-gui
-        module-services
-        module-db
+        utf8
         ${TARGET_LIBRARIES}
 )
 
 # Board specific compilation definitions,options,include directories and features
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_TARGET})
-target_compile_definitions(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_DEFINITIONS})
-target_include_directories(${PROJECT_NAME} PUBLIC ${BOARD_DIR_INCLUDES})
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_INCLUDES})
-target_compile_features(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_FEATURES})
-target_compile_options(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_OPTIONS})
 
 target_include_directories(${PROJECT_NAME}
-
         PUBLIC
 
         ${CMAKE_CURRENT_SOURCE_DIR}
-        ${CMAKE_CURRENT_SOURCE_DIR}/messages
-        ${CMAKE_CURRENT_SOURCE_DIR}/windows
-        ${CMAKE_CURRENT_SOURCE_DIR}/options
-        ${CMAKE_CURRENT_SOURCE_DIR}/options/type
         ${CMAKE_BINARY_DIR}
 )
-
-
-target_compile_definitions(${PROJECT_NAME}
-
-        PUBLIC
-
-        )
 
 target_compile_options(${PROJECT_NAME}
 
@@ -170,11 +137,6 @@ target_compile_options(${PROJECT_NAME}
         $<$<COMPILE_LANGUAGE:CXX>:-fno-non-call-exceptions>
         $<$<COMPILE_LANGUAGE:CXX>:-Wno-literal-suffix>
 
-)
-
-target_compile_features(${PROJECT_NAME} PUBLIC
-
-        cxx_std_14
 )
 
 if (${ENABLE_TESTS})

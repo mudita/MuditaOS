@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ThreadRecord.hpp"
@@ -12,9 +12,10 @@
 #include <queries/messages/threads/QueryThreadsGet.hpp>
 #include <queries/messages/threads/QueryThreadsGetForList.hpp>
 #include <queries/messages/threads/QueryThreadsSearchForList.hpp>
+#include <queries/messages/threads/QueryThreadsGetCount.hpp>
 
 #include <cassert>
-#include <log/log.hpp>
+#include <log.hpp>
 
 ThreadRecordInterface::ThreadRecordInterface(SmsDB *smsDb, ContactsDB *contactsDb)
     : smsDB(smsDb), contactsDB(contactsDb)
@@ -22,7 +23,7 @@ ThreadRecordInterface::ThreadRecordInterface(SmsDB *smsDb, ContactsDB *contactsD
 
 bool ThreadRecordInterface::Add(const ThreadRecord &rec)
 {
-    auto ret = smsDB->threads.add(ThreadsTableRow{{.ID = rec.ID},
+    auto ret = smsDB->threads.add(ThreadsTableRow{Record(rec.ID),
                                                   .date           = rec.date,
                                                   .msgCount       = rec.msgCount,
                                                   .unreadMsgCount = rec.unreadMsgCount,
@@ -47,7 +48,7 @@ bool ThreadRecordInterface::RemoveByID(uint32_t id)
 
 bool ThreadRecordInterface::Update(const ThreadRecord &rec)
 {
-    return smsDB->threads.update(ThreadsTableRow{{.ID = rec.ID},
+    return smsDB->threads.update(ThreadsTableRow{Record(rec.ID),
                                                  .date           = rec.date,
                                                  .msgCount       = rec.msgCount,
                                                  .unreadMsgCount = rec.unreadMsgCount,
@@ -193,6 +194,9 @@ std::unique_ptr<db::QueryResult> ThreadRecordInterface::runQuery(std::shared_ptr
     else if (typeid(*query) == typeid(db::query::ThreadRemove)) {
         return threadRemoveQuery(query);
     }
+    else if (typeid(*query) == typeid(db::query::ThreadGetCount)) {
+        return threadsGetCount(query);
+    }
 
     return nullptr;
 }
@@ -317,6 +321,16 @@ std::unique_ptr<db::QueryResult> ThreadRecordInterface::threadRemoveQuery(const 
 
     const auto ret = RemoveByID(localQuery->id);
     auto response  = std::make_unique<db::query::ThreadRemoveResult>(ret);
+    response->setRequestQuery(query);
+    return response;
+}
+
+std::unique_ptr<db::QueryResult> ThreadRecordInterface::threadsGetCount(const std::shared_ptr<db::Query> &query)
+{
+    const auto localQuery = static_cast<const db::query::ThreadGetCount *>(query.get());
+
+    auto count    = GetCount(localQuery->getState());
+    auto response = std::make_unique<db::query::ThreadGetCountResult>(localQuery->getState(), count);
     response->setRequestQuery(query);
     return response;
 }

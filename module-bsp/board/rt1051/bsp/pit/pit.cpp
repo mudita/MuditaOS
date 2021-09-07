@@ -1,11 +1,11 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "pit.hpp"
 #include <board.h>
-#include <clock_config.h>
+#include <board/clock_config.h>
 #include <fsl_pit.h>
-#include <pin_mux.h>
+#include <board/pin_mux.h>
 #include <stdint.h>
 
 struct PIT_t

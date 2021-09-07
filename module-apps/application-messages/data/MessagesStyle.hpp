@@ -1,7 +1,11 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
+
+#include <gui/widgets/Style.hpp>
+
+#include <cstdint>
 
 namespace style
 {
@@ -11,7 +15,7 @@ namespace style
         {
             inline constexpr uint32_t listPositionX = style::window::default_left_margin;
             // Magic 1 -> discussed with Design for proper alignment.
-            inline constexpr uint32_t ListPositionY = style::header::height - 1;
+            inline constexpr uint32_t ListPositionY = style::window::default_vertical_pos - 1;
             // Bottom margin need to be added to fit all elements.
             inline constexpr uint32_t listHeight =
                 style::window_height - ListPositionY - style::footer::height + style::margins::small;
@@ -28,7 +32,7 @@ namespace style
             inline constexpr uint32_t leftMargin  = 10;
             inline constexpr uint32_t rightMargin = 10;
 
-            inline constexpr uint32_t timestampWidth             = 100;
+            inline constexpr uint32_t timestampWidth             = 120;
             inline constexpr uint32_t numberImportanceWidth      = 80;
             inline constexpr uint32_t numberImportanceLeftMargin = 10;
             inline constexpr uint32_t snippetLeftMargin          = 5;
@@ -62,12 +66,13 @@ namespace style
         namespace smsInput
         {
             inline constexpr gui::Length min_h                   = 40;
-            inline constexpr gui::Length default_input_w         = 395;
+            inline constexpr gui::Length default_input_w         = 385;
             inline constexpr gui::Length default_input_h         = 30;
             inline constexpr gui::Length bottom_padding          = 5;
             inline constexpr gui::Length max_input_h             = default_input_h * 4 + bottom_padding;
-            inline constexpr gui::Length reply_bottom_margin     = 5;
+            inline constexpr gui::Length reply_bottom_margin     = 8;
             inline constexpr gui::Length new_sms_vertical_spacer = 25;
+            inline constexpr gui::Length new_sms_left_margin     = 10;
         } // namespace smsInput
 
         namespace smsOutput
@@ -95,7 +100,7 @@ namespace style
         namespace smsList
         {
             inline constexpr uint32_t x = style::window::default_left_margin;
-            inline constexpr uint32_t y = style::header::height;
+            inline constexpr uint32_t y = style::window::default_vertical_pos;
             inline constexpr uint32_t h = style::window::default_body_height;
             inline constexpr uint32_t w = style::listview::body_width_with_scroll;
         } // namespace smsList
@@ -105,7 +110,7 @@ namespace style
             namespace list
             {
                 inline constexpr uint32_t x = style::window::default_left_margin;
-                inline constexpr uint32_t y = style::header::height;
+                inline constexpr uint32_t y = style::window::default_vertical_pos;
                 inline constexpr uint32_t h = style::window_height - y - style::footer::height;
                 inline constexpr uint32_t w = style::listview::body_width_with_scroll;
 

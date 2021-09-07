@@ -8,3 +8,25 @@ add_catch2_executable(
         service-appmgr
         module-utils
 )
+
+add_catch2_executable(
+    NAME
+        application-manifest-tests
+    SRCS
+        tests-main.cpp
+        test-ApplicationManifest.cpp
+    LIBS
+        service-appmgr
+        module-utils
+)
+
+add_catch2_executable(
+    NAME
+        application-stack-tests
+    SRCS
+        tests-main.cpp
+        test-ApplicationStack.cpp
+    LIBS
+        service-appmgr
+        module-utils
+)

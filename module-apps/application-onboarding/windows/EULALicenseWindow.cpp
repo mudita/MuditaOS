@@ -40,7 +40,7 @@ namespace app::onBoarding
     {
         AppWindow::buildInterface();
 
-        setTitle(utils::localize.get("app_onboarding_eula_license"));
+        setTitle(utils::translate("app_onboarding_eula_license"));
 
         namespace previewStyle = app::notes::style::preview;
         eulaText               = new gui::Text(
@@ -56,12 +56,19 @@ namespace app::onBoarding
         bottomBar->setActive(gui::BottomBar::Side::LEFT, true);
 
         bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get(::style::strings::common::accept));
+        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(::style::strings::common::accept));
 
         bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
-        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(::style::strings::common::back));
+        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(::style::strings::common::back));
 
         setFocusItem(eulaText);
+    }
+
+    gui::status_bar::Configuration EULALicenseWindow::configureStatusBar(
+        gui::status_bar::Configuration appConfiguration)
+    {
+        appConfiguration.setIndicator(gui::status_bar::Indicator::SimCard, false);
+        return appConfiguration;
     }
 
     void EULALicenseWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
@@ -71,15 +78,12 @@ namespace app::onBoarding
 
     bool EULALicenseWindow::onInput(const gui::InputEvent &inputEvent)
     {
-        if (inputEvent.isShortPress()) {
-            if (inputEvent.is(gui::KeyCode::KEY_ENTER)) {
+        if (inputEvent.isShortRelease(gui::KeyCode::KEY_ENTER)) {
+            presenter->acceptEULA();
 
-                presenter->acceptEULA();
-
-                application->switchWindow(gui::window::name::onBoarding_start_configuration,
-                                          gui::ShowMode::GUI_SHOW_INIT,
-                                          std::make_unique<OnBoardingSwitchData>());
-            }
+            application->switchWindow(gui::window::name::onBoarding_start_configuration,
+                                      gui::ShowMode::GUI_SHOW_INIT,
+                                      std::make_unique<OnBoardingSwitchData>());
         }
         return AppWindow::onInput(inputEvent);
     }

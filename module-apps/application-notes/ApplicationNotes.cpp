@@ -1,24 +1,23 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "ApplicationNotes.hpp"
+#include <application-notes/ApplicationNotes.hpp>
+#include <presenter/NoteEditWindowPresenter.hpp>
+#include <presenter/NotePreviewWindowPresenter.hpp>
+#include <presenter/NotesMainWindowPresenter.hpp>
+#include <windows/NoteEditWindow.hpp>
+#include <windows/NoteCreateWindow.hpp>
+#include <windows/NoteMainWindow.hpp>
+#include <windows/NotePreviewWindow.hpp>
+#include <windows/SearchEngineWindow.hpp>
+#include <windows/SearchResultsWindow.hpp>
 
-#include "MessageType.hpp"
-#include "windows/NoteMainWindow.hpp"
-#include "windows/NotePreviewWindow.hpp"
-#include "windows/NoteEditWindow.hpp"
-#include "windows/SearchEngineWindow.hpp"
-#include "windows/SearchResultsWindow.hpp"
-
-#include <service-db/DBMessage.hpp>
+#include <apps-common/windows/Dialog.hpp>
+#include <apps-common/windows/OptionWindow.hpp>
+#include <MessageType.hpp>
+#include <service-db/DBNotificationMessage.hpp>
 #include <service-db/QueryMessage.hpp>
 
-#include <module-apps/application-notes/presenter/NotesMainWindowPresenter.hpp>
-#include <module-apps/application-notes/presenter/NotePreviewWindowPresenter.hpp>
-#include <module-apps/application-notes/presenter/NoteEditWindowPresenter.hpp>
-#include <module-apps/windows/OptionWindow.hpp>
-#include <module-apps/windows/Dialog.hpp>
-#include <module-services/service-db/service-db/DBNotificationMessage.hpp>
 #include <utility>
 
 namespace app
@@ -28,8 +27,12 @@ namespace app
         constexpr auto NotesStackSize = 4096U;
     } // namespace
 
-    ApplicationNotes::ApplicationNotes(std::string name, std::string parent, StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), startInBackground, NotesStackSize)
+    ApplicationNotes::ApplicationNotes(std::string name,
+                                       std::string parent,
+                                       sys::phone_modes::PhoneMode phoneMode,
+                                       sys::bluetooth::BluetoothMode bluetoothMode,
+                                       StartInBackground startInBackground)
+        : Application(std::move(name), std::move(parent), phoneMode, bluetoothMode, startInBackground, NotesStackSize)
     {
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
     }
@@ -55,13 +58,7 @@ namespace app
             }
         }
 
-        if (resp != nullptr) {
-            if (auto command = callbackStorage->getCallback(resp); command->execute()) {
-                refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-            }
-            return msgHandled();
-        }
-        return msgNotHandled();
+        return handleAsyncResponse(resp);
     }
 
     sys::ReturnCodes ApplicationNotes::InitHandler()
@@ -72,13 +69,13 @@ namespace app
         }
 
         createUserInterface();
-        setActiveWindow(gui::name::window::main_window);
+
         return ret;
     }
 
     sys::ReturnCodes ApplicationNotes::DeinitHandler()
     {
-        return sys::ReturnCodes::Success;
+        return Application::DeinitHandler();
     }
 
     sys::ReturnCodes ApplicationNotes::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
@@ -104,13 +101,20 @@ namespace app
             auto presenter       = std::make_unique<notes::NoteEditWindowPresenter>(std::move(notesRepository));
             return std::make_unique<notes::NoteEditWindow>(app, std::move(presenter));
         });
-        windowsFactory.attach(gui::name::window::notes_search, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::name::window::note_create, [](Application *app, const std::string &name) {
             auto notesRepository = std::make_unique<notes::NotesDBRepository>(app);
-            auto presenter       = std::make_unique<notes::SearchEngineWindowPresenter>(std::move(notesRepository));
-            return std::make_unique<notes::SearchEngineWindow>(app, std::move(presenter));
+            auto presenter       = std::make_unique<notes::NoteCreateWindowPresenter>(std::move(notesRepository));
+            return std::make_unique<notes::NoteCreateWindow>(app, std::move(presenter));
         });
-        windowsFactory.attach(gui::name::window::notes_search_result, [](Application *app, const std::string &name) {
-            return std::make_unique<notes::SearchResultsWindow>(app);
+        windowsFactory.attach(gui::name::window::notes_search, [](Application *app, const std::string &name) {
+            return std::make_unique<notes::SearchEngineWindow>(app,
+                                                               std::make_unique<notes::SearchEngineWindowPresenter>());
+        });
+        windowsFactory.attach(gui::name::window::notes_search_result, [](Application *app, const std::string &) {
+            auto notesRepository = std::make_unique<notes::NotesDBRepository>(app);
+            auto notesProvider   = std::make_shared<notes::NotesSearchListModel>(app, std::move(notesRepository));
+            auto presenter       = std::make_unique<notes::NotesSearchWindowPresenter>(notesProvider);
+            return std::make_unique<notes::SearchResultsWindow>(app, std::move(presenter));
         });
         windowsFactory.attach(gui::name::window::note_dialog, [](Application *app, const std::string &name) {
             return std::make_unique<gui::Dialog>(app, name);
@@ -119,8 +123,11 @@ namespace app
             return std::make_unique<gui::DialogYesNo>(app, name);
         });
         windowsFactory.attach(
-            utils::localize.get("app_phonebook_options_title"),
+            utils::translate("app_phonebook_options_title"),
             [](Application *app, const std::string &name) { return std::make_unique<gui::OptionWindow>(app, name); });
+
+        attachPopups(
+            {gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes, gui::popup::ID::PhoneLock});
     }
 
     void ApplicationNotes::destroyUserInterface()

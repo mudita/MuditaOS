@@ -1,17 +1,20 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include "Urc.hpp"
 
+#include <EventStore.hpp>
+
 namespace at::urc
 {
     class Qind : public Urc
     {
 
-        const std::string type_csq  = "csq";
-        const std::string type_fota = "FOTA";
+        const std::string type_csq           = "csq";
+        const std::string type_fota          = "FOTA";
+        const std::string type_act           = "act";
         const std::string_view type_sms_done = "SMS DONE";
 
         static const auto invalid_rssi_low  = 99;
@@ -30,6 +33,12 @@ namespace at::urc
             Fota,
             Stage,
             Param
+        };
+
+        enum ACT
+        {
+            ACT,
+            ACTVALUE
         };
 
         const size_t fotaMinTokenSize = 2;
@@ -65,6 +74,10 @@ namespace at::urc
         [[nodiscard]] auto getFotaParameter() const noexcept -> std::string;
 
         [[nodiscard]] auto isSmsDone() const noexcept -> bool;
+
+        [[nodiscard]] auto isAct() const noexcept -> bool;
+        [[nodiscard]] auto getAct() const noexcept -> std::string;
+        [[nodiscard]] auto getAccessTechnology() const noexcept -> Store::Network::AccessTechnology;
 
         void Handle(UrcHandler &h) final
         {

@@ -1,14 +1,15 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include <board.h>
 #include "ServiceEink.hpp"
 #include "messages/EinkModeMessage.hpp"
 #include "messages/PrepareDisplayEarlyRequest.hpp"
 #include <service-gui/messages/EinkInitialized.hpp>
-#include <service-gui/Common.hpp>
 #include <time/ScopedTime.hpp>
+#include <Timers/TimerFactory.hpp>
 
-#include <log/log.hpp>
+#include <log.hpp>
 #include <messages/EinkMessage.hpp>
 #include <messages/ImageMessage.hpp>
 #include <SystemManager/messages/DeviceRegistrationMessage.hpp>
@@ -17,21 +18,22 @@
 
 #include <cstring>
 #include <memory>
-#include <gsl_util>
+#include <gsl/util>
 
 namespace service::eink
 {
     namespace
     {
-        constexpr auto ServceEinkStackDepth = 4096 + 1024;
+        constexpr auto ServceEinkStackDepth = 2048U;
         constexpr std::chrono::milliseconds displayPowerOffTimeout{3800};
     } // namespace
 
     ServiceEink::ServiceEink(const std::string &name, std::string parent)
-        : sys::Service(name, std::move(parent), ServceEinkStackDepth), currentState{State::Running},
-          displayPowerOffTimer{
-              std::make_unique<sys::Timer>(this, displayPowerOffTimeout.count(), sys::Timer::Type::SingleShot)}
+        : sys::Service(name, std::move(parent), ServceEinkStackDepth),
+          display{{BOARD_EINK_DISPLAY_RES_X, BOARD_EINK_DISPLAY_RES_Y}}, currentState{State::Running}
     {
+        displayPowerOffTimer = sys::TimerFactory::createSingleShotTimer(
+            this, "einkDisplayPowerOff", displayPowerOffTimeout, [this](sys::Timer &) { display.powerOff(); });
         connect(typeid(EinkModeMessage),
                 [this](sys::Message *message) -> sys::MessagePointer { return handleEinkModeChangedMessage(message); });
 
@@ -41,7 +43,8 @@ namespace service::eink
         connect(typeid(PrepareDisplayEarlyRequest),
                 [this](sys::Message *request) -> sys::MessagePointer { return handlePrepareEarlyRequest(request); });
 
-        displayPowerOffTimer->connect([this](sys::Timer &it) { display.powerOff(); });
+        eInkSentinel = std::make_shared<EinkSentinel>(name::eink, this);
+        display.setEinkSentinel(eInkSentinel);
     }
 
     sys::MessagePointer ServiceEink::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *response)
@@ -60,11 +63,7 @@ namespace service::eink
         auto deviceRegistrationMsg = std::make_shared<sys::DeviceRegistrationMessage>(display.getDevice());
         bus.sendUnicast(deviceRegistrationMsg, service::name::system_manager);
 
-        cpuSentinel = std::make_shared<sys::CpuSentinel>(name::eink, this, [this](bsp::CpuFrequencyHz newFrequency) {
-            updateResourcesAfterCpuFrequencyChange(newFrequency);
-        });
-
-        auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuSentinel);
+        auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(eInkSentinel);
         bus.sendUnicast(sentinelRegistrationMsg, service::name::system_manager);
 
         display.powerOn();
@@ -76,8 +75,14 @@ namespace service::eink
 
     sys::ReturnCodes ServiceEink::DeinitHandler()
     {
+        display.wipeOut();
         display.shutdown();
         return sys::ReturnCodes::Success;
+    }
+
+    void ServiceEink::ProcessCloseReason(sys::CloseReason closeReason)
+    {
+        sendCloseReadyMessage(this);
     }
 
     sys::ReturnCodes ServiceEink::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
@@ -138,9 +143,9 @@ namespace service::eink
 
     void ServiceEink::showImage(std::uint8_t *frameBuffer, ::gui::RefreshModes refreshMode)
     {
-        displayPowerOffTimer->stop();
+        displayPowerOffTimer.stop();
 
-        auto displayPowerOffTimerReload = gsl::finally([this]() { displayPowerOffTimer->reload(); });
+        auto displayPowerOffTimerReload = gsl::finally([this]() { displayPowerOffTimer.start(); });
 
         if (const auto status = prepareDisplay(refreshMode, WaveformTemperature::KEEP_CURRENT);
             status != EinkStatus_e ::EinkOK) {
@@ -174,7 +179,7 @@ namespace service::eink
     {
         EinkStatus_e status;
 
-        displayPowerOffTimer->stop();
+        displayPowerOffTimer.stop();
         display.powerOn();
 
         const auto temperature = behaviour == WaveformTemperature::KEEP_CURRENT ? display.getLastTemperature()
@@ -208,8 +213,5 @@ namespace service::eink
     {
         return currentState == state;
     }
-
-    void ServiceEink::updateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyHz newFrequency)
-    {}
 
 } // namespace service::eink

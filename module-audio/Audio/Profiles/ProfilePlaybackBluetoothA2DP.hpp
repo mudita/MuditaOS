@@ -14,14 +14,14 @@ namespace audio
         ProfilePlaybackBluetoothA2DP(Volume volume)
             : Profile("Playback Bluetooth A2DP",
                       Type::PlaybackBluetoothA2DP,
-                      AudioDevice::Format{.sampleRate_Hz = 44100,
-                                          .bitWidth      = 16,
-                                          .flags         = 0,
-                                          .outputVolume  = static_cast<float>(volume),
-                                          .inputGain     = 0,
-                                          .inputPath     = AudioDevice::InputPath::None,
-                                          .outputPath    = AudioDevice::OutputPath::None},
-                      AudioDevice::Type::Bluetooth)
+                      audio::codec::Configuration{.sampleRate_Hz = 44100,
+                                                  .bitWidth      = 16,
+                                                  .flags         = 0,
+                                                  .outputVolume  = static_cast<float>(volume),
+                                                  .inputGain     = 0,
+                                                  .inputPath     = audio::codec::InputPath::None,
+                                                  .outputPath    = audio::codec::OutputPath::None},
+                      AudioDevice::Type::BluetoothA2DP)
         {}
     };
 

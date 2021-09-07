@@ -6,8 +6,6 @@
 #include <catch2/catch.hpp>
 #include <service-cellular/QMBNManager.hpp>
 
-using namespace cellular;
-
 TEST_CASE("Quectel MBN test")
 {
     SECTION("Parse list of MBN")

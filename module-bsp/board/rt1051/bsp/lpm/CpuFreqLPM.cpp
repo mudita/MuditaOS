@@ -1,8 +1,8 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CpuFreqLPM.hpp"
-#include "log/log.hpp"
+#include <log.hpp>
 #include "fsl_dcdc.h"
 
 namespace bsp
@@ -65,4 +65,10 @@ namespace bsp
         /* Set SystemCoreClock variable. */
         SystemCoreClockUpdate();
     }
+
+    void CpuFreqLPM::SetHighestCoreVoltage()
+    {
+        DCDC_AdjustTargetVoltage(DCDC, VDDRun_1275_mV, VDDStandby_925_mV);
+    }
+
 } // namespace bsp

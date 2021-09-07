@@ -5,7 +5,7 @@
 
 #include <Service/Service.hpp>
 
-#include <module-utils/magic_enum/include/magic_enum.hpp>
+#include <magic_enum.hpp>
 
 #include <stdexcept>
 #include <utility>
@@ -19,18 +19,26 @@ namespace sys::phone_modes
         }
     }
 
-    void Subject::setMode(PhoneMode _phoneMode, Tethering _tetheringMode)
+    bool Subject::setMode(PhoneMode _phoneMode, Tethering _tetheringMode)
     {
-        if (const bool changed = changePhoneMode(_phoneMode) || changeTetheringMode(_tetheringMode); changed) {
-            notifyChange();
+        const bool phoneModeChanged = changePhoneMode(_phoneMode);
+        if (phoneModeChanged) {
+            notifyPhoneModeChange();
         }
+        const bool tetheringChanged = changeTetheringMode(_tetheringMode);
+        if (tetheringChanged) {
+            notifyTetheringChange();
+        }
+        return phoneModeChanged || tetheringChanged;
     }
 
-    void Subject::setPhoneMode(PhoneMode mode)
+    bool Subject::setPhoneMode(PhoneMode mode)
     {
-        if (const auto changed = changePhoneMode(mode); changed) {
-            notifyChange();
+        const auto changed = changePhoneMode(mode);
+        if (changed) {
+            notifyPhoneModeChange();
         }
+        return changed;
     }
 
     bool Subject::changePhoneMode(PhoneMode mode) noexcept
@@ -38,11 +46,13 @@ namespace sys::phone_modes
         return std::exchange(phoneMode, mode) != mode;
     }
 
-    void Subject::setTetheringMode(Tethering mode)
+    bool Subject::setTetheringMode(Tethering mode)
     {
-        if (const auto changed = changeTetheringMode(mode); changed) {
-            notifyChange();
+        const auto changed = changeTetheringMode(mode);
+        if (changed) {
+            notifyTetheringChange();
         }
+        return changed;
     }
 
     bool Subject::changeTetheringMode(Tethering mode) noexcept
@@ -50,12 +60,21 @@ namespace sys::phone_modes
         return std::exchange(tetheringMode, mode) != mode;
     }
 
-    void Subject::notifyChange()
+    void Subject::notifyPhoneModeChange()
     {
-        LOG_INFO("Phone modes changed: Phone mode: [%s]; Tethering: [%s]. Notifying phone modes observers.",
-                 magic_enum::enum_name(phoneMode).data(),
+        LOG_INFO("Phone mode changed to: [%s]. Notifying phone modes observers.",
+                 magic_enum::enum_name(phoneMode).data());
+        owner->bus.sendMulticast(std::make_shared<PhoneModeChanged>(phoneMode), BusChannel::PhoneModeChanges);
+    }
+
+    void Subject::notifyTetheringChange()
+    {
+        LOG_INFO("Tethering mode changed to: [%s]. Notifying phone modes observers.",
                  magic_enum::enum_name(tetheringMode).data());
-        auto message = std::make_shared<PhoneModeChanged>(phoneMode, tetheringMode);
-        owner->bus.sendMulticast(std::move(message), BusChannel::PhoneModeChanges);
+        owner->bus.sendMulticast(std::make_shared<TetheringChanged>(tetheringMode), BusChannel::PhoneModeChanges);
+    }
+    bool Subject::isTetheringEnabled() const noexcept
+    {
+        return tetheringMode == Tethering::On;
     }
 } // namespace sys::phone_modes

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -12,20 +12,19 @@ namespace gui
 {
     class PhonebookSearchResults : public AppWindow
     {
-      protected:
-        std::shared_ptr<PhonebookModel> searchResultsModel;
-        PhonebookListView *searchResultList = nullptr;
-
       public:
-        PhonebookSearchResults(app::Application *app);
+        explicit PhonebookSearchResults(app::Application *app);
         ~PhonebookSearchResults() override;
 
-        auto onInput(const InputEvent &inputEvent) -> bool override;
+      private:
+        void buildInterface() override;
+        void destroyInterface() override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         auto handleSwitchData(SwitchData *data) -> bool override;
         void rebuild() override;
-        void buildInterface() override;
-        void destroyInterface() override;
+
+        std::shared_ptr<PhonebookModel> searchResultsModel;
+        PhonebookListView *searchResultList = nullptr;
     };
 
 } /* namespace gui */

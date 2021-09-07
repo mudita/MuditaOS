@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -7,8 +7,16 @@
 
 namespace purefs::blkdev
 {
+    //! Unsigned sector type
     using sector_t = uint64_t;
+    //! Signed sector type
     using scount_t = int64_t;
+    //! Hardware partition type
+    using hwpart_t = uint8_t;
+    //! Common partition type
+    using part_t = int16_t;
+    //! Default hardware partition
+    constexpr hwpart_t default_hw_partition = 0;
     namespace internal
     {
         class disk_handle;
@@ -39,5 +47,14 @@ namespace purefs::blkdev
         suspend,       //! Device is in suspend state
         force_suspend, //! Device is in force suspend state
         power_off      //! Device is in poweroff state
+    };
+
+    //! Disk manager flags
+    struct flags
+    {
+        enum _flags
+        {
+            no_parts_scan = 0x1 //! Don't scan partitions on disc
+        };
     };
 } // namespace purefs::blkdev

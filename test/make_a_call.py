@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 import sys
@@ -46,6 +46,7 @@ def main():
         port_name = sys.argv[1]
 
     harness = Harness(sys.argv[1])
+    harness.unlock_phone()
     number = str(sys.argv[2])
     duration = int(sys.argv[3])
     count_before = get_calllog_count(harness)

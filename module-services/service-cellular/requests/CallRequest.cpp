@@ -8,12 +8,14 @@
 #include <at/Commands.hpp>
 
 #include "service-cellular/requests/CallRequest.hpp"
+#include <at/ATFactory.hpp>
 
 namespace cellular
 {
-    std::string CallRequest::command()
+    at::Cmd CallRequest::command()
     {
-        return std::string(at::factory(at::AT::ATD) + request + ";");
+        auto cmd = at::factory(at::AT::ATD);
+        return cmd + request + ";";
     }
 
     void CallRequest::handle(RequestHandler &h, at::Result &result)

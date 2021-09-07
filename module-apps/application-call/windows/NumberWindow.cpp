@@ -1,17 +1,14 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "ApplicationCall.hpp"
+#include "CallAppStyle.hpp"
+#include "CallSwitchData.hpp"
 #include "NumberWindow.hpp"
 
-#include "application-call/ApplicationCall.hpp"
-#include "application-call/data/CallAppStyle.hpp"
-#include "application-call/data/CallSwitchData.hpp"
-
 #include <ContactRecord.hpp>
-#include <gui/widgets/BottomBar.hpp>
 #include <gui/widgets/Image.hpp>
 #include <gui/widgets/Label.hpp>
-#include <gui/widgets/TopBar.hpp>
 #include <gui/widgets/Window.hpp>
 #include <i18n/i18n.hpp>
 #include <InputMode.hpp>
@@ -38,10 +35,10 @@ namespace gui
         numberLabel->setText(num);
 
         if (num.empty()) {
-            bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+            bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
             return;
         }
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_call_clear"));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate("app_call_clear"));
     }
 
     void NumberWindow::buildInterface()
@@ -54,7 +51,7 @@ namespace gui
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
 
-        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(callAppStyle::strings::call));
+        bottomBar->setText(BottomBar::Side::LEFT, utils::translate(callAppStyle::strings::call));
 
         numberLabel = new gui::Label(this, numberLabel::x, numberLabel::y, numberLabel::w, numberLabel::h);
         numberLabel->setPenWidth(numberLabel::borderW);
@@ -81,8 +78,8 @@ namespace gui
 
     bool NumberWindow::onInput(const InputEvent &inputEvent)
     {
-        auto code = translator.handle(inputEvent.key, InputMode({InputMode::phone}).get());
-        if (inputEvent.isShortPress()) {
+        auto code = translator.handle(inputEvent.getRawKey(), InputMode({InputMode::phone}).get());
+        if (inputEvent.isShortRelease()) {
             // Call function
             if (inputEvent.is(KeyCode::KEY_LF)) {
                 interface->handleCallEvent(enteredNumber);
@@ -114,7 +111,7 @@ namespace gui
                 return true;
             }
         }
-        else if (inputEvent.isLongPress()) {
+        else if (inputEvent.isLongRelease()) {
             // erase all characters from phone number
             if (inputEvent.is(KeyCode::KEY_RF)) {
                 // if there isn't any char in phone number field return to previous application
@@ -141,7 +138,7 @@ namespace gui
     {
         auto newFormatter = std::unique_ptr<Formatter>(numberUtil.GetAsYouTypeFormatter(regionCode));
         formatter.swap(newFormatter);
-        LOG_INFO("Switched formatter to region: %s", regionCode.c_str());
+        LOG_INFO("Switched formatter to new region");
     }
 
     void NumberWindow::initFormatterInput(const std::string &number)

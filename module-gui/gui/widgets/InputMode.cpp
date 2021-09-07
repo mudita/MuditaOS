@@ -1,10 +1,10 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <InputMode.hpp>
 #include <i18n/i18n.hpp>
 #include <map>
-#include <log/log.hpp>
+#include <log.hpp>
 
 /// input mode strings - as these are stored in json (in files...)
 const std::map<InputMode::Mode, std::string> input_mode = {
@@ -66,7 +66,7 @@ const std::string &InputMode::get()
         actualInputMode == input_mode.find(InputMode::phone)->second) {
         return input_mode.at(modeNow());
     }
-    return utils::localize.getInputLanguageFilename(actualInputMode);
+    return utils::getInputLanguageFilename(actualInputMode);
 }
 
 void InputMode::show_input_type()

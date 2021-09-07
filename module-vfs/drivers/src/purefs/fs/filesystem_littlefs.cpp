@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <purefs/fs/drivers/filesystem_littlefs.hpp>
@@ -9,8 +9,8 @@
 #include <purefs/blkdev/disk_manager.hpp>
 #include <purefs/blkdev/disk_handle.hpp>
 #include <purefs/fs/mount_flags.hpp>
-#include <littlefs/lfs.h>
-#include <log/log.hpp>
+#include <lfs.h>
+#include <log.hpp>
 
 #include <climits>
 #include <syslimits.h>
@@ -18,6 +18,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <cstring>
+#include <algorithm>
 #include <sys/stat.h>
 
 namespace
@@ -127,13 +128,13 @@ namespace
         }
         cfg->block_cycles    = 512;
         cfg->block_count     = 0; // Read later from super block
-        cfg->lookahead_size  = 131072;
         const auto total_siz = uint64_t(sector_size) * uint64_t(part_sectors_count);
         if (total_siz % cfg->block_size) {
             LOG_ERROR("Block size doesn't match partition size");
             return -ERANGE;
         }
         cfg->block_count = total_siz / cfg->block_size - 1;
+        cfg->lookahead_size = std::min<lfs_size_t>(131072U, ((cfg->block_count >> 3U) + 1U) << 3U);
         cfg->read_size  = cfg->block_size;
         cfg->prog_size  = cfg->block_size;
         cfg->cache_size = cfg->block_size;
@@ -446,6 +447,13 @@ namespace purefs::fs::drivers
     auto filesystem_littlefs::dirclose(fsdir dirstate) noexcept -> int
     {
         return invoke_lfs(dirstate, ::lfs_dir_close);
+    }
+
+    auto filesystem_littlefs::fchmod(fsfile zfile, mode_t mode) noexcept -> int
+    {
+        // Littlefs doesn't support chmod() so we need that path exists
+        struct stat filestat;
+        return fstat(zfile, filestat);
     }
 
 } // namespace purefs::fs::drivers

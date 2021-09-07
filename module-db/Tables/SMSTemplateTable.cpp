@@ -4,7 +4,7 @@
 #include "SMSTemplateTable.hpp"
 
 #include <Utils.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 
 #include <cassert>
 

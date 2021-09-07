@@ -1,19 +1,19 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "SMSInputWidget.hpp"
-#include "AppWindow.hpp"
-#include "application-messages/data/MessagesStyle.hpp"
-#include <module-apps/application-messages/ApplicationMessages.hpp>
-#include <service-cellular/service-cellular/MessageConstants.hpp>
+#include "ApplicationMessages.hpp"
+#include "MessagesStyle.hpp"
 
-#include <Style.hpp>
-#include <i18n/i18n.hpp>
+#include <AppWindow.hpp>
 #include <Font.hpp>
-#include <utility>
-#include <algorithm>
+#include <i18n/i18n.hpp>
+#include <service-cellular/service-cellular/MessageConstants.hpp>
+#include <SMSInputWidget.hpp>
+#include <Style.hpp>
+#include <TextParse.hpp>
 
-#include "TextParse.hpp"
+#include <algorithm>
+#include <utility>
 
 namespace gui
 {
@@ -21,7 +21,8 @@ namespace gui
     SMSInputWidget::SMSInputWidget(app::Application *application) : application(application)
     {
         setMinimumSize(style::window::default_body_width, style::messages::smsInput::min_h);
-        setMargins(Margins(0, style::messages::smsInput::new_sms_vertical_spacer, 0, 0));
+        setMargins(Margins(
+            style::messages::smsInput::new_sms_left_margin, style::messages::smsInput::new_sms_vertical_spacer, 0, 0));
         setEdges(gui::RectangleEdge::None);
 
         body = new HBox(this, 0, 0, 0, 0);
@@ -29,8 +30,7 @@ namespace gui
         body->setMaximumSize(style::window::default_body_width, style::messages::smsInput::max_input_h);
 
         deleteByList = false;
-
-        inputText = new gui::Text(body, 0, 0, 0, 0, "", ExpandMode::Up);
+        inputText    = new gui::Text(body, 0, 0, 0, 0, ExpandMode::Up);
         inputText->setMaximumSize(style::messages::smsInput::default_input_w, style::messages::smsInput::max_input_h);
         inputText->setMinimumSize(style::messages::smsInput::default_input_w,
                                   style::messages::smsInput::default_input_h);
@@ -53,8 +53,14 @@ namespace gui
             return true;
         };
 
+        inputText->setInputMode(new InputMode(
+            {InputMode::ABC, InputMode::abc, InputMode::digit},
+            [=](const UTF8 &Text) { application->getCurrentWindow()->bottomBarTemporaryMode(Text); },
+            [=]() { application->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
+            [=]() { application->getCurrentWindow()->selectSpecialCharacter(); }));
+
         inputText->inputCallback = [this, application]([[maybe_unused]] Item &, const InputEvent &event) {
-            if (event.state == InputEvent::State::keyReleasedShort && event.keyCode == KeyCode::KEY_LF) {
+            if (event.isShortRelease(KeyCode::KEY_LF)) {
                 auto app = dynamic_cast<app::ApplicationMessages *>(application);
                 assert(app != nullptr);
                 return app->newMessageOptions(application->getCurrentWindow()->getName(), inputText);
@@ -69,15 +75,9 @@ namespace gui
             if (inputText->focus) {
 
                 application->getWindow(gui::name::window::thread_view)
-                    ->setBottomBarText(utils::localize.get("sms_reply"), BottomBar::Side::CENTER);
+                    ->setBottomBarText(utils::translate("sms_reply"), BottomBar::Side::CENTER);
 
-                inputText->setInputMode(new InputMode(
-                    {InputMode::ABC, InputMode::abc, InputMode::digit},
-                    [=](const UTF8 &Text) { application->getCurrentWindow()->bottomBarTemporaryMode(Text); },
-                    [=]() { application->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
-                    [=]() { application->getCurrentWindow()->selectSpecialCharacter(); }));
-
-                if (inputText->getText() == utils::localize.get("sms_temp_reply")) {
+                if (inputText->getText() == utils::translate("sms_temp_reply")) {
                     inputText->clear();
                 }
             }
@@ -87,7 +87,7 @@ namespace gui
 
                     // Temporary solution to be fixed when proper Text Color handling will be added.
                     auto format = TextFormat(Font(27).raw(), Color(7, 0));
-                    for (auto &el : textToTextBlocks(utils::localize.get("sms_temp_reply"), format)) {
+                    for (auto &el : textToTextBlocks(utils::translate("sms_temp_reply"), format)) {
                         inputText->addText(el);
                     }
                 }
@@ -99,6 +99,16 @@ namespace gui
         };
 
         dimensionChangedCallback = [&](gui::Item &, const BoundingBox &newDim) -> bool {
+            if (newDim.w == style::listview::item_width_with_scroll - style::messages::smsInput::new_sms_left_margin) {
+                inputText->setMinimumWidth(style::messages::smsInput::default_input_w);
+                inputText->setMaximumWidth(style::messages::smsInput::default_input_w);
+            }
+            else {
+                inputText->setMinimumWidth(style::messages::smsInput::default_input_w +
+                                           style::listview::scroll::item_margin);
+                inputText->setMaximumWidth(style::messages::smsInput::default_input_w +
+                                           style::listview::scroll::item_margin);
+            }
             body->setArea({0, 0, newDim.w, newDim.h});
             return true;
         };
@@ -106,7 +116,7 @@ namespace gui
 
     void SMSInputWidget::handleDraftMessage()
     {
-        if (const auto &text = inputText->getText(); text.empty() || (text == utils::localize.get("sms_temp_reply"))) {
+        if (const auto &text = inputText->getText(); text.empty() || (text == utils::translate("sms_temp_reply"))) {
             clearDraftMessage();
         }
         else {
@@ -156,9 +166,8 @@ namespace gui
         }
     }
 
-    auto SMSInputWidget::handleRequestResize([[maybe_unused]] const Item *child,
-                                             unsigned short request_w,
-                                             unsigned short request_h) -> Size
+    auto SMSInputWidget::handleRequestResize([[maybe_unused]] const Item *child, Length request_w, Length request_h)
+        -> Size
     {
         request_h =
             std::clamp((Length)request_h, style::messages::smsInput::min_h, style::messages::smsInput::max_input_h);

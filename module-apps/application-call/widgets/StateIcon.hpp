@@ -1,13 +1,15 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include "Image.hpp"
-#include "Label.hpp"
-#include <Style.hpp>
-#include <log/log.hpp>
 #include <i18n/i18n.hpp>
+#include <Image.hpp>
+#include <Label.hpp>
+#include <log.hpp>
+#include <Style.hpp>
+
+#include <map>
 
 namespace gui
 {
@@ -21,7 +23,7 @@ namespace gui
             constexpr uint32_t x = 0;
             constexpr uint32_t y = 58;
             constexpr uint32_t w = icon::w;
-            constexpr uint32_t h = 20;
+            constexpr uint32_t h = 22;
         } // namespace label
         namespace img
         {
@@ -74,7 +76,7 @@ namespace gui
         {
             this->state = state;
             img->set(data.at(state).first);
-            label->setText(utils::localize.get(data.at(state).second));
+            label->setText(utils::translate(data.at(state).second));
             using namespace style::window;
             label->setFont(data.find(state) != data.begin() ? font::verysmallbold : font::verysmall);
         }

@@ -1,37 +1,119 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "service-audio/AudioMessage.hpp"
-#include "service-audio/ServiceAudio.hpp"
+#include <AudioMessage.hpp>
+#include <ServiceAudio.hpp>
 
 #include <Audio/Operation/IdleOperation.hpp>
 #include <Audio/Operation/PlaybackOperation.hpp>
-#include <service-bluetooth/Constants.hpp>
-#include <service-bluetooth/ServiceBluetoothCommon.hpp>
+#include <Bluetooth/audio/BluetoothAudioDevice.hpp>
+#include <module-audio/Audio/VolumeScaler.hpp>
+#include <module-sys/SystemManager/messages/SentinelRegistrationMessage.hpp>
 #include <service-bluetooth/BluetoothMessage.hpp>
+#include <service-bluetooth/Constants.hpp>
+#include <service-bluetooth/messages/AudioRouting.hpp>
+#include <service-bluetooth/messages/Ring.hpp>
+#include <service-bluetooth/messages/AudioNotify.hpp>
+#include <service-bluetooth/ServiceBluetoothCommon.hpp>
 #include <service-db/Settings.hpp>
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
+#include <Utils.hpp>
 
+#include <algorithm>
+#include <initializer_list>
+#include <iterator>
 #include <type_traits>
+#include <utility>
 
 using namespace audio;
 
-inline constexpr auto audioServiceStackSize = 1024 * 13;
+inline constexpr auto audioServiceStackSize = 1024 * 4;
+
+static constexpr auto defaultVolumeHigh              = "10";
+static constexpr auto defaultVolumeLow               = "5";
+static constexpr auto defaultVolumeMuted             = "0";
+static constexpr auto defaultTrue                    = "1";
+static constexpr auto defaultFalse                   = "0";
+static constexpr auto defaultCallRingtonePath        = "assets/audio/ringtone/ringtone_drum_2.mp3";
+static constexpr auto defaultTextMessageRingtonePath = "assets/audio/sms/sms_drum_2.mp3";
+static constexpr auto defaultNotificationsPath       = "assets/audio/alarm/alarm_hang_drum.mp3";
+static constexpr auto defaultKeypadSoundPath         = "assets/audio/sms/sms_drum_2.mp3";
+
+static constexpr std::initializer_list<std::pair<audio::DbPathElement, const char *>> cacheInitializer{
+
+    // PLAYBACK
+    {DbPathElement{Setting::Volume, PlaybackType::Multimedia, Profile::Type::PlaybackHeadphones}, defaultVolumeLow},
+    {DbPathElement{Setting::Volume, PlaybackType::Multimedia, Profile::Type::PlaybackBluetoothA2DP}, defaultVolumeLow},
+    {DbPathElement{Setting::Volume, PlaybackType::Multimedia, Profile::Type::PlaybackLoudspeaker}, defaultVolumeHigh},
+
+    {DbPathElement{Setting::Volume, PlaybackType::System, Profile::Type::PlaybackHeadphones}, defaultVolumeLow},
+    {DbPathElement{Setting::Volume, PlaybackType::System, Profile::Type::PlaybackBluetoothA2DP}, defaultVolumeLow},
+    {DbPathElement{Setting::Volume, PlaybackType::System, Profile::Type::PlaybackLoudspeaker}, defaultVolumeHigh},
+
+    {DbPathElement{Setting::Volume, PlaybackType::Alarm, Profile::Type::PlaybackHeadphones}, defaultVolumeLow},
+    {DbPathElement{Setting::Volume, PlaybackType::Alarm, Profile::Type::PlaybackBluetoothA2DP}, defaultVolumeLow},
+    {DbPathElement{Setting::Volume, PlaybackType::Alarm, Profile::Type::PlaybackLoudspeaker}, defaultVolumeHigh},
+
+    // ROUTING
+    {DbPathElement{Setting::Gain, PlaybackType::None, Profile::Type::RoutingBluetoothHSP}, "20"},
+    {DbPathElement{Setting::Gain, PlaybackType::None, Profile::Type::RoutingEarspeaker}, "3"},
+    {DbPathElement{Setting::Gain, PlaybackType::None, Profile::Type::RoutingLoudspeaker}, "10"},
+    {DbPathElement{Setting::Gain, PlaybackType::None, Profile::Type::RoutingHeadphones}, "0"},
+
+    {DbPathElement{Setting::Volume, PlaybackType::None, Profile::Type::RoutingBluetoothHSP}, defaultVolumeHigh},
+    {DbPathElement{Setting::Volume, PlaybackType::None, Profile::Type::RoutingEarspeaker}, defaultVolumeHigh},
+    {DbPathElement{Setting::Volume, PlaybackType::None, Profile::Type::RoutingHeadphones}, defaultVolumeHigh},
+    {DbPathElement{Setting::Volume, PlaybackType::None, Profile::Type::RoutingLoudspeaker}, defaultVolumeHigh},
+
+    // RECORDING
+    {DbPathElement{Setting::Gain, PlaybackType::None, Profile::Type::RecordingBuiltInMic}, "200"},
+    {DbPathElement{Setting::Gain, PlaybackType::None, Profile::Type::RecordingHeadphones}, "100"},
+    {DbPathElement{Setting::Gain, PlaybackType::None, Profile::Type::RecordingBluetoothHSP}, "100"},
+
+    // MISC
+    {DbPathElement{Setting::EnableVibration, PlaybackType::Multimedia, Profile::Type::Idle}, defaultFalse},
+    {DbPathElement{Setting::EnableVibration, PlaybackType::Notifications, Profile::Type::Idle}, defaultTrue},
+    {DbPathElement{Setting::EnableVibration, PlaybackType::KeypadSound, Profile::Type::Idle}, defaultFalse},
+    {DbPathElement{Setting::EnableVibration, PlaybackType::CallRingtone, Profile::Type::Idle}, defaultTrue},
+    {DbPathElement{Setting::EnableVibration, PlaybackType::TextMessageRingtone, Profile::Type::Idle}, defaultTrue},
+    {DbPathElement{Setting::EnableVibration, PlaybackType::Meditation, Profile::Type::Idle}, defaultFalse},
+    {DbPathElement{Setting::EnableVibration, PlaybackType::Alarm, Profile::Type::Idle}, defaultTrue},
+
+    {DbPathElement{Setting::EnableSound, PlaybackType::Multimedia, Profile::Type::Idle}, defaultTrue},
+    {DbPathElement{Setting::EnableSound, PlaybackType::Notifications, Profile::Type::Idle}, defaultTrue},
+    {DbPathElement{Setting::EnableSound, PlaybackType::KeypadSound, Profile::Type::Idle}, defaultTrue},
+    {DbPathElement{Setting::EnableSound, PlaybackType::CallRingtone, Profile::Type::Idle}, defaultTrue},
+    {DbPathElement{Setting::EnableSound, PlaybackType::TextMessageRingtone, Profile::Type::Idle}, defaultTrue},
+    {DbPathElement{Setting::EnableSound, PlaybackType::Meditation, Profile::Type::Idle}, defaultTrue},
+    {DbPathElement{Setting::EnableSound, PlaybackType::Alarm, Profile::Type::Idle}, defaultTrue},
+
+    {DbPathElement{Setting::Sound, PlaybackType::Notifications, Profile::Type::Idle}, defaultNotificationsPath},
+    {DbPathElement{Setting::Sound, PlaybackType::KeypadSound, Profile::Type::Idle}, defaultKeypadSoundPath},
+    {DbPathElement{Setting::Sound, PlaybackType::CallRingtone, Profile::Type::Idle}, defaultCallRingtonePath},
+    {DbPathElement{Setting::Sound, PlaybackType::TextMessageRingtone, Profile::Type::Idle},
+     defaultTextMessageRingtonePath},
+};
 
 ServiceAudio::ServiceAudio()
     : sys::Service(service::name::audio, "", audioServiceStackSize, sys::ServicePriority::Idle),
       audioMux([this](auto... params) { return this->AudioServicesCallback(params...); }),
-      settingsProvider(std::make_unique<settings::Settings>(this)),
-      phoneModeObserver(std::make_unique<sys::phone_modes::Observer>())
+      cpuSentinel(std::make_shared<sys::CpuSentinel>(service::name::audio, this)),
+      settingsProvider(std::make_unique<settings::Settings>())
 {
     LOG_INFO("[ServiceAudio] Initializing");
     bus.channels.push_back(sys::BusChannel::ServiceAudioNotifications);
-    bus.channels.push_back(sys::BusChannel::PhoneModeChanges);
 
-    phoneModeObserver->connect(this);
-    phoneModeObserver->subscribe([&](sys::phone_modes::PhoneMode phoneMode, sys::phone_modes::Tethering tetheringMode) {
-        HandlePhoneModeChange(phoneMode, tetheringMode);
-    });
+    auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuSentinel);
+    bus.sendUnicast(std::move(sentinelRegistrationMsg), ::service::name::system_manager);
+
+    connect(typeid(A2DPDeviceVolumeChanged),
+            [this](sys::Message *msg) -> sys::MessagePointer { return handleA2DPVolumeChangedOnBluetoothDevice(msg); });
+    connect(typeid(HSPDeviceVolumeChanged),
+            [this](sys::Message *msg) -> sys::MessagePointer { return handleHSPVolumeChangedOnBluetoothDevice(msg); });
+    connect(typeid(message::bluetooth::AudioPause),
+            [this](sys::Message *msg) -> sys::MessagePointer { return handleA2DPAudioPause(); });
+    connect(typeid(message::bluetooth::AudioStart),
+            [this](sys::Message *msg) -> sys::MessagePointer { return handleA2DPAudioStart(); });
 }
 
 ServiceAudio::~ServiceAudio()
@@ -41,347 +123,11 @@ ServiceAudio::~ServiceAudio()
 
 sys::ReturnCodes ServiceAudio::InitHandler()
 {
-    static const std::string defaultVolumeHigh  = "10";
-    static const std::string defaultVolumeLow   = "2";
-    static const std::string defaultVolumeMuted = "0";
-    static const std::string defaultTrue        = "1";
-    static const std::string defaultFalse       = "0";
-
-    using namespace sys::phone_modes;
-
-    settingsCache = {
-
-        // PLAYBACK
-        {dbPath(PhoneMode::Connected, Setting::Volume, PlaybackType::Multimedia, Profile::Type::PlaybackHeadphones),
-         defaultVolumeLow},
-        {dbPath(PhoneMode::Connected, Setting::Volume, PlaybackType::Multimedia, Profile::Type::PlaybackBluetoothA2DP),
-         defaultVolumeLow},
-        {dbPath(PhoneMode::Connected, Setting::Volume, PlaybackType::Multimedia, Profile::Type::PlaybackLoudspeaker),
-         defaultVolumeHigh},
-
-        {dbPath(PhoneMode::DoNotDisturb, Setting::Volume, PlaybackType::Multimedia, Profile::Type::PlaybackHeadphones),
-         defaultVolumeLow},
-        {dbPath(
-             PhoneMode::DoNotDisturb, Setting::Volume, PlaybackType::Multimedia, Profile::Type::PlaybackBluetoothA2DP),
-         defaultVolumeLow},
-        {dbPath(PhoneMode::DoNotDisturb, Setting::Volume, PlaybackType::Multimedia, Profile::Type::PlaybackLoudspeaker),
-         defaultVolumeHigh},
-
-        {dbPath(PhoneMode::Offline, Setting::Volume, PlaybackType::Multimedia, Profile::Type::PlaybackHeadphones),
-         defaultVolumeLow},
-        {dbPath(PhoneMode::Offline, Setting::Volume, PlaybackType::Multimedia, Profile::Type::PlaybackBluetoothA2DP),
-         defaultVolumeLow},
-        {dbPath(PhoneMode::Offline, Setting::Volume, PlaybackType::Multimedia, Profile::Type::PlaybackLoudspeaker),
-         defaultVolumeHigh},
-
-        {dbPath(PhoneMode::Connected, Setting::Volume, PlaybackType::Notifications, Profile::Type::PlaybackHeadphones),
-         defaultVolumeLow},
-        {dbPath(
-             PhoneMode::Connected, Setting::Volume, PlaybackType::Notifications, Profile::Type::PlaybackBluetoothA2DP),
-         defaultVolumeLow},
-        {dbPath(PhoneMode::Connected, Setting::Volume, PlaybackType::Notifications, Profile::Type::PlaybackLoudspeaker),
-         defaultVolumeHigh},
-
-        {dbPath(
-             PhoneMode::DoNotDisturb, Setting::Volume, PlaybackType::Notifications, Profile::Type::PlaybackHeadphones),
-         defaultVolumeLow},
-        {dbPath(PhoneMode::DoNotDisturb,
-                Setting::Volume,
-                PlaybackType::Notifications,
-                Profile::Type::PlaybackBluetoothA2DP),
-         defaultVolumeLow},
-        {dbPath(
-             PhoneMode::DoNotDisturb, Setting::Volume, PlaybackType::Notifications, Profile::Type::PlaybackLoudspeaker),
-         defaultVolumeHigh},
-
-        {dbPath(PhoneMode::Offline, Setting::Volume, PlaybackType::Notifications, Profile::Type::PlaybackHeadphones),
-         defaultVolumeLow},
-        {dbPath(PhoneMode::Offline, Setting::Volume, PlaybackType::Notifications, Profile::Type::PlaybackBluetoothA2DP),
-         defaultVolumeLow},
-        {dbPath(PhoneMode::Offline, Setting::Volume, PlaybackType::Notifications, Profile::Type::PlaybackLoudspeaker),
-         defaultVolumeHigh},
-
-        {dbPath(PhoneMode::Connected, Setting::Volume, PlaybackType::KeypadSound, Profile::Type::PlaybackHeadphones),
-         defaultVolumeLow},
-        {dbPath(PhoneMode::Connected, Setting::Volume, PlaybackType::KeypadSound, Profile::Type::PlaybackBluetoothA2DP),
-         defaultVolumeLow},
-        {dbPath(PhoneMode::Connected, Setting::Volume, PlaybackType::KeypadSound, Profile::Type::PlaybackLoudspeaker),
-         defaultVolumeHigh},
-
-        {dbPath(PhoneMode::DoNotDisturb, Setting::Volume, PlaybackType::KeypadSound, Profile::Type::PlaybackHeadphones),
-         defaultVolumeMuted},
-        {dbPath(
-             PhoneMode::DoNotDisturb, Setting::Volume, PlaybackType::KeypadSound, Profile::Type::PlaybackBluetoothA2DP),
-         defaultVolumeMuted},
-        {dbPath(
-             PhoneMode::DoNotDisturb, Setting::Volume, PlaybackType::KeypadSound, Profile::Type::PlaybackLoudspeaker),
-         defaultVolumeMuted},
-
-        {dbPath(PhoneMode::Offline, Setting::Volume, PlaybackType::KeypadSound, Profile::Type::PlaybackHeadphones),
-         defaultVolumeMuted},
-        {dbPath(PhoneMode::Offline, Setting::Volume, PlaybackType::KeypadSound, Profile::Type::PlaybackBluetoothA2DP),
-         defaultVolumeMuted},
-        {dbPath(PhoneMode::Offline, Setting::Volume, PlaybackType::KeypadSound, Profile::Type::PlaybackLoudspeaker),
-         defaultVolumeMuted},
-
-        {dbPath(PhoneMode::Connected, Setting::Volume, PlaybackType::CallRingtone, Profile::Type::PlaybackHeadphones),
-         defaultVolumeLow},
-        {dbPath(
-             PhoneMode::Connected, Setting::Volume, PlaybackType::CallRingtone, Profile::Type::PlaybackBluetoothA2DP),
-         defaultVolumeLow},
-        {dbPath(PhoneMode::Connected, Setting::Volume, PlaybackType::CallRingtone, Profile::Type::PlaybackLoudspeaker),
-         defaultVolumeHigh},
-
-        {dbPath(
-             PhoneMode::DoNotDisturb, Setting::Volume, PlaybackType::CallRingtone, Profile::Type::PlaybackHeadphones),
-         defaultVolumeMuted},
-        {dbPath(PhoneMode::DoNotDisturb,
-                Setting::Volume,
-                PlaybackType::CallRingtone,
-                Profile::Type::PlaybackBluetoothA2DP),
-         defaultVolumeMuted},
-        {dbPath(
-             PhoneMode::DoNotDisturb, Setting::Volume, PlaybackType::CallRingtone, Profile::Type::PlaybackLoudspeaker),
-         defaultVolumeMuted},
-
-        {dbPath(PhoneMode::Offline, Setting::Volume, PlaybackType::CallRingtone, Profile::Type::PlaybackHeadphones),
-         defaultVolumeMuted},
-        {dbPath(PhoneMode::Offline, Setting::Volume, PlaybackType::CallRingtone, Profile::Type::PlaybackBluetoothA2DP),
-         defaultVolumeMuted},
-        {dbPath(PhoneMode::Offline, Setting::Volume, PlaybackType::CallRingtone, Profile::Type::PlaybackLoudspeaker),
-         defaultVolumeMuted},
-
-        {dbPath(PhoneMode::Connected, Setting::Volume, PlaybackType::Meditation, Profile::Type::PlaybackHeadphones),
-         defaultVolumeLow},
-        {dbPath(PhoneMode::Connected, Setting::Volume, PlaybackType::Meditation, Profile::Type::PlaybackBluetoothA2DP),
-         defaultVolumeLow},
-        {dbPath(PhoneMode::Connected, Setting::Volume, PlaybackType::Meditation, Profile::Type::PlaybackLoudspeaker),
-         defaultVolumeHigh},
-
-        {dbPath(PhoneMode::DoNotDisturb, Setting::Volume, PlaybackType::Meditation, Profile::Type::PlaybackHeadphones),
-         defaultVolumeLow},
-        {dbPath(
-             PhoneMode::DoNotDisturb, Setting::Volume, PlaybackType::Meditation, Profile::Type::PlaybackBluetoothA2DP),
-         defaultVolumeLow},
-        {dbPath(PhoneMode::DoNotDisturb, Setting::Volume, PlaybackType::Meditation, Profile::Type::PlaybackLoudspeaker),
-         defaultVolumeHigh},
-
-        {dbPath(PhoneMode::Offline, Setting::Volume, PlaybackType::Meditation, Profile::Type::PlaybackHeadphones),
-         defaultVolumeLow},
-        {dbPath(PhoneMode::Offline, Setting::Volume, PlaybackType::Meditation, Profile::Type::PlaybackBluetoothA2DP),
-         defaultVolumeLow},
-        {dbPath(PhoneMode::Offline, Setting::Volume, PlaybackType::Meditation, Profile::Type::PlaybackLoudspeaker),
-         defaultVolumeHigh},
-
-        {dbPath(PhoneMode::Connected, Setting::Volume, PlaybackType::Alarm, Profile::Type::PlaybackHeadphones),
-         defaultVolumeLow},
-        {dbPath(PhoneMode::Connected, Setting::Volume, PlaybackType::Alarm, Profile::Type::PlaybackBluetoothA2DP),
-         defaultVolumeLow},
-        {dbPath(PhoneMode::Connected, Setting::Volume, PlaybackType::Alarm, Profile::Type::PlaybackLoudspeaker),
-         defaultVolumeHigh},
-
-        {dbPath(PhoneMode::DoNotDisturb, Setting::Volume, PlaybackType::Alarm, Profile::Type::PlaybackHeadphones),
-         defaultVolumeLow},
-        {dbPath(PhoneMode::DoNotDisturb, Setting::Volume, PlaybackType::Alarm, Profile::Type::PlaybackBluetoothA2DP),
-         defaultVolumeLow},
-        {dbPath(PhoneMode::DoNotDisturb, Setting::Volume, PlaybackType::Alarm, Profile::Type::PlaybackLoudspeaker),
-         defaultVolumeHigh},
-
-        {dbPath(PhoneMode::Offline, Setting::Volume, PlaybackType::Alarm, Profile::Type::PlaybackHeadphones),
-         defaultVolumeLow},
-        {dbPath(PhoneMode::Offline, Setting::Volume, PlaybackType::Alarm, Profile::Type::PlaybackBluetoothA2DP),
-         defaultVolumeLow},
-        {dbPath(PhoneMode::Offline, Setting::Volume, PlaybackType::Alarm, Profile::Type::PlaybackLoudspeaker),
-         defaultVolumeHigh},
-
-        {dbPath(PhoneMode::Connected,
-                Setting::Volume,
-                PlaybackType::TextMessageRingtone,
-                Profile::Type::PlaybackHeadphones),
-         defaultVolumeLow},
-        {dbPath(PhoneMode::Connected,
-                Setting::Volume,
-                PlaybackType::TextMessageRingtone,
-                Profile::Type::PlaybackBluetoothA2DP),
-         defaultVolumeLow},
-        {dbPath(PhoneMode::Connected,
-                Setting::Volume,
-                PlaybackType::TextMessageRingtone,
-                Profile::Type::PlaybackLoudspeaker),
-         defaultVolumeHigh},
-
-        {dbPath(PhoneMode::DoNotDisturb,
-                Setting::Volume,
-                PlaybackType::TextMessageRingtone,
-                Profile::Type::PlaybackHeadphones),
-         defaultVolumeMuted},
-        {dbPath(PhoneMode::DoNotDisturb,
-                Setting::Volume,
-                PlaybackType::TextMessageRingtone,
-                Profile::Type::PlaybackBluetoothA2DP),
-         defaultVolumeMuted},
-        {dbPath(PhoneMode::DoNotDisturb,
-                Setting::Volume,
-                PlaybackType::TextMessageRingtone,
-                Profile::Type::PlaybackLoudspeaker),
-         defaultVolumeMuted},
-
-        {dbPath(
-             PhoneMode::Offline, Setting::Volume, PlaybackType::TextMessageRingtone, Profile::Type::PlaybackHeadphones),
-         defaultVolumeMuted},
-        {dbPath(PhoneMode::Offline,
-                Setting::Volume,
-                PlaybackType::TextMessageRingtone,
-                Profile::Type::PlaybackBluetoothA2DP),
-         defaultVolumeMuted},
-        {dbPath(PhoneMode::Offline,
-                Setting::Volume,
-                PlaybackType::TextMessageRingtone,
-                Profile::Type::PlaybackLoudspeaker),
-         defaultVolumeMuted},
-
-        // ROUTING
-        {dbPath(PhoneMode::Connected, Setting::Gain, PlaybackType::None, Profile::Type::RoutingBluetoothHSP), "20"},
-        {dbPath(PhoneMode::Connected, Setting::Gain, PlaybackType::None, Profile::Type::RoutingEarspeaker), "3"},
-        {dbPath(PhoneMode::Connected, Setting::Gain, PlaybackType::None, Profile::Type::RoutingLoudspeaker), "10"},
-        {dbPath(PhoneMode::Connected, Setting::Gain, PlaybackType::None, Profile::Type::RoutingHeadphones), "0"},
-
-        {dbPath(PhoneMode::DoNotDisturb, Setting::Gain, PlaybackType::None, Profile::Type::RoutingBluetoothHSP), "20"},
-        {dbPath(PhoneMode::DoNotDisturb, Setting::Gain, PlaybackType::None, Profile::Type::RoutingEarspeaker), "3"},
-        {dbPath(PhoneMode::DoNotDisturb, Setting::Gain, PlaybackType::None, Profile::Type::RoutingLoudspeaker), "10"},
-        {dbPath(PhoneMode::DoNotDisturb, Setting::Gain, PlaybackType::None, Profile::Type::RoutingHeadphones), "0"},
-
-        {dbPath(PhoneMode::Offline, Setting::Gain, PlaybackType::None, Profile::Type::RoutingBluetoothHSP), "20"},
-        {dbPath(PhoneMode::Offline, Setting::Gain, PlaybackType::None, Profile::Type::RoutingEarspeaker), "3"},
-        {dbPath(PhoneMode::Offline, Setting::Gain, PlaybackType::None, Profile::Type::RoutingLoudspeaker), "10"},
-        {dbPath(PhoneMode::Offline, Setting::Gain, PlaybackType::None, Profile::Type::RoutingHeadphones), "0"},
-
-        {dbPath(PhoneMode::Connected, Setting::Volume, PlaybackType::None, Profile::Type::RoutingBluetoothHSP),
-         defaultVolumeHigh},
-        {dbPath(PhoneMode::Connected, Setting::Volume, PlaybackType::None, Profile::Type::RoutingEarspeaker),
-         defaultVolumeHigh},
-        {dbPath(PhoneMode::Connected, Setting::Volume, PlaybackType::None, Profile::Type::RoutingHeadphones),
-         defaultVolumeHigh},
-        {dbPath(PhoneMode::Connected, Setting::Volume, PlaybackType::None, Profile::Type::RoutingLoudspeaker),
-         defaultVolumeHigh},
-
-        {dbPath(PhoneMode::DoNotDisturb, Setting::Volume, PlaybackType::None, Profile::Type::RoutingBluetoothHSP),
-         defaultVolumeHigh},
-        {dbPath(PhoneMode::DoNotDisturb, Setting::Volume, PlaybackType::None, Profile::Type::RoutingEarspeaker),
-         defaultVolumeHigh},
-        {dbPath(PhoneMode::DoNotDisturb, Setting::Volume, PlaybackType::None, Profile::Type::RoutingHeadphones),
-         defaultVolumeHigh},
-        {dbPath(PhoneMode::DoNotDisturb, Setting::Volume, PlaybackType::None, Profile::Type::RoutingLoudspeaker),
-         defaultVolumeHigh},
-
-        {dbPath(PhoneMode::Offline, Setting::Volume, PlaybackType::None, Profile::Type::RoutingBluetoothHSP),
-         defaultVolumeHigh},
-        {dbPath(PhoneMode::Offline, Setting::Volume, PlaybackType::None, Profile::Type::RoutingEarspeaker),
-         defaultVolumeHigh},
-        {dbPath(PhoneMode::Offline, Setting::Volume, PlaybackType::None, Profile::Type::RoutingHeadphones),
-         defaultVolumeHigh},
-        {dbPath(PhoneMode::Offline, Setting::Volume, PlaybackType::None, Profile::Type::RoutingLoudspeaker),
-         defaultVolumeHigh},
-
-        // RECORDING
-        {dbPath(PhoneMode::Connected, Setting::Gain, PlaybackType::None, Profile::Type::RecordingBuiltInMic), "200"},
-        {dbPath(PhoneMode::Connected, Setting::Gain, PlaybackType::None, Profile::Type::RecordingHeadphones), "100"},
-        {dbPath(PhoneMode::Connected, Setting::Gain, PlaybackType::None, Profile::Type::RecordingBluetoothHSP), "100"},
-
-        {dbPath(PhoneMode::DoNotDisturb, Setting::Gain, PlaybackType::None, Profile::Type::RecordingBuiltInMic), "200"},
-        {dbPath(PhoneMode::DoNotDisturb, Setting::Gain, PlaybackType::None, Profile::Type::RecordingHeadphones), "100"},
-        {dbPath(PhoneMode::DoNotDisturb, Setting::Gain, PlaybackType::None, Profile::Type::RecordingBluetoothHSP),
-         "100"},
-
-        {dbPath(PhoneMode::Offline, Setting::Gain, PlaybackType::None, Profile::Type::RecordingBuiltInMic), "200"},
-        {dbPath(PhoneMode::Offline, Setting::Gain, PlaybackType::None, Profile::Type::RecordingHeadphones), "100"},
-        {dbPath(PhoneMode::Offline, Setting::Gain, PlaybackType::None, Profile::Type::RecordingBluetoothHSP), "100"},
-
-        // MISC
-        {dbPath(PhoneMode::Connected, Setting::EnableVibration, PlaybackType::Multimedia, Profile::Type::Idle),
-         defaultFalse},
-        {dbPath(PhoneMode::Connected, Setting::EnableVibration, PlaybackType::Notifications, Profile::Type::Idle),
-         defaultTrue},
-        {dbPath(PhoneMode::Connected, Setting::EnableVibration, PlaybackType::KeypadSound, Profile::Type::Idle),
-         defaultFalse},
-        {dbPath(PhoneMode::Connected, Setting::EnableVibration, PlaybackType::CallRingtone, Profile::Type::Idle),
-         defaultTrue},
-        {dbPath(PhoneMode::Connected, Setting::EnableVibration, PlaybackType::TextMessageRingtone, Profile::Type::Idle),
-         defaultTrue},
-        {dbPath(PhoneMode::Connected, Setting::EnableVibration, PlaybackType::Meditation, Profile::Type::Idle),
-         defaultFalse},
-        {dbPath(PhoneMode::Connected, Setting::EnableVibration, PlaybackType::Alarm, Profile::Type::Idle), defaultTrue},
-
-        {dbPath(PhoneMode::DoNotDisturb, Setting::EnableVibration, PlaybackType::Multimedia, Profile::Type::Idle),
-         defaultFalse},
-        {dbPath(PhoneMode::DoNotDisturb, Setting::EnableVibration, PlaybackType::Notifications, Profile::Type::Idle),
-         defaultFalse},
-        {dbPath(PhoneMode::DoNotDisturb, Setting::EnableVibration, PlaybackType::KeypadSound, Profile::Type::Idle),
-         defaultFalse},
-        {dbPath(PhoneMode::DoNotDisturb, Setting::EnableVibration, PlaybackType::CallRingtone, Profile::Type::Idle),
-         defaultFalse},
-        {dbPath(
-             PhoneMode::DoNotDisturb, Setting::EnableVibration, PlaybackType::TextMessageRingtone, Profile::Type::Idle),
-         defaultFalse},
-        {dbPath(PhoneMode::DoNotDisturb, Setting::EnableVibration, PlaybackType::Meditation, Profile::Type::Idle),
-         defaultFalse},
-        {dbPath(PhoneMode::DoNotDisturb, Setting::EnableVibration, PlaybackType::Alarm, Profile::Type::Idle),
-         defaultTrue},
-
-        {dbPath(PhoneMode::Offline, Setting::EnableVibration, PlaybackType::Multimedia, Profile::Type::Idle),
-         defaultFalse},
-        {dbPath(PhoneMode::Offline, Setting::EnableVibration, PlaybackType::Notifications, Profile::Type::Idle),
-         defaultFalse},
-        {dbPath(PhoneMode::Offline, Setting::EnableVibration, PlaybackType::KeypadSound, Profile::Type::Idle),
-         defaultFalse},
-        {dbPath(PhoneMode::Offline, Setting::EnableVibration, PlaybackType::CallRingtone, Profile::Type::Idle),
-         defaultFalse},
-        {dbPath(PhoneMode::Offline, Setting::EnableVibration, PlaybackType::TextMessageRingtone, Profile::Type::Idle),
-         defaultFalse},
-        {dbPath(PhoneMode::Offline, Setting::EnableVibration, PlaybackType::Meditation, Profile::Type::Idle),
-         defaultFalse},
-        {dbPath(PhoneMode::Offline, Setting::EnableVibration, PlaybackType::Alarm, Profile::Type::Idle), defaultTrue},
-
-        {dbPath(PhoneMode::Connected, Setting::EnableSound, PlaybackType::Multimedia, Profile::Type::Idle),
-         defaultTrue},
-        {dbPath(PhoneMode::Connected, Setting::EnableSound, PlaybackType::Notifications, Profile::Type::Idle),
-         defaultTrue},
-        {dbPath(PhoneMode::Connected, Setting::EnableSound, PlaybackType::KeypadSound, Profile::Type::Idle),
-         defaultTrue},
-        {dbPath(PhoneMode::Connected, Setting::EnableSound, PlaybackType::CallRingtone, Profile::Type::Idle),
-         defaultTrue},
-        {dbPath(PhoneMode::Connected, Setting::EnableSound, PlaybackType::TextMessageRingtone, Profile::Type::Idle),
-         defaultTrue},
-        {dbPath(PhoneMode::Connected, Setting::EnableSound, PlaybackType::Meditation, Profile::Type::Idle),
-         defaultTrue},
-        {dbPath(PhoneMode::Connected, Setting::EnableSound, PlaybackType::Alarm, Profile::Type::Idle), defaultTrue},
-
-        {dbPath(PhoneMode::DoNotDisturb, Setting::EnableSound, PlaybackType::Multimedia, Profile::Type::Idle),
-         defaultTrue},
-        {dbPath(PhoneMode::DoNotDisturb, Setting::EnableSound, PlaybackType::Notifications, Profile::Type::Idle),
-         defaultFalse},
-        {dbPath(PhoneMode::DoNotDisturb, Setting::EnableSound, PlaybackType::KeypadSound, Profile::Type::Idle),
-         defaultFalse},
-        {dbPath(PhoneMode::DoNotDisturb, Setting::EnableSound, PlaybackType::CallRingtone, Profile::Type::Idle),
-         defaultFalse},
-        {dbPath(PhoneMode::DoNotDisturb, Setting::EnableSound, PlaybackType::TextMessageRingtone, Profile::Type::Idle),
-         defaultFalse},
-        {dbPath(PhoneMode::DoNotDisturb, Setting::EnableSound, PlaybackType::Meditation, Profile::Type::Idle),
-         defaultTrue},
-        {dbPath(PhoneMode::DoNotDisturb, Setting::EnableSound, PlaybackType::Alarm, Profile::Type::Idle), defaultTrue},
-
-        {dbPath(PhoneMode::Offline, Setting::EnableSound, PlaybackType::Multimedia, Profile::Type::Idle), defaultTrue},
-        {dbPath(PhoneMode::Offline, Setting::EnableSound, PlaybackType::Notifications, Profile::Type::Idle),
-         defaultFalse},
-        {dbPath(PhoneMode::Offline, Setting::EnableSound, PlaybackType::KeypadSound, Profile::Type::Idle),
-         defaultFalse},
-        {dbPath(PhoneMode::Offline, Setting::EnableSound, PlaybackType::CallRingtone, Profile::Type::Idle),
-         defaultFalse},
-        {dbPath(PhoneMode::Offline, Setting::EnableSound, PlaybackType::TextMessageRingtone, Profile::Type::Idle),
-         defaultFalse},
-        {dbPath(PhoneMode::Offline, Setting::EnableSound, PlaybackType::Meditation, Profile::Type::Idle), defaultTrue},
-        {dbPath(PhoneMode::Offline, Setting::EnableSound, PlaybackType::Alarm, Profile::Type::Idle), defaultTrue},
-    };
+    settingsProvider->init(service::ServiceProxy(shared_from_this()));
+    std::transform(std::begin(cacheInitializer),
+                   std::end(cacheInitializer),
+                   std::inserter(settingsCache, std::end(settingsCache)),
+                   [](auto &el) { return std::make_pair(dbPath(el.first), el.second); });
 
     for (const auto &setting : settingsCache) {
         settingsProvider->registerValueChange(
@@ -393,19 +139,26 @@ sys::ReturnCodes ServiceAudio::InitHandler()
 
 sys::ReturnCodes ServiceAudio::DeinitHandler()
 {
+    settingsProvider->deinit();
     return sys::ReturnCodes::Success;
+}
+
+void ServiceAudio::ProcessCloseReason(sys::CloseReason closeReason)
+{
+    if (const auto &activeInputOpt = audioMux.GetActiveInput(); activeInputOpt.has_value()) {
+        const auto activeInput = activeInputOpt.value();
+        activeInput->audio->Stop();
+    }
+    sendCloseReadyMessage(this);
 }
 
 std::optional<std::string> ServiceAudio::AudioServicesCallback(const sys::Message *msg)
 {
     if (const auto *eof = dynamic_cast<const AudioServiceMessage::EndOfFile *>(msg); eof) {
-        auto newMsg =
-            std::make_shared<AudioNotificationMessage>(AudioNotificationMessage::Type::EndOfFile, eof->GetToken());
-        bus.sendMulticast(std::move(newMsg), sys::BusChannel::ServiceAudioNotifications);
+        bus.sendUnicast(std::make_shared<AudioInternalEOFNotificationMessage>(eof->GetToken()), service::name::audio);
     }
     else if (const auto *dbReq = dynamic_cast<const AudioServiceMessage::DbRequest *>(msg); dbReq) {
-        std::string path =
-            dbPath(phoneModeObserver->getCurrentPhoneMode(), dbReq->setting, dbReq->playback, dbReq->profile);
+        std::string path = dbPath(dbReq->setting, dbReq->playback, dbReq->profile);
         LOG_DEBUG("ServiceAudio::DBbCallback(%s)", path.c_str());
         auto settings_it = settingsCache.find(path);
         if (settingsCache.end() == settings_it) {
@@ -413,6 +166,18 @@ std::optional<std::string> ServiceAudio::AudioServicesCallback(const sys::Messag
             return std::nullopt;
         }
         return settings_it->second;
+    }
+    else if (const auto *deviceMsg = dynamic_cast<const AudioServiceMessage::AudioDeviceCreated *>(msg); deviceMsg) {
+        if (deviceMsg->getDeviceType() == AudioDevice::Type::BluetoothA2DP) {
+            auto startBluetoothAudioMsg = std::make_shared<BluetoothAudioStartMessage>(
+                std::static_pointer_cast<bluetooth::A2DPAudioDevice>(deviceMsg->getDevice()));
+            bus.sendUnicast(std::move(startBluetoothAudioMsg), service::name::bluetooth);
+        }
+        else if (deviceMsg->getDeviceType() == AudioDevice::Type::BluetoothHSP) {
+            auto startBluetoothAudioMsg = std::make_shared<BluetoothAudioStartMessage>(
+                std::static_pointer_cast<bluetooth::HSPAudioDevice>(deviceMsg->getDevice()));
+            bus.sendUnicast(std::move(startBluetoothAudioMsg), service::name::bluetooth);
+        }
     }
     else {
         LOG_DEBUG("Message received but not handled - no effect.");
@@ -434,8 +199,12 @@ constexpr bool ServiceAudio::IsResumable(const audio::PlaybackType &type) const
 
 constexpr bool ServiceAudio::ShouldLoop(const std::optional<audio::PlaybackType> &type) const
 {
-
-    return type.value_or(audio::PlaybackType::None) == audio::PlaybackType::CallRingtone;
+    return type.value_or(audio::PlaybackType::None) == audio::PlaybackType::CallRingtone ||
+           type.value_or(audio::PlaybackType::None) == audio::PlaybackType::Alarm
+#if ENABLE_PLAYBACK_AUTO_REPEAT == 1
+           || type.value_or(audio::PlaybackType::None) == audio::PlaybackType::Multimedia
+#endif
+        ;
 }
 
 bool ServiceAudio::IsVibrationEnabled(const audio::PlaybackType &type)
@@ -444,6 +213,7 @@ bool ServiceAudio::IsVibrationEnabled(const audio::PlaybackType &type)
         utils::getNumericValue<audio::Vibrate>(getSetting(Setting::EnableVibration, Profile::Type::Idle, type));
     return isEnabled;
 }
+
 bool ServiceAudio::IsOperationEnabled(const audio::PlaybackType &plType, const Operation::Type &opType)
 {
     if (opType == Operation::Type::Router || opType == Operation::Type::Recorder) {
@@ -452,6 +222,11 @@ bool ServiceAudio::IsOperationEnabled(const audio::PlaybackType &plType, const O
     auto isEnabled =
         utils::getNumericValue<audio::EnableSound>(getSetting(Setting::EnableSound, Profile::Type::Idle, plType));
     return isEnabled;
+}
+
+std::string ServiceAudio::GetSound(const audio::PlaybackType &plType)
+{
+    return getSetting(Setting::Sound, Profile::Type::Idle, plType);
 }
 
 ServiceAudio::VibrationType ServiceAudio::GetVibrationType(const audio::PlaybackType &type)
@@ -471,11 +246,40 @@ ServiceAudio::VibrationType ServiceAudio::GetVibrationType(const audio::Playback
 
 void ServiceAudio::VibrationUpdate(const audio::PlaybackType &type, std::optional<AudioMux::Input *> input)
 {
-    auto curVibrationType = GetVibrationType(type);
-    if (curVibrationType == VibrationType::OneShot && !IsVibrationMotorOn()) {
+    switch (const auto curVibrationType = GetVibrationType(type); curVibrationType) {
+    case VibrationType::None:
+        DisableVibration(input);
+        break;
+    case VibrationType::OneShot:
+        EnableOneShotVibration();
+        break;
+    case VibrationType::Continuous:
+        EnableContinuousVibration(input);
+        break;
+    }
+}
+
+void ServiceAudio::DisableVibration(std::optional<audio::AudioMux::Input *> input)
+{
+    if (IsVibrationMotorOn()) {
+        EventManagerServiceAPI::vibraStop(this);
+        vibrationMotorStatus = AudioMux::VibrationStatus::Off;
+    }
+    if (input) {
+        input.value()->DisableVibration();
+    }
+}
+
+void ServiceAudio::EnableOneShotVibration()
+{
+    if (!IsVibrationMotorOn()) {
         EventManagerServiceAPI::vibraPulseOnce(this);
     }
-    else if (input && curVibrationType == VibrationType::Continuous) {
+}
+
+void ServiceAudio::EnableContinuousVibration(std::optional<audio::AudioMux::Input *> input)
+{
+    if (input) {
         input.value()->EnableVibration();
     }
 
@@ -487,18 +291,6 @@ void ServiceAudio::VibrationUpdate(const audio::PlaybackType &type, std::optiona
         EventManagerServiceAPI::vibraPulseRepeatUntilStop(this);
         vibrationMotorStatus = AudioMux::VibrationStatus::On;
     }
-    else if (!anyOfInputsOn && IsVibrationMotorOn()) {
-        EventManagerServiceAPI::vibraStop(this);
-        vibrationMotorStatus = AudioMux::VibrationStatus::Off;
-    }
-}
-
-std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleGetFileTags(const std::string &fileName)
-{
-    if (auto tag = Audio::GetFileTags(fileName.c_str())) {
-        return std::make_unique<AudioResponseMessage>(RetCode::Success, tag.value());
-    }
-    return std::make_unique<AudioResponseMessage>(RetCode::FileDoesntExist);
 }
 
 std::unique_ptr<AudioResponseMessage> ServiceAudio::HandlePause(const Token &token)
@@ -525,11 +317,7 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandlePause(std::optional<Au
         audioInput->DisableVibration();
     }
     else {
-        retCode = audioInput->audio->Stop();
-        auto broadMsg =
-            std::make_shared<AudioNotificationMessage>(AudioNotificationMessage::Type::Stop, audioInput->token);
-        bus.sendMulticast(std::move(broadMsg), sys::BusChannel::ServiceAudioNotifications);
-        audioMux.ResetInput(audioInput);
+        retCode = StopInput(audioInput);
     }
 
     VibrationUpdate();
@@ -555,7 +343,7 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const Operation:
     auto AudioStart = [&](auto &input) {
         if (input) {
             for (auto &audioInput : audioMux.GetAllInputs()) {
-                HandlePause(&audioInput);
+                StopInput(&audioInput);
             }
             retToken = audioMux.ResetInput(input);
 
@@ -574,6 +362,21 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const Operation:
 
     if (opType == Operation::Type::Playback) {
         auto input = audioMux.GetPlaybackInput(playbackType);
+        if (playbackType == audio::PlaybackType::CallRingtone && bluetoothHSPConnected && input &&
+            (*input)->audio->GetPriorityPlaybackProfile() == Profile::Type::PlaybackBluetoothA2DP) {
+            LOG_DEBUG("Sending Bluetooth start ringing");
+            bus.sendUnicast(std::make_shared<message::bluetooth::Ring>(message::bluetooth::Ring::State::Enable),
+                            service::name::bluetooth);
+            return std::make_unique<AudioStartPlaybackResponse>(audio::RetCode::Success, retToken);
+        }
+        else if (bluetoothA2DPConnected) {
+            if (playbackType != audio::PlaybackType::CallRingtone) {
+                LOG_DEBUG("Sending Bluetooth start stream request");
+                bus.sendUnicast(std::make_shared<BluetoothMessage>(BluetoothMessage::Request::Play),
+                                service::name::bluetooth);
+            }
+        }
+
         AudioStart(input);
         return std::make_unique<AudioStartPlaybackResponse>(retCode, retToken);
     }
@@ -584,6 +387,10 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const Operation:
     }
     else if (opType == Operation::Type::Router) {
         auto input = audioMux.GetRoutingInput(true);
+        if (bluetoothHSPConnected) {
+            LOG_DEBUG("Sending Bluetooth start routing");
+            bus.sendUnicast(std::make_shared<message::bluetooth::StartAudioRouting>(), service::name::bluetooth);
+        }
         AudioStart(input);
         return std::make_unique<AudioStartRoutingResponse>(retCode, retToken);
     }
@@ -592,41 +399,49 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const Operation:
 
 std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleSendEvent(std::shared_ptr<Event> evt)
 {
-    auto isBT =
-        evt->getType() == EventType::BlutoothHSPDeviceState || evt->getType() == EventType::BlutoothA2DPDeviceState;
-    if (isBT && evt->getDeviceState() == audio::Event::DeviceState::Connected) {
-        auto req = std::make_shared<BluetoothRequestStreamMessage>();
-        bus.sendUnicast(req, service::name::bluetooth);
-        return std::make_unique<AudioEventResponse>(RetCode::Success);
+    // update bluetooth state
+    if (evt->getType() == EventType::BlutoothA2DPDeviceState) {
+        const auto newState = evt->getDeviceState() == Event::DeviceState::Connected;
+        if (newState != bluetoothA2DPConnected) {
+            LOG_DEBUG("Bluetooth connection status changed: %s", newState ? "connected" : "disconnected");
+            bluetoothA2DPConnected = newState;
+            const auto playbacksToBeStopped{
+                (bluetoothA2DPConnected) ? std::vector<audio::PlaybackType>{audio::PlaybackType::Alarm,
+                                                                            audio::PlaybackType::Meditation,
+                                                                            audio::PlaybackType::Notifications,
+                                                                            audio::PlaybackType::TextMessageRingtone}
+                                         : std::vector<audio::PlaybackType>{audio::PlaybackType::Alarm,
+                                                                            audio::PlaybackType::Meditation,
+                                                                            audio::PlaybackType::Multimedia,
+                                                                            audio::PlaybackType::Notifications,
+                                                                            audio::PlaybackType::TextMessageRingtone}};
+            HandleStop(playbacksToBeStopped, audio::Token());
+        }
+    }
+    else if (evt->getType() == EventType::BlutoothHSPDeviceState) {
+        auto newState = evt->getDeviceState() == Event::DeviceState::Connected;
+        if (newState != bluetoothHSPConnected) {
+            LOG_DEBUG("Bluetooth connection status changed: %s", newState ? "connected" : "disconnected");
+            bluetoothHSPConnected = newState;
+        }
     }
 
+    // update information about endpoints availability
     for (auto &input : audioMux.GetAllInputs()) {
         input.audio->SendEvent(evt);
     }
+
     return std::make_unique<AudioEventResponse>(RetCode::Success);
 }
 
 std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStop(const std::vector<audio::PlaybackType> &stopTypes,
-                                                               const Token &token,
-                                                               bool &muted)
+                                                               const Token &token)
 {
     std::vector<std::pair<Token, audio::RetCode>> retCodes;
 
-    auto stopInput = [this](auto inp) {
-        if (inp->audio->GetCurrentState() == Audio::State::Idle) {
-            return audio::RetCode::Success;
-        }
-        auto rCode = inp->audio->Stop();
-        // Send notification that audio file was stopped
-        auto msgStop = std::make_shared<AudioNotificationMessage>(AudioNotificationMessage::Type::Stop, inp->token);
-        bus.sendMulticast(msgStop, sys::BusChannel::ServiceAudioNotifications);
-        audioMux.ResetInput(inp);
-        return rCode;
-    };
-
     // stop by token
     if (auto tokenInput = audioMux.GetInput(token); token.IsValid() && tokenInput) {
-        retCodes.emplace_back(std::make_pair(token, stopInput(tokenInput.value())));
+        retCodes.emplace_back(std::make_pair(token, StopInput(tokenInput.value())));
     }
     else if (token.IsValid()) {
         return std::make_unique<AudioStopResponse>(RetCode::TokenNotFound, Token::MakeBadToken());
@@ -636,9 +451,8 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStop(const std::vector
         for (auto &input : audioMux.GetAllInputs()) {
             const auto &currentOperation = input.audio->GetCurrentOperation();
             if (std::find(stopTypes.begin(), stopTypes.end(), currentOperation.GetPlaybackType()) != stopTypes.end()) {
-                muted  = true;
                 auto t = input.token;
-                retCodes.emplace_back(t, stopInput(&input));
+                retCodes.emplace_back(t, StopInput(&input));
             }
         }
     }
@@ -646,8 +460,14 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStop(const std::vector
     else if (token.IsUninitialized()) {
         for (auto &input : audioMux.GetAllInputs()) {
             auto t = input.token;
-            retCodes.emplace_back(t, stopInput(&input));
+            retCodes.emplace_back(t, StopInput(&input));
         }
+    }
+
+    // stop bluetooth stream if available
+    if (bluetoothA2DPConnected) {
+        LOG_DEBUG("Sending Bluetooth stop request");
+        bus.sendUnicast(std::make_shared<BluetoothMessage>(BluetoothMessage::Request::Stop), service::name::bluetooth);
     }
 
     // on failure return first false code
@@ -661,71 +481,78 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStop(const std::vector
     return std::make_unique<AudioStopResponse>(audio::RetCode::Success, token);
 }
 
-std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStop(const std::vector<audio::PlaybackType> &stopTypes,
-                                                               const Token &token)
+auto ServiceAudio::StopInput(audio::AudioMux::Input *input, StopReason stopReason) -> audio::RetCode
 {
-    bool muted = false;
-    return HandleStop(stopTypes, token, muted);
+    if (input->audio->GetCurrentState() == Audio::State::Idle) {
+        return audio::RetCode::Success;
+    }
+    const auto rCode = input->audio->Stop();
+    // Send notification that audio file was stopped
+    std::shared_ptr<AudioNotificationMessage> msg;
+    if (stopReason == StopReason::Eof) {
+        msg = std::make_shared<AudioEOFNotification>(input->token);
+    }
+    else {
+        msg = std::make_shared<AudioStopNotification>(input->token);
+    }
+    bus.sendMulticast(std::move(msg), sys::BusChannel::ServiceAudioNotifications);
+    audioMux.ResetInput(input);
+    VibrationUpdate();
+    return rCode;
 }
 
-void ServiceAudio::HandleNotification(const AudioNotificationMessage::Type &type, const Token &token)
+void ServiceAudio::HandleEOF(const Token &token)
 {
-    if (type == AudioNotificationMessage::Type::EndOfFile) {
-        auto input = audioMux.GetInput(token);
-        if (input && ShouldLoop((*input)->audio->GetCurrentOperationPlaybackType())) {
+    if (const auto input = audioMux.GetInput(token); input) {
+        if (ShouldLoop((*input)->audio->GetCurrentOperationPlaybackType())) {
             (*input)->audio->Start();
+            if ((*input)->audio->IsMuted()) {
+                (*input)->audio->Mute();
+            }
         }
         else {
-            auto newMsg = std::make_shared<AudioStopRequest>(token);
-            bus.sendUnicast(newMsg, service::name::audio);
+            StopInput(*input, StopReason::Eof);
         }
-        return;
-    }
-
-    if (type != AudioNotificationMessage::Type::Stop) {
-        LOG_DEBUG("Unhandled AudioNotificationMessage");
     }
 }
 
-auto ServiceAudio::HandleKeyPressed(const int step) -> std::unique_ptr<AudioKeyPressedResponse>
+auto ServiceAudio::HandleKeyPressed(const int step) -> sys::MessagePointer
 {
-    const std::vector<audio::PlaybackType> typesToMute = {audio::PlaybackType::Notifications,
-                                                          audio::PlaybackType::CallRingtone,
-                                                          audio::PlaybackType::TextMessageRingtone};
+    auto context = getCurrentContext();
 
-    // mute if 0 and return with parameter shouldn't popup
-    bool muted         = false;
-    const auto context = getCurrentContext();
-    if (step < 0) {
-        HandleStop(typesToMute, Token(), muted);
-        if (muted) {
-            return std::make_unique<AudioKeyPressedResponse>(audio::RetCode::Success, 0, muted, context);
-        }
-    }
-    const auto volume =
+    const auto currentVolume =
         utils::getNumericValue<int>(getSetting(Setting::Volume, Profile::Type::Idle, PlaybackType::None));
-    const auto newVolume = std::clamp(volume + step, static_cast<int>(minVolume), static_cast<int>(maxVolume));
-    setSetting(Setting::Volume, std::to_string(newVolume), Profile::Type::Idle, PlaybackType::None);
-    return std::make_unique<AudioKeyPressedResponse>(audio::RetCode::Success, newVolume, muted, context);
+
+    if (isSystemSound(context.second)) {
+        // active system sounds can be only muted, no volume control is possible
+        if (step < 0) {
+            MuteCurrentOperation();
+            return sys::msgHandled();
+        }
+        else {
+            return sys::msgHandled();
+        }
+    }
+
+    const auto newVolume = std::clamp(currentVolume + step, static_cast<int>(minVolume), static_cast<int>(maxVolume));
+    if (auto input = audioMux.GetIdleInput(); input) {
+        // when no active input change volume of system sounds
+        auto updatedProfile = (*input)->audio->GetPriorityPlaybackProfile();
+        setSetting(Setting::Volume, std::to_string(newVolume), updatedProfile, PlaybackType::System);
+        context.second = PlaybackType::CallRingtone;
+    }
+    else {
+        // update volume of currently active sound
+        setSetting(Setting::Volume, std::to_string(newVolume));
+    }
+    bus.sendMulticast(std::make_shared<VolumeChanged>(newVolume, context), sys::BusChannel::ServiceAudioNotifications);
+    return sys::msgHandled();
 }
 
-void ServiceAudio::HandlePhoneModeChange(sys::phone_modes::PhoneMode phoneMode,
-                                         sys::phone_modes::Tethering tetheringMode)
+void ServiceAudio::MuteCurrentOperation()
 {
-    LOG_INFO("Phone mode changed to %s", utils::enumToString(phoneMode).c_str());
     for (auto &input : audioMux.GetAllInputs()) {
-        if (input.audio->GetCurrentState() != Audio::State::Idle) {
-            std::string path = dbPath(phoneMode,
-                                      Setting::Volume,
-                                      input.audio->GetCurrentOperationPlaybackType(),
-                                      input.audio->GetPriorityPlaybackProfile());
-            if (const auto it = settingsCache.find(path); settingsCache.end() != it) {
-                input.audio->SetOutputVolume(utils::getNumericValue<audio::Volume>(it->second));
-            }
-            else {
-                LOG_ERROR("Requested uninitialized DB value %s", path.c_str());
-            }
-        }
+        input.audio->Mute();
     }
 }
 
@@ -742,22 +569,21 @@ bool ServiceAudio::IsBusy()
 sys::MessagePointer ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
 {
     sys::MessagePointer responseMsg;
-    bool isBusy = IsBusy();
+    const auto isBusy = IsBusy();
+    auto &msgType     = typeid(*msgl);
 
-    auto &msgType = typeid(*msgl);
-
-    if (msgType == typeid(AudioNotificationMessage)) {
-        auto *msg = static_cast<AudioNotificationMessage *>(msgl);
-        HandleNotification(msg->type, msg->token);
+    if (msgType == typeid(AudioInternalEOFNotificationMessage)) {
+        auto *msg = static_cast<AudioInternalEOFNotificationMessage *>(msgl);
+        HandleEOF(msg->token);
     }
     else if (msgType == typeid(AudioGetSetting)) {
         auto *msg   = static_cast<AudioGetSetting *>(msgl);
-        auto value  = getSetting(msg->setting, msg->profileType, msg->playbackType);
-        responseMsg = std::make_shared<AudioResponseMessage>(RetCode::Success, utils::getNumericValue<float>(value));
+        auto value  = getSetting(msg->setting, Profile::Type::Idle, msg->playbackType);
+        responseMsg = std::make_shared<AudioResponseMessage>(RetCode::Success, value);
     }
     else if (msgType == typeid(AudioSetSetting)) {
         auto *msg = static_cast<AudioSetSetting *>(msgl);
-        setSetting(msg->setting, msg->val, msg->profileType, msg->playbackType);
+        setSetting(msg->setting, msg->val, Profile::Type::Idle, msg->playbackType);
         responseMsg = std::make_shared<AudioResponseMessage>(RetCode::Success);
     }
     else if (msgType == typeid(AudioStopRequest)) {
@@ -784,10 +610,6 @@ sys::MessagePointer ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sy
         auto *msg   = static_cast<AudioResumeRequest *>(msgl);
         responseMsg = HandleResume(msg->token);
     }
-    else if (msgType == typeid(AudioGetFileTagsRequest)) {
-        auto *msg   = static_cast<AudioGetFileTagsRequest *>(msgl);
-        responseMsg = HandleGetFileTags(msg->fileName);
-    }
     else if (msgType == typeid(AudioEventRequest)) {
         auto *msg   = static_cast<AudioEventRequest *>(msgl);
         responseMsg = HandleSendEvent(msg->getEvent());
@@ -797,11 +619,9 @@ sys::MessagePointer ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sy
         responseMsg = HandleKeyPressed(msg->step);
     }
 
-    auto curIsBusy = IsBusy();
-    if (isBusy != curIsBusy) {
-        auto broadMsg = std::make_shared<AudioNotificationMessage>(
-            curIsBusy ? AudioNotificationMessage::Type::ServiceWakeUp : AudioNotificationMessage::Type::ServiceSleep);
-        bus.sendMulticast(broadMsg, sys::BusChannel::ServiceAudioNotifications);
+    if (const auto curIsBusy = IsBusy(); isBusy != curIsBusy) {
+        curIsBusy ? cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyHz::Level_6)
+                  : cpuSentinel->ReleaseMinimumFrequency();
     }
 
     if (responseMsg) {
@@ -839,12 +659,24 @@ std::string ServiceAudio::getSetting(const Setting &setting,
         }
     }
 
-    if (setting == Setting::EnableVibration || setting == Setting::EnableSound) {
+    switch (setting) {
+    case Setting::EnableVibration:
+    case Setting::EnableSound:
+    case Setting::Sound:
         targetProfile = Profile::Type::Idle;
+        break;
+    case Setting::Volume:
+        if (targetPlayback == PlaybackType::Alarm) {
+            targetProfile = Profile::Type::Idle;
+        }
+        break;
+    case Setting::Gain:
+        break;
     }
 
-    std::string path = dbPath(phoneModeObserver->getCurrentPhoneMode(), setting, targetPlayback, targetProfile);
+    const auto path = dbPath(setting, targetPlayback, targetProfile);
     if (const auto set_it = settingsCache.find(path); settingsCache.end() != set_it) {
+        LOG_INFO("Get audio setting %s = %s", path.c_str(), set_it->second.c_str());
         return set_it->second;
     }
 
@@ -864,18 +696,15 @@ void ServiceAudio::setSetting(const Setting &setting,
 
     std::optional<AudioMux::Input *> activeInput;
 
+    // request changing currently active audio playback
     if (profileType == Profile::Type::Idle && playbackType == PlaybackType::None) {
         if (activeInput = audioMux.GetActiveInput(); activeInput.has_value()) {
             const auto &currentOperation = (*activeInput)->audio->GetCurrentOperation();
             updatedProfile               = currentOperation.GetProfile()->GetType();
             updatedPlayback              = (*activeInput)->audio->GetCurrentOperationPlaybackType();
         }
-        else if (auto input = audioMux.GetIdleInput(); input && (setting == audio::Setting::Volume)) {
-            updatedProfile  = (*input)->audio->GetPriorityPlaybackProfile();
-            updatedPlayback = PlaybackType::CallRingtone;
-            valueToSet      = std::clamp(utils::getNumericValue<audio::Volume>(value), minVolume, maxVolume);
-        }
         else {
+            LOG_DEBUG("%s has not been set - no active playback.", utils::enumToString(setting).c_str());
             return;
         }
     }
@@ -886,7 +715,12 @@ void ServiceAudio::setSetting(const Setting &setting,
         valueToSet              = std::to_string(clampedValue);
         if (activeInput) {
             retCode = activeInput.value()->audio->SetOutputVolume(clampedValue);
+            break;
         }
+        if (updatedPlayback == PlaybackType::Alarm) {
+            updatedProfile = Profile::Type::Idle;
+        }
+        break;
     } break;
     case Setting::Gain: {
         const auto clampedValue = std::clamp(utils::getNumericValue<audio::Gain>(value), minGain, maxGain);
@@ -896,28 +730,25 @@ void ServiceAudio::setSetting(const Setting &setting,
         }
     } break;
     case Setting::EnableVibration:
-    case Setting::EnableSound: {
+    case Setting::EnableSound:
+    case Setting::Sound: {
         updatedProfile = audio::Profile::Type::Idle;
         valueToSet     = value;
     } break;
     }
 
     if (retCode == RetCode::Success) {
-        settingsProvider->setValue(
-            dbPath(phoneModeObserver->getCurrentPhoneMode(), setting, updatedPlayback, updatedProfile), valueToSet);
-        settingsCache[dbPath(phoneModeObserver->getCurrentPhoneMode(), setting, updatedPlayback, updatedProfile)] =
-            valueToSet;
+        settingsProvider->setValue(dbPath(setting, updatedPlayback, updatedProfile), valueToSet);
+        settingsCache[dbPath(setting, updatedPlayback, updatedProfile)] = valueToSet;
     }
 }
 
-const std::pair<audio::Profile::Type, audio::PlaybackType> ServiceAudio::getCurrentContext()
+const audio::Context ServiceAudio::getCurrentContext()
 {
     const auto activeInput = audioMux.GetActiveInput();
     if (!activeInput.has_value()) {
         const auto idleInput = audioMux.GetIdleInput();
-        if (idleInput.has_value()) {
-            return {(*idleInput)->audio->GetPriorityPlaybackProfile(), audio::PlaybackType::CallRingtone};
-        }
+        return {(*idleInput)->audio->GetPriorityPlaybackProfile(), audio::PlaybackType::None};
     }
     auto &audio                  = (*activeInput)->audio;
     const auto &currentOperation = audio->GetCurrentOperation();
@@ -935,4 +766,50 @@ void ServiceAudio::settingsChanged(const std::string &name, std::string value)
         return;
     }
     LOG_ERROR("ServiceAudio::settingsChanged received notification about not registered setting: %s", name.c_str());
+}
+
+void ServiceAudio::onVolumeChanged(Volume volume)
+{
+    const auto [profileType, playbackType] = getCurrentContext();
+    settingsProvider->setValue(dbPath(Setting::Volume, playbackType, profileType), std::to_string(volume));
+    settingsCache[dbPath(Setting::Volume, playbackType, profileType)] = std::to_string(volume);
+    bus.sendMulticast(std::make_shared<VolumeChanged>(volume, std::make_pair(profileType, playbackType)),
+                      sys::BusChannel::ServiceAudioNotifications);
+}
+
+auto ServiceAudio::handleA2DPVolumeChangedOnBluetoothDevice(sys::Message *msgl) -> sys::MessagePointer
+{
+    auto *a2dpMsg = dynamic_cast<A2DPDeviceVolumeChanged *>(msgl);
+    assert(a2dpMsg != nullptr);
+    const auto volume = volume::scaler::a2dp::toSystemVolume(a2dpMsg->getVolume());
+    onVolumeChanged(volume);
+    return sys::msgHandled();
+}
+
+auto ServiceAudio::handleHSPVolumeChangedOnBluetoothDevice(sys::Message *msgl) -> sys::MessagePointer
+{
+    auto *hspMsg = dynamic_cast<HSPDeviceVolumeChanged *>(msgl);
+    assert(hspMsg != nullptr);
+    const auto volume = volume::scaler::hsp::toSystemVolume(hspMsg->getVolume());
+    onVolumeChanged(volume);
+    return sys::msgHandled();
+}
+auto ServiceAudio::handleA2DPAudioPause() -> sys::MessagePointer
+{
+    if (auto input = audioMux.GetPlaybackInput(audio::PlaybackType::Multimedia);
+        input && (*input)->audio->Pause() == RetCode::Success) {
+        bus.sendMulticast(std::make_shared<AudioPausedNotification>((*input)->token),
+                          sys::BusChannel::ServiceAudioNotifications);
+    }
+    return sys::msgHandled();
+}
+
+auto ServiceAudio::handleA2DPAudioStart() -> sys::MessagePointer
+{
+    if (auto input = audioMux.GetPlaybackInput(audio::PlaybackType::Multimedia);
+        input && (*input)->audio->Resume() == RetCode::Success) {
+        bus.sendMulticast(std::make_shared<AudioResumedNotification>((*input)->token),
+                          sys::BusChannel::ServiceAudioNotifications);
+    }
+    return sys::msgHandled();
 }

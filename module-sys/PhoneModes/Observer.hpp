@@ -18,12 +18,21 @@ namespace sys::phone_modes
     class Observer
     {
       public:
-        using OnChangeCallback   = std::function<void(PhoneMode, Tethering)>;
+        using OnPhoneModeChangedCallback = std::function<void(PhoneMode)>;
+        using OnTetheringChangedCallback = std::function<void(Tethering)>;
         using OnCompleteCallback = std::function<void()>;
         using OnErrorCallback    = std::function<void(const std::exception &)>;
+        struct OnFinishedCallbacks
+        {
+            OnCompleteCallback onComplete;
+            OnErrorCallback onError;
+        };
 
         void connect(Service *owner);
-        void subscribe(OnChangeCallback &&onChange,
+        void subscribe(OnPhoneModeChangedCallback &&onChange,
+                       OnCompleteCallback &&onComplete = {},
+                       OnErrorCallback &&onError       = {}) noexcept;
+        void subscribe(OnTetheringChangedCallback &&onChange,
                        OnCompleteCallback &&onComplete = {},
                        OnErrorCallback &&onError       = {}) noexcept;
 
@@ -33,11 +42,12 @@ namespace sys::phone_modes
 
       private:
         sys::MessagePointer handlePhoneModeChange(PhoneModeChanged *message);
-        void onPhoneModeChanged();
+        sys::MessagePointer handleTetheringChange(TetheringChanged *message);
 
-        OnChangeCallback onChangeCallback;
-        OnCompleteCallback onCompleteCallback;
-        OnErrorCallback onErrorCallback;
+        OnPhoneModeChangedCallback onPhoneModeChangedCallback;
+        OnTetheringChangedCallback onTetheringChangedCallback;
+        OnFinishedCallbacks onPhoneModeChangeFinished;
+        OnFinishedCallbacks onTetheringChangeFinished;
         PhoneMode phoneMode     = PhoneMode::Connected;
         Tethering tetheringMode = Tethering::Off;
     };

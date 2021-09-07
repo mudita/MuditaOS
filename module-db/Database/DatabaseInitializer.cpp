@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DatabaseInitializer.hpp"
@@ -8,7 +8,8 @@
 #include <memory>
 #include <set>
 #include <string>
-#include <log/log.hpp>
+#include <sstream>
+#include <log.hpp>
 
 DatabaseInitializer::DatabaseInitializer(Database *db) : db(db)
 {}
@@ -19,10 +20,14 @@ bool DatabaseInitializer::run(std::filesystem::path path, std::string ext)
     std::filesystem::path dbpath = db->getName();
     std::string dbname           = dbpath.filename().replace_extension();
 
-    auto files = listFiles(path, dbname, ext);
-    for (auto file : files) {
+    for (int i = 1;; i++) {
+        auto fname = std::make_unique<std::stringstream>();
+        (*fname) << dbname << "_" << std::setfill('0') << std::setw(3) << i << '.' << ext;
+        auto file = path / fname->str();
         LOG_DEBUG("Runing db script: %s", file.c_str());
         auto commands = readCommands(file);
+        if (commands.empty())
+            break;
         if (!executeOnDb(commands)) {
             LOG_ERROR("Can't initialize database [%s] with [%s]", db->getName().c_str(), file.c_str());
             return false;
@@ -48,6 +53,8 @@ std::string DatabaseInitializer::readContent(const char *filename) const noexcep
 
         std::fclose(fp);
     }
+    else
+        return {};
 
     return std::string(fcontent.get());
 }
@@ -55,6 +62,9 @@ std::string DatabaseInitializer::readContent(const char *filename) const noexcep
 std::vector<std::string> DatabaseInitializer::readCommands(std::filesystem::path filePath)
 {
     auto fileContent = readContent(filePath.c_str());
+    if (fileContent.empty())
+        return {};
+
     std::string currentStatement{};
     std::vector<std::string> statements{};
 

@@ -5,5 +5,6 @@ add_catch2_executable(
         tests-main.cpp
         tests-StatefulController.cpp
     LIBS
+        module-sys
         module-bluetooth
 )

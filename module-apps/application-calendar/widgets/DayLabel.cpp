@@ -1,11 +1,13 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DayLabel.hpp"
-#include "application-calendar/ApplicationCalendar.hpp"
-#include "application-calendar/widgets/CalendarStyle.hpp"
-#include "application-calendar/widgets/MonthBox.hpp"
-#include "application-calendar/data/CalendarData.hpp"
+#include "MonthBox.hpp"
+#include <application-calendar/ApplicationCalendar.hpp>
+#include <application-calendar/data/CalendarData.hpp>
+#include <application-calendar/widgets/CalendarStyle.hpp>
+
+#include <gui/widgets/Image.hpp>
 #include <time/time_conversion.hpp>
 
 namespace gui
@@ -69,17 +71,6 @@ namespace gui
                 this->dayNumber->setFont(style::window::font::medium);
             }
             this->activatedCallback = [=](gui::Item &item) {
-                auto data       = std::make_unique<DayMonthData>();
-                auto month      = actualMonthBox->month;
-                auto dateFilter = actualMonthBox->monthFilterValue.year() / actualMonthBox->monthFilterValue.month() /
-                                  date::day(numb);
-                auto filter = TimePointFromYearMonthDay(dateFilter);
-                data->setData(number + " " + month, filter);
-                LOG_DEBUG("Switch to DayEventsWindow");
-                if (auto calendarApp = dynamic_cast<app::ApplicationCalendar *>(app); calendarApp != nullptr) {
-                    calendarApp->setEquivalentToEmptyWindow(EquivalentWindow::DayEventsWindow);
-                }
-                app->switchWindow(style::window::calendar::name::day_events_window, std::move(data));
                 return true;
             };
             this->setPenWidth(style::window::default_border_no_focus_w);

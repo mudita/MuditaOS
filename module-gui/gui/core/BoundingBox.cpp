@@ -1,22 +1,15 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BoundingBox.hpp"
 #include <limits>
 #include <sstream>
 #include <limits>
+#include <module-gui/gui/Common.hpp>
 
 namespace gui
 {
-    const uint16_t BoundingBox::zero_size = 0;
-    const uint16_t BoundingBox::max_size  = std::numeric_limits<uint16_t>().max();
-    const uint16_t BoundingBox::min_size  = std::numeric_limits<uint16_t>().min();
-
-    const int16_t BoundingBox::zero_position = 0;
-    const int16_t BoundingBox::max_position  = std::numeric_limits<int16_t>().max();
-    const int16_t BoundingBox::min_position  = std::numeric_limits<int16_t>().min();
-
-    BoundingBox::BoundingBox(int32_t x, int32_t y, uint32_t w, uint32_t h)
+    BoundingBox::BoundingBox(Position x, Position y, Length w, Length h)
     {
         this->x = x;
         this->y = y;
@@ -81,13 +74,13 @@ namespace gui
 
     void BoundingBox::clear()
     {
-        x = 0;
-        y = 0;
-        w = 0;
-        h = 0;
+        x = zero_position;
+        y = zero_position;
+        w = zero_size;
+        h = zero_size;
     }
 
-    uint16_t BoundingBox::size(gui::Axis axis) const
+    Length BoundingBox::size(gui::Axis axis) const
     {
         if (axis == Axis::X)
             return w;
@@ -95,7 +88,7 @@ namespace gui
             return h;
     }
 
-    int16_t BoundingBox::pos(gui::Axis axis) const
+    Position BoundingBox::pos(gui::Axis axis) const
     {
         if (axis == Axis::X)
             return x;

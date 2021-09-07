@@ -3,19 +3,13 @@
 
 #include "service-desktop/DesktopMessages.hpp"
 #include "parser/MessageHandler.hpp"
+#include <module-bluetooth/Bluetooth/Device.hpp>
 
 namespace sdesktop
 {
     using namespace parserFSM;
     namespace developerMode
     {
-
-        ATResponseEvent::ATResponseEvent(std::vector<std::string> resp)
-        {
-            context.setResponseStatus(http::Code::OK);
-            context.setEndpoint(EndpointType::developerMode);
-            context.setResponseBody(json11::Json::object{{json::developerMode::ATResponse, resp}});
-        }
 
         AppFocusChangeEvent::AppFocusChangeEvent(std::string appName)
         {
@@ -28,7 +22,7 @@ namespace sdesktop
         {
             context.setResponseStatus(http::Code::OK);
             context.setEndpoint(EndpointType::developerMode);
-            context.setResponseBody(json11::Json::object{{json::developerMode::isLocked, isLocked}});
+            context.setResponseBody(json11::Json::object{{json::developerMode::phoneLocked, isLocked}});
         }
 
         CellularStateInfoRequestEvent::CellularStateInfoRequestEvent(std::string stateStr)
@@ -37,26 +31,25 @@ namespace sdesktop
             context.setEndpoint(EndpointType::developerMode);
             context.setResponseBody(json11::Json::object{{json::developerMode::cellularStateInfo, stateStr}});
         }
+
+        CellularSleepModeInfoRequestEvent::CellularSleepModeInfoRequestEvent(bool isInSleepMode)
+        {
+            context.setResponseStatus(http::Code::OK);
+            context.setEndpoint(EndpointType::developerMode);
+            context.setResponseBody(json11::Json::object{{json::developerMode::cellularSleepModeInfo, isInSleepMode}});
+        }
     } // namespace developerMode
-    namespace bluetooth
+
+    namespace usb
     {
-        BluetoothStatusRequestEvent::BluetoothStatusRequestEvent(int state)
+        USBConfigured::USBConfigured(USBConfigurationType configurationType)
+            : sys::DataMessage(MessageType::USBConfigured), configurationType(configurationType)
+        {}
+
+        USBConfigurationType USBConfigured::getConfigurationType() const noexcept
         {
-            context.setResponseStatus(http::Code::OK);
-            context.setEndpoint(EndpointType::bluetooth);
-            context.setResponseBody(json11::Json::object{{json::bluetooth::state, state}});
+            return configurationType;
         }
-        ScanStartedEvent::ScanStartedEvent()
-        {
-            context.setResponseStatus(http::Code::OK);
-            context.setEndpoint(EndpointType::bluetooth);
-            context.setResponseBody(json11::Json::object{{json::bluetooth::scan, json::bluetooth::btOn}});
-        }
-        ScanStoppedEvent::ScanStoppedEvent()
-        {
-            context.setResponseStatus(http::Code::OK);
-            context.setEndpoint(EndpointType::bluetooth);
-            context.setResponseBody(json11::Json::object{{json::bluetooth::scan, json::bluetooth::btOff}});
-        }
-    } // namespace bluetooth
+    } // namespace usb
+
 } // namespace sdesktop

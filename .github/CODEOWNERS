@@ -5,61 +5,18 @@
 #    example `dir     @owner` means whole only dir **without subdirs**
 # 3. starting dir from `/` means `from root dir` whereas without means `all such catalogs` (like we would do with extglob `**/`
 # 4. Sub groups are marked from organization, not group so we don't have `@mudita/os/embedded-abs` but `@mudita/embedded-abs`
-#
-# CODEOWNERS for teams have some issues: https://github.community/t/codeowners-works-with-users-but-not-teams/733
 
-\.github @pholat @rwicik @alekrudnik
+/.github/CODEOWNERS                         @mudita/chapter-leads
 
-# all `os` devs are codeovners
-* @mudita/os
+# bsp
+/board                                      @mudita/chapter-bsp
+/module-bsp                                 @mudita/chapter-bsp
 
-#documents
-*.md                                        @wojtekidd
-/doc                                        @wojtekidd
+# build system
+/CMakeLists.txt                             @mudita/chapter-bsp
+/third-party/CMakeLists.txt                 @mudita/chapter-bsp
+/module-utils/CMakeLists.txt                @mudita/chapter-bsp
+/cmake                                      @mudita/chapter-bsp
+/test/CMakeLists.txt                        @mudita/chapter-bsp
+/module-services/service-desktop            @mudita/embedded-centerpure
 
-#modules
-/module-audio                               @hubert-chrzaniuk @jimmorrisson @alekrudnik
-/module-bluetooth                           @SP2FET
-/module-bsp                                 @grzyw-o-mat @SzMrMdt
-/module-cellular                            @kkleczkowski @alekrudnik
-/module-db                                  @mudita/embedded-abs @pholat @PrzeBrudny
-/module-gui                                 @PrzeBrudny @pholat @mozdzyk
-/module-utils                               @alekrudnik @mpsm @piotr-tanski
-/module-utils/PhoneNumber.*                 @mpsm
-/module-vfs                                 @lucckb @alekrudnik @rkubiak01 @SzMrMdt
-/module_services                            @alekrudnik
-
-#system
-/module-bsp/board/rt1051/bsp/audio          @mpsm @alekrudnik
-/module-os                                  @mpsm
-/module-sys                                 @mpsm @alekrudnik
-/module-sys/Service                         @pholat
-
-#services
-/module_services/service-antenna            @kkleczkowski
-/module-services/service-appmgr             @pholat @piotr-tanski
-/module_services/service-audio              @hubert-chrzaniuk @jimmorrisson
-/module_services/service-cellular           @kkleczkowski
-/module-services/service-db                 @mudita/embedded-abs @PrzeBrudny
-/module-services/service-desktop            @SP2FET @rkubiak01
-/module_services/service-file-indexer       @lucckb
-
-#apps
-/module-apps                                @piotr-tanski @pholat @PrzeBrudny
-/module-apps/application-calendar           @PrzeBrudny @pholat @alekrudnik
-/module-apps/application-call               @alekrudnik
-/module-apps/application-calllog            @mudita/embedded-abs
-/module-apps/application-messages           @PrzeBrudny
-/module-apps/application-music-player       @alekrudnik
-/module-apps/application-phonebook          @mudita/embedded-abs @PrzeBrudny
-/module-apps/application-settings-new       @mudita/embedded-abs
-/module-apps/application-settings           @mudita/embedded-abs
-
-#build system
-*.cmake                                     @rwicik @mpsm
-*.sh                                        @pholat @rwicik @lucckb
-\.gitmodules                                 @mpsm @rwicik
-/board/rt1051/ldscripts                     @mpsm
-/config                                     @rwicik @rkubiak01
-/docker                                     @rwicik
-CMakeLists.txt                              @rwicik @mpsm

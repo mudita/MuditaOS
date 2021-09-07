@@ -25,10 +25,12 @@ namespace sys
 
         [[nodiscard]] auto GetName() const noexcept -> std::string;
         void HoldMinimumFrequency(bsp::CpuFrequencyHz frequencyToHold);
+        void ReleaseMinimumFrequency();
         void CpuFrequencyHasChanged(bsp::CpuFrequencyHz newFrequency);
 
       protected:
         const std::string name;
+        bsp::CpuFrequencyHz currentFrequencyToHold{bsp::CpuFrequencyHz::Level_1};
         sys::Service *owner{nullptr};
 
         /// function called from the PowerManager context

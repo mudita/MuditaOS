@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ContactDetailsModel.hpp"
@@ -16,7 +16,7 @@ ContactDetailsModel::ContactDetailsModel(app::Application *app) : application(ap
 
 void ContactDetailsModel::clearData()
 {
-    list->clear();
+    list->reset();
     eraseInternalData();
 }
 
@@ -25,7 +25,7 @@ auto ContactDetailsModel::requestRecordsCount() -> unsigned int
     return internalData.size();
 }
 
-auto ContactDetailsModel::getMinimalItemHeight() const -> unsigned int
+auto ContactDetailsModel::getMinimalItemSpaceRequired() const -> unsigned int
 {
     return phonebookStyle::outputLinesTextWithLabelWidget::h;
 }

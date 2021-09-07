@@ -29,16 +29,17 @@ INSTALL_PACKAGES="
         build-essential \
         ca-certificates \
         ccache \
-        clang-format-10 \
-        clang-tidy \
+        clang-format-12 \
+        clang-tidy-12 \
         curl \
         doxygen \
         g++-10 \
         gcc-10 \
+        gdb \
         git \
         gnupg2 \
         graphviz \
-        gtkmm-3.0 \
+        libgtkmm-3.0-dev \
         libblkid-dev 
         libfdisk-dev \
         libfuse-dev \
@@ -52,6 +53,7 @@ INSTALL_PACKAGES="
         python3-pip \
         python3-requests \
         rhash \
+        rsync \
         tzdata \
         tar \
         vim \

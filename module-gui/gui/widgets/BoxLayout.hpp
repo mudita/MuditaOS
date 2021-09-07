@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -9,7 +9,7 @@
 #include "Rect.hpp"
 #include <Alignment.hpp>
 #include "LayoutSizeStore.hpp"
-#include "log/log.hpp"
+#include <log.hpp>
 
 namespace gui
 {
@@ -116,12 +116,14 @@ namespace gui
         /// callback for situaton when we reached top/bottom/left/right of box
         /// if we want to do sth special (i.e. request new items)
         std::function<bool(const InputEvent &inputEvent)> borderCallback = nullptr;
-        // set focus on specified box element
+        /// set focus on specified box element
         bool setFocusOnElement(unsigned int elementNumber);
         void setFocusOnLastElement();
-        template <Axis axis>
-        auto handleRequestResize(const Item *, unsigned short request_w, unsigned short request_h) -> Size;
+        template <Axis axis> auto handleRequestResize(const Item *, Length request_w, Length request_h) -> Size;
         auto onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool override;
+        /// Get primary sizes used in axis dominant layouts
+        Length getPrimarySizeLeft();
+        Length getPrimarySize();
     };
 
     class HBox : public BoxLayout
@@ -132,8 +134,7 @@ namespace gui
         HBox(Item *parent, const uint32_t &x = 0, const uint32_t &y = 0, const uint32_t &w = 0, const uint32_t &h = 0);
         virtual ~HBox() = default;
         virtual void addWidget(Item *item) override;
-        auto handleRequestResize(const Item *, unsigned short request_w, unsigned short request_h) -> Size override;
-        Length getSizeLeft();
+        auto handleRequestResize(const Item *, Length request_w, Length request_h) -> Size override;
     };
 
     class VBox : public BoxLayout
@@ -144,8 +145,7 @@ namespace gui
         VBox(Item *parent, const uint32_t &x = 0, const uint32_t &y = 0, const uint32_t &w = 0, const uint32_t &h = 0);
         virtual ~VBox() = default;
         virtual void addWidget(Item *item) override;
-        auto handleRequestResize(const Item *, unsigned short request_w, unsigned short request_h) -> Size override;
-        Length getSizeLeft();
+        auto handleRequestResize(const Item *, Length request_w, Length request_h) -> Size override;
     };
 
 } /* namespace gui */

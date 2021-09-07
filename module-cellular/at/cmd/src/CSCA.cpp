@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <log/log.hpp>
+#include <log.hpp>
 #include <memory>
 #include <string>
 #include <type_traits>
@@ -17,30 +17,29 @@ namespace at
         CSCA::CSCA() noexcept : CSCA(at::cmd::Modifier::None)
         {}
 
-        result::CSCA &CSCA::parse(Result &base_result)
+        result::CSCA CSCA::parseCSCA(const Result &base_result)
         {
-            auto *p = new result::CSCA(base_result);
-            result  = std::unique_ptr<result::CSCA>(p);
+            result::CSCA p{base_result};
             // use parent operator bool
-            if (p->Result::operator bool()) {
-                if (p->response.empty()) {
+            if (p.Result::operator bool()) {
+                if (p.response.empty()) {
                     LOG_ERROR("Can't parse - empty response");
-                    p->code = result::CSCA::Code::PARSING_ERROR;
+                    p.code = result::CSCA::Code::PARSING_ERROR;
                 }
                 else {
-                    auto str = p->response[0];
+                    auto str = p.response[0];
                     str.erase(std::remove(str.begin(), str.end(), ' '), str.end());
-                    auto pos            = str.find(":");
-                    auto end            = str.find(",");
-                    p->smsCenterAddress = std::string(str, pos + 1, end - pos - 1);
-                    p->smsTypeOfAddress = std::string(str, end + 1);
-                    if (p->smsCenterAddress.empty() || p->smsTypeOfAddress.empty()) {
+                    auto pos           = str.find(":");
+                    auto end           = str.find(",");
+                    p.smsCenterAddress = std::string(str, pos + 1, end - pos - 1);
+                    p.smsTypeOfAddress = std::string(str, end + 1);
+                    if (p.smsCenterAddress.empty() || p.smsTypeOfAddress.empty()) {
                         LOG_ERROR("Can't parse - bad value");
-                        p->code = result::CSCA::Code::PARSING_ERROR;
+                        p.code = result::CSCA::Code::PARSING_ERROR;
                     }
                 }
             }
-            return *p;
+            return p;
         }
 
         void CSCA::set(const utils::PhoneNumber::View &smsCenterAddress, int smsTypeOfAddress)

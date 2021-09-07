@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bsp/keyboard/key_codes.hpp>
+#include <hal/key_input/KeyEventDefinitions.hpp>
 
 #include <cstdint>
 #include <optional>
@@ -39,6 +39,7 @@ namespace bsp
 
         bsp::KeyCodes parse(const Measurements &measurements);
         std::optional<bsp::KeyCodes> WorkerEventHandler();
+        void resetCurrentParsedValue();
 
         BaseType_t IRQHandler();
         void enableIRQ();

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -12,11 +12,11 @@ namespace app::notes
     class NoteSwitchData : public gui::SwitchData
     {
       public:
-        explicit NoteSwitchData(NotesRecord record);
+        explicit NoteSwitchData(std::shared_ptr<NotesRecord> record);
 
-        const NotesRecord &getRecord() const noexcept;
+        std::shared_ptr<NotesRecord> getRecord() noexcept;
 
       private:
-        NotesRecord record;
+        std::shared_ptr<NotesRecord> record = nullptr;
     };
 } // namespace app::notes

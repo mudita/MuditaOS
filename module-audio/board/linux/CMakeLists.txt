@@ -3,6 +3,7 @@
 
 set(AUDIO_LINUX_SOURCES
 	LinuxAudioPlatform.cpp
+	LinuxAudioDevice.cpp
 )
 
 add_library(${AUDIO_BOARD_LIBRARY} STATIC ${AUDIO_LINUX_SOURCES})

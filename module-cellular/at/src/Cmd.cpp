@@ -23,7 +23,7 @@ namespace at
         *this = operator=(p);
     }
 
-    void Cmd::split(const std::string &str, Result &result) const
+    void Cmd::split(const std::string &str, Result &result)
     {
         constexpr char tokenDelimiter = ',';
 
@@ -61,37 +61,37 @@ namespace at
         return *this;
     }
 
-    Result &Cmd::parse(Result &that)
+    Result Cmd::parseBase(const Result &that)
     {
-        result = std::make_unique<Result>(that);
-        if (result->code != Result::Code::OK) {
-            return *result;
+        auto result = that;
+        if (result.code != Result::Code::OK) {
+            return result;
         }
-        else if (result->response.empty()) {
+        else if (result.response.empty()) {
             LOG_ERROR("Can't parse - empty response");
-            result->code = Result::Code::PARSING_ERROR;
-            return *result;
+            result.code = Result::Code::PARSING_ERROR;
+            return result;
         }
-        else if (result->response.size() == 1) {
-            if (result->response[0] == "OK") {
+        else if (result.response.size() == 1) {
+            if (result.response[0] == "OK") {
                 LOG_INFO("OK response");
-                result->code = Result::Code::OK;
-                return *result;
+                result.code = Result::Code::OK;
+                return result;
             }
             LOG_ERROR("Can't parse - response not valid");
-            result->code = Result::Code::ERROR;
-            return *result;
+            result.code = Result::Code::ERROR;
+            return result;
         }
         const char headDelimiter = ':';
-        const auto atResponse    = result->response;
+        const auto atResponse    = result.response;
         const auto lastPosition  = atResponse.end() - 1;
         for (auto it = atResponse.begin(); it != lastPosition; it++) {
             auto prefixIter = std::find(it->begin(), it->end(), headDelimiter);
             auto head       = std::string(it->begin(), prefixIter);
             auto body       = std::string(prefixIter == it->end() ? it->begin() : prefixIter + 1, it->end());
-            split(body, *result);
+            split(body, result);
         }
 
-        return *result;
+        return result;
     }
 } // namespace at

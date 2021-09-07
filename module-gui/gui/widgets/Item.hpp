@@ -1,10 +1,10 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include "Alignment.hpp"        // for Alignment
-#include "Axes.hpp"             // for Axis
+#include "Alignment.hpp" // for Alignment
+#include "Axes.hpp"      // for Axis
 #include <module-gui/gui/Common.hpp>
 #include "Layout.hpp"           // for LayoutHorizontalPolicy, LayoutVertic...
 #include "Margins.hpp"          // for Padding, Margins
@@ -16,6 +16,7 @@
 #include <utility>              // for move
 #include <core/DrawCommandForward.hpp>
 #include <module-gui/gui/widgets/visitor/GuiVisitor.hpp>
+#include <module-sys/Timers/Timer.hpp>
 
 namespace gui
 {
@@ -25,10 +26,6 @@ namespace gui
 {
     class Navigation;
 } // namespace gui
-namespace gui
-{
-    class Timer;
-}
 
 namespace gui
 {
@@ -116,9 +113,9 @@ namespace gui
         /// policy for changing horizontal size if Item is placed inside layout.
         LayoutHorizontalPolicy horizontalPolicy;
         /// Maximum height to which Layout base widget can scale current widget.
-        uint16_t maxHeight;
+        Length maxHeight;
         /// Maximum width to which Layout base widget can scale current widget.
-        uint16_t maxWidth;
+        Length maxWidth;
 
         /// @defgroup callbacks     Item callback functions
         /// callback functors are meant to emulate signal <-> slot actions where you bind element instance to in code
@@ -147,7 +144,7 @@ namespace gui
         /// callback when timer is called on Item and onTimer is executed
         /// @param `this` : item
         /// @param `timer` : which triggered this callback
-        std::function<bool(Item &, Timer &)> timerCallback = nullptr;
+        std::function<bool(Item &, sys::Timer &)> timerCallback = nullptr;
 
         /// callback on navigation, called when item passes navigation to handle by its children
         /// @param `InputEvent` : input event e.g. key pressed
@@ -197,7 +194,7 @@ namespace gui
         virtual bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim);
         /// called on Timer event in application, triggeres timerCallback
         /// @param : timer timer element which triggered this action
-        virtual bool onTimer(Timer &timer);
+        virtual bool onTimer(sys::Timer &timer);
 
         /// @}
 
@@ -227,17 +224,17 @@ namespace gui
         /// @param sizeOnAxis : new size for selected axis
         /// @param sizeOnOrthogonalAxis : new size for orthogonal axis to selected
         void setAreaInAxis(Axis axis,
-                           uint32_t posOnAxis,
-                           uint32_t posOnOrthogonalAxis,
-                           uint32_t sizeOnAxis,
-                           uint32_t sizeOnOrthogonalAxis);
+                           Position posOnAxis,
+                           Position posOnOrthogonalAxis,
+                           Length sizeOnAxis,
+                           Length sizeOnOrthogonalAxis);
         /// sets position of element - this is sets area().x and area().y of item
         /// @note calls onDimensionChanged callback & updateDrawArea for item
         /// @attention should be bind to area
-        virtual void setPosition(const short &x, const short &y);
-        virtual void setPosition(const short &val, Axis axis);
-        [[nodiscard]] uint16_t getSize(Axis axis) const;
-        [[nodiscard]] uint16_t getPosition(Axis axis) const;
+        virtual void setPosition(const Position &x, const Position &y);
+        virtual void setPosition(const Position &val, Axis axis);
+        [[nodiscard]] Length getSize(Axis axis) const;
+        [[nodiscard]] Position getPosition(Axis axis) const;
         virtual void setMargins(const Margins &value);
         [[nodiscard]] Margins getMargins();
         virtual void setPadding(const Padding &value);
@@ -249,7 +246,7 @@ namespace gui
         /// @param axis : selected axis (X or Y)
         /// @param itemSize : size of item on selected axis for this calculation
         /// @return alignment for selected axis.
-        [[nodiscard]] virtual uint16_t getAxisAlignmentValue(Axis axis, uint16_t itemSize);
+        [[nodiscard]] virtual Length getAxisAlignmentValue(Axis axis, Length itemSize);
 
         /// @defgroup size_range_setters Named the same way that are in QT minimum/maximum sizes setters
         ///
@@ -258,20 +255,20 @@ namespace gui
         /// 2. doesn't trigger any callbacks
         /// @note we can consider calling callback when setMinimum/Maximum exceeds normal size
         /// @{
-        void setMaximumSize(uint32_t val, Axis axis);
-        void setMaximumWidth(uint32_t w);
-        void setMaximumHeight(uint32_t h);
-        void setMaximumSize(uint32_t w, uint32_t h);
-        void setMinimumSize(uint32_t val, Axis axis);
-        void setMinimumSize(uint32_t w, uint32_t h);
-        void setMinimumWidth(uint32_t w);
-        void setMinimumHeight(uint32_t h);
+        void setMaximumSize(Length val, Axis axis);
+        void setMaximumWidth(Length w);
+        void setMaximumHeight(Length h);
+        void setMaximumSize(Length w, Length h);
+        void setMinimumSize(Length val, Axis axis);
+        void setMinimumSize(Length w, Length h);
+        void setMinimumWidth(Length w);
+        void setMinimumHeight(Length h);
         /// @}
 
         /// requests bigger size from parent if parent available
         /// if no parent available - sets size
         /// @return true if handled positively
-        virtual auto requestSize(unsigned short request_w, unsigned short request_h) -> Size final;
+        virtual auto requestSize(Length request_w, Length request_h) -> Size final;
         /// handle for layouts to implement to resize on demand ( i.e. when it needs to expand after
         /// addition/removal of chars )
         ///
@@ -285,10 +282,10 @@ namespace gui
         /// should be handled without infinite loop on resize ( item->setSize -> notify Layout -> layout: item->setSize
         /// )
         /// @return bool requested size granted {w,h}
-        virtual auto handleRequestResize(const Item *, unsigned short request_w, unsigned short request_h) -> Size;
+        virtual auto handleRequestResize(const Item *, Length request_w, Length request_h) -> Size;
 
-        virtual void setSize(const unsigned short w, const unsigned short h);
-        void setSize(uint32_t val, Axis axis);
+        virtual void setSize(Length w, Length h);
+        void setSize(Length val, Axis axis);
         virtual void setBoundingBox(const BoundingBox &new_box);
         /// entry function to create commands to execute in renderer to draw on screen
         /// @note we should consider lazy evaluation prior to drawing on screen, rather than on each resize of elements
@@ -304,7 +301,7 @@ namespace gui
         /// pre hook function, if set it is executed before building draw command
         /// at Item::buildDrawListImplementation()
         /// @param `commandlist` : commands list of commands for renderer to draw elements on screen
-        std::function<void(std::list<Command> &)> preBuildDrawListHook  = nullptr;
+        std::function<void(std::list<Command> &)> preBuildDrawListHook = nullptr;
         /// post hook function, if set it is executed after building draw command
         /// at Item::buildDrawListImplementation()
         /// @param `commandlist` : commands list of commands for renderer to draw elements on screen
@@ -336,39 +333,39 @@ namespace gui
         /// all these elements should be checked for naming/use consistency
         /// possibly all of that should be handled via area() (and area should have callback pinned from Item on resize
         /// @{
-        void setX(const int32_t x);
-        void setY(const int32_t y);
-        [[nodiscard]] int32_t getX() const
+        void setX(const Position x);
+        void setY(const Position y);
+        [[nodiscard]] Position getX() const
         {
             return (widgetArea.x);
         }
-        [[nodiscard]] int32_t getY() const
+        [[nodiscard]] Position getY() const
         {
             return (widgetArea.y);
         }
-        [[nodiscard]] uint32_t getWidth() const
+        [[nodiscard]] gui::Length getWidth() const
         {
             return (widgetArea.w);
         }
-        [[nodiscard]] uint32_t getHeight() const
+        [[nodiscard]] gui::Length getHeight() const
         {
             return (widgetArea.h);
         }
         /// helper function to show where widget ends in x axis
         /// @return item ends position in X axis
-        [[nodiscard]] int32_t offset_w() const
+        [[nodiscard]] Position offset_w() const
         {
             return getWidth() + widgetArea.x;
         }
         /// helper function to show where widget ends in y axis
         /// @return item ends position in Y axis
-        [[nodiscard]] int32_t offset_h() const
+        [[nodiscard]] Position offset_h() const
         {
             return getHeight() + widgetArea.y;
         }
         /// helper function to show where widget ends in selected axis
         /// @return item ends position in selected axis
-        [[nodiscard]] int32_t getOffset(Axis axis) const
+        [[nodiscard]] Position getOffset(Axis axis) const
         {
             return this->widgetArea.size(axis) + this->widgetArea.pos(axis);
         };
@@ -378,13 +375,13 @@ namespace gui
         /// @note this is needed so that timer for element would live as long as element lives.
         /// @details Timers can be attached to Item
         /// in order to pass on an ownership of timer to application/widget which uses its functionalities.
-        void attachTimer(std::unique_ptr<Timer> &&timer)
+        void attachTimer(sys::Timer *timer)
         {
-            timers.emplace_back(std::move(timer));
+            timers.push_back(timer);
         }
 
         /// remove timer from item and as a result - destory it.
-        void detachTimer(Timer &timer);
+        void detachTimer(sys::Timer &timer);
 
         /// simple check function to determine if item is active && visible.
         /// @return true if item is active and visible. Otherwise false.
@@ -407,7 +404,7 @@ namespace gui
 
       private:
         /// list of attached timers to item.
-        std::list<std::unique_ptr<Timer>> timers;
+        std::list<sys::Timer *> timers;
     };
     /// gets navigation direction (LEFT,RIGHT,UP,DOWN) based on incoming input event
     /// @param[in] evt : input event e.g. key pressed

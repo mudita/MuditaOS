@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <application-phonebook/ApplicationPhonebook.hpp>
@@ -97,11 +97,8 @@ auto PhonebookModel::updateRecords(std::vector<ContactRecord> records) -> bool
 #if DEBUG_DB_MODEL_DATA == 1
     LOG_DEBUG("Offset: %" PRIu32 ", Limit: %" PRIu32 " Count:%" PRIu32 "", offset, limit, count);
     for (uint32_t i = 0; i < records->size(); ++i) {
-        LOG_DEBUG("id: %" PRIu32 ", name: %s %s, fav: %d",
-                  records.get()->operator[](i).ID,
-                  records.get()->operator[](i).primaryName.c_str(),
-                  records.get()->operator[](i).alternativeName.c_str(),
-                  records.get()->operator[](i).isOnFavourites());
+        LOG_DEBUG(
+            "id: %" PRIu32 ", fav: %d", records.get()->operator[](i).ID, records.get()->operator[](i).isOnFavourites());
     }
 #endif
 
@@ -111,7 +108,7 @@ auto PhonebookModel::updateRecords(std::vector<ContactRecord> records) -> bool
     return true;
 }
 
-auto PhonebookModel::getMinimalItemHeight() const -> unsigned int
+auto PhonebookModel::getMinimalItemSpaceRequired() const -> unsigned int
 {
     return phonebookStyle::contactItem::h;
 }
@@ -144,14 +141,13 @@ auto PhonebookModel::getItem(gui::Order order) -> gui::ListItem *
         if (messagesSelectCallback) {
             return false;
         }
-        if (event.state != gui::InputEvent::State::keyReleasedShort) {
-            return false;
-        }
-        if (event.keyCode == gui::KeyCode::KEY_LF) {
+        if (event.isShortRelease(gui::KeyCode::KEY_LF)) {
             if (item->contact && !item->contact->numbers.empty()) {
                 const auto phoneNumber = item->contact->numbers.front().number;
-                return app::manager::Controller::sendAction(
-                    application, app::manager::actions::Dial, std::make_unique<app::ExecuteCallData>(phoneNumber));
+                return app::manager::Controller::sendAction(application,
+                                                            app::manager::actions::Call,
+                                                            std::make_unique<app::ExecuteCallData>(phoneNumber),
+                                                            app::manager::OnSwitchBehaviour::RunInBackground);
             }
         }
         return false;

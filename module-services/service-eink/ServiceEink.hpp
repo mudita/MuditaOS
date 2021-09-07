@@ -6,9 +6,9 @@
 #include <Service/Common.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
-#include <Service/Timer.hpp>
-#include <Service/CpuSentinel.hpp>
+#include <Timers/TimerHandle.hpp>
 
+#include "EinkSentinel.hpp"
 #include "EinkDisplay.hpp"
 
 #include <service-db/DBServiceName.hpp>
@@ -28,6 +28,7 @@ namespace service::eink
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *response) override;
         sys::ReturnCodes InitHandler() override;
         sys::ReturnCodes DeinitHandler() override;
+        void ProcessCloseReason(sys::CloseReason closeReason) override;
         sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override;
 
       private:
@@ -55,19 +56,14 @@ namespace service::eink
         EinkStatus_e refreshDisplay(::gui::RefreshModes refreshMode);
         EinkStatus_e updateDisplay(uint8_t *frameBuffer, ::gui::RefreshModes refreshMode);
 
-        // function called from the PowerManager context
-        // to update resources immediately
-        // critical section or mutex support necessary
-        void updateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyHz newFrequency);
-
         sys::MessagePointer handleEinkModeChangedMessage(sys::Message *message);
         sys::MessagePointer handleImageMessage(sys::Message *message);
         sys::MessagePointer handlePrepareEarlyRequest(sys::Message *message);
 
         EinkDisplay display;
         State currentState;
-        std::unique_ptr<sys::Timer> displayPowerOffTimer;
-        std::shared_ptr<sys::CpuSentinel> cpuSentinel;
+        sys::TimerHandle displayPowerOffTimer;
+        std::shared_ptr<EinkSentinel> eInkSentinel;
     };
 } // namespace service::eink
 

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "common.hpp"
 #include <catch2/catch.hpp>
 
 #include <Databases/ContactsDB.hpp>
@@ -26,10 +27,8 @@ TEST_CASE("Contact Groups tests")
 {
     INFO("sqlite Init");
     Database::initialize();
-    const auto contactsPath = (std::filesystem::path{"user"} / "contacts.db");
-    if (std::filesystem::exists(contactsPath)) {
-        REQUIRE(std::filesystem::remove(contactsPath));
-    }
+    const auto contactsPath = (std::filesystem::path{"sys/user"} / "contacts.db");
+    RemoveDbFiles(contactsPath.stem());
 
     ContactsDB contactDb{contactsPath.c_str()};
     INFO("contactDB init");
@@ -172,7 +171,7 @@ TEST_CASE("Contact Groups tests")
 void addSomeContacts(ContactsDB &contactsDb)
 {
     ContactsTableRow testRow1 = {
-        {.ID = 0}, .nameID = 0, .numbersID = "0 1 2 3 4", .ringID = 0, .addressID = 0, .speedDial = "666"
+        Record(0), .nameID = 0, .numbersID = "0 1 2 3 4", .ringID = 0, .addressID = 0, .speedDial = "666"
 
     };
 

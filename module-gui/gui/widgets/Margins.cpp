@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /*
@@ -14,7 +14,7 @@
 namespace gui
 {
 
-    short Margins::getSumInAxis(gui::Axis axis) const
+    Position Margins::getSumInAxis(gui::Axis axis) const
     {
         switch (axis) {
         case Axis::X:
@@ -26,7 +26,7 @@ namespace gui
         }
     }
 
-    short Margins::getMarginInAxis(Axis axis, MarginInAxis pos) const
+    Position Margins::getMarginInAxis(Axis axis, MarginInAxis pos) const
     {
         switch (axis) {
 

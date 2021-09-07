@@ -263,7 +263,7 @@ class Thread {
             return Name;
         }
 #else
-        inline char* GetName()
+        inline char* GetName() const
         {
             return pcTaskGetName(handle);
         }

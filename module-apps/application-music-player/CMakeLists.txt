@@ -1,25 +1,54 @@
-﻿
-include_directories( ${CMAKE_PROJECT_NAME}
+﻿# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+# For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+add_library(application-music-player STATIC)
+
+target_include_directories(application-music-player
+    PRIVATE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     PUBLIC
-        "${CMAKE_CURRENT_LIST_DIR}"
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
 
-target_sources( ${PROJECT_NAME}
-
+target_sources(application-music-player
     PRIVATE
-        "${CMAKE_CURRENT_LIST_DIR}/ApplicationMusicPlayer.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/windows/MusicPlayerAllSongsWindow.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/windows/MusicPlayerEmptyWindow.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/widgets/SongItem.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/widgets/Action.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/models/SongsModel.cpp"
-        
+        ApplicationMusicPlayer.cpp
+        AudioNotificationsHandler.cpp
+        models/SongContext.cpp
+        models/SongsModel.cpp
+        models/SongsRepository.cpp
+        presenters/SongsPresenter.cpp
+        widgets/Action.cpp
+        widgets/SongItem.cpp
+        windows/MusicPlayerAllSongsWindow.cpp
+    PRIVATE
+        AudioNotificationsHandler.hpp
+        data/MusicPlayerStyle.hpp
+        models/SongContext.hpp
+        models/SongsModel.hpp
+        models/SongsRepository.hpp
+        models/SongsModelInterface.hpp
+        presenters/SongsPresenter.hpp
+        widgets/Action.hpp
+        widgets/SongItem.hpp
+        windows/MusicPlayerAllSongsWindow.hpp
     PUBLIC
-        "${CMAKE_CURRENT_LIST_DIR}/ApplicationMusicPlayer.hpp"
+        include/application-music-player/ApplicationMusicPlayer.hpp
 )
-target_link_libraries(${PROJECT_NAME}
+
+target_link_libraries(application-music-player
     PRIVATE
+        i18n
+        log
+        module-gui
         service-audio
+        time
+    PUBLIC
+        apps-common
         module-audio
+        tagsfetcher
 )
+
+if (${ENABLE_TESTS})
+    add_subdirectory(tests)
+endif()

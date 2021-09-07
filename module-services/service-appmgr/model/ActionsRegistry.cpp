@@ -1,10 +1,10 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <service-appmgr/model/ActionsRegistry.hpp>
+#include "ActionsRegistry.hpp"
 
-#include <module-utils/log/log.hpp>
-#include <module-utils/magic_enum/include/magic_enum.hpp>
+#include <log.hpp>
+#include <magic_enum.hpp>
 
 #include <cassert>
 #include <stdexcept>
@@ -70,12 +70,24 @@ namespace app::manager
 
     void ActionsRegistry::notifyAboutNextAction()
     {
-        for (auto &action : actions) {
-            if (const auto handled = nextActionReady(action); handled) {
+        for (auto it = actions.begin(); it != actions.end();) {
+            auto &action = *it;
+            switch (const auto status = nextActionReady(action); status) {
+            case ActionProcessStatus::Accepted: {
                 LOG_INFO(
                     "Pending action %s to %s", magic_enum::enum_name(action.actionId).data(), action.target.c_str());
                 actionInProgress = &action;
                 return;
+            }
+            case ActionProcessStatus::Dropped: {
+                // Drop the action, so it'll not be processed again.
+                it = actions.erase(it);
+                break;
+            }
+            case ActionProcessStatus::Skipped:
+                // Skip the action and check the next one.
+                ++it;
+                break;
             }
         }
     }

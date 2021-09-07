@@ -10,11 +10,10 @@
 
 #include "../core/BoundingBox.hpp"
 #include "../core/DrawCommand.hpp"
-#include <log/log.hpp>
 
 #include "Rect.hpp"
 #include "Style.hpp"
-#include <log/log.hpp>
+#include <log.hpp>
 
 namespace gui
 {

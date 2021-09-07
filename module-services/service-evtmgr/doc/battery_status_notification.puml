@@ -1,4 +1,5 @@
 @startuml
+skinparam BackgroundColor F0F0F0
 participant "Battery Charger" as bc
 participant "Worker Event" as we
 participant "Event Manager" as evm

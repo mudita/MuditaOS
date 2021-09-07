@@ -3,11 +3,13 @@
 
 #pragma once
 
+#include <AppWindow.hpp>
+
 #include <vector>
-#include "AppWindow.hpp"
 
 namespace gui
 {
+    class Image;
     class DeadBatteryWindow : public AppWindow
     {
       public:
@@ -15,10 +17,7 @@ namespace gui
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;
-        void onBeforeShow(ShowMode mode, SwitchData *data) override;
-
-      private:
-        gui::Image *image = nullptr;
+        bool onInput(const InputEvent &inputEvent) override;
     };
 
 } /* namespace gui */

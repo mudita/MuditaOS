@@ -1,11 +1,11 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include "BasePresenter.hpp"
 
-#include <module-apps/application-notes/model/NotesRepository.hpp>
+#include <module-apps/application-notes/model/NotesListModel.hpp>
 
 namespace app::notes
 {
@@ -16,14 +16,13 @@ namespace app::notes
         {
           public:
             virtual ~View() noexcept = default;
-
-            virtual void notesFound(const std::vector<NotesRecord> &notes, const std::string &searchText) = 0;
+            virtual void emptySearch()                                     = 0;
+            virtual void processValidSearch(const std::string &searchText) = 0;
         };
         class Presenter : public BasePresenter<SearchEngineWindowContract::View>
         {
           public:
             virtual ~Presenter() noexcept = default;
-
             virtual void searchFor(const std::string &searchText) = 0;
         };
     };
@@ -31,11 +30,7 @@ namespace app::notes
     class SearchEngineWindowPresenter : public SearchEngineWindowContract::Presenter
     {
       public:
-        explicit SearchEngineWindowPresenter(std::unique_ptr<AbstractNotesRepository> &&notesRepository);
-
+        SearchEngineWindowPresenter() = default;
         void searchFor(const std::string &searchText) override;
-
-      private:
-        std::unique_ptr<AbstractNotesRepository> notesRepository;
     };
 } // namespace app::notes

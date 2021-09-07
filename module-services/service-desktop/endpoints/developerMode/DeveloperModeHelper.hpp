@@ -8,10 +8,10 @@
 #include <Common/Query.hpp>
 #include <Service/Common.hpp>
 #include <Service/Service.hpp>
-#include <bsp/keyboard/key_codes.hpp>
+#include <hal/key_input/KeyEventDefinitions.hpp>
 #include <input/InputEvent.hpp>
 #include <module-db/Interface/SMSRecord.hpp>
-#include "Mode/BaseHelper.hpp"
+#include <endpoints/BaseHelper.hpp>
 
 namespace sys
 {
@@ -26,10 +26,11 @@ namespace parserFSM
         static auto getKeyCode(int val) noexcept -> bsp::KeyCodes;
         bool sendKeypress(bsp::KeyCodes keyCode, gui::InputEvent::State state);
 
-        void requestSimChange(const int simSelected);
-        auto smsRecordFromJson(json11::Json msgJson) -> SMSRecord;
-        bool requestCellularPowerStateChange(const int simSelected);
+        void requestSimChange(int simSelected);
+        auto smsRecordFromJson(const json11::Json &msgJson) -> SMSRecord;
+        bool requestCellularPowerStateChange(int simSelected);
         bool requestServiceStateInfo(sys::Service *serv);
+        bool requestCellularSleepModeInfo(sys::Service *serv);
         auto prepareSMS(Context &context) -> ProcessResult;
 
       public:
@@ -45,20 +46,31 @@ namespace parserFSM
     {
         inline constexpr auto keyPressed             = "keyPressed";
         inline constexpr auto state                  = "state";
-        inline constexpr auto systemStarted          = "systemStarted";
         inline constexpr auto ATResponse             = "ATResponse";
         inline constexpr auto AT                     = "AT";
+        inline constexpr auto timeout                = "timeout";
         inline constexpr auto focus                  = "focus";
-        inline constexpr auto isLocked               = "isLocked";
+        inline constexpr auto phoneLocked            = "phoneLocked";
         inline constexpr auto changeSim              = "changeSim";
+        inline constexpr auto changeAutoLockTimeout  = "changeAutoLockTimeout";
         inline constexpr auto smsCommand             = "smsCommand";
         inline constexpr auto changeCellularStateCmd = "changeCellularStateCmd";
         inline constexpr auto getInfo                = "getInfo";
         inline constexpr auto tethering              = "tethering";
-        inline constexpr auto usbSecurity            = "usbSecurity";
+        inline constexpr auto switchApplication      = "switchApplication";
+        inline constexpr auto switchWindow           = "switchWindow";
+        inline constexpr auto phoneLockCodeEnabled   = "phoneLockCodeEnabled";
+
+        namespace switchData
+        {
+            inline constexpr auto applicationName = "applicationName";
+            inline constexpr auto windowName      = "windowName";
+        } // namespace switchData
+
         /// values for getInfo cmd
-        inline constexpr auto simStateInfo      = "simState";
-        inline constexpr auto cellularStateInfo = "cellularState";
+        inline constexpr auto simStateInfo          = "simState";
+        inline constexpr auto cellularStateInfo     = "cellularState";
+        inline constexpr auto cellularSleepModeInfo = "cellularSleepMode";
 
         /// values for smsCommand
         inline constexpr auto smsAdd = "smsAdd";
@@ -66,10 +78,6 @@ namespace parserFSM
         /// values for tethering
         inline constexpr auto tetheringOn  = "on";
         inline constexpr auto tetheringOff = "off";
-
-        /// values for usbSecurity
-        inline constexpr auto usbLock   = "usbLock";
-        inline constexpr auto usbUnlock = "usbUnlock";
 
     } // namespace json::developerMode
 

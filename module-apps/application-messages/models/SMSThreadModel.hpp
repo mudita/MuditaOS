@@ -1,13 +1,14 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include "DatabaseModel.hpp"
-#include "Application.hpp"
-#include "ListItemProvider.hpp"
-#include "Interface/SMSRecord.hpp"
-#include <application-messages/widgets/SMSInputWidget.hpp>
+#include "SMSInputWidget.hpp"
+
+#include <DatabaseModel.hpp>
+#include <Application.hpp>
+#include <ListItemProvider.hpp>
+#include <Interface/SMSRecord.hpp>
 
 class SMSThreadModel : public app::DatabaseModel<SMSRecord>,
                        public gui::ListItemProvider,
@@ -31,6 +32,6 @@ class SMSThreadModel : public app::DatabaseModel<SMSRecord>,
     unsigned int requestRecordsCount() override;
     bool updateRecords(std::vector<SMSRecord> records) override;
     void requestRecords(uint32_t offset, uint32_t limit) override;
-    unsigned int getMinimalItemHeight() const override;
+    unsigned int getMinimalItemSpaceRequired() const override;
     gui::ListItem *getItem(gui::Order order) override;
 };

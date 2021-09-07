@@ -4,7 +4,7 @@
 #include "Audio.hpp"
 #include "Operation/Operation.hpp"
 
-#include <log/log.hpp>
+#include <log.hpp>
 #include <bsp/headset/headset.hpp>
 
 namespace audio
@@ -23,17 +23,6 @@ namespace audio
     Position Audio::GetPosition()
     {
         return currentOperation->GetPosition();
-    }
-
-    std::optional<Tags> Audio::GetFileTags(const char *filename)
-    {
-        auto ret = Decoder::Create(filename);
-        if (ret == nullptr) {
-            return {};
-        }
-        else {
-            return *ret->fetchTags();
-        };
     }
 
     audio::RetCode Audio::SendEvent(std::shared_ptr<Event> evt)
@@ -90,7 +79,7 @@ namespace audio
                 break;
             }
             currentOperation = std::move(ret);
-            UpdateProfiles();
+            UpdateProfiles(playbackType);
         }
         catch (const AudioInitException &audioException) {
             // If creating operation failed fallback to IdleOperation which is guaranteed to work
@@ -124,6 +113,7 @@ namespace audio
             LOG_ERROR("Operation STOP failure: %s", audio::str(retStop).c_str());
         }
 
+        muted    = Muted::False;
         auto ret = Operation::Create(Operation::Type::Idle);
         if (ret) {
             currentState     = State::Idle;
@@ -154,16 +144,28 @@ namespace audio
 
     audio::RetCode Audio::Mute()
     {
+        muted = Muted::True;
         return SetOutputVolume(0);
     }
 
-    void Audio::UpdateProfiles()
+    void Audio::SendUpdateEventsToCurrentOperation()
     {
         auto updateEvents = audioSinkState.getUpdateEvents();
         for (auto &event : updateEvents) {
             currentOperation->SendEvent(event);
         }
+    }
+
+    void Audio::UpdateProfiles()
+    {
+        SendUpdateEventsToCurrentOperation();
         currentOperation->SwitchToPriorityProfile();
+    }
+
+    void Audio::UpdateProfiles(audio::PlaybackType playbackType)
+    {
+        SendUpdateEventsToCurrentOperation();
+        currentOperation->SwitchToPriorityProfile(playbackType);
     }
 
 } // namespace audio

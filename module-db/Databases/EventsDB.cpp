@@ -3,10 +3,5 @@
 
 #include "EventsDB.hpp"
 
-EventsDB::EventsDB(const char *name) : Database(name), events(this)
-{
-    if (events.create() == false) {
-        return;
-    }
-    isInitialized_ = true;
-}
+EventsDB::EventsDB(const char *name) : Database(name), alarmEvents(this)
+{}

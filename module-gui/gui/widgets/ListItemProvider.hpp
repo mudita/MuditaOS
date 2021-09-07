@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -7,8 +7,7 @@
 
 namespace gui
 {
-
-    class ListView;
+    class ListViewEngine;
 
     enum class Order
     {
@@ -18,15 +17,14 @@ namespace gui
 
     class ListItemProvider
     {
-
       public:
         virtual ~ListItemProvider() = default;
 
-        ListView *list = nullptr;
+        ListViewEngine *list = nullptr;
 
         virtual unsigned int requestRecordsCount() = 0;
 
-        [[nodiscard]] virtual unsigned int getMinimalItemHeight() const = 0;
+        [[nodiscard]] virtual unsigned int getMinimalItemSpaceRequired() const = 0;
 
         virtual ListItem *getItem(Order order) = 0;
 

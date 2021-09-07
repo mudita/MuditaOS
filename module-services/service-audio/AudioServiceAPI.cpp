@@ -1,13 +1,13 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "service-audio/AudioServiceAPI.hpp"
-#include "service-audio/ServiceAudio.hpp"
-#include "service-audio/AudioMessage.hpp"
+#include <AudioMessage.hpp>
+#include <AudioServiceAPI.hpp>
+#include <ServiceAudio.hpp>
 
 #include <Audio/decoder/Decoder.hpp>
+#include <log.hpp>
 #include <Service/Common.hpp>
-#include <log/log.hpp>
 
 #include <utility>
 
@@ -25,7 +25,7 @@ namespace AudioServiceAPI
         {
             auto msgType = static_cast<int>(msg->type);
             LOG_DEBUG("Msg type %d", msgType);
-            auto ret = serv->bus.sendUnicast(msg, service::name::audio, sys::BusProxy::defaultTimeout);
+            auto ret = serv->bus.sendUnicastSync(msg, service::name::audio, sys::BusProxy::defaultTimeout);
             if (ret.first == sys::ReturnCodes::Success) {
                 if (auto resp = std::dynamic_pointer_cast<AudioResponseMessage>(ret.second)) {
                     LOG_DEBUG("Msg type %d done", msgType);
@@ -102,61 +102,100 @@ namespace AudioServiceAPI
         return serv->bus.sendUnicast(msg, service::name::audio);
     }
 
-    template <typename T>
-    audio::RetCode GetSetting(sys::Service *serv,
-                              const audio::Setting &setting,
-                              T &value,
-                              const audio::PlaybackType &playbackType,
-                              const audio::Profile::Type &profileType)
+    std::string GetSetting(sys::Service *serv, audio::Setting setting, audio::PlaybackType playbackType)
     {
-        auto msg  = std::make_shared<AudioGetSetting>(profileType, playbackType, setting);
+        auto msg  = std::make_shared<AudioGetSetting>(playbackType, setting);
         auto resp = SendAudioRequest(serv, msg);
         if (resp->retCode == RetCode::Success) {
-            value = resp->val;
+            return resp->val;
         }
 
-        return resp->retCode;
+        return "";
     }
 
-    template audio::RetCode GetSetting<uint32_t>(sys::Service *serv,
-                                                 const audio::Setting &setting,
-                                                 uint32_t &value,
-                                                 const audio::PlaybackType &playbackType,
-                                                 const audio::Profile::Type &profileType);
+    std::optional<audio::SettingState> GetSettingState(sys::Service *serv,
+                                                       audio::Setting setting,
+                                                       audio::PlaybackType playbackType)
+    {
+        auto settingValue = GetSetting(serv, setting, playbackType);
+        if (!settingValue.empty()) {
+            return settingValue != "0" ? audio::SettingState::Enabled : audio::SettingState::Disabled;
+        }
 
-    template audio::RetCode GetSetting<bool>(sys::Service *serv,
-                                             const audio::Setting &setting,
-                                             bool &value,
-                                             const audio::PlaybackType &playbackType,
-                                             const audio::Profile::Type &profileType);
+        return std::nullopt;
+    }
 
     template <typename T>
     audio::RetCode SetSetting(sys::Service *serv,
-                              const audio::Setting &setting,
+                              audio::Setting setting,
                               const T value,
-                              const audio::PlaybackType &playbackType,
-                              const audio::Profile::Type &profileType)
+                              audio::PlaybackType playbackType)
     {
-        auto msg = std::make_shared<AudioSetSetting>(profileType, playbackType, setting, std::to_string(value));
+        auto msg = std::make_shared<AudioSetSetting>(playbackType, setting, std::to_string(value));
 
         return SendAudioRequest(serv, msg)->retCode;
     }
 
-    template audio::RetCode SetSetting<uint32_t>(
-        sys::Service *, const Setting &, const uint32_t, const PlaybackType &, const Profile::Type &);
-
-    template audio::RetCode SetSetting<bool>(
-        sys::Service *, const Setting &, const bool, const PlaybackType &, const Profile::Type &);
-
-    std::optional<Tags> GetFileTags(sys::Service *serv, const std::string &fileName)
+    template <>
+    audio::RetCode SetSetting<std::string>(sys::Service *serv,
+                                           audio::Setting setting,
+                                           const std::string str,
+                                           audio::PlaybackType playbackType)
     {
-        auto msg = std::make_shared<AudioGetFileTagsRequest>(fileName);
+        auto msg = std::make_shared<AudioSetSetting>(playbackType, setting, str);
 
-        auto resp = SendAudioRequest(serv, msg);
-        if (resp->retCode == audio::RetCode::Success) {
-            return resp->tags;
+        return SendAudioRequest(serv, msg)->retCode;
+    }
+
+    audio::RetCode SetVibrationSetting(sys::Service *serv,
+                                       audio::SettingState settingState,
+                                       audio::PlaybackType playbackType)
+    {
+        return SetSetting(
+            serv, audio::Setting::EnableVibration, settingState == audio::SettingState::Enabled, playbackType);
+    }
+
+    audio::RetCode SetSoundSetting(sys::Service *serv,
+                                   audio::SettingState settingState,
+                                   audio::PlaybackType playbackType)
+    {
+        return SetSetting(
+            serv, audio::Setting::EnableSound, settingState == audio::SettingState::Enabled, playbackType);
+    }
+
+    std::optional<audio::SettingState> GetVibrationSetting(sys::Service *serv, audio::PlaybackType playbackType)
+    {
+        return GetSettingState(serv, audio::Setting::EnableVibration, playbackType);
+    }
+
+    std::optional<audio::SettingState> GetSoundSetting(sys::Service *serv, audio::PlaybackType playbackType)
+    {
+        return GetSettingState(serv, audio::Setting::EnableSound, playbackType);
+    }
+
+    audio::RetCode SetSound(sys::Service *serv, const std::string &filePath, audio::PlaybackType playbackType)
+    {
+        return SetSetting(serv, audio::Setting::Sound, filePath, playbackType);
+    }
+
+    std::string GetSound(sys::Service *serv, audio::PlaybackType playbackType)
+    {
+        return GetSetting(serv, audio::Setting::Sound, playbackType);
+    }
+
+    audio::RetCode SetVolume(sys::Service *serv, const audio::Volume vol, audio::PlaybackType playbackType)
+    {
+        return SetSetting(serv, audio::Setting::Volume, std::to_string(vol), playbackType);
+    }
+
+    std::optional<audio::Volume> GetVolume(sys::Service *serv, audio::PlaybackType playbackType)
+    {
+        std::optional<audio::Volume> volume;
+        try {
+            return static_cast<audio::Volume>(std::stoi(GetSetting(serv, audio::Setting::Volume, playbackType)));
         }
-        else {
+        catch (const std::exception &e) {
+            LOG_ERROR("exception %s", e.what());
             return std::nullopt;
         }
     }
@@ -167,4 +206,13 @@ namespace AudioServiceAPI
         return serv->bus.sendUnicast(msg, service::name::audio);
     }
 
+    bool BluetoothA2DPVolumeChanged(sys::Service *serv, const std::uint8_t volume)
+    {
+        return serv->bus.sendUnicast(std::make_shared<A2DPDeviceVolumeChanged>(volume), service::name::audio);
+    }
+
+    bool BluetoothHSPVolumeChanged(sys::Service *serv, const std::uint8_t volume)
+    {
+        return serv->bus.sendUnicast(std::make_shared<HSPDeviceVolumeChanged>(volume), service::name::audio);
+    }
 } // namespace AudioServiceAPI

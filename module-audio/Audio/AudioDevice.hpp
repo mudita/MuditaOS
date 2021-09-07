@@ -27,89 +27,45 @@ namespace audio
             None,
             Audiocodec,
             Cellular,
-            Bluetooth
+            BluetoothA2DP,
+            BluetoothHSP
         };
-
-        enum class Flags
-        {
-            OutputMono   = 1 << 0,
-            OutputStereo = 1 << 1,
-            InputLeft    = 1 << 2,
-            InputRight   = 1 << 3,
-            InputStereo  = 1 << 4
-        };
-
-        enum class InputPath
-        {
-            Headphones,
-            Microphone,
-            None
-        };
-
-        enum class OutputPath
-        {
-            Headphones,
-            Earspeaker,
-            Loudspeaker,
-            None
-        };
-
-        using Format = struct
-        {
-            uint32_t sampleRate_Hz = 0; /*!< Sample rate of audio data */
-            uint32_t bitWidth      = 0; /*!< Data length of audio data, usually 8/16/24/32 bits */
-            uint32_t flags         = 0; /*!< In/Out configuration flags */
-            float outputVolume     = 0.0f;
-            float inputGain        = 0.0f;
-            InputPath inputPath    = InputPath::None;
-            OutputPath outputPath  = OutputPath::None;
-        };
-
-        AudioDevice() = default;
-        explicit AudioDevice(const audio::Endpoint::Capabilities &sourceCaps,
-                             const audio::Endpoint::Capabilities &sinkCaps)
-            : IOProxy(sourceCaps, sinkCaps)
-        {}
 
         virtual ~AudioDevice() = default;
 
-        virtual RetCode Start(const Format &format) = 0;
-        virtual RetCode Stop()                      = 0;
-
-        virtual RetCode OutputVolumeCtrl(float vol)           = 0;
-        virtual RetCode InputGainCtrl(float gain)             = 0;
-        virtual RetCode OutputPathCtrl(OutputPath outputPath) = 0;
-        virtual RetCode InputPathCtrl(InputPath inputPath)    = 0;
-        virtual bool IsFormatSupported(const Format &format)  = 0;
-
-        float GetOutputVolume() const noexcept
+        virtual RetCode Start()
         {
-            return currentFormat.outputVolume;
+            return RetCode::Success;
         }
 
-        float GetInputGain() const noexcept
+        virtual RetCode Stop()
         {
-            return currentFormat.inputGain;
+            return RetCode::Success;
         }
 
-        OutputPath GetOutputPath() const noexcept
+        virtual RetCode Pause()
         {
-            return currentFormat.outputPath;
+            return RetCode::Success;
         }
 
-        InputPath GetInputPath() const noexcept
+        virtual RetCode Resume()
         {
-            return currentFormat.inputPath;
+            return RetCode::Success;
         }
 
-        Format GetCurrentFormat() const noexcept
+        /// Set device output volume
+        /// @param vol desired volume from 0 to 10
+        /// @return RetCode::Success if OK, or RetCode::Failure otherwise
+        virtual RetCode setOutputVolume(float vol) = 0;
+
+        /// Set device input gain
+        /// @param gain desired input gain from 0 to 100
+        /// @return RetCode::Success if OK, or RetCode::Failure otherwise
+        virtual RetCode setInputGain(float gain)   = 0;
+
+        auto getSinkFormat() -> AudioFormat override
         {
-            return currentFormat;
+            return getSourceFormat();
         }
-
-      protected:
-        Format currentFormat;
-
-        bool isInitialized = false;
     };
 } // namespace audio

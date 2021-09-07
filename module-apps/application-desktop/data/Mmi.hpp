@@ -3,7 +3,11 @@
 
 #pragma once
 
+#include <i18n/i18n.hpp>
 #include <service-appmgr/data/MmiActionsParams.hpp>
+#include <utf8/UTF8.hpp>
+
+#include <map>
 
 namespace mmi
 {
@@ -122,13 +126,13 @@ namespace mmi
 
         virtual void visit(mmiactions::MMICallForwardingResult &customResult, std::string &displayMessage)
         {
-            displayMessage += utils::localize.get("app_desktop_info_mmi_call_forwarding") + "\n";
+            displayMessage += utils::translate("app_desktop_info_mmi_call_forwarding") + "\n";
             if (customResult.getMessageType() == mmiactions::IMMICustomResultParams::MMIType::CallForwardingData) {
                 auto [voice, fax, sync, async] = customResult.getData();
-                displayMessage += utils::localize.get("app_desktop_info_mmi_common_voice") + ": " + voice + "\n" +
-                                  utils::localize.get("app_desktop_info_mmi_common_fax") + ": " + fax + "\n" +
-                                  utils::localize.get("app_desktop_info_mmi_common_sync") + ": " + sync + "\n" +
-                                  utils::localize.get("app_desktop_info_mmi_common_async") + ": " + async + "\n";
+                displayMessage += utils::translate("app_desktop_info_mmi_common_voice") + ": " + voice + "\n" +
+                                  utils::translate("app_desktop_info_mmi_common_fax") + ": " + fax + "\n" +
+                                  utils::translate("app_desktop_info_mmi_common_sync") + ": " + sync + "\n" +
+                                  utils::translate("app_desktop_info_mmi_common_async") + ": " + async + "\n";
             }
             else if (customResult.getMessageType() ==
                      mmiactions::IMMICustomResultParams::MMIType::CallForwardingNotification) {
@@ -138,7 +142,7 @@ namespace mmi
 
         virtual void visit(mmiactions::MMICallBarringResult &customResult, std::string &displayMessage)
         {
-            displayMessage += utils::localize.get("app_desktop_info_mmi_call_barring") + "\n";
+            displayMessage += utils::translate("app_desktop_info_mmi_call_barring") + "\n";
             if (customResult.getMessageType() == mmiactions::IMMICustomResultParams::MMIType::CallBarringData) {
                 displayMessage += getCustomMessagesFromDictionary(customResult.getMessages());
             }
@@ -150,7 +154,7 @@ namespace mmi
 
         virtual void visit(mmiactions::MMICallWaitingResult &customResult, std::string &displayMessage)
         {
-            displayMessage += utils::localize.get("app_desktop_info_mmi_call_waiting") + "\n";
+            displayMessage += utils::translate("app_desktop_info_mmi_call_waiting") + "\n";
             if (customResult.getMessageType() == mmiactions::IMMICustomResultParams::MMIType::CallWaitingData) {
                 displayMessage += getCustomMessagesFromDictionary(customResult.getMessages());
             }
@@ -162,19 +166,19 @@ namespace mmi
 
         virtual void visit(mmiactions::MMIClipResult &customResult, std::string &displayMessage)
         {
-            displayMessage += utils::localize.get("app_desktop_info_mmi_clip") + "\n";
+            displayMessage += utils::translate("app_desktop_info_mmi_clip") + "\n";
             displayMessage += getSelectedMessagesFromDictionary(customResult.getMessage());
         }
 
         virtual void visit(mmiactions::MMIClirResult &customResult, std::string &displayMessage)
         {
-            displayMessage += utils::localize.get("app_desktop_info_mmi_clir") + "\n";
+            displayMessage += utils::translate("app_desktop_info_mmi_clir") + "\n";
             displayMessage += getSelectedMessagesFromDictionary(customResult.getMessage());
         }
 
         virtual void visit(mmiactions::MMIImeiResult &customResult, std::string &displayMessage)
         {
-            displayMessage += utils::localize.get("app_desktop_info_mmi_imei") + "\n";
+            displayMessage += utils::translate("app_desktop_info_mmi_imei") + "\n";
             displayMessage += customResult.getImei() + "\n";
             displayMessage += getSelectedMessagesFromDictionary(customResult.getMessage());
         }
@@ -191,12 +195,12 @@ namespace mmi
                 auto it = messageDictionary.find(serviceState);
                 if (messageDictionary.end() != it) {
                     if (queryStr.empty()) {
-                        queryStr += utils::localize.get(it->second) + "\n";
+                        queryStr += utils::translate(it->second) + "\n";
                     }
                 }
                 it = messageDictionary.find(serviceClass);
                 if (messageDictionary.end() != it) {
-                    queryStr += utils::localize.get(it->second) + "\n";
+                    queryStr += utils::translate(it->second) + "\n";
                 }
             }
             return queryStr;
@@ -209,7 +213,7 @@ namespace mmi
             for (const auto &msg : msgList) {
                 auto it = messageDictionary.find(msg);
                 if (messageDictionary.end() != it) {
-                    selectedMessages += utils::localize.get(it->second) + "\n";
+                    selectedMessages += utils::translate(it->second) + "\n";
                 }
             }
             return selectedMessages;

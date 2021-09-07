@@ -1,85 +1,106 @@
-cmake_minimum_required(VERSION 3.12)
+add_library(module-vfs STATIC)
 
-project(module-vfs VERSION 1.0
-        DESCRIPTION "VFS module library")
+module_is_test_entity()
 
-add_subdirectory(thirdparty/lfsfs)
+target_sources(module-vfs
+    PRIVATE
+        $<$<STREQUAL:${PROJECT_TARGET},TARGET_RT1051>:
+            board/rt1051/newlib/vfs_io_syscalls.cpp
+            board/rt1051/purefs/src/fs/thread_local_cwd.cpp
+        >
+        $<$<STREQUAL:${PROJECT_TARGET},TARGET_Linux>:
+            board/linux/purefs/src/fs/thread_local_cwd.cpp
+        >
 
+        drivers/include/purefs/fs/drivers/directory_handle_littlefs.hpp
+        drivers/include/purefs/fs/drivers/directory_handle_vfat.hpp
+        drivers/include/purefs/fs/drivers/file_handle_littlefs.hpp
+        drivers/include/purefs/fs/drivers/file_handle_vfat.hpp
+        drivers/include/purefs/fs/drivers/filesystem_littlefs.hpp
+        drivers/include/purefs/fs/drivers/filesystem_vfat.hpp
+        drivers/include/purefs/fs/drivers/mount_point_littlefs.hpp
+        drivers/include/purefs/fs/drivers/mount_point_vfat.hpp
+        drivers/include/thirdparty/fatfs/ffconf.h
+        drivers/include/thirdparty/fatfs/volume_mapper.hpp
+        drivers/include/thirdparty/littlefs/volume_mapper.hpp
+        drivers/src/purefs/fs/filesystem_littlefs.cpp
+        drivers/src/purefs/fs/filesystem_vfat.cpp
+        drivers/src/thirdparty/fatfs/ff_glue.cpp
+        drivers/src/thirdparty/fatfs/ffsystem.cpp
+        drivers/src/thirdparty/littlefs/lfs_glue.cpp
 
-set(FF_FAT_SOURCES_THIRDPARTY
-        ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/fatfs/source/ff.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/fatfs/source/ffunicode.c
-)
+        include/internal/purefs/blkdev/disk_handle.hpp
+        include/internal/purefs/blkdev/partition_parser.hpp
+        include/internal/purefs/fs/notifier.hpp
+        include/internal/purefs/fs/thread_local_cwd.hpp
+        include/internal/purefs/vfs_subsystem_internal.hpp
 
-set(FF_FAT_SOURCES
-    ${FF_FAT_SOURCES_THIRDPARTY}
-    ${CMAKE_CURRENT_SOURCE_DIR}/drivers/src/thirdparty/fatfs/ffsystem.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/drivers/src/thirdparty/fatfs/ff_glue.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/drivers/src/thirdparty/littlefs/lfs_glue.cpp
-)
-
-set(SOURCES
-        ${FF_FAT_SOURCES}
-        src/purefs/filesystem_paths.cpp
+        src/purefs/blkdev/disk_handle.cpp
         src/purefs/blkdev/disk_manager.cpp
         src/purefs/blkdev/disk.cpp
         src/purefs/blkdev/partition_parser.cpp
-        src/purefs/blkdev/disk_handle.cpp
-        src/purefs/fs/filesystem.cpp
+        src/purefs/filesystem_paths.cpp
+        src/purefs/fs/filesystem_cwd.cpp
         src/purefs/fs/filesystem_operations.cpp
         src/purefs/fs/filesystem_syscalls.cpp
-        src/purefs/fs/filesystem_cwd.cpp
+        src/purefs/fs/filesystem.cpp
+        src/purefs/fs/fsnotify.cpp
+        src/purefs/fs/notifier.cpp
         src/purefs/vfs_subsystem.cpp
-        drivers/src/purefs/fs/filesystem_vfat.cpp
-        drivers/src/purefs/fs/filesystem_littlefs.cpp
+
+    PUBLIC
+        include/user/newlib/vfs_io_syscalls.hpp
+        include/user/purefs/blkdev/defs.hpp
+        include/user/purefs/blkdev/disk_manager.hpp
+        include/user/purefs/blkdev/disk.hpp
+        include/user/purefs/blkdev/partition.hpp
+        include/user/purefs/filesystem_paths.hpp
+        include/user/purefs/fs/directory_handle.hpp
+        include/user/purefs/fs/file_handle.hpp
+        include/user/purefs/fs/filesystem_operations.hpp
+        include/user/purefs/fs/filesystem.hpp
+        include/user/purefs/fs/fsnotify.hpp
+        include/user/purefs/fs/handle_mapper.hpp
+        include/user/purefs/fs/inotify_flags.hpp
+        include/user/purefs/fs/inotify_message.hpp
+        include/user/purefs/fs/inotify.hpp
+        include/user/purefs/fs/mount_flags.hpp
+        include/user/purefs/fs/mount_point.hpp
+        include/user/purefs/vfs_subsystem.hpp
 )
 
+target_compile_definitions(module-vfs PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
+target_compile_definitions(module-vfs PUBLIC ${PROJECT_TARGET})
+target_include_directories(module-vfs PUBLIC ${PROJECT_INCLUDES})
+target_include_directories(module-vfs PUBLIC ${CMAKE_BINARY_DIR})
 
-if(${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
-    include(targets/Target_RT1051.cmake)
-elseif(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
-    include(targets/Target_Linux.cmake)
-else()
-    message(FATAL_ERROR "Invalid target!")
-endif()
-
-add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
-
-
-# Board specific compilation definitions,options,include directories and features
-target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
-target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_TARGET})
-target_compile_definitions(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_DEFINITIONS})
-target_include_directories(${PROJECT_NAME} PUBLIC ${BOARD_DIR_INCLUDES})
-target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_INCLUDES})
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_BINARY_DIR})
-target_compile_features(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_FEATURES})
-target_compile_options(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_OPTIONS})
-target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
-
-target_compile_definitions(${PROJECT_NAME}
-        PUBLIC
+target_include_directories(module-vfs
+    PRIVATE
+        $<BUILD_INTERFACE:
+            $<$<STREQUAL:${PROJECT_TARGET},TARGET_RT1051>:${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/purefs/include>
+            $<$<STREQUAL:${PROJECT_TARGET},TARGET_Linux>:${CMAKE_CURRENT_SOURCE_DIR}/board/linux/purefs/include>
+            ${CMAKE_CURRENT_SOURCE_DIR}/drivers/include/thirdparty
+            ${CMAKE_CURRENT_SOURCE_DIR}/drivers/include/thirdparty/fatfs
+            ${CMAKE_CURRENT_SOURCE_DIR}/include/internal
+        >
+    PUBLIC
+        $<BUILD_INTERFACE:
+            ${CMAKE_CURRENT_SOURCE_DIR}/drivers/include
+            ${CMAKE_CURRENT_SOURCE_DIR}/include/user/
+        >
 )
 
-target_include_directories(${PROJECT_NAME}
-        PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/user/deprecated
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/user/
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/internal/
-        ${CMAKE_CURRENT_SOURCE_DIR}/drivers/include
+target_link_libraries(module-vfs 
+    PRIVATE
+        fatfs::fatfs
+        json::json
+        littlefs::littlefs
+        module-bsp 
+        module-os
+        module-utils
+    PUBLIC 
+        module-sys
 )
-
-target_include_directories(${PROJECT_NAME}
-        PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/drivers/include/thirdparty/fatfs
-        ${CMAKE_CURRENT_SOURCE_DIR}/drivers/include/thirdparty
-        ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/fatfs/source
-)
-
-target_link_libraries(${PROJECT_NAME} PUBLIC ${TARGET_LIBRARIES} module-bsp module-utils)
-target_link_libraries(${PROJECT_NAME} PRIVATE littlefs )
-# TODO: Temporary only remove when removing old vfs
-target_link_libraries(${PROJECT_NAME} PUBLIC utils-bootconfig )
 
 if (${ENABLE_TESTS})
     add_subdirectory(tests)

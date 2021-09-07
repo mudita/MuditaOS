@@ -6,7 +6,7 @@
 #include "CellularMessage.hpp"
 #include "PacketDataCellularMessage.hpp"
 
-#include <Modem/TS0710/TS0710.h>
+#include <modem/mux/CellularMux.h>
 #include <PhoneNumber.hpp>
 #include <module-bsp/bsp/cellular/bsp_cellular.hpp>
 #include <utf8/UTF8.hpp>
@@ -27,6 +27,7 @@ namespace CellularServiceAPI
 
     bool AnswerIncomingCall(sys::Service *serv);
     bool HangupCall(sys::Service *serv);
+    bool DismissCall(sys::Service *serv, bool addNotificationToDB);
     /*
      * @brief Its calls sercive-cellular for selected SIM IMSI number.
      * @param serv pointer to caller service.
@@ -35,11 +36,16 @@ namespace CellularServiceAPI
      */
     std::string GetIMSI(sys::Service *serv, bool getFullIMSINumber = false);
     /*
-     * @brief Its calls sercive-cellular for selected SIM own phone number.
+     * @brief Its subscribes service-cellular for selected SIM own phone number response messages.
      * @param serv pointer to caller service.
-     * #return SIM own number when succeeds, empty string when fails
+     * @param callback called on response message receive event.
      */
-    std::string GetOwnNumber(sys::Service *serv);
+    void SubscribeForOwnNumber(sys::Service *serv, std::function<void(const std::string &)> callback);
+    /*
+     * @brief Its calls service-cellular for selected SIM own phone number.
+     * @param serv pointer to caller service.
+     */
+    void RequestForOwnNumber(sys::Service *serv);
     /*
      * @brief It calls service-cellulat fo newtwork info
      * @param serv pointer to caller service.
@@ -48,9 +54,9 @@ namespace CellularServiceAPI
 
     /*
      * @brief Get current operator, result async in
-     * CellularGetCurrentOperatorResponse message
+     * CellularCurrentOperatorNameResponse message
      */
-    void GetCurrentOperator(sys::Service *serv);
+    void RequestCurrentOperatorName(sys::Service *serv);
     /*
      * @brief It calls service-cellulat to perform operators scan
      * @param serv pointer to caller service.
@@ -76,7 +82,7 @@ namespace CellularServiceAPI
     bool GetScanMode(sys::Service *serv);
     bool GetFirmwareVersion(sys::Service *serv, std::string &response);
     bool GetChannel(sys::Service *serv,
-                    TS0710::Channel channel); /// asynchronous, returns message CellureMessageChannelReady;
+                    CellularMux::Channel channel); /// asynchronous, returns message CellureMessageChannelReady;
     bool GetDataChannel(sys::Service *serv);
     bool GetCSQ(sys::Service *serv, std::string &response);
     bool GetCREG(sys::Service *serv, std::string &response);
@@ -87,15 +93,6 @@ namespace CellularServiceAPI
 
     bool USSDRequest(sys::Service *serv, CellularUSSDMessage::RequestType type, std::string data = "");
 
-    bool ChangeSimPin(sys::Service *serv,
-                      Store::GSM::SIM sim,
-                      const std::vector<unsigned int> &passcode,
-                      const std::vector<unsigned int> &pin);
-    bool SetSimCardLock(sys::Service *serv,
-                        Store::GSM::SIM sim,
-                        CellularSimCardLockDataMessage::SimCardLock lock,
-                        const std::vector<unsigned int> &pin);
-    bool SetSimCard(sys::Service *serv, Store::GSM::SIM sim);
     /**
      * @brief get all APNs from phone configuration
      */
@@ -138,6 +135,10 @@ namespace CellularServiceAPI
     bool GetDataTransfer(sys::Service *serv);
     bool SetVoLTE(sys::Service *serv, bool value);
 
-    bool ChangeModulePowerState(sys::Service *serv, cellular::State::PowerState newState);
+    bool ChangeModulePowerState(sys::Service *serv, cellular::service::State::PowerState newState);
+
+    bool SetFlightMode(sys::Service *serv, bool flightModeOn);
+
+    bool SetConnectionFrequency(sys::Service *serv, uint8_t connectionFrequency);
 
 }; // namespace CellularServiceAPI

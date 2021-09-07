@@ -7,7 +7,7 @@
 #include <parser/ParserUtils.hpp>
 #include <parser/MessageHandler.hpp>
 
-#include <json/json11.hpp>
+#include <json11.hpp>
 #include <Common/Query.hpp>
 #include <Service/Service.hpp>
 #include <string>
@@ -19,7 +19,7 @@ namespace parserFSM
     class Endpoint
     {
       public:
-        Endpoint(sys::Service *_ownerServicePtr) : ownerServicePtr(_ownerServicePtr){};
+        explicit Endpoint(sys::Service *_ownerServicePtr) : ownerServicePtr(_ownerServicePtr){};
         virtual ~Endpoint()                                      = default;
         virtual auto handle(parserFSM::Context &context) -> void = 0;
         auto c_str() -> const char *
@@ -28,7 +28,7 @@ namespace parserFSM
         }
 
       protected:
-        std::string debugName         = "";
+        std::string debugName;
         sys::Service *ownerServicePtr = nullptr;
     };
 

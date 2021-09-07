@@ -1,0 +1,31 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+
+participant "Worker Bluetooth" as workbt
+participant "Service Bluetooth" as srvbt
+participant "Application Settings" as appsett
+
+activate appsett
+appsett->srvbt : start scanning msg
+    activate srvbt
+    srvbt -> workbt : command(scanOn)
+        deactivate srvbt
+        activate workbt
+        workbt -> workbt : scanOn
+        loop
+            [o-> workbt : device detected
+            activate workbt
+            workbt -> appsett : available device msg
+            deactivate workbt
+            activate appsett
+                appsett -> appsett : process
+            deactivate appsett
+        end
+appsett->srvbt : stop scanning msg
+    deactivate appsett
+    activate srvbt
+    srvbt -> workbt : command(stanOff)
+        deactivate srvbt
+        deactivate workbt
+
+@enduml

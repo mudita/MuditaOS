@@ -3,14 +3,13 @@
 
 #pragma once
 
-#include "Database/Database.hpp"
-#include "module-db/Tables/EventsTable.hpp"
+#include <Database/Database.hpp>
+#include <Tables/AlarmEventsTable.hpp>
 
 class EventsDB : public Database
 {
   public:
-    EventsDB(const char *name);
-    ~EventsDB() override = default;
+    explicit EventsDB(const char *name);
 
-    EventsTable events;
+    AlarmEventsTable alarmEvents;
 };

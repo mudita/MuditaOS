@@ -1,0 +1,46 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+
+participant "Harness" as harness
+participant "Worker Desktop" as workdsktp
+participant "Bluetooth Endpoint" as endbt
+participant "Service Desktop" as srvdsktp
+participant "Service Bluetooth" as srvbt
+
+[o-> harness : endpoint request
+activate harness
+    harness -> harness : create message
+    harness -> workdsktp : send request
+    deactivate harness
+    activate workdsktp
+        alt BT endpoint request
+        workdsktp -> endbt : send request
+    deactivate workdsktp
+    activate endbt
+            endbt -> endbt : parse request
+            endbt -> endbt : create message
+            endbt -> srvbt : send message
+            activate srvbt
+
+            alt is simple request
+            endbt -> srvdsktp : simple response
+    deactivate endbt
+    activate srvdsktp
+            else requires actual response
+                srvdsktp <-- srvbt : respond
+    activate srvdsktp
+    deactivate srvbt
+            end
+                srvdsktp -> srvdsktp : create http response
+        workdsktp <-- srvdsktp : response
+    deactivate srvdsktp
+    deactivate srvdsktp
+    activate workdsktp
+        end
+    harness <-- workdsktp : reponse
+    deactivate workdsktp
+    activate harness
+[<-- harness : reponse
+    deactivate harness
+
+@enduml

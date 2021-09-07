@@ -4,6 +4,7 @@
 #pragma once
 
 #include <at/Result.hpp>
+#include <at/Cmd.hpp>
 
 #include "service-cellular/RequestHandler.hpp"
 #include "service-cellular/requests/Request.hpp"
@@ -22,9 +23,10 @@ namespace cellular
         RejectRequest(RejectReason rejectReason, const std::string &number)
             : Request(number), rejectReason(rejectReason){};
 
-        std::string command() final
+        at::Cmd command() final
         {
-            return std::string();
+            constexpr std::chrono::milliseconds immediateTimeout{0};
+            return at::Cmd(std::string(), immediateTimeout);
         }
 
         void handle(RequestHandler &h, at::Result &result)

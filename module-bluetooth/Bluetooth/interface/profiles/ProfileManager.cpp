@@ -1,5 +1,9 @@
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 #include <service-bluetooth/ServiceBluetooth.hpp>
 #include "ProfileManager.hpp"
+#include <GAP/GAP.hpp>
 
 namespace bluetooth
 {
@@ -21,6 +25,10 @@ namespace bluetooth
                     ptr->init();
                 }
             }
+            // TODO profile selection based on capabilities and priority?
+            // audio & capa cell & HSP & HFP  & A2DP-> HFP
+            // audio & capa cell & HSP  & A2DP-> HSP
+            // audio & HSP & HFP & A2DP -> A2DP
             currentProfilePtr = profilesList[AudioProfile::A2DP].get();
 
             if (auto serviceBt = dynamic_cast<ServiceBluetooth *>(ownerService); serviceBt != nullptr) {
@@ -40,6 +48,7 @@ namespace bluetooth
                 ptr->connect();
             }
         }
+
         return Error::Success;
     }
 
@@ -67,15 +76,50 @@ namespace bluetooth
         start();
         return Error::Success;
     }
+
     auto ProfileManager::start() -> Error::Code
     {
         currentProfilePtr->start();
         return Error::Success;
     }
+
     auto ProfileManager::stop() -> Error::Code
     {
         currentProfilePtr->stop();
         return Error::Success;
+    }
+
+    auto ProfileManager::startRinging() -> Error::Code
+    {
+        switchProfile(AudioProfile::HSP);
+        return currentProfilePtr->startRinging();
+    }
+
+    auto ProfileManager::stopRinging() -> Error::Code
+    {
+        return currentProfilePtr->stopRinging();
+    }
+
+    auto ProfileManager::initializeCall() -> Error::Code
+    {
+        switchProfile(AudioProfile::HSP);
+        return currentProfilePtr->initializeCall();
+    }
+
+    auto ProfileManager::setAudioDevice(std::shared_ptr<BluetoothAudioDevice> device) -> Error::Code
+    {
+        auto profileType = device->getProfileType();
+
+        if (currentProfilePtr == nullptr || profilesList[profileType] == nullptr) {
+            return Error::NotReady;
+        }
+
+        profilesList[profileType]->setAudioDevice(device);
+        return switchProfile(profileType);
+    }
+    auto ProfileManager::isAddressActuallyUsed(bd_addr_t address) -> bool
+    {
+        return !static_cast<bool>(bd_addr_cmp(address, remoteAddr));
     }
 
 } // namespace bluetooth

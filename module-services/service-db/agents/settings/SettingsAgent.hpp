@@ -1,7 +1,9 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
+
+#include "FactorySettings.hpp"
 
 #include <service-db/DatabaseAgent.hpp>
 #include <service-db/SettingsMessages.hpp>
@@ -24,7 +26,7 @@ namespace sys
 class SettingsAgent : public DatabaseAgent
 {
   public:
-    SettingsAgent(sys::Service *parentService, settings::SettingsCache *cache = nullptr);
+    SettingsAgent(sys::Service *parentService, const std::string dbName, settings::SettingsCache *cache = nullptr);
     ~SettingsAgent() = default;
 
     void initDb() override;
@@ -35,30 +37,20 @@ class SettingsAgent : public DatabaseAgent
 
   private:
     settings::SettingsCache *cache;
+    settings::FactorySettings factorySettings;
+
     using MapOfRecipentsToBeNotified = std::map<std::string, std::set<settings::EntryPath>>;
-    MapOfRecipentsToBeNotified variableChangeRecipents;
+    MapOfRecipentsToBeNotified variableChangeRecipients;
     using SetOfRecipents = std::set<std::string>;
-    SetOfRecipents profileChangedRecipents;
-    SetOfRecipents modeChangeRecipents;
+    SetOfRecipents profileChangedRecipients;
+    SetOfRecipents modeChangeRecipients;
+    const std::string dbName;
+
     // db operations
-    auto dbGetValue(settings::EntryPath path) -> std::optional<std::string>;
-    auto dbSetValue(settings::EntryPath path, std::string value) -> bool;
-    auto dbRegisterValueChange(settings::EntryPath path) -> bool;
-    auto dbUnregisterValueChange(settings::EntryPath path) -> bool;
-
-    auto dbRegisterOnProfileChange(const std::string &service) -> bool;
-    auto dbUnregisterOnProfileChange(const std::string &service) -> bool;
-    auto dbSetCurrentProfile(const std::string &profile) -> bool;
-    auto dbGetCurrentProfile() -> std::string;
-    auto dbGetAllProfiles() -> std::list<std::string>;
-    auto dbAddProfile(const std::string &profile) -> bool;
-
-    auto dbRegisterOnModeChange(const std::string &service) -> bool;
-    auto dbUnregisterOnModeChange(const std::string &service) -> bool;
-    auto dbSetCurrentMode(const std::string &mode) -> bool;
-    auto dbGetCurrentMode() -> std::string;
-    auto dbGetAllModes() -> std::list<std::string>;
-    auto dbAddMode(const std::string &mode) -> bool;
+    auto dbGetValue(const settings::EntryPath &path) -> std::optional<std::string>;
+    auto dbSetValue(const settings::EntryPath &path, const std::string &value) -> bool;
+    auto dbRegisterValueChange(const settings::EntryPath &path) -> bool;
+    auto dbUnregisterValueChange(const settings::EntryPath &path) -> bool;
 
     auto getDbInitString() -> const std::string override;
 
@@ -68,20 +60,4 @@ class SettingsAgent : public DatabaseAgent
     auto handleSetVariable(sys::Message *req) -> sys::MessagePointer;
     auto handleRegisterOnVariableChange(sys::Message *req) -> sys::MessagePointer;
     auto handleUnregisterOnVariableChange(sys::Message *req) -> sys::MessagePointer;
-
-    // profile
-    auto handleRegisterProfileChange(sys::Message *req) -> sys::MessagePointer;
-    auto handleUnregisterProfileChange(sys::Message *req) -> sys::MessagePointer;
-    auto handleSetCurrentProfile(sys::Message *req) -> sys::MessagePointer;
-    auto handleGetCurrentProfile(sys::Message *req) -> sys::MessagePointer;
-    auto handleAddProfile(sys::Message *req) -> sys::MessagePointer;
-    auto handleListProfiles(sys::Message *req) -> sys::MessagePointer;
-
-    // mode
-    auto handleRegisterOnModeChange(sys::Message *req) -> sys::MessagePointer;
-    auto handleUnregisterOnModeChange(sys::Message *req) -> sys::MessagePointer;
-    auto handleSetCurrentMode(sys::Message *req) -> sys::MessagePointer;
-    auto handleGetCurrentMode(sys::Message *req) -> sys::MessagePointer;
-    auto handleAddMode(sys::Message *req) -> sys::MessagePointer;
-    auto handleListModes(sys::Message *req) -> sys::MessagePointer;
 };

@@ -3,12 +3,12 @@
 
 #pragma once
 
+#include "CalllogModel.hpp"
+#include "data/CallLogInternals.hpp"
 #include <BoxLayout.hpp>
-#include "Label.hpp"
-#include "Image.hpp"
-#include "ListItem.hpp"
-#include "../data/CallLogInternals.hpp"
-#include "../CalllogModel.hpp"
+#include <Label.hpp>
+#include <Image.hpp>
+#include <ListItem.hpp>
 
 namespace gui
 {
@@ -38,11 +38,9 @@ namespace gui
         gui::Label *timestamp                                                  = nullptr;
         gui::Image *imageCallType[calllog::CallLogCallType::NUM_OF_CALL_TYPES] = {nullptr, nullptr, nullptr};
         gui::Label *text                                                       = nullptr;
-        // flag that defines if time should be displayed in 24h mode
-        bool mode24H = false;
 
       public:
-        CalllogItem(CalllogModel *model, bool mode24H);
+        CalllogItem(CalllogModel *model);
         virtual ~CalllogItem() = default;
         // sets copy of alarm's
         void setCall(std::shared_ptr<CalllogRecord> &);

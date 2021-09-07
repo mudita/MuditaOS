@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "parse_args.h"
@@ -295,8 +295,8 @@ int parse_program_args(int argc, char **argv, struct littlefs_opts *opts)
             }
         }
         else {
-            fprintf(stderr, "source directories not specified\n");
-            return -1;
+            opts->src_dirs_siz = 0;
+            opts->src_dirs     = NULL;
         }
         if (!opts->dst_image) {
             fprintf(stderr, "--image <file> is not specified\n");

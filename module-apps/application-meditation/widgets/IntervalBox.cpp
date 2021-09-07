@@ -1,14 +1,13 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "IntervalBox.hpp"
-
-#include "application-meditation/data/Style.hpp"
 #include "Style.hpp"
 #include "TimerProperty.hpp"
-#include "InputEvent.hpp"
 
+#include <gui/input/InputEvent.hpp>
 #include <i18n/i18n.hpp>
+
 #include <cassert>
 
 using namespace gui;
@@ -36,7 +35,7 @@ void IntervalBox::build()
                               boxStyle::topLabel::Y,
                               boxStyle::topLabel::Width,
                               boxStyle::topLabel::Height,
-                              utils::localize.get("app_meditation_interval_chime"));
+                              utils::translate("app_meditation_interval_chime"));
     topLabel->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Bottom));
     topLabel->setFont(style::window::font::verysmall);
     topLabel->setEdges(RectangleEdge::None);
@@ -91,7 +90,7 @@ bool IntervalBox::onFocus(bool state)
 
 bool IntervalBox::onInput(const InputEvent &inputEvent)
 {
-    if (inputEvent.isShortPress()) {
+    if (inputEvent.isShortRelease()) {
         if (inputEvent.is(KeyCode::KEY_LEFT)) {
             updateIntervals(ChimeIntervalList::Direction::Previous);
             return true;
@@ -156,10 +155,10 @@ bool IntervalBox::ChimeIntervalList::hasNext(Direction direction, std::chrono::m
 std::string IntervalBox::ChimeIntervalList::toPrintableInterval(std::chrono::minutes value)
 {
     if (value.count() == 0) {
-        return utils::localize.get("app_meditation_interval_none");
+        return utils::translate("app_meditation_interval_none");
     }
     const std::string toReplace = "%0";
-    std::string temp            = utils::localize.get("app_meditation_interval_every_x_minutes");
+    std::string temp            = utils::translate("app_meditation_interval_every_x_minutes");
     temp.replace(temp.find(toReplace), toReplace.size(), std::to_string(static_cast<int>(value.count())));
     return temp;
 }

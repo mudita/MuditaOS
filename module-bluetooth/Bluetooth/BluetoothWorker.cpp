@@ -4,10 +4,11 @@
 #include <service-bluetooth/ServiceBluetooth.hpp>
 #include "BluetoothWorker.hpp"
 #include "BtCommand.hpp"
-#include "log/log.hpp"
+#include <log.hpp>
 #include "interface/BluetoothDriverImpl.hpp"
 #include "interface/profiles/A2DP/A2DP.hpp"
 #include "interface/profiles/HSP/HSP.hpp"
+#include "audio/BluetoothAudioDevice.hpp"
 #include "BtKeysStorage.hpp"
 
 #if DEBUG_BLUETOOTH_HCI_COMS == 1
@@ -27,8 +28,8 @@ using namespace bsp;
 
 namespace queues
 {
-    constexpr inline auto io  = "qBtIO";
-    constexpr inline auto cmd = "qBtCmds";
+    constexpr inline auto io      = "qBtIO";
+    constexpr inline auto cmd     = "qBtCmds";
     constexpr inline auto btstack = "qBtStack";
 
     constexpr inline auto queueLength        = 10;
@@ -37,6 +38,8 @@ namespace queues
 
 namespace
 {
+    constexpr auto BluetoothWorkerStackDepth = 3072U;
+
     class DeviceRegistration
     {
       public:
@@ -85,7 +88,8 @@ namespace
 } // namespace
 
 BluetoothWorker::BluetoothWorker(sys::Service *service)
-    : Worker(service), service(service), profileManager(std::make_shared<bluetooth::ProfileManager>(service)),
+    : Worker(service, BluetoothWorkerStackDepth), service(service),
+      profileManager(std::make_shared<bluetooth::ProfileManager>(service)),
       settings(static_cast<ServiceBluetooth *>(service)->settingsHolder),
       runLoop(std::make_unique<bluetooth::RunLoop>()),
       controller{createStatefulController(
@@ -146,10 +150,15 @@ auto BluetoothWorker::handleCommand(QueueHandle_t queue) -> bool
 
     switch (command.getType()) {
     case bluetooth::Command::PowerOn:
+        initDevicesList();
         controller->turnOn();
         break;
     case bluetooth::Command::PowerOff:
         controller->turnOff();
+        break;
+    case bluetooth::Command::Unpair:
+        controller->processCommand(command);
+        removeFromBoundDevices(command.getAddress());
         break;
     default:
         controller->processCommand(command);
@@ -166,6 +175,7 @@ auto BluetoothWorker::handleBtStackTrigger(QueueHandle_t queue) -> bool
         return false;
     }
     if (notification) {
+        cpp_freertos::LockGuard lock(loopMutex);
         runLoop->process();
         return true;
     }
@@ -251,4 +261,26 @@ auto BluetoothWorker::deinit() -> bool
 {
     controller->turnOff();
     return Worker::deinit();
+}
+void BluetoothWorker::initDevicesList()
+{
+    auto bondedDevicesStr =
+        std::visit(bluetooth::StringVisitor(), settings->getValue(bluetooth::Settings::BondedDevices));
+    pairedDevices = SettingsSerializer::fromString(bondedDevicesStr);
+}
+void BluetoothWorker::removeFromBoundDevices(uint8_t *addr)
+{
+    auto position = std::find_if(
+        pairedDevices.begin(), pairedDevices.end(), [&](Devicei device) { return !bd_addr_cmp(addr, device.address); });
+    if (position != pairedDevices.end()) {
+        pairedDevices.erase(position);
+        settings->setValue(bluetooth::Settings::BondedDevices, SettingsSerializer::toString(pairedDevices));
+        LOG_INFO("Device removed from paired devices list");
+    }
+}
+
+void BluetoothWorker::setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> device)
+{
+    cpp_freertos::LockGuard lock(loopMutex);
+    profileManager->setAudioDevice(std::move(device));
 }

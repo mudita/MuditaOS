@@ -1,13 +1,15 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NetworkSettings.hpp"
 #include "QMBNManager.hpp"
 #include <unordered_map>
+#include <at/ATFactory.hpp>
+#include <at/cmd/QNWINFO.hpp>
 
-std::string NetworkSettings::getCurrentOperator() const
+std::string NetworkSettings::getCurrentOperatorName() const
 {
-    auto channel = cellularService.cmux->get(TS0710::Channel::Commands);
+    auto channel = cellularService.cmux->get(CellularMux::Channel::Commands);
     if (channel) {
         at::Cmd buildCmd = at::factory(at::AT::COPS) + "?";
         auto resp        = channel->cmd(buildCmd);
@@ -22,10 +24,108 @@ std::string NetworkSettings::getCurrentOperator() const
     return {};
 }
 
+std::optional<at::response::cops::Operator> NetworkSettings::getCurrentOperator() const
+{
+    auto channel = cellularService.cmux->get(CellularMux::Channel::Commands);
+    if (channel) {
+        at::Cmd buildCmd = at::factory(at::AT::COPS) + "?";
+        auto resp        = channel->cmd(buildCmd);
+        at::response::cops::CurrentOperatorInfo ret;
+        if ((resp.code == at::Result::Code::OK) && (at::response::parseCOPS(resp, ret))) {
+            return ret.getOperator();
+        }
+    }
+
+    return {};
+}
+
+namespace
+{
+    constexpr auto cdma1x         = "CDMA1X";
+    constexpr auto cdma1xAndHdr   = "CDMA1X AND HDR";
+    constexpr auto cmda1xAndEhrdp = "CDMA1X AND EHRPD";
+    constexpr auto hdr            = "HDR";
+    constexpr auto hdrEhrpd       = "HDR-EHRPD";
+    constexpr auto gsm            = "GSM";
+    constexpr auto edge           = "EDGE";
+    constexpr auto wcdma          = "WCDMA";
+    constexpr auto hsdpa          = "HSDPA";
+    constexpr auto hsupa          = "HSUPA";
+    constexpr auto hspaPlus       = "HSPA+";
+    constexpr auto tdscdma        = "TDSCDMA";
+    constexpr auto tddLte         = "TDD LTE";
+    constexpr auto fddLte         = "FDD LTE";
+
+    std::map<std::string_view, at::response::cops::AccessTechnology> technologyMap = {
+        {cdma1x, at::response::cops::AccessTechnology::CDMA},
+        {cdma1xAndHdr, at::response::cops::AccessTechnology::CDMA},
+        {cmda1xAndEhrdp, at::response::cops::AccessTechnology::CDMA},
+        {hdr, at::response::cops::AccessTechnology::UTRAN},
+        {hdrEhrpd, at::response::cops::AccessTechnology::UTRAN},
+        {gsm, at::response::cops::AccessTechnology::GSM},
+        {edge, at::response::cops::AccessTechnology::GSM_W_EGPRS},
+        {wcdma, at::response::cops::AccessTechnology::UTRAN},
+        {hsdpa, at::response::cops::AccessTechnology::UTRAN_W_HSDPA},
+        {hsupa, at::response::cops::AccessTechnology::UTRAN_W_HSUPA},
+        {hspaPlus, at::response::cops::AccessTechnology::UTRAN},
+        {tdscdma, at::response::cops::AccessTechnology::UTRAN},
+        {tddLte, at::response::cops::AccessTechnology::E_UTRAN},
+        {fddLte, at::response::cops::AccessTechnology::E_UTRAN}};
+} // namespace
+
+std::optional<at::result::QNWINFO> NetworkSettings::getCurrentNetworkInfo() const
+{
+    auto channel = cellularService.cmux->get(CellularMux::Channel::Commands);
+    if (channel) {
+        auto command = at::cmd::QNWINFO();
+        auto result  = channel->cmd(command);
+        if (auto response = command.parseQNWINFO(result); response) {
+            return response;
+        }
+    }
+    return {};
+}
+
+NetworkSettings::SimpleNAT NetworkSettings::toSimpleNAT(at::response::cops::AccessTechnology nat)
+{
+    switch (nat) {
+    case at::response::cops::AccessTechnology::GSM:
+    case at::response::cops::AccessTechnology::GSM_W_EGPRS:
+        return SimpleNAT::GSM;
+    case at::response::cops::AccessTechnology::UTRAN:
+    case at::response::cops::AccessTechnology::UTRAN_W_HSDPA:
+    case at::response::cops::AccessTechnology::UTRAN_W_HSUPA:
+    case at::response::cops::AccessTechnology::UTRAN_W_HSDPA_and_HSUPA:
+    case at::response::cops::AccessTechnology::CDMA:
+        return SimpleNAT::UMTS;
+    case at::response::cops::AccessTechnology::E_UTRAN:
+        return SimpleNAT::LTE;
+    }
+    return SimpleNAT::GSM;
+}
+
+std::optional<at::response::cops::AccessTechnology> NetworkSettings::getCurrentNAT() const
+{
+    const auto currentOperator = getCurrentOperator();
+    if (currentOperator && currentOperator->technology) {
+        return currentOperator->technology;
+    }
+
+    const auto currentNetworkInfo = getCurrentNetworkInfo();
+    if (currentNetworkInfo) {
+        auto it = technologyMap.find(currentNetworkInfo->act);
+        if (it != technologyMap.end()) {
+            return it->second;
+        }
+    }
+
+    return {};
+}
+
 std::vector<std::string> NetworkSettings::scanOperators(bool fullInfoList)
 {
     std::vector<std::string> operatorNames;
-    auto channel = cellularService.cmux->get(TS0710::Channel::Commands);
+    auto channel = cellularService.cmux->get(CellularMux::Channel::Commands);
     if (channel) {
         at::Cmd buildCmd = at::factory(at::AT::COPS) + "=?";
 
@@ -74,7 +174,7 @@ std::vector<std::string> NetworkSettings::scanOperators(bool fullInfoList)
 
 bool NetworkSettings::setOperatorAutoSelect()
 {
-    auto channel = cellularService.cmux->get(TS0710::Channel::Commands);
+    auto channel = cellularService.cmux->get(CellularMux::Channel::Commands);
     if (!channel) {
         return false;
     }
@@ -88,7 +188,7 @@ bool NetworkSettings::setOperator(at::response::cops::CopsMode mode,
                                   at::response::cops::NameFormat format,
                                   const std::string &name)
 {
-    auto channel = cellularService.cmux->get(TS0710::Channel::Commands);
+    auto channel = cellularService.cmux->get(CellularMux::Channel::Commands);
     if (!channel) {
         return false;
     }
@@ -102,7 +202,7 @@ bool NetworkSettings::setOperator(at::response::cops::CopsMode mode,
 
 at::Result::Code NetworkSettings::getPreferredVoiceDomain(VoiceDomainPreference &pref)
 {
-    auto channel = cellularService.cmux->get(TS0710::Channel::Commands);
+    auto channel = cellularService.cmux->get(CellularMux::Channel::Commands);
     if (!channel) {
         return at::Result::Code::ERROR;
     }
@@ -119,7 +219,7 @@ at::Result::Code NetworkSettings::getPreferredVoiceDomain(VoiceDomainPreference 
 
 at::Result::Code NetworkSettings::setPreferredVoiceDomain(VoiceDomainPreference pref)
 {
-    auto channel = cellularService.cmux->get(TS0710::Channel::Commands);
+    auto channel = cellularService.cmux->get(CellularMux::Channel::Commands);
     if (!channel) {
         return at::Result::Code::ERROR;
     }
@@ -131,7 +231,7 @@ at::Result::Code NetworkSettings::setPreferredVoiceDomain(VoiceDomainPreference 
 
 at::Result::Code NetworkSettings::getPreferredSMSDomain(SMSDomainPreference &pref)
 {
-    auto channel = cellularService.cmux->get(TS0710::Channel::Commands);
+    auto channel = cellularService.cmux->get(CellularMux::Channel::Commands);
     if (!channel) {
         return at::Result::Code::ERROR;
     }
@@ -148,7 +248,7 @@ at::Result::Code NetworkSettings::getPreferredSMSDomain(SMSDomainPreference &pre
 
 at::Result::Code NetworkSettings::setPreferredSMSDomain(SMSDomainPreference pref)
 {
-    auto channel = cellularService.cmux->get(TS0710::Channel::Commands);
+    auto channel = cellularService.cmux->get(CellularMux::Channel::Commands);
     if (!channel) {
         return at::Result::Code::ERROR;
     }
@@ -161,7 +261,7 @@ at::Result::Code NetworkSettings::setPreferredSMSDomain(SMSDomainPreference pref
 at::Result::Code NetworkSettings::setIMSState(at::response::qcfg_ims::IMSState state)
 {
     std::vector<std::string> operatorNames;
-    auto channel = cellularService.cmux->get(TS0710::Channel::Commands);
+    auto channel = cellularService.cmux->get(CellularMux::Channel::Commands);
     if (!channel) {
         return at::Result::Code::ERROR;
     }
@@ -174,7 +274,7 @@ std::optional<std::pair<at::response::qcfg_ims::IMSState, at::response::qcfg_ims
     getIMSState()
 {
     std::vector<std::string> operatorNames;
-    auto channel = cellularService.cmux->get(TS0710::Channel::Commands);
+    auto channel = cellularService.cmux->get(CellularMux::Channel::Commands);
     if (channel) {
 
         at::Cmd buildCmd = at::factory(at::AT::QCFG_IMS);
@@ -190,7 +290,6 @@ std::optional<std::pair<at::response::qcfg_ims::IMSState, at::response::qcfg_ims
 
 at::Result::Code NetworkSettings::setVoLTEState(VoLTEState state)
 {
-
     /**
      * VoLTE On scenario
      * 1^) auto select off
@@ -208,7 +307,7 @@ at::Result::Code NetworkSettings::setVoLTEState(VoLTEState state)
      * 3) Reboot
      */
 
-    auto channel = cellularService.cmux->get(TS0710::Channel::Commands);
+    auto channel = cellularService.cmux->get(CellularMux::Channel::Commands);
     if (!channel) {
         return at::Result::Code::ERROR;
     }
@@ -225,10 +324,11 @@ at::Result::Code NetworkSettings::setVoLTEState(VoLTEState state)
     }
     LOG_DEBUG("Modem soft reboot");
     cellularService.resetCellularModule(ServiceCellular::ResetType::SoftReset);
+
     return at::Result::Code::OK;
 }
 
-VoLTEState NetworkSettings::getVoLTEState()
+VoLTEState NetworkSettings::getVoLTEConfigurationState()
 {
     /** VoLTE on could be detect in general by one parameter,
      * based on enable IP multimedia services ON (via QCFG="ims")
@@ -248,8 +348,7 @@ VoLTEState NetworkSettings::getVoLTEState()
 
 std::string NetworkSettings::printVoLTEDebug()
 {
-
-    auto channel = cellularService.cmux->get(TS0710::Channel::Commands);
+    auto channel = cellularService.cmux->get(CellularMux::Channel::Commands);
     if (channel) {
         auto resp = channel->cmd("AT+QVOLTEDBG");
         if (resp.code == at::Result::Code::OK) {
@@ -257,10 +356,8 @@ std::string NetworkSettings::printVoLTEDebug()
             for (auto el : resp.response) {
                 buffer = el + "\r\n";
             }
-            LOG_DEBUG("VOLTEDEBUG:\r\n%s", buffer.c_str());
             return buffer;
         }
     }
-
     return {};
 }

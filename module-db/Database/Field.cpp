@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Field.hpp"
-#include <log/log.hpp>
+#include <log.hpp>
 #include <functional>
 
 const char *Field::getCString() const
@@ -20,7 +20,7 @@ template <class T> static T lget(T &val, const std::string &mValue, std::functio
         return foo();
     }
     catch (...) {
-        LOG_FATAL("Can't convert: %s to: %s", mValue.c_str(), typeid(T).name());
+        LOG_FATAL("Can't convert value to: %s", typeid(T).name());
     }
     return val;
 }

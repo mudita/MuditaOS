@@ -3,7 +3,7 @@
 
 #include <algorithm>
 #include "BtKeysStorage.hpp"
-#include <log/log.hpp>
+#include <log.hpp>
 
 json11::Json bluetooth::KeyStorage::keysJson = json11::Json();
 btstack_link_key_db_t bluetooth::KeyStorage::keyStorage;
@@ -71,7 +71,7 @@ namespace bluetooth
     auto KeyStorage::getLinkKey(uint8_t *bd_addr, link_key_t link_key, link_key_type_t *type) -> int
     {
         if (type != nullptr && bd_addr != nullptr) {
-            LOG_INFO("getting key for address %s from API", bd_addr_to_str(bd_addr));
+            LOG_INFO("getting key from API");
             if (keys.empty()) {
                 LOG_ERROR("Keys empty!");
                 return 0;
@@ -95,7 +95,6 @@ namespace bluetooth
     }
     void KeyStorage::putLinkKey(uint8_t *bd_addr, uint8_t *link_key, link_key_type_t type)
     {
-        LOG_INFO("putting key for address %s from API", bd_addr_to_str(bd_addr));
         auto keyEntry = json11::Json::object{{strings::bd_addr, bd_addr_to_str(bd_addr)},
                                              {strings::link_key, std::string(reinterpret_cast<char *>(link_key))},
                                              {strings::type, type}};
@@ -110,7 +109,7 @@ namespace bluetooth
     void KeyStorage::deleteLinkKey(uint8_t *bd_addr)
     {
         auto keysSize = keys.size();
-        LOG_INFO("deleting key for address %s from API", bd_addr_to_str(bd_addr));
+        LOG_INFO("deleting key from API");
         auto end = std::remove_if(keys.begin(), keys.end(), [&](auto &key) {
             bd_addr_t addr;
             sscanf_bd_addr(key[strings::bd_addr].string_value().c_str(), addr);

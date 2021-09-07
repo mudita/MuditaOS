@@ -1,14 +1,12 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Item.hpp"
 #include "BoundingBox.hpp" // for BoundingBox, BoundingBox::(anonymous)
 #include "InputEvent.hpp"  // for InputEvent, KeyCode, InputEvent::State
 #include "Navigation.hpp"  // for Navigation
-#include "Timer.hpp"       // for Timer
-#include <Timer.hpp>
-#include <algorithm> // for find
-#include <list>      // for list<>::iterator, list, operator!=, _List...
+#include <algorithm>       // for find
+#include <list>            // for list<>::iterator, list, operator!=, _List...
 #include <memory>
 #include <DrawCommand.hpp>
 namespace gui
@@ -16,7 +14,7 @@ namespace gui
 
     NavigationDirection inputToNavigation(const InputEvent &evt)
     {
-        switch (evt.keyCode) {
+        switch (evt.getKeyCode()) {
         case gui::KeyCode::KEY_LEFT:
             return gui::NavigationDirection::LEFT;
         case gui::KeyCode::KEY_RIGHT:
@@ -143,22 +141,22 @@ namespace gui
         onDimensionChanged(oldArea, widgetArea);
     }
 
-    void Item::setPosition(const short &x, const short &y)
+    void Item::setPosition(const Position &x, const Position &y)
     {
         setArea({x, y, widgetArea.w, widgetArea.h});
     }
 
-    void Item::setX(const int32_t x)
+    void Item::setX(const Position x)
     {
         setArea({x, widgetArea.y, widgetArea.w, widgetArea.h});
     }
 
-    void Item::setY(const int32_t y)
+    void Item::setY(const Position y)
     {
         setArea({widgetArea.x, y, widgetArea.w, widgetArea.h});
     }
 
-    auto Item::requestSize(unsigned short request_w, unsigned short request_h) -> Size
+    auto Item::requestSize(Length request_w, Length request_h) -> Size
     {
         if (parent == nullptr) {
             setSize(request_w, request_h);
@@ -167,7 +165,7 @@ namespace gui
         return parent->handleRequestResize(this, request_w, request_h);
     }
 
-    auto Item::handleRequestResize(const Item *it, unsigned short request_w, unsigned short request_h) -> Size
+    auto Item::handleRequestResize(const Item *it, Length request_w, Length request_h) -> Size
     {
         if (it == nullptr) {
             return {0, 0};
@@ -175,12 +173,12 @@ namespace gui
         return {it->getWidth(), it->getHeight()};
     }
 
-    void Item::setSize(const unsigned short w, const unsigned short h)
+    void Item::setSize(Length w, Length h)
     {
         setArea({widgetArea.x, widgetArea.y, w, h});
     }
 
-    void Item::setSize(uint32_t val, Axis axis)
+    void Item::setSize(Length val, Axis axis)
     {
         uint16_t w = getWidth();
         uint16_t h = getHeight();
@@ -204,7 +202,7 @@ namespace gui
     }
 
     void Item::setAreaInAxis(
-        Axis axis, uint32_t posOnAxis, uint32_t posOnOrthogonalAxis, uint32_t sizeOnAxis, uint32_t sizeOnOrthogonalAxis)
+        Axis axis, Position posOnAxis, Position posOnOrthogonalAxis, Length sizeOnAxis, Length sizeOnOrthogonalAxis)
     {
         if (axis == Axis::X) {
 
@@ -223,22 +221,22 @@ namespace gui
     }
 
     /// set maximum
-    void Item::setMaximumSize(uint32_t val, Axis axis)
+    void Item::setMaximumSize(Length val, Axis axis)
     {
         setAreaSizeInAxis(area(Area::Max), axis, val);
     }
 
-    void Item::setMaximumWidth(uint32_t w)
+    void Item::setMaximumWidth(Length w)
     {
         setMaximumSize(w, Axis::X);
     }
 
-    void Item::setMaximumHeight(uint32_t h)
+    void Item::setMaximumHeight(Length h)
     {
         setMaximumSize(h, Axis::Y);
     }
 
-    void Item::setMaximumSize(uint32_t w, uint32_t h)
+    void Item::setMaximumSize(Length w, Length h)
     {
         setMaximumHeight(h);
         setMaximumWidth(w);
@@ -246,22 +244,22 @@ namespace gui
 
     /// set minimum
 
-    void Item::setMinimumSize(uint32_t val, Axis axis)
+    void Item::setMinimumSize(Length val, Axis axis)
     {
         setAreaSizeInAxis(area(Area::Min), axis, val);
     }
 
-    void Item::setMinimumWidth(uint32_t w)
+    void Item::setMinimumWidth(Length w)
     {
         setMinimumSize(w, Axis::X);
     }
 
-    void Item::setMinimumHeight(uint32_t h)
+    void Item::setMinimumHeight(Length h)
     {
         setMinimumSize(h, Axis::Y);
     }
 
-    void Item::setMinimumSize(uint32_t w, uint32_t h)
+    void Item::setMinimumSize(Length w, Length h)
     {
         setMinimumWidth(w);
         setMinimumHeight(h);
@@ -292,20 +290,20 @@ namespace gui
         return padding;
     }
 
-    uint16_t Item::getSize(Axis axis) const
+    Length Item::getSize(Axis axis) const
     {
         return widgetArea.size(axis);
     }
 
-    uint16_t Item::getPosition(Axis axis) const
+    Position Item::getPosition(Axis axis) const
     {
         return widgetArea.pos(axis);
     }
 
-    void Item::setPosition(const short &val, Axis axis)
+    void Item::setPosition(const Position &val, Axis axis)
     {
-        int16_t x = getX();
-        int16_t y = getY();
+        Position x = getX();
+        Position y = getY();
         if (axis == Axis::X) {
             x = val;
         }
@@ -337,7 +335,7 @@ namespace gui
         return alignment;
     }
 
-    uint16_t Item::getAxisAlignmentValue(Axis axis, uint16_t itemSize)
+    Length Item::getAxisAlignmentValue(Axis axis, Length itemSize)
     {
         auto tempAlignment = getAlignment(axis);
 
@@ -382,9 +380,7 @@ namespace gui
 
     void Item::setRadius(int value)
     {
-        if (value < 0)
-            value = 0;
-        radius = value;
+        radius = std::abs(value);
     }
 
     void Item::updateDrawArea()
@@ -439,11 +435,11 @@ namespace gui
     bool Item::handleNavigation(const InputEvent inputEvent)
     {
         gui::Item *newFocusItem = nullptr;
-        if ((focusItem != nullptr) && (inputEvent.state == InputEvent::State::keyReleasedShort)) {
+        if ((focusItem != nullptr) && (inputEvent.isShortRelease())) {
             if (itemNavigation != nullptr && itemNavigation(inputEvent)) {
                 return true;
             }
-            if (inputEvent.keyCode == gui::KeyCode::KEY_ENTER && focusItem != nullptr) {
+            if (inputEvent.is(gui::KeyCode::KEY_ENTER) && focusItem != nullptr) {
                 return focusItem->onActivated(nullptr);
             }
             newFocusItem = focusItem->getNavigationItem(inputToNavigation(inputEvent));
@@ -515,7 +511,7 @@ namespace gui
         return false;
     }
 
-    auto Item::onTimer(Timer &timer) -> bool
+    auto Item::onTimer(sys::Timer &timer) -> bool
     {
         if (timerCallback != nullptr) {
             return timerCallback(*this, timer);
@@ -523,10 +519,12 @@ namespace gui
         return false;
     }
 
-    void Item::detachTimer(Timer &timer)
+    void Item::detachTimer(sys::Timer &timer)
     {
-        auto el = std::find_if(timers.begin(), timers.end(), [&](auto &el) -> bool { return el.get() == &timer; });
-        timers.erase(el);
+        const auto it = std::find_if(timers.begin(), timers.end(), [&timer](auto &ptr) { return ptr == &timer; });
+        if (it != timers.end()) {
+            timers.erase(it);
+        }
     }
 
     void Item::accept(GuiVisitor &visitor)

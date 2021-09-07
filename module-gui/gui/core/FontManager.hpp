@@ -42,14 +42,16 @@ namespace gui
 
         virtual ~FontManager();
 
-        [[nodiscard]] auto getFont(const std::string &name) const -> RawFont *;
+        [[nodiscard]] auto getFont(std::string_view name = defaultFontName) const -> RawFont *;
         [[nodiscard]] auto getFont(uint32_t num) const -> RawFont *;
         [[nodiscard]] auto isInitialized() const
         {
             return initialized;
         }
 
+        static constexpr auto defaultFontName{"gt_pressura_regular_27"};
+
       private:
-        [[nodiscard]] auto find(const std::string &name) const -> RawFont *;
+        [[nodiscard]] auto find(std::string_view name) const -> RawFont *;
     };
 }; // namespace gui

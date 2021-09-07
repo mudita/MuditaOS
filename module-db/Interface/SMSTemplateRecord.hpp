@@ -49,7 +49,9 @@ class SMSTemplateRecordInterface : public RecordInterface<SMSTemplateRecord, SMS
   private:
     SmsDB *smsDB = nullptr;
     std::unique_ptr<db::QueryResult> getByIDQuery(const std::shared_ptr<db::Query> &query);
-    std::unique_ptr<db::QueryResult> getQuery(const std::shared_ptr<db::Query> &query);
+    auto getQueryRecords(const std::shared_ptr<db::Query> &query) -> std::vector<SMSTemplateRecord>;
+    auto getQuery(const std::shared_ptr<db::Query> &query) -> std::unique_ptr<db::QueryResult>;
+    auto getQueryWithTotalCount(const std::shared_ptr<db::Query> &query) -> std::unique_ptr<db::QueryResult>;
     std::unique_ptr<db::QueryResult> getForListQuery(const std::shared_ptr<db::Query> &query);
     std::unique_ptr<db::QueryResult> getCountQuery(const std::shared_ptr<db::Query> &query);
     std::unique_ptr<db::QueryResult> addQuery(const std::shared_ptr<db::Query> &query);

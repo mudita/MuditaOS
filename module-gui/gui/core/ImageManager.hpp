@@ -1,36 +1,36 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+#pragma once
 
-/*
- * ImageManager.hpp
- *
- *  Created on: 18 maj 2019
- *      Author: robert
- */
-
-#ifndef GUI_CORE_PIXMAPMANAGER_HPP_
-#define GUI_CORE_PIXMAPMANAGER_HPP_
-
+#include "ImageMap.hpp"
 #include <vector>
 #include <string>
 #include <cstdint>
-#include <cstring>
-
-#include "ImageMap.hpp"
+#include <map>
 
 namespace gui
 {
-
     class ImageManager
     {
+      private:
+        std::map<ImageTypeSpecifier, std::string> specifierMap = {{ImageTypeSpecifier::None, "None"},
+                                                                  {ImageTypeSpecifier::W_G, "_W_G"},
+                                                                  {ImageTypeSpecifier::B_G, "_B_G"},
+                                                                  {ImageTypeSpecifier::W_M, "_W_M"},
+                                                                  {ImageTypeSpecifier::B_M, "_B_M"}};
+        std::string checkAndAddSpecifierToName(const std::string &name, ImageTypeSpecifier specifier);
+        ImageMap *createFallbackImage();
+        std::uint32_t fallbackImageId{0};
+
       protected:
         std::string mapFolder;
         std::vector<ImageMap *> imageMaps;
 
-        std::vector<std::string> getImageMapList(std::string ext);
-
+        auto getImageMapList(std::string ext1, std::string ext2)
+            -> std::pair<std::vector<std::string>, std::vector<std::string>>;
         ImageMap *loadPixMap(std::string filename);
         ImageMap *loadVecMap(std::string filename);
+        void addFallbackImage();
         void loadImageMaps(std::string baseDirectory);
 
         ImageManager();
@@ -45,10 +45,8 @@ namespace gui
         virtual ~ImageManager();
 
         ImageMap *getImageMap(uint32_t id);
-        uint32_t getImageMapID(const std::string &name);
+        uint32_t getImageMapID(const std::string &name, ImageTypeSpecifier specifier = ImageTypeSpecifier::None);
         void clear();
     };
 
 } /* namespace gui */
-
-#endif /* GUI_CORE_PIXMAPMANAGER_HPP_ */

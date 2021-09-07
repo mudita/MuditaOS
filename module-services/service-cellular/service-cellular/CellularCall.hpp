@@ -15,6 +15,7 @@
 #include <iosfwd>
 #include <string>
 #include <sys/types.h>
+#include <Service/CpuSentinel.hpp>
 
 namespace CellularCall
 {
@@ -30,7 +31,9 @@ namespace CellularCall
         bool isActiveCall = false;
         std::function<CalllogRecord(const CalllogRecord &rec)> startCallAction;
         std::function<bool(const CalllogRecord &rec)> endCallAction;
-        utils::time::Timestamp startActiveTime = 0;
+        utils::time::Timestamp startActiveTime;
+
+        std::shared_ptr<sys::CpuSentinel> cpuSentinel;
 
         void setType(const CallType type)
         {
@@ -46,7 +49,7 @@ namespace CellularCall
         {
             call            = CalllogRecord();
             isActiveCall    = false;
-            startActiveTime = 0;
+            startActiveTime.set_time(0);
         }
 
       public:
@@ -82,7 +85,19 @@ namespace CellularCall
 
         bool isValid() const
         {
-            return call.ID != 0;
+            return call.ID != DB_ID_NONE;
         }
+
+        bool isActive() const
+        {
+            return isActiveCall;
+        }
+
+        [[nodiscard]] CallType getType() const noexcept
+        {
+            return call.type;
+        }
+
+        void setCpuSentinel(std::shared_ptr<sys::CpuSentinel> sentinel);
     };
 } // namespace CellularCall

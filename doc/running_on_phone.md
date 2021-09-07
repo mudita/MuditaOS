@@ -33,10 +33,9 @@ Files required to boot from eMMC are:
 - firmware image checksum files: `.boot.json` and `.boot.json.crc32`
 - assets (images, fonts, sounds, databases)
 
-### Upload to eMMC
+### Uploading it to the eMMC
 
-- [Mount Mudita Pure as a USB MSC (disk drive)](#How-to-mount-Mudita-Pure-as-a-USB-MSC)
-- Use convenience script `flash_eMMC.sh <build_folder; default="build">` to copy both the executable **AND** the assets. **Note:** databases will be restored to their default. This script copies everything needed for the phone to work. This means that after running it you can remove `boot.bin` from the phone, load the code to SDRAM and work on current assets.
+-  Use the `pureflash` command to burn image into the eMMC card `sudo pureflash <PurePhone.img> /dev/sdX` **Note:** Replace `/dev/sdX` with the disk name you found for your phone after connecting it to your computer.
 
 ## How to mount Mudita Pure as a USB MSC
 
@@ -51,3 +50,6 @@ If you have a bootloader flashed and working use the following key combination, 
 - wait while text scrolls from the bottom
 - release centre button
 - press key 4
+
+FAT partition can be mounted directly by the Linux kernel. LittleFS partition can be mounted via
+FUSE using the following command `lfsfuse /dev/sdX <mount_point> --block_size=32768`

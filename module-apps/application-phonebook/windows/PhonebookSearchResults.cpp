@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhonebookSearchResults.hpp"
@@ -38,9 +38,9 @@ namespace gui
 
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
-        setTitle(utils::localize.get("common_results_prefix"));
+        setTitle(utils::translate("common_results_prefix"));
     }
 
     void PhonebookSearchResults::destroyInterface()
@@ -60,34 +60,6 @@ namespace gui
         }
     }
 
-    auto PhonebookSearchResults::onInput(const InputEvent &inputEvent) -> bool
-    {
-        if (AppWindow::onInput(inputEvent)) {
-            return true;
-        }
-
-        // process only if key is released
-        if (inputEvent.state != InputEvent::State::keyReleasedShort) {
-            return false;
-        }
-        if (inputEvent.state == InputEvent::State::keyReleasedShort) {
-            switch (inputEvent.keyCode) {
-            case KeyCode::KEY_LEFT:
-                LOG_INFO("Adding new contact");
-                application->switchWindow(gui::window::name::new_contact);
-                return true;
-            case KeyCode::KEY_RIGHT:
-                LOG_INFO("Searching contact");
-                application->switchWindow("Search");
-                return true;
-            default:
-                break;
-            }
-        }
-
-        return false;
-    }
-
     auto PhonebookSearchResults::handleSwitchData(SwitchData *data) -> bool
     {
         if (data == nullptr) {
@@ -98,18 +70,18 @@ namespace gui
         assert(searchResultsData != nullptr);
 
         searchResultsModel = searchResultsData->consumeSearchResultsModel();
-        setTitle(utils::localize.get("common_results_prefix") + "\"" + searchResultsModel->getFilter() + "\"");
+        setTitle(utils::translate("common_results_prefix") + "\"" + searchResultsModel->getFilter() + "\"");
         searchResultList->setProvider(searchResultsModel);
 
         if (searchResultsModel->messagesSelectCallback) {
             bottomBar->setActive(BottomBar::Side::LEFT, false);
             bottomBar->setText(BottomBar::Side::LEFT, "");
-            bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::select));
+            bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::select));
         }
         else {
             bottomBar->setActive(BottomBar::Side::LEFT, true);
-            bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(style::strings::common::call));
-            bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::open));
+            bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::call));
+            bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::open));
         }
 
         return true;

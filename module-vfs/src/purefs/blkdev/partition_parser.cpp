@@ -1,9 +1,9 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <purefs/blkdev/partition_parser.hpp>
 #include <purefs/blkdev/disk.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <errno.h>
 #include <limits>
 
@@ -28,6 +28,7 @@ namespace purefs::blkdev::internal
             constexpr auto reserved_sect      = 0x00e;
             constexpr auto number_of_fats     = 0x010;
             constexpr auto num_parts          = 4;
+            constexpr auto min_sector_size    = 512;
         } // namespace
     }     // namespace defs
     namespace
@@ -48,15 +49,19 @@ namespace purefs::blkdev::internal
     // Partition search
     auto partition_parser::partition_search() -> int
     {
-        const auto sect_size = m_disk->get_info(info_type::sector_size);
+        const auto sect_size = m_disk->get_info(info_type::sector_size, 0);
         if (sect_size < 0) {
             LOG_ERROR("Unable to get sector size");
             return sect_size;
         }
         std::vector<std::uint8_t> mbr_sect(sect_size);
-        auto ret = m_disk->read(mbr_sect.data(), 0, 1);
+        auto ret = m_disk->read(mbr_sect.data(), 0, 1, 0);
         if (ret < 0) {
             return ret;
+        }
+        if (sect_size < defs::min_sector_size) {
+            LOG_ERROR("Unable to scan partition when sector size < 512");
+            return -ENXIO;
         }
         // Check initial signature
         if ((mbr_sect[defs::mbr_signature_offs] != 0x55) && (mbr_sect[defs::mbr_signature_offs + 1] != 0xAA)) {
@@ -94,8 +99,8 @@ namespace purefs::blkdev::internal
 
     auto partition_parser::check_partition(const std::shared_ptr<disk> disk, const partition &part) -> bool
     {
-        auto sector_size     = disk->get_info(info_type::sector_size);
-        const auto this_size = uint64_t(disk->get_info(info_type::sector_count)) * uint64_t(sector_size);
+        auto sector_size     = disk->get_info(info_type::sector_size, 0);
+        const auto this_size = uint64_t(disk->get_info(info_type::sector_count, 0)) * uint64_t(sector_size);
         const auto poffset   = uint64_t(part.start_sector) * uint64_t(sector_size);
         const auto psize     = uint64_t(part.num_sectors) * uint64_t(sector_size);
         const auto pnext     = uint64_t(part.start_sector) * uint64_t(sector_size) + poffset;
@@ -133,7 +138,7 @@ namespace purefs::blkdev::internal
     auto partition_parser::parse_extended(uint32_t lba, uint32_t count) -> int
     {
         static constexpr auto max_parts{100};
-        auto sector_size = m_disk->get_info(info_type::sector_size);
+        auto sector_size = m_disk->get_info(info_type::sector_size, 0);
         int extended_part_num;
         std::array<partition, defs::num_parts> parts;
         auto current_sector     = lba;
@@ -149,7 +154,7 @@ namespace purefs::blkdev::internal
         while (try_count--) {
             if (sector_in_buf != current_sector) {
                 LOG_INFO("extended parse: Read sector %u\n", unsigned(current_sector));
-                error = m_disk->read(sect_buf.data(), current_sector, 1);
+                error = m_disk->read(sect_buf.data(), current_sector, 1, 0);
                 if (error < 0)
                     break;
                 sector_in_buf = current_sector;

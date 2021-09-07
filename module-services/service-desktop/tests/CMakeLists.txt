@@ -1,5 +1,16 @@
-file (COPY "${CMAKE_CURRENT_LIST_DIR}/muditaos-unittest.tar" DESTINATION "${CMAKE_BINARY_DIR}/sys/updates")
-file (COPY "${CMAKE_CURRENT_LIST_DIR}/factory-test" DESTINATION "${CMAKE_BINARY_DIR}/sys")
+file(
+    COPY
+        muditaos-unittest.tar
+    DESTINATION
+        ${TEST_ASSETS_DEST_DIR}/updates
+)
+
+file(
+    COPY
+        factory-test
+    DESTINATION
+        ${TEST_ASSETS_DEST_DIR}
+)
 
 add_catch2_executable(
     NAME
@@ -11,9 +22,7 @@ add_catch2_executable(
         service-desktop
         module-utils
         module-apps
-        iosyscalls
-    DEPS
-        PurePhone.img-target
+    USE_FS
 )
 
 add_catch2_executable(
@@ -26,6 +35,18 @@ add_catch2_executable(
         service-desktop
         module-utils
         module-apps
-        module-vfs
-        iosyscalls
+    USE_FS
+)
+
+add_catch2_executable(
+    NAME
+        service-desktop-endpoint-filesystem
+    SRCS
+        tests-main.cpp
+        test-fs-ep-operations.cpp
+    LIBS
+        service-desktop
+        module-utils
+        module-apps
+    USE_FS
 )

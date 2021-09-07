@@ -2,12 +2,10 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CallLogMainWindow.hpp"
-#include "application-calllog/data/CallLogInternals.hpp"
-#include "application-calllog/ApplicationCallLog.hpp"
-#include "application-calllog/widgets/CalllogItem.hpp"
+#include "data/CallLogInternals.hpp"
+#include "ApplicationCallLog.hpp"
+#include "widgets/CalllogItem.hpp"
 
-#include <application-call/ApplicationCall.hpp>
-#include <service-appmgr/model/ApplicationManager.hpp>
 #include <service-db/DBCalllogMessage.hpp>
 #include <i18n/i18n.hpp>
 #include <Label.hpp>
@@ -18,6 +16,7 @@
 #include <cassert>
 #include <functional>
 #include <memory>
+#include <service-db/DBNotificationMessage.hpp>
 
 using namespace style;
 using namespace callLogStyle;
@@ -34,19 +33,21 @@ namespace gui
 
     void CallLogMainWindow::rebuild()
     {
-        destroyInterface();
-        buildInterface();
+        if (list == nullptr) {
+            return;
+        }
+        list->rebuildList(gui::listview::RebuildType::InPlace);
     }
 
     void CallLogMainWindow::buildInterface()
     {
         AppWindow::buildInterface();
 
-        setTitle(utils::localize.get("app_calllog_title_main"));
+        setTitle(utils::translate("app_calllog_title_main"));
 
-        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(style::strings::common::call));
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::open));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::call));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::open));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
         list = new gui::ListView(this,
                                  mainWindow::x,
@@ -54,7 +55,7 @@ namespace gui
                                  mainWindow::w,
                                  mainWindow::h,
                                  calllogModel,
-                                 style::listview::ScrollBarType::Fixed);
+                                 gui::listview::ScrollBarType::Fixed);
 
         setFocusItem(list);
     }
@@ -74,11 +75,14 @@ namespace gui
         app->setAllEntriesRead();
     }
 
-    bool CallLogMainWindow::onDatabaseMessage(sys::Message *msgl)
+    bool CallLogMainWindow::onDatabaseMessage(sys::Message *msg)
     {
-        auto *msg = dynamic_cast<DBCalllogResponseMessage *>(msgl);
-        if (msg != nullptr) {
-            return calllogModel->updateRecords(std::move(*msg->records));
+        auto notification = dynamic_cast<db::NotificationMessage *>(msg);
+        if (notification != nullptr) {
+            if (notification->interface == db::Interface::Name::Calllog && notification->dataModified()) {
+                rebuild();
+                return true;
+            }
         }
         return false;
     }

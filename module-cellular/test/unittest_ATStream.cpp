@@ -5,7 +5,7 @@
 #define CATCH_CONFIG_MAIN
 
 #include <catch2/catch.hpp>
-#include "Modem/ATStream.hpp"
+#include "modem/ATStream.hpp"
 #include "Result.hpp"
 
 TEST_CASE("Channel Test- AT return parser")

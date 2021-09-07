@@ -3,7 +3,8 @@
 
 #pragma once
 
-#include "Audio/AudioDevice.hpp"
+#include <Audio/AudioDevice.hpp>
+#include <Audio/codec.hpp>
 
 #include <memory>
 #include <functional>
@@ -54,38 +55,38 @@ namespace audio
 
         void SetSampleRate(uint32_t samplerate);
 
-        void SetOutputPath(AudioDevice::OutputPath path);
+        void SetOutputPath(audio::codec::OutputPath path);
 
-        void SetInputPath(AudioDevice::InputPath path);
+        void SetInputPath(audio::codec::InputPath path);
 
         Volume GetOutputVolume() const
         {
-            return audioFormat.outputVolume;
+            return audioConfiguration.outputVolume;
         }
 
         Gain GetInputGain() const
         {
-            return audioFormat.inputGain;
+            return audioConfiguration.inputGain;
         }
 
         uint32_t GetSampleRate()
         {
-            return audioFormat.sampleRate_Hz;
+            return audioConfiguration.sampleRate_Hz;
         }
 
         uint32_t GetInOutFlags()
         {
-            return audioFormat.flags;
+            return audioConfiguration.flags;
         }
 
-        AudioDevice::OutputPath GetOutputPath() const
+        audio::codec::OutputPath GetOutputPath() const
         {
-            return audioFormat.outputPath;
+            return audioConfiguration.outputPath;
         }
 
-        AudioDevice::InputPath GetInputPath() const
+        audio::codec::InputPath GetInputPath() const
         {
-            return audioFormat.inputPath;
+            return audioConfiguration.inputPath;
         }
 
         AudioDevice::Type GetAudioDeviceType() const
@@ -93,9 +94,18 @@ namespace audio
             return audioDeviceType;
         }
 
-        AudioDevice::Format GetAudioFormat()
+        [[deprecated]] audio::codec::Configuration GetAudioConfiguration() const
         {
-            return audioFormat;
+            return audioConfiguration;
+        }
+
+        auto getAudioFormat() const noexcept
+        {
+            auto isStereo =
+                (audioConfiguration.flags & static_cast<std::uint32_t>(audio::codec::Flags::OutputStereo)) != 0 ||
+                (audioConfiguration.flags & static_cast<std::uint32_t>(audio::codec::Flags::InputStereo)) != 0;
+            auto channels = isStereo ? 2U : 1U;
+            return AudioFormat(audioConfiguration.sampleRate_Hz, audioConfiguration.bitWidth, channels);
         }
 
         const std::string &GetName() const
@@ -109,9 +119,12 @@ namespace audio
         }
 
       protected:
-        Profile(const std::string &name, const Type type, const AudioDevice::Format &fmt, AudioDevice::Type devType);
+        Profile(const std::string &name,
+                const Type type,
+                const audio::codec::Configuration &fmt,
+                AudioDevice::Type devType);
 
-        AudioDevice::Format audioFormat{};
+        audio::codec::Configuration audioConfiguration;
         AudioDevice::Type audioDeviceType = AudioDevice::Type::Audiocodec;
 
         std::string name;

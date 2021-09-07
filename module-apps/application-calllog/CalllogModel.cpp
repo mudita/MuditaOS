@@ -2,74 +2,80 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CalllogModel.hpp"
+
 #include "InputEvent.hpp"
 #include "ListView.hpp"
 #include "data/CallLogInternals.hpp"
 #include "data/CallLogSwitchData.hpp"
 #include "widgets/CalllogItem.hpp"
-#include <module-utils/time/DateAndTimeSettings.hpp>
-#include <module-utils/Utils.hpp>
 
-#include <service-db/DBServiceAPI.hpp>
 #include <service-appmgr/Controller.hpp>
 #include "application-call/data/CallSwitchData.hpp"
+#include <module-db/queries/calllog/QueryCalllogGet.hpp>
 
 using namespace calllog;
 
-CalllogModel::CalllogModel(app::Application *app) : DatabaseModel(app)
+CalllogModel::CalllogModel(app::Application *app) : DatabaseModel(app), app::AsyncCallbackReceiver(app)
 {}
 
 unsigned int CalllogModel::requestRecordsCount()
 {
-    recordsCount = DBServiceAPI::CalllogGetCount(application);
     return recordsCount;
 }
 
-void CalllogModel::requestRecords(const uint32_t offset, const uint32_t limit)
+void CalllogModel::requestRecords(uint32_t offset, uint32_t limit)
 {
-    DBServiceAPI::CalllogGetLimitOffset(application, offset, limit);
+    auto query = std::make_unique<db::query::CalllogGet>(limit, offset);
+    auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Calllog);
+    task->setCallback([this](auto response) {
+        auto result = dynamic_cast<db::query::CalllogGetResult *>(response);
+        if (result == nullptr) {
+            return false;
+        }
+        return onCalllogRetrieved(result->getRecords(), result->getTotalCount());
+    });
+    task->execute(application, this);
+}
+
+bool CalllogModel::onCalllogRetrieved(const std::vector<CalllogRecord> &records, unsigned int repoCount)
+{
+    if (recordsCount != repoCount) {
+        recordsCount = repoCount;
+        list->reSendLastRebuildRequest();
+        return false;
+    }
+    return updateRecords(records);
 }
 
 bool CalllogModel::updateRecords(std::vector<CalllogRecord> records)
 {
-#if DEBUG_DB_MODEL_DATA == 1
-    LOG_DEBUG("Offset: %" PRIu32 ", Limit: %" PRIu32 " Count: %" PRIu32 "", offset, limit, count);
-    for (uint32_t i = 0; i < records.get()->size(); ++i) {
-        LOG_DEBUG(
-            "id: %" PRIu32 ", name: %s", records.get()->operator[](i).ID, records.get()->operator[](i).name.c_str());
-    }
-#endif
-
     DatabaseModel::updateRecords(std::move(records));
     list->onProviderDataUpdate();
-
     return true;
 }
 
-unsigned int CalllogModel::getMinimalItemHeight() const
+unsigned int CalllogModel::getMinimalItemSpaceRequired() const
 {
-
     return gui::clItemStyle::h;
 }
 
 gui::ListItem *CalllogModel::getItem(gui::Order order)
 {
-
     std::shared_ptr<CalllogRecord> call = getRecord(order);
-    if (call.get() == nullptr) {
+    if (!call) {
         return nullptr;
     }
 
-    auto item = new gui::CalllogItem(this, !(utils::dateAndTimeSettings.isTimeFormat12()));
+    auto contact = DBServiceAPI::MatchContactByPhoneNumber(application, call->phoneNumber);
+    call->name   = contact ? contact->getFormattedName() : UTF8(call->phoneNumber.getFormatted());
 
-    auto callCallback = [this, item](gui::Item &, const gui::InputEvent &event) {
-        if (event.state != gui::InputEvent::State::keyReleasedShort) {
-            return false;
-        }
-        if (event.keyCode == gui::KeyCode::KEY_LF) {
+    auto item = new gui::CalllogItem(this);
+
+    auto callCallback = [this, item](gui::Item & /*item*/, const gui::InputEvent &event) {
+        if (event.isShortRelease(gui::KeyCode::KEY_LF)) {
             return app::manager::Controller::sendAction(
                 application,
-                app::manager::actions::Dial,
+                app::manager::actions::Call,
                 std::make_unique<app::ExecuteCallData>(item->getCall().phoneNumber));
         }
         return false;

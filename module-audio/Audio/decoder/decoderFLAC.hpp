@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -22,6 +22,8 @@ namespace audio
         void setPosition(float pos) override;
 
       private:
+        auto getBitWidth() -> unsigned int override;
+
         drflac *flac = nullptr;
 
         uint32_t totalSamplesCount = 0;
@@ -53,9 +55,6 @@ namespace audio
         // determined by the "origin" parameter which will be either drflac_seek_origin_start or
         // drflac_seek_origin_current.
         static drflac_bool32 drflac_seek(void *pUserData, int offset, drflac_seek_origin origin);
-
-        // Use pMetadata->type to determine which metadata block is being handled and how to read the data.
-        static void drflac_meta(void *pUserData, drflac_metadata *pMetadata);
     };
 
 } // namespace audio

@@ -1,10 +1,10 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CheckBox.hpp"
-#include "InputEvent.hpp"
 #include "Style.hpp"
-#include "Utils.hpp"
+#include <InputEvent.hpp>
+#include <i18n/i18n.hpp>
 
 namespace gui
 {
@@ -14,19 +14,18 @@ namespace gui
                        const uint32_t &y,
                        const uint32_t &w,
                        const uint32_t &h,
-                       std::function<void(const UTF8 &text)> bottomBarTemporaryMode,
-                       std::function<void()> bottomBarRestoreFromTemporaryMode,
-                       bool textOnLeft)
+                       const std::function<void(const UTF8 &text)> &bottomBarTemporaryMode,
+                       const std::function<void()> &bottomBarRestoreFromTemporaryMode,
+                       BottomBar::Side bottomBarSide)
         : HBox(parent, x, y, w, h), bottomBarTemporaryMode(bottomBarTemporaryMode),
-          bottomBarRestoreFromTemporaryMode(bottomBarRestoreFromTemporaryMode), textOnLeft(textOnLeft)
+          bottomBarRestoreFromTemporaryMode(bottomBarRestoreFromTemporaryMode), bottomBarSide(bottomBarSide)
 
     {
         setEdges(RectangleEdge::Bottom);
         setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
 
-        image = new Image("small_tick_W_M");
+        image = new Image(this, "small_tick_W_M");
         image->setVisible(false);
-        addWidget(image);
 
         applyCallbacks();
     }
@@ -35,61 +34,60 @@ namespace gui
     {
         focusChangedCallback = [&](Item &item) {
             if (focus) {
-                setFocusItem(image);
-                if (image->visible) {
-                    bottomBarTemporaryMode(utils::localize.get("common_uncheck"));
+                if (isChecked()) {
+                    if (bottomBarTemporaryMode) {
+                        bottomBarTemporaryMode(utils::translate("common_uncheck"));
+                    }
                 }
                 else {
-                    bottomBarTemporaryMode(utils::localize.get("common_check"));
+                    if (bottomBarTemporaryMode) {
+                        bottomBarTemporaryMode(utils::translate("common_check"));
+                    }
                 }
             }
             else {
                 setFocusItem(nullptr);
-                bottomBarRestoreFromTemporaryMode();
+                if (bottomBarRestoreFromTemporaryMode) {
+                    bottomBarRestoreFromTemporaryMode();
+                }
             }
             return true;
         };
 
         inputCallback = [&](gui::Item &item, const gui::InputEvent &event) {
-            if (event.state != gui::InputEvent::State::keyReleasedShort) {
+            if (!event.isShortRelease()) {
                 return false;
             }
-            if (textOnLeft) {
-                if (event.keyCode == gui::KeyCode::KEY_LF) {
-                    image->setVisible(!image->visible);
-                    if (image->visible) {
-                        bottomBarTemporaryMode(utils::localize.get("common_uncheck"));
+            if ((bottomBarSide == BottomBar::Side::LEFT && event.is(gui::KeyCode::KEY_LF)) ||
+                (bottomBarSide == BottomBar::Side::CENTER && event.is(gui::KeyCode::KEY_ENTER))) {
+                setCheck(!isChecked());
+                if (isChecked()) {
+                    if (bottomBarTemporaryMode) {
+                        bottomBarTemporaryMode(utils::translate("common_uncheck"));
                     }
-                    else {
-                        bottomBarTemporaryMode(utils::localize.get("common_check"));
-                    }
-                    return true;
                 }
-            }
-            else {
-                if (event.keyCode == gui::KeyCode::KEY_ENTER) {
-                    image->setVisible(!image->visible);
-                    if (image->visible) {
-                        bottomBarTemporaryMode(utils::localize.get("common_uncheck"));
+                else {
+                    if (bottomBarTemporaryMode) {
+                        bottomBarTemporaryMode(utils::translate("common_check"));
                     }
-                    else {
-                        bottomBarTemporaryMode(utils::localize.get("common_check"));
-                    }
-                    return true;
                 }
+                return true;
             }
+
             return false;
         };
     }
 
-    void CheckBox::setImageVisible(bool state)
+    void CheckBox::setCheck(bool state)
     {
+        checkState = state;
         image->setVisible(state);
+        resizeItems();
     }
 
     bool CheckBox::isChecked()
     {
-        return image->visible;
+        return checkState;
     }
 
 } /* namespace gui */

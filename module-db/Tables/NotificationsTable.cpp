@@ -1,12 +1,11 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NotificationsTable.hpp"
-#include "module-db/Interface/NotificationsRecord.hpp"
+#include "Database/Database.hpp"
 
-#include <log/log.hpp>
+#include <log.hpp>
 #include <Utils.hpp>
-
 #include <cassert>
 
 NotificationsTable::NotificationsTable(Database *db) : Table(db)
@@ -19,7 +18,10 @@ bool NotificationsTable::create()
 
 bool NotificationsTable::add(NotificationsTableRow entry)
 {
-    return db->execute("INSERT or IGNORE INTO notifications (key, value) VALUES (%lu, %lu);", entry.key, entry.value);
+    return db->execute("INSERT or IGNORE INTO notifications (key, value, contact_id) VALUES (%lu, %lu, %lu);",
+                       entry.key,
+                       entry.value,
+                       entry.contactID);
 }
 
 bool NotificationsTable::removeById(uint32_t id)
@@ -42,8 +44,11 @@ bool NotificationsTable::removeByField(NotificationsTableFields field, const cha
 
 bool NotificationsTable::update(NotificationsTableRow entry)
 {
-    return db->execute(
-        "UPDATE notifications SET key = %lu, value = %lu WHERE _id = %lu;", entry.key, entry.value, entry.ID);
+    return db->execute("UPDATE notifications SET key = %lu, value = %lu, contact_id = %lu WHERE _id = %lu;",
+                       entry.key,
+                       entry.value,
+                       entry.contactID,
+                       entry.ID);
 }
 
 NotificationsTableRow NotificationsTable::getById(uint32_t id)
@@ -59,12 +64,12 @@ NotificationsTableRow NotificationsTable::getById(uint32_t id)
     return NotificationsTableRow{
         (*retQuery)[0].getUInt32(), // ID
         (*retQuery)[1].getUInt32(), // key
-        (*retQuery)[2].getUInt32()  // value
-
+        (*retQuery)[2].getUInt32(), // value
+        (*retQuery)[3].getUInt32()  // contactID
     };
 }
 
-NotificationsTableRow NotificationsTable::GetByKey(uint32_t key)
+NotificationsTableRow NotificationsTable::getByKey(uint32_t key)
 {
     auto retQuery = db->query("SELECT * FROM notifications WHERE key= %u;", key);
 
@@ -77,7 +82,8 @@ NotificationsTableRow NotificationsTable::GetByKey(uint32_t key)
     return NotificationsTableRow{
         (*retQuery)[0].getUInt32(), // ID
         (*retQuery)[1].getUInt32(), // key
-        (*retQuery)[2].getUInt32()  // value
+        (*retQuery)[2].getUInt32(), // value
+        (*retQuery)[3].getUInt32()  // contactID
     };
 }
 
@@ -96,6 +102,7 @@ std::vector<NotificationsTableRow> NotificationsTable::getLimitOffset(uint32_t o
             (*retQuery)[0].getUInt32(), // ID
             (*retQuery)[1].getUInt32(), // key
             (*retQuery)[2].getUInt32(), // value
+            (*retQuery)[3].getUInt32()  // contactID
         });
     } while (retQuery->nextRow());
 

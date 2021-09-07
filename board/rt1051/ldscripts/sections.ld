@@ -20,6 +20,10 @@ __dtcm_ram_end = ORIGIN(SRAM_DTC) + LENGTH(SRAM_DTC);
 __sdram_cached_start = ORIGIN(BOARD_SDRAM_HEAP);
 __sdram_cached_end = ORIGIN(BOARD_SDRAM_HEAP) + LENGTH(BOARD_SDRAM_HEAP);
 
+EXTERN(image_vector_table);
+EXTERN(boot_data);
+EXTERN(hyperflash_config);
+
 SECTIONS
 {
     /* Image Vector Table and Boot Data for booting from external flash */
@@ -35,7 +39,7 @@ SECTIONS
         . = 0x430 ;
         KEEP(*(.boot_hdr.dcd_data))
         __boot_hdr_end__ = ABSOLUTE(.) ;
-        . = 0x2000 ;
+        . = 0x1000 ;
     } > BOARD_SDRAM_TEXT
 
     /* Data sections descriptors for startup initialization */
@@ -80,9 +84,10 @@ SECTIONS
     {
         *(NonCacheable)
         *(COMMON)
-        lib/libmodule-os.a:*(.bss*)
-        lib/libmodule-sys.a:*(.bss*)
-        lib/libmodule-bsp.a:*(.bss*)
+        *libmodule-os.a:*(.bss*)
+        *libmodule-sys.a:*(.bss*)
+        *libmodule-bsp.a:*(.bss*)
+        *libusb_stack.a:*(.bss*)
     } > SRAM_DTC
 
     /* System initialized data */
@@ -90,9 +95,10 @@ SECTIONS
     {
         *(NonCacheable.init)
         *(.ramfunc*)
-        lib/libmodule-os.a:*(.data*)
-        lib/libmodule-sys.a:*(.data*)
-        lib/libmodule-bsp.a:*(.data*)
+        *libmodule-os.a:*(.data*)
+        *libmodule-sys.a:*(.data*)
+        *libmodule-bsp.a:*(.data*)
+        *libusb_stack.a:*(.data*)
     } > SRAM_DTC AT > BOARD_SDRAM_TEXT
 
     /* MAIN TEXT SECTION */

@@ -1,4 +1,5 @@
 @startuml
+skinparam BackgroundColor F0F0F0
 participant ServiceCellular as cellular
 participant TS0710 as ts
 participant WorkerThread as worker

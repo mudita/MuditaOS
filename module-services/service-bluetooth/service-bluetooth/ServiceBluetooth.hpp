@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "Constants.hpp"
+#include <service-bluetooth/Constants.hpp>
 #include <Service/Common.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
@@ -11,17 +11,48 @@
 #include <service-db/DBServiceName.hpp>
 #include <service-audio/ServiceAudio.hpp>
 #include <module-bluetooth/Bluetooth/CommandHandler.hpp>
-#include "BluetoothMessage.hpp"
 #include "ProfileManager.hpp"
 #include <Service/CpuSentinel.hpp>
+#include <Timers/TimerHandle.hpp>
 
 #include <memory> // for unique_ptr
-
+namespace message::bluetooth
+{
+    class ResponsePasskey;
+}
 class BluetoothWorker;
 namespace settings
 {
     class Settings;
 }
+
+namespace sdesktop
+{
+    class Event;
+    namespace developerMode
+    {
+        class DeveloperModeRequest;
+        class DeveloperModeMessageWrapper;
+    } // namespace developerMode
+} // namespace sdesktop
+
+namespace message::bluetooth
+{
+    class RequestBondedDevices;
+    class RequestStatus;
+    class SetStatus;
+    class Unpair;
+    class RequestDeviceName;
+    class SetDeviceName;
+    class Connect;
+    class ConnectResult;
+    class Disconnect;
+    class DisconnectResult;
+    class A2DPVolume;
+    class HSPVolume;
+    class Ring;
+    class StartAudioRouting;
+} // namespace message::bluetooth
 
 class ServiceBluetooth : public sys::Service
 {
@@ -33,18 +64,46 @@ class ServiceBluetooth : public sys::Service
     virtual sys::MessagePointer DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp) override;
     sys::ReturnCodes InitHandler() override;
     sys::ReturnCodes DeinitHandler() override;
+    void ProcessCloseReason(sys::CloseReason closeReason) override;
     virtual sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override;
     void sendWorkerCommand(bluetooth::Command command);
     QueueHandle_t workerQueue = nullptr;
     std::shared_ptr<bluetooth::SettingsHolder> settingsHolder;
     bluetooth::ProfileManager *profileManagerPtr = nullptr;
-    void scanStartedCallback();
-    void scanStoppedCallback();
 
   private:
     std::unique_ptr<BluetoothWorker> worker;
     std::shared_ptr<sys::CpuSentinel> cpuSentinel;
-    bool enabledFromHarness = false;
+    sys::TimerHandle connectionTimeoutTimer;
+
+    void startTimeoutTimer();
+    void stopTimeoutTimer();
+
+    template <typename T> auto connectHandler() -> bool
+    {
+        return connect(typeid(T), [&](sys::Message *msg) { return handle(static_cast<T *>(msg)); });
+    }
+
+    [[nodiscard]] auto handle(message::bluetooth::RequestBondedDevices *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(message::bluetooth::RequestStatus *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(message::bluetooth::SetStatus *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(BluetoothPairMessage *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(message::bluetooth::Unpair *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(message::bluetooth::RequestDeviceName *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(message::bluetooth::SetDeviceName *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(message::bluetooth::Connect *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(message::bluetooth::ConnectResult *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(message::bluetooth::Disconnect *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(message::bluetooth::DisconnectResult *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(BluetoothMessage *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(BluetoothAddrMessage *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(sdesktop::developerMode::DeveloperModeRequest *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(BluetoothAudioStartMessage *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(message::bluetooth::A2DPVolume *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(message::bluetooth::HSPVolume *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(message::bluetooth::Ring *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(message::bluetooth::StartAudioRouting *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(message::bluetooth::ResponsePasskey *msg) -> std::shared_ptr<sys::Message>;
 };
 
 namespace sys

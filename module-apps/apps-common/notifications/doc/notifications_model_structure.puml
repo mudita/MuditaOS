@@ -1,0 +1,39 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+
+skinparam linetype ortho
+
+node "GUI Model View Porvider" {
+    class ListItem
+    class ListView
+    class InternalModel
+    class Provider
+
+    ListView "use"-l--> Provider
+    ListView "use"--> ListItem
+}
+class "NotificationsChangedParams" as params
+
+node "Notification ListItems"{
+    class "NotificationListItem" as notifLI
+    class "NotificationWithEventCounter" as notifCounter
+    class "NotificationWithOnOffButton" as notifButton
+
+    notifLI <|-- notifCounter
+    notifLI <|-- notifButton
+}
+
+node "Notifications Model"{
+    class "NotificationsModel" as model
+}
+
+model "create"*..-> notifLI
+model "use"-d--> params
+
+Provider <|-- model
+InternalModel <|-- model
+ListItem <|-- notifLI
+
+
+
+@enduml

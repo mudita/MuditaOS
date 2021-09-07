@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #ifndef PUREPHONE_RT1051DRIVERI2C_HPP
@@ -8,7 +8,7 @@
 
 #include "../fsl_drivers/fsl_common.h"
 #include "../fsl_drivers/fsl_lpi2c.h"
-#include "clock_config.h"
+#include "board/clock_config.h"
 
 #include "mutex.hpp"
 

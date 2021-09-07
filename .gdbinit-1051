@@ -1,3 +1,6 @@
+source .gdb_macros
+
+set pagination off
 target remote localhost:2331
 source tools/gdb_crash_extend.py
 source tools/misc/puregdb/puregdb.py
@@ -8,9 +11,6 @@ load
 eval "monitor exec SetRTTAddr %p", &_SEGGER_RTT
 info threads
 thread 2
-b main
+tb main
 b HardFault_Handler
-b MemManage_Handler
-b BusFault_Handler
-b UsageFault_Handler
-b ResetISR
+

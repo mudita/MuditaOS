@@ -79,39 +79,39 @@ namespace audio
 
     Profile::Profile(const std::string &name,
                      const Type type,
-                     const AudioDevice::Format &fmt,
+                     const audio::codec::Configuration &fmt,
                      AudioDevice::Type devType)
-        : audioFormat(fmt), audioDeviceType(devType), name(name), type(type)
+        : audioConfiguration(fmt), audioDeviceType(devType), name(name), type(type)
     {}
 
     void Profile::SetInputGain(Gain gain)
     {
-        audioFormat.inputGain = gain;
+        audioConfiguration.inputGain = gain;
     }
 
     void Profile::SetOutputVolume(Volume vol)
     {
-        audioFormat.outputVolume = vol;
+        audioConfiguration.outputVolume = vol;
     }
 
-    void Profile::SetInputPath(AudioDevice::InputPath path)
+    void Profile::SetInputPath(audio::codec::InputPath path)
     {
-        audioFormat.inputPath = path;
+        audioConfiguration.inputPath = path;
     }
 
-    void Profile::SetOutputPath(AudioDevice::OutputPath path)
+    void Profile::SetOutputPath(audio::codec::OutputPath path)
     {
-        audioFormat.outputPath = path;
+        audioConfiguration.outputPath = path;
     }
 
     void Profile::SetInOutFlags(uint32_t flags)
     {
-        audioFormat.flags = flags;
+        audioConfiguration.flags = flags;
     }
 
     void Profile::SetSampleRate(uint32_t samplerate)
     {
-        audioFormat.sampleRate_Hz = samplerate;
+        audioConfiguration.sampleRate_Hz = samplerate;
     }
 
     const std::string str(const Profile::Type &profileType)

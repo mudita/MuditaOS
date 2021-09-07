@@ -28,7 +28,7 @@ MuditaOS is a mobile operating system optimized for E Ink displays. Built on Fre
 - system manager that restores the system after switching on the device or performs the initial start-up
 - application manager for managing application lifecycle 
 - SQLite database for storing contacts and notes
-- VFS (Virtual File System) + file storage based on FAT File System
+- VFS (Virtual File System) + file storage based on `littlefs` (little fail-safe file system)
 - MTP (Media Transfer Protocol) support
 
 ## Table of contents
@@ -55,6 +55,7 @@ You can quickstart the project by going through one of the following guides:
 - [Super dirty quickstart with unit tests](./doc/quickstart.md#super-dirty-quickstart-with-unit-tests)
 - [Super dirty quickstart on the phone](./doc/quickstart.md#super-dirty-quickstart-on-the-phone)
 - [Preparing packages](./doc/quickstart.md#preparing-packages)
+- [Logging engine](./module-utils/log/doc/logging_engine.md)
 
 ## Contributing
 
@@ -78,7 +79,7 @@ When contributing code or documentation changes please follow the guidleines ins
 
 ## Documentation
 
-For everything that you need to kickstart your development environment please go to the [Documentation](./doc/) folder on Github.
+For everything you need to kickstart your development environment please go to the [Documentation](./doc/README.md) on GitHub.
 
 A fully detailed documentation can be build locally using [Doxygen](https://www.doxygen.nl/index.html).
 

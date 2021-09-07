@@ -3,7 +3,7 @@
 
 #include "TextBlock.hpp"
 #include "TextConstants.hpp"
-#include "log/log.hpp"
+#include <log.hpp>
 #include <cassert>
 #include <TextFormat.hpp>
 #include <RawFont.hpp>

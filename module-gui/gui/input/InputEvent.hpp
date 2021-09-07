@@ -1,11 +1,11 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include <sstream>
 #include <cstdint>
-#include "bsp/keyboard/key_codes.hpp"
+#include <type_traits>
 #include "common_data/RawKey.hpp"
 
 namespace gui
@@ -41,6 +41,10 @@ namespace gui
         SWITCH_UP  = static_cast<int>(bsp::KeyCodes::SSwitchUp),
         SWITCH_MID = static_cast<int>(bsp::KeyCodes::SSwitchMid),
         SWITCH_DN  = static_cast<int>(bsp::KeyCodes::SSwitchDown),
+
+        HEADSET_OK    = static_cast<int>(bsp::KeyCodes::HeadsetOk),
+        HEADSET_VOLUP = static_cast<int>(bsp::KeyCodes::HeadsetVolUp),
+        HEADSET_VOLDN = static_cast<int>(bsp::KeyCodes::HeadsetVolDown),
     };
 
     static const int InvalidNumericKeyCode = -1;
@@ -79,35 +83,101 @@ namespace gui
       public:
         enum class State
         {
-            Undefined        = 0x00,
-            keyPressed       = 0x01,
-            keyReleasedShort = 0x02,
-            keyReleasedLong  = 0x04,
+            Undefined        = 0x00, /// No action defined or translation error
+            keyPressed       = 0x01, /// Key pressed event
+            keyReleasedShort = 0x02, /// Key released before timeout
+            keyReleasedLong  = 0x04, /// Key released after timeout
+            keyMoved         = 0x05, /// Monostable key event
         };
 
-        RawKey key      = {};                     /// RawKey data
-        State state     = State::keyPressed;      /// initial translated key state
-        KeyCode keyCode = KeyCode::KEY_UNDEFINED; /// initial translated key code
-
         InputEvent(RawKey key, State state = State::Undefined, KeyCode keyCode = KeyCode::KEY_UNDEFINED);
-        [[nodiscard]] auto isShortPress() const -> bool
+
+        [[nodiscard]] auto getRawKey() const -> RawKey
+        {
+            return rawKey;
+        }
+
+        [[nodiscard]] auto getState() const -> State
+        {
+            return state;
+        }
+
+        void setState(State s)
+        {
+            state = s;
+        }
+
+        [[nodiscard]] auto getKeyCode() const -> KeyCode
+        {
+            return keyCode;
+        }
+
+        void setKeyCode(KeyCode code)
+        {
+            keyCode = code;
+        }
+
+        [[nodiscard]] auto isKeyPress() const -> bool
+        {
+            return state == State::keyPressed;
+        }
+
+        [[nodiscard]] auto isKeyPress(KeyCode code) const -> bool
+        {
+            return isKeyPress() && is(code);
+        }
+
+        [[nodiscard]] auto isShortRelease() const -> bool
         {
             return state == State::keyReleasedShort;
         }
-        [[nodiscard]] auto isKeyRelease() const -> bool
+
+        [[nodiscard]] auto isShortRelease(KeyCode code) const -> bool
         {
-            return state == State::keyReleasedShort || state == State::keyReleasedLong;
+            return isShortRelease() && is(code);
         }
-        [[nodiscard]] auto isLongPress() const -> bool
+
+        [[nodiscard]] auto isLongRelease() const -> bool
         {
             return state == State::keyReleasedLong;
         }
+
+        [[nodiscard]] auto isLongRelease(KeyCode code) const -> bool
+        {
+            return isLongRelease() && is(code);
+        }
+
+        [[nodiscard]] auto isKeyRelease() const -> bool
+        {
+            return isShortRelease() || isLongRelease();
+        }
+
+        [[nodiscard]] auto isKeyRelease(KeyCode code) const -> bool
+        {
+            return isKeyRelease() && is(code);
+        }
+
         [[nodiscard]] auto is(KeyCode code) const -> bool
         {
             return keyCode == code;
         }
+
+        [[nodiscard]] auto isDigit() const -> bool
+        {
+            return toNumeric(keyCode) != InvalidNumericKeyCode;
+        }
+
         [[nodiscard]] auto str() const -> std::string;
+
+        [[nodiscard]] auto numericValue() const -> int;
+
+      private:
+        RawKey rawKey   = {};                     /// RawKey data
+        State state     = State::keyPressed;      /// initial translated key state
+        KeyCode keyCode = KeyCode::KEY_UNDEFINED; /// initial translated key code
     };
+
+    static_assert(std::is_trivially_copyable_v<InputEvent>);
 
 } // namespace gui
 
@@ -122,6 +192,8 @@ namespace gui
         return "keyReleasedShort";
     case gui::InputEvent::State::keyReleasedLong:
         return "keyReleasedLong ";
+    case gui::InputEvent::State::keyMoved:
+        return "keyMoved";
     }
     return "";
 }
@@ -181,6 +253,12 @@ namespace gui
         return "SWITCH_MID";
     case gui::KeyCode::SWITCH_DN:
         return "SWITCH_DN";
+    case gui::KeyCode::HEADSET_OK:
+        return "HEADSET_OK";
+    case gui::KeyCode::HEADSET_VOLUP:
+        return "HEADSET_VOLUP";
+    case gui::KeyCode::HEADSET_VOLDN:
+        return "HEADSET_VOLDN";
     }
     return "";
 }

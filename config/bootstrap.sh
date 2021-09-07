@@ -7,7 +7,7 @@
 #                   !!! WARNING !!!
 #
 # this script was written for `raw` ubuntu 18.10 64b
-# optionaly consider installing ccache:
+# optionally consider installing ccache:
 #     `sudo apt install ccache`
 # it's support is added to default ccache
 
@@ -24,7 +24,7 @@ function test_if_run_as_root() {
     if [[ "${MY_NAME}" == "root" ]]; then
         cat <<-MSGEND
 			Please do not run this script as a root.
-			Script will ask for your password for taks it needs
+			Script will ask for your password for tasks it needs
 			to run as a root (sudo ...)
 			MSGEND
         exit 1
@@ -52,7 +52,7 @@ function install_hooks(){
     echo -e "\e[32m${FUNCNAME[0]}\e[0m"
     cat <<-MSGEND
 		Install style checking hooks
-		by default hook is reportin error only
+		by default hook is reporting error only
 		if you would like to make it automatically fix style errors add config "user.fixinstage" to your git configuration:
 		    git config user.fixinstage true
 		MSGEND
@@ -85,7 +85,7 @@ function install_pip_packages() {
 function install_ubuntu_packages() {
     echo -e "\e[32m${FUNCNAME[0]}\e[0m"
     cat <<-MSGEND
-		# Install neccessary packages
+		# Install necessary packages
 		MSGEND
     echo "This will change your system, press CTRL+C if you do not want to install required packages, or press enter to continue..."
     read asdfasraewrawesjr

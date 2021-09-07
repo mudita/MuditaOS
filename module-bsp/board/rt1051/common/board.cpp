@@ -5,14 +5,18 @@ extern "C"
 #include "fsl_common.h"
 #include "fsl_clock.h"
 #include "fsl_dcdc.h"
-#include "pin_mux.h"
+#include "fsl_snvs_hp.h"
+#include "fsl_snvs_lp.h"
+#include "board/pin_mux.h"
 #if LOG_LUART_ENABLED
 #include "fsl_lpuart.h"
 #endif
 }
 #include "audio.hpp"
 #include "chip.hpp"
-#include "irq/irq_gpio.hpp"
+#include "board/irq_gpio.hpp"
+#include "reboot_codes.hpp"
+#include <board/debug_console.hpp>
 
 #include <cstdint>
 
@@ -20,58 +24,6 @@ extern std::uint8_t __sdram_cached_start[];
 
 namespace bsp
 {
-
-#if LOG_LUART_ENABLED
-    static lpuart_handle_t g_lpuartHandle;
-#endif
-
-    /* Get debug console frequency. */
-    __attribute__((unused)) static uint32_t BOARD_DebugConsoleSrcFreq(void)
-    {
-        uint32_t freq;
-
-        /* To make it simple, we assume default PLL and divider settings, and the only variable
-           from application is use PLL3 source or OSC source */
-        if (CLOCK_GetMux(kCLOCK_UartMux) == 0) /* PLL3 div6 80M */
-        {
-            freq = (CLOCK_GetPllFreq(kCLOCK_PllUsb1) / 6U) / (CLOCK_GetDiv(kCLOCK_UartDiv) + 1U);
-        }
-        else {
-            freq = CLOCK_GetOscFreq() / (CLOCK_GetDiv(kCLOCK_UartDiv) + 1U);
-        }
-
-        return freq;
-    }
-
-    /* Initialize debug console. */
-    static void BOARD_InitDebugConsole(void)
-    {
-#if LOG_LUART_ENABLED
-        /* The user initialization should be placed here */
-        lpuart_config_t lpuartConfig;
-
-        /* Initialize the LPUART. */
-        /*
-         * lpuartConfig.baudRate_Bps = 115200U;
-         * lpuartConfig.parityMode = kLPUART_ParityDisabled;
-         * lpuartConfig.stopBitCount = kLPUART_OneStopBit;
-         * lpuartConfig.txFifoWatermark = 0;
-         * lpuartConfig.rxFifoWatermark = 0;
-         * lpuartConfig.enableTx = false;
-         * lpuartConfig.enableRx = false;
-         */
-        LPUART_GetDefaultConfig(&lpuartConfig);
-        lpuartConfig.baudRate_Bps = 115200;
-        lpuartConfig.enableTx     = true;
-        lpuartConfig.enableRx     = true;
-
-        LPUART_TransferCreateHandle(LPUART3, &g_lpuartHandle, NULL, NULL);
-
-        LPUART_Init(LPUART3, &lpuartConfig, BOARD_DebugConsoleSrcFreq());
-        LPUART_EnableTx(LPUART3, true);
-        LPUART_EnableRx(LPUART3, true);
-#endif
-    }
 
     /* MPU configuration. */
     static void BOARD_ConfigMPU(void)
@@ -153,7 +105,11 @@ namespace bsp
          * BOARD_SDRAM_TEXT
          */
         MPU->RBAR = ARM_MPU_RBAR(7, 0x80000000U);
+#if defined(HW_SDRAM_64_MB) && (HW_SDRAM_64_MB == 1)
+        MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_RO, 0, 0, 1, 1, 0, ARM_MPU_REGION_SIZE_64MB);
+#else
         MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_RO, 0, 0, 1, 1, 0, ARM_MPU_REGION_SIZE_16MB);
+#endif
 
         /* The define sets the cacheable memory to shareable,
          * this suggestion is referred from chapter 2.2.1 Memory regions,
@@ -167,11 +123,17 @@ namespace bsp
          * BOARD_SDRAM_HEAP
          */
         MPU->RBAR = ARM_MPU_RBAR(9, reinterpret_cast<std::uintptr_t>(__sdram_cached_start));
+#if defined(HW_SDRAM_64_MB) && (HW_SDRAM_64_MB == 1)
+        MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 0, 0, 1, 1, 0, ARM_MPU_REGION_SIZE_64MB);
+#else
         MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 0, 0, 1, 1, 0, ARM_MPU_REGION_SIZE_16MB);
-#endif
+#endif // HW_SDRAM_64_MB
+#endif // SDRAM_IS_SHAREABLE
 
         /* Enable MPU */
         ARM_MPU_Enable(MPU_CTRL_PRIVDEFENA_Msk);
+
+        SCB->SHCSR &= ~(SCB_SHCSR_MEMFAULTENA_Msk | SCB_SHCSR_USGFAULTENA_Msk | SCB_SHCSR_BUSFAULTENA_Msk);
 
         /* Enable I cache and D cache */
         SCB_EnableDCache();
@@ -181,19 +143,23 @@ namespace bsp
     void BoardInit()
     {
         PINMUX_InitBootPins();
-
         BOARD_InitBootClocks();
         BOARD_ConfigMPU();
 
-        BOARD_InitDebugConsole();
+        board::initDebugConsole();
 
         irq_gpio_Init();
 
+        // SNVS init. is required for proper operation of the RTC when Secure Boot is used
+        SNVS_LP_Init(SNVS);
+        SNVS_HP_Init(SNVS);
+        SNVS_HP_ChangeSSMState(SNVS);
+
+        // Default flag set on start in non-volatile memory to detect boot fault
+        SNVS->LPGPR[0] = rebootCode::rebootFailedToBoot;
+
         // Set internal DCDC to DCM mode. Switching between DCM and CCM mode will be done automatically.
         DCDC_BootIntoDCM(DCDC);
-
-        // init audio
-        audioInit();
 
         PrintSystemClocks();
         clearAndPrintBootReason();

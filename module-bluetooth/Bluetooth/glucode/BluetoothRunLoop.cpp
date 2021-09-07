@@ -137,16 +137,6 @@ namespace bluetooth
     }
     auto RunLoop::process() -> bool
     {
-
-        btstack_data_source_t *ds;
-        btstack_data_source_t *next;
-        for (ds = reinterpret_cast<btstack_data_source_t *>(data_sources); ds != nullptr; ds = next) {
-            next = reinterpret_cast<btstack_data_source_t *>(
-                ds->item.next); // cache pointer to next data_source to allow data source to remove itself
-            if ((ds->flags & DATA_SOURCE_CALLBACK_POLL) != 0) {
-                ds->process(ds, DATA_SOURCE_CALLBACK_POLL);
-            }
-        }
         // process registered function calls on run loop thread
         while (true) {
             function_call_t message = {nullptr, nullptr};

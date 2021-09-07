@@ -8,7 +8,7 @@
 
 #include "DrawCommand.hpp"
 
-#include <module-utils/math/Math.hpp>
+#include <Math.hpp>
 
 namespace gui
 {

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TextCursor.hpp"
@@ -6,7 +6,7 @@
 #include "Text.hpp"
 #include "TextBlockCursor.hpp"
 #include "TextDocument.hpp"
-#include "log/log.hpp"
+#include <log.hpp>
 #include "TextLine.hpp"
 #include <cassert>
 #include <RawFont.hpp>
@@ -137,7 +137,7 @@ namespace gui
         if (document->isEmpty() && default_font != nullptr) {
             h += default_font->info.line_height;
             x = getAxisAlignmentValue(Axis::X, w);
-            y = getAxisAlignmentValue(Axis::Y, h);
+            y = getAxisAlignmentValue(Axis::Y, text->lines->calculateInitialCursorPosition(h));
         }
         else if (text != nullptr || text->lines->size() > 0) {
             auto [line, column, row] = getSelectedLine();

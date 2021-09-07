@@ -4,7 +4,7 @@
 #include "FileIndexerAgent.hpp"
 #include "FileIndexer_queries.hpp"
 
-#include <log/log.hpp>
+#include <log.hpp>
 #include <purefs/filesystem_paths.hpp>
 #include <Application.hpp>
 #include <memory>
@@ -17,7 +17,7 @@ FileIndexerAgent::FileIndexerAgent(sys::Service *parentService) : DatabaseAgent(
 void FileIndexerAgent::initDb()
 {
     auto notifications = database->query(FileIndexer::Statements::getAllNotifications);
-    if (nullptr == notifications || FileIndexer::ONE_ROW_FOUND == notifications->getRowCount()) {
+    if (nullptr == notifications || DatabaseAgent::ONE_ROW_FOUND == notifications->getRowCount()) {
         return;
     }
     if (notifications->getFieldCount() == FileIndexer::NOTIFICATION_RECORD_COLUMN_COUNT) {
@@ -41,7 +41,7 @@ void FileIndexerAgent::registerMessages()
     using std::placeholders::_1;
 
     // all API asynchronic
-    parentService->connect(FileIndexer::Messages::GetListDirMessage(),
+    parentService->connect(FileIndexer::Messages::GetListDirRequest(),
                            std::bind(&FileIndexerAgent::handleListDir, this, _1));
 
     parentService->connect(FileIndexer::Messages::GetRecordMessage(),
@@ -87,7 +87,7 @@ auto FileIndexerAgent::getAgentName() -> const std::string
 auto FileIndexerAgent::dbRegisterFileChange(std::string dir, std::string service) -> bool
 {
     auto retQuery = database->query(FileIndexer::Statements::getNotification, dir.c_str(), service.c_str());
-    if (nullptr == retQuery || FileIndexer::ZERO_ROWS_FOUND == retQuery->getRowCount()) {
+    if (nullptr == retQuery || DatabaseAgent::ZERO_ROWS_FOUND == retQuery->getRowCount()) {
         // notification does not exist in db, insert a new one
         return database->execute(FileIndexer::Statements::setNotification, dir.c_str(), service.c_str());
     }
@@ -142,7 +142,7 @@ auto FileIndexerAgent::handleUnregisterOnFileChange(sys::Message *req) -> sys::M
 auto FileIndexerAgent::dbGetFilesCount() -> unsigned int
 {
     auto retQuery = database->query(FileIndexer::Statements::getFilesCount);
-    if (nullptr == retQuery || FileIndexer::ONE_ROW_FOUND != retQuery->getRowCount()) {
+    if (nullptr == retQuery || DatabaseAgent::ONE_ROW_FOUND != retQuery->getRowCount()) {
         return 0;
     }
     return (*retQuery)[0].getUInt32();
@@ -151,57 +151,24 @@ auto FileIndexerAgent::dbGetFilesCount() -> unsigned int
 auto FileIndexerAgent::dbGeMetadataCount() -> unsigned int
 {
     auto retQuery = database->query(FileIndexer::Statements::getMetadataCount);
-    if (nullptr == retQuery || FileIndexer::ONE_ROW_FOUND != retQuery->getRowCount()) {
+    if (nullptr == retQuery || DatabaseAgent::ONE_ROW_FOUND != retQuery->getRowCount()) {
         return 0;
     }
     return (*retQuery)[0].getUInt32();
 }
 
-auto FileIndexerAgent::dbListDir(std::unique_ptr<FileIndexer::ListDirData> listDir)
-    -> std::unique_ptr<FileIndexer::ListDirData>
+auto FileIndexerAgent::dbListDir(unsigned int offset, unsigned int limit, const std::string &directory)
+    -> std::unique_ptr<FileIndexer::ListDir>
 {
-    auto retQuery = database->query(FileIndexer::Statements::getFilesByDir, listDir->directory.c_str());
-    if (nullptr == retQuery || FileIndexer::ZERO_ROWS_FOUND == retQuery->getRowCount()) {
-        listDir->count = 0;
-        listDir->fileList.clear();
-        return listDir;
-    }
-    listDir->count     = retQuery->getRowCount();
-    unsigned int index = 0;
-
-    // returns all files in directory
-    if (listDir->list_limit == 0) {
-        do {
-            listDir->fileList.push_back(FileIndexer::FileRecord(retQuery.get()));
-        } while (retQuery->nextRow());
-        return listDir;
-    }
-
-    // returns files from  directory in chunks (offset,limit)
-    // validate offset against count
-    if (listDir->list_offset > listDir->count) {
-        listDir->count = 0;
-        return listDir;
-    }
-    // Navigate to the proper row specified by offset
-    if (listDir->list_offset > 0) {
-        do {
-            index++;
-        } while (retQuery->nextRow() && (index < listDir->list_offset));
-    }
-    // Add records to the file list starting form list_offset and limited by list_limit
-    do {
-        listDir->fileList.push_back(FileIndexer::FileRecord(retQuery.get()));
-        index++;
-    } while (retQuery->nextRow() && (index < listDir->list_offset + listDir->list_limit));
-
-    return listDir;
+    auto retQuery = database->query(FileIndexer::Statements::getFilesByDir, directory.c_str());
+    return getList<FileIndexer::ListDir, FileIndexer::FileRecord>(offset, limit, std::move(retQuery));
 }
 
 auto FileIndexerAgent::handleListDir(sys::Message *req) -> sys::MessagePointer
 {
-    if (auto msg = dynamic_cast<FileIndexer::Messages::GetListDirMessage *>(req)) {
-        return std::make_shared<FileIndexer::Messages::GetListDirResponseMessage>(dbListDir(std::move(msg->listDir)));
+    if (auto msg = dynamic_cast<FileIndexer::Messages::GetListDirRequest *>(req)) {
+        return std::make_shared<FileIndexer::Messages::GetListDirResponse>(
+            dbListDir(msg->offset, msg->limit, msg->directory));
     }
     return std::make_shared<sys::ResponseMessage>();
 }
@@ -212,13 +179,13 @@ auto FileIndexerAgent::dbGetRecord(std::unique_ptr<FileIndexer::FileRecord> reco
 
     if (false == record->path.empty()) {
         retQuery = database->query(FileIndexer::Statements::getFileInfoByPath, record->path.c_str());
-        if (nullptr == retQuery || FileIndexer::ONE_ROW_FOUND != retQuery->getRowCount()) {
+        if (nullptr == retQuery || DatabaseAgent::ONE_ROW_FOUND != retQuery->getRowCount()) {
             return FileIndexer::FileRecord{};
         }
     }
     else if (record->file_id != FileIndexer::FILE_ID_NOT_EXISTS) {
         retQuery = database->query(FileIndexer::Statements::getFileInfoById, record->file_id);
-        if (nullptr == retQuery || FileIndexer::ONE_ROW_FOUND != retQuery->getRowCount()) {
+        if (nullptr == retQuery || DatabaseAgent::ONE_ROW_FOUND != retQuery->getRowCount()) {
             return FileIndexer::FileRecord{};
         }
     }
@@ -233,7 +200,7 @@ auto FileIndexerAgent::dbSetRecord(std::unique_ptr<FileIndexer::FileRecord> reco
     auto retQuery = database->query(FileIndexer::Statements::getFileInfoByPath, record->path.c_str());
     FileIndexer::FileRecord retRecord(retQuery.get());
 
-    if (nullptr == retQuery || FileIndexer::ONE_ROW_FOUND != retQuery->getRowCount()) {
+    if (nullptr == retQuery || DatabaseAgent::ONE_ROW_FOUND != retQuery->getRowCount()) {
         // file do not exist in db, insert a new file record
         return database->execute(FileIndexer::Statements::insertFileInfo,
                                  // retRecord.file_id,
@@ -260,7 +227,7 @@ auto FileIndexerAgent::dbDeleteFile(std::unique_ptr<FileIndexer::FileRecord> rec
     unsigned int file_id = FileIndexer::FILE_ID_NOT_EXISTS;
     if (false == record->path.empty()) {
         auto retQuery = database->query(FileIndexer::Statements::getFileIdByPath, record->path.c_str());
-        if (nullptr == retQuery || FileIndexer::ONE_ROW_FOUND != retQuery->getRowCount()) {
+        if (nullptr == retQuery || DatabaseAgent::ONE_ROW_FOUND != retQuery->getRowCount()) {
             return false;
         }
         else {
@@ -278,7 +245,7 @@ auto FileIndexerAgent::dbDeleteAllFilesInDir(std::unique_ptr<FileIndexer::FileRe
     bool retStatus = false;
     if (false == record->directory.empty()) {
         auto retQuery = database->query(FileIndexer::Statements::getFilesIdByDir, record->directory.c_str());
-        if (nullptr == retQuery || FileIndexer::ZERO_ROWS_FOUND == retQuery->getRowCount()) {
+        if (nullptr == retQuery || DatabaseAgent::ZERO_ROWS_FOUND == retQuery->getRowCount()) {
             return false;
         }
         else {
@@ -314,7 +281,7 @@ auto FileIndexerAgent::handleGetRecord(sys::Message *req) -> sys::MessagePointer
         return std::make_shared<FileIndexer::Messages::GetRecordResponseMessage>(
             std::make_unique<FileIndexer::FileRecord>(msg->dbRecord));
     }
-    return app::msgHandled();
+    return sys::msgHandled();
 }
 
 auto FileIndexerAgent::handleSetRecord(sys::Message *req) -> sys::MessagePointer
@@ -338,7 +305,7 @@ auto FileIndexerAgent::handleSetRecord(sys::Message *req) -> sys::MessagePointer
             }
         }
     }
-    return app::msgHandled();
+    return sys::msgHandled();
 }
 
 auto FileIndexerAgent::handleDeleteFile(sys::Message *req) -> sys::MessagePointer
@@ -359,7 +326,7 @@ auto FileIndexerAgent::handleDeleteFile(sys::Message *req) -> sys::MessagePointe
             parentService->bus.sendUnicast(std::move(notifyMsg), recipient);
         }
     }
-    return app::msgHandled();
+    return sys::msgHandled();
 }
 
 auto FileIndexerAgent::handleDeleteAllFilesInDir(sys::Message *req) -> sys::MessagePointer
@@ -381,7 +348,7 @@ auto FileIndexerAgent::handleDeleteAllFilesInDir(sys::Message *req) -> sys::Mess
             parentService->bus.sendUnicast(std::move(notifyMsg), recipient);
         }
     }
-    return app::msgHandled();
+    return sys::msgHandled();
 }
 
 auto FileIndexerAgent::dbGetProperty(std::unique_ptr<FileIndexer::FileMetadata> metaData) -> FileIndexer::FileMetadata
@@ -392,7 +359,7 @@ auto FileIndexerAgent::dbGetProperty(std::unique_ptr<FileIndexer::FileMetadata> 
     std::unique_ptr<QueryResult> retQuery = nullptr;
 
     retQuery = database->query(FileIndexer::Statements::getPropertyValue, property.c_str(), metaData->path.c_str());
-    if (nullptr == retQuery || FileIndexer::ONE_ROW_FOUND != retQuery->getRowCount()) {
+    if (nullptr == retQuery || DatabaseAgent::ONE_ROW_FOUND != retQuery->getRowCount()) {
         return *metaData;
     }
     FileIndexer::FileMetadata retMetaData;
@@ -429,14 +396,14 @@ auto FileIndexerAgent::dbSetProperty(std::unique_ptr<FileIndexer::FileMetadata> 
 
     if (false == metaData->path.empty()) {
         retQuery = database->query(FileIndexer::Statements::getFileInfoByPath, metaData->path.c_str());
-        if (nullptr == retQuery || FileIndexer::ONE_ROW_FOUND != retQuery->getRowCount()) {
+        if (nullptr == retQuery || DatabaseAgent::ONE_ROW_FOUND != retQuery->getRowCount()) {
             return false;
         }
         fileId = (*retQuery)[0].getUInt32();
     }
     else if (metaData->file_id != FileIndexer::FILE_ID_NOT_EXISTS) {
         retQuery = database->query(FileIndexer::Statements::getFileInfoById, metaData->file_id);
-        if (nullptr == retQuery || FileIndexer::ONE_ROW_FOUND != retQuery->getRowCount()) {
+        if (nullptr == retQuery || DatabaseAgent::ONE_ROW_FOUND != retQuery->getRowCount()) {
             return false;
         }
         fileId = metaData->file_id;
@@ -460,14 +427,14 @@ auto FileIndexerAgent::dbSetProperties(std::unique_ptr<FileIndexer::FileMetadata
 
     if (false == metaData->path.empty()) {
         retQuery = database->query(FileIndexer::Statements::getFileInfoByPath, metaData->path.c_str());
-        if (nullptr == retQuery || FileIndexer::ONE_ROW_FOUND != retQuery->getRowCount()) {
+        if (nullptr == retQuery || DatabaseAgent::ONE_ROW_FOUND != retQuery->getRowCount()) {
             return false;
         }
         fileId = (*retQuery)[0].getUInt32();
     }
     else if (metaData->file_id != FileIndexer::FILE_ID_NOT_EXISTS) {
         retQuery = database->query(FileIndexer::Statements::getFileInfoById, metaData->file_id);
-        if (nullptr == retQuery || FileIndexer::ONE_ROW_FOUND != retQuery->getRowCount()) {
+        if (nullptr == retQuery || DatabaseAgent::ONE_ROW_FOUND != retQuery->getRowCount()) {
             return false;
         }
         fileId = metaData->file_id;
@@ -509,7 +476,7 @@ auto FileIndexerAgent::handleGetProperty(sys::Message *req) -> sys::MessagePoint
         return std::make_shared<FileIndexer::Messages::GetPropertyResponseMessage>(
             std::make_unique<FileIndexer::FileMetadata>(msg->dbMetaData));
     }
-    return app::msgHandled();
+    return sys::msgHandled();
 }
 
 auto FileIndexerAgent::handleGetAllProperties(sys::Message *req) -> sys::MessagePointer
@@ -521,7 +488,7 @@ auto FileIndexerAgent::handleGetAllProperties(sys::Message *req) -> sys::Message
         return std::make_shared<FileIndexer::Messages::GetPropertyResponseMessage>(
             std::make_unique<FileIndexer::FileMetadata>(msg->dbMetaData));
     }
-    return app::msgHandled();
+    return sys::msgHandled();
 }
 
 auto FileIndexerAgent::handleSetProperty(sys::Message *req) -> sys::MessagePointer
@@ -544,7 +511,7 @@ auto FileIndexerAgent::handleSetProperty(sys::Message *req) -> sys::MessagePoint
             dbSetProperty(std::make_unique<FileIndexer::FileMetadata>(metaData));
         }
     }
-    return app::msgHandled();
+    return sys::msgHandled();
 }
 
 auto FileIndexerAgent::handleSetProperties(sys::Message *req) -> sys::MessagePointer
@@ -564,5 +531,5 @@ auto FileIndexerAgent::handleSetProperties(sys::Message *req) -> sys::MessagePoi
             parentService->bus.sendUnicast(std::move(notifyMsg), recipient);
         }
     }
-    return app::msgHandled();
+    return sys::msgHandled();
 }

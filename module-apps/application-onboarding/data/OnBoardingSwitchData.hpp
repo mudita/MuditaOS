@@ -4,7 +4,7 @@
 #pragma once
 
 #include <SwitchData.hpp>
-#include <json/json11.hpp>
+#include <json11.hpp>
 #include <utility>
 
 namespace app::onBoarding

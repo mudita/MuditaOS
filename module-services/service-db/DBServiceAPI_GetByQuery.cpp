@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-db/DBServiceAPI.hpp"
@@ -33,5 +33,5 @@ sys::SendResult DBServiceAPI::GetQueryWithReply(sys::Service *serv,
                                                 std::uint32_t timeout)
 {
     auto msg = std::make_shared<db::QueryMessage>(database, std::move(query));
-    return serv->bus.sendUnicast(msg, service::name::db, timeout);
+    return serv->bus.sendUnicastSync(msg, service::name::db, timeout);
 }

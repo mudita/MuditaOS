@@ -1,10 +1,12 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include "Axes.hpp"
+#include "gui/Common.hpp"
 #include <cstdint>
+#include <limits>
 #include <string>
 
 namespace gui
@@ -16,20 +18,20 @@ namespace gui
     class BoundingBox
     {
       public:
-        static const uint16_t zero_size;
-        static const uint16_t max_size;
-        static const uint16_t min_size;
+        static constexpr Length zero_size = 0;
+        static constexpr Length max_size  = std::numeric_limits<Length>().max();
+        static constexpr Length min_size  = std::numeric_limits<Length>().min();
 
-        static const int16_t zero_position;
-        static const int16_t max_position;
-        static const int16_t min_position;
+        static constexpr Position zero_position = 0;
+        static constexpr Position max_position  = std::numeric_limits<Position>().max();
+        static constexpr Position min_position  = std::numeric_limits<Position>().min();
 
         struct
         {
-            int16_t x = zero_position, y = zero_position;
-            uint16_t w = zero_size, h = zero_size;
+            Position x = zero_position, y = zero_position;
+            Length w = zero_size, h = zero_size;
         };
-        BoundingBox(int32_t x = 0, int32_t y = 0, uint32_t w = 0, uint32_t h = 0);
+        BoundingBox(Position x = zero_position, Position y = zero_position, Length w = 0, Length h = 0);
         virtual ~BoundingBox() = default;
 
         static bool intersect(const BoundingBox &box1, const BoundingBox &box2, BoundingBox &result);
@@ -37,9 +39,9 @@ namespace gui
         /// set x,y,w,h to zero
         void clear();
         /// get size in axis - in x get width in y get height
-        uint16_t size(gui::Axis axis) const;
+        Length size(gui::Axis axis) const;
         /// get position in axis - in x get x, in y get y
-        int16_t pos(gui::Axis axis) const;
+        Position pos(gui::Axis axis) const;
         std::string str() const;
         /// logical sum of bounding box by another bounding box values
         void sum(const BoundingBox &box);

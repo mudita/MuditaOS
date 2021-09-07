@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "board/rt1051/common/clock_config.h"
+#include "board/clock_config.h"
 
 namespace drivers
 {

@@ -1,17 +1,15 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ScanModesWindow.hpp"
-#include "gui/widgets/BoxLayout.hpp"
-#include "gui/widgets/Item.hpp"
-#include "gui/widgets/Label.hpp"
-#include "gui/widgets/Window.hpp"
-
+#include <application-antenna/AntennaAppStyle.hpp>
+#include <application-antenna/ApplicationAntenna.hpp>
 #include <i18n/i18n.hpp>
-#include <Style.hpp>
-
-#include "../AntennaAppStyle.hpp"
-#include "../ApplicationAntenna.hpp"
+#include <module-gui/gui/widgets/BoxLayout.hpp>
+#include <module-gui/gui/widgets/Item.hpp>
+#include <module-gui/gui/widgets/Label.hpp>
+#include <module-gui/gui/widgets/Style.hpp>
+#include <module-gui/gui/widgets/Window.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
 
 namespace gui
@@ -34,10 +32,10 @@ namespace gui
         bottomBar->setActive(BottomBar::Side::LEFT, true);
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::open));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::open));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
-        setTitle(utils::localize.get("app_desktop_tools_antenna"));
+        setTitle(utils::translate("app_desktop_tools_antenna"));
 
         modeButtonParams.insert(std::pair<uint32_t, std::string>(scanModes::Auto, "AUTO"));
         modeButtonParams.insert(std::pair<uint32_t, std::string>(scanModes::GSM_only, "GSM only"));
@@ -50,9 +48,9 @@ namespace gui
         modeButtonParams.insert(std::pair<uint32_t, std::string>(scanModes::CDMA_and_HDR_only, "CDMA and HDR only"));
 
         uint32_t w = this->getWidth() - style::window::default_left_margin * 2;
-        uint32_t h = this->getHeight() - title->offset_h() - bottomBar->getHeight();
+        uint32_t h = this->getHeight() - style::window::default_vertical_pos - bottomBar->getHeight();
 
-        modesBox = new gui::VBox(this, style::window::default_left_margin, (uint32_t)title->offset_h(), w, h);
+        modesBox = new gui::VBox(this, style::window::default_left_margin, style::window::default_vertical_pos, w, h);
         modesBox->setPenWidth(0);
         modesBox->setPenFocusWidth(0);
         modesBox->setEdges(gui::RectangleEdge::None);

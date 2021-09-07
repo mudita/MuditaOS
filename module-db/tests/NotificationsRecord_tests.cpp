@@ -1,15 +1,18 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "common.hpp"
 #include <catch2/catch.hpp>
 
-#include "Interface/NotificationsRecord.hpp"
-#include "Database/Database.hpp"
-#include "Databases/NotificationsDB.hpp"
-#include "module-db/queries/notifications/QueryNotificationsGet.hpp"
-#include "module-db/queries/notifications/QueryNotificationsIncrement.hpp"
-#include "module-db/queries/notifications/QueryNotificationsClear.hpp"
-#include "module-db/queries/notifications/QueryNotificationsGetAll.hpp"
+#include <Interface/NotificationsRecord.hpp>
+#include <Interface/ContactRecord.hpp>
+#include <Database/Database.hpp>
+#include <Databases/NotificationsDB.hpp>
+#include <Databases/ContactsDB.hpp>
+#include <queries/notifications/QueryNotificationsGet.hpp>
+#include <queries/notifications/QueryNotificationsIncrement.hpp>
+#include <queries/notifications/QueryNotificationsClear.hpp>
+#include <queries/notifications/QueryNotificationsGetAll.hpp>
 
 #include <filesystem>
 
@@ -21,16 +24,6 @@
 
 TEST_CASE("Notifications Record tests")
 {
-    Database::initialize();
-
-    const auto notificationsPath = (std::filesystem::path{"user"} / "notifications.db");
-    if (std::filesystem::exists(notificationsPath)) {
-        REQUIRE(std::filesystem::remove(notificationsPath));
-    }
-
-    NotificationsDB notificationsDb{notificationsPath.c_str()};
-
-    REQUIRE(notificationsDb.isInitialized());
 
     SECTION("Default Constructor")
     {
@@ -39,34 +32,50 @@ TEST_CASE("Notifications Record tests")
         REQUIRE(testRec.ID == DB_ID_NONE);
         REQUIRE(testRec.key == NotificationsRecord::Key::NotValidKey);
         REQUIRE(testRec.value == 0);
+        REQUIRE_FALSE(testRec.contactRecord.has_value());
     }
 
     SECTION("Constructor from NotificationsTableRow")
     {
         NotificationsTableRow tableRow{
-            {.ID = 10}, .key = static_cast<uint32_t>(NotificationsRecord::Key::Calls), .value = 2};
-
+            Record(10), .key = static_cast<uint32_t>(NotificationsRecord::Key::Calls), .value = 2};
         NotificationsRecord testRec(tableRow);
         REQUIRE(testRec.isValid());
         REQUIRE(testRec.ID == 10);
         REQUIRE(testRec.key == NotificationsRecord::Key::Calls);
         REQUIRE(testRec.value == 2);
+        REQUIRE_FALSE(testRec.contactRecord.has_value());
     }
+
+    Database::initialize();
+    const auto notificationsPath = (std::filesystem::path{"sys/user"} / "notifications.db");
+    const auto contactsPath      = (std::filesystem::path{"sys/user"} / "contacts.db");
+    RemoveDbFiles(notificationsPath.stem());
+    RemoveDbFiles(contactsPath.stem());
+
+    NotificationsDB notificationsDb{notificationsPath.c_str()};
+    ContactsDB contactsDb{contactsPath.c_str()};
+    REQUIRE(notificationsDb.isInitialized());
+    REQUIRE(contactsDb.isInitialized());
 
     const auto notificationsCount = notificationsDb.notifications.count() + 1;
     // clear notifications table
     for (std::size_t id = 1; id <= notificationsCount; id++) {
         REQUIRE(notificationsDb.notifications.removeById(id));
     }
-    NotificationsRecordInterface notificationsRecordInterface(&notificationsDb);
+
+    ContactRecordInterface contactRecordInterface(&contactsDb);
+    NotificationsRecordInterface notificationsRecordInterface(&notificationsDb, &contactRecordInterface);
+    REQUIRE(contactRecordInterface.GetCount() == 0);
     REQUIRE(notificationsRecordInterface.GetCount() == 0);
+
     NotificationsTableRow callsRow{
-        {.ID = DB_ID_NONE}, .key = static_cast<uint32_t>(NotificationsRecord::Key::Calls), .value = 0};
+        Record(DB_ID_NONE), .key = static_cast<uint32_t>(NotificationsRecord::Key::Calls), .value = 0};
 
     REQUIRE(notificationsDb.notifications.add(callsRow));
 
     NotificationsTableRow smsRow{
-        {.ID = DB_ID_NONE}, .key = static_cast<uint32_t>(NotificationsRecord::Key::Sms), .value = 0};
+        Record(DB_ID_NONE), .key = static_cast<uint32_t>(NotificationsRecord::Key::Sms), .value = 0};
 
     REQUIRE(notificationsDb.notifications.add(smsRow));
     NotificationsRecord testRec;
@@ -80,12 +89,14 @@ TEST_CASE("Notifications Record tests")
         REQUIRE(callsNotifications.ID == 1);
         REQUIRE(callsNotifications.key == NotificationsRecord::Key::Calls);
         REQUIRE(callsNotifications.value == 0);
+        REQUIRE_FALSE(callsNotifications.contactRecord.has_value());
 
         auto smsNotifications = notificationsRecordInterface.GetByID(2);
         REQUIRE(smsNotifications.isValid());
         REQUIRE(smsNotifications.ID == 2);
         REQUIRE(smsNotifications.key == NotificationsRecord::Key::Sms);
         REQUIRE(smsNotifications.value == 0);
+        REQUIRE_FALSE(smsNotifications.contactRecord.has_value());
     }
 
     SECTION("Get entry by key")
@@ -180,7 +191,9 @@ TEST_CASE("Notifications Record tests")
         REQUIRE(entryPost.value == entryPre.value);
     }
 
-    auto getByKey = [&](NotificationsRecord::Key key, uint32_t val) {
+    auto getByKey = [&](NotificationsRecord::Key key,
+                        uint32_t expectedValue,
+                        const std::optional<ContactRecord> &expectedContactRecord = std::nullopt) {
         auto query  = std::make_shared<db::query::notifications::Get>(key);
         auto ret    = notificationsRecordInterface.runQuery(query);
         auto result = dynamic_cast<db::query::notifications::GetResult *>(ret.get());
@@ -188,11 +201,16 @@ TEST_CASE("Notifications Record tests")
         auto record = result->getResult();
         REQUIRE(record.isValid());
         REQUIRE(record.key == key);
-        REQUIRE(record.value == val);
+        REQUIRE(record.value == expectedValue);
+        REQUIRE(record.contactRecord.has_value() == expectedContactRecord.has_value());
+        if (expectedContactRecord.has_value()) {
+            REQUIRE(record.contactRecord.value().ID == expectedContactRecord.value().ID);
+        }
     };
 
-    auto incrementByKey = [&](NotificationsRecord::Key key) {
-        auto query  = std::make_shared<db::query::notifications::Increment>(key);
+    auto incrementByKey = [&](NotificationsRecord::Key key, const std::string &phoneNumber = "+48500500500") {
+        utils::PhoneNumber number(phoneNumber);
+        auto query  = std::make_shared<db::query::notifications::Increment>(key, number.getView());
         auto ret    = notificationsRecordInterface.runQuery(query);
         auto result = dynamic_cast<db::query::notifications::IncrementResult *>(ret.get());
         REQUIRE(result != nullptr);
@@ -251,6 +269,97 @@ TEST_CASE("Notifications Record tests")
         REQUIRE(result != nullptr);
         auto records = result->getResult();
         REQUIRE(records->size() == numberOfNotifcations);
+    }
+
+    SECTION("Notification DB and Contact DB connection tests")
+    {
+        const std::string primaryNameTest_1 = "PrimaryTestNameOne";
+        const std::string numberUserTest_1  = "600123456";
+        ContactRecord testContactRecord_1;
+        testContactRecord_1.primaryName = primaryNameTest_1;
+        testContactRecord_1.numbers =
+            std::vector<ContactRecord::Number>({ContactRecord::Number(utils::PhoneNumber(numberUserTest_1).getView())});
+
+        const std::string primaryNameTest_2 = "PrimaryTestNameTwo";
+        const std::string numberUserTest_2  = "600600600";
+        ContactRecord testContactRecord_2;
+        testContactRecord_2.primaryName = primaryNameTest_2;
+        testContactRecord_2.numbers =
+            std::vector<ContactRecord::Number>({ContactRecord::Number(utils::PhoneNumber(numberUserTest_2).getView())});
+
+        REQUIRE(contactRecordInterface.Add(testContactRecord_1));
+        REQUIRE(contactRecordInterface.Add(testContactRecord_2));
+
+        const auto someUnknownNumber      = "500200300";
+        const auto noNotificationExpected = 0;
+        const auto contactNotExpected     = std::nullopt;
+
+        SECTION("Tests preconditions")
+        {
+            getByKey(NotificationsRecord::Key::Calls, noNotificationExpected);
+        }
+
+        SECTION("Single call notification from unknown number")
+        {
+            const auto expectedNotificationValue = 1;
+            incrementByKey(NotificationsRecord::Key::Calls, someUnknownNumber);
+            getByKey(NotificationsRecord::Key::Calls, expectedNotificationValue, contactNotExpected);
+        }
+
+        SECTION("Single call notification from known number")
+        {
+            const auto expectedNotificationValue = 1;
+            incrementByKey(NotificationsRecord::Key::Calls, numberUserTest_1);
+            getByKey(NotificationsRecord::Key::Calls, expectedNotificationValue, testContactRecord_1);
+            clearByKey(NotificationsRecord::Key::Calls);
+            getByKey(NotificationsRecord::Key::Calls, noNotificationExpected, contactNotExpected);
+        }
+
+        SECTION("Multiple call notifications from single known number")
+        {
+            const auto expectedNotificationValue = 3;
+            for (int i = 0; i < expectedNotificationValue; i++)
+                incrementByKey(NotificationsRecord::Key::Calls, numberUserTest_1);
+            getByKey(NotificationsRecord::Key::Calls, expectedNotificationValue, testContactRecord_1);
+            clearByKey(NotificationsRecord::Key::Calls);
+            getByKey(NotificationsRecord::Key::Calls, noNotificationExpected, contactNotExpected);
+        }
+
+        SECTION("Multiple call notifications from multiple known numbers")
+        {
+            const auto expectedNotificationValue = 2 * 3;
+            for (int i = 0; i < expectedNotificationValue / 2; i++) {
+                incrementByKey(NotificationsRecord::Key::Calls, numberUserTest_1);
+                incrementByKey(NotificationsRecord::Key::Calls, numberUserTest_2);
+            }
+            getByKey(NotificationsRecord::Key::Calls, expectedNotificationValue, contactNotExpected);
+            clearByKey(NotificationsRecord::Key::Calls);
+            getByKey(NotificationsRecord::Key::Calls, noNotificationExpected, contactNotExpected);
+        }
+
+        SECTION("Multiple call notifications in sequence of known-unknown-known numbers")
+        {
+            incrementByKey(NotificationsRecord::Key::Calls, numberUserTest_1);
+            getByKey(NotificationsRecord::Key::Calls, 1, testContactRecord_1);
+
+            incrementByKey(NotificationsRecord::Key::Calls, someUnknownNumber);
+            getByKey(NotificationsRecord::Key::Calls, 2, contactNotExpected);
+
+            incrementByKey(NotificationsRecord::Key::Calls, numberUserTest_1);
+            getByKey(NotificationsRecord::Key::Calls, 3, contactNotExpected);
+        }
+
+        SECTION("Multiple call notifications in sequence of unknown-known-unknown numbers")
+        {
+            incrementByKey(NotificationsRecord::Key::Calls, someUnknownNumber);
+            getByKey(NotificationsRecord::Key::Calls, 1, contactNotExpected);
+
+            incrementByKey(NotificationsRecord::Key::Calls, numberUserTest_1);
+            getByKey(NotificationsRecord::Key::Calls, 2, contactNotExpected);
+
+            incrementByKey(NotificationsRecord::Key::Calls, someUnknownNumber);
+            getByKey(NotificationsRecord::Key::Calls, 3, contactNotExpected);
+        }
     }
 
     Database::deinitialize();

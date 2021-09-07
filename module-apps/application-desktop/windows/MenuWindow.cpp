@@ -1,17 +1,18 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "DBNotificationsHandler.hpp"
 #include "MenuWindow.hpp"
-#include "../ApplicationDesktop.hpp"
-#include "InputEvent.hpp"
-#include "Item.hpp"
-#include "Navigation.hpp"
-#include "service-appmgr/Controller.hpp"
+#include "Names.hpp"
 
-#include <tools/Common.hpp>
-#include <Style.hpp>
-#include <cassert>
 #include <i18n/i18n.hpp>
+#include <Image.hpp>
+#include <InputEvent.hpp>
+#include <Item.hpp>
+#include <Navigation.hpp>
+#include <service-appmgr/Controller.hpp>
+#include <Style.hpp>
+#include <tools/Common.hpp>
 
 namespace style::design
 {
@@ -42,7 +43,6 @@ namespace
 
 namespace gui
 {
-    inline const auto APP_SETTINGS_NEW = "ApplicationSettingsNew";
     Tile::Tile(UTF8 icon,
                std::string title,
                std::function<bool(Item &)> activatedCallback,
@@ -58,12 +58,12 @@ namespace gui
         center(it, img, Axis::X);
         it->addWidget(img);
 
-        auto *desc =
+        description =
             new gui::Label(it, 0, it->area().h - style::design::tile_text_y, it->area().w, style::design::tile_text_y);
-        desc->setPenWidth(style::window::default_border_no_focus_w);
-        desc->setFont(style::window::font::verysmall);
-        desc->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Bottom));
-        desc->setText(utils::localize.get(title));
+        description->setPenWidth(style::window::default_border_no_focus_w);
+        description->setFont(style::window::font::verysmall);
+        description->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Bottom));
+        description->setText(utils::translate(title));
 
         if (hasNotificationsCallback != nullptr) {
             onNotificationsChangeCallback =
@@ -82,7 +82,7 @@ namespace gui
             onNotificationsChangeCallback(gui::RefreshModes::GUI_REFRESH_DEEP);
         }
 
-        this->activatedCallback = activatedCallback;
+        this->activatedCallback = std::move(activatedCallback);
         this->setPenWidth(style::window::default_border_no_focus_w);
         this->setPenFocusWidth(style::window::default_border_focus_w);
         this->setEdges(RectangleEdge::Top | RectangleEdge::Bottom);
@@ -94,6 +94,15 @@ namespace gui
             return onNotificationsChangeCallback(mode);
         }
         return false;
+    }
+
+    DisabledTile::DisabledTile(UTF8 icon,
+                               std::string title,
+                               std::function<bool(Item &)> activatedCallback,
+                               std::function<bool()> hasNotificationsCallback)
+        : Tile{std::move(icon), std::move(title), std::move(activatedCallback), std::move(hasNotificationsCallback)}
+    {
+        description->setTextColor(gui::ColorGrey);
     }
 
     MenuPage::MenuPage(gui::Item *parent, UTF8 title, std::vector<Tile *> tiles) : title(std::move(title))
@@ -129,7 +138,8 @@ namespace gui
         return visibleStateChanged;
     }
 
-    MenuWindow::MenuWindow(app::Application *app) : AppWindow(app, app::window::name::desktop_menu)
+    MenuWindow::MenuWindow(app::Application *app, const app::DBNotificationsBaseHandler &accessor)
+        : AppWindow(app, app::window::name::desktop_menu), dbNotifications(accessor)
     {
         buildInterface();
     }
@@ -146,141 +156,158 @@ namespace gui
         AppWindow::buildInterface();
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::open));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
-
-        auto app = dynamic_cast<app::ApplicationDesktop *>(application);
-        assert(app);
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::open));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
         mainMenu = new MenuPage(
             this,
-            utils::localize.get("app_desktop_menu_title"),
+            utils::translate("app_desktop_menu_title"),
             {
 
-                new gui::Tile{
-                    "menu_tools_W_G",
-                    "app_desktop_menu_tools",
+                createApplicationTile("menu_tools_W_G",
+                                      "app_desktop_menu_tools",
+                                      [=](gui::Item &item) {
+                                          switchMenu(toolsMenu);
+                                          return true;
+                                      }),
+#ifdef ENABLE_APP_ALARM_CLOCK
+                createApplicationTile("menu_alarm_W_G",
+                                      "app_desktop_menu_alarm",
+                                      [=](gui::Item &item) {
+                                          return app::manager::Controller::sendAction(
+                                              application,
+                                              app::manager::actions::Launch,
+                                              std::make_unique<app::ApplicationLaunchData>("ApplicationAlarmClock"));
+                                      }),
+#else
+                createDisabledApplicationTile("alarm_icon_disabled",
+                                              "app_desktop_menu_alarm"),
+#endif
+                createApplicationTile("menu_calendar_W_G",
+                                      "app_desktop_menu_calendar",
+                                      [=](gui::Item &item) {
+                                          return app::manager::Controller::sendAction(
+                                              application,
+                                              app::manager::actions::Launch,
+                                              std::make_unique<app::ApplicationLaunchData>("ApplicationCalendar"));
+                                      }),
+
+                createApplicationTile(
+                    "menu_phone_W_G",
+                    "app_desktop_menu_phone",
                     [=](gui::Item &item) {
-                        {
-                            switchMenu(toolsMenu);
-                            return true;
-                        }
+                        return app::manager::Controller::sendAction(
+                            application,
+                            app::manager::actions::Launch,
+                            std::make_unique<app::ApplicationLaunchData>("ApplicationCallLog"));
                     },
-                },
-                new gui::Tile("menu_alarm_W_G",
-                              "app_desktop_menu_alarm",
-                              [=](gui::Item &item) {
-                                  return app::manager::Controller::sendAction(
-                                      application,
-                                      app::manager::actions::Launch,
-                                      std::make_unique<app::ApplicationLaunchData>("ApplicationAlarmClock"));
-                              }),
+                    [=]() {
+                        return dbNotifications.hasNotification(app::DBNotificationsBaseHandler::Type::notReadCall);
+                    }),
 
-                new gui::Tile("menu_calendar_W_G",
-                              "app_desktop_menu_calendar",
-                              [=](gui::Item &item) {
-                                  return app::manager::Controller::sendAction(
-                                      application,
-                                      app::manager::actions::Launch,
-                                      std::make_unique<app::ApplicationLaunchData>("ApplicationCalendar"));
-                              }),
+                createApplicationTile("menu_contacts_W_G",
+                                      "app_desktop_menu_contacts",
+                                      [=](gui::Item &item) {
+                                          return app::manager::Controller::sendAction(
+                                              application,
+                                              app::manager::actions::Launch,
+                                              std::make_unique<app::ApplicationLaunchData>("ApplicationPhonebook"));
+                                      }),
 
-                new gui::Tile{"menu_phone_W_G",
-                              "app_desktop_menu_phone",
-                              [=](gui::Item &item) {
-                                  return app::manager::Controller::sendAction(
-                                      application,
-                                      app::manager::actions::Launch,
-                                      std::make_unique<app::ApplicationLaunchData>("ApplicationCallLog"));
-                              },
-                              [=]() { return app->notifications.notRead.Calls > 0; }},
-
-                new gui::Tile("menu_contacts_W_G",
-                              "app_desktop_menu_contacts",
-                              [=](gui::Item &item) {
-                                  return app::manager::Controller::sendAction(
-                                      application,
-                                      app::manager::actions::Launch,
-                                      std::make_unique<app::ApplicationLaunchData>("ApplicationPhonebook"));
-                              }),
-
-                new gui::Tile{"menu_messages_W_G",
-                              "app_desktop_menu_messages",
-                              [=](gui::Item &item) {
-                                  return app::manager::Controller::sendAction(
-                                      application,
-                                      app::manager::actions::Launch,
-                                      std::make_unique<app::ApplicationLaunchData>("ApplicationMessages"));
-                              },
-                              [=]() { return app->notifications.notRead.SMS > 0; }},
-                new gui::Tile{"menu_music_player_W_G",
-                              "app_desktop_menu_music",
-                              [=](gui::Item &item) {
-                                  return app::manager::Controller::sendAction(
-                                      application,
-                                      app::manager::actions::Launch,
-                                      std::make_unique<app::ApplicationLaunchData>("ApplicationMusicPlayer"));
-                              }},
-                new gui::Tile{"menu_meditation_W_G",
-                              "app_desktop_menu_meditation",
-                              [=](gui::Item &item) {
-                                  return app::manager::Controller::sendAction(
-                                      application,
-                                      app::manager::actions::Launch,
-                                      std::make_unique<app::ApplicationLaunchData>("ApplicationMeditation"));
-                              }},
-                new gui::Tile{"menu_settings_W_G", "app_desktop_menu_settings_new", [=](gui::Item &item) {
-                                  return app::manager::Controller::sendAction(
-                                      application,
-                                      app::manager::actions::Launch,
-                                      std::make_unique<app::ApplicationLaunchData>(APP_SETTINGS_NEW));
-                              }}});
+                createApplicationTile(
+                    "menu_messages_W_G",
+                    "app_desktop_menu_messages",
+                    [=](gui::Item &item) {
+                        return app::manager::Controller::sendAction(
+                            application,
+                            app::manager::actions::Launch,
+                            std::make_unique<app::ApplicationLaunchData>("ApplicationMessages"));
+                    },
+                    [=]() {
+                        return dbNotifications.hasNotification(app::DBNotificationsBaseHandler::Type::notReadSMS);
+                    }),
+                createApplicationTile("menu_music_player_W_G",
+                                      "app_desktop_menu_music",
+                                      [=](gui::Item &item) {
+                                          return app::manager::Controller::sendAction(
+                                              application,
+                                              app::manager::actions::Launch,
+                                              std::make_unique<app::ApplicationLaunchData>("ApplicationMusicPlayer"));
+                                      }),
+                createApplicationTile("menu_meditation_W_G",
+                                      "app_desktop_menu_meditation",
+                                      [=](gui::Item &item) {
+                                          return app::manager::Controller::sendAction(
+                                              application,
+                                              app::manager::actions::Launch,
+                                              std::make_unique<app::ApplicationLaunchData>("ApplicationMeditation"));
+                                      }),
+                createApplicationTile("menu_settings_W_G", "app_desktop_menu_settings", [=](gui::Item &item) {
+                    return app::manager::Controller::sendAction(
+                        application,
+                        app::manager::actions::Launch,
+                        std::make_unique<app::ApplicationLaunchData>("ApplicationSettings"));
+                })});
 
         toolsMenu = new MenuPage(
             this,
-            utils::localize.get("app_desktop_tools_title"),
+            utils::translate("app_desktop_tools_title"),
             {
-                new gui::Tile{"menu_tools_notes_W_G",
-                              "app_desktop_tools_notes",
-                              [=](gui::Item &item) {
-                                  return app::manager::Controller::sendAction(
-                                      application,
-                                      app::manager::actions::Launch,
-                                      std::make_unique<app::ApplicationLaunchData>("ApplicationNotes"));
-                              }},
-                new gui::Tile{"menu_tools_calculator_W_G",
-                              "app_desktop_tools_calculator",
-                              [=](gui::Item &item) {
-                                  return app::manager::Controller::sendAction(
-                                      application,
-                                      app::manager::actions::Launch,
-                                      std::make_unique<app::ApplicationLaunchData>("ApplicationCalculator"));
-                              }},
-                new gui::Tile{"menu_tools_recorder_W_G",
-                              "app_desktop_tools_antenna",
-                              [=](gui::Item &item) {
-                                  return app::manager::Controller::sendAction(
-                                      application,
-                                      app::manager::actions::Launch,
-                                      std::make_unique<app::ApplicationLaunchData>("ApplicationAntenna"));
-                              }},
+                createApplicationTile("menu_tools_notes_W_G",
+                                      "app_desktop_tools_notes",
+                                      [=](gui::Item &item) {
+                                          return app::manager::Controller::sendAction(
+                                              application,
+                                              app::manager::actions::Launch,
+                                              std::make_unique<app::ApplicationLaunchData>("ApplicationNotes"));
+                                      }),
+                createApplicationTile("menu_tools_calculator_W_G",
+                                      "app_desktop_tools_calculator",
+                                      [=](gui::Item &item) {
+                                          return app::manager::Controller::sendAction(
+                                              application,
+                                              app::manager::actions::Launch,
+                                              std::make_unique<app::ApplicationLaunchData>("ApplicationCalculator"));
+                                      }),
+#ifdef ENABLE_APP_ANTENNA
+                createApplicationTile("menu_tools_recorder_W_G",
+                                      "app_desktop_tools_antenna",
+                                      [=](gui::Item &item) {
+                                          return app::manager::Controller::sendAction(
+                                              application,
+                                              app::manager::actions::Launch,
+                                              std::make_unique<app::ApplicationLaunchData>("ApplicationAntenna"));
+                                      }),
+#endif
             });
 
         using namespace style::window;
         mainMenu->setSize(this->area().w - default_left_margin - default_right_margin,
-                          bottomBar->area().pos(Axis::Y) - this->title->getOffset(Axis::Y) -
-                              style::design::grid_offset);
-        mainMenu->setPosition(default_left_margin, title->getOffset(Axis::Y) + style::design::grid_offset);
+                          bottomBar->area().pos(Axis::Y) - default_vertical_pos - style::design::grid_offset);
+        mainMenu->setPosition(default_left_margin, default_vertical_pos + style::design::grid_offset);
         mainMenu->setVisible(false);
 
         toolsMenu->setSize(this->area().w - default_left_margin - default_right_margin,
-                           bottomBar->area().pos(Axis::Y) - this->title->getOffset(Axis::Y) -
-                               style::design::grid_offset);
-        toolsMenu->setPosition(default_left_margin, title->getOffset(Axis::Y) + style::design::grid_offset);
+                           bottomBar->area().pos(Axis::Y) - default_vertical_pos - style::design::grid_offset);
+        toolsMenu->setPosition(default_left_margin, default_vertical_pos + style::design::grid_offset);
         toolsMenu->setVisible(false);
 
         switchMenu(mainMenu);
         mainMenu->setFirstTimeSelection();
+    }
+
+    gui::Tile *MenuWindow::createApplicationTile(UTF8 icon,
+                                                 std::string title,
+                                                 std::function<bool(Item &)> activatedCallback,
+                                                 std::function<bool()> hasNotificationsCallback)
+    {
+        return new gui::Tile{
+            std::move(icon), std::move(title), std::move(activatedCallback), std::move(hasNotificationsCallback)};
+    }
+
+    gui::Tile *MenuWindow::createDisabledApplicationTile(UTF8 icon, std::string title)
+    {
+        return new gui::DisabledTile{std::move(icon), std::move(title), [](gui::Item & /*item*/) { return false; }};
     }
 
     void MenuWindow::destroyInterface()
@@ -297,8 +324,7 @@ namespace gui
 
     bool MenuWindow::onInput(const InputEvent &inputEvent)
     {
-        if ((inputEvent.state == InputEvent::State::keyReleasedShort) && (inputEvent.keyCode == KeyCode::KEY_RF) &&
-            (toolsMenu->visible)) {
+        if (inputEvent.isShortRelease(KeyCode::KEY_RF) && toolsMenu->visible) {
             switchMenu(mainMenu);
             return true;
         }
@@ -316,6 +342,7 @@ namespace gui
 
         setTitle(page->title);
         setFocusItem(page);
+        application->refreshWindow(RefreshModes::GUI_REFRESH_DEEP);
     }
 
     void MenuWindow::refresh()

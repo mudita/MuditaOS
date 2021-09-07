@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CalllogHelper.hpp"
@@ -47,7 +47,7 @@ auto CalllogHelper::requestDataFromDB(Context &context) -> sys::ReturnCodes
                     auto recordsPtr = std::make_unique<std::vector<CalllogRecord>>(contactResult->getRecords());
                     json11::Json::array calllogArray;
 
-                    for (auto record : *recordsPtr.get()) {
+                    for (const auto &record : *recordsPtr) {
                         calllogArray.emplace_back(CalllogHelper::to_json(record));
                     }
 
@@ -69,7 +69,7 @@ auto CalllogHelper::requestDataFromDB(Context &context) -> sys::ReturnCodes
 
 auto CalllogHelper::getCalllogCount(Context &context) -> sys::ReturnCodes
 {
-    auto query = std::make_unique<db::query::CalllogGetCount>();
+    auto query = std::make_unique<db::query::CalllogGetCount>(EntryState::ALL);
 
     auto listener = std::make_unique<db::EndpointListener>(
         [](db::QueryResult *result, Context context) {
@@ -102,7 +102,7 @@ auto CalllogHelper::getCalllogByContactID(Context &context) -> sys::ReturnCodes
                 auto records = calllogResult->getResults();
                 json11::Json::array calllogArray;
 
-                for (auto record : records) {
+                for (const auto &record : records) {
                     calllogArray.emplace_back(CalllogHelper::to_json(record));
                 }
 
@@ -133,7 +133,7 @@ auto CalllogHelper::deleteDBEntry(Context &context) -> sys::ReturnCodes
         [](db::QueryResult *result, Context context) {
             if (auto calllogResult = dynamic_cast<db::query::CalllogRemoveResult *>(result)) {
 
-                context.setResponseStatus(calllogResult->getResults() ? http::Code::OK
+                context.setResponseStatus(calllogResult->getResults() ? http::Code::NoContent
                                                                       : http::Code::InternalServerError);
                 MessageHandler::putToSendQueue(context.createSimpleResponse());
                 return true;
@@ -153,15 +153,16 @@ auto CalllogHelper::requestCount(Context &context) -> sys::ReturnCodes
 }
 auto CalllogHelper::to_json(CalllogRecord record) -> json11::Json
 {
-    std::stringstream ss;
-    ss << record.date;
-    std::string date = ss.str();
+    std::unique_ptr<std::stringstream> ss = std::make_unique<std::stringstream>();
 
-    ss.clear();
-    ss.str(std::string{});
+    (*ss) << record.date;
+    std::string date = ss->str();
 
-    ss << record.duration;
-    std::string duration = ss.str();
+    ss->clear();
+    ss->str(std::string{});
+
+    (*ss) << record.duration;
+    std::string duration = ss->str();
 
     auto recordEntry = json11::Json::object{{json::calllog::presentation, static_cast<int>(record.presentation)},
                                             {json::calllog::date, date},

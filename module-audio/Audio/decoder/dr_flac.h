@@ -4877,8 +4877,13 @@ drflac *drflac_open_with_metadata_private(drflac_read_proc onRead,
     drflac__init_cpu_caps();
 #endif
 
-    drflac_init_info init;
-    if (!drflac__init_private(&init, onRead, onSeek, onMeta, container, pUserData, pUserDataMD)) {
+    drflac_init_info *init = (drflac_init_info *)DRFLAC_MALLOC(sizeof(drflac_init_info));
+    if (init == NULL) {
+        return NULL;
+    }
+
+    if (!drflac__init_private(init, onRead, onSeek, onMeta, container, pUserData, pUserDataMD)) {
+        DRFLAC_FREE(init);
         return NULL;
     }
 
@@ -4894,40 +4899,40 @@ drflac *drflac_open_with_metadata_private(drflac_read_proc onRead,
     // The allocation size for decoded frames depends on the number of 32-bit integers that fit inside the largest SIMD
     // vector we are supporting.
     drflac_uint32 wholeSIMDVectorCountPerChannel;
-    if ((init.maxBlockSize % (DRFLAC_MAX_SIMD_VECTOR_SIZE / sizeof(drflac_int32))) == 0) {
-        wholeSIMDVectorCountPerChannel = (init.maxBlockSize / (DRFLAC_MAX_SIMD_VECTOR_SIZE / sizeof(drflac_int32)));
+    if ((init->maxBlockSize % (DRFLAC_MAX_SIMD_VECTOR_SIZE / sizeof(drflac_int32))) == 0) {
+        wholeSIMDVectorCountPerChannel = (init->maxBlockSize / (DRFLAC_MAX_SIMD_VECTOR_SIZE / sizeof(drflac_int32)));
     }
     else {
-        wholeSIMDVectorCountPerChannel = (init.maxBlockSize / (DRFLAC_MAX_SIMD_VECTOR_SIZE / sizeof(drflac_int32))) + 1;
+        wholeSIMDVectorCountPerChannel = (init->maxBlockSize / (DRFLAC_MAX_SIMD_VECTOR_SIZE / sizeof(drflac_int32))) + 1;
     }
 
     drflac_uint32 decodedSamplesAllocationSize =
-        wholeSIMDVectorCountPerChannel * DRFLAC_MAX_SIMD_VECTOR_SIZE * init.channels;
+        wholeSIMDVectorCountPerChannel * DRFLAC_MAX_SIMD_VECTOR_SIZE * init->channels;
 
     allocationSize += decodedSamplesAllocationSize;
     allocationSize += DRFLAC_MAX_SIMD_VECTOR_SIZE; // Allocate extra bytes to ensure we have enough for alignment.
 
 #ifndef DR_FLAC_NO_OGG
     // There's additional data required for Ogg streams.
-    if (init.container == drflac_container_ogg) {
+    if (init->container == drflac_container_ogg) {
         allocationSize += sizeof(drflac_oggbs);
     }
 #endif
 
     drflac *pFlac = (drflac *)DRFLAC_MALLOC(allocationSize);
-    drflac__init_from_info(pFlac, &init);
+    drflac__init_from_info(pFlac, init);
     pFlac->pDecodedSamples = (drflac_int32 *)drflac_align((size_t)pFlac->pExtraData, DRFLAC_MAX_SIMD_VECTOR_SIZE);
 
 #ifndef DR_FLAC_NO_OGG
-    if (init.container == drflac_container_ogg) {
+    if (init->container == drflac_container_ogg) {
         drflac_oggbs *oggbs   = (drflac_oggbs *)((drflac_uint8 *)pFlac->pDecodedSamples + decodedSamplesAllocationSize);
         oggbs->onRead         = onRead;
         oggbs->onSeek         = onSeek;
         oggbs->pUserData      = pUserData;
-        oggbs->currentBytePos = init.oggFirstBytePos;
-        oggbs->firstBytePos   = init.oggFirstBytePos;
-        oggbs->serialNumber   = init.oggSerial;
-        oggbs->bosPageHeader  = init.oggBosHeader;
+        oggbs->currentBytePos = init->oggFirstBytePos;
+        oggbs->firstBytePos   = init->oggFirstBytePos;
+        oggbs->serialNumber   = init->oggSerial;
+        oggbs->bosPageHeader  = init->oggBosHeader;
         oggbs->bytesRemainingInPage = 0;
 
         // The Ogg bistream needs to be layered on top of the original bitstream.
@@ -4939,8 +4944,9 @@ drflac *drflac_open_with_metadata_private(drflac_read_proc onRead,
 #endif
 
     // Decode metadata before returning.
-    if (init.hasMetadataBlocks) {
+    if (init->hasMetadataBlocks) {
         if (!drflac__read_and_decode_metadata(pFlac)) {
+            DRFLAC_FREE(init);
             DRFLAC_FREE(pFlac);
             return NULL;
         }
@@ -4948,8 +4954,8 @@ drflac *drflac_open_with_metadata_private(drflac_read_proc onRead,
 
     // If we get here, but don't have a STREAMINFO block, it means we've opened the stream in relaxed mode and need to
     // decode the first frame.
-    if (!init.hasStreamInfoBlock) {
-        pFlac->currentFrame.header = init.firstFrameHeader;
+    if (!init->hasStreamInfoBlock) {
+        pFlac->currentFrame.header = init->firstFrameHeader;
         do {
             drflac_result result = drflac__decode_frame(pFlac);
             if (result == DRFLAC_SUCCESS) {
@@ -4960,11 +4966,13 @@ drflac *drflac_open_with_metadata_private(drflac_read_proc onRead,
                     if (!drflac__read_next_frame_header(
                             &pFlac->bs, pFlac->bitsPerSample, &pFlac->currentFrame.header)) {
                         DRFLAC_FREE(pFlac);
+                        DRFLAC_FREE(init);
                         return NULL;
                     }
                     continue;
                 }
                 else {
+                    DRFLAC_FREE(init);
                     DRFLAC_FREE(pFlac);
                     return NULL;
                 }
@@ -4972,7 +4980,7 @@ drflac *drflac_open_with_metadata_private(drflac_read_proc onRead,
         } while (1);
     }
 
-    // M.P: Preallocated scratch buffer used during decoding in order to save on stack usage
+    DRFLAC_FREE(init);
     pFlac->scratchBuffer = (drflac_int32 *)DRFLAC_MALLOC(4096 * sizeof(drflac_int32));
 
     return pFlac;
@@ -5656,7 +5664,7 @@ drflac_bool32 drflac_seek_to_sample(drflac *pFlac, drflac_uint64 sampleIndex)
             }                                                                                                          \
                                                                                                                        \
             /* At this point everything should be decoded, but we just want to fill the unused part buffer with        \
-               silence - need to protect those ears from random noise! */                                                                              \
+               silence - need to protect those ears from random noise! */                                              \
             drflac_zero_memory(pSampleData + totalSampleCount,                                                         \
                                (size_t)(sampleDataBufferSize - totalSampleCount * sizeof(type)));                      \
         }                                                                                                              \

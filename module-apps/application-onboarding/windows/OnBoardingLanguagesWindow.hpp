@@ -3,14 +3,14 @@
 
 #pragma once
 
-#include <module-apps/application-settings-new/windows/LanguagesWindow.hpp>
+#include <application-settings/windows/system/LanguagesWindow.hpp>
 
 namespace app::onBoarding
 {
     class OnBoardingLanguagesWindow : public gui::LanguagesWindow
     {
       public:
-        explicit OnBoardingLanguagesWindow(app::Application *app);
+        explicit OnBoardingLanguagesWindow(app::Application *app, const std::string &);
 
       private:
         void onBeforeShow(gui::ShowMode mode, gui::SwitchData *data) override;

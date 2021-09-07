@@ -1,4 +1,4 @@
-﻿project(service-db)
+project(service-db)
 message("${PROJECT_NAME}  ${CMAKE_CURRENT_LIST_DIR}" )
 
 
@@ -6,33 +6,37 @@ set(SOURCES
     DBServiceAPI.cpp
     DBServiceAPI_GetByQuery.cpp
     DatabaseAgent.cpp
-    ServiceDB.cpp
-        messages/DBCalllogMessage.cpp
+    ServiceDBCommon.cpp
+    EntryPath.cpp
+    messages/DBCalllogMessage.cpp
     messages/DBContactMessage.cpp
-    messages/DBCountryCodeMessage.cpp
-    messages/DBNotesMessage.cpp
     messages/DBNotificationMessage.cpp
     messages/DBServiceMessage.cpp
-    messages/DBSMSMessage.cpp
-    messages/DBSMSTemplateMessage.cpp
-    messages/DBThreadMessage.cpp
     messages/QueryMessage.cpp
     agents/settings/SettingsAgent.cpp
     agents/settings/Settings.cpp
+    agents/settings/SettingsProxy.cpp
     agents/settings/SettingsCache.cpp
+    agents/settings/FactorySettings.cpp
     agents/file_indexer/FileIndexerAgent.cpp
+    agents/quotes/QuotesAgent.cpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
 
 target_include_directories(${PROJECT_NAME}
+    PRIVATE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/agents>
     PUBLIC
-        ${CMAKE_CURRENT_LIST_DIR}
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
         module-db
+        json::json
+    PUBLIC
+        utf8
 )
 
 if (${ENABLE_TESTS})

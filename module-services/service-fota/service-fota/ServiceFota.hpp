@@ -5,12 +5,13 @@
 
 #include "FotaServiceAPI.hpp"
 
-#include <Modem/TS0710/DLC_channel.h>
-#include <Modem/TS0710/TS0710.h>
+#include <modem/mux/DLCChannel.h>
+#include <modem/mux/CellularMux.h>
 #include <Result.hpp>
 #include <Service/Common.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
+#include <Timers/TimerHandle.hpp>
 #include <service-cellular/ServiceCellular.hpp>
 
 #include <service-db/DBServiceName.hpp>
@@ -20,13 +21,8 @@
 #include <sstream>
 #include <string>
 
-class DLC_channel;
+class DLCChannel;
 class FotaUrcHandler;
-
-namespace sys
-{
-    class Timer;
-} // namespace sys
 
 namespace service::name
 {
@@ -60,6 +56,8 @@ namespace FotaService
 
         sys::ReturnCodes DeinitHandler() override;
 
+        void ProcessCloseReason(sys::CloseReason closeReason) override;
+
         sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode /*mode*/) override final
         {
             return sys::ReturnCodes::Success;
@@ -73,7 +71,7 @@ namespace FotaService
         sys::MessagePointer handleCellularGetChannelResponseMessage(sys::Message *req);
         /** Do nothing until celular finishes it's startup
          */
-        sys::MessagePointer handleServiceCellularNotifications(sys::Message *req);
+        sys::MessagePointer handleSimReadyNotification(sys::Message *req);
         sys::MessagePointer handleConfigureAPN(sys::Message *req);
         sys::MessagePointer handleConnect(sys::Message *req);
         sys::MessagePointer handleHttpGet(sys::Message *req);
@@ -87,7 +85,7 @@ namespace FotaService
          */
         sys::MessagePointer handleRawProgress(sys::Message *req);
 
-        std::unique_ptr<sys::Timer> connectionTimer;
+        sys::TimerHandle connectionTimer;
         void getApnConfiguration();
         void getConfig();
         void getActiveCotext();
@@ -114,8 +112,8 @@ namespace FotaService
         void sendProgress(unsigned int progress, const std::string &receiver);
         void sendFotaFinshed(const std::string &receiver);
 
-        State state              = State ::Idle;
-        DLC_channel *dataChannel = nullptr;
+        State state             = State ::Idle;
+        DLCChannel *dataChannel = nullptr;
         APN::ContextMap contextMap;
         std::string url;
         std::string file;

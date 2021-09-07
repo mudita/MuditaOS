@@ -8,7 +8,8 @@
 #define CATCH_CONFIG_MAIN
 
 #include <catch2/catch.hpp>
-#include <module-utils/time/time_conversion.hpp>
+#include <time/time_conversion.hpp>
+#include <time/time_constants.hpp>
 
 #include "UrcQind.hpp"
 #include "UrcCusd.hpp"
@@ -131,6 +132,59 @@ TEST_CASE("+Qind: csq")
         REQUIRE(qind->isCsq());
         REQUIRE(*qind->getRSSI() == 50);
         REQUIRE_FALSE(qind->getBER());
+    }
+}
+
+TEST_CASE("+Qind: act")
+{
+    SECTION("ACT")
+    {
+        auto urc  = at::urc::UrcFactory::Create("+QIND:\"act\",\"HSDPA&HSUPA\"");
+        auto qind = getURC<at::urc::Qind>(urc);
+        REQUIRE(qind);
+        REQUIRE(qind->isAct());
+        REQUIRE(qind->getAct() == "HSDPA&HSUPA");
+        REQUIRE(qind->getAccessTechnology() == Store::Network::AccessTechnology::UtranWHsdpaAndWHsupa);
+    }
+
+    SECTION("too short")
+    {
+        auto urc  = at::urc::UrcFactory::Create("+QIND:\"act\"");
+        auto qind = getURC<at::urc::Qind>(urc);
+        REQUIRE(qind);
+        REQUIRE_FALSE(qind->isAct());
+        REQUIRE(qind->getAct() == "");
+        REQUIRE(qind->getAccessTechnology() == Store::Network::AccessTechnology::Unknown);
+    }
+
+    SECTION("too long")
+    {
+        auto urc  = at::urc::UrcFactory::Create("+QIND:\"act\",\"HSDPA&HSUPA\",\"HSDPA&HSUPA\"");
+        auto qind = getURC<at::urc::Qind>(urc);
+        REQUIRE(qind);
+        REQUIRE_FALSE(qind->isCsq());
+        REQUIRE(qind->getAct() == "");
+        REQUIRE(qind->getAccessTechnology() == Store::Network::AccessTechnology::Unknown);
+    }
+
+    SECTION("not act")
+    {
+        auto urc  = at::urc::UrcFactory::Create("+QIND:\"csq\",\"HSDPA&HSUPA\"");
+        auto qind = getURC<at::urc::Qind>(urc);
+        REQUIRE(qind);
+        REQUIRE_FALSE(qind->isAct());
+        REQUIRE(qind->getAct() == "");
+        REQUIRE(qind->getAccessTechnology() == Store::Network::AccessTechnology::Unknown);
+    }
+
+    SECTION("Uknown NAT")
+    {
+        auto urc  = at::urc::UrcFactory::Create("+QIND:\"act\",\"Super\"");
+        auto qind = getURC<at::urc::Qind>(urc);
+        REQUIRE(qind);
+        REQUIRE(qind->isAct());
+        REQUIRE(qind->getAct() == "Super");
+        REQUIRE(qind->getAccessTechnology() == Store::Network::AccessTechnology::Unknown);
     }
 }
 

@@ -1,4 +1,5 @@
 @startuml
+skinparam BackgroundColor F0F0F0
 participant "Application Manager" as appmgr
 participant "Root Application" as root
 

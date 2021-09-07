@@ -1,7 +1,7 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "log/log.hpp"
+#include <log.hpp>
 #include "utf8/UTF8.hpp"
 
 #include "../core/DrawCommand.hpp"
@@ -63,7 +63,9 @@ namespace gui
 
         switch (alignment.vertical) {
         case (Alignment::Vertical::Center):
-            textArea.y = (widgetArea.h - font->info.line_height) / 2 + font->info.base;
+            textArea.y = widgetArea.h > font->info.line_height
+                             ? (widgetArea.h - font->info.line_height) / 2 + font->info.base
+                             : font->info.base;
             break;
         case Alignment::Vertical::Top:
             textArea.y = font->info.base + padding.top;

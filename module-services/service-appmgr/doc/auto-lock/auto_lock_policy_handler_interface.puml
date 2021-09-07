@@ -1,0 +1,38 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+
+skinparam linetype ortho
+
+interface "LockPolicyHandlerInterface" as handlerInt
+{
+    {method}{abstract} # bool preventsAutoLockByWindow()
+    {method}{abstract} # bool preventsAutoLockByState()
+    {method} + bool preventsAutoLocking()
+}
+
+interface "LockPolicyAccessInterface" as access
+{
+    {field} - AutoLockPolicy policy
+    {method} - void set()
+    {method} + void get()
+}
+
+class "LockPolicyHandler" as handler
+{
+    {field} - preventsAutoLockByStateCallback
+    {method} + void setPreventsAutoLockByStateCallback(...)
+}
+
+class "app::ApplicationLauncher" as launcher
+
+class "app::Application" as app
+
+access <|-- handlerInt
+handlerInt <|-- handler
+
+launcher..>app : <<creates>>
+launcher-->access : <<friend>>
+launcher-->handlerInt : <<use>>
+app..>handler : <<creates>>
+
+@enduml

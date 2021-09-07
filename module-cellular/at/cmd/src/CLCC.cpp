@@ -46,26 +46,29 @@ namespace at
             return magic_enum::enum_cast<T>(ret);
         }
 
-        result::CLCC &CLCC::parse(Result &base_result)
+        template auto CLCC::toEnum<ModemCall::CallDir>(const std::string &text) -> std::optional<ModemCall::CallDir>;
+        template auto CLCC::toEnum<ModemCall::CallState>(const std::string &text)
+            -> std::optional<ModemCall::CallState>;
+        template auto CLCC::toEnum<ModemCall::CallMode>(const std::string &text) -> std::optional<ModemCall::CallMode>;
+
+        result::CLCC CLCC::parseCLCC(const Result &base_result)
         {
             using namespace std::literals;
-            auto &baseResult = Cmd::parse(base_result);
-            auto p           = new result::CLCC(baseResult);
-            result           = std::unique_ptr<result::CLCC>(p);
+            auto baseResult = Cmd::parseBase(base_result);
+            result::CLCC p{baseResult};
 
-            auto parseErrorHandler = [&p]() -> result::CLCC & {
+            auto parseErrorHandler = [&p]() {
                 LOG_ERROR("Parsing error - invalid parameter passed");
-                p->code = result::CLCC::Code::PARSING_ERROR;
-                return *p;
+                p.code = result::CLCC::Code::PARSING_ERROR;
             };
-            if (p && p->tokens.size() > 0) {
-                for (const auto &tokens : p->tokens) {
+            if (p && p.tokens.size() > 0) {
+                for (const auto &tokens : p.tokens) {
                     auto numberOfTokens = tokens.size();
                     if (numberOfTokens != 7 && numberOfTokens != 8) {
                         LOG_ERROR("Can't parse - number of tokens %u is not valid",
-                                  static_cast<unsigned int>(result->tokens.size()));
-                        p->code = result::CLCC::Code::PARSING_ERROR;
-                        return *p;
+                                  static_cast<unsigned int>(p.tokens.size()));
+                        p.code = result::CLCC::Code::PARSING_ERROR;
+                        return p;
                     }
 
                     try {
@@ -73,24 +76,26 @@ namespace at
                         const auto callState = toEnum<ModemCall::CallState>(tokens[2]);
                         const auto callMode  = toEnum<ModemCall::CallMode>(tokens[3]);
                         if (!callDir.has_value() || !callState.has_value() || !callMode.has_value()) {
-                            return parseErrorHandler();
+                            parseErrorHandler();
+                            return p;
                         }
-                        p->data.push_back(result::CLCC::Data{toUInt(tokens[0]),
-                                                             callDir.value(),
-                                                             callState.value(),
-                                                             callMode.value(),
-                                                             toBool(tokens[4]),
-                                                             utils::PhoneNumber(tokens[5]).getView(),
-                                                             tokens[6],
-                                                             (numberOfTokens == 8) ? tokens[7] : "",
-                                                             numberOfTokens});
+                        p.data.push_back(result::CLCC::Data{toUInt(tokens[0]),
+                                                            callDir.value(),
+                                                            callState.value(),
+                                                            callMode.value(),
+                                                            toBool(tokens[4]),
+                                                            utils::PhoneNumber(tokens[5]).getView(),
+                                                            tokens[6],
+                                                            (numberOfTokens == 8) ? tokens[7] : "",
+                                                            numberOfTokens});
                     }
                     catch (...) {
-                        return parseErrorHandler();
+                        parseErrorHandler();
+                        return p;
                     }
                 }
             }
-            return *p;
+            return p;
         }
     } // namespace cmd
 

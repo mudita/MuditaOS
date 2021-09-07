@@ -1,13 +1,13 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "DesktopInputWidget.hpp"
+#include "Mmi.hpp"
 #include "MmiPullWindow.hpp"
-#include <application-desktop/widgets/DesktopInputWidget.hpp>
-#include <application-desktop/data/Mmi.hpp>
-#include <service-appmgr/model/ApplicationManager.hpp>
-#include <service-appmgr/data/MmiActionsParams.hpp>
 
 #include <i18n/i18n.hpp>
+#include <service-appmgr/data/MmiActionsParams.hpp>
+
 #include <string>
 
 using namespace gui;
@@ -37,8 +37,8 @@ MmiPullWindow::MmiPullWindow(app::Application *app, const std::string &name) : g
 {
     AppWindow::buildInterface();
 
-    bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_desktop_replay"));
-    bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+    bottomBar->setText(BottomBar::Side::CENTER, utils::translate("app_desktop_replay"));
+    bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
     text = new Text(
         this, style::desktop::text::x, style::desktop::text::y, style::desktop::text::w, style::desktop::text::h);
     text->setTextType(TextType::MultiLine);
@@ -46,7 +46,7 @@ MmiPullWindow::MmiPullWindow(app::Application *app, const std::string &name) : g
     text->setEdges(RectangleEdge::None);
     text->setFont(style::window::font::medium);
     text->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
-    setTitle(utils::localize.get("app_desktop_info"));
+    setTitle(utils::translate("app_desktop_info"));
 
     InputBox = new DesktopInputWidget(application,
                                       this,

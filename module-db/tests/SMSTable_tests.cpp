@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -15,7 +15,7 @@ TEST_CASE("SMS Table tests")
 {
     Database::initialize();
 
-    const auto smsPath = (std::filesystem::path{"user"} / "sms.db");
+    const auto smsPath = (std::filesystem::path{"sys/user"} / "sms.db");
 
     if (std::filesystem::exists(smsPath)) {
         REQUIRE(std::filesystem::remove(smsPath));
@@ -24,22 +24,20 @@ TEST_CASE("SMS Table tests")
     SmsDB smsdb(smsPath.c_str());
     REQUIRE(smsdb.isInitialized());
 
-    SMSTableRow testRow1 = {{.ID = 0},
+    SMSTableRow testRow1 = {Record(0),
                             .threadID  = 0,
                             .contactID = 0,
                             .date      = 0,
-                            .dateSent  = 0,
                             .errorCode = 0,
                             .body      = "Test SMS message 1",
                             .type      = SMSType ::INBOX
 
     };
 
-    SMSTableRow testRow2 = {{.ID = 0},
+    SMSTableRow testRow2 = {Record(0),
                             .threadID  = 0,
                             .contactID = 0,
                             .date      = 0,
-                            .dateSent  = 0,
                             .errorCode = 0,
                             .body      = "Test Draft SMS",
                             .type      = SMSType ::DRAFT

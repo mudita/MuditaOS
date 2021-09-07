@@ -1,10 +1,10 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "GridLayout.hpp"
 #include "InputEvent.hpp"
 #include "Style.hpp"
-#include <log/log.hpp>
+#include <log.hpp>
 
 using namespace gui;
 
@@ -16,14 +16,14 @@ GridLayout::GridLayout(
     setPenFocusWidth(style::window::default_border_no_focus_w);
 
     this->borderCallback = [this](const InputEvent &inputEvent) -> bool {
-        if (inputEvent.state != InputEvent::State::keyReleasedShort) {
+        if (!inputEvent.isShortRelease()) {
             return false;
         }
 
         auto it       = this->getNavigationFocusedItem();
         auto distance = std::distance(children.begin(), it);
 
-        switch (inputEvent.keyCode) {
+        switch (inputEvent.getKeyCode()) {
         case KeyCode::KEY_UP: {
             auto col   = static_cast<uint32_t>(distance % colSize);
             Item *item = getFirstActiveItem(getLastColumnIndex(col), (-1) * static_cast<int>(colSize));

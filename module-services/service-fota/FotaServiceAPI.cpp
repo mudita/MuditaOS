@@ -6,7 +6,7 @@
 #include "service-fota/ServiceFota.hpp"
 
 #include <MessageType.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 
 #include <memory>
 #include <sstream>
@@ -47,7 +47,7 @@ namespace FotaService
 
     void API::FotaStart(sys::Service *serv, const std::string &url)
     {
-        LOG_DEBUG("Fota Star: %s", url.c_str());
+        LOG_DEBUG("Fota Start: %s", url.c_str());
         std::shared_ptr<FotaService::FOTAStart> msg = std::make_shared<FotaService::FOTAStart>();
 
         msg->url = url;

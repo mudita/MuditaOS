@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <iosyscalls.hpp>
+#include "iosyscalls-internal.hpp"
 
 #include <dirent.h>
 #include <errno.h>
@@ -214,7 +214,7 @@ extern "C"
                 entry->d_ino    = stdata.st_ino;
                 entry->d_type   = S_ISREG(stdata.st_mode) ? DT_REG : DT_DIR;
                 entry->d_reclen = fname.size();
-                std::strncpy(entry->d_name, fname.c_str(), sizeof(entry->d_name));
+                std::strncpy(entry->d_name, fname.c_str(), sizeof(entry->d_name) - 1);
                 *result = entry;
                 return 0;
             }

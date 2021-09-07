@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 #include <errno.h>
 #include <stdio.h>
@@ -9,6 +9,8 @@
 #include <newlib/vfs_io_syscalls.hpp>
 #include <sys/statvfs.h>
 #include <sys/mount.h>
+#include <time/time_syscalls.hpp>
+
 extern "C"
 {
     using namespace vfsn::internal;
@@ -127,5 +129,41 @@ extern "C"
     int umount(const char *special_file)
     {
         return syscalls::umount(_REENT->_errno, special_file);
+    }
+    int _gettimeofday_r(struct _reent *r, struct timeval *tp, void *tzp)
+    {
+        return utils::internal::syscalls::gettimeofday(r->_errno, tp, tzp);
+    }
+    void __tz_lock()
+    {
+        utils::internal::syscalls::tz_lock();
+    }
+    void __tz_unlock()
+    {
+        utils::internal::syscalls::tz_unlock();
+    }
+    void __env_lock(struct _reent *reent)
+    {
+        utils::internal::syscalls::env_lock(reent->_errno);
+    }
+    void __env_unlock(struct _reent *reent)
+    {
+        utils::internal::syscalls::env_unlock(reent->_errno);
+    }
+    ssize_t readlink(const char *path, char *buf, size_t buflen)
+    {
+        return syscalls::readlink(_REENT->_errno, path, buf, buflen);
+    }
+    int symlink(const char *name1, const char *name2)
+    {
+        return syscalls::symlink(_REENT->_errno, name1, name2);
+    }
+    long fpathconf(int fd, int name)
+    {
+        return syscalls::fpathconf(_REENT->_errno, fd, name);
+    }
+    long pathconf(const char *path, int name)
+    {
+        return syscalls::pathconf(_REENT->_errno, path, name);
     }
 }

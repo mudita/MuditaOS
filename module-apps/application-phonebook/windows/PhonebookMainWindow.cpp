@@ -8,6 +8,8 @@
 
 #include <queries/phonebook/QueryContactGet.hpp>
 
+#include <header/AddElementAction.hpp>
+#include <header/SearchAction.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <service-db/QueryMessage.hpp>
 #include <service-db/DBNotificationMessage.hpp>
@@ -23,38 +25,16 @@ namespace gui
 
     void PhonebookMainWindow::rebuild()
     {
-        contactsList->rebuildList(style::listview::RebuildType::InPlace);
+        contactsList->rebuildList(gui::listview::RebuildType::InPlace);
     }
 
     void PhonebookMainWindow::buildInterface()
     {
         AppWindow::buildInterface();
 
-        setTitle(utils::localize.get("app_phonebook_title_main"));
-        leftArrowImage  = new gui::Image(this,
-                                        phonebookStyle::mainWindow::leftArrowImage::x,
-                                        phonebookStyle::mainWindow::leftArrowImage::y,
-                                        phonebookStyle::mainWindow::leftArrowImage::w,
-                                        phonebookStyle::mainWindow::leftArrowImage::h,
-                                        "arrow_left");
-        rightArrowImage = new gui::Image(this,
-                                         phonebookStyle::mainWindow::rightArrowImage::x,
-                                         phonebookStyle::mainWindow::rightArrowImage::y,
-                                         phonebookStyle::mainWindow::rightArrowImage::w,
-                                         phonebookStyle::mainWindow::rightArrowImage::h,
-                                         "arrow_right");
-        newContactImage = new gui::Image(this,
-                                         phonebookStyle::mainWindow::newContactImage::x,
-                                         phonebookStyle::mainWindow::newContactImage::y,
-                                         phonebookStyle::mainWindow::newContactImage::w,
-                                         phonebookStyle::mainWindow::newContactImage::h,
-                                         "cross");
-        searchImage     = new gui::Image(this,
-                                     phonebookStyle::mainWindow::searchImage::x,
-                                     phonebookStyle::mainWindow::searchImage::y,
-                                     phonebookStyle::mainWindow::searchImage::w,
-                                     phonebookStyle::mainWindow::searchImage::h,
-                                     "search");
+        setTitle(utils::translate("app_phonebook_title_main"));
+        header->navigationIndicatorAdd(new gui::header::AddElementAction(), gui::header::BoxSelection::Left);
+        header->navigationIndicatorAdd(new gui::header::SearchAction(), gui::header::BoxSelection::Right);
 
         contactsList = new gui::PhonebookListView(this,
                                                   phonebookStyle::mainWindow::contactsList::x,
@@ -66,14 +46,14 @@ namespace gui
 
         phonebookModel->letterMap = phonebookModel->requestLetterMap();
         phonebookModel->setDisplayMode(static_cast<uint32_t>(ContactDisplayMode::SortedByLetter));
-        contactsList->rebuildList(style::listview::RebuildType::Full);
+        contactsList->rebuildList(gui::listview::RebuildType::Full);
 
         bottomBar->setActive(BottomBar::Side::LEFT, true);
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(style::strings::common::call));
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::open));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::call));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::open));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
         auto app  = application;
         inputMode = std::make_unique<InputMode>(
@@ -110,14 +90,14 @@ namespace gui
                     std::make_unique<app::manager::SwitchBackRequest>(application->GetName(), std::move(data)));
             };
 
-            leftArrowImage->setVisible(false);
-            newContactImage->setVisible(false);
+            header->navigationIndicatorRemove(gui::header::BoxSelection::Left);
+            header->navigationIndicatorRemove(gui::header::BoxSelection::Right);
         }
     }
 
     void PhonebookMainWindow::HandleFilteringByLetter(const InputEvent &inputEvent)
     {
-        auto code = translator.handle(inputEvent.key, inputMode ? inputMode->get() : "");
+        auto code = translator.handle(inputEvent.getRawKey(), inputMode ? inputMode->get() : "");
         if (code != Profile::none_key) {
             LOG_INFO("char=' %c'", static_cast<char>(code));
             char letter = static_cast<char>(code);
@@ -129,17 +109,15 @@ namespace gui
             if (dataOffset != phonebookContactsMap::NO_MATCH_FOUND) {
                 LOG_DEBUG("PhoneBook Data Offset : %" PRIu32, dataOffset);
                 phonebookModel->setDisplayMode(static_cast<uint32_t>(ContactDisplayMode::SortedByLetter));
-                contactsList->rebuildList(style::listview::RebuildType::OnOffset, dataOffset);
+                contactsList->rebuildList(gui::listview::RebuildType::OnOffset, dataOffset);
             }
         }
     }
 
     bool PhonebookMainWindow::onInput(const InputEvent &inputEvent)
     {
-
-        // process only if key is released
-        if (inputEvent.state == InputEvent::State::keyReleasedShort) {
-            switch (inputEvent.keyCode) {
+        if (inputEvent.isShortRelease()) {
+            switch (inputEvent.getKeyCode()) {
 
             case KeyCode::KEY_LEFT: {
                 if (enableNewContact) {

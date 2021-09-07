@@ -3,42 +3,36 @@
 
 #pragma once
 
-#include "SimCardResult.hpp"
-
 #include "CellularCall.hpp"
 #include "CellularMessage.hpp"
-#include "State.hpp"
 #include "USSD.hpp"
 #include "PacketData.hpp"
 #include "PacketDataCellularMessage.hpp"
+#include "src/CallManager.hpp"
+#include <service-cellular/connection-manager/ConnectionManager.hpp>
 
-#include <module-cellular/Modem/ATURCStream.hpp>
-#include <Modem/TS0710/DLC_channel.h>
-#include <Modem/TS0710/TS0710.h>
-#include <Modem/TS0710/TS0710_types.h>
+#include <modem/ATURCStream.hpp>
+#include <modem/mux/DLCChannel.h>
+#include <modem/mux/CellularMux.h>
+#include <modem/mux/CellularMuxTypes.h>
 #include <SMSRecord.hpp>
 #include <Service/Common.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
 #include <Service/CpuSentinel.hpp>
+#include <Timers/TimerHandle.hpp>
 #include <bsp/common.hpp>
 #include <utf8/UTF8.hpp>
+#include <service-db/Settings.hpp>
+#include <module-sys/PhoneModes/Observer.hpp>
+#include <service-db/DBServiceName.hpp>
+#include <service-db/DBNotificationMessage.hpp>
+
 #include <optional> // for optional
 #include <memory>   // for unique_ptr, allocator, make_unique, shared_ptr
 #include <string>   // for string
 #include <vector>   // for vector
-#include <service-db/Settings.hpp>
-#include <module-services/service-db/agents/settings/SystemSettings.hpp>
-#include <service-db/DBServiceName.hpp>
-#include <service-db/DBNotificationMessage.hpp>
-
 #include <cstdint>
-#include <memory>
-#include <optional>
-#include <string>
-#include <vector>
-
-class MuxDaemon;
 
 namespace db
 {
@@ -47,16 +41,27 @@ namespace db
         class SMSSearchByTypeResult;
     } // namespace query
 } // namespace db
-namespace sys
-{
-    class Timer;
-} // namespace sys
 
 namespace packet_data
 {
     class PacketData;
     class PDPContext;
 } // namespace packet_data
+
+namespace constants
+{
+    using namespace std::chrono_literals;
+    inline constexpr std::chrono::milliseconds sleepTimerInterval{500ms};
+    inline constexpr std::chrono::milliseconds enterSleepModeTime{5s};
+} // namespace constants
+
+class ConnectionManager;
+
+namespace cellular::internal
+{
+    class ServiceCellularPriv;
+}
+
 class ServiceCellular : public sys::Service
 {
 
@@ -65,11 +70,14 @@ class ServiceCellular : public sys::Service
 
     ~ServiceCellular() override;
 
-    sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp = nullptr) override;
-
+    sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp = nullptr) override
+    {
+        return std::make_shared<sys::ResponseMessage>();
+    }
     // Invoked during initialization
     sys::ReturnCodes InitHandler() override;
     sys::ReturnCodes DeinitHandler() override;
+    void ProcessCloseReason(sys::CloseReason closeReason) override;
     sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final;
 
     /** Register message handlers.
@@ -78,8 +86,6 @@ class ServiceCellular : public sys::Service
 
     static const char *serviceName;
 
-    bool sendSMS(SMSRecord record);
-    auto receiveSMS(std::string messageNumber) -> std::shared_ptr<CellularResponseMessage>;
     /**
      * @brief Its getting selected SIM card own number.
      * @param destination Reference to destination string.
@@ -96,93 +102,41 @@ class ServiceCellular : public sys::Service
     bool getIMSI(std::string &destination, bool fullNumber = false);
     std::vector<std::string> getNetworkInfo();
 
-    /** group of action/messages send "outside" eg. GUI
-     * requestPin is call anytime modem need pin, here should be called any action
-     * which allow user input (or mockup) pin. Then send appropriate action to notify the modem
-     * \param attempts Attempts counter for current action
-     * \param msg Literal name of action eg. SIM PIN
-     * \return
-     */
-    bool requestPin(unsigned int attempts, const std::string msg);
-
-    /** requestPuk is call anytime modem need puk, here should be called any action
-     * which allow user input (or mockup) puk and new pin. Then send appropriate action to notify the modem
-     * \param attempts Attempts counter for current action
-     * \param msg Literal name of action eg. SIM PUK
-     * \return
-     */
-    bool requestPuk(unsigned int attempts, const std::string msg);
-
-    /** Call in case of SIM card unlocked, MT ready. Place for sending message/action inform rest
-     * \return
-     */
-    bool sendSimUnlocked();
-
-    /** Call in case of SIM card locked (card fail, eg. to many bad PUK). Place for sending message/action inform rest
-     * \return
-     */
-    bool sendSimBlocked();
-
-    /** From this point should be send message/action call interaction in other layers eg. GUI
-     * \param cme_error
-     * \return
-     */
-    bool sendUnhandledCME(unsigned int cme_error);
-
-    /** Similar to sendBadPin
-     * \return
-     */
-    bool sendBadPin();
-
-    /** Message send, when modem return incorrect password for PIN message.
-     * Probably modem firmware depend. On current version last bad message (attempts=1) return PUK request
-     * and generate PUK URC, so finally action on puk request will be call. This implementation allow to
-     * rethrow URC (so achive similar behavior in all cases).
-     * \return
-     */
-    bool sendBadPuk();
-
-    /** Place to send action notifying eg. GUI
-     * \param res
-     * \return
-     */
-    bool sendChangePinResult(SimCardResult res);
-
-    /// sim functionality
-
-    /** Function ready for change pin action send to Service Cellular form eg. GUI
-     * \param oldPin
-     * \param newPin
-     * \return
-     */
-    bool changePin(const std::string oldPin, const std::string newPin);
-    bool unlockSimPin(std::string pin);
-    bool unlockSimPuk(std::string puk, std::string pin);
-    bool setPinLock(bool lock, const std::string pin);
-
   private:
     at::ATURCStream atURCStream;
-    std::unique_ptr<TS0710> cmux = std::make_unique<TS0710>(PortSpeed_e::PS460800, this);
+    std::unique_ptr<CellularMux> cmux = std::make_unique<CellularMux>(PortSpeed_e::PS460800, this);
     std::shared_ptr<sys::CpuSentinel> cpuSentinel;
 
     // used for polling for call state
-    std::unique_ptr<sys::Timer> callStateTimer;
-    std::unique_ptr<sys::Timer> stateTimer;
-    std::unique_ptr<sys::Timer> ussdTimer;
+    sys::TimerHandle callStateTimer;
+    sys::TimerHandle callEndedRecentlyTimer;
+    sys::TimerHandle stateTimer;
+    sys::TimerHandle ussdTimer;
+
+    // used to enter modem sleep mode
+    sys::TimerHandle sleepTimer;
+
+    // used to manage network connection in Messages only mode
+    sys::TimerHandle connectionTimer;
+
+    std::unique_ptr<settings::Settings> settings;
+
+    void SleepTimerHandler();
     void CallStateTimerHandler();
-    DLC_channel::Callback_t notificationCallback = nullptr;
+    DLCChannel::Callback_t notificationCallback = nullptr;
 
     std::unique_ptr<packet_data::PacketData> packetData;
-
-    cellular::State state;
+    std::unique_ptr<sys::phone_modes::Observer> phoneModeObserver;
+    std::unique_ptr<ConnectionManager> connectionManager;
     bsp::Board board = bsp::Board::none;
 
     /// URC GSM notification handler
-    std::optional<std::shared_ptr<CellularMessage>> identifyNotification(const std::string &data);
+    std::optional<std::shared_ptr<sys::Message>> identifyNotification(const std::string &data);
 
     std::vector<std::string> messageParts;
 
     CellularCall::CellularCall ongoingCall;
+    std::vector<CalllogRecord> tetheringCalllog;
 
     ussd::State ussdState = ussd::State::none;
 
@@ -194,9 +148,8 @@ class ServiceCellular : public sys::Service
     };
 
     bool resetCellularModule(ResetType type);
-    bool isAfterForceReboot = false;
-    bool nextPowerStateChangeAwaiting          = false;
-    cellular::State::PowerState nextPowerState = cellular::State::PowerState::Off;
+    bool isAfterForceReboot           = false;
+    bool nextPowerStateChangeAwaiting = false;
 
     /// one point of state change handling
     void change_state(cellular::StateChange *msg);
@@ -234,10 +187,6 @@ class ServiceCellular : public sys::Service
     /// check one time modem configuration for sim (hot swap)
     /// if hot swap is not enabled full modem restart is needed (right now at best reboot)
     bool handle_sim_sanity_check();
-    /// select sim from settings
-    bool handle_select_sim();
-    /// initialize sim (GSM commands for initialization)
-    bool handle_sim_init();
     /// modem failure handler
     bool handle_failure();
     /// fatal failure handler, if we have power switch - we could handle it here
@@ -247,17 +196,16 @@ class ServiceCellular : public sys::Service
     /// Process change of power state
     void handle_power_state_change();
 
-    std::unique_ptr<settings::Settings> settings = std::make_unique<settings::Settings>(this);
     bool handle_apn_conf_procedure();
 
-    bool handleAllMessagesFromMessageStorage();
+    bool handleTextMessagesInit();
     [[nodiscard]] SMSRecord createSMSRecord(const UTF8 &decodedMessage,
                                             const UTF8 &receivedNumber,
                                             const time_t messageDate,
                                             const SMSType &smsType = SMSType::INBOX) const noexcept;
     bool dbAddSMSRecord(const SMSRecord &record);
-    void onSMSReceived();
-    [[nodiscard]] bool handleListMessages(const at::AT &command, DLC_channel *channel);
+    void onSMSReceived(const utils::PhoneNumber::View &number);
+    [[nodiscard]] bool receiveAllMessages();
     /// @}
 
     bool transmitDtmfTone(uint32_t digit);
@@ -279,19 +227,18 @@ class ServiceCellular : public sys::Service
     uint32_t ussdTimeout = 0;
     void setUSSDTimer();
     bool handleUSSDRequest(CellularUSSDMessage::RequestType requestType, const std::string &request = "");
+    bool handleIMEIRequest();
+
     bool handleUSSDURC();
     void handleUSSDTimer();
-
-    bool handleSimState(at::SimState state, const std::string message);
-    bool handleSimResponse(sys::DataMessage *msgl);
 
     std::shared_ptr<cellular::RawCommandRespAsync> handleCellularStartOperatorsScan(
         CellularStartOperatorsScanMessage *msg);
 
     std::shared_ptr<CellularSetOperatorAutoSelectResponse> handleCellularSetOperatorAutoSelect(
         CellularSetOperatorAutoSelectMessage *msg);
-    std::shared_ptr<CellularGetCurrentOperatorResponse> handleCellularGetCurrentOperator(
-        CellularGetCurrentOperatorMessage *msg);
+    std::shared_ptr<CellularCurrentOperatorNameResponse> handleCellularRequestCurrentOperatorName(
+        CellularRequestCurrentOperatorNameMessage *msg);
     std::shared_ptr<CellularGetAPNResponse> handleCellularGetAPNMessage(CellularGetAPNMessage *msg);
     std::shared_ptr<CellularSetAPNResponse> handleCellularSetAPNMessage(CellularSetAPNMessage *msg);
     std::shared_ptr<CellularNewAPNResponse> handleCellularNewAPNMessage(CellularNewAPNMessage *msg);
@@ -308,10 +255,12 @@ class ServiceCellular : public sys::Service
         CellularGetActiveContextsMessage *msg);
     friend class CellularUrcHandler;
     friend class SimCard;
+    friend class cellular::internal::ServiceCellularPriv;
     friend class CellularRequestHandler;
     friend class NetworkSettings;
     friend class packet_data::PDPContext;
     friend class packet_data::PacketData;
+    friend class ConnectionManagerCellularCommands;
 
     void volteChanged(const std::string &value);
     void apnListChanged(const std::string &value);
@@ -319,13 +268,60 @@ class ServiceCellular : public sys::Service
 
     auto handleCellularAnswerIncomingCallMessage(CellularMessage *msg) -> std::shared_ptr<CellularResponseMessage>;
     auto handleCellularCallRequestMessage(CellularCallRequestMessage *msg) -> std::shared_ptr<CellularResponseMessage>;
-    auto handleCellularHangupCallMessage(CellularHangupCallMessage *msg) -> std::shared_ptr<CellularResponseMessage>;
+    void handleCellularHangupCallMessage(CellularHangupCallMessage *msg);
+    void handleCellularDismissCallMessage(sys::Message *msg);
     auto handleDBQueryResponseMessage(db::QueryResponse *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularListCallsMessage(CellularMessage *msg) -> std::shared_ptr<sys::ResponseMessage>;
-    auto handleDBNotificatioMessage(db::NotificationMessage *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleDBNotificationMessage(db::NotificationMessage *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularRingingMessage(CellularRingingMessage *msg) -> std::shared_ptr<sys::ResponseMessage>;
-    auto handleCellularIncominCallMessage(CellularIncominCallMessage *msg) -> std::shared_ptr<sys::ResponseMessage>;
-    auto handleCellularCallerIdMessage(CellularCallerIdMessage *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularIncomingCallMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularCallerIdMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularGetIMSIMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularGetOwnNumberMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularGetNetworkInfoMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularSelectAntennaMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularSetScanModeMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularGetScanModeMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularGetFirmwareVersionMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleEVMStatusMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularGetCsqMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularGetCregMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularGetNwinfoMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularGetAntennaMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularDtmfRequestMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularUSSDMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleSimStateMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleStateRequestMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+
+    auto handleCallActiveNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCallAbortedNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handlePowerUpProcedureCompleteNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handlePowerDownDeregisteringNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handlePowerDownDeregisteredNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleNewIncomingSMSNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleRawCommandNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleSmsDoneNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleSignalStrengthUpdateNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleNetworkStatusUpdateNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleUrcIncomingNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularSetFlightModeMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularSetRadioOnOffMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularRingNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularCallerIdNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularSetConnectionFrequencyMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+
+    auto receiveSMS(std::string messageNumber) -> bool;
+
+    auto hangUpCall() -> bool;
+    auto hangUpCallBusy() -> bool;
+
+    auto tetheringTurnOffURC() -> bool;
+    auto tetheringTurnOnURC() -> bool;
+    auto logTetheringCalls() -> void;
+
+  private:
+    std::unique_ptr<cellular::internal::ServiceCellularPriv> priv;
+    cellular::internal::SimpleCallManager callManager;
 };
 
 namespace sys

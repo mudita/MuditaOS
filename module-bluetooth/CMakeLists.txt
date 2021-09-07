@@ -1,8 +1,14 @@
-﻿project(module-bluetooth VERSION 1.0 DESCRIPTION "Bluetooth module library")
+﻿# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+# For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
+project(module-bluetooth VERSION 1.0 DESCRIPTION "Bluetooth module library")
 
 set(CMAKE_CXX_STANDARD 17)
 
+module_is_test_entity()
+
 set(SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/audio/BluetoothAudioDevice.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/BluetoothWorker.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/WorkerController.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/CommandHandler.cpp
@@ -14,9 +20,12 @@ set(SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/A2DP/AVRCP.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/A2DP/AVDTP.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/HSP/HSP.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/HSP/SCO.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/SCO/SCO.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/SCO/ScoUtils.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/HFP/HFP.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/Profile.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/ProfileManager.cpp
-
+    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/PhoneInterface.cpp
         )
 
 message("Build with BlueKitchen")
@@ -30,13 +39,9 @@ add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_DIR_SOURCES})
 # # Board specific compilation definitions,options,include directories and features
 target_compile_definitions(${PROJECT_NAME} PUBLIC   ${PROJECT_CONFIG_DEFINITIONS}
                                                     ${PROJECT_TARGET}
-                                                    ${TARGET_COMPILE_DEFINITIONS}
                                                     ${BOARD_DIR_DEFINITIONS}
                                                     )
-target_compile_features(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_FEATURES})
 target_compile_options(${PROJECT_NAME}
-    PUBLIC
-    ${TARGET_COMPILE_OPTIONS}
     PRIVATE
     -Wno-sign-compare
     -Wno-missing-field-initializers
@@ -46,31 +51,30 @@ target_compile_options(${PROJECT_NAME}
     # C only flags
     "$<$<COMPILE_LANGUAGE:C>:-Wno-old-style-declaration>"
 )
-target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
 
 target_include_directories(
     ${PROJECT_NAME}
     PUBLIC
-    ${BOARD_DIR_INCLUDES}
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${TARGET_LIBRARIES_INCLUDES}
     ${BT_STACK_ROOT}/src
     ${BT_STACK_ROOT}/src/classic
-
-
 )
 
 target_link_libraries(${PROJECT_NAME}
-    service-evtmgr
+    application-settings
+    ${BOARD_DIR_LIBRARIES}
+    module-audio
     module-bsp
-    service-bluetooth
+    module-sys
     module-utils
     module-vfs
-    module-sys
-    module-audio
     service-audio
-    ${BOARD_DIR_LIBRARIES}
-    )
+    service-bluetooth
+    service-evtmgr
+    sml::sml
+    json::json
+)
 
 if (${ENABLE_TESTS})
     add_subdirectory(tests)

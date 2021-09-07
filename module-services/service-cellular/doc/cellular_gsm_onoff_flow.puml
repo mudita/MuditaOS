@@ -1,4 +1,5 @@
 @startuml
+skinparam BackgroundColor F0F0F0
 
 participant "Battery level check" as batt
 participant "System Manager" as sysmgr
@@ -11,10 +12,6 @@ participant "ApplicaionDesktop" as appdsktp
     activate cell
     cell -> sysmgr : CellularCheckIfStartAllowedMessage
     activate sysmgr
-    sysmgr -> batt : BatteryLevelCriticalCheckMessage
-    activate batt
-    batt -> sysmgr : BatteryLevelCriticalMessage
-    deactivate batt
     sysmgr -> cell : CellularPowerStateChange(Off)
     cell -> cell : handle_power_state_change
     sysmgr -> appmgr : CriticalBatteryLevelNotification(true)
@@ -27,10 +24,6 @@ alt
     activate cell
     cell -> sysmgr : CellularCheckIfStartAllowedMessage
     activate sysmgr
-    sysmgr -> batt : BatteryLevelNormalCheckMessage
-    activate batt
-    batt -> sysmgr : BatteryLevelCriticalMessage
-    deactivate batt
     sysmgr -> cell : CellularPowerStateChange(On)
     cell -> cell : handle_power_state_change
     sysmgr -> appmgr : CriticalBatteryLevelNotification(false)
@@ -39,7 +32,7 @@ alt
 end
 
 == Normal flow ==
-    batt -> sysmgr : BatteryLevelCriticalMessage
+    batt -> sysmgr : BatteryStateChangeMessage
     activate sysmgr
     sysmgr -> cell : CellularPowerStateChange(Off)
     activate cell
@@ -50,7 +43,7 @@ end
     appmgr -> appdsktp : actions::DisplayLowBatteryNotification
     deactivate appmgr
 alt
-    batt -> sysmgr : BatteryLevelNormalMessage
+    batt -> sysmgr : BatteryStateChangeMessage
     activate sysmgr
     sysmgr -> cell : CellularPowerStateChange(On)
     activate cell

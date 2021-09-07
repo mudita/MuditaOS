@@ -1,8 +1,9 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "service-desktop/DeveloperModeMessage.hpp"
-#include <service-appmgr/messages/DOMRequest.hpp>
+#include "DOMRequest.hpp"
+
+#include <service-desktop/DeveloperModeMessage.hpp>
 
 namespace app::manager
 {

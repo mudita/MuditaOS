@@ -10,6 +10,9 @@
 #include "Audio/StreamQueuedEventsListener.hpp"
 #include "Audio/decoder/Decoder.hpp"
 
+#include <chrono>
+using namespace std::chrono_literals;
+
 namespace audio::playbackDefaults
 {
     constexpr audio::Volume defaultLoudspeakerVolume = 10;
@@ -37,16 +40,13 @@ namespace audio
         audio::RetCode SetInputGain(float gain) final;
 
         Position GetPosition() final;
+        audio::RetCode SwitchToPriorityProfile(audio::PlaybackType playbackType) final;
 
       private:
-        static constexpr auto minimumBlockSize = 256U;
-        static constexpr auto maximumBlockSize = 2048U;
-        static constexpr Endpoint::Capabilities playbackCapabilities{.minBlockSize = minimumBlockSize,
-                                                                     .maxBlockSize = maximumBlockSize};
+        static constexpr auto playbackTimeConstraint = 10ms;
 
         std::unique_ptr<Stream> dataStreamOut;
         std::unique_ptr<Decoder> dec;
-        std::unique_ptr<Tags> tags;
         std::unique_ptr<StreamConnection> outputConnection;
 
         DecoderWorker::EndOfFileCallback endOfFileCallback;

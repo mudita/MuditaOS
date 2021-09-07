@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "screen.hpp"
 #include <limits>
 #include <gui/core/Color.hpp>
 #include <gui/Common.hpp>
@@ -18,18 +19,30 @@ namespace gui
 /// one place to gather all common magical numbers from design
 namespace style
 {
-    inline constexpr auto window_height = 600U;
-    inline constexpr auto window_width  = 480U;
+    inline constexpr auto window_height = getScreenResolutionY();
+    inline constexpr auto window_width  = getScreenResolutionX();
+
+    namespace status_bar
+    {
+        inline constexpr auto default_horizontal_pos  = 20U;
+        inline constexpr auto default_vertical_pos    = 0U;
+        inline constexpr unsigned status_bar_margin_w = default_horizontal_pos * 2;
+        inline constexpr auto height                  = 46U;
+        inline constexpr auto width                   = window_width - status_bar_margin_w;
+    } // namespace status_bar
+
     namespace header
     {
-        inline constexpr auto height = 105U;
+        inline constexpr auto default_horizontal_pos = 0U;
+        inline constexpr auto default_vertical_pos   = status_bar::height;
+        inline constexpr auto height                 = 59U;
+        inline constexpr auto width                  = window_width;
+
         namespace font
         {
-            inline constexpr auto time  = "gt_pressura_regular_24";
-            inline constexpr auto modes = "gt_pressura_regular_20";
-            inline constexpr auto title = "gt_pressura_bold_32";
-        }; // namespace font
-    };     // namespace header
+            inline constexpr auto title = "gt_pressura_bold_30";
+        } // namespace font
+    }     // namespace header
 
     namespace footer
     {
@@ -43,18 +56,21 @@ namespace style
 
     namespace window
     {
+        inline constexpr auto default_vertical_pos = header::default_vertical_pos + header::height;
         inline constexpr auto default_left_margin  = 20U;
         inline constexpr auto default_right_margin = 20U;
         inline constexpr auto default_body_width =
             style::window_width - style::window::default_right_margin - style::window::default_left_margin;
         inline constexpr auto default_body_height =
-            style::window_height - style::header::height - style::footer::height;
+            style::window_height - style::window::default_vertical_pos - style::footer::height;
         inline constexpr auto default_border_focus_w       = 2U;
         inline constexpr auto default_border_rect_no_focus = 1U;
         inline constexpr auto default_border_no_focus_w    = 0U;
         inline constexpr auto default_rect_yaps            = 10U;
         namespace font
         {
+            inline constexpr auto thehugest        = "gt_pressura_regular_190";
+            inline constexpr auto huge             = "gt_pressura_regular_90";
             inline constexpr auto supersizemelight = "gt_pressura_light_90";
             inline constexpr auto largelight       = "gt_pressura_light_46";
             inline constexpr auto verybigbold      = "gt_pressura_bold_32";
@@ -84,7 +100,24 @@ namespace style
         /// minimal label decoration for Option
         void decorateOption(gui::Label *el);
 
-    }; // namespace window
+        namespace bottomBar
+        {
+            inline constexpr auto leftMargin  = 30U;
+            inline constexpr auto rightMargin = 30U;
+
+            inline constexpr auto h = 54U;
+            inline constexpr auto w = window_width;
+        } // namespace bottomBar
+
+        namespace progressBar
+        {
+            inline constexpr auto x     = style::window::default_left_margin;
+            inline constexpr auto y     = 400U;
+            inline constexpr auto w     = style::window::default_body_width;
+            inline constexpr auto h     = 50U;
+            inline constexpr auto range = 10U;
+        }; // namespace progressBar
+    };     // namespace window
 
     namespace settings
     {
@@ -131,12 +164,15 @@ namespace style
             inline constexpr auto call           = "common_call";
             inline constexpr auto send           = "common_send";
             inline constexpr auto save           = "common_save";
+            inline constexpr auto import         = "common_import";
             inline constexpr auto confirm        = "common_confirm";
             inline constexpr auto select         = "common_select";
             inline constexpr auto use            = "common_use";
             inline constexpr auto ok             = "common_ok";
             inline constexpr auto back           = "common_back";
+            inline constexpr auto skip           = "common_skip";
             inline constexpr auto set            = "common_set";
+            inline constexpr auto show           = "common_show";
             inline constexpr auto yes            = "common_yes";
             inline constexpr auto no             = "common_no";
             inline constexpr auto check          = "common_check";
@@ -153,7 +189,10 @@ namespace style
             inline constexpr auto pause          = "common_pause";
             inline constexpr auto accept         = "common_accept";
             inline constexpr auto retry          = "common_retry";
+            inline constexpr auto replace        = "common_replace";
             inline constexpr auto abort          = "common_abort";
+            inline constexpr auto adjust         = "common_adjust";
+            inline constexpr auto play_pause     = "common_play_pause";
             // days
             inline constexpr auto Monday    = "common_monday";
             inline constexpr auto Tuesday   = "common_tuesday";
@@ -182,53 +221,6 @@ namespace style
 
     namespace listview
     {
-        inline constexpr auto nPos = std::numeric_limits<unsigned int>::max();
-
-        /// Possible List boundaries handling types
-        enum class Boundaries
-        {
-            Fixed,     ///< Fixed - list will stop scrolling on first or last elements on appropriate top or bottom
-                       ///< directions.
-            Continuous ///< Continuous - list will continue to beginning or end on first or last elements on
-                       ///< appropriate top or bottom directions.
-        };
-
-        /// Possible List scrolling directions
-        enum class Direction
-        {
-            Top,
-            Bottom
-        };
-
-        /// Possible List rebuild types
-        enum class RebuildType
-        {
-            Full,          ///< Full rebuild - resets lists to all initial conditions and request data from beginning.
-            InPlace,       ///< InPlace rebuild - stores currently focused part of list and rebuild from that part.
-            OnPageElement, ///< OnPageElement rebuild - same page but focus changed on provided element index.
-            OnOffset       ///< OnOffset rebuild - resets lists to all initial conditions and request data from provided
-                           ///< offset.
-        };
-
-        /// Possible List ScrollBar types
-        enum class ScrollBarType
-        {
-            None,         ///< None - list without scroll bar (but with scrolling).
-            Proportional, ///< Proportional - scroll bar size calculated based on elements count in model and currently
-                          ///< displayed number of elements. Use with large unequal heights lists elements.
-            Fixed,        ///< Fixed - scroll bar size calculated based on fixed equal elements sizes in list.
-                          ///< Use when all elements have equal heights.
-            PreRendered   ///< PreRendered - scroll bar size calculated based on pre rendered pages on whole list. Use
-                          ///< when elements are not equal heights but there are few of them as its renders whole
-                          ///< context and can be time consuming.
-        };
-
-        enum class Orientation
-        {
-            TopBottom,
-            BottomTop
-        };
-
         namespace scroll
         {
             inline constexpr auto x           = 0U;
@@ -249,12 +241,36 @@ namespace style
 
     } // namespace listview
 
+    namespace sidelistview
+    {
+        inline auto arrow_left_image  = "arrow_left_24px_W_G";
+        inline auto arrow_right_image = "arrow_right_24px_W_G";
+
+        namespace list_item
+        {
+            inline constexpr auto w = window_width;
+            inline constexpr auto h = window_height;
+        } // namespace list_item
+
+        namespace progress_bar
+        {
+            inline constexpr auto margin_left   = 0U;
+            inline constexpr auto margin_top    = 10U;
+            inline constexpr auto margin_right  = 0U;
+            inline constexpr auto margin_bottom = 10U;
+            inline constexpr auto h             = 50U;
+        } // namespace progress_bar
+
+    }     // namespace sidelistview
+
     namespace margins
     {
-        inline constexpr auto small    = 6U;
-        inline constexpr auto big      = 8U;
-        inline constexpr auto very_big = 12U;
-        inline constexpr auto huge     = 24U;
+        inline constexpr auto very_small = 3U;
+        inline constexpr auto small      = 6U;
+        inline constexpr auto big        = 8U;
+        inline constexpr auto very_big   = 12U;
+        inline constexpr auto large      = 20U;
+        inline constexpr auto huge       = 24U;
     } // namespace margins
 
     namespace padding
@@ -269,5 +285,24 @@ namespace style
         inline constexpr auto leftMargin  = 10U;
         inline constexpr auto rightMargin = 10U;
     } // namespace widgets
+
+    namespace notifications
+    {
+        inline constexpr auto spanSize     = 8;
+        inline constexpr auto digitSize    = 16;
+        inline constexpr auto iconWidth    = 35;
+        inline constexpr auto textMinWidth = 250;
+        inline constexpr auto textMaxWidth = 350;
+        inline constexpr auto itemHeight   = 55;
+
+        namespace model
+        {
+            inline constexpr auto maxNotificationsPerPage = 4;
+            inline constexpr auto x                       = 20;
+            inline constexpr auto y                       = 284;
+            inline constexpr auto w                       = style::window::default_body_width;
+            inline constexpr auto h                       = itemHeight * maxNotificationsPerPage;
+        } // namespace model
+    }     // namespace notifications
 
 }; // namespace style

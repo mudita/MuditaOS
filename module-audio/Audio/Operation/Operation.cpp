@@ -7,7 +7,6 @@
 
 #include "Audio/AudioDevice.hpp"
 #include "Audio/AudioDeviceFactory.hpp"
-#include "Audio/AudioPlatform.hpp"
 
 #include "IdleOperation.hpp"
 #include "PlaybackOperation.hpp"
@@ -56,14 +55,27 @@ namespace audio
         }
     }
 
-    audio::RetCode Operation::SwitchToPriorityProfile()
+    std::optional<Profile::Type> Operation::GetPriorityProfile() const
     {
         for (auto &p : supportedProfiles) {
             if (p.isAvailable == true) {
-                return SwitchProfile(p.profile->GetType());
+                return p.profile->GetType();
             }
         }
+        return {};
+    }
+
+    audio::RetCode Operation::SwitchToPriorityProfile()
+    {
+        if (const auto priorityProfile = GetPriorityProfile(); priorityProfile.has_value()) {
+            return SwitchProfile(priorityProfile.value());
+        }
         return audio::RetCode::ProfileNotSet;
+    }
+
+    audio::RetCode Operation::SwitchToPriorityProfile([[maybe_unused]] audio::PlaybackType playbackType)
+    {
+        return SwitchToPriorityProfile();
     }
 
     void Operation::SetProfileAvailability(std::vector<Profile::Type> profiles, bool available)
@@ -94,10 +106,13 @@ namespace audio
         supportedProfiles.emplace_back(Profile::Create(profile, volume, gain), isAvailable);
     }
 
-    std::shared_ptr<AudioDevice> Operation::CreateDevice(AudioDevice::Type type)
+    std::shared_ptr<AudioDevice> Operation::CreateDevice(const Profile &profile)
     {
-        auto factory = AudioPlatform::GetDeviceFactory();
+        return factory->CreateDevice(profile);
+    }
 
-        return factory->CreateDevice(type);
+    std::shared_ptr<AudioDevice> Operation::createCellularAudioDevice()
+    {
+        return factory->createCellularAudioDevice();
     }
 } // namespace audio

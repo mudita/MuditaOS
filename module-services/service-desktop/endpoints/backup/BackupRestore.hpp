@@ -5,11 +5,17 @@
 
 #include <Service/Service.hpp>
 #include <filesystem>
+#include <json11.hpp>
 
 namespace sys
 {
     class Service;
 } // namespace sys
+
+namespace bkp
+{
+    inline constexpr auto backupInfo = "backup.json";
+};
 
 class BackupRestore
 {
@@ -17,13 +23,14 @@ class BackupRestore
     BackupRestore(){};
     ~BackupRestore(){};
     static bool BackupUserFiles(sys::Service *ownerService, std::filesystem::path &path);
-    static void RestoreUserFiles(sys::Service *ownerService);
+    static bool RestoreUserFiles(sys::Service *ownerService, const std::filesystem::path &path);
+    static json11::Json GetBackupFiles();
 
   private:
     static bool RemoveBackupDir(std::filesystem::path &path);
     static bool CreateBackupDir(std::filesystem::path &path);
     static bool PackUserFiles(std::filesystem::path &path);
-    static bool UnpackBackupFile();
-    static bool ReplaceUserFiles();
+    static bool UnpackBackupFile(const std::filesystem::path &path);
+    static bool ReplaceUserFiles(const std::filesystem::path &path);
     static bool WriteBackupInfo(sys::Service *ownerService, const std::filesystem::path &path);
 };

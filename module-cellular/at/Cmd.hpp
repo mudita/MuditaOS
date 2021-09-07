@@ -3,19 +3,15 @@
 
 #pragma once
 
+#include "Result.hpp"
+
+#include <at/Constants.hpp>
+
 #include <string>
-#include <Result.hpp>
 #include <chrono>
 
 namespace at
 {
-    using namespace std::chrono_literals;
-
-    struct Cmd;
-
-    /// if you've checked it's ok - or it was at least 300 in code somewhere, take this
-    const auto default_timeout = 300ms;
-
     namespace cmd
     {
         enum class Modifier
@@ -33,10 +29,8 @@ namespace at
       private:
         std::string cmd;                                     /// command head to run (AT, CLCC etc...)
         std::chrono::milliseconds timeout = default_timeout; /// timeout for this command
-        void split(const std::string &str, Result &result) const;
 
       protected:
-        std::unique_ptr<Result> result;          /// lifetime result storage to be able to return reference to it
         cmd::Modifier mod = cmd::Modifier::None; /// modifier responsible to define action we want to perform
         std::string body;                        /// part after command name
       public:
@@ -86,7 +80,8 @@ namespace at
             return tmp;
         }
 
-        /// would have used optional but it doesn't work with references
-        [[nodiscard]] virtual auto parse(Result &base_result) -> Result &;
+      protected:
+        [[nodiscard]] static auto parseBase(const Result &base_result) -> Result;
+        static void split(const std::string &str, Result &result);
     };
 }; // namespace at

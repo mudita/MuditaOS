@@ -2,15 +2,18 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CommandHandler.hpp"
+#include <service-bluetooth/ServiceBluetooth.hpp>
 
 #include <utility>
-#include <service-bluetooth/ServiceBluetooth.hpp>
 #include <service-bluetooth/SettingsHolder.hpp>
-
 #include <Service/Service.hpp>
 
 #include "Device.hpp"
 #include "BtCommand.hpp"
+
+#include <service-desktop/service-desktop/Constants.hpp>
+#include <service-bluetooth/messages/ResponseVisibleDevices.hpp>
+#include "GAP/GAP.hpp"
 
 extern "C"
 {
@@ -42,12 +45,16 @@ namespace bluetooth
             return Error::Success;
         case bluetooth::Command::StartScan:
             return scan();
+        case bluetooth::Command::getDevicesAvailable:
+            return availableDevices();
         case bluetooth::Command::StopScan:
             return stopScan();
         case bluetooth::Command::StartPan:
             return startPan();
         case bluetooth::Command::Pair:
             return pair(command.getAddress());
+        case bluetooth::Command::Unpair:
+            return unpair(command.getAddress());
         case bluetooth::Command::VisibilityOn:
             return setVisibility(true);
         case bluetooth::Command::VisibilityOff:
@@ -62,6 +69,12 @@ namespace bluetooth
             return switchAudioProfile();
         case bluetooth::Command::None:
             return Error::Success;
+        case Command::StartRinging:
+            return profileManager->startRinging();
+        case Command::StopRinging:
+            return profileManager->stopRinging();
+        case Command::StartRouting:
+            return profileManager->initializeCall();
         case Command::StartStream:
             profileManager->start();
             return Error::Success;
@@ -81,15 +94,14 @@ namespace bluetooth
         }
 
         LOG_INFO("Scan started!");
-        static_cast<ServiceBluetooth *>(service)->scanStartedCallback();
         // open new scan window
         return Error::Success;
     }
 
     Error::Code CommandHandler::stopScan()
     {
+        LOG_INFO("Stopping scan!");
         driver->stopScan();
-        static_cast<ServiceBluetooth *>(service)->scanStoppedCallback();
         return Error::Success;
     }
 
@@ -113,22 +125,23 @@ namespace bluetooth
     Error::Code CommandHandler::establishAudioConnection(uint8_t *addr)
     {
         profileManager->init();
-        LOG_INFO("Connecting audio with %s", bd_addr_to_str(addr));
+        LOG_INFO("Connecting audio");
         profileManager->connect(addr);
-
         return Error::Success;
     }
 
     Error::Code CommandHandler::disconnectAudioConnection()
     {
+        LOG_INFO("Disconnecting audio");
         profileManager->disconnect();
         return Error::Success;
     }
     Error::Code CommandHandler::pair(bd_addr_t addr)
     {
-        LOG_INFO("Pairing with %s", bd_addr_to_str(addr));
-
-        return driver->pair(addr) ? Error::Success : Error::LibraryError;
+        LOG_INFO("Pairing...");
+        const auto error_code = driver->pair(addr) ? Error::Success : Error::LibraryError;
+        LOG_INFO("Pairing result: %s", magic_enum::enum_name(error_code).data());
+        return error_code;
     }
     Error::Code CommandHandler::switchAudioProfile()
     {
@@ -144,5 +157,22 @@ namespace bluetooth
         profileManager->switchProfile(profile);
         return Error::Success;
     }
+    Error::Code CommandHandler::unpair(uint8_t *addr)
+    {
+        LOG_INFO("Unpairing...");
+        if (profileManager->isAddressActuallyUsed(addr)) {
+            profileManager->disconnect();
+        }
+        const auto error_code = driver->unpair(addr) ? Error::Success : Error::LibraryError;
+        LOG_INFO("Unpairing result: %s", magic_enum::enum_name(error_code).data());
+        return error_code;
+    }
 
+    Error::Code CommandHandler::availableDevices()
+    {
+        auto msg = std::make_shared<message::bluetooth::ResponseVisibleDevices>(bluetooth::GAP::getDevicesList());
+        static_cast<ServiceBluetooth *>(service)->bus.sendUnicast(std::move(msg), service::name::service_desktop);
+
+        return Error::Success;
+    }
 } // namespace bluetooth

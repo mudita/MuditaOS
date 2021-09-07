@@ -17,7 +17,7 @@
 #include <filesystem>
 #include <memory>
 #include <module-db/queries/messages/sms/QuerySMSGetCount.hpp>
-#include <module-utils/json/json11.hpp>
+#include <json11.hpp>
 
 namespace db
 {
@@ -39,8 +39,8 @@ TEST_CASE("Query interface")
 {
     Database::initialize();
 
-    auto contactsDB      = std::make_unique<ContactsDB>((std::filesystem::path{"user"} / "contacts.db").c_str());
-    auto smsDB           = std::make_unique<SmsDB>((std::filesystem::path{"user"} / "sms.db").c_str());
+    auto contactsDB      = std::make_unique<ContactsDB>((std::filesystem::path{"sys/user"} / "contacts.db").c_str());
+    auto smsDB           = std::make_unique<SmsDB>((std::filesystem::path{"sys/user"} / "sms.db").c_str());
     auto smsInterface    = std::make_unique<SMSRecordInterface>(smsDB.get(), contactsDB.get());
     auto threadInterface = std::make_unique<ThreadRecordInterface>(smsDB.get(), contactsDB.get());
 

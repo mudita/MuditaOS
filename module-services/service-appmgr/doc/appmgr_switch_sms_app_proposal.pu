@@ -1,4 +1,5 @@
 @startuml
+skinparam BackgroundColor F0F0F0
 participant "Application" as app
 box "Application Manager Service" #LightBlue
 participant "Controller" as appmgr_control

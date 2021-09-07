@@ -2,8 +2,10 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "gtest/gtest.h"
-#include <module-utils/log/log.hpp>
-#include <module-gui/gui/widgets/BoxLayout.hpp>
+
+#include "TestBoxLayout.hpp"
+
+#include <log.hpp>
 #include <module-gui/test/mock/TestListViewProvider.hpp>
 #include <gui/input/InputEvent.hpp>
 
@@ -31,25 +33,6 @@ class TestItem : public gui::Rect
     unsigned int ID = 0;
     TestItem(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h) : Rect(parent, x, y, w, h){};
     ~TestItem() = default;
-};
-
-class TestBoxLayout : public gui::BoxLayout
-{
-
-  public:
-    friend class BoxLayoutTesting;
-    FRIEND_TEST(BoxLayoutTesting, Constructor_Destructor_Test);
-    FRIEND_TEST(BoxLayoutTesting, Fill_Box_Test);
-    FRIEND_TEST(BoxLayoutTesting, Navigate_Test);
-    FRIEND_TEST(BoxLayoutTesting, Border_Callback_Test);
-    FRIEND_TEST(BoxLayoutTesting, Box_Alignment_Test);
-    FRIEND_TEST(BoxLayoutTesting, Box_Widget_Min_Max_Resize_Test);
-    FRIEND_TEST(BoxLayoutTesting, Box_Widgets_Alignment_Test);
-    FRIEND_TEST(BoxLayoutTesting, Box_Widgets_Alignment_Magrin_Test);
-    FRIEND_TEST(BoxLayoutTesting, Box_Margins_Test);
-
-    TestBoxLayout(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h) : BoxLayout(parent, x, y, w, h){};
-    ~TestBoxLayout() = default;
 };
 
 class BoxLayoutTesting : public ::testing::Test

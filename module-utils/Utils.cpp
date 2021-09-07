@@ -1,9 +1,12 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Utils.hpp"
+
+#include <crc32.h>
+
+#include <ctime>
 #include <filesystem>
-#include <crc32/crc32.h>
 
 namespace utils::filesystem
 {
@@ -16,17 +19,17 @@ namespace utils::filesystem
     {
         auto buf = std::make_unique<unsigned char[]>(crc_buf_len);
 
-        unsigned long crc32 = 0;
+        CRC32 digestCrc32;
         while (!std::feof(file)) {
             size_t dataLen = std::fread(buf.get(), 1, crc_buf_len, file);
             if (dataLen == 0) {
-                return crc32;
+                break;
             }
 
-            crc32 = Crc32_ComputeBuf(crc32, buf.get(), dataLen);
+            digestCrc32.add(buf.get(), dataLen);
         }
 
-        return crc32;
+        return digestCrc32.getHashValue();
     }
 
     std::string generateRandomId(std::size_t length) noexcept
@@ -35,7 +38,7 @@ namespace utils::filesystem
 
         std::random_device random_device;
         std::mt19937 generator(random_device());
-        generator.seed(utils::time::Timestamp().getTime());
+        generator.seed(std::time(nullptr));
         std::uniform_int_distribution<> distribution(0, CHARACTERS.size() - 1);
 
         std::string random_string;

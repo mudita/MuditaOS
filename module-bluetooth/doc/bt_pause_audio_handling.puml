@@ -1,0 +1,23 @@
+@startuml
+
+actor User
+participant "A2DP Sink" as sink
+participant "Source's AVRCP event handler" as source
+participant "Service Bluetooth" as bt
+participant "Service Audio" as audio
+participant "Application music player" as app 
+
+
+User -> sink : Pause button pressed
+sink -> source : AVRCP event pause 
+source -> bt : Event play message
+bt -> audio : Stream pause message
+==Handle pause message==
+hnote over audio
+    Pause stream
+endhnote
+== ==
+audio -> app : Audio paused
+app -> User : Show state paused
+
+@enduml

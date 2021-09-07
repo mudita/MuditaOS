@@ -25,6 +25,8 @@ extern "C"
 #else
 extern "C"
 {
+#include <btstack_uart.h>
+
 #include <btstack_run_loop_posix.h>
 #include <btstack_tlv_posix.h>
 }
@@ -73,7 +75,7 @@ namespace bluetooth
         auto uartDriver = runLoopInitLinux(runLoop);
 #endif
 
-        const hci_transport_t *transport = hci_transport_h4_instance(uartDriver);
+        const hci_transport_t *transport = hci_transport_h4_instance_for_uart(uartDriver);
         hci_init(transport, (void *)&config);
 
         hci_set_link_key_db(bluetooth::KeyStorage::getKeyStorage());
@@ -95,7 +97,7 @@ namespace bluetooth
                 break;
             }
             gap_local_bd_addr(addr);
-            LOG_INFO("BTstack up and running at %s", bd_addr_to_str(addr));
+            LOG_INFO("BTstack up and running");
             bluetooth::KeyStorage::settings->setValue(bluetooth::Settings::State,
                                                       static_cast<int>(BluetoothStatus::State::On));
             break;
@@ -106,7 +108,6 @@ namespace bluetooth
                 }
                 // terminate, name 248 chars
                 packet[6 + 248] = 0;
-                LOG_INFO("Local name: %s", &packet[6]);
             }
             if (HCI_EVENT_IS_COMMAND_COMPLETE(packet, hci_read_local_version_information)) {
                 local_version_information_handler(packet);
@@ -205,5 +206,9 @@ namespace bluetooth
     auto Driver::pair(uint8_t *addr, std::uint8_t protectionLevel) -> bool
     {
         return gap->pair(addr, protectionLevel);
+    }
+    auto Driver::unpair(uint8_t *addr) -> bool
+    {
+        return gap->unpair(addr);
     }
 } // namespace bluetooth

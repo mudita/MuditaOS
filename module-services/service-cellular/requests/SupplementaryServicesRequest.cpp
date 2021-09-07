@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <string>
@@ -6,6 +6,7 @@
 
 #include <at/Commands.hpp>
 #include <Utils.hpp>
+#include <at/ATFactory.hpp>
 
 #include "service-cellular/requests/SupplementaryServicesRequest.hpp"
 #include "service-cellular/requests/CallForwardingRequest.hpp"
@@ -14,6 +15,7 @@
 #include "service-cellular/requests/ColpRequest.hpp"
 #include "service-cellular/requests/CallWaitingRequest.hpp"
 #include "service-cellular/requests/CallBarringRequest.hpp"
+#include <map>
 
 namespace
 {

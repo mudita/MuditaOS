@@ -1,9 +1,9 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include "module-db/Interface/NotificationsRecord.hpp"
+#include <Interface/NotificationsRecord.hpp>
 #include <Common/Query.hpp>
 #include <string>
 
@@ -22,7 +22,7 @@ namespace db::query::notifications
         std::unique_ptr<std::vector<NotificationsRecord>> records;
 
       public:
-        GetAllResult(std::unique_ptr<std::vector<NotificationsRecord>> records);
+        explicit GetAllResult(std::unique_ptr<std::vector<NotificationsRecord>> records);
         [[nodiscard]] auto getResult() -> std::unique_ptr<std::vector<NotificationsRecord>>;
 
         [[nodiscard]] auto debugInfo() const -> std::string override;

@@ -13,14 +13,20 @@ namespace message::bluetooth
     class ResponseBondedDevices : public BluetoothMessage
     {
       public:
-        explicit ResponseBondedDevices(std::vector<Devicei> devices) : devices(std::move(devices))
+        explicit ResponseBondedDevices(std::vector<Devicei> devices, std::string addressOfConnectedDevice)
+            : devices(std::move(devices)), addressOfConnectedDevice(std::move(addressOfConnectedDevice))
         {}
-        [[nodiscard]] auto getDevices() const -> std::vector<Devicei>
+        [[nodiscard]] auto getDevices() const noexcept -> std::vector<Devicei>
         {
             return devices;
+        }
+        [[nodiscard]] auto getAddressOfConnectedDevice() const noexcept -> const std::string &
+        {
+            return addressOfConnectedDevice;
         }
 
       private:
         std::vector<Devicei> devices;
+        std::string addressOfConnectedDevice;
     };
 } // namespace message::bluetooth

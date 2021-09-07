@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
-# Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 declare -A OPTS=( ['continous']=' -singlerun ' ['verify']='  ' ['speed']=' -speed 25000 ')
+jlinkScriptFileName="evkbimxrt1050_sdram_init.jlinkscript"
 
 help()
 {
@@ -13,6 +14,7 @@ Params:
     continous   - run in continous mode
     verify      - verify data loaded
     speed       - change speed (please mind 30000 is max by docs)
+    T6          - run for the T6 board 
 EOF
 }
 while [[ $# -gt 0 ]]; do
@@ -28,6 +30,10 @@ while [[ $# -gt 0 ]]; do
             OPTS[$1]=" -speed $2 "
             shift
             ;;
+        "T6")
+            echo "run for the T6 board"
+            jlinkScriptFileName="evkbimxrt1050_sdram_init_T6.jlinkscript"
+            ;;
         *)
             help
             ;;
@@ -35,7 +41,7 @@ while [[ $# -gt 0 ]]; do
     shift
 done
 CMD="JLinkGDBServerCLExe -if SWD -device MCIMXRT1051                     \
-    -jlinkscriptfile evkbimxrt1050_sdram_init.jlinkscript -strict -ir    \
+    -jlinkscriptfile $jlinkScriptFileName -strict -ir    \
     -rtos GDBServer/RTOSPlugin_FreeRTOS                                  \
     ${OPTS[@]}"
 

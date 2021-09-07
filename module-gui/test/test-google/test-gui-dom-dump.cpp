@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "gtest/gtest.h"
@@ -21,9 +21,12 @@ class Item2JsonSerializerTester : public ::testing::Test
     Item2JsonSerializerTester()
     {
         auto &fm = gui::FontManager::getInstance();
-        fm.init("assets");
+        fm.init("sys/current/assets");
 
-        root.addWidget(new gui::Text(nullptr, 0, 0, 0, 0, testTextValue1));
+        auto text = new gui::Text(nullptr, 0, 0, 0, 0);
+        text->setText(testTextValue1);
+
+        root.addWidget(text);
         root.addWidget(new gui::Label(nullptr, 0, 0, 0, 0, testTextValue2));
 
         serializer.traverse(root);

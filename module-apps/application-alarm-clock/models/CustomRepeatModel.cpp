@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CustomRepeatModel.hpp"
@@ -19,7 +19,7 @@ namespace app::alarmClock
         return internalData.size();
     }
 
-    unsigned int CustomRepeatModel::getMinimalItemHeight() const
+    unsigned int CustomRepeatModel::getMinimalItemSpaceRequired() const
     {
         return style::alarmClock::window::item::checkBox::height;
     }
@@ -38,7 +38,7 @@ namespace app::alarmClock
     void CustomRepeatModel::createData(const WeekDaysRepeatData &data)
     {
         for (auto const &[key, dayName] : gui::CustomCheckBoxWithLabel::weekDays) {
-            internalData.push_back(new gui::CustomCheckBoxWithLabel(application, utils::localize.get(dayName), data));
+            internalData.push_back(new gui::CustomCheckBoxWithLabel(application, utils::translate(dayName), data));
         }
 
         for (auto &item : internalData) {
@@ -48,7 +48,7 @@ namespace app::alarmClock
 
     void CustomRepeatModel::loadData(const WeekDaysRepeatData &data)
     {
-        list->clear();
+        list->reset();
         eraseInternalData();
 
         createData(data);

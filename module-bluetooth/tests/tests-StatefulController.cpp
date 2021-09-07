@@ -34,6 +34,10 @@ class DriverMock : public AbstractDriver
     {
         return true;
     }
+    bool unpair(uint8_t *addr) override
+    {
+        return true;
+    }
     void registerErrorCallback(const ErrorCallback &) override
     {}
 

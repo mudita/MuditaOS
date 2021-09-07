@@ -24,9 +24,11 @@ namespace sys
         return ret;
     }
 
-    SendResult BusProxy::sendUnicast(std::shared_ptr<Message> message, const std::string &targetName, uint32_t timeout)
+    SendResult BusProxy::sendUnicastSync(std::shared_ptr<Message> message,
+                                         const std::string &targetName,
+                                         uint32_t timeout)
     {
-        auto ret = busImpl->SendUnicast(std::move(message), targetName, owner, timeout);
+        auto ret = busImpl->SendUnicastSync(std::move(message), targetName, owner, timeout);
         if (ret.first != ReturnCodes::Failure) {
             watchdog.refresh();
         }

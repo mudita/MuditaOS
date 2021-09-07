@@ -3,17 +3,25 @@
 
 #pragma once
 
-#include "Device.hpp"
-#include "Service/Worker.hpp"
-#include "interface/profiles/Profile.hpp"
-#include <FreeRTOS.h>
-#include <bsp/bluetooth/Bluetooth.hpp>
-#include <memory>
-#include <task.h>
-#include <vector>
-#include "service-bluetooth/SettingsHolder.hpp"
+#include "audio/BluetoothAudioDevice.hpp"
 #include "glucode/BluetoothRunLoop.hpp"
+#include "interface/profiles/Profile.hpp"
+#include "service-bluetooth/SettingsHolder.hpp"
+#include "Service/Worker.hpp"
+
+#include "Device.hpp"
 #include "WorkerController.hpp"
+
+#include <bsp/bluetooth/Bluetooth.hpp>
+
+#include <mutex.hpp>
+
+#include <FreeRTOS.h>
+#include <task.h>
+
+#include <memory>
+#include <vector>
+
 struct HCI;
 
 /// debug option for HCI (uart) commands debugging
@@ -63,7 +71,7 @@ namespace bluetooth
         {
         };
     };
-}; // namespace Bt
+}; // namespace bluetooth
 
 class BluetoothWorker : private sys::Worker
 {
@@ -76,11 +84,14 @@ class BluetoothWorker : private sys::Worker
         queueRunloopTrigger // btstack run_loop queue
     };
 
-    sys::Service *service       = nullptr;
-    bool isRunning              = false;
+    sys::Service *service = nullptr;
+    bool isRunning        = false;
+    cpp_freertos::MutexStandard loopMutex;
 
     void registerQueues();
     void onLinkKeyAdded(const std::string &deviceAddress);
+    void initDevicesList();
+    void removeFromBoundDevices(uint8_t *addr);
 
   public:
     enum Error
@@ -99,6 +110,8 @@ class BluetoothWorker : private sys::Worker
 
     bool run() override;
     auto deinit() -> bool override;
+
+    void setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> device);
 
     /// bluetooth stack id in use
     unsigned long active_features;

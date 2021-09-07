@@ -11,10 +11,9 @@
 #include "gui/widgets/Image.hpp"
 #include "gui/widgets/Window.hpp"
 #include "gui/widgets/BottomBar.hpp"
-#include "gui/widgets/TopBar.hpp"
 #include "gui/widgets/ListView.hpp"
 
-#include "../CalllogModel.hpp"
+#include "CalllogModel.hpp"
 
 namespace gui
 {
@@ -25,7 +24,7 @@ namespace gui
         gui::ListView *list                        = nullptr;
 
       public:
-        CallLogMainWindow(app::Application *app);
+        explicit CallLogMainWindow(app::Application *app);
 
         // virtual methods
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
@@ -33,6 +32,8 @@ namespace gui
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;
+
+      private:
         bool onDatabaseMessage(sys::Message *msg) override;
     };
 

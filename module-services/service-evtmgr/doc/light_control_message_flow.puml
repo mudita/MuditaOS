@@ -1,5 +1,10 @@
 @startuml
+skinparam BackgroundColor F0F0F0
+alt control message without any parameters
 Application -> "Event Manager" as evm : ScreenLightControlMessage
+else contol message with parameters
+Application -> "Event Manager" as evm : ScreenLightSetParameters
+end
 evm -> "ScreenLightControl" as slc: processRequest()
 slc -> "Eink Frontlight" : request
 slc -> "Light Sensor" : request

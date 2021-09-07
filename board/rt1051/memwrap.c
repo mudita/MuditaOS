@@ -58,13 +58,6 @@ void* calloc (size_t num, size_t size)
     return memset(p, 0, total);
 }
 
-/* struct tm * localtime(const time_t *t)
-{
-  static struct tm y = {0};
-  //RtcServiceGetCurrentDateTime(&tm);
-  return &y;
-} */
-
 void *realloc(void *aptr, size_t nbytes)
 {
     return userrealloc(aptr, nbytes);
@@ -104,5 +97,3 @@ void _putchar(char character)
 {
     // Use of printf is banned
 }
-
-

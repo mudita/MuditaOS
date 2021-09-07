@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /// These are random tests what could be salvaged from old tests
@@ -17,7 +17,7 @@
 #include <fcntl.h>
 #include <catch2/catch.hpp>
 
-#include <log/log.hpp>
+#include <log.hpp>
 #include <utf8/UTF8.hpp>
 
 #include <module-gui/gui/core/ImageManager.hpp>
@@ -53,11 +53,11 @@ TEST_CASE("Are fonts loaded")
     auto &fontmanager = gui::FontManager::getInstance();
     // check getInstance - getting even default font will result in nullptr
     // this is because no fonts are loaded
-    REQUIRE(fontmanager.getFont(0) == nullptr);
+    REQUIRE(fontmanager.getFont() == nullptr);
     // now initialize, from where is it taken? nobody knows from this foo
-    fontmanager.init("assets");
+    fontmanager.init("sys/current/assets");
     // check if there is at least default font
-    REQUIRE(fontmanager.getFont(0) != nullptr);
+    REQUIRE(fontmanager.getFont() != nullptr);
 }
 
 TEST_CASE("Draw window with labels")

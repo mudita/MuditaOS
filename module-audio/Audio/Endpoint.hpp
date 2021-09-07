@@ -3,7 +3,12 @@
 
 #pragma once
 
-#include "Stream.hpp"
+#include "AbstractStream.hpp"
+#include "AudioFormat.hpp"
+
+#include <chrono>
+#include <optional>
+#include <vector>
 
 #include <cstdint>
 
@@ -12,55 +17,51 @@ namespace audio
     class Endpoint
     {
       public:
-        struct Capabilities
+        struct Traits
         {
-            bool usesDMA             = false;
-            std::size_t minBlockSize = 1;
-            std::size_t maxBlockSize = SIZE_MAX;
+            bool usesDMA = false;
+
+            // optional constraints
+            std::optional<std::size_t> blockSizeConstraint          = std::nullopt;
+            std::optional<std::chrono::milliseconds> timeConstraint = std::nullopt;
         };
 
         Endpoint() = default;
-        Endpoint(const Capabilities &caps);
 
-        void connectStream(Stream &stream);
+        void connectStream(AbstractStream &stream);
         void disconnectStream();
         bool isConnected() const noexcept;
 
-        [[nodiscard]] const Capabilities &getCapabilities() const noexcept;
+        [[nodiscard]] virtual auto getTraits() const -> Traits = 0;
+
+        auto isFormatSupported(const AudioFormat &format) -> bool;
+        virtual auto getSupportedFormats() -> std::vector<AudioFormat> = 0;
 
       protected:
-        Capabilities _caps;
-        Stream *_stream = nullptr;
+        AbstractStream *_stream = nullptr;
     };
 
     class Sink : public Endpoint
     {
       public:
-        Sink() = default;
-        explicit Sink(const Capabilities &caps);
-
-        virtual void onDataSend()    = 0;
-        virtual void enableOutput()  = 0;
-        virtual void disableOutput() = 0;
+        virtual auto getSinkFormat() -> AudioFormat = 0;
+        virtual void onDataSend()                   = 0;
+        virtual void enableOutput()                 = 0;
+        virtual void disableOutput()                = 0;
     };
 
     class Source : public Endpoint
     {
       public:
-        Source() = default;
-        explicit Source(const Capabilities &caps);
-
-        virtual void onDataReceive() = 0;
-        virtual void enableInput()   = 0;
-        virtual void disableInput()  = 0;
+        virtual auto getSourceFormat() -> AudioFormat = 0;
+        virtual void onDataReceive()                  = 0;
+        virtual void enableInput()                    = 0;
+        virtual void disableInput()                   = 0;
     };
 
     class IOProxy : public Source, public Sink
     {
       public:
-        IOProxy() = default;
-        IOProxy(const Capabilities &sourceCaps, const Capabilities &sinkCaps);
-
         inline bool isSinkConnected() const noexcept
         {
             return Sink::isConnected();
@@ -71,14 +72,24 @@ namespace audio
             return Source::isConnected();
         }
 
-        inline void connectOutputStream(Stream &stream)
+        inline void connectOutputStream(AbstractStream &stream)
         {
             Sink::connectStream(stream);
         }
 
-        inline void connectInputStream(Stream &stream)
+        inline void connectInputStream(AbstractStream &stream)
         {
             Source::connectStream(stream);
+        }
+
+        inline auto isFormatSupportedBySink(const AudioFormat &format) -> bool
+        {
+            return Sink::isFormatSupported(format);
+        }
+
+        inline auto isFormatSupportedBySource(const AudioFormat &format) -> bool
+        {
+            return Source::isFormatSupported(format);
         }
     };
 
@@ -86,7 +97,7 @@ namespace audio
     {
       public:
         StreamConnection() = default;
-        StreamConnection(Source *source, Sink *sink, Stream *stream);
+        StreamConnection(Source *source, Sink *sink, AbstractStream *stream);
         ~StreamConnection();
 
         void enable();
@@ -95,14 +106,13 @@ namespace audio
 
         [[nodiscard]] Source *getSource() const noexcept;
         [[nodiscard]] Sink *getSink() const noexcept;
-        [[nodiscard]] Stream *getStream() const noexcept;
-
+        [[nodiscard]] AbstractStream *getStream() const noexcept;
         [[nodiscard]] bool isEnabled() const noexcept;
 
       private:
-        bool enabled    = false;
-        Sink *_sink     = nullptr;
-        Source *_source = nullptr;
-        Stream *_stream = nullptr;
+        bool enabled            = false;
+        Sink *_sink             = nullptr;
+        Source *_source         = nullptr;
+        AbstractStream *_stream = nullptr;
     };
 }; // namespace audio

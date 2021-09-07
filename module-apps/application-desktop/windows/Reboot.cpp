@@ -1,15 +1,17 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "ApplicationDesktop.hpp"
 #include "Reboot.hpp"
-#include "../ApplicationDesktop.hpp"
-#include <Style.hpp>
+
 #include <i18n/i18n.hpp>
+#include <Style.hpp>
 
 namespace gui
 {
 
-    RebootWindow::RebootWindow(app::Application *app) : AppWindow(app, app::window::name::desktop_reboot)
+    RebootWindow::RebootWindow(app::Application *app, std::unique_ptr<PowerOffPresenter> &&presenter)
+        : AppWindow(app, app::window::name::desktop_reboot), presenter(std::move(presenter))
     {
         buildInterface();
     }
@@ -27,13 +29,12 @@ namespace gui
         auto text_y_offset = 270;
         auto text_height   = 300;
 
-        text = new Text(
-            this,
-            style::window::default_left_margin,
-            text_y_offset,
-            style::window_width - style::window::default_left_margin * 2,
-            text_height,
-            "Phone have to reboot, press any key to confirm and remove battery for 10 sec to perform full reboot");
+        text = new Text(this,
+                        style::window::default_left_margin,
+                        text_y_offset,
+                        style::window_width - style::window::default_left_margin * 2,
+                        text_height);
+        text->setText(utils::translate("phone_needs_rebooting"));
         text->setFilled(false);
         text->setBorderColor(gui::ColorFullBlack);
         text->setFont(style::header::font::title);
@@ -58,12 +59,7 @@ namespace gui
 
     bool RebootWindow::onInput(const InputEvent &inputEvent)
     {
-        text->setText("!!! Shutdown !!!");
-        application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-        /// needed to actually have time to show stuff on screen before system close
-        ulTaskNotifyTake(pdTRUE, 1000);
-        // shutdown
-        sys::SystemManager::CloseSystem(application);
+        presenter->powerOff();
         return true;
     }
 

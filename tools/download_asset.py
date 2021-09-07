@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 Download ecooboot.bin from repository
@@ -14,17 +14,18 @@ import json
 import os
 import requests
 import sys
+
 from tqdm import tqdm
 import time
 
 
 class Getter(object):
-    '''Download latest ecooboot.bin image'''
+    '''Download latest ecooboot.bin/updater.bin images'''
 
     def __init__(self):
         self.host = 'https://api.github.com/repos'
         self.organisation = 'mudita'
-        self.repo = 'ecoboot'
+        self.repo = ''
         self.apitoken = None
         self.ghLogin = None
         self.getGitRoot()
@@ -38,6 +39,8 @@ class Getter(object):
         self.restPrefix += '/'
         self.restPrefix += self.organisation
         self.restPrefix += '/'
+        if self.repo == '':
+            raise ValueError("Repository must be set")
         self.restPrefix += self.repo
         self.restPrefix += '/'
         return self.restPrefix
@@ -57,7 +60,7 @@ class Getter(object):
         try:
             gitConfigReader = self.gitRepo.config_reader()
             self.apitoken = gitConfigReader.get_value("user", "apitoken")
-        except: 
+        except:
             pass
 
     def getGHLogin(self, args=None):
@@ -122,7 +125,7 @@ class Getter(object):
         print(sys._getframe().f_code.co_name)
         self.getReleases(args)
         print("tag:", args.tag)
-        print("asset:", args.asset)
+        print("asset:", args.assetRepoName)
         release = None
         if args.tag is None:
             release = self.releases[0]
@@ -135,21 +138,14 @@ class Getter(object):
             print("No release with tag:", args.tag)
         print("release:", release['tag_name'])
         assets = release['assets']
-        if len(assets) > 1 and args.asset is None:
-            print("Available assets")
-            i=0
-            for asset in assets:
-                print(i, asset['name'])
-                i+=1
-            print("Use `-a <number>` to select file")
-            return
-        if args.asset is not None:
-            self.downloadAsset(assets[int(args.asset)])
-        else:
-            self.downloadAsset(assets[0])
 
+        for asset in assets:
+            if asset['name'] == args.assetRepoName:
+                self.downloadAsset(asset, args.assetOutName)
+                with open(args.workdir + '/' + args.repository + '.version', 'w+') as versionfile:
+                    versionfile.write(release['tag_name'])
 
-    def downloadAsset(self, asset):
+    def downloadAsset(self, asset, outName):
         self.createWorkdir()
         print("name:", asset['name'])
         print("url:", asset['url'])
@@ -159,7 +155,7 @@ class Getter(object):
                                 auth=(self.ghLogin, self.apitoken),
                                 headers=headers,
                                 stream=True)
-        destination_file = self.args.workdir + "/" + asset['name']
+        destination_file = self.args.workdir + "/" + outName
         print("downloading to:", destination_file)
         progres_bar = tqdm(total=asset['size'], unit='iB', unit_scale=True)
         with open(destination_file, 'wb') as fd:
@@ -182,6 +178,7 @@ class Getter(object):
 
 
 def main():
+
     getter = Getter()
 
     parser = argparse.ArgumentParser(description="Download ecooboot")
@@ -213,7 +210,8 @@ def main():
                                              description="Download Release based on tag or the latest")
     getReleases_args.set_defaults(func=getter.downloadRelease)
     getReleases_args.add_argument('tag', help="Download release with selected tag", nargs='?')
-    getReleases_args.add_argument('-a', '--asset', help="Asset name to download, use asset number")
+    getReleases_args.add_argument('-n', '--assetRepoName', help="Asset name in repository", required=True)
+    getReleases_args.add_argument('-o', '--assetOutName', help="Asset output name", required=True)
 
     args = parser.parse_args()
     getter.repo = args.repository

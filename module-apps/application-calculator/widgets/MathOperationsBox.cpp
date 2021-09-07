@@ -1,9 +1,10 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "CalculatorStyle.hpp"
 #include "MathOperationsBox.hpp"
-#include "application-calculator/widgets/CalculatorStyle.hpp"
-#include <gui/widgets/Label.hpp>
+#include <data/CalculatorInputProcessor.hpp>
+#include <module-gui/gui/widgets/Label.hpp>
 #include <cassert>
 
 namespace gui
@@ -23,15 +24,17 @@ namespace gui
 
     void MathOperationsBox::fillInTheGrid()
     {
+        using namespace calc;
+
         std::array<const std::string, style::calculator::grid_cells> math_operations = {
             "",
-            style::calculator::symbols::strings::plus,
+            symbols::strings::plus,
             "",
-            style::calculator::symbols::strings::multiplication,
-            style::calculator::symbols::strings::equals,
-            style::calculator::symbols::strings::division,
+            symbols::strings::multiplication,
+            symbols::strings::equals,
+            symbols::strings::division,
             "",
-            style::calculator::symbols::strings::minus,
+            symbols::strings::minus,
             ""};
 
         for (const auto &symbol : math_operations) {

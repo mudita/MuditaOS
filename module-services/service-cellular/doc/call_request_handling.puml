@@ -1,9 +1,10 @@
 @startuml
+skinparam BackgroundColor F0F0F0
 participant ServiceCellular as cellular
 participant RequestFactory as factory
 participant IRequest as request
 participant CellularRequestHandler as handler
-participant DLC_channel as channel
+participant DLCChannel as channel
 
 
 ?->     cellular + : ""call request""

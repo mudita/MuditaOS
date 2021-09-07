@@ -1,15 +1,15 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "ApplicationMessages.hpp"
+#include "MessagesStyle.hpp"
+#include "SearchResultsItem.hpp"
 #include "ThreadsSearchResultsModel.hpp"
-#include "ListView.hpp"
-#include "time/time_conversion.hpp"
-#include "application-messages/widgets/SearchResultsItem.hpp"
 
-#include <service-db/DBServiceAPI.hpp>
+#include <ListView.hpp>
 #include <module-db/queries/messages/threads/QueryThreadsSearchForList.hpp>
-#include <module-apps/application-messages/ApplicationMessages.hpp>
-#include "application-messages/data/MessagesStyle.hpp"
+#include <service-db/DBServiceAPI.hpp>
+#include <time/time_conversion_factory.hpp>
 
 namespace gui::model
 {
@@ -18,7 +18,7 @@ namespace gui::model
         : BaseThreadsRecordModel(app), app::AsyncCallbackReceiver{app}
     {}
 
-    auto ThreadsSearchResultsModel::getMinimalItemHeight() const -> unsigned int
+    auto ThreadsSearchResultsModel::getMinimalItemSpaceRequired() const -> unsigned int
     {
         return style::messages::threadItem::sms_thread_item_h;
     }
@@ -33,8 +33,9 @@ namespace gui::model
 
         auto ret = new gui::SearchResultsItem();
         {
+            using namespace utils::time;
             ret->setContact(threadStruct->contact->getFormattedName());
-            ret->setTimestamp(utils::time::DateTime(threadStruct->thread->date));
+            ret->setTimestamp(*TimestampFactory().createTimestamp(TimestampType::DateTime, threadStruct->thread->date));
             // The only thing that differs with ThreadModel actually - here show what was found
             ret->setPreview(threadStruct->thread->snippet);
         }

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Item2JsonSerializingVisitor.hpp"
@@ -8,10 +8,11 @@
 #include "Text.hpp"
 #include "Window.hpp"
 #include "BottomBar.hpp"
-#include "TopBar.hpp"
+#include "StatusBar.hpp"
+#include "ListItem.hpp"
 
 #include "ItemDataNames.hpp"
-#include <module-utils/magic_enum/include/magic_enum.hpp>
+#include <magic_enum.hpp>
 
 using namespace gui;
 
@@ -73,7 +74,7 @@ void Item2JsonSerializingVisitor::visit(gui::Window &item)
     if (itemName.empty()) {
         itemName = magic_enum::enum_name(visitor::Names::Window);
     }
-    sink.emplace(magic_enum::enum_name(visitor::Window::WindowName), std::string{item.getName()});
+    sink.emplace(magic_enum::enum_name(visitor::Window::WindowName), std::string{item.getUniqueName()});
     visit(static_cast<gui::Item &>(item));
 }
 
@@ -85,17 +86,25 @@ void Item2JsonSerializingVisitor::visit(gui::BottomBar &item)
     visit(static_cast<gui::Item &>(item));
 }
 
-void Item2JsonSerializingVisitor::visit(gui::top_bar::TopBar &item)
+void Item2JsonSerializingVisitor::visit(gui::status_bar::StatusBar &item)
 {
     if (itemName.empty()) {
-        itemName = magic_enum::enum_name(visitor::Names::TopBar);
+        itemName = magic_enum::enum_name(visitor::Names::StatusBar);
     }
     visit(static_cast<gui::Item &>(item));
 }
 
+void Item2JsonSerializingVisitor::visit(gui::ListItem &item)
+{
+    if (itemName.empty()) {
+        itemName = magic_enum::enum_name(visitor::Names::ListItem);
+    }
+    visit(static_cast<gui::Rect &>(item));
+}
+
 auto Item2JsonSerializingVisitor::serialize(gui::BoundingBox &box) -> json11::Json::array
 {
-    return {box.x, box.y, box.w, box.h};
+    return {static_cast<int>(box.x), static_cast<int>(box.y), static_cast<int>(box.w), static_cast<int>(box.h)};
 }
 
 auto Item2JsonSerializingVisitor::serialize(gui::Color &color) -> json11::Json::array

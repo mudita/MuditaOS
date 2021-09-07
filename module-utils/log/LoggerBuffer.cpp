@@ -10,7 +10,7 @@ std::pair<bool, std::string> LoggerBuffer::get()
         return {result, logMsg};
     }
     if (numOfLostBytes > 0) {
-        logMsg += "\r\n" + std::to_string(numOfLostBytes) + " " + lostBytesMessage;
+        logMsg         = std::to_string(numOfLostBytes) + " " + lostBytesMessage + "\n" + logMsg;
         numOfLostBytes = 0;
     }
     return {true, logMsg};

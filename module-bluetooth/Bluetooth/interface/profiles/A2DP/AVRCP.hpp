@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -46,6 +46,7 @@ namespace bluetooth
 
         static std::array<uint8_t, SDP_BUFFER_LENGTH> sdpTargetServiceBuffer;
         static std::array<uint8_t, SDP_BUFFER_LENGTH> sdpControllerServiceBuffer;
+        static sys::Service *ownerService;
 
         static avrcp_track_t tracks[3];
         static int currentTrackIndex;
@@ -55,6 +56,6 @@ namespace bluetooth
         static void packetHandler(uint8_t packetType, uint16_t channel, uint8_t *packet, uint16_t size);
         static void targetPacketHandler(uint8_t packetType, uint16_t channel, uint8_t *packet, uint16_t size);
         static void controllerPacketHandler(uint8_t packetType, uint16_t channel, uint8_t *packet, uint16_t size);
-        static void init();
+        static void init(sys::Service *service);
     };
 } // namespace Bt

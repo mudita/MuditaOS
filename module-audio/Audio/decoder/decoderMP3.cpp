@@ -41,28 +41,6 @@ namespace audio
         // position += (float) ((float) (samplesToReadChann / chanNumber) / (float) sampleRate);
     }
 
-    void decoderMP3::fetchTagsSpecific()
-    {
-
-        std::fseek(fd, firstValidFrameFileOffset + 4, SEEK_SET);
-        auto buff = std::make_unique<uint8_t[]>(firstValidFrameByteSize);
-
-        std::fread(buff.get(), 1, firstValidFrameByteSize, fd);
-
-        xing_info_t xinfo = {};
-        if (parseXingHeader(buff.get(), firstValidFrameByteSize, &xinfo)) {
-            // valid xing header found
-            tag->total_duration_s = xinfo.TotalFrames * (samplesPerFrame) / sampleRate;
-        }
-        else {
-            // Scan through whole file and count frames
-            uint32_t frames_count = get_frames_count();
-            tag->total_duration_s = frames_count * (samplesPerFrame) / sampleRate;
-        }
-
-        std::rewind(fd);
-    }
-
     bool decoderMP3::find_first_valid_frame()
     {
 
@@ -275,6 +253,12 @@ namespace audio
         position += (float)((float)(chanNumber == 2 ? samplesToRead / chanNumber : samplesToRead) / (float)sampleRate);
 
         return samplesToRead;
+    }
+
+    auto decoderMP3::getBitWidth() -> unsigned int
+    {
+        static constexpr auto mp3bitWidth = 16U;
+        return mp3bitWidth;
     }
 
 } // namespace audio

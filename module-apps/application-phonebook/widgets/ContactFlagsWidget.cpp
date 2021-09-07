@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ContactFlagsWidget.hpp"
@@ -17,7 +17,7 @@ namespace gui
 
     const unsigned char ContactFlagsWidget::iconsCount = 4;
     ContactFlagsWidget::ContactFlagsWidget(Item *parent)
-        : Rect(parent, 0, style::header::height, style::window_width, style::widget::ContactFlag::height)
+        : Rect(parent, 0, style::window::default_vertical_pos, style::window_width, style::widget::ContactFlag::height)
     {
         favourites = speedDial = ice = true;
         blocked                      = false;
@@ -65,10 +65,10 @@ namespace gui
 
     void ContactFlagsWidget::initGUIIcons()
     {
-        favouritesIcon = new ContactFlagIconWidget("small_heart_W_M", utils::localize.get("FAVOURITES"), this);
-        speedDialIcon  = new ContactFlagIconWidget(speedDialPos, utils::localize.get("SPEED DIAL"), this);
-        iceIcon        = new ContactFlagIconWidget("ice", utils::localize.get("ICE"), this);
-        blockedIcon    = new ContactFlagIconWidget("block", utils::localize.get("BLOCKED"), this);
+        favouritesIcon = new ContactFlagIconWidget("small_heart_W_M", utils::translate("FAVOURITES"), this);
+        speedDialIcon  = new ContactFlagIconWidget(speedDialPos, utils::translate("SPEED DIAL"), this);
+        iceIcon        = new ContactFlagIconWidget("ice", utils::translate("ICE"), this);
+        blockedIcon    = new ContactFlagIconWidget("block", utils::translate("BLOCKED"), this);
     }
 
     void ContactFlagsWidget::buildWidget()

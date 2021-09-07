@@ -1,8 +1,8 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-cellular/SignalStrength.hpp"
-#include <log/log.hpp>
+#include <log.hpp>
 
 SignalStrength::SignalStrength(int rssi)
 {
@@ -33,9 +33,6 @@ Store::RssiBar SignalStrength::rssidBmToBar(const int rssidBm)
 
     if (rssidBm == rssidBm_invalid) {
         return RssiBar::zero;
-    }
-    else if (rssidBm >= rssidBm_five_bar_margin) {
-        return RssiBar::five;
     }
     else if (rssidBm >= rssidBm_four_bar_margin) {
         return RssiBar::four;

@@ -2,12 +2,12 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "UI_Helper.hpp"
-#include "log/log.hpp"
+#include <log.hpp>
 #include "service-desktop/Constants.hpp"
 #include "service-desktop/DeveloperModeMessage.hpp"
 #include <variant>
-#include <service-appmgr/model/ApplicationManager.hpp>
-#include <service-appmgr/service-appmgr/messages/DOMRequest.hpp>
+#include <service-appmgr/Constants.hpp>
+#include <service-appmgr/messages/DOMRequest.hpp>
 
 namespace parserFSM
 {
@@ -33,7 +33,7 @@ namespace parserFSM
             owner->bus.sendUnicast(
                 std::make_shared<app::manager::DOMRequest>(service::name::service_desktop,
                                                            std::make_unique<sdesktop::Event>(std::move(event))),
-                app::manager::ApplicationManager::ServiceName);
+                service::name::appmgr);
             return {sent::delayed, std::nullopt};
         }
         return {sent::no, std::nullopt};

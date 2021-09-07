@@ -5,6 +5,7 @@
 
 #include <at/Commands.hpp>
 #include <Utils.hpp>
+#include <at/ATFactory.hpp>
 
 #include "service-cellular/requests/PasswordRegistrationRequest.hpp"
 #include "service-cellular/requests/CallBarringRequest.hpp" // for barringServiceToFacility map
@@ -23,7 +24,7 @@ namespace cellular
         return std::make_unique<PasswordRegistrationRequest>(data, matchGroups);
     }
 
-    auto PasswordRegistrationRequest::command() -> std::string
+    auto PasswordRegistrationRequest::command() -> at::Cmd
     {
         std::vector<commandBuilderFunc> commandParts = {
             [this]() { return getCommandFacility(); },
@@ -31,7 +32,7 @@ namespace cellular
             [this]() { return getNewPassword(); },
         };
 
-        return buildCommand(at::AT::CPWD, commandParts);
+        return at::Cmd(buildCommand(at::AT::CPWD, commandParts));
     }
 
     auto PasswordRegistrationRequest::getCommandFacility() const noexcept -> std::string

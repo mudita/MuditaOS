@@ -1,3 +1,14 @@
+#Auto-locking mechanism
+PurePhone screen can be locked automatically due to user inactivity.  
+The Auto-locking mechanism is controlled by 'gs_auto_lock_time' parameter settings stored in database.
+Initial value for 'gs_auto_lock_time' (units for value is ms) can be changed in image/user/db/settings_v2_002.sql.
+Values lower than 1000 (<1s) are treated as 0 and thus disable auto-locking.
+Auto lock action is performed only if following conditions are met:
+ - tethering is off
+ - focused application does not prevent auto-locking
+
+
+
 #SIM PIN flow
 
 The PIN/PUK-related flow between SIM card and `PurePhone` `User` is directed by three main entities:

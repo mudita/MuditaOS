@@ -22,6 +22,8 @@ namespace gui
 
         void buildInterface() override;
 
+        status_bar::Configuration configureStatusBar(status_bar::Configuration appConfiguration) override;
+
         auto addNewContact() -> bool;
     };
 

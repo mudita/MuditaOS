@@ -3,7 +3,7 @@
 
 #include <catch2/catch.hpp>
 
-#include <module-services/service-appmgr/service-appmgr/model/ActionsRegistry.hpp>
+#include <service-appmgr/model/ActionsRegistry.hpp>
 
 using namespace app::manager;
 
@@ -14,7 +14,7 @@ TEST_CASE("Given actions registry when initialise it incorrectly then verify")
 
 TEST_CASE("Given empty actions registry when verify its state then no pending actions")
 {
-    auto nextActionCallback = [](ActionEntry & /*entry*/) { return true; };
+    auto nextActionCallback = [](ActionEntry & /*entry*/) { return ActionProcessStatus::Accepted; };
     ActionsRegistry registry{std::move(nextActionCallback)};
 
     REQUIRE(!registry.hasPendingAction());
@@ -22,7 +22,7 @@ TEST_CASE("Given empty actions registry when verify its state then no pending ac
 
 TEST_CASE("Given actions registry when enqueue then check pending action")
 {
-    auto nextActionCallback = [](ActionEntry & /*entry*/) { return true; };
+    auto nextActionCallback = [](ActionEntry & /*entry*/) { return ActionProcessStatus::Accepted; };
     ActionsRegistry registry{std::move(nextActionCallback)};
 
     registry.enqueue(ActionEntry{actions::Launch});
@@ -35,7 +35,7 @@ TEST_CASE("Given actions registry when enqueue then check if action was processe
     bool handled            = false;
     auto nextActionCallback = [&handled](ActionEntry & /*entry*/) {
         handled = true;
-        return true;
+        return ActionProcessStatus::Accepted;
     };
     ActionsRegistry registry{std::move(nextActionCallback)};
 
@@ -45,7 +45,7 @@ TEST_CASE("Given actions registry when enqueue then check if action was processe
 
 TEST_CASE("Given actions registry when finished queued action then no pending actions")
 {
-    auto nextActionCallback = [](ActionEntry & /*entry*/) { return true; };
+    auto nextActionCallback = [](ActionEntry & /*entry*/) { return ActionProcessStatus::Accepted; };
     ActionsRegistry registry{std::move(nextActionCallback)};
 
     registry.enqueue(ActionEntry{actions::Launch});
@@ -58,7 +58,7 @@ TEST_CASE("Given actions registry when enqueue multiple actions sequentially the
     int counter             = 0;
     auto nextActionCallback = [&counter](ActionEntry & /*entry*/) {
         ++counter;
-        return true;
+        return ActionProcessStatus::Accepted;
     };
     ActionsRegistry registry{std::move(nextActionCallback)};
 
@@ -79,7 +79,7 @@ TEST_CASE("Given actions registry when enqueue multiple actions at once then cou
     int counter             = 0;
     auto nextActionCallback = [&counter](ActionEntry & /*entry*/) {
         ++counter;
-        return true;
+        return ActionProcessStatus::Accepted;
     };
     ActionsRegistry registry{std::move(nextActionCallback)};
 
@@ -104,7 +104,7 @@ TEST_CASE("Given actions registry when enqueue multiple actions at once then cou
 
 TEST_CASE("Given actions registry when enqueue multiple actions at once then wait for them to expire.")
 {
-    auto nextActionCallback = [](ActionEntry & /*entry*/) { return true; };
+    auto nextActionCallback = [](ActionEntry & /*entry*/) { return ActionProcessStatus::Accepted; };
     ActionsRegistry registry{std::move(nextActionCallback)};
 
     registry.enqueue(ActionEntry{actions::Launch});
@@ -126,9 +126,9 @@ TEST_CASE("Given actions registry when enqueue multiple actions at once then pro
     auto nextActionCallback = [&counter](ActionEntry &entry) {
         if (entry.actionId == actions::UserAction) {
             ++counter;
-            return true;
+            return ActionProcessStatus::Accepted;
         }
-        return false;
+        return ActionProcessStatus::Skipped;
     };
     ActionsRegistry registry{std::move(nextActionCallback)};
 
@@ -142,4 +142,36 @@ TEST_CASE("Given actions registry when enqueue multiple actions at once then pro
     registry.finished();
     REQUIRE(counter == 1);
     REQUIRE(!registry.hasPendingAction());
+}
+
+TEST_CASE("Process the specific actions only and skip others.")
+{
+    int acceptedCounter     = 0;
+    int skippedCounter      = 0;
+    int droppedCounter      = 0;
+    auto nextActionCallback = [&acceptedCounter, &skippedCounter, &droppedCounter](ActionEntry &entry) {
+        if (entry.actionId == actions::UserAction) {
+            ++acceptedCounter;
+            return ActionProcessStatus::Accepted;
+        }
+        if (entry.actionId == actions::Home) {
+            ++skippedCounter;
+            return ActionProcessStatus::Skipped;
+        }
+        ++droppedCounter;
+        return ActionProcessStatus::Dropped;
+    };
+    ActionsRegistry registry{std::move(nextActionCallback)};
+
+    registry.enqueue(ActionEntry{actions::Launch});
+    REQUIRE(droppedCounter == 1);
+    REQUIRE(!registry.hasPendingAction());
+
+    registry.enqueue(ActionEntry{actions::Home});
+    REQUIRE(skippedCounter == 1);
+    REQUIRE(!registry.hasPendingAction());
+
+    registry.enqueue(ActionEntry{actions::UserAction});
+    registry.finished();
+    REQUIRE(acceptedCounter == 1);
 }

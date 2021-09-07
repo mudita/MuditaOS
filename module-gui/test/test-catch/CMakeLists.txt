@@ -1,4 +1,4 @@
-﻿# gui tests
+# gui tests
 add_catch2_executable(
         NAME
                 gui
@@ -7,16 +7,15 @@ add_catch2_executable(
                 test-context.cpp
                 test-gui-callbacks.cpp
                 test-gui-resizes.cpp
+                test-gui-image.cpp
                 ../mock/TestWindow.cpp
                 ../mock/InitializedFontManager.cpp
-        test-language-input-parser.cpp
+                test-language-input-parser.cpp
+                test-key-translator.cpp
         INCLUDE
                 ..
         LIBS
+                module-sys
                 module-gui
-                module-vfs
-                iosyscalls
-        DEPS
-                assets
-                PurePhone.img-target
+	USE_FS
 )

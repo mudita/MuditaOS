@@ -1,0 +1,19 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+
+[*] --> InitialCheck
+InitialCheck --> LevelCriticalNotCharging : initialLevelCheck [isCriticalNotCharging && !isShutdown]
+InitialCheck --> Shutdown : initialLevelCheck [isCriticalNotCharging && isShutdown]
+InitialCheck --> LevelCriticalCharging : initialLevelCheck [isCriticalCharging]
+InitialCheck --> LevelNormal : initialLevelCheck [isNormal]
+LevelNormal --> LevelCriticalNotCharging : criticalLevelCheck [isCriticalNotCharging && !isShutdown] /\n (setCriticalNotCharging, sendStateChange)
+LevelNormal --> Shutdown : criticalLevelCheck [isCriticalNotCharging && isShutdown] /\n (setShutdown, sendStateChange)
+LevelNormal --> LevelCriticalCharging : criticalLevelCheck [isCriticalCharging] /\n (setCriticalCharging, sendStateChange)
+LevelCriticalNotCharging --> LevelNormal : criticalLevelCheck [isNormal] /\n (setNormal, sendStateChange)
+LevelCriticalNotCharging --> LevelCriticalCharging : criticalLevelCheck [isCriticalCharging] /\n (setCriticalCharging, sendStateChange)
+LevelCriticalNotCharging --> Shutdown : criticalLevelCheck [isShutdown] / (sendShutdown, sendStateChange)
+LevelCriticalCharging --> LevelCriticalNotCharging : criticalLevelCheck [isCriticalNotCharging && !isShutdown] /\n (setCriticalNotCharging, sendStateChange)
+LevelCriticalCharging --> LevelNormal : criticalLevelCheck [isNormal] /\n (setNormal, sendStateChange)
+LevelCriticalCharging --> Shutdown : criticalLevelCheck [isCriticalNotCharging && isShutdown] / \n(setShutdown, sendStateChange)
+
+@enduml

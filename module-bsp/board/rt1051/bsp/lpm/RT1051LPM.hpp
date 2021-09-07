@@ -10,20 +10,24 @@
 
 namespace bsp
 {
-    inline constexpr uint8_t OscillatorReadyCounterValue{127};
-
     class RT1051LPM : public LowPowerMode
     {
       public:
         RT1051LPM();
         int32_t PowerOff() override final;
-        int32_t Reboot() override final;
+        int32_t Reboot(RebootType reason) override final;
         void SetCpuFrequency(CpuFrequencyHz freq) final;
+        void SetHighestCoreVoltage() final;
         [[nodiscard]] uint32_t GetCpuFrequency() const noexcept final;
         void SwitchOscillatorSource(OscillatorSource source) final;
+        void SetBootSuccess() override;
+
+        void EnableDcdcPowerSaveMode() final;
+        void DisableDcdcPowerSaveMode() final;
 
       private:
-        std::shared_ptr<drivers::DriverGPIO> gpio;
+        std::shared_ptr<drivers::DriverGPIO> gpio_1;
+        std::shared_ptr<drivers::DriverGPIO> gpio_2;
         std::unique_ptr<bsp::CpuFreqLPM> CpuFreq;
     };
 

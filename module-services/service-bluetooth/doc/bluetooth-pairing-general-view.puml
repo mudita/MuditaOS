@@ -1,0 +1,35 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+
+actor "External BT device" as extbt
+participant "Worker Bluetooth" as workbt
+participant "Service Bluetooth" as srvbt
+participant "Database Agent" as sett
+participant "Application Settings" as appsett
+
+activate appsett
+appsett -> sett : register cb on bonded devices change
+    activate sett
+appsett <- sett : bonded devices callback
+    deactivate sett
+        ... ...
+
+appsett->srvbt : pair msg(address)
+    activate srvbt
+    srvbt -> workbt : command(pair, address)
+        deactivate srvbt
+        activate workbt
+        workbt -> extbt : bond
+            activate extbt
+        workbt <-- extbt : respond
+            deactivate extbt
+
+        workbt -> sett : update bonded devices
+        deactivate workbt
+            activate sett
+appsett <- sett : bonded devices callback
+            deactivate sett
+
+
+
+@enduml

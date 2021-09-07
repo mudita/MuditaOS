@@ -3,18 +3,11 @@
 
 #pragma once
 
-//TODO maybe move KeyEvents to keyboard.hpp
 namespace bsp
 {
     enum class RetCode{
         Success,
         Failure
-
-    };
-
-    enum class KeyEvents{
-        Released,
-        Pressed,
 
     };
 

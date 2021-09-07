@@ -1,34 +1,29 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include "Message.hpp"
+#include "module-sys/Service/Message.hpp"
 
 #include <module-bsp/bsp/torch/torch.hpp>
 
 namespace sevm
 {
-    class BatteryStatusChangeMessage : public sys::Message
+    class BatteryStatusChangeMessage : public sys::DataMessage
     {};
 
-    class BatterySetCriticalLevel : public sys::Message
+    class BatterySetCriticalLevel : public sys::DataMessage
     {
       public:
-        BatterySetCriticalLevel(std::uint8_t level) : Message(), criticalLevel(level)
+        BatterySetCriticalLevel(std::uint8_t level) : criticalLevel(level)
         {}
-        unsigned int criticalLevel = 0;
+        const unsigned int criticalLevel = 0;
     };
 
-    class BatteryLevelCriticalCheckMessage : public sys::Message
-    {};
-    class BatteryLevelCriticalMessage : public sys::Message
+    class BatteryStateChangeMessage : public sys::DataMessage
     {};
 
-    class BatteryLevelNormalMessage : public sys::Message
-    {};
-
-    class BatteryBrownoutMessage : public sys::Message
+    class BatteryBrownoutMessage : public sys::DataMessage
     {};
 
 } // namespace sevm

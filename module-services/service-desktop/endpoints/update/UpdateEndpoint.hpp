@@ -1,8 +1,9 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
+#include "UpdateHelper.hpp"
 #include <endpoints/Endpoint.hpp>
 #include <parser/ParserUtils.hpp>
 
@@ -22,13 +23,16 @@ namespace sys
 
 class UpdateEndpoint : public parserFSM::Endpoint
 {
+  private:
+    const std::unique_ptr<parserFSM::UpdateHelper> updateHelper;
 
   public:
-    UpdateEndpoint(sys::Service *ownerServicePtr) : Endpoint(ownerServicePtr)
+    explicit UpdateEndpoint(sys::Service *ownerServicePtr)
+        : Endpoint(ownerServicePtr), updateHelper(std::make_unique<parserFSM::UpdateHelper>(ownerServicePtr))
     {
         debugName = "UpdateEndpoint";
     }
     auto handle(parserFSM::Context &context) -> void override;
-    auto run(parserFSM::Context &context) -> sys::ReturnCodes;
-    auto getUpdates(parserFSM::Context &context) -> sys::ReturnCodes;
+
+    [[nodiscard]] auto helperSwitcher(parserFSM::Context &ctx) -> parserFSM::BaseHelper &;
 };

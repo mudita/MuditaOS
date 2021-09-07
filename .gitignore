@@ -52,8 +52,13 @@ docker/assets/requirements*
 tags
 .ycm_extra_conf.py
 
-update/
+update/*
 
 # build in docker files
 .ccache/
 .bash_history
+
+# often created by the visual studio code
+/null.d
+
+test/test_env

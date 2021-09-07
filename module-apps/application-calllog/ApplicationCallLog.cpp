@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationCallLog.hpp"
@@ -10,11 +10,10 @@
 #include "windows/CallLogOptionsWindow.hpp"
 
 #include <service-db/DBServiceAPI.hpp>
-#include <service-db/DBMessage.hpp>
 #include <Dialog.hpp>
 #include <OptionWindow.hpp>
 #include <i18n/i18n.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <MessageType.hpp>
 #include <module-db/queries/calllog/QueryCalllogSetAllRead.hpp>
 #include <module-db/queries/notifications/QueryNotificationsClear.hpp>
@@ -23,9 +22,14 @@ using namespace calllog;
 
 namespace app
 {
-    ApplicationCallLog::ApplicationCallLog(std::string name, std::string parent, StartInBackground startInBackground)
-        : Application(name, parent, startInBackground, 4096)
+    ApplicationCallLog::ApplicationCallLog(std::string name,
+                                           std::string parent,
+                                           sys::phone_modes::PhoneMode phoneMode,
+                                           sys::bluetooth::BluetoothMode bluetoothMode,
+                                           StartInBackground startInBackground)
+        : Application(name, parent, phoneMode, bluetoothMode, startInBackground, 4096)
     {
+        bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         addActionReceiver(manager::actions::ShowCallLog, [this](auto &&data) {
             switchWindow(gui::name::window::main_window, std::move(data));
             return actionHandled();
@@ -40,36 +44,21 @@ namespace app
     // Invoked upon receiving data message
     sys::MessagePointer ApplicationCallLog::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
     {
-
-        auto retMsg = Application::DataReceivedHandler(msgl);
         // if message was handled by application's template there is no need to process further.
-        if ((reinterpret_cast<sys::ResponseMessage *>(retMsg.get())->retCode == sys::ReturnCodes::Success)) {
+        auto retMsg = Application::DataReceivedHandler(msgl);
+        if (auto responseMsg = dynamic_cast<sys::ResponseMessage *>(retMsg.get());
+            responseMsg != nullptr && responseMsg->retCode == sys::ReturnCodes::Success) {
             return retMsg;
         }
 
-        auto handled = false;
-
-        // handle database response
-        if (resp != nullptr) {
-            handled = true;
-            switch (resp->responseTo) {
-            case MessageType::DBCalllogGetLimitOffset: {
-                if (getCurrentWindow()->onDatabaseMessage(resp)) {
-                    refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-                }
-                break;
+        if (msgl->messageType == MessageType::DBServiceNotification) {
+            for (auto &[name, window] : windowsStack.windows) {
+                window->onDatabaseMessage(msgl);
             }
-            default:
-                break;
-            }
+            return sys::msgHandled();
         }
 
-        if (handled) {
-            return std::make_shared<sys::ResponseMessage>();
-        }
-        else {
-            return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
-        }
+        return handleAsyncResponse(resp);
     }
 
     // Invoked during initialization
@@ -88,7 +77,7 @@ namespace app
 
     sys::ReturnCodes ApplicationCallLog::DeinitHandler()
     {
-        return sys::ReturnCodes::Success;
+        return Application::DeinitHandler();
     }
 
     void ApplicationCallLog::createUserInterface()
@@ -100,11 +89,14 @@ namespace app
             return std::make_unique<gui::CallLogDetailsWindow>(app);
         });
         windowsFactory.attach(
-            utils::localize.get("app_phonebook_options_title"),
+            utils::translate("app_phonebook_options_title"),
             [](Application *app, const std::string &name) { return std::make_unique<gui::OptionWindow>(app, name); });
         windowsFactory.attach(calllog::settings::DialogYesNoStr, [](Application *app, const std::string &name) {
             return std::make_unique<gui::DialogYesNo>(app, name);
         });
+
+        attachPopups(
+            {gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes, gui::popup::ID::PhoneLock});
     }
 
     void ApplicationCallLog::destroyUserInterface()
@@ -113,19 +105,20 @@ namespace app
     bool ApplicationCallLog::removeCalllogEntry(const CalllogRecord &record)
     {
         LOG_DEBUG("Removing CalllogRecord: %" PRIu32, record.ID);
-        gui::DialogMetadata meta;
-        meta.action = [=]() -> bool {
-            if (DBServiceAPI::CalllogRemove(this, record.ID) == false) {
-                LOG_ERROR("CalllogRemove id=%" PRIu32 " failed", record.ID);
-                return false;
-            }
-            this->switchWindow(calllog::settings::MainWindowStr);
-            return true;
-        };
-        meta.title = record.name;
-        meta.text  = utils::localize.get("app_calllog_delete_call_confirmation");
-        meta.icon  = "phonebook_contact_delete_trashcan";
-        switchWindow(calllog::settings::DialogYesNoStr, std::make_unique<gui::DialogMetadataMessage>(meta));
+        auto metaData = std::make_unique<gui::DialogMetadataMessage>(
+            gui::DialogMetadata{record.name,
+                                "phonebook_contact_delete_trashcan",
+                                utils::translate("app_calllog_delete_call_confirmation"),
+                                "",
+                                [=]() -> bool {
+                                    if (DBServiceAPI::CalllogRemove(this, record.ID) == false) {
+                                        LOG_ERROR("CalllogRemove id=%" PRIu32 " failed", record.ID);
+                                        return false;
+                                    }
+                                    this->switchWindow(calllog::settings::MainWindowStr);
+                                    return true;
+                                }});
+        switchWindow(calllog::settings::DialogYesNoStr, gui::ShowMode::GUI_SHOW_INIT, std::move(metaData));
         return true;
     }
 

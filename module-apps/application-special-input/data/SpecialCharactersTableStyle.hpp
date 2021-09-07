@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -30,7 +30,7 @@ namespace specialInputStyle
     namespace specialInputListView
     {
         constexpr uint32_t x = style::window::default_left_margin;
-        constexpr uint32_t y = style::header::height;
+        constexpr uint32_t y = style::window::default_vertical_pos;
         constexpr uint32_t w = style::listview::body_width_with_scroll;
         constexpr uint32_t h = style::window::default_body_height;
     } // namespace specialInputListView

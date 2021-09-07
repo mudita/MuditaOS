@@ -2,9 +2,9 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CalllogItem.hpp"
-#include "time/time_conversion.hpp"
-#include "../data/CallLogInternals.hpp"
-#include "gui/widgets/BoxLayout.hpp"
+#include "data/CallLogInternals.hpp"
+#include <time/time_conversion_factory.hpp>
+#include <gui/widgets/BoxLayout.hpp>
 
 #include <Style.hpp>
 
@@ -13,7 +13,7 @@ using namespace calllog;
 namespace gui
 {
 
-    CalllogItem::CalllogItem(CalllogModel *model, bool mode24H) : model{model}, mode24H{mode24H}
+    CalllogItem::CalllogItem(CalllogModel *model) : model{model}
     {
         setMargins(Margins(0, style::margins::big, 0, 0));
         setMinimumSize(clItemStyle::w, clItemStyle::h);
@@ -61,7 +61,7 @@ namespace gui
     {
         this->call = call;
         if (call->presentation == PresentationType::PR_UNKNOWN) {
-            text->setText(utils::localize.get(callLogStyle::strings::privateNumber));
+            text->setText(utils::translate(callLogStyle::strings::privateNumber));
         }
         else {
             text->setText(call->name);
@@ -74,7 +74,8 @@ namespace gui
 
         imageCallType[static_cast<uint32_t>(callType)]->setVisible(true);
 
-        timestamp->setText(utils::time::DateTime(call->date, false)); // TODO: alek: check for AM/PM and 24h
+        using namespace utils::time;
+        timestamp->setText(*TimestampFactory().createTimestamp(TimestampType::DateTime, call->date));
     }
 
 } /* namespace gui */

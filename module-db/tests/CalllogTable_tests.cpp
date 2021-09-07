@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -17,7 +17,7 @@ TEST_CASE("Calllog Table tests")
 {
     Database::initialize();
 
-    const auto calllogPath = (std::filesystem::path{"user"} / "calllog.db");
+    const auto calllogPath = (std::filesystem::path{"sys/user"} / "calllog.db");
     if (std::filesystem::exists(calllogPath)) {
         REQUIRE(std::filesystem::remove(calllogPath));
     }
@@ -42,7 +42,7 @@ TEST_CASE("Calllog Table tests")
         REQUIRE(testRow.isRead == true);
     }
 
-    CalllogTableRow testRow = {{.ID = DB_ID_NONE},
+    CalllogTableRow testRow = {Record(DB_ID_NONE),
                                .number       = "600123456",
                                .e164number   = "+48600226908",
                                .presentation = PresentationType::PR_ALLOWED,

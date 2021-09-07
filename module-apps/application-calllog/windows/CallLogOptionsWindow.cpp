@@ -3,7 +3,6 @@
 
 #include "CallLogOptionsWindow.hpp"
 #include <i18n/i18n.hpp>
-#include <module-services/service-db/service-db/DBServiceAPI.hpp>
 #include <OptionContact.hpp>
 
 /// below just for apps names...
@@ -28,7 +27,7 @@ std::list<gui::Option> calllogWindowOptions(app::ApplicationCallLog *app, const 
 
     // add option delete call option
     options.push_back(gui::Option(
-        utils::localize.get("app_calllog_options_delete_call"),
+        utils::translate("app_calllog_options_delete_call"),
         [=](gui::Item &item) { return app->removeCalllogEntry(record); },
         gui::option::Arrow::Disabled));
 

@@ -4,19 +4,24 @@
 #pragma once
 
 #include <module-services/service-desktop/parser/ParserUtils.hpp>
+#include <utility>
 #include "ResponseContext.hpp"
 
 namespace parserFSM
 {
+    constexpr http::Code toCode(bool r)
+    {
+        return r ? http::Code::OK : http::Code::InternalServerError;
+    }
 
     namespace json
     {
-        inline constexpr auto method   = "method";
-        inline constexpr auto endpoint = "endpoint";
-        inline constexpr auto uuid     = "uuid";
-        inline constexpr auto status   = "status";
+        inline constexpr auto method     = "method";
+        inline constexpr auto endpoint   = "endpoint";
+        inline constexpr auto uuid       = "uuid";
+        inline constexpr auto status     = "status";
         inline constexpr auto totalCount = "totalCount";
-        inline constexpr auto body     = "body";
+        inline constexpr auto body       = "body";
         inline constexpr auto offset     = "offset";
         inline constexpr auto limit      = "limit";
         inline constexpr auto nextPage   = "nextPage";
@@ -30,13 +35,13 @@ namespace parserFSM
       protected:
         json11::Json body;
         EndpointType endpoint;
-        uint32_t uuid;
+        int uuid;
         http::Method method;
         endpoint::ResponseContext responseContext;
 
         auto validate() -> void
         {
-            if (body.is_object() == false) {
+            if (!body.is_object()) {
                 body = json11::Json();
             }
             if (static_cast<int>(endpoint) > lastEndpoint) {
@@ -46,7 +51,7 @@ namespace parserFSM
                 method = http::Method::get;
             }
         }
-        auto buildResponseStr(std::size_t responseSize, std::string responsePayloadString) -> std::string
+        auto buildResponseStr(std::size_t responseSize, const std::string &responsePayloadString) -> std::string
         {
             constexpr auto pos                 = 0;
             constexpr auto count               = 1;
@@ -60,20 +65,12 @@ namespace parserFSM
         }
 
       public:
-        Context(json11::Json &js)
+        explicit Context(json11::Json &js)
         {
             body     = js[json::body];
             endpoint = static_cast<EndpointType>(js[json::endpoint].int_value());
             uuid     = js[json::uuid].int_value();
-            if (uuid == invalidUuid) {
-                try {
-                    uuid = stoi(js[json::uuid].string_value());
-                }
-                catch (...) {
-                    uuid = invalidUuid;
-                }
-            }
-            method = static_cast<http::Method>(js[json::method].int_value());
+            method   = static_cast<http::Method>(js[json::method].int_value());
             validate();
         }
         Context()
@@ -87,16 +84,22 @@ namespace parserFSM
 
         virtual auto createSimpleResponse(const std::string &entryTitle = json::entries) -> std::string
         {
-            json11::Json responseJson = json11::Json::object{{json::endpoint, static_cast<int>(getEndpoint())},
-                                                             {json::status, static_cast<int>(responseContext.status)},
-                                                             {json::uuid, std::to_string(getUuid())},
-                                                             {json::body, responseContext.body}};
+            json11::Json::object contextJsonObject =
+                json11::Json::object{{json::endpoint, static_cast<int>(getEndpoint())},
+                                     {json::status, static_cast<int>(responseContext.status)},
+                                     {json::uuid, getUuid()}};
+            if (!responseContext.body.is_null()) {
+                contextJsonObject[json::body] = responseContext.body;
+            }
+
+            const json11::Json responseJson{std::move(contextJsonObject)};
+
             return buildResponseStr(responseJson.dump().size(), responseJson.dump());
         }
 
         auto setResponse(endpoint::ResponseContext r)
         {
-            r = responseContext;
+            responseContext = std::move(r);
         }
 
         auto setResponseStatus(http::Code status)
@@ -109,7 +112,7 @@ namespace parserFSM
         }
         auto setResponseBody(json11::Json respBody)
         {
-            responseContext.body = respBody;
+            responseContext.body = std::move(respBody);
         }
         auto getBody() -> const json11::Json &
         {
@@ -119,7 +122,7 @@ namespace parserFSM
         {
             return endpoint;
         }
-        auto getUuid() -> uint32_t
+        auto getUuid() -> int
         {
             return uuid;
         }
@@ -133,11 +136,11 @@ namespace parserFSM
     {
       private:
         // from request
-        std::size_t requestedLimit, requestedOffset;
+        std::size_t requestedLimit{}, requestedOffset{};
         // set by query (during helper run)
-        std::size_t totalCount;
+        std::size_t totalCount{};
         // set it before calling handle on helper
-        std::size_t pageSize;
+        std::size_t pageSize{};
 
       public:
         explicit PagedContext(json11::Json &js, size_t pageSize) : Context(js), pageSize(pageSize)
@@ -183,10 +186,9 @@ namespace parserFSM
 
     namespace endpoint_pageing
     {
-        inline constexpr std::size_t contactsPageSize = 10;
-        inline constexpr std::size_t calendarEventsPageSize = 10;
-        inline constexpr std::size_t threadsPageSize        = 11;
-    }
+        inline constexpr std::size_t contactsPageSize       = 10;
+        inline constexpr std::size_t messagesPageSize       = 4;
+    } // namespace endpoint_pageing
 
     class ContextFactory
     {
@@ -195,13 +197,11 @@ namespace parserFSM
         {
             switch (static_cast<EndpointType>(js[json::endpoint].int_value())) {
             // enable for pagination in other endpoints
-            case EndpointType::calendarEvents:
-                return std::make_unique<PagedContext>(js, endpoint_pageing::calendarEventsPageSize);
             // case EndpointType::calllog:
             case EndpointType::contacts:
                 return std::make_unique<PagedContext>(js, endpoint_pageing::contactsPageSize);
             case EndpointType::messages:
-                return std::make_unique<PagedContext>(js, endpoint_pageing::threadsPageSize);
+                return std::make_unique<PagedContext>(js, endpoint_pageing::messagesPageSize);
             default:
                 return std::make_unique<Context>(js);
             }

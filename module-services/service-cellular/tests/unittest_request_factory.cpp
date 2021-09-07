@@ -111,10 +111,9 @@ TEST_CASE("Emergency handling")
 
         RequestFactory requestFactory(test.number,
                                       dummyChannel,
-                                      test.isEmergencyRequest ? CellularCallRequestMessage::RequestMode::Emergency
-                                                              : CellularCallRequestMessage::RequestMode::Normal,
-                                      test.insertSim ? RequestFactory::SimStatus::SimInsterted
-                                                     : RequestFactory::SimStatus::SimSlotEmpty);
+                                      test.isEmergencyRequest ? cellular::api::CallMode::Emergency
+                                                              : cellular::api::CallMode::Regular,
+                                      test.insertSim);
         std::shared_ptr<IRequest> request = requestFactory.create();
 
         INFO("Failed test case idx: " + std::to_string(idx));
@@ -128,7 +127,7 @@ TEST_CASE("Emergency handling")
 
         if (request) {
             auto requestCommand = request->command();
-            REQUIRE(requestCommand == test.expectedCommand);
+            REQUIRE(requestCommand.getCmd() == test.expectedCommand);
         }
         idx++;
     }
@@ -445,10 +444,7 @@ TEST_CASE("MMI requests")
 
     for (auto &testCase : testCases) {
         auto mockChannel = at::GenericChannel(at::Result::Code::OK, {});
-        RequestFactory requestFactory(testCase.requestString,
-                                      mockChannel,
-                                      CellularCallRequestMessage::RequestMode::Normal,
-                                      RequestFactory::SimStatus::SimInsterted);
+        RequestFactory requestFactory(testCase.requestString, mockChannel, cellular::api::CallMode::Regular, true);
         auto request        = requestFactory.create();
         auto requestCommand = request->command();
 
@@ -456,16 +452,16 @@ TEST_CASE("MMI requests")
         REQUIRE(typeid(*request.get()).name() == testCase.expectedType.name());
         REQUIRE(request->isValid() == testCase.expectedValid);
         if (typeid(*request.get()).name() == typeid(CallRequest).name()) {
-            REQUIRE(requestCommand == "ATD" + testCase.requestString + ";");
+            REQUIRE(requestCommand.getCmd() == "ATD" + testCase.requestString + ";");
         }
         else if (typeid(*request.get()).name() == typeid(UssdRequest).name()) {
-            REQUIRE(requestCommand == "AT+CUSD=1," + testCase.requestString + ",15");
+            REQUIRE(requestCommand.getCmd() == "AT+CUSD=1," + testCase.requestString + ",15");
         }
         else {
-            if (requestCommand == testCase.expectedCommandString) {
+            if (requestCommand.getCmd() == testCase.expectedCommandString) {
                 LOG_ERROR("HERE");
             }
-            REQUIRE(requestCommand == testCase.expectedCommandString);
+            REQUIRE(requestCommand.getCmd() == testCase.expectedCommandString);
         }
     }
 }

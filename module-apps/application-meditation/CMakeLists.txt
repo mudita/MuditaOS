@@ -1,35 +1,56 @@
-﻿include_directories(${CMAKE_PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_LIST_DIR}")
-include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_LIST_DIR}")
+﻿# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+# For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-target_sources(${PROJECT_NAME}
+add_library(application-meditation STATIC)
+
+target_include_directories(application-meditation
     PRIVATE
-        ApplicationMeditation.cpp
-        windows/MeditationListViewWindows.cpp
-        windows/MeditationTimerWindow.cpp
-        windows/MeditationWindow.cpp
-        widgets/MeditationTimer.cpp
-        widgets/MeditationModel.cpp
-        widgets/MeditationListItems.cpp
-        widgets/IntervalBox.cpp
-        widgets/TimerProperty.cpp
+        $<BUILD_INTERFACE:
+            ${CMAKE_CURRENT_SOURCE_DIR}/data
+            ${CMAKE_CURRENT_SOURCE_DIR}/include/application-meditation
+            ${CMAKE_CURRENT_SOURCE_DIR}/widgets
+            ${CMAKE_CURRENT_SOURCE_DIR}/windows
+        >
     PUBLIC
-        ApplicationMeditation.hpp
-        data/Style.hpp
-        data/MeditationTimerData.hpp
-        data/OptionsData.hpp
-        windows/Names.hpp
-        windows/MeditationListViewWindows.hpp
-        windows/MeditationTimerWindow.hpp
-        windows/MeditationWindow.hpp
-        widgets/MeditationTimer.hpp
-        widgets/MeditationModel.hpp
-        widgets/MeditationListItems.hpp
-        widgets/IntervalBox.hpp
-        widgets/TimerProperty.hpp
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
 
-target_link_libraries(${PROJECT_NAME}
+target_sources(application-meditation
     PRIVATE
-        service-audio
-    )
+        ApplicationMeditation.cpp
+        data/MeditationTimerData.hpp
+        data/Style.hpp
+        widgets/IntervalBox.cpp
+        widgets/IntervalBox.hpp
+        widgets/MeditationListItems.cpp
+        widgets/MeditationListItems.hpp
+        widgets/MeditationModel.cpp
+        widgets/MeditationModel.hpp
+        widgets/MeditationTimer.cpp
+        widgets/MeditationTimer.hpp
+        widgets/TimerProperty.cpp
+        widgets/TimerProperty.hpp
+        windows/MeditationListViewWindows.cpp
+        windows/MeditationListViewWindows.hpp
+        windows/MeditationTimerWindow.cpp
+        windows/MeditationTimerWindow.hpp
+        windows/MeditationWindow.cpp
+        windows/MeditationWindow.hpp
+        windows/Names.hpp
+    PUBLIC
+        include/application-meditation/ApplicationMeditation.hpp
+        include/application-meditation/OptionsData.hpp
+)
 
+target_link_libraries(application-meditation
+    PRIVATE
+        i18n
+        module-sys
+        module-utils
+        module-vfs
+        service-audio
+        time
+    PUBLIC
+        apps-common
+        module-gui
+)

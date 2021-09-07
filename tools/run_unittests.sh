@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash
 # Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
@@ -27,6 +27,8 @@ if [[ $# -ne 1 ]]; then
     exit 1
 fi
 
+source ${root_dir}/config/common_scripsts_lib
+
 TESTS_FILE=$1
 
 if [[ ! -r ${TESTS_FILE} ]]; then
@@ -50,8 +52,18 @@ do
     do
         CUR_TEST=$( trim ${TESTS[$I]}) 
         if [[ -n "${CUR_TEST}" ]]; then
-            echo ${TEST_BINARY} \"${CUR_TEST}\"
-            ./${TEST_BINARY} "${CUR_TEST}" | tee ${run_logs}
+            echo -en "${TEST_BINARY} \"${CUR_TEST}\":"
+            ./${TEST_BINARY} "${CUR_TEST}" --use-colour=yes > ${run_logs}
+            RESULT=$?
+
+            if [[ ${RESULT} -eq 0 ]]; then
+                echo -e "${OK}"
+            else
+                echo -e "${ERROR}"
+                cat ${run_logs}
+                exit 1
+            fi
+
             CHK_IF_RUN=`cat ${run_logs} | grep "No tests ran" || true` 
             echo "---$CHK_IF_RUN---"
             if [[ -n "${CHK_IF_RUN}" ]]; then

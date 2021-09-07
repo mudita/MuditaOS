@@ -1,8 +1,10 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <UrcQind.hpp>
 #include <log/debug.hpp>
+
+#include <map>
 
 using namespace at::urc;
 
@@ -109,4 +111,61 @@ auto Qind::getBER() const noexcept -> std::optional<int>
     }
 
     return std::nullopt;
+}
+
+auto Qind::isAct() const noexcept -> bool
+{
+    if (tokens.size() == magic_enum::enum_count<enum ACT>()) {
+        return tokens[ACT].find(type_act) != std::string::npos;
+    }
+    return false;
+}
+
+auto Qind::getAct() const noexcept -> std::string
+{
+    if (isAct()) {
+        return tokens[ACT::ACTVALUE];
+    }
+
+    return "";
+}
+
+namespace
+{
+    constexpr auto gsm           = "GSM";
+    constexpr auto egprs         = "EGPRS";
+    constexpr auto wcdma         = "WCDMA ";
+    constexpr auto hsdpa         = "HSDPA";
+    constexpr auto hsupa         = "HSUPA";
+    constexpr auto hsdpaAndHsupa = "HSDPA&HSUPA";
+    constexpr auto lte           = "LTE";
+    constexpr auto tdScdma       = "TD-SCDMA";
+    constexpr auto cdma          = "CDMA";
+    constexpr auto hdr           = "HDR";
+    constexpr auto evdo          = "EVDO";
+    constexpr auto unknown       = "UNKNOWN";
+
+    std::map<std::string_view, Store::Network::AccessTechnology> technologyMap = {
+        {gsm, Store::Network::AccessTechnology::Gsm},
+        {egprs, Store::Network::AccessTechnology::GsmWEgprs},
+        {wcdma, Store::Network::AccessTechnology::Utran},
+        {hsdpa, Store::Network::AccessTechnology::UtranWHsdpa},
+        {hsupa, Store::Network::AccessTechnology::UtranWHsupa},
+        {hsdpaAndHsupa, Store::Network::AccessTechnology::UtranWHsdpaAndWHsupa},
+        {lte, Store::Network::AccessTechnology::EUtran},
+        {tdScdma, Store::Network::AccessTechnology::Utran},
+        {cdma, Store::Network::AccessTechnology::Cdma},
+        {hdr, Store::Network::AccessTechnology::Utran},
+        {evdo, Store::Network::AccessTechnology::Utran},
+        {unknown, Store::Network::AccessTechnology::Unknown}};
+} // namespace
+[[nodiscard]] auto Qind::getAccessTechnology() const noexcept -> Store::Network::AccessTechnology
+{
+    auto act = getAct();
+
+    auto it = technologyMap.find(act);
+    if (it != technologyMap.end()) {
+        return it->second;
+    }
+    return Store::Network::AccessTechnology::Unknown;
 }

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Service.hpp"
@@ -7,10 +7,11 @@
 #include "Service/Common.hpp"  // for BusChannels, ReturnCodes, ReturnCodes...
 #include "Service/Mailbox.hpp" // for Mailbox
 #include "Service/Message.hpp" // for Message, MessagePointer, DataMessage, Resp...
-#include "Timer.hpp"           // for Timer
-#include "TimerMessage.hpp"    // for TimerMessage
+#include "Timers/SystemTimer.hpp"
+#include "module-sys/Timers/TimerHandle.hpp"  // for Timer
+#include "module-sys/Timers/TimerMessage.hpp" // for TimerMessage
 #include "log/debug.hpp"       // for DEBUG_SERVICE_MESSAGES
-#include "log/log.hpp"         // for LOG_ERROR, LOG_DEBUG, LOG_FATAL
+#include <log.hpp>             // for LOG_ERROR, LOG_DEBUG, LOG_FATAL
 #include "mutex.hpp"           // for cpp_freertos
 #include "portmacro.h"         // for UBaseType_t
 #include "thread.hpp"          // for Thread
@@ -19,6 +20,7 @@
 #include <cstdint>             // for uint32_t, uint64_t, UINT32_MAX
 #include <iosfwd>              // for std
 #include <typeinfo>            // for type_info
+#include <module-sys/SystemManager/Constants.hpp>
 
 #if (DEBUG_SERVICE_MESSAGES > 0)
 #include <cxxabi.h>
@@ -29,20 +31,34 @@ void debug_msg(sys::Service *srvc, const sys::Message *ptr)
 {
 #if (DEBUG_SERVICE_MESSAGES > 0)
 
-    int status     = -1;
-    char *realname = nullptr;
-    realname       = abi::__cxa_demangle(typeid(*ptr).name(), 0, 0, &status);
+    int status           = -4; /// assign error number which is not  defined for __cxa_demangle
+    const char *realname = nullptr;
+    realname             = typeid(*ptr).name();
+    char *demangled      = abi::__cxa_demangle(realname, 0, 0, &status);
 
-    LOG_DEBUG("Handle message ([%s] -> [%s] (%s) data: %s",
-              ptr->sender.c_str(),
-              srvc->GetName().c_str(),
-              realname,
-              std::string(*ptr).c_str());
+    assert(srvc);
+    assert(ptr);
 
-    free(realname);
+    LOG_DEBUG("Handle message ([%s] -> [%s] (%s) data: %s %s",
+              ptr ? ptr->sender.c_str() : "",
+              srvc ? srvc->GetName().c_str() : "",
+              status == 0 ? demangled ? demangled : realname : realname,
+              std::string(*ptr).c_str(),
+              status != 0 ? status == -1
+                                ? "!mem fail!"
+                                : status == -2 ? "name ABI fail" : status == -3 ? "arg invalid" : "other failure!"
+                          : "");
+
+    free(demangled);
 #else
 #endif
 }
+
+#if (DEBUG_SERVICE_MESSAGES > 0)
+#define log_debug(...) LOG_DEBUG(__VA_ARGS__)
+#else
+#define log_debug(...)
+#endif
 
 namespace sys
 {
@@ -142,6 +158,9 @@ namespace sys
         const auto idx = type_index(typeid(*message));
         if (const auto handler = message_handlers.find(idx); handler != message_handlers.end()) {
             const auto &handlerFunction = handler->second;
+            if (handlerFunction == nullptr) {
+                return {true, nullptr};
+            }
             return {true, handlerFunction(message)};
         }
         return {false, nullptr};
@@ -151,8 +170,8 @@ namespace sys
     {
         auto idx = type_index(type);
         if (message_handlers.find(idx) == message_handlers.end()) {
-            LOG_DEBUG("Registering new message handler on %s", type.name());
-            message_handlers[idx] = handler;
+            log_debug("Registering new message handler on %s", type.name());
+            message_handlers[idx] = std::move(handler);
             return true;
         }
         LOG_ERROR("Handler for: %s already registered!", type.name());
@@ -170,11 +189,23 @@ namespace sys
         return connect(&msg, handler);
     }
 
+    bool Service::disconnect(const std::type_info &type)
+    {
+        auto iter = message_handlers.find(type);
+        if (iter == std::end(message_handlers)) {
+            return false;
+        }
+        message_handlers.erase(iter);
+        return true;
+    }
+
     void Service::CloseHandler()
     {
         timers.stop();
         enableRunLoop = false;
     }
+
+    auto Service::ProcessCloseReason(CloseReason closeReason) -> void{};
 
     auto Service::TimerHandle(SystemMessage &message) -> ReturnCodes
     {
@@ -184,14 +215,27 @@ namespace sys
             return ReturnCodes::Failure;
         }
 
-        auto timer = timers.get(timer_message->getTimer());
-        if (timer == timers.noTimer()) {
+        auto sysTimer = timer_message->getTimer();
+        auto timer    = timers.get(sysTimer);
+        if (timer == nullptr) {
             LOG_ERROR("No such timer registered in Service");
             return ReturnCodes::Failure;
         }
-
-        (*timer)->onTimeout();
+        timer->onTimeout();
         return ReturnCodes::Success;
+    }
+
+    void Service::Timers::attach(timer::SystemTimer *timer)
+    {
+        list.push_back(timer);
+    }
+
+    void Service::Timers::detach(timer::SystemTimer *timer)
+    {
+        const auto it = std::find(list.begin(), list.end(), timer);
+        if (it != list.end()) {
+            list.erase(it);
+        }
     }
 
     void Service::Timers::stop()
@@ -199,6 +243,21 @@ namespace sys
         for (auto timer : list) {
             timer->stop();
         }
+    }
+
+    auto Service::Timers::get(timer::SystemTimer *timer) noexcept -> timer::SystemTimer *
+    {
+        auto it = std::find(list.begin(), list.end(), timer);
+        if (it == list.end()) {
+            return nullptr;
+        }
+        return *it;
+    }
+
+    void Service::sendCloseReadyMessage(Service *service)
+    {
+        auto msg = std::make_shared<sys::ReadyToCloseMessage>();
+        service->bus.sendUnicast(std::move(msg), service::name::system_manager);
     }
 
     auto Proxy::handleMessage(Service *service, Message *message, ResponseMessage *response) -> MessagePointer
@@ -232,7 +291,11 @@ namespace sys
                 service->isReady = true;
             }
             break;
+        case SystemMessageType::ServiceCloseReason:
+            service->ProcessCloseReason(static_cast<ServiceCloseReasonMessage *>(message)->getCloseReason());
+            break;
         }
         return std::make_shared<ResponseMessage>(ret);
     }
+
 } // namespace sys

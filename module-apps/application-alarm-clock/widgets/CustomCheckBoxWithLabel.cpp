@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CustomCheckBoxWithLabel.hpp"
@@ -90,8 +90,8 @@ namespace gui
     void CustomCheckBoxWithLabel::setCheckBoxes()
     {
         for (auto const &[key, dayName] : weekDays) {
-            if (descriptionLabel->getText() == utils::localize.get(dayName)) {
-                checkBox->setImageVisible(checkBoxData.getData(static_cast<uint32_t>(key)));
+            if (descriptionLabel->getText() == utils::translate(dayName)) {
+                checkBox->setCheck(checkBoxData.getData(static_cast<uint32_t>(key)));
             }
         }
     }

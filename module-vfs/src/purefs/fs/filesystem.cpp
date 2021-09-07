@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 #include <purefs/fs/filesystem.hpp>
 #include <purefs/fs/filesystem_operations.hpp>
@@ -6,6 +6,8 @@
 #include <purefs/blkdev/disk_manager.hpp>
 #include <purefs/fs/thread_local_cwd.hpp>
 #include <purefs/blkdev/disk_handle.hpp>
+#include <purefs/fs/notifier.hpp>
+#include <purefs/fs/fsnotify.hpp>
 #include <log/log.hpp>
 #include <split_sv.hpp>
 #include <errno.h>
@@ -21,7 +23,8 @@ namespace purefs::fs
         };
     }
     filesystem::filesystem(std::shared_ptr<blkdev::disk_manager> diskmm)
-        : m_diskmm(diskmm), m_lock(new cpp_freertos::MutexRecursive)
+        : m_diskmm(diskmm), m_lock(std::make_unique<cpp_freertos::MutexRecursive>()),
+          m_notifier(std::make_unique<internal::notifier>())
     {}
 
     filesystem::~filesystem()
@@ -36,7 +39,7 @@ namespace purefs::fs
         cpp_freertos::LockGuard _lck(*m_lock);
         const auto it = m_fstypes.find(std::string(fsname));
         if (it != std::end(m_fstypes)) {
-            LOG_ERROR("Disc: %s already registered.", std::string(fsname).c_str());
+            LOG_ERROR("Filesystem %s already registered", std::string(fsname).c_str());
             return -EEXIST;
         }
         else {
@@ -74,7 +77,7 @@ namespace purefs::fs
     {
         // Sanity check input data
         if (target.size() <= 1 || target[0] != '/') {
-            LOG_ERROR("VFS: Invalid target mountpoint path %s", std::string(target).c_str());
+            LOG_ERROR("VFS: Invalid target mountpoint path");
             return -EINVAL;
         }
         if (flags & ~(mount_flags::remount | mount_flags::read_only)) {
@@ -90,13 +93,13 @@ namespace purefs::fs
                     return {};
                 }
                 else {
-                    LOG_ERROR("VFS: mount point already exists %s", std::string(target).c_str());
+                    LOG_ERROR("VFS: given mount point already exists");
                     return -EBUSY;
                 }
             }
             const auto mpp = m_partitions.find(std::string(dev_or_part));
             if (mpp != std::end(m_partitions)) {
-                LOG_ERROR("VFS: partition already used %s", std::string(dev_or_part).c_str());
+                LOG_ERROR("VFS: given partition already used");
                 return -EBUSY;
             }
             std::string filesystem_type;
@@ -139,7 +142,7 @@ namespace purefs::fs
                 }
             }
             else {
-                LOG_ERROR("Device or partition %s doesn't exists", std::string(dev_or_part).c_str());
+                LOG_ERROR("Device or partition with given name doesn't exists");
                 return -ENXIO;
             }
         }
@@ -308,4 +311,10 @@ namespace purefs::fs
             return {};
         }
     }
+
+    auto filesystem::inotify_create(std::shared_ptr<sys::Service> svc) -> std::shared_ptr<inotify>
+    {
+        return std::make_shared<inotify>(svc, m_notifier);
+    }
+
 } // namespace purefs::fs

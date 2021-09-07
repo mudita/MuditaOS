@@ -1,0 +1,29 @@
+add_catch2_executable(
+    NAME
+        utils-time_display
+    SRCS
+        unittest_TimeRangeParser.cpp
+    LIBS
+        module-utils
+        time
+)
+
+add_catch2_executable(
+    NAME
+        utils-TimeZone
+    SRCS
+        unittest_TimeZone.cpp
+    LIBS
+        time
+)
+# time tests
+add_catch2_executable(
+    NAME
+        utils-time
+    SRCS
+        unittest_time.cpp
+    LIBS
+        time
+        utf8
+    USE_FS
+)

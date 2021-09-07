@@ -1,11 +1,11 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmTimeItem.hpp"
 #include "AlarmClockStyle.hpp"
 #include <ListView.hpp>
 #include <Style.hpp>
-#include <time/time_conversion.hpp>
+#include <time/time_constants.hpp>
 #include <time/time_date_validation.hpp>
 
 namespace gui
@@ -68,7 +68,7 @@ namespace gui
     {
         inputCallback = [&](Item &item, const InputEvent &event) {
             auto focusedItem = getFocusItem();
-            if (!event.isShortPress()) {
+            if (!event.isShortRelease()) {
                 return false;
             }
             if (event.is(gui::KeyCode::KEY_ENTER) || event.is(gui::KeyCode::KEY_RF)) {
@@ -111,14 +111,14 @@ namespace gui
             return false;
         };
 
-        onSaveCallback = [&](std::shared_ptr<AlarmsRecord> record) {
+        onSaveCallback = [&](std::shared_ptr<AlarmEventRecord> record) {
             validateHour();
             auto hours   = std::chrono::hours(std::stoi(hourInput->getText().c_str()));
             auto minutes = std::chrono::minutes(std::stoi(minuteInput->getText().c_str()));
             if (!mode24H) {
                 hours = date::make24(hours, isPm(mode12hInput->getText()));
             }
-            record->time = TimePointFromYearMonthDay(TimePointToYearMonthDay(TimePointNow())) + hours + minutes;
+            record->startDate = TimePointFromYearMonthDay(TimePointToYearMonthDay(TimePointNow())) + hours + minutes;
         };
 
         onInputCallback(*hourInput);
@@ -133,7 +133,7 @@ namespace gui
     void AlarmTimeItem::onInputCallback(gui::Text &textItem)
     {
         textItem.inputCallback = [&](Item &item, const InputEvent &event) {
-            if (!event.isShortPress()) {
+            if (!event.isShortRelease()) {
                 return false;
             }
             if (textItem.getText().length() > 1 && !event.is(gui::KeyCode::KEY_LEFT) &&
@@ -155,17 +155,17 @@ namespace gui
             mode12hInput->setFont(style::window::font::largelight);
             mode12hInput->setPenFocusWidth(style::window::default_border_focus_w);
             mode12hInput->setPenWidth(style::window::default_border_rect_no_focus);
-            mode12hInput->setText(utils::localize.get(utils::time::Locale::getAM()));
+            mode12hInput->setText(utils::translate(utils::time::Locale::getAM()));
             mode12hInput->inputCallback = [&](Item &item, const InputEvent &event) {
-                if (event.state != gui::InputEvent::State::keyReleasedShort) {
+                if (!event.isShortRelease()) {
                     return false;
                 }
-                if (event.keyCode == gui::KeyCode::KEY_LF) {
-                    if (mode12hInput->getText() == utils::localize.get(utils::time::Locale::getAM())) {
-                        mode12hInput->setText(utils::localize.get(utils::time::Locale::getPM()));
+                if (event.is(gui::KeyCode::KEY_LF)) {
+                    if (mode12hInput->getText() == utils::translate(utils::time::Locale::getAM())) {
+                        mode12hInput->setText(utils::translate(utils::time::Locale::getPM()));
                     }
                     else {
-                        mode12hInput->setText(utils::localize.get(utils::time::Locale::getAM()));
+                        mode12hInput->setText(utils::translate(utils::time::Locale::getAM()));
                     }
                     return true;
                 }
@@ -173,7 +173,7 @@ namespace gui
             };
             mode12hInput->focusChangedCallback = [&](Item &item) {
                 if (item.focus) {
-                    bottomBarTemporaryMode(utils::localize.get("common_switch"));
+                    bottomBarTemporaryMode(utils::translate("common_switch"));
                 }
                 else {
                     bottomBarRestoreFromTemporaryMode();
@@ -186,14 +186,14 @@ namespace gui
             hourInput->setMinimumSize(timeItem::timeInput12h, timeItem::height - timeItem::separator);
             minuteInput->setMinimumSize(timeItem::timeInput12h, timeItem::height - timeItem::separator);
 
-            onLoadCallback = [&](std::shared_ptr<AlarmsRecord> alarm) {
-                hourInput->setText(TimePointToHourString12H(alarm->time));
-                minuteInput->setText(TimePointToMinutesString(alarm->time));
-                if (date::is_am(TimePointToHourMinSec(alarm->time).hours())) {
-                    mode12hInput->setText(utils::localize.get(utils::time::Locale::getAM()));
+            onLoadCallback = [&](std::shared_ptr<AlarmEventRecord> alarm) {
+                hourInput->setText(TimePointToHourString12H(alarm->startDate));
+                minuteInput->setText(TimePointToMinutesString(alarm->startDate));
+                if (date::is_am(TimePointToHourMinSec(alarm->startDate).hours())) {
+                    mode12hInput->setText(utils::translate(utils::time::Locale::getAM()));
                 }
                 else {
-                    mode12hInput->setText(utils::localize.get(utils::time::Locale::getPM()));
+                    mode12hInput->setText(utils::translate(utils::time::Locale::getPM()));
                 }
             };
         }
@@ -201,16 +201,16 @@ namespace gui
             hourInput->setMinimumSize(timeItem::timeInput24h, timeItem::height - timeItem::separator);
             minuteInput->setMinimumSize(timeItem::timeInput24h, timeItem::height - timeItem::separator);
 
-            onLoadCallback = [&](std::shared_ptr<AlarmsRecord> alarm) {
-                hourInput->setText(TimePointToHourString24H(alarm->time));
-                minuteInput->setText(TimePointToMinutesString(alarm->time));
+            onLoadCallback = [&](std::shared_ptr<AlarmEventRecord> alarm) {
+                hourInput->setText(TimePointToHourString24H(alarm->startDate));
+                minuteInput->setText(TimePointToMinutesString(alarm->startDate));
             };
         }
     }
 
     bool AlarmTimeItem::isPm(const std::string &text) const
     {
-        return !(text == utils::localize.get(utils::time::Locale::getAM()));
+        return !(text == utils::translate(utils::time::Locale::getAM()));
     }
 
     void AlarmTimeItem::validateHour()

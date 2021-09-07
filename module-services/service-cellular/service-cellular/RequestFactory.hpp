@@ -8,7 +8,7 @@
 #include <map>
 #include <functional>
 
-#include <Modem/TS0710/DLC_channel.h>
+#include <modem/mux/DLCChannel.h>
 
 #include "requests/CallRequest.hpp"
 #include "service-appmgr/Actions.hpp"
@@ -21,16 +21,10 @@ namespace cellular
     class RequestFactory
     {
       public:
-        enum class SimStatus
-        {
-            SimInsterted,
-            SimSlotEmpty
-        };
-
         RequestFactory(const std::string &data,
                        at::BaseChannel &channel,
-                       CellularCallRequestMessage::RequestMode requestMode,
-                       SimStatus simCardStatus);
+                       cellular::api::CallMode callMode,
+                       bool simInserted);
         std::unique_ptr<IRequest> create();
 
       private:
@@ -41,7 +35,7 @@ namespace cellular
         std::vector<std::pair<std::string, CreateCallback>> requestMap;
 
         at::BaseChannel &channel;
-        const CellularCallRequestMessage::RequestMode requestMode;
-        const SimStatus simStatus;
+        const cellular::api::CallMode callMode;
+        const bool simInserted;
     };
 } // namespace cellular

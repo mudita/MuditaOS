@@ -1,10 +1,10 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NewEditAlarmWindow.hpp"
 #include "application-alarm-clock/data/AlarmsData.hpp"
 #include "application-calendar/data/OptionParser.hpp"
-#include <module-db/Interface/AlarmsRecord.hpp>
+#include <module-db/Interface/AlarmEventRecord.hpp>
 
 namespace app::alarmClock
 {
@@ -23,8 +23,8 @@ namespace app::alarmClock
 
         bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
         bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
-        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get(style::strings::common::save));
+        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(style::strings::common::save));
 
         list = new gui::ListView(this,
                                  style::alarmClock::window::listView_x,
@@ -32,7 +32,7 @@ namespace app::alarmClock
                                  style::alarmClock::window::listView_w,
                                  style::alarmClock::window::listView_h,
                                  presenter->getAlarmsItemProvider(),
-                                 style::listview::ScrollBarType::None);
+                                 gui::listview::ScrollBarType::None);
         setFocusItem(list);
     }
 
@@ -40,10 +40,10 @@ namespace app::alarmClock
     {
         switch (alarmAction) {
         case AlarmAction::Add:
-            setTitle(utils::localize.get("app_alarm_clock_new_alarm_title"));
+            setTitle(utils::translate("app_alarm_clock_new_alarm_title"));
             break;
         case AlarmAction::Edit:
-            setTitle(utils::localize.get("app_alarm_clock_edit_alarm_title"));
+            setTitle(utils::translate("app_alarm_clock_edit_alarm_title"));
             break;
         }
 
@@ -69,7 +69,7 @@ namespace app::alarmClock
             return true;
         }
 
-        if (inputEvent.isShortPress() && inputEvent.is(gui::KeyCode::KEY_ENTER)) {
+        if (inputEvent.isShortRelease(gui::KeyCode::KEY_ENTER)) {
             presenter->saveData(alarmRecord, alarmAction);
             return true;
         }

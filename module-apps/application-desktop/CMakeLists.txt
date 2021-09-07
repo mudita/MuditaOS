@@ -1,78 +1,76 @@
-﻿
-include_directories( ${CMAKE_PROJECT_NAME}
+﻿# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+# For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-	PUBLIC
-		"${CMAKE_CURRENT_LIST_DIR}"
-)
+add_library(application-desktop STATIC)
 
-include_directories( ${PROJECT_NAME}
-
-	PUBLIC
-		"${CMAKE_CURRENT_LIST_DIR}"
-)
-
-target_sources( ${PROJECT_NAME}
-
-	PRIVATE
-		"${CMAKE_CURRENT_LIST_DIR}/ApplicationDesktop.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/widgets/PinLock.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/widgets/PinLockHandler.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/widgets/NotificationsBox.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/widgets/DesktopInputWidget.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/DesktopMainWindow.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/PinLockBaseWindow.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/ScreenLockBox.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/SimLockBox.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/PukLockBox.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/PinLockWindow.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/MenuWindow.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/PowerOffWindow.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/DeadBatteryWindow.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/LockedInfoWindow.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/windows/Reboot.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/Update.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/UpdateProgress.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/MmiPullWindow.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/MmiPushWindow.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/MmiInternalMsgWindow.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/ScreenLockBaseBox.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/LockWindow.cpp"
-	PUBLIC
-		"${CMAKE_CURRENT_LIST_DIR}/ApplicationDesktop.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/data/LockPhoneData.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/data/Style.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/data/Mmi.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/widgets/PinHash.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/widgets/PinLock.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/widgets/DesktopInputWidget.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/widgets/PinLockHandler.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/widgets/NotificationsBox.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/DesktopMainWindow.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/PinLockBaseWindow.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/PinLockBox.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/ScreenLockBox.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/SimLockBox.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/PukLockBox.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/PinLockWindow.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/MenuWindow.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/PowerOffWindow.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/LockedInfoWindow.hpp"
-        "${CMAKE_CURRENT_LIST_DIR}/windows/Reboot.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/Update.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/UpdateProgress.hpp"
-        "${CMAKE_CURRENT_LIST_DIR}/windows/Names.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/MmiPullWindow.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/MmiPushWindow.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/MmiInternalMsgWindow.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/ScreenLockBaseBox.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/LockWindow.hpp"
-)
-
-target_link_libraries(${PROJECT_NAME}
+target_include_directories(application-desktop
     PRIVATE
-        service-cellular
-        service-db
-        service-desktop
-        service-time
-        utils-bootconfig
-    )
+        $<BUILD_INTERFACE:
+			${CMAKE_CURRENT_SOURCE_DIR}/data
+			${CMAKE_CURRENT_SOURCE_DIR}/include/application-desktop
+			${CMAKE_CURRENT_SOURCE_DIR}/models
+			${CMAKE_CURRENT_SOURCE_DIR}/widgets
+			${CMAKE_CURRENT_SOURCE_DIR}/windows
+		>
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+)
+
+target_sources(application-desktop
+	PRIVATE
+		ApplicationDesktop.cpp
+		data/DesktopData.hpp
+		data/DesktopStyle.hpp
+		data/Mmi.hpp
+		models/ActiveNotificationsModel.cpp
+		models/ActiveNotificationsModel.hpp
+		widgets/DBNotificationsHandler.cpp
+		widgets/DesktopInputWidget.cpp
+		widgets/DesktopInputWidget.hpp
+		windows/ChargingBatteryWindow.cpp
+		windows/ChargingBatteryWindow.hpp
+		windows/DeadBatteryWindow.cpp
+		windows/DeadBatteryWindow.hpp
+		windows/DesktopMainWindow.cpp
+		windows/DesktopMainWindow.hpp
+		windows/LogoWindow.cpp
+		windows/LogoWindow.hpp
+		windows/MenuWindow.cpp
+		windows/MenuWindow.hpp
+		windows/MmiInternalMsgWindow.cpp
+		windows/MmiInternalMsgWindow.hpp
+		windows/MmiPullWindow.cpp
+		windows/MmiPullWindow.hpp
+		windows/MmiPushWindow.cpp
+		windows/MmiPushWindow.hpp
+		windows/Reboot.cpp
+		windows/Reboot.hpp
+	PUBLIC
+		include/application-desktop/ApplicationDesktop.hpp
+		include/application-desktop/Constants.hpp
+		include/application-desktop/DBNotificationsHandler.hpp
+		include/application-desktop/Names.hpp
+)
+
+target_link_libraries(application-desktop
+    PRIVATE
+		application-messages
+		i18n
+		log
+		magic_enum::magic_enum
+		Microsoft.GSL::GSL
+		module-db
+		module-gui
+		module-sys
+		service-appmgr
+		service-cellular
+		service-db
+		service-time
+		time
+		utf8
+		utils-bootconfig
+	PUBLIC
+		apps-common
+		module-sys
+		service-desktop
+)

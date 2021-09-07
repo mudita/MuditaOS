@@ -1,8 +1,8 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MeditationListItems.hpp"
-#include "application-meditation/data/Style.hpp"
+#include "Style.hpp"
 
 #include <i18n/i18n.hpp>
 
@@ -56,7 +56,7 @@ std::string PreparationTimeItem::convertToPrintable(std::chrono::seconds _durati
 }
 
 OptionItemMeditationCounter::OptionItemMeditationCounter(bool isCounterOn)
-    : MeditationListItem(utils::localize.get("app_meditation_option_show_counter"))
+    : MeditationListItem(utils::translate("app_meditation_option_show_counter"))
 {
     imageOptionOn  = new gui::Image(this,
                                    listStyle::image::X,
@@ -81,8 +81,7 @@ void OptionItemMeditationCounter::select(bool isSelected)
     imageOptionOff->setVisible(!isSelected);
 }
 
-OptionItemPreparation::OptionItemPreparation()
-    : MeditationListItem(utils::localize.get("app_meditation_preparation_time"))
+OptionItemPreparation::OptionItemPreparation() : MeditationListItem(utils::translate("app_meditation_preparation_time"))
 {
     image = new gui::Image(this,
                            listStyle::image::X,

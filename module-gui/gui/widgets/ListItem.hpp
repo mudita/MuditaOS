@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -13,6 +13,7 @@ namespace gui
 
       public:
         bool deleteByList = true;
+        void accept(GuiVisitor &visitor) override;
 
         ListItem();
     };
@@ -20,9 +21,9 @@ namespace gui
     template <class T> class ListItemWithCallbacks : public ListItem
     {
       public:
-        std::function<bool()> onEmptyCallback                          = nullptr;
-        std::function<bool()> onContentChangedCallback                 = nullptr;
-        std::function<void(std::shared_ptr<T> record)> onSaveCallback  = nullptr;
-        std::function<void(std::shared_ptr<T> record)> onLoadCallback  = nullptr;
+        std::function<bool()> onEmptyCallback                         = nullptr;
+        std::function<bool()> onContentChangedCallback                = nullptr;
+        std::function<void(std::shared_ptr<T> record)> onSaveCallback = nullptr;
+        std::function<void(std::shared_ptr<T> record)> onLoadCallback = nullptr;
     };
 } /* namespace gui */

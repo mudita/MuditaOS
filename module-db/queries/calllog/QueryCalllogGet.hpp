@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -21,8 +21,13 @@ namespace db::query
     class CalllogGetResult : public RecordQueryResult<CalllogRecord>
     {
       public:
-        CalllogGetResult(const std::vector<CalllogRecord> &records);
+        CalllogGetResult(std::vector<CalllogRecord> &&records, unsigned int dbRecordsCount);
         [[nodiscard]] auto debugInfo() const -> std::string override;
+
+        [[nodiscard]] auto getTotalCount() const noexcept -> unsigned int;
+
+      private:
+        unsigned int dbRecordsCount;
     };
 
 }; // namespace db::query

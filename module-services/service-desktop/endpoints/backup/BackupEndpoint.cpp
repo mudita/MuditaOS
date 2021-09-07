@@ -9,7 +9,7 @@
 #include <service-desktop/DesktopMessages.hpp>
 #include <service-desktop/ServiceDesktop.hpp>
 
-#include <json/json11.hpp>
+#include <json11.hpp>
 #include <purefs/filesystem_paths.hpp>
 
 #include <filesystem>
@@ -37,19 +37,19 @@ auto BackupEndpoint::request(Context &context) -> sys::ReturnCodes
     auto owner = static_cast<ServiceDesktop *>(ownerServicePtr);
 
     if (context.getBody()[json::task].is_string()) {
-        if (owner->getBackupStatus().task == context.getBody()[json::task].string_value()) {
-            if (owner->getBackupStatus().state == true) {
+        if (owner->getBackupRestoreStatus().task == context.getBody()[json::task].string_value()) {
+            if (owner->getBackupRestoreStatus().state != ServiceDesktop::OperationState::Running) {
                 context.setResponseStatus(parserFSM::http::Code::SeeOther);
             }
 
-            context.setResponseBody(owner->getBackupStatus());
+            context.setResponseBody(owner->getBackupRestoreStatus());
         }
         else {
             context.setResponseStatus(parserFSM::http::Code::NotFound);
         }
     }
     else if (context.getBody()[json::request] == true) {
-        if (owner->getBackupStatus().state == true) {
+        if (owner->getBackupRestoreStatus().state == ServiceDesktop::OperationState::Running) {
             // a backup is already running, don't start a second task
             context.setResponseStatus(parserFSM::http::Code::NotAcceptable);
         }
@@ -62,7 +62,7 @@ auto BackupEndpoint::request(Context &context) -> sys::ReturnCodes
                                              service::name::service_desktop);
 
             // return new generated backup info
-            context.setResponseBody(owner->getBackupStatus());
+            context.setResponseBody(owner->getBackupRestoreStatus());
         }
     }
     else {
@@ -70,7 +70,7 @@ auto BackupEndpoint::request(Context &context) -> sys::ReturnCodes
         context.setResponseStatus(parserFSM::http::Code::BadRequest);
     }
 
-    LOG_DEBUG("responding: %s", context.createSimpleResponse().c_str());
+    LOG_DEBUG("responding");
     MessageHandler::putToSendQueue(context.createSimpleResponse());
 
     return sys::ReturnCodes::Success;

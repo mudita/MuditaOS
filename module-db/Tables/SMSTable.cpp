@@ -1,8 +1,8 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SMSTable.hpp"
-#include <log/log.hpp>
+#include <log.hpp>
 
 SMSTable::SMSTable(Database *db) : Table(db)
 {}
@@ -14,12 +14,11 @@ bool SMSTable::create()
 
 bool SMSTable::add(SMSTableRow entry)
 {
-    return db->execute("INSERT or ignore INTO sms ( thread_id,contact_id, date, date_send, error_code, body, "
-                       "type ) VALUES (%lu,%lu,%lu,%lu,0,'%q',%d);",
+    return db->execute("INSERT or ignore INTO sms ( thread_id,contact_id, date, error_code, body, "
+                       "type ) VALUES (%lu,%lu,%lu,0,'%q',%d);",
                        entry.threadID,
                        entry.contactID,
                        entry.date,
-                       entry.dateSent,
                        entry.body.c_str(),
                        entry.type);
 }
@@ -54,12 +53,11 @@ bool SMSTable::removeByField(SMSTableFields field, const char *str)
 
 bool SMSTable::update(SMSTableRow entry)
 {
-    return db->execute("UPDATE sms SET thread_id = %lu, contact_id = %lu ,date = %lu, date_send = %lu, error_code = 0, "
+    return db->execute("UPDATE sms SET thread_id = %lu, contact_id = %lu ,date = %lu, error_code = 0, "
                        "body = '%q', type =%d WHERE _id=%lu;",
                        entry.threadID,
                        entry.contactID,
                        entry.date,
-                       entry.dateSent,
                        entry.body.c_str(),
                        entry.type,
                        entry.ID);
@@ -78,10 +76,9 @@ SMSTableRow SMSTable::getById(uint32_t id)
         (*retQuery)[1].getUInt32(),                       // threadID
         (*retQuery)[2].getUInt32(),                       // contactID
         (*retQuery)[3].getUInt32(),                       // date
-        (*retQuery)[4].getUInt32(),                       // dateSent
-        (*retQuery)[5].getUInt32(),                       // errorCode
-        (*retQuery)[6].getString(),                       // body
-        static_cast<SMSType>((*retQuery)[7].getUInt32()), // type
+        (*retQuery)[4].getUInt32(),                       // errorCode
+        (*retQuery)[5].getString(),                       // body
+        static_cast<SMSType>((*retQuery)[6].getUInt32()), // type
     };
 }
 
@@ -101,10 +98,9 @@ std::vector<SMSTableRow> SMSTable::getByContactId(uint32_t contactId)
             (*retQuery)[1].getUInt32(),                       // threadID
             (*retQuery)[2].getUInt32(),                       // contactID
             (*retQuery)[3].getUInt32(),                       // date
-            (*retQuery)[4].getUInt32(),                       // dateSent
-            (*retQuery)[5].getUInt32(),                       // errorCode
-            (*retQuery)[6].getString(),                       // body
-            static_cast<SMSType>((*retQuery)[7].getUInt32()), // type
+            (*retQuery)[4].getUInt32(),                       // errorCode
+            (*retQuery)[5].getString(),                       // body
+            static_cast<SMSType>((*retQuery)[6].getUInt32()), // type
         });
     } while (retQuery->nextRow());
 
@@ -130,10 +126,9 @@ std::vector<SMSTableRow> SMSTable::getByThreadId(uint32_t threadId, uint32_t off
             (*retQuery)[1].getUInt32(),                       // threadID
             (*retQuery)[2].getUInt32(),                       // contactID
             (*retQuery)[3].getUInt32(),                       // date
-            (*retQuery)[4].getUInt32(),                       // dateSent
-            (*retQuery)[5].getUInt32(),                       // errorCode
-            (*retQuery)[6].getString(),                       // body
-            static_cast<SMSType>((*retQuery)[7].getUInt32()), // type
+            (*retQuery)[4].getUInt32(),                       // errorCode
+            (*retQuery)[5].getString(),                       // body
+            static_cast<SMSType>((*retQuery)[6].getUInt32()), // type
         });
     } while (retQuery->nextRow());
 
@@ -146,7 +141,7 @@ std::vector<SMSTableRow> SMSTable::getByThreadIdWithoutDraftWithEmptyInput(uint3
 {
     auto retQuery = db->query("SELECT * FROM sms WHERE thread_id= %u AND type != %u UNION ALL SELECT 0 as _id, 0 as "
                               "thread_id, 0 as contact_id, 0 as "
-                              "date, 0 as date_send, 0 as error_code, 0 as body, %u as type LIMIT %u OFFSET %u",
+                              "date, 0 as error_code, 0 as body, %u as type LIMIT %u OFFSET %u",
                               threadId,
                               SMSType::DRAFT,
                               SMSType::INPUT,
@@ -165,10 +160,9 @@ std::vector<SMSTableRow> SMSTable::getByThreadIdWithoutDraftWithEmptyInput(uint3
             (*retQuery)[1].getUInt32(),                       // threadID
             (*retQuery)[2].getUInt32(),                       // contactID
             (*retQuery)[3].getUInt32(),                       // date
-            (*retQuery)[4].getUInt32(),                       // dateSent
-            (*retQuery)[5].getUInt32(),                       // errorCode
-            (*retQuery)[6].getString(),                       // body
-            static_cast<SMSType>((*retQuery)[7].getUInt32()), // type
+            (*retQuery)[4].getUInt32(),                       // errorCode
+            (*retQuery)[5].getString(),                       // body
+            static_cast<SMSType>((*retQuery)[6].getUInt32()), // type
         });
     } while (retQuery->nextRow());
 
@@ -200,10 +194,9 @@ SMSTableRow SMSTable::getDraftByThreadId(uint32_t threadId)
         (*retQuery)[1].getUInt32(),                       // threadID
         (*retQuery)[2].getUInt32(),                       // contactID
         (*retQuery)[3].getUInt32(),                       // date
-        (*retQuery)[4].getUInt32(),                       // dateSent
-        (*retQuery)[5].getUInt32(),                       // errorCode
-        (*retQuery)[6].getString(),                       // body
-        static_cast<SMSType>((*retQuery)[7].getUInt32()), // type
+        (*retQuery)[4].getUInt32(),                       // errorCode
+        (*retQuery)[5].getString(),                       // body
+        static_cast<SMSType>((*retQuery)[6].getUInt32()), // type
     };
 }
 
@@ -224,10 +217,9 @@ std::vector<SMSTableRow> SMSTable::getByText(std::string text)
             (*retQuery)[1].getUInt32(),                       // threadID
             (*retQuery)[2].getUInt32(),                       // contactID
             (*retQuery)[3].getUInt32(),                       // date
-            (*retQuery)[4].getUInt32(),                       // dateSent
-            (*retQuery)[5].getUInt32(),                       // errorCode
-            (*retQuery)[6].getString(),                       // body
-            static_cast<SMSType>((*retQuery)[7].getUInt32()), // type
+            (*retQuery)[4].getUInt32(),                       // errorCode
+            (*retQuery)[5].getString(),                       // body
+            static_cast<SMSType>((*retQuery)[6].getUInt32()), // type
         });
     } while (retQuery->nextRow());
 
@@ -249,10 +241,9 @@ std::vector<SMSTableRow> SMSTable::getByText(std::string text, uint32_t threadId
             (*retQuery)[1].getUInt32(),                       // threadID
             (*retQuery)[2].getUInt32(),                       // contactID
             (*retQuery)[3].getUInt32(),                       // date
-            (*retQuery)[4].getUInt32(),                       // dateSent
-            (*retQuery)[5].getUInt32(),                       // errorCode
-            (*retQuery)[6].getString(),                       // body
-            static_cast<SMSType>((*retQuery)[7].getUInt32()), // type
+            (*retQuery)[4].getUInt32(),                       // errorCode
+            (*retQuery)[5].getString(),                       // body
+            static_cast<SMSType>((*retQuery)[6].getUInt32()), // type
         });
     } while (retQuery->nextRow());
     return ret;
@@ -274,10 +265,9 @@ std::vector<SMSTableRow> SMSTable::getLimitOffset(uint32_t offset, uint32_t limi
             (*retQuery)[1].getUInt32(),                       // threadID
             (*retQuery)[2].getUInt32(),                       // contactID
             (*retQuery)[3].getUInt32(),                       // date
-            (*retQuery)[4].getUInt32(),                       // dateSent
-            (*retQuery)[5].getUInt32(),                       // errorCode
-            (*retQuery)[6].getString(),                       // body
-            static_cast<SMSType>((*retQuery)[7].getUInt32()), // type
+            (*retQuery)[4].getUInt32(),                       // errorCode
+            (*retQuery)[5].getString(),                       // body
+            static_cast<SMSType>((*retQuery)[6].getUInt32()), // type
         });
     } while (retQuery->nextRow());
 
@@ -323,10 +313,9 @@ std::vector<SMSTableRow> SMSTable::getLimitOffsetByField(uint32_t offset,
             (*retQuery)[1].getUInt32(),                       // threadID
             (*retQuery)[2].getUInt32(),                       // contactID
             (*retQuery)[3].getUInt32(),                       // date
-            (*retQuery)[4].getUInt32(),                       // dateSent
-            (*retQuery)[5].getUInt32(),                       // errorCode
-            (*retQuery)[6].getString(),                       // body
-            static_cast<SMSType>((*retQuery)[7].getUInt32()), // type
+            (*retQuery)[4].getUInt32(),                       // errorCode
+            (*retQuery)[5].getString(),                       // body
+            static_cast<SMSType>((*retQuery)[6].getUInt32()), // type
         });
     } while (retQuery->nextRow());
 
@@ -375,10 +364,9 @@ std::pair<uint32_t, std::vector<SMSTableRow>> SMSTable::getManyByType(SMSType ty
                     (*retQuery)[1].getUInt32(),                       // threadID
                     (*retQuery)[2].getUInt32(),                       // contactID
                     (*retQuery)[3].getUInt32(),                       // date
-                    (*retQuery)[4].getUInt32(),                       // dateSent
-                    (*retQuery)[5].getUInt32(),                       // errorCode
-                    (*retQuery)[6].getString(),                       // body
-                    static_cast<SMSType>((*retQuery)[7].getUInt32()), // type
+                    (*retQuery)[4].getUInt32(),                       // errorCode
+                    (*retQuery)[5].getString(),                       // body
+                    static_cast<SMSType>((*retQuery)[6].getUInt32()), // type
                 });
             } while (retQuery->nextRow());
         }

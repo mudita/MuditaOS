@@ -3,7 +3,6 @@
 
 list(APPEND CMAKE_MODULE_PATH "${SRC_DIR}/cmake/modules")
 include(Version)
-
 configure_file(
     ${SRC_DIR}/source/version.hpp.template
     ${CMAKE_BINARY_DIR}/source/version.hpp

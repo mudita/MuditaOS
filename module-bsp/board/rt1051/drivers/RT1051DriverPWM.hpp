@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -27,7 +27,15 @@ namespace drivers
 
         void UpdateClockFrequency(std::uint32_t newFrequency) final;
 
+        enum class PwmState
+        {
+            Off,
+            On,
+        };
+
       private:
+        PwmState GetPwmState();
+
         void SetupPWMChannel(PWMChannel channel);
 
         void SetupPWMInstance(std::uint32_t clockFrequency);

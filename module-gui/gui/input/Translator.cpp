@@ -1,8 +1,8 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Translator.hpp"
-#include "log/log.hpp"
+#include <log.hpp>
 #include <algorithm>
 #include <filesystem>
 #include "i18n/i18n.hpp"
@@ -16,47 +16,66 @@ namespace gui
         constexpr auto special = "special";
     } // namespace filetype
 
-    void recon_long_press(InputEvent &evt, const RawKey &key, const RawKey &prev_key_press, uint32_t time)
-    {
-        if (key.state == RawKey::State::Released && prev_key_press.key_code == key.key_code) {
-            // determine long press
-            if (key.time_release - prev_key_press.time_press >= key_time_longpress_ms) {
-                evt.state = InputEvent::State::keyReleasedLong;
-            }
-        }
-    }
-
     InputEvent KeyBaseTranslation::set(RawKey key)
     {
         gui::InputEvent evt(key);
-        if (key.state == RawKey::State::Pressed) {
-            evt.state = InputEvent::State::keyPressed;
+        switch (key.state) {
+        case RawKey::State::Pressed:
+            evt.setState(InputEvent::State::keyPressed);
+            break;
+        case RawKey::State::Released:
+            translateRelease(evt, key);
+            break;
+        case RawKey::State::Moved:
+            evt.setState(InputEvent::State::keyMoved);
+            break;
+        case RawKey::State::Undefined:
+            evt.setState(InputEvent::State::Undefined);
+            break;
         }
-        else if (key.state == RawKey::State::Released) {
-            evt.state = InputEvent::State::keyReleasedShort;
-        }
-        recon_long_press(evt, key, prev_key_press, key_time_longpress_ms);
         // store last key press/release
         if (key.state == RawKey::State::Pressed) {
-            prev_key_press = key;
+            previousKeyPress = key;
         }
-        if (key.state != RawKey::State::Released) {
-            prev_key_released = false;
-        }
-        else {
-            prev_key_released = true;
-        }
+        isPreviousKeyPressed = (key.state == RawKey::State::Pressed);
+
         return evt;
     }
 
-    bool KeyBaseTranslation::timeout(uint32_t time)
+    void KeyBaseTranslation::translateRelease(InputEvent &evt, const RawKey &key)
     {
-        if (!prev_key_released && (prev_key_press.time_press != 0) &&
-            (time - prev_key_press.time_press >= key_time_longpress_ms)) {
-            prev_key_timedout = true;
+        if (!isPreviousKeyPressed) {
+            // Release can only happen after Press
+            evt.setState(InputEvent::State::Undefined);
+            return;
+        }
+        if ((previousKeyPress.keyCode == key.keyCode) &&
+            (key.timeRelease - previousKeyPress.timePress >= keyTimeLongpressMs)) {
+            evt.setState(InputEvent::State::keyReleasedLong);
+        }
+        else {
+            evt.setState(InputEvent::State::keyReleasedShort);
+        }
+    }
+
+    bool KeyBaseTranslation::isKeyPressTimedOut(uint32_t actualTimeStamp)
+    {
+        if (isPreviousKeyPressed && (previousKeyPress.timePress != 0) &&
+            (actualTimeStamp - previousKeyPress.timePress >= keyTimeLongpressMs)) {
+            isPreviousKeyTimedOut = true;
             return true;
         }
         return false;
+    }
+
+    void KeyBaseTranslation::resetPreviousKeyPress()
+    {
+        previousKeyPress = {};
+    }
+
+    void KeyBaseTranslation::setPreviousKeyTimedOut(bool status)
+    {
+        isPreviousKeyTimedOut = status;
     }
 
     gui::KeyCode getKeyCode(bsp::KeyCodes code)
@@ -137,6 +156,16 @@ namespace gui
         case bsp::KeyCodes::SSwitchMid:
             return gui::KeyCode::SWITCH_MID;
             break;
+        case bsp::KeyCodes::HeadsetOk:
+            return gui::KeyCode::HEADSET_OK;
+
+        case bsp::KeyCodes::HeadsetVolUp:
+            void resetPreviousKeyPress();
+            return gui::KeyCode::HEADSET_VOLUP;
+
+        case bsp::KeyCodes::HeadsetVolDown:
+            return gui::KeyCode::HEADSET_VOLDN;
+
         default:
             LOG_ERROR("Unhandled bsp key!");
             return gui::KeyCode::KEY_UNDEFINED;
@@ -147,36 +176,28 @@ namespace gui
     {
         auto evt = KeyBaseTranslation::set(key);
         // when last action timed out we don't want to handle key release
-        if (prev_key_timedout && key.state == RawKey::State::Released) {
-            evt.state         = InputEvent::State::Undefined;
-            prev_key_timedout = false;
+        if (isPreviousKeyTimedOut && key.state == RawKey::State::Released) {
+            evt.setState(InputEvent::State::Undefined);
+            isPreviousKeyTimedOut = false;
         }
-        evt.keyCode = getKeyCode(key.key_code);
+        evt.setKeyCode(getKeyCode(key.keyCode));
         return evt;
     }
 
     InputEvent KeyInputSimpleTranslation::translate(uint32_t timeout)
     {
-        RawKey key;
-        key.state        = RawKey::State::Released;
-        key.key_code     = prev_key_press.key_code;
-        key.time_press   = 0;
-        key.time_release = timeout;
-        InputEvent evt(key);
-        evt.state   = InputEvent::State::keyReleasedLong;
-        evt.keyCode = getKeyCode(key.key_code);
-        return evt;
+        RawKey key{RawKey::State::Released, previousKeyPress.keyCode, 0, timeout};
+        return InputEvent{key, InputEvent::State::keyReleasedLong, getKeyCode(key.keyCode)};
     }
 
     uint32_t KeyInputMappedTranslation::handle(RawKey key, const std::string &keymap)
     {
         // get shortpress
-        if (prev_key_press.key_code != key.key_code) {
+        if (previousKeyPress.keyCode != key.keyCode) {
             times = 0;
         }
         else if (key.state == RawKey::State::Released) {
-            /// TODO use key_time_cycle_ms from keymap (if exists in keymap...)
-            if (key.time_release - prev_key_press.time_release < key_time_cycle_ms) {
+            if (key.timeRelease - previousKeyPress.timeRelease < keyTimeCycleMs) {
                 ++times;
             }
             else {
@@ -184,9 +205,9 @@ namespace gui
             }
         }
         if (key.state == RawKey::State::Released) {
-            prev_key_press = key;
+            previousKeyPress = key;
         }
-        return profiles.get(keymap).getCharKey(key.key_code, times);
+        return profiles.get(keymap).getCharKey(key.keyCode, times);
     }
 
     uint32_t KeyInputMappedTranslation::getTimes() const noexcept
@@ -206,11 +227,9 @@ namespace gui
     std::vector<std::string> Profiles::getProfilesNames()
     {
         std::vector<std::string> profilesNames;
-        LOG_INFO("Scanning %s profiles folder: %s",
-                 utils::files::jsonExtension,
-                 utils::localize.InputLanguageDirPath.c_str());
+        LOG_INFO("Scanning %s profiles folder: %s", utils::files::jsonExtension, utils::getInputLanguagePath().c_str());
 
-        for (const auto &entry : std::filesystem::directory_iterator(utils::localize.InputLanguageDirPath)) {
+        for (const auto &entry : std::filesystem::directory_iterator(utils::getInputLanguagePath())) {
             profilesNames.push_back(std::filesystem::path(entry.path().stem()));
         }
 
@@ -242,7 +261,7 @@ namespace gui
         std::vector<std::string> profilesNames = getProfilesNames();
         for (const auto &profileName : profilesNames) {
             if (!profileName.empty()) {
-                auto filePath = utils::localize.InputLanguageDirPath / (profileName + utils::files::jsonExtension);
+                auto filePath = utils::getInputLanguagePath() / (profileName + utils::files::jsonExtension);
                 loadProfile(filePath);
             }
         }
@@ -263,7 +282,7 @@ namespace gui
 
     Profile &Profiles::get(const std::string &name)
     {
-        std::filesystem::path filepath = utils::localize.InputLanguageDirPath / (name + utils::files::jsonExtension);
+        std::filesystem::path filepath = utils::getInputLanguagePath() / (name + utils::files::jsonExtension);
         // if profile not in profile map -> load
         if (filepath.empty()) {
             LOG_ERROR("Request for nonexistent profile: %s", filepath.c_str());

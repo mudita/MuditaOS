@@ -1,8 +1,9 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <Utils.hpp>
 #include "decoderFLAC.hpp"
+#include "flac/flacfile.h"
 
 #define DR_FLAC_IMPLEMENTATION
 #define DR_FLAC_NO_STDIO
@@ -22,7 +23,7 @@ namespace audio
             return;
         }
 
-        flac = drflac_open_with_metadata(drflac_read, drflac_seek, drflac_meta, this);
+        flac = drflac_open(drflac_read, drflac_seek, this);
         if (flac == NULL) {
             return;
         }
@@ -81,30 +82,11 @@ namespace audio
         return !std::fseek(userdata->fd, offset, origin == drflac_seek_origin_start ? SEEK_SET : SEEK_CUR);
     }
 
-    void decoderFLAC::drflac_meta(void *pUserData, drflac_metadata *pMetadata)
+    auto decoderFLAC::getBitWidth() -> unsigned int
     {
-        decoderFLAC *userdata = (decoderFLAC *)pUserData;
-
-        if (pMetadata->type == DRFLAC_METADATA_BLOCK_TYPE_STREAMINFO) {
-            userdata->tag->total_duration_s =
-                (pMetadata->data.streaminfo.totalSampleCount / (pMetadata->data.streaminfo.bitsPerSample / 8)) /
-                pMetadata->data.streaminfo.sampleRate;
-
-            if (pMetadata->data.streaminfo.channels == 1) {
-                userdata->tag->total_duration_s *= 2;
-            }
-
-            userdata->tag->duration_min  = userdata->tag->total_duration_s / utils::secondsInMinute;
-            userdata->tag->duration_hour = userdata->tag->duration_min / utils::secondsInMinute;
-            userdata->tag->duration_sec  = userdata->tag->total_duration_s % utils::secondsInMinute;
-            userdata->tag->sample_rate   = pMetadata->data.streaminfo.sampleRate;
-            userdata->tag->num_channel   = pMetadata->data.streaminfo.channels;
-
-            userdata->sampleRate = pMetadata->data.streaminfo.sampleRate;
-            userdata->chanNumber = pMetadata->data.streaminfo.channels;
-
-            userdata->totalSamplesCount = pMetadata->data.streaminfo.totalSampleCount;
-        }
+        TagLib::FLAC::File flacFile(filePath.c_str());
+        auto properties = flacFile.audioProperties();
+        return properties->bitsPerSample();
     }
 
 } // namespace audio

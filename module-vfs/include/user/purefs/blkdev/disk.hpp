@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -11,9 +11,9 @@ namespace purefs::blkdev
     class disk
     {
       public:
+        disk()             = default;
         disk(const disk &) = delete;
         auto operator=(const disk &) = delete;
-        disk()                       = default;
         virtual ~disk()              = default;
 
         /** Initialize the disk this method is called by the disc manager
@@ -25,35 +25,38 @@ namespace purefs::blkdev
         /** Disk cleanup just before unregistering
          * @return  zero on success otherwise error
          */
-        virtual auto cleanup() -> int = 0;
+        virtual auto cleanup() -> int;
 
         /** Write a data onto block device or partition
          * @param[in] buf Data buffer to write
          * @param[in] lba First sector
-         * @param[in] Count sectors count
+         * @param[in] count sectors count
+         * @param[in] hwpart Hardware partition
          * @return zero on success otherwise error
          */
-        virtual auto write(const void *buf, sector_t lba, std::size_t count) -> int = 0;
+        virtual auto write(const void *buf, sector_t lba, std::size_t count, hwpart_t hwpart) -> int = 0;
 
         /** Read a data from block device or partition
          * @param[in] buf Data buffer for read
          * @param[in] lba First sector
-         * @param[in] Count sectors count
+         * @param[in] count sectors count
+         * @param[in] hwpart Hardware partition
          * @return zero on success otherwise error
          */
-        virtual auto read(void *buf, sector_t lba, std::size_t count) -> int = 0;
+        virtual auto read(void *buf, sector_t lba, std::size_t count, hwpart_t hwpart) -> int = 0;
 
         /** Erase selected area on the block device or partition
          * @param[in] lba First sector to erase
          * @param[in] count Sectors count for erase
+         * @param[in] hwpart Hardware partition
          * @return zero or success otherwise error
          */
-        virtual auto erase(sector_t lba, std::size_t count) -> int;
+        virtual auto erase(sector_t lba, std::size_t count, hwpart_t hwpart) -> int;
 
         /** Flush buffers and write all data into the physical device
          * @return zero or success otherwise error
          */
-        virtual auto sync() -> int = 0;
+        virtual auto sync() -> int;
 
         /** Set block device power state
          * @param[in] target_state Set the target power state
@@ -77,9 +80,10 @@ namespace purefs::blkdev
 
         /** List the partitions on the underlaying device
          * @param[in] device_name Block device name
+         * @param[in] hwpart Hardware partition
          * @return Partition list @see partition
          */
-        [[nodiscard]] virtual auto get_info(info_type what) const -> scount_t = 0;
+        [[nodiscard]] virtual auto get_info(info_type what, hwpart_t hwpart) const -> scount_t = 0;
 
         /** List the partitions on the underlaying device
          * @param[in] device_name Block device name
@@ -90,7 +94,6 @@ namespace purefs::blkdev
             return m_partitions;
         }
 
-      protected:
         /** Clear all partitions */
         auto clear_partitions() -> void
         {

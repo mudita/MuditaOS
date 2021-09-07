@@ -2,27 +2,26 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DeadBatteryWindow.hpp"
-#include "InputEvent.hpp"
-#include "gui/widgets/Image.hpp"
-#include "gui/widgets/BottomBar.hpp"
-#include "gui/widgets/TopBar.hpp"
-#include "log/log.hpp"
-#include <application-desktop/windows/Names.hpp>
-#include <service-appmgr/model/ApplicationManager.hpp>
+#include "Names.hpp"
+
+#include <gui/widgets/Image.hpp>
+#include <Image.hpp>
+#include <InputEvent.hpp>
+#include <log.hpp>
 #include <service-appmgr/Controller.hpp>
 
 namespace gui
 {
     namespace
     {
-        constexpr inline auto SHUTDOWN_TIMER_MS = 500;
-        constexpr inline auto IMG_POS_X         = 176;
-        constexpr inline auto IMG_POS_Y         = 250;
+        constexpr inline auto imgPositionX = 176;
+        constexpr inline auto imgPositionY = 250;
     } // namespace
 
     DeadBatteryWindow::DeadBatteryWindow(app::Application *app) : AppWindow(app, app::window::name::dead_battery)
     {
         buildInterface();
+        preventsAutoLock = true;
     }
 
     void DeadBatteryWindow::rebuild()
@@ -35,19 +34,18 @@ namespace gui
     {
         AppWindow::buildInterface();
         bottomBar->setVisible(false);
-        topBar->setVisible(false);
-
-        image = new gui::Image(this, IMG_POS_X, IMG_POS_Y, 0, 0, "dead_battery_W_G");
-    }
-
-    void DeadBatteryWindow::onBeforeShow(ShowMode mode, SwitchData *data)
-    {
-        app::manager::Controller::sendAction(application, app::manager::actions::CloseSystem);
+        statusBar->setVisible(false);
+        new gui::Image(this, imgPositionX, imgPositionY, 0, 0, "dead_battery_W_G");
     }
 
     void DeadBatteryWindow::destroyInterface()
     {
         erase();
-        image = nullptr;
+    }
+
+    bool DeadBatteryWindow::onInput(const InputEvent &inputEvent)
+    {
+        // Ignore all inputs
+        return true;
     }
 } /* namespace gui */

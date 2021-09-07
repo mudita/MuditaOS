@@ -1,0 +1,66 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+
+participant "Incoming call URC" as urc
+participant "Call request" as call
+participant "Messages DB" as message
+participant "Service cellular" as cellular
+participant "Service cellular notification " as notification
+
+== Connected mode ==
+
+    activate urc
+    activate cellular
+    urc -> cellular : Ring urc / Clip urc
+    cellular -> cellular : identifyNotification
+    cellular -> cellular : CellularRingNotification | CellularCallerIdNotification
+    cellular -> notification :CellularCallerIdMessage | CellularIncominCallMessage
+
+    urc -> cellular : Cmti urc
+    cellular -> cellular : identifyNotification
+    cellular -> cellular : receiveSms
+    cellular -> message : add record
+    deactivate urc
+
+    activate message
+    message -> cellular : new queeued
+    cellular -> cellular : CellularSendSMSMessage
+    cellular -> message : update record
+    deactivate message
+
+    activate call
+    call -> cellular : CellularCallRequestMessage
+    cellular -> cellular : handleCellularCallRequestMessage
+    cellular -> notification : CellularRingingMessage
+    deactivate call
+
+
+== Do not Disturb mode ==
+
+    activate urc
+
+    urc -> cellular : Ring urc / Clip urc
+    cellular -> cellular : identifyNotification
+    cellular -> cellular : CellularRingNotification | CellularCallerIdNotification
+    cellular -> cellular : hangUpCall
+
+    urc -> cellular : Cmti urc
+    cellular -> cellular : identifyNotification
+    cellular -> cellular : receiveSms
+    cellular -> message : add record
+    deactivate urc
+
+    activate message
+    message -> cellular : new queeued
+    cellular -> cellular : CellularSendSMSMessage
+    cellular -> message : update record
+    deactivate message
+
+    activate call
+    call -> cellular : CellularCallRequestMessage
+    cellular -> cellular : handleCellularCallRequestMessage
+    cellular -> notification : CellularRingingMessage
+    deactivate call
+    deactivate cellular
+
+@enduml

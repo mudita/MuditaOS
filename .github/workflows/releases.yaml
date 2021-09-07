@@ -11,7 +11,7 @@ jobs:
     - name: "Check Out"
       uses: actions/checkout@v2
       with:
-        token: ${{ secrets.GitHub_PAT }}
+        token: ${{ secrets.RELEASE_TOKEN }}
         submodules: recursive
         fetch-depth: 0
     - name: "Style checking"
@@ -21,13 +21,17 @@ jobs:
       run: |
         export JOBS=${JOBS:-$(nproc)} && \
         echo "JOBS=${JOBS}" &&  \
-        ./configure.sh linux Debug -G Ninja && \
-        pushd build-linux-Debug && \
+        ./configure.sh pure linux Debug -G Ninja && \
+        pushd build-purephone-linux-Debug && \
         ninja unittests && \
         popd
     - name: Run unit tests
       run: |
-        ./tools/run_unittests.sh enabled_unittests
+        export JOBS=${JOBS:-$(nproc)} && \
+        echo "JOBS=${JOBS}" &&  \
+        pushd build-purephone-linux-Debug && \
+        ninja check -j ${JOBS} && \
+        popd
     - name: "Build and package for RT1051"
       id: build_release_package 
       env:
@@ -36,11 +40,11 @@ jobs:
       run: |
         export JOBS=${JOBS:-$(nproc)} && \
         echo "JOBS=${JOBS}" &&  \
-        ./configure.sh rt1051 RelWithDebInfo -G Ninja && \
-        pushd build-rt1051-RelWithDebInfo && \
-        ninja -j ${JOBS} && \
-        ninja -j ${JOBS} package-update && \
-        ninja -j ${JOBS} package-standalone && \
+        ./configure.sh pure rt1051 RelWithDebInfo -DWITH_BOARD_REVISION=6 -G Ninja && \
+        pushd build-purephone-rt1051-RelWithDebInfo && \
+        ninja -j ${JOBS} Pure&& \
+        ninja -j ${JOBS} PurePhone-UpdatePackage && \
+        ninja -j ${JOBS} PurePhone-StandaloneImage && \
         popd && \
         ./print_last_changes.sh && \
         uptime
@@ -48,7 +52,7 @@ jobs:
       id: create_release
       uses: actions/create-release@v1
       env:
-        GITHUB_TOKEN: ${{ secrets.GitHub_PAT }}
+        GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
       with:
         tag_name: ${{ github.ref }}
         release_name: ${{ github.ref }}
@@ -59,7 +63,7 @@ jobs:
       id: upload-stanalone-package
       uses: actions/upload-release-asset@v1.0.2
       env:
-        GITHUB_TOKEN: ${{ secrets.GitHub_PAT }}
+        GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         # here we have to use relative path with starting "./"
@@ -70,7 +74,7 @@ jobs:
       id: upload-update-package
       uses: actions/upload-release-asset@v1.0.2
       env:
-        GITHUB_TOKEN: ${{ secrets.GitHub_PAT }}
+        GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         # here we have to use relative path with starting "./"

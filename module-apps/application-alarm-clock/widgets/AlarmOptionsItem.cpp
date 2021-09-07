@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmOptionsItem.hpp"
@@ -6,7 +6,7 @@
 #include <InputEvent.hpp>
 #include <Style.hpp>
 #include <Utils.hpp>
-#include <module-services/service-audio/service-audio/AudioServiceAPI.hpp>
+#include <service-audio/AudioServiceAPI.hpp>
 #include <purefs/filesystem_paths.hpp>
 
 namespace gui
@@ -21,6 +21,9 @@ namespace gui
     {
         application = app;
         assert(app != nullptr);
+
+        // create audioOperations to allow shounds preview
+        audioOperations = std::make_unique<app::AsyncAudioOperations>(app);
 
         setMinimumSize(style::window::default_body_width, style::alarmClock::window::item::options::height);
 
@@ -83,13 +86,13 @@ namespace gui
         optionsNames.clear();
         switch (itemName) {
         case AlarmOptionItemName::Sound:
-            descriptionLabel->setText(utils::localize.get("app_alarm_clock_sound"));
+            descriptionLabel->setText(utils::translate("app_alarm_clock_sound"));
             break;
         case AlarmOptionItemName::Snooze:
-            descriptionLabel->setText(utils::localize.get("app_alarm_clock_snooze"));
+            descriptionLabel->setText(utils::translate("app_alarm_clock_snooze"));
             break;
         case AlarmOptionItemName::Repeat:
-            descriptionLabel->setText(utils::localize.get("app_alarm_clock_repeat"));
+            descriptionLabel->setText(utils::translate("app_alarm_clock_repeat"));
             break;
         }
         if (itemName == AlarmOptionItemName::Sound) {
@@ -98,16 +101,16 @@ namespace gui
             }
         }
         else if (itemName == AlarmOptionItemName::Snooze) {
-            optionsNames.push_back(utils::localize.get("app_alarm_clock_snooze_5_min"));
-            optionsNames.push_back(utils::localize.get("app_alarm_clock_snooze_10_min"));
-            optionsNames.push_back(utils::localize.get("app_alarm_clock_snooze_15_min"));
-            optionsNames.push_back(utils::localize.get("app_alarm_clock_snooze_30_min"));
+            optionsNames.push_back(utils::translate("app_alarm_clock_snooze_5_min"));
+            optionsNames.push_back(utils::translate("app_alarm_clock_snooze_10_min"));
+            optionsNames.push_back(utils::translate("app_alarm_clock_snooze_15_min"));
+            optionsNames.push_back(utils::translate("app_alarm_clock_snooze_30_min"));
         }
         else if (itemName == AlarmOptionItemName::Repeat) {
-            optionsNames.push_back(utils::localize.get("app_alarm_clock_repeat_never"));
-            optionsNames.push_back(utils::localize.get("app_alarm_clock_repeat_everyday"));
-            optionsNames.push_back(utils::localize.get("app_alarm_clock_repeat_week_days"));
-            optionsNames.push_back(utils::localize.get("app_alarm_clock_repeat_custom"));
+            optionsNames.push_back(utils::translate("app_alarm_clock_repeat_never"));
+            optionsNames.push_back(utils::translate("app_alarm_clock_repeat_everyday"));
+            optionsNames.push_back(utils::translate("app_alarm_clock_repeat_week_days"));
+            optionsNames.push_back(utils::translate("app_alarm_clock_repeat_custom"));
         }
     }
 
@@ -121,10 +124,10 @@ namespace gui
                 rightArrow->setVisible(true);
                 hBox->resizeItems();
                 if (itemName == AlarmOptionItemName::Sound) {
-                    bottomBarTemporaryMode(utils::localize.get("app_alarm_clock_play_pause"));
+                    bottomBarTemporaryMode(utils::translate(style::strings::common::play_pause));
                 }
                 if (itemName == AlarmOptionItemName::Repeat && actualVectorIndex == optionsNames.size() - 1) {
-                    bottomBarTemporaryMode(utils::localize.get("app_alarm_clock_edit"));
+                    bottomBarTemporaryMode(utils::translate("app_alarm_clock_edit"));
                 }
             }
             else {
@@ -135,11 +138,16 @@ namespace gui
                 hBox->resizeItems();
                 bottomBarRestoreFromTemporaryMode();
             }
+
+            // stop preview playback when we loose focus
+            if (itemName == AlarmOptionItemName::Sound && musicStatus == MusicStatus::Play) {
+                stopAudioPreview();
+            }
             return true;
         };
 
         inputCallback = [&](gui::Item &item, const gui::InputEvent &event) {
-            if (event.state != gui::InputEvent::State::keyReleasedShort) {
+            if (!event.isShortRelease()) {
                 return false;
             }
             if (event.is(gui::KeyCode::KEY_RF)) {
@@ -151,7 +159,7 @@ namespace gui
                 if (actualVectorIndex >= optionsNames.size()) {
                     actualVectorIndex = optionsNames.size() - 1;
                     if (itemName == AlarmOptionItemName::Repeat) {
-                        bottomBarTemporaryMode(utils::localize.get("app_alarm_clock_edit"));
+                        bottomBarTemporaryMode(utils::translate("app_alarm_clock_edit"));
                     }
                 }
                 else if (itemName == AlarmOptionItemName::Repeat) {
@@ -167,7 +175,7 @@ namespace gui
                     actualVectorIndex = 0;
                 }
                 if (actualVectorIndex == optionsNames.size() - 1 && itemName == AlarmOptionItemName::Repeat) {
-                    bottomBarTemporaryMode(utils::localize.get("app_alarm_clock_edit"));
+                    bottomBarTemporaryMode(utils::translate("app_alarm_clock_edit"));
                 }
                 else if (itemName == AlarmOptionItemName::Repeat) {
                     bottomBarRestoreFromTemporaryMode();
@@ -185,48 +193,50 @@ namespace gui
             }
 
             if (event.is(gui::KeyCode::KEY_LF) && itemName == AlarmOptionItemName::Sound) {
-                if (musicStatus == MusicStatus::Stop) {
-                    musicStatus = MusicStatus::Play;
-                    AudioServiceAPI::PlaybackStart(
-                        application, audio::PlaybackType::Alarm, songsList[actualVectorIndex].filePath);
+                if (songsList[actualVectorIndex].filePath != currentlyPreviewedPath) {
+                    playAudioPreview(songsList[actualVectorIndex].filePath);
                 }
-                else if (musicStatus == MusicStatus::Play) {
-                    musicStatus = MusicStatus::Stop;
-                    AudioServiceAPI::StopAll(application);
+                else if (musicStatus == MusicStatus::Stop) {
+                    resumeAudioPreview();
                 }
+                else {
+                    pauseAudioPreview();
+                }
+            }
+
+            // stop preview playback when we go back
+            if (itemName == AlarmOptionItemName::Sound && musicStatus == MusicStatus::Play &&
+                event.is(gui::KeyCode::KEY_RF)) {
+                stopAudioPreview();
             }
             return false;
         };
 
-        onSaveCallback = [&](std::shared_ptr<AlarmsRecord> alarm) {
+        onSaveCallback = [&](std::shared_ptr<AlarmEventRecord> alarm) {
             switch (itemName) {
             case AlarmOptionItemName::Sound: {
-                alarm->path = songsList[actualVectorIndex].filePath;
+                // stop preview playback if it is played
+                if (musicStatus == MusicStatus::Play) {
+                    stopAudioPreview();
+                }
+                alarm->musicTone = songsList[actualVectorIndex].filePath;
                 break;
             }
             case AlarmOptionItemName::Snooze: {
-                alarm->snooze = static_cast<uint32_t>(snoozeOptions[actualVectorIndex]);
+                alarm->snoozeDuration = static_cast<uint32_t>(snoozeOptions[actualVectorIndex]);
                 break;
             }
             case AlarmOptionItemName::Repeat: {
-                if (alarm->repeat < optionsNames.size() - 1 && actualVectorIndex != optionsNames.size() - 1) {
-                    alarm->repeat = actualVectorIndex;
-                }
-                else if (alarm->repeat == optionsNames.size() - 1 ||
-                         optionsNames[optionsNames.size() - 1] ==
-                             utils::localize.get("app_alarm_clock_repeat_custom")) {
-                    alarm->repeat = static_cast<uint32_t>(AlarmRepeat::never);
-                }
                 break;
             }
             }
         };
 
-        onLoadCallback = [&](std::shared_ptr<AlarmsRecord> alarm) {
+        onLoadCallback = [&](std::shared_ptr<AlarmEventRecord> alarm) {
             switch (itemName) {
             case AlarmOptionItemName::Sound: {
-                auto it = std::find_if(songsList.begin(), songsList.end(), [alarm](const audio::Tags &tag) {
-                    return tag.filePath == alarm->path.c_str();
+                auto it = std::find_if(songsList.begin(), songsList.end(), [alarm](const tags::fetcher::Tags &tag) {
+                    return tag.filePath == alarm->musicTone.c_str();
                 });
                 if (it == songsList.end()) {
                     LOG_DEBUG("No such song in the list");
@@ -238,8 +248,8 @@ namespace gui
                 break;
             }
             case AlarmOptionItemName::Snooze: {
-                auto it =
-                    std::find(snoozeOptions.begin(), snoozeOptions.end(), static_cast<AlarmSnooze>(alarm->snooze));
+                auto it = std::find(
+                    snoozeOptions.begin(), snoozeOptions.end(), static_cast<AlarmSnooze>(alarm->snoozeDuration));
                 if (it == snoozeOptions.end()) {
                     actualVectorIndex = 0;
                 }
@@ -249,36 +259,6 @@ namespace gui
                 break;
             }
             case AlarmOptionItemName::Repeat: {
-                if (alarm->repeat < optionsNames.size() - 1) {
-                    actualVectorIndex = alarm->repeat;
-                    if (alarm->repeat == static_cast<uint32_t>(AlarmRepeat::never)) {
-                        optionsNames[optionsNames.size() - 1] = utils::localize.get("app_alarm_clock_repeat_custom");
-                    }
-                    bottomBarRestoreFromTemporaryMode();
-                }
-                else {
-                    auto parser = CustomRepeatValueParser(alarm->repeat);
-                    if (parser.isCustomValueEveryday()) {
-                        actualVectorIndex = static_cast<uint32_t>(AlarmRepeat::everyday);
-                        alarm->repeat     = actualVectorIndex;
-                        bottomBarRestoreFromTemporaryMode();
-                        optionsNames[optionsNames.size() - 1] = utils::localize.get("app_alarm_clock_repeat_custom");
-                    }
-                    else if (parser.isCustomValueWeekDays()) {
-                        actualVectorIndex = static_cast<uint32_t>(AlarmRepeat::weekDays);
-                        alarm->repeat     = actualVectorIndex;
-                        bottomBarRestoreFromTemporaryMode();
-                        optionsNames[optionsNames.size() - 1] = utils::localize.get("app_alarm_clock_repeat_custom");
-                    }
-                    else {
-                        actualVectorIndex                     = optionsNames.size() - 1;
-                        optionsNames[optionsNames.size() - 1] = parser.getWeekDaysText();
-                        if (this->focus) {
-                            bottomBarTemporaryMode(utils::localize.get("app_alarm_clock_edit"));
-                        }
-                    }
-                }
-                repeatOptionValue = alarm->repeat;
                 break;
             }
             }
@@ -291,25 +271,80 @@ namespace gui
         };
     }
 
-    std::vector<audio::Tags> AlarmOptionsItem::getMusicFilesList()
+    std::vector<tags::fetcher::Tags> AlarmOptionsItem::getMusicFilesList()
     {
         const auto musicFolder = (purefs::dir::getUserDiskPath() / "music").string();
-        std::vector<audio::Tags> musicFiles;
+        std::vector<tags::fetcher::Tags> musicFiles;
         LOG_INFO("Scanning music folder: %s", musicFolder.c_str());
         for (const auto &ent : std::filesystem::directory_iterator(musicFolder)) {
             if (!ent.is_directory()) {
                 const auto filePath = std::string(musicFolder) + "/" + ent.path().filename().c_str();
-                auto fileTags       = AudioServiceAPI::GetFileTags(application, filePath);
-                if (fileTags) {
-                    musicFiles.push_back(*fileTags);
-                    LOG_DEBUG("file: %s found", ent.path().filename().c_str());
-                }
-                else {
-                    LOG_ERROR("Not an audio file %s", ent.path().filename().c_str());
-                }
+                auto fileTags       = tags::fetcher::fetchTags(filePath);
+                musicFiles.push_back(fileTags);
+                LOG_DEBUG("file: %s found", ent.path().filename().c_str());
             }
         }
         LOG_INFO("Total number of music files found: %u", static_cast<unsigned int>(musicFiles.size()));
         return musicFiles;
+    }
+
+    bool AlarmOptionsItem::playAudioPreview(const std::string &path)
+    {
+        return audioOperations->play(path, [this, path](audio::RetCode retCode, audio::Token token) {
+            if (retCode != audio::RetCode::Success || !token.IsValid()) {
+                LOG_ERROR("Audio preview callback failed with retcode = %s. Token validity: %d",
+                          str(retCode).c_str(),
+                          token.IsValid());
+                return;
+            }
+            musicStatus             = MusicStatus::Play;
+            currentlyPreviewedToken = token;
+            currentlyPreviewedPath  = path;
+        });
+    }
+
+    bool AlarmOptionsItem::pauseAudioPreview()
+    {
+        return audioOperations->pause(currentlyPreviewedToken, [this](audio::RetCode retCode, audio::Token token) {
+            if (token != currentlyPreviewedToken) {
+                LOG_ERROR("Audio preview pause failed: wrong token");
+                return;
+            }
+            if (retCode != audio::RetCode::Success || !token.IsValid()) {
+                LOG_ERROR("Audio preview pause failed with retcode = %s. Token validity: %d",
+                          str(retCode).c_str(),
+                          token.IsValid());
+                return;
+            }
+            musicStatus = MusicStatus::Stop;
+        });
+    }
+
+    bool AlarmOptionsItem::resumeAudioPreview()
+    {
+        return audioOperations->resume(currentlyPreviewedToken, [this](audio::RetCode retCode, audio::Token token) {
+            if (token != currentlyPreviewedToken) {
+                LOG_ERROR("Audio preview resume failed: wrong token");
+                return;
+            }
+
+            if (retCode != audio::RetCode::Success || !token.IsValid()) {
+                LOG_ERROR("Audio preview pause failed with retcode = %s. Token validity: %d",
+                          str(retCode).c_str(),
+                          token.IsValid());
+                return;
+            }
+            musicStatus = MusicStatus::Play;
+        });
+    }
+
+    bool AlarmOptionsItem::stopAudioPreview()
+    {
+        if (currentlyPreviewedToken.IsValid()) {
+            musicStatus            = MusicStatus::Stop;
+            currentlyPreviewedPath = "";
+            return audioOperations->stop(currentlyPreviewedToken, [](audio::RetCode, audio::Token) {});
+        }
+        return false;
     }
 } /* namespace gui */

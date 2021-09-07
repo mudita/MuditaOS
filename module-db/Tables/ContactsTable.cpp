@@ -1,8 +1,9 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ContactsTable.hpp"
-#include <log/log.hpp>
+#include <log.hpp>
+#include <Utils.hpp>
 
 namespace ColumnName
 {
@@ -95,7 +96,7 @@ ContactsTableRow ContactsTable::getByIdCommon(std::unique_ptr<QueryResult> retQu
     debug_db_data(
         "got results: %" PRIu32 "; ID: %" PRIu32, retQuery->getRowCount(), (*retQuery)[ColumnName::id].getInt32());
     return ContactsTableRow{
-        {.ID = (*retQuery)[ColumnName::id].getUInt32()},
+        Record((*retQuery)[ColumnName::id].getUInt32()),
         .nameID    = (*retQuery)[ColumnName::name_id].getUInt32(),
         .numbersID = (*retQuery)[ColumnName::numbers_id].getString(),
         .ringID    = (*retQuery)[ColumnName::ring_id].getUInt32(),
@@ -287,9 +288,22 @@ std::vector<std::uint32_t> ContactsTable::GetIDsSortedByField(
     switch (matchType) {
     case MatchType::Name: {
         query += exclude_temporary;
+
         if (!name.empty()) {
-            query += " AND ( contact_name.name_primary || ' ' || contact_name.name_alternative LIKE '" + name + "%%'";
-            query += " OR contact_name.name_alternative || ' ' || contact_name.name_primary LIKE '" + name + "%%')";
+            const auto names     = utils::split(name, " ");
+            const auto namePart1 = names[0];
+            const auto namePart2 = names.size() > 1 ? names[1] : "";
+
+            if (!namePart1.empty() && !namePart2.empty()) {
+                query += " AND (( contact_name.name_primary LIKE '" + namePart1 + "%%'";
+                query += " AND contact_name.name_alternative  LIKE '" + namePart2 + "%%')";
+                query += " OR ( contact_name.name_primary LIKE '" + namePart2 + "%%'";
+                query += " AND contact_name.name_alternative  LIKE '" + namePart1 + "%%'))";
+            }
+            else {
+                query += " AND ( contact_name.name_primary LIKE '" + namePart1 + "%%'";
+                query += " OR contact_name.name_alternative  LIKE '" + namePart1 + "%%')";
+            }
         }
     } break;
 

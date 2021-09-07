@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -6,8 +6,13 @@
 #include <Bluetooth/Device.hpp>
 #include <Bluetooth/Error.hpp>
 #include <BtCommand.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <Audio/AudioCommon.hpp>
+#include <audio/BluetoothAudioDevice.hpp>
+
+#include "MediaContext.hpp"
+
+#include <memory>
 
 extern "C"
 {
@@ -17,29 +22,6 @@ extern "C"
 
 namespace bluetooth
 {
-    static constexpr int SBC_STORAGE_SIZE = 1030;
-    struct MediaContext
-    {
-        uint16_t a2dp_cid;
-        uint8_t local_seid;
-        uint8_t remote_seid;
-        uint8_t stream_opened;
-        uint16_t avrcp_cid;
-
-        uint32_t time_audio_data_sent_in_ms;
-        uint32_t acc_num_missed_samples;
-        uint32_t samples_ready;
-        btstack_timer_source_t audio_timer;
-        uint8_t streaming;
-        int max_media_payload_size;
-
-        uint8_t sbc_storage[SBC_STORAGE_SIZE];
-        uint16_t sbc_storage_count;
-        uint8_t sbc_ready_to_send;
-
-        uint16_t volume;
-    };
-
     class AVRCP;
     class A2DP::A2DPImpl
     {
@@ -66,9 +48,9 @@ namespace bluetooth
         static void sourcePacketHandler(uint8_t packetType, uint16_t channel, uint8_t *packet, uint16_t size);
         static void hciPacketHandler(uint8_t packetType, uint16_t channel, uint8_t *packet, uint16_t size);
         static void sendMediaPacket();
-        static auto fillSbcAudioBuffer(MediaContext *context) -> int;
         static void sendAudioEvent(audio::EventType event, audio::Event::DeviceState state);
         static bool isConnected;
+        static std::shared_ptr<BluetoothAudioDevice> audioDevice;
 
       public:
         auto init() -> Error::Code;
@@ -79,5 +61,6 @@ namespace bluetooth
         void setDeviceAddress(bd_addr_t addr);
         void setOwnerService(const sys::Service *service);
         auto getStreamData() -> std::shared_ptr<BluetoothStreamData>;
+        void setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice);
     };
-} // namespace Bt
+} // namespace bluetooth

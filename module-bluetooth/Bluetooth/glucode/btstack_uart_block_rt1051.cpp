@@ -1,8 +1,8 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <bsp/bluetooth/Bluetooth.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 
 using namespace bsp;
 
@@ -86,6 +86,17 @@ extern "C"
         BlueKitchen::getInstance()->write(buffer, length);
     }
 
+    static int btstack_uart_rt1051_get_supported_sleep_modes(void)
+    {
+        return BTSTACK_UART_SLEEP_MASK_RTS_HIGH_WAKE_ON_CTS_PULSE;
+    }
+
+    static void btstack_uart_rt1051_set_sleep(btstack_uart_sleep_mode_t sleep_mode)
+    {}
+
+    static void btstack_uart_rt1051_set_wakeup_handler(void (*the_wakeup_handler)(void))
+    {}
+
     static const btstack_uart_block_t btstack_uart_posix = {
         /* int  (*init)(hci_transport_config_uart_t * config); */ uart_rt1051_init,
         /* int  (*open)(void); */ uart_rt1051_open,
@@ -97,9 +108,9 @@ extern "C"
         /* int  (*set_flowcontrol)(int flowcontrol); */ NULL, // uart_rt1051_set_flowcontrol,
         /* void (*receive_block)(uint8_t *buffer, uint16_t len); */ uart_rt1051_receive_block,
         /* void (*send_block)(const uint8_t *buffer, uint16_t length); */ uart_rt1051_send_block,
-        /* int (*get_supported_sleep_modes); */ NULL,
-        /* void (*set_sleep)(btstack_uart_sleep_mode_t sleep_mode); */ NULL,
-        /* void (*set_wakeup_handler)(void (*handler)(void)); */ NULL,
+        /* int (*get_supported_sleep_modes); */ &btstack_uart_rt1051_get_supported_sleep_modes,
+        /* void (*set_sleep)(btstack_uart_sleep_mode_t sleep_mode); */ &btstack_uart_rt1051_set_sleep,
+        /* void (*set_wakeup_handler)(void (*handler)(void)); */ &btstack_uart_rt1051_set_wakeup_handler,
     };
 
     const btstack_uart_block_t *btstack_uart_block_rt1051_instance()

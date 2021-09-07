@@ -19,6 +19,12 @@ namespace audio
 
     class Audio
     {
+        enum class Muted : bool
+        {
+            True,
+            False
+        };
+
       public:
         enum class State
         {
@@ -43,8 +49,6 @@ namespace audio
             return currentState;
         }
 
-        static std::optional<Tags> GetFileTags(const char *filename);
-
         // Range 0-1
         audio::RetCode SetOutputVolume(Volume vol);
 
@@ -59,6 +63,11 @@ namespace audio
         Gain GetInputGain()
         {
             return currentOperation->GetInputGain();
+        }
+
+        [[nodiscard]] auto IsMuted() const noexcept
+        {
+            return muted == Muted::True;
         }
 
         const Operation &GetCurrentOperation() const
@@ -79,11 +88,11 @@ namespace audio
 
         audio::Profile::Type GetPriorityPlaybackProfile() const
         {
-            if (audioSinkState.isConnected(EventType::BlutoothA2DPDeviceState)) {
-                return Profile::Type::PlaybackBluetoothA2DP;
-            }
             if (audioSinkState.isConnected(EventType::JackState)) {
                 return Profile::Type::PlaybackHeadphones;
+            }
+            if (audioSinkState.isConnected(EventType::BlutoothA2DPDeviceState)) {
+                return Profile::Type::PlaybackBluetoothA2DP;
             }
             return Profile::Type::PlaybackLoudspeaker;
         }
@@ -100,10 +109,24 @@ namespace audio
         virtual audio::RetCode Resume();
         virtual audio::RetCode Mute();
 
-      private:
-        void UpdateProfiles();
-
+      protected:
         AudioSinkState audioSinkState;
+
+      private:
+        void SendUpdateEventsToCurrentOperation();
+        /**
+         * @brief Sends update to the current operation and switches to priority profile.
+         */
+        void UpdateProfiles();
+        /**
+         * @brief Sends update to the current operation and switches to priority profile.
+         *
+         * @param playbackType if it's callringtone and bluetooth a2dp is used then
+         * ignore priorities and change profile to the earpeaker. Not needed otherwise.
+         */
+        void UpdateProfiles(audio::PlaybackType playbackType);
+
+        Muted muted = Muted::False;
 
         std::shared_ptr<BluetoothStreamData> btData;
 

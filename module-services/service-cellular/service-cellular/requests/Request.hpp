@@ -6,6 +6,7 @@
 #include <at/Result.hpp>
 #include <at/Commands.hpp>
 #include "service-cellular/RequestHandler.hpp"
+#include <at/Cmd.hpp>
 
 namespace cellular
 {
@@ -15,7 +16,7 @@ namespace cellular
     class IRequest
     {
       public:
-        virtual std::string command()                              = 0;
+        virtual at::Cmd command()                                  = 0;
         virtual void handle(RequestHandler &h, at::Result &result) = 0;
         virtual void setHandled(bool handled)                      = 0;
         virtual bool checkModemResponse(const at::Result &result)  = 0;
@@ -45,7 +46,7 @@ namespace cellular
          */
         auto buildCommand(at::AT atCommand,
                           const std::vector<commandBuilderFunc> &builderFunctions,
-                          bool trim = true) const -> std::string;
+                          bool trim = true) const -> at::Cmd;
         bool isRequestHandled = false;
         std::string request;
     };

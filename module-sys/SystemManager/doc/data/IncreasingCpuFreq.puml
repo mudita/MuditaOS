@@ -1,0 +1,19 @@
+@startuml
+#lightblue :12 MHz;
+
+partition "**loop** UpdateCpuFrequency interval" {
+	while ((__cpuLoad__ > __frequencyShiftUpperThreshold)__ __maxAboveThresholdCount__ time in a row) is (no)
+	
+	endwhile (yes)
+	
+	note right
+	  Minimum execution time:
+	  __maxAboveThresholdCount__ * __UpdateCpuFrequencyInterval__
+	  ====
+	  Currently it is 3 * 100 ms = <b> 300ms </b>
+	end note
+}
+:IncreaseCpuFrequency();
+
+#lightblue :528 MHz;
+@enduml

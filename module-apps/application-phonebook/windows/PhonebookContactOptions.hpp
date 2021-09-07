@@ -25,7 +25,6 @@ namespace gui
         };
         std::shared_ptr<ContactRecord> contact = nullptr;
         auto contactOptionsList() -> std::list<gui::Option>;
-        auto contactBlock(bool shouldBeBlocked) -> bool;
         auto contactRemove() -> bool;
         auto showNotification(NotificationType notificationType) -> bool;
     };

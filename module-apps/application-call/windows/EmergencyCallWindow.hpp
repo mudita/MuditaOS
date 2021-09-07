@@ -17,6 +17,7 @@ namespace gui
         bool onInput(const InputEvent &inputEvent) override;
 
         void buildInterface() override;
+        status_bar::Configuration configureStatusBar(status_bar::Configuration appConfiguration) override;
     };
 
 } /* namespace gui */

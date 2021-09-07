@@ -6,13 +6,13 @@
 #include <memory> // for allocator, unique_ptr
 
 #include "WorkerDesktop.hpp"
-#include "endpoints/update/UpdateMuditaOS.hpp"
 #include "Service/Common.hpp"  // for ReturnCodes, ServicePowerMode
 #include "Service/Message.hpp" // for MessagePointer, DataMessage (ptr only), ResponseMessage (ptr only)
 #include "Service/Service.hpp" // for Service
+#include "Timers/TimerHandle.hpp"
 #include "Constants.hpp"
-#include "WorkerDesktop.hpp"
-#include <endpoints/update/UpdateMuditaOS.hpp>
+#include "USBSecurityModel.hpp"
+
 #include <service-db/DBServiceName.hpp>
 
 namespace settings
@@ -20,9 +20,12 @@ namespace settings
     class Settings;
 }
 
+class UpdateMuditaOS;
+
 namespace sdesktop
 {
     inline constexpr auto service_stack             = 8192;
+    inline constexpr auto worker_stack              = 8704;
     inline constexpr auto cdc_queue_len             = 32;
     inline constexpr auto cdc_queue_object_size     = 1024;
     inline constexpr auto irq_queue_object_size     = sizeof(bsp::USBDeviceStatus);
@@ -33,44 +36,88 @@ namespace sdesktop
 
 }; // namespace sdesktop
 
+namespace sdesktop::bluetooth
+{
+    class BluetoothMessagesHandler;
+}
+
 class ServiceDesktop : public sys::Service
 {
   public:
     ServiceDesktop();
     ~ServiceDesktop() override;
 
-    struct BackupStatus
+    enum class Operation
+    {
+        Backup,
+        Restore
+    };
+    enum class OperationState
+    {
+        Stopped,
+        Running,
+        Error
+    };
+
+    static const std::string opToString(const OperationState &op)
+    {
+        switch (op) {
+        case OperationState::Stopped:
+            return "stopped";
+        case OperationState::Running:
+            return "running";
+        case OperationState::Error:
+            return "error";
+        default:
+            return "unkown";
+        }
+    }
+    struct BackupRestoreStatus
     {
         std::filesystem::path backupTempDir;
         std::filesystem::path location;
+        bool lastOperationResult = false;
         std::string task;
-        bool state = false;
+        OperationState state = OperationState::Stopped;
+        Operation operation  = Operation::Backup;
         json11::Json to_json() const
         {
-            return json11::Json::object{
-                {parserFSM::json::task, task},
-                {parserFSM::json::state, state ? parserFSM::json::finished : parserFSM::json::pending},
-                {parserFSM::json::location, location.string()}};
+            return json11::Json::object{{parserFSM::json::task, task},
+                                        {parserFSM::json::state, opToString(state)},
+                                        {parserFSM::json::location, location.string()}};
         }
-    } backupStatus;
+    } backupRestoreStatus;
 
     sys::ReturnCodes InitHandler() override;
     sys::ReturnCodes DeinitHandler() override;
+    void ProcessCloseReason(sys::CloseReason closeReason) override;
     sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override;
     sys::MessagePointer DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp) override;
 
-    std::unique_ptr<UpdateMuditaOS> updateOS;
     std::unique_ptr<WorkerDesktop> desktopWorker;
-    void storeHistory(const std::string &historyValue);
+
     void prepareBackupData();
-    const BackupStatus getBackupStatus()
+    void prepareRestoreData(const std::filesystem::path &restoreLocation);
+    const BackupRestoreStatus getBackupRestoreStatus()
     {
-        return backupStatus;
+        return backupRestoreStatus;
+    }
+    const sdesktop::USBSecurityModel *getSecurity()
+    {
+        return usbSecurityModel.get();
     }
 
+    auto requestLogsFlush() -> void;
+
+    auto getSerialNumber() const -> std::string;
+
   private:
+    std::unique_ptr<sdesktop::USBSecurityModel> usbSecurityModel;
     std::unique_ptr<settings::Settings> settings;
-    std::unique_ptr<sys::Timer> transferTimer;
+    std::unique_ptr<sdesktop::bluetooth::BluetoothMessagesHandler> btMsgHandler;
+
+    static constexpr unsigned int DefaultLogFlushTimeoutInMs = 1000U;
+    bool initialized                                         = false;
 };
 
 namespace sys

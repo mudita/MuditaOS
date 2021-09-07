@@ -1,8 +1,8 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "CalendarData.hpp"
-#include "dateCommon.hpp"
+#include <application-calendar/data/CalendarData.hpp>
+#include <time/dateCommon.hpp>
 
 WeekDaysRepeatData::WeekDaysRepeatData()
 {

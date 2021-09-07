@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -18,6 +18,7 @@ namespace db
 
         enum class Name
         {
+            AlarmEvents,
             SMS,
             SMSThread,
             SMSTemplate,
@@ -27,7 +28,7 @@ namespace db
             Calllog,
             CountryCodes,
             Notifications,
-            Events,
+            Quotes,
         };
     };
 }; // namespace db
@@ -35,6 +36,8 @@ namespace db
 constexpr const char *c_str(enum db::Interface::Name db)
 {
     switch (db) {
+    case db::Interface::Name::AlarmEvents:
+        return "AlarmEvents";
     case db::Interface::Name::SMS:
         return "SMS";
     case db::Interface::Name::SMSThread:
@@ -53,8 +56,8 @@ constexpr const char *c_str(enum db::Interface::Name db)
         return "CountryCodes";
     case db::Interface::Name::Notifications:
         return "Notifications";
-    case db::Interface::Name::Events:
-        return "Events";
+    case db::Interface::Name::Quotes:
+        return "Quotes";
     };
     return "";
 }

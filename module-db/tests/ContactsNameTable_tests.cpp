@@ -1,6 +1,5 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
-
 
 #include <catch2/catch.hpp>
 
@@ -18,7 +17,7 @@ TEST_CASE("Contacts Name Table tests")
 {
     Database::initialize();
 
-    const auto contactsPath = (std::filesystem::path{"user"} / "contacts.db");
+    const auto contactsPath = (std::filesystem::path{"sys/user"} / "contacts.db");
     if (std::filesystem::exists(contactsPath)) {
         REQUIRE(std::filesystem::remove(contactsPath));
     }
@@ -27,7 +26,7 @@ TEST_CASE("Contacts Name Table tests")
     REQUIRE(contactsdb.isInitialized());
 
     ContactsNameTableRow testRow1 = {
-        {.ID = DB_ID_NONE}, .contactID = DB_ID_NONE, .namePrimary = "Mateusz", .nameAlternative = "Pati"};
+        Record(DB_ID_NONE), .contactID = DB_ID_NONE, .namePrimary = "Mateusz", .nameAlternative = "Pati"};
 
     const auto contactsCount = contactsdb.name.count() + 1;
     // clear contacts table

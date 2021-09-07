@@ -1,18 +1,18 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-#include "i18n/i18n.hpp"
+#include "Split.hpp"
+#include <log.hpp>
+#include <magic_enum.hpp>
+
 #include <algorithm> // std::find_if_not
-#include <log/log.hpp>
 #include <sstream>
 #include <iomanip>
 #include <cmath>
 #include <chrono>
 #include <random>
-#include "time/time_conversion.hpp"
-
-#include <magic_enum.hpp>
+#include <tuple>
 
 namespace utils
 {
@@ -22,53 +22,13 @@ namespace utils
 
     std::string bytesToHex(const std::vector<std::uint8_t> &bytes);
     std::vector<std::uint8_t> hexToBytes(const std::string &hex);
-    // template <typename T> std::string numToHex(T c);
+
     template <typename T> std::string numToHex(T c)
     {
         std::stringstream s;
         s.fill('0');
         s << std::setw(sizeof(T) * 2) << std::hex << static_cast<unsigned long long>(c);
         return s.str();
-    }
-    template <typename Out> void split(const std::string &s, char delim, Out result)
-    {
-        std::stringstream ss(s);
-        std::string item;
-        while (std::getline(ss, item, delim)) {
-            *(result++) = item;
-        }
-    }
-
-    static inline std::vector<std::string> split(const std::string &s, char delim)
-    {
-        std::vector<std::string> elems;
-        split(s, delim, std::back_inserter(elems));
-        return elems;
-    }
-
-    static inline std::vector<std::string> split(const std::string &s,
-                                                 const std::string &delimiter,
-                                                 const bool skipEmptyTokens = true)
-    {
-        size_t pos_start = 0, pos_end, delim_len = delimiter.length();
-        std::string token;
-        std::vector<std::string> res;
-        uint32_t tokenCount = 0;
-
-        while (((pos_end = s.find(delimiter, pos_start)) != std::string::npos)) {
-            token     = s.substr(pos_start, pos_end - pos_start);
-            pos_start = pos_end + delim_len;
-            if (!skipEmptyTokens || !token.empty()) {
-                tokenCount++;
-                res.push_back(token);
-            }
-        }
-
-        token = s.substr(pos_start);
-        if (!skipEmptyTokens || !token.empty()) {
-            res.push_back(token);
-        }
-        return res;
     }
 
     static inline std::string removeNewLines(const std::string &s)
@@ -112,14 +72,12 @@ namespace utils
         return base;
     }
 
-    template <typename T> std::string to_string(T t)
+    template <typename T>[[nodiscard]] std::string to_string(T t)
     {
-        std::ostringstream ss;
-        ss << t;
-        return ss.str();
+        return std::to_string(t);
     }
 
-    template <> inline std::string to_string<long double>(long double t)
+    template <>[[nodiscard]] inline std::string to_string<long double>(long double t)
     {
         uint32_t precision = 6;
         int base           = static_cast<int>(t);
@@ -155,14 +113,28 @@ namespace utils
         return baseAsStr + "." + fractionalAsStr;
     }
 
-    template <> inline std::string to_string<float>(float t)
+    template <>[[nodiscard]] inline std::string to_string<float>(float t)
     {
-        return to_string((long double)(t));
+        return to_string(static_cast<long double>(t));
     }
 
-    template <> inline std::string to_string<double>(double t)
+    template <>[[nodiscard]] inline std::string to_string<double>(double t)
     {
-        return to_string((long double)(t));
+        return to_string(static_cast<long double>(t));
+    }
+
+    template <>[[nodiscard]] inline std::string to_string<std::int64_t>(std::int64_t value)
+    {
+        std::ostringstream ss;
+        ss << value;
+        return ss.str();
+    }
+
+    template <>[[nodiscard]] inline std::string to_string<std::uint64_t>(std::uint64_t value)
+    {
+        std::ostringstream ss;
+        ss << value;
+        return ss.str();
     }
 
     template <typename T>[[nodiscard]] const std::string enumToString(const T &t)
@@ -247,6 +219,16 @@ namespace utils
     static inline void findAndReplaceAll(std::string &data, const std::string &toSearch, const std::string &replaceStr)
     {
         findAndReplaceAll(data, {{toSearch, replaceStr}});
+    }
+
+    static inline std::tuple<uint8_t, uint8_t, uint8_t> floatingPointConverter(float value)
+    {
+        int32_t decimal = value * (1 << 20); // multiply by 2^20
+
+        const uint32_t fractional = decimal & 0xFFFFF;
+        decimal >>= 20;
+
+        return std::make_tuple((decimal << 4) | (fractional >> 16), fractional >> 8, fractional & 0xFF);
     }
 
     static inline uint32_t swapBytes(uint32_t toSwap)

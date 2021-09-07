@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -33,7 +33,7 @@ namespace gui
         void updateDraftMessage(const UTF8 &inputText);
         void displayDraftMessage() const;
 
-        auto handleRequestResize(const Item *, unsigned short request_w, unsigned short request_h) -> Size override;
+        auto handleRequestResize(const Item *, Length request_w, Length request_h) -> Size override;
     };
 
 } /* namespace gui */

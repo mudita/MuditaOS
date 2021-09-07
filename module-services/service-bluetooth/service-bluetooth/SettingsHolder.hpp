@@ -1,11 +1,10 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 #pragma once
-#include <json/json11.hpp>
+#include <json11.hpp>
 #include <string>
 #include <variant>
 #include <service-db/Settings.hpp>
-#include <agents/settings/SystemSettings.hpp>
 #include <module-utils/Utils.hpp>
 #include "SettingsSerializer.hpp"
 
@@ -18,7 +17,8 @@ namespace bluetooth
         Visibility,
         State,
         BondedDevices,
-        BtKeys
+        BtKeys,
+        ConnectedDevice
     };
 
     constexpr inline auto trueStr  = "true";
@@ -83,6 +83,7 @@ namespace bluetooth
         void setValue(const Settings &newSetting, const SettingEntry &value);
         std::function<void()> onStateChange;
         std::function<void(const std::string &)> onLinkKeyAdded;
+        void deinit();
 
       private:
         static std::map<Settings, std::string> settingString;

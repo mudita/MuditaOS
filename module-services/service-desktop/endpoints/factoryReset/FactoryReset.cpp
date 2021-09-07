@@ -1,10 +1,9 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "FactoryReset.hpp"
-#include <SystemManager/SystemManager.hpp>
-#include <log/log.hpp>
-#include <purefs/filesystem_paths.hpp>
+#include <SystemManager/SystemManagerCommon.hpp>
+#include <log.hpp>
 #include <service-db/DBServiceName.hpp>
 #include <Utils.hpp>
 
@@ -28,7 +27,7 @@ namespace FactoryReset
         inline constexpr auto copy_buf = 8192 * 4;
     } // namespace
 
-    static bool CopyFile(std::string sourcefile, std::string targetfile);
+    static bool CopyFile(const std::string &sourcefile, const std::string &targetfile);
 
     static int recurseDepth            = 0;
     static const int max_recurse_depth = 120; /* 120 is just an arbitrary value of max number of recursive calls.
@@ -38,66 +37,82 @@ namespace FactoryReset
 
     bool Run(sys::Service *ownerService)
     {
-        LOG_INFO("FactoryReset: restoring factory state started...");
+        LOG_INFO("Restoring factory state started...");
 
-        recurseDepth             = 0;
-        const auto factoryOSPath = purefs::dir::getFactoryOSPath();
+        recurseDepth          = 0;
+        const auto userOSPath = purefs::dir::getUserDiskPath();
 
-        if (std::filesystem::is_directory(factoryOSPath.c_str()) && std::filesystem::is_empty(factoryOSPath.c_str())) {
-            LOG_ERROR("FactoryReset: restoring factory state aborted");
-            LOG_ERROR("FactoryReset: directory %s seems empty.", factoryOSPath.c_str());
+        if (std::filesystem::is_directory(userOSPath.c_str()) && std::filesystem::is_empty(userOSPath.c_str())) {
+            LOG_ERROR("Restoring factory state aborted");
+            LOG_ERROR("Directory %s seems empty.", userOSPath.c_str());
             return false;
         }
 
         if (ownerService != nullptr) {
-            LOG_INFO("FactoryReset: closing ServiceDB...");
+            LOG_INFO("Closing ServiceDB...");
             std::string dbServiceName = service::name::db;
-            sys::SystemManager::DestroyService(dbServiceName, ownerService);
+            sys::SystemManagerCommon::DestroySystemService(dbServiceName, ownerService);
         }
 
-        if (DeleteDirContent(purefs::dir::getRootDiskPath()) != true) {
-            LOG_ERROR("FactoryReset: restoring factory state aborted");
-            return false;
-        }
+        DeleteSelectedUserFiles(userOSPath);
 
-        if (CopyDirContent(factoryOSPath, purefs::dir::getRootDiskPath()) != true) {
-            LOG_ERROR("FactoryReset: restoring factory state aborted");
-            return false;
-        }
-
-        LOG_INFO("FactoryReset: restoring factory state finished, rebooting...");
-        sys::SystemManager::Reboot(ownerService);
+        LOG_INFO("Rebooting...");
+        sys::SystemManagerCommon::Reboot(ownerService);
         return true;
     }
 
-    bool DeleteDirContent(std::string dir)
+    bool DeleteSelectedUserFiles(const std::filesystem::path &userOSPath)
+    {
+        bool returnStatus                        = true;
+        std::vector<std::string> selectedFileExt = {".db", ".db-journal", ".db-wal"};
+
+        LOG_INFO("Delete DB files which will be recreated with factory content after reboot:");
+        for (const auto &f : std::filesystem::directory_iterator(userOSPath.c_str())) {
+            for (const auto &ext : selectedFileExt) {
+                if (f.path().extension() == ext) {
+                    auto removeStatus = std::filesystem::remove(f.path());
+                    if (!removeStatus) {
+                        LOG_ERROR("Error deleting file %s, aborting...", f.path().c_str());
+                        returnStatus = false;
+                    }
+                    else {
+                        LOG_INFO("%s deleted.", f.path().c_str());
+                    }
+                    break;
+                }
+            }
+        }
+        return returnStatus;
+    }
+
+    bool DeleteDirContent(const std::string &dir)
     {
         for (auto &direntry : std::filesystem::directory_iterator(dir.c_str())) {
-            if ((direntry.path().string().compare(".") != 0) && (direntry.path().string().compare("..") != 0) &&
-                (direntry.path().string().compare("...") != 0)) {
+            if (!((direntry.path().string() != ".") && (direntry.path().string() != "..") &&
+                  (direntry.path().string() != "..."))) {
+                continue;
+            }
+            std::string delpath = dir;
+            delpath += "/";
+            delpath += direntry.path().string();
 
-                std::string delpath = dir;
-                delpath += "/";
-                delpath += direntry.path().string().c_str();
-
-                if (std::filesystem::is_directory(direntry)) {
-                    if (direntry.path().string().compare(purefs::dir::getFactoryOSPath()) != 0) {
-                        LOG_INFO("FactoryReset: recursively deleting dir %s...", delpath.c_str());
-                        try {
-                            std::filesystem::remove_all(delpath.c_str());
-                        }
-                        catch (const std::filesystem::filesystem_error &e) {
-                            LOG_ERROR("FactoryReset: error deleting dir %s, aborting...", delpath.c_str());
-                            return false;
-                        }
+            if (std::filesystem::is_directory(direntry)) {
+                if (direntry.path().string() != purefs::dir::getFactoryOSPath()) {
+                    LOG_INFO("FactoryReset: recursively deleting dir...");
+                    try {
+                        std::filesystem::remove_all(delpath.c_str());
                     }
-                }
-                else {
-                    LOG_INFO("FactoryReset: deleting file %s...", delpath.c_str());
-                    if (std::filesystem::remove(delpath.c_str())) {
-                        LOG_ERROR("FactoryReset: error deleting file %s, aborting...", delpath.c_str());
+                    catch (const std::filesystem::filesystem_error &e) {
+                        LOG_ERROR("FactoryReset: error deleting dir, aborting...");
                         return false;
                     }
+                }
+            }
+            else {
+                LOG_INFO("FactoryReset: deleting file...");
+                if (std::filesystem::remove(delpath.c_str())) {
+                    LOG_ERROR("FactoryReset: error deleting file, aborting...");
+                    return false;
                 }
             }
         }
@@ -105,59 +120,58 @@ namespace FactoryReset
         return true;
     }
 
-    bool CopyDirContent(std::string sourcedir, std::string targetdir)
+    bool CopyDirContent(const std::string &sourcedir, const std::string &targetdir)
     {
         if (recurseDepth >= max_recurse_depth) {
-            LOG_ERROR("FactoryReset: recurse level %d (too high), error assumed, skipping restore of dir %s",
-                      recurseDepth,
-                      sourcedir.c_str());
+            LOG_ERROR("FactoryReset: recurse level %d (too high), error assumed, skipping restore of dir",
+                      recurseDepth);
             return false;
         }
 
         const auto factoryOSPath = purefs::dir::getFactoryOSPath();
 
         for (auto &direntry : std::filesystem::directory_iterator(sourcedir.c_str())) {
-            if ((direntry.path().string().compare(".") == 0) || (direntry.path().string().compare("..") == 0) ||
-                (direntry.path().string().compare("...") == 0)) {
+            if ((direntry.path().string() == ".") || (direntry.path().string() == "..") ||
+                (direntry.path().string() == "...")) {
                 continue;
             }
 
             std::string sourcepath = sourcedir;
             sourcepath += "/";
-            sourcepath += direntry.path().string().c_str();
+            sourcepath += direntry.path().string();
 
             std::string targetpath = targetdir;
             targetpath += "/";
-            targetpath += direntry.path().string().c_str();
+            targetpath += direntry.path().string();
 
             if ((sourcepath.size() >= max_filepath_length) || (targetpath.size() >= max_filepath_length)) {
                 LOG_ERROR("FactoryReset: path length (source or target) exceeds system limit of %d",
                           max_filepath_length);
-                LOG_ERROR("FactoryReset: skipping restore of dir %s into %s", sourcepath.c_str(), targetpath.c_str());
+                LOG_ERROR("FactoryReset: skipping restore of directory");
                 return false;
             }
 
             if (std::filesystem::is_directory(direntry)) {
-                if (targetpath.compare(factoryOSPath.c_str()) == 0) {
+                if (targetpath == factoryOSPath) {
                     continue;
                 }
 
-                LOG_INFO("FactoryReset: restoring dir  %s into %s...", sourcepath.c_str(), targetpath.c_str());
+                LOG_INFO("FactoryReset: restoring directory");
 
                 try {
                     if (std::filesystem::create_directory(targetpath.c_str())) {
-                        LOG_ERROR("FactoryReset: create dir %s failed", targetpath.c_str());
+                        LOG_ERROR("FactoryReset: create dir failed");
                         return false;
                     }
                 }
                 catch (const std::filesystem::filesystem_error &err) {
-                    LOG_FATAL("Exception while creating dir %s", targetpath.c_str());
+                    LOG_FATAL("Exception while creating dir");
                     return false;
                 }
 
                 recurseDepth++;
 
-                if (CopyDirContent(sourcepath, targetpath) != true) {
+                if (!CopyDirContent(sourcepath, targetpath)) {
                     recurseDepth--;
                     return false;
                 }
@@ -165,9 +179,9 @@ namespace FactoryReset
                 recurseDepth--;
             }
             else {
-                LOG_INFO("FactoryReset: restoring file %s into %s...", sourcepath.c_str(), targetpath.c_str());
+                LOG_INFO("FactoryReset: restoring file");
 
-                if (CopyFile(sourcepath, targetpath) != true) {
+                if (!CopyFile(sourcepath, targetpath)) {
                     return false;
                 }
             }
@@ -176,7 +190,7 @@ namespace FactoryReset
         return true;
     }
 
-    static bool CopyFile(std::string sourcefile, std::string targetfile)
+    static bool CopyFile(const std::string &sourcefile, const std::string &targetfile)
     {
         bool ret  = true;
         auto lamb = [](std::FILE *stream) { std::fclose(stream); };
@@ -184,10 +198,10 @@ namespace FactoryReset
         std::unique_ptr<std::FILE, decltype(lamb)> sf(std::fopen(sourcefile.c_str(), "r"), lamb);
         std::unique_ptr<std::FILE, decltype(lamb)> tf(std::fopen(targetfile.c_str(), "w"), lamb);
 
-        if ((sf.get() != nullptr) && (tf.get() != nullptr)) {
+        if (sf && tf) {
             std::unique_ptr<unsigned char[]> buffer(new unsigned char[copy_buf]);
 
-            if (buffer.get() != nullptr) {
+            if (buffer) {
                 uint32_t loopcount = (std::filesystem::file_size(sourcefile) / copy_buf) + 1u;
                 uint32_t readsize  = copy_buf;
 
@@ -197,13 +211,13 @@ namespace FactoryReset
                     }
 
                     if (std::fread(buffer.get(), 1, readsize, sf.get()) != readsize) {
-                        LOG_ERROR("FactoryReset: read from sourcefile %s failed", sourcefile.c_str());
+                        LOG_ERROR("FactoryReset: read from sourcefile failed");
                         ret = false;
                         break;
                     }
 
                     if (std::fwrite(buffer.get(), 1, readsize, tf.get()) != readsize) {
-                        LOG_ERROR("FactoryReset: write to targetfile %s failed", targetfile.c_str());
+                        LOG_ERROR("FactoryReset: write to targetfile failed");
                         ret = false;
                         break;
                     }

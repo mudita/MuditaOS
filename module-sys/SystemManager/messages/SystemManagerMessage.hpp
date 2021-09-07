@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -8,7 +8,7 @@
 
 #include "SystemManager/Constants.hpp"
 #include "SystemManager/data/SystemManagerActionsParams.hpp"
-#include <service-appmgr/service-appmgr/Actions.hpp>
+#include <service-appmgr/Actions.hpp>
 
 namespace sys
 {
@@ -19,32 +19,24 @@ namespace sys
         SystemManagerMessage() : sys::DataMessage(MessageType::PMChangePowerMode){};
     };
 
-    class CriticalBatteryLevelNotification : public sys::Message, public app::manager::actions::ConvertibleToAction
+    class CriticalBatteryLevelNotification : public sys::DataMessage, public app::manager::actions::ConvertibleToAction
     {
       public:
-        explicit CriticalBatteryLevelNotification(bool isActive) : sys::Message(), isActive(isActive)
+        explicit CriticalBatteryLevelNotification(bool isActive, bool isCharging = false)
+            : isActive(isActive), isCharging(isCharging)
         {}
 
         [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
         {
             return std::make_unique<app::manager::ActionRequest>(
                 service::name::system_manager,
-                app::manager::actions::DisplayLowBatteryNotification,
-                std::make_unique<app::manager::actions::LowBatteryNotificationParams>(isActive));
+                app::manager::actions::DisplayLowBatteryScreen,
+                std::make_unique<app::manager::actions::LowBatteryNotificationParams>(isActive, isCharging));
         }
 
       private:
         bool isActive;
-    };
-
-    class SystemBrownoutMesssage : public sys::Message, public app::manager::actions::ConvertibleToAction
-    {
-      public:
-        [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
-        {
-            return std::make_unique<app::manager::ActionRequest>(
-                service::name::system_manager, app::manager::actions::SystemBrownout, nullptr);
-        }
+        bool isCharging;
     };
 
 } // namespace sys

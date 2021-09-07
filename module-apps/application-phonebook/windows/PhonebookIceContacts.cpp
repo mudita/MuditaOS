@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhonebookIceContacts.hpp"
@@ -25,7 +25,7 @@ namespace gui
     {
         AppWindow::buildInterface();
 
-        setTitle(utils::localize.get("app_phonebook_ice_contacts_title"));
+        setTitle(utils::translate("app_phonebook_ice_contacts_title"));
 
         contactsListIce = new gui::ListView(this,
                                             phonebookStyle::iceContactsWindow::contactsListIce::x,
@@ -33,14 +33,14 @@ namespace gui
                                             phonebookStyle::iceContactsWindow::contactsListIce::w,
                                             phonebookStyle::iceContactsWindow::contactsListIce::h,
                                             phonebookModel,
-                                            style::listview::ScrollBarType::Fixed);
+                                            gui::listview::ScrollBarType::Fixed);
 
         setFocusItem(contactsListIce);
 
         bottomBar->setActive(BottomBar::Side::LEFT, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(style::strings::common::call));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::call));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
     }
 
     void PhonebookIceContacts::destroyInterface()
@@ -55,6 +55,9 @@ namespace gui
 
     bool PhonebookIceContacts::onInput(const InputEvent &inputEvent)
     {
+        if (inputEvent.isShortRelease(KeyCode::KEY_ENTER)) {
+            return true;
+        }
         // check if any of the lower inheritance onInput methods catch the event
         return AppWindow::onInput(inputEvent);
     }
