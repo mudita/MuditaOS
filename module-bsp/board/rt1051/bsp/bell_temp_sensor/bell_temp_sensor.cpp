@@ -18,6 +18,7 @@ namespace bsp::bell_temp_sensor
     namespace
     {
         std::shared_ptr<drivers::DriverI2C> i2c;
+        bool isInitiated = false;
 
         drivers::I2CAddress addr = {
             .deviceAddress = static_cast<uint32_t>(CT7117_DEVICE_ADDR), .subAddress = 0, .subAddressSize = 1};
@@ -50,12 +51,19 @@ namespace bsp::bell_temp_sensor
 
         LOG_DEBUG("Initializing Bell temperature sensor");
 
+        if (isInitiated)
+        {
+            return isPresent() ? kStatus_Success : kStatus_Fail;    
+        }
+
         drivers::DriverI2CParams i2cParams;
         i2cParams.baudrate = static_cast<std::uint32_t>(BoardDefinitions::BELL_TEMP_SENSOR_I2C_BAUDRATE);
         i2c = drivers::DriverI2C::Create(static_cast<drivers::I2CInstances>(BoardDefinitions::BELL_TEMP_SENSOR_I2C),
                                          i2cParams);
 
         wakeup();
+
+        isInitiated = true;
 
         return isPresent() ? kStatus_Success : kStatus_Fail;
     }
