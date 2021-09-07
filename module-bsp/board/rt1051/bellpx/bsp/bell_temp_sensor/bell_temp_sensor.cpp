@@ -9,7 +9,6 @@
 
 #include "fsl_common.h"
 #include <log.hpp>
-#include <sstream>
 
 namespace bsp::bell_temp_sensor
 {
