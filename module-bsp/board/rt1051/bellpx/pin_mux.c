@@ -1194,7 +1194,7 @@ void PINMUX_WDOG_B_Init(void)
 
 void PINMUX_InitI2C4(void)
 {
-    //D0B0 (11 0 1 0 000 10 110 00 0) ->
+    // D0B0 (11 0 1 0 000 10 110 00 0) ->
     /*
         0 (SRE)     : 0
         1-2 (X)     : 00
@@ -1206,21 +1206,23 @@ void PINMUX_InitI2C4(void)
         13 (PUE)    : 0
         14-15 (PUS) : 11
         16 (HYS)    : 0
-    */ 
+    */
 
     IOMUXC_SetPinMux(PINMUX_I2C4_SCL, 1U); /* Software Input On Field: Input Path is determined by functionality */
 
     IOMUXC_SetPinConfig(PINMUX_I2C4_SCL,
 
-                        PAD_CONFIG_SLEW_RATE_SLOW | PAD_CONFIG_DRIVER_STRENGTH_LVL_6 | PAD_CONFIG_SPEED_MEDIUM_2_100MHz |
-                            PAD_CONFIG_PULL_KEEPER_ENABLED | PAD_CONFIG_SELECT_KEEPER | PAD_CONFIG_PULL_UP_22kOhm);
+                        PAD_CONFIG_SLEW_RATE_SLOW | PAD_CONFIG_DRIVER_STRENGTH_LVL_6 |
+                            PAD_CONFIG_SPEED_MEDIUM_2_100MHz | PAD_CONFIG_PULL_KEEPER_ENABLED |
+                            PAD_CONFIG_SELECT_KEEPER | PAD_CONFIG_PULL_UP_22kOhm);
 
     IOMUXC_SetPinMux(PINMUX_I2C4_SDA, 1U); /* Software Input On Field: Input Path is determined by functionality */
 
     IOMUXC_SetPinConfig(PINMUX_I2C4_SDA,
 
-                        PAD_CONFIG_SLEW_RATE_SLOW | PAD_CONFIG_DRIVER_STRENGTH_LVL_6 | PAD_CONFIG_SPEED_MEDIUM_2_100MHz |
-                            PAD_CONFIG_PULL_KEEPER_ENABLED | PAD_CONFIG_SELECT_KEEPER | PAD_CONFIG_PULL_UP_22kOhm);
+                        PAD_CONFIG_SLEW_RATE_SLOW | PAD_CONFIG_DRIVER_STRENGTH_LVL_6 |
+                            PAD_CONFIG_SPEED_MEDIUM_2_100MHz | PAD_CONFIG_PULL_KEEPER_ENABLED |
+                            PAD_CONFIG_SELECT_KEEPER | PAD_CONFIG_PULL_UP_22kOhm);
 }
 
 /***********************************************************************************************************************
