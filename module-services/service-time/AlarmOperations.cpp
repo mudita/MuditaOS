@@ -72,9 +72,7 @@ namespace alarms
     void AlarmOperations::getAlarmsInRange(
         TimePoint start, TimePoint end, std::uint32_t offset, std::uint32_t limit, OnGetAlarmsInRangeProcessed callback)
     {
-        OnGetAlarmEventsInRangeCallback repoCallback = [callback](std::vector<AlarmEventRecord> records) {
-            callback(records);
-        };
+        OnGetAlarmEventsInRangeCallback repoCallback = [callback](auto vals) { callback(std::move(vals)); };
         alarmEventsRepo->getAlarmEventsInRange(start, end, offset, limit, repoCallback);
     }
 
