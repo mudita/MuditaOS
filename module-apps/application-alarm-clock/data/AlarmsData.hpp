@@ -7,13 +7,6 @@
 #include <module-db/Interface/AlarmEventRecord.hpp>
 #include <SwitchData.hpp>
 
-enum class AlarmRepeat
-{
-    never,
-    everyday,
-    weekDays
-};
-
 enum class AlarmSnooze
 {
     FiveMinutes    = 5,

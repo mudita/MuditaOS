@@ -14,9 +14,11 @@ target_sources( ${PROJECT_NAME}
         "${CMAKE_CURRENT_LIST_DIR}/widgets/AlarmTimeItem.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/widgets/AlarmOptionsItem.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/widgets/CustomCheckBoxWithLabel.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/widgets/addedit/AlarmOptionRepeat.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/presenter/AlarmClockMainWindowPresenter.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/presenter/AlarmClockEditWindowPresenter.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/presenter/CustomRepeatWindowPresenter.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/presenter/AlarmPresenter.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/data/AlarmsData.cpp"
     PUBLIC
         "${CMAKE_CURRENT_LIST_DIR}/ApplicationAlarmClock.hpp"
@@ -24,3 +26,7 @@ target_sources( ${PROJECT_NAME}
         "${CMAKE_CURRENT_LIST_DIR}/widgets/AlarmInternalListItem.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/data/AlarmsData.hpp"
         )
+
+if (${ENABLE_TESTS})
+    add_subdirectory(tests)
+endif()
