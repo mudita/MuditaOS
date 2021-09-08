@@ -57,7 +57,6 @@ class AlarmEventsTable : public Table<AlarmEventsTableRow, AlarmEventsTableField
     auto create() -> bool override;
     auto add(AlarmEventsTableRow entry) -> bool override;
     auto removeById(uint32_t id) -> bool override;
-    auto removeByField(AlarmEventsTableFields field, const char *str) -> bool override;
     auto update(AlarmEventsTableRow entry) -> bool override;
     auto getById(uint32_t id) -> AlarmEventsTableRow override;
     auto getLimitOffset(uint32_t offset, uint32_t limit) -> std::vector<AlarmEventsTableRow> override;
