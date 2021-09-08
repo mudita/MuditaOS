@@ -226,9 +226,9 @@ namespace gui
                 alarm->snoozeDuration = static_cast<uint32_t>(snoozeOptions[actualVectorIndex]);
                 break;
             }
-            case AlarmOptionItemName::Repeat: {
+            case AlarmOptionItemName::Repeat:
+                // repead handled in class
                 break;
-            }
             }
         };
 
@@ -258,9 +258,9 @@ namespace gui
                 }
                 break;
             }
-            case AlarmOptionItemName::Repeat: {
+            case AlarmOptionItemName::Repeat:
+                // repead handled in class
                 break;
-            }
             }
             optionLabel->setText(optionsNames[actualVectorIndex]);
         };

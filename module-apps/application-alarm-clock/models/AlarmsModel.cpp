@@ -44,14 +44,9 @@ namespace app::alarmClock
             return nullptr;
         }
 
-        auto item               = new gui::AlarmItem(record);
+        auto item               = new gui::AlarmItem(AlarmPresenter(record));
         item->activatedCallback = [this, record](gui::Item &) {
-            if (record->enabled) {
-                record->enabled = false;
-            }
-            else {
-                record->enabled = false;
-            }
+            record->enabled = !record->enabled;
             alarmsRepository->update(*record, nullptr);
             return true;
         };

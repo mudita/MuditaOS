@@ -19,7 +19,10 @@ namespace utils
 
         class Locale
         {
-            static const int num_days       = 7;
+          public:
+            static constexpr int num_days = 7;
+
+          private:
             static const int num_monts      = 12;
             static const int num_formatters = 9;
             // imo it would be nicer to have datetime locales in different json with thiny bit nicer and more effective

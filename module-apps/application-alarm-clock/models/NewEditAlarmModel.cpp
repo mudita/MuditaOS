@@ -4,6 +4,7 @@
 #include "NewEditAlarmModel.hpp"
 #include "application-alarm-clock/widgets/AlarmTimeItem.hpp"
 #include "application-alarm-clock/widgets/AlarmOptionsItem.hpp"
+#include "application-alarm-clock/widgets/addedit/AlarmOptionRepeat.hpp"
 #include "application-alarm-clock/widgets/AlarmClockStyle.hpp"
 #include <ListView.hpp>
 
@@ -36,7 +37,7 @@ namespace app::alarmClock
         return getRecord(order);
     }
 
-    void NewEditAlarmModel::createData()
+    void NewEditAlarmModel::createData(std::shared_ptr<AlarmEventRecord> record)
     {
         auto app = application;
         assert(app != nullptr);
@@ -57,12 +58,12 @@ namespace app::alarmClock
             [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
             [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); }));
 
-        repeatOption = new gui::AlarmOptionsItem(
+        internalData.push_back(new gui::AlarmOptionRepeat(
             application,
             AlarmOptionItemName::Repeat,
+            AlarmPresenter(record),
             [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
-            [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); });
-        internalData.push_back(repeatOption);
+            [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); }));
 
         for (auto &item : internalData) {
             item->deleteByList = false;
@@ -74,7 +75,7 @@ namespace app::alarmClock
         list->reset();
         eraseInternalData();
 
-        createData();
+        createData(record);
 
         for (auto &item : internalData) {
             if (item->onLoadCallback) {
