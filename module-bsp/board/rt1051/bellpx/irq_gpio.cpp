@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "board/irq_gpio.hpp"
+#include <module-utils/Utils.hpp>
 
 #include "board.h"
 #include "FreeRTOS.h"
@@ -10,7 +11,7 @@
 
 #include "board/rt1051/bsp/eink/bsp_eink.h"
 #include <hal/battery_charger/AbstractBatteryCharger.hpp>
-#include <hal/key_input/AbstractKeyInput.hpp>
+#include <hal/key_input/KeyInput.hpp>
 #include "board/BoardDefinitions.hpp"
 #include "bsp/light_sensor/light_sensor.hpp"
 
@@ -24,15 +25,18 @@ namespace bsp
         DisableIRQ(GPIO2_Combined_0_15_IRQn);
         DisableIRQ(GPIO2_Combined_16_31_IRQn);
         DisableIRQ(GPIO3_Combined_16_31_IRQn);
+        DisableIRQ(GPIO5_Combined_0_15_IRQn);
 
         GPIO_PortDisableInterrupts(GPIO1, UINT32_MAX);
         GPIO_PortDisableInterrupts(GPIO2, UINT32_MAX);
         GPIO_PortDisableInterrupts(GPIO3, UINT32_MAX);
+        GPIO_PortClearInterruptFlags(GPIO5, UINT32_MAX);
 
         // Clear all IRQs
         GPIO_PortClearInterruptFlags(GPIO1, UINT32_MAX);
         GPIO_PortClearInterruptFlags(GPIO2, UINT32_MAX);
         GPIO_PortClearInterruptFlags(GPIO3, UINT32_MAX);
+        GPIO_PortClearInterruptFlags(GPIO5, UINT32_MAX);
 
         EnableIRQ(GPIO1_Combined_0_15_IRQn);
         NVIC_SetPriority(GPIO1_Combined_0_15_IRQn, configLIBRARY_LOWEST_INTERRUPT_PRIORITY);
@@ -48,6 +52,9 @@ namespace bsp
 
         EnableIRQ(GPIO3_Combined_16_31_IRQn);
         NVIC_SetPriority(GPIO3_Combined_16_31_IRQn, configLIBRARY_LOWEST_INTERRUPT_PRIORITY);
+
+        EnableIRQ(GPIO5_Combined_0_15_IRQn);
+        NVIC_SetPriority(GPIO5_Combined_0_15_IRQn, configLIBRARY_LOWEST_INTERRUPT_PRIORITY);
     }
 
     extern "C"
@@ -90,10 +97,6 @@ namespace bsp
                 xHigherPriorityTaskWoken |= hal::battery::IRQHandler();
             }
 
-            if (irq_mask & (1 << static_cast<uint32_t>(BoardDefinitions::LIGHT_SENSOR_IRQ))) {
-                xHigherPriorityTaskWoken |= bsp::light_sensor::IRQHandler();
-            }
-
             // Clear all IRQs
             GPIO_PortClearInterruptFlags(GPIO2, irq_mask);
 
@@ -106,8 +109,11 @@ namespace bsp
             BaseType_t xHigherPriorityTaskWoken = 0;
             uint32_t irq_mask                   = GPIO_GetPinsInterruptFlags(GPIO2);
 
-            if (irq_mask & (1 << BOARD_KEYBOARD_IRQ_GPIO_PIN)) {
-                xHigherPriorityTaskWoken |= hal::key_input::generalIRQHandler();
+            if (irq_mask & ((1 << static_cast<uint32_t>(BoardDefinitions::BELL_SWITCHES_CENTER)) |
+                            (1 << static_cast<uint32_t>(BoardDefinitions::BELL_SWITCHES_RIGHT)) |
+                            (1 << static_cast<uint32_t>(BoardDefinitions::BELL_SWITCHES_LEFT)) |
+                            (1 << static_cast<uint32_t>(BoardDefinitions::BELL_SWITCHES_LATCH)))) {
+                xHigherPriorityTaskWoken |= hal::key_input::generalIRQHandler(irq_mask);
             }
 
             // Clear all IRQs
@@ -129,6 +135,23 @@ namespace bsp
 
             // Clear all IRQs on the GPIO3 port
             GPIO_PortClearInterruptFlags(BOARD_EINK_BUSY_GPIO, irq_mask);
+
+            // Switch context if necessary
+            portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
+        }
+
+        void GPIO5_Combined_0_15_IRQHandler(void)
+        {
+            BaseType_t xHigherPriorityTaskWoken = 0;
+            uint32_t irq_mask                   = GPIO_GetPinsInterruptFlags(GPIO5);
+
+            if (irq_mask & (1 << static_cast<uint32_t>(BoardDefinitions::BELL_WAKEUP))) {
+
+                xHigherPriorityTaskWoken |= hal::key_input::wakeupIRQHandler();
+            }
+
+            // Clear all IRQs on the GPIO5 port
+            GPIO_PortClearInterruptFlags(GPIO5, irq_mask);
 
             // Switch context if necessary
             portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);

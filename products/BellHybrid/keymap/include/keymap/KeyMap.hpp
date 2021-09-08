@@ -9,6 +9,7 @@
 /// GUI design
 enum class KeyMap
 {
+    Frontlight    = static_cast<int>(gui::KeyCode::KEY_LF),
     Back          = static_cast<int>(gui::KeyCode::KEY_RF),
     LightPress    = static_cast<int>(gui::KeyCode::KEY_ENTER),
     RotateLeft    = static_cast<int>(gui::KeyCode::KEY_DOWN),
