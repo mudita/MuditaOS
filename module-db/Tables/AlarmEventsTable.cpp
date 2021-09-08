@@ -204,8 +204,8 @@ std::vector<AlarmEventsTableRow> AlarmEventsTable::getRecurringBetweenDates(Time
 {
     auto retQuery = db->query("SELECT * FROM events e "
                               "JOIN alarm_events ae ON ae.event_id = e._id "
-                              "WHERE start_date BETWEEN '%q' and '%q' "
-                              "OR (start_date <= '%q' AND end_date >= '%q') "
+                              "WHERE (start_date BETWEEN '%q' and '%q' "
+                              "OR (start_date <= '%q' AND end_date >= '%q')) "
                               "AND rrule <> '' "
                               "ORDER BY start_date LIMIT %lu OFFSET %lu;",
                               TimePointToString(startDate).c_str(),
