@@ -139,6 +139,45 @@ TEST_CASE("AlarmEventRecord tests")
         return alarmsRec;
     };
 
+    SECTION("Add remove add")
+    {
+        auto retAlarmEvents = getLimitedQuery(0, 10);
+        REQUIRE(retAlarmEvents.size() == 0);
+
+        addQuery(testName1,
+                 testEventStart,
+                 testDuration,
+                 testIsAllDay,
+                 testRRuleDaily,
+                 testMusicTone,
+                 testEnabled,
+                 testSnoozeDuration);
+
+        retAlarmEvents = getLimitedQuery(0, 10);
+        REQUIRE(retAlarmEvents.size() == 1);
+
+        const auto queryRemove  = std::make_shared<db::query::alarmEvents::Remove>(1);
+        const auto retRemove    = alarmEventRecordInterface.runQuery(queryRemove);
+        const auto resultRemove = dynamic_cast<db::query::alarmEvents::RemoveResult *>(retRemove.get());
+        REQUIRE(resultRemove != nullptr);
+        REQUIRE(resultRemove->getResult());
+
+        retAlarmEvents = getLimitedQuery(0, 10);
+        REQUIRE(retAlarmEvents.size() == 0);
+
+        addQuery(testName1,
+                 testEventStart,
+                 testDuration,
+                 testIsAllDay,
+                 testRRuleDaily,
+                 testMusicTone,
+                 testEnabled,
+                 testSnoozeDuration);
+
+        retAlarmEvents = getLimitedQuery(0, 10);
+        REQUIRE(retAlarmEvents.size() == 1);
+    }
+
     SECTION("Add & Get")
     {
         addQuery(testName1,

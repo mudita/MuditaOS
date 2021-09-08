@@ -87,26 +87,14 @@ bool AlarmEventsTable::add(AlarmEventsTableRow entry)
 
 bool AlarmEventsTable::removeById(uint32_t id)
 {
-    return db->execute("DELETE FROM events "
-                       "WHERE events._id = (SELECT event_id FROM alarm_events WHERE _id=%lu);",
+    return db->execute("BEGIN TRANSACTION; "
+                       "DELETE FROM events "
+                       "WHERE events._id = (SELECT event_id FROM alarm_events WHERE _id=%lu); "
+                       "DELETE FROM alarm_events "
+                       "WHERE event_id = %lu; "
+                       "COMMIT;",
+                       id,
                        id);
-}
-
-bool AlarmEventsTable::removeByField(AlarmEventsTableFields field, const char *str)
-{
-    const auto &fieldName = getFieldName(field);
-
-    if (fieldName.empty()) {
-        return false;
-    }
-
-    return db->execute("DELETE e "
-                       "FROM events e "
-                       "INNER JOIN alarm_events ae "
-                       "  ON e._id = ae.event_id "
-                       "WHERE %q = '%q';",
-                       fieldName.c_str(),
-                       str);
 }
 
 bool AlarmEventsTable::update(AlarmEventsTableRow entry)
