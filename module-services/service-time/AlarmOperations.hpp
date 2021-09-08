@@ -50,11 +50,21 @@ namespace alarms
                                               const std::shared_ptr<alarms::AlarmHandler> handler) = 0;
     };
 
-    class AlarmOperations : public IAlarmOperations
+    class IAlarmOperationsFactory
     {
       public:
-        explicit AlarmOperations(std::unique_ptr<AbstractAlarmEventsRepository> &&alarmEventsRepo,
-                                 GetCurrentTime getCurrentTimeCallback);
+        virtual ~IAlarmOperationsFactory() noexcept = default;
+
+        virtual std::unique_ptr<IAlarmOperations> create(
+            std::unique_ptr<AbstractAlarmEventsRepository> &&alarmEventsRepo,
+            IAlarmOperations::GetCurrentTime getCurrentTimeCallback) const = 0;
+    };
+
+    class AlarmOperationsCommon : public IAlarmOperations
+    {
+      public:
+        explicit AlarmOperationsCommon(std::unique_ptr<AbstractAlarmEventsRepository> &&alarmEventsRepo,
+                                       GetCurrentTime getCurrentTimeCallback);
 
         void updateEventsCache(TimePoint now) override;
 
@@ -107,5 +117,13 @@ namespace alarms
         void processSnoozedEventsQueue(const TimePoint now);
 
         TimePoint getCurrentTime();
+    };
+
+    class CommonAlarmOperationsFactory : public IAlarmOperationsFactory
+    {
+      public:
+        std::unique_ptr<IAlarmOperations> create(
+            std::unique_ptr<AbstractAlarmEventsRepository> &&alarmEventsRepo,
+            IAlarmOperations::GetCurrentTime getCurrentTimeCallback) const override;
     };
 } // namespace alarms
