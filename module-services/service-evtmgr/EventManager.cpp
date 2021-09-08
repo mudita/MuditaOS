@@ -74,17 +74,7 @@ sys::MessagePointer EventManagerCommon::DataReceivedHandler(sys::DataMessage *ms
 {
     bool handled = false;
 
-    if (msgl->messageType == MessageType::DBServiceNotification) {
-        auto *msg = dynamic_cast<db::NotificationMessage *>(msgl);
-        if (msg != nullptr) {
-            if (msg->interface == db::Interface::Name::Alarms) {
-                alarmDBEmpty = false;
-                alarmIsValid = false;
-                handled      = true;
-            }
-        }
-    }
-    else if (msgl->messageType == MessageType::EVM_GPIO) {
+    if (msgl->messageType == MessageType::EVM_GPIO) {
         LOG_DEBUG("EVM_GPIO msg");
     }
     else if (msgl->messageType == MessageType::EVMFocusApplication) {

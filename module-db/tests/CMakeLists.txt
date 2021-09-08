@@ -3,8 +3,6 @@ add_catch2_executable(
         db
     SRCS
         AlarmEventRecord_tests.cpp
-        AlarmsRecord_tests.cpp
-        AlarmsTable_tests.cpp
         CalllogRecord_tests.cpp
         CalllogTable_tests.cpp
         ContactGroups_tests.cpp
