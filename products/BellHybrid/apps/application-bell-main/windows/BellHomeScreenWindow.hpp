@@ -26,6 +26,7 @@ namespace gui
         bool updateTime() override;
         bool onInput(const InputEvent &inputEvent) override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        bool onDatabaseMessage(sys::Message *msg) override;
 
         void setAlarmTriggered() override;
         void setAlarmSnoozed() override;

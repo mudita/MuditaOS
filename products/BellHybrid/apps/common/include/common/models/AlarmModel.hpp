@@ -26,12 +26,20 @@ namespace app
         void setAlarmTime(time_t time) override;
         time_t getAlarmTime() const override;
         void activate(bool value) override;
+        void update() override;
 
       private:
-        void requestAlarm();
+        enum class State
+        {
+            Invalid,
+            InitInProgress,
+            Valid
+        };
+
         void updateAlarm(const AlarmEventRecord &alarm);
         Application *app{};
         AlarmEventRecord cachedRecord;
+        State state{State::Invalid};
 
         std::function<bool(sys::ResponseMessage *)> responseCallback;
     };

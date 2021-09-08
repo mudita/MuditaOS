@@ -10,6 +10,7 @@
 #include <module-sys/Timers/SystemTimer.hpp>
 #include <module-sys/Timers/TimerFactory.hpp>
 #include <time/time_constants.hpp>
+#include <service-db/DBNotificationMessage.hpp>
 
 namespace app::home_screen
 {
@@ -76,5 +77,11 @@ namespace app::home_screen
     void HomeScreenPresenter::refreshWindow()
     {
         app->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+    }
+    void HomeScreenPresenter::onDatabaseMessage(db::NotificationMessage *msg)
+    {
+        if (msg->interface == db::Interface::Name::AlarmEvents && msg->type == db::Query::Type::Update) {
+            alarmModel->update();
+        }
     }
 } // namespace app::home_screen

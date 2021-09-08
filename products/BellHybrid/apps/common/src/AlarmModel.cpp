@@ -17,14 +17,27 @@ namespace app
         responseCallback = [this](const auto response) -> bool {
             const auto resp = dynamic_cast<alarms::AlarmGetResponseMessage *>(response);
             if (resp) {
-                cachedRecord = resp->alarm;
+                if (resp->alarm.isValid()) {
+                    cachedRecord = resp->alarm;
+                    state        = State::Valid;
+                }
+                else if (state == State::InitInProgress) {
+                    /// We received invalid response from DB during model initialization. It means alarm record does not
+                    /// exist, hence we need to create one.
+                    auto request = AsyncRequest::createFromMessage(
+                        std::make_unique<alarms::AlarmAddRequestMessage>(cachedRecord), service::name::service_time);
+                    request->execute(this->app, this, responseCallback);
+
+                    state = State::Valid;
+                    this->update();
+                }
             }
             return true;
         };
-
-        requestAlarm();
+        state = State::InitInProgress;
+        update();
     }
-    void AlarmModel::requestAlarm()
+    void AlarmModel::update()
     {
         auto request = AsyncRequest::createFromMessage(std::make_unique<alarms::AlarmGetRequestMessage>(),
                                                        service::name::service_time);
@@ -51,7 +64,7 @@ namespace app
                                                        service::name::service_time);
         request->execute(app, this, responseCallback);
 
-        requestAlarm();
+        cachedRecord = alarm;
     }
     bool AlarmModel::isActive() const
     {

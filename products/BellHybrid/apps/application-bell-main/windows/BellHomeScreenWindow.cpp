@@ -11,6 +11,7 @@
 #include <gui/widgets/TextFixedSize.hpp>
 #include <gui/widgets/Style.hpp>
 #include <i18n/i18n.hpp>
+#include <service-db/DBNotificationMessage.hpp>
 #include <service-time/api/TimeSettingsApi.hpp>
 #include <time/time_constants.hpp>
 #include <widgets/AlarmSetSpinner.hpp>
@@ -244,5 +245,14 @@ namespace gui
         auto newTime         = std::localtime(&alarmTime);
         handleMinuteDecrease(*newTime);
         alarm->setTime(std::mktime(newTime));
+    }
+    bool BellHomeScreenWindow::onDatabaseMessage(sys::Message *msg)
+    {
+        auto *msgNotification = dynamic_cast<db::NotificationMessage *>(msg);
+        if (msgNotification != nullptr) {
+            presenter->onDatabaseMessage(msgNotification);
+            return true;
+        }
+        return false;
     }
 } // namespace gui
