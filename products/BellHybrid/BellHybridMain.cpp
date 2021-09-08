@@ -10,10 +10,8 @@
 #include <application-bell-powernap/ApplicationBellPowerNap.hpp>
 
 // modules
-#include <module-db/Databases/AlarmsDB.hpp>
 #include <module-db/Databases/EventsDB.hpp>
 #include <module-db/Interface/AlarmEventRecord.hpp>
-#include <module-db/Interface/AlarmsRecord.hpp>
 
 // services
 #include <appmgr/ApplicationManager.hpp>

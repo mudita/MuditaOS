@@ -108,8 +108,9 @@ namespace app::alarmClock
 
     bool AlarmClockMainWindow::onDatabaseMessage(sys::Message *msgl)
     {
+        // TODO this is actually bad - we can request data from ServiceTime when there is no data there
         auto *msgNotification = dynamic_cast<db::NotificationMessage *>(msgl);
-        if (msgNotification != nullptr && msgNotification->interface == db::Interface::Name::Alarms) {
+        if (msgNotification != nullptr && msgNotification->interface == db::Interface::Name::AlarmEvents) {
             if (msgNotification->dataModified()) {
                 alarmsList->rebuildList(gui::listview::RebuildType::InPlace);
             }

@@ -5,7 +5,6 @@
 
 #include <module-db/Databases/EventsDB.hpp>
 #include <module-db/Interface/AlarmEventRecord.hpp>
-#include <module-db/Interface/AlarmsRecord.hpp>
 
 #include <service-db/DBServiceMessage.hpp>
 #include <service-db/agents/settings/SettingsAgent.hpp>

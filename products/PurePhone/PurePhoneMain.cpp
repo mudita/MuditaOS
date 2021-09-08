@@ -26,12 +26,10 @@
 #include <application-onboarding/ApplicationOnBoarding.hpp>
 
 // modules
-#include <module-db/Databases/AlarmsDB.hpp>
 #include <module-db/Databases/CountryCodesDB.hpp>
 #include <module-db/Databases/EventsDB.hpp>
 #include <module-db/Databases/NotificationsDB.hpp>
 #include <module-db/Interface/AlarmEventRecord.hpp>
-#include <module-db/Interface/AlarmsRecord.hpp>
 #include <module-db/Interface/CountryCodeRecord.hpp>
 #include <module-db/Interface/NotificationsRecord.hpp>
 

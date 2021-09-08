@@ -3,13 +3,11 @@
 
 #include <db/ServiceDB.hpp>
 
-#include <module-db/Databases/AlarmsDB.hpp>
 #include <module-db/Databases/CountryCodesDB.hpp>
 #include <module-db/Databases/EventsDB.hpp>
 #include <module-db/Databases/NotificationsDB.hpp>
 #include <module-db/Databases/NotificationsDB.hpp>
 #include <module-db/Interface/AlarmEventRecord.hpp>
-#include <module-db/Interface/AlarmsRecord.hpp>
 #include <module-db/Interface/CalllogRecord.hpp>
 #include <module-db/Interface/CountryCodeRecord.hpp>
 #include <module-db/Interface/NotesRecord.hpp>
@@ -31,7 +29,6 @@ ServiceDB::~ServiceDB()
     eventsDB.reset();
     contactsDB.reset();
     smsDB.reset();
-    alarmsDB.reset();
     notesDB.reset();
     countryCodesDB.reset();
     notificationsDB.reset();
@@ -54,8 +51,6 @@ db::Interface *ServiceDB::getInterface(db::Interface::Name interface)
         return smsTemplateRecordInterface.get();
     case db::Interface::Name::Contact:
         return contactRecordInterface.get();
-    case db::Interface::Name::Alarms:
-        return alarmsRecordInterface.get();
     case db::Interface::Name::Notes:
         return notesRecordInterface.get();
     case db::Interface::Name::Calllog:
@@ -211,7 +206,6 @@ sys::ReturnCodes ServiceDB::InitHandler()
     eventsDB        = std::make_unique<EventsDB>((purefs::dir::getUserDiskPath() / "events.db").c_str());
     contactsDB      = std::make_unique<ContactsDB>((purefs::dir::getUserDiskPath() / "contacts.db").c_str());
     smsDB           = std::make_unique<SmsDB>((purefs::dir::getUserDiskPath() / "sms.db").c_str());
-    alarmsDB        = std::make_unique<AlarmsDB>((purefs::dir::getUserDiskPath() / "alarms.db").c_str());
     notesDB         = std::make_unique<NotesDB>((purefs::dir::getUserDiskPath() / "notes.db").c_str());
     calllogDB       = std::make_unique<CalllogDB>((purefs::dir::getUserDiskPath() / "calllog.db").c_str());
     countryCodesDB  = std::make_unique<CountryCodesDB>("country-codes.db");
@@ -224,7 +218,6 @@ sys::ReturnCodes ServiceDB::InitHandler()
     smsRecordInterface         = std::make_unique<SMSRecordInterface>(smsDB.get(), contactsDB.get());
     threadRecordInterface      = std::make_unique<ThreadRecordInterface>(smsDB.get(), contactsDB.get());
     smsTemplateRecordInterface = std::make_unique<SMSTemplateRecordInterface>(smsDB.get());
-    alarmsRecordInterface      = std::make_unique<AlarmsRecordInterface>(alarmsDB.get());
     notesRecordInterface       = std::make_unique<NotesRecordInterface>(notesDB.get());
     calllogRecordInterface     = std::make_unique<CalllogRecordInterface>(calllogDB.get(), contactsDB.get());
     countryCodeRecordInterface = std::make_unique<CountryCodeRecordInterface>(countryCodesDB.get());
@@ -257,11 +250,6 @@ bool ServiceDB::StoreIntoBackup(const std::filesystem::path &backupPath)
 
     if (smsDB->storeIntoFile(backupPath / std::filesystem::path(smsDB->getName()).filename()) == false) {
         LOG_ERROR("smsDB backup failed");
-        return false;
-    }
-
-    if (alarmsDB->storeIntoFile(backupPath / std::filesystem::path(alarmsDB->getName()).filename()) == false) {
-        LOG_ERROR("alarmsDB backup failed");
         return false;
     }
 

@@ -23,7 +23,6 @@ namespace db
             SMSThread,
             SMSTemplate,
             Contact,
-            Alarms,
             Notes,
             Calllog,
             CountryCodes,
@@ -46,8 +45,6 @@ constexpr const char *c_str(enum db::Interface::Name db)
         return "SMSTemplate";
     case db::Interface::Name::Contact:
         return "Contact";
-    case db::Interface::Name::Alarms:
-        return "Alarms";
     case db::Interface::Name::Notes:
         return "Notes";
     case db::Interface::Name::Calllog:

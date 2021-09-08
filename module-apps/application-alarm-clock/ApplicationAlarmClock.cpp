@@ -40,7 +40,7 @@ namespace app
         if (msg != nullptr) {
             LOG_DEBUG("Received notification: %s", msg->to_string().c_str());
             // window-specific actions
-            if (msg->interface == db::Interface::Name::Alarms) {
+            if (msg->interface == db::Interface::Name::AlarmEvents) {
                 for (auto &[name, window] : windowsStack.windows) {
                     window->onDatabaseMessage(msg);
                 }
