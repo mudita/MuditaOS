@@ -5,9 +5,10 @@
 
 #include <magic_enum.hpp>
 
+using KeyNotificationSource = uint16_t;
+
 namespace bsp
 {
-
     enum class KeyCodes
     {
         Undefined     = 0,
@@ -44,7 +45,7 @@ namespace bsp
 
         HeadsetOk      = 71,
         HeadsetVolUp   = 72,
-        HeadsetVolDown = 73
+        HeadsetVolDown = 73,
     };
 
     enum class KeyEvents
