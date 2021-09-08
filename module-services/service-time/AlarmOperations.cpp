@@ -10,11 +10,18 @@
 
 namespace alarms
 {
-    AlarmOperations::AlarmOperations(std::unique_ptr<AbstractAlarmEventsRepository> &&alarmEventsRepo,
-                                     GetCurrentTime getCurrentTimeCallback)
+    std::unique_ptr<IAlarmOperations> CommonAlarmOperationsFactory::create(
+        std::unique_ptr<AbstractAlarmEventsRepository> &&alarmEventsRepo,
+        IAlarmOperations::GetCurrentTime getCurrentTimeCallback) const
+    {
+        return std::make_unique<AlarmOperationsCommon>(std::move(alarmEventsRepo), getCurrentTimeCallback);
+    }
+
+    AlarmOperationsCommon::AlarmOperationsCommon(std::unique_ptr<AbstractAlarmEventsRepository> &&alarmEventsRepo,
+                                                 GetCurrentTime getCurrentTimeCallback)
         : alarmEventsRepo{std::move(alarmEventsRepo)}, getCurrentTimeCallback{getCurrentTimeCallback} {};
 
-    void AlarmOperations::updateEventsCache(TimePoint now)
+    void AlarmOperationsCommon::updateEventsCache(TimePoint now)
     {
         OnGetNextSingleProcessed callback = [&](std::vector<SingleEventRecord> singleEvents) {
             nextSingleEvents.clear();
@@ -26,13 +33,13 @@ namespace alarms
         getNextSingleEvents(now, callback);
     }
 
-    void AlarmOperations::getAlarm(const std::uint32_t alarmId, OnGetAlarmProcessed callback)
+    void AlarmOperationsCommon::getAlarm(const std::uint32_t alarmId, OnGetAlarmProcessed callback)
     {
         OnGetAlarmEventCallback repoCallback = [callback](AlarmEventRecord record) { callback(record); };
         alarmEventsRepo->getAlarmEvent(alarmId, repoCallback);
     }
 
-    void AlarmOperations::addAlarm(AlarmEventRecord record, OnAddAlarmProcessed callback)
+    void AlarmOperationsCommon::addAlarm(AlarmEventRecord record, OnAddAlarmProcessed callback)
     {
         OnAddAlarmEventCallback repoCallback = [&, callback, record](bool success) mutable {
             checkAndUpdateCache(record);
@@ -41,7 +48,7 @@ namespace alarms
         alarmEventsRepo->addAlarmEvent(record, repoCallback);
     }
 
-    void AlarmOperations::updateAlarm(AlarmEventRecord record, OnUpdateAlarmProcessed callback)
+    void AlarmOperationsCommon::updateAlarm(AlarmEventRecord record, OnUpdateAlarmProcessed callback)
     {
         OnUpdateAlarmEventCallback repoCallback = [&, callback, record](bool success) mutable {
             auto found = std::find_if(nextSingleEvents.begin(),
@@ -61,7 +68,7 @@ namespace alarms
         alarmEventsRepo->updateAlarmEvent(record, repoCallback);
     }
 
-    void AlarmOperations::removeAlarm(const std::uint32_t alarmId, OnRemoveAlarmProcessed callback)
+    void AlarmOperationsCommon::removeAlarm(const std::uint32_t alarmId, OnRemoveAlarmProcessed callback)
     {
         OnRemoveAlarmEventCallback repoCallback = [&, callback, alarmId](bool success) {
             auto found = std::find_if(
@@ -77,14 +84,14 @@ namespace alarms
         alarmEventsRepo->removeAlarmEvent(alarmId, repoCallback);
     }
 
-    void AlarmOperations::getAlarmsInRange(
+    void AlarmOperationsCommon::getAlarmsInRange(
         TimePoint start, TimePoint end, std::uint32_t offset, std::uint32_t limit, OnGetAlarmsInRangeProcessed callback)
     {
         OnGetAlarmEventsInRangeCallback repoCallback = [callback](auto vals) { callback(std::move(vals)); };
         alarmEventsRepo->getAlarmEventsInRange(start, end, offset, limit, repoCallback);
     }
 
-    void AlarmOperations::getNextSingleEvents(TimePoint start, OnGetNextSingleProcessed callback)
+    void AlarmOperationsCommon::getNextSingleEvents(TimePoint start, OnGetNextSingleProcessed callback)
     {
         auto nextEvents = std::make_shared<std::vector<AlarmEventRecord>>();
 
@@ -101,7 +108,7 @@ namespace alarms
         alarmEventsRepo->getNext(start, getNextSingleEventsOffset, getNextSingleEventsLimit, repoGetNextCallback);
     }
 
-    void AlarmOperations::turnOffRingingAlarm(const std::uint32_t id, OnTurnOffRingingAlarm callback)
+    void AlarmOperationsCommon::turnOffRingingAlarm(const std::uint32_t id, OnTurnOffRingingAlarm callback)
     {
         auto found =
             std::find_if(ongoingSingleEvents.begin(),
@@ -117,9 +124,9 @@ namespace alarms
         callback(true);
     }
 
-    void AlarmOperations::snoozeRingingAlarm(const std::uint32_t id,
-                                             const TimePoint nextAlarmTime,
-                                             OnSnoozeRingingAlarm callback)
+    void AlarmOperationsCommon::snoozeRingingAlarm(const std::uint32_t id,
+                                                   const TimePoint nextAlarmTime,
+                                                   OnSnoozeRingingAlarm callback)
     {
         auto found =
             std::find_if(ongoingSingleEvents.begin(),
@@ -152,11 +159,11 @@ namespace alarms
         callback(true);
     }
 
-    void AlarmOperations::onRepoGetNextResponse(OnGetNextSingleProcessed handledCallback,
-                                                std::shared_ptr<std::vector<AlarmEventRecord>> nextEvents,
-                                                TimePoint start,
-                                                OnGetAlarmEventsRecurringInRange recurringCallback,
-                                                std::vector<AlarmEventRecord> records)
+    void AlarmOperationsCommon::onRepoGetNextResponse(OnGetNextSingleProcessed handledCallback,
+                                                      std::shared_ptr<std::vector<AlarmEventRecord>> nextEvents,
+                                                      TimePoint start,
+                                                      OnGetAlarmEventsRecurringInRange recurringCallback,
+                                                      std::vector<AlarmEventRecord> records)
     {
         if (records.empty()) {
             handledCallback({});
@@ -173,10 +180,11 @@ namespace alarms
         }
     }
 
-    void AlarmOperations::onRepoGetRecurringInRangeResponse(OnGetNextSingleProcessed handledCallback,
-                                                            std::shared_ptr<std::vector<AlarmEventRecord>> nextEvents,
-                                                            TimePoint start,
-                                                            std::vector<AlarmEventRecord> records)
+    void AlarmOperationsCommon::onRepoGetRecurringInRangeResponse(
+        OnGetNextSingleProcessed handledCallback,
+        std::shared_ptr<std::vector<AlarmEventRecord>> nextEvents,
+        TimePoint start,
+        std::vector<AlarmEventRecord> records)
     {
         std::vector<SingleEventRecord> outEvents;
         if (!records.empty()) {
@@ -200,7 +208,7 @@ namespace alarms
         handledCallback(outEvents);
     }
 
-    void AlarmOperations::checkAndUpdateCache(AlarmEventRecord record)
+    void AlarmOperationsCommon::checkAndUpdateCache(AlarmEventRecord record)
     {
         auto nearestNewSingleEvent = record.getNextSingleEvent(getCurrentTime());
 
@@ -213,7 +221,7 @@ namespace alarms
         }
     }
 
-    auto AlarmOperations::minuteUpdated(TimePoint now) -> void
+    auto AlarmOperationsCommon::minuteUpdated(TimePoint now) -> void
     {
         auto isHandlingInProgress = !ongoingSingleEvents.empty();
 
@@ -230,13 +238,13 @@ namespace alarms
         }
     }
 
-    void AlarmOperations::addAlarmExecutionHandler(const alarms::AlarmType type,
-                                                   const std::shared_ptr<alarms::AlarmHandler> handler)
+    void AlarmOperationsCommon::addAlarmExecutionHandler(const alarms::AlarmType type,
+                                                         const std::shared_ptr<alarms::AlarmHandler> handler)
     {
         alarmHandlerFactory.addHandler(type, handler);
     }
 
-    void AlarmOperations::switchAlarmExecution(const SingleEventRecord &singleAlarmEvent, bool newStateOn)
+    void AlarmOperationsCommon::switchAlarmExecution(const SingleEventRecord &singleAlarmEvent, bool newStateOn)
     {
         alarms::AlarmType alarmType = alarms::AlarmType::None;
         if (typeid(*(singleAlarmEvent.parent)) == typeid(AlarmEventRecord)) {
@@ -260,7 +268,7 @@ namespace alarms
         }
     }
 
-    auto AlarmOperations::processNextEventsQueue(const TimePoint now) -> void
+    auto AlarmOperationsCommon::processNextEventsQueue(const TimePoint now) -> void
     {
         if (nextSingleEvents.front()->startDate <= now) {
             ongoingSingleEvents.insert(ongoingSingleEvents.end(),
@@ -270,7 +278,7 @@ namespace alarms
         }
     }
 
-    auto AlarmOperations::processSnoozedEventsQueue(const TimePoint now) -> void
+    auto AlarmOperationsCommon::processSnoozedEventsQueue(const TimePoint now) -> void
     {
         for (auto it = snoozedSingleEvents.begin(); it != snoozedSingleEvents.end();) {
             if ((*it)->startDate <= now) {
@@ -283,7 +291,7 @@ namespace alarms
         }
     }
 
-    TimePoint AlarmOperations::getCurrentTime()
+    TimePoint AlarmOperationsCommon::getCurrentTime()
     {
         if (!getCurrentTimeCallback) {
             return TIME_POINT_INVALID;

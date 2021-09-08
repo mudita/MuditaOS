@@ -52,6 +52,7 @@ target_link_libraries(BellHybrid
         service-desktop
         service-time
         sys
+        bell::time
         platform
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_Linux>:iosyscalls>"
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_RT1051>:CrashCatcher::CrashCatcher>"
