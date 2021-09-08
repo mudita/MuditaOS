@@ -5,9 +5,11 @@
 #include "presenter/PowerNapMainWindowPresenter.hpp"
 #include "presenter/PowerNapProgressPresenter.hpp"
 #include "presenter/PowerNapSessionEndedPresenter.hpp"
+#include "widgets/PowerNapAlarm.hpp"
 #include "windows/PowerNapMainWindow.hpp"
 #include "windows/PowerNapProgressWindow.hpp"
 #include "windows/PowerNapSessionEndedWindow.hpp"
+#include <service-audio/AudioMessage.hpp>
 
 namespace app
 {
@@ -16,9 +18,11 @@ namespace app
                                                      sys::phone_modes::PhoneMode mode,
                                                      sys::bluetooth::BluetoothMode bluetoothMode,
                                                      StartInBackground startInBackground)
-        : ApplicationBell(std::move(name), std::move(parent), mode, bluetoothMode, startInBackground)
+        : ApplicationBell(std::move(name), std::move(parent), mode, bluetoothMode, startInBackground),
+          alarm{std::make_unique<powernap::PowerNapAlarmImpl>(this)}
     {}
 
+    ApplicationBellPowerNap::~ApplicationBellPowerNap() = default;
     sys::ReturnCodes ApplicationBellPowerNap::InitHandler()
     {
         auto ret = Application::InitHandler();
@@ -37,7 +41,7 @@ namespace app
             return std::make_unique<gui::PowerNapMainWindow>(app, std::move(presenter));
         });
         windowsFactory.attach(gui::window::name::powernapProgress, [this](Application *app, const std::string &name) {
-            auto presenter = std::make_unique<powernap::PowerNapProgressPresenter>(app, settings.get());
+            auto presenter = std::make_unique<powernap::PowerNapProgressPresenter>(app, settings.get(), *alarm);
             return std::make_unique<gui::PowerNapProgressWindow>(app, std::move(presenter));
         });
         windowsFactory.attach(gui::window::name::powernapSessionEnded, [](Application *app, const std::string &name) {
@@ -55,6 +59,12 @@ namespace app
             response != nullptr && response->retCode == sys::ReturnCodes::Success) {
             return retMsg;
         }
+
+        if ((resp != nullptr) && typeid(*resp) == typeid(AudioStartPlaybackResponse)) {
+            auto *msg = static_cast<AudioStartPlaybackResponse *>(resp);
+            alarm->registerAudioStream(msg->token);
+        }
+
         return sys::msgHandled();
     }
 } // namespace app

@@ -9,7 +9,7 @@
 namespace
 {
     constexpr std::chrono::minutes emptyValue{0};
-    constexpr std::chrono::minutes spinnerDefaultValue{20};
+    constexpr std::chrono::minutes spinnerDefaultValue{15};
 } // namespace
 
 namespace app::powernap
