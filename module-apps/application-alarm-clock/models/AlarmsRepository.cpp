@@ -2,11 +2,6 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmsRepository.hpp"
-#include <module-db/queries/alarms/QueryAlarmsGetLimited.hpp>
-#include <module-db/queries/alarms/QueryAlarmsAdd.hpp>
-#include <module-db/queries/alarms/QueryAlarmsRemove.hpp>
-#include <module-db/queries/alarms/QueryAlarmsEdit.hpp>
-#include <module-db/queries/alarms/QueryAlarmsTurnOffAll.hpp>
 #include <service-time/include/service-time/AlarmMessage.hpp>
 #include <service-time/Constants.hpp>
 
