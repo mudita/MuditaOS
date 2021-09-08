@@ -480,6 +480,14 @@ TEST_CASE("AlarmEventRecord tests")
                  testMusicTone,
                  testEnabled,
                  testSnoozeDuration);
+        addQuery("TestAlarmName4",
+                 testEventStart,
+                 testDuration,
+                 testIsAllDay,
+                 testEmptyRRuleText,
+                 testMusicTone,
+                 testEnabled,
+                 testSnoozeDuration);
         auto alarms = getRecurringBetweenDatesQuery(
             TimePointFromString("2020-01-01 12:00:00"), TimePointFromString("2020-01-11 11:00:00"), 0, 100);
         REQUIRE(alarms.size() == 0);
