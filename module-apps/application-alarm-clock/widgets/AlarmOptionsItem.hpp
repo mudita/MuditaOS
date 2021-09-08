@@ -19,6 +19,7 @@ namespace gui
 
     class AlarmOptionsItem : public AlarmInternalListItem
     {
+      protected:
         enum class MusicStatus
         {
             Stop,

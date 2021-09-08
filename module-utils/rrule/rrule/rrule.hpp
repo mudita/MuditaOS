@@ -27,6 +27,8 @@ namespace rrule
             YEARLY_RECURRENCE,
             NO_RECURRENCE,
         };
+
+        /// Information: by definition weekday = monday - friday, therefore our weekday is not a proper weekday
         enum class RRuleWeekday
         {
             NO_WEEKDAY,
