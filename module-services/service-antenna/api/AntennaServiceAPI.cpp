@@ -41,4 +41,9 @@ namespace AntennaServiceAPI
         }
         return false;
     }
+
+    void InvalidCSQNotification(sys::Service *serv)
+    {
+        serv->bus.sendUnicast(std::make_shared<antenna::message::InvalidCsqNotification>(), service::name::antenna);
+    }
 } // namespace AntennaServiceAPI

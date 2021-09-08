@@ -34,3 +34,13 @@ class AntennaLockRequestResponse : public sys::ResponseMessage
     bool retCode;
     antenna::lockState data;
 };
+
+namespace antenna::message
+{
+    class InvalidCsqNotification : public sys::DataMessage
+    {
+      public:
+        InvalidCsqNotification() : sys::DataMessage(MessageType::MessageTypeUninitialized)
+        {}
+    };
+} // namespace antenna::message
