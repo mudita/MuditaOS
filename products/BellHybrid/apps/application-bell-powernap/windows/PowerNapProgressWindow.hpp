@@ -23,7 +23,7 @@ namespace gui
         void buildLayout();
         void configureTimer();
 
-        void switchWindow() override;
+        void napEnded() override;
 
       public:
         PowerNapProgressWindow(app::Application *app,

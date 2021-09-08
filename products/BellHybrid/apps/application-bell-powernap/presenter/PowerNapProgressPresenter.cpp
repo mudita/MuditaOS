@@ -4,6 +4,7 @@
 #include "PowerNapProgressPresenter.hpp"
 #include "application-bell-powernap/ApplicationBellPowerNap.hpp"
 #include "data/PowerNapCommon.hpp"
+#include "widgets/PowerNapAlarm.hpp"
 
 #include <apps-common/widgets/ProgressTimerImpl.hpp>
 #include <service-db/Settings.hpp>
@@ -21,12 +22,14 @@ namespace
 } // namespace
 namespace app::powernap
 {
-    PowerNapProgressPresenter::PowerNapProgressPresenter(app::Application *app, settings::Settings *settings)
-        : app{app}, settings{settings}, napAlarmTimer{sys::TimerFactory::createSingleShotTimer(
-                                            app, powernapAlarmTimerName, powernapAlarmTimeout, [this](sys::Timer &) {
-                                                onNapAlarmFinished();
-                                            })}
+    PowerNapProgressPresenter::PowerNapProgressPresenter(app::Application *app,
+                                                         settings::Settings *settings,
+                                                         PowerNapAlarm &alarm)
+        : app{app}, settings{settings}, alarm{alarm},
+          napAlarmTimer{sys::TimerFactory::createSingleShotTimer(
+              app, powernapAlarmTimerName, powernapAlarmTimeout, [this](sys::Timer &) { onNapAlarmFinished(); })}
     {}
+
     void PowerNapProgressPresenter::initTimer(gui::Item *parent)
     {
         timer = std::make_unique<app::ProgressTimerImpl>(app, parent, powernapTimerName, timerTick);
@@ -39,6 +42,12 @@ namespace app::powernap
         timer->reset(std::chrono::minutes{utils::getNumericValue<int>(value)});
         timer->start();
     }
+    void PowerNapProgressPresenter::endNap()
+    {
+        timer->stop();
+        napAlarmTimer.stop();
+        onNapAlarmFinished();
+    }
     app::ProgressTimerUIConfigurator &PowerNapProgressPresenter::getUIConfigurator() noexcept
     {
         Expects(timer != nullptr);
@@ -46,11 +55,13 @@ namespace app::powernap
     }
     void PowerNapProgressPresenter::onNapFinished()
     {
+        alarm.start();
         napAlarmTimer.start();
     }
-
     void PowerNapProgressPresenter::onNapAlarmFinished()
     {
-        getView()->switchWindow();
+        alarm.stop();
+        getView()->napEnded();
     }
+
 } // namespace app::powernap
