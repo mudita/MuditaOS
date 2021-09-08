@@ -60,6 +60,8 @@ class ServiceAntenna : public sys::Service
     void handleLockRequest(antenna::lockState request);
     std::unique_ptr<sys::phone_modes::Observer> phoneModeObserver;
 
+    void registerMessageHandlers();
+
   protected:
     // flag informs about suspend/resume status
     bool suspended = false;

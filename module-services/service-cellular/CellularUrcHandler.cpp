@@ -113,10 +113,10 @@ void CellularUrcHandler::Handle(Qind &urc)
 {
     if (urc.isCsq()) {
         // Received signal strength change
-        AntennaServiceAPI::CSQChange(&cellularService);
         auto rssi = urc.getRSSI();
         if (!rssi) {
             LOG_INFO("Invalid csq - ignore");
+            AntennaServiceAPI::InvalidCSQNotification(&cellularService);
         }
         else {
             SignalStrength signalStrength(*rssi);
