@@ -11,6 +11,13 @@
 #include <time/time_conversion.hpp>
 #include <time/time_constants.hpp>
 
+/// Uncomment to print state machine debug logs
+/// #define DEBUG_STATE_MACHINE 1U
+
+#ifdef DEBUG_STATE_MACHINE
+#include "StateControllerLogger.hpp"
+#endif
+
 namespace app::home_screen
 {
     namespace sml = boost::sml;
@@ -42,20 +49,22 @@ namespace app::home_screen
                             std::to_string(duration.getMinutes()) + " min");
             };
 
-            auto setDefaultAlarmTime = [](AbstractView &view, AbstractTimeModel &timeModel) {
-                constexpr auto defaultAlarmTimeHour = 7U;
-                constexpr auto defaultAlarmTimeMin  = 0U;
-                const auto now                      = timeModel.getCurrentTime();
-                const auto newTime                  = std::localtime(&now);
-                newTime->tm_hour                    = defaultAlarmTimeHour;
-                newTime->tm_min                     = defaultAlarmTimeMin;
-                auto alarmTime                      = std::mktime(newTime);
+            auto setDefaultAlarmTime =
+                [](AbstractView &view, AbstractAlarmModel &alarmModel, AbstractTimeModel &timeModel) {
+                    constexpr auto defaultAlarmTimeHour = 7U;
+                    constexpr auto defaultAlarmTimeMin  = 0U;
+                    const auto now                      = timeModel.getCurrentTime();
+                    const auto newTime                  = std::localtime(&now);
+                    newTime->tm_hour                    = defaultAlarmTimeHour;
+                    newTime->tm_min                     = defaultAlarmTimeMin;
+                    auto alarmTime                      = std::mktime(newTime);
 
-                if (alarmTime < now) {
-                    alarmTime += utils::time::secondsInDay;
-                }
-                view.setAlarmTime(alarmTime);
-            };
+                    if (alarmTime < now) {
+                        alarmTime += utils::time::secondsInDay;
+                    }
+                    view.setAlarmTime(alarmTime);
+                    alarmModel.setAlarmTime(alarmTime);
+                };
 
             auto isAlarmActive = [](AbstractAlarmModel &alarmModel) -> bool { return alarmModel.isActive(); };
 
@@ -85,14 +94,16 @@ namespace app::home_screen
 
         namespace Deactivated
         {
-            auto entry =
-                [](AbstractView &view, AbstractTemperatureModel &temperatureModel, AbstractTimeModel &timeModel) {
-                    Helpers::setDefaultAlarmTime(view, timeModel);
-                    view.setAlarmEdit(false);
-                    view.setAlarmActive(false);
-                    view.setAlarmVisible(false);
-                    view.setTemperature(temperatureModel.getTemperature());
-                };
+            auto entry = [](AbstractView &view,
+                            AbstractTemperatureModel &temperatureModel,
+                            AbstractAlarmModel &alarmModel,
+                            AbstractTimeModel &timeModel) {
+                Helpers::setDefaultAlarmTime(view, alarmModel, timeModel);
+                view.setAlarmEdit(false);
+                view.setAlarmActive(false);
+                view.setAlarmVisible(false);
+                view.setTemperature(temperatureModel.getTemperature());
+            };
         } // namespace Deactivated
 
         namespace DeactivatedWait
@@ -114,10 +125,7 @@ namespace app::home_screen
                 view.setAlarmTimeVisible(true);
                 view.setAlarmVisible(true);
             };
-            auto exit = [](AbstractView &view, AbstractAlarmModel &alarmModel) {
-                view.setAlarmEdit(false);
-                alarmModel.setAlarmTime(view.getAlarmTime());
-            };
+            auto exit = [](AbstractView &view) { view.setAlarmEdit(false); };
 
             auto processRotateLeft = [](AbstractView &view, AbstractPresenter &presenter) {
                 presenter.spawnTimer();
@@ -150,6 +158,7 @@ namespace app::home_screen
                             AbstractPresenter &presenter,
                             AbstractAlarmModel &alarmModel,
                             AbstractTimeModel &timeModel) {
+                alarmModel.setAlarmTime(view.getAlarmTime());
                 alarmModel.activate(true);
                 presenter.spawnTimer();
                 view.setBottomDescription(
@@ -164,10 +173,10 @@ namespace app::home_screen
         {
             auto entry =
                 [](AbstractView &view, AbstractAlarmModel &alarmModel, AbstractTemperatureModel &temperatureModel) {
-                    view.setAlarmTime(alarmModel.getAlarmTime());
                     view.setTemperature(temperatureModel.getTemperature());
                     view.setAlarmActive(true);
                     view.setAlarmVisible(true);
+                    view.setAlarmTime(alarmModel.getAlarmTime());
                 };
         } // namespace Activated
 
@@ -223,9 +232,9 @@ namespace app::home_screen
             {
                 using namespace sml;
                 // clang-format off
-                return make_transition_table(*"Deactivated"_s + event<Events::LightPress>/ Helpers::switchToMenu = "Deactivated"_s,
-                                             "Deactivated"_s + sml::on_entry<_> / Deactivated::entry,
+                return make_transition_table(*"Deactivated"_s + sml::on_entry<_> / Deactivated::entry,
                                              "Deactivated"_s [Helpers::isAlarmActive] = "Activated"_s,
+                                             "Deactivated"_s + event<Events::LightPress>/ Helpers::switchToMenu = "Deactivated"_s,
                                              "Deactivated"_s + event<Events::RotateRightPress> / Helpers::makeAlarmEditable = "DeactivatedEdit"_s,
                                              "Deactivated"_s + event<Events::DeepUpPress> / Helpers::showAlarmTime = "ActivatedWait"_s,
                                              "Deactivated"_s + event<Events::TimeUpdate> / Helpers::updateTemperature,
@@ -255,6 +264,7 @@ namespace app::home_screen
                                              "ActivatedWait"_s + event<Events::LightPress>/ Helpers::switchToMenu = "Activated"_s,
 
                                              "Activated"_s + sml::on_entry<_> / Activated::entry,
+                                             "Activated"_s [not Helpers::isAlarmActive] = "Deactivated"_s,
                                              "Activated"_s + event<Events::LightPress>/ Helpers::switchToMenu = "Activated"_s,
                                              "Activated"_s + event<Events::RotateRightPress> / Helpers::makeAlarmEditable = "ActivatedEdit"_s,
                                              "Activated"_s + event<Events::TimeUpdate> / Helpers::updateTemperature,
@@ -305,10 +315,22 @@ namespace app::home_screen
              AbstractTemperatureModel &temperatureModel,
              AbstractAlarmModel &alarmModel,
              AbstractTimeModel &timeModel)
-            : sm{view, presenter, temperatureModel, alarmModel, timeModel}
+            : sm{
+#ifdef DEBUG_STATE_MACHINE
+                  smLogger,
+#endif
+                  view,
+                  presenter,
+                  temperatureModel,
+                  alarmModel,
+                  timeModel}
         {}
-
+#ifdef DEBUG_STATE_MACHINE
+        using SM = sml::sm<StateMachine, sml::logger<Logger>>;
+        Logger smLogger;
+#else
         using SM = sml::sm<StateMachine>;
+#endif
         SM sm;
     };
 
