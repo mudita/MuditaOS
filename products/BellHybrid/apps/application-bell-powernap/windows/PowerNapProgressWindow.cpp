@@ -54,6 +54,7 @@ namespace gui
         : AppWindow(app, gui::window::name::powernapProgress), presenter{std::move(presenter)}
     {
         buildInterface();
+        this->presenter->attach(this);
     }
 
     void PowerNapProgressWindow::onBeforeShow(ShowMode mode, SwitchData *data)
@@ -93,13 +94,13 @@ namespace gui
     {
         if (inputEvent.isShortRelease()) {
             if (inputEvent.is(KeyCode::KEY_RF) || inputEvent.is(KeyCode::KEY_ENTER)) {
-                switchWindow();
+                presenter->endNap();
                 return true;
             }
         }
         return AppWindow::onInput(inputEvent);
     }
-    void PowerNapProgressWindow::switchWindow()
+    void PowerNapProgressWindow::napEnded()
     {
         application->switchWindow(gui::window::name::powernapSessionEnded, std::make_unique<gui::PowerNapSwitchData>());
     }

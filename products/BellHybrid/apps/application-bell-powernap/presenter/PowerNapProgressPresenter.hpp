@@ -22,6 +22,7 @@ namespace settings
 
 namespace app::powernap
 {
+    class PowerNapAlarm;
     class PowerNapProgressContract
     {
       public:
@@ -29,7 +30,7 @@ namespace app::powernap
         {
           public:
             ~View() = default;
-            virtual void switchWindow() = 0;
+            virtual void napEnded() = 0;
         };
 
         class Presenter : public BasePresenter<PowerNapProgressContract::View>
@@ -38,24 +39,29 @@ namespace app::powernap
             virtual void initTimer(gui::Item *parent)                              = 0;
             virtual app::ProgressTimerUIConfigurator &getUIConfigurator() noexcept = 0;
             virtual void activate()                                                = 0;
+            virtual void endNap()                                                  = 0;
         };
     };
+
+    class AlarmController;
 
     class PowerNapProgressPresenter : public PowerNapProgressContract::Presenter
     {
         app::Application *app        = nullptr;
         settings::Settings *settings = nullptr;
+        PowerNapAlarm &alarm;
         std::unique_ptr<app::ProgressTimer> timer;
         sys::TimerHandle napAlarmTimer;
 
         void initTimer(gui::Item *parent) override;
         app::ProgressTimerUIConfigurator &getUIConfigurator() noexcept override;
         void activate() override;
+        void endNap() override;
 
         void onNapFinished();
         void onNapAlarmFinished();
 
       public:
-        PowerNapProgressPresenter(app::Application *app, settings::Settings *settings);
+        PowerNapProgressPresenter(app::Application *app, settings::Settings *settings, PowerNapAlarm &alarm);
     };
 } // namespace app::powernap
