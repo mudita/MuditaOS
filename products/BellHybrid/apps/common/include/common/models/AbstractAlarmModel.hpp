@@ -16,6 +16,8 @@ namespace app
         virtual void setAlarmTime(time_t time) = 0;
         virtual time_t getAlarmTime() const    = 0;
         virtual void activate(bool value)      = 0;
+        /// Command model to update its internal data
+        virtual void update() = 0;
     };
 
 } // namespace app

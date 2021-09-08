@@ -21,6 +21,7 @@ target_sources(application-bell-main
 
         presenters/HomeScreenPresenter.hpp
         presenters/StateController.hpp
+        presenters/StateControllerLogger.hpp
 
     PUBLIC
         include/application-bell-main/ApplicationBellMain.hpp
