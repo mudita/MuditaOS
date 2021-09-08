@@ -4,6 +4,7 @@
 #pragma once
 
 #include "KeyEventDefinitions.hpp"
+
 #include <FreeRTOS.h>
 #include <queue.h>
 
@@ -22,12 +23,12 @@ namespace hal::key_input
 
         virtual ~AbstractKeyInput() = default;
 
-        virtual void init(xQueueHandle)                               = 0;
-        virtual void deinit()                                         = 0;
-        virtual std::vector<bsp::KeyEvent> getKeyEvents(std::uint8_t) = 0;
+        virtual void init(xQueueHandle)                                        = 0;
+        virtual void deinit()                                                  = 0;
+        virtual std::vector<bsp::KeyEvent> getKeyEvents(KeyNotificationSource) = 0;
     };
 
-    BaseType_t generalIRQHandler();
+    BaseType_t generalIRQHandler(std::uint32_t irqMask);
     BaseType_t rightFunctionalIRQHandler();
-
+    BaseType_t wakeupIRQHandler();
 } // namespace hal::key_input

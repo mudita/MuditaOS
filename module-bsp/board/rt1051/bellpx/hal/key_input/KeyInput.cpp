@@ -4,6 +4,8 @@
 #include "KeyInput.hpp"
 
 #include <hal/GenericFactory.hpp>
+#include <bsp/switches/switches.hpp>
+#include <board/BoardDefinitions.hpp>
 
 namespace hal::key_input
 {
@@ -12,25 +14,28 @@ namespace hal::key_input
         return hal::impl::factory<KeyInput, AbstractKeyInput>();
     }
 
-    void KeyInput::init(xQueueHandle)
-    {}
+    void KeyInput::init(xQueueHandle queueHandle)
+    {
+        bsp::bell_switches::init(queueHandle);
+    }
 
     void KeyInput::deinit()
-    {}
-
-    std::vector<bsp::KeyEvent> KeyInput::getKeyEvents(std::uint8_t)
     {
-        return std::vector<bsp::KeyEvent>{};
+        bsp::bell_switches::deinit();
     }
 
-    BaseType_t generalIRQHandler()
+    std::vector<bsp::KeyEvent> KeyInput::getKeyEvents(KeyNotificationSource notification)
     {
-        return 0;
+        return bsp::bell_switches::getKeyEvents(notification);
     }
 
-    BaseType_t rightFunctionalIRQHandler()
+    BaseType_t generalIRQHandler(std::uint32_t irqMask)
     {
-        return 0;
+        return bsp::bell_switches::IRQHandler(irqMask);
     }
 
+    BaseType_t wakeupIRQHandler()
+    {
+        return bsp::bell_switches::wakeupIRQHandler();
+    }
 } // namespace hal::key_input
