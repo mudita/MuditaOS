@@ -25,6 +25,11 @@ namespace gui
     class AppWindow;
 }
 
+namespace db
+{
+    class NotificationMessage;
+}
+
 namespace app::home_screen
 {
     class AbstractTimeModel;
@@ -69,6 +74,7 @@ namespace app::home_screen
         virtual void handleUpdateTimeEvent()                                        = 0;
         virtual bool handleInputEvent(const gui::InputEvent &inputEvent)            = 0;
         virtual void onBeforeShow()                                                 = 0;
+        virtual void onDatabaseMessage(db::NotificationMessage *msg)                = 0;
         virtual void refreshWindow()                                                = 0;
         virtual void spawnTimer(std::chrono::milliseconds timeout = defaultTimeout) = 0;
         virtual void detachTimer()                                                  = 0;
@@ -95,6 +101,7 @@ namespace app::home_screen
         void handleUpdateTimeEvent() override;
         bool handleInputEvent(const gui::InputEvent &inputEvent) override;
         void onBeforeShow() override;
+        void onDatabaseMessage(db::NotificationMessage *msg) override;
         void refreshWindow() override;
 
         void spawnTimer(std::chrono::milliseconds timeout) override;

@@ -10,6 +10,7 @@
 #include "windows/BellMainMenuWindow.hpp"
 
 #include <common/models/AlarmModel.hpp>
+#include <service-db/DBNotificationMessage.hpp>
 #include <windows/Dialog.hpp>
 
 namespace app
@@ -21,6 +22,7 @@ namespace app
                                              StartInBackground startInBackground)
         : Application(name, parent, mode, bluetoothMode, startInBackground)
     {
+        bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         addActionReceiver(manager::actions::ShowAlarm, [this](auto &&data) {
             switchWindow(gui::name::window::main_window, std::move(data));
             return actionHandled();
@@ -67,13 +69,14 @@ namespace app
         if (respMessage != nullptr && respMessage->retCode == sys::ReturnCodes::Success) {
             return retMsg;
         }
-        if (resp != nullptr) {
-            if (auto command = callbackStorage->getCallback(resp); command->execute()) {
-                refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+        auto msg = dynamic_cast<db::NotificationMessage *>(msgl);
+        if (msg != nullptr) {
+            for (auto &[name, window] : windowsStack.windows) {
+                window->onDatabaseMessage(msg);
             }
             return sys::msgHandled();
         }
-        return std::make_shared<sys::ResponseMessage>();
+        return handleAsyncResponse(resp);
     }
 
     void ApplicationBellMain::showPopup(gui::popup::ID id, const gui::PopupRequestParams *params)
