@@ -158,8 +158,14 @@ extern "C"
 /**
  * BELL DOME SWITCH
  */
-#define PINMUX_DOME_SWITCH IOMUXC_GPIO_B0_11_GPIO2_IO11
+#define PINMUX_DOME_SWITCH IOMUXC_GPIO_B1_11_GPIO2_IO27
     void PINMUX_DomeSwitch(void);
+
+/**
+ * BELL WAKEUP
+ */
+#define PINMUX_WAKEUP IOMUXC_SNVS_WAKEUP_GPIO5_IO00
+    void PINMUX_Wakeup(void);
 
 /**
  * BELL WDOG_B

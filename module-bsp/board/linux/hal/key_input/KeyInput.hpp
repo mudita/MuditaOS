@@ -12,6 +12,6 @@ namespace hal::key_input
       public:
         void init(xQueueHandle qHandle) final;
         void deinit() final;
-        std::vector<bsp::KeyEvent> getKeyEvents(std::uint8_t) final;
+        std::vector<bsp::KeyEvent> getKeyEvents(KeyNotificationSource) final;
     };
 } // namespace hal::key_input

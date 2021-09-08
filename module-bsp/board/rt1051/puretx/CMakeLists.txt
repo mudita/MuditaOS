@@ -11,7 +11,7 @@ target_sources(
 
     PRIVATE
         hal/battery_charger/BatteryCharger.cpp
-	hal/key_input/KeyInput.cpp
+        hal/key_input/KeyInput.cpp
         bsp/battery_charger/battery_charger.cpp
         bsp/eink/eink_pin_config.cpp
         bsp/keyboard/keyboard.cpp

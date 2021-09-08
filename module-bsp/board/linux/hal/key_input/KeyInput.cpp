@@ -84,7 +84,7 @@ namespace hal::key_input
         close(fd);
     }
 
-    std::vector<bsp::KeyEvent> LinuxKeyInput::getKeyEvents(std::uint8_t)
+    std::vector<bsp::KeyEvent> LinuxKeyInput::getKeyEvents(KeyNotificationSource)
     {
         using namespace bsp;
         KeyEvent keyEvent;

@@ -74,6 +74,7 @@ target_link_libraries(${PROJECT_NAME}
         eventstore
         module-os
         service-bluetooth
+        magic_enum
         ${TARGET_LIBRARIES}
     PRIVATE
         time-constants

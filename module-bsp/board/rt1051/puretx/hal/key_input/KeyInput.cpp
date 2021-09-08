@@ -23,12 +23,12 @@ namespace hal::key_input
         bsp::keyboard::deinit();
     }
 
-    std::vector<bsp::KeyEvent> KeyInput::getKeyEvents(std::uint8_t notification)
+    std::vector<bsp::KeyEvent> KeyInput::getKeyEvents(KeyNotificationSource notification)
     {
         return bsp::keyboard::getKeyEvents(notification);
     }
 
-    BaseType_t generalIRQHandler()
+    BaseType_t generalIRQHandler(std::uint32_t irqMask)
     {
         return bsp::keyboard::IRQHandler();
     }
