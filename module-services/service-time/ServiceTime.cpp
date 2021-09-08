@@ -34,7 +34,8 @@ namespace stm
     constexpr auto automaticTimezoneName  = "";
     constexpr auto automaticTimezoneRules = "UTC0";
 
-    ServiceTime::ServiceTime() : sys::Service(service::name::service_time, "", StackDepth)
+    ServiceTime::ServiceTime(const alarms::IAlarmOperationsFactory &alarmOperationsFactory)
+        : sys::Service(service::name::service_time, "", StackDepth)
     {
         LOG_INFO("[ServiceTime] Initializing");
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
@@ -42,7 +43,7 @@ namespace stm
         timeManager = std::make_unique<TimeManager>(std::make_unique<RTCCommand>(this));
 
         auto alarmEventsRepo = std::make_unique<alarms::AlarmEventsDBRepository>(this);
-        auto alarmOperations = std::make_unique<alarms::AlarmOperations>(std::move(alarmEventsRepo), TimePointNow);
+        auto alarmOperations = alarmOperationsFactory.create(std::move(alarmEventsRepo), TimePointNow);
         alarmOperations->updateEventsCache(TimePointNow());
         alarmMessageHandler = std::make_unique<alarms::AlarmMessageHandler>(this, std::move(alarmOperations));
     }
