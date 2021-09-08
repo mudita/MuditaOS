@@ -8,7 +8,6 @@
 
 #include <service-db/DBServiceMessage.hpp>
 #include <service-db/agents/settings/SettingsAgent.hpp>
-#include <service-db/agents/file_indexer/FileIndexerAgent.hpp>
 #include <time/ScopedTime.hpp>
 
 #include <purefs/filesystem_paths.hpp>

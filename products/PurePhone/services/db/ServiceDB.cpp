@@ -16,7 +16,6 @@
 #include <module-db/Interface/SMSRecord.hpp>
 #include <module-db/Interface/SMSTemplateRecord.hpp>
 #include <purefs/filesystem_paths.hpp>
-#include <service-db/agents/file_indexer/FileIndexerAgent.hpp>
 #include <service-db/agents/quotes/QuotesAgent.hpp>
 #include <service-db/agents/settings/SettingsAgent.hpp>
 #include <service-db/DBCalllogMessage.hpp>
@@ -235,7 +234,6 @@ sys::ReturnCodes ServiceDB::InitHandler()
         std::make_unique<db::multimedia_files::MultimediaFilesRecordInterface>(multimediaFilesDB.get());
 
     databaseAgents.emplace(std::make_unique<SettingsAgent>(this, "settings_v2.db"));
-    databaseAgents.emplace(std::make_unique<FileIndexerAgent>(this));
 
     for (auto &dbAgent : databaseAgents) {
         dbAgent->initDb();
