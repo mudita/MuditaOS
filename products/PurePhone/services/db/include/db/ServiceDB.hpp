@@ -7,7 +7,6 @@
 #include <service-db/ServiceDBCommon.hpp>
 #include <service-fileindexer/Constants.hpp>
 
-class AlarmsDB;
 class AlarmEventRecordInterface;
 class AlarmsRecordInterface;
 class CalllogDB;
@@ -44,7 +43,6 @@ class ServiceDB : public ServiceDBCommon
     std::unique_ptr<EventsDB> eventsDB;
     std::unique_ptr<SmsDB> smsDB;
     std::unique_ptr<ContactsDB> contactsDB;
-    std::unique_ptr<AlarmsDB> alarmsDB;
     std::unique_ptr<NotesDB> notesDB;
     std::unique_ptr<CalllogDB> calllogDB;
     std::unique_ptr<CountryCodesDB> countryCodesDB;
@@ -56,7 +54,6 @@ class ServiceDB : public ServiceDBCommon
     std::unique_ptr<ThreadRecordInterface> threadRecordInterface;
     std::unique_ptr<SMSTemplateRecordInterface> smsTemplateRecordInterface;
     std::unique_ptr<ContactRecordInterface> contactRecordInterface;
-    std::unique_ptr<AlarmsRecordInterface> alarmsRecordInterface;
     std::unique_ptr<NotesRecordInterface> notesRecordInterface;
     std::unique_ptr<CalllogRecordInterface> calllogRecordInterface;
     std::unique_ptr<CountryCodeRecordInterface> countryCodeRecordInterface;
