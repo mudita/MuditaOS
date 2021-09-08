@@ -10,9 +10,8 @@
 
 namespace gui
 {
-    AlarmItem::AlarmItem(std::shared_ptr<AlarmEventRecord> record) : alarm(std::move(record))
+    AlarmItem::AlarmItem(app::alarmClock::AlarmPresenter p) : AlarmEventItem(p)
     {
-        assert(alarm != nullptr);
         setMinimumSize(style::window::default_body_width, style::alarmClock::window::item::height);
         setMargins(gui::Margins(0, style::margins::small, 0, style::alarmClock::window::item::botMargin));
 
@@ -52,11 +51,12 @@ namespace gui
 
     void AlarmItem::setAlarm()
     {
-        timeLabel->setText(TimePointToLocalizedTimeString(alarm->startDate));
-        if (alarm->enabled) {
-            onOffImage->switchState(ButtonState::Off);
+        timeLabel->setText(TimePointToLocalizedTimeString(presenter().getAlarm()->startDate));
+        onOffImage->switchState(presenter().getAlarm()->enabled ? ButtonState::Off : ButtonState::On);
+
+        if (presenter().hasRecurrence()) {
+            periodLabel->setText(presenter().getDescription());
         }
-        if (alarm->rruleText != "") {}
 
         if (periodLabel->getText().empty()) {
             periodLabel->setMaximumSize(0, 0);

@@ -9,20 +9,20 @@
 #include <ListItem.hpp>
 #include <BoxLayout.hpp>
 #include <Label.hpp>
+#include <application-alarm-clock/presenter/AlarmPresenter.hpp>
 
 namespace gui
 {
-    class AlarmItem : public ListItem
+    class AlarmItem : public ListItem, public app::alarmClock::AlarmEventItem
     {
         gui::HBox *hBox              = nullptr;
         gui::VBox *vBox              = nullptr;
         gui::ButtonOnOff *onOffImage = nullptr;
         gui::Label *timeLabel        = nullptr;
         gui::Label *periodLabel      = nullptr;
-        std::shared_ptr<AlarmEventRecord> alarm;
         void setAlarm();
 
       public:
-        explicit AlarmItem(std::shared_ptr<AlarmEventRecord> record);
+        explicit AlarmItem(app::alarmClock::AlarmPresenter);
     };
 } // namespace gui

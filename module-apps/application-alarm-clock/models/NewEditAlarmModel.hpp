@@ -39,7 +39,7 @@ namespace app::alarmClock
         void loadData(std::shared_ptr<AlarmEventRecord> record) override;
         void saveData(std::shared_ptr<AlarmEventRecord> alarm, AlarmAction action) override;
         void loadRepeat(std::shared_ptr<AlarmEventRecord> record) override;
-        void createData();
+        void createData(std::shared_ptr<AlarmEventRecord> record);
 
         [[nodiscard]] unsigned int getMinimalItemSpaceRequired() const override;
         [[nodiscard]] unsigned int requestRecordsCount() override;
