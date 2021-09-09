@@ -18,7 +18,7 @@
 namespace gui
 {
 
-    SMSInputWidget::SMSInputWidget(app::Application *application) : application(application)
+    SMSInputWidget::SMSInputWidget(app::ApplicationCommon *application) : application(application)
     {
         setMinimumSize(style::window::default_body_width, style::messages::smsInput::min_h);
         setMargins(Margins(

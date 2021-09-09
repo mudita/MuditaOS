@@ -17,7 +17,7 @@ using StringList = std::list<std::string>;
 namespace gui
 {
 
-    AlgoParamsWindow::AlgoParamsWindow(app::Application *app) : AppWindow(app, gui::name::window::algo_window)
+    AlgoParamsWindow::AlgoParamsWindow(app::ApplicationCommon *app) : AppWindow(app, gui::name::window::algo_window)
     {
         buildInterface();
     }

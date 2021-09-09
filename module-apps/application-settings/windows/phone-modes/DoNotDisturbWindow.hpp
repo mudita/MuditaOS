@@ -17,7 +17,7 @@ namespace gui
     class DoNotDisturbWindow : public BaseSettingsWindow
     {
       public:
-        DoNotDisturbWindow(app::Application *app, app::settingsInterface::DndSettings *dndSettings);
+        DoNotDisturbWindow(app::ApplicationCommon *app, app::settingsInterface::DndSettings *dndSettings);
         void buildInterface() override;
 
       private:

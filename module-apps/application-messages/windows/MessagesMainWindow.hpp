@@ -25,7 +25,7 @@ namespace gui
         gui::ListView *list                        = nullptr;
 
       public:
-        explicit MessagesMainWindow(app::Application *app);
+        explicit MessagesMainWindow(app::ApplicationCommon *app);
 
         // virtual methods
         bool onInput(const InputEvent &inputEvent) override;

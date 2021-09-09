@@ -5,7 +5,7 @@
 #include "ListView.hpp"
 #include <service-db/DBServiceAPI.hpp>
 
-BaseThreadsRecordModel::BaseThreadsRecordModel(app::Application *app) : DatabaseModel(app)
+BaseThreadsRecordModel::BaseThreadsRecordModel(app::ApplicationCommon *app) : DatabaseModel(app)
 {
     requestRecordsCount();
 }

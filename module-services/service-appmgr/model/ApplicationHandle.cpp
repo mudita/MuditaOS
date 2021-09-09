@@ -44,7 +44,7 @@ namespace app::manager
 
     auto ApplicationHandle::checkBlockClosing() const noexcept -> bool
     {
-        return launcher->handle->getState() == Application::State::FINALIZING_CLOSE;
+        return launcher->handle->getState() == ApplicationCommon::State::FINALIZING_CLOSE;
     }
 
     auto ApplicationHandle::closeable() const noexcept -> bool

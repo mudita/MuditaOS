@@ -24,7 +24,7 @@ using namespace callLogStyle;
 namespace gui
 {
 
-    CallLogMainWindow::CallLogMainWindow(app::Application *app)
+    CallLogMainWindow::CallLogMainWindow(app::ApplicationCommon *app)
         : AppWindow(app, calllog::settings::MainWindowStr), calllogModel{std::make_shared<CalllogModel>(app)}
     {
 

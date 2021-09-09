@@ -70,7 +70,7 @@ namespace
 
 namespace gui
 {
-    BellHomeScreenWindow::BellHomeScreenWindow(app::Application *app,
+    BellHomeScreenWindow::BellHomeScreenWindow(app::ApplicationCommon *app,
                                                std::unique_ptr<app::home_screen::AbstractPresenter> presenter)
         : AppWindow(app, name::window::main_window), presenter{std::move(presenter)}
     {

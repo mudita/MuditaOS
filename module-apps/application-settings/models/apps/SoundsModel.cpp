@@ -35,7 +35,7 @@ gui::ListItem *SoundsModel::getItem(gui::Order order)
     return getRecord(order);
 }
 
-void SoundsModel::createData(app::Application *app, audio_settings::AbstractAudioSettingsModel *model)
+void SoundsModel::createData(app::ApplicationCommon *app, audio_settings::AbstractAudioSettingsModel *model)
 {
     assert(model);
     assert(app);
@@ -90,7 +90,7 @@ std::filesystem::path SoundsModel::getSoundPath(audio_settings::AbstractAudioSet
 }
 
 void SoundsModel::applyItems(const std::vector<std::filesystem::path> &sounds,
-                             app::Application *app,
+                             app::ApplicationCommon *app,
                              audio_settings::AbstractAudioSettingsModel *model)
 {
     auto currentItemIndex  = 0;

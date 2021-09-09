@@ -10,7 +10,7 @@ namespace gui
     class TetheringOffPopup : public DialogYesNo
     {
       public:
-        TetheringOffPopup(app::Application *app, const std::string &name);
+        TetheringOffPopup(app::ApplicationCommon *app, const std::string &name);
         status_bar::Configuration configureStatusBar(status_bar::Configuration appConfiguration) override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
     };

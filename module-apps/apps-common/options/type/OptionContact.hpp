@@ -5,7 +5,7 @@
 
 #include "OptionSimple.hpp"
 #include "OptionStyle.hpp"
-#include "Application.hpp"
+#include "ApplicationCommon.hpp"
 
 #include <module-db/Interface/ContactRecord.hpp>
 
@@ -14,12 +14,12 @@ namespace gui::option
     class Contact : public Simple
     {
       private:
-        bool onContactOptionClick(app::Application *app,
+        bool onContactOptionClick(app::ApplicationCommon *app,
                                   ContactOperation contactOperation,
                                   const ContactRecord &contactRecord);
 
       public:
-        Contact(app::Application *app,
+        Contact(app::ApplicationCommon *app,
                 ContactOperation contactOperation,
                 const ContactRecord &contactRec,
                 gui::option::Arrow arrow = option::Arrow::Disabled);

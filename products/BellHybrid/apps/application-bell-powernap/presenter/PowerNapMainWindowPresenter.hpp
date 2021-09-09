@@ -13,7 +13,7 @@ namespace gui
 
 namespace app
 {
-    class Application;
+    class ApplicationCommon;
 }
 
 namespace settings
@@ -45,12 +45,12 @@ namespace app::powernap
 
     class PowerNapMainWindowPresenter : public PowerNapMainWindowContract::Presenter
     {
-        app::Application *app        = nullptr;
+        app::ApplicationCommon *app  = nullptr;
         settings::Settings *settings = nullptr;
         std::shared_ptr<PowerNapModel> model;
 
       public:
-        PowerNapMainWindowPresenter(app::Application *app, settings::Settings *settings);
+        PowerNapMainWindowPresenter(app::ApplicationCommon *app, settings::Settings *settings);
         auto getNapTimeProvider() -> std::shared_ptr<gui::ListItemProvider> override;
 
         void loadNapTimeList() override;

@@ -14,7 +14,7 @@
 namespace gui
 {
 
-    PhonebookNewContact::PhonebookNewContact(app::Application *app)
+    PhonebookNewContact::PhonebookNewContact(app::ApplicationCommon *app)
         : AppWindow(app, gui::window::name::new_contact), newContactModel{std::make_shared<NewContactModel>(app)}
     {
         buildInterface();

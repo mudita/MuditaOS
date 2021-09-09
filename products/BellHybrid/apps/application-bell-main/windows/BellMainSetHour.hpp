@@ -12,7 +12,7 @@ namespace gui
     class BellMainSetHour : public AppWindow
     {
       public:
-        explicit BellMainSetHour(app::Application *app);
+        explicit BellMainSetHour(app::ApplicationCommon *app);
 
         void buildInterface() override;
         bool onInput(const InputEvent &inputEvent) override;

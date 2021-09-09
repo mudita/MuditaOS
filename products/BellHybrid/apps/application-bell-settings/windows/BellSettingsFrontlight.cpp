@@ -14,7 +14,7 @@
 namespace gui
 {
     BellSettingsFrontlightWindow::BellSettingsFrontlightWindow(
-        app::Application *app,
+        app::ApplicationCommon *app,
         std::unique_ptr<app::bell_settings::FrontlightWindowContract::Presenter> &&windowPresenter,
         std::string name)
         : AppWindow(app, std::move(name)), presenter{std::move(windowPresenter)}

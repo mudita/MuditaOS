@@ -11,7 +11,7 @@ namespace gui
     class FontSizeWindow : public BaseSettingsWindow
     {
       public:
-        explicit FontSizeWindow(app::Application *app);
+        explicit FontSizeWindow(app::ApplicationCommon *app);
         auto buildOptionsList() -> std::list<gui::Option> override;
     };
 } // namespace gui

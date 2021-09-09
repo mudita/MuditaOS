@@ -14,7 +14,7 @@
 namespace gui
 {
 
-    PhonebookContactOptions::PhonebookContactOptions(app::Application *app)
+    PhonebookContactOptions::PhonebookContactOptions(app::ApplicationCommon *app)
         : OptionWindow(app, gui::window::name::contact_options)
     {}
 

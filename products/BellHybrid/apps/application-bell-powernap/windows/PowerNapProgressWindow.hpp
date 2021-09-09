@@ -26,7 +26,7 @@ namespace gui
         void napEnded() override;
 
       public:
-        PowerNapProgressWindow(app::Application *app,
+        PowerNapProgressWindow(app::ApplicationCommon *app,
                                std::shared_ptr<app::powernap::PowerNapProgressContract::Presenter> presenter);
     };
 } // namespace gui

@@ -9,7 +9,7 @@
 #include <module-db/queries/messages/templates/QuerySMSTemplateGetForList.hpp>
 #include <service-db/DBServiceAPI.hpp>
 
-SMSTemplateModel::SMSTemplateModel(app::Application *app) : DatabaseModel(app), app::AsyncCallbackReceiver{app}
+SMSTemplateModel::SMSTemplateModel(app::ApplicationCommon *app) : DatabaseModel(app), app::AsyncCallbackReceiver{app}
 {}
 
 unsigned int SMSTemplateModel::requestRecordsCount()

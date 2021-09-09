@@ -20,7 +20,7 @@ class SMSThreadModel : public app::DatabaseModel<SMSRecord>,
     std::unique_ptr<utils::PhoneNumber::View> number;
     unsigned int numberID = DB_ID_NONE;
 
-    SMSThreadModel(app::Application *app);
+    SMSThreadModel(app::ApplicationCommon *app);
     ~SMSThreadModel() override;
 
     void addReturnNumber();

@@ -13,7 +13,7 @@ namespace gui
         VBox *box = nullptr;
 
       public:
-        explicit InformationWindow(app::Application *app);
+        explicit InformationWindow(app::ApplicationCommon *app);
         void buildInterface() override;
 
       private:

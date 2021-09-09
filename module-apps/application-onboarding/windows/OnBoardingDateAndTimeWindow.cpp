@@ -13,7 +13,7 @@
 
 namespace app::onBoarding
 {
-    OnBoardingDateAndTimeWindow::OnBoardingDateAndTimeWindow(app::Application *app)
+    OnBoardingDateAndTimeWindow::OnBoardingDateAndTimeWindow(app::ApplicationCommon *app)
         : DateAndTimeMainWindow(app, gui::window::name::onBoarding_date_and_time)
     {
         changeDateAndTimeWindow = gui::window::name::onBoarding_change_date_and_time;

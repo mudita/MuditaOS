@@ -16,7 +16,7 @@ namespace app::alarmClock
 {
 
     AlarmClockMainWindow::AlarmClockMainWindow(
-        app::Application *app, std::unique_ptr<AlarmClockMainWindowContract::Presenter> &&windowPresenter)
+        app::ApplicationCommon *app, std::unique_ptr<AlarmClockMainWindowContract::Presenter> &&windowPresenter)
         : AppWindow(app, gui::name::window::main_window), presenter{std::move(windowPresenter)}
     {
         presenter->attach(this);

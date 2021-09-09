@@ -15,7 +15,7 @@
 namespace gui
 {
 
-    AllDevicesWindow::AllDevicesWindow(app::Application *app,
+    AllDevicesWindow::AllDevicesWindow(app::ApplicationCommon *app,
                                        std::shared_ptr<BluetoothSettingsModel> bluetoothSettingsModel)
         : BaseSettingsWindow(app, window::name::all_devices), bluetoothSettingsModel(bluetoothSettingsModel)
     {

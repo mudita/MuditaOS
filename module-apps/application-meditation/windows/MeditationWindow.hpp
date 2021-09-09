@@ -13,7 +13,7 @@ namespace gui
     class MeditationWindow : public AppWindow
     {
       public:
-        explicit MeditationWindow(app::Application *app);
+        explicit MeditationWindow(app::ApplicationCommon *app);
 
         auto onInput(const InputEvent &inputEvent) -> bool override;
 

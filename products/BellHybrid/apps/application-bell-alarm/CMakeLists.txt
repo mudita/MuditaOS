@@ -24,6 +24,7 @@ target_include_directories(application-bell-alarm
 
 target_link_libraries(application-bell-alarm
     PRIVATE
+        app
         bell::app-common
         module-gui
 )

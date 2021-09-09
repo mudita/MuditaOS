@@ -3,13 +3,13 @@
 
 #include "TetheringPhoneModePopup.hpp"
 #include "DialogMetadataMessage.hpp"
-#include "Application.hpp"
+#include "ApplicationCommon.hpp"
 #include "data/PopupRequestParams.hpp"
 #include <service-appmgr/Controller.hpp>
 
 namespace gui
 {
-    TetheringPhoneModePopup::TetheringPhoneModePopup(app::Application *app, const std::string &name)
+    TetheringPhoneModePopup::TetheringPhoneModePopup(app::ApplicationCommon *app, const std::string &name)
         : TetheringNotificationPopup{app, name}
     {}
 

@@ -24,7 +24,7 @@ namespace app
 
     class ProgressTimerImpl : public ProgressTimer
     {
-        app::Application *app   = nullptr;
+        app::ApplicationCommon *app = nullptr;
         gui::Item *parent       = nullptr;
         gui::Text *text         = nullptr;
         gui::Progress *progress = nullptr;
@@ -52,7 +52,7 @@ namespace app
         [[nodiscard]] auto intervalReached() const noexcept -> bool;
 
       public:
-        ProgressTimerImpl(app::Application *app,
+        ProgressTimerImpl(app::ApplicationCommon *app,
                           gui::Item *parent,
                           std::string timerName,
                           std::chrono::milliseconds baseTick);

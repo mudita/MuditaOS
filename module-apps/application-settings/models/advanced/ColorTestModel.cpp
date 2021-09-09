@@ -8,7 +8,7 @@
 namespace gui
 {
 
-    ColorTestModel::ColorTestModel(app::Application *app) : application{app}
+    ColorTestModel::ColorTestModel(app::ApplicationCommon *app) : application{app}
     {
         createData();
     }

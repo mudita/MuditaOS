@@ -12,7 +12,7 @@ namespace gui
         gui::Item *body = nullptr;
 
       public:
-        SMSSearch(app::Application *app);
+        SMSSearch(app::ApplicationCommon *app);
         bool onInput(const InputEvent &inputEvent) override;
     };
 

@@ -8,7 +8,7 @@
 
 namespace app
 {
-    class Application;
+    class ApplicationCommon;
 }
 
 namespace gui::option
@@ -22,12 +22,12 @@ namespace gui::option
             Call,
             AddContact
         };
-        OptionWithActiveIcons(app::Application *app,
+        OptionWithActiveIcons(app::ApplicationCommon *app,
                               std::shared_ptr<ContactRecord> contact,
                               std::vector<BasicIcon> icons);
 
       private:
-        app::Application *app;
+        app::ApplicationCommon *app;
         std::shared_ptr<ContactRecord> contact;
         std::vector<BasicIcon> icons;
         [[nodiscard]] auto build() const -> ListItem * override;

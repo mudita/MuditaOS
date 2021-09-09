@@ -12,7 +12,7 @@ namespace gui
     class BellSettingsBedtimeToneWindow : public AppWindow
     {
       public:
-        explicit BellSettingsBedtimeToneWindow(app::Application *app,
+        explicit BellSettingsBedtimeToneWindow(app::ApplicationCommon *app,
                                                std::string name = gui::window::name::bellSettingsBedtimeTone);
 
         void buildInterface() override;

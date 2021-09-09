@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "Application.hpp"
+#include "ApplicationCommon.hpp"
 #include "AppWindow.hpp"
 #include "ListView.hpp"
 #include <functional>
@@ -33,8 +33,8 @@ namespace gui
         void refreshOptions(std::list<Option> &&optionList, unsigned int pageIndex);
 
       public:
-        OptionWindow(app::Application *app, const std::string &name);
-        OptionWindow(app::Application *app, const std::string &name, std::list<Option> options);
+        OptionWindow(app::ApplicationCommon *app, const std::string &name);
+        OptionWindow(app::ApplicationCommon *app, const std::string &name, std::list<Option> options);
 
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         void onClose(CloseReason reason) override;

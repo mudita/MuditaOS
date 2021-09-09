@@ -12,7 +12,7 @@ namespace gui
     class EditQuotesWindow : public BaseSettingsWindow
     {
       public:
-        explicit EditQuotesWindow(app::Application *app);
+        explicit EditQuotesWindow(app::ApplicationCommon *app);
 
       private:
         void switchHandler(bool &optionSwitch);

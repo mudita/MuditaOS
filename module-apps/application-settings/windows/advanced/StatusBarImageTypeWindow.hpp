@@ -9,7 +9,7 @@ namespace gui
     class StatusBarImageTypeWindow : public AppWindow
     {
       public:
-        explicit StatusBarImageTypeWindow(app::Application *app);
+        explicit StatusBarImageTypeWindow(app::ApplicationCommon *app);
 
         status_bar::Configuration configureStatusBar(status_bar::Configuration appConfiguration) override;
     };

@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <apps-common/Application.hpp>
+#include <apps-common/ApplicationCommon.hpp>
 #include <gui/widgets/BoxLayout.hpp>
 
 namespace gui
@@ -17,7 +17,7 @@ namespace gui
         gui::Image *dotImage  = nullptr;
 
       public:
-        DayLabel(app::Application *app,
+        DayLabel(app::ApplicationCommon *app,
                  gui::Item *parent,
                  const uint32_t &cellIndex,
                  const uint32_t &firstWeekOffset,

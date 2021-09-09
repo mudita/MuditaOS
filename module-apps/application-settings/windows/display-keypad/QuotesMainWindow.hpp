@@ -11,7 +11,7 @@ namespace gui
     class QuotesMainWindow : public AppWindow
     {
       public:
-        explicit QuotesMainWindow(app::Application *app);
+        explicit QuotesMainWindow(app::ApplicationCommon *app);
 
       private:
         void buildInterface() override;

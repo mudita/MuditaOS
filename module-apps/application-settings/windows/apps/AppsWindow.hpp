@@ -10,7 +10,7 @@ namespace gui
     class AppsWindow : public OptionWindow
     {
       public:
-        explicit AppsWindow(app::Application *app);
+        explicit AppsWindow(app::ApplicationCommon *app);
 
       private:
         std::list<Option> appsAndToolsOptionsList();

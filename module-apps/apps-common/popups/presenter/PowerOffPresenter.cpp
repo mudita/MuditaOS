@@ -7,7 +7,7 @@
 
 namespace gui
 {
-    PowerOffPresenter::PowerOffPresenter(app::Application *app) : application(app)
+    PowerOffPresenter::PowerOffPresenter(app::ApplicationCommon *app) : application(app)
     {}
 
     void PowerOffPresenter::powerOff()

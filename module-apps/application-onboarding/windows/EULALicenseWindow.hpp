@@ -16,7 +16,7 @@ namespace app::onBoarding
     class EULALicenseWindow : public gui::AppWindow, public EULALicenseWindowContract::View
     {
       public:
-        explicit EULALicenseWindow(app::Application *app,
+        explicit EULALicenseWindow(app::ApplicationCommon *app,
                                    std::unique_ptr<EULALicenseWindowContract::Presenter> &&windowPresenter);
         ~EULALicenseWindow() noexcept override;
 

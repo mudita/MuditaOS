@@ -12,7 +12,7 @@ namespace gui
     class ChangeDateAndTimeWindow : public AppWindow
     {
       public:
-        explicit ChangeDateAndTimeWindow(app::Application *app,
+        explicit ChangeDateAndTimeWindow(app::ApplicationCommon *app,
                                          std::string name = gui::window::name::change_date_and_time);
 
         void buildInterface() override;

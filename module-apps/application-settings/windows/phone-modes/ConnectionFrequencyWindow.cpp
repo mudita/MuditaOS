@@ -10,7 +10,7 @@
 
 namespace gui
 {
-    ConnectionFrequencyWindow::ConnectionFrequencyWindow(app::Application *app,
+    ConnectionFrequencyWindow::ConnectionFrequencyWindow(app::ApplicationCommon *app,
                                                          app::settingsInterface::ConnectionSettings *connectionSettings)
         : BaseSettingsWindow(app, gui::window::name::connection_frequency), connectionSettings(connectionSettings)
     {

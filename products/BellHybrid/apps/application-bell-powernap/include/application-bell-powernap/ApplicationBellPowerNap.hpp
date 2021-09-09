@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <common/ApplicationBell.hpp>
+#include <Application.hpp>
 
 namespace gui::window::name
 {
@@ -19,7 +19,7 @@ namespace app
 
     inline constexpr auto applicationBellPowerNapName = "ApplicationBellPowerNap";
 
-    class ApplicationBellPowerNap : public ApplicationBell
+    class ApplicationBellPowerNap : public Application
     {
         std::unique_ptr<powernap::PowerNapAlarmImpl> alarm;
 

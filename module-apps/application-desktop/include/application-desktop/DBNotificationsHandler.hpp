@@ -13,7 +13,7 @@ namespace db
 
 namespace app
 {
-    class Application;
+    class ApplicationCommon;
 
     class DBNotificationsBaseHandler
     {
@@ -30,13 +30,13 @@ namespace app
 
     class DBNotificationsHandler : public DBNotificationsBaseHandler
     {
-        Application *ownerApp = nullptr;
+        ApplicationCommon *ownerApp = nullptr;
         std::map<Type, int> notifications;
 
         void setNotification(Type type, int value);
 
       public:
-        explicit DBNotificationsHandler(Application *ownerApp);
+        explicit DBNotificationsHandler(ApplicationCommon *ownerApp);
 
         void initHandler();
         bool handle(db::NotificationMessage *msg);

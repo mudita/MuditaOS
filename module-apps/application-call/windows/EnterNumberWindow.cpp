@@ -18,7 +18,7 @@
 
 namespace gui
 {
-    EnterNumberWindow::EnterNumberWindow(app::Application *app,
+    EnterNumberWindow::EnterNumberWindow(app::ApplicationCommon *app,
                                          app::EnterNumberWindowInterface *interface,
                                          std::string windowName)
         : NumberWindow(app, interface, std::move(windowName))

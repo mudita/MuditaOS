@@ -3,7 +3,7 @@
 
 #include "models/AlarmModel.hpp"
 
-#include <apps-common/Application.hpp>
+#include <apps-common/ApplicationCommon.hpp>
 #include <db/SystemSettings.hpp>
 #include <module-db/Interface/AlarmEventRecord.hpp>
 #include <time/dateCommon.hpp>
@@ -14,7 +14,7 @@
 
 namespace app
 {
-    AlarmModel::AlarmModel(Application *app) : app::AsyncCallbackReceiver{app}, app{app}
+    AlarmModel::AlarmModel(ApplicationCommon *app) : app::AsyncCallbackReceiver{app}, app{app}
     {
         state = State::InitInProgress;
         settings.init(service::ServiceProxy{app->weak_from_this()});

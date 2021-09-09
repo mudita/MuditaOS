@@ -12,7 +12,7 @@
 
 namespace gui
 {
-    SystemMainWindow::SystemMainWindow(app::Application *app) : BaseSettingsWindow(app, window::name::system)
+    SystemMainWindow::SystemMainWindow(app::ApplicationCommon *app) : BaseSettingsWindow(app, window::name::system)
     {}
 
     auto SystemMainWindow::buildOptionsList() -> std::list<Option>

@@ -10,7 +10,7 @@ namespace gui
     class MeditationOptionsWindow : public OptionWindow
     {
       public:
-        explicit MeditationOptionsWindow(app::Application *);
+        explicit MeditationOptionsWindow(app::ApplicationCommon *);
 
       private:
         std::list<Option> buildOptionsList();
@@ -21,7 +21,7 @@ namespace gui
     class PreparationTimeWindow : public OptionWindow
     {
       public:
-        explicit PreparationTimeWindow(app::Application *app);
+        explicit PreparationTimeWindow(app::ApplicationCommon *app);
 
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
 

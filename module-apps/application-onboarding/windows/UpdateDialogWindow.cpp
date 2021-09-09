@@ -12,7 +12,7 @@
 
 namespace app::onBoarding
 {
-    UpdateDialogWindow::UpdateDialogWindow(app::Application *app,
+    UpdateDialogWindow::UpdateDialogWindow(app::ApplicationCommon *app,
                                            std::unique_ptr<OnBoardingFinalizeContract::Presenter> &&windowPresenter)
         : gui::Dialog(app, gui::window::name::onBoarding_update), presenter(std::move(windowPresenter))
     {

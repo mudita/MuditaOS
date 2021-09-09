@@ -5,13 +5,13 @@
 
 #include <log/log.hpp>
 #include <messages/DialogMetadataMessage.hpp>
-#include <apps-common/Application.hpp>
+#include <apps-common/ApplicationCommon.hpp>
 #include <SystemManager/messages/TetheringStateRequest.hpp>
 #include <service-appmgr/Controller.hpp>
 
 namespace gui
 {
-    TetheringOffPopup::TetheringOffPopup(app::Application *app, const std::string &name) : DialogYesNo{app, name}
+    TetheringOffPopup::TetheringOffPopup(app::ApplicationCommon *app, const std::string &name) : DialogYesNo{app, name}
     {
         statusBar->configure(configureStatusBar(application->getStatusBarConfiguration()));
     }

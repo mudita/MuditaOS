@@ -6,7 +6,7 @@
 #include <service-cellular/PacketDataCellularMessage.hpp>
 #include <service-cellular/ServiceCellular.hpp>
 
-ApnSettingsModel::ApnSettingsModel(app::Application *application) : application{application}
+ApnSettingsModel::ApnSettingsModel(app::ApplicationCommon *application) : application{application}
 {}
 
 void ApnSettingsModel::requestAPNList()

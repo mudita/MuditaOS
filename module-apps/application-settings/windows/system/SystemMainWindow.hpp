@@ -10,7 +10,7 @@ namespace gui
     class SystemMainWindow : public BaseSettingsWindow
     {
       public:
-        explicit SystemMainWindow(app::Application *app);
+        explicit SystemMainWindow(app::ApplicationCommon *app);
 
       private:
         auto buildOptionsList() -> std::list<Option> override;

@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <apps-common/Application.hpp>
+#include <apps-common/ApplicationCommon.hpp>
 #include <apps-common/InternalModel.hpp>
 #include <module-utils/Temperature.hpp>
 #include <time/time_locale.hpp>
@@ -22,7 +22,7 @@ namespace app::bell_settings
     class TimeUnitsModel : public app::InternalModel<gui::ListItem *>, public gui::ListItemProvider
     {
       public:
-        explicit TimeUnitsModel(app::Application *app);
+        explicit TimeUnitsModel(app::ApplicationCommon *app);
 
         ~TimeUnitsModel();
 
@@ -45,7 +45,7 @@ namespace app::bell_settings
         [[nodiscard]] auto getTemperatureUnit() -> utils::temperature::Temperature::Unit;
 
       private:
-        app::Application *application{};
+        app::ApplicationCommon *application{};
         gui::TimeSetListItem *timeSetListItem{};
         gui::TimeFormatSetListItem *timeFmtSetListItem{};
         gui::TemperatureUnitListItem *temperatureUnitListItem{};

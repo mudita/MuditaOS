@@ -26,7 +26,7 @@ namespace gui
         void switchPage();
 
       public:
-        SpecialInputMainWindow(app::Application *app);
+        SpecialInputMainWindow(app::ApplicationCommon *app);
         virtual ~SpecialInputMainWindow() = default;
 
         // virtual methods

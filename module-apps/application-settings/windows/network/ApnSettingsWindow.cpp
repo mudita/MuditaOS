@@ -13,7 +13,8 @@
 namespace gui
 {
 
-    ApnSettingsWindow::ApnSettingsWindow(app::Application *app) : OptionWindow(app, gui::window::name::apn_settings)
+    ApnSettingsWindow::ApnSettingsWindow(app::ApplicationCommon *app)
+        : OptionWindow(app, gui::window::name::apn_settings)
     {
         buildInterface();
     }

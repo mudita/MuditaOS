@@ -25,7 +25,7 @@
 namespace gui
 {
 
-    AntennaMainWindow::AntennaMainWindow(app::Application *app) : AppWindow(app, gui::name::window::main_window)
+    AntennaMainWindow::AntennaMainWindow(app::ApplicationCommon *app) : AppWindow(app, gui::name::window::main_window)
     {
         buildInterface();
     }

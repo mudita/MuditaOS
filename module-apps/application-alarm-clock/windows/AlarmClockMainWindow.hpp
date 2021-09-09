@@ -21,7 +21,7 @@ namespace app::alarmClock
         void onListFilled();
 
       public:
-        AlarmClockMainWindow(app::Application *app,
+        AlarmClockMainWindow(app::ApplicationCommon *app,
                              std::unique_ptr<AlarmClockMainWindowContract::Presenter> &&windowPresenter);
         ~AlarmClockMainWindow() noexcept override;
 

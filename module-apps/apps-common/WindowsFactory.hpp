@@ -10,7 +10,7 @@
 
 namespace app
 {
-    class Application;
+    class ApplicationCommon;
 };
 
 namespace gui
@@ -24,7 +24,7 @@ namespace app
     {
       public:
         using handle  = std::unique_ptr<gui::AppWindow>;
-        using builder = std::function<handle(Application *, std::string)>;
+        using builder = std::function<handle(ApplicationCommon *, std::string)>;
 
       private:
         std::map<std::string, builder> builders;
@@ -38,6 +38,6 @@ namespace app
 
         void attach(const std::string &name, builder builder);
         [[nodiscard]] auto isRegistered(const std::string &name) const -> bool;
-        auto build(Application *app, const std::string &name) -> handle;
+        auto build(ApplicationCommon *app, const std::string &name) -> handle;
     };
 } // namespace app

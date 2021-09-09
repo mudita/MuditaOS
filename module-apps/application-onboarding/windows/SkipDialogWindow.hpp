@@ -10,6 +10,6 @@ namespace app::onBoarding
     class SkipDialogWindow : public gui::DialogYesNo
     {
       public:
-        explicit SkipDialogWindow(app::Application *app);
+        explicit SkipDialogWindow(app::ApplicationCommon *app);
     };
 } // namespace app::onBoarding

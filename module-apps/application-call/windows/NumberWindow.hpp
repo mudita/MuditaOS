@@ -24,7 +24,7 @@ namespace gui
       public:
         using CountryCode = utils::country::Id;
 
-        NumberWindow(app::Application *app,
+        NumberWindow(app::ApplicationCommon *app,
                      app::EnterNumberWindowInterface *interface,
                      std::string windowName = app::window::name_number);
 

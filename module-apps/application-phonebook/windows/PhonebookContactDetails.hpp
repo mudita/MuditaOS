@@ -16,7 +16,7 @@ namespace gui
     class PhonebookContactDetails : public AppWindow
     {
       public:
-        PhonebookContactDetails(app::Application *app);
+        PhonebookContactDetails(app::ApplicationCommon *app);
         ~PhonebookContactDetails() override;
 
         auto onInput(const InputEvent &inputEvent) -> bool override;

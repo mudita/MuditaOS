@@ -12,7 +12,7 @@
 
 namespace app::notes
 {
-    NotesDBRepository::NotesDBRepository(Application *application)
+    NotesDBRepository::NotesDBRepository(ApplicationCommon *application)
         : app::AsyncCallbackReceiver{application}, application{application}
     {}
 

@@ -12,7 +12,7 @@
 
 namespace gui::option
 {
-    Call::Call(app::Application *app, const ContactRecord &contact)
+    Call::Call(app::ApplicationCommon *app, const ContactRecord &contact)
     {
         assert(app != nullptr);
 

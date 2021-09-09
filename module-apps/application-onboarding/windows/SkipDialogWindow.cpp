@@ -6,7 +6,7 @@
 
 namespace app::onBoarding
 {
-    SkipDialogWindow::SkipDialogWindow(app::Application *app)
+    SkipDialogWindow::SkipDialogWindow(app::ApplicationCommon *app)
         : gui::DialogYesNo(app, gui::window::name::onBoarding_skip)
     {
         applyToStatusBar([](gui::status_bar::Configuration configuration) {

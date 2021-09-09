@@ -12,14 +12,14 @@
 namespace app
 {
 
-    class Application;
+    class ApplicationCommon;
 
     class WindowsStack
     {
-        Application *parent;
+        ApplicationCommon *parent;
 
       public:
-        WindowsStack(Application *parent) : parent(parent)
+        WindowsStack(ApplicationCommon *parent) : parent(parent)
         {}
 
         std::vector<std::string> stack;

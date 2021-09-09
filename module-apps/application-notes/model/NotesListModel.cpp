@@ -14,10 +14,11 @@
 
 namespace app::notes
 {
-    NotesListItemProvider::NotesListItemProvider(Application *app) : DatabaseModel(app)
+    NotesListItemProvider::NotesListItemProvider(ApplicationCommon *app) : DatabaseModel(app)
     {}
 
-    NotesListModel::NotesListModel(app::Application *app, std::shared_ptr<AbstractNotesRepository> notesRepository)
+    NotesListModel::NotesListModel(app::ApplicationCommon *app,
+                                   std::shared_ptr<AbstractNotesRepository> notesRepository)
         : NotesListItemProvider(app), notesRepository{std::move(notesRepository)}
     {}
 

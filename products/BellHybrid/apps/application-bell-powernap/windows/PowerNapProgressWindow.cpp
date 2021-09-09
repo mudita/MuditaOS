@@ -50,7 +50,7 @@ namespace
 namespace gui
 {
     PowerNapProgressWindow::PowerNapProgressWindow(
-        app::Application *app, std::shared_ptr<app::powernap::PowerNapProgressContract::Presenter> presenter)
+        app::ApplicationCommon *app, std::shared_ptr<app::powernap::PowerNapProgressContract::Presenter> presenter)
         : AppWindow(app, gui::window::name::powernapProgress), presenter{std::move(presenter)}
     {
         buildInterface();

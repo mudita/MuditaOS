@@ -3,7 +3,8 @@
 
 #include "SoundsPlayer.hpp"
 
-SoundsPlayer::SoundsPlayer(app::Application *app) : audioOperations{std::make_unique<app::AsyncAudioOperations>(app)}
+SoundsPlayer::SoundsPlayer(app::ApplicationCommon *app)
+    : audioOperations{std::make_unique<app::AsyncAudioOperations>(app)}
 {}
 
 bool SoundsPlayer::play(const std::string &path)

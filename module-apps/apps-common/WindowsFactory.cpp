@@ -17,7 +17,7 @@ namespace app
         return builders.find(name) != std::end(builders);
     }
 
-    auto WindowsFactory::build(Application *app, const std::string &name) -> handle
+    auto WindowsFactory::build(ApplicationCommon *app, const std::string &name) -> handle
     {
         return builders[name](app, name);
     }

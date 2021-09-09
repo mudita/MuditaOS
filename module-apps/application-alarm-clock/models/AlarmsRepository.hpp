@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "Application.hpp"
+#include <apps-common/ApplicationCommon.hpp>
 #include <module-db/Interface/AlarmEventRecord.hpp>
 
 namespace app::alarmClock
@@ -26,7 +26,7 @@ namespace app::alarmClock
     class AlarmsDBRepository : public AbstractAlarmsRepository, public AsyncCallbackReceiver
     {
       public:
-        explicit AlarmsDBRepository(Application *app);
+        explicit AlarmsDBRepository(ApplicationCommon *app);
 
         void getLimited(std::uint32_t offset, std::uint32_t limit, const OnGetCallback &callback) override;
         // template <class QueryType, class ResultType>
@@ -40,6 +40,6 @@ namespace app::alarmClock
         void turnOffAll(const OnResultCallback &callback) override;
 
       private:
-        Application *application;
+        ApplicationCommon *application;
     };
 } // namespace app::alarmClock

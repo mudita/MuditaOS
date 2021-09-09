@@ -23,7 +23,7 @@ namespace detailsWindow = callLogStyle::detailsWindow;
 namespace gui
 {
 
-    CallLogDetailsWindow::CallLogDetailsWindow(app::Application *app)
+    CallLogDetailsWindow::CallLogDetailsWindow(app::ApplicationCommon *app)
         : AppWindow(app, calllog::settings::DetailsWindowStr)
     {
         buildInterface();

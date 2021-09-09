@@ -24,7 +24,7 @@
 
 namespace gui
 {
-    MessagesMainWindow::MessagesMainWindow(app::Application *app)
+    MessagesMainWindow::MessagesMainWindow(app::ApplicationCommon *app)
         : AppWindow(app, gui::name::window::main_window), app::AsyncCallbackReceiver{app}
     {
         buildInterface();

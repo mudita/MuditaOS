@@ -40,7 +40,7 @@ namespace gui
 
         static constexpr auto name = "BellFinishedWindow";
 
-        explicit BellFinishedWindow(app::Application *app);
+        explicit BellFinishedWindow(app::ApplicationCommon *app);
 
       private:
         void buildInterface() override;

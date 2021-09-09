@@ -29,7 +29,7 @@ namespace style::window::volume
 
 namespace app
 {
-    class Application;
+    class ApplicationCommon;
 } // namespace app
 
 namespace gui
@@ -50,7 +50,7 @@ namespace gui
         VBarGraph *volumeBar = nullptr;
 
       public:
-        VolumeWindow(app::Application *app, const std::string &name);
+        VolumeWindow(app::ApplicationCommon *app, const std::string &name);
 
         void addVolumeText();
         void addVolumeBar();

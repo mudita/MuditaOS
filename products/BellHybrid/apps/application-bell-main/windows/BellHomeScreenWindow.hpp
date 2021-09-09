@@ -19,7 +19,8 @@ namespace gui
     class BellHomeScreenWindow : public AppWindow, public app::home_screen::AbstractView
     {
       public:
-        BellHomeScreenWindow(app::Application *app, std::unique_ptr<app::home_screen::AbstractPresenter> presenter);
+        BellHomeScreenWindow(app::ApplicationCommon *app,
+                             std::unique_ptr<app::home_screen::AbstractPresenter> presenter);
 
       private:
         void buildInterface() override;

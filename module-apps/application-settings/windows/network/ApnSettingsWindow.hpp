@@ -13,7 +13,7 @@ namespace gui
     class ApnSettingsWindow : public OptionWindow
     {
       public:
-        ApnSettingsWindow(app::Application *app);
+        ApnSettingsWindow(app::ApplicationCommon *app);
 
       private:
         void buildInterface() override;

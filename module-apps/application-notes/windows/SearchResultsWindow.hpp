@@ -7,7 +7,7 @@
 
 #include "AppWindow.hpp"
 
-#include <apps-common/Application.hpp>
+#include <apps-common/ApplicationCommon.hpp>
 #include <module-apps/application-notes/presenter/NotesSearchResultPresenter.hpp>
 
 #include <module-gui/gui/widgets/ListView.hpp>
@@ -17,7 +17,7 @@ namespace app::notes
     class SearchResultsWindow : public gui::AppWindow, public NotesSearchWindowContract::View
     {
       public:
-        explicit SearchResultsWindow(app::Application *app,
+        explicit SearchResultsWindow(app::ApplicationCommon *app,
                                      std::unique_ptr<NotesSearchWindowContract::Presenter> &&windowPresenter);
         ~SearchResultsWindow() noexcept override;
 

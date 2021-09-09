@@ -8,7 +8,7 @@
 
 namespace gui
 {
-    QuoteCategoriesWindow::QuoteCategoriesWindow(app::Application *app)
+    QuoteCategoriesWindow::QuoteCategoriesWindow(app::ApplicationCommon *app)
         : AppWindow(app, gui::window::name::quote_categories),
           categoriesModel(std::make_shared<Quotes::CategoriesModel>(app))
     {

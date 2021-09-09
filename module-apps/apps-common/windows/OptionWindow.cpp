@@ -12,13 +12,13 @@
 
 namespace gui
 {
-    OptionWindow::OptionWindow(app::Application *app, const std::string &name)
+    OptionWindow::OptionWindow(app::ApplicationCommon *app, const std::string &name)
         : AppWindow(app, name), optionsModel{std::make_shared<OptionsModel>(app)}
     {
         buildInterface();
     }
 
-    OptionWindow::OptionWindow(app::Application *app, const std::string &name, std::list<Option> options)
+    OptionWindow::OptionWindow(app::ApplicationCommon *app, const std::string &name, std::list<Option> options)
         : AppWindow(app, name), optionsModel{std::make_shared<OptionsModel>(app)}, options(std::move(options))
     {
         buildInterface();

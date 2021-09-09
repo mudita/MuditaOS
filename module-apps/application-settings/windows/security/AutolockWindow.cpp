@@ -24,7 +24,8 @@ namespace gui
             {"20m", std::chrono::minutes{20}}};
     } // namespace
 
-    AutolockWindow::AutolockWindow(app::Application *app, app::settingsInterface::AutoLockSettings *autoLockSettings)
+    AutolockWindow::AutolockWindow(app::ApplicationCommon *app,
+                                   app::settingsInterface::AutoLockSettings *autoLockSettings)
         : BaseSettingsWindow(app, window::name::autolock), autoLockSettings(autoLockSettings)
     {
         setTitle(utils::translate("app_settings_display_security_autolock"));

@@ -24,7 +24,7 @@ namespace
     }
 } // namespace
 
-MeditationOptionsWindow::MeditationOptionsWindow(app::Application *app)
+MeditationOptionsWindow::MeditationOptionsWindow(app::ApplicationCommon *app)
     : OptionWindow(app, app::window::name::meditation_options)
 {
     setTitle(utils::translate("common_options"));
@@ -68,7 +68,7 @@ void MeditationOptionsWindow::addPreparationTimeOption(std::list<Option> &option
         option::SettingRightItem::ArrowBlack));
 }
 
-PreparationTimeWindow::PreparationTimeWindow(app::Application *app)
+PreparationTimeWindow::PreparationTimeWindow(app::ApplicationCommon *app)
     : OptionWindow(app, app::window::name::meditation_preparation)
 {
     setTitle(utils::translate("app_meditation_preparation_time"));

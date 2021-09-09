@@ -15,7 +15,7 @@ namespace gui
     class PhonebookNewContact : public AppWindow
     {
       public:
-        PhonebookNewContact(app::Application *app);
+        PhonebookNewContact(app::ApplicationCommon *app);
 
         auto onInput(const InputEvent &inputEvent) -> bool override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;

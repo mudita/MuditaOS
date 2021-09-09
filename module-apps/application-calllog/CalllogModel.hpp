@@ -15,7 +15,7 @@ class CalllogModel : public app::DatabaseModel<CalllogRecord>,
                      public app::AsyncCallbackReceiver
 {
   public:
-    explicit CalllogModel(app::Application *app);
+    explicit CalllogModel(app::ApplicationCommon *app);
 
     [[nodiscard]] unsigned int requestRecordsCount() override;
     [[nodiscard]] bool updateRecords(std::vector<CalllogRecord> records) override;

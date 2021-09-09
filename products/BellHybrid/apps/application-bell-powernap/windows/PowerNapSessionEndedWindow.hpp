@@ -17,6 +17,7 @@ namespace gui
 
       public:
         explicit PowerNapSessionEndedWindow(
-            app::Application *app, std::shared_ptr<app::powernap::PowerNapSessionEndedContract::Presenter> presenter);
+            app::ApplicationCommon *app,
+            std::shared_ptr<app::powernap::PowerNapSessionEndedContract::Presenter> presenter);
     };
 } // namespace gui

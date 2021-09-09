@@ -138,7 +138,7 @@ namespace gui
         return visibleStateChanged;
     }
 
-    MenuWindow::MenuWindow(app::Application *app, const app::DBNotificationsBaseHandler &accessor)
+    MenuWindow::MenuWindow(app::ApplicationCommon *app, const app::DBNotificationsBaseHandler &accessor)
         : AppWindow(app, app::window::name::desktop_menu), dbNotifications(accessor)
     {
         buildInterface();

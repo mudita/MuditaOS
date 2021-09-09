@@ -15,7 +15,7 @@
 
 namespace app::music_player
 {
-    ServiceAudioTagsFetcher::ServiceAudioTagsFetcher(Application *application) : application(application)
+    ServiceAudioTagsFetcher::ServiceAudioTagsFetcher(ApplicationCommon *application) : application(application)
     {}
 
     std::optional<tags::fetcher::Tags> ServiceAudioTagsFetcher::getFileTags(const std::string &filePath) const

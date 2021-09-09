@@ -7,7 +7,7 @@
 
 namespace gui
 {
-    BellSettingsBedtimeToneWindow::BellSettingsBedtimeToneWindow(app::Application *app, std::string name)
+    BellSettingsBedtimeToneWindow::BellSettingsBedtimeToneWindow(app::ApplicationCommon *app, std::string name)
         : AppWindow(app, std::move(name))
     {
         buildInterface();
