@@ -35,7 +35,9 @@ auto PhonebookModel::requestRecordsCount() -> unsigned int
 
     auto dispMode = static_cast<ContactDisplayMode>(getDisplayMode());
     if (dispMode == ContactDisplayMode::SortedByLetter) {
-        return letterMap.itemCount;
+        letterMap    = requestLetterMap();
+        recordsCount = letterMap.itemCount;
+        return recordsCount;
     }
 
     auto [code, msg] = DBServiceAPI::GetQueryWithReply(

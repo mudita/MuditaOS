@@ -104,7 +104,9 @@ namespace gui
         /// Total provider elements count
         unsigned int elementsCount = 0;
         void setElementsCount(unsigned int count);
-        void onElementsCountChanged();
+        void onElementsCountChanged(unsigned int count);
+        bool shouldCallEmptyListCallbacks = false;
+        void checkEmptyListCallbacks();
 
         /// Data model provider
         std::shared_ptr<ListItemProvider> provider = nullptr;
