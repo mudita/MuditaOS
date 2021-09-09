@@ -26,7 +26,7 @@ namespace sdesktop
 {
     inline constexpr auto service_stack             = 8192;
     inline constexpr auto worker_stack              = 8704;
-    inline constexpr auto cdc_queue_len             = 32;
+    inline constexpr auto cdc_queue_len             = 1024;
     inline constexpr auto cdc_queue_object_size     = 1024;
     inline constexpr auto irq_queue_object_size     = sizeof(bsp::USBDeviceStatus);
     inline constexpr auto file_transfer_timeout     = 5000;
