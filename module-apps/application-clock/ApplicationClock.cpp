@@ -83,7 +83,7 @@ namespace app
 
     void ApplicationClock::createUserInterface()
     {
-        windowsFactory.attach(gui::name::window::main_window, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::name::window::main_window, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::ClockMainWindow>(app, name);
         });
 

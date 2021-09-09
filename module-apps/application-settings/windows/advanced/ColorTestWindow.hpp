@@ -15,7 +15,7 @@ namespace gui
         gui::ColorTestListView *colorListView          = nullptr;
 
       public:
-        explicit ColorTestWindow(app::Application *app);
+        explicit ColorTestWindow(app::ApplicationCommon *app);
 
         void applyInputCallback();
         void buildInterface() override;

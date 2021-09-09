@@ -49,6 +49,7 @@ target_link_libraries(application-calendar
 		time-constants
 
 	PRIVATE
+		app
 		service-appmgr
 		service-db
 		service-time

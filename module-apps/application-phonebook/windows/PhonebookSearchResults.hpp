@@ -13,7 +13,7 @@ namespace gui
     class PhonebookSearchResults : public AppWindow
     {
       public:
-        explicit PhonebookSearchResults(app::Application *app);
+        explicit PhonebookSearchResults(app::ApplicationCommon *app);
         ~PhonebookSearchResults() override;
 
       private:

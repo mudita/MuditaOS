@@ -8,7 +8,7 @@
 
 namespace gui
 {
-    MessagesWindow::MessagesWindow(app::Application *app,
+    MessagesWindow::MessagesWindow(app::ApplicationCommon *app,
                                    std::unique_ptr<audio_settings::AbstractAudioSettingsModel> &&audioModel)
         : BaseSettingsWindow(app, gui::window::name::messages), mWidgetMaker(this), mAudioModel(std::move(audioModel))
     {

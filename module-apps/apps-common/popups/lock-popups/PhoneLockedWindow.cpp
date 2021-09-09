@@ -12,7 +12,7 @@
 
 namespace gui
 {
-    PhoneLockedWindow::PhoneLockedWindow(app::Application *app, const std::string &name)
+    PhoneLockedWindow::PhoneLockedWindow(app::ApplicationCommon *app, const std::string &name)
         : AppWindow(app, name),
           notificationsModel(std::make_shared<NotificationsModel>(NotificationsListPlacement::LockedScreen))
     {

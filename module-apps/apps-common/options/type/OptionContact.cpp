@@ -11,7 +11,7 @@
 
 namespace gui::option
 {
-    Contact::Contact(app::Application *app,
+    Contact::Contact(app::ApplicationCommon *app,
                      ContactOperation contactOperation,
                      const ContactRecord &contactRec,
                      gui::option::Arrow arrow)
@@ -38,7 +38,7 @@ namespace gui::option
         this->arrow       = arrow;
     }
 
-    bool Contact::onContactOptionClick(app::Application *app,
+    bool Contact::onContactOptionClick(app::ApplicationCommon *app,
                                        ContactOperation contactOperation,
                                        const ContactRecord &contactRecord)
     {

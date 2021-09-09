@@ -10,7 +10,7 @@ namespace app::onBoarding
     class OnBoardingLanguagesWindow : public gui::LanguagesWindow
     {
       public:
-        explicit OnBoardingLanguagesWindow(app::Application *app, const std::string &);
+        explicit OnBoardingLanguagesWindow(app::ApplicationCommon *app, const std::string &);
 
       private:
         void onBeforeShow(gui::ShowMode mode, gui::SwitchData *data) override;

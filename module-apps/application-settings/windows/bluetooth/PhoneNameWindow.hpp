@@ -10,7 +10,7 @@ namespace gui
     class PhoneNameWindow : public AppWindow
     {
       public:
-        explicit PhoneNameWindow(app::Application *app);
+        explicit PhoneNameWindow(app::ApplicationCommon *app);
 
       private:
         void buildInterface() override;

@@ -500,7 +500,7 @@ namespace app::manager
 
         if (targetApp->state() == ApplicationHandle::State::ACTIVE_FORGROUND ||
             targetApp->state() == ApplicationHandle::State::ACTIVE_BACKGROUND) {
-            app::Application::requestAction(this, targetName, action.actionId, std::move(action.params));
+            app::ApplicationCommon::requestAction(this, targetName, action.actionId, std::move(action.params));
             return ActionProcessStatus::Accepted;
         }
         return ActionProcessStatus::Skipped;

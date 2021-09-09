@@ -84,6 +84,7 @@ endif()
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
+        app
         application-messages
         application-settings
         apps-common

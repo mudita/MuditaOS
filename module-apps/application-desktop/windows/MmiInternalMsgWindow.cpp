@@ -10,7 +10,8 @@
 
 using namespace gui;
 
-MmiInternalMsgWindow::MmiInternalMsgWindow(app::Application *app, const std::string &name) : MmiPushWindow(app, name)
+MmiInternalMsgWindow::MmiInternalMsgWindow(app::ApplicationCommon *app, const std::string &name)
+    : MmiPushWindow(app, name)
 {}
 
 void MmiInternalMsgWindow::onBeforeShow(ShowMode mode, SwitchData *data)

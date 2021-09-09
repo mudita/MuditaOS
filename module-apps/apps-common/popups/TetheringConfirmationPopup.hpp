@@ -12,7 +12,7 @@ namespace gui
     class TetheringConfirmationPopup : public DialogYesNo
     {
       public:
-        TetheringConfirmationPopup(app::Application *app, const std::string &name);
+        TetheringConfirmationPopup(app::ApplicationCommon *app, const std::string &name);
 
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
     };

@@ -11,7 +11,7 @@ namespace gui
     class QuotesOptionsWindow : public BaseSettingsWindow
     {
       public:
-        explicit QuotesOptionsWindow(app::Application *app);
+        explicit QuotesOptionsWindow(app::ApplicationCommon *app);
 
       private:
         std::list<Option> buildOptionsList() override;

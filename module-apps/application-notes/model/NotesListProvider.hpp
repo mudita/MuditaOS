@@ -5,13 +5,13 @@
 
 #include <apps-common/DatabaseModel.hpp>
 #include <module-db/Interface/NotesRecord.hpp>
-#include <apps-common/Application.hpp>
+#include <apps-common/ApplicationCommon.hpp>
 
 namespace app::notes
 {
     class NotesListItemProvider : public app::DatabaseModel<NotesRecord>, public gui::ListItemProvider
     {
       public:
-        explicit NotesListItemProvider(app::Application *app);
+        explicit NotesListItemProvider(app::ApplicationCommon *app);
     };
 } // namespace app::notes

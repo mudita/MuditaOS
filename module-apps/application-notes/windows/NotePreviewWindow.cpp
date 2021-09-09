@@ -16,7 +16,7 @@
 
 namespace app::notes
 {
-    NotePreviewWindow::NotePreviewWindow(app::Application *app,
+    NotePreviewWindow::NotePreviewWindow(app::ApplicationCommon *app,
                                          std::unique_ptr<NotePreviewWindowContract::Presenter> &&windowPresenter)
         : AppWindow(app, gui::name::window::note_preview), presenter(std::move(windowPresenter))
     {

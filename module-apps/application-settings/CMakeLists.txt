@@ -139,7 +139,6 @@ target_sources(application-settings
 
 target_link_libraries(application-settings
     PRIVATE
-        apps-common
         eventstore
         module-bluetooth
         module-bsp
@@ -154,6 +153,8 @@ target_link_libraries(application-settings
         service-desktop
         service-evtmgr
         service-time
+    PUBLIC
+        app
 )
 
 add_dependencies(application-settings version)

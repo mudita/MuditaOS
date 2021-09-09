@@ -18,7 +18,7 @@
 
 namespace app::bell_settings
 {
-    TimeUnitsModel::TimeUnitsModel(app::Application *app) : application(app)
+    TimeUnitsModel::TimeUnitsModel(app::ApplicationCommon *app) : application(app)
     {}
 
     TimeUnitsModel::~TimeUnitsModel()

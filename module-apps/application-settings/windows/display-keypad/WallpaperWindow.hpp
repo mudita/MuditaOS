@@ -12,7 +12,7 @@ namespace gui
     class WallpaperWindow : public BaseSettingsWindow
     {
       public:
-        explicit WallpaperWindow(app::Application *app);
+        explicit WallpaperWindow(app::ApplicationCommon *app);
 
       private:
         void switchHandler(bool &onOffSwitch);

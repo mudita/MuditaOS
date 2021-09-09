@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <apps-common/Application.hpp>
+#include <apps-common/ApplicationCommon.hpp>
 #include <apps-common/InternalModel.hpp>
 
 namespace app::bell_settings
@@ -11,7 +11,7 @@ namespace app::bell_settings
     class PrewakeUpModel : public app::InternalModel<gui::ListItem *>, public gui::ListItemProvider
     {
       public:
-        explicit PrewakeUpModel(app::Application *app);
+        explicit PrewakeUpModel(app::ApplicationCommon *app);
 
         ~PrewakeUpModel();
 
@@ -32,6 +32,6 @@ namespace app::bell_settings
         [[nodiscard]] auto getMinimalItemSpaceRequired() const -> unsigned int override;
 
       private:
-        app::Application *application{};
+        app::ApplicationCommon *application{};
     };
 } // namespace app::bell_settings

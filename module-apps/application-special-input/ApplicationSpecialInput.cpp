@@ -24,7 +24,7 @@ ApplicationSpecialInput::ApplicationSpecialInput(std::string name,
         return actionHandled();
     });
 
-    windowsFactory.attach(app::char_select, [](Application *app, const std::string &name) {
+    windowsFactory.attach(app::char_select, [](ApplicationCommon *app, const std::string &name) {
         return std::make_unique<gui::SpecialInputMainWindow>(app);
     });
 

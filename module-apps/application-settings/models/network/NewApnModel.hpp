@@ -10,10 +10,10 @@
 
 class NewApnModel : public app::InternalModel<gui::ApnListItem *>, public gui::ListItemProvider
 {
-    app::Application *application = nullptr;
+    app::ApplicationCommon *application = nullptr;
 
   public:
-    explicit NewApnModel(app::Application *app);
+    explicit NewApnModel(app::ApplicationCommon *app);
 
     void clearData();
     void saveData(const std::shared_ptr<packet_data::APN::Config> &apnRecord);

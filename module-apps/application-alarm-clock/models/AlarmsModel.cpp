@@ -11,10 +11,10 @@
 
 namespace app::alarmClock
 {
-    AlarmsListItemProvider::AlarmsListItemProvider(Application *app) : DatabaseModel(app)
+    AlarmsListItemProvider::AlarmsListItemProvider(ApplicationCommon *app) : DatabaseModel(app)
     {}
 
-    AlarmsModel::AlarmsModel(app::Application *app, std::shared_ptr<AbstractAlarmsRepository> alarmsRepository)
+    AlarmsModel::AlarmsModel(app::ApplicationCommon *app, std::shared_ptr<AbstractAlarmsRepository> alarmsRepository)
         : AlarmsListItemProvider(app), alarmsRepository{std::move(alarmsRepository)}
     {}
 

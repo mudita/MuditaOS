@@ -11,7 +11,7 @@ namespace gui
     class BellSettingsAdvancedWindow : public OptionWindow
     {
       public:
-        explicit BellSettingsAdvancedWindow(app::Application *app);
+        explicit BellSettingsAdvancedWindow(app::ApplicationCommon *app);
 
       private:
         std::list<Option> settingsOptionsList();

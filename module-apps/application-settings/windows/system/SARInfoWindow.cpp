@@ -10,7 +10,7 @@
 
 namespace gui
 {
-    SARInfoWindow::SARInfoWindow(app::Application *app,
+    SARInfoWindow::SARInfoWindow(app::ApplicationCommon *app,
                                  std::unique_ptr<SARInfoWindowContract::Presenter> &&windowPresenter)
         : gui::AppWindow(app, window::name::sar), presenter{std::move(windowPresenter)}
     {

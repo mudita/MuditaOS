@@ -20,7 +20,7 @@ namespace app::alarmClock
         }
 
         void removeAlarm(const AlarmEventRecord &record,
-                         Application *application,
+                         ApplicationCommon *application,
                          AbstractAlarmsRepository &alarmsRepository)
         {
             auto metaData = std::make_unique<gui::DialogMetadataMessage>(
@@ -38,7 +38,7 @@ namespace app::alarmClock
         }
     } // namespace
 
-    std::list<gui::Option> alarmsListOptions(Application *application,
+    std::list<gui::Option> alarmsListOptions(ApplicationCommon *application,
                                              const AlarmEventRecord &record,
                                              AbstractAlarmsRepository &alarmsRepository)
     {

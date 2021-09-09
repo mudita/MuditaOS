@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <apps-common/Application.hpp>
+#include <apps-common/ApplicationCommon.hpp>
 #include <service-cellular/CellularMessage.hpp>
 
 class AbstractTechnicalInformationRepository
@@ -18,11 +18,11 @@ class AbstractTechnicalInformationRepository
 class TechnicalInformationRepository : public AbstractTechnicalInformationRepository, public app::AsyncCallbackReceiver
 {
   public:
-    explicit TechnicalInformationRepository(app::Application *application);
+    explicit TechnicalInformationRepository(app::ApplicationCommon *application);
     void readImei(OnReadCallback callback) override;
     std::string getImei() override;
 
   private:
-    app::Application *application{};
+    app::ApplicationCommon *application{};
     std::string imeiStr;
 };

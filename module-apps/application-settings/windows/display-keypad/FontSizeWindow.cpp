@@ -8,7 +8,7 @@
 namespace gui
 {
 
-    FontSizeWindow::FontSizeWindow(app::Application *app) : BaseSettingsWindow(app, gui::window::name::font_size)
+    FontSizeWindow::FontSizeWindow(app::ApplicationCommon *app) : BaseSettingsWindow(app, gui::window::name::font_size)
     {
         setTitle(utils::translate("app_settings_display_font_size"));
     }

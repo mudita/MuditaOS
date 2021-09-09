@@ -31,7 +31,7 @@ namespace
         };
     }
 
-    auto createSMSActivatedCallback(app::Application *app)
+    auto createSMSActivatedCallback(app::ApplicationCommon *app)
     {
         return [app]([[maybe_unused]] gui::Item &_item) {
             return app::manager::Controller::sendAction(
@@ -39,7 +39,7 @@ namespace
         };
     }
 
-    auto createSMSActivatedCallback(app::Application *app, const ContactRecord &record)
+    auto createSMSActivatedCallback(app::ApplicationCommon *app, const ContactRecord &record)
     {
         Expects(not record.numbers.empty());
         return [app, number = record.numbers[0].number]([[maybe_unused]] gui::Item &_item) {
@@ -60,7 +60,7 @@ namespace
         };
     }
 
-    void setSMSActivatedCallback(NotificationListItem *item, Notification provider, app::Application *app)
+    void setSMSActivatedCallback(NotificationListItem *item, Notification provider, app::ApplicationCommon *app)
     {
         if (provider->hasRecord() && not provider->getRecord().numbers.empty()) {
             item->activatedCallback = createSMSActivatedCallback(app, provider->getRecord());
@@ -70,7 +70,7 @@ namespace
         }
     }
 
-    void setSMSOnInputCallback(NotificationListItem *item, app::Application *app)
+    void setSMSOnInputCallback(NotificationListItem *item, app::ApplicationCommon *app)
     {
         item->inputCallback = [app]([[maybe_unused]] Item &item, const InputEvent &inputEvent) {
             if (inputEvent.isShortRelease(KeyCode::KEY_RF)) {
@@ -96,14 +96,14 @@ namespace
         };
     }
 
-    void setCallActivatedCallback(NotificationListItem *item, app::Application *app)
+    void setCallActivatedCallback(NotificationListItem *item, app::ApplicationCommon *app)
     {
         item->activatedCallback = [app]([[maybe_unused]] gui::Item &_item) {
             return app::manager::Controller::sendAction(app, app::manager::actions::ShowCallLog);
         };
     }
 
-    auto createCallOnRightFunctionalCallback(app::Application *app) -> std::function<void()>
+    auto createCallOnRightFunctionalCallback(app::ApplicationCommon *app) -> std::function<void()>
     {
         return [app]() {
             DBServiceAPI::GetQuery(app,
@@ -111,7 +111,7 @@ namespace
                                    std::make_unique<db::query::notifications::Clear>(NotificationsRecord::Key::Calls));
         };
     }
-    auto createCallOnLeftFunctionalCallback(app::Application *app, Notification provider) -> std::function<void()>
+    auto createCallOnLeftFunctionalCallback(app::ApplicationCommon *app, Notification provider) -> std::function<void()>
     {
         if (!provider->hasRecord()) {
             return nullptr;
@@ -125,7 +125,7 @@ namespace
         return nullptr;
     }
 
-    void setCallOnInputCallback(NotificationListItem *item, Notification provider, app::Application *app)
+    void setCallOnInputCallback(NotificationListItem *item, Notification provider, app::ApplicationCommon *app)
     {
         auto onRightFunctionalKeyCallback = createCallOnRightFunctionalCallback(app);
         auto onLeftFunctionalKeyCallback  = createCallOnLeftFunctionalCallback(app, provider);
@@ -147,7 +147,7 @@ namespace
         };
     }
 
-    void setTetheringActivatedCallback(NotificationListItem *item, app::Application *app)
+    void setTetheringActivatedCallback(NotificationListItem *item, app::ApplicationCommon *app)
     {
         item->activatedCallback = [app]([[maybe_unused]] gui::Item &_item) {
             app->switchWindow(gui::popup::window::tethering_off_window);

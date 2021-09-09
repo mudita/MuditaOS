@@ -11,7 +11,7 @@ namespace gui
     class AlarmActivatedWindow : public Dialog
     {
       public:
-        explicit AlarmActivatedWindow(app::Application *app);
+        explicit AlarmActivatedWindow(app::ApplicationCommon *app);
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
     };
 } /* namespace gui */

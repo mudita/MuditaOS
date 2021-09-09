@@ -11,7 +11,7 @@
 namespace gui
 {
 
-    UiTestWindow::UiTestWindow(app::Application *app) : AppWindow(app, "TEST_UI")
+    UiTestWindow::UiTestWindow(app::ApplicationCommon *app) : AppWindow(app, "TEST_UI")
     {
         AppWindow::buildInterface();
         buildInterface();

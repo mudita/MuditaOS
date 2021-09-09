@@ -11,7 +11,7 @@ namespace gui
     class BaseSettingsWindow : public OptionWindow
     {
       public:
-        BaseSettingsWindow(app::Application *app, std::string name);
+        BaseSettingsWindow(app::ApplicationCommon *app, std::string name);
 
         void rebuild() override;
 

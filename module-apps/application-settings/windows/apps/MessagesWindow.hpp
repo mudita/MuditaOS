@@ -17,7 +17,7 @@ namespace gui
         ///  Constructor
         ///  @app parent application pointer
         ///  @audioModel audio settings model
-        explicit MessagesWindow(app::Application *app,
+        explicit MessagesWindow(app::ApplicationCommon *app,
                                 std::unique_ptr<audio_settings::AbstractAudioSettingsModel> &&audioModel);
 
       private:

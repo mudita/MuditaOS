@@ -10,7 +10,7 @@
 
 namespace gui
 {
-    ApnOptionsWindow::ApnOptionsWindow(app::Application *app) : BaseSettingsWindow(app, window::name::apn_options)
+    ApnOptionsWindow::ApnOptionsWindow(app::ApplicationCommon *app) : BaseSettingsWindow(app, window::name::apn_options)
     {
         setTitle(utils::translate("app_settings_apn_options"));
         apnSettingsModel = new ApnSettingsModel(application);

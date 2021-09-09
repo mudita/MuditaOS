@@ -8,7 +8,7 @@
 
 namespace gui
 {
-    PhoneWindow::PhoneWindow(app::Application *app,
+    PhoneWindow::PhoneWindow(app::ApplicationCommon *app,
                              std::unique_ptr<audio_settings::AbstractAudioSettingsModel> &&audioModel)
         : BaseSettingsWindow(app, gui::window::name::phone), mWidgetMaker(this), mAudioModel(std::move(audioModel))
     {

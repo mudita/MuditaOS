@@ -15,7 +15,7 @@ namespace gui
     class PhonebookIceContacts : public AppWindow
     {
       public:
-        PhonebookIceContacts(app::Application *app);
+        PhonebookIceContacts(app::ApplicationCommon *app);
         virtual ~PhonebookIceContacts();
 
         bool onInput(const InputEvent &inputEvent) override;

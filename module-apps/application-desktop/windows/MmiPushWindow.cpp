@@ -6,7 +6,7 @@
 
 #include <i18n/i18n.hpp>
 #include <Image.hpp>
-#include <apps-common/Application.hpp>
+#include <apps-common/ApplicationCommon.hpp>
 #include <service-appmgr/data/MmiActionsParams.hpp>
 
 using namespace gui;
@@ -29,7 +29,7 @@ namespace style::desktop
 
 } // namespace style::desktop
 
-MmiPushWindow::MmiPushWindow(app::Application *app, const std::string &name) : gui::AppWindow(app, name)
+MmiPushWindow::MmiPushWindow(app::ApplicationCommon *app, const std::string &name) : gui::AppWindow(app, name)
 {
     AppWindow::buildInterface();
     bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::ok));

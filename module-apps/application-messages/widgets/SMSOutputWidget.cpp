@@ -14,7 +14,7 @@
 namespace gui
 {
 
-    SMSOutputWidget::SMSOutputWidget(app::Application *application, const std::shared_ptr<SMSRecord> &record)
+    SMSOutputWidget::SMSOutputWidget(app::ApplicationCommon *application, const std::shared_ptr<SMSRecord> &record)
     {
         setMinimumSize(style::window::default_body_width, style::messages::smsOutput::default_h);
         setMargins(Margins(0, style::messages::smsOutput::sms_vertical_spacer, 0, 0));

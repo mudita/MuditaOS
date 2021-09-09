@@ -20,7 +20,7 @@ namespace app
                                              sys::phone_modes::PhoneMode mode,
                                              sys::bluetooth::BluetoothMode bluetoothMode,
                                              StartInBackground startInBackground)
-        : ApplicationBell(name, parent, mode, bluetoothMode, startInBackground)
+        : Application(name, parent, mode, bluetoothMode, startInBackground)
     {
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         addActionReceiver(manager::actions::ShowAlarm, [this](auto &&data) {
@@ -43,7 +43,7 @@ namespace app
 
     void ApplicationBellMain::createUserInterface()
     {
-        windowsFactory.attach(gui::name::window::main_window, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::name::window::main_window, [](ApplicationCommon *app, const std::string &name) {
             auto timeModel        = std::make_unique<app::home_screen::TimeModel>();
             auto temperatureModel = std::make_unique<app::home_screen::TemperatureModel>(app);
             auto alarmModel       = std::make_unique<app::AlarmModel>(app);
@@ -52,14 +52,14 @@ namespace app
             return std::make_unique<gui::BellHomeScreenWindow>(app, std::move(presenter));
         });
 
-        windowsFactory.attach(gui::window::name::bell_main_menu, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::bell_main_menu, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::BellMainMenuWindow>(app);
         });
 
         // for demo only - to be removed
-        windowsFactory.attach(gui::window::name::bell_main_menu_dialog, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::Dialog>(app, name);
-        });
+        windowsFactory.attach(
+            gui::window::name::bell_main_menu_dialog,
+            [](ApplicationCommon *app, const std::string &name) { return std::make_unique<gui::Dialog>(app, name); });
 
         attachPopups({gui::popup::ID::AlarmActivated});
     }

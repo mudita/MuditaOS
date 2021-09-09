@@ -13,7 +13,7 @@
 
 namespace gui
 {
-    ChangeTimeZone::ChangeTimeZone(app::Application *app)
+    ChangeTimeZone::ChangeTimeZone(app::ApplicationCommon *app)
         : BaseSettingsWindow(app, window::name::change_date_and_time),
           timeZonesList(utils::time::getAvailableTimeZonesWithOffset())
     {

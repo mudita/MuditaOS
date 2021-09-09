@@ -3,9 +3,9 @@
 
 #pragma once
 
+#include <apps-common/ApplicationCommon.hpp>
 #include <Service/Message.hpp>
 #include <MessageType.hpp>
-#include <apps-common/Application.hpp>
 
 namespace app::manager
 {

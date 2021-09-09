@@ -21,7 +21,7 @@ namespace
     constexpr std::chrono::seconds endScreenTimeoutTime{5};
 } // namespace
 
-MeditationTimerWindow::MeditationTimerWindow(app::Application *app)
+MeditationTimerWindow::MeditationTimerWindow(app::ApplicationCommon *app)
     : AppWindow{app, name::window::main_window},
       endScreenTimeout{sys::TimerFactory::createSingleShotTimer(
           app, "MeditationEndScreenTimeout", endScreenTimeoutTime, [this](sys::Timer &) {

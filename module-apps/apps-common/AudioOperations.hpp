@@ -3,13 +3,14 @@
 
 #pragma once
 
-#include <apps-common/Application.hpp>
 #include <Audio/decoder/Decoder.hpp>
 
 #include <AsyncTask.hpp>
 
 namespace app
 {
+    class ApplicationCommon;
+
     class AbstractAudioOperations
     {
       public:
@@ -29,7 +30,7 @@ namespace app
     class AsyncAudioOperations : public AbstractAudioOperations, public app::AsyncCallbackReceiver
     {
       public:
-        explicit AsyncAudioOperations(Application *application);
+        explicit AsyncAudioOperations(ApplicationCommon *application);
 
         bool play(const std::string &filePath, const OnPlayCallback &callback) override;
         bool pause(const audio::Token &token, const OnPauseCallback &callback) override;
@@ -37,6 +38,6 @@ namespace app
         bool stop(const audio::Token &token, const OnStopCallback &callback) override;
 
       private:
-        Application *application = nullptr;
+        ApplicationCommon *application = nullptr;
     };
 } // namespace app

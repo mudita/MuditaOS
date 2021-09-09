@@ -10,7 +10,7 @@
 
 namespace gui
 {
-    StatusBarImageTypeWindow::StatusBarImageTypeWindow(app::Application *app)
+    StatusBarImageTypeWindow::StatusBarImageTypeWindow(app::ApplicationCommon *app)
         : AppWindow(app, window::name::status_bar_img_type)
     {
         AppWindow::buildInterface();

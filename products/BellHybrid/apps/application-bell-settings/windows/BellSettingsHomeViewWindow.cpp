@@ -7,7 +7,7 @@
 
 namespace gui
 {
-    BellSettingsHomeViewWindow::BellSettingsHomeViewWindow(app::Application *app, std::string name)
+    BellSettingsHomeViewWindow::BellSettingsHomeViewWindow(app::ApplicationCommon *app, std::string name)
         : AppWindow(app, std::move(name))
     {
         buildInterface();

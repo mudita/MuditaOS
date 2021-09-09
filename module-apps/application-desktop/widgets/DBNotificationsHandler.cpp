@@ -12,14 +12,14 @@ using namespace app;
 
 namespace
 {
-    bool requestUnreadThreadsCount(app::Application *app)
+    bool requestUnreadThreadsCount(app::ApplicationCommon *app)
     {
         const auto [succeed, _] = DBServiceAPI::GetQuery(
             app, db::Interface::Name::SMSThread, std::make_unique<db::query::ThreadGetCount>(EntryState::UNREAD));
         return succeed;
     }
 
-    bool requestUnreadCallsCount(app::Application *app)
+    bool requestUnreadCallsCount(app::ApplicationCommon *app)
     {
         const auto [succeed, _] = DBServiceAPI::GetQuery(
             app, db::Interface::Name::Calllog, std::make_unique<db::query::CalllogGetCount>(EntryState::UNREAD));
@@ -27,7 +27,7 @@ namespace
     }
 } // namespace
 
-DBNotificationsHandler::DBNotificationsHandler(Application *ownerApp)
+DBNotificationsHandler::DBNotificationsHandler(ApplicationCommon *ownerApp)
     : ownerApp(ownerApp), notifications{{Type::notReadSMS, 0}, {Type::notReadCall, 0}}
 {}
 

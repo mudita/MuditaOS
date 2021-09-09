@@ -4,7 +4,7 @@
 #pragma once
 
 #include "OptionWindow.hpp"
-#include "Application.hpp"
+#include "ApplicationCommon.hpp"
 
 namespace gui::option
 {

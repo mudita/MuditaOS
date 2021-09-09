@@ -13,7 +13,7 @@ namespace app::notes
     class NotesSearchListModel : public NotesListModel
     {
       public:
-        NotesSearchListModel(app::Application *app, std::shared_ptr<AbstractNotesRepository> notesRepository)
+        NotesSearchListModel(app::ApplicationCommon *app, std::shared_ptr<AbstractNotesRepository> notesRepository)
             : NotesListModel(app, std::move(notesRepository))
         {}
         void setSearchText(const std::string &text)

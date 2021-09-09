@@ -23,7 +23,7 @@ namespace app::alarmClock
         std::unique_ptr<AlarmClockEditWindowContract::Presenter> presenter;
 
       public:
-        NewEditAlarmWindow(app::Application *app,
+        NewEditAlarmWindow(app::ApplicationCommon *app,
                            std::unique_ptr<AlarmClockEditWindowContract::Presenter> &&windowPresenter);
 
         bool handleSwitchData(gui::SwitchData *data) override;

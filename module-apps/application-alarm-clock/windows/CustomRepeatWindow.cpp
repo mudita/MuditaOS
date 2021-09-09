@@ -6,7 +6,7 @@
 namespace app::alarmClock
 {
 
-    CustomRepeatWindow::CustomRepeatWindow(app::Application *app,
+    CustomRepeatWindow::CustomRepeatWindow(app::ApplicationCommon *app,
                                            std::unique_ptr<CustomRepeatWindowContract::Presenter> &&windowPresenter)
         : AppWindow(app, style::alarmClock::window::name::customRepeat), presenter{std::move(windowPresenter)}
     {

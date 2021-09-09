@@ -9,7 +9,7 @@
 
 namespace gui
 {
-    WallpaperWindow::WallpaperWindow(app::Application *app) : BaseSettingsWindow(app, window::name::wallpaper)
+    WallpaperWindow::WallpaperWindow(app::ApplicationCommon *app) : BaseSettingsWindow(app, window::name::wallpaper)
     {
         setTitle(utils::translate("app_settings_display_wallpaper"));
     }

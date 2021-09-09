@@ -3,14 +3,14 @@
 
 #pragma once
 
-#include <apps-common/Application.hpp>
+#include <ApplicationCommon.hpp>
 
 namespace app
 {
-    class ApplicationBell : public Application
+    class Application : public ApplicationCommon
     {
       public:
-        using Application::Application;
+        using ApplicationCommon::ApplicationCommon;
 
       protected:
         void attachPopups(const std::vector<gui::popup::ID> &popupsList) override;

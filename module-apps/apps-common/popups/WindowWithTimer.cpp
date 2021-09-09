@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "WindowWithTimer.hpp"
-#include "Application.hpp"
+#include "ApplicationCommon.hpp"
 #include "GuiTimer.hpp"
 
 namespace gui
@@ -12,7 +12,7 @@ namespace gui
         constexpr auto timerName = "PopupTimer";
     } // namespace popup
 
-    WindowWithTimer::WindowWithTimer(app::Application *app,
+    WindowWithTimer::WindowWithTimer(app::ApplicationCommon *app,
                                      const std::string &name,
                                      const std::chrono::milliseconds timeout)
         : AppWindow{app, name}, timeout{timeout}

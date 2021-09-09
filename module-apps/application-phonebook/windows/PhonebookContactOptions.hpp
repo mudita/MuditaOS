@@ -12,7 +12,7 @@ namespace gui
     class PhonebookContactOptions : public OptionWindow
     {
       public:
-        PhonebookContactOptions(app::Application *app);
+        PhonebookContactOptions(app::ApplicationCommon *app);
         ~PhonebookContactOptions() override = default;
         auto handleSwitchData(SwitchData *data) -> bool override;
 

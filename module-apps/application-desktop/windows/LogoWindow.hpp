@@ -10,7 +10,7 @@ namespace gui
     class LogoWindow : public AppWindow
     {
       public:
-        explicit LogoWindow(app::Application *app);
+        explicit LogoWindow(app::ApplicationCommon *app);
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;

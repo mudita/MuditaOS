@@ -16,7 +16,7 @@
 
 namespace gui
 {
-    PhonebookMainWindow::PhonebookMainWindow(app::Application *app)
+    PhonebookMainWindow::PhonebookMainWindow(app::ApplicationCommon *app)
         : AppWindow(app, gui::name::window::main_window), phonebookModel{
                                                               std::make_shared<PhonebookModel>(this->application)}
     {

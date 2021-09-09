@@ -7,7 +7,7 @@
 
 namespace app
 {
-    class Application;
+    class ApplicationCommon;
 }
 
 namespace app::powernap
@@ -29,10 +29,10 @@ namespace app::powernap
 
     class PowerNapSessionEndPresenter : public PowerNapSessionEndedContract::Presenter
     {
-        app::Application *app{};
+        app::ApplicationCommon *app{};
         void activate() override;
 
       public:
-        explicit PowerNapSessionEndPresenter(app::Application *app);
+        explicit PowerNapSessionEndPresenter(app::ApplicationCommon *app);
     };
 } // namespace app::powernap

@@ -25,7 +25,7 @@ namespace gui
 
       public:
         SMSTemplatesWindow() = delete;
-        SMSTemplatesWindow(app::Application *app);
+        SMSTemplatesWindow(app::ApplicationCommon *app);
         virtual ~SMSTemplatesWindow();
 
         void onBeforeShow(ShowMode mode, SwitchData *data) override;

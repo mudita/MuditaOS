@@ -19,7 +19,7 @@ namespace app::alarmClock
         WeekDaysRepeatData weekDaysOptData;
 
       public:
-        CustomRepeatWindow(app::Application *app,
+        CustomRepeatWindow(app::ApplicationCommon *app,
                            std::unique_ptr<CustomRepeatWindowContract::Presenter> &&windowPresenter);
 
         void onBeforeShow(gui::ShowMode mode, gui::SwitchData *data) override;

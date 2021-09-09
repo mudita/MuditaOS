@@ -12,7 +12,7 @@
 
 namespace app::onBoarding
 {
-    EULALicenseWindow::EULALicenseWindow(app::Application *app,
+    EULALicenseWindow::EULALicenseWindow(app::ApplicationCommon *app,
                                          std::unique_ptr<EULALicenseWindowContract::Presenter> &&windowPresenter)
         : gui::AppWindow(app, gui::window::name::onBoarding_eula), presenter{std::move(windowPresenter)}
     {

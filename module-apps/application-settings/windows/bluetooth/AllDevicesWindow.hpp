@@ -12,7 +12,7 @@ namespace gui
     class AllDevicesWindow : public BaseSettingsWindow
     {
       public:
-        AllDevicesWindow(app::Application *app, std::shared_ptr<BluetoothSettingsModel> bluetoothSettingsModel);
+        AllDevicesWindow(app::ApplicationCommon *app, std::shared_ptr<BluetoothSettingsModel> bluetoothSettingsModel);
 
       private:
         void buildInterface() override;

@@ -9,7 +9,7 @@
 class ThreadsModel : public BaseThreadsRecordModel, public app::AsyncCallbackReceiver
 {
   public:
-    explicit ThreadsModel(app::Application *app);
+    explicit ThreadsModel(app::ApplicationCommon *app);
 
     void requestRecords(uint32_t offset, uint32_t limit) override;
     [[nodiscard]] auto getMinimalItemSpaceRequired() const -> unsigned int override;

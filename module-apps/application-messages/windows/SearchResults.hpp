@@ -23,7 +23,7 @@ namespace gui
         auto listViewRequest(const std::string &text) -> bool;
 
       public:
-        SearchResults(app::Application *app);
+        SearchResults(app::ApplicationCommon *app);
         /// needed to init populate db
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         auto showEmptyResults() -> bool;

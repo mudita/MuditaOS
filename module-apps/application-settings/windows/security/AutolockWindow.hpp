@@ -15,7 +15,7 @@ namespace gui
     class AutolockWindow : public BaseSettingsWindow
     {
       public:
-        AutolockWindow(app::Application *app, app::settingsInterface::AutoLockSettings *autoLockSettings);
+        AutolockWindow(app::ApplicationCommon *app, app::settingsInterface::AutoLockSettings *autoLockSettings);
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
 
       private:

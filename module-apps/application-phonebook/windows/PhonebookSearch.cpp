@@ -8,7 +8,7 @@
 
 namespace gui
 {
-    PhonebookSearch::PhonebookSearch(app::Application *app) : AppWindow(app, gui::window::name::search)
+    PhonebookSearch::PhonebookSearch(app::ApplicationCommon *app) : AppWindow(app, gui::window::name::search)
     {
         buildInterface();
     }

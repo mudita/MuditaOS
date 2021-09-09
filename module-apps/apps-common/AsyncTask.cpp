@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AsyncTask.hpp"
-#include "Application.hpp"
+#include <apps-common/ApplicationCommon.hpp>
 #include "log.hpp"
 
 namespace app
@@ -17,7 +17,7 @@ namespace app
         }
     }
 
-    void AsyncTask::execute(Application *application,
+    void AsyncTask::execute(ApplicationCommon *application,
                             AsyncCallbackReceiver::Ptr receiverObject,
                             std::optional<std::function<bool(sys::ResponseMessage *)>> callback,
                             ReceiverBehavior receiverBehavior)
@@ -47,7 +47,7 @@ namespace app
         query->setQueryListener(db::QueryCallback::fromFunction(std::move(callback)));
     }
 
-    RequestId AsyncQuery::onExecute(Application *application)
+    RequestId AsyncQuery::onExecute(ApplicationCommon *application)
     {
         const auto [result, id] = DBServiceAPI::GetQuery(application, target, std::move(query));
         if (!result) {
@@ -66,7 +66,7 @@ namespace app
         : message{std::move(message)}, serviceName{serviceName}
     {}
 
-    auto AsyncRequest::onExecute(Application *application) -> RequestId
+    auto AsyncRequest::onExecute(ApplicationCommon *application) -> RequestId
     {
         std::shared_ptr<sys::DataMessage> msg{std::move(message)};
         bool result = application->bus.sendUnicast(msg, serviceName);

@@ -10,7 +10,7 @@ namespace gui
     class DisplayAndKeypadWindow : public OptionWindow
     {
       public:
-        explicit DisplayAndKeypadWindow(app::Application *app);
+        explicit DisplayAndKeypadWindow(app::ApplicationCommon *app);
 
       private:
         std::list<Option> displayAndKeypadOptionsList();

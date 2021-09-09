@@ -24,7 +24,7 @@ namespace gui
         ProgressBar *progressBar = nullptr;
 
       public:
-        ClockMainWindow(app::Application *app, const std::string &name);
+        ClockMainWindow(app::ApplicationCommon *app, const std::string &name);
 
         bool handleSwitchData(SwitchData *data) override;
 

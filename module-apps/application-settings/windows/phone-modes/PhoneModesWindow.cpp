@@ -10,7 +10,7 @@
 
 namespace gui
 {
-    PhoneModesWindow::PhoneModesWindow(app::Application *app,
+    PhoneModesWindow::PhoneModesWindow(app::ApplicationCommon *app,
                                        app::settingsInterface::PhoneModeSettings *phoneModeSettings)
         : OptionWindow(app, gui::window::name::phone_modes), phoneModeSettings(phoneModeSettings)
     {

@@ -25,12 +25,12 @@ namespace app::alarmClock
 
     class CustomRepeatModel : public CustomRepeatListItemProvider
     {
-        app::Application *application = nullptr;
+        app::ApplicationCommon *application = nullptr;
         std::shared_ptr<AbstractAlarmsRepository> alarmsRepository;
         void createData(const WeekDaysRepeatData &data);
 
       public:
-        CustomRepeatModel(app::Application *app, std::shared_ptr<AbstractAlarmsRepository> alarmsRepository);
+        CustomRepeatModel(app::ApplicationCommon *app, std::shared_ptr<AbstractAlarmsRepository> alarmsRepository);
 
         [[nodiscard]] unsigned int getMinimalItemSpaceRequired() const override;
         [[nodiscard]] unsigned int requestRecordsCount() override;

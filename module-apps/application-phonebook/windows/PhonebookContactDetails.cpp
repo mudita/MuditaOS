@@ -10,7 +10,7 @@
 
 namespace gui
 {
-    PhonebookContactDetails::PhonebookContactDetails(app::Application *app)
+    PhonebookContactDetails::PhonebookContactDetails(app::ApplicationCommon *app)
         : AppWindow(app, gui::window::name::contact), contactDetailsModel{std::make_shared<ContactDetailsModel>(app)}
     {
         buildInterface();

@@ -9,7 +9,7 @@
 
 namespace app::bell_settings
 {
-    PrewakeUpModel::PrewakeUpModel(app::Application *app) : application(app)
+    PrewakeUpModel::PrewakeUpModel(app::ApplicationCommon *app) : application(app)
     {}
 
     PrewakeUpModel::~PrewakeUpModel()

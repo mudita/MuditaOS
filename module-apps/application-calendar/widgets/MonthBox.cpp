@@ -8,7 +8,7 @@
 
 namespace gui
 {
-    MonthBox::MonthBox(app::Application *app,
+    MonthBox::MonthBox(app::ApplicationCommon *app,
                        gui::Item *parent,
                        const int &offsetTop,
                        const uint32_t &width,

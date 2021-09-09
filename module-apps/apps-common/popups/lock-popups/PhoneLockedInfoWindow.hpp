@@ -14,7 +14,7 @@ namespace gui
     class PhoneLockedInfoWindow : public WindowWithTimer
     {
       public:
-        PhoneLockedInfoWindow(app::Application *app, const std::string &name);
+        PhoneLockedInfoWindow(app::ApplicationCommon *app, const std::string &name);
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         bool onInput(const InputEvent &inputEvent) override;
         void buildInterface() override;

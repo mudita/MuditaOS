@@ -9,10 +9,10 @@
 
 class OptionsModel : public app::InternalModel<gui::ListItem *>, public gui::ListItemProvider
 {
-    app::Application *application = nullptr;
+    app::ApplicationCommon *application = nullptr;
 
   public:
-    explicit OptionsModel(app::Application *app);
+    explicit OptionsModel(app::ApplicationCommon *app);
 
     void clearData();
     void createData(std::list<gui::Option> &optionList);

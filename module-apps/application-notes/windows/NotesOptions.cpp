@@ -24,7 +24,9 @@ namespace app::notes
             options.emplace_back(utils::translate(translationId), onClickCallback);
         }
 
-        void removeNote(const NotesRecord &record, Application *application, AbstractNotesRepository &notesRepository)
+        void removeNote(const NotesRecord &record,
+                        ApplicationCommon *application,
+                        AbstractNotesRepository &notesRepository)
         {
             auto metaData = std::make_unique<gui::DialogMetadataMessage>(
                 gui::DialogMetadata{record.snippet,
@@ -42,7 +44,7 @@ namespace app::notes
         }
     } // namespace
 
-    std::list<gui::Option> noteListOptions(Application *application,
+    std::list<gui::Option> noteListOptions(ApplicationCommon *application,
                                            const NotesRecord &record,
                                            AbstractNotesRepository &notesRepository)
     {
@@ -57,7 +59,7 @@ namespace app::notes
         return options;
     }
 
-    std::list<gui::Option> notePreviewOptions(Application *application,
+    std::list<gui::Option> notePreviewOptions(ApplicationCommon *application,
                                               const NotesRecord &record,
                                               AbstractNotesRepository &notesRepository,
                                               gui::Text *textWidget)
@@ -83,7 +85,9 @@ namespace app::notes
         return options;
     }
 
-    std::list<gui::Option> noteEditOptions(Application *application, const NotesRecord &record, gui::Text *textWidget)
+    std::list<gui::Option> noteEditOptions(ApplicationCommon *application,
+                                           const NotesRecord &record,
+                                           gui::Text *textWidget)
     {
         std::list<gui::Option> options;
         addOption(

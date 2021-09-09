@@ -16,7 +16,7 @@
 
 namespace gui
 {
-    MeditationWindow::MeditationWindow(app::Application *app) : AppWindow{app, name::window::main_window}
+    MeditationWindow::MeditationWindow(app::ApplicationCommon *app) : AppWindow{app, name::window::main_window}
     {
         MeditationWindow::buildInterface();
     }

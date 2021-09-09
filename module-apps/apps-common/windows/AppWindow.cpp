@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AppWindow.hpp"
-#include "Application.hpp"
+#include "ApplicationCommon.hpp"
 #include "InputEvent.hpp"
 #include "StatusBar.hpp"
 #include "status-bar/Time.hpp"
@@ -16,7 +16,7 @@ using namespace style::header;
 namespace gui
 {
 
-    AppWindow::AppWindow(app::Application *app, std::string name) : Window(name), application{app}
+    AppWindow::AppWindow(app::ApplicationCommon *app, std::string name) : Window(name), application{app}
     {
         setSize(style::window_width, style::window_height);
     }

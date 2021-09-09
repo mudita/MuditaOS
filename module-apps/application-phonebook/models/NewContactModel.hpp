@@ -12,10 +12,10 @@
 
 class NewContactModel : public app::InternalModel<gui::ContactListItem *>, public gui::ListItemProvider
 {
-    app::Application *application = nullptr;
+    app::ApplicationCommon *application = nullptr;
 
   public:
-    NewContactModel(app::Application *app);
+    NewContactModel(app::ApplicationCommon *app);
 
     void clearData();
     void saveData(std::shared_ptr<ContactRecord> contactRecord);

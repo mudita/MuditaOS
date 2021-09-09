@@ -8,7 +8,7 @@
 
 namespace app
 {
-    class Application;
+    class ApplicationCommon;
 }
 
 namespace app::bell_settings
@@ -17,7 +17,7 @@ namespace app::bell_settings
     class SnoozeSettingsModel : public AbstractSnoozeSettingsModel
     {
       public:
-        explicit SnoozeSettingsModel(Application *app);
+        explicit SnoozeSettingsModel(ApplicationCommon *app);
         void setSnooze(bool value) override;
         bool getSnooze() const override;
 

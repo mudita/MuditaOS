@@ -10,7 +10,6 @@
 #include "OnActionPolicy.hpp"
 #include <service-appmgr/messages/Message.hpp>
 
-#include <apps-common/Application.hpp>
 #include <apps-common/ApplicationLauncher.hpp>
 
 #include <Service/Common.hpp>

@@ -12,7 +12,7 @@ namespace gui
     class BellSettingsTurnOffWindow : public AppWindow
     {
       public:
-        explicit BellSettingsTurnOffWindow(app::Application *app,
+        explicit BellSettingsTurnOffWindow(app::ApplicationCommon *app,
                                            std::string name = gui::window::name::bellSettingsTurnOff);
 
         void buildInterface() override;

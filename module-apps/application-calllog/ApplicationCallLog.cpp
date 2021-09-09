@@ -82,16 +82,17 @@ namespace app
 
     void ApplicationCallLog::createUserInterface()
     {
-        windowsFactory.attach(calllog::settings::MainWindowStr, [](Application *app, const std::string &name) {
+        windowsFactory.attach(calllog::settings::MainWindowStr, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::CallLogMainWindow>(app);
         });
-        windowsFactory.attach(calllog::settings::DetailsWindowStr, [](Application *app, const std::string &name) {
+        windowsFactory.attach(calllog::settings::DetailsWindowStr, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::CallLogDetailsWindow>(app);
         });
-        windowsFactory.attach(
-            utils::translate("app_phonebook_options_title"),
-            [](Application *app, const std::string &name) { return std::make_unique<gui::OptionWindow>(app, name); });
-        windowsFactory.attach(calllog::settings::DialogYesNoStr, [](Application *app, const std::string &name) {
+        windowsFactory.attach(utils::translate("app_phonebook_options_title"),
+                              [](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<gui::OptionWindow>(app, name);
+                              });
+        windowsFactory.attach(calllog::settings::DialogYesNoStr, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::DialogYesNo>(app, name);
         });
 

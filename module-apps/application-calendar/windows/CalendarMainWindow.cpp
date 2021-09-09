@@ -12,7 +12,7 @@
 namespace gui
 {
 
-    CalendarMainWindow::CalendarMainWindow(app::Application *app, const std::string &name)
+    CalendarMainWindow::CalendarMainWindow(app::ApplicationCommon *app, const std::string &name)
         : AppWindow(app, name), app::AsyncCallbackReceiver{app}
     {
         std::chrono::system_clock::time_point tp = std::chrono::system_clock::now();

@@ -14,7 +14,7 @@ namespace gui
     class QuoteAddEditWindow : public AppWindow
     {
       public:
-        explicit QuoteAddEditWindow(app::Application *app);
+        explicit QuoteAddEditWindow(app::ApplicationCommon *app);
         void buildInterface() override;
 
       private:

@@ -16,7 +16,7 @@ namespace gui
         const std::chrono::milliseconds timeout;
 
       public:
-        explicit WindowWithTimer(app::Application *app,
+        explicit WindowWithTimer(app::ApplicationCommon *app,
                                  const std::string &name,
                                  const std::chrono::milliseconds timeout = defautTimeout);
         void destroyInterface() override;

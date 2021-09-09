@@ -12,7 +12,7 @@
 #include <service-db/DBServiceAPI.hpp>
 #include <service-db/QueryMessage.hpp>
 
-SMSThreadModel::SMSThreadModel(app::Application *app) : DatabaseModel(app), app::AsyncCallbackReceiver{app}
+SMSThreadModel::SMSThreadModel(app::ApplicationCommon *app) : DatabaseModel(app), app::AsyncCallbackReceiver{app}
 {
     smsInput = new gui::SMSInputWidget(application);
 }

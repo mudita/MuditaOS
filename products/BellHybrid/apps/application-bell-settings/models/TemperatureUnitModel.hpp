@@ -10,7 +10,7 @@
 
 namespace app
 {
-    class Application;
+    class ApplicationCommon;
 }
 
 namespace app::bell_settings
@@ -28,7 +28,7 @@ namespace app::bell_settings
     class TemperatureUnitModel : public AbstractTemperatureUnitModel
     {
       public:
-        explicit TemperatureUnitModel(Application *app);
+        explicit TemperatureUnitModel(ApplicationCommon *app);
 
         utils::temperature::Temperature::Unit get() const override;
 

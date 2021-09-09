@@ -8,14 +8,15 @@
 #include <widgets/Spinner.hpp>
 #include <service-db/Settings.hpp>
 
-class Application;
+class ApplicationCommon;
 
 namespace app::bell_settings
 {
     class FrontlightModel
     {
       public:
-        explicit FrontlightModel(app::Application *app, app::settingsInterface::BellScreenLightSettings *slSettings);
+        explicit FrontlightModel(app::ApplicationCommon *app,
+                                 app::settingsInterface::BellScreenLightSettings *slSettings);
         ~FrontlightModel();
 
         auto saveData() -> void;
@@ -25,7 +26,7 @@ namespace app::bell_settings
         [[nodiscard]] auto getSpinner() -> gui::Spinner *;
 
       private:
-        app::Application *application                                        = nullptr;
+        app::ApplicationCommon *application                                  = nullptr;
         app::settingsInterface::BellScreenLightSettings *screenLightSettings = nullptr;
         gui::Spinner *frontlightSetSpinner                                   = nullptr;
         mutable settings::Settings settings;

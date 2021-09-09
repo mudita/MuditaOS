@@ -6,7 +6,7 @@
 #include "models/TemperatureModel.hpp"
 #include "models/TimeModel.hpp"
 
-#include <apps-common/Application.hpp>
+#include <apps-common/ApplicationCommon.hpp>
 #include <module-sys/Timers/SystemTimer.hpp>
 #include <module-sys/Timers/TimerFactory.hpp>
 #include <time/time_constants.hpp>
@@ -14,7 +14,7 @@
 
 namespace app::home_screen
 {
-    HomeScreenPresenter::HomeScreenPresenter(Application *app,
+    HomeScreenPresenter::HomeScreenPresenter(ApplicationCommon *app,
                                              std::unique_ptr<AbstractAlarmModel> alarmModel,
                                              std::unique_ptr<AbstractTemperatureModel> temperatureModel,
                                              std::unique_ptr<AbstractTimeModel> timeModel)

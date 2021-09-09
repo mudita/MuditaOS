@@ -24,7 +24,7 @@ namespace gui
         auto handleContactNameQueryResponse(db::QueryResult *) -> bool;
 
       public:
-        explicit SMSThreadViewWindow(app::Application *app);
+        explicit SMSThreadViewWindow(app::ApplicationCommon *app);
         ~SMSThreadViewWindow() override;
 
         bool onInput(const InputEvent &inputEvent) override;

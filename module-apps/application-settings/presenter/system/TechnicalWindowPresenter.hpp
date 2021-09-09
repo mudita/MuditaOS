@@ -30,14 +30,14 @@ class TechnicalWindowContract
 class TechnicalWindowPresenter : public TechnicalWindowContract::Presenter
 {
   public:
-    explicit TechnicalWindowPresenter(app::Application *application,
+    explicit TechnicalWindowPresenter(app::ApplicationCommon *application,
                                       std::shared_ptr<TechnicalInformationModel> technicalInformationProvider);
 
     std::shared_ptr<gui::ListItemProvider> getTechnicalInformationProvider() const override;
     void requestImei() override;
 
   private:
-    app::Application *application{};
+    app::ApplicationCommon *application{};
     std::shared_ptr<TechnicalInformationModel> technicalInformationProvider;
     std::function<void()> onImeiReady = nullptr;
 };

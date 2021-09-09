@@ -3,14 +3,14 @@
 
 #pragma once
 
-#include <apps-common/Application.hpp>
+#include <apps-common/ApplicationCommon.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
 #include <service-cellular/PacketDataTypes.hpp>
 
 class ApnSettingsModel
 {
   public:
-    explicit ApnSettingsModel(app::Application *application);
+    explicit ApnSettingsModel(app::ApplicationCommon *application);
 
     void requestAPNList();
     void saveAPN(const std::shared_ptr<packet_data::APN::Config> &apn);
@@ -18,5 +18,5 @@ class ApnSettingsModel
     void setAsDefaultAPN(const std::shared_ptr<packet_data::APN::Config> &apn);
 
   private:
-    app::Application *application = nullptr;
+    app::ApplicationCommon *application = nullptr;
 };

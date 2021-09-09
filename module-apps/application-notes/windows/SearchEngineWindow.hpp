@@ -5,7 +5,7 @@
 
 #include "AppWindow.hpp"
 
-#include <apps-common/Application.hpp>
+#include <apps-common/ApplicationCommon.hpp>
 #include <module-apps/application-notes/presenter/SearchEngineWindowPresenter.hpp>
 
 #include <module-gui/gui/input/InputEvent.hpp>
@@ -16,7 +16,7 @@ namespace app::notes
     class SearchEngineWindow : public gui::AppWindow, public SearchEngineWindowContract::View
     {
       public:
-        SearchEngineWindow(Application *application,
+        SearchEngineWindow(ApplicationCommon *application,
                            std::unique_ptr<SearchEngineWindowContract::Presenter> &&windowPresenter);
         ~SearchEngineWindow() noexcept override;
 

@@ -12,7 +12,7 @@ namespace gui
     class ApnOptionsWindow : public BaseSettingsWindow
     {
       public:
-        ApnOptionsWindow(app::Application *app);
+        ApnOptionsWindow(app::ApplicationCommon *app);
 
       private:
         auto buildOptionsList() -> std::list<gui::Option> override;

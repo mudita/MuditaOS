@@ -117,34 +117,35 @@ namespace app
 
     void ApplicationMessages::createUserInterface()
     {
-        windowsFactory.attach(gui::name::window::main_window, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::name::window::main_window, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::MessagesMainWindow>(app);
         });
-        windowsFactory.attach(gui::name::window::thread_view, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::name::window::thread_view, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::SMSThreadViewWindow>(app);
         });
-        windowsFactory.attach(gui::name::window::new_sms, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::name::window::new_sms, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::NewMessageWindow>(app);
         });
-        windowsFactory.attach(
-            utils::translate("app_phonebook_options_title"),
-            [](Application *app, const std::string &name) { return std::make_unique<gui::OptionWindow>(app, name); });
-        windowsFactory.attach(gui::name::window::dialog, [](Application *app, const std::string &name) {
+        windowsFactory.attach(utils::translate("app_phonebook_options_title"),
+                              [](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<gui::OptionWindow>(app, name);
+                              });
+        windowsFactory.attach(gui::name::window::dialog, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::Dialog>(app, name);
         });
-        windowsFactory.attach(gui::name::window::dialog_confirm, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::name::window::dialog_confirm, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::DialogConfirm>(app, name);
         });
-        windowsFactory.attach(gui::name::window::dialog_yes_no, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::name::window::dialog_yes_no, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::DialogYesNo>(app, name);
         });
-        windowsFactory.attach(gui::name::window::thread_sms_search, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::SMSSearch>(app);
-        });
-        windowsFactory.attach(gui::name::window::sms_templates, [](Application *app, const std::string &name) {
+        windowsFactory.attach(
+            gui::name::window::thread_sms_search,
+            [](ApplicationCommon *app, const std::string &name) { return std::make_unique<gui::SMSSearch>(app); });
+        windowsFactory.attach(gui::name::window::sms_templates, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::SMSTemplatesWindow>(app);
         });
-        windowsFactory.attach(gui::name::window::search_results, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::name::window::search_results, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::SearchResults>(app);
         });
 

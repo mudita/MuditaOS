@@ -14,7 +14,7 @@ namespace style::quotes::list
 
 namespace Quotes
 {
-    CategoriesModel::CategoriesModel(app::Application *application)
+    CategoriesModel::CategoriesModel(app::ApplicationCommon *application)
         : DatabaseModel(application), app::AsyncCallbackReceiver{application}, app(application)
     {}
 
