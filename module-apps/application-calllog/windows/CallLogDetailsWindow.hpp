@@ -35,7 +35,7 @@ namespace gui
         void initDateWidgets();
 
       public:
-        explicit CallLogDetailsWindow(app::Application *app);
+        explicit CallLogDetailsWindow(app::ApplicationCommon *app);
 
         // virtual methods
         bool onInput(const InputEvent &inputEvent) override;

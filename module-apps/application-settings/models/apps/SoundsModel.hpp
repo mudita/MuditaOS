@@ -20,7 +20,7 @@ class SoundsModel : public app::InternalModel<gui::ListItem *>, public AbstractS
     /// Creates data for model
     /// @param app pointer to current application
     /// @param model audio settings model
-    void createData(app::Application *app, audio_settings::AbstractAudioSettingsModel *model) override;
+    void createData(app::ApplicationCommon *app, audio_settings::AbstractAudioSettingsModel *model) override;
 
     void clearData() override;
 
@@ -43,7 +43,7 @@ class SoundsModel : public app::InternalModel<gui::ListItem *>, public AbstractS
     /// @param app pointer to current application
     /// @param model audio settings model
     void applyItems(const std::vector<std::filesystem::path> &sounds,
-                    app::Application *app,
+                    app::ApplicationCommon *app,
                     audio_settings::AbstractAudioSettingsModel *model);
 
     std::shared_ptr<AbstractSoundsPlayer> soundsPlayer;

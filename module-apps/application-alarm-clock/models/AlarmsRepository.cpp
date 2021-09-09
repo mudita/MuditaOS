@@ -12,7 +12,7 @@ namespace app::alarmClock
 {
     auto async = app::AsyncRequest::createFromMessage;
 
-    AlarmsDBRepository::AlarmsDBRepository(Application *application)
+    AlarmsDBRepository::AlarmsDBRepository(ApplicationCommon *application)
         : AsyncCallbackReceiver{application}, application{application}
     {}
 

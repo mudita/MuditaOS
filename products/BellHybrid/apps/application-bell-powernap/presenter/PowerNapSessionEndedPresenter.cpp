@@ -9,7 +9,7 @@
 
 namespace app::powernap
 {
-    PowerNapSessionEndPresenter ::PowerNapSessionEndPresenter(app::Application *app) : app{app}
+    PowerNapSessionEndPresenter ::PowerNapSessionEndPresenter(app::ApplicationCommon *app) : app{app}
     {}
 
     void PowerNapSessionEndPresenter::activate()

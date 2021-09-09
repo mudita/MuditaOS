@@ -12,7 +12,7 @@
 
 using namespace gui;
 
-ActiveIconFactory::ActiveIconFactory(app::Application *app) : app{app}
+ActiveIconFactory::ActiveIconFactory(app::ApplicationCommon *app) : app{app}
 {
     assert(app);
 }

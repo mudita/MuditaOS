@@ -22,7 +22,7 @@ namespace gui
         std::vector<uint8_t> frequency{0, 15, 30, 45, 60};
 
       public:
-        ConnectionFrequencyWindow(app::Application *app,
+        ConnectionFrequencyWindow(app::ApplicationCommon *app,
                                   app::settingsInterface::ConnectionSettings *connectionSettings);
         void onBeforeShow(ShowMode m, SwitchData *d) override;
     };

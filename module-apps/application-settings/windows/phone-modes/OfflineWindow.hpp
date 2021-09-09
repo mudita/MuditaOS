@@ -17,7 +17,7 @@ namespace gui
     class OfflineWindow : public BaseSettingsWindow
     {
       public:
-        OfflineWindow(app::Application *app, app::settingsInterface::OfflineSettings *offlineSettings);
+        OfflineWindow(app::ApplicationCommon *app, app::settingsInterface::OfflineSettings *offlineSettings);
         void buildInterface() override;
 
       private:

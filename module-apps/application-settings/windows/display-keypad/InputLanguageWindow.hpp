@@ -12,7 +12,7 @@ namespace gui
     class InputLanguageWindow : public BaseSettingsWindow
     {
       public:
-        explicit InputLanguageWindow(app::Application *app);
+        explicit InputLanguageWindow(app::ApplicationCommon *app);
 
       protected:
         auto buildOptionsList() -> std::list<gui::Option> override;

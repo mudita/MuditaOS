@@ -31,7 +31,7 @@ namespace gui
         void invalidate() noexcept;
 
       public:
-        explicit MeditationTimerWindow(app::Application *app);
+        explicit MeditationTimerWindow(app::ApplicationCommon *app);
 
         auto onInput(const InputEvent &inputEvent) -> bool override;
 

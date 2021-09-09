@@ -38,6 +38,7 @@ target_link_libraries(application-calculator
     PUBLIC
         apps-common
     PRIVATE
+        app
         i18n
         Microsoft.GSL::GSL
         module-gui

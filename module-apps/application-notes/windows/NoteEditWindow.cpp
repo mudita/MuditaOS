@@ -24,12 +24,12 @@ namespace app::notes
         constexpr auto MaxCharactersCount = 4000U;
     } // namespace
 
-    NoteEditWindow::NoteEditWindow(app::Application *app,
+    NoteEditWindow::NoteEditWindow(app::ApplicationCommon *app,
                                    std::unique_ptr<NoteEditWindowContract::Presenter> &&windowPresenter)
         : NoteEditWindow(app, std::move(windowPresenter), gui::name::window::note_edit)
     {}
 
-    NoteEditWindow::NoteEditWindow(app::Application *app,
+    NoteEditWindow::NoteEditWindow(app::ApplicationCommon *app,
                                    std::unique_ptr<NoteEditWindowContract::Presenter> &&windowPresenter,
                                    const std::string &windowName)
         : gui::AppWindow{app, windowName}, presenter{std::move(windowPresenter)}

@@ -12,7 +12,7 @@
 namespace gui
 {
 
-    AddDeviceWindow::AddDeviceWindow(app::Application *app,
+    AddDeviceWindow::AddDeviceWindow(app::ApplicationCommon *app,
                                      std::shared_ptr<BluetoothSettingsModel> bluetoothSettingsModel)
         : BaseSettingsWindow(app, window::name::add_device), bluetoothSettingsModel(bluetoothSettingsModel)
     {

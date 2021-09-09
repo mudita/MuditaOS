@@ -17,7 +17,7 @@ namespace app::notes
     class NotesListModel : public NotesListItemProvider
     {
       public:
-        NotesListModel(app::Application *app, std::shared_ptr<AbstractNotesRepository> notesRepository);
+        NotesListModel(app::ApplicationCommon *app, std::shared_ptr<AbstractNotesRepository> notesRepository);
 
         [[nodiscard]] unsigned int requestRecordsCount() override;
         [[nodiscard]] bool updateRecords(std::vector<NotesRecord> records) override;

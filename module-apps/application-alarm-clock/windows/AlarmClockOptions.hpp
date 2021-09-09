@@ -15,7 +15,7 @@ namespace gui
 
 namespace app::alarmClock
 {
-    std::list<gui::Option> alarmsListOptions(Application *application,
+    std::list<gui::Option> alarmsListOptions(ApplicationCommon *application,
                                              const AlarmEventRecord &record,
                                              AbstractAlarmsRepository &alarmsRepository);
 }

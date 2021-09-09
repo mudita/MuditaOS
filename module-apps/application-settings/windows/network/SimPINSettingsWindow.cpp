@@ -12,7 +12,7 @@
 
 namespace gui
 {
-    SimPINSettingsWindow::SimPINSettingsWindow(app::Application *app)
+    SimPINSettingsWindow::SimPINSettingsWindow(app::ApplicationCommon *app)
         : BaseSettingsWindow(app, window::name::sim_pin_settings)
     {
         app->bus.sendUnicast<cellular::msg::request::sim::GetLockState>();

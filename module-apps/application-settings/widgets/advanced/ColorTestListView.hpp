@@ -3,18 +3,22 @@
 
 #pragma once
 
-#include <Application.hpp>
 #include <ListView.hpp>
+
+namespace app
+{
+    class ApplicationCommon;
+}
 
 namespace gui
 {
     class ColorTestListView : public ListView
     {
       private:
-        app::Application *app;
+        app::ApplicationCommon *app;
 
       public:
-        ColorTestListView(app::Application *application,
+        ColorTestListView(app::ApplicationCommon *application,
                           Item *parent,
                           uint32_t x,
                           uint32_t y,

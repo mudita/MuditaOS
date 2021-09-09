@@ -38,6 +38,7 @@ target_sources( application-calllog
 target_link_libraries( application-calllog
 
 	PRIVATE
+		app
 		i18n
 		log
 		Microsoft.GSL::GSL

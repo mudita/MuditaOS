@@ -19,7 +19,7 @@ namespace gui
         gui::Icon *emptyListIcon                   = nullptr;
 
       public:
-        explicit CallLogMainWindow(app::Application *app);
+        explicit CallLogMainWindow(app::ApplicationCommon *app);
 
         // virtual methods
         void onBeforeShow(ShowMode mode, SwitchData *data) override;

@@ -12,11 +12,11 @@
 #include "Service/Message.hpp" // for MessagePointer
 #include "Service/Service.hpp" // for Service
 #include "Timers/TimerHandle.hpp"
-#include "SwitchData.hpp"                  // for SwitchData
+#include "SwitchData.hpp" // for SwitchData
 #include <SystemManager/SystemManagerCommon.hpp>
 #include <hal/key_input/KeyEventDefinitions.hpp>
-#include "gui/Common.hpp"                  // for ShowMode
-#include "projdefs.h"                      // for pdMS_TO_TICKS
+#include "gui/Common.hpp" // for ShowMode
+#include "projdefs.h"     // for pdMS_TO_TICKS
 #include <PhoneModes/Observer.hpp>
 
 #include <service-appmgr/ApplicationManifest.hpp>
@@ -55,7 +55,7 @@ namespace settings
 
 namespace app
 {
-    class Application;
+    class ApplicationCommon;
     class GuiTimer;
 
     class ActionHandledResponse; // Forward declaration
@@ -122,7 +122,7 @@ namespace app
     /// This is template for creating new applications. Main difference between Application and service is that:
     /// 1. Application has access to GUI and Input
     /// 2. Application lifetime is managed with app::manager::ApplicationManager
-    class Application : public sys::Service, public AsyncCallbacksDeleter
+    class ApplicationCommon : public sys::Service, public AsyncCallbacksDeleter
     {
       public:
         /// state in which application is right now
@@ -197,17 +197,18 @@ namespace app
         sys::TimerHandle longPressTimer;
         void clearLongPressTimeout();
 
-        explicit Application(std::string name,
-                             std::string parent                          = "",
-                             sys::phone_modes::PhoneMode phoneMode       = sys::phone_modes::PhoneMode::Connected,
-                             sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled,
-                             StartInBackground startInBackground         = {false},
-                             uint32_t stackDepth                         = 4096,
-                             sys::ServicePriority priority               = sys::ServicePriority::Idle);
+        explicit ApplicationCommon(
+            std::string name,
+            std::string parent                          = "",
+            sys::phone_modes::PhoneMode phoneMode       = sys::phone_modes::PhoneMode::Connected,
+            sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled,
+            StartInBackground startInBackground         = {false},
+            uint32_t stackDepth                         = 4096,
+            sys::ServicePriority priority               = sys::ServicePriority::Idle);
 
-        virtual ~Application() noexcept;
+        virtual ~ApplicationCommon() noexcept;
 
-        Application::State getState();
+        ApplicationCommon::State getState();
         void setState(State st);
 
         /// Method responsible for rendering currently active window.

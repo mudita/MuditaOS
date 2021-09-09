@@ -10,7 +10,8 @@
 
 namespace gui
 {
-    NetworkWindow::NetworkWindow(app::Application *app, app::settingsInterface::OperatorsSettings *operatorsSettings)
+    NetworkWindow::NetworkWindow(app::ApplicationCommon *app,
+                                 app::settingsInterface::OperatorsSettings *operatorsSettings)
         : BaseSettingsWindow(app, gui::window::name::network), operatorsSettings(operatorsSettings)
     {}
 

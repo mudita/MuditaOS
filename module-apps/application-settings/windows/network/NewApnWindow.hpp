@@ -14,7 +14,7 @@ namespace gui
     class NewApnWindow : public AppWindow
     {
       public:
-        NewApnWindow(app::Application *app);
+        NewApnWindow(app::ApplicationCommon *app);
 
       private:
         auto onInput(const InputEvent &inputEvent) -> bool override;

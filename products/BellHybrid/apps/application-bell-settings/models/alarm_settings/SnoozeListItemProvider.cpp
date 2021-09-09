@@ -5,7 +5,7 @@
 #include "SnoozeListItemProvider.hpp"
 #include "SnoozeListItems.hpp"
 
-#include <apps-common/Application.hpp>
+#include <apps-common/ApplicationCommon.hpp>
 #include <common/models/SnoozeSettingsModel.hpp>
 #include <gui/widgets/ListViewEngine.hpp>
 

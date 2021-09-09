@@ -5,13 +5,13 @@
 #include "models/PowerNapModel.hpp"
 #include "data/PowerNapCommon.hpp"
 #include <ApplicationBellPowerNap.hpp>
-#include <apps-common/Application.hpp>
+#include <apps-common/ApplicationCommon.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
 #include <service-db/Settings.hpp>
 
 namespace app::powernap
 {
-    PowerNapMainWindowPresenter::PowerNapMainWindowPresenter(app::Application *app, settings::Settings *settings)
+    PowerNapMainWindowPresenter::PowerNapMainWindowPresenter(app::ApplicationCommon *app, settings::Settings *settings)
         : app{app}, settings{settings}, model{std::make_shared<PowerNapModel>()}
     {}
 

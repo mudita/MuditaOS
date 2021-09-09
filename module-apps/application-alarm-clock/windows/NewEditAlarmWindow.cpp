@@ -9,7 +9,7 @@
 namespace app::alarmClock
 {
 
-    NewEditAlarmWindow::NewEditAlarmWindow(app::Application *app,
+    NewEditAlarmWindow::NewEditAlarmWindow(app::ApplicationCommon *app,
                                            std::unique_ptr<AlarmClockEditWindowContract::Presenter> &&windowPresenter)
         : AppWindow(app, style::alarmClock::window::name::newEditAlarm), presenter{std::move(windowPresenter)}
     {

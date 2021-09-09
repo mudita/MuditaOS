@@ -38,6 +38,7 @@ target_sources(application-call
 
 target_link_libraries(application-call
     PRIVATE
+		app
 		i18n
 		libphonenumber::libphonenumber
 		log

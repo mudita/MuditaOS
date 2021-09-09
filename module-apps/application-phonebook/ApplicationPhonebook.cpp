@@ -97,41 +97,42 @@ namespace app
 
     void ApplicationPhonebook::createUserInterface()
     {
-        windowsFactory.attach(gui::name::window::main_window, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::name::window::main_window, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::PhonebookMainWindow>(app);
         });
-        windowsFactory.attach(gui::window::name::contact, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::contact, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::PhonebookContactDetails>(app);
         });
-        windowsFactory.attach(gui::window::name::search, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::search, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::PhonebookSearch>(app);
         });
-        windowsFactory.attach(gui::window::name::search_results, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::search_results, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::PhonebookSearchResults>(app);
         });
-        windowsFactory.attach(gui::window::name::dialog, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::dialog, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::Dialog>(app, name);
         });
-        windowsFactory.attach(gui::window::name::dialog_yes_no, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::dialog_yes_no, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::DialogYesNo>(app, gui::window::name::dialog_yes_no);
         });
-        windowsFactory.attach(gui::window::name::dialog_yes_no_icon_txt, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::DialogYesNoIconTxt>(app, name);
-        });
-        windowsFactory.attach(gui::window::name::dialog_confirm, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::dialog_yes_no_icon_txt,
+                              [](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<gui::DialogYesNoIconTxt>(app, name);
+                              });
+        windowsFactory.attach(gui::window::name::dialog_confirm, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::DialogConfirm>(app, gui::window::name::dialog_confirm);
         });
-        windowsFactory.attach(gui::window::name::contact_options, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::contact_options, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::PhonebookContactOptions>(app);
         });
-        windowsFactory.attach(gui::window::name::namecard_options, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::namecard_options, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::PhonebookNamecardOptions>(app);
         });
-        windowsFactory.attach(gui::window::name::ice_contacts, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::ice_contacts, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::PhonebookIceContacts>(app);
         });
 
-        windowsFactory.attach(gui::window::name::new_contact, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::new_contact, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::PhonebookNewContact>(app);
         });
 

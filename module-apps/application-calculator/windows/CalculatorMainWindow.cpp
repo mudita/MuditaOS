@@ -8,7 +8,7 @@
 namespace gui
 {
 
-    CalculatorMainWindow::CalculatorMainWindow(app::Application *app, std::string name) : AppWindow(app, name)
+    CalculatorMainWindow::CalculatorMainWindow(app::ApplicationCommon *app, std::string name) : AppWindow(app, name)
     {
         buildInterface();
     }

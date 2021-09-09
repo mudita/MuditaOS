@@ -12,7 +12,7 @@ namespace gui
     class ChargingBatteryWindow : public AppWindow
     {
       public:
-        explicit ChargingBatteryWindow(app::Application *app);
+        explicit ChargingBatteryWindow(app::ApplicationCommon *app);
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;

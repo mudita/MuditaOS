@@ -12,7 +12,7 @@
 
 namespace gui
 {
-    DateAndTimeMainWindow::DateAndTimeMainWindow(app::Application *app, std::string name)
+    DateAndTimeMainWindow::DateAndTimeMainWindow(app::ApplicationCommon *app, std::string name)
         : BaseSettingsWindow(app, std::move(name))
     {
         setTitle(utils::translate("app_settings_date_and_time"));

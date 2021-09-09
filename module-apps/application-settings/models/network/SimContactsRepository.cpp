@@ -9,7 +9,7 @@
 
 #include <application-settings/ApplicationSettings.hpp>
 
-SimContactsRepository::SimContactsRepository(app::Application *application)
+SimContactsRepository::SimContactsRepository(app::ApplicationCommon *application)
     : app::AsyncCallbackReceiver{application}, application{application}
 {}
 

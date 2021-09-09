@@ -13,7 +13,7 @@
 namespace gui
 {
 
-    OfflineWindow::OfflineWindow(app::Application *app, app::settingsInterface::OfflineSettings *offlineSettings)
+    OfflineWindow::OfflineWindow(app::ApplicationCommon *app, app::settingsInterface::OfflineSettings *offlineSettings)
         : BaseSettingsWindow(app, gui::window::name::offline), offlineSettings(offlineSettings)
     {
         isFlightMode = offlineSettings->isFlightMode();

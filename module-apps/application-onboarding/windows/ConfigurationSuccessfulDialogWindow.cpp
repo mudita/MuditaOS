@@ -14,7 +14,7 @@
 
 namespace app::onBoarding
 {
-    ConfigurationSuccessfulDialogWindow::ConfigurationSuccessfulDialogWindow(app::Application *app)
+    ConfigurationSuccessfulDialogWindow::ConfigurationSuccessfulDialogWindow(app::ApplicationCommon *app)
         : gui::Dialog(app, gui::window::name::onBoarding_configuration_successful)
     {
         header->navigationIndicatorAdd(new gui::header::IceAction(), gui::header::BoxSelection::Left);

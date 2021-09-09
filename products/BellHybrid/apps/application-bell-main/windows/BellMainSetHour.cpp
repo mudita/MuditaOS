@@ -11,7 +11,8 @@
 
 namespace gui
 {
-    BellMainSetHour::BellMainSetHour(app::Application *app) : AppWindow(app, gui::window::name::bell_main_set_hour)
+    BellMainSetHour::BellMainSetHour(app::ApplicationCommon *app)
+        : AppWindow(app, gui::window::name::bell_main_set_hour)
     {
         buildInterface();
     }

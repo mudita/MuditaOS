@@ -19,7 +19,7 @@ namespace gui
         app::settingsInterface::SimParams *simParams;
 
       public:
-        SimCardsWindow(app::Application *app, app::settingsInterface::SimParams *simParams);
+        SimCardsWindow(app::ApplicationCommon *app, app::settingsInterface::SimParams *simParams);
 
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
     };

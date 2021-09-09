@@ -3,14 +3,14 @@
 
 #include "TetheringConfirmationPopup.hpp"
 #include "DialogMetadataMessage.hpp"
-#include "Application.hpp"
+#include "ApplicationCommon.hpp"
 
 #include <module-sys/SystemManager/messages/TetheringQuestionRequest.hpp>
 #include <service-appmgr/Controller.hpp>
 
 namespace gui
 {
-    TetheringConfirmationPopup::TetheringConfirmationPopup(app::Application *app, const std::string &name)
+    TetheringConfirmationPopup::TetheringConfirmationPopup(app::ApplicationCommon *app, const std::string &name)
         : DialogYesNo{app, name}
     {}
 

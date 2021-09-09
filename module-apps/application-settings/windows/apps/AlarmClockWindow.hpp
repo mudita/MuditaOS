@@ -17,7 +17,7 @@ namespace gui
         ///  Constructor
         ///  @app parent application pointer
         /// @audioModel audio settings model
-        explicit AlarmClockWindow(app::Application *app,
+        explicit AlarmClockWindow(app::ApplicationCommon *app,
                                   std::unique_ptr<audio_settings::AbstractAudioSettingsModel> &&audioModel);
 
       private:

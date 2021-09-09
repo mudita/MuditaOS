@@ -3,7 +3,7 @@
 
 #include "LockPolicyHandler.hpp"
 #include <log.hpp>
-#include <Application.hpp>
+#include <ApplicationCommon.hpp>
 #include <gsl/assert>
 
 using namespace locks;
@@ -34,7 +34,7 @@ bool LockPolicyHandlerInterface::preventsAutoLocking()
     return true;
 }
 
-LockPolicyHandler::LockPolicyHandler(app::Application *owner,
+LockPolicyHandler::LockPolicyHandler(app::ApplicationCommon *owner,
                                      std::function<bool()> preventsAutoLockByStateCallback) noexcept
     : owner{owner}, preventsAutoLockByStateCallback(std::move(preventsAutoLockByStateCallback))
 {

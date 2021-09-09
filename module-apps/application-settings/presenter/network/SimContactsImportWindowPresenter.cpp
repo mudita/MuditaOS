@@ -4,7 +4,7 @@
 #include "SimContactsImportWindowPresenter.hpp"
 
 SimContactsImportWindowPresenter::SimContactsImportWindowPresenter(
-    app::Application *application, std::shared_ptr<SimContactsImportModel> simContactsProvider)
+    app::ApplicationCommon *application, std::shared_ptr<SimContactsImportModel> simContactsProvider)
     : application(application), simContactsProvider{std::move(simContactsProvider)}
 {
     onSave = [&]() {

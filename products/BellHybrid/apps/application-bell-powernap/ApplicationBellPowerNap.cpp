@@ -18,7 +18,7 @@ namespace app
                                                      sys::phone_modes::PhoneMode mode,
                                                      sys::bluetooth::BluetoothMode bluetoothMode,
                                                      StartInBackground startInBackground)
-        : ApplicationBell(std::move(name), std::move(parent), mode, bluetoothMode, startInBackground),
+        : Application(std::move(name), std::move(parent), mode, bluetoothMode, startInBackground),
           alarm{std::make_unique<powernap::PowerNapAlarmImpl>(this)}
     {}
 
@@ -36,18 +36,20 @@ namespace app
 
     void ApplicationBellPowerNap::createUserInterface()
     {
-        windowsFactory.attach(gui::name::window::main_window, [this](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::name::window::main_window, [this](ApplicationCommon *app, const std::string &name) {
             auto presenter = std::make_unique<powernap::PowerNapMainWindowPresenter>(app, settings.get());
             return std::make_unique<gui::PowerNapMainWindow>(app, std::move(presenter));
         });
-        windowsFactory.attach(gui::window::name::powernapProgress, [this](Application *app, const std::string &name) {
-            auto presenter = std::make_unique<powernap::PowerNapProgressPresenter>(app, settings.get(), *alarm);
-            return std::make_unique<gui::PowerNapProgressWindow>(app, std::move(presenter));
-        });
-        windowsFactory.attach(gui::window::name::powernapSessionEnded, [](Application *app, const std::string &name) {
-            auto presenter = std::make_unique<powernap::PowerNapSessionEndPresenter>(app);
-            return std::make_unique<gui::PowerNapSessionEndedWindow>(app, std::move(presenter));
-        });
+        windowsFactory.attach(
+            gui::window::name::powernapProgress, [this](ApplicationCommon *app, const std::string &name) {
+                auto presenter = std::make_unique<powernap::PowerNapProgressPresenter>(app, settings.get(), *alarm);
+                return std::make_unique<gui::PowerNapProgressWindow>(app, std::move(presenter));
+            });
+        windowsFactory.attach(gui::window::name::powernapSessionEnded,
+                              [](ApplicationCommon *app, const std::string &name) {
+                                  auto presenter = std::make_unique<powernap::PowerNapSessionEndPresenter>(app);
+                                  return std::make_unique<gui::PowerNapSessionEndedWindow>(app, std::move(presenter));
+                              });
 
         attachPopups({gui::popup::ID::AlarmActivated});
     }

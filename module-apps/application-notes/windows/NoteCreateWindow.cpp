@@ -7,7 +7,7 @@
 
 namespace app::notes
 {
-    NoteCreateWindow::NoteCreateWindow(app::Application *app,
+    NoteCreateWindow::NoteCreateWindow(app::ApplicationCommon *app,
                                        std::unique_ptr<NoteEditWindowContract::Presenter> &&windowPresenter)
         : NoteEditWindow(app, std::move(windowPresenter), gui::name::window::note_create)
     {}

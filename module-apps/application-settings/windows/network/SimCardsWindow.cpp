@@ -11,7 +11,7 @@
 
 namespace gui
 {
-    SimCardsWindow::SimCardsWindow(app::Application *app, app::settingsInterface::SimParams *simParams)
+    SimCardsWindow::SimCardsWindow(app::ApplicationCommon *app, app::settingsInterface::SimParams *simParams)
         : BaseSettingsWindow(app, gui::window::name::sim_cards), simParams(simParams)
     {}
 

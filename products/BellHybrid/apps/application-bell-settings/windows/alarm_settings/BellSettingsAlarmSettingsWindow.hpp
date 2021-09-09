@@ -14,7 +14,7 @@ namespace gui
       public:
         static constexpr auto name = "BellSettingsAlarmSettingsWindow";
 
-        explicit BellSettingsAlarmSettingsWindow(app::Application *app);
+        explicit BellSettingsAlarmSettingsWindow(app::ApplicationCommon *app);
 
       private:
         std::list<Option> alarmSettingsOptionsList();

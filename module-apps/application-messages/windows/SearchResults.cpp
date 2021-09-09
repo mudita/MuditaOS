@@ -13,7 +13,7 @@
 
 namespace gui
 {
-    SearchResults::SearchResults(app::Application *app) : AppWindow(app, name::window::search_results)
+    SearchResults::SearchResults(app::ApplicationCommon *app) : AppWindow(app, name::window::search_results)
     {
         namespace msgThreadStyle = style::messages::threads;
 

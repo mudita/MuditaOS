@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "Application.hpp"
+#include "ApplicationCommon.hpp"
 #include "Common.hpp"                         // for RefreshModes
 #include "GuiTimer.hpp"                       // for GuiTimer
 #include "Item.hpp"                           // for Item
@@ -76,7 +76,7 @@ namespace app
         return std::make_shared<ActionHandledResponse>(sys::ReturnCodes::Failure);
     }
 
-    const char *Application::stateStr(Application::State st)
+    const char *ApplicationCommon::stateStr(ApplicationCommon::State st)
     {
         switch (st) {
         case State::NONE:
@@ -98,13 +98,13 @@ namespace app
         }
     }
 
-    Application::Application(std::string name,
-                             std::string parent,
-                             sys::phone_modes::PhoneMode phoneMode,
-                             sys::bluetooth::BluetoothMode bluetoothMode,
-                             StartInBackground startInBackground,
-                             uint32_t stackDepth,
-                             sys::ServicePriority priority)
+    ApplicationCommon::ApplicationCommon(std::string name,
+                                         std::string parent,
+                                         sys::phone_modes::PhoneMode phoneMode,
+                                         sys::bluetooth::BluetoothMode bluetoothMode,
+                                         StartInBackground startInBackground,
+                                         uint32_t stackDepth,
+                                         sys::ServicePriority priority)
         : Service(std::move(name), std::move(parent), stackDepth, priority),
           default_window(gui::name::window::main_window), windowsStack(this),
           keyTranslator{std::make_unique<gui::KeyInputSimpleTranslation>()}, startInBackground{startInBackground},
@@ -165,17 +165,17 @@ namespace app
         });
     }
 
-    Application::~Application() noexcept
+    ApplicationCommon::~ApplicationCommon() noexcept
     {
         windowsStack.windows.clear();
     }
 
-    Application::State Application::getState()
+    ApplicationCommon::State ApplicationCommon::getState()
     {
         return state;
     }
 
-    void Application::setState(State st)
+    void ApplicationCommon::setState(State st)
     {
 #if DEBUG_APPLICATION_MANAGEMENT == 1
         LOG_DEBUG("[%s] (%s) -> (%s)", GetName().c_str(), stateStr(state), stateStr(st));
@@ -183,7 +183,7 @@ namespace app
         state = st;
     }
 
-    void Application::longPressTimerCallback()
+    void ApplicationCommon::longPressTimerCallback()
     {
         const auto actualTimeStamp = xTaskGetTickCount();
         if (keyTranslator->isKeyPressTimedOut(actualTimeStamp)) {
@@ -194,12 +194,12 @@ namespace app
         }
     }
 
-    void Application::clearLongPressTimeout()
+    void ApplicationCommon::clearLongPressTimeout()
     {
         keyTranslator->setPreviousKeyTimedOut(false);
     }
 
-    void Application::render(gui::RefreshModes mode)
+    void ApplicationCommon::render(gui::RefreshModes mode)
     {
         if (windowsStack.isEmpty()) {
             LOG_ERROR("Current window is not defined");
@@ -233,7 +233,7 @@ namespace app
             suspendInProgress = false;
     }
 
-    void Application::updateWindow(const std::string &windowName, std::unique_ptr<gui::SwitchData> data)
+    void ApplicationCommon::updateWindow(const std::string &windowName, std::unique_ptr<gui::SwitchData> data)
     {
         const auto currentWindow = getCurrentWindow();
         auto msg =
@@ -241,10 +241,10 @@ namespace app
         bus.sendUnicast(std::move(msg), this->GetName());
     }
 
-    void Application::switchWindow(const std::string &windowName,
-                                   gui::ShowMode cmd,
-                                   std::unique_ptr<gui::SwitchData> data,
-                                   SwitchReason reason)
+    void ApplicationCommon::switchWindow(const std::string &windowName,
+                                         gui::ShowMode cmd,
+                                         std::unique_ptr<gui::SwitchData> data,
+                                         SwitchReason reason)
     {
 
         std::string window;
@@ -269,7 +269,7 @@ namespace app
         }
     }
 
-    void Application::returnToPreviousWindow(const uint32_t times)
+    void ApplicationCommon::returnToPreviousWindow(const uint32_t times)
     {
         if (const auto prevWindow = getPrevWindow(times); prevWindow == gui::name::window::no_window) {
             app::manager::Controller::switchBack(this);
@@ -280,14 +280,14 @@ namespace app
         }
     }
 
-    void Application::popCurrentWindow()
+    void ApplicationCommon::popCurrentWindow()
     {
         if (!windowsStack.stack.empty()) {
             windowsStack.stack.pop_back();
         }
     }
 
-    void Application::popWindow(const std::string &window)
+    void ApplicationCommon::popWindow(const std::string &window)
     {
         auto popWindow = std::find(windowsStack.stack.begin(), windowsStack.stack.end(), window);
         if (popWindow != windowsStack.stack.end()) {
@@ -295,7 +295,7 @@ namespace app
         }
     }
 
-    void Application::refreshWindow(gui::RefreshModes mode)
+    void ApplicationCommon::refreshWindow(gui::RefreshModes mode)
     {
         if (not windowsStack.isEmpty()) {
             auto msg = std::make_shared<AppRefreshMessage>(mode, getCurrentWindow()->getName());
@@ -303,7 +303,7 @@ namespace app
         }
     }
 
-    sys::MessagePointer Application::DataReceivedHandler(sys::DataMessage *msgl)
+    sys::MessagePointer ApplicationCommon::DataReceivedHandler(sys::DataMessage *msgl)
     {
         auto msg = dynamic_cast<CellularNotificationMessage *>(msgl);
         if (msg != nullptr) {
@@ -348,7 +348,7 @@ namespace app
         return sys::msgNotHandled();
     }
 
-    sys::MessagePointer Application::handleAsyncResponse(sys::ResponseMessage *resp)
+    sys::MessagePointer ApplicationCommon::handleAsyncResponse(sys::ResponseMessage *resp)
     {
         if (resp != nullptr) {
             if (auto command = callbackStorage->getCallback(resp); command->execute()) {
@@ -362,7 +362,7 @@ namespace app
         }
     }
 
-    sys::MessagePointer Application::handleSignalStrengthUpdate(sys::Message *msgl)
+    sys::MessagePointer ApplicationCommon::handleSignalStrengthUpdate(sys::Message *msgl)
     {
         if ((state == State::ACTIVE_FORGROUND) && getCurrentWindow()->updateSignalStrength()) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
@@ -370,7 +370,7 @@ namespace app
         return sys::msgHandled();
     }
 
-    sys::MessagePointer Application::handleNetworkAccessTechnologyUpdate(sys::Message *msgl)
+    sys::MessagePointer ApplicationCommon::handleNetworkAccessTechnologyUpdate(sys::Message *msgl)
     {
         if ((state == State::ACTIVE_FORGROUND) && getCurrentWindow()->updateNetworkAccessTechnology()) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
@@ -378,7 +378,7 @@ namespace app
         return sys::msgHandled();
     }
 
-    sys::MessagePointer Application::handleInputEvent(sys::Message *msgl)
+    sys::MessagePointer ApplicationCommon::handleInputEvent(sys::Message *msgl)
     {
         AppInputEventMessage *msg = reinterpret_cast<AppInputEventMessage *>(msgl);
         if (msg->getEvent().isKeyPress()) {
@@ -393,9 +393,9 @@ namespace app
         return sys::msgHandled();
     }
 
-    sys::MessagePointer Application::handleKBDKeyEvent(sys::Message *msgl)
+    sys::MessagePointer ApplicationCommon::handleKBDKeyEvent(sys::Message *msgl)
     {
-        if (this->getState() != app::Application::State::ACTIVE_FORGROUND) {
+        if (this->getState() != app::ApplicationCommon::State::ACTIVE_FORGROUND) {
             LOG_FATAL("!!! Terrible terrible damage! application with no focus grabbed key!");
         }
         sevm::KbdMessage *msg = static_cast<sevm::KbdMessage *>(msgl);
@@ -406,7 +406,7 @@ namespace app
         return sys::msgHandled();
     }
 
-    sys::MessagePointer Application::handleBatteryStatusChange()
+    sys::MessagePointer ApplicationCommon::handleBatteryStatusChange()
     {
         if ((state == State::ACTIVE_FORGROUND) && getCurrentWindow()->updateBatteryStatus()) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
@@ -414,7 +414,7 @@ namespace app
         return sys::msgHandled();
     }
 
-    sys::MessagePointer Application::handleMinuteUpdated(sys::Message *msgl)
+    sys::MessagePointer ApplicationCommon::handleMinuteUpdated(sys::Message *msgl)
     {
         if (state == State::ACTIVE_FORGROUND && getCurrentWindow()->updateTime()) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
@@ -422,7 +422,7 @@ namespace app
         return sys::msgHandled();
     }
 
-    sys::MessagePointer Application::handleAction(sys::Message *msgl)
+    sys::MessagePointer ApplicationCommon::handleAction(sys::Message *msgl)
     {
         auto *msg         = static_cast<AppActionRequest *>(msgl);
         const auto action = msg->getAction();
@@ -445,7 +445,7 @@ namespace app
         return actionNotHandled();
     }
 
-    sys::MessagePointer Application::handleApplicationSwitch(sys::Message *msgl)
+    sys::MessagePointer ApplicationCommon::handleApplicationSwitch(sys::Message *msgl)
     {
         auto *msg = static_cast<AppSwitchMessage *>(msgl);
 
@@ -459,7 +459,7 @@ namespace app
         return sys::msgNotHandled();
     }
 
-    sys::MessagePointer Application::handleApplicationSwitchLaunch(sys::Message *msgl)
+    sys::MessagePointer ApplicationCommon::handleApplicationSwitchLaunch(sys::Message *msgl)
     {
         auto *msg    = static_cast<AppSwitchMessage *>(msgl);
         bool handled = false;
@@ -506,7 +506,7 @@ namespace app
         return sys::msgNotHandled();
     }
 
-    sys::MessagePointer Application::handleApplicationSwitchOnAction(sys::Message *msgl)
+    sys::MessagePointer ApplicationCommon::handleApplicationSwitchOnAction(sys::Message *msgl)
     {
         if ((state == State::ACTIVATING) || (state == State::INITIALIZING) || (state == State::ACTIVE_BACKGROUND)) {
             setState(State::ACTIVE_FORGROUND);
@@ -519,7 +519,7 @@ namespace app
         }
     }
 
-    sys::MessagePointer Application::handleSwitchWindow(sys::Message *msgl)
+    sys::MessagePointer ApplicationCommon::handleSwitchWindow(sys::Message *msgl)
     {
         auto msg = static_cast<AppSwitchWindowMessage *>(msgl);
         // check if specified window is in the application
@@ -559,7 +559,7 @@ namespace app
         return sys::msgHandled();
     }
 
-    sys::MessagePointer Application::handleUpdateWindow(sys::Message *msgl)
+    sys::MessagePointer ApplicationCommon::handleUpdateWindow(sys::Message *msgl)
     {
         auto msg = static_cast<AppUpdateWindowMessage *>(msgl);
 
@@ -575,7 +575,7 @@ namespace app
         return sys::msgHandled();
     }
 
-    sys::MessagePointer Application::handleAppClose(sys::Message *msgl)
+    sys::MessagePointer ApplicationCommon::handleAppClose(sys::Message *msgl)
     {
         setState(State::DEACTIVATING);
 
@@ -595,7 +595,7 @@ namespace app
         }
     }
 
-    void Application::checkBlockingRequests()
+    void ApplicationCommon::checkBlockingRequests()
     {
         if (getState() == State::FINALIZING_CLOSE && !callbackStorage->checkBlockingCloseRequests()) {
             LOG_INFO("Blocking requests done for [%s]. Closing application.", GetName().c_str());
@@ -604,7 +604,7 @@ namespace app
         }
     }
 
-    sys::MessagePointer Application::handleAppRebuild(sys::Message *msgl)
+    sys::MessagePointer ApplicationCommon::handleAppRebuild(sys::Message *msgl)
     {
         LOG_INFO("Application %s rebuilding gui", GetName().c_str());
         for (auto &[name, window] : windowsStack) {
@@ -619,7 +619,7 @@ namespace app
         return sys::msgHandled();
     }
 
-    sys::MessagePointer Application::handleAppRefresh(sys::Message *msgl)
+    sys::MessagePointer ApplicationCommon::handleAppRefresh(sys::Message *msgl)
     {
         auto *msg = static_cast<AppRefreshMessage *>(msgl);
         assert(msg);
@@ -633,7 +633,7 @@ namespace app
         return sys::msgHandled();
     }
 
-    sys::MessagePointer Application::handleGetDOM(sys::Message *msgl)
+    sys::MessagePointer ApplicationCommon::handleGetDOM(sys::Message *msgl)
     {
         if (windowsStack.isEmpty()) {
             LOG_ERROR("Current window is not defined - can't dump DOM");
@@ -652,7 +652,7 @@ namespace app
         return sys::msgHandled();
     }
 
-    sys::MessagePointer Application::handleAppFocusLost(sys::Message *msgl)
+    sys::MessagePointer ApplicationCommon::handleAppFocusLost(sys::Message *msgl)
     {
         if (state == State::ACTIVE_FORGROUND) {
             setState(State::ACTIVE_BACKGROUND);
@@ -661,7 +661,7 @@ namespace app
         return sys::msgHandled();
     }
 
-    sys::MessagePointer Application::handleSimStateUpdateMessage(sys::Message *msgl)
+    sys::MessagePointer ApplicationCommon::handleSimStateUpdateMessage(sys::Message *msgl)
     {
         if (getCurrentWindow()->updateSim()) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
@@ -669,7 +669,7 @@ namespace app
         return sys::msgHandled();
     }
 
-    sys::ReturnCodes Application::InitHandler()
+    sys::ReturnCodes ApplicationCommon::InitHandler()
     {
         setState(State::INITIALIZING);
 
@@ -683,7 +683,7 @@ namespace app
         return sys::ReturnCodes::Success;
     }
 
-    sys::ReturnCodes Application::DeinitHandler()
+    sys::ReturnCodes ApplicationCommon::DeinitHandler()
     {
         settings->deinit();
         LOG_INFO("Closing an application: %s", GetName().c_str());
@@ -692,78 +692,78 @@ namespace app
         return sys::ReturnCodes::Success;
     }
 
-    void Application::setActiveWindow(const std::string &windowName)
+    void ApplicationCommon::setActiveWindow(const std::string &windowName)
     {
         pushWindow(windowName);
     }
 
-    bool Application::adjustCurrentVolume(const int step)
+    bool ApplicationCommon::adjustCurrentVolume(const int step)
     {
         return AudioServiceAPI::KeyPressed(this, step);
     }
 
-    void Application::toggleTorchOnOff()
+    void ApplicationCommon::toggleTorchOnOff()
     {
         auto msg = std::make_shared<sevm::ToggleTorchOnOffMessage>();
         bus.sendUnicast(std::move(msg), service::name::evt_manager);
     }
 
-    void Application::toggleTorchColor()
+    void ApplicationCommon::toggleTorchColor()
     {
         auto msg = std::make_shared<sevm::ToggleTorchColorMessage>();
         bus.sendUnicast(std::move(msg), service::name::evt_manager);
     }
 
-    void Application::requestAction(sys::Service *sender,
-                                    const ApplicationName &applicationName,
-                                    manager::actions::ActionId actionId,
-                                    manager::actions::ActionParamsPtr &&data)
+    void ApplicationCommon::requestAction(sys::Service *sender,
+                                          const ApplicationName &applicationName,
+                                          manager::actions::ActionId actionId,
+                                          manager::actions::ActionParamsPtr &&data)
     {
         auto msg = std::make_shared<AppActionRequest>(actionId, std::move(data));
         sender->bus.sendUnicast(msg, applicationName);
     }
 
-    void Application::messageSwitchApplication(sys::Service *sender,
-                                               std::string application,
-                                               std::string window,
-                                               std::unique_ptr<gui::SwitchData> data,
-                                               StartupReason startupReason)
+    void ApplicationCommon::messageSwitchApplication(sys::Service *sender,
+                                                     std::string application,
+                                                     std::string window,
+                                                     std::unique_ptr<gui::SwitchData> data,
+                                                     StartupReason startupReason)
     {
         auto msg = std::make_shared<AppSwitchMessage>(application, window, std::move(data), startupReason);
         sender->bus.sendUnicast(msg, application);
     }
 
-    void Application::messageCloseApplication(sys::Service *sender, std::string application)
+    void ApplicationCommon::messageCloseApplication(sys::Service *sender, std::string application)
     {
         auto msg = std::make_shared<AppMessage>(MessageType::AppClose);
         sender->bus.sendUnicast(msg, application);
     }
 
-    void Application::messageRebuildApplication(sys::Service *sender, std::string application)
+    void ApplicationCommon::messageRebuildApplication(sys::Service *sender, std::string application)
     {
         auto msg = std::make_shared<AppRebuildMessage>();
         sender->bus.sendUnicast(msg, application);
     }
 
-    void Application::messageApplicationLostFocus(sys::Service *sender, std::string application)
+    void ApplicationCommon::messageApplicationLostFocus(sys::Service *sender, std::string application)
     {
         sender->bus.sendUnicast(std::make_shared<AppLostFocusMessage>(), application);
     }
 
-    void Application::messageSwitchBack(sys::Service *sender, const std::string &application)
+    void ApplicationCommon::messageSwitchBack(sys::Service *sender, const std::string &application)
     {
         sender->bus.sendUnicast(std::make_shared<AppSwitchBackMessage>(), application);
     }
 
-    void Application::messageInputEventApplication(sys::Service *sender,
-                                                   std::string application,
-                                                   const gui::InputEvent &event)
+    void ApplicationCommon::messageInputEventApplication(sys::Service *sender,
+                                                         std::string application,
+                                                         const gui::InputEvent &event)
     {
         auto msg = std::make_shared<AppInputEventMessage>(event);
         sender->bus.sendUnicast(msg, application);
     }
 
-    void Application::handlePhoneModeChanged(sys::phone_modes::PhoneMode mode)
+    void ApplicationCommon::handlePhoneModeChanged(sys::phone_modes::PhoneMode mode)
     {
         auto flightModeSetting = settings->getValue(settings::Cellular::offlineMode, settings::SettingsScope::Global);
         bool flightMode        = flightModeSetting == "1" ? true : false;
@@ -778,7 +778,7 @@ namespace app
         }
     }
 
-    void Application::handleVolumeChanged(audio::Volume volume, audio::Context context)
+    void ApplicationCommon::handleVolumeChanged(audio::Volume volume, audio::Context context)
     {
         using namespace gui::popup;
         const auto popupName = resolveWindowName(gui::popup::ID::Volume);
@@ -790,31 +790,31 @@ namespace app
         }
     }
 
-    void Application::attachPopups(const std::vector<gui::popup::ID> &popupsList)
+    void ApplicationCommon::attachPopups(const std::vector<gui::popup::ID> &popupsList)
     {
         using namespace gui::popup;
         for (auto popup : popupsList) {
             switch (popup) {
             case ID::Volume:
-                windowsFactory.attach(window::volume_window, [](Application *app, const std::string &name) {
+                windowsFactory.attach(window::volume_window, [](ApplicationCommon *app, const std::string &name) {
                     return std::make_unique<gui::VolumeWindow>(app, window::volume_window);
                 });
                 break;
             case ID::Tethering:
             case ID::TetheringPhoneModeChangeProhibited:
                 windowsFactory.attach(window::tethering_confirmation_window,
-                                      [](Application *app, const std::string &name) {
+                                      [](ApplicationCommon *app, const std::string &name) {
                                           return std::make_unique<gui::TetheringConfirmationPopup>(
                                               app, window::tethering_confirmation_window);
                                       });
                 windowsFactory.attach(window::tethering_phonemode_change_window,
-                                      [](Application *app, const std::string &name) {
+                                      [](ApplicationCommon *app, const std::string &name) {
                                           return std::make_unique<gui::TetheringPhoneModePopup>(
                                               app, window::tethering_phonemode_change_window);
                                       });
                 break;
             case ID::PhoneModes:
-                windowsFactory.attach(window::phone_modes_window, [](Application *app, const std::string &name) {
+                windowsFactory.attach(window::phone_modes_window, [](ApplicationCommon *app, const std::string &name) {
                     return std::make_unique<gui::HomeModesWindow>(app, window::phone_modes_window);
                 });
                 break;
@@ -824,21 +824,23 @@ namespace app
             case ID::PhoneLockInput:
             case ID::PhoneLockInfo:
             case ID::PhoneLockChangeInfo:
-                windowsFactory.attach(window::phone_lock_window, [](Application *app, const std::string &name) {
+                windowsFactory.attach(window::phone_lock_window, [](ApplicationCommon *app, const std::string &name) {
                     return std::make_unique<gui::PhoneLockedWindow>(app, window::phone_lock_window);
                 });
-                windowsFactory.attach(window::phone_lock_info_window, [](Application *app, const std::string &name) {
-                    return std::make_unique<gui::PhoneLockedInfoWindow>(app, window::phone_lock_info_window);
-                });
-                windowsFactory.attach(window::phone_lock_input_window, [](Application *app, const std::string &name) {
-                    return std::make_unique<gui::PhoneLockInputWindow>(app, window::phone_lock_input_window);
-                });
+                windowsFactory.attach(
+                    window::phone_lock_info_window, [](ApplicationCommon *app, const std::string &name) {
+                        return std::make_unique<gui::PhoneLockedInfoWindow>(app, window::phone_lock_info_window);
+                    });
+                windowsFactory.attach(
+                    window::phone_lock_input_window, [](ApplicationCommon *app, const std::string &name) {
+                        return std::make_unique<gui::PhoneLockInputWindow>(app, window::phone_lock_input_window);
+                    });
                 windowsFactory.attach(window::phone_lock_change_info_window,
-                                      [](Application *app, const std::string &name) {
+                                      [](ApplicationCommon *app, const std::string &name) {
                                           return std::make_unique<gui::PhoneLockChangeInfoWindow>(
                                               app, window::phone_lock_change_info_window);
                                       });
-                windowsFactory.attach(window::power_off_window, [](Application *app, const std::string &name) {
+                windowsFactory.attach(window::power_off_window, [](ApplicationCommon *app, const std::string &name) {
                     auto presenter = std::make_unique<gui::PowerOffPresenter>(app);
                     return std::make_unique<gui::PowerOffWindow>(app, std::move(presenter));
                 });
@@ -846,15 +848,16 @@ namespace app
             case ID::SimLock:
             case ID::SimInfo:
             case ID::SimNotReady:
-                windowsFactory.attach(window::sim_unlock_window, [](Application *app, const std::string &name) {
+                windowsFactory.attach(window::sim_unlock_window, [](ApplicationCommon *app, const std::string &name) {
                     return std::make_unique<gui::SimLockInputWindow>(app, window::sim_unlock_window);
                 });
-                windowsFactory.attach(window::sim_info_window, [](Application *app, const std::string &name) {
+                windowsFactory.attach(window::sim_info_window, [](ApplicationCommon *app, const std::string &name) {
                     return std::make_unique<gui::SimInfoWindow>(app, window::sim_info_window);
                 });
-                windowsFactory.attach(window::sim_not_ready_window, [](Application *app, const std::string &name) {
-                    return std::make_unique<gui::SimNotReadyWindow>(app, window::sim_not_ready_window);
-                });
+                windowsFactory.attach(
+                    window::sim_not_ready_window, [](ApplicationCommon *app, const std::string &name) {
+                        return std::make_unique<gui::SimNotReadyWindow>(app, window::sim_not_ready_window);
+                    });
                 break;
             default:
                 break;
@@ -862,7 +865,7 @@ namespace app
         }
     }
 
-    void Application::showPopup(gui::popup::ID id, const gui::PopupRequestParams *params)
+    void ApplicationCommon::showPopup(gui::popup::ID id, const gui::PopupRequestParams *params)
     {
         using namespace gui::popup;
         if (id == ID::PhoneModes) {
@@ -900,7 +903,7 @@ namespace app
         }
     }
 
-    void Application::abortPopup(gui::popup::ID id)
+    void ApplicationCommon::abortPopup(gui::popup::ID id)
     {
         const auto popupName = gui::popup::resolveWindowName(id);
 
@@ -912,12 +915,12 @@ namespace app
         }
     }
 
-    bool Application::isPopupPermitted([[maybe_unused]] gui::popup::ID popupId) const
+    bool ApplicationCommon::isPopupPermitted([[maybe_unused]] gui::popup::ID popupId) const
     {
         return true;
     }
 
-    bool Application::popToWindow(const std::string &window)
+    bool ApplicationCommon::popToWindow(const std::string &window)
     {
         if (window == gui::name::window::no_window) {
             bool ret = false;
@@ -940,7 +943,7 @@ namespace app
         return false;
     }
 
-    void Application::pushWindow(const std::string &newWindow)
+    void ApplicationCommon::pushWindow(const std::string &newWindow)
     {
         // handle if window was already on
         LOG_DEBUG("App: %s window %s request", GetName().c_str(), newWindow.c_str());
@@ -958,7 +961,7 @@ namespace app
 #endif
     };
 
-    const std::string Application::getPrevWindow(uint32_t count) const
+    const std::string ApplicationCommon::getPrevWindow(uint32_t count) const
     {
         if (this->windowsStack.stack.size() <= 1 || count > this->windowsStack.stack.size()) {
             return gui::name::window::no_window;
@@ -966,7 +969,7 @@ namespace app
         return *std::prev(windowsStack.stack.end(), count + 1);
     }
 
-    gui::AppWindow *Application::getCurrentWindow()
+    gui::AppWindow *ApplicationCommon::getCurrentWindow()
     {
         if (windowsStack.stack.size() == 0) {
             windowsStack.push(default_window, windowsFactory.build(this, default_window));
@@ -975,7 +978,7 @@ namespace app
         return windowsStack.get(windowsStack.stack.back());
     }
 
-    bool Application::isCurrentWindow(const std::string &windowName) const noexcept
+    bool ApplicationCommon::isCurrentWindow(const std::string &windowName) const noexcept
     {
         if (windowsStack.isEmpty()) {
             return false;
@@ -983,55 +986,55 @@ namespace app
         return windowsStack.stack.back() == windowName;
     }
 
-    gui::AppWindow *Application::getWindow(const std::string &name)
+    gui::AppWindow *ApplicationCommon::getWindow(const std::string &name)
     {
         return windowsStack.get(name);
     }
 
-    void Application::connect(GuiTimer *timer, gui::Item *item)
+    void ApplicationCommon::connect(GuiTimer *timer, gui::Item *item)
     {
         item->attachTimer(timer);
     }
 
-    const gui::status_bar::Configuration &Application::getStatusBarConfiguration() const noexcept
+    const gui::status_bar::Configuration &ApplicationCommon::getStatusBarConfiguration() const noexcept
     {
         return statusBarManager->getConfiguration();
     }
 
-    void Application::addActionReceiver(manager::actions::ActionId actionId, OnActionReceived &&callback)
+    void ApplicationCommon::addActionReceiver(manager::actions::ActionId actionId, OnActionReceived &&callback)
     {
         receivers.insert_or_assign(actionId, std::move(callback));
     }
 
-    void Application::handleNotificationsChanged(std::unique_ptr<gui::SwitchData> notificationsParams)
+    void ApplicationCommon::handleNotificationsChanged(std::unique_ptr<gui::SwitchData> notificationsParams)
     {
         if (auto window = getCurrentWindow()->getName(); window == gui::popup::window::phone_lock_window) {
             switchWindow(window, std::move(notificationsParams));
         }
     }
 
-    void Application::cancelCallbacks(AsyncCallbackReceiver::Ptr receiver)
+    void ApplicationCommon::cancelCallbacks(AsyncCallbackReceiver::Ptr receiver)
     {
         callbackStorage->removeAll(receiver);
     }
 
-    auto Application::getPhoneLockSubject() noexcept -> locks::PhoneLockSubject &
+    auto ApplicationCommon::getPhoneLockSubject() noexcept -> locks::PhoneLockSubject &
     {
         return phoneLockSubject;
     }
 
-    bool Application::isPhoneLockEnabled() const noexcept
+    bool ApplicationCommon::isPhoneLockEnabled() const noexcept
     {
         return (utils::getNumericValue<bool>(
             settings->getValue(settings::SystemProperties::lockScreenPasscodeIsOn, settings::SettingsScope::Global)));
     }
 
-    auto Application::getLockPolicyHandler() noexcept -> locks::LockPolicyHandlerInterface &
+    auto ApplicationCommon::getLockPolicyHandler() noexcept -> locks::LockPolicyHandlerInterface &
     {
         return lockPolicyHandler;
     }
 
-    auto Application::getSimLockSubject() noexcept -> locks::SimLockSubject &
+    auto ApplicationCommon::getSimLockSubject() noexcept -> locks::SimLockSubject &
     {
         return simLockSubject;
     }

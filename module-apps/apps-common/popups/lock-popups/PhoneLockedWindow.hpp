@@ -27,7 +27,7 @@ namespace gui
         bool processLongReleaseEvent(const InputEvent &inputEvent);
 
       public:
-        PhoneLockedWindow(app::Application *app, const std::string &name);
+        PhoneLockedWindow(app::ApplicationCommon *app, const std::string &name);
 
         bool onInput(const InputEvent &inputEvent) override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;

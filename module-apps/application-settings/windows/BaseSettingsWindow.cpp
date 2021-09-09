@@ -5,7 +5,7 @@
 
 namespace gui
 {
-    BaseSettingsWindow::BaseSettingsWindow(app::Application *app, std::string name) : OptionWindow(app, name)
+    BaseSettingsWindow::BaseSettingsWindow(app::ApplicationCommon *app, std::string name) : OptionWindow(app, name)
     {}
 
     void BaseSettingsWindow::rebuild()

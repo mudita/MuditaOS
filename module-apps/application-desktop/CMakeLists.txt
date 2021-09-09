@@ -54,6 +54,7 @@ target_sources(application-desktop
 
 target_link_libraries(application-desktop
     PRIVATE
+		app
 		application-messages
 		i18n
 		log

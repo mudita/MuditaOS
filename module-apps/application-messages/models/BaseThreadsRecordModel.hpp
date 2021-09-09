@@ -29,12 +29,12 @@ class BaseThreadsRecordModel : public app::DatabaseModel<ThreadListStruct>, publ
 {
   public:
     BaseThreadsRecordModel() = delete;
-    BaseThreadsRecordModel(app::Application *app);
+    BaseThreadsRecordModel(app::ApplicationCommon *app);
 
     unsigned int requestRecordsCount() override;
     bool updateRecords(std::vector<ThreadListStruct> records) override;
 
-    app::Application *getApplication(void)
+    app::ApplicationCommon *getApplication(void)
     {
         return application;
     };

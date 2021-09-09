@@ -14,7 +14,7 @@
 namespace gui::model
 {
 
-    ThreadsSearchResultsModel::ThreadsSearchResultsModel(app::Application *app)
+    ThreadsSearchResultsModel::ThreadsSearchResultsModel(app::ApplicationCommon *app)
         : BaseThreadsRecordModel(app), app::AsyncCallbackReceiver{app}
     {}
 

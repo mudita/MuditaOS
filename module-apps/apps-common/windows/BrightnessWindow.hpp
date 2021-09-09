@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <apps-common/Application.hpp>
+#include <apps-common/ApplicationCommon.hpp>
 #include "AppWindow.hpp"
 #include "apps-common/widgets/BarGraph.hpp"
 #include "apps-common/widgets/BightnessBox.hpp"
@@ -20,7 +20,7 @@ namespace gui
         HBarGraph *brightnessBar      = nullptr;
 
       public:
-        BrightnessWindow(app::Application *app, const std::string &name);
+        BrightnessWindow(app::ApplicationCommon *app, const std::string &name);
 
         ~BrightnessWindow() override;
 

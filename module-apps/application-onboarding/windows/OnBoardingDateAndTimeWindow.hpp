@@ -10,7 +10,7 @@ namespace app::onBoarding
     class OnBoardingDateAndTimeWindow : public gui::DateAndTimeMainWindow
     {
       public:
-        explicit OnBoardingDateAndTimeWindow(app::Application *app);
+        explicit OnBoardingDateAndTimeWindow(app::ApplicationCommon *app);
         ~OnBoardingDateAndTimeWindow();
 
       protected:

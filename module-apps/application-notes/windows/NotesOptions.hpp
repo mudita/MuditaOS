@@ -15,12 +15,14 @@ namespace gui
 
 namespace app::notes
 {
-    std::list<gui::Option> noteListOptions(Application *application,
+    std::list<gui::Option> noteListOptions(ApplicationCommon *application,
                                            const NotesRecord &record,
                                            AbstractNotesRepository &notesRepository);
-    std::list<gui::Option> notePreviewOptions(Application *application,
+    std::list<gui::Option> notePreviewOptions(ApplicationCommon *application,
                                               const NotesRecord &record,
                                               AbstractNotesRepository &notesRepository,
                                               gui::Text *textWidget);
-    std::list<gui::Option> noteEditOptions(Application *application, const NotesRecord &record, gui::Text *textWidget);
+    std::list<gui::Option> noteEditOptions(ApplicationCommon *application,
+                                           const NotesRecord &record,
+                                           gui::Text *textWidget);
 } // namespace app::notes

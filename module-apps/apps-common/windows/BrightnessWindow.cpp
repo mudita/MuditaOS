@@ -7,7 +7,7 @@
 
 namespace gui
 {
-    BrightnessWindow::BrightnessWindow(app::Application *app, const std::string &name) : AppWindow(app, name)
+    BrightnessWindow::BrightnessWindow(app::ApplicationCommon *app, const std::string &name) : AppWindow(app, name)
     {
         buildInterface();
     }

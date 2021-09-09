@@ -8,7 +8,7 @@
 #include <widgets/DayLabel.hpp>
 #include <widgets/MonthBox.hpp>
 
-#include <apps-common/Application.hpp>
+#include <apps-common/ApplicationCommon.hpp>
 #include <apps-common/windows/AppWindow.hpp>
 #include <gui/widgets/GridLayout.hpp>
 
@@ -42,7 +42,7 @@ namespace gui
         std::unique_ptr<MonthModel> monthModel;
 
       public:
-        CalendarMainWindow(app::Application *app, const std::string &name);
+        CalendarMainWindow(app::ApplicationCommon *app, const std::string &name);
 
         void rebuild() override;
         void buildMonth(std::unique_ptr<MonthModel> &model);

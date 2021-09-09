@@ -6,7 +6,7 @@
 namespace app
 {
     class ApplicationLauncher;
-    class Application;
+    class ApplicationCommon;
 } // namespace app
 
 namespace locks
@@ -45,14 +45,14 @@ namespace locks
 
     class LockPolicyHandler : public LockPolicyHandlerInterface
     {
-        app::Application *owner = nullptr;
+        app::ApplicationCommon *owner = nullptr;
         std::function<bool()> preventsAutoLockByStateCallback;
 
         [[nodiscard]] bool preventsAutoLockByWindow() final;
         [[nodiscard]] bool preventsAutoLockByState() const final;
 
       public:
-        explicit LockPolicyHandler(app::Application *owner,
+        explicit LockPolicyHandler(app::ApplicationCommon *owner,
                                    std::function<bool()> preventsAutoLockByStateCallback = nullptr) noexcept;
 
         void setPreventsAutoLockByStateCallback(std::function<bool()> _preventsAutoLockByStateCallback) noexcept;

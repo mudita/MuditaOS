@@ -52,7 +52,7 @@ namespace gui
     std::unique_ptr<NewMessageWindow::MessageMemento> NewMessageWindow::memento =
         std::make_unique<NewMessageWindow::MessageMemento>();
 
-    NewMessageWindow::NewMessageWindow(app::Application *app)
+    NewMessageWindow::NewMessageWindow(app::ApplicationCommon *app)
         : AppWindow(app, name::window::new_sms), app::AsyncCallbackReceiver{app}
     {
         buildInterface();

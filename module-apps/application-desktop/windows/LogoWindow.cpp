@@ -9,7 +9,7 @@
 
 namespace gui
 {
-    LogoWindow::LogoWindow(app::Application *app) : AppWindow(app, app::window::name::logo_window)
+    LogoWindow::LogoWindow(app::ApplicationCommon *app) : AppWindow(app, app::window::name::logo_window)
     {
         buildInterface();
     }

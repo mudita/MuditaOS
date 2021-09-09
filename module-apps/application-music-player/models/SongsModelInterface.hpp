@@ -8,7 +8,7 @@
 #include <widgets/SongItem.hpp>
 #include <InternalModel.hpp>
 #include <ListItemProvider.hpp>
-#include <apps-common/Application.hpp>
+#include <apps-common/ApplicationCommon.hpp>
 
 namespace app::music_player
 {

@@ -8,7 +8,7 @@
 class SoundsPlayer : public AbstractSoundsPlayer
 {
   public:
-    explicit SoundsPlayer(app::Application *app);
+    explicit SoundsPlayer(app::ApplicationCommon *app);
 
     bool play(const std::string &path) override;
     bool pause() override;

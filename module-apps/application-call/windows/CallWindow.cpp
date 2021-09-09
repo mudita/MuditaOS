@@ -34,7 +34,7 @@ namespace gui
     using namespace app::call;
     using AudioEvent = app::CallWindowInterface::AudioEvent;
 
-    CallWindow::CallWindow(app::Application *app, app::CallWindowInterface *interface, std::string windowName)
+    CallWindow::CallWindow(app::ApplicationCommon *app, app::CallWindowInterface *interface, std::string windowName)
         : AppWindow(app, windowName), interface(interface)
     {
         assert(interface != nullptr);

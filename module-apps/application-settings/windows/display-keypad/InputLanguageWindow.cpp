@@ -10,7 +10,7 @@
 
 namespace gui
 {
-    InputLanguageWindow::InputLanguageWindow(app::Application *app)
+    InputLanguageWindow::InputLanguageWindow(app::ApplicationCommon *app)
         : BaseSettingsWindow(app, window::name::input_language), langList(profiles.getAvailableInputLanguages())
     {
         setTitle(utils::translate("app_settings_display_input_language"));

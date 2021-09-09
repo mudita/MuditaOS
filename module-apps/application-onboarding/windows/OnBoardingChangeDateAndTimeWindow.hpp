@@ -10,7 +10,7 @@ namespace app::onBoarding
     class OnBoardingChangeDateAndTimeWindow : public gui::ChangeDateAndTimeWindow
     {
       public:
-        explicit OnBoardingChangeDateAndTimeWindow(app::Application *app);
+        explicit OnBoardingChangeDateAndTimeWindow(app::ApplicationCommon *app);
 
         bool onInput(const gui::InputEvent &inputEvent) override;
     };

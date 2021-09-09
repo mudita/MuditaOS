@@ -3,12 +3,12 @@
 
 #include "models/SnoozeSettingsModel.hpp"
 
-#include <apps-common/Application.hpp>
+#include <apps-common/ApplicationCommon.hpp>
 #include <db/SystemSettings.hpp>
 
 namespace app::bell_settings
 {
-    SnoozeSettingsModel::SnoozeSettingsModel(Application *app)
+    SnoozeSettingsModel::SnoozeSettingsModel(ApplicationCommon *app)
     {
         settings.init(service::ServiceProxy{app->weak_from_this()});
     }

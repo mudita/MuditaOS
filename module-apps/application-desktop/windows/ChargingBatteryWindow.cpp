@@ -17,7 +17,7 @@ namespace gui
         constexpr inline auto imgPositionY = 250;
     } // namespace
 
-    ChargingBatteryWindow::ChargingBatteryWindow(app::Application *app)
+    ChargingBatteryWindow::ChargingBatteryWindow(app::ApplicationCommon *app)
         : AppWindow(app, app::window::name::dead_battery)
     {
         buildInterface();

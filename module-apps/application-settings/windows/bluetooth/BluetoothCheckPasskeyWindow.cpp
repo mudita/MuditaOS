@@ -17,7 +17,7 @@ namespace gui
     } // namespace
     namespace passkey_style = style::settings::window::bluetooth::passkey;
 
-    BluetoothCheckPasskeyWindow::BluetoothCheckPasskeyWindow(app::Application *app)
+    BluetoothCheckPasskeyWindow::BluetoothCheckPasskeyWindow(app::ApplicationCommon *app)
         : AppWindow(app, window::name::bluetooth_check_passkey)
     {
         bluetoothSettingsModel = std::make_unique<BluetoothSettingsModel>(application);

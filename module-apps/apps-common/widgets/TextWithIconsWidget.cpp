@@ -5,7 +5,7 @@
 #include <Style.hpp>
 #include <TextFixedSize.hpp>
 #include <Image.hpp>
-#include <Application.hpp>
+#include <ApplicationCommon.hpp>
 
 using namespace gui;
 

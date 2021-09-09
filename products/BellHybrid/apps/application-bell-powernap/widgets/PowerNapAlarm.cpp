@@ -13,7 +13,7 @@ namespace
 
 namespace app::powernap
 {
-    PowerNapAlarmImpl::PowerNapAlarmImpl(app::Application *app) : app{app}
+    PowerNapAlarmImpl::PowerNapAlarmImpl(app::ApplicationCommon *app) : app{app}
     {}
 
     void PowerNapAlarmImpl::start()

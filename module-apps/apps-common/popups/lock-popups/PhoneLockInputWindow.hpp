@@ -15,7 +15,7 @@ namespace gui
         locks::PhoneLockInputTypeAction phoneLockInputTypeAction = locks::PhoneLockInputTypeAction::Unlock;
 
       public:
-        PhoneLockInputWindow(app::Application *app, const std::string &window_name);
+        PhoneLockInputWindow(app::ApplicationCommon *app, const std::string &window_name);
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         bool onInput(const InputEvent &inputEvent) override;
 

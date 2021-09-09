@@ -13,7 +13,7 @@
 
 namespace app::onBoarding
 {
-    OnBoardingSimSelectWindow::OnBoardingSimSelectWindow(app::Application *app, std::string name)
+    OnBoardingSimSelectWindow::OnBoardingSimSelectWindow(app::ApplicationCommon *app, std::string name)
         : BaseSettingsWindow(app, std::move(name))
     {
         buildInterface();

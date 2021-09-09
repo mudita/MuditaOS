@@ -20,7 +20,8 @@ namespace gui
     class DisplayLightWindow : public BaseSettingsWindow
     {
       public:
-        DisplayLightWindow(app::Application *app, app::settingsInterface::ScreenLightSettings *screenLightSettings);
+        DisplayLightWindow(app::ApplicationCommon *app,
+                           app::settingsInterface::ScreenLightSettings *screenLightSettings);
         ~DisplayLightWindow();
 
       private:

@@ -15,7 +15,7 @@ class SMSTemplateModel : public app::DatabaseModel<SMSTemplateRecord>,
 {
   public:
     SMSTemplateModel() = delete;
-    SMSTemplateModel(app::Application *app);
+    SMSTemplateModel(app::ApplicationCommon *app);
 
     unsigned int requestRecordsCount() override;
     bool updateRecords(std::vector<SMSTemplateRecord> records) override;

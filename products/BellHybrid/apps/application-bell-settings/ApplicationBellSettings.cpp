@@ -35,7 +35,7 @@ namespace app
                                                      sys::phone_modes::PhoneMode mode,
                                                      sys::bluetooth::BluetoothMode bluetoothMode,
                                                      StartInBackground startInBackground)
-        : ApplicationBell(std::move(name), std::move(parent), mode, bluetoothMode, startInBackground)
+        : Application(std::move(name), std::move(parent), mode, bluetoothMode, startInBackground)
     {}
 
     sys::ReturnCodes ApplicationBellSettings::InitHandler()
@@ -51,49 +51,54 @@ namespace app
 
     void ApplicationBellSettings::createUserInterface()
     {
-        windowsFactory.attach(gui::name::window::main_window, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::name::window::main_window, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::BellSettingsWindow>(app);
         });
 
         // Advanced
-        windowsFactory.attach(gui::window::name::bellSettingsAdvanced, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::BellSettingsAdvancedWindow>(app);
-        });
+        windowsFactory.attach(gui::window::name::bellSettingsAdvanced,
+                              [](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<gui::BellSettingsAdvancedWindow>(app);
+                              });
 
-        windowsFactory.attach(gui::window::name::bellSettingsTimeUnits, [](Application *app, const std::string &name) {
-            auto temperatureUnitModel = std::make_unique<bell_settings::TemperatureUnitModel>(app);
-            auto timeUnitsProvider    = std::make_shared<bell_settings::TimeUnitsModel>(app);
-            auto presenter            = std::make_unique<bell_settings::TimeUnitsWindowPresenter>(timeUnitsProvider,
-                                                                                       std::move(temperatureUnitModel));
-            return std::make_unique<gui::BellSettingsTimeUnitsWindow>(app, std::move(presenter));
-        });
+        windowsFactory.attach(
+            gui::window::name::bellSettingsTimeUnits, [](ApplicationCommon *app, const std::string &name) {
+                auto temperatureUnitModel = std::make_unique<bell_settings::TemperatureUnitModel>(app);
+                auto timeUnitsProvider    = std::make_shared<bell_settings::TimeUnitsModel>(app);
+                auto presenter            = std::make_unique<bell_settings::TimeUnitsWindowPresenter>(
+                    timeUnitsProvider, std::move(temperatureUnitModel));
+                return std::make_unique<gui::BellSettingsTimeUnitsWindow>(app, std::move(presenter));
+            });
 
-        windowsFactory.attach(gui::window::name::bellSettingsFrontlight, [](Application *app, const std::string &name) {
-            auto model =
-                std::make_shared<bell_settings::FrontlightModel>(app, static_cast<ApplicationBellSettings *>(app));
-            auto presenter = std::make_unique<bell_settings::FrontlightWindowPresenter>(std::move(model));
-            return std::make_unique<gui::BellSettingsFrontlightWindow>(app, std::move(presenter));
-        });
+        windowsFactory.attach(
+            gui::window::name::bellSettingsFrontlight, [](ApplicationCommon *app, const std::string &name) {
+                auto model =
+                    std::make_shared<bell_settings::FrontlightModel>(app, static_cast<ApplicationBellSettings *>(app));
+                auto presenter = std::make_unique<bell_settings::FrontlightWindowPresenter>(std::move(model));
+                return std::make_unique<gui::BellSettingsFrontlightWindow>(app, std::move(presenter));
+            });
 
-        windowsFactory.attach(gui::BellFinishedWindow::name, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::BellFinishedWindow::name, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::BellFinishedWindow>(app);
         });
 
-        windowsFactory.attach(gui::window::name::bellSettingsHomeView, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::BellSettingsHomeViewWindow>(app);
-        });
+        windowsFactory.attach(gui::window::name::bellSettingsHomeView,
+                              [](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<gui::BellSettingsHomeViewWindow>(app);
+                              });
 
         windowsFactory.attach(gui::window::name::bellSettingsBedtimeTone,
-                              [](Application *app, const std::string &name) {
+                              [](ApplicationCommon *app, const std::string &name) {
                                   return std::make_unique<gui::BellSettingsBedtimeToneWindow>(app);
                               });
 
-        windowsFactory.attach(gui::window::name::bellSettingsTurnOff, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::BellSettingsTurnOffWindow>(app);
-        });
+        windowsFactory.attach(gui::window::name::bellSettingsTurnOff,
+                              [](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<gui::BellSettingsTurnOffWindow>(app);
+                              });
 
         windowsFactory.attach(
-            gui::window::name::bellSettingsAlarmSettingsPrewakeUp, [](Application *app, const std::string &name) {
+            gui::window::name::bellSettingsAlarmSettingsPrewakeUp, [](ApplicationCommon *app, const std::string &name) {
                 auto model     = std::make_shared<bell_settings::PrewakeUpModel>(app);
                 auto presenter = std::make_unique<bell_settings::PrewakeUpWindowPresenter>(std::move(model));
                 return std::make_unique<gui::BellSettingsPrewakeUpWindow>(app, std::move(presenter));
@@ -103,11 +108,11 @@ namespace app
 
         // Alarm setup
         windowsFactory.attach(gui::BellSettingsAlarmSettingsWindow::name,
-                              [](Application *app, const std::string &name) {
+                              [](ApplicationCommon *app, const std::string &name) {
                                   return std::make_unique<gui::BellSettingsAlarmSettingsWindow>(app);
                               });
         windowsFactory.attach(
-            gui::BellSettingsAlarmSettingsSnoozeWindow::name, [this](Application *app, const std::string &) {
+            gui::BellSettingsAlarmSettingsSnoozeWindow::name, [this](ApplicationCommon *app, const std::string &) {
                 auto model     = std::make_unique<bell_settings::SnoozeSettingsModel>(this);
                 auto provider  = std::make_shared<bell_settings::SnoozeListItemProvider>(*model);
                 auto presenter = std::make_unique<bell_settings::SnoozePresenter>(provider, std::move(model));

@@ -3,14 +3,14 @@
 
 #include "TemperatureModel.hpp"
 
-#include <apps-common/Application.hpp>
+#include <apps-common/ApplicationCommon.hpp>
 #include <service-db/Settings.hpp>
 #include <db/SystemSettings.hpp>
 #include <evtmgr/api/TemperatureApi.hpp>
 
 namespace app::home_screen
 {
-    TemperatureModel::TemperatureModel(app::Application *app)
+    TemperatureModel::TemperatureModel(app::ApplicationCommon *app)
     {
         settings.init(service::ServiceProxy{app->weak_from_this()});
     }

@@ -19,7 +19,7 @@
 
 namespace app::notes
 {
-    NoteMainWindow::NoteMainWindow(app::Application *app,
+    NoteMainWindow::NoteMainWindow(app::ApplicationCommon *app,
                                    std::unique_ptr<NotesMainWindowContract::Presenter> &&windowPresenter)
         : AppWindow(app, gui::name::window::main_window), presenter{std::move(windowPresenter)}
     {

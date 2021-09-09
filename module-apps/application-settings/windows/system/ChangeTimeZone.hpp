@@ -11,7 +11,7 @@ namespace gui
     class ChangeTimeZone : public BaseSettingsWindow
     {
       public:
-        explicit ChangeTimeZone(app::Application *app);
+        explicit ChangeTimeZone(app::ApplicationCommon *app);
 
       protected:
         [[nodiscard]] auto buildOptionsList() -> std::list<Option> override;

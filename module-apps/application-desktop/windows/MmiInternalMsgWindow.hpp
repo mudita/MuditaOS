@@ -18,7 +18,7 @@ namespace gui
     class MmiInternalMsgWindow : public MmiPushWindow
     {
       public:
-        MmiInternalMsgWindow(app::Application *app, const std::string &name);
+        MmiInternalMsgWindow(app::ApplicationCommon *app, const std::string &name);
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         void handleInternalMessages(mmiactions::MMIResultParams *metadata);
     };

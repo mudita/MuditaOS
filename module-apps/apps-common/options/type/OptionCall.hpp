@@ -4,7 +4,7 @@
 #pragma once
 
 #include "OptionSimple.hpp"
-#include "Application.hpp"
+#include "ApplicationCommon.hpp"
 
 #include <module-db/Interface/ContactRecord.hpp>
 
@@ -13,6 +13,6 @@ namespace gui::option
     class Call : public Simple
     {
       public:
-        Call(app::Application *app, const ContactRecord &contact);
+        Call(app::ApplicationCommon *app, const ContactRecord &contact);
     };
 }; // namespace gui::option

@@ -13,7 +13,7 @@ namespace gui
     class SARInfoWindow : public gui::AppWindow, public SARInfoWindowContract::View
     {
       public:
-        explicit SARInfoWindow(app::Application *app,
+        explicit SARInfoWindow(app::ApplicationCommon *app,
                                std::unique_ptr<SARInfoWindowContract::Presenter> &&windowPresenter);
 
       private:

@@ -10,7 +10,7 @@
 namespace gui
 {
 
-    KeypadLightWindow::KeypadLightWindow(app::Application *app,
+    KeypadLightWindow::KeypadLightWindow(app::ApplicationCommon *app,
                                          app::settingsInterface::KeypdBacklightSettings *settings)
         : BaseSettingsWindow(app, window::name::keypad_light), keypadLightSettings(settings)
     {

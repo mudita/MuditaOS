@@ -9,7 +9,7 @@
 
 namespace gui
 {
-    EditQuotesWindow::EditQuotesWindow(app::Application *app) : BaseSettingsWindow(app, window::name::edit_quotes)
+    EditQuotesWindow::EditQuotesWindow(app::ApplicationCommon *app) : BaseSettingsWindow(app, window::name::edit_quotes)
     {
         setTitle(utils::translate("app_settings_display_wallpaper_edit_quotes"));
     }

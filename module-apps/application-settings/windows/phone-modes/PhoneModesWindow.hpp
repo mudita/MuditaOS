@@ -25,6 +25,6 @@ namespace gui
         std::vector<std::string> modifiedModesStrings{initialModesStrings};
 
       public:
-        PhoneModesWindow(app::Application *app, app::settingsInterface::PhoneModeSettings *phoneModeSettings);
+        PhoneModesWindow(app::ApplicationCommon *app, app::settingsInterface::PhoneModeSettings *phoneModeSettings);
     };
 } // namespace gui

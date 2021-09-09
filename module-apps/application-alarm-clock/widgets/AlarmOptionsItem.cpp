@@ -12,7 +12,7 @@
 namespace gui
 {
 
-    AlarmOptionsItem::AlarmOptionsItem(app::Application *app,
+    AlarmOptionsItem::AlarmOptionsItem(app::ApplicationCommon *app,
                                        AlarmOptionItemName itemName,
                                        std::function<void(const UTF8 &)> bottomBarTemporaryMode,
                                        std::function<void()> bottomBarRestoreFromTemporaryMode)

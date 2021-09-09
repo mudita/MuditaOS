@@ -51,7 +51,7 @@ namespace gui
         gui::HBox *pinLabelsBox           = nullptr;
 
       protected:
-        LockInputWindow(app::Application *app, std::string name) : AppWindow(app, std::move(name))
+        LockInputWindow(app::ApplicationCommon *app, std::string name) : AppWindow(app, std::move(name))
         {}
 
         void build();

@@ -9,7 +9,7 @@
 namespace gui
 {
 
-    EmergencyCallWindow::EmergencyCallWindow(app::Application *app, app::EnterNumberWindowInterface *interface)
+    EmergencyCallWindow::EmergencyCallWindow(app::ApplicationCommon *app, app::EnterNumberWindowInterface *interface)
         : NumberWindow(app, interface, app::window::name_emergencyCall)
     {
         buildInterface();

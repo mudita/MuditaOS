@@ -3,8 +3,8 @@
 
 #include <service-db/DBNotificationMessage.hpp>
 #include <service-db/DBServiceName.hpp>
+#include <service-db/QueryMessage.hpp>
 #include <service-db/ServiceDBCommon.hpp>
-#include <service-db/agents/quotes/QuotesAgent.cpp>
 
 #include <purefs/filesystem_paths.hpp>
 

@@ -19,7 +19,7 @@ namespace gui
         status_bar::Configuration configureStatusBar(status_bar::Configuration appConfiguration) override;
 
       public:
-        PowerNapMainWindow(app::Application *app,
+        PowerNapMainWindow(app::ApplicationCommon *app,
                            std::unique_ptr<app::powernap::PowerNapMainWindowContract::Presenter> &&windowPresenter);
     };
 } // namespace gui

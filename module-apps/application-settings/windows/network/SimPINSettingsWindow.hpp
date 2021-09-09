@@ -10,7 +10,7 @@ namespace gui
     class SimPINSettingsWindow : public BaseSettingsWindow
     {
       public:
-        explicit SimPINSettingsWindow(app::Application *app);
+        explicit SimPINSettingsWindow(app::ApplicationCommon *app);
 
       private:
         auto buildOptionsList() -> std::list<Option> override;

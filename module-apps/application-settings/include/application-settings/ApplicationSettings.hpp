@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "Application.hpp"
+#include <Application.hpp>
 
 #include <application-settings/windows/WindowNames.hpp>
 #include <application-settings/models/apps/SoundsPlayer.hpp>
