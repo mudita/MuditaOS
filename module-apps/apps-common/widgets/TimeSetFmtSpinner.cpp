@@ -7,14 +7,7 @@
 #include <date/date.h>
 #include <gui/core/FontManager.hpp>
 #include <gui/core/RawFont.hpp>
-#include <gui/widgets/Spinner.hpp>
-#include <gui/widgets/TextSpinner.hpp>
-
-namespace
-{
-    constexpr auto fmtSpinnerAMPos = 0U;
-    constexpr auto fmtSpinnerPMPos = 1U;
-} // namespace
+#include <widgets/spinners/Spinners.hpp>
 
 namespace gui
 {
@@ -34,8 +27,8 @@ namespace gui
         timeSetSpinner->setMargins(Margins(0, 0, 0, 0));
 
         auto minSize   = getMinimumFmtSize();
-        auto textRange = TextSpinner::TextRange{time::Locale::getAM(), time::Locale::getPM()};
-        fmt            = new TextSpinner(textRange, Boundaries::Continuous);
+        auto textRange = UTF8Spinner::Range{time::Locale::getAM(), time::Locale::getPM()};
+        fmt            = new UTF8Spinner(textRange, Boundaries::Continuous);
         fmt->setMinimumSize(minSize.first, minSize.second);
         fmt->setFont(fontName);
         fmt->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
@@ -73,10 +66,10 @@ namespace gui
                 auto hours = std::chrono::hours(timeSetSpinner->getHour());
                 timeSetSpinner->setHour(date::make12(hours).count());
                 if (date::is_pm(hours)) {
-                    fmt->setCurrentPosition(fmtSpinnerPMPos);
+                    fmt->setCurrentValue(time::Locale::getPM());
                 }
                 else {
-                    fmt->setCurrentPosition(fmtSpinnerAMPos);
+                    fmt->setCurrentValue(time::Locale::getAM());
                 }
             }
 
@@ -202,7 +195,7 @@ namespace gui
     }
     auto TimeSetFmtSpinner::isPM() const noexcept -> bool
     {
-        return fmt->getCurrentText() == utils::time::Locale::getPM().c_str();
+        return fmt->getCurrentValue() == utils::time::Locale::getPM().c_str();
     }
     auto TimeSetFmtSpinner::setTime(std::time_t time) noexcept -> void
     {
@@ -219,7 +212,7 @@ namespace gui
             const auto isPM    = date::is_pm(hours);
             timeSetSpinner->setHour(time12H.count());
             timeSetSpinner->setMinute(t->tm_min);
-            fmt->setCurrentPosition(isPM ? fmtSpinnerPMPos : fmtSpinnerAMPos);
+            fmt->setCurrentValue(isPM ? utils::time::Locale::getPM() : utils::time::Locale::getAM());
         }
     }
     auto TimeSetFmtSpinner::getTime() const noexcept -> std::time_t

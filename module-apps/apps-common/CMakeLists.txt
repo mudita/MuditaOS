@@ -50,10 +50,15 @@ target_sources(apps-common
         windows/BrightnessWindow.cpp
         windows/Dialog.cpp
         windows/OptionWindow.cpp
+
     PUBLIC
         widgets/TimeSetFmtSpinner.hpp
         actions/AlarmRingingData.hpp
         actions/AlarmTriggeredAction.hpp
+
+        widgets/spinners/GenericSpinner.hpp
+        widgets/spinners/SpinnerPolicies.hpp
+        widgets/spinners/Spinners.hpp
 )
 
 add_subdirectory(popups)

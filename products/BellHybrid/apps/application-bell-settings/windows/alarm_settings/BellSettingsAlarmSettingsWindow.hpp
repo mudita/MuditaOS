@@ -12,14 +12,15 @@ namespace gui
     class BellSettingsAlarmSettingsWindow : public OptionWindow
     {
       public:
-        explicit BellSettingsAlarmSettingsWindow(app::Application *app,
-                                                 std::string name = gui::window::name::bellSettingsAlarmSettings);
+        static constexpr auto name = "BellSettingsAlarmSettingsWindow";
+
+        explicit BellSettingsAlarmSettingsWindow(app::Application *app);
 
       private:
-        static constexpr auto title = "Alarm settings";
-
         std::list<Option> alarmSettingsOptionsList();
+
         void buildInterface() override;
+
         void rebuild() override;
     };
 } /* namespace gui */
