@@ -144,7 +144,7 @@ auto FileOperations::getFileHashForReceiveID(transfer_id rxID) -> std::string
 
 auto FileOperations::getDataForReceiveID(transfer_id rxID, std::uint32_t chunkNo) -> std::string
 {
-    LOG_DEBUG("Getting data for rxID %u", static_cast<unsigned>(rxID));
+    LOG_DEBUG("Getting chunk %u for rxID %u", static_cast<unsigned>(chunkNo), static_cast<unsigned>(rxID));
 
     const auto fileCtxEntry = readTransfers.find(rxID);
 
@@ -188,7 +188,7 @@ auto FileOperations::createTransmitIDForFile(const std::filesystem::path &file,
     cancelTimedOutWriteTransfer();
     const auto txID = ++runningXfrId;
 
-    LOG_DEBUG("Creating rxID %u", static_cast<unsigned>(txID));
+    LOG_DEBUG("Creating txID %u", static_cast<unsigned>(txID));
 
     createFileWriteContextFor(file, size, Crc32, txID);
 
@@ -198,7 +198,7 @@ auto FileOperations::createTransmitIDForFile(const std::filesystem::path &file,
 auto FileOperations::sendDataForTransmitID(transfer_id txID, std::uint32_t chunkNo, const std::string &data)
     -> sys::ReturnCodes
 {
-    LOG_DEBUG("Transmitting data for txID %u", static_cast<unsigned>(txID));
+    LOG_DEBUG("Transmitting chunk %u for txID %u", static_cast<unsigned>(chunkNo), static_cast<unsigned>(txID));
     auto returnCode = sys::ReturnCodes::Success;
 
     const auto fileCtxEntry = writeTransfers.find(txID);
