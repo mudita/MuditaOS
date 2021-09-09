@@ -20,8 +20,7 @@ namespace bell
         void handleRotaryEncoderEvent();
         enum class EventQueues
         {
-            queueHeadsetIRQ = static_cast<int>(WorkerEventQueues::queueRTC) + 1,
-            queueRotaryEncoder,
+            queueRotaryEncoder = static_cast<int>(WorkerEventQueues::queueRTC) + 1,
         };
         static constexpr auto rotaryEncoderQueueSize = 64U;
         static constexpr auto rotaryEncoderQueueName = "qRotaryEncoder";

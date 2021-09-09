@@ -4,12 +4,11 @@
 #pragma once
 
 #include <widgets/BellSideListItem.hpp>
+#include <widgets/spinners/Spinners.hpp>
 #include <utf8/UTF8.hpp>
 
 namespace gui
 {
-    class TextSpinner;
-
     class TemperatureUnitListItem : public BellSideListItem
     {
       public:
@@ -19,7 +18,7 @@ namespace gui
         auto getUnitAsStr() const noexcept -> UTF8;
 
       private:
-        TextSpinner *temperatureUnit{};
+        UTF8Spinner *temperatureUnit{};
     };
 
 } // namespace gui

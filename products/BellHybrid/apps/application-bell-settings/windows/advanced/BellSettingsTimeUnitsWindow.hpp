@@ -8,7 +8,6 @@
 #include "TimeUnitsModel.hpp"
 
 #include <apps-common/windows/AppWindow.hpp>
-#include <widgets/SideListView.hpp>
 
 namespace gui
 {
