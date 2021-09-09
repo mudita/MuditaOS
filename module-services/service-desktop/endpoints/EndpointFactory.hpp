@@ -19,6 +19,7 @@
 #include "update/UpdateEndpoint.hpp"
 #include <endpoints/bluetooth/BluetoothEndpoint.hpp>
 #include "security/SecurityEndpoint.hpp"
+#include "nullEndpoint/NullEndpoint.hpp"
 
 class EndpointFactory
 {
@@ -56,7 +57,7 @@ class EndpointFactory
         case parserFSM::EndpointType::usbSecurity:
             return std::make_unique<SecurityEndpoint>(ownerServicePtr);
         default:
-            return nullptr;
+            return std::make_unique<NullEndpoint>(ownerServicePtr);
         }
     }
 };

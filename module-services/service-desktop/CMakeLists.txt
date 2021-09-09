@@ -34,6 +34,7 @@ set(SOURCES
     endpoints/filesystem/FileContext.cpp
     endpoints/security/SecurityEndpoint.cpp
     endpoints/security/SecurityEndpointHelper.cpp
+    endpoints/nullEndpoint/NullEndpoint.cpp
 
     parser/HttpEnums.cpp
     parser/ParserFSM.cpp
