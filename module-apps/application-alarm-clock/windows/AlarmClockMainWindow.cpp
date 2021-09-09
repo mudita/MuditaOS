@@ -113,6 +113,7 @@ namespace app::alarmClock
         emptyListIcon->setVisible(true);
         bottomBar->setActive(gui::BottomBar::Side::LEFT, false);
         bottomBar->setActive(gui::BottomBar::Side::CENTER, false);
+        application->refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
     }
 
     void AlarmClockMainWindow::onListFilled()
@@ -120,5 +121,6 @@ namespace app::alarmClock
         emptyListIcon->setVisible(false);
         bottomBar->setActive(gui::BottomBar::Side::LEFT, true);
         bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
+        application->refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
     }
 } // namespace app::alarmClock

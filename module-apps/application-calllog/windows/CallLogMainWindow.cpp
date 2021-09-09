@@ -104,6 +104,7 @@ namespace gui
         bottomBar->setActive(gui::BottomBar::Side::LEFT, false);
         bottomBar->setActive(gui::BottomBar::Side::CENTER, false);
         emptyListIcon->setVisible(true);
+        application->refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
     }
 
     void CallLogMainWindow::onListFilled()
@@ -111,5 +112,6 @@ namespace gui
         bottomBar->setActive(gui::BottomBar::Side::LEFT, true);
         bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
         emptyListIcon->setVisible(false);
+        application->refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
     }
 } /* namespace gui */
