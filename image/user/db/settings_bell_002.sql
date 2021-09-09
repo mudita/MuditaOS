@@ -46,4 +46,4 @@ INSERT OR IGNORE INTO settings_tab (path, value) VALUES
     ('snooze_interval','1'),
     ('snooze_tone','Meditative surprises'),
     ('snooze_volume','10');
-
+    

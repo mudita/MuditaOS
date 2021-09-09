@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BellSettingsAlarmSettingsWindow.hpp"
+#include "BellSettingsAlarmSettingsSnoozeWindow.hpp"
 
 #include <application-bell-settings/ApplicationBellSettings.hpp>
 #include <apps-common/messages/DialogMetadataMessage.hpp>
@@ -10,8 +11,7 @@
 
 namespace gui
 {
-    BellSettingsAlarmSettingsWindow::BellSettingsAlarmSettingsWindow(app::Application *app, std::string name)
-        : OptionWindow(app, std::move(name))
+    BellSettingsAlarmSettingsWindow::BellSettingsAlarmSettingsWindow(app::Application *app) : OptionWindow(app, name)
     {
         addOptions(alarmSettingsOptionsList());
         buildInterface();
@@ -25,7 +25,7 @@ namespace gui
 
     void BellSettingsAlarmSettingsWindow::buildInterface()
     {
-        header->setTitle(title);
+        header->setTitle(utils::translate("app_bell_settings_alarm_settings"));
         header->setEdges(RectangleEdge::None);
         statusBar->setVisible(false);
         bottomBar->setVisible(false);
@@ -64,7 +64,7 @@ namespace gui
         addAlarmSettingsOption(utils::translate("app_bell_settings_alarm_settings_alarm_tone_and_light"),
                                gui::window::name::bellSettingsAlarmSettingsAlarmToneAndLight);
         addAlarmSettingsOption(utils::translate("app_bell_settings_alarm_settings_snooze"),
-                               gui::window::name::bellSettingsAlarmSettingsSnooze);
+                               BellSettingsAlarmSettingsSnoozeWindow::name);
 
         return alarmSettingsOptionsList;
     }

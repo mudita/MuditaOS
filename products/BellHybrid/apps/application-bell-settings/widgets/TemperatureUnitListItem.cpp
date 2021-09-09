@@ -4,7 +4,7 @@
 #include "BellSettingsStyle.hpp"
 #include "TemperatureUnitListItem.hpp"
 
-#include <gui/widgets/TextSpinner.hpp>
+#include <widgets/spinners/Spinners.hpp>
 #include <module-utils/Temperature.hpp>
 
 namespace gui
@@ -17,7 +17,7 @@ namespace gui
         setFocusItem(body);
 
         temperatureUnit =
-            new TextSpinner({utils::temperature::celsiusDegreeSymbol, utils::temperature::fahrenheitDegreeSymbol},
+            new UTF8Spinner({utils::temperature::celsiusDegreeSymbol, utils::temperature::fahrenheitDegreeSymbol},
                             Boundaries::Continuous);
         temperatureUnit->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::h);
         temperatureUnit->setFont(bell_settings_style::time_fmt_set_list_item::font);
@@ -40,6 +40,6 @@ namespace gui
 
     auto TemperatureUnitListItem::getUnitAsStr() const noexcept -> UTF8
     {
-        return temperatureUnit->getCurrentText();
+        return temperatureUnit->getCurrentValue();
     }
 } // namespace gui

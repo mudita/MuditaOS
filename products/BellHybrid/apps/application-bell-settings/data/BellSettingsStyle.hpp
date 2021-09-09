@@ -32,5 +32,9 @@ namespace gui
             inline constexpr auto options_list_margin_y = 110U;
             inline constexpr auto default_body_width    = 400U;
         } // namespace alarm_settings_window
+        namespace alarm_settings_chime_tone
+        {
+            inline constexpr auto font_center = "gt_pressura_light_46";
+        }
     } // namespace bell_settings_style
 } // namespace gui
