@@ -88,12 +88,14 @@ namespace gui
             emptyListIcon->setVisible(true);
             bottomBar->setActive(BottomBar::Side::LEFT, false);
             bottomBar->setActive(BottomBar::Side::CENTER, false);
+            application->refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
         };
 
         list->notEmptyListCallback = [this]() {
             emptyListIcon->setVisible(false);
             bottomBar->setActive(BottomBar::Side::LEFT, true);
             bottomBar->setActive(BottomBar::Side::CENTER, true);
+            application->refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
         };
 
         setFocusItem(list);

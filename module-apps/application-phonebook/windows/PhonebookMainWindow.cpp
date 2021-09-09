@@ -60,7 +60,6 @@ namespace gui
         contactsList->emptyListCallback    = [this]() { onEmptyList(); };
         contactsList->notEmptyListCallback = [this]() { onListFilled(); };
 
-        phonebookModel->letterMap = phonebookModel->requestLetterMap();
         phonebookModel->setDisplayMode(static_cast<uint32_t>(ContactDisplayMode::SortedByLetter));
         contactsList->rebuildList(gui::listview::RebuildType::Full);
 
@@ -176,6 +175,7 @@ namespace gui
         bottomBar->setActive(gui::BottomBar::Side::CENTER, false);
         emptyListIcon->setVisible(true);
         header->navigationIndicatorRemove(gui::header::BoxSelection::Right);
+        application->refreshWindow(RefreshModes::GUI_REFRESH_DEEP);
     }
 
     void PhonebookMainWindow::onListFilled()
@@ -184,5 +184,6 @@ namespace gui
         bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
         emptyListIcon->setVisible(false);
         header->navigationIndicatorAdd(new gui::header::SearchAction(), gui::header::BoxSelection::Right);
+        application->refreshWindow(RefreshModes::GUI_REFRESH_DEEP);
     }
 } /* namespace gui */
