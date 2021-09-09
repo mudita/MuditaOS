@@ -26,7 +26,7 @@ namespace
     }
 } // namespace
 
-OptionWithActiveIcons::OptionWithActiveIcons(app::Application *app,
+OptionWithActiveIcons::OptionWithActiveIcons(app::ApplicationCommon *app,
                                              std::shared_ptr<ContactRecord> contact,
                                              std::vector<BasicIcon> icons)
     : app{app}, contact{std::move(contact)}, icons{std::move(icons)}

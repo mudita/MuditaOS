@@ -17,14 +17,15 @@ namespace gui
     // class DesktopInputWidget : public ListItem
     class DesktopInputWidget : public HBox
     {
-        app::Application *application = nullptr;
+        app::ApplicationCommon *application = nullptr;
         HBox *body                    = nullptr;
         gui::Image *replyImage        = nullptr;
 
       public:
         gui::Text *inputText = nullptr;
 
-        DesktopInputWidget(app::Application *application, Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
+        DesktopInputWidget(
+            app::ApplicationCommon *application, Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
         ~DesktopInputWidget() override = default;
 
         auto handleRequestResize(const Item *, Length request_w, Length request_h) -> Size override;

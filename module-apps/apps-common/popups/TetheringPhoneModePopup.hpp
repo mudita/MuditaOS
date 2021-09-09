@@ -12,7 +12,7 @@ namespace gui
     class TetheringPhoneModePopup : public TetheringNotificationPopup
     {
       public:
-        TetheringPhoneModePopup(app::Application *app, const std::string &name);
+        TetheringPhoneModePopup(app::ApplicationCommon *app, const std::string &name);
 
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
     };

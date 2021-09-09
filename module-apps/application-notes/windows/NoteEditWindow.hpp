@@ -20,7 +20,8 @@ namespace app::notes
     class NoteEditWindow : public gui::AppWindow, public NoteEditWindowContract::View
     {
       public:
-        NoteEditWindow(app::Application *app, std::unique_ptr<NoteEditWindowContract::Presenter> &&windowPresenter);
+        NoteEditWindow(app::ApplicationCommon *app,
+                       std::unique_ptr<NoteEditWindowContract::Presenter> &&windowPresenter);
         ~NoteEditWindow() noexcept override;
 
         void onBeforeShow(gui::ShowMode mode, gui::SwitchData *data) override;
@@ -32,7 +33,7 @@ namespace app::notes
         void destroyInterface() override;
 
       protected:
-        NoteEditWindow(app::Application *app,
+        NoteEditWindow(app::ApplicationCommon *app,
                        std::unique_ptr<NoteEditWindowContract::Presenter> &&windowPresenter,
                        const std::string &windowName);
         virtual void onCharactersCountChanged(std::uint32_t count);

@@ -15,7 +15,7 @@ namespace gui
     {
       public:
         explicit BellSettingsFrontlightWindow(
-            app::Application *app,
+            app::ApplicationCommon *app,
             std::unique_ptr<app::bell_settings::FrontlightWindowContract::Presenter> &&windowPresenter,
             std::string name = window::name::bellSettingsFrontlight);
 

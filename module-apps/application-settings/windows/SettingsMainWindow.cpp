@@ -7,7 +7,7 @@
 
 #include <service-appmgr/Controller.hpp>
 
-std::list<gui::Option> mainWindowOptionsNew(app::Application *app)
+std::list<gui::Option> mainWindowOptionsNew(app::ApplicationCommon *app)
 {
     std::list<gui::Option> l;
 

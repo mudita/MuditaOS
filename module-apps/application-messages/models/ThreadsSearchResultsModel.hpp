@@ -14,7 +14,7 @@ namespace gui::model
         UTF8 textToSearch;
 
       public:
-        ThreadsSearchResultsModel(app::Application *app);
+        ThreadsSearchResultsModel(app::ApplicationCommon *app);
 
         auto getMinimalItemSpaceRequired() const -> unsigned int override;
         auto getItem(Order order) -> ListItem * override;

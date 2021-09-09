@@ -8,7 +8,7 @@
 namespace gui
 {
     TechnicalInformationWindow::TechnicalInformationWindow(
-        app::Application *app, std::shared_ptr<TechnicalWindowContract::Presenter> technicalPresenter)
+        app::ApplicationCommon *app, std::shared_ptr<TechnicalWindowContract::Presenter> technicalPresenter)
         : AppWindow(app, gui::window::name::technical_information), presenter(std::move(technicalPresenter))
     {
         presenter->attach(this);

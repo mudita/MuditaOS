@@ -12,7 +12,7 @@ namespace gui
     {
 
       public:
-        TechnicalInformationWindow(app::Application *app,
+        TechnicalInformationWindow(app::ApplicationCommon *app,
                                    std::shared_ptr<TechnicalWindowContract::Presenter> presenter);
 
       private:

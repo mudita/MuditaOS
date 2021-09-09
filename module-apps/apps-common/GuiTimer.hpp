@@ -16,7 +16,7 @@ namespace gui
 
 namespace app
 {
-    class Application;
+    class ApplicationCommon;
 
     /// Proxies system timer capabilities to the gui layer
     class GuiTimer : public sys::Timer
@@ -28,7 +28,7 @@ namespace app
             Periodic
         };
 
-        GuiTimer(Application *parent,
+        GuiTimer(ApplicationCommon *parent,
                  gui::Item *item,
                  const std::string &name,
                  std::chrono::milliseconds timeout,
@@ -48,17 +48,17 @@ namespace app
     class GuiTimerFactory
     {
       public:
-        static sys::TimerHandle createSingleShotTimer(Application *parent,
+        static sys::TimerHandle createSingleShotTimer(ApplicationCommon *parent,
                                                       gui::Item *item,
                                                       const std::string &name,
                                                       std::chrono::milliseconds interval);
-        static sys::TimerHandle createPeriodicTimer(Application *parent,
+        static sys::TimerHandle createPeriodicTimer(ApplicationCommon *parent,
                                                     gui::Item *item,
                                                     const std::string &name,
                                                     std::chrono::milliseconds interval);
 
       private:
-        static sys::TimerHandle createGuiTimer(Application *parent,
+        static sys::TimerHandle createGuiTimer(ApplicationCommon *parent,
                                                gui::Item *item,
                                                const std::string &name,
                                                std::chrono::milliseconds interval,

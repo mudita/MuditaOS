@@ -13,7 +13,7 @@
 namespace gui
 {
 
-    BellSettingsAdvancedWindow::BellSettingsAdvancedWindow(app::Application *app)
+    BellSettingsAdvancedWindow::BellSettingsAdvancedWindow(app::ApplicationCommon *app)
         : OptionWindow(app, gui::window::name::bellSettingsAdvanced)
     {
         addOptions(settingsOptionsList());

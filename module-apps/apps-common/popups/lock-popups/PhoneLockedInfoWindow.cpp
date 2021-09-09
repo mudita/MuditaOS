@@ -10,7 +10,7 @@
 
 using namespace gui;
 
-PhoneLockedInfoWindow::PhoneLockedInfoWindow(app::Application *app, const std::string &name)
+PhoneLockedInfoWindow::PhoneLockedInfoWindow(app::ApplicationCommon *app, const std::string &name)
     : WindowWithTimer(app, name, std::chrono::seconds(2))
 {
     buildInterface();

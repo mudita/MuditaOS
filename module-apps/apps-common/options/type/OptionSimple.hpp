@@ -5,7 +5,6 @@
 
 #include "OptionBase.hpp"
 #include "OptionStyle.hpp"
-#include "Application.hpp"
 
 namespace gui::option
 {

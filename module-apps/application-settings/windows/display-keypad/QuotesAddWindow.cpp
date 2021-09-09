@@ -29,7 +29,7 @@ namespace gui
         }
     } // namespace
 
-    QuoteAddEditWindow::QuoteAddEditWindow(app::Application *app)
+    QuoteAddEditWindow::QuoteAddEditWindow(app::ApplicationCommon *app)
         : AppWindow(app, gui::window::name::quotes), quoteModel(std::make_shared<Quotes::QuotesModel>(app))
     {
         buildInterface();

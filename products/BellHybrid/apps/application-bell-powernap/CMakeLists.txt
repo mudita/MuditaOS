@@ -44,6 +44,7 @@ target_sources(application-bell-powernap
 
 target_link_libraries(application-bell-powernap
     PRIVATE
+        app
         bell::app-common
         bell::app-main
 

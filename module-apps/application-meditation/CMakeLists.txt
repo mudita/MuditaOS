@@ -40,6 +40,7 @@ target_sources(application-meditation
 
 target_link_libraries(application-meditation
     PRIVATE
+        app
         i18n
         module-sys
         module-utils

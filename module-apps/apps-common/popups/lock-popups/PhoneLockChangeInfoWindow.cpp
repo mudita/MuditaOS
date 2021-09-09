@@ -8,7 +8,7 @@
 
 using namespace gui;
 
-PhoneLockChangeInfoWindow::PhoneLockChangeInfoWindow(app::Application *app, const std::string &name)
+PhoneLockChangeInfoWindow::PhoneLockChangeInfoWindow(app::ApplicationCommon *app, const std::string &name)
     : WindowWithTimer(app, name)
 {
     buildInterface();

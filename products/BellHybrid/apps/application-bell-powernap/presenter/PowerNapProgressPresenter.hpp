@@ -9,7 +9,7 @@
 #include <memory>
 namespace app
 {
-    class Application;
+    class ApplicationCommon;
 } // namespace app
 namespace gui
 {
@@ -47,7 +47,7 @@ namespace app::powernap
 
     class PowerNapProgressPresenter : public PowerNapProgressContract::Presenter
     {
-        app::Application *app        = nullptr;
+        app::ApplicationCommon *app  = nullptr;
         settings::Settings *settings = nullptr;
         PowerNapAlarm &alarm;
         std::unique_ptr<app::ProgressTimer> timer;
@@ -62,6 +62,6 @@ namespace app::powernap
         void onNapAlarmFinished();
 
       public:
-        PowerNapProgressPresenter(app::Application *app, settings::Settings *settings, PowerNapAlarm &alarm);
+        PowerNapProgressPresenter(app::ApplicationCommon *app, settings::Settings *settings, PowerNapAlarm &alarm);
     };
 } // namespace app::powernap

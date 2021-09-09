@@ -29,6 +29,7 @@ target_sources(application-special-input
 
 target_link_libraries(application-special-input
     PRIVATE
+        app
         apps-common
         i18n
         service-appmgr

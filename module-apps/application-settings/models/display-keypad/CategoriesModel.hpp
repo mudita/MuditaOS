@@ -13,7 +13,7 @@ namespace Quotes
                             public app::AsyncCallbackReceiver
     {
       public:
-        explicit CategoriesModel(app::Application *app);
+        explicit CategoriesModel(app::ApplicationCommon *app);
         [[nodiscard]] auto requestRecordsCount() -> unsigned int final;
         [[nodiscard]] auto getMinimalItemSpaceRequired() const -> unsigned int final;
         auto getItem(gui::Order order) -> gui::ListItem * final;
@@ -21,7 +21,7 @@ namespace Quotes
         bool updateRecords(std::vector<CategoryRecord> records);
 
       private:
-        app::Application *app = nullptr;
+        app::ApplicationCommon *app = nullptr;
 
         auto handleQueryResponse(db::QueryResult *queryResult) -> bool;
     };

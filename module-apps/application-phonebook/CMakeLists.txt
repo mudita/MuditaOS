@@ -63,6 +63,7 @@ target_compile_definitions(application-phonebook
 
 target_link_libraries(application-phonebook
     PRIVATE
+        app
         utf8
         module-gui
         module-utils

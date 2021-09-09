@@ -12,7 +12,7 @@
 #include <time/ScopedTime.hpp>
 #include <BottomBar.hpp>
 
-NewContactModel::NewContactModel(app::Application *app) : application(app)
+NewContactModel::NewContactModel(app::ApplicationCommon *app) : application(app)
 {}
 
 auto NewContactModel::requestRecordsCount() -> unsigned int

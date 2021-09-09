@@ -9,7 +9,7 @@
 
 namespace app::alarmClock
 {
-    NewEditAlarmModel::NewEditAlarmModel(app::Application *app,
+    NewEditAlarmModel::NewEditAlarmModel(app::ApplicationCommon *app,
                                          std::shared_ptr<AbstractAlarmsRepository> alarmsRepository,
                                          bool mode24H)
         : application(app), alarmsRepository{std::move(alarmsRepository)}, mode24H(mode24H)

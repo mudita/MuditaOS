@@ -15,7 +15,7 @@
 namespace gui
 {
 
-    ScanModesWindow::ScanModesWindow(app::Application *app) : AppWindow(app, gui::name::window::scan_window)
+    ScanModesWindow::ScanModesWindow(app::ApplicationCommon *app) : AppWindow(app, gui::name::window::scan_window)
     {
         buildInterface();
     }

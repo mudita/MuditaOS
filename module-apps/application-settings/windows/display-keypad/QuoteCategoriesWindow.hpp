@@ -11,7 +11,7 @@ namespace gui
     class QuoteCategoriesWindow : public AppWindow
     {
       public:
-        QuoteCategoriesWindow(app::Application *app);
+        QuoteCategoriesWindow(app::ApplicationCommon *app);
 
       private:
         void buildInterface() override;

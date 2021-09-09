@@ -12,10 +12,10 @@
 
 class ContactDetailsModel : public app::InternalModel<gui::ContactListItem *>, public gui::ListItemProvider
 {
-    app::Application *application = nullptr;
+    app::ApplicationCommon *application = nullptr;
 
   public:
-    ContactDetailsModel(app::Application *app);
+    ContactDetailsModel(app::ApplicationCommon *app);
 
     void clearData();
     void loadData(std::shared_ptr<ContactRecord> contactRecord);

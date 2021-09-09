@@ -14,7 +14,7 @@
 
 namespace app
 {
-    AsyncAudioOperations::AsyncAudioOperations(Application *application)
+    AsyncAudioOperations::AsyncAudioOperations(ApplicationCommon *application)
         : app::AsyncCallbackReceiver{application}, application(application)
     {}
 

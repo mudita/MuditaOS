@@ -32,7 +32,7 @@ namespace gui
         void onListFilled();
 
       public:
-        PhonebookMainWindow(app::Application *app);
+        PhonebookMainWindow(app::ApplicationCommon *app);
         virtual ~PhonebookMainWindow();
 
         // virtual methods

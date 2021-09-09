@@ -9,7 +9,7 @@
 
 #include <ListView.hpp>
 
-NewApnModel::NewApnModel(app::Application *app) : application(app)
+NewApnModel::NewApnModel(app::ApplicationCommon *app) : application(app)
 {}
 
 auto NewApnModel::requestRecordsCount() -> unsigned int

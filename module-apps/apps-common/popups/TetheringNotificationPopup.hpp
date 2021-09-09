@@ -10,7 +10,7 @@ namespace gui
     class TetheringNotificationPopup : public gui::DialogConfirm
     {
       public:
-        TetheringNotificationPopup(app::Application *app, const std::string &name);
+        TetheringNotificationPopup(app::ApplicationCommon *app, const std::string &name);
 
         gui::status_bar::Configuration configureStatusBar(gui::status_bar::Configuration appConfiguration) override;
     };

@@ -5,14 +5,14 @@
 
 #include <application-settings/windows/WindowNames.hpp>
 
-#include <apps-common/Application.hpp>
+#include <Application.hpp>
 #include <service-eink/Common.hpp>
 #include <service-eink/messages/EinkModeMessage.hpp>
 
 namespace gui
 {
 
-    EinkModeWindow::EinkModeWindow(app::Application *app) : AppWindow(app, window::name::eink_mode)
+    EinkModeWindow::EinkModeWindow(app::ApplicationCommon *app) : AppWindow(app, window::name::eink_mode)
     {
         AppWindow::buildInterface();
         bottomBar->setActive(BottomBar::Side::CENTER, true);

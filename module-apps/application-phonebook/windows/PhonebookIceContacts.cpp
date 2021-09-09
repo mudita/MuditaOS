@@ -9,7 +9,7 @@
 
 namespace gui
 {
-    PhonebookIceContacts::PhonebookIceContacts(app::Application *app)
+    PhonebookIceContacts::PhonebookIceContacts(app::ApplicationCommon *app)
         : AppWindow(app, gui::window::name::ice_contacts), phonebookModel{std::make_shared<PhonebookModel>(
                                                                this->application, "", ContactsDB::iceGroupId())}
     {

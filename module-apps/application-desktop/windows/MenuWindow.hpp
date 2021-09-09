@@ -66,7 +66,7 @@ namespace gui
         MenuPage *toolsMenu = nullptr;
 
       public:
-        MenuWindow(app::Application *app, const app::DBNotificationsBaseHandler &accessor);
+        MenuWindow(app::ApplicationCommon *app, const app::DBNotificationsBaseHandler &accessor);
 
         bool onInput(const InputEvent &inputEvent) override;
 

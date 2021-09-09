@@ -12,7 +12,7 @@
 
 namespace gui
 {
-    SimLockInputWindow::SimLockInputWindow(app::Application *app, const std::string &window_name)
+    SimLockInputWindow::SimLockInputWindow(app::ApplicationCommon *app, const std::string &window_name)
         : LockInputWindow(app, window_name)
     {
         buildInterface();

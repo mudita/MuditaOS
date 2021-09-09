@@ -13,7 +13,7 @@ namespace app::onBoarding
     class StartConfigurationWindow : public gui::AppWindow
     {
       public:
-        explicit StartConfigurationWindow(app::Application *app);
+        explicit StartConfigurationWindow(app::ApplicationCommon *app);
 
         gui::status_bar::Configuration configureStatusBar(gui::status_bar::Configuration appConfiguration) override;
         bool onInput(const gui::InputEvent &inputEvent) override;

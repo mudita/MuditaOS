@@ -17,7 +17,7 @@ namespace gui
     {
       public:
         explicit BellSettingsPrewakeUpWindow(
-            app::Application *app,
+            app::ApplicationCommon *app,
             std::unique_ptr<app::bell_settings::PrewakeUpWindowContract::Presenter> &&windowPresenter,
             std::string name = gui::window::name::bellSettingsAlarmSettingsPrewakeUp);
 

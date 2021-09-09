@@ -18,7 +18,9 @@ namespace gui
         ///  Constructor
         ///  @param app pointer to application
         ///  @param name window name
-        explicit SoundSelectWindow(app::Application *app, std::string name, std::shared_ptr<AbstractSoundsModel> model);
+        explicit SoundSelectWindow(app::ApplicationCommon *app,
+                                   std::string name,
+                                   std::shared_ptr<AbstractSoundsModel> model);
 
         ///  Called before the window is shown
         ///  @param mode show mode

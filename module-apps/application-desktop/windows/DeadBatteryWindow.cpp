@@ -18,7 +18,7 @@ namespace gui
         constexpr inline auto imgPositionY = 250;
     } // namespace
 
-    DeadBatteryWindow::DeadBatteryWindow(app::Application *app) : AppWindow(app, app::window::name::dead_battery)
+    DeadBatteryWindow::DeadBatteryWindow(app::ApplicationCommon *app) : AppWindow(app, app::window::name::dead_battery)
     {
         buildInterface();
         preventsAutoLock = true;

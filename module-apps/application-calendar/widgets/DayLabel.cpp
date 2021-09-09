@@ -12,7 +12,7 @@
 
 namespace gui
 {
-    DayLabel::DayLabel(app::Application *app,
+    DayLabel::DayLabel(app::ApplicationCommon *app,
                        gui::Item *parent,
                        const uint32_t &cellIndex,
                        const uint32_t &firstWeekOffset,

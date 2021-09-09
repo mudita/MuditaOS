@@ -18,7 +18,7 @@ namespace gui
     class NewMessageWindow : public AppWindow, public app::AsyncCallbackReceiver
     {
       public:
-        explicit NewMessageWindow(app::Application *app);
+        explicit NewMessageWindow(app::ApplicationCommon *app);
 
         bool onInput(const InputEvent &inputEvent) override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;

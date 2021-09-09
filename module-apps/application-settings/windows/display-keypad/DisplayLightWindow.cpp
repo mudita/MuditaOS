@@ -7,7 +7,8 @@
 
 namespace gui
 {
-    DisplayLightWindow::DisplayLightWindow(app::Application *app, app::settingsInterface::ScreenLightSettings *settings)
+    DisplayLightWindow::DisplayLightWindow(app::ApplicationCommon *app,
+                                           app::settingsInterface::ScreenLightSettings *settings)
         : BaseSettingsWindow(app, window::name::display_light), screenLightSettings(settings)
     {
         auto values = screenLightSettings->getCurrentValues();

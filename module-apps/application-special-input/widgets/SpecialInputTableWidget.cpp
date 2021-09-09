@@ -16,7 +16,7 @@ namespace gui
 
     using namespace specialInputStyle;
 
-    SpecialInputTableWidget::SpecialInputTableWidget(app::Application *app, std::list<Carrier> &&carrier)
+    SpecialInputTableWidget::SpecialInputTableWidget(app::ApplicationCommon *app, std::list<Carrier> &&carrier)
         : application(app)
     {
         setMinimumSize(specialCharacterTableWidget::window_grid_w, specialCharacterTableWidget::window_grid_h);

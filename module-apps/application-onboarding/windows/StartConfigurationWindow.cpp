@@ -17,7 +17,7 @@
 
 namespace app::onBoarding
 {
-    StartConfigurationWindow::StartConfigurationWindow(app::Application *app)
+    StartConfigurationWindow::StartConfigurationWindow(app::ApplicationCommon *app)
         : gui::AppWindow(app, gui::window::name::onBoarding_start_configuration)
     {
         buildInterface();

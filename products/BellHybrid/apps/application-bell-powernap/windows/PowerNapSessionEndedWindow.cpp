@@ -13,7 +13,7 @@
 namespace gui
 {
     PowerNapSessionEndedWindow::PowerNapSessionEndedWindow(
-        app::Application *app, std::shared_ptr<app::powernap::PowerNapSessionEndedContract::Presenter> presenter)
+        app::ApplicationCommon *app, std::shared_ptr<app::powernap::PowerNapSessionEndedContract::Presenter> presenter)
         : WindowWithTimer(app, gui::window::name::powernapSessionEnded), presenter{std::move(presenter)}
     {
         buildInterface();

@@ -4,7 +4,7 @@
 #include "QuotesAgent.hpp"
 #include "QuotesQueries.hpp"
 
-#include <Application.hpp>
+//#include <Application.hpp>
 #include <Common/Query.hpp>
 
 namespace Quotes

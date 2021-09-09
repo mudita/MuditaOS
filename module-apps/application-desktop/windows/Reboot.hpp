@@ -14,7 +14,7 @@ namespace gui
     class RebootWindow : public AppWindow
     {
       public:
-        RebootWindow(app::Application *app, std::unique_ptr<PowerOffPresenter> &&presenter);
+        RebootWindow(app::ApplicationCommon *app, std::unique_ptr<PowerOffPresenter> &&presenter);
         ~RebootWindow() override = default;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         bool onInput(const InputEvent &inputEvent) override;

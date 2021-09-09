@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "common/BellFinishedWindow.hpp"
-#include <apps-common/Application.hpp>
+#include <apps-common/ApplicationCommon.hpp>
 #include <gui/input/InputEvent.hpp>
 #include <gui/widgets/Icon.hpp>
 #include <i18n/i18n.hpp>
@@ -10,7 +10,7 @@
 namespace gui
 {
 
-    BellFinishedWindow::BellFinishedWindow(app::Application *app) : WindowWithTimer(app, name)
+    BellFinishedWindow::BellFinishedWindow(app::ApplicationCommon *app) : WindowWithTimer(app, name)
     {
         buildInterface();
 

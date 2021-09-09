@@ -8,7 +8,8 @@
 namespace gui
 {
     PowerNapMainWindow::PowerNapMainWindow(
-        app::Application *app, std::unique_ptr<app::powernap::PowerNapMainWindowContract::Presenter> &&windowPresenter)
+        app::ApplicationCommon *app,
+        std::unique_ptr<app::powernap::PowerNapMainWindowContract::Presenter> &&windowPresenter)
         : AppWindow(app, gui::name::window::main_window), windowPresenter{std::move(windowPresenter)}
     {
         this->windowPresenter->attach(this);

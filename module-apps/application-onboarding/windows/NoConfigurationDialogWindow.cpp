@@ -14,7 +14,7 @@
 
 namespace app::onBoarding
 {
-    NoConfigurationDialogWindow::NoConfigurationDialogWindow(app::Application *app)
+    NoConfigurationDialogWindow::NoConfigurationDialogWindow(app::ApplicationCommon *app)
         : gui::Dialog(app, gui::window::name::onBoarding_no_configuration)
     {
         header->navigationIndicatorAdd(new gui::header::IceAction(), gui::header::BoxSelection::Left);

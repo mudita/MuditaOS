@@ -11,7 +11,8 @@
 
 namespace gui
 {
-    BellSettingsAlarmSettingsWindow::BellSettingsAlarmSettingsWindow(app::Application *app) : OptionWindow(app, name)
+    BellSettingsAlarmSettingsWindow::BellSettingsAlarmSettingsWindow(app::ApplicationCommon *app)
+        : OptionWindow(app, name)
     {
         addOptions(alarmSettingsOptionsList());
         buildInterface();

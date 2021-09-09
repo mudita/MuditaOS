@@ -19,7 +19,7 @@ namespace gui
         app::settingsInterface::OperatorsSettings *operatorsSettings;
 
       public:
-        NetworkWindow(app::Application *app, app::settingsInterface::OperatorsSettings *operatorsSettings);
+        NetworkWindow(app::ApplicationCommon *app, app::settingsInterface::OperatorsSettings *operatorsSettings);
 
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
     };

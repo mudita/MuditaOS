@@ -11,7 +11,7 @@ namespace gui
     class LanguagesWindow : public BaseSettingsWindow
     {
       public:
-        explicit LanguagesWindow(app::Application *app, std::string name = window::name::languages);
+        explicit LanguagesWindow(app::ApplicationCommon *app, std::string name = window::name::languages);
 
       protected:
         auto buildOptionsList() -> std::list<Option> override;

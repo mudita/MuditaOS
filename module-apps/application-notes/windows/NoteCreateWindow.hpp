@@ -10,7 +10,8 @@ namespace app::notes
     class NoteCreateWindow : public NoteEditWindow
     {
       public:
-        NoteCreateWindow(app::Application *app, std::unique_ptr<NoteEditWindowContract::Presenter> &&windowPresenter);
+        NoteCreateWindow(app::ApplicationCommon *app,
+                         std::unique_ptr<NoteEditWindowContract::Presenter> &&windowPresenter);
 
       private:
         bool onInput(const gui::InputEvent &inputEvent) override;

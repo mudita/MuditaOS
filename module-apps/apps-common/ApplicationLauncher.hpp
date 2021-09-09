@@ -3,8 +3,6 @@
 
 #pragma once
 
-#include "Application.hpp"
-
 namespace app
 {
     using ApplicationManifest = app::manager::ApplicationManifest;
@@ -75,7 +73,7 @@ namespace app
             return false;
         }
 
-        std::shared_ptr<Application> handle = nullptr;
+        std::shared_ptr<ApplicationCommon> handle = nullptr;
     };
 
     /// application launcher boilerplate

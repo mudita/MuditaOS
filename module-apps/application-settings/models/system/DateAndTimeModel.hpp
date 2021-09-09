@@ -16,7 +16,7 @@ namespace gui
 class DateAndTimeModel : public app::InternalModel<gui::DateOrTimeListItem *>, public gui::ListItemProvider
 {
   public:
-    DateAndTimeModel(app::Application *application);
+    DateAndTimeModel(app::ApplicationCommon *application);
 
     void loadData(std::shared_ptr<utils::time::FromTillDate> fromTillDate);
     void saveData(std::shared_ptr<utils::time::FromTillDate> fromTillDate);
@@ -27,7 +27,7 @@ class DateAndTimeModel : public app::InternalModel<gui::DateOrTimeListItem *>, p
     [[nodiscard]] unsigned int requestRecordsCount() override;
 
   private:
-    app::Application *app           = nullptr;
+    app::ApplicationCommon *app     = nullptr;
     gui::SettingsDateItem *dateItem = nullptr;
     gui::SettingsTimeItem *timeItem = nullptr;
 

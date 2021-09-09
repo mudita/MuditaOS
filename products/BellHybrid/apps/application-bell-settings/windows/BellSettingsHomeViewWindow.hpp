@@ -12,7 +12,7 @@ namespace gui
     class BellSettingsHomeViewWindow : public AppWindow
     {
       public:
-        explicit BellSettingsHomeViewWindow(app::Application *app,
+        explicit BellSettingsHomeViewWindow(app::ApplicationCommon *app,
                                             std::string name = gui::window::name::bellSettingsHomeView);
 
         void buildInterface() override;

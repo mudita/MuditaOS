@@ -35,7 +35,7 @@ class SimContactsImportWindowContract
 class SimContactsImportWindowPresenter : public SimContactsImportWindowContract::Presenter
 {
   public:
-    explicit SimContactsImportWindowPresenter(app::Application *application,
+    explicit SimContactsImportWindowPresenter(app::ApplicationCommon *application,
                                               std::shared_ptr<SimContactsImportModel> simContactsProvider);
 
     std::shared_ptr<gui::ListItemProvider> getSimContactsProvider() const override;
@@ -46,7 +46,7 @@ class SimContactsImportWindowPresenter : public SimContactsImportWindowContract:
     bool isRequestCompleted() override;
 
   private:
-    app::Application *application               = nullptr;
+    app::ApplicationCommon *application         = nullptr;
     bool requestCompleted                       = true;
     bool duplicatesChecked                      = false;
     std::function<void()> onSave                = nullptr;

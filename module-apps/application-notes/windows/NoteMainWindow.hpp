@@ -17,7 +17,8 @@ namespace app::notes
     class NoteMainWindow : public gui::AppWindow, public NotesMainWindowContract::View
     {
       public:
-        NoteMainWindow(app::Application *app, std::unique_ptr<NotesMainWindowContract::Presenter> &&windowPresenter);
+        NoteMainWindow(app::ApplicationCommon *app,
+                       std::unique_ptr<NotesMainWindowContract::Presenter> &&windowPresenter);
         ~NoteMainWindow() noexcept override;
 
         // virtual methods

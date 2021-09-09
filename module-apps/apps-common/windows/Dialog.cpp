@@ -5,11 +5,11 @@
 #include "DialogMetadataMessage.hpp"
 #include <i18n/i18n.hpp>
 #include <Image.hpp>
-#include <apps-common/Application.hpp>
+#include <apps-common/ApplicationCommon.hpp>
 
 using namespace gui;
 
-Dialog::Dialog(app::Application *app, const std::string &name) : gui::AppWindow(app, name)
+Dialog::Dialog(app::ApplicationCommon *app, const std::string &name) : gui::AppWindow(app, name)
 {
     AppWindow::buildInterface();
     bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
@@ -37,7 +37,7 @@ void Dialog::onBeforeShow(ShowMode mode, SwitchData *data)
     }
 }
 
-DialogConfirm::DialogConfirm(app::Application *app, const std::string &name) : Dialog(app, name)
+DialogConfirm::DialogConfirm(app::ApplicationCommon *app, const std::string &name) : Dialog(app, name)
 {
     bottomBar->setActive(BottomBar::Side::RIGHT, false);
     bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::ok));
@@ -60,7 +60,7 @@ void DialogConfirm::onBeforeShow(ShowMode mode, SwitchData *data)
     }
 }
 
-DialogYesNo::DialogYesNo(app::Application *app, const std::string &name) : Dialog(app, name)
+DialogYesNo::DialogYesNo(app::ApplicationCommon *app, const std::string &name) : Dialog(app, name)
 {
     icon->text->setMinimumSize(style::window::default_body_width, dialog::style::option::iconTextH);
     icon->text->setMaximumSize(style::window::default_body_width, dialog::style::option::iconTextH);
@@ -119,7 +119,7 @@ void DialogYesNo::onBeforeShow(ShowMode mode, SwitchData *data)
     }
 }
 
-DialogYesNoIconTxt::DialogYesNoIconTxt(app::Application *app, const std::string &name) : DialogYesNo(app, name)
+DialogYesNoIconTxt::DialogYesNoIconTxt(app::ApplicationCommon *app, const std::string &name) : DialogYesNo(app, name)
 {
     iconText = new Label(this,
                          style::window::default_left_margin,
@@ -143,7 +143,7 @@ void DialogYesNoIconTxt::onBeforeShow(ShowMode mode, SwitchData *data)
     }
 }
 
-DialogRetry::DialogRetry(app::Application *app, const std::string &name) : Dialog(app, name)
+DialogRetry::DialogRetry(app::ApplicationCommon *app, const std::string &name) : Dialog(app, name)
 {
     bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::retry));
     setFocusItem(bottomBar);

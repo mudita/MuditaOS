@@ -11,7 +11,7 @@
 #include <time/ScopedTime.hpp>
 #include <module-apps/application-phonebook/data/PhonebookInternals.hpp>
 
-ContactDetailsModel::ContactDetailsModel(app::Application *app) : application(app)
+ContactDetailsModel::ContactDetailsModel(app::ApplicationCommon *app) : application(app)
 {}
 
 void ContactDetailsModel::clearData()

@@ -16,7 +16,7 @@ namespace app::onBoarding
     class ConfigurationSuccessfulDialogWindow : public gui::Dialog
     {
       public:
-        explicit ConfigurationSuccessfulDialogWindow(app::Application *app);
+        explicit ConfigurationSuccessfulDialogWindow(app::ApplicationCommon *app);
 
         bool onInput(const gui::InputEvent &inputEvent) override;
     };

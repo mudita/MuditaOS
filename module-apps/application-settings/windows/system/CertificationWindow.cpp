@@ -10,7 +10,8 @@
 
 namespace gui
 {
-    CertificationWindow::CertificationWindow(app::Application *app) : AppWindow(app, gui::window::name::certification)
+    CertificationWindow::CertificationWindow(app::ApplicationCommon *app)
+        : AppWindow(app, gui::window::name::certification)
     {
         buildInterface();
     }

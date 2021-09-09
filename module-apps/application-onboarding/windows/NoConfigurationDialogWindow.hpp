@@ -16,7 +16,7 @@ namespace app::onBoarding
     class NoConfigurationDialogWindow : public gui::Dialog
     {
       public:
-        explicit NoConfigurationDialogWindow(app::Application *app);
+        explicit NoConfigurationDialogWindow(app::ApplicationCommon *app);
 
         bool onInput(const gui::InputEvent &inputEvent) override;
     };

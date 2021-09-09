@@ -5,7 +5,7 @@
 #include <service-cellular/ServiceCellular.hpp>
 #include <application-settings/ApplicationSettings.hpp>
 
-TechnicalInformationRepository::TechnicalInformationRepository(app::Application *application)
+TechnicalInformationRepository::TechnicalInformationRepository(app::ApplicationCommon *application)
     : app::AsyncCallbackReceiver{application}, application{application}
 {}
 

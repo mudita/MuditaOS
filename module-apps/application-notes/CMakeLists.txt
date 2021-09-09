@@ -56,6 +56,7 @@ target_sources(application-notes
 
 target_link_libraries(application-notes
 	PRIVATE
+		app
 		apps-common
 		clipboard
 		module-gui

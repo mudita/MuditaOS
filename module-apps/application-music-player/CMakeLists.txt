@@ -38,6 +38,7 @@ target_sources(application-music-player
 
 target_link_libraries(application-music-player
     PRIVATE
+        app
         i18n
         log
         module-gui

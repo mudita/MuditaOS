@@ -11,7 +11,7 @@ namespace gui
     class KeypadLightWindow : public BaseSettingsWindow
     {
       public:
-        KeypadLightWindow(app::Application *app, app::settingsInterface::KeypdBacklightSettings *settings);
+        KeypadLightWindow(app::ApplicationCommon *app, app::settingsInterface::KeypdBacklightSettings *settings);
 
       private:
         void onBeforeShow(ShowMode mode, SwitchData *data) override;

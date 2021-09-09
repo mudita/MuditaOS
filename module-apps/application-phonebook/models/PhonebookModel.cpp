@@ -22,7 +22,7 @@
 
 const static std::uint32_t phonebookModelTimeout = 1000;
 
-PhonebookModel::PhonebookModel(app::Application *app,
+PhonebookModel::PhonebookModel(app::ApplicationCommon *app,
                                std::string filter,
                                std::uint32_t groupFilter,
                                std::uint32_t displayMode)

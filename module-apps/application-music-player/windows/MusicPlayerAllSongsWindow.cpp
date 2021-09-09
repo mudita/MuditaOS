@@ -16,7 +16,7 @@ namespace gui
 {
 
     MusicPlayerAllSongsWindow::MusicPlayerAllSongsWindow(
-        app::Application *app, std::shared_ptr<app::music_player::SongsContract::Presenter> windowPresenter)
+        app::ApplicationCommon *app, std::shared_ptr<app::music_player::SongsContract::Presenter> windowPresenter)
         : AppWindow(app, gui::name::window::all_songs_window), presenter{windowPresenter}
     {
         presenter->attach(this);

@@ -5,9 +5,9 @@
 
 #include <vector>
 
+#include <apps-common/ApplicationCommon.hpp>
 #include "application-phonebook/data/PhonebookStyle.hpp"
 #include "application-phonebook/widgets/PhonebookItem.hpp"
-#include "Application.hpp"
 #include "Common/Query.hpp"
 #include "DatabaseModel.hpp"
 #include "Interface/ContactRecord.hpp"
@@ -29,7 +29,7 @@ class PhonebookModel : public app::DatabaseModel<ContactRecord>,
 
   public:
     ContactsMapData letterMap;
-    PhonebookModel(app::Application *app,
+    PhonebookModel(app::ApplicationCommon *app,
                    std::string filter        = "",
                    std::uint32_t groupFilter = 0,
                    std::uint32_t displayMode = 0);

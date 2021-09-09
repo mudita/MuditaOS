@@ -5,7 +5,7 @@ add_library(apps-common STATIC)
 
 target_sources(apps-common
     PRIVATE
-        Application.cpp
+        ApplicationCommon.cpp
         AsyncTask.cpp
         AudioOperations.cpp
         AudioOperations.hpp
@@ -52,6 +52,7 @@ target_sources(apps-common
         windows/OptionWindow.cpp
 
     PUBLIC
+        ApplicationCommon.hpp
         widgets/TimeSetFmtSpinner.hpp
         actions/AlarmRingingData.hpp
         actions/AlarmTriggeredAction.hpp

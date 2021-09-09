@@ -13,7 +13,7 @@
 namespace gui
 {
     BellSettingsTimeUnitsWindow::BellSettingsTimeUnitsWindow(
-        app::Application *app,
+        app::ApplicationCommon *app,
         std::unique_ptr<app::bell_settings::TimeUnitsWindowContract::Presenter> &&windowPresenter,
         std::string name)
         : AppWindow(app, name), presenter{std::move(windowPresenter)}

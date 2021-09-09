@@ -3,18 +3,21 @@
 
 #pragma once
 
-#include <apps-common/Application.hpp>
+namespace app
+{
+    class ApplicationCommon;
+}
 
 namespace gui
 {
     class PowerOffPresenter
     {
       public:
-        PowerOffPresenter(app::Application *app);
+        PowerOffPresenter(app::ApplicationCommon *app);
         void powerOff();
 
       private:
-        app::Application *application;
+        app::ApplicationCommon *application;
     };
 
 } // namespace gui

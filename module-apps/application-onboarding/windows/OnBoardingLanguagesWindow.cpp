@@ -10,7 +10,7 @@
 
 namespace app::onBoarding
 {
-    OnBoardingLanguagesWindow::OnBoardingLanguagesWindow(app::Application *app, const std::string &name)
+    OnBoardingLanguagesWindow::OnBoardingLanguagesWindow(app::ApplicationCommon *app, const std::string &name)
         : LanguagesWindow(app, name)
     {
         applyToStatusBar([](gui::status_bar::Configuration configuration) {

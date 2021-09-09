@@ -16,7 +16,7 @@ namespace style::quotes::list
 
 namespace Quotes
 {
-    QuotesModel::QuotesModel(app::Application *application)
+    QuotesModel::QuotesModel(app::ApplicationCommon *application)
         : DatabaseModel(application), app::AsyncCallbackReceiver{application}, app(application)
     {}
 

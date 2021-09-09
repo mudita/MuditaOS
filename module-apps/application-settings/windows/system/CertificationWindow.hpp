@@ -10,7 +10,7 @@ namespace gui
     class CertificationWindow : public AppWindow
     {
       public:
-        explicit CertificationWindow(app::Application *app);
+        explicit CertificationWindow(app::ApplicationCommon *app);
 
       private:
         void buildInterface() override;

@@ -13,7 +13,7 @@
 
 namespace app
 {
-    class Application;
+    class ApplicationCommon;
 }
 
 namespace app
@@ -23,7 +23,7 @@ namespace app
     class AlarmModel : public AbstractAlarmModel, public AsyncCallbackReceiver
     {
       public:
-        explicit AlarmModel(Application *app);
+        explicit AlarmModel(ApplicationCommon *app);
 
         bool isActive() const override;
         void setAlarmTime(time_t time) override;
@@ -47,7 +47,7 @@ namespace app
         AlarmEventRecord generateDefaultAlarm() const;
         std::shared_ptr<AlarmEventRecord> getAlarmPtr() const;
 
-        Application *app{};
+        ApplicationCommon *app{};
         State state{State::Invalid};
         SingleEventRecord cachedRecord;
         std::uint32_t snoozeCount = 0;

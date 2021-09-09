@@ -9,7 +9,7 @@
 #include <ListView.hpp>
 #include <widgets/DateAndTimeStyle.hpp>
 
-DateAndTimeModel::DateAndTimeModel(app::Application *application) : app(application)
+DateAndTimeModel::DateAndTimeModel(app::ApplicationCommon *application) : app(application)
 {}
 
 void DateAndTimeModel::loadData(std::shared_ptr<utils::time::FromTillDate> fromTillDate)

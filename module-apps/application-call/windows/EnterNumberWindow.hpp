@@ -13,7 +13,7 @@ namespace gui
         gui::AddContactIcon *newContactIcon = nullptr;
 
       public:
-        EnterNumberWindow(app::Application *app,
+        EnterNumberWindow(app::ApplicationCommon *app,
                           app::EnterNumberWindowInterface *interface,
                           std::string windowName = app::window::name_enterNumber);
         ~EnterNumberWindow() override = default;

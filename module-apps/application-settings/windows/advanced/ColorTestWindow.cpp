@@ -13,7 +13,7 @@ namespace gui
 {
     static gui::ColorScheme currentColorScheme = gui::Color::defaultColorScheme;
 
-    ColorTestWindow::ColorTestWindow(app::Application *app)
+    ColorTestWindow::ColorTestWindow(app::ApplicationCommon *app)
         : AppWindow{app, window::name::color_test_window}, colorTestModel{std::make_shared<ColorTestModel>(app)}
     {
         buildInterface();

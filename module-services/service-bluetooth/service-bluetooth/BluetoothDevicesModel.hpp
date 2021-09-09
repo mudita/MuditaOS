@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include "Application.hpp"
 #include <Device.hpp>
 #include "service-bluetooth/messages/SyncDevices.hpp"
 extern "C"

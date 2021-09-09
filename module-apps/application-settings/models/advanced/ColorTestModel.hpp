@@ -13,10 +13,10 @@ namespace gui
     class ColorTestModel : public app::InternalModel<gui::ColorTestListItem *>, public gui::ListItemProvider
     {
       private:
-        app::Application *application = nullptr;
+        app::ApplicationCommon *application = nullptr;
 
       public:
-        explicit ColorTestModel(app::Application *app);
+        explicit ColorTestModel(app::ApplicationCommon *app);
 
         [[nodiscard]] auto requestRecordsCount() -> unsigned int override;
         [[nodiscard]] auto getMinimalItemSpaceRequired() const -> unsigned int override;

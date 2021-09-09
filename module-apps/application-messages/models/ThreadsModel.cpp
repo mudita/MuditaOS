@@ -16,7 +16,7 @@
 #include <OptionWindow.hpp>
 #include <service-db/DBServiceAPI.hpp>
 
-ThreadsModel::ThreadsModel(app::Application *app) : BaseThreadsRecordModel(app), app::AsyncCallbackReceiver{app}
+ThreadsModel::ThreadsModel(app::ApplicationCommon *app) : BaseThreadsRecordModel(app), app::AsyncCallbackReceiver{app}
 {}
 
 auto ThreadsModel::getMinimalItemSpaceRequired() const -> unsigned int

@@ -4,7 +4,7 @@
 #pragma once
 
 #include "application-phonebook/widgets/PhonebookItem.hpp"
-#include "Application.hpp"
+#include <apps-common/ApplicationCommon.hpp>
 
 #include <ListView.hpp>
 

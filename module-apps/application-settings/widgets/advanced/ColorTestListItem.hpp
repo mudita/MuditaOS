@@ -14,10 +14,10 @@ namespace gui
       private:
         VBox *vBox        = nullptr;
         Label *colorLabel = nullptr;
-        app::Application *app;
+        app::ApplicationCommon *app;
 
       public:
-        explicit ColorTestListItem(app::Application *app, const Color color);
+        explicit ColorTestListItem(app::ApplicationCommon *app, const Color color);
 
         bool onInput(const InputEvent &inputEvent) override;
         [[nodiscard]] uint8_t getColorIntensity();

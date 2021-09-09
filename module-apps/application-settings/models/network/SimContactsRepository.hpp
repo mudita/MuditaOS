@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <apps-common/Application.hpp>
+#include <apps-common/ApplicationCommon.hpp>
 #include <module-db/Interface/ContactRecord.hpp>
 #include <service-cellular/CellularMessage.hpp>
 
@@ -27,7 +27,7 @@ class AbstractSimContactsRepository
 class SimContactsRepository : public AbstractSimContactsRepository, public app::AsyncCallbackReceiver
 {
   public:
-    explicit SimContactsRepository(app::Application *application);
+    explicit SimContactsRepository(app::ApplicationCommon *application);
 
     const std::vector<ContactRecord> &getImportedRecords() override;
     const std::vector<ContactRecord> &getDuplicatedRecords() override;
@@ -41,7 +41,7 @@ class SimContactsRepository : public AbstractSimContactsRepository, public app::
     std::vector<ContactRecord> importedRecords;
     std::vector<ContactRecord> uniqueRecords;
     std::vector<ContactRecord> duplicatedRecords;
-    app::Application *application;
+    app::ApplicationCommon *application;
 
 #if DEBUG_SIM_IMPORT_DATA == 1
     void printRecordsData(const std::string &name, const std::vector<ContactRecord> &data);

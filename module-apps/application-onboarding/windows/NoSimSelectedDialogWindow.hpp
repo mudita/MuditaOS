@@ -12,7 +12,7 @@ namespace app::onBoarding
     class NoSimSelectedDialogWindow : public gui::Dialog
     {
       public:
-        explicit NoSimSelectedDialogWindow(app::Application *app);
+        explicit NoSimSelectedDialogWindow(app::ApplicationCommon *app);
 
         bool onInput(const gui::InputEvent &inputEvent) override;
     };

@@ -96,7 +96,7 @@ namespace gui
         return appConfiguration;
     }
 
-    DesktopMainWindow::DesktopMainWindow(app::Application *app)
+    DesktopMainWindow::DesktopMainWindow(app::ApplicationCommon *app)
         : AppWindow(app, app::window::name::desktop_main_window),
           notificationsModel(std::make_shared<ActiveNotificationsModel>(this))
     {

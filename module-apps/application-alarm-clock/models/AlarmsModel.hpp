@@ -15,13 +15,13 @@ namespace app::alarmClock
     class AlarmsListItemProvider : public app::DatabaseModel<AlarmEventRecord>, public gui::ListItemProvider
     {
       public:
-        explicit AlarmsListItemProvider(app::Application *app);
+        explicit AlarmsListItemProvider(app::ApplicationCommon *app);
     };
 
     class AlarmsModel : public AlarmsListItemProvider
     {
       public:
-        AlarmsModel(app::Application *app, std::shared_ptr<AbstractAlarmsRepository> alarmsRepository);
+        AlarmsModel(app::ApplicationCommon *app, std::shared_ptr<AbstractAlarmsRepository> alarmsRepository);
 
         void requestRecords(uint32_t offset, uint32_t limit) override;
         bool updateRecords(std::vector<AlarmEventRecord> records) override;

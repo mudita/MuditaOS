@@ -64,33 +64,35 @@ namespace app
 
     void ApplicationAlarmClock::createUserInterface()
     {
-        windowsFactory.attach(gui::name::window::main_window, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::name::window::main_window, [](ApplicationCommon *app, const std::string &name) {
             auto alarmsRepository = std::make_unique<alarmClock::AlarmsDBRepository>(app);
             auto alarmsProvider   = std::make_shared<alarmClock::AlarmsModel>(app, std::move(alarmsRepository));
             auto presenter        = std::make_unique<alarmClock::AlarmClockMainWindowPresenter>(alarmsProvider);
             return std::make_unique<alarmClock::AlarmClockMainWindow>(app, std::move(presenter));
         });
         windowsFactory.attach(
-            style::alarmClock::window::name::newEditAlarm, [](Application *app, const std::string &name) {
+            style::alarmClock::window::name::newEditAlarm, [](ApplicationCommon *app, const std::string &name) {
                 auto alarmsRepository = std::make_unique<alarmClock::AlarmsDBRepository>(app);
                 auto alarmsProvider = std::make_shared<alarmClock::NewEditAlarmModel>(app, std::move(alarmsRepository));
                 auto presenter      = std::make_unique<alarmClock::AlarmClockEditWindowPresenter>(alarmsProvider);
                 return std::make_unique<alarmClock::NewEditAlarmWindow>(app, std::move(presenter));
             });
         windowsFactory.attach(
-            style::alarmClock::window::name::customRepeat, [](Application *app, const std::string &name) {
+            style::alarmClock::window::name::customRepeat, [](ApplicationCommon *app, const std::string &name) {
                 auto alarmsRepository = std::make_unique<alarmClock::AlarmsDBRepository>(app);
                 auto alarmsProvider = std::make_shared<alarmClock::CustomRepeatModel>(app, std::move(alarmsRepository));
                 auto presenter      = std::make_unique<alarmClock::CustomRepeatWindowPresenter>(alarmsProvider);
                 return std::make_unique<alarmClock::CustomRepeatWindow>(app, std::move(presenter));
             });
-        windowsFactory.attach(
-            utils::translate("app_alarm_clock_options_title"),
-            [](Application *app, const std::string &name) { return std::make_unique<gui::OptionWindow>(app, name); });
+        windowsFactory.attach(utils::translate("app_alarm_clock_options_title"),
+                              [](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<gui::OptionWindow>(app, name);
+                              });
 
-        windowsFactory.attach(
-            style::alarmClock::window::name::dialogYesNo,
-            [](Application *app, const std::string &name) { return std::make_unique<gui::DialogYesNo>(app, name); });
+        windowsFactory.attach(style::alarmClock::window::name::dialogYesNo,
+                              [](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<gui::DialogYesNo>(app, name);
+                              });
 
         attachPopups(
             {gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes, gui::popup::ID::PhoneLock});

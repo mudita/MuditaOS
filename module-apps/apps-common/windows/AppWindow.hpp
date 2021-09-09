@@ -12,7 +12,7 @@
 
 namespace app
 {
-    class Application;
+    class ApplicationCommon;
 };
 
 namespace gui
@@ -47,7 +47,7 @@ namespace gui
         /**
          * Pointer to the application object that owns the window.
          */
-        app::Application *application = nullptr;
+        app::ApplicationCommon *application = nullptr;
 
         /**
          * A function that applies configuration changes to the current status bar configuration.
@@ -62,9 +62,9 @@ namespace gui
 
       public:
         AppWindow() = delete;
-        AppWindow(app::Application *app, std::string name);
+        AppWindow(app::ApplicationCommon *app, std::string name);
 
-        app::Application *getApplication()
+        app::ApplicationCommon *getApplication()
         {
             return application;
         };

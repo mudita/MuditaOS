@@ -4,7 +4,7 @@
 #include "TechnicalWindowPresenter.hpp"
 
 TechnicalWindowPresenter::TechnicalWindowPresenter(
-    app::Application *application, std::shared_ptr<TechnicalInformationModel> technicalInformationProvider)
+    app::ApplicationCommon *application, std::shared_ptr<TechnicalInformationModel> technicalInformationProvider)
     : application(application), technicalInformationProvider{std::move(technicalInformationProvider)}
 {
     onImeiReady = [&]() {

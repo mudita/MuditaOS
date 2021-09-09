@@ -9,7 +9,7 @@
 
 namespace gui
 {
-    DisplayAndKeypadWindow::DisplayAndKeypadWindow(app::Application *app)
+    DisplayAndKeypadWindow::DisplayAndKeypadWindow(app::ApplicationCommon *app)
         : OptionWindow(app, gui::window::name::display_and_keypad)
     {
         addOptions(displayAndKeypadOptionsList());

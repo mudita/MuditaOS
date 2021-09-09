@@ -18,7 +18,7 @@
 
 namespace app
 {
-    class Application;
+    class ApplicationCommon;
 }
 
 namespace gui
@@ -88,7 +88,7 @@ namespace app::home_screen
     class HomeScreenPresenter : public AbstractPresenter
     {
       public:
-        HomeScreenPresenter(Application *app,
+        HomeScreenPresenter(ApplicationCommon *app,
                             std::unique_ptr<AbstractAlarmModel> alarmModel,
                             std::unique_ptr<AbstractTemperatureModel> temperatureModel,
                             std::unique_ptr<AbstractTimeModel> timeModel);
@@ -112,7 +112,7 @@ namespace app::home_screen
         void handleAlarmModelReady() override;
 
       private:
-        Application *app;
+        ApplicationCommon *app;
         sys::TimerHandle timer;
         std::unique_ptr<AbstractAlarmModel> alarmModel;
         std::unique_ptr<AbstractTemperatureModel> temperatureModel;

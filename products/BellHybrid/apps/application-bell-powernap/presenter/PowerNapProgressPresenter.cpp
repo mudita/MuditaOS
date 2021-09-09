@@ -22,7 +22,7 @@ namespace
 } // namespace
 namespace app::powernap
 {
-    PowerNapProgressPresenter::PowerNapProgressPresenter(app::Application *app,
+    PowerNapProgressPresenter::PowerNapProgressPresenter(app::ApplicationCommon *app,
                                                          settings::Settings *settings,
                                                          PowerNapAlarm &alarm)
         : app{app}, settings{settings}, alarm{alarm},

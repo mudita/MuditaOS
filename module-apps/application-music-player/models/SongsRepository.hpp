@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <apps-common/Application.hpp>
+#include <apps-common/ApplicationCommon.hpp>
 #include <tags_fetcher/TagsFetcher.hpp>
 #include <purefs/filesystem_paths.hpp>
 
@@ -27,12 +27,12 @@ namespace app::music_player
     class ServiceAudioTagsFetcher : public AbstractTagsFetcher
     {
       public:
-        explicit ServiceAudioTagsFetcher(Application *application);
+        explicit ServiceAudioTagsFetcher(ApplicationCommon *application);
 
         std::optional<tags::fetcher::Tags> getFileTags(const std::string &filePath) const final;
 
       private:
-        Application *application = nullptr;
+        ApplicationCommon *application = nullptr;
     };
 
     class AbstractSongsRepository

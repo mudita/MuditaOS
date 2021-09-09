@@ -6,7 +6,7 @@
 
 namespace app
 {
-    class Application;
+    class ApplicationCommon;
 }
 
 namespace app::powernap
@@ -22,14 +22,14 @@ namespace app::powernap
 
     class PowerNapAlarmImpl : public PowerNapAlarm
     {
-        app::Application *app{};
+        app::ApplicationCommon *app{};
         audio::Token token;
 
         void start() override;
         void stop() override;
 
       public:
-        explicit PowerNapAlarmImpl(app::Application *app);
+        explicit PowerNapAlarmImpl(app::ApplicationCommon *app);
         void registerAudioStream(audio::Token _token);
     };
 

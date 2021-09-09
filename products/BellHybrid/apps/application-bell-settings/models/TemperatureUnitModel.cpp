@@ -3,7 +3,7 @@
 
 #include "TemperatureUnitModel.hpp"
 
-#include <apps-common/Application.hpp>
+#include <apps-common/ApplicationCommon.hpp>
 #include <service-db/Settings.hpp>
 #include <db/SystemSettings.hpp>
 
@@ -14,7 +14,7 @@ namespace
 
 namespace app::bell_settings
 {
-    TemperatureUnitModel::TemperatureUnitModel(app::Application *app)
+    TemperatureUnitModel::TemperatureUnitModel(app::ApplicationCommon *app)
     {
         settings.init(service::ServiceProxy{app->weak_from_this()});
     }

@@ -28,7 +28,7 @@ namespace gui
       public:
         gui::Text *inputText = nullptr;
 
-        SMSOutputWidget(app::Application *application, const std::shared_ptr<SMSRecord> &record);
+        SMSOutputWidget(app::ApplicationCommon *application, const std::shared_ptr<SMSRecord> &record);
         virtual ~SMSOutputWidget() = default;
 
         auto handleRequestResize(const Item *, Length request_w, Length request_h) -> Size override;

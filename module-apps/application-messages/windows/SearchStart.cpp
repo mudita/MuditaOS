@@ -12,7 +12,7 @@
 namespace gui
 {
 
-    SMSSearch::SMSSearch(app::Application *app) : AppWindow(app, name::window::thread_sms_search)
+    SMSSearch::SMSSearch(app::ApplicationCommon *app) : AppWindow(app, name::window::thread_sms_search)
     {
         buildInterface();
         setTitle(utils::translate("app_messages_title_main"));

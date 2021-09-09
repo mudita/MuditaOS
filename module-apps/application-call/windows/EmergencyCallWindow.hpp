@@ -11,7 +11,7 @@ namespace gui
     class EmergencyCallWindow : public NumberWindow
     {
       public:
-        EmergencyCallWindow(app::Application *app, app::EnterNumberWindowInterface *interface);
+        EmergencyCallWindow(app::ApplicationCommon *app, app::EnterNumberWindowInterface *interface);
         ~EmergencyCallWindow() override = default;
 
         bool onInput(const InputEvent &inputEvent) override;

@@ -5,7 +5,7 @@
 
 #include <data/CalculatorInputProcessor.hpp>
 #include <widgets/MathOperationsBox.hpp>
-#include <apps-common/Application.hpp>
+#include <apps-common/ApplicationCommon.hpp>
 #include <apps-common/windows/AppWindow.hpp>
 #include <module-gui/gui/widgets/Text.hpp>
 
@@ -20,7 +20,7 @@ namespace gui
         void setupInputProcessing();
 
       public:
-        CalculatorMainWindow(app::Application *app, std::string name);
+        CalculatorMainWindow(app::ApplicationCommon *app, std::string name);
 
         ~CalculatorMainWindow() override = default;
         void buildInterface() override;

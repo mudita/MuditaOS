@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <apps-common/Application.hpp>
+#include <apps-common/ApplicationCommon.hpp>
 #include <apps-common/windows/AppWindow.hpp>
 #include <module-gui/gui/widgets/Text.hpp>
 
@@ -40,7 +40,7 @@ namespace gui
         gui::Label *addSpacer(void);
 
       public:
-        ScanModesWindow(app::Application *app);
+        ScanModesWindow(app::ApplicationCommon *app);
 
         // virtual methods
         bool onInput(const InputEvent &inputEvent) override;

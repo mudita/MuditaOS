@@ -15,7 +15,7 @@ namespace gui
     {
       public:
         static constexpr auto name = "BellSettingsAlarmSettingsSnooze";
-        BellSettingsAlarmSettingsSnoozeWindow(app::Application *app,
+        BellSettingsAlarmSettingsSnoozeWindow(app::ApplicationCommon *app,
                                               std::unique_ptr<app::bell_settings::SnoozePresenter> presenter);
 
         void buildInterface() override;

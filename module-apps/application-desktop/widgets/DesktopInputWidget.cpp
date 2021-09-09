@@ -39,7 +39,7 @@ namespace gui
 {
 
     DesktopInputWidget::DesktopInputWidget(
-        app::Application *application, Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h)
+        app::ApplicationCommon *application, Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h)
         : HBox(parent, x, y, w, h), application(application)
     {
         setMinimumSize(style::window::default_body_width, style::desktop::inputWidget::min_h);

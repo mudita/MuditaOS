@@ -11,7 +11,8 @@
 
 namespace gui
 {
-    DoNotDisturbWindow::DoNotDisturbWindow(app::Application *app, app::settingsInterface::DndSettings *dndSettings)
+    DoNotDisturbWindow::DoNotDisturbWindow(app::ApplicationCommon *app,
+                                           app::settingsInterface::DndSettings *dndSettings)
         : BaseSettingsWindow(app, gui::window::name::do_not_disturb), dndSettings(dndSettings)
     {
         buildInterface();

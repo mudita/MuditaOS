@@ -11,7 +11,7 @@
 namespace gui
 {
 
-    BluetoothWindow::BluetoothWindow(app::Application *app) : BaseSettingsWindow(app, window::name::bluetooth)
+    BluetoothWindow::BluetoothWindow(app::ApplicationCommon *app) : BaseSettingsWindow(app, window::name::bluetooth)
     {
         bluetoothSettingsModel = std::make_unique<BluetoothSettingsModel>(application);
         bluetoothSettingsModel->requestStatus();

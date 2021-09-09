@@ -6,7 +6,7 @@
 #include <application-settings/windows/WindowNames.hpp>
 #include <status-bar/Style.hpp>
 
-std::list<gui::Option> advancedOptions(app::Application *app)
+std::list<gui::Option> advancedOptions(app::ApplicationCommon *app)
 {
     std::list<gui::Option> l;
 

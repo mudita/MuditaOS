@@ -3,11 +3,12 @@
 
 #include "ColorTestListView.hpp"
 
+#include <ApplicationCommon.hpp>
 #include <InputEvent.hpp>
 
 namespace gui
 {
-    ColorTestListView::ColorTestListView(app::Application *application,
+    ColorTestListView::ColorTestListView(app::ApplicationCommon *application,
                                          Item *parent,
                                          uint32_t x,
                                          uint32_t y,

@@ -2,13 +2,15 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PowerOffWindow.hpp"
+#include "Popups.hpp"
 
 #include <log.hpp>
 #include <messages/DialogMetadataMessage.hpp>
+#include <i18n/i18n.hpp>
 
 namespace gui
 {
-    PowerOffWindow::PowerOffWindow(app::Application *app, std::unique_ptr<PowerOffPresenter> &&presenter)
+    PowerOffWindow::PowerOffWindow(app::ApplicationCommon *app, std::unique_ptr<PowerOffPresenter> &&presenter)
         : DialogYesNo(app, popup::window::power_off_window), presenter(std::move(presenter))
     {}
 

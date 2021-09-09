@@ -59,7 +59,7 @@ namespace gui
         [[nodiscard]] auto getState() const noexcept -> app::call::State;
 
       public:
-        CallWindow(app::Application *app,
+        CallWindow(app::ApplicationCommon *app,
                    app::CallWindowInterface *interface,
                    std::string windowName = app::window::name_call);
 

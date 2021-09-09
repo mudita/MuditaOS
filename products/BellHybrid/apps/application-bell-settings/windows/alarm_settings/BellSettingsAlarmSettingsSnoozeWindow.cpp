@@ -7,7 +7,7 @@
 #include "models/alarm_settings/SnoozeListItemProvider.hpp"
 #include "presenter/alarm_settings/SnoozePresenter.hpp"
 
-#include <apps-common/Application.hpp>
+#include <apps-common/ApplicationCommon.hpp>
 #include <common/BellFinishedWindow.hpp>
 #include <gui/input/InputEvent.hpp>
 #include <widgets/SideListView.hpp>
@@ -16,7 +16,7 @@ namespace gui
 {
 
     BellSettingsAlarmSettingsSnoozeWindow::BellSettingsAlarmSettingsSnoozeWindow(
-        app::Application *app, std::unique_ptr<app::bell_settings::SnoozePresenter> presenter)
+        app::ApplicationCommon *app, std::unique_ptr<app::bell_settings::SnoozePresenter> presenter)
         : AppWindow(app, name), presenter{std::move(presenter)}
     {
         this->presenter->attach(this);

@@ -11,7 +11,7 @@
 namespace gui
 {
 
-    InformationWindow::InformationWindow(app::Application *app) : AppWindow(app, gui::window::name::information)
+    InformationWindow::InformationWindow(app::ApplicationCommon *app) : AppWindow(app, gui::window::name::information)
     {
         buildInterface();
     }

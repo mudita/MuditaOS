@@ -1,14 +1,15 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <common/popups/AlarmActivatedWindow.hpp>
 
 #include <apps-common/messages/DialogMetadataMessage.hpp>
 #include <common/TimeUtils.hpp>
+#include <common/popups/AlarmActivatedWindow.hpp>
+#include <popups/Popups.hpp>
 
 namespace gui
 {
-    AlarmActivatedWindow::AlarmActivatedWindow(app::Application *app)
+    AlarmActivatedWindow::AlarmActivatedWindow(app::ApplicationCommon *app)
         : Dialog(app, popup::window::alarm_activated_window)
     {}
 

@@ -19,7 +19,7 @@ namespace gui
         void setVisibleState() override;
 
       public:
-        SimLockInputWindow(app::Application *app, const std::string &window_name);
+        SimLockInputWindow(app::ApplicationCommon *app, const std::string &window_name);
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         bool onInput(const InputEvent &inputEvent) override;
 
