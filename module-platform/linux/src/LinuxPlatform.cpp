@@ -8,7 +8,8 @@
 #include <bsp/bsp.hpp>
 #include <iosyscalls.hpp>
 #include <purefs/vfs_subsystem.hpp>
-
+#include <purefs/filesystem_paths.hpp>
+#include <filesystem>
 #include <exception>
 
 using platform::linux::BlockDeviceFactory;
@@ -29,6 +30,7 @@ LinuxPlatform::~LinuxPlatform()
 void LinuxPlatform::init()
 {
     initFilesystem();
+    ::platform::Platform::initDiagnosticFolders();
 }
 
 void LinuxPlatform::initFilesystem()

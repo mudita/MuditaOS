@@ -7,6 +7,9 @@
 #include "LockGuard.hpp"
 #include <Logger.hpp>
 #include <module-utils/Utils.hpp>
+#include <portmacro.h>
+#include <ticks.hpp>
+#include <purefs/filesystem_paths.hpp>
 #include "macros.h"
 
 namespace Log
