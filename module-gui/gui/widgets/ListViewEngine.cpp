@@ -21,8 +21,7 @@ namespace gui
     void ListViewEngine::setElementsCount(unsigned int count)
     {
         if (elementsCount != count || elementsCount == 0) {
-            elementsCount = count;
-            onElementsCountChanged();
+            onElementsCountChanged(count);
         }
     }
 
@@ -201,6 +200,7 @@ namespace gui
         }
 
         clear();
+        checkEmptyListCallbacks();
 
         addItemsOnPage();
 
@@ -401,19 +401,31 @@ namespace gui
         }
     }
 
-    void ListViewEngine::onElementsCountChanged()
+    void ListViewEngine::onElementsCountChanged(unsigned int count)
     {
-        if (isEmpty()) {
-            if (emptyListCallback) {
-                emptyListCallback();
-            }
+        if (elementsCount == 0 || count == 0) {
+            shouldCallEmptyListCallbacks = true;
         }
-        else if (notEmptyListCallback) {
-            notEmptyListCallback();
-        }
+
+        elementsCount = count;
 
         if (checkFullRenderRequirementCallback) {
             checkFullRenderRequirementCallback();
+        }
+    }
+
+    void ListViewEngine::checkEmptyListCallbacks()
+    {
+        if (shouldCallEmptyListCallbacks) {
+            if (isEmpty()) {
+                if (emptyListCallback) {
+                    emptyListCallback();
+                }
+            }
+            else if (notEmptyListCallback) {
+                notEmptyListCallback();
+            }
+            shouldCallEmptyListCallbacks = false;
         }
     }
 

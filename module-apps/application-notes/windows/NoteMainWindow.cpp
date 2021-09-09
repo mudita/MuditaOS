@@ -98,6 +98,7 @@ namespace app::notes
         bottomBar->setActive(gui::BottomBar::Side::CENTER, false);
         emptyListIcon->setVisible(true);
         header->navigationIndicatorRemove(gui::header::BoxSelection::Right);
+        application->refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
     }
 
     void NoteMainWindow::onListFilled()
@@ -106,6 +107,7 @@ namespace app::notes
         bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
         emptyListIcon->setVisible(false);
         header->navigationIndicatorAdd(new gui::header::SearchAction(), gui::header::BoxSelection::Right);
+        application->refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
     }
 
     bool NoteMainWindow::onInput(const gui::InputEvent &inputEvent)
