@@ -4,10 +4,10 @@
 #include "application-bell-settings/ApplicationBellSettings.hpp"
 #include "BellSettingsStyle.hpp"
 #include "BellSettingsFrontlight.hpp"
-#include "data/FinishedWindowMessageData.hpp"
 
 #include <gui/input/InputEvent.hpp>
 #include <apps-common/options/OptionStyle.hpp>
+#include <common/BellFinishedWindow.hpp>
 #include <widgets/SideListView.hpp>
 #include <widgets/BellBaseLayout.hpp>
 
@@ -68,9 +68,11 @@ namespace gui
         if (inputEvent.isShortRelease(KeyCode::KEY_ENTER)) {
             presenter->saveData();
 
-            auto finishedMessageData = std::make_unique<FinishedWindowMessageData>(
-                utils::translate("app_bell_settings_frontlight_finished_message"));
-            application->switchWindow(window::name::bellSettingsFinished, std::move(finishedMessageData));
+            application->switchWindow(BellFinishedWindow::name,
+                                      BellFinishedWindow::Data::Factory::create(
+                                          "circle_success",
+                                          utils::translate("app_bell_settings_frontlight_finished_message"),
+                                          window::name::bellSettingsAdvanced));
             return true;
         }
 

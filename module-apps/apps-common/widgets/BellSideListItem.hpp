@@ -13,6 +13,7 @@ namespace style::bell_sidelist_item
 
 namespace gui
 {
+
     class BellSideListItem : public ListItemWithDescription
     {
       public:

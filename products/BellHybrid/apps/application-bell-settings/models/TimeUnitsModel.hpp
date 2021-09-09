@@ -34,7 +34,7 @@ namespace app::bell_settings
 
         auto createData() -> void;
 
-        auto requestRecords(uint32_t offset, uint32_t limit) -> void;
+        auto requestRecords(uint32_t offset, uint32_t limit) -> void override;
 
         [[nodiscard]] auto getItem(gui::Order order) -> gui::ListItem * override;
 
