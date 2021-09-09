@@ -24,6 +24,8 @@ function(add_image)
         set(BIN_FILE_PATH "")
     endif()
 
+    set(VERSION_FILE_PATH ${CMAKE_BINARY_DIR}/${_ARG_PRODUCT}-version.json)
+
     if(HAS_UPDATER)
         set(UPDATER_FILE_PATH ${CMAKE_BINARY_DIR}/updater.bin)
     else()
@@ -50,6 +52,7 @@ function(add_image)
             ${SCRIPT_PATH}
             ${DISK_IMAGE_NAME}
             ${CMAKE_BINARY_DIR}/${_ARG_SYSROOT}
+            "${VERSION_FILE_PATH}"
             "${BIN_FILE_PATH}"
             "${UPDATER_FILE_PATH}"
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
