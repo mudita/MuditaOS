@@ -59,7 +59,7 @@ namespace app
         if (!alarmEventPtr) {
             return;
         }
-        alarmEventPtr->startDate = Clock::from_time_t(time);
+        alarmEventPtr->startDate = TimePointFloorMinutes(Clock::from_time_t(time));
 
         updateAlarm(*alarmEventPtr);
     }
