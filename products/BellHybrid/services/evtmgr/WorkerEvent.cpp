@@ -45,10 +45,24 @@ namespace bell
         bsp::rotary_encoder::deinit();
     }
 
+    void WorkerEvent::processRotaryAsShortRelease(bsp::KeyCodes code)
+    {
+        processKeyEvent(bsp::KeyEvents::Pressed, code);
+        processKeyEvent(bsp::KeyEvents::Released, code);
+    }
+
     void WorkerEvent::handleRotaryEncoderEvent()
     {
         if (const auto &key = bsp::rotary_encoder::WorkerEventHandler(); key.has_value()) {
-            LOG_DEBUG("Rotary encoder handler %i", int(key.value()));
+            if (key.value() == bsp::rotary_encoder::type::forward) {
+                processRotaryAsShortRelease(bsp::KeyCodes::JoystickUp);
+            }
+            else if (key.value() == bsp::rotary_encoder::type::backward) {
+                processRotaryAsShortRelease(bsp::KeyCodes::JoystickDown);
+            }
+            else {
+                LOG_ERROR("Unknown rotary event");
+            }
         }
     }
 } // namespace bell
