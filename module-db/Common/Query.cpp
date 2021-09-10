@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <memory>
 #include <utility>
+#include <log/log.hpp>
 
 using namespace db;
 
@@ -21,12 +22,12 @@ bool QueryCallback::handleQueryResponse(QueryResult *response)
     return callback(response);
 }
 
-EndpointListener::EndpointListener(EndpointQueryCallbackFunction &&_callback, parserFSM::Context &_context)
+EndpointListener::EndpointListener(EndpointQueryCallbackFunction &&_callback, Context &_context)
     : callback{std::move(_callback)}, context(_context)
 {}
 
 EndpointListenerWithPages::EndpointListenerWithPages(EndpointQueryCallbackFunctionWithPages &&_callback,
-                                                     const parserFSM::PagedContext &_context)
+                                                     const PagedContext &_context)
     : callback{std::move(_callback)}, context(_context)
 {}
 

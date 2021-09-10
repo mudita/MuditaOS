@@ -8,7 +8,7 @@
 #include <memory>
 #include <Item.hpp>
 #include <time/ScopedTime.hpp>
-#include <service-desktop/endpoints/developerMode/event/DomRequest.hpp>
+#include <endpoints/developerMode/event/DomRequest.hpp>
 
 namespace app
 {

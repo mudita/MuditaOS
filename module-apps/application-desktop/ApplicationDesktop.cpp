@@ -20,7 +20,7 @@
 #include <messages/DialogMetadataMessage.hpp>
 #include <MessageType.hpp>
 #include <module-gui/gui/widgets/status-bar/SIM.hpp>
-#include <module-services/service-desktop/service-desktop/Constants.hpp>
+#include <service-desktop/Constants.hpp>
 #include <popups/presenter/PowerOffPresenter.hpp>
 #include <popups/TetheringOffPopup.hpp>
 #include <service-appmgr/Controller.hpp>

@@ -3,13 +3,14 @@
 
 #include <endpoints/Endpoint.hpp>
 #include <endpoints/EndpointFactory.hpp>
+#include <endpoints/nullEndpoint/NullEndpoint.hpp>
+#include <endpoints/JsonKeyNames.hpp>
 #include <endpoints/contacts/ContactHelper.hpp>
 #include <endpoints/contacts/ContactsEndpoint.hpp>
 #include <endpoints/messages/MessageHelper.hpp>
 #include <endpoints/filesystem/FileContext.hpp>
 #include <endpoints/filesystem/FileOperations.hpp>
-#include <parser/ParserFSM.hpp>
-#include <parser/ParserUtils.hpp>
+#include <ParserFSM.hpp>
 
 #include <Common/Common.hpp>
 #include <ContactRecord.hpp>
@@ -25,14 +26,14 @@
 #include <string>
 #include <vector>
 
-using namespace parserFSM;
+using namespace sdesktop::endpoints;
 
 TEST_CASE("Parser Test")
 {
     StateMachine parser(nullptr);
 
     auto factory = std::make_unique<SecuredEndpointFactory>(EndpointSecurity::Allow);
-    auto handler = std::make_unique<parserFSM::MessageHandler>(nullptr, std::move(factory));
+    auto handler = std::make_unique<MessageHandler>(nullptr, std::move(factory));
     parser.setMessageHandler(std::move(handler));
 
     SECTION("Parse message with divided header and payload")
@@ -47,14 +48,14 @@ TEST_CASE("Parser Test")
 
         testMessage = R"(int":1, "method":1, "body":{"test":"test"}})";
         parser.processMessage(std::move(testMessage));
-        REQUIRE(parser.getCurrentState() == State::ReceivedPayload);
+        REQUIRE(parser.getCurrentState() == State::NoMsg);
     }
 
     SECTION("Parse whole message")
     {
         std::string testMessage = R"(#000000050{"endpoint":1, "method":1, "body":{"test":"test"}})";
         parser.processMessage(std::move(testMessage));
-        REQUIRE(parser.getCurrentState() == State::ReceivedPayload);
+        REQUIRE(parser.getCurrentState() == State::NoMsg);
     }
 
     SECTION("Parse message with start char detached from mesage")
@@ -70,7 +71,7 @@ TEST_CASE("Parser Test")
 
         testMessage = R"(dpoint":1, "method":1, "body":{"test":"test"}})";
         parser.processMessage(std::move(testMessage));
-        REQUIRE(parser.getCurrentState() == State::ReceivedPayload);
+        REQUIRE(parser.getCurrentState() == State::NoMsg);
     }
 
     SECTION("Parse message with beginning of another one")
@@ -81,7 +82,7 @@ TEST_CASE("Parser Test")
 
         testMessage = R"(point":1, "method":1, "body":{"test":"test"}})";
         parser.processMessage(std::move(testMessage));
-        REQUIRE(parser.getCurrentState() == State::ReceivedPayload);
+        REQUIRE(parser.getCurrentState() == State::NoMsg);
     }
     SECTION("Parse junk message")
     {
@@ -115,6 +116,16 @@ TEST_CASE("Parser Test")
 TEST_CASE("DB Helpers test - json decoding")
 {
     std::string err;
+    Database::initialize();
+    const auto contactsPath = (std::filesystem::path{"sys/user"} / "contacts.db");
+
+    if (std::filesystem::exists(contactsPath)) {
+        REQUIRE(std::filesystem::remove(contactsPath));
+    }
+
+    ContactsDB contactsDb(contactsPath.c_str());
+
+    REQUIRE(contactsDb.isInitialized());
 
     SECTION("correct json")
     {
@@ -136,7 +147,7 @@ TEST_CASE("DB Helpers test - json decoding")
     SECTION("incorrect json")
     {
         std::string recordPayload =
-            R"({"adress": "6 Czeczota St.\n02600 Warsaw", "altName": "Cic", "blocked": "true", "favourite": true, "numbers": "724842187", "priName": "Baatek"})";
+            R"({"adress": "6 Czeczota St.\n02600 Warsaw", "altName": "Cic", "blocked": true, "favourite": true, "numbers": "724842187", "priName": "Baatek"})";
         auto contactJson = json11::Json::parse(recordPayload, err);
         REQUIRE(err.empty());
 
@@ -227,11 +238,11 @@ TEST_CASE("Context class test")
         REQUIRE(context.getMethod() == http::Method::get);
         REQUIRE(context.getUuid() == 12345);
         REQUIRE(context.getEndpoint() == EndpointType::contacts);
-        REQUIRE(context.createSimpleResponse() == R"(#000000045{"endpoint": 7, "status": 200, "uuid": 12345})");
+        REQUIRE(context.createSimpleResponse().dump() == R"({"endpoint": 7, "status": 200, "uuid": 12345})");
 
         context.setResponseBody(context.getBody());
-        REQUIRE(context.createSimpleResponse() ==
-                R"(#000000071{"body": {"test": "test"}, "endpoint": 7, "status": 200, "uuid": 12345})");
+        REQUIRE(context.createSimpleResponse().dump() ==
+                R"({"body": {"test": "test"}, "endpoint": 7, "status": 200, "uuid": 12345})");
     }
     SECTION("Invalid message")
     {
@@ -273,7 +284,8 @@ TEST_CASE("Endpoint Factory test")
         Context context(msgJson);
         auto factory = std::make_unique<EndpointFactory>();
         auto handler = factory->create(context, nullptr);
-        REQUIRE(handler == nullptr);
+        REQUIRE(handler != nullptr);
+        REQUIRE(typeid(*handler.get()) == typeid(NullEndpoint));
     }
 }
 
@@ -312,18 +324,18 @@ TEST_CASE("FileOperations UT Test Get File")
 
     SECTION("Create receive id for file")
     {
-        auto filePath{"/sys/user/music/SMS-drum2-stereo.mp3"};
+        auto filePath{"/sys/user/music/Nick_Lewis_-_Bring_The_Light.mp3"};
 
         auto [rxID, fileSize] = fileOps.createReceiveIDForFile(filePath);
 
         REQUIRE(rxID == 1);
-        REQUIRE(fileSize == 49146);
+        REQUIRE(fileSize == 5431340);
     }
 }
 
 TEST_CASE("FileContext UT Test Valid Input")
 {
-    auto filePath{"/sys/user/MuditaOS.log"};
+    auto filePath{"/sys/user/data/applications/settings/quotes.json"};
     auto fileSize{1536u};
     auto fileOffset{128 * 6u};
     auto chunkSize{128 * 3u};
@@ -346,7 +358,7 @@ TEST_CASE("FileContext UT Test Valid Input")
 
 TEST_CASE("FileContext UT Test Invalid Input")
 {
-    auto filePath{"/sys/user/music/SMS-drum2-stereo.mp3"};
+    auto filePath{"/sys/user/music/Nick_Lewis_-_Bring_The_Light.mp3"};
 
     SECTION("Create file context for file with invalid file size")
     {
@@ -358,7 +370,7 @@ TEST_CASE("FileContext UT Test Invalid Input")
 
     SECTION("Create file context for file with invalid chunk size")
     {
-        auto fileSize{49146u};
+        auto fileSize{5431340u};
         auto chunkSize{0u};
 
         REQUIRE_THROWS_WITH(FileReadContext(filePath, fileSize, chunkSize), "Invalid FileContext arguments");
@@ -371,36 +383,12 @@ TEST_CASE("FileOperations UT Test Send File")
 
     SECTION("Create receive id for file")
     {
-        auto filePath{"/sys/user/music/SMS-drum2-stereo.mp3"};
-        auto fileSize{49146};
-        auto fileCrc32{"efd73581"};
+        auto filePath{"/sys/user/destination_file"};
+        auto fileSize{5431340u};
+        auto fileCrc32{"4a36d291"};
 
         auto txID = fileOps.createTransmitIDForFile(filePath, fileSize, fileCrc32);
 
-        REQUIRE(txID == 1);
+        REQUIRE(txID != 0);
     }
 }
-
-TEST_CASE("FileContext UT Test Valid Input")
-{
-    auto filePath{"/sys/user/MuditaOS.log"};
-    auto fileSize{1536u};
-    auto fileOffset{128 * 6u};
-    auto chunkSize{128 * 3u};
-
-    SECTION("Create file context for file")
-    {
-        auto fileCtx = FileReadContext(filePath, fileSize, chunkSize, fileOffset);
-
-        REQUIRE(3 == fileCtx.expectedChunkInFile());
-
-        REQUIRE(true == fileCtx.validateChunkRequest(3));
-        REQUIRE(false == fileCtx.validateChunkRequest(4));
-
-        REQUIRE(4 == fileCtx.totalChunksInFile());
-
-        fileCtx.advanceFileOffset(fileSize - fileOffset);
-        REQUIRE(true == fileCtx.reachedEOF());
-    }
-}
-

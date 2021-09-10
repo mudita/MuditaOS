@@ -3,11 +3,10 @@
 
 #include "service-desktop/ServiceDesktop.hpp"
 #include "service-desktop/WorkerDesktop.hpp"
-#include "service-desktop/endpoints/EndpointFactory.hpp"
-#include "service-desktop/DesktopMessages.hpp"
-#include "parser/MessageHandler.hpp"
-#include "parser/ParserFSM.hpp"
-#include "endpoints/Context.hpp"
+#include <endpoints/EndpointFactory.hpp>
+#include <service-desktop/DesktopMessages.hpp>
+#include <endpoints/message/Sender.hpp>
+#include <MessageHandler.hpp>
 #include "Timers/TimerFactory.hpp"
 
 #include <bsp/usb/usb.hpp>
@@ -17,7 +16,7 @@
 #include <map>
 #include <vector>
 #include <filesystem>
-#include <module-services/service-desktop/service-desktop/DesktopMessages.hpp>
+#include <service-desktop/DesktopMessages.hpp>
 #include "SystemManager/messages/SentinelRegistrationMessage.hpp"
 
 inline constexpr auto uploadFailedMessage = "file upload terminated before all data transferred";
@@ -39,7 +38,7 @@ bool WorkerDesktop::init(std::list<sys::WorkerQueueInfo> queues)
 
     irqQueue     = Worker::getQueueHandleByName(sdesktop::IRQ_QUEUE_BUFFER_NAME);
     receiveQueue = Worker::getQueueHandleByName(sdesktop::RECEIVE_QUEUE_BUFFER_NAME);
-    parserFSM::MessageHandler::setSendQueueHandle(Worker::getQueueHandleByName(sdesktop::SEND_QUEUE_BUFFER_NAME));
+    sdesktop::endpoints::sender::setSendQueueHandle(Worker::getQueueHandleByName(sdesktop::SEND_QUEUE_BUFFER_NAME));
 
     cpuSentinel                  = std::make_shared<sys::CpuSentinel>("WorkerDesktop", ownerService);
     auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuSentinel);
@@ -62,7 +61,7 @@ bool WorkerDesktop::deinit(void)
     }
 
     unsigned int maxcount = 10;
-    while (parser.getCurrentState() != parserFSM::State::NoMsg && --maxcount > 0) {
+    while (parser.getCurrentState() != sdesktop::endpoints::State::NoMsg && --maxcount > 0) {
         vTaskDelay(300);
     }
     LOG_INFO("we can deinit worker now");
@@ -102,8 +101,9 @@ bool WorkerDesktop::handleMessage(uint32_t queueID)
             return false;
         }
 
+        using namespace sdesktop::endpoints;
         auto factory = std::make_unique<SecuredEndpointFactory>(securityModel.getEndpointSecurity());
-        auto handler = std::make_unique<parserFSM::MessageHandler>(ownerService, std::move(factory));
+        auto handler = std::make_unique<MessageHandler>(ownerService, std::move(factory));
 
         parser.setMessageHandler(std::move(handler));
         parser.processMessage(std::move(*receivedMsg));

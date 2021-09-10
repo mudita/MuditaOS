@@ -1,10 +1,9 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "BaseHelper.hpp"
-#include <Context.hpp>
+#include <endpoints/BaseHelper.hpp>
 
-namespace parserFSM
+namespace sdesktop::endpoints
 {
 
     auto ret() -> BaseHelper::ProcessResult
@@ -48,4 +47,5 @@ namespace parserFSM
         postProcess(method, context);
         return {sent::no, std::nullopt};
     }
-} // namespace parserFSM
+
+} // namespace sdesktop::endpoints

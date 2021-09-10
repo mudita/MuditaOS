@@ -1,9 +1,9 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "BluetoothMessagesHandler.hpp"
-#include "BluetoothEventMessages.hpp"
-#include "BluetoothHelper.hpp"
+#include <endpoints/bluetooth/BluetoothMessagesHandler.hpp>
+#include <endpoints/bluetooth/BluetoothEventMessages.hpp>
+#include <endpoints/bluetooth/BluetoothHelper.hpp>
 #include <service-desktop/ServiceDesktop.hpp>
 #include <service-desktop/DeveloperModeMessage.hpp>
 #include <btstack_util.h>
@@ -21,7 +21,7 @@ namespace sdesktop::bluetooth
 
 } // namespace sdesktop::bluetooth
 using namespace sdesktop::bluetooth;
-namespace btConstants = parserFSM::json::bluetooth;
+namespace btConstants = sdesktop::endpoints::json::bluetooth;
 
 namespace
 {
