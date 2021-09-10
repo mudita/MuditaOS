@@ -10,7 +10,8 @@ namespace gui
     class Spinner : public TextFixedSize
     {
       public:
-        Spinner(int minValue, int maxValue, int step, Boundaries boundaries);
+        using OnUpdateCallback = std::function<void(int _currentValue)>;
+        Spinner(int minValue, int maxValue, int step, Boundaries boundaries, OnUpdateCallback cb = nullptr);
 
         void setCurrentValue(int newCurrent);
         void setFixedFieldWidth(unsigned char newFixedFieldWidth);
@@ -40,5 +41,7 @@ namespace gui
         ///< value of 0 means no fixed width.
         RectangleEdge focusEdges = RectangleEdge::Bottom;
         void updateSpinner();
+
+        OnUpdateCallback onUpdate{nullptr};
     };
 } // namespace gui
