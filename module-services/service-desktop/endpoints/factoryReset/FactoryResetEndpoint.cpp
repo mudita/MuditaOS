@@ -1,10 +1,10 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "FactoryResetEndpoint.hpp"
+#include <endpoints/factoryReset/FactoryResetEndpoint.hpp>
 
-#include <endpoints/Context.hpp>
-#include <parser/MessageHandler.hpp>
+#include <endpoints/JsonKeyNames.hpp>
+#include <endpoints/message/Sender.hpp>
 #include <service-desktop/DesktopMessages.hpp>
 #include <service-desktop/ServiceDesktop.hpp>
 
@@ -12,29 +12,34 @@
 
 #include <memory>
 
-auto FactoryResetEndpoint::handle(parserFSM::Context &context) -> void
+namespace sdesktop::endpoints
 {
-    if (context.getMethod() == parserFSM::http::Method::post) {
 
-        if (context.getBody()[parserFSM::json::factoryRequest] == true) {
-            auto msg = std::make_shared<sdesktop::FactoryMessage>();
-            ownerServicePtr->bus.sendUnicast(msg, service::name::service_desktop);
+    auto FactoryResetEndpoint::handle(Context &context) -> void
+    {
+        if (context.getMethod() == http::Method::post) {
 
-            context.setResponseBody(json11::Json::object({{parserFSM::json::factoryRequest, true}}));
+            if (context.getBody()[json::factoryRequest] == true) {
+                auto msg = std::make_shared<sdesktop::FactoryMessage>();
+                ownerServicePtr->bus.sendUnicast(msg, service::name::service_desktop);
+
+                context.setResponseBody(json11::Json::object({{json::factoryRequest, true}}));
+            }
+            else {
+                context.setResponseBody(json11::Json::object({{json::factoryRequest, false}}));
+            }
+
+            sender::putToSendQueue(context.createSimpleResponse());
+
+            return;
         }
         else {
-            context.setResponseBody(json11::Json::object({{parserFSM::json::factoryRequest, false}}));
+            context.setResponseBody(json11::Json::object({{json::factoryRequest, false}}));
+
+            sender::putToSendQueue(context.createSimpleResponse());
+
+            return;
         }
-
-        parserFSM::MessageHandler::putToSendQueue(context.createSimpleResponse());
-
-        return;
     }
-    else {
-        context.setResponseBody(json11::Json::object({{parserFSM::json::factoryRequest, false}}));
 
-        parserFSM::MessageHandler::putToSendQueue(context.createSimpleResponse());
-
-        return;
-    }
-}
+} // namespace sdesktop::endpoints

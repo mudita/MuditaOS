@@ -29,9 +29,9 @@
 #include <log.hpp>
 #include <bits/exception.h>
 #include <utility>
-#include <service-desktop/service-desktop/DesktopMessages.hpp>
-#include <service-desktop/endpoints/bluetooth/BluetoothEventMessages.hpp>
-#include <service-desktop/endpoints/bluetooth/BluetoothHelper.hpp>
+#include <service-desktop/DesktopMessages.hpp>
+#include <endpoints/bluetooth/BluetoothEventMessages.hpp>
+#include <endpoints/bluetooth/BluetoothHelper.hpp>
 #include <service-audio/AudioServiceAPI.hpp>
 #include <BtCommand.hpp>
 #include <BtKeysStorage.hpp>

@@ -32,6 +32,7 @@
 #include <module-db/Databases/MultimediaFilesDB.hpp>
 #include <module-db/Interface/AlarmEventRecord.hpp>
 #include <module-db/Interface/CountryCodeRecord.hpp>
+#include <module-db/Interface/NotesRecord.hpp>
 #include <module-db/Interface/NotificationsRecord.hpp>
 #include <module-db/Interface/MultimediaFilesRecord.hpp>
 

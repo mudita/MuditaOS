@@ -1,0 +1,102 @@
+option(ENABLE_DEVELOPER_MODE_ENDPOINT "Enable developer mode endpoint in service desktop" ${ENABLE_DEVELOPER_MODE_ENDPOINT_DEFAULT})
+
+add_library(desktop-endpoints STATIC)
+
+target_sources(
+        desktop-endpoints
+    PRIVATE
+        BaseHelper.cpp
+        HttpEnums.cpp
+        EndpointFactory.cpp
+        backup/BackupEndpoint.cpp
+        backup/BackupRestore.cpp
+        bluetooth/BluetoothEndpoint.cpp
+        bluetooth/BluetoothEventMessages.cpp
+        bluetooth/BluetoothHelper.cpp
+        bluetooth/BluetoothMessagesHandler.cpp
+        calllog/CalllogEndpoint.cpp
+        calllog/CalllogHelper.cpp
+        contacts/ContactHelper.cpp
+        contacts/ContactsEndpoint.cpp
+        developerMode/DeveloperModeEndpoint.cpp
+        developerMode/DeveloperModeHelper.cpp
+        developerMode/Mode/UI_Helper.cpp
+        developerMode/event/ATRequest.cpp
+        developerMode/event/DomRequest.cpp
+        developerMode/fs/FS_Helper.cpp
+        deviceInfo/DeviceInfoEndpoint.cpp
+        factoryReset/FactoryResetEndpoint.cpp
+        filesystem/FileContext.cpp
+        filesystem/FileOperations.cpp
+        filesystem/FilesystemEndpoint.cpp
+        messages/MessageHelper.cpp
+        messages/MessagesEndpoint.cpp
+        nullEndpoint/NullEndpoint.cpp
+        restore/RestoreEndpoint.cpp
+        security/SecurityEndpoint.cpp
+        security/SecurityEndpointHelper.cpp
+        update/UpdateEndpoint.cpp
+        update/UpdateHelper.cpp
+    PUBLIC
+        include/endpoints/BaseHelper.hpp
+        include/endpoints/Context.hpp
+        include/endpoints/DBHelper.hpp
+        include/endpoints/Endpoint.hpp
+        include/endpoints/EndpointFactory.hpp
+        include/endpoints/EndpointType.hpp
+        include/endpoints/HttpEnums.hpp
+        include/endpoints/JsonKeyNames.hpp
+        include/endpoints/ResponseContext.hpp
+        include/endpoints/backup/BackupEndpoint.hpp
+        include/endpoints/backup/BackupRestore.hpp
+        include/endpoints/bluetooth/BluetoothEndpoint.hpp
+        include/endpoints/bluetooth/BluetoothEventMessages.hpp
+        include/endpoints/bluetooth/BluetoothHelper.hpp
+        include/endpoints/bluetooth/BluetoothMessagesHandler.hpp
+        include/endpoints/calllog/CalllogEndpoint.hpp
+        include/endpoints/calllog/CalllogHelper.hpp
+        include/endpoints/contacts/ContactHelper.hpp
+        include/endpoints/contacts/ContactsEndpoint.hpp
+        include/endpoints/developerMode/DeveloperModeEndpoint.hpp
+        include/endpoints/developerMode/DeveloperModeHelper.hpp
+        include/endpoints/developerMode/Mode/UI_Helper.hpp
+        include/endpoints/developerMode/event/ATRequest.hpp
+        include/endpoints/developerMode/event/DomRequest.hpp
+        include/endpoints/developerMode/fs/FS_Helper.hpp
+        include/endpoints/deviceInfo/DeviceInfoEndpoint.hpp
+        include/endpoints/factoryReset/FactoryResetEndpoint.hpp
+        include/endpoints/filesystem/FileContext.hpp
+        include/endpoints/filesystem/FileOperations.hpp
+        include/endpoints/filesystem/FilesystemEndpoint.hpp
+        include/endpoints/messages/MessageHelper.hpp
+        include/endpoints/messages/MessagesEndpoint.hpp
+        include/endpoints/nullEndpoint/NullEndpoint.hpp
+        include/endpoints/restore/RestoreEndpoint.hpp
+        include/endpoints/security/SecurityEndpoint.hpp
+        include/endpoints/security/SecurityEndpointHelper.hpp
+        include/endpoints/update/UpdateEndpoint.hpp
+        include/endpoints/update/UpdateHelper.hpp
+)
+
+target_include_directories(
+        desktop-endpoints
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    PRIVATE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+)
+
+target_compile_definitions(
+        desktop-endpoints
+    PRIVATE
+        ENABLE_DEVELOPER_MODE_ENDPOINT=$<BOOL:${ENABLE_DEVELOPER_MODE_ENDPOINT}>
+)
+
+target_link_libraries(
+        desktop-endpoints
+    PUBLIC
+        endpoint-message-sender
+    PRIVATE
+        microtar
+        base64::base64
+)

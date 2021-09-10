@@ -4,8 +4,8 @@
 #include "RawATHandler.hpp"
 #include <modem/ATCommon.hpp>
 #include <module-sys/Service/Message.hpp>
-#include <service-desktop/endpoints/developerMode/DeveloperModeEndpoint.hpp>
-#include <service-desktop/endpoints/developerMode/event/ATRequest.hpp>
+#include <service-desktop/DeveloperModeMessage.hpp>
+#include <endpoints/developerMode/event/ATRequest.hpp>
 
 namespace cellular
 {

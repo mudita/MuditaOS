@@ -4,14 +4,17 @@
 #pragma once
 
 #include <functional>
-#include <module-services/service-desktop/endpoints/Context.hpp>
+#include <endpoints/Context.hpp>
 
 namespace db
 {
+    using sdesktop::endpoints::Context;
+    using sdesktop::endpoints::PagedContext;
+
     class QueryResult; // Forward declaration
     using QueryCallbackFunction         = std::function<bool(db::QueryResult *)>;
-    using EndpointQueryCallbackFunction = std::function<bool(db::QueryResult *, parserFSM::Context &)>;
-    using EndpointQueryCallbackFunctionWithPages = std::function<bool(db::QueryResult *, parserFSM::PagedContext &)>;
+    using EndpointQueryCallbackFunction          = std::function<bool(db::QueryResult *, Context &)>;
+    using EndpointQueryCallbackFunctionWithPages = std::function<bool(db::QueryResult *, PagedContext &)>;
     class QueryListener
     {
       public:
@@ -37,27 +40,26 @@ namespace db
     {
       public:
         EndpointListener() = default;
-        EndpointListener(EndpointQueryCallbackFunction &&_callback, parserFSM::Context &_context);
+        EndpointListener(EndpointQueryCallbackFunction &&_callback, Context &_context);
 
         bool handleQueryResponse(db::QueryResult *result) override;
 
       private:
         EndpointQueryCallbackFunction callback;
-        parserFSM::Context context;
+        Context context;
     };
 
     class EndpointListenerWithPages : public EndpointListener
     {
       public:
         EndpointListenerWithPages() = default;
-        EndpointListenerWithPages(EndpointQueryCallbackFunctionWithPages &&_callback,
-                                  const parserFSM::PagedContext &_context);
+        EndpointListenerWithPages(EndpointQueryCallbackFunctionWithPages &&_callback, const PagedContext &_context);
 
         bool handleQueryResponse(db::QueryResult *result) override;
 
       private:
         EndpointQueryCallbackFunctionWithPages callback;
-        parserFSM::PagedContext context;
+        PagedContext context;
     };
 
     /// virtual query input interface

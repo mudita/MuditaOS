@@ -4,20 +4,19 @@
 #pragma once
 
 #include "MessageHandler.hpp"
-#include "ParserUtils.hpp"
 
 #include <json11.hpp>
 
 #include <string>
 
-namespace parserFSM
+namespace sdesktop::endpoints
 {
+
     enum class State
     {
         NoMsg,
         ReceivedPartialHeader,
         ReceivedPartialPayload,
-        ReceivedPayload,
     };
 
     class StateMachine
@@ -30,7 +29,7 @@ namespace parserFSM
             return state;
         };
 
-        void setState(const parserFSM::State newState) noexcept
+        void setState(const State newState) noexcept
         {
             state = newState;
         }
@@ -39,7 +38,7 @@ namespace parserFSM
 
       private:
         std::string receivedMsg;
-        parserFSM::State state = State::NoMsg;
+        State state = State::NoMsg;
         std::string payload;
         std::string header;
         unsigned long payloadLength   = 0;
@@ -52,4 +51,5 @@ namespace parserFSM
         void parsePartialMessage();
         void parsePayload();
     };
-} // namespace parserFSM
+
+} // namespace sdesktop::endpoints
