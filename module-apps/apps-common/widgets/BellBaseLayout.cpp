@@ -85,4 +85,12 @@ namespace gui
         rightArrow->setVisible(true);
         rightArrow->setEdges(RectangleEdge::None);
     }
+
+    void BellBaseLayout::setArrowVisible(Arrow arrow, bool isVisible)
+    {
+        auto item = arrow == Arrow::Left ? leftArrow : rightArrow;
+        if (item != nullptr) {
+            item->setVisible(isVisible);
+        }
+    }
 } // namespace gui

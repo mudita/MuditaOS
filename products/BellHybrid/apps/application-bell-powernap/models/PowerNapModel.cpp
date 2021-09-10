@@ -58,5 +58,6 @@ namespace app::powernap
         powerNapItem = new gui::PowerNapListItem();
         internalData.push_back(powerNapItem);
         powerNapItem->deleteByList = false;
+        setValue(spinnerDefaultValue);
     }
 } // namespace app::powernap
