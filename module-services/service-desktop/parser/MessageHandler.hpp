@@ -5,29 +5,14 @@
 
 #include <Service/Service.hpp>
 #include <json11.hpp>
-#include <log.hpp>
 
-#include <string>
-
-namespace sys
+namespace sdesktop::endpoints
 {
-    class Service;
-} // namespace sys
 
-extern "C"
-{
-#include <FreeRTOS.h> // for xQueueHandle
-#include <queue.h>
-}
+    class EndpointFactory;
 
-class EndpointFactory;
-
-namespace parserFSM
-{
     class MessageHandler
     {
-        static xQueueHandle sendQueue;
-
         json11::Json messageJson;
         std::string JsonErrorMsg;
         sys::Service *OwnerServicePtr = nullptr;
@@ -50,10 +35,6 @@ namespace parserFSM
         };
         void parseMessage(const std::string &msg);
         void processMessage();
-        static void putToSendQueue(const std::string &msg);
-        static void setSendQueueHandle(xQueueHandle handle)
-        {
-            sendQueue = handle;
-        }
     };
-} // namespace parserFSM
+
+} // namespace sdesktop::endpoints

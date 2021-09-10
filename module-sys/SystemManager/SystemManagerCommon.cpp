@@ -17,7 +17,7 @@
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
 #include <service-evtmgr/EVMessages.hpp>
 #include <service-appmgr/messages/UserPowerDownRequest.hpp>
-#include <service-desktop/service-desktop/Constants.hpp>
+#include <service-desktop/Constants.hpp>
 #include <service-appmgr/Constants.hpp>
 #include <service-appmgr/Controller.hpp>
 #include "messages/CpuFrequencyMessage.hpp"

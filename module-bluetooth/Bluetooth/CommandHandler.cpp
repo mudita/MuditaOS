@@ -10,7 +10,7 @@
 
 #include "Device.hpp"
 
-#include <service-desktop/service-desktop/Constants.hpp>
+#include <service-desktop/Constants.hpp>
 #include <service-bluetooth/messages/ResponseVisibleDevices.hpp>
 #include "GAP/GAP.hpp"
 

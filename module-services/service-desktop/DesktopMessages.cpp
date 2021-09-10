@@ -4,10 +4,12 @@
 #include "service-desktop/DesktopMessages.hpp"
 #include "parser/MessageHandler.hpp"
 #include <module-bluetooth/Bluetooth/Device.hpp>
+#include <endpoints/developerMode/DeveloperModeEndpoint.hpp>
 
 namespace sdesktop
 {
-    using namespace parserFSM;
+    using namespace endpoints;
+
     namespace developerMode
     {
 
