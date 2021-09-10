@@ -29,21 +29,41 @@ namespace gui
         setEdges(RectangleEdge::None);
         setFocusItem(body);
 
-        spinner = new Spinner(spinnerMin, spinnerMax, spinnerStep, Boundaries::Fixed);
+        createSpinner();
+        createBottomDescription();
+        registerCallbacks();
+    }
+
+    void PowerNapListItem::createSpinner()
+    {
+        auto onUpdate = [this](int currentValue) {
+            const auto isMin = currentValue == spinnerMin;
+            const auto isMax = currentValue == spinnerMax;
+            body->setArrowVisible(BellBaseLayout::Arrow::Left, not isMin);
+            body->setArrowVisible(BellBaseLayout::Arrow::Right, not isMax);
+        };
+
+        spinner = new Spinner(spinnerMin, spinnerMax, spinnerStep, Boundaries::Fixed, std::move(onUpdate));
         spinner->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::h);
         spinner->setFont(powerNapStyle::napPeriodFont);
         spinner->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         spinner->setEdges(RectangleEdge::None);
         spinner->setFocusEdges(RectangleEdge::None);
         body->getCenterBox()->addWidget(spinner);
+    }
 
+    void PowerNapListItem::createBottomDescription()
+    {
         bottomDescription = new Label(body->lastBox);
         bottomDescription->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::outer_layouts_h);
         bottomDescription->setFont(powerNapStyle::descriptionFont);
         bottomDescription->setEdges(RectangleEdge::None);
         bottomDescription->activeItem = false;
         bottomDescription->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+    }
 
+    void PowerNapListItem::registerCallbacks()
+    {
         dimensionChangedCallback = [&](Item &, const BoundingBox &newDim) -> bool {
             body->setArea({0, 0, newDim.w, newDim.h});
             return true;

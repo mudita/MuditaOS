@@ -30,10 +30,18 @@ namespace gui
     class BellBaseLayout : public VThreeBox<VBox, VBox, VBox>
     {
       public:
+        enum class Arrow
+        {
+            Left,
+            Right
+        };
+
         explicit BellBaseLayout(
             Item *parent, Position x = 0, Position y = 0, Length w = 0, Length h = 0, bool withSideArrows = true);
 
         [[nodiscard]] Item *getCenterBox() const noexcept;
+
+        void setArrowVisible(Arrow arrow, bool isVisible);
 
       private:
         HThreeBox<HBox, HBox, HBox> *centerThreeBox{nullptr};
