@@ -38,6 +38,11 @@ namespace sdesktop::endpoints
         return dynamic_cast<ServiceDesktop *>(ownerServicePtr)->getSerialNumber();
     }
 
+    auto DeviceInfoEndpoint::getCaseColour() -> std::string
+    {
+        return static_cast<ServiceDesktop *>(ownerServicePtr)->getCaseColour();
+    }
+
     auto DeviceInfoEndpoint::getDeviceInfo(Context &context) -> bool
     {
         if (ownerServicePtr == nullptr) {
@@ -70,7 +75,8 @@ namespace sdesktop::endpoints
              {json::gitBranch, (std::string)GIT_BRANCH},
              {json::currentRTCTime, std::to_string(static_cast<uint32_t>(std::time(nullptr)))},
              {json::version, std::string(VERSION)},
-             {json::serialNumber, getSerialNumber()}}));
+             {json::serialNumber, getSerialNumber()},
+             {json::caseColour, getCaseColour()}}));
 
         sender::putToSendQueue(context.createSimpleResponse());
         return true;

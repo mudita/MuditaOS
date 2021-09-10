@@ -114,6 +114,7 @@ class ServiceDesktop : public sys::Service
     auto requestLogsFlush() -> void;
 
     auto getSerialNumber() const -> std::string;
+    auto getCaseColour() const -> std::string;
 
   private:
     std::unique_ptr<sdesktop::USBSecurityModel> usbSecurityModel;
