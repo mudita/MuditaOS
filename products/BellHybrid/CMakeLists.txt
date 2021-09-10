@@ -41,6 +41,7 @@ target_link_libraries(BellHybrid
         bell::app-main
         bell::app-settings
         bell::app-powernap
+        bell::app-meditation-timer
         appmgr
         db
         evtmgr

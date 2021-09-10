@@ -8,6 +8,7 @@
 #include <application-bell-main/ApplicationBellMain.hpp>
 #include <application-bell-settings/ApplicationBellSettings.hpp>
 #include <application-bell-powernap/ApplicationBellPowerNap.hpp>
+#include <application-bell-meditation-timer/ApplicationBellMeditationTimer.hpp>
 
 // modules
 #include <module-db/Databases/AlarmsDB.hpp>
@@ -103,6 +104,8 @@ int main()
             applications.push_back(app::CreateLauncher<app::ApplicationBellSettings>(app::applicationBellSettingsName));
             applications.push_back(app::CreateLauncher<app::ApplicationBellAlarm>(app::applicationBellAlarmName));
             applications.push_back(app::CreateLauncher<app::ApplicationBellPowerNap>(app::applicationBellPowerNapName));
+            applications.push_back(
+                app::CreateLauncher<app::ApplicationBellMeditationTimer>(app::applicationBellMeditationTimerName));
             // start application manager
             return sysmgr->RunSystemService(
                 std::make_shared<app::manager::ApplicationManager>(

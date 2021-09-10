@@ -7,6 +7,7 @@
 #include <application-bell-main/ApplicationBellMain.hpp>
 #include <application-bell-settings/ApplicationBellSettings.hpp>
 #include <application-bell-powernap/ApplicationBellPowerNap.hpp>
+#include <application-bell-meditation-timer/ApplicationBellMeditationTimer.hpp>
 #include <data/BellMainStyle.hpp>
 
 #include <Dialog.hpp>
@@ -80,7 +81,7 @@ namespace gui
         addAppMenu(utils::translate("app_bellmain_alarm"), app::applicationBellAlarmName);
         addAppMenu(utils::translate("app_bellmain_power_nap"), app::applicationBellPowerNapName);
         // for demo only - to be replaced by call o final window
-        addWinMenu(utils::translate("app_bellmain_meditation_timer"), gui::window::name::bell_main_menu_dialog);
+        addWinMenu(utils::translate("app_bellmain_meditation_timer"), app::applicationBellMeditationTimerName);
         addWinMenu(utils::translate("app_bellmain_background_sounds"), gui::window::name::bell_main_menu_dialog);
         addWinMenu(utils::translate("app_bellmain_bedtime"), gui::window::name::bell_main_menu_dialog);
 
