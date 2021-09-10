@@ -15,7 +15,7 @@ EventRecord::EventRecord(
     : Record{id}, EventInfo{name, startDate, TIME_POINT_INVALID, duration, isAllDay}, rruleText{rruleText}
 {
     if (rruleText.empty()) {
-        this->endDate = startDate + std::chrono::minutes(duration);
+        this->endDate = this->startDate + std::chrono::minutes(duration);
     }
     else {
         rrule::RRule recurrence(rruleText);
@@ -24,7 +24,7 @@ EventRecord::EventRecord(
             this->endDate = TIME_POINT_MAX;
         }
         else {
-            this->endDate = recurrence.generateLastTimePoint(startDate) + std::chrono::minutes(duration);
+            this->endDate = recurrence.generateLastTimePoint(this->startDate) + std::chrono::minutes(duration);
         }
     }
 }

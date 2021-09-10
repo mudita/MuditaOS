@@ -26,7 +26,8 @@ struct EventInfo
 
     EventInfo() = default;
     EventInfo(const UTF8 &name, TimePoint startDate, TimePoint endDate, uint32_t duration, bool isAllDay)
-        : name{name}, startDate{startDate}, endDate{endDate}, duration{duration}, isAllDay{isAllDay} {};
+        : name{name}, startDate{TimePointFloorMinutes(startDate)}, endDate{TimePointFloorMinutes(endDate)},
+          duration{duration}, isAllDay{isAllDay} {};
 
     auto isValid() const -> bool;
 };
