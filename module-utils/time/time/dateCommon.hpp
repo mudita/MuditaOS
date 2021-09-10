@@ -356,6 +356,11 @@ inline unsigned int WeekdayIndexFromTimePoint(const TimePoint &tp)
     return ymw.weekday().iso_encoding() - 1;
 }
 
+inline TimePoint TimePointFloorMinutes(const TimePoint &tp)
+{
+    return std::chrono::floor<std::chrono::minutes>(tp);
+}
+
 inline std::string createUID()
 {
     constexpr uint32_t bufferLimit = 16;
