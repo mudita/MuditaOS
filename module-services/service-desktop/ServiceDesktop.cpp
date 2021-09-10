@@ -1,12 +1,13 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "service-appmgr/messages/DOMRequest.hpp"
-#include "service-desktop/DesktopMessages.hpp"
-#include "service-desktop/ServiceDesktop.hpp"
-#include "service-desktop/WorkerDesktop.hpp"
-#include "service-cellular/CellularMessage.hpp"
-#include "endpoints/backup/BackupRestore.hpp"
+#include <service-appmgr/messages/DOMRequest.hpp>
+#include <service-desktop/DesktopMessages.hpp>
+#include <service-desktop/ServiceDesktop.hpp>
+#include <service-desktop/WorkerDesktop.hpp>
+#include <service-cellular/CellularMessage.hpp>
+#include <endpoints/bluetooth/BluetoothMessagesHandler.hpp>
+#include <endpoints/backup/BackupRestore.hpp>
 
 #include <Common/Query.hpp>
 #include <MessageType.hpp>
@@ -25,7 +26,6 @@
 
 #include <module-sys/SystemManager/Constants.hpp>
 #include <module-sys/SystemManager/messages/TetheringStateRequest.hpp>
-#include <endpoints/bluetooth/BluetoothMessagesHandler.hpp>
 
 #include <sys/mount.h>
 #include <sys/statvfs.h>

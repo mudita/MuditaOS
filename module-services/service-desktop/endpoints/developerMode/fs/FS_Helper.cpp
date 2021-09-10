@@ -1,18 +1,20 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "FS_Helper.hpp"
+#include <endpoints/developerMode/fs/FS_Helper.hpp>
 
 #include <log.hpp>
 #include <service-desktop/Constants.hpp>
 #include <service-desktop/DeveloperModeMessage.hpp>
-#include <service-desktop/parser/MessageHandler.hpp>
+#include <endpoints/message/Sender.hpp>
 
 #include <filesystem>
 #include <system_error>
 
-namespace parserFSM
+namespace sdesktop::endpoints
 {
+    using sender::putToSendQueue;
+
     void FS_Helper::preProcess(http::Method method, Context &context)
     {
         LOG_INFO("In FS helper - requesting %d", static_cast<int>(method));
@@ -27,7 +29,7 @@ namespace parserFSM
             return {sent::no, std::move(response)};
         }
         else {
-            return {sent::no, endpoint::ResponseContext{.status = http::Code::BadRequest}};
+            return {sent::no, ResponseContext{.status = http::Code::BadRequest}};
         }
     }
 
@@ -57,10 +59,10 @@ namespace parserFSM
         }
         else {
             context.setResponseStatus(http::Code::BadRequest);
-            MessageHandler::putToSendQueue(context.createSimpleResponse());
+            putToSendQueue(context.createSimpleResponse());
         }
 
-        return {sent::no, endpoint::ResponseContext{.status = code}};
+        return {sent::no, ResponseContext{.status = code}};
     }
 
     bool FS_Helper::requestFileRemoval(const std::string &fileName)
@@ -75,7 +77,7 @@ namespace parserFSM
         return (!ec) ? true : false;
     }
 
-    endpoint::ResponseContext FS_Helper::requestListDir(const std::string &directory)
+    ResponseContext FS_Helper::requestListDir(const std::string &directory)
     {
         std::vector<std::string> filesInDir;
         for (const auto &entry : std::filesystem::directory_iterator{directory}) {
@@ -87,7 +89,7 @@ namespace parserFSM
             jsonArr.push_back(json11::Json::object{{json::fs::path, path}});
         }
         json11::Json::object response({{directory, jsonArr}});
-        return endpoint::ResponseContext{.status = http::Code::OK, .body = response};
+        return ResponseContext{.status = http::Code::OK, .body = response};
     }
 
-} // namespace parserFSM
+} // namespace sdesktop::endpoints

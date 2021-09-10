@@ -2,12 +2,12 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-desktop/DesktopEvent.hpp"
-#include <service-desktop/parser/MessageHandler.hpp>
+#include <endpoints/message/Sender.hpp>
 
 namespace sdesktop
 {
     void Event::send()
     {
-        parserFSM::MessageHandler::putToSendQueue(context.createSimpleResponse());
+        endpoints::sender::putToSendQueue(context.createSimpleResponse());
     }
 } // namespace sdesktop
