@@ -44,6 +44,7 @@ target_link_libraries(BellHybrid
         bell::app-bedtime
         bell::app-common
         bell::app-main
+        bell::app-meditation-timer
         bell::app-powernap
         bell::app-settings
         bell::db

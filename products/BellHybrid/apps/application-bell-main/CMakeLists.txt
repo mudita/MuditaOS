@@ -56,6 +56,7 @@ target_link_libraries(application-bell-main
         bell::app-bedtime
         bell::app-settings
         bell::app-powernap
+        bell::app-meditation-timer
         bell::keymap
         ${TARGET_LIBRARIES}
     PUBLIC
