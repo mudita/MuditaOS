@@ -52,6 +52,11 @@ auto ServiceDesktop::getSerialNumber() const -> std::string
     return settings->getValue(std::string("factory_data/serial"), settings::SettingsScope::Global);
 }
 
+auto ServiceDesktop::getCaseColour() const -> std::string
+{
+    return settings->getValue(std::string("factory_data/case_colour"), settings::SettingsScope::Global);
+}
+
 auto ServiceDesktop::requestLogsFlush() -> void
 {
     int response = 0;

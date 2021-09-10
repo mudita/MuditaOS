@@ -29,4 +29,5 @@ def test_device_info(harness):
     assert ret["body"]["currentRTCTime"] is not None
     assert ret["body"]["version"] is not None
     assert ret["body"]["serialNumber"] is not None
+    assert ret["body"]["caseColour"] is not None
 
