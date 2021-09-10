@@ -44,6 +44,9 @@ namespace bsp::rotary_encoder
                     }
                 });
         }
+        if (xTimerStart(gTimerHandle, 0) != pdPASS) {
+            LOG_ERROR("Couldn't start encoder timer");
+        }
         LOG_DEBUG("Init rotary encoder driver");
         const auto ret = (gTimerHandle && gHandleIrq) ? (kStatus_Success) : (kStatus_Fail);
         LOG_DEBUG("Init rotary encoder driver status %i", ret);
@@ -86,6 +89,7 @@ namespace bsp::rotary_encoder
             ret = type::forward;
         }
         encCounter = tmp;
+
         return ret;
     }
 
