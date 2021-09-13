@@ -11,7 +11,6 @@ target_sources(sys-manager
         include/SystemManager/messages/DeviceRegistrationMessage.hpp
         include/SystemManager/messages/TetheringStateRequest.hpp
         include/SystemManager/messages/SystemManagerMessage.hpp
-        include/SystemManager/messages/CpuFrequencyMessage.hpp
         include/SystemManager/SystemManagerCommon.hpp
         include/SystemManager/CpuGovernor.hpp
         include/SystemManager/PowerManager.hpp
