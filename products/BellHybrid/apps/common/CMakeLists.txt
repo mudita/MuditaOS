@@ -11,11 +11,12 @@ target_include_directories(application-bell-common
 target_sources(application-bell-common
     PRIVATE
         src/AlarmModel.cpp
-        src/TimeUtils.cpp
-        src/popups/AlarmActivatedWindow.cpp
-        src/SnoozeSettingsModel.cpp
         src/BellFinishedWindow.cpp
         src/BellSideListItemWithCallbacks.cpp
+        src/SnoozeSettingsModel.cpp
+        src/TimeUtils.cpp
+        src/popups/AlarmActivatedWindow.cpp
+        src/popups/AlarmDeactivatedWindow.cpp
     PUBLIC
         include/common/BellFinishedWindow.hpp
         include/common/TimeUtils.hpp
@@ -23,6 +24,7 @@ target_sources(application-bell-common
         include/common/models/AlarmModel.hpp
         include/common/models/SnoozeSettingsModel.hpp
         include/common/popups/AlarmActivatedWindow.hpp
+        include/common/popups/AlarmDeactivatedWindow.hpp
         include/common/widgets/BellSideListItemWithCallbacks.hpp
 )
 

@@ -34,7 +34,7 @@ namespace app
             return std::make_unique<gui::BellAlarmWindow>(app, std::move(presenter));
         });
 
-        attachPopups({gui::popup::ID::AlarmActivated});
+        attachPopups({gui::popup::ID::AlarmActivated, gui::popup::ID::AlarmDeactivated});
     }
 
     sys::MessagePointer ApplicationBellAlarm::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
