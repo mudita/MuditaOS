@@ -147,10 +147,9 @@ bool WorkerEventCommon::initCommonHardwareComponents()
     bsp::rtc::getCurrentTimestamp(&timestamp);
     bsp::rtc::setMinuteAlarm(timestamp);
 
-    cpuSentinel = std::make_shared<sys::CpuSentinel>(
-        service::name::evt_manager, service, [this](bsp::CpuFrequencyHz newFrequency) {
-            updateResourcesAfterCpuFrequencyChange(newFrequency);
-        });
+    cpuSentinel = std::make_shared<sys::CpuSentinel>("WorkerEvent", service, [this](bsp::CpuFrequencyHz newFrequency) {
+        updateResourcesAfterCpuFrequencyChange(newFrequency);
+    });
 
     auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuSentinel);
     service->bus.sendUnicast(std::move(sentinelRegistrationMsg), service::name::system_manager);

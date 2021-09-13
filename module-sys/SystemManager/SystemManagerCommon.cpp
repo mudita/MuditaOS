@@ -20,7 +20,6 @@
 #include <service-desktop/Constants.hpp>
 #include <service-appmgr/Constants.hpp>
 #include <service-appmgr/Controller.hpp>
-#include <SystemManager/messages/CpuFrequencyMessage.hpp>
 #include <SystemManager/messages/DeviceRegistrationMessage.hpp>
 #include <SystemManager/messages/SentinelRegistrationMessage.hpp>
 #include <SystemManager/messages/RequestCpuFrequencyMessage.hpp>
