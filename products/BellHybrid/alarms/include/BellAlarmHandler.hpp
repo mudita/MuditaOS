@@ -29,4 +29,30 @@ namespace alarms
         auto handle(const AlarmEventRecord &record) -> bool;
         auto handleOff(const AlarmEventRecord &record) -> bool;
     };
+
+    class PreWakeUpChimeHandler : public AlarmHandler
+    {
+      public:
+        explicit PreWakeUpChimeHandler(sys::Service *service);
+        auto handle(const AlarmEventRecord &record) -> bool;
+        auto handleOff(const AlarmEventRecord &record) -> bool;
+
+        static constexpr auto name = "PreWakeUpChimeHandler";
+
+      private:
+        sys::Service *service{};
+    };
+
+    class PreWakeUpFrontlightHandler : public AlarmHandler
+    {
+      public:
+        explicit PreWakeUpFrontlightHandler(sys::Service *service);
+        auto handle(const AlarmEventRecord &record) -> bool;
+        auto handleOff(const AlarmEventRecord &record) -> bool;
+
+        static constexpr auto name = "PreWakeUpFrontlightHandler";
+
+      private:
+        sys::Service *service{};
+    };
 } // namespace alarms

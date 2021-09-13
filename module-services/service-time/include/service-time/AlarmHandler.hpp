@@ -12,6 +12,8 @@ namespace alarms
         Clock,
         Calendar,
         EveningReminder,
+        PreWakeUpChime,
+        PreWakeUpFrontlight,
         None
     };
 

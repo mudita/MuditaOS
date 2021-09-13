@@ -51,4 +51,33 @@ namespace alarms
         return true;
     }
 
+    PreWakeUpChimeHandler::PreWakeUpChimeHandler(sys::Service *service) : service{service}
+    {}
+
+    auto PreWakeUpChimeHandler::handle(const AlarmEventRecord &record) -> bool
+    {
+        LOG_INFO("PreWakeUpChimeHandler::handle");
+        return true;
+    }
+
+    auto PreWakeUpChimeHandler::handleOff(const AlarmEventRecord &record) -> bool
+    {
+        LOG_INFO("PreWakeUpChimeHandler::handleOff");
+        return true;
+    }
+
+    PreWakeUpFrontlightHandler::PreWakeUpFrontlightHandler(sys::Service *service) : service{service}
+    {}
+
+    auto PreWakeUpFrontlightHandler::handle(const AlarmEventRecord &record) -> bool
+    {
+        LOG_INFO("PreWakeUpFrontlightHandler::handle");
+        return true;
+    }
+
+    auto PreWakeUpFrontlightHandler::handleOff(const AlarmEventRecord &record) -> bool
+    {
+        LOG_INFO("PreWakeUpFrontlightHandler::handleOff");
+        return true;
+    }
 } // namespace alarms
