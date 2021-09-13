@@ -18,6 +18,7 @@ target_include_directories(bell-time
 target_link_libraries(bell-time
     PRIVATE
         module-sys
+        bell::alarms
     PUBLIC
         service-time
 )
