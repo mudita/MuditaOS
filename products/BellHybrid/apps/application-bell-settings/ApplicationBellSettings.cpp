@@ -134,7 +134,7 @@ namespace app
             }
             return sys::msgHandled();
         }
-        return std::make_shared<sys::ResponseMessage>();
+        return handleAsyncResponse(resp);
     }
 
     void ApplicationBellSettings::setBrightness(bsp::eink_frontlight::BrightnessPercentage value)
