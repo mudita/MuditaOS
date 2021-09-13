@@ -9,7 +9,7 @@ namespace app
     void Application::attachPopups(const std::vector<gui::popup::ID> &popupsList)
     {
         using namespace gui::popup;
-        app::Application::attachPopups(popupsList);
+        app::ApplicationCommon::attachPopups(popupsList);
         for (auto popup : popupsList) {
             switch (popup) {
             case ID::AlarmActivated:
