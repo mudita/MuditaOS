@@ -40,7 +40,7 @@ namespace alarms
         Actions actions;
         actions.emplace_back(std::make_unique<PlayToneAction>(*service));
         actions.emplace_back(std::make_unique<NotifyGUIAction>(*service));
-        actions.emplace_back(std::make_unique<FrontlightAction>());
+        actions.emplace_back(std::make_unique<FrontlightAction>(*service));
         return actions;
     }
 
