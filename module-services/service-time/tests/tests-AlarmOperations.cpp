@@ -113,7 +113,7 @@ class AlarmOperationsFixture : public ::testing::Test
   protected:
     auto getMockedAlarmOperations(std::unique_ptr<MockAlarmEventsRepository> &alarmRepo)
     {
-        return std::make_unique<alarms::AlarmOperations>(std::move(alarmRepo), timeInjector);
+        return std::make_unique<alarms::AlarmOperationsCommon>(std::move(alarmRepo), timeInjector);
     }
 };
 

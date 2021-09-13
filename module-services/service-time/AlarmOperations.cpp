@@ -11,6 +11,7 @@
 namespace alarms
 {
     std::unique_ptr<IAlarmOperations> CommonAlarmOperationsFactory::create(
+        [[maybe_unused]] sys::Service *service,
         std::unique_ptr<AbstractAlarmEventsRepository> &&alarmEventsRepo,
         IAlarmOperations::GetCurrentTime getCurrentTimeCallback) const
     {
@@ -223,8 +224,12 @@ namespace alarms
 
     auto AlarmOperationsCommon::minuteUpdated(TimePoint now) -> void
     {
-        auto isHandlingInProgress = !ongoingSingleEvents.empty();
+        processEvents(now);
+    }
 
+    void AlarmOperationsCommon::processEvents(TimePoint now)
+    {
+        const auto isHandlingInProgress = !ongoingSingleEvents.empty();
         if (!nextSingleEvents.empty()) {
             processNextEventsQueue(now);
         }
@@ -246,25 +251,33 @@ namespace alarms
 
     void AlarmOperationsCommon::switchAlarmExecution(const SingleEventRecord &singleAlarmEvent, bool newStateOn)
     {
-        alarms::AlarmType alarmType = alarms::AlarmType::None;
-        if (typeid(*(singleAlarmEvent.parent)) == typeid(AlarmEventRecord)) {
-            alarmType = alarms::AlarmType::Clock;
-        }
-
-        auto alarmEventPtr = std::dynamic_pointer_cast<AlarmEventRecord>(singleAlarmEvent.parent);
-        if (alarmEventPtr) {
-            auto handler = alarmHandlerFactory.getHandler(alarmType);
-            if (handler) {
-                if (newStateOn) {
-                    handler->handle(*alarmEventPtr);
-                }
-                else {
-                    handler->handleOff(*alarmEventPtr);
-                }
-            }
+        if (auto alarmEventPtr = std::dynamic_pointer_cast<AlarmEventRecord>(singleAlarmEvent.parent); alarmEventPtr) {
+            handleAlarmEvent(alarmEventPtr, getAlarmEventType(singleAlarmEvent), newStateOn);
         }
         else {
             LOG_WARN("Parent type is not AlarmEventRecord!");
+        }
+    }
+
+    alarms::AlarmType AlarmOperationsCommon::getAlarmEventType(const SingleEventRecord &event)
+    {
+        if (typeid(*(event.parent)) == typeid(AlarmEventRecord)) {
+            return alarms::AlarmType::Clock;
+        }
+        return alarms::AlarmType::None;
+    }
+
+    void AlarmOperationsCommon::handleAlarmEvent(const std::shared_ptr<AlarmEventRecord> &event,
+                                                 alarms::AlarmType alarmType,
+                                                 bool newStateOn)
+    {
+        if (auto handler = alarmHandlerFactory.getHandler(alarmType); handler) {
+            if (newStateOn) {
+                handler->handle(*event);
+            }
+            else {
+                handler->handleOff(*event);
+            }
         }
     }
 
