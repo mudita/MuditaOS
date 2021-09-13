@@ -66,7 +66,7 @@ int main()
     systemServices.emplace_back(sys::CreatorFor<ServiceDB>());
     systemServices.emplace_back(sys::CreatorFor<ServiceAudio>());
     systemServices.emplace_back(sys::CreatorFor<ServiceDesktop>());
-    systemServices.emplace_back(sys::CreatorFor<stm::ServiceTime>(alarms::AlarmOperationsFactory{}));
+    systemServices.emplace_back(sys::CreatorFor<stm::ServiceTime>());
     systemServices.emplace_back(sys::CreatorFor<service::eink::ServiceEink>());
     systemServices.emplace_back(sys::CreatorFor<service::gui::ServiceGUI>());
 

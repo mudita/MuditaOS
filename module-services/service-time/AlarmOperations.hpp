@@ -10,9 +10,10 @@
 
 #include <module-db/Interface/AlarmEventRecord.hpp>
 
+#include <Service/Service.hpp>
+
 namespace alarms
 {
-
     class IAlarmOperations
     {
       public:
@@ -56,6 +57,7 @@ namespace alarms
         virtual ~IAlarmOperationsFactory() noexcept = default;
 
         virtual std::unique_ptr<IAlarmOperations> create(
+            sys::Service *service,
             std::unique_ptr<AbstractAlarmEventsRepository> &&alarmEventsRepo,
             IAlarmOperations::GetCurrentTime getCurrentTimeCallback) const = 0;
     };
@@ -63,8 +65,8 @@ namespace alarms
     class AlarmOperationsCommon : public IAlarmOperations
     {
       public:
-        explicit AlarmOperationsCommon(std::unique_ptr<AbstractAlarmEventsRepository> &&alarmEventsRepo,
-                                       GetCurrentTime getCurrentTimeCallback);
+        AlarmOperationsCommon(std::unique_ptr<AbstractAlarmEventsRepository> &&alarmEventsRepo,
+                              GetCurrentTime getCurrentTimeCallback);
 
         void updateEventsCache(TimePoint now) override;
 
@@ -86,7 +88,7 @@ namespace alarms
         void addAlarmExecutionHandler(const alarms::AlarmType type,
                                       const std::shared_ptr<alarms::AlarmHandler> handler) override;
 
-      private:
+      protected:
         std::unique_ptr<AbstractAlarmEventsRepository> alarmEventsRepo;
         AlarmHandlerFactory alarmHandlerFactory;
 
@@ -95,6 +97,12 @@ namespace alarms
         std::vector<std::unique_ptr<SingleEventRecord>> ongoingSingleEvents;
         std::vector<std::unique_ptr<SnoozedAlarmEventRecord>> snoozedSingleEvents;
 
+        alarms::AlarmType getAlarmEventType(const SingleEventRecord &event);
+        void handleAlarmEvent(const std::shared_ptr<AlarmEventRecord> &event,
+                              alarms::AlarmType alarmType,
+                              bool newStateOn);
+
+      private:
         GetCurrentTime getCurrentTimeCallback;
 
         // Max 100 alarms for one minute seems reasonable, next events will be dropped
@@ -113,6 +121,7 @@ namespace alarms
 
         void checkAndUpdateCache(AlarmEventRecord record);
         void switchAlarmExecution(const SingleEventRecord &singleAlarmEvent, bool newStateOn);
+        void processEvents(TimePoint now);
         void processNextEventsQueue(const TimePoint now);
         void processSnoozedEventsQueue(const TimePoint now);
 
@@ -123,6 +132,7 @@ namespace alarms
     {
       public:
         std::unique_ptr<IAlarmOperations> create(
+            sys::Service *service,
             std::unique_ptr<AbstractAlarmEventsRepository> &&alarmEventsRepo,
             IAlarmOperations::GetCurrentTime getCurrentTimeCallback) const override;
     };
