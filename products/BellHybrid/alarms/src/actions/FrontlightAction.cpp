@@ -3,17 +3,26 @@
 
 #include "FrontlightAction.hpp"
 
+#include <service-evtmgr/Constants.hpp>
+#include <service-evtmgr/ScreenLightControlMessage.hpp>
+
 namespace alarms
 {
+    FrontlightAction::FrontlightAction(sys::Service &service) : service{service}
+    {}
+
     bool FrontlightAction::execute()
     {
-        // turnOnFrontlight after it will be implemented [BH-756]
+        service.bus.sendUnicast(std::make_shared<sevm::ScreenLightControlMessage>(screen_light_control::Action::turnOn),
+                                service::name::evt_manager);
         return true;
     }
 
     bool FrontlightAction::turnOff()
     {
-        // turnOffFrontlight after it will be implemented [BH-756]
+        service.bus.sendUnicast(
+            std::make_shared<sevm::ScreenLightControlMessage>(screen_light_control::Action::turnOff),
+            service::name::evt_manager);
         return true;
     }
 } // namespace alarms
