@@ -61,7 +61,7 @@ namespace app
             gui::window::name::bell_main_menu_dialog,
             [](ApplicationCommon *app, const std::string &name) { return std::make_unique<gui::Dialog>(app, name); });
 
-        attachPopups({gui::popup::ID::AlarmActivated});
+        attachPopups({gui::popup::ID::AlarmActivated, gui::popup::ID::AlarmDeactivated});
     }
 
     sys::MessagePointer ApplicationBellMain::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)

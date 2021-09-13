@@ -4,17 +4,13 @@
 #pragma once
 
 #include <apps-common/windows/Dialog.hpp>
-#include <AsyncTask.hpp>
 
 namespace gui
 {
-    class AlarmActivatedWindow : public Dialog, public app::AsyncCallbackReceiver
+    class AlarmDeactivatedWindow : public Dialog
     {
       public:
-        explicit AlarmActivatedWindow(app::ApplicationCommon *app);
+        explicit AlarmDeactivatedWindow(app::ApplicationCommon *app);
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
-
-      private:
-        bool onAlarmResponseMessage(sys::ResponseMessage *response, ShowMode mode);
     };
 } /* namespace gui */

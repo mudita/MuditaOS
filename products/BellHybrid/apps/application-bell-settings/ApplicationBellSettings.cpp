@@ -104,8 +104,6 @@ namespace app
                 return std::make_unique<gui::BellSettingsPrewakeUpWindow>(app, std::move(presenter));
             });
 
-        attachPopups({gui::popup::ID::AlarmActivated});
-
         // Alarm setup
         windowsFactory.attach(gui::BellSettingsAlarmSettingsWindow::name,
                               [](ApplicationCommon *app, const std::string &name) {
@@ -118,6 +116,8 @@ namespace app
                 auto presenter = std::make_unique<bell_settings::SnoozePresenter>(provider, std::move(model));
                 return std::make_unique<gui::BellSettingsAlarmSettingsSnoozeWindow>(app, std::move(presenter));
             });
+
+        attachPopups({gui::popup::ID::AlarmActivated, gui::popup::ID::AlarmDeactivated});
     }
 
     sys::MessagePointer ApplicationBellSettings::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)

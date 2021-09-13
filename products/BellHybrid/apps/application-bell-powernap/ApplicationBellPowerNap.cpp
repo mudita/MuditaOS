@@ -51,7 +51,7 @@ namespace app
                                   return std::make_unique<gui::PowerNapSessionEndedWindow>(app, std::move(presenter));
                               });
 
-        attachPopups({gui::popup::ID::AlarmActivated});
+        attachPopups({gui::popup::ID::AlarmActivated, gui::popup::ID::AlarmDeactivated});
     }
 
     sys::MessagePointer ApplicationBellPowerNap::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
