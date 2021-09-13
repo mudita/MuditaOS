@@ -67,6 +67,6 @@ namespace app
             alarm->registerAudioStream(msg->token);
         }
 
-        return sys::msgHandled();
+        return handleAsyncResponse(resp);
     }
 } // namespace app

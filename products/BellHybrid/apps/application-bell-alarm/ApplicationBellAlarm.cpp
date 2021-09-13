@@ -43,6 +43,6 @@ namespace app
         if (dynamic_cast<sys::ResponseMessage *>(retMsg.get())->retCode == sys::ReturnCodes::Success) {
             return retMsg;
         }
-        return std::make_shared<sys::ResponseMessage>();
+        return handleAsyncResponse(resp);
     }
 } // namespace app
