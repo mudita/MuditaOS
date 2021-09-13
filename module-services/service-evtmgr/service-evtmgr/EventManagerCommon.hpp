@@ -13,6 +13,7 @@
 #include <Service/Worker.hpp>
 #include <service-db/DBServiceName.hpp>
 #include <Timers/TimerHandle.hpp>
+#include <Service/CpuSentinel.hpp>
 
 #include <cstdint>
 #include <memory>
@@ -21,6 +22,16 @@
 #include <service-db/Settings.hpp>
 
 class WorkerEventCommon;
+
+class EventManagerSentinel
+{
+  public:
+    explicit EventManagerSentinel(std::shared_ptr<sys::CpuSentinel> cpuSentinel, bsp::CpuFrequencyHz frequencyToHold);
+    ~EventManagerSentinel();
+
+  private:
+    std::shared_ptr<sys::CpuSentinel> cpuSentinel;
+};
 
 class EventManagerCommon : public sys::Service
 {
@@ -42,6 +53,7 @@ class EventManagerCommon : public sys::Service
 
     std::shared_ptr<settings::Settings> settings;
     std::unique_ptr<WorkerEventCommon> EventWorker;
+    std::shared_ptr<sys::CpuSentinel> cpuSentinel;
     // application where key events are sent. This is also only application that is allowed to change keyboard long
     // press settings.
     std::string targetApplication;
