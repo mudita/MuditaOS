@@ -149,4 +149,30 @@ namespace alarms
         const bool success;
     };
 
+    class StopAllSnoozedAlarmsRequestMessage : public AlarmMessage
+    {
+      public:
+        explicit StopAllSnoozedAlarmsRequestMessage(){};
+    };
+
+    class RegisterSnoozedAlarmsCountChangeHandlerRequestMessage : public AlarmMessage
+    {
+      public:
+        explicit RegisterSnoozedAlarmsCountChangeHandlerRequestMessage(){};
+    };
+
+    class SnoozedAlarmsCountChangeMessage : public AlarmMessage
+    {
+      public:
+        explicit SnoozedAlarmsCountChangeMessage(unsigned snoozedCount) : snoozedCount{snoozedCount} {};
+
+        [[nodiscard]] unsigned getSnoozedCount() const
+        {
+            return snoozedCount;
+        }
+
+      private:
+        unsigned snoozedCount = 0;
+    };
+
 } // namespace alarms

@@ -25,6 +25,7 @@ namespace alarms
         using OnGetNextSingleProcessed    = std::function<void(std::vector<SingleEventRecord>)>;
         using OnSnoozeRingingAlarm        = std::function<void(bool)>;
         using OnTurnOffRingingAlarm       = std::function<void(bool)>;
+        using OnSnoozedAlarmsCountChange  = std::function<void(unsigned)>;
 
         virtual ~IAlarmOperations() noexcept = default;
 
@@ -49,6 +50,8 @@ namespace alarms
         virtual void minuteUpdated(TimePoint now)                                                  = 0;
         virtual void addAlarmExecutionHandler(const alarms::AlarmType type,
                                               const std::shared_ptr<alarms::AlarmHandler> handler) = 0;
+        virtual void stopAllSnoozedAlarms()                                                        = 0;
+        virtual void addSnoozedAlarmsCountChangeCallback(OnSnoozedAlarmsCountChange)               = 0;
     };
 
     class IAlarmOperationsFactory
@@ -87,6 +90,8 @@ namespace alarms
         void minuteUpdated(TimePoint now) override;
         void addAlarmExecutionHandler(const alarms::AlarmType type,
                                       const std::shared_ptr<alarms::AlarmHandler> handler) override;
+        void stopAllSnoozedAlarms() override;
+        void addSnoozedAlarmsCountChangeCallback(OnSnoozedAlarmsCountChange callback) override;
 
       protected:
         std::unique_ptr<AbstractAlarmEventsRepository> alarmEventsRepo;
@@ -104,6 +109,7 @@ namespace alarms
 
       private:
         GetCurrentTime getCurrentTimeCallback;
+        OnSnoozedAlarmsCountChange onSnoozedAlarmsCountChangeCallback = nullptr;
 
         // Max 100 alarms for one minute seems reasonable, next events will be dropped
         constexpr static auto getNextSingleEventsOffset = 0;
@@ -126,6 +132,7 @@ namespace alarms
         void processSnoozedEventsQueue(const TimePoint now);
 
         TimePoint getCurrentTime();
+        void handleSnoozedAlarmsCountChange();
     };
 
     class CommonAlarmOperationsFactory : public IAlarmOperationsFactory

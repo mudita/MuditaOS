@@ -15,6 +15,7 @@ namespace notifications
         NotSeenSms,
         NotSeenCall,
         Tethering,
+        AlarmSnooze,
         PhoneLock
     };
 
@@ -58,6 +59,17 @@ namespace notifications
         [[nodiscard]] auto getValue() const noexcept -> unsigned;
     };
 
+    class NotificationWithCounter : public Notification
+    {
+        unsigned value = 0;
+
+      protected:
+        explicit NotificationWithCounter(NotificationType type, unsigned value);
+
+      public:
+        [[nodiscard]] auto getValue() const noexcept -> unsigned;
+    };
+
     class NotificationWithTime : public Notification
     {
         std::string formattedTime;
@@ -85,6 +97,12 @@ namespace notifications
     {
       public:
         TetheringNotification();
+    };
+
+    class AlarmSnoozeNotification : public NotificationWithCounter
+    {
+      public:
+        explicit AlarmSnoozeNotification(unsigned snoozeCount);
     };
 
     class PhoneLockNotification : public NotificationWithTime
