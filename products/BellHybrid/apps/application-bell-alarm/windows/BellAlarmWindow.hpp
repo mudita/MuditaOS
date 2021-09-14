@@ -24,6 +24,9 @@ namespace gui
         bool onInput(const InputEvent &inputEvent) override;
         void rebuild() override;
 
+        void setAlarmTime(time_t time) override;
+        time_t getAlarmTime() override;
+
       private:
         BellBaseLayout *body{nullptr};
         Label *topText{nullptr};
