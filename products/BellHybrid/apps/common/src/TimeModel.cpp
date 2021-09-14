@@ -1,9 +1,9 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "TimeModel.hpp"
+#include "models/TimeModel.hpp"
 
-namespace app::home_screen
+namespace app
 {
 
     time_t TimeModel::getCurrentTime() const
@@ -14,4 +14,4 @@ namespace app::home_screen
     {
         return stm::api::timeFormat();
     }
-} // namespace app::home_screen
+} // namespace app

@@ -18,6 +18,7 @@
 
 namespace app
 {
+    class AbstractTimeModel;
     class ApplicationCommon;
 }
 
@@ -33,7 +34,6 @@ namespace db
 
 namespace app::home_screen
 {
-    class AbstractTimeModel;
     class AbstractController;
     class AbstractTemperatureModel;
 

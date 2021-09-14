@@ -9,6 +9,11 @@
 #include <chrono>
 #include <memory>
 
+namespace app
+{
+    class AbstractTimeModel;
+}
+
 namespace app::home_screen
 {
 
@@ -17,7 +22,6 @@ namespace app::home_screen
     class AbstractView;
     class AbstractPresenter;
     class AbstractTemperatureModel;
-    class AbstractTimeModel;
     class AbstractController
     {
       public:
