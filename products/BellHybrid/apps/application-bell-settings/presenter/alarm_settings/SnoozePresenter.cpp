@@ -4,7 +4,6 @@
 #include "SnoozePresenter.hpp"
 
 #include "models/alarm_settings/SnoozeListItemProvider.hpp"
-#include <common/models/SnoozeSettingsModel.hpp>
 
 namespace app::bell_settings
 {

@@ -4,8 +4,9 @@
 #pragma once
 
 #include "ApplicationBellSettings.hpp"
-#include <apps-common/windows/AppWindow.hpp>
 #include "presenter/alarm_settings/SnoozePresenter.hpp"
+
+#include <apps-common/windows/AppWindow.hpp>
 
 namespace gui
 {

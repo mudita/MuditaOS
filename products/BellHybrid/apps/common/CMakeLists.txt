@@ -15,13 +15,10 @@ target_sources(application-bell-common
         src/BellFinishedWindow.cpp
         src/BellSideListItemWithCallbacks.cpp
         src/TimeUtils.cpp
-        src/TimeUtils.cpp
-        src/models/SettingsModel.cpp
-        src/models/SnoozeSettingsModel.cpp
-        src/popups/AlarmActivatedWindow.cpp
         src/popups/AlarmActivatedWindow.cpp
         src/popups/AlarmDeactivatedWindow.cpp
         src/widgets/ListItems.cpp
+
         src/options/BellOptionWindow.cpp
         src/options/OptionBellMenu.cpp
     PUBLIC
@@ -30,8 +27,6 @@ target_sources(application-bell-common
         include/common/models/AbstractAlarmModel.hpp
         include/common/models/AbstractSettingsModel.hpp
         include/common/models/AlarmModel.hpp
-        include/common/models/SettingsModel.hpp
-        include/common/models/SnoozeSettingsModel.hpp
         include/common/models/TimeModel.hpp
         include/common/popups/AlarmActivatedWindow.hpp
         include/common/popups/AlarmDeactivatedWindow.hpp

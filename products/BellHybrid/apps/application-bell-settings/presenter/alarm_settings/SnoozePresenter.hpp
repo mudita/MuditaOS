@@ -4,17 +4,11 @@
 #pragma once
 
 #include <apps-common/BasePresenter.hpp>
-#include <common/models/AbstractSnoozeSettingsModel.hpp>
+#include <models/alarm_settings/AbstractSnoozeSettingsModel.hpp>
 #include <memory>
-
-namespace app
-{
-    class Application;
-}
 
 namespace gui
 {
-    class AppWindow;
     class ListItemProvider;
 } // namespace gui
 

@@ -15,7 +15,6 @@ namespace gui::window::name
     inline constexpr auto bellSettingsFinished                       = "BellSettingsFinished";
     inline constexpr auto bellSettingsFrontlight                     = "BellSettingsFrontlight";
     inline constexpr auto bellSettingsHomeView                       = "BellSettingsHomeView";
-    inline constexpr auto bellSettingsAlarmSettingsPrewakeUp         = "BellSettingsAlarmSettingsPrewakeUp";
     inline constexpr auto bellSettingsAlarmSettingsAlarmToneAndLight = "BellSettingsAlarmSettingsAlarmToneAndLight";
     inline constexpr auto bellSettingsBedtimeTone                    = "BellSettingsBedtimeTone";
     inline constexpr auto bellSettingsTurnOff                        = "BellSettingsTurnOff";

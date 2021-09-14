@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "AbstractSettingsModel.hpp"
+#include <common/models/AbstractSettingsModel.hpp>
 
 #include <service-db/Settings.hpp>
 
