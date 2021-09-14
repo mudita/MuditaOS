@@ -151,6 +151,8 @@ namespace purefs::blkdev
             return m_sectors[hwpart];
         case info_type::erase_block:
             return 1;
+        case info_type::start_sector:
+            return -ENOTSUP;
         }
         return -ENOTSUP;
     }

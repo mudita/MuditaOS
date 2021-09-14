@@ -11,7 +11,7 @@ add_custom_command(
 add_catch2_executable(
     NAME vfs-disk
     SRCS
-        ${CMAKE_CURRENT_LIST_DIR}/unittest_disk_manager.cpp
+        unittest_disk_manager.cpp
     LIBS
         platform
         purefs-paths
@@ -23,7 +23,7 @@ add_catch2_executable(
 add_catch2_executable(
     NAME vfs-core-fs
     SRCS
-        ${CMAKE_CURRENT_LIST_DIR}/unittest_filesystem_core.cpp
+        unittest_filesystem_core.cpp
     LIBS
         platform
         module-vfs
@@ -48,7 +48,7 @@ add_custom_target(
 add_catch2_executable(
     NAME vfs-littlefs
     SRCS
-        ${CMAKE_CURRENT_LIST_DIR}/unittest_filesystem_littlefs.cpp
+        unittest_filesystem_littlefs.cpp
     LIBS
         platform
         module-vfs
@@ -60,7 +60,7 @@ add_catch2_executable(
 add_catch2_executable(
     NAME vfs-ext4
     SRCS
-        ${CMAKE_CURRENT_LIST_DIR}/unittest_filesystem_ext4.cpp
+        unittest_filesystem_ext4.cpp
     LIBS
         platform
         module-vfs
@@ -72,7 +72,7 @@ add_catch2_executable(
 add_catch2_executable(
     NAME vfs-dualmount
     SRCS
-        ${CMAKE_CURRENT_LIST_DIR}/unittest_filesystem_dualmount.cpp
+        unittest_filesystem_dualmount.cpp
     LIBS
         platform
         module-vfs
@@ -91,6 +91,16 @@ add_catch2_executable(
         module-sys
         module-vfs
         platform
+    USE_FS
+)
+
+add_catch2_executable(
+    NAME vfs-reedgefs
+    SRCS
+        unittest_filesystem_reedgefs.cpp
+    LIBS
+        platform
+        module-vfs
     USE_FS
 )
 

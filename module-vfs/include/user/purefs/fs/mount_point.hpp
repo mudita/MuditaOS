@@ -71,7 +71,7 @@ namespace purefs::fs::internal
         }
 
       private:
-        virtual auto native_root() const noexcept -> std::string_view = 0;
+        virtual auto native_root() const noexcept -> std::string = 0;
 
       private:
         const std::weak_ptr<blkdev::internal::disk_handle> m_diskh;
