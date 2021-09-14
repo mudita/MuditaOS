@@ -14,20 +14,27 @@ target_sources(application-bell-common
         src/TimeModel.cpp
         src/BellFinishedWindow.cpp
         src/BellSideListItemWithCallbacks.cpp
-        src/SnoozeSettingsModel.cpp
         src/TimeUtils.cpp
+        src/TimeUtils.cpp
+        src/models/SettingsModel.cpp
+        src/models/SnoozeSettingsModel.cpp
+        src/popups/AlarmActivatedWindow.cpp
         src/popups/AlarmActivatedWindow.cpp
         src/popups/AlarmDeactivatedWindow.cpp
+        src/widgets/ListItems.cpp
     PUBLIC
         include/common/BellFinishedWindow.hpp
         include/common/TimeUtils.hpp
         include/common/models/AbstractAlarmModel.hpp
+        include/common/models/AbstractSettingsModel.hpp
         include/common/models/AlarmModel.hpp
+        include/common/models/SettingsModel.hpp
         include/common/models/SnoozeSettingsModel.hpp
         include/common/models/TimeModel.hpp
         include/common/popups/AlarmActivatedWindow.hpp
         include/common/popups/AlarmDeactivatedWindow.hpp
         include/common/widgets/BellSideListItemWithCallbacks.hpp
+        include/common/widgets/ListItems.hpp
 )
 
 target_link_libraries(application-bell-common

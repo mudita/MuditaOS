@@ -8,54 +8,59 @@
 
 namespace app::bell_settings
 {
-    SnoozeSettingsModel::SnoozeSettingsModel(ApplicationCommon *app)
-    {
-        settings.init(service::ServiceProxy{app->weak_from_this()});
-    }
-    bool SnoozeSettingsModel::getSnooze() const
-    {
-        const auto str = settings.getValue(bell::settings::Snooze::active, settings::SettingsScope::Global);
-        return std::stoi(str);
-    }
-    void SnoozeSettingsModel::setSnooze(bool value)
+    void SnoozeOnOffModel::setValue(bool value)
     {
         const auto valStr = std::to_string(value);
         settings.setValue(bell::settings::Snooze::active, valStr, settings::SettingsScope::Global);
     }
-    void SnoozeSettingsModel::setLength(std::uint8_t value)
+
+    bool SnoozeOnOffModel::getValue() const
+    {
+        const auto str = settings.getValue(bell::settings::Snooze::active, settings::SettingsScope::Global);
+        return std::stoi(str);
+    }
+
+    void SnoozeLengthModel::setValue(std::uint8_t value)
     {
         const auto valStr = std::to_string(value);
         settings.setValue(bell::settings::Snooze::length, valStr, settings::SettingsScope::Global);
     }
-    std::uint8_t SnoozeSettingsModel::getLength() const
+
+    std::uint8_t SnoozeLengthModel::getValue() const
     {
         const auto str = settings.getValue(bell::settings::Snooze::length, settings::SettingsScope::Global);
         return std::stoi(str);
     }
-    void SnoozeSettingsModel::setChimeInterval(std::uint8_t value)
+
+    void SnoozeChimeIntervalModel::setValue(std::uint8_t value)
     {
         const auto valStr = std::to_string(value);
         settings.setValue(bell::settings::Snooze::interval, valStr, settings::SettingsScope::Global);
     }
-    std::uint8_t SnoozeSettingsModel::getChimeInterval() const
+
+    std::uint8_t SnoozeChimeIntervalModel::getValue() const
     {
         const auto str = settings.getValue(bell::settings::Snooze::interval, settings::SettingsScope::Global);
         return std::stoi(str);
     }
-    void SnoozeSettingsModel::setChimeTone(const UTF8 &value)
+
+    void SnoozeChimeToneModel::setValue(UTF8 value)
     {
         settings.setValue(bell::settings::Snooze::tone, value, settings::SettingsScope::Global);
     }
-    UTF8 SnoozeSettingsModel::getChimeTone() const
+
+    UTF8 SnoozeChimeToneModel::getValue() const
     {
         return settings.getValue(bell::settings::Snooze::tone, settings::SettingsScope::Global);
     }
-    void SnoozeSettingsModel::setChimeVolume(std::uint8_t value)
+
+    void SnoozeChimeVolumeModel::setValue(std::uint8_t value)
     {
         const auto valStr = std::to_string(value);
         settings.setValue(bell::settings::Snooze::volume, valStr, settings::SettingsScope::Global);
     }
-    std::uint8_t SnoozeSettingsModel::getChimeVolume() const
+
+    std::uint8_t SnoozeChimeVolumeModel::getValue() const
     {
         const auto str = settings.getValue(bell::settings::Snooze::volume, settings::SettingsScope::Global);
         return std::stoi(str);
