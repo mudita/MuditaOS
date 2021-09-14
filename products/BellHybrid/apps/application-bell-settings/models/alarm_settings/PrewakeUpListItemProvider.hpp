@@ -3,17 +3,17 @@
 
 #pragma once
 
-#include <models/alarm_settings/AbstractSnoozeSettingsModel.hpp>
+#include <models/alarm_settings/AbstractPrewakeUpSettingsModel.hpp>
 #include <common/widgets/BellSideListItemWithCallbacks.hpp>
 #include <apps-common/InternalModel.hpp>
 
 namespace app::bell_settings
 {
-    class SnoozeListItemProvider : public app::InternalModel<gui::BellSideListItemWithCallbacks *>,
-                                   public gui::ListItemProvider
+    class PrewakeUpListItemProvider : public app::InternalModel<gui::BellSideListItemWithCallbacks *>,
+                                      public gui::ListItemProvider
     {
       public:
-        explicit SnoozeListItemProvider(AbstractSnoozeSettingsModel &model);
+        explicit PrewakeUpListItemProvider(AbstractPrewakeUpSettingsModel &model);
 
         std::vector<gui::BellSideListItemWithCallbacks *> getListItems();
 
@@ -25,12 +25,14 @@ namespace app::bell_settings
 
         [[nodiscard]] auto getMinimalItemSpaceRequired() const -> unsigned int override;
 
+        void clearData();
+
         std::function<void()> onExit;
 
       private:
         void buildListItems();
 
-        AbstractSnoozeSettingsModel &model;
+        AbstractPrewakeUpSettingsModel &model;
     };
 
 } // namespace app::bell_settings

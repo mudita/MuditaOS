@@ -37,5 +37,8 @@ INSERT OR IGNORE INTO settings_tab (path, value) VALUES
     ('snooze_length','10'),
     ('snooze_interval','1'),
     ('snooze_tone','Meditative surprises'),
-    ('snooze_volume','10');
-    
+    ('snooze_volume','10'),
+    ('prewake_up_duration', '10'),
+    ('prewake_up_tone','Meditative surprises'),
+    ('prewake_up_volume','5'),
+    ('prewake_up_light_duration','10');
