@@ -3,31 +3,54 @@
 
 #pragma once
 
-#include <utf8/UTF8.hpp>
+#include <common/models/AbstractSettingsModel.hpp>
+
 #include <cstdint>
+#include <utf8/UTF8.hpp>
 
 namespace app::bell_settings
 {
-
     class AbstractSnoozeSettingsModel
     {
       public:
+        AbstractSnoozeSettingsModel(std::unique_ptr<gui::AbstractSettingsModel<bool>> snoozeOnOff,
+                                    std::unique_ptr<gui::AbstractSettingsModel<std::uint8_t>> snoozeLength,
+                                    std::unique_ptr<gui::AbstractSettingsModel<std::uint8_t>> snoozeChimeInterval,
+                                    std::unique_ptr<gui::AbstractSettingsModel<UTF8>> snoozeChimeTone,
+                                    std::unique_ptr<gui::AbstractSettingsModel<std::uint8_t>> snoozeChimeVolume)
+            : snoozeOnOff(std::move(snoozeOnOff)), snoozeLength(std::move(snoozeLength)),
+              snoozeChimeInterval(std::move(snoozeChimeInterval)), snoozeChimeTone(std::move(snoozeChimeTone)),
+              snoozeChimeVolume(std::move(snoozeChimeVolume))
+        {}
+
         virtual ~AbstractSnoozeSettingsModel() = default;
 
-        virtual void setSnooze(bool value) = 0;
-        virtual bool getSnooze() const     = 0;
+        gui::AbstractSettingsModel<bool> &getSnoozeOnOff()
+        {
+            return *snoozeOnOff;
+        }
+        gui::AbstractSettingsModel<std::uint8_t> &getSnoozeLength()
+        {
+            return *snoozeLength;
+        }
+        gui::AbstractSettingsModel<std::uint8_t> &getSnoozeChimeInterval()
+        {
+            return *snoozeChimeInterval;
+        }
+        gui::AbstractSettingsModel<UTF8> &getSnoozeChimeTone()
+        {
+            return *snoozeChimeTone;
+        }
+        gui::AbstractSettingsModel<std::uint8_t> &getSnoozeChimeVolume()
+        {
+            return *snoozeChimeVolume;
+        }
 
-        virtual void setLength(std::uint8_t value) = 0;
-        virtual std::uint8_t getLength() const     = 0;
-
-        virtual void setChimeInterval(std::uint8_t value) = 0;
-        virtual std::uint8_t getChimeInterval() const     = 0;
-
-        virtual void setChimeTone(const UTF8 &value) = 0;
-        virtual UTF8 getChimeTone() const            = 0;
-
-        virtual void setChimeVolume(std::uint8_t value) = 0;
-        virtual std::uint8_t getChimeVolume() const     = 0;
+      private:
+        std::unique_ptr<gui::AbstractSettingsModel<bool>> snoozeOnOff;
+        std::unique_ptr<gui::AbstractSettingsModel<std::uint8_t>> snoozeLength;
+        std::unique_ptr<gui::AbstractSettingsModel<std::uint8_t>> snoozeChimeInterval;
+        std::unique_ptr<gui::AbstractSettingsModel<UTF8>> snoozeChimeTone;
+        std::unique_ptr<gui::AbstractSettingsModel<std::uint8_t>> snoozeChimeVolume;
     };
-
 } // namespace app::bell_settings

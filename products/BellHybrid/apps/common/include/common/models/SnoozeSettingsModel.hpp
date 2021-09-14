@@ -4,37 +4,68 @@
 #pragma once
 
 #include "AbstractSnoozeSettingsModel.hpp"
-#include <service-db/Settings.hpp>
-
-namespace app
-{
-    class ApplicationCommon;
-}
+#include "SettingsModel.hpp"
 
 namespace app::bell_settings
 {
+    class SnoozeOnOffModel : public gui::SettingsModel<bool>
+    {
+      public:
+        using SettingsModel::SettingsModel;
+
+        void setValue(bool value) override;
+        bool getValue() const override;
+    };
+
+    class SnoozeLengthModel : public gui::SettingsModel<std::uint8_t>
+    {
+      public:
+        using SettingsModel::SettingsModel;
+
+        void setValue(std::uint8_t value) override;
+        std::uint8_t getValue() const override;
+    };
+
+    class SnoozeChimeIntervalModel : public gui::SettingsModel<std::uint8_t>
+    {
+      public:
+        using SettingsModel::SettingsModel;
+
+        void setValue(std::uint8_t value) override;
+        std::uint8_t getValue() const override;
+    };
+
+    class SnoozeChimeToneModel : public gui::SettingsModel<UTF8>
+    {
+      public:
+        using SettingsModel::SettingsModel;
+
+        void setValue(UTF8 value) override;
+        UTF8 getValue() const override;
+    };
+
+    class SnoozeChimeVolumeModel : public gui::SettingsModel<std::uint8_t>
+    {
+      public:
+        using SettingsModel::SettingsModel;
+
+        void setValue(std::uint8_t value) override;
+        std::uint8_t getValue() const override;
+    };
 
     class SnoozeSettingsModel : public AbstractSnoozeSettingsModel
     {
       public:
-        explicit SnoozeSettingsModel(ApplicationCommon *app);
-        void setSnooze(bool value) override;
-        bool getSnooze() const override;
-
-        void setLength(std::uint8_t value) override;
-        std::uint8_t getLength() const override;
-
-        void setChimeInterval(std::uint8_t value) override;
-        std::uint8_t getChimeInterval() const override;
-
-        void setChimeTone(const UTF8 &value) override;
-        UTF8 getChimeTone() const override;
-
-        void setChimeVolume(std::uint8_t value) override;
-        std::uint8_t getChimeVolume() const override;
-
-      private:
-        mutable settings::Settings settings;
+        SnoozeSettingsModel(std::unique_ptr<SnoozeOnOffModel> snoozeOnOffModel,
+                            std::unique_ptr<SnoozeLengthModel> snoozeLengthModel,
+                            std::unique_ptr<SnoozeChimeIntervalModel> snoozeChimeIntervalModel,
+                            std::unique_ptr<SnoozeChimeToneModel> snoozeChimeToneModel,
+                            std::unique_ptr<SnoozeChimeVolumeModel> snoozeChimeVolumeModel)
+            : AbstractSnoozeSettingsModel(std::move(snoozeOnOffModel),
+                                          std::move(snoozeLengthModel),
+                                          std::move(snoozeChimeIntervalModel),
+                                          std::move(snoozeChimeToneModel),
+                                          std::move(snoozeChimeVolumeModel))
+        {}
     };
-
 } // namespace app::bell_settings

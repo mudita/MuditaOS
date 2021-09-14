@@ -111,9 +111,20 @@ namespace app
                               });
         windowsFactory.attach(
             gui::BellSettingsAlarmSettingsSnoozeWindow::name, [this](ApplicationCommon *app, const std::string &) {
-                auto model     = std::make_unique<bell_settings::SnoozeSettingsModel>(this);
-                auto provider  = std::make_shared<bell_settings::SnoozeListItemProvider>(*model);
-                auto presenter = std::make_unique<bell_settings::SnoozePresenter>(provider, std::move(model));
+                auto snoozeOnOffModel         = std::make_unique<bell_settings::SnoozeOnOffModel>(this);
+                auto snoozeLengthModel        = std::make_unique<bell_settings::SnoozeLengthModel>(this);
+                auto snoozeChimeIntervalModel = std::make_unique<bell_settings::SnoozeChimeIntervalModel>(this);
+                auto snoozeChimeToneModel     = std::make_unique<bell_settings::SnoozeChimeToneModel>(this);
+                auto snoozeChimeVolumeModel   = std::make_unique<bell_settings::SnoozeChimeVolumeModel>(this);
+                auto snoozeSettingsModel =
+                    std::make_unique<bell_settings::SnoozeSettingsModel>(std::move(snoozeOnOffModel),
+                                                                         std::move(snoozeLengthModel),
+                                                                         std::move(snoozeChimeIntervalModel),
+                                                                         std::move(snoozeChimeToneModel),
+                                                                         std::move(snoozeChimeVolumeModel));
+                auto provider = std::make_shared<bell_settings::SnoozeListItemProvider>(*snoozeSettingsModel);
+                auto presenter =
+                    std::make_unique<bell_settings::SnoozePresenter>(provider, std::move(snoozeSettingsModel));
                 return std::make_unique<gui::BellSettingsAlarmSettingsSnoozeWindow>(app, std::move(presenter));
             });
 
