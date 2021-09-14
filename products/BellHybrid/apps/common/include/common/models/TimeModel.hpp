@@ -5,7 +5,7 @@
 
 #include <service-time/api/TimeSettingsApi.hpp>
 
-namespace app::home_screen
+namespace app
 {
     class AbstractTimeModel
     {
@@ -22,4 +22,4 @@ namespace app::home_screen
         utils::time::Locale::TimeFormat getTimeFormat() const override;
         time_t getCurrentTime() const override;
     };
-} // namespace app::home_screen
+} // namespace app

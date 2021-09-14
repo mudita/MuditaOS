@@ -3,13 +3,13 @@
 
 #include "include/application-bell-main/ApplicationBellMain.hpp"
 #include "models/TemperatureModel.hpp"
-#include "models/TimeModel.hpp"
 #include "presenters/HomeScreenPresenter.hpp"
 
 #include "windows/BellHomeScreenWindow.hpp"
 #include "windows/BellMainMenuWindow.hpp"
 
 #include <common/models/AlarmModel.hpp>
+#include <common/models/TimeModel.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <windows/Dialog.hpp>
 
@@ -44,7 +44,7 @@ namespace app
     void ApplicationBellMain::createUserInterface()
     {
         windowsFactory.attach(gui::name::window::main_window, [](ApplicationCommon *app, const std::string &name) {
-            auto timeModel        = std::make_unique<app::home_screen::TimeModel>();
+            auto timeModel        = std::make_unique<app::TimeModel>();
             auto temperatureModel = std::make_unique<app::home_screen::TemperatureModel>(app);
             auto alarmModel       = std::make_unique<app::AlarmModel>(app);
             auto presenter        = std::make_unique<app::home_screen::HomeScreenPresenter>(

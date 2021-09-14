@@ -4,9 +4,9 @@
 #include "HomeScreenPresenter.hpp"
 #include "StateController.hpp"
 #include "models/TemperatureModel.hpp"
-#include "models/TimeModel.hpp"
 
 #include <apps-common/ApplicationCommon.hpp>
+#include <common/models/TimeModel.hpp>
 #include <module-sys/Timers/SystemTimer.hpp>
 #include <module-sys/Timers/TimerFactory.hpp>
 #include <time/time_constants.hpp>
