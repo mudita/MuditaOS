@@ -38,6 +38,7 @@ namespace notifications
         void handle(db::query::notifications::GetAllResult *msg);
         void handle(db::NotificationMessage *msg);
         void handle(sys::phone_modes::Tethering tethering);
+        void handleSnooze(unsigned snoozeCount);
         void requestNotSeenNotifications();
         void send();
 

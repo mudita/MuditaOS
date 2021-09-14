@@ -289,7 +289,6 @@ namespace style
     namespace notifications
     {
         inline constexpr auto spanSize     = 8;
-        inline constexpr auto digitSize    = 16;
         inline constexpr auto iconWidth    = 35;
         inline constexpr auto textMinWidth = 250;
         inline constexpr auto textMaxWidth = 350;

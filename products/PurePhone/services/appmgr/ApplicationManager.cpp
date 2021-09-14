@@ -27,6 +27,8 @@
 #include <service-evtmgr/Constants.hpp>
 #include <service-evtmgr/torch.hpp>
 #include <sys/messages/TetheringPhoneModeChangeProhibitedMessage.hpp>
+#include <service-time/include/service-time/AlarmMessage.hpp>
+#include <service-time/include/service-time/AlarmServiceAPI.hpp>
 
 namespace app::manager
 {
@@ -336,6 +338,13 @@ namespace app::manager
             return sys::msgHandled();
         });
 
+        alarms::AlarmServiceAPI::requestRegisterSnoozedAlarmsCountChangeCallback(this);
+        connect(typeid(alarms::SnoozedAlarmsCountChangeMessage), [&](sys::Message *request) -> sys::MessagePointer {
+            auto data = static_cast<alarms::SnoozedAlarmsCountChangeMessage *>(request);
+            handleSnoozeCountChange(data->getSnoozedCount());
+            return sys::msgHandled();
+        });
+
         auto convertibleToActionHandler = [this](sys::Message *request) { return handleMessageAsAction(request); };
         connect(typeid(CellularMMIResultMessage), convertibleToActionHandler);
         connect(typeid(CellularMMIResponseMessage), convertibleToActionHandler);
@@ -386,6 +395,11 @@ namespace app::manager
     void ApplicationManager::handleTetheringChanged(sys::phone_modes::Tethering tethering)
     {
         notificationProvider.handle(tethering);
+    }
+
+    void ApplicationManager::handleSnoozeCountChange(unsigned snoozeCount)
+    {
+        notificationProvider.handleSnooze(snoozeCount);
     }
 
     auto ApplicationManager::handleAutoLockGetRequest([[maybe_unused]] GetAutoLockTimeoutRequest *request)

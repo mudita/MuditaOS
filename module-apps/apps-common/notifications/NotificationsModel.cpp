@@ -75,11 +75,13 @@ bool NotificationsModel::hasDismissibleNotification() const noexcept
     return false;
 }
 
-void NotificationsModel::dismissAll(const InputEvent &event)
+void NotificationsModel::dismissAll()
 {
     for (auto it = std::begin(internalData); it != std::end(internalData); it++) {
         if (auto item = *it; item->isDismissible()) {
-            item->onInput(event);
+            if (item->dismissCallback) {
+                item->dismissCallback();
+            }
         }
     }
 }
@@ -114,6 +116,15 @@ auto NotificationsModel::create(const notifications::TetheringNotification *noti
     return item;
 }
 
+auto NotificationsModel::create(const notifications::AlarmSnoozeNotification *notification) -> NotificationListItem *
+{
+    auto item = new NotificationWithEventCounter(notifications::NotificationType::AlarmSnooze,
+                                                 utils::to_string(notification->getValue()));
+    item->setName(utils::translate("app_desktop_alarm_snooze"), true);
+    item->deleteByList = false;
+    return item;
+}
+
 auto NotificationsModel::create(const notifications::PhoneLockNotification *notification) -> NotificationListItem *
 {
     auto item = new NotificationListItem(notifications::NotificationType::PhoneLock);
@@ -138,28 +149,31 @@ void NotificationsModel::updateData(app::manager::actions::NotificationsChangedP
 
     const auto showOnLocked =
         (listPlacement == NotificationsListPlacement::LockedScreen) && params->showNotificationsWhenLocked();
-
     phoneTimeLock = hasPhoneLockTime(params);
+    tetheringOn   = hasTetheringNotification(params);
+    const auto callAndSMSVisibility =
+        ((listPlacement == NotificationsListPlacement::Desktop) || showOnLocked) && not tetheringOn;
 
-    if ((listPlacement == NotificationsListPlacement::Desktop) || showOnLocked) {
-        tetheringOn = hasTetheringNotification(params);
-        for (const auto &notification : params->getNotifications()) {
-            if (not tetheringOn && typeid(*notification) == typeid(notifications::NotSeenSMSNotification)) {
-                auto sms = static_cast<const notifications::NotSeenSMSNotification *>(notification.get());
-                internalData.push_back(create(sms));
-            }
-            else if (not tetheringOn && typeid(*notification) == typeid(notifications::NotSeenCallNotification)) {
-                auto call = static_cast<const notifications::NotSeenCallNotification *>(notification.get());
-                internalData.push_back(create(call));
-            }
-            else if (typeid(*notification) == typeid(notifications::TetheringNotification)) {
-                auto tethering = static_cast<const notifications::TetheringNotification *>(notification.get());
-                internalData.push_back(create(tethering));
-            }
-            else if (typeid(*notification) == typeid(notifications::PhoneLockNotification)) {
-                auto phoneLock = static_cast<const notifications::PhoneLockNotification *>(notification.get());
-                internalData.push_back(create(phoneLock));
-            }
+    for (const auto &notification : params->getNotifications()) {
+        if (typeid(*notification) == typeid(notifications::NotSeenSMSNotification) && callAndSMSVisibility) {
+            auto sms = static_cast<const notifications::NotSeenSMSNotification *>(notification.get());
+            internalData.push_back(create(sms));
+        }
+        else if (typeid(*notification) == typeid(notifications::NotSeenCallNotification) && callAndSMSVisibility) {
+            auto call = static_cast<const notifications::NotSeenCallNotification *>(notification.get());
+            internalData.push_back(create(call));
+        }
+        else if (typeid(*notification) == typeid(notifications::TetheringNotification)) {
+            auto tethering = static_cast<const notifications::TetheringNotification *>(notification.get());
+            internalData.push_back(create(tethering));
+        }
+        else if (typeid(*notification) == typeid(notifications::PhoneLockNotification)) {
+            auto phoneLock = static_cast<const notifications::PhoneLockNotification *>(notification.get());
+            internalData.push_back(create(phoneLock));
+        }
+        else if (typeid(*notification) == typeid(notifications::AlarmSnoozeNotification)) {
+            auto snooze = static_cast<const notifications::AlarmSnoozeNotification *>(notification.get());
+            internalData.push_back(create(snooze));
         }
     }
 

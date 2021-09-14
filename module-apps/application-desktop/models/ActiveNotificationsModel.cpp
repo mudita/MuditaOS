@@ -13,6 +13,8 @@
 #include <service-appmgr/Constants.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <service-appmgr/messages/SwitchRequest.hpp>
+#include <service-appmgr/messages/SwitchRequest.hpp>
+#include <service-time/include/service-time/AlarmServiceAPI.hpp>
 
 using namespace gui;
 
@@ -70,18 +72,27 @@ namespace
         }
     }
 
+    void clearSMSNotifications(app::ApplicationCommon *app)
+    {
+        DBServiceAPI::GetQuery(app,
+                               db::Interface::Name::Notifications,
+                               std::make_unique<db::query::notifications::Clear>(NotificationsRecord::Key::Sms));
+    }
+
     void setSMSOnInputCallback(NotificationListItem *item, app::ApplicationCommon *app)
     {
         item->inputCallback = [app]([[maybe_unused]] Item &item, const InputEvent &inputEvent) {
             if (inputEvent.isShortRelease(KeyCode::KEY_RF)) {
-                DBServiceAPI::GetQuery(
-                    app,
-                    db::Interface::Name::Notifications,
-                    std::make_unique<db::query::notifications::Clear>(NotificationsRecord::Key::Sms));
+                clearSMSNotifications(app);
                 return true;
             }
             return false;
         };
+    }
+
+    void setSMSDismissCallback(NotificationListItem *item, app::ApplicationCommon *app)
+    {
+        item->dismissCallback = [app]() { clearSMSNotifications(app); };
     }
 
     void setCallFocusChangedCallback(NotificationListItem *item, Notification provider, ActiveNotificationsModel *model)
@@ -147,6 +158,11 @@ namespace
         };
     }
 
+    void setCallDismissCallback(NotificationListItem *item, app::ApplicationCommon *app)
+    {
+        item->dismissCallback = createCallOnRightFunctionalCallback(app);
+    }
+
     void setTetheringActivatedCallback(NotificationListItem *item, app::ApplicationCommon *app)
     {
         item->activatedCallback = [app]([[maybe_unused]] gui::Item &_item) {
@@ -164,6 +180,40 @@ namespace
             }
             return false;
         };
+    }
+
+    void setSnoozeFocusChangedCallback(NotificationListItem *item, ActiveNotificationsModel *model)
+    {
+        item->focusChangedCallback = [model](gui::Item &_item) {
+            if (_item.focus) {
+                model->setParentBottomBar({}, utils::translate("app_desktop_show"), utils::translate("common_stop"));
+            }
+            return true;
+        };
+    }
+
+    void setSnoozeActivatedCallback(NotificationListItem *item, app::ApplicationCommon *app)
+    {
+        item->activatedCallback = [app]([[maybe_unused]] gui::Item &_item) {
+            LOG_ERROR("TODO open active snooze");
+            return true;
+        };
+    }
+
+    void setSnoozeOnInputCallback(NotificationListItem *item, app::ApplicationCommon *app)
+    {
+        item->inputCallback = [app]([[maybe_unused]] Item &item, const InputEvent &inputEvent) {
+            if (inputEvent.isShortRelease() && inputEvent.is(KeyCode::KEY_RF)) {
+                alarms::AlarmServiceAPI::requestStopAllSnoozedAlarms(app);
+                return true;
+            }
+            return false;
+        };
+    }
+
+    void setSnoozeDismissCallback(NotificationListItem *item, app::ApplicationCommon *app)
+    {
+        item->dismissCallback = [app]() { alarms::AlarmServiceAPI::requestStopAllSnoozedAlarms(app); };
     }
 } // namespace
 
@@ -184,6 +234,7 @@ auto ActiveNotificationsModel::create(const notifications::NotSeenSMSNotificatio
     setSMSFocusChangedCallback(item, this);
     setSMSActivatedCallback(item, notification, parent->getApplication());
     setSMSOnInputCallback(item, parent->getApplication());
+    setSMSDismissCallback(item, parent->getApplication());
     item->setDismissible(true);
     return item;
 }
@@ -194,6 +245,7 @@ auto ActiveNotificationsModel::create(const notifications::NotSeenCallNotificati
     setCallFocusChangedCallback(item, notification, this);
     setCallActivatedCallback(item, parent->getApplication());
     setCallOnInputCallback(item, notification, parent->getApplication());
+    setCallDismissCallback(item, parent->getApplication());
     item->setDismissible(true);
     return item;
 }
@@ -204,5 +256,17 @@ auto ActiveNotificationsModel::create(const notifications::TetheringNotification
     auto item               = NotificationsModel::create(notification);
     setTetheringActivatedCallback(item, parent->getApplication());
     setTetheringFocusChangedCallback(item, this);
+    return item;
+}
+
+auto ActiveNotificationsModel::create(const notifications::AlarmSnoozeNotification *notification)
+    -> NotificationListItem *
+{
+    auto item = NotificationsModel::create(notification);
+    setSnoozeFocusChangedCallback(item, this);
+    setSnoozeActivatedCallback(item, parent->getApplication());
+    setSnoozeOnInputCallback(item, parent->getApplication());
+    setSnoozeDismissCallback(item, parent->getApplication());
+    item->setDismissible(true);
     return item;
 }

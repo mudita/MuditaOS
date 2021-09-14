@@ -157,6 +157,8 @@ namespace alarms
         switchAlarmExecution(*(*found), false);
         ongoingSingleEvents.erase(found);
 
+        handleSnoozedAlarmsCountChange();
+
         callback(true);
     }
 
@@ -302,6 +304,18 @@ namespace alarms
                 ++it;
             }
         }
+        handleSnoozedAlarmsCountChange();
+    }
+
+    auto AlarmOperationsCommon::stopAllSnoozedAlarms() -> void
+    {
+        snoozedSingleEvents.clear();
+        handleSnoozedAlarmsCountChange();
+    }
+
+    auto AlarmOperationsCommon::addSnoozedAlarmsCountChangeCallback(OnSnoozedAlarmsCountChange callback) -> void
+    {
+        onSnoozedAlarmsCountChangeCallback = callback;
     }
 
     TimePoint AlarmOperationsCommon::getCurrentTime()
@@ -310,6 +324,13 @@ namespace alarms
             return TIME_POINT_INVALID;
         }
         return getCurrentTimeCallback();
+    }
+
+    void AlarmOperationsCommon::handleSnoozedAlarmsCountChange()
+    {
+        if (onSnoozedAlarmsCountChangeCallback) {
+            onSnoozedAlarmsCountChangeCallback(snoozedSingleEvents.size());
+        }
     }
 
 } // namespace alarms

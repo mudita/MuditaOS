@@ -212,7 +212,7 @@ namespace gui
             }
             if (inputEvent.is(KeyCode::KEY_RF) && hasDismissibleNotification) {
                 LOG_DEBUG("KEY_RF pressed to clear all notifications");
-                notificationsModel->dismissAll(inputEvent);
+                notificationsModel->dismissAll();
                 return true;
             }
             if (inputEvent.is(gui::KeyCode::KEY_LF) && tetheringNotActive) {

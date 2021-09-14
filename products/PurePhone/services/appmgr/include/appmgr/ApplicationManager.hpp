@@ -26,6 +26,7 @@ namespace app::manager
         void handleBluetoothModeChanged(sys::bluetooth::BluetoothMode mode);
         void changeBluetoothMode(const ApplicationHandle *app);
         void handleTetheringChanged(sys::phone_modes::Tethering tethering);
+        void handleSnoozeCountChange(unsigned snoozeCount);
         void processKeypadBacklightState(bsp::keypad_backlight::State keypadLightState);
         void registerMessageHandlers() override;
         void startBackgroundApplications();
