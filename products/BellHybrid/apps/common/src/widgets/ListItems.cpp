@@ -70,7 +70,7 @@ namespace gui
         spinner->setFocusEdges(RectangleEdge::None);
         body->getCenterBox()->addWidget(spinner);
 
-        auto bottomText = new TextFixedSize(body->lastBox);
+        bottomText = new TextFixedSize(body->lastBox);
         bottomText->setMaximumSize(::style::bell_base_layout::w, ::style::bell_base_layout::outer_layouts_h);
         bottomText->setFont(::style::bell_sidelist_item::description_font);
         bottomText->setEdges(RectangleEdge::None);
@@ -78,6 +78,18 @@ namespace gui
         bottomText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         bottomText->setText(bottomDescription);
         bottomText->drawUnderline(false);
+
+        inputCallback = [&](Item &item, const InputEvent &event) {
+            const auto result = body->onInput(event);
+            bottomText->setVisible(spinner->getCurrentValue().getValue().has_value());
+            return result;
+        };
+
+        focusChangedCallback = [&](Item &) {
+            bottomText->setVisible(spinner->getCurrentValue().getValue().has_value());
+            OnFocusChangedCallback();
+            return true;
+        };
 
         getValue = [&model, this]() {
             const auto val = spinner->getCurrentValue().getValue();

@@ -3,9 +3,8 @@
 
 #pragma once
 
-#include "application-bell-settings/ApplicationBellSettings.hpp"
-#include "PrewakeUpModel.hpp"
-#include "PrewakeUpPresenter.hpp"
+#include "ApplicationBellSettings.hpp"
+#include "presenter/alarm_settings/PrewakeUpPresenter.hpp"
 
 #include <apps-common/windows/AppWindow.hpp>
 
@@ -16,17 +15,19 @@ namespace gui
     class BellSettingsPrewakeUpWindow : public AppWindow, public app::bell_settings::PrewakeUpWindowContract::View
     {
       public:
+        static constexpr auto name = "BellSettingsAlarmSettingsPrewakeUp";
         explicit BellSettingsPrewakeUpWindow(
             app::ApplicationCommon *app,
-            std::unique_ptr<app::bell_settings::PrewakeUpWindowContract::Presenter> &&windowPresenter,
-            std::string name = gui::window::name::bellSettingsAlarmSettingsPrewakeUp);
+            std::unique_ptr<app::bell_settings::PrewakeUpWindowContract::Presenter> presenter);
 
         void buildInterface() override;
+        void onClose(CloseReason reason) override;
         bool onInput(const InputEvent &inputEvent) override;
         void rebuild() override;
+        void exit() override;
 
       private:
-        SideListView *sidelistview = nullptr;
+        SideListView *sidelistview{};
         std::unique_ptr<app::bell_settings::PrewakeUpWindowContract::Presenter> presenter;
     };
 } /* namespace gui */

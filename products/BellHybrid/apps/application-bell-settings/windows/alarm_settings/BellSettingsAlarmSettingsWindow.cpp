@@ -1,8 +1,9 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "BellSettingsAlarmSettingsWindow.hpp"
 #include "BellSettingsAlarmSettingsSnoozeWindow.hpp"
+#include "BellSettingsAlarmSettingsWindow.hpp"
+#include "BellSettingsPrewakeUpWindow.hpp"
 
 #include <application-bell-settings/ApplicationBellSettings.hpp>
 #include <apps-common/messages/DialogMetadataMessage.hpp>
@@ -42,7 +43,7 @@ namespace gui
         };
 
         addAlarmSettingsOption(utils::translate("app_bell_settings_alarm_settings_prewake_up"),
-                               gui::window::name::bellSettingsAlarmSettingsPrewakeUp);
+                               BellSettingsPrewakeUpWindow::name);
         addAlarmSettingsOption(utils::translate("app_bell_settings_alarm_settings_alarm_tone_and_light"),
                                gui::window::name::bellSettingsAlarmSettingsAlarmToneAndLight);
         addAlarmSettingsOption(utils::translate("app_bell_settings_alarm_settings_snooze"),

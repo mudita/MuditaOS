@@ -23,38 +23,48 @@ target_sources(application-bell-settings
     PRIVATE
         ApplicationBellSettings.cpp
         models/FrontlightModel.cpp
-        models/PrewakeUpModel.cpp
+        models/SettingsModel.cpp
         models/TemperatureUnitModel.cpp
         models/TimeUnitsModel.cpp
+        models/alarm_settings/PrewakeUpListItemProvider.cpp
+        models/alarm_settings/PrewakeUpSettingsModel.cpp
         models/alarm_settings/SnoozeListItemProvider.cpp
+        models/alarm_settings/SnoozeSettingsModel.cpp
 
         presenter/FrontlightPresenter.cpp
-        presenter/PrewakeUpPresenter.cpp
         presenter/TimeUnitsPresenter.cpp
+        presenter/alarm_settings/PrewakeUpPresenter.cpp
         presenter/alarm_settings/SnoozePresenter.cpp
 
-        widgets/TimeSetListItem.cpp
-        widgets/TimeFormatSetListItem.cpp
         widgets/TemperatureUnitListItem.cpp
+        widgets/TimeFormatSetListItem.cpp
+        widgets/TimeSetListItem.cpp
 
-        windows/BellSettingsWindow.cpp
         windows/BellSettingsBedtimeToneWindow.cpp
         windows/BellSettingsFrontlight.cpp
         windows/BellSettingsHomeViewWindow.cpp
-        windows/BellSettingsPrewakeUpWindow.cpp
         windows/BellSettingsTurnOffWindow.cpp
+        windows/BellSettingsWindow.cpp
         windows/advanced/BellSettingsAdvancedWindow.cpp
         windows/advanced/BellSettingsTimeUnitsWindow.cpp
-        windows/alarm_settings/BellSettingsAlarmSettingsWindow.cpp
         windows/alarm_settings/BellSettingsAlarmSettingsSnoozeWindow.cpp
+        windows/alarm_settings/BellSettingsAlarmSettingsWindow.cpp
+        windows/alarm_settings/BellSettingsPrewakeUpWindow.cpp
 
-        models/PrewakeUpModel.hpp
+        models/SettingsModel.hpp
+        models/alarm_settings/AbstractPrewakeUpSettingsModel.hpp
+        models/alarm_settings/AbstractSnoozeSettingsModel.hpp
+        models/alarm_settings/PrewakeUpListItemProvider.hpp
+        models/alarm_settings/PrewakeUpSettingsModel.hpp
         models/alarm_settings/SnoozeListItemProvider.hpp
+        models/alarm_settings/SnoozeSettingsModel.hpp
 
         presenter/FrontlightPresenter.hpp
-        presenter/PrewakeUpPresenter.hpp
+        presenter/alarm_settings/PrewakeUpPresenter.hpp
         presenter/alarm_settings/SnoozePresenter.hpp
 
+        widgets/TemperatureUnitListItem.hpp
+        widgets/TimeFormatSetListItem.hpp
         widgets/TimeSetListItem.hpp
 
         windows/alarm_settings/BellSettingsAlarmSettingsSnoozeWindow.hpp
@@ -63,9 +73,12 @@ target_sources(application-bell-settings
         windows/BellSettingsBedtimeToneWindow.hpp
         windows/BellSettingsFrontlight.hpp
         windows/BellSettingsHomeViewWindow.hpp
-        windows/BellSettingsPrewakeUpWindow.hpp
         windows/BellSettingsTurnOffWindow.hpp
         windows/BellSettingsWindow.hpp
+        windows/advanced/BellSettingsAdvancedWindow.hpp
+        windows/alarm_settings/BellSettingsAlarmSettingsSnoozeWindow.hpp
+        windows/alarm_settings/BellSettingsAlarmSettingsWindow.hpp
+        windows/alarm_settings/BellSettingsPrewakeUpWindow.hpp
 
         data/FinishedWindowMessageData.hpp
 

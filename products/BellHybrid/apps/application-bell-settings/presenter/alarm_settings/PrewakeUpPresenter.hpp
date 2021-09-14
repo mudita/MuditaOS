@@ -3,12 +3,19 @@
 
 #pragma once
 
-#include "PrewakeUpModel.hpp"
-
 #include <apps-common/BasePresenter.hpp>
+#include <models/alarm_settings/AbstractPrewakeUpSettingsModel.hpp>
+#include <memory>
+
+namespace gui
+{
+    class ListItemProvider;
+} // namespace gui
 
 namespace app::bell_settings
 {
+    class PrewakeUpListItemProvider;
+
     class PrewakeUpWindowContract
     {
       public:
@@ -16,32 +23,33 @@ namespace app::bell_settings
         {
           public:
             virtual ~View() noexcept = default;
+            virtual void exit()      = 0;
         };
 
-        class Presenter : public BasePresenter<PrewakeUpWindowContract::View>
+        class Presenter : public BasePresenter<View>
         {
           public:
             virtual ~Presenter() noexcept                                                   = default;
             virtual auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> = 0;
-            virtual auto clearData() -> void                                                = 0;
             virtual auto saveData() -> void                                                 = 0;
             virtual auto loadData() -> void                                                 = 0;
-            virtual auto createData() -> void                                               = 0;
+            virtual auto eraseProviderData() -> void                                        = 0;
         };
     };
 
     class PrewakeUpWindowPresenter : public PrewakeUpWindowContract::Presenter
     {
       public:
-        explicit PrewakeUpWindowPresenter(std::shared_ptr<PrewakeUpModel> pagesProvider);
+        PrewakeUpWindowPresenter(std::shared_ptr<PrewakeUpListItemProvider> provider,
+                                 std::unique_ptr<AbstractPrewakeUpSettingsModel> model);
 
         auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> override;
-        auto clearData() -> void override;
         auto saveData() -> void override;
         auto loadData() -> void override;
-        auto createData() -> void override;
+        auto eraseProviderData() -> void override;
 
       private:
-        std::shared_ptr<PrewakeUpModel> pagesProvider;
+        std::shared_ptr<PrewakeUpListItemProvider> provider;
+        std::unique_ptr<AbstractPrewakeUpSettingsModel> model;
     };
 } // namespace app::bell_settings
