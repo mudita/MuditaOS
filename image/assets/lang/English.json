@@ -229,6 +229,7 @@
   "app_desktop_press_to_complete_unlock": "<text font='gt_pressura' size='27'>Press <b>#</b> to unlock</text>",
   "app_desktop_unread_messages": "<text>Unread <b>messages</b></text>",
   "app_desktop_missed_calls": "<text>Missed <b>calls</b></text>",
+  "app_desktop_alarm_snooze": "<text>Snooze</text>",
   "app_desktop_menu_phone": "CALLS",
   "app_desktop_menu_contacts": "CONTACTS",
   "app_desktop_menu_messages": "MESSAGES",

@@ -703,3 +703,15 @@ TEST_F(AlarmOperationsFixture, handleAfterUpdateSecondGetsFirst)
     alarmOperations->addAlarmExecutionHandler(alarms::AlarmType::Clock, handler);
     alarmOperations->minuteUpdated(TimePointFromString("2022-11-11 7:00:00"));
 }
+
+TEST_F(AlarmOperationsFixture, snoozeCountChangeCallback)
+{
+    auto alarmRepoMock   = std::make_unique<MockAlarmEventsRepository>();
+    auto alarmOperations = getMockedAlarmOperations(alarmRepoMock);
+
+    int i         = 1;
+    auto callback = [&](unsigned count) { i = count; };
+    alarmOperations->addSnoozedAlarmsCountChangeCallback(callback);
+    alarmOperations->stopAllSnoozedAlarms();
+    EXPECT_EQ(i, 0);
+}

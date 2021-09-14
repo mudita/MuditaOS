@@ -57,6 +57,15 @@ auto NotificationWithContact::getValue() const noexcept -> unsigned
     return value;
 }
 
+NotificationWithCounter::NotificationWithCounter(NotificationType type, unsigned value)
+    : Notification(type), value{value}
+{}
+
+auto NotificationWithCounter::getValue() const noexcept -> unsigned
+{
+    return value;
+}
+
 NotificationWithTime::NotificationWithTime(NotificationType type,
                                            NotificationPriority priorityType,
                                            std::string formattedTime)
@@ -77,6 +86,10 @@ NotSeenCallNotification::NotSeenCallNotification(unsigned value, std::optional<C
 {}
 
 TetheringNotification::TetheringNotification() : Notification(NotificationType::Tethering)
+{}
+
+AlarmSnoozeNotification::AlarmSnoozeNotification(unsigned value)
+    : NotificationWithCounter(NotificationType::AlarmSnooze, value)
 {}
 
 PhoneLockNotification::PhoneLockNotification(std::string formattedTime)
