@@ -108,6 +108,18 @@ void NotificationProvider::handle(sys::phone_modes::Tethering tethering)
     }
 }
 
+void NotificationProvider::handleSnooze(unsigned snoozeCount)
+{
+    if (snoozeCount > 0) {
+        notifications[NotificationType::AlarmSnooze] =
+            std::make_shared<notifications::AlarmSnoozeNotification>(snoozeCount);
+    }
+    else if (snoozeCount == 0) {
+        notifications.erase(NotificationType::AlarmSnooze);
+    }
+    send();
+}
+
 void NotificationProvider::requestNotSeenNotifications()
 {
     DBServiceAPI::GetQuery(

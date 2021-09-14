@@ -35,6 +35,8 @@ namespace gui
             -> NotificationListItem *;
         [[nodiscard]] virtual auto create(const notifications::TetheringNotification *notification)
             -> NotificationListItem *;
+        [[nodiscard]] virtual auto create(const notifications::AlarmSnoozeNotification *notification)
+            -> NotificationListItem *;
         [[nodiscard]] virtual auto create(const notifications::PhoneLockNotification *notification)
             -> NotificationListItem *;
 
@@ -46,7 +48,7 @@ namespace gui
         [[nodiscard]] bool isPhoneTimeLock() const noexcept;
 
         void updateData(app::manager::actions::NotificationsChangedParams *params);
-        void dismissAll(const InputEvent &event);
+        void dismissAll();
         void clearAll();
     };
 

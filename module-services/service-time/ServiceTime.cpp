@@ -166,6 +166,19 @@ namespace stm
             return alarmMessageHandler->handleSnoozeRingingAlarm(
                 static_cast<alarms::RingingAlarmSnoozeRequestMessage *>(request));
         });
+        connect(typeid(alarms::StopAllSnoozedAlarmsRequestMessage), [&](sys::Message *request) -> sys::MessagePointer {
+            alarmMessageHandler->handleStopAllSnoozedAlarms();
+            return std::make_shared<sys::ResponseMessage>();
+        });
+        connect(
+            typeid(alarms::RegisterSnoozedAlarmsCountChangeHandlerRequestMessage),
+            [&](sys::Message *request) -> sys::MessagePointer {
+                auto senderName = request->sender;
+                alarmMessageHandler->handleAddSnoozedAlarmCountChangeCallback([this, senderName](unsigned snoozeCount) {
+                    bus.sendUnicast(std::make_shared<alarms::SnoozedAlarmsCountChangeMessage>(snoozeCount), senderName);
+                });
+                return std::make_shared<sys::ResponseMessage>();
+            });
     }
 
     auto ServiceTime::handleSetAutomaticDateAndTimeRequest(sys::Message *request)

@@ -33,6 +33,8 @@ namespace gui
         [[nodiscard]] NotificationType getType() const noexcept;
         void setName(const UTF8 &name, bool isRich = false, gui::text::RichTextParser::TokenMap &&tokens = {});
         void setDismissible(bool isDismissible) noexcept;
+
+        std::function<void()> dismissCallback = nullptr;
     };
 
     class NotificationWithEventCounter : public NotificationListItem
