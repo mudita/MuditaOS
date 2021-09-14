@@ -3,9 +3,9 @@
 
 #include "StateController.hpp"
 #include "HomeScreenPresenter.hpp"
-#include "models/TimeModel.hpp"
 
 #include <common/TimeUtils.hpp>
+#include <common/models/TimeModel.hpp>
 
 #include <keymap/KeyMap.hpp>
 
