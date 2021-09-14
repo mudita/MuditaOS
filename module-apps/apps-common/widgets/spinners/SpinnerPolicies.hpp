@@ -5,8 +5,10 @@
 
 #include <gui/Common.hpp>
 
-#include <vector>
+#include <utf8/UTF8.hpp>
+
 #include <cstdint>
+#include <vector>
 
 namespace gui
 {

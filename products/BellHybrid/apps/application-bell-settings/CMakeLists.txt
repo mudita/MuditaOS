@@ -27,7 +27,6 @@ target_sources(application-bell-settings
         models/TemperatureUnitModel.cpp
         models/TimeUnitsModel.cpp
         models/alarm_settings/SnoozeListItemProvider.cpp
-        models/alarm_settings/SnoozeListItems.hpp
 
         presenter/FrontlightPresenter.cpp
         presenter/PrewakeUpPresenter.cpp
