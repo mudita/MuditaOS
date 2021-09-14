@@ -23,6 +23,7 @@ namespace gui
     {
         presenter->attach(this);
         buildInterface();
+        presenter->createData();
     }
 
     void BellAlarmWindow::buildInterface()
@@ -68,6 +69,16 @@ namespace gui
             return true;
         }
         return AppWindow::onInput(inputEvent);
+    }
+
+    void BellAlarmWindow::setAlarmTime(time_t time)
+    {
+        timeSetFmtSpinner->setTime(time);
+    }
+
+    time_t BellAlarmWindow::getAlarmTime()
+    {
+        return timeSetFmtSpinner->getTime();
     }
 
     void BellAlarmWindow::rebuild()

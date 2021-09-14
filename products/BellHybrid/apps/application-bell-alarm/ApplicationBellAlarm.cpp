@@ -5,6 +5,8 @@
 #include "presenter/BellAlarmWindowPresenter.hpp"
 #include "windows/BellAlarmWindow.hpp"
 
+#include <common/models/AlarmModel.hpp>
+
 namespace app
 {
     ApplicationBellAlarm::ApplicationBellAlarm(std::string name,
@@ -30,7 +32,8 @@ namespace app
     void ApplicationBellAlarm::createUserInterface()
     {
         windowsFactory.attach(gui::name::window::main_window, [](ApplicationCommon *app, const std::string &name) {
-            auto presenter = std::make_unique<bell_alarm::BellAlarmWindowPresenter>();
+            auto alarmModel = std::make_unique<app::AlarmModel>(app);
+            auto presenter  = std::make_unique<bell_alarm::BellAlarmWindowPresenter>(std::move(alarmModel));
             return std::make_unique<gui::BellAlarmWindow>(app, std::move(presenter));
         });
 
