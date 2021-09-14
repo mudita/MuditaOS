@@ -5,11 +5,12 @@
 usage() {
 cat << ==usage
 Usage: $(basename $0) image_path image_partitions build_dir [boot.bin_file] [updater.bin_file]
-    image_path       - Destination image path name e.g., PurePhone.img
-    image_partitions - Path to image_partitions.map product-specific file
-    sysroot          - product's system root e.g., build-rt1051-RelWithDebInfo/sysroot
-    boot.bin_file    - optional for linux image - name of the boot.bin file (for different targets)
-    updater.bin_file - optional for linux image - name of the updater.bin file
+    image_path        - Destination image path name e.g., PurePhone.img
+    image_partitions  - Path to image_partitions.map product-specific file
+    sysroot           - product's system root e.g., build-rt1051-RelWithDebInfo/sysroot
+    version.json_file - version file
+    boot.bin_file     - optional for linux image - name of the boot.bin file (for different targets)
+    updater.bin_file  - optional for linux image - name of the updater.bin file
 ==usage
 }
 
@@ -24,8 +25,9 @@ PRODUCT_NAME=$(basename -s .img $1)
 IMAGE_PARTITIONS=$(realpath $2)
 
 SYSROOT=$(realpath $3)
-BIN_FILE=$4
-UPDATER_FILE=$5
+VERSION_FILE=$4
+BIN_FILE=$5
+UPDATER_FILE=$6
 
 if [ ! -d "$SYSROOT" ]; then
 	echo "Error! ${SYSROOT} is not a directory"
@@ -115,6 +117,13 @@ for i in $CURRENT_DATA; do
 		exit 1
 	fi
 done
+
+if [[ -n "${VERSION_FILE}" && -f "${VERSION_FILE}" ]]; then
+	mcopy -v -s -i "$PART1" ${VERSION_FILE} ::/current/version.json
+else
+	echo "Warning! Missing version.json"
+	echo "(it's fine for a Linux build)"
+fi
 
 if [[ -n "${BIN_FILE}" && -f "${BIN_FILE}" ]]; then
 	mcopy -v -s -i "$PART1" ${BIN_FILE} ::/current/boot.bin
