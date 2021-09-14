@@ -16,26 +16,42 @@ target_sources(module-vfs
 
         drivers/include/purefs/fs/drivers/directory_handle_littlefs.hpp
         drivers/include/purefs/fs/drivers/directory_handle_vfat.hpp
+        drivers/include/purefs/fs/drivers/directory_handle_reedgefs.hpp
         drivers/include/purefs/fs/drivers/file_handle_littlefs.hpp
         drivers/include/purefs/fs/drivers/file_handle_vfat.hpp
+        drivers/include/purefs/fs/drivers/file_handle_reedgefs.hpp
         drivers/include/purefs/fs/drivers/filesystem_littlefs.hpp
         drivers/include/purefs/fs/drivers/filesystem_ext4.hpp
         drivers/include/purefs/fs/drivers/filesystem_vfat.hpp
+        drivers/include/purefs/fs/drivers/filesystem_reedgefs.hpp
         drivers/include/purefs/fs/drivers/mount_point_littlefs.hpp
         drivers/include/purefs/fs/drivers/mount_point_vfat.hpp
         drivers/include/purefs/fs/drivers/mount_point_ext4.hpp
+        drivers/include/purefs/fs/drivers/mount_point_reedgefs.hpp
         drivers/include/thirdparty/fatfs/ffconf.h
+        drivers/include/thirdparty/reedgefs/redconf.h
         drivers/include/thirdparty/fatfs/volume_mapper.hpp
         drivers/include/thirdparty/littlefs/volume_mapper.hpp
         drivers/include/thirdparty/lwext4/ext4_bdev.hpp
         drivers/src/purefs/fs/filesystem_littlefs.cpp
         drivers/src/purefs/fs/filesystem_ext4.cpp
         drivers/src/purefs/fs/filesystem_vfat.cpp
+        drivers/src/purefs/fs/filesystem_reedgefs.cpp
         drivers/src/thirdparty/fatfs/ff_glue.cpp
         drivers/src/thirdparty/fatfs/ffsystem.cpp
         drivers/src/thirdparty/littlefs/lfs_glue.cpp
         drivers/src/thirdparty/lwext4/ext4_bdev.cpp
         drivers/src/purefs/fs/mount_point_ext4.cpp
+        drivers/src/thirdparty/reedgefs/redconf.c
+        drivers/src/thirdparty/reedgefs/glue.cpp
+        drivers/src/thirdparty/reedgefs/services/osassert.c
+        drivers/src/thirdparty/reedgefs/services/osbdev_custom.h
+        drivers/src/thirdparty/reedgefs/services/osbdev.c
+        drivers/src/thirdparty/reedgefs/services/osclock.c
+        drivers/src/thirdparty/reedgefs/services/osmutex.c
+        drivers/src/thirdparty/reedgefs/services/osoutput.c
+        drivers/src/thirdparty/reedgefs/services/ostask.c
+        drivers/src/thirdparty/reedgefs/services/ostimestamp.c
 
         include/internal/purefs/blkdev/disk_handle.hpp
         include/internal/purefs/blkdev/partition_parser.hpp
@@ -87,6 +103,7 @@ target_include_directories(module-vfs
             $<$<STREQUAL:${PROJECT_TARGET},TARGET_Linux>:${CMAKE_CURRENT_SOURCE_DIR}/board/linux/purefs/include>
             ${CMAKE_CURRENT_SOURCE_DIR}/drivers/include/thirdparty
             ${CMAKE_CURRENT_SOURCE_DIR}/drivers/include/thirdparty/fatfs
+            ${CMAKE_CURRENT_SOURCE_DIR}/drivers/include/thirdparty/reedgefs
             ${CMAKE_CURRENT_SOURCE_DIR}/include/internal
         >
     PUBLIC
@@ -98,6 +115,7 @@ target_include_directories(module-vfs
 
 target_link_libraries(module-vfs 
     PRIVATE
+        reliance-edge::fs
         fatfs::fatfs
         lwext4::lwext4
         json::json

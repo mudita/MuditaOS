@@ -43,7 +43,7 @@ namespace purefs::fs::drivers
         }
 
       private:
-        auto native_root() const noexcept -> std::string_view override
+        auto native_root() const noexcept -> std::string override
         {
             return ff_drive();
         }

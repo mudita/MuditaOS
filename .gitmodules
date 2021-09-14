@@ -102,3 +102,7 @@
 [submodule "third-party/dr_libs/src"]
 	path = third-party/dr_libs/src
 	url = https://github.com/mudita/dr_libs.git
+[submodule "reliance-edge"]
+	path = third-party/reedgefs/src
+	url = ../reliance-edge.git
+    branch = mudita

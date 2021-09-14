@@ -155,6 +155,9 @@ namespace purefs::blkdev
         case info_type::erase_block:
             // not supported
             return 0;
+        case info_type::start_sector:
+            // not supported
+            return 0;
         }
         return -ENOTSUP;
     }

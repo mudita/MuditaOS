@@ -327,14 +327,20 @@ namespace purefs::blkdev
             LOG_ERROR("Disk doesn't exists");
             return {};
         }
-        //! When it is partition as for partition sectors count
-        if (what == info_type::sector_count && dfd->is_user_partition()) {
+        //! When it is partition ask for partition info
+        if ((what == info_type::sector_count || what == info_type::start_sector) && dfd->is_user_partition()) {
             if (unsigned(dfd->partition()) >= disk->partitions().size()) {
                 LOG_ERROR("Partition number out of range");
                 return -ERANGE;
             }
             const auto part = disk->partitions()[dfd->partition()];
-            return part.num_sectors;
+            if (what == info_type::sector_count) {
+                return part.num_sectors;
+            }
+            if (what == info_type::start_sector) {
+                return part.start_sector;
+            }
+            return {};
         }
         else {
             return disk->get_info(what, dfd->system_partition());

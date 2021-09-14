@@ -36,7 +36,8 @@ namespace purefs::blkdev
     {
         sector_count, //! Number of sectors on disk or part
         sector_size,  //! Single sector size
-        erase_block   //! Number of sectors in erase block
+        erase_block,  //! Number of sectors in erase block
+        start_sector  //! First sector
     };
 
     //! Power control states

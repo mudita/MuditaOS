@@ -33,7 +33,7 @@ namespace purefs::fs::drivers
         auto unlock() noexcept -> void;
 
       private:
-        auto native_root() const noexcept -> std::string_view override
+        auto native_root() const noexcept -> std::string override
         {
             return m_root;
         }
