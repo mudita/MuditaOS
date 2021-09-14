@@ -22,4 +22,11 @@ namespace bell::settings
         constexpr inline auto tone     = "snooze_tone";
         constexpr inline auto volume   = "snooze_volume";
     } // namespace Snooze
+    namespace PrewakeUp
+    {
+        constexpr inline auto duration      = "prewake_up_duration";
+        constexpr inline auto tone          = "prewake_up_tone";
+        constexpr inline auto volume        = "prewake_up_volume";
+        constexpr inline auto lightDuration = "prewake_up_light_duration";
+    } // namespace PrewakeUp
 };    // namespace bell::settings

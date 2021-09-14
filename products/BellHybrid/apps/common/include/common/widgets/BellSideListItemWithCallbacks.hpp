@@ -17,6 +17,9 @@ namespace gui
         /// Set list item's value and perform custom action.
         std::function<void()> setValue;
         std::function<void()> onExit;
+
+      protected:
+        void OnFocusChangedCallback();
     };
 
 } // namespace gui

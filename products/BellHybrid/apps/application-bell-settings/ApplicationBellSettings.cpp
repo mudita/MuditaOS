@@ -3,26 +3,26 @@
 
 #include "ApplicationBellSettings.hpp"
 #include "FrontlightPresenter.hpp"
-#include "PrewakeUpPresenter.hpp"
 #include "presenter/TimeUnitsPresenter.hpp"
 #include "models/FrontlightModel.hpp"
-#include "models/PrewakeUpModel.hpp"
 #include "models/TemperatureUnitModel.hpp"
+#include "models/alarm_settings/PrewakeUpListItemProvider.hpp"
+#include "models/alarm_settings/PrewakeUpSettingsModel.hpp"
 #include "models/alarm_settings/SnoozeListItemProvider.hpp"
+#include "models/alarm_settings/SnoozeSettingsModel.hpp"
 #include "presenter/alarm_settings/SnoozePresenter.hpp"
 #include "windows/advanced/BellSettingsAdvancedWindow.hpp"
 #include "windows/advanced/BellSettingsTimeUnitsWindow.hpp"
-#include "windows/alarm_settings/BellSettingsAlarmSettingsWindow.hpp"
 #include "windows/alarm_settings/BellSettingsAlarmSettingsSnoozeWindow.hpp"
+#include "windows/alarm_settings/BellSettingsAlarmSettingsWindow.hpp"
+#include "windows/alarm_settings/BellSettingsPrewakeUpWindow.hpp"
 #include "windows/BellSettingsBedtimeToneWindow.hpp"
 #include "windows/BellSettingsFrontlight.hpp"
 #include "windows/BellSettingsHomeViewWindow.hpp"
-#include "windows/BellSettingsPrewakeUpWindow.hpp"
 #include "windows/BellSettingsTurnOffWindow.hpp"
 #include "windows/BellSettingsWindow.hpp"
 
 #include <apps-common/windows/Dialog.hpp>
-#include <common/models/SnoozeSettingsModel.hpp>
 #include <common/BellFinishedWindow.hpp>
 #include <service-evtmgr/Constants.hpp>
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
@@ -99,9 +99,19 @@ namespace app
                               });
 
         windowsFactory.attach(
-            gui::window::name::bellSettingsAlarmSettingsPrewakeUp, [](ApplicationCommon *app, const std::string &name) {
-                auto model     = std::make_shared<bell_settings::PrewakeUpModel>(app);
-                auto presenter = std::make_unique<bell_settings::PrewakeUpWindowPresenter>(std::move(model));
+            gui::BellSettingsPrewakeUpWindow::name, [this](ApplicationCommon *app, const std::string &name) {
+                auto chimeDurationModel = std::make_unique<bell_settings::PrewakeUpChimeDurationModel>(this);
+                auto chimeToneModel     = std::make_unique<bell_settings::PrewakeUpChimeToneModel>(this);
+                auto chimeVolumeModel   = std::make_unique<bell_settings::PrewakeUpChimeVolumeModel>(this);
+                auto lightDurationModel = std::make_unique<bell_settings::PrewakeUpLightDurationModel>(this);
+                auto prewakeUpSettingsModel =
+                    std::make_unique<bell_settings::PrewakeUpSettingsModel>(std::move(chimeDurationModel),
+                                                                            std::move(chimeToneModel),
+                                                                            std::move(chimeVolumeModel),
+                                                                            std::move(lightDurationModel));
+                auto provider  = std::make_shared<bell_settings::PrewakeUpListItemProvider>(*prewakeUpSettingsModel);
+                auto presenter = std::make_unique<bell_settings::PrewakeUpWindowPresenter>(
+                    provider, std::move(prewakeUpSettingsModel));
                 return std::make_unique<gui::BellSettingsPrewakeUpWindow>(app, std::move(presenter));
             });
 
