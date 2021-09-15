@@ -22,13 +22,6 @@ namespace gui
     void MeditationTimerWindow::buildInterface()
     {
         MeditationWindow::buildInterface();
-        statusBar->setVisible(false);
-        // bottomBar->setActive(BottomBar::Side::CENTER, true);
-        // bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(style::strings::common::select));
-        // bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        // bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
-
-        // setTitle(gui::name::window::meditation_timer);
 
         auto newLabel = [](Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h) {
             auto label = new gui::Label(parent, x, y, w, h);
@@ -39,20 +32,23 @@ namespace gui
         };
 
         title = newLabel(this, mtStyle::title::x, mtStyle::title::y, mtStyle::title::w, mtStyle::title::h);
-        title->setFont(style::window::font::big);
-        title->setText(gui::name::window::meditation_timer);
+        title->setFont(mtStyle::title::font);
+        title->setText(utils::translate("app_meditation_title_main"));
 
         text = newLabel(this, mtStyle::text::x, mtStyle::text::y, mtStyle::text::w, mtStyle::text::h);
-        text->setFont(style::window::font::supersizemelight);
+        text->setFont(mtStyle::text::font);
 
         minute = newLabel(this, mtStyle::minute::x, mtStyle::minute::y, mtStyle::minute::w, mtStyle::minute::h);
-        minute->setFont(style::window::font::small);
-        minute->setText("Minutes");
+        minute->setFont(mtStyle::minute::font);
+        minute->setText(utils::translate("app_meditation_bell_minutes"));
+        // minute->setText("Minutes");
+        minute->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
     }
 
     void MeditationTimerWindow::destroyInterface()
     {
         erase();
+        title  = nullptr;
         text   = nullptr;
         minute = nullptr;
     }
@@ -93,11 +89,11 @@ namespace gui
     {
         LOG_DEBUG("increaseTimer");
 
-        uint32_t t = item.getTimerSecs();
-        if (t >= meditation::value::TIMER_MAX) {
+        std::chrono::seconds t = item.getTimer();
+        if (t >= meditation::value::maxTimerValue) {
             return;
         }
-        item.setTimerSecs(t + 60);
+        item.setTimer(t + std::chrono::seconds{60});
         updateDisplay();
     }
 
@@ -105,16 +101,16 @@ namespace gui
     {
         LOG_DEBUG("decreaseTimer");
 
-        uint32_t t = item.getTimerSecs();
-        if (t <= meditation::value::TIMER_MIN) {
+        std::chrono::seconds t = item.getTimer();
+        if (t <= meditation::value::minTimerValue) {
             return;
         }
-        item.setTimerSecs(t - 60);
+        item.setTimer(t - std::chrono::seconds{60});
         updateDisplay();
     }
 
     void MeditationTimerWindow::updateDisplay()
     {
-        text->setText(std::to_string(item.getTimerSecs() / 60));
+        text->setText(std::to_string(item.getTimer() / std::chrono::seconds{60}));
     }
 } // namespace gui

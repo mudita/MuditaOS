@@ -23,13 +23,6 @@ namespace gui
     {
         MeditationWindow::buildInterface();
 
-        // bottomBar->setActive(BottomBar::Side::CENTER, true);
-        // bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(style::strings::common::select));
-        // bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        // bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
-
-        // setTitle(gui::name::window::interval_chime);
-
         previousImage = new gui::Image(
             this, icStyle::left_arrow::x, icStyle::left_arrow::y, 0, 0, icStyle::left_arrow::imageSource);
         nextImage = new gui::Image(
@@ -44,15 +37,16 @@ namespace gui
         };
 
         title = newLabel(this, icStyle::title::x, icStyle::title::y, icStyle::title::w, icStyle::title::h);
-        title->setFont(style::window::font::medium);
-        title->setText(gui::name::window::interval_chime);
+        title->setFont(icStyle::title::font);
+        title->setText(utils::translate("app_meditation_interval_chime"));
 
         text = newLabel(this, icStyle::text::x, icStyle::text::y, icStyle::text::w, icStyle::text::h);
-        text->setFont(style::window::font::supersizemelight);
+        text->setFont(icStyle::text::font);
 
         minute = newLabel(this, icStyle::minute::x, icStyle::minute::y, icStyle::minute::w, icStyle::minute::h);
-        minute->setFont(style::window::font::small);
-        minute->setText("Minutes");
+        minute->setFont(icStyle::minute::font);
+        minute->setText(utils::translate("app_meditation_bell_minutes"));
+        minute->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
     }
 
     void IntervalChimeWindow::destroyInterface()
@@ -60,6 +54,7 @@ namespace gui
         erase();
         previousImage = nullptr;
         nextImage     = nullptr;
+        title         = nullptr;
         text          = nullptr;
         minute        = nullptr;
     }
@@ -104,13 +99,13 @@ namespace gui
     {
         LOG_DEBUG("previous");
 
-        if (intervalType > INTERVAL_NONE) {
-            intervalType--;
+        if (static_cast<uint32_t>(intervalType) > static_cast<uint32_t>(IntervalType::IntervalNone)) {
+            intervalType = IntervalType(static_cast<uint32_t>(intervalType) - 1);
         }
         else {
-            intervalType = INTERVAL_15;
+            intervalType = IntervalType::Interval_15;
         }
-        item.setIntervalSecs(intervalToSecs());
+        item.setInterval(intervalToSecs());
         updateDisplay();
     }
 
@@ -118,13 +113,13 @@ namespace gui
     {
         LOG_DEBUG("next");
 
-        if (intervalType < INTERVAL_15) {
-            intervalType++;
+        if (static_cast<uint32_t>(intervalType) < static_cast<uint32_t>(IntervalType::Interval_15)) {
+            intervalType = IntervalType(static_cast<uint32_t>(intervalType) + 1);
         }
         else {
-            intervalType = INTERVAL_NONE;
+            intervalType = IntervalType::IntervalNone;
         }
-        item.setIntervalSecs(intervalToSecs());
+        item.setInterval(intervalToSecs());
         updateDisplay();
     }
 
@@ -133,41 +128,53 @@ namespace gui
         text->setText(getIntervalString());
     }
 
-    std::string IntervalChimeWindow::getIntervalString()
+    std::string IntervalChimeWindow::getIntervalString() const
     {
-        switch (intervalType) {
-        case INTERVAL_NONE:
-            return "None";
-        case INTERVAL_1:
-            return "every 1";
-        case INTERVAL_2:
-            return "every 2";
-        case INTERVAL_5:
-            return "every 5";
-        case INTERVAL_10:
-            return "every 10";
-        case INTERVAL_15:
-            return "every 15";
+        if (intervalType == IntervalType::IntervalNone) {
+            return utils::translate("app_meditation_bell_interval_none");
         }
-        return "None";
+
+        const std::string toReplace = "%0";
+        std::string temp            = utils::translate("app_meditation_bell_interval_every_x_minutes");
+
+        switch (intervalType) {
+        case IntervalType::IntervalNone:
+            break;
+        case IntervalType::Interval_1:
+            temp.replace(temp.find(toReplace), toReplace.size(), std::to_string(1));
+            break;
+        case IntervalType::Interval_2:
+            temp.replace(temp.find(toReplace), toReplace.size(), std::to_string(2));
+            break;
+        case IntervalType::Interval_5:
+            temp.replace(temp.find(toReplace), toReplace.size(), std::to_string(5));
+            break;
+        case IntervalType::Interval_10:
+            temp.replace(temp.find(toReplace), toReplace.size(), std::to_string(10));
+            break;
+        case IntervalType::Interval_15:
+            temp.replace(temp.find(toReplace), toReplace.size(), std::to_string(15));
+            break;
+        }
+        return temp;
     }
 
-    uint32_t IntervalChimeWindow::intervalToSecs()
+    std::chrono::seconds IntervalChimeWindow::intervalToSecs() const noexcept
     {
         switch (intervalType) {
-        case INTERVAL_NONE:
-            return 0;
-        case INTERVAL_1:
-            return 60;
-        case INTERVAL_2:
-            return 2 * 60;
-        case INTERVAL_5:
-            return 5 * 60;
-        case INTERVAL_10:
-            return 10 * 60;
-        case INTERVAL_15:
-            return 15 * 60;
+        case IntervalType::IntervalNone:
+            return std::chrono::seconds::zero();
+        case IntervalType::Interval_1:
+            return std::chrono::seconds{60};
+        case IntervalType::Interval_2:
+            return std::chrono::seconds{2 * 60};
+        case IntervalType::Interval_5:
+            return std::chrono::seconds{5 * 60};
+        case IntervalType::Interval_10:
+            return std::chrono::seconds{10 * 60};
+        case IntervalType::Interval_15:
+            return std::chrono::seconds{15 * 60};
         }
-        return 0;
+        return std::chrono::seconds::zero();
     }
 } // namespace gui

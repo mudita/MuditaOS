@@ -26,8 +26,9 @@ namespace gui
 
       public:
         MeditationWindow() = delete;
-        explicit MeditationWindow(app::Application *app, std::string name);
+        MeditationWindow(app::Application *app, std::string name);
 
+        void buildInterface() override;
         bool onInput(const gui::InputEvent &inputEvent) override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
     };

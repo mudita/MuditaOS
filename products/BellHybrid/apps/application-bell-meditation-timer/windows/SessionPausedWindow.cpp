@@ -12,35 +12,9 @@ using namespace meditationStyle;
 
 namespace gui
 {
-    SessionPausedWindow::SessionPausedWindow(app::Application *app) : AppWindow(app, gui::name::window::session_paused)
-    {
-        buildInterface();
-    }
-
-    void SessionPausedWindow::buildInterface()
-    {
-        AppWindow::buildInterface();
-
-        appImage = new gui::Image(this, spStyle::icon::x, spStyle::icon::y, 0, 0, spStyle::icon::imageSource);
-
-        text = new gui::Label(this, spStyle::text::x, spStyle::text::y, spStyle::text::w, spStyle::text::h);
-        text->setFilled(false);
-        text->setBorderColor(gui::ColorNoColor);
-        text->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-        text->setText("Paused");
-    }
-
-    void SessionPausedWindow::destroyInterface()
-    {
-        erase();
-        appImage = nullptr;
-        text     = nullptr;
-    }
-
-    void SessionPausedWindow::onBeforeShow(ShowMode mode, SwitchData *data)
-    {
-        AppWindow::onBeforeShow(mode, data);
-    }
+    SessionPausedWindow::SessionPausedWindow(app::Application *app)
+        : IconTextWindow(app, gui::name::window::session_paused)
+    {}
 
     bool SessionPausedWindow::onInput(const gui::InputEvent &inputEvent)
     {
@@ -49,7 +23,25 @@ namespace gui
             return true;
         }
 
-        return AppWindow::onInput(inputEvent);
+        return WithTimerWindow::onInput(inputEvent);
     }
 
+    void SessionPausedWindow::onTimeout()
+    {}
+
+    std::string SessionPausedWindow::getText()
+    {
+        return utils::translate("app_meditation_bell_paused");
+        // return "<text>Paused</text>";
+    }
+
+    std::string SessionPausedWindow::getImageName()
+    {
+        return spStyle::icon::imageSource;
+    }
+
+    std::chrono::seconds SessionPausedWindow::getTimeout() const
+    {
+        return std::chrono::seconds::zero();
+    }
 } // namespace gui

@@ -26,11 +26,12 @@ namespace gui
         ~WithTimerWindow();
 
         // virtual methods
+        void buildInterface() override;
         void destroyInterface() override;
         bool onInput(const InputEvent &inputEvent) override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
 
-        void startTimer(uint32_t secs, bool repeat = false);
+        void startTimer(std::chrono::seconds secs, bool repeat = false);
         void stopTimer();
 
         virtual void onTimeout() = 0;

@@ -8,8 +8,9 @@
 namespace gui
 {
 
-    WithTimerWindow::WithTimerWindow(app::Application *app, std::string name) : MeditationWindow(app, name)
+    WithTimerWindow::WithTimerWindow(app::Application *app, std::string name) : MeditationWindow(app, move(name))
     {
+        buildInterface();
         timerCallback = [this](Item &, sys::Timer &) {
             LOG_DEBUG("timeount callback");
             onTimeout();
@@ -23,6 +24,11 @@ namespace gui
         detachTimerIfExists();
     }
 
+    void WithTimerWindow::buildInterface()
+    {
+        MeditationWindow::buildInterface();
+    }
+
     void WithTimerWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         MeditationWindow::onBeforeShow(mode, data);
@@ -33,15 +39,15 @@ namespace gui
         return MeditationWindow::onInput(inputEvent);
     }
 
-    void WithTimerWindow::startTimer(uint32_t secs, bool repeat)
+    void WithTimerWindow::startTimer(std::chrono::seconds secs, bool repeat)
     {
         if (repeat) {
             timer = app::GuiTimerFactory::createPeriodicTimer(
-                application, this, window::timerName, std::chrono::milliseconds{secs * 1000});
+                application, this, window::timerName, std::chrono::duration_cast<std::chrono::milliseconds>(secs));
         }
         else {
             timer = app::GuiTimerFactory::createSingleShotTimer(
-                application, this, window::timerName, std::chrono::milliseconds{secs * 1000});
+                application, this, window::timerName, std::chrono::duration_cast<std::chrono::milliseconds>(secs));
         }
         timer.start();
     }

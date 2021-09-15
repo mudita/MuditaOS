@@ -7,51 +7,52 @@ namespace meditation
 {
     namespace value
     {
-        inline constexpr auto TIMER_DEF = 20 * 60;
-        inline constexpr auto TIMER_MAX = 180 * 60;
-        inline constexpr auto TIMER_MIN = 1 * 60;
+        inline constexpr auto defaultTimerValue = std::chrono::seconds{20 * 60};
+        inline constexpr auto maxTimerValue     = std::chrono::seconds{180 * 60};
+        inline constexpr auto minTimerValue     = std::chrono::seconds{1 * 60};
     } // namespace value
 
     class MeditationItem
     {
       private:
-        uint32_t timerSecs;
-        uint32_t intervalSecs;
-        uint32_t passedSecs;
+        std::chrono::seconds timer;
+        std::chrono::seconds interval;
+        std::chrono::seconds passed;
 
       public:
-        explicit MeditationItem() : timerSecs{value::TIMER_DEF}, intervalSecs{0}, passedSecs{0}
+        MeditationItem()
+            : timer{value::defaultTimerValue}, interval{std::chrono::seconds::zero()}, passed{
+                                                                                           std::chrono::seconds::zero()}
         {}
-        virtual ~MeditationItem() = default;
 
-        inline auto getTimerSecs()
+        inline auto getTimer() const noexcept
         {
-            return timerSecs;
+            return timer;
         }
 
-        inline void setTimerSecs(uint32_t secs)
+        inline void setTimer(std::chrono::seconds value) noexcept
         {
-            timerSecs = secs;
+            timer = value;
         }
 
-        inline auto getIntervalSecs()
+        inline auto getInterval() const noexcept
         {
-            return intervalSecs;
+            return interval;
         }
 
-        inline void setIntervalSecs(uint32_t secs)
+        inline void setInterval(std::chrono::seconds value) noexcept
         {
-            intervalSecs = secs;
+            interval = value;
         }
 
-        inline auto getPassedSecs()
+        inline auto getPassed() const noexcept
         {
-            return passedSecs;
+            return passed;
         }
 
-        inline void setPassedSecs(uint32_t secs)
+        inline void setPassed(std::chrono::seconds value) noexcept
         {
-            passedSecs = secs;
+            passed = value;
         }
     };
 

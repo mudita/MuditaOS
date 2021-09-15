@@ -13,20 +13,22 @@ namespace gui
 
     void ReadyGoingWindow::onTimeout()
     {
-        LOG_DEBUG("onTimeout: timer=%ld, interval=%ld", item.getTimerSecs(), item.getIntervalSecs());
+        LOG_DEBUG("onTimeout: timer=%ld, interval=%ld", item.getTimer().count(), item.getInterval().count());
         gotoWindow(gui::name::window::meditation_running);
     }
 
-    std::vector<std::string> ReadyGoingWindow::getText()
+    std::string ReadyGoingWindow::getText()
     {
-        std::vector<std::string> content;
-        content.emplace_back("Put down Bell Harmony");
-        content.emplace_back("and wait for the gong");
-        return content;
+        return utils::translate("app_meditation_bell_put_down_and_wait");
     }
 
-    uint32_t ReadyGoingWindow::getTimeout()
+    std::string ReadyGoingWindow::getImageName()
     {
-        return 5;
+        return itStyle::icon::imageSource;
+    }
+
+    std::chrono::seconds ReadyGoingWindow::getTimeout() const
+    {
+        return timeout;
     }
 } // namespace gui

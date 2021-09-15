@@ -19,7 +19,11 @@ namespace gui
 
         // virtual methods
         void onTimeout() override;
-        std::vector<std::string> getText() override;
-        uint32_t getTimeout() override;
+        std::string getText() override;
+        std::string getImageName() override;
+        std::chrono::seconds getTimeout() const override;
+
+      private:
+        const std::chrono::seconds timeout = std::chrono::seconds{5};
     };
 } // namespace gui
