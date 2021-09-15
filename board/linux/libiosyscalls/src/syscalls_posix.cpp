@@ -25,6 +25,7 @@ namespace
     {
         __REAL_DECL(link);
         __REAL_DECL(unlink);
+        __REAL_DECL(rmdir);
         __REAL_DECL(symlink);
 
         __REAL_DECL(fcntl);
@@ -82,6 +83,7 @@ namespace
     {
         __REAL_DLSYM(link);
         __REAL_DLSYM(unlink);
+        __REAL_DLSYM(rmdir);
         __REAL_DLSYM(symlink);
 
         __REAL_DLSYM(fcntl);
@@ -130,10 +132,10 @@ namespace
         __REAL_DLSYM(poll);
         __REAL_DLSYM(statvfs);
 
-        if (!(real::link && real::unlink && real::symlink && real::fcntl && real::chdir && real::fchdir &&
-              real::getcwd && real::getwd && real::get_current_dir_name && real::mkdir && real::chmod && real::fchmod &&
-              real::fsync && real::fdatasync && real::read && real::write && real::lseek && real::lseek64 &&
-              real::mount && real::umount && real::ioctl && real::poll && real::statvfs
+        if (!(real::link && real::unlink && real::rmdir && real::symlink && real::fcntl && real::chdir &&
+              real::fchdir && real::getcwd && real::getwd && real::get_current_dir_name && real::mkdir && real::chmod &&
+              real::fchmod && real::fsync && real::fdatasync && real::read && real::write && real::lseek &&
+              real::lseek64 && real::mount && real::umount && real::ioctl && real::poll && real::statvfs
 #if __GLIBC__ > 2 || ((__GLIBC__ == 2) && (__GLIBC_MINOR__ >= 28))
               && real::fcntl64
 #endif
@@ -285,6 +287,21 @@ extern "C"
         }
     }
     __asm__(".symver _iosys_unlink,unlink@GLIBC_2.2.5");
+
+    int _iosys_rmdir(const char *name)
+    {
+        if (vfs::redirect_to_image(name)) {
+            TRACE_SYSCALLN("(%s) -> VFS", name);
+            return vfs::invoke_fs(&fs::rmdir, name);
+        }
+        else {
+            TRACE_SYSCALLN("(%s) -> linux fs", name);
+            char tmp[PATH_MAX];
+            const auto path = vfs::npath_translate(name, tmp);
+            return real::rmdir(path);
+        }
+    }
+    __asm__(".symver _iosys_rmdir,rmdir@GLIBC_2.2.5");
 
     int _iosys_fcntl(int fd, int cmd, ... /* arg */)
     {

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <purefs/fs/drivers/filesystem_vfat.hpp>
@@ -376,6 +376,18 @@ namespace purefs::fs::drivers
         }
         const auto fspath = vmnt->native_path(name);
         const auto fret   = f_unlink(fspath.c_str());
+        return translate_error(fret);
+    }
+
+    auto filesystem_vfat::rmdir(fsmount mnt, std::string_view name) noexcept -> int
+    {
+        auto vmnt = std::dynamic_pointer_cast<mount_point_vfat>(mnt);
+        if (!vmnt) {
+            LOG_ERROR("Non VFAT mount point");
+            return -ENXIO;
+        }
+        const auto fspath = vmnt->native_path(name);
+        const auto fret   = f_rmdir(fspath.c_str());
         return translate_error(fret);
     }
 

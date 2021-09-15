@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 #include <purefs/fs/filesystem_operations.hpp>
 #include <purefs/fs/directory_handle.hpp>
@@ -46,6 +46,10 @@ namespace purefs::fs
         return -ENOTSUP;
     }
     auto filesystem_operations::unlink(fsmount mnt, std::string_view name) noexcept -> int
+    {
+        return -ENOTSUP;
+    }
+    auto filesystem_operations::rmdir(fsmount mnt, std::string_view name) noexcept -> int
     {
         return -ENOTSUP;
     }
