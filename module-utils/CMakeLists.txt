@@ -11,10 +11,10 @@ add_library(${PROJECT_NAME} STATIC)
 target_sources(module-utils
     PRIVATE
         circular_buffer/StringCircularBuffer.cpp
-        #generators/RandomStringGenerator.cpp
+        generators/RandomStringGenerator.cpp
         #ical/ParserICS.cpp
         #PhoneNumber.cpp
-        #Utils.cpp
+        Utils.cpp
 
     PUBLIC
         circular_buffer/StringCircularBuffer.hpp
@@ -29,7 +29,7 @@ target_link_libraries(${PROJECT_NAME}
         magic_enum
         log-api
     PRIVATE
-        #hash-library::hash-library
+        hash-library::hash-library
         #json::json
         #    time
 )
