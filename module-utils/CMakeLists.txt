@@ -28,6 +28,8 @@ target_link_libraries(${PROJECT_NAME}
         clipboard
         eventstore
         log-api
+        math
+        ucs2
         utf8
 
         # third-party components
@@ -58,8 +60,8 @@ add_subdirectory(Clipboard)
 add_subdirectory(EventStore)
 #add_subdirectory(i18n)
 add_subdirectory(log)
-#add_subdirectory(math)
+add_subdirectory(math)
 #add_subdirectory(rrule)
 #add_subdirectory(time)
-#add_subdirectory(ucs2)
+add_subdirectory(ucs2)
 add_subdirectory(utf8)

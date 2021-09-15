@@ -4,7 +4,10 @@ module_is_test_entity(ucs2)
 
 target_sources(ucs2
     PRIVATE
-       ucs2/UCS2.cpp
+        ucs2/UCS2.cpp
+
+    PUBLIC
+        ucs2/UCS2.hpp
 )
 
 target_include_directories(ucs2
@@ -17,7 +20,7 @@ target_link_libraries(ucs2
         utf8
 
     PRIVATE
-        log
+        log-api
 )
 
 if (${ENABLE_TESTS})
