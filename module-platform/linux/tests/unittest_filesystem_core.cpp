@@ -134,7 +134,7 @@ TEST_CASE("Corefs: Create new file, write, read from it")
     fscore.write(hwnd, text.c_str(), text.size());
 
     REQUIRE(fscore.close(hwnd) == 0);
-    SECTION("Read from file")
+
     {
         int hwnd = fscore.open("/sys/test.txt", O_RDONLY, 0);
         REQUIRE(hwnd >= 3);
@@ -142,10 +142,8 @@ TEST_CASE("Corefs: Create new file, write, read from it")
         REQUIRE(fscore.read(hwnd, buf, sizeof(buf)) == 4);
         REQUIRE(strcmp(buf, text.c_str()) == 0);
         fscore.close(hwnd);
-        REQUIRE(fscore.umount("/sys") == 0);
     }
 
-    SECTION("Test seek file")
     {
         int hwnd = fscore.open("/sys/test.txt", O_RDONLY, 0);
         REQUIRE(hwnd >= 3);
@@ -155,8 +153,14 @@ TEST_CASE("Corefs: Create new file, write, read from it")
         REQUIRE(fscore.read(hwnd, buf, sizeof(buf)) == 0);
         REQUIRE(fscore.seek(hwnd, 0, SEEK_SET) == 0);
         fscore.close(hwnd);
-        REQUIRE(fscore.umount("/sys") == 0);
     }
+
+    {
+        REQUIRE(fscore.rmdir("/sys/test23") == -ENOENT);
+        REQUIRE(fscore.mkdir("/sys/testdirxyzk", 0666) == 0);
+        REQUIRE(fscore.rmdir("/sys/testdirxyzk") == 0);
+    }
+    REQUIRE(fscore.umount("/sys") == 0);
 }
 
 TEST_CASE("Corefs: Register null filesystem")

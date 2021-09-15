@@ -93,3 +93,7 @@
 [submodule "usb_stack"]
 	path = third-party/usb_stack
 	url = ../usb_stack.git
+[submodule "third-party/lwext4/lwext4"]
+	path = third-party/lwext4/lwext4
+	url = ../lwext4.git
+	branch = mudita
