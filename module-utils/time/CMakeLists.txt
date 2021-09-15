@@ -13,18 +13,21 @@ target_sources(time
     PRIVATE
         time/time_conversion.cpp
         time/time_date_validation.cpp
-        time/TimeRangeParser.cpp
-        time/TimeZone.cpp
         time/time_conversion_factory.cpp
-
         time/dateCommon.hpp
+        #time/TimeRangeParser.cpp
+        #time/TimeZone.cpp
 )
 
-target_include_directories(time PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
+target_include_directories(time
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+)
 
 target_link_libraries(time 
-    PRIVATE 
+    PRIVATE
         time-constants
+        utils
         utz::utz
     PUBLIC
         i18n

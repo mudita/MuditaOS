@@ -4,8 +4,9 @@
 #ifndef DATECOMMON_H
 #define DATECOMMON_H
 
-#include <time/time_conversion_factory.hpp>
-#include <module-utils/Utils.hpp>
+#include "time_conversion_factory.hpp"
+
+#include <Utils.hpp>
 #include <service-time/api/TimeSettingsApi.hpp>
 
 #include <date/date.h>

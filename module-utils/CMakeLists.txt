@@ -29,6 +29,7 @@ target_link_libraries(${PROJECT_NAME}
         i18n
         log-api
         math
+        time
         ucs2
         utf8
         utils
@@ -58,7 +59,7 @@ add_subdirectory(i18n)
 add_subdirectory(log)
 add_subdirectory(math)
 #add_subdirectory(rrule)
-#add_subdirectory(time)
+add_subdirectory(time)
 add_subdirectory(ucs2)
 add_subdirectory(utf8)
 add_subdirectory(utils)
