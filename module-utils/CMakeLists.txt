@@ -24,6 +24,7 @@ target_sources(module-utils
 
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
+        bootconfig
         clipboard
         eventstore
         i18n
@@ -52,7 +53,7 @@ if (${ENABLE_TESTS})
     add_subdirectory( test )
 endif()
 
-#add_subdirectory(bootconfig)
+add_subdirectory(bootconfig)
 add_subdirectory(Clipboard)
 add_subdirectory(EventStore)
 add_subdirectory(i18n)

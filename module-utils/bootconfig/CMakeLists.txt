@@ -7,10 +7,14 @@ target_include_directories(bootconfig
 )
 
 target_link_libraries(bootconfig
-   PRIVATE
-      purefs-paths
-      hash-library::hash-library
-      Microsoft.GSL::GSL
-      json::json
-      version-header
+    PRIVATE
+        module-os
+        purefs-paths
+        time
+        utils
+
+        hash-library::hash-library
+        Microsoft.GSL::GSL
+        json::json
+        version-header
 )

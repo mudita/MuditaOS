@@ -3,23 +3,21 @@
 #include <boot/bootconfig.hpp>
 #include <boot/bootconstants.hpp>
 
-#include <gsl/util>
-#include <limits.h>
+#include <log.hpp>
 #include <purefs/filesystem_paths.hpp>
 #include <source/version.hpp>
-#include <time/time_conversion.hpp>
 #include <ticks.hpp>
-#include <cstdio>
-#include <log.hpp>
-#include <array>
+#include <time/time_conversion.hpp>
 #include <Utils.hpp>
 
+#include <gsl/util>
+
+#include <limits.h>
+
+#include <array>
 #include <fstream>
 
-#include <purefs/filesystem_paths.hpp>
-#include <sys/mount.h>
-#include <sys/statvfs.h>
-
+#include <cstdio>
 namespace boot
 {
     namespace
@@ -131,7 +129,6 @@ namespace boot
         }
         return 0;
     }
-
 
     bool BootConfig::loadBootConfig(const std::filesystem::path &bootJsonPath)
     {
