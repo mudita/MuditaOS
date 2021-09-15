@@ -6,32 +6,32 @@ endif()
 
 module_is_test_entity()
 
-set (SOURCES
-        ${CMAKE_CURRENT_SOURCE_DIR}/PhoneNumber.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/PhoneNumber.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/NumberHolderMatcher.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/country.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/ical/ParserICS.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Utils.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/circular_buffer/StringCircularBuffer.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/generators/RandomStringGenerator.cpp
+add_library(${PROJECT_NAME} STATIC)
+
+target_sources(module-utils
+    PRIVATE
+        circular_buffer/StringCircularBuffer.cpp
+        #generators/RandomStringGenerator.cpp
+        #ical/ParserICS.cpp
+        #PhoneNumber.cpp
+        #Utils.cpp
+
+    PUBLIC
+        circular_buffer/StringCircularBuffer.hpp
+        country.hpp
+        NumberHolderMatcher.hpp
+        PhoneNumber.hpp
 )
 
-add_library(${PROJECT_NAME} STATIC ${SOURCES})
-
 target_link_libraries(${PROJECT_NAME}
-PUBLIC
-    application-calendar
-    board
-    libphonenumber::libphonenumber
-    log
-    magic_enum
-    module-os
-    module-vfs
-PRIVATE
-    hash-library::hash-library
-    json::json
-    time
+    PUBLIC
+        #libphonenumber::libphonenumber
+        magic_enum
+        log-api
+    PRIVATE
+        #hash-library::hash-library
+        #json::json
+        #    time
 )
 
 # Board specific compilation definitions,options,include directories and features
@@ -48,13 +48,13 @@ if (${ENABLE_TESTS})
     add_subdirectory( test )
 endif()
 
-add_subdirectory(bootconfig)
-add_subdirectory(Clipboard)
-add_subdirectory(EventStore)
-add_subdirectory(i18n)
+#add_subdirectory(bootconfig)
+#add_subdirectory(Clipboard)
+#add_subdirectory(EventStore)
+#add_subdirectory(i18n)
 add_subdirectory(log)
-add_subdirectory(math)
-add_subdirectory(rrule)
-add_subdirectory(time)
-add_subdirectory(ucs2)
-add_subdirectory(utf8)
+#add_subdirectory(math)
+#add_subdirectory(rrule)
+#add_subdirectory(time)
+#add_subdirectory(ucs2)
+#add_subdirectory(utf8)

@@ -47,4 +47,5 @@ target_link_libraries (libphonenumber
         re2::re2
     PUBLIC 
         protobuf::libprotobuf-lite
+        module-os
 )

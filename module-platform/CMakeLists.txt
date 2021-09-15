@@ -23,4 +23,5 @@ target_link_libraries(
         module-bsp
 )
 
+add_subdirectory(logger)
 add_subdirectory(${PROJECT_TARGET_NAME})
