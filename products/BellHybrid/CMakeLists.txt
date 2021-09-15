@@ -40,6 +40,7 @@ target_link_libraries(BellHybrid
         appmgr
         bell::app-alarm
         bell::app-onboarding
+        bell::app-background-sounds
         bell::app-common
         bell::app-main
         bell::app-powernap
