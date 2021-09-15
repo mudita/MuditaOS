@@ -15,8 +15,8 @@ target_sources(time
         time/time_date_validation.cpp
         time/time_conversion_factory.cpp
         time/dateCommon.hpp
-        #time/TimeRangeParser.cpp
-        #time/TimeZone.cpp
+        time/TimeRangeParser.cpp
+        time/TimeZone.cpp
 )
 
 target_include_directories(time
@@ -26,6 +26,7 @@ target_include_directories(time
 
 target_link_libraries(time 
     PRIVATE
+        date
         time-constants
         utils
         utz::utz
