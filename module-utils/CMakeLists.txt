@@ -13,7 +13,7 @@ target_sources(module-utils
         circular_buffer/StringCircularBuffer.cpp
         generators/RandomStringGenerator.cpp
         #ical/ParserICS.cpp
-        #PhoneNumber.cpp
+        PhoneNumber.cpp
         Utils.cpp
 
     PUBLIC
@@ -25,9 +25,10 @@ target_sources(module-utils
 
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
-        #libphonenumber::libphonenumber
-        magic_enum
+        libphonenumber::libphonenumber
         log-api
+        magic_enum
+        utf8
     PRIVATE
         hash-library::hash-library
         #json::json
@@ -57,4 +58,4 @@ add_subdirectory(log)
 #add_subdirectory(rrule)
 #add_subdirectory(time)
 #add_subdirectory(ucs2)
-#add_subdirectory(utf8)
+add_subdirectory(utf8)
