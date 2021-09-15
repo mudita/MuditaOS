@@ -92,3 +92,6 @@
 [submodule "libical"]
 	path = third-party/libical/libical
 	url = https://github.com/mudita/libical
+[submodule "third-party/lwext4/lwext4"]
+	path = third-party/lwext4/lwext4
+	url = https://github.com/gkostka/lwext4.git
