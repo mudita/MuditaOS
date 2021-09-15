@@ -6,6 +6,8 @@
 #include <apps-common/windows/Dialog.hpp>
 #include <AsyncTask.hpp>
 
+struct AlarmEventRecord;
+
 namespace gui
 {
     class AlarmActivatedWindow : public Dialog, public app::AsyncCallbackReceiver
@@ -15,6 +17,8 @@ namespace gui
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
 
       private:
+        void activateAlarm(AlarmEventRecord alarmEvent);
         bool onAlarmResponseMessage(sys::ResponseMessage *response, ShowMode mode);
+        void showAlarmTime(ShowMode mode, time_t alarmTime);
     };
 } /* namespace gui */
