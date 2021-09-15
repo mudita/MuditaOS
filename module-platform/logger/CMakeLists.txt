@@ -9,5 +9,16 @@ target_sources(log
 add_subdirectory(board)
 
 target_include_directories(log PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(log PUBLIC log-api)
+target_link_libraries(log
+        PRIVATE
+                board
+                module-bsp
+                module-os
+                module-utils
+
+                Microsoft.GSL::GSL
+                segger::rtt
+        PUBLIC
+                log-api
+)
 

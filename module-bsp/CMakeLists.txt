@@ -76,6 +76,7 @@ target_link_libraries(${PROJECT_NAME}
     PUBLIC
         eventstore
         module-os
+        utils
     PRIVATE
         time-constants
         magic_enum

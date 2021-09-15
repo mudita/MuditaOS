@@ -1,12 +1,15 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "critical.hpp"
-#include <fstream>
+#include "Logger.hpp"
+
+#include <critical.hpp>
+#include <LockGuard.hpp>
+#include <macros.h>
+
 #include <gsl/util>
-#include "LockGuard.hpp"
-#include <Logger.hpp>
-#include "macros.h"
+
+#include <fstream>
 
 namespace Log
 {
@@ -134,7 +137,7 @@ namespace Log
         }
 
         {
-            status = 1;
+            status           = 1;
             const auto &logs = getLogs();
 
             LockGuard lock(flushMutex);
