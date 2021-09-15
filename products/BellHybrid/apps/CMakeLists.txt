@@ -20,6 +20,7 @@ target_link_libraries(app
 
 add_subdirectory(application-bell-main)
 add_subdirectory(application-bell-onboarding)
+add_subdirectory(application-bell-background-sounds)
 add_subdirectory(application-bell-alarm)
 add_subdirectory(application-bell-settings)
 add_subdirectory(application-bell-powernap)
