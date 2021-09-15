@@ -38,8 +38,8 @@ namespace gui
         gui::Label *title           = nullptr;
         gui::Label *timer           = nullptr;
         UnityProgressBar *progress  = nullptr;
-        uint32_t passedTimerSecs    = 0;
-        uint32_t passedIntervalSecs = 0;
+        std::chrono::seconds passedTimer    = std::chrono::seconds::zero();
+        std::chrono::seconds passedInterval = std::chrono::seconds::zero();
 
         void updateProgress();
         void updateDateTime();

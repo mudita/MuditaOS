@@ -18,7 +18,6 @@ namespace meditation
         explicit MeditationSwitchData(MeditationItem item)
             : gui::SwitchData(MEDITATION_SWITCH_DATA_STR), item{std::move(item)}
         {}
-        virtual ~MeditationSwitchData() = default;
 
         [[nodiscard]] auto getMeditationItem() const noexcept -> const MeditationItem &
         {

@@ -19,20 +19,22 @@ namespace gui
     class IconTextWindow : public WithTimerWindow
     {
       public:
-        explicit IconTextWindow(app::Application *app, std::string name);
+        IconTextWindow(app::Application *app, std::string name);
 
         // virtual methods
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         void buildInterface() override;
         void destroyInterface() override;
 
-        virtual uint32_t getTimeout()              = 0;
-        virtual std::vector<std::string> getText() = 0;
+        virtual std::chrono::seconds getTimeout() const = 0;
+        virtual std::string getText()                   = 0;
+        virtual std::string getImageName()              = 0;
 
       private:
         gui::Image *appImage = nullptr;
         gui::Text *text      = nullptr;
 
+        void showImage();
         void showText();
     };
 } // namespace gui

@@ -11,58 +11,71 @@ namespace meditationStyle
     {
         namespace icon
         {
-            constexpr inline auto x           = style::window_width / 2 - 60;
-            constexpr inline auto y           = style::header::height + 72;
+            inline constexpr auto w           = 128;
+            inline constexpr auto h           = 128;
+            constexpr inline auto x           = (style::window_width - w) / 2;
+            constexpr inline auto y           = style::window_height / 2 - h;
             constexpr inline auto imageSource = "logo_no_text";
         } // namespace icon
 
         namespace text
         {
-            constexpr inline auto x = 60;
-            constexpr inline auto y = style::header::height + 60;
-            constexpr inline auto w = style::window_width - 120;
-            constexpr inline auto h = style::window::default_body_height - 60;
+            constexpr inline auto textMarginTop = 40;
+            constexpr inline auto w             = style::window_width;
+            constexpr inline auto h             = style::window_height / 2 - textMarginTop;
+            constexpr inline auto x             = 0;
+            constexpr inline auto y             = style::window_height / 2 + textMarginTop;
+            constexpr inline auto font          = style::window::font::largelight;
         } // namespace text
     }     // namespace itStyle
 
     namespace icStyle
     {
+        namespace arrow
+        {
+            inline constexpr auto w = 64;
+            inline constexpr auto h = 64;
+        } // namespace arrow
+
         namespace left_arrow
         {
-            constexpr inline auto x           = style::window::default_left_margin;
-            constexpr inline auto y           = style::header::height + style::window::default_body_height / 2 - 6;
-            constexpr inline auto imageSource = "arrow_left";
+            constexpr inline auto x           = 0;
+            constexpr inline auto y           = (style::window_height - arrow::h) / 2;
+            constexpr inline auto imageSource = "bell_arrow_left";
         } // namespace left_arrow
 
         namespace right_arrow
         {
-            constexpr inline auto x           = style::window_width - style::window::default_right_margin - 6;
-            constexpr inline auto y           = style::header::height + style::window::default_body_height / 2 - 6;
-            constexpr inline auto imageSource = "arrow_right";
+            constexpr inline auto x           = style::window_width - arrow::w;
+            constexpr inline auto y           = (style::window_height - arrow::h) / 2;
+            constexpr inline auto imageSource = "bell_arrow_right";
         } // namespace right_arrow
 
         namespace title
         {
-            constexpr inline auto x = 60;
-            constexpr inline auto y = style::header::height + 100;
-            constexpr inline auto w = style::window_width - 120;
-            constexpr inline auto h = 36;
+            constexpr inline auto w    = style::window_width;
+            constexpr inline auto h    = 120;
+            constexpr inline auto x    = 0;
+            constexpr inline auto y    = 0;
+            constexpr inline auto font = style::window::font::largelight;
         } // namespace title
 
         namespace text
         {
-            constexpr inline auto x = 60;
-            constexpr inline auto y = style::header::height;
-            constexpr inline auto w = style::window_width - 120;
-            constexpr inline auto h = style::window::default_body_height;
+            constexpr inline auto w    = style::window_width;
+            constexpr inline auto h    = style::window_height;
+            constexpr inline auto x    = 0;
+            constexpr inline auto y    = 0;
+            constexpr inline auto font = style::window::font::supersizemelight;
         } // namespace text
 
         namespace minute
         {
-            constexpr inline auto x = 60;
-            constexpr inline auto y = style::header::height + style::window::default_body_height - 60;
-            constexpr inline auto w = style::window_width - 120;
-            constexpr inline auto h = 60;
+            constexpr inline auto w    = style::window_width;
+            constexpr inline auto h    = 120;
+            constexpr inline auto x    = 0;
+            constexpr inline auto y    = style::window_height - h;
+            constexpr inline auto font = style::window::font::largelight;
         } // namespace minute
     }     // namespace icStyle
 
@@ -70,39 +83,45 @@ namespace meditationStyle
     {
         namespace datetime
         {
-            constexpr inline auto x = 60;
-            constexpr inline auto y = style::header::height + 24;
-            constexpr inline auto w = style::window_width - 120;
-            constexpr inline auto h = 36;
+            constexpr inline auto w    = style::window_width;
+            constexpr inline auto h    = 80;
+            constexpr inline auto x    = 0;
+            constexpr inline auto y    = 24;
+            constexpr inline auto font = style::window::font::largelight;
         } // namespace datetime
 
         namespace title
         {
-            constexpr inline auto x = 60;
-            constexpr inline auto y = style::header::height + 120;
-            constexpr inline auto w = style::window_width - 120;
-            constexpr inline auto h = 36;
+            constexpr inline auto w    = style::window_width;
+            constexpr inline auto h    = 160;
+            constexpr inline auto x    = 0;
+            constexpr inline auto y    = datetime::y + datetime::h;
+            constexpr inline auto font = style::window::font::largelight;
         } // namespace title
 
         namespace progress
         {
-            constexpr inline auto x = 60;
-            constexpr inline auto y = style::header::height + 280;
-            constexpr inline auto w = style::window_width - 120;
+            constexpr inline auto progressMarginTop  = 40;
+            constexpr inline auto progressMarginLeft = 60;
+            constexpr inline auto w                  = style::window_width - progressMarginLeft * 2;
             constexpr inline auto h = 24;
+            constexpr inline auto x                  = progressMarginLeft;
+            constexpr inline auto y                  = title::y + title::h + progressMarginTop;
 
             constexpr inline auto Radius               = 100;
             constexpr inline auto BorderColor          = gui::ColorGrey;
             constexpr inline auto BorderColorOnFocused = gui::ColorFullBlack;
-            constexpr inline auto PenWidth             = 2;
+            constexpr inline auto PenWidth             = 3;
         } // namespace progress
 
         namespace timer
         {
-            constexpr inline auto x = 60;
-            constexpr inline auto y = style::header::height + 320;
-            constexpr inline auto w = style::window_width - 120;
-            constexpr inline auto h = 36;
+            constexpr inline auto timerMarginBottom = 60;
+            constexpr inline auto w                 = style::window_width;
+            constexpr inline auto h                 = 60;
+            constexpr inline auto x                 = 0;
+            constexpr inline auto y                 = style::window_height - timerMarginBottom - h;
+            constexpr inline auto font              = style::window::font::largelight;
         } // namespace timer
     }     // namespace mrStyle
 
@@ -110,26 +129,29 @@ namespace meditationStyle
     {
         namespace title
         {
-            constexpr inline auto x = 60;
-            constexpr inline auto y = style::header::height + 20;
-            constexpr inline auto w = style::window_width - 120;
-            constexpr inline auto h = 36;
+            constexpr inline auto w    = style::window_width;
+            constexpr inline auto h    = 120;
+            constexpr inline auto x    = 0;
+            constexpr inline auto y    = 0;
+            constexpr inline auto font = style::window::font::largelight;
         } // namespace title
 
         namespace text
         {
-            constexpr inline auto x = 60;
-            constexpr inline auto y = style::header::height;
-            constexpr inline auto w = style::window_width - 120;
-            constexpr inline auto h = style::window::default_body_height;
+            constexpr inline auto w    = style::window_width;
+            constexpr inline auto h    = style::window_height;
+            constexpr inline auto x    = 0;
+            constexpr inline auto y    = 0;
+            constexpr inline auto font = style::window::font::supersizemelight;
         } // namespace text
 
         namespace minute
         {
-            constexpr inline auto x = 60;
-            constexpr inline auto y = style::header::height + style::window::default_body_height - 60;
-            constexpr inline auto w = style::window_width - 120;
-            constexpr inline auto h = 60;
+            constexpr inline auto w    = style::window_width;
+            constexpr inline auto h    = 120;
+            constexpr inline auto x    = 0;
+            constexpr inline auto y    = style::window_height - h;
+            constexpr inline auto font = style::window::font::largelight;
         } // namespace minute
     }     // namespace mtStyle
 
@@ -137,17 +159,7 @@ namespace meditationStyle
     {
         namespace icon
         {
-            constexpr inline auto x           = style::window_width / 2 - 14;
-            constexpr inline auto y           = style::header::height + 72;
             constexpr inline auto imageSource = "pause";
         } // namespace icon
-
-        namespace text
-        {
-            constexpr inline auto x = 60;
-            constexpr inline auto y = style::header::height + 60;
-            constexpr inline auto w = style::window_width - 120;
-            constexpr inline auto h = style::window::default_body_height - 60;
-        } // namespace text
     }     // namespace spStyle
 } // namespace meditationStyle

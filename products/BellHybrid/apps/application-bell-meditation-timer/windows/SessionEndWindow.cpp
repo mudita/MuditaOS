@@ -4,6 +4,7 @@
 #include "SessionEndWindow.hpp"
 
 #include "log.hpp"
+#include <service-appmgr/Controller.hpp>
 
 namespace gui
 {
@@ -12,20 +13,21 @@ namespace gui
 
     void SessionEndWindow::onTimeout()
     {
-        application->popToWindow(gui::name::window::main_window);
-        application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+        app::manager::Controller::sendAction(application, app::manager::actions::Home);
     }
 
-    std::vector<std::string> SessionEndWindow::getText()
+    std::string SessionEndWindow::getText()
     {
-        std::vector<std::string> content;
-        content.emplace_back("Thank you for");
-        content.emplace_back("the session");
-        return content;
+        return utils::translate("app_meditation_bell_thank_you_for_session");
     }
 
-    uint32_t SessionEndWindow::getTimeout()
+    std::string SessionEndWindow::getImageName()
     {
-        return 3;
+        return itStyle::icon::imageSource;
+    }
+
+    std::chrono::seconds SessionEndWindow::getTimeout() const
+    {
+        return timeout;
     }
 } // namespace gui

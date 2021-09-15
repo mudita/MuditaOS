@@ -7,7 +7,6 @@
 #include "../data/MeditationSwitchData.hpp"
 
 #include <service-time/ServiceTime.hpp>
-//#include <service-time/TimeMessage.hpp>
 
 #include "log.hpp"
 #include <i18n/i18n.hpp>
@@ -36,21 +35,15 @@ namespace gui
 
         datetime =
             newLabel(this, mrStyle::datetime::x, mrStyle::datetime::y, mrStyle::datetime::w, mrStyle::datetime::h);
+        datetime->setFont(mrStyle::datetime::font);
 
         title = newLabel(this, mrStyle::title::x, mrStyle::title::y, mrStyle::title::w, mrStyle::title::h);
-        title->setText(gui::name::window::meditation_running_title);
+        title->setText(utils::translate("app_meditation_title_main"));
+        title->setFont(mrStyle::title::font);
 
         timer = newLabel(this, mrStyle::timer::x, mrStyle::timer::y, mrStyle::timer::w, mrStyle::timer::h);
+        timer->setFont(mrStyle::timer::font);
 
-        const Point boxCenter(mrStyle::progress::x + (mrStyle::progress::w / 2),
-                              mrStyle::progress::y + (mrStyle::progress::h / 2));
-        Circle::ShapeParams params;
-        params.setCenterPoint(boxCenter)
-            .setRadius(mrStyle::progress::Radius)
-            .setBorderColor(mrStyle::progress::BorderColor)
-            .setFocusBorderColor(mrStyle::progress::BorderColor)
-            .setPenWidth(mrStyle::progress::PenWidth)
-            .setFocusPenWidth(mrStyle::progress::PenWidth);
         progress = new UnityProgressBar(
             this, mrStyle::progress::x, mrStyle::progress::y, mrStyle::progress::w, mrStyle::progress::h);
     }
@@ -82,6 +75,9 @@ namespace gui
             pause();
             return true;
         }
+        if (inputEvent.is(gui::KeyCode::KEY_RF)) {
+            return true;
+        }
 
         return WithTimerWindow::onInput(inputEvent);
     }
@@ -89,14 +85,14 @@ namespace gui
     void MeditationRunningWindow::onTimeout()
     {
         LOG_DEBUG("onTimeout");
-        passedTimerSecs += 1;
-        passedIntervalSecs += 1;
+        passedTimer += std::chrono::seconds{1};
+        passedInterval += std::chrono::seconds{1};
 
-        if (passedIntervalSecs == item.getIntervalSecs()) {
-            passedIntervalSecs = 0;
+        if (passedInterval == item.getInterval()) {
+            passedInterval = std::chrono::seconds::zero();
             intervalTimeout();
         }
-        if (passedTimerSecs == item.getTimerSecs()) {
+        if (passedTimer == item.getTimer()) {
             endSession();
         }
         else {
@@ -122,7 +118,7 @@ namespace gui
 
     void MeditationRunningWindow::updateTimer()
     {
-        uint32_t remained = item.getTimerSecs() - passedTimerSecs;
+        uint32_t remained = item.getTimer().count() - passedTimer.count();
         uint32_t minutes  = remained / 60;
         uint32_t seconds  = remained % 60;
         char buffer[32];
@@ -133,8 +129,7 @@ namespace gui
 
     void MeditationRunningWindow::updateProgress()
     {
-        const auto percentage = static_cast<float>(passedTimerSecs) / item.getTimerSecs();
-        uint32_t percent      = std::lround(percentage * 100);
+        uint32_t percent = std::lround(passedTimer.count() * 100 / item.getTimer().count());
 
         progress->setPercentageValue(percent);
     }
@@ -142,11 +137,11 @@ namespace gui
     void MeditationRunningWindow::start()
     {
         LOG_DEBUG("start");
-        progress->setMaximum(item.getTimerSecs());
+        progress->setMaximum(item.getTimer().count());
         progress->setValue(0);
         updateDateTime();
         updateTimer();
-        startTimer(1, true);
+        startTimer(std::chrono::seconds{1}, true);
         playGong();
     }
 
@@ -165,7 +160,7 @@ namespace gui
         updateProgress();
         updateDateTime();
         updateTimer();
-        startTimer(1, true);
+        startTimer(std::chrono::seconds{1}, true);
     }
 
     void MeditationRunningWindow::intervalTimeout()

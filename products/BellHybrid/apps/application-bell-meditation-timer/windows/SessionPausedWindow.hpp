@@ -3,15 +3,8 @@
 
 #pragma once
 
-#include <Application.hpp>
-#include <AppWindow.hpp>
 #include <InputEvent.hpp>
-#include <Utils.hpp>
-#include <Style.hpp>
-#include <BoxLayout.hpp>
-#include <Label.hpp>
-#include <Image.hpp>
-#include <Text.hpp>
+#include "IconTextWindow.hpp"
 
 namespace gui
 {
@@ -20,19 +13,16 @@ namespace gui
         inline constexpr auto session_paused = "Sension paused";
     }
 
-    class SessionPausedWindow : public AppWindow
+    class SessionPausedWindow : public IconTextWindow
     {
       public:
         explicit SessionPausedWindow(app::Application *app);
 
         // virtual methods
-        void onBeforeShow(ShowMode mode, SwitchData *data) override;
         bool onInput(const gui::InputEvent &inputEvent) override;
-        void buildInterface() override;
-        void destroyInterface() override;
-
-      private:
-        gui::Image *appImage = nullptr;
-        gui::Label *text     = nullptr;
+        void onTimeout() override;
+        std::string getText() override;
+        std::string getImageName() override;
+        std::chrono::seconds getTimeout() const override;
     };
 } // namespace gui

@@ -9,9 +9,18 @@
 namespace gui
 {
 
-    MeditationWindow::MeditationWindow(app::Application *app, std::string name) : AppWindow(app, name)
+    MeditationWindow::MeditationWindow(app::Application *app, std::string name) : AppWindow(app, std::move(name))
     {
         inputDisabled = false;
+    }
+
+    void MeditationWindow::buildInterface()
+    {
+        AppWindow::buildInterface();
+
+        statusBar->setVisible(false);
+        header->setTitleVisibility(false);
+        bottomBar->setVisible(false);
     }
 
     bool MeditationWindow::onInput(const gui::InputEvent &inputEvent)
@@ -33,12 +42,13 @@ namespace gui
         if (auto switchData = dynamic_cast<meditation::MeditationSwitchData *>(data); data != nullptr) {
             item = switchData->getMeditationItem();
         }
+        statusBar->setVisible(false);
     }
 
     void MeditationWindow::gotoWindow(std::string name)
     {
         std::unique_ptr<gui::SwitchData> data = std::make_unique<meditation::MeditationSwitchData>(item);
-        application->switchWindow(name, std::move(data));
+        application->switchWindow(std::move(name), std::move(data));
     }
 
     void MeditationWindow::disableInput()

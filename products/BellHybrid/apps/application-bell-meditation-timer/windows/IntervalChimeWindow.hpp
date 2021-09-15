@@ -20,20 +20,20 @@ namespace gui
         inline constexpr auto interval_chime = "Interval chime";
     }
 
-    enum IntervalType
-    {
-        INTERVAL_NONE = 0,
-        INTERVAL_1,
-        INTERVAL_2,
-        INTERVAL_5,
-        INTERVAL_10,
-        INTERVAL_15
-    };
-
     class IntervalChimeWindow : public MeditationWindow
     {
       public:
         explicit IntervalChimeWindow(app::Application *app);
+
+        enum class IntervalType
+        {
+            IntervalNone = 0,
+            Interval_1,
+            Interval_2,
+            Interval_5,
+            Interval_10,
+            Interval_15
+        };
 
         // virtual methods
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
@@ -43,7 +43,7 @@ namespace gui
         bool onInput(const gui::InputEvent &inputEvent) override;
 
       private:
-        uint32_t intervalType     = 0;
+        IntervalType intervalType = IntervalType::IntervalNone;
         gui::Image *previousImage = nullptr;
         gui::Image *nextImage     = nullptr;
         gui::Label *title         = nullptr;
@@ -53,7 +53,7 @@ namespace gui
         void previousInterval();
         void nextInterval();
         void updateDisplay();
-        std::string getIntervalString();
-        uint32_t intervalToSecs();
+        std::string getIntervalString() const;
+        std::chrono::seconds intervalToSecs() const noexcept;
     };
 } // namespace gui

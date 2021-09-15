@@ -10,8 +10,9 @@
 namespace gui
 {
     UnityProgressBar::UnityProgressBar(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h)
-        : ProgressBar(parent, x, y, w, h)
+        : Rect(parent, x, y, w, h)
     {
+        setFilled(false);
         updateDrawArea();
     }
 
@@ -34,6 +35,11 @@ namespace gui
         const auto percent       = static_cast<float>(value) / 100.0f;
         const auto absoluteValue = std::lround(static_cast<float>(maxValue) * percent);
         setValue(absoluteValue);
+    }
+
+    int UnityProgressBar::getMaximum() const noexcept
+    {
+        return maxValue;
     }
 
     void UnityProgressBar::buildDrawListImplementation(std::list<Command> &commands)

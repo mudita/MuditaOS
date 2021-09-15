@@ -12,7 +12,7 @@ namespace app
     class ApplicationBellMeditationTimer : public Application
     {
       public:
-        ApplicationBellMeditationTimer(
+        explicit ApplicationBellMeditationTimer(
             std::string name                            = applicationBellMeditationTimerName,
             std::string parent                          = "",
             sys::phone_modes::PhoneMode mode            = sys::phone_modes::PhoneMode::Offline,
