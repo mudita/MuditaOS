@@ -25,10 +25,14 @@ target_sources(module-utils
 
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
-        libphonenumber::libphonenumber
+        clipboard
+        eventstore
         log-api
-        magic_enum
         utf8
+
+        # third-party components
+        libphonenumber::libphonenumber
+        magic_enum
     PRIVATE
         hash-library::hash-library
         #json::json
@@ -50,8 +54,8 @@ if (${ENABLE_TESTS})
 endif()
 
 #add_subdirectory(bootconfig)
-#add_subdirectory(Clipboard)
-#add_subdirectory(EventStore)
+add_subdirectory(Clipboard)
+add_subdirectory(EventStore)
 #add_subdirectory(i18n)
 add_subdirectory(log)
 #add_subdirectory(math)
