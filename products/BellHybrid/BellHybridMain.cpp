@@ -6,6 +6,7 @@
 // applications
 #include <application-bell-alarm/ApplicationBellAlarm.hpp>
 #include <application-bell-onboarding/ApplicationBellOnBoarding.hpp>
+#include <application-bell-background-sounds/ApplicationBellBackgroundSounds.hpp>
 #include <application-bell-main/ApplicationBellMain.hpp>
 #include <application-bell-settings/ApplicationBellSettings.hpp>
 #include <application-bell-powernap/ApplicationBellPowerNap.hpp>
@@ -99,6 +100,8 @@ int main()
             applications.push_back(app::CreateLauncher<app::ApplicationBellPowerNap>(app::applicationBellPowerNapName));
             applications.push_back(
                 app::CreateLauncher<app::ApplicationBellOnBoarding>(app::applicationBellOnBoardingName));
+            applications.push_back(
+                app::CreateLauncher<app::ApplicationBellBackgroundSounds>(app::applicationBellBackgroundSoundsName));
             // start application manager
             return sysmgr->RunSystemService(
                 std::make_shared<app::manager::ApplicationManager>(
