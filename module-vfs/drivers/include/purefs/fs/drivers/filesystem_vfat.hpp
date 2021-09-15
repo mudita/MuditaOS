@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -30,6 +30,7 @@ namespace purefs::fs::drivers
         auto fstat(fsfile zfile, struct stat &st) noexcept -> int override;
         auto stat(fsmount mnt, std::string_view file, struct stat &st) noexcept -> int override;
         auto unlink(fsmount mnt, std::string_view name) noexcept -> int override;
+        auto rmdir(fsmount mnt, std::string_view name) noexcept -> int override;
         auto rename(fsmount mnt, std::string_view oldname, std::string_view newname) noexcept -> int override;
         auto mkdir(fsmount mnt, std::string_view path, int mode) noexcept -> int override;
 

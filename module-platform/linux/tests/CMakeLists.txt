@@ -36,6 +36,13 @@ add_custom_target(
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     DEPENDS genlittlefs test-assets
 )
+set(EXT4_IMAGE "ext4test.img")
+add_custom_target(
+    ${EXT4_IMAGE}
+    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/genext4diskimg.sh 1G ${EXT4_IMAGE} ${CMAKE_BINARY_DIR}/module-platform/test_dir
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    DEPENDS genlittlefs test-assets
+)
 
 add_catch2_executable(
     NAME vfs-littlefs
@@ -45,6 +52,17 @@ add_catch2_executable(
         platform
     DEPS
         ${LITTLEFS_IMAGE}
+    USE_FS
+)
+
+add_catch2_executable(
+    NAME vfs-ext4
+    SRCS
+        ${CMAKE_CURRENT_LIST_DIR}/unittest_filesystem_ext4.cpp
+    LIBS
+        platform
+    DEPS
+        ${EXT4_IMAGE}
     USE_FS
 )
 
