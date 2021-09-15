@@ -375,6 +375,11 @@ namespace purefs::fs::drivers
         return invoke_lfs(mnt, name, ::lfs_remove);
     }
 
+    auto filesystem_littlefs::rmdir(fsmount mnt, std::string_view name) noexcept -> int
+    {
+        return invoke_lfs(mnt, name, ::lfs_remove);
+    }
+
     auto filesystem_littlefs::rename(fsmount mnt, std::string_view oldname, std::string_view newname) noexcept -> int
     {
         auto mntp = std::static_pointer_cast<mount_point_littlefs>(mnt);
