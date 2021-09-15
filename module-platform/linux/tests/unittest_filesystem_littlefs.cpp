@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
@@ -260,7 +260,7 @@ TEST_CASE("littlefs: Directory tests")
             }
         }
 
-        REQUIRE(fs_core->unlink(path) == 0);
+        REQUIRE(fs_core->rmdir(path) == 0);
     }
 
     REQUIRE(fs_core->umount("/sys") == 0);

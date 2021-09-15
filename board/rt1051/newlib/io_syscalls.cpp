@@ -57,7 +57,10 @@ extern "C"
     {
         return syscalls::stat(r->_errno, file, pstat);
     }
-
+    int rmdir(const char *path)
+    {
+        return syscalls::rmdir(_REENT->_errno, path);
+    }
     /** POSIX directory related funcs */
     int chdir(const char *path)
     {
