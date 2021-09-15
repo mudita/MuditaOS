@@ -18,8 +18,9 @@ target_include_directories(i18n
 target_link_libraries(i18n
     PRIVATE 
         json::json
-        #log-api
+        log-api
         module-os
+        purefs-paths
 )
 
 if (${ENABLE_TESTS})

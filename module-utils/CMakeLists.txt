@@ -27,6 +27,7 @@ target_link_libraries(${PROJECT_NAME}
     PUBLIC
         clipboard
         eventstore
+        i18n
         log-api
         math
         ucs2
@@ -37,7 +38,6 @@ target_link_libraries(${PROJECT_NAME}
         magic_enum
     PRIVATE
         hash-library::hash-library
-        #json::json
         #    time
 )
 
@@ -58,7 +58,7 @@ endif()
 #add_subdirectory(bootconfig)
 add_subdirectory(Clipboard)
 add_subdirectory(EventStore)
-#add_subdirectory(i18n)
+add_subdirectory(i18n)
 add_subdirectory(log)
 add_subdirectory(math)
 #add_subdirectory(rrule)
