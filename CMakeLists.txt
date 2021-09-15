@@ -158,6 +158,10 @@ add_custom_target(
         "Generating version info"
     )
 
+add_library(version-header INTERFACE)
+target_include_directories(version-header INTERFACE $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>)
+target_sources(version-header PRIVATE ${CMAKE_BINARY_DIR}/source/version.hpp)
+
 fetch_ecoboot()
 fetch_updater()
 

@@ -8,6 +8,10 @@ configure_file(
     ${CMAKE_BINARY_DIR}/source/version.hpp
     )
 
+add_library(version-header INTERFACE)
+target_include_directories(version-header PUBLIC $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>)
+target_sources(version-header PRIVATE ${CMAKE_BINARY_DIR}/source/version.hpp)
+
 message("GIT_REV: ${GIT_REV}")
 message("GIT_TAG: ${GIT_TAG}")
 message("Version: ${CMAKE_PROJECT_VERSION}")

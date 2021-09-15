@@ -4,7 +4,7 @@
 #include "TimeZone.hpp"
 #include <utz/utz.h>
 #include <utz/zones.h>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <ctime>
 
 namespace utils::time

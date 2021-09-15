@@ -9,8 +9,6 @@ target_sources(time-constants
 
 add_library(time)
 
-module_is_test_entity(time)
-
 target_sources(time
     PRIVATE
         time/time_conversion.cpp
@@ -30,8 +28,7 @@ target_link_libraries(time
         utz::utz
     PUBLIC
         i18n
-        log
-        module-utils
+        log-api
         utf8
 )
 

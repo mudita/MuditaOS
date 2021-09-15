@@ -14,7 +14,6 @@ target_sources(module-utils
         generators/RandomStringGenerator.cpp
         #ical/ParserICS.cpp
         PhoneNumber.cpp
-        Utils.cpp
 
     PUBLIC
         circular_buffer/StringCircularBuffer.hpp
@@ -32,13 +31,10 @@ target_link_libraries(${PROJECT_NAME}
         math
         ucs2
         utf8
+        utils
 
         # third-party components
         libphonenumber::libphonenumber
-        magic_enum
-    PRIVATE
-        hash-library::hash-library
-        #    time
 )
 
 # Board specific compilation definitions,options,include directories and features
@@ -65,3 +61,4 @@ add_subdirectory(math)
 #add_subdirectory(time)
 add_subdirectory(ucs2)
 add_subdirectory(utf8)
+add_subdirectory(utils)
