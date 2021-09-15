@@ -3,19 +3,51 @@
 
 #include "CodecAW8898.hpp"
 #include "AW8898_regs.hpp"
-#include "bsp/BoardDefinitions.hpp"
+#include "board/BoardDefinitions.hpp"
+#include <log.hpp>
+#include "FreeRTOS.h"
+#include "task.h"
 
 using namespace drivers;
 
+inline void FlipBytes(uint16_t *val) {
+    uint16_t tmp = *val << 8;
+    *val = (*val >> 8) | tmp;
+}
+
 CodecAW8898::CodecAW8898() : i2cAddr{}
 {
-
+    LOG_INFO("Initializing AW8898 audio codec");
     i2cAddr.deviceAddress  = AW8898_I2C_ADDR;
     i2cAddr.subAddressSize = 1; // AW8898 uses 1byte addressing
     i2c                    = DriverI2C::Create(
         static_cast<I2CInstances>(BoardDefinitions::AUDIOCODEC_I2C),
         DriverI2CParams{.baudrate = static_cast<uint32_t>(BoardDefinitions::AUDIOCODEC_I2C_BAUDRATE)});
-    Reset();
+    
+    gpio = DriverGPIO::Create(static_cast<GPIOInstances>(BoardDefinitions::BELL_AUDIOCODEC_GPIO), DriverGPIOParams{});
+
+    gpio->ConfPin(DriverGPIOPinParams{.dir      = DriverGPIOPinParams::Direction::Output,
+                                      .irqMode  = DriverGPIOPinParams::InterruptMode::NoIntmode,
+                                      .defLogic = 0,
+                                      .pin      = static_cast<uint32_t>(BoardDefinitions::BELL_AUDIOCODEC_RSTN_PA_PIN)});
+
+    gpio->ConfPin(DriverGPIOPinParams{.dir      = DriverGPIOPinParams::Direction::Input,
+                                      .irqMode  = DriverGPIOPinParams::InterruptMode::IntFallingEdge,
+                                      .defLogic = 0,
+                                      .pin      = static_cast<uint32_t>(BoardDefinitions::BELL_AUDIOCODEC_INTN_PA_PIN)});
+
+    gpio->ClearPortInterrupts(1 << static_cast<uint32_t>(BoardDefinitions::BELL_AUDIOCODEC_INTN_PA_PIN));
+    gpio->DisableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::BELL_AUDIOCODEC_INTN_PA_PIN));
+
+    gpio->WritePin(static_cast<std::uint32_t>(BoardDefinitions::BELL_AUDIOCODEC_RSTN_PA_PIN), 0);   //reset chip
+    vTaskDelay(pdMS_TO_TICKS(2));
+    gpio->WritePin(static_cast<std::uint32_t>(BoardDefinitions::BELL_AUDIOCODEC_RSTN_PA_PIN), 1);   //clear reset
+    vTaskDelay(pdMS_TO_TICKS(2));
+
+    auto ret = Probe();
+    LOG_DEBUG("AW8898 Probe: 0x%04lX", ret.value());
+    //Reset();
+    
 }
 
 CodecAW8898::~CodecAW8898()
@@ -31,6 +63,7 @@ CodecRetCode CodecAW8898::Start(const CodecParams &param)
     // Software reset - p.19
     i2cAddr.subAddress                   = AW8898_REG_ID;
     aw8898_reg_idcode_t dev_id = { .idcode = AW8898_SW_RESET_MAGIC };
+    FlipBytes((uint16_t*)&dev_id);
     i2c->Write(i2cAddr, (uint8_t *)&dev_id, 2);
 
     // Power up sequence - table 2, p.18
@@ -96,6 +129,7 @@ CodecRetCode CodecAW8898::Start(const CodecParams &param)
         return CodecRetCode::InvalidSampleRate;
     }
     i2cAddr.subAddress = AW8898_REG_I2SCTRL;
+    FlipBytes((uint16_t*)&i2s_setup);
     i2c->Write(i2cAddr, (uint8_t *)&i2s_setup, 2);
 
     aw8898_reg_i2stxcfg_t i2s_tx_setup = 
@@ -108,6 +142,7 @@ CodecRetCode CodecAW8898::Start(const CodecParams &param)
         .dohz = 0          //unused channel data set to 0
     };
     i2cAddr.subAddress = AW8898_REG_I2STXCFG;
+    FlipBytes((uint16_t*)&i2s_setup);
     i2c->Write(i2cAddr, (uint8_t *)&i2s_setup, 2);
 
     /* 3.1 Enable system (SYSCTRL.PWDN=0) */
@@ -118,6 +153,7 @@ CodecRetCode CodecAW8898::Start(const CodecParams &param)
         .pwdn = 0      //power up
     };
     i2cAddr.subAddress = AW8898_REG_SYSCTRL;
+    FlipBytes((uint16_t*)&sys_setup);
     i2c->Write(i2cAddr, (uint8_t *)&sys_setup, 2);
 
     /* 3,2 Bias, OSC, PLL active */
@@ -128,19 +164,21 @@ CodecRetCode CodecAW8898::Start(const CodecParams &param)
     while ((sys_status & 0x0001) != 1) //wait for PLLS = 1 (locked)
     {
         i2c->Read(i2cAddr, (uint8_t *)&sys_status, 2);
+        FlipBytes((uint16_t*)&sys_status);
     }
 
     /* 4.1 Enable Boost and amplifier
             (SYSCTRL.AMPPD=0)
     */
     i2cAddr.subAddress = AW8898_REG_SYSCTRL;
-    i2c->Modify(i2cAddr, 0x0002, false, 2);   //(SYSCTRL.AMPPD=0)
+    i2c->Modify(i2cAddr, 0x0200, false, 2);   //(SYSCTRL.AMPPD=0)
 
     /* 4.2 Wait SYSST.SWS=1 */
     i2cAddr.subAddress = AW8898_REG_SYSST;
     while ((sys_status & (1 << 8)) == 0) //wait for SWS = 1 
     {
         i2c->Read(i2cAddr, (uint8_t *)&sys_status, 2);
+        FlipBytes((uint16_t*)&sys_status);
     }
 
     // Store param configuration
@@ -157,8 +195,8 @@ CodecRetCode CodecAW8898::Pause()
 {
     // Turn off device
     i2cAddr.subAddress = AW8898_REG_SYSCTRL;
-    i2c->Modify(i2cAddr, 0x0002, true, 2);   //(SYSCTRL.AMPPD=1)
-    i2c->Modify(i2cAddr, 0x0001, true, 2);   //(SYSCTRL.PWDN=1)
+    i2c->Modify(i2cAddr, 0x0200, true, 2);   //(SYSCTRL.AMPPD=1)
+    i2c->Modify(i2cAddr, 0x0100, true, 2);   //(SYSCTRL.PWDN=1)
 
     return CodecRetCode::Success;
 }
@@ -167,15 +205,16 @@ CodecRetCode CodecAW8898::Resume()
 {
     // Turn on device
     i2cAddr.subAddress = AW8898_REG_SYSCTRL;
-    i2c->Modify(i2cAddr, 0x0001, false, 2);   //(SYSCTRL.PWDN=0)
+    i2c->Modify(i2cAddr, 0x0100, false, 2);   //(SYSCTRL.PWDN=0)
     /* 3.3 Waiting for PLL locked */
     i2cAddr.subAddress = AW8898_REG_SYSST;
     uint16_t sys_status = 0;
-    while ((sys_status & 0x0001) != 1) //wait for PLLS = 1 (locked)
+    while ((sys_status & 0x0100) != 1) //wait for PLLS = 1 (locked)
     {
         i2c->Read(i2cAddr, (uint8_t *)&sys_status, 2);
+        FlipBytes((uint16_t*)&sys_status);
     }
-    i2c->Modify(i2cAddr, 0x0002, false, 2);   //(SYSCTRL.AMPPD=0)
+    i2c->Modify(i2cAddr, 0x0200, false, 2);   //(SYSCTRL.AMPPD=0)
     
     return CodecRetCode::Success;
 }
@@ -230,15 +269,17 @@ CodecRetCode CodecAW8898::SetOutputVolume(const float vol)
     // If volume set to 0 then mute output
     i2cAddr.subAddress                   = AW8898_REG_PWMCTRL;
     if (vol == 0)
-        i2c->Modify(i2cAddr, 0x0001, true, 2);   //(PWMCTRL.HMUTE=1) - enable mute
+        i2c->Modify(i2cAddr, 0x0100, true, 2);   //(PWMCTRL.HMUTE=1) - enable mute
     else
-        i2c->Modify(i2cAddr, 0x0001, false, 2);   //(PWMCTRL.HMUTE=0) - disable mute
+        i2c->Modify(i2cAddr, 0x0100, false, 2);   //(PWMCTRL.HMUTE=0) - disable mute
 
     // volume is encoded with 8 bits. vol is in range 0-10
     i2cAddr.subAddress = AW8898_REG_HAGCCFG7;
     aw8898_reg_hagccfg7_t regval = {};
     i2c->Read(i2cAddr, (uint8_t *)&regval, 2);
+    FlipBytes((uint16_t*)&regval);
     regval.volume = static_cast<uint8_t>(25.5 * vol);
+    FlipBytes((uint16_t*)&regval);
     i2c->Write(i2cAddr, (uint8_t *)&regval, 2);
 
     currentParams.outVolume = vol;
@@ -250,6 +291,7 @@ CodecRetCode CodecAW8898::Reset()
     // Software reset - p.19
     i2cAddr.subAddress                   = AW8898_REG_ID;
     aw8898_reg_idcode_t dev_id = { AW8898_SW_RESET_MAGIC };
+    FlipBytes((uint16_t*)&dev_id);
     i2c->Write(i2cAddr, (uint8_t *)&dev_id, 2);
 
     return CodecRetCode::Success;
@@ -258,7 +300,7 @@ CodecRetCode CodecAW8898::Reset()
 CodecRetCode CodecAW8898::SetMute(const bool enable)
 {
     i2cAddr.subAddress                   = AW8898_REG_PWMCTRL;
-    i2c->Modify(i2cAddr, 0x0001, enable ? true : false, 2);   //(PWMCTRL.HMUTE)
+    i2c->Modify(i2cAddr, 0x0100, enable ? true : false, 2);   //(PWMCTRL.HMUTE)
     return CodecRetCode::Success;
 }
 
@@ -267,6 +309,7 @@ std::optional<uint32_t> CodecAW8898::Probe()
     uint16_t id = 0;
 
     i2cAddr.subAddress = AW8898_REG_ID;
-    i2c->Write(i2cAddr, (uint8_t *)&id, 2);
+    i2c->Read(i2cAddr, (uint8_t *)&id, 2);
+    FlipBytes((uint16_t*)&id);
     return id;
 }

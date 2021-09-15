@@ -19,6 +19,7 @@ target_sources(
         bsp/bell_temp_sensor/bell_temp_sensor.cpp
         bsp/battery-charger/battery-charger.cpp
         bsp/fuel_gauge/fuel_gauge.cpp
+        bsp/audio-bell/CodecAW8898.cpp
         pin_mux.c
         clock_config.cpp
         irq_gpio.cpp

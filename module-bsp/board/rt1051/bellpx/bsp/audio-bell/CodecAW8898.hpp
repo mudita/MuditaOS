@@ -6,6 +6,7 @@
 
 #include "Codec.hpp"
 #include "drivers/i2c/DriverI2C.hpp"
+#include "drivers/gpio/DriverGPIO.hpp"
 
 class CodecParamsAW8898 : public CodecParams
 {
@@ -110,6 +111,7 @@ class CodecAW8898 : public Codec
 
   private:
     std::shared_ptr<drivers::DriverI2C> i2c;
+    std::shared_ptr<drivers::DriverGPIO> gpio;
     drivers::I2CAddress i2cAddr;
     CodecParamsAW8898 currentParams;
 

@@ -1029,6 +1029,38 @@ void PINMUX_InitAudioCodec(void)
                         PAD_CONFIG_DRIVER_STRENGTH_LVL_1 | PAD_CONFIG_SELECT_PULL | PAD_CONFIG_PULL_UP_100kOhm);
     IOMUXC_SetPinConfig(PINMUX_AUDIOCODEC_SAIx_TX_SYNC, /* GPIO_AD_B1_15 PAD functional properties : */
                         PAD_CONFIG_DRIVER_STRENGTH_LVL_1 | PAD_CONFIG_SELECT_PULL | PAD_CONFIG_PULL_UP_100kOhm);
+
+    IOMUXC_SetPinMux(PINMUX_AUDIOCODEC_SCL, 1U); /* Software Input On Field: Input Path is determined by functionality */
+
+    IOMUXC_SetPinConfig(PINMUX_AUDIOCODEC_SCL,
+
+                        PAD_CONFIG_SLEW_RATE_SLOW | PAD_CONFIG_DRIVER_STRENGTH_LVL_6 |
+                            PAD_CONFIG_SPEED_MEDIUM_2_100MHz | PAD_CONFIG_PULL_KEEPER_ENABLED |
+                            PAD_CONFIG_SELECT_KEEPER | PAD_CONFIG_PULL_UP_22kOhm);
+
+    IOMUXC_SetPinMux(PINMUX_AUDIOCODEC_SDA, 1U); /* Software Input On Field: Input Path is determined by functionality */
+
+    IOMUXC_SetPinConfig(PINMUX_AUDIOCODEC_SDA,
+
+                        PAD_CONFIG_SLEW_RATE_SLOW | PAD_CONFIG_DRIVER_STRENGTH_LVL_6 |
+                            PAD_CONFIG_SPEED_MEDIUM_2_100MHz | PAD_CONFIG_PULL_KEEPER_ENABLED |
+                            PAD_CONFIG_SELECT_KEEPER | PAD_CONFIG_PULL_UP_22kOhm);
+
+    IOMUXC_SetPinMux(PINMUX_AUDIOCODEC_RSTN_PA,
+                     0U);
+    IOMUXC_SetPinConfig(PINMUX_AUDIOCODEC_RSTN_PA,
+
+                        PAD_CONFIG_SLEW_RATE_SLOW | PAD_CONFIG_DRIVER_STRENGTH_LVL_6 |
+                            PAD_CONFIG_SPEED_MEDIUM_2_100MHz | PAD_CONFIG_PULL_KEEPER_ENABLED |
+                            PAD_CONFIG_SELECT_KEEPER | PAD_CONFIG_PULL_UP_22kOhm);
+
+    IOMUXC_SetPinMux(PINMUX_AUDIOCODEC_INTN_PA,
+                     0U);
+    IOMUXC_SetPinConfig(PINMUX_AUDIOCODEC_INTN_PA,
+
+                        PAD_CONFIG_SLEW_RATE_SLOW | PAD_CONFIG_DRIVER_STRENGTH_LVL_6 |
+                            PAD_CONFIG_SPEED_MEDIUM_2_100MHz | PAD_CONFIG_PULL_KEEPER_ENABLED |
+                            PAD_CONFIG_SELECT_PULL | PAD_CONFIG_PULL_UP_100kOhm);
 }
 
 void PINMUX_InitEINK(void)
