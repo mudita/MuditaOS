@@ -25,11 +25,13 @@ target_sources(module-vfs
         drivers/include/thirdparty/fatfs/ffconf.h
         drivers/include/thirdparty/fatfs/volume_mapper.hpp
         drivers/include/thirdparty/littlefs/volume_mapper.hpp
+        drivers/include/thirdparty/lwext4/ext4_bdev.hpp
         drivers/src/purefs/fs/filesystem_littlefs.cpp
         drivers/src/purefs/fs/filesystem_vfat.cpp
         drivers/src/thirdparty/fatfs/ff_glue.cpp
         drivers/src/thirdparty/fatfs/ffsystem.cpp
         drivers/src/thirdparty/littlefs/lfs_glue.cpp
+        drivers/src/thirdparty/lwext4/ext4_bdev.cpp
 
         include/internal/purefs/blkdev/disk_handle.hpp
         include/internal/purefs/blkdev/partition_parser.hpp
@@ -93,6 +95,7 @@ target_include_directories(module-vfs
 target_link_libraries(module-vfs 
     PRIVATE
         fatfs::fatfs
+        lwext4::lwext4
         json::json
         littlefs::littlefs
         module-bsp 

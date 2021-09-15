@@ -7,7 +7,6 @@ include(lwext4_macros.cmake)
 target_include_directories(lwext4
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/lwext4/include>
-    PRIVATE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
 )
 
