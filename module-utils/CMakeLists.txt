@@ -12,7 +12,7 @@ target_sources(module-utils
     PRIVATE
         circular_buffer/StringCircularBuffer.cpp
         generators/RandomStringGenerator.cpp
-        #ical/ParserICS.cpp
+        ical/ParserICS.cpp
         PhoneNumber.cpp
 
     PUBLIC
@@ -37,6 +37,7 @@ target_link_libraries(${PROJECT_NAME}
         utils
 
         # third-party components
+        json::json
         libphonenumber::libphonenumber
 )
 
