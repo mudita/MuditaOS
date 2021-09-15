@@ -19,6 +19,7 @@ namespace vfsn::internal::syscalls
     int fstat(int &_errno_, int fd, struct stat *st);
     int link(int &_errno_, const char *existing, const char *newLink);
     int unlink(int &_errno_, const char *name);
+    int rmdir(int &_errno_, const char *name);
     int fcntl(int &_errno_, int fd, int cmd, int arg);
     int stat(int &_errno_, const char *file, struct stat *pstat);
     int chdir(int &_errno_, const char *path);

@@ -31,6 +31,15 @@ namespace purefs::fs
         return err;
     }
 
+    auto filesystem::rmdir(std::string_view name) noexcept -> int
+    {
+        const auto err = invoke_fops(iaccess::rw, &filesystem_operations::rmdir, name);
+        if (!err) {
+            m_notifier->notify(name, inotify_flags::del);
+        }
+        return err;
+    }
+
     auto filesystem::mkdir(std::string_view path, int mode) noexcept -> int
     {
         const auto err = invoke_fops(iaccess::rw, &filesystem_operations::mkdir, path, mode);
