@@ -128,6 +128,7 @@ namespace purefs::fs
         auto unlink(std::string_view name) noexcept -> int;
         auto rename(std::string_view oldname, std::string_view newname) noexcept -> int;
         auto mkdir(std::string_view path, int mode) noexcept -> int;
+        auto rmdir(std::string_view path) noexcept -> int;
 
         /** Directory support API */
         auto diropen(std::string_view path) noexcept -> fsdir;

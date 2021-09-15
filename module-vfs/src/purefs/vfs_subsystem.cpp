@@ -4,6 +4,7 @@
 #include <purefs/fs/filesystem.hpp>
 #include <purefs/fs/drivers/filesystem_vfat.hpp>
 #include <purefs/fs/drivers/filesystem_littlefs.hpp>
+#include <purefs/fs/drivers/filesystem_ext4.hpp>
 #include <purefs/blkdev/disk_manager.hpp>
 #include <purefs/vfs_subsystem.hpp>
 #include <purefs/vfs_subsystem_internal.hpp>
@@ -22,6 +23,7 @@ namespace purefs::subsystem
         constexpr auto default_nvrom_name       = "nvrom0";
         constexpr auto fat_part_code            = 0x0b;
         constexpr auto lfs_part_code            = 0x9e;
+        constexpr auto linux_part_code          = 0x83;
         constexpr auto layout_part_count        = 3;
         constexpr auto boot_part_index          = 0;
         constexpr auto user_part_index          = 2;
@@ -148,6 +150,11 @@ namespace purefs::subsystem
             LOG_FATAL("Unable to register lfs filesystem with error %i", err);
             return {};
         }
+        err = fs_core->register_filesystem("ext4", std::make_shared<fs::drivers::filesystem_ext4>());
+        if (err) {
+            LOG_FATAL("Unable to register ext4 filesystem with error %i", err);
+            return {};
+        }
 
         g_disk_mgr = disk_mgr;
         g_fs_core  = fs_core;
@@ -186,7 +193,7 @@ namespace purefs::subsystem
             LOG_FATAL("Invalid boot partition type expected code: %i current code: %i", fat_part_code, boot_part.type);
             return -EIO;
         }
-        if (user_part.type != lfs_part_code) {
+        if ((user_part.type != lfs_part_code) && (user_part.type != linux_part_code)) {
             LOG_FATAL("Invalid user partition type expected code: %i current code: %i", lfs_part_code, user_part.type);
             return -EIO;
         }
@@ -200,14 +207,20 @@ namespace purefs::subsystem
         if (err) {
             return err;
         }
-        const int lfs_block_log2     = read_mbr_lfs_erase_size(disk, default_blkdev_name, user_part.physical_number);
-        uint32_t lfs_block_size      = 0;
-        uint32_t *lfs_block_size_ptr = nullptr;
-        if (lfs_block_log2 >= block_size_min_shift && lfs_block_log2 <= block_size_max_shift) {
-            lfs_block_size     = 1U << lfs_block_log2;
-            lfs_block_size_ptr = &lfs_block_size;
+        if (user_part.type == lfs_part_code) {
+            const int lfs_block_log2 = read_mbr_lfs_erase_size(disk, default_blkdev_name, user_part.physical_number);
+            uint32_t lfs_block_size  = 0;
+            uint32_t *lfs_block_size_ptr = nullptr;
+            if (lfs_block_log2 >= block_size_min_shift && lfs_block_log2 <= block_size_max_shift) {
+                lfs_block_size     = 1U << lfs_block_log2;
+                lfs_block_size_ptr = &lfs_block_size;
+            }
+            err =
+                vfs->mount(user_part.name, purefs::dir::getUserDiskPath().string(), "littlefs", 0, lfs_block_size_ptr);
         }
-        err = vfs->mount(user_part.name, purefs::dir::getUserDiskPath().string(), "littlefs", 0, lfs_block_size_ptr);
+        else {
+            err = vfs->mount(user_part.name, purefs::dir::getUserDiskPath().string(), "ext4");
+        }
         const std::string json_file = (dir::getRootDiskPath() / file::boot_json).string();
         const auto boot_dir_name    = parse_boot_json_directory(json_file);
         const auto user_dir         = (dir::getRootDiskPath() / boot_dir_name).string();

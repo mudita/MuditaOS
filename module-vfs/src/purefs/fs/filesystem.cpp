@@ -18,9 +18,7 @@ namespace purefs::fs
     namespace
     {
         constexpr std::pair<short, std::string_view> part_types_to_vfs[] = {
-            {0x0b, "vfat"},
-            {0x9e, "littlefs"},
-        };
+            {0x0b, "vfat"}, {0x9e, "littlefs"}, {0x83, "ext4"}};
     }
     filesystem::filesystem(std::shared_ptr<blkdev::disk_manager> diskmm)
         : m_diskmm(diskmm), m_lock(std::make_unique<cpp_freertos::MutexRecursive>()),

@@ -75,7 +75,6 @@ PART3_SIZE=$(($DEVICE_BLK_COUNT - $PART1_SIZE - $PART2_SIZE - $PART1_START))
 
 echo "Remove previous image file"
 rm -f $IMAGE_NAME
-
 truncate -s $(($DEVICE_BLK_COUNT * $DEVICE_BLK_SIZE)) $IMAGE_NAME
 sfdisk $IMAGE_NAME << ==sfdisk
 label: dos
@@ -83,8 +82,8 @@ label-id: 0x09650eb4
 unit: sectors
 
 /dev/sdx1 : start=    $PART1_START,  size=    $PART1_SIZE, type=b, bootable
-/dev/sdx2 : start=    $PART2_START,  size=    $PART2_SIZE, type=9e
-/dev/sdx3 : start=    $PART3_START,  size=    $PART3_SIZE, type=9e
+/dev/sdx2 : start=    $PART2_START,  size=    $PART2_SIZE, type=83
+/dev/sdx3 : start=    $PART3_START,  size=    $PART3_SIZE, type=83
 ==sfdisk
 
 
@@ -142,10 +141,40 @@ fi
 mcopy -s -i "$PART1" .boot.json ::
 mcopy -s -i "$PART1" .boot.json.crc32 ::
 
-#Littlefs generate image
-echo $(pwd)
-$GENLFS --image=$IMAGE_NAME --block_size=4096 --overwrite --partition_num=2
-$GENLFS --image=$IMAGE_NAME --block_size=32768 --overwrite --partition_num=3 -- user/*
+# ^64bit - 64bit inodes are not supported by the lwext4
+# ^metadata_csum - Metatata checksums has buggy implementation in the lwext4 
+
+# Ext4 backup partition used by updater
+mke2fs \
+  -F \
+  -L 'backup' \
+  -N 0 \
+  -E offset=$(($PART2_START*$DEVICE_BLK_SIZE)) \
+  -O ^64bit \
+  -O ^flex_bg \
+  -O ^metadata_csum \
+  -m 0 \
+  -r 1 \
+  -t ext4 \
+  "$IMAGE_NAME" \
+  $((($PART2_SIZE*$DEVICE_BLK_SIZE)/1024)) \
+;
+
+# EXT4 user partition
+mke2fs \
+  -F \
+  -L 'user' \
+  -N 0 \
+  -E offset=$(($PART3_START*$DEVICE_BLK_SIZE)) \
+  -O ^64bit \
+  -O ^flex_bg \
+  -O ^metadata_csum \
+  -d "user" \
+  -m 0 \
+  -r 1 \
+  -t ext4 \
+  "$IMAGE_NAME" \
+;
 
 # back to previous dir
 cd -
