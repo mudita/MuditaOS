@@ -11,6 +11,8 @@ namespace gui
     {
         std::unique_ptr<app::bgSounds::BGSoundsMainWindowContract::Presenter> presenter;
 
+        auto onInput(const InputEvent &inputEvent) -> bool override;
+
       public:
         BGSoundsMainWindow(app::ApplicationCommon *app,
                            std::unique_ptr<app::bgSounds::BGSoundsMainWindowContract::Presenter> &&presenter);

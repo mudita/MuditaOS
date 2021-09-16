@@ -5,6 +5,11 @@
 
 #include <Application.hpp>
 
+namespace gui::window::name
+{
+    inline constexpr auto bgSoundsTimerSelect = "BGSoundsTimerSelectWindow";
+}
+
 namespace app
 {
     inline constexpr auto applicationBellBackgroundSoundsName = "ApplicationBellBackgroundSounds";

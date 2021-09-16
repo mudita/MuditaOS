@@ -19,6 +19,7 @@ namespace gui
     void PowerNapMainWindow::buildInterface()
     {
         AppWindow::buildInterface();
+        statusBar->setVisible(false);
 
         sideListView = new gui::SideListView(
             this, 0, 0, style::window_width, style::window_height, windowPresenter->getNapTimeProvider());
@@ -40,9 +41,4 @@ namespace gui
         return AppWindow::onInput(inputEvent);
     }
 
-    status_bar::Configuration PowerNapMainWindow::configureStatusBar(status_bar::Configuration appConfiguration)
-    {
-        appConfiguration.disable(status_bar::Indicator::Time);
-        return appConfiguration;
-    }
 } // namespace gui
