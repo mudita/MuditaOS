@@ -30,24 +30,24 @@ namespace alarms
         virtual auto getFrontlightSettings() -> Settings = 0;
     };
 
-    class PreWakeUpHandler
+    class PreWakeUp
     {
       public:
-        struct Result
+        struct Decision
         {
             bool timeForChime;
             bool timeForFrontlight;
         };
 
-        explicit PreWakeUpHandler(PreWakeUpSettingsProvider *settingsProvider);
-        auto handle(TimePoint now, const SingleEventRecord &event) -> Result;
+        explicit PreWakeUp(std::unique_ptr<PreWakeUpSettingsProvider> &&settingsProvider);
+        auto decide(TimePoint now, const SingleEventRecord &event) -> Decision;
 
       private:
         auto isTimeForPreWakeUp(TimePoint now,
                                 const SingleEventRecord &event,
                                 PreWakeUpSettingsProvider::Settings settings) -> bool;
 
-        PreWakeUpSettingsProvider *settingsProvider;
+        std::unique_ptr<PreWakeUpSettingsProvider> settingsProvider;
     };
 
     class AlarmOperations : public AlarmOperationsCommon
@@ -58,11 +58,11 @@ namespace alarms
                         std::unique_ptr<PreWakeUpSettingsProvider> &&settingsProvider);
 
         void minuteUpdated(TimePoint now) override;
+        void processPreWakeUp(TimePoint now);
 
       private:
-        void processPreWakeUpEvents(TimePoint now);
-        void preWakeUp(const SingleEventRecord &event, PreWakeUpHandler::Result handleResult);
+        void handlePreWakeUp(const SingleEventRecord &event, PreWakeUp::Decision decision);
 
-        std::unique_ptr<PreWakeUpSettingsProvider> settingsProvider;
+        PreWakeUp preWakeUp;
     };
 } // namespace alarms
