@@ -16,6 +16,7 @@ class MockAlarmHandler : public alarms::AlarmHandler
     MOCK_METHOD(bool, handle, (const AlarmEventRecord &record), ());
     MOCK_METHOD(bool, handleOff, (const AlarmEventRecord &record), ());
 };
+
 class MockAlarmEventsRepository : public alarms::AbstractAlarmEventsRepository
 {
   public:
@@ -111,11 +112,17 @@ alarms::IAlarmOperations::OnUpdateAlarmProcessed universalBoolCallback = [](bool
 class AlarmOperationsFixture : public ::testing::Test
 {
   protected:
-    auto getMockedAlarmOperations(std::unique_ptr<MockAlarmEventsRepository> &alarmRepo)
-    {
-        return std::make_unique<alarms::AlarmOperationsCommon>(std::move(alarmRepo), timeInjector);
-    }
+    std::unique_ptr<alarms::IAlarmOperations> getMockedAlarmOperations(
+        std::unique_ptr<MockAlarmEventsRepository> &alarmRepo);
 };
+
+#if defined COMMON_ALARM_OPERATIONS_TEST
+std::unique_ptr<alarms::IAlarmOperations> AlarmOperationsFixture::getMockedAlarmOperations(
+    std::unique_ptr<MockAlarmEventsRepository> &alarmRepo)
+{
+    return std::make_unique<alarms::AlarmOperationsCommon>(std::move(alarmRepo), timeInjector);
+}
+#endif
 
 constexpr auto defName     = "";
 constexpr auto defDuration = 60;
