@@ -22,7 +22,7 @@ namespace gui
         DesktopInputWidget *InputBox = nullptr;
 
       public:
-        MmiPullWindow(app::Application *app, const std::string &name);
+        MmiPullWindow(app::ApplicationCommon *app, const std::string &name);
         ~MmiPullWindow() override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         bool onInput(const InputEvent &inputEvent) override;

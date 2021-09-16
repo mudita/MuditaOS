@@ -22,16 +22,12 @@ target_sources(application-meditation
         data/Style.hpp
         widgets/IntervalBox.cpp
         widgets/IntervalBox.hpp
-        widgets/MeditationListItems.cpp
-        widgets/MeditationListItems.hpp
-        widgets/MeditationModel.cpp
-        widgets/MeditationModel.hpp
         widgets/MeditationTimer.cpp
         widgets/MeditationTimer.hpp
         widgets/TimerProperty.cpp
         widgets/TimerProperty.hpp
-        windows/MeditationListViewWindows.cpp
-        windows/MeditationListViewWindows.hpp
+        windows/MeditationOptionsWindows.cpp
+        windows/MeditationOptionsWindows.hpp
         windows/MeditationTimerWindow.cpp
         windows/MeditationTimerWindow.hpp
         windows/MeditationWindow.cpp
@@ -44,6 +40,7 @@ target_sources(application-meditation
 
 target_link_libraries(application-meditation
     PRIVATE
+        app
         i18n
         module-sys
         module-utils

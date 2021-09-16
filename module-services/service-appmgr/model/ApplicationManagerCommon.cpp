@@ -13,6 +13,7 @@
 #include <SystemManager/messages/SystemManagerMessage.hpp>
 #include <application-onboarding/data/OnBoardingMessages.hpp>
 #include <apps-common/messages/AppMessage.hpp>
+#include <apps-common/actions/AlarmTriggeredAction.hpp>
 #include <i18n/i18n.hpp>
 #include <log/log.hpp>
 #include <service-audio/AudioMessage.hpp>
@@ -47,7 +48,7 @@ namespace app::manager
     {
         for (const auto &item : stack) {
             if (auto app = getApplication(item.appName);
-                app != nullptr && app->state() == app::Application::State::ACTIVE_FORGROUND) {
+                app != nullptr && app->state() == app::ApplicationCommon::State::ACTIVE_FORGROUND) {
                 return app;
             }
         }
@@ -60,7 +61,7 @@ namespace app::manager
             return nullptr;
         }
         auto app = getApplication(stack.front().appName);
-        return app->state() != app::Application::State::ACTIVE_FORGROUND ? app : nullptr;
+        return app->state() != app::ApplicationCommon::State::ACTIVE_FORGROUND ? app : nullptr;
     }
 
     auto ApplicationManagerBase::getPreviousApplication() const noexcept -> ApplicationHandle *
@@ -162,6 +163,8 @@ namespace app::manager
         case sys::CloseReason::RegularPowerDown:
             [[fallthrough]];
         case sys::CloseReason::Reboot:
+            [[fallthrough]];
+        case sys::CloseReason::FactoryReset:
             break;
         }
         handleActionRequest(&act);
@@ -270,6 +273,7 @@ namespace app::manager
         auto convertibleToActionHandler = [this](sys::Message *request) { return handleMessageAsAction(request); };
         connect(typeid(sys::CriticalBatteryLevelNotification), convertibleToActionHandler);
         connect(typeid(VolumeChanged), convertibleToActionHandler);
+        connect(typeid(app::actions::AlarmTriggeredAction), convertibleToActionHandler);
     }
 
     sys::ReturnCodes ApplicationManagerCommon::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
@@ -295,7 +299,7 @@ namespace app::manager
         if (app.state() == ApplicationHandle::State::ACTIVE_BACKGROUND) {
             LOG_INFO("Switching focus to application [%s] (window [%s])", app.name().c_str(), app.switchWindow.c_str());
             setState(State::AwaitingFocusConfirmation);
-            app::Application::messageSwitchApplication(
+            app::ApplicationCommon::messageSwitchApplication(
                 this, app.name(), app.switchWindow, std::move(app.switchData), StartupReason::Launch);
             return true;
         }
@@ -372,16 +376,16 @@ namespace app::manager
         LOG_DEBUG("Switch applications: [%s][%s](%s) -> [%s][%s](%s)",
                   currentlyFocusedApp->name().c_str(),
                   currentlyFocusedApp->switchWindow.c_str(),
-                  app::Application::stateStr(currentlyFocusedApp->state()),
+                  app::ApplicationCommon::stateStr(currentlyFocusedApp->state()),
                   app->name().c_str(),
                   app->switchWindow.c_str(),
-                  app::Application::stateStr(app->state()));
+                  app::ApplicationCommon::stateStr(app->state()));
 
         stack.front().isCloseable = closeCurrentlyFocusedApp;
         onApplicationSwitch(*app, std::move(msg->getData()), msg->getWindow());
         if (app->name() == currentlyFocusedApp->name()) {
             // Switch window only.
-            app::Application::messageSwitchApplication(
+            app::ApplicationCommon::messageSwitchApplication(
                 this, app->name(), app->switchWindow, std::move(app->switchData), StartupReason::Launch);
             return false;
         }
@@ -408,12 +412,12 @@ namespace app::manager
         if (isCloseable) {
             LOG_INFO("Closing application %s", app.name().c_str());
             setState(State::AwaitingCloseConfirmation);
-            app::Application::messageCloseApplication(this, app.name());
+            app::ApplicationCommon::messageCloseApplication(this, app.name());
         }
         else {
             LOG_INFO("Application %s is about to lose focus.", app.name().c_str());
             setState(State::AwaitingLostFocusConfirmation);
-            app::Application::messageApplicationLostFocus(this, app.name());
+            app::ApplicationCommon::messageApplicationLostFocus(this, app.name());
         }
     }
 
@@ -490,7 +494,7 @@ namespace app::manager
 
         if (targetApp->state() == ApplicationHandle::State::ACTIVE_FORGROUND ||
             targetApp->state() == ApplicationHandle::State::ACTIVE_BACKGROUND) {
-            app::Application::requestAction(this, targetName, action.actionId, std::move(action.params));
+            app::ApplicationCommon::requestAction(this, targetName, action.actionId, std::move(action.params));
             return ActionProcessStatus::Accepted;
         }
         return ActionProcessStatus::Skipped;
@@ -504,7 +508,7 @@ namespace app::manager
         }
         action.setTargetApplication(targetApp->name());
         auto &params = action.params;
-        app::Application::requestAction(this, targetApp->name(), action.actionId, std::move(params));
+        app::ApplicationCommon::requestAction(this, targetApp->name(), action.actionId, std::move(params));
         return ActionProcessStatus::Accepted;
     }
 
@@ -524,7 +528,7 @@ namespace app::manager
         action.setTargetApplication(targetApp->name());
         auto &actionParams = action.params;
         if (const auto state = targetApp->state(); state == ApplicationHandle::State::ACTIVE_FORGROUND) {
-            app::Application::requestAction(this, targetApp->name(), action.actionId, std::move(actionParams));
+            app::ApplicationCommon::requestAction(this, targetApp->name(), action.actionId, std::move(actionParams));
             return ActionProcessStatus::Accepted;
         }
         else if (state == ApplicationHandle::State::ACTIVE_BACKGROUND) {
@@ -550,7 +554,7 @@ namespace app::manager
     {
         if (const auto actionFlag = app->actionFlag(action.actionId);
             actionFlag == actions::ActionFlag::AcceptWhenInBackground) {
-            app::Application::requestAction(this, app->name(), action.actionId, std::move(action.params));
+            app::ApplicationCommon::requestAction(this, app->name(), action.actionId, std::move(action.params));
             return ActionProcessStatus::Accepted;
         }
         return ActionProcessStatus::Dropped;
@@ -575,17 +579,17 @@ namespace app::manager
         if (previousApp->name() == currentlyFocusedApp->name()) {
             // Switch window only.
             onApplicationSwitchToPrev(*previousApp, std::move(msg->getData()));
-            app::Application::messageSwitchBack(this, currentlyFocusedApp->name());
+            app::ApplicationCommon::messageSwitchBack(this, currentlyFocusedApp->name());
             return true;
         }
 
         LOG_DEBUG("Switch applications: [%s][%s](%s) -> [%s][%s](%s)",
                   currentlyFocusedApp->name().c_str(),
                   currentlyFocusedApp->switchWindow.c_str(),
-                  app::Application::stateStr(currentlyFocusedApp->state()),
+                  app::ApplicationCommon::stateStr(currentlyFocusedApp->state()),
                   previousApp->name().c_str(),
                   previousApp->switchWindow.c_str(),
-                  app::Application::stateStr(previousApp->state()));
+                  app::ApplicationCommon::stateStr(previousApp->state()));
 
         onApplicationSwitchToPrev(*previousApp, std::move(msg->getData()));
         requestApplicationClose(*currentlyFocusedApp, isApplicationCloseable(currentlyFocusedApp));
@@ -638,7 +642,7 @@ namespace app::manager
             app.setState(ApplicationHandle::State::ACTIVATING);
             setState(State::AwaitingFocusConfirmation);
 
-            app::Application::messageSwitchApplication(
+            app::ApplicationCommon::messageSwitchApplication(
                 this, app.name(), app.switchWindow, std::move(app.switchData), launchingApp->startupReason);
         }
     }
@@ -682,7 +686,7 @@ namespace app::manager
             if (app && app->valid()) {
                 if (const auto appState = app->state(); appState == ApplicationHandle::State::ACTIVE_FORGROUND ||
                                                         appState == ApplicationHandle::State::ACTIVE_BACKGROUND) {
-                    app::Application::messageRebuildApplication(this, app->name());
+                    app::ApplicationCommon::messageRebuildApplication(this, app->name());
                 }
             }
         }
@@ -695,8 +699,9 @@ namespace app::manager
             LOG_ERROR("Failed to switch to %s. No such application.", msg->getSenderName().c_str());
             return false;
         }
-        LOG_INFO(
-            "Switch confirmed by %s (%s).", senderApp->name().c_str(), app::Application::stateStr(senderApp->state()));
+        LOG_INFO("Switch confirmed by %s (%s).",
+                 senderApp->name().c_str(),
+                 app::ApplicationCommon::stateStr(senderApp->state()));
         return onSwitchConfirmed(*senderApp);
     }
 
@@ -745,7 +750,7 @@ namespace app::manager
             break;
         default: {
             auto &params = action->params;
-            app::Application::requestAction(this, app.name(), action->actionId, std::move(params));
+            app::ApplicationCommon::requestAction(this, app.name(), action->actionId, std::move(params));
             break;
         }
         }

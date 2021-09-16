@@ -7,7 +7,7 @@
 #include "NotificationData.hpp"
 #include "ListItemProvider.hpp"
 
-#include "Application.hpp"
+#include <apps-common/ApplicationCommon.hpp>
 #include "InternalModel.hpp"
 #include <service-appmgr/data/NotificationsChangedActionsParams.hpp>
 

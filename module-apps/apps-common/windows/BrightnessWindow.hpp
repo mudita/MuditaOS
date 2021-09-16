@@ -1,9 +1,9 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include <apps-common/Application.hpp>
+#include <apps-common/ApplicationCommon.hpp>
 #include "AppWindow.hpp"
 #include "apps-common/widgets/BarGraph.hpp"
 #include "apps-common/widgets/BightnessBox.hpp"
@@ -20,7 +20,7 @@ namespace gui
         HBarGraph *brightnessBar      = nullptr;
 
       public:
-        BrightnessWindow(app::Application *app, const std::string &name);
+        BrightnessWindow(app::ApplicationCommon *app, const std::string &name);
 
         ~BrightnessWindow() override;
 

@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationMeditation.hpp"
-#include "MeditationListViewWindows.hpp"
+#include "MeditationOptionsWindows.hpp"
 #include "MeditationTimerWindow.hpp"
 #include "MeditationWindow.hpp"
 #include "Names.hpp"
@@ -42,18 +42,21 @@ namespace app
 
     void ApplicationMeditation::createUserInterface()
     {
-        windowsFactory.attach(app::window::name::meditation_main_window, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::MeditationWindow>(app);
-        });
-        windowsFactory.attach(app::window::name::meditation_timer, [](Application *app, const std::string &name) {
+        windowsFactory.attach(app::window::name::meditation_main_window,
+                              [](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<gui::MeditationWindow>(app);
+                              });
+        windowsFactory.attach(app::window::name::meditation_timer, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::MeditationTimerWindow>(app);
         });
-        windowsFactory.attach(app::window::name::meditation_options, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::MeditationOptionsWindow>(app);
-        });
-        windowsFactory.attach(app::window::name::meditation_preparation, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::PreparationTimeWindow>(app);
-        });
+        windowsFactory.attach(app::window::name::meditation_options,
+                              [](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<gui::MeditationOptionsWindow>(app);
+                              });
+        windowsFactory.attach(app::window::name::meditation_preparation,
+                              [](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<gui::PreparationTimeWindow>(app);
+                              });
 
         attachPopups(
             {gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes, gui::popup::ID::PhoneLock});

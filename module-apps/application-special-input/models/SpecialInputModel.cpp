@@ -5,7 +5,7 @@
 #include "SpecialInputTableWidget.hpp"
 #include <ListView.hpp>
 
-SpecialInputModel::SpecialInputModel(app::Application *app) : application(app)
+SpecialInputModel::SpecialInputModel(app::ApplicationCommon *app) : application(app)
 {}
 
 auto SpecialInputModel::requestRecordsCount() -> unsigned int

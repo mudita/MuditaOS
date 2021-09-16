@@ -10,7 +10,7 @@
 namespace gui
 {
 
-    RebootWindow::RebootWindow(app::Application *app, std::unique_ptr<PowerOffPresenter> &&presenter)
+    RebootWindow::RebootWindow(app::ApplicationCommon *app, std::unique_ptr<PowerOffPresenter> &&presenter)
         : AppWindow(app, app::window::name::desktop_reboot), presenter(std::move(presenter))
     {
         buildInterface();

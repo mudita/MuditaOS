@@ -4,7 +4,7 @@
 #include "GuiTimer.hpp"
 #include "Item.hpp" // for Item
 
-#include <apps-common/Application.hpp> // for Application
+#include <apps-common/ApplicationCommon.hpp> // for Application
 
 #include "module-sys/Timers/SystemTimer.hpp" // for Timer, Timer::Type, Timer::Ty...
 #include "module-sys/Timers/TimerFactory.hpp"
@@ -27,7 +27,7 @@ namespace app
     class GuiTimer::Impl
     {
       public:
-        Impl(Application *parent,
+        Impl(ApplicationCommon *parent,
              gui::Item *item,
              const std::string &name,
              std::chrono::milliseconds timeout,
@@ -35,15 +35,21 @@ namespace app
         std::unique_ptr<sys::timer::SystemTimer> timer;
     };
 
-    GuiTimer::Impl::Impl(
-        Application *parent, gui::Item *item, const std::string &name, std::chrono::milliseconds timeout, Type type)
+    GuiTimer::Impl::Impl(ApplicationCommon *parent,
+                         gui::Item *item,
+                         const std::string &name,
+                         std::chrono::milliseconds timeout,
+                         Type type)
         : timer{std::make_unique<sys::timer::SystemTimer>(parent, name, timeout, guiTypeToSysType(type))}
     {
         timer->connect([item](sys::Timer &self) { item->onTimer(self); });
     }
 
-    GuiTimer::GuiTimer(
-        Application *parent, gui::Item *item, const std::string &name, std::chrono::milliseconds timeout, Type type)
+    GuiTimer::GuiTimer(ApplicationCommon *parent,
+                       gui::Item *item,
+                       const std::string &name,
+                       std::chrono::milliseconds timeout,
+                       Type type)
         : pimpl(std::make_unique<GuiTimer::Impl>(parent, item, name, timeout, type)), item{item}
     {}
 
@@ -72,7 +78,7 @@ namespace app
         return pimpl->timer->isActive();
     }
 
-    sys::TimerHandle GuiTimerFactory::createSingleShotTimer(Application *parent,
+    sys::TimerHandle GuiTimerFactory::createSingleShotTimer(ApplicationCommon *parent,
                                                             gui::Item *item,
                                                             const std::string &name,
                                                             std::chrono::milliseconds interval)
@@ -80,7 +86,7 @@ namespace app
         return createGuiTimer(parent, item, name, interval, GuiTimer::Type::SingleShot);
     }
 
-    sys::TimerHandle GuiTimerFactory::createPeriodicTimer(Application *parent,
+    sys::TimerHandle GuiTimerFactory::createPeriodicTimer(ApplicationCommon *parent,
                                                           gui::Item *item,
                                                           const std::string &name,
                                                           std::chrono::milliseconds interval)
@@ -88,7 +94,7 @@ namespace app
         return createGuiTimer(parent, item, name, interval, GuiTimer::Type::Periodic);
     }
 
-    sys::TimerHandle GuiTimerFactory::createGuiTimer(Application *parent,
+    sys::TimerHandle GuiTimerFactory::createGuiTimer(ApplicationCommon *parent,
                                                      gui::Item *item,
                                                      const std::string &name,
                                                      std::chrono::milliseconds interval,

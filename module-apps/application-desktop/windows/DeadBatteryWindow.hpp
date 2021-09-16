@@ -13,7 +13,7 @@ namespace gui
     class DeadBatteryWindow : public AppWindow
     {
       public:
-        explicit DeadBatteryWindow(app::Application *app);
+        explicit DeadBatteryWindow(app::ApplicationCommon *app);
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;

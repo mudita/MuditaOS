@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <apps-common/Application.hpp>
+#include <Application.hpp>
 
 namespace app
 {
@@ -23,7 +23,6 @@ namespace app
 
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
-        sys::ReturnCodes DeinitHandler() override;
 
         sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) final
         {

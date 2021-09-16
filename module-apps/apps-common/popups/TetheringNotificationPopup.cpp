@@ -3,11 +3,11 @@
 
 #include "TetheringNotificationPopup.hpp"
 
-#include <Application.hpp>
+#include <ApplicationCommon.hpp>
 
 namespace gui
 {
-    TetheringNotificationPopup::TetheringNotificationPopup(app::Application *app, const std::string &name)
+    TetheringNotificationPopup::TetheringNotificationPopup(app::ApplicationCommon *app, const std::string &name)
         : gui::DialogConfirm(app, name)
     {
         statusBar->configure(configureStatusBar(application->getStatusBarConfiguration()));

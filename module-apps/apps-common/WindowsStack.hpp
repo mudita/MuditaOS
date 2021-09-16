@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -12,14 +12,14 @@
 namespace app
 {
 
-    class Application;
+    class ApplicationCommon;
 
     class WindowsStack
     {
-        Application *parent;
+        ApplicationCommon *parent;
 
       public:
-        WindowsStack(Application *parent) : parent(parent)
+        WindowsStack(ApplicationCommon *parent) : parent(parent)
         {}
 
         std::vector<std::string> stack;

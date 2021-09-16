@@ -68,6 +68,7 @@ target_sources(application-messages
 
 target_link_libraries(application-messages
     PRIVATE
+        app
         clipboard
         i18n
         log

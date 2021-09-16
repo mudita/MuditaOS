@@ -304,7 +304,9 @@ void PINMUX_InitBootPins(void)
     PINMUX_InitButtons();
     PINMUX_InitRotaryEncoder();
     PINMUX_DomeSwitch();
+    PINMUX_Wakeup();
     PINMUX_WDOG_B_Init();
+    PINMUX_InitI2C4();
 }
 
 /*
@@ -1124,6 +1126,8 @@ void PINMUX_InitEinkFrontlight(void)
 
 void PINMUX_InitButtons(void)
 {
+    CLOCK_EnableClock(kCLOCK_Iomuxc);
+
     IOMUXC_SetPinMux(PINMUX_BUTTON_SW1, 0U); /* Software Input On Field: Input Path is determined by functionality */
 
     IOMUXC_SetPinMux(PINMUX_BUTTON_SW2, 0U); /* Software Input On Field: Input Path is determined by functionality */
@@ -1134,24 +1138,22 @@ void PINMUX_InitButtons(void)
                      0U); /* Software Input On Field: Input Path is determined by functionality */
 
     IOMUXC_SetPinConfig(PINMUX_BUTTON_SW1,
-
                         PAD_CONFIG_SLEW_RATE_SLOW | PAD_CONFIG_DRIVER_DISABLED | PAD_CONFIG_SPEED_SLOW_50MHz |
-                            PAD_CONFIG_PULL_KEEPER_DISABLED | PAD_CONFIG_SELECT_PULL | PAD_CONFIG_PULL_UP_100kOhm);
+                            PAD_CONFIG_PULL_KEEPER_DISABLED | PAD_CONFIG_SELECT_PULL | PAD_CONFIG_PULL_UP_22kOhm);
 
     IOMUXC_SetPinConfig(PINMUX_BUTTON_SW2,
-
                         PAD_CONFIG_SLEW_RATE_SLOW | PAD_CONFIG_DRIVER_DISABLED | PAD_CONFIG_SPEED_SLOW_50MHz |
-                            PAD_CONFIG_PULL_KEEPER_DISABLED | PAD_CONFIG_SELECT_PULL | PAD_CONFIG_PULL_UP_100kOhm);
+                            PAD_CONFIG_PULL_KEEPER_DISABLED | PAD_CONFIG_SELECT_PULL | PAD_CONFIG_PULL_UP_22kOhm);
 
     IOMUXC_SetPinConfig(PINMUX_BUTTON_SW_ENC,
-
                         PAD_CONFIG_SLEW_RATE_SLOW | PAD_CONFIG_DRIVER_DISABLED | PAD_CONFIG_SPEED_SLOW_50MHz |
-                            PAD_CONFIG_PULL_KEEPER_DISABLED | PAD_CONFIG_SELECT_PULL | PAD_CONFIG_PULL_UP_100kOhm);
+                            PAD_CONFIG_DRIVER_STRENGTH_LVL_6 | PAD_CONFIG_PULL_KEEPER_ENABLED | PAD_CONFIG_SELECT_PULL |
+                            PAD_CONFIG_PULL_UP_100kOhm);
 
     IOMUXC_SetPinConfig(PINMUX_BUTTON_SW_PUSH,
-
                         PAD_CONFIG_SLEW_RATE_SLOW | PAD_CONFIG_DRIVER_DISABLED | PAD_CONFIG_SPEED_SLOW_50MHz |
-                            PAD_CONFIG_PULL_KEEPER_DISABLED | PAD_CONFIG_SELECT_PULL | PAD_CONFIG_PULL_UP_100kOhm);
+                            PAD_CONFIG_PULL_KEEPER_ENABLED | PAD_CONFIG_SELECT_PULL | PAD_CONFIG_PULL_UP_22kOhm |
+                            PAD_CONFIG_HYSTERESIS_ENABLED);
 }
 
 void PINMUX_InitRotaryEncoder(void)
@@ -1173,7 +1175,7 @@ void PINMUX_InitRotaryEncoder(void)
 
 void PINMUX_DomeSwitch(void)
 {
-    IOMUXC_SetPinMux(PINMUX_DOME_SWITCH, 0U); /* Software Input On Field: Input Path is determined by functionality */
+    IOMUXC_SetPinMux(PINMUX_DOME_SWITCH, 1U); /* Software Input On Field: Input Path is determined by functionality */
 
     IOMUXC_SetPinConfig(PINMUX_DOME_SWITCH,
 
@@ -1189,6 +1191,51 @@ void PINMUX_WDOG_B_Init(void)
 
                         PAD_CONFIG_SLEW_RATE_SLOW | PAD_CONFIG_DRIVER_DISABLED | PAD_CONFIG_SPEED_SLOW_50MHz |
                             PAD_CONFIG_PULL_KEEPER_ENABLED | PAD_CONFIG_SELECT_PULL | PAD_CONFIG_PULL_UP_100kOhm);
+}
+
+void PINMUX_InitI2C4(void)
+{
+    // D0B0 (11 0 1 0 000 10 110 00 0) ->
+    /*
+        0 (SRE)     : 0
+        1-2 (X)     : 00
+        3-5 (DSE)   : 110
+        6-7 (SPEED) : 10
+        8-10 (X)    : 000
+        11 (ODE)    : 0
+        12 (PKE)    : 1
+        13 (PUE)    : 0
+        14-15 (PUS) : 11
+        16 (HYS)    : 0
+    */
+
+    IOMUXC_SetPinMux(PINMUX_I2C4_SCL, 1U); /* Software Input On Field: Input Path is determined by functionality */
+
+    IOMUXC_SetPinConfig(PINMUX_I2C4_SCL,
+
+                        PAD_CONFIG_SLEW_RATE_SLOW | PAD_CONFIG_DRIVER_STRENGTH_LVL_6 |
+                            PAD_CONFIG_SPEED_MEDIUM_2_100MHz | PAD_CONFIG_PULL_KEEPER_ENABLED |
+                            PAD_CONFIG_SELECT_KEEPER | PAD_CONFIG_PULL_UP_22kOhm);
+
+    IOMUXC_SetPinMux(PINMUX_I2C4_SDA, 1U); /* Software Input On Field: Input Path is determined by functionality */
+
+    IOMUXC_SetPinConfig(PINMUX_I2C4_SDA,
+
+                        PAD_CONFIG_SLEW_RATE_SLOW | PAD_CONFIG_DRIVER_STRENGTH_LVL_6 |
+                            PAD_CONFIG_SPEED_MEDIUM_2_100MHz | PAD_CONFIG_PULL_KEEPER_ENABLED |
+                            PAD_CONFIG_SELECT_KEEPER | PAD_CONFIG_PULL_UP_22kOhm);
+}
+
+void PINMUX_Wakeup(void)
+{
+    CLOCK_EnableClock(kCLOCK_IomuxcSnvs);
+
+    IOMUXC_SetPinMux(PINMUX_WAKEUP, 1U); /* Software Input On Field: Input Path is determined by functionality */
+
+    IOMUXC_SetPinConfig(PINMUX_WAKEUP,
+
+                        PAD_CONFIG_SLEW_RATE_SLOW | PAD_CONFIG_DRIVER_DISABLED | PAD_CONFIG_SPEED_SLOW_50MHz |
+                            PAD_CONFIG_PULL_KEEPER_DISABLED | PAD_CONFIG_SELECT_PULL | PAD_CONFIG_PULL_UP_100kOhm);
 }
 
 /***********************************************************************************************************************

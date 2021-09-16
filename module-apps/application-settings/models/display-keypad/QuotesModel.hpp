@@ -18,7 +18,7 @@ namespace Quotes
                         public app::AsyncCallbackReceiver
     {
       public:
-        explicit QuotesModel(app::Application *application);
+        explicit QuotesModel(app::ApplicationCommon *application);
 
         [[nodiscard]] auto requestRecordsCount() -> unsigned int final;
         [[nodiscard]] auto getMinimalItemSpaceRequired() const -> unsigned int final;
@@ -34,7 +34,7 @@ namespace Quotes
         auto handleQueryResponse(db::QueryResult *queryResult) -> bool;
 
       private:
-        app::Application *app = nullptr;
+        app::ApplicationCommon *app = nullptr;
     };
 
 } // namespace Quotes

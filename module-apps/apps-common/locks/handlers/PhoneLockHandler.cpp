@@ -353,6 +353,7 @@ namespace locks
             lock.lockState = Lock::LockState::Blocked;
         }
         setPhoneLockTimeInformationInSettings();
+        broadcastLockTime();
     }
 
     sys::MessagePointer PhoneLockHandler::verifyPhoneUnlockInput(LockInput inputData)
@@ -399,7 +400,9 @@ namespace locks
 
         if (lock.isState(Lock::LockState::Blocked)) {
             phoneExternalUnlockInfoAction();
-            return sys::msgHandled();
+            if (std::time(nullptr) <= lockedTill) {
+                return sys::msgHandled();
+            }
         }
 
         comparePhoneLockHashCode(inputData);
@@ -479,6 +482,12 @@ namespace locks
         lockedTill                = 0;
         nextUnlockAttemptLockTime = initialLockTime;
         phoneLockTimer.stop();
+    }
+
+    void PhoneLockHandler::broadcastLockTime() noexcept
+    {
+        owner->bus.sendMulticast(std::make_shared<locks::NextPhoneUnlockAttemptLockTime>(lockedTill),
+                                 sys::BusChannel::PhoneLockChanges);
     }
 
 } // namespace locks

@@ -15,7 +15,7 @@
 
 using namespace calllog;
 
-CalllogModel::CalllogModel(app::Application *app) : DatabaseModel(app), app::AsyncCallbackReceiver(app)
+CalllogModel::CalllogModel(app::ApplicationCommon *app) : DatabaseModel(app), app::AsyncCallbackReceiver(app)
 {}
 
 unsigned int CalllogModel::requestRecordsCount()

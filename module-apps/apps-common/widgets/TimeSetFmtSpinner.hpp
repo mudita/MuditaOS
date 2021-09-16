@@ -6,12 +6,12 @@
 #include <gui/widgets/BoxLayout.hpp>
 #include <gui/widgets/TextConstants.hpp>
 #include <time/time_locale.hpp>
+#include <widgets/spinners/Spinners.hpp>
 
 #include <string>
 
 namespace gui
 {
-    class TextSpinner;
     class TimeSetSpinner;
 
     /// Time set spinner widget class with option for dynamic switching between 24/12-hour format
@@ -60,7 +60,7 @@ namespace gui
         auto handleRightFunctionKey() -> bool;
 
         TimeSetSpinner *timeSetSpinner             = nullptr;
-        TextSpinner *fmt                           = nullptr;
+        UTF8Spinner *fmt                           = nullptr;
         EditMode editMode                          = EditMode::Edit;
         std::string fontName                       = style::window::font::supersizemelight;
         utils::time::Locale::TimeFormat timeFormat = utils::time::Locale::TimeFormat::FormatTime12H;

@@ -31,7 +31,7 @@ INSERT OR IGNORE INTO settings_tab (path, value) VALUES
     ('\ServiceBluetooth\\bt_device_name', 'PurePhone'),
     ('\ServiceBluetooth\\bt_bonded_devices', ''),
     ('battery_critical_level', '10'),
-    ('cl_offline_mode', '0'),
+    ('cl_offline_mode', '1'),
     ('cl_current_uid', '0'),
     ('off_connection_frequency', '0'),
     ('off_notifications_when_locked', '0'),
@@ -42,7 +42,7 @@ INSERT OR IGNORE INTO settings_tab (path, value) VALUES
     ('keypad_light_state', '0'),
     ('gs_current_timezone_name', ''),
     ('gs_current_timezone_rules', ''),
-    ('\ServiceTime\\gs_automatic_date_and_time_is_on', '1'),
-    ('temperature_unit', 'C');
+    ('\ServiceTime\\gs_automatic_date_and_time_is_on', '1');
+
 
 

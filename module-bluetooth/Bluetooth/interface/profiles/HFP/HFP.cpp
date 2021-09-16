@@ -40,9 +40,9 @@ namespace bluetooth
         return pimpl->init();
     }
 
-    void HFP::setDeviceAddress(uint8_t *addr)
+    void HFP::setDevice(const Devicei &device)
     {
-        pimpl->setDeviceAddress(addr);
+        pimpl->setDevice(device);
     }
 
     void HFP::setOwnerService(const sys::Service *service)
@@ -116,6 +116,8 @@ namespace bluetooth
         {1, 1},
         {2, 1},
     };
+    Devicei HFP::HFPImpl::device;
+
     void HFP::HFPImpl::dump_supported_codecs(void)
     {
         LOG_DEBUG("Supported codecs: ");
@@ -357,10 +359,10 @@ namespace bluetooth
         hfp_ag_release_service_level_connection(aclHandle);
     }
 
-    void HFP::HFPImpl::setDeviceAddress(bd_addr_t addr)
+    void HFP::HFPImpl::setDevice(Devicei dev)
     {
-        bd_addr_copy(deviceAddr, addr);
-        LOG_DEBUG("Address set!");
+        device = dev;
+        LOG_DEBUG("Device set!");
     }
 
     void HFP::HFPImpl::setOwnerService(const sys::Service *service)

@@ -3,21 +3,33 @@
 
 #pragma once
 
-#include <apps-common/Application.hpp>
+#include <Application.hpp>
 
+namespace gui::window::name
+{
+    inline constexpr auto powernapProgress     = "PowerNapProgressWindow";
+    inline constexpr auto powernapSessionEnded = "PowerNapSessionEndedWindow";
+} // namespace gui::window::name
 namespace app
 {
+    namespace powernap
+    {
+        class PowerNapAlarmImpl;
+    }
+
     inline constexpr auto applicationBellPowerNapName = "ApplicationBellPowerNap";
 
     class ApplicationBellPowerNap : public Application
     {
+        std::unique_ptr<powernap::PowerNapAlarmImpl> alarm;
+
       public:
         ApplicationBellPowerNap(std::string name                            = applicationBellPowerNapName,
                                 std::string parent                          = "",
                                 sys::phone_modes::PhoneMode mode            = sys::phone_modes::PhoneMode::Offline,
                                 sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled,
                                 StartInBackground startInBackground         = {false});
-
+        ~ApplicationBellPowerNap();
         sys::ReturnCodes InitHandler() override;
 
         void createUserInterface() override;

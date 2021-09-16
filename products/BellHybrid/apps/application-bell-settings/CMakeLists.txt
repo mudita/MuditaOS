@@ -22,43 +22,55 @@ target_include_directories(application-bell-settings
 target_sources(application-bell-settings
     PRIVATE
         ApplicationBellSettings.cpp
-        models/TimeUnitsModel.cpp
-        models/TemperatureUnitModel.cpp
         models/FrontlightModel.cpp
-        presenter/TimeUnitsPresenter.cpp
+        models/PrewakeUpModel.cpp
+        models/TemperatureUnitModel.cpp
+        models/TimeUnitsModel.cpp
+        models/alarm_settings/SnoozeListItemProvider.cpp
+        models/alarm_settings/SnoozeListItems.hpp
+
         presenter/FrontlightPresenter.cpp
+        presenter/PrewakeUpPresenter.cpp
+        presenter/TimeUnitsPresenter.cpp
+        presenter/alarm_settings/SnoozePresenter.cpp
+
         widgets/TimeSetListItem.cpp
         widgets/TimeFormatSetListItem.cpp
         widgets/TemperatureUnitListItem.cpp
+
         windows/BellSettingsWindow.cpp
-        windows/BellSettingsAdvancedWindow.cpp
-        windows/BellSettingsTimeUnitsWindow.cpp
-        windows/BellSettingsFinishedWindow.cpp
-        windows/BellSettingsAlarmSettingsWindow.cpp
         windows/BellSettingsBedtimeToneWindow.cpp
         windows/BellSettingsFrontlight.cpp
         windows/BellSettingsHomeViewWindow.cpp
+        windows/BellSettingsPrewakeUpWindow.cpp
         windows/BellSettingsTurnOffWindow.cpp
+        windows/advanced/BellSettingsAdvancedWindow.cpp
+        windows/advanced/BellSettingsTimeUnitsWindow.cpp
+        windows/alarm_settings/BellSettingsAlarmSettingsWindow.cpp
+        windows/alarm_settings/BellSettingsAlarmSettingsSnoozeWindow.cpp
 
+        models/PrewakeUpModel.hpp
         models/TimeUnitsModel.hpp
-        models/TemperatureUnitModel.hpp
-        models/FrontlightModel.hpp
-        presenter/TimeUnitsPresenter.hpp
+        models/alarm_settings/SnoozeListItemProvider.hpp
+
         presenter/FrontlightPresenter.hpp
+        presenter/PrewakeUpPresenter.hpp
+        presenter/TimeUnitsPresenter.hpp
+        presenter/alarm_settings/SnoozePresenter.hpp
+
         widgets/TimeSetListItem.hpp
-        widgets/TimeFormatSetListItem.hpp
-        widgets/TemperatureUnitListItem.hpp
-        windows/BellSettingsWindow.hpp
-        windows/BellSettingsAdvancedWindow.hpp
-        windows/BellSettingsAlarmSettingsWindow.hpp
+
+        windows/alarm_settings/BellSettingsAlarmSettingsSnoozeWindow.hpp
+        windows/alarm_settings/BellSettingsAlarmSettingsWindow.hpp
+        windows/advanced/BellSettingsTimeUnitsWindow.hpp
+        windows/advanced/BellSettingsAdvancedWindow.hpp
         windows/BellSettingsBedtimeToneWindow.hpp
         windows/BellSettingsFrontlight.hpp
         windows/BellSettingsHomeViewWindow.hpp
-        windows/BellSettingsTimeUnitsWindow.hpp
+        windows/BellSettingsPrewakeUpWindow.hpp
         windows/BellSettingsTurnOffWindow.hpp
+        windows/BellSettingsWindow.hpp
 
-    PRIVATE
-        windows/BellSettingsFinishedWindow.hpp
         data/FinishedWindowMessageData.hpp
 
     PUBLIC
@@ -67,9 +79,13 @@ target_sources(application-bell-settings
 
 target_link_libraries(application-bell-settings
     PRIVATE
+        app
         bellgui
+        bell::app-common
+        bell::db
         service-appmgr
-    PUBLIC
         apps-common
+    PUBLIC
         module-gui
+        bell::app-common
 )

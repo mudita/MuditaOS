@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmEventRecord.hpp"
@@ -107,11 +107,11 @@ std::unique_ptr<db::query::alarmEvents::GetResult> AlarmEventRecordInterface::ru
 std::unique_ptr<db::query::alarmEvents::GetBetweenDatesResult> AlarmEventRecordInterface::runQueryImplGetBetweenDates(
     std::shared_ptr<db::query::alarmEvents::GetBetweenDates> query)
 {
-    const auto alarmEventsRows =
+    const auto [alarmEventsRows, count] =
         eventsDB->alarmEvents.getBetweenDates(query->start, query->end, query->offset, query->limit);
     const auto recordVector = generateRecordsVector(alarmEventsRows);
 
-    auto response = std::make_unique<db::query::alarmEvents::GetBetweenDatesResult>(recordVector);
+    auto response = std::make_unique<db::query::alarmEvents::GetBetweenDatesResult>(recordVector, count);
     response->setRequestQuery(query);
 
     return response;

@@ -14,6 +14,6 @@ namespace gui
         gui::Text *text = nullptr;
 
       public:
-        explicit UiTestWindow(app::Application *app);
+        explicit UiTestWindow(app::ApplicationCommon *app);
     };
 } // namespace gui

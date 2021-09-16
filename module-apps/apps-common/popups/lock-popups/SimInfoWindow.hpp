@@ -14,7 +14,7 @@ namespace gui
         Icon *infoIcon = nullptr;
 
       public:
-        SimInfoWindow(app::Application *app, const std::string &name);
+        SimInfoWindow(app::ApplicationCommon *app, const std::string &name);
 
         void buildInterface() override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;

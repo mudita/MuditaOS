@@ -26,14 +26,14 @@
 #include <application-onboarding/ApplicationOnBoarding.hpp>
 
 // modules
-#include <module-db/Databases/AlarmsDB.hpp>
 #include <module-db/Databases/CountryCodesDB.hpp>
 #include <module-db/Databases/EventsDB.hpp>
 #include <module-db/Databases/NotificationsDB.hpp>
+#include <module-db/Databases/MultimediaFilesDB.hpp>
 #include <module-db/Interface/AlarmEventRecord.hpp>
-#include <module-db/Interface/AlarmsRecord.hpp>
 #include <module-db/Interface/CountryCodeRecord.hpp>
 #include <module-db/Interface/NotificationsRecord.hpp>
+#include <module-db/Interface/MultimediaFilesRecord.hpp>
 
 // services
 #include <appmgr/ApplicationManager.hpp>
@@ -49,7 +49,6 @@
 #include <service-gui/ServiceGUI.hpp>
 #include <service-gui/Common.hpp>
 #include <module-services/service-eink/ServiceEink.hpp>
-#include <service-fileindexer/Constants.hpp>
 #include <service-fileindexer/ServiceFileIndexer.hpp>
 #include <service-desktop/ServiceDesktop.hpp>
 
@@ -96,9 +95,7 @@ int main()
 
     std::vector<std::unique_ptr<sys::BaseServiceCreator>> systemServices;
     systemServices.emplace_back(sys::CreatorFor<EventManager>());
-#if ENABLE_FILEINDEXER_SERVICE
     systemServices.emplace_back(sys::CreatorFor<service::ServiceFileIndexer>());
-#endif
     systemServices.emplace_back(sys::CreatorFor<ServiceDB>());
 #if ENABLE_GSM == 0
     // For now disable permanently Service cellular when there is no GSM configured

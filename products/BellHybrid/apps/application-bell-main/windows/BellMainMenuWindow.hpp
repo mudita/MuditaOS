@@ -11,7 +11,7 @@ namespace gui
     class BellMainMenuWindow : public OptionWindow
     {
       public:
-        BellMainMenuWindow(app::Application *app);
+        BellMainMenuWindow(app::ApplicationCommon *app);
 
       private:
         std::list<Option> mainMenuOptionsList();

@@ -10,10 +10,10 @@ target_sources(evtmgr
         internal/TemperatureApi.cpp
 
         internal/StaticData.hpp
+        screen-light-control/ScreenLightControl.cpp
     PUBLIC
         include/evtmgr/EventManager.hpp
         include/evtmgr/api/TemperatureApi.hpp
-        include/evtmgr/messages/AlarmMessage.hpp
 )
 
 target_include_directories(evtmgr
@@ -25,9 +25,9 @@ target_include_directories(evtmgr
 
 target_link_libraries(evtmgr
    PRIVATE
-        alarms
         keymap
         module-bsp
         module-utils
         service-evtmgr
+        sys
 )

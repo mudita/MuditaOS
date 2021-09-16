@@ -45,4 +45,16 @@ namespace bsp
     void LinuxLPM::DisableDcdcPowerSaveMode()
     {}
 
+    void LinuxLPM::DisconnectInternalLoadResistor()
+    {}
+
+    void LinuxLPM::ConnectInternalLoadResistor()
+    {}
+
+    void LinuxLPM::SwitchToRegularModeLDO()
+    {}
+
+    void LinuxLPM::SwitchToLowPowerModeLDO()
+    {}
+
 } // namespace bsp

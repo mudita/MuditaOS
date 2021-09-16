@@ -26,20 +26,20 @@ namespace app::alarmClock
 
     class NewEditAlarmModel : public AlarmsInternalListItemProvider
     {
-        app::Application *application = nullptr;
+        app::ApplicationCommon *application = nullptr;
         std::shared_ptr<AbstractAlarmsRepository> alarmsRepository;
         gui::AlarmInternalListItem *repeatOption = nullptr;
         bool mode24H = false;
 
       public:
-        NewEditAlarmModel(app::Application *app,
+        NewEditAlarmModel(app::ApplicationCommon *app,
                           std::shared_ptr<AbstractAlarmsRepository> alarmsRepository,
                           bool mode24H = false);
 
         void loadData(std::shared_ptr<AlarmEventRecord> record) override;
         void saveData(std::shared_ptr<AlarmEventRecord> alarm, AlarmAction action) override;
         void loadRepeat(std::shared_ptr<AlarmEventRecord> record) override;
-        void createData();
+        void createData(std::shared_ptr<AlarmEventRecord> record);
 
         [[nodiscard]] unsigned int getMinimalItemSpaceRequired() const override;
         [[nodiscard]] unsigned int requestRecordsCount() override;

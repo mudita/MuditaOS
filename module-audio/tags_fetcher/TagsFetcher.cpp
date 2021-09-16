@@ -35,10 +35,12 @@ namespace tags::fetcher
                 return title;
             };
 
-            const auto artist = tags->artist().to8Bit(unicode);
-            const auto album  = tags->album().to8Bit(unicode);
-            const auto genre  = tags->genre().to8Bit(unicode);
-            const auto year   = std::to_string(tags->year());
+            const auto artist  = tags->artist().to8Bit(unicode);
+            const auto album   = tags->album().to8Bit(unicode);
+            const auto genre   = tags->genre().to8Bit(unicode);
+            const auto year    = tags->year();
+            const auto comment = tags->comment().to8Bit(unicode);
+            const auto track   = tags->track();
 
             const uint32_t total_duration_s = properties->length();
             const uint32_t duration_min     = total_duration_s / utils::secondsInMinute;
@@ -61,7 +63,9 @@ namespace tags::fetcher
                         title,
                         album,
                         year,
-                        filePath};
+                        filePath,
+                        comment,
+                        track};
         }
 
         return {};

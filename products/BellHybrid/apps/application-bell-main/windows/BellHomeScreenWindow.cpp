@@ -5,12 +5,13 @@
 #include "data/BellMainStyle.hpp"
 
 #include <application-bell-main/ApplicationBellMain.hpp>
-#include <application-bell-main/data/AlarmRingingSwitchData.hpp>
 #include <apps-common/widgets/BellBaseLayout.hpp>
+#include <apps-common/actions/AlarmRingingData.hpp>
 #include <gui/input/InputEvent.hpp>
 #include <gui/widgets/TextFixedSize.hpp>
 #include <gui/widgets/Style.hpp>
 #include <i18n/i18n.hpp>
+#include <service-db/DBNotificationMessage.hpp>
 #include <service-time/api/TimeSettingsApi.hpp>
 #include <time/time_constants.hpp>
 #include <widgets/AlarmSetSpinner.hpp>
@@ -69,7 +70,7 @@ namespace
 
 namespace gui
 {
-    BellHomeScreenWindow::BellHomeScreenWindow(app::Application *app,
+    BellHomeScreenWindow::BellHomeScreenWindow(app::ApplicationCommon *app,
                                                std::unique_ptr<app::home_screen::AbstractPresenter> presenter)
         : AppWindow(app, name::window::main_window), presenter{std::move(presenter)}
     {
@@ -201,7 +202,7 @@ namespace gui
     void BellHomeScreenWindow::onBeforeShow(ShowMode, SwitchData *data)
     {
         presenter->onBeforeShow();
-        const auto alarmRingingSwitchData = dynamic_cast<alarms::AlarmRingingSwitchData *>(data);
+        const auto alarmRingingSwitchData = dynamic_cast<app::actions::AlarmRingingData *>(data);
         if (alarmRingingSwitchData != nullptr) {
             presenter->handleAlarmRingingEvent();
         }
@@ -244,5 +245,14 @@ namespace gui
         auto newTime         = std::localtime(&alarmTime);
         handleMinuteDecrease(*newTime);
         alarm->setTime(std::mktime(newTime));
+    }
+    bool BellHomeScreenWindow::onDatabaseMessage(sys::Message *msg)
+    {
+        auto *msgNotification = dynamic_cast<db::NotificationMessage *>(msg);
+        if (msgNotification != nullptr) {
+            presenter->onDatabaseMessage(msgNotification);
+            return true;
+        }
+        return false;
     }
 } // namespace gui

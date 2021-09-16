@@ -24,7 +24,7 @@
 
 namespace gui
 {
-    MessagesMainWindow::MessagesMainWindow(app::Application *app)
+    MessagesMainWindow::MessagesMainWindow(app::ApplicationCommon *app)
         : AppWindow(app, gui::name::window::main_window), app::AsyncCallbackReceiver{app}
     {
         buildInterface();
@@ -74,7 +74,7 @@ namespace gui
                                  style::window::default_vertical_pos,
                                  style::window_width,
                                  style::window_height - style::window::default_vertical_pos - style::footer::height,
-                                 "phonebook_empty_grey_circle_W_G",
+                                 "empty_list_add_W_G",
                                  utils::translate("app_messages_no_messages"));
 
         list->setVisible(true);
@@ -88,12 +88,14 @@ namespace gui
             emptyListIcon->setVisible(true);
             bottomBar->setActive(BottomBar::Side::LEFT, false);
             bottomBar->setActive(BottomBar::Side::CENTER, false);
+            application->refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
         };
 
         list->notEmptyListCallback = [this]() {
             emptyListIcon->setVisible(false);
             bottomBar->setActive(BottomBar::Side::LEFT, true);
             bottomBar->setActive(BottomBar::Side::CENTER, true);
+            application->refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
         };
 
         setFocusItem(list);

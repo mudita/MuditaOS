@@ -9,7 +9,8 @@
 
 namespace gui
 {
-    SecurityMainWindow::SecurityMainWindow(app::Application *app) : BaseSettingsWindow(app, window::name::security)
+    SecurityMainWindow::SecurityMainWindow(app::ApplicationCommon *app)
+        : BaseSettingsWindow(app, window::name::security)
     {}
 
     void SecurityMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)

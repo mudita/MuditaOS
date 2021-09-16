@@ -9,7 +9,7 @@
 
 using namespace gui;
 
-SimNotReadyWindow::SimNotReadyWindow(app::Application *app, const std::string &name) : AppWindow(app, name)
+SimNotReadyWindow::SimNotReadyWindow(app::ApplicationCommon *app, const std::string &name) : AppWindow(app, name)
 {
     buildInterface();
 }

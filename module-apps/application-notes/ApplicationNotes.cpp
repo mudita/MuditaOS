@@ -85,46 +85,48 @@ namespace app
 
     void ApplicationNotes::createUserInterface()
     {
-        windowsFactory.attach(gui::name::window::main_window, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::name::window::main_window, [](ApplicationCommon *app, const std::string &name) {
             auto notesRepository = std::make_unique<notes::NotesDBRepository>(app);
             auto notesProvider   = std::make_shared<notes::NotesListModel>(app, std::move(notesRepository));
             auto presenter       = std::make_unique<notes::NotesMainWindowPresenter>(notesProvider);
             return std::make_unique<notes::NoteMainWindow>(app, std::move(presenter));
         });
-        windowsFactory.attach(gui::name::window::note_preview, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::name::window::note_preview, [](ApplicationCommon *app, const std::string &name) {
             auto notesRepository = std::make_unique<notes::NotesDBRepository>(app);
             auto presenter       = std::make_unique<notes::NotePreviewWindowPresenter>(std::move(notesRepository));
             return std::make_unique<notes::NotePreviewWindow>(app, std::move(presenter));
         });
-        windowsFactory.attach(gui::name::window::note_edit, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::name::window::note_edit, [](ApplicationCommon *app, const std::string &name) {
             auto notesRepository = std::make_unique<notes::NotesDBRepository>(app);
             auto presenter       = std::make_unique<notes::NoteEditWindowPresenter>(std::move(notesRepository));
             return std::make_unique<notes::NoteEditWindow>(app, std::move(presenter));
         });
-        windowsFactory.attach(gui::name::window::note_create, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::name::window::note_create, [](ApplicationCommon *app, const std::string &name) {
             auto notesRepository = std::make_unique<notes::NotesDBRepository>(app);
             auto presenter       = std::make_unique<notes::NoteCreateWindowPresenter>(std::move(notesRepository));
             return std::make_unique<notes::NoteCreateWindow>(app, std::move(presenter));
         });
-        windowsFactory.attach(gui::name::window::notes_search, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::name::window::notes_search, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<notes::SearchEngineWindow>(app,
                                                                std::make_unique<notes::SearchEngineWindowPresenter>());
         });
-        windowsFactory.attach(gui::name::window::notes_search_result, [](Application *app, const std::string &) {
+        windowsFactory.attach(gui::name::window::notes_search_result, [](ApplicationCommon *app, const std::string &) {
             auto notesRepository = std::make_unique<notes::NotesDBRepository>(app);
             auto notesProvider   = std::make_shared<notes::NotesSearchListModel>(app, std::move(notesRepository));
             auto presenter       = std::make_unique<notes::NotesSearchWindowPresenter>(notesProvider);
             return std::make_unique<notes::SearchResultsWindow>(app, std::move(presenter));
         });
-        windowsFactory.attach(gui::name::window::note_dialog, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::name::window::note_dialog, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::Dialog>(app, name);
         });
-        windowsFactory.attach(gui::name::window::note_confirm_dialog, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::DialogYesNo>(app, name);
-        });
-        windowsFactory.attach(
-            utils::translate("app_phonebook_options_title"),
-            [](Application *app, const std::string &name) { return std::make_unique<gui::OptionWindow>(app, name); });
+        windowsFactory.attach(gui::name::window::note_confirm_dialog,
+                              [](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<gui::DialogYesNo>(app, name);
+                              });
+        windowsFactory.attach(utils::translate("app_phonebook_options_title"),
+                              [](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<gui::OptionWindow>(app, name);
+                              });
 
         attachPopups(
             {gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes, gui::popup::ID::PhoneLock});

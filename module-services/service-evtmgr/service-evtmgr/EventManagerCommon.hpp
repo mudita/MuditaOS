@@ -49,10 +49,6 @@ class EventManagerCommon : public sys::Service
     uint32_t alarmTimestamp;
     // ID of alarm waiting to trigger
     uint32_t alarmID;
-    // flag set when there is no alarm to trigger in current day
-    bool alarmDBEmpty = false;
-    // flag set when there is alarm to handle
-    bool alarmIsValid = false;
 
   public:
     explicit EventManagerCommon(const std::string &name = service::name::evt_manager);

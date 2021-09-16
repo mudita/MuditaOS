@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <apps-common/Application.hpp>
+#include <apps-common/ApplicationCommon.hpp>
 
 #include <memory>
 #include <string>
@@ -18,7 +18,7 @@ namespace app::manager
     class ApplicationHandle
     {
       public:
-        using State = app::Application::State;
+        using State = app::ApplicationCommon::State;
 
         explicit ApplicationHandle(std::unique_ptr<app::ApplicationLauncher> &&_launcher);
 

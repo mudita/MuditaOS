@@ -14,7 +14,7 @@ namespace gui
         Icon *infoIcon = nullptr;
 
       public:
-        SimNotReadyWindow(app::Application *app, const std::string &name);
+        SimNotReadyWindow(app::ApplicationCommon *app, const std::string &name);
 
         void buildInterface() override;
         status_bar::Configuration configureStatusBar(status_bar::Configuration appConfiguration) override;

@@ -1,11 +1,11 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include <models/MonthModel.hpp>
 
-#include <apps-common/Application.hpp>
+#include <apps-common/ApplicationCommon.hpp>
 #include <gui/widgets/GridLayout.hpp>
 
 namespace gui
@@ -13,7 +13,7 @@ namespace gui
     class MonthBox : public GridLayout
     {
       public:
-        MonthBox(app::Application *app,
+        MonthBox(app::ApplicationCommon *app,
                  gui::Item *parent,
                  const int &offsetTop,
                  const uint32_t &width,

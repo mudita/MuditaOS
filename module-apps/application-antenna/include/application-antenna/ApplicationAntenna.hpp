@@ -4,7 +4,7 @@
 #pragma once
 
 #include <windows/AppWindow.hpp>
-#include <apps-common/Application.hpp>
+#include <apps-common/ApplicationCommon.hpp>
 #include <module-sys/Timers/TimerHandle.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
 
@@ -47,7 +47,6 @@ namespace app
 
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
-        sys::ReturnCodes DeinitHandler() override;
 
         sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final
         {

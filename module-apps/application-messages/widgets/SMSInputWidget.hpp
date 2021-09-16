@@ -16,7 +16,7 @@ namespace gui
 
     class SMSInputWidget : public ListItem
     {
-        app::Application *application = nullptr;
+        app::ApplicationCommon *application = nullptr;
         HBox *body                    = nullptr;
         gui::Image *replyImage        = nullptr;
 
@@ -25,7 +25,7 @@ namespace gui
         std::optional<SMSRecord> draft; // draft message of the thread we are showing, if exists.
         std::unique_ptr<utils::PhoneNumber::View> number = nullptr;
 
-        SMSInputWidget(app::Application *application);
+        SMSInputWidget(app::ApplicationCommon *application);
         ~SMSInputWidget() override = default;
 
         void handleDraftMessage();

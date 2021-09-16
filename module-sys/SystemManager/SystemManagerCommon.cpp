@@ -3,6 +3,7 @@
 
 #include "SystemManagerCommon.hpp"
 
+#include <apps-common/ApplicationCommon.hpp>
 #include "DependencyGraph.hpp"
 #include "graph/TopologicalSort.hpp"
 
@@ -232,9 +233,16 @@ namespace sys
         return true;
     }
 
+    bool SystemManagerCommon::FactoryReset(Service *s)
+    {
+        return s->bus.sendUnicast(std::make_shared<SystemManagerCmd>(Code::FactoryReset, CloseReason::FactoryReset),
+                                  service::name::system_manager);
+    }
+
     bool SystemManagerCommon::Reboot(Service *s)
     {
-        s->bus.sendUnicast(std::make_shared<SystemManagerCmd>(Code::Reboot), service::name::system_manager);
+        s->bus.sendUnicast(std::make_shared<SystemManagerCmd>(Code::Reboot, CloseReason::Reboot),
+                           service::name::system_manager);
         return true;
     }
 
@@ -294,7 +302,9 @@ namespace sys
         return RunService(std::move(service), caller, timeout);
     }
 
-    bool SystemManagerCommon::RunApplication(std::shared_ptr<app::Application> app, Service *caller, TickType_t timeout)
+    bool SystemManagerCommon::RunApplication(std::shared_ptr<app::ApplicationCommon> app,
+                                             Service *caller,
+                                             TickType_t timeout)
     {
         CriticalSection::Enter();
         applicationsList.push_back(app);
@@ -359,10 +369,10 @@ namespace sys
     {
         cpp_freertos::LockGuard lck(appDestroyMutex);
         if (RequestServiceClose(name, caller)) {
-            auto app =
-                std::find_if(applicationsList.begin(),
-                             applicationsList.end(),
-                             [&name](std::shared_ptr<app::Application> const &s) { return s->GetName() == name; });
+            auto app = std::find_if(
+                applicationsList.begin(),
+                applicationsList.end(),
+                [&name](std::shared_ptr<app::ApplicationCommon> const &s) { return s->GetName() == name; });
             if (app == applicationsList.end()) {
                 LOG_ERROR("No such application to destroy in the list: %s", name.c_str());
                 return false;
@@ -473,6 +483,9 @@ namespace sys
                     break;
                 case Code::RebootToUpdate:
                     RebootHandler(State::RebootToUpdate, data->updateReason);
+                    break;
+                case Code::FactoryReset:
+                    CloseSystemHandler(CloseReason::FactoryReset);
                     break;
                 case Code::None:
                     break;
@@ -667,7 +680,7 @@ namespace sys
     }
 
     std::vector<std::shared_ptr<Service>> SystemManagerCommon::servicesList;
-    std::vector<std::shared_ptr<app::Application>> SystemManagerCommon::applicationsList;
+    std::vector<std::shared_ptr<app::ApplicationCommon>> SystemManagerCommon::applicationsList;
     cpp_freertos::MutexStandard SystemManagerCommon::serviceDestroyMutex;
     cpp_freertos::MutexStandard SystemManagerCommon::appDestroyMutex;
     std::unique_ptr<PowerManager> SystemManagerCommon::powerManager;

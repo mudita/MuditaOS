@@ -5,7 +5,7 @@
 
 #include "SpecialCharactersTableStyle.hpp"
 #include "SpecialInputMainWindow.hpp"
-#include <apps-common/Application.hpp>
+#include <apps-common/ApplicationCommon.hpp>
 #include <ListItem.hpp>
 #include <Text.hpp>
 #include <TextFixedSize.hpp>
@@ -29,10 +29,10 @@ namespace gui
       protected:
         void decorateActionActivated(Item *it, const std::string &str);
         GridLayout *box               = nullptr;
-        app::Application *application = nullptr;
+        app::ApplicationCommon *application = nullptr;
 
       public:
-        SpecialInputTableWidget(app::Application *app, std::list<Carrier> &&carier);
+        SpecialInputTableWidget(app::ApplicationCommon *app, std::list<Carrier> &&carier);
     };
 
 } /* namespace gui */

@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <apps-common/Application.hpp>
+#include <Application.hpp>
 
 namespace gui::window::name
 {
@@ -12,10 +12,18 @@ namespace gui::window::name
 
 namespace app
 {
+    namespace internal
+    {
+        class BellAlarmPriv;
+    } // namespace internal
+
     inline constexpr auto applicationBellAlarmName = "ApplicationBellAlarm";
 
     class ApplicationBellAlarm : public Application
     {
+      private:
+        std::unique_ptr<internal::BellAlarmPriv> priv;
+
       public:
         explicit ApplicationBellAlarm(
             std::string name                            = applicationBellAlarmName,
@@ -24,6 +32,7 @@ namespace app
             sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled,
             StartInBackground startInBackground         = {false});
 
+        ~ApplicationBellAlarm() override;
         sys::ReturnCodes InitHandler() override;
 
         void createUserInterface() override;

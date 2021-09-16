@@ -13,7 +13,7 @@ namespace gui
     class BluetoothCheckPasskeyWindow : public AppWindow
     {
       public:
-        explicit BluetoothCheckPasskeyWindow(app::Application *app);
+        explicit BluetoothCheckPasskeyWindow(app::ApplicationCommon *app);
 
       private:
         void buildInterface() override;

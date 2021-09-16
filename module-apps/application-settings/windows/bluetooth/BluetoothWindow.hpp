@@ -11,7 +11,7 @@ namespace gui
     class BluetoothWindow : public BaseSettingsWindow
     {
       public:
-        explicit BluetoothWindow(app::Application *app);
+        explicit BluetoothWindow(app::ApplicationCommon *app);
 
       private:
         void onBeforeShow(ShowMode mode, SwitchData *data) override;

@@ -22,7 +22,7 @@
 
 const static std::uint32_t phonebookModelTimeout = 1000;
 
-PhonebookModel::PhonebookModel(app::Application *app,
+PhonebookModel::PhonebookModel(app::ApplicationCommon *app,
                                std::string filter,
                                std::uint32_t groupFilter,
                                std::uint32_t displayMode)
@@ -35,7 +35,9 @@ auto PhonebookModel::requestRecordsCount() -> unsigned int
 
     auto dispMode = static_cast<ContactDisplayMode>(getDisplayMode());
     if (dispMode == ContactDisplayMode::SortedByLetter) {
-        return letterMap.itemCount;
+        letterMap    = requestLetterMap();
+        recordsCount = letterMap.itemCount;
+        return recordsCount;
     }
 
     auto [code, msg] = DBServiceAPI::GetQueryWithReply(

@@ -7,7 +7,7 @@
 
 namespace gui
 {
-    BellSettingsTurnOffWindow::BellSettingsTurnOffWindow(app::Application *app, std::string name)
+    BellSettingsTurnOffWindow::BellSettingsTurnOffWindow(app::ApplicationCommon *app, std::string name)
         : AppWindow(app, std::move(name))
     {
         buildInterface();

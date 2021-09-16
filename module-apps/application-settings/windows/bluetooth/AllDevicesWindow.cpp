@@ -4,8 +4,8 @@
 #include "AllDevicesWindow.hpp"
 
 #include <application-settings/data/BondedDevicesData.hpp>
-#include <application-settings/data/PairingDeviceData.hpp>
 #include <application-settings/windows/WindowNames.hpp>
+#include <application-settings/widgets/SettingsStyle.hpp>
 
 #include <DialogMetadataMessage.hpp>
 #include <InputEvent.hpp>
@@ -15,10 +15,10 @@
 namespace gui
 {
 
-    AllDevicesWindow::AllDevicesWindow(app::Application *app) : BaseSettingsWindow(app, window::name::all_devices)
+    AllDevicesWindow::AllDevicesWindow(app::ApplicationCommon *app,
+                                       std::shared_ptr<BluetoothSettingsModel> bluetoothSettingsModel)
+        : BaseSettingsWindow(app, window::name::all_devices), bluetoothSettingsModel(bluetoothSettingsModel)
     {
-        bluetoothSettingsModel = std::make_unique<BluetoothSettingsModel>(application);
-        bluetoothSettingsModel->requestBondedDevices();
         buildInterface();
     }
 
@@ -45,31 +45,9 @@ namespace gui
     {
         if (mode == ShowMode::GUI_SHOW_RETURN) {
             bluetoothSettingsModel->stopScan();
-            if (activeDevice.state == ActiveDevice::DeviceState::Connecting) {
-                activeDevice.address.clear();
-                activeDevice.state = ActiveDevice::DeviceState::Unknown;
-            }
-            else if (activeDevice.state == ActiveDevice::DeviceState::Pairing) {
-                devices.erase(std::remove_if(devices.begin(),
-                                             devices.end(),
-                                             [&](const auto &device) {
-                                                 return (bd_addr_to_str(device.address) == activeDevice.address);
-                                             }),
-                              devices.end());
-
-                activeDevice.address.clear();
-                activeDevice.state = ActiveDevice::DeviceState::Unknown;
-            }
         }
         if (const auto bondedDevicesData = dynamic_cast<BondedDevicesData *>(data); bondedDevicesData != nullptr) {
-            devices              = bondedDevicesData->getDevices();
-            activeDevice.address = bondedDevicesData->getAddressOfConnectedDevice();
-            activeDevice.state   = ActiveDevice::DeviceState::Connected;
-        }
-        else if (const auto pairingDeviceData = dynamic_cast<PairingDeviceData *>(data); pairingDeviceData != nullptr) {
-            activeDevice.address = bd_addr_to_str(pairingDeviceData->getPairingDevice().address);
-            activeDevice.state   = ActiveDevice::DeviceState::Pairing;
-            devices.emplace_back(pairingDeviceData->getPairingDevice());
+            bluetoothSettingsModel->replaceDevicesList(bondedDevicesData->getDevices());
         }
         refreshOptionsList();
     }
@@ -90,15 +68,12 @@ namespace gui
             return true;
         }
         if (inputEvent.is(KeyCode::KEY_LF)) {
-            devices.erase(std::remove_if(devices.begin(),
-                                         devices.end(),
-                                         [&](const auto &device) {
-                                             return (bd_addr_to_str(device.address) == addressOfDeviceSelected);
-                                         }),
-                          devices.end());
             bottomBar->setActive(BottomBar::Side::LEFT, false);
             bottomBar->setActive(BottomBar::Side::CENTER, false);
-            bluetoothSettingsModel->requestDeviceUnpair(addressOfDeviceSelected);
+            auto selectedDevice = bluetoothSettingsModel->getSelectedDevice();
+            if (selectedDevice.has_value()) {
+                bluetoothSettingsModel->requestDeviceUnpair(selectedDevice.value().get());
+            }
             refreshOptionsList();
             return true;
         }
@@ -107,30 +82,25 @@ namespace gui
 
     auto AllDevicesWindow::buildOptionsList() -> std::list<Option>
     {
-        bottomBar->setActive(BottomBar::Side::CENTER, !devices.empty());
-
+        bottomBar->setActive(BottomBar::Side::CENTER, !bluetoothSettingsModel->getDevices().empty());
         std::list<gui::Option> optionsList;
-        for (const auto &device : devices) {
-            ActiveDevice newDevice(bd_addr_to_str(device.address));
-            newDevice.address == activeDevice.address ? newDevice.state = activeDevice.state
-                                                      : newDevice.state = ActiveDevice::DeviceState::Paired;
-            UTF8 textOnCenter                                           = getTextOnCenter(newDevice.state);
-            option::SettingRightItem rightItem                          = getRightItem(newDevice.state);
-            UTF8 textOnRight                                            = getTextOnRight(newDevice.state);
+
+        for (const auto &device : bluetoothSettingsModel->getDevices()) {
+            UTF8 textOnCenter                  = getTextOnCenter(device.deviceState);
+            option::SettingRightItem rightItem = getRightItem(device.deviceState);
+            UTF8 textOnRight                   = getTextOnRight(device.deviceState);
 
             optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
                 device.name,
-                [=](gui::Item & /*item*/) {
-                    return handleDeviceAction(newDevice);
-                },
+                [=](gui::Item & /*item*/) { return handleDeviceAction(device); },
                 [=](gui::Item &item) {
                     if (item.focus) {
                         this->setBottomBarText(textOnCenter, BottomBar::Side::CENTER);
-                        if (newDevice.state != ActiveDevice::DeviceState::Pairing) {
+                        if (device.deviceState != DeviceState::Pairing) {
                             this->setBottomBarText(utils::translate("common_forget"), BottomBar::Side::LEFT);
                             this->bottomBar->setActive(BottomBar::Side::LEFT, true);
                         }
-                        addressOfDeviceSelected = newDevice.address;
+                        bluetoothSettingsModel->setSelectedDevice(device);
                     }
                     return true;
                 },
@@ -142,64 +112,80 @@ namespace gui
         return optionsList;
     }
 
-    UTF8 AllDevicesWindow::getTextOnCenter(const ActiveDevice::DeviceState &state) const
+    UTF8 AllDevicesWindow::getTextOnCenter(const DeviceState &state) const
     {
         switch (state) {
-        case ActiveDevice::DeviceState::Connected:
+        case DeviceState::Connected:
             return utils::translate("common_disconnect");
-        case ActiveDevice::DeviceState::Paired:
+        case DeviceState::Paired:
+            if (bluetoothSettingsModel->isDeviceConnecting()) {
+                break;
+            }
             return utils::translate("common_connect");
-        case ActiveDevice::DeviceState::Pairing:
-        case ActiveDevice::DeviceState::Connecting:
-        case ActiveDevice::DeviceState::Unknown:
+        case DeviceState::Pairing:
+            [[fallthrough]];
+        case DeviceState::Connecting:
+            [[fallthrough]];
+        case DeviceState::Unknown:
+            [[fallthrough]];
+        case DeviceState::ConnectedAudio:
+            [[fallthrough]];
+        case DeviceState::ConnectedVoice:
             break;
         }
         return UTF8();
     }
 
-    UTF8 AllDevicesWindow::getTextOnRight(const ActiveDevice::DeviceState &state) const
+    UTF8 AllDevicesWindow::getTextOnRight(const DeviceState &state) const
     {
         switch (state) {
-        case ActiveDevice::DeviceState::Connected:
+        case DeviceState::Connected:
             return utils::translate("app_settings_option_connected");
-        case ActiveDevice::DeviceState::Connecting:
+        case DeviceState::Connecting:
             return utils::translate("app_settings_option_connecting");
-        case ActiveDevice::DeviceState::Pairing:
+        case DeviceState::Pairing:
             return utils::translate("app_settings_option_pairing");
-        case ActiveDevice::DeviceState::Paired:
-        case ActiveDevice::DeviceState::Unknown:
+        case DeviceState::Paired:
+            [[fallthrough]];
+        case DeviceState::Unknown:
+            [[fallthrough]];
+        case DeviceState::ConnectedAudio:
+            [[fallthrough]];
+        case DeviceState::ConnectedVoice:
             break;
         }
         return UTF8();
     }
 
-    option::SettingRightItem AllDevicesWindow::getRightItem(const ActiveDevice::DeviceState &state) const
+    option::SettingRightItem AllDevicesWindow::getRightItem(const DeviceState &state) const
     {
         switch (state) {
-        case ActiveDevice::DeviceState::Connected:
-        case ActiveDevice::DeviceState::Connecting:
-        case ActiveDevice::DeviceState::Pairing:
+        case DeviceState::Connected:
+            [[fallthrough]];
+        case DeviceState::Connecting:
+            [[fallthrough]];
+        case DeviceState::Pairing:
             return option::SettingRightItem::Text;
-        case ActiveDevice::DeviceState::Paired:
+        case DeviceState::Paired:
             return option::SettingRightItem::Bt;
-        case ActiveDevice::DeviceState::Unknown:
+        case DeviceState::Unknown:
+            [[fallthrough]];
+        case DeviceState::ConnectedAudio:
+            [[fallthrough]];
+        case DeviceState::ConnectedVoice:
             break;
         }
         return option::SettingRightItem::Disabled;
     }
 
-    auto AllDevicesWindow::handleDeviceAction(const ActiveDevice &newDevice) -> bool
+    auto AllDevicesWindow::handleDeviceAction(const Devicei &device) -> bool
     {
-        if (newDevice.state == ActiveDevice::DeviceState::Connected) {
-            activeDevice.address.clear();
-            activeDevice.state = ActiveDevice::DeviceState::Unknown;
+        if (device.deviceState == DeviceState::Connected) {
             bluetoothSettingsModel->requestDisconnection();
             refreshOptionsList();
         }
-        else if (newDevice.state == ActiveDevice::DeviceState::Paired) {
-            activeDevice.address = newDevice.address;
-            activeDevice.state   = ActiveDevice::DeviceState::Connecting;
-            bluetoothSettingsModel->requestConnection(newDevice.address);
+        else if (device.deviceState == DeviceState::Paired && !bluetoothSettingsModel->isDeviceConnecting()) {
+            bluetoothSettingsModel->requestConnection(device);
             refreshOptionsList();
         }
         return true;

@@ -11,7 +11,7 @@ namespace app::onBoarding
     class OnBoardingSimSelectWindow : public gui::BaseSettingsWindow
     {
       public:
-        explicit OnBoardingSimSelectWindow(app::Application *app, std::string name);
+        explicit OnBoardingSimSelectWindow(app::ApplicationCommon *app, std::string name);
         void buildInterface() override;
 
       private:

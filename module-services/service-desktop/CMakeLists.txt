@@ -17,11 +17,11 @@ set(SOURCES
     endpoints/contacts/ContactsEndpoint.cpp
     endpoints/developerMode/DeveloperModeEndpoint.cpp
     endpoints/developerMode/DeveloperModeHelper.cpp
+    endpoints/developerMode/fs/FS_Helper.cpp
     endpoints/developerMode/Mode/UI_Helper.cpp
     endpoints/developerMode/event/DomRequest.cpp
     endpoints/developerMode/event/ATRequest.cpp
     endpoints/deviceInfo/DeviceInfoEndpoint.cpp
-    endpoints/factoryReset/FactoryReset.cpp
     endpoints/factoryReset/FactoryResetEndpoint.cpp
     endpoints/messages/MessageHelper.cpp
     endpoints/messages/MessagesEndpoint.cpp
@@ -33,6 +33,7 @@ set(SOURCES
     endpoints/filesystem/FileContext.cpp
     endpoints/security/SecurityEndpoint.cpp
     endpoints/security/SecurityEndpointHelper.cpp
+    endpoints/nullEndpoint/NullEndpoint.cpp
 
     parser/HttpEnums.cpp
     parser/ParserFSM.cpp

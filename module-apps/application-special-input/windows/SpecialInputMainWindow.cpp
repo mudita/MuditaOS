@@ -10,7 +10,7 @@
 
 using namespace gui;
 
-SpecialInputMainWindow::SpecialInputMainWindow(app::Application *app)
+SpecialInputMainWindow::SpecialInputMainWindow(app::ApplicationCommon *app)
     : AppWindow(app, app::char_select), model{std::make_shared<SpecialInputModel>(this->application)}
 {
     buildInterface();

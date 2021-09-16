@@ -9,6 +9,7 @@
 #include <at/ATFactory.hpp>
 #include <at/UrcFactory.hpp>
 #include <at/UrcCpin.hpp>
+#include <at/cmd/QSIMSTAT.hpp>
 
 namespace cellular
 {
@@ -63,6 +64,8 @@ namespace cellular
             Store::GSM::get()->selected = static_cast<Store::GSM::SIM>(sim);
             bsp::cellular::sim::simSelect();
             bsp::cellular::sim::hotSwapTrigger();
+            clearSimInsertedStatus();
+            simSelectInProgress = true;
             return true;
         }
 
@@ -301,6 +304,53 @@ namespace cellular
             }
 
             return sim::Result::OK;
+        }
+
+        bool SimCard::isSimCardInserted()
+        {
+            if (simInserted == std::nullopt) {
+                if (simInserted = readSimCardInsertStatus(); !simInserted) {
+                    return false;
+                }
+            }
+
+            if (simInserted == at::SimInsertedStatus::Inserted || simInserted == at::SimInsertedStatus::Unknown) {
+                return true;
+            }
+            return false;
+        }
+
+        std::optional<at::SimInsertedStatus> SimCard::readSimCardInsertStatus()
+        {
+            auto command  = at::cmd::QSIMSTAT(at::cmd::Modifier::Get);
+            auto response = channel->cmd(command);
+            auto result   = command.parseQSIMSTAT(response);
+
+            if (result.code != at::Result::Code::OK) {
+                LOG_ERROR("Can't read SIM insertion status.");
+                return std::nullopt;
+            }
+            return result.status;
+        }
+        void SimCard::handleSimTimer()
+        {
+            simSelectInProgress = false;
+            if (!isSimCardInserted()) {
+                if (onSimNotPresent) {
+                    onSimNotPresent();
+                }
+            }
+        }
+        void SimCard::handleSimInsertionNotification(at::SimInsertedStatus status)
+        {
+            if (auto actual = getSimInsertedStatus(); actual.has_value() && actual != status) {
+                setSimInserted(status);
+                if (status == at::SimInsertedStatus::Removed) {
+                    if (onSimNotPresent) {
+                        onSimNotPresent();
+                    }
+                }
+            }
         }
     } // namespace service
 } // namespace cellular

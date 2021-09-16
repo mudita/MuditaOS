@@ -19,7 +19,7 @@ namespace gui
         Image *icon = nullptr;
 
       public:
-        MmiPushWindow(app::Application *app, const std::string &name);
+        MmiPushWindow(app::ApplicationCommon *app, const std::string &name);
         ~MmiPushWindow() override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         bool onInput(const InputEvent &inputEvent) override;

@@ -16,7 +16,7 @@ namespace gui
         {WeekDayIso::Saturday, style::strings::common::Saturday},
         {WeekDayIso::Sunday, style::strings::common::Sunday}};
 
-    CustomCheckBoxWithLabel::CustomCheckBoxWithLabel(app::Application *app,
+    CustomCheckBoxWithLabel::CustomCheckBoxWithLabel(app::ApplicationCommon *app,
                                                      const std::string &description,
                                                      const WeekDaysRepeatData &data)
         : application(app), checkBoxData(data)

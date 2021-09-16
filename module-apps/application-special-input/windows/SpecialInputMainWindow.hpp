@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -26,7 +26,7 @@ namespace gui
         void switchPage();
 
       public:
-        SpecialInputMainWindow(app::Application *app);
+        SpecialInputMainWindow(app::ApplicationCommon *app);
         virtual ~SpecialInputMainWindow() = default;
 
         // virtual methods

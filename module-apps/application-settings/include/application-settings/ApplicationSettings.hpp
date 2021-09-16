@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "Application.hpp"
+#include <Application.hpp>
 
 #include <application-settings/windows/WindowNames.hpp>
 #include <application-settings/models/apps/SoundsPlayer.hpp>
@@ -11,6 +11,7 @@
 #include <bsp/keypad_backlight/keypad_backlight.hpp>
 #include <service-evtmgr/screen-light-control/ScreenLightControl.hpp>
 #include <EventStore.hpp>
+#include <application-settings/models/bluetooth/BluetoothSettingsModel.hpp>
 
 class AudioStopNotification; // Forward declaration
 
@@ -188,6 +189,7 @@ namespace app
         bool callsFromFavorites       = false;
         int connectionFrequency       = 0;
         bool flightModeOn             = true;
+        std::shared_ptr<BluetoothSettingsModel> bluetoothSettingsModel = nullptr;
     };
 
     template <> struct ManifestTraits<ApplicationSettings>

@@ -3,13 +3,13 @@
 
 #include <module-gui/gui/input/InputEvent.hpp>
 #include <i18n/i18n.hpp>
-#include "Application.hpp"
+#include "ApplicationCommon.hpp"
 #include "VolumeWindow.hpp"
 #include "popups/data/PopupData.hpp"
 
 namespace gui
 {
-    VolumeWindow::VolumeWindow(app::Application *app, const std::string &name) : WindowWithTimer(app, name)
+    VolumeWindow::VolumeWindow(app::ApplicationCommon *app, const std::string &name) : WindowWithTimer(app, name)
     {
         buildInterface();
     }

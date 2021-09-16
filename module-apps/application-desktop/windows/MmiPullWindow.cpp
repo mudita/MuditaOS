@@ -33,7 +33,7 @@ namespace style::desktop
 
 } // namespace style::desktop
 
-MmiPullWindow::MmiPullWindow(app::Application *app, const std::string &name) : gui::AppWindow(app, name)
+MmiPullWindow::MmiPullWindow(app::ApplicationCommon *app, const std::string &name) : gui::AppWindow(app, name)
 {
     AppWindow::buildInterface();
 

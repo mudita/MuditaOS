@@ -11,10 +11,8 @@
 #include <application-bell-meditation-timer/ApplicationBellMeditationTimer.hpp>
 
 // modules
-#include <module-db/Databases/AlarmsDB.hpp>
 #include <module-db/Databases/EventsDB.hpp>
 #include <module-db/Interface/AlarmEventRecord.hpp>
-#include <module-db/Interface/AlarmsRecord.hpp>
 
 // services
 #include <appmgr/ApplicationManager.hpp>
@@ -24,11 +22,8 @@
 #include <Service/ServiceCreator.hpp>
 #include <service-appmgr/Constants.hpp>
 #include <service-audio/ServiceAudio.hpp>
-#include <service-bluetooth/ServiceBluetooth.hpp>
 #include <service-desktop/ServiceDesktop.hpp>
-#include <service-fileindexer/Constants.hpp>
 #include <service-gui/ServiceGUI.hpp>
-#include <service-lwip/ServiceLwIP.hpp>
 #include <service-time/ServiceTime.hpp>
 
 #include <Application.hpp>
@@ -37,6 +32,7 @@
 #include <log/log.hpp>
 #include <source/version.hpp>
 #include <sys/SystemManager.hpp>
+#include <time/AlarmOperations.hpp>
 #include <SystemWatchdog/SystemWatchdog.hpp>
 #include <thread.hpp>
 
@@ -68,9 +64,6 @@ int main()
 
     std::vector<std::unique_ptr<sys::BaseServiceCreator>> systemServices;
     systemServices.emplace_back(sys::CreatorFor<EventManager>());
-#if ENABLE_FILEINDEXER_SERVICE
-    systemServices.emplace_back(sys::CreatorFor<service::ServiceFileIndexer>());
-#endif
     systemServices.emplace_back(sys::CreatorFor<ServiceDB>());
     systemServices.emplace_back(sys::CreatorFor<ServiceAudio>());
     systemServices.emplace_back(sys::CreatorFor<ServiceDesktop>());

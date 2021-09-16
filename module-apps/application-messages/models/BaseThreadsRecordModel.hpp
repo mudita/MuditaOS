@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -29,12 +29,12 @@ class BaseThreadsRecordModel : public app::DatabaseModel<ThreadListStruct>, publ
 {
   public:
     BaseThreadsRecordModel() = delete;
-    BaseThreadsRecordModel(app::Application *app);
+    BaseThreadsRecordModel(app::ApplicationCommon *app);
 
     unsigned int requestRecordsCount() override;
     bool updateRecords(std::vector<ThreadListStruct> records) override;
 
-    app::Application *getApplication(void)
+    app::ApplicationCommon *getApplication(void)
     {
         return application;
     };

@@ -1,9 +1,9 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include <apps-common/Application.hpp>
+#include <apps-common/ApplicationCommon.hpp>
 #include <gui/widgets/BoxLayout.hpp>
 
 namespace gui
@@ -17,7 +17,7 @@ namespace gui
         gui::Image *dotImage  = nullptr;
 
       public:
-        DayLabel(app::Application *app,
+        DayLabel(app::ApplicationCommon *app,
                  gui::Item *parent,
                  const uint32_t &cellIndex,
                  const uint32_t &firstWeekOffset,

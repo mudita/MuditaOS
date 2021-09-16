@@ -43,6 +43,7 @@ set_target_properties(PurePhone
 
 target_link_libraries(PurePhone
     PRIVATE
+        app
         $<$<BOOL:${ENABLE_APP_ANTENNA}>:application-antenna>
         application-calculator
         application-calendar
@@ -67,6 +68,7 @@ target_link_libraries(PurePhone
         service-audio
         service-bluetooth
         service-desktop
+        service-fileindexer
         service-lwip
         service-time
         sys
@@ -108,6 +110,7 @@ include(GitHubWorkerMessages)
 github_message_standalone()
 github_message_update()
 
+add_subdirectory(apps)
 add_subdirectory(services)
 add_subdirectory(sys)
 

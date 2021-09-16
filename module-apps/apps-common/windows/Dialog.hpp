@@ -52,7 +52,7 @@ namespace gui
         Icon *icon = nullptr;
 
       public:
-        Dialog(app::Application *app, const std::string &name);
+        Dialog(app::ApplicationCommon *app, const std::string &name);
 
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
     };
@@ -64,7 +64,7 @@ namespace gui
     class DialogConfirm : public Dialog
     {
       public:
-        DialogConfirm(app::Application *app, const std::string &name);
+        DialogConfirm(app::ApplicationCommon *app, const std::string &name);
 
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
     };
@@ -80,7 +80,7 @@ namespace gui
         HBox *hBox = nullptr;
 
       public:
-        DialogYesNo(app::Application *app, const std::string &name);
+        DialogYesNo(app::ApplicationCommon *app, const std::string &name);
 
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
 
@@ -97,7 +97,7 @@ namespace gui
         Label *iconText = nullptr;
 
       public:
-        DialogYesNoIconTxt(app::Application *app, const std::string &name);
+        DialogYesNoIconTxt(app::ApplicationCommon *app, const std::string &name);
 
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
     };
@@ -108,7 +108,7 @@ namespace gui
     class DialogRetry : public Dialog
     {
       public:
-        DialogRetry(app::Application *app, const std::string &name);
+        DialogRetry(app::ApplicationCommon *app, const std::string &name);
 
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
     };

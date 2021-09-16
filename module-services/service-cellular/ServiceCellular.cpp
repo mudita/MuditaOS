@@ -143,6 +143,8 @@ ServiceCellular::ServiceCellular()
                         connectionManager->onTimerTick();
                 });
         });
+    simTimer = sys::TimerFactory::createSingleShotTimer(
+        this, "simTimer", std::chrono::milliseconds{6000}, [this](sys::Timer &) { priv->simCard->handleSimTimer(); });
 
     ongoingCall.setStartCallAction([=](const CalllogRecord &rec) {
         auto call = DBServiceAPI::CalllogAdd(this, rec);
@@ -1267,7 +1269,6 @@ bool ServiceCellular::handle_sim_sanity_check()
     auto ret = sim_check_hot_swap(cmux->get(CellularMux::Channel::Commands));
     if (ret) {
         priv->state->set(State::ST::ModemOn);
-        bsp::cellular::sim::simSelect();
     }
     else {
         LOG_ERROR("Sanity check failure - user will be promped about full shutdown");

@@ -24,8 +24,8 @@ namespace sys
         ServiceEvtmgrNotifications,
         PhoneModeChanges,
         PhoneLockChanges,
-        AlarmChanges,
-        BluetoothModeChanges
+        BluetoothModeChanges,
+        BluetoothNotifications
     };
 
     enum class ServicePriority
@@ -48,6 +48,7 @@ namespace sys
     {
         RegularPowerDown,
         Reboot,
+        FactoryReset,
         SystemBrownout,
         LowBattery
     };
@@ -123,10 +124,10 @@ inline const char *c_str(sys::BusChannel channel)
         return "PhoneModeChanges";
     case sys::BusChannel::BluetoothModeChanges:
         return "BluetoothModeChanges";
+    case sys::BusChannel::BluetoothNotifications:
+        return "BluetoothNotifications";
     case sys::BusChannel::PhoneLockChanges:
         return "PhoneLockChanges";
-    case sys::BusChannel::AlarmChanges:
-        return "AlarmChanges";
     }
     return "";
 }

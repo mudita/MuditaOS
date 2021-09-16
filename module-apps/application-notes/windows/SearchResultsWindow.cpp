@@ -11,7 +11,7 @@
 
 namespace app::notes
 {
-    SearchResultsWindow::SearchResultsWindow(Application *application,
+    SearchResultsWindow::SearchResultsWindow(ApplicationCommon *application,
                                              std::unique_ptr<NotesSearchWindowContract::Presenter> &&windowPresenter)
         : AppWindow(application, gui::name::window::notes_search_result), presenter(std::move(windowPresenter))
     {

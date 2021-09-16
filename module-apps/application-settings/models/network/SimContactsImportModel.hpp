@@ -15,12 +15,13 @@ class SimContactsImportModel : public app::InternalModel<gui::SimContactImportSe
                                public gui::ListItemProvider
 {
   private:
-    app::Application *application = nullptr;
+    app::ApplicationCommon *application = nullptr;
     std::shared_ptr<AbstractSimContactsRepository> contactsRepository;
     std::vector<bool> getSelectedContacts();
 
   public:
-    SimContactsImportModel(app::Application *app, std::unique_ptr<AbstractSimContactsRepository> contactsRepository);
+    SimContactsImportModel(app::ApplicationCommon *app,
+                           std::unique_ptr<AbstractSimContactsRepository> contactsRepository);
 
     void createSimImported();
     void createDuplicates();

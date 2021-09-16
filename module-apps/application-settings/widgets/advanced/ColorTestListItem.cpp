@@ -7,7 +7,7 @@
 namespace gui
 {
 
-    ColorTestListItem::ColorTestListItem(app::Application *app, const Color color) : app{app}
+    ColorTestListItem::ColorTestListItem(app::ApplicationCommon *app, const Color color) : app{app}
     {
         setMinimumSize(style::listview::item_width_with_scroll, style::colorTest::item::color::height);
         setMargins(Margins(style::margins::very_big, 0, 0, 0));

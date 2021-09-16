@@ -139,6 +139,45 @@ TEST_CASE("AlarmEventRecord tests")
         return alarmsRec;
     };
 
+    SECTION("Add remove add")
+    {
+        auto retAlarmEvents = getLimitedQuery(0, 10);
+        REQUIRE(retAlarmEvents.size() == 0);
+
+        addQuery(testName1,
+                 testEventStart,
+                 testDuration,
+                 testIsAllDay,
+                 testRRuleDaily,
+                 testMusicTone,
+                 testEnabled,
+                 testSnoozeDuration);
+
+        retAlarmEvents = getLimitedQuery(0, 10);
+        REQUIRE(retAlarmEvents.size() == 1);
+
+        const auto queryRemove  = std::make_shared<db::query::alarmEvents::Remove>(1);
+        const auto retRemove    = alarmEventRecordInterface.runQuery(queryRemove);
+        const auto resultRemove = dynamic_cast<db::query::alarmEvents::RemoveResult *>(retRemove.get());
+        REQUIRE(resultRemove != nullptr);
+        REQUIRE(resultRemove->getResult());
+
+        retAlarmEvents = getLimitedQuery(0, 10);
+        REQUIRE(retAlarmEvents.size() == 0);
+
+        addQuery(testName1,
+                 testEventStart,
+                 testDuration,
+                 testIsAllDay,
+                 testRRuleDaily,
+                 testMusicTone,
+                 testEnabled,
+                 testSnoozeDuration);
+
+        retAlarmEvents = getLimitedQuery(0, 10);
+        REQUIRE(retAlarmEvents.size() == 1);
+    }
+
     SECTION("Add & Get")
     {
         addQuery(testName1,
@@ -387,19 +426,21 @@ TEST_CASE("AlarmEventRecord tests")
 
         auto retAlarmEvents = getBetweenDatesQuery(
             TimePointFromString("2020-01-01 00:00:00"), TimePointFromString("2020-02-01 00:00:00"), 0, 10);
-        REQUIRE(retAlarmEvents.size() == 1);
-        REQUIRE(retAlarmEvents[0].ID == 1);
+        REQUIRE(retAlarmEvents.first.size() == 1);
+        REQUIRE(retAlarmEvents.first[0].ID == 1);
 
         retAlarmEvents = getBetweenDatesQuery(
             TimePointFromString("2020-05-01 00:00:00"), TimePointFromString("2020-10-01 00:00:00"), 0, 10);
-        REQUIRE(retAlarmEvents.size() == 2);
-        REQUIRE(retAlarmEvents[0].ID == 2);
-        REQUIRE(retAlarmEvents[1].ID == 3);
+        REQUIRE(retAlarmEvents.first.size() == 2);
+        REQUIRE(retAlarmEvents.first[0].ID == 2);
+        REQUIRE(retAlarmEvents.first[1].ID == 3);
 
         retAlarmEvents = getBetweenDatesQuery(
             TimePointFromString("2020-05-01 00:00:00"), TimePointFromString("2020-10-01 00:00:00"), 1, 10);
-        REQUIRE(retAlarmEvents.size() == 1);
-        REQUIRE(retAlarmEvents[0].ID == 3);
+        REQUIRE(retAlarmEvents.first.size() == 1);
+        REQUIRE(retAlarmEvents.first[0].ID == 3);
+
+        REQUIRE(retAlarmEvents.second == 3);
     }
 
     SECTION("Get Next")
@@ -446,8 +487,10 @@ TEST_CASE("AlarmEventRecord tests")
                  testEnabled,
                  testSnoozeDuration);
 
-        retAlarmEvents = getBetweenDatesQuery(
-            TimePointFromString("2020-05-01 00:00:00"), TimePointFromString("2020-10-01 00:00:00"), 1, 10);
+        retAlarmEvents =
+            getBetweenDatesQuery(
+                TimePointFromString("2020-05-01 00:00:00"), TimePointFromString("2020-10-01 00:00:00"), 1, 10)
+                .first;
         retAlarmEvents = getNextQuery(TimePointFromString("2020-01-01 00:00:00"), 0, 10);
         REQUIRE(retAlarmEvents.size() == 2);
         REQUIRE((((retAlarmEvents[0].ID == 3) && (retAlarmEvents[1].ID == 4)) ||
@@ -477,6 +520,14 @@ TEST_CASE("AlarmEventRecord tests")
                  testDuration,
                  testIsAllDay,
                  "FREQ=DAILY;UNTIL=20200115T170000Z",
+                 testMusicTone,
+                 testEnabled,
+                 testSnoozeDuration);
+        addQuery("TestAlarmName4",
+                 testEventStart,
+                 testDuration,
+                 testIsAllDay,
+                 testEmptyRRuleText,
                  testMusicTone,
                  testEnabled,
                  testSnoozeDuration);

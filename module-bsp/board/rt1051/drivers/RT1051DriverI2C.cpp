@@ -22,6 +22,14 @@ namespace drivers
             base = LPI2C2;
             LOG_DEBUG("Init: I2C2");
             break;
+        case I2CInstances ::I2C3:
+            base = LPI2C3;
+            LOG_DEBUG("Init: I2C3");
+            break;
+        case I2CInstances ::I2C4:
+            base = LPI2C4;
+            LOG_DEBUG("Init: I2C4");
+            break;
         default:
             break;
         }
@@ -37,6 +45,12 @@ namespace drivers
             break;
         case I2CInstances ::I2C2:
             LOG_DEBUG("Deinit: I2C2");
+            break;
+        case I2CInstances ::I2C3:
+            LOG_DEBUG("Deinit: I2C3");
+            break;
+        case I2CInstances ::I2C4:
+            LOG_DEBUG("Deinit: I2C4");
             break;
         default:
             break;

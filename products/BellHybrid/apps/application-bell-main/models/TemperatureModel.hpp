@@ -12,7 +12,7 @@
 
 namespace app
 {
-    class Application;
+    class ApplicationCommon;
 }
 
 namespace app::home_screen
@@ -28,7 +28,7 @@ namespace app::home_screen
     class TemperatureModel : public AbstractTemperatureModel
     {
       public:
-        explicit TemperatureModel(app::Application *app);
+        explicit TemperatureModel(app::ApplicationCommon *app);
         utils::temperature::Temperature getTemperature() const override;
 
       private:

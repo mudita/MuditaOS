@@ -48,6 +48,7 @@ namespace app::manager
             this, autoLockTimerName, sys::timer::InfiniteTimeout, [this](sys::Timer &) { onPhoneLocked(); });
 
         bus.channels.push_back(sys::BusChannel::BluetoothModeChanges);
+        bus.channels.push_back(sys::BusChannel::BluetoothNotifications);
         bus.channels.push_back(sys::BusChannel::PhoneModeChanges);
         bus.channels.push_back(sys::BusChannel::PhoneLockChanges);
         bus.channels.push_back(sys::BusChannel::ServiceCellularNotifications);
@@ -296,6 +297,9 @@ namespace app::manager
             }
             return simLockHandler.handleCMEErrorRequest(data->code);
         });
+        connect(typeid(cellular::msg::notification::SimNotInserted), [&](sys::Message *request) -> sys::MessagePointer {
+            return simLockHandler.handleSimNotInsertedMessage();
+        });
         connect(typeid(locks::SetSim), [&](sys::Message *request) -> sys::MessagePointer {
             auto data = static_cast<locks::SetSim *>(request);
             simLockHandler.setSim(data->getSimSlot());
@@ -496,7 +500,7 @@ namespace app::manager
 
         if (targetApp->state() == ApplicationHandle::State::ACTIVE_FORGROUND ||
             targetApp->state() == ApplicationHandle::State::ACTIVE_BACKGROUND) {
-            app::Application::requestAction(this, targetName, action.actionId, std::move(action.params));
+            app::ApplicationCommon::requestAction(this, targetName, action.actionId, std::move(action.params));
             return ActionProcessStatus::Accepted;
         }
         return ActionProcessStatus::Skipped;

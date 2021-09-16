@@ -7,7 +7,7 @@
 
 namespace gui
 {
-    AppsWindow::AppsWindow(app::Application *app) : OptionWindow(app, gui::window::name::apps)
+    AppsWindow::AppsWindow(app::ApplicationCommon *app) : OptionWindow(app, gui::window::name::apps)
     {
         addOptions(appsAndToolsOptionsList());
         setTitle(utils::translate("app_settings_apps"));

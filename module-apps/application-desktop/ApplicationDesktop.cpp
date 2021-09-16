@@ -154,48 +154,44 @@ namespace app
         return sys::ReturnCodes::Success;
     }
 
-    sys::ReturnCodes ApplicationDesktop::DeinitHandler()
-    {
-        return sys::ReturnCodes::Success;
-    }
-
     void ApplicationDesktop::createUserInterface()
     {
         using namespace app::window::name;
-        windowsFactory.attach(desktop_main_window, [](Application *app, const std::string &name) {
+        windowsFactory.attach(desktop_main_window, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::DesktopMainWindow>(app);
         });
-        windowsFactory.attach(desktop_menu, [this](Application *app, const std::string newname) {
+        windowsFactory.attach(desktop_menu, [this](ApplicationCommon *app, const std::string newname) {
             return std::make_unique<gui::MenuWindow>(app, dbNotificationHandler);
         });
-        windowsFactory.attach(dead_battery, [](Application *app, const std::string newname) {
+        windowsFactory.attach(dead_battery, [](ApplicationCommon *app, const std::string newname) {
             return std::make_unique<gui::DeadBatteryWindow>(app);
         });
-        windowsFactory.attach(logo_window, [](Application *app, const std::string newname) {
+        windowsFactory.attach(logo_window, [](ApplicationCommon *app, const std::string newname) {
             return std::make_unique<gui::LogoWindow>(app);
         });
-        windowsFactory.attach(charging_battery, [](Application *app, const std::string newname) {
+        windowsFactory.attach(charging_battery, [](ApplicationCommon *app, const std::string newname) {
             return std::make_unique<gui::ChargingBatteryWindow>(app);
         });
-        windowsFactory.attach(desktop_reboot, [](Application *app, const std::string newname) {
+        windowsFactory.attach(desktop_reboot, [](ApplicationCommon *app, const std::string newname) {
             auto presenter = std::make_unique<gui::PowerOffPresenter>(app);
             return std::make_unique<gui::RebootWindow>(app, std::move(presenter));
         });
-        windowsFactory.attach(desktop_mmi_pull, [](Application *app, const std::string newname) {
+        windowsFactory.attach(desktop_mmi_pull, [](ApplicationCommon *app, const std::string newname) {
             return std::make_unique<gui::MmiPullWindow>(app, desktop_mmi_pull);
         });
-        windowsFactory.attach(desktop_mmi_push, [](Application *app, const std::string newname) {
+        windowsFactory.attach(desktop_mmi_push, [](ApplicationCommon *app, const std::string newname) {
             return std::make_unique<gui::MmiPushWindow>(app, desktop_mmi_push);
         });
-        windowsFactory.attach(desktop_mmi_internal, [](Application *app, const std::string newname) {
+        windowsFactory.attach(desktop_mmi_internal, [](ApplicationCommon *app, const std::string newname) {
             return std::make_unique<gui::MmiInternalMsgWindow>(app, desktop_mmi_internal);
         });
-        windowsFactory.attach(gui::window::name::dialog_confirm, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::dialog_confirm, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::DialogConfirm>(app, name);
         });
-        windowsFactory.attach(gui::popup::window::tethering_off_window, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::TetheringOffPopup>(app, gui::popup::window::tethering_off_window);
-        });
+        windowsFactory.attach(
+            gui::popup::window::tethering_off_window, [](ApplicationCommon *app, const std::string &name) {
+                return std::make_unique<gui::TetheringOffPopup>(app, gui::popup::window::tethering_off_window);
+            });
 
         attachPopups({gui::popup::ID::Volume,
                       gui::popup::ID::Tethering,

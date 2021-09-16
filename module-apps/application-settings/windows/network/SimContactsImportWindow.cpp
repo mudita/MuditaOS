@@ -10,7 +10,7 @@
 namespace gui
 {
     SimContactsImportWindow::SimContactsImportWindow(
-        app::Application *app, std::unique_ptr<SimContactsImportWindowContract::Presenter> simImportPresenter)
+        app::ApplicationCommon *app, std::unique_ptr<SimContactsImportWindowContract::Presenter> simImportPresenter)
         : AppWindow(app, gui::window::name::import_contacts), presenter(std::move(simImportPresenter))
     {
         presenter->attach(this);

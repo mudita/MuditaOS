@@ -14,6 +14,7 @@ class MockAlarmHandler : public alarms::AlarmHandler
 {
   public:
     MOCK_METHOD(bool, handle, (const AlarmEventRecord &record), ());
+    MOCK_METHOD(bool, handleOff, (const AlarmEventRecord &record), ());
 };
 class MockAlarmEventsRepository : public alarms::AbstractAlarmEventsRepository
 {
@@ -112,7 +113,7 @@ class AlarmOperationsFixture : public ::testing::Test
   protected:
     auto getMockedAlarmOperations(std::unique_ptr<MockAlarmEventsRepository> &alarmRepo)
     {
-        return std::make_unique<alarms::AlarmOperations>(std::move(alarmRepo), timeInjector);
+        return std::make_unique<alarms::AlarmOperationsCommon>(std::move(alarmRepo), timeInjector);
     }
 };
 

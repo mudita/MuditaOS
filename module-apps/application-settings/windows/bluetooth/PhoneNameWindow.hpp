@@ -3,7 +3,6 @@
 #pragma once
 
 #include <application-settings/models/bluetooth/BluetoothSettingsModel.hpp>
-
 #include <Text.hpp>
 
 namespace gui
@@ -11,7 +10,7 @@ namespace gui
     class PhoneNameWindow : public AppWindow
     {
       public:
-        explicit PhoneNameWindow(app::Application *app);
+        explicit PhoneNameWindow(app::ApplicationCommon *app);
 
       private:
         void buildInterface() override;

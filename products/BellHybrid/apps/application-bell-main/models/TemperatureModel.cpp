@@ -3,20 +3,20 @@
 
 #include "TemperatureModel.hpp"
 
-#include <apps-common/Application.hpp>
+#include <apps-common/ApplicationCommon.hpp>
 #include <service-db/Settings.hpp>
-#include <service-db/agents/settings/SystemSettings.hpp>
+#include <db/SystemSettings.hpp>
 #include <evtmgr/api/TemperatureApi.hpp>
 
 namespace app::home_screen
 {
-    TemperatureModel::TemperatureModel(app::Application *app)
+    TemperatureModel::TemperatureModel(app::ApplicationCommon *app)
     {
         settings.init(service::ServiceProxy{app->weak_from_this()});
     }
     utils::temperature::Temperature TemperatureModel::getTemperature() const
     {
-        const auto unitStr = settings.getValue(settings::Temperature::unit, settings::SettingsScope::Global);
+        const auto unitStr = settings.getValue(bell::settings::Temperature::unit, settings::SettingsScope::Global);
         const auto unit    = *utils::temperature::strToUnit(unitStr);
         auto temperature   = evtmgr::api::getCurrentTemperature();
 

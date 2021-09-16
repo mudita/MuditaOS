@@ -4,6 +4,7 @@
 #pragma once
 
 #include "AlarmEventsDBRepository.hpp"
+#include "AlarmOperations.hpp"
 #include "AlarmMessageHandler.hpp"
 #include "Constants.hpp"
 #include "service-time/TimeManager.hpp"
@@ -48,7 +49,8 @@ namespace stm
         void initStaticData();
 
       public:
-        ServiceTime();
+        ServiceTime(
+            const alarms::IAlarmOperationsFactory &alarmOperationsFactory = alarms::CommonAlarmOperationsFactory{});
         ~ServiceTime();
 
         sys::ReturnCodes InitHandler() override;

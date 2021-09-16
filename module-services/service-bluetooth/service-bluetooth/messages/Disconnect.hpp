@@ -11,5 +11,16 @@ namespace message::bluetooth
     {};
 
     class DisconnectResult : public BluetoothMessage
-    {};
+    {
+      public:
+        explicit DisconnectResult(Devicei device) : device(device)
+        {}
+        [[nodiscard]] auto getDevice() const -> Devicei
+        {
+            return device;
+        }
+
+      private:
+        Devicei device;
+    };
 } // namespace message::bluetooth

@@ -2,11 +2,6 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmsRepository.hpp"
-#include <module-db/queries/alarms/QueryAlarmsGetLimited.hpp>
-#include <module-db/queries/alarms/QueryAlarmsAdd.hpp>
-#include <module-db/queries/alarms/QueryAlarmsRemove.hpp>
-#include <module-db/queries/alarms/QueryAlarmsEdit.hpp>
-#include <module-db/queries/alarms/QueryAlarmsTurnOffAll.hpp>
 #include <service-time/include/service-time/AlarmMessage.hpp>
 #include <service-time/Constants.hpp>
 
@@ -17,7 +12,7 @@ namespace app::alarmClock
 {
     auto async = app::AsyncRequest::createFromMessage;
 
-    AlarmsDBRepository::AlarmsDBRepository(Application *application)
+    AlarmsDBRepository::AlarmsDBRepository(ApplicationCommon *application)
         : AsyncCallbackReceiver{application}, application{application}
     {}
 
@@ -33,7 +28,7 @@ namespace app::alarmClock
                 return false;
             }
             if (callback) {
-                callback(result->alarms, result->alarms.size());
+                callback(result->alarms, result->count);
             }
             return true;
         };

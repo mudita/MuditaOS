@@ -25,7 +25,7 @@ namespace audio_settings
         return audio::PlaybackType::None;
     }
 
-    AudioSettingsModel::AudioSettingsModel(app::Application *application, PlaybackType playbackType)
+    AudioSettingsModel::AudioSettingsModel(app::ApplicationCommon *application, PlaybackType playbackType)
         : application(application), playbackType(playbackTypeToAudioPlaybackType(playbackType))
     {}
 

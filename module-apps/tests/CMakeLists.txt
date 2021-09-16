@@ -5,6 +5,7 @@ add_catch2_executable(
         tests-main.cpp
         test-CallbackStorage.cpp
         test-PhoneModesPolicies.cpp
+        tests-BluetoothSettingsModel.cpp
     LIBS
         module-apps
 )

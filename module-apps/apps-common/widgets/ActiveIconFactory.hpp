@@ -4,17 +4,17 @@
 #pragma once
 
 #include "ImageBox.hpp"
-#include <Application.hpp>
+#include <ApplicationCommon.hpp>
 #include <module-db/Interface/ContactRecord.hpp>
 
 namespace gui
 {
     class ActiveIconFactory
     {
-        app::Application *app;
+        app::ApplicationCommon *app;
 
       public:
-        explicit ActiveIconFactory(app::Application *app);
+        explicit ActiveIconFactory(app::ApplicationCommon *app);
 
         [[nodiscard]] auto makeCustomIcon(const UTF8 &image,
                                           std::function<bool(Item &)> onActivated,

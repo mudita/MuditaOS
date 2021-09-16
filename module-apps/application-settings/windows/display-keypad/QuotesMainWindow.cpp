@@ -22,7 +22,7 @@ namespace style::quotes
 
 namespace gui
 {
-    QuotesMainWindow::QuotesMainWindow(app::Application *app)
+    QuotesMainWindow::QuotesMainWindow(app::ApplicationCommon *app)
         : AppWindow(app, gui::window::name::quotes), quotesModel(std::make_shared<Quotes::QuotesModel>(app))
     {
         buildInterface();

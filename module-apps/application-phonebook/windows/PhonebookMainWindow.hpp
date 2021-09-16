@@ -8,7 +8,8 @@
 #include "application-phonebook/widgets/PhonebookListView.hpp"
 
 #include <AppWindow.hpp>
-#include <gui/widgets/ListView.hpp>
+#include <ListView.hpp>
+#include <Icon.hpp>
 
 #include <application-phonebook/data/ContactsMap.hpp>
 
@@ -20,14 +21,18 @@ namespace gui
       protected:
         std::shared_ptr<PhonebookModel> phonebookModel = nullptr;
         ListView *contactsList                         = nullptr;
+        gui::Icon *emptyListIcon                       = nullptr;
 
-        bool enableNewContact  = true;
-        bool requestedSearch   = false;
+        bool enableNewContact = true;
+        bool requestedSearch  = false;
         std::unique_ptr<InputMode> inputMode;
         gui::KeyInputMappedTranslation translator;
 
+        void onEmptyList();
+        void onListFilled();
+
       public:
-        PhonebookMainWindow(app::Application *app);
+        PhonebookMainWindow(app::ApplicationCommon *app);
         virtual ~PhonebookMainWindow();
 
         // virtual methods

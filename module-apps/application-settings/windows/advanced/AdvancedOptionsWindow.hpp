@@ -5,4 +5,4 @@
 
 #include <OptionWindow.hpp>
 
-std::list<gui::Option> advancedOptions(app::Application *app);
+std::list<gui::Option> advancedOptions(app::ApplicationCommon *app);

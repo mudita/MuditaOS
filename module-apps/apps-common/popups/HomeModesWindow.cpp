@@ -11,7 +11,7 @@
 
 namespace gui
 {
-    HomeModesWindow::HomeModesWindow(app::Application *app, const std::string &name) : WindowWithTimer(app, name)
+    HomeModesWindow::HomeModesWindow(app::ApplicationCommon *app, const std::string &name) : WindowWithTimer(app, name)
     {
         buildInterface();
     }

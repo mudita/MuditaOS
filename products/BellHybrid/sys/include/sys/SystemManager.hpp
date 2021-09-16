@@ -7,9 +7,16 @@
 
 namespace sys
 {
+    class AlarmActivationStatusChangeRequest;
+
     class SystemManager : public SystemManagerCommon
     {
       public:
         explicit SystemManager(std::vector<std::unique_ptr<BaseServiceCreator>> &&creators);
+
+      private:
+        auto InitHandler() -> ReturnCodes override;
+
+        auto handleAlarmActivationStatusChangeRequest(AlarmActivationStatusChangeRequest *request) -> MessagePointer;
     };
 } // namespace sys

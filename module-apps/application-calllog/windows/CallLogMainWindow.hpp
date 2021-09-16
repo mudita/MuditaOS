@@ -3,17 +3,11 @@
 
 #pragma once
 
-#include <string>
-#include <functional>
-
-#include "AppWindow.hpp"
-#include "gui/widgets/Label.hpp"
-#include "gui/widgets/Image.hpp"
-#include "gui/widgets/Window.hpp"
-#include "gui/widgets/BottomBar.hpp"
-#include "gui/widgets/ListView.hpp"
-
 #include "CalllogModel.hpp"
+
+#include <AppWindow.hpp>
+#include <ListView.hpp>
+#include <Icon.hpp>
 
 namespace gui
 {
@@ -22,9 +16,10 @@ namespace gui
     {
         std::shared_ptr<CalllogModel> calllogModel = nullptr;
         gui::ListView *list                        = nullptr;
+        gui::Icon *emptyListIcon                   = nullptr;
 
       public:
-        explicit CallLogMainWindow(app::Application *app);
+        explicit CallLogMainWindow(app::ApplicationCommon *app);
 
         // virtual methods
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
@@ -35,6 +30,8 @@ namespace gui
 
       private:
         bool onDatabaseMessage(sys::Message *msg) override;
+        void onEmptyList();
+        void onListFilled();
     };
 
 } /* namespace gui */

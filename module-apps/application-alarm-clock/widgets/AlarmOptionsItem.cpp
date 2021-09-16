@@ -12,7 +12,7 @@
 namespace gui
 {
 
-    AlarmOptionsItem::AlarmOptionsItem(app::Application *app,
+    AlarmOptionsItem::AlarmOptionsItem(app::ApplicationCommon *app,
                                        AlarmOptionItemName itemName,
                                        std::function<void(const UTF8 &)> bottomBarTemporaryMode,
                                        std::function<void()> bottomBarRestoreFromTemporaryMode)
@@ -226,9 +226,9 @@ namespace gui
                 alarm->snoozeDuration = static_cast<uint32_t>(snoozeOptions[actualVectorIndex]);
                 break;
             }
-            case AlarmOptionItemName::Repeat: {
+            case AlarmOptionItemName::Repeat:
+                // repead handled in class
                 break;
-            }
             }
         };
 
@@ -258,9 +258,9 @@ namespace gui
                 }
                 break;
             }
-            case AlarmOptionItemName::Repeat: {
+            case AlarmOptionItemName::Repeat:
+                // repead handled in class
                 break;
-            }
             }
             optionLabel->setText(optionsNames[actualVectorIndex]);
         };

@@ -47,7 +47,7 @@ namespace audio_settings
       public:
         /// @param application application pointer
         /// @param playbackType playback type
-        AudioSettingsModel(app::Application *application, PlaybackType playbackType);
+        AudioSettingsModel(app::ApplicationCommon *application, PlaybackType playbackType);
 
         bool isVibrationEnabled() override;
         void setVibrationEnabled() override;
@@ -62,7 +62,7 @@ namespace audio_settings
         audio::PlaybackType getPlaybackType() override;
 
       private:
-        app::Application *application = nullptr;
+        app::ApplicationCommon *application = nullptr;
         audio::PlaybackType playbackType;
     };
 } // namespace audio_settings

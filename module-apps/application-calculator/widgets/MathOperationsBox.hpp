@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <apps-common/Application.hpp>
+#include <apps-common/ApplicationCommon.hpp>
 #include <module-gui/gui/widgets/GridLayout.hpp>
 #include <module-gui/gui/widgets/Item.hpp>
 

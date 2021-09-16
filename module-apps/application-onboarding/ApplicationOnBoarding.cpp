@@ -109,11 +109,6 @@ namespace app
         bus.sendUnicast(std::make_shared<onBoarding::FinalizeOnBoarding>(), service::name::appmgr);
     }
 
-    sys::ReturnCodes ApplicationOnBoarding::DeinitHandler()
-    {
-        return sys::ReturnCodes::Success;
-    }
-
     sys::ReturnCodes ApplicationOnBoarding::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
     {
         return sys::ReturnCodes::Success;
@@ -121,55 +116,57 @@ namespace app
 
     void ApplicationOnBoarding::createUserInterface()
     {
-        windowsFactory.attach(gui::name::window::main_window, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::name::window::main_window, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<app::onBoarding::OnBoardingLanguagesWindow>(app, gui::name::window::main_window);
         });
         windowsFactory.attach(gui::window::name::onBoarding_start_configuration,
-                              [](Application *app, const std::string &name) {
+                              [](ApplicationCommon *app, const std::string &name) {
                                   return std::make_unique<app::onBoarding::StartConfigurationWindow>(app);
                               });
-        windowsFactory.attach(gui::window::name::onBoarding_eula, [&](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::onBoarding_eula, [&](ApplicationCommon *app, const std::string &name) {
             auto eulaRepository = std::make_unique<app::onBoarding::EULARepository>("assets/licenses", "eula.txt");
             auto presenter      = std::make_unique<app::onBoarding::EULALicenseWindowPresenter>([&]() { acceptEULA(); },
                                                                                            std::move(eulaRepository));
             return std::make_unique<app::onBoarding::EULALicenseWindow>(app, std::move(presenter));
         });
-        windowsFactory.attach(gui::window::name::onBoarding_sim_select, [](Application *app, const std::string &name) {
-            return std::make_unique<app::onBoarding::OnBoardingSimSelectWindow>(
-                app, gui::window::name::onBoarding_sim_select);
-        });
+        windowsFactory.attach(gui::window::name::onBoarding_sim_select,
+                              [](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<app::onBoarding::OnBoardingSimSelectWindow>(
+                                      app, gui::window::name::onBoarding_sim_select);
+                              });
         windowsFactory.attach(gui::window::name::onBoarding_no_sim_selected,
-                              [](Application *app, const std::string &name) {
+                              [](ApplicationCommon *app, const std::string &name) {
                                   return std::make_unique<app::onBoarding::NoSimSelectedDialogWindow>(app);
                               });
         windowsFactory.attach(gui::window::name::onBoarding_configuration_successful,
-                              [](Application *app, const std::string &name) {
+                              [](ApplicationCommon *app, const std::string &name) {
                                   return std::make_unique<app::onBoarding::ConfigurationSuccessfulDialogWindow>(app);
                               });
         windowsFactory.attach(gui::window::name::onBoarding_no_configuration,
-                              [](Application *app, const std::string &name) {
+                              [](ApplicationCommon *app, const std::string &name) {
                                   return std::make_unique<app::onBoarding::NoConfigurationDialogWindow>(app);
                               });
-        windowsFactory.attach(gui::window::name::onBoarding_update, [&](Application *app, const std::string &name) {
-            auto presenter =
-                std::make_unique<app::onBoarding::OnBoardingFinalizeWindowPresenter>([&]() { finalizeOnBoarding(); });
-            return std::make_unique<app::onBoarding::UpdateDialogWindow>(app, std::move(presenter));
-        });
-        windowsFactory.attach(gui::window::name::onBoarding_skip, [](Application *app, const std::string &name) {
+        windowsFactory.attach(
+            gui::window::name::onBoarding_update, [&](ApplicationCommon *app, const std::string &name) {
+                auto presenter = std::make_unique<app::onBoarding::OnBoardingFinalizeWindowPresenter>(
+                    [&]() { finalizeOnBoarding(); });
+                return std::make_unique<app::onBoarding::UpdateDialogWindow>(app, std::move(presenter));
+            });
+        windowsFactory.attach(gui::window::name::onBoarding_skip, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<app::onBoarding::SkipDialogWindow>(app);
         });
         windowsFactory.attach(gui::window::name::onBoarding_date_and_time,
-                              [](Application *app, const std::string &name) {
+                              [](ApplicationCommon *app, const std::string &name) {
                                   return std::make_unique<app::onBoarding::OnBoardingDateAndTimeWindow>(app);
                               });
         windowsFactory.attach(gui::window::name::onBoarding_change_date_and_time,
-                              [](Application *app, const std::string &name) {
+                              [](ApplicationCommon *app, const std::string &name) {
                                   return std::make_unique<app::onBoarding::OnBoardingChangeDateAndTimeWindow>(app);
                               });
-        windowsFactory.attach(gui::window::name::change_time_zone, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::change_time_zone, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::ChangeTimeZone>(app);
         });
-        windowsFactory.attach(gui::window::name::dialog_confirm, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::dialog_confirm, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::DialogConfirm>(app, gui::window::name::dialog_confirm);
         });
 

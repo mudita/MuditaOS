@@ -57,11 +57,11 @@ namespace alarms
     {
         return handleWithCallback<AlarmsGetInRangeRequestMessage,
                                   AlarmsGetInRangeResponseMessage,
-                                  std::vector<AlarmEventRecord>>(
+                                  std::pair<std::vector<AlarmEventRecord>, std::uint32_t>>(
             request,
             [&](AlarmsGetInRangeRequestMessage *request, IAlarmOperations::OnGetAlarmsInRangeProcessed callback) {
                 alarmOperations->getAlarmsInRange(
-                    request->start, request->end, request->offset, request->limit, callback);
+                    request->start, request->end, request->offset, request->limit, std::move(callback));
             });
     }
 
@@ -74,6 +74,24 @@ namespace alarms
             request,
             [&](AlarmGetNextSingleEventsRequestMessage *request, IAlarmOperations::OnGetNextSingleProcessed callback) {
                 alarmOperations->getNextSingleEvents(TimePointNow(), callback);
+            });
+    }
+
+    auto AlarmMessageHandler::handleTurnOffRingingAlarm(RingingAlarmTurnOffRequestMessage *request)
+        -> std::shared_ptr<RingingAlarmTurnOffResponseMessage>
+    {
+        return handleWithCallback<RingingAlarmTurnOffRequestMessage, RingingAlarmTurnOffResponseMessage, bool>(
+            request, [&](RingingAlarmTurnOffRequestMessage *request, IAlarmOperations::OnTurnOffRingingAlarm callback) {
+                alarmOperations->turnOffRingingAlarm(request->id, callback);
+            });
+    }
+
+    auto AlarmMessageHandler::handleSnoozeRingingAlarm(RingingAlarmSnoozeRequestMessage *request)
+        -> std::shared_ptr<RingingAlarmSnoozeResponseMessage>
+    {
+        return handleWithCallback<RingingAlarmSnoozeRequestMessage, RingingAlarmSnoozeResponseMessage, bool>(
+            request, [&](RingingAlarmSnoozeRequestMessage *request, IAlarmOperations::OnSnoozeRingingAlarm callback) {
+                alarmOperations->snoozeRingingAlarm(request->id, request->nextAlarmTime, callback);
             });
     }
 

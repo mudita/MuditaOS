@@ -16,7 +16,7 @@
 
 namespace gui
 {
-    PhonebookMainWindow::PhonebookMainWindow(app::Application *app)
+    PhonebookMainWindow::PhonebookMainWindow(app::ApplicationCommon *app)
         : AppWindow(app, gui::name::window::main_window), phonebookModel{
                                                               std::make_shared<PhonebookModel>(this->application)}
     {
@@ -36,6 +36,10 @@ namespace gui
         header->navigationIndicatorAdd(new gui::header::AddElementAction(), gui::header::BoxSelection::Left);
         header->navigationIndicatorAdd(new gui::header::SearchAction(), gui::header::BoxSelection::Right);
 
+        bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::call));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::open));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+
         contactsList = new gui::PhonebookListView(this,
                                                   phonebookStyle::mainWindow::contactsList::x,
                                                   phonebookStyle::mainWindow::contactsList::y,
@@ -44,16 +48,20 @@ namespace gui
                                                   phonebookModel);
         setFocusItem(contactsList);
 
-        phonebookModel->letterMap = phonebookModel->requestLetterMap();
+        emptyListIcon =
+            new gui::Icon(this,
+                          0,
+                          ::style::window::default_vertical_pos,
+                          ::style::window_width,
+                          ::style::window_height - ::style::window::default_vertical_pos - ::style::footer::height,
+                          "empty_list_add_W_G",
+                          utils::translate("app_phonebook_no_contacts"));
+
+        contactsList->emptyListCallback    = [this]() { onEmptyList(); };
+        contactsList->notEmptyListCallback = [this]() { onListFilled(); };
+
         phonebookModel->setDisplayMode(static_cast<uint32_t>(ContactDisplayMode::SortedByLetter));
         contactsList->rebuildList(gui::listview::RebuildType::Full);
-
-        bottomBar->setActive(BottomBar::Side::LEFT, true);
-        bottomBar->setActive(BottomBar::Side::CENTER, true);
-        bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::call));
-        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::open));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
         auto app  = application;
         inputMode = std::make_unique<InputMode>(
@@ -117,28 +125,23 @@ namespace gui
     bool PhonebookMainWindow::onInput(const InputEvent &inputEvent)
     {
         if (inputEvent.isShortRelease()) {
-            switch (inputEvent.getKeyCode()) {
-
-            case KeyCode::KEY_LEFT: {
+            if (inputEvent.is(gui::KeyCode::KEY_LEFT)) {
                 if (enableNewContact) {
                     std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>();
                     application->switchWindow(
                         gui::window::name::new_contact, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
+                    return true;
                 }
             }
+            else if (inputEvent.is(gui::KeyCode::KEY_RIGHT) &&
+                     header->navigationIndicatorVisible(gui::header::BoxSelection::Right)) {
+                application->switchWindow(gui::window::name::search);
                 return true;
-
-            case KeyCode::KEY_RIGHT:
-                application->switchWindow("Search");
-                return true;
-
-            default:
+            }
+            else {
                 HandleFilteringByLetter(inputEvent);
-                break;
             }
         }
-
-        // check if any of the lower inheritance onInput methods catch the event
         return AppWindow::onInput(inputEvent);
     }
 
@@ -164,5 +167,23 @@ namespace gui
     bool PhonebookMainWindow::isSearchRequested() const
     {
         return requestedSearch;
+    }
+
+    void PhonebookMainWindow::onEmptyList()
+    {
+        bottomBar->setActive(gui::BottomBar::Side::LEFT, false);
+        bottomBar->setActive(gui::BottomBar::Side::CENTER, false);
+        emptyListIcon->setVisible(true);
+        header->navigationIndicatorRemove(gui::header::BoxSelection::Right);
+        application->refreshWindow(RefreshModes::GUI_REFRESH_DEEP);
+    }
+
+    void PhonebookMainWindow::onListFilled()
+    {
+        bottomBar->setActive(gui::BottomBar::Side::LEFT, true);
+        bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
+        emptyListIcon->setVisible(false);
+        header->navigationIndicatorAdd(new gui::header::SearchAction(), gui::header::BoxSelection::Right);
+        application->refreshWindow(RefreshModes::GUI_REFRESH_DEEP);
     }
 } /* namespace gui */

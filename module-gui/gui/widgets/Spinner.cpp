@@ -11,8 +11,9 @@
 namespace gui
 {
 
-    Spinner::Spinner(int minValue, int maxValue, int step, Boundaries boundaries)
-        : minValue(minValue), maxValue(maxValue), step(step), currentValue(minValue), boundaries(boundaries)
+    Spinner::Spinner(int minValue, int maxValue, int step, Boundaries boundaries, OnUpdateCallback cb)
+        : minValue(minValue), maxValue(maxValue), step(step), currentValue(minValue),
+          boundaries(boundaries), onUpdate{std::move(cb)}
     {
         setEditMode(EditMode::Browse);
         drawUnderline(false);
@@ -106,6 +107,9 @@ namespace gui
         }
         outStream << currentValue;
         setText(outStream.str());
+        if (onUpdate) {
+            onUpdate(currentValue);
+        }
     }
     void Spinner::setMinValue(int newMinValue)
     {

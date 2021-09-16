@@ -16,13 +16,14 @@
 namespace gui
 {
     BellAlarmWindow::BellAlarmWindow(
-        app::Application *app,
-        std::unique_ptr<app::bell_alarm::BellAlarmWindowContract::Presenter> &&windowPresenter,
+        app::ApplicationCommon *app,
+        std::shared_ptr<app::bell_alarm::BellAlarmWindowContract::Presenter> windowPresenter,
         std::string name)
         : AppWindow(app, std::move(name)), presenter{std::move(windowPresenter)}
     {
         presenter->attach(this);
         buildInterface();
+        presenter->createData();
     }
 
     void BellAlarmWindow::buildInterface()
@@ -68,6 +69,27 @@ namespace gui
             return true;
         }
         return AppWindow::onInput(inputEvent);
+    }
+
+    void BellAlarmWindow::onBeforeShow(ShowMode, SwitchData *data)
+    {
+        presenter->onBeforeShow();
+    }
+
+    void BellAlarmWindow::setAlarmTime(time_t time)
+    {
+        timeSetFmtSpinner->setTime(time);
+    }
+
+    time_t BellAlarmWindow::getAlarmTime() const
+    {
+        return timeSetFmtSpinner->getTime();
+    }
+
+    void BellAlarmWindow::setTimeFormat(utils::time::Locale::TimeFormat fmt)
+    {
+        timeSetFmtSpinner->setTimeFormat(fmt);
+        body->resizeItems();
     }
 
     void BellAlarmWindow::rebuild()

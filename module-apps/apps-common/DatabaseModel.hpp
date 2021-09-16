@@ -9,7 +9,7 @@
 #include <utility>
 #include <algorithm>
 
-#include "Application.hpp"
+#include <apps-common/ApplicationCommon.hpp>
 
 namespace app
 {
@@ -17,13 +17,13 @@ namespace app
     template <class T> class DatabaseModel
     {
       protected:
-        Application *application  = nullptr;
-        unsigned int recordsCount = 0;
+        ApplicationCommon *application = nullptr;
+        unsigned int recordsCount      = std::numeric_limits<unsigned int>::max();
         int modelIndex            = 0;
         std::vector<std::shared_ptr<T>> records;
 
       public:
-        explicit DatabaseModel(Application *app) : application{app}, recordsCount{0}
+        explicit DatabaseModel(ApplicationCommon *app) : application{app}
         {}
 
         virtual ~DatabaseModel()
@@ -35,6 +35,8 @@ namespace app
         {
             modelIndex = 0;
             records.clear();
+
+            assert(dbRecords.size() <= recordsCount);
 
             if (!dbRecords.empty()) {
                 for (uint32_t i = 0; i < dbRecords.size(); i++) {

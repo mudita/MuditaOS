@@ -22,6 +22,12 @@ namespace bsp
 
         void EnableDcdcPowerSaveMode() final;
         void DisableDcdcPowerSaveMode() final;
+
+        void DisconnectInternalLoadResistor() final;
+        void ConnectInternalLoadResistor() final;
+
+        void SwitchToRegularModeLDO() final;
+        void SwitchToLowPowerModeLDO() final;
     };
 
 } // namespace bsp

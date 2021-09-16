@@ -148,23 +148,18 @@ namespace app
         return ret;
     }
 
-    sys::ReturnCodes ApplicationCall::DeinitHandler()
-    {
-        return sys::ReturnCodes::Success;
-    }
-
     void ApplicationCall::createUserInterface()
     {
-        windowsFactory.attach(app::window::name_enterNumber, [](Application *app, const std::string newname) {
+        windowsFactory.attach(app::window::name_enterNumber, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::EnterNumberWindow>(app, static_cast<ApplicationCall *>(app));
         });
-        windowsFactory.attach(app::window::name_call, [](Application *app, const std::string &name) {
+        windowsFactory.attach(app::window::name_call, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::CallWindow>(app, static_cast<ApplicationCall *>(app));
         });
-        windowsFactory.attach(app::window::name_emergencyCall, [](Application *app, const std::string &name) {
+        windowsFactory.attach(app::window::name_emergencyCall, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::EmergencyCallWindow>(app, static_cast<ApplicationCall *>(app));
         });
-        windowsFactory.attach(app::window::name_dialogConfirm, [](Application *app, const std::string &name) {
+        windowsFactory.attach(app::window::name_dialogConfirm, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::DialogConfirm>(app, name);
         });
         attachPopups({gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes});

@@ -13,7 +13,7 @@
 
 namespace gui
 {
-    InformationWidget::InformationWidget(app::Application *app)
+    InformationWidget::InformationWidget(app::ApplicationCommon *app)
     {
         setMargins(gui::Margins(style::widgets::leftMargin, style::margins::huge, 0, 0));
 

@@ -50,6 +50,15 @@ namespace alarms
             return sendRequest<AlarmGetNextSingleEventsRequestMessage>(serv);
         }
 
+        bool requestTurnOffRingingAlarm(sys::Service *serv, const std::uint32_t id)
+        {
+            return sendRequest<RingingAlarmTurnOffRequestMessage>(serv, id);
+        }
+
+        bool requestSnoozeRingingAlarm(sys::Service *serv, const std::uint32_t id, const TimePoint nextAlarmTime)
+        {
+            return sendRequest<RingingAlarmSnoozeRequestMessage>(serv, id, nextAlarmTime);
+        }
     }; // namespace AlarmServiceAPI
 
 } // namespace alarms

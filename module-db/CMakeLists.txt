@@ -17,7 +17,6 @@ set(SOURCES
         Database/sqlite3vfs.cpp
         ${SQLITE3_SOURCE}
 
-        Databases/AlarmsDB.cpp
         Databases/CalllogDB.cpp
         Databases/ContactsDB.cpp
         Databases/CountryCodesDB.cpp
@@ -37,8 +36,6 @@ set(SOURCES
         Tables/ContactsRingtonesTable.cpp
         Tables/ContactsAddressTable.cpp
         Tables/ContactsGroups.cpp
-        Tables/AlarmsTable.cpp
-        Tables/AlarmsStatusTable.cpp
         Tables/NotesTable.cpp
         Tables/CalllogTable.cpp
         Tables/CountryCodesTable.cpp
@@ -47,7 +44,6 @@ set(SOURCES
         Tables/MultimediaFilesTable.cpp
 
         Interface/AlarmEventRecord.cpp
-        Interface/AlarmsRecord.cpp
         Interface/CalllogRecord.cpp
         Interface/ContactRecord.cpp
         Interface/EventRecord.cpp
@@ -68,12 +64,6 @@ set(SOURCES
         queries/alarm_events/QueryAlarmEventsGetNext.cpp
         queries/alarm_events/QueryAlarmEventsGetRecurringBetweenDates.cpp
         queries/alarm_events/QueryAlarmEventsRemove.cpp
-        queries/alarms/QueryAlarmsAdd.cpp
-        queries/alarms/QueryAlarmsEdit.cpp
-        queries/alarms/QueryAlarmsGet.cpp
-        queries/alarms/QueryAlarmsGetLimited.cpp
-        queries/alarms/QueryAlarmsRemove.cpp
-        queries/alarms/QueryAlarmsTurnOffAll.cpp
         queries/calllog/QueryCalllogGet.cpp
         queries/calllog/QueryCalllogGetByContactID.cpp
         queries/calllog/QueryCalllogGetCount.cpp

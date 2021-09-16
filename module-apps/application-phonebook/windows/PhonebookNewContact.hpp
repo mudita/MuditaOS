@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -15,7 +15,7 @@ namespace gui
     class PhonebookNewContact : public AppWindow
     {
       public:
-        PhonebookNewContact(app::Application *app);
+        PhonebookNewContact(app::ApplicationCommon *app);
 
         auto onInput(const InputEvent &inputEvent) -> bool override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;

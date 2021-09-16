@@ -16,18 +16,23 @@ namespace gui
     class BellAlarmWindow : public AppWindow, public app::bell_alarm::BellAlarmWindowContract::View
     {
       public:
-        explicit BellAlarmWindow(app::Application *app,
-                                 std::unique_ptr<app::bell_alarm::BellAlarmWindowContract::Presenter> &&windowPresenter,
+        explicit BellAlarmWindow(app::ApplicationCommon *app,
+                                 std::shared_ptr<app::bell_alarm::BellAlarmWindowContract::Presenter> windowPresenter,
                                  std::string name = window::name::bellAlarm);
 
         void buildInterface() override;
         bool onInput(const InputEvent &inputEvent) override;
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
         void rebuild() override;
+
+        void setAlarmTime(time_t time) override;
+        time_t getAlarmTime() const override;
+        void setTimeFormat(utils::time::Locale::TimeFormat fmt);
 
       private:
         BellBaseLayout *body{nullptr};
         Label *topText{nullptr};
         TimeSetFmtSpinner *timeSetFmtSpinner{nullptr};
-        std::unique_ptr<app::bell_alarm::BellAlarmWindowContract::Presenter> presenter;
+        std::shared_ptr<app::bell_alarm::BellAlarmWindowContract::Presenter> presenter;
     };
 } /* namespace gui */

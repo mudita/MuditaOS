@@ -5,7 +5,7 @@
 
 #include <functional>
 
-#include <apps-common/Application.hpp>
+#include <apps-common/ApplicationCommon.hpp>
 
 #include <module-db/Interface/NotesRecord.hpp>
 
@@ -32,7 +32,7 @@ namespace app::notes
     class NotesDBRepository : public AbstractNotesRepository, public app::AsyncCallbackReceiver
     {
       public:
-        explicit NotesDBRepository(Application *application);
+        explicit NotesDBRepository(ApplicationCommon *application);
 
         void get(std::uint32_t offset, std::uint32_t limit, const OnGetCallback &callback) override;
         void getByText(const std::string &text,
@@ -43,6 +43,6 @@ namespace app::notes
         void remove(const NotesRecord &note, const OnRemoveCallback &callback) override;
 
       private:
-        Application *application;
+        ApplicationCommon *application;
     };
 } // namespace app::notes

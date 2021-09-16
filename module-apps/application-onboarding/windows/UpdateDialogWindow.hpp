@@ -16,7 +16,7 @@ namespace app::onBoarding
         std::unique_ptr<OnBoardingFinalizeContract::Presenter> presenter;
 
       public:
-        UpdateDialogWindow(app::Application *app,
+        UpdateDialogWindow(app::ApplicationCommon *app,
                            std::unique_ptr<OnBoardingFinalizeContract::Presenter> &&windowPresenter);
         void onBeforeShow(gui::ShowMode mode, gui::SwitchData *data) override;
         bool onInput(const gui::InputEvent &inputEvent) override;

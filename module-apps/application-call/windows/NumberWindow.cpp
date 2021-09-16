@@ -19,7 +19,7 @@
 
 namespace gui
 {
-    NumberWindow::NumberWindow(app::Application *app,
+    NumberWindow::NumberWindow(app::ApplicationCommon *app,
                                app::EnterNumberWindowInterface *interface,
                                std::string windowName)
         : AppWindow(app, std::move(windowName)), interface(interface), currentCountry(defaultCountry),

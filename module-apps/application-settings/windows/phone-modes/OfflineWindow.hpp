@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -17,7 +17,7 @@ namespace gui
     class OfflineWindow : public BaseSettingsWindow
     {
       public:
-        OfflineWindow(app::Application *app, app::settingsInterface::OfflineSettings *offlineSettings);
+        OfflineWindow(app::ApplicationCommon *app, app::settingsInterface::OfflineSettings *offlineSettings);
         void buildInterface() override;
 
       private:

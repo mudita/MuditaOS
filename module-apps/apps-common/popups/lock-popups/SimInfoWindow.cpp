@@ -8,7 +8,7 @@
 
 using namespace gui;
 
-SimInfoWindow::SimInfoWindow(app::Application *app, const std::string &name) : WindowWithTimer(app, name)
+SimInfoWindow::SimInfoWindow(app::ApplicationCommon *app, const std::string &name) : WindowWithTimer(app, name)
 {
     buildInterface();
 }

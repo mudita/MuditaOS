@@ -18,7 +18,6 @@ set(SOURCES
     agents/settings/SettingsProxy.cpp
     agents/settings/SettingsCache.cpp
     agents/settings/FactorySettings.cpp
-    agents/file_indexer/FileIndexerAgent.cpp
     agents/quotes/QuotesAgent.cpp
 )
 
@@ -42,4 +41,3 @@ target_link_libraries(${PROJECT_NAME}
 if (${ENABLE_TESTS})
     add_subdirectory(test)
 endif ()
-

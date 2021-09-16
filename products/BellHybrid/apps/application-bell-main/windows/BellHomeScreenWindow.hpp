@@ -19,13 +19,15 @@ namespace gui
     class BellHomeScreenWindow : public AppWindow, public app::home_screen::AbstractView
     {
       public:
-        BellHomeScreenWindow(app::Application *app, std::unique_ptr<app::home_screen::AbstractPresenter> presenter);
+        BellHomeScreenWindow(app::ApplicationCommon *app,
+                             std::unique_ptr<app::home_screen::AbstractPresenter> presenter);
 
       private:
         void buildInterface() override;
         bool updateTime() override;
         bool onInput(const InputEvent &inputEvent) override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        bool onDatabaseMessage(sys::Message *msg) override;
 
         void setAlarmTriggered() override;
         void setAlarmSnoozed() override;

@@ -31,20 +31,20 @@
 
 namespace stm
 {
-    constexpr auto automaticTimezoneName = "";
+    constexpr auto automaticTimezoneName  = "";
     constexpr auto automaticTimezoneRules = "UTC0";
 
-    ServiceTime::ServiceTime() : sys::Service(service::name::service_time, "", StackDepth)
+    ServiceTime::ServiceTime(const alarms::IAlarmOperationsFactory &alarmOperationsFactory)
+        : sys::Service(service::name::service_time, "", StackDepth), timeManager{std::make_unique<TimeManager>(
+                                                                         std::make_unique<RTCCommand>(this))}
     {
         LOG_INFO("[ServiceTime] Initializing");
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
 
-        timeManager = std::make_unique<TimeManager>(std::make_unique<RTCCommand>(this));
-
         auto alarmEventsRepo = std::make_unique<alarms::AlarmEventsDBRepository>(this);
-        auto alarmOperations = std::make_unique<alarms::AlarmOperations>(std::move(alarmEventsRepo), TimePointNow);
+        auto alarmOperations = alarmOperationsFactory.create(this, std::move(alarmEventsRepo), TimePointNow);
         alarmOperations->updateEventsCache(TimePointNow());
-        alarmMessageHandler  = std::make_unique<alarms::AlarmMessageHandler>(this, std::move(alarmOperations));
+        alarmMessageHandler = std::make_unique<alarms::AlarmMessageHandler>(this, std::move(alarmOperations));
     }
 
     ServiceTime::~ServiceTime()
@@ -158,6 +158,14 @@ namespace stm
                     return alarmMessageHandler->handleGetNextSingleEvents(
                         static_cast<alarms::AlarmGetNextSingleEventsRequestMessage *>(request));
                 });
+        connect(typeid(alarms::RingingAlarmTurnOffRequestMessage), [&](sys::Message *request) -> sys::MessagePointer {
+            return alarmMessageHandler->handleTurnOffRingingAlarm(
+                static_cast<alarms::RingingAlarmTurnOffRequestMessage *>(request));
+        });
+        connect(typeid(alarms::RingingAlarmSnoozeRequestMessage), [&](sys::Message *request) -> sys::MessagePointer {
+            return alarmMessageHandler->handleSnoozeRingingAlarm(
+                static_cast<alarms::RingingAlarmSnoozeRequestMessage *>(request));
+        });
     }
 
     auto ServiceTime::handleSetAutomaticDateAndTimeRequest(sys::Message *request)
@@ -213,7 +221,7 @@ namespace stm
 
     auto ServiceTime::handleSetTimezoneRequest(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>
     {
-        auto message = static_cast<stm::message::SetTimezoneRequest *>(request);
+        auto message       = static_cast<stm::message::SetTimezoneRequest *>(request);
         auto timeZoneName  = message->getTimezoneName();
         auto timeZoneRules = utils::time::getTimeZoneRules(timeZoneName);
 
@@ -230,7 +238,7 @@ namespace stm
     auto ServiceTime::handleCellularTimeNotificationMessage(sys::Message *request)
         -> std::shared_ptr<sys::ResponseMessage>
     {
-        auto message  = static_cast<CellularTimeNotificationMessage *>(request);
+        auto message       = static_cast<CellularTimeNotificationMessage *>(request);
         auto timezoneRules = TimezoneHandler(std::chrono::duration_cast<std::chrono::minutes>(
                                                  std::chrono::seconds{message->getTimeZoneOffset().value()}))
                                  .getTimezone();

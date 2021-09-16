@@ -10,7 +10,7 @@
 
 namespace bsp::keyboard
 {
-    std::vector<KeyEvent> getKeyEvents(std::uint8_t notification);
+    std::vector<KeyEvent> getKeyEvents(KeyNotificationSource notification);
 
     std::int32_t init(xQueueHandle qHandle);
 

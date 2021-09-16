@@ -31,6 +31,7 @@ target_sources(application-settings
         models/system/SARInfoRepository.cpp
         models/system/TechnicalInformationModel.cpp
         models/system/TechnicalInformationRepository.cpp
+        models/bluetooth/BluetoothSettingsModel.cpp
         presenter/network/SimContactsImportWindowPresenter.cpp
         presenter/system/SARInfoWindowPresenter.cpp
         presenter/system/TechnicalWindowPresenter.cpp
@@ -138,7 +139,6 @@ target_sources(application-settings
 
 target_link_libraries(application-settings
     PRIVATE
-        apps-common
         eventstore
         module-bluetooth
         module-bsp
@@ -153,6 +153,8 @@ target_link_libraries(application-settings
         service-desktop
         service-evtmgr
         service-time
+    PUBLIC
+        app
 )
 
 add_dependencies(application-settings version)

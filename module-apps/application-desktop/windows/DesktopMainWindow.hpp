@@ -36,7 +36,7 @@ namespace gui
         app::ApplicationDesktop *getAppDesktop() const;
 
       public:
-        explicit DesktopMainWindow(app::Application *app);
+        explicit DesktopMainWindow(app::ApplicationCommon *app);
 
         // virtual methods gui::Window
         bool onInput(const InputEvent &inputEvent) override;

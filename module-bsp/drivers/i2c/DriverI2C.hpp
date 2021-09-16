@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #ifndef PUREPHONE_DRIVERI2C_HPP
@@ -14,6 +14,8 @@ namespace drivers
     {
         I2C1,
         I2C2,
+        I2C3,
+        I2C4,
         COUNT
     };
 

@@ -9,7 +9,7 @@
 namespace app::alarmClock
 {
 
-    CustomRepeatModel::CustomRepeatModel(app::Application *app,
+    CustomRepeatModel::CustomRepeatModel(app::ApplicationCommon *app,
                                          std::shared_ptr<AbstractAlarmsRepository> alarmsRepository)
         : application(app), alarmsRepository{std::move(alarmsRepository)}
     {}

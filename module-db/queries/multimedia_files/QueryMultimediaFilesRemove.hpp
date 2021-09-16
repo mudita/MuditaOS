@@ -18,14 +18,13 @@ namespace db::multimedia_files::query
         const uint32_t id;
     };
 
-    class RemoveResult : public QueryResult
+    class RemoveByPath : public Query
     {
-        const bool ret = true;
-
       public:
-        explicit RemoveResult(bool ret);
-        [[nodiscard]] auto getResult() const -> bool;
+        explicit RemoveByPath(const std::string &path);
         [[nodiscard]] auto debugInfo() const -> std::string override;
+
+        const std::string path;
     };
 
     class RemoveAll : public Query
@@ -35,12 +34,12 @@ namespace db::multimedia_files::query
         [[nodiscard]] auto debugInfo() const -> std::string override;
     };
 
-    class RemoveAllResult : public QueryResult
+    class RemoveResult : public QueryResult
     {
         const bool ret = true;
 
       public:
-        explicit RemoveAllResult(bool ret);
+        explicit RemoveResult(bool ret);
         [[nodiscard]] auto getResult() const -> bool;
         [[nodiscard]] auto debugInfo() const -> std::string override;
     };

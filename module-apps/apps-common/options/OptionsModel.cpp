@@ -1,10 +1,11 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include <ApplicationCommon.hpp>
 #include "ListView.hpp"
 #include "OptionsModel.hpp"
 
-OptionsModel::OptionsModel(app::Application *app) : application(app)
+OptionsModel::OptionsModel(app::ApplicationCommon *app) : application(app)
 {}
 
 auto OptionsModel::requestRecordsCount() -> unsigned int

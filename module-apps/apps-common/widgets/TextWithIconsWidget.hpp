@@ -7,7 +7,7 @@
 #include <ImageBox.hpp>
 namespace app
 {
-    class Application;
+    class ApplicationCommon;
 }
 
 namespace gui
@@ -15,7 +15,7 @@ namespace gui
 
     class TextWithIconsWidget : public HBox
     {
-        app::Application *app = nullptr;
+        app::ApplicationCommon *app = nullptr;
 
       public:
         explicit TextWithIconsWidget(gui::Item *parent);

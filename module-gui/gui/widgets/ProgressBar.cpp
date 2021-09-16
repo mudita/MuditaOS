@@ -139,7 +139,7 @@ namespace gui
     {
         using namespace trigonometry;
 
-        progressArc->setSweepAngle(getPercentageValue() * FullAngle);
+        progressArc->setSweepAngle(std::ceil(getPercentageValue() * FullAngle));
         progressIndicator->setCenter(calculateProgressIndicatorCenter());
 
         Circle::buildDrawListImplementation(commands);

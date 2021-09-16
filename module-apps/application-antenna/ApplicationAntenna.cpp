@@ -148,21 +148,16 @@ namespace app
         return ret;
     }
 
-    sys::ReturnCodes ApplicationAntenna::DeinitHandler()
-    {
-        return sys::ReturnCodes::Success;
-    }
-
     void ApplicationAntenna::createUserInterface()
     {
         using namespace gui::name::window;
-        windowsFactory.attach(main_window, [](Application *app, const std::string &name) {
+        windowsFactory.attach(main_window, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::AntennaMainWindow>(app);
         });
-        windowsFactory.attach(scan_window, [](Application *app, const std::string &name) {
+        windowsFactory.attach(scan_window, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::ScanModesWindow>(app);
         });
-        windowsFactory.attach(algo_window, [](Application *app, const std::string &name) {
+        windowsFactory.attach(algo_window, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::AlgoParamsWindow>(app);
         });
 

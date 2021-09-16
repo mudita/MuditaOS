@@ -13,7 +13,8 @@
 namespace gui
 {
 
-    ApnSettingsWindow::ApnSettingsWindow(app::Application *app) : OptionWindow(app, gui::window::name::apn_settings)
+    ApnSettingsWindow::ApnSettingsWindow(app::ApplicationCommon *app)
+        : OptionWindow(app, gui::window::name::apn_settings)
     {
         buildInterface();
     }
@@ -28,7 +29,7 @@ namespace gui
                                  style::window::default_vertical_pos,
                                  style::window_width,
                                  style::window_height - style::window::default_vertical_pos - style::footer::height,
-                                 "phonebook_empty_grey_circle_W_G",
+                                 "empty_list_add_W_G",
                                  utils::translate("app_settings_apn_settings_no_apns"));
 
         bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::options));

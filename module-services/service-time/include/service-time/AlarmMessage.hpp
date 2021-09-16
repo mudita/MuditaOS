@@ -98,9 +98,10 @@ namespace alarms
     class AlarmsGetInRangeResponseMessage : public AlarmResponse
     {
       public:
-        AlarmsGetInRangeResponseMessage(std::vector<AlarmEventRecord> alarms = std::vector<AlarmEventRecord>())
-            : alarms(alarms){};
+        explicit AlarmsGetInRangeResponseMessage(std::pair<std::vector<AlarmEventRecord>, std::uint32_t> p)
+            : alarms(std::move(p.first)), count(p.second){};
         std::vector<AlarmEventRecord> alarms;
+        const std::uint32_t count = 0;
     };
 
     class AlarmGetNextSingleEventsRequestMessage : public AlarmMessage
@@ -116,6 +117,36 @@ namespace alarms
             std::vector<SingleEventRecord> singleEvents = std::vector<SingleEventRecord>())
             : singleEvents(singleEvents){};
         std::vector<SingleEventRecord> singleEvents;
+    };
+
+    class RingingAlarmTurnOffRequestMessage : public AlarmMessage
+    {
+      public:
+        explicit RingingAlarmTurnOffRequestMessage(const std::uint32_t id = 0) : id(id){};
+        const std::uint32_t id;
+    };
+
+    class RingingAlarmTurnOffResponseMessage : public AlarmResponse
+    {
+      public:
+        explicit RingingAlarmTurnOffResponseMessage(const bool success = false) : success(success){};
+        const bool success;
+    };
+
+    class RingingAlarmSnoozeRequestMessage : public AlarmMessage
+    {
+      public:
+        RingingAlarmSnoozeRequestMessage(const std::uint32_t id, const TimePoint nextAlarmTime = TIME_POINT_INVALID)
+            : id(id), nextAlarmTime(nextAlarmTime){};
+        const std::uint32_t id;
+        const TimePoint nextAlarmTime;
+    };
+
+    class RingingAlarmSnoozeResponseMessage : public AlarmResponse
+    {
+      public:
+        explicit RingingAlarmSnoozeResponseMessage(const bool success = false) : success(success){};
+        const bool success;
     };
 
 } // namespace alarms

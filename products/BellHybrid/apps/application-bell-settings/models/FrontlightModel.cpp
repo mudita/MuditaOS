@@ -22,7 +22,8 @@ namespace
 
 namespace app::bell_settings
 {
-    FrontlightModel::FrontlightModel(app::Application *app, app::settingsInterface::BellScreenLightSettings *slSettings)
+    FrontlightModel::FrontlightModel(app::ApplicationCommon *app,
+                                     app::settingsInterface::BellScreenLightSettings *slSettings)
         : application(app), screenLightSettings(slSettings)
     {
         settings.init(service::ServiceProxy{application->weak_from_this()});

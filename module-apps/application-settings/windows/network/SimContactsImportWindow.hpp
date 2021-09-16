@@ -13,7 +13,7 @@ namespace gui
     class SimContactsImportWindow : public AppWindow, public SimContactsImportWindowContract::View
     {
       public:
-        SimContactsImportWindow(app::Application *app,
+        SimContactsImportWindow(app::ApplicationCommon *app,
                                 std::unique_ptr<SimContactsImportWindowContract::Presenter> presenter);
 
       private:

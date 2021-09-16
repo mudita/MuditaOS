@@ -14,10 +14,12 @@
 #include <utf8/UTF8.hpp>
 
 #include <chrono>
+#include <functional>
 
 namespace app
 {
-    class Application;
+    class AbstractTimeModel;
+    class ApplicationCommon;
 }
 
 namespace gui
@@ -25,9 +27,13 @@ namespace gui
     class AppWindow;
 }
 
+namespace db
+{
+    class NotificationMessage;
+}
+
 namespace app::home_screen
 {
-    class AbstractTimeModel;
     class AbstractController;
     class AbstractTemperatureModel;
 
@@ -69,10 +75,12 @@ namespace app::home_screen
         virtual void handleUpdateTimeEvent()                                        = 0;
         virtual bool handleInputEvent(const gui::InputEvent &inputEvent)            = 0;
         virtual void onBeforeShow()                                                 = 0;
+        virtual void onDatabaseMessage(db::NotificationMessage *msg)                = 0;
         virtual void refreshWindow()                                                = 0;
         virtual void spawnTimer(std::chrono::milliseconds timeout = defaultTimeout) = 0;
         virtual void detachTimer()                                                  = 0;
         virtual void handleAlarmRingingEvent()                                      = 0;
+        virtual void handleAlarmModelReady()                                        = 0;
 
         static constexpr auto defaultTimeout = std::chrono::milliseconds{5000};
     };
@@ -80,7 +88,7 @@ namespace app::home_screen
     class HomeScreenPresenter : public AbstractPresenter
     {
       public:
-        HomeScreenPresenter(Application *app,
+        HomeScreenPresenter(ApplicationCommon *app,
                             std::unique_ptr<AbstractAlarmModel> alarmModel,
                             std::unique_ptr<AbstractTemperatureModel> temperatureModel,
                             std::unique_ptr<AbstractTimeModel> timeModel);
@@ -95,14 +103,16 @@ namespace app::home_screen
         void handleUpdateTimeEvent() override;
         bool handleInputEvent(const gui::InputEvent &inputEvent) override;
         void onBeforeShow() override;
+        void onDatabaseMessage(db::NotificationMessage *msg) override;
         void refreshWindow() override;
 
-        void spawnTimer(std::chrono::milliseconds timeout) override;
+        void spawnTimer(std::chrono::milliseconds timeout = defaultTimeout) override;
         void detachTimer() override;
         void handleAlarmRingingEvent() override;
+        void handleAlarmModelReady() override;
 
       private:
-        Application *app;
+        ApplicationCommon *app;
         sys::TimerHandle timer;
         std::unique_ptr<AbstractAlarmModel> alarmModel;
         std::unique_ptr<AbstractTemperatureModel> temperatureModel;

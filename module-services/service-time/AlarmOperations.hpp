@@ -4,23 +4,27 @@
 #pragma once
 
 #include "AlarmRepository.hpp"
+#include "SnoozedAlarmEventRecord.hpp"
 
 #include <service-time/AlarmHandlerFactory.hpp>
 
 #include <module-db/Interface/AlarmEventRecord.hpp>
 
+#include <Service/Service.hpp>
+
 namespace alarms
 {
-
     class IAlarmOperations
     {
       public:
         using OnGetAlarmProcessed         = std::function<void(AlarmEventRecord)>;
-        using OnGetAlarmsInRangeProcessed = std::function<void(std::vector<AlarmEventRecord>)>;
+        using OnGetAlarmsInRangeProcessed = std::function<void(std::pair<std::vector<AlarmEventRecord>, uint32_t>)>;
         using OnAddAlarmProcessed         = std::function<void(bool)>;
         using OnUpdateAlarmProcessed      = std::function<void(bool)>;
         using OnRemoveAlarmProcessed      = std::function<void(bool)>;
         using OnGetNextSingleProcessed    = std::function<void(std::vector<SingleEventRecord>)>;
+        using OnSnoozeRingingAlarm        = std::function<void(bool)>;
+        using OnTurnOffRingingAlarm       = std::function<void(bool)>;
 
         virtual ~IAlarmOperations() noexcept = default;
 
@@ -38,16 +42,31 @@ namespace alarms
                                       std::uint32_t limit,
                                       OnGetAlarmsInRangeProcessed callback)                    = 0;
         virtual void getNextSingleEvents(TimePoint start, OnGetNextSingleProcessed callback)   = 0;
+        virtual void turnOffRingingAlarm(const std::uint32_t id, OnTurnOffRingingAlarm callback)   = 0;
+        virtual void snoozeRingingAlarm(const std::uint32_t id,
+                                        const TimePoint nextAlarmTime,
+                                        OnSnoozeRingingAlarm callback)                             = 0;
         virtual void minuteUpdated(TimePoint now)                                                  = 0;
         virtual void addAlarmExecutionHandler(const alarms::AlarmType type,
                                               const std::shared_ptr<alarms::AlarmHandler> handler) = 0;
     };
 
-    class AlarmOperations : public IAlarmOperations
+    class IAlarmOperationsFactory
     {
       public:
-        explicit AlarmOperations(std::unique_ptr<AbstractAlarmEventsRepository> &&alarmEventsRepo,
-                                 GetCurrentTime getCurrentTimeCallback);
+        virtual ~IAlarmOperationsFactory() noexcept = default;
+
+        virtual std::unique_ptr<IAlarmOperations> create(
+            sys::Service *service,
+            std::unique_ptr<AbstractAlarmEventsRepository> &&alarmEventsRepo,
+            IAlarmOperations::GetCurrentTime getCurrentTimeCallback) const = 0;
+    };
+
+    class AlarmOperationsCommon : public IAlarmOperations
+    {
+      public:
+        AlarmOperationsCommon(std::unique_ptr<AbstractAlarmEventsRepository> &&alarmEventsRepo,
+                              GetCurrentTime getCurrentTimeCallback);
 
         void updateEventsCache(TimePoint now) override;
 
@@ -61,17 +80,29 @@ namespace alarms
                               std::uint32_t limit,
                               OnGetAlarmsInRangeProcessed callback) override;
         void getNextSingleEvents(TimePoint start, OnGetNextSingleProcessed callback) override;
+        void turnOffRingingAlarm(const std::uint32_t id, OnTurnOffRingingAlarm callback) override;
+        void snoozeRingingAlarm(const std::uint32_t id,
+                                const TimePoint nextAlarmTime,
+                                OnSnoozeRingingAlarm callback) override;
         void minuteUpdated(TimePoint now) override;
         void addAlarmExecutionHandler(const alarms::AlarmType type,
                                       const std::shared_ptr<alarms::AlarmHandler> handler) override;
 
-      private:
+      protected:
         std::unique_ptr<AbstractAlarmEventsRepository> alarmEventsRepo;
         AlarmHandlerFactory alarmHandlerFactory;
 
         // Events we are waiting for (on one timepoint)
-        std::vector<SingleEventRecord> nextSingleEvents;
+        std::vector<std::unique_ptr<SingleEventRecord>> nextSingleEvents;
+        std::vector<std::unique_ptr<SingleEventRecord>> ongoingSingleEvents;
+        std::vector<std::unique_ptr<SnoozedAlarmEventRecord>> snoozedSingleEvents;
 
+        alarms::AlarmType getAlarmEventType(const SingleEventRecord &event);
+        void handleAlarmEvent(const std::shared_ptr<AlarmEventRecord> &event,
+                              alarms::AlarmType alarmType,
+                              bool newStateOn);
+
+      private:
         GetCurrentTime getCurrentTimeCallback;
 
         // Max 100 alarms for one minute seems reasonable, next events will be dropped
@@ -89,7 +120,20 @@ namespace alarms
                                                std::vector<AlarmEventRecord> records);
 
         void checkAndUpdateCache(AlarmEventRecord record);
-        void executeAlarm(const SingleEventRecord &singleAlarmEvent);
+        void switchAlarmExecution(const SingleEventRecord &singleAlarmEvent, bool newStateOn);
+        void processEvents(TimePoint now);
+        void processNextEventsQueue(const TimePoint now);
+        void processSnoozedEventsQueue(const TimePoint now);
+
         TimePoint getCurrentTime();
+    };
+
+    class CommonAlarmOperationsFactory : public IAlarmOperationsFactory
+    {
+      public:
+        std::unique_ptr<IAlarmOperations> create(
+            sys::Service *service,
+            std::unique_ptr<AbstractAlarmEventsRepository> &&alarmEventsRepo,
+            IAlarmOperations::GetCurrentTime getCurrentTimeCallback) const override;
     };
 } // namespace alarms

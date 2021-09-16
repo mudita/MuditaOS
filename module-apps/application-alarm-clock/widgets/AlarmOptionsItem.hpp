@@ -2,7 +2,8 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-#include "Application.hpp"
+
+#include <apps-common/ApplicationCommon.hpp>
 #include "AlarmInternalListItem.hpp"
 #include "application-alarm-clock/data/AlarmsData.hpp"
 #include <apps-common/AudioOperations.hpp>
@@ -18,12 +19,13 @@ namespace gui
 
     class AlarmOptionsItem : public AlarmInternalListItem
     {
+      protected:
         enum class MusicStatus
         {
             Stop,
             Play
         };
-        app::Application *application = nullptr;
+        app::ApplicationCommon *application = nullptr;
         gui::VBox *vBox               = nullptr;
         gui::HBox *hBox               = nullptr;
         gui::Label *optionLabel       = nullptr;
@@ -50,7 +52,7 @@ namespace gui
         std::vector<tags::fetcher::Tags> getMusicFilesList();
 
       public:
-        AlarmOptionsItem(app::Application *app,
+        AlarmOptionsItem(app::ApplicationCommon *app,
                          AlarmOptionItemName itemName,
                          std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr,
                          std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr);

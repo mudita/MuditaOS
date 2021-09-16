@@ -18,7 +18,8 @@
 namespace gui
 {
 
-    BellMainMenuWindow::BellMainMenuWindow(app::Application *app) : OptionWindow(app, gui::window::name::bell_main_menu)
+    BellMainMenuWindow::BellMainMenuWindow(app::ApplicationCommon *app)
+        : OptionWindow(app, gui::window::name::bell_main_menu)
     {
         addOptions(mainMenuOptionsList());
         buildInterface();

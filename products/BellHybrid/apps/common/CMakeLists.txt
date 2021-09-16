@@ -2,29 +2,42 @@ add_library(application-bell-common STATIC)
 add_library(bell::app-common ALIAS application-bell-common)
 
 target_include_directories(application-bell-common
-        PRIVATE
+    PRIVATE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/common>
-        PUBLIC
+    PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        )
+)
 
 target_sources(application-bell-common
-        PRIVATE
+    PRIVATE
         src/AlarmModel.cpp
-
-        PUBLIC
-        include/common/models/AlarmModel.hpp
+        src/TimeModel.cpp
+        src/BellFinishedWindow.cpp
+        src/BellSideListItemWithCallbacks.cpp
+        src/SnoozeSettingsModel.cpp
+        src/TimeUtils.cpp
+        src/popups/AlarmActivatedWindow.cpp
+        src/popups/AlarmDeactivatedWindow.cpp
+    PUBLIC
+        include/common/BellFinishedWindow.hpp
+        include/common/TimeUtils.hpp
         include/common/models/AbstractAlarmModel.hpp
-
-        )
-
+        include/common/models/AlarmModel.hpp
+        include/common/models/SnoozeSettingsModel.hpp
+        include/common/models/TimeModel.hpp
+        include/common/popups/AlarmActivatedWindow.hpp
+        include/common/popups/AlarmDeactivatedWindow.hpp
+        include/common/widgets/BellSideListItemWithCallbacks.hpp
+)
 
 target_link_libraries(application-bell-common
-        PUBLIC
+    PUBLIC
         apps-common
+        service-db
 
-        PRIVATE
+    PRIVATE
+        bell::db
         module-gui
         service-time
-
+        bell::db
         )

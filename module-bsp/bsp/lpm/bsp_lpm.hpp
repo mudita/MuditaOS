@@ -45,6 +45,12 @@ namespace bsp
         virtual void EnableDcdcPowerSaveMode()  = 0;
         virtual void DisableDcdcPowerSaveMode() = 0;
 
+        virtual void DisconnectInternalLoadResistor()  = 0;
+        virtual void ConnectInternalLoadResistor() = 0;
+
+        virtual void SwitchToRegularModeLDO()  = 0;
+        virtual void SwitchToLowPowerModeLDO() = 0;
+
       protected:
         CpuFrequencyHz currentFrequency = CpuFrequencyHz::Level_6;
     };

@@ -3,13 +3,14 @@
 
 #include "include/application-bell-main/ApplicationBellMain.hpp"
 #include "models/TemperatureModel.hpp"
-#include "models/TimeModel.hpp"
 #include "presenters/HomeScreenPresenter.hpp"
 
 #include "windows/BellHomeScreenWindow.hpp"
 #include "windows/BellMainMenuWindow.hpp"
 
 #include <common/models/AlarmModel.hpp>
+#include <common/models/TimeModel.hpp>
+#include <service-db/DBNotificationMessage.hpp>
 #include <windows/Dialog.hpp>
 
 namespace app
@@ -20,7 +21,13 @@ namespace app
                                              sys::bluetooth::BluetoothMode bluetoothMode,
                                              StartInBackground startInBackground)
         : Application(name, parent, mode, bluetoothMode, startInBackground)
-    {}
+    {
+        bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
+        addActionReceiver(manager::actions::ShowAlarm, [this](auto &&data) {
+            switchWindow(gui::name::window::main_window, std::move(data));
+            return actionHandled();
+        });
+    }
 
     sys::ReturnCodes ApplicationBellMain::InitHandler()
     {
@@ -36,8 +43,8 @@ namespace app
 
     void ApplicationBellMain::createUserInterface()
     {
-        windowsFactory.attach(gui::name::window::main_window, [](Application *app, const std::string &name) {
-            auto timeModel        = std::make_unique<app::home_screen::TimeModel>();
+        windowsFactory.attach(gui::name::window::main_window, [](ApplicationCommon *app, const std::string &name) {
+            auto timeModel        = std::make_unique<app::TimeModel>();
             auto temperatureModel = std::make_unique<app::home_screen::TemperatureModel>(app);
             auto alarmModel       = std::make_unique<app::AlarmModel>(app);
             auto presenter        = std::make_unique<app::home_screen::HomeScreenPresenter>(
@@ -45,14 +52,16 @@ namespace app
             return std::make_unique<gui::BellHomeScreenWindow>(app, std::move(presenter));
         });
 
-        windowsFactory.attach(gui::window::name::bell_main_menu, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::bell_main_menu, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::BellMainMenuWindow>(app);
         });
 
         // for demo only - to be removed
-        windowsFactory.attach(gui::window::name::bell_main_menu_dialog, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::Dialog>(app, name);
-        });
+        windowsFactory.attach(
+            gui::window::name::bell_main_menu_dialog,
+            [](ApplicationCommon *app, const std::string &name) { return std::make_unique<gui::Dialog>(app, name); });
+
+        attachPopups({gui::popup::ID::AlarmActivated, gui::popup::ID::AlarmDeactivated});
     }
 
     sys::MessagePointer ApplicationBellMain::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
@@ -62,18 +71,19 @@ namespace app
         if (respMessage != nullptr && respMessage->retCode == sys::ReturnCodes::Success) {
             return retMsg;
         }
-        if (resp != nullptr) {
-            if (auto command = callbackStorage->getCallback(resp); command->execute()) {
-                refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+        auto msg = dynamic_cast<db::NotificationMessage *>(msgl);
+        if (msg != nullptr) {
+            for (auto &[name, window] : windowsStack.windows) {
+                window->onDatabaseMessage(msg);
             }
             return sys::msgHandled();
         }
-        return std::make_shared<sys::ResponseMessage>();
+        return handleAsyncResponse(resp);
     }
 
     void ApplicationBellMain::showPopup(gui::popup::ID id, const gui::PopupRequestParams *params)
     {
-        if (id == gui::popup::ID::AlarmActivated) {
+        if (id == gui::popup::ID::AlarmActivated || id == gui::popup::ID::AlarmDeactivated) {
             if (not isHomeScreenFocused()) {
                 switchWindow(gui::popup::resolveWindowName(id));
             }

@@ -19,7 +19,11 @@
 #include "DeviceManager.hpp"
 #include <chrono>
 #include <vector>
-#include <apps-common/Application.hpp>
+
+namespace app
+{
+    class ApplicationCommon;
+}
 
 namespace sys
 {
@@ -39,6 +43,7 @@ namespace sys
         Restore,
         Reboot,
         RebootToUpdate,
+        FactoryReset,
         None,
     };
 
@@ -92,6 +97,8 @@ namespace sys
 
         static bool Restore(Service *s);
 
+        static bool FactoryReset(Service *s);
+
         static bool Reboot(Service *s);
 
         static bool RebootToUpdate(Service *s, UpdateReason updateReason);
@@ -103,7 +110,9 @@ namespace sys
         /// Runs a service
         static bool RunSystemService(std::shared_ptr<Service> service, Service *caller, TickType_t timeout = 5000);
         /// Runs an application
-        static bool RunApplication(std::shared_ptr<app::Application> app, Service *caller, TickType_t timeout = 5000);
+        static bool RunApplication(std::shared_ptr<app::ApplicationCommon> app,
+                                   Service *caller,
+                                   TickType_t timeout = 5000);
 
         /// Destroy existing service
         /// @note there is no fallback
@@ -190,7 +199,7 @@ namespace sys
         std::shared_ptr<sys::CpuSentinel> cpuSentinel;
 
         static std::vector<std::shared_ptr<Service>> servicesList;
-        static std::vector<std::shared_ptr<app::Application>> applicationsList;
+        static std::vector<std::shared_ptr<app::ApplicationCommon>> applicationsList;
         static cpp_freertos::MutexStandard serviceDestroyMutex;
         static cpp_freertos::MutexStandard appDestroyMutex;
         static std::unique_ptr<PowerManager> powerManager;

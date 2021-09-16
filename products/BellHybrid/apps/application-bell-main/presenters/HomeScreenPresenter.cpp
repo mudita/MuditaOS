@@ -4,16 +4,17 @@
 #include "HomeScreenPresenter.hpp"
 #include "StateController.hpp"
 #include "models/TemperatureModel.hpp"
-#include "models/TimeModel.hpp"
 
-#include <apps-common/Application.hpp>
+#include <apps-common/ApplicationCommon.hpp>
+#include <common/models/TimeModel.hpp>
 #include <module-sys/Timers/SystemTimer.hpp>
 #include <module-sys/Timers/TimerFactory.hpp>
 #include <time/time_constants.hpp>
+#include <service-db/DBNotificationMessage.hpp>
 
 namespace app::home_screen
 {
-    HomeScreenPresenter::HomeScreenPresenter(Application *app,
+    HomeScreenPresenter::HomeScreenPresenter(ApplicationCommon *app,
                                              std::unique_ptr<AbstractAlarmModel> alarmModel,
                                              std::unique_ptr<AbstractTemperatureModel> temperatureModel,
                                              std::unique_ptr<AbstractTimeModel> timeModel)
@@ -41,7 +42,7 @@ namespace app::home_screen
     {
         if (not timer.isValid()) {
             auto callback = [this](sys::Timer &) { stateController->handleTimerEvent(); };
-            timer         = sys::TimerFactory::createSingleShotTimer(app, timerName, defaultTimeout, callback);
+            timer         = sys::TimerFactory::createSingleShotTimer(app, timerName, timeout, callback);
         }
         timer.stop();
         timer.start();
@@ -62,6 +63,7 @@ namespace app::home_screen
 
     void HomeScreenPresenter::onBeforeShow()
     {
+        alarmModel->update([&]() { handleAlarmModelReady(); });
         getView()->setTimeFormat(timeModel->getTimeFormat());
         getView()->setTime(timeModel->getCurrentTime());
         getView()->setAlarmTimeFormat(timeModel->getTimeFormat());
@@ -76,5 +78,16 @@ namespace app::home_screen
     void HomeScreenPresenter::refreshWindow()
     {
         app->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+    }
+    void HomeScreenPresenter::onDatabaseMessage(db::NotificationMessage *msg)
+    {
+        if (msg->interface == db::Interface::Name::AlarmEvents && msg->type == db::Query::Type::Update) {
+            alarmModel->update();
+        }
+    }
+    void HomeScreenPresenter::handleAlarmModelReady()
+    {
+        getView()->setAlarmTime(alarmModel->getAlarmTime());
+        stateController->handleAlarmModelReady();
     }
 } // namespace app::home_screen

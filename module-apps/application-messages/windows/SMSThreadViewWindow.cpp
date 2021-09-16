@@ -20,7 +20,7 @@
 namespace gui
 {
 
-    SMSThreadViewWindow::SMSThreadViewWindow(app::Application *app)
+    SMSThreadViewWindow::SMSThreadViewWindow(app::ApplicationCommon *app)
         : AppWindow(app, name::window::thread_view), app::AsyncCallbackReceiver{app},
           smsModel{std::make_shared<SMSThreadModel>(app)}
     {

@@ -10,7 +10,6 @@ set(SOURCES
         backlight-handler/BacklightHandler.cpp
         battery-brownout-detector/BatteryBrownoutDetector.cpp
         screen-light-control/ControlFunctions.cpp
-        screen-light-control/ScreenLightControl.cpp
         screen-light-control/ScreenLightControlParameters.cpp
         vibra/Vibra.cpp
 )

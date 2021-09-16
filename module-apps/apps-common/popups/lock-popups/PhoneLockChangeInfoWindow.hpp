@@ -14,7 +14,7 @@ namespace gui
         Icon *infoIcon = nullptr;
 
       public:
-        PhoneLockChangeInfoWindow(app::Application *app, const std::string &name);
+        PhoneLockChangeInfoWindow(app::ApplicationCommon *app, const std::string &name);
 
         void buildInterface() override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;

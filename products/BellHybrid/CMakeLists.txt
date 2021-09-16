@@ -37,26 +37,25 @@ set_target_properties(BellHybrid
 
 target_link_libraries(BellHybrid
     PRIVATE
+        appmgr
         bell::app-alarm
+        bell::app-common
         bell::app-main
-        bell::app-settings
         bell::app-powernap
         bell::app-meditation-timer
         appmgr
-        db
+        bell::app-settings
+        bell::db
         evtmgr
         messagetype
-        module-apps
         module-bsp
         module-vfs
         service-audio
-        service-bluetooth
         service-desktop
-        service-lwip
         service-time
         sys
+        bell::time
         platform
-        ${LWIP_LIBRARIES}
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_Linux>:iosyscalls>"
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_RT1051>:CrashCatcher::CrashCatcher>"
     )

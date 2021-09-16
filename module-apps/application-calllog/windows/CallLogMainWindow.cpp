@@ -24,7 +24,7 @@ using namespace callLogStyle;
 namespace gui
 {
 
-    CallLogMainWindow::CallLogMainWindow(app::Application *app)
+    CallLogMainWindow::CallLogMainWindow(app::ApplicationCommon *app)
         : AppWindow(app, calllog::settings::MainWindowStr), calllogModel{std::make_shared<CalllogModel>(app)}
     {
 
@@ -58,6 +58,18 @@ namespace gui
                                  gui::listview::ScrollBarType::Fixed);
 
         setFocusItem(list);
+
+        emptyListIcon =
+            new gui::Icon(this,
+                          0,
+                          ::style::window::default_vertical_pos,
+                          ::style::window_width,
+                          ::style::window_height - ::style::window::default_vertical_pos - ::style::footer::height,
+                          "info_icon_W_G",
+                          utils::translate("app_calllog_no_calls"));
+
+        list->emptyListCallback    = [this]() { onEmptyList(); };
+        list->notEmptyListCallback = [this]() { onListFilled(); };
     }
 
     void CallLogMainWindow::destroyInterface()
@@ -85,5 +97,21 @@ namespace gui
             }
         }
         return false;
+    }
+
+    void CallLogMainWindow::onEmptyList()
+    {
+        bottomBar->setActive(gui::BottomBar::Side::LEFT, false);
+        bottomBar->setActive(gui::BottomBar::Side::CENTER, false);
+        emptyListIcon->setVisible(true);
+        application->refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
+    }
+
+    void CallLogMainWindow::onListFilled()
+    {
+        bottomBar->setActive(gui::BottomBar::Side::LEFT, true);
+        bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
+        emptyListIcon->setVisible(false);
+        application->refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
     }
 } /* namespace gui */

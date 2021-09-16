@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -33,5 +33,5 @@ struct ContactsMapData
 {
     std::map<std::string, std::uint32_t> firstLetterDictionary;
     std::uint32_t favouritesCount;
-    std::uint32_t itemCount;
+    std::uint32_t itemCount = 0;
 };

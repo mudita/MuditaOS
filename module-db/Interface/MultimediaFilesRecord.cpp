@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MultimediaFilesRecord.hpp"
+#include "BaseInterface.hpp"
 
 #include <Databases/MultimediaFilesDB.hpp>
 #include <queries/multimedia_files/QueryMultimediaFilesAdd.hpp>
@@ -38,6 +39,9 @@ namespace db::multimedia_files
         if (typeid(*query) == typeid(query::Remove)) {
             return runQueryImplRemove(std::static_pointer_cast<query::Remove>(query));
         }
+        if (typeid(*query) == typeid(query::RemoveByPath)) {
+            return runQueryImplRemoveByPath(std::static_pointer_cast<query::RemoveByPath>(query));
+        }
         if (typeid(*query) == typeid(query::RemoveAll)) {
             return runQueryImplRemoveAll(std::static_pointer_cast<query::RemoveAll>(query));
         }
@@ -68,6 +72,12 @@ namespace db::multimedia_files
         if (typeid(*query) == typeid(query::GetCountForAlbum)) {
             return runQueryImplGetCount(std::static_pointer_cast<query::GetCountForAlbum>(query));
         }
+        if (typeid(*query) == typeid(query::AddOrEdit)) {
+            return runQueryImplAddOrEdit(std::static_pointer_cast<query::AddOrEdit>(query));
+        }
+        if (typeid(*query) == typeid(query::GetByPath)) {
+            return runQueryImplGetByPath(std::static_pointer_cast<query::GetByPath>(query));
+        }
 
         return nullptr;
     }
@@ -78,6 +88,16 @@ namespace db::multimedia_files
         const auto result = database->files.add(query->getRecord());
 
         auto response = std::make_unique<query::AddResult>(result);
+        response->setRequestQuery(query);
+        return response;
+    }
+
+    std::unique_ptr<query::AddOrEditResult> MultimediaFilesRecordInterface::runQueryImplAddOrEdit(
+        const std::shared_ptr<query::AddOrEdit> &query)
+    {
+        const auto result = database->files.addOrUpdate(query->getRecord(), query->getOldPath());
+
+        auto response = std::make_unique<query::AddOrEditResult>(result);
         response->setRequestQuery(query);
         return response;
     }
@@ -96,6 +116,16 @@ namespace db::multimedia_files
         const std::shared_ptr<query::Get> &query)
     {
         const auto record = database->files.getById(query->id);
+
+        auto response = std::make_unique<query::GetResult>(record);
+        response->setRequestQuery(query);
+        return response;
+    }
+
+    std::unique_ptr<query::GetResult> MultimediaFilesRecordInterface::runQueryImplGetByPath(
+        const std::shared_ptr<query::GetByPath> &query)
+    {
+        const auto record = database->files.getByPath(query->path);
 
         auto response = std::make_unique<query::GetResult>(record);
         response->setRequestQuery(query);
@@ -122,11 +152,20 @@ namespace db::multimedia_files
         return response;
     }
 
-    std::unique_ptr<query::RemoveAllResult> MultimediaFilesRecordInterface::runQueryImplRemoveAll(
+    std::unique_ptr<query::RemoveResult> MultimediaFilesRecordInterface::runQueryImplRemoveByPath(
+        const std::shared_ptr<query::RemoveByPath> &query)
+    {
+        const bool ret = database->files.removeByField(TableFields::path, query->path.c_str());
+        auto response  = std::make_unique<query::RemoveResult>(ret);
+        response->setRequestQuery(query);
+        return response;
+    }
+
+    std::unique_ptr<query::RemoveResult> MultimediaFilesRecordInterface::runQueryImplRemoveAll(
         const std::shared_ptr<query::RemoveAll> &query)
     {
         const bool ret = database->files.removeAll();
-        auto response  = std::make_unique<query::RemoveAllResult>(ret);
+        auto response  = std::make_unique<query::RemoveResult>(ret);
         response->setRequestQuery(query);
         return response;
     }

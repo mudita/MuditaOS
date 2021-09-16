@@ -3,18 +3,18 @@
 
 #include "TemperatureUnitModel.hpp"
 
-#include <apps-common/Application.hpp>
+#include <apps-common/ApplicationCommon.hpp>
 #include <service-db/Settings.hpp>
-#include <service-db/agents/settings/SystemSettings.hpp>
+#include <db/SystemSettings.hpp>
 
 namespace
 {
-    constexpr auto temperatureUnit = settings::Temperature::unit;
+    constexpr auto temperatureUnit = bell::settings::Temperature::unit;
 } // namespace
 
 namespace app::bell_settings
 {
-    TemperatureUnitModel::TemperatureUnitModel(app::Application *app)
+    TemperatureUnitModel::TemperatureUnitModel(app::ApplicationCommon *app)
     {
         settings.init(service::ServiceProxy{app->weak_from_this()});
     }

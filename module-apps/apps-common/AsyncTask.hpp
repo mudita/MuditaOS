@@ -10,7 +10,7 @@
 
 namespace app
 {
-    class Application; // Forward declaration
+    class ApplicationCommon; // Forward declaration
 
     using RequestId = std::uint64_t;
     class AsyncCallbackReceiver;
@@ -57,7 +57,7 @@ namespace app
          * @param application       Application
          * @param receiverObject    The context of receiver
          */
-        void execute(Application *application,
+        void execute(ApplicationCommon *application,
                      AsyncCallbackReceiver::Ptr receiverObject,
                      std::optional<std::function<bool(sys::ResponseMessage *)>> callback = std::nullopt,
                      ReceiverBehavior receiverBehavior                                   = ReceiverBehavior::None);
@@ -68,7 +68,7 @@ namespace app
          * @param application   Application
          * @return Request identifier, to be matched with a response.
          */
-        [[nodiscard]] virtual auto onExecute(Application *application) -> RequestId = 0;
+        [[nodiscard]] virtual auto onExecute(ApplicationCommon *application) -> RequestId = 0;
     };
 
     /**
@@ -86,7 +86,7 @@ namespace app
         void setCallback(std::unique_ptr<db::QueryListener> &&listener) noexcept;
 
       private:
-        [[nodiscard]] auto onExecute(Application *application) -> RequestId override;
+        [[nodiscard]] auto onExecute(ApplicationCommon *application) -> RequestId override;
 
         std::unique_ptr<db::Query> query;
         db::Interface::Name target;
@@ -103,7 +103,7 @@ namespace app
         void setCallback(std::function<bool> &&callback) noexcept;
 
       private:
-        [[nodiscard]] auto onExecute(Application *application) -> RequestId override;
+        [[nodiscard]] auto onExecute(ApplicationCommon *application) -> RequestId override;
 
         std::unique_ptr<sys::DataMessage> message;
         std::string serviceName;

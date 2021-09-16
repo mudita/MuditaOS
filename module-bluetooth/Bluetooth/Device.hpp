@@ -5,6 +5,7 @@
 #include <array>
 #include <cstring>
 #include <module-bluetooth/lib/btstack/src/bluetooth.h>
+#include <btstack_util.h>
 #include <string>
 #include <utility>
 
@@ -73,6 +74,17 @@ static inline std::string getListOfSupportedServicesInString(uint32_t cod)
     return res;
 }
 
+enum class DeviceState
+{
+    Connected,
+    ConnectedAudio,
+    ConnectedVoice,
+    Connecting,
+    Pairing,
+    Paired,
+    Unknown
+};
+
 struct Devicei : public Device
 {
   public:
@@ -81,13 +93,31 @@ struct Devicei : public Device
     uint16_t clockOffset;
     uint32_t classOfDevice; ///> Class of Device/Service
     DEVICE_STATE state;
+    DeviceState deviceState;
 
-    Devicei(std::string name = "") : Device(std::move(name))
-    {}
+    explicit Devicei(std::string name = "") : Device(std::move(name))
+    {
+        memset(address, 0, sizeof(address));
+    }
     ~Devicei() override = default;
     void setAddress(bd_addr_t *addr)
     {
         memcpy(&address, addr, sizeof address);
+    }
+
+    inline bool operator==(const Devicei &cmpDevice) const
+    {
+        return (cmpDevice.name == name) && (bd_addr_cmp(cmpDevice.address, address) == 0);
+    }
+
+    inline bool operator!=(const Devicei &cmpDevice) const
+    {
+        return (cmpDevice.name != name) || (bd_addr_cmp(cmpDevice.address, address) != 0);
+    }
+
+    auto address_str() const -> const char *
+    {
+        return bd_addr_to_str(address);
     }
 };
 

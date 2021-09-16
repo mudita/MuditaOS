@@ -18,7 +18,7 @@ namespace gui
         Icon *emptyListIcon = nullptr;
 
       public:
-        explicit MusicPlayerAllSongsWindow(app::Application *app,
+        explicit MusicPlayerAllSongsWindow(app::ApplicationCommon *app,
                                            std::shared_ptr<app::music_player::SongsContract::Presenter> presenter);
 
         void onBeforeShow([[maybe_unused]] ShowMode mode, [[maybe_unused]] SwitchData *data) override;

@@ -8,7 +8,6 @@ target_sources(application-bell-main
         windows/BellMainMenuWindow.cpp
 
         models/TemperatureModel.cpp
-        models/TimeModel.cpp
 
         presenters/HomeScreenPresenter.cpp
         presenters/StateController.cpp
@@ -17,14 +16,13 @@ target_sources(application-bell-main
         windows/BellMainMenuWindow.hpp
 
         models/TemperatureModel.hpp
-        models/TimeModel.hpp
 
         presenters/HomeScreenPresenter.hpp
         presenters/StateController.hpp
+        presenters/StateControllerLogger.hpp
 
     PUBLIC
         include/application-bell-main/ApplicationBellMain.hpp
-        include/application-bell-main/data/AlarmRingingSwitchData.hpp
 )
 
 target_include_directories(application-bell-main
@@ -36,18 +34,21 @@ target_include_directories(application-bell-main
 
 target_link_libraries(application-bell-main
     PRIVATE
+        app
         apps-common
         bellgui
         i18n
         module-gui
         service-gui
         time
+        bell::db
         bell::evtmgr
-        bell::app-common
         bell::app-alarm
         bell::app-settings
         bell::app-powernap
         bell::app-meditation-timer
         bell::keymap
         ${TARGET_LIBRARIES}
+    PUBLIC
+        bell::app-common
 )

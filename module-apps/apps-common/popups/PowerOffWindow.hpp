@@ -13,7 +13,7 @@ namespace gui
         std::unique_ptr<PowerOffPresenter> presenter;
 
       public:
-        PowerOffWindow(app::Application *app, std::unique_ptr<PowerOffPresenter> &&presenter);
+        PowerOffWindow(app::ApplicationCommon *app, std::unique_ptr<PowerOffPresenter> &&presenter);
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
     };
 

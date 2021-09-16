@@ -10,7 +10,7 @@
 
 namespace app::onBoarding
 {
-    NoSimSelectedDialogWindow::NoSimSelectedDialogWindow(app::Application *app)
+    NoSimSelectedDialogWindow::NoSimSelectedDialogWindow(app::ApplicationCommon *app)
         : gui::Dialog(app, gui::window::name::onBoarding_no_sim_selected)
     {
         bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(style::strings::common::ok));

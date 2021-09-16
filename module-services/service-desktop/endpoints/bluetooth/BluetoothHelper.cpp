@@ -79,11 +79,15 @@ auto parserFSM::BluetoothHelper::processPostRequest(Context &context) -> sys::Re
     auto body = context.getBody();
     std::unique_ptr<sys::Message> msg;
     if (auto address = body[json::bluetooth::connect].string_value(); !address.empty()) {
-        msg = std::make_unique<::message::bluetooth::Connect>(std::move(address));
+        auto device = Devicei("DevMode device");
+        sscanf_bd_addr(address.c_str(), device.address);
+        msg = std::make_unique<::message::bluetooth::Connect>(device);
     }
     else if (auto address = body[json::bluetooth::pair].string_value(); !address.empty()) {
+        auto device = Devicei("DevMode device");
+        sscanf_bd_addr(address.c_str(), device.address);
         LOG_INFO("Requesting pairing form harness");
-        msg = std::make_unique<BluetoothPairMessage>(std::move(address));
+        msg = std::make_unique<BluetoothPairMessage>(device);
     }
 
     sendRequest(context, std::move(msg));
@@ -102,7 +106,9 @@ auto parserFSM::BluetoothHelper::processDeleteRequest(Context &context) -> sys::
     }
     else if (auto address = body[json::bluetooth::unpair].string_value(); !address.empty()) {
         LOG_INFO("Requesting pairing form harness");
-        msg = std::make_unique<::message::bluetooth::Unpair>(std::move(address));
+        auto device = Devicei("DevMode device");
+        sscanf_bd_addr(address.c_str(), device.address);
+        msg = std::make_unique<::message::bluetooth::Unpair>(device);
     }
     sendRequest(context, std::move(msg));
     MessageHandler::putToSendQueue(context.createSimpleResponse());

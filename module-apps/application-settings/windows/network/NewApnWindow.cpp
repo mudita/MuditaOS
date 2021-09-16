@@ -9,7 +9,7 @@
 namespace gui
 {
 
-    NewApnWindow::NewApnWindow(app::Application *app)
+    NewApnWindow::NewApnWindow(app::ApplicationCommon *app)
         : AppWindow(app, gui::window::name::new_apn),
           apn(std::make_shared<packet_data::APN::Config>()), newApnModel{std::make_shared<NewApnModel>(app)}
     {

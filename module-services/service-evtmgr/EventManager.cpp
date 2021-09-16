@@ -29,6 +29,8 @@
 #include <service-desktop/DesktopMessages.hpp>
 #include <service-time/Constants.hpp>
 #include <service-time/service-time/TimeMessage.hpp>
+#include <service-bluetooth/messages/Status.hpp>
+#include <application-settings/ApplicationSettings.hpp>
 
 #include <cassert>
 #include <fstream>
@@ -40,6 +42,7 @@
 #include <EventStore.hpp>
 #include <ticks.hpp>
 #include <purefs/filesystem_paths.hpp>
+#include <Constants.hpp>
 
 namespace
 {
@@ -74,17 +77,7 @@ sys::MessagePointer EventManagerCommon::DataReceivedHandler(sys::DataMessage *ms
 {
     bool handled = false;
 
-    if (msgl->messageType == MessageType::DBServiceNotification) {
-        auto *msg = dynamic_cast<db::NotificationMessage *>(msgl);
-        if (msg != nullptr) {
-            if (msg->interface == db::Interface::Name::Alarms) {
-                alarmDBEmpty = false;
-                alarmIsValid = false;
-                handled      = true;
-            }
-        }
-    }
-    else if (msgl->messageType == MessageType::EVM_GPIO) {
+    if (msgl->messageType == MessageType::EVM_GPIO) {
         LOG_DEBUG("EVM_GPIO msg");
     }
     else if (msgl->messageType == MessageType::EVMFocusApplication) {
@@ -101,6 +94,21 @@ sys::MessagePointer EventManagerCommon::DataReceivedHandler(sys::DataMessage *ms
         handled = true;
     }
     else if (auto msg = dynamic_cast<AudioEventRequest *>(msgl); msg) {
+        auto event = msg->getEvent();
+        switch (event->getType()) {
+        case audio::EventType::BlutoothA2DPDeviceState: {
+            auto message = std::make_shared<message::bluetooth::ProfileStatus>(
+                bluetooth::AudioProfile::A2DP, (event->getDeviceState() == audio::Event::DeviceState::Connected));
+            bus.sendUnicast(message, app::name_settings);
+        } break;
+        case audio::EventType::BlutoothHSPDeviceState: {
+            auto message = std::make_shared<message::bluetooth::ProfileStatus>(
+                bluetooth::AudioProfile::HSP, (event->getDeviceState() == audio::Event::DeviceState::Connected));
+            bus.sendUnicast(message, app::name_settings);
+        } break;
+        default:
+            break;
+        }
         AudioServiceAPI::SendEvent(this, msg->getEvent());
         handled = true;
     }

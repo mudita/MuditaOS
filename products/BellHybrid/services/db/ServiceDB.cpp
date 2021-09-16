@@ -5,11 +5,9 @@
 
 #include <module-db/Databases/EventsDB.hpp>
 #include <module-db/Interface/AlarmEventRecord.hpp>
-#include <module-db/Interface/AlarmsRecord.hpp>
 
 #include <service-db/DBServiceMessage.hpp>
 #include <service-db/agents/settings/SettingsAgent.hpp>
-#include <service-db/agents/file_indexer/FileIndexerAgent.hpp>
 #include <time/ScopedTime.hpp>
 
 #include <purefs/filesystem_paths.hpp>
@@ -74,7 +72,7 @@ sys::ReturnCodes ServiceDB::InitHandler()
     // Create record interfaces
     alarmEventRecordInterface = std::make_unique<AlarmEventRecordInterface>(eventsDB.get());
 
-    databaseAgents.emplace(std::make_unique<SettingsAgent>(this));
+    databaseAgents.emplace(std::make_unique<SettingsAgent>(this, "settings_bell.db"));
 
     for (auto &dbAgent : databaseAgents) {
         dbAgent->initDb();

@@ -17,7 +17,7 @@ namespace app::notes
     class NotePreviewWindow : public gui::AppWindow, public NotePreviewWindowContract::View
     {
       public:
-        NotePreviewWindow(app::Application *app,
+        NotePreviewWindow(app::ApplicationCommon *app,
                           std::unique_ptr<NotePreviewWindowContract::Presenter> &&windowPresenter);
         ~NotePreviewWindow() noexcept override;
 

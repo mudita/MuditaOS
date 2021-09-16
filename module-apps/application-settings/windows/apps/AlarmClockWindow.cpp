@@ -8,7 +8,7 @@
 
 namespace gui
 {
-    AlarmClockWindow::AlarmClockWindow(app::Application *app,
+    AlarmClockWindow::AlarmClockWindow(app::ApplicationCommon *app,
                                        std::unique_ptr<audio_settings::AbstractAudioSettingsModel> &&audioModel)
         : BaseSettingsWindow(app, gui::window::name::alarm_clock), mWidgetMaker(this),
           mAudioModel(std::move(audioModel))

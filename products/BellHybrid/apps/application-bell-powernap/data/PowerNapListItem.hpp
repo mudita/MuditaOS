@@ -14,8 +14,12 @@ namespace gui
         Spinner *spinner         = nullptr;
         Label *bottomDescription = nullptr;
 
+        void createSpinner();
+        void createBottomDescription();
+        void registerCallbacks();
+
       public:
-        explicit PowerNapListItem();
+        PowerNapListItem();
 
         [[nodiscard]] int getSpinnerValue() const noexcept;
         void setSpinnerValue(int value);

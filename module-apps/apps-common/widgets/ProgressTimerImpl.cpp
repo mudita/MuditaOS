@@ -4,14 +4,14 @@
 #include "ProgressTimerImpl.hpp"
 #include <Text.hpp>
 #include <ProgressBar.hpp>
-#include <Application.hpp>
+#include <ApplicationCommon.hpp>
 #include <time/time_conversion.hpp>
 #include <gsl/assert>
 
 namespace app
 {
 
-    ProgressTimerImpl::ProgressTimerImpl(app::Application *app,
+    ProgressTimerImpl::ProgressTimerImpl(app::ApplicationCommon *app,
                                          gui::Item *parent,
                                          std::string timerName,
                                          std::chrono::milliseconds baseTick)

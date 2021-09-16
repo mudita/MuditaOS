@@ -17,7 +17,7 @@ namespace gui
     class InformationWidget : public ContactListItem
     {
       public:
-        InformationWidget(app::Application *app);
+        InformationWidget(app::ApplicationCommon *app);
         ~InformationWidget() override = default;
         VBox *vBox                               = nullptr;
         Label *titleLabel                        = nullptr;

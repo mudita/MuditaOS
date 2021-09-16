@@ -14,7 +14,7 @@ namespace gui
         ModesBox *modesBox = nullptr;
 
       public:
-        HomeModesWindow(app::Application *app, const std::string &name);
+        HomeModesWindow(app::ApplicationCommon *app, const std::string &name);
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         void rebuild() override;
         void buildInterface() override;

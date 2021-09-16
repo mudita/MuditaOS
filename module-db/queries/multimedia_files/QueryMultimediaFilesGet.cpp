@@ -13,6 +13,14 @@ namespace db::multimedia_files::query
         return std::string{"Get"};
     }
 
+    GetByPath::GetByPath(const std::string &path) : Query(Query::Type::Read), path(path)
+    {}
+
+    auto GetByPath::debugInfo() const -> std::string
+    {
+        return std::string{"GetByPath"};
+    }
+
     GetResult::GetResult(const MultimediaFilesRecord &record) : record(record)
     {}
 

@@ -73,10 +73,10 @@
 #include <service-bluetooth/messages/ResponseVisibleDevices.hpp>
 #include <service-bluetooth/messages/Status.hpp>
 #include <service-bluetooth/messages/Unpair.hpp>
-#include <service-db/agents/settings/SystemSettings.hpp>
+#include <service-bluetooth/messages/Disconnect.hpp>
 #include <service-db/Settings.hpp>
+#include <service-db/agents/settings/SystemSettings.hpp>
 #include <module-services/service-appmgr/include/service-appmgr/Constants.hpp>
-#include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <module-services/service-evtmgr/service-evtmgr/ScreenLightControlMessage.hpp>
 #include <module-services/service-evtmgr/service-evtmgr/Constants.hpp>
 #include <module-services/service-evtmgr/service-evtmgr/EVMessages.hpp>
@@ -86,6 +86,7 @@
 #include <apps-common/windows/Dialog.hpp>
 
 #include <i18n/i18n.hpp>
+#include <service-bluetooth/messages/SyncDevices.hpp>
 
 namespace app
 {
@@ -106,6 +107,7 @@ namespace app
           AsyncCallbackReceiver{this}, soundsPlayer{std::make_shared<SoundsPlayer>(this)}
     {
         bus.channels.push_back(sys::BusChannel::ServiceAudioNotifications);
+        bus.channels.push_back(sys::BusChannel::BluetoothNotifications);
 
         CellularServiceAPI::SubscribeForOwnNumber(this, [&](const std::string &number) {
             selectedSimNumber = number;
@@ -115,6 +117,7 @@ namespace app
             Store::GSM::get()->sim == selectedSim) {
             CellularServiceAPI::RequestForOwnNumber(this);
         }
+        bluetoothSettingsModel = std::make_shared<BluetoothSettingsModel>(this);
     }
 
     ApplicationSettings::~ApplicationSettings()
@@ -179,12 +182,21 @@ namespace app
             return sys::MessageNone{};
         });
 
-        connect(typeid(::message::bluetooth::ResponseBondedDevices), [&](sys::Message *msg) {
-            auto responseBondedDevicesMsg = static_cast<::message::bluetooth::ResponseBondedDevices *>(msg);
+        connect(typeid(::message::bluetooth::SyncDevices), [&](sys::Message *msg) {
+            auto message = static_cast<::message::bluetooth::SyncDevices *>(msg);
+            bluetoothSettingsModel->replaceDevicesList(message->getDevices());
+
             if (gui::window::name::all_devices == getCurrentWindow()->getName()) {
-                auto bondedDevicesData = std::make_unique<gui::BondedDevicesData>(
-                    responseBondedDevicesMsg->getDevices(), responseBondedDevicesMsg->getAddressOfConnectedDevice());
-                switchWindow(gui::window::name::all_devices, std::move(bondedDevicesData));
+                switchWindow(gui::window::name::all_devices);
+            }
+            return sys::MessageNone{};
+        });
+        connect(typeid(::message::bluetooth::ResponseBondedDevices), [&](sys::Message *msg) {
+            auto message = static_cast<::message::bluetooth::ResponseBondedDevices *>(msg);
+            bluetoothSettingsModel->replaceDevicesList(message->getDevices());
+
+            if (gui::window::name::all_devices == getCurrentWindow()->getName()) {
+                switchWindow(gui::window::name::all_devices);
             }
             return sys::MessageNone{};
         });
@@ -204,13 +216,12 @@ namespace app
 
         connect(typeid(BluetoothPairResultMessage), [&](sys::Message *msg) {
             auto bluetoothPairResultMsg = static_cast<BluetoothPairResultMessage *>(msg);
+            auto device                 = bluetoothPairResultMsg->getDevice();
             if (bluetoothPairResultMsg->isSucceed()) {
-                bus.sendUnicast(std::make_shared<::message::bluetooth::RequestBondedDevices>(),
-                                service::name::bluetooth);
                 return sys::MessageNone{};
             }
-            auto addr    = bluetoothPairResultMsg->getAddr();
-            auto message = std::make_shared<BluetoothPairMessage>(std::move(addr));
+            auto message = std::make_shared<BluetoothPairMessage>(device);
+
             switchToAllDevicesViaBtErrorPrompt(std::move(message), "app_settings_bluetooth_pairing_error_message");
 
             return sys::MessageNone{};
@@ -221,31 +232,37 @@ namespace app
             return sys::MessageNone{};
         });
 
+        connect(typeid(::message::bluetooth::ProfileStatus), [&](sys::Message *msg) { return sys::MessageNone{}; });
+
         connect(typeid(::message::bluetooth::UnpairResult), [&](sys::Message *msg) {
             auto unpairResultMsg = static_cast<::message::bluetooth::UnpairResult *>(msg);
             if (unpairResultMsg->isSucceed()) {
                 return sys::MessageNone{};
             }
-            auto addr = unpairResultMsg->getAddr();
-            bus.sendUnicast(std::make_shared<::message::bluetooth::RequestBondedDevices>(), service::name::bluetooth);
-            auto message = std::make_shared<message::bluetooth::Unpair>(std::move(addr));
+            auto device  = unpairResultMsg->getDevice();
+            auto message = std::make_shared<message::bluetooth::Unpair>(device);
             switchToAllDevicesViaBtErrorPrompt(std::move(message), "app_settings_bluetooth_unpairing_error_message");
             return sys::MessageNone{};
         });
 
         connect(typeid(::message::bluetooth::ConnectResult), [&](sys::Message *msg) {
             auto connectResultMsg = static_cast<::message::bluetooth::ConnectResult *>(msg);
+            auto device           = connectResultMsg->getDevice();
+
             if (connectResultMsg->isSucceed()) {
-                bus.sendUnicast(std::make_shared<::message::bluetooth::RequestBondedDevices>(),
-                                service::name::bluetooth);
                 return sys::MessageNone{};
             }
-            auto addr    = connectResultMsg->getAddr();
-            auto message = std::make_shared<message::bluetooth::Connect>(std::move(addr));
+
+            auto message = std::make_shared<message::bluetooth::Connect>(device);
             switchToAllDevicesViaBtErrorPrompt(std::move(message), "app_settings_bluetooth_connecting_error_message");
             return sys::MessageNone{};
         });
-
+        connect(typeid(::message::bluetooth::DisconnectResult), [&](sys::Message *msg) {
+            if (gui::window::name::all_devices == getCurrentWindow()->getName()) {
+                switchWindow(gui::window::name::all_devices);
+            }
+            return sys::MessageNone{};
+        });
         connect(typeid(::message::bluetooth::InitializationResult), [&](sys::Message *msg) {
             auto initializationResultMsg = static_cast<::message::bluetooth::InitializationResult *>(msg);
             if (initializationResultMsg->isSucceed()) {
@@ -339,208 +356,216 @@ namespace app
             [this](const std::string &value) { notificationsWhenLocked = utils::getNumericValue<bool>(value); },
             ::settings::SettingsScope::Global);
 
+        bluetoothSettingsModel->requestBondedDevices();
         return ret;
     }
 
     void ApplicationSettings::createUserInterface()
     {
-        windowsFactory.attach(gui::name::window::main_window, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::name::window::main_window, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::OptionWindow>(
                 app, utils::translate("app_settings_title_main"), mainWindowOptionsNew(app));
         });
 
         // Advanced
-        windowsFactory.attach(gui::window::name::advanced, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::advanced, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::OptionWindow>(
                 app, utils::translate("app_settings_advanced"), advancedOptions(app));
         });
-        windowsFactory.attach(gui::window::name::information, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::information, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::InformationWindow>(app);
         });
-        windowsFactory.attach(gui::window::name::ui_test, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::ui_test, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::UiTestWindow>(app);
         });
-        windowsFactory.attach(gui::window::name::eink_mode, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::eink_mode, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::EinkModeWindow>(app);
         });
-        windowsFactory.attach(gui::window::name::color_test_window, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::ColorTestWindow>(app);
-        });
-        windowsFactory.attach(gui::window::name::status_bar_img_type, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::StatusBarImageTypeWindow>(app);
-        });
+        windowsFactory.attach(gui::window::name::color_test_window,
+                              [](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<gui::ColorTestWindow>(app);
+                              });
+        windowsFactory.attach(gui::window::name::status_bar_img_type,
+                              [](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<gui::StatusBarImageTypeWindow>(app);
+                              });
 
         // Bluetooth
-        windowsFactory.attach(gui::window::name::bluetooth, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::bluetooth, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::BluetoothWindow>(app);
         });
-        windowsFactory.attach(gui::window::name::add_device, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::AddDeviceWindow>(app);
+        windowsFactory.attach(gui::window::name::add_device, [this](ApplicationCommon *app, const std::string &name) {
+            return std::make_unique<gui::AddDeviceWindow>(app, bluetoothSettingsModel);
         });
-        windowsFactory.attach(gui::window::name::all_devices, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::AllDevicesWindow>(app);
+        windowsFactory.attach(gui::window::name::all_devices, [this](ApplicationCommon *app, const std::string &name) {
+            return std::make_unique<gui::AllDevicesWindow>(app, bluetoothSettingsModel);
         });
-        windowsFactory.attach(gui::window::name::phone_name, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::phone_name, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::PhoneNameWindow>(app);
         });
         windowsFactory.attach(gui::window::name::bluetooth_check_passkey,
-                              [](Application *app, const std::string &name) {
+                              [](ApplicationCommon *app, const std::string &name) {
                                   return std::make_unique<gui::BluetoothCheckPasskeyWindow>(app);
                               });
 
         // Network
-        windowsFactory.attach(gui::window::name::network, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::network, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::NetworkWindow>(app, static_cast<ApplicationSettings *>(app));
         });
-        windowsFactory.attach(gui::window::name::sim_cards, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::sim_cards, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::SimCardsWindow>(app, static_cast<ApplicationSettings *>(app));
         });
-        windowsFactory.attach(gui::window::name::sim_pin_settings, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::sim_pin_settings, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::SimPINSettingsWindow>(app);
         });
-        windowsFactory.attach(gui::window::name::import_contacts, [&](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::import_contacts, [&](ApplicationCommon *app, const std::string &name) {
             auto repository = std::make_unique<SimContactsRepository>(this);
             auto model      = std::make_unique<SimContactsImportModel>(this, std::move(repository));
             auto presenter  = std::make_unique<SimContactsImportWindowPresenter>(this, std::move(model));
             return std::make_unique<gui::SimContactsImportWindow>(app, std::move(presenter));
         });
 
-        windowsFactory.attach(gui::window::name::new_apn, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::new_apn, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::NewApnWindow>(app);
         });
-        windowsFactory.attach(gui::window::name::apn_settings, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::apn_settings, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::ApnSettingsWindow>(app);
         });
-        windowsFactory.attach(gui::window::name::apn_options, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::apn_options, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::ApnOptionsWindow>(app);
         });
 
         // Display and keypad
-        windowsFactory.attach(gui::window::name::display_and_keypad, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::DisplayAndKeypadWindow>(app);
-        });
-        windowsFactory.attach(gui::window::name::display_light, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::display_and_keypad,
+                              [](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<gui::DisplayAndKeypadWindow>(app);
+                              });
+        windowsFactory.attach(gui::window::name::display_light, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::DisplayLightWindow>(app, static_cast<ApplicationSettings *>(app));
         });
-        windowsFactory.attach(gui::window::name::font_size, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::font_size, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::FontSizeWindow>(app);
         });
-        windowsFactory.attach(gui::window::name::wallpaper, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::wallpaper, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::WallpaperWindow>(app);
         });
-        windowsFactory.attach(gui::window::name::quotes, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::quotes, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::QuotesMainWindow>(app);
         });
-        windowsFactory.attach(gui::window::name::new_quote, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::new_quote, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::QuoteAddEditWindow>(app);
         });
-        windowsFactory.attach(gui::window::name::options_quote, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::options_quote, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::QuotesOptionsWindow>(app);
         });
-        windowsFactory.attach(gui::window::name::edit_quotes, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::edit_quotes, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::EditQuotesWindow>(app);
         });
-        windowsFactory.attach(gui::window::name::quote_categories, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::quote_categories, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::QuoteCategoriesWindow>(app);
         });
-        windowsFactory.attach(gui::window::name::quotes_dialog_yes_no, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::DialogYesNo>(app, name);
-        });
-        windowsFactory.attach(gui::window::name::keypad_light, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::quotes_dialog_yes_no,
+                              [](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<gui::DialogYesNo>(app, name);
+                              });
+        windowsFactory.attach(gui::window::name::keypad_light, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::KeypadLightWindow>(app, static_cast<ApplicationSettings *>(app));
         });
-        windowsFactory.attach(gui::window::name::input_language, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::input_language, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::InputLanguageWindow>(app);
         });
 
         // Phone modes
-        windowsFactory.attach(gui::window::name::phone_modes, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::phone_modes, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::PhoneModesWindow>(app, static_cast<ApplicationSettings *>(app));
         });
-        windowsFactory.attach(gui::window::name::do_not_disturb, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::do_not_disturb, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::DoNotDisturbWindow>(app, static_cast<ApplicationSettings *>(app));
         });
-        windowsFactory.attach(gui::window::name::offline, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::offline, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::OfflineWindow>(app, static_cast<ApplicationSettings *>(app));
         });
-        windowsFactory.attach(gui::window::name::connection_frequency, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::ConnectionFrequencyWindow>(app, static_cast<ApplicationSettings *>(app));
-        });
+        windowsFactory.attach(
+            gui::window::name::connection_frequency, [](ApplicationCommon *app, const std::string &name) {
+                return std::make_unique<gui::ConnectionFrequencyWindow>(app, static_cast<ApplicationSettings *>(app));
+            });
 
         // Apps
-        windowsFactory.attach(gui::window::name::apps, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::apps, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::AppsWindow>(app);
         });
-        windowsFactory.attach(gui::window::name::phone, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::phone, [](ApplicationCommon *app, const std::string &name) {
             auto audioModel =
                 std::make_unique<audio_settings::AudioSettingsModel>(app, audio_settings::PlaybackType::CallRingtone);
             return std::make_unique<gui::PhoneWindow>(app, std::move(audioModel));
         });
-        windowsFactory.attach(gui::window::name::messages, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::messages, [](ApplicationCommon *app, const std::string &name) {
             auto audioModel = std::make_unique<audio_settings::AudioSettingsModel>(
                 app, audio_settings::PlaybackType::TextMessageRingtone);
             return std::make_unique<gui::MessagesWindow>(app, std::move(audioModel));
         });
-        windowsFactory.attach(gui::window::name::alarm_clock, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::alarm_clock, [](ApplicationCommon *app, const std::string &name) {
             auto audioModel =
                 std::make_unique<audio_settings::AudioSettingsModel>(app, audio_settings::PlaybackType::Alarm);
             return std::make_unique<gui::AlarmClockWindow>(app, std::move(audioModel));
         });
-        windowsFactory.attach(gui::window::name::sound_select, [this](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::sound_select, [this](ApplicationCommon *app, const std::string &name) {
             auto model = std::make_shared<SoundsModel>(soundsPlayer);
             return std::make_unique<gui::SoundSelectWindow>(app, name, std::move(model));
         });
 
         // Security
-        windowsFactory.attach(gui::window::name::security, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::security, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::SecurityMainWindow>(app);
         });
-        windowsFactory.attach(gui::window::name::autolock, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::autolock, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::AutolockWindow>(app, static_cast<ApplicationSettings *>(app));
         });
 
         // System
-        windowsFactory.attach(gui::window::name::system, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::system, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::SystemMainWindow>(app);
         });
-        windowsFactory.attach(gui::window::name::languages, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::languages, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::LanguagesWindow>(app);
         });
-        windowsFactory.attach(gui::window::name::date_and_time, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::date_and_time, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::DateAndTimeMainWindow>(app, gui::window::name::date_and_time);
         });
-        windowsFactory.attach(gui::window::name::change_time_zone, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::change_time_zone, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::ChangeTimeZone>(app);
         });
-        windowsFactory.attach(gui::window::name::change_date_and_time, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::ChangeDateAndTimeWindow>(app);
-        });
-        windowsFactory.attach(gui::window::name::technical_information, [&](Application *app, const std::string &name) {
-            auto factoryData = std::make_unique<FactoryData>(*settings);
-            auto repository  = std::make_unique<TechnicalInformationRepository>(this);
-            auto model     = std::make_unique<TechnicalInformationModel>(std::move(factoryData), std::move(repository));
-            auto presenter = std::make_unique<TechnicalWindowPresenter>(this, std::move(model));
-            return std::make_unique<gui::TechnicalInformationWindow>(app, std::move(presenter));
-        });
-        windowsFactory.attach(gui::window::name::certification, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::change_date_and_time,
+                              [](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<gui::ChangeDateAndTimeWindow>(app);
+                              });
+        windowsFactory.attach(
+            gui::window::name::technical_information, [&](ApplicationCommon *app, const std::string &name) {
+                auto factoryData = std::make_unique<FactoryData>(*settings);
+                auto repository  = std::make_unique<TechnicalInformationRepository>(this);
+                auto model = std::make_unique<TechnicalInformationModel>(std::move(factoryData), std::move(repository));
+                auto presenter = std::make_unique<TechnicalWindowPresenter>(this, std::move(model));
+                return std::make_unique<gui::TechnicalInformationWindow>(app, std::move(presenter));
+            });
+        windowsFactory.attach(gui::window::name::certification, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::CertificationWindow>(app);
         });
-        windowsFactory.attach(gui::window::name::sar, [&](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::sar, [&](ApplicationCommon *app, const std::string &name) {
             auto sarInfoRepository = std::make_unique<SARInfoRepository>("assets/certification_info", "sar.txt");
             auto presenter         = std::make_unique<SARInfoWindowPresenter>(std::move(sarInfoRepository));
             return std::make_unique<gui::SARInfoWindow>(app, std::move(presenter));
         });
-        windowsFactory.attach(gui::window::name::factory_reset, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::factory_reset, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::DialogYesNo>(app, name);
         });
 
-        windowsFactory.attach(gui::window::name::dialog_settings, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::dialog_settings, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::Dialog>(app, name);
         });
-        windowsFactory.attach(gui::window::name::dialog_confirm, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::dialog_confirm, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::DialogConfirm>(app, gui::window::name::dialog_confirm);
         });
-        windowsFactory.attach(gui::window::name::dialog_retry, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::dialog_retry, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::DialogRetry>(app, name);
         });
 

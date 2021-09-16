@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 // module-gui
@@ -16,7 +16,7 @@
 namespace gui
 {
 
-    ClockMainWindow::ClockMainWindow(app::Application *app, const std::string &name) : gui::AppWindow(app, name)
+    ClockMainWindow::ClockMainWindow(app::ApplicationCommon *app, const std::string &name) : gui::AppWindow(app, name)
     {
         uint32_t xOffset = 0;
         uint32_t yOffset = 0;

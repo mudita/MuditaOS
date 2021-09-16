@@ -26,7 +26,8 @@ struct EventInfo
 
     EventInfo() = default;
     EventInfo(const UTF8 &name, TimePoint startDate, TimePoint endDate, uint32_t duration, bool isAllDay)
-        : name{name}, startDate{startDate}, endDate{endDate}, duration{duration}, isAllDay{isAllDay} {};
+        : name{name}, startDate{TimePointFloorMinutes(startDate)}, endDate{TimePointFloorMinutes(endDate)},
+          duration{duration}, isAllDay{isAllDay} {};
 
     auto isValid() const -> bool;
 };
@@ -58,6 +59,8 @@ struct EventRecord : public Record, public EventInfo
 struct SingleEventRecord : public Record, public EventInfo
 {
     std::shared_ptr<EventRecord> parent;
+
+    virtual ~SingleEventRecord() = default;
 
     SingleEventRecord() = default;
     SingleEventRecord(std::shared_ptr<EventRecord> parent, TimePoint startDate, TimePoint endDate)
