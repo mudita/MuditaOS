@@ -10,6 +10,7 @@ target_sources(apps-common
 		HomeModesWindow.cpp
 		Popups.cpp
 		PowerOffWindow.cpp
+		AlarmPopup.cpp
 		TetheringConfirmationPopup.cpp
 		TetheringNotificationPopup.cpp
 		TetheringPhoneModePopup.cpp
@@ -29,6 +30,7 @@ target_sources(apps-common
 		HomeModesWindow.hpp
 		Popups.hpp
 		PowerOffWindow.hpp
+		AlarmPopup.hpp
 		TetheringConfirmationPopup.hpp
 		TetheringNotificationPopup.hpp
 		TetheringPhoneModePopup.hpp
@@ -44,4 +46,5 @@ target_sources(apps-common
 		lock-popups/SimInfoWindow.hpp
 		lock-popups/SimNotReadyWindow.hpp
 		presenter/PowerOffPresenter.hpp
+
 )

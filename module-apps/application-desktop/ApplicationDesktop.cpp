@@ -197,7 +197,8 @@ namespace app
                       gui::popup::ID::Tethering,
                       gui::popup::ID::PhoneModes,
                       gui::popup::ID::PhoneLock,
-                      gui::popup::ID::SimLock});
+                      gui::popup::ID::SimLock,
+                      gui::popup::ID::Alarm});
     }
 
     void ApplicationDesktop::destroyUserInterface()

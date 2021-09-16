@@ -24,7 +24,8 @@ namespace gui
             SimInfo,
             SimNotReady,
             AlarmActivated,
-            AlarmDeactivated
+            AlarmDeactivated,
+            Alarm
         };
 
         namespace window
@@ -45,6 +46,7 @@ namespace gui
             inline constexpr auto sim_not_ready_window              = "SimNotReadyPopup";
             inline constexpr auto alarm_activated_window            = "AlarmActivatedPopup";
             inline constexpr auto alarm_deactivated_window          = "AlarmDeactivatedPopup";
+            inline constexpr auto alarm_window                      = "AlarmPopup";
         } // namespace window
 
         std::string resolveWindowName(ID id);

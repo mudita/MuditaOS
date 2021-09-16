@@ -8,7 +8,7 @@
 
 namespace gui
 {
-    class ImageBox : public HBox
+    class ImageBox : public VBox
     {
       public:
         ImageBox(Item *parent, const Position &x, const Position &y, const Length &w, const Length &h, Image *image);
@@ -18,9 +18,9 @@ namespace gui
 
         void showImage(bool show);
         void setImage(const UTF8 &name);
-        void setMinimumSizeToFitImage();
+        virtual void setMinimumSizeToFitImage();
 
-      private:
+      protected:
         Image *image;
     };
 }; // namespace gui
