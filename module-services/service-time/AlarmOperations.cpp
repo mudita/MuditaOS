@@ -93,6 +93,15 @@ namespace alarms
         alarmEventsRepo->getAlarmEventsInRange(start, end, offset, limit, repoCallback);
     }
 
+    void AlarmOperationsCommon::getFirstNextSingleEvent(TimePoint start, OnGetFirstNextSingleProcessed callback)
+    {
+        OnGetNextCallback repoGetFirstNextCallback = [&, callback, start](std::vector<AlarmEventRecord> records) {
+            onRepoGetFirstNextSingeResponse(callback, start, records);
+        };
+
+        alarmEventsRepo->getNext(start, getNextSingleEventsOffset, getNextSingleEventsLimit, repoGetFirstNextCallback);
+    }
+
     void AlarmOperationsCommon::getNextSingleEvents(TimePoint start, OnGetNextSingleProcessed callback)
     {
         auto nextEvents = std::make_shared<std::vector<AlarmEventRecord>>();
@@ -162,6 +171,18 @@ namespace alarms
         handleActiveAlarmsCountChange();
 
         callback(true);
+    }
+
+    void AlarmOperationsCommon::onRepoGetFirstNextSingeResponse(OnGetFirstNextSingleProcessed handledCallback,
+                                                                TimePoint start,
+                                                                std::vector<AlarmEventRecord> records)
+    {
+        if (records.empty()) {
+            handledCallback({});
+        }
+        else {
+            handledCallback(records.front().getNextSingleEvent(start));
+        }
     }
 
     void AlarmOperationsCommon::onRepoGetNextResponse(OnGetNextSingleProcessed handledCallback,
