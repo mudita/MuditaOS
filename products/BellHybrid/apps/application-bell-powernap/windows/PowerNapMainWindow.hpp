@@ -16,7 +16,6 @@ namespace gui
 
         bool onInput(const gui::InputEvent &inputEvent) override;
         void buildInterface() override;
-        status_bar::Configuration configureStatusBar(status_bar::Configuration appConfiguration) override;
 
       public:
         PowerNapMainWindow(app::ApplicationCommon *app,

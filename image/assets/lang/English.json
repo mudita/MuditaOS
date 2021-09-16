@@ -606,5 +606,7 @@
   "app_bell_settings_advanced_frontlight": "Frontlight",
   "app_bell_settings_frontlight_top_message": "Frontlight intensity",
   "app_bell_settings_frontlight_finished_message": "Frontlight is set",
-  "app_bell_powernap_session_ended_message": "<text>Hello!<br />Rise & shine</text>"
+  "app_bell_powernap_session_ended_message": "<text>Hello!<br />Rise & shine</text>",
+  "app_bell_background_sounds_timer_off": "OFF",
+  "app_bell_background_sounds_timer_title": "Timer"
 }

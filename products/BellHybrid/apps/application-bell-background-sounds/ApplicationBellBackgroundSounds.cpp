@@ -3,7 +3,9 @@
 
 #include "ApplicationBellBackgroundSounds.hpp"
 #include "presenter/BGSoundsMainWindowPresenter.hpp"
+#include "presenter/BGSoundsTimerSelectPresenter.hpp"
 #include "windows/BGSoundsMainWindow.hpp"
+#include "windows/BGSoundsTimerSelectWindow.hpp"
 
 namespace app
 {
@@ -31,6 +33,11 @@ namespace app
             auto presenter = std::make_unique<bgSounds::BGSoundsMainWindowPresenter>();
             return std::make_unique<gui::BGSoundsMainWindow>(app, std::move(presenter));
         });
+        windowsFactory.attach(
+            gui::window::name::bgSoundsTimerSelect, [this](ApplicationCommon *app, const std::string &name) {
+                auto presenter = std::make_unique<bgSounds::BGSoundsTimerSelectPresenter>(settings.get());
+                return std::make_unique<gui::BGSoundsTimerSelectWindow>(app, std::move(presenter));
+            });
     }
 
     sys::MessagePointer ApplicationBellBackgroundSounds::DataReceivedHandler(sys::DataMessage *msgl,
