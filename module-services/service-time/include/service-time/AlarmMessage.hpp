@@ -104,6 +104,16 @@ namespace alarms
         const std::uint32_t count = 0;
     };
 
+    class AlarmGetFirstNextSingleEventRequestMessage : public AlarmMessage
+    {};
+
+    class AlarmGetFirstNextSingleEventResponseMessage : public AlarmResponse
+    {
+      public:
+        AlarmGetFirstNextSingleEventResponseMessage(SingleEventRecord singleEvent = {}) : singleEvent(singleEvent){};
+        SingleEventRecord singleEvent;
+    };
+
     class AlarmGetNextSingleEventsRequestMessage : public AlarmMessage
     {
       public:
