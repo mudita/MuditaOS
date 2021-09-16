@@ -24,6 +24,7 @@ target_sources(apps-common
         notifications/policies/SMSNotificationPolicy.cpp
         notifications/policies/NotificationsListPolicy.cpp
         options/OptionsModel.cpp
+        options/OptionsList.cpp
         options/type/OptionCall.cpp
         options/type/OptionContact.cpp
         options/type/OptionSetting.cpp
@@ -123,8 +124,6 @@ target_compile_options(apps-common
 add_library(bellgui)
 target_sources( bellgui
    PRIVATE
-      ${CMAKE_CURRENT_SOURCE_DIR}/options/type/OptionBellMenu.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/options/type/OptionBellMenu.hpp
 )
 target_include_directories( bellgui
    PUBLIC

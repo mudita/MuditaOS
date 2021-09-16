@@ -5,6 +5,13 @@
 
 #include "OptionWindow.hpp"
 
+namespace style::bell_options
+{
+    inline constexpr auto h                  = 60U;
+    inline constexpr auto option_margin      = 2;
+    inline constexpr auto default_text_width = 380;
+} // namespace style::bell_options
+
 namespace gui::option
 {
     class OptionBellMenu : public option::Base

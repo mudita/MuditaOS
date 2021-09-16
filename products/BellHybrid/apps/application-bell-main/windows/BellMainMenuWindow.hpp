@@ -3,19 +3,16 @@
 
 #pragma once
 
-#include <OptionWindow.hpp>
+#include <common/options/BellOptionWindow.hpp>
 
 namespace gui
 {
-
-    class BellMainMenuWindow : public OptionWindow
+    class BellMainMenuWindow : public BellOptionWindow
     {
       public:
-        BellMainMenuWindow(app::ApplicationCommon *app);
+        explicit BellMainMenuWindow(app::ApplicationCommon *app);
 
       private:
         std::list<Option> mainMenuOptionsList();
-        void buildInterface() override;
     };
-
 } // namespace gui

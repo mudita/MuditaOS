@@ -22,6 +22,8 @@ target_sources(application-bell-common
         src/popups/AlarmActivatedWindow.cpp
         src/popups/AlarmDeactivatedWindow.cpp
         src/widgets/ListItems.cpp
+        src/options/BellOptionWindow.cpp
+        src/options/OptionBellMenu.cpp
     PUBLIC
         include/common/BellFinishedWindow.hpp
         include/common/TimeUtils.hpp
@@ -35,6 +37,8 @@ target_sources(application-bell-common
         include/common/popups/AlarmDeactivatedWindow.hpp
         include/common/widgets/BellSideListItemWithCallbacks.hpp
         include/common/widgets/ListItems.hpp
+        include/common/options/BellOptionWindow.hpp
+        include/common/options/OptionBellMenu.hpp
 )
 
 target_link_libraries(application-bell-common

@@ -3,7 +3,7 @@
 
 #include "ApplicationOnBoarding.hpp"
 
-#include "data/OnBoardingMessages.hpp"
+#include "apps-common/messages/OnBoardingMessages.hpp"
 #include "windows/StartConfigurationWindow.hpp"
 #include "windows/OnBoardingLanguagesWindow.hpp"
 #include "windows/EULALicenseWindow.hpp"

@@ -11,29 +11,15 @@
 
 #include <Dialog.hpp>
 #include <DialogMetadataMessage.hpp>
-#include <OptionBellMenu.hpp>
+#include <common/options/OptionBellMenu.hpp>
 #include <service-appmgr/Controller.hpp>
 
 namespace gui
 {
-
     BellMainMenuWindow::BellMainMenuWindow(app::ApplicationCommon *app)
-        : OptionWindow(app, gui::window::name::bell_main_menu)
+        : BellOptionWindow(app, gui::window::name::bell_main_menu)
     {
         addOptions(mainMenuOptionsList());
-        buildInterface();
-    }
-
-    void BellMainMenuWindow::buildInterface()
-    {
-        statusBar->setVisible(false);
-        header->setTitleVisibility(false);
-        bottomBar->setVisible(false);
-
-        optionsList->setPosition(bellMainStyle::mainMenuWindow::options_list_x,
-                                 bellMainStyle::mainMenuWindow::options_list_y);
-        optionsList->setMaximumWidth(bellMainStyle::mainMenuWindow::default_body_width);
-        optionsList->setBoundaries(gui::Boundaries::Fixed);
     }
 
     std::list<Option> BellMainMenuWindow::mainMenuOptionsList()

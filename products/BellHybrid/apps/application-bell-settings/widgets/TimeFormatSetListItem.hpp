@@ -6,12 +6,12 @@
 #include <time/time_locale.hpp>
 #include <utf8/UTF8.hpp>
 #include <widgets/BellSideListItem.hpp>
+#include <widgets/spinners/Spinners.hpp>
 
 #include <functional>
 
 namespace gui
 {
-    class Spinner;
     class Label;
 
     class TimeFormatSetListItem : public gui::BellSideListItem
@@ -30,7 +30,7 @@ namespace gui
 
       private:
         Label *bottomDescription{};
-        Spinner *timeFormat{};
+        UTF8Spinner *timeFormat;
     };
 
 } // namespace gui

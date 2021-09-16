@@ -9,16 +9,8 @@ INSERT OR REPLACE INTO dictionary_tab (path, value) VALUES
 
 -- ----------- insert default values -------------------
 INSERT OR IGNORE INTO settings_tab (path, value) VALUES
-    ('system/phone_mode', 'online'),
     ('gs_time_format', '0'),
     ('gs_date_format', '1'),
-    ('gs_auto_lock_time', '30'),
-    ('gs_unlock_lock_time', '0'),
-    ('gs_unlock_attempt_lock_time', '15'),
-    ('gs_no_lock_time_attempts_left', '3'),
-    ('gs_active_sim', ''),
-    ('gs_lock_pass_hash', ''),
-    ('gs_lock_screen_passcode_is_on', '0'),
     ('gs_display_language', 'English'),
     ('gs_input_language', 'English'),
     ('\ApplicationManager\\gs_onboarding_done', '0'),

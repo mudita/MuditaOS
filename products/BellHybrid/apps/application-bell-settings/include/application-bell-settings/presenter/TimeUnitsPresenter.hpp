@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "TimeUnitsModel.hpp"
+#include <application-bell-settings/models/TimeUnitsModel.hpp>
 
 #include <apps-common/BasePresenter.hpp>
 
@@ -39,10 +39,10 @@ namespace app::bell_settings
                                           std::unique_ptr<AbstractTemperatureUnitModel> temperatureUnitModel);
 
         auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> override;
-        auto clearData() -> void;
-        auto saveData() -> void;
-        auto loadData() -> void;
-        auto createData() -> void;
+        auto clearData() -> void override;
+        auto saveData() -> void override;
+        auto loadData() -> void override;
+        auto createData() -> void override;
 
       private:
         std::shared_ptr<TimeUnitsModel> pagesProvider;

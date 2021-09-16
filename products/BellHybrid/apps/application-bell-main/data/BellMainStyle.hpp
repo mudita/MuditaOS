@@ -26,11 +26,4 @@ namespace bellMainStyle
 
         } // namespace bottomDescription
     }     // namespace mainWindow
-
-    namespace mainMenuWindow
-    {
-        inline constexpr gui::Length options_list_x     = 100U;
-        inline constexpr gui::Length options_list_y     = 50U;
-        inline constexpr gui::Length default_body_width = 400U;
-    } // namespace mainMenuWindow
 } // namespace bellMainStyle
