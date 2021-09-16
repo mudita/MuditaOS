@@ -7,7 +7,6 @@
 #include <service-audio/AudioMessage.hpp>
 #include <service-evtmgr/EVMessages.hpp>
 #include <bsp/rotary_encoder/rotary_encoder.hpp>
-#include <bsp/audio-bell/CodecAW8898.hpp>
 
 namespace bell
 {
@@ -25,18 +24,6 @@ namespace bell
     {
         bsp::eink_frontlight::init();
         bsp::rotary_encoder::init(queues[static_cast<int32_t>(EventQueues::queueRotaryEncoder)]->GetQueueHandle());
-
-        CodecParamsAW8898 codecParams;
-
-        codecParams.sampleRate = CodecParamsAW8898::ValToSampleRate(44100);
-        if (codecParams.sampleRate == CodecParamsAW8898::SampleRate::Invalid) {
-            LOG_ERROR("Unsupported sample rate");
-        }
-
-        codecParams.outVolume  = 30.0;
-
-        CodecAW8898 codec;
-        codec.Start(codecParams);
     }
 
     bool WorkerEvent::handleMessage(std::uint32_t queueID)

@@ -15,6 +15,8 @@ inline void FlipBytes(uint16_t *val) {
     *val = (*val >> 8) | tmp;
 }
 
+constexpr auto READ_STATUS_RETRIES = 5;
+
 CodecAW8898::CodecAW8898() : i2cAddr{}
 {
     LOG_INFO("Initializing AW8898 audio codec");
@@ -146,25 +148,37 @@ CodecRetCode CodecAW8898::Start(const CodecParams &param)
     i2c->Write(i2cAddr, (uint8_t *)&i2s_setup, 2);
 
     /* 3.1 Enable system (SYSCTRL.PWDN=0) */
-    aw8898_reg_sysctrl_t sys_setup = 
-    {
-        // all values default to 0 except:
-        .i2sen = 1,     //enable I2S
-        .pwdn = 0      //power up
-    };
+    aw8898_reg_sysctrl_t sys_setup;
+    i2c->Read(i2cAddr, (uint8_t *)&sys_setup, 2);
+    FlipBytes((uint16_t*)&sys_setup);
+    sys_setup.i2sen = 1;     //enable I2S
+    sys_setup.pwdn = 0;      //power up
+    sys_setup.rcv_mode = 0;  //SPK mode
+    sys_setup.amppd = 1;     //amplifier power down
     i2cAddr.subAddress = AW8898_REG_SYSCTRL;
     FlipBytes((uint16_t*)&sys_setup);
     i2c->Write(i2cAddr, (uint8_t *)&sys_setup, 2);
 
     /* 3,2 Bias, OSC, PLL active */
-    
+    vTaskDelay(pdMS_TO_TICKS(10));
+
     /* 3.3 Waiting for PLL locked */
     i2cAddr.subAddress = AW8898_REG_SYSST;
     uint16_t sys_status = 0;
+    //TODO: change to structure
+    int retries = READ_STATUS_RETRIES;
     while ((sys_status & 0x0001) != 1) //wait for PLLS = 1 (locked)
     {
         i2c->Read(i2cAddr, (uint8_t *)&sys_status, 2);
         FlipBytes((uint16_t*)&sys_status);
+        LOG_DEBUG("*** SYSST: %04X", sys_status);
+        vTaskDelay(pdMS_TO_TICKS(2));
+
+        if (retries-- == 0)
+        {
+            LOG_ERROR("Failed to start codec !");
+            return CodecRetCode::InvalidOutputPath;     //there isn't suitable fail return code
+        }
     }
 
     /* 4.1 Enable Boost and amplifier
@@ -175,10 +189,18 @@ CodecRetCode CodecAW8898::Start(const CodecParams &param)
 
     /* 4.2 Wait SYSST.SWS=1 */
     i2cAddr.subAddress = AW8898_REG_SYSST;
+    retries = READ_STATUS_RETRIES;
     while ((sys_status & (1 << 8)) == 0) //wait for SWS = 1 
     {
         i2c->Read(i2cAddr, (uint8_t *)&sys_status, 2);
         FlipBytes((uint16_t*)&sys_status);
+        vTaskDelay(pdMS_TO_TICKS(2));
+
+        if (retries-- == 0)
+        {
+            LOG_ERROR("Failed to start codec !");
+            return CodecRetCode::InvalidOutputPath;     //there isn't suitable fail return code
+        }
     }
 
     // Store param configuration
