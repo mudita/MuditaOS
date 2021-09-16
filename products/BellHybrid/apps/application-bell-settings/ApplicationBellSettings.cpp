@@ -4,7 +4,7 @@
 #include "ApplicationBellSettings.hpp"
 #include "FrontlightPresenter.hpp"
 #include "PrewakeUpPresenter.hpp"
-#include "TimeUnitsPresenter.hpp"
+#include "presenter/TimeUnitsPresenter.hpp"
 #include "models/FrontlightModel.hpp"
 #include "models/PrewakeUpModel.hpp"
 #include "models/TemperatureUnitModel.hpp"
@@ -78,9 +78,10 @@ namespace app
                 return std::make_unique<gui::BellSettingsFrontlightWindow>(app, std::move(presenter));
             });
 
-        windowsFactory.attach(gui::BellFinishedWindow::name, [](ApplicationCommon *app, const std::string &name) {
-            return std::make_unique<gui::BellFinishedWindow>(app);
-        });
+        windowsFactory.attach(gui::BellFinishedWindow::defaultName,
+                              [](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<gui::BellFinishedWindow>(app);
+                              });
 
         windowsFactory.attach(gui::window::name::bellSettingsHomeView,
                               [](ApplicationCommon *app, const std::string &name) {

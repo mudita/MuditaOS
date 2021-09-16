@@ -5,12 +5,12 @@
 #include <apps-common/ApplicationCommon.hpp>
 #include <gui/input/InputEvent.hpp>
 #include <gui/widgets/Icon.hpp>
-#include <i18n/i18n.hpp>
 
 namespace gui
 {
 
-    BellFinishedWindow::BellFinishedWindow(app::ApplicationCommon *app) : WindowWithTimer(app, name)
+    BellFinishedWindow::BellFinishedWindow(app::ApplicationCommon *app, const std::string &name)
+        : WindowWithTimer(app, name)
     {
         buildInterface();
 
@@ -19,6 +19,7 @@ namespace gui
             return true;
         };
     }
+
     void BellFinishedWindow::buildInterface()
     {
         WindowWithTimer::buildInterface();
@@ -28,7 +29,9 @@ namespace gui
         bottomBar->setVisible(false);
 
         icon = new Icon(this, 0, 0, style::window_width, style::window_height, {}, {});
+        icon->text->setFont(style::window::font::verybiglight);
     }
+
     bool BellFinishedWindow::onInput(const InputEvent &inputEvent)
     {
         if (inputEvent.isShortRelease(KeyCode::KEY_ENTER) || inputEvent.isShortRelease(KeyCode::KEY_RF)) {
@@ -37,16 +40,12 @@ namespace gui
         }
         return false;
     }
-    void BellFinishedWindow::rebuild()
-    {
-        erase();
-        buildInterface();
-    }
+
     void BellFinishedWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         WindowWithTimer::onBeforeShow(mode, data);
 
-        if (auto metadata = dynamic_cast<Data *>(data)) {
+        if (auto metadata = dynamic_cast<BellFinishedWindowData *>(data)) {
             icon->image->set(metadata->icon);
             icon->text->setText(metadata->text);
             windowToReturn = metadata->windowToReturn;

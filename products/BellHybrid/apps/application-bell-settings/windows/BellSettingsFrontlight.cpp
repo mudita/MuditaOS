@@ -65,8 +65,8 @@ namespace gui
         if (inputEvent.isShortRelease(KeyCode::KEY_ENTER)) {
             presenter->saveData();
 
-            application->switchWindow(BellFinishedWindow::name,
-                                      BellFinishedWindow::Data::Factory::create(
+            application->switchWindow(BellFinishedWindow::defaultName,
+                                      BellFinishedWindowData::Factory::create(
                                           "circle_success",
                                           utils::translate("app_bell_settings_frontlight_finished_message"),
                                           window::name::bellSettingsAdvanced));

@@ -44,6 +44,7 @@ target_link_libraries(application-bell-main
         bell::db
         bell::evtmgr
         bell::app-alarm
+        bell::app-onboarding
         bell::app-settings
         bell::app-powernap
         bell::keymap

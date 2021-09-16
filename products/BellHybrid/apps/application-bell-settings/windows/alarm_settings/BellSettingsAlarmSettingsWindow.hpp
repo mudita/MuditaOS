@@ -5,11 +5,11 @@
 
 #include <application-bell-settings/ApplicationBellSettings.hpp>
 
-#include <apps-common/windows/OptionWindow.hpp>
+#include <common/options/BellOptionWindow.hpp>
 
 namespace gui
 {
-    class BellSettingsAlarmSettingsWindow : public OptionWindow
+    class BellSettingsAlarmSettingsWindow : public BellOptionWindow
     {
       public:
         static constexpr auto name = "BellSettingsAlarmSettingsWindow";
@@ -18,9 +18,5 @@ namespace gui
 
       private:
         std::list<Option> alarmSettingsOptionsList();
-
-        void buildInterface() override;
-
-        void rebuild() override;
     };
 } /* namespace gui */

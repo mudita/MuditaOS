@@ -22,6 +22,7 @@ namespace gui
         this->presenter->attach(this);
         buildInterface();
     }
+
     void BellSettingsAlarmSettingsSnoozeWindow::buildInterface()
     {
         AppWindow::buildInterface();
@@ -39,6 +40,7 @@ namespace gui
 
         setFocusItem(listView);
     }
+
     bool BellSettingsAlarmSettingsSnoozeWindow::onInput(const InputEvent &inputEvent)
     {
         if (listView->onInput(inputEvent)) {
@@ -50,16 +52,18 @@ namespace gui
         }
         return AppWindow::onInput(inputEvent);
     }
+
     void BellSettingsAlarmSettingsSnoozeWindow::rebuild()
     {
         erase();
         buildInterface();
     }
+
     void BellSettingsAlarmSettingsSnoozeWindow::exit()
     {
         presenter->saveData();
-        application->switchWindow(BellFinishedWindow::name,
-                                  BellFinishedWindow::Data::Factory::create(
+        application->switchWindow(BellFinishedWindow::defaultName,
+                                  BellFinishedWindowData::Factory::create(
                                       "circle_success",
                                       utils::translate("app_bell_settings_alarm_settings_snooze_finished"),
                                       BellSettingsAlarmSettingsWindow::name));

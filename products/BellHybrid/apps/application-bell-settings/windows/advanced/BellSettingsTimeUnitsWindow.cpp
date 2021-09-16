@@ -3,7 +3,7 @@
 
 #include "application-bell-settings/ApplicationBellSettings.hpp"
 #include "BellSettingsStyle.hpp"
-#include "BellSettingsTimeUnitsWindow.hpp"
+#include "windows/advanced/BellSettingsTimeUnitsWindow.hpp"
 
 #include <gui/input/InputEvent.hpp>
 #include <apps-common/options/OptionStyle.hpp>
@@ -20,6 +20,14 @@ namespace gui
     {
         presenter->attach(this);
         buildInterface();
+
+        finishedCallback = [this]() {
+            application->switchWindow(BellFinishedWindow::defaultName,
+                                      BellFinishedWindowData::Factory::create(
+                                          "circle_success",
+                                          utils::translate("app_bell_settings_time_units_finished_message"),
+                                          gui::window::name::bellSettingsAdvanced));
+        };
     }
 
     void BellSettingsTimeUnitsWindow::rebuild()
@@ -55,11 +63,9 @@ namespace gui
         }
         if (inputEvent.isShortRelease(KeyCode::KEY_ENTER)) {
             presenter->saveData();
-            application->switchWindow(BellFinishedWindow::name,
-                                      BellFinishedWindow::Data::Factory::create(
-                                          "circle_success",
-                                          utils::translate("app_bell_settings_time_units_finished_message"),
-                                          gui::window::name::bellSettingsAdvanced));
+            if (finishedCallback) {
+                finishedCallback();
+            }
             return true;
         }
         if (AppWindow::onInput(inputEvent)) {

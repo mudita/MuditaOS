@@ -16,6 +16,7 @@ target_include_directories(appmgr
 target_link_libraries(appmgr
    PRIVATE
         module-apps
+        application-bell-onboarding
         service-appmgr
    PUBLIC
         alarms
