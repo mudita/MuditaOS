@@ -24,7 +24,7 @@ namespace gui
     class MeditationRunningWindow : public WithTimerWindow
     {
       public:
-        explicit MeditationRunningWindow(app::Application *app);
+        explicit MeditationRunningWindow(app::ApplicationCommon *app);
 
         // virtual methods
         void onBeforeShow(ShowMode mode, SwitchData *data) override;

@@ -9,7 +9,7 @@
 namespace gui
 {
 
-    MeditationWindow::MeditationWindow(app::Application *app, std::string name) : AppWindow(app, std::move(name))
+    MeditationWindow::MeditationWindow(app::ApplicationCommon *app, std::string name) : AppWindow(app, std::move(name))
     {
         inputDisabled = false;
     }

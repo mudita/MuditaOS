@@ -23,7 +23,7 @@ namespace gui
     class IntervalChimeWindow : public MeditationWindow
     {
       public:
-        explicit IntervalChimeWindow(app::Application *app);
+        explicit IntervalChimeWindow(app::ApplicationCommon *app);
 
         enum class IntervalType
         {

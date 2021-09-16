@@ -15,7 +15,7 @@ namespace gui
     class ReadyGoingWindow : public IconTextWindow
     {
       public:
-        explicit ReadyGoingWindow(app::Application *app);
+        explicit ReadyGoingWindow(app::ApplicationCommon *app);
 
         // virtual methods
         void onTimeout() override;

@@ -8,7 +8,8 @@
 
 namespace gui
 {
-    ReadyGoingWindow::ReadyGoingWindow(app::Application *app) : IconTextWindow(app, gui::name::window::ready_going)
+    ReadyGoingWindow::ReadyGoingWindow(app::ApplicationCommon *app)
+        : IconTextWindow(app, gui::name::window::ready_going)
     {}
 
     void ReadyGoingWindow::onTimeout()

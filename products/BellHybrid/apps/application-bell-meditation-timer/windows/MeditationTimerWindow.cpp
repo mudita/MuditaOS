@@ -10,7 +10,7 @@
 
 namespace gui
 {
-    MeditationTimerWindow::MeditationTimerWindow(app::Application *app)
+    MeditationTimerWindow::MeditationTimerWindow(app::ApplicationCommon *app)
         : MeditationWindow(app, gui::name::window::meditation_timer)
     {
         buildInterface();

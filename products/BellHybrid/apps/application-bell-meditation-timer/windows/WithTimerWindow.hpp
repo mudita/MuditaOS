@@ -22,7 +22,7 @@ namespace gui
 
       public:
         WithTimerWindow() = delete;
-        explicit WithTimerWindow(app::Application *app, std::string name);
+        explicit WithTimerWindow(app::ApplicationCommon *app, std::string name);
         ~WithTimerWindow();
 
         // virtual methods

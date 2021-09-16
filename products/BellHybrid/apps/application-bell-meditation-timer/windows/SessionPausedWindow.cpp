@@ -12,7 +12,7 @@ using namespace meditationStyle;
 
 namespace gui
 {
-    SessionPausedWindow::SessionPausedWindow(app::Application *app)
+    SessionPausedWindow::SessionPausedWindow(app::ApplicationCommon *app)
         : IconTextWindow(app, gui::name::window::session_paused)
     {}
 

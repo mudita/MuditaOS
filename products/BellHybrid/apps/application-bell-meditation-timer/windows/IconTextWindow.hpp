@@ -19,7 +19,7 @@ namespace gui
     class IconTextWindow : public WithTimerWindow
     {
       public:
-        IconTextWindow(app::Application *app, std::string name);
+        IconTextWindow(app::ApplicationCommon *app, std::string name);
 
         // virtual methods
         void onBeforeShow(ShowMode mode, SwitchData *data) override;

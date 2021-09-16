@@ -15,7 +15,7 @@ namespace gui
     class SessionEndWindow : public IconTextWindow
     {
       public:
-        explicit SessionEndWindow(app::Application *app);
+        explicit SessionEndWindow(app::ApplicationCommon *app);
 
         // virtual methods
         void onTimeout() override;

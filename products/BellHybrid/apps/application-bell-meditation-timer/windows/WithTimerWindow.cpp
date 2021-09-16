@@ -8,7 +8,7 @@
 namespace gui
 {
 
-    WithTimerWindow::WithTimerWindow(app::Application *app, std::string name) : MeditationWindow(app, move(name))
+    WithTimerWindow::WithTimerWindow(app::ApplicationCommon *app, std::string name) : MeditationWindow(app, move(name))
     {
         buildInterface();
         timerCallback = [this](Item &, sys::Timer &) {
