@@ -29,7 +29,8 @@ namespace alarms
 
     bool PlayAudioAction::turnOff()
     {
-        return true;
+        auto stopPlaybackVec = std::vector<audio::PlaybackType>({audio::PlaybackType::Alarm});
+        return AudioServiceAPI::Stop(&service, stopPlaybackVec);
     }
 
     void PlayAudioAction::detachTimer()
