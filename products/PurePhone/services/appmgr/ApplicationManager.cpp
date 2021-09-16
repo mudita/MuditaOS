@@ -6,7 +6,6 @@
 #include <apps-common/popups/data/BluetoothModeParams.hpp>
 #include <application-desktop/ApplicationDesktop.hpp>
 #include <application-onboarding/ApplicationOnBoarding.hpp>
-#include <application-onboarding/data/OnBoardingMessages.hpp>
 #include <application-special-input/ApplicationSpecialInput.hpp>
 #include <apps-common/popups/data/PhoneModeParams.hpp>
 #include <apps-common/popups/data/PopupRequestParams.hpp>

@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <common/data/BellFinishedWindowSwitchData.hpp>
 #include <apps-common/messages/DialogMetadataMessage.hpp>
 #include <apps-common/popups/WindowWithTimer.hpp>
 
@@ -13,42 +14,13 @@ namespace gui
     class BellFinishedWindow : public WindowWithTimer
     {
       public:
-        struct Data : public gui::SwitchData
-        {
-          public:
-            struct Factory
-            {
-                static std::unique_ptr<Data> create(const UTF8 &icon,
-                                                    const UTF8 &text,
-                                                    const std::string &windowToReturn)
-                {
-                    return std::unique_ptr<Data>(new Data(icon, text, windowToReturn));
-                }
-            };
+        static constexpr auto defaultName = "BellFinishedWindow";
 
-            UTF8 icon{};
-            UTF8 text{};
-            std::string windowToReturn;
+        explicit BellFinishedWindow(app::ApplicationCommon *app, const std::string &name = defaultName);
 
-          private:
-            Data() = default;
-
-            Data(const UTF8 &icon, const UTF8 &text, const std::string &windowToReturn)
-                : icon{icon}, text{text}, windowToReturn{windowToReturn}
-            {}
-        };
-
-        static constexpr auto name = "BellFinishedWindow";
-
-        explicit BellFinishedWindow(app::ApplicationCommon *app);
-
-      private:
+      protected:
         void buildInterface() override;
-
         bool onInput(const InputEvent &inputEvent) override;
-
-        void rebuild() override;
-
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
 
         Icon *icon{};

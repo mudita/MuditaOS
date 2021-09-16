@@ -2,24 +2,18 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "OptionWindow.hpp"
-#include "Label.hpp"
-#include <i18n/i18n.hpp>
-#include <log.hpp>
-#include <Style.hpp>
-#include <memory>
-#include <utility>
 #include <messages/OptionsWindow.hpp>
 
 namespace gui
 {
     OptionWindow::OptionWindow(app::ApplicationCommon *app, const std::string &name)
-        : AppWindow(app, name), optionsModel{std::make_shared<OptionsModel>(app)}
+        : AppWindow(app, name), OptionsList(std::make_shared<OptionsModel>(app))
     {
         buildInterface();
     }
 
     OptionWindow::OptionWindow(app::ApplicationCommon *app, const std::string &name, std::list<Option> options)
-        : AppWindow(app, name), optionsModel{std::make_shared<OptionsModel>(app)}, options(std::move(options))
+        : AppWindow(app, name), OptionsList(std::make_shared<OptionsModel>(app), std::move(options))
     {
         buildInterface();
     }
@@ -27,49 +21,6 @@ namespace gui
     void OptionWindow::rebuild()
     {
         recreateOptions();
-    }
-
-    void OptionWindow::createOptions()
-    {
-        optionsModel->createData(options);
-    }
-
-    void OptionWindow::refreshOptions(std::list<Option> &&optionList)
-    {
-        options = std::move(optionList);
-        optionsList->rebuildList(listview::RebuildType::InPlace);
-    }
-
-    void OptionWindow::refreshOptions(std::list<Option> &&optionList, unsigned int pageIndex)
-    {
-        options = std::move(optionList);
-        optionsList->rebuildList(listview::RebuildType::OnPageElement, pageIndex);
-    }
-
-    void OptionWindow::addOptions(std::list<Option> &&optionList)
-    {
-        options = std::move(optionList);
-        createOptions();
-
-        optionsList->rebuildList();
-    }
-
-    void OptionWindow::changeOptions(std::list<Option> &&optionList)
-    {
-        clearOptions();
-        addOptions(std::move(optionList));
-    }
-
-    void OptionWindow::recreateOptions()
-    {
-        clearOptions();
-        createOptions();
-    }
-
-    void OptionWindow::clearOptions()
-    {
-        optionsList->clear();
-        optionsModel->clearData();
     }
 
     void OptionWindow::buildInterface()

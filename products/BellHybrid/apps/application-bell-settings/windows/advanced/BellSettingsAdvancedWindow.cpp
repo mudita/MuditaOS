@@ -5,31 +5,18 @@
 #include "BellSettingsAdvancedWindow.hpp"
 #include "BellSettingsStyle.hpp"
 
-#include <apps-common/options/type/OptionBellMenu.hpp>
+#include <common/options/OptionBellMenu.hpp>
 #include <apps-common/messages/DialogMetadataMessage.hpp>
 #include <apps-common/windows/Dialog.hpp>
-#include <service-appmgr/Controller.hpp>
 
 namespace gui
 {
 
     BellSettingsAdvancedWindow::BellSettingsAdvancedWindow(app::ApplicationCommon *app)
-        : OptionWindow(app, gui::window::name::bellSettingsAdvanced)
+        : BellOptionWindow(app, gui::window::name::bellSettingsAdvanced)
     {
         addOptions(settingsOptionsList());
-        buildInterface();
-    }
-
-    void BellSettingsAdvancedWindow::buildInterface()
-    {
-        statusBar->setVisible(false);
-        header->setTitleVisibility(false);
-        bottomBar->setVisible(false);
-
-        optionsList->setPosition(bell_settings_style::settings_window::options_list_margin_x,
-                                 bell_settings_style::settings_window::options_list_margin_y);
-        optionsList->setMaximumWidth(bell_settings_style::settings_window::default_body_width);
-        optionsList->setBoundaries(gui::Boundaries::Continuous);
+        setListTitle(utils::translate("app_bell_settings_advanced"));
     }
 
     std::list<Option> BellSettingsAdvancedWindow::settingsOptionsList()

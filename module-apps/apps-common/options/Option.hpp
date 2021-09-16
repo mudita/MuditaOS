@@ -7,6 +7,7 @@
 #include <utf8/UTF8.hpp>
 #include <functional>
 #include <memory>
+#include <cassert>
 
 #include "OptionBase.hpp"
 #include "OptionSimple.hpp"

@@ -6,6 +6,7 @@
 #include "Option.hpp"
 #include "InternalModel.hpp"
 #include <ListItemProvider.hpp>
+#include <Application.hpp>
 
 class OptionsModel : public app::InternalModel<gui::ListItem *>, public gui::ListItemProvider
 {

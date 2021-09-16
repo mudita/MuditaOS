@@ -2,8 +2,8 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <appmgr/ApplicationManager.hpp>
-
 #include <appmgr/messages/AlarmMessage.hpp>
+#include <application-bell-onboarding/BellOnBoardingNames.hpp>
 
 namespace app::manager
 {
@@ -26,8 +26,12 @@ namespace app::manager
 
     auto ApplicationManager::resolveHomeApplication() -> std::string
     {
+        if (checkOnBoarding()) {
+            return app::applicationBellOnBoardingName;
+        }
         return rootApplicationName;
     }
+
     void ApplicationManager::registerMessageHandlers()
     {
         ApplicationManagerCommon::registerMessageHandlers();
