@@ -1,0 +1,12 @@
+add_gtest_executable(
+    NAME
+        service-time-bell-alarm-operations
+    SRCS
+        test-BellAlarmOperations.cpp
+    LIBS
+        module-sys
+        bell::time
+    INCLUDE
+        $<TARGET_PROPERTY:bell::time,INCLUDE_DIRECTORIES>
+        $<TARGET_PROPERTY:service-time,SOURCE_DIR>
+)
