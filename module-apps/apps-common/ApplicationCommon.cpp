@@ -40,6 +40,7 @@
 #include <service-db/agents/settings/SystemSettings.hpp>
 #include <service-audio/AudioServiceAPI.hpp> // for GetOutputVolume
 
+#include <popups/AlarmPopup.hpp>
 #include <popups/VolumeWindow.hpp>
 #include <popups/HomeModesWindow.hpp>
 #include <popups/TetheringPhoneModePopup.hpp>
@@ -57,6 +58,7 @@
 #include <popups/data/PopupRequestParams.hpp>
 #include <popups/data/PhoneModeParams.hpp>
 #include <popups/data/BluetoothModeParams.hpp>
+#include <popups/data/AlarmPopupParams.hpp>
 #include <locks/data/LockData.hpp>
 
 namespace gui
@@ -859,6 +861,10 @@ namespace app
                         return std::make_unique<gui::SimNotReadyWindow>(app, window::sim_not_ready_window);
                     });
                 break;
+            case ID::Alarm:
+                windowsFactory.attach(window::alarm_window, [](ApplicationCommon *app, const std::string &name) {
+                    return std::make_unique<gui::AlarmPopup>(app, window::alarm_window);
+                });
             default:
                 break;
             }
@@ -897,6 +903,13 @@ namespace app
                          std::make_unique<locks::SimLockData>(popupParams->getLock(),
                                                               popupParams->getSimInputTypeAction(),
                                                               popupParams->getErrorCode()));
+        }
+        else if (id == ID::Alarm) {
+            auto popupParams = static_cast<const gui::AlarmPopupRequestParams *>(params);
+            switchWindow(gui::popup::resolveWindowName(id),
+                         std::make_unique<gui::AlarmPopupParams>(popupParams->getPopupType(),
+                                                                 popupParams->getAlarmTimeString(),
+                                                                 popupParams->getSnoozeTimeString()));
         }
         else {
             switchWindow(gui::popup::resolveWindowName(id));
