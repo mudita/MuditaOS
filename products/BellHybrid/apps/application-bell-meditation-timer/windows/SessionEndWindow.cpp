@@ -8,7 +8,8 @@
 
 namespace gui
 {
-    SessionEndWindow::SessionEndWindow(app::Application *app) : IconTextWindow(app, gui::name::window::session_end)
+    SessionEndWindow::SessionEndWindow(app::ApplicationCommon *app)
+        : IconTextWindow(app, gui::name::window::session_end)
     {}
 
     void SessionEndWindow::onTimeout()

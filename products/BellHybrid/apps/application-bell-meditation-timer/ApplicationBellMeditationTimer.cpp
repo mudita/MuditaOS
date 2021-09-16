@@ -33,22 +33,23 @@ namespace app
 
     void ApplicationBellMeditationTimer::createUserInterface()
     {
-        windowsFactory.attach(gui::name::window::main_window, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::name::window::main_window, [this](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::MeditationTimerWindow>(app);
         });
-        windowsFactory.attach(gui::name::window::interval_chime, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::name::window::interval_chime, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::IntervalChimeWindow>(app);
         });
-        windowsFactory.attach(gui::name::window::ready_going, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::name::window::ready_going, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::ReadyGoingWindow>(app);
         });
-        windowsFactory.attach(gui::name::window::meditation_running, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::MeditationRunningWindow>(app);
-        });
-        windowsFactory.attach(gui::name::window::session_paused, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::name::window::meditation_running,
+                              [](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<gui::MeditationRunningWindow>(app);
+                              });
+        windowsFactory.attach(gui::name::window::session_paused, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::SessionPausedWindow>(app);
         });
-        windowsFactory.attach(gui::name::window::session_end, [](Application *app, const std::string &name) {
+        windowsFactory.attach(gui::name::window::session_end, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::SessionEndWindow>(app);
         });
     }

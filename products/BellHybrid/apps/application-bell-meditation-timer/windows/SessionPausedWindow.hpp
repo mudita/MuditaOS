@@ -16,7 +16,7 @@ namespace gui
     class SessionPausedWindow : public IconTextWindow
     {
       public:
-        explicit SessionPausedWindow(app::Application *app);
+        explicit SessionPausedWindow(app::ApplicationCommon *app);
 
         // virtual methods
         bool onInput(const gui::InputEvent &inputEvent) override;

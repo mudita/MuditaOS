@@ -10,7 +10,7 @@
 
 namespace gui
 {
-    IntervalChimeWindow::IntervalChimeWindow(app::Application *app)
+    IntervalChimeWindow::IntervalChimeWindow(app::ApplicationCommon *app)
         : MeditationWindow(app, gui::name::window::interval_chime)
     {
         buildInterface();

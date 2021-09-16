@@ -15,7 +15,7 @@
 
 namespace gui
 {
-    MeditationRunningWindow::MeditationRunningWindow(app::Application *app)
+    MeditationRunningWindow::MeditationRunningWindow(app::ApplicationCommon *app)
         : WithTimerWindow(app, gui::name::window::meditation_running)
     {
         buildInterface();

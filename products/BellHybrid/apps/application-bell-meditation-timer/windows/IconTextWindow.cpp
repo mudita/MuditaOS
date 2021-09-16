@@ -13,7 +13,8 @@
 
 namespace gui
 {
-    IconTextWindow::IconTextWindow(app::Application *app, std::string name) : WithTimerWindow(app, std::move(name))
+    IconTextWindow::IconTextWindow(app::ApplicationCommon *app, std::string name)
+        : WithTimerWindow(app, std::move(name))
     {
         buildInterface();
         disableInput();
