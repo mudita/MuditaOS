@@ -27,6 +27,8 @@ namespace alarms
         auto handleRemoveAlarm(AlarmRemoveRequestMessage *request) -> std::shared_ptr<AlarmRemoveResponseMessage>;
         auto handleGetAlarmsInRange(AlarmsGetInRangeRequestMessage *request)
             -> std::shared_ptr<AlarmsGetInRangeResponseMessage>;
+        auto handleGetFirstNextSingleEvent(AlarmGetFirstNextSingleEventRequestMessage *request)
+            -> std::shared_ptr<AlarmGetFirstNextSingleEventResponseMessage>;
         auto handleGetNextSingleEvents(AlarmGetNextSingleEventsRequestMessage *request)
             -> std::shared_ptr<AlarmGetNextSingleEventsResponseMessage>;
         auto handleTurnOffRingingAlarm(RingingAlarmTurnOffRequestMessage *request)

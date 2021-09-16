@@ -65,6 +65,19 @@ namespace alarms
             });
     }
 
+    auto AlarmMessageHandler::handleGetFirstNextSingleEvent(AlarmGetFirstNextSingleEventRequestMessage *request)
+        -> std::shared_ptr<AlarmGetFirstNextSingleEventResponseMessage>
+    {
+        return handleWithCallback<AlarmGetFirstNextSingleEventRequestMessage,
+                                  AlarmGetFirstNextSingleEventResponseMessage,
+                                  SingleEventRecord>(
+            request,
+            [&]([[maybe_unused]] AlarmGetFirstNextSingleEventRequestMessage *request,
+                IAlarmOperations::OnGetFirstNextSingleProcessed callback) {
+                alarmOperations->getFirstNextSingleEvent(TimePointNow(), std::move(callback));
+            });
+    }
+
     auto AlarmMessageHandler::handleGetNextSingleEvents(AlarmGetNextSingleEventsRequestMessage *request)
         -> std::shared_ptr<AlarmGetNextSingleEventsResponseMessage>
     {
@@ -124,7 +137,7 @@ namespace alarms
             &alarmOperationsCallback) -> std::shared_ptr<ResponseType>
     {
         auto callback = [&, requestPtr = std::make_shared<RequestType>(*request)](CallbackParamType param) {
-            auto response   = std::make_shared<ResponseType>(param);
+            auto response = std::make_shared<ResponseType>(param);
             service->bus.sendResponse(response, requestPtr);
         };
 

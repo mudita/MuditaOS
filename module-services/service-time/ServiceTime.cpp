@@ -146,6 +146,11 @@ namespace stm
             return alarmMessageHandler->handleGetAlarmsInRange(
                 static_cast<alarms::AlarmsGetInRangeRequestMessage *>(request));
         });
+        connect(typeid(alarms::AlarmGetFirstNextSingleEventRequestMessage),
+                [&](sys::Message *request) -> sys::MessagePointer {
+                    return alarmMessageHandler->handleGetFirstNextSingleEvent(
+                        static_cast<alarms::AlarmGetFirstNextSingleEventRequestMessage *>(request));
+                });
         connect(typeid(alarms::AlarmGetNextSingleEventsRequestMessage),
                 [&](sys::Message *request) -> sys::MessagePointer {
                     return alarmMessageHandler->handleGetNextSingleEvents(
