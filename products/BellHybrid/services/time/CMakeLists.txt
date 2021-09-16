@@ -22,3 +22,7 @@ target_link_libraries(bell-time
     PUBLIC
         service-time
 )
+
+if (${ENABLE_TESTS})
+    add_subdirectory(tests)
+endif ()

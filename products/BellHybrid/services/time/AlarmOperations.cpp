@@ -9,7 +9,7 @@ namespace alarms
 {
     namespace
     {
-        class MockedPreWakeUpSettingsProvider : public PreWakeUpSettingsProvider
+        class FakePreWakeUpSettingsProvider : public PreWakeUpSettingsProvider
         {
           public:
             auto getChimeSettings() -> Settings override
@@ -29,7 +29,7 @@ namespace alarms
         std::unique_ptr<AbstractAlarmEventsRepository> &&alarmEventsRepo,
         IAlarmOperations::GetCurrentTime getCurrentTimeCallback) const
     {
-        auto settingsProvider = std::make_unique<MockedPreWakeUpSettingsProvider>();
+        auto settingsProvider = std::make_unique<FakePreWakeUpSettingsProvider>();
         auto alarmOperations  = std::make_unique<AlarmOperations>(
             std::move(alarmEventsRepo), getCurrentTimeCallback, std::move(settingsProvider));
         alarmOperations->addAlarmExecutionHandler(alarms::AlarmType::PreWakeUpChime,
@@ -43,16 +43,16 @@ namespace alarms
                                      GetCurrentTime getCurrentTimeCallback,
                                      std::unique_ptr<PreWakeUpSettingsProvider> &&settingsProvider)
         : AlarmOperationsCommon{std::move(alarmEventsRepo), std::move(getCurrentTimeCallback)},
-          settingsProvider{std::move(settingsProvider)}
+          preWakeUp(std::move(settingsProvider))
     {}
 
     void AlarmOperations::minuteUpdated(TimePoint now)
     {
         AlarmOperationsCommon::minuteUpdated(now);
-        processPreWakeUpEvents(now);
+        processPreWakeUp(now);
     }
 
-    void AlarmOperations::processPreWakeUpEvents(TimePoint now)
+    void AlarmOperations::processPreWakeUp(TimePoint now)
     {
         if (nextSingleEvents.empty()) {
             return;
@@ -63,30 +63,30 @@ namespace alarms
             return;
         }
 
-        PreWakeUpHandler handler{settingsProvider.get()};
-        preWakeUp(nextEvent, handler.handle(now, nextEvent));
-    }
-
-    void AlarmOperations::preWakeUp(const SingleEventRecord &event, PreWakeUpHandler::Result handleResult)
-    {
-        if (!handleResult.timeForChime && !handleResult.timeForFrontlight) {
+        const auto decision = preWakeUp.decide(now, nextEvent);
+        if (!decision.timeForChime && !decision.timeForFrontlight) {
             return;
         }
+        handlePreWakeUp(nextEvent, decision);
+    }
 
+    void AlarmOperations::handlePreWakeUp(const SingleEventRecord &event, PreWakeUp::Decision decision)
+    {
         if (auto alarmEventPtr = std::dynamic_pointer_cast<AlarmEventRecord>(event.parent); alarmEventPtr) {
-            if (handleResult.timeForChime) {
+            if (decision.timeForChime) {
                 handleAlarmEvent(alarmEventPtr, alarms::AlarmType::PreWakeUpChime, true);
             }
-            if (handleResult.timeForFrontlight) {
+            if (decision.timeForFrontlight) {
                 handleAlarmEvent(alarmEventPtr, alarms::AlarmType::PreWakeUpFrontlight, true);
             }
         }
     }
 
-    PreWakeUpHandler::PreWakeUpHandler(PreWakeUpSettingsProvider *settingsProvider) : settingsProvider{settingsProvider}
+    PreWakeUp::PreWakeUp(std::unique_ptr<PreWakeUpSettingsProvider> &&settingsProvider)
+        : settingsProvider{std::move(settingsProvider)}
     {}
 
-    auto PreWakeUpHandler::handle(TimePoint now, const SingleEventRecord &event) -> Result
+    auto PreWakeUp::decide(TimePoint now, const SingleEventRecord &event) -> Decision
     {
         const auto chimeSettings       = settingsProvider->getChimeSettings();
         const auto frontlightSettings  = settingsProvider->getFrontlightSettings();
@@ -95,9 +95,9 @@ namespace alarms
         return {isTimeForChime, isTimeForFrontlight};
     }
 
-    auto PreWakeUpHandler::isTimeForPreWakeUp(TimePoint now,
-                                              const SingleEventRecord &event,
-                                              PreWakeUpSettingsProvider::Settings settings) -> bool
+    auto PreWakeUp::isTimeForPreWakeUp(TimePoint now,
+                                       const SingleEventRecord &event,
+                                       PreWakeUpSettingsProvider::Settings settings) -> bool
     {
         const auto expectedAlarmStart = std::chrono::floor<std::chrono::minutes>(now) + settings.timeBeforeAlarm;
         return settings.enabled && std::chrono::floor<std::chrono::minutes>(event.startDate) == expectedAlarmStart;
