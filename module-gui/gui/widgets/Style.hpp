@@ -73,6 +73,7 @@ namespace style
             inline constexpr auto supersizeme      = "gt_pressura_regular_90";
             inline constexpr auto supersizemelight = "gt_pressura_light_90";
             inline constexpr auto largelight       = "gt_pressura_light_46";
+            inline constexpr auto large            = "gt_pressura_regular_46";
             inline constexpr auto verybiglight     = "gt_pressura_light_38";
             inline constexpr auto bigbold          = "gt_pressura_bold_30";
             inline constexpr auto big              = "gt_pressura_regular_30";

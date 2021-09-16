@@ -49,19 +49,16 @@ target_sources(application-bell-settings
         windows/alarm_settings/BellSettingsAlarmSettingsSnoozeWindow.cpp
 
         models/PrewakeUpModel.hpp
-        models/TimeUnitsModel.hpp
         models/alarm_settings/SnoozeListItemProvider.hpp
 
         presenter/FrontlightPresenter.hpp
         presenter/PrewakeUpPresenter.hpp
-        presenter/TimeUnitsPresenter.hpp
         presenter/alarm_settings/SnoozePresenter.hpp
 
         widgets/TimeSetListItem.hpp
 
         windows/alarm_settings/BellSettingsAlarmSettingsSnoozeWindow.hpp
         windows/alarm_settings/BellSettingsAlarmSettingsWindow.hpp
-        windows/advanced/BellSettingsTimeUnitsWindow.hpp
         windows/advanced/BellSettingsAdvancedWindow.hpp
         windows/BellSettingsBedtimeToneWindow.hpp
         windows/BellSettingsFrontlight.hpp
@@ -73,6 +70,9 @@ target_sources(application-bell-settings
         data/FinishedWindowMessageData.hpp
 
     PUBLIC
+        include/application-bell-settings/models/TimeUnitsModel.hpp
+        include/application-bell-settings/presenter/TimeUnitsPresenter.hpp
+        include/application-bell-settings/windows/advanced/BellSettingsTimeUnitsWindow.hpp
         include/application-bell-settings/ApplicationBellSettings.hpp
 )
 

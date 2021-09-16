@@ -5,10 +5,7 @@
 
 #include "ApplicationCommon.hpp"
 #include "AppWindow.hpp"
-#include "ListView.hpp"
-#include <functional>
-#include "Option.hpp"
-#include "OptionsModel.hpp"
+#include "OptionsList.hpp"
 
 namespace gui
 {
@@ -17,21 +14,8 @@ namespace gui
     ///  Options GUI window with ListView populated accordingly to provided options in window constructor.
     ///
 
-    class OptionWindow : public AppWindow
+    class OptionWindow : public AppWindow, protected OptionsList
     {
-      protected:
-        std::shared_ptr<OptionsModel> optionsModel = nullptr;
-        ListView *optionsList                      = nullptr;
-        std::list<Option> options;
-
-        void createOptions();
-        void recreateOptions();
-        void clearOptions();
-        void addOptions(std::list<Option> &&optionList);
-        void changeOptions(std::list<Option> &&optionList);
-        void refreshOptions(std::list<Option> &&optionList);
-        void refreshOptions(std::list<Option> &&optionList, unsigned int pageIndex);
-
       public:
         OptionWindow(app::ApplicationCommon *app, const std::string &name);
         OptionWindow(app::ApplicationCommon *app, const std::string &name, std::list<Option> options);

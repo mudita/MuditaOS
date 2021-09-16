@@ -31,7 +31,6 @@ target_sources(${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/windows/StartConfigurationWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/OnBoardingLanguagesWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/data/OnBoardingSwitchData.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/data/OnBoardingMessages.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/EULALicenseWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/presenter/EULALicenseWindowPresenter.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/presenter/OnBoardingFinalizeWindowPresenter.hpp"
@@ -44,4 +43,4 @@ target_sources(${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/windows/OnBoardingSimSelectWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/NoSimSelectedDialogWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/style/OnBoardingStyle.hpp"
-		)
+)

@@ -39,6 +39,7 @@ target_link_libraries(BellHybrid
     PRIVATE
         appmgr
         bell::app-alarm
+        bell::app-onboarding
         bell::app-common
         bell::app-main
         bell::app-powernap
