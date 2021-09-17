@@ -42,6 +42,7 @@ namespace locks
 
     void PhoneLockHandler::setPhoneLockTime(const time_t time)
     {
+        systemTimeCorrectnessCheck(time);
         lockedTill = time;
         if (std::time(nullptr) < lockedTill) {
             lock.lockState = Lock::LockState::Blocked;
@@ -172,7 +173,6 @@ namespace locks
 
             textToPrint = formattedTime + ", " + formattedDay;
         }
-
         owner->bus.sendMulticast(std::make_shared<locks::PhoneLockTimeUpdate>(textToPrint),
                                  sys::BusChannel::PhoneLockChanges);
     }
@@ -488,6 +488,18 @@ namespace locks
     {
         owner->bus.sendMulticast(std::make_shared<locks::NextPhoneUnlockAttemptLockTime>(lockedTill),
                                  sys::BusChannel::PhoneLockChanges);
+    }
+    void PhoneLockHandler::systemTimeCorrectnessCheck(time_t newTime)
+    {
+        if (std::chrono::system_clock::now() < std::chrono::system_clock::from_time_t(failsafeTime)) {
+            LOG_ERROR("System time is not correct! Starting failsafe timer..");
+
+            failsafeTimer = sys::TimerFactory::createSingleShotTimer(
+                owner, failsafeTimerName, failsafeTimerInterval, [this, newTime](sys::Timer &) {
+                    setPhoneLockTime(newTime);
+                });
+            failsafeTimer.start();
+        }
     }
 
 } // namespace locks

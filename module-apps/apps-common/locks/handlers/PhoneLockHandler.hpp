@@ -14,9 +14,12 @@
 namespace locks
 {
     constexpr auto phoneLockTimerName                    = "PhoneLockTimer";
+    constexpr auto failsafeTimerName                     = "FailsafeTimer";
     constexpr unsigned int initialNoLockTimeAttemptsLeft = 3;
     constexpr time_t initialLockTime                     = 15;
     constexpr unsigned int phoneLockTimeMultiplier       = 2;
+    constexpr time_t failsafeTime                        = 1631865170;
+    constexpr auto failsafeTimerInterval                 = std::chrono::seconds{15};
 
     class PhoneLockHandler
     {
@@ -45,6 +48,7 @@ namespace locks
         std::vector<unsigned int> storedInputData;
 
         sys::TimerHandle phoneLockTimer;
+        sys::TimerHandle failsafeTimer;
         time_t lockedTill                = 0;
         time_t nextUnlockAttemptLockTime = initialLockTime;
 
@@ -76,6 +80,10 @@ namespace locks
         void comparePhoneLockHashCode(LockInput inputData);
         sys::MessagePointer verifyPhoneUnlockInput(LockInput inputData);
         sys::MessagePointer verifyPhoneLockChangeInput(LockInput inputData);
+        /// When system boots up after being unpowered for a while (eg. after pulling out battery), it may have
+        /// desynchronized its time clock. Phonelock is basing on a system time, so it is necessary to check if
+        /// system time has a reasonable value.
+        void systemTimeCorrectnessCheck(time_t);
 
       public:
         explicit PhoneLockHandler(sys::Service *owner, std::shared_ptr<settings::Settings> settings);
