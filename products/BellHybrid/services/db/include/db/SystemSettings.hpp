@@ -29,4 +29,10 @@ namespace bell::settings
         constexpr inline auto volume        = "prewake_up_volume";
         constexpr inline auto lightDuration = "prewake_up_light_duration";
     } // namespace PrewakeUp
+    namespace Alarm
+    {
+        constexpr inline auto tone        = "alarm_tone";
+        constexpr inline auto volume      = "alarm_volume";
+        constexpr inline auto lightActive = "alarm_light_active";
+    } // namespace Alarm
 };    // namespace bell::settings
