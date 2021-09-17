@@ -1,54 +1,77 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "BellSettingsAlarmSettingsSnoozeWindow.hpp"
+#include "application-bell-settings/ApplicationBellSettings.hpp"
+#include "BellSettingsAlarmSettingsMenuWindow.hpp"
 #include "BellSettingsAlarmSettingsWindow.hpp"
-#include "BellSettingsPrewakeUpWindow.hpp"
+#include "BellSettingsStyle.hpp"
+#include <common/BellFinishedWindow.hpp>
 
-#include <application-bell-settings/ApplicationBellSettings.hpp>
-#include <apps-common/messages/DialogMetadataMessage.hpp>
-#include <common/options/OptionBellMenu.hpp>
-#include <data/BellSettingsStyle.hpp>
+#include <apps-common/options/OptionStyle.hpp>
+#include <module-gui/gui/input/InputEvent.hpp>
+#include <module-gui/gui/widgets/SideListView.hpp>
 
 namespace gui
 {
-    BellSettingsAlarmSettingsWindow::BellSettingsAlarmSettingsWindow(app::ApplicationCommon *app)
-        : BellOptionWindow(app, name)
+    BellSettingsAlarmSettingsWindow::BellSettingsAlarmSettingsWindow(
+        app::ApplicationCommon *app,
+        std::unique_ptr<app::bell_settings::AlarmSettingsWindowContract::Presenter> presenter)
+        : AppWindow(app, name), presenter{std::move(presenter)}
     {
-        addOptions(alarmSettingsOptionsList());
-        setListTitle(utils::translate("app_bell_settings_alarm_settings"));
+        this->presenter->attach(this);
+        buildInterface();
     }
 
-    std::list<Option> BellSettingsAlarmSettingsWindow::alarmSettingsOptionsList()
+    void BellSettingsAlarmSettingsWindow::rebuild()
     {
-        std::list<gui::Option> alarmSettingsOptionsList;
-        auto addAlarmSettingsOption = [&](const UTF8 &name, const std::string &window) {
-            alarmSettingsOptionsList.emplace_back(std::make_unique<gui::option::OptionBellMenu>(
-                name,
-                [=](gui::Item &item) {
-                    if (window.empty()) {
-                        return false;
-                    }
-                    application->switchWindow(
-                        window,
-                        gui::ShowMode::GUI_SHOW_INIT,
-                        std::make_unique<gui::DialogMetadataMessage>(gui::DialogMetadata{name, "search_big", " "}));
-                    return true;
-                },
-                [=](gui::Item &item) {
-                    // put focus change callback here
-                    return true;
-                },
-                this));
-        };
+        erase();
+        buildInterface();
+    }
 
-        addAlarmSettingsOption(utils::translate("app_bell_settings_alarm_settings_prewake_up"),
-                               BellSettingsPrewakeUpWindow::name);
-        addAlarmSettingsOption(utils::translate("app_bell_settings_alarm_settings_alarm_tone_and_light"),
-                               gui::window::name::bellSettingsAlarmSettingsAlarmToneAndLight);
-        addAlarmSettingsOption(utils::translate("app_bell_settings_alarm_settings_snooze"),
-                               BellSettingsAlarmSettingsSnoozeWindow::name);
+    void BellSettingsAlarmSettingsWindow::buildInterface()
+    {
+        AppWindow::buildInterface();
+        statusBar->setVisible(false);
+        header->setTitleVisibility(false);
+        bottomBar->setVisible(false);
 
-        return alarmSettingsOptionsList;
+        sidelistview = new SideListView(
+            this, 0U, 0U, this->getWidth(), this->getHeight(), presenter->getPagesProvider(), PageBarType::None);
+        sidelistview->setEdges(RectangleEdge::None);
+
+        sidelistview->rebuildList(listview::RebuildType::Full);
+
+        presenter->loadData();
+
+        setFocusItem(sidelistview);
+    }
+
+    bool BellSettingsAlarmSettingsWindow::onInput(const gui::InputEvent &inputEvent)
+    {
+        if (sidelistview->onInput(inputEvent)) {
+            return true;
+        }
+        if (inputEvent.isShortRelease(KeyCode::KEY_ENTER)) {
+            exit();
+            return true;
+        }
+
+        return AppWindow::onInput(inputEvent);
+    }
+
+    void BellSettingsAlarmSettingsWindow::exit()
+    {
+        presenter->saveData();
+        application->switchWindow(
+            BellFinishedWindow::defaultName,
+            BellFinishedWindowData::Factory::create(
+                "circle_success",
+                utils::translate("app_bell_settings_alarm_settings_alarm_tone_and_light_finished"),
+                BellSettingsAlarmSettingsMenuWindow::name));
+    }
+
+    void BellSettingsAlarmSettingsWindow::onClose(CloseReason reason)
+    {
+        presenter->eraseProviderData();
     }
 } /* namespace gui */

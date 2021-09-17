@@ -6,6 +6,8 @@
 #include "presenter/TimeUnitsPresenter.hpp"
 #include "models/FrontlightModel.hpp"
 #include "models/TemperatureUnitModel.hpp"
+#include "models/alarm_settings/AlarmSettingsListItemProvider.hpp"
+#include "models/alarm_settings/AlarmSettingsModel.hpp"
 #include "models/alarm_settings/PrewakeUpListItemProvider.hpp"
 #include "models/alarm_settings/PrewakeUpSettingsModel.hpp"
 #include "models/alarm_settings/SnoozeListItemProvider.hpp"
@@ -13,6 +15,7 @@
 #include "presenter/alarm_settings/SnoozePresenter.hpp"
 #include "windows/advanced/BellSettingsAdvancedWindow.hpp"
 #include "windows/advanced/BellSettingsTimeUnitsWindow.hpp"
+#include "windows/alarm_settings/BellSettingsAlarmSettingsMenuWindow.hpp"
 #include "windows/alarm_settings/BellSettingsAlarmSettingsSnoozeWindow.hpp"
 #include "windows/alarm_settings/BellSettingsAlarmSettingsWindow.hpp"
 #include "windows/alarm_settings/BellSettingsPrewakeUpWindow.hpp"
@@ -115,9 +118,9 @@ namespace app
             });
 
         // Alarm setup
-        windowsFactory.attach(gui::BellSettingsAlarmSettingsWindow::name,
+        windowsFactory.attach(gui::BellSettingsAlarmSettingsMenuWindow::name,
                               [](ApplicationCommon *app, const std::string &name) {
-                                  return std::make_unique<gui::BellSettingsAlarmSettingsWindow>(app);
+                                  return std::make_unique<gui::BellSettingsAlarmSettingsMenuWindow>(app);
                               });
         windowsFactory.attach(
             gui::BellSettingsAlarmSettingsSnoozeWindow::name, [this](ApplicationCommon *app, const std::string &) {
@@ -136,6 +139,18 @@ namespace app
                 auto presenter =
                     std::make_unique<bell_settings::SnoozePresenter>(provider, std::move(snoozeSettingsModel));
                 return std::make_unique<gui::BellSettingsAlarmSettingsSnoozeWindow>(app, std::move(presenter));
+            });
+        windowsFactory.attach(
+            gui::BellSettingsAlarmSettingsWindow::name, [this](ApplicationCommon *app, const std::string &) {
+                auto alarmToneModel       = std::make_unique<bell_settings::AlarmToneModel>(this);
+                auto alarmVolumeModel     = std::make_unique<bell_settings::AlarmVolumeModel>(this);
+                auto alarmLightOnOffModel = std::make_unique<bell_settings::AlarmLightOnOffModel>(this);
+                auto alarmSettingsModel   = std::make_unique<bell_settings::AlarmSettingsModel>(
+                    std::move(alarmToneModel), std::move(alarmVolumeModel), std::move(alarmLightOnOffModel));
+                auto provider = std::make_shared<bell_settings::AlarmSettingsListItemProvider>(*alarmSettingsModel);
+                auto presenter =
+                    std::make_unique<bell_settings::AlarmSettingsPresenter>(provider, std::move(alarmSettingsModel));
+                return std::make_unique<gui::BellSettingsAlarmSettingsWindow>(app, std::move(presenter));
             });
 
         attachPopups({gui::popup::ID::AlarmActivated, gui::popup::ID::AlarmDeactivated});

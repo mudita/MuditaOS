@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BellSettingsWindow.hpp"
-#include "alarm_settings/BellSettingsAlarmSettingsWindow.hpp"
+#include "alarm_settings/BellSettingsAlarmSettingsMenuWindow.hpp"
 
 #include <application-bell-settings/ApplicationBellSettings.hpp>
 #include <data/BellSettingsStyle.hpp>
@@ -43,7 +43,7 @@ namespace gui
         };
 
         addWinSettings(utils::translate("app_bell_settings_home_view"), window::name::bellSettingsHomeView);
-        addWinSettings(utils::translate("app_bell_settings_alarm_settings"), BellSettingsAlarmSettingsWindow::name);
+        addWinSettings(utils::translate("app_bell_settings_alarm_settings"), BellSettingsAlarmSettingsMenuWindow::name);
         addWinSettings(utils::translate("app_bell_settings_bedtime_tone"), window::name::bellSettingsBedtimeTone);
         addWinSettings(utils::translate("app_bell_settings_advanced"), window::name::bellSettingsAdvanced);
         addWinSettings(utils::translate("app_bell_settings_turn_off"), window::name::bellSettingsTurnOff);
