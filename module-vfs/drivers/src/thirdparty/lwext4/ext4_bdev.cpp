@@ -55,7 +55,7 @@ namespace purefs::fs::drivers::ext4::internal
                 if (err) {
                     LOG_ERROR("Sector write error errno: %i", err);
                 }
-                return err;
+                return -err;
             }
             int read(struct ext4_blockdev *bdev, void *buf, uint64_t blk_id, uint32_t blk_cnt)
             {
@@ -71,7 +71,7 @@ namespace purefs::fs::drivers::ext4::internal
                 if (err) {
                     LOG_ERROR("Sector write error errno: %i", err);
                 }
-                return err;
+                return -err;
             }
 
             int open(struct ext4_blockdev *bdev)
@@ -102,7 +102,7 @@ namespace purefs::fs::drivers::ext4::internal
         }
 
         // Insert into the container
-        auto cfg              = std::make_unique<ext4_config>();
+        auto cfg = std::make_unique<ext4_config>();
         std::memset(cfg.get(), 0, sizeof(ext4_config));
         cfg->ifc.open         = io::open;
         cfg->ifc.bread        = io::read;
@@ -118,8 +118,9 @@ namespace purefs::fs::drivers::ext4::internal
         cfg->bdev.part_size   = uint64_t(sect_size) * sect_count;
 
         cpp_freertos::LockGuard _lck(g_lock);
+        auto bdev = &cfg->bdev;
         g_volumes.insert(std::make_pair(&cfg->bdev, std::move(cfg)));
-        return {&cfg->bdev, {}};
+        return {bdev, {}};
     }
 
     // Remove volume

@@ -12,7 +12,7 @@ target_include_directories(lwext4
 
 target_compile_definitions(lwext4
     PRIVATE
-    CONFIG_DEBUG_PRINTF=0
+    CONFIG_DEBUG_PRINTF=1
     CONFIG_DEBUG_ASSERT=0
     CONFIG_HAVE_OWN_OFLAGS=1
     CONFIG_HAVE_OWN_ERRNO=0

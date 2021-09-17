@@ -124,41 +124,53 @@ namespace purefs::fs::drivers
             LOG_ERROR("Non ext4 mount point");
             return -EIO;
         }
+        ext4_locker _lck(vmnt);
         auto [bd, err] = ext4::internal::append_volume(disk_mngr(), disk);
         if (err) {
             LOG_ERROR("Unable to append volume err: %i", err);
             return err;
         }
-        ext4_locker _lck(vmnt);
         // Test only
         ext4_dmask_set(DEBUG_ALL);
         err = ext4_device_register(bd, disk->name().c_str());
         if (err) {
             LOG_ERROR("Unable to register device with err: %i", err);
+            ext4::internal::remove_volume(bd);
             return -err;
         }
+        const auto mnt_path = vmnt->mount_path();
         // Mount
-        err = ext4_mount(disk->name().c_str(), vmnt->mount_path().c_str(), vmnt->is_ro());
+        err = ext4_mount(disk->name().c_str(), mnt_path.c_str(), vmnt->is_ro());
         if (err) {
             LOG_ERROR("Unable to mount ext4 errno %i", err);
+            ext4_device_unregister(disk->name().c_str());
+            ext4::internal::remove_volume(bd);
             return -err;
         }
         // Start ext4 recover
-        err = ext4_recover(vmnt->mount_path().c_str());
+        err = ext4_recover(mnt_path.c_str());
         if (err) {
             LOG_ERROR("Ext4 recover failed errno %i", err);
+            ext4_umount(mnt_path.c_str());
+            ext4_device_unregister(disk->name().c_str());
+            ext4::internal::remove_volume(bd);
             return -err;
         }
         // Start journaling
-        err = ext4_journal_start(vmnt->mount_path().c_str());
+        err = ext4_journal_start(mnt_path.c_str());
         if (err) {
             LOG_WARN("Unable to start journalling errno %i", err);
         }
         err = ext4_block_cache_write_back(bd, true);
         if (err) {
             LOG_ERROR("Unable to switch to write back mode errno %i", err);
+            ext4_umount(mnt_path.c_str());
+            ext4_device_unregister(disk->name().c_str());
+            ext4::internal::remove_volume(bd);
             return -err;
         }
+        filesystem_operations::mount(mnt, data);
+        vmnt->block_dev(bd);
         return err;
     }
 
@@ -178,19 +190,22 @@ namespace purefs::fs::drivers
         }
         err = ext4_journal_stop(mnt->mount_path().c_str());
         if (err) {
-            LOG_ERROR("Unable to stop ext4 journal %i", err);
-            return -err;
+            LOG_WARN("Unable to stop ext4 journal %i", err);
+            err = 0;
         }
         err = ext4_umount(mnt->mount_path().c_str());
         if (err) {
             LOG_ERROR("Unable to umount device");
             return -err;
         }
+        //! NOTE: Bug in the lib it always return ENOENT
+        ext4_device_unregister(vmnt->disk()->name().c_str());
         err = ext4::internal::remove_volume(vmnt->block_dev());
         if (err) {
             LOG_ERROR("Remove volume error %i", err);
             return err;
         }
+        filesystem_operations::umount(mnt);
         return err;
     }
 

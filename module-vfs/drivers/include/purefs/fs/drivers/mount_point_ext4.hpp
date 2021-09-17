@@ -25,12 +25,12 @@ namespace purefs::fs::drivers
         {
             return m_bdev;
         }
-        void block_dev(ext4_blockdev *bdev) noexcept
+        auto block_dev(ext4_blockdev *bdev) noexcept -> void
         {
             m_bdev = bdev;
         }
-        void lock() noexcept;
-        void unlock() noexcept;
+        auto lock() noexcept -> void;
+        auto unlock() noexcept -> void;
 
       private:
         auto native_root() const noexcept -> std::string_view override
