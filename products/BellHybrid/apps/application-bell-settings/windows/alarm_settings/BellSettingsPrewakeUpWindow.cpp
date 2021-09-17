@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "application-bell-settings/ApplicationBellSettings.hpp"
-#include "BellSettingsAlarmSettingsWindow.hpp"
+#include "BellSettingsAlarmSettingsMenuWindow.hpp"
 #include "BellSettingsPrewakeUpWindow.hpp"
 #include "BellSettingsStyle.hpp"
 #include <common/BellFinishedWindow.hpp>
@@ -65,7 +65,7 @@ namespace gui
                                   BellFinishedWindowData::Factory::create(
                                       "big_check",
                                       utils::translate("app_bell_settings_alarm_settings_prewake_up_finished"),
-                                      BellSettingsAlarmSettingsWindow::name));
+                                      BellSettingsAlarmSettingsMenuWindow::name));
     }
 
     void BellSettingsPrewakeUpWindow::onClose(CloseReason reason)

@@ -3,7 +3,7 @@
 
 #include "BellSettingsAlarmSettingsSnoozeWindow.hpp"
 
-#include "BellSettingsAlarmSettingsWindow.hpp"
+#include "BellSettingsAlarmSettingsMenuWindow.hpp"
 #include "models/alarm_settings/SnoozeListItemProvider.hpp"
 #include "presenter/alarm_settings/SnoozePresenter.hpp"
 
@@ -66,6 +66,6 @@ namespace gui
                                   BellFinishedWindowData::Factory::create(
                                       "big_check",
                                       utils::translate("app_bell_settings_alarm_settings_snooze_finished"),
-                                      BellSettingsAlarmSettingsWindow::name));
+                                      BellSettingsAlarmSettingsMenuWindow::name));
     }
 } // namespace gui

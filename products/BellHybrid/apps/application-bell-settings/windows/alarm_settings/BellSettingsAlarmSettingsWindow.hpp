@@ -3,20 +3,32 @@
 
 #pragma once
 
-#include <application-bell-settings/ApplicationBellSettings.hpp>
+#include "ApplicationBellSettings.hpp"
+#include "presenter/alarm_settings/AlarmSettingsPresenter.hpp"
 
-#include <common/options/BellOptionWindow.hpp>
+#include <apps-common/windows/AppWindow.hpp>
 
 namespace gui
 {
-    class BellSettingsAlarmSettingsWindow : public BellOptionWindow
+    class SideListView;
+
+    class BellSettingsAlarmSettingsWindow : public AppWindow,
+                                            public app::bell_settings::AlarmSettingsWindowContract::View
     {
       public:
         static constexpr auto name = "BellSettingsAlarmSettingsWindow";
+        explicit BellSettingsAlarmSettingsWindow(
+            app::ApplicationCommon *app,
+            std::unique_ptr<app::bell_settings::AlarmSettingsWindowContract::Presenter> presenter);
 
-        explicit BellSettingsAlarmSettingsWindow(app::ApplicationCommon *app);
+        void buildInterface() override;
+        void onClose(CloseReason reason) override;
+        bool onInput(const InputEvent &inputEvent) override;
+        void rebuild() override;
+        void exit() override;
 
       private:
-        std::list<Option> alarmSettingsOptionsList();
+        SideListView *sidelistview{};
+        std::unique_ptr<app::bell_settings::AlarmSettingsWindowContract::Presenter> presenter;
     };
 } /* namespace gui */

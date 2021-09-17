@@ -41,4 +41,7 @@ INSERT OR IGNORE INTO settings_tab (path, value) VALUES
     ('prewake_up_duration', '10'),
     ('prewake_up_tone','Meditative surprises'),
     ('prewake_up_volume','5'),
-    ('prewake_up_light_duration','10');
+    ('prewake_up_light_duration','10'),
+    ('alarm_tone','Meditative surprises'),
+    ('alarm_volume','5'),
+    ('alarm_light_active','1');
