@@ -35,6 +35,30 @@ namespace
         }
         return ret;
     }
+    auto stmode_to_type(mode_t mode)
+    {
+        if (S_ISREG(mode)) {
+            return DT_REG;
+        }
+        else if (S_ISDIR(mode)) {
+            return DT_DIR;
+        }
+        else if (S_ISCHR(mode)) {
+            return DT_CHR;
+        }
+        else if (S_ISBLK(mode)) {
+            return DT_BLK;
+        }
+        else if (S_ISFIFO(mode)) {
+            return DT_FIFO;
+        }
+        else if (S_ISSOCK(mode)) {
+            return DT_SOCK;
+        }
+        else {
+            return 0;
+        }
+    }
 } // namespace
 
 namespace vfsn::internal::syscalls
@@ -215,7 +239,7 @@ namespace vfsn::internal::syscalls
             }
             dirp->position += 1;
             dirp->dir_data.d_ino    = stdata.st_ino;
-            dirp->dir_data.d_type   = S_ISREG(stdata.st_mode) ? DT_REG : DT_DIR;
+            dirp->dir_data.d_type   = stmode_to_type(stdata.st_mode);
             dirp->dir_data.d_reclen = fname.size();
             std::strncpy(dirp->dir_data.d_name, fname.c_str(), sizeof(dirp->dir_data.d_name));
             return &dirp->dir_data;
@@ -255,7 +279,7 @@ namespace vfsn::internal::syscalls
             }
             dirp->position += 1;
             entry->d_ino    = stdata.st_ino;
-            entry->d_type   = S_ISREG(stdata.st_mode) ? DT_REG : DT_DIR;
+            entry->d_type   = stmode_to_type(stdata.st_mode);
             entry->d_reclen = fname.size();
             std::strncpy(entry->d_name, fname.c_str(), sizeof(entry->d_name));
             *result = entry;

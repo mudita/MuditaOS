@@ -4,6 +4,7 @@
 #include <purefs/fs/filesystem.hpp>
 #include <purefs/fs/drivers/filesystem_vfat.hpp>
 #include <purefs/fs/drivers/filesystem_littlefs.hpp>
+#include <purefs/fs/drivers/filesystem_ext4.hpp>
 #include <purefs/blkdev/disk_manager.hpp>
 #include <purefs/vfs_subsystem.hpp>
 #include <purefs/vfs_subsystem_internal.hpp>
@@ -146,6 +147,11 @@ namespace purefs::subsystem
         err = fs_core->register_filesystem("littlefs", std::make_shared<fs::drivers::filesystem_littlefs>());
         if (err) {
             LOG_FATAL("Unable to register lfs filesystem with error %i", err);
+            return {};
+        }
+        err = fs_core->register_filesystem("ext4", std::make_shared<fs::drivers::filesystem_ext4>());
+        if (err) {
+            LOG_FATAL("Unable to register ext4 filesystem with error %i", err);
             return {};
         }
 

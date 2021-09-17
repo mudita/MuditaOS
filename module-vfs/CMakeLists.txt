@@ -19,19 +19,23 @@ target_sources(module-vfs
         drivers/include/purefs/fs/drivers/file_handle_littlefs.hpp
         drivers/include/purefs/fs/drivers/file_handle_vfat.hpp
         drivers/include/purefs/fs/drivers/filesystem_littlefs.hpp
+        drivers/include/purefs/fs/drivers/filesystem_ext4.hpp
         drivers/include/purefs/fs/drivers/filesystem_vfat.hpp
         drivers/include/purefs/fs/drivers/mount_point_littlefs.hpp
         drivers/include/purefs/fs/drivers/mount_point_vfat.hpp
+        drivers/include/purefs/fs/drivers/mount_point_ext4.hpp
         drivers/include/thirdparty/fatfs/ffconf.h
         drivers/include/thirdparty/fatfs/volume_mapper.hpp
         drivers/include/thirdparty/littlefs/volume_mapper.hpp
         drivers/include/thirdparty/lwext4/ext4_bdev.hpp
         drivers/src/purefs/fs/filesystem_littlefs.cpp
+        drivers/src/purefs/fs/filesystem_ext4.cpp
         drivers/src/purefs/fs/filesystem_vfat.cpp
         drivers/src/thirdparty/fatfs/ff_glue.cpp
         drivers/src/thirdparty/fatfs/ffsystem.cpp
         drivers/src/thirdparty/littlefs/lfs_glue.cpp
         drivers/src/thirdparty/lwext4/ext4_bdev.cpp
+        drivers/src/purefs/fs/mount_point_ext4.cpp
 
         include/internal/purefs/blkdev/disk_handle.hpp
         include/internal/purefs/blkdev/partition_parser.hpp

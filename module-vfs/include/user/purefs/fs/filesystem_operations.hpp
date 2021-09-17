@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -47,7 +47,7 @@ namespace purefs::fs
                                     unsigned flags) -> fsmount            = 0;
         virtual auto mount(fsmount mnt, const void *data) noexcept -> int = 0;
         virtual auto umount(fsmount mnt) noexcept -> int                  = 0;
-        virtual auto stat_vfs(fsmount mnt, std::string_view path, statvfs &stat) const noexcept -> int;
+        virtual auto stat_vfs(fsmount mnt, std::string_view path, struct statvfs &stat) const noexcept -> int;
 
         /** Standard file access API */
         virtual auto open(fsmount mnt, std::string_view path, int flags, int mode) noexcept -> fsfile = 0;

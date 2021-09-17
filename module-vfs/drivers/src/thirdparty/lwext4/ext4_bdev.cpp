@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include <log.hpp>
 #include <mutex.hpp>
+#include <cstring>
 #include <purefs/blkdev/disk_manager.hpp>
 
 namespace purefs::fs::drivers::ext4::internal
@@ -81,22 +82,6 @@ namespace purefs::fs::drivers::ext4::internal
             {
                 return 0;
             }
-            int lock(struct ext4_blockdev *bdev)
-            {
-                auto ctx = reinterpret_cast<context *>(bdev->bdif->p_user);
-                if (!ctx) {
-                    return -EIO;
-                }
-                return ctx->mutex.Lock() ? (0) : (-EIO);
-            }
-            int unlock(struct ext4_blockdev *bdev)
-            {
-                auto ctx = reinterpret_cast<context *>(bdev->bdif->p_user);
-                if (!ctx) {
-                    return -EIO;
-                }
-                return ctx->mutex.Unlock() ? (0) : (-EIO);
-            }
 
         } // namespace io
 
@@ -118,12 +103,11 @@ namespace purefs::fs::drivers::ext4::internal
 
         // Insert into the container
         auto cfg              = std::make_unique<ext4_config>();
+        std::memset(cfg.get(), 0, sizeof(ext4_config));
         cfg->ifc.open         = io::open;
         cfg->ifc.bread        = io::read;
         cfg->ifc.bwrite       = io::write;
         cfg->ifc.close        = io::close;
-        cfg->ifc.lock         = io::lock;
-        cfg->ifc.unlock       = io::unlock;
         cfg->buf              = std::make_unique<uint8_t[]>(sect_size);
         cfg->ifc.ph_bbuf      = cfg->buf.get();
         cfg->ifc.ph_bcnt      = sect_count;
