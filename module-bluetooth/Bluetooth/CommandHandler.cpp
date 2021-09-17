@@ -72,6 +72,12 @@ namespace bluetooth
             return profileManager->stopRinging();
         case Command::StartRouting:
             return profileManager->initializeCall();
+        case Command::CallAnswered:
+            return profileManager->callAnswered();
+        case Command::CallTerminated:
+            return profileManager->callTerminated();
+        case Command::IncomingCallNumber:
+            return profileManager->setIncomingCallNumber(command.getNumberString());
         case Command::StartStream:
             profileManager->start();
             return Error::Success;

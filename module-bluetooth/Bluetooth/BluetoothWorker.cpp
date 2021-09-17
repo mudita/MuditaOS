@@ -38,7 +38,7 @@ namespace queues
 
 namespace
 {
-    constexpr auto BluetoothWorkerStackDepth = 3072U;
+    constexpr auto BluetoothWorkerStackDepth = 4096U;
 
     class DeviceRegistration
     {
@@ -142,7 +142,7 @@ auto BluetoothWorker::run() -> bool
 
 auto BluetoothWorker::handleCommand(QueueHandle_t queue) -> bool
 {
-    bluetooth::Command command(bluetooth::Command::Type::None);
+    bluetooth::Command command(bluetooth::Command::None);
     if (xQueueReceive(queue, static_cast<void *>(&command), 0) != pdTRUE) {
         LOG_ERROR("Queue receive failure!");
         return false;

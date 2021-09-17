@@ -8,6 +8,7 @@
 #include "interface/BluetoothDriver.hpp"
 
 #include <cstdint>
+#include <PhoneNumber.hpp>
 
 namespace sys
 {
@@ -40,16 +41,27 @@ namespace bluetooth
             StartStream,
             StopStream,
             SwitchProfile,
+            CallAnswered,
+            CallTerminated,
+            IncomingCallNumber,
             None,
         };
-
-        explicit Command(Command::Type type, std::optional<Devicei> dev = std::nullopt) : type(type)
+        Command(Command::Type type, std::optional<Devicei> dev) : type(type)
         {
             if (dev.has_value()) {
                 device = dev.value();
             }
         }
-
+        Command(Command::Type type, std::optional<utils::PhoneNumber::View> num) : type(type)
+        {
+            if (num.has_value()) {
+                LOG_ERROR("Command number: %s", num->getEntered().c_str());
+                numberStringPtr  = new std::string();
+                *numberStringPtr = num->getEntered();
+            }
+        }
+        explicit Command(Command::Type type) : type(type)
+        {}
         auto getType() const noexcept -> Command::Type
         {
             return type;
@@ -60,8 +72,22 @@ namespace bluetooth
             return device;
         }
 
+        auto getNumberString() noexcept -> std::string
+        {
+            if (numberStringPtr != nullptr) {
+                return *numberStringPtr;
+            }
+            return std::string();
+        }
+
+        void destroy()
+        {
+            delete numberStringPtr;
+        }
+
       private:
         Devicei device{};
+        std::string *numberStringPtr = nullptr;
         Type type;
     };
 

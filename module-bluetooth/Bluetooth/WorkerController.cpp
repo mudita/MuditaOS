@@ -180,5 +180,6 @@ namespace bluetooth
     {
         LOG_INFO("Process command: %s", magic_enum::enum_name(command.getType()).data());
         pimpl->sm.process_event(ProcessCommand{command});
+        command.destroy();
     }
 } // namespace bluetooth
