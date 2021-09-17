@@ -15,8 +15,8 @@ namespace bluetooth
     {
         if (!initialized) {
             profilesList = {{AudioProfile::A2DP, std::make_shared<bluetooth::A2DP>()},
-                            {AudioProfile::HSP, std::make_shared<bluetooth::HSP>()},
-                            {AudioProfile::HFP, nullptr},
+                            {AudioProfile::HSP, nullptr},
+                            {AudioProfile::HFP, std::make_shared<bluetooth::HFP>()},
                             {AudioProfile::None, nullptr}};
 
             for (auto &[profileName, ptr] : profilesList) {
@@ -90,7 +90,7 @@ namespace bluetooth
 
     auto ProfileManager::startRinging() -> Error::Code
     {
-        switchProfile(AudioProfile::HSP);
+        switchProfile(AudioProfile::HFP);
         return currentProfilePtr->startRinging();
     }
 
@@ -101,7 +101,7 @@ namespace bluetooth
 
     auto ProfileManager::initializeCall() -> Error::Code
     {
-        switchProfile(AudioProfile::HSP);
+        switchProfile(AudioProfile::HFP);
         return currentProfilePtr->initializeCall();
     }
 
@@ -119,6 +119,22 @@ namespace bluetooth
     auto ProfileManager::isAddressActuallyUsed(const bd_addr_t address) -> bool
     {
         return !static_cast<bool>(bd_addr_cmp(address, remoteAddr));
+    }
+    auto ProfileManager::callAnswered() -> Error::Code
+    {
+        return currentProfilePtr->callAnswered();
+    }
+    auto ProfileManager::callTerminated() -> Error::Code
+    {
+        return currentProfilePtr->callTerminated();
+    }
+    auto ProfileManager::setIncomingCallNumber(const std::string &num) -> Error::Code
+    {
+        if (currentProfilePtr) {
+            return currentProfilePtr->setIncomingCallNumber(num);
+        }
+        LOG_ERROR("No profile, returning!");
+        return Error::Success;
     }
 
 } // namespace bluetooth
