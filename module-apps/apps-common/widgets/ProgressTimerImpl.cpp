@@ -8,14 +8,19 @@
 #include <time/time_conversion.hpp>
 #include <gsl/assert>
 
+namespace
+{
+    inline constexpr auto increasingModePrefix = "-";
+}
 namespace app
 {
 
     ProgressTimerImpl::ProgressTimerImpl(app::ApplicationCommon *app,
                                          gui::Item *parent,
                                          std::string timerName,
-                                         std::chrono::milliseconds baseTick)
-        : app{app}, parent{parent}, name{std::move(timerName)}, baseTickInterval{baseTick}
+                                         std::chrono::milliseconds baseTick,
+                                         ProgressCountdownMode countdownMode)
+        : app{app}, parent{parent}, name{std::move(timerName)}, baseTickInterval{baseTick}, countdownMode{countdownMode}
     {}
 
     void ProgressTimerImpl::resetProgress()
@@ -35,11 +40,17 @@ namespace app
     void ProgressTimerImpl::updateText()
     {
         using utils::time::Duration;
-        if (text != nullptr) {
-            const auto secondsRemaining = duration - elapsed;
-            const Duration remainingDuration{std::time_t{secondsRemaining.count()}};
-            text->setText(remainingDuration.str(Duration::DisplayedFormat::Fixed0M0S));
+        if (text == nullptr) {
+            return;
         }
+        const auto secondsRemaining = duration - elapsed;
+        const Duration remainingDuration{std::time_t{secondsRemaining.count()}};
+        UTF8 timerText;
+        if (countdownMode == ProgressCountdownMode::Increasing && secondsRemaining != std::chrono::seconds::zero()) {
+            timerText += increasingModePrefix;
+        }
+        timerText += remainingDuration.str(Duration::DisplayedFormat::Fixed0M0S);
+        text->setText(std::move(timerText));
     }
 
     void ProgressTimerImpl::updateProgress()
