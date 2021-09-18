@@ -13,15 +13,21 @@ target_include_directories(application-bell-background-sounds
 target_sources(application-bell-background-sounds
     PRIVATE
         ApplicationBellBackgroundSounds.cpp
+        presenter/BGSoundsProgressPresenter.cpp
         presenter/BGSoundsTimerSelectPresenter.cpp
         windows/BGSoundsMainWindow.cpp
+        windows/BGSoundsPausedWindow.cpp
+        windows/BGSoundsProgressWindow.cpp
         windows/BGSoundsTimerSelectWindow.cpp
 
         data/BGSoundsCommon.hpp
         data/BGSoundsStyle.hpp
         presenter/BGSoundsMainWindowPresenter.hpp
+        presenter/BGSoundsProgressPresenter.hpp
         presenter/BGSoundsTimerSelectPresenter.hpp
         windows/BGSoundsMainWindow.hpp
+        windows/BGSoundsPausedWindow.hpp
+        windows/BGSoundsProgressWindow.hpp
         windows/BGSoundsTimerSelectWindow.hpp
 
     PUBLIC

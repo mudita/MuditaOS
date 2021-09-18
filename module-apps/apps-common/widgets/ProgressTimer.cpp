@@ -1,10 +1,11 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "ProgressTimerImpl.hpp"
+#include "ProgressTimer.hpp"
 #include <Text.hpp>
 #include <ProgressBar.hpp>
 #include <ApplicationCommon.hpp>
+#include <apps-common/GuiTimer.hpp>
 #include <time/time_conversion.hpp>
 #include <gsl/assert>
 
@@ -15,29 +16,29 @@ namespace
 namespace app
 {
 
-    ProgressTimerImpl::ProgressTimerImpl(app::ApplicationCommon *app,
-                                         gui::Item *parent,
-                                         std::string timerName,
-                                         std::chrono::milliseconds baseTick,
-                                         ProgressCountdownMode countdownMode)
+    ProgressTimer::ProgressTimer(app::ApplicationCommon *app,
+                                 gui::Item &parent,
+                                 std::string timerName,
+                                 std::chrono::milliseconds baseTick,
+                                 ProgressCountdownMode countdownMode)
         : app{app}, parent{parent}, name{std::move(timerName)}, baseTickInterval{baseTick}, countdownMode{countdownMode}
     {}
 
-    void ProgressTimerImpl::resetProgress()
+    void ProgressTimer::resetProgress()
     {
         if (progress != nullptr) {
             progress->setValue(0);
         }
     }
 
-    void ProgressTimerImpl::update()
+    void ProgressTimer::update()
     {
         updateText();
         updateProgress();
         app->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
     }
 
-    void ProgressTimerImpl::updateText()
+    void ProgressTimer::updateText()
     {
         using utils::time::Duration;
         if (text == nullptr) {
@@ -53,7 +54,7 @@ namespace app
         text->setText(std::move(timerText));
     }
 
-    void ProgressTimerImpl::updateProgress()
+    void ProgressTimer::updateProgress()
     {
         if (progress != nullptr) {
             const auto percentage  = static_cast<float>(elapsed.count()) / duration.count();
@@ -62,7 +63,7 @@ namespace app
         }
     }
 
-    void ProgressTimerImpl::reset(std::chrono::seconds _duration, std::chrono::seconds _interval)
+    void ProgressTimer::reset(std::chrono::seconds _duration, std::chrono::seconds _interval)
     {
         Expects(_duration != std::chrono::seconds::zero());
 
@@ -75,21 +76,21 @@ namespace app
         resetProgress();
     }
 
-    void ProgressTimerImpl::start()
+    void ProgressTimer::start()
     {
         startTimer();
         isRunning = true;
     }
 
-    void ProgressTimerImpl::startTimer()
+    void ProgressTimer::startTimer()
     {
         Expects(app != nullptr);
-        parent->timerCallback = [this](gui::Item &it, sys::Timer &task) { return onTimerTimeout(it, task); };
-        timerTask             = app::GuiTimerFactory::createPeriodicTimer(app, parent, name, baseTickInterval);
+        parent.timerCallback = [this](gui::Item &it, sys::Timer &task) { return onTimerTimeout(task); };
+        timerTask            = app::GuiTimerFactory::createPeriodicTimer(app, &parent, name, baseTickInterval);
         timerTask.start();
     }
 
-    auto ProgressTimerImpl::onTimerTimeout(gui::Item &self, sys::Timer &task) -> bool
+    auto ProgressTimer::onTimerTimeout(sys::Timer &task) -> bool
     {
         if (isStopped() || isFinished()) {
             task.stop();
@@ -107,43 +108,43 @@ namespace app
         return true;
     }
 
-    auto ProgressTimerImpl::isFinished() const noexcept -> bool
+    auto ProgressTimer::isFinished() const noexcept -> bool
     {
         return duration <= elapsed;
     }
 
-    auto ProgressTimerImpl::isStopped() const noexcept -> bool
+    auto ProgressTimer::isStopped() const noexcept -> bool
     {
         return !isRunning;
     }
 
-    auto ProgressTimerImpl::intervalReached() const noexcept -> bool
+    auto ProgressTimer::intervalReached() const noexcept -> bool
     {
         return hasInterval && (elapsed.count() % interval.count()) == 0;
     }
 
-    void ProgressTimerImpl::stop()
+    void ProgressTimer::stop()
     {
         isRunning = false;
     }
 
-    void ProgressTimerImpl::registerOnFinishedCallback(std::function<void()> cb)
+    void ProgressTimer::registerOnFinishedCallback(std::function<void()> cb)
     {
         onFinishedCallback = std::move(cb);
     }
 
-    void ProgressTimerImpl::registerOnIntervalCallback(std::function<void()> cb)
+    void ProgressTimer::registerOnIntervalCallback(std::function<void()> cb)
     {
         onIntervalCallback = std::move(cb);
     }
 
-    void ProgressTimerImpl::attach(gui::Progress *_progress)
+    void ProgressTimer::attach(gui::Progress *_progress)
     {
         Expects(_progress != nullptr);
         progress = _progress;
     }
 
-    void ProgressTimerImpl::attach(gui::Text *_text)
+    void ProgressTimer::attach(gui::Text *_text)
     {
         Expects(_text != nullptr);
         text = _text;

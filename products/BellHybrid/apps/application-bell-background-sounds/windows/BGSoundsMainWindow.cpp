@@ -3,7 +3,9 @@
 
 #include "BGSoundsMainWindow.hpp"
 #include <application-bell-background-sounds/ApplicationBellBackgroundSounds.hpp>
+#include <ApplicationBellBackgroundSounds.hpp>
 #include <module-gui/gui/input/InputEvent.hpp>
+
 namespace gui
 {
     BGSoundsMainWindow::BGSoundsMainWindow(

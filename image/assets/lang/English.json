@@ -76,6 +76,7 @@
   "common_minute_lower": "minute",
   "common_minutes_lower": "minutes",
   "common_minute_short": "min",
+  "common_paused": "Paused",
   "locale_12hour_min": "%I:%M %p",
   "locale_12hour_min_short": "%I:%M",
   "locale_24hour_min": "%H:%M",

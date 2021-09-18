@@ -7,7 +7,7 @@
 #include <GuiTimer.hpp>
 #include <purefs/filesystem_paths.hpp>
 #include <service-audio/AudioServiceAPI.hpp>
-#include <apps-common/widgets/ProgressTimerImpl.hpp>
+#include <apps-common/widgets/ProgressTimer.hpp>
 
 #include <gsl/assert>
 
@@ -55,7 +55,7 @@ namespace gui
         text->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
         text->setEditMode(EditMode::Browse);
 
-        timer = std::make_unique<app::ProgressTimerImpl>(application, this, meditationTimerName, timerTick);
+        timer = std::make_unique<app::ProgressTimer>(application, *this, meditationTimerName, timerTick);
         timer->attach(progressBar);
         timer->attach(text);
         auto intervalCallback = [app = application] {
@@ -78,7 +78,7 @@ namespace gui
         text->setVisible(isVisible);
     }
 
-    app::ProgressTimer &MeditationTimer::getTimer() noexcept
+    app::TimerWithCallbacks &MeditationTimer::getTimer() noexcept
     {
         Expects(timer != nullptr);
         return *timer;

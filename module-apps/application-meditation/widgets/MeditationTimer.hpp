@@ -8,7 +8,12 @@
 #include <gui/widgets/BoxLayout.hpp>
 #include <gui/widgets/ProgressBar.hpp>
 #include <gui/widgets/Text.hpp>
-#include <apps-common/widgets/ProgressTimer.hpp>
+#include <apps-common/widgets/TimerWithCallbacks.hpp>
+
+namespace app
+{
+    class ProgressTimer;
+}
 
 namespace gui
 {
@@ -26,7 +31,7 @@ namespace gui
         [[nodiscard]] auto onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool override;
 
         void setCounterVisible(bool isVisible) noexcept;
-        [[nodiscard]] app::ProgressTimer &getTimer() noexcept;
+        [[nodiscard]] app::TimerWithCallbacks &getTimer() noexcept;
         [[nodiscard]] gui::Progress &getProgress() noexcept;
 
       private:
