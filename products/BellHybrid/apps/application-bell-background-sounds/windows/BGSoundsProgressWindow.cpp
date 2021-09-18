@@ -1,10 +1,9 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "PowerNapProgressWindow.hpp"
-#include "application-bell-powernap/ApplicationBellPowerNap.hpp"
-#include "data/PowerNapStyle.hpp"
-#include "data/PowerNapSwitchData.hpp"
+#include "BGSoundsProgressWindow.hpp"
+#include <ApplicationBellBackgroundSounds.hpp>
+#include "data/BGSoundsStyle.hpp"
 #include <apps-common/widgets/BellBaseLayout.hpp>
 #include <apps-common/widgets/BarGraph.hpp>
 #include <apps-common/widgets/ProgressTimer.hpp>
@@ -13,6 +12,10 @@
 
 namespace
 {
+    inline constexpr auto recordNamePlaceHolder = "Meditative Surprises";
+    inline constexpr auto bgSoundsTimerName     = "BGSoundsProgressTimer";
+    inline constexpr std::chrono::seconds timerTick{1};
+
     void decorateProgressItem(gui::Rect *item, gui::Alignment::Vertical alignment)
     {
         item->setEdges(gui::RectangleEdge::None);
@@ -22,8 +25,8 @@ namespace
     void createTitle(gui::VBox *parent)
     {
         auto title = new gui::Text(parent, 0, 0, parent->getWidth(), parent->getHeight() / 2);
-        title->setFont(gui::powerNapStyle::descriptionFont);
-        title->setText(utils::translate("app_bellmain_power_nap"));
+        title->setFont(gui::bgSoundsStyle::descriptionFont);
+        title->setText(recordNamePlaceHolder);
         decorateProgressItem(title, gui::Alignment::Vertical::Top);
     }
     gui::HBarGraph *createProgress(gui::VBox *parent)
@@ -31,14 +34,14 @@ namespace
         auto progressBox = new gui::HBox(parent, 0, 0, parent->getWidth(), parent->getHeight() / 2);
         decorateProgressItem(progressBox, gui::Alignment::Vertical::Bottom);
         auto progressBar =
-            new gui::HBarGraph(progressBox, 0, 0, gui::powerNapStyle::progress::boxesCount, gui::BarGraphStyle::Heavy);
+            new gui::HBarGraph(progressBox, 0, 0, gui::bgSoundsStyle::progress::boxesCount, gui::BarGraphStyle::Heavy);
         decorateProgressItem(progressBar, gui::Alignment::Vertical::Center);
         return progressBar;
     }
     gui::Text *createTimer(gui::Item *parent)
     {
         using namespace style;
-        using namespace gui::powerNapStyle;
+        using namespace gui::bgSoundsStyle;
         auto timer = new gui::Text(
             parent, 0, 0, bell_base_layout::w, bell_base_layout::outer_layouts_h - progress::bottomDescTopMargin);
         timer->setFont(descriptionFont);
@@ -46,33 +49,34 @@ namespace
         decorateProgressItem(timer, gui::Alignment::Vertical::Top);
         return timer;
     }
-
-    inline constexpr auto powernapTimerName = "PowerNapTimer";
-    inline constexpr std::chrono::seconds timerTick{1};
 } // namespace
 
 namespace gui
 {
-    PowerNapProgressWindow::PowerNapProgressWindow(
-        app::ApplicationCommon *app, std::shared_ptr<app::powernap::PowerNapProgressContract::Presenter> presenter)
-        : AppWindow(app, gui::window::name::powernapProgress), presenter{std::move(presenter)}
+    BGSoundsProgressWindow::BGSoundsProgressWindow(
+        app::ApplicationCommon *app, std::shared_ptr<app::bgSounds::BGSoundsProgressContract::Presenter> presenter)
+        : AppWindow(app, gui::window::name::bgSoundsProgress), presenter{std::move(presenter)}
     {
         this->presenter->attach(this);
         buildInterface();
     }
 
-    void PowerNapProgressWindow::onBeforeShow(ShowMode mode, SwitchData *data)
+    void BGSoundsProgressWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
+        if (mode == ShowMode::GUI_SHOW_RETURN) {
+            presenter->resume();
+            return;
+        }
         presenter->activate();
     }
 
-    void PowerNapProgressWindow::buildInterface()
+    void BGSoundsProgressWindow::buildInterface()
     {
         AppWindow::buildInterface();
         buildLayout();
         configureTimer();
     }
-    void PowerNapProgressWindow::buildLayout()
+    void BGSoundsProgressWindow::buildLayout()
     {
         auto body = new gui::BellBaseLayout(this, 0, 0, style::bell_base_layout::w, style::bell_base_layout::h, false);
         auto vBox =
@@ -87,27 +91,34 @@ namespace gui
             return true;
         };
     }
-    void PowerNapProgressWindow::configureTimer()
+    void BGSoundsProgressWindow::configureTimer()
     {
-        auto timer = std::make_unique<app::ProgressTimer>(
-            application, *this, powernapTimerName, timerTick, app::ProgressCountdownMode::Increasing);
+        auto timer = std::make_unique<app::ProgressTimer>(application, *this, bgSoundsTimerName, timerTick);
         timer->attach(progressBar);
         timer->attach(timerText);
         presenter->setTimer(std::move(timer));
     }
 
-    auto PowerNapProgressWindow::onInput(const InputEvent &inputEvent) -> bool
+    auto BGSoundsProgressWindow::onInput(const InputEvent &inputEvent) -> bool
     {
         if (inputEvent.isShortRelease()) {
-            if (inputEvent.is(KeyCode::KEY_RF) || inputEvent.is(KeyCode::KEY_ENTER)) {
-                presenter->endNap();
+            if (inputEvent.is(KeyCode::KEY_RF)) {
+                presenter->stop();
+                return true;
+            }
+            else if (inputEvent.is(KeyCode::KEY_ENTER)) {
+                presenter->pause();
                 return true;
             }
         }
         return AppWindow::onInput(inputEvent);
     }
-    void PowerNapProgressWindow::napEnded()
+    void BGSoundsProgressWindow::onFinished()
     {
-        application->switchWindow(gui::window::name::powernapSessionEnded, std::make_unique<gui::PowerNapSwitchData>());
+        application->returnToPreviousWindow();
+    }
+    void BGSoundsProgressWindow::onPaused()
+    {
+        application->switchWindow(gui::window::name::bgSoundsPaused);
     }
 } // namespace gui
