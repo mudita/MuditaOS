@@ -32,7 +32,8 @@ namespace app::powernap
 
     void PowerNapProgressPresenter::initTimer(gui::Item *parent)
     {
-        timer = std::make_unique<app::ProgressTimerImpl>(app, parent, powernapTimerName, timerTick);
+        timer = std::make_unique<app::ProgressTimerImpl>(
+            app, parent, powernapTimerName, timerTick, app::ProgressCountdownMode::Increasing);
         timer->registerOnFinishedCallback([this]() { onNapFinished(); });
     }
     void PowerNapProgressPresenter::activate()
