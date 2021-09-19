@@ -49,8 +49,8 @@
  *
  */
 
-#include "board/clock_config.h"
-#include "board.h"
+#include <board/clock_config.h>
+#include <board/board.h>
 #include "fsl_iomuxc.h"
 #include "fsl_dcdc.h"
 #include "fsl_gpc.h"

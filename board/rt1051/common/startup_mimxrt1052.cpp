@@ -452,7 +452,7 @@ extern "C"
 #endif
 
 #include "MIMXRT1051.h"
-#include "macros.h"
+#include <board/macros.h>
 #include <cinttypes>
 #include <cstdlib>
 #include <cstdint>

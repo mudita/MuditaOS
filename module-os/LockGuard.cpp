@@ -3,15 +3,15 @@
 
 #include "critical.hpp"
 #include "LockGuard.hpp"
-#include <macros.h>
+#include <board/macros.h>
 #include <stdexcept>
 
-LockGuard::LockGuard(cpp_freertos::MutexStandard& mutex) : mutex(mutex)
+LockGuard::LockGuard(cpp_freertos::MutexStandard &mutex) : mutex(mutex)
 {
     if (isIRQ()) {
         savedInterruptStatus = cpp_freertos::CriticalSection::EnterFromISR();
     }
-    else if(!mutex.Lock()) {
+    else if (!mutex.Lock()) {
         throw std::runtime_error("LockGuard failed to lock mutex");
     }
 }

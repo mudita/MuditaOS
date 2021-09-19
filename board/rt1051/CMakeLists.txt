@@ -46,8 +46,10 @@ target_sources(board
         xip/evkbimxrt1050_sdram_ini_dcd.c
         xip/fsl_flexspi_nor_boot.c
 
-        board.h
-        macros.h
+        board/board.h
+        board/debug_console.hpp
+        board/macros.h
+        board/reboot_codes.hpp
 )
 
 target_include_directories(board

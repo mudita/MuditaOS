@@ -3,7 +3,7 @@
 
 #include "CriticalSectionGuard.hpp"
 
-#include <macros.h>
+#include <board/macros.h>
 
 extern "C"
 {

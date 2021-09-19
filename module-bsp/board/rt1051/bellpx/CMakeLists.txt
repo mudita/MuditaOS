@@ -17,8 +17,4 @@ target_sources(
         bsp/switches/switches.cpp
         bsp/rotary_encoder/rotary_encoder.cpp
         bsp/bell_temp_sensor/bell_temp_sensor.cpp
-        pin_mux.c
-        clock_config.cpp
-        irq_gpio.cpp
-        debug_console.cpp
 )

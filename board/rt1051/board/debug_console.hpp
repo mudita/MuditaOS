@@ -3,8 +3,8 @@
 
 #pragma once
 
-namespace bsp::board
+namespace board
 {
     //! Initialize debug console
     void initDebugConsole();
-} // namespace bsp::board
+} // namespace board

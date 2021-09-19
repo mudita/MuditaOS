@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-namespace bsp
+namespace board
 {
 
     void irq_gpio_Init(void);

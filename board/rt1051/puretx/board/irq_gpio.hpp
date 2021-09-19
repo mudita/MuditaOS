@@ -3,7 +3,7 @@
 
 #pragma once
 
-namespace bsp
+namespace board
 {
 
     void irq_gpio_Init(void);

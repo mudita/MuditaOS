@@ -8,7 +8,7 @@
 
 #include <cstdint>
 
-namespace bsp
+namespace board
 {
     enum rebootCode : std::uint32_t
     {
@@ -18,4 +18,4 @@ namespace bsp
         rebootToFactoryRstCode = std::uint32_t{0xdead0002},
         rebootFailedToBoot     = std::uint32_t{0xdeadFFFF}
     };
-} // namespace bsp
+} // namespace board
