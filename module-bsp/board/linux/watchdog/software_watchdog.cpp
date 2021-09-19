@@ -2,8 +2,8 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "software_watchdog.hpp"
-#include <module-os/RTOSWrapper/include/critical.hpp>
-#include <module-os/RTOSWrapper/include/ticks.hpp>
+#include <critical.hpp>
+#include <ticks.hpp>
 #include <system/Common.hpp>
 #include <log/log.hpp>
 #include <cstdlib>

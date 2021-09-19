@@ -29,6 +29,8 @@ target_link_libraries(
         desktop-endpoint-base
     PUBLIC
         endpoint-message-sender
+        hash-library::hash-library
+        module-db
         sys-service
 )
 

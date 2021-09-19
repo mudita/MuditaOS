@@ -5,7 +5,6 @@
 
 #include "ServiceForward.hpp"
 #include "BusProxy.hpp"
-#include "Common.hpp"  // for ReturnCodes, ServicePriority, BusChannels
 #include "Mailbox.hpp" // for Mailbox
 #include "Message.hpp" // for MessagePointer
 #include "ServiceManifest.hpp"

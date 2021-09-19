@@ -28,11 +28,7 @@ set(SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/PhoneInterface.cpp
         )
 
-message("Build with BlueKitchen")
 include(lib/btstack.cmake)
-
-message(${CMAKE_CXX_FLAGS_RELWITHDEBINFO})
-message("Sources: " ${SOURCES})
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_DIR_SOURCES})
 
 
@@ -56,6 +52,7 @@ target_include_directories(
     PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${TARGET_LIBRARIES_INCLUDES}
+    ${BT_STACK_ROOT}
     ${BT_STACK_ROOT}/src
     ${BT_STACK_ROOT}/src/classic
 )
