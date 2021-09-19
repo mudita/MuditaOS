@@ -31,12 +31,18 @@ namespace db::multimedia_files::query
         return std::string{"GetLimitedForAlbum"};
     }
 
-    GetLimitedResult::GetLimitedResult(std::vector<MultimediaFilesRecord> records) : records(std::move(records))
+    GetLimitedResult::GetLimitedResult(std::vector<MultimediaFilesRecord> records, unsigned int dbRecordsCount)
+        : records(std::move(records)), dbRecordsCount{dbRecordsCount}
     {}
 
     auto GetLimitedResult::getResult() const -> std::vector<MultimediaFilesRecord>
     {
         return records;
+    }
+
+    auto GetLimitedResult::getCount() const noexcept -> unsigned int
+    {
+        return dbRecordsCount;
     }
 
     auto GetLimitedResult::debugInfo() const -> std::string
@@ -53,12 +59,18 @@ namespace db::multimedia_files::query
         return std::string{"GetArtistsLimited"};
     }
 
-    GetArtistsLimitedResult::GetArtistsLimitedResult(std::vector<Artist> records) : records(std::move(records))
+    GetArtistsLimitedResult::GetArtistsLimitedResult(std::vector<Artist> records, unsigned int dbRecordsCount)
+        : records(std::move(records)), dbRecordsCount{dbRecordsCount}
     {}
 
     auto GetArtistsLimitedResult::getResult() const -> std::vector<Artist>
     {
         return records;
+    }
+
+    auto GetArtistsLimitedResult::getCount() const noexcept -> unsigned int
+    {
+        return dbRecordsCount;
     }
 
     auto GetArtistsLimitedResult::debugInfo() const -> std::string
@@ -75,12 +87,18 @@ namespace db::multimedia_files::query
         return std::string{"GetAlbumsLimited"};
     }
 
-    GetAlbumsLimitedResult::GetAlbumsLimitedResult(std::vector<Album> records) : records(std::move(records))
+    GetAlbumsLimitedResult::GetAlbumsLimitedResult(std::vector<Album> records, unsigned int dbRecordsCount)
+        : records(std::move(records)), dbRecordsCount{dbRecordsCount}
     {}
 
     auto GetAlbumsLimitedResult::getResult() const -> std::vector<Album>
     {
         return records;
+    }
+
+    auto GetAlbumsLimitedResult::getCount() const noexcept -> unsigned int
+    {
+        return dbRecordsCount;
     }
 
     auto GetAlbumsLimitedResult::debugInfo() const -> std::string
