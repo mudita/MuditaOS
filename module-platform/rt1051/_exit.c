@@ -7,13 +7,12 @@
 #include <MIMXRT1051.h>
 #include <log.hpp>
 #include <task.h>
-#include <macros.h>
+#include <board/macros.h>
 // ----------------------------------------------------------------------------
 
 // Forward declaration
 
-void
-_exit(int code);
+void _exit(int code);
 
 // ----------------------------------------------------------------------------
 
@@ -30,9 +29,8 @@ void __attribute__((weak)) _exit(int code)
     haltIfDebugging();
     vTaskEndScheduler();
 #ifdef DEBUG
-    while(1){};
+    while (1) {};
 #endif
 }
 
 // ----------------------------------------------------------------------------
-

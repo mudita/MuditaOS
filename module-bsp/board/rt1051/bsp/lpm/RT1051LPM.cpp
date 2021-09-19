@@ -4,7 +4,7 @@
 #include "RT1051LPM.hpp"
 
 #include <board/board.h>
-#include "reboot_codes.hpp"
+#include <board/reboot_codes.hpp>
 #include <log.hpp>
 #include "board/BoardDefinitions.hpp"
 #include "bsp/watchdog/watchdog.hpp"
@@ -18,6 +18,7 @@ namespace bsp
 {
 
     using namespace drivers;
+    using board::rebootCode;
 
     RT1051LPM::RT1051LPM()
     {

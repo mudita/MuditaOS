@@ -14,5 +14,6 @@ target_link_libraries(eventstore
    PRIVATE
       module-os
       log-api
+      hal
 )
 

@@ -6,7 +6,8 @@
 #include "Common.hpp"
 #include "MessageForward.hpp"
 
-#include <MessageType.hpp>
+// TODO
+#include <source/MessageType.hpp>
 #include <magic_enum.hpp>
 
 #include <cstdint>

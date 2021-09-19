@@ -23,14 +23,10 @@ target_sources(
         drivers/pwm/DriverPWM.cpp
         drivers/semc/DriverSEMC.cpp
         drivers/usdhc/DriverUSDHC.cpp
-
-    PUBLIC
-        hal/temperature_source/TemperatureSource.hpp
-        hal/battery_charger/AbstractBatteryCharger.hpp
-        hal/key_input/AbstractKeyInput.hpp
-        hal/key_input/KeyEventDefinitions.hpp
 )
 add_board_subdirectory(board)
+add_subdirectory(hal)
+
 
 # Board specific compilation definitions,options,include directories and features
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
@@ -80,6 +76,7 @@ target_link_libraries(${PROJECT_NAME}
         module-os
         service-bluetooth
         magic_enum
+        hal
         ${TARGET_LIBRARIES}
     PRIVATE
         purefs-paths

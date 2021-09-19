@@ -3,7 +3,7 @@
 
 #include "StreamQueuedEventsListener.hpp"
 
-#include <macros.h>
+#include <board/macros.h>
 
 #include <utility>
 

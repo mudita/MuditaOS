@@ -7,7 +7,7 @@
 #include <log.hpp>
 
 #include "board/BoardDefinitions.hpp"
-#include "board/rt1051/common/audio.hpp"
+#include <audio.hpp>
 
 using audio::codec::Configuration;
 

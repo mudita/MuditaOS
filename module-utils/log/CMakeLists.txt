@@ -10,5 +10,12 @@ add_subdirectory(api)
 add_subdirectory(board)
 
 target_include_directories(log PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(log PUBLIC log-api)
+target_link_libraries(log
+        PUBLIC
+                board
+                log-api
+        PRIVATE
+                module-utils
+                segger::rtt
+)
 

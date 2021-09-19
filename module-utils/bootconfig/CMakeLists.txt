@@ -18,7 +18,7 @@ target_link_libraries( ${PROJECT_NAME}
    PRIVATE
       module-utils
       module-vfs
-      module-platform
+      platform
       hash-library::hash-library
       Microsoft.GSL::GSL
       json::json

@@ -69,6 +69,7 @@ target_link_libraries(${PROJECT_NAME}
         Microsoft.GSL::GSL
         json::json
         base64::base64
+        platform
         $<$<STREQUAL:${PROJECT_TARGET},TARGET_RT1051>:usb_stack::usb_stack>
     PUBLIC
         module-cellular

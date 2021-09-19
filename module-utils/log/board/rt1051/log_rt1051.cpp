@@ -3,7 +3,7 @@
 
 #include <board/board.h>
 #include <critical.hpp>
-#include <macros.h>
+#include <board/macros.h>
 #include <log.hpp>
 #include <Logger.hpp>
 #include <SEGGER_RTT.h>

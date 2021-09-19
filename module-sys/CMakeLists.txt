@@ -30,7 +30,12 @@ set(SOURCES
         )
 
 add_library(bus STATIC ${BUS_IMPL_SOURCES})
-target_link_libraries(bus PRIVATE module-os)
+target_link_libraries(bus
+    PRIVATE
+        magic_enum
+        messagetype
+        module-os
+)
 
 target_compile_definitions(bus PRIVATE ${PROJECT_CONFIG_DEFINITIONS})
 target_compile_definitions(bus PRIVATE ${PROJECT_TARGET})
