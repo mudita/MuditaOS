@@ -4,6 +4,9 @@
 #pragma once
 
 #include <apps-common/BasePresenter.hpp>
+#include <memory>
+#include <string>
+#include <vector>
 
 namespace app::bgSounds
 {
@@ -13,13 +16,24 @@ namespace app::bgSounds
         class View
         {
           public:
-            ~View() = default;
+            virtual ~View() = default;
+
+            virtual void setSoundsList() = 0;
         };
 
         class Presenter : public BasePresenter<BGSoundsMainWindowContract::View>
-        {};
+        {
+          public:
+            virtual void loadAudioRecords() = 0;
+        };
     };
 
     class BGSoundsMainWindowPresenter : public BGSoundsMainWindowContract::Presenter
-    {};
+    {
+        void loadAudioRecords() override;
+
+      public:
+        explicit BGSoundsMainWindowPresenter();
+    };
+
 } // namespace app::bgSounds
