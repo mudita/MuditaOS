@@ -5,8 +5,8 @@
 
 #include "BlockDeviceFactory.hpp"
 
-#include <bsp/bsp.hpp>
-#include <purefs/vfs_subsystem.h>
+#include <Board.hpp>
+#include <purefs/vfs_subsystem.hpp>
 
 #include <exception>
 
@@ -15,7 +15,7 @@ using platform::rt1051::RT1051Platform;
 
 RT1051Platform::RT1051Platform()
 {
-    bsp::BoardInit();
+    board::BoardInit();
 }
 
 RT1051Platform::~RT1051Platform()

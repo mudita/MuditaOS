@@ -13,7 +13,7 @@ extern "C"
 #endif
 }
 
-namespace bsp::board
+namespace board
 {
 
 #if LOG_LUART_ENABLED
@@ -60,4 +60,4 @@ namespace bsp::board
         LPUART_EnableRx(LPUART3, true);
 #endif
     }
-} // namespace bsp::board
+} // namespace board

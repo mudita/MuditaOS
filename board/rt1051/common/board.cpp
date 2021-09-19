@@ -148,7 +148,7 @@ namespace board
         BOARD_InitBootClocks();
         BOARD_ConfigMPU();
 
-        board::initDebugConsole();
+        initDebugConsole();
 
         irq_gpio_Init();
 
