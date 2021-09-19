@@ -16,7 +16,7 @@ namespace app::music_player
     class SongsModel : public SongsModelInterface
     {
       public:
-        explicit SongsModel(std::shared_ptr<AbstractSongsRepository> songsRepository);
+        SongsModel(app::ApplicationCommon *app, std::shared_ptr<AbstractSongsRepository> songsRepository);
 
         void createData(OnShortReleaseCallback shortReleaseCallback,
                         OnLongPressCallback longPressCallback,
@@ -46,9 +46,16 @@ namespace app::music_player
         void clearData() override;
 
       private:
-        void clearCurrentItemState();
-        void updateCurrentItemState();
+        bool onMusicListRetrieved(const std::vector<db::multimedia_files::MultimediaFilesRecord> &records,
+                                  unsigned int repoRecordsCount);
+        [[nodiscard]] bool updateRecords(std::vector<db::multimedia_files::MultimediaFilesRecord> records) override;
+
         SongContext songContext;
+
+        OnShortReleaseCallback shortReleaseCallback{nullptr};
+        OnLongPressCallback longPressCallback{nullptr};
+        OnSetBottomBarTemporaryCallback bottomBarTemporaryMode{nullptr};
+        OnRestoreBottomBarTemporaryCallback bottomBarRestoreFromTemporaryMode{nullptr};
 
         std::shared_ptr<AbstractSongsRepository> songsRepository;
     };

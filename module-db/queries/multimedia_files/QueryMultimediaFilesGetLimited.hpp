@@ -48,11 +48,12 @@ namespace db::multimedia_files::query
     class GetLimitedResult : public QueryResult
     {
         const std::vector<MultimediaFilesRecord> records;
+        unsigned int dbRecordsCount;
 
       public:
-        explicit GetLimitedResult(std::vector<MultimediaFilesRecord> records);
+        explicit GetLimitedResult(std::vector<MultimediaFilesRecord> records, unsigned int dbRecordsCount);
         [[nodiscard]] auto getResult() const -> std::vector<MultimediaFilesRecord>;
-
+        [[nodiscard]] auto getCount() const noexcept -> unsigned int;
         [[nodiscard]] auto debugInfo() const -> std::string override;
     };
 
@@ -69,11 +70,12 @@ namespace db::multimedia_files::query
     class GetArtistsLimitedResult : public QueryResult
     {
         const std::vector<Artist> records;
+        unsigned int dbRecordsCount;
 
       public:
-        explicit GetArtistsLimitedResult(std::vector<Artist> records);
+        explicit GetArtistsLimitedResult(std::vector<Artist> records, unsigned int dbRecordsCount);
         [[nodiscard]] auto getResult() const -> std::vector<Artist>;
-
+        [[nodiscard]] auto getCount() const noexcept -> unsigned int;
         [[nodiscard]] auto debugInfo() const -> std::string override;
     };
 
@@ -90,11 +92,12 @@ namespace db::multimedia_files::query
     class GetAlbumsLimitedResult : public QueryResult
     {
         const std::vector<Album> records;
+        unsigned int dbRecordsCount;
 
       public:
-        explicit GetAlbumsLimitedResult(std::vector<Album> records);
+        explicit GetAlbumsLimitedResult(std::vector<Album> records, unsigned int dbRecordsCount);
         [[nodiscard]] auto getResult() const -> std::vector<Album>;
-
+        [[nodiscard]] auto getCount() const noexcept -> unsigned int;
         [[nodiscard]] auto debugInfo() const -> std::string override;
     };
 } // namespace db::multimedia_files::query
