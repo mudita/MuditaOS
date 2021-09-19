@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "pit.hpp"
-#include <board.h>
+#include <board/board.h>
 #include <board/clock_config.h>
 #include <fsl_pit.h>
 #include <board/pin_mux.h>

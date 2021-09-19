@@ -5,7 +5,7 @@
 #include <cstdarg>
 #include <FreeRTOS.h>
 #include <thread.hpp>
-#include <board.h>
+#include <board/board.h>
 
 #if defined(TARGET_RT1051)
 #include "board/rt1051/common/fsl_drivers/fsl_lpuart_edma.h"

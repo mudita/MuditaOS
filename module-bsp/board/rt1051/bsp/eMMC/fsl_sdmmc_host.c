@@ -33,7 +33,7 @@
  */
 
 #include "fsl_sdmmc_host.h"
-#include "board.h"
+#include <board/board.h>
 #include "fsl_sdmmc_event.h"
 #include "fsl_gpio.h"
 #ifdef BOARD_USDHC_CD_PORT_BASE

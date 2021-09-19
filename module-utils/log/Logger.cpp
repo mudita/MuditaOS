@@ -9,7 +9,7 @@
 #include <module-utils/Utils.hpp>
 #include <portmacro.h>
 #include <ticks.hpp>
-#include "macros.h"
+#include <board/macros.h>
 
 namespace Log
 {

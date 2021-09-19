@@ -9,6 +9,8 @@
 
 #include <module-cellular/at/SimInsertedState.hpp>
 
+#include <optional>
+
 namespace at
 {
     class Cmd;
@@ -238,8 +240,8 @@ namespace cellular::service
          */
         std::optional<at::SimInsertedStatus> readSimCardInsertStatus();
 
-        at::BaseChannel *channel        = nullptr;
-        std::optional<api::SimSlot> sim = std::nullopt;
+        at::BaseChannel *channel                         = nullptr;
+        std::optional<api::SimSlot> sim                  = std::nullopt;
         std::optional<at::SimInsertedStatus> simInserted = std::nullopt;
         bool simSelectInProgress                         = false;
     };

@@ -7,7 +7,7 @@
 #include <message_buffer.h>
 #include <timers.h>
 
-#include "board.h"
+#include <board/board.h>
 #include "fsl_lpuart.h"
 #include "fsl_lpuart_edma.h"
 

@@ -5,7 +5,7 @@
 
 #include <service-fileindexer/Constants.hpp>
 
-#include <log/log.hpp>
+#include <log.hpp>
 #include <purefs/filesystem_paths.hpp>
 
 namespace

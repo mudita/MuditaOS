@@ -9,7 +9,7 @@
 
 #include "FreeRTOS.h"
 #include "task.h"
-#include "macros.h"
+#include <board/macros.h>
 
 #include "drivers/pll/DriverPLL.hpp"
 #include "drivers/dmamux/DriverDMAMux.hpp"

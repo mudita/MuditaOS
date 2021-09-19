@@ -10,7 +10,7 @@
 #include <timers.h>
 #include <bsp/switches/switches.hpp>
 #include <board/BoardDefinitions.hpp>
-#include <board.h>
+#include <board/board.h>
 #include <fsl_common.h>
 
 #include <chrono>

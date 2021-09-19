@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <hal/cellular/SIM.hpp>
+
 #include <vector>
 
 namespace cellular
@@ -14,6 +16,8 @@ namespace cellular
 
     namespace api
     {
+        using hal::cellular::SimSlot;
+
         enum class CallMode
         {
             Regular,

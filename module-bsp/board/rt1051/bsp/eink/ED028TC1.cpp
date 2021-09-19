@@ -6,7 +6,7 @@
 #include "fsl_edma.h"
 #include "ED028TC1.h"
 #include "bsp_eink.h"
-#include "board.h"
+#include <board/board.h>
 
 #include <stdbool.h>
 #include <assert.h>
@@ -20,9 +20,9 @@
 //#include "vfs.h"
 
 //#include "log.h"
-#include "board.h"
+#include <board/board.h>
 #include "eink_binarization_luts.h"
-#include "macros.h"
+#include <board/macros.h>
 
 #include <magic_enum.hpp>
 #include "drivers/pll/DriverPLL.hpp"

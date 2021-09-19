@@ -5,7 +5,7 @@
 #include "HFP.hpp"
 
 #include <Bluetooth/Error.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <service-evtmgr/Constants.hpp>
 #include <service-audio/AudioMessage.hpp>
 #include <BluetoothWorker.hpp>

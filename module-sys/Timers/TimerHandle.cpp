@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TimerHandle.hpp"
-#include <module-utils/log/log.hpp>
+#include <log.hpp>
 
 namespace sys
 {

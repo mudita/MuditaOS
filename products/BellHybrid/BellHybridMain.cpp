@@ -30,7 +30,7 @@
 #include <Application.hpp>
 #include <ApplicationLauncher.hpp>
 #include <log/Logger.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <source/version.hpp>
 #include <sys/SystemManager.hpp>
 #include <time/AlarmOperations.hpp>

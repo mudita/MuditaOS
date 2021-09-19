@@ -4,7 +4,7 @@
 #include <service-fileindexer/InotifyHandler.hpp>
 
 #include <filesystem>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <module-db/queries/multimedia_files/QueryMultimediaFilesAdd.hpp>
 #include <module-db/queries/multimedia_files/QueryMultimediaFilesRemove.hpp>
 #include <purefs/fs/inotify_message.hpp>

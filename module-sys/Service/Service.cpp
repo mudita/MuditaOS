@@ -10,16 +10,16 @@
 #include "Timers/SystemTimer.hpp"
 #include "module-sys/Timers/TimerHandle.hpp"  // for Timer
 #include "module-sys/Timers/TimerMessage.hpp" // for TimerMessage
-#include "log/debug.hpp"       // for DEBUG_SERVICE_MESSAGES
-#include <log.hpp>             // for LOG_ERROR, LOG_DEBUG, LOG_FATAL
-#include "mutex.hpp"           // for cpp_freertos
-#include "portmacro.h"         // for UBaseType_t
-#include "thread.hpp"          // for Thread
-#include "ticks.hpp"           // for Ticks
-#include <algorithm>           // for remove_if
-#include <cstdint>             // for uint32_t, uint64_t, UINT32_MAX
-#include <iosfwd>              // for std
-#include <typeinfo>            // for type_info
+#include <debug.hpp>                          // for DEBUG_SERVICE_MESSAGES
+#include <log.hpp>                            // for LOG_ERROR, LOG_DEBUG, LOG_FATAL
+#include "mutex.hpp"                          // for cpp_freertos
+#include "portmacro.h"                        // for UBaseType_t
+#include "thread.hpp"                         // for Thread
+#include "ticks.hpp"                          // for Ticks
+#include <algorithm>                          // for remove_if
+#include <cstdint>                            // for uint32_t, uint64_t, UINT32_MAX
+#include <iosfwd>                             // for std
+#include <typeinfo>                           // for type_info
 #include <module-sys/SystemManager/Constants.hpp>
 
 #if (DEBUG_SERVICE_MESSAGES > 0)
@@ -44,9 +44,10 @@ void debug_msg(sys::Service *srvc, const sys::Message *ptr)
               srvc ? srvc->GetName().c_str() : "",
               status == 0 ? demangled ? demangled : realname : realname,
               std::string(*ptr).c_str(),
-              status != 0 ? status == -1
-                                ? "!mem fail!"
-                                : status == -2 ? "name ABI fail" : status == -3 ? "arg invalid" : "other failure!"
+              status != 0 ? status == -1   ? "!mem fail!"
+                            : status == -2 ? "name ABI fail"
+                            : status == -3 ? "arg invalid"
+                                           : "other failure!"
                           : "");
 
     free(demangled);

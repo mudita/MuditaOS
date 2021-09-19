@@ -21,7 +21,7 @@
 #include "fsl_lpuart.h"
 
 #include "clock_config.h"
-#include "board.h"
+#include <board/board.h>
 
 #include "FreeRTOS.h"
 #include "semphr.h"

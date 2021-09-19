@@ -11,7 +11,7 @@
  */
 
 #include "ED028TC1.h"
-#include "board.h"
+#include <board/board.h>
 
 #include <stdbool.h>
 #include <assert.h>
@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "macros.h"
+#include <board/macros.h>
 
 // header of the eink's shared memory frame buffer.
 typedef struct

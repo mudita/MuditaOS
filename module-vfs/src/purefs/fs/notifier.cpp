@@ -6,7 +6,7 @@
 #include <Service/Service.hpp>
 #include <purefs/fs/inotify_message.hpp>
 #include <purefs/fs/thread_local_cwd.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 
 namespace purefs::fs::internal
 {

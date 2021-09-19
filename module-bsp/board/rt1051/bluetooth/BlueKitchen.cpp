@@ -5,7 +5,7 @@
 #include <log.hpp>
 #include "FreeRTOS.h"
 #include "fsl_lpuart.h"
-#include "board.h"
+#include <board/board.h>
 
 #if DEBUG_BLUETOOTH_HCI_COMS == 1
 #define logHciStack(...) LOG_DEBUG(__VA_ARGS__)

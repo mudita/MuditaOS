@@ -15,7 +15,7 @@
 #include <apps-common/messages/AppMessage.hpp>
 #include <apps-common/actions/AlarmTriggeredAction.hpp>
 #include <i18n/i18n.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <service-audio/AudioMessage.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
 #include <module-utils/Utils.hpp>

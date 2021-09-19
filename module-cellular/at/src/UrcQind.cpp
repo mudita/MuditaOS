@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <UrcQind.hpp>
-#include <log/debug.hpp>
+#include <debug.hpp>
 
 #include <map>
 

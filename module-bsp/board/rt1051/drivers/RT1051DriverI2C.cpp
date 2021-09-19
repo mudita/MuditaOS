@@ -3,7 +3,7 @@
 
 #include "RT1051DriverI2C.hpp"
 #include <log.hpp>
-#include "../board.h"
+#include <board/board.h>
 
 namespace drivers
 {

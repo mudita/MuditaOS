@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RT1051CellularAudio.hpp"
-#include "board.h"
+#include <board/board.h>
 #include "dma_config.h"
 #include <log.hpp>
 

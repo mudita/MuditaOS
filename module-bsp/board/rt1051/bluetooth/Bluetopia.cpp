@@ -4,7 +4,7 @@
 #include "bluetooth/Bluetooth.hpp"
 #include <log.hpp>
 #include "fsl_lpuart.h"
-#include "board.h"
+#include <board/board.h>
 
 namespace bsp
 {

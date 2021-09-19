@@ -4,7 +4,7 @@
 #pragma once
 
 #include <boost/sml.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 
 struct Logger
 {

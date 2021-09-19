@@ -4,7 +4,7 @@
 #include "RT1051DriverPWM.hpp"
 #include "RT1051DriverPWMhelper.hpp"
 #include <log.hpp>
-#include "../board.h"
+#include <board/board.h>
 #include <algorithm>
 
 namespace drivers

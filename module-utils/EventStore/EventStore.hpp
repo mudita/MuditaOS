@@ -9,6 +9,8 @@
 // - gsm SIM tray
 // it's not meant to serve as polling interface - rather to serve data
 
+#include <hal/cellular/SIM.hpp>
+
 #include <cstddef>
 #include <string>
 
@@ -20,6 +22,8 @@ namespace cpp_freertos
 
 namespace Store
 {
+    using hal::cellular::SimSlot;
+
     struct Battery
     {
         enum class LevelState
@@ -108,12 +112,6 @@ namespace Store
       public:
         GSM(const GSM &) = delete;
         GSM &operator=(const GSM &) = delete;
-
-        enum class SimSlot
-        {
-            SIM1 = 0,
-            SIM2 = 1
-        };
 
         enum class Tray
         {

@@ -36,7 +36,7 @@
 #define _FSL_SDMMC_HOST_H
 
 #include "fsl_common.h"
-#include "board.h"
+#include <board/board.h>
 #if defined(FSL_FEATURE_SOC_SDHC_COUNT) && FSL_FEATURE_SOC_SDHC_COUNT > 0U
 #include "fsl_sdhc.h"
 #elif defined(FSL_FEATURE_SOC_SDIF_COUNT) && FSL_FEATURE_SOC_SDIF_COUNT > 0U

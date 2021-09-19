@@ -8,7 +8,7 @@
 
 #include "FreeRTOS.h"
 #include "task.h"
-#include "macros.h"
+#include <board/macros.h>
 
 #include "board/rt1051/bsp/audio/CodecMAX98090.hpp"
 

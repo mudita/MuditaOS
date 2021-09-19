@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "../UrcCtze.hpp"
-#include <log/debug.hpp>
+#include <debug.hpp>
 #include <time/time_constants.hpp>
 
 #include <date/date.h>

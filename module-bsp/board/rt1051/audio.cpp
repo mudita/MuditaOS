@@ -7,7 +7,7 @@
 
 extern "C"
 {
-#include "board.h"
+#include <board/board.h>
 #include "dma_config.h"
 }
 

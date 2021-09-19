@@ -3,7 +3,7 @@
 
 #include "RT1051LPM.hpp"
 
-#include "board.h"
+#include <board/board.h>
 #include "reboot_codes.hpp"
 #include <log.hpp>
 #include "board/BoardDefinitions.hpp"

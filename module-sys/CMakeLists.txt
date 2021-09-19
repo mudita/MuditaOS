@@ -44,10 +44,10 @@ target_link_libraries(module-sys
         apps-common
         bus
         service-evtmgr
-        messagetype
         magic_enum
         eventstore
     PUBLIC
+        messagetype
         module-os
         module-bsp
     )

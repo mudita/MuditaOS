@@ -3,7 +3,7 @@
 
 #include <purefs/fs/fsnotify.hpp>
 #include <purefs/fs/notifier.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <mutex.hpp>
 #include <cerrno>
 

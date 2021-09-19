@@ -5,8 +5,10 @@
 
 #include <locks/data/LockData.hpp>
 
-#include <module-sys/Service/Service.hpp>
+#include <Service/Service.hpp>
 #include <service-cellular-api>
+#include <EventStore.hpp>
+#include <hal/cellular/SIM.hpp>
 
 namespace locks
 {
@@ -18,7 +20,7 @@ namespace locks
       public:
         explicit SimLockSubject(sys::Service *owner);
 
-        void setSim(cellular::api::SimSlot simSlot);
+        void setSim(hal::cellular::SimSlot simSlot);
         void changeSimPin();
         void enableSimPin();
         void disableSimPin();

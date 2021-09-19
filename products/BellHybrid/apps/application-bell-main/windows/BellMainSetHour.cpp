@@ -5,7 +5,7 @@
 #include <data/BellMainStyle.hpp>
 
 #include <i18n/i18n.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <gui/input/InputEvent.hpp>
 #include <application-bell-main/ApplicationBellMain.hpp>
 

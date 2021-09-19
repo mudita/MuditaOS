@@ -4,7 +4,7 @@
 #include "bsp/bluetooth/Bluetooth.hpp"
 #include <log.hpp>
 #include "FreeRTOS.h"
-#include "board.h"
+#include <board/board.h>
 #include "fsl_lpuart_edma.h"
 #include <board/BoardDefinitions.hpp>
 

@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <log/log.hpp>
+#include <log.hpp>
 #include "HSPImpl.hpp"
 #include "HSP.hpp"
 
@@ -191,7 +191,7 @@ namespace bluetooth
                 LOG_DEBUG("Audio connection establishment failed with status %u\n",
                           hsp_subevent_audio_connection_complete_get_status(event));
                 sendAudioEvent(audio::EventType::BlutoothHSPDeviceState, audio::Event::DeviceState::Disconnected);
-                isConnected = false;
+                isConnected  = false;
                 callAnswered = false;
             }
             else {
@@ -203,7 +203,7 @@ namespace bluetooth
             break;
         case HSP_SUBEVENT_AUDIO_DISCONNECTION_COMPLETE:
             LOG_DEBUG("Audio connection released.\n\n");
-            scoHandle   = HCI_CON_HANDLE_INVALID;
+            scoHandle    = HCI_CON_HANDLE_INVALID;
             callAnswered = false;
             break;
         case HSP_SUBEVENT_MICROPHONE_GAIN_CHANGED:

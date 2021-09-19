@@ -3,7 +3,7 @@
 
 #include "TetheringOffPopup.hpp"
 
-#include <log/log.hpp>
+#include <log.hpp>
 #include <messages/DialogMetadataMessage.hpp>
 #include <apps-common/ApplicationCommon.hpp>
 #include <SystemManager/messages/TetheringStateRequest.hpp>

@@ -10,7 +10,7 @@
 #include <apps-common/messages/DialogMetadataMessage.hpp>
 #include <apps-common/windows/Dialog.hpp>
 #include <apps-common/windows/DialogMetadata.hpp>
-#include <log/log.hpp>
+#include <log.hpp>
 #include <module-apps/application-phonebook/data/PhonebookItemData.hpp>
 #include <module-sys/Timers/TimerFactory.hpp>
 #include <PhoneNumber.hpp>

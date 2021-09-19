@@ -4,7 +4,7 @@
 #include "board/irq_gpio.hpp"
 #include <module-utils/Utils.hpp>
 
-#include "board.h"
+#include <board/board.h>
 #include "FreeRTOS.h"
 #include "queue.h"
 #include "fsl_common.h"
