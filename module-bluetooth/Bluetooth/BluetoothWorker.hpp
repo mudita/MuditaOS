@@ -29,6 +29,8 @@ struct HCI;
 
 namespace bluetooth
 {
+    using namespace bsp::bluetooth;
+
     inline const char *MessageCstr(Message what)
     {
         switch (what) {

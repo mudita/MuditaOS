@@ -24,8 +24,6 @@
 #define logHciBytes(...)
 #endif
 
-using namespace bsp;
-
 namespace queues
 {
     constexpr inline auto io      = "qBtIO";
@@ -107,7 +105,7 @@ void BluetoothWorker::registerQueues()
 {
     static_cast<ServiceBluetooth *>(service)->workerQueue = Worker::getQueueHandleByName(queues::cmd);
     runLoop->setTriggerQueue(Worker::getQueueHandleByName(queues::btstack));
-    BlueKitchen::getInstance()->qHandle = queues[queueIO_handle]->GetQueueHandle();
+    bsp::BlueKitchen::getInstance()->qHandle = queues[queueIO_handle]->GetQueueHandle();
 }
 
 void BluetoothWorker::onLinkKeyAdded(const std::string &deviceAddress)
@@ -211,7 +209,7 @@ auto BluetoothWorker::handleMessage(uint32_t queueID) -> bool
         LOG_ERROR("Queue receive failure!");
         return false;
     }
-    auto bt = BlueKitchen::getInstance();
+    auto bt = bsp::BlueKitchen::getInstance();
     switch (notification) {
     case bluetooth::Message::EvtSending:
         logHciComs("[evt] sending");
