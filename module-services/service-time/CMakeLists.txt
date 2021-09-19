@@ -33,6 +33,7 @@ target_link_libraries(${PROJECT_NAME}
         utils-time
         service-db
         service-time-api
+        service-evtmgr
         module-sys
         module-apps
 )

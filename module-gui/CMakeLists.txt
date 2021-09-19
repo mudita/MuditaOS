@@ -19,8 +19,10 @@ target_link_libraries(${PROJECT_NAME}
         eventstore
         utils-math
         module-utils
+        sys-phonemodes
         sys-service
         sys-watchdog
+        service-bluetooth
         utf8
     PRIVATE
         i18n

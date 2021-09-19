@@ -70,9 +70,8 @@ target_link_libraries(${PROJECT_NAME}
         hal
         eventstore
         module-os
-        service-bluetooth
         magic_enum
-        ${TARGET_LIBRARIES}
+        utility
     PRIVATE
         purefs-paths
         time-constants

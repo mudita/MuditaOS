@@ -14,4 +14,5 @@ target_include_directories(${AUDIO_BOARD_LIBRARY} INTERFACE ${CMAKE_CURRENT_SOUR
 target_link_libraries(${AUDIO_BOARD_LIBRARY}
     module-bsp
     module-os
+    module-bluetooth
 )

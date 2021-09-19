@@ -24,7 +24,6 @@ target_include_directories(${PROJECT_NAME}
         "${CMAKE_CURRENT_LIST_DIR}"
          ${CMAKE_CURRENT_LIST_DIR}/service-evtmgr/include
 )
- 
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
@@ -36,9 +35,15 @@ target_link_libraries(${PROJECT_NAME}
         service-audio
         service-cellular
         service-desktop
+        service-bluetooth
         sml::sml
         Microsoft.GSL::GSL
         eventstore
+    PUBLIC
+        service-db
+        sys-service
+        sys-manager
+        messagetype
 )
 
 if (${ENABLE_TESTS})

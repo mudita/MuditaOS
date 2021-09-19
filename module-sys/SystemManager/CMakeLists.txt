@@ -29,14 +29,14 @@ target_include_directories(sys-manager
 )
 
 target_link_libraries(sys-manager
-    PRIVATE
+    PUBLIC
         apps-common
         service-evtmgr
-
-    PUBLIC
         eventstore
         sys-service
         sys-common
+    PRIVATE
+        service-desktop
 )
 
 if (${ENABLE_TESTS})
