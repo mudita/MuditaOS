@@ -4,14 +4,17 @@
 #pragma once
 
 #include "presenter/BGSoundsMainWindowPresenter.hpp"
-#include <AppWindow.hpp>
+#include <common/options/BellOptionWindow.hpp>
 namespace gui
 {
-    class BGSoundsMainWindow : public AppWindow, public app::bgSounds::BGSoundsMainWindowContract::View
+    class BGSoundsMainWindow : public BellOptionWindow, public app::bgSounds::BGSoundsMainWindowContract::View
     {
         std::unique_ptr<app::bgSounds::BGSoundsMainWindowContract::Presenter> presenter;
 
-        auto onInput(const InputEvent &inputEvent) -> bool override;
+        void setSoundsList();
+        void buildInterface() override;
+
+        void onActivated(std::string recordName);
 
       public:
         BGSoundsMainWindow(app::ApplicationCommon *app,

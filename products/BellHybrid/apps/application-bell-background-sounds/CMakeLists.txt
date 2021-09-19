@@ -13,6 +13,7 @@ target_include_directories(application-bell-background-sounds
 target_sources(application-bell-background-sounds
     PRIVATE
         ApplicationBellBackgroundSounds.cpp
+        presenter/BGSoundsMainWindowPresenter.cpp
         presenter/BGSoundsProgressPresenter.cpp
         presenter/BGSoundsTimerSelectPresenter.cpp
         presenter/BGSoundsVolumePresenter.cpp
@@ -24,6 +25,7 @@ target_sources(application-bell-background-sounds
 
         data/BGSoundsCommon.hpp
         data/BGSoundsStyle.hpp
+        data/BGSoundsAudioData.hpp
         presenter/BGSoundsMainWindowPresenter.hpp
         presenter/BGSoundsProgressPresenter.hpp
         presenter/BGSoundsTimerSelectPresenter.hpp
@@ -45,4 +47,5 @@ target_link_libraries(application-bell-background-sounds
 
     PUBLIC
         module-gui
+        bell::app-common
 )
