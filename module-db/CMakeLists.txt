@@ -167,6 +167,7 @@ target_link_libraries(${PROJECT_NAME}
         module-utils
         module-vfs
         utf8
+        desktop-endpoints
     PRIVATE
         application-calendar
         Microsoft.GSL::GSL

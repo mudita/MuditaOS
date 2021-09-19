@@ -2,7 +2,6 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "bsp/bluetooth/Bluetooth.hpp"
-#include "BluetoothWorker.hpp"
 #include <log/log.hpp>
 #include "FreeRTOS.h"
 #include "fsl_lpuart.h"

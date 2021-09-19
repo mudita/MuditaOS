@@ -76,6 +76,7 @@ target_link_libraries(service-appmgr
         json::json
         module-audio
         service-cellular
+        service-desktop
         service-db
         service-gui
     PUBLIC

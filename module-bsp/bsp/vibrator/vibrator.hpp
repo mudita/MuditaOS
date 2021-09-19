@@ -1,6 +1,5 @@
 #pragma once
 
-#include <Timers/Timer.hpp>
 #include <Utils.hpp>
 
 #include <chrono>
