@@ -4,6 +4,7 @@
 #pragma once
 
 #include "presenter/BGSoundsTimerSelectPresenter.hpp"
+#include "data/BGSoundsAudioData.hpp"
 #include <AppWindow.hpp>
 #include <apps-common/widgets/spinners/Spinners.hpp>
 
@@ -19,8 +20,10 @@ namespace gui
         BellBaseLayout *body    = nullptr;
         UTF8Spinner *spinner    = nullptr;
         Text *bottomDescription = nullptr;
+        std::unique_ptr<BGSoundsAudioContext> audioContext;
 
         void buildInterface() override;
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
         bool onInput(const gui::InputEvent &inputEvent) override;
 
         void createTopMessage();

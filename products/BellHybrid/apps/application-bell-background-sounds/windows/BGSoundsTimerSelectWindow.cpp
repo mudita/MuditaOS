@@ -134,6 +134,14 @@ namespace gui
         };
     }
 
+    void BGSoundsTimerSelectWindow::onBeforeShow(ShowMode mode, SwitchData *data)
+    {
+        if (data && typeid(*data) == typeid(BGSoundsSwitchData)) {
+            auto *audioSwitchData = static_cast<BGSoundsSwitchData *>(data);
+            audioContext          = audioSwitchData->getAudioContext();
+        }
+    }
+
     bool BGSoundsTimerSelectWindow::onInput(const gui::InputEvent &inputEvent)
     {
         if (spinner->onInput(inputEvent)) {
@@ -143,9 +151,13 @@ namespace gui
         if (inputEvent.isShortRelease(KeyCode::KEY_ENTER)) {
             auto currentValue = UTF8ToTimerValue(spinner->getCurrentValue());
             presenter->setTimerValue(currentValue);
+
+            auto audioSwitchData                        = std::make_unique<BGSoundsSwitchData>(std::move(audioContext));
+            audioSwitchData->ignoreCurrentWindowOnStack = true;
+            application->switchWindow(gui::window::name::bgSoundsProgress, std::move(audioSwitchData));
+
             return true;
         }
-
         return AppWindow::onInput(inputEvent);
     }
 
