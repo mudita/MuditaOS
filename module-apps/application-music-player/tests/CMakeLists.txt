@@ -3,7 +3,6 @@ add_gtest_executable(
         app-music-player
     SRCS
         unittest.cpp
-        unittest_songrepository.cpp
         unittest_songsmodel.cpp
     LIBS
         application-music-player
