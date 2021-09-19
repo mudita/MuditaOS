@@ -12,13 +12,19 @@
 namespace app::music_player
 {
 
-    SongsModel::SongsModel(std::shared_ptr<AbstractSongsRepository> songsRepository)
-        : songsRepository{std::move(songsRepository)}
+    SongsListItemProvider::SongsListItemProvider(ApplicationCommon *app) : DatabaseModel(app)
+    {}
+
+    SongsModelInterface::SongsModelInterface(ApplicationCommon *app) : SongsListItemProvider(app)
+    {}
+
+    SongsModel::SongsModel(app::ApplicationCommon *app, std::shared_ptr<AbstractSongsRepository> songsRepository)
+        : SongsModelInterface(app), songsRepository{std::move(songsRepository)}
     {}
 
     auto SongsModel::requestRecordsCount() -> unsigned int
     {
-        return internalData.size();
+        return recordsCount;
     }
 
     auto SongsModel::getMinimalItemSpaceRequired() const -> unsigned int
@@ -28,13 +34,54 @@ namespace app::music_player
 
     void SongsModel::requestRecords(const uint32_t offset, const uint32_t limit)
     {
-        setupModel(offset, limit);
-        list->onProviderDataUpdate();
+        songsRepository->getMusicFilesList(
+            offset,
+            limit,
+            [this](const std::vector<db::multimedia_files::MultimediaFilesRecord> &records,
+                   unsigned int repoRecordsCount) { return onMusicListRetrieved(records, repoRecordsCount); });
     }
 
     auto SongsModel::getItem(gui::Order order) -> gui::ListItem *
     {
-        return getRecord(order);
+        std::shared_ptr<db::multimedia_files::MultimediaFilesRecord> song = getRecord(order);
+        if (!song) {
+            return nullptr;
+        }
+
+        auto item = new gui::SongItem(song->tags.album.artist,
+                                      song->tags.title,
+                                      utils::time::Duration(song->audioProperties.songLength).str(),
+                                      bottomBarTemporaryMode,
+                                      bottomBarRestoreFromTemporaryMode);
+
+        if (songContext.filePath == song->fileInfo.path) {
+            item->setState(songContext.isPlaying() ? gui::SongItem::ItemState::Playing
+                                                   : (songContext.isPaused() ? gui::SongItem::ItemState::Paused
+                                                                             : gui::SongItem::ItemState::None));
+        }
+        else {
+            item->setState(gui::SongItem::ItemState::None);
+        }
+
+        item->activatedCallback = [this, song](gui::Item &) {
+            if (shortReleaseCallback != nullptr) {
+                shortReleaseCallback(song->fileInfo.path);
+                return true;
+            }
+            return false;
+        };
+
+        item->inputCallback = [=](gui::Item &, const gui::InputEvent &event) {
+            if (event.isLongRelease(gui::KeyCode::KEY_ENTER)) {
+                if (longPressCallback != nullptr) {
+                    longPressCallback();
+                    return true;
+                }
+            }
+            return false;
+        };
+
+        return item;
     }
 
     void SongsModel::createData(OnShortReleaseCallback shortReleaseCallback,
@@ -42,34 +89,10 @@ namespace app::music_player
                                 OnSetBottomBarTemporaryCallback bottomBarTemporaryMode,
                                 OnRestoreBottomBarTemporaryCallback bottomBarRestoreFromTemporaryMode)
     {
-        songsRepository->scanMusicFilesList();
-        auto songsList = songsRepository->getMusicFilesList();
-        for (const auto &song : songsList) {
-            auto item = new gui::SongItem(song.artist,
-                                          song.title,
-                                          utils::time::Duration(song.total_duration_s).str(),
-                                          bottomBarTemporaryMode,
-                                          bottomBarRestoreFromTemporaryMode);
-
-            item->activatedCallback = [=](gui::Item &) {
-                shortReleaseCallback(song.filePath);
-                return true;
-            };
-
-            item->inputCallback = [longPressCallback](gui::Item &, const gui::InputEvent &event) {
-                if (event.isLongRelease(gui::KeyCode::KEY_ENTER)) {
-                    longPressCallback();
-                    return true;
-                }
-                return false;
-            };
-
-            internalData.push_back(item);
-        }
-
-        for (auto &item : internalData) {
-            item->deleteByList = false;
-        }
+        this->shortReleaseCallback              = shortReleaseCallback;
+        this->longPressCallback                 = longPressCallback;
+        this->bottomBarTemporaryMode            = bottomBarTemporaryMode;
+        this->bottomBarRestoreFromTemporaryMode = bottomBarRestoreFromTemporaryMode;
     }
 
     bool SongsModel::isSongPlaying() const noexcept
@@ -80,7 +103,6 @@ namespace app::music_player
     void SongsModel::setCurrentSongState(SongState songState) noexcept
     {
         songContext.currentSongState = songState;
-        updateCurrentItemState();
     }
 
     std::optional<audio::Token> SongsModel::getCurrentFileToken() const noexcept
@@ -112,50 +134,35 @@ namespace app::music_player
     void SongsModel::setCurrentSongContext(SongContext context)
     {
         using namespace gui;
-        clearCurrentItemState();
-
         songContext = context;
-
-        updateCurrentItemState();
     }
 
     void SongsModel::clearCurrentSongContext()
     {
-        clearCurrentItemState();
         songContext.clear();
-    }
-
-    void SongsModel::clearCurrentItemState()
-    {
-        using namespace gui;
-        const auto songIndex = getCurrentIndex();
-        if (songIndex < internalData.size()) {
-            internalData[songIndex]->setState(SongItem::ItemState::None);
-        }
-    }
-
-    void SongsModel::updateCurrentItemState()
-    {
-        using namespace gui;
-        const auto songIndex = getCurrentIndex();
-        if (songIndex >= internalData.size()) {
-            return;
-        }
-
-        if (songContext.isPlaying()) {
-            internalData[songIndex]->setState(SongItem::ItemState::Playing);
-        }
-        else if (songContext.isPaused()) {
-            internalData[songIndex]->setState(SongItem::ItemState::Paused);
-        }
-        else {
-            internalData[songIndex]->setState(SongItem::ItemState::None);
-        }
     }
 
     void SongsModel::clearData()
     {
         list->reset();
-        eraseInternalData();
     }
+
+    [[nodiscard]] bool SongsModel::updateRecords(std::vector<db::multimedia_files::MultimediaFilesRecord> records)
+    {
+        DatabaseModel::updateRecords(std::move(records));
+        list->onProviderDataUpdate();
+        return true;
+    }
+
+    bool SongsModel::onMusicListRetrieved(const std::vector<db::multimedia_files::MultimediaFilesRecord> &records,
+                                          unsigned int repoRecordsCount)
+    {
+        if (recordsCount != repoRecordsCount) {
+            recordsCount = repoRecordsCount;
+            list->reSendLastRebuildRequest();
+            return false;
+        }
+        return updateRecords(records);
+    }
+
 } // namespace app::music_player

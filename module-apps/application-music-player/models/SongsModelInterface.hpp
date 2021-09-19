@@ -6,20 +6,22 @@
 #include "SongContext.hpp"
 #include <string>
 #include <widgets/SongItem.hpp>
-#include <InternalModel.hpp>
 #include <ListItemProvider.hpp>
 #include <apps-common/ApplicationCommon.hpp>
+#include <apps-common/DatabaseModel.hpp>
+#include <module-db/Interface/MultimediaFilesRecord.hpp>
 
 namespace app::music_player
 {
-    class SongsListItemProvider : public app::InternalModel<gui::SongItem *>, public gui::ListItemProvider
+    class SongsListItemProvider : public app::DatabaseModel<db::multimedia_files::MultimediaFilesRecord>,
+                                  public gui::ListItemProvider
     {
       public:
         using OnShortReleaseCallback              = std::function<bool(const std::string &fileName)>;
         using OnLongPressCallback                 = std::function<void()>;
         using OnSetBottomBarTemporaryCallback     = std::function<void(const UTF8 &)>;
         using OnRestoreBottomBarTemporaryCallback = std::function<void()>;
-
+        explicit SongsListItemProvider(app::ApplicationCommon *app);
         virtual ~SongsListItemProvider() noexcept = default;
 
         virtual void createData(OnShortReleaseCallback shortReleaseCallback,
@@ -33,6 +35,7 @@ namespace app::music_player
     class SongsModelInterface : public SongsListItemProvider
     {
       public:
+        explicit SongsModelInterface(app::ApplicationCommon *app);
         virtual ~SongsModelInterface() noexcept = default;
 
         virtual bool isSongPlaying() const noexcept                              = 0;

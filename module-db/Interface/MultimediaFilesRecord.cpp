@@ -137,7 +137,7 @@ namespace db::multimedia_files
     {
         const auto records = database->files.getLimitOffset(query->offset, query->limit);
 
-        auto response = std::make_unique<query::GetLimitedResult>(records);
+        auto response = std::make_unique<query::GetLimitedResult>(records, database->files.count());
         response->setRequestQuery(query);
 
         return response;
@@ -192,7 +192,7 @@ namespace db::multimedia_files
     {
         const auto records = database->files.getArtistsLimitOffset(query->offset, query->limit);
 
-        auto response = std::make_unique<query::GetArtistsLimitedResult>(records);
+        auto response = std::make_unique<query::GetArtistsLimitedResult>(records, database->files.countArtists());
         response->setRequestQuery(query);
 
         return response;
@@ -212,7 +212,7 @@ namespace db::multimedia_files
     {
         const auto records = database->files.getAlbumsLimitOffset(query->offset, query->limit);
 
-        auto response = std::make_unique<query::GetAlbumsLimitedResult>(records);
+        auto response = std::make_unique<query::GetAlbumsLimitedResult>(records, database->files.countAlbums());
         response->setRequestQuery(query);
 
         return response;
@@ -223,7 +223,7 @@ namespace db::multimedia_files
     {
         const auto records = database->files.getLimitOffset(query->artist, query->offset, query->limit);
 
-        auto response = std::make_unique<query::GetLimitedResult>(records);
+        auto response = std::make_unique<query::GetLimitedResult>(records, database->files.count());
         response->setRequestQuery(query);
 
         return response;
@@ -243,7 +243,7 @@ namespace db::multimedia_files
     {
         const auto records = database->files.getLimitOffset(query->album, query->offset, query->limit);
 
-        auto response = std::make_unique<query::GetLimitedResult>(records);
+        auto response = std::make_unique<query::GetLimitedResult>(records, database->files.count());
         response->setRequestQuery(query);
 
         return response;
