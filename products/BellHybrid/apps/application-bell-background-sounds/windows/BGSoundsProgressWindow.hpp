@@ -4,6 +4,7 @@
 #pragma once
 
 #include "presenter/BGSoundsProgressPresenter.hpp"
+#include "data/BGSoundsAudioData.hpp"
 #include <AppWindow.hpp>
 
 namespace gui
@@ -13,8 +14,10 @@ namespace gui
     class BGSoundsProgressWindow : public AppWindow, public app::bgSounds::BGSoundsProgressContract::View
     {
         std::shared_ptr<app::bgSounds::BGSoundsProgressContract::Presenter> presenter;
+        gui::Text *title            = nullptr;
         gui::HBarGraph *progressBar = nullptr;
         gui::Text *timerText        = nullptr;
+        std::unique_ptr<BGSoundsAudioContext> audioContext;
 
         void buildInterface() override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;

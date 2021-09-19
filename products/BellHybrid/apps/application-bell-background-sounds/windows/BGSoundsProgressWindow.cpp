@@ -12,7 +12,6 @@
 
 namespace
 {
-    inline constexpr auto recordNamePlaceHolder = "Meditative Surprises";
     inline constexpr auto bgSoundsTimerName     = "BGSoundsProgressTimer";
     inline constexpr std::chrono::seconds timerTick{1};
 
@@ -22,12 +21,13 @@ namespace
         item->activeItem = false;
         item->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, alignment));
     }
-    void createTitle(gui::VBox *parent)
+    gui::Text *createTitle(gui::VBox *parent)
     {
         auto title = new gui::Text(parent, 0, 0, parent->getWidth(), parent->getHeight() / 2);
         title->setFont(gui::bgSoundsStyle::descriptionFont);
-        title->setText(recordNamePlaceHolder);
+
         decorateProgressItem(title, gui::Alignment::Vertical::Top);
+        return title;
     }
     gui::HBarGraph *createProgress(gui::VBox *parent)
     {
@@ -67,6 +67,13 @@ namespace gui
             presenter->resume();
             return;
         }
+
+        if (data && typeid(*data) == typeid(BGSoundsSwitchData)) {
+            auto *audioSwitchData = static_cast<BGSoundsSwitchData *>(data);
+            audioContext          = audioSwitchData->getAudioContext();
+            title->setText(audioContext->getTitle());
+        }
+
         presenter->activate();
     }
 
@@ -82,7 +89,7 @@ namespace gui
         auto vBox =
             new VBox(body->getCenterBox(), 0, 0, style::bell_base_layout::w, style::bell_base_layout::center_layout_h);
         decorateProgressItem(vBox, gui::Alignment::Vertical::Top);
-        createTitle(vBox);
+        title       = createTitle(vBox);
         progressBar = createProgress(vBox);
         timerText   = createTimer(body->lastBox);
 
@@ -93,7 +100,8 @@ namespace gui
     }
     void BGSoundsProgressWindow::configureTimer()
     {
-        auto timer = std::make_unique<app::ProgressTimer>(application, *this, bgSoundsTimerName, timerTick);
+        auto timer = std::make_unique<app::ProgressTimer>(
+            application, *this, bgSoundsTimerName, timerTick, app::ProgressCountdownMode::Increasing);
         timer->attach(progressBar);
         timer->attach(timerText);
         presenter->setTimer(std::move(timer));
