@@ -8,6 +8,7 @@ target_link_libraries(log
     PRIVATE
         module-bsp
         segger::rtt
+        utils-time
 )
 
 if (${LOG_REDIRECT} STREQUAL "RTT_JLINK")
