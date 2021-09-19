@@ -46,6 +46,7 @@ target_sources(board
         xip/evkbimxrt1050_sdram_ini_dcd.c
         xip/fsl_flexspi_nor_boot.c
 
+    PUBLIC
         board/board.h
         board/debug_console.hpp
         board/macros.h

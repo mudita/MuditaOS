@@ -98,6 +98,7 @@ target_link_libraries(module-vfs
         module-bsp 
         module-os
         module-utils
+        platform
     PUBLIC 
         purefs-paths
         module-sys

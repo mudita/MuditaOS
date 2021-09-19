@@ -6,7 +6,7 @@
 #include "BlockDeviceFactory.hpp"
 
 #include <bsp/bsp.hpp>
-#include <purefs/vfs_subsystem.hpp>
+#include <purefs/vfs_subsystem.h>
 
 #include <exception>
 

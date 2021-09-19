@@ -4,6 +4,7 @@
 
 target_sources(module-bsp
 	PRIVATE
+		audio.cpp
 		bluetooth/BlueKitchen.cpp
 		bluetooth/BluetoothCommon.cpp
 		bsp/audio/CodecMAX98090.cpp
