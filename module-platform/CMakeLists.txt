@@ -21,6 +21,7 @@ target_link_libraries(
 
     PRIVATE
         module-bsp
+        module-vfs
 )
 
 add_subdirectory(${PROJECT_TARGET_NAME})

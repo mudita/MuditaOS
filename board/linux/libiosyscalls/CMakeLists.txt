@@ -59,6 +59,7 @@ target_link_libraries(
         dl
     PRIVATE
         phmap
+        module-vfs
 )
 
 target_compile_definitions( ${PROJECT_NAME} PUBLIC TARGET_Linux )

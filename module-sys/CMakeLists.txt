@@ -46,9 +46,9 @@ target_sources(module-sys PRIVATE ${SOURCES})
 
 target_link_libraries(module-sys
     PRIVATE
-        apps-common
+        #apps-common
         bus
-        service-evtmgr
+        #service-evtmgr
         magic_enum
         eventstore
     PUBLIC

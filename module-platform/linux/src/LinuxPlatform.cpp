@@ -5,7 +5,6 @@
 
 #include "BlockDeviceFactory.hpp"
 
-#include <bsp/bsp.hpp>
 #include <iosyscalls.hpp>
 #include <purefs/vfs_subsystem.hpp>
 
@@ -15,9 +14,7 @@ using platform::linux::BlockDeviceFactory;
 using platform::linux::LinuxPlatform;
 
 LinuxPlatform::LinuxPlatform(std::string imageName) : imageName(std::move(imageName))
-{
-    bsp::BoardInit();
-}
+{}
 
 LinuxPlatform::~LinuxPlatform()
 {

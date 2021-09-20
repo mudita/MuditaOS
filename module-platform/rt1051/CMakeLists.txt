@@ -44,7 +44,6 @@ target_link_libraries(
         CrashCatcher::CrashCatcher
 
     PRIVATE
-        module-vfs
         log-api
 )
 

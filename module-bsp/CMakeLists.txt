@@ -74,7 +74,7 @@ target_link_libraries(${PROJECT_NAME}
     PUBLIC
         eventstore
         module-os
-        service-bluetooth
+        #service-bluetooth
         magic_enum
         hal
         ${TARGET_LIBRARIES}

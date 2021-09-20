@@ -17,4 +17,5 @@ target_link_libraries(tagsfetcher
     PRIVATE
     tag
     Microsoft.GSL::GSL
+    module-utils
 )

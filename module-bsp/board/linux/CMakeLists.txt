@@ -2,8 +2,6 @@ configure_file(eink/config.h.in eink-config.h)
 
 target_sources(module-bsp
         PRIVATE
-                board.cpp
-
                 bluetooth/Bluetooth.cpp
                 bluetooth/test/bsp_bt.cpp
                 cellular/linux_cellular.cpp

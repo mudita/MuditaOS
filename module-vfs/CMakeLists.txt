@@ -95,10 +95,9 @@ target_link_libraries(module-vfs
         fatfs::fatfs
         json::json
         littlefs::littlefs
-        module-bsp 
+        #module-bsp 
         module-os
-        module-utils
-        platform
+        #module-utils
     PUBLIC 
         purefs-paths
         module-sys

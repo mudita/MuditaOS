@@ -3,7 +3,7 @@
 
 #include "LinuxAudioDevice.hpp"
 #include <Audio/Stream.hpp>
-#include <module-utils/log/log.hpp>
+#include <log.hpp>
 
 namespace audio
 {
