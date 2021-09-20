@@ -3,8 +3,7 @@
 
 #pragma once
 
-
-#include <module-sys/Service/Service.hpp>
+#include <Service/Service.hpp>
 #include <time/dateCommon.hpp>
 
 #include <ctime>
@@ -19,8 +18,8 @@ struct AlarmEventRecord;
  */
 namespace alarms
 {
-    using OnGetAlarmEventCallback          = std::function<void(AlarmEventRecord)>;
-    using OnGetAlarmEventsCallback         = std::function<void(std::vector<AlarmEventRecord>)>;
+    using OnGetAlarmEventCallback  = std::function<void(AlarmEventRecord)>;
+    using OnGetAlarmEventsCallback = std::function<void(std::vector<AlarmEventRecord>)>;
     using OnGetAlarmEventsInRangeCallback =
         std::function<void(std::pair<std::vector<AlarmEventRecord>, std::uint32_t>)>;
     using OnAddAlarmEventCallback          = std::function<void(bool)>;

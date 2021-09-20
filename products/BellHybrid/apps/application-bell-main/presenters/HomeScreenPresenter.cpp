@@ -7,8 +7,8 @@
 
 #include <apps-common/ApplicationCommon.hpp>
 #include <common/models/TimeModel.hpp>
-#include <module-sys/Timers/SystemTimer.hpp>
-#include <module-sys/Timers/TimerFactory.hpp>
+#include <Timers/SystemTimer.hpp>
+#include <Timers/TimerFactory.hpp>
 #include <time/time_constants.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 

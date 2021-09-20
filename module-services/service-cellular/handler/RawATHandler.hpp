@@ -1,6 +1,6 @@
 #pragma once
 
-#include <module-sys/Service/MessageForward.hpp>
+#include <Service/MessageForward.hpp>
 
 namespace at
 {

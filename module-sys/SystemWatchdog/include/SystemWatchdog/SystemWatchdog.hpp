@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <module-sys/Service/Watchdog.hpp>
+#include <Service/Watchdog.hpp>
 #include "thread.hpp"
 
 namespace sys

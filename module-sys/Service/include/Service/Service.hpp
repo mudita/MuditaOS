@@ -10,19 +10,19 @@
 #include "Message.hpp" // for MessagePointer
 #include "ServiceManifest.hpp"
 #include "Watchdog.hpp"
-#include "thread.hpp"                                   // for Thread
-#include <module-sys/SystemWatchdog/SystemWatchdog.hpp> // for SystemWatchdog
-#include <algorithm>                                    // for find, max
-#include <cstdint>                                      // for uint32_t, uint64_t
-#include <functional>                                   // for function
-#include <iterator>                                     // for end
-#include <map>                                          // for map
-#include <memory>                                       // for allocator, shared_ptr, enable_shared_from_this
-#include <string>                                       // for string
-#include <typeindex>                                    // for type_index
-#include <utility>                                      // for pair
-#include <vector>                                       // for vector<>::iterator, vector
-#include <typeinfo>                                     // for connect by type
+#include "thread.hpp"                        // for Thread
+#include <SystemWatchdog/SystemWatchdog.hpp> // for SystemWatchdog
+#include <algorithm>                         // for find, max
+#include <cstdint>                           // for uint32_t, uint64_t
+#include <functional>                        // for function
+#include <iterator>                          // for end
+#include <map>                               // for map
+#include <memory>                            // for allocator, shared_ptr, enable_shared_from_this
+#include <string>                            // for string
+#include <typeindex>                         // for type_index
+#include <utility>                           // for pair
+#include <vector>                            // for vector<>::iterator, vector
+#include <typeinfo>                          // for connect by type
 
 namespace sys
 {

@@ -5,7 +5,7 @@
 
 #include <locks/data/LockData.hpp>
 
-#include <module-sys/Service/Service.hpp>
+#include <Service/Service.hpp>
 #include <service-cellular-api>
 
 namespace locks

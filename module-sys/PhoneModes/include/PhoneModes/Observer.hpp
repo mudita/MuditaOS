@@ -20,8 +20,8 @@ namespace sys::phone_modes
       public:
         using OnPhoneModeChangedCallback = std::function<void(PhoneMode)>;
         using OnTetheringChangedCallback = std::function<void(Tethering)>;
-        using OnCompleteCallback = std::function<void()>;
-        using OnErrorCallback    = std::function<void(const std::exception &)>;
+        using OnCompleteCallback         = std::function<void()>;
+        using OnErrorCallback            = std::function<void(const std::exception &)>;
         struct OnFinishedCallbacks
         {
             OnCompleteCallback onComplete;

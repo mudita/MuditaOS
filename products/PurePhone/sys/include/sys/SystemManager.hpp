@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include <module-sys/PhoneModes/Subject.hpp>
-#include <module-sys/SystemManager/SystemManagerCommon.hpp>
+#include <PhoneModes/Subject.hpp>
+#include <SystemManager/SystemManagerCommon.hpp>
 
 namespace sys
 {

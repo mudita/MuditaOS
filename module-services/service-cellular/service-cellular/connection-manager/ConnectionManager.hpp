@@ -5,7 +5,7 @@
 
 #include "ConnectionManagerCellularCommandsInterface.hpp"
 #include "module-services/service-cellular/service-cellular/ServiceCellular.hpp"
-#include <module-sys/PhoneModes/Observer.hpp>
+#include <PhoneModes/Observer.hpp>
 #include <functional>
 
 // connection timer period is 1 minute, connect to network for 5 minutes

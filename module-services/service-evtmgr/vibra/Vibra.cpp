@@ -3,13 +3,12 @@
 
 #include "Vibra.hpp"
 #include "SystemManager/Constants.hpp"
-#include <module-sys/Timers/TimerFactory.hpp>
+#include <Timers/TimerFactory.hpp>
 
 namespace vibra_handle
 {
     Vibra::Vibra(sys::Service *parent) : parent{parent}
-    {
-    }
+    {}
 
     void Vibra::intPulse(bool repetitive)
     {

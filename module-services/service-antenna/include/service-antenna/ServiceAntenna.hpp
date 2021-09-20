@@ -8,7 +8,7 @@
 #include <bsp/cellular/bsp_cellular.hpp>
 #include <Timers/TimerHandle.hpp>
 #include <service-db/DBServiceName.hpp>
-#include <module-sys/PhoneModes/Observer.hpp>
+#include <PhoneModes/Observer.hpp>
 
 namespace service::name
 {
