@@ -84,7 +84,7 @@ unit: sectors
 
 /dev/sdx1 : start=    $PART1_START,  size=    $PART1_SIZE, type=b, bootable
 /dev/sdx2 : start=    $PART2_START,  size=    $PART2_SIZE, type=9e
-/dev/sdx3 : start=    $PART3_START,  size=    $PART3_SIZE, type=9e
+/dev/sdx3 : start=    $PART3_START,  size=    $PART3_SIZE, type=83
 ==sfdisk
 
 
@@ -143,9 +143,24 @@ mcopy -s -i "$PART1" .boot.json ::
 mcopy -s -i "$PART1" .boot.json.crc32 ::
 
 #Littlefs generate image
-echo $(pwd)
 $GENLFS --image=$IMAGE_NAME --block_size=4096 --overwrite --partition_num=2
-$GENLFS --image=$IMAGE_NAME --block_size=32768 --overwrite --partition_num=3 -- user/*
+
+# User EXT4 image
+mke2fs \
+  -F \
+  -L 'user' \
+  -N 0 \
+  -E offset=$(($PART3_START*$DEVICE_BLK_SIZE)) \
+  -O ^64bit \
+  -O ^filetype \
+  -O ^extents \
+  -O ^flex_bg \
+  -d "user" \
+  -m 0 \
+  -r 1 \
+  -t ext4 \
+  "$IMAGE_NAME" \
+;
 
 # back to previous dir
 cd -
