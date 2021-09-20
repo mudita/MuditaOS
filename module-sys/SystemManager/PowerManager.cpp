@@ -3,7 +3,7 @@
 
 #include <log.hpp>
 
-#include "PowerManager.hpp"
+#include <SystemManager/PowerManager.hpp>
 
 namespace sys
 {

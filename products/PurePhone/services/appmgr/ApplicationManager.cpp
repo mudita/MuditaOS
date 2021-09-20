@@ -10,8 +10,8 @@
 #include <apps-common/popups/data/PhoneModeParams.hpp>
 #include <apps-common/popups/data/PopupRequestParams.hpp>
 #include <module-db/queries/notifications/QueryNotificationsGetAll.hpp>
-#include <module-sys/SystemManager/messages/TetheringQuestionRequest.hpp>
-#include <module-sys/Timers/TimerFactory.hpp>
+#include <SystemManager/messages/TetheringQuestionRequest.hpp>
+#include <Timers/TimerFactory.hpp>
 #include <service-appmgr/Constants.hpp>
 #include <service-appmgr/messages/AutoLockRequests.hpp>
 #include <service-appmgr/messages/GetAllNotificationsRequest.hpp>

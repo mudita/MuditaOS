@@ -2,11 +2,11 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationCommon.hpp"
-#include "Common.hpp"                         // for RefreshModes
-#include "GuiTimer.hpp"                       // for GuiTimer
-#include "Item.hpp"                           // for Item
-#include "MessageType.hpp"                    // for MessageType
-#include "module-sys/Timers/TimerFactory.hpp" // for Timer
+#include "Common.hpp"              // for RefreshModes
+#include "GuiTimer.hpp"            // for GuiTimer
+#include "Item.hpp"                // for Item
+#include "MessageType.hpp"         // for MessageType
+#include "Timers/TimerFactory.hpp" // for Timer
 #include "StatusBar.hpp"
 #include "status-bar/Time.hpp"
 #include "Translator.hpp"                // for KeyInputSim...

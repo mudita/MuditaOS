@@ -6,7 +6,7 @@
 #include <service-appmgr/Actions.hpp>
 #include <service-appmgr/messages/Message.hpp>
 
-#include <module-sys/Service/Service.hpp>
+#include <Service/Service.hpp>
 #include <SwitchData.hpp>
 
 #include <i18n/i18n.hpp>

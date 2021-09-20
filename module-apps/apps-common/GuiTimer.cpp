@@ -6,8 +6,8 @@
 
 #include <apps-common/ApplicationCommon.hpp> // for Application
 
-#include "module-sys/Timers/SystemTimer.hpp" // for Timer, Timer::Type, Timer::Ty...
-#include "module-sys/Timers/TimerFactory.hpp"
+#include "Timers/SystemTimer.hpp" // for Timer, Timer::Type, Timer::Ty...
+#include "Timers/TimerFactory.hpp"
 
 #include <functional>
 

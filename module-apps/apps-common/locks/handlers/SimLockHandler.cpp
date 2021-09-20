@@ -9,14 +9,14 @@
 
 #include <apps-common/popups/data/PopupRequestParams.hpp>
 #include <EventStore.hpp>
-#include <module-sys/Timers/TimerFactory.hpp>
+#include <Timers/TimerFactory.hpp>
 #include <service-cellular-api>
 
 namespace locks
 {
-    constexpr unsigned int default_attempts           = 4;
-    constexpr unsigned int max_input_size             = 8;
-    constexpr unsigned int min_input_size             = 4;
+    constexpr unsigned int default_attempts = 4;
+    constexpr unsigned int max_input_size   = 8;
+    constexpr unsigned int min_input_size   = 4;
 
     SimLockHandler::SimLockHandler(sys::Service *owner)
         : owner(owner), lock(Lock::LockState::Unlocked, default_attempts)

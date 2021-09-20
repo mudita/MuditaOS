@@ -10,7 +10,7 @@
 
 #include <db/ServiceDB.hpp>
 #include <evtmgr/EventManager.hpp>
-#include <module-sys/SystemManager/SystemManagerCommon.hpp>
+#include <SystemManager/SystemManagerCommon.hpp>
 
 #include <service-evtmgr/Constants.hpp>
 

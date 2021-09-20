@@ -3,7 +3,7 @@
 
 #include <catch2/catch.hpp>
 #include <memory>
-#include <module-sys/Service/ServiceProxy.hpp>
+#include <Service/ServiceProxy.hpp>
 
 namespace sys
 {

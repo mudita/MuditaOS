@@ -12,7 +12,7 @@
 #include <apps-common/windows/DialogMetadata.hpp>
 #include <log/log.hpp>
 #include <module-apps/application-phonebook/data/PhonebookItemData.hpp>
-#include <module-sys/Timers/TimerFactory.hpp>
+#include <Timers/TimerFactory.hpp>
 #include <PhoneNumber.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <service-appmgr/data/MmiActionsParams.hpp>

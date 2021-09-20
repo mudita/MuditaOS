@@ -7,12 +7,12 @@
 #include <locks/data/SimLockMessages.hpp>
 #include <locks/data/LockData.hpp>
 
-#include <module-sys/Service/Service.hpp>
+#include <Service/Service.hpp>
 #include <Timers/TimerHandle.hpp>
 
 namespace locks
 {
-    using StoredLockInput               = std::vector<unsigned int>;
+    using StoredLockInput = std::vector<unsigned int>;
 
     class SimLockHandler
     {

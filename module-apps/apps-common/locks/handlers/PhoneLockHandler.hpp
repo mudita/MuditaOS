@@ -8,7 +8,7 @@
 #include <locks/data/LockData.hpp>
 
 #include <service-db/Settings.hpp>
-#include <module-sys/Service/Service.hpp>
+#include <Service/Service.hpp>
 #include <Timers/TimerHandle.hpp>
 
 namespace locks

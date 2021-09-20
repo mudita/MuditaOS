@@ -3,7 +3,7 @@
 
 #include <service-evtmgr/screen-light-control/ScreenLightControl.hpp>
 #include <service-evtmgr/screen-light-control/ScreenLightControlParameters.hpp>
-#include <module-sys/Timers/TimerFactory.hpp>
+#include <Timers/TimerFactory.hpp>
 #include <Service/Service.hpp>
 
 namespace screen_light_control

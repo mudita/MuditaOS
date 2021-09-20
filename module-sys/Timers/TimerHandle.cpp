@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "TimerHandle.hpp"
+#include <Timers/TimerHandle.hpp>
 #include <module-utils/log/log.hpp>
 
 namespace sys

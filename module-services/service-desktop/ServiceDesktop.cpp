@@ -21,11 +21,11 @@
 #include <service-evtmgr/EventManagerCommon.hpp>
 #include <service-evtmgr/EVMessages.hpp>
 #include <purefs/filesystem_paths.hpp>
-#include <module-sys/SystemManager/SystemManagerCommon.hpp>
-#include <module-sys/Timers/TimerFactory.hpp>
+#include <SystemManager/SystemManagerCommon.hpp>
+#include <Timers/TimerFactory.hpp>
 
-#include <module-sys/SystemManager/Constants.hpp>
-#include <module-sys/SystemManager/messages/TetheringStateRequest.hpp>
+#include <SystemManager/Constants.hpp>
+#include <SystemManager/messages/TetheringStateRequest.hpp>
 
 #include <sys/mount.h>
 #include <sys/statvfs.h>

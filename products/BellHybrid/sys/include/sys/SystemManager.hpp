@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <module-sys/SystemManager/SystemManagerCommon.hpp>
+#include <SystemManager/SystemManagerCommon.hpp>
 
 namespace sys
 {

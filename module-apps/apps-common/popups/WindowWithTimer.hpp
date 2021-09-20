@@ -4,7 +4,7 @@
 #pragma once
 
 #include "AppWindow.hpp"
-#include <module-sys/Timers/TimerHandle.hpp>
+#include <Timers/TimerHandle.hpp>
 
 namespace gui
 {
