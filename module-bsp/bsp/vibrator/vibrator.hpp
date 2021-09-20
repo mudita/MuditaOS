@@ -1,6 +1,6 @@
 #pragma once
 
-#include <module-sys/Timers/Timer.hpp>
+#include <Timers/Timer.hpp>
 #include <Utils.hpp>
 
 #include <chrono>
@@ -10,8 +10,8 @@ namespace bsp
 {
     namespace vibrator
     {
-        inline constexpr auto defaultVibraPulseMs = 1000;        /// default: 1000 ms vibra pulse
-        inline constexpr auto defaultVibraPauseMs = 1000;        /// default: 1000 ms vibra pause between pulses
+        inline constexpr auto defaultVibraPulseMs = 1000; /// default: 1000 ms vibra pulse
+        inline constexpr auto defaultVibraPauseMs = 1000; /// default: 1000 ms vibra pause between pulses
 
         enum class Action
         {

@@ -5,7 +5,7 @@
 
 #include "AbstractAlarmAction.hpp"
 #include <service-db/Settings.hpp>
-#include <module-sys/Timers/TimerHandle.hpp>
+#include <Timers/TimerHandle.hpp>
 #include <Service/Service.hpp>
 
 namespace alarms

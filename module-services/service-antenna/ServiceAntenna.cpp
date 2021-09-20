@@ -10,7 +10,7 @@
 #include <EventStore.hpp>
 #include <log.hpp>
 #include <MessageType.hpp>
-#include <module-sys/Timers/TimerFactory.hpp>
+#include <Timers/TimerFactory.hpp>
 #include <projdefs.h>
 #include <service-cellular/CellularMessage.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
@@ -352,7 +352,7 @@ bool ServiceAntenna::bandCheckStateHandler(void)
         LOG_INFO("QNWINFO: %s", qnwinfo.c_str());
         const auto bandFrequency = at::response::qnwinfo::parseNetworkFrequency(qnwinfo);
         LOG_INFO("Band frequency: %" PRIu32, bandFrequency);
-        constexpr uint32_t GHz = 1000;
+        constexpr uint32_t GHz  = 1000;
         const bool isBandSubGHz = bandFrequency < GHz;
         if (currentAntenna == bsp::cellular::antenna::highBand) {
             LOG_INFO("High band antenna.");

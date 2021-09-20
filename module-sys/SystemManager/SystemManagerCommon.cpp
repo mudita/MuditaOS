@@ -1,10 +1,10 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "SystemManagerCommon.hpp"
+#include <SystemManager/SystemManagerCommon.hpp>
 
 #include <apps-common/ApplicationCommon.hpp>
-#include "DependencyGraph.hpp"
+#include <SystemManager/DependencyGraph.hpp>
 #include "graph/TopologicalSort.hpp"
 
 #include "thread.hpp"
@@ -20,10 +20,10 @@
 #include <service-desktop/Constants.hpp>
 #include <service-appmgr/Constants.hpp>
 #include <service-appmgr/Controller.hpp>
-#include "messages/CpuFrequencyMessage.hpp"
-#include "messages/DeviceRegistrationMessage.hpp"
-#include "messages/SentinelRegistrationMessage.hpp"
-#include "messages/RequestCpuFrequencyMessage.hpp"
+#include <SystemManager/messages/CpuFrequencyMessage.hpp>
+#include <SystemManager/messages/DeviceRegistrationMessage.hpp>
+#include <SystemManager/messages/SentinelRegistrationMessage.hpp>
+#include <SystemManager/messages/RequestCpuFrequencyMessage.hpp>
 #include <time/ScopedTime.hpp>
 #include "Timers/TimerFactory.hpp"
 #include <service-appmgr/StartupType.hpp>

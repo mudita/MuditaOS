@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <module-sys/PhoneModes/Common.hpp>
+#include <PhoneModes/Common.hpp>
 
 namespace sys
 {

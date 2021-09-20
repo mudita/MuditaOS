@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <module-sys/Service/Message.hpp>
+#include <Service/Message.hpp>
 
 #include <apps-common/popups/data/PopupRequestParams.hpp>
 

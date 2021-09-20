@@ -4,7 +4,7 @@
 #pragma once
 
 #include <MessageType.hpp>
-#include <module-sys/Service/Message.hpp>
+#include <Service/Message.hpp>
 #include <time/time_locale.hpp>
 
 class TimeMessage : public sys::DataMessage

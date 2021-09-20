@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <module-sys/Service/Message.hpp>
+#include <Service/Message.hpp>
 
 #include <service-appmgr/Actions.hpp>
 #include <service-appmgr/messages/ActionRequest.hpp>

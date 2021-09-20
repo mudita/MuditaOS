@@ -4,7 +4,7 @@
 #pragma once
 
 #include <locks/data/LockData.hpp>
-#include <module-sys/Service/Service.hpp>
+#include <Service/Service.hpp>
 
 namespace locks
 {

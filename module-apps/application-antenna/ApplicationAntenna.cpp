@@ -13,7 +13,7 @@
 #include <windows/ScanModesWindow.hpp>
 #include <windows/AlgoParamsWindow.hpp>
 #include <module-cellular/at/response.hpp>
-#include <module-sys/Timers/TimerFactory.hpp>
+#include <Timers/TimerFactory.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
 #include <ticks.hpp>
 

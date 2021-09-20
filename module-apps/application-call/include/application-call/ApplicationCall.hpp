@@ -6,7 +6,7 @@
 #include "Application.hpp"
 #include "CallState.hpp"
 
-#include <module-sys/Timers/TimerHandle.hpp>
+#include <Timers/TimerHandle.hpp>
 #include <service-cellular/CellularMessage.hpp>
 #include <service-evtmgr/Constants.hpp>
 #include <service-evtmgr/EVMessages.hpp>

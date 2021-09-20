@@ -6,7 +6,7 @@
 #include "popups/Popups.hpp"
 
 #include <service-appmgr/Actions.hpp>
-#include <module-sys/PhoneModes/Common.hpp>
+#include <PhoneModes/Common.hpp>
 #include <module-audio/Audio/AudioCommon.hpp>
 #include <locks/widgets/Lock.hpp>
 #include <locks/data/LockData.hpp>

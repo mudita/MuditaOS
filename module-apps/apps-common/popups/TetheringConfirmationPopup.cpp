@@ -5,7 +5,7 @@
 #include "DialogMetadataMessage.hpp"
 #include "ApplicationCommon.hpp"
 
-#include <module-sys/SystemManager/messages/TetheringQuestionRequest.hpp>
+#include <SystemManager/messages/TetheringQuestionRequest.hpp>
 #include <service-appmgr/Controller.hpp>
 
 namespace gui
