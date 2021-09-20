@@ -17,7 +17,6 @@ namespace hal::battery
         // Mocking initial state to make system run
         Store::Battery::modify().state = Store::Battery::State::Discharging;
         Store::Battery::modify().level = getBatteryVoltage();
-        eventsHandler.onStatusChanged();
     }
 
     int BatteryCharger::getBatteryVoltage()
