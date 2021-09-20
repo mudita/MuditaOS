@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "module-sys/Timers/Timer.hpp"       // for Timer
-#include "module-sys/Timers/TimerHandle.hpp" // for TimerHandle
+#include "Timers/Timer.hpp"       // for Timer
+#include "Timers/TimerHandle.hpp" // for TimerHandle
 
 #include <memory>
 #include <string> // for string

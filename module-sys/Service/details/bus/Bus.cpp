@@ -3,8 +3,8 @@
 
 #include "Bus.hpp"
 
-#include "module-sys/Service/Service.hpp"
-#include "module-sys/SystemWatchdog/SystemWatchdog.hpp"
+#include <Service/Service.hpp>
+#include "SystemWatchdog/SystemWatchdog.hpp"
 #include "module-os/CriticalSectionGuard.hpp"
 
 #include "ticks.hpp"

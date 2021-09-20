@@ -16,7 +16,7 @@
 #include <utility>              // for move
 #include <core/DrawCommandForward.hpp>
 #include <module-gui/gui/widgets/visitor/GuiVisitor.hpp>
-#include <module-sys/Timers/Timer.hpp>
+#include <Timers/Timer.hpp>
 
 namespace gui
 {

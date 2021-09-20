@@ -4,7 +4,7 @@
 #pragma once
 
 #include <Service/Service.hpp>
-#include <module-sys/Timers/TimerHandle.hpp>
+#include <Timers/TimerHandle.hpp>
 #include <filesystem>
 
 namespace service::detail

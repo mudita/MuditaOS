@@ -8,7 +8,7 @@
 #include <Audio/Operation/PlaybackOperation.hpp>
 #include <Bluetooth/audio/BluetoothAudioDevice.hpp>
 #include <module-audio/Audio/VolumeScaler.hpp>
-#include <module-sys/SystemManager/messages/SentinelRegistrationMessage.hpp>
+#include <SystemManager/messages/SentinelRegistrationMessage.hpp>
 #include <service-bluetooth/BluetoothMessage.hpp>
 #include <service-bluetooth/Constants.hpp>
 #include <service-bluetooth/messages/AudioRouting.hpp>

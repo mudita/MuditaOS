@@ -6,7 +6,7 @@
 #include "FreeRTOS.h"
 #include "portmacro.h"                             // for TickType_t
 #include <module-os/RTOSWrapper/include/timer.hpp> // for Timer
-#include "Timer.hpp"
+#include <Timers/Timer.hpp>
 #include <functional> // for function
 #include <string>     // for string
 #include <atomic>

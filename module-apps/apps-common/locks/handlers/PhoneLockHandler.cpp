@@ -8,7 +8,7 @@
 #include <service-appmgr/Controller.hpp>
 #include <apps-common/popups/data/PopupRequestParams.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
-#include <module-sys/Timers/TimerFactory.hpp>
+#include <Timers/TimerFactory.hpp>
 #include <time/time_conversion_factory.hpp>
 
 namespace locks

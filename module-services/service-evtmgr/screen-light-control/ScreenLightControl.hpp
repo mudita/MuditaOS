@@ -5,7 +5,7 @@
 
 #include "ScreenLightControlParameters.hpp"
 #include <memory>
-#include <module-sys/Timers/TimerHandle.hpp>
+#include <Timers/TimerHandle.hpp>
 namespace settings
 {
     class Settings;

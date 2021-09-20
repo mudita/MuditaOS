@@ -3,7 +3,7 @@
 
 #include "RawATHandler.hpp"
 #include <modem/ATCommon.hpp>
-#include <module-sys/Service/Message.hpp>
+#include <Service/Message.hpp>
 #include <service-desktop/DeveloperModeMessage.hpp>
 #include <endpoints/developerMode/event/ATRequest.hpp>
 

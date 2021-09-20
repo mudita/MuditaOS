@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "Observer.hpp"
+#include <PhoneModes/Observer.hpp>
 
 #include <Service/Service.hpp>
 
@@ -71,7 +71,7 @@ namespace sys::phone_modes
 
     sys::MessagePointer Observer::handlePhoneModeChange(PhoneModeChanged *message)
     {
-        phoneMode     = message->getPhoneMode();
+        phoneMode = message->getPhoneMode();
         if (!onPhoneModeChangedCallback) {
             LOG_WARN("No subscriber on phone mode change.");
             return MessageNone{};
