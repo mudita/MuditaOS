@@ -14,9 +14,13 @@ target_compile_definitions(lwext4
     PRIVATE
     CONFIG_DEBUG_PRINTF=1
     CONFIG_DEBUG_ASSERT=0
-    CONFIG_HAVE_OWN_OFLAGS=1
+    CONFIG_HAVE_OWN_OFLAGS=0
     CONFIG_HAVE_OWN_ERRNO=0
-    CONFIG_BLOCK_DEV_CACHE_SIZE=16
+    CONFIG_BLOCK_DEV_CACHE_SIZE=128
+)
+target_compile_options(lwext4
+    PRIVATE
+    -Wno-format
 )
 
 target_sources(lwext4
