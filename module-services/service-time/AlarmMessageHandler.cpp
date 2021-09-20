@@ -111,12 +111,6 @@ namespace alarms
         alarmOperations->addSnoozedAlarmsCountChangeCallback(callback);
     }
 
-    auto AlarmMessageHandler::addAlarmExecutionHandler(const alarms::AlarmType type,
-                                                       const std::shared_ptr<alarms::AlarmHandler> handler) -> void
-    {
-        alarmOperations->addAlarmExecutionHandler(type, handler);
-    }
-
     template <class RequestType, class ResponseType, class CallbackParamType>
     auto AlarmMessageHandler::handleWithCallback(
         RequestType *request,

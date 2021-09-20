@@ -9,50 +9,34 @@
 
 namespace alarms
 {
-    class BellAlarmClockHandler : public AlarmHandler
+    class BellAlarmHandler : public AlarmHandler
+    {
+      public:
+        using Actions = std::vector<std::unique_ptr<AbstractAlarmAction>>;
+
+        explicit BellAlarmHandler(Actions &&actions = {});
+        bool handle(const AlarmEventRecord &record) override;
+        bool handleOff(const AlarmEventRecord &record) override;
+
+      private:
+        Actions actions;
+    };
+
+    class BellAlarmClockHandler : public BellAlarmHandler
     {
       public:
         explicit BellAlarmClockHandler(sys::Service *service);
-        auto handle(const AlarmEventRecord &record) -> bool;
-        auto handleOff(const AlarmEventRecord &record) -> bool;
-
-        static constexpr auto name = "BellAlarmClockHandler";
 
       private:
-        sys::Service *service{};
-        std::vector<std::unique_ptr<AbstractAlarmAction>> actions;
+        static auto getActions(sys::Service *service) -> Actions;
     };
 
-    class EveningReminderHandler : public AlarmHandler
-    {
-      public:
-        auto handle(const AlarmEventRecord &record) -> bool;
-        auto handleOff(const AlarmEventRecord &record) -> bool;
-    };
-
-    class PreWakeUpChimeHandler : public AlarmHandler
+    class PreWakeUpChimeHandler : public BellAlarmHandler
     {
       public:
         explicit PreWakeUpChimeHandler(sys::Service *service);
-        auto handle(const AlarmEventRecord &record) -> bool;
-        auto handleOff(const AlarmEventRecord &record) -> bool;
-
-        static constexpr auto name = "PreWakeUpChimeHandler";
 
       private:
-        sys::Service *service{};
-    };
-
-    class PreWakeUpFrontlightHandler : public AlarmHandler
-    {
-      public:
-        explicit PreWakeUpFrontlightHandler(sys::Service *service);
-        auto handle(const AlarmEventRecord &record) -> bool;
-        auto handleOff(const AlarmEventRecord &record) -> bool;
-
-        static constexpr auto name = "PreWakeUpFrontlightHandler";
-
-      private:
-        sys::Service *service{};
+        static auto getActions(sys::Service *service) -> Actions;
     };
 } // namespace alarms

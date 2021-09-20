@@ -34,17 +34,13 @@ namespace stm
     constexpr auto automaticTimezoneName  = "";
     constexpr auto automaticTimezoneRules = "UTC0";
 
-    ServiceTime::ServiceTime(const alarms::IAlarmOperationsFactory &alarmOperationsFactory)
+    ServiceTime::ServiceTime(std::shared_ptr<alarms::IAlarmOperationsFactory> alarmOperationsFactory)
         : sys::Service(service::name::service_time, "", StackDepth), timeManager{std::make_unique<TimeManager>(
-                                                                         std::make_unique<RTCCommand>(this))}
+                                                                         std::make_unique<RTCCommand>(this))},
+          alarmOperationsFactory{std::move(alarmOperationsFactory)}
     {
         LOG_INFO("[ServiceTime] Initializing");
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
-
-        auto alarmEventsRepo = std::make_unique<alarms::AlarmEventsDBRepository>(this);
-        auto alarmOperations = alarmOperationsFactory.create(this, std::move(alarmEventsRepo), TimePointNow);
-        alarmOperations->updateEventsCache(TimePointNow());
-        alarmMessageHandler = std::make_unique<alarms::AlarmMessageHandler>(this, std::move(alarmOperations));
     }
 
     ServiceTime::~ServiceTime()
@@ -61,8 +57,11 @@ namespace stm
         static TimeSettings timeSettings;
         utils::time::TimestampFactory().init(&timeSettings);
 
+        auto alarmEventsRepo = std::make_unique<alarms::AlarmEventsDBRepository>(this);
+        auto alarmOperations = alarmOperationsFactory->create(this, std::move(alarmEventsRepo), TimePointNow);
+        alarmOperations->updateEventsCache(TimePointNow());
+        alarmMessageHandler = std::make_unique<alarms::AlarmMessageHandler>(this, std::move(alarmOperations));
         registerMessageHandlers();
-
         return sys::ReturnCodes::Success;
     }
 
@@ -101,12 +100,6 @@ namespace stm
         else {
             return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
         }
-    }
-
-    void ServiceTime::addAlarmExecutionHandler(const alarms::AlarmType type,
-                                               const std::shared_ptr<alarms::AlarmHandler> handler)
-    {
-        alarmMessageHandler->addAlarmExecutionHandler(type, handler);
     }
 
     void ServiceTime::registerMessageHandlers()
