@@ -15,6 +15,7 @@ namespace db
     {
       public:
         virtual std::unique_ptr<db::QueryResult> runQuery(std::shared_ptr<db::Query> query);
+        virtual ~Interface() = default;
 
         enum class Name
         {

@@ -36,7 +36,7 @@ namespace packet_data
     {
 
       private:
-        ServiceCellular &cellularService;
+        [[maybe_unused]] ServiceCellular &cellularService;
         DLCChannel *channel = nullptr;
 
       public:

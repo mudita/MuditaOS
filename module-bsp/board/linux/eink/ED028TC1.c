@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /**
@@ -174,7 +174,10 @@ EinkStatus_e EinkRefreshImage(
     return EinkOK;
 }
 
-__attribute__((optimize("O3"))) void EinkARGBToLuminance(uint8_t *dataIn,
+#ifndef __clang__
+__attribute__((optimize("O3")))
+#endif
+void EinkARGBToLuminance(uint8_t *dataIn,
                                                          uint8_t *dataOut,
                                                          uint32_t displayWidth,
                                                          uint32_t displayHeight)

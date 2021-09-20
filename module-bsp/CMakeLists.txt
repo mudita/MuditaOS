@@ -44,10 +44,15 @@ target_compile_options(${PROJECT_NAME}
     -Wno-switch
     -Wno-implicit-fallthrough
     -Wno-unused-variable
+)
 
-    # C only flags
+
+if (NOT(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang"))
+target_compile_options(${PROJECT_NAME}
+    PRIVATE
     $<$<COMPILE_LANGUAGE:C>:-Wno-old-style-declaration>
 )
+endif()
 
 target_compile_definitions(${PROJECT_NAME}
 

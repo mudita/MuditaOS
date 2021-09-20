@@ -13,7 +13,7 @@
 class TechnicalInformationModel : public app::InternalModel<gui::ListItem *>, public gui::ListItemProvider
 {
   private:
-    app::ApplicationCommon *application = nullptr;
+    [[maybe_unused]] app::ApplicationCommon *application = nullptr;
     std::unique_ptr<AbstractFactoryData> factoryData;
     std::shared_ptr<AbstractTechnicalInformationRepository> technicalInformationRepository = nullptr;
 

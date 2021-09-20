@@ -19,8 +19,6 @@ namespace
         {"042", cellular::PinChangeRequest::PassChangeType::ChangePin2},
         {"05", cellular::PinChangeRequest::PassChangeType::ChangePinByPuk},
     }};
-
-    constexpr inline std::string_view changeNetworkPasswordServiceCode = "03";
 } // namespace
 
 namespace cellular

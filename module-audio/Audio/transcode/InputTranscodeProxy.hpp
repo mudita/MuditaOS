@@ -27,7 +27,7 @@ namespace audio::transcode
                                      std::shared_ptr<Transform> transform) noexcept;
 
         bool push(const Span &span) override;
-        bool push(void *data, std::size_t dataSize);
+        bool push(void *data, std::size_t dataSize) override;
         void commit() override;
         bool reserve(Span &span) override;
         [[nodiscard]] auto getInputTraits() const noexcept -> Traits override;

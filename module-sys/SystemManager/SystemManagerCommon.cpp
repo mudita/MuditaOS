@@ -215,7 +215,7 @@ namespace sys
         cpuStatisticsTimer.start();
 
         powerManagerEfficiencyTimer = sys::TimerFactory::createPeriodicTimer(
-            this, "logPowerManagerEfficiency", constants::powerManagerLogsTimerInterval, [this](sys::Timer &) {
+            this, "logPowerManagerEfficiency", constants::powerManagerLogsTimerInterval, [](sys::Timer &) {
                 powerManager->LogPowerManagerEfficiency();
             });
         powerManagerEfficiencyTimer.start();
@@ -526,28 +526,28 @@ namespace sys
             return MessageNone{};
         });
 
-        connect(typeid(sys::DeviceRegistrationMessage), [this](sys::Message *message) -> sys::MessagePointer {
+        connect(typeid(sys::DeviceRegistrationMessage), [](sys::Message *message) -> sys::MessagePointer {
             auto msg = static_cast<sys::DeviceRegistrationMessage *>(message);
             deviceManager->RegisterNewDevice(msg->getDevice());
 
             return sys::MessageNone{};
         });
 
-        connect(typeid(sys::SentinelRegistrationMessage), [this](sys::Message *message) -> sys::MessagePointer {
+        connect(typeid(sys::SentinelRegistrationMessage), [](sys::Message *message) -> sys::MessagePointer {
             auto msg = static_cast<sys::SentinelRegistrationMessage *>(message);
             powerManager->RegisterNewSentinel(msg->getSentinel());
 
             return sys::MessageNone{};
         });
 
-        connect(typeid(sys::HoldCpuFrequencyMessage), [this](sys::Message *message) -> sys::MessagePointer {
+        connect(typeid(sys::HoldCpuFrequencyMessage), [](sys::Message *message) -> sys::MessagePointer {
             auto msg = static_cast<sys::HoldCpuFrequencyMessage *>(message);
             powerManager->SetCpuFrequencyRequest(msg->getName(), msg->getRequest());
 
             return sys::MessageNone{};
         });
 
-        connect(typeid(sys::ReleaseCpuFrequencyMessage), [this](sys::Message *message) -> sys::MessagePointer {
+        connect(typeid(sys::ReleaseCpuFrequencyMessage), [](sys::Message *message) -> sys::MessagePointer {
             auto msg = static_cast<sys::ReleaseCpuFrequencyMessage *>(message);
             powerManager->ResetCpuFrequencyRequest(msg->getName());
 

@@ -30,7 +30,7 @@ namespace gui
      */
     class CalllogItem : public ListItem
     {
-        CalllogModel *model = nullptr;
+        [[maybe_unused]] CalllogModel *model = nullptr;
         // pointer to the calls record
         std::shared_ptr<CalllogRecord> call = nullptr;
         gui::HBox *hBox                     = nullptr;

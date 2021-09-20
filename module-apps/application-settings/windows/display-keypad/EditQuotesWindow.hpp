@@ -21,6 +21,6 @@ namespace gui
         bool isOurFavouritesSwitchOn = false;
         bool isCustomSwitchOn        = false;
 
-        Item *quotes;
+        [[maybe_unused]] Item *quotes;
     };
 } // namespace gui

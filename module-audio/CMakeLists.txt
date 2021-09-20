@@ -58,8 +58,15 @@ target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}
 set_source_files_properties(
         ${CMAKE_CURRENT_SOURCE_DIR}/Audio/decoder/decoderFLAC.cpp
         PROPERTIES COMPILE_FLAGS
-	"-Wno-implicit-fallthrough -Wno-error=maybe-uninitialized"
+	"-Wno-implicit-fallthrough"
 )
+
+if (NOT(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang"))
+set_source_files_properties(
+        ${CMAKE_CURRENT_SOURCE_DIR}/Audio/decoder/decoderFLAC.cpp
+        PROPERTIES COMPILE_FLAGS "-Wno-error=maybe-uninitialized"
+)
+endif()
 
 target_link_libraries(${PROJECT_NAME}
         PUBLIC

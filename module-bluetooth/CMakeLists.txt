@@ -47,9 +47,14 @@ target_compile_options(${PROJECT_NAME}
     -Wno-missing-field-initializers
     -Wno-unused-function
     -Wno-implicit-fallthrough
-    # C only flags
-    "$<$<COMPILE_LANGUAGE:C>:-Wno-old-style-declaration>"
 )
+
+if (NOT(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang"))
+    target_compile_options(${PROJECT_NAME}
+        PRIVATE
+        "$<$<COMPILE_LANGUAGE:C>:-Wno-old-style-declaration>"
+)
+endif()
 
 target_include_directories(
     ${PROJECT_NAME}

@@ -16,7 +16,7 @@ namespace gui
     {
       private:
         auto buildOptionsList() -> std::list<Option> override;
-        app::settingsInterface::OperatorsSettings *operatorsSettings;
+        [[maybe_unused]] app::settingsInterface::OperatorsSettings *operatorsSettings;
 
       public:
         NetworkWindow(app::ApplicationCommon *app, app::settingsInterface::OperatorsSettings *operatorsSettings);

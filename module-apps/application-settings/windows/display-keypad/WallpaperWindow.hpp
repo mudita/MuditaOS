@@ -22,6 +22,6 @@ namespace gui
         bool isWallpaperClockSwitchOn  = false;
         bool isWallpaperQuotesSwitchOn = false;
 
-        Item *quotes;
+        [[maybe_unused]] Item *quotes;
     };
 } // namespace gui

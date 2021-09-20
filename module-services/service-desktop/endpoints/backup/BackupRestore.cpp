@@ -25,7 +25,6 @@ namespace sys
     class Service;
 } // namespace sys
 
-static const long unsigned int empty_dirlist_size = 2;
 static bool isValidDirentry(const std::filesystem::directory_entry &direntry)
 {
     return direntry.path() != "." && direntry.path() != ".." && direntry.path() != "...";

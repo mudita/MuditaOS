@@ -10,8 +10,8 @@
 class RandomStringGenerator
 {
   public:
-    RandomStringGenerator(size_t minLength = minRandomStringLength, size_t maxLength = maxRandomStringLength)
-        : minLength(minLength), maxLength(maxLength), lengthDist(minLength, maxLength)
+    explicit RandomStringGenerator(int minLength = minRandomStringLength, int maxLength = maxRandomStringLength)
+        : lengthDist(minLength, maxLength)
     {}
 
     std::string getRandomString();
@@ -20,8 +20,6 @@ class RandomStringGenerator
   private:
     std::uniform_int_distribution<> charDist{0, sizeof(charSet) - 1};
     std::default_random_engine rng{std::random_device{}()};
-    const size_t minLength;
-    const size_t maxLength;
     std::uniform_int_distribution<> lengthDist;
 
     static constexpr auto minRandomStringLength = 1;

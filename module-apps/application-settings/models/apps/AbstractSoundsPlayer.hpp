@@ -24,4 +24,5 @@ class AbstractSoundsPlayer
     virtual bool stop(audio::Token token)                            = 0;
     virtual bool isInState(State state) const noexcept               = 0;
     virtual bool previouslyPlayed(const std::string &filePath) const = 0;
+    virtual ~AbstractSoundsPlayer()                                  = default;
 };

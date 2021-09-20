@@ -106,3 +106,11 @@ target_link_libraries(module-vfs
 if (${ENABLE_TESTS})
     add_subdirectory(tests)
 endif ()
+
+if (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang")
+target_compile_options(module-vfs
+    PRIVATE
+    -Wno-unused-function
+    -Wno-unused-const-variable
+)
+endif()

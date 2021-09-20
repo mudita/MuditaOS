@@ -15,5 +15,7 @@ if (LINUX_ENABLE_SANITIZER)
     add_link_options(-fsanitize=address)
 endif (LINUX_ENABLE_SANITIZER)
 
+add_link_options(-lstdc++)
+
 set(CMAKE_STRIP strip CACHE INTERNAL "")
 set(CMAKE_OBJCOPY objcopy CACHE INTERNAL "")

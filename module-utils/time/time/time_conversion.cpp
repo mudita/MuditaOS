@@ -33,8 +33,6 @@ namespace utils::time
                                                                  "%A",  // day long
                                                                  "%b",  // month abbrew
                                                                  "%B"}; // month long
-        constexpr auto hoursMinFormat12H                      = "%I:%M";
-        constexpr auto hoursMinFormat24H                      = "%H:%M";
 
         struct Format
         {

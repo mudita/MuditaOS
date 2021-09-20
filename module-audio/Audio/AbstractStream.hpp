@@ -47,6 +47,7 @@ namespace audio
              * @param event - type of event
              */
             virtual void onEvent(AbstractStream *stream, Event event) = 0;
+            virtual ~EventListener()                                  = default;
         };
 
         /**

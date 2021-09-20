@@ -63,7 +63,5 @@ namespace parserFSM
         auto getMessagesTemplates(Context &context) -> sys::ReturnCodes;
 
         json11::Json receivedJson;
-
-        const int defaultLimit = 100; // will be removed after introducing pagination
     };
 } // namespace parserFSM

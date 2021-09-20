@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -54,12 +54,12 @@ namespace gui
          */
         void updateLabels();
 
-        void rebuild(){};
-        void buildInterface()
+        void rebuild() override{};
+        void buildInterface() override
         {
             AppWindow::buildInterface();
         };
-        void destroyInterface()
+        void destroyInterface() override
         {
             AppWindow::destroyInterface();
         };

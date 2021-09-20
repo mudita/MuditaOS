@@ -23,14 +23,16 @@ ThreadRecordInterface::ThreadRecordInterface(SmsDB *smsDb, ContactsDB *contactsD
 
 bool ThreadRecordInterface::Add(const ThreadRecord &rec)
 {
-    auto ret = smsDB->threads.add(ThreadsTableRow{Record(rec.ID),
-                                                  .date           = rec.date,
-                                                  .msgCount       = rec.msgCount,
-                                                  .unreadMsgCount = rec.unreadMsgCount,
-                                                  .contactID      = rec.contactID,
-                                                  .numberID       = rec.numberID,
-                                                  .snippet        = rec.snippet,
-                                                  .type           = rec.type});
+    auto r           = ThreadsTableRow{};
+    r.ID             = rec.ID;
+    r.date           = rec.date;
+    r.msgCount       = rec.msgCount;
+    r.unreadMsgCount = rec.unreadMsgCount;
+    r.contactID      = rec.contactID;
+    r.numberID       = rec.numberID;
+    r.snippet        = rec.snippet;
+    r.type           = rec.type;
+    auto ret         = smsDB->threads.add(r);
 
     return ret;
 }
@@ -48,16 +50,16 @@ bool ThreadRecordInterface::RemoveByID(uint32_t id)
 
 bool ThreadRecordInterface::Update(const ThreadRecord &rec)
 {
-    return smsDB->threads.update(ThreadsTableRow{Record(rec.ID),
-                                                 .date           = rec.date,
-                                                 .msgCount       = rec.msgCount,
-                                                 .unreadMsgCount = rec.unreadMsgCount,
-                                                 .contactID      = rec.contactID,
-                                                 .numberID       = rec.numberID,
-                                                 .snippet        = rec.snippet,
-                                                 .type           = rec.type
-
-    });
+    auto r           = ThreadsTableRow{};
+    r.ID             = rec.ID;
+    r.date           = rec.date;
+    r.msgCount       = rec.msgCount;
+    r.unreadMsgCount = rec.unreadMsgCount;
+    r.contactID      = rec.contactID;
+    r.numberID       = rec.numberID;
+    r.snippet        = rec.snippet;
+    r.type           = rec.type;
+    return smsDB->threads.update(r);
 }
 
 uint32_t ThreadRecordInterface::GetCount()
@@ -247,7 +249,7 @@ std::vector<ThreadRecord> ThreadRecordInterface::getThreads(const std::shared_pt
 
 std::unique_ptr<db::QueryResult> ThreadRecordInterface::threadsGetQuery(const std::shared_ptr<db::Query> &query)
 {
-    auto response = std::make_unique<db::query::ThreadsGetResults>(std::move(getThreads(query)));
+    auto response = std::make_unique<db::query::ThreadsGetResults>(getThreads(query));
     response->setRequestQuery(query);
     return response;
 }
@@ -256,7 +258,7 @@ std::unique_ptr<db::QueryResult> ThreadRecordInterface::threadsGetQueryWithTotal
     const std::shared_ptr<db::Query> &query)
 {
     auto count    = smsDB->threads.count();
-    auto response = std::make_unique<db::query::ThreadsGetResultsWithTotalCount>(std::move(getThreads(query)), count);
+    auto response = std::make_unique<db::query::ThreadsGetResultsWithTotalCount>(getThreads(query), count);
     response->setRequestQuery(query);
     return response;
 }

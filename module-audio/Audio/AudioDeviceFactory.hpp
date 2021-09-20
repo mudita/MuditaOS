@@ -1,3 +1,6 @@
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 // Copyright (c) 2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
@@ -22,6 +25,7 @@ namespace audio
         };
 
         explicit AudioDeviceFactory(Observer *observer = nullptr);
+        virtual ~AudioDeviceFactory() = default;
 
         void setObserver(Observer *observer) noexcept;
         std::shared_ptr<AudioDevice> CreateDevice(const Profile &profile);

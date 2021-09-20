@@ -49,7 +49,7 @@ namespace bluetooth
         class HSPImpl;
         std::unique_ptr<HSPImpl> pimpl;
         const sys::Service *ownerService{};
-        btstack_run_loop *runLoopInstance{};
+        // btstack_run_loop *runLoopInstance{};
     };
 
 } // namespace bluetooth

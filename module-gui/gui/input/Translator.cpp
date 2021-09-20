@@ -13,7 +13,6 @@ namespace gui
     {
         constexpr auto jsonKey = "filetype";
         constexpr auto normal  = "normal";
-        constexpr auto special = "special";
     } // namespace filetype
 
     InputEvent KeyBaseTranslation::set(RawKey key)

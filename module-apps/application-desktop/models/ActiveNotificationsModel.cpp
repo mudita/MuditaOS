@@ -194,7 +194,7 @@ namespace
 
     void setSnoozeActivatedCallback(NotificationListItem *item, app::ApplicationCommon *app)
     {
-        item->activatedCallback = [app]([[maybe_unused]] gui::Item &_item) {
+        item->activatedCallback = []([[maybe_unused]] gui::Item &_item) {
             LOG_ERROR("TODO open active snooze");
             return true;
         };

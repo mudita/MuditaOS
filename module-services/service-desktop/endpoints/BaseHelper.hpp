@@ -56,6 +56,7 @@ namespace parserFSM
       public:
         explicit BaseHelper(sys::Service *p) : owner(p)
         {}
+        virtual ~BaseHelper() = default;
 
         /// generall processing function
         ///

@@ -42,7 +42,7 @@ namespace gui
         void setConnectionToDateItem(DateWidget *item);
 
       private:
-        VBox *vBox              = nullptr;
+        [[maybe_unused]] VBox *vBox = nullptr;
         HBox *hBox              = nullptr;
         Label *colonLabel       = nullptr;
         Label *descriptionLabel = nullptr;

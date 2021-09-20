@@ -106,26 +106,25 @@ namespace service::detail
             auto mimeType = getMimeType(path);
             auto tags     = tags::fetcher::fetchTags(path);
 
-            db::multimedia_files::MultimediaFilesRecord record{
-                Record(DB_ID_NONE),
-                .fileInfo = {.path = std::string(path), .mediaType = mimeType, .size = static_cast<size_t>(fileSize)},
-                .tags =
+            db::multimedia_files::MultimediaFilesRecord record{};
+            record.ID       = DB_ID_NONE;
+            record.fileInfo = {.path = std::string(path), .mediaType = mimeType, .size = static_cast<size_t>(fileSize)};
+            record.tags     = {
+                .title = tags.title,
+                .album =
                     {
-                        .title = tags.title,
-                        .album =
-                            {
-                                .artist = tags.artist,
-                                .title  = tags.album,
-                            },
-                        .comment = tags.comment,
-                        .genre   = tags.genre,
-                        .year    = tags.year,
-                        .track   = tags.track,
+                        .artist = tags.artist,
+                        .title  = tags.album,
                     },
-                .audioProperties = {.songLength = tags.total_duration_s,
-                                    .bitrate    = tags.bitrate,
-                                    .sampleRate = tags.sample_rate,
-                                    .channels   = tags.num_channel}};
+                .comment = tags.comment,
+                .genre   = tags.genre,
+                .year    = tags.year,
+                .track   = tags.track,
+            };
+            record.audioProperties = {.songLength = tags.total_duration_s,
+                                      .bitrate    = tags.bitrate,
+                                      .sampleRate = tags.sample_rate,
+                                      .channels   = tags.num_channel};
 
             return record;
         }

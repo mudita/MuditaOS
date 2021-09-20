@@ -32,7 +32,7 @@ namespace app::music_player
         std::optional<tags::fetcher::Tags> getFileTags(const std::string &filePath) const final;
 
       private:
-        ApplicationCommon *application = nullptr;
+        [[maybe_unused]] ApplicationCommon *application = nullptr;
     };
 
     class AbstractSongsRepository

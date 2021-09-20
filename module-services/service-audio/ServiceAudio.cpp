@@ -31,7 +31,7 @@ inline constexpr auto audioServiceStackSize = 1024 * 4;
 
 static constexpr auto defaultVolumeHigh              = "10";
 static constexpr auto defaultVolumeLow               = "5";
-static constexpr auto defaultVolumeMuted             = "0";
+// static constexpr auto defaultVolumeMuted             = "0";
 static constexpr auto defaultTrue                    = "1";
 static constexpr auto defaultFalse                   = "0";
 static constexpr auto defaultCallRingtonePath        = "assets/audio/ringtone/ringtone_drum_2.mp3";

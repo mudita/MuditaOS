@@ -43,7 +43,7 @@ namespace parserFSM
         std::string payload;
         std::string header;
         unsigned long payloadLength   = 0;
-        sys::Service *OwnerServicePtr = nullptr;
+        [[maybe_unused]] sys::Service *OwnerServicePtr = nullptr;
         std::unique_ptr<MessageHandler> messageHandler;
 
         void parseHeader();

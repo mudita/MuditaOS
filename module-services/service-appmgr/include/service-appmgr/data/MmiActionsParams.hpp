@@ -35,6 +35,7 @@ namespace app::manager::actions
     class IMMICustomResultParams
     {
       public:
+        virtual ~IMMICustomResultParams() = default;
         enum class MMIType
         {
             NoneSpecified,

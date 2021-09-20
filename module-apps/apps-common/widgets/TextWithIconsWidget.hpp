@@ -15,7 +15,7 @@ namespace gui
 
     class TextWithIconsWidget : public HBox
     {
-        app::ApplicationCommon *app = nullptr;
+        [[maybe_unused]] app::ApplicationCommon *app = nullptr;
 
       public:
         explicit TextWithIconsWidget(gui::Item *parent);

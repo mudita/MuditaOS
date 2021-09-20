@@ -25,3 +25,4 @@ target_include_directories(hash-library
        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
 )
 
+target_compile_options(hash-library PRIVATE "-Wno-error=unused-function")

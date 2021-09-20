@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <string>
@@ -9,11 +9,6 @@
 
 #include "service-cellular/requests/PasswordRegistrationRequest.hpp"
 #include "service-cellular/requests/CallBarringRequest.hpp" // for barringServiceToFacility map
-
-namespace
-{
-    constexpr inline std::string_view changeNetworkPasswordServiceCode = "03";
-}
 
 namespace cellular
 {

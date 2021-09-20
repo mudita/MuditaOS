@@ -156,10 +156,17 @@ target_include_directories(${PROJECT_NAME}
         ${CMAKE_CURRENT_SOURCE_DIR}/Database
 )
 
+if (NOT (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang"))
 target_compile_options(${PROJECT_NAME}
     PRIVATE
     -Wno-error=return-local-addr
 )
+else()
+target_compile_options(${PROJECT_NAME}
+    PRIVATE
+    -Wno-potentially-evaluated-expression
+)
+endif()
 
 target_link_libraries(${PROJECT_NAME}
     PUBLIC

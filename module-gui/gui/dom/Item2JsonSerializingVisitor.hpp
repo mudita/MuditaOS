@@ -11,7 +11,7 @@ namespace gui
 {
     class ItemNode;
     class BoundingBox;
-    class Color;
+    struct Color;
 
     /// Visitor serializing a single object of a class in a `gui::Item`'s inheritance hierarchy into the JSON format. On
     /// each visit, acceptor is serialized with a result appended into the `sink`.

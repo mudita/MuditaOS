@@ -10,7 +10,7 @@
 
 class OptionsModel : public app::InternalModel<gui::ListItem *>, public gui::ListItemProvider
 {
-    app::ApplicationCommon *application = nullptr;
+    [[maybe_unused]] app::ApplicationCommon *application = nullptr;
 
   public:
     explicit OptionsModel(app::ApplicationCommon *app);

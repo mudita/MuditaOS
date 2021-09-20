@@ -24,7 +24,7 @@ namespace gui
 
         gui::Text *quoteText          = nullptr;
         gui::Text *authorText         = nullptr;
-        gui::Label *authorCharCounter = nullptr;
+        [[maybe_unused]] gui::Label *authorCharCounter = nullptr;
         gui::Label *quoteCharCounter  = nullptr;
 
         QuoteAction quoteAction;

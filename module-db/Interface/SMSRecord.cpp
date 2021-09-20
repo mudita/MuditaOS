@@ -63,16 +63,17 @@ bool SMSRecordInterface::Add(const SMSRecord &rec)
     }
     auto thread = (*threadRec)[0];
 
-    // Create SMS
-    if (!smsDB->sms.add(SMSTableRow{Record(DB_ID_NONE), // the entry is not yet in the DB
-                                    .threadID  = thread.ID,
-                                    .contactID = contactID,
-                                    .date      = rec.date,
-                                    .errorCode = rec.errorCode,
-                                    .body      = rec.body,
-                                    .type      = rec.type
+    auto r      = SMSTableRow{}; // the entry is not yet in the DB
+    r.ID        = DB_ID_NONE;
+    r.threadID  = thread.ID;
+    r.contactID = contactID;
+    r.date      = rec.date;
+    r.errorCode = rec.errorCode;
+    r.body      = rec.body;
+    r.type      = rec.type;
 
-        })) {
+    // Create SMS
+    if (!smsDB->sms.add(r)) {
         LOG_ERROR("Cannot add sms");
         return false;
     }
@@ -170,13 +171,15 @@ bool SMSRecordInterface::Update(const SMSRecord &recUpdated)
         return false;
     }
 
-    smsDB->sms.update(SMSTableRow{Record(recCurrent.ID),
-                                  .threadID  = recCurrent.threadID,
-                                  .contactID = recCurrent.contactID,
-                                  .date      = recUpdated.date,
-                                  .errorCode = recUpdated.errorCode,
-                                  .body      = recUpdated.body,
-                                  .type      = recUpdated.type});
+    auto r      = SMSTableRow{};
+    r.ID        = recCurrent.ID;
+    r.threadID  = recCurrent.threadID;
+    r.contactID = recCurrent.contactID;
+    r.date      = recUpdated.date;
+    r.errorCode = recUpdated.errorCode;
+    r.body      = recUpdated.body;
+    r.type      = recUpdated.type;
+    smsDB->sms.update(r);
 
     // Update messages read count if necessary
     ThreadRecordInterface threadInterface(smsDB, contactsDB);

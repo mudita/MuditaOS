@@ -213,7 +213,6 @@ inline std::string TimePointToString(const TimePoint &tp, date::months months)
 {
     date::year_month_day yearMonthDay     = date::year_month_day{date::floor<date::days>(tp)};
     date::year_month_day yearMonthDayLast = yearMonthDay.year() / yearMonthDay.month() / date::last;
-    auto tpHourMinuteSecond               = TimePointToHourMinSec(tp).to_duration();
 
     TimePoint timePoint;
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SMSTemplateRecord.hpp"
@@ -26,8 +26,11 @@ SMSTemplateRecordInterface::SMSTemplateRecordInterface(SmsDB *smsDb) : smsDB(sms
 
 bool SMSTemplateRecordInterface::Add(const SMSTemplateRecord &rec)
 {
-    return smsDB->templates.add(
-        SMSTemplateTableRow{Record(rec.ID), .text = rec.text, .lastUsageTimestamp = rec.lastUsageTimestamp});
+    auto r               = SMSTemplateTableRow{};
+    r.ID                 = rec.ID;
+    r.text               = rec.text;
+    r.lastUsageTimestamp = rec.lastUsageTimestamp;
+    return smsDB->templates.add(r);
 }
 uint32_t SMSTemplateRecordInterface::GetCount()
 {
@@ -56,8 +59,12 @@ bool SMSTemplateRecordInterface::Update(const SMSTemplateRecord &rec)
         return false;
     }
 
-    return smsDB->templates.update(
-        SMSTemplateTableRow{Record(rec.ID), .text = rec.text, .lastUsageTimestamp = rec.lastUsageTimestamp});
+    auto r               = SMSTemplateTableRow{};
+    r.ID                 = rec.ID;
+    r.text               = rec.text;
+    r.lastUsageTimestamp = rec.lastUsageTimestamp;
+
+    return smsDB->templates.update(r);
 }
 
 bool SMSTemplateRecordInterface::RemoveByID(uint32_t id)

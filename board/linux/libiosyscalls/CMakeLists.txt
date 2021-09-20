@@ -33,7 +33,11 @@ target_sources(
         include/iosyscalls.hpp
 )
 
-target_compile_options( ${PROJECT_NAME} PRIVATE "-Wno-nonnull-compare" )
+
+if (NOT (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang"))
+    target_compile_options( ${PROJECT_NAME} PRIVATE "-Wno-nonnull-compare" )
+endif()
+
 get_target_property( target_options ${PROJECT_NAME} COMPILE_OPTIONS)
 if("-fsanitize=address" IN_LIST target_options )
     list(REMOVE_ITEM target_options "-fsanitize=address")

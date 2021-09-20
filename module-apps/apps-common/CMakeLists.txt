@@ -107,18 +107,24 @@ target_include_directories(apps-common
 )
 
 target_compile_options(apps-common
-
         PUBLIC
-
         -Wall
-
         $<$<COMPILE_LANGUAGE:C>:-std=gnu11>
-        $<$<COMPILE_LANGUAGE:C>:-Wno-discarded-qualifiers>
-
         $<$<COMPILE_LANGUAGE:CXX>:-fno-non-call-exceptions>
-        $<$<COMPILE_LANGUAGE:CXX>:-Wno-literal-suffix>
-
 )
+
+if (NOT (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang"))
+    target_compile_options(${PROJECT_NAME}
+        PRIVATE
+            $<$<COMPILE_LANGUAGE:CXX>:-Wno-literal-suffix>
+            $<$<COMPILE_LANGUAGE:C>:-Wno-discarded-qualifiers>
+    )
+else()
+    target_compile_options(apps-common
+        PRIVATE
+        -Wno-potentially-evaluated-expression
+    )
+endif()
 
 # Bell Hybrid related libs
 add_library(bellgui)

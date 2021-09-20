@@ -88,14 +88,19 @@ add_compile_definitions(FSL_RTOS_FREE_RTOS
 
 add_compile_options(
     $<$<COMPILE_LANGUAGE:C>:-std=gnu11>
-    -fsingle-precision-constant
     -ffunction-sections
     -fdata-sections
-    -MMD
     -MP
     -fno-builtin
     # warning flags
     -Wall -Wextra -Werror -Wno-unused-parameter -Wno-deprecated-declarations)
+
+
+if (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang")
+add_compile_options(
+    -fbracket-depth=3000
+    )
+endif()
 
 include_directories(${CMAKE_SOURCE_DIR})
 

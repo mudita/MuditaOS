@@ -28,6 +28,7 @@ namespace audio
             factory = AudioPlatform::GetDeviceFactory();
             factory->setObserver(&observer);
         }
+        virtual ~Operation() = default;
 
         enum class State
         {
@@ -59,7 +60,6 @@ namespace audio
             return "";
         }
 
-        virtual ~Operation() = default;
 
         static std::unique_ptr<Operation> Create(Type t,
                                                  const char *fileName                   = "",

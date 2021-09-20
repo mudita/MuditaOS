@@ -190,7 +190,6 @@ namespace AudioServiceAPI
 
     std::optional<audio::Volume> GetVolume(sys::Service *serv, audio::PlaybackType playbackType)
     {
-        std::optional<audio::Volume> volume;
         try {
             return static_cast<audio::Volume>(std::stoi(GetSetting(serv, audio::Setting::Volume, playbackType)));
         }

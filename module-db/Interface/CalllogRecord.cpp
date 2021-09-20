@@ -82,16 +82,18 @@ bool CalllogRecordInterface::Add(const CalllogRecord &rec)
         LOG_DEBUG("Adding private call entry to call log record.");
     }
 
-    return calllogDB->calls.add(CalllogTableRow{Record(localRec.ID), // this is only to remove warning
-                                                .number       = localRec.phoneNumber.getEntered(),
-                                                .e164number   = localRec.phoneNumber.getE164(),
-                                                .presentation = localRec.presentation,
-                                                .date         = localRec.date,
-                                                .duration     = localRec.duration,
-                                                .type         = localRec.type,
-                                                .name         = localRec.name,
-                                                .contactId    = localRec.contactId,
-                                                .isRead       = localRec.isRead});
+    auto r         = CalllogTableRow{};
+    r.ID           = localRec.ID;
+    r.number       = localRec.phoneNumber.getEntered();
+    r.e164number   = localRec.phoneNumber.getE164();
+    r.presentation = localRec.presentation;
+    r.date         = localRec.date;
+    r.duration     = localRec.duration;
+    r.type         = localRec.type;
+    r.name         = localRec.name;
+    r.contactId    = localRec.contactId;
+    r.isRead       = localRec.isRead;
+    return calllogDB->calls.add(r);
 }
 
 uint32_t CalllogRecordInterface::GetLastID()
@@ -161,16 +163,18 @@ bool CalllogRecordInterface::Update(const CalllogRecord &rec)
         }
     }
 
-    return calllogDB->calls.update(CalllogTableRow{Record(rec.ID),
-                                                   .number       = rec.phoneNumber.getEntered(),
-                                                   .e164number   = rec.phoneNumber.getE164(),
-                                                   .presentation = presentation,
-                                                   .date         = rec.date,
-                                                   .duration     = rec.duration,
-                                                   .type         = rec.type,
-                                                   .name         = rec.name,
-                                                   .contactId    = contactID,
-                                                   .isRead       = rec.isRead});
+    auto r         = CalllogTableRow{};
+    r.ID           = rec.ID;
+    r.number       = rec.phoneNumber.getEntered();
+    r.e164number   = rec.phoneNumber.getE164();
+    r.presentation = presentation;
+    r.date         = rec.date;
+    r.duration     = rec.duration;
+    r.type         = rec.type;
+    r.name         = rec.name;
+    r.contactId    = contactID;
+    r.isRead       = rec.isRead;
+    return calllogDB->calls.update(r);
 }
 
 bool CalllogRecordInterface::RemoveByID(uint32_t id)

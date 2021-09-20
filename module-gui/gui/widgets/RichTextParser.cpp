@@ -34,6 +34,7 @@ namespace text
 
       public:
         Attribute() = delete;
+        virtual ~Attribute() = default;
         /// return true on success, otherwise set fallback value and return false
         /// @note could run: preVisitHook -> visit -> postVisit hook
         virtual auto visit(gui::TextFormat &fmt, std::string value) -> bool = 0;

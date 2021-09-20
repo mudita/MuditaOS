@@ -34,15 +34,17 @@ namespace gui
     auto AutolockWindow::buildOptionsList() -> std::list<gui::Option>
     {
         std::list<gui::Option> optionsList;
-        for (const auto &[timeString, time] : autoLockTimes) {
+        for (auto [timeString, time] : autoLockTimes) {
+            setTime(time);
+            auto foo = [=](gui::Item & /*item*/) {
+                autoLockSettings->setAutoLockTime(getTime());
+                currentAutoLockTimeout = getTime();
+                refreshOptionsList();
+                return true;
+            };
             optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
                 timeString,
-                [=](gui::Item &item) {
-                    autoLockSettings->setAutoLockTime(time);
-                    currentAutoLockTimeout = time;
-                    refreshOptionsList();
-                    return true;
-                },
+                foo,
                 [=](gui::Item &item) {
                     if (item.focus) {
                         this->setBottomBarText(utils::translate(style::strings::common::select),

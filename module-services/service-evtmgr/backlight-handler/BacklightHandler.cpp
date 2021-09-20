@@ -14,17 +14,17 @@ namespace backlight
         constexpr auto keypadLightTimerName    = "KeypadLightTimer";
         constexpr auto screenLightTimerName    = "ScreenLightTimer";
         constexpr auto keypadLightTimerTimeout = std::chrono::seconds(5);
-        constexpr auto screenLightTimerTimeout = std::chrono::seconds(5);
+        // constexpr auto screenLightTimerTimeout = std::chrono::seconds(5);
     } // namespace timers
 
     Handler::Handler(std::shared_ptr<settings::Settings> settings, sys::Service *parent)
         : settings{std::move(settings)}, screenLightControl{std::make_unique<screen_light_control::ScreenLightControl>(
                                              parent)},
-          keypadLightTimer{
-              sys::TimerFactory::createSingleShotTimer(parent,
-                                                       timers::keypadLightTimerName,
-                                                       timers::keypadLightTimerTimeout,
-                                                       [this](sys::Timer &) { bsp::keypad_backlight::shutdown(); })},
+          keypadLightTimer{sys::TimerFactory::createSingleShotTimer(
+              parent,
+              timers::keypadLightTimerName,
+              timers::keypadLightTimerTimeout,
+              [&](sys::Timer & /*unused*/) { bsp::keypad_backlight::shutdown(); })},
           screenLightTimer{sys::TimerFactory::createSingleShotTimer(
               parent, timers::screenLightTimerName, timers::keypadLightTimerTimeout, [this](sys::Timer &t) {
                   if (getScreenLightState() &&

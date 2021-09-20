@@ -13,7 +13,7 @@
 
 namespace cellular::msg::notification
 {
-    class ModemStateChanged;
+    struct ModemStateChanged;
 }
 
 namespace gui

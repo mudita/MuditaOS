@@ -7,7 +7,7 @@
 
 namespace at
 {
-    class Cmd;
+    struct Cmd;
     class BaseChannel;
 } // namespace at
 

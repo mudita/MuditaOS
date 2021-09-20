@@ -68,6 +68,14 @@ target_link_libraries(${PROJECT_NAME}
         utf8
     )
 
+if (NOT (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang"))
+else()
+target_compile_options(${PROJECT_NAME}
+    PRIVATE
+    -Wno-potentially-evaluated-expression
+)
+endif()
+
 if (${ENABLE_TESTS})
     add_subdirectory(tests)
 endif ()

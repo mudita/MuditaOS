@@ -17,10 +17,19 @@ namespace gui
       public:
         AutolockWindow(app::ApplicationCommon *app, app::settingsInterface::AutoLockSettings *autoLockSettings);
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        std::chrono::seconds getTime() const
+        {
+            return time;
+        }
+        void setTime(std::chrono::seconds t)
+        {
+            time = t;
+        };
 
       private:
         auto buildOptionsList() -> std::list<Option> override;
         std::chrono::seconds currentAutoLockTimeout{0};
         app::settingsInterface::AutoLockSettings *autoLockSettings;
+        std::chrono::seconds time;
     };
 } // namespace gui

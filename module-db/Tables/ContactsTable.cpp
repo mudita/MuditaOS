@@ -95,14 +95,14 @@ ContactsTableRow ContactsTable::getByIdCommon(std::unique_ptr<QueryResult> retQu
 
     debug_db_data(
         "got results: %" PRIu32 "; ID: %" PRIu32, retQuery->getRowCount(), (*retQuery)[ColumnName::id].getInt32());
-    return ContactsTableRow{
-        Record((*retQuery)[ColumnName::id].getUInt32()),
-        .nameID    = (*retQuery)[ColumnName::name_id].getUInt32(),
-        .numbersID = (*retQuery)[ColumnName::numbers_id].getString(),
-        .ringID    = (*retQuery)[ColumnName::ring_id].getUInt32(),
-        .addressID = (*retQuery)[ColumnName::address_id].getUInt32(),
-        .speedDial = (*retQuery)[ColumnName::speeddial].getString(),
-    };
+
+    auto r      = ContactsTableRow{Record((*retQuery)[ColumnName::id].getUInt32())};
+    r.nameID    = (*retQuery)[ColumnName::name_id].getUInt32();
+    r.numbersID = (*retQuery)[ColumnName::numbers_id].getString();
+    r.ringID    = (*retQuery)[ColumnName::ring_id].getUInt32();
+    r.addressID = (*retQuery)[ColumnName::address_id].getUInt32();
+    r.speedDial = (*retQuery)[ColumnName::speeddial].getString();
+    return r;
 }
 
 std::vector<ContactsTableRow> ContactsTable::Search(const std::string &primaryName,

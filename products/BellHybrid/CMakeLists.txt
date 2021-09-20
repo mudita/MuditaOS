@@ -10,9 +10,17 @@ target_compile_definitions(BellHybrid
 
 target_compile_options(BellHybrid
     PRIVATE
-        $<$<COMPILE_LANGUAGE:C>:-Wno-discarded-qualifiers>
         "-Wno-error=deprecated-declarations"
     )
+
+
+if (NOT (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang"))
+target_compile_options(BellHybrid
+    PRIVATE
+        $<$<COMPILE_LANGUAGE:C>:-Wno-discarded-qualifiers>
+    )
+endif()
+
 
 
 target_sources(BellHybrid

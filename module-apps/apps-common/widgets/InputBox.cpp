@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "InputBox.hpp"
@@ -8,7 +8,6 @@
 
 namespace gui
 {
-    constexpr uint32_t default_x = style::window::default_left_margin;
     constexpr uint32_t default_w =
         style::window_width - style::window::default_left_margin - style::window::default_right_margin;
     namespace inputHeader

@@ -17,9 +17,15 @@ define_serial(PurePhone)
 
 target_compile_options(PurePhone
     PRIVATE
-        $<$<COMPILE_LANGUAGE:C>:-Wno-discarded-qualifiers>
         "-Wno-error=deprecated-declarations"
     )
+
+if (NOT (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang"))
+target_compile_options(PurePhone
+    PRIVATE
+        $<$<COMPILE_LANGUAGE:C>:-Wno-discarded-qualifiers>
+    )
+endif()
 
 target_sources(PurePhone
     PRIVATE

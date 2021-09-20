@@ -77,7 +77,6 @@ class WorkerEventCommon : public sys::Worker
      * @brief list of keys with long press enabled. First item is key code, second is long press time.
      */
     std::map<uint32_t, uint32_t> longPressParamsList;
-    bool longPressTaskEnabled = false;
     bsp::KeyEvents lastState  = bsp::KeyEvents::Released;
     bsp::KeyCodes lastPressed = static_cast<bsp::KeyCodes>(0);
     std::shared_ptr<sys::CpuSentinel> cpuSentinel;
@@ -87,6 +86,7 @@ class WorkerEventCommon : public sys::Worker
   public:
     explicit WorkerEventCommon(sys::Service *service);
 
+    using sys::Worker::init;
     void init(std::shared_ptr<settings::Settings> settings);
     virtual bool deinit() override;
 

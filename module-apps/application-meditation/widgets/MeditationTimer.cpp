@@ -18,11 +18,6 @@ namespace
 } // namespace
 namespace gui
 {
-    namespace
-    {
-        constexpr auto TimerInterval = std::chrono::milliseconds{1000};
-    } // namespace
-
     MeditationTimer::MeditationTimer(std::uint32_t x,
                                      std::uint32_t y,
                                      std::uint32_t width,

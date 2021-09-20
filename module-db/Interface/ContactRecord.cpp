@@ -29,9 +29,11 @@ ContactRecordInterface::ContactRecordInterface(ContactsDB *db)
 
 auto ContactRecordInterface::Add(ContactRecord &rec) -> bool
 {
-    bool ret = contactDB->contacts.add(
-        ContactsTableRow{Record(DB_ID_NONE), .speedDial = rec.speeddial, .namePrimary = rec.primaryName});
-
+    auto r        = ContactsTableRow{};
+    r.ID          = DB_ID_NONE;
+    r.speedDial   = rec.speeddial;
+    r.namePrimary = rec.primaryName;
+    bool ret      = contactDB->contacts.add(r);
     if (!ret) {
         return false;
     }
@@ -40,10 +42,12 @@ auto ContactRecordInterface::Add(ContactRecord &rec) -> bool
     debug_db_data("New contact with ID %" PRIu32 " created", contactID);
     rec.ID = contactID;
 
-    ret = contactDB->name.add(ContactsNameTableRow{Record(DB_ID_NONE),
-                                                   .contactID       = contactID,
-                                                   .namePrimary     = rec.primaryName,
-                                                   .nameAlternative = rec.alternativeName});
+    auto r2            = ContactsNameTableRow{};
+    r2.ID              = DB_ID_NONE;
+    r2.contactID       = contactID;
+    r2.namePrimary     = rec.primaryName;
+    r2.nameAlternative = rec.alternativeName;
+    ret                = contactDB->name.add(r2);
 
     if (!ret) {
         return false;
@@ -54,11 +58,13 @@ auto ContactRecordInterface::Add(ContactRecord &rec) -> bool
     // build string list of number IDs
     std::string numbersIDs;
     for (const auto &a : rec.numbers) {
-        ret = contactDB->number.add(ContactsNumberTableRow{Record(DB_ID_NONE),
-                                                           .contactID  = contactID,
-                                                           .numberUser = a.number.getEntered(),
-                                                           .numbere164 = a.number.getE164(),
-                                                           .type       = a.numberType});
+        auto r       = ContactsNumberTableRow{};
+        r.ID         = DB_ID_NONE;
+        r.contactID  = contactID;
+        r.numberUser = a.number.getEntered();
+        r.numbere164 = a.number.getE164();
+        r.type       = a.numberType;
+        ret          = contactDB->number.add(r);
         if (!ret) {
             return false;
         }
@@ -79,8 +85,13 @@ auto ContactRecordInterface::Add(ContactRecord &rec) -> bool
 
     auto contactRingID = contactDB->getLastInsertRowId();
 
-    ret = contactDB->address.add(ContactsAddressTableRow{
-        Record(DB_ID_NONE), .contactID = contactID, .address = rec.address, .note = rec.note, .mail = rec.mail});
+    auto r3      = ContactsAddressTableRow{};
+    r3.ID        = DB_ID_NONE;
+    r3.contactID = contactID;
+    r3.address   = rec.address;
+    r3.note      = rec.note;
+    r3.mail      = rec.mail;
+    ret          = contactDB->address.add(r3);
 
     if (!ret) {
         return false;
@@ -88,12 +99,14 @@ auto ContactRecordInterface::Add(ContactRecord &rec) -> bool
 
     auto contactAddressID = contactDB->getLastInsertRowId();
 
-    ret = contactDB->contacts.update(ContactsTableRow{Record(contactID),
-                                                      .nameID    = contactNameID,
-                                                      .numbersID = numbersIDs,
-                                                      .ringID    = contactRingID,
-                                                      .addressID = contactAddressID,
-                                                      .speedDial = rec.speeddial});
+    auto r4      = ContactsTableRow{};
+    r4.ID        = contactID;
+    r4.nameID    = contactNameID;
+    r4.numbersID = numbersIDs;
+    r4.ringID    = contactRingID;
+    r4.addressID = contactAddressID;
+    r4.speedDial = rec.speeddial;
+    ret          = contactDB->contacts.update(r4);
     for (const auto &group : rec.groups) {
         contactDB->groups.addContactToGroup(contactID, group.ID);
     }
@@ -453,11 +466,13 @@ auto ContactRecordInterface::Update(const ContactRecord &rec) -> bool
         auto numberMatch =
             numberMatcher.bestMatch(utils::PhoneNumber(number.number), utils::PhoneNumber::Match::POSSIBLE);
         if (numberMatch == numberMatcher.END) {
-            if (!contactDB->number.add(ContactsNumberTableRow{Record(DB_ID_NONE),
-                                                              .contactID  = contact.ID,
-                                                              .numberUser = number.number.getEntered(),
-                                                              .numbere164 = number.number.getE164(),
-                                                              .type       = number.numberType})) {
+            auto r       = ContactsNumberTableRow{};
+            r.ID         = DB_ID_NONE;
+            r.contactID  = contact.ID;
+            r.numberUser = number.number.getEntered();
+            r.numbere164 = number.number.getE164();
+            r.type       = number.numberType;
+            if (!contactDB->number.add(r)) {
                 error_db_data("Failed to add new number for contact");
                 return false;
             }
@@ -509,35 +524,41 @@ auto ContactRecordInterface::Update(const ContactRecord &rec) -> bool
         }
     }
 
-    ret = contactDB->contacts.update(ContactsTableRow{Record(contact.ID),
-                                                      .nameID          = contact.nameID,
-                                                      .numbersID       = joinNumberIDs(outputNumberIDs),
-                                                      .ringID          = contact.ringID,
-                                                      .addressID       = contact.addressID,
-                                                      .speedDial       = rec.speeddial,
-                                                      .namePrimary     = rec.primaryName,
-                                                      .nameAlternative = rec.alternativeName});
+    auto r            = ContactsTableRow{};
+    r.ID              = contact.ID;
+    r.nameID          = contact.nameID;
+    r.numbersID       = joinNumberIDs(outputNumberIDs);
+    r.ringID          = contact.ringID;
+    r.addressID       = contact.addressID;
+    r.speedDial       = rec.speeddial;
+    r.namePrimary     = rec.primaryName;
+    r.nameAlternative = rec.alternativeName;
+    ret               = contactDB->contacts.update(r);
 
     if (!ret) {
         error_db_data("Failed to update contact.");
         return false;
     }
 
-    ret = contactDB->name.update(ContactsNameTableRow{Record(contact.nameID),
-                                                      .contactID       = contact.ID,
-                                                      .namePrimary     = rec.primaryName,
-                                                      .nameAlternative = rec.alternativeName});
+    auto r2            = ContactsNameTableRow{};
+    r2.ID              = contact.nameID;
+    r2.contactID       = contact.ID;
+    r2.namePrimary     = rec.primaryName;
+    r2.nameAlternative = rec.alternativeName;
+    ret                = contactDB->name.update(r2);
 
     if (!ret) {
         error_db_data("Failed to update contact name");
         return false;
     }
 
-    ret = contactDB->address.update(ContactsAddressTableRow{Record(contact.addressID),
-                                                            .contactID = contact.ID,
-                                                            .address   = rec.address,
-                                                            .note      = rec.note,
-                                                            .mail      = rec.mail});
+    auto r3      = ContactsAddressTableRow{};
+    r3.ID        = contact.addressID;
+    r3.contactID = contact.ID;
+    r3.address   = rec.address;
+    r3.note      = rec.note;
+    r3.mail      = rec.mail;
+    ret          = contactDB->address.update(r3);
 
     if (!ret) {
         error_db_data("Failed to update contact address");
@@ -663,16 +684,18 @@ auto ContactRecordInterface::GetLimitOffset(uint32_t offset, uint32_t limit)
             return records;
         }
 
-        records->push_back(ContactRecord{Record(contact.ID),
-                                         .primaryName     = name.namePrimary,
-                                         .alternativeName = name.nameAlternative,
-                                         .numbers         = nrs,
-                                         .address         = address.address,
-                                         .note            = address.note,
-                                         .mail            = address.mail,
-                                         .assetPath       = ring.assetPath,
-                                         .speeddial       = contact.speedDial,
-                                         .groups          = contactDB->groups.getGroupsForContact(contact.ID)});
+        auto r            = ContactRecord{};
+        r.ID              = contact.ID;
+        r.primaryName     = name.namePrimary;
+        r.alternativeName = name.nameAlternative;
+        r.numbers         = nrs;
+        r.address         = address.address;
+        r.note            = address.note;
+        r.mail            = address.mail;
+        r.assetPath       = ring.assetPath;
+        r.speeddial       = contact.speedDial;
+        r.groups          = contactDB->groups.getGroupsForContact(contact.ID);
+        records->push_back(r);
     }
 
     return records;
@@ -711,16 +734,18 @@ auto ContactRecordInterface::GetLimitOffsetByField(uint32_t offset,
                 return records;
             }
 
-            records->push_back(ContactRecord{Record(record.ID),
-                                             .primaryName     = record.namePrimary,
-                                             .alternativeName = record.nameAlternative,
-                                             .numbers         = nrs,
-                                             .address         = address.address,
-                                             .note            = address.note,
-                                             .mail            = address.mail,
-                                             .assetPath       = ring.assetPath,
-                                             .speeddial       = contact.speedDial,
-                                             .groups          = contactDB->groups.getGroupsForContact(record.ID)});
+            auto r            = ContactRecord{};
+            r.ID              = record.ID;
+            r.primaryName     = record.namePrimary;
+            r.alternativeName = record.nameAlternative;
+            r.numbers         = nrs;
+            r.address         = address.address;
+            r.note            = address.note;
+            r.mail            = address.mail;
+            r.assetPath       = ring.assetPath;
+            r.speeddial       = contact.speedDial;
+            r.groups          = contactDB->groups.getGroupsForContact(record.ID);
+            records->push_back(r);
         }
     } break;
 
@@ -754,18 +779,18 @@ auto ContactRecordInterface::GetLimitOffsetByField(uint32_t offset,
                 return records;
             }
 
-            records->push_back(ContactRecord{Record(record.ID),
-                                             .primaryName     = name.namePrimary,
-                                             .alternativeName = name.nameAlternative,
-                                             .numbers         = nrs,
-                                             .address         = address.address,
-                                             .note            = address.note,
-                                             .mail            = address.mail,
-                                             .assetPath       = ring.assetPath,
-                                             .speeddial       = contact.speedDial,
-                                             .groups          = contactDB->groups.getGroupsForContact(record.ID)
-
-            });
+            auto r            = ContactRecord{};
+            r.ID              = record.ID;
+            r.primaryName     = name.namePrimary;
+            r.alternativeName = name.nameAlternative;
+            r.numbers         = nrs;
+            r.address         = address.address;
+            r.note            = address.note;
+            r.mail            = address.mail;
+            r.assetPath       = ring.assetPath;
+            r.speeddial       = contact.speedDial;
+            r.groups          = contactDB->groups.getGroupsForContact(record.ID);
+            records->push_back(r);
         }
     } break;
 
@@ -799,19 +824,18 @@ auto ContactRecordInterface::GetLimitOffsetByField(uint32_t offset,
                 return records;
             }
 
-            records->push_back(ContactRecord{
-                Record(record.ID),
-                .primaryName     = name.namePrimary,
-                .alternativeName = name.nameAlternative,
-                .numbers         = nrs,
-                .address         = address.address,
-                .note            = address.note,
-                .mail            = address.mail,
-                .assetPath       = ring.assetPath,
-                .speeddial       = contact.speedDial,
-                .groups          = contactDB->groups.getGroupsForContact(record.ID),
-
-            });
+            auto r            = ContactRecord{};
+            r.ID              = record.ID;
+            r.primaryName     = name.namePrimary;
+            r.alternativeName = name.nameAlternative;
+            r.numbers         = nrs;
+            r.address         = address.address;
+            r.note            = address.note;
+            r.mail            = address.mail;
+            r.assetPath       = ring.assetPath;
+            r.speeddial       = contact.speedDial;
+            r.groups          = contactDB->groups.getGroupsForContact(record.ID);
+            records->push_back(r);
         }
     } break;
     case ContactRecordField::SpeedDial: {
@@ -844,16 +868,18 @@ auto ContactRecordInterface::GetLimitOffsetByField(uint32_t offset,
                 return records;
             }
 
-            records->push_back(ContactRecord{Record(contact.ID),
-                                             .primaryName     = name.namePrimary,
-                                             .alternativeName = name.nameAlternative,
-                                             .numbers         = nrs,
-                                             .address         = address.address,
-                                             .note            = address.note,
-                                             .mail            = address.mail,
-                                             .assetPath       = ring.assetPath,
-                                             .speeddial       = contact.speedDial,
-                                             .groups          = contactDB->groups.getGroupsForContact(contact.ID)});
+            auto r            = ContactRecord{};
+            r.ID              = contact.ID;
+            r.primaryName     = name.namePrimary;
+            r.alternativeName = name.nameAlternative;
+            r.numbers         = nrs;
+            r.address         = address.address;
+            r.note            = address.note;
+            r.mail            = address.mail;
+            r.assetPath       = ring.assetPath;
+            r.speeddial       = contact.speedDial;
+            r.groups          = contactDB->groups.getGroupsForContact(contact.ID);
+            records->push_back(r);
         }
     } break;
     case ContactRecordField::Groups: {
@@ -893,17 +919,18 @@ auto ContactRecordInterface::GetByName(const UTF8 &primaryName, const UTF8 &alte
         if (!address.isValid()) {
             return records;
         }
-
-        records->push_back(ContactRecord{Record(record.ID),
-                                         .primaryName     = record.namePrimary,
-                                         .alternativeName = record.nameAlternative,
-                                         .numbers         = nrs,
-                                         .address         = address.address,
-                                         .note            = address.note,
-                                         .mail            = address.mail,
-                                         .assetPath       = ring.assetPath,
-                                         .speeddial       = contact.speedDial,
-                                         .groups          = contactDB->groups.getGroupsForContact(record.ID)});
+        auto r            = ContactRecord{};
+        r.ID              = record.ID;
+        r.primaryName     = record.namePrimary;
+        r.alternativeName = record.nameAlternative;
+        r.numbers         = nrs;
+        r.address         = address.address;
+        r.note            = address.note;
+        r.mail            = address.mail;
+        r.assetPath       = ring.assetPath;
+        r.speeddial       = contact.speedDial;
+        r.groups          = contactDB->groups.getGroupsForContact(record.ID);
+        records->push_back(r);
     }
 
     return records;
@@ -937,16 +964,18 @@ auto ContactRecordInterface::Search(const char *primaryName, const char *alterna
             return records;
         }
 
-        records->push_back(ContactRecord{Record(record.ID),
-                                         .primaryName     = record.namePrimary,
-                                         .alternativeName = record.nameAlternative,
-                                         .numbers         = nrs,
-                                         .address         = address.address,
-                                         .note            = address.note,
-                                         .mail            = address.mail,
-                                         .assetPath       = ring.assetPath,
-                                         .speeddial       = contact.speedDial,
-                                         .groups          = contactDB->groups.getGroupsForContact(record.ID)});
+        auto r            = ContactRecord{};
+        r.ID              = record.ID;
+        r.primaryName     = record.namePrimary;
+        r.alternativeName = record.nameAlternative;
+        r.numbers         = nrs;
+        r.address         = address.address;
+        r.note            = address.note;
+        r.mail            = address.mail;
+        r.assetPath       = ring.assetPath;
+        r.speeddial       = contact.speedDial;
+        r.groups          = contactDB->groups.getGroupsForContact(record.ID);
+        records->push_back(r);
     }
 
     return records;
@@ -976,10 +1005,8 @@ auto ContactRecordInterface::GetByNumber(const utils::PhoneNumber::View &numberV
     // Contact not found, create temporary one
     if (createTempContact == CreateTempContact::True) {
         debug_db_data("Cannot find contact for number %s, creating temporary one", number.c_str());
-        ContactRecord tmpRecord = {
-            Record(DB_ID_NONE),
-            .numbers = std::vector<ContactRecord::Number>{ContactRecord::Number(numberView)},
-        };
+        ContactRecord tmpRecord = {Record(DB_ID_NONE)};
+        tmpRecord.numbers       = std::vector<ContactRecord::Number>{ContactRecord::Number(numberView)};
         if (!Add(tmpRecord)) {
             error_db_data("Cannot add contact record");
             return ret;
@@ -1027,9 +1054,9 @@ auto ContactRecordInterface::MatchByNumber(const utils::PhoneNumber::View &numbe
         }
 
         debug_db_data("Cannot find contact for number %s, creating temporary one", numberView.getEntered().c_str());
-        ContactRecord newContact = {Record(DB_ID_NONE),
-                                    .numbers = std::vector<ContactRecord::Number>{ContactRecord::Number(numberView)},
-                                    .groups  = {contactDB->groups.getById(ContactsDB::temporaryGroupId())}};
+        ContactRecord newContact = {Record(DB_ID_NONE)};
+        newContact.numbers       = std::vector<ContactRecord::Number>{ContactRecord::Number(numberView)};
+        newContact.groups        = {contactDB->groups.getById(ContactsDB::temporaryGroupId())};
 
         if (!Add(newContact)) {
             error_db_data("Cannot add contact record");

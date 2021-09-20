@@ -43,7 +43,6 @@
 namespace
 {
     constexpr auto BluetoothServiceStackDepth = 2560U;
-    inline constexpr auto nameSettings        = "ApplicationSettings";
     inline constexpr auto connectionTimeout   = std::chrono::minutes{30};
 } // namespace
 

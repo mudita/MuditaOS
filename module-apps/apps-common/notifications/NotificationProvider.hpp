@@ -13,7 +13,7 @@ namespace sys
     class Service;
 }
 
-class NotificationsRecord;
+struct NotificationsRecord;
 
 namespace db
 {
