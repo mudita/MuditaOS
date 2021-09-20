@@ -2,7 +2,6 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ATParser.hpp"
-#include <service-fota/FotaServiceAPI.hpp>
 #include "bsp/cellular/bsp_cellular.hpp"
 #include <service-cellular/CellularMessage.hpp>
 #include "ticks.hpp"
@@ -80,14 +79,9 @@ at::Result ATParser::processNewData(sys::Service *service, const bsp::cellular::
     }
     else if (!ret.empty()) {
         if (ret.size() == 1 && ret[0] == ATParser::Urc::Fota) {
-            std::string fotaData;
-            {
-                cpp_freertos::LockGuard lock(mutex);
-                fotaData = std::string(urcBuffer);
-                urcBuffer.erase();
-            }
             LOG_DEBUG("parsing FOTA");
-            FotaService::API::sendRawProgress(service, fotaData);
+            cpp_freertos::LockGuard lock(mutex);
+            urcBuffer.erase();
         }
         else {
             urcs.insert(std::end(urcs), std::begin(ret), std::end(ret));

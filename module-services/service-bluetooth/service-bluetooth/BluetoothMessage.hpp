@@ -35,7 +35,6 @@ class BluetoothMessage : public sys::DataMessage
         Scan,
         StopScan,
         getDevicesAvailable,
-        PAN,
         Visible,
         Play,
         SwitchProfile,

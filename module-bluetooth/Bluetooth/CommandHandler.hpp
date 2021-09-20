@@ -26,7 +26,6 @@ namespace bluetooth
             StartScan,
             StopScan,
             getDevicesAvailable,
-            StartPan,
             VisibilityOn,
             VisibilityOff,
             ConnectAudio,
@@ -87,7 +86,6 @@ namespace bluetooth
       private:
         Error::Code scan();
         Error::Code stopScan();
-        Error::Code startPan();
         Error::Code setVisibility(bool visibility);
         Error::Code establishAudioConnection(const Devicei &device);
         Error::Code disconnectAudioConnection();
