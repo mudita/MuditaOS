@@ -5,23 +5,37 @@
 
 #include <BellAlarmHandler.hpp>
 
+#include <service-db/Settings.hpp>
+
 namespace alarms
 {
     namespace
     {
-        class FakePreWakeUpSettingsProvider : public PreWakeUpSettingsProvider
+        class PreWakeUpSettingsProviderImpl : public PreWakeUpSettingsProvider
         {
           public:
-            auto getChimeSettings() -> Settings override
-            {
-                return {true, std::chrono::minutes{5}};
-            }
+            explicit PreWakeUpSettingsProviderImpl(sys::Service *service);
+            auto getChimeSettings() -> Settings override;
+            auto getFrontlightSettings() -> Settings override;
 
-            auto getFrontlightSettings() -> Settings override
-            {
-                return {true, std::chrono::minutes{5}};
-            }
+          private:
+            settings::Settings settings;
         };
+
+        PreWakeUpSettingsProviderImpl::PreWakeUpSettingsProviderImpl(sys::Service *service)
+        {
+            settings.init(service::ServiceProxy{service->weak_from_this()});
+        }
+
+        auto PreWakeUpSettingsProviderImpl::getChimeSettings() -> Settings
+        {
+            return {true, std::chrono::minutes{5}};
+        }
+
+        auto PreWakeUpSettingsProviderImpl::getFrontlightSettings() -> Settings
+        {
+            return {true, std::chrono::minutes{5}};
+        }
     } // namespace
 
     std::unique_ptr<IAlarmOperations> AlarmOperationsFactory::create(
@@ -29,13 +43,13 @@ namespace alarms
         std::unique_ptr<AbstractAlarmEventsRepository> &&alarmEventsRepo,
         IAlarmOperations::GetCurrentTime getCurrentTimeCallback) const
     {
-        auto settingsProvider = std::make_unique<FakePreWakeUpSettingsProvider>();
+        auto settingsProvider = std::make_unique<PreWakeUpSettingsProviderImpl>(service);
         auto alarmOperations  = std::make_unique<AlarmOperations>(
             std::move(alarmEventsRepo), getCurrentTimeCallback, std::move(settingsProvider));
+        alarmOperations->addAlarmExecutionHandler(alarms::AlarmType::Clock,
+                                                  std::make_shared<alarms::BellAlarmClockHandler>(service));
         alarmOperations->addAlarmExecutionHandler(alarms::AlarmType::PreWakeUpChime,
                                                   std::make_shared<alarms::PreWakeUpChimeHandler>(service));
-        alarmOperations->addAlarmExecutionHandler(alarms::AlarmType::PreWakeUpFrontlight,
-                                                  std::make_shared<alarms::PreWakeUpFrontlightHandler>(service));
         return alarmOperations;
     }
 

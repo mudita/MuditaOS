@@ -51,8 +51,7 @@ namespace sys
 
         [[nodiscard]] auto create() const -> std::shared_ptr<Service> override
         {
-            return std::apply([](auto... args) { return std::make_shared<T, Args...>(std::forward<Args>(args)...); },
-                              savedArgs);
+            return std::apply([](auto... args) { return std::make_shared<T>(std::forward<Args>(args)...); }, savedArgs);
         }
 
       private:

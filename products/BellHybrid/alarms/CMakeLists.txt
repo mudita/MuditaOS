@@ -4,13 +4,13 @@ add_library(bell::alarms ALIAS alarms)
 target_sources(alarms
     PRIVATE
         BellAlarmHandler.cpp
-        src/actions/PlayToneAction.cpp
+        src/actions/PlayAudioActions.cpp
         src/actions/NotifyGUIAction.cpp
         src/actions/FrontlightAction.cpp
 
         include/AbstractAlarmAction.hpp
         include/BellAlarmHandler.hpp
-        src/actions/PlayToneAction.hpp
+        src/actions/PlayAudioActions.hpp
         src/actions/FrontlightAction.hpp
         src/actions/NotifyGUIAction.hpp
     PUBLIC
