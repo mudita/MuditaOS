@@ -233,7 +233,6 @@ sys::ReturnCodes EventManagerCommon::DeinitHandler()
 
 void EventManagerCommon::ProcessCloseReason(sys::CloseReason closeReason)
 {
-    bsp::torch::turn(bsp::torch::State::off);
     sendCloseReadyMessage(this);
 }
 
