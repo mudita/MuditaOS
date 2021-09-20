@@ -70,8 +70,7 @@ target_link_libraries(${PROJECT_NAME}
         service-appmgr
         service-cellular
         service-eink
-        service-fota
-    
+
     PRIVATE
         Microsoft.GSL::GSL
         time-constants
