@@ -16,5 +16,4 @@ target_sources(
         bsp/eink/eink_pin_config.cpp
         bsp/keyboard/keyboard.cpp
         irq_gpio.cpp
-        debug_console.cpp
 )

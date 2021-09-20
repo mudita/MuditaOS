@@ -10,7 +10,6 @@ target_sources(
         module-bsp
 
     PRIVATE
-        debug_console.cpp
         hal/temperature_source/TemperatureSource.cpp
         hal/battery_charger/BatteryCharger.cpp
         hal/key_input/KeyInput.cpp

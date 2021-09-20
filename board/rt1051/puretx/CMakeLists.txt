@@ -28,11 +28,11 @@ target_sources(board
     PUBLIC
         board/BoardDefinitions.hpp
         board/clock_config.h
-        board/irq_gpio.hpp
         board/pin_mux.h
         eink-config.h
 
     PRIVATE
         clock_config.cpp
         irq_init.cpp
+        pin_mux.c
 )

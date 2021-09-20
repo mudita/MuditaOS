@@ -10,6 +10,7 @@ target_sources(board
     PRIVATE
         common/board.cpp
         common/chip.cpp
+        common/debug_console.cpp
         common/fsl_drivers/fsl_adc.c
         common/fsl_drivers/fsl_cache.c
         common/fsl_drivers/fsl_clock.c
