@@ -17,6 +17,7 @@ namespace gui
         /// Set list item's value and perform custom action.
         std::function<void()> setValue;
         std::function<void()> onExit;
+        std::function<void()> onProceed;
     };
 
 } // namespace gui

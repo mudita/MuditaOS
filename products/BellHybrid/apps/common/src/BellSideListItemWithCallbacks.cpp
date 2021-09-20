@@ -1,6 +1,8 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include <module-gui/gui/input/InputEvent.hpp>
+
 #include "widgets/BellSideListItemWithCallbacks.hpp"
 
 namespace gui
@@ -28,7 +30,14 @@ namespace gui
             return true;
         };
 
-        inputCallback = [&](Item &, const InputEvent &inputEvent) -> bool { return body->onInput(inputEvent); };
+        inputCallback = [&](Item &, const InputEvent &inputEvent) -> bool {
+            if (inputEvent.isShortRelease(KeyCode::KEY_ENTER)) {
+                if (onProceed) {
+                    onProceed();
+                }
+            }
+            return body->onInput(inputEvent);
+        };
     }
 
 } // namespace gui

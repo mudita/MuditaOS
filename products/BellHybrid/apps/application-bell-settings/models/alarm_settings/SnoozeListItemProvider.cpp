@@ -24,7 +24,7 @@ namespace app::bell_settings
 
         auto onOff =
             new OnOffListItem(model.getSnoozeOnOff(), utils::translate("app_bell_settings_alarm_settings_snooze"));
-        onOff->onExit = [onOff, this]() {
+        onOff->onProceed = [onOff, this]() {
             if (not onOff->isActive()) {
                 this->onExit();
             }
@@ -49,7 +49,7 @@ namespace app::bell_settings
             new NumWithStringListItem(model.getSnoozeChimeInterval(),
                                       range,
                                       utils::translate("app_bell_settings_alarm_settings_snooze_chime_interval"));
-        chimeInterval->onExit = [chimeInterval, this] {
+        chimeInterval->onProceed = [chimeInterval, this] {
             if (chimeInterval->isOff()) {
                 this->onExit();
             }
