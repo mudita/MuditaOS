@@ -15,7 +15,7 @@ extern "C"
 #endif
 }
 
-#include <board/irq_gpio.hpp>
+#include <board/irq_init.hpp>
 #include <board/reboot_codes.hpp>
 #include <board/debug_console.hpp>
 

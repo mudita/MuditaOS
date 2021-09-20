@@ -34,4 +34,5 @@ target_sources(board
 
     PRIVATE
         clock_config.cpp
+        irq_init.cpp
 )
