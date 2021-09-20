@@ -22,7 +22,7 @@ namespace purefs::fs::drivers
                                        std::string_view path,
                                        unsigned flags,
                                        std::shared_ptr<filesystem_operations> fs)
-        : mount_point(diskh, mount_path_mod(path), flags, fs), m_root(path),
+        : mount_point(diskh, mount_path_mod(path), flags, fs), m_root(mount_path_mod(path)),
           m_lock(std::make_unique<cpp_freertos::MutexRecursive>())
     {}
 

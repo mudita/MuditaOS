@@ -52,7 +52,7 @@ namespace purefs::fs::drivers
         auto fchmod(fsfile zfile, mode_t mode) noexcept -> int override;
 
       private:
-        static auto stat(const char *mount_point, const char *path, struct stat *st) noexcept -> int;
+        static auto stat(const char *mount_point, const char *path, struct stat *st, bool ro) noexcept -> int;
     };
 
 } // namespace purefs::fs::drivers

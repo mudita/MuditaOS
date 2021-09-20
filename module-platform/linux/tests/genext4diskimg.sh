@@ -22,7 +22,7 @@ IMAGE_FILE="$2"
 SYSROOT="$3"
 shift 3
 
-if [ ! -d "${SYSROOT}/sys" ]; then
+if [ ! -d "${SYSROOT}" ]; then
 	echo "Invalid sysroot: ${SYSROOT}"
 	exit -1
 fi
@@ -46,6 +46,7 @@ unit: sectors
 /dev/sdz1 : start=$SECTOR_START, size=$SECTOR_END, type=83
 ==sfdisk
 
+#Generate image
 mke2fs \
   -F \
   -L 'user' \
@@ -55,7 +56,7 @@ mke2fs \
   -O ^filetype \
   -O ^extents \
   -O ^flex_bg \
-  -d "${SYSROOT}/sys/current/assets" \
+  -d "${SYSROOT}" \
   -m 0 \
   -r 1 \
   -t ext4 \

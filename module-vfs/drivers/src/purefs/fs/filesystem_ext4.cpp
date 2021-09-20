@@ -140,7 +140,7 @@ namespace purefs::fs::drivers
         }
         const auto mnt_path = vmnt->mount_path();
         // Mount
-        err = ext4_mount(disk->name().c_str(), mnt_path.c_str(), vmnt->is_ro());
+        err = ext4_mount(disk->name().c_str(), mnt_path.c_str(), 0);
         if (err) {
             LOG_ERROR("Unable to mount ext4 errno %i", err);
             ext4_device_unregister(disk->name().c_str());
@@ -294,7 +294,7 @@ namespace purefs::fs::drivers
         return rpos;
     }
 
-    auto filesystem_ext4::stat(const char *mount_point, const char *path, struct stat *st) noexcept -> int
+    auto filesystem_ext4::stat(const char *mount_point, const char *path, struct stat *st, bool ro) noexcept -> int
     {
         uint32_t inonum;
         ext4_inode ino;
@@ -307,10 +307,13 @@ namespace purefs::fs::drivers
         if (err) {
             return -err;
         }
-        std::memset(&st, 0, sizeof(st));
+        std::memset(st, 0, sizeof(*st));
         st->st_ino       = inonum;
         const auto btype = ext4_inode_type(sb, &ino);
         st->st_mode      = ext4_inode_get_mode(sb, &ino) | ino_to_st_mode(btype);
+        if (ro) {
+            st->st_mode &= ~(S_IWUSR | S_IWGRP | S_IWOTH);
+        }
         // Update file type
         st->st_nlink   = ext4_inode_get_links_cnt(&ino);
         st->st_uid     = ext4_inode_get_uid(&ino);
@@ -336,7 +339,7 @@ namespace purefs::fs::drivers
         }
         ext4_locker _lck(mntp);
         const auto path = vfile->open_path();
-        return stat(mntp->mount_path().c_str(), vfile->open_path().c_str(), &st);
+        return stat(mntp->mount_path().c_str(), vfile->open_path().c_str(), &st, zfile->mntpoint()->is_ro());
     }
 
     auto filesystem_ext4::stat(fsmount mnt, std::string_view file, struct stat &st) noexcept -> int
@@ -347,7 +350,7 @@ namespace purefs::fs::drivers
             return -EBADF;
         }
         ext4_locker _lck(mntp);
-        return stat(mntp->mount_path().c_str(), std::string(file).c_str(), &st);
+        return stat(mntp->mount_path().c_str(), std::string(file).c_str(), &st, mntp->is_ro());
     }
 
     auto filesystem_ext4::link(fsmount mnt, std::string_view existing, std::string_view newlink) noexcept -> int
@@ -370,7 +373,17 @@ namespace purefs::fs::drivers
 
     auto filesystem_ext4::mkdir(fsmount mnt, std::string_view path, int mode) noexcept -> int
     {
-        return invoke_efs(mnt, ::ext4_dir_mk, std::string(path).c_str());
+        auto mntp = std::static_pointer_cast<mount_point_ext4>(mnt);
+        if (!mntp) {
+            LOG_ERROR("Non ext4 mount point");
+            return -EBADF;
+        }
+        ext4_locker _lck(mntp);
+        const auto npath = mntp->native_path(path);
+        if (::ext4_inode_exist(npath.c_str(), EXT4_DE_UNKNOWN) == 0) {
+            return -EEXIST;
+        }
+        return ::ext4_dir_mk(npath.c_str());
     }
 
     auto filesystem_ext4::diropen(fsmount mnt, std::string_view path) noexcept -> fsdir

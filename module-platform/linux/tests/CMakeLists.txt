@@ -39,7 +39,7 @@ add_custom_target(
 set(EXT4_IMAGE "ext4test.img")
 add_custom_target(
     ${EXT4_IMAGE}
-    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/genext4diskimg.sh 1G ${EXT4_IMAGE} ${TEST_SYSROOT}
+    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/genext4diskimg.sh 1G ${EXT4_IMAGE} ${CMAKE_BINARY_DIR}/module-platform/test_dir
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     DEPENDS genlittlefs test-assets
 )
