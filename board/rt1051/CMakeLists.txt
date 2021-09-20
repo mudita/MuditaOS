@@ -31,6 +31,7 @@ target_sources(board
         common/fsl_drivers/fsl_pit.c
         common/fsl_drivers/fsl_pmu.c
         common/fsl_drivers/fsl_pwm.c
+        common/fsl_drivers/fsl_qtmr.c
         common/fsl_drivers/fsl_rtwdog.c
         common/fsl_drivers/fsl_sai_edma.c
         common/fsl_drivers/fsl_sai.c

@@ -6,7 +6,7 @@
 #include "WorkerEvent.hpp"
 #include <evtmgr/EventManager.hpp>
 #include <keymap/KeyMap.hpp>
-#include <module-bsp/hal/temperature_source/TemperatureSource.hpp>
+#include <hal/temperature_source/TemperatureSource.hpp>
 #include <module-sys/SystemManager/Constants.hpp>
 #include <screen-light-control/ScreenLightControl.hpp>
 #include <service-evtmgr/KbdMessage.hpp>

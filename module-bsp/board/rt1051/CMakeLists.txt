@@ -52,9 +52,6 @@ target_include_directories(module-bsp
 	$<BUILD_INTERFACE:
 		${CMAKE_CURRENT_SOURCE_DIR}
 		${CMAKE_CURRENT_SOURCE_DIR}/bsp
-		${CMAKE_CURRENT_SOURCE_DIR}/common
-		${CMAKE_CURRENT_SOURCE_DIR}/common/fsl_drivers
-		${CMAKE_CURRENT_SOURCE_DIR}/common/cmsis
 
 		${CMAKE_SOURCE_DIR}/module-bluetooth/Bluetooth
 		${CMAKE_SOURCE_DIR}/module-sys/
