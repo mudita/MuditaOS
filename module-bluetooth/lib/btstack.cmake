@@ -134,13 +134,8 @@ message("-----------------------")
 else ()
 endif()
 
-include(${CMAKE_SOURCE_DIR}/module-lwip/lwip-includes.cmake)
-list(APPEND TARGET_LIBRARIES_INCLUDES ${LWIP_INCLUDE_DIRS})
-list(APPEND TARGET_LIBRARIES_INCLUDES
-    ${BT_STACK_ROOT}/platform/lwip
-    )
 set(BOARD_DIR_SOURCES
-    ${BT_INT}/PAN.cpp
+    ${BT_INT}/BtCommand.cpp
 
     ${BT_GLU}/bluetooth_init_cc2564C_1.0.c
     ${BT_GLU}/btstack_uart_block_rt1051.cpp
@@ -152,7 +147,6 @@ set(BOARD_DIR_SOURCES
     ${BT_CORE}
     ${BT_COMMON}
     ${BT_CLASSIC}
-    ${BNEP_LWIP}
     ${BT_STACK_ROOT}/3rd-party/hxcmod-player/mods/nao-deceased_by_disease.c
     ${BT_STACK_ROOT}/3rd-party/hxcmod-player/hxcmod.c
     ${BT_STACK_ROOT}/src/classic/btstack_sbc_encoder_bluedroid.c
