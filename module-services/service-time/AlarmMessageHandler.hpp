@@ -38,9 +38,6 @@ namespace alarms
         auto handleAddSnoozedAlarmCountChangeCallback(AlarmOperationsCommon::OnSnoozedAlarmsCountChange callback)
             -> void;
 
-        auto addAlarmExecutionHandler(const alarms::AlarmType type, const std::shared_ptr<alarms::AlarmHandler> handler)
-            -> void;
-
       private:
         stm::ServiceTime *service = nullptr;
         std::unique_ptr<IAlarmOperations> alarmOperations;
