@@ -5,7 +5,6 @@
 #include "A2DP.hpp"
 #include <Bluetooth/Device.hpp>
 #include <Bluetooth/Error.hpp>
-#include <BtCommand.hpp>
 #include <log.hpp>
 #include <Audio/AudioCommon.hpp>
 #include <audio/BluetoothAudioDevice.hpp>

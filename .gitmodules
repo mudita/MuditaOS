@@ -1,7 +1,3 @@
-[submodule "lwip"]
-	path = module-lwip/lib/lwip
-	url = ../lwip.git
-	shallow = true
 [submodule "microtar"]
 	path = third-party/microtar/src
 	url = ../microtar.git

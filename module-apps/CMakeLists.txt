@@ -18,7 +18,6 @@ set(APPLICATIONS
     calculator
     calendar
     call
-    clock
     desktop
     meditation
     messages
