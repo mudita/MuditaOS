@@ -30,7 +30,8 @@ namespace app
             std::string parent                          = "",
             sys::phone_modes::PhoneMode mode            = sys::phone_modes::PhoneMode::Offline,
             sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled,
-            StartInBackground startInBackground         = {false});
+            StartInBackground startInBackground         = {false},
+            std::uint32_t stackDepth                    = 8192);
 
         ~ApplicationBellAlarm() override;
         sys::ReturnCodes InitHandler() override;

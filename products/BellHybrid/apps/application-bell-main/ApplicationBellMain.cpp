@@ -19,8 +19,9 @@ namespace app
                                              std::string parent,
                                              sys::phone_modes::PhoneMode mode,
                                              sys::bluetooth::BluetoothMode bluetoothMode,
-                                             StartInBackground startInBackground)
-        : Application(name, parent, mode, bluetoothMode, startInBackground)
+                                             StartInBackground startInBackground,
+                                             std::uint32_t stackDepth)
+        : Application(name, parent, mode, bluetoothMode, startInBackground, stackDepth)
     {
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         addActionReceiver(manager::actions::ShowAlarm, [this](auto &&data) {
