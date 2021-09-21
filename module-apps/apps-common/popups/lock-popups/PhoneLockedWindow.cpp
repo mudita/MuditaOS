@@ -65,10 +65,11 @@ namespace gui
 
     void PhoneLockedWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        if (auto notificationData = dynamic_cast<app::manager::actions::NotificationsChangedParams *>(data)) {
+        auto notificationData = dynamic_cast<app::manager::actions::NotificationsChangedParams *>(data);
+        if (notificationData) {
             notificationsModel->updateData(notificationData);
         }
-        else {
+        else if (!notificationsModel->isPhoneTimeLock()) {
             app::manager::Controller::requestNotifications(application);
             bottomBar->setActive(BottomBar::Side::LEFT, false);
             bottomBar->setActive(BottomBar::Side::CENTER, false);
@@ -77,6 +78,11 @@ namespace gui
         }
 
         if (notificationsModel->isPhoneTimeLock()) {
+            if (!refreshedOnPhoneLockTimeLock) {
+                application->refreshWindow(RefreshModes::GUI_REFRESH_DEEP);
+                refreshedOnPhoneLockTimeLock = true;
+            }
+
             bottomBar->setText(BottomBar::Side::LEFT, utils::translate("app_desktop_emergency"));
             bottomBar->setActive(BottomBar::Side::CENTER, false);
             bottomBar->setActive(BottomBar::Side::RIGHT, false);

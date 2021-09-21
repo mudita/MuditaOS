@@ -434,7 +434,7 @@
   "phone_lock_blocked_information_seconds": " seconds",
   "phone_lock_blocked_information_minute": "a minute",
   "phone_lock_blocked_information_minutes": " minutes",
-  "phone_lock_notification": "<text>Passcode lock till <token>$TIME</token></text>",
+  "phone_lock_notification": "<text>Passcode lock for <token>$TIME</token></text>",
   "phone_lock_unlock_invalid": "<text>Wrong passcode.<br></br>Please try again.</text>",
   "phone_lock_blocked": "Sorry, phone blocked",
   "phone_lock_current": "Type current passcode",

@@ -26,6 +26,12 @@ namespace notifications
         Lowest
     };
 
+    enum class NotificationOnReceiveUpdate
+    {
+        PartialRebuild,
+        FullRebuild,
+    };
+
     class Notification
     {
         static constexpr auto highestPriority = std::numeric_limits<uint32_t>::max();

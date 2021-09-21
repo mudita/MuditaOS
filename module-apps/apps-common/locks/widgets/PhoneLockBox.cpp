@@ -3,6 +3,7 @@
 
 #include "Lock.hpp"
 #include "PhoneLockBox.hpp"
+#include <i18n/i18n.hpp>
 
 namespace gui
 {
@@ -55,6 +56,7 @@ namespace gui
                             {{LockWindow->getToken(LockInputWindow::Token::Time), formattedTime}});
         LockWindow->setImage("error_W_G");
         LockWindow->setBottomBarWidgetsActive(false, true, false);
+        LockWindow->setBottomBarText(utils::translate(style::strings::common::ok), BottomBar::Side::CENTER);
     }
 
     void PhoneLockBox::setVisibleStateError(unsigned int errorCode)
@@ -102,6 +104,7 @@ namespace gui
             break;
         }
         LockWindow->setImage("info_icon_W_G");
-        LockWindow->setBottomBarWidgetsActive(false, true, true);
+        LockWindow->setBottomBarWidgetsActive(false, true, false);
+        LockWindow->setBottomBarText(utils::translate(style::strings::common::ok), BottomBar::Side::CENTER);
     }
 } // namespace gui

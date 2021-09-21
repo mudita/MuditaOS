@@ -62,14 +62,21 @@ namespace locks
     {
       private:
         std::string formattedTime;
+        bool isFirstData;
 
       public:
-        explicit PhoneLockTimeUpdate(std::string formattedTime) : formattedTime(std::move(formattedTime))
+        explicit PhoneLockTimeUpdate(std::string formattedTime, bool isFirstData = true)
+            : formattedTime(std::move(formattedTime)), isFirstData(isFirstData)
         {}
 
         [[nodiscard]] const auto &getTime() const noexcept
         {
             return formattedTime;
+        }
+
+        [[nodiscard]] const auto &getIsFirstData() const noexcept
+        {
+            return isFirstData;
         }
     };
 
