@@ -6,21 +6,23 @@
 #include "Context.hpp"
 
 #include <Service/Service.hpp>
-#include <endpoints/message/Sender.hpp>
 
 namespace sdesktop::endpoints
 {
 
+    enum class EndpointSecurity
+    {
+        Allow,
+        Block
+    };
+
     class Endpoint
     {
       public:
-        explicit Endpoint(sys::Service *_ownerServicePtr) : ownerServicePtr(_ownerServicePtr){};
+        explicit Endpoint(sys::Service *_ownerServicePtr);
         virtual ~Endpoint()                           = default;
         virtual auto handle(Context &context) -> void = 0;
-        auto c_str() -> const char *
-        {
-            return debugName.c_str();
-        }
+        auto c_str() -> const char *;
 
       protected:
         std::string debugName;
@@ -30,16 +32,10 @@ namespace sdesktop::endpoints
     class SecuredEndpoint : public Endpoint
     {
       public:
-        explicit SecuredEndpoint(sys::Service *ownerServicePtr) : Endpoint(ownerServicePtr)
-        {}
+        explicit SecuredEndpoint(sys::Service *ownerServicePtr);
         ~SecuredEndpoint() = default;
 
-        auto handle(Context &context) -> void override
-        {
-            context.setResponseStatus(http::Code::Forbidden);
-            sdesktop::endpoints::sender::putToSendQueue(context.createSimpleResponse());
-            LOG_INFO("Endpoint #%d secured", static_cast<int>(context.getEndpoint()));
-        }
+        auto handle(Context &context) -> void override;
     };
 
 } // namespace sdesktop::endpoints

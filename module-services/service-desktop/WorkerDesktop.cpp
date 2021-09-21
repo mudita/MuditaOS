@@ -102,7 +102,7 @@ bool WorkerDesktop::handleMessage(uint32_t queueID)
         }
 
         using namespace sdesktop::endpoints;
-        auto factory = std::make_unique<SecuredEndpointFactory>(securityModel.getEndpointSecurity());
+        auto factory = EndpointFactory::create(securityModel.getEndpointSecurity());
         auto handler = std::make_unique<MessageHandler>(ownerService, std::move(factory));
 
         parser.setMessageHandler(std::move(handler));

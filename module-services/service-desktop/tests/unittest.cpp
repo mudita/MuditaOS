@@ -32,7 +32,7 @@ TEST_CASE("Parser Test")
 {
     StateMachine parser(nullptr);
 
-    auto factory = std::make_unique<SecuredEndpointFactory>(EndpointSecurity::Allow);
+    auto factory = std::make_unique<EndpointFactory>(EndpointSecurity::Allow);
     auto handler = std::make_unique<MessageHandler>(nullptr, std::move(factory));
     parser.setMessageHandler(std::move(handler));
 
@@ -299,7 +299,7 @@ TEST_CASE("Secured Endpoint Factory test")
         REQUIRE(err.empty());
 
         Context context(msgJson);
-        auto factory = std::make_unique<SecuredEndpointFactory>(EndpointSecurity::Allow);
+        auto factory = std::make_unique<EndpointFactory>(EndpointSecurity::Allow);
         auto handler = factory->create(context, nullptr);
         REQUIRE(dynamic_cast<ContactsEndpoint *>(handler.get()));
     }
@@ -312,7 +312,7 @@ TEST_CASE("Secured Endpoint Factory test")
         REQUIRE(err.empty());
 
         Context context(msgJson);
-        auto factory = std::make_unique<SecuredEndpointFactory>(EndpointSecurity::Block);
+        auto factory = std::make_unique<EndpointFactory>(EndpointSecurity::Block);
         auto handler = factory->create(context, nullptr);
         REQUIRE(dynamic_cast<SecuredEndpoint *>(handler.get()));
     }
