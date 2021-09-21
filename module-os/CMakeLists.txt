@@ -79,4 +79,4 @@ if((${PROJECT_TARGET} STREQUAL "TARGET_RT1051") AND (${SYSTEM_VIEW_ENABLED}))
     target_link_libraries(${PROJECT_NAME} PUBLIC segger::systemview)
 endif()
 
-target_link_libraries(${PROJECT_NAME} PUBLIC module-bsp module-utils)
+target_link_libraries(${PROJECT_NAME} PUBLIC module-utils)
