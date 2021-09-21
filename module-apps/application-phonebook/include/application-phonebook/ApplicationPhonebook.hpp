@@ -30,12 +30,10 @@ namespace app
     class ApplicationPhonebook : public app::Application
     {
       public:
-        explicit ApplicationPhonebook(
-            std::string name                            = name_phonebook,
-            std::string parent                          = {},
-            sys::phone_modes::PhoneMode phoneMode       = sys::phone_modes::PhoneMode::Connected,
-            sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled,
-            StartInBackground startInBackground         = {false});
+        explicit ApplicationPhonebook(std::string name                    = name_phonebook,
+                                      std::string parent                  = {},
+                                      StatusIndicators statusIndicators   = StatusIndicators{},
+                                      StartInBackground startInBackground = {false});
         ~ApplicationPhonebook() override = default;
 
         auto DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) -> sys::MessagePointer override;
@@ -64,7 +62,8 @@ namespace app
                      manager::actions::ShowContactDetails,
                      manager::actions::ShowEmergencyContacts,
                      manager::actions::PhoneModeChanged,
-                     manager::actions::BluetoothModeChanged}};
+                     manager::actions::BluetoothModeChanged,
+                     manager::actions::AlarmClockStatusChanged}};
         }
     };
 } // namespace app

@@ -31,6 +31,7 @@ namespace alarms
         bool requestSnoozeRingingAlarm(sys::Service *serv, const std::uint32_t id, const TimePoint nextAlarmTime);
         bool requestStopAllSnoozedAlarms(sys::Service *serv);
         bool requestRegisterSnoozedAlarmsCountChangeCallback(sys::Service *serv);
+        bool requestRegisterActiveAlarmsIndicatorHandler(sys::Service *serv);
     }; // namespace AlarmServiceAPI
 
 } // namespace alarms

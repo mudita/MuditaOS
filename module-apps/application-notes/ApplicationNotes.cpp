@@ -29,10 +29,9 @@ namespace app
 
     ApplicationNotes::ApplicationNotes(std::string name,
                                        std::string parent,
-                                       sys::phone_modes::PhoneMode phoneMode,
-                                       sys::bluetooth::BluetoothMode bluetoothMode,
+                                       StatusIndicators statusIndicators,
                                        StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), phoneMode, bluetoothMode, startInBackground, NotesStackSize)
+        : Application(std::move(name), std::move(parent), statusIndicators, startInBackground, NotesStackSize)
     {
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
     }

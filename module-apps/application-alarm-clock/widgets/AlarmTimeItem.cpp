@@ -120,6 +120,7 @@ namespace gui
                 hours = date::make24(hours, isPm(mode12hInput->getText()));
             }
             record->startDate = TimePointFromYearMonthDay(TimePointToYearMonthDay(TimePointNow())) + hours + minutes;
+            record->endDate   = record->startDate;
         };
 
         onInputCallback(*hourInput);

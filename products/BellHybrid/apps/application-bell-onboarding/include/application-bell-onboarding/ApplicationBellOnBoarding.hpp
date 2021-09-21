@@ -11,11 +11,10 @@ namespace app
     class ApplicationBellOnBoarding : public Application
     {
       public:
-        ApplicationBellOnBoarding(std::string name                            = applicationBellOnBoardingName,
-                                  std::string parent                          = "",
-                                  sys::phone_modes::PhoneMode mode            = sys::phone_modes::PhoneMode::Offline,
-                                  sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled,
-                                  StartInBackground startInBackground         = {false});
+        ApplicationBellOnBoarding(std::string name                    = applicationBellOnBoardingName,
+                                  std::string parent                  = "",
+                                  StatusIndicators statusIndicators   = StatusIndicators{},
+                                  StartInBackground startInBackground = {false});
 
         sys::ReturnCodes InitHandler() override;
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;

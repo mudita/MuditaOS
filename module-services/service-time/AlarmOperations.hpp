@@ -26,6 +26,7 @@ namespace alarms
         using OnSnoozeRingingAlarm        = std::function<void(bool)>;
         using OnTurnOffRingingAlarm       = std::function<void(bool)>;
         using OnSnoozedAlarmsCountChange  = std::function<void(unsigned)>;
+        using OnActiveAlarmCountChange    = std::function<void(bool)>;
 
         virtual ~IAlarmOperations() noexcept = default;
 
@@ -52,6 +53,7 @@ namespace alarms
                                               const std::shared_ptr<alarms::AlarmHandler> handler) = 0;
         virtual void stopAllSnoozedAlarms()                                                        = 0;
         virtual void addSnoozedAlarmsCountChangeCallback(OnSnoozedAlarmsCountChange)               = 0;
+        virtual void addActiveAlarmCountChangeCallback(OnActiveAlarmCountChange)                   = 0;
     };
 
     class IAlarmOperationsFactory
@@ -92,6 +94,7 @@ namespace alarms
                                       const std::shared_ptr<alarms::AlarmHandler> handler) override;
         void stopAllSnoozedAlarms() override;
         void addSnoozedAlarmsCountChangeCallback(OnSnoozedAlarmsCountChange callback) override;
+        void addActiveAlarmCountChangeCallback(OnActiveAlarmCountChange callback) override;
 
       protected:
         std::unique_ptr<AbstractAlarmEventsRepository> alarmEventsRepo;
@@ -110,6 +113,7 @@ namespace alarms
       private:
         GetCurrentTime getCurrentTimeCallback;
         OnSnoozedAlarmsCountChange onSnoozedAlarmsCountChangeCallback = nullptr;
+        OnActiveAlarmCountChange onActiveAlarmCountChangeCallback     = nullptr;
 
         // Max 100 alarms for one minute seems reasonable, next events will be dropped
         constexpr static auto getNextSingleEventsOffset = 0;
@@ -133,6 +137,7 @@ namespace alarms
 
         TimePoint getCurrentTime();
         void handleSnoozedAlarmsCountChange();
+        void handleActiveAlarmsCountChange();
     };
 
     class CommonAlarmOperationsFactory : public IAlarmOperationsFactory

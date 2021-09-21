@@ -8,12 +8,11 @@ namespace app
 {
     ApplicationCalendar::ApplicationCalendar(std::string name,
                                              std::string parent,
-                                             sys::phone_modes::PhoneMode phoneMode,
-                                             sys::bluetooth::BluetoothMode bluetoothMode,
+                                             StatusIndicators statusIndicators,
                                              StartInBackground startInBackground,
                                              uint32_t stackDepth,
                                              sys::ServicePriority priority)
-        : Application(name, parent, phoneMode, bluetoothMode, startInBackground, stackDepth, priority)
+        : Application(name, parent, statusIndicators, startInBackground, stackDepth, priority)
     {}
 
     sys::MessagePointer ApplicationCalendar::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)

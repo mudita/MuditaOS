@@ -51,7 +51,7 @@ namespace gui
     void AlarmItem::setAlarm()
     {
         timeLabel->setText(TimePointToLocalizedTimeString(getPresenter()->getAlarm()->startDate));
-        onOffImage->switchState(getPresenter()->getAlarm()->enabled ? ButtonState::Off : ButtonState::On);
+        onOffImage->switchState(getPresenter()->getAlarm()->enabled ? ButtonState::On : ButtonState::Off);
 
         if (getPresenter()->hasRecurrence()) {
             periodLabel->setText(getPresenter()->getDescription());

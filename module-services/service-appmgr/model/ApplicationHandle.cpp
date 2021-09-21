@@ -71,18 +71,14 @@ namespace app::manager
         return manifest.getActionFlag(action);
     }
 
-    void ApplicationHandle::run(sys::phone_modes::PhoneMode phoneMode,
-                                sys::bluetooth::BluetoothMode bluetoothMode,
-                                sys::Service *caller)
+    void ApplicationHandle::run(StatusIndicators statusIndicators, sys::Service *caller)
     {
-        launcher->run(phoneMode, bluetoothMode, caller);
+        launcher->run(statusIndicators, caller);
     }
 
-    void ApplicationHandle::runInBackground(sys::phone_modes::PhoneMode phoneMode,
-                                            sys::bluetooth::BluetoothMode bluetoothMode,
-                                            sys::Service *caller)
+    void ApplicationHandle::runInBackground(StatusIndicators statusIndicators, sys::Service *caller)
     {
-        launcher->runBackground(phoneMode, bluetoothMode, caller);
+        launcher->runBackground(statusIndicators, caller);
     }
 
     void ApplicationHandle::close() noexcept
