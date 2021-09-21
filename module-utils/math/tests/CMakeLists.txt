@@ -4,6 +4,6 @@ add_catch2_executable(
     SRCS
         test_math.cpp
     LIBS
-        math
+        utils-math
         module-utils
 )

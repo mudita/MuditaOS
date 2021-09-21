@@ -226,7 +226,7 @@ namespace bluetooth
             break;
         case HFP_SUBEVENT_SERVICE_LEVEL_CONNECTION_RELEASED:
             LOG_DEBUG("Service level connection released.\n");
-            aclHandle = HCI_CON_HANDLE_INVALID;
+            aclHandle   = HCI_CON_HANDLE_INVALID;
             isConnected = false;
             sendAudioEvent(audio::EventType::BlutoothHFPDeviceState, audio::Event::DeviceState::Disconnected);
 
@@ -258,7 +258,7 @@ namespace bluetooth
             // todo stop ringtone stream here
             break;
         case HFP_SUBEVENT_PLACE_CALL_WITH_NUMBER:
-                hfp_ag_outgoing_call_accepted();
+            hfp_ag_outgoing_call_accepted();
             break;
 
         case HFP_SUBEVENT_ATTACH_NUMBER_TO_VOICE_TAG:

@@ -6,7 +6,7 @@
 #include "Names.hpp"
 
 #include <gui/widgets/Image.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <service-appmgr/Controller.hpp>
 
 namespace gui

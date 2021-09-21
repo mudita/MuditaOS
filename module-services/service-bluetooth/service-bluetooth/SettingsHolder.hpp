@@ -5,7 +5,7 @@
 #include <string>
 #include <variant>
 #include <service-db/Settings.hpp>
-#include <module-utils/Utils.hpp>
+#include <Utils.hpp>
 #include "SettingsSerializer.hpp"
 
 namespace bluetooth
@@ -90,4 +90,4 @@ namespace bluetooth
         std::unique_ptr<settings::Settings> settingsProvider;
         std::map<Settings, SettingEntry> settingsMap;
     };
-} // namespace Bluetooth
+} // namespace bluetooth

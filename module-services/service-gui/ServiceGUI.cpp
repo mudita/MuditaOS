@@ -12,7 +12,7 @@
 #include <DrawCommand.hpp>
 #include <FontManager.hpp>
 #include <gui/core/ImageManager.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <service-eink/Common.hpp>
 #include <service-eink/messages/ImageMessage.hpp>
 #include <service-eink/messages/EinkMessage.hpp>
@@ -190,9 +190,9 @@ namespace service::gui
 
     sys::MessagePointer ServiceGUI::handleGUIRenderingFinished(sys::Message *message)
     {
-        auto finishedMsg       = static_cast<service::gui::RenderingFinished *>(message);
-        const auto contextId   = finishedMsg->getContextId();
-        auto refreshMode       = finishedMsg->getRefreshMode();
+        auto finishedMsg     = static_cast<service::gui::RenderingFinished *>(message);
+        const auto contextId = finishedMsg->getContextId();
+        auto refreshMode     = finishedMsg->getRefreshMode();
         if (isInState(State::Idle)) {
             if (cache.isRenderCached()) {
                 refreshMode = getMaxRefreshMode(cache.getCachedRender()->refreshMode, refreshMode);

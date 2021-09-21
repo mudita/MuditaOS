@@ -35,6 +35,7 @@ target_include_directories(sys-manager
 
 target_link_libraries(sys-manager
     PUBLIC
+        eventstore
         sys-service
 )
 

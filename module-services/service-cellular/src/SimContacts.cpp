@@ -7,7 +7,6 @@
 #include <at/cmd/CPBS.hpp>
 #include <at/cmd/CPBR.hpp>
 
-#include <log/Logger.hpp>
 namespace cellular::service
 {
     void SimContacts::setChannel(at::BaseChannel *channel)

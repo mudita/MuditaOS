@@ -4,7 +4,7 @@
 #include "ListViewEngine.hpp"
 
 #include <cassert>
-#include <log.hpp>
+#include <log/log.hpp>
 
 namespace gui
 {
@@ -436,7 +436,7 @@ namespace gui
             unsigned int diff = currentPageSize < body->getVisibleChildrenCount()
                                     ? 0
                                     : currentPageSize - body->getVisibleChildrenCount();
-            currentPageSize = body->getVisibleChildrenCount();
+            currentPageSize   = body->getVisibleChildrenCount();
 
             if (direction == listview::Direction::Top) {
                 startIndex += diff;

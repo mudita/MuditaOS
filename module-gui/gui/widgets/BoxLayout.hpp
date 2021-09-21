@@ -9,7 +9,7 @@
 #include "Rect.hpp"
 #include <Alignment.hpp>
 #include "LayoutSizeStore.hpp"
-#include <log.hpp>
+#include <log/log.hpp>
 
 namespace gui
 {
@@ -60,7 +60,7 @@ namespace gui
         };
 
         template <Axis axis> void resizeItems();
-        template <Axis axis>[[nodiscard]] Position getAxisAlignmentValue(Position calcPos, Length calcSize, Item *el);
+        template <Axis axis> [[nodiscard]] Position getAxisAlignmentValue(Position calcPos, Length calcSize, Item *el);
 
         std::list<Item *> outOfDrawAreaItems;
         void addToOutOfDrawAreaList(Item *item);
@@ -68,16 +68,16 @@ namespace gui
         virtual void resizeItems();
         bool reverseOrder = false;
 
-        template <Axis axis>[[nodiscard]] Length calculateElemResize(Item *el, Length &toSplit);
+        template <Axis axis> [[nodiscard]] Length calculateElemResize(Item *el, Length &toSplit);
         template <Axis axis>
         [[nodiscard]] Length calculateElemAxisSize(Item *el, Length calculatedResize, Length &toSplit);
-        template <Axis axis>[[nodiscard]] Length calculateElemOrtAxisSize(Item *el);
+        template <Axis axis> [[nodiscard]] Length calculateElemOrtAxisSize(Item *el);
         template <Axis axis>
         [[nodiscard]] Position calculateElemAxisPosition(Item *el,
                                                          Length axisItemSize,
                                                          Position &startingPosition,
                                                          Position &leftPosition);
-        template <Axis axis>[[nodiscard]] Position calculateElemOrtAxisPosition(Item *el, Length orthogonalItemSize);
+        template <Axis axis> [[nodiscard]] Position calculateElemOrtAxisPosition(Item *el, Length orthogonalItemSize);
 
         Item *getLastVisibleElement();
 

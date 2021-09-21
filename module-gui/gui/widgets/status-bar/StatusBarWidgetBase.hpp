@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <log.hpp>
+#include <log/log.hpp>
 
 namespace gui::status_bar
 {

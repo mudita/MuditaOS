@@ -3,7 +3,7 @@
 
 #include "bsp/bluetooth/Bluetooth.hpp"
 #include "BluetoothWorker.hpp"
-#include <log.hpp>
+#include <log/log.hpp>
 
 /// stubs
 

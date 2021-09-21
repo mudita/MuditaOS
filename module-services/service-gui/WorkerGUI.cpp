@@ -4,7 +4,7 @@
 #include "WorkerGUI.hpp"
 
 #include <DrawCommand.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <Renderer.hpp>
 #include <Service/Worker.hpp>
 #include <service-gui/ServiceGUI.hpp>

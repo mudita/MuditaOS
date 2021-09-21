@@ -3,7 +3,7 @@
 
 #include <endpoints/developerMode/fs/FS_Helper.hpp>
 
-#include <log.hpp>
+#include <log/log.hpp>
 #include <service-desktop/Constants.hpp>
 #include <service-desktop/DeveloperModeMessage.hpp>
 #include <endpoints/message/Sender.hpp>

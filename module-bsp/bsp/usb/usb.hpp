@@ -12,7 +12,7 @@ extern "C"
 
 #include <errno.h>
 #include <iostream>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -29,7 +29,8 @@ namespace bsp
         Configured
     };
 
-    struct usbInitParams {
+    struct usbInitParams
+    {
         xQueueHandle queueHandle;
         xQueueHandle irqQueueHandle;
         const char *serialNumber;

@@ -13,7 +13,7 @@
 #include "Service/ServiceCreator.hpp"
 #include "Timers/TimerHandle.hpp"
 #include "PowerManager.hpp"
-#include <common_data/RawKey.hpp>
+#include <hal/key_input/RawKey.hpp>
 #include "Constants.hpp"
 #include "CpuStatistics.hpp"
 #include "DeviceManager.hpp"

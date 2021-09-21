@@ -17,7 +17,7 @@
 #include <fcntl.h>
 #include <catch2/catch.hpp>
 
-#include <log.hpp>
+#include <log/log.hpp>
 #include <utf8/UTF8.hpp>
 
 #include <module-gui/gui/core/ImageManager.hpp>

@@ -3,7 +3,7 @@
 
 #include "PhoneMode.hpp"
 
-#include <log.hpp>
+#include <log/log.hpp>
 #include <i18n/i18n.hpp>
 
 #include "Item.hpp"

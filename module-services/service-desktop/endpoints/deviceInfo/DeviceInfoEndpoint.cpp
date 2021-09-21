@@ -6,7 +6,7 @@
 #include <endpoints/JsonKeyNames.hpp>
 
 #include <EventStore.hpp>
-#include <source/version.hpp>
+#include <product/version.hpp>
 #include <service-desktop/ServiceDesktop.hpp>
 #include <version.hpp>
 

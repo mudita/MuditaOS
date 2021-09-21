@@ -9,7 +9,7 @@
 
 #include <InputEvent.hpp>
 #include <ListView.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <module-db/queries/messages/threads/QueryThreadsGet.hpp>
 #include <module-db/queries/messages/threads/QueryThreadsGetForList.hpp>
 #include <OptionsWindow.hpp>

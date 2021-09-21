@@ -12,7 +12,7 @@
 
 #include <BaseInterface.hpp>
 #include <Common/Query.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <MessageType.hpp>
 #include <module-db/Interface/EventRecord.hpp>
 #include <service-db/DBNotificationMessage.hpp>

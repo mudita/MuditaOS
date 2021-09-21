@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RT1051DriverGPIO.hpp"
-#include <log.hpp>
+#include <log/log.hpp>
 
 namespace drivers
 {

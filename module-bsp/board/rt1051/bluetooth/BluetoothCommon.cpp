@@ -3,7 +3,7 @@
 
 #include "BluetoothWorker.hpp"
 #include "bsp/bluetooth/Bluetooth.hpp"
-#include <log.hpp>
+#include <log/log.hpp>
 #include "FreeRTOS.h"
 #include "board.h"
 #include "fsl_lpuart_edma.h"

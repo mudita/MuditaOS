@@ -23,6 +23,8 @@ set(LDSCRIPTSDIR "${CMAKE_CURRENT_LIST_DIR}/board/rt1051/ldscripts" CACHE INTERN
 
 set(PROJECT_TARGET "TARGET_RT1051" CACHE INTERNAL "")
 
+include_directories(${CMAKE_SOURCE_DIR}/board/rt1051/newlib/include)
+
 add_compile_definitions(
         CPU_MIMXRT1051DVL6B_cm7
         CPU_MIMXRT1051DVL6B

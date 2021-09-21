@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Lock.hpp"
-#include <log.hpp>
+#include <log/log.hpp>
 
 namespace locks
 {

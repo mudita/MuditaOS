@@ -1,1 +1,3 @@
+add_library(board INTERFACE)
 add_subdirectory(libiosyscalls)
+target_compile_definitions(board-config INTERFACE PROJECT_CONFIG_USER_DYNMEM_SIZE=0)

@@ -62,10 +62,11 @@ target_link_libraries(${PROJECT_NAME}
         service-evtmgr
         ucs2
         json::json
-        time
+        utils-time
     PUBLIC
         eventstore
         utf8
+        hal
     )
 
 if (${ENABLE_TESTS})

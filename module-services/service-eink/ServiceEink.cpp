@@ -9,7 +9,7 @@
 #include <time/ScopedTime.hpp>
 #include <Timers/TimerFactory.hpp>
 
-#include <log.hpp>
+#include <log/log.hpp>
 #include <messages/EinkMessage.hpp>
 #include <messages/ImageMessage.hpp>
 #include <SystemManager/messages/DeviceRegistrationMessage.hpp>

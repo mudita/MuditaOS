@@ -40,7 +40,7 @@ target_link_libraries(application-bell-main
         i18n
         module-gui
         service-gui
-        time
+        utils-time
         bell::db
         bell::evtmgr
         bell::app-alarm

@@ -59,9 +59,9 @@
 
 #include <Application.hpp>
 #include <ApplicationLauncher.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <Logger.hpp>
-#include <source/version.hpp>
+#include <product/version.hpp>
 #include <sys/SystemManager.hpp>
 #include <SystemWatchdog/SystemWatchdog.hpp>
 #include <thread.hpp>

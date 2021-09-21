@@ -9,6 +9,6 @@ target_sources(service-time-api
 
 target_link_libraries(service-time-api
         PRIVATE
-        time
+        utils-time
         service-time
         )

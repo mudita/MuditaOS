@@ -13,7 +13,7 @@
 
 #include "Rect.hpp"
 #include "Style.hpp"
-#include <log.hpp>
+#include <log/log.hpp>
 
 namespace gui
 {

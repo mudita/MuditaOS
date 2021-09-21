@@ -15,7 +15,7 @@ target_include_directories(sys-watchdog
 
 target_link_libraries(sys-watchdog
     PUBLIC
-        sys-service
+        sys-service-common
 
     PRIVATE
         module-bsp

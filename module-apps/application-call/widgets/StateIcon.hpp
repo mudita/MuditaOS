@@ -6,7 +6,7 @@
 #include <i18n/i18n.hpp>
 #include <Image.hpp>
 #include <Label.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <Style.hpp>
 
 #include <map>
@@ -46,7 +46,7 @@ namespace gui
         using IconMap = std::map<T, std::pair<const std::string, const std::string>>;
         StateIcon()   = delete;
         StateIcon(
-            Item * parent, const uint32_t &x, const uint32_t &y, const uint32_t &w_margin, T state, const IconMap &data)
+            Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w_margin, T state, const IconMap &data)
             : Rect(parent, x, y, icon::w + 2 * w_margin, icon::h), data(data)
         {
             setEdges(RectangleEdge::None);

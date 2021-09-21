@@ -3,7 +3,7 @@
 
 #include "bsp/magnetometer/magnetometer.hpp"
 
-#include <module-utils/Utils.hpp> // for byte conversion functions. it is included first because of magic enum define
+#include <Utils.hpp> // for byte conversion functions. it is included first because of magic enum define
 
 #include "ALS31300.hpp"
 #include "board/BoardDefinitions.hpp"

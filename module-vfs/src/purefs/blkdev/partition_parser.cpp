@@ -3,7 +3,7 @@
 
 #include <purefs/blkdev/partition_parser.hpp>
 #include <purefs/blkdev/disk.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <errno.h>
 #include <limits>
 

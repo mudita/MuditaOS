@@ -45,6 +45,7 @@ set_source_files_properties (${CMAKE_CURRENT_SOURCE_DIR}/src/cpp/src/phonenumber
 target_link_libraries (libphonenumber 
     PRIVATE 
         re2::re2
-    PUBLIC 
+    PUBLIC
+        module-os
         protobuf::libprotobuf-lite
 )

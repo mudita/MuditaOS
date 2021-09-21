@@ -4,8 +4,7 @@ add_catch2_executable(
     SRCS
         unittest_TimeRangeParser.cpp
     LIBS
-        module-utils
-        time
+        utils-time
 )
 
 add_catch2_executable(
@@ -14,7 +13,7 @@ add_catch2_executable(
     SRCS
         unittest_TimeZone.cpp
     LIBS
-        time
+        utils-time
 )
 # time tests
 add_catch2_executable(
@@ -23,7 +22,8 @@ add_catch2_executable(
     SRCS
         unittest_time.cpp
     LIBS
-        time
+        utils-time
         utf8
+        module-vfs
     USE_FS
 )

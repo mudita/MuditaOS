@@ -15,7 +15,7 @@
 #include <queries/messages/threads/QueryThreadsGetCount.hpp>
 
 #include <cassert>
-#include <log.hpp>
+#include <log/log.hpp>
 
 ThreadRecordInterface::ThreadRecordInterface(SmsDB *smsDb, ContactsDB *contactsDb)
     : smsDB(smsDb), contactsDB(contactsDb)
@@ -241,7 +241,7 @@ std::unique_ptr<db::QueryResult> ThreadRecordInterface::markAsReadQuery(const st
 std::vector<ThreadRecord> ThreadRecordInterface::getThreads(const std::shared_ptr<db::Query> &query)
 {
     const auto localQuery = static_cast<const db::query::ThreadsGet *>(query.get());
-    auto dbResult = smsDB->threads.getLimitOffset(localQuery->offset, localQuery->limit);
+    auto dbResult         = smsDB->threads.getLimitOffset(localQuery->offset, localQuery->limit);
     return std::vector<ThreadRecord>(dbResult.begin(), dbResult.end());
 }
 
@@ -289,7 +289,7 @@ std::unique_ptr<db::QueryResult> ThreadRecordInterface::threadGetByIDQuery(const
 
     const auto ret = GetByID(localQuery->id);
     auto response  = std::make_unique<db::query::ThreadGetByIDResult>(ret.isValid() ? std::optional<ThreadRecord>{ret}
-                                                                                   : std::nullopt);
+                                                                                    : std::nullopt);
     response->setRequestQuery(query);
     return response;
 }
