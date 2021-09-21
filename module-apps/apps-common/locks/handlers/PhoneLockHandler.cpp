@@ -17,12 +17,29 @@ namespace locks
         : owner(owner), settings(std::move(settings)),
           lock(Lock::LockState::InputRequired, initialNoLockTimeAttemptsLeft)
     {
-        phoneLockTimer = sys::TimerFactory::createSingleShotTimer(
-            owner,
-            phoneLockTimerName,
-            std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::from_time_t(lockedTill) -
-                                                             std::chrono::system_clock::now()),
-            [this](sys::Timer &) { phoneLockTimeUpdateInfoAction(LockTimerState::Stop); });
+        phoneLockTimer = sys::TimerFactory::createPeriodicTimer(
+            owner, phoneLockTimerName, std::chrono::seconds{(1)}, [this](sys::Timer &) {
+                if (lockedFor == 0) {
+                    phoneLockTimer.stop();
+                    phoneLockTimeUpdateInfoAction(LockTimerState::Stop);
+                    return;
+                }
+
+                if (lockedFor == nextUnlockAttemptLockTime) {
+                    phoneLockTimeUpdateInfoAction(LockTimerState::Start);
+                }
+                else if (lockedFor % utils::secondsInMinute == 0 || lockedFor <= utils::secondsInMinute) {
+                    phoneLockTimeUpdateInfoAction(LockTimerState::Counting);
+                }
+
+                --lockedFor;
+
+                if (lockedFor == 0) {
+                    savePhoneLockTime();
+                }
+
+                return;
+            });
     }
 
     void PhoneLockHandler::enablePhoneLock(bool _phoneLockEnabled)
@@ -42,12 +59,11 @@ namespace locks
 
     void PhoneLockHandler::setPhoneLockTime(const time_t time)
     {
-        lockedTill = time;
-        if (std::time(nullptr) < lockedTill) {
+        if (time != 0) {
+            lockedFor      = time;
             lock.lockState = Lock::LockState::Blocked;
             phoneLockTimeUpdateInfoAction(LockTimerState::Start);
-            phoneLockTimer.restart(std::chrono::duration_cast<std::chrono::seconds>(
-                std::chrono::system_clock::from_time_t(lockedTill) - std::chrono::system_clock::now()));
+            phoneLockTimer.start();
         }
     }
 
@@ -162,18 +178,25 @@ namespace locks
     void PhoneLockHandler::phoneLockTimeUpdateInfoAction(LockTimerState state)
     {
         std::string textToPrint;
+        auto rebuildRequired = state == LockTimerState::Start;
 
-        if (state == LockTimerState::Start) {
-            auto formattedTime =
-                utils::time::TimestampFactory().createTimestamp(utils::time::TimestampType::Clock, lockedTill)->str();
-            auto formattedDay = utils::time::TimestampFactory()
-                                    .createTimestamp(utils::time::TimestampType::DateText, lockedTill)
-                                    ->day(true);
+        if (state == LockTimerState::Start || state == LockTimerState::Counting) {
+            if (lockedFor <= utils::secondsInMinute) {
+                using utils::time::Duration;
+                const Duration remainingDuration{static_cast<uint32_t>(std::time_t{lockedFor})};
+                textToPrint = remainingDuration.str(Duration::DisplayedFormat::Fixed0M0S);
 
-            textToPrint = formattedTime + ", " + formattedDay;
+                if (lockedFor == utils::secondsInMinute) {
+                    rebuildRequired = true;
+                }
+            }
+            else {
+                textToPrint = std::to_string(lockedFor / utils::secondsInMinute) +
+                              utils::translate("phone_lock_blocked_information_minutes");
+            }
         }
 
-        owner->bus.sendMulticast(std::make_shared<locks::PhoneLockTimeUpdate>(textToPrint),
+        owner->bus.sendMulticast(std::make_shared<locks::PhoneLockTimeUpdate>(textToPrint, rebuildRequired),
                                  sys::BusChannel::PhoneLockChanges);
     }
 
@@ -195,9 +218,8 @@ namespace locks
 
     void PhoneLockHandler::savePhoneLockTime()
     {
-        settings->setValue(::settings::SystemProperties::unlockLockTime,
-                           std::to_string(lockedTill),
-                           ::settings::SettingsScope::Global);
+        settings->setValue(
+            ::settings::SystemProperties::unlockLockTime, std::to_string(lockedFor), ::settings::SettingsScope::Global);
     }
 
     void PhoneLockHandler::saveNextUnlockAttemptLockTime()
@@ -231,7 +253,7 @@ namespace locks
             return sys::msgHandled();
         }
         if (lock.isState(Lock::LockState::Blocked)) {
-            if (std::time(nullptr) > lockedTill) {
+            if (lockedFor == 0) {
                 lock.lockState = Lock::LockState::InputRequired;
             }
             phoneInputRequiredAction();
@@ -246,7 +268,8 @@ namespace locks
 
     sys::MessagePointer PhoneLockHandler::handleLockRequest()
     {
-        lock.lockState = Lock::LockState::InputRequired;
+        lock.lockState    = Lock::LockState::InputRequired;
+        lock.attemptsLeft = initialNoLockTimeAttemptsLeft;
         phoneLockAction();
 
         return sys::msgHandled();
@@ -345,15 +368,14 @@ namespace locks
         }
         else if (lock.attemptsLeft > 0) {
             lock.lockState = Lock::LockState::InputInvalid;
-            resetLockTime();
         }
         else {
             increaseLockTime();
-            phoneLockTimeUpdateInfoAction(LockTimerState::Start);
             lock.lockState = Lock::LockState::Blocked;
         }
-        setPhoneLockTimeInformationInSettings();
+
         broadcastLockTime();
+        setPhoneLockTimeInformationInSettings();
     }
 
     sys::MessagePointer PhoneLockHandler::verifyPhoneUnlockInput(LockInput inputData)
@@ -400,7 +422,8 @@ namespace locks
 
         if (lock.isState(Lock::LockState::Blocked)) {
             phoneExternalUnlockInfoAction();
-            if (std::time(nullptr) <= lockedTill) {
+            broadcastLockTime();
+            if (lockedFor != 0) {
                 return sys::msgHandled();
             }
         }
@@ -456,38 +479,38 @@ namespace locks
 
     void PhoneLockHandler::increaseLockTime() noexcept
     {
-        if (lockedTill != 0) {
-            nextUnlockAttemptLockTime *= locks::phoneLockTimeMultiplier;
-        }
-        lockedTill = std::time(nullptr) + nextUnlockAttemptLockTime;
-        phoneLockTimer.restart(std::chrono::duration_cast<std::chrono::seconds>(
-            std::chrono::system_clock::from_time_t(lockedTill) - std::chrono::system_clock::now()));
+        nextUnlockAttemptLockTime != 0 ? nextUnlockAttemptLockTime *= locks::phoneLockTimeMultiplier
+                                       : nextUnlockAttemptLockTime = initialLockTime;
+        lockedFor = nextUnlockAttemptLockTime;
 
-        if (nextUnlockAttemptLockTime < utils::secondsInMinute) {
-            lock.setNextUnlockAttemptFormattedTime(std::to_string(nextUnlockAttemptLockTime) +
+        phoneLockTimer.start();
+        phoneLockTimeUpdateInfoAction(LockTimerState::Start);
+
+        if (lockedFor < utils::secondsInMinute) {
+            lock.setNextUnlockAttemptFormattedTime(std::to_string(lockedFor) +
                                                    utils::translate("phone_lock_blocked_information_seconds"));
         }
-        else if (nextUnlockAttemptLockTime >= utils::secondsInMinute &&
-                 nextUnlockAttemptLockTime < 2 * utils::secondsInMinute) {
+        else if (lockedFor >= utils::secondsInMinute && lockedFor < 2 * utils::secondsInMinute) {
             lock.setNextUnlockAttemptFormattedTime(utils::translate("phone_lock_blocked_information_minute"));
         }
         else {
-            lock.setNextUnlockAttemptFormattedTime(std::to_string(nextUnlockAttemptLockTime / utils::secondsInMinute) +
+            lock.setNextUnlockAttemptFormattedTime(std::to_string(lockedFor / utils::secondsInMinute) +
                                                    utils::translate("phone_lock_blocked_information_minutes"));
         }
     }
 
     void PhoneLockHandler::resetLockTime() noexcept
     {
-        lockedTill                = 0;
-        nextUnlockAttemptLockTime = initialLockTime;
+        lockedFor                 = 0;
+        nextUnlockAttemptLockTime = 0;
         phoneLockTimer.stop();
     }
 
     void PhoneLockHandler::broadcastLockTime() noexcept
     {
-        owner->bus.sendMulticast(std::make_shared<locks::NextPhoneUnlockAttemptLockTime>(lockedTill),
-                                 sys::BusChannel::PhoneLockChanges);
+        owner->bus.sendMulticast(
+            std::make_shared<locks::NextPhoneUnlockAttemptLockTime>(std::time(nullptr) + lockedFor),
+            sys::BusChannel::PhoneLockChanges);
     }
 
 } // namespace locks

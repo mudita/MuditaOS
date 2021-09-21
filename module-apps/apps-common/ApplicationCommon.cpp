@@ -244,11 +244,13 @@ namespace app
             suspendInProgress = false;
     }
 
-    void ApplicationCommon::updateWindow(const std::string &windowName, std::unique_ptr<gui::SwitchData> data)
+    void ApplicationCommon::updateCurrentWindow(std::unique_ptr<gui::SwitchData> data,
+                                                gui::ShowMode command,
+                                                gui::RefreshModes refreshMode)
     {
         const auto currentWindow = getCurrentWindow();
-        auto msg =
-            std::make_shared<AppUpdateWindowMessage>(currentWindow ? currentWindow->getName() : "", std::move(data));
+        auto msg                 = std::make_shared<AppUpdateWindowMessage>(
+            currentWindow ? currentWindow->getName() : "", std::move(data), command, refreshMode);
         bus.sendUnicast(std::move(msg), this->GetName());
     }
 
@@ -782,7 +784,7 @@ namespace app
         using namespace gui::popup;
         const auto &popupName = resolveWindowName(gui::popup::ID::PhoneModes);
         if (const auto currentWindowName = getCurrentWindow()->getName(); currentWindowName == popupName) {
-            updateWindow(popupName, std::make_unique<gui::ModesPopupData>(mode, flightMode));
+            updateCurrentWindow(std::make_unique<gui::ModesPopupData>(mode, flightMode));
         }
         else {
             switchWindow(popupName, std::make_unique<gui::ModesPopupData>(mode, flightMode));
@@ -794,7 +796,7 @@ namespace app
         using namespace gui::popup;
         const auto popupName = resolveWindowName(gui::popup::ID::Volume);
         if (const auto currentWindowName = getCurrentWindow()->getName(); currentWindowName == popupName) {
-            updateWindow(popupName, std::make_unique<gui::VolumePopupData>(volume, context));
+            updateCurrentWindow(std::make_unique<gui::VolumePopupData>(volume, context));
         }
         else {
             switchWindow(popupName, std::make_unique<gui::VolumePopupData>(volume, context));
@@ -1031,8 +1033,17 @@ namespace app
     void ApplicationCommon::handleNotificationsChanged(std::unique_ptr<gui::SwitchData> notificationsParams)
     {
         if (auto window = getCurrentWindow()->getName(); window == gui::popup::window::phone_lock_window) {
-            switchWindow(window, std::move(notificationsParams));
+
+            auto refreshMode = getRefreshModeFromNotifications(notificationsParams.get());
+            updateCurrentWindow(std::move(notificationsParams), gui::ShowMode::GUI_SHOW_INIT, refreshMode);
         }
+    }
+
+    gui::RefreshModes ApplicationCommon::getRefreshModeFromNotifications(gui::SwitchData *notificationsParams)
+    {
+        auto data = static_cast<manager::actions::NotificationsChangedParams *>(notificationsParams);
+        return data->fastRefreshOnNotificationUpdate() ? gui::RefreshModes::GUI_REFRESH_FAST
+                                                       : gui::RefreshModes::GUI_REFRESH_DEEP;
     }
 
     void ApplicationCommon::cancelCallbacks(AsyncCallbackReceiver::Ptr receiver)
