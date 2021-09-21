@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <endpoints/EndpointFactory.hpp>
+#include <endpoints/Endpoint.hpp>
 
 namespace settings
 {

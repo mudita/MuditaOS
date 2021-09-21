@@ -3,29 +3,24 @@
 
 #pragma once
 
-#include <endpoints/security/SecurityEndpoint.hpp>
+#include <endpoints/Endpoint.hpp>
 
 namespace sdesktop::endpoints
 {
-    class Endpoint;
 
     class EndpointFactory
     {
-      public:
-        virtual ~EndpointFactory() = default;
-        virtual auto create(Context &context, sys::Service *ownerServicePtr) -> std::unique_ptr<Endpoint>;
-    };
-    class SecuredEndpointFactory : public EndpointFactory
-    {
+      protected:
         static constexpr auto Whitelist = {EndpointType::developerMode, EndpointType::usbSecurity};
 
+        EndpointFactory() = default;
+
       public:
-        explicit SecuredEndpointFactory(EndpointSecurity security);
+        virtual ~EndpointFactory() = default;
 
-        auto create(Context &context, sys::Service *ownerServicePtr) -> std::unique_ptr<Endpoint> override;
+        static auto create(EndpointSecurity security = EndpointSecurity::Allow) -> std::unique_ptr<EndpointFactory>;
 
-      private:
-        EndpointSecurity endpointSecurity;
+        virtual auto create(Context &context, sys::Service *ownerServicePtr) -> std::unique_ptr<Endpoint> = 0;
     };
 
 } // namespace sdesktop::endpoints
