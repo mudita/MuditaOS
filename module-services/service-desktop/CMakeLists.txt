@@ -57,8 +57,8 @@ target_link_libraries(service-desktop
         desktop-endpoints
 )
 
-
 if (${ENABLE_TESTS})
-    add_subdirectory(tests)
+    # EGD-7371 - tests are disabled until dependency issues are solved
+    #add_subdirectory(tests)
 endif ()
 
