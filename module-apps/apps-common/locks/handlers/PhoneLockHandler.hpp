@@ -30,6 +30,7 @@ namespace locks
         enum class LockTimerState
         {
             Start,
+            Counting,
             Stop,
         };
 
@@ -45,8 +46,8 @@ namespace locks
         std::vector<unsigned int> storedInputData;
 
         sys::TimerHandle phoneLockTimer;
-        time_t lockedTill                = 0;
-        time_t nextUnlockAttemptLockTime = initialLockTime;
+        time_t lockedFor                 = 0;
+        time_t nextUnlockAttemptLockTime = 0;
 
         void setPhoneLockInputTypeAction(PhoneLockInputTypeAction _phoneLockInputTypeAction);
         bool checkPhoneLockInputTypeAction(PhoneLockInputTypeAction _phoneLockInputTypeAction);

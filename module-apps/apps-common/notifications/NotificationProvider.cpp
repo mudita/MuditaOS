@@ -39,19 +39,19 @@ bool NotificationProvider::handleNotSeenWithCounter(NotificationsRecord &&record
 void NotificationProvider::handle(locks::PhoneLockTimeUpdate *msg)
 {
     assert(msg);
+    auto updateOnReceive = NotificationOnReceiveUpdate::FullRebuild;
 
     if (const auto &formattedTime = msg->getTime(); !formattedTime.empty()) {
+        updateOnReceive = msg->getIsFirstData() ? NotificationOnReceiveUpdate::FullRebuild
+                                                : NotificationOnReceiveUpdate::PartialRebuild;
+
         notifications[NotificationType::PhoneLock] = std::make_shared<PhoneLockNotification>(formattedTime);
     }
     else {
         notifications.erase(NotificationType::PhoneLock);
     }
 
-    notifcationConfig.updateCurrentList(listPolicy);
-
-    if (listPolicy.updateListAllowed()) {
-        send();
-    }
+    send(updateOnReceive);
 }
 
 void NotificationProvider::handle(db::query::notifications::GetAllResult *msg)
@@ -139,7 +139,7 @@ namespace
     };
 } // namespace
 
-void NotificationProvider::send()
+void NotificationProvider::send(NotificationOnReceiveUpdate updateOnReceive)
 {
     notifcationConfig.updateCurrentList(listPolicy);
 
@@ -151,8 +151,10 @@ void NotificationProvider::send()
             return (lhs->getPriority() > rhs->getPriority());
         });
 
-    app::manager::Controller::sendAction(ownerService,
-                                         app::manager::actions::NotificationsChanged,
-                                         std::make_unique<app::manager::actions::NotificationsChangedParams>(
-                                             std::move(toSendNotifications), listPolicy.showListWhenLocked()));
+    auto fastRefreshOnUpdate = updateOnReceive == NotificationOnReceiveUpdate::PartialRebuild;
+    app::manager::Controller::sendAction(
+        ownerService,
+        app::manager::actions::NotificationsChanged,
+        std::make_unique<app::manager::actions::NotificationsChangedParams>(
+            std::move(toSendNotifications), listPolicy.showListWhenLocked(), fastRefreshOnUpdate));
 }

@@ -23,6 +23,7 @@ namespace gui
         gui::Label *dayText                                         = nullptr;
         gui::ListView *notificationsList                            = nullptr;
         std::shared_ptr<gui::NotificationsModel> notificationsModel = nullptr;
+        bool refreshedOnPhoneLockTimeLock                           = false;
 
         bool processLongReleaseEvent(const InputEvent &inputEvent);
 

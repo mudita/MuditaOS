@@ -135,7 +135,7 @@ namespace app
         if (auto phoneMsg = dynamic_cast<CellularNotificationMessage *>(msgl); nullptr != phoneMsg) {
             auto currentWindow = getCurrentWindow();
             if (gui::window::name::network == currentWindow->getName()) {
-                updateWindow(gui::window::name::network, nullptr);
+                updateCurrentWindow();
             }
         }
 
@@ -156,7 +156,7 @@ namespace app
             CellularServiceAPI::RequestForOwnNumber(this);
             auto currentWindow = getCurrentWindow();
             if (gui::window::name::sim_cards == currentWindow->getName()) {
-                updateWindow(gui::window::name::sim_cards, nullptr);
+                updateCurrentWindow();
             }
             return sys::MessageNone{};
         });
@@ -296,7 +296,7 @@ namespace app
             auto simCardPinLockState = static_cast<cellular::msg::request::sim::GetLockState::Response *>(msg);
             auto pinSettingsLockStateData =
                 std::make_unique<gui::PINSettingsLockStateData>(simCardPinLockState->locked);
-            updateWindow(gui::window::name::sim_pin_settings, std::move(pinSettingsLockStateData));
+            updateCurrentWindow(std::move(pinSettingsLockStateData));
             return sys::MessageNone{};
         });
 
@@ -314,7 +314,7 @@ namespace app
         connect(typeid(manager::GetAutoLockTimeoutResponse), [&](sys::Message *msg) {
             auto response = static_cast<manager::GetAutoLockTimeoutResponse *>(msg);
             auto data     = std::make_unique<gui::AutoLockData>(response->getValue());
-            updateWindow(gui::window::name::autolock, std::move(data));
+            updateCurrentWindow(std::move(data));
             return sys::MessageNone{};
         });
 
