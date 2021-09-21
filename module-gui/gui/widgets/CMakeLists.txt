@@ -31,6 +31,7 @@ target_sources( ${PROJECT_NAME}
         "${CMAKE_CURRENT_LIST_DIR}/SideListView.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/Spinner.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/StatusBar.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/status-bar/AlarmClock.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/status-bar/BT.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/status-bar/SIM.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/status-bar/BatteryBase.cpp"

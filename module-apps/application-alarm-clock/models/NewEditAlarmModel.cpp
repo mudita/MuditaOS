@@ -110,6 +110,7 @@ namespace app::alarmClock
                                      [this](bool) { application->switchWindow(gui::name::window::main_window); });
         }
         else {
+            alarm->enabled = true;
             alarmsRepository->add(*alarm, [this](bool) { application->returnToPreviousWindow(); });
         }
         list->reset();

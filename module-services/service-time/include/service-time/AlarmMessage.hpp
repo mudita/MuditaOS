@@ -175,4 +175,26 @@ namespace alarms
         unsigned snoozedCount = 0;
     };
 
+    /// Message to register service (sender) awaiting for ActiveAlarmMessage
+    class RegisterActiveAlarmsIndicatorHandlerRequestMessage : public AlarmMessage
+    {
+      public:
+        explicit RegisterActiveAlarmsIndicatorHandlerRequestMessage(){};
+    };
+
+    /// Message to indicate if any alarm is currently actively waiting for execution
+    class ActiveAlarmMessage : public AlarmMessage
+    {
+      public:
+        explicit ActiveAlarmMessage(bool anyAlarmActive) : anyAlarmActive{anyAlarmActive} {};
+
+        [[nodiscard]] bool isAnyAlarmActive() const noexcept
+        {
+            return anyAlarmActive;
+        }
+
+      private:
+        bool anyAlarmActive = 0;
+    };
+
 } // namespace alarms

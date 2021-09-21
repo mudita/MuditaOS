@@ -69,6 +69,11 @@ namespace alarms
         {
             return sendRequest<RegisterSnoozedAlarmsCountChangeHandlerRequestMessage>(serv);
         }
+
+        bool requestRegisterActiveAlarmsIndicatorHandler(sys::Service *serv)
+        {
+            return sendRequest<RegisterActiveAlarmsIndicatorHandlerRequestMessage>(serv);
+        }
     }; // namespace AlarmServiceAPI
 
 } // namespace alarms

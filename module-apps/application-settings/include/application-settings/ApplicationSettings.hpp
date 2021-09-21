@@ -119,12 +119,10 @@ namespace app
                                 public AsyncCallbackReceiver
     {
       public:
-        explicit ApplicationSettings(
-            std::string name                            = name_settings,
-            std::string parent                          = {},
-            sys::phone_modes::PhoneMode phoneMode       = sys::phone_modes::PhoneMode::Connected,
-            sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled,
-            StartInBackground startInBackground         = {false});
+        explicit ApplicationSettings(std::string name                    = name_settings,
+                                     std::string parent                  = {},
+                                     StatusIndicators statusIndicators   = StatusIndicators{},
+                                     StartInBackground startInBackground = {false});
         ~ApplicationSettings() override;
         auto DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) -> sys::MessagePointer override;
         auto InitHandler() -> sys::ReturnCodes override;
@@ -196,8 +194,10 @@ namespace app
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {
-            return {
-                {manager::actions::Launch, manager::actions::PhoneModeChanged, manager::actions::BluetoothModeChanged}};
+            return {{manager::actions::Launch,
+                     manager::actions::PhoneModeChanged,
+                     manager::actions::BluetoothModeChanged,
+                     manager::actions::AlarmClockStatusChanged}};
         }
     };
 } /* namespace app */

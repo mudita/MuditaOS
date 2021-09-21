@@ -17,11 +17,10 @@ namespace app
 {
     ApplicationBellMain::ApplicationBellMain(std::string name,
                                              std::string parent,
-                                             sys::phone_modes::PhoneMode mode,
-                                             sys::bluetooth::BluetoothMode bluetoothMode,
+                                             StatusIndicators statusIndicators,
                                              StartInBackground startInBackground,
                                              std::uint32_t stackDepth)
-        : Application(name, parent, mode, bluetoothMode, startInBackground, stackDepth)
+        : Application(name, parent, statusIndicators, startInBackground, stackDepth)
     {
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         addActionReceiver(manager::actions::ShowAlarm, [this](auto &&data) {

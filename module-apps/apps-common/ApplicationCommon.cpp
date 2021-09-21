@@ -17,6 +17,7 @@
 #include <log.hpp>                       // for LOG_INFO
 #include "messages/AppMessage.hpp"       // for AppSwitchMe...
 #include "service-appmgr/Controller.hpp" // for Controller
+#include "actions/AlarmClockStatusChangeParams.hpp"
 #include <service-cellular-api>
 #include <service-cellular/CellularMessage.hpp>
 #include <service-evtmgr/BatteryMessages.hpp>
@@ -102,8 +103,7 @@ namespace app
 
     ApplicationCommon::ApplicationCommon(std::string name,
                                          std::string parent,
-                                         sys::phone_modes::PhoneMode phoneMode,
-                                         sys::bluetooth::BluetoothMode bluetoothMode,
+                                         StatusIndicators statusIndicators,
                                          StartInBackground startInBackground,
                                          uint32_t stackDepth,
                                          sys::ServicePriority priority)
@@ -111,8 +111,8 @@ namespace app
           default_window(gui::name::window::main_window), windowsStack(this),
           keyTranslator{std::make_unique<gui::KeyInputSimpleTranslation>()}, startInBackground{startInBackground},
           callbackStorage{std::make_unique<CallbackStorage>()}, statusBarManager{std::make_unique<StatusBarManager>()},
-          settings(std::make_unique<settings::Settings>()), phoneMode{phoneMode}, bluetoothMode(bluetoothMode),
-          phoneLockSubject(this), lockPolicyHandler(this), simLockSubject(this)
+          settings(std::make_unique<settings::Settings>()), statusIndicators{statusIndicators}, phoneLockSubject(this),
+          lockPolicyHandler(this), simLockSubject(this)
     {
         statusBarManager->enableIndicators({gui::status_bar::Indicator::Time});
 
@@ -136,14 +136,22 @@ namespace app
         addActionReceiver(app::manager::actions::PhoneModeChanged, [this](auto &&params) {
             if (params != nullptr) {
                 auto modeParams = static_cast<gui::PhoneModeParams *>(params.get());
-                this->phoneMode = modeParams->getPhoneMode();
+                this->statusIndicators.phoneMode = modeParams->getPhoneMode();
             }
             return actionHandled();
         });
         addActionReceiver(app::manager::actions::BluetoothModeChanged, [this](auto &&params) {
             if (params != nullptr) {
                 auto modeParams     = static_cast<gui::BluetoothModeParams *>(params.get());
-                this->bluetoothMode = modeParams->getBluetoothMode();
+                this->statusIndicators.bluetoothMode = modeParams->getBluetoothMode();
+                refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+            }
+            return actionHandled();
+        });
+        addActionReceiver(app::manager::actions::AlarmClockStatusChanged, [this](auto &&params) {
+            if (params != nullptr) {
+                auto status = static_cast<AlarmClockStatusParams *>(params.get())->getAlarmClockStatus();
+                this->statusIndicators.alarmClockStatus = status;
                 refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
             }
             return actionHandled();
@@ -212,12 +220,13 @@ namespace app
         if (state == State::ACTIVE_FORGROUND) {
             auto window = getCurrentWindow();
             window->updateBatteryStatus();
-            window->updateBluetooth(bluetoothMode);
+            window->updateBluetooth(statusIndicators.bluetoothMode);
+            window->updateAlarmClock(statusIndicators.alarmClockStatus);
             window->updateSim();
             window->updateSignalStrength();
             window->updateNetworkAccessTechnology();
             window->updateTime();
-            window->updatePhoneMode(phoneMode);
+            window->updatePhoneMode(statusIndicators.phoneMode);
 
             auto message = std::make_shared<service::gui::DrawMessage>(window->buildDrawList(), mode);
 

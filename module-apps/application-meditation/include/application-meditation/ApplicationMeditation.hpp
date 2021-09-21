@@ -16,12 +16,10 @@ namespace app
     class ApplicationMeditation : public Application
     {
       public:
-        explicit ApplicationMeditation(
-            std::string name                            = name_meditation,
-            std::string parent                          = {},
-            sys::phone_modes::PhoneMode phoneMode       = sys::phone_modes::PhoneMode::Connected,
-            sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled,
-            StartInBackground startInBackground         = {false});
+        explicit ApplicationMeditation(std::string name                    = name_meditation,
+                                       std::string parent                  = {},
+                                       StatusIndicators statusIndicators   = StatusIndicators{},
+                                       StartInBackground startInBackground = {false});
 
         auto InitHandler() -> sys::ReturnCodes override;
         auto DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) -> sys::MessagePointer override;
@@ -36,9 +34,11 @@ namespace app
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {
-            return {
-                {manager::actions::Launch, manager::actions::PhoneModeChanged, manager::actions::BluetoothModeChanged},
-                locks::AutoLockPolicy::PreventPermanently};
+            return {{manager::actions::Launch,
+                     manager::actions::PhoneModeChanged,
+                     manager::actions::BluetoothModeChanged,
+                     manager::actions::AlarmClockStatusChanged},
+                    locks::AutoLockPolicy::PreventPermanently};
         }
     };
 } // namespace app

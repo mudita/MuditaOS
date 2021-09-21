@@ -23,11 +23,10 @@ namespace app
     class ApplicationNotes : public Application
     {
       public:
-        explicit ApplicationNotes(std::string name                            = name_notes,
-                                  std::string parent                          = {},
-                                  sys::phone_modes::PhoneMode phoneMode       = sys::phone_modes::PhoneMode::Connected,
-                                  sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled,
-                                  StartInBackground startInBackground         = {false});
+        explicit ApplicationNotes(std::string name                    = name_notes,
+                                  std::string parent                  = {},
+                                  StatusIndicators statusIndicators   = StatusIndicators{},
+                                  StartInBackground startInBackground = {false});
 
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
@@ -42,8 +41,10 @@ namespace app
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {
-            return {
-                {manager::actions::Launch, manager::actions::PhoneModeChanged, manager::actions::BluetoothModeChanged}};
+            return {{manager::actions::Launch,
+                     manager::actions::PhoneModeChanged,
+                     manager::actions::BluetoothModeChanged,
+                     manager::actions::AlarmClockStatusChanged}};
         }
     };
 } // namespace app

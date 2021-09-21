@@ -19,11 +19,10 @@ namespace app
 
     ApplicationAlarmClock::ApplicationAlarmClock(std::string name,
                                                  std::string parent,
-                                                 sys::phone_modes::PhoneMode phoneMode,
-                                                 sys::bluetooth::BluetoothMode bluetoothMode,
+                                                 StatusIndicators statusIndicators,
                                                  uint32_t stackDepth,
                                                  sys::ServicePriority priority)
-        : Application(name, parent, phoneMode, bluetoothMode, false, stackDepth, priority)
+        : Application(name, parent, statusIndicators, false, stackDepth, priority)
     {
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
     }
