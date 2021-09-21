@@ -5,8 +5,6 @@
 #include <ATFactory.hpp>
 #include <modem/BaseChannel.hpp>
 
-#include <log/Logger.hpp>
-
 namespace
 {
     constexpr auto IMEIResonseSize = 2;

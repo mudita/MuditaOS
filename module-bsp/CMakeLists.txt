@@ -23,12 +23,6 @@ target_sources(
         drivers/pwm/DriverPWM.cpp
         drivers/semc/DriverSEMC.cpp
         drivers/usdhc/DriverUSDHC.cpp
-
-    PUBLIC
-        hal/temperature_source/TemperatureSource.hpp
-        hal/battery_charger/AbstractBatteryCharger.hpp
-        hal/key_input/AbstractKeyInput.hpp
-        hal/key_input/KeyEventDefinitions.hpp
 )
 add_board_subdirectory(board)
 
@@ -69,8 +63,11 @@ target_include_directories(${PROJECT_NAME}
         >
 )
 
+add_subdirectory(hal)
+
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
+        hal
         eventstore
         module-os
         service-bluetooth

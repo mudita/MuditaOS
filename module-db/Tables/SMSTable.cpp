@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SMSTable.hpp"
-#include <log.hpp>
+#include <log/log.hpp>
 
 SMSTable::SMSTable(Database *db) : Table(db)
 {}

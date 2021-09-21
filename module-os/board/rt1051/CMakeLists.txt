@@ -31,5 +31,6 @@ target_include_directories(
 
 target_link_libraries(module-os
     PUBLIC
+        fsl
         cmsis
 )

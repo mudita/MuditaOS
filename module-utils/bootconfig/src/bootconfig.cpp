@@ -6,19 +6,17 @@
 #include <gsl/util>
 #include <limits.h>
 #include <purefs/filesystem_paths.hpp>
-#include <source/version.hpp>
+#include <product/version.hpp>
 #include <time/time_conversion.hpp>
 #include <ticks.hpp>
 #include <cstdio>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <array>
 #include <Utils.hpp>
 
 #include <fstream>
 
 #include <purefs/filesystem_paths.hpp>
-#include <sys/mount.h>
-#include <sys/statvfs.h>
 
 namespace boot
 {
@@ -131,7 +129,6 @@ namespace boot
         }
         return 0;
     }
-
 
     bool BootConfig::loadBootConfig(const std::filesystem::path &bootJsonPath)
     {

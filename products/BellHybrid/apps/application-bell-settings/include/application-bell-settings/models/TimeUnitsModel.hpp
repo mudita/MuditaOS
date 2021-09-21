@@ -5,7 +5,7 @@
 
 #include <apps-common/ApplicationCommon.hpp>
 #include <apps-common/InternalModel.hpp>
-#include <module-utils/Temperature.hpp>
+#include <Temperature.hpp>
 #include <time/time_locale.hpp>
 
 namespace gui

@@ -10,7 +10,7 @@
 #include <purefs/blkdev/disk_handle.hpp>
 #include <purefs/fs/mount_flags.hpp>
 #include <lfs.h>
-#include <log.hpp>
+#include <log/log.hpp>
 
 #include <climits>
 #include <syslimits.h>
@@ -133,11 +133,11 @@ namespace
             LOG_ERROR("Block size doesn't match partition size");
             return -ERANGE;
         }
-        cfg->block_count = total_siz / cfg->block_size - 1;
+        cfg->block_count    = total_siz / cfg->block_size - 1;
         cfg->lookahead_size = std::min<lfs_size_t>(131072U, ((cfg->block_count >> 3U) + 1U) << 3U);
-        cfg->read_size  = cfg->block_size;
-        cfg->prog_size  = cfg->block_size;
-        cfg->cache_size = cfg->block_size;
+        cfg->read_size      = cfg->block_size;
+        cfg->prog_size      = cfg->block_size;
+        cfg->cache_size     = cfg->block_size;
         LOG_INFO("LFS: block count %u block size %u", unsigned(cfg->block_count), unsigned(cfg->block_size));
         return 0;
     }
@@ -149,7 +149,7 @@ namespace purefs::fs::drivers
     namespace
     {
         template <typename T, typename... Args>
-        auto invoke_lfs(filesystem_littlefs::fsfile zfil, T lfs_fun, Args &&... args)
+        auto invoke_lfs(filesystem_littlefs::fsfile zfil, T lfs_fun, Args &&...args)
             -> decltype(lfs_fun(nullptr, nullptr, std::forward<Args>(args)...))
         {
             auto vfile = std::dynamic_pointer_cast<file_handle_littlefs>(zfil);
@@ -166,7 +166,7 @@ namespace purefs::fs::drivers
             return lfs_to_errno(lerr);
         }
         template <typename T, typename... Args>
-        auto invoke_lfs(filesystem_littlefs::fsdir zdir, T lfs_fun, Args &&... args)
+        auto invoke_lfs(filesystem_littlefs::fsdir zdir, T lfs_fun, Args &&...args)
             -> decltype(lfs_fun(nullptr, nullptr, std::forward<Args>(args)...))
         {
             auto vdir = std::dynamic_pointer_cast<directory_handle_littlefs>(zdir);
@@ -184,7 +184,7 @@ namespace purefs::fs::drivers
         }
 
         template <typename T, typename... Args>
-        auto invoke_lfs(filesystem_littlefs::fsmount fmnt, T lfs_fun, Args &&... args)
+        auto invoke_lfs(filesystem_littlefs::fsmount fmnt, T lfs_fun, Args &&...args)
             -> decltype(lfs_fun(nullptr, std::forward<Args>(args)...))
         {
             auto mntp = std::static_pointer_cast<mount_point_littlefs>(fmnt);
@@ -197,7 +197,7 @@ namespace purefs::fs::drivers
         }
 
         template <typename T, typename... Args>
-        auto invoke_lfs(filesystem_littlefs::fsmount fmnt, std::string_view path, T lfs_fun, Args &&... args)
+        auto invoke_lfs(filesystem_littlefs::fsmount fmnt, std::string_view path, T lfs_fun, Args &&...args)
             -> decltype(lfs_fun(nullptr, "", std::forward<Args>(args)...))
         {
             auto mntp = std::static_pointer_cast<mount_point_littlefs>(fmnt);
@@ -234,7 +234,7 @@ namespace purefs::fs::drivers
             return lfs_to_errno(err);
         }
         {
-            auto diskmm = disk_mngr();
+            auto diskmm      = disk_mngr();
             const auto ssize = diskmm->get_info(disk, blkdev::info_type::sector_size);
             if (ssize < 0) {
                 LOG_ERROR("Unable to read sector size %i", int(ssize));

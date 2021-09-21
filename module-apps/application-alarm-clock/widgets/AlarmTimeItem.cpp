@@ -7,6 +7,7 @@
 #include <Style.hpp>
 #include <time/time_constants.hpp>
 #include <time/time_date_validation.hpp>
+#include <service-time/api/TimeSettingsApi.hpp>
 
 namespace gui
 {

@@ -5,7 +5,7 @@
 
 #include "Service/Message.hpp"
 
-#include <common_data/RawKey.hpp>
+#include <hal/key_input/RawKey.hpp>
 
 namespace sevm
 {

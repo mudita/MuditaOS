@@ -9,7 +9,7 @@
 #include <gui/widgets/ListView.hpp>
 #include <test/mock/TestListViewProvider.hpp>
 
-#include <log.hpp>
+#include <log/log.hpp>
 
 class ListViewTesting : public ::testing::Test
 {

@@ -5,7 +5,7 @@
 
 #include "TestBoxLayout.hpp"
 
-#include <log.hpp>
+#include <log/log.hpp>
 #include <module-gui/test/mock/TestListViewProvider.hpp>
 #include <gui/input/InputEvent.hpp>
 

@@ -4,7 +4,7 @@
 #include <Timers/SystemTimer.hpp>
 #include <Service/Service.hpp>
 #include <Timers/TimerMessage.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <projdefs.h>
 #include <memory>
 

@@ -4,7 +4,7 @@
 #include "PowerOffWindow.hpp"
 #include "Popups.hpp"
 
-#include <log.hpp>
+#include <log/log.hpp>
 #include <messages/DialogMetadataMessage.hpp>
 #include <i18n/i18n.hpp>
 

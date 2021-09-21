@@ -3,7 +3,7 @@
 
 #include "crashdumpwriter_vfs.hpp"
 
-#include <log.hpp>
+#include <log/log.hpp>
 #include <fcntl.h>
 #include "purefs/vfs_subsystem.hpp"
 

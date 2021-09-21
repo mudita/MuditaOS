@@ -10,7 +10,7 @@
 #include "Timers/TimerFactory.hpp"
 
 #include <bsp/usb/usb.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <crc32.h>
 
 #include <map>

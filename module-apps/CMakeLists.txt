@@ -84,6 +84,7 @@ endif()
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
         app
+        application-calendar
         application-messages
         application-settings
         apps-common
@@ -98,7 +99,8 @@ target_link_libraries(${PROJECT_NAME}
         service-cellular
         service-db
         service-evtmgr
-        time
+        service-time-api
+        utils-time
         utils-bootconfig
     PUBLIC
         module-audio

@@ -13,7 +13,7 @@
 #include <service-appmgr/Controller.hpp>
 
 #include <filesystem>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <i18n/i18n.hpp>
 #include <purefs/filesystem_paths.hpp>
 #include <service-audio/AudioServiceAPI.hpp>

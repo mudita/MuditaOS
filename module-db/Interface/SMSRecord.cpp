@@ -19,7 +19,7 @@
 #include "queries/messages/sms/QuerySMSGetLastByThreadID.hpp"
 #include <queries/messages/sms/QuerySMSGetForList.hpp>
 
-#include <log.hpp>
+#include <log/log.hpp>
 
 #include <PhoneNumber.hpp>
 #include <optional>
@@ -205,8 +205,8 @@ void SMSRecordInterface::UpdateThreadSummary(ThreadRecord &threadToUpdate, const
 {
     threadToUpdate.snippet = rec.body.substr(
         0, std::min<size_t>({snippetLength, rec.body.length(), rec.body.find("\n"), rec.body.find("\r")}));
-    threadToUpdate.date    = rec.date;
-    threadToUpdate.type    = rec.type;
+    threadToUpdate.date = rec.date;
+    threadToUpdate.type = rec.type;
 }
 
 bool SMSRecordInterface::RemoveByID(uint32_t id)
@@ -464,7 +464,7 @@ std::unique_ptr<db::QueryResult> SMSRecordInterface::updateQuery(const std::shar
 auto SMSRecordInterface::getQueryRecords(const std::shared_ptr<db::Query> &query) -> std::vector<SMSRecord>
 {
     const auto localQuery = static_cast<const db::query::SMSGet *>(query.get());
-    auto smsVector    = smsDB->sms.getLimitOffset(localQuery->getOffset(), localQuery->getLimit());
+    auto smsVector        = smsDB->sms.getLimitOffset(localQuery->getOffset(), localQuery->getLimit());
     return std::vector<SMSRecord>(smsVector.begin(), smsVector.end());
 }
 

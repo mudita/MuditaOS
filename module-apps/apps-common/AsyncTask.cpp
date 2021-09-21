@@ -3,7 +3,7 @@
 
 #include "AsyncTask.hpp"
 #include <apps-common/ApplicationCommon.hpp>
-#include "log.hpp"
+#include "log/log.hpp"
 
 namespace app
 {

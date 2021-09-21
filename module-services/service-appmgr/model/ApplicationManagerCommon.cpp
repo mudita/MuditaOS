@@ -18,7 +18,7 @@
 #include <log/log.hpp>
 #include <service-audio/AudioMessage.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
-#include <module-utils/Utils.hpp>
+#include <Utils.hpp>
 #include <service-appmgr/Constants.hpp>
 #include <service-desktop/Constants.hpp>
 #include <service-desktop/DesktopMessages.hpp>

@@ -4,7 +4,7 @@
 #include "NotificationsTable.hpp"
 #include "Database/Database.hpp"
 
-#include <log.hpp>
+#include <log/log.hpp>
 #include <Utils.hpp>
 #include <cassert>
 

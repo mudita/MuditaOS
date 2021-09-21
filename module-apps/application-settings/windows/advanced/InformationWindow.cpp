@@ -6,7 +6,7 @@
 #include <application-settings/windows/WindowNames.hpp>
 
 #include <service-cellular/CellularServiceAPI.hpp>
-#include <source/version.hpp>
+#include <product/version.hpp>
 
 namespace gui
 {

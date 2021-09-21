@@ -33,7 +33,7 @@ target_link_libraries(${PROJECT_NAME}
         service-antenna
         ${TARGET_LIBRARIES}
     PRIVATE
-        time
+        utils-time
 )
 
 # Board specific compilation definitions,options,include directories and features

@@ -1,7 +1,5 @@
 add_library(i18n STATIC)
 
-module_is_test_entity(i18n)
-
 target_sources(i18n
     PRIVATE
         i18n.cpp
@@ -20,9 +18,9 @@ target_include_directories(i18n
 target_link_libraries(i18n
     PRIVATE 
         json::json
-        log
+        log-api
         module-os
-        module-vfs
+        purefs-paths
 )
 
 if (${ENABLE_TESTS})

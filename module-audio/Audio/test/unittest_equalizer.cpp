@@ -5,7 +5,7 @@
 
 #include <catch2/catch.hpp>
 #include <module-audio/Audio/equalizer/Equalizer.hpp>
-#include <module-utils/Utils.hpp>
+#include <Utils.hpp>
 #include <stdexcept>
 
 SCENARIO("Calculate filter coeff")

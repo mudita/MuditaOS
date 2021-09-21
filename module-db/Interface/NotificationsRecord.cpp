@@ -9,7 +9,7 @@
 #include "module-db/queries/notifications/QueryNotificationsGetAll.hpp"
 #include "Databases/NotificationsDB.hpp"
 
-#include <log.hpp>
+#include <log/log.hpp>
 #include <Utils.hpp>
 
 #include <cassert>

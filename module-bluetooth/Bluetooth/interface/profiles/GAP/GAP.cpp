@@ -3,7 +3,7 @@
 
 #include "GAP.hpp"
 
-#include <log.hpp>
+#include <log/log.hpp>
 #include <service-bluetooth/BluetoothMessage.hpp>
 #include <service-bluetooth/messages/ResponseVisibleDevices.hpp>
 #include <service-bluetooth/messages/Unpair.hpp>
@@ -156,8 +156,8 @@ namespace bluetooth
             LOG_INFO(", rssi %d dBm", static_cast<int8_t>(gap_event_inquiry_result_get_rssi(packet)));
         }
         if (gap_event_inquiry_result_get_name_available(packet) != 0u) {
-            auto name   = gap_event_inquiry_result_get_name(packet);
-            device.name = std::string{reinterpret_cast<const char *>(name)};
+            auto name    = gap_event_inquiry_result_get_name(packet);
+            device.name  = std::string{reinterpret_cast<const char *>(name)};
             device.state = REMOTE_NAME_FETCHED;
         }
         else {

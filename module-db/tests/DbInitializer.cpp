@@ -8,7 +8,7 @@
 #include <memory>
 #include <set>
 #include <string>
-#include <log.hpp>
+#include <log/log.hpp>
 
 DatabaseInitializer::DatabaseInitializer(Database *db) : db(db)
 {}

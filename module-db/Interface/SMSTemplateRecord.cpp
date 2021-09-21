@@ -10,7 +10,7 @@
 #include "queries/messages/templates/QuerySMSTemplateUpdate.hpp"
 #include <queries/messages/templates/QuerySMSTemplateGetForList.hpp>
 
-#include <log.hpp>
+#include <log/log.hpp>
 
 #include <cassert>
 

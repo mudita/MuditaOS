@@ -43,7 +43,7 @@ target_link_libraries(application-music-player
         log
         module-gui
         service-audio
-        time
+        utils-time
     PUBLIC
         apps-common
         module-audio

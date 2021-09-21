@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-#include <log.hpp>
+#include <log/log.hpp>
 #include "queue.hpp"
 #include <btstack_run_loop.h>
 #include <timer.hpp>

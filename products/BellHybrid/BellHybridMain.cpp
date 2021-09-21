@@ -29,9 +29,9 @@
 
 #include <Application.hpp>
 #include <ApplicationLauncher.hpp>
-#include <log/Logger.hpp>
+#include <Logger.hpp>
 #include <log/log.hpp>
-#include <source/version.hpp>
+#include <product/version.hpp>
 #include <sys/SystemManager.hpp>
 #include <time/AlarmOperations.hpp>
 #include <SystemWatchdog/SystemWatchdog.hpp>

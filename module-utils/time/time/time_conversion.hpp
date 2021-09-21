@@ -7,7 +7,7 @@
 /// as stdlib builtin locale doesn't provide way to substitute C-LOCALE
 
 #include "time/time_locale.hpp"
-#include <log.hpp>
+#include <log/log.hpp>
 
 #include <vector>
 #include <string>

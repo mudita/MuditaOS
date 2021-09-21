@@ -6,7 +6,7 @@
 #include <CalllogRecord.hpp>
 #include <PhoneNumber.hpp>
 #include <Utils.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 
 #include <cinttypes>
 #include <ctime>

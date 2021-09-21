@@ -5,7 +5,7 @@
 #include "TimerProperty.hpp"
 
 #include <i18n/i18n.hpp>
-#include <module-utils/Utils.hpp>
+#include <Utils.hpp>
 
 using namespace gui;
 

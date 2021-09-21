@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <endpoints/developerMode/Mode/UI_Helper.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 #include "service-desktop/Constants.hpp"
 #include "service-desktop/DeveloperModeMessage.hpp"
 #include <service-appmgr/Constants.hpp>

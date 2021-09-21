@@ -71,7 +71,7 @@ target_link_libraries(${PROJECT_NAME}
                 tag
                 minimp3::minimp3
         PRIVATE
-                math
+                utils-math
                 tagsfetcher
 )
 

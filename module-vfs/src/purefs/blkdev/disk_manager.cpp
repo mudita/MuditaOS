@@ -3,7 +3,7 @@
 
 #include <purefs/blkdev/disk_manager.hpp>
 #include <purefs/blkdev/disk.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <mutex.hpp>
 #include <errno.h>
 #include <charconv>
@@ -18,7 +18,7 @@ namespace purefs::blkdev
     namespace
     {
         using namespace std::literals;
-        static constexpr auto part_suffix = "part"sv;
+        static constexpr auto part_suffix    = "part"sv;
         static constexpr auto syspart_suffix = "sys"sv;
     } // namespace
 
