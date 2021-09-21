@@ -5,10 +5,10 @@ set(SOURCES
         WorkerEventCommon.cpp
         api/EventManagerServiceAPI.cpp
         api/torch.cpp
+        backlight-handler/BacklightHandlerCommon.cpp
         battery/BatteryController.cpp
         battery/BatteryController.hpp
         battery-level-check/BatteryLevelCheck.cpp
-        backlight-handler/BacklightHandler.cpp
         battery-brownout-detector/BatteryBrownoutDetector.cpp
         screen-light-control/ControlFunctions.cpp
         screen-light-control/ScreenLightControlParameters.cpp

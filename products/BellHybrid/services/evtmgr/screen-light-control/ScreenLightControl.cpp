@@ -66,7 +66,7 @@ namespace screen_light_control
 
     void ScreenLightControl::readoutTimerCallback()
     {
-        functions::calculateBrightness(brightnessValue);
+        // functions::calculateBrightness(brightnessValue);
     }
 
     auto ScreenLightControl::getAutoModeState() const noexcept -> ScreenLightMode
@@ -114,6 +114,7 @@ namespace screen_light_control
     void ScreenLightControl::setParameters(ManualModeParameters params)
     {
         brightnessValue = params.manualModeBrightness;
+        functions::setRampTarget(brightnessValue);
         setManualBrightnessLevel();
     }
 
