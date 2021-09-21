@@ -29,7 +29,7 @@ namespace backlight
         /// @screen_light_control::Parameters parameters being set
         void processScreenRequest(screen_light_control::Action action, const screen_light_control::Parameters &params);
 
-        void handleKeyPressed();
+        void handleKeyPressed(const int key = 0);
         /// Process request of the keypad light control
         /// @keypad_backlight::action an action to perform
         /// @return True if request was processed successfully, false otherwise
@@ -60,7 +60,7 @@ namespace backlight
         void setKeypadLightState(bsp::keypad_backlight::State value) noexcept;
         void restoreKeypadLightState();
         void handleKeypadLightRefresh();
-        void handleScreenLightRefresh();
+        void handleScreenLightRefresh(const int key = 0);
         void handleScreenLightSettings(screen_light_control::Action action,
                                        const screen_light_control::Parameters &params);
     };

@@ -23,4 +23,6 @@ namespace screen_light_control::functions
 
     void setFunctionFromPoints(const BrightnessFunction &points);
 
+    void setRampTarget(bsp::eink_frontlight::BrightnessPercentage value);
+
 } // namespace screen_light_control::functions
