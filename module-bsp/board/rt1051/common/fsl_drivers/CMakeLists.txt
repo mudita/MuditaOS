@@ -1,0 +1,74 @@
+add_library(fsl STATIC)
+
+target_sources(fsl
+    PRIVATE
+        fsl_adc.c
+        fsl_cache.c
+        fsl_clock.c
+        fsl_common.c
+        fsl_dcdc.c
+        fsl_dmamux.c
+        fsl_edma.c
+        fsl_flexram.c
+        fsl_gpc.c
+        fsl_gpio.c
+        fsl_gpt.c
+        fsl_lpi2c.c
+        fsl_lpspi.c
+        fsl_lpspi_edma.c
+        fsl_lpuart.c
+        fsl_lpuart_edma.c
+        fsl_pit.c
+        fsl_pmu.c
+        fsl_pwm.c
+        fsl_qtmr.c
+        fsl_rtwdog.c
+        fsl_sai.c
+        fsl_sai_edma.c
+        fsl_semc.c
+        fsl_snvs_hp.c
+        fsl_snvs_lp.c
+        fsl_src.c
+        fsl_usdhc.c
+        fsl_wdog.c
+    
+    PUBLIC
+        fsl_adc.h
+        fsl_cache.h
+        fsl_clock.h
+        fsl_common.h
+        fsl_dcdc.h
+        fsl_device_registers.h
+        fsl_dmamux.h
+        fsl_edma.h
+        fsl_flexram.h
+        fsl_gpc.h
+        fsl_gpio.h
+        fsl_gpt.h
+        fsl_iomuxc.h
+        fsl_lpi2c.h
+        fsl_lpspi_edma.h
+        fsl_lpspi.h
+        fsl_lpuart_edma.h
+        fsl_lpuart.h
+        fsl_pit.h
+        fsl_pmu.h
+        fsl_pwm.h
+        fsl_qtmr.h
+        fsl_rtwdog.h
+        fsl_sai_edma.h
+        fsl_sai.h
+        fsl_semc.h
+        fsl_snvs_hp.h
+        fsl_snvs_lp.h
+        fsl_src.h
+        fsl_usdhc.h
+        fsl_wdog.h    
+)
+
+target_include_directories(fsl
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}>
+)
+
+target_link_libraries(fsl PUBLIC cmsis)
