@@ -25,13 +25,11 @@ namespace app
         std::unique_ptr<internal::BellAlarmPriv> priv;
 
       public:
-        explicit ApplicationBellAlarm(
-            std::string name                            = applicationBellAlarmName,
-            std::string parent                          = "",
-            sys::phone_modes::PhoneMode mode            = sys::phone_modes::PhoneMode::Offline,
-            sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled,
-            StartInBackground startInBackground         = {false},
-            std::uint32_t stackDepth                    = 8192);
+        explicit ApplicationBellAlarm(std::string name                    = applicationBellAlarmName,
+                                      std::string parent                  = "",
+                                      StatusIndicators statusIndicators   = StatusIndicators{},
+                                      StartInBackground startInBackground = {false},
+                                      std::uint32_t stackDepth            = 8192);
 
         ~ApplicationBellAlarm() override;
         sys::ReturnCodes InitHandler() override;

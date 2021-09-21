@@ -111,6 +111,12 @@ namespace alarms
         alarmOperations->addSnoozedAlarmsCountChangeCallback(callback);
     }
 
+    auto AlarmMessageHandler::handleAddActiveAlarmCountChangeCallback(
+        AlarmOperationsCommon::OnActiveAlarmCountChange callback) -> void
+    {
+        alarmOperations->addActiveAlarmCountChangeCallback(callback);
+    }
+
     template <class RequestType, class ResponseType, class CallbackParamType>
     auto AlarmMessageHandler::handleWithCallback(
         RequestType *request,

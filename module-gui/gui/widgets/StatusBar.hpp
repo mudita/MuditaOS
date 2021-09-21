@@ -7,6 +7,7 @@
 
 #include <PhoneModes/Common.hpp>
 #include <service-bluetooth/Constants.hpp>
+#include "status-bar/AlarmClock.hpp"
 
 #include <vector>
 #include <map>
@@ -46,6 +47,7 @@ namespace gui::status_bar
         SimCard,                 /// sim card info
         NetworkAccessTechnology, /// NAT (eg 3G, 4G, LTE)
         PhoneMode,               /// phone mode
+        AlarmClock,              /// alarm clock active
     };
 
     using Indicators          = std::vector<Indicator>;
@@ -81,6 +83,10 @@ namespace gui::status_bar
         /// @param bluetoothMode desired bluetooth mode configuration
         void setBluetoothMode(sys::bluetooth::BluetoothMode bluetoothMode);
 
+        /// Set alarm clock status
+        /// @param alarmClockStatus desired alarm clock status
+        void setAlarmClockStatus(bool alarmClockStatus);
+
         /// Set a configuration modifier to the specified indicator
         /// @param indicator indicator type
         /// @param config desired indicator's configuration
@@ -93,6 +99,10 @@ namespace gui::status_bar
         /// Get the bluetooth mode configuration
         /// @return bluetooth mode
         [[nodiscard]] auto getBluetoothMode() const noexcept -> sys::bluetooth::BluetoothMode;
+
+        /// Get the Alarm Clock status configuration
+        /// @return alarm clock status
+        [[nodiscard]] auto getAlarmClockStatus() const noexcept -> bool;
 
         /// Check if the specified indicator is enabled
         /// @param indicator indicator to be checked
@@ -109,20 +119,26 @@ namespace gui::status_bar
 
       private:
         /// Current indicator statuses
-        IndicatorStatuses indicatorStatuses = {{Indicator::Signal, false},
-                                               {Indicator::PhoneMode, false},
-                                               {Indicator::Time, false},
-                                               {Indicator::Lock, false},
-                                               {Indicator::Battery, false},
-                                               {Indicator::Bluetooth, false},
-                                               {Indicator::SimCard, false},
-                                               {Indicator::NetworkAccessTechnology, false}};
+        IndicatorStatuses indicatorStatuses = {
+            {Indicator::Signal, false},
+            {Indicator::PhoneMode, false},
+            {Indicator::Time, false},
+            {Indicator::Lock, false},
+            {Indicator::Battery, false},
+            {Indicator::Bluetooth, false},
+            {Indicator::SimCard, false},
+            {Indicator::NetworkAccessTechnology, false},
+            {Indicator::AlarmClock, false},
+        };
 
         /// Phone mode
         sys::phone_modes::PhoneMode mPhoneMode = sys::phone_modes::PhoneMode::Connected;
 
         /// Bluetooth mode
         sys::bluetooth::BluetoothMode mBluetoothMode = sys::bluetooth::BluetoothMode::Disabled;
+
+        /// Alarm Clock status
+        bool mAlarmClockStatus = false;
 
         /// Indicator modifiers:
         IndicatorsModifiers indicatorsModifiers;
@@ -152,8 +168,11 @@ namespace gui::status_bar
         /// @return configuration stored in Configuration class
         [[nodiscard]] auto getConfiguration() const noexcept -> const Configuration &;
 
-        /// Update sim card status widget state depending on the current configuration
+        /// Update bluetooth status widget state depending on the current configuration
         bool updateBluetooth(sys::bluetooth::BluetoothMode mode);
+
+        /// Update alarm clock status widget state depending on the current configuration
+        bool updateAlarmClock(bool status);
 
         /// Update sim card status widget state depending on the current configuration
         bool updateSim();
@@ -183,6 +202,10 @@ namespace gui::status_bar
         /// Show/hide bluetooth status widget
         /// @param enabled true to show false to hide the widget
         void showBluetooth(bool enabled);
+
+        /// Show/hide alarm clock status widget
+        /// @param enabled true to show false to hide the widget
+        void showAlarmClock(bool enabled);
 
         /// Show/hide sim card status widget
         /// @param enabled true to show false to hide the widget
@@ -239,6 +262,9 @@ namespace gui::status_bar
 
         /// Pointer to widget with bluetooth status
         BT *bluetooth = nullptr;
+
+        /// Pointer to widget with alarm clock status
+        AlarmClock *alarmClock = nullptr;
 
         /// Pointer to widget with sim card status
         SIM *sim = nullptr;

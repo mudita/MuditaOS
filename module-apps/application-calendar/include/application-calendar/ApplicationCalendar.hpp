@@ -17,11 +17,10 @@ namespace app
       public:
         ApplicationCalendar(std::string name,
                             std::string parent,
-                            sys::phone_modes::PhoneMode phoneMode       = sys::phone_modes::PhoneMode::Connected,
-                            sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled,
-                            StartInBackground startInBackground         = {false},
-                            uint32_t stackDepth                         = 8192,
-                            sys::ServicePriority priority               = sys::ServicePriority::Idle);
+                            StatusIndicators statusIndicators   = StatusIndicators{},
+                            StartInBackground startInBackground = {false},
+                            uint32_t stackDepth                 = 8192,
+                            sys::ServicePriority priority       = sys::ServicePriority::Idle);
 
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
@@ -39,8 +38,10 @@ namespace app
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {
-            return {
-                {manager::actions::Launch, manager::actions::PhoneModeChanged, manager::actions::BluetoothModeChanged}};
+            return {{manager::actions::Launch,
+                     manager::actions::PhoneModeChanged,
+                     manager::actions::BluetoothModeChanged,
+                     manager::actions::AlarmClockStatusChanged}};
         }
     };
 } /* namespace app */

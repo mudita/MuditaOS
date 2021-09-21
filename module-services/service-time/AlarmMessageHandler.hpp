@@ -37,6 +37,7 @@ namespace alarms
         auto handleStopAllSnoozedAlarms() -> void;
         auto handleAddSnoozedAlarmCountChangeCallback(AlarmOperationsCommon::OnSnoozedAlarmsCountChange callback)
             -> void;
+        auto handleAddActiveAlarmCountChangeCallback(AlarmOperationsCommon::OnActiveAlarmCountChange callback) -> void;
 
       private:
         stm::ServiceTime *service = nullptr;

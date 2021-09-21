@@ -46,11 +46,10 @@ namespace app
     class ApplicationBellSettings : public Application, public settingsInterface::BellScreenLightSettings
     {
       public:
-        ApplicationBellSettings(std::string name                            = applicationBellSettingsName,
-                                std::string parent                          = "",
-                                sys::phone_modes::PhoneMode mode            = sys::phone_modes::PhoneMode::Offline,
-                                sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled,
-                                StartInBackground startInBackground         = {false});
+        ApplicationBellSettings(std::string name                    = applicationBellSettingsName,
+                                std::string parent                  = "",
+                                StatusIndicators statusIndicators   = StatusIndicators{},
+                                StartInBackground startInBackground = {false});
 
         sys::ReturnCodes InitHandler() override;
 

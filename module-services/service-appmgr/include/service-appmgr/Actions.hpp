@@ -55,6 +55,7 @@ namespace app::manager
             CallRejectedByOfflineNotification,
             PhoneModeChanged,
             BluetoothModeChanged,
+            AlarmClockStatusChanged,
             NotificationsChanged,
             ShowPopup,
             AbortPopup,

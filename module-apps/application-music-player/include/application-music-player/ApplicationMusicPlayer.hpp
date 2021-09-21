@@ -34,12 +34,10 @@ namespace app
     {
 
       public:
-        explicit ApplicationMusicPlayer(
-            std::string name                            = name_music_player,
-            std::string parent                          = {},
-            sys::phone_modes::PhoneMode phoneMode       = sys::phone_modes::PhoneMode::Connected,
-            sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled,
-            StartInBackground startInBackground         = {false});
+        explicit ApplicationMusicPlayer(std::string name                    = name_music_player,
+                                        std::string parent                  = {},
+                                        StatusIndicators statusIndicators   = StatusIndicators{},
+                                        StartInBackground startInBackground = {false});
         ~ApplicationMusicPlayer() override;
 
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl,
@@ -66,9 +64,11 @@ namespace app
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {
-            return {
-                {manager::actions::Launch, manager::actions::PhoneModeChanged, manager::actions::BluetoothModeChanged},
-                locks::AutoLockPolicy::DetermineByWindow};
+            return {{manager::actions::Launch,
+                     manager::actions::PhoneModeChanged,
+                     manager::actions::BluetoothModeChanged,
+                     manager::actions::AlarmClockStatusChanged},
+                    locks::AutoLockPolicy::DetermineByWindow};
         }
     };
 } /* namespace app */

@@ -9,6 +9,7 @@
 #include <application-special-input/ApplicationSpecialInput.hpp>
 #include <apps-common/popups/data/PhoneModeParams.hpp>
 #include <apps-common/popups/data/PopupRequestParams.hpp>
+#include <apps-common/actions/AlarmClockStatusChangeParams.hpp>
 #include <module-db/queries/notifications/QueryNotificationsGetAll.hpp>
 #include <SystemManager/messages/TetheringQuestionRequest.hpp>
 #include <Timers/TimerFactory.hpp>
@@ -125,7 +126,11 @@ namespace app::manager
     {
         for (const auto &name : std::vector<ApplicationName>{app::special_input}) {
             if (auto app = getApplication(name); app != nullptr) {
-                app->runInBackground(phoneModeObserver->getCurrentPhoneMode(), bluetoothMode, this);
+                StatusIndicators statusIndicators;
+                statusIndicators.phoneMode        = phoneModeObserver->getCurrentPhoneMode();
+                statusIndicators.bluetoothMode    = bluetoothMode;
+                statusIndicators.alarmClockStatus = alarmClockStatus;
+                app->runInBackground(statusIndicators, this);
             }
         }
     }
@@ -344,6 +349,13 @@ namespace app::manager
             return sys::msgHandled();
         });
 
+        alarms::AlarmServiceAPI::requestRegisterActiveAlarmsIndicatorHandler(this);
+        connect(typeid(alarms::ActiveAlarmMessage), [&](sys::Message *request) -> sys::MessagePointer {
+            auto data = static_cast<alarms::ActiveAlarmMessage *>(request);
+            handleAlarmClockStatusChanged(data->isAnyAlarmActive());
+            return sys::msgHandled();
+        });
+
         auto convertibleToActionHandler = [this](sys::Message *request) { return handleMessageAsAction(request); };
         connect(typeid(CellularMMIResultMessage), convertibleToActionHandler);
         connect(typeid(CellularMMIResponseMessage), convertibleToActionHandler);
@@ -387,6 +399,24 @@ namespace app::manager
     void ApplicationManager::changeBluetoothMode(const ApplicationHandle *app)
     {
         ActionEntry action{actions::BluetoothModeChanged, std::make_unique<gui::BluetoothModeParams>(bluetoothMode)};
+        action.setTargetApplication(app->name());
+        actionsRegistry.enqueue(std::move(action));
+    }
+
+    void ApplicationManager::handleAlarmClockStatusChanged(bool status)
+    {
+        if (alarmClockStatus != status) {
+            alarmClockStatus = status;
+            for (const auto app : getStackedApplications()) {
+                changeAlarmClockStatus(app);
+            }
+        }
+    }
+
+    void ApplicationManager::changeAlarmClockStatus(const ApplicationHandle *app)
+    {
+        ActionEntry action{actions::AlarmClockStatusChanged,
+                           std::make_unique<app::AlarmClockStatusParams>(alarmClockStatus)};
         action.setTargetApplication(app->name());
         actionsRegistry.enqueue(std::move(action));
     }
@@ -473,7 +503,11 @@ namespace app::manager
     {
         if (not ApplicationManagerCommon::startApplication(app)) {
             LOG_INFO("Starting application %s", app.name().c_str());
-            app.run(phoneModeObserver->getCurrentPhoneMode(), bluetoothMode, this);
+            StatusIndicators statusIndicators;
+            statusIndicators.phoneMode        = phoneModeObserver->getCurrentPhoneMode();
+            statusIndicators.bluetoothMode    = bluetoothMode;
+            statusIndicators.alarmClockStatus = alarmClockStatus;
+            app.run(statusIndicators, this);
         }
         return true;
     }
@@ -524,6 +558,7 @@ namespace app::manager
         switch (action.actionId) {
         case actions::BluetoothModeChanged:
         case actions::PhoneModeChanged:
+        case actions::AlarmClockStatusChanged:
             return handleActionOnActiveApps(action);
         default:
             return ApplicationManagerCommon::handleAction(action);
