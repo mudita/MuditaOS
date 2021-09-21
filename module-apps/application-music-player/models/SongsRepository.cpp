@@ -242,4 +242,14 @@ namespace app::music_player
         return true;
     }
 
+    std::optional<db::multimedia_files::MultimediaFilesRecord> SongsRepository::getRecord(
+        const std::string &filePath) const
+    {
+        const auto index = getCachedFileIndex(filePath);
+        if (index == std::numeric_limits<size_t>::max()) {
+            return std::nullopt;
+        }
+        return musicFilesModelCache.records[index];
+    }
+
 } // namespace app::music_player

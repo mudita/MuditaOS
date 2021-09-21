@@ -5,6 +5,7 @@
 
 #include "AudioNotificationsHandler.hpp"
 
+#include <windows/MusicPlayerMainWindow.hpp>
 #include <windows/MusicPlayerAllSongsWindow.hpp>
 #include <apps-common/AudioOperations.hpp>
 #include <presenters/SongsPresenter.hpp>
@@ -41,7 +42,7 @@ namespace app
               std::move(name), std::move(parent), statusIndicators, startInBackground, applicationMusicPlayerStackSize),
           priv{std::make_unique<music_player::internal::MusicPlayerPriv>()}
     {
-        LOG_INFO("ApplicationMusicPlayer::create");
+        LOG_INFO("ApplicationMusicPlayer creating");
 
         bus.channels.push_back(sys::BusChannel::ServiceAudioNotifications);
 
@@ -50,7 +51,7 @@ namespace app
         priv->songsModel     = std::make_unique<app::music_player::SongsModel>(this, std::move(songsRepository));
         auto audioOperations = std::make_unique<app::AsyncAudioOperations>(this);
         priv->songsPresenter =
-            std::make_unique<app::music_player::SongsPresenter>(priv->songsModel, std::move(audioOperations));
+            std::make_unique<app::music_player::SongsPresenter>(this, priv->songsModel, std::move(audioOperations));
 
         // callback used when playing state is changed
         using SongState                                 = app::music_player::SongState;
@@ -121,7 +122,7 @@ namespace app
 
     sys::ReturnCodes ApplicationMusicPlayer::DeinitHandler()
     {
-        priv->songsPresenter->getMusicPlayerItemProvider()->clearData();
+        priv->songsPresenter->getMusicPlayerModelInterface()->clearData();
         priv->songsPresenter->stop();
         return Application::DeinitHandler();
     }
@@ -129,9 +130,13 @@ namespace app
     void ApplicationMusicPlayer::createUserInterface()
     {
         windowsFactory.attach(gui::name::window::main_window, [&](ApplicationCommon *app, const std::string &name) {
-            return std::make_unique<gui::MusicPlayerAllSongsWindow>(app, priv->songsPresenter);
+            return std::make_unique<gui::MusicPlayerMainWindow>(app, priv->songsPresenter);
         });
 
+        windowsFactory.attach(gui::name::window::all_songs_window,
+                              [&](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<gui::MusicPlayerAllSongsWindow>(app, priv->songsPresenter);
+                              });
         attachPopups({gui::popup::ID::Volume,
                       gui::popup::ID::Tethering,
                       gui::popup::ID::PhoneModes,

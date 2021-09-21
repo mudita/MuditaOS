@@ -21,9 +21,9 @@ void ImageBox::showImage(bool show)
     image->setVisible(show);
 }
 
-void ImageBox::setImage(const UTF8 &name)
+void ImageBox::setImage(const UTF8 &name, ImageTypeSpecifier specifier)
 {
-    image->set(name);
+    image->set(name, specifier);
 }
 
 void ImageBox::setMinimumSizeToFitImage()

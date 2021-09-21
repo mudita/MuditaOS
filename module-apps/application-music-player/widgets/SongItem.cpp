@@ -87,7 +87,7 @@ namespace gui
                     bottorBarText = utils::translate("common_resume");
                     break;
                 case ItemState::None:
-                    bottorBarText = utils::translate("app_music_player_play");
+                    bottorBarText = utils::translate("common_play");
                     break;
                 }
                 if (bottomBarTemporaryMode != nullptr) {
@@ -110,11 +110,11 @@ namespace gui
         itemState = state;
         switch (state) {
         case ItemState::Paused:
-            playedSong->set("now_playing_icon_pause_list");
+            playedSong->set("mp_now_playing_icon_pause_list", musicPlayerStyle::common::imageType);
             playedSong->setVisible(true);
             break;
         case ItemState::Playing:
-            playedSong->set("now_playing_icon_list");
+            playedSong->set("mp_now_playing_icon_list", musicPlayerStyle::common::imageType);
             playedSong->setVisible(true);
             break;
         case ItemState::None:

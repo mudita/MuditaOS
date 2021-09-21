@@ -50,7 +50,9 @@ namespace gui
 
     void OptionWindow::onClose([[maybe_unused]] CloseReason reason)
     {
-        optionsList->onClose();
+        if (optionsList != nullptr) {
+            optionsList->onClose();
+        }
     }
 
     void OptionWindow::onBeforeShow(ShowMode mode, SwitchData *data)
