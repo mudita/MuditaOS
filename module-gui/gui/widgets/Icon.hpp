@@ -24,7 +24,8 @@ namespace gui
              const uint32_t &w,
              const uint32_t &h,
              const UTF8 &imageName,
-             const UTF8 &text);
+             const UTF8 &text,
+             ImageTypeSpecifier specifier = ImageTypeSpecifier::None);
 
         ~Icon() override = default;
 

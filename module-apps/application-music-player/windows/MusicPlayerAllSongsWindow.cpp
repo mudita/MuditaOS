@@ -19,7 +19,6 @@ namespace gui
         app::ApplicationCommon *app, std::shared_ptr<app::music_player::SongsContract::Presenter> windowPresenter)
         : AppWindow(app, gui::name::window::all_songs_window), presenter{windowPresenter}
     {
-        presenter->attach(this);
         buildInterface();
     }
 
@@ -31,26 +30,28 @@ namespace gui
 
     void MusicPlayerAllSongsWindow::buildInterface()
     {
+        presenter->attach(this);
         AppWindow::buildInterface();
 
-        bottomBar->setText(BottomBar::Side::CENTER, utils::translate("app_music_player_music_library"));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate("app_music_player_quit"));
+        setTitle(utils::translate("app_music_player_music_library_window_name"));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
         songsList = new gui::ListView(this,
                                       musicPlayerStyle::allSongsWindow::x,
                                       musicPlayerStyle::allSongsWindow::y,
                                       musicPlayerStyle::allSongsWindow::w,
                                       musicPlayerStyle::allSongsWindow::h,
-                                      presenter->getMusicPlayerItemProvider(),
+                                      presenter->getMusicPlayerModelInterface(),
                                       listview::ScrollBarType::Fixed);
 
         emptyListIcon = new gui::Icon(this,
-                                      ::style::window::default_left_margin,
-                                      ::style::window::default_vertical_pos,
-                                      ::style::window::default_body_width,
-                                      ::style::window::default_body_height,
-                                      "note",
-                                      utils::translate("app_music_player_music_empty_window_notification"));
+                                      style::window::default_left_margin,
+                                      musicPlayerStyle::mainWindow::musicLibraryScreen::emptyLibraryNoteMargin,
+                                      style::window::default_body_width,
+                                      style::window::default_body_height,
+                                      "mp_note",
+                                      utils::translate("app_music_player_music_empty_window_notification"),
+                                      musicPlayerStyle::common::imageType);
 
         emptyListIcon->setAlignment(Alignment::Horizontal::Center);
         songsList->emptyListCallback    = [this]() { emptyListIcon->setVisible(true); };
@@ -69,9 +70,12 @@ namespace gui
     void MusicPlayerAllSongsWindow::onBeforeShow([[maybe_unused]] ShowMode mode, [[maybe_unused]] SwitchData *data)
     {
         presenter->attach(this);
+        presenter->createData();
+        songsList->rebuildList(listview::RebuildType::OnPageElement);
     }
 
-    void MusicPlayerAllSongsWindow::updateSongsState()
+    void MusicPlayerAllSongsWindow::updateSongsState(std::optional<db::multimedia_files::MultimediaFilesRecord> record,
+                                                     RecordState state)
     {
         songsList->rebuildList(gui::listview::RebuildType::InPlace);
     }
@@ -94,11 +98,6 @@ namespace gui
     bool MusicPlayerAllSongsWindow::onInput(const InputEvent &inputEvent)
     {
         if (AppWindow::onInput(inputEvent)) {
-            return true;
-        }
-
-        if (inputEvent.isShortRelease(gui::KeyCode::KEY_ENTER)) {
-            presenter->createData();
             return true;
         }
 

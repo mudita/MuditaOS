@@ -64,7 +64,9 @@ namespace app::music_player
         }
 
         item->activatedCallback = [this, song](gui::Item &) {
+            LOG_ERROR("activatedCallback for %s", song->fileInfo.path.c_str());
             if (shortReleaseCallback != nullptr) {
+                activatedRecord = *song;
                 shortReleaseCallback(song->fileInfo.path);
                 return true;
             }
@@ -112,6 +114,11 @@ namespace app::music_player
         return songContext.currentFileToken;
     }
 
+    std::optional<db::multimedia_files::MultimediaFilesRecord> SongsModel::getActivatedRecord() const noexcept
+    {
+        return activatedRecord;
+    }
+
     std::string SongsModel::getNextFilePath(const std::string &filePath) const
     {
         return songsRepository->getNextFilePath(filePath);
@@ -129,18 +136,21 @@ namespace app::music_player
 
     void SongsModel::setCurrentSongContext(SongContext context)
     {
-        using namespace gui;
         songContext = context;
+        activatedRecord = songsRepository->getRecord(context.filePath);
     }
 
     void SongsModel::clearCurrentSongContext()
     {
         songContext.clear();
+        activatedRecord = std::nullopt;
     }
 
     void SongsModel::clearData()
     {
-        list->reset();
+        if (list != nullptr) {
+            list->reset();
+        }
     }
 
     [[nodiscard]] bool SongsModel::updateRecords(std::vector<db::multimedia_files::MultimediaFilesRecord> records)
@@ -153,7 +163,7 @@ namespace app::music_player
     bool SongsModel::onMusicListRetrieved(const std::vector<db::multimedia_files::MultimediaFilesRecord> &records,
                                           unsigned int repoRecordsCount)
     {
-        if (recordsCount != repoRecordsCount) {
+        if (list != nullptr && recordsCount != repoRecordsCount) {
             recordsCount = repoRecordsCount;
             list->reSendLastRebuildRequest();
             return false;

@@ -15,10 +15,11 @@ namespace app::music_player
 
     struct SongContext
     {
-      public:
+        static constexpr uint32_t StartPos = 0;
         SongState currentSongState = SongState::NotPlaying;
         std::optional<audio::Token> currentFileToken;
         std::string filePath;
+        uint32_t currentPos = StartPos;
 
         void clear();
 
