@@ -4,9 +4,9 @@
 #ifndef DATECOMMON_H
 #define DATECOMMON_H
 
-#include <time/time_conversion_factory.hpp>
-#include <module-utils/Utils.hpp>
-#include <service-time/api/TimeSettingsApi.hpp>
+#include "time_conversion_factory.hpp"
+
+#include <Utils.hpp>
 
 #include <date/date.h>
 
@@ -276,12 +276,6 @@ inline std::string TimePointToLocalizedTimeString(const TimePoint &tp, const std
     return timestamp->str(format);
 }
 
-inline std::string TimePointToLocalizedHourMinString(const TimePoint &tp)
-{
-    return stm::api::isTimeFormat12h() ? TimePointToLocalizedTimeString(tp, "%I:%M")
-                                       : TimePointToLocalizedTimeString(tp, "%H:%M");
-}
-
 inline TimePoint TimePointFromString(const char *s1)
 {
     TimePoint tp;
@@ -324,12 +318,6 @@ inline std::string TimePointToHourString12H(const TimePoint &tp)
         calendar::Timestamp(TimePointToTimeT(tp)).get_UTC_date_time_sub_value(calendar::Timestamp::GetParameters::Hour);
     auto hour12h = date::make12(std::chrono::hours(hour)).count();
     return utils::to_string(hour12h);
-}
-
-inline std::string TimePointToLocalizedHourString(const TimePoint &tp)
-{
-    return stm::api::isTimeFormat12h() ? TimePointToLocalizedTimeString(tp, "%I")
-                                       : TimePointToLocalizedTimeString(tp, "%H");
 }
 
 inline std::string TimePointToHourString24H(const TimePoint &tp)

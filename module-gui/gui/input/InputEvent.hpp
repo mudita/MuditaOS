@@ -3,10 +3,11 @@
 
 #pragma once
 
+#include <hal/key_input/RawKey.hpp>
+
 #include <sstream>
 #include <cstdint>
 #include <type_traits>
-#include "common_data/RawKey.hpp"
 
 namespace gui
 {

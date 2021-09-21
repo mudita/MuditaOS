@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <log.hpp>
+#include <log/log.hpp>
 #include <string>
 #include <json11.hpp>
 

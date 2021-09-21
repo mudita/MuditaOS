@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 #include <purefs/fs/filesystem.hpp>
 #include <errno.h>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <purefs/fs/filesystem_operations.hpp>
 #include <purefs/fs/file_handle.hpp>
 #include <purefs/fs/directory_handle.hpp>

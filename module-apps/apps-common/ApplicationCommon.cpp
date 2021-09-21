@@ -9,12 +9,12 @@
 #include "Timers/TimerFactory.hpp" // for Timer
 #include "StatusBar.hpp"
 #include "status-bar/Time.hpp"
-#include "Translator.hpp"                // for KeyInputSim...
-#include <EventStore.hpp>                // for Battery
-#include "common_data/RawKey.hpp"        // for RawKey, key...
+#include "Translator.hpp" // for KeyInputSim...
+#include <EventStore.hpp> // for Battery
+#include <hal/key_input/RawKey.hpp>
 #include "gui/input/InputEvent.hpp"      // for InputEvent
-#include "log/debug.hpp"                 // for DEBUG_APPLI...
-#include <log.hpp>                       // for LOG_INFO
+#include <log/debug.hpp>                 // for DEBUG_APPLI...
+#include <log/log.hpp>                   // for LOG_INFO
 #include "messages/AppMessage.hpp"       // for AppSwitchMe...
 #include "service-appmgr/Controller.hpp" // for Controller
 #include "actions/AlarmClockStatusChangeParams.hpp"
@@ -36,7 +36,7 @@
 #include <type_traits> // for add_const<>...
 #include <WindowsFactory.hpp>
 #include <service-gui/Common.hpp>
-#include <module-utils/Utils.hpp>
+#include <Utils.hpp>
 #include <service-db/Settings.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
 #include <service-audio/AudioServiceAPI.hpp> // for GetOutputVolume

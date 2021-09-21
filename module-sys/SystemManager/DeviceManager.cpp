@@ -3,7 +3,7 @@
 
 #include <SystemManager/DeviceManager.hpp>
 #include <algorithm>
-#include <log.hpp>
+#include <log/log.hpp>
 
 namespace sys
 {

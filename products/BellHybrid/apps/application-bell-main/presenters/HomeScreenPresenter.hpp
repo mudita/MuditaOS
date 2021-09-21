@@ -9,7 +9,7 @@
 #include <common/models/AbstractAlarmModel.hpp>
 #include <gui/input/InputEvent.hpp>
 #include <Timers/TimerHandle.hpp>
-#include <module-utils/Temperature.hpp>
+#include <Temperature.hpp>
 #include <time/time_locale.hpp>
 #include <utf8/UTF8.hpp>
 

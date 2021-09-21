@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <endpoints/filesystem/FileContext.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 
 FileContext::FileContext(
     std::filesystem::path path, std::size_t size, std::size_t chunkSize, std::string openMode, std::size_t offset)

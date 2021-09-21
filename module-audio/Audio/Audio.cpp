@@ -4,7 +4,7 @@
 #include "Audio.hpp"
 #include "Operation/Operation.hpp"
 
-#include <log.hpp>
+#include <log/log.hpp>
 #include <bsp/headset/headset.hpp>
 
 namespace audio

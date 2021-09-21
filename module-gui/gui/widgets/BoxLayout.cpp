@@ -5,7 +5,7 @@
 #include "BoxLayoutSizeStore.hpp"
 #include <InputEvent.hpp>
 #include <Label.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 #include "assert.h"
 
 namespace gui

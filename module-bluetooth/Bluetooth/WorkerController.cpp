@@ -6,7 +6,7 @@
 #include "Device.hpp"
 #include "interface/profiles/ProfileManager.hpp"
 
-#include <log.hpp>
+#include <log/log.hpp>
 #define BOOST_SML_CFG_DISABLE_MIN_SIZE // GCC10 fix
 #include <boost/sml.hpp>
 #include <magic_enum.hpp>

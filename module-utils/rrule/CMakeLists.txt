@@ -13,12 +13,12 @@ target_include_directories(rrule PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE
 target_link_libraries(rrule
     PUBLIC
         date
-        time
+        utils-time
+        utility
+
     PRIVATE
         ical_cxx
 )
-
-module_is_test_entity(rrule)
 
 if (${ENABLE_TESTS})
     add_subdirectory(test)

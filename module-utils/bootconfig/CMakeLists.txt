@@ -1,24 +1,24 @@
-project( utils-bootconfig VERSION 1.0
-        DESCRIPTION "Library for processing boot config"
+add_library(utils-bootconfig STATIC)
+
+target_sources(utils-bootconfig
+    PRIVATE
+        src/bootconfig.cpp
 )
 
-set ( SOURCES
-    src/bootconfig.cpp
+target_include_directories(utils-bootconfig
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>    
 )
 
-set( INCLUDES
-    include
-)
-
-add_library( ${PROJECT_NAME} STATIC ${SOURCES} )
-
-target_include_directories( ${PROJECT_NAME} PUBLIC ${INCLUDES} )
-
-target_link_libraries( ${PROJECT_NAME}
+target_link_libraries(utils-bootconfig
    PRIVATE
-      module-utils
-      module-vfs
-      hash-library::hash-library
-      Microsoft.GSL::GSL
-      json::json
+        module-os
+        purefs-paths
+        utils-time
+        utility
+        version-header
+
+        Microsoft.GSL::GSL
+        json::json
+        hash-library::hash-library
 )

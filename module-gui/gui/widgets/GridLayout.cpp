@@ -4,7 +4,7 @@
 #include "GridLayout.hpp"
 #include "InputEvent.hpp"
 #include "Style.hpp"
-#include <log.hpp>
+#include <log/log.hpp>
 
 using namespace gui;
 

@@ -5,7 +5,7 @@
 
 #include <endpoints/EndpointFactory.hpp>
 
-#include <log.hpp>
+#include <log/log.hpp>
 
 #include <memory>
 

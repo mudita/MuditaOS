@@ -11,7 +11,7 @@
 #include "AVRCP.hpp"
 #include <Bluetooth/Device.hpp>
 #include <Bluetooth/Error.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <service-bluetooth/BluetoothMessage.hpp>
 #include <Audio/AudioCommon.hpp>
 #include <service-audio/AudioMessage.hpp>

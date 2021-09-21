@@ -3,11 +3,11 @@
 
 #pragma once
 
-#include "log.hpp"
+#include "log/log.hpp"
 
 #include <AlarmEventRecord.hpp>
 #include <time/time_locale.hpp>
-#include <rrule/rrule/rrule.hpp>
+#include <rrule/rrule.hpp>
 #include <utf8/UTF8.hpp>
 
 #include <functional>

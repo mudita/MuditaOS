@@ -7,7 +7,7 @@
 #include "SMSTemplatesWindow.hpp"
 
 #include <i18n/i18n.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <Style.hpp>
 
@@ -73,7 +73,7 @@ namespace gui
     void SMSTemplatesWindow::smsSendTemplateRequestHandler(const SMSSendTemplateRequest *const switchData)
     {
         preventsAutoLock = switchData->isAutoLockPrevented();
-        auto app = dynamic_cast<app::ApplicationMessages *>(application);
+        auto app         = dynamic_cast<app::ApplicationMessages *>(application);
         assert(app != nullptr);
 
         auto phoneNumber       = switchData->getPhoneNumber();

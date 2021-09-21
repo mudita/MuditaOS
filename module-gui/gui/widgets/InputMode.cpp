@@ -4,7 +4,7 @@
 #include <InputMode.hpp>
 #include <i18n/i18n.hpp>
 #include <map>
-#include <log.hpp>
+#include <log/log.hpp>
 
 /// input mode strings - as these are stored in json (in files...)
 const std::map<InputMode::Mode, std::string> input_mode = {

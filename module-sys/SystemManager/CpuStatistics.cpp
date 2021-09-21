@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <SystemManager/CpuStatistics.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <FreeRTOS.h>
 #include <task.h>
 #include <limits>

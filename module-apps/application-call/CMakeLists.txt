@@ -48,7 +48,7 @@ target_link_libraries(application-call
 		service-appmgr
 		service-audio
 		service-db
-		time
+		utils-time
 	PUBLIC
 		apps-common
 		module-sys

@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <module-utils/Temperature.hpp>
+#include <Temperature.hpp>
 #include <widgets/BellSideListItem.hpp>
 #include <widgets/spinners/Spinners.hpp>
 #include <utf8/UTF8.hpp>

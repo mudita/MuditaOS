@@ -87,8 +87,9 @@ target_link_libraries(apps-common
         module-services
         module-sys
         module-utils
-        time
+        utils-time
         utf8
+        version-header
 )
 
 # Board specific compilation definitions,options,include directories and features

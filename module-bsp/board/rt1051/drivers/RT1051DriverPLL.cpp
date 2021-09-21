@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RT1051DriverPLL.hpp"
-#include <log.hpp>
+#include <log/log.hpp>
 #include "board/clock_config.h"
 
 namespace drivers

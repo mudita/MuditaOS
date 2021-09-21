@@ -171,6 +171,7 @@ target_link_libraries(${PROJECT_NAME}
         application-calendar
         Microsoft.GSL::GSL
         rrule
+        board
 )
 
 # Host target configuration(mainly used for unit testing)

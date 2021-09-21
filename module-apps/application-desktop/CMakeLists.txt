@@ -67,7 +67,7 @@ target_link_libraries(application-desktop
 		service-cellular
 		service-db
 		service-time
-		time
+		utils-time
 		utf8
 		utils-bootconfig
 	PUBLIC

@@ -5,5 +5,6 @@ add_catch2_executable(
         test_i18n.cpp
     LIBS
         i18n
+        module-vfs
     USE_FS
 )

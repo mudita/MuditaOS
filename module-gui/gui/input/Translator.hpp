@@ -5,7 +5,7 @@
 
 #include "InputEvent.hpp"
 #include "Profile.hpp"
-#include <common_data/RawKey.hpp>
+#include <hal/key_input/RawKey.hpp>
 #include <cstdint>
 #include <map>
 #include <memory>

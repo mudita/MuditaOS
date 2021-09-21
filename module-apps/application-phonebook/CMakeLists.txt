@@ -67,7 +67,7 @@ target_link_libraries(application-phonebook
         utf8
         module-gui
         module-utils
-        time
+        utils-time
         module-db
         service-appmgr
         service-db

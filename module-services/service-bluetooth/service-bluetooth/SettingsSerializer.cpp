@@ -3,7 +3,7 @@
 
 #include "SettingsSerializer.hpp"
 #include "btstack_util.h"
-#include <log.hpp>
+#include <log/log.hpp>
 
 namespace strings
 {
@@ -40,7 +40,7 @@ auto SettingsSerializer::fromString(const std::string &jsonStr) -> std::vector<D
     for (auto &device : devicesArray) {
         Devicei temp;
         sscanf_bd_addr(device[strings::addr].string_value().c_str(), temp.address);
-        temp.name = device[strings::name].string_value();
+        temp.name        = device[strings::name].string_value();
         temp.deviceState = DeviceState::Paired;
         devicesVector.emplace_back(temp);
     }

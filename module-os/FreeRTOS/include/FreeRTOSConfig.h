@@ -39,101 +39,101 @@
  *----------------------------------------------------------*/
 #include <assert.h>
 #include <stdint.h>
-#include <log.hpp>
+#include <log/log.hpp>
 
-//TODO: Look at tasks.c: void vTaskStepTick( const TickType_t xTicksToJump ) before upgrading FreeRTOS
+// TODO: Look at tasks.c: void vTaskStepTick( const TickType_t xTicksToJump ) before upgrading FreeRTOS
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
-/* System clock frequency. */
-extern uint32_t SystemCoreClock;
+    /* System clock frequency. */
+    extern uint32_t SystemCoreClock;
 #ifdef __cplusplus
 }
 #endif
 
-#define configUSE_PREEMPTION                    1
-#define configUSE_TICKLESS_IDLE                 0
-#define configCPU_CLOCK_HZ                      (SystemCoreClock)
-#define configTICK_RATE_HZ                      ((TickType_t)1000)
-#define configMAX_PRIORITIES                    5
-#define configMINIMAL_STACK_SIZE                ((unsigned short)128)       //< Number of uint32_t's. So value of 128 will mean 512 bytes
-#define configMAX_TASK_NAME_LEN                 64
-#define configUSE_16_BIT_TICKS                  0
-#define configIDLE_SHOULD_YIELD                 1
-#define configUSE_TASK_NOTIFICATIONS            1
-#define configUSE_MUTEXES                       1
-#define configUSE_RECURSIVE_MUTEXES             1
-#define configUSE_COUNTING_SEMAPHORES           1
-#define configUSE_ALTERNATIVE_API               0 /* Deprecated! */
-#define configQUEUE_REGISTRY_SIZE               32
-#define configUSE_QUEUE_SETS                    1
-#define configUSE_TIME_SLICING                  1
+#define configUSE_PREEMPTION          1
+#define configUSE_TICKLESS_IDLE       0
+#define configCPU_CLOCK_HZ            (SystemCoreClock)
+#define configTICK_RATE_HZ            ((TickType_t)1000)
+#define configMAX_PRIORITIES          5
+#define configMINIMAL_STACK_SIZE      ((unsigned short)128) //< Number of uint32_t's. So value of 128 will mean 512 bytes
+#define configMAX_TASK_NAME_LEN       64
+#define configUSE_16_BIT_TICKS        0
+#define configIDLE_SHOULD_YIELD       1
+#define configUSE_TASK_NOTIFICATIONS  1
+#define configUSE_MUTEXES             1
+#define configUSE_RECURSIVE_MUTEXES   1
+#define configUSE_COUNTING_SEMAPHORES 1
+#define configUSE_ALTERNATIVE_API     0 /* Deprecated! */
+#define configQUEUE_REGISTRY_SIZE     32
+#define configUSE_QUEUE_SETS          1
+#define configUSE_TIME_SLICING        1
 #ifdef TARGET_Linux
-#	define configUSE_NEWLIB_REENTRANT              0
+#define configUSE_NEWLIB_REENTRANT 0
 #else
-#	define configUSE_NEWLIB_REENTRANT              1
+#define configUSE_NEWLIB_REENTRANT 1
 #endif
 #define configENABLE_BACKWARD_COMPATIBILITY     1
 #define configNUM_THREAD_LOCAL_STORAGE_POINTERS 5
 #define configUSE_APPLICATION_TASK_TAG          0
 
 /* Memory allocation related definitions. */
-#define configSUPPORT_STATIC_ALLOCATION         1
-#define configSUPPORT_DYNAMIC_ALLOCATION        1
+#define configSUPPORT_STATIC_ALLOCATION  1
+#define configSUPPORT_DYNAMIC_ALLOCATION 1
 #ifdef TARGET_Linux
-#   define configTOTAL_HEAP_SIZE                   ((size_t)(1024*512))
+#define configTOTAL_HEAP_SIZE ((size_t)(1024 * 512))
 #else
-#   define configTOTAL_HEAP_SIZE                   ((size_t)(1024*386))
+#define configTOTAL_HEAP_SIZE ((size_t)(1024 * 386))
 #endif
 
-#define configAPPLICATION_ALLOCATED_HEAP        0
+#define configAPPLICATION_ALLOCATED_HEAP 0
 
 /* Hook function related definitions. */
-#define configUSE_IDLE_HOOK                     0
-#define configUSE_TICK_HOOK                     0
-#define configCHECK_FOR_STACK_OVERFLOW          2
-#define configUSE_MALLOC_FAILED_HOOK            1
-#define configUSE_DAEMON_TASK_STARTUP_HOOK      0
+#define configUSE_IDLE_HOOK                0
+#define configUSE_TICK_HOOK                0
+#define configCHECK_FOR_STACK_OVERFLOW     2
+#define configUSE_MALLOC_FAILED_HOOK       1
+#define configUSE_DAEMON_TASK_STARTUP_HOOK 0
 
 /* Run time and task stats gathering related definitions. */
-#define configGENERATE_RUN_TIME_STATS           1
-#define configUSE_TRACE_FACILITY                1
-#define configUSE_STATS_FORMATTING_FUNCTIONS    1
-#define configRECORD_STACK_HIGH_ADDRESS		    1
+#define configGENERATE_RUN_TIME_STATS        1
+#define configUSE_TRACE_FACILITY             1
+#define configUSE_STATS_FORMATTING_FUNCTIONS 1
+#define configRECORD_STACK_HIGH_ADDRESS      1
 
 /* Co-routine related definitions. */
-#define configUSE_CO_ROUTINES                   0
-#define configMAX_CO_ROUTINE_PRIORITIES         2
+#define configUSE_CO_ROUTINES           0
+#define configMAX_CO_ROUTINE_PRIORITIES 2
 
 /* Software timer related definitions. */
-#define configUSE_TIMERS                        1
-#define configTIMER_TASK_PRIORITY               0
-#define configTIMER_QUEUE_LENGTH                48
-#define configTIMER_TASK_STACK_DEPTH            (1024)
+#define configUSE_TIMERS             1
+#define configTIMER_TASK_PRIORITY    0
+#define configTIMER_QUEUE_LENGTH     48
+#define configTIMER_TASK_STACK_DEPTH (1024)
 
 /* Define to trap errors during development. */
 #ifndef NDEBUG
-#   define configASSERT(x)                      assert(x)
+#define configASSERT(x) assert(x)
 #endif
 
-
 /* Optional functions - most linkers will remove unused functions anyway. */
-#define INCLUDE_vTaskPrioritySet                1
-#define INCLUDE_uxTaskPriorityGet               1
-#define INCLUDE_vTaskDelete                     1
-#define INCLUDE_vTaskSuspend                    1
-#define INCLUDE_vTaskDelayUntil                 1
-#define INCLUDE_vTaskDelay                      1
-#define INCLUDE_xTaskGetSchedulerState          1
-#define INCLUDE_xTaskGetCurrentTaskHandle       1
-#define INCLUDE_uxTaskGetStackHighWaterMark     1
-#define INCLUDE_uxTaskGetStackHighWaterMark2    1
-#define INCLUDE_xTaskGetIdleTaskHandle          1
-#define INCLUDE_eTaskGetState                   0
-#define INCLUDE_xTimerPendFunctionCall          1
-#define INCLUDE_xTaskAbortDelay                 0
-#define INCLUDE_xTaskGetHandle                  0
-#define INCLUDE_xTaskResumeFromISR              1
+#define INCLUDE_vTaskPrioritySet             1
+#define INCLUDE_uxTaskPriorityGet            1
+#define INCLUDE_vTaskDelete                  1
+#define INCLUDE_vTaskSuspend                 1
+#define INCLUDE_vTaskDelayUntil              1
+#define INCLUDE_vTaskDelay                   1
+#define INCLUDE_xTaskGetSchedulerState       1
+#define INCLUDE_xTaskGetCurrentTaskHandle    1
+#define INCLUDE_uxTaskGetStackHighWaterMark  1
+#define INCLUDE_uxTaskGetStackHighWaterMark2 1
+#define INCLUDE_xTaskGetIdleTaskHandle       1
+#define INCLUDE_eTaskGetState                0
+#define INCLUDE_xTimerPendFunctionCall       1
+#define INCLUDE_xTaskAbortDelay              0
+#define INCLUDE_xTaskGetHandle               0
+#define INCLUDE_xTaskResumeFromISR           1
 
 #ifdef __NVIC_PRIO_BITS
 /* __BVIC_PRIO_BITS will be specified when CMSIS is being used. */
@@ -161,30 +161,30 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 
 /* Definitions that map the FreeRTOS port interrupt handlers to their CMSIS
 standard names. */
-#define vPortSVCHandler SVC_Handler
-#define xPortPendSVHandler PendSV_Handler
+#define vPortSVCHandler     SVC_Handler
+#define xPortPendSVHandler  PendSV_Handler
 #define xPortSysTickHandler SysTick_Handler
 
 /* if this is 0 then tickless idle will not fire */
-#define configPRE_SLEEP_PROCESSING      vPortPRE_SLEEP_PROCESSING
-#define configPOST_SLEEP_PROCESSING     vPortPOST_SLEEP_PROCESSING
+#define configPRE_SLEEP_PROCESSING  vPortPRE_SLEEP_PROCESSING
+#define configPOST_SLEEP_PROCESSING vPortPOST_SLEEP_PROCESSING
 //#define configEXPECTED_IDLE_TIME_BEFORE_SLEEP 100
 
-#define configSYSTICK_CLOCK_HZ			(100000U)
+#define configSYSTICK_CLOCK_HZ (100000U)
 /* Low power Tickless idle. Low power timer (GPT) is initialized in application code. */
-#define configGPT_CLOCK_HZ                    (32768U)
+#define configGPT_CLOCK_HZ (32768U)
 
 /* system heap integrity check */
 #ifdef DEBUG_FREERTOS
-#define configSYSTEM_HEAP_STATS           (1)
-#define configUSER_HEAP_STATS             (1)
-#define configSYSTEM_HEAP_INTEGRITY_CHECK (1)
+#define configSYSTEM_HEAP_STATS              (1)
+#define configUSER_HEAP_STATS                (1)
+#define configSYSTEM_HEAP_INTEGRITY_CHECK    (1)
 #define PROJECT_CONFIG_HEAP_INTEGRITY_CHECKS (1)
 #endif
 
 extern void vConfigureTimerForRunTimeStats(void);
 extern uint32_t ulHighFrequencyTimerTicks(void);
 #define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() vConfigureTimerForRunTimeStats()
-#define portGET_RUN_TIME_COUNTER_VALUE() ulHighFrequencyTimerTicks()
+#define portGET_RUN_TIME_COUNTER_VALUE()         ulHighFrequencyTimerTicks()
 
 #endif /* FREERTOS_CONFIG_H */

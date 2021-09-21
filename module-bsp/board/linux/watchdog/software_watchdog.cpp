@@ -5,7 +5,7 @@
 #include <module-os/RTOSWrapper/include/critical.hpp>
 #include <module-os/RTOSWrapper/include/ticks.hpp>
 #include <Service/Common.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <cstdlib>
 
 namespace bsp::watchdog

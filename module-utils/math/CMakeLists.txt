@@ -1,6 +1,6 @@
-add_library(math INTERFACE)
+add_library(utils-math INTERFACE)
 
-target_include_directories(math
+target_include_directories(utils-math
     INTERFACE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 )

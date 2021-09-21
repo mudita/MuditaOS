@@ -4,7 +4,7 @@
 #include "Font.hpp"
 #include "FontManager.hpp" // for FontManager
 #include "RawFont.hpp"
-#include <log.hpp>
+#include <log/log.hpp>
 #include <algorithm>
 #include <sstream>
 

@@ -3,7 +3,7 @@
 
 #include <SystemManager/CpuGovernor.hpp>
 #include <algorithm>
-#include <log.hpp>
+#include <log/log.hpp>
 
 namespace sys
 {

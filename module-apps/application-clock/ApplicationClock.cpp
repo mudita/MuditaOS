@@ -6,7 +6,7 @@
 #include "gui/widgets/Window.hpp"
 
 // module-utils
-#include <log.hpp>
+#include <log/log.hpp>
 #include <service-evtmgr/EVMessages.hpp>
 #include <service-evtmgr/EventManagerCommon.hpp>
 #include <Timers/TimerFactory.hpp>

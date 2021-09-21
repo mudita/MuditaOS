@@ -76,7 +76,7 @@ target_link_libraries(application-messages
         service-appmgr
         service-cellular
         service-db
-        time
+        utils-time
     PUBLIC
         apps-common
         module-db

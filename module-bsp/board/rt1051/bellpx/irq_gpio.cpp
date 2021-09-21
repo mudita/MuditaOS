@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "board/irq_gpio.hpp"
-#include <module-utils/Utils.hpp>
+#include <Utils.hpp>
 
 #include "board.h"
 #include "FreeRTOS.h"

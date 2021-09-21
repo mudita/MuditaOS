@@ -3,7 +3,7 @@
 
 #include "TextLineCursor.hpp"
 #include "Text.hpp"
-#include <log.hpp>
+#include <log/log.hpp>
 
 #define debug_text_cursor(...)
 // #define debug_text_cursor(...) LOG_DEBUG(__VA_ARGS__)

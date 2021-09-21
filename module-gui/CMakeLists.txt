@@ -14,17 +14,20 @@ include_directories( ../module-utils )
 
 target_link_libraries(${PROJECT_NAME} 
     PUBLIC 
-        ${TARGET_LIBRARIES} 
+        ${TARGET_LIBRARIES}
+        module-bsp
         eventstore
-        math
-        module-utils 
+        utils-math
+        module-utils
+        sys-timers
+        sys-watchdog
         utf8
     PRIVATE
         i18n
         json::json
         Microsoft.GSL::GSL
         pugixml::pugixml
-        time
+        utils-time
 )
 
 # Board specific compilation definitions,options,include directories and features

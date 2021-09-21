@@ -3,10 +3,9 @@
 
 #include "critical.hpp"
 #include <fstream>
-#include <gsl/util>
 #include "LockGuard.hpp"
 #include <Logger.hpp>
-#include <module-utils/Utils.hpp>
+#include <Utils.hpp>
 #include <portmacro.h>
 #include <ticks.hpp>
 #include "macros.h"

@@ -1,3 +1,5 @@
+add_library(board STATIC)
+
 add_subdirectory(cmsis)
 add_subdirectory(${BOARD})
 
@@ -24,11 +26,13 @@ target_include_directories(board
     PUBLIC
         $<BUILD_INTERFACE:
             ${CMAKE_CURRENT_SOURCE_DIR}
-            ${CMAKE_CURRENT_SOURCE_DIR}/newlib/include
         >
 )
 
 target_link_libraries(board
     PUBLIC
+        fsl
+        module-vfs
+        log-api
         CrashCatcher::CrashCatcher
 )

@@ -3,7 +3,7 @@
 
 #include <endpoints/update/UpdateHelper.hpp>
 #include <endpoints/Context.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <SystemManager/SystemManagerCommon.hpp>
 #include <purefs/filesystem_paths.hpp>
 

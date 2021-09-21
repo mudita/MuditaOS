@@ -13,7 +13,7 @@
 #include <Dialog.hpp>
 #include <OptionWindow.hpp>
 #include <i18n/i18n.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <MessageType.hpp>
 #include <module-db/queries/calllog/QueryCalllogSetAllRead.hpp>
 #include <module-db/queries/notifications/QueryNotificationsClear.hpp>

@@ -12,5 +12,7 @@ add_gtest_executable(
         LIBS
                 module-utils
                 module-gui
+                sys-service
+                sys-timers
         USE_FS
 )

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include <module-utils/Utils.hpp>
+#include <Utils.hpp>
 #include <utility>
 
 namespace bsp::cellular
@@ -50,7 +50,7 @@ namespace bsp::cellular
 
         [[nodiscard]] auto serialize() const -> std::unique_ptr<uint8_t[]>
         {
-            auto serialized     = std::make_unique< uint8_t[]>(data.size() + sizeof(resultCode));
+            auto serialized     = std::make_unique<uint8_t[]>(data.size() + sizeof(resultCode));
             serialized.get()[0] = static_cast<unsigned char>(resultCode);
 
             if (data.size() > 0) {

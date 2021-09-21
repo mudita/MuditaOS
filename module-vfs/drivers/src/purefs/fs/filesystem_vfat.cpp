@@ -8,7 +8,7 @@
 #include <purefs/fs/drivers/file_handle_vfat.hpp>
 #include <purefs/fs/drivers/directory_handle_vfat.hpp>
 #include <purefs/fs/mount_flags.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <fatfs/volume_mapper.hpp>
 #include <ff.h>
 #include <sys/statvfs.h>

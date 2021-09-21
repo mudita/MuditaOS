@@ -18,7 +18,7 @@
 #include <Tables/CountryCodesTable.hpp>
 #include <ThreadRecord.hpp>
 #include <Utils.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <queries/messages/threads/QueryThreadGetByNumber.hpp>
 
 #include <utility>

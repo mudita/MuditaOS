@@ -8,7 +8,7 @@
 
 #include <at/response.hpp>
 #include <EventStore.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <MessageType.hpp>
 #include <Timers/TimerFactory.hpp>
 #include <projdefs.h>
