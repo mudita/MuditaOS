@@ -120,7 +120,9 @@ namespace app
     {
         if (auto window = getCurrentWindow()->getName();
             window == app::window::name::desktop_main_window || window == gui::popup::window::phone_lock_window) {
-            switchWindow(window, std::move(notificationsParams));
+
+            auto refreshMode = getRefreshModeFromNotifications(notificationsParams.get());
+            updateCurrentWindow(std::move(notificationsParams), gui::ShowMode::GUI_SHOW_INIT, refreshMode);
         }
     }
 

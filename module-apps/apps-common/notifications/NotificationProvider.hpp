@@ -40,7 +40,7 @@ namespace notifications
         void handle(sys::phone_modes::Tethering tethering);
         void handleSnooze(unsigned snoozeCount);
         void requestNotSeenNotifications();
-        void send();
+        void send(NotificationOnReceiveUpdate updateOnReceive = NotificationOnReceiveUpdate::FullRebuild);
 
         using Notifications = std::map<NotificationType, std::shared_ptr<Notification>>;
 

@@ -223,10 +223,12 @@ namespace app
         void render(gui::RefreshModes mode);
 
         /// Responsible for sending updated data to the current window.
-        /// @note Sending different window name than the current one won't cause switch.
-        /// @param windowName name of the window that suppose to be updated.
         /// @param data contextual data for windows flow control.
-        void updateWindow(const std::string &windowName, std::unique_ptr<gui::SwitchData> data);
+        /// @param cmd command for Application, right now it's either: Start or Return. As user only Start is used.
+        /// @param refreshMode refresh mode to be used when updating window.
+        void updateCurrentWindow(std::unique_ptr<gui::SwitchData> data = nullptr,
+                                 gui::ShowMode command                 = gui::ShowMode::GUI_SHOW_INIT,
+                                 gui::RefreshModes refreshMode         = gui::RefreshModes::GUI_REFRESH_FAST);
 
         /// Method sending switch command for another window. It will switch window within active application.
         /// To switch windows between applications use app::manager::Controller::switchApplication
@@ -416,6 +418,7 @@ namespace app
 
         void addActionReceiver(manager::actions::ActionId actionId, OnActionReceived &&callback);
         virtual void handleNotificationsChanged(std::unique_ptr<gui::SwitchData> notificationsParams);
+        gui::RefreshModes getRefreshModeFromNotifications(gui::SwitchData *notificationsParams);
 
         std::unique_ptr<StatusBarManager> statusBarManager;
 
