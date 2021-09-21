@@ -43,7 +43,7 @@ namespace app::home_screen
                     detachTimer(presenter);
                 };
 
-            auto isAlarmActive = [](AbstractAlarmModel &alarmModel) -> bool { return alarmModel.isActive(); };
+            auto isAlarmActive   = [](AbstractAlarmModel &alarmModel) -> bool { return alarmModel.isActive(); };
             auto isSnoozeAllowed = [](AbstractAlarmModel &alarmModel) -> bool { return alarmModel.isSnoozeAllowed(); };
 
         } // namespace Helpers
@@ -240,6 +240,7 @@ namespace app::home_screen
                                              "DeactivatedWait"_s + sml::on_exit<_> / DeactivatedWait::exit,
                                              "DeactivatedWait"_s + event<Events::Timer> = "Deactivated"_s,
                                              "DeactivatedWait"_s + event<Events::LightPress>/ Helpers::switchToMenu = "Deactivated"_s,
+                                             "DeactivatedWait"_s + event<Events::DeepUpPress> / Helpers::detachTimer = "ActivatedWait"_s,
 
                                              "DeactivatedEdit"_s + sml::on_entry<_> / AlarmEdit::entry,
                                              "DeactivatedEdit"_s + sml::on_exit<_> / AlarmEdit::exit,
@@ -259,6 +260,7 @@ namespace app::home_screen
                                              "ActivatedWait"_s + sml::on_exit<_> / ActivatedWait::exit,
                                              "ActivatedWait"_s + event<Events::Timer> / Helpers::makeAlarmNonEditable = "Activated"_s,
                                              "ActivatedWait"_s + event<Events::LightPress>/ Helpers::switchToMenu = "Activated"_s,
+                                             "ActivatedWait"_s + event<Events::DeepDownPress>/ Helpers::detachTimer = "DeactivatedWait"_s,
 
                                              "Activated"_s + sml::on_entry<_> / Activated::entry,
                                              "Activated"_s [not Helpers::isAlarmActive] = "Deactivated"_s,
