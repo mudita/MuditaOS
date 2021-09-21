@@ -30,7 +30,7 @@ namespace db::multimedia_files
 
     struct AudioProperties
     {
-        unsigned songLength{}; /// in minutes
+        unsigned songLength{}; /// in seconds
         unsigned bitrate{};    /// in kb/s
         unsigned sampleRate{}; /// in Hz
         unsigned channels{};   /// 1 - mono, 2 - stereo

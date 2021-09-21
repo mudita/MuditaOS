@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -9,14 +9,12 @@
 
 namespace gui
 {
-    class MusicPlayerAllSongsWindow;
     namespace name
     {
         namespace window
         {
+            inline constexpr auto track_info_window = "Track Info";
             inline constexpr auto all_songs_window = "All Songs";
-            inline constexpr auto player_window    = "Player";
-            inline constexpr auto empty_window     = "Empty";
         }; // namespace window
     };     // namespace name
 };         // namespace gui

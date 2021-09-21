@@ -15,13 +15,14 @@ Icon::Icon(Item *parent,
            const uint32_t &w,
            const uint32_t &h,
            const UTF8 &imageName,
-           const UTF8 &str)
+           const UTF8 &str,
+           ImageTypeSpecifier specifier)
     : VBox(parent, x, y, w, h)
 {
     setEdges(RectangleEdge::None);
     setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
-    image = new Image(this, imageName);
+    image = new Image(this, imageName, specifier);
     image->setMargins(Margins(0, icon::image_top_margin, 0, icon::image_bottom_margin));
 
     text = new Text(this, 0, 0, 0, 0);

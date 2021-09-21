@@ -11,6 +11,7 @@ namespace app::music_player
         currentSongState = SongState::NotPlaying;
         currentFileToken = std::nullopt;
         filePath         = "";
+        currentPos       = 0;
     }
 
     bool SongContext::isValid() const
