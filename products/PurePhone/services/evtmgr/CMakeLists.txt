@@ -6,6 +6,7 @@ target_sources(evtmgr
         WorkerEvent.cpp
         WorkerEvent.hpp
         screen-light-control/ScreenLightControl.cpp
+        backlight-handler/BacklightHandler.cpp
     PUBLIC
         include/evtmgr/EVMessages.hpp
         include/evtmgr/EventManager.hpp

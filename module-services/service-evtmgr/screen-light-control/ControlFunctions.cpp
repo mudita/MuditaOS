@@ -95,4 +95,9 @@ namespace screen_light_control::functions
         }
     }
 
+    void setRampTarget(bsp::eink_frontlight::BrightnessPercentage value)
+    {
+        rampTarget = value;
+    }
+
 } // namespace screen_light_control::functions
