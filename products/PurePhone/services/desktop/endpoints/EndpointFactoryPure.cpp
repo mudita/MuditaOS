@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <endpoints/EndpointFactory.hpp>
+#include "EndpointFactoryPure.hpp"
 
 #include <endpoints/backup/BackupEndpoint.hpp>
 #include <endpoints/bluetooth/BluetoothEndpoint.hpp>
@@ -14,12 +14,13 @@
 #include <endpoints/messages/MessagesEndpoint.hpp>
 #include <endpoints/nullEndpoint/NullEndpoint.hpp>
 #include <endpoints/restore/RestoreEndpoint.hpp>
+#include <endpoints/security/SecurityEndpoint.hpp>
 #include <endpoints/update/UpdateEndpoint.hpp>
 
 namespace sdesktop::endpoints
 {
 
-    std::unique_ptr<Endpoint> EndpointFactory::create(Context &context, sys::Service *ownerServicePtr)
+    std::unique_ptr<Endpoint> EndpointFactoryPure::constructEndpoint(Context &context, sys::Service *ownerServicePtr)
     {
         LOG_DEBUG("Creating endpoint: %d", static_cast<int>(context.getEndpoint()));
         switch (context.getEndpoint()) {
@@ -54,10 +55,10 @@ namespace sdesktop::endpoints
         }
     }
 
-    SecuredEndpointFactory::SecuredEndpointFactory(EndpointSecurity security) : endpointSecurity(security)
+    EndpointFactoryPure::EndpointFactoryPure(EndpointSecurity security) : EndpointFactory{}, endpointSecurity{security}
     {}
 
-    std::unique_ptr<Endpoint> SecuredEndpointFactory::create(Context &context, sys::Service *ownerServicePtr)
+    std::unique_ptr<Endpoint> EndpointFactoryPure::create(Context &context, sys::Service *ownerServicePtr)
     {
         auto security = endpointSecurity;
         if (std::find(Whitelist.begin(), Whitelist.end(), context.getEndpoint()) != Whitelist.end()) {
@@ -66,10 +67,15 @@ namespace sdesktop::endpoints
 
         switch (security) {
         case EndpointSecurity::Allow:
-            return EndpointFactory::create(context, ownerServicePtr);
+            return constructEndpoint(context, ownerServicePtr);
         default:
             return std::make_unique<SecuredEndpoint>(ownerServicePtr);
         }
+    }
+
+    auto EndpointFactory::create(EndpointSecurity security) -> std::unique_ptr<EndpointFactory>
+    {
+        return std::make_unique<EndpointFactoryPure>(security);
     }
 
 } // namespace sdesktop::endpoints
