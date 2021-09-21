@@ -5,7 +5,7 @@
 
 #include <service-evtmgr/EventManagerCommon.hpp>
 
-#include <backlight-handler/BacklightHandler.hpp>
+#include "BacklightHandler.hpp"
 
 namespace hal::temperature
 {

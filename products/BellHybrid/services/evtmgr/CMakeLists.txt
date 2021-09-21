@@ -11,6 +11,7 @@ target_sources(evtmgr
 
         internal/StaticData.hpp
         screen-light-control/ScreenLightControl.cpp
+        backlight-handler/BacklightHandler.cpp
     PUBLIC
         include/evtmgr/EventManager.hpp
         include/evtmgr/api/TemperatureApi.hpp

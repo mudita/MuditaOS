@@ -59,6 +59,10 @@ void EventManager::handleKeyEvent(sys::Message *msg)
                 service::name::system_manager);
         }
     }
+
+    if (kbdMessage->key.state == RawKey::State::Pressed) {
+        backlightHandler.handleKeyPressed(static_cast<int>(key));
+    }
 }
 
 auto EventManager::createEventWorker() -> std::unique_ptr<WorkerEventCommon>
@@ -94,6 +98,9 @@ void EventManager::initProductEvents()
             backlightHandler.getScreenLightState(), backlightHandler.getScreenAutoModeState(), params);
         return msg;
     });
+
+    backlightHandler.processScreenRequest(screen_light_control::Action::enableAutomaticMode,
+                                          screen_light_control::Parameters());
 }
 
 sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
