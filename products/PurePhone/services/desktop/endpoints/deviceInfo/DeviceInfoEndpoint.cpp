@@ -8,7 +8,6 @@
 #include <EventStore.hpp>
 #include <product/version.hpp>
 #include <service-desktop/ServiceDesktop.hpp>
-#include <version.hpp>
 
 #include <cstdint>
 #include <string>
