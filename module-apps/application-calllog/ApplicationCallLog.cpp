@@ -24,10 +24,9 @@ namespace app
 {
     ApplicationCallLog::ApplicationCallLog(std::string name,
                                            std::string parent,
-                                           sys::phone_modes::PhoneMode phoneMode,
-                                           sys::bluetooth::BluetoothMode bluetoothMode,
+                                           StatusIndicators statusIndicators,
                                            StartInBackground startInBackground)
-        : Application(name, parent, phoneMode, bluetoothMode, startInBackground, 4096)
+        : Application(name, parent, statusIndicators, startInBackground, 4096)
     {
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         addActionReceiver(manager::actions::ShowCallLog, [this](auto &&data) {

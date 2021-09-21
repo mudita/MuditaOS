@@ -79,6 +79,14 @@ namespace gui
         return statusBar->updateBluetooth(mode);
     }
 
+    bool AppWindow::updateAlarmClock(bool status)
+    {
+        if (statusBar == nullptr) {
+            return false;
+        }
+        return statusBar->updateAlarmClock(status);
+    }
+
     bool AppWindow::updateSim()
     {
         if (statusBar == nullptr) {

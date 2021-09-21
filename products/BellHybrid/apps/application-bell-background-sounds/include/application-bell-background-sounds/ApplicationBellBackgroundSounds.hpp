@@ -12,12 +12,10 @@ namespace app
     class ApplicationBellBackgroundSounds : public Application
     {
       public:
-        ApplicationBellBackgroundSounds(
-            std::string name                            = applicationBellBackgroundSoundsName,
-            std::string parent                          = "",
-            sys::phone_modes::PhoneMode mode            = sys::phone_modes::PhoneMode::Offline,
-            sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled,
-            StartInBackground startInBackground         = {false});
+        ApplicationBellBackgroundSounds(std::string name                    = applicationBellBackgroundSoundsName,
+                                        std::string parent                  = "",
+                                        StatusIndicators statusIndicators   = StatusIndicators{},
+                                        StartInBackground startInBackground = {false});
 
         sys::ReturnCodes InitHandler() override;
 

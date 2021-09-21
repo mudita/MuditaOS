@@ -172,6 +172,15 @@ namespace stm
                 });
                 return std::make_shared<sys::ResponseMessage>();
             });
+        connect(typeid(alarms::RegisterActiveAlarmsIndicatorHandlerRequestMessage),
+                [&](sys::Message *request) -> sys::MessagePointer {
+                    auto senderName = request->sender;
+                    alarmMessageHandler->handleAddActiveAlarmCountChangeCallback(
+                        [this, senderName](bool isAnyAlarmActive) {
+                            bus.sendUnicast(std::make_shared<alarms::ActiveAlarmMessage>(isAnyAlarmActive), senderName);
+                        });
+                    return std::make_shared<sys::ResponseMessage>();
+                });
     }
 
     auto ServiceTime::handleSetAutomaticDateAndTimeRequest(sys::Message *request)

@@ -19,13 +19,11 @@ namespace app
     class ApplicationBellMain : public Application
     {
       public:
-        explicit ApplicationBellMain(
-            std::string name                            = applicationBellName,
-            std::string parent                          = "",
-            sys::phone_modes::PhoneMode mode            = sys::phone_modes::PhoneMode::Offline,
-            sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled,
-            StartInBackground startInBackground         = {false},
-            std::uint32_t stackDepth                    = 8192);
+        explicit ApplicationBellMain(std::string name                    = applicationBellName,
+                                     std::string parent                  = "",
+                                     StatusIndicators statusIndicators   = StatusIndicators{},
+                                     StartInBackground startInBackground = {false},
+                                     std::uint32_t stackDepth            = 8192);
 
         sys::ReturnCodes InitHandler() override;
 

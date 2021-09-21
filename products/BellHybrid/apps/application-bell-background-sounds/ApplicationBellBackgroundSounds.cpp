@@ -9,10 +9,9 @@ namespace app
 {
     ApplicationBellBackgroundSounds::ApplicationBellBackgroundSounds(std::string name,
                                                                      std::string parent,
-                                                                     sys::phone_modes::PhoneMode mode,
-                                                                     sys::bluetooth::BluetoothMode bluetoothMode,
+                                                                     StatusIndicators statusIndicators,
                                                                      StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), mode, bluetoothMode, startInBackground)
+        : Application(std::move(name), std::move(parent), statusIndicators, startInBackground)
     {}
 
     sys::ReturnCodes ApplicationBellBackgroundSounds::InitHandler()

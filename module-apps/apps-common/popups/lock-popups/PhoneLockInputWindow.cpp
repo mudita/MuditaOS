@@ -43,6 +43,7 @@ namespace gui
             appConfiguration.enable(status_bar::Indicator::Signal);
             appConfiguration.enable(status_bar::Indicator::SimCard);
             appConfiguration.enable(status_bar::Indicator::Bluetooth);
+            appConfiguration.enable(status_bar::Indicator::AlarmClock);
         }
         else {
             appConfiguration.enable(status_bar::Indicator::Time);

@@ -19,11 +19,10 @@ namespace app
       public:
         std::string requester = "";
 
-        ApplicationSpecialInput(std::string name                            = special_input,
-                                std::string parent                          = {},
-                                sys::phone_modes::PhoneMode phoneMode       = sys::phone_modes::PhoneMode::Connected,
-                                sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled,
-                                StartInBackground startInBackground         = {true});
+        ApplicationSpecialInput(std::string name                    = special_input,
+                                std::string parent                  = {},
+                                StatusIndicators statusIndicators   = StatusIndicators{},
+                                StartInBackground startInBackground = {true});
         virtual ~ApplicationSpecialInput() = default;
 
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
