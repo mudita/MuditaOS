@@ -2,70 +2,84 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
+
+#include <module-gui/gui/Common.hpp>
 #include <Style.hpp>
 
 namespace musicPlayerStyle
 {
+    namespace common
+    {
+        constexpr gui::ImageTypeSpecifier imageType = gui::ImageTypeSpecifier ::W_G;
+    }
+
     namespace mainWindow
     {
-        namespace songTitle
+        namespace startScreen
         {
-            constexpr uint32_t x = 40;
-            constexpr uint32_t y = 110;
-            constexpr uint32_t w = 400;
-            constexpr uint32_t h = 35;
-        } // namespace songTitle
-        namespace songAuthor
+            constexpr uint32_t noteUpMargin            = 100;
+            constexpr uint32_t noteSize                = 132;
+            constexpr uint32_t noteDownMargin          = 28;
+            constexpr uint32_t descriptionWidth        = 400;
+            constexpr uint32_t descriptionHeight       = 66;
+            constexpr uint32_t descriptionBottomMargin = 40;
+            constexpr uint32_t buttonsBottomMargin     = 40;
+        } // namespace startScreen
+
+        namespace trackInfoScreen
         {
-            constexpr uint32_t x = 40;
-            constexpr uint32_t y = 161;
-            constexpr uint32_t w = 400;
-            constexpr uint32_t h = 35;
-        } // namespace songAuthor
-        namespace songProgress
+            constexpr uint32_t topMargin      = 110;
+            constexpr uint32_t titleHeight    = 40;
+            constexpr uint32_t internalMargin = 16;
+            constexpr uint32_t artistHeight   = 30;
+            constexpr uint32_t swipeBarMargin = 65;
+        } // namespace trackInfoScreen
+
+        namespace musicLibraryScreen
         {
-            constexpr uint32_t x = 31;
-            constexpr uint32_t y = 232;
-            constexpr uint32_t w = 419;
-            constexpr uint32_t h = 12;
-        } // namespace songProgress
-        namespace songCurrentTime
+            constexpr uint32_t topArrowMargin         = 15;
+            constexpr uint32_t emptyLibraryNoteMargin = 165;
+            constexpr uint32_t bottomArrowMargin      = 15;
+            constexpr uint32_t optionListHeight       = 280;
+        } // namespace musicLibraryScreen
+
+        namespace playButtons
         {
-            constexpr uint32_t x = 30;
-            constexpr uint32_t y = 270;
-            constexpr uint32_t w = 100;
-            constexpr uint32_t h = 20;
-        } // namespace songCurrentTime
-        namespace songDuration
+            constexpr uint32_t width          = 330;
+            constexpr uint32_t height         = 50;
+            constexpr uint32_t internalMargin = 10;
+        } // namespace playButtons
+
+        namespace lineArrow
         {
-            constexpr uint32_t x = 350;
-            constexpr uint32_t y = 278;
-            constexpr uint32_t w = 100;
-            constexpr uint32_t h = 20;
-        } // namespace songDuration
-        namespace rewind
+            constexpr uint32_t textWidth      = 240;
+            constexpr uint32_t textHeight     = 30;
+            constexpr uint32_t internalMargin = 12;
+        } // namespace lineArrow
+
+        namespace trackInfo
         {
-            constexpr uint32_t x = 84;
-            constexpr uint32_t y = 342;
-        } // namespace rewind
-        namespace fastForward
+            constexpr uint32_t topMargin      = 125;
+            constexpr uint32_t width          = 430;
+            constexpr uint32_t height         = 45;
+            constexpr uint32_t internalMargin = 24;
+        } // namespace trackInfo
+
+        namespace trackProgress
         {
-            constexpr uint32_t x = 364;
-            constexpr uint32_t y = 342;
-        } // namespace fastForward
-        namespace action
-        {
-            constexpr uint32_t x = 224;
-            constexpr uint32_t y = 342;
-        } // namespace action
-        namespace musicLibrary
-        {
-            constexpr uint32_t x = 140;
-            constexpr uint32_t y = 456;
-            constexpr uint32_t w = 201;
-            constexpr uint32_t h = 20;
-        } // namespace musicLibrary
+            constexpr uint32_t topMargin         = 44;
+            constexpr uint32_t bottomMargin      = 38;
+            constexpr uint32_t height            = 60;
+            constexpr uint32_t barWidth          = 419;
+            constexpr uint32_t barThickness      = 3;
+            constexpr uint32_t barHeight         = 15;
+            constexpr uint32_t bottomHeight      = 45;
+            constexpr uint32_t descriptionWidth  = 40;
+            constexpr uint32_t descriptionHeight = 24;
+
+        } // namespace trackProgress
     }     // namespace mainWindow
+
     namespace allSongsWindow
     {
         constexpr uint32_t x = style::window::default_left_margin;
@@ -75,26 +89,6 @@ namespace musicPlayerStyle
         // Bottom margin need to be added to fit all elements.
         constexpr uint32_t h = style::window_height - y - style::footer::height + style::margins::small;
     } // namespace allSongsWindow
-    namespace emptyWindow
-    {
-        namespace noteImg
-        {
-            constexpr uint32_t x = 176;
-            constexpr uint32_t y = 102;
-        } // namespace noteImg
-        namespace placeHolderImg
-        {
-            constexpr uint32_t x = 80;
-            constexpr uint32_t y = 374;
-        } // namespace placeHolderImg
-        namespace infoText
-        {
-            constexpr uint32_t x = 40;
-            constexpr uint32_t y = 260;
-            constexpr uint32_t w = 400;
-            constexpr uint32_t h = 66;
-        } // namespace infoText
-    }     // namespace emptyWindow
 
     namespace songItem
     {
@@ -109,22 +103,5 @@ namespace musicPlayerStyle
         constexpr int32_t rightMargin = 4;
 
     } // namespace songItem
-
-    namespace volumeLabel
-    {
-        constexpr uint32_t x = 0;
-        constexpr uint32_t y = 52;
-
-        constexpr uint32_t w = style::window_width;
-        constexpr uint32_t h = 52;
-
-        constexpr auto defaultVolumeLabelText = "Vol: 10";
-
-        constexpr int32_t topMargin    = 0;
-        constexpr int32_t bottomMargin = 0;
-
-        constexpr int32_t leftMargin  = 16;
-        constexpr int32_t rightMargin = 0;
-    } // namespace volumeLabel
 
 } // namespace musicPlayerStyle

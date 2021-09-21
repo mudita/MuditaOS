@@ -56,6 +56,8 @@ namespace app::music_player
                                        const OnGetMusicFilesListCallback &callback) = 0;
         virtual std::string getNextFilePath(const std::string &filePath) const     = 0;
         virtual std::string getPreviousFilePath(const std::string &filePath) const = 0;
+        virtual std::optional<db::multimedia_files::MultimediaFilesRecord> getRecord(
+            const std::string &filePath) const                                      = 0;
         virtual void updateRepository(const std::string &filePath)                  = 0;
     };
 
@@ -70,6 +72,8 @@ namespace app::music_player
                                const OnGetMusicFilesListCallback &callback) override;
         std::string getNextFilePath(const std::string &filePath) const override;
         std::string getPreviousFilePath(const std::string &filePath) const override;
+        std::optional<db::multimedia_files::MultimediaFilesRecord> getRecord(
+            const std::string &filePath) const override;
 
         /// If the currently playing track is not included in the musicFilesCache then we request new data of the size
         /// of the cache otherwise if the index number of the currently playing track exceeds the upper or lower

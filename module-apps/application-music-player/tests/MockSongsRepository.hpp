@@ -25,6 +25,10 @@ namespace testing::app::music_player
         MOCK_METHOD(std::size_t, getFileIndex, (const std::string &filePath), (const override));
         MOCK_METHOD(std::string, getNextFilePath, (const std::string &filePath), (const override));
         MOCK_METHOD(std::string, getPreviousFilePath, (const std::string &filePath), (const override));
+        MOCK_METHOD(std::optional<db::multimedia_files::MultimediaFilesRecord>,
+                    getRecord,
+                    (const std::string &filePath),
+                    (const override));
         MOCK_METHOD(void, updateRepository, (const std::string &filePath), (override));
     };
 }; // namespace testing::app::music_player

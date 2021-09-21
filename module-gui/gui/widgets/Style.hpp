@@ -191,6 +191,7 @@ namespace style
             inline constexpr auto stop           = "common_stop";
             inline constexpr auto resume         = "common_resume";
             inline constexpr auto pause          = "common_pause";
+            inline constexpr auto play           = "common_play";
             inline constexpr auto accept         = "common_accept";
             inline constexpr auto retry          = "common_retry";
             inline constexpr auto replace        = "common_replace";

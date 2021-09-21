@@ -4,15 +4,22 @@
 #include "SongsPresenter.hpp"
 
 #include <service-audio/AudioMessage.hpp>
+#include <Timers/TimerFactory.hpp>
+#include <algorithm>
 
 namespace app::music_player
 {
-    SongsPresenter::SongsPresenter(std::shared_ptr<app::music_player::SongsModelInterface> songsModelInterface,
+    SongsPresenter::SongsPresenter(app::ApplicationCommon *app,
+                                   std::shared_ptr<app::music_player::SongsModelInterface> songsModelInterface,
                                    std::unique_ptr<AbstractAudioOperations> &&audioOperations)
         : songsModelInterface{std::move(songsModelInterface)}, audioOperations{std::move(audioOperations)}
-    {}
+    {
+        auto tick         = std::chrono::seconds{1};
+        songProgressTimer = sys::TimerFactory::createPeriodicTimer(
+            app, "MP Song Progres", tick, [this]([[maybe_unused]] sys::Timer &) { handleTrackProgressTick(); });
+    }
 
-    std::shared_ptr<app::music_player::SongsListItemProvider> SongsPresenter::getMusicPlayerItemProvider() const
+    std::shared_ptr<app::music_player::SongsModelInterface> SongsPresenter::getMusicPlayerModelInterface() const
     {
         return songsModelInterface;
     }
@@ -35,13 +42,19 @@ namespace app::music_player
                           token.IsValid());
                 return;
             }
-            SongContext songToken{SongState::Playing, token, filePath};
-            songsModelInterface->setCurrentSongContext(songToken);
+
+            SongContext songContext{SongState::Playing, token, filePath, SongContext::StartPos};
+            songsModelInterface->setCurrentSongContext(songContext);
+
             if (changePlayingStateCallback != nullptr) {
                 changePlayingStateCallback(SongState::Playing);
             }
             updateViewSongState();
             songsModelInterface->updateRepository(filePath);
+            resetTrackProgressRatio();
+            songProgressTimer.start();
+            updateViewProgresState();
+            refreshView();
         });
     }
 
@@ -65,6 +78,10 @@ namespace app::music_player
                     changePlayingStateCallback(SongState::NotPlaying);
                 }
                 updateViewSongState();
+                songProgressTimer.stop();
+                updateTrackProgressRatio();
+                updateViewProgresState();
+                refreshView();
             });
         }
         return false;
@@ -91,6 +108,9 @@ namespace app::music_player
                         changePlayingStateCallback(SongState::Playing);
                     }
                     updateViewSongState();
+                    songProgressTimestamp = std::chrono::system_clock::now();
+                    songProgressTimer.start();
+                    refreshView();
                 });
         }
         return false;
@@ -100,11 +120,42 @@ namespace app::music_player
     {
         auto currentFileToken = songsModelInterface->getCurrentFileToken();
         if (currentFileToken) {
-            return audioOperations->stop(currentFileToken.value(), [](audio::RetCode, audio::Token) {
+            return audioOperations->stop(currentFileToken.value(), [this](audio::RetCode, audio::Token) {
                 // The answer will come via multicast and will be handled in the application
+                updateViewSongState();
+                songProgressTimer.stop();
+                resetTrackProgressRatio();
+                updateViewProgresState();
+                refreshView();
             });
         }
         return false;
+    }
+
+    bool SongsPresenter::playNext()
+    {
+        auto currentSongContext = songsModelInterface->getCurrentSongContext();
+        auto nextSongToPlay     = songsModelInterface->getNextFilePath(currentSongContext.filePath);
+        if (nextSongToPlay.empty()) {
+            return false;
+        }
+        return play(nextSongToPlay);
+    }
+
+    bool SongsPresenter::playPrevious()
+    {
+        auto currentSongContext = songsModelInterface->getCurrentSongContext();
+        auto prevSongToPlay     = songsModelInterface->getPreviousFilePath(currentSongContext.filePath);
+        if (prevSongToPlay.empty()) {
+            return false;
+        }
+
+        return play(prevSongToPlay);
+    }
+
+    void SongsPresenter::songsStateRequest()
+    {
+        updateViewSongState();
     }
 
     void SongsPresenter::setPlayingStateCallback(std::function<void(SongState)> cb)
@@ -172,6 +223,56 @@ namespace app::music_player
         return false;
     }
 
+    bool SongsPresenter::handlePlayOrPauseRequest()
+    {
+        auto currentSongContext = songsModelInterface->getCurrentSongContext();
+        if (currentSongContext.isPaused()) {
+            return resume();
+        }
+        else if (currentSongContext.isPlaying()) {
+            return pause();
+        }
+        return false;
+    }
+
+    void SongsPresenter::updateTrackProgressRatio()
+    {
+        auto secondsTotal = 0;
+        if (songsModelInterface->getActivatedRecord()) {
+            secondsTotal = songsModelInterface->getActivatedRecord()->audioProperties.songLength;
+        }
+
+        const std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
+        auto millisecondsToAdd = std::chrono::duration_cast<std::chrono::milliseconds>(now - songProgressTimestamp);
+        songMillisecondsElapsed += millisecondsToAdd;
+        songProgressTimestamp = now;
+
+        if (secondsTotal == 0) {
+            currentProgressRatio = 0.f;
+        }
+        else {
+            currentProgressRatio =
+                static_cast<float>(std::chrono::duration_cast<std::chrono::seconds>(songMillisecondsElapsed).count()) /
+                secondsTotal;
+        }
+        currentProgressRatio = std::clamp(currentProgressRatio, 0.f, 1.f);
+    }
+
+    void SongsPresenter::resetTrackProgressRatio()
+    {
+        currentProgressRatio    = 0.0;
+        songMillisecondsElapsed = std::chrono::milliseconds::zero();
+        songProgressTimestamp   = std::chrono::system_clock::now();
+        updateTrackProgressRatio();
+    }
+
+    void SongsPresenter::handleTrackProgressTick()
+    {
+        updateTrackProgressRatio();
+        updateViewProgresState();
+        refreshView();
+    }
+
     bool SongsPresenter::requestAudioOperation(const std::string &filePath)
     {
         auto currentSongContext = songsModelInterface->getCurrentSongContext();
@@ -198,7 +299,20 @@ namespace app::music_player
     void SongsPresenter::updateViewSongState()
     {
         if (auto view = getView(); view != nullptr) {
-            view->updateSongsState();
+            auto currentSongContext = songsModelInterface->getCurrentSongContext();
+            auto currentRecord      = songsModelInterface->getActivatedRecord();
+            view->updateSongsState(currentRecord,
+                                   currentSongContext.isPlaying()
+                                       ? SongsContract::View::RecordState::Playing
+                                       : (currentSongContext.isPaused() ? SongsContract::View::RecordState::Paused
+                                                                        : SongsContract::View::RecordState::Stopped));
+        }
+    }
+
+    void SongsPresenter::updateViewProgresState()
+    {
+        if (auto view = getView(); view != nullptr) {
+            view->updateSongProgress(currentProgressRatio);
         }
     }
 

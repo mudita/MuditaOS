@@ -17,7 +17,7 @@ namespace gui
         ~ImageBox() override = default;
 
         void showImage(bool show);
-        void setImage(const UTF8 &name);
+        void setImage(const UTF8 &name, ImageTypeSpecifier specifier = ImageTypeSpecifier::None);
         virtual void setMinimumSizeToFitImage();
 
       protected:

@@ -38,6 +38,7 @@ namespace app::music_player
         bool isSongPlaying() const noexcept override;
         void setCurrentSongState(SongState songState) noexcept override;
         std::optional<audio::Token> getCurrentFileToken() const noexcept override;
+        std::optional<db::multimedia_files::MultimediaFilesRecord> getActivatedRecord() const noexcept override;
 
         SongContext getCurrentSongContext() const noexcept override;
         void setCurrentSongContext(SongContext context) override;
@@ -51,6 +52,7 @@ namespace app::music_player
         [[nodiscard]] bool updateRecords(std::vector<db::multimedia_files::MultimediaFilesRecord> records) override;
 
         SongContext songContext;
+        std::optional<db::multimedia_files::MultimediaFilesRecord> activatedRecord = std::nullopt;
 
         OnShortReleaseCallback shortReleaseCallback{nullptr};
         OnLongPressCallback longPressCallback{nullptr};

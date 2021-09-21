@@ -13,10 +13,6 @@ namespace gui
     class Icon;
     class MusicPlayerAllSongsWindow : public AppWindow, public app::music_player::SongsContract::View
     {
-        std::shared_ptr<app::music_player::SongsContract::Presenter> presenter;
-        ListView *songsList = nullptr;
-        Icon *emptyListIcon = nullptr;
-
       public:
         explicit MusicPlayerAllSongsWindow(app::ApplicationCommon *app,
                                            std::shared_ptr<app::music_player::SongsContract::Presenter> presenter);
@@ -28,10 +24,18 @@ namespace gui
         void destroyInterface() override;
         bool onInput(const InputEvent &inputEvent) override;
 
-        void updateSongsState() override;
+        void updateSongsState(std::optional<db::multimedia_files::MultimediaFilesRecord> record,
+                              RecordState state) override;
+        void updateSongProgress(float progres) override
+        {}
         void refreshWindow() override;
         void setBottomBarTemporaryMode(const std::string &text) override;
         void restoreFromBottomBarTemporaryMode() override;
+
+      private:
+        std::shared_ptr<app::music_player::SongsContract::Presenter> presenter;
+        ListView *songsList = nullptr;
+        Icon *emptyListIcon = nullptr;
     };
 
 } /* namespace gui */
