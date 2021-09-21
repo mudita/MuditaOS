@@ -15,7 +15,7 @@
 #include "TextDocument.hpp"
 #include "TextLine.hpp"
 #include "TextParse.hpp"
-#include <log.hpp>
+#include <log/log.hpp>
 #include "utf8/UTF8.hpp"
 #include <Style.hpp>
 #include <cassert>

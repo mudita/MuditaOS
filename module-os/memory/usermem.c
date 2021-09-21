@@ -16,7 +16,7 @@
  * Sets heap size in SDRAM
  */
 #ifndef PROJECT_CONFIG_USER_DYNMEM_SIZE
-#define USERMEM_TOTAL_HEAP_SIZE	0
+#error "Define user heap size!"
 #else
 #define USERMEM_TOTAL_HEAP_SIZE	PROJECT_CONFIG_USER_DYNMEM_SIZE
 #endif

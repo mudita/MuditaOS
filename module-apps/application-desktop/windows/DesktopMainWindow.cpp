@@ -7,7 +7,7 @@
 #include "DesktopStyle.hpp"
 
 #include <application-call/data/CallSwitchData.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <messages/DialogMetadataMessage.hpp>
 #include <notifications/NotificationsModel.hpp>
 #include <service-appmgr/Controller.hpp>
@@ -234,9 +234,9 @@ namespace gui
     bool DesktopMainWindow::updateTime()
     {
         using namespace utils::time;
-        auto ret       = AppWindow::updateTime();
-        auto clock     = TimestampFactory().createTimestamp(TimestampType::Clock, std::time(nullptr));
-        auto date      = TimestampFactory().createTimestamp(TimestampType::DateText, std::time(nullptr));
+        auto ret   = AppWindow::updateTime();
+        auto clock = TimestampFactory().createTimestamp(TimestampType::Clock, std::time(nullptr));
+        auto date  = TimestampFactory().createTimestamp(TimestampType::DateText, std::time(nullptr));
         if (time != nullptr) {
             time->setText(clock->str());
         }

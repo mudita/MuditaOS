@@ -60,6 +60,7 @@ target_link_libraries(PurePhone
         appmgr
         db
         evtmgr
+        log
         messagetype
         module-apps
         module-bsp
@@ -71,6 +72,7 @@ target_link_libraries(PurePhone
         service-fileindexer
         service-time
         sys
+        version-header
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_Linux>:iosyscalls>"
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_RT1051>:CrashCatcher::CrashCatcher>"
     )
@@ -84,8 +86,6 @@ set_source_files_properties(PurePhoneMain.cpp PROPERTIES COMPILE_DEFINITIONS "${
 strip_executable(PurePhone)
 
 message_serial_status()
-
-add_dependencies(PurePhone version)
 
 include(AddBootBin)
 add_boot_bin(PurePhone)

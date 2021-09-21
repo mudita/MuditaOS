@@ -43,6 +43,7 @@ add_catch2_executable(
         ${CMAKE_CURRENT_LIST_DIR}/unittest_filesystem_littlefs.cpp
     LIBS
         platform
+        module-vfs
     DEPS
         ${LITTLEFS_IMAGE}
     USE_FS
@@ -54,6 +55,7 @@ add_catch2_executable(
         ${CMAKE_CURRENT_LIST_DIR}/unittest_filesystem_dualmount.cpp
     LIBS
         platform
+        module-vfs
     DEPS
         ${LITTLEFS_IMAGE}
     USE_FS

@@ -96,7 +96,9 @@ target_link_libraries(
         desktop-endpoints
     PUBLIC
         endpoint-message-sender
+        sys-service
     PRIVATE
         microtar
         base64::base64
+        version-header
 )

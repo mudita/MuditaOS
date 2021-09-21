@@ -19,6 +19,9 @@ target_sources(
 target_link_libraries(
         platform
 
+    PUBLIC
+        board
+
     PRIVATE
         module-bsp
 )

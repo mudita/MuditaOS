@@ -9,7 +9,6 @@
 
 #include <service-time/service-time/TimeMessage.hpp>
 
-#include <log/Logger.hpp>
 namespace cellular::service
 {
 

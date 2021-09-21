@@ -1,6 +1,6 @@
 target_compile_definitions(
-   board
-      PUBLIC
+   board-config
+      INTERFACE
    PROJECT_CONFIG_USER_DYNMEM_SIZE=9*1024*1024
    HW_SDRAM_64_MB=0
 )

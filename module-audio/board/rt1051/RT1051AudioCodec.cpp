@@ -4,7 +4,7 @@
 #include "RT1051AudioCodec.hpp"
 #include "board.h"
 #include "dma_config.h"
-#include <log.hpp>
+#include <log/log.hpp>
 
 #include "board/BoardDefinitions.hpp"
 #include "board/rt1051/common/audio.hpp"

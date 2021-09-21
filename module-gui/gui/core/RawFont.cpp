@@ -8,7 +8,7 @@
 #include "FontKerning.hpp"   // for FontKerning
 #include "Renderer.hpp"      // for Renderer
 #include "TextConstants.hpp" // for newline
-#include <log.hpp>           // for LOG_ERROR
+#include <log/log.hpp>       // for LOG_ERROR
 #include "utf8/UTF8.hpp"     // for UTF8
 #include <cstring>           // for memcpy
 #include <utility>           // for pair

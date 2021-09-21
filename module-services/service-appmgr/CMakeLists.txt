@@ -72,7 +72,6 @@ target_sources(service-appmgr
 
 target_link_libraries(service-appmgr
     PRIVATE
-        apps-common
         application-special-input
         json::json
         module-audio
@@ -80,7 +79,8 @@ target_link_libraries(service-appmgr
         service-db
         service-gui
     PUBLIC
-        time
+        apps-common
+        utils-time
 )
 
 target_include_directories(service-appmgr

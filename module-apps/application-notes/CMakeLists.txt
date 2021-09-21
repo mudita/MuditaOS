@@ -63,6 +63,6 @@ target_link_libraries(application-notes
 		module-db
 		service-db
 		log
-		time
+		utils-time
 		i18n		
 )

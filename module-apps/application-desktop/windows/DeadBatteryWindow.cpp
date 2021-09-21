@@ -7,7 +7,7 @@
 #include <gui/widgets/Image.hpp>
 #include <Image.hpp>
 #include <InputEvent.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <service-appmgr/Controller.hpp>
 
 namespace gui

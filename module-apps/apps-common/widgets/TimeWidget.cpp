@@ -8,6 +8,7 @@
 #include <time/time_date_validation.hpp>
 #include "DateAndTimeStyle.hpp"
 #include <time/TimeZone.hpp>
+#include <service-time/api/TimeSettingsApi.hpp>
 
 namespace gui
 {

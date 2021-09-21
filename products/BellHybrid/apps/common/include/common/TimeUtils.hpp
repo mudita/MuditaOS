@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <module-utils/utf8/utf8/UTF8.hpp>
+#include <utf8/UTF8.hpp>
 
 #include <ctime>
 

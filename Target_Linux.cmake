@@ -8,6 +8,7 @@ set(TARGET_LIBRARIES
     portaudio
     CACHE INTERNAL "" )
 
+link_libraries(pthread rt)
 
 option (LINUX_ENABLE_SANITIZER "Enable address sanitizer for Linux" ON)
 if (LINUX_ENABLE_SANITIZER)

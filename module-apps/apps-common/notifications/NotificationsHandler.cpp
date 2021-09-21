@@ -3,7 +3,7 @@
 
 #include "NotificationsHandler.hpp"
 #include <service-db/DBServiceAPI.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <service-cellular/service-cellular/CellularMessage.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <service-audio/AudioServiceAPI.hpp>

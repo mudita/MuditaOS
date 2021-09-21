@@ -5,7 +5,7 @@
 
 #include "Constants.hpp"
 
-#include <common_data/RawKey.hpp>
+#include <hal/key_input/RawKey.hpp>
 #include <MessageType.hpp>
 #include <Service/Common.hpp>
 #include <Service/Message.hpp>

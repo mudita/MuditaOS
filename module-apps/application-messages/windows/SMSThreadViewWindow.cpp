@@ -6,7 +6,7 @@
 #include "SMSdata.hpp"
 #include "SMSThreadViewWindow.hpp"
 
-#include <log.hpp>
+#include <log/log.hpp>
 #include <module-db/queries/phonebook/QueryContactGetByID.hpp>
 #include <OptionsMessages.hpp>
 #include <service-db/DBNotificationMessage.hpp>

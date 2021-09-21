@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 #include <purefs/blkdev/disk_handle.hpp>
 #include <purefs/blkdev/disk.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 
 namespace purefs::blkdev::internal
 {

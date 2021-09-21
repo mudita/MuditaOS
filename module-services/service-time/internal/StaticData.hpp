@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <module-utils/time/time/time_locale.hpp>
+#include <time/time_locale.hpp>
 
 namespace stm::internal
 {

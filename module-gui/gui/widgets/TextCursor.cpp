@@ -6,7 +6,7 @@
 #include "Text.hpp"
 #include "TextBlockCursor.hpp"
 #include "TextDocument.hpp"
-#include <log.hpp>
+#include <log/log.hpp>
 #include "TextLine.hpp"
 #include <cassert>
 #include <RawFont.hpp>

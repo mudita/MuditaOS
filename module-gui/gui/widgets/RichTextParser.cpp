@@ -9,11 +9,11 @@
 #include <sstream>
 #include <string>
 #include <map>
-#include <log.hpp>
+#include <log/log.hpp>
 #include "TextFormat.hpp"
 
 #include <pugixml.hpp>
-#include <module-utils/Utils.hpp>
+#include <Utils.hpp>
 #include <utility>
 
 #ifdef DEBUG_RTP

@@ -13,6 +13,7 @@
 #include "windows/OptionWindow.hpp"
 #include <service-db/DBNotificationMessage.hpp>
 #include <service-db/QueryMessage.hpp>
+#include <service-time/api/TimeSettingsApi.hpp>
 
 namespace app
 {

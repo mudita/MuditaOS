@@ -21,5 +21,6 @@ target_include_directories(sys-timers
 
 target_link_libraries(sys-timers
     PUBLIC
+        sys-service
         module-os
 )

@@ -14,7 +14,7 @@
 #include <InputEvent.hpp>
 #include <InputMode.hpp>
 #include <Label.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <magic_enum.hpp>
 #include <Margins.hpp>
 #include <service-appmgr/Controller.hpp>
@@ -130,7 +130,7 @@ namespace gui
         };
         sendSmsIcon->activatedCallback = [=](gui::Item &item) {
             LOG_INFO("Send message template and reject the call");
-            constexpr auto preventAutoLock = true;
+            constexpr auto preventAutoLock  = true;
             auto msg                        = std::make_unique<SMSSendTemplateRequest>(phoneNumber, preventAutoLock);
             msg->ignoreCurrentWindowOnStack = true;
             return app::manager::Controller::sendAction(application,

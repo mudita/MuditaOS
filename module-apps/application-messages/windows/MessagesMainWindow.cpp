@@ -12,7 +12,7 @@
 #include <header/AddElementAction.hpp>
 #include <header/SearchAction.hpp>
 #include <i18n/i18n.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <module-db/queries/messages/threads/QueryThreadGetByContactID.hpp>
 #include <module-db/queries/notifications/QueryNotificationsClear.hpp>
 #include <service-db/DBNotificationMessage.hpp>

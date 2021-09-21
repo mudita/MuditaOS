@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ThreadsTable.hpp"
-#include <log.hpp>
+#include <log/log.hpp>
 
 ThreadsTable::ThreadsTable(Database *db) : Table(db)
 {}

@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "bsp/bell_temp_sensor/bell_temp_sensor.hpp"
-#include <log.hpp>
+#include <log/log.hpp>
 
 namespace bsp::bell_temp_sensor
 {

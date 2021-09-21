@@ -7,7 +7,7 @@
 #include "PixMap.hpp"
 #include "DrawCommand.hpp"
 #include "Renderer.hpp"
-#include <log.hpp>
+#include <log/log.hpp>
 #include <set>
 #include <string>
 #include <filesystem>
@@ -28,8 +28,8 @@ namespace gui
 
     void ImageManager::loadImageMaps(std::string baseDirectory)
     {
-        mapFolder                            = baseDirectory + "/images";
-        auto [pixMapFiles, vecMapFiles]      = getImageMapList(".mpi", ".vpi");
+        mapFolder                       = baseDirectory + "/images";
+        auto [pixMapFiles, vecMapFiles] = getImageMapList(".mpi", ".vpi");
 
         for (std::string mapName : pixMapFiles) {
             loadPixMap(mapName);

@@ -4,8 +4,7 @@
 #pragma once
 
 #include <assert.h>
-#include <board.h>
-#include <log.hpp>
+#include <log/log.hpp>
 #include "LoggerBuffer.hpp"
 #include "log_colors.hpp"
 #include <map>

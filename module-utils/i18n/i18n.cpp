@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "i18nImpl.hpp"
-#include <log.hpp>
+#include <log/log.hpp>
 #include <cstdio>
 #include <purefs/filesystem_paths.hpp>
 

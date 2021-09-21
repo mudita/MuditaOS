@@ -9,7 +9,7 @@
 #include <SystemManager/messages/SystemManagerMessage.hpp>
 #include <SystemManager/messages/TetheringQuestionRequest.hpp>
 #include <SystemManager/messages/TetheringStateRequest.hpp>
-#include <module-utils/EventStore/EventStore.hpp>
+#include <EventStore.hpp>
 #include <service-appmgr/Constants.hpp>
 #include <service-cellular/CellularMessage.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>

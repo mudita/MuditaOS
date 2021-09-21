@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RT1051DriverI2C.hpp"
-#include <log.hpp>
+#include <log/log.hpp>
 #include "../board.h"
 
 namespace drivers

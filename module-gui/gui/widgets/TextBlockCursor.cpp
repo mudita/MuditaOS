@@ -5,7 +5,7 @@
 #include "TextBlock.hpp"
 #include "TextDocument.hpp"
 #include "TextParse.hpp"
-#include <log.hpp>
+#include <log/log.hpp>
 #include <cassert>
 
 static const int last_char_inclusive = 0; // if then -1 / else 0

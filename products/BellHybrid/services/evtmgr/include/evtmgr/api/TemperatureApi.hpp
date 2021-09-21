@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <module-bsp/hal/temperature_source/TemperatureSource.hpp>
+#include <hal/temperature_source/TemperatureSource.hpp>
 
 namespace evtmgr::api
 {

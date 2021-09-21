@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NotesTable.hpp"
-#include <log.hpp>
+#include <log/log.hpp>
 #include <string>
 
 NotesTable::NotesTable(Database *db) : Table(db)

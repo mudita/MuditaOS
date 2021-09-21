@@ -4,7 +4,7 @@
 #include <lfs.h>
 #include <purefs/blkdev/disk_handle.hpp>
 #include <purefs/blkdev/disk_manager.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <mutex.hpp>
 #include <errno.h>
 

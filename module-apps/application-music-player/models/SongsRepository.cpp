@@ -4,7 +4,7 @@
 #include "SongsRepository.hpp"
 
 #include <algorithm>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <service-audio/AudioServiceAPI.hpp>
 #include <service-audio/AudioServiceName.hpp>
 #include <time/ScopedTime.hpp>

@@ -19,7 +19,7 @@
 #include <bsp/common.hpp>
 #include <bsp/rtc/rtc.hpp>
 #include <hal/key_input/KeyEventDefinitions.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <Logger.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <service-audio/AudioMessage.hpp>

@@ -14,7 +14,7 @@
 #include <ContactRecord.hpp>
 #include <PhoneNumber.hpp>
 #include <Service/Common.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <queries/RecordQuery.hpp>
 #include <queries/phonebook/QueryContactGetByID.hpp>
 #include <queries/phonebook/QueryContactUpdate.hpp>

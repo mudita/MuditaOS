@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-cellular/SignalStrength.hpp"
-#include <log.hpp>
+#include <log/log.hpp>
 
 SignalStrength::SignalStrength(int rssi)
 {

@@ -5,7 +5,7 @@
 #include "Common.hpp"   // for Status, Status::GUI_SUCCESS
 #include "FontInfo.hpp" // for FontInfo
 #include "RawFont.hpp"  // for RawFont
-#include <log.hpp>      // for LOG_ERROR, LOG_INFO, LOG_WARN
+#include <log/log.hpp>  // for LOG_ERROR, LOG_INFO, LOG_WARN
 #include <Utils.hpp>
 #include <filesystem>
 #include <cstdio>

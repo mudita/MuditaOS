@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <hal/cellular/SIM.hpp>
+
 #include <vector>
 
 namespace cellular
@@ -26,11 +28,7 @@ namespace cellular
             Disabled
         };
 
-        enum class SimSlot
-        {
-            SIM1 = 0,
-            SIM2 = 1
-        };
+        using SimSlot = hal::cellular::SimSlot;
 
         enum class ModemState
         {

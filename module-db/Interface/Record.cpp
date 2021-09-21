@@ -3,7 +3,7 @@
 
 #include "Record.hpp"
 #include <Common/Query.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 
 namespace db
 {

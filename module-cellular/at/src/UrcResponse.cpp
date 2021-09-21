@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <UrcResponse.hpp>
-#include <module-utils/Utils.hpp>
+#include <Utils.hpp>
 
 using namespace at::urc;
 

@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <module-bsp/hal/temperature_source/TemperatureSource.hpp>
+#include <hal/temperature_source/TemperatureSource.hpp>
 #include <hal/GenericFactory.hpp>
 #include "bsp/bell_temp_sensor/bell_temp_sensor.hpp"
 

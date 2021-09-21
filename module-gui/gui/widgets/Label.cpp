@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <log.hpp>
+#include <log/log.hpp>
 #include "utf8/UTF8.hpp"
 
 #include "../core/DrawCommand.hpp"
