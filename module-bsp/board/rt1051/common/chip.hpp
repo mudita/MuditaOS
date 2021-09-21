@@ -6,8 +6,8 @@
 #include <cstdint>
 extern "C"
 {
-#include "cmsis/cmsis_gcc.h"
-#include "cmsis/core_cm7.h"
+#include "cmsis_gcc.h"
+#include "core_cm7.h"
 #include "fsl_drivers/fsl_src.h"
 #include "macros.h"
 }

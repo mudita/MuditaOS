@@ -730,8 +730,9 @@ extern "C"
 
 /* SCB Configurable Fault Status Register Definitions */
 #define SCB_CFSR_USGFAULTSR_Pos 16U /*!< SCB CFSR: Usage Fault Status Register Position */
-#define SCB_CFSR_USGFAULTSR_Msk (0xFFFFUL << SCB_CFSR_USGFAULTSR_Pos) /*!< SCB CFSR: Usage Fault Status Register Mask  \
-                                                                       */
+#define SCB_CFSR_USGFAULTSR_Msk                                                                                        \
+    (0xFFFFUL << SCB_CFSR_USGFAULTSR_Pos) /*!< SCB CFSR: Usage Fault Status Register Mask                              \
+                                           */
 
 #define SCB_CFSR_BUSFAULTSR_Pos 8U                                  /*!< SCB CFSR: Bus Fault Status Register Position */
 #define SCB_CFSR_BUSFAULTSR_Msk (0xFFUL << SCB_CFSR_BUSFAULTSR_Pos) /*!< SCB CFSR: Bus Fault Status Register Mask */
@@ -1882,8 +1883,9 @@ extern "C"
     (1UL << CoreDebug_DHCSR_S_RESTART_ST_Pos) /*!< CoreDebug DHCSR: S_RESTART_ST Mask */
 
 #define CoreDebug_DHCSR_S_RESET_ST_Pos 25U /*!< CoreDebug DHCSR: S_RESET_ST Position */
-#define CoreDebug_DHCSR_S_RESET_ST_Msk (1UL << CoreDebug_DHCSR_S_RESET_ST_Pos) /*!< CoreDebug DHCSR: S_RESET_ST Mask   \
-                                                                                */
+#define CoreDebug_DHCSR_S_RESET_ST_Msk                                                                                 \
+    (1UL << CoreDebug_DHCSR_S_RESET_ST_Pos) /*!< CoreDebug DHCSR: S_RESET_ST Mask                                      \
+                                             */
 
 #define CoreDebug_DHCSR_S_RETIRE_ST_Pos 24U /*!< CoreDebug DHCSR: S_RETIRE_ST Position */
 #define CoreDebug_DHCSR_S_RETIRE_ST_Msk                                                                                \
@@ -1906,8 +1908,9 @@ extern "C"
     (1UL << CoreDebug_DHCSR_C_SNAPSTALL_Pos) /*!< CoreDebug DHCSR: C_SNAPSTALL Mask */
 
 #define CoreDebug_DHCSR_C_MASKINTS_Pos 3U /*!< CoreDebug DHCSR: C_MASKINTS Position */
-#define CoreDebug_DHCSR_C_MASKINTS_Msk (1UL << CoreDebug_DHCSR_C_MASKINTS_Pos) /*!< CoreDebug DHCSR: C_MASKINTS Mask   \
-                                                                                */
+#define CoreDebug_DHCSR_C_MASKINTS_Msk                                                                                 \
+    (1UL << CoreDebug_DHCSR_C_MASKINTS_Pos) /*!< CoreDebug DHCSR: C_MASKINTS Mask                                      \
+                                             */
 
 #define CoreDebug_DHCSR_C_STEP_Pos 2U                                  /*!< CoreDebug DHCSR: C_STEP Position */
 #define CoreDebug_DHCSR_C_STEP_Msk (1UL << CoreDebug_DHCSR_C_STEP_Pos) /*!< CoreDebug DHCSR: C_STEP Mask */
@@ -1916,8 +1919,9 @@ extern "C"
 #define CoreDebug_DHCSR_C_HALT_Msk (1UL << CoreDebug_DHCSR_C_HALT_Pos) /*!< CoreDebug DHCSR: C_HALT Mask */
 
 #define CoreDebug_DHCSR_C_DEBUGEN_Pos 0U /*!< CoreDebug DHCSR: C_DEBUGEN Position */
-#define CoreDebug_DHCSR_C_DEBUGEN_Msk (1UL /*<< CoreDebug_DHCSR_C_DEBUGEN_Pos*/) /*!< CoreDebug DHCSR: C_DEBUGEN Mask  \
-                                                                                  */
+#define CoreDebug_DHCSR_C_DEBUGEN_Msk                                                                                  \
+    (1UL /*<< CoreDebug_DHCSR_C_DEBUGEN_Pos*/) /*!< CoreDebug DHCSR: C_DEBUGEN Mask                                    \
+                                                */
 
 /* Debug Core Register Selector Register Definitions */
 #define CoreDebug_DCRSR_REGWnR_Pos 16U                                 /*!< CoreDebug DCRSR: REGWnR Position */
@@ -1943,8 +1947,9 @@ extern "C"
 #define CoreDebug_DEMCR_MON_EN_Msk (1UL << CoreDebug_DEMCR_MON_EN_Pos) /*!< CoreDebug DEMCR: MON_EN Mask */
 
 #define CoreDebug_DEMCR_VC_HARDERR_Pos 10U /*!< CoreDebug DEMCR: VC_HARDERR Position */
-#define CoreDebug_DEMCR_VC_HARDERR_Msk (1UL << CoreDebug_DEMCR_VC_HARDERR_Pos) /*!< CoreDebug DEMCR: VC_HARDERR Mask   \
-                                                                                */
+#define CoreDebug_DEMCR_VC_HARDERR_Msk                                                                                 \
+    (1UL << CoreDebug_DEMCR_VC_HARDERR_Pos) /*!< CoreDebug DEMCR: VC_HARDERR Mask                                      \
+                                             */
 
 #define CoreDebug_DEMCR_VC_INTERR_Pos 9U                                     /*!< CoreDebug DEMCR: VC_INTERR Position */
 #define CoreDebug_DEMCR_VC_INTERR_Msk (1UL << CoreDebug_DEMCR_VC_INTERR_Pos) /*!< CoreDebug DEMCR: VC_INTERR Mask */
@@ -1953,15 +1958,17 @@ extern "C"
 #define CoreDebug_DEMCR_VC_BUSERR_Msk (1UL << CoreDebug_DEMCR_VC_BUSERR_Pos) /*!< CoreDebug DEMCR: VC_BUSERR Mask */
 
 #define CoreDebug_DEMCR_VC_STATERR_Pos 7U /*!< CoreDebug DEMCR: VC_STATERR Position */
-#define CoreDebug_DEMCR_VC_STATERR_Msk (1UL << CoreDebug_DEMCR_VC_STATERR_Pos) /*!< CoreDebug DEMCR: VC_STATERR Mask   \
-                                                                                */
+#define CoreDebug_DEMCR_VC_STATERR_Msk                                                                                 \
+    (1UL << CoreDebug_DEMCR_VC_STATERR_Pos) /*!< CoreDebug DEMCR: VC_STATERR Mask                                      \
+                                             */
 
 #define CoreDebug_DEMCR_VC_CHKERR_Pos 6U                                     /*!< CoreDebug DEMCR: VC_CHKERR Position */
 #define CoreDebug_DEMCR_VC_CHKERR_Msk (1UL << CoreDebug_DEMCR_VC_CHKERR_Pos) /*!< CoreDebug DEMCR: VC_CHKERR Mask */
 
 #define CoreDebug_DEMCR_VC_NOCPERR_Pos 5U /*!< CoreDebug DEMCR: VC_NOCPERR Position */
-#define CoreDebug_DEMCR_VC_NOCPERR_Msk (1UL << CoreDebug_DEMCR_VC_NOCPERR_Pos) /*!< CoreDebug DEMCR: VC_NOCPERR Mask   \
-                                                                                */
+#define CoreDebug_DEMCR_VC_NOCPERR_Msk                                                                                 \
+    (1UL << CoreDebug_DEMCR_VC_NOCPERR_Pos) /*!< CoreDebug DEMCR: VC_NOCPERR Mask                                      \
+                                             */
 
 #define CoreDebug_DEMCR_VC_MMERR_Pos 4U                                    /*!< CoreDebug DEMCR: VC_MMERR Position */
 #define CoreDebug_DEMCR_VC_MMERR_Msk (1UL << CoreDebug_DEMCR_VC_MMERR_Pos) /*!< CoreDebug DEMCR: VC_MMERR Mask */
@@ -2196,8 +2203,9 @@ extern "C"
     __STATIC_INLINE uint32_t __NVIC_GetEnableIRQ(IRQn_Type IRQn)
     {
         if ((int32_t)(IRQn) >= 0) {
-            return ((uint32_t)(
-                ((NVIC->ISER[(((uint32_t)IRQn) >> 5UL)] & (1UL << (((uint32_t)IRQn) & 0x1FUL))) != 0UL) ? 1UL : 0UL));
+            return ((uint32_t)(((NVIC->ISER[(((uint32_t)IRQn) >> 5UL)] & (1UL << (((uint32_t)IRQn) & 0x1FUL))) != 0UL)
+                                   ? 1UL
+                                   : 0UL));
         }
         else {
             return (0U);
@@ -2230,8 +2238,9 @@ extern "C"
     __STATIC_INLINE uint32_t __NVIC_GetPendingIRQ(IRQn_Type IRQn)
     {
         if ((int32_t)(IRQn) >= 0) {
-            return ((uint32_t)(
-                ((NVIC->ISPR[(((uint32_t)IRQn) >> 5UL)] & (1UL << (((uint32_t)IRQn) & 0x1FUL))) != 0UL) ? 1UL : 0UL));
+            return ((uint32_t)(((NVIC->ISPR[(((uint32_t)IRQn) >> 5UL)] & (1UL << (((uint32_t)IRQn) & 0x1FUL))) != 0UL)
+                                   ? 1UL
+                                   : 0UL));
         }
         else {
             return (0U);
@@ -2275,8 +2284,9 @@ extern "C"
     __STATIC_INLINE uint32_t __NVIC_GetActive(IRQn_Type IRQn)
     {
         if ((int32_t)(IRQn) >= 0) {
-            return ((uint32_t)(
-                ((NVIC->IABR[(((uint32_t)IRQn) >> 5UL)] & (1UL << (((uint32_t)IRQn) & 0x1FUL))) != 0UL) ? 1UL : 0UL));
+            return ((uint32_t)(((NVIC->IABR[(((uint32_t)IRQn) >> 5UL)] & (1UL << (((uint32_t)IRQn) & 0x1FUL))) != 0UL)
+                                   ? 1UL
+                                   : 0UL));
         }
         else {
             return (0U);
@@ -2294,8 +2304,9 @@ extern "C"
     __STATIC_INLINE uint32_t NVIC_GetTargetState(IRQn_Type IRQn)
     {
         if ((int32_t)(IRQn) >= 0) {
-            return ((uint32_t)(
-                ((NVIC->ITNS[(((uint32_t)IRQn) >> 5UL)] & (1UL << (((uint32_t)IRQn) & 0x1FUL))) != 0UL) ? 1UL : 0UL));
+            return ((uint32_t)(((NVIC->ITNS[(((uint32_t)IRQn) >> 5UL)] & (1UL << (((uint32_t)IRQn) & 0x1FUL))) != 0UL)
+                                   ? 1UL
+                                   : 0UL));
         }
         else {
             return (0U);
@@ -2312,8 +2323,9 @@ extern "C"
     {
         if ((int32_t)(IRQn) >= 0) {
             NVIC->ITNS[(((uint32_t)IRQn) >> 5UL)] |= ((uint32_t)(1UL << (((uint32_t)IRQn) & 0x1FUL)));
-            return ((uint32_t)(
-                ((NVIC->ITNS[(((uint32_t)IRQn) >> 5UL)] & (1UL << (((uint32_t)IRQn) & 0x1FUL))) != 0UL) ? 1UL : 0UL));
+            return ((uint32_t)(((NVIC->ITNS[(((uint32_t)IRQn) >> 5UL)] & (1UL << (((uint32_t)IRQn) & 0x1FUL))) != 0UL)
+                                   ? 1UL
+                                   : 0UL));
         }
         else {
             return (0U);
@@ -2330,8 +2342,9 @@ extern "C"
     {
         if ((int32_t)(IRQn) >= 0) {
             NVIC->ITNS[(((uint32_t)IRQn) >> 5UL)] &= ~((uint32_t)(1UL << (((uint32_t)IRQn) & 0x1FUL)));
-            return ((uint32_t)(
-                ((NVIC->ITNS[(((uint32_t)IRQn) >> 5UL)] & (1UL << (((uint32_t)IRQn) & 0x1FUL))) != 0UL) ? 1UL : 0UL));
+            return ((uint32_t)(((NVIC->ITNS[(((uint32_t)IRQn) >> 5UL)] & (1UL << (((uint32_t)IRQn) & 0x1FUL))) != 0UL)
+                                   ? 1UL
+                                   : 0UL));
         }
         else {
             return (0U);
@@ -2399,9 +2412,9 @@ extern "C"
         PreemptPriorityBits = ((7UL - PriorityGroupTmp) > (uint32_t)(__NVIC_PRIO_BITS))
                                   ? (uint32_t)(__NVIC_PRIO_BITS)
                                   : (uint32_t)(7UL - PriorityGroupTmp);
-        SubPriorityBits = ((PriorityGroupTmp + (uint32_t)(__NVIC_PRIO_BITS)) < (uint32_t)7UL)
-                              ? (uint32_t)0UL
-                              : (uint32_t)((PriorityGroupTmp - 7UL) + (uint32_t)(__NVIC_PRIO_BITS));
+        SubPriorityBits     = ((PriorityGroupTmp + (uint32_t)(__NVIC_PRIO_BITS)) < (uint32_t)7UL)
+                                  ? (uint32_t)0UL
+                                  : (uint32_t)((PriorityGroupTmp - 7UL) + (uint32_t)(__NVIC_PRIO_BITS));
 
         return (((PreemptPriority & (uint32_t)((1UL << (PreemptPriorityBits)) - 1UL)) << SubPriorityBits) |
                 ((SubPriority & (uint32_t)((1UL << (SubPriorityBits)) - 1UL))));
@@ -2430,9 +2443,9 @@ extern "C"
         PreemptPriorityBits = ((7UL - PriorityGroupTmp) > (uint32_t)(__NVIC_PRIO_BITS))
                                   ? (uint32_t)(__NVIC_PRIO_BITS)
                                   : (uint32_t)(7UL - PriorityGroupTmp);
-        SubPriorityBits = ((PriorityGroupTmp + (uint32_t)(__NVIC_PRIO_BITS)) < (uint32_t)7UL)
-                              ? (uint32_t)0UL
-                              : (uint32_t)((PriorityGroupTmp - 7UL) + (uint32_t)(__NVIC_PRIO_BITS));
+        SubPriorityBits     = ((PriorityGroupTmp + (uint32_t)(__NVIC_PRIO_BITS)) < (uint32_t)7UL)
+                                  ? (uint32_t)0UL
+                                  : (uint32_t)((PriorityGroupTmp - 7UL) + (uint32_t)(__NVIC_PRIO_BITS));
 
         *pPreemptPriority = (Priority >> SubPriorityBits) & (uint32_t)((1UL << (PreemptPriorityBits)) - 1UL);
         *pSubPriority     = (Priority) & (uint32_t)((1UL << (SubPriorityBits)) - 1UL);
@@ -2539,9 +2552,10 @@ extern "C"
     __STATIC_INLINE uint32_t TZ_NVIC_GetEnableIRQ_NS(IRQn_Type IRQn)
     {
         if ((int32_t)(IRQn) >= 0) {
-            return ((uint32_t)(
-                ((NVIC_NS->ISER[(((uint32_t)IRQn) >> 5UL)] & (1UL << (((uint32_t)IRQn) & 0x1FUL))) != 0UL) ? 1UL
-                                                                                                           : 0UL));
+            return (
+                (uint32_t)(((NVIC_NS->ISER[(((uint32_t)IRQn) >> 5UL)] & (1UL << (((uint32_t)IRQn) & 0x1FUL))) != 0UL)
+                               ? 1UL
+                               : 0UL));
         }
         else {
             return (0U);
@@ -2571,9 +2585,10 @@ extern "C"
     __STATIC_INLINE uint32_t TZ_NVIC_GetPendingIRQ_NS(IRQn_Type IRQn)
     {
         if ((int32_t)(IRQn) >= 0) {
-            return ((uint32_t)(
-                ((NVIC_NS->ISPR[(((uint32_t)IRQn) >> 5UL)] & (1UL << (((uint32_t)IRQn) & 0x1FUL))) != 0UL) ? 1UL
-                                                                                                           : 0UL));
+            return (
+                (uint32_t)(((NVIC_NS->ISPR[(((uint32_t)IRQn) >> 5UL)] & (1UL << (((uint32_t)IRQn) & 0x1FUL))) != 0UL)
+                               ? 1UL
+                               : 0UL));
         }
         else {
             return (0U);
@@ -2614,9 +2629,10 @@ extern "C"
     __STATIC_INLINE uint32_t TZ_NVIC_GetActive_NS(IRQn_Type IRQn)
     {
         if ((int32_t)(IRQn) >= 0) {
-            return ((uint32_t)(
-                ((NVIC_NS->IABR[(((uint32_t)IRQn) >> 5UL)] & (1UL << (((uint32_t)IRQn) & 0x1FUL))) != 0UL) ? 1UL
-                                                                                                           : 0UL));
+            return (
+                (uint32_t)(((NVIC_NS->IABR[(((uint32_t)IRQn) >> 5UL)] & (1UL << (((uint32_t)IRQn) & 0x1FUL))) != 0UL)
+                               ? 1UL
+                               : 0UL));
         }
         else {
             return (0U);
