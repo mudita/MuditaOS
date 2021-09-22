@@ -9,6 +9,7 @@ namespace gui::bgSoundsStyle
 {
     inline constexpr auto descriptionFont = style::window::font::largelight;
     inline constexpr auto timerValueFont  = style::window::font::supersizemelight;
+    inline constexpr auto valumeValueFont = style::window::font::supersizemelight;
     namespace progress
     {
         inline constexpr auto bottomDescTopMargin = 20U;

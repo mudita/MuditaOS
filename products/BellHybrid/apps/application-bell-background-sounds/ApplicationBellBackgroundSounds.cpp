@@ -5,10 +5,12 @@
 #include "presenter/BGSoundsMainWindowPresenter.hpp"
 #include "presenter/BGSoundsTimerSelectPresenter.hpp"
 #include "presenter/BGSoundsProgressPresenter.hpp"
+#include "presenter/BGSoundsVolumePresenter.hpp"
 #include "windows/BGSoundsMainWindow.hpp"
 #include "windows/BGSoundsPausedWindow.hpp"
 #include "windows/BGSoundsProgressWindow.hpp"
 #include "windows/BGSoundsTimerSelectWindow.hpp"
+#include "windows/BGSoundsVolumeWindow.hpp"
 
 namespace app
 {
@@ -48,6 +50,10 @@ namespace app
             });
         windowsFactory.attach(gui::window::name::bgSoundsPaused, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::BGSoundsPausedWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::bgSoundsVolume, [](ApplicationCommon *app, const std::string &name) {
+            auto presenter = std::make_unique<bgSounds::BGSoundsVolumePresenter>();
+            return std::make_unique<gui::BGSoundsVolumeWindow>(app, std::move(presenter));
         });
     }
 
