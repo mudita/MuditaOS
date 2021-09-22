@@ -15,20 +15,24 @@ target_sources(application-bell-background-sounds
         ApplicationBellBackgroundSounds.cpp
         presenter/BGSoundsProgressPresenter.cpp
         presenter/BGSoundsTimerSelectPresenter.cpp
+        presenter/BGSoundsVolumePresenter.cpp
         windows/BGSoundsMainWindow.cpp
         windows/BGSoundsPausedWindow.cpp
         windows/BGSoundsProgressWindow.cpp
         windows/BGSoundsTimerSelectWindow.cpp
+        windows/BGSoundsVolumeWindow.cpp
 
         data/BGSoundsCommon.hpp
         data/BGSoundsStyle.hpp
         presenter/BGSoundsMainWindowPresenter.hpp
         presenter/BGSoundsProgressPresenter.hpp
         presenter/BGSoundsTimerSelectPresenter.hpp
+        presenter/BGSoundsVolumePresenter.hpp
         windows/BGSoundsMainWindow.hpp
         windows/BGSoundsPausedWindow.hpp
         windows/BGSoundsProgressWindow.hpp
         windows/BGSoundsTimerSelectWindow.hpp
+        windows/BGSoundsVolumeWindow.hpp
 
     PUBLIC
         include/application-bell-background-sounds/ApplicationBellBackgroundSounds.hpp
