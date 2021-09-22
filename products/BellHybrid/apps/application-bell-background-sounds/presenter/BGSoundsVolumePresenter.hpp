@@ -4,16 +4,16 @@
 #pragma once
 
 #include <apps-common/BasePresenter.hpp>
-#include <memory>
-
-namespace gui
-{
-    class ListItemProvider;
-}
 
 namespace app::bgSounds
 {
-    class BGSoundsVolumeModel;
+    using VolumeData = struct VolumeData
+    {
+        unsigned int min;
+        unsigned int max;
+        unsigned int step;
+    };
+
     class BGSoundsVolumeContract
     {
       public:
@@ -25,18 +25,23 @@ namespace app::bgSounds
         class Presenter : public BasePresenter<BGSoundsVolumeContract::View>
         {
           public:
-            virtual auto getVolumeProvider() -> std::shared_ptr<gui::ListItemProvider> = 0;
-            virtual void loadVolumeData()                                              = 0;
-            virtual void onVolumeChanged()                                             = 0;
+            virtual VolumeData getVolumeData()     = 0;
+            virtual unsigned int getCurrentVolume()           = 0;
+            virtual void onVolumeChanged(unsigned int volume) = 0;
         };
     };
 
     class BGSoundsVolumePresenter : public BGSoundsVolumeContract::Presenter
     {
-        std::shared_ptr<BGSoundsVolumeModel> model;
-        auto getVolumeProvider() -> std::shared_ptr<gui::ListItemProvider> override;
-        void loadVolumeData() override;
-        void onVolumeChanged() override;
+        struct VolumeData volumeData
+        {
+            0U, 10U, 1U
+        };
+        unsigned int currentVolume = 5U;
+
+        VolumeData getVolumeData() override;
+        unsigned int getCurrentVolume() override;
+        void onVolumeChanged(unsigned int volume) override;
 
       public:
         BGSoundsVolumePresenter();

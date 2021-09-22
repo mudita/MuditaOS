@@ -74,13 +74,13 @@ namespace gui
 
     template <typename ValuePolicy> bool GenericSpinner<ValuePolicy>::isPreviousEvent(const InputEvent &inputEvent)
     {
-        return (orientation == Orientation::Vertical && inputEvent.is(KeyCode::KEY_UP)) ||
+        return (orientation == Orientation::Vertical && inputEvent.is(KeyCode::KEY_DOWN)) ||
                (orientation == Orientation::Horizontal && inputEvent.is(KeyCode::KEY_LEFT));
     }
 
     template <typename ValuePolicy> bool GenericSpinner<ValuePolicy>::isNextEvent(const InputEvent &inputEvent)
     {
-        return (orientation == Orientation::Vertical && inputEvent.is(KeyCode::KEY_DOWN)) ||
+        return (orientation == Orientation::Vertical && inputEvent.is(KeyCode::KEY_UP)) ||
                (orientation == Orientation::Horizontal && inputEvent.is(KeyCode::KEY_RIGHT));
     }
 

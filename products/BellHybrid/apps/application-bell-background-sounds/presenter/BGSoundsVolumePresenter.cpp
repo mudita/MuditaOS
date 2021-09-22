@@ -2,20 +2,23 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BGSoundsVolumePresenter.hpp"
-#include "models/BGSoundsVolumeModel.hpp"
 
 namespace app::bgSounds
 {
-    BGSoundsVolumePresenter::BGSoundsVolumePresenter() : model{std::make_shared<BGSoundsVolumeModel>()}
+    BGSoundsVolumePresenter::BGSoundsVolumePresenter()
     {}
-    auto BGSoundsVolumePresenter::getVolumeProvider() -> std::shared_ptr<gui::ListItemProvider>
+
+    VolumeData BGSoundsVolumePresenter::getVolumeData()
     {
-        return model;
+        return volumeData;
     }
-    void BGSoundsVolumePresenter::loadVolumeData()
+
+    unsigned int BGSoundsVolumePresenter::getCurrentVolume()
     {
-        model->createData();
+        return currentVolume;
     }
-    void BGSoundsVolumePresenter::onVolumeChanged()
+
+    void BGSoundsVolumePresenter::onVolumeChanged(unsigned int volume)
     {}
+
 } // namespace app::bgSounds
