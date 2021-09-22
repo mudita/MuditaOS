@@ -16,10 +16,8 @@ namespace app::alarmClock
 {
     NewEditAlarmModel::NewEditAlarmModel(app::ApplicationCommon *app,
                                          std::shared_ptr<alarmClock::AlarmRRulePresenter> rRulePresenter,
-                                         std::shared_ptr<AbstractAlarmsRepository> alarmsRepository,
-                                         bool mode24H)
-        : application(app), alarmsRepository{std::move(alarmsRepository)}, rRulePresenter(rRulePresenter),
-          mode24H(mode24H)
+                                         std::shared_ptr<AbstractAlarmsRepository> alarmsRepository)
+        : application(app), alarmsRepository{std::move(alarmsRepository)}, rRulePresenter(rRulePresenter)
     {}
 
     unsigned int NewEditAlarmModel::requestRecordsCount()
@@ -49,7 +47,6 @@ namespace app::alarmClock
         assert(app != nullptr);
 
         internalData.push_back(new gui::AlarmTimeItem(
-            mode24H,
             [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
             [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); }));
 
