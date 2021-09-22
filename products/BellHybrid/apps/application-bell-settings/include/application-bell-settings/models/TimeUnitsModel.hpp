@@ -42,7 +42,8 @@ namespace app::bell_settings
 
         [[nodiscard]] auto getMinimalItemSpaceRequired() const -> unsigned int override;
 
-        [[nodiscard]] auto getTemperatureUnit() -> utils::temperature::Temperature::Unit;
+        [[nodiscard]] auto getTemperatureUnit() const -> utils::temperature::Temperature::Unit;
+        auto setTemperatureUnit(utils::temperature::Temperature::Unit unit) -> void;
 
       private:
         app::ApplicationCommon *application{};
