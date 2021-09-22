@@ -57,6 +57,7 @@ target_link_libraries(PurePhone
         application-phonebook
         application-settings
         application-special-input
+        pure::time
         appmgr
         db
         evtmgr
@@ -108,6 +109,7 @@ include(GitHubWorkerMessages)
 github_message_standalone()
 github_message_update()
 
+add_subdirectory(alarms)
 add_subdirectory(apps)
 add_subdirectory(services)
 add_subdirectory(sys)
