@@ -2,7 +2,9 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmPopup.hpp"
-#include "data/AlarmPopupParams.hpp"
+#include "log/log.hpp"
+#include "time/dateCommon.hpp"
+#include <data/AlarmPopupRequestParams.hpp>
 
 #include <InputEvent.hpp>
 #include <i18n/i18n.hpp>
@@ -16,7 +18,10 @@ using namespace style::popup::alarm;
 namespace gui
 {
 
-    AlarmPopup::AlarmPopup(app::ApplicationCommon *app, const std::string &name) : AppWindow(app, name)
+    AlarmPopup::AlarmPopup(app::ApplicationCommon *app,
+                           const std::string &name,
+                           std::shared_ptr<app::popup::AlarmPopupPresenter> presenter)
+        : AppWindow(app, name), app::popup::AlarmPopupContract::View(std::move(presenter))
     {
         buildInterface();
     }
@@ -32,30 +37,17 @@ namespace gui
     void AlarmPopup::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         /// Use AlarmPopupType to determine popup origin
-
-        if (auto params = dynamic_cast<AlarmPopupParams *>(data); params && mode == ShowMode::GUI_SHOW_INIT) {
+        auto params = dynamic_cast<AlarmPopupRequestParams *>(data);
+        assert(params);
+        getPresenter()->setModel(params->popRecord());
+        if ((params != nullptr) && mode == ShowMode::GUI_SHOW_INIT) {
 
             bottomBar->setActive(BottomBar::Side::RIGHT, true);
             bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::stop));
 
-            addAlarmLabels(params->getAlarmTimeString());
-
-            /// Apply snooze button visibility based on Event records (snooze interval != 0);
-
-            bottomBar->setActive(BottomBar::Side::CENTER, true);
-            bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::select));
-
-            addSnoozeLabel(params->getSnoozeTimeString());
-
-            auto snoozeIcon = new ImageBoxWithText(
-                body, new Image("snooze_icon", ImageTypeSpecifier::W_G), utils::translate("app_popup_snooze_text"));
-            snoozeIcon->activatedCallback = [=](gui::Item &item) {
-                LOG_DEBUG("TODO: Add SNOOZE action");
-                return true;
-            };
-
-            setFocusItem(snoozeIcon);
-            body->resizeItems();
+            if (getPresenter()->isSnoozeAble()) {
+                showSnoozeButton();
+            }
         }
     }
 
@@ -74,14 +66,11 @@ namespace gui
     bool AlarmPopup::onInput(const InputEvent &inputEvent)
     {
         if (inputEvent.isShortRelease() && inputEvent.is(KeyCode::KEY_RF)) {
-            LOG_DEBUG("TODO: Add STOP action");
+            getPresenter()->stopAlarm();
             return true;
         }
 
-        if (AppWindow::onInput(inputEvent)) {
-            return true;
-        }
-        return false;
+        return AppWindow::onInput(inputEvent);
     }
 
     void AlarmPopup::addArcOverlay()
@@ -129,7 +118,7 @@ namespace gui
         alarmLabel->setMinimumHeightToFitText();
     }
 
-    void AlarmPopup::addSnoozeLabel(std::string timeString)
+    void AlarmPopup::addSnoozeLabel()
     {
         auto snoozeLabelBox = new VBox(body);
         snoozeLabelBox->setMinimumSize(style::window::default_body_width, style::popup::alarm::SnoozeLabel::h);
@@ -137,15 +126,36 @@ namespace gui
         snoozeLabelBox->setMargins(Margins(0, style::popup::alarm::SnoozeLabel::top_margin, 0, 0));
         snoozeLabelBox->setEdges(RectangleEdge::None);
 
-        if (!timeString.empty()) {
+        if (getPresenter()->isSnoozed() && !getPresenter()->snoozedTill().empty()) {
             auto snoozeLabel = new gui::TextFixedSize(snoozeLabelBox);
             snoozeLabel->drawUnderline(false);
             snoozeLabel->setFont(style::window::font::mediumlight);
             snoozeLabel->setAlignment(
                 gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Bottom));
-            snoozeLabel->setText(utils::translate("app_popup_alarm_snoozed_till") + std::string{" "} + timeString);
+            snoozeLabel->setText(utils::translate("app_popup_alarm_snoozed_till") + std::string{" "} +
+                                 getPresenter()->snoozedTill());
             snoozeLabel->setMinimumWidthToFitText(snoozeLabel->getText());
             snoozeLabel->setMinimumHeightToFitText();
         }
+    }
+
+    void AlarmPopup::showSnoozeButton()
+    {
+        addAlarmLabels(getPresenter()->startedAt());
+
+        bottomBar->setActive(BottomBar::Side::CENTER, true);
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::select));
+
+        addSnoozeLabel();
+
+        auto snoozeIcon = new ImageBoxWithText(
+            body, new Image("snooze_icon", ImageTypeSpecifier::W_G), utils::translate("app_popup_snooze_text"));
+        snoozeIcon->activatedCallback = [=](gui::Item & /*item*/) {
+            getPresenter()->snoozeHit();
+            return true;
+        };
+
+        setFocusItem(snoozeIcon);
+        body->resizeItems();
     }
 } // namespace gui

@@ -4,8 +4,8 @@
 #pragma once
 
 #include "popups/Popups.hpp"
-#include "AlarmPopupParams.hpp"
 
+#include <memory>
 #include <service-appmgr/Actions.hpp>
 #include <PhoneModes/Common.hpp>
 #include <module-audio/Audio/AudioCommon.hpp>
@@ -14,6 +14,7 @@
 
 namespace gui
 {
+
     class PopupRequestParams : public app::manager::actions::ActionParams
     {
       public:
@@ -124,34 +125,4 @@ namespace gui
         const audio::Context audioContext;
     };
 
-    class AlarmPopupRequestParams : public PopupRequestParams
-    {
-      public:
-        explicit AlarmPopupRequestParams(popup::ID popupId,
-                                         AlarmPopupType type,
-                                         std::string alarmTime,
-                                         std::string snoozeTime = std::string{})
-            : PopupRequestParams{popupId}, type{type}, alarmTime{alarmTime}, snoozeTime{snoozeTime}
-        {}
-
-        [[nodiscard]] AlarmPopupType getPopupType() const
-        {
-            return type;
-        }
-
-        [[nodiscard]] std::string getAlarmTimeString() const
-        {
-            return alarmTime;
-        }
-
-        [[nodiscard]] std::string getSnoozeTimeString() const
-        {
-            return snoozeTime;
-        }
-
-      private:
-        const AlarmPopupType type;
-        const std::string alarmTime;
-        const std::string snoozeTime;
-    };
 } // namespace gui

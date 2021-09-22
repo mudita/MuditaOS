@@ -63,6 +63,7 @@
 #include <Logger.hpp>
 #include <product/version.hpp>
 #include <sys/SystemManager.hpp>
+#include <time/AlarmOperations.hpp>
 #include <SystemWatchdog/SystemWatchdog.hpp>
 #include <thread.hpp>
 
@@ -106,7 +107,7 @@ int main()
     systemServices.emplace_back(sys::CreatorFor<ServiceAudio>());
     systemServices.emplace_back(sys::CreatorFor<ServiceBluetooth>());
     systemServices.emplace_back(sys::CreatorFor<ServiceDesktop>());
-    systemServices.emplace_back(sys::CreatorFor<stm::ServiceTime>());
+    systemServices.emplace_back(sys::CreatorFor<stm::ServiceTime>(std::make_shared<alarms::AlarmOperationsFactory>()));
     systemServices.emplace_back(sys::CreatorFor<service::eink::ServiceEink>());
     systemServices.emplace_back(sys::CreatorFor<service::gui::ServiceGUI>());
 
