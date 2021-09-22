@@ -5,6 +5,7 @@
 
 #include <AppWindow.hpp>
 #include <string>
+#include "presenter/AlarmPresenter.hpp"
 
 namespace style::popup::alarm
 {
@@ -33,15 +34,18 @@ namespace style::popup::alarm
 
 namespace gui
 {
-    class AlarmPopup : public AppWindow
+    class AlarmPopup : public AppWindow, app::popup::AlarmPopupContract::View
     {
       public:
-        AlarmPopup(app::ApplicationCommon *app, const std::string &name);
+        AlarmPopup(app::ApplicationCommon *app,
+                   const std::string &name,
+                   std::shared_ptr<app::popup::AlarmPopupPresenter> presenter);
         void buildInterface() override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         bool onInput(const InputEvent &inputEvent) override;
 
         status_bar::Configuration configureStatusBar(status_bar::Configuration appConfiguration) override;
+        virtual void showSnoozeButton() override;
 
       private:
         VBox *body = nullptr;
@@ -49,7 +53,7 @@ namespace gui
         void addArcOverlay();
         void createMainLayout();
         void addAlarmLabels(std::string timeString);
-        void addSnoozeLabel(std::string timeString);
+        void addSnoozeLabel();
     };
 
 }; // namespace gui
