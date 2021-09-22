@@ -5,7 +5,6 @@
 #include "TemperatureUnitListItem.hpp"
 
 #include <widgets/spinners/Spinners.hpp>
-#include <module-utils/Temperature.hpp>
 
 namespace gui
 {
@@ -41,5 +40,11 @@ namespace gui
     auto TemperatureUnitListItem::getUnitAsStr() const noexcept -> UTF8
     {
         return temperatureUnit->getCurrentValue();
+    }
+    auto TemperatureUnitListItem::setUnit(const utils::temperature::Temperature::Unit unit) -> void
+    {
+        using namespace utils::temperature;
+        temperatureUnit->setCurrentValue(unit == Temperature::Unit::Celsius ? celsiusDegreeSymbol
+                                                                            : fahrenheitDegreeSymbol);
     }
 } // namespace gui
