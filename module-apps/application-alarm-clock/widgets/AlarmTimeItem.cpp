@@ -12,10 +12,9 @@ namespace gui
 {
     namespace timeItem = style::alarmClock::window::item::time;
 
-    AlarmTimeItem::AlarmTimeItem(bool mode24H,
-                                 std::function<void(const UTF8 &text)> bottomBarTemporaryMode,
+    AlarmTimeItem::AlarmTimeItem(std::function<void(const UTF8 &text)> bottomBarTemporaryMode,
                                  std::function<void()> bottomBarRestoreFromTemporaryMode)
-        : mode24H{mode24H}, bottomBarTemporaryMode(std::move(bottomBarTemporaryMode)),
+        : mode24H(!stm::api::isTimeFormat12h()), bottomBarTemporaryMode(std::move(bottomBarTemporaryMode)),
           bottomBarRestoreFromTemporaryMode(std::move(bottomBarRestoreFromTemporaryMode))
     {
         setMinimumSize(timeItem::width, timeItem::height);
@@ -113,13 +112,22 @@ namespace gui
         };
 
         onSaveCallback = [&](std::shared_ptr<AlarmEventRecord> record) {
+            using namespace utils::time;
             validateHour();
-            auto hours   = std::chrono::hours(std::stoi(hourInput->getText().c_str()));
-            auto minutes = std::chrono::minutes(std::stoi(minuteInput->getText().c_str()));
-            if (!mode24H) {
-                hours = date::make24(hours, isPm(mode12hInput->getText()));
+            const auto now     = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+            const auto newTime = std::localtime(&now);
+
+            if (mode24H) {
+                newTime->tm_hour = utils::toNumeric(hourInput->getText());
             }
-            record->startDate = TimePointFromYearMonthDay(TimePointToYearMonthDay(TimePointNow())) + hours + minutes;
+            else {
+                newTime->tm_hour = date::make24(std::chrono::hours{utils::toNumeric(hourInput->getText())},
+                                                isPm(mode12hInput->getText()))
+                                       .count();
+            }
+            newTime->tm_min = utils::toNumeric(minuteInput->getText());
+
+            record->startDate = TimePointFloorMinutes(std::chrono::system_clock::from_time_t(std::mktime(newTime)));
             record->endDate   = record->startDate;
         };
 
@@ -224,5 +232,4 @@ namespace gui
             minuteInput->setText("00");
         }
     }
-
 } /* namespace gui */

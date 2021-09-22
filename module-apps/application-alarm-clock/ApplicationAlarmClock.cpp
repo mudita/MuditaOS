@@ -75,7 +75,7 @@ namespace app
                               [rRulePresenter](ApplicationCommon *app, const std::string &name) {
                                   auto alarmsRepository = std::make_unique<alarmClock::AlarmsDBRepository>(app);
                                   auto alarmsProvider   = std::make_shared<alarmClock::NewEditAlarmModel>(
-                                      app, rRulePresenter, std::move(alarmsRepository), !stm::api::isTimeFormat12h());
+                                      app, rRulePresenter, std::move(alarmsRepository));
                                   auto presenter =
                                       std::make_unique<alarmClock::AlarmClockEditWindowPresenter>(alarmsProvider);
                                   return std::make_unique<alarmClock::NewEditAlarmWindow>(app, std::move(presenter));
