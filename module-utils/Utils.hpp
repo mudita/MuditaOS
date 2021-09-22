@@ -170,6 +170,17 @@ namespace utils
         return true;
     }
 
+    static inline int toNumeric(const std::string &text)
+    {
+        try {
+            return std::stoi(text);
+        }
+        catch (const std::exception &e) {
+            LOG_ERROR("toNumeric exception %s", e.what());
+            return 0;
+        }
+    }
+
     static inline void findAndReplaceAll(std::string &data,
                                          const std::vector<std::pair<std::string, std::optional<std::string>>> &values,
                                          std::function<std::string(int)> getReplaceString = nullptr)

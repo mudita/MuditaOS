@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -24,12 +24,11 @@ namespace gui
         void applyInputCallbacks();
         void onInputCallback(gui::Text &textItem);
         void prepareForTimeMode();
-        bool isPm(const std::string &text) const;
+        [[nodiscard]] bool isPm(const std::string &text) const;
         void validateHour();
 
       public:
-        AlarmTimeItem(bool mode24H,
-                      std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr,
+        AlarmTimeItem(std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr,
                       std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr);
     };
 
