@@ -119,8 +119,12 @@ namespace app::bell_settings
         application->bus.sendUnicast(std::move(msg), service::name::service_time);
     }
 
-    auto TimeUnitsModel::getTemperatureUnit() -> utils::temperature::Temperature::Unit
+    auto TimeUnitsModel::getTemperatureUnit() const -> utils::temperature::Temperature::Unit
     {
         return *utils::temperature::strToUnit(temperatureUnitListItem->getUnitAsStr());
+    }
+    auto TimeUnitsModel::setTemperatureUnit(const utils::temperature::Temperature::Unit unit) -> void
+    {
+        temperatureUnitListItem->setUnit(unit);
     }
 } // namespace app::bell_settings
