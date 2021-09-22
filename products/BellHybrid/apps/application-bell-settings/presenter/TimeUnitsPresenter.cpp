@@ -31,6 +31,7 @@ namespace app::bell_settings
     auto TimeUnitsWindowPresenter::loadData() -> void
     {
         pagesProvider->loadData();
+        pagesProvider->setTemperatureUnit(temperatureUnitModel->get());
     }
 
     auto TimeUnitsWindowPresenter::createData() -> void
