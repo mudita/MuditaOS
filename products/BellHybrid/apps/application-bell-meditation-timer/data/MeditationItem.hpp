@@ -7,7 +7,7 @@ namespace meditation
 {
     namespace value
     {
-        inline constexpr auto defaultTimerValue = std::chrono::seconds{20 * 60};
+        inline constexpr auto defaultTimerValue = std::chrono::seconds{15 * 60};
         inline constexpr auto maxTimerValue     = std::chrono::seconds{180 * 60};
         inline constexpr auto minTimerValue     = std::chrono::seconds{1 * 60};
     } // namespace value
