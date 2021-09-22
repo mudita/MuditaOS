@@ -57,9 +57,9 @@
 #include <popups/lock-popups/SimNotReadyWindow.hpp>
 #include <popups/data/PopupData.hpp>
 #include <popups/data/PopupRequestParams.hpp>
+#include <popups/data/AlarmPopupRequestParams.hpp>
 #include <popups/data/PhoneModeParams.hpp>
 #include <popups/data/BluetoothModeParams.hpp>
-#include <popups/data/AlarmPopupParams.hpp>
 #include <locks/data/LockData.hpp>
 
 namespace gui
@@ -872,7 +872,8 @@ namespace app
                 break;
             case ID::Alarm:
                 windowsFactory.attach(window::alarm_window, [](ApplicationCommon *app, const std::string &name) {
-                    return std::make_unique<gui::AlarmPopup>(app, window::alarm_window);
+                    auto presenter = std::make_shared<popup::AlarmPopupPresenter>(app);
+                    return std::make_unique<gui::AlarmPopup>(app, window::alarm_window, presenter);
                 });
             default:
                 break;
@@ -914,11 +915,10 @@ namespace app
                                                               popupParams->getErrorCode()));
         }
         else if (id == ID::Alarm) {
-            auto popupParams = static_cast<const gui::AlarmPopupRequestParams *>(params);
+            auto popupParams =
+                const_cast<gui::AlarmPopupRequestParams *>(static_cast<const gui::AlarmPopupRequestParams *>(params));
             switchWindow(gui::popup::resolveWindowName(id),
-                         std::make_unique<gui::AlarmPopupParams>(popupParams->getPopupType(),
-                                                                 popupParams->getAlarmTimeString(),
-                                                                 popupParams->getSnoozeTimeString()));
+                         std::make_unique<gui::AlarmPopupRequestParams>(popupParams));
         }
         else {
             switchWindow(gui::popup::resolveWindowName(id));
