@@ -3,7 +3,9 @@
 
 #include "ApplicationBellBackgroundSounds.hpp"
 #include "presenter/BGSoundsMainWindowPresenter.hpp"
+#include "presenter/BGSoundsVolumePresenter.hpp"
 #include "windows/BGSoundsMainWindow.hpp"
+#include "windows/BGSoundsVolumeWindow.hpp"
 
 namespace app
 {
@@ -31,6 +33,10 @@ namespace app
         windowsFactory.attach(gui::name::window::main_window, [](ApplicationCommon *app, const std::string &name) {
             auto presenter = std::make_unique<bgSounds::BGSoundsMainWindowPresenter>();
             return std::make_unique<gui::BGSoundsMainWindow>(app, std::move(presenter));
+        });
+        windowsFactory.attach(gui::window::name::bgSoundsVolume, [](ApplicationCommon *app, const std::string &name) {
+            auto presenter = std::make_unique<bgSounds::BGSoundsVolumePresenter>();
+            return std::make_unique<gui::BGSoundsVolumeWindow>(app, std::move(presenter));
         });
     }
 

@@ -13,10 +13,17 @@ target_include_directories(application-bell-background-sounds
 target_sources(application-bell-background-sounds
     PRIVATE
         ApplicationBellBackgroundSounds.cpp
+        data/BGSoundsVolumeListItem.cpp
+        models/BGSoundsVolumeModel.cpp
+        presenter/BGSoundsVolumePresenter.cpp
         windows/BGSoundsMainWindow.cpp
+        windows/BGSoundsVolumeWindow.cpp
 
-        presenter/BGSoundsMainWindowPresenter.hpp
+        data/BGSoundsVolumeListItem.hpp
+        models/BGSoundsVolumeModel.hpp
+        presenter/BGSoundsVolumePresenter.hpp
         windows/BGSoundsMainWindow.hpp
+        windows/BGSoundsVolumeWindow.hpp
 
     PUBLIC
         include/application-bell-background-sounds/ApplicationBellBackgroundSounds.hpp
