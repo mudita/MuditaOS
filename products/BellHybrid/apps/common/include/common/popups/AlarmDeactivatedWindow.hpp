@@ -3,14 +3,21 @@
 
 #pragma once
 
-#include <apps-common/windows/Dialog.hpp>
+#include <apps-common/popups/WindowWithTimer.hpp>
 
 namespace gui
 {
-    class AlarmDeactivatedWindow : public Dialog
+    class Icon;
+    class AlarmDeactivatedWindow : public WindowWithTimer
     {
       public:
         explicit AlarmDeactivatedWindow(app::ApplicationCommon *app);
-        void onBeforeShow(ShowMode mode, SwitchData *data) override;
+
+      private:
+        bool onInput(const InputEvent &inputEvent) override;
+        void buildInterface() override;
+        void returnToPreviousWindow();
+
+        Icon *icon{};
     };
 } /* namespace gui */
