@@ -29,7 +29,6 @@ namespace bluetooth
         auto getStreamData() -> std::shared_ptr<BluetoothStreamData>;
         void setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice);
         [[nodiscard]] auto callAnswered() const noexcept -> Error::Code;
-        [[nodiscard]] auto callTerminated() const noexcept -> Error::Code;
         [[nodiscard]] auto setIncomingCallNumber(const std::string &num) const noexcept -> Error::Code;
 
       private:

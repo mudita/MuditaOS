@@ -114,10 +114,6 @@ namespace bluetooth
     {
         pimpl->setAudioDevice(std::move(audioDevice));
     }
-    auto A2DP::callTerminated() const noexcept -> Error::Code
-    {
-        return Error::SystemError;
-    }
     auto A2DP::callAnswered() const noexcept -> Error::Code
     {
         return Error::SystemError;

@@ -90,6 +90,7 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
     connectHandler<BluetoothPairResultMessage>();
     connectHandler<message::bluetooth::A2DPVolume>();
     connectHandler<message::bluetooth::HSPVolume>();
+    connectHandler<message::bluetooth::HFPVolume>();
     connectHandler<message::bluetooth::Ring>();
     connectHandler<message::bluetooth::StartAudioRouting>();
     connectHandler<message::bluetooth::Connect>();
@@ -408,7 +409,13 @@ auto ServiceBluetooth::handle(message::bluetooth::A2DPVolume *msg) -> std::share
 auto ServiceBluetooth::handle(message::bluetooth::HSPVolume *msg) -> std::shared_ptr<sys::Message>
 {
     using namespace message::bluetooth;
-    AudioServiceAPI::BluetoothHSPV olumeChanged(this, msg->getVolume());
+    AudioServiceAPI::BluetoothHSPVolumeChanged(this, msg->getVolume());
+    return sys::MessageNone{};
+}
+auto ServiceBluetooth::handle(message::bluetooth::HFPVolume *msg) -> std::shared_ptr<sys::Message>
+{
+    using namespace message::bluetooth;
+    AudioServiceAPI::BluetoothHFPVolumeChanged(this, msg->getVolume());
     return sys::MessageNone{};
 }
 
@@ -431,10 +438,10 @@ auto ServiceBluetooth::handle(CellularCallerIdMessage *msg) -> std::shared_ptr<s
 {
     auto number = msg->number;
     auto btOn   = std::visit(bluetooth::BoolVisitor(), settingsHolder->getValue(bluetooth::Settings::State));
-    LOG_ERROR("Received caller ID msg! Number: %s", number.getEntered().c_str());
+    LOG_ERROR("Received caller ID msg! ");
 
     if (btOn) {
-        LOG_ERROR("Sending to profile!");
+        LOG_DEBUG("Sending to profile!");
         sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::IncomingCallNumber, number));
     }
 

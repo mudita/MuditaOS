@@ -34,4 +34,10 @@ namespace message::bluetooth
         explicit HSPVolume(std::uint8_t volume) : AudioVolume{volume}
         {}
     };
+    class HFPVolume : public AudioVolume
+    {
+      public:
+        explicit HFPVolume(std::uint8_t volume) : AudioVolume{volume}
+        {}
+    };
 } // namespace message::bluetooth

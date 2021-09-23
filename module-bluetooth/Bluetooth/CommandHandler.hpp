@@ -42,7 +42,6 @@ namespace bluetooth
             StopStream,
             SwitchProfile,
             CallAnswered,
-            CallTerminated,
             IncomingCallNumber,
             None,
         };
@@ -55,7 +54,6 @@ namespace bluetooth
         Command(Command::Type type, std::optional<utils::PhoneNumber::View> num) : type(type)
         {
             if (num.has_value()) {
-                LOG_ERROR("Command number: %s", num->getEntered().c_str());
                 numberStringPtr  = new std::string();
                 *numberStringPtr = num->getEntered();
             }
