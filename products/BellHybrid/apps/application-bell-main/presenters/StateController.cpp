@@ -13,6 +13,8 @@
 #include <time/time_conversion.hpp>
 #include <time/time_constants.hpp>
 
+#include <random>
+
 /// Uncomment to print state machine debug logs
 /// #define DEBUG_STATE_MACHINE 1U
 
@@ -45,7 +47,20 @@ namespace app::home_screen
 
             auto isAlarmActive   = [](AbstractAlarmModel &alarmModel) -> bool { return alarmModel.isActive(); };
             auto isSnoozeAllowed = [](AbstractAlarmModel &alarmModel) -> bool { return alarmModel.isSnoozeAllowed(); };
-
+            auto getRand         = [](const std::uint32_t lo, const std::uint32_t hi) -> std::uint32_t {
+                std::random_device dev;
+                std::mt19937 rng(dev());
+                std::uniform_int_distribution<std::mt19937::result_type> dist(lo, hi);
+                return dist(rng);
+            };
+            auto getGreeting = []() -> UTF8 {
+                const auto greetingCollection = utils::translate_array("app_bell_greeting_msg");
+                if (greetingCollection.empty()) {
+                    LOG_WARN("app_bell_greeting_msg array does not exist, using default string");
+                    return "app_bell_greeting_msg";
+                }
+                return greetingCollection[Helpers::getRand(0, greetingCollection.size() - 1)];
+            };
         } // namespace Helpers
 
         namespace Events
@@ -187,7 +202,7 @@ namespace app::home_screen
             auto entry = [](AbstractView &view, AbstractAlarmModel &alarmModel, AbstractPresenter &presenter) {
                 presenter.spawnTimer();
                 alarmModel.turnOff();
-                view.setBottomDescription(utils::translate("app_bell_alarm_ringing_deactivated"));
+                view.setBottomDescription(Helpers::getGreeting());
                 view.setAlarmActive(false);
             };
             auto exit = [](AbstractPresenter &presenter) { presenter.detachTimer(); };
@@ -307,8 +322,8 @@ namespace app::home_screen
                     );
                 // clang-format on
             }
-        };
-    } // namespace
+        }; // namespace Helpers
+    }      // namespace
 
     class StateController::Impl
     {

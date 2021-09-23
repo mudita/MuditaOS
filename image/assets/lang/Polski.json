@@ -324,7 +324,7 @@
   "app_onboarding_no_configuration": "<text>Twój telefon Mudita Pure nie został<br></br>skonfigurowany. Możesz przejść do<br></br>Ustawień, by go skonfigurować.</text>",
   "app_onboarding_update_info": "<text>Aktualna wersja MuditaOS to <br></br> <token>$VERSION</token>. Często się pojawiają aktualizacje z nowymi <br></br> funkcjami i poprawkami. <br></br>Aby zaktualizować telefon, <br></br> odwiedź stronę: </text><text font='gt_pressura' weight='bold' size='27'>www.mudita.com/updateos</text><br></br><text>i postępuj zgodnie ze wskazówkami.</text>",
   "app_settings_title_main": "Ustawienia",
-  "app_settings_advanced" : "Zaawansowane",
+  "app_settings_advanced": "Zaawansowane",
   "app_settings_bt": "Bluetooth",
   "app_settings_bluetooth_add_device": "Dodaj urządzenie",
   "app_settings_bluetooth_all_devices": "Wszystkie urządzenia",
@@ -604,9 +604,11 @@
   "app_bellmain_home_screen_bottom_desc": "Next alarm will ring in",
   "app_bellmain_home_screen_bottom_desc_dp": "Deep press to activate",
   "app_bell_alarm_deactivated": "Alarm deactivated",
-  "app_bell_alarm_ringing_deactivated": "Good morning!\nRise and shine",
   "app_bell_settings_advanced_frontlight": "Frontlight",
   "app_bell_settings_frontlight_top_message": "Frontlight intensity",
   "app_bell_settings_frontlight_finished_message": "Frontlight is set",
-  "app_bell_powernap_session_ended_message": "<text>Hello!<br />Rise & shine</text>"
+  "app_bell_powernap_session_ended_message": "<text>Hello!<br />Rise & shine</text>",
+  "app_bell_greeting_msg": [
+    "<text>Good morning!<br />Rise and shine</text>"
+  ]
 }
