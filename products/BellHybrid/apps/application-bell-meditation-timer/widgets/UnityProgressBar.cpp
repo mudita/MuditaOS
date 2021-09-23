@@ -44,6 +44,7 @@ namespace gui
 
     void UnityProgressBar::buildDrawListImplementation(std::list<Command> &commands)
     {
+        // LOG_DEBUG("buildDrawListImplementation, maxValue=%d, currentValue=%d", maxValue, currentValue);
         uint32_t items = (widgetArea.w + gw) / (rw + gw);
         uint32_t count = currentValue * items / maxValue;
         uint32_t fx    = widgetArea.x + (widgetArea.w - (rw * items + gw * (items - 1))) / 2;

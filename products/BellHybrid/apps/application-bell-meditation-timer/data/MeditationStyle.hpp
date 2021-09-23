@@ -5,7 +5,7 @@
 
 #include <Style.hpp>
 
-namespace meditationStyle
+namespace app::meditationStyle
 {
     namespace itStyle
     {

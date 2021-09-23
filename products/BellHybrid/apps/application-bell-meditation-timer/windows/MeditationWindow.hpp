@@ -6,11 +6,11 @@
 #include <AppWindow.hpp>
 #include <Application.hpp>
 
-#include "../data/MeditationStyle.hpp"
-#include "../data/MeditationItem.hpp"
+#include "MeditationStyle.hpp"
+#include "MeditationItem.hpp"
 
-using namespace meditation;
-using namespace meditationStyle;
+using namespace app::meditation;
+using namespace app::meditationStyle;
 
 namespace gui
 {
@@ -18,11 +18,13 @@ namespace gui
     class MeditationWindow : public AppWindow
     {
       protected:
-        MeditationItem item;
         bool inputDisabled;
 
         void gotoWindow(std::string name);
         void disableInput();
+
+        virtual void buildMeditationItem(MeditationItem &item)       = 0;
+        virtual void onMeditationItemAvailable(MeditationItem *item) = 0;
 
       public:
         MeditationWindow() = delete;

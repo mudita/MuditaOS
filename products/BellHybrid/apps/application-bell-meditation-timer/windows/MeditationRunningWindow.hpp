@@ -3,52 +3,54 @@
 
 #pragma once
 
-#include "widgets/UnityProgressBar.hpp"
 #include <Application.hpp>
 #include <InputEvent.hpp>
-#include <Utils.hpp>
-#include <Style.hpp>
-#include <BoxLayout.hpp>
 #include <Label.hpp>
+#include <Text.hpp>
 
+#include "UnityProgressBar.hpp"
 #include "WithTimerWindow.hpp"
+#include "MeditationProgressPresenter.hpp"
 
 namespace gui
 {
     namespace name::window
     {
-        inline constexpr auto meditation_running       = "Meditation countdown";
-        inline constexpr auto meditation_running_title = "Meditation timer";
+        inline constexpr auto meditation_running = "Meditation progress";
     } // namespace name::window
 
-    class MeditationRunningWindow : public WithTimerWindow
+    class MeditationRunningWindow : public MeditationWindow, public app::meditation::MeditationProgressContract::View
     {
       public:
-        explicit MeditationRunningWindow(app::ApplicationCommon *app);
+        explicit MeditationRunningWindow(
+            app::ApplicationCommon *app,
+            std::unique_ptr<app::meditation::MeditationProgressContract::Presenter> &&windowPresenter);
 
         // virtual methods
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         bool onInput(const InputEvent &inputEvent) override;
         void buildInterface() override;
         void destroyInterface() override;
-        void onTimeout() override;
+        void pregressFinished() override;
+        void intervalReached() override;
+        void baseTickReached() override;
+        void buildMeditationItem(MeditationItem &item) override;
+        void onMeditationItemAvailable(MeditationItem *item) override;
 
       private:
-        gui::Label *datetime        = nullptr;
-        gui::Label *title           = nullptr;
-        gui::Label *timer           = nullptr;
-        UnityProgressBar *progress  = nullptr;
-        std::chrono::seconds passedTimer    = std::chrono::seconds::zero();
-        std::chrono::seconds passedInterval = std::chrono::seconds::zero();
+        std::unique_ptr<app::meditation::MeditationProgressContract::Presenter> presenter;
+        gui::Label *datetime            = nullptr;
+        gui::Label *title               = nullptr;
+        gui::Text *timer                = nullptr;
+        gui::UnityProgressBar *progress = nullptr;
 
-        void updateProgress();
+        void configureTimer();
         void updateDateTime();
-        void updateTimer();
         void start();
         void pause();
         void resume();
-        void intervalTimeout();
         void endSession();
+        void intervalTimeout();
         void playGong();
     };
 } // namespace gui

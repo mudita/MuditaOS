@@ -3,21 +3,20 @@
 
 #include "MeditationTimerWindow.hpp"
 #include "IntervalChimeWindow.hpp"
-#include "../data/MeditationSwitchData.hpp"
 
 #include "log.hpp"
 #include <i18n/i18n.hpp>
 
 namespace gui
 {
-    MeditationTimerWindow::MeditationTimerWindow(app::ApplicationCommon *app)
-        : MeditationWindow(app, gui::name::window::meditation_timer)
+    MeditationTimerWindow::MeditationTimerWindow(
+        app::ApplicationCommon *app,
+        std::unique_ptr<app::meditation::MeditationTimerContract::Presenter> &&windowPresenter)
+        : MeditationWindow(app, gui::name::window::meditation_timer), presenter{std::move(windowPresenter)}
     {
         buildInterface();
+        presenter->attach(this);
     }
-
-    void MeditationTimerWindow::rebuild()
-    {}
 
     void MeditationTimerWindow::buildInterface()
     {
@@ -55,25 +54,18 @@ namespace gui
 
     void MeditationTimerWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        if (mode == ShowMode::GUI_SHOW_INIT) {
-            updateDisplay();
-        }
+        MeditationWindow::onBeforeShow(mode, data);
     }
 
     bool MeditationTimerWindow::onInput(const gui::InputEvent &inputEvent)
     {
-        if (inputEvent.isShortRelease(gui::KeyCode::KEY_RF)) {
-            application->returnToPreviousWindow();
-            return true;
-        }
-
         if (inputEvent.isShortRelease(gui::KeyCode::KEY_UP) || inputEvent.isShortRelease(gui::KeyCode::KEY_RIGHT)) {
-            increaseTimer();
+            presenter->increase();
             return true;
         }
 
         if (inputEvent.isShortRelease(gui::KeyCode::KEY_DOWN) || inputEvent.isShortRelease(gui::KeyCode::KEY_LEFT)) {
-            decreaseTimer();
+            presenter->decrease();
             return true;
         }
 
@@ -85,32 +77,22 @@ namespace gui
         return MeditationWindow::onInput(inputEvent);
     }
 
-    void MeditationTimerWindow::increaseTimer()
-    {
-        LOG_DEBUG("increaseTimer");
-
-        std::chrono::seconds t = item.getTimer();
-        if (t >= meditation::value::maxTimerValue) {
-            return;
-        }
-        item.setTimer(t + std::chrono::seconds{60});
-        updateDisplay();
-    }
-
-    void MeditationTimerWindow::decreaseTimer()
-    {
-        LOG_DEBUG("decreaseTimer");
-
-        std::chrono::seconds t = item.getTimer();
-        if (t <= meditation::value::minTimerValue) {
-            return;
-        }
-        item.setTimer(t - std::chrono::seconds{60});
-        updateDisplay();
-    }
-
     void MeditationTimerWindow::updateDisplay()
     {
-        text->setText(std::to_string(item.getTimer() / std::chrono::seconds{60}));
+        LOG_DEBUG("updateDisplay");
+        text->setText(presenter->getTimerString());
+    }
+
+    void MeditationTimerWindow::buildMeditationItem(MeditationItem &item)
+    {
+        presenter->request(item);
+    }
+
+    void MeditationTimerWindow::onMeditationItemAvailable(MeditationItem *item)
+    {
+        if (item == nullptr) {
+            item = new MeditationItem();
+        }
+        presenter->activate(*item);
     }
 } // namespace gui

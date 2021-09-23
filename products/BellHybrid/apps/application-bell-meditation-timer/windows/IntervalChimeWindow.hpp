@@ -5,13 +5,11 @@
 
 #include <Application.hpp>
 #include <InputEvent.hpp>
-#include <Utils.hpp>
-#include <Style.hpp>
-#include <BoxLayout.hpp>
 #include <Label.hpp>
 #include <Image.hpp>
 
 #include "MeditationWindow.hpp"
+#include "IntervalChimePresenter.hpp"
 
 namespace gui
 {
@@ -20,20 +18,12 @@ namespace gui
         inline constexpr auto interval_chime = "Interval chime";
     }
 
-    class IntervalChimeWindow : public MeditationWindow
+    class IntervalChimeWindow : public MeditationWindow, public app::meditation::IntervalChimeContract::View
     {
       public:
-        explicit IntervalChimeWindow(app::ApplicationCommon *app);
-
-        enum class IntervalType
-        {
-            IntervalNone = 0,
-            Interval_1,
-            Interval_2,
-            Interval_5,
-            Interval_10,
-            Interval_15
-        };
+        explicit IntervalChimeWindow(
+            app::ApplicationCommon *app,
+            std::unique_ptr<app::meditation::IntervalChimeContract::Presenter> &&windowPresenter);
 
         // virtual methods
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
@@ -41,19 +31,16 @@ namespace gui
         void buildInterface() override;
         void destroyInterface() override;
         bool onInput(const gui::InputEvent &inputEvent) override;
+        void updateDisplay() override;
+        void buildMeditationItem(MeditationItem &item) override;
+        void onMeditationItemAvailable(MeditationItem *item) override;
 
       private:
-        IntervalType intervalType = IntervalType::IntervalNone;
+        std::unique_ptr<app::meditation::IntervalChimeContract::Presenter> presenter;
         gui::Image *previousImage = nullptr;
         gui::Image *nextImage     = nullptr;
         gui::Label *title         = nullptr;
         gui::Label *text          = nullptr;
         gui::Label *minute        = nullptr;
-
-        void previousInterval();
-        void nextInterval();
-        void updateDisplay();
-        std::string getIntervalString() const;
-        std::chrono::seconds intervalToSecs() const noexcept;
     };
 } // namespace gui

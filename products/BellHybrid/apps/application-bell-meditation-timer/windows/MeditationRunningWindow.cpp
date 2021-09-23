@@ -4,26 +4,27 @@
 #include "MeditationRunningWindow.hpp"
 #include "SessionPausedWindow.hpp"
 #include "SessionEndWindow.hpp"
-#include "../data/MeditationSwitchData.hpp"
 
 #include <service-time/ServiceTime.hpp>
 
 #include "log.hpp"
 #include <i18n/i18n.hpp>
-#include <Font.hpp>
-#include <TextBlock.hpp>
 
 namespace gui
 {
-    MeditationRunningWindow::MeditationRunningWindow(app::ApplicationCommon *app)
-        : WithTimerWindow(app, gui::name::window::meditation_running)
+    MeditationRunningWindow::MeditationRunningWindow(
+        app::ApplicationCommon *app,
+        std::unique_ptr<app::meditation::MeditationProgressContract::Presenter> &&windowPresenter)
+        : MeditationWindow(app, gui::name::window::meditation_running), presenter{std::move(windowPresenter)}
     {
         buildInterface();
+        configureTimer();
+        presenter->attach(this);
     }
 
     void MeditationRunningWindow::buildInterface()
     {
-        WithTimerWindow::buildInterface();
+        MeditationWindow::buildInterface();
 
         auto newLabel = [](Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h) {
             auto label = new gui::Label(parent, x, y, w, h);
@@ -41,11 +42,13 @@ namespace gui
         title->setText(utils::translate("app_meditation_title_main"));
         title->setFont(mrStyle::title::font);
 
-        timer = newLabel(this, mrStyle::timer::x, mrStyle::timer::y, mrStyle::timer::w, mrStyle::timer::h);
+        timer = new gui::Text(this, mrStyle::timer::x, mrStyle::timer::y, mrStyle::timer::w, mrStyle::timer::h);
         timer->setFont(mrStyle::timer::font);
+        timer->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
 
-        progress = new UnityProgressBar(
+        progress = new gui::UnityProgressBar(
             this, mrStyle::progress::x, mrStyle::progress::y, mrStyle::progress::w, mrStyle::progress::h);
+        progress->setMaximum(100);
     }
 
     void MeditationRunningWindow::destroyInterface()
@@ -59,7 +62,7 @@ namespace gui
 
     void MeditationRunningWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        WithTimerWindow::onBeforeShow(mode, data);
+        MeditationWindow::onBeforeShow(mode, data);
 
         if (mode == ShowMode::GUI_SHOW_INIT) {
             start();
@@ -79,28 +82,42 @@ namespace gui
             return true;
         }
 
-        return WithTimerWindow::onInput(inputEvent);
+        return MeditationWindow::onInput(inputEvent);
     }
 
-    void MeditationRunningWindow::onTimeout()
+    void MeditationRunningWindow::pregressFinished()
     {
-        LOG_DEBUG("onTimeout");
-        passedTimer += std::chrono::seconds{1};
-        passedInterval += std::chrono::seconds{1};
+        endSession();
+    }
 
-        if (passedInterval == item.getInterval()) {
-            passedInterval = std::chrono::seconds::zero();
-            intervalTimeout();
+    void MeditationRunningWindow::intervalReached()
+    {
+        intervalTimeout();
+    }
+
+    void MeditationRunningWindow::baseTickReached()
+    {
+        updateDateTime();
+    }
+
+    void MeditationRunningWindow::buildMeditationItem(MeditationItem &item)
+    {
+        presenter->request(item);
+    }
+
+    void MeditationRunningWindow::onMeditationItemAvailable(MeditationItem *item)
+    {
+        if (item != nullptr) {
+            presenter->activate(*item);
         }
-        if (passedTimer == item.getTimer()) {
-            endSession();
-        }
-        else {
-            updateProgress();
-            updateDateTime();
-            updateTimer();
-            application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-        }
+        updateDateTime();
+    }
+
+    void MeditationRunningWindow::configureTimer()
+    {
+        presenter->initTimer(this);
+        presenter->getUIConfigurator().attach(progress);
+        presenter->getUIConfigurator().attach(timer);
     }
 
     void MeditationRunningWindow::updateDateTime()
@@ -116,51 +133,24 @@ namespace gui
         }
     }
 
-    void MeditationRunningWindow::updateTimer()
-    {
-        uint32_t remained = item.getTimer().count() - passedTimer.count();
-        uint32_t minutes  = remained / 60;
-        uint32_t seconds  = remained % 60;
-        char buffer[32];
-
-        sprintf(buffer, "%ld:%02ld", minutes, seconds);
-        timer->setText(std::string(buffer));
-    }
-
-    void MeditationRunningWindow::updateProgress()
-    {
-        uint32_t percent = std::lround(passedTimer.count() * 100 / item.getTimer().count());
-
-        progress->setPercentageValue(percent);
-    }
-
     void MeditationRunningWindow::start()
     {
         LOG_DEBUG("start");
-        progress->setMaximum(item.getTimer().count());
-        progress->setValue(0);
-        updateDateTime();
-        updateTimer();
-        startTimer(std::chrono::seconds{1}, true);
+        presenter->start();
         playGong();
     }
 
     void MeditationRunningWindow::pause()
     {
         LOG_DEBUG("pause");
-
-        stopTimer();
+        presenter->pause();
         gotoWindow(gui::name::window::session_paused);
     }
 
     void MeditationRunningWindow::resume()
     {
         LOG_DEBUG("resume");
-
-        updateProgress();
-        updateDateTime();
-        updateTimer();
-        startTimer(std::chrono::seconds{1}, true);
+        presenter->resume();
     }
 
     void MeditationRunningWindow::intervalTimeout()
@@ -172,9 +162,7 @@ namespace gui
     void MeditationRunningWindow::endSession()
     {
         LOG_DEBUG("endSession");
-
         playGong();
-        stopTimer();
         gotoWindow(gui::name::window::session_end);
     }
 
