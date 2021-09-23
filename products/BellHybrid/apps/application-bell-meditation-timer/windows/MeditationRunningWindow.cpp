@@ -6,6 +6,8 @@
 #include "SessionEndWindow.hpp"
 
 #include <service-time/ServiceTime.hpp>
+#include <purefs/filesystem_paths.hpp>
+#include <service-audio/AudioServiceAPI.hpp>
 
 #include "log.hpp"
 #include <i18n/i18n.hpp>
@@ -169,8 +171,8 @@ namespace gui
     void MeditationRunningWindow::playGong()
     {
         LOG_DEBUG("playGong");
-        // AudioServiceAPI::PlaybackStart(application,
-        //                               audio::PlaybackType::Meditation,
-        //                               purefs::dir::getCurrentOSPath() / "assets/audio/meditation/gong.mp3");
+        AudioServiceAPI::PlaybackStart(application,
+                                       audio::PlaybackType::Meditation,
+                                       purefs::dir::getCurrentOSPath() / "assets/audio/meditation/gong.mp3");
     }
 } // namespace gui
