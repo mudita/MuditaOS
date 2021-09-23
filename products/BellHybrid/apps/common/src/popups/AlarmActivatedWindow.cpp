@@ -79,7 +79,7 @@ namespace gui
         header->setTitleVisibility(false);
         bottomBar->setVisible(false);
 
-        icon = new Icon(this, 0, 0, style::window_width, style::window_height, "bell_alarm_activated", {});
+        icon = new Icon(this, 0, 0, style::window_width, style::window_height, "big_alarm", {});
         icon->text->setFont(style::window::font::verybiglight);
     }
     void AlarmActivatedWindow::returnToPreviousWindow()
