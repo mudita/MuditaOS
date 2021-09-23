@@ -303,3 +303,10 @@ class HSPDeviceVolumeChanged : public BluetoothDeviceVolumeChanged
     HSPDeviceVolumeChanged(std::uint8_t volume) : BluetoothDeviceVolumeChanged{volume}
     {}
 };
+
+class HFPDeviceVolumeChanged : public BluetoothDeviceVolumeChanged
+{
+  public:
+    HFPDeviceVolumeChanged(std::uint8_t volume) : BluetoothDeviceVolumeChanged{volume}
+    {}
+};

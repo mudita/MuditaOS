@@ -219,4 +219,12 @@ namespace AudioServiceAPI
      * @return True if request has been sent successfully, false otherwise
      */
     bool BluetoothHSPVolumeChanged(sys::Service *serv, const std::uint8_t volume);
+
+    /** @brief Bluetooth HFP volume changed handler.
+     *
+     * @param serv - requesting service.
+     * @param volume - volume level
+     * @return True if request has been sent successfully, false otherwise
+     */
+    bool BluetoothHFPVolumeChanged(sys::Service *serv, const std::uint8_t volume);
 }; // namespace AudioServiceAPI

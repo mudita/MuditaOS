@@ -8,6 +8,7 @@
 #include <log/log.hpp>
 #include <service-evtmgr/Constants.hpp>
 #include <service-audio/AudioMessage.hpp>
+#include <service-bluetooth/messages/AudioVolume.hpp>
 #include <BluetoothWorker.hpp>
 #include "SCO/ScoUtils.hpp"
 
@@ -94,10 +95,6 @@ namespace bluetooth
     {
         return pimpl->callAnswered();
     }
-    auto HFP::callTerminated() const noexcept -> Error::Code
-    {
-        return pimpl->callTerminated();
-    }
     auto HFP::setIncomingCallNumber(const std::string &num) const noexcept -> Error::Code
     {
         LOG_INFO("Setting number: %s", num.c_str());
@@ -137,7 +134,7 @@ namespace bluetooth
         {2, 1},
     };
     Devicei HFP::HFPImpl::device;
-    bool HFP::HFPImpl::isAudioRouted = false;
+    bool HFP::HFPImpl::isAudioRouted                = false;
     bool HFP::HFPImpl::isConnected                  = false;
     bool HFP::HFPImpl::isAudioConnectionEstablished = false;
 
@@ -265,7 +262,7 @@ namespace bluetooth
         case HFP_SUBEVENT_AUDIO_CONNECTION_RELEASED:
             LOG_DEBUG("Audio connection released\n");
             scoHandle = HCI_CON_HANDLE_INVALID;
-            isAudioRouted = false;
+            isAudioRouted                = false;
             isAudioConnectionEstablished = false;
             break;
         case HFP_SUBEVENT_START_RINGINIG:
@@ -297,6 +294,14 @@ namespace bluetooth
                 isAudioRouted = true;
             }
             break;
+
+        case HFP_SUBEVENT_SPEAKER_VOLUME: {
+            const auto volume = hfp_subevent_speaker_volume_get_gain(event);
+            auto &busProxy    = const_cast<sys::Service *>(ownerService)->bus;
+            busProxy.sendUnicast(std::make_shared<message::bluetooth::HFPVolume>(volume), service::name::bluetooth);
+            LOG_DEBUG("Received speaker gain change %d\n", hsp_subevent_speaker_gain_changed_get_gain(event));
+        } break;
+
         case HFP_SUBEVENT_CALL_TERMINATED:
             LOG_DEBUG("Call terminated by HF\n");
             cellularInterface->hangupCall(const_cast<sys::Service *>(ownerService));
@@ -438,6 +443,7 @@ namespace bluetooth
     void HFP::HFPImpl::setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice)
     {
         HFP::HFPImpl::audioDevice = std::static_pointer_cast<CVSDAudioDevice>(audioDevice);
+        HFP::HFPImpl::audioDevice->setAclHandle(aclHandle);
     }
     void HFP::HFPImpl::startRinging() const noexcept
     {
@@ -448,7 +454,7 @@ namespace bluetooth
     auto HFP::HFPImpl::callAnswered() const noexcept -> Error::Code
     {
         if (!isAudioRouted) {
-            LOG_ERROR("Call answered!");
+            LOG_DEBUG("Call answered!");
             hfp_ag_answer_incoming_call();
             establishAudioConnection();
             audioInterface->startAudioRouting(const_cast<sys::Service *>(ownerService));
@@ -456,11 +462,6 @@ namespace bluetooth
         }
         return Error::Success;
     }
-    auto HFP::HFPImpl::callTerminated() const noexcept -> Error::Code
-    {
-        return Error::Success;
-    }
-
     auto HFP::HFPImpl::setIncomingCallNumber(const std::string &num) const noexcept -> Error::Code
     {
         hfp_ag_set_clip(129, num.c_str());
