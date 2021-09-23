@@ -5,6 +5,7 @@
 
 #include <presenter/OnBoardingLanguageWindowPresenter.hpp>
 #include <common/options/BellOptionWindow.hpp>
+#include <BellOnBoardingNames.hpp>
 
 namespace gui
 {
@@ -14,7 +15,8 @@ namespace gui
       public:
         OnBoardingLanguageWindow(
             app::ApplicationCommon *app,
-            std::unique_ptr<app::OnBoarding::OnBoardingLanguageWindowPresenter::Presenter> &&presenter);
+            std::unique_ptr<app::OnBoarding::OnBoardingLanguageWindowPresenter::Presenter> &&presenter,
+            const std::string &name = gui::window::name::onBoardingLanguageWindow);
 
       private:
         std::unique_ptr<app::OnBoarding::OnBoardingLanguageWindowPresenter::Presenter> presenter;
