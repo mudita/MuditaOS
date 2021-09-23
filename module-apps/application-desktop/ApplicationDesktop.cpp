@@ -27,7 +27,7 @@
 #include <service-cellular-api>
 #include <service-db/DBNotificationMessage.hpp>
 #include <service-db/QueryMessage.hpp>
-#include <SystemManager/messages/SystemManagerMessage.hpp>
+#include <system/messages/SystemManagerMessage.hpp>
 #include <windows/Dialog.hpp>
 #include <windows/DialogMetadata.hpp>
 

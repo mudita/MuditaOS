@@ -6,9 +6,9 @@
 #include <sys/messages/TetheringPhoneModeChangeProhibitedMessage.hpp>
 
 #include <evtmgr/EVMessages.hpp>
-#include <SystemManager/messages/SystemManagerMessage.hpp>
-#include <SystemManager/messages/TetheringQuestionRequest.hpp>
-#include <SystemManager/messages/TetheringStateRequest.hpp>
+#include <system/messages/SystemManagerMessage.hpp>
+#include <system/messages/TetheringQuestionRequest.hpp>
+#include <system/messages/TetheringStateRequest.hpp>
 #include <EventStore.hpp>
 #include <service-appmgr/Constants.hpp>
 #include <service-cellular/CellularMessage.hpp>

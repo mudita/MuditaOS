@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Vibra.hpp"
-#include "SystemManager/Constants.hpp"
+#include "system/Constants.hpp"
 #include <Timers/TimerFactory.hpp>
 
 namespace vibra_handle

@@ -9,8 +9,8 @@
 #include "Mailbox.hpp" // for Mailbox
 #include "Message.hpp" // for MessagePointer
 #include "ServiceManifest.hpp"
-#include "Watchdog.hpp"
-#include "thread.hpp"                        // for Thread
+#include "thread.hpp" // for Thread
+#include <SystemWatchdog/Watchdog.hpp>
 #include <SystemWatchdog/SystemWatchdog.hpp> // for SystemWatchdog
 #include <algorithm>                         // for find, max
 #include <cstdint>                           // for uint32_t, uint64_t

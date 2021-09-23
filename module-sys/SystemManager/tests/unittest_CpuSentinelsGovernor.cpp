@@ -5,7 +5,7 @@
 
 #include <catch2/catch.hpp>
 #include <SystemManager/CpuGovernor.hpp>
-#include <Service/CpuSentinel.hpp>
+#include <SystemManager/CpuSentinel.hpp>
 
 TEST_CASE("Power Manager CPU sentinels governor test")
 {

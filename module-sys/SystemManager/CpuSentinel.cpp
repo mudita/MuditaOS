@@ -1,9 +1,9 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <Service/CpuSentinel.hpp>
-#include "SystemManager/messages/RequestCpuFrequencyMessage.hpp"
-#include "SystemManager/Constants.hpp"
+#include <SystemManager/CpuSentinel.hpp>
+#include "system/messages/RequestCpuFrequencyMessage.hpp"
+#include "system/Constants.hpp"
 #include <memory>
 
 namespace sys

@@ -24,8 +24,8 @@
 #include <SystemManager/SystemManagerCommon.hpp>
 #include <Timers/TimerFactory.hpp>
 
-#include <SystemManager/Constants.hpp>
-#include <SystemManager/messages/TetheringStateRequest.hpp>
+#include <system/Constants.hpp>
+#include <system/messages/TetheringStateRequest.hpp>
 
 #include <sys/mount.h>
 #include <sys/statvfs.h>

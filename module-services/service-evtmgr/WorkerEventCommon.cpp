@@ -28,7 +28,7 @@
 #include <service-desktop/Constants.hpp>
 #include <service-desktop/DesktopMessages.hpp>
 #include <SystemManager/SystemManagerCommon.hpp>
-#include <SystemManager/messages/SentinelRegistrationMessage.hpp>
+#include <system/messages/SentinelRegistrationMessage.hpp>
 
 extern "C"
 {

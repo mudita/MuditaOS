@@ -17,7 +17,7 @@
 #include <vector>
 #include <filesystem>
 #include <service-desktop/DesktopMessages.hpp>
-#include "SystemManager/messages/SentinelRegistrationMessage.hpp"
+#include "system/messages/SentinelRegistrationMessage.hpp"
 
 inline constexpr auto uploadFailedMessage = "file upload terminated before all data transferred";
 
