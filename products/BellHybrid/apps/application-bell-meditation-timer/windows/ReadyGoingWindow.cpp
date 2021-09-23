@@ -9,12 +9,12 @@
 namespace gui
 {
     ReadyGoingWindow::ReadyGoingWindow(app::ApplicationCommon *app)
-        : IconTextWindow(app, gui::name::window::ready_going)
+        : IconTextWindow(
+              app, gui::name::window::ready_going, std::make_unique<app::meditation::MeditationBasePresenter>(app))
     {}
 
     void ReadyGoingWindow::onTimeout()
     {
-        LOG_DEBUG("onTimeout: timer=%ld, interval=%ld", item.getTimer().count(), item.getInterval().count());
         gotoWindow(gui::name::window::meditation_running);
     }
 

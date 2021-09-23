@@ -2,18 +2,16 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SessionPausedWindow.hpp"
-#include "../data/MeditationStyle.hpp"
 
 #include "log.hpp"
 #include <i18n/i18n.hpp>
 #include <Font.hpp>
 
-using namespace meditationStyle;
-
 namespace gui
 {
     SessionPausedWindow::SessionPausedWindow(app::ApplicationCommon *app)
-        : IconTextWindow(app, gui::name::window::session_paused)
+        : IconTextWindow(
+              app, gui::name::window::session_paused, std::make_unique<app::meditation::MeditationBasePresenter>(app))
     {}
 
     bool SessionPausedWindow::onInput(const gui::InputEvent &inputEvent)

@@ -3,17 +3,19 @@
 
 #include "IntervalChimeWindow.hpp"
 #include "ReadyGoingWindow.hpp"
-#include "../data/MeditationSwitchData.hpp"
 
 #include "log.hpp"
 #include <i18n/i18n.hpp>
 
 namespace gui
 {
-    IntervalChimeWindow::IntervalChimeWindow(app::ApplicationCommon *app)
-        : MeditationWindow(app, gui::name::window::interval_chime)
+    IntervalChimeWindow::IntervalChimeWindow(
+        app::ApplicationCommon *app,
+        std::unique_ptr<app::meditation::IntervalChimeContract::Presenter> &&windowPresenter)
+        : MeditationWindow(app, gui::name::window::interval_chime), presenter{std::move(windowPresenter)}
     {
         buildInterface();
+        presenter->attach(this);
     }
 
     void IntervalChimeWindow::rebuild()
@@ -61,8 +63,6 @@ namespace gui
 
     void IntervalChimeWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        LOG_DEBUG("onBeforeShow: mode=%s", mode == ShowMode::GUI_SHOW_INIT ? "GUI_SHOW_INIT" : "GUI_SHOW_RETURN");
-
         MeditationWindow::onBeforeShow(mode, data);
 
         if (mode == ShowMode::GUI_SHOW_INIT) {
@@ -72,18 +72,13 @@ namespace gui
 
     bool IntervalChimeWindow::onInput(const gui::InputEvent &inputEvent)
     {
-        if (inputEvent.isShortRelease(gui::KeyCode::KEY_RF)) {
-            application->returnToPreviousWindow();
-            return true;
-        }
-
         if (inputEvent.isShortRelease(gui::KeyCode::KEY_LEFT) || inputEvent.isShortRelease(gui::KeyCode::KEY_UP)) {
-            previousInterval();
+            presenter->decrease();
             return true;
         }
 
         if (inputEvent.isShortRelease(gui::KeyCode::KEY_RIGHT) || inputEvent.isShortRelease(gui::KeyCode::KEY_DOWN)) {
-            nextInterval();
+            presenter->increase();
             return true;
         }
 
@@ -95,86 +90,20 @@ namespace gui
         return MeditationWindow::onInput(inputEvent);
     }
 
-    void IntervalChimeWindow::previousInterval()
-    {
-        LOG_DEBUG("previous");
-
-        if (static_cast<uint32_t>(intervalType) > static_cast<uint32_t>(IntervalType::IntervalNone)) {
-            intervalType = IntervalType(static_cast<uint32_t>(intervalType) - 1);
-        }
-        else {
-            intervalType = IntervalType::Interval_15;
-        }
-        item.setInterval(intervalToSecs());
-        updateDisplay();
-    }
-
-    void IntervalChimeWindow::nextInterval()
-    {
-        LOG_DEBUG("next");
-
-        if (static_cast<uint32_t>(intervalType) < static_cast<uint32_t>(IntervalType::Interval_15)) {
-            intervalType = IntervalType(static_cast<uint32_t>(intervalType) + 1);
-        }
-        else {
-            intervalType = IntervalType::IntervalNone;
-        }
-        item.setInterval(intervalToSecs());
-        updateDisplay();
-    }
-
     void IntervalChimeWindow::updateDisplay()
     {
-        text->setText(getIntervalString());
+        text->setText(presenter->getIntervalString());
     }
 
-    std::string IntervalChimeWindow::getIntervalString() const
+    void IntervalChimeWindow::buildMeditationItem(MeditationItem &item)
     {
-        if (intervalType == IntervalType::IntervalNone) {
-            return utils::translate("app_meditation_bell_interval_none");
-        }
-
-        const std::string toReplace = "%0";
-        std::string temp            = utils::translate("app_meditation_bell_interval_every_x_minutes");
-
-        switch (intervalType) {
-        case IntervalType::IntervalNone:
-            break;
-        case IntervalType::Interval_1:
-            temp.replace(temp.find(toReplace), toReplace.size(), std::to_string(1));
-            break;
-        case IntervalType::Interval_2:
-            temp.replace(temp.find(toReplace), toReplace.size(), std::to_string(2));
-            break;
-        case IntervalType::Interval_5:
-            temp.replace(temp.find(toReplace), toReplace.size(), std::to_string(5));
-            break;
-        case IntervalType::Interval_10:
-            temp.replace(temp.find(toReplace), toReplace.size(), std::to_string(10));
-            break;
-        case IntervalType::Interval_15:
-            temp.replace(temp.find(toReplace), toReplace.size(), std::to_string(15));
-            break;
-        }
-        return temp;
+        presenter->request(item);
     }
 
-    std::chrono::seconds IntervalChimeWindow::intervalToSecs() const noexcept
+    void IntervalChimeWindow::onMeditationItemAvailable(MeditationItem *item)
     {
-        switch (intervalType) {
-        case IntervalType::IntervalNone:
-            return std::chrono::seconds::zero();
-        case IntervalType::Interval_1:
-            return std::chrono::seconds{60};
-        case IntervalType::Interval_2:
-            return std::chrono::seconds{2 * 60};
-        case IntervalType::Interval_5:
-            return std::chrono::seconds{5 * 60};
-        case IntervalType::Interval_10:
-            return std::chrono::seconds{10 * 60};
-        case IntervalType::Interval_15:
-            return std::chrono::seconds{15 * 60};
+        if (item != nullptr) {
+            presenter->activate(*item);
         }
-        return std::chrono::seconds::zero();
     }
 } // namespace gui
