@@ -5,7 +5,7 @@
 
 #include <memory>
 #include <vector>
-#include "Service/CpuSentinel.hpp"
+#include "SystemManager/CpuSentinel.hpp"
 
 namespace sys
 {

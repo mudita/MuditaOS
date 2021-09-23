@@ -7,7 +7,7 @@
 #include <evtmgr/EventManager.hpp>
 #include <keymap/KeyMap.hpp>
 #include <hal/temperature_source/TemperatureSource.hpp>
-#include <SystemManager/Constants.hpp>
+#include <system/Constants.hpp>
 #include <screen-light-control/ScreenLightControl.hpp>
 #include <service-evtmgr/KbdMessage.hpp>
 #include <service-evtmgr/ScreenLightControlMessage.hpp>

@@ -17,7 +17,7 @@
 #include "NetworkSettings.hpp"
 #include "service-cellular/RequestFactory.hpp"
 #include "service-cellular/CellularRequestHandler.hpp"
-#include "SystemManager/messages/SentinelRegistrationMessage.hpp"
+#include "system/messages/SentinelRegistrationMessage.hpp"
 
 #include <Audio/AudioCommon.hpp>
 #include <BaseInterface.hpp>

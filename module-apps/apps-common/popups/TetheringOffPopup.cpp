@@ -6,7 +6,7 @@
 #include <log/log.hpp>
 #include <messages/DialogMetadataMessage.hpp>
 #include <apps-common/ApplicationCommon.hpp>
-#include <SystemManager/messages/TetheringStateRequest.hpp>
+#include <system/messages/TetheringStateRequest.hpp>
 #include <service-appmgr/Controller.hpp>
 
 namespace gui

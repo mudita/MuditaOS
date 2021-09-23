@@ -4,7 +4,7 @@
 #pragma once
 
 #include <service-bluetooth/Constants.hpp>
-#include <Service/Common.hpp>
+#include <system/Common.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
 #include "service-bluetooth/SettingsHolder.hpp"
@@ -13,7 +13,7 @@
 #include <module-bluetooth/Bluetooth/CommandHandler.hpp>
 #include "ProfileManager.hpp"
 #include "BluetoothDevicesModel.hpp"
-#include <Service/CpuSentinel.hpp>
+#include <SystemManager/CpuSentinel.hpp>
 #include <Timers/TimerHandle.hpp>
 
 #include <memory> // for unique_ptr

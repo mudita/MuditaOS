@@ -10,7 +10,7 @@
 
 #include <Service/Message.hpp>
 #include <SystemManager/SystemManagerCommon.hpp>
-#include <SystemManager/messages/SystemManagerMessage.hpp>
+#include <system/messages/SystemManagerMessage.hpp>
 #include <apps-common/messages/OnBoardingMessages.hpp>
 #include <apps-common/messages/AppMessage.hpp>
 #include <apps-common/actions/AlarmTriggeredAction.hpp>

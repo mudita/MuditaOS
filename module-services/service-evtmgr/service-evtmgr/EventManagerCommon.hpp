@@ -7,13 +7,13 @@
 
 #include <hal/key_input/RawKey.hpp>
 #include <MessageType.hpp>
-#include <Service/Common.hpp>
+#include <system/Common.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
 #include <Service/Worker.hpp>
 #include <service-db/DBServiceName.hpp>
 #include <Timers/TimerHandle.hpp>
-#include <Service/CpuSentinel.hpp>
+#include <SystemManager/CpuSentinel.hpp>
 
 #include <cstdint>
 #include <memory>

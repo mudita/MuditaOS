@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "SystemReturnCodes.hpp"
+#include <system/SystemReturnCodes.hpp>
 
 namespace sys
 {

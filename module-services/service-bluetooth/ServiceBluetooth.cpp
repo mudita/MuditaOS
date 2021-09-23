@@ -24,7 +24,7 @@
 #include "service-bluetooth/BluetoothDevicesModel.hpp"
 #include "service-bluetooth/messages/BluetoothModeChanged.hpp"
 
-#include "SystemManager/messages/SentinelRegistrationMessage.hpp"
+#include "system/messages/SentinelRegistrationMessage.hpp"
 
 #include <log/log.hpp>
 #include <bits/exception.h>

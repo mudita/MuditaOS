@@ -15,7 +15,7 @@
 #include <iosfwd>
 #include <string>
 #include <sys/types.h>
-#include <Service/CpuSentinel.hpp>
+#include <SystemManager/CpuSentinel.hpp>
 
 namespace CellularCall
 {
@@ -47,8 +47,8 @@ namespace CellularCall
 
         void clear()
         {
-            call            = CalllogRecord();
-            isActiveCall    = false;
+            call         = CalllogRecord();
+            isActiveCall = false;
             startActiveTime.set_time(0);
         }
 

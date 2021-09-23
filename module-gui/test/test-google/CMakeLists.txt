@@ -13,6 +13,5 @@ add_gtest_executable(
                 module-utils
                 module-gui
                 sys-service
-                sys-timers
         USE_FS
 )

@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include "Common.hpp"
 #include "MessageForward.hpp"
 
+#include <system/Common.hpp>
 #include <MessageType.hpp>
 #include <magic_enum.hpp>
 
