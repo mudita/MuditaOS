@@ -199,14 +199,18 @@ namespace gui
             minuteInput->setMinimumSize(elemWidth, timeItem::height);
 
             onLoadCallback = [&](std::shared_ptr<AlarmEventRecord> alarm) {
-                hourInput->setText(TimePointToHourString12H(alarm->startDate));
-                minuteInput->setText(TimePointToMinutesString(alarm->startDate));
-                if (date::is_am(TimePointToHourMinSec(alarm->startDate).hours())) {
-                    mode12hInput->setText(utils::translate(utils::time::Locale::getAM()));
-                }
-                else {
-                    mode12hInput->setText(utils::translate(utils::time::Locale::getPM()));
-                }
+                auto readTime  = Clock::to_time_t(alarm->startDate);
+                auto alarmTime = std::localtime(&readTime);
+
+                const auto hours   = std::chrono::hours{alarmTime->tm_hour};
+                const auto time12H = date::make12(hours);
+                const auto isPM    = date::is_pm(hours);
+
+                hourInput->setText(std::to_string(time12H.count()));
+                minuteInput->setText(std::to_string(alarmTime->tm_min));
+
+                isPM ? mode12hInput->setText(utils::translate(utils::time::Locale::getPM()))
+                     : mode12hInput->setText(utils::translate(utils::time::Locale::getAM()));
             };
         }
         else {
@@ -215,8 +219,11 @@ namespace gui
             minuteInput->setMinimumSize(elemWidth, timeItem::height);
 
             onLoadCallback = [&](std::shared_ptr<AlarmEventRecord> alarm) {
-                hourInput->setText(TimePointToHourString24H(alarm->startDate));
-                minuteInput->setText(TimePointToMinutesString(alarm->startDate));
+                auto readTime  = Clock::to_time_t(alarm->startDate);
+                auto alarmTime = std::localtime(&readTime);
+
+                hourInput->setText(std::to_string(alarmTime->tm_hour));
+                minuteInput->setText(std::to_string(alarmTime->tm_min));
             };
         }
     }
