@@ -208,8 +208,9 @@ std::vector<AlarmEventsTableRow> AlarmEventsTable::getNext(TimePoint start, uint
                               "JOIN alarm_events ae ON ae.event_id = e._id "
                               "WHERE start_date = "
                               "	("
-                              "		SELECT MIN(e.start_date) FROM events as e "
-                              "		WHERE e.start_date > '%q'"
+                              "     SELECT MIN(start_date) FROM (events as e "
+                              "     JOIN alarm_events ae ON ae.event_id = e._id) "
+                              "     WHERE start_date > '%q' AND ae.enabled = 1 "
                               "	) "
                               "LIMIT %lu OFFSET %lu;",
                               TimePointToString(start).c_str(),
