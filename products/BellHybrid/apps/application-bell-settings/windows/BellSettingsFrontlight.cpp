@@ -67,7 +67,7 @@ namespace gui
 
             application->switchWindow(BellFinishedWindow::defaultName,
                                       BellFinishedWindowData::Factory::create(
-                                          "circle_success",
+                                          "big_check",
                                           utils::translate("app_bell_settings_frontlight_finished_message"),
                                           window::name::bellSettingsAdvanced));
             return true;

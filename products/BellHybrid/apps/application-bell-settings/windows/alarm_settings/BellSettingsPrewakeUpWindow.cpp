@@ -63,7 +63,7 @@ namespace gui
         presenter->saveData();
         application->switchWindow(BellFinishedWindow::defaultName,
                                   BellFinishedWindowData::Factory::create(
-                                      "circle_success",
+                                      "big_check",
                                       utils::translate("app_bell_settings_alarm_settings_prewake_up_finished"),
                                       BellSettingsAlarmSettingsWindow::name));
     }
