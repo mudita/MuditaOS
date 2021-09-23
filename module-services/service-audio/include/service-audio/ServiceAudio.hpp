@@ -117,6 +117,7 @@ class ServiceAudio : public sys::Service
     void onVolumeChanged(audio::Volume volume);
     auto handleA2DPVolumeChangedOnBluetoothDevice(sys::Message *msgl) -> sys::MessagePointer;
     auto handleHSPVolumeChangedOnBluetoothDevice(sys::Message *msgl) -> sys::MessagePointer;
+    auto handleHFPVolumeChangedOnBluetoothDevice(sys::Message *msgl) -> sys::MessagePointer;
     auto handleA2DPAudioPause() -> sys::MessagePointer;
     auto handleA2DPAudioStart() -> sys::MessagePointer;
 };
