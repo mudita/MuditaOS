@@ -100,9 +100,14 @@ namespace service::detail
             return {};
         }
 
-        db::multimedia_files::MultimediaFilesRecord CreateMultimediaFilesRecord(const fs::path &path)
+        std::optional<db::multimedia_files::MultimediaFilesRecord> CreateMultimediaFilesRecord(const fs::path &path)
         {
-            auto fileSize = fs::file_size(path);
+            std::error_code errorCode;
+            auto fileSize = fs::file_size(path, errorCode);
+            if (errorCode) {
+                LOG_WARN("Can't get file size");
+                return {};
+            }
             auto mimeType = getMimeType(path);
             auto tags     = tags::fetcher::fetchTags(path);
 
@@ -141,8 +146,13 @@ namespace service::detail
         }
 
         auto record = CreateMultimediaFilesRecord(path);
-        auto query  = std::make_unique<db::multimedia_files::query::Add>(record);
-        DBServiceAPI::GetQuery(svc.get(), db::Interface::Name::MultimediaFiles, std::move(query));
+        if (record.has_value()) {
+            auto query = std::make_unique<db::multimedia_files::query::Add>(record.value());
+            DBServiceAPI::GetQuery(svc.get(), db::Interface::Name::MultimediaFiles, std::move(query));
+        }
+        else {
+            LOG_INFO("onUpdateOrCreate: skipped file");
+        }
     }
 
     // On remove content
