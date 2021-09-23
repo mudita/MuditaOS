@@ -24,6 +24,6 @@ namespace gui
         std::chrono::seconds getTimeout() const override;
 
       private:
-        const std::chrono::seconds timeout = std::chrono::seconds{3};
+        static constexpr std::chrono::seconds timeout = std::chrono::seconds{3};
     };
 } // namespace gui
