@@ -9,7 +9,7 @@ namespace app::meditation
 {
     namespace value
     {
-        inline constexpr auto defaultTimerValue = std::chrono::minutes{20};
+        inline constexpr auto defaultTimerValue = std::chrono::minutes{15};
         inline constexpr auto maxTimerValue     = std::chrono::minutes{180};
         inline constexpr auto minTimerValue     = std::chrono::minutes{1};
     } // namespace value
