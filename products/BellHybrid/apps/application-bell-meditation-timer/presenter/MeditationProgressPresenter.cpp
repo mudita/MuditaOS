@@ -79,7 +79,9 @@ namespace app::meditation
 
     void MeditationProgressPresenter::onIntervalReached()
     {
-        getView()->intervalReached();
+        if (model->getInterval().count() > 0) {
+            getView()->intervalReached();
+        }
     }
 
     void MeditationProgressPresenter::onBaseTickReached()
