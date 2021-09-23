@@ -92,19 +92,19 @@ namespace app::meditation
     IntervalChimeModel::IntervalType IntervalChimeModel::secsToInterval(std::chrono::seconds secs)
     {
         int s = secs.count();
-        if (s >= 60 * 15) {
+        if (s >= intervalToSecs(IntervalType::Interval_15).count()) {
             return IntervalType::Interval_15;
         }
-        if (s >= 60 * 10) {
+        if (s >= intervalToSecs(IntervalType::Interval_10).count()) {
             return IntervalType::Interval_10;
         }
-        if (s >= 60 * 5) {
+        if (s >= intervalToSecs(IntervalType::Interval_5).count()) {
             return IntervalType::Interval_5;
         }
-        if (s > 60 * 2) {
+        if (s >= intervalToSecs(IntervalType::Interval_2).count()) {
             return IntervalType::Interval_2;
         }
-        if (s > 60 * 1) {
+        if (s >= intervalToSecs(IntervalType::Interval_1).count()) {
             return IntervalType::Interval_1;
         }
         return IntervalType::IntervalNone;
@@ -116,15 +116,15 @@ namespace app::meditation
         case IntervalType::IntervalNone:
             return std::chrono::seconds::zero();
         case IntervalType::Interval_1:
-            return std::chrono::seconds{60};
+            return std::chrono::seconds(std::chrono::minutes{1});
         case IntervalType::Interval_2:
-            return std::chrono::seconds{2 * 60};
+            return std::chrono::seconds(std::chrono::minutes{2});
         case IntervalType::Interval_5:
-            return std::chrono::seconds{5 * 60};
+            return std::chrono::seconds(std::chrono::minutes{5});
         case IntervalType::Interval_10:
-            return std::chrono::seconds{10 * 60};
+            return std::chrono::seconds(std::chrono::minutes{10});
         case IntervalType::Interval_15:
-            return std::chrono::seconds{15 * 60};
+            return std::chrono::seconds(std::chrono::minutes{15});
         }
         return std::chrono::seconds::zero();
     }
