@@ -9,4 +9,5 @@ namespace alarms::paths
 {
     std::filesystem::path getMusicDir() noexcept;
     std::filesystem::path getPreWakeUpChimesDir() noexcept;
+    std::filesystem::path getSnoozeChimesDir() noexcept;
 } // namespace alarms::paths

@@ -14,6 +14,7 @@ namespace alarms
         EveningReminder,
         PreWakeUpChime,
         PreWakeUpFrontlight,
+        SnoozeChime,
         None
     };
 
