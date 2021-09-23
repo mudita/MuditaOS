@@ -51,23 +51,35 @@ namespace app
         }
     }
 
-    void ProgressTimerImpl::reset(std::chrono::seconds _duration, std::chrono::seconds _interval)
+    void ProgressTimerImpl::reset(std::chrono::seconds _duration,
+                                  std::chrono::seconds _interval,
+                                  std::chrono::seconds _elapsed)
     {
         Expects(_duration != std::chrono::seconds::zero());
 
         duration    = _duration;
-        elapsed     = std::chrono::seconds::zero();
+        elapsed     = _elapsed;
         interval    = _interval;
         hasInterval = _interval != std::chrono::seconds::zero();
 
         updateText();
-        resetProgress();
+        if (_interval != std::chrono::seconds::zero()) {
+            updateProgress();
+        }
+        else {
+            resetProgress();
+        }
     }
 
     void ProgressTimerImpl::start()
     {
+        if (isStarted) {
+            isRunning = true;
+            return;
+        }
         startTimer();
         isRunning = true;
+        isStarted = true;
     }
 
     void ProgressTimerImpl::startTimer()
@@ -82,6 +94,8 @@ namespace app
     {
         if (isStopped() || isFinished()) {
             task.stop();
+            isStarted = false;
+            isRunning = false;
             if (isFinished() && onFinishedCallback != nullptr) {
                 onFinishedCallback();
             }
@@ -91,6 +105,9 @@ namespace app
         ++elapsed;
         if ((intervalReached() || isFinished()) && onIntervalCallback != nullptr) {
             onIntervalCallback();
+        }
+        if (onBaseTickCallback != nullptr) {
+            onBaseTickCallback();
         }
         update();
         return true;
@@ -124,6 +141,11 @@ namespace app
     void ProgressTimerImpl::registerOnIntervalCallback(std::function<void()> cb)
     {
         onIntervalCallback = std::move(cb);
+    }
+
+    void ProgressTimerImpl::registerOnBaseTickCallback(std::function<void()> cb)
+    {
+        onBaseTickCallback = std::move(cb);
     }
 
     void ProgressTimerImpl::attach(gui::Progress *_progress)

@@ -35,19 +35,26 @@ namespace gui
 
     void MeditationWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        if (mode == ShowMode::GUI_SHOW_RETURN) {
+        if (mode != ShowMode::GUI_SHOW_INIT) {
             return;
         }
 
-        if (auto switchData = dynamic_cast<meditation::MeditationSwitchData *>(data); data != nullptr) {
-            item = switchData->getMeditationItem();
+        if (auto switchData = dynamic_cast<app::meditation::MeditationSwitchData *>(data); data != nullptr) {
+            MeditationItem item = switchData->getMeditationItem();
+            onMeditationItemAvailable(&item);
+        }
+        else {
+            onMeditationItemAvailable(nullptr);
         }
         statusBar->setVisible(false);
     }
 
     void MeditationWindow::gotoWindow(std::string name)
     {
-        std::unique_ptr<gui::SwitchData> data = std::make_unique<meditation::MeditationSwitchData>(item);
+        MeditationItem item;
+
+        buildMeditationItem(item);
+        std::unique_ptr<gui::SwitchData> data = std::make_unique<app::meditation::MeditationSwitchData>(item);
         application->switchWindow(std::move(name), std::move(data));
     }
 

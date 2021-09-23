@@ -9,7 +9,8 @@
 namespace gui
 {
     SessionEndWindow::SessionEndWindow(app::ApplicationCommon *app)
-        : IconTextWindow(app, gui::name::window::session_end)
+        : IconTextWindow(
+              app, gui::name::window::session_end, std::make_unique<app::meditation::MeditationBasePresenter>(app))
     {}
 
     void SessionEndWindow::onTimeout()

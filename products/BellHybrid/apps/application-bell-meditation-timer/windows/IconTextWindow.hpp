@@ -3,34 +3,36 @@
 
 #pragma once
 
-#include <Application.hpp>
 #include <InputEvent.hpp>
-#include <Utils.hpp>
-#include <Style.hpp>
-#include <BoxLayout.hpp>
-#include <Label.hpp>
 #include <Image.hpp>
 #include <Text.hpp>
 
 #include "WithTimerWindow.hpp"
+#include "MeditationBasePresenter.hpp"
 
 namespace gui
 {
-    class IconTextWindow : public WithTimerWindow
+    class IconTextWindow : public WithTimerWindow, public app::meditation::MeditationBaseContract::View
     {
       public:
-        IconTextWindow(app::ApplicationCommon *app, std::string name);
+        IconTextWindow(app::ApplicationCommon *app,
+                       std::string name,
+                       std::unique_ptr<app::meditation::MeditationBaseContract::Presenter> &&windowPresenter);
 
         // virtual methods
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         void buildInterface() override;
         void destroyInterface() override;
+        void buildMeditationItem(MeditationItem &item) override;
+        void onMeditationItemAvailable(MeditationItem *item) override;
+        void updateDisplay() override;
 
         virtual std::chrono::seconds getTimeout() const = 0;
         virtual std::string getText()                   = 0;
         virtual std::string getImageName()              = 0;
 
       private:
+        std::unique_ptr<app::meditation::MeditationBaseContract::Presenter> presenter;
         gui::Image *appImage = nullptr;
         gui::Text *text      = nullptr;
 

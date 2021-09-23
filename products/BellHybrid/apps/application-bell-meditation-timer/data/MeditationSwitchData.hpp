@@ -5,9 +5,9 @@
 
 #include <SwitchData.hpp>
 
-#include "../data/MeditationItem.hpp"
+#include "MeditationItem.hpp"
 
-namespace meditation
+namespace app::meditation
 {
     inline constexpr auto MEDITATION_SWITCH_DATA_STR = "MeditationSwitchData";
 
