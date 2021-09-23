@@ -44,12 +44,32 @@ namespace
         Settings frontlightSettings{true, std::chrono::minutes{2}};
     };
 
+    class MockedSnoozeChimeSettingsProvider : public alarms::SnoozeChimeSettingsProvider
+    {
+      public:
+        void setSettings(bool enabled, std::chrono::minutes interval)
+        {
+            settings = Settings{enabled, interval};
+        }
+
+        auto getSettings() -> Settings override
+        {
+            return settings;
+        }
+
+      private:
+        Settings settings{true, std::chrono::minutes{1}};
+    };
+
     std::unique_ptr<alarms::IAlarmOperations> getMockedAlarmOperations(
         std::unique_ptr<MockAlarmEventsRepository> &alarmRepo,
-        std::unique_ptr<alarms::PreWakeUpSettingsProvider> &&settingsProvider)
+        std::unique_ptr<alarms::PreWakeUpSettingsProvider> &&preWakeUpSettingsProvider,
+        std::unique_ptr<alarms::SnoozeChimeSettingsProvider> &&snoozeChimeSettingsProvider)
     {
-        return std::make_unique<alarms::AlarmOperations>(
-            std::move(alarmRepo), timeInjector, std::move(settingsProvider));
+        return std::make_unique<alarms::AlarmOperations>(std::move(alarmRepo),
+                                                         timeInjector,
+                                                         std::move(preWakeUpSettingsProvider),
+                                                         std::move(snoozeChimeSettingsProvider));
     }
 } // namespace
 
@@ -57,7 +77,9 @@ namespace
 std::unique_ptr<alarms::IAlarmOperations> AlarmOperationsFixture::getMockedAlarmOperations(
     std::unique_ptr<MockAlarmEventsRepository> &alarmRepo)
 {
-    return ::getMockedAlarmOperations(alarmRepo, std::make_unique<MockedPreWakeUpSettingsProvider>());
+    return ::getMockedAlarmOperations(alarmRepo,
+                                      std::make_unique<MockedPreWakeUpSettingsProvider>(),
+                                      std::make_unique<MockedSnoozeChimeSettingsProvider>());
 }
 
 TEST(PreWakeUp, TooEarlyForPreWakeUp)
@@ -202,8 +224,9 @@ class BellAlarmOperationsFixture : public ::testing::Test
         chimeHandler      = std::make_shared<MockAlarmHandler>();
         frontlightHandler = std::make_shared<MockAlarmHandler>();
 
-        alarmOperations =
-            ::getMockedAlarmOperations(alarmRepoMock, std::make_unique<MockedPreWakeUpSettingsProvider>());
+        alarmOperations = ::getMockedAlarmOperations(alarmRepoMock,
+                                                     std::make_unique<MockedPreWakeUpSettingsProvider>(),
+                                                     std::make_unique<MockedSnoozeChimeSettingsProvider>());
         alarmOperations->addAlarmExecutionHandler(alarms::AlarmType::PreWakeUpChime, chimeHandler);
         alarmOperations->addAlarmExecutionHandler(alarms::AlarmType::PreWakeUpFrontlight, frontlightHandler);
         alarmOperations->updateEventsCache(TimePointFromString("2022-11-11 08:00:00"));
