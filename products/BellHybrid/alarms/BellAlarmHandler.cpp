@@ -53,4 +53,14 @@ namespace alarms
         actions.emplace_back(createPreWakeUpChimeAction(*service));
         return actions;
     }
+
+    SnoozeChimeHandler::SnoozeChimeHandler(sys::Service *service) : BellAlarmHandler{getActions(service)}
+    {}
+
+    auto SnoozeChimeHandler::getActions(sys::Service *service) -> Actions
+    {
+        Actions actions;
+        actions.emplace_back(createSnoozeChimeAction(*service));
+        return actions;
+    }
 } // namespace alarms

@@ -9,9 +9,11 @@ struct SnoozedAlarmEventRecord : public SingleEventRecord
 {
   public:
     std::uint32_t snoozeCount = 1;
+    TimePoint snoozeStart     = TIME_POINT_INVALID;
 
     explicit SnoozedAlarmEventRecord(SingleEventRecord *singleAlarm)
-        : SingleEventRecord(singleAlarm->parent, singleAlarm->startDate, singleAlarm->endDate){};
+        : SingleEventRecord(singleAlarm->parent, singleAlarm->startDate, singleAlarm->endDate), snoozeStart{
+                                                                                                    TimePointNow()} {};
 
     std::uint32_t snooze() noexcept
     {

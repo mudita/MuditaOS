@@ -30,6 +30,7 @@ target_include_directories(alarms
 
 target_link_libraries(alarms
    PRIVATE
+        module-audio
         module-vfs
         bell::db
         bell::app-common
