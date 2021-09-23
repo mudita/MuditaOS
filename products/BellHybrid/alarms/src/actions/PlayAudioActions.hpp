@@ -5,6 +5,7 @@
 
 #include "AbstractAlarmAction.hpp"
 #include <service-audio/AudioServiceAPI.hpp>
+#include <module-audio/Audio/AudioCommon.hpp>
 #include <service-db/Settings.hpp>
 #include <Timers/TimerHandle.hpp>
 #include <Service/Service.hpp>
@@ -20,7 +21,7 @@ namespace alarms
         bool turnOff() override;
 
       protected:
-        explicit PlayAudioAction(sys::Service &service, audio::PlaybackType playbackType);
+        explicit PlayAudioAction(sys::Service &service, audio::PlaybackType = audio::PlaybackType::Alarm);
 
         static constexpr auto InfiniteDuration = std::chrono::seconds::max();
         bool play(const std::filesystem::path &path, std::chrono::seconds duration = InfiniteDuration);
@@ -59,4 +60,5 @@ namespace alarms
     };
 
     std::unique_ptr<PlayChimeAction> createPreWakeUpChimeAction(sys::Service &service);
+    std::unique_ptr<PlayChimeAction> createSnoozeChimeAction(sys::Service &service);
 } // namespace alarms

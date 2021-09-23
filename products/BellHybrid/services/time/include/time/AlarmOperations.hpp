@@ -4,6 +4,7 @@
 #pragma once
 
 #include <AlarmOperations.hpp>
+#include <db/SystemSettings.hpp>
 
 namespace alarms
 {
@@ -28,6 +29,19 @@ namespace alarms
         virtual ~PreWakeUpSettingsProvider() noexcept    = default;
         virtual auto getChimeSettings() -> Settings      = 0;
         virtual auto getFrontlightSettings() -> Settings = 0;
+    };
+
+    class SnoozeChimeSettingsProvider
+    {
+      public:
+        struct Settings
+        {
+            bool enabled{false};
+            std::chrono::minutes chimeInterval{std::chrono::minutes::zero()};
+        };
+
+        virtual ~SnoozeChimeSettingsProvider() noexcept = default;
+        virtual auto getSettings() -> Settings          = 0;
     };
 
     class PreWakeUp
@@ -55,14 +69,20 @@ namespace alarms
       public:
         AlarmOperations(std::unique_ptr<AbstractAlarmEventsRepository> &&alarmEventsRepo,
                         GetCurrentTime getCurrentTimeCallback,
-                        std::unique_ptr<PreWakeUpSettingsProvider> &&settingsProvider);
+                        std::unique_ptr<PreWakeUpSettingsProvider> &&preWakeUpSettingsProvider,
+                        std::unique_ptr<SnoozeChimeSettingsProvider> &&snoozeChimeSettingsProvider);
 
         void minuteUpdated(TimePoint now) override;
+        void stopAllSnoozedAlarms() override;
         void processPreWakeUp(TimePoint now);
+        void processSnoozeChime(TimePoint now);
+        void stopAllSnoozeChimes();
 
       private:
         void handlePreWakeUp(const SingleEventRecord &event, PreWakeUp::Decision decision);
+        void handleSnoozeChime(const SingleEventRecord &event, bool newStateOn);
 
         PreWakeUp preWakeUp;
+        std::unique_ptr<SnoozeChimeSettingsProvider> snoozeChimeSettings;
     };
 } // namespace alarms

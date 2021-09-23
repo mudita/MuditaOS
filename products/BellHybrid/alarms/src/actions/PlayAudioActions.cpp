@@ -6,6 +6,7 @@
 
 #include <service-time/ServiceTime.hpp>
 #include <db/SystemSettings.hpp>
+#include <purefs/filesystem_paths.hpp>
 #include <Timers/TimerFactory.hpp>
 
 namespace
@@ -68,6 +69,11 @@ namespace alarms
     {
         return std::make_unique<PlayChimeAction>(
             service, paths::getPreWakeUpChimesDir(), bell::settings::PrewakeUp::tone);
+    }
+
+    std::unique_ptr<PlayChimeAction> createSnoozeChimeAction(sys::Service &service)
+    {
+        return std::make_unique<PlayChimeAction>(service, paths::getSnoozeChimesDir(), bell::settings::Snooze::tone);
     }
 
     PlayChimeAction::PlayChimeAction(sys::Service &service,

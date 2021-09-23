@@ -16,4 +16,8 @@ namespace alarms::paths
     {
         return purefs::dir::getCurrentOSPath() / "assets/audio/alarm/prewakeup";
     }
+    std::filesystem::path getSnoozeChimesDir() noexcept
+    {
+        return purefs::dir::getCurrentOSPath() / "assets/audio/alarm/snooze";
+    }
 } // namespace alarms::paths
