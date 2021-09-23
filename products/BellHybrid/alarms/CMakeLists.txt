@@ -7,6 +7,7 @@ target_sources(alarms
         src/AlarmSoundPaths.cpp
         src/actions/PlayAudioActions.cpp
         src/actions/NotifyGUIAction.cpp
+        src/actions/NotifyGUIBedtimeReminderAction.cpp
         src/actions/FrontlightAction.cpp
 
         include/AbstractAlarmAction.hpp
@@ -14,10 +15,12 @@ target_sources(alarms
         src/actions/PlayAudioActions.hpp
         src/actions/FrontlightAction.hpp
         src/actions/NotifyGUIAction.hpp
+        src/actions/NotifyGUIBedtimeReminderAction.hpp
     PUBLIC
         include/AlarmSoundPaths.hpp
         include/popups/AlarmActivatedPopupRequestParams.hpp
         include/popups/AlarmDeactivatedPopupRequestParams.hpp
+        include/popups/BedtimeReminderPopupRequestParams.hpp
 )
 
 target_include_directories(alarms
@@ -33,6 +36,7 @@ target_link_libraries(alarms
         module-audio
         module-vfs
         bell::db
+        bell::appmgr
         bell::app-common
         apps-common
    PUBLIC

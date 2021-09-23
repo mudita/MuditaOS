@@ -7,6 +7,7 @@
 
 #include <service-db/Settings.hpp>
 #include <db/SystemSettings.hpp>
+#include <time/dateCommon.hpp>
 
 namespace alarms
 {
@@ -49,6 +50,25 @@ namespace alarms
                 "%s: enabled: %d; duration: %d minutes", path.data(), isEnabled, static_cast<int>(duration.count()));
             return {isEnabled, duration};
         }
+
+        class BedtimeSettingsProviderImpl : public AbstractBedtimeSettingsProvider
+        {
+          public:
+            explicit BedtimeSettingsProviderImpl(sys::Service *service)
+                : bedtimeModel{std::make_unique<app::bell_bedtime::BedtimeModel>(service)}
+            {}
+            auto isBedtimeEnabled() -> bool override
+            {
+                return bedtimeModel.get()->getBedtimeOnOff().getValue();
+            }
+            auto getBedtimeTime() -> time_t override
+            {
+                return bedtimeModel.get()->getBedtimeTime().getValue();
+            }
+
+          private:
+            std::unique_ptr<app::bell_bedtime::BedtimeModel> bedtimeModel;
+        };
     } // namespace
 
     namespace
@@ -89,25 +109,32 @@ namespace alarms
     {
         auto preWakeUpSettingsProvider   = std::make_unique<PreWakeUpSettingsProviderImpl>(service);
         auto snoozeChimeSettingsProvider = std::make_unique<SnoozeChimeSettingsProviderImpl>(service);
+        auto bedtimeSettingsProvider     = std::make_unique<BedtimeSettingsProviderImpl>(service);
         auto alarmOperations             = std::make_unique<AlarmOperations>(std::move(alarmEventsRepo),
                                                                  getCurrentTimeCallback,
                                                                  std::move(preWakeUpSettingsProvider),
-                                                                 std::move(snoozeChimeSettingsProvider));
+                                                                 std::move(snoozeChimeSettingsProvider),
+                                                                 std::move(bedtimeSettingsProvider));
         alarmOperations->addAlarmExecutionHandler(alarms::AlarmType::Clock,
                                                   std::make_shared<alarms::BellAlarmClockHandler>(service));
         alarmOperations->addAlarmExecutionHandler(alarms::AlarmType::PreWakeUpChime,
                                                   std::make_shared<alarms::PreWakeUpChimeHandler>(service));
         alarmOperations->addAlarmExecutionHandler(alarms::AlarmType::SnoozeChime,
                                                   std::make_shared<alarms::SnoozeChimeHandler>(service));
+        alarmOperations->addAlarmExecutionHandler(alarms::AlarmType::BedtimeReminder,
+                                                  std::make_shared<alarms::BedtimeReminderHandler>(service));
+
         return alarmOperations;
     }
 
     AlarmOperations::AlarmOperations(std::unique_ptr<AbstractAlarmEventsRepository> &&alarmEventsRepo,
                                      GetCurrentTime getCurrentTimeCallback,
                                      std::unique_ptr<PreWakeUpSettingsProvider> &&preWakeUpSettingsProvider,
-                                     std::unique_ptr<SnoozeChimeSettingsProvider> &&snoozeChimeSettings)
+                                     std::unique_ptr<SnoozeChimeSettingsProvider> &&snoozeChimeSettings,
+                                     std::unique_ptr<AbstractBedtimeSettingsProvider> &&bedtimeSettingsProvider)
         : AlarmOperationsCommon{std::move(alarmEventsRepo), std::move(getCurrentTimeCallback)},
-          preWakeUp(std::move(preWakeUpSettingsProvider)), snoozeChimeSettings(std::move(snoozeChimeSettings))
+          preWakeUp(std::move(preWakeUpSettingsProvider)), snoozeChimeSettings(std::move(snoozeChimeSettings)),
+          bedtime(std::move(bedtimeSettingsProvider))
     {}
 
     void AlarmOperations::minuteUpdated(TimePoint now)
@@ -115,6 +142,7 @@ namespace alarms
         AlarmOperationsCommon::minuteUpdated(now);
         processPreWakeUp(now);
         processSnoozeChime(now);
+        processBedtime(now);
     }
 
     void AlarmOperations::stopAllSnoozedAlarms()
@@ -139,6 +167,15 @@ namespace alarms
             return;
         }
         handlePreWakeUp(nextEvent, decision);
+    }
+
+    void AlarmOperations::processBedtime(TimePoint now)
+    {
+        if (bedtime.decide(now)) {
+            auto bedtimeEvent           = std::make_shared<AlarmEventRecord>();
+            bedtimeEvent.get()->enabled = true;
+            handleAlarmEvent(bedtimeEvent, alarms::AlarmType::BedtimeReminder, true);
+        }
     }
 
     void AlarmOperations::handlePreWakeUp(const SingleEventRecord &event, PreWakeUp::Decision decision)
@@ -207,5 +244,24 @@ namespace alarms
     {
         const auto expectedAlarmStart = std::chrono::floor<std::chrono::minutes>(now) + settings.timeBeforeAlarm;
         return settings.enabled && std::chrono::floor<std::chrono::minutes>(event.startDate) == expectedAlarmStart;
+    }
+
+    Bedtime::Bedtime(std::unique_ptr<AbstractBedtimeSettingsProvider> &&settingsProvider)
+        : settingsProvider{std::move(settingsProvider)}
+    {}
+
+    auto Bedtime::decide(TimePoint now) -> bool
+    {
+        const auto activated = settingsProvider->isBedtimeEnabled();
+        const auto time      = settingsProvider->getBedtimeTime();
+        return activated && isTimeForBed(now, time);
+    }
+
+    auto Bedtime::isTimeForBed(const TimePoint &now, const time_t &bedtime) -> bool
+    {
+        auto time_tNow    = TimePointToTimeT(now);
+        std::tm bedtimeTm = *std::localtime(&bedtime);
+        std::tm checkTm   = *std::localtime(&time_tNow);
+        return (bedtimeTm.tm_hour == checkTm.tm_hour && bedtimeTm.tm_min == checkTm.tm_min);
     }
 } // namespace alarms

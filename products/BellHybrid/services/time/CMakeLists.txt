@@ -20,6 +20,8 @@ target_link_libraries(bell-time
         module-sys
         bell::alarms
         bell::db
+        application-bell-common
+        utils-time
     PUBLIC
         service-time
 )

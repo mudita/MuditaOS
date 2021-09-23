@@ -4,7 +4,7 @@
 #pragma once
 
 #include "AbstractSnoozeSettingsModel.hpp"
-#include <models/SettingsModel.hpp>
+#include <common/models/SettingsModel.hpp>
 
 namespace app::bell_settings
 {

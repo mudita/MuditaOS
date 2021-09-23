@@ -16,15 +16,21 @@ target_sources(application-bell-common
         src/TimeModel.cpp
         src/SoundsRepository.cpp
         src/windows/BellFinishedWindow.cpp
+        src/windows/BellFinishedCallbackWindow.cpp
         src/windows/BellTurnOffWindow.cpp
         src/windows/BellWelcomeWindow.cpp
         src/BellSideListItemWithCallbacks.cpp
         src/TimeUtils.cpp
-        src/popups/presenter/AlarmActivatedPresenter.cpp
+        src/TimeUtils.cpp
+        src/models/SettingsModel.cpp
+        src/models/BedtimeModel.cpp
         src/popups/AlarmActivatedWindow.cpp
+        src/popups/AlarmActivatedWindow.cpp
+        src/popups/BedtimeNotificationWindow.cpp
         src/popups/AlarmDeactivatedWindow.cpp
         src/popups/BellTurnOffOptionWindow.cpp
         src/popups/BellRebootWindow.cpp
+        src/popups/presenter/AlarmActivatedPresenter.cpp
         src/widgets/ListItems.cpp
         src/widgets/BellStatusClock.cpp
 
@@ -35,18 +41,24 @@ target_sources(application-bell-common
         include/common/SoundsRepository.hpp
         include/common/BellPowerOffPresenter.hpp
         include/common/windows/BellFinishedWindow.hpp
+        include/common/windows/BellFinishedCallbackWindow.hpp
         include/common/windows/BellTurnOffWindow.hpp
         include/common/windows/BellWelcomeWindow.hpp
         include/common/TimeUtils.hpp
+        include/common/data/BellFinishedCallbackWindowSwitchData.hpp
         include/common/models/AbstractAlarmModel.hpp
+        include/common/models/AbstractBedtimeModel.hpp
         include/common/models/AbstractSettingsModel.hpp
         include/common/models/AbstractAudioModel.hpp
         include/common/models/AlarmModel.hpp
+        include/common/models/SettingsModel.hpp
+        include/common/models/BedtimeModel.hpp
         include/common/models/TimeModel.hpp
         include/common/models/AudioModel.hpp
         include/common/popups/presenter/AlarmActivatedPresenter.hpp
         include/common/popups/AlarmActivatedWindow.hpp
         include/common/popups/AlarmDeactivatedWindow.hpp
+        include/common/popups/BedtimeNotificationWindow.hpp
         include/common/popups/BellTurnOffOptionWindow.hpp
         include/common/popups/BellRebootWindow.hpp
         include/common/widgets/BellSideListItemWithCallbacks.hpp

@@ -5,6 +5,7 @@
 
 #include <AlarmOperations.hpp>
 #include <db/SystemSettings.hpp>
+#include <common/models/BedtimeModel.hpp>
 
 namespace alarms
 {
@@ -44,6 +45,14 @@ namespace alarms
         virtual auto getSettings() -> Settings          = 0;
     };
 
+    class AbstractBedtimeSettingsProvider
+    {
+      public:
+        virtual ~AbstractBedtimeSettingsProvider() noexcept = default;
+        virtual auto isBedtimeEnabled() -> bool             = 0;
+        virtual auto getBedtimeTime() -> time_t             = 0;
+    };
+
     class PreWakeUp
     {
       public:
@@ -64,13 +73,26 @@ namespace alarms
         std::unique_ptr<PreWakeUpSettingsProvider> settingsProvider;
     };
 
+    class Bedtime
+    {
+      public:
+        explicit Bedtime(std::unique_ptr<AbstractBedtimeSettingsProvider> &&settingsProvider);
+        auto decide(TimePoint now) -> bool;
+
+      private:
+        auto isTimeForBed(const TimePoint &now, const time_t &bedtime) -> bool;
+
+        const std::unique_ptr<AbstractBedtimeSettingsProvider> settingsProvider;
+    };
+
     class AlarmOperations : public AlarmOperationsCommon
     {
       public:
         AlarmOperations(std::unique_ptr<AbstractAlarmEventsRepository> &&alarmEventsRepo,
                         GetCurrentTime getCurrentTimeCallback,
                         std::unique_ptr<PreWakeUpSettingsProvider> &&preWakeUpSettingsProvider,
-                        std::unique_ptr<SnoozeChimeSettingsProvider> &&snoozeChimeSettingsProvider);
+                        std::unique_ptr<SnoozeChimeSettingsProvider> &&snoozeChimeSettingsProvider,
+                        std::unique_ptr<AbstractBedtimeSettingsProvider> &&BedtimeModel);
 
         void minuteUpdated(TimePoint now) override;
         void stopAllSnoozedAlarms() override;
@@ -81,8 +103,11 @@ namespace alarms
       private:
         void handlePreWakeUp(const SingleEventRecord &event, PreWakeUp::Decision decision);
         void handleSnoozeChime(const SingleEventRecord &event, bool newStateOn);
+        void handleBedtime(const SingleEventRecord &event, bool decision);
+        void processBedtime(TimePoint now);
 
         PreWakeUp preWakeUp;
         std::unique_ptr<SnoozeChimeSettingsProvider> snoozeChimeSettings;
+        Bedtime bedtime;
     };
 } // namespace alarms

@@ -49,4 +49,12 @@ namespace alarms
       private:
         static auto getActions(sys::Service *service) -> Actions;
     };
+    class BedtimeReminderHandler : public BellAlarmHandler
+    {
+      public:
+        explicit BedtimeReminderHandler(sys::Service *service);
+
+      private:
+        static auto getActions(sys::Service *service) -> Actions;
+    };
 } // namespace alarms

@@ -4,6 +4,7 @@
 #pragma once
 
 #include <Application.hpp>
+#include <common/models/BedtimeModel.hpp>
 
 namespace gui::window::name
 {

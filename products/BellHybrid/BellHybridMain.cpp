@@ -7,6 +7,7 @@
 #include <application-bell-alarm/ApplicationBellAlarm.hpp>
 #include <application-bell-onboarding/ApplicationBellOnBoarding.hpp>
 #include <application-bell-background-sounds/ApplicationBellBackgroundSounds.hpp>
+#include <application-bell-bedtime/ApplicationBellBedtime.hpp>
 #include <application-bell-main/ApplicationBellMain.hpp>
 #include <application-bell-settings/ApplicationBellSettings.hpp>
 #include <application-bell-powernap/ApplicationBellPowerNap.hpp>
@@ -97,6 +98,7 @@ int main()
                 app::CreateLauncher<app::ApplicationBellMain>(app::applicationBellName, app::Closeable::False));
             applications.push_back(app::CreateLauncher<app::ApplicationBellSettings>(app::applicationBellSettingsName));
             applications.push_back(app::CreateLauncher<app::ApplicationBellAlarm>(app::applicationBellAlarmName));
+            applications.push_back(app::CreateLauncher<app::ApplicationBellBedtime>(app::applicationBellBedtimeName));
             applications.push_back(app::CreateLauncher<app::ApplicationBellPowerNap>(app::applicationBellPowerNapName));
             applications.push_back(
                 app::CreateLauncher<app::ApplicationBellOnBoarding>(app::applicationBellOnBoardingName));

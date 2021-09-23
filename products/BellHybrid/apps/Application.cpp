@@ -15,6 +15,7 @@
 #include <common/windows/BellTurnOffWindow.hpp>
 #include <common/windows/BellWelcomeWindow.hpp>
 #include <service-appmgr/Constants.hpp>
+#include <common/popups/BedtimeNotificationWindow.hpp>
 
 namespace app
 {
@@ -58,6 +59,13 @@ namespace app
                     return std::make_unique<gui::BellRebootWindow>(app,
                                                                    std::make_unique<gui::BellPowerOffPresenter>(app));
                 });
+                break;
+            case ID::BedtimeNotification:
+                windowsFactory.attach(window::bedtime_notification_window,
+                                      [](app::ApplicationCommon *app, const std::string &name) {
+                                          return std::make_unique<gui::BedtimeNotificationWindow>(app);
+                                      });
+                break;
             default:
                 break;
             }

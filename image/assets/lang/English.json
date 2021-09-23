@@ -575,6 +575,8 @@
   "app_bell_settings_time_units_finished_message": "Time and units are set.",
   "app_bellmain_alarm": "Alarm",
   "app_bellmain_bedtime": "Bedtime",
+  "app_bell_bedtime_set_finished": "Bedtime reminder\nis set",
+  "app_bell_bedtime_notification": "It is Your bedtime",
   "app_bellmain_power_nap": "Power nap",
   "app_bellmain_meditation_timer": "Meditation timer",
   "app_bellmain_background_sounds": "Background sounds",

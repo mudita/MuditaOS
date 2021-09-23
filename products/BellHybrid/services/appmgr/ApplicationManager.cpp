@@ -73,5 +73,6 @@ namespace app::manager
         connect(typeid(AlarmActivated), convertibleToActionHandler);
         connect(typeid(AlarmDeactivated), convertibleToActionHandler);
         connect(typeid(BatteryShutdown), convertibleToActionHandler);
+        connect(typeid(BedtimeNotification), convertibleToActionHandler);
     }
 } // namespace app::manager
