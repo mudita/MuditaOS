@@ -2,12 +2,10 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <models/SettingsModel.hpp>
-
-#include <apps-common/ApplicationCommon.hpp>
-
+#include <utf8/UTF8.hpp>
 namespace gui
 {
-    template <class ValueType> SettingsModel<ValueType>::SettingsModel(app::ApplicationCommon *app)
+    template <class ValueType> SettingsModel<ValueType>::SettingsModel(sys::Service *app)
     {
         settings.init(service::ServiceProxy{app->weak_from_this()});
     }
@@ -16,4 +14,5 @@ namespace gui
     template class SettingsModel<std::uint8_t>;
     template class SettingsModel<std::string>;
     template class SettingsModel<UTF8>;
+    template class SettingsModel<time_t>;
 } // namespace gui

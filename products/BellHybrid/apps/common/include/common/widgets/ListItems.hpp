@@ -8,7 +8,10 @@
 
 #include <apps-common/widgets/spinners/SpinnerContents.hpp>
 #include <apps-common/widgets/spinners/Spinners.hpp>
+#include <apps-common/widgets/TimeSetFmtSpinner.hpp>
+
 #include <i18n/i18n.hpp>
+#include <time/dateCommon.hpp>
 
 namespace gui
 {
@@ -72,5 +75,18 @@ namespace gui
 
       private:
         UTF8Spinner *spinner{};
+    };
+
+    class TimeListItem : public BellSideListItemWithCallbacks
+    {
+      public:
+        explicit TimeListItem(AbstractSettingsModel<time_t> &model,
+                              utils::time::Locale::TimeFormat fmt,
+                              const std::string &focusFont,
+                              const std::string &noFocusFont,
+                              const std::string &topDescription = "");
+
+      private:
+        TimeSetFmtSpinner *spinner{};
     };
 } // namespace gui

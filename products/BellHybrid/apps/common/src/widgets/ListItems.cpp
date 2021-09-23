@@ -134,12 +134,32 @@ namespace gui
         getValue = [&model, this]() { model.setValue(spinner->getCurrentValue()); };
         setValue = [&model, this]() { spinner->setCurrentValue(model.getValue()); };
     }
+
     void UTF8ListItem::setOnValueChanged(std::function<void(const UTF8 &)> &&cb)
     {
         spinner->onValueChanged = cb;
     }
+
     UTF8Spinner::Type UTF8ListItem::getCurrentValue()
     {
         return spinner->getCurrentValue();
+    }
+
+    TimeListItem::TimeListItem(AbstractSettingsModel<time_t> &model,
+                               utils::time::Locale::TimeFormat timeFormat,
+                               const std::string &focusFont,
+                               const std::string &noFocusFont,
+                               const std::string &topDescription)
+        : BellSideListItemWithCallbacks(topDescription)
+    {
+        auto centerBox = dynamic_cast<HBox *>(body->getCenterBox());
+        spinner        = new TimeSetFmtSpinner(centerBox);
+        spinner->setMaximumSize(::style::bell_base_layout::w, ::style::bell_base_layout::h);
+        spinner->setFont(focusFont, noFocusFont);
+        spinner->setTimeFormat(timeFormat);
+        spinner->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+
+        getValue = [&model, this]() { model.setValue(spinner->getTime()); };
+        setValue = [&model, this]() { spinner->setTime(model.getValue()); };
     }
 } // namespace gui

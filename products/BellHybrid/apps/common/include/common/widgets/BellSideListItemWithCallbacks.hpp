@@ -19,6 +19,8 @@ namespace gui
         std::function<void()> onEnter;
         std::function<void()> onExit;
 
+        std::function<void()> onProceed;
+
       protected:
         void OnFocusChangedCallback();
     };

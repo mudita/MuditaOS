@@ -45,6 +45,15 @@ namespace alarms
         settings::Settings settings;
     };
 
+    class PlayBedtimeToneAction : public PlayToneAction
+    {
+        static auto constexpr bedtimeNotificationAudoFile = "Evening_Horizon.mp3";
+
+      public:
+        using PlayToneAction::PlayToneAction;
+        bool execute() override;
+    };
+
     class PlayChimeAction : public PlayAudioAction
     {
       public:
@@ -61,4 +70,6 @@ namespace alarms
 
     std::unique_ptr<PlayChimeAction> createPreWakeUpChimeAction(sys::Service &service);
     std::unique_ptr<PlayChimeAction> createSnoozeChimeAction(sys::Service &service);
+    std::unique_ptr<PlayBedtimeToneAction> createBedtimeChimeAction(sys::Service &service);
+
 } // namespace alarms

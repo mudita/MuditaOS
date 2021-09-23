@@ -590,6 +590,8 @@
   "app_bell_settings_time_units_finished_message": "Czas i jednostki ustawione.",
   "app_bellmain_alarm": "Alarm",
   "app_bellmain_bedtime": "Pora snu",
+  "app_bell_bedtime_set_finished": "Pora snu\nustawiona",
+  "app_bell_bedtime_notification": "Pora na sen",
   "app_bellmain_power_nap": "Drzemka",
   "app_bellmain_meditation_timer": "Medytacja",
   "app_bellmain_background_sounds": "Dźwięki otoczenia",

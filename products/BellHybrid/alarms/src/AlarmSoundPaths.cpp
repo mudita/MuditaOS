@@ -21,8 +21,14 @@ namespace alarms::paths
     {
         return purefs::dir::getCurrentOSPath() / "assets/audio/bell/prewakeup";
     }
+
     std::filesystem::path getSnoozeChimesDir() noexcept
     {
         return purefs::dir::getCurrentOSPath() / "assets/audio/bell/chimes";
+    }
+
+    std::filesystem::path getBedtimeReminderChimesDir() noexcept
+    {
+        return purefs::dir::getCurrentOSPath() / "assets/audio/bell/evening_reminder";
     }
 } // namespace alarms::paths
