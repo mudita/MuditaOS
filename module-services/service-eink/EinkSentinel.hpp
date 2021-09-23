@@ -4,7 +4,7 @@
 #pragma once
 
 #include <Service/Service.hpp>
-#include <Service/CpuSentinel.hpp>
+#include <SystemManager/CpuSentinel.hpp>
 
 namespace service::eink
 {

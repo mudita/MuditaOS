@@ -4,7 +4,7 @@
 #include "software_watchdog.hpp"
 #include <module-os/RTOSWrapper/include/critical.hpp>
 #include <module-os/RTOSWrapper/include/ticks.hpp>
-#include <Service/Common.hpp>
+#include <system/Common.hpp>
 #include <log/log.hpp>
 #include <cstdlib>
 

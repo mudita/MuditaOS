@@ -8,7 +8,7 @@
 #include <MessageType.hpp>
 #include <modem/mux/CellularMux.h>
 #include <PhoneNumber.hpp>
-#include <Service/Common.hpp>
+#include <system/Common.hpp>
 #include <bsp/cellular/bsp_cellular.hpp>
 #include <log/log.hpp>
 

@@ -9,7 +9,7 @@
 #include <Service/Service.hpp>
 #include <Service/Worker.hpp>
 #include <bsp/common.hpp>
-#include <Service/CpuSentinel.hpp>
+#include <SystemManager/CpuSentinel.hpp>
 #include <hal/battery_charger/AbstractBatteryCharger.hpp>
 #include <hal/key_input/AbstractKeyInput.hpp>
 #include <battery/BatteryController.hpp>

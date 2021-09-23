@@ -6,7 +6,7 @@
 #include <MessageType.hpp>
 #include <Service/Message.hpp>
 
-#include "SystemManager/Constants.hpp"
+#include "system/Constants.hpp"
 #include "SystemManager/data/SystemManagerActionsParams.hpp"
 #include <service-appmgr/Actions.hpp>
 

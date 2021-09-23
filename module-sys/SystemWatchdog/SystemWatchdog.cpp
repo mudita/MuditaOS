@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <SystemWatchdog/SystemWatchdog.hpp>
-#include "Service/Common.hpp"
+#include "system/Common.hpp"
 #include "critical.hpp"
 #include "ticks.hpp"
 #include "bsp/watchdog/watchdog.hpp"

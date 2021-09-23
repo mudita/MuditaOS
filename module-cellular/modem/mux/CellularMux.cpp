@@ -14,7 +14,7 @@
 #include <service-cellular/CellularMessage.hpp>
 
 #include <RTOSWrapper/include/ticks.hpp>
-#include <SystemManager/messages/DeviceRegistrationMessage.hpp>
+#include <system/messages/DeviceRegistrationMessage.hpp>
 #include <time/time_constants.hpp>
 
 #include <gsl/util>
@@ -537,7 +537,7 @@ void CellularMux::processData(bsp::cellular::CellularDMAResultStruct &result)
     LOG_DEBUG("Worker start");
 
     constexpr auto waitForDataIndefinitely = std::chrono::milliseconds::max();
-    CellularMux *inst          = static_cast<CellularMux *>(ptr);
+    CellularMux *inst                      = static_cast<CellularMux *>(ptr);
 
     bsp::cellular::CellularDMAResultStruct result{};
 

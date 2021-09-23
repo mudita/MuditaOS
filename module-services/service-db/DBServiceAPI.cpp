@@ -13,7 +13,7 @@
 #include <MessageType.hpp>
 #include <PhoneNumber.hpp>
 #include <SMSTemplateRecord.hpp>
-#include <Service/Common.hpp>
+#include <system/Common.hpp>
 #include <Service/Service.hpp>
 #include <Tables/CountryCodesTable.hpp>
 #include <ThreadRecord.hpp>

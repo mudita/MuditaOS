@@ -14,7 +14,7 @@
 #include <MessageType.hpp>
 #include <Service/Worker.hpp>
 #include <Timers/TimerFactory.hpp>
-#include <SystemManager/Constants.hpp>
+#include <system/Constants.hpp>
 #include <SystemManager/SystemManagerCommon.hpp>
 #include <bsp/common.hpp>
 #include <bsp/rtc/rtc.hpp>
@@ -38,7 +38,7 @@
 #include <list>
 #include <ctime>
 #include <apps-common/messages/AppMessage.hpp>
-#include <SystemManager/messages/SentinelRegistrationMessage.hpp>
+#include <system/messages/SentinelRegistrationMessage.hpp>
 #include <EventStore.hpp>
 #include <ticks.hpp>
 #include <purefs/filesystem_paths.hpp>
