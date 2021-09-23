@@ -6,7 +6,7 @@
 #include <endpoints/DBHelper.hpp>
 
 #include <ContactRecord.hpp>
-#include <Service/Common.hpp>
+#include <system/Common.hpp>
 #include <Service/Service.hpp>
 #include <json11.hpp>
 

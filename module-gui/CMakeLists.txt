@@ -12,14 +12,14 @@ include(gui/dom/CMakeLists.txt)
 
 include_directories( ../module-utils )
 
-target_link_libraries(${PROJECT_NAME} 
-    PUBLIC 
+target_link_libraries(${PROJECT_NAME}
+    PUBLIC
         ${TARGET_LIBRARIES}
         module-bsp
         eventstore
         utils-math
         module-utils
-        sys-timers
+        sys-service
         sys-watchdog
         utf8
     PRIVATE

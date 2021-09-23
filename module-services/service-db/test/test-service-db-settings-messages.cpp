@@ -1,18 +1,18 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <catch2/catch.hpp>           // for Section, SourceLineInfo, SECTION, SectionInfo, StringRef, TEST_CASE
-#include <Service/Service.hpp>        // for Service
-#include <Service/Message.hpp>        // for MessagePointer, ResponseMessage, DataMessage
-#include <functional>                 // for _Bind_helper<>::type, _Placeholder, bind, _1, _2
-#include <list>                       // for list
-#include <memory>                     // for make_shared, allocator, shared_ptr
-#include <optional>                   // for optional
-#include <string>                     // for string
-#include <utility>                    // for move
+#include <catch2/catch.hpp>    // for Section, SourceLineInfo, SECTION, SectionInfo, StringRef, TEST_CASE
+#include <Service/Service.hpp> // for Service
+#include <Service/Message.hpp> // for MessagePointer, ResponseMessage, DataMessage
+#include <functional>          // for _Bind_helper<>::type, _Placeholder, bind, _1, _2
+#include <list>                // for list
+#include <memory>              // for make_shared, allocator, shared_ptr
+#include <optional>            // for optional
+#include <string>              // for string
+#include <utility>             // for move
 
 #include <service-db/SettingsMessages.hpp> // for SetVariable, ListProfiles, GetVariable, AddMode, AddProfile, CurrentModeChanged, CurrentProfileChanged, EntryPath, GetCurrentMode, GetCurrentProfile, ListModes, ModeListResponse, ProfileListResponse, RegisterOnVariableChange, UnregisterOnVariableChange, VariableChanged, VariableResponse
-#include "Service/Common.hpp"            // for ReturnCodes, ReturnCodes::Success, ServicePowerMode
+#include "system/Common.hpp"               // for ReturnCodes, ReturnCodes::Success, ServicePowerMode
 
 namespace settings
 {

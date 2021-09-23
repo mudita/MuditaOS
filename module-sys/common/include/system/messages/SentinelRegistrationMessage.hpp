@@ -4,7 +4,7 @@
 #pragma once
 
 #include <Service/Message.hpp>
-#include "Service/CpuSentinel.hpp"
+#include "SystemManager/CpuSentinel.hpp"
 
 namespace sys
 {

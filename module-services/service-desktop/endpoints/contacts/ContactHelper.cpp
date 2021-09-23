@@ -13,7 +13,7 @@
 #include <Common/Query.hpp>
 #include <ContactRecord.hpp>
 #include <PhoneNumber.hpp>
-#include <Service/Common.hpp>
+#include <system/Common.hpp>
 #include <log/log.hpp>
 #include <queries/RecordQuery.hpp>
 #include <queries/phonebook/QueryContactGetByID.hpp>

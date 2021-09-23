@@ -7,7 +7,7 @@
 // This is straight forward declaration header for includes purposes
 
 #include <memory>
-#include "SystemReturnCodes.hpp"
+#include <system/SystemReturnCodes.hpp>
 
 namespace sys
 {

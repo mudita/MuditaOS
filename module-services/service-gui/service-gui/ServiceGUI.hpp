@@ -9,7 +9,7 @@
 #include "messages/RenderingFinished.hpp"
 #include "Common.hpp"
 
-#include <Service/Common.hpp>
+#include <system/Common.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
 #include <Timers/TimerHandle.hpp>

@@ -3,7 +3,7 @@
 
 #include "BatteryLevelCheck.hpp"
 #include "service-evtmgr/BatteryMessages.hpp"
-#include "SystemManager/Constants.hpp"
+#include "system/Constants.hpp"
 #include <service-db/agents/settings/SystemSettings.hpp>
 #include <EventStore.hpp>
 #include <Utils.hpp>

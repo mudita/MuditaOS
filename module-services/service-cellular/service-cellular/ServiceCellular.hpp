@@ -16,10 +16,10 @@
 #include <modem/mux/CellularMux.h>
 #include <modem/mux/CellularMuxTypes.h>
 #include <SMSRecord.hpp>
-#include <Service/Common.hpp>
+#include <system/Common.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
-#include <Service/CpuSentinel.hpp>
+#include <SystemManager/CpuSentinel.hpp>
 #include <Timers/TimerHandle.hpp>
 #include <bsp/common.hpp>
 #include <utf8/UTF8.hpp>

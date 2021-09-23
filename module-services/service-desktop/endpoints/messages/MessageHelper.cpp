@@ -11,7 +11,7 @@
 #include <Common/Query.hpp>
 #include <SMSRecord.hpp>
 #include <SMSTemplateRecord.hpp>
-#include <Service/Common.hpp>
+#include <system/Common.hpp>
 #include <ThreadRecord.hpp>
 #include <queries/messages/sms/QuerySMSGet.hpp>
 #include <queries/messages/sms/QuerySMSGetByID.hpp>

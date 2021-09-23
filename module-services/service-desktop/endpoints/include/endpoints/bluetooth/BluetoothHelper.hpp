@@ -3,7 +3,7 @@
 #pragma once
 
 #include <endpoints/Context.hpp>
-#include <Service/Common.hpp>
+#include <system/Common.hpp>
 #include <Service/Service.hpp>
 
 namespace sdesktop::endpoints
