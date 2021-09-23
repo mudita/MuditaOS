@@ -15,6 +15,8 @@
 #include <common/models/TimeModel.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <windows/Dialog.hpp>
+#include <service-audio/AudioMessage.hpp>
+#include <common/popups/BedtimeNotificationWindow.hpp>
 
 namespace app
 {
@@ -72,7 +74,8 @@ namespace app
         attachPopups({gui::popup::ID::AlarmActivated,
                       gui::popup::ID::AlarmDeactivated,
                       gui::popup::ID::PowerOff,
-                      gui::popup::ID::Reboot});
+                      gui::popup::ID::Reboot,
+                      gui::popup::ID::BedtimeNotification});
     }
 
     sys::MessagePointer ApplicationBellMain::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)

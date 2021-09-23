@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <AlarmOperations.hpp>
+#include <common/models/BedtimeModel.hpp>
 #include <module-db/Interface/AlarmEventRecord.hpp>
 
 #include <products/BellHybrid/services/time/include/time/AlarmOperations.hpp>
@@ -61,15 +62,38 @@ namespace
         Settings settings{true, std::chrono::minutes{1}};
     };
 
+    class MockedBedtimeModel : public alarms::AbstractBedtimeSettingsProvider
+    {
+      public:
+        MockedBedtimeModel() : bedtimeOnOff{false}, bedtimeTime{0}
+        {}
+        MockedBedtimeModel(bool OnOff, TimePoint time) : bedtimeOnOff{OnOff}, bedtimeTime{TimePointToTimeT(time)}
+        {}
+        auto isBedtimeEnabled() -> bool override
+        {
+            return bedtimeOnOff;
+        }
+        auto getBedtimeTime() -> time_t override
+        {
+            return bedtimeTime;
+        }
+
+      private:
+        bool bedtimeOnOff;
+        time_t bedtimeTime;
+    };
+
     std::unique_ptr<alarms::IAlarmOperations> getMockedAlarmOperations(
         std::unique_ptr<MockAlarmEventsRepository> &alarmRepo,
         std::unique_ptr<alarms::PreWakeUpSettingsProvider> &&preWakeUpSettingsProvider,
-        std::unique_ptr<alarms::SnoozeChimeSettingsProvider> &&snoozeChimeSettingsProvider)
+        std::unique_ptr<alarms::SnoozeChimeSettingsProvider> &&snoozeChimeSettingsProvider,
+        std::unique_ptr<alarms::AbstractBedtimeSettingsProvider> &&bedtimeSettingsProvider)
     {
         return std::make_unique<alarms::AlarmOperations>(std::move(alarmRepo),
                                                          timeInjector,
                                                          std::move(preWakeUpSettingsProvider),
-                                                         std::move(snoozeChimeSettingsProvider));
+                                                         std::move(snoozeChimeSettingsProvider),
+                                                         std::move(bedtimeSettingsProvider));
     }
 } // namespace
 
@@ -79,7 +103,8 @@ std::unique_ptr<alarms::IAlarmOperations> AlarmOperationsFixture::getMockedAlarm
 {
     return ::getMockedAlarmOperations(alarmRepo,
                                       std::make_unique<MockedPreWakeUpSettingsProvider>(),
-                                      std::make_unique<MockedSnoozeChimeSettingsProvider>());
+                                      std::make_unique<MockedSnoozeChimeSettingsProvider>(),
+                                      std::make_unique<MockedBedtimeModel>());
 }
 
 TEST(PreWakeUp, TooEarlyForPreWakeUp)
@@ -186,6 +211,26 @@ TEST(PreWakeUp, TimeToLightFrontlightButDisabled)
     ASSERT_FALSE(decision.timeForFrontlight);
 }
 
+TEST(Bedtime, TimeToBedDisabled)
+{
+    auto settingsProvider = std::make_unique<MockedBedtimeModel>(false, TimePointFromString("2022-11-11 05:02:00"));
+    alarms::Bedtime bedtime(std::move(settingsProvider));
+    ASSERT_FALSE(bedtime.decide(TimePointFromString("2022-11-11 05:02:00")));
+    ASSERT_FALSE(bedtime.decide(TimePointFromString("2022-11-11 07:32:00")));
+}
+
+TEST(Bedtime, TimeToBedEnabled)
+{
+    auto settingsProvider = std::make_unique<MockedBedtimeModel>(true, TimePointFromString("2022-11-11 05:02:00"));
+    alarms::Bedtime bedtime(std::move(settingsProvider));
+    ASSERT_TRUE(bedtime.decide(TimePointFromString("2022-11-11 05:02:00")));
+    ASSERT_TRUE(bedtime.decide(TimePointFromString("2022-12-03 05:02:01")));
+    ASSERT_TRUE(bedtime.decide(TimePointFromString("2022-12-03 05:02:03")));
+    ASSERT_TRUE(bedtime.decide(TimePointFromString("2022-12-03 05:02:55")));
+    ASSERT_FALSE(bedtime.decide(TimePointFromString("2022-11-11 07:32:00")));
+    ASSERT_FALSE(bedtime.decide(TimePointFromString("2022-11-11 05:01:59")));
+}
+
 TEST(PreWakeUp, TimePointIsNotRoundedToFullMinute)
 {
     alarms::PreWakeUp preWakeUp(std::make_unique<MockedPreWakeUpSettingsProvider>());
@@ -226,7 +271,8 @@ class BellAlarmOperationsFixture : public ::testing::Test
 
         alarmOperations = ::getMockedAlarmOperations(alarmRepoMock,
                                                      std::make_unique<MockedPreWakeUpSettingsProvider>(),
-                                                     std::make_unique<MockedSnoozeChimeSettingsProvider>());
+                                                     std::make_unique<MockedSnoozeChimeSettingsProvider>(),
+                                                     std::make_unique<MockedBedtimeModel>());
         alarmOperations->addAlarmExecutionHandler(alarms::AlarmType::PreWakeUpChime, chimeHandler);
         alarmOperations->addAlarmExecutionHandler(alarms::AlarmType::PreWakeUpFrontlight, frontlightHandler);
         alarmOperations->updateEventsCache(TimePointFromString("2022-11-11 08:00:00"));

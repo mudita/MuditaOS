@@ -6,6 +6,7 @@
 #include <common/models/AbstractSettingsModel.hpp>
 
 #include <service-db/Settings.hpp>
+#include <Service/Service.hpp>
 
 namespace app
 {
@@ -17,7 +18,7 @@ namespace gui
     template <class ValueType> class SettingsModel : public AbstractSettingsModel<ValueType>
     {
       public:
-        explicit SettingsModel(app::ApplicationCommon *app);
+        explicit SettingsModel(sys::Service *app);
 
       protected:
         mutable settings::Settings settings;

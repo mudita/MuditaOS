@@ -65,6 +65,11 @@ namespace alarms
         return play(tonePath, ringingDuration);
     }
 
+    bool PlayBedtimeToneAction::execute()
+    {
+        return play(paths::getBedtimeReminderChimesDir() / bedtimeNotificationAudoFile, InfiniteDuration);
+    }
+
     std::unique_ptr<PlayChimeAction> createPreWakeUpChimeAction(sys::Service &service)
     {
         return std::make_unique<PlayChimeAction>(
@@ -74,6 +79,11 @@ namespace alarms
     std::unique_ptr<PlayChimeAction> createSnoozeChimeAction(sys::Service &service)
     {
         return std::make_unique<PlayChimeAction>(service, paths::getSnoozeChimesDir(), bell::settings::Snooze::tone);
+    }
+
+    std::unique_ptr<PlayBedtimeToneAction> createBedtimeChimeAction(sys::Service &service)
+    {
+        return std::make_unique<PlayBedtimeToneAction>(service);
     }
 
     PlayChimeAction::PlayChimeAction(sys::Service &service,
