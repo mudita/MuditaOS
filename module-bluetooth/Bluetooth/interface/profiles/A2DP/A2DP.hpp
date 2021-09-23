@@ -36,8 +36,6 @@ namespace bluetooth
         [[nodiscard]] auto stopRinging() const noexcept -> Error::Code override;
         /// @return SystemError - it's not posible to start routing while there's A2DP active
         [[nodiscard]] auto initializeCall() const noexcept -> Error::Code override;
-        /// @return SystemError - it's not posible to handle call terminated while there's A2DP active
-        [[nodiscard]] auto callTerminated() const noexcept -> Error::Code override;
         /// @return SystemError - it's not posible to handle call answered while there's A2DP active
         [[nodiscard]] auto callAnswered() const noexcept -> Error::Code override;
         /// @return Success - ignoring in A2DP

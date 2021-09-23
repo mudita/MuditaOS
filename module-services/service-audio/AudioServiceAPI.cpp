@@ -215,4 +215,8 @@ namespace AudioServiceAPI
     {
         return serv->bus.sendUnicast(std::make_shared<HSPDeviceVolumeChanged>(volume), service::name::audio);
     }
+    bool BluetoothHFPVolumeChanged(sys::Service *serv, const std::uint8_t volume)
+    {
+        return serv->bus.sendUnicast(std::make_shared<HFPDeviceVolumeChanged>(volume), service::name::audio);
+    }
 } // namespace AudioServiceAPI

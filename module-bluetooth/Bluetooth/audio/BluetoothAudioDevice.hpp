@@ -78,6 +78,7 @@ namespace bluetooth
         auto getTraits() const -> Traits override;
         auto getSourceFormat() -> ::audio::AudioFormat override;
         void enableInput() override;
+        void setAclHandle(hci_con_handle_t handle);
 
         void receiveCVSD(audio::AbstractStream::Span receivedData);
 
@@ -100,6 +101,7 @@ namespace bluetooth
         std::unique_ptr<std::int16_t[]> decoderBuffer;
         std::size_t leftoversSize = 0;
         btstack_cvsd_plc_state_t cvsdPlcState;
+        hci_con_handle_t aclHandle;
     };
 
 } // namespace bluetooth

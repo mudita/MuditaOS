@@ -44,7 +44,6 @@ namespace bluetooth
         auto stopRinging() -> Error::Code;
         auto initializeCall() -> Error::Code;
         auto callAnswered() -> Error::Code;
-        auto callTerminated() -> Error::Code;
         auto setIncomingCallNumber(const std::string &num) -> Error::Code;
         auto isAddressActuallyUsed(const bd_addr_t address) -> bool;
 

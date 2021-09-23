@@ -124,17 +124,13 @@ namespace bluetooth
     {
         return currentProfilePtr->callAnswered();
     }
-    auto ProfileManager::callTerminated() -> Error::Code
-    {
-        return currentProfilePtr->callTerminated();
-    }
     auto ProfileManager::setIncomingCallNumber(const std::string &num) -> Error::Code
     {
         if (currentProfilePtr) {
             return currentProfilePtr->setIncomingCallNumber(num);
         }
         LOG_ERROR("No profile, returning!");
-        return Error::Success;
+        return Error::NotReady;
     }
 
 } // namespace bluetooth

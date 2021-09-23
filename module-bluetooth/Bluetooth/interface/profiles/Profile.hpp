@@ -9,7 +9,6 @@
 #include <service-bluetooth/ServiceBluetoothCommon.hpp>
 
 #include <memory>
-#include <PhoneNumber.hpp>
 
 namespace bluetooth
 {
@@ -37,9 +36,6 @@ namespace bluetooth
         /// Executed after the call is answered
         /// @return Error code that determines, whether operation was successful or not
         [[nodiscard]] virtual auto callAnswered() const noexcept -> Error::Code = 0;
-        /// Executed after the call is terminated
-        /// @return Error code that determines, whether operation was successful or not
-        [[nodiscard]] virtual auto callTerminated() const noexcept -> Error::Code = 0;
         /// Sets the incoming call number
         /// @return Error code that determines, whether operation was successful or not
         [[nodiscard]] virtual auto setIncomingCallNumber(const std::string &num) const noexcept -> Error::Code = 0;

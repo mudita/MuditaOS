@@ -369,10 +369,6 @@ namespace bluetooth
     {
         return Error::Success;
     }
-    auto HSP::callTerminated() const noexcept -> Error::Code
-    {
-        return Error::Success;
-    }
     auto HSP::setIncomingCallNumber(const std::string &num) const noexcept -> Error::Code
     {
         return Error::Success;

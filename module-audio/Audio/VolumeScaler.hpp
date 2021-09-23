@@ -30,4 +30,16 @@ namespace audio::volume::scaler
         /// @return Volume level scaled to satisfy HSP's range [0, 15].
         std::uint8_t toHSPGain(float systemVolume) noexcept;
     } // namespace hsp
+
+    namespace hfp
+    {
+        /// @brief Takes volume level and converts it to according one for the system.
+        /// @param hspSpeakerGain - HFP speaker gain.
+        /// @return Volume level scaled to satisfy system's range [audio::minVolume, audio::maxVolume].
+        Volume toSystemVolume(std::uint8_t hfpSpeakerGain) noexcept;
+        /// @brief Takes volume level and converts it to according one for the HFP speaker gain.
+        /// @param systemVolume - system volume level.
+        /// @return Volume level scaled to satisfy HFP's range [0, 15].
+        std::uint8_t toHFPGain(float systemVolume) noexcept;
+    } // namespace hfp
 } // namespace audio::volume::scaler
