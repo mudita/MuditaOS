@@ -3,6 +3,7 @@
 
 #include "i18nImpl.hpp"
 #include <log/log.hpp>
+#include <algorithm>
 #include <cstdio>
 #include <purefs/filesystem_paths.hpp>
 
@@ -22,6 +23,7 @@ namespace utils
         {
           public:
             const std::string &get(const std::string &str);
+            const std::vector<std::string> get_array(const std::string &str);
             using i18n::getDisplayLanguage;
             using i18n::getDisplayLanguagePath;
             using i18n::getInputLanguage;
@@ -40,6 +42,23 @@ namespace utils
                 return returnNonEmptyString(getFallbackLanguageJSON()[str].string_value(), str);
             }
             return returnNonEmptyString(getDisplayLanguageJSON()[str].string_value(), str);
+        }
+
+        const std::vector<std::string> i18nPrivateInterface::get_array(const std::string &str)
+        {
+            std::vector<std::string> out;
+            auto object = getDisplayLanguageJSON()[str];
+            // if language pack returned nothing then try default language
+            if (not object.is_array()) {
+                object = getFallbackLanguageJSON()[str];
+            }
+            if (object.is_array()) {
+                out.reserve(object.array_items().size());
+                std::for_each(object.array_items().begin(), object.array_items().end(), [&out](const auto &o) {
+                    out.emplace_back(o.string_value());
+                });
+            }
+            return out;
         }
 
     } // namespace
@@ -158,6 +177,11 @@ namespace utils
     const std::string &translate(const std::string &text)
     {
         return utils::localize.get(text);
+    }
+
+    const std::vector<std::string> translate_array(const std::string &text)
+    {
+        return utils::localize.get_array(text);
     }
 
     const std::string &getDisplayLanguage()
