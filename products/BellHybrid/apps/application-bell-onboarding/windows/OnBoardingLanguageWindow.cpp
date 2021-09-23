@@ -8,8 +8,9 @@ namespace gui
 {
     OnBoardingLanguageWindow::OnBoardingLanguageWindow(
         app::ApplicationCommon *app,
-        std::unique_ptr<app::OnBoarding::OnBoardingLanguageWindowPresenter::Presenter> &&presenter)
-        : BellOptionWindow(app, gui::name::window::main_window), presenter{std::move(presenter)}
+        std::unique_ptr<app::OnBoarding::OnBoardingLanguageWindowPresenter::Presenter> &&presenter,
+        const std::string &name)
+        : BellOptionWindow(app, name), presenter{std::move(presenter)}
     {
         this->presenter->attach(this);
         refreshOptions(languageOptionsList(), this->presenter->getSelectedLanguageIndex());

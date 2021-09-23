@@ -7,6 +7,7 @@
 #include <windows/OnBoardingLanguageWindow.hpp>
 #include <windows/OnBoardingFinalizeWindow.hpp>
 #include <windows/OnBoardingSettingsWindow.hpp>
+#include <windows/OnBoardingWelcomeWindow.hpp>
 
 #include <service-appmgr/Constants.hpp>
 #include <service-appmgr/messages/GetCurrentDisplayLanguageResponse.hpp>
@@ -36,7 +37,7 @@ namespace app
         createUserInterface();
 
         connect(typeid(manager::GetCurrentDisplayLanguageResponse), [&](sys::Message *msg) {
-            if (gui::name::window::main_window == getCurrentWindow()->getName()) {
+            if (gui::window::name::onBoardingLanguageWindow == getCurrentWindow()->getName()) {
                 switchWindow(gui::window::name::onBoardingSettingsWindow);
                 return sys::msgHandled();
             }
@@ -49,9 +50,14 @@ namespace app
     void ApplicationBellOnBoarding::createUserInterface()
     {
         windowsFactory.attach(gui::name::window::main_window, [this](ApplicationCommon *app, const std::string &name) {
-            auto presenter = std::make_unique<OnBoarding::OnBoardingLanguageWindowPresenter>(this);
-            return std::make_unique<gui::OnBoardingLanguageWindow>(app, std::move(presenter));
+            return std::make_unique<gui::OnBoardingWelcomeWindow>(app, name);
         });
+
+        windowsFactory.attach(
+            gui::window::name::onBoardingLanguageWindow, [this](ApplicationCommon *app, const std::string &name) {
+                auto presenter = std::make_unique<OnBoarding::OnBoardingLanguageWindowPresenter>(this);
+                return std::make_unique<gui::OnBoardingLanguageWindow>(app, std::move(presenter), name);
+            });
 
         windowsFactory.attach(
             gui::window::name::onBoardingSettingsWindow, [](ApplicationCommon *app, const std::string &name) {
