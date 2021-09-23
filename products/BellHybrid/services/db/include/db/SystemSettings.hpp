@@ -31,4 +31,9 @@ namespace bell::settings
         constexpr inline auto lightActive = "alarm_light_active";
         constexpr inline auto duration    = "alarm_duration";
     } // namespace Alarm
+    namespace Bedtime
+    {
+        constexpr inline auto active = "bedtime_active";
+        constexpr inline auto time   = "bedtime_time";
+    } // namespace Bedtime
 };    // namespace bell::settings

@@ -41,6 +41,7 @@ target_link_libraries(BellHybrid
         bell::app-alarm
         bell::app-onboarding
         bell::app-background-sounds
+        bell::app-bedtime
         bell::app-common
         bell::app-main
         bell::app-powernap

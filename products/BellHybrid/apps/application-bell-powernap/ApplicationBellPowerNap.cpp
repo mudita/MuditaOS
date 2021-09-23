@@ -56,7 +56,8 @@ namespace app
         attachPopups({gui::popup::ID::AlarmActivated,
                       gui::popup::ID::AlarmDeactivated,
                       gui::popup::ID::PowerOff,
-                      gui::popup::ID::Reboot});
+                      gui::popup::ID::Reboot,
+                      gui::popup::ID::BedtimeNotification});
     }
 
     sys::MessagePointer ApplicationBellPowerNap::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)

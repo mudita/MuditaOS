@@ -5,6 +5,7 @@
 #include "src/actions/PlayAudioActions.hpp"
 #include "src/actions/NotifyGUIAction.hpp"
 #include "src/actions/FrontlightAction.hpp"
+#include "src/actions/NotifyGUIBedtimeReminderAction.hpp"
 
 namespace alarms
 {
@@ -32,8 +33,7 @@ namespace alarms
     }
 
     BellAlarmClockHandler::BellAlarmClockHandler(sys::Service *service) : BellAlarmHandler{getActions(service)}
-    {
-    }
+    {}
 
     auto BellAlarmClockHandler::getActions(sys::Service *service) -> Actions
     {
@@ -61,6 +61,17 @@ namespace alarms
     {
         Actions actions;
         actions.emplace_back(createSnoozeChimeAction(*service));
+        return actions;
+    }
+
+    BedtimeReminderHandler::BedtimeReminderHandler(sys::Service *service) : BellAlarmHandler{getActions(service)}
+    {}
+
+    auto BedtimeReminderHandler::getActions(sys::Service *service) -> Actions
+    {
+        Actions actions;
+        actions.emplace_back(createBedtimeChimeAction(*service));
+        actions.emplace_back(std::make_unique<NotifyGUIBedtimeReminderAction>(*service));
         return actions;
     }
 } // namespace alarms

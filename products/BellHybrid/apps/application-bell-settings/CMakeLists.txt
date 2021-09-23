@@ -23,7 +23,6 @@ target_sources(application-bell-settings
     PRIVATE
         ApplicationBellSettings.cpp
         models/FrontlightModel.cpp
-        models/SettingsModel.cpp
         models/TemperatureUnitModel.cpp
         models/TimeUnitsModel.cpp
         models/advanced/AboutYourBellModel.cpp
@@ -61,7 +60,6 @@ target_sources(application-bell-settings
         windows/alarm_settings/BellSettingsAlarmSettingsWindow.cpp
         windows/alarm_settings/BellSettingsPrewakeUpWindow.cpp
 
-        models/SettingsModel.hpp
         models/advanced/AboutYourBellModel.hpp
         models/alarm_settings/AbstractAlarmSettingsModel.hpp
         models/alarm_settings/AbstractPrewakeUpSettingsModel.hpp
