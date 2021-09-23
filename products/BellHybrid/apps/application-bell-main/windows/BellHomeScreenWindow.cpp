@@ -113,7 +113,6 @@ namespace gui
         bottomText->setEdges(RectangleEdge::None);
         bottomText->activeItem = false;
         bottomText->drawUnderline(false);
-        bottomText->setLines(2);
 
         body->resize();
     }
@@ -159,7 +158,7 @@ namespace gui
     {
         bottomText->setFont(bellMainStyle::mainWindow::bottomDescription::font_small);
         bottomText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
-        bottomText->setText(desc);
+        bottomText->setRichText(desc);
     }
 
     void BellHomeScreenWindow::setTime(std::time_t newTime)
