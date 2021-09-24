@@ -34,7 +34,7 @@ namespace app
     void ApplicationBellMeditationTimer::createUserInterface()
     {
         windowsFactory.attach(gui::name::window::main_window, [this](ApplicationCommon *app, const std::string &name) {
-            auto presenter = std::make_unique<app::meditation::MeditationTimerPresenter>(app);
+            auto presenter = std::make_unique<app::meditation::MeditationTimerPresenter>(app, settings.get());
             return std::make_unique<gui::MeditationTimerWindow>(app, std::move(presenter));
         });
         windowsFactory.attach(gui::name::window::interval_chime, [](ApplicationCommon *app, const std::string &name) {
@@ -42,23 +42,17 @@ namespace app
             return std::make_unique<gui::IntervalChimeWindow>(app, std::move(presenter));
         });
         windowsFactory.attach(gui::name::window::ready_going, [](ApplicationCommon *app, const std::string &name) {
-            //            auto presenter = std::make_unique<app::meditation::MeditationBasePresenter>(app);
-            //            return std::make_unique<gui::ReadyGoingWindow>(app, std::move(presenter));
             return std::make_unique<gui::ReadyGoingWindow>(app);
         });
-        windowsFactory.attach(gui::name::window::meditation_running,
-                              [](ApplicationCommon *app, const std::string &name) {
-                                  auto presenter = std::make_unique<app::meditation::MeditationProgressPresenter>(app);
-                                  return std::make_unique<gui::MeditationRunningWindow>(app, std::move(presenter));
-                              });
+        windowsFactory.attach(
+            gui::name::window::meditation_running, [this](ApplicationCommon *app, const std::string &name) {
+                auto presenter = std::make_unique<app::meditation::MeditationProgressPresenter>(app, settings.get());
+                return std::make_unique<gui::MeditationRunningWindow>(app, std::move(presenter));
+            });
         windowsFactory.attach(gui::name::window::session_paused, [](ApplicationCommon *app, const std::string &name) {
-            //            auto presenter = std::make_unique<app::meditation::MeditationBasePresenter>(app);
-            //            return std::make_unique<gui::SessionPausedWindow>(app, std::move(presenter));
             return std::make_unique<gui::SessionPausedWindow>(app);
         });
         windowsFactory.attach(gui::name::window::session_end, [](ApplicationCommon *app, const std::string &name) {
-            //            auto presenter = std::make_unique<app::meditation::MeditationBasePresenter>(app);
-            //            return std::make_unique<gui::SessionEndWindow>(app, std::move(presenter));
             return std::make_unique<gui::SessionEndWindow>(app);
         });
     }

@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <apps-common/ApplicationCommon.hpp>
 #include <apps-common/BasePresenter.hpp>
 #include <apps-common/widgets/ProgressTimer.hpp>
 
@@ -18,6 +19,11 @@ namespace app
 namespace gui
 {
     class Item;
+}
+
+namespace settings
+{
+    class Settings;
 }
 
 namespace app::meditation
@@ -50,7 +56,8 @@ namespace app::meditation
     class MeditationProgressPresenter : public MeditationProgressContract::Presenter
     {
       private:
-        app::ApplicationCommon *app = nullptr;
+        app::ApplicationCommon *app  = nullptr;
+        settings::Settings *settings = nullptr;
         std::unique_ptr<app::ProgressTimer> timer;
         std::shared_ptr<MeditationProgressModel> model;
 
@@ -59,7 +66,7 @@ namespace app::meditation
         void onBaseTickReached();
 
       public:
-        explicit MeditationProgressPresenter(app::ApplicationCommon *app);
+        explicit MeditationProgressPresenter(app::ApplicationCommon *app, settings::Settings *settings);
 
         void activate(MeditationItem &item) override;
         void request(MeditationItem &item) override;

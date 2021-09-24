@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <apps-common/ApplicationCommon.hpp>
 #include <apps-common/BasePresenter.hpp>
 
 #include "MeditationItem.hpp"
