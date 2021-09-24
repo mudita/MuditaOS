@@ -40,8 +40,6 @@ TEST_CASE("Calllog Record tests")
         REQUIRE(testRec.date == 0);
         REQUIRE(testRec.duration == 0);
         REQUIRE(testRec.type == CallType::CT_NONE);
-        REQUIRE(testRec.name == "");
-        REQUIRE(testRec.contactId == 0);
         REQUIRE(!testRec.phoneNumber.isValid());
         REQUIRE(testRec.isRead == true);
     }
@@ -52,8 +50,6 @@ TEST_CASE("Calllog Record tests")
     testRec.date         = 100;
     testRec.duration     = 100;
     testRec.type         = CallType::CT_INCOMING;
-    testRec.name         = "Test name";
-    testRec.contactId    = 2;
     testRec.phoneNumber  = utils::PhoneNumber("600123456").getView();
     testRec.isRead       = false;
 
@@ -80,10 +76,6 @@ TEST_CASE("Calllog Record tests")
         REQUIRE(call.type == testRec.type);
         REQUIRE(call.phoneNumber == testRec.phoneNumber);
         REQUIRE(call.isRead == testRec.isRead);
-        // below fields will be filled in with contact data
-        REQUIRE_FALSE(call.contactId == testRec.contactId);
-        REQUIRE_FALSE(call.name == testRec.name);
-        REQUIRE(call.name == "600123456");
     }
 
     SECTION("Entry update")
@@ -104,8 +96,6 @@ TEST_CASE("Calllog Record tests")
         REQUIRE(callPost.type == callPre.type);
         REQUIRE(callPost.isRead == callPre.isRead);
         REQUIRE(callPost.phoneNumber == callPre.phoneNumber);
-        REQUIRE(callPost.contactId == callPre.contactId);
-        REQUIRE(callPost.name == callPre.name);
     }
 
     SECTION("Get entry - invalid ID")
@@ -116,8 +106,6 @@ TEST_CASE("Calllog Record tests")
         REQUIRE(call.date == 0);
         REQUIRE(call.duration == 0);
         REQUIRE(call.type == CallType::CT_NONE);
-        REQUIRE(call.name == "");
-        REQUIRE(call.contactId == 0);
         REQUIRE(!call.phoneNumber.isValid());
         REQUIRE(call.isRead == true);
     }

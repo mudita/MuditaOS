@@ -85,13 +85,6 @@ TEST_CASE("SMS Record tests")
             REQUIRE(w.number == numberTest);
         }
 
-        // Get all available records by specified contact ID and check for invalid data
-        records = smsRecInterface.GetLimitOffsetByField(0, 100, SMSRecordField::ContactID, "1");
-        for (const auto &w : *records) {
-            REQUIRE(w.body == bodyTest);
-            REQUIRE(w.number == numberTest);
-        }
-
         // Remove records one by one
         REQUIRE(smsRecInterface.RemoveByID(1));
         REQUIRE(smsRecInterface.RemoveByID(2));
@@ -142,28 +135,10 @@ TEST_CASE("SMS Record tests")
             REQUIRE(w.number == numberTest2);
         }
 
-        // Get all available records by specified contact ID and check for invalid data
-        records = smsRecInterface.GetLimitOffsetByField(0, 100, SMSRecordField::ContactID, "1");
-        for (const auto &w : *records) {
-            REQUIRE(w.body == bodyTest);
-            REQUIRE(w.number == numberTest);
-        }
-
-        // Get all available records by specified contact ID and check for invalid data
-        records = smsRecInterface.GetLimitOffsetByField(0, 100, SMSRecordField::ContactID, "2");
-        for (const auto &w : *records) {
-            REQUIRE(w.body == bodyTest);
-            REQUIRE(w.number == numberTest2);
-        }
-
         // Remove sms records in order to check automatic management of threads and contact databases
         ThreadRecordInterface threadRecordInterface(&smsDB, &contactsDB);
         REQUIRE(smsRecInterface.RemoveByID(1));
-        records = smsRecInterface.GetLimitOffsetByField(0, 100, SMSRecordField::ContactID, "1");
-
         REQUIRE(smsRecInterface.RemoveByID(2));
-        records = smsRecInterface.GetLimitOffsetByField(0, 100, SMSRecordField::ContactID, "1");
-        REQUIRE((*records).size() == 0);
 
         REQUIRE(smsRecInterface.RemoveByID(3));
         REQUIRE(smsRecInterface.RemoveByID(4));
@@ -187,7 +162,7 @@ TEST_CASE("SMS Record tests")
                                   .date           = threadRec.date,
                                   .msgCount       = threadRec.msgCount,
                                   .unreadMsgCount = threadRec.unreadMsgCount,
-                                  .contactID      = threadRec.contactID,
+                                  .contactID      = DB_ID_NONE,
                                   .snippet        = threadRec.snippet,
                                   .type           = threadRec.type};
         threadRaw.msgCount = trueCount + 1; // break the DB
@@ -228,7 +203,6 @@ TEST_CASE("SMS Record tests")
         REQUIRE(smsRecInterface.Add(recordIN));
         REQUIRE(smsRecInterface.Add(recordIN));
         REQUIRE(smsRecInterface.Add(recordIN));
-        REQUIRE(smsRecInterface.RemoveByField(SMSRecordField::ContactID, "1"));
         Database::deinitialize();
     }
 

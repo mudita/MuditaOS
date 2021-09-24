@@ -22,7 +22,6 @@ struct CalllogRecord : public Record
     time_t duration                      = 0;
     CallType type                        = CallType::CT_NONE;
     UTF8 name                            = "";
-    uint32_t contactId                   = 0;
     utils::PhoneNumber::View phoneNumber = utils::PhoneNumber::View();
     bool isRead                          = true;
 
@@ -32,8 +31,6 @@ struct CalllogRecord : public Record
     CalllogRecord() = default;
     CalllogRecord(const CallType type, const utils::PhoneNumber::View &number);
     CalllogRecord(const CalllogTableRow &tableRow);
-
-    uint32_t getContactId() const;
 };
 
 enum class CalllogRecordField
@@ -71,7 +68,7 @@ class CalllogRecordInterface : public RecordInterface<CalllogRecord, CalllogReco
   private:
     CalllogDB *calllogDB   = nullptr;
     ContactsDB *contactsDB = nullptr;
-    ContactRecord GetContactRecordByID(uint32_t contactId);
+
     std::vector<CalllogRecord> GetByContactID(uint32_t id);
 
     std::unique_ptr<db::QueryResult> getQuery(std::shared_ptr<db::Query> query);
@@ -79,4 +76,6 @@ class CalllogRecordInterface : public RecordInterface<CalllogRecord, CalllogReco
     std::unique_ptr<db::QueryResult> getCountQuery(std::shared_ptr<db::Query> query);
     std::unique_ptr<db::QueryResult> removeQuery(std::shared_ptr<db::Query> query);
     std::unique_ptr<db::QueryResult> getByContactIDQuery(std::shared_ptr<db::Query> query);
+
+    std::optional<ContactRecord> getContactByNumber(utils::PhoneNumber::View number);
 };

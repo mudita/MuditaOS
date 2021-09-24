@@ -12,7 +12,6 @@
 #include <queries/messages/threads/QueryThreadMarkAsRead.hpp>
 #include <queries/messages/threads/QueryThreadsSearchForList.hpp>
 #include <queries/messages/threads/QueryThreadGetByID.hpp>
-#include <queries/messages/threads/QueryThreadGetByContactID.hpp>
 #include <queries/messages/threads/QueryThreadGetByNumber.hpp>
 #include <queries/messages/threads/QueryThreadRemove.hpp>
 #include <queries/messages/threads/QueryThreadsGet.hpp>
@@ -44,7 +43,6 @@ TEST_CASE("Thread Record tests")
     const char *snippetTest      = "Test snippet";
     const char *snippetTest2     = "Test snippet2";
     const SMSType typeTest       = SMSType ::UNKNOWN;
-    const uint32_t contactIDTest = 100;
 
     ThreadRecordInterface threadRecordInterface1(&smsDB, &contactsDB);
 
@@ -52,7 +50,6 @@ TEST_CASE("Thread Record tests")
     recordIN.date      = dateTest;
     recordIN.snippet   = snippetTest;
     recordIN.type      = typeTest;
-    recordIN.contactID = contactIDTest;
 
     const auto threadRecords = threadRecordInterface1.GetCount() + 1;
     // clear all records
@@ -91,7 +88,6 @@ TEST_CASE("Thread Record tests")
             REQUIRE(w.date == dateTest);
             REQUIRE(w.snippet == snippetTest);
             REQUIRE(w.type == typeTest);
-            REQUIRE(w.contactID == contactIDTest);
         }
     }
 
@@ -109,20 +105,6 @@ TEST_CASE("Thread Record tests")
             REQUIRE(w.date == dateTest);
             REQUIRE(w.snippet == snippetTest);
             REQUIRE(w.type == typeTest);
-            REQUIRE(w.contactID == contactIDTest);
-        }
-    }
-
-    SECTION("Get all available records by specified thread ID and check for invalid data")
-    {
-        auto records = threadRecordInterface1.GetLimitOffsetByField(
-            0, 100, ThreadRecordField ::ContactID, std::to_string(contactIDTest).c_str());
-        REQUIRE((*records).size() == 2);
-        for (const auto &w : *records) {
-            REQUIRE(w.date == dateTest);
-            REQUIRE(w.snippet == snippetTest);
-            REQUIRE(w.type == typeTest);
-            REQUIRE(w.contactID == contactIDTest);
         }
     }
 
@@ -133,16 +115,6 @@ TEST_CASE("Thread Record tests")
         auto result = dynamic_cast<db::query::ThreadGetByIDResult *>(ret.get());
 
         REQUIRE(result->getRecord().has_value());
-    }
-
-    SECTION("Get record by contact id")
-    {
-        auto query  = std::make_shared<db::query::ThreadGetByContactID>(contactIDTest);
-        auto ret    = threadRecordInterface1.runQuery(query);
-        auto result = dynamic_cast<db::query::ThreadGetByContactIDResult *>(ret.get());
-
-        REQUIRE(result->getRecord().has_value());
-        REQUIRE(result->getRecord()->contactID == contactIDTest);
     }
 
     SECTION("Remove records one by one")

@@ -13,3 +13,5 @@ CREATE TABLE IF NOT EXISTS calls(
     contactId INTEGER DEFAULT 0,
     isRead INTEGER DEFAULT 1
 );
+-- calls.contactId should not be used.
+-- calls.name should not be used.

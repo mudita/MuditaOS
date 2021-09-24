@@ -35,26 +35,28 @@ TEST_CASE("Contact Record db tests")
 
     recordIN.primaryName     = primaryNameTest;
     recordIN.alternativeName = alternativeNameTest;
-    recordIN.numbers         = std::vector<ContactRecord::Number>({
-        ContactRecord::Number(numberUserTest, numberE164Test, contactNumberTypeTest),
-    });
     recordIN.address         = addressTest;
     recordIN.note            = noteTest;
     recordIN.mail            = mailTest;
     recordIN.assetPath       = assetPath;
     recordIN.speeddial       = speeddialTest;
 
+    recordIN.numbers = {ContactRecord::Number("600123451", "+48600123451", contactNumberTypeTest)};
     REQUIRE(contRecInterface.Add(recordIN));
+    recordIN.numbers = {ContactRecord::Number("600123452", "+48600123452", contactNumberTypeTest)};
     REQUIRE(contRecInterface.Add(recordIN));
+    recordIN.numbers = {ContactRecord::Number("600123453", "+48600123453", contactNumberTypeTest)};
     REQUIRE(contRecInterface.Add(recordIN));
+    recordIN.numbers = {ContactRecord::Number("600123454", "+48600123454", contactNumberTypeTest)};
     REQUIRE(contRecInterface.Add(recordIN));
+    recordIN.numbers = {ContactRecord::Number(numberUserTest, numberE164Test, contactNumberTypeTest)};
     REQUIRE(contRecInterface.Add(recordIN));
+    REQUIRE(contRecInterface.GetCount() == 5);
 
     SECTION("Get record by ID")
     {
-        auto recordOUT = contRecInterface.GetByID(1);
-
-        REQUIRE(recordOUT.ID == 1);
+        auto recordOUT = contRecInterface.GetByID(5);
+        REQUIRE(recordOUT.ID == 5);
 
         REQUIRE(recordOUT.primaryName == primaryNameTest);
         REQUIRE(recordOUT.alternativeName == alternativeNameTest);
@@ -67,6 +69,25 @@ TEST_CASE("Contact Record db tests")
         REQUIRE(recordOUT.mail == mailTest);
         REQUIRE(recordOUT.assetPath == assetPath);
         REQUIRE(recordOUT.speeddial == speeddialTest);
+    }
+
+    SECTION("Get records by limit offset by NumberE164 filed")
+    {
+        auto recordList = contRecInterface.GetLimitOffsetByField(0, 2, ContactRecordField::NumberE164, numberE164Test);
+        REQUIRE(recordList->size() == 1);
+
+        auto w = recordList->front();
+        REQUIRE(w.ID == 5);
+        REQUIRE(w.primaryName == primaryNameTest);
+        REQUIRE(w.alternativeName == alternativeNameTest);
+        REQUIRE(w.numbers[0].number.getEntered() == numberUserTest);
+        REQUIRE(w.numbers[0].number.getE164() == numberE164Test);
+        REQUIRE(w.numbers[0].numberType == contactNumberTypeTest);
+        REQUIRE(w.address == addressTest);
+        REQUIRE(w.note == noteTest);
+        REQUIRE(w.mail == mailTest);
+        REQUIRE(w.assetPath == assetPath);
+        REQUIRE(w.speeddial == speeddialTest);
     }
 
     REQUIRE(contRecInterface.RemoveByID(5));
@@ -83,8 +104,6 @@ TEST_CASE("Contact Record db tests")
 
             REQUIRE(w.primaryName == primaryNameTest);
             REQUIRE(w.alternativeName == alternativeNameTest);
-            REQUIRE(w.numbers[0].number.getEntered() == numberUserTest);
-            REQUIRE(w.numbers[0].number.getE164() == numberE164Test);
             REQUIRE(w.numbers[0].numberType == contactNumberTypeTest);
             REQUIRE(w.address == addressTest);
             REQUIRE(w.note == noteTest);
@@ -107,31 +126,6 @@ TEST_CASE("Contact Record db tests")
 
             REQUIRE(w.primaryName == primaryNameTest);
             REQUIRE(w.alternativeName == alternativeNameTest);
-            REQUIRE(w.numbers[0].number.getEntered() == numberUserTest);
-            REQUIRE(w.numbers[0].number.getE164() == numberE164Test);
-            REQUIRE(w.numbers[0].numberType == contactNumberTypeTest);
-            REQUIRE(w.address == addressTest);
-            REQUIRE(w.note == noteTest);
-            REQUIRE(w.mail == mailTest);
-            REQUIRE(w.assetPath == assetPath);
-            REQUIRE(w.speeddial == speeddialTest);
-        }
-    }
-
-    SECTION("Get records by limit offset by NumberE164 filed")
-    {
-        auto recordList = contRecInterface.GetLimitOffsetByField(0, 2, ContactRecordField::NumberE164, numberE164Test);
-        REQUIRE(recordList->size() == 2);
-
-        uint32_t cnt = 1;
-        for (const auto &w : *recordList) {
-
-            REQUIRE(w.ID == cnt++);
-
-            REQUIRE(w.primaryName == primaryNameTest);
-            REQUIRE(w.alternativeName == alternativeNameTest);
-            REQUIRE(w.numbers[0].number.getEntered() == numberUserTest);
-            REQUIRE(w.numbers[0].number.getE164() == numberE164Test);
             REQUIRE(w.numbers[0].numberType == contactNumberTypeTest);
             REQUIRE(w.address == addressTest);
             REQUIRE(w.note == noteTest);
@@ -310,7 +304,7 @@ TEST_CASE("Contact record numbers update")
         newRecord.numbers = std::vector<ContactRecord::Number>({ContactRecord::Number(numbers[1], std::string(""))});
         REQUIRE(records.Update(newRecord));
 
-        REQUIRE(contactDB.number.count() == 3);
+        REQUIRE(contactDB.number.count() == 4);
 
         auto validatationRecord = records.GetByID(1);
         REQUIRE(validatationRecord.numbers.size() == 1);
@@ -363,7 +357,7 @@ TEST_CASE("Contact record numbers update")
         newRecord.numbers = std::vector<ContactRecord::Number>(
             {ContactRecord::Number(numbers[2], std::string("")), ContactRecord::Number(numbers[1], std::string(""))});
         REQUIRE(records.Update(newRecord));
-        REQUIRE(contactDB.number.count() == 3);
+        REQUIRE(contactDB.number.count() == 4);
 
         auto validatationRecord = records.GetByID(1);
         REQUIRE(validatationRecord.numbers.size() == 2);
@@ -383,15 +377,23 @@ TEST_CASE("Contact record numbers update")
         newRecord.numbers = std::vector<ContactRecord::Number>(
             {ContactRecord::Number(numbers[2], std::string("")), ContactRecord::Number(numbers[3], std::string(""))});
         REQUIRE(records.Update(newRecord));
-        REQUIRE(contactDB.number.count() == 2);
+        REQUIRE(contactDB.number.count() == 4);
 
-        auto validatationRecord = records.GetByID(1);
-        REQUIRE(validatationRecord.numbers.size() == 2);
-        REQUIRE(validatationRecord.numbers[0].number.getEntered() == numbers[2]);
-        REQUIRE(validatationRecord.numbers[1].number.getEntered() == numbers[3]);
+        auto validationRecord = records.GetByIdWithTemporary(1);
+        REQUIRE(validationRecord.ID == DB_ID_NONE);
 
-        validatationRecord = records.GetByID(2);
-        REQUIRE(validatationRecord.numbers.empty());
+        validationRecord = records.GetByIdWithTemporary(2);
+        REQUIRE(validationRecord.ID != DB_ID_NONE);
+        REQUIRE(validationRecord.numbers[0].number.getEntered() == numbers[0]);
+
+        validationRecord = records.GetByIdWithTemporary(3);
+        REQUIRE(validationRecord.ID != DB_ID_NONE);
+        REQUIRE(validationRecord.numbers[0].number.getEntered() == numbers[1]);
+
+        validationRecord = records.GetByID(4);
+        REQUIRE(validationRecord.numbers.size() == 2);
+        REQUIRE(validationRecord.numbers[0].number.getEntered() == numbers[2]);
+        REQUIRE(validationRecord.numbers[1].number.getEntered() == numbers[3]);
     }
 
     Database::deinitialize();
