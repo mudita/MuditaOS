@@ -50,7 +50,7 @@ namespace alarms
     auto PreWakeUpChimeHandler::getActions(sys::Service *service) -> Actions
     {
         Actions actions;
-        actions.emplace_back(std::make_unique<PlayChimeAction>(*service));
+        actions.emplace_back(createPreWakeUpChimeAction(*service));
         return actions;
     }
 } // namespace alarms

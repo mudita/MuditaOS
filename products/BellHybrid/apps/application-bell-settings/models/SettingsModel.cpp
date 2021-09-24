@@ -14,5 +14,6 @@ namespace gui
 
     template class SettingsModel<bool>;
     template class SettingsModel<std::uint8_t>;
+    template class SettingsModel<std::string>;
     template class SettingsModel<UTF8>;
 } // namespace gui

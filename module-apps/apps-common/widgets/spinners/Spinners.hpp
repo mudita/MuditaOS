@@ -10,4 +10,6 @@ namespace gui
     using UTF8Spinner     = GenericSpinner<StringPolicy<UTF8>>;
     using UIntegerSpinner = GenericSpinner<NumericPolicy<std::uint32_t>>;
     using IntegerSpinner  = GenericSpinner<NumericPolicy<std::int32_t>>;
+
+    template <typename ModelType> using ModelDelegateSpinner = GenericSpinner<ModelDelegatePolicy<ModelType>>;
 } // namespace gui
