@@ -6,6 +6,7 @@
 #include <BellAlarmHandler.hpp>
 
 #include <service-db/Settings.hpp>
+#include <db/SystemSettings.hpp>
 
 namespace alarms
 {
@@ -19,6 +20,8 @@ namespace alarms
             auto getFrontlightSettings() -> Settings override;
 
           private:
+            auto getSettings(std::string_view path) -> Settings;
+
             settings::Settings settings;
         };
 
@@ -29,12 +32,22 @@ namespace alarms
 
         auto PreWakeUpSettingsProviderImpl::getChimeSettings() -> Settings
         {
-            return {true, std::chrono::minutes{5}};
+            return getSettings(bell::settings::PrewakeUp::duration);
         }
 
         auto PreWakeUpSettingsProviderImpl::getFrontlightSettings() -> Settings
         {
-            return {true, std::chrono::minutes{5}};
+            return getSettings(bell::settings::PrewakeUp::lightDuration);
+        }
+
+        auto PreWakeUpSettingsProviderImpl::getSettings(std::string_view path) -> Settings
+        {
+            const auto settingValue = settings.getValue(path.data(), settings::SettingsScope::Global);
+            const auto duration     = std::chrono::minutes{utils::toNumeric(settingValue)};
+            const auto isEnabled    = duration != std::chrono::minutes::zero();
+            LOG_DEBUG(
+                "%s: enabled: %d; duration: %d minutes", path.data(), isEnabled, static_cast<int>(duration.count()));
+            return {isEnabled, duration};
         }
     } // namespace
 

@@ -4,6 +4,7 @@ add_library(bell::alarms ALIAS alarms)
 target_sources(alarms
     PRIVATE
         BellAlarmHandler.cpp
+        src/AlarmSoundPaths.cpp
         src/actions/PlayAudioActions.cpp
         src/actions/NotifyGUIAction.cpp
         src/actions/FrontlightAction.cpp
@@ -14,6 +15,7 @@ target_sources(alarms
         src/actions/FrontlightAction.hpp
         src/actions/NotifyGUIAction.hpp
     PUBLIC
+        include/AlarmSoundPaths.hpp
         include/popups/AlarmActivatedPopupRequestParams.hpp
         include/popups/AlarmDeactivatedPopupRequestParams.hpp
 )
