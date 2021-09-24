@@ -78,8 +78,6 @@ class DBServiceAPI
     [[deprecated]] static auto verifyContact(sys::Service *serv, const ContactRecord &rec) -> ContactVerificationResult;
     [[deprecated]] static auto ContactGetByID(sys::Service *serv, uint32_t contactID)
         -> std::unique_ptr<std::vector<ContactRecord>>;
-    [[deprecated]] static auto ContactGetByIDWithTemporary(sys::Service *serv, uint32_t contactID)
-        -> std::unique_ptr<std::vector<ContactRecord>>;
 
   private:
     [[deprecated]] static auto ContactGetByIDCommon(sys::Service *serv, std::shared_ptr<DBContactMessage> contactMsg)
@@ -98,6 +96,9 @@ class DBServiceAPI
      */
     [[deprecated]] static auto MatchContactByPhoneNumber(sys::Service *serv, const utils::PhoneNumber::View &numberView)
         -> std::unique_ptr<ContactRecord>;
+    [[deprecated]] static auto MatchContactByNumberID(sys::Service *serv, std::uint32_t numberID)
+        -> std::unique_ptr<ContactRecord>;
+    [[deprecated]] static auto NumberByID(sys::Service *serv, std::uint32_t numberID) -> utils::PhoneNumber::View;
 
     [[deprecated]] static auto ContactAdd(sys::Service *serv, const ContactRecord &rec) -> bool;
     [[deprecated]] static auto ContactRemove(sys::Service *serv, uint32_t id) -> bool;

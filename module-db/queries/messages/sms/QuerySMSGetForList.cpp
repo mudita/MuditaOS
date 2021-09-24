@@ -7,8 +7,8 @@
 
 namespace db::query
 {
-    SMSGetForList::SMSGetForList(unsigned int threadId, unsigned int offset, unsigned int limit, unsigned int contactID)
-        : Query(Query::Type::Read), threadId(threadId), offset(offset), limit(limit), contactID(contactID)
+    SMSGetForList::SMSGetForList(unsigned int threadId, unsigned int offset, unsigned int limit, unsigned int numberID)
+        : Query(Query::Type::Read), threadId(threadId), offset(offset), limit(limit), numberID(numberID)
     {}
 
     auto SMSGetForList::debugInfo() const -> std::string

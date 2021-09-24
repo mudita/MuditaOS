@@ -7,6 +7,7 @@
 
 #include "Record.hpp"
 #include "ThreadRecord.hpp"
+#include "ContactRecord.hpp"
 #include "module-db/Databases/SmsDB.hpp"
 #include "module-db/Databases/ContactsDB.hpp"
 #include "module-db/Common/Common.hpp"
@@ -27,17 +28,15 @@ struct SMSRecord : public Record
     UTF8 body;
     SMSType type       = SMSType::UNKNOWN;
     uint32_t threadID  = 0;
-    uint32_t contactID = 0;
     utils::PhoneNumber::View number;
 
     SMSRecord() = default;
     SMSRecord(const SMSTableRow &w)
-        : Record(w.ID), date(w.date), errorCode(w.errorCode), body(w.body), type(w.type), threadID(w.threadID),
-          contactID(w.contactID)
+        : Record(w.ID), date(w.date), errorCode(w.errorCode), body(w.body), type(w.type), threadID(w.threadID)
     {}
     SMSRecord(const SMSTableRow &w, const utils::PhoneNumber::View &num)
         : Record(w.ID), date(w.date), errorCode(w.errorCode), body(w.body), type(w.type), threadID(w.threadID),
-          contactID(w.contactID), number(num)
+          number(num)
     {}
 };
 
@@ -84,7 +83,6 @@ class SMSRecordInterface : public RecordInterface<SMSRecord, SMSRecordField>
     static void UpdateThreadSummary(ThreadRecord &threadToUpdate, const SMSRecord &rec);
     std::unique_ptr<db::query::SMSSearchByTypeResult> runQueryImpl(const db::query::SMSSearchByType *query);
     std::unique_ptr<db::QueryResult> getByIDQuery(const std::shared_ptr<db::Query> &query);
-    std::unique_ptr<db::QueryResult> getByContactIDQuery(const std::shared_ptr<db::Query> &query);
     std::unique_ptr<db::QueryResult> getByTextQuery(const std::shared_ptr<db::Query> &query);
     std::unique_ptr<db::QueryResult> getCountQuery(const std::shared_ptr<db::Query> &query);
     std::unique_ptr<db::QueryResult> addQuery(const std::shared_ptr<db::Query> &query);
@@ -99,4 +97,6 @@ class SMSRecordInterface : public RecordInterface<SMSRecord, SMSRecordField>
     std::unique_ptr<db::QueryResult> getForListQuery(const std::shared_ptr<db::Query> &query);
     std::unique_ptr<db::QueryResult> getCountByThreadIDQuery(const std::shared_ptr<db::Query> &query);
     std::unique_ptr<db::QueryResult> getLastByThreadIDQuery(const std::shared_ptr<db::Query> &query);
+
+    auto getPhoneNumberBySMS(const SMSRecord &sms) -> std::optional<utils::PhoneNumber::View>;
 };

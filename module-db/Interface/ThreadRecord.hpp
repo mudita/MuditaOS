@@ -20,13 +20,12 @@ struct ThreadRecord : Record
     uint32_t unreadMsgCount = 0;
     UTF8 snippet;
     SMSType type       = SMSType::UNKNOWN;
-    uint32_t contactID = DB_ID_NONE;
     uint32_t numberID  = DB_ID_NONE;
 
     ThreadRecord() = default;
     ThreadRecord(const ThreadsTableRow &rec)
         : Record(rec.ID), date(rec.date), msgCount(rec.msgCount), unreadMsgCount(rec.unreadMsgCount),
-          snippet(rec.snippet), type(rec.type), contactID(rec.contactID), numberID(rec.numberID)
+          snippet(rec.snippet), type(rec.type), numberID(rec.numberID)
     {}
 
     bool isUnread() const
@@ -80,7 +79,6 @@ class ThreadRecordInterface : public RecordInterface<ThreadRecord, ThreadRecordF
     std::unique_ptr<db::QueryResult> threadsGetForListQuery(const std::shared_ptr<db::Query> &query);
     std::unique_ptr<db::QueryResult> threadGetByIDQuery(const std::shared_ptr<db::Query> &query);
     std::unique_ptr<db::QueryResult> threadGetByNumberQuery(const std::shared_ptr<db::Query> &query);
-    std::unique_ptr<db::QueryResult> threadGetByContactIDQuery(const std::shared_ptr<db::Query> &query);
     std::unique_ptr<db::QueryResult> threadRemoveQuery(const std::shared_ptr<db::Query> &query);
     std::unique_ptr<db::QueryResult> threadsGetCount(const std::shared_ptr<db::Query> &query);
 

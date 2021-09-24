@@ -72,7 +72,6 @@ set(SOURCES
         queries/calllog/QueryCalllogSetAllRead.cpp
         queries/messages/sms/QuerySMSAdd.cpp
         queries/messages/sms/QuerySMSGet.cpp
-        queries/messages/sms/QuerySMSGetByContactID.cpp
         queries/messages/sms/QuerySMSGetByID.cpp
         queries/messages/sms/QuerySMSGetByText.cpp
         queries/messages/sms/QuerySMSGetByThreadID.cpp
@@ -90,7 +89,6 @@ set(SOURCES
         queries/messages/templates/QuerySMSTemplateGetForList.cpp
         queries/messages/templates/QuerySMSTemplateRemove.cpp
         queries/messages/templates/QuerySMSTemplateUpdate.cpp
-        queries/messages/threads/QueryThreadGetByContactID.cpp
         queries/messages/threads/QueryThreadGetByID.cpp
         queries/messages/threads/QueryThreadGetByNumber.cpp
         queries/messages/threads/QueryThreadMarkAsRead.cpp
@@ -118,6 +116,7 @@ set(SOURCES
         queries/phonebook/QueryContactAdd.cpp
         queries/phonebook/QueryContactGet.cpp
         queries/phonebook/QueryContactGetByID.cpp
+        queries/phonebook/QueryContactGetByNumberID.cpp
         queries/phonebook/QueryContactRemove.cpp
         queries/phonebook/QueryContactUpdate.cpp
         queries/phonebook/QueryMergeContactsList.cpp
