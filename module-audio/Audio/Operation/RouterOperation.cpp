@@ -9,7 +9,7 @@
 #include <Audio/StreamFactory.hpp>
 #include <Audio/transcode/TransformFactory.hpp>
 
-#include <log.hpp>
+#include <log/log.hpp>
 #include <mutex.hpp>
 
 #include <algorithm>
@@ -24,6 +24,7 @@ namespace audio
     {
         // order defines priority
         AddProfile(Profile::Type::RoutingHeadphones, PlaybackType::None, false);
+        AddProfile(Profile::Type::RoutingBluetoothHFP, PlaybackType::None, false);
         AddProfile(Profile::Type::RoutingBluetoothHSP, PlaybackType::None, false);
         AddProfile(Profile::Type::RoutingEarspeaker, PlaybackType::None, true);
         AddProfile(Profile::Type::RoutingLoudspeaker, PlaybackType::None, true);
@@ -140,6 +141,10 @@ namespace audio
             break;
         case EventType::BlutoothHSPDeviceState:
             SetProfileAvailability({Profile::Type::RoutingBluetoothHSP}, isAvailable);
+            SwitchToPriorityProfile();
+            break;
+        case EventType::BlutoothHFPDeviceState:
+            SetProfileAvailability({Profile::Type::RoutingBluetoothHFP}, isAvailable);
             SwitchToPriorityProfile();
             break;
         case EventType::CallLoudspeakerOn:

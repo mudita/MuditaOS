@@ -6,7 +6,7 @@
 #include <array>
 #include <utf8/UTF8.hpp>
 #include "i18n/i18n.hpp"
-#include <log.hpp>
+#include <log/log.hpp>
 
 namespace utils
 {
@@ -28,7 +28,7 @@ namespace utils
             // imo it would be nicer to have datetime locales in different json with thiny bit nicer and more effective
             // getters
             const std::array<std::string, num_days> daysShort = {
-                "common_mo", "common_tu", "common_we", "common_th", "common_fr", "common_sa", "common_su"};
+                "common_sun", "common_mon", "common_tue", "common_wed", "common_thu", "common_fri", "common_sat"};
 
             const std::array<std::string, num_days> days = {"common_sunday",
                                                             "common_monday",
@@ -158,9 +158,15 @@ namespace utils
                     LOG_ERROR("Bad value: %d", day);
                     return "";
                 }
-                else {
-                    return translate(tlocale.days[day]);
+                return translate(tlocale.days[day]);
+            }
+
+            static const UTF8 get_day(const uint32_t &day)
+            {
+                if (day >= num_days) {
+                    return "";
                 }
+                return translate(tlocale.days[day]);
             }
 
             static const UTF8 get_short_day(const uint32_t &day)
@@ -169,9 +175,7 @@ namespace utils
                     LOG_ERROR("Bad value");
                     return "";
                 }
-                else {
-                    return translate(tlocale.daysShort[day]);
-                }
+                return translate(tlocale.daysShort[day]);
             }
 
             static const UTF8 get_month(enum Month mon)
@@ -180,9 +184,7 @@ namespace utils
                     LOG_ERROR("Bad value %d", mon);
                     return "";
                 }
-                else {
-                    return translate(tlocale.months[mon]);
-                }
+                return translate(tlocale.months[mon]);
             }
 
             static const UTF8 yesterday()

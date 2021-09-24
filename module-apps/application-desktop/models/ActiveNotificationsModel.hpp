@@ -17,5 +17,6 @@ namespace gui
         auto create(const notifications::NotSeenSMSNotification *notification) -> NotificationListItem * override;
         auto create(const notifications::NotSeenCallNotification *notification) -> NotificationListItem * override;
         auto create(const notifications::TetheringNotification *notification) -> NotificationListItem * override;
+        auto create(const notifications::AlarmSnoozeNotification *notification) -> NotificationListItem * override;
     };
 } // namespace gui

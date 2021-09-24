@@ -4,7 +4,7 @@
 #include "AlarmClockMainWindow.hpp"
 #include "application-alarm-clock/widgets/AlarmClockStyle.hpp"
 #include "application-alarm-clock/data/AlarmsData.hpp"
-#include "log.hpp"
+#include "log/log.hpp"
 #include "windows/DialogMetadata.hpp"
 #include "messages/DialogMetadataMessage.hpp"
 #include <InputEvent.hpp>
@@ -85,6 +85,7 @@ namespace app::alarmClock
         if (inputEvent.isShortRelease(gui::KeyCode::KEY_LEFT)) {
             auto rec                              = new AlarmEventRecord();
             rec->startDate                        = TimePointNow();
+            rec->snoozeDuration                   = 10;
             auto event                            = std::make_shared<AlarmEventRecord>(*rec);
             std::unique_ptr<AlarmRecordData> data = std::make_unique<AlarmRecordData>(event);
             data->setDescription(style::alarmClock::newAlarm);

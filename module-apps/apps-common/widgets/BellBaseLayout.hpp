@@ -8,21 +8,20 @@
 
 namespace style::bell_base_layout
 {
-    constexpr inline auto w                  = style::window_width;
-    constexpr inline auto h                  = style::window_height;
-    constexpr inline auto first_layout_min_h = 50U;
-    constexpr inline auto outer_layouts_h    = 120U;
+    constexpr inline auto w                   = style::window_width;
+    constexpr inline auto h                   = style::window_height;
+    constexpr inline auto first_layout_min_h  = 30U;
+    constexpr inline auto outer_layouts_w     = 390U;
+    constexpr inline auto outer_layouts_h     = 102U;
+    constexpr inline auto outer_layout_margin = 39U;
+    constexpr inline auto center_layout_h     = h - 2 * outer_layout_margin - 2 * outer_layouts_h;
 
-    namespace arrow
+    enum class ParentType
     {
-        inline constexpr auto w = 64U;
-        inline constexpr auto h = 64U;
-    } // namespace arrow
+        SideListView,
+        Window
+    };
 
-    namespace centerbox
-    {
-        constexpr inline auto h = (style::window_height - 2 * outer_layouts_h);
-    } // namespace centerbox
 } // namespace style::bell_base_layout
 
 namespace gui
@@ -36,10 +35,17 @@ namespace gui
             Right
         };
 
-        explicit BellBaseLayout(
-            Item *parent, Position x = 0, Position y = 0, Length w = 0, Length h = 0, bool withSideArrows = true);
+        explicit BellBaseLayout(Item *parent,
+                                Position x                               = 0,
+                                Position y                               = 0,
+                                Length w                                 = 0,
+                                Length h                                 = 0,
+                                bool withSideArrows                      = true,
+                                style::bell_base_layout::ParentType type = style::bell_base_layout::ParentType::Window);
 
         [[nodiscard]] Item *getCenterBox() const noexcept;
+        void resizeCenter();
+        void resize();
 
         void setArrowVisible(Arrow arrow, bool isVisible);
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <purefs/fs/drivers/filesystem_vfat.hpp>
@@ -8,7 +8,7 @@
 #include <purefs/fs/drivers/file_handle_vfat.hpp>
 #include <purefs/fs/drivers/directory_handle_vfat.hpp>
 #include <purefs/fs/mount_flags.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <fatfs/volume_mapper.hpp>
 #include <ff.h>
 #include <sys/statvfs.h>

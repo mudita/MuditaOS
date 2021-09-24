@@ -2,82 +2,55 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BellAlarmHandler.hpp"
-#include "src/actions/PlayToneAction.hpp"
+#include "src/actions/PlayAudioActions.hpp"
 #include "src/actions/NotifyGUIAction.hpp"
 #include "src/actions/FrontlightAction.hpp"
 
 namespace alarms
 {
-    BellAlarmClockHandler::BellAlarmClockHandler(sys::Service *service) : service{service}
-    {
-        actions.emplace_back(std::make_unique<PlayToneAction>(*service));
-        actions.emplace_back(std::make_unique<NotifyGUIAction>(*service));
-        actions.emplace_back(std::make_unique<FrontlightAction>());
-    }
+    BellAlarmHandler::BellAlarmHandler(Actions &&actions) : actions{std::move(actions)}
+    {}
 
-    auto BellAlarmClockHandler::handle(const AlarmEventRecord &record) -> bool
+    bool BellAlarmHandler::handle(const AlarmEventRecord &record)
     {
-        LOG_DEBUG("BellAlarmClockHandler");
-
         auto result{true};
-
         if (record.enabled) {
             for (const auto &action : actions) {
                 result &= action->execute();
             }
         }
-
         return result;
     }
 
-    auto BellAlarmClockHandler::handleOff([[maybe_unused]] const AlarmEventRecord &record) -> bool
+    bool BellAlarmHandler::handleOff([[maybe_unused]] const AlarmEventRecord &record)
     {
         auto result{true};
         for (const auto &action : actions) {
             result &= action->turnOff();
         }
-
         return result;
     }
 
-    auto EveningReminderHandler::handle([[maybe_unused]] const AlarmEventRecord &record) -> bool
+    BellAlarmClockHandler::BellAlarmClockHandler(sys::Service *service) : BellAlarmHandler{getActions(service)}
     {
-        // implement this alarm type handling here
-        return true;
     }
 
-    auto EveningReminderHandler::handleOff([[maybe_unused]] const AlarmEventRecord &record) -> bool
+    auto BellAlarmClockHandler::getActions(sys::Service *service) -> Actions
     {
-        return true;
+        Actions actions;
+        actions.emplace_back(std::make_unique<PlayToneAction>(*service));
+        actions.emplace_back(std::make_unique<NotifyGUIAction>(*service));
+        actions.emplace_back(std::make_unique<FrontlightAction>(*service));
+        return actions;
     }
 
-    PreWakeUpChimeHandler::PreWakeUpChimeHandler(sys::Service *service) : service{service}
+    PreWakeUpChimeHandler::PreWakeUpChimeHandler(sys::Service *service) : BellAlarmHandler{getActions(service)}
     {}
 
-    auto PreWakeUpChimeHandler::handle(const AlarmEventRecord &record) -> bool
+    auto PreWakeUpChimeHandler::getActions(sys::Service *service) -> Actions
     {
-        LOG_INFO("PreWakeUpChimeHandler::handle");
-        return true;
-    }
-
-    auto PreWakeUpChimeHandler::handleOff(const AlarmEventRecord &record) -> bool
-    {
-        LOG_INFO("PreWakeUpChimeHandler::handleOff");
-        return true;
-    }
-
-    PreWakeUpFrontlightHandler::PreWakeUpFrontlightHandler(sys::Service *service) : service{service}
-    {}
-
-    auto PreWakeUpFrontlightHandler::handle(const AlarmEventRecord &record) -> bool
-    {
-        LOG_INFO("PreWakeUpFrontlightHandler::handle");
-        return true;
-    }
-
-    auto PreWakeUpFrontlightHandler::handleOff(const AlarmEventRecord &record) -> bool
-    {
-        LOG_INFO("PreWakeUpFrontlightHandler::handleOff");
-        return true;
+        Actions actions;
+        actions.emplace_back(std::make_unique<PlayChimeAction>(*service));
+        return actions;
     }
 } // namespace alarms

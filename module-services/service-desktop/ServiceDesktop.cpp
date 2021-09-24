@@ -1,18 +1,19 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "service-appmgr/messages/DOMRequest.hpp"
-#include "service-desktop/DesktopMessages.hpp"
-#include "service-desktop/ServiceDesktop.hpp"
-#include "service-desktop/WorkerDesktop.hpp"
-#include "service-cellular/CellularMessage.hpp"
-#include "endpoints/backup/BackupRestore.hpp"
+#include <service-appmgr/messages/DOMRequest.hpp>
+#include <service-desktop/DesktopMessages.hpp>
+#include <service-desktop/ServiceDesktop.hpp>
+#include <service-desktop/WorkerDesktop.hpp>
+#include <service-cellular/CellularMessage.hpp>
+#include <endpoints/bluetooth/BluetoothMessagesHandler.hpp>
+#include <endpoints/backup/BackupRestore.hpp>
 
 #include <Common/Query.hpp>
 #include <MessageType.hpp>
 #include <Service/Worker.hpp>
 #include <json11.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <application-desktop/Constants.hpp>
 #include <locks/data/PhoneLockMessages.hpp>
 #include <service-appmgr/Constants.hpp>
@@ -20,12 +21,11 @@
 #include <service-evtmgr/EventManagerCommon.hpp>
 #include <service-evtmgr/EVMessages.hpp>
 #include <purefs/filesystem_paths.hpp>
-#include <module-sys/SystemManager/SystemManagerCommon.hpp>
-#include <module-sys/Timers/TimerFactory.hpp>
+#include <SystemManager/SystemManagerCommon.hpp>
+#include <Timers/TimerFactory.hpp>
 
-#include <module-sys/SystemManager/Constants.hpp>
-#include <module-sys/SystemManager/messages/TetheringStateRequest.hpp>
-#include <endpoints/bluetooth/BluetoothMessagesHandler.hpp>
+#include <SystemManager/Constants.hpp>
+#include <SystemManager/messages/TetheringStateRequest.hpp>
 
 #include <sys/mount.h>
 #include <sys/statvfs.h>
@@ -50,6 +50,11 @@ ServiceDesktop::~ServiceDesktop()
 auto ServiceDesktop::getSerialNumber() const -> std::string
 {
     return settings->getValue(std::string("factory_data/serial"), settings::SettingsScope::Global);
+}
+
+auto ServiceDesktop::getCaseColour() const -> std::string
+{
+    return settings->getValue(std::string("factory_data/case_colour"), settings::SettingsScope::Global);
 }
 
 auto ServiceDesktop::requestLogsFlush() -> void

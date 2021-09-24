@@ -20,7 +20,7 @@
 #include <messages/DialogMetadataMessage.hpp>
 #include <MessageType.hpp>
 #include <module-gui/gui/widgets/status-bar/SIM.hpp>
-#include <module-services/service-desktop/service-desktop/Constants.hpp>
+#include <service-desktop/Constants.hpp>
 #include <popups/presenter/PowerOffPresenter.hpp>
 #include <popups/TetheringOffPopup.hpp>
 #include <service-appmgr/Controller.hpp>
@@ -37,10 +37,9 @@ namespace app
 {
     ApplicationDesktop::ApplicationDesktop(std::string name,
                                            std::string parent,
-                                           sys::phone_modes::PhoneMode phoneMode,
-                                           sys::bluetooth::BluetoothMode bluetoothMode,
+                                           StatusIndicators statusIndicators,
                                            StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), phoneMode, bluetoothMode, startInBackground),
+        : Application(std::move(name), std::move(parent), statusIndicators, startInBackground),
           AsyncCallbackReceiver(this), dbNotificationHandler(this)
     {
         using namespace gui::status_bar;
@@ -197,7 +196,8 @@ namespace app
                       gui::popup::ID::Tethering,
                       gui::popup::ID::PhoneModes,
                       gui::popup::ID::PhoneLock,
-                      gui::popup::ID::SimLock});
+                      gui::popup::ID::SimLock,
+                      gui::popup::ID::Alarm});
     }
 
     void ApplicationDesktop::destroyUserInterface()

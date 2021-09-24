@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "circular_buffer/StringCircularBuffer.hpp"
+#include "StringCircularBuffer.hpp"
 
 class LoggerBuffer : public StringCircularBuffer
 {

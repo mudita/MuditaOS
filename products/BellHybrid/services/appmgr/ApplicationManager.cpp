@@ -2,8 +2,8 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <appmgr/ApplicationManager.hpp>
-
 #include <appmgr/messages/AlarmMessage.hpp>
+#include <application-bell-onboarding/BellOnBoardingNames.hpp>
 
 namespace app::manager
 {
@@ -19,15 +19,19 @@ namespace app::manager
     {
         if (not ApplicationManagerCommon::startApplication(app)) {
             LOG_INFO("Starting application %s", app.name().c_str());
-            app.run(sys::phone_modes::PhoneMode::Offline, sys::bluetooth::BluetoothMode::Disabled, this);
+            app.run(StatusIndicators{}, this);
         }
         return true;
     }
 
     auto ApplicationManager::resolveHomeApplication() -> std::string
     {
+        if (checkOnBoarding()) {
+            return app::applicationBellOnBoardingName;
+        }
         return rootApplicationName;
     }
+
     void ApplicationManager::registerMessageHandlers()
     {
         ApplicationManagerCommon::registerMessageHandlers();

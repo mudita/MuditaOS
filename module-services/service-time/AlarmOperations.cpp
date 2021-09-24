@@ -30,6 +30,7 @@ namespace alarms
             for (auto &ev : singleEvents) {
                 nextSingleEvents.emplace_back(std::make_unique<SingleEventRecord>(ev));
             }
+            handleActiveAlarmsCountChange();
         };
         getNextSingleEvents(now, callback);
     }
@@ -157,6 +158,9 @@ namespace alarms
         switchAlarmExecution(*(*found), false);
         ongoingSingleEvents.erase(found);
 
+        handleSnoozedAlarmsCountChange();
+        handleActiveAlarmsCountChange();
+
         callback(true);
     }
 
@@ -241,6 +245,7 @@ namespace alarms
         if (!isHandlingInProgress && !ongoingSingleEvents.empty()) {
             switchAlarmExecution(*(ongoingSingleEvents.front()), true);
         }
+        handleActiveAlarmsCountChange();
     }
 
     void AlarmOperationsCommon::addAlarmExecutionHandler(const alarms::AlarmType type,
@@ -302,6 +307,24 @@ namespace alarms
                 ++it;
             }
         }
+        handleSnoozedAlarmsCountChange();
+    }
+
+    auto AlarmOperationsCommon::stopAllSnoozedAlarms() -> void
+    {
+        snoozedSingleEvents.clear();
+        handleSnoozedAlarmsCountChange();
+        handleActiveAlarmsCountChange();
+    }
+
+    auto AlarmOperationsCommon::addSnoozedAlarmsCountChangeCallback(OnSnoozedAlarmsCountChange callback) -> void
+    {
+        onSnoozedAlarmsCountChangeCallback = callback;
+    }
+
+    auto AlarmOperationsCommon::addActiveAlarmCountChangeCallback(OnActiveAlarmCountChange callback) -> void
+    {
+        onActiveAlarmCountChangeCallback = callback;
     }
 
     TimePoint AlarmOperationsCommon::getCurrentTime()
@@ -310,6 +333,21 @@ namespace alarms
             return TIME_POINT_INVALID;
         }
         return getCurrentTimeCallback();
+    }
+
+    void AlarmOperationsCommon::handleSnoozedAlarmsCountChange()
+    {
+        if (onSnoozedAlarmsCountChangeCallback) {
+            onSnoozedAlarmsCountChangeCallback(snoozedSingleEvents.size());
+        }
+    }
+
+    void AlarmOperationsCommon::handleActiveAlarmsCountChange()
+    {
+        if (onActiveAlarmCountChangeCallback) {
+            onActiveAlarmCountChangeCallback(!nextSingleEvents.empty() || !snoozedSingleEvents.empty() ||
+                                             !ongoingSingleEvents.empty());
+        }
     }
 
 } // namespace alarms

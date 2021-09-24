@@ -6,6 +6,7 @@
 #include "service-evtmgr/Constants.hpp"
 #include "service-evtmgr/WorkerEventCommon.hpp"
 #include "battery-level-check/BatteryLevelCheck.hpp"
+#include "battery/BatteryController.hpp"
 
 #include <Audio/AudioCommon.hpp>
 #include <MessageType.hpp>
@@ -20,9 +21,9 @@
 #include <bsp/eink_frontlight/eink_frontlight.hpp>
 #include <EventStore.hpp>
 
-#include <common_data/RawKey.hpp>
+#include <hal/key_input/RawKey.hpp>
 #include <headset.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <service-audio/AudioMessage.hpp>
 #include <service-desktop/Constants.hpp>
 #include <service-desktop/DesktopMessages.hpp>
@@ -45,8 +46,8 @@ extern "C"
 
 WorkerEventCommon::WorkerEventCommon(sys::Service *service)
     : sys::Worker(service, stackDepthBytes),
-      service(service), batteryCharger{hal::battery::AbstractBatteryCharger::Factory::create(service)},
-      keyInput{hal::key_input::AbstractKeyInput::Factory::create()}
+      service(service), keyInput{hal::key_input::AbstractKeyInput::Factory::create()},
+      batteryController(std::make_shared<sevm::battery::BatteryController>(service))
 {}
 
 bool WorkerEventCommon::handleMessage(uint32_t queueID)
@@ -78,7 +79,8 @@ bool WorkerEventCommon::handleMessage(uint32_t queueID)
         if (!queue->Dequeue(&notification, 0)) {
             return false;
         }
-        batteryCharger->processStateChangeNotification(notification);
+
+        batteryController->handleBatteryNotification(notification);
     }
 
     if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueChargerDetect)) {
@@ -86,8 +88,9 @@ bool WorkerEventCommon::handleMessage(uint32_t queueID)
         if (!queue->Dequeue(&notification, 0)) {
             return false;
         }
+
         LOG_DEBUG("USB charger type: %d", notification);
-        batteryCharger->setChargingCurrentLimit(notification);
+        batteryController->handleChargerNotification(notification);
     }
 
     if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueRTC)) {
@@ -104,7 +107,6 @@ bool WorkerEventCommon::handleMessage(uint32_t queueID)
         message->timestamp = timestamp;
         service->bus.sendUnicast(message, service::name::evt_manager);
     }
-
 
     return true;
 }
@@ -138,17 +140,16 @@ bool WorkerEventCommon::initCommonHardwareComponents()
     keyInput->init(queues[static_cast<int32_t>(WorkerEventQueues::queueKeyboardIRQ)]->GetQueueHandle());
     auto queueBatteryHandle = queues[static_cast<int32_t>(WorkerEventQueues::queueBattery)]->GetQueueHandle();
     auto queueChargerDetect = queues[static_cast<int32_t>(WorkerEventQueues::queueChargerDetect)]->GetQueueHandle();
-    batteryCharger->init(queueBatteryHandle, queueChargerDetect);
+    batteryController->init(queueBatteryHandle, queueChargerDetect);
     bsp::rtc::init(queues[static_cast<int32_t>(WorkerEventQueues::queueRTC)]->GetQueueHandle());
 
     time_t timestamp;
     bsp::rtc::getCurrentTimestamp(&timestamp);
     bsp::rtc::setMinuteAlarm(timestamp);
 
-    cpuSentinel = std::make_shared<sys::CpuSentinel>(
-        service::name::evt_manager, service, [this](bsp::CpuFrequencyHz newFrequency) {
-            updateResourcesAfterCpuFrequencyChange(newFrequency);
-        });
+    cpuSentinel = std::make_shared<sys::CpuSentinel>("WorkerEvent", service, [this](bsp::CpuFrequencyHz newFrequency) {
+        updateResourcesAfterCpuFrequencyChange(newFrequency);
+    });
 
     auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuSentinel);
     service->bus.sendUnicast(std::move(sentinelRegistrationMsg), service::name::system_manager);
@@ -172,7 +173,7 @@ bool WorkerEventCommon::deinit(void)
     deinitProductHardware();
 
     keyInput->deinit();
-    batteryCharger->deinit();
+    batteryController->deinit();
     battery_level_check::deinit();
 
     return true;

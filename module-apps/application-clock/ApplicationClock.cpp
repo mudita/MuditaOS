@@ -6,10 +6,10 @@
 #include "gui/widgets/Window.hpp"
 
 // module-utils
-#include <log.hpp>
+#include <log/log.hpp>
 #include <service-evtmgr/EVMessages.hpp>
 #include <service-evtmgr/EventManagerCommon.hpp>
-#include <module-sys/Timers/TimerFactory.hpp>
+#include <Timers/TimerFactory.hpp>
 // MessageType
 #include "MessageType.hpp"
 // this module
@@ -87,8 +87,11 @@ namespace app
             return std::make_unique<gui::ClockMainWindow>(app, name);
         });
 
-        attachPopups(
-            {gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes, gui::popup::ID::PhoneLock});
+        attachPopups({gui::popup::ID::Volume,
+                      gui::popup::ID::Tethering,
+                      gui::popup::ID::PhoneModes,
+                      gui::popup::ID::PhoneLock,
+                      gui::popup::ID::Alarm});
     }
 
     void ApplicationClock::destroyUserInterface()

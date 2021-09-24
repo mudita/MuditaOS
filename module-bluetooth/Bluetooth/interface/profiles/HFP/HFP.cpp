@@ -9,6 +9,7 @@
 #include <service-evtmgr/Constants.hpp>
 #include <service-audio/AudioMessage.hpp>
 #include <BluetoothWorker.hpp>
+#include "SCO/ScoUtils.hpp"
 
 extern "C"
 {
@@ -72,16 +73,22 @@ namespace bluetooth
     }
     auto HFP::startRinging() const noexcept -> Error::Code
     {
+        pimpl->startRinging();
         return Error::Success;
     }
     auto HFP::stopRinging() const noexcept -> Error::Code
     {
+        pimpl->stopRinging();
         return Error::Success;
     }
     auto HFP::initializeCall() const noexcept -> Error::Code
     {
-        pimpl->start();
+        pimpl->initializeCall();
         return Error::Success;
+    }
+    void HFP::setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice)
+    {
+        pimpl->setAudioDevice(audioDevice);
     }
 
     HFP::~HFP() = default;
@@ -96,6 +103,7 @@ namespace bluetooth
     std::string HFP::HFPImpl::agServiceName = "PurePhone HFP";
     bool HFP::HFPImpl::isConnected          = false;
     SCOCodec HFP::HFPImpl::codec            = SCOCodec::CVSD;
+    std::shared_ptr<CVSDAudioDevice> HFP::HFPImpl::audioDevice;
 
     int HFP::HFPImpl::memory_1_enabled = 1;
     btstack_packet_callback_registration_t HFP::HFPImpl::hci_event_callback_registration;
@@ -158,9 +166,9 @@ namespace bluetooth
             if (READ_SCO_CONNECTION_HANDLE(event) != scoHandle) {
                 break;
             }
-            LOG_DEBUG("Processing SCO receive");
-
-            sco->receive(event, eventSize);
+            if (audioDevice != nullptr) {
+                audioDevice->receiveCVSD(audio::AbstractStream::Span{.data = event, .dataSize = eventSize});
+            }
             break;
 
         case HCI_EVENT_PACKET:
@@ -173,15 +181,13 @@ namespace bluetooth
 
     void HFP::HFPImpl::processHCIEvent(uint8_t *event)
     {
-        LOG_DEBUG("Inside hfp hci event");
         switch (hci_event_packet_get_type(event)) {
         case HCI_EVENT_SCO_CAN_SEND_NOW:
-            LOG_DEBUG("SCO send event");
-
-            sco->send(scoHandle);
+            if (audioDevice != nullptr) {
+                audioDevice->onDataSend(scoHandle);
+            }
             break;
         case HCI_EVENT_HFP_META:
-            LOG_DEBUG("Processsing HFP event");
             processHFPEvent(event);
             break;
         default:
@@ -207,6 +213,8 @@ namespace bluetooth
             status = hfp_subevent_service_level_connection_established_get_status(event);
             if (status) {
                 LOG_DEBUG("Connection failed, status 0x%02x\n", status);
+                sendAudioEvent(audio::EventType::BlutoothHFPDeviceState, audio::Event::DeviceState::Disconnected);
+                isConnected = false;
                 break;
             }
             aclHandle = hfp_subevent_service_level_connection_established_get_acl_handle(event);
@@ -218,8 +226,8 @@ namespace bluetooth
             break;
         case HFP_SUBEVENT_SERVICE_LEVEL_CONNECTION_RELEASED:
             LOG_DEBUG("Service level connection released.\n");
-            aclHandle = HCI_CON_HANDLE_INVALID;
-
+            aclHandle   = HCI_CON_HANDLE_INVALID;
+            isConnected = false;
             sendAudioEvent(audio::EventType::BlutoothHFPDeviceState, audio::Event::DeviceState::Disconnected);
 
             break;
@@ -233,8 +241,6 @@ namespace bluetooth
                 LOG_DEBUG("Audio connection established with SCO handle 0x%04x.\n", scoHandle);
                 codec = static_cast<SCOCodec>(hfp_subevent_audio_connection_established_get_negotiated_codec(event));
                 dump_supported_codecs();
-
-                sco->setCodec(codec);
                 hci_request_sco_can_send_now_event();
                 RunLoop::trigger();
             }
@@ -245,7 +251,6 @@ namespace bluetooth
             break;
         case HFP_SUBEVENT_START_RINGINIG:
             LOG_DEBUG("Start Ringing\n");
-
             // todo request here ringtone stream
             break;
         case HFP_SUBEVENT_STOP_RINGINIG:
@@ -253,18 +258,7 @@ namespace bluetooth
             // todo stop ringtone stream here
             break;
         case HFP_SUBEVENT_PLACE_CALL_WITH_NUMBER:
-            LOG_DEBUG("Outgoing call '%s'\n", hfp_subevent_place_call_with_number_get_number(event));
-            // todo has to be feeded with proper phone number from cellular
-            if (strcmp("1234567", hfp_subevent_place_call_with_number_get_number(event)) == 0 ||
-                strcmp("7654321", hfp_subevent_place_call_with_number_get_number(event)) == 0 ||
-                (memory_1_enabled && strcmp(">1", hfp_subevent_place_call_with_number_get_number(event)) == 0)) {
-                LOG_DEBUG("Dialstring valid: accept call\n");
-                hfp_ag_outgoing_call_accepted();
-            }
-            else {
-                LOG_DEBUG("Dialstring invalid: reject call\n");
-                hfp_ag_outgoing_call_rejected();
-            }
+            hfp_ag_outgoing_call_accepted();
             break;
 
         case HFP_SUBEVENT_ATTACH_NUMBER_TO_VOICE_TAG:
@@ -308,12 +302,12 @@ namespace bluetooth
         Profile::initSdp();
 
         serviceBuffer.fill(0);
-        constexpr std::uint32_t hspSdpRecordHandle = 0x10001;
-        uint16_t supported_features                = (1 << HFP_AGSF_ESCO_S4) | (1 << HFP_AGSF_HF_INDICATORS) |
+        constexpr std::uint32_t hspSdpRecordHandle = 0x10005;
+        uint16_t supported_features                = (1 << HFP_AGSF_ESCO_S4) /*| (1 << HFP_AGSF_HF_INDICATORS) */ |
                                       (1 << HFP_AGSF_CODEC_NEGOTIATION) | (1 << HFP_AGSF_EXTENDED_ERROR_RESULT_CODES) |
                                       (1 << HFP_AGSF_ENHANCED_CALL_CONTROL) | (1 << HFP_AGSF_ENHANCED_CALL_STATUS) |
-                                      (1 << HFP_AGSF_ABILITY_TO_REJECT_A_CALL) | (1 << HFP_AGSF_IN_BAND_RING_TONE) |
-                                      (1 << HFP_AGSF_VOICE_RECOGNITION_FUNCTION) | (1 << HFP_AGSF_THREE_WAY_CALLING);
+                                      (1 << HFP_AGSF_ABILITY_TO_REJECT_A_CALL) /*| (1 << HFP_AGSF_IN_BAND_RING_TONE) |*/
+            /* (1 << HFP_AGSF_VOICE_RECOGNITION_FUNCTION) |(1 << HFP_AGSF_THREE_WAY_CALLING)*/;
         int wide_band_speech = 0;
         hfp_ag_create_sdp_record(serviceBuffer.data(),
                                  hspSdpRecordHandle,
@@ -340,6 +334,8 @@ namespace bluetooth
         hci_register_sco_packet_handler(&packetHandler);
 
         hfp_ag_register_packet_handler(&packetHandler);
+
+        hfp_ag_set_use_in_band_ring_tone(0);
 
         LOG_INFO("HFP init done!");
 
@@ -379,7 +375,8 @@ namespace bluetooth
         if (!isConnected) {
             connect();
         }
-        establishAudioConnection();
+        hfp_ag_set_speaker_gain(aclHandle, 8);
+        hfp_ag_set_microphone_gain(aclHandle, 10);
     }
     void HFP::HFPImpl::stop()
     {
@@ -405,4 +402,23 @@ namespace bluetooth
         }
         hfp_ag_init_codecs(codecsList.size(), reinterpret_cast<uint8_t *>(codecsList.data()));
     }
+    void HFP::HFPImpl::initializeCall() const noexcept
+    {
+        establishAudioConnection();
+        LOG_WARN("Target phone number mocked - to be gathered from cellular");
+        hfp_ag_outgoing_call_initiated("1234567");
+    }
+    void HFP::HFPImpl::setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice)
+    {
+        HFP::HFPImpl::audioDevice = std::static_pointer_cast<CVSDAudioDevice>(audioDevice);
+    }
+    void HFP::HFPImpl::startRinging() const noexcept
+    {
+        hfp_ag_incoming_call();
+    }
+    void HFP::HFPImpl::stopRinging() const noexcept
+    {
+        hfp_ag_answer_incoming_call();
+    }
+
 } // namespace bluetooth

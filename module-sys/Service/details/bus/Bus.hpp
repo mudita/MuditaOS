@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "module-sys/Service/Common.hpp"
-#include "module-sys/Service/Message.hpp"
+#include "Service/Common.hpp"
+#include "Service/Message.hpp"
 
 #include <cstdint>
 #include <memory>

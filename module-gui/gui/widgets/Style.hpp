@@ -69,11 +69,13 @@ namespace style
         inline constexpr auto default_rect_yaps            = 10U;
         namespace font
         {
-            inline constexpr auto thehugest        = "gt_pressura_regular_190";
-            inline constexpr auto huge             = "gt_pressura_regular_90";
+            inline constexpr auto huge             = "gt_pressura_regular_190";
+            inline constexpr auto supersizeme      = "gt_pressura_regular_90";
             inline constexpr auto supersizemelight = "gt_pressura_light_90";
             inline constexpr auto largelight       = "gt_pressura_light_46";
-            inline constexpr auto verybigbold      = "gt_pressura_bold_32";
+            inline constexpr auto large            = "gt_pressura_regular_46";
+            inline constexpr auto verybiglight     = "gt_pressura_light_38";
+            inline constexpr auto mediumbigbold    = "gt_pressura_bold_32";
             inline constexpr auto bigbold          = "gt_pressura_bold_30";
             inline constexpr auto big              = "gt_pressura_regular_30";
             inline constexpr auto biglight         = "gt_pressura_light_30";
@@ -164,6 +166,7 @@ namespace style
             inline constexpr auto call           = "common_call";
             inline constexpr auto send           = "common_send";
             inline constexpr auto save           = "common_save";
+            inline constexpr auto edit           = "common_edit";
             inline constexpr auto import         = "common_import";
             inline constexpr auto confirm        = "common_confirm";
             inline constexpr auto select         = "common_select";
@@ -236,6 +239,8 @@ namespace style
 
         inline constexpr auto item_width_with_scroll =
             style::window::default_body_width - style::listview::scroll::item_margin;
+        inline constexpr auto item_width_with_without_scroll =
+            style::window::default_body_width - 2 * style::listview::scroll::item_margin;
         inline constexpr auto body_width_with_scroll =
             style::window::default_body_width + style::listview::scroll::margin;
 
@@ -261,7 +266,7 @@ namespace style
             inline constexpr auto h             = 50U;
         } // namespace progress_bar
 
-    }     // namespace sidelistview
+    } // namespace sidelistview
 
     namespace margins
     {
@@ -289,7 +294,6 @@ namespace style
     namespace notifications
     {
         inline constexpr auto spanSize     = 8;
-        inline constexpr auto digitSize    = 16;
         inline constexpr auto iconWidth    = 35;
         inline constexpr auto textMinWidth = 250;
         inline constexpr auto textMaxWidth = 350;

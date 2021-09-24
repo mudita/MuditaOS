@@ -12,7 +12,7 @@
 
 #include <BaseInterface.hpp>
 #include <Common/Query.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <MessageType.hpp>
 #include <module-db/Interface/EventRecord.hpp>
 #include <service-db/DBNotificationMessage.hpp>
@@ -34,17 +34,13 @@ namespace stm
     constexpr auto automaticTimezoneName  = "";
     constexpr auto automaticTimezoneRules = "UTC0";
 
-    ServiceTime::ServiceTime(const alarms::IAlarmOperationsFactory &alarmOperationsFactory)
+    ServiceTime::ServiceTime(std::shared_ptr<alarms::IAlarmOperationsFactory> alarmOperationsFactory)
         : sys::Service(service::name::service_time, "", StackDepth), timeManager{std::make_unique<TimeManager>(
-                                                                         std::make_unique<RTCCommand>(this))}
+                                                                         std::make_unique<RTCCommand>(this))},
+          alarmOperationsFactory{std::move(alarmOperationsFactory)}
     {
         LOG_INFO("[ServiceTime] Initializing");
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
-
-        auto alarmEventsRepo = std::make_unique<alarms::AlarmEventsDBRepository>(this);
-        auto alarmOperations = alarmOperationsFactory.create(this, std::move(alarmEventsRepo), TimePointNow);
-        alarmOperations->updateEventsCache(TimePointNow());
-        alarmMessageHandler = std::make_unique<alarms::AlarmMessageHandler>(this, std::move(alarmOperations));
     }
 
     ServiceTime::~ServiceTime()
@@ -61,8 +57,11 @@ namespace stm
         static TimeSettings timeSettings;
         utils::time::TimestampFactory().init(&timeSettings);
 
+        auto alarmEventsRepo = std::make_unique<alarms::AlarmEventsDBRepository>(this);
+        auto alarmOperations = alarmOperationsFactory->create(this, std::move(alarmEventsRepo), TimePointNow);
+        alarmOperations->updateEventsCache(TimePointNow());
+        alarmMessageHandler = std::make_unique<alarms::AlarmMessageHandler>(this, std::move(alarmOperations));
         registerMessageHandlers();
-
         return sys::ReturnCodes::Success;
     }
 
@@ -101,12 +100,6 @@ namespace stm
         else {
             return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
         }
-    }
-
-    void ServiceTime::addAlarmExecutionHandler(const alarms::AlarmType type,
-                                               const std::shared_ptr<alarms::AlarmHandler> handler)
-    {
-        alarmMessageHandler->addAlarmExecutionHandler(type, handler);
     }
 
     void ServiceTime::registerMessageHandlers()
@@ -166,6 +159,28 @@ namespace stm
             return alarmMessageHandler->handleSnoozeRingingAlarm(
                 static_cast<alarms::RingingAlarmSnoozeRequestMessage *>(request));
         });
+        connect(typeid(alarms::StopAllSnoozedAlarmsRequestMessage), [&](sys::Message *request) -> sys::MessagePointer {
+            alarmMessageHandler->handleStopAllSnoozedAlarms();
+            return std::make_shared<sys::ResponseMessage>();
+        });
+        connect(
+            typeid(alarms::RegisterSnoozedAlarmsCountChangeHandlerRequestMessage),
+            [&](sys::Message *request) -> sys::MessagePointer {
+                auto senderName = request->sender;
+                alarmMessageHandler->handleAddSnoozedAlarmCountChangeCallback([this, senderName](unsigned snoozeCount) {
+                    bus.sendUnicast(std::make_shared<alarms::SnoozedAlarmsCountChangeMessage>(snoozeCount), senderName);
+                });
+                return std::make_shared<sys::ResponseMessage>();
+            });
+        connect(typeid(alarms::RegisterActiveAlarmsIndicatorHandlerRequestMessage),
+                [&](sys::Message *request) -> sys::MessagePointer {
+                    auto senderName = request->sender;
+                    alarmMessageHandler->handleAddActiveAlarmCountChangeCallback(
+                        [this, senderName](bool isAnyAlarmActive) {
+                            bus.sendUnicast(std::make_shared<alarms::ActiveAlarmMessage>(isAnyAlarmActive), senderName);
+                        });
+                    return std::make_shared<sys::ResponseMessage>();
+                });
     }
 
     auto ServiceTime::handleSetAutomaticDateAndTimeRequest(sys::Message *request)

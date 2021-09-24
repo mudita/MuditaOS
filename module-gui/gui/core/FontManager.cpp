@@ -1,11 +1,11 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "FontManager.hpp"
 #include "Common.hpp"   // for Status, Status::GUI_SUCCESS
 #include "FontInfo.hpp" // for FontInfo
 #include "RawFont.hpp"  // for RawFont
-#include <log.hpp>      // for LOG_ERROR, LOG_INFO, LOG_WARN
+#include <log/log.hpp>  // for LOG_ERROR, LOG_INFO, LOG_WARN
 #include <Utils.hpp>
 #include <filesystem>
 #include <cstdio>

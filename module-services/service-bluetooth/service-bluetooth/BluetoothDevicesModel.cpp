@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BluetoothDevicesModel.hpp"
-#include <module-sys/Service/Service.hpp>
+#include <Service/Service.hpp>
 #include <service-bluetooth/messages/BondedDevices.hpp>
 
 BluetoothDevicesModel::BluetoothDevicesModel(sys::Service *service) : service{service}

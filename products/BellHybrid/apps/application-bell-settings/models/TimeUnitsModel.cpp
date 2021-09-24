@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "TimeUnitsModel.hpp"
+#include "models/TimeUnitsModel.hpp"
 #include "widgets/TimeFormatSetListItem.hpp"
 #include "widgets/TimeSetListItem.hpp"
 #include "widgets/TemperatureUnitListItem.hpp"
@@ -119,8 +119,12 @@ namespace app::bell_settings
         application->bus.sendUnicast(std::move(msg), service::name::service_time);
     }
 
-    auto TimeUnitsModel::getTemperatureUnit() -> utils::temperature::Temperature::Unit
+    auto TimeUnitsModel::getTemperatureUnit() const -> utils::temperature::Temperature::Unit
     {
         return *utils::temperature::strToUnit(temperatureUnitListItem->getUnitAsStr());
+    }
+    auto TimeUnitsModel::setTemperatureUnit(const utils::temperature::Temperature::Unit unit) -> void
+    {
+        temperatureUnitListItem->setUnit(unit);
     }
 } // namespace app::bell_settings

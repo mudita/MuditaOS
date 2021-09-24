@@ -24,6 +24,7 @@ target_sources(apps-common
         notifications/policies/SMSNotificationPolicy.cpp
         notifications/policies/NotificationsListPolicy.cpp
         options/OptionsModel.cpp
+        options/OptionsList.cpp
         options/type/OptionCall.cpp
         options/type/OptionContact.cpp
         options/type/OptionSetting.cpp
@@ -39,6 +40,7 @@ target_sources(apps-common
         widgets/InputBox.cpp
         widgets/ModesBox.cpp
         widgets/SpinBox.cpp
+        widgets/TextSpinnerBox.cpp
         widgets/TextWithIconsWidget.cpp
         widgets/TimeSetSpinner.cpp
         widgets/AlarmSetSpinner.cpp
@@ -85,8 +87,9 @@ target_link_libraries(apps-common
         module-services
         module-sys
         module-utils
-        time
+        utils-time
         utf8
+        version-header
 )
 
 # Board specific compilation definitions,options,include directories and features
@@ -123,8 +126,6 @@ target_compile_options(apps-common
 add_library(bellgui)
 target_sources( bellgui
    PRIVATE
-      ${CMAKE_CURRENT_SOURCE_DIR}/options/type/OptionBellMenu.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/options/type/OptionBellMenu.hpp
 )
 target_include_directories( bellgui
    PUBLIC

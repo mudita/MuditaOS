@@ -18,6 +18,8 @@
 #include "ProfileRoutingBluetoothHSP.hpp"
 
 #include "ProfilePlaybackBluetoothA2DP.hpp"
+#include "ProfileRoutingBluetoothHFP.hpp"
+#include "ProfileRecordingBluetoothHFP.hpp"
 
 #include <Utils.hpp>
 
@@ -53,6 +55,10 @@ namespace audio
             assert(gain);
             inst = std::make_unique<ProfileRecordingBluetoothHSP>(gain.value());
             break;
+        case Type::RecordingBluetoothHFP:
+            assert(gain);
+            inst = std::make_unique<ProfileRecordingBluetoothHFP>(gain.value());
+            break;
         case Type::RoutingHeadphones:
             assert(gain && vol);
             inst = std::make_unique<ProfileRoutingHeadphones>(vol.value(), gain.value());
@@ -68,6 +74,10 @@ namespace audio
         case Type::RoutingBluetoothHSP:
             assert(gain && vol);
             inst = std::make_unique<ProfileRoutingBluetoothHSP>(vol.value(), gain.value());
+            break;
+        case Type::RoutingBluetoothHFP:
+            assert(gain && vol);
+            inst = std::make_unique<ProfileRoutingBluetoothHFP>(vol.value(), gain.value());
             break;
         case Type::Idle:
             inst = std::make_unique<ProfileIdle>();

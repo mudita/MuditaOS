@@ -14,10 +14,9 @@ namespace
 
 ApplicationSpecialInput::ApplicationSpecialInput(std::string name,
                                                  std::string parent,
-                                                 sys::phone_modes::PhoneMode phoneMode,
-                                                 sys::bluetooth::BluetoothMode bluetoothMode,
+                                                 StatusIndicators statusIndicators,
                                                  StartInBackground startInBackground)
-    : Application(name, parent, phoneMode, bluetoothMode, startInBackground, SpecialInputAppStackDepth)
+    : Application(name, parent, statusIndicators, startInBackground, SpecialInputAppStackDepth)
 {
     addActionReceiver(manager::actions::ShowSpecialInput, [this](auto &&data) {
         switchWindow(app::char_select, std::move(data));

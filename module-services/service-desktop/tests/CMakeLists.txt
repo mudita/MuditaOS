@@ -25,28 +25,8 @@ add_catch2_executable(
     USE_FS
 )
 
-add_catch2_executable(
-    NAME
-        service-desktop-endpoint-contacts
-    SRCS
-        tests-main.cpp
-        test-contacts.cpp
-    LIBS
-        service-desktop
-        module-utils
-        module-apps
-    USE_FS
-)
-
-add_catch2_executable(
-    NAME
-        service-desktop-endpoint-filesystem
-    SRCS
-        tests-main.cpp
-        test-fs-ep-operations.cpp
-    LIBS
-        service-desktop
-        module-utils
-        module-apps
-    USE_FS
+target_include_directories(
+        catch2-service-desktop
+    PRIVATE
+        $<TARGET_PROPERTY:service-desktop,INCLUDE_DIRECTORIES>
 )

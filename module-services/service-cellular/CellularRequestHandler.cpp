@@ -5,9 +5,9 @@
 #include "service-cellular/RequestFactory.hpp"
 #include "service-cellular/ServiceCellular.hpp"
 
-#include "Service/Message.hpp"
-#include "module-sys/Timers/TimerHandle.hpp"
-#include "module-sys/Timers/TimerFactory.hpp"
+#include <Service/Message.hpp>
+#include <Timers/TimerHandle.hpp>
+#include <Timers/TimerFactory.hpp>
 
 #include "service-cellular/requests/CallRequest.hpp"
 #include "service-cellular/requests/SupplementaryServicesRequest.hpp"

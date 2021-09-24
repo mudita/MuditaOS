@@ -29,10 +29,9 @@ namespace app
 
     ApplicationNotes::ApplicationNotes(std::string name,
                                        std::string parent,
-                                       sys::phone_modes::PhoneMode phoneMode,
-                                       sys::bluetooth::BluetoothMode bluetoothMode,
+                                       StatusIndicators statusIndicators,
                                        StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), phoneMode, bluetoothMode, startInBackground, NotesStackSize)
+        : Application(std::move(name), std::move(parent), statusIndicators, startInBackground, NotesStackSize)
     {
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
     }
@@ -128,8 +127,11 @@ namespace app
                                   return std::make_unique<gui::OptionWindow>(app, name);
                               });
 
-        attachPopups(
-            {gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes, gui::popup::ID::PhoneLock});
+        attachPopups({gui::popup::ID::Volume,
+                      gui::popup::ID::Tethering,
+                      gui::popup::ID::PhoneModes,
+                      gui::popup::ID::PhoneLock,
+                      gui::popup::ID::Alarm});
     }
 
     void ApplicationNotes::destroyUserInterface()

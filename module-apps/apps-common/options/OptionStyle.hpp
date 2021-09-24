@@ -47,11 +47,4 @@ namespace gui::option
         inline constexpr uint32_t optionsListH                = style::window::default_body_height;
     } // namespace window
 
-    namespace bell::window
-    {
-        inline constexpr gui::Length option_bottom_margin = 9;
-        inline constexpr gui::Length option_left_margin   = 10;
-        inline constexpr gui::Length default_text_width   = 400;
-    } // namespace bell::window
-
 } // namespace gui::option

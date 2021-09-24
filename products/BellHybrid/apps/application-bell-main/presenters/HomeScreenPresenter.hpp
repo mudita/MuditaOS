@@ -8,8 +8,8 @@
 #include <apps-common/BasePresenter.hpp>
 #include <common/models/AbstractAlarmModel.hpp>
 #include <gui/input/InputEvent.hpp>
-#include <module-sys/Timers/TimerHandle.hpp>
-#include <module-utils/Temperature.hpp>
+#include <Timers/TimerHandle.hpp>
+#include <Temperature.hpp>
 #include <time/time_locale.hpp>
 #include <utf8/UTF8.hpp>
 
@@ -20,7 +20,7 @@ namespace app
 {
     class AbstractTimeModel;
     class ApplicationCommon;
-}
+} // namespace app
 
 namespace gui
 {

@@ -2,18 +2,22 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NewEditAlarmModel.hpp"
-#include "application-alarm-clock/widgets/AlarmTimeItem.hpp"
-#include "application-alarm-clock/widgets/AlarmOptionsItem.hpp"
-#include "application-alarm-clock/widgets/addedit/AlarmOptionRepeat.hpp"
-#include "application-alarm-clock/widgets/AlarmClockStyle.hpp"
+
+#include <application-alarm-clock/widgets/AlarmTimeItem.hpp>
+#include <application-alarm-clock/widgets/AlarmSnoozeOptionsItem.hpp>
+#include <application-alarm-clock/widgets/AlarmMusicOptionsItem.hpp>
+#include <application-alarm-clock/widgets/AlarmRRuleOptionsItem.hpp>
+#include <application-alarm-clock/presenter/AlarmRRulePresenter.hpp>
+#include <application-alarm-clock/widgets/AlarmClockStyle.hpp>
+
 #include <ListView.hpp>
 
 namespace app::alarmClock
 {
     NewEditAlarmModel::NewEditAlarmModel(app::ApplicationCommon *app,
-                                         std::shared_ptr<AbstractAlarmsRepository> alarmsRepository,
-                                         bool mode24H)
-        : application(app), alarmsRepository{std::move(alarmsRepository)}, mode24H(mode24H)
+                                         std::shared_ptr<alarmClock::AlarmRRulePresenter> rRulePresenter,
+                                         std::shared_ptr<AbstractAlarmsRepository> alarmsRepository)
+        : application(app), alarmsRepository{std::move(alarmsRepository)}, rRulePresenter(rRulePresenter)
     {}
 
     unsigned int NewEditAlarmModel::requestRecordsCount()
@@ -23,7 +27,7 @@ namespace app::alarmClock
 
     unsigned int NewEditAlarmModel::getMinimalItemSpaceRequired() const
     {
-        return style::alarmClock::window::item::options::height;
+        return style::alarmClock::window::item::options::h;
     }
 
     void NewEditAlarmModel::requestRecords(uint32_t offset, uint32_t limit)
@@ -37,31 +41,27 @@ namespace app::alarmClock
         return getRecord(order);
     }
 
-    void NewEditAlarmModel::createData(std::shared_ptr<AlarmEventRecord> record)
+    void NewEditAlarmModel::createData()
     {
         auto app = application;
         assert(app != nullptr);
 
         internalData.push_back(new gui::AlarmTimeItem(
-            mode24H,
-            [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
-            [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); }));
-        internalData.push_back(new gui::AlarmOptionsItem(
-            application,
-            AlarmOptionItemName::Sound,
             [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
             [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); }));
 
-        internalData.push_back(new gui::AlarmOptionsItem(
+        internalData.push_back(new gui::AlarmMusicOptionsItem(
             application,
-            AlarmOptionItemName::Snooze,
+            utils::translate("app_alarm_clock_sound"),
             [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
             [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); }));
 
-        internalData.push_back(new gui::AlarmOptionRepeat(
+        internalData.push_back(new gui::AlarmSnoozeOptionsItem(utils::translate("app_alarm_clock_snooze")));
+
+        internalData.push_back(new gui::AlarmRRuleOptionsItem(
             application,
-            AlarmOptionItemName::Repeat,
-            AlarmPresenter(record),
+            utils::translate("app_alarm_clock_repeat"),
+            rRulePresenter,
             [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
             [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); }));
 
@@ -75,7 +75,8 @@ namespace app::alarmClock
         list->reset();
         eraseInternalData();
 
-        createData(record);
+        rRulePresenter->loadRecord(record);
+        createData();
 
         for (auto &item : internalData) {
             if (item->onLoadCallback) {
@@ -106,6 +107,7 @@ namespace app::alarmClock
                                      [this](bool) { application->switchWindow(gui::name::window::main_window); });
         }
         else {
+            alarm->enabled = true;
             alarmsRepository->add(*alarm, [this](bool) { application->returnToPreviousWindow(); });
         }
         list->reset();

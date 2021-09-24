@@ -72,7 +72,7 @@ namespace gui
     {
         auto body = new gui::BellBaseLayout(this, 0, 0, style::bell_base_layout::w, style::bell_base_layout::h, false);
         auto vBox =
-            new VBox(body->getCenterBox(), 0, 0, style::bell_base_layout::w, style::bell_base_layout::centerbox::h);
+            new VBox(body->getCenterBox(), 0, 0, style::bell_base_layout::w, style::bell_base_layout::center_layout_h);
         decorateProgressItem(vBox, gui::Alignment::Vertical::Top);
         createTitle(vBox);
         progressBar = createProgress(vBox);

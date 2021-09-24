@@ -62,7 +62,7 @@ namespace
 
     auto buildNotificationCountText(const UTF8 &indicator) -> gui::Text *
     {
-        auto number = new gui::Text();
+        auto number = new gui::TextFixedSize();
         if (indicator.length() > 2) {
             number->setText(maxNotificationValue);
         }
@@ -73,8 +73,10 @@ namespace
             number->setText(indicator);
         }
 
-        number->setMinimumWidth(number->getText().length() * style::notifications::digitSize);
+        number->drawUnderline(false);
         number->setFont(style::window::font::mediumbold);
+        number->setMinimumWidthToFitText(indicator);
+        number->setMinimumHeightToFitText();
         number->setPenWidth(style::window::default_border_no_focus_w);
         number->setMargins(gui::Margins(0, 0, style::window::default_right_margin, 0));
         number->setAlignment(Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Center));
@@ -86,6 +88,7 @@ namespace
         {notifications::NotificationType::NotSeenSms, "messages_notification_icon"},
         {notifications::NotificationType::NotSeenCall, "calls_notification_icon"},
         {notifications::NotificationType::Tethering, "tethering_notification_icon"},
+        {notifications::NotificationType::AlarmSnooze, "alarm_notification_icon"},
         {notifications::NotificationType::PhoneLock, "lock_notification_icon_W_G"}};
 } // namespace
 

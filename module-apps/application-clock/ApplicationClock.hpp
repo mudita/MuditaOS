@@ -7,7 +7,7 @@
 #include "gui/widgets/Label.hpp"
 #include "gui/widgets/Image.hpp"
 #include "gui/widgets/ProgressBar.hpp"
-#include "module-sys/Timers/TimerHandle.hpp"
+#include "Timers/TimerHandle.hpp"
 
 namespace app
 {

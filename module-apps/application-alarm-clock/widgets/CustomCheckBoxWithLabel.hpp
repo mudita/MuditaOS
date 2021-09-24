@@ -3,31 +3,24 @@
 
 #pragma once
 
-#include "AlarmInternalListItem.hpp"
-#include "application-alarm-clock/data/AlarmsData.hpp"
-#include "ApplicationCommon.hpp"
-#include "application-calendar/data/CalendarData.hpp"
-#include <BoxLayout.hpp>
-#include <CheckBox.hpp>
+#include <ListItem.hpp>
+#include <CheckBoxWithLabel.hpp>
+
+#include <application-calendar/data/CalendarData.hpp>
 
 namespace gui
 {
-    class CustomCheckBoxWithLabel : public AlarmInternalListItem
+    class CustomCheckBoxWithLabel : public ListItem
     {
-        gui::HBox *hBox               = nullptr;
-        app::ApplicationCommon *application = nullptr;
-        gui::Label *descriptionLabel  = nullptr;
-        gui::CheckBox *checkBox       = nullptr;
-        WeekDaysRepeatData checkBoxData;
-
-        void setCheckBoxes();
-        void applyCallbacks();
+      private:
+        gui::CheckBoxWithLabel *checkBoxWithLabel = nullptr;
+        bool initialState                         = false;
 
       public:
-        CustomCheckBoxWithLabel(app::ApplicationCommon *app,
-                                const std::string &description,
-                                const WeekDaysRepeatData &data);
-
-        static const std::map<WeekDayIso, std::string> weekDays;
+        CustomCheckBoxWithLabel(const std::string &description,
+                                bool initialState,
+                                const std::function<void(const UTF8 &text)> &bottomBarTemporaryMode = nullptr,
+                                const std::function<void()> &bottomBarRestoreFromTemporaryMode      = nullptr);
+        bool isChecked();
     };
 } // namespace gui

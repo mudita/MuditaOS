@@ -1,12 +1,12 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "SystemWatchdog.hpp"
+#include <SystemWatchdog/SystemWatchdog.hpp>
 #include "Service/Common.hpp"
 #include "critical.hpp"
 #include "ticks.hpp"
 #include "bsp/watchdog/watchdog.hpp"
-#include <log.hpp>
+#include <log/log.hpp>
 
 namespace sys
 {

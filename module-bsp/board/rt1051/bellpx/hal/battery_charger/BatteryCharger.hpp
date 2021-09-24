@@ -3,22 +3,21 @@
 
 #pragma once
 
-#include <module-bsp/hal/battery_charger/AbstractBatteryCharger.hpp>
-
-#include <memory>
+#include <hal/battery_charger/AbstractBatteryCharger.hpp>
 
 namespace hal::battery
 {
     class BatteryCharger : public AbstractBatteryCharger
     {
       public:
-        explicit BatteryCharger(sys::Service *);
+        explicit BatteryCharger(AbstractBatteryCharger::BatteryChargerEvents &eventsHandler);
         void init(xQueueHandle queueBatteryHandle, xQueueHandle) final;
         void deinit() final;
         void processStateChangeNotification(std::uint8_t notification) final;
         void setChargingCurrentLimit(std::uint8_t) final;
+        int getBatteryVoltage() final;
 
       private:
-        sys::Service *service;
+        AbstractBatteryCharger::BatteryChargerEvents &eventsHandler;
     };
 } // namespace hal::battery

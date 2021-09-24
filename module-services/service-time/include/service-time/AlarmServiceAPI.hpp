@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <module-sys/Service/Service.hpp>
+#include <Service/Service.hpp>
 
 #include <time/dateCommon.hpp>
 
@@ -29,6 +29,9 @@ namespace alarms
         bool requestGetNextSingleEvents(sys::Service *serv);
         bool requestTurnOffRingingAlarm(sys::Service *serv, const std::uint32_t id);
         bool requestSnoozeRingingAlarm(sys::Service *serv, const std::uint32_t id, const TimePoint nextAlarmTime);
+        bool requestStopAllSnoozedAlarms(sys::Service *serv);
+        bool requestRegisterSnoozedAlarmsCountChangeCallback(sys::Service *serv);
+        bool requestRegisterActiveAlarmsIndicatorHandler(sys::Service *serv);
     }; // namespace AlarmServiceAPI
 
 } // namespace alarms

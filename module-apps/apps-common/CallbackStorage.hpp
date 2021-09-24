@@ -5,7 +5,7 @@
 
 #include "AsyncTask.hpp"
 
-#include "module-sys/Service/Message.hpp"
+#include "Service/Message.hpp"
 
 #include <memory>
 #include <list>

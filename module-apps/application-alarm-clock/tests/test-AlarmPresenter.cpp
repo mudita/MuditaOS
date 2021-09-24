@@ -2,24 +2,24 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
-#include <application-alarm-clock/presenter/AlarmPresenter.hpp>
+#include <application-alarm-clock/presenter/AlarmRRulePresenter.hpp>
 
 using namespace app::alarmClock;
 
-class PubPresenter : public AlarmPresenter
+class PubPresenter : public AlarmRRulePresenter
 {
   public:
-    PubPresenter() : AlarmPresenter(std::make_shared<AlarmEventRecord>())
+    PubPresenter() : AlarmRRulePresenter(std::make_shared<AlarmEventRecord>())
     {}
 
     utl::Day dayToDay(uint32_t day_no)
     {
-        return AlarmPresenter::dayToDay(day_no);
+        return AlarmRRulePresenter::dayToDay(day_no);
     }
 
     uint8_t dayToDay(utl::Day day)
     {
-        return AlarmPresenter::dayToDay(day);
+        return AlarmRRulePresenter::dayToDay(day);
     }
 };
 
@@ -32,7 +32,7 @@ TEST_CASE("transformations test")
 TEST_CASE("empty rrule")
 {
     std::shared_ptr<AlarmEventRecord> alarm;
-    AlarmPresenter presenter(alarm);
+    AlarmRRulePresenter presenter(alarm);
     REQUIRE(!presenter.hasRecurrence());
 }
 
@@ -40,7 +40,7 @@ TEST_CASE("empty rrule")
 TEST_CASE("recurrence rule get & set")
 {
     auto alarm = std::make_shared<AlarmEventRecord>();
-    AlarmPresenter presenter(alarm);
+    AlarmRRulePresenter presenter(alarm);
 
     SECTION("no recurrence")
     {
@@ -51,7 +51,7 @@ TEST_CASE("recurrence rule get & set")
     {
         alarm->rruleText = "FREQ=WEEKLY;BYDAY=SU,MO,TU,WE,TH,FR,SA;INTERVAL=1";
         REQUIRE(presenter.hasRecurrence());
-        REQUIRE(presenter.getSpinner() == AlarmPresenter::Spinner::Weekly);
+        REQUIRE(presenter.getOption() == AlarmRRulePresenter::RRuleOptions::Everyday);
         REQUIRE(presenter.getDays().size() == 7);
     }
 
@@ -78,62 +78,91 @@ TEST_CASE("recurrence rule get & set")
     }
 }
 
-TEST_CASE("getSpinner")
+TEST_CASE("getOptions")
 {
     auto alarm = std::make_shared<AlarmEventRecord>();
-    AlarmPresenter presenter(alarm);
+    AlarmRRulePresenter presenter(alarm);
 
     SECTION("nothing")
     {
-        REQUIRE(presenter.getSpinner() == AlarmPresenter::Spinner::Never);
+        REQUIRE(presenter.getOption() == AlarmRRulePresenter::RRuleOptions::Never);
     }
 
     SECTION("weekdays")
     {
         presenter.setDays({utl::Mon, utl::Tue, utl::Wed, utl::Thu, utl::Fri});
-        REQUIRE(presenter.getSpinner() == AlarmPresenter::Spinner::Weekdays);
+        REQUIRE(presenter.getOption() == AlarmRRulePresenter::RRuleOptions::Weekdays);
     }
 
     SECTION("week")
     {
         presenter.setDays({utl::Mon, utl::Tue, utl::Wed, utl::Thu, utl::Fri, utl::Sat, utl::Sun});
-        REQUIRE(presenter.getSpinner() == AlarmPresenter::Spinner::Weekly);
+        REQUIRE(presenter.getOption() == AlarmRRulePresenter::RRuleOptions::Everyday);
     }
 
     SECTION("custom")
     {
         presenter.setDays({utl::Tue, utl::Wed, utl::Thu, utl::Fri, utl::Sat, utl::Sun});
-        REQUIRE(presenter.getSpinner() == AlarmPresenter::Spinner::Custom);
+        REQUIRE(presenter.getOption() == AlarmRRulePresenter::RRuleOptions::Custom);
     }
 
     SECTION("signle day")
     {
         presenter.setDays({utl::Tue});
-        REQUIRE(presenter.getSpinner() == AlarmPresenter::Spinner::OnDay);
+        REQUIRE(presenter.getOption() == AlarmRRulePresenter::RRuleOptions::OnDay);
     }
 }
 
-TEST_CASE("setSpinner")
+TEST_CASE("getCustomDays")
 {
     auto alarm = std::make_shared<AlarmEventRecord>();
-    AlarmPresenter presenter(alarm);
+    AlarmRRulePresenter presenter(alarm);
+
+    std::list<utl::Day> days = {utl::Sun, utl::Wed, utl::Fri};
+    presenter.setOption(AlarmRRulePresenter::RRuleOptions::Custom, days);
+
+    REQUIRE(presenter.getCustomDays()[0] == std::pair<std::string, bool>{utils::time::Locale::get_day(utl::Sun), true});
+    REQUIRE(presenter.getCustomDays()[1] ==
+            std::pair<std::string, bool>{utils::time::Locale::get_day(utl::Mon), false});
+    REQUIRE(presenter.getCustomDays()[2] ==
+            std::pair<std::string, bool>{utils::time::Locale::get_day(utl::Tue), false});
+    REQUIRE(presenter.getCustomDays()[3] == std::pair<std::string, bool>{utils::time::Locale::get_day(utl::Wed), true});
+    REQUIRE(presenter.getCustomDays()[4] ==
+            std::pair<std::string, bool>{utils::time::Locale::get_day(utl::Thu), false});
+    REQUIRE(presenter.getCustomDays()[5] == std::pair<std::string, bool>{utils::time::Locale::get_day(utl::Fri), true});
+    REQUIRE(presenter.getCustomDays()[6] ==
+            std::pair<std::string, bool>{utils::time::Locale::get_day(utl::Sat), false});
+}
+
+TEST_CASE("setOptions")
+{
+    auto alarm = std::make_shared<AlarmEventRecord>();
+    AlarmRRulePresenter presenter(alarm);
 
     SECTION("nothing")
     {
-        presenter.setSpinner(AlarmPresenter::Spinner::Never, nullptr);
+        presenter.setOption(AlarmRRulePresenter::RRuleOptions::Never);
         REQUIRE(presenter.getDays().empty());
     }
 
     SECTION("weekdays")
     {
-        presenter.setSpinner(AlarmPresenter::Spinner::Weekdays, nullptr);
+        presenter.setOption(AlarmRRulePresenter::RRuleOptions::Weekdays);
         REQUIRE(presenter.getDays() == std::list<utl::Day>{utl::Mon, utl::Tue, utl::Wed, utl::Thu, utl::Fri});
     }
 
     SECTION("week")
     {
-        presenter.setSpinner(AlarmPresenter::Spinner::Weekly, nullptr);
+        presenter.setOption(AlarmRRulePresenter::RRuleOptions::Everyday);
         REQUIRE(presenter.getDays() ==
                 std::list<utl::Day>{utl::Sun, utl::Mon, utl::Tue, utl::Wed, utl::Thu, utl::Fri, utl::Sat});
+    }
+
+    SECTION("custom")
+    {
+        std::list<utl::Day> days = {utl::Sun, utl::Wed, utl::Fri};
+
+        presenter.setOption(AlarmRRulePresenter::RRuleOptions::Custom, days);
+        REQUIRE(presenter.getDays() == days);
     }
 }

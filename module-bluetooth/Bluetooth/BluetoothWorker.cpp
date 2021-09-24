@@ -4,7 +4,7 @@
 #include <service-bluetooth/ServiceBluetooth.hpp>
 #include "BluetoothWorker.hpp"
 #include "BtCommand.hpp"
-#include <log.hpp>
+#include <log/log.hpp>
 #include "interface/BluetoothDriverImpl.hpp"
 #include "interface/profiles/A2DP/A2DP.hpp"
 #include "interface/profiles/HSP/HSP.hpp"

@@ -19,7 +19,7 @@
 #include <bsp/common.hpp>
 #include <bsp/rtc/rtc.hpp>
 #include <hal/key_input/KeyEventDefinitions.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <Logger.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <service-audio/AudioMessage.hpp>
@@ -38,7 +38,7 @@
 #include <list>
 #include <ctime>
 #include <apps-common/messages/AppMessage.hpp>
-#include <SystemManager/messages/CpuFrequencyMessage.hpp>
+#include <SystemManager/messages/SentinelRegistrationMessage.hpp>
 #include <EventStore.hpp>
 #include <ticks.hpp>
 #include <purefs/filesystem_paths.hpp>
@@ -49,6 +49,18 @@ namespace
     constexpr auto loggerDelayMs   = 1000 * 60 * 5;
     constexpr auto loggerTimerName = "Logger";
 } // namespace
+
+EventManagerSentinel::EventManagerSentinel(std::shared_ptr<sys::CpuSentinel> cpuSentinel,
+                                           bsp::CpuFrequencyHz frequencyToHold)
+    : cpuSentinel(cpuSentinel)
+{
+    cpuSentinel->HoldMinimumFrequency(frequencyToHold);
+}
+
+EventManagerSentinel::~EventManagerSentinel()
+{
+    cpuSentinel->ReleaseMinimumFrequency();
+}
 
 EventManagerCommon::EventManagerCommon(const std::string &name)
     : sys::Service(name, "", stackDepth), loggerTimer{sys::TimerFactory::createPeriodicTimer(
@@ -209,6 +221,10 @@ sys::ReturnCodes EventManagerCommon::InitHandler()
     EventWorker->init(settings);
     EventWorker->run();
 
+    cpuSentinel                  = std::make_shared<sys::CpuSentinel>(service::name::evt_manager, this);
+    auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuSentinel);
+    bus.sendUnicast(sentinelRegistrationMsg, service::name::system_manager);
+
     return sys::ReturnCodes::Success;
 }
 
@@ -233,7 +249,6 @@ sys::ReturnCodes EventManagerCommon::DeinitHandler()
 
 void EventManagerCommon::ProcessCloseReason(sys::CloseReason closeReason)
 {
-    bsp::torch::turn(bsp::torch::State::off);
     sendCloseReadyMessage(this);
 }
 
@@ -281,6 +296,7 @@ void EventManagerCommon::handleKeyEvent(sys::Message *msg)
 
 int EventManagerCommon::dumpLogsToFile()
 {
+    EventManagerSentinel dumpSentinel(cpuSentinel, bsp::CpuFrequencyHz::Level_3);
     const auto logPath = purefs::dir::getUserDiskPath() / LOG_FILE_NAME;
     const auto ts      = cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks());
 

@@ -24,8 +24,11 @@ namespace app::manager
         void handlePhoneModeChanged(sys::phone_modes::PhoneMode phoneMode);
         auto handleBluetoothModeChangedAction(ActionEntry &action) -> ActionProcessStatus;
         void handleBluetoothModeChanged(sys::bluetooth::BluetoothMode mode);
+        void handleAlarmClockStatusChanged(bool status);
         void changeBluetoothMode(const ApplicationHandle *app);
+        void changeAlarmClockStatus(const ApplicationHandle *app);
         void handleTetheringChanged(sys::phone_modes::Tethering tethering);
+        void handleSnoozeCountChange(unsigned snoozeCount);
         void processKeypadBacklightState(bsp::keypad_backlight::State keypadLightState);
         void registerMessageHandlers() override;
         void startBackgroundApplications();
@@ -49,6 +52,7 @@ namespace app::manager
 
         std::shared_ptr<sys::phone_modes::Observer> phoneModeObserver;
         sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled;
+        bool alarmClockStatus                       = false;
         locks::PhoneLockHandler phoneLockHandler;
         locks::SimLockHandler simLockHandler;
 

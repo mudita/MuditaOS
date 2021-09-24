@@ -1,176 +1,163 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "MessageHandler.hpp"
 #include "ParserFSM.hpp"
 
-namespace sys
-{
-    class Service;
-} // namespace sys
-
-#include <service-desktop/ServiceDesktop.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <memory>
 #include <string>
 
-#include "MessageHandler.hpp" // for MessageHandler
-#include "ParserUtils.hpp" // for eraseFront, calcPayloadLength, extractPayload, getHeader, removeHeader, size_header, endpointChar, parserFSM
+#include "MessageHandler.hpp"
+#include <endpoints/EndpointFactory.hpp>
+#include <endpoints/message/Common.hpp>
 
-namespace sys
+namespace sdesktop::endpoints
 {
-    class Service;
-}
 
-using namespace parserFSM;
+    StateMachine::StateMachine(sys::Service *OwnerService) : OwnerServicePtr(OwnerService)
+    {}
 
-StateMachine::StateMachine(sys::Service *OwnerService) : OwnerServicePtr(OwnerService)
-{}
-
-void StateMachine::processMessage(std::string &&msg)
-{
-    receivedMsg = std::move(msg);
-
-    switch (state) {
-    case State::ReceivedPayload:
-        state = State::NoMsg;
-        [[fallthrough]];
-    case State::NoMsg: // first message - empty payload
-        parseHeader();
-        break;
-    case State::ReceivedPartialHeader:
-        parsePartialHeader();
-        break;
-    case State::ReceivedPartialPayload:
-        parsePartialMessage();
-        break;
-
-    default:
-        break;
-    }
-}
-
-void StateMachine::parseHeader()
-{
-    payload.clear();
-    header.clear();
-    payloadLength = 0;
-
-    auto messageStart = receivedMsg.find(message::endpointChar);
-    if (messageStart == std::string::npos) {
-        LOG_ERROR("This is not a valid endpoint message! Type=%c", receivedMsg.at(0));
-        return;
-    }
-
-    if (receivedMsg.size() < message::size_header) // header divided in few parts
+    void StateMachine::processMessage(std::string &&msg)
     {
-        state = State::ReceivedPartialHeader;
-        header.append(receivedMsg); // append to whole header string
-        return;
+        receivedMsg = std::move(msg);
+
+        switch (state) {
+        case State::NoMsg:
+            parseHeader();
+            break;
+        case State::ReceivedPartialHeader:
+            parsePartialHeader();
+            break;
+        case State::ReceivedPartialPayload:
+            parsePartialMessage();
+            break;
+
+        default:
+            break;
+        }
     }
 
-    header        = message::getHeader(receivedMsg);
-    payloadLength = message::calcPayloadLength(header);
-    if (payloadLength == 0) // failed to obtain payload length from msg
+    void StateMachine::parseHeader()
     {
-        LOG_ERROR("Damaged header!");
-        state = State::NoMsg;
-        return;
-    }
+        payload.clear();
+        header.clear();
+        payloadLength = 0;
 
-    LOG_DEBUG("Payload length: %lu", payloadLength);
+        auto messageStart = receivedMsg.find(message::endpointChar);
+        if (messageStart == std::string::npos) {
+            LOG_ERROR("This is not a valid endpoint message! Type=%c", receivedMsg.at(0));
+            return;
+        }
 
-    message::removeHeader(receivedMsg);
-    parseNewMessage();
-}
+        if (receivedMsg.size() < message::size_header) // header divided in few parts
+        {
+            state = State::ReceivedPartialHeader;
+            header.append(receivedMsg); // append to whole header string
+            return;
+        }
 
-void StateMachine::parsePartialHeader()
-{
-    auto previousHeaderLength = header.size();
-    auto missingHeaderLength  = message::size_header - previousHeaderLength;
-
-    if (receivedMsg.size() >= missingHeaderLength) // rest of the message is here
-    {
-        header.append(receivedMsg.substr(0, missingHeaderLength));
-        LOG_DEBUG("Header: %s\n", header.c_str());
+        header        = message::getHeader(receivedMsg);
         payloadLength = message::calcPayloadLength(header);
+        if (payloadLength == 0) // failed to obtain payload length from msg
+        {
+            LOG_ERROR("Damaged header!");
+            state = State::NoMsg;
+            return;
+        }
 
-        LOG_DEBUG("Payload length: %lu\n", payloadLength);
-        message::eraseFront(receivedMsg, missingHeaderLength);
+        LOG_DEBUG("Payload length: %lu", payloadLength);
 
+        message::removeHeader(receivedMsg);
         parseNewMessage();
     }
-    else // the message is even longer :(
+
+    void StateMachine::parsePartialHeader()
     {
-        header.append(receivedMsg);
-    }
-}
+        auto previousHeaderLength = header.size();
+        auto missingHeaderLength  = message::size_header - previousHeaderLength;
 
-void StateMachine::parseNewMessage()
-{
-    if (receivedMsg.size() >= payloadLength) {
+        if (receivedMsg.size() >= missingHeaderLength) // rest of the message is here
+        {
+            header.append(receivedMsg.substr(0, missingHeaderLength));
+            LOG_DEBUG("Header: %s\n", header.c_str());
+            payloadLength = message::calcPayloadLength(header);
 
-        payload = message::extractPayload(receivedMsg, payloadLength);
+            LOG_DEBUG("Payload length: %lu\n", payloadLength);
+            message::eraseFront(receivedMsg, missingHeaderLength);
 
-        parsePayload();
-
-        if (receivedMsg.size() > payloadLength) { // contains part of new header
-            message::eraseFront(receivedMsg, payloadLength);
-            parseHeader();
+            parseNewMessage();
+        }
+        else // the message is even longer :(
+        {
+            header.append(receivedMsg);
         }
     }
-    else // message divided in 2 or more packets
+
+    void StateMachine::parseNewMessage()
     {
-        payload = receivedMsg.substr(0, std::string::npos); // take rest of the message
-        state   = State::ReceivedPartialPayload;
-    }
-}
+        if (receivedMsg.size() >= payloadLength) {
 
-void StateMachine::parsePartialMessage()
-{
-    auto previousPayloadLength = payload.size();
-    auto missingPayloadLength  = payloadLength - previousPayloadLength;
+            payload = message::extractPayload(receivedMsg, payloadLength);
 
-    if (receivedMsg.size() >= missingPayloadLength) // rest of the message is here
-    {
-        payload.append(message::extractPayload(receivedMsg, missingPayloadLength));
+            parsePayload();
 
-        parsePayload();
-
-        if (receivedMsg.size() > missingPayloadLength) {
-            message::eraseFront(receivedMsg, missingPayloadLength);
-            parseHeader();
+            if (receivedMsg.size() > payloadLength) { // contains part of new header
+                message::eraseFront(receivedMsg, payloadLength);
+                parseHeader();
+            }
+        }
+        else // message divided in 2 or more packets
+        {
+            payload = receivedMsg.substr(0, std::string::npos); // take rest of the message
+            state   = State::ReceivedPartialPayload;
         }
     }
-    else // the message is even longer
+
+    void StateMachine::parsePartialMessage()
     {
-        payload.append(receivedMsg);
-    }
-}
+        auto previousPayloadLength = payload.size();
+        auto missingPayloadLength  = payloadLength - previousPayloadLength;
 
-void StateMachine::parsePayload()
-{
-    if (payload.empty()) {
-        LOG_ERROR("Empty payload!");
+        if (receivedMsg.size() >= missingPayloadLength) // rest of the message is here
+        {
+            payload.append(message::extractPayload(receivedMsg, missingPayloadLength));
+
+            parsePayload();
+
+            if (receivedMsg.size() > missingPayloadLength) {
+                message::eraseFront(receivedMsg, missingPayloadLength);
+                parseHeader();
+            }
+        }
+        else // the message is even longer
+        {
+            payload.append(receivedMsg);
+        }
+    }
+
+    void StateMachine::parsePayload()
+    {
+        if (payload.empty()) {
+            LOG_ERROR("Empty payload!");
+            state = State::NoMsg;
+            return;
+        }
+
+        messageHandler->parseMessage(payload);
+
+        if (!messageHandler->isValid() || messageHandler->isJSONNull()) {
+            LOG_DEBUG("Error parsing JSON");
+            state = State::NoMsg;
+            return;
+        }
+
+        messageHandler->processMessage();
         state = State::NoMsg;
-        return;
     }
 
-    state = State::ReceivedPayload;
-
-    messageHandler->parseMessage(payload);
-
-    if (!messageHandler->isValid() || messageHandler->isJSONNull()) {
-        LOG_DEBUG("Error parsing JSON");
-        state = State::NoMsg;
-        return;
+    void StateMachine::setMessageHandler(std::unique_ptr<MessageHandler> handler)
+    {
+        messageHandler = std::move(handler);
     }
 
-    messageHandler->processMessage();
-    state = State::NoMsg;
-}
-
-void StateMachine::setMessageHandler(std::unique_ptr<MessageHandler> handler)
-{
-    messageHandler = std::move(handler);
-}
+} // namespace sdesktop::endpoints

@@ -1,65 +1,46 @@
-project(service-desktop)
-message( "${PROJECT_NAME}  ${CMAKE_CURRENT_LIST_DIR}" )
+add_subdirectory(endpoints)
+add_subdirectory(message-common)
+add_subdirectory(message-sender)
 
-option(ENABLE_DEVELOPER_MODE_ENDPOINT "Enable developer mode endpoint in service desktop" ON)
+add_library(service-desktop STATIC)
 
-set(SOURCES
-    endpoints/BaseHelper.cpp
-    endpoints/backup/BackupEndpoint.cpp
-    endpoints/backup/BackupRestore.cpp
-    endpoints/bluetooth/BluetoothEndpoint.cpp
-    endpoints/bluetooth/BluetoothHelper.cpp
-    endpoints/bluetooth/BluetoothEventMessages.cpp
-    endpoints/bluetooth/BluetoothMessagesHandler.cpp
-    endpoints/calllog/CalllogEndpoint.cpp
-    endpoints/calllog/CalllogHelper.cpp
-    endpoints/contacts/ContactHelper.cpp
-    endpoints/contacts/ContactsEndpoint.cpp
-    endpoints/developerMode/DeveloperModeEndpoint.cpp
-    endpoints/developerMode/DeveloperModeHelper.cpp
-    endpoints/developerMode/fs/FS_Helper.cpp
-    endpoints/developerMode/Mode/UI_Helper.cpp
-    endpoints/developerMode/event/DomRequest.cpp
-    endpoints/developerMode/event/ATRequest.cpp
-    endpoints/deviceInfo/DeviceInfoEndpoint.cpp
-    endpoints/factoryReset/FactoryResetEndpoint.cpp
-    endpoints/messages/MessageHelper.cpp
-    endpoints/messages/MessagesEndpoint.cpp
-    endpoints/restore/RestoreEndpoint.cpp
-    endpoints/update/UpdateEndpoint.cpp
-    endpoints/update/UpdateHelper.cpp
-    endpoints/filesystem/FilesystemEndpoint.cpp
-    endpoints/filesystem/FileOperations.cpp
-    endpoints/filesystem/FileContext.cpp
-    endpoints/security/SecurityEndpoint.cpp
-    endpoints/security/SecurityEndpointHelper.cpp
-    endpoints/nullEndpoint/NullEndpoint.cpp
-
-    parser/HttpEnums.cpp
-    parser/ParserFSM.cpp
-    parser/MessageHandler.cpp
-
-    DesktopEvent.cpp
-    DeveloperModeMessage.cpp
-    DesktopMessages.cpp
-    ServiceDesktop.cpp
-    WorkerDesktop.cpp
-    USBSecurityModel.cpp
-)
-
-add_library(${PROJECT_NAME} STATIC ${SOURCES})
-
-add_dependencies(${PROJECT_NAME} version)
-
-target_include_directories(${PROJECT_NAME}
+target_sources(
+        service-desktop
+    PRIVATE
+        DesktopEvent.cpp
+        DeveloperModeMessage.cpp
+        DesktopMessages.cpp
+        ServiceDesktop.cpp
+        WorkerDesktop.cpp
+        USBSecurityModel.cpp
+        parser/ParserFSM.cpp
+        parser/MessageHandler.cpp
+    PRIVATE
+        WorkerDesktop.hpp
+        parser/ParserFSM.hpp
+        parser/MessageHandler.hpp
     PUBLIC
-        ${CMAKE_CURRENT_LIST_DIR}
+        include/service-desktop/Constants.hpp
+        include/service-desktop/DesktopEvent.hpp
+        include/service-desktop/DesktopMessages.hpp
+        include/service-desktop/DeveloperModeMessage.hpp
+        include/service-desktop/ServiceDesktop.hpp
+        include/service-desktop/USBSecurityModel.hpp
 )
 
-target_link_libraries(${PROJECT_NAME}
+target_include_directories(
+        service-desktop
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    PRIVATE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/parser>
+)
+
+add_dependencies(service-desktop version)
+
+target_link_libraries(service-desktop
     PRIVATE
         application-desktop
-        microtar
         module-utils
         service-appmgr
         service-cellular
@@ -68,22 +49,16 @@ target_link_libraries(${PROJECT_NAME}
         utils-bootconfig
         Microsoft.GSL::GSL
         json::json
-        base64::base64
         $<$<STREQUAL:${PROJECT_TARGET},TARGET_RT1051>:usb_stack::usb_stack>
     PUBLIC
         module-cellular
         eventstore
         hash-library::hash-library
+        desktop-endpoints
 )
-
-target_compile_definitions(
-        ${PROJECT_NAME}
-    PRIVATE
-        ENABLE_DEVELOPER_MODE_ENDPOINT=$<BOOL:${ENABLE_DEVELOPER_MODE_ENDPOINT}>
-)
-
 
 if (${ENABLE_TESTS})
-    add_subdirectory(tests)
+    # EGD-7371 - tests are disabled until dependency issues are solved
+    #add_subdirectory(tests)
 endif ()
 

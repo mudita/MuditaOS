@@ -4,8 +4,8 @@
 #include "software_watchdog.hpp"
 #include <module-os/RTOSWrapper/include/critical.hpp>
 #include <module-os/RTOSWrapper/include/ticks.hpp>
-#include <module-sys/Service/Common.hpp>
-#include <log.hpp>
+#include <Service/Common.hpp>
+#include <log/log.hpp>
 #include <cstdlib>
 
 namespace bsp::watchdog

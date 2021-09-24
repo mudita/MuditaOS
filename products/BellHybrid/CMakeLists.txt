@@ -39,6 +39,8 @@ target_link_libraries(BellHybrid
     PRIVATE
         appmgr
         bell::app-alarm
+        bell::app-onboarding
+        bell::app-background-sounds
         bell::app-common
         bell::app-main
         bell::app-powernap
@@ -47,6 +49,7 @@ target_link_libraries(BellHybrid
         bell::app-settings
         bell::db
         evtmgr
+        log
         messagetype
         module-bsp
         module-vfs
@@ -56,6 +59,7 @@ target_link_libraries(BellHybrid
         sys
         bell::time
         platform
+        version-header
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_Linux>:iosyscalls>"
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_RT1051>:CrashCatcher::CrashCatcher>"
     )
@@ -67,8 +71,6 @@ endif()
 set_source_files_properties(BellHybridMain.cpp PROPERTIES COMPILE_DEFINITIONS "${ENABLED_APPS_DEFINES}")
 
 strip_executable(BellHybrid)
-
-add_dependencies(BellHybrid version)
 
 include(AddBootBin)
 add_boot_bin(BellHybrid)

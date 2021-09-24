@@ -109,7 +109,7 @@ namespace bluetooth
     bool HSP::HSPImpl::isConnected          = false;
     bool HSP::HSPImpl::callAnswered         = false;
     bool HSP::HSPImpl::isRinging            = false;
-    std::shared_ptr<HSPAudioDevice> HSP::HSPImpl::audioDevice;
+    std::shared_ptr<CVSDAudioDevice> HSP::HSPImpl::audioDevice;
     Devicei HSP::HSPImpl::device;
 
     void HSP::HSPImpl::sendAudioEvent(audio::EventType event, audio::Event::DeviceState state)
@@ -191,7 +191,7 @@ namespace bluetooth
                 LOG_DEBUG("Audio connection establishment failed with status %u\n",
                           hsp_subevent_audio_connection_complete_get_status(event));
                 sendAudioEvent(audio::EventType::BlutoothHSPDeviceState, audio::Event::DeviceState::Disconnected);
-                isConnected = false;
+                isConnected  = false;
                 callAnswered = false;
             }
             else {
@@ -203,7 +203,7 @@ namespace bluetooth
             break;
         case HSP_SUBEVENT_AUDIO_DISCONNECTION_COMPLETE:
             LOG_DEBUG("Audio connection released.\n\n");
-            scoHandle   = HCI_CON_HANDLE_INVALID;
+            scoHandle    = HCI_CON_HANDLE_INVALID;
             callAnswered = false;
             break;
         case HSP_SUBEVENT_MICROPHONE_GAIN_CHANGED:
@@ -368,6 +368,6 @@ namespace bluetooth
 
     void HSP::HSPImpl::setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice)
     {
-        HSP::HSPImpl::audioDevice = std::static_pointer_cast<HSPAudioDevice>(audioDevice);
+        HSP::HSPImpl::audioDevice = std::static_pointer_cast<CVSDAudioDevice>(audioDevice);
     }
 } // namespace bluetooth

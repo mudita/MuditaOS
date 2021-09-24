@@ -8,7 +8,7 @@
 
 #include <application-onboarding/ApplicationOnBoarding.hpp>
 #include <service-appmgr/Controller.hpp>
-#include <source/version.hpp>
+#include <product/version.hpp>
 
 namespace app::onBoarding
 {

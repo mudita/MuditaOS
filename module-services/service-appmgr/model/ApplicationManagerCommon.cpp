@@ -11,14 +11,14 @@
 #include <Service/Message.hpp>
 #include <SystemManager/SystemManagerCommon.hpp>
 #include <SystemManager/messages/SystemManagerMessage.hpp>
-#include <application-onboarding/data/OnBoardingMessages.hpp>
+#include <apps-common/messages/OnBoardingMessages.hpp>
 #include <apps-common/messages/AppMessage.hpp>
 #include <apps-common/actions/AlarmTriggeredAction.hpp>
 #include <i18n/i18n.hpp>
 #include <log/log.hpp>
 #include <service-audio/AudioMessage.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
-#include <module-utils/Utils.hpp>
+#include <Utils.hpp>
 #include <service-appmgr/Constants.hpp>
 #include <service-desktop/Constants.hpp>
 #include <service-desktop/DesktopMessages.hpp>

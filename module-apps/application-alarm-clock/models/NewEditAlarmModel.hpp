@@ -3,11 +3,13 @@
 
 #pragma once
 
-#include "application-alarm-clock/widgets/AlarmInternalListItem.hpp"
-#include "application-alarm-clock/models/AlarmsRepository.hpp"
-#include "application-alarm-clock/data/AlarmsData.hpp"
-#include "Application.hpp"
-#include "InternalModel.hpp"
+#include <application-alarm-clock/widgets/AlarmInternalListItem.hpp>
+#include <application-alarm-clock/models/AlarmsRepository.hpp>
+#include <application-alarm-clock/data/AlarmsData.hpp>
+#include <application-alarm-clock/presenter/AlarmRRulePresenter.hpp>
+
+#include <Application.hpp>
+#include <InternalModel.hpp>
 #include <ListItemProvider.hpp>
 #include <module-db/Interface/AlarmEventRecord.hpp>
 
@@ -28,18 +30,18 @@ namespace app::alarmClock
     {
         app::ApplicationCommon *application = nullptr;
         std::shared_ptr<AbstractAlarmsRepository> alarmsRepository;
+        std::shared_ptr<alarmClock::AlarmRRulePresenter> rRulePresenter;
         gui::AlarmInternalListItem *repeatOption = nullptr;
-        bool mode24H = false;
 
       public:
         NewEditAlarmModel(app::ApplicationCommon *app,
-                          std::shared_ptr<AbstractAlarmsRepository> alarmsRepository,
-                          bool mode24H = false);
+                          std::shared_ptr<alarmClock::AlarmRRulePresenter> rRulePresenter,
+                          std::shared_ptr<AbstractAlarmsRepository> alarmsRepository);
 
         void loadData(std::shared_ptr<AlarmEventRecord> record) override;
         void saveData(std::shared_ptr<AlarmEventRecord> alarm, AlarmAction action) override;
         void loadRepeat(std::shared_ptr<AlarmEventRecord> record) override;
-        void createData(std::shared_ptr<AlarmEventRecord> record);
+        void createData();
 
         [[nodiscard]] unsigned int getMinimalItemSpaceRequired() const override;
         [[nodiscard]] unsigned int requestRecordsCount() override;

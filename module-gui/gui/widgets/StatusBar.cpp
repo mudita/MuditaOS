@@ -13,6 +13,7 @@
 #include "status-bar/SignalStrengthText.hpp"
 #include "status-bar/NetworkAccessTechnology.hpp"
 #include "status-bar/PhoneMode.hpp"
+#include "status-bar/AlarmClock.hpp"
 #include "status-bar/BT.hpp"
 #include "status-bar/SIM.hpp"
 #include "status-bar/Time.hpp"
@@ -74,6 +75,16 @@ namespace gui::status_bar
     void Configuration::setBluetoothMode(sys::bluetooth::BluetoothMode bluetoothMode)
     {
         mBluetoothMode = bluetoothMode;
+    }
+
+    void Configuration::setAlarmClockStatus(bool alarmClockStatus)
+    {
+        mAlarmClockStatus = alarmClockStatus;
+    }
+
+    auto Configuration::getAlarmClockStatus() const noexcept -> bool
+    {
+        return mAlarmClockStatus;
     }
 
     auto Configuration::isEnabled(Indicator indicator) const -> bool
@@ -149,6 +160,8 @@ namespace gui::status_bar
         sim->setMargins(gui::Margins(0, 0, margins::between, margins::iconBottom));
         bluetooth = new BT(rightBox, 0, 0);
         bluetooth->setMargins(gui::Margins(0, 0, margins::between, margins::iconBottom));
+        alarmClock = new AlarmClock(rightBox, 0, 0);
+        alarmClock->setMargins(gui::Margins(0, 0, margins::between, margins::iconBottom));
 
         updateSignalStrength();
         updateNetworkAccessTechnology();
@@ -179,6 +192,10 @@ namespace gui::status_bar
 
         if (config.isEnabled(Indicator::Bluetooth)) {
             bluetooth->setBluetoothMode(config.getBluetoothMode());
+        }
+
+        if (config.isEnabled(Indicator::AlarmClock)) {
+            alarmClock->setAlarmClockStatus(config.getAlarmClockStatus());
         }
 
         for (auto &[indicator, modifier] : config.getIndicatorsModifiers()) {
@@ -214,6 +231,9 @@ namespace gui::status_bar
             break;
         case Indicator::Bluetooth:
             showBluetooth(enabled);
+            break;
+        case Indicator::AlarmClock:
+            showAlarmClock(enabled);
             break;
         case Indicator::NetworkAccessTechnology:
             showNetworkAccessTechnology(enabled);
@@ -257,6 +277,17 @@ namespace gui::status_bar
         rightBox->resizeItems();
     }
 
+    void StatusBar::showAlarmClock(bool enabled)
+    {
+        if (enabled && configuration.getAlarmClockStatus()) {
+            alarmClock->show();
+        }
+        else {
+            alarmClock->hide();
+        }
+        rightBox->resizeItems();
+    }
+
     void StatusBar::showSim(bool enabled)
     {
         if (enabled) {
@@ -276,6 +307,17 @@ namespace gui::status_bar
         }
         configuration.setBluetoothMode(mode);
         bluetooth->setBluetoothMode(mode);
+        rightBox->resizeItems();
+        return true;
+    }
+
+    bool StatusBar::updateAlarmClock(bool status)
+    {
+        if (alarmClock == nullptr || !configuration.isEnabled(Indicator::AlarmClock)) {
+            return false;
+        }
+        configuration.setAlarmClockStatus(status);
+        alarmClock->setAlarmClockStatus(status);
         rightBox->resizeItems();
         return true;
     }

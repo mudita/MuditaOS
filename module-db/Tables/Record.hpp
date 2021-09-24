@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <log.hpp>
+#include <log/log.hpp>
 #include <cstdint>
 
 constexpr uint32_t DB_ID_NONE = 0;

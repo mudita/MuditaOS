@@ -4,6 +4,7 @@
 #include "BellMainMenuWindow.hpp"
 
 #include <application-bell-alarm/ApplicationBellAlarm.hpp>
+#include <application-bell-background-sounds/ApplicationBellBackgroundSounds.hpp>
 #include <application-bell-main/ApplicationBellMain.hpp>
 #include <application-bell-settings/ApplicationBellSettings.hpp>
 #include <application-bell-powernap/ApplicationBellPowerNap.hpp>
@@ -12,29 +13,15 @@
 
 #include <Dialog.hpp>
 #include <DialogMetadataMessage.hpp>
-#include <OptionBellMenu.hpp>
+#include <common/options/OptionBellMenu.hpp>
 #include <service-appmgr/Controller.hpp>
 
 namespace gui
 {
-
     BellMainMenuWindow::BellMainMenuWindow(app::ApplicationCommon *app)
-        : OptionWindow(app, gui::window::name::bell_main_menu)
+        : BellOptionWindow(app, gui::window::name::bell_main_menu)
     {
         addOptions(mainMenuOptionsList());
-        buildInterface();
-    }
-
-    void BellMainMenuWindow::buildInterface()
-    {
-        statusBar->setVisible(false);
-        header->setTitleVisibility(false);
-        bottomBar->setVisible(false);
-
-        optionsList->setPosition(bellMainStyle::mainMenuWindow::options_list_x,
-                                 bellMainStyle::mainMenuWindow::options_list_y);
-        optionsList->setMaximumWidth(bellMainStyle::mainMenuWindow::default_body_width);
-        optionsList->setBoundaries(gui::Boundaries::Fixed);
     }
 
     std::list<Option> BellMainMenuWindow::mainMenuOptionsList()
@@ -83,7 +70,7 @@ namespace gui
         addAppMenu(utils::translate("app_bellmain_power_nap"), app::applicationBellPowerNapName);
         addAppMenu(utils::translate("app_bellmain_meditation_timer"), app::applicationBellMeditationTimerName);
         // for demo only - to be replaced by call o final window
-        addWinMenu(utils::translate("app_bellmain_background_sounds"), gui::window::name::bell_main_menu_dialog);
+        addAppMenu(utils::translate("app_bellmain_background_sounds"), app::applicationBellBackgroundSoundsName);
         addWinMenu(utils::translate("app_bellmain_bedtime"), gui::window::name::bell_main_menu_dialog);
 
         addAppMenu(utils::translate("app_bellmain_settings"), app::applicationBellSettingsName);

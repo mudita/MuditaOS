@@ -18,7 +18,6 @@ include(Colours)
 include(CCacheConfig)
 include(ProjectConfig)
 include(ModuleConfig)
-include(module-lwip/lwip-includes.cmake)
 include(SerialPort)
 include(CopyGdbInit)
 include(Utils)
@@ -131,7 +130,6 @@ add_subdirectory(module-audio)
 add_subdirectory(module-services)
 add_subdirectory(module-apps)
 add_subdirectory(module-bluetooth)
-add_subdirectory(module-lwip)
 add_subdirectory(image)
 add_subdirectory(host-tools)
 
@@ -157,6 +155,10 @@ add_custom_target(
     COMMENT
         "Generating version info"
     )
+
+add_library(version-header INTERFACE)
+target_include_directories(version-header INTERFACE $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/source/include>)
+add_dependencies(version-header version)
 
 fetch_ecoboot()
 fetch_updater()

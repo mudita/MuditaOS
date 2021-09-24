@@ -24,10 +24,10 @@ namespace app
 
     ApplicationBellAlarm::ApplicationBellAlarm(std::string name,
                                                std::string parent,
-                                               sys::phone_modes::PhoneMode mode,
-                                               sys::bluetooth::BluetoothMode bluetoothMode,
-                                               StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), mode, bluetoothMode, startInBackground),
+                                               StatusIndicators statusIndicators,
+                                               StartInBackground startInBackground,
+                                               uint32_t stackDepth)
+        : Application(std::move(name), std::move(parent), statusIndicators, startInBackground, stackDepth),
           priv{std::make_unique<app::internal::BellAlarmPriv>()}
     {}
     ApplicationBellAlarm::~ApplicationBellAlarm() = default;

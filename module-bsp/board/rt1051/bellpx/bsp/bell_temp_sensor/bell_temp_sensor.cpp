@@ -8,7 +8,7 @@
 #include "drivers/gpio/DriverGPIO.hpp"
 
 #include "fsl_common.h"
-#include <log.hpp>
+#include <log/log.hpp>
 
 namespace bsp::bell_temp_sensor
 {

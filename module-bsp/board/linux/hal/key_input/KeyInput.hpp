@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <module-bsp/hal/key_input/AbstractKeyInput.hpp>
+#include <hal/key_input/AbstractKeyInput.hpp>
 
 namespace hal::key_input
 {

@@ -23,7 +23,7 @@ namespace gui
       public:
         Image();
         /// create new Image element and resize it to size needed by selected Image
-        Image(const UTF8 &);
+        Image(const UTF8 &imageName, ImageTypeSpecifier specifier = ImageTypeSpecifier::None);
         Image(Item *parent, const UTF8 &imageName, ImageTypeSpecifier specifier = ImageTypeSpecifier::None);
         /// Create new Image element on position x,y w&h will be *ignored*
         Image(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h, const UTF8 = UTF8{""});

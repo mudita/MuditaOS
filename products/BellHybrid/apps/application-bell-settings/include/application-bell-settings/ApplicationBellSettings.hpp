@@ -15,7 +15,6 @@ namespace gui::window::name
     inline constexpr auto bellSettingsFinished                       = "BellSettingsFinished";
     inline constexpr auto bellSettingsFrontlight                     = "BellSettingsFrontlight";
     inline constexpr auto bellSettingsHomeView                       = "BellSettingsHomeView";
-    inline constexpr auto bellSettingsAlarmSettingsPrewakeUp         = "BellSettingsAlarmSettingsPrewakeUp";
     inline constexpr auto bellSettingsAlarmSettingsAlarmToneAndLight = "BellSettingsAlarmSettingsAlarmToneAndLight";
     inline constexpr auto bellSettingsBedtimeTone                    = "BellSettingsBedtimeTone";
     inline constexpr auto bellSettingsTurnOff                        = "BellSettingsTurnOff";
@@ -47,11 +46,10 @@ namespace app
     class ApplicationBellSettings : public Application, public settingsInterface::BellScreenLightSettings
     {
       public:
-        ApplicationBellSettings(std::string name                            = applicationBellSettingsName,
-                                std::string parent                          = "",
-                                sys::phone_modes::PhoneMode mode            = sys::phone_modes::PhoneMode::Offline,
-                                sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled,
-                                StartInBackground startInBackground         = {false});
+        ApplicationBellSettings(std::string name                    = applicationBellSettingsName,
+                                std::string parent                  = "",
+                                StatusIndicators statusIndicators   = StatusIndicators{},
+                                StartInBackground startInBackground = {false});
 
         sys::ReturnCodes InitHandler() override;
 

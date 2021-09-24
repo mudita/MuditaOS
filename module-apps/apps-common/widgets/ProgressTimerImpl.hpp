@@ -21,6 +21,11 @@ namespace gui
 
 namespace app
 {
+    enum class ProgressCountdownMode
+    {
+        Decreasing,
+        Increasing
+    };
 
     class ProgressTimerImpl : public ProgressTimer
     {
@@ -43,6 +48,7 @@ namespace app
         std::function<void()> onFinishedCallback = nullptr;
         std::function<void()> onIntervalCallback = nullptr;
         std::function<void()> onBaseTickCallback = nullptr;
+        ProgressCountdownMode countdownMode;
 
         void startTimer();
         void update();
@@ -57,7 +63,8 @@ namespace app
         ProgressTimerImpl(app::ApplicationCommon *app,
                           gui::Item *parent,
                           std::string timerName,
-                          std::chrono::milliseconds baseTick);
+                          std::chrono::milliseconds baseTick,
+                          ProgressCountdownMode countdownMode = ProgressCountdownMode::Decreasing);
         void reset(std::chrono::seconds _duration,
                    std::chrono::seconds _interval = std::chrono::seconds::zero(),
                    std::chrono::seconds _elapsed  = std::chrono::seconds::zero()) override;

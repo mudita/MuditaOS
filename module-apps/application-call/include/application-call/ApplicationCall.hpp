@@ -6,7 +6,7 @@
 #include "Application.hpp"
 #include "CallState.hpp"
 
-#include <module-sys/Timers/TimerHandle.hpp>
+#include <Timers/TimerHandle.hpp>
 #include <service-cellular/CellularMessage.hpp>
 #include <service-evtmgr/Constants.hpp>
 #include <service-evtmgr/EVMessages.hpp>
@@ -71,11 +71,10 @@ namespace app
         call::State callState = call::State::IDLE;
 
       public:
-        explicit ApplicationCall(std::string name                            = name_call,
-                                 std::string parent                          = {},
-                                 sys::phone_modes::PhoneMode phoneMode       = sys::phone_modes::PhoneMode::Connected,
-                                 sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled,
-                                 StartInBackground startInBackground         = {false});
+        explicit ApplicationCall(std::string name                    = name_call,
+                                 std::string parent                  = {},
+                                 StatusIndicators statusIndicators   = StatusIndicators{},
+                                 StartInBackground startInBackground = {false});
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
         bool isPopupPermitted(gui::popup::ID popupId) const override;
@@ -142,7 +141,8 @@ namespace app
                      manager::actions::HandleIncomingCall,
                      manager::actions::HandleCallerId,
                      manager::actions::HandleCallerId,
-                     manager::actions::BluetoothModeChanged},
+                     manager::actions::BluetoothModeChanged,
+                     manager::actions::AlarmClockStatusChanged},
                     locks::AutoLockPolicy::PreventPermanently};
         }
     };

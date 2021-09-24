@@ -17,7 +17,6 @@ namespace bluetooth::sco::utils
         if (scoHandle == HCI_CON_HANDLE_INVALID) {
             return;
         }
-
         constexpr auto offset         = 3;
         constexpr auto lengthPosition = 2;
         const auto scoPacketLength    = hci_get_sco_packet_length();

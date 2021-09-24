@@ -1,10 +1,10 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "SystemTimer.hpp"
-#include "module-sys/Service/Service.hpp"
-#include "TimerMessage.hpp"
-#include <log.hpp>
+#include <Timers/SystemTimer.hpp>
+#include <Service/Service.hpp>
+#include <Timers/TimerMessage.hpp>
+#include <log/log.hpp>
 #include <projdefs.h>
 #include <memory>
 

@@ -5,7 +5,7 @@
 
 #include <apps-common/ApplicationCommon.hpp>
 #include <tags_fetcher/TagsFetcher.hpp>
-#include <purefs/filesystem_paths.hpp>
+#include <module-db/Interface/MultimediaFilesRecord.hpp>
 
 #include <memory>
 #include <optional>
@@ -38,32 +38,35 @@ namespace app::music_player
     class AbstractSongsRepository
     {
       public:
+        using OnGetMusicFilesListCallback =
+            std::function<bool(const std::vector<db::multimedia_files::MultimediaFilesRecord> &, unsigned int)>;
+
         virtual ~AbstractSongsRepository() noexcept = default;
 
-        virtual void scanMusicFilesList()                                          = 0;
-        virtual std::vector<tags::fetcher::Tags> getMusicFilesList() const         = 0;
+        virtual void getMusicFilesList(std::uint32_t offset,
+                                       std::uint32_t limit,
+                                       const OnGetMusicFilesListCallback &callback) = 0;
         virtual std::size_t getFileIndex(const std::string &filePath) const        = 0;
         virtual std::string getNextFilePath(const std::string &filePath) const     = 0;
         virtual std::string getPreviousFilePath(const std::string &filePath) const = 0;
     };
 
-    class SongsRepository : public AbstractSongsRepository
+    class SongsRepository : public AbstractSongsRepository, public app::AsyncCallbackReceiver
     {
-        static constexpr auto musicSubfolderName = "music";
-
       public:
-        explicit SongsRepository(std::unique_ptr<AbstractTagsFetcher> tagsFetcher,
-                                 std::string musicFolderName = purefs::dir::getUserDiskPath() / musicSubfolderName);
+        explicit SongsRepository(ApplicationCommon *application, std::unique_ptr<AbstractTagsFetcher> tagsFetcher);
 
-        void scanMusicFilesList() override;
-        std::vector<tags::fetcher::Tags> getMusicFilesList() const override;
+        void getMusicFilesList(std::uint32_t offset,
+                               std::uint32_t limit,
+                               const OnGetMusicFilesListCallback &callback) override;
         std::size_t getFileIndex(const std::string &filePath) const override;
         std::string getNextFilePath(const std::string &filePath) const override;
         std::string getPreviousFilePath(const std::string &filePath) const override;
 
       private:
+        ApplicationCommon *application;
+
         std::unique_ptr<AbstractTagsFetcher> tagsFetcher;
-        std::string musicFolderName;
-        std::vector<tags::fetcher::Tags> musicFiles;
+        std::vector<db::multimedia_files::MultimediaFilesRecord> musicFiles;
     };
 } // namespace app::music_player

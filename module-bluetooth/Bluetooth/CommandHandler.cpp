@@ -9,9 +9,8 @@
 #include <Service/Service.hpp>
 
 #include "Device.hpp"
-#include "BtCommand.hpp"
 
-#include <service-desktop/service-desktop/Constants.hpp>
+#include <service-desktop/Constants.hpp>
 #include <service-bluetooth/messages/ResponseVisibleDevices.hpp>
 #include "GAP/GAP.hpp"
 
@@ -49,8 +48,6 @@ namespace bluetooth
             return availableDevices();
         case bluetooth::Command::StopScan:
             return stopScan();
-        case bluetooth::Command::StartPan:
-            return startPan();
         case bluetooth::Command::Pair:
             return pair(command.getDevice());
         case bluetooth::Command::Unpair:
@@ -103,16 +100,6 @@ namespace bluetooth
         LOG_INFO("Stopping scan!");
         driver->stopScan();
         return Error::Success;
-    }
-
-    Error::Code CommandHandler::startPan()
-    {
-        bluetooth::PAN::bnep_setup();
-        if (const auto err = bluetooth::PAN::bnep_start(); err.err != bluetooth::Error::Success) {
-            LOG_ERROR("PAN setup error: %s %" PRIu32, toString(err.err).c_str(), err.lib_code);
-            return err.err;
-        }
-        return bluetooth::Error::Success;
     }
 
     Error::Code CommandHandler::setVisibility(bool visibility)

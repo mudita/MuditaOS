@@ -11,6 +11,9 @@ target_include_directories(eventstore
 )
 
 target_link_libraries(eventstore
+   PUBLIC
+      hal
+
    PRIVATE
       module-os
 )

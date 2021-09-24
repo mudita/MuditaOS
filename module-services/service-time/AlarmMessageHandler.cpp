@@ -100,10 +100,21 @@ namespace alarms
         alarmOperations->minuteUpdated(TimePointNow());
     }
 
-    auto AlarmMessageHandler::addAlarmExecutionHandler(const alarms::AlarmType type,
-                                                       const std::shared_ptr<alarms::AlarmHandler> handler) -> void
+    auto AlarmMessageHandler::handleStopAllSnoozedAlarms() -> void
     {
-        alarmOperations->addAlarmExecutionHandler(type, handler);
+        alarmOperations->stopAllSnoozedAlarms();
+    }
+
+    auto AlarmMessageHandler::handleAddSnoozedAlarmCountChangeCallback(
+        AlarmOperationsCommon::OnSnoozedAlarmsCountChange callback) -> void
+    {
+        alarmOperations->addSnoozedAlarmsCountChangeCallback(callback);
+    }
+
+    auto AlarmMessageHandler::handleAddActiveAlarmCountChangeCallback(
+        AlarmOperationsCommon::OnActiveAlarmCountChange callback) -> void
+    {
+        alarmOperations->addActiveAlarmCountChangeCallback(callback);
     }
 
     template <class RequestType, class ResponseType, class CallbackParamType>

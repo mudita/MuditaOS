@@ -15,7 +15,7 @@
 #include "TextDocument.hpp"
 #include "TextLine.hpp"
 #include "TextParse.hpp"
-#include <log.hpp>
+#include <log/log.hpp>
 #include "utf8/UTF8.hpp"
 #include <Style.hpp>
 #include <cassert>
@@ -220,11 +220,13 @@ namespace gui
 
     void Text::setMinimumWidthToFitText(const UTF8 &text)
     {
-        auto textToFit = !text::RichTextParser().parse(text, &format)->getText().empty()
-                             ? text::RichTextParser().parse(text, &format)->getText()
-                             : text;
+        if (!text.empty()) {
+            auto textToFit = !text::RichTextParser().parse(text, &format)->getText().empty()
+                                 ? text::RichTextParser().parse(text, &format)->getText()
+                                 : text;
 
-        setMinimumWidth(format.getFont()->getPixelWidth(textToFit) + TextCursor::defaultWidth);
+            setMinimumWidth(format.getFont()->getPixelWidth(textToFit) + TextCursor::defaultWidth);
+        }
     }
 
     void Text::setMinimumHeightToFitText(unsigned int linesCount)

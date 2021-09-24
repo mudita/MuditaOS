@@ -12,7 +12,7 @@
 #include <apps-common/windows/DialogMetadata.hpp>
 #include <log/log.hpp>
 #include <module-apps/application-phonebook/data/PhonebookItemData.hpp>
-#include <module-sys/Timers/TimerFactory.hpp>
+#include <Timers/TimerFactory.hpp>
 #include <PhoneNumber.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <service-appmgr/data/MmiActionsParams.hpp>
@@ -27,10 +27,9 @@ namespace app
 {
     ApplicationCall::ApplicationCall(std::string name,
                                      std::string parent,
-                                     sys::phone_modes::PhoneMode phoneMode,
-                                     sys::bluetooth::BluetoothMode bluetoothMode,
+                                     StatusIndicators statusIndicators,
                                      StartInBackground startInBackground)
-        : Application(name, parent, phoneMode, bluetoothMode, startInBackground, app::call_stack_size)
+        : Application(name, parent, statusIndicators, startInBackground, app::call_stack_size)
     {
         using namespace gui::status_bar;
         statusBarManager->enableIndicators(

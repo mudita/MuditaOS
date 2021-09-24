@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <common/models/AbstractSnoozeSettingsModel.hpp>
+#include <models/alarm_settings/AbstractSnoozeSettingsModel.hpp>
 #include <common/widgets/BellSideListItemWithCallbacks.hpp>
 #include <apps-common/InternalModel.hpp>
 

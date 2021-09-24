@@ -1,15 +1,15 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "BackupRestore.hpp"
+#include <endpoints/backup/BackupRestore.hpp>
 
 #include <SystemManager/SystemManagerCommon.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <microtar.hpp>
 #include <purefs/filesystem_paths.hpp>
 #include <service-db/DBServiceAPI.hpp>
 #include <service-db/DBServiceName.hpp>
-#include <module-utils/Utils.hpp>
+#include <Utils.hpp>
 
 #include <cassert>
 #include <filesystem>

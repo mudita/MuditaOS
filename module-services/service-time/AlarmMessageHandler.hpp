@@ -34,9 +34,10 @@ namespace alarms
         auto handleSnoozeRingingAlarm(RingingAlarmSnoozeRequestMessage *request)
             -> std::shared_ptr<RingingAlarmSnoozeResponseMessage>;
         auto handleMinuteUpdated() -> void;
-
-        auto addAlarmExecutionHandler(const alarms::AlarmType type, const std::shared_ptr<alarms::AlarmHandler> handler)
+        auto handleStopAllSnoozedAlarms() -> void;
+        auto handleAddSnoozedAlarmCountChangeCallback(AlarmOperationsCommon::OnSnoozedAlarmsCountChange callback)
             -> void;
+        auto handleAddActiveAlarmCountChangeCallback(AlarmOperationsCommon::OnActiveAlarmCountChange callback) -> void;
 
       private:
         stm::ServiceTime *service = nullptr;

@@ -8,19 +8,19 @@
 
 namespace gui
 {
-    class ImageBox : public HBox
+    class ImageBox : public VBox
     {
       public:
-        ImageBox(
-            Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w, const uint32_t &h, Image *image);
+        ImageBox(Item *parent, const Position &x, const Position &y, const Length &w, const Length &h, Image *image);
+        ImageBox(Item *parent, Image *image);
 
         ~ImageBox() override = default;
 
         void showImage(bool show);
         void setImage(const UTF8 &name);
-        void setMinimumSizeToFitImage();
+        virtual void setMinimumSizeToFitImage();
 
-      private:
+      protected:
         Image *image;
     };
 }; // namespace gui

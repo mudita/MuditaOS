@@ -26,12 +26,12 @@
 
 #include "SystemManager/messages/SentinelRegistrationMessage.hpp"
 
-#include <log.hpp>
+#include <log/log.hpp>
 #include <bits/exception.h>
 #include <utility>
-#include <service-desktop/service-desktop/DesktopMessages.hpp>
-#include <service-desktop/endpoints/bluetooth/BluetoothEventMessages.hpp>
-#include <service-desktop/endpoints/bluetooth/BluetoothHelper.hpp>
+#include <service-desktop/DesktopMessages.hpp>
+#include <endpoints/bluetooth/BluetoothEventMessages.hpp>
+#include <endpoints/bluetooth/BluetoothHelper.hpp>
 #include <service-audio/AudioServiceAPI.hpp>
 #include <BtCommand.hpp>
 #include <BtKeysStorage.hpp>
@@ -350,20 +350,6 @@ auto ServiceBluetooth::handle(BluetoothMessage *msg) -> std::shared_ptr<sys::Mes
     case BluetoothMessage::getDevicesAvailable:
         sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::getDevicesAvailable));
         break;
-    case BluetoothMessage::PAN: {
-        /// TODO request lwip first...
-        /// because TODO blocking message - wrecks system
-        LOG_INFO("Request LwIP running!");
-        //                    auto ret = message_lwip(this, LwIP_message::Request::Start);
-        //                    if (ret != sys::ReturnCodes::Success) {
-        //                        LOG_ERROR("Request for LwIP start failed");
-        //                    }
-        //                    else {
-        /// TODO request PPP
-        LOG_INFO("Start PAN");
-        sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::StartPan));
-        //                    }
-    } break;
     case BluetoothMessage::Visible: {
         auto visibility =
             not std::visit(bluetooth::BoolVisitor(), settingsHolder->getValue(bluetooth::Settings::Visibility));

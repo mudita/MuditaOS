@@ -3,7 +3,7 @@
 
 #include "ApplicationOnBoarding.hpp"
 
-#include "data/OnBoardingMessages.hpp"
+#include "apps-common/messages/OnBoardingMessages.hpp"
 #include "windows/StartConfigurationWindow.hpp"
 #include "windows/OnBoardingLanguagesWindow.hpp"
 #include "windows/EULALicenseWindow.hpp"
@@ -31,11 +31,9 @@ namespace app
 
     ApplicationOnBoarding::ApplicationOnBoarding(std::string name,
                                                  std::string parent,
-                                                 sys::phone_modes::PhoneMode phoneMode,
-                                                 sys::bluetooth::BluetoothMode bluetoothMode,
+                                                 StatusIndicators statusIndicators,
                                                  StartInBackground startInBackground)
-        : Application(
-              std::move(name), std::move(parent), phoneMode, bluetoothMode, startInBackground, OnBoardingStackSize)
+        : Application(std::move(name), std::move(parent), statusIndicators, startInBackground, OnBoardingStackSize)
     {
         using namespace gui::status_bar;
         statusBarManager->enableIndicators(
@@ -174,7 +172,8 @@ namespace app
                       gui::popup::ID::Tethering,
                       gui::popup::ID::PhoneModes,
                       gui::popup::ID::PhoneLock,
-                      gui::popup::ID::SimLock});
+                      gui::popup::ID::SimLock,
+                      gui::popup::ID::Alarm});
     }
 
     void ApplicationOnBoarding::destroyUserInterface()

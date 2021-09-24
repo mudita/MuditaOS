@@ -2,36 +2,38 @@ add_library(time-constants INTERFACE)
 
 target_include_directories(time-constants INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
 
-target_sources(time-constants 
+target_sources(time-constants
     PUBLIC
         time/time_constants.hpp
 )
 
-add_library(time)
+add_library(utils-time)
 
-module_is_test_entity(time)
-
-target_sources(time
+target_sources(utils-time
     PRIVATE
         time/time_conversion.cpp
         time/time_date_validation.cpp
+        time/time_conversion_factory.cpp
+        time/dateCommon.hpp
         time/TimeRangeParser.cpp
         time/TimeZone.cpp
-        time/time_conversion_factory.cpp
-
-        time/dateCommon.hpp
 )
 
-target_include_directories(time PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
-
-target_link_libraries(time 
-    PRIVATE 
-        time-constants
-        utz::utz
+target_include_directories(utils-time
     PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+)
+
+target_link_libraries(utils-time
+    PRIVATE
+        utz::utz
+
+    PUBLIC
+        time-constants
+        date
         i18n
-        log
-        module-utils
+        log-api
+        utility
         utf8
 )
 

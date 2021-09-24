@@ -32,6 +32,7 @@
 #include <module-db/Databases/MultimediaFilesDB.hpp>
 #include <module-db/Interface/AlarmEventRecord.hpp>
 #include <module-db/Interface/CountryCodeRecord.hpp>
+#include <module-db/Interface/NotesRecord.hpp>
 #include <module-db/Interface/NotificationsRecord.hpp>
 #include <module-db/Interface/MultimediaFilesRecord.hpp>
 
@@ -43,7 +44,6 @@
 #include <service-audio/ServiceAudio.hpp>
 #include <service-bluetooth/ServiceBluetooth.hpp>
 #include <service-db/agents/quotes/QuotesAgent.hpp>
-#include <service-lwip/ServiceLwIP.hpp>
 #include <service-time/ServiceTime.hpp>
 #include <Service/ServiceCreator.hpp>
 #include <service-gui/ServiceGUI.hpp>
@@ -53,17 +53,17 @@
 #include <service-desktop/ServiceDesktop.hpp>
 
 #if ENABLE_GSM == 1
-#include <service-fota/ServiceFota.hpp>
 #include <service-cellular/ServiceCellular.hpp>
 #include <service-antenna/ServiceAntenna.hpp>
 #endif
 
 #include <Application.hpp>
 #include <ApplicationLauncher.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <Logger.hpp>
-#include <source/version.hpp>
+#include <product/version.hpp>
 #include <sys/SystemManager.hpp>
+#include <time/AlarmOperations.hpp>
 #include <SystemWatchdog/SystemWatchdog.hpp>
 #include <thread.hpp>
 
@@ -103,13 +103,11 @@ int main()
 #else
     systemServices.emplace_back(sys::CreatorFor<ServiceAntenna>());
     systemServices.emplace_back(sys::CreatorFor<ServiceCellular>());
-    systemServices.emplace_back(sys::CreatorFor<FotaService::Service>());
 #endif
     systemServices.emplace_back(sys::CreatorFor<ServiceAudio>());
     systemServices.emplace_back(sys::CreatorFor<ServiceBluetooth>());
-    systemServices.emplace_back(sys::CreatorFor<ServiceLwIP>());
     systemServices.emplace_back(sys::CreatorFor<ServiceDesktop>());
-    systemServices.emplace_back(sys::CreatorFor<stm::ServiceTime>());
+    systemServices.emplace_back(sys::CreatorFor<stm::ServiceTime>(std::make_shared<alarms::AlarmOperationsFactory>()));
     systemServices.emplace_back(sys::CreatorFor<service::eink::ServiceEink>());
     systemServices.emplace_back(sys::CreatorFor<service::gui::ServiceGUI>());
 

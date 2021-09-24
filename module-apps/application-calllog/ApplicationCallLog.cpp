@@ -13,7 +13,7 @@
 #include <Dialog.hpp>
 #include <OptionWindow.hpp>
 #include <i18n/i18n.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <MessageType.hpp>
 #include <module-db/queries/calllog/QueryCalllogSetAllRead.hpp>
 #include <module-db/queries/notifications/QueryNotificationsClear.hpp>
@@ -24,10 +24,9 @@ namespace app
 {
     ApplicationCallLog::ApplicationCallLog(std::string name,
                                            std::string parent,
-                                           sys::phone_modes::PhoneMode phoneMode,
-                                           sys::bluetooth::BluetoothMode bluetoothMode,
+                                           StatusIndicators statusIndicators,
                                            StartInBackground startInBackground)
-        : Application(name, parent, phoneMode, bluetoothMode, startInBackground, 4096)
+        : Application(name, parent, statusIndicators, startInBackground, 4096)
     {
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         addActionReceiver(manager::actions::ShowCallLog, [this](auto &&data) {
@@ -96,8 +95,11 @@ namespace app
             return std::make_unique<gui::DialogYesNo>(app, name);
         });
 
-        attachPopups(
-            {gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes, gui::popup::ID::PhoneLock});
+        attachPopups({gui::popup::ID::Volume,
+                      gui::popup::ID::Tethering,
+                      gui::popup::ID::PhoneModes,
+                      gui::popup::ID::PhoneLock,
+                      gui::popup::ID::Alarm});
     }
 
     void ApplicationCallLog::destroyUserInterface()

@@ -4,7 +4,7 @@
 #include "ThreadWindowOptions.hpp"
 
 #include <i18n/i18n.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <OptionCall.hpp>
 #include <OptionContact.hpp>
 #include <OptionWindow.hpp>

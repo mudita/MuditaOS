@@ -3,23 +3,17 @@
 
 #include "BatteryCharger.hpp"
 
-#include <sys/stat.h>
-#include <fcntl.h>
 #include <EventStore.hpp>
 #include <hal/GenericFactory.hpp>
-#include <service-evtmgr/battery-level-check/BatteryLevelCheck.hpp>
-#include <service-evtmgr/BatteryMessages.hpp>
-#include <service-evtmgr/EventManagerCommon.hpp>
 #include <magic_enum.hpp>
 
 #include <algorithm>
 
+#include <sys/stat.h>
+#include <fcntl.h>
+
 namespace hal::battery
 {
-    std::shared_ptr<AbstractBatteryCharger> AbstractBatteryCharger::Factory::create(sys::Service *service)
-    {
-        return hal::impl::factory<LinuxBatteryCharger, AbstractBatteryCharger>(service);
-    }
 
     namespace
     {
@@ -36,7 +30,8 @@ namespace hal::battery
         constexpr auto queueTimeoutTicks    = 100;
         constexpr auto taskDelay            = 50;
 
-        constexpr unsigned fullBattery = 100;
+        constexpr auto fullBattery              = 100U;
+        constexpr auto dummyBatteryVoltageLevel = 3700;
 
         constexpr auto chargerPlugStateChange = 'p';
         constexpr auto batteryLevelUp         = ']';
@@ -101,10 +96,11 @@ namespace hal::battery
         }
     } // namespace
 
-    LinuxBatteryCharger::LinuxBatteryCharger(sys::Service *service) : service{service}
+    BatteryCharger::BatteryCharger(AbstractBatteryCharger::BatteryChargerEvents &eventsHandler)
+        : eventsHandler(eventsHandler)
     {}
 
-    void LinuxBatteryCharger::init(xQueueHandle irqQueueHandle, xQueueHandle dcdQueueHandle)
+    void BatteryCharger::init(xQueueHandle irqQueueHandle, xQueueHandle dcdQueueHandle)
     {
         IRQQueueHandle = irqQueueHandle;
         DCDQueueHandle = dcdQueueHandle;
@@ -113,14 +109,14 @@ namespace hal::battery
         Store::Battery::modify().level = batteryLevel;
     }
 
-    void LinuxBatteryCharger::deinit()
+    void BatteryCharger::deinit()
     {
         IRQQueueHandle = nullptr;
         DCDQueueHandle = nullptr;
         vTaskDelete(batteryWorkerHandle);
     }
 
-    void LinuxBatteryCharger::processStateChangeNotification(std::uint8_t notification)
+    void BatteryCharger::processStateChangeNotification(std::uint8_t notification)
     {
         if (isPlugged) {
             if (batteryLevel > fullBattery) {
@@ -137,13 +133,15 @@ namespace hal::battery
         }
         batteryLevel                   = std::clamp(batteryLevel, unsigned{0}, fullBattery);
         Store::Battery::modify().level = batteryLevel;
-        battery_level_check::checkBatteryLevel();
-
-        auto message = std::make_shared<sevm::BatteryStatusChangeMessage>();
-        service->bus.sendUnicast(std::move(message), service::name::evt_manager);
+        eventsHandler.onStatusChanged();
     }
 
-    void LinuxBatteryCharger::setChargingCurrentLimit(std::uint8_t usbType)
+    int BatteryCharger::getBatteryVoltage()
+    {
+        return dummyBatteryVoltageLevel;
+    }
+
+    void BatteryCharger::setChargingCurrentLimit(std::uint8_t usbType)
     {
         auto usbTypeStr = magic_enum::enum_name(static_cast<USBSourceType>(usbType));
         LOG_INFO("Setup charging current for usb source type: %s", usbTypeStr.data());

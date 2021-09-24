@@ -69,15 +69,17 @@ TEST_CASE("Query interface")
 
     SECTION("Endpoint callback test")
     {
+        using sdesktop::endpoints::Context;
+
         std::shared_ptr<db::Query> query = std::make_shared<db::query::SMSGetCount>();
         auto testMessage                 = R"({"endpoint":6, "method":1, "uuid":12345, "body":{"test":"test"}})";
         std::string err;
         auto msgJson = json11::Json::parse(testMessage, err);
         REQUIRE(err.empty());
 
-        parserFSM::Context context(msgJson);
+        Context context(msgJson);
         auto listener = std::make_unique<db::EndpointListener>(
-            [=](db::QueryResult *result, parserFSM::Context &context) {
+            [=](db::QueryResult *result, Context &context) {
                 if (auto SMSResult = dynamic_cast<db::query::SMSGetCountResult *>(result)) {
                     auto id   = SMSResult->getResults();
                     auto body = json11::Json::object{{"count", static_cast<int>(id)}};

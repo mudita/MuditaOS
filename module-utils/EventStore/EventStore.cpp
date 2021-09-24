@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "EventStore.hpp"
-#include <log.hpp>
+#include <log/log.hpp>
 #include <memory>
 #include <mutex.hpp>
 

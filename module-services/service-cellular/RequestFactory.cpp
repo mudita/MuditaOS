@@ -6,7 +6,7 @@
 #include <re2/re2.h>
 
 #include <at/Commands.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 
 #include "service-cellular/requests/CallRequest.hpp"
 #include "service-cellular/requests/SupplementaryServicesRequest.hpp"

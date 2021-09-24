@@ -59,6 +59,21 @@ namespace alarms
         {
             return sendRequest<RingingAlarmSnoozeRequestMessage>(serv, id, nextAlarmTime);
         }
+
+        bool requestStopAllSnoozedAlarms(sys::Service *serv)
+        {
+            return sendRequest<StopAllSnoozedAlarmsRequestMessage>(serv);
+        }
+
+        bool requestRegisterSnoozedAlarmsCountChangeCallback(sys::Service *serv)
+        {
+            return sendRequest<RegisterSnoozedAlarmsCountChangeHandlerRequestMessage>(serv);
+        }
+
+        bool requestRegisterActiveAlarmsIndicatorHandler(sys::Service *serv)
+        {
+            return sendRequest<RegisterActiveAlarmsIndicatorHandlerRequestMessage>(serv);
+        }
     }; // namespace AlarmServiceAPI
 
 } // namespace alarms

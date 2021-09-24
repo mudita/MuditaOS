@@ -4,7 +4,7 @@
 #include "CalllogRecord.hpp"
 
 #include <ContactRecord.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <Tables/CalllogTable.hpp>
 #include <PhoneNumber.hpp>
 #include <Utils.hpp>

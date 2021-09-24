@@ -72,20 +72,10 @@ namespace gui
         GUI_SHOW_RETURN
     };
 
-    enum class AlignementFlags
+    enum class Orientation
     {
-        GUI_ALIGN_VERTICAL_CENTER   = 0x01,
-        GUI_ALIGN_VERTICAL_TOP      = 0x02,
-        GUI_ALIGN_VERTICAL_BOTTOM   = 0x04,
-        GUI_ALIGN_HORIZONTAL_CENTER = 0x08,
-        GUI_ALIGN_HORIZONTAL_LEFT   = 0x10,
-        GUI_ALIGN_HORIZONTAL_RIGHT  = 0x20
-    };
-
-    enum class OrientationFlags
-    {
-        GUI_ORIENTATION_HORIZONTAL = 0x00,
-        GUI_ORIENTATION_VERTICAL   = 0x01
+        Vertical,
+        Horizontal
     };
 
     template <class T> bool operator&(const T &lhs, const T &rhs)
@@ -139,6 +129,7 @@ namespace gui
         BottomLeft  = 0x40,
         BottomRight = 0x80,
     };
+
     enum class Boundaries
     {
         Fixed,     ///< Fixed - will stop scrolling on first or last elements on appropriate top or bottom

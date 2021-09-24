@@ -14,10 +14,9 @@ namespace app
       public:
         ApplicationAlarmClock(std::string name,
                               std::string parent,
-                              sys::phone_modes::PhoneMode phoneMode       = sys::phone_modes::PhoneMode::Connected,
-                              sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled,
-                              uint32_t stackDepth                         = 4096,
-                              sys::ServicePriority priority               = sys::ServicePriority::Idle);
+                              StatusIndicators statusIndicators = StatusIndicators{},
+                              uint32_t stackDepth               = 4096 * 2,
+                              sys::ServicePriority priority     = sys::ServicePriority::Idle);
 
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
 
@@ -36,8 +35,10 @@ namespace app
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {
-            return {
-                {manager::actions::Launch, manager::actions::PhoneModeChanged, manager::actions::BluetoothModeChanged}};
+            return {{manager::actions::Launch,
+                     manager::actions::PhoneModeChanged,
+                     manager::actions::BluetoothModeChanged,
+                     manager::actions::AlarmClockStatusChanged}};
         }
     };
 } // namespace app

@@ -3,10 +3,9 @@
 
 #include "BellSettingsStyle.hpp"
 #include "SnoozeListItemProvider.hpp"
-#include "SnoozeListItems.hpp"
+#include <common/widgets/ListItems.hpp>
 
 #include <apps-common/ApplicationCommon.hpp>
-#include <common/models/SnoozeSettingsModel.hpp>
 #include <gui/widgets/ListViewEngine.hpp>
 
 namespace app::bell_settings
@@ -23,24 +22,51 @@ namespace app::bell_settings
         constexpr auto itemCount = 5U;
         internalData.reserve(itemCount);
 
-        auto onOff    = new SnoozeOnOffListItem(model);
+        auto onOff =
+            new OnOffListItem(model.getSnoozeOnOff(), utils::translate("app_bell_settings_alarm_settings_snooze"));
         onOff->onExit = [onOff, this]() {
             if (not onOff->isActive()) {
                 this->onExit();
             }
         };
         internalData.emplace_back(onOff);
-        internalData.emplace_back(new SnoozeLengthListItem(model));
+        constexpr auto snoozeLengthStep = 1U;
+        constexpr auto snoozeLengthMin  = 1U;
+        constexpr auto snoozeLengthMax  = 30U;
+        internalData.emplace_back(
+            new NumListItem(model.getSnoozeLength(),
+                            UIntegerSpinner::Range{snoozeLengthMin, snoozeLengthMax, snoozeLengthStep},
+                            utils::translate("app_bell_settings_alarm_settings_snooze_length")));
 
-        auto chimeInterval    = new SnoozeChimeIntervalListItem(model);
+        const UTF8 minStr = utils::translate("common_minute_short");
+        const auto range  = NumWithStringListItem::NumWithStringSpinner::Range{
+            NumWithStringListItem::Value{utils::translate("app_settings_toggle_off")},
+            NumWithStringListItem::Value{1, minStr},
+            NumWithStringListItem::Value{2, minStr},
+            NumWithStringListItem::Value{3, minStr},
+            NumWithStringListItem::Value{5, minStr}};
+        auto chimeInterval =
+            new NumWithStringListItem(model.getSnoozeChimeInterval(),
+                                      range,
+                                      utils::translate("app_bell_settings_alarm_settings_snooze_chime_interval"));
         chimeInterval->onExit = [chimeInterval, this] {
             if (chimeInterval->isOff()) {
                 this->onExit();
             }
         };
         internalData.emplace_back(chimeInterval);
-        internalData.emplace_back(new SnoozeChimeToneListItem(model));
-        internalData.emplace_back(new SnoozeChimeVolumeListItem(model));
+        const auto textRange = UTF8Spinner::Range{{"Meditative\nsurprises"}}; // TODO: Full list needed
+        internalData.emplace_back(
+            new UTF8ListItem(model.getSnoozeChimeTone(),
+                             textRange,
+                             utils::translate("app_bell_settings_alarm_settings_snooze_chime_tone")));
+        constexpr auto volumeStep = 1U;
+        constexpr auto volumeMin  = 1U;
+        constexpr auto volumeMax  = 10U;
+        internalData.emplace_back(
+            new NumListItem(model.getSnoozeChimeVolume(),
+                            UIntegerSpinner::Range{volumeMin, volumeMax, volumeStep},
+                            utils::translate("app_bell_settings_alarm_settings_snooze_chime_volume")));
 
         for (auto item : internalData) {
             item->deleteByList = false;
@@ -53,7 +79,7 @@ namespace app::bell_settings
         list->onProviderDataUpdate();
     }
 
-    auto SnoozeListItemProvider::getItem(gui::Order order) -> gui::ListItem *
+    auto SnoozeListItemProvider::getItem(Order order) -> ListItem *
     {
         return getRecord(order);
     }
@@ -68,7 +94,7 @@ namespace app::bell_settings
         return style::sidelistview::list_item::w;
     }
 
-    std::vector<gui::BellSideListItemWithCallbacks *> SnoozeListItemProvider::getListItems()
+    std::vector<BellSideListItemWithCallbacks *> SnoozeListItemProvider::getListItems()
     {
         return internalData;
     }

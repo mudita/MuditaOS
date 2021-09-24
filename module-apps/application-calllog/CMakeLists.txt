@@ -47,7 +47,7 @@ target_link_libraries( application-calllog
 		module-utils
 		service-appmgr
 		service-db
-		time
+		utils-time
 	PUBLIC
 		apps-common
 		module-db

@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ContactsTable.hpp"
-#include <log.hpp>
+#include <log/log.hpp>
 #include <Utils.hpp>
 
 namespace ColumnName

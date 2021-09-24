@@ -2,9 +2,6 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NewEditAlarmWindow.hpp"
-#include "application-alarm-clock/data/AlarmsData.hpp"
-#include "application-calendar/data/OptionParser.hpp"
-#include <module-db/Interface/AlarmEventRecord.hpp>
 
 namespace app::alarmClock
 {
@@ -53,13 +50,6 @@ namespace app::alarmClock
                 alarmRecord = rec->getData();
             }
             presenter->loadData(alarmRecord);
-        }
-
-        if (mode == gui::ShowMode::GUI_SHOW_RETURN) {
-            if (auto receivedData = dynamic_cast<WeekDaysRepeatData *>(data); receivedData != nullptr) {
-                presenter->updateRepeat(alarmRecord, *receivedData);
-                presenter->loadRepeat(alarmRecord);
-            }
         }
     }
 

@@ -30,4 +30,6 @@ add_gtest_executable(
         service-time
     INCLUDE
         $<TARGET_PROPERTY:service-time,INCLUDE_DIRECTORIES>
+    DEFS
+        COMMON_ALARM_OPERATIONS_TEST
 )

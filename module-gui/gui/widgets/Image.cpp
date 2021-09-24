@@ -7,7 +7,7 @@
 #include "ImageManager.hpp"
 
 #include <utf8/UTF8.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 
 namespace gui
 {
@@ -32,10 +32,10 @@ namespace gui
         set(imageName, specifier);
     }
 
-    Image::Image(const UTF8 &imageName) : imageMap{nullptr}
+    Image::Image(const UTF8 &imageName, ImageTypeSpecifier specifier) : imageMap{nullptr}
     {
         type = ItemType::IMAGE;
-        set(imageName);
+        set(imageName, specifier);
     }
 
     bool Image::set(int id)

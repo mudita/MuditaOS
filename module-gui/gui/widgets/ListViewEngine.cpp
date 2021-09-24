@@ -4,7 +4,7 @@
 #include "ListViewEngine.hpp"
 
 #include <cassert>
-#include <log.hpp>
+#include <log/log.hpp>
 
 namespace gui
 {

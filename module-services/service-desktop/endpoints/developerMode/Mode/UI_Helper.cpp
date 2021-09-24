@@ -1,15 +1,14 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "UI_Helper.hpp"
-#include <log.hpp>
+#include <endpoints/developerMode/Mode/UI_Helper.hpp>
+#include <log/log.hpp>
 #include "service-desktop/Constants.hpp"
 #include "service-desktop/DeveloperModeMessage.hpp"
-#include <variant>
 #include <service-appmgr/Constants.hpp>
 #include <service-appmgr/messages/DOMRequest.hpp>
 
-namespace parserFSM
+namespace sdesktop::endpoints
 {
     void UI_Helper::preProcess(http::Method method, Context &context)
     {
@@ -38,4 +37,4 @@ namespace parserFSM
         }
         return {sent::no, std::nullopt};
     }
-}; // namespace parserFSM
+}; // namespace sdesktop::endpoints

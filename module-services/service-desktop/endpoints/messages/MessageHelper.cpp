@@ -1,11 +1,11 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "MessageHelper.hpp"
+#include <endpoints/messages/MessageHelper.hpp>
 
 #include <endpoints/Context.hpp>
-#include <parser/MessageHandler.hpp>
-#include <parser/ParserUtils.hpp>
+#include <endpoints/JsonKeyNames.hpp>
+#include <endpoints/message/Sender.hpp>
 
 #include <BaseInterface.hpp>
 #include <Common/Query.hpp>
@@ -34,8 +34,9 @@
 #include <utility>
 #include <module-db/queries/messages/sms/QuerySMSGetByText.hpp>
 
-namespace parserFSM
+namespace sdesktop::endpoints
 {
+    using sender::putToSendQueue;
 
     auto MessageHelper::toJson(const SMSRecord &record) -> json11::Json
     {
@@ -95,7 +96,7 @@ namespace parserFSM
         }
         LOG_ERROR("Category of request is missing or incorrect!");
         context.setResponseStatus(http::Code::BadRequest);
-        MessageHandler::putToSendQueue(context.createSimpleResponse());
+        putToSendQueue(context.createSimpleResponse());
         return sys::ReturnCodes::Unresolved;
     }
 
@@ -109,7 +110,7 @@ namespace parserFSM
         }
         LOG_ERROR("Category of request is missing or incorrect!");
         context.setResponseStatus(http::Code::BadRequest);
-        MessageHandler::putToSendQueue(context.createSimpleResponse());
+        putToSendQueue(context.createSimpleResponse());
         return sys::ReturnCodes::Unresolved;
     }
 
@@ -123,7 +124,7 @@ namespace parserFSM
         }
         LOG_ERROR("Category of request is missing or incorrect!");
         context.setResponseStatus(http::Code::BadRequest);
-        MessageHandler::putToSendQueue(context.createSimpleResponse());
+        putToSendQueue(context.createSimpleResponse());
         return sys::ReturnCodes::Unresolved;
     }
 
@@ -140,7 +141,7 @@ namespace parserFSM
         }
         LOG_ERROR("Category of request is missing or incorrect!");
         context.setResponseStatus(http::Code::BadRequest);
-        MessageHandler::putToSendQueue(context.createSimpleResponse());
+        putToSendQueue(context.createSimpleResponse());
         return sys::ReturnCodes::Unresolved;
     }
 
@@ -171,7 +172,7 @@ namespace parserFSM
 
         if (smsBody.size() > msgConstants::maxConcatenatedLen) {
             context.setResponseStatus(http::Code::BadRequest);
-            MessageHandler::putToSendQueue(context.createSimpleResponse());
+            putToSendQueue(context.createSimpleResponse());
             return sys::ReturnCodes::Success;
         }
 
@@ -191,7 +192,7 @@ namespace parserFSM
 
                 context.setResponseStatus(http::Code::OK);
                 context.setResponseBody(toJson(smsAddResult->record));
-                MessageHandler::putToSendQueue(context.createSimpleResponse());
+                putToSendQueue(context.createSimpleResponse());
                 return true;
             },
             context);
@@ -215,7 +216,7 @@ namespace parserFSM
 
                     context.setResponseStatus(smsTemplateResult->getResults() ? http::Code::NoContent
                                                                               : http::Code::InternalServerError);
-                    MessageHandler::putToSendQueue(context.createSimpleResponse());
+                    putToSendQueue(context.createSimpleResponse());
                     return true;
                 }
                 else {
@@ -249,14 +250,14 @@ namespace parserFSM
         if (!context.getBody()[json::messages::templateID].is_number()) {
             LOG_ERROR("Bad request! templateID is incorrect or missing!");
             context.setResponseStatus(http::Code::BadRequest);
-            MessageHandler::putToSendQueue(context.createSimpleResponse());
+            putToSendQueue(context.createSimpleResponse());
             return sys::ReturnCodes::Unresolved;
         }
 
         if (!context.getBody()[json::messages::templateBody].is_string()) {
             LOG_ERROR("Bad request! templateBody is incorrect or missing!");
             context.setResponseStatus(http::Code::BadRequest);
-            MessageHandler::putToSendQueue(context.createSimpleResponse());
+            putToSendQueue(context.createSimpleResponse());
             return sys::ReturnCodes::Unresolved;
         }
 
@@ -271,7 +272,7 @@ namespace parserFSM
 
                     context.setResponseStatus(smsTemplateResult->getResult() ? http::Code::NoContent
                                                                              : http::Code::InternalServerError);
-                    MessageHandler::putToSendQueue(context.createSimpleResponse());
+                    putToSendQueue(context.createSimpleResponse());
                     return true;
                 }
                 else {
@@ -291,7 +292,7 @@ namespace parserFSM
         if (!context.getBody()[json::messages::templateBody].is_string()) {
             LOG_ERROR("Bad request! templateBody is incorrect or missing!");
             context.setResponseStatus(http::Code::BadRequest);
-            MessageHandler::putToSendQueue(context.createSimpleResponse());
+            putToSendQueue(context.createSimpleResponse());
             return sys::ReturnCodes::Unresolved;
         }
 
@@ -304,7 +305,7 @@ namespace parserFSM
 
                     context.setResponseStatus(smsTemplateResult->getResult() ? http::Code::NoContent
                                                                              : http::Code::InternalServerError);
-                    MessageHandler::putToSendQueue(context.createSimpleResponse());
+                    putToSendQueue(context.createSimpleResponse());
                     return true;
                 }
                 else {
@@ -324,7 +325,7 @@ namespace parserFSM
         if (!context.getBody()[json::messages::templateID].is_number()) {
             LOG_ERROR("Bad request! templateID is incorrect or missing!");
             context.setResponseStatus(http::Code::BadRequest);
-            MessageHandler::putToSendQueue(context.createSimpleResponse());
+            putToSendQueue(context.createSimpleResponse());
             return sys::ReturnCodes::Unresolved;
         }
 
@@ -336,7 +337,7 @@ namespace parserFSM
 
                     context.setResponseStatus(smsTemplateResult->getResults() ? http::Code::NoContent
                                                                               : http::Code::InternalServerError);
-                    MessageHandler::putToSendQueue(context.createSimpleResponse());
+                    putToSendQueue(context.createSimpleResponse());
                     return true;
                 }
                 else {
@@ -372,7 +373,7 @@ namespace parserFSM
                         }
                         context.setResponseBody(std::move(threadsArray));
                         context.setTotalCount(threadsResults->getCount());
-                        MessageHandler::putToSendQueue(context.createSimpleResponse());
+                        putToSendQueue(context.createSimpleResponse());
                         return true;
                     }
                     else {
@@ -395,14 +396,14 @@ namespace parserFSM
         if (!context.getBody()[json::messages::threadID].is_number()) {
             LOG_ERROR("Bad request! threadID is incorrect or missing!");
             context.setResponseStatus(http::Code::BadRequest);
-            MessageHandler::putToSendQueue(context.createSimpleResponse());
+            putToSendQueue(context.createSimpleResponse());
             return sys::ReturnCodes::Unresolved;
         }
 
         if (!context.getBody()[json::messages::isUnread].is_bool()) {
             LOG_ERROR("Bad request! isUnread is incorrect or missing!");
             context.setResponseStatus(http::Code::BadRequest);
-            MessageHandler::putToSendQueue(context.createSimpleResponse());
+            putToSendQueue(context.createSimpleResponse());
             return sys::ReturnCodes::Unresolved;
         }
 
@@ -417,7 +418,7 @@ namespace parserFSM
 
                     context.setResponseStatus(threadResult->getResult() ? http::Code::NoContent
                                                                         : http::Code::InternalServerError);
-                    MessageHandler::putToSendQueue(context.createSimpleResponse());
+                    putToSendQueue(context.createSimpleResponse());
                     return true;
                 }
                 else {
@@ -436,7 +437,7 @@ namespace parserFSM
     auto MessageHelper::deleteThread(Context &context) -> sys::ReturnCodes
     {
         context.setResponseStatus(http::Code::NotImplemented);
-        MessageHandler::putToSendQueue(context.createSimpleResponse());
+        putToSendQueue(context.createSimpleResponse());
         return sys::ReturnCodes::Success;
     }
 
@@ -449,7 +450,7 @@ namespace parserFSM
                 if (auto smsResult = dynamic_cast<db::query::SMSGetCountResult *>(result)) {
                     auto count = smsResult->getResults();
                     context.setResponseBody(json11::Json::object{{json::messages::count, static_cast<int>(count)}});
-                    MessageHandler::putToSendQueue(context.createSimpleResponse());
+                    putToSendQueue(context.createSimpleResponse());
                     return true;
                 }
                 else {
@@ -471,7 +472,7 @@ namespace parserFSM
                 if (auto smsResult = dynamic_cast<db::query::SMSGetByIDResult *>(result)) {
 
                     context.setResponseBody(MessageHelper::toJson(smsResult->getResults()));
-                    MessageHandler::putToSendQueue(context.createSimpleResponse());
+                    putToSendQueue(context.createSimpleResponse());
                     return true;
                 }
                 else {
@@ -508,7 +509,7 @@ namespace parserFSM
 
                         context.setResponseBody(std::move(smsArray));
                         context.setTotalCount(smsResult->getTotalCount());
-                        MessageHandler::putToSendQueue(context.createSimpleResponse());
+                        putToSendQueue(context.createSimpleResponse());
                         return true;
                     }
                     else {
@@ -551,7 +552,7 @@ namespace parserFSM
                     }
 
                     context.setResponseBody(std::move(smsArray));
-                    MessageHandler::putToSendQueue(context.createSimpleResponse());
+                    putToSendQueue(context.createSimpleResponse());
                     return true;
                 }
                 else {
@@ -587,7 +588,7 @@ namespace parserFSM
 
                         context.setResponseBody(std::move(smsArray));
                         context.setTotalCount(smsResult->getTotalCount());
-                        MessageHandler::putToSendQueue(context.createSimpleResponse());
+                        putToSendQueue(context.createSimpleResponse());
                         return true;
                     }
                     else {
@@ -616,7 +617,7 @@ namespace parserFSM
                     auto count = smsResult->getResults();
 
                     context.setResponseBody(json11::Json::object{{json::messages::count, static_cast<int>(count)}});
-                    MessageHandler::putToSendQueue(context.createSimpleResponse());
+                    putToSendQueue(context.createSimpleResponse());
                     return true;
                 }
                 else {
@@ -639,7 +640,7 @@ namespace parserFSM
                 if (auto smsTemplateResult = dynamic_cast<db::query::SMSTemplateGetByIDResult *>(result)) {
 
                     context.setResponseBody(MessageHelper::toJson(smsTemplateResult->getResults()));
-                    MessageHandler::putToSendQueue(context.createSimpleResponse());
+                    putToSendQueue(context.createSimpleResponse());
                     return true;
                 }
                 else {
@@ -675,7 +676,7 @@ namespace parserFSM
 
                         context.setResponseBody(std::move(smsTemplateArray));
                         context.setTotalCount(smsTemplateResult->getTotalTemplatesCount());
-                        MessageHandler::putToSendQueue(context.createSimpleResponse());
+                        putToSendQueue(context.createSimpleResponse());
                         return true;
                     }
                     else {
@@ -693,4 +694,4 @@ namespace parserFSM
         }
         return sys::ReturnCodes::Success;
     }
-} // namespace parserFSM
+} // namespace sdesktop::endpoints

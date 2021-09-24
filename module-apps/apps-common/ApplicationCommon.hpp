@@ -119,6 +119,14 @@ namespace app
         return ManifestTraits<T>::GetManifest();
     }
 
+    class StatusIndicators
+    {
+      public:
+        sys::phone_modes::PhoneMode phoneMode       = sys::phone_modes::PhoneMode::Connected;
+        sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled;
+        bool alarmClockStatus                       = false;
+    };
+
     /// This is template for creating new applications. Main difference between Application and service is that:
     /// 1. Application has access to GUI and Input
     /// 2. Application lifetime is managed with app::manager::ApplicationManager
@@ -197,14 +205,12 @@ namespace app
         sys::TimerHandle longPressTimer;
         void clearLongPressTimeout();
 
-        explicit ApplicationCommon(
-            std::string name,
-            std::string parent                          = "",
-            sys::phone_modes::PhoneMode phoneMode       = sys::phone_modes::PhoneMode::Connected,
-            sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled,
-            StartInBackground startInBackground         = {false},
-            uint32_t stackDepth                         = 4096,
-            sys::ServicePriority priority               = sys::ServicePriority::Idle);
+        explicit ApplicationCommon(std::string name,
+                                   std::string parent                  = "",
+                                   StatusIndicators statusIndicators   = StatusIndicators{},
+                                   StartInBackground startInBackground = {false},
+                                   uint32_t stackDepth                 = 4096,
+                                   sys::ServicePriority priority       = sys::ServicePriority::Idle);
 
         virtual ~ApplicationCommon() noexcept;
 
@@ -415,8 +421,7 @@ namespace app
 
         /// application's settings
         std::unique_ptr<settings::Settings> settings;
-        sys::phone_modes::PhoneMode phoneMode;
-        sys::bluetooth::BluetoothMode bluetoothMode;
+        StatusIndicators statusIndicators;
 
         locks::PhoneLockSubject phoneLockSubject;
         locks::LockPolicyHandler lockPolicyHandler;

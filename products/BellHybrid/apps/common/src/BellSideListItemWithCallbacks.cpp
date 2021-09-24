@@ -10,16 +10,7 @@ namespace gui
         : BellSideListItem(description)
     {
         focusChangedCallback = [&](Item &) {
-            if (focus) {
-                setFocusItem(body);
-            }
-            else {
-                setFocusItem(focus ? body : nullptr);
-                if (onExit) {
-                    onExit();
-                }
-            }
-
+            OnFocusChangedCallback();
             return true;
         };
 
@@ -31,4 +22,16 @@ namespace gui
         inputCallback = [&](Item &, const InputEvent &inputEvent) -> bool { return body->onInput(inputEvent); };
     }
 
+    void BellSideListItemWithCallbacks::OnFocusChangedCallback()
+    {
+        if (focus) {
+            setFocusItem(body);
+        }
+        else {
+            setFocusItem(focus ? body : nullptr);
+            if (onExit) {
+                onExit();
+            }
+        }
+    }
 } // namespace gui

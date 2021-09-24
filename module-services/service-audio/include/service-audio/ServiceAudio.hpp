@@ -52,7 +52,7 @@ class ServiceAudio : public sys::Service
     std::unique_ptr<settings::Settings> settingsProvider;
     std::map<std::string, std::string> settingsCache;
     bool bluetoothA2DPConnected = false;
-    bool bluetoothHSPConnected  = false;
+    bool bluetoothVoiceProfileConnected = false;
 
     auto IsVibrationMotorOn()
     {

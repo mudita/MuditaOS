@@ -4,7 +4,7 @@
 #include "Database.hpp"
 #include "DatabaseInitializer.hpp"
 
-#include <log.hpp>
+#include <log/log.hpp>
 
 #include <purefs/filesystem_paths.hpp>
 #include <gsl/util>

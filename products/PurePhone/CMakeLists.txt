@@ -57,9 +57,11 @@ target_link_libraries(PurePhone
         application-phonebook
         application-settings
         application-special-input
+        pure::time
         appmgr
         db
         evtmgr
+        log
         messagetype
         module-apps
         module-bsp
@@ -69,10 +71,9 @@ target_link_libraries(PurePhone
         service-bluetooth
         service-desktop
         service-fileindexer
-        service-lwip
         service-time
         sys
-        ${LWIP_LIBRARIES}
+        version-header
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_Linux>:iosyscalls>"
         "$<$<STREQUAL:${PROJECT_TARGET},TARGET_RT1051>:CrashCatcher::CrashCatcher>"
     )
@@ -86,8 +87,6 @@ set_source_files_properties(PurePhoneMain.cpp PROPERTIES COMPILE_DEFINITIONS "${
 strip_executable(PurePhone)
 
 message_serial_status()
-
-add_dependencies(PurePhone version)
 
 include(AddBootBin)
 add_boot_bin(PurePhone)
@@ -110,6 +109,7 @@ include(GitHubWorkerMessages)
 github_message_standalone()
 github_message_update()
 
+add_subdirectory(alarms)
 add_subdirectory(apps)
 add_subdirectory(services)
 add_subdirectory(sys)

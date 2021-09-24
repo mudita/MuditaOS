@@ -6,7 +6,7 @@
 #include "CellularMuxData.h"
 #include "CellularMuxFrame.h"
 
-#include <log.hpp>
+#include <log/log.hpp>
 #include <ticks.hpp>
 #include <Utils.hpp>
 #include <magic_enum.hpp>

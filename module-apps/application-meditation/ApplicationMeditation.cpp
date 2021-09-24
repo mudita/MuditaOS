@@ -11,11 +11,9 @@ namespace app
 {
     ApplicationMeditation::ApplicationMeditation(std::string name,
                                                  std::string parent,
-                                                 sys::phone_modes::PhoneMode phoneMode,
-                                                 sys::bluetooth::BluetoothMode bluetoothMode,
+                                                 StatusIndicators statusIndicators,
                                                  StartInBackground startInBackground)
-        : Application{name, parent, phoneMode, bluetoothMode, startInBackground},
-          state{std::make_unique<gui::OptionsData>()}
+        : Application{name, parent, statusIndicators, startInBackground}, state{std::make_unique<gui::OptionsData>()}
     {}
 
     auto ApplicationMeditation::InitHandler() -> sys::ReturnCodes
@@ -58,8 +56,11 @@ namespace app
                                   return std::make_unique<gui::PreparationTimeWindow>(app);
                               });
 
-        attachPopups(
-            {gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes, gui::popup::ID::PhoneLock});
+        attachPopups({gui::popup::ID::Volume,
+                      gui::popup::ID::Tethering,
+                      gui::popup::ID::PhoneModes,
+                      gui::popup::ID::PhoneLock,
+                      gui::popup::ID::Alarm});
     }
 
     void ApplicationMeditation::destroyUserInterface()

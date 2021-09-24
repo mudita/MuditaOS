@@ -1,3 +1,6 @@
+add_library(board STATIC)
+
+add_subdirectory(cmsis)
 add_subdirectory(${BOARD})
 
 if (${MEMORY_LINKER_FILE_PATH} STREQUAL "")
@@ -8,7 +11,6 @@ set (CMAKE_EXE_LINKER_FLAGS "-nostdlib -Xlinker --gc-sections -Xlinker --sort-se
 
 target_sources(board
     PRIVATE
-        _exit.c
         crashdump/consoledump.cpp
         crashdump/crashcatcher_impl.cpp
         crashdump/crashdumpwriter_vfs.cpp
@@ -24,11 +26,13 @@ target_include_directories(board
     PUBLIC
         $<BUILD_INTERFACE:
             ${CMAKE_CURRENT_SOURCE_DIR}
-            ${CMAKE_CURRENT_SOURCE_DIR}/newlib/include
         >
 )
 
 target_link_libraries(board
     PUBLIC
+        fsl
+        module-vfs
+        log-api
         CrashCatcher::CrashCatcher
 )

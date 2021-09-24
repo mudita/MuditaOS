@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SMSTemplateRecord.hpp"
@@ -10,7 +10,7 @@
 #include "queries/messages/templates/QuerySMSTemplateUpdate.hpp"
 #include <queries/messages/templates/QuerySMSTemplateGetForList.hpp>
 
-#include <log.hpp>
+#include <log/log.hpp>
 
 #include <cassert>
 

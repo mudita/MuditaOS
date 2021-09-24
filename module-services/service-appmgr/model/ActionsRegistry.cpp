@@ -3,7 +3,7 @@
 
 #include "ActionsRegistry.hpp"
 
-#include <log.hpp>
+#include <log/log.hpp>
 #include <magic_enum.hpp>
 
 #include <cassert>

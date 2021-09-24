@@ -7,21 +7,22 @@
 #include <Style.hpp>
 #include <time/time_constants.hpp>
 #include <time/time_date_validation.hpp>
+#include <service-time/api/TimeSettingsApi.hpp>
 
 namespace gui
 {
     namespace timeItem = style::alarmClock::window::item::time;
 
-    AlarmTimeItem::AlarmTimeItem(bool mode24H,
-                                 std::function<void(const UTF8 &text)> bottomBarTemporaryMode,
+    AlarmTimeItem::AlarmTimeItem(std::function<void(const UTF8 &text)> bottomBarTemporaryMode,
                                  std::function<void()> bottomBarRestoreFromTemporaryMode)
-        : mode24H{mode24H}, bottomBarTemporaryMode(std::move(bottomBarTemporaryMode)),
+        : mode24H(!stm::api::isTimeFormat12h()), bottomBarTemporaryMode(std::move(bottomBarTemporaryMode)),
           bottomBarRestoreFromTemporaryMode(std::move(bottomBarRestoreFromTemporaryMode))
     {
-        setMinimumSize(style::window::default_body_width, timeItem::height);
+        setMinimumSize(timeItem::width, timeItem::height);
 
         setEdges(RectangleEdge::None);
-        setMargins(gui::Margins(style::margins::small, timeItem::margin, 0, timeItem::marginBot));
+        setMargins(gui::Margins(
+            style::widgets::leftMargin, timeItem::marginTop, style::widgets::rightMargin, timeItem::marginBot));
 
         hBox = new gui::HBox(this, 0, 0, 0, 0);
         hBox->setEdges(gui::RectangleEdge::None);
@@ -31,7 +32,7 @@ namespace gui
         applyItemSpecificProperties(hourInput);
 
         colonLabel = new gui::Label(hBox, 0, 0, 0, 0);
-        colonLabel->setMinimumSize(timeItem::separator, timeItem::height - timeItem::separator);
+        colonLabel->setMinimumSize(timeItem::separator, timeItem::height);
         colonLabel->setEdges(gui::RectangleEdge::None);
         colonLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
         colonLabel->setFont(style::window::font::medium);
@@ -112,13 +113,23 @@ namespace gui
         };
 
         onSaveCallback = [&](std::shared_ptr<AlarmEventRecord> record) {
+            using namespace utils::time;
             validateHour();
-            auto hours   = std::chrono::hours(std::stoi(hourInput->getText().c_str()));
-            auto minutes = std::chrono::minutes(std::stoi(minuteInput->getText().c_str()));
-            if (!mode24H) {
-                hours = date::make24(hours, isPm(mode12hInput->getText()));
+            const auto now     = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+            const auto newTime = std::localtime(&now);
+
+            if (mode24H) {
+                newTime->tm_hour = utils::toNumeric(hourInput->getText());
             }
-            record->startDate = TimePointFromYearMonthDay(TimePointToYearMonthDay(TimePointNow())) + hours + minutes;
+            else {
+                newTime->tm_hour = date::make24(std::chrono::hours{utils::toNumeric(hourInput->getText())},
+                                                isPm(mode12hInput->getText()))
+                                       .count();
+            }
+            newTime->tm_min = utils::toNumeric(minuteInput->getText());
+
+            record->startDate = TimePointFloorMinutes(std::chrono::system_clock::from_time_t(std::mktime(newTime)));
+            record->endDate   = record->startDate;
         };
 
         onInputCallback(*hourInput);
@@ -181,29 +192,38 @@ namespace gui
                 return true;
             };
 
-            mode12hInput->setMinimumSize(timeItem::timeInput12h, timeItem::height - timeItem::separator);
+            auto elemWidth = (timeItem::width - (2 * timeItem::separator)) / 3;
+            mode12hInput->setMinimumSize(elemWidth, timeItem::height);
             mode12hInput->setMargins(gui::Margins(timeItem::separator, 0, 0, 0));
-            hourInput->setMinimumSize(timeItem::timeInput12h, timeItem::height - timeItem::separator);
-            minuteInput->setMinimumSize(timeItem::timeInput12h, timeItem::height - timeItem::separator);
+            hourInput->setMinimumSize(elemWidth, timeItem::height);
+            minuteInput->setMinimumSize(elemWidth, timeItem::height);
 
             onLoadCallback = [&](std::shared_ptr<AlarmEventRecord> alarm) {
-                hourInput->setText(TimePointToHourString12H(alarm->startDate));
-                minuteInput->setText(TimePointToMinutesString(alarm->startDate));
-                if (date::is_am(TimePointToHourMinSec(alarm->startDate).hours())) {
-                    mode12hInput->setText(utils::translate(utils::time::Locale::getAM()));
-                }
-                else {
-                    mode12hInput->setText(utils::translate(utils::time::Locale::getPM()));
-                }
+                auto readTime  = Clock::to_time_t(alarm->startDate);
+                auto alarmTime = std::localtime(&readTime);
+
+                const auto hours   = std::chrono::hours{alarmTime->tm_hour};
+                const auto time12H = date::make12(hours);
+                const auto isPM    = date::is_pm(hours);
+
+                hourInput->setText(std::to_string(time12H.count()));
+                minuteInput->setText(std::to_string(alarmTime->tm_min));
+
+                isPM ? mode12hInput->setText(utils::translate(utils::time::Locale::getPM()))
+                     : mode12hInput->setText(utils::translate(utils::time::Locale::getAM()));
             };
         }
         else {
-            hourInput->setMinimumSize(timeItem::timeInput24h, timeItem::height - timeItem::separator);
-            minuteInput->setMinimumSize(timeItem::timeInput24h, timeItem::height - timeItem::separator);
+            auto elemWidth = (timeItem::width - timeItem::separator) / 2;
+            hourInput->setMinimumSize(elemWidth, timeItem::height);
+            minuteInput->setMinimumSize(elemWidth, timeItem::height);
 
             onLoadCallback = [&](std::shared_ptr<AlarmEventRecord> alarm) {
-                hourInput->setText(TimePointToHourString24H(alarm->startDate));
-                minuteInput->setText(TimePointToMinutesString(alarm->startDate));
+                auto readTime  = Clock::to_time_t(alarm->startDate);
+                auto alarmTime = std::localtime(&readTime);
+
+                hourInput->setText(std::to_string(alarmTime->tm_hour));
+                minuteInput->setText(std::to_string(alarmTime->tm_min));
             };
         }
     }
@@ -220,5 +240,4 @@ namespace gui
             minuteInput->setText("00");
         }
     }
-
 } /* namespace gui */

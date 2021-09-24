@@ -30,13 +30,15 @@ namespace stm
     class ServiceTime : public sys::Service
     {
       private:
-        static constexpr auto StackDepth = 2048;
+        static constexpr auto StackDepth = 2048 * 4;
 
         std::unique_ptr<TimeManager> timeManager;
 
         std::unique_ptr<settings::Settings> settings;
 
         std::unique_ptr<alarms::AlarmMessageHandler> alarmMessageHandler;
+
+        std::shared_ptr<alarms::IAlarmOperationsFactory> alarmOperationsFactory;
 
         void registerMessageHandlers();
         auto handleSetAutomaticDateAndTimeRequest(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>;
@@ -49,8 +51,8 @@ namespace stm
         void initStaticData();
 
       public:
-        ServiceTime(
-            const alarms::IAlarmOperationsFactory &alarmOperationsFactory = alarms::CommonAlarmOperationsFactory{});
+        ServiceTime(std::shared_ptr<alarms::IAlarmOperationsFactory> alarmOperationsFactory =
+                        std::make_shared<alarms::CommonAlarmOperationsFactory>());
         ~ServiceTime();
 
         sys::ReturnCodes InitHandler() override;
@@ -59,9 +61,6 @@ namespace stm
         sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final;
 
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp = nullptr) override;
-
-        void addAlarmExecutionHandler(const alarms::AlarmType type,
-                                      const std::shared_ptr<alarms::AlarmHandler> handler);
     };
 
 } /* namespace stm */

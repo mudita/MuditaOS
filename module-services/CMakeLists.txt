@@ -3,8 +3,6 @@
 
 module_is_test_entity()
 
-include(${CMAKE_SOURCE_DIR}/module-lwip/lwip-includes.cmake)
-
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
 
 add_subdirectory( service-antenna )
@@ -16,9 +14,7 @@ add_subdirectory( service-db )
 add_subdirectory( service-desktop )
 add_subdirectory( service-eink )
 add_subdirectory( service-evtmgr )
-add_subdirectory( service-fota )
 add_subdirectory( service-gui )
-add_subdirectory( service-lwip )
 add_subdirectory( service-time )
 
 target_link_libraries(${PROJECT_NAME} 
@@ -37,7 +33,7 @@ target_link_libraries(${PROJECT_NAME}
         service-antenna
         ${TARGET_LIBRARIES}
     PRIVATE
-        time
+        utils-time
 )
 
 # Board specific compilation definitions,options,include directories and features

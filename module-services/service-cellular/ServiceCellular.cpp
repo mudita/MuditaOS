@@ -40,7 +40,7 @@
 #include <Tables/CalllogTable.hpp>
 #include <Tables/Record.hpp>
 #include <Utils.hpp>
-#include <utility/Utility.hpp>
+#include <Utility.hpp>
 #include <at/cmd/CLCC.hpp>
 #include <at/cmd/CFUN.hpp>
 #include <at/UrcClip.hpp>
@@ -54,7 +54,7 @@
 #include <bsp/cellular/bsp_cellular.hpp>
 #include <EventStore.hpp>
 #include <country.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <at/UrcFactory.hpp>
 #include <queries/messages/sms/QuerySMSSearchByType.hpp>
 #include <queries/notifications/QueryNotificationsIncrement.hpp>

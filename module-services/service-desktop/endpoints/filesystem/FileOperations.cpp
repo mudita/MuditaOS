@@ -1,10 +1,9 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "FileOperations.hpp"
-#include "FileContext.cpp"
+#include <endpoints/filesystem/FileOperations.hpp>
 #include <base64.h>
-#include <log.hpp>
+#include <log/log.hpp>
 
 FileOperations &FileOperations::instance()
 {

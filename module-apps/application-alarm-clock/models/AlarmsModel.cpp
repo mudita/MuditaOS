@@ -44,7 +44,7 @@ namespace app::alarmClock
             return nullptr;
         }
 
-        auto item               = new gui::AlarmItem(AlarmPresenter(record));
+        auto item               = new gui::AlarmItem(std::make_shared<AlarmRRulePresenter>(record));
         item->activatedCallback = [this, record](gui::Item &) {
             record->enabled = !record->enabled;
             alarmsRepository->update(*record, nullptr);

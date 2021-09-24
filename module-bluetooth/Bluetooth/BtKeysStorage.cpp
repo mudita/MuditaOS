@@ -1,9 +1,9 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <algorithm>
 #include "BtKeysStorage.hpp"
-#include <log.hpp>
+#include <log/log.hpp>
 
 json11::Json bluetooth::KeyStorage::keysJson = json11::Json();
 btstack_link_key_db_t bluetooth::KeyStorage::keyStorage;
@@ -151,4 +151,4 @@ namespace bluetooth
         }
     }
 
-} // namespace Bt
+} // namespace bluetooth

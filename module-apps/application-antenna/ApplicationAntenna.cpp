@@ -13,7 +13,7 @@
 #include <windows/ScanModesWindow.hpp>
 #include <windows/AlgoParamsWindow.hpp>
 #include <module-cellular/at/response.hpp>
-#include <module-sys/Timers/TimerFactory.hpp>
+#include <Timers/TimerFactory.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
 #include <ticks.hpp>
 
@@ -161,8 +161,11 @@ namespace app
             return std::make_unique<gui::AlgoParamsWindow>(app);
         });
 
-        attachPopups(
-            {gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes, gui::popup::ID::PhoneLock});
+        attachPopups({gui::popup::ID::Volume,
+                      gui::popup::ID::Tethering,
+                      gui::popup::ID::PhoneModes,
+                      gui::popup::ID::PhoneLock,
+                      gui::popup::ID::Alarm});
     }
 
     void ApplicationAntenna::destroyUserInterface()

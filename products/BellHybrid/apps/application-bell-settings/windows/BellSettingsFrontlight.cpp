@@ -48,12 +48,9 @@ namespace gui
         topText->activeItem = false;
         topText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
-        auto centerBox = dynamic_cast<HBox *>(body->getCenterBox());
-        centerBox->addWidget(presenter->getPagesProvider()->getSpinner());
-        body->resizeItems();
-        body->firstBox->resizeItems();
-        centerBox->resizeItems();
-        body->lastBox->resizeItems();
+        body->getCenterBox()->addWidget(presenter->getPagesProvider()->getSpinner());
+
+        body->resize();
 
         presenter->loadData();
 
@@ -68,8 +65,8 @@ namespace gui
         if (inputEvent.isShortRelease(KeyCode::KEY_ENTER)) {
             presenter->saveData();
 
-            application->switchWindow(BellFinishedWindow::name,
-                                      BellFinishedWindow::Data::Factory::create(
+            application->switchWindow(BellFinishedWindow::defaultName,
+                                      BellFinishedWindowData::Factory::create(
                                           "circle_success",
                                           utils::translate("app_bell_settings_frontlight_finished_message"),
                                           window::name::bellSettingsAdvanced));

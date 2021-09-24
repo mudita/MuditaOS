@@ -4,7 +4,7 @@
 #include "SMSPartsHandler.hpp"
 
 #include <service-cellular/service-cellular/MessageConstants.hpp>
-#include <log.hpp>
+#include <log/log.hpp>
 
 namespace cellular::internal::sms
 {

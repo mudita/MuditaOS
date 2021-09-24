@@ -13,7 +13,7 @@
 #include <service-appmgr/Controller.hpp>
 
 #include <filesystem>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <i18n/i18n.hpp>
 #include <purefs/filesystem_paths.hpp>
 #include <service-audio/AudioServiceAPI.hpp>
@@ -35,15 +35,10 @@ namespace app
 
     ApplicationMusicPlayer::ApplicationMusicPlayer(std::string name,
                                                    std::string parent,
-                                                   sys::phone_modes::PhoneMode phoneMode,
-                                                   sys::bluetooth::BluetoothMode bluetoothMode,
+                                                   StatusIndicators statusIndicators,
                                                    StartInBackground startInBackground)
-        : Application(std::move(name),
-                      std::move(parent),
-                      phoneMode,
-                      bluetoothMode,
-                      startInBackground,
-                      applicationMusicPlayerStackSize),
+        : Application(
+              std::move(name), std::move(parent), statusIndicators, startInBackground, applicationMusicPlayerStackSize),
           priv{std::make_unique<music_player::internal::MusicPlayerPriv>()}
     {
         LOG_INFO("ApplicationMusicPlayer::create");
@@ -51,8 +46,8 @@ namespace app
         bus.channels.push_back(sys::BusChannel::ServiceAudioNotifications);
 
         auto tagsFetcher     = std::make_unique<app::music_player::ServiceAudioTagsFetcher>(this);
-        auto songsRepository = std::make_unique<app::music_player::SongsRepository>(std::move(tagsFetcher));
-        priv->songsModel     = std::make_unique<app::music_player::SongsModel>(std::move(songsRepository));
+        auto songsRepository = std::make_unique<app::music_player::SongsRepository>(this, std::move(tagsFetcher));
+        priv->songsModel     = std::make_unique<app::music_player::SongsModel>(this, std::move(songsRepository));
         auto audioOperations = std::make_unique<app::AsyncAudioOperations>(this);
         priv->songsPresenter =
             std::make_unique<app::music_player::SongsPresenter>(priv->songsModel, std::move(audioOperations));
@@ -137,8 +132,11 @@ namespace app
             return std::make_unique<gui::MusicPlayerAllSongsWindow>(app, priv->songsPresenter);
         });
 
-        attachPopups(
-            {gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes, gui::popup::ID::PhoneLock});
+        attachPopups({gui::popup::ID::Volume,
+                      gui::popup::ID::Tethering,
+                      gui::popup::ID::PhoneModes,
+                      gui::popup::ID::PhoneLock,
+                      gui::popup::ID::Alarm});
     }
 
     void ApplicationMusicPlayer::destroyUserInterface()

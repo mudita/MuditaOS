@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <Temperature.hpp>
 #include <widgets/BellSideListItem.hpp>
 #include <widgets/spinners/Spinners.hpp>
 #include <utf8/UTF8.hpp>
@@ -16,6 +17,7 @@ namespace gui
             const UTF8 &topDesc = "", Length x = 0, Length y = 0, Length w = 0, Length h = 0);
 
         auto getUnitAsStr() const noexcept -> UTF8;
+        auto setUnit(utils::temperature::Temperature::Unit unit) -> void;
 
       private:
         UTF8Spinner *temperatureUnit{};

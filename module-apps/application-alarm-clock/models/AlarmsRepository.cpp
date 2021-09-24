@@ -6,7 +6,7 @@
 #include <service-time/Constants.hpp>
 
 #include "AsyncTask.hpp"
-#include "log.hpp"
+#include "log/log.hpp"
 
 namespace app::alarmClock
 {
@@ -72,6 +72,5 @@ namespace app::alarmClock
     }
 
     void AlarmsDBRepository::turnOffAll(const AbstractAlarmsRepository::OnResultCallback &callback)
-    {
-    }
+    {}
 } // namespace app::alarmClock

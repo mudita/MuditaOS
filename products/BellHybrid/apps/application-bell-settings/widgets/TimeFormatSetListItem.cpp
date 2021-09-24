@@ -7,15 +7,13 @@
 #include <gui/core/FontManager.hpp>
 #include <gui/core/RawFont.hpp>
 #include <gui/widgets/Label.hpp>
-#include <gui/widgets/Spinner.hpp>
 
 #include <widgets/TimeSetFmtSpinner.hpp>
 
 namespace
 {
-    constexpr auto fmtSpinnerMin  = 12U;
-    constexpr auto fmtSpinnerMax  = 24U;
-    constexpr auto fmtSpinnerStep = 12U;
+    constexpr auto fmtSpinner12H = "12h";
+    constexpr auto fmtSpinner24H = "24h";
 } // namespace
 
 namespace gui
@@ -28,14 +26,11 @@ namespace gui
         setEdges(RectangleEdge::None);
         setFocusItem(body);
 
-        timeFormat = new Spinner(fmtSpinnerMin, fmtSpinnerMax, fmtSpinnerStep, Boundaries::Continuous);
-        timeFormat->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::centerbox::h);
+        timeFormat = new UTF8Spinner({fmtSpinner12H, fmtSpinner24H}, Boundaries::Continuous);
+        timeFormat->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::center_layout_h);
         timeFormat->setFont(bell_settings_style::time_fmt_set_list_item::font);
         timeFormat->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        timeFormat->setFixedFieldWidth(2);
-        timeFormat->setEdges(RectangleEdge::None);
         timeFormat->setFocusEdges(RectangleEdge::None);
-        timeFormat->setCurrentValue(fmtSpinnerMin);
 
         body->getCenterBox()->addWidget(timeFormat);
 
@@ -71,7 +66,7 @@ namespace gui
 
     auto TimeFormatSetListItem::getTimeFmt() const noexcept -> utils::time::Locale::TimeFormat
     {
-        return timeFormat->getCurrentValue() == fmtSpinnerMin ? utils::time::Locale::TimeFormat::FormatTime12H
+        return timeFormat->getCurrentValue() == fmtSpinner12H ? utils::time::Locale::TimeFormat::FormatTime12H
                                                               : utils::time::Locale::TimeFormat::FormatTime24H;
     }
 
@@ -79,10 +74,10 @@ namespace gui
     {
         using namespace utils::time;
         if (fmt == Locale::TimeFormat::FormatTime12H) {
-            timeFormat->setCurrentValue(fmtSpinnerMin);
+            timeFormat->setCurrentValue(fmtSpinner12H);
         }
         else if (fmt == Locale::TimeFormat::FormatTime24H) {
-            timeFormat->setCurrentValue(fmtSpinnerMax);
+            timeFormat->setCurrentValue(fmtSpinner24H);
         }
     }
 } // namespace gui

@@ -4,7 +4,7 @@
 #pragma once
 
 #include "Result.hpp"
-#include <log.hpp>
+#include <log/log.hpp>
 #include <map>
 #include <memory>
 #include <string>

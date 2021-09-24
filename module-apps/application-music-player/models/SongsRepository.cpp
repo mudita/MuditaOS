@@ -4,12 +4,12 @@
 #include "SongsRepository.hpp"
 
 #include <algorithm>
-#include <log.hpp>
+#include <log/log.hpp>
 #include <service-audio/AudioServiceAPI.hpp>
 #include <service-audio/AudioServiceName.hpp>
 #include <time/ScopedTime.hpp>
 #include <service-audio/AudioMessage.hpp>
-#include <tags_fetcher/TagsFetcher.hpp>
+#include <module-db/queries/multimedia_files/QueryMultimediaFilesGetLimited.hpp>
 
 #include <filesystem>
 
@@ -23,46 +23,40 @@ namespace app::music_player
         return tags::fetcher::fetchTags(filePath);
     }
 
-    SongsRepository::SongsRepository(std::unique_ptr<AbstractTagsFetcher> tagsFetcher, std::string musicFolderName)
-        : tagsFetcher(std::move(tagsFetcher)), musicFolderName(std::move(musicFolderName))
+    SongsRepository::SongsRepository(ApplicationCommon *application, std::unique_ptr<AbstractTagsFetcher> tagsFetcher)
+        : app::AsyncCallbackReceiver{application}, application{application}, tagsFetcher(std::move(tagsFetcher))
     {}
 
-    void SongsRepository::scanMusicFilesList()
+    void SongsRepository::getMusicFilesList(std::uint32_t offset,
+                                            std::uint32_t limit,
+                                            const OnGetMusicFilesListCallback &callback)
     {
-        musicFiles.clear();
+        auto query = std::make_unique<db::multimedia_files::query::GetLimited>(offset, limit);
+        auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::MultimediaFiles);
 
-        LOG_INFO("Scanning music folder: %s", musicFolderName.c_str());
-        {
-            auto time = utils::time::Scoped("fetch tags time");
-            for (const auto &entry : std::filesystem::directory_iterator(musicFolderName)) {
-                if (!std::filesystem::is_directory(entry)) {
-                    const auto &filePath = entry.path();
-                    const auto fileTags  = tagsFetcher->getFileTags(filePath);
-                    if (fileTags) {
-                        musicFiles.push_back(*fileTags);
-                    }
-                    else {
-                        LOG_ERROR("Scanned not an audio file, skipped");
-                    }
-                }
+        task->setCallback([this, callback](auto response) {
+            auto result = dynamic_cast<db::multimedia_files::query::GetLimitedResult *>(response);
+            musicFiles.clear();
+
+            if (result == nullptr) {
+                return false;
             }
-            std::sort(
-                musicFiles.begin(), musicFiles.end(), [](const tags::fetcher::Tags &t1, const tags::fetcher::Tags &t2) {
-                    return t1.filePath < t2.filePath;
-                });
-        }
-        LOG_INFO("Total number of music files found: %u", static_cast<unsigned int>(musicFiles.size()));
-    }
 
-    std::vector<tags::fetcher::Tags> SongsRepository::getMusicFilesList() const
-    {
-        return musicFiles;
+            if (callback) {
+                for (auto &record : result->getResult()) {
+                    musicFiles.push_back(record);
+                }
+                callback(musicFiles, result->getCount());
+            }
+            return true;
+        });
+        task->execute(application, this);
     }
 
     std::size_t SongsRepository::getFileIndex(const std::string &filePath) const
     {
         auto it = std::find_if(musicFiles.begin(), musicFiles.end(), [filePath](const auto &musicFile) {
-            return musicFile.filePath == filePath;
+            return musicFile.fileInfo.path == filePath;
         });
 
         if (it != musicFiles.end()) {
@@ -79,7 +73,7 @@ namespace app::music_player
         if (currentIndex == std::numeric_limits<size_t>::max() || currentIndex == musicFiles.size() - 1) {
             return "";
         }
-        return musicFiles[currentIndex + 1].filePath;
+        return musicFiles[currentIndex + 1].fileInfo.path;
     }
 
     std::string SongsRepository::getPreviousFilePath(const std::string &filePath) const
@@ -89,6 +83,7 @@ namespace app::music_player
         if (currentIndex == std::numeric_limits<size_t>::max() || currentIndex == 0) {
             return "";
         }
-        return musicFiles[currentIndex - 1].filePath;
+        return musicFiles[currentIndex - 1].fileInfo.path;
     }
+
 } // namespace app::music_player

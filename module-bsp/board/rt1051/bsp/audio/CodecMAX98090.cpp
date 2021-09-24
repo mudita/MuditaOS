@@ -5,7 +5,7 @@
 #include "max98090_regs.hpp"
 #include "board/BoardDefinitions.hpp"
 
-#include <module-utils/Utils.hpp>
+#include <Utils.hpp>
 
 #include <map>
 

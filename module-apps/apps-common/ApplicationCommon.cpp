@@ -2,21 +2,22 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationCommon.hpp"
-#include "Common.hpp"                         // for RefreshModes
-#include "GuiTimer.hpp"                       // for GuiTimer
-#include "Item.hpp"                           // for Item
-#include "MessageType.hpp"                    // for MessageType
-#include "module-sys/Timers/TimerFactory.hpp" // for Timer
+#include "Common.hpp"              // for RefreshModes
+#include "GuiTimer.hpp"            // for GuiTimer
+#include "Item.hpp"                // for Item
+#include "MessageType.hpp"         // for MessageType
+#include "Timers/TimerFactory.hpp" // for Timer
 #include "StatusBar.hpp"
 #include "status-bar/Time.hpp"
-#include "Translator.hpp"                // for KeyInputSim...
-#include <EventStore.hpp>                // for Battery
-#include "common_data/RawKey.hpp"        // for RawKey, key...
+#include "Translator.hpp" // for KeyInputSim...
+#include <EventStore.hpp> // for Battery
+#include <hal/key_input/RawKey.hpp>
 #include "gui/input/InputEvent.hpp"      // for InputEvent
-#include "log/debug.hpp"                 // for DEBUG_APPLI...
-#include <log.hpp>                       // for LOG_INFO
+#include <log/debug.hpp>                 // for DEBUG_APPLI...
+#include <log/log.hpp>                   // for LOG_INFO
 #include "messages/AppMessage.hpp"       // for AppSwitchMe...
 #include "service-appmgr/Controller.hpp" // for Controller
+#include "actions/AlarmClockStatusChangeParams.hpp"
 #include <service-cellular-api>
 #include <service-cellular/CellularMessage.hpp>
 #include <service-evtmgr/BatteryMessages.hpp>
@@ -35,11 +36,12 @@
 #include <type_traits> // for add_const<>...
 #include <WindowsFactory.hpp>
 #include <service-gui/Common.hpp>
-#include <module-utils/Utils.hpp>
+#include <Utils.hpp>
 #include <service-db/Settings.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
 #include <service-audio/AudioServiceAPI.hpp> // for GetOutputVolume
 
+#include <popups/AlarmPopup.hpp>
 #include <popups/VolumeWindow.hpp>
 #include <popups/HomeModesWindow.hpp>
 #include <popups/TetheringPhoneModePopup.hpp>
@@ -55,6 +57,7 @@
 #include <popups/lock-popups/SimNotReadyWindow.hpp>
 #include <popups/data/PopupData.hpp>
 #include <popups/data/PopupRequestParams.hpp>
+#include <popups/data/AlarmPopupRequestParams.hpp>
 #include <popups/data/PhoneModeParams.hpp>
 #include <popups/data/BluetoothModeParams.hpp>
 #include <locks/data/LockData.hpp>
@@ -100,8 +103,7 @@ namespace app
 
     ApplicationCommon::ApplicationCommon(std::string name,
                                          std::string parent,
-                                         sys::phone_modes::PhoneMode phoneMode,
-                                         sys::bluetooth::BluetoothMode bluetoothMode,
+                                         StatusIndicators statusIndicators,
                                          StartInBackground startInBackground,
                                          uint32_t stackDepth,
                                          sys::ServicePriority priority)
@@ -109,8 +111,8 @@ namespace app
           default_window(gui::name::window::main_window), windowsStack(this),
           keyTranslator{std::make_unique<gui::KeyInputSimpleTranslation>()}, startInBackground{startInBackground},
           callbackStorage{std::make_unique<CallbackStorage>()}, statusBarManager{std::make_unique<StatusBarManager>()},
-          settings(std::make_unique<settings::Settings>()), phoneMode{phoneMode}, bluetoothMode(bluetoothMode),
-          phoneLockSubject(this), lockPolicyHandler(this), simLockSubject(this)
+          settings(std::make_unique<settings::Settings>()), statusIndicators{statusIndicators}, phoneLockSubject(this),
+          lockPolicyHandler(this), simLockSubject(this)
     {
         statusBarManager->enableIndicators({gui::status_bar::Indicator::Time});
 
@@ -134,14 +136,22 @@ namespace app
         addActionReceiver(app::manager::actions::PhoneModeChanged, [this](auto &&params) {
             if (params != nullptr) {
                 auto modeParams = static_cast<gui::PhoneModeParams *>(params.get());
-                this->phoneMode = modeParams->getPhoneMode();
+                this->statusIndicators.phoneMode = modeParams->getPhoneMode();
             }
             return actionHandled();
         });
         addActionReceiver(app::manager::actions::BluetoothModeChanged, [this](auto &&params) {
             if (params != nullptr) {
                 auto modeParams     = static_cast<gui::BluetoothModeParams *>(params.get());
-                this->bluetoothMode = modeParams->getBluetoothMode();
+                this->statusIndicators.bluetoothMode = modeParams->getBluetoothMode();
+                refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+            }
+            return actionHandled();
+        });
+        addActionReceiver(app::manager::actions::AlarmClockStatusChanged, [this](auto &&params) {
+            if (params != nullptr) {
+                auto status = static_cast<AlarmClockStatusParams *>(params.get())->getAlarmClockStatus();
+                this->statusIndicators.alarmClockStatus = status;
                 refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
             }
             return actionHandled();
@@ -210,12 +220,13 @@ namespace app
         if (state == State::ACTIVE_FORGROUND) {
             auto window = getCurrentWindow();
             window->updateBatteryStatus();
-            window->updateBluetooth(bluetoothMode);
+            window->updateBluetooth(statusIndicators.bluetoothMode);
+            window->updateAlarmClock(statusIndicators.alarmClockStatus);
             window->updateSim();
             window->updateSignalStrength();
             window->updateNetworkAccessTechnology();
             window->updateTime();
-            window->updatePhoneMode(phoneMode);
+            window->updatePhoneMode(statusIndicators.phoneMode);
 
             auto message = std::make_shared<service::gui::DrawMessage>(window->buildDrawList(), mode);
 
@@ -859,6 +870,11 @@ namespace app
                         return std::make_unique<gui::SimNotReadyWindow>(app, window::sim_not_ready_window);
                     });
                 break;
+            case ID::Alarm:
+                windowsFactory.attach(window::alarm_window, [](ApplicationCommon *app, const std::string &name) {
+                    auto presenter = std::make_shared<popup::AlarmPopupPresenter>(app);
+                    return std::make_unique<gui::AlarmPopup>(app, window::alarm_window, presenter);
+                });
             default:
                 break;
             }
@@ -897,6 +913,12 @@ namespace app
                          std::make_unique<locks::SimLockData>(popupParams->getLock(),
                                                               popupParams->getSimInputTypeAction(),
                                                               popupParams->getErrorCode()));
+        }
+        else if (id == ID::Alarm) {
+            auto popupParams =
+                const_cast<gui::AlarmPopupRequestParams *>(static_cast<const gui::AlarmPopupRequestParams *>(params));
+            switchWindow(gui::popup::resolveWindowName(id),
+                         std::make_unique<gui::AlarmPopupRequestParams>(popupParams));
         }
         else {
             switchWindow(gui::popup::resolveWindowName(id));

@@ -5,7 +5,7 @@
 
 #include <CrashCatcher/CrashCatcher.h>
 
-#include <log.hpp>
+#include <log/log.hpp>
 #include <date/date.h>
 #include "crashdumpwriter.hpp"
 #include "consoledump.hpp"

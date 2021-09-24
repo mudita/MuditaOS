@@ -46,7 +46,7 @@ target_link_libraries(application-meditation
         module-utils
         module-vfs
         service-audio
-        time
+        utils-time
     PUBLIC
         apps-common
         module-gui

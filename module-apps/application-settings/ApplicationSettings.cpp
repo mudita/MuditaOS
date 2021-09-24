@@ -99,11 +99,9 @@ namespace app
 
     ApplicationSettings::ApplicationSettings(std::string name,
                                              std::string parent,
-                                             sys::phone_modes::PhoneMode phoneMode,
-                                             sys::bluetooth::BluetoothMode bluetoothMode,
+                                             StatusIndicators statusIndicators,
                                              StartInBackground startInBackground)
-        : Application(
-              std::move(name), std::move(parent), phoneMode, bluetoothMode, startInBackground, settingStackDepth),
+        : Application(std::move(name), std::move(parent), statusIndicators, startInBackground, settingStackDepth),
           AsyncCallbackReceiver{this}, soundsPlayer{std::make_shared<SoundsPlayer>(this)}
     {
         bus.channels.push_back(sys::BusChannel::ServiceAudioNotifications);
@@ -573,7 +571,8 @@ namespace app
                       gui::popup::ID::Tethering,
                       gui::popup::ID::PhoneModes,
                       gui::popup::ID::PhoneLock,
-                      gui::popup::ID::SimLock});
+                      gui::popup::ID::SimLock,
+                      gui::popup::ID::Alarm});
     }
 
     void ApplicationSettings::destroyUserInterface()
@@ -748,7 +747,7 @@ namespace app
 
     auto ApplicationSettings::getCurrentPhoneMode() const noexcept -> sys::phone_modes::PhoneMode
     {
-        return phoneMode;
+        return statusIndicators.phoneMode;
     }
 
     void ApplicationSettings::setAutoLockTime(std::chrono::seconds lockTime)

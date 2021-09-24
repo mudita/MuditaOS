@@ -8,11 +8,6 @@ target_sources(tagsfetcher
         PUBLIC
         TagsFetcher.hpp)
 
-target_include_directories(ucs2
-    PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-)
-
 target_link_libraries(tagsfetcher
     PRIVATE
     tag
