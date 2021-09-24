@@ -26,6 +26,14 @@ class DBContactMessage : public DBMessage
     bool withTemporary = false;
 };
 
+class DBMatchContactByNumberIDMessage : public sys::DataMessage
+{
+  public:
+    explicit DBMatchContactByNumberIDMessage(std::uint32_t numberID);
+
+    const std::uint32_t numberID;
+};
+
 /**
  * @brief Message used to match Contact by an instance of PhoneNumber::View
  *

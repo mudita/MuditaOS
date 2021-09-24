@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include <Databases/ContactsDB.hpp>
 #include <Common/Query.hpp>
 #include <Common/Logging.hpp>
+#include <Databases/ContactsDB.hpp>
 #include <Tables/ContactsGroups.hpp>
 
 #include <i18n/i18n.hpp>
@@ -204,6 +204,8 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
                      CreateTempContact createTempContact = CreateTempContact::False)
         -> std::unique_ptr<std::vector<ContactRecord>>;
 
+    auto GetByNumberID(std::uint32_t numberId) -> std::optional<ContactRecord>;
+
     auto MatchByNumber(const utils::PhoneNumber::View &numberView,
                        CreateTempContact createTempContact  = CreateTempContact::False,
                        utils::PhoneNumber::Match matchLevel = utils::PhoneNumber::Match::POSSIBLE)
@@ -254,7 +256,7 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
     auto verifyTemporary(ContactRecord &record) -> bool;
 
   private:
-    ContactsDB *contactDB;
+    ContactsDB *contactDB = nullptr;
 
     /// get multiple numbers by split numbers_id
     auto getNumbers(const std::string &numbers_id) -> std::vector<ContactRecord::Number>;
@@ -266,6 +268,7 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
     auto splitNumberIDs(const std::string &numberIDs) -> const std::vector<std::uint32_t>;
     auto joinNumberIDs(const std::vector<std::uint32_t> &numberIDs) -> std::string;
     auto unbindNumber(std::uint32_t contactId, std::uint32_t numberId) -> bool;
+    void unbindSpeedDialKeyFromOtherContacts(const UTF8 &key);
 
     const std::uint32_t favouritesGroupId;
     auto getQuery(const std::shared_ptr<db::Query> &query) -> const std::unique_ptr<db::QueryResult>;
@@ -275,6 +278,7 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
     auto getLetterMapQuery(const std::shared_ptr<db::Query> &query) -> const std::unique_ptr<db::QueryResult>;
 
     auto getByIDQuery(const std::shared_ptr<db::Query> &query) -> const std::unique_ptr<db::QueryResult>;
+    auto getByNumberIDQuery(const std::shared_ptr<db::Query> &query) -> const std::unique_ptr<db::QueryResult>;
     auto getContactsSize(const std::shared_ptr<db::Query> &query) -> std::size_t;
     auto getSizeQuery(const std::shared_ptr<db::Query> &query) -> const std::unique_ptr<db::QueryResult>;
     auto addQuery(const std::shared_ptr<db::Query> &query) -> const std::unique_ptr<db::QueryResult>;
@@ -284,4 +288,15 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
     auto mergeContactsListQuery(const std::shared_ptr<db::Query> &query) -> const std::unique_ptr<db::QueryResult>;
     auto checkContactsListDuplicatesQuery(const std::shared_ptr<db::Query> &query)
         -> const std::unique_ptr<db::QueryResult>;
+
+    auto addTemporaryContactForNumber(const ContactRecord::Number &number) -> std::pair<bool, ContactRecord>;
+    auto getNumbersIDs(std::uint32_t contactID, const ContactRecord &contact) -> std::vector<std::uint32_t>;
+    auto addNumbers(std::uint32_t contactID, const std::vector<ContactRecord::Number> &numbers)
+        -> std::pair<bool, std::string>;
+    auto addOrUpdateName(std::uint32_t contactID, std::uint32_t nameID, const ContactRecord &contact)
+        -> std::pair<bool, std::uint32_t>;
+    auto addOrUpdateAddress(std::uint32_t contactID, std::uint32_t addressID, const ContactRecord &contact)
+        -> std::pair<bool, std::uint32_t>;
+    auto addOrUpdateRingtone(std::uint32_t contactID, std::uint32_t ringtoneID, const ContactRecord &contact)
+        -> std::pair<bool, std::uint32_t>;
 };

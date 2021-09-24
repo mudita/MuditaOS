@@ -16,9 +16,9 @@ namespace db::query
         unsigned int threadId  = DB_ID_NONE;
         unsigned int offset    = 0;
         unsigned int limit     = 0;
-        unsigned int contactID = 0;
+        unsigned int numberID  = 0;
 
-        SMSGetForList(unsigned int id, unsigned int offset = 0, unsigned int limit = 0, unsigned int contactID = 0);
+        SMSGetForList(unsigned int id, unsigned int offset = 0, unsigned int limit = 0, unsigned int numberID = 0);
         [[nodiscard]] auto debugInfo() const -> std::string override;
     };
 
