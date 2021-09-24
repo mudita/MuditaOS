@@ -2,8 +2,11 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MeditationProgressPresenter.hpp"
+#include "MeditationCommon.hpp"
 
 #include <apps-common/widgets/ProgressTimerImpl.hpp>
+#include <service-db/agents/settings/SystemSettings.hpp>
+#include <service-db/Settings.hpp>
 
 #include "log.hpp"
 #include <gsl/assert>
@@ -16,8 +19,8 @@ namespace
 
 namespace app::meditation
 {
-    MeditationProgressPresenter ::MeditationProgressPresenter(app::ApplicationCommon *app)
-        : app{app}, model{std::make_shared<MeditationProgressModel>()}
+    MeditationProgressPresenter ::MeditationProgressPresenter(app::ApplicationCommon *app, settings::Settings *settings)
+        : app{app}, settings{settings}, model{std::make_shared<MeditationProgressModel>()}
     {
         model->createData();
     }
@@ -25,6 +28,9 @@ namespace app::meditation
     void MeditationProgressPresenter::activate(MeditationItem &item)
     {
         model->setData(item);
+
+        settings->setValue(
+            meditationDBRecordName, utils::to_string(item.getTimer().count()), settings::SettingsScope::AppLocal);
     }
 
     void MeditationProgressPresenter::request(MeditationItem &item)

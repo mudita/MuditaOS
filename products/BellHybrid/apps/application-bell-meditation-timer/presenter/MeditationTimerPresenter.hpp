@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <apps-common/ApplicationCommon.hpp>
 #include <apps-common/BasePresenter.hpp>
 
 #include "MeditationItem.hpp"
@@ -13,6 +14,11 @@
 namespace app
 {
     class ApplicationCommon;
+}
+
+namespace settings
+{
+    class Settings;
 }
 
 namespace app::meditation
@@ -42,7 +48,7 @@ namespace app::meditation
     class MeditationTimerPresenter : public MeditationTimerContract::Presenter
     {
       public:
-        explicit MeditationTimerPresenter(app::ApplicationCommon *app);
+        explicit MeditationTimerPresenter(app::ApplicationCommon *app, settings::Settings *settings);
 
         void activate(MeditationItem &item) override;
         void request(MeditationItem &item) override;
@@ -51,7 +57,8 @@ namespace app::meditation
         auto getTimerString() -> std::string;
 
       private:
-        app::ApplicationCommon *app = nullptr;
+        app::ApplicationCommon *app  = nullptr;
+        settings::Settings *settings = nullptr;
         std::shared_ptr<MeditationTimerModel> model;
 
         void updateDisplay();

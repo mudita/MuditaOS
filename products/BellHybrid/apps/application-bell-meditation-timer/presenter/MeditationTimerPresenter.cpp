@@ -2,20 +2,31 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MeditationTimerPresenter.hpp"
+#include "MeditationCommon.hpp"
+
+#include <service-db/agents/settings/SystemSettings.hpp>
+#include <service-db/Settings.hpp>
 
 #include "log.hpp"
 #include <gsl/assert>
 
 namespace app::meditation
 {
-    MeditationTimerPresenter ::MeditationTimerPresenter(app::ApplicationCommon *app)
-        : app{app}, model{std::make_shared<MeditationTimerModel>()}
+    MeditationTimerPresenter ::MeditationTimerPresenter(app::ApplicationCommon *app, settings::Settings *settings)
+        : app{app}, settings{settings}, model{std::make_shared<MeditationTimerModel>()}
     {
         model->createData();
     }
 
     void MeditationTimerPresenter::activate(MeditationItem &item)
     {
+        const auto value = settings->getValue(meditationDBRecordName, settings::SettingsScope::AppLocal);
+        int seconds      = utils::getNumericValue<int>(value);
+        if (seconds >= std::chrono::seconds(app::meditation::value::minTimerValue).count() &&
+            seconds <= std::chrono::seconds(app::meditation::value::maxTimerValue).count()) {
+            item.setTimer(std::chrono::seconds{seconds});
+        }
+
         model->setData(item);
         model->setOnTimerChanged([this]() { updateDisplay(); });
         updateDisplay();
