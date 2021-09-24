@@ -20,6 +20,7 @@
 #include <Utils.hpp>
 #include <log/log.hpp>
 #include <queries/messages/threads/QueryThreadGetByNumber.hpp>
+#include <queries/phonebook/QueryNumberGetByID.hpp>
 
 #include <utility>
 #include <cassert>
@@ -32,16 +33,6 @@ auto DBServiceAPI::ContactGetByID(sys::Service *serv, uint32_t contactID) -> std
     rec.ID = contactID;
 
     std::shared_ptr<DBContactMessage> msg = std::make_shared<DBContactMessage>(MessageType::DBContactGetByID, rec);
-    return ContactGetByIDCommon(serv, std::move(msg));
-}
-
-auto DBServiceAPI::ContactGetByIDWithTemporary(sys::Service *serv, uint32_t contactID)
-    -> std::unique_ptr<std::vector<ContactRecord>>
-{
-    ContactRecord rec;
-    rec.ID                                = contactID;
-    std::shared_ptr<DBContactMessage> msg = std::make_shared<DBContactMessage>(MessageType::DBContactGetByID, rec);
-    msg->withTemporary                    = true;
     return ContactGetByIDCommon(serv, std::move(msg));
 }
 
@@ -88,6 +79,35 @@ auto DBServiceAPI::MatchContactByPhoneNumber(sys::Service *serv, const utils::Ph
         return nullptr;
     }
     return std::move(contactResponse->contact);
+}
+
+auto DBServiceAPI::MatchContactByNumberID(sys::Service *serv, std::uint32_t numberID) -> std::unique_ptr<ContactRecord>
+{
+    auto msg             = std::make_shared<DBMatchContactByNumberIDMessage>(numberID);
+    auto ret             = serv->bus.sendUnicastSync(std::move(msg), service::name::db, DefaultTimeoutInMs);
+    auto contactResponse = dynamic_cast<DBContactNumberResponseMessage *>(ret.second.get());
+    if (contactResponse == nullptr || contactResponse->retCode != sys::ReturnCodes::Success) {
+        LOG_ERROR("DB response error, return code: %s", c_str(ret.first));
+        return nullptr;
+    }
+    return std::move(contactResponse->contact);
+}
+
+auto DBServiceAPI::NumberByID(sys::Service *serv, std::uint32_t numberID) -> utils::PhoneNumber::View
+{
+    auto msg = std::make_unique<db::query::NumberGetByID>(numberID);
+    const auto [status, response] =
+        DBServiceAPI::GetQueryWithReply(serv, db::Interface::Name::Contact, std::move(msg), DefaultTimeoutInMs);
+    if (status != sys::ReturnCodes::Success || !response) {
+        return utils::PhoneNumber::View{};
+    }
+    auto queryResponse = dynamic_cast<db::QueryResponse *>(response.get());
+    if (queryResponse == nullptr) {
+        return utils::PhoneNumber::View{};
+    }
+    auto result           = queryResponse->getResult();
+    auto numberIdResponse = dynamic_cast<db::query::NumberGetByIDResult *>(result.get());
+    return numberIdResponse->getNumber();
 }
 
 auto DBServiceAPI::IsContactInFavourites(sys::Service *serv, const utils::PhoneNumber::View &numberView) -> bool

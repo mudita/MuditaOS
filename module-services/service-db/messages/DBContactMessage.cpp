@@ -25,6 +25,10 @@ DBContactResponseMessage ::DBContactResponseMessage(std::unique_ptr<std::vector<
       records(std::move(rec)), favourite{favourite}, limit{limit}, offset{offset}
 {}
 
+DBMatchContactByNumberIDMessage::DBMatchContactByNumberIDMessage(std::uint32_t numberID)
+    : sys::DataMessage{MessageType::DBContactMatchByNumberID}, numberID{numberID}
+{}
+
 DBContactNumberMessage::DBContactNumberMessage(const utils::PhoneNumber::View &numberView)
     : sys::DataMessage(MessageType::DBContactMatchByNumber), numberView(numberView)
 {}

@@ -129,6 +129,19 @@ sys::MessagePointer ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::
         }
     } break;
 
+    case MessageType::DBContactMatchByNumberID: {
+        auto time = utils::time::Scoped("DBContactMatchByNumber");
+        auto *msg = dynamic_cast<DBMatchContactByNumberIDMessage *>(msgl);
+        auto ret  = contactRecordInterface->GetByNumberID(msg->numberID);
+        if (ret.has_value()) {
+            responseMsg = std::make_shared<DBContactNumberResponseMessage>(
+                sys::ReturnCodes::Success, std::make_unique<ContactRecord>(std::move(*ret)));
+        }
+        else {
+            responseMsg = std::make_shared<DBContactNumberResponseMessage>(sys::ReturnCodes::Failure, nullptr);
+        }
+    } break;
+
     case MessageType::DBContactRemove: {
         auto time             = utils::time::Scoped("DBContactRemove");
         DBContactMessage *msg = reinterpret_cast<DBContactMessage *>(msgl);

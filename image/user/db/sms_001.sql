@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS sms
     type       INTEGER,
     FOREIGN KEY (thread_id) REFERENCES threads (_id) ON DELETE CASCADE
 );
+-- sms.contact_id should not be used.
 
 CREATE TABLE IF NOT EXISTS templates
 (
@@ -31,6 +32,7 @@ CREATE TABLE IF NOT EXISTS threads
     snippet    TEXT NOT NULL,
     last_dir   INTEGER
 );
+-- threads.contact_id should not be used.
 
 CREATE TABLE IF NOT EXISTS threads_count
 (

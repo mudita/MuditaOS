@@ -7,7 +7,6 @@
 
 #include <queries/messages/threads/QueryThreadGetByID.hpp>
 #include <queries/messages/threads/QueryThreadGetByNumber.hpp>
-#include <queries/messages/threads/QueryThreadGetByContactID.hpp>
 #include <queries/messages/threads/QueryThreadRemove.hpp>
 #include <queries/messages/threads/QueryThreadsGet.hpp>
 #include <queries/messages/threads/QueryThreadsGetForList.hpp>
@@ -27,7 +26,6 @@ bool ThreadRecordInterface::Add(const ThreadRecord &rec)
                                                   .date           = rec.date,
                                                   .msgCount       = rec.msgCount,
                                                   .unreadMsgCount = rec.unreadMsgCount,
-                                                  .contactID      = rec.contactID,
                                                   .numberID       = rec.numberID,
                                                   .snippet        = rec.snippet,
                                                   .type           = rec.type});
@@ -52,7 +50,6 @@ bool ThreadRecordInterface::Update(const ThreadRecord &rec)
                                                  .date           = rec.date,
                                                  .msgCount       = rec.msgCount,
                                                  .unreadMsgCount = rec.unreadMsgCount,
-                                                 .contactID      = rec.contactID,
                                                  .numberID       = rec.numberID,
                                                  .snippet        = rec.snippet,
                                                  .type           = rec.type
@@ -92,9 +89,6 @@ std::unique_ptr<std::vector<ThreadRecord>> ThreadRecordInterface::GetLimitOffset
 
     ThreadsTableFields threadsField = ThreadsTableFields();
     switch (field) {
-    case ThreadRecordField::ContactID: {
-        threadsField = ThreadsTableFields::ContactID;
-    } break;
     case ThreadRecordField::NumberID: {
         threadsField = ThreadsTableFields::NumberID;
     } break;
@@ -119,32 +113,6 @@ ThreadRecord ThreadRecordInterface::GetByID(uint32_t id)
     }
 
     return ThreadRecord(rec);
-}
-
-ThreadRecord ThreadRecordInterface::GetByContact(uint32_t contact_id)
-{
-    auto ret =
-        smsDB->threads.getLimitOffsetByField(0, 1, ThreadsTableFields::ContactID, std::to_string(contact_id).c_str());
-    if (ret.size() == 0) {
-        ContactRecordInterface contactInterface(contactsDB);
-        const auto &numbersIds = contactInterface.GetNumbersIdsByContact(contact_id);
-
-        ThreadRecord re;
-        re.contactID = contact_id;
-        re.numberID  = numbersIds.empty() ? DB_ID_NONE : numbersIds.front();
-        if (!Add(re)) {
-            LOG_ERROR("There is no thread but we cant add it");
-            return ThreadRecord();
-        }
-
-        ret = smsDB->threads.getLimitOffsetByField(
-            0, 1, ThreadsTableFields::ContactID, std::to_string(contact_id).c_str());
-        if (ret.size() == 0) {
-            return ThreadRecord();
-        }
-    }
-
-    return ThreadRecord(ret[0]);
 }
 
 ThreadRecord ThreadRecordInterface::GetByNumber(const utils::PhoneNumber::View &phoneNumber)
@@ -188,9 +156,6 @@ std::unique_ptr<db::QueryResult> ThreadRecordInterface::runQuery(std::shared_ptr
     else if (typeid(*query) == typeid(db::query::ThreadGetByNumber)) {
         return threadGetByNumberQuery(query);
     }
-    else if (typeid(*query) == typeid(db::query::ThreadGetByContactID)) {
-        return threadGetByContactIDQuery(query);
-    }
     else if (typeid(*query) == typeid(db::query::ThreadRemove)) {
         return threadRemoveQuery(query);
     }
@@ -212,8 +177,11 @@ std::unique_ptr<db::QueryResult> ThreadRecordInterface::threadSearchForListQuery
 
     std::vector<ContactRecord> contacts;
 
+    auto contactDb = ContactRecordInterface(contactsDB);
     for (const auto &record : records) {
-        contacts.push_back(ContactRecordInterface(contactsDB).GetByIdWithTemporary(record.contactID));
+        if (auto contact = contactDb.GetByNumberID(record.numberID); contact.has_value()) {
+            contacts.push_back(contact.value());
+        }
     }
 
     auto response = std::make_unique<db::query::ThreadsSearchResultForList>(records, contacts, count);
@@ -271,9 +239,12 @@ std::unique_ptr<db::QueryResult> ThreadRecordInterface::threadsGetForListQuery(c
     std::vector<ContactRecord> contacts;
     std::vector<utils::PhoneNumber::View> numbers;
 
+    auto contactDb = ContactRecordInterface(contactsDB);
     for (const auto &record : records) {
-        contacts.push_back(ContactRecordInterface(contactsDB).GetByIdWithTemporary(record.contactID));
-        numbers.push_back(ContactRecordInterface(contactsDB).GetNumberById(record.numberID));
+        if (auto contact = contactDb.GetByNumberID(record.numberID); contact.has_value()) {
+            contacts.push_back(contact.value());
+        }
+        numbers.push_back(contactDb.GetNumberById(record.numberID));
     }
 
     auto count = smsDB->threads.count();
@@ -299,18 +270,6 @@ std::unique_ptr<db::QueryResult> ThreadRecordInterface::threadGetByNumberQuery(c
     const auto localQuery = static_cast<const db::query::ThreadGetByNumber *>(query.get());
 
     auto response = std::make_unique<db::query::ThreadGetByNumberResult>(GetByNumber(localQuery->getNumber()));
-    response->setRequestQuery(query);
-    return response;
-}
-
-std::unique_ptr<db::QueryResult> ThreadRecordInterface::threadGetByContactIDQuery(
-    const std::shared_ptr<db::Query> &query)
-{
-    const auto localQuery = static_cast<const db::query::ThreadGetByContactID *>(query.get());
-
-    const auto thread = GetByContact(localQuery->id);
-    auto response     = std::make_unique<db::query::ThreadGetByContactIDResult>(
-        thread.isValid() ? std::optional<ThreadRecord>(thread) : std::nullopt);
     response->setRequestQuery(query);
     return response;
 }
