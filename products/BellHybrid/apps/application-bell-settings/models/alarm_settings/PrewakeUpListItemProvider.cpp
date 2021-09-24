@@ -7,6 +7,7 @@
 
 #include <apps-common/ApplicationCommon.hpp>
 #include <gui/widgets/ListViewEngine.hpp>
+#include <widgets/SoundFileListItem.hpp>
 
 namespace app::bell_settings
 {
@@ -41,11 +42,11 @@ namespace app::bell_settings
         };
         internalData.emplace_back(chimeDuration);
 
-        const auto textRange = UTF8Spinner::Range{{"Meditative\nsurprises"}}; // TODO: Full list needed
         internalData.emplace_back(
-            new UTF8ListItem(model.getChimeTone(),
-                             textRange,
-                             utils::translate("app_bell_settings_alarm_settings_prewake_up_chime_tone")));
+            new SoundFileListItem(model.getChimeTone(),
+                                  AlarmSoundType::PreWakeUp,
+                                  AlarmSoundDelegate::fromModel(AlarmSoundsModel{AlarmSoundType::PreWakeUp}),
+                                  utils::translate("app_bell_settings_alarm_settings_prewake_up_chime_tone")));
 
         constexpr auto volumeStep = 1U;
         constexpr auto volumeMin  = 1U;
@@ -53,7 +54,7 @@ namespace app::bell_settings
         internalData.emplace_back(
             new NumListItem(model.getChimeVolume(),
                             UIntegerSpinner::Range{volumeMin, volumeMax, volumeStep},
-                            utils::translate("app_bell_settings_alarm_settings_snooze_chime_volume")));
+                            utils::translate("app_bell_settings_alarm_settings_prewake_up_chime_volume")));
 
         const auto lightDurationRange = NumWithStringListItem::NumWithStringSpinner::Range{
             NumWithStringListItem::Value{utils::translate("app_settings_toggle_off")},

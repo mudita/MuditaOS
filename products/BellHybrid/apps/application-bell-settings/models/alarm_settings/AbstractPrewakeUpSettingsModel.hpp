@@ -6,7 +6,8 @@
 #include <common/models/AbstractSettingsModel.hpp>
 
 #include <cstdint>
-#include <utf8/UTF8.hpp>
+#include <memory>
+#include <string>
 
 namespace app::bell_settings
 {
@@ -14,7 +15,7 @@ namespace app::bell_settings
     {
       public:
         AbstractPrewakeUpSettingsModel(std::unique_ptr<gui::AbstractSettingsModel<std::uint8_t>> chimeDuration,
-                                       std::unique_ptr<gui::AbstractSettingsModel<UTF8>> chimeTone,
+                                       std::unique_ptr<gui::AbstractSettingsModel<std::string>> chimeTone,
                                        std::unique_ptr<gui::AbstractSettingsModel<std::uint8_t>> chimeVolume,
                                        std::unique_ptr<gui::AbstractSettingsModel<std::uint8_t>> lightDuration)
             : chimeDuration(std::move(chimeDuration)), chimeTone(std::move(chimeTone)),
@@ -28,7 +29,7 @@ namespace app::bell_settings
             return *chimeDuration;
         }
 
-        gui::AbstractSettingsModel<UTF8> &getChimeTone()
+        gui::AbstractSettingsModel<std::string> &getChimeTone()
         {
             return *chimeTone;
         }
@@ -45,7 +46,7 @@ namespace app::bell_settings
 
       private:
         std::unique_ptr<gui::AbstractSettingsModel<std::uint8_t>> chimeDuration;
-        std::unique_ptr<gui::AbstractSettingsModel<UTF8>> chimeTone;
+        std::unique_ptr<gui::AbstractSettingsModel<std::string>> chimeTone;
         std::unique_ptr<gui::AbstractSettingsModel<std::uint8_t>> chimeVolume;
         std::unique_ptr<gui::AbstractSettingsModel<std::uint8_t>> lightDuration;
     };
