@@ -24,6 +24,7 @@ target_sources(application-bell-settings
         ApplicationBellSettings.cpp
         models/FrontlightModel.cpp
         models/SettingsModel.cpp
+        models/SoundFilesModel.cpp
         models/TemperatureUnitModel.cpp
         models/TimeUnitsModel.cpp
         models/alarm_settings/AlarmSettingsListItemProvider.cpp
@@ -39,6 +40,7 @@ target_sources(application-bell-settings
         presenter/alarm_settings/PrewakeUpPresenter.cpp
         presenter/alarm_settings/SnoozePresenter.cpp
 
+        widgets/SoundFileListItem.cpp
         widgets/TemperatureUnitListItem.cpp
         widgets/TimeFormatSetListItem.cpp
         widgets/TimeSetListItem.cpp
@@ -56,6 +58,7 @@ target_sources(application-bell-settings
         windows/alarm_settings/BellSettingsPrewakeUpWindow.cpp
 
         models/SettingsModel.hpp
+        models/SoundFilesModel.hpp
         models/alarm_settings/AbstractAlarmSettingsModel.hpp
         models/alarm_settings/AbstractPrewakeUpSettingsModel.hpp
         models/alarm_settings/AbstractSnoozeSettingsModel.hpp
@@ -71,6 +74,7 @@ target_sources(application-bell-settings
         presenter/alarm_settings/PrewakeUpPresenter.hpp
         presenter/alarm_settings/SnoozePresenter.hpp
 
+        widgets/SoundFileListItem.hpp
         widgets/TemperatureUnitListItem.hpp
         widgets/TimeFormatSetListItem.hpp
         widgets/TimeSetListItem.hpp
@@ -104,6 +108,7 @@ target_link_libraries(application-bell-settings
         bellgui
         bell::app-common
         bell::db
+        bell::alarms
         service-appmgr
         apps-common
     PUBLIC
