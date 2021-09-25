@@ -71,10 +71,9 @@ namespace gui
         if (data && typeid(*data) == typeid(BGSoundsSwitchData)) {
             auto *audioSwitchData = static_cast<BGSoundsSwitchData *>(data);
             audioContext          = audioSwitchData->getAudioContext();
-            title->setText(audioContext->getTitle());
+            title->setText(audioContext->getTags().title);
+            presenter->activate(audioContext->getTags());
         }
-
-        presenter->activate();
     }
 
     void BGSoundsProgressWindow::buildInterface()

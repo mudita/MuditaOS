@@ -3,6 +3,7 @@
 
 #pragma once
 #include <SwitchData.hpp>
+#include <tags_fetcher/TagsFetcher.hpp>
 
 #include <chrono>
 #include <memory>
@@ -12,14 +13,14 @@ namespace gui
 {
     class BGSoundsAudioContext
     {
-        std::string title;
+        tags::fetcher::Tags tags;
 
       public:
-        explicit BGSoundsAudioContext(std::string title) : title{std::move(title)}
+        explicit BGSoundsAudioContext(const tags::fetcher::Tags &tags) : tags{tags}
         {}
-        [[nodiscard]] const std::string &getTitle() const noexcept
+        [[nodiscard]] const tags::fetcher::Tags &getTags() const noexcept
         {
-            return title;
+            return tags;
         }
     };
 

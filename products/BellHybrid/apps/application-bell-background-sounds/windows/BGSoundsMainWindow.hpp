@@ -11,10 +11,10 @@ namespace gui
     {
         std::unique_ptr<app::bgSounds::BGSoundsMainWindowContract::Presenter> presenter;
 
-        void setSoundsList();
+        void setSoundsList(std::vector<tags::fetcher::Tags> soundsTags);
         void buildInterface() override;
 
-        void onActivated(std::string recordName);
+        void onActivated(const tags::fetcher::Tags &selectedSoundTags);
 
       public:
         BGSoundsMainWindow(app::ApplicationCommon *app,
