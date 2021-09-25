@@ -14,16 +14,22 @@ namespace gui::window::name
 } // namespace gui::window::name
 namespace app
 {
+    namespace bgSounds
+    {
+        class BGSoundsPlayer;
+    }
     inline constexpr auto applicationBellBackgroundSoundsName = "ApplicationBellBackgroundSounds";
 
     class ApplicationBellBackgroundSounds : public Application
     {
+        std::unique_ptr<bgSounds::BGSoundsPlayer> player;
+
       public:
         ApplicationBellBackgroundSounds(std::string name                    = applicationBellBackgroundSoundsName,
                                         std::string parent                  = "",
                                         StatusIndicators statusIndicators   = StatusIndicators{},
                                         StartInBackground startInBackground = {false});
-
+        ~ApplicationBellBackgroundSounds();
         sys::ReturnCodes InitHandler() override;
 
         void createUserInterface() override;

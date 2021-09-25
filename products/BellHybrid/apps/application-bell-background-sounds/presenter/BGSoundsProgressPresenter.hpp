@@ -5,6 +5,7 @@
 
 #include <apps-common/BasePresenter.hpp>
 #include <apps-common/widgets/TimerWithCallbacks.hpp>
+#include <tags_fetcher/TagsFetcher.hpp>
 #include <memory>
 namespace app
 {
@@ -35,7 +36,7 @@ namespace app::bgSounds
         class Presenter : public BasePresenter<BGSoundsProgressContract::View>
         {
           public:
-            virtual void activate()                                                 = 0;
+            virtual void activate(const tags::fetcher::Tags &tags)                  = 0;
             virtual void stop()                                                     = 0;
             virtual void pause()                                                    = 0;
             virtual void resume()                                                   = 0;
@@ -43,15 +44,15 @@ namespace app::bgSounds
         };
     };
 
-    class AlarmController;
+    class AbstractBGSoundsPlayer;
 
     class BGSoundsProgressPresenter : public BGSoundsProgressContract::Presenter
     {
         settings::Settings *settings = nullptr;
+        AbstractBGSoundsPlayer &player;
         std::unique_ptr<app::TimerWithCallbacks> timer;
-        bool runTimer = false;
 
-        void activate() override;
+        void activate(const tags::fetcher::Tags &tags) override;
         void stop() override;
         void pause() override;
         void resume() override;
@@ -60,6 +61,6 @@ namespace app::bgSounds
         void onFinished();
 
       public:
-        BGSoundsProgressPresenter(app::ApplicationCommon *app, settings::Settings *settings);
+        BGSoundsProgressPresenter(settings::Settings *settings, AbstractBGSoundsPlayer &player);
     };
 } // namespace app::bgSounds
