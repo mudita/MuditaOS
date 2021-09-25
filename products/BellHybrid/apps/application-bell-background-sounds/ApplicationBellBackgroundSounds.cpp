@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationBellBackgroundSounds.hpp"
+#include "models/BGSoundsRepository.hpp"
 #include "presenter/BGSoundsMainWindowPresenter.hpp"
 #include "presenter/BGSoundsTimerSelectPresenter.hpp"
 #include "presenter/BGSoundsProgressPresenter.hpp"
@@ -11,15 +12,26 @@
 #include "windows/BGSoundsProgressWindow.hpp"
 #include "windows/BGSoundsTimerSelectWindow.hpp"
 #include "windows/BGSoundsVolumeWindow.hpp"
+#include "widgets/BGSoundsPlayer.hpp"
+#include <service-audio/AudioMessage.hpp>
 
+#include <log/log.hpp>
 namespace app
 {
     ApplicationBellBackgroundSounds::ApplicationBellBackgroundSounds(std::string name,
                                                                      std::string parent,
                                                                      StatusIndicators statusIndicators,
                                                                      StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), statusIndicators, startInBackground)
-    {}
+        : Application(std::move(name), std::move(parent), statusIndicators, startInBackground),
+          player{std::make_unique<bgSounds::BGSoundsPlayer>(this)}
+    {
+        bus.channels.push_back(sys::BusChannel::ServiceAudioNotifications);
+        connect(typeid(AudioEOFNotification), [&](sys::Message *msg) -> sys::MessagePointer {
+            auto notification = static_cast<AudioEOFNotification *>(msg);
+            return player->handle(notification);
+        });
+    }
+    ApplicationBellBackgroundSounds::~ApplicationBellBackgroundSounds() = default;
 
     sys::ReturnCodes ApplicationBellBackgroundSounds::InitHandler()
     {
@@ -34,8 +46,10 @@ namespace app
 
     void ApplicationBellBackgroundSounds::createUserInterface()
     {
-        windowsFactory.attach(gui::name::window::main_window, [](ApplicationCommon *app, const std::string &name) {
-            auto presenter = std::make_unique<bgSounds::BGSoundsMainWindowPresenter>();
+        windowsFactory.attach(gui::name::window::main_window, [this](ApplicationCommon *app, const std::string &name) {
+            auto tagsFetcher      = std::make_unique<bgSounds::BGSoundsTagsFetcher>(app);
+            auto soundsRepository = std::make_shared<bgSounds::BGSoundsRepository>(std::move(tagsFetcher));
+            auto presenter = std::make_unique<bgSounds::BGSoundsMainWindowPresenter>(std::move(soundsRepository));
             return std::make_unique<gui::BGSoundsMainWindow>(app, std::move(presenter));
         });
         windowsFactory.attach(
@@ -45,7 +59,7 @@ namespace app
             });
         windowsFactory.attach(
             gui::window::name::bgSoundsProgress, [this](ApplicationCommon *app, const std::string &name) {
-                auto presenter = std::make_unique<bgSounds::BGSoundsProgressPresenter>(app, settings.get());
+                auto presenter = std::make_unique<bgSounds::BGSoundsProgressPresenter>(settings.get(), *player);
                 return std::make_unique<gui::BGSoundsProgressWindow>(app, std::move(presenter));
             });
         windowsFactory.attach(gui::window::name::bgSoundsPaused, [](ApplicationCommon *app, const std::string &name) {
@@ -70,6 +84,7 @@ namespace app
             response != nullptr && response->retCode == sys::ReturnCodes::Success) {
             return retMsg;
         }
+
         return handleAsyncResponse(resp);
     }
 } // namespace app
