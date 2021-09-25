@@ -3,6 +3,7 @@
 
 #include "BGSoundsProgressPresenter.hpp"
 #include "data/BGSoundsCommon.hpp"
+#include "widgets/BGSoundsPlayer.hpp"
 #include <ApplicationBellBackgroundSounds.hpp>
 #include <apps-common/widgets/ProgressTimer.hpp>
 #include <service-db/Settings.hpp>
@@ -13,8 +14,8 @@
 
 namespace app::bgSounds
 {
-    BGSoundsProgressPresenter::BGSoundsProgressPresenter(app::ApplicationCommon *app, settings::Settings *settings)
-        : settings{settings}
+    BGSoundsProgressPresenter::BGSoundsProgressPresenter(settings::Settings *settings, AbstractBGSoundsPlayer &player)
+        : settings{settings}, player{player}
     {}
 
     void BGSoundsProgressPresenter::setTimer(std::unique_ptr<app::TimerWithCallbacks> &&_timer)
@@ -23,36 +24,61 @@ namespace app::bgSounds
         timer->registerOnFinishedCallback([this]() { onFinished(); });
     }
 
-    void BGSoundsProgressPresenter::activate()
+    void BGSoundsProgressPresenter::activate(const tags::fetcher::Tags &tags)
     {
         Expects(timer != nullptr);
+        AbstractBGSoundsPlayer::PlaybackMode mode;
         const auto value = settings->getValue(timerValueDBRecordName, settings::SettingsScope::AppLocal);
-        runTimer         = utils::is_number(value);
-        if (runTimer) {
+        if (utils::is_number(value) && utils::getNumericValue<int>(value) != 0) {
             timer->reset(std::chrono::minutes{utils::getNumericValue<int>(value)});
-            timer->start();
+            mode = AbstractBGSoundsPlayer::PlaybackMode::Looped;
         }
+        else {
+            timer->reset(std::chrono::seconds{tags.total_duration_s});
+            mode = AbstractBGSoundsPlayer::PlaybackMode::SingleShot;
+        }
+        auto onStartCallback = [this](audio::RetCode retCode) {
+            if (retCode == audio::RetCode::Success) {
+                timer->start();
+            }
+        };
+        player.start(tags.filePath, mode, std::move(onStartCallback));
     }
     void BGSoundsProgressPresenter::stop()
     {
-        timer->stop();
         onFinished();
+        timer->stop();
     }
     void BGSoundsProgressPresenter::onFinished()
     {
-        getView()->onFinished();
+        auto onStopCallback = [this](audio::RetCode retCode) {
+            if (retCode == audio::RetCode::Success) {
+                getView()->onFinished();
+            }
+        };
+        player.stop(std::move(onStopCallback));
     }
     void BGSoundsProgressPresenter::pause()
     {
         if (not timer->isStopped()) {
-            timer->stop();
-            getView()->onPaused();
+            auto onPauseCallback = [this](audio::RetCode retCode) {
+                if (retCode == audio::RetCode::Success) {
+                    timer->stop();
+                    getView()->onPaused();
+                }
+            };
+            player.pause(std::move(onPauseCallback));
         }
     }
     void BGSoundsProgressPresenter::resume()
     {
-        if (runTimer && timer->isStopped()) {
-            timer->start();
+        if (timer->isStopped()) {
+            auto onResumeCallback = [this](audio::RetCode retCode) {
+                if (retCode == audio::RetCode::Success) {
+                    timer->start();
+                }
+            };
+            player.resume(std::move(onResumeCallback));
         }
     }
 
