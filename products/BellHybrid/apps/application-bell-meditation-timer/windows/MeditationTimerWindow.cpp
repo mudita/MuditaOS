@@ -22,34 +22,15 @@ namespace gui
     {
         MeditationWindow::buildInterface();
 
-        auto newLabel = [](Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h) {
-            auto label = new gui::Label(parent, x, y, w, h);
-            label->setFilled(false);
-            label->setBorderColor(gui::ColorNoColor);
-            label->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-            return label;
-        };
-
-        title = newLabel(this, mtStyle::title::x, mtStyle::title::y, mtStyle::title::w, mtStyle::title::h);
-        title->setFont(mtStyle::title::font);
-        title->setText(utils::translate("app_meditation_title_main"));
-
-        text = newLabel(this, mtStyle::text::x, mtStyle::text::y, mtStyle::text::w, mtStyle::text::h);
-        text->setFont(mtStyle::text::font);
-
-        minute = newLabel(this, mtStyle::minute::x, mtStyle::minute::y, mtStyle::minute::w, mtStyle::minute::h);
-        minute->setFont(mtStyle::minute::font);
-        minute->setText(utils::translate("app_meditation_bell_minutes"));
-        // minute->setText("Minutes");
-        minute->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
+        sideListView =
+            new gui::SideListView(this, 0, 0, style::window_width, style::window_height, presenter->getProvider());
+        setFocusItem(sideListView);
     }
 
     void MeditationTimerWindow::destroyInterface()
     {
         erase();
-        title  = nullptr;
-        text   = nullptr;
-        minute = nullptr;
+        sideListView = nullptr;
     }
 
     void MeditationTimerWindow::onBeforeShow(ShowMode mode, SwitchData *data)
@@ -59,13 +40,7 @@ namespace gui
 
     bool MeditationTimerWindow::onInput(const gui::InputEvent &inputEvent)
     {
-        if (inputEvent.isShortRelease(gui::KeyCode::KEY_UP) || inputEvent.isShortRelease(gui::KeyCode::KEY_RIGHT)) {
-            presenter->increase();
-            return true;
-        }
-
-        if (inputEvent.isShortRelease(gui::KeyCode::KEY_DOWN) || inputEvent.isShortRelease(gui::KeyCode::KEY_LEFT)) {
-            presenter->decrease();
+        if (sideListView->onInput(inputEvent)) {
             return true;
         }
 
@@ -77,15 +52,15 @@ namespace gui
         return MeditationWindow::onInput(inputEvent);
     }
 
-    void MeditationTimerWindow::updateDisplay()
+    status_bar::Configuration MeditationTimerWindow::configureStatusBar(status_bar::Configuration appConfiguration)
     {
-        LOG_DEBUG("updateDisplay");
-        text->setText(presenter->getTimerString());
+        appConfiguration.disable(status_bar::Indicator::Time);
+        return appConfiguration;
     }
 
     void MeditationTimerWindow::buildMeditationItem(MeditationItem &item)
     {
-        presenter->request(item);
+        presenter->get(item);
     }
 
     void MeditationTimerWindow::onMeditationItemAvailable(MeditationItem *item)
@@ -93,6 +68,7 @@ namespace gui
         if (item == nullptr) {
             item = new MeditationItem();
         }
-        presenter->activate(*item);
+        presenter->set(*item);
+        sideListView->rebuildList(listview::RebuildType::Full);
     }
 } // namespace gui

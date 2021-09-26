@@ -153,6 +153,11 @@ namespace app::meditationStyle
             constexpr inline auto y    = style::window_height - h;
             constexpr inline auto font = style::window::font::largelight;
         } // namespace minute
+
+        namespace config
+        {
+            constexpr inline auto arrow = false;
+        } // namespace config
     }     // namespace mtStyle
 
     namespace spStyle
