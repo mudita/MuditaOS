@@ -19,6 +19,7 @@ target_include_directories(application-bell-meditation-timer
 target_sources(application-bell-meditation-timer
     PRIVATE
         ApplicationBellMeditationTimer.cpp
+        data/IntervalChimeListItem.cpp
         data/MeditationTimerListItem.cpp
         models/IntervalChimeModel.cpp
         models/MeditationBaseModel.cpp
@@ -28,6 +29,8 @@ target_sources(application-bell-meditation-timer
         presenter/MeditationBasePresenter.cpp
         presenter/MeditationProgressPresenter.cpp
         presenter/MeditationTimerPresenter.cpp
+        widgets/ScroolSpinner.cpp
+        widgets/UnityProgressBar.cpp
         windows/IconTextWindow.cpp
         windows/IntervalChimeWindow.cpp
         windows/MeditationRunningWindow.cpp
@@ -36,7 +39,6 @@ target_sources(application-bell-meditation-timer
         windows/ReadyGoingWindow.cpp
         windows/SessionEndWindow.cpp
         windows/SessionPausedWindow.cpp
-        widgets/UnityProgressBar.cpp
         windows/WithTimerWindow.cpp
     PUBLIC
         include/application-bell-meditation-timer/ApplicationBellMeditationTimer.hpp

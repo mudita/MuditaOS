@@ -4,10 +4,16 @@
 #pragma once
 
 #include "MeditationBaseModel.hpp"
+#include "IntervalChimeListItem.hpp"
+
+#include <ListItemProvider.hpp>
+#include <apps-common/InternalModel.hpp>
 
 namespace app::meditation
 {
-    class IntervalChimeModel : public MeditationBaseModel
+    class IntervalChimeModel : public MeditationBaseModel,
+                               public app::InternalModel<gui::ListItem *>,
+                               public gui::ListItemProvider
     {
       private:
         enum class IntervalType
@@ -17,20 +23,24 @@ namespace app::meditation
             Interval_2,
             Interval_5,
             Interval_10,
-            Interval_15
+            Interval_15,
+            IntervalTotal
         };
 
-        std::function<void()> onIntervalChangedCallback{nullptr};
-        IntervalType interval{IntervalType::IntervalNone};
+        gui::IntervalChimeListItem *item = nullptr;
 
-        IntervalType secsToInterval(std::chrono::seconds secs);
-        std::chrono::seconds intervalToSecs(IntervalType interval);
+        IntervalType secsToInterval(std::chrono::seconds secs) const noexcept;
+        std::chrono::seconds intervalToSecs(IntervalType interval) const noexcept;
 
       public:
-        auto setOnIntervalChanged(std::function<void()> cb) -> void;
-        [[nodiscard]] auto getInterval() -> std::chrono::seconds;
-        void nextInterval();
-        void previousInterval();
-        auto getIntervalString() -> std::string;
+        auto createData() -> void;
+        auto setData(MeditationItem &item) -> void;
+        [[nodiscard]] auto getItem(gui::Order order) -> gui::ListItem * override;
+        [[nodiscard]] auto requestRecordsCount() -> unsigned int override;
+        [[nodiscard]] auto getMinimalItemSpaceRequired() const -> unsigned int override;
+        void requestRecords(uint32_t offset, uint32_t limit) override;
+
+        [[nodiscard]] std::chrono::minutes getValue() const noexcept;
+        void setValue(std::chrono::minutes value);
     };
 } // namespace app::meditation

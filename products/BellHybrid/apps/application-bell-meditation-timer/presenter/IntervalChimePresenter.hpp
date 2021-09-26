@@ -24,19 +24,16 @@ namespace app::meditation
         class View
         {
           public:
-            virtual ~View()              = default;
-            virtual void updateDisplay() = 0;
+            virtual ~View() = default;
         };
 
         class Presenter : public BasePresenter<IntervalChimeContract::View>
         {
           public:
-            virtual ~Presenter() noexcept                   = default;
-            virtual void activate(MeditationItem &item)     = 0;
-            virtual void request(MeditationItem &item)      = 0;
-            virtual void increase()                         = 0;
-            virtual void decrease()                         = 0;
-            virtual auto getIntervalString() -> std::string = 0;
+            virtual ~Presenter() noexcept                                        = default;
+            virtual void set(MeditationItem &item)                               = 0;
+            virtual void get(MeditationItem &item)                               = 0;
+            virtual auto getProvider() -> std::shared_ptr<gui::ListItemProvider> = 0;
         };
     };
 
@@ -45,16 +42,12 @@ namespace app::meditation
       public:
         explicit IntervalChimePresenter(app::ApplicationCommon *app);
 
-        void activate(MeditationItem &item) override;
-        void request(MeditationItem &item) override;
-        void increase() override;
-        void decrease() override;
-        auto getIntervalString() -> std::string;
+        void set(MeditationItem &item) override;
+        void get(MeditationItem &item) override;
+        auto getProvider() -> std::shared_ptr<gui::ListItemProvider> override;
 
       private:
         app::ApplicationCommon *app = nullptr;
         std::shared_ptr<IntervalChimeModel> model;
-
-        void updateDisplay();
     };
 } // namespace app::meditation

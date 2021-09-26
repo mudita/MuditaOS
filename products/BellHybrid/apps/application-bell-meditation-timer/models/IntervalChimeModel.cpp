@@ -3,92 +3,110 @@
 
 #include "IntervalChimeModel.hpp"
 
+#include <ListView.hpp>
+
 #include <i18n/i18n.hpp>
 
 namespace app::meditation
 {
-    auto IntervalChimeModel::setOnIntervalChanged(std::function<void()> cb) -> void
+    auto IntervalChimeModel::createData() -> void
     {
-        onIntervalChangedCallback = std::move(cb);
+        MeditationBaseModel::createData();
+
+        auto onGetTitle = [this](int index) -> std::string {
+            if (meditationItem == nullptr) {
+                return "";
+            }
+
+            IntervalType interval = IntervalType(index);
+            if (interval == IntervalType::IntervalNone) {
+                return utils::translate("app_meditation_bell_interval_none");
+            }
+
+            const std::string toReplace = "%0";
+            std::string temp            = utils::translate("app_meditation_bell_interval_every_x_minutes");
+
+            switch (interval) {
+            case IntervalType::IntervalNone:
+            case IntervalType::IntervalTotal:
+                temp = utils::translate("app_meditation_bell_interval_none");
+                break;
+            case IntervalType::Interval_1:
+                temp.replace(temp.find(toReplace), toReplace.size(), std::to_string(1));
+                break;
+            case IntervalType::Interval_2:
+                temp.replace(temp.find(toReplace), toReplace.size(), std::to_string(2));
+                break;
+            case IntervalType::Interval_5:
+                temp.replace(temp.find(toReplace), toReplace.size(), std::to_string(5));
+                break;
+            case IntervalType::Interval_10:
+                temp.replace(temp.find(toReplace), toReplace.size(), std::to_string(10));
+                break;
+            case IntervalType::Interval_15:
+                temp.replace(temp.find(toReplace), toReplace.size(), std::to_string(15));
+                break;
+            }
+            return temp;
+        };
+
+        item = new gui::IntervalChimeListItem(static_cast<int>(IntervalType::IntervalTotal), std::move(onGetTitle));
+        internalData.push_back(item);
+        item->deleteByList = false;
+        item->setOnIndexChanged(
+            [this](int index) { meditationItem->setInterval(intervalToSecs(IntervalType(index))); });
     }
 
-    auto IntervalChimeModel::getInterval() -> std::chrono::seconds
+    auto IntervalChimeModel::setData(MeditationItem &item) -> void
     {
-        if (meditationItem == nullptr) {
-            return std::chrono::seconds{0};
+        MeditationBaseModel::setData(item);
+
+        setValue(std::chrono::duration_cast<std::chrono::minutes>(item.getInterval()));
+    }
+
+    auto IntervalChimeModel::getItem(gui::Order order) -> gui::ListItem *
+    {
+        return getRecord(order);
+    }
+
+    auto IntervalChimeModel::requestRecordsCount() -> unsigned int
+    {
+        return internalData.size();
+    }
+
+    auto IntervalChimeModel::getMinimalItemSpaceRequired() const -> unsigned int
+    {
+        return style::sidelistview::list_item::w;
+    }
+
+    void IntervalChimeModel::requestRecords(uint32_t offset, uint32_t limit)
+    {
+        setupModel(offset, limit);
+        list->onProviderDataUpdate();
+    }
+
+    std::chrono::minutes IntervalChimeModel::getValue() const noexcept
+    {
+        if (item == nullptr) {
+            return std::chrono::minutes{0};
+            ;
         }
-        return meditationItem->getInterval();
+        return std::chrono::duration_cast<std::chrono::minutes>(intervalToSecs(IntervalType(item->getSpinnerIndex())));
     }
 
-    void IntervalChimeModel::nextInterval()
+    void IntervalChimeModel::setValue(std::chrono::minutes value)
     {
-        if (meditationItem == nullptr) {
+        if (item == nullptr) {
             return;
         }
-        if (interval == IntervalType::Interval_15) {
-            interval = IntervalType::IntervalNone;
-        }
-        else {
-            interval = IntervalType(static_cast<uint32_t>(interval) + 1);
-        }
-        meditationItem->setInterval(intervalToSecs(interval));
-        if (onIntervalChangedCallback != nullptr) {
-            onIntervalChangedCallback();
+        IntervalType interval = secsToInterval(std::chrono::seconds(value));
+        item->setSpinnerIndex(static_cast<int>(interval));
+        if (list != nullptr) {
+            list->rebuildList(gui::listview::RebuildType::Full);
         }
     }
 
-    void IntervalChimeModel::previousInterval()
-    {
-        if (meditationItem == nullptr) {
-            return;
-        }
-        if (interval == IntervalType::IntervalNone) {
-            interval = IntervalType::Interval_15;
-        }
-        else {
-            interval = IntervalType(static_cast<uint32_t>(interval) - 1);
-        }
-        meditationItem->setInterval(intervalToSecs(interval));
-        if (onIntervalChangedCallback != nullptr) {
-            onIntervalChangedCallback();
-        }
-    }
-
-    auto IntervalChimeModel::getIntervalString() -> std::string
-    {
-        if (meditationItem == nullptr) {
-            return "";
-        }
-        if (interval == IntervalType::IntervalNone) {
-            return utils::translate("app_meditation_bell_interval_none");
-        }
-
-        const std::string toReplace = "%0";
-        std::string temp            = utils::translate("app_meditation_bell_interval_every_x_minutes");
-
-        switch (interval) {
-        case IntervalType::IntervalNone:
-            break;
-        case IntervalType::Interval_1:
-            temp.replace(temp.find(toReplace), toReplace.size(), std::to_string(1));
-            break;
-        case IntervalType::Interval_2:
-            temp.replace(temp.find(toReplace), toReplace.size(), std::to_string(2));
-            break;
-        case IntervalType::Interval_5:
-            temp.replace(temp.find(toReplace), toReplace.size(), std::to_string(5));
-            break;
-        case IntervalType::Interval_10:
-            temp.replace(temp.find(toReplace), toReplace.size(), std::to_string(10));
-            break;
-        case IntervalType::Interval_15:
-            temp.replace(temp.find(toReplace), toReplace.size(), std::to_string(15));
-            break;
-        }
-        return temp;
-    }
-
-    IntervalChimeModel::IntervalType IntervalChimeModel::secsToInterval(std::chrono::seconds secs)
+    IntervalChimeModel::IntervalType IntervalChimeModel::secsToInterval(std::chrono::seconds secs) const noexcept
     {
         int s = secs.count();
         if (s >= intervalToSecs(IntervalType::Interval_15).count()) {
@@ -109,10 +127,11 @@ namespace app::meditation
         return IntervalType::IntervalNone;
     }
 
-    std::chrono::seconds IntervalChimeModel::intervalToSecs(IntervalType interval)
+    std::chrono::seconds IntervalChimeModel::intervalToSecs(IntervalType interval) const noexcept
     {
         switch (interval) {
         case IntervalType::IntervalNone:
+        case IntervalType::IntervalTotal:
             return std::chrono::seconds::zero();
         case IntervalType::Interval_1:
             return std::chrono::seconds(std::chrono::minutes{1});

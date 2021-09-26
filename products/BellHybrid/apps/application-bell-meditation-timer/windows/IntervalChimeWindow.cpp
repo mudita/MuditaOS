@@ -17,67 +17,29 @@ namespace gui
         presenter->attach(this);
     }
 
-    void IntervalChimeWindow::rebuild()
-    {}
-
     void IntervalChimeWindow::buildInterface()
     {
         MeditationWindow::buildInterface();
 
-        previousImage = new gui::Image(
-            this, icStyle::left_arrow::x, icStyle::left_arrow::y, 0, 0, icStyle::left_arrow::imageSource);
-        nextImage = new gui::Image(
-            this, icStyle::right_arrow::x, icStyle::right_arrow::y, 0, 0, icStyle::right_arrow::imageSource);
-
-        auto newLabel = [](Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h) {
-            auto label = new gui::Label(parent, x, y, w, h);
-            label->setFilled(false);
-            label->setBorderColor(gui::ColorNoColor);
-            label->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-            return label;
-        };
-
-        title = newLabel(this, icStyle::title::x, icStyle::title::y, icStyle::title::w, icStyle::title::h);
-        title->setFont(icStyle::title::font);
-        title->setText(utils::translate("app_meditation_interval_chime"));
-
-        text = newLabel(this, icStyle::text::x, icStyle::text::y, icStyle::text::w, icStyle::text::h);
-        text->setFont(icStyle::text::font);
-
-        minute = newLabel(this, icStyle::minute::x, icStyle::minute::y, icStyle::minute::w, icStyle::minute::h);
-        minute->setFont(icStyle::minute::font);
-        minute->setText(utils::translate("app_meditation_bell_minutes"));
-        minute->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
+        sideListView =
+            new gui::SideListView(this, 0, 0, style::window_width, style::window_height, presenter->getProvider());
+        setFocusItem(sideListView);
     }
 
     void IntervalChimeWindow::destroyInterface()
     {
         erase();
-        previousImage = nullptr;
-        nextImage     = nullptr;
-        title         = nullptr;
-        text          = nullptr;
-        minute        = nullptr;
+        sideListView = nullptr;
     }
 
     void IntervalChimeWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         MeditationWindow::onBeforeShow(mode, data);
-
-        if (mode == ShowMode::GUI_SHOW_INIT) {
-            updateDisplay();
-        }
     }
 
     bool IntervalChimeWindow::onInput(const gui::InputEvent &inputEvent)
     {
-        if (inputEvent.isShortRelease(gui::KeyCode::KEY_LEFT) || inputEvent.isShortRelease(gui::KeyCode::KEY_UP)) {
-            presenter->decrease();
-            return true;
-        }
-
-        if (inputEvent.isShortRelease(gui::KeyCode::KEY_RIGHT) || inputEvent.isShortRelease(gui::KeyCode::KEY_DOWN)) {
-            presenter->increase();
+        if (sideListView->onInput(inputEvent)) {
             return true;
         }
 
@@ -89,20 +51,21 @@ namespace gui
         return MeditationWindow::onInput(inputEvent);
     }
 
-    void IntervalChimeWindow::updateDisplay()
+    status_bar::Configuration IntervalChimeWindow::configureStatusBar(status_bar::Configuration appConfiguration)
     {
-        text->setText(presenter->getIntervalString());
+        appConfiguration.disable(status_bar::Indicator::Time);
+        return appConfiguration;
     }
 
     void IntervalChimeWindow::buildMeditationItem(MeditationItem &item)
     {
-        presenter->request(item);
+        presenter->get(item);
     }
 
     void IntervalChimeWindow::onMeditationItemAvailable(MeditationItem *item)
     {
         if (item != nullptr) {
-            presenter->activate(*item);
+            presenter->set(*item);
         }
     }
 } // namespace gui
