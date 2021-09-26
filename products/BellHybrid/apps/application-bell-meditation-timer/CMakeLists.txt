@@ -19,6 +19,7 @@ target_include_directories(application-bell-meditation-timer
 target_sources(application-bell-meditation-timer
     PRIVATE
         ApplicationBellMeditationTimer.cpp
+        data/MeditationTimerListItem.cpp
         models/IntervalChimeModel.cpp
         models/MeditationBaseModel.cpp
         models/MeditationProgressModel.cpp

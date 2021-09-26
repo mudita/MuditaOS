@@ -5,7 +5,7 @@
 
 #include <Application.hpp>
 #include <InputEvent.hpp>
-#include <Label.hpp>
+#include <SideListView.hpp>
 
 #include "MeditationWindow.hpp"
 #include "MeditationTimerPresenter.hpp"
@@ -29,14 +29,12 @@ namespace gui
         void buildInterface() override;
         void destroyInterface() override;
         bool onInput(const gui::InputEvent &inputEvent) override;
-        void updateDisplay() override;
+        status_bar::Configuration configureStatusBar(status_bar::Configuration appConfiguration) override;
         void buildMeditationItem(MeditationItem &item) override;
         void onMeditationItemAvailable(MeditationItem *item) override;
 
       private:
         std::unique_ptr<app::meditation::MeditationTimerContract::Presenter> presenter;
-        gui::Label *title  = nullptr;
-        gui::Label *text   = nullptr;
-        gui::Label *minute = nullptr;
+        SideListView *sideListView = nullptr;
     };
 } // namespace gui

@@ -11,11 +11,9 @@ namespace app::meditation
 {
     MeditationTimerPresenter ::MeditationTimerPresenter(app::ApplicationCommon *app, settings::Settings *settings)
         : app{app}, settings{settings}, model{std::make_shared<MeditationTimerModel>()}
-    {
-        model->createData();
-    }
+    {}
 
-    void MeditationTimerPresenter::activate(MeditationItem &item)
+    void MeditationTimerPresenter::set(MeditationItem &item)
     {
         const auto value = settings->getValue(meditationDBRecordName, settings::SettingsScope::AppLocal);
         int seconds      = utils::getNumericValue<int>(value);
@@ -24,12 +22,11 @@ namespace app::meditation
             item.setTimer(std::chrono::seconds{seconds});
         }
 
+        model->createData();
         model->setData(item);
-        model->setOnTimerChanged([this]() { updateDisplay(); });
-        updateDisplay();
     }
 
-    void MeditationTimerPresenter::request(MeditationItem &item)
+    void MeditationTimerPresenter::get(MeditationItem &item)
     {
         MeditationItem *p = model->getData();
         if (p != nullptr) {
@@ -37,23 +34,8 @@ namespace app::meditation
         }
     }
 
-    void MeditationTimerPresenter::increase()
+    auto MeditationTimerPresenter::getProvider() -> std::shared_ptr<gui::ListItemProvider>
     {
-        model->increaseTimer();
-    }
-
-    void MeditationTimerPresenter::decrease()
-    {
-        model->decreaseTimer();
-    }
-
-    auto MeditationTimerPresenter::getTimerString() -> std::string
-    {
-        return model->getTimerString();
-    }
-
-    void MeditationTimerPresenter::updateDisplay()
-    {
-        getView()->updateDisplay();
+        return model;
     }
 } // namespace app::meditation
