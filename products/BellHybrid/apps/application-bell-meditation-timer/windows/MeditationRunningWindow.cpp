@@ -5,11 +5,12 @@
 #include "SessionPausedWindow.hpp"
 #include "SessionEndWindow.hpp"
 
-#include <service-time/ServiceTime.hpp>
 #include <purefs/filesystem_paths.hpp>
 #include <service-audio/AudioServiceAPI.hpp>
+#include <service-time/api/TimeSettingsApi.hpp>
+#include <service-time/ServiceTime.hpp>
 
-#include "log.hpp"
+#include <log/log.hpp>
 #include <i18n/i18n.hpp>
 
 namespace gui

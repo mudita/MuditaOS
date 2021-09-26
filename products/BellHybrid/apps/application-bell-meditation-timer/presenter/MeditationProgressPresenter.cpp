@@ -8,7 +8,7 @@
 #include <service-db/agents/settings/SystemSettings.hpp>
 #include <service-db/Settings.hpp>
 
-#include "log.hpp"
+#include <log/log.hpp>
 #include <gsl/assert>
 
 namespace
@@ -44,7 +44,6 @@ namespace app::meditation
     void MeditationProgressPresenter::initTimer(gui::Item *parent)
     {
         timer = std::make_unique<app::ProgressTimerImpl>(app, parent, meditationProgressTimerName, baseTick);
-        // timer = new app::ProgressTimerImpl(app, parent, meditationProgressTimerName, baseTick);
         timer->registerOnFinishedCallback([this]() { onProgressFinished(); });
         timer->registerOnIntervalCallback([this]() { onIntervalReached(); });
         timer->registerOnBaseTickCallback([this]() { onBaseTickReached(); });

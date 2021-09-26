@@ -4,7 +4,7 @@
 #include "MeditationTimerWindow.hpp"
 #include "IntervalChimeWindow.hpp"
 
-#include "log.hpp"
+#include <log/log.hpp>
 #include <i18n/i18n.hpp>
 
 namespace gui

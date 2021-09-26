@@ -3,7 +3,6 @@
 
 #include "IntervalChimeModel.hpp"
 
-#include "log.hpp"
 #include <i18n/i18n.hpp>
 
 namespace app::meditation

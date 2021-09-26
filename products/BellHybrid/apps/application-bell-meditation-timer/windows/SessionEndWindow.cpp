@@ -3,7 +3,6 @@
 
 #include "SessionEndWindow.hpp"
 
-#include "log.hpp"
 #include <service-appmgr/Controller.hpp>
 
 namespace gui

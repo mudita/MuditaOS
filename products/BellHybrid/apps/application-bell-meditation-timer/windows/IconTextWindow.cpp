@@ -6,7 +6,7 @@
 
 #include "IconTextWindow.hpp"
 
-#include "log.hpp"
+#include <log/log.hpp>
 #include <i18n/i18n.hpp>
 
 namespace gui

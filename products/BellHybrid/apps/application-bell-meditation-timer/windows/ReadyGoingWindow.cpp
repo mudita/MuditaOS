@@ -4,8 +4,6 @@
 #include "ReadyGoingWindow.hpp"
 #include "MeditationRunningWindow.hpp"
 
-#include "log.hpp"
-
 namespace gui
 {
     ReadyGoingWindow::ReadyGoingWindow(app::ApplicationCommon *app)

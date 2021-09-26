@@ -3,9 +3,6 @@
 
 #include "MeditationBaseModel.hpp"
 
-#include "log.hpp"
-#include <i18n/i18n.hpp>
-
 namespace app::meditation
 {
     auto MeditationBaseModel::createData() -> void

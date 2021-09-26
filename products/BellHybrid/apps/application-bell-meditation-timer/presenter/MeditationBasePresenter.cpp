@@ -3,8 +3,6 @@
 
 #include "MeditationBasePresenter.hpp"
 
-#include "log.hpp"
-
 namespace app::meditation
 {
     MeditationBasePresenter ::MeditationBasePresenter(app::ApplicationCommon *app) : app{app}
