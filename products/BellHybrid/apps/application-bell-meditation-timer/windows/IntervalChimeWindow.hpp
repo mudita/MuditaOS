@@ -3,10 +3,8 @@
 
 #pragma once
 
-#include <Application.hpp>
 #include <InputEvent.hpp>
-#include <Label.hpp>
-#include <Image.hpp>
+#include <SideListView.hpp>
 
 #include "MeditationWindow.hpp"
 #include "IntervalChimePresenter.hpp"
@@ -27,20 +25,15 @@ namespace gui
 
         // virtual methods
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
-        void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;
         bool onInput(const gui::InputEvent &inputEvent) override;
-        void updateDisplay() override;
+        status_bar::Configuration configureStatusBar(status_bar::Configuration appConfiguration) override;
         void buildMeditationItem(MeditationItem &item) override;
         void onMeditationItemAvailable(MeditationItem *item) override;
 
       private:
         std::unique_ptr<app::meditation::IntervalChimeContract::Presenter> presenter;
-        gui::Image *previousImage = nullptr;
-        gui::Image *nextImage     = nullptr;
-        gui::Label *title         = nullptr;
-        gui::Label *text          = nullptr;
-        gui::Label *minute        = nullptr;
+        SideListView *sideListView = nullptr;
     };
 } // namespace gui

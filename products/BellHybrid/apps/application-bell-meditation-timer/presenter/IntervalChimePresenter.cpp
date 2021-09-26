@@ -3,24 +3,19 @@
 
 #include "IntervalChimePresenter.hpp"
 
-#include <gsl/assert>
-
 namespace app::meditation
 {
     IntervalChimePresenter ::IntervalChimePresenter(app::ApplicationCommon *app)
         : app{app}, model{std::make_shared<IntervalChimeModel>()}
+    {}
+
+    void IntervalChimePresenter::set(MeditationItem &item)
     {
         model->createData();
-    }
-
-    void IntervalChimePresenter::activate(MeditationItem &item)
-    {
         model->setData(item);
-        model->setOnIntervalChanged([this]() { updateDisplay(); });
-        updateDisplay();
     }
 
-    void IntervalChimePresenter::request(MeditationItem &item)
+    void IntervalChimePresenter::get(MeditationItem &item)
     {
         MeditationItem *p = model->getData();
         if (p != nullptr) {
@@ -28,23 +23,8 @@ namespace app::meditation
         }
     }
 
-    void IntervalChimePresenter::increase()
+    auto IntervalChimePresenter::getProvider() -> std::shared_ptr<gui::ListItemProvider>
     {
-        model->nextInterval();
-    }
-
-    void IntervalChimePresenter::decrease()
-    {
-        model->previousInterval();
-    }
-
-    auto IntervalChimePresenter::getIntervalString() -> std::string
-    {
-        return model->getIntervalString();
-    }
-
-    void IntervalChimePresenter::updateDisplay()
-    {
-        getView()->updateDisplay();
+        return model;
     }
 } // namespace app::meditation
