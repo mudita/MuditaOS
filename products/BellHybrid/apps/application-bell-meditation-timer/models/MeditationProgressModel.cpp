@@ -3,9 +3,6 @@
 
 #include "MeditationProgressModel.hpp"
 
-#include "log.hpp"
-#include <i18n/i18n.hpp>
-
 namespace app::meditation
 {
     void MeditationProgressModel::onElapsed(std::chrono::seconds elapsed)

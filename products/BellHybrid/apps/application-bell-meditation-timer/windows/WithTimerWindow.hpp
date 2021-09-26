@@ -4,7 +4,8 @@
 #pragma once
 
 #include "MeditationWindow.hpp"
-#include <module-sys/Timers/TimerHandle.hpp>
+
+#include <apps-common/GuiTimer.hpp>
 
 namespace gui
 {

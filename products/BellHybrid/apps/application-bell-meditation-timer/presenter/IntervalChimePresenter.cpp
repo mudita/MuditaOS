@@ -3,7 +3,6 @@
 
 #include "IntervalChimePresenter.hpp"
 
-#include "log.hpp"
 #include <gsl/assert>
 
 namespace app::meditation

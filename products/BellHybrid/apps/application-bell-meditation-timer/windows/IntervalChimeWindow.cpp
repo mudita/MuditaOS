@@ -4,7 +4,6 @@
 #include "IntervalChimeWindow.hpp"
 #include "ReadyGoingWindow.hpp"
 
-#include "log.hpp"
 #include <i18n/i18n.hpp>
 
 namespace gui

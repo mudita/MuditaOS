@@ -7,9 +7,6 @@
 #include <service-db/agents/settings/SystemSettings.hpp>
 #include <service-db/Settings.hpp>
 
-#include "log.hpp"
-#include <gsl/assert>
-
 namespace app::meditation
 {
     MeditationTimerPresenter ::MeditationTimerPresenter(app::ApplicationCommon *app, settings::Settings *settings)

@@ -3,7 +3,6 @@
 
 #include "SessionPausedWindow.hpp"
 
-#include "log.hpp"
 #include <i18n/i18n.hpp>
 #include <Font.hpp>
 
@@ -30,7 +29,6 @@ namespace gui
     std::string SessionPausedWindow::getText()
     {
         return utils::translate("app_meditation_bell_paused");
-        // return "<text>Paused</text>";
     }
 
     std::string SessionPausedWindow::getImageName()

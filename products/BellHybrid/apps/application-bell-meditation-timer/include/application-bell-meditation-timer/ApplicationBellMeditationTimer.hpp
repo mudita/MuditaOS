@@ -12,12 +12,11 @@ namespace app
     class ApplicationBellMeditationTimer : public Application
     {
       public:
-        explicit ApplicationBellMeditationTimer(
-            std::string name                            = applicationBellMeditationTimerName,
-            std::string parent                          = "",
-            sys::phone_modes::PhoneMode mode            = sys::phone_modes::PhoneMode::Offline,
-            sys::bluetooth::BluetoothMode bluetoothMode = sys::bluetooth::BluetoothMode::Disabled,
-            StartInBackground startInBackground         = {false});
+        ApplicationBellMeditationTimer(std::string name                    = applicationBellMeditationTimerName,
+                                       std::string parent                  = "",
+                                       StatusIndicators statusIndicators   = StatusIndicators{},
+                                       StartInBackground startInBackground = {false});
+        ~ApplicationBellMeditationTimer();
 
         sys::ReturnCodes InitHandler() override;
 
