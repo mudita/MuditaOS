@@ -691,5 +691,8 @@
     "<text>Rise up, start fresh!<br />It's going to be GREAT day!</text>",
     "<text>Hejsan!<br />Have a wonderful day!</text>",
     "<text>It's a new Day!<br />Spread  kindness everywhere you go</text>"
-  ]
+  ],
+  "app_bell_settings_advanced_factory_reset": "Factory reset",
+  "app_bell_settings_display_factory_reset_confirmation": "<text>Reset to factory<br></br>settings ?</text>",
+  "app_bell_settings_factory_reset_finished": "Factory settings\nrestored"
 }
