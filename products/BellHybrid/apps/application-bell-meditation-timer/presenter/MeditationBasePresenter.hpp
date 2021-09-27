@@ -31,9 +31,9 @@ namespace app::meditation
         class Presenter : public BasePresenter<MeditationBaseContract::View>
         {
           public:
-            virtual ~Presenter() noexcept               = default;
-            virtual void activate(MeditationItem &item) = 0;
-            virtual void request(MeditationItem &item)  = 0;
+            virtual ~Presenter() noexcept          = default;
+            virtual void set(MeditationItem &item) = 0;
+            virtual void get(MeditationItem &item) = 0;
         };
     };
 
@@ -41,8 +41,8 @@ namespace app::meditation
     {
       public:
         explicit MeditationBasePresenter(app::ApplicationCommon *app);
-        void activate(MeditationItem &item) override;
-        void request(MeditationItem &item) override;
+        void set(MeditationItem &item) override;
+        void get(MeditationItem &item) override;
 
       protected:
         app::ApplicationCommon *app{};

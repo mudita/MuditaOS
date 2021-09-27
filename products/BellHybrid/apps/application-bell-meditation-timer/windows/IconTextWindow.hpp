@@ -4,8 +4,7 @@
 #pragma once
 
 #include <InputEvent.hpp>
-#include <Image.hpp>
-#include <Text.hpp>
+#include <gui/widgets/Icon.hpp>
 
 #include "WithTimerWindow.hpp"
 #include "MeditationBasePresenter.hpp"
@@ -33,8 +32,7 @@ namespace gui
 
       private:
         std::unique_ptr<app::meditation::MeditationBaseContract::Presenter> presenter;
-        gui::Image *appImage = nullptr;
-        gui::Text *text      = nullptr;
+        Icon *icon{};
 
         void showImage();
         void showText();
