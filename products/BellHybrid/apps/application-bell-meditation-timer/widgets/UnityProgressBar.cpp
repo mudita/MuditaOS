@@ -9,8 +9,9 @@
 
 namespace gui
 {
-    UnityProgressBar::UnityProgressBar(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h)
-        : Rect(parent, x, y, w, h)
+    UnityProgressBar::UnityProgressBar(
+        Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h, std::uint32_t faciaWidth, std::uint32_t gapWidth)
+        : Rect(parent, x, y, w, h), faciaWidth{faciaWidth}, gapWidth{gapWidth}, displayWidth{w}, displayHeight{h}
     {
         setFilled(false);
         updateDrawArea();
@@ -44,20 +45,48 @@ namespace gui
 
     void UnityProgressBar::buildDrawListImplementation(std::list<Command> &commands)
     {
-        // LOG_DEBUG("buildDrawListImplementation, maxValue=%d, currentValue=%d", maxValue, currentValue);
-        uint32_t items = (widgetArea.w + gw) / (rw + gw);
+        uint32_t items = (displayWidth + gapWidth) / (faciaWidth + gapWidth);
         uint32_t count = currentValue * items / maxValue;
-        uint32_t fx    = widgetArea.x + (widgetArea.w - (rw * items + gw * (items - 1))) / 2;
+
+        uint32_t fx;
+        uint32_t fy;
+
+        switch (alignment.vertical) {
+        case Alignment::Vertical::Top:
+            fy = drawArea.y;
+            break;
+        case Alignment::Vertical::Bottom:
+            fy = drawArea.y + drawArea.h - displayHeight;
+            break;
+        case Alignment::Vertical::Center:
+        default:
+            fy = drawArea.y + (drawArea.h - displayHeight) / 2;
+            break;
+        }
+
+        switch (alignment.horizontal) {
+        case Alignment::Horizontal::Left:
+            fx = drawArea.x;
+            break;
+        case Alignment::Horizontal::Right:
+            fx = drawArea.x + drawArea.w - (faciaWidth * items + gapWidth * (items - 1));
+            break;
+        case Alignment::Horizontal::Center:
+        default:
+            fx = drawArea.x + (drawArea.w - (faciaWidth * items + gapWidth * (items - 1))) / 2;
+            break;
+        }
 
         for (uint32_t i = 0; i < items; i++) {
-            gui::Position x = static_cast<gui::Position>(fx + (rw + gw) * i);
+            gui::Position x = static_cast<gui::Position>(fx + (faciaWidth + gapWidth) * i);
+            gui::Position y = static_cast<gui::Position>(fy);
             auto rect       = std::make_unique<DrawRectangle>();
-            rect->origin    = {x, drawArea.y};
-            rect->width     = rw;
-            rect->height    = drawArea.h;
+            rect->origin    = {x, y};
+            rect->width     = faciaWidth;
+            rect->height    = displayHeight;
             rect->areaX     = x;
             rect->areaY     = widgetArea.y;
-            rect->areaW     = rw;
+            rect->areaW     = faciaWidth;
             rect->areaH     = widgetArea.h;
             rect->filled    = true;
             if (i < count) {
@@ -75,5 +104,17 @@ namespace gui
     bool UnityProgressBar::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
     {
         return true;
+    }
+
+    void UnityProgressBar::setFaciaSize(std::uint32_t fw, std::uint32_t gw)
+    {
+        faciaWidth = fw;
+        gapWidth   = gw;
+    }
+
+    void UnityProgressBar::setDisplaySize(std::uint32_t width, std::uint32_t height)
+    {
+        displayWidth  = width;
+        displayHeight = height;
     }
 } /* namespace gui */

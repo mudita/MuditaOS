@@ -2,9 +2,10 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MeditationRunningWindow.hpp"
-#include "SessionPausedWindow.hpp"
 #include "SessionEndWindow.hpp"
+#include "SessionPausedWindow.hpp"
 
+#include <apps-common/widgets/BellBaseLayout.hpp>
 #include <purefs/filesystem_paths.hpp>
 #include <service-audio/AudioServiceAPI.hpp>
 #include <service-time/api/TimeSettingsApi.hpp>
@@ -12,6 +13,55 @@
 
 #include <log/log.hpp>
 #include <i18n/i18n.hpp>
+
+namespace
+{
+    void decorateProgressItem(gui::Rect *item, gui::Alignment::Vertical alignment)
+    {
+        item->setEdges(gui::RectangleEdge::None);
+        item->activeItem = false;
+        item->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, alignment));
+    }
+
+    gui::Label *createDatetime(gui::Item *parent)
+    {
+        auto datetime = new gui::Label(parent, 0, 0, parent->getWidth(), parent->getHeight());
+        datetime->setFont(mrStyle::datetime::font);
+        decorateProgressItem(datetime, gui::Alignment::Vertical::Center);
+        return datetime;
+    }
+
+    gui::Label *createTitle(gui::VBox *parent)
+    {
+        auto title = new gui::Label(parent, 0, 0, parent->getWidth(), parent->getHeight() / 2);
+        title->setText(utils::translate("app_meditation_title_main"));
+        title->setFont(mrStyle::title::font);
+        decorateProgressItem(title, gui::Alignment::Vertical::Top);
+        return title;
+    }
+
+    gui::UnityProgressBar *createProgress(gui::VBox *parent)
+    {
+        LOG_DEBUG("createProgress: parent=%d,%d,%d,%d",
+                  parent->getX(),
+                  parent->getY(),
+                  parent->getWidth(),
+                  parent->getHeight());
+        auto progress = new gui::UnityProgressBar(parent, 0, 0, parent->getWidth(), parent->getHeight() / 2);
+        progress->setDisplaySize(mrStyle::progress::w, mrStyle::progress::h);
+        progress->setMaximum(100);
+        decorateProgressItem(progress, gui::Alignment::Vertical::Center);
+        return progress;
+    }
+
+    gui::Text *createTimer(gui::Item *parent)
+    {
+        auto timer = new gui::Text(parent, 0, 0, style::bell_base_layout::w, style::bell_base_layout::outer_layouts_h);
+        timer->setFont(mrStyle::timer::font);
+        decorateProgressItem(timer, gui::Alignment::Vertical::Top);
+        return timer;
+    }
+} // namespace
 
 namespace gui
 {
@@ -29,38 +79,15 @@ namespace gui
     {
         MeditationWindow::buildInterface();
 
-        auto newLabel = [](Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h) {
-            auto label = new gui::Label(parent, x, y, w, h);
-            label->setFilled(false);
-            label->setBorderColor(gui::ColorNoColor);
-            label->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-            return label;
-        };
+        auto body = new gui::BellBaseLayout(this, 0, 0, style::bell_base_layout::w, style::bell_base_layout::h, false);
+        auto vBox =
+            new VBox(body->getCenterBox(), 0, 0, style::bell_base_layout::w, style::bell_base_layout::center_layout_h);
 
-        datetime =
-            newLabel(this, mrStyle::datetime::x, mrStyle::datetime::y, mrStyle::datetime::w, mrStyle::datetime::h);
-        datetime->setFont(mrStyle::datetime::font);
-
-        title = newLabel(this, mrStyle::title::x, mrStyle::title::y, mrStyle::title::w, mrStyle::title::h);
-        title->setText(utils::translate("app_meditation_title_main"));
-        title->setFont(mrStyle::title::font);
-
-        timer = new gui::Text(this, mrStyle::timer::x, mrStyle::timer::y, mrStyle::timer::w, mrStyle::timer::h);
-        timer->setFont(mrStyle::timer::font);
-        timer->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-
-        progress = new gui::UnityProgressBar(
-            this, mrStyle::progress::x, mrStyle::progress::y, mrStyle::progress::w, mrStyle::progress::h);
-        progress->setMaximum(100);
-    }
-
-    void MeditationRunningWindow::destroyInterface()
-    {
-        erase();
-        datetime = nullptr;
-        title    = nullptr;
-        timer    = nullptr;
-        progress = nullptr;
+        decorateProgressItem(vBox, gui::Alignment::Vertical::Top);
+        datetime = createDatetime(body->firstBox);
+        createTitle(vBox);
+        progress = createProgress(vBox);
+        timer    = createTimer(body->lastBox);
     }
 
     void MeditationRunningWindow::onBeforeShow(ShowMode mode, SwitchData *data)
