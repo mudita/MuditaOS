@@ -17,6 +17,7 @@ namespace gui::window::name
     inline constexpr auto bellSettingsHomeView    = "BellSettingsHomeView";
     inline constexpr auto bellSettingsLanguage    = "BellSettingsLanguage";
     inline constexpr auto bellSettingsBedtimeTone = "BellSettingsBedtimeTone";
+    inline constexpr auto bellSettingsFactoryReset = "BellSettingsFactoryReset";
 } // namespace gui::window::name
 
 namespace app
