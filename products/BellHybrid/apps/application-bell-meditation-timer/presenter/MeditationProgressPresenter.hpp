@@ -5,7 +5,7 @@
 
 #include <apps-common/ApplicationCommon.hpp>
 #include <apps-common/BasePresenter.hpp>
-#include <apps-common/widgets/ProgressTimer.hpp>
+#include <apps-common/widgets/TimerWithCallbacks.hpp>
 
 #include "MeditationProgressModel.hpp"
 
@@ -42,14 +42,13 @@ namespace app::meditation
         class Presenter : public BasePresenter<MeditationProgressContract::View>
         {
           public:
-            virtual void set(MeditationItem &item)                                 = 0;
-            virtual void get(MeditationItem &item)                                 = 0;
-            virtual void initTimer(gui::Item *parent)                              = 0;
-            virtual app::ProgressTimerUIConfigurator &getUIConfigurator() noexcept = 0;
-            virtual void start()                                                   = 0;
-            virtual void stop()                                                    = 0;
-            virtual void pause()                                                   = 0;
-            virtual void resume()                                                  = 0;
+            virtual void set(MeditationItem &item)                                  = 0;
+            virtual void get(MeditationItem &item)                                  = 0;
+            virtual void setTimer(std::unique_ptr<app::TimerWithCallbacks> &&timer) = 0;
+            virtual void start()                                                    = 0;
+            virtual void stop()                                                     = 0;
+            virtual void pause()                                                    = 0;
+            virtual void resume()                                                   = 0;
         };
     };
 
@@ -58,7 +57,7 @@ namespace app::meditation
       private:
         app::ApplicationCommon *app  = nullptr;
         settings::Settings *settings = nullptr;
-        std::unique_ptr<app::ProgressTimer> timer;
+        std::unique_ptr<app::TimerWithCallbacks> timer;
         std::shared_ptr<MeditationProgressModel> model;
 
         void onProgressFinished();
@@ -70,8 +69,7 @@ namespace app::meditation
 
         void set(MeditationItem &item) override;
         void get(MeditationItem &item) override;
-        void initTimer(gui::Item *parent) override;
-        app::ProgressTimerUIConfigurator &getUIConfigurator() noexcept override;
+        void setTimer(std::unique_ptr<app::TimerWithCallbacks> &&_timer) override;
         void start() override;
         void stop() override;
         void pause() override;

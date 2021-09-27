@@ -46,6 +46,7 @@ namespace app
         const std::string name;
 
         std::atomic_bool isRunning{false};
+        std::atomic_bool isStarted{false};
         std::chrono::seconds duration{std::chrono::seconds::zero()};
         std::chrono::seconds elapsed{std::chrono::seconds::zero()};
         std::chrono::seconds interval{std::chrono::seconds::zero()};

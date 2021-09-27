@@ -4,18 +4,11 @@
 #include "MeditationProgressPresenter.hpp"
 #include "MeditationCommon.hpp"
 
-#include <apps-common/widgets/ProgressTimerImpl.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
 #include <service-db/Settings.hpp>
 
 #include <log/log.hpp>
 #include <gsl/assert>
-
-namespace
-{
-    inline constexpr auto meditationProgressTimerName = "MeditationProgressTimer";
-    inline constexpr std::chrono::seconds baseTick{1};
-} // namespace
 
 namespace app::meditation
 {
@@ -41,18 +34,12 @@ namespace app::meditation
         }
     }
 
-    void MeditationProgressPresenter::initTimer(gui::Item *parent)
+    void MeditationProgressPresenter::setTimer(std::unique_ptr<app::TimerWithCallbacks> &&_timer)
     {
-        timer = std::make_unique<app::ProgressTimerImpl>(app, parent, meditationProgressTimerName, baseTick);
+        timer = std::move(_timer);
         timer->registerOnFinishedCallback([this]() { onProgressFinished(); });
         timer->registerOnIntervalCallback([this]() { onIntervalReached(); });
         timer->registerOnBaseTickCallback([this]() { onBaseTickReached(); });
-    }
-
-    app::ProgressTimerUIConfigurator &MeditationProgressPresenter::getUIConfigurator() noexcept
-    {
-        Expects(timer != nullptr);
-        return *timer;
     }
 
     void MeditationProgressPresenter::start()
