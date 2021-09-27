@@ -7,7 +7,7 @@
 
 namespace gui
 {
-    class ActiveNotificationsModel : public gui::NotificationsModel
+    class ActiveNotificationsModel : public gui::NotificationsModel, public app::AsyncCallbackReceiver
     {
       private:
         AppWindow *parent = nullptr;

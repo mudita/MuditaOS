@@ -3,9 +3,12 @@
 
 #pragma once
 
-#include <AppWindow.hpp>
-#include <string>
 #include "presenter/AlarmPresenter.hpp"
+
+#include <AppWindow.hpp>
+#include <TextFixedSize.hpp>
+
+#include <string>
 
 namespace style::popup::alarm
 {
@@ -34,6 +37,11 @@ namespace style::popup::alarm
 
 namespace gui
 {
+    enum class SnoozeShow
+    {
+        First,
+        Next
+    };
     class AlarmPopup : public AppWindow, app::popup::AlarmPopupContract::View
     {
       public:
@@ -49,11 +57,16 @@ namespace gui
 
       private:
         VBox *body = nullptr;
+        gui::TextFixedSize *alarmTimeLabel = nullptr;
+        gui::TextFixedSize *snoozeLabel    = nullptr;
+        SnoozeShow snoozeShow              = SnoozeShow::First;
 
         void addArcOverlay();
         void createMainLayout();
-        void addAlarmLabels(std::string timeString);
+        void addAlarmLabels();
         void addSnoozeLabel();
+        void addWindowElements();
+        void refillText();
     };
 
 }; // namespace gui
