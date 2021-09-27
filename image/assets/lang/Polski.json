@@ -632,5 +632,8 @@
 "app_bell_settings_alarm_settings_tone": "Dźwięk alarmu",
 "app_bell_settings_alarm_settings_volume": "Głośność alarmu",
 "app_bell_settings_alarm_settings_light": "Światło alarmu",
-"app_bell_settings_alarm_settings_alarm_tone_and_light_finished": "Ustawiono dźwięk i światło alarmu"
+"app_bell_settings_alarm_settings_alarm_tone_and_light_finished": "Ustawiono dźwięk i światło alarmu",
+"app_bell_settings_advanced_factory_reset": "Ustawienia fabryczne",
+"app_bell_settings_display_factory_reset_confirmation": "<text>Przywrócić ustawienia<br></br>fabryczne ?</text>",
+"app_bell_settings_factory_reset_finished": "Ustawienia fabryczne\nprzywrócone"
 }
