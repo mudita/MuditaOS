@@ -9,12 +9,6 @@
 namespace sdesktop::endpoints
 {
 
-    enum class EndpointSecurity
-    {
-        Allow,
-        Block
-    };
-
     class SecurityEndpoint : public Endpoint
     {
         const std::unique_ptr<SecurityEndpointHelper> helper;

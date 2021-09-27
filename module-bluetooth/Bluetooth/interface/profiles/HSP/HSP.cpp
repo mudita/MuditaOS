@@ -365,6 +365,14 @@ namespace bluetooth
     {
         pimpl->setAudioDevice(audioDevice);
     }
+    auto HSP::callAnswered() const noexcept -> Error::Code
+    {
+        return Error::Success;
+    }
+    auto HSP::setIncomingCallNumber(const std::string &num) const noexcept -> Error::Code
+    {
+        return Error::Success;
+    }
 
     void HSP::HSPImpl::setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice)
     {

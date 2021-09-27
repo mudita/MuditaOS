@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <endpoints/security/SecurityEndpointHelper.hpp>
+#include <endpoints/message/Sender.hpp>
 #include <endpoints/JsonKeyNames.hpp>
 #include <service-appmgr/Constants.hpp>
 #include <service-appmgr/messages/PreventBlockingRequest.hpp>

@@ -17,7 +17,7 @@
 #include <vector>
 #include <filesystem>
 #include <service-desktop/DesktopMessages.hpp>
-#include "SystemManager/messages/SentinelRegistrationMessage.hpp"
+#include "system/messages/SentinelRegistrationMessage.hpp"
 
 inline constexpr auto uploadFailedMessage = "file upload terminated before all data transferred";
 
@@ -102,7 +102,7 @@ bool WorkerDesktop::handleMessage(uint32_t queueID)
         }
 
         using namespace sdesktop::endpoints;
-        auto factory = std::make_unique<SecuredEndpointFactory>(securityModel.getEndpointSecurity());
+        auto factory = EndpointFactory::create(securityModel.getEndpointSecurity());
         auto handler = std::make_unique<MessageHandler>(ownerService, std::move(factory));
 
         parser.setMessageHandler(std::move(handler));

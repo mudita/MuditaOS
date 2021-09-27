@@ -8,7 +8,7 @@
 #include <Audio/Operation/PlaybackOperation.hpp>
 #include <Bluetooth/audio/BluetoothAudioDevice.hpp>
 #include <module-audio/Audio/VolumeScaler.hpp>
-#include <SystemManager/messages/SentinelRegistrationMessage.hpp>
+#include <system/messages/SentinelRegistrationMessage.hpp>
 #include <service-bluetooth/BluetoothMessage.hpp>
 #include <service-bluetooth/Constants.hpp>
 #include <service-bluetooth/messages/AudioRouting.hpp>
@@ -114,6 +114,8 @@ ServiceAudio::ServiceAudio()
             [this](sys::Message *msg) -> sys::MessagePointer { return handleA2DPVolumeChangedOnBluetoothDevice(msg); });
     connect(typeid(HSPDeviceVolumeChanged),
             [this](sys::Message *msg) -> sys::MessagePointer { return handleHSPVolumeChangedOnBluetoothDevice(msg); });
+    connect(typeid(HFPDeviceVolumeChanged),
+            [this](sys::Message *msg) -> sys::MessagePointer { return handleHFPVolumeChangedOnBluetoothDevice(msg); });
     connect(typeid(message::bluetooth::AudioPause),
             [this](sys::Message *msg) -> sys::MessagePointer { return handleA2DPAudioPause(); });
     connect(typeid(message::bluetooth::AudioStart),
@@ -801,6 +803,15 @@ auto ServiceAudio::handleHSPVolumeChangedOnBluetoothDevice(sys::Message *msgl) -
     auto *hspMsg = dynamic_cast<HSPDeviceVolumeChanged *>(msgl);
     assert(hspMsg != nullptr);
     const auto volume = volume::scaler::hsp::toSystemVolume(hspMsg->getVolume());
+    onVolumeChanged(volume);
+    return sys::msgHandled();
+}
+
+auto ServiceAudio::handleHFPVolumeChangedOnBluetoothDevice(sys::Message *msgl) -> sys::MessagePointer
+{
+    auto *hfpMsg = dynamic_cast<HFPDeviceVolumeChanged *>(msgl);
+    assert(hfpMsg != nullptr);
+    const auto volume = volume::scaler::hfp::toSystemVolume(hfpMsg->getVolume());
     onVolumeChanged(volume);
     return sys::msgHandled();
 }

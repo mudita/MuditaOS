@@ -5,7 +5,7 @@
 
 #include <endpoints/Endpoint.hpp>
 
-#include <Service/Common.hpp>
+#include <system/Common.hpp>
 
 #include <string>
 

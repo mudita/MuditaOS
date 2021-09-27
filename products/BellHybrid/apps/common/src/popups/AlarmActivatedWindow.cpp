@@ -3,14 +3,14 @@
 
 #include <ApplicationCommon.hpp>
 #include <apps-common/popups/data/PopupRequestParams.hpp>
-#include <common/TimeUtils.hpp>
 #include <common/popups/AlarmActivatedWindow.hpp>
-#include <popups/Popups.hpp>
-#include <service-time/AlarmMessage.hpp>
-#include <service-time/Constants.hpp>
-#include <service-appmgr/Controller.hpp>
+#include <common/TimeUtils.hpp>
 #include <gui/input/InputEvent.hpp>
 #include <gui/widgets/Icon.hpp>
+#include <popups/Popups.hpp>
+#include <service-appmgr/Controller.hpp>
+#include <service-time/AlarmMessage.hpp>
+#include <service-time/Constants.hpp>
 
 namespace gui
 {
@@ -28,7 +28,7 @@ namespace gui
     {
         WindowWithTimer::onBeforeShow(mode, data);
         auto task = app::AsyncRequest::createFromMessage(
-            std::make_unique<alarms::AlarmGetNextSingleEventsRequestMessage>(), service::name::service_time);
+            std::make_unique<alarms::AlarmGetFirstNextSingleEventRequestMessage>(), service::name::service_time);
 
         auto onResponseCallback = [this, mode](auto response) { return onAlarmResponseMessage(response, mode); };
         task->execute(this->application, this, onResponseCallback);
@@ -40,30 +40,28 @@ namespace gui
         auto task          = app::AsyncRequest::createFromMessage(
             std::make_unique<alarms::AlarmUpdateRequestMessage>(alarmEvent), service::name::service_time);
 
-        task->execute(this->application, this);
+        task->execute(application, this);
     }
 
     bool AlarmActivatedWindow::onAlarmResponseMessage(sys::ResponseMessage *response, ShowMode mode)
     {
-        auto result = dynamic_cast<alarms::AlarmGetNextSingleEventsResponseMessage *>(response);
+        auto result = dynamic_cast<alarms::AlarmGetFirstNextSingleEventResponseMessage *>(response);
         if (result == nullptr || result->retCode != sys::ReturnCodes::Success) {
             LOG_WARN("Get next single event request failed!");
             return false;
         }
-        const auto &singleEvents = result->singleEvents;
-        if (singleEvents.empty()) {
-            LOG_WARN("There is no event!");
-            return false;
-        }
-        const auto &singleEventRecord = singleEvents.front();
+        const auto &singleEventRecord = result->singleEvent;
         const auto &startDate         = singleEventRecord.startDate;
         LOG_DEBUG("Alarm time: %s", TimePointToString(startDate).c_str());
         const auto alarmTime = std::chrono::system_clock::to_time_t(startDate);
         showAlarmTime(mode, alarmTime);
-        const auto alarmEventRecord = dynamic_cast<AlarmEventRecord *>(singleEventRecord.parent.get());
-        if (alarmEventRecord != nullptr) {
-            activateAlarm(*alarmEventRecord);
+
+        auto alarmEventRecord = dynamic_cast<AlarmEventRecord *>(singleEventRecord.parent.get());
+        if (alarmEventRecord == nullptr) {
+            LOG_WARN("Getting alarm event record failed!");
+            return false;
         }
+        activateAlarm(*alarmEventRecord);
 
         return true;
     }
@@ -81,7 +79,7 @@ namespace gui
         header->setTitleVisibility(false);
         bottomBar->setVisible(false);
 
-        icon = new Icon(this, 0, 0, style::window_width, style::window_height, "bell_alarm_activated", {});
+        icon = new Icon(this, 0, 0, style::window_width, style::window_height, "big_alarm", {});
         icon->text->setFont(style::window::font::verybiglight);
     }
     void AlarmActivatedWindow::returnToPreviousWindow()

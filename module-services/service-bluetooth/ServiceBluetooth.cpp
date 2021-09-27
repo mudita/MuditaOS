@@ -24,7 +24,7 @@
 #include "service-bluetooth/BluetoothDevicesModel.hpp"
 #include "service-bluetooth/messages/BluetoothModeChanged.hpp"
 
-#include "SystemManager/messages/SentinelRegistrationMessage.hpp"
+#include "system/messages/SentinelRegistrationMessage.hpp"
 
 #include <log/log.hpp>
 #include <bits/exception.h>
@@ -39,6 +39,7 @@
 #include <typeinfo>
 #include <service-bluetooth/messages/Passkey.hpp>
 #include <GAP/GAP.hpp>
+#include <service-cellular/CellularMessage.hpp>
 
 namespace
 {
@@ -50,6 +51,7 @@ namespace
 ServiceBluetooth::ServiceBluetooth() : sys::Service(service::name::bluetooth, "", BluetoothServiceStackDepth)
 {
     LOG_INFO("[ServiceBluetooth] Initializing");
+    bus.channels.push_back(sys::BusChannel::ServiceCellularNotifications);
 }
 
 ServiceBluetooth::~ServiceBluetooth()
@@ -88,6 +90,7 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
     connectHandler<BluetoothPairResultMessage>();
     connectHandler<message::bluetooth::A2DPVolume>();
     connectHandler<message::bluetooth::HSPVolume>();
+    connectHandler<message::bluetooth::HFPVolume>();
     connectHandler<message::bluetooth::Ring>();
     connectHandler<message::bluetooth::StartAudioRouting>();
     connectHandler<message::bluetooth::Connect>();
@@ -102,6 +105,8 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
     connectHandler<message::bluetooth::Unpair>();
     connectHandler<sdesktop::developerMode::DeveloperModeRequest>();
     connectHandler<message::bluetooth::ResponsePasskey>();
+    connectHandler<CellularCallerIdMessage>();
+    connectHandler<CellularCallActiveNotification>();
 
     settingsHolder->onStateChange = [this]() {
         auto initialState = std::visit(bluetooth::IntVisitor(), settingsHolder->getValue(bluetooth::Settings::State));
@@ -177,6 +182,7 @@ auto ServiceBluetooth::handle(message::bluetooth::SetStatus *msg) -> std::shared
 
     switch (newBtStatus.state) {
     case BluetoothStatus::State::On:
+
         cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyHz::Level_3);
         sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::PowerOn));
         bus.sendMulticast(
@@ -406,12 +412,19 @@ auto ServiceBluetooth::handle(message::bluetooth::HSPVolume *msg) -> std::shared
     AudioServiceAPI::BluetoothHSPVolumeChanged(this, msg->getVolume());
     return sys::MessageNone{};
 }
+auto ServiceBluetooth::handle(message::bluetooth::HFPVolume *msg) -> std::shared_ptr<sys::Message>
+{
+    using namespace message::bluetooth;
+    AudioServiceAPI::BluetoothHFPVolumeChanged(this, msg->getVolume());
+    return sys::MessageNone{};
+}
 
 auto ServiceBluetooth::handle(message::bluetooth::Ring *msg) -> std::shared_ptr<sys::Message>
 {
     const auto enableRing = msg->enabled();
     sendWorkerCommand(bluetooth::Command(enableRing ? bluetooth::Command::Type::StartRinging
                                                     : bluetooth::Command::Type::StopRinging));
+
     return std::make_shared<sys::ResponseMessage>();
 }
 
@@ -421,12 +434,33 @@ auto ServiceBluetooth::handle(message::bluetooth::StartAudioRouting *msg) -> std
     return std::make_shared<sys::ResponseMessage>();
 }
 
+auto ServiceBluetooth::handle(CellularCallerIdMessage *msg) -> std::shared_ptr<sys::Message>
+{
+    auto number = msg->number;
+    auto btOn   = std::visit(bluetooth::BoolVisitor(), settingsHolder->getValue(bluetooth::Settings::State));
+    LOG_ERROR("Received caller ID msg! ");
+
+    if (btOn) {
+        LOG_DEBUG("Sending to profile!");
+        sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::IncomingCallNumber, number));
+    }
+
+    return sys::MessageNone{};
+}
+
+auto ServiceBluetooth::handle(CellularCallActiveNotification *msg) -> std::shared_ptr<sys::Message>
+{
+    sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::CallAnswered));
+    return std::make_shared<sys::ResponseMessage>();
+}
+
 void ServiceBluetooth::startTimeoutTimer()
 {
     if (connectionTimeoutTimer.isValid()) {
         connectionTimeoutTimer.start();
     }
 }
+
 void ServiceBluetooth::stopTimeoutTimer()
 {
     if (connectionTimeoutTimer.isValid()) {

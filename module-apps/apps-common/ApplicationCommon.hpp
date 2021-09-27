@@ -8,7 +8,7 @@
 #include "Audio/Profiles/Profile.hpp" // for Profile, Pro...
 #include "CallbackStorage.hpp"
 
-#include "Service/Common.hpp"  // for ReturnCodes
+#include "system/Common.hpp"   // for ReturnCodes
 #include "Service/Message.hpp" // for MessagePointer
 #include "Service/Service.hpp" // for Service
 #include "Timers/TimerHandle.hpp"

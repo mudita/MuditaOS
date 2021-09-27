@@ -8,6 +8,7 @@
 #include <log/log.hpp>
 #include <service-evtmgr/Constants.hpp>
 #include <service-audio/AudioMessage.hpp>
+#include <service-bluetooth/messages/AudioVolume.hpp>
 #include <BluetoothWorker.hpp>
 #include "SCO/ScoUtils.hpp"
 
@@ -90,22 +91,30 @@ namespace bluetooth
     {
         pimpl->setAudioDevice(audioDevice);
     }
+    auto HFP::callAnswered() const noexcept -> Error::Code
+    {
+        return pimpl->callAnswered();
+    }
+    auto HFP::setIncomingCallNumber(const std::string &num) const noexcept -> Error::Code
+    {
+        LOG_INFO("Setting number: %s", num.c_str());
+        return pimpl->setIncomingCallNumber(num);
+    }
 
     HFP::~HFP() = default;
 
     hci_con_handle_t HFP::HFPImpl::scoHandle = HCI_CON_HANDLE_INVALID;
     hci_con_handle_t HFP::HFPImpl::aclHandle = HCI_CON_HANDLE_INVALID;
-    bd_addr_t HFP::HFPImpl::deviceAddr;
     std::array<uint8_t, serviceBufferLength> HFP::HFPImpl::serviceBuffer;
     std::unique_ptr<SCO> HFP::HFPImpl::sco;
     std::unique_ptr<CellularInterface> HFP::HFPImpl::cellularInterface = nullptr;
+    std::unique_ptr<AudioInterface> HFP::HFPImpl::audioInterface       = nullptr;
     const sys::Service *HFP::HFPImpl::ownerService;
     std::string HFP::HFPImpl::agServiceName = "PurePhone HFP";
-    bool HFP::HFPImpl::isConnected          = false;
     SCOCodec HFP::HFPImpl::codec            = SCOCodec::CVSD;
     std::shared_ptr<CVSDAudioDevice> HFP::HFPImpl::audioDevice;
 
-    int HFP::HFPImpl::memory_1_enabled = 1;
+    [[maybe_unused]] int HFP::HFPImpl::memory_1_enabled = 1;
     btstack_packet_callback_registration_t HFP::HFPImpl::hci_event_callback_registration;
     [[maybe_unused]] int HFP::HFPImpl::ag_indicators_nr = 7;
     hfp_ag_indicator_t HFP::HFPImpl::ag_indicators[]    = {
@@ -125,6 +134,9 @@ namespace bluetooth
         {2, 1},
     };
     Devicei HFP::HFPImpl::device;
+    bool HFP::HFPImpl::isAudioRouted                = false;
+    bool HFP::HFPImpl::isConnected                  = false;
+    bool HFP::HFPImpl::isAudioConnectionEstablished = false;
 
     void HFP::HFPImpl::dump_supported_codecs(void)
     {
@@ -218,8 +230,8 @@ namespace bluetooth
                 break;
             }
             aclHandle = hfp_subevent_service_level_connection_established_get_acl_handle(event);
-            hfp_subevent_service_level_connection_established_get_bd_addr(event, deviceAddr);
-            LOG_DEBUG("Service level connection established to %s.\n", bd_addr_to_str(deviceAddr));
+            hfp_subevent_service_level_connection_established_get_bd_addr(event, device.address);
+            LOG_DEBUG("Service level connection established to %s.\n", bd_addr_to_str(device.address));
             isConnected = true;
             sendAudioEvent(audio::EventType::BlutoothHFPDeviceState, audio::Event::DeviceState::Connected);
             dump_supported_codecs();
@@ -235,11 +247,13 @@ namespace bluetooth
             if (hfp_subevent_audio_connection_established_get_status(event)) {
                 LOG_DEBUG("Audio connection establishment failed with status %u\n",
                           hfp_subevent_audio_connection_established_get_status(event));
+                isAudioConnectionEstablished = false;
             }
             else {
                 scoHandle = hfp_subevent_audio_connection_established_get_sco_handle(event);
                 LOG_DEBUG("Audio connection established with SCO handle 0x%04x.\n", scoHandle);
                 codec = static_cast<SCOCodec>(hfp_subevent_audio_connection_established_get_negotiated_codec(event));
+                isAudioConnectionEstablished = true;
                 dump_supported_codecs();
                 hci_request_sco_can_send_now_event();
                 RunLoop::trigger();
@@ -248,6 +262,8 @@ namespace bluetooth
         case HFP_SUBEVENT_AUDIO_CONNECTION_RELEASED:
             LOG_DEBUG("Audio connection released\n");
             scoHandle = HCI_CON_HANDLE_INVALID;
+            isAudioRouted                = false;
+            isAudioConnectionEstablished = false;
             break;
         case HFP_SUBEVENT_START_RINGINIG:
             LOG_DEBUG("Start Ringing\n");
@@ -273,7 +289,19 @@ namespace bluetooth
         case HFP_SUBEVENT_CALL_ANSWERED:
             LOG_DEBUG("Call answered by HF\n");
             cellularInterface->answerIncomingCall(const_cast<sys::Service *>(ownerService));
+            if (!isAudioRouted) {
+                audioInterface->startAudioRouting(const_cast<sys::Service *>(ownerService));
+                isAudioRouted = true;
+            }
             break;
+
+        case HFP_SUBEVENT_SPEAKER_VOLUME: {
+            const auto volume = hfp_subevent_speaker_volume_get_gain(event);
+            auto &busProxy    = const_cast<sys::Service *>(ownerService)->bus;
+            busProxy.sendUnicast(std::make_shared<message::bluetooth::HFPVolume>(volume), service::name::bluetooth);
+            LOG_DEBUG("Received speaker gain change %d\n", hsp_subevent_speaker_gain_changed_get_gain(event));
+        } break;
+
         case HFP_SUBEVENT_CALL_TERMINATED:
             LOG_DEBUG("Call terminated by HF\n");
             cellularInterface->hangupCall(const_cast<sys::Service *>(ownerService));
@@ -286,8 +314,10 @@ namespace bluetooth
 
     void HFP::HFPImpl::establishAudioConnection()
     {
-        LOG_DEBUG("Establish Audio connection to %s...\n", bd_addr_to_str(deviceAddr));
-        hfp_ag_establish_audio_connection(aclHandle);
+        if (!isAudioConnectionEstablished) {
+            LOG_DEBUG("Establish Audio connection to %s...\n", bd_addr_to_str(device.address));
+            hfp_ag_establish_audio_connection(aclHandle);
+        }
     }
     static hfp_phone_number_t subscriber_number = {129, "225577"};
     auto HFP::HFPImpl::init() -> Error::Code
@@ -297,12 +327,13 @@ namespace bluetooth
         sco->init();
 
         cellularInterface = std::make_unique<CellularInterfaceImpl>();
+        audioInterface    = std::make_unique<AudioInterfaceImpl>();
 
         Profile::initL2cap();
         Profile::initSdp();
 
         serviceBuffer.fill(0);
-        constexpr std::uint32_t hspSdpRecordHandle = 0x10005;
+        constexpr std::uint32_t hspSdpRecordHandle = 0x10004;
         uint16_t supported_features                = (1 << HFP_AGSF_ESCO_S4) /*| (1 << HFP_AGSF_HF_INDICATORS) */ |
                                       (1 << HFP_AGSF_CODEC_NEGOTIATION) | (1 << HFP_AGSF_EXTENDED_ERROR_RESULT_CODES) |
                                       (1 << HFP_AGSF_ENHANCED_CALL_CONTROL) | (1 << HFP_AGSF_ENHANCED_CALL_STATUS) |
@@ -346,7 +377,7 @@ namespace bluetooth
     {
         if (!isConnected) {
             LOG_DEBUG("Connecting the HFP profile");
-            hfp_ag_establish_service_level_connection(deviceAddr);
+            hfp_ag_establish_service_level_connection(device.address);
         }
     }
 
@@ -380,7 +411,7 @@ namespace bluetooth
     }
     void HFP::HFPImpl::stop()
     {
-        hfp_ag_release_audio_connection(aclHandle);
+        hfp_ag_call_dropped();
     }
 
     void HFP::HFPImpl::initCodecs()
@@ -404,21 +435,37 @@ namespace bluetooth
     }
     void HFP::HFPImpl::initializeCall() const noexcept
     {
-        establishAudioConnection();
-        LOG_WARN("Target phone number mocked - to be gathered from cellular");
-        hfp_ag_outgoing_call_initiated("1234567");
+        if (!isAudioRouted) {
+            LOG_DEBUG("Phone number is unused in BT stack - mocking");
+            hfp_ag_outgoing_call_initiated("1234567");
+        }
     }
     void HFP::HFPImpl::setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice)
     {
         HFP::HFPImpl::audioDevice = std::static_pointer_cast<CVSDAudioDevice>(audioDevice);
+        HFP::HFPImpl::audioDevice->setAclHandle(aclHandle);
     }
     void HFP::HFPImpl::startRinging() const noexcept
     {
         hfp_ag_incoming_call();
     }
     void HFP::HFPImpl::stopRinging() const noexcept
+    {}
+    auto HFP::HFPImpl::callAnswered() const noexcept -> Error::Code
     {
-        hfp_ag_answer_incoming_call();
+        if (!isAudioRouted) {
+            LOG_DEBUG("Call answered!");
+            hfp_ag_answer_incoming_call();
+            establishAudioConnection();
+            audioInterface->startAudioRouting(const_cast<sys::Service *>(ownerService));
+            isAudioRouted = true;
+        }
+        return Error::Success;
+    }
+    auto HFP::HFPImpl::setIncomingCallNumber(const std::string &num) const noexcept -> Error::Code
+    {
+        hfp_ag_set_clip(129, num.c_str());
+        return Error::Success;
     }
 
 } // namespace bluetooth

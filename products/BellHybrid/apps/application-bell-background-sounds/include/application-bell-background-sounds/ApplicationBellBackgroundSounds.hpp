@@ -7,9 +7,11 @@
 
 namespace gui::window::name
 {
+    inline constexpr auto bgSoundsPaused      = "BGSoundsPausedWindow";
+    inline constexpr auto bgSoundsProgress    = "BGSoundsProgressWindow";
     inline constexpr auto bgSoundsTimerSelect = "BGSoundsTimerSelectWindow";
-}
-
+    inline constexpr auto bgSoundsVolume      = "BGSoundsVolumeWindow";
+} // namespace gui::window::name
 namespace app
 {
     inline constexpr auto applicationBellBackgroundSoundsName = "ApplicationBellBackgroundSounds";

@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <endpoints/security/SecurityEndpoint.hpp>
+#include <endpoints/message/Sender.hpp>
 
 namespace sdesktop::endpoints
 {

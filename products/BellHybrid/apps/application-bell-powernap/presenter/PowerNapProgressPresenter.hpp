@@ -4,7 +4,7 @@
 #pragma once
 
 #include <apps-common/BasePresenter.hpp>
-#include <apps-common/widgets/ProgressTimer.hpp>
+#include <apps-common/widgets/TimerWithCallbacks.hpp>
 #include <Timers/TimerHandle.hpp>
 #include <memory>
 namespace app
@@ -36,27 +36,23 @@ namespace app::powernap
         class Presenter : public BasePresenter<PowerNapProgressContract::View>
         {
           public:
-            virtual void initTimer(gui::Item *parent)                              = 0;
-            virtual app::ProgressTimerUIConfigurator &getUIConfigurator() noexcept = 0;
             virtual void activate()                                                = 0;
             virtual void endNap()                                                  = 0;
+            virtual void setTimer(std::unique_ptr<app::TimerWithCallbacks> &&timer) = 0;
         };
     };
-
-    class AlarmController;
 
     class PowerNapProgressPresenter : public PowerNapProgressContract::Presenter
     {
         app::ApplicationCommon *app  = nullptr;
         settings::Settings *settings = nullptr;
         PowerNapAlarm &alarm;
-        std::unique_ptr<app::ProgressTimer> timer;
+        std::unique_ptr<app::TimerWithCallbacks> timer;
         sys::TimerHandle napAlarmTimer;
 
-        void initTimer(gui::Item *parent) override;
-        app::ProgressTimerUIConfigurator &getUIConfigurator() noexcept override;
         void activate() override;
         void endNap() override;
+        void setTimer(std::unique_ptr<app::TimerWithCallbacks> &&_timer) override;
 
         void onNapFinished();
         void onNapAlarmFinished();

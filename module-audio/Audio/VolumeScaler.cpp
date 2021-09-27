@@ -57,4 +57,18 @@ namespace audio::volume::scaler
             return systemToBtProfileVolume(systemVolume, hspMaxVolume);
         }
     } // namespace hsp
+
+    namespace hfp
+    {
+        constexpr auto hfpMaxVolume = float{0x0F}; // from HFP documentation
+
+        Volume toSystemVolume(std::uint8_t hfpSpeakerGain) noexcept
+        {
+            return btProfileToSystemVolume(hfpSpeakerGain, static_cast<float>(hfpMaxVolume));
+        }
+        std::uint8_t toHFPGain(float systemVolume) noexcept
+        {
+            return systemToBtProfileVolume(systemVolume, hfpMaxVolume);
+        }
+    } // namespace hfp
 } // namespace audio::volume::scaler

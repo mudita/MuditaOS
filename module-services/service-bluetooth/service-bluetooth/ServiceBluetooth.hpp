@@ -4,7 +4,7 @@
 #pragma once
 
 #include <service-bluetooth/Constants.hpp>
-#include <Service/Common.hpp>
+#include <system/Common.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
 #include "service-bluetooth/SettingsHolder.hpp"
@@ -13,7 +13,7 @@
 #include <module-bluetooth/Bluetooth/CommandHandler.hpp>
 #include "ProfileManager.hpp"
 #include "BluetoothDevicesModel.hpp"
-#include <Service/CpuSentinel.hpp>
+#include <SystemManager/CpuSentinel.hpp>
 #include <Timers/TimerHandle.hpp>
 
 #include <memory> // for unique_ptr
@@ -51,10 +51,14 @@ namespace message::bluetooth
     class DisconnectResult;
     class A2DPVolume;
     class HSPVolume;
+    class HFPVolume;
     class Ring;
     class StartAudioRouting;
     class GetBluetoothDevicesModel;
 } // namespace message::bluetooth
+
+class CellularCallerIdMessage;
+class CellularCallActiveNotification;
 
 class ServiceBluetooth : public sys::Service
 {
@@ -105,10 +109,12 @@ class ServiceBluetooth : public sys::Service
     [[nodiscard]] auto handle(BluetoothAudioStartMessage *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(message::bluetooth::A2DPVolume *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(message::bluetooth::HSPVolume *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(message::bluetooth::HFPVolume *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(message::bluetooth::Ring *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(message::bluetooth::StartAudioRouting *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(message::bluetooth::ResponsePasskey *msg) -> std::shared_ptr<sys::Message>;
-    [[nodiscard]] auto handle(message::bluetooth::GetBluetoothDevicesModel *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(CellularCallerIdMessage *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(CellularCallActiveNotification *msg) -> std::shared_ptr<sys::Message>;
 };
 
 namespace sys

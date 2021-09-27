@@ -7,6 +7,7 @@
 #include "data/PowerNapSwitchData.hpp"
 #include <apps-common/widgets/BellBaseLayout.hpp>
 #include <apps-common/widgets/BarGraph.hpp>
+#include <apps-common/widgets/ProgressTimer.hpp>
 #include <apps-common/GuiTimer.hpp>
 #include <Text.hpp>
 
@@ -45,6 +46,9 @@ namespace
         decorateProgressItem(timer, gui::Alignment::Vertical::Top);
         return timer;
     }
+
+    inline constexpr auto powernapTimerName = "PowerNapTimer";
+    inline constexpr std::chrono::seconds timerTick{1};
 } // namespace
 
 namespace gui
@@ -53,8 +57,8 @@ namespace gui
         app::ApplicationCommon *app, std::shared_ptr<app::powernap::PowerNapProgressContract::Presenter> presenter)
         : AppWindow(app, gui::window::name::powernapProgress), presenter{std::move(presenter)}
     {
-        buildInterface();
         this->presenter->attach(this);
+        buildInterface();
     }
 
     void PowerNapProgressWindow::onBeforeShow(ShowMode mode, SwitchData *data)
@@ -85,9 +89,11 @@ namespace gui
     }
     void PowerNapProgressWindow::configureTimer()
     {
-        presenter->initTimer(this);
-        presenter->getUIConfigurator().attach(progressBar);
-        presenter->getUIConfigurator().attach(timerText);
+        auto timer = std::make_unique<app::ProgressTimer>(
+            application, *this, powernapTimerName, timerTick, app::ProgressCountdownMode::Increasing);
+        timer->attach(progressBar);
+        timer->attach(timerText);
+        presenter->setTimer(std::move(timer));
     }
 
     auto PowerNapProgressWindow::onInput(const InputEvent &inputEvent) -> bool

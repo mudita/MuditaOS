@@ -75,10 +75,17 @@ void A2DPAudioDevice::onDataReceive()
 
 auto CVSDAudioDevice::setOutputVolume(float vol) -> audio::AudioDevice::RetCode
 {
-    const auto volumeToSet = audio::volume::scaler::hsp::toHSPGain(vol);
-    hsp_ag_set_speaker_gain(volumeToSet);
+    if (getProfileType() == AudioProfile::HSP) {
+        const auto volumeToSet = audio::volume::scaler::hsp::toHSPGain(vol);
+        hsp_ag_set_speaker_gain(volumeToSet);
+        LOG_DEBUG("Volume to be set %d", volumeToSet);
+    }
+    else {
+        const auto volumeToSet = audio::volume::scaler::hfp::toHFPGain(vol);
+        hfp_ag_set_speaker_gain(aclHandle, volumeToSet);
+        LOG_DEBUG("Volume to be set %d", volumeToSet);
+    }
 
-    LOG_DEBUG("Volume to be set %d", volumeToSet);
     outputVolume = vol;
     return audio::AudioDevice::RetCode::Success;
 }
@@ -270,6 +277,10 @@ auto A2DPAudioDevice::getSourceFormat() -> ::audio::AudioFormat
 auto CVSDAudioDevice::getSourceFormat() -> ::audio::AudioFormat
 {
     return AudioFormat{bluetooth::SCO::CVSD_SAMPLE_RATE, supportedBitWidth, supportedChannels};
+}
+void CVSDAudioDevice::setAclHandle(hci_con_handle_t handle)
+{
+    aclHandle = handle;
 }
 
 audio::AudioDevice::RetCode A2DPAudioDevice::Pause()

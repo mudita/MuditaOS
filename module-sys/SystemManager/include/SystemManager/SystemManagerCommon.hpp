@@ -14,7 +14,7 @@
 #include "Timers/TimerHandle.hpp"
 #include "PowerManager.hpp"
 #include <hal/key_input/RawKey.hpp>
-#include "Constants.hpp"
+#include <system/Constants.hpp>
 #include "CpuStatistics.hpp"
 #include "DeviceManager.hpp"
 #include <chrono>

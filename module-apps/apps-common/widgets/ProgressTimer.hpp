@@ -1,29 +1,33 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
-
 #pragma once
 
+#include "TimerWithCallbacks.hpp"
+#include <Timers/TimerHandle.hpp>
+#include <atomic>
 #include <chrono>
-#include <functional>
-
+#include <string>
+namespace
+{
+    constexpr auto baseTickDefault = std::chrono::milliseconds{1000};
+} // namespace
 namespace gui
 {
+    class Item;
     class Text;
     class Progress;
 } // namespace gui
 
 namespace app
 {
-    class ProgressTimerUIConfigurator
+    class ApplicationCommon;
+
+    enum class ProgressCountdownMode
     {
-
-      public:
-        virtual ~ProgressTimerUIConfigurator()       = default;
-        virtual void attach(gui::Progress *progress) = 0;
-        virtual void attach(gui::Text *clock)        = 0;
+        Decreasing,
+        Increasing
     };
-
-    /** ProgressTimer provides an interface that connect Timer's features to UI representation.
+    /** ProgressTimer connects Timer's features with UI representation.
      * The Timer's features consists of:
      * 1) counting time down,
      * 2) ability to perform action (via onIntervalCallback) periodically on reaching an interval
@@ -32,21 +36,55 @@ namespace app
      * 1) ability to present time left on attached Text
      * 2) ability to present timer's progress on attached class realising Progress interface.
      */
-    class ProgressTimer : public ProgressTimerUIConfigurator
+    class ProgressTimer : public app::TimerWithCallbacks
     {
-      public:
-        [[nodiscard]] virtual auto isStopped() const noexcept -> bool                    = 0;
-        virtual void reset(std::chrono::seconds duration,
-                           std::chrono::seconds interval = std::chrono::seconds::zero(),
-                           std::chrono::seconds elapsed  = std::chrono::seconds::zero())  = 0;
-        virtual void start()                                                             = 0;
-        virtual void stop()                                                              = 0;
-        virtual void registerOnFinishedCallback(std::function<void()> cb)                = 0;
-        virtual void registerOnIntervalCallback(std::function<void()> cb)                = 0;
-        virtual void registerOnBaseTickCallback(std::function<void()> cb)                = 0;
+        app::ApplicationCommon *app = nullptr;
+        gui::Item &parent;
+        gui::Text *text         = nullptr;
+        gui::Progress *progress = nullptr;
+        const std::string name;
 
-        virtual void attach(gui::Progress *progress) = 0;
-        virtual void attach(gui::Text *text)         = 0;
+        std::atomic_bool isRunning{false};
+        std::chrono::seconds duration{std::chrono::seconds::zero()};
+        std::chrono::seconds elapsed{std::chrono::seconds::zero()};
+        std::chrono::seconds interval{std::chrono::seconds::zero()};
+        std::chrono::milliseconds baseTickInterval{std::chrono::milliseconds::zero()};
+        bool hasInterval = false;
+
+        sys::TimerHandle timerTask;
+
+        std::function<void()> onFinishedCallback = nullptr;
+        std::function<void()> onIntervalCallback = nullptr;
+        std::function<void()> onBaseTickCallback = nullptr;
+        ProgressCountdownMode countdownMode;
+
+        void startTimer();
+        void update();
+        void updateText();
+        void updateProgress();
+        void resetProgress();
+        [[nodiscard]] auto onTimerTimeout(sys::Timer &timerTask) -> bool;
+        [[nodiscard]] auto isFinished() const noexcept -> bool;
+        [[nodiscard]] auto intervalReached() const noexcept -> bool;
+
+      public:
+        ProgressTimer(app::ApplicationCommon *app,
+                      gui::Item &parent,
+                      std::string timerName,
+                      std::chrono::milliseconds baseTick,
+                      ProgressCountdownMode countdownMode = ProgressCountdownMode::Decreasing);
+        void reset(std::chrono::seconds _duration,
+                   std::chrono::seconds _interval = std::chrono::seconds::zero(),
+                   std::chrono::seconds elapsed   = std::chrono::seconds::zero()) override;
+        void start() override;
+        void stop() override;
+        void registerOnFinishedCallback(std::function<void()> cb) override;
+        void registerOnIntervalCallback(std::function<void()> cb) override;
+        void registerOnBaseTickCallback(std::function<void()> cb) override;
+        [[nodiscard]] auto isStopped() const noexcept -> bool override;
+
+        void attach(gui::Progress *_progress);
+        void attach(gui::Text *_text);
     };
 
 } // namespace app

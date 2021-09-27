@@ -28,6 +28,8 @@ namespace bluetooth
         void setOwnerService(const sys::Service *service);
         auto getStreamData() -> std::shared_ptr<BluetoothStreamData>;
         void setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice);
+        [[nodiscard]] auto callAnswered() const noexcept -> Error::Code;
+        [[nodiscard]] auto setIncomingCallNumber(const std::string &num) const noexcept -> Error::Code;
 
       private:
         static void sendAudioEvent(audio::EventType event, audio::Event::DeviceState state);
@@ -43,11 +45,10 @@ namespace bluetooth
         static hci_con_handle_t aclHandle;
         static std::unique_ptr<SCO> sco;
         static std::unique_ptr<CellularInterface> cellularInterface;
-        static bd_addr_t deviceAddr;
+        static std::unique_ptr<AudioInterface> audioInterface;
         static const sys::Service *ownerService;
-        static bool isConnected;
         static SCOCodec codec;
-        static int memory_1_enabled;
+        [[maybe_unused]] static int memory_1_enabled;
         static btstack_packet_callback_registration_t hci_event_callback_registration;
         [[maybe_unused]] static int ag_indicators_nr;
         static hfp_ag_indicator_t ag_indicators[7];
@@ -57,5 +58,8 @@ namespace bluetooth
         [[maybe_unused]] static hfp_generic_status_indicator_t hf_indicators[2];
         static std::shared_ptr<CVSDAudioDevice> audioDevice;
         static Devicei device;
+        static bool isAudioRouted;
+        static bool isConnected;
+        static bool isAudioConnectionEstablished;
     };
 } // namespace bluetooth

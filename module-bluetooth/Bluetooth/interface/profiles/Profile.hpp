@@ -33,6 +33,12 @@ namespace bluetooth
         /// Initializes call
         /// @return Error code that determines, whether operation was successful or not
         [[nodiscard]] virtual auto initializeCall() const noexcept -> Error::Code = 0;
+        /// Executed after the call is answered
+        /// @return Error code that determines, whether operation was successful or not
+        [[nodiscard]] virtual auto callAnswered() const noexcept -> Error::Code = 0;
+        /// Sets the incoming call number
+        /// @return Error code that determines, whether operation was successful or not
+        [[nodiscard]] virtual auto setIncomingCallNumber(const std::string &num) const noexcept -> Error::Code = 0;
 
       protected:
         static void initSdp();

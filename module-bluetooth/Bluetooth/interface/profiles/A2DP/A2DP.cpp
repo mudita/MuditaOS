@@ -114,6 +114,15 @@ namespace bluetooth
     {
         pimpl->setAudioDevice(std::move(audioDevice));
     }
+    auto A2DP::callAnswered() const noexcept -> Error::Code
+    {
+        return Error::SystemError;
+    }
+    auto A2DP::setIncomingCallNumber(const std::string &num) const noexcept -> Error::Code
+    {
+        LOG_INFO("Setting number in A2DP - ignoring");
+        return Error::Success;
+    }
 
     const sys::Service *A2DP::A2DPImpl::ownerService;
     QueueHandle_t A2DP::A2DPImpl::sourceQueue = nullptr;

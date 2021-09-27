@@ -4,7 +4,7 @@
 #include "BatteryBrownoutDetector.hpp"
 
 #include <service-evtmgr/BatteryMessages.hpp>
-#include <SystemManager/Constants.hpp>
+#include <system/Constants.hpp>
 #include <Timers/TimerFactory.hpp>
 
 namespace

@@ -6,6 +6,7 @@
 #include <service-desktop/ServiceDesktop.hpp>
 #include <service-desktop/WorkerDesktop.hpp>
 #include <service-cellular/CellularMessage.hpp>
+#include <endpoints/EndpointFactory.hpp>
 #include <endpoints/bluetooth/BluetoothMessagesHandler.hpp>
 #include <endpoints/backup/BackupRestore.hpp>
 
@@ -24,8 +25,8 @@
 #include <SystemManager/SystemManagerCommon.hpp>
 #include <Timers/TimerFactory.hpp>
 
-#include <SystemManager/Constants.hpp>
-#include <SystemManager/messages/TetheringStateRequest.hpp>
+#include <system/Constants.hpp>
+#include <system/messages/TetheringStateRequest.hpp>
 
 #include <sys/mount.h>
 #include <sys/statvfs.h>

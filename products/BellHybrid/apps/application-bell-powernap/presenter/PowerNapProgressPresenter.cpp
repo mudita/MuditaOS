@@ -6,7 +6,7 @@
 #include "data/PowerNapCommon.hpp"
 #include "widgets/PowerNapAlarm.hpp"
 
-#include <apps-common/widgets/ProgressTimerImpl.hpp>
+#include <apps-common/widgets/ProgressTimer.hpp>
 #include <service-db/Settings.hpp>
 #include <Timers/TimerFactory.hpp>
 #include <Utils.hpp>
@@ -15,9 +15,7 @@
 
 namespace
 {
-    inline constexpr auto powernapTimerName      = "PowerNapTimer";
     inline constexpr auto powernapAlarmTimerName = "PowerNapAlarmTimer";
-    inline constexpr std::chrono::seconds timerTick{1};
     inline constexpr std::chrono::minutes powernapAlarmTimeout{3};
 } // namespace
 namespace app::powernap
@@ -28,14 +26,15 @@ namespace app::powernap
         : app{app}, settings{settings}, alarm{alarm},
           napAlarmTimer{sys::TimerFactory::createSingleShotTimer(
               app, powernapAlarmTimerName, powernapAlarmTimeout, [this](sys::Timer &) { onNapAlarmFinished(); })}
+
     {}
 
-    void PowerNapProgressPresenter::initTimer(gui::Item *parent)
+    void PowerNapProgressPresenter::setTimer(std::unique_ptr<app::TimerWithCallbacks> &&_timer)
     {
-        timer = std::make_unique<app::ProgressTimerImpl>(
-            app, parent, powernapTimerName, timerTick, app::ProgressCountdownMode::Increasing);
+        timer = std::move(_timer);
         timer->registerOnFinishedCallback([this]() { onNapFinished(); });
     }
+
     void PowerNapProgressPresenter::activate()
     {
         Expects(timer != nullptr);
@@ -48,11 +47,6 @@ namespace app::powernap
         timer->stop();
         napAlarmTimer.stop();
         onNapAlarmFinished();
-    }
-    app::ProgressTimerUIConfigurator &PowerNapProgressPresenter::getUIConfigurator() noexcept
-    {
-        Expects(timer != nullptr);
-        return *timer;
     }
     void PowerNapProgressPresenter::onNapFinished()
     {

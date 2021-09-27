@@ -4,11 +4,14 @@
 #pragma once
 
 #include <apps-common/popups/WindowWithTimer.hpp>
+#include <AsyncTask.hpp>
+
+struct AlarmEventRecord;
 
 namespace gui
 {
     class Icon;
-    class AlarmDeactivatedWindow : public WindowWithTimer
+    class AlarmDeactivatedWindow : public WindowWithTimer, public app::AsyncCallbackReceiver
     {
       public:
         explicit AlarmDeactivatedWindow(app::ApplicationCommon *app);
@@ -17,6 +20,8 @@ namespace gui
         bool onInput(const InputEvent &inputEvent) override;
         void buildInterface() override;
         void returnToPreviousWindow();
+        void deactivateAlarm(AlarmEventRecord &alarmEvent);
+        bool onAlarmResponseMessage(sys::ResponseMessage *response);
 
         Icon *icon{};
     };

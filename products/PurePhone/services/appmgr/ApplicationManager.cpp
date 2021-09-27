@@ -11,7 +11,7 @@
 #include <apps-common/popups/data/PopupRequestParams.hpp>
 #include <apps-common/actions/AlarmClockStatusChangeParams.hpp>
 #include <module-db/queries/notifications/QueryNotificationsGetAll.hpp>
-#include <SystemManager/messages/TetheringQuestionRequest.hpp>
+#include <system/messages/TetheringQuestionRequest.hpp>
 #include <Timers/TimerFactory.hpp>
 #include <service-appmgr/Constants.hpp>
 #include <service-appmgr/messages/AutoLockRequests.hpp>

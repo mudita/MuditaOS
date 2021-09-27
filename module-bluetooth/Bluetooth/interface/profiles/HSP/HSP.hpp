@@ -42,6 +42,8 @@ namespace bluetooth
         /// - SCO link establishment
         /// @return Success
         [[nodiscard]] auto initializeCall() const noexcept -> Error::Code override;
+        [[nodiscard]] auto callAnswered() const noexcept -> Error::Code override;
+        [[nodiscard]] auto setIncomingCallNumber(const std::string &num) const noexcept -> Error::Code override;
 
         void setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice) override;
 

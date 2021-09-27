@@ -24,7 +24,7 @@ namespace gui
         finishedCallback = [this]() {
             application->switchWindow(BellFinishedWindow::defaultName,
                                       BellFinishedWindowData::Factory::create(
-                                          "circle_success",
+                                          "big_check",
                                           utils::translate("app_bell_settings_time_units_finished_message"),
                                           gui::window::name::bellSettingsAdvanced));
         };

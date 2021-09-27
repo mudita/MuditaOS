@@ -20,9 +20,9 @@
 #include <service-desktop/Constants.hpp>
 #include <service-appmgr/Constants.hpp>
 #include <service-appmgr/Controller.hpp>
-#include <SystemManager/messages/DeviceRegistrationMessage.hpp>
-#include <SystemManager/messages/SentinelRegistrationMessage.hpp>
-#include <SystemManager/messages/RequestCpuFrequencyMessage.hpp>
+#include <system/messages/DeviceRegistrationMessage.hpp>
+#include <system/messages/SentinelRegistrationMessage.hpp>
+#include <system/messages/RequestCpuFrequencyMessage.hpp>
 #include <time/ScopedTime.hpp>
 #include "Timers/TimerFactory.hpp"
 #include <service-appmgr/StartupType.hpp>

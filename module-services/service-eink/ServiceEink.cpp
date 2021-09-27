@@ -12,9 +12,9 @@
 #include <log/log.hpp>
 #include <messages/EinkMessage.hpp>
 #include <messages/ImageMessage.hpp>
-#include <SystemManager/messages/DeviceRegistrationMessage.hpp>
-#include <SystemManager/messages/SentinelRegistrationMessage.hpp>
-#include <SystemManager/Constants.hpp>
+#include <system/messages/DeviceRegistrationMessage.hpp>
+#include <system/messages/SentinelRegistrationMessage.hpp>
+#include <system/Constants.hpp>
 
 #include <cstring>
 #include <memory>

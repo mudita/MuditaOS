@@ -9,4 +9,15 @@ namespace gui::bgSoundsStyle
 {
     inline constexpr auto descriptionFont = style::window::font::largelight;
     inline constexpr auto timerValueFont  = style::window::font::supersizemelight;
+    inline constexpr auto valumeValueFont = style::window::font::supersizemelight;
+    namespace progress
+    {
+        inline constexpr auto bottomDescTopMargin = 20U;
+        inline constexpr auto boxesCount          = 16;
+    } // namespace progress
+
+    namespace pause
+    {
+        inline constexpr auto textH = 200U;
+    }
 } // namespace gui::bgSoundsStyle

@@ -18,8 +18,8 @@
 #include <service-appmgr/Actions.hpp>
 #include <messages/AppMessage.hpp>
 
-#include <SystemManager/messages/TetheringStateRequest.hpp>
-#include <SystemManager/Constants.hpp>
+#include <system/messages/TetheringStateRequest.hpp>
+#include <system/Constants.hpp>
 
 #include <service-db/agents/settings/SystemSettings.hpp>
 #include <service-db/DBServiceAPI.hpp>

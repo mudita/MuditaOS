@@ -4,7 +4,6 @@
 #include <Service/Service.hpp>
 #include "FreeRTOSConfig.h"    // for configASSERT
 #include "MessageType.hpp"     // for MessageType, MessageType::MessageType...
-#include <Service/Common.hpp>  // for BusChannels, ReturnCodes, ReturnCodes...
 #include "Service/Mailbox.hpp" // for Mailbox
 #include <Service/Message.hpp> // for Message, MessagePointer, DataMessage, Resp...
 #include "Timers/SystemTimer.hpp"
@@ -20,7 +19,7 @@
 #include <cstdint>                 // for uint32_t, uint64_t, UINT32_MAX
 #include <iosfwd>                  // for std
 #include <typeinfo>                // for type_info
-#include <SystemManager/Constants.hpp>
+#include <system/Constants.hpp>
 
 #if (DEBUG_SERVICE_MESSAGES > 0)
 #include <cxxabi.h>

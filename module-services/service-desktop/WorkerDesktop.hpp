@@ -6,9 +6,8 @@
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
 #include <Service/Worker.hpp>
-#include <Service/CpuSentinel.hpp>
+#include <SystemManager/CpuSentinel.hpp>
 #include <ParserFSM.hpp>
-#include <endpoints/EndpointFactory.hpp>
 #include <bsp/usb/usb.hpp>
 #include <service-desktop/USBSecurityModel.hpp>
 

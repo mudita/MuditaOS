@@ -4,7 +4,7 @@
 #pragma once
 
 #include "Message.hpp"
-#include "Watchdog.hpp"
+#include <SystemWatchdog/Watchdog.hpp>
 
 #include <cstdint>
 #include <memory>
