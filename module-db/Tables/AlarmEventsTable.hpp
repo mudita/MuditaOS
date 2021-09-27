@@ -67,6 +67,7 @@ class AlarmEventsTable : public Table<AlarmEventsTableRow, AlarmEventsTableField
     auto getRecurringBetweenDates(TimePoint startDate, TimePoint endDate, uint32_t offset, uint32_t limit)
         -> std::vector<AlarmEventsTableRow>;
     auto getNext(TimePoint start, uint32_t offset, uint32_t limit) -> std::vector<AlarmEventsTableRow>;
+    auto toggleAll(bool toggle) -> bool;
 
     auto count() -> uint32_t override;
     auto countByFieldId(const char *field, uint32_t id) -> uint32_t override;

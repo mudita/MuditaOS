@@ -14,6 +14,7 @@
 #include <queries/alarm_events/QueryAlarmEventsGetRecurringBetweenDates.hpp>
 #include <queries/alarm_events/QueryAlarmEventsGetNext.hpp>
 #include <queries/alarm_events/QueryAlarmEventsRemove.hpp>
+#include <queries/alarm_events/QueryAlarmEventsToggleAll.hpp>
 #include <catch2/catch.hpp>
 
 #include <algorithm>
@@ -134,6 +135,15 @@ TEST_CASE("AlarmEventRecord tests")
         const auto query  = std::make_shared<db::query::alarmEvents::GetNext>(start, offset, limit);
         const auto ret    = alarmEventRecordInterface.runQuery(query);
         const auto result = dynamic_cast<db::query::alarmEvents::GetNextResult *>(ret.get());
+        REQUIRE(result != nullptr);
+        auto alarmsRec = result->getResult();
+        return alarmsRec;
+    };
+
+    auto toggleAll = [&](const bool toggle) {
+        auto query  = std::make_shared<db::query::alarmEvents::ToggleAll>(toggle);
+        auto ret    = alarmEventRecordInterface.runQuery(query);
+        auto result = dynamic_cast<db::query::alarmEvents::ToggleAllResult *>(ret.get());
         REQUIRE(result != nullptr);
         auto alarmsRec = result->getResult();
         return alarmsRec;
@@ -549,6 +559,54 @@ TEST_CASE("AlarmEventRecord tests")
         alarms = getRecurringBetweenDatesQuery(
             TimePointFromString("2020-01-15 17:30:00"), TimePointFromString("2020-01-15 17:30:01"), 0, 100);
         REQUIRE(alarms.size() == 2);
+    }
+
+    SECTION("ToggleAll Alarms")
+    {
+        addQuery(testName1,
+                 testEventStart,
+                 testDuration,
+                 testIsAllDay,
+                 testEmptyRRuleText,
+                 testMusicTone,
+                 true,
+                 testSnoozeDuration);
+        addQuery(testName2,
+                 testEventStart,
+                 testDuration,
+                 testIsAllDay,
+                 testEmptyRRuleText,
+                 testMusicTone,
+                 false,
+                 testSnoozeDuration);
+        addQuery(testName3,
+                 testEventStart,
+                 testDuration,
+                 testIsAllDay,
+                 testEmptyRRuleText,
+                 testMusicTone,
+                 true,
+                 testSnoozeDuration);
+
+        auto retAlarmEvents = getLimitedQuery(0, 3);
+        REQUIRE(retAlarmEvents.size() == 3);
+        REQUIRE(retAlarmEvents[0].enabled);
+        REQUIRE(!retAlarmEvents[1].enabled);
+        REQUIRE(retAlarmEvents[2].enabled);
+
+        toggleAll(false);
+        retAlarmEvents = getLimitedQuery(0, 3);
+        REQUIRE(retAlarmEvents.size() == 3);
+        REQUIRE(!retAlarmEvents[0].enabled);
+        REQUIRE(!retAlarmEvents[1].enabled);
+        REQUIRE(!retAlarmEvents[2].enabled);
+
+        toggleAll(true);
+        retAlarmEvents = getLimitedQuery(0, 3);
+        REQUIRE(retAlarmEvents.size() == 3);
+        REQUIRE(retAlarmEvents[0].enabled);
+        REQUIRE(retAlarmEvents[1].enabled);
+        REQUIRE(retAlarmEvents[2].enabled);
     }
 
     Database::deinitialize();

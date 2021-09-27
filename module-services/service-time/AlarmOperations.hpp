@@ -26,8 +26,9 @@ namespace alarms
         using OnGetNextSingleProcessed      = std::function<void(std::vector<SingleEventRecord>)>;
         using OnSnoozeRingingAlarm          = std::function<void(bool)>;
         using OnTurnOffRingingAlarm         = std::function<void(bool)>;
-        using OnSnoozedAlarmsCountChange  = std::function<void(unsigned)>;
-        using OnActiveAlarmCountChange    = std::function<void(bool)>;
+        using OnSnoozedAlarmsCountChange    = std::function<void(unsigned)>;
+        using OnActiveAlarmCountChange      = std::function<void(bool)>;
+        using OnToggleAllProcessed          = std::function<void(bool)>;
 
         virtual ~IAlarmOperations() noexcept = default;
 
@@ -52,10 +53,11 @@ namespace alarms
                                         OnSnoozeRingingAlarm callback)                                = 0;
         virtual void minuteUpdated(TimePoint now)                                                     = 0;
         virtual void addAlarmExecutionHandler(const alarms::AlarmType type,
-                                              const std::shared_ptr<alarms::AlarmHandler> handler) = 0;
-        virtual void stopAllSnoozedAlarms()                                                        = 0;
-        virtual void addSnoozedAlarmsCountChangeCallback(OnSnoozedAlarmsCountChange)               = 0;
-        virtual void addActiveAlarmCountChangeCallback(OnActiveAlarmCountChange)                   = 0;
+                                              const std::shared_ptr<alarms::AlarmHandler> handler)    = 0;
+        virtual void stopAllSnoozedAlarms()                                                           = 0;
+        virtual void addSnoozedAlarmsCountChangeCallback(OnSnoozedAlarmsCountChange)                  = 0;
+        virtual void addActiveAlarmCountChangeCallback(OnActiveAlarmCountChange)                      = 0;
+        virtual void toggleAll(bool toggle, OnToggleAll callback)                                     = 0;
     };
 
     class IAlarmOperationsFactory
@@ -98,6 +100,7 @@ namespace alarms
         void stopAllSnoozedAlarms() override;
         void addSnoozedAlarmsCountChangeCallback(OnSnoozedAlarmsCountChange callback) override;
         void addActiveAlarmCountChangeCallback(OnActiveAlarmCountChange callback) override;
+        void toggleAll(bool toggle, OnToggleAll callback) override;
 
       protected:
         std::unique_ptr<AbstractAlarmEventsRepository> alarmEventsRepo;
