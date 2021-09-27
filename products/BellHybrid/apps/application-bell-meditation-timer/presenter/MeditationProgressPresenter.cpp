@@ -25,7 +25,7 @@ namespace app::meditation
         model->createData();
     }
 
-    void MeditationProgressPresenter::activate(MeditationItem &item)
+    void MeditationProgressPresenter::set(MeditationItem &item)
     {
         model->setData(item);
 
@@ -33,7 +33,7 @@ namespace app::meditation
             meditationDBRecordName, utils::to_string(item.getTimer().count()), settings::SettingsScope::AppLocal);
     }
 
-    void MeditationProgressPresenter::request(MeditationItem &item)
+    void MeditationProgressPresenter::get(MeditationItem &item)
     {
         MeditationItem *p = model->getData();
         if (p != nullptr) {
