@@ -50,6 +50,10 @@ namespace gui
         spinner->setEdges(RectangleEdge::None);
         spinner->setFocusEdges(RectangleEdge::None);
         body->getCenterBox()->addWidget(spinner);
+        if (!app::meditationStyle::mtStyle::config::arrow) {
+            body->setArrowVisible(BellBaseLayout::Arrow::Left, false);
+            body->setArrowVisible(BellBaseLayout::Arrow::Right, false);
+        }
     }
 
     void MeditationTimerListItem::createBottomDescription()
