@@ -63,7 +63,7 @@ class AlarmEventsTable : public Table<AlarmEventsTableRow, AlarmEventsTableField
     auto getLimitOffsetByField(uint32_t offset, uint32_t limit, AlarmEventsTableFields field, const char *str)
         -> std::vector<AlarmEventsTableRow> override;
     auto getBetweenDates(TimePoint startDate, TimePoint endDate, std::uint32_t offset, std::uint32_t limit)
-        -> std::pair<std::vector<AlarmEventsTableRow>, std::uint32_t>;
+        -> std::vector<AlarmEventsTableRow>;
     auto getRecurringBetweenDates(TimePoint startDate, TimePoint endDate, uint32_t offset, uint32_t limit)
         -> std::vector<AlarmEventsTableRow>;
     auto getNext(TimePoint start, uint32_t offset, uint32_t limit) -> std::vector<AlarmEventsTableRow>;
