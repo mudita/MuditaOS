@@ -1,8 +1,7 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#ifndef PUREPHONE_CODECAW8898_HPP
-#define PUREPHONE_CODECAW8898_HPP
+#pragma once
 
 #include "Codec.hpp"
 #include "drivers/i2c/DriverI2C.hpp"
@@ -82,12 +81,8 @@ class CodecParamsAW8898 : public CodecParams
 
     Cmd opCmd             = Cmd::None;
     float outVolume       = 0;
-    //float inGain          = 0;
     bool muteEnable       = false;
     bool resetEnable      = false;
-    //bool micBiasEnable    = false;
-    //InputPath inputPath   = InputPath::None;
-    //OutputPath outputPath = OutputPath::None;
     SampleRate sampleRate = SampleRate ::Rate44K1Hz;
 };
 
@@ -116,15 +111,6 @@ class CodecAW8898 : public Codec
     CodecParamsAW8898 currentParams;
 
     CodecRetCode SetOutputVolume(const float vol);
-    //CodecRetCode SetInputGain(const float gain);
     CodecRetCode SetMute(const bool enable);
-    //CodecRetCode SetInputPath(const CodecParamsAW8898::InputPath path);
-    //CodecRetCode SetOutputPath(const CodecParamsAW8898::OutputPath path);
-    //CodecRetCode MicBias(const bool enable);
-    //CodecRetCode SetupEarspeakerEqualizer();
-    //CodecRetCode SetupLoudspeakerEqualizer();
-    //CodecRetCode WriteFilterCoeff(const float coeff, const uint8_t basereg);
     CodecRetCode Reset();
 };
-
-#endif // PUREPHONE_CODECAW8898_HPP
