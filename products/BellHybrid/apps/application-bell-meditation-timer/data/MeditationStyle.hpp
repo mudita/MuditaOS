@@ -25,7 +25,7 @@ namespace app::meditationStyle
             constexpr inline auto h             = style::window_height / 2 - textMarginTop;
             constexpr inline auto x             = 0;
             constexpr inline auto y             = style::window_height / 2 + textMarginTop;
-            constexpr inline auto font          = style::window::font::largelight;
+            constexpr inline auto font          = style::window::font::verybiglight;
         } // namespace text
     }     // namespace itStyle
 
@@ -87,7 +87,7 @@ namespace app::meditationStyle
             constexpr inline auto h    = 80;
             constexpr inline auto x    = 0;
             constexpr inline auto y    = 24;
-            constexpr inline auto font = style::window::font::largelight;
+            constexpr inline auto font = style::window::font::verybiglight;
         } // namespace datetime
 
         namespace title
