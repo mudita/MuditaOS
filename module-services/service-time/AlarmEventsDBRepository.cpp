@@ -12,6 +12,7 @@
 #include <module-db/queries/alarm_events/QueryAlarmEventsGetNext.hpp>
 #include <module-db/queries/alarm_events/QueryAlarmEventsGetRecurringBetweenDates.hpp>
 #include <module-db/queries/alarm_events/QueryAlarmEventsRemove.hpp>
+#include <module-db/queries/alarm_events/QueryAlarmEventsToggleAll.hpp>
 
 namespace alarms
 {
@@ -88,6 +89,12 @@ namespace alarms
         sendQueryWithCallback<db::query::alarmEvents::GetRecurringBetweenDates,
                               db::query::alarmEvents::GetRecurringBetweenDatesResult,
                               OnGetAlarmEventsRecurringInRange>(callback, start, end, offset, limit);
+    }
+
+    auto AlarmEventsDBRepository::toggleAll(bool toggle, const OnToggleAll &callback) -> void
+    {
+        sendQueryWithCallback<db::query::alarmEvents::ToggleAll, db::query::alarmEvents::ToggleAllResult, OnToggleAll>(
+            callback, toggle);
     }
 
     template <typename requestT, typename responseT, typename callbackT, typename... Types>

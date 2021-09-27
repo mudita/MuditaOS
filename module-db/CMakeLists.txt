@@ -64,6 +64,7 @@ set(SOURCES
         queries/alarm_events/QueryAlarmEventsGetNext.cpp
         queries/alarm_events/QueryAlarmEventsGetRecurringBetweenDates.cpp
         queries/alarm_events/QueryAlarmEventsRemove.cpp
+        queries/alarm_events/QueryAlarmEventsToggleAll.cpp
         queries/calllog/QueryCalllogGet.cpp
         queries/calllog/QueryCalllogGetByContactID.cpp
         queries/calllog/QueryCalllogGetCount.cpp

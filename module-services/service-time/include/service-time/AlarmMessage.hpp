@@ -80,6 +80,20 @@ namespace alarms
         const bool success;
     };
 
+    class AlarmToggleAllRequestMessage : public AlarmMessage
+    {
+      public:
+        AlarmToggleAllRequestMessage(const bool toggle) : toggle(toggle){};
+        const bool toggle;
+    };
+
+    class AlarmToggleAllResponseMessage : public AlarmResponse
+    {
+      public:
+        AlarmToggleAllResponseMessage(const bool success = false) : success(success){};
+        const bool success;
+    };
+
     class AlarmsGetInRangeRequestMessage : public AlarmMessage
     {
       public:

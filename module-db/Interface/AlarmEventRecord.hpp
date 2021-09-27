@@ -26,6 +26,8 @@ namespace db::query::alarmEvents
     class GetResult;
     class Remove;
     class RemoveResult;
+    class ToggleAll;
+    class ToggleAllResult;
 } // namespace db::query::alarmEvents
 
 struct AlarmEventRecord : public EventRecord
@@ -78,4 +80,6 @@ class AlarmEventRecordInterface : public db::Interface
         std::shared_ptr<db::query::alarmEvents::GetRecurringBetweenDates> query);
     std::unique_ptr<db::query::alarmEvents::RemoveResult> runQueryImplRemove(
         std::shared_ptr<db::query::alarmEvents::Remove> query);
+    std::unique_ptr<db::query::alarmEvents::ToggleAllResult> runQueryImplRemove(
+        std::shared_ptr<db::query::alarmEvents::ToggleAll> query);
 };
