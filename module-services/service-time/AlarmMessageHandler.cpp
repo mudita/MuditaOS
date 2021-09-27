@@ -52,6 +52,15 @@ namespace alarms
             });
     }
 
+    auto AlarmMessageHandler::handleToggleAll(AlarmToggleAllRequestMessage *request)
+        -> std::shared_ptr<AlarmToggleAllResponseMessage>
+    {
+        return handleWithCallback<AlarmToggleAllRequestMessage, AlarmToggleAllResponseMessage, bool>(
+            request, [&](AlarmToggleAllRequestMessage *request, IAlarmOperations::OnToggleAllProcessed callback) {
+                alarmOperations->toggleAll(request->toggle, callback);
+            });
+    }
+
     auto AlarmMessageHandler::handleGetAlarmsInRange(AlarmsGetInRangeRequestMessage *request)
         -> std::shared_ptr<AlarmsGetInRangeResponseMessage>
     {

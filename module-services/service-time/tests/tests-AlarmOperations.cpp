@@ -39,6 +39,7 @@ class MockAlarmEventsRepository : public alarms::AbstractAlarmEventsRepository
                  std::uint32_t limit,
                  const alarms::OnGetAlarmEventsInRangeCallback &callback),
                 ());
+    MOCK_METHOD(void, toggleAll, (const bool toggle, const alarms::OnToggleAll &callback), ());
 
     auto addAlarmEvent(const AlarmEventRecord &alarmEvent, const alarms::OnAddAlarmEventCallback &callback) -> void
     {
@@ -721,4 +722,51 @@ TEST_F(AlarmOperationsFixture, snoozeCountChangeCallback)
     alarmOperations->addSnoozedAlarmsCountChangeCallback(callback);
     alarmOperations->stopAllSnoozedAlarms();
     EXPECT_EQ(i, 0);
+}
+
+TEST_F(AlarmOperationsFixture, toggleAll)
+{
+    alarms::IAlarmOperations::OnGetAlarmProcessed callbackOn = [](AlarmEventRecord record) {
+        EXPECT_TRUE(record.enabled);
+    };
+
+    alarms::IAlarmOperations::OnGetAlarmProcessed callbackOff = [](AlarmEventRecord record) {
+        EXPECT_FALSE(record.enabled);
+    };
+
+    auto alarmRepoMock   = std::make_unique<MockAlarmEventsRepository>();
+    auto alarmOperations = getMockedAlarmOperations(alarmRepoMock);
+
+    alarmOperations->addAlarm(AlarmEventRecord(1,
+                                               defName,
+                                               TimePointFromString("2022-11-11 17:00:00"),
+                                               defDuration,
+                                               defAllDay,
+                                               defRRule,
+                                               defMusic,
+                                               false,
+                                               defSnooze),
+                              universalBoolCallback);
+
+    alarmOperations->addAlarm(AlarmEventRecord(2,
+                                               defName,
+                                               TimePointFromString("2022-11-11 17:00:00"),
+                                               defDuration,
+                                               defAllDay,
+                                               defRRule,
+                                               defMusic,
+                                               true,
+                                               defSnooze),
+                              universalBoolCallback);
+
+    alarmOperations->getAlarm(1, callbackOff);
+    alarmOperations->getAlarm(2, callbackOn);
+
+    alarmOperations->toggleAll(true, universalBoolCallback);
+    alarmOperations->getAlarm(1, callbackOn);
+    alarmOperations->getAlarm(2, callbackOn);
+
+    alarmOperations->toggleAll(false, universalBoolCallback);
+    alarmOperations->getAlarm(1, callbackOff);
+    alarmOperations->getAlarm(2, callbackOff);
 }

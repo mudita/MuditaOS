@@ -338,6 +338,17 @@ namespace alarms
         handleActiveAlarmsCountChange();
     }
 
+    void AlarmOperationsCommon::toggleAll(bool toggle, OnToggleAll callback)
+    {
+        OnToggleAll repoCallback = [&, callback](bool success) mutable {
+            updateEventsCache(getCurrentTime());
+
+            callback(success);
+        };
+
+        alarmEventsRepo->toggleAll(toggle, repoCallback);
+    }
+
     auto AlarmOperationsCommon::addSnoozedAlarmsCountChangeCallback(OnSnoozedAlarmsCountChange callback) -> void
     {
         onSnoozedAlarmsCountChangeCallback = callback;

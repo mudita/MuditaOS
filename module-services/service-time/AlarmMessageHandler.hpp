@@ -40,6 +40,7 @@ namespace alarms
         auto handleAddSnoozedAlarmCountChangeCallback(AlarmOperationsCommon::OnSnoozedAlarmsCountChange callback)
             -> void;
         auto handleAddActiveAlarmCountChangeCallback(AlarmOperationsCommon::OnActiveAlarmCountChange callback) -> void;
+        auto handleToggleAll(AlarmToggleAllRequestMessage *request) -> std::shared_ptr<AlarmToggleAllResponseMessage>;
 
       private:
         stm::ServiceTime *service = nullptr;

@@ -38,6 +38,7 @@ namespace alarms
                                             std::uint32_t offset,
                                             std::uint32_t limit,
                                             const OnGetAlarmEventsRecurringInRange &callback) -> void override;
+        auto toggleAll(bool toggle, const OnToggleAll &callback) -> void override;
 
       private:
         template <typename requestT, typename responseT, typename callbackT, typename... Types>

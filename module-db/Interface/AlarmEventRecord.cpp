@@ -12,6 +12,7 @@
 #include <queries/alarm_events/QueryAlarmEventsGetNext.hpp>
 #include <queries/alarm_events/QueryAlarmEventsGetRecurringBetweenDates.hpp>
 #include <queries/alarm_events/QueryAlarmEventsRemove.hpp>
+#include <queries/alarm_events/QueryAlarmEventsToggleAll.hpp>
 
 #include <rrule/rrule.hpp>
 
@@ -70,6 +71,9 @@ std::unique_ptr<db::QueryResult> AlarmEventRecordInterface::runQuery(std::shared
     }
     if (typeid(*query) == typeid(db::query::alarmEvents::Remove)) {
         return runQueryImplRemove(std::static_pointer_cast<db::query::alarmEvents::Remove>(query));
+    }
+    if (typeid(*query) == typeid(db::query::alarmEvents::ToggleAll)) {
+        return runQueryImplRemove(std::static_pointer_cast<db::query::alarmEvents::ToggleAll>(query));
     }
     return nullptr;
 }
@@ -159,6 +163,15 @@ std::unique_ptr<db::query::alarmEvents::RemoveResult> AlarmEventRecordInterface:
 {
     const bool ret = eventsDB->alarmEvents.removeById(query->id);
     auto response  = std::make_unique<db::query::alarmEvents::RemoveResult>(ret);
+    response->setRequestQuery(query);
+    return response;
+}
+
+std::unique_ptr<db::query::alarmEvents::ToggleAllResult> AlarmEventRecordInterface::runQueryImplRemove(
+    std::shared_ptr<db::query::alarmEvents::ToggleAll> query)
+{
+    const bool ret = eventsDB->alarmEvents.toggleAll(query->toggle);
+    auto response  = std::make_unique<db::query::alarmEvents::ToggleAllResult>(ret);
     response->setRequestQuery(query);
     return response;
 }
