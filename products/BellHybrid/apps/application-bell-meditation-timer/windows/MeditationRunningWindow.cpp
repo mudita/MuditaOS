@@ -132,13 +132,13 @@ namespace gui
 
     void MeditationRunningWindow::buildMeditationItem(MeditationItem &item)
     {
-        presenter->request(item);
+        presenter->get(item);
     }
 
     void MeditationRunningWindow::onMeditationItemAvailable(MeditationItem *item)
     {
         if (item != nullptr) {
-            presenter->activate(*item);
+            presenter->set(*item);
         }
         updateDateTime();
     }

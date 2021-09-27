@@ -42,8 +42,8 @@ namespace app::meditation
         class Presenter : public BasePresenter<MeditationProgressContract::View>
         {
           public:
-            virtual void activate(MeditationItem &item)                            = 0;
-            virtual void request(MeditationItem &item)                             = 0;
+            virtual void set(MeditationItem &item)                                 = 0;
+            virtual void get(MeditationItem &item)                                 = 0;
             virtual void initTimer(gui::Item *parent)                              = 0;
             virtual app::ProgressTimerUIConfigurator &getUIConfigurator() noexcept = 0;
             virtual void start()                                                   = 0;
@@ -68,8 +68,8 @@ namespace app::meditation
       public:
         explicit MeditationProgressPresenter(app::ApplicationCommon *app, settings::Settings *settings);
 
-        void activate(MeditationItem &item) override;
-        void request(MeditationItem &item) override;
+        void set(MeditationItem &item) override;
+        void get(MeditationItem &item) override;
         void initTimer(gui::Item *parent) override;
         app::ProgressTimerUIConfigurator &getUIConfigurator() noexcept override;
         void start() override;
