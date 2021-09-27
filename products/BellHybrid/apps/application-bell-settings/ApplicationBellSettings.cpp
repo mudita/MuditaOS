@@ -27,6 +27,7 @@
 #include "windows/BellSettingsFrontlight.hpp"
 #include "windows/BellSettingsHomeViewWindow.hpp"
 #include "windows/BellSettingsWindow.hpp"
+#include "widgets/DialogYesNo.hpp"
 
 #include <AlarmSoundPaths.hpp>
 #include <apps-common/windows/Dialog.hpp>
@@ -207,6 +208,11 @@ namespace app
                       gui::popup::ID::PowerOff,
                       gui::popup::ID::Reboot,
                       gui::popup::ID::BedtimeNotification});
+
+        windowsFactory.attach(gui::window::name::bellSettingsFactoryReset,
+                              [](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<gui::BellDialogYesNo>(app, name);
+                              });
     }
 
     sys::MessagePointer ApplicationBellSettings::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
