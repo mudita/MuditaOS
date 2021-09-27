@@ -108,12 +108,30 @@ namespace alarms
             });
     }
 
+    auto AlarmMessageHandler::handleTurnOffSnooze(TurnOffSnoozeRequestMessage *request)
+        -> std::shared_ptr<TurnOffSnoozeResponseMessage>
+    {
+        return handleWithCallback<TurnOffSnoozeRequestMessage, TurnOffSnoozeResponseMessage, bool>(
+            request, [&](TurnOffSnoozeRequestMessage *request, IAlarmOperations::OnTurnOffRingingAlarm callback) {
+                alarmOperations->turnOffSnoozedAlarm(request->id, callback);
+            });
+    }
+
     auto AlarmMessageHandler::handleSnoozeRingingAlarm(RingingAlarmSnoozeRequestMessage *request)
         -> std::shared_ptr<RingingAlarmSnoozeResponseMessage>
     {
         return handleWithCallback<RingingAlarmSnoozeRequestMessage, RingingAlarmSnoozeResponseMessage, bool>(
             request, [&](RingingAlarmSnoozeRequestMessage *request, IAlarmOperations::OnSnoozeRingingAlarm callback) {
                 alarmOperations->snoozeRingingAlarm(request->id, request->nextAlarmTime, callback);
+            });
+    }
+
+    auto AlarmMessageHandler::handlePostponeSnooze(PostponeSnoozeRequestMessage *request)
+        -> std::shared_ptr<PostponeSnoozeResponseMessage>
+    {
+        return handleWithCallback<PostponeSnoozeRequestMessage, PostponeSnoozeResponseMessage, bool>(
+            request, [&](PostponeSnoozeRequestMessage *request, IAlarmOperations::OnSnoozeRingingAlarm callback) {
+                alarmOperations->postponeSnooze(request->id, request->nextAlarmTime, callback);
             });
     }
 
@@ -137,6 +155,17 @@ namespace alarms
         AlarmOperationsCommon::OnActiveAlarmCountChange callback) -> void
     {
         alarmOperations->addActiveAlarmCountChangeCallback(callback);
+    }
+
+    auto AlarmMessageHandler::handleGetSnoozedAlarms(GetSnoozedAlarmsRequestMessage *request)
+        -> std::shared_ptr<GetSnoozedAlarmsResponseMessage>
+    {
+        return handleWithCallback<GetSnoozedAlarmsRequestMessage,
+                                  GetSnoozedAlarmsResponseMessage,
+                                  std::vector<SingleEventRecord>>(
+            request, [&](GetSnoozedAlarmsRequestMessage *request, IAlarmOperations::OnGetSnoozedAlarms callback) {
+                alarmOperations->getSnoozedAlarms(callback);
+            });
     }
 
     template <class RequestType, class ResponseType, class CallbackParamType>

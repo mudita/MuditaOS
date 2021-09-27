@@ -132,6 +132,24 @@ namespace alarms
         }
         switchAlarmExecution(*(*found), false);
         ongoingSingleEvents.erase(found);
+        handleActiveAlarmsCountChange();
+        callback(true);
+    }
+
+    void AlarmOperationsCommon::turnOffSnoozedAlarm(const std::uint32_t id, OnTurnOffRingingAlarm callback)
+    {
+        auto found = std::find_if(
+            snoozedSingleEvents.begin(),
+            snoozedSingleEvents.end(),
+            [id](const std::unique_ptr<SnoozedAlarmEventRecord> &event) { return id == event->parent->ID; });
+        if (found == snoozedSingleEvents.end()) {
+            LOG_ERROR("Trying to turn off nonexisting event");
+            callback(false);
+            return;
+        }
+        snoozedSingleEvents.erase(found);
+        handleSnoozedAlarmsCountChange();
+        handleActiveAlarmsCountChange();
         callback(true);
     }
 
@@ -161,6 +179,16 @@ namespace alarms
             return;
         }
 
+        // if ID already in snoozed -> remove
+        for (auto it = snoozedSingleEvents.begin(); it != snoozedSingleEvents.end();) {
+            if ((*it)->parent->ID == id) {
+                it = snoozedSingleEvents.erase(it);
+            }
+            else {
+                ++it;
+            }
+        }
+
         newSnoozed->startDate = nextAlarmTime;
         snoozedSingleEvents.push_back(std::move(newSnoozed));
 
@@ -169,6 +197,24 @@ namespace alarms
 
         handleSnoozedAlarmsCountChange();
         handleActiveAlarmsCountChange();
+
+        callback(true);
+    }
+
+    void AlarmOperationsCommon::postponeSnooze(const std::uint32_t id,
+                                               const TimePoint nextAlarmTime,
+                                               OnSnoozeRingingAlarm callback)
+    {
+        auto found = std::find_if(
+            snoozedSingleEvents.begin(),
+            snoozedSingleEvents.end(),
+            [id](const std::unique_ptr<SnoozedAlarmEventRecord> &event) { return id == event->parent->ID; });
+        if (found == snoozedSingleEvents.end()) {
+            LOG_ERROR("Trying to postpone nonexisting snooze");
+            callback(false);
+            return;
+        }
+        (*found)->startDate = nextAlarmTime;
 
         callback(true);
     }
@@ -225,7 +271,7 @@ namespace alarms
             if (newSingle.startDate == nearestTimePoint) {
                 outEvents.push_back(newSingle);
             }
-            else if (newSingle.startDate < nearestTimePoint) {
+            else if (newSingle.startDate < nearestTimePoint && newSingle.startDate != TIME_POINT_INVALID) {
                 nearestTimePoint = newSingle.startDate;
                 outEvents.clear();
                 outEvents.push_back(newSingle);
@@ -265,8 +311,9 @@ namespace alarms
 
         if (!isHandlingInProgress && !ongoingSingleEvents.empty()) {
             switchAlarmExecution(*(ongoingSingleEvents.front()), true);
+            handleActiveAlarmsCountChange();
+            handleSnoozedAlarmsCountChange();
         }
-        handleActiveAlarmsCountChange();
     }
 
     void AlarmOperationsCommon::addAlarmExecutionHandler(const alarms::AlarmType type,
@@ -314,6 +361,7 @@ namespace alarms
                                        std::make_move_iterator(nextSingleEvents.begin()),
                                        std::make_move_iterator(nextSingleEvents.end()));
             nextSingleEvents.clear();
+            updateEventsCache(now);
         }
     }
 
@@ -328,7 +376,6 @@ namespace alarms
                 ++it;
             }
         }
-        handleSnoozedAlarmsCountChange();
     }
 
     auto AlarmOperationsCommon::stopAllSnoozedAlarms() -> void
@@ -382,4 +429,19 @@ namespace alarms
         }
     }
 
+    void AlarmOperationsCommon::getSnoozedAlarms(OnGetSnoozedAlarms callback)
+    {
+        std::vector<SingleEventRecord> snoozedEvents;
+        if (!snoozedSingleEvents.empty()) {
+            for (const auto &evt : snoozedSingleEvents) {
+                snoozedEvents.push_back(*evt.get());
+            }
+
+            auto isEarlier = [](const SingleEventRecord &a, const SingleEventRecord &b) {
+                return a.startDate < b.startDate;
+            };
+            std::sort(snoozedEvents.begin(), snoozedEvents.end(), isEarlier);
+        }
+        callback(std::move(snoozedEvents));
+    }
 } // namespace alarms

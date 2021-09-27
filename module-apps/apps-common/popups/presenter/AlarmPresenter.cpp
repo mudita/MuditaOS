@@ -9,41 +9,103 @@
 
 namespace app::popup
 {
+    AlarmPopupContract::AlarmModel::AlarmModel(ApplicationCommon *app) : AsyncCallbackReceiver(app), app(app)
+    {}
+
+    void AlarmPopupContract::AlarmModel::attach(Presenter *p)
+    {
+        presenter = p;
+    }
+
+    void AlarmPopupContract::AlarmModel::set(std::shared_ptr<AlarmEventRecord> record)
+    {
+        this->record = std::move(record);
+    }
+
+    void AlarmPopupContract::AlarmModel::setSnoozed(std::vector<SingleEventRecord> snoozed)
+    {
+        this->snoozedRecord = snoozed;
+    }
+
+    void AlarmPopupContract::AlarmModel::reset()
+    {
+        if (!snoozedRecord.empty()) {
+            snoozedRecord.clear();
+        }
+        snoozedTill    = std::string{};
+        isSnoozedAlarm = false;
+    }
+
     auto async = app::AsyncRequest::createFromMessage;
 
-    void AlarmPopupContract::AlarmModel::snoozeAlarm()
+    template <typename requestType, typename responseType> void AlarmPopupContract::AlarmModel::snoozeAlarm()
     {
-        auto request = std::make_unique<alarms::RingingAlarmSnoozeRequestMessage>(
-            record->ID, TimePointNow() + std::chrono::seconds(record->snoozeDuration));
+        auto request =
+            std::make_unique<requestType>(record->ID, TimePointNow() + std::chrono::minutes(record->snoozeDuration));
         auto task = async(std::move(request), service::name::service_time);
         auto cb   = [&](auto response) {
-            auto result = dynamic_cast<alarms::RingingAlarmSnoozeResponseMessage *>(response);
+            auto result = dynamic_cast<responseType *>(response);
             assert(result);
             assert(result->success);
             if (!result) {
                 return false;
             }
-            presenter->handleAlarmSnoozed();
+            presenter->processIfSnoozed();
             return true;
         };
         task->execute(app, this, cb);
     }
 
-    void AlarmPopupContract::AlarmModel::stopAlarm()
+    template <typename requestType, typename responseType> void AlarmPopupContract::AlarmModel::stopAlarm()
     {
-        auto request = std::make_unique<alarms::RingingAlarmTurnOffRequestMessage>(record->ID);
+        auto request = std::make_unique<requestType>(record->ID);
         auto task    = async(std::move(request), service::name::service_time);
         auto cb      = [&](auto response) {
-            auto result = dynamic_cast<alarms::RingingAlarmTurnOffResponseMessage *>(response);
+            auto result = dynamic_cast<responseType *>(response);
             assert(result);
             assert(result->success);
             if (!result) {
                 return false;
             }
-            presenter->handleAlarmTurnedOff();
+            presenter->processIfSnoozed();
             return true;
         };
         task->execute(app, this, cb);
+    }
+
+    void AlarmPopupContract::AlarmModel::setRefreshWindowCallback(std::function<void()> callback)
+    {
+        refreshWindowCallback = callback;
+    }
+
+    void AlarmPopupContract::AlarmModel::processIfSnoozed()
+    {
+        if (!snoozedRecord.empty()) {
+            isSnoozedAlarm = true;
+            snoozedTill    = utils::time::TimestampFactory()
+                              .createTimestamp(utils::time::TimestampType::Clock,
+                                               TimePointToTimeT(snoozedRecord.front().startDate))
+                              ->str();
+
+            auto request = std::make_unique<alarms::AlarmGetRequestMessage>(snoozedRecord.front().parent->ID);
+            auto task    = async(std::move(request), service::name::service_time);
+            auto cb      = [&](auto response) {
+                auto result = dynamic_cast<alarms::AlarmGetResponseMessage *>(response);
+                assert(result);
+                if (!result) {
+                    return false;
+                }
+                record = std::make_shared<AlarmEventRecord>(result->alarm);
+                refreshWindowCallback();
+                return true;
+            };
+            task->execute(app, this, cb);
+            snoozedRecord.erase(snoozedRecord.begin());
+        }
+        else {
+            isSnoozedAlarm = false;
+            presenter->handleAlarmSnoozed();
+        }
     }
 
     std::uint32_t AlarmPopupPresenter::getSnoozeTime()
@@ -58,14 +120,26 @@ namespace app::popup
 
     void AlarmPopupPresenter::snoozeHit()
     {
-        this->getModel()->snoozeAlarm();
-        // TODO test
-        LOG_DEBUG("Snooozed!");
+        if (isSnoozed()) {
+            this->getModel()
+                ->snoozeAlarm<alarms::PostponeSnoozeRequestMessage, alarms::PostponeSnoozeResponseMessage>();
+        }
+        else {
+            this->getModel()
+                ->snoozeAlarm<alarms::RingingAlarmSnoozeRequestMessage, alarms::RingingAlarmSnoozeResponseMessage>();
+        }
+        LOG_DEBUG("Snoozed!");
     }
 
     void AlarmPopupPresenter::stopAlarm()
     {
-        this->getModel()->stopAlarm();
+        if (isSnoozed()) {
+            this->getModel()->stopAlarm<alarms::TurnOffSnoozeRequestMessage, alarms::TurnOffSnoozeResponseMessage>();
+        }
+        else {
+            this->getModel()
+                ->stopAlarm<alarms::RingingAlarmTurnOffRequestMessage, alarms::RingingAlarmTurnOffResponseMessage>();
+        }
         LOG_DEBUG("Stopped!");
     }
 
@@ -81,19 +155,19 @@ namespace app::popup
 
     bool AlarmPopupPresenter::isSnoozed()
     {
-        return false;
+        return this->getModel()->isSnoozedAlarm;
     }
 
     std::string AlarmPopupPresenter::snoozedTill()
     {
-        return "";
+        return this->getModel()->snoozedTill;
     }
 
     std::string AlarmPopupPresenter::startedAt()
     {
-        auto time = utils::time::TimestampFactory().createTimestamp(utils::time::TimestampType::Time,
-                                                                    TimePointToTimeT(TimePointNow()));
-        return (*time + getSnoozeTime()).str("%H:%M");
+        return utils::time::TimestampFactory()
+            .createTimestamp(utils::time::TimestampType::Clock, TimePointToTimeT(this->getModel()->record->startDate))
+            ->str();
     }
 
     AlarmPopupPresenter::AlarmPopupPresenter(ApplicationCommon *app) : AlarmPopupContract::Presenter(app)
