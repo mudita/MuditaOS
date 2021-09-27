@@ -168,10 +168,10 @@ std::vector<AlarmEventsTableRow> AlarmEventsTable::getLimitOffsetByField(uint32_
     return retQueryUnpack(std::move(retQuery));
 }
 
-std::pair<std::vector<AlarmEventsTableRow>, std::uint32_t> AlarmEventsTable::getBetweenDates(TimePoint startDate,
-                                                                                             TimePoint endDate,
-                                                                                             std::uint32_t offset,
-                                                                                             std::uint32_t limit)
+std::vector<AlarmEventsTableRow> AlarmEventsTable::getBetweenDates(TimePoint startDate,
+                                                                   TimePoint endDate,
+                                                                   std::uint32_t offset,
+                                                                   std::uint32_t limit)
 {
     auto retQuery = db->query("SELECT * FROM events e "
                               "JOIN alarm_events ae ON ae.event_id = e._id "
@@ -182,7 +182,7 @@ std::pair<std::vector<AlarmEventsTableRow>, std::uint32_t> AlarmEventsTable::get
                               limit,
                               offset);
 
-    return {retQueryUnpack(std::move(retQuery)), count()};
+    return retQueryUnpack(std::move(retQuery));
 }
 
 std::vector<AlarmEventsTableRow> AlarmEventsTable::getRecurringBetweenDates(TimePoint startDate,

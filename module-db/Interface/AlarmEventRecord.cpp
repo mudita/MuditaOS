@@ -111,7 +111,8 @@ std::unique_ptr<db::query::alarmEvents::GetResult> AlarmEventRecordInterface::ru
 std::unique_ptr<db::query::alarmEvents::GetBetweenDatesResult> AlarmEventRecordInterface::runQueryImplGetBetweenDates(
     std::shared_ptr<db::query::alarmEvents::GetBetweenDates> query)
 {
-    const auto [alarmEventsRows, count] =
+    const auto count = eventsDB->alarmEvents.count();
+    const auto alarmEventsRows =
         eventsDB->alarmEvents.getBetweenDates(query->start, query->end, query->offset, query->limit);
     const auto recordVector = generateRecordsVector(alarmEventsRows);
 
