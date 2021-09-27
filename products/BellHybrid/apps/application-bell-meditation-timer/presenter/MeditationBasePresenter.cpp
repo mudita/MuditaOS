@@ -8,7 +8,7 @@ namespace app::meditation
     MeditationBasePresenter ::MeditationBasePresenter(app::ApplicationCommon *app) : app{app}
     {}
 
-    void MeditationBasePresenter::activate(MeditationItem &item)
+    void MeditationBasePresenter::set(MeditationItem &item)
     {
         model = std::make_shared<MeditationBaseModel>();
         model->setData(item);
@@ -16,7 +16,7 @@ namespace app::meditation
         getView()->updateDisplay();
     }
 
-    void MeditationBasePresenter::request(MeditationItem &item)
+    void MeditationBasePresenter::get(MeditationItem &item)
     {
         MeditationItem *p = model->getData();
         if (p != nullptr) {
