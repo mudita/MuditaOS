@@ -30,7 +30,6 @@ namespace gui
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         bool onInput(const InputEvent &inputEvent) override;
         void buildInterface() override;
-        void destroyInterface() override;
         void pregressFinished() override;
         void intervalReached() override;
         void baseTickReached() override;
@@ -40,7 +39,6 @@ namespace gui
       private:
         std::unique_ptr<app::meditation::MeditationProgressContract::Presenter> presenter;
         gui::Label *datetime            = nullptr;
-        gui::Label *title               = nullptr;
         gui::Text *timer                = nullptr;
         gui::UnityProgressBar *progress = nullptr;
 
