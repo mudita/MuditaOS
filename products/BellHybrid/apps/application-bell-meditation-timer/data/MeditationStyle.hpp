@@ -164,7 +164,7 @@ namespace app::meditationStyle
     {
         namespace icon
         {
-            constexpr inline auto imageSource = "pause";
+            constexpr inline auto imageSource = "big_pause";
         } // namespace icon
     }     // namespace spStyle
 } // namespace meditationStyle
