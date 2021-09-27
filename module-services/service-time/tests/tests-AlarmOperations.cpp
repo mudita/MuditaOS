@@ -770,3 +770,223 @@ TEST_F(AlarmOperationsFixture, toggleAll)
     alarmOperations->getAlarm(1, callbackOff);
     alarmOperations->getAlarm(2, callbackOff);
 }
+
+TEST_F(AlarmOperationsFixture, getSnoozedAlarmsList)
+{
+    auto alarmRepoMock    = std::make_unique<MockAlarmEventsRepository>();
+    const auto alarm1time = TimePointFromString("2022-11-11 11:00:00");
+    const auto alarm2time = TimePointFromString("2022-11-11 11:02:00");
+    const auto alarm3time = TimePointFromString("2022-11-11 11:04:00");
+    alarmRepoMock->addSingleEvent(
+        AlarmEventRecord(1, defName, alarm1time, defDuration, defAllDay, defRRule, defMusic, defEnabled, defSnooze));
+    alarmRepoMock->addSingleEvent(
+        AlarmEventRecord(2, defName, alarm2time, defDuration, defAllDay, defRRule, defMusic, defEnabled, defSnooze));
+    alarmRepoMock->addSingleEvent(
+        AlarmEventRecord(3, defName, alarm3time, defDuration, defAllDay, defRRule, defMusic, defEnabled, defSnooze));
+    auto alarmOperations = getMockedAlarmOperations(alarmRepoMock);
+
+    int snoozedCount   = 0;
+    auto countcallback = [&](unsigned count) { snoozedCount = count; };
+    alarmOperations->addSnoozedAlarmsCountChangeCallback(countcallback);
+
+    bool alarmActive    = false;
+    auto activeCallback = [&](bool isAnyActive) { alarmActive = isAnyActive; };
+    alarmOperations->addActiveAlarmCountChangeCallback(activeCallback);
+
+    EXPECT_EQ(snoozedCount, 0);
+
+    alarmOperations->updateEventsCache(TimePointFromString("2022-11-11 09:00:00"));
+    EXPECT_EQ(alarmActive, true);
+
+    alarmOperations->minuteUpdated(alarm1time);
+    alarmOperations->snoozeRingingAlarm(1, TimePointFromString("2022-11-11 11:10:00"), [](bool) {});
+    EXPECT_EQ(snoozedCount, 1);
+    alarmOperations->updateEventsCache(alarm2time);
+
+    alarmOperations->minuteUpdated(alarm2time);
+    alarmOperations->snoozeRingingAlarm(2, TimePointFromString("2022-11-11 11:08:00"), [](bool) {});
+    EXPECT_EQ(snoozedCount, 2);
+    alarmOperations->updateEventsCache(alarm3time);
+
+    alarmOperations->minuteUpdated(alarm3time);
+    alarmOperations->snoozeRingingAlarm(3, TimePointFromString("2022-11-11 11:09:00"), [](bool) {});
+    EXPECT_EQ(snoozedCount, 3);
+
+    std::vector<SingleEventRecord> snoozedEvents;
+    auto cb = [&](std::vector<SingleEventRecord> records) { snoozedEvents = std::move(records); };
+    alarmOperations->getSnoozedAlarms(cb);
+    EXPECT_EQ(snoozedCount, 3);
+    EXPECT_EQ(snoozedEvents.size(), 3);
+    // Check if events are sorted starting from nearest
+    EXPECT_EQ(snoozedEvents.at(0).parent->ID, 2);
+    EXPECT_EQ(snoozedEvents.at(1).parent->ID, 3);
+    EXPECT_EQ(snoozedEvents.at(2).parent->ID, 1);
+    EXPECT_EQ(snoozedEvents.front().parent->ID, 2);
+}
+
+TEST_F(AlarmOperationsFixture, postponeSnooze)
+{
+    auto alarmRepoMock   = std::make_unique<MockAlarmEventsRepository>();
+    const auto alarmTime = TimePointFromString("2022-11-11 11:00:00");
+    alarmRepoMock->addSingleEvent(
+        AlarmEventRecord(1, defName, alarmTime, defDuration, defAllDay, defRRule, defMusic, defEnabled, defSnooze));
+    auto alarmOperations = getMockedAlarmOperations(alarmRepoMock);
+
+    int snoozedCount   = 0;
+    auto countcallback = [&](unsigned count) { snoozedCount = count; };
+    alarmOperations->addSnoozedAlarmsCountChangeCallback(countcallback);
+
+    bool alarmActive    = false;
+    auto activeCallback = [&](bool isAnyActive) { alarmActive = isAnyActive; };
+    alarmOperations->addActiveAlarmCountChangeCallback(activeCallback);
+
+    EXPECT_EQ(snoozedCount, 0);
+
+    alarmOperations->updateEventsCache(TimePointFromString("2022-11-11 09:00:00"));
+    EXPECT_TRUE(alarmActive);
+
+    const auto snoozeTime = TimePointFromString("2022-11-11 11:10:00");
+    alarmOperations->minuteUpdated(alarmTime);
+    alarmOperations->snoozeRingingAlarm(1, snoozeTime, [](bool) {});
+    EXPECT_EQ(snoozedCount, 1);
+
+    std::vector<SingleEventRecord> snoozedEvents;
+    auto cb = [&](std::vector<SingleEventRecord> records) { snoozedEvents = std::move(records); };
+    alarmOperations->getSnoozedAlarms(cb);
+    EXPECT_EQ(snoozedEvents.size(), 1);
+    EXPECT_EQ(snoozedEvents.front().startDate, snoozeTime);
+
+    const auto postponedSnoozeTime = TimePointFromString("2022-11-11 11:20:00");
+    alarmOperations->postponeSnooze(snoozedEvents.front().parent->ID, postponedSnoozeTime, [](bool) {});
+    alarmOperations->getSnoozedAlarms(cb);
+    EXPECT_EQ(snoozedEvents.size(), 1);
+    EXPECT_EQ(snoozedEvents.front().startDate, postponedSnoozeTime);
+}
+
+TEST_F(AlarmOperationsFixture, snoozeMultipleTimes)
+{
+    auto alarmRepoMock   = std::make_unique<MockAlarmEventsRepository>();
+    const auto alarmTime = TimePointFromString("2022-11-11 11:00:00");
+    alarmRepoMock->addSingleEvent(
+        AlarmEventRecord(1, defName, alarmTime, defDuration, defAllDay, defRRule, defMusic, defEnabled, defSnooze));
+    auto alarmOperations = getMockedAlarmOperations(alarmRepoMock);
+
+    int snoozedCount   = 0;
+    auto countcallback = [&](unsigned count) { snoozedCount = count; };
+    alarmOperations->addSnoozedAlarmsCountChangeCallback(countcallback);
+
+    bool alarmActive    = false;
+    auto activeCallback = [&](bool isAnyActive) { alarmActive = isAnyActive; };
+    alarmOperations->addActiveAlarmCountChangeCallback(activeCallback);
+
+    EXPECT_EQ(snoozedCount, 0);
+
+    alarmOperations->updateEventsCache(TimePointFromString("2022-11-11 09:00:00"));
+    EXPECT_TRUE(alarmActive);
+
+    const auto snoozeTime = TimePointFromString("2022-11-11 11:10:00");
+    alarmOperations->minuteUpdated(alarmTime);
+    alarmOperations->snoozeRingingAlarm(1, snoozeTime, [](bool) {});
+    EXPECT_EQ(snoozedCount, 1);
+
+    alarmOperations->updateEventsCache(snoozeTime);
+    std::vector<SingleEventRecord> snoozedEvents;
+    auto cb = [&](std::vector<SingleEventRecord> records) { snoozedEvents = std::move(records); };
+    alarmOperations->getSnoozedAlarms(cb);
+    EXPECT_EQ(snoozedEvents.size(), 1);
+    EXPECT_EQ(snoozedEvents.front().startDate, snoozeTime);
+
+    const auto anotherSnoozeTime = TimePointFromString("2022-11-11 11:20:00");
+    alarmOperations->snoozeRingingAlarm(snoozedEvents.front().parent->ID, anotherSnoozeTime, [](bool) {});
+    alarmOperations->getSnoozedAlarms(cb);
+    EXPECT_EQ(snoozedEvents.size(), 1);
+}
+
+TEST_F(AlarmOperationsFixture, stopSnooze)
+{
+    auto alarmRepoMock   = std::make_unique<MockAlarmEventsRepository>();
+    const auto alarmTime = TimePointFromString("2022-11-11 11:00:00");
+    alarmRepoMock->addSingleEvent(
+        AlarmEventRecord(1, defName, alarmTime, defDuration, defAllDay, defRRule, defMusic, defEnabled, defSnooze));
+    auto alarmOperations = getMockedAlarmOperations(alarmRepoMock);
+
+    int snoozedCount   = 0;
+    auto countcallback = [&](unsigned count) { snoozedCount = count; };
+    alarmOperations->addSnoozedAlarmsCountChangeCallback(countcallback);
+
+    bool alarmActive    = false;
+    auto activeCallback = [&](bool isAnyActive) { alarmActive = isAnyActive; };
+    alarmOperations->addActiveAlarmCountChangeCallback(activeCallback);
+
+    EXPECT_EQ(snoozedCount, 0);
+
+    alarmOperations->updateEventsCache(TimePointFromString("2022-11-11 09:00:00"));
+    EXPECT_TRUE(alarmActive);
+
+    const auto snoozeTime = TimePointFromString("2022-11-11 11:10:00");
+    alarmOperations->minuteUpdated(alarmTime);
+    alarmOperations->snoozeRingingAlarm(1, snoozeTime, [](bool) {});
+    EXPECT_EQ(snoozedCount, 1);
+    alarmOperations->updateEventsCache(snoozeTime);
+
+    std::vector<SingleEventRecord> snoozedEvents;
+    auto cb = [&](std::vector<SingleEventRecord> records) { snoozedEvents = std::move(records); };
+    alarmOperations->getSnoozedAlarms(cb);
+    EXPECT_EQ(snoozedEvents.size(), 1);
+    EXPECT_EQ(snoozedEvents.front().startDate, snoozeTime);
+
+    alarmOperations->turnOffSnoozedAlarm(snoozedEvents.front().parent->ID, [](bool) {});
+    alarmOperations->getSnoozedAlarms(cb);
+    EXPECT_TRUE(snoozedEvents.empty());
+    EXPECT_EQ(snoozedCount, 0);
+    EXPECT_FALSE(alarmActive);
+}
+
+TEST_F(AlarmOperationsFixture, handleMultipleAlarmsWithSnooze)
+{
+    auto alarmRepoMock          = std::make_unique<MockAlarmEventsRepository>();
+    const auto alarm1time       = TimePointFromString("2022-11-11 11:00:00");
+    const auto alarm2time       = TimePointFromString("2022-11-11 11:02:00");
+    const auto alarm1timeSnooze = TimePointFromString("2022-11-11 11:10:00");
+    const auto alarm2timeSnooze = TimePointFromString("2022-11-11 11:06:00");
+    alarmRepoMock->addSingleEvent(
+        AlarmEventRecord(1, defName, alarm1time, defDuration, defAllDay, defRRule, defMusic, defEnabled, defSnooze));
+    alarmRepoMock->addSingleEvent(
+        AlarmEventRecord(2, defName, alarm2time, defDuration, defAllDay, defRRule, defMusic, defEnabled, defSnooze));
+
+    auto alarmOperations = getMockedAlarmOperations(alarmRepoMock);
+    // auto handler = std::make_shared<MockAlarmHandler>();
+    // EXPECT_CALL(*handler, handle(testing::_)).Times(4);
+    // alarmOperations->addAlarmExecutionHandler(alarms::AlarmType::Clock, handler);
+
+    int snoozedCount   = 0;
+    auto countcallback = [&](unsigned count) { snoozedCount = count; };
+    alarmOperations->addSnoozedAlarmsCountChangeCallback(countcallback);
+    bool alarmActive    = false;
+    auto activeCallback = [&](bool isAnyActive) { alarmActive = isAnyActive; };
+    alarmOperations->addActiveAlarmCountChangeCallback(activeCallback);
+
+    alarmOperations->updateEventsCache(TimePointFromString("2022-11-11 09:00:00"));
+
+    alarmOperations->minuteUpdated(alarm1time);
+    alarmOperations->snoozeRingingAlarm(1, alarm1timeSnooze, universalBoolCallback);
+    alarmOperations->updateEventsCache(alarm2time);
+    EXPECT_EQ(snoozedCount, 1);
+    EXPECT_TRUE(alarmActive);
+
+    alarmOperations->minuteUpdated(alarm2time);
+    alarmOperations->snoozeRingingAlarm(2, alarm2timeSnooze, universalBoolCallback);
+    alarmOperations->updateEventsCache(alarm2timeSnooze);
+    EXPECT_EQ(snoozedCount, 2);
+    EXPECT_TRUE(alarmActive);
+
+    alarmOperations->minuteUpdated(alarm2timeSnooze);
+    alarmOperations->turnOffRingingAlarm(2, universalBoolCallback);
+    EXPECT_EQ(snoozedCount, 1);
+    EXPECT_TRUE(alarmActive);
+
+    alarmOperations->minuteUpdated(alarm1timeSnooze);
+    alarmOperations->turnOffRingingAlarm(1, universalBoolCallback);
+    EXPECT_EQ(snoozedCount, 0);
+    EXPECT_FALSE(alarmActive);
+}

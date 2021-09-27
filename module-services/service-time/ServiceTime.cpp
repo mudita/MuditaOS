@@ -163,9 +163,17 @@ namespace stm
             return alarmMessageHandler->handleTurnOffRingingAlarm(
                 static_cast<alarms::RingingAlarmTurnOffRequestMessage *>(request));
         });
+        connect(typeid(alarms::TurnOffSnoozeRequestMessage), [&](sys::Message *request) -> sys::MessagePointer {
+            return alarmMessageHandler->handleTurnOffSnooze(
+                static_cast<alarms::TurnOffSnoozeRequestMessage *>(request));
+        });
         connect(typeid(alarms::RingingAlarmSnoozeRequestMessage), [&](sys::Message *request) -> sys::MessagePointer {
             return alarmMessageHandler->handleSnoozeRingingAlarm(
                 static_cast<alarms::RingingAlarmSnoozeRequestMessage *>(request));
+        });
+        connect(typeid(alarms::PostponeSnoozeRequestMessage), [&](sys::Message *request) -> sys::MessagePointer {
+            return alarmMessageHandler->handlePostponeSnooze(
+                static_cast<alarms::PostponeSnoozeRequestMessage *>(request));
         });
         connect(typeid(alarms::StopAllSnoozedAlarmsRequestMessage), [&](sys::Message *request) -> sys::MessagePointer {
             alarmMessageHandler->handleStopAllSnoozedAlarms();
@@ -189,6 +197,10 @@ namespace stm
                         });
                     return std::make_shared<sys::ResponseMessage>();
                 });
+        connect(typeid(alarms::GetSnoozedAlarmsRequestMessage), [&](sys::Message *request) -> sys::MessagePointer {
+            auto message = static_cast<alarms::GetSnoozedAlarmsRequestMessage *>(request);
+            return alarmMessageHandler->handleGetSnoozedAlarms(message);
+        });
     }
 
     auto ServiceTime::handleSetAutomaticDateAndTimeRequest(sys::Message *request)

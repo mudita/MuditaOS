@@ -22,8 +22,13 @@ namespace gui
             : PopupRequestParams{popup::ID::Alarm}, type{type}, record(std::move(r))
         {}
 
+        explicit AlarmPopupRequestParams(AlarmPopupType type, std::vector<SingleEventRecord> snoozed)
+            : PopupRequestParams{popup::ID::Alarm}, type{type}, snoozedAlarms(std::move(snoozed))
+        {}
+
         explicit AlarmPopupRequestParams(AlarmPopupRequestParams *p)
-            : PopupRequestParams{p->getPopupId()}, type(p->type), record(std::move(p->record))
+            : PopupRequestParams{p->getPopupId()}, type(p->type), record(std::move(p->record)),
+              snoozedAlarms(std::move(p->snoozedAlarms))
         {}
 
         [[nodiscard]] AlarmPopupType getPopupType() const
@@ -36,8 +41,14 @@ namespace gui
             return std::move(record);
         }
 
+        [[nodiscard]] const std::vector<SingleEventRecord> popSnoozed()
+        {
+            return std::move(snoozedAlarms);
+        }
+
       private:
         const AlarmPopupType type;
         std::unique_ptr<AlarmEventRecord> record;
+        const std::vector<SingleEventRecord> snoozedAlarms;
     };
 } // namespace gui

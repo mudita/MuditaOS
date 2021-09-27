@@ -157,6 +157,20 @@ namespace alarms
         const bool success;
     };
 
+    class TurnOffSnoozeRequestMessage : public AlarmMessage
+    {
+      public:
+        explicit TurnOffSnoozeRequestMessage(const std::uint32_t id = 0) : id(id){};
+        const std::uint32_t id;
+    };
+
+    class TurnOffSnoozeResponseMessage : public AlarmResponse
+    {
+      public:
+        explicit TurnOffSnoozeResponseMessage(const bool success = false) : success(success){};
+        const bool success;
+    };
+
     class RingingAlarmSnoozeRequestMessage : public AlarmMessage
     {
       public:
@@ -170,6 +184,22 @@ namespace alarms
     {
       public:
         explicit RingingAlarmSnoozeResponseMessage(const bool success = false) : success(success){};
+        const bool success;
+    };
+
+    class PostponeSnoozeRequestMessage : public AlarmMessage
+    {
+      public:
+        PostponeSnoozeRequestMessage(const std::uint32_t id, const TimePoint nextAlarmTime = TIME_POINT_INVALID)
+            : id(id), nextAlarmTime(nextAlarmTime){};
+        const std::uint32_t id;
+        const TimePoint nextAlarmTime;
+    };
+
+    class PostponeSnoozeResponseMessage : public AlarmResponse
+    {
+      public:
+        explicit PostponeSnoozeResponseMessage(const bool success = false) : success(success){};
         const bool success;
     };
 
@@ -221,4 +251,17 @@ namespace alarms
         bool anyAlarmActive = 0;
     };
 
+    class GetSnoozedAlarmsRequestMessage : public AlarmMessage
+    {
+      public:
+        GetSnoozedAlarmsRequestMessage(){};
+    };
+
+    class GetSnoozedAlarmsResponseMessage : public AlarmResponse
+    {
+      public:
+        explicit GetSnoozedAlarmsResponseMessage(std::vector<SingleEventRecord> snoozedAlarms)
+            : snoozedAlarms(std::move(snoozedAlarms)){};
+        const std::vector<SingleEventRecord> snoozedAlarms;
+    };
 } // namespace alarms
