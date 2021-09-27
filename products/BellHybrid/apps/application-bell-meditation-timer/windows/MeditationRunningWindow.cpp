@@ -6,6 +6,7 @@
 #include "SessionPausedWindow.hpp"
 
 #include <apps-common/widgets/BellBaseLayout.hpp>
+#include <apps-common/widgets/ProgressTimer.hpp>
 #include <purefs/filesystem_paths.hpp>
 #include <service-audio/AudioServiceAPI.hpp>
 #include <service-time/api/TimeSettingsApi.hpp>
@@ -16,6 +17,10 @@
 
 namespace
 {
+    inline constexpr auto meditationProgressTimerName = "MeditationProgressTimer";
+    inline constexpr std::chrono::seconds baseTick{1};
+    inline constexpr auto meditationProgressMode = app::ProgressCountdownMode::Decreasing;
+
     void decorateProgressItem(gui::Rect *item, gui::Alignment::Vertical alignment)
     {
         item->setEdges(gui::RectangleEdge::None);
@@ -145,9 +150,11 @@ namespace gui
 
     void MeditationRunningWindow::configureTimer()
     {
-        presenter->initTimer(this);
-        presenter->getUIConfigurator().attach(progress);
-        presenter->getUIConfigurator().attach(timer);
+        auto progressTimer = std::make_unique<app::ProgressTimer>(
+            application, *this, meditationProgressTimerName, baseTick, meditationProgressMode);
+        progressTimer->attach(progress);
+        progressTimer->attach(timer);
+        presenter->setTimer(std::move(progressTimer));
     }
 
     void MeditationRunningWindow::updateDateTime()
