@@ -30,7 +30,7 @@ namespace alarms
 
     bool PlayAudioAction::turnOff(const AlarmEventRecord & /*record*/)
     {
-        return true;
+        return AudioServiceAPI::Stop(&service, {audio::PlaybackType::Alarm});
     }
 
     void PlayAudioAction::detachTimer()

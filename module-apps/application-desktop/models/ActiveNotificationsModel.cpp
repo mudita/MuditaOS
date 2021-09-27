@@ -15,6 +15,9 @@
 #include <service-appmgr/messages/SwitchRequest.hpp>
 #include <service-appmgr/messages/SwitchRequest.hpp>
 #include <service-time/include/service-time/AlarmServiceAPI.hpp>
+#include <service-time/AlarmMessage.hpp>
+#include <service-time/Constants.hpp>
+#include <apps-common/popups/data/AlarmPopupRequestParams.hpp>
 
 using namespace gui;
 
@@ -192,10 +195,27 @@ namespace
         };
     }
 
-    void setSnoozeActivatedCallback(NotificationListItem *item, app::ApplicationCommon *app)
+    void setSnoozeActivatedCallback(NotificationListItem *item,
+                                    ActiveNotificationsModel *model,
+                                    app::ApplicationCommon *app)
     {
-        item->activatedCallback = [app]([[maybe_unused]] gui::Item &_item) {
-            LOG_ERROR("TODO open active snooze");
+        item->activatedCallback = [model, app]([[maybe_unused]] gui::Item &_item) {
+            auto request = std::make_unique<alarms::GetSnoozedAlarmsRequestMessage>();
+            auto task    = app::AsyncRequest::createFromMessage(std::move(request), service::name::service_time);
+            auto cb      = [&](auto response) {
+                auto result = dynamic_cast<alarms::GetSnoozedAlarmsResponseMessage *>(response);
+                assert(result);
+                if (!result || result->snoozedAlarms.empty()) {
+                    return false;
+                }
+                app::manager::Controller::sendAction(
+                    app,
+                    app::manager::actions::ShowPopup,
+                    std::make_unique<gui::AlarmPopupRequestParams>(AlarmPopupType::SnoozeCheck,
+                                                                   std::move(result->snoozedAlarms)));
+                return true;
+            };
+            task->execute(app, model, cb);
             return true;
         };
     }
@@ -217,7 +237,8 @@ namespace
     }
 } // namespace
 
-ActiveNotificationsModel::ActiveNotificationsModel(AppWindow *parent) : parent(parent)
+ActiveNotificationsModel::ActiveNotificationsModel(AppWindow *parent)
+    : AsyncCallbackReceiver(parent->getApplication()), parent(parent)
 {}
 
 void ActiveNotificationsModel::setParentBottomBar(const UTF8 &left, const UTF8 &center, const UTF8 &right)
@@ -264,7 +285,7 @@ auto ActiveNotificationsModel::create(const notifications::AlarmSnoozeNotificati
 {
     auto item = NotificationsModel::create(notification);
     setSnoozeFocusChangedCallback(item, this);
-    setSnoozeActivatedCallback(item, parent->getApplication());
+    setSnoozeActivatedCallback(item, this, parent->getApplication());
     setSnoozeOnInputCallback(item, parent->getApplication());
     setSnoozeDismissCallback(item, parent->getApplication());
     item->setDismissible(true);

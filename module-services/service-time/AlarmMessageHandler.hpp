@@ -33,14 +33,19 @@ namespace alarms
             -> std::shared_ptr<AlarmGetNextSingleEventsResponseMessage>;
         auto handleTurnOffRingingAlarm(RingingAlarmTurnOffRequestMessage *request)
             -> std::shared_ptr<RingingAlarmTurnOffResponseMessage>;
+        auto handleTurnOffSnooze(TurnOffSnoozeRequestMessage *request) -> std::shared_ptr<TurnOffSnoozeResponseMessage>;
         auto handleSnoozeRingingAlarm(RingingAlarmSnoozeRequestMessage *request)
             -> std::shared_ptr<RingingAlarmSnoozeResponseMessage>;
+        auto handlePostponeSnooze(PostponeSnoozeRequestMessage *request)
+            -> std::shared_ptr<PostponeSnoozeResponseMessage>;
         auto handleMinuteUpdated() -> void;
         auto handleStopAllSnoozedAlarms() -> void;
         auto handleAddSnoozedAlarmCountChangeCallback(AlarmOperationsCommon::OnSnoozedAlarmsCountChange callback)
             -> void;
         auto handleAddActiveAlarmCountChangeCallback(AlarmOperationsCommon::OnActiveAlarmCountChange callback) -> void;
         auto handleToggleAll(AlarmToggleAllRequestMessage *request) -> std::shared_ptr<AlarmToggleAllResponseMessage>;
+        auto handleGetSnoozedAlarms(GetSnoozedAlarmsRequestMessage *request)
+            -> std::shared_ptr<GetSnoozedAlarmsResponseMessage>;
 
       private:
         stm::ServiceTime *service = nullptr;

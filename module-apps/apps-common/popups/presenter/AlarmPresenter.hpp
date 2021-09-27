@@ -23,24 +23,26 @@ namespace app::popup
             friend Presenter;
             friend AlarmPopupPresenter;
 
-            std::shared_ptr<AlarmEventRecord> record = nullptr;
-            Presenter *presenter                     = nullptr;
+          private:
+            void set(std::shared_ptr<AlarmEventRecord> record);
+            void setSnoozed(std::vector<SingleEventRecord> snoozed);
+            void reset();
+            template <typename requestType, typename responseType> void snoozeAlarm();
+            template <typename requestType, typename responseType> void stopAlarm();
+            void setRefreshWindowCallback(std::function<void()> callback);
+            void processIfSnoozed();
 
-            void set(std::shared_ptr<AlarmEventRecord> record)
-            {
-                this->record = std::move(record);
-            }
-            ApplicationCommon *app;
-            void snoozeAlarm();
-            void stopAlarm();
+            std::shared_ptr<AlarmEventRecord> record = nullptr;
+            std::vector<SingleEventRecord> snoozedRecord;
+            Presenter *presenter                     = nullptr;
+            std::function<void()> refreshWindowCallback = nullptr;
+            std::string snoozedTill                     = std::string{};
+            bool isSnoozedAlarm                         = false;
+            ApplicationCommon *app                      = nullptr;
 
           public:
-            explicit AlarmModel(ApplicationCommon *app) : AsyncCallbackReceiver(app), app(app)
-            {}
-            void attach(Presenter *p)
-            {
-                presenter = p;
-            }
+            explicit AlarmModel(ApplicationCommon *app);
+            void attach(Presenter *p);
         };
 
         class View
@@ -63,6 +65,7 @@ namespace app::popup
 
         class Presenter : public BasePresenter<AlarmPopupContract::View>
         {
+          private:
             std::shared_ptr<AlarmModel> model;
             ApplicationCommon *app = nullptr;
 
@@ -86,6 +89,22 @@ namespace app::popup
             virtual void setModel(std::shared_ptr<AlarmEventRecord> r)
             {
                 this->model->set(std::move(r));
+            }
+            virtual void setSnoozedRecord(std::vector<SingleEventRecord> snoozed)
+            {
+                this->model->setSnoozed(snoozed);
+            }
+            virtual void setRefreshWindowCallback(std::function<void()> callback)
+            {
+                this->model->setRefreshWindowCallback(std::move(callback));
+            }
+            virtual void processIfSnoozed()
+            {
+                this->model->processIfSnoozed();
+            }
+            virtual void resetModel()
+            {
+                this->model->reset();
             }
 
             virtual std::uint32_t getSnoozeTime() = 0;
