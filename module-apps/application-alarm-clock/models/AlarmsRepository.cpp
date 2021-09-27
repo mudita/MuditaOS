@@ -72,5 +72,7 @@ namespace app::alarmClock
     }
 
     void AlarmsDBRepository::turnOffAll(const AbstractAlarmsRepository::OnResultCallback &callback)
-    {}
+    {
+        GetQuery<alarms::AlarmToggleAllRequestMessage, alarms::AlarmToggleAllResponseMessage>(callback, false);
+    }
 } // namespace app::alarmClock

@@ -142,6 +142,9 @@ namespace stm
         connect(typeid(alarms::AlarmRemoveRequestMessage), [&](sys::Message *request) -> sys::MessagePointer {
             return alarmMessageHandler->handleRemoveAlarm(static_cast<alarms::AlarmRemoveRequestMessage *>(request));
         });
+        connect(typeid(alarms::AlarmToggleAllRequestMessage), [&](sys::Message *request) -> sys::MessagePointer {
+            return alarmMessageHandler->handleToggleAll(static_cast<alarms::AlarmToggleAllRequestMessage *>(request));
+        });
         connect(typeid(alarms::AlarmsGetInRangeRequestMessage), [&](sys::Message *request) -> sys::MessagePointer {
             return alarmMessageHandler->handleGetAlarmsInRange(
                 static_cast<alarms::AlarmsGetInRangeRequestMessage *>(request));

@@ -27,6 +27,7 @@ namespace alarms
     using OnRemoveAlarmEventCallback       = std::function<void(bool)>;
     using OnGetNextCallback                = std::function<void(std::vector<AlarmEventRecord>)>;
     using OnGetAlarmEventsRecurringInRange = std::function<void(std::vector<AlarmEventRecord>)>;
+    using OnToggleAll                      = std::function<void(bool)>;
 
     class AbstractAlarmEventsRepository
     {
@@ -108,5 +109,11 @@ namespace alarms
                                                     std::uint32_t offset,
                                                     std::uint32_t limit,
                                                     const OnGetAlarmEventsRecurringInRange &callback) = 0;
+
+        /**
+         * Toggles all alarms on/off
+         * @param toggle disable/enable value
+         */
+        virtual void toggleAll(bool toggle, const OnToggleAll &callback) = 0;
     };
 } // namespace alarms

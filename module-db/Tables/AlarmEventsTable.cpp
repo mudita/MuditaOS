@@ -220,6 +220,13 @@ std::vector<AlarmEventsTableRow> AlarmEventsTable::getNext(TimePoint start, uint
     return retQueryUnpack(std::move(retQuery));
 }
 
+auto AlarmEventsTable::toggleAll(bool toggle) -> bool
+{
+    auto ret = db->execute("UPDATE alarm_events SET enabled = '%d';", static_cast<int>(toggle));
+
+    return ret;
+}
+
 uint32_t AlarmEventsTable::count()
 {
     auto queryRet = db->query("SELECT COUNT(*) FROM alarm_events;");
