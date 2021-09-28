@@ -160,7 +160,8 @@ namespace gui
                 showDialogDuplicatedSpeedDialNumber();
                 return false;
             case DBServiceAPI::ContactVerificationResult::temporaryContactExists:
-                // Nothing to do. Update the contact and eventually unbind the phone number from the temporary one.
+                LOG_DEBUG("Temporary contact exists. Let's update the contact and unbind the phone numbers from the "
+                          "temporary one");
                 break;
             }
         }

@@ -1371,8 +1371,7 @@ ContactRecordInterface::ContactNumberMatch::ContactNumberMatch(ContactRecord rec
 auto ContactRecordInterface::GetNumberById(std::uint32_t numberId) -> utils::PhoneNumber::View
 {
     auto row = contactDB->number.getById(numberId);
-    auto number = utils::PhoneNumber(row.numberUser, row.numbere164).getView();
-    return number;
+    return utils::PhoneNumber(row.numberUser, row.numbere164).getView();
 }
 
 auto ContactRecordInterface::GetNumbersIdsByContact(std::uint32_t contactId) -> std::vector<std::uint32_t>
