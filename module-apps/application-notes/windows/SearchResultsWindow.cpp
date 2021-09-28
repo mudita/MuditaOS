@@ -15,6 +15,7 @@ namespace app::notes
                                              std::unique_ptr<NotesSearchWindowContract::Presenter> &&windowPresenter)
         : AppWindow(application, gui::name::window::notes_search_result), presenter(std::move(windowPresenter))
     {
+        presenter->attach(this);
         buildInterface();
     }
 
