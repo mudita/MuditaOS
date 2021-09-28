@@ -3,8 +3,9 @@
 
 #pragma once
 
+#include "presenter/AlarmActivatedPresenter.hpp"
+
 #include <apps-common/popups/WindowWithTimer.hpp>
-#include <AsyncTask.hpp>
 
 struct AlarmEventRecord;
 
@@ -12,19 +13,18 @@ namespace gui
 {
     class Icon;
 
-    class AlarmActivatedWindow : public WindowWithTimer, public app::AsyncCallbackReceiver
+    class AlarmActivatedWindow : public WindowWithTimer, app::popup::AlarmActivatedContract::View
     {
       public:
-        explicit AlarmActivatedWindow(app::ApplicationCommon *app);
+        AlarmActivatedWindow(app::ApplicationCommon *app,
+                             std::shared_ptr<app::popup::AlarmActivatedPresenter> presenter);
 
       private:
         bool onInput(const InputEvent &inputEvent) override;
         void buildInterface() override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
-        void activateAlarm(AlarmEventRecord &alarmEvent);
-        bool onAlarmResponseMessage(sys::ResponseMessage *response, ShowMode mode);
-        void showAlarmTime(ShowMode mode, time_t alarmTime);
         void returnToPreviousWindow();
+        void setAlarmTime(time_t alarmTime);
 
         Icon *icon{};
     };
