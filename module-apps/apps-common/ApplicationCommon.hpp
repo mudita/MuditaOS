@@ -255,6 +255,9 @@ namespace app
         ///@param ignoredWindowsNumber: defines how many windows will be skipped while going back on stack
         void returnToPreviousWindow(const uint32_t times = 1);
 
+        /// Find and pop window from stack by window name
+        void popWindow(const std::string &window);
+
         /// Pops the current window from the windows stack
         void popCurrentWindow();
 
@@ -353,9 +356,6 @@ namespace app
         /// @ingrup AppWindowStack
         WindowsStack windowsStack;
         WindowsFactory windowsFactory;
-
-        /// Find and pop window from stack by window name
-        void popWindow(const std::string &window);
 
         /// Method used to attach popups windows to application
         virtual void attachPopups(const std::vector<gui::popup::ID> &popupsList);

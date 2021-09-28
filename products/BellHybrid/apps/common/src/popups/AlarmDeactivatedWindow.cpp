@@ -12,13 +12,20 @@
 #include <service-appmgr/Controller.hpp>
 #include <service-time/AlarmMessage.hpp>
 #include <service-time/Constants.hpp>
+#include <application-bell-alarm/ApplicationBellAlarmNames.hpp>
+#include <application-bell-main/ApplicationBellMain.hpp>
 
 namespace gui
 {
-    AlarmDeactivatedWindow::AlarmDeactivatedWindow(app::ApplicationCommon *app)
-        : WindowWithTimer(app, popup::window::alarm_deactivated_window), app::AsyncCallbackReceiver{app}
+    AlarmDeactivatedWindow::AlarmDeactivatedWindow(app::ApplicationCommon *app,
+                                                   std::shared_ptr<app::popup::AlarmActivatedPresenter> presenter)
+        : WindowWithTimer(app, popup::window::alarm_deactivated_window), app::popup::AlarmActivatedContract::View(
+                                                                             std::move(presenter))
     {
+        getPresenter()->attach(this);
         buildInterface();
+        getPresenter()->updateAlarmModel([&]() { getPresenter()->deactivate(); });
+
         timerCallback = [this](Item &, sys::Timer &) {
             returnToPreviousWindow();
             return true;
@@ -37,11 +44,6 @@ namespace gui
     void AlarmDeactivatedWindow::buildInterface()
     {
         WindowWithTimer::buildInterface();
-        auto task = app::AsyncRequest::createFromMessage(
-            std::make_unique<alarms::AlarmGetFirstNextSingleEventRequestMessage>(), service::name::service_time);
-
-        auto onResponseCallback = [this](auto response) { return onAlarmResponseMessage(response); };
-        task->execute(application, this, onResponseCallback);
 
         statusBar->setVisible(false);
         header->setTitleVisibility(false);
@@ -62,32 +64,15 @@ namespace gui
         app::manager::Controller::sendAction(application,
                                              app::manager::actions::AbortPopup,
                                              std::make_unique<gui::PopupRequestParams>(gui::popup::ID::AlarmActivated));
-        application->returnToPreviousWindow();
-    }
 
-    void AlarmDeactivatedWindow::deactivateAlarm(AlarmEventRecord &alarmEvent)
-    {
-        alarmEvent.enabled = false;
-        auto task          = app::AsyncRequest::createFromMessage(
-            std::make_unique<alarms::AlarmUpdateRequestMessage>(alarmEvent), service::name::service_time);
-
-        task->execute(this->application, this);
-    }
-
-    bool AlarmDeactivatedWindow::onAlarmResponseMessage(sys::ResponseMessage *response)
-    {
-        auto result = dynamic_cast<alarms::AlarmGetFirstNextSingleEventResponseMessage *>(response);
-        if (result == nullptr || result->retCode != sys::ReturnCodes::Success) {
-            LOG_WARN("Get next single event request failed!");
-            return false;
+        if (application->getPrevWindow() == gui::window::name::bellAlarmSet) {
+            app::manager::Controller::sendAction(
+                application,
+                app::manager::actions::Launch,
+                std::make_unique<app::ApplicationLaunchData>(app::applicationBellName));
         }
-        auto alarmEventRecord = dynamic_cast<AlarmEventRecord *>(result->singleEvent.parent.get());
-        if (alarmEventRecord == nullptr) {
-            LOG_WARN("Getting alarm event record failed!");
-            return false;
+        else {
+            application->returnToPreviousWindow();
         }
-
-        deactivateAlarm(*alarmEventRecord);
-        return true;
     }
 } /* namespace gui */

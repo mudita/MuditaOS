@@ -3,25 +3,25 @@
 
 #pragma once
 
+#include "presenter/AlarmActivatedPresenter.hpp"
+
 #include <apps-common/popups/WindowWithTimer.hpp>
-#include <AsyncTask.hpp>
 
 struct AlarmEventRecord;
 
 namespace gui
 {
     class Icon;
-    class AlarmDeactivatedWindow : public WindowWithTimer, public app::AsyncCallbackReceiver
+    class AlarmDeactivatedWindow : public WindowWithTimer, app::popup::AlarmActivatedContract::View
     {
       public:
-        explicit AlarmDeactivatedWindow(app::ApplicationCommon *app);
+        AlarmDeactivatedWindow(app::ApplicationCommon *app,
+                               std::shared_ptr<app::popup::AlarmActivatedPresenter> presenter);
 
       private:
         bool onInput(const InputEvent &inputEvent) override;
         void buildInterface() override;
         void returnToPreviousWindow();
-        void deactivateAlarm(AlarmEventRecord &alarmEvent);
-        bool onAlarmResponseMessage(sys::ResponseMessage *response);
 
         Icon *icon{};
     };
