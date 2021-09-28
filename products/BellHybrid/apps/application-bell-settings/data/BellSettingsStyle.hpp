@@ -36,5 +36,18 @@ namespace gui
         {
             inline constexpr auto font_center = "gt_pressura_light_46";
         }
+
+        namespace about_your_bell_window
+        {
+            inline constexpr auto height = 100U;
+            inline constexpr auto width  = 400U;
+            namespace list_item
+            {
+                inline constexpr auto width        = style::window::default_body_width;
+                inline constexpr auto height       = 66;
+                inline constexpr auto title_height = 33;
+                inline constexpr auto value_height = 33;
+            } // namespace list_item
+        }     // namespace about_your_bell_window
     } // namespace bell_settings_style
 } // namespace gui
