@@ -68,7 +68,7 @@ namespace gui
 
     void AlarmActivatedWindow::showAlarmTime(ShowMode, time_t alarmTime)
     {
-        icon->text->setText(utils::time::getBottomDescription(
+        icon->text->setRichText(utils::time::getBottomDescription(
             utils::time::calculateTimeDifference(alarmTime, utils::time::getCurrentTime())));
     }
     void AlarmActivatedWindow::buildInterface()

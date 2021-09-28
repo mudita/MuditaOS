@@ -5,11 +5,15 @@ target_sources(application-bell-alarm
     PRIVATE
         ApplicationBellAlarm.cpp
         presenter/BellAlarmWindowPresenter.cpp
+        presenter/BellAlarmSetPresenter.cpp
         windows/BellAlarmWindow.cpp
+        windows/BellAlarmSetWindow.cpp
     PRIVATE
         data/BellAlarmStyle.hpp
         presenter/BellAlarmWindowPresenter.hpp
+        presenter/BellAlarmSetPresenter.hpp
         windows/BellAlarmWindow.hpp
+        windows/BellAlarmSetWindow.hpp
     PUBLIC
         include/application-bell-alarm/ApplicationBellAlarm.hpp
 )
@@ -25,6 +29,7 @@ target_include_directories(application-bell-alarm
 target_link_libraries(application-bell-alarm
     PRIVATE
         app
+        bell::app-main
         bell::app-common
         module-gui
 )
