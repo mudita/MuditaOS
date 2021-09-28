@@ -66,8 +66,13 @@ gui::ListItem *CalllogModel::getItem(gui::Order order)
         return nullptr;
     }
 
-    auto contact = DBServiceAPI::MatchContactByPhoneNumber(application, call->phoneNumber);
-    call->name   = contact ? contact->getFormattedName() : UTF8(call->phoneNumber.getFormatted());
+    if (auto contact = DBServiceAPI::MatchContactByPhoneNumber(application, call->phoneNumber);
+        contact && !contact->isTemporary()) {
+        call->name = contact->getFormattedName();
+    }
+    else {
+        call->name = UTF8(call->phoneNumber.getFormatted());
+    }
 
     auto item = new gui::CalllogItem(this);
 

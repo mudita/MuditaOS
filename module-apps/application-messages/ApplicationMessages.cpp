@@ -23,7 +23,7 @@
 #include <module-db/queries/messages/sms/QuerySMSUpdate.hpp>
 #include <module-db/queries/messages/threads/QueryThreadGetByID.hpp>
 #include <module-db/queries/messages/threads/QueryThreadRemove.hpp>
-#include <module-db/queries/phonebook/QueryContactGetByID.hpp>
+#include <module-db/queries/phonebook/QueryContactGetByNumberID.hpp>
 #include <OptionsWindow.hpp>
 #include <OptionWindow.hpp>
 #include <service-cellular/CellularMessage.hpp>
@@ -178,8 +178,8 @@ namespace app
 
     bool ApplicationMessages::removeSmsThread(const ThreadRecord *record)
     {
-        using db::query::ContactGetByID;
-        using db::query::ContactGetByIDResult;
+        using db::query::ContactGetByNumberID;
+        using db::query::ContactGetByNumberIDResult;
 
         if (record == nullptr) {
             LOG_ERROR("Trying to remove a null SMS thread!");
@@ -187,10 +187,10 @@ namespace app
         }
         LOG_DEBUG("Removing thread: %" PRIu32, record->ID);
 
-        auto query = std::make_unique<ContactGetByID>(record->contactID, true);
+        auto query = std::make_unique<ContactGetByNumberID>(record->numberID);
         auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Contact);
         task->setCallback([this, record](auto response) {
-            auto result = dynamic_cast<ContactGetByIDResult *>(response);
+            auto result = dynamic_cast<ContactGetByNumberIDResult *>(response);
             if (result != nullptr) {
                 const auto &contact = result->getResult();
                 auto metaData       = std::make_unique<gui::DialogMetadataMessage>(

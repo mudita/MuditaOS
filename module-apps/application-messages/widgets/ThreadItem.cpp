@@ -77,9 +77,15 @@ namespace gui
 
     void ThreadItem::setContactName(std::optional<long int> numberImportance)
     {
-        contact->setText(threadStruct->contact->getFormattedName());
-        if (numberImportance.has_value()) {
-            displayNumberImportance(numberImportance.value());
+        auto contactRecord = threadStruct->contact;
+        if (contactRecord->isTemporary()) {
+            contact->setText(threadStruct->number->getFormatted());
+        }
+        else {
+            contact->setText(threadStruct->contact->getFormattedName());
+            if (numberImportance.has_value()) {
+                displayNumberImportance(numberImportance.value());
+            }
         }
     }
 
