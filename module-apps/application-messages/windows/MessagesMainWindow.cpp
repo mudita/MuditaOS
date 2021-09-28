@@ -113,11 +113,12 @@ namespace gui
                 auto query         = std::make_unique<ThreadGetByNumber>(primaryNumber);
                 auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Contact);
                 task->setCallback([app = application](auto response) {
-                    const auto result = dynamic_cast<ThreadGetByNumberResult *>(response);
-                    if (auto thread = result->getThread(); thread.isValid()) {
-                        app->switchWindow(gui::name::window::thread_view,
-                                          std::make_unique<SMSThreadData>(std::make_unique<ThreadRecord>(thread)));
-                        return true;
+                    if (const auto result = dynamic_cast<ThreadGetByNumberResult *>(response); result != nullptr) {
+                        if (auto thread = result->getThread(); thread.isValid()) {
+                            app->switchWindow(gui::name::window::thread_view,
+                                              std::make_unique<SMSThreadData>(std::make_unique<ThreadRecord>(thread)));
+                            return true;
+                        }
                     }
                     LOG_FATAL("No thread and thread not created!");
                     return false;
