@@ -15,6 +15,7 @@ target_sources(application-bell-common
         src/BellFinishedWindow.cpp
         src/BellSideListItemWithCallbacks.cpp
         src/TimeUtils.cpp
+        src/popups/presenter/AlarmActivatedPresenter.cpp
         src/popups/AlarmActivatedWindow.cpp
         src/popups/AlarmDeactivatedWindow.cpp
         src/widgets/ListItems.cpp
@@ -28,6 +29,7 @@ target_sources(application-bell-common
         include/common/models/AbstractSettingsModel.hpp
         include/common/models/AlarmModel.hpp
         include/common/models/TimeModel.hpp
+        include/common/popups/presenter/AlarmActivatedPresenter.hpp
         include/common/popups/AlarmActivatedWindow.hpp
         include/common/popups/AlarmDeactivatedWindow.hpp
         include/common/widgets/BellSideListItemWithCallbacks.hpp
@@ -42,7 +44,8 @@ target_link_libraries(application-bell-common
         service-db
 
     PRIVATE
-        bell::db
+        bell::app-main
+        bell::app-alarm 
         module-gui
         service-time
         bell::db
