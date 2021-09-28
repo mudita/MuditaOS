@@ -11,7 +11,6 @@
 #include <BoxLayout.hpp>
 #include <i18n/i18n.hpp>
 #include <module-db/queries/messages/sms/QuerySMSGetLastByThreadID.hpp>
-#include <module-db/queries/messages/threads/QueryThreadGetByContactID.hpp>
 #include <module-db/queries/messages/threads/QueryThreadGetByNumber.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <service-cellular/service-cellular/MessageConstants.hpp>
@@ -87,18 +86,15 @@ namespace gui
             setFocusItem(message);
         }
         else if (auto sendRequest = dynamic_cast<SMSSendRequest *>(data); sendRequest != nullptr) {
-            phoneNumber = sendRequest->getPhoneNumber();
             LOG_INFO("Received sms send request");
-            auto retContact = DBServiceAPI::MatchContactByPhoneNumber(application, phoneNumber);
-            if (!retContact) {
-                LOG_WARN("No valid contact for given number");
+            phoneNumber = sendRequest->getPhoneNumber();
+            contact     = DBServiceAPI::MatchContactByPhoneNumber(application, phoneNumber);
+            if (!contact || contact->isTemporary()) {
                 recipient->setText(phoneNumber.getFormatted());
-                message->setText(sendRequest->textData);
-                return;
             }
-
-            contact = std::move(retContact);
-            recipient->setText(contact->getFormattedName());
+            else {
+                recipient->setText(contact->getFormattedName());
+            }
             message->setText(sendRequest->textData);
         }
 
@@ -310,35 +306,10 @@ namespace gui
 
     auto NewMessageWindow::handleMessageText() -> bool
     {
-        if (contact && !(contact->numbers.empty())) {
-            return addDraft(*contact);
-        }
         if (const auto &number = getPhoneNumber(); !number.get().empty()) {
             return addDraft(number);
         }
         return false;
-    }
-
-    auto NewMessageWindow::addDraft(const ContactRecord &contactRecord) -> bool
-    {
-        auto number = contactRecord.numbers.front().number;
-        auto query  = std::make_unique<db::query::ThreadGetByContactID>(contactRecord.ID);
-        auto task   = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::SMSThread);
-        task->setCallback([this, number](auto response) {
-            const auto result = dynamic_cast<db::query::ThreadGetByContactIDResult *>(response);
-            if (result == nullptr) {
-                return false;
-            }
-
-            const auto &thread = result->getRecord();
-            if (!thread.has_value()) {
-                storeMessageDraft(number, message->getText());
-                return true;
-            }
-            return addDraftToExistingThread(thread->ID, number, message->getText());
-        });
-        task->execute(application, this, std::nullopt, app::ReceiverBehavior::WaitForResponseToClose);
-        return true;
     }
 
     auto NewMessageWindow::addDraft(const utils::PhoneNumber &number) -> bool

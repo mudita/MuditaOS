@@ -167,8 +167,6 @@ namespace sdesktop::endpoints
                                                 {json::calllog::duration, duration},
                                                 {json::calllog::id, static_cast<int>(record.ID)},
                                                 {json::calllog::type, static_cast<int>(record.type)},
-                                                {json::calllog::name, record.name.c_str()},
-                                                {json::calllog::contactId, static_cast<int>(record.getContactId())},
                                                 {json::calllog::phoneNumber, record.phoneNumber.getEntered()},
                                                 {json::calllog::isRead, record.isRead}};
         return recordEntry;

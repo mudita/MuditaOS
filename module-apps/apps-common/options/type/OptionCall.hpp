@@ -13,6 +13,6 @@ namespace gui::option
     class Call : public Simple
     {
       public:
-        Call(app::ApplicationCommon *app, const ContactRecord &contact);
+        Call(app::ApplicationCommon *app, const UTF8 &contactName, utils::PhoneNumber::View phoneNumber);
     };
 }; // namespace gui::option

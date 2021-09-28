@@ -7,7 +7,8 @@
 #include "SMSThreadViewWindow.hpp"
 
 #include <log/log.hpp>
-#include <module-db/queries/phonebook/QueryContactGetByID.hpp>
+#include <module-db/queries/phonebook/QueryContactGetByNumberID.hpp>
+#include <module-db/queries/phonebook/QueryNumberGetByID.hpp>
 #include <OptionsMessages.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <service-db/DBServiceAPI.hpp>
@@ -65,7 +66,7 @@ namespace gui
             auto pdata = dynamic_cast<SMSThreadData *>(data);
             if (pdata) {
                 LOG_INFO("Thread data received: %" PRIu32, pdata->thread->ID);
-                requestContactName(pdata->thread->contactID);
+                requestContact(pdata->thread->numberID);
 
                 // Mark thread as Read
                 if (pdata->thread->isUnread()) {
@@ -119,21 +120,48 @@ namespace gui
         return false;
     }
 
-    auto SMSThreadViewWindow::requestContactName(unsigned int contactID) -> void
+    auto SMSThreadViewWindow::requestContact(unsigned int numberID) -> void
     {
-        auto query = std::make_unique<db::query::ContactGetByID>(contactID, true);
+        auto query = std::make_unique<db::query::ContactGetByNumberID>(numberID);
         auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Contact);
-        task->setCallback([this](auto response) { return handleContactNameQueryResponse(response); });
+        task->setCallback([this, numberID](auto response) {
+            if (const auto ret = handleContactQueryResponse(response); !ret) {
+                requestNumber(numberID);
+                return false;
+            }
+            return true;
+        });
         task->execute(application, this);
     }
 
-    auto SMSThreadViewWindow::handleContactNameQueryResponse(db::QueryResult *queryResult) -> bool
+    auto SMSThreadViewWindow::handleContactQueryResponse(db::QueryResult *queryResult) -> bool
     {
-        auto msgResponse = dynamic_cast<db::query::ContactGetByIDResult *>(queryResult);
-        assert(msgResponse != nullptr);
-
+        auto msgResponse = dynamic_cast<db::query::ContactGetByNumberIDResult *>(queryResult);
+        if (msgResponse == nullptr) {
+            return false;
+        }
+        if (auto contactRecord = msgResponse->getResult(); !contactRecord.isValid() || contactRecord.isTemporary()) {
+            return false;
+        }
         setTitle(msgResponse->getResult().getFormattedName());
+        return true;
+    }
 
-        return false;
+    void SMSThreadViewWindow::requestNumber(unsigned int numberID)
+    {
+        auto query = std::make_unique<db::query::NumberGetByID>(numberID);
+        auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Contact);
+        task->setCallback([this](auto response) { return handleNumberQueryResponse(response); });
+        task->execute(application, this);
+    }
+
+    auto SMSThreadViewWindow::handleNumberQueryResponse(db::QueryResult *queryResult) -> bool
+    {
+        auto msgResponse = dynamic_cast<db::query::NumberGetByIDResult *>(queryResult);
+        if (msgResponse == nullptr) {
+            return false;
+        }
+        setTitle(msgResponse->getNumber().getFormatted().c_str());
+        return true;
     }
 } /* namespace gui */

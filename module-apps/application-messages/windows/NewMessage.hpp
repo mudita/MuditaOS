@@ -32,7 +32,6 @@ namespace gui
         void updateBottomBar();
         auto getPhoneNumber() const -> utils::PhoneNumber;
         auto handleMessageText() -> bool;
-        auto addDraft(const ContactRecord &contactRecord) -> bool;
         auto addDraft(const utils::PhoneNumber &number) -> bool;
         auto addDraftToExistingThread(unsigned int threadId, const utils::PhoneNumber::View &number, const UTF8 &text)
             -> bool;

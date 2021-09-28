@@ -266,7 +266,7 @@ namespace gui
             if (!callData->getPhoneNumber().getFormatted().empty()) {
                 auto contact     = DBServiceAPI::MatchContactByPhoneNumber(this->application, phoneNumber);
                 auto displayName = phoneNumber.getFormatted();
-                if (contact) {
+                if (contact && !contact->isTemporary()) {
                     LOG_INFO("number recognized as contact id = %" PRIu32, contact->ID);
                     displayName = contact->getFormattedName();
                 }

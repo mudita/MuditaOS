@@ -12,22 +12,16 @@
 
 namespace gui::option
 {
-    Call::Call(app::ApplicationCommon *app, const ContactRecord &contact)
+    Call::Call(app::ApplicationCommon *app, const UTF8 &contactName, utils::PhoneNumber::View phoneNumber)
     {
         assert(app != nullptr);
 
-        text =
-            "<text>" + utils::translate("sms_call_text") + "<b>" + contact.getFormattedName().c_str() + "</b></text>";
-
-        activatedCallback = [app, contact](gui::Item &item) {
-            if (!contact.numbers.empty()) {
-                const auto &phoneNumber = contact.numbers.front().number;
-                return app::manager::Controller::sendAction(app,
-                                                            app::manager::actions::Call,
-                                                            std::make_unique<app::ExecuteCallData>(phoneNumber),
-                                                            app::manager::OnSwitchBehaviour::RunInBackground);
-            }
-            return false;
+        text              = "<text>" + utils::translate("sms_call_text") + "<b>" + contactName.c_str() + "</b></text>";
+        activatedCallback = [app, phoneNumber](gui::Item &item) {
+            return app::manager::Controller::sendAction(app,
+                                                        app::manager::actions::Call,
+                                                        std::make_unique<app::ExecuteCallData>(phoneNumber),
+                                                        app::manager::OnSwitchBehaviour::RunInBackground);
         };
     }
 } // namespace gui::option
