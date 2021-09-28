@@ -8,6 +8,7 @@
 #include <common/options/OptionBellMenu.hpp>
 #include <apps-common/messages/DialogMetadataMessage.hpp>
 #include <apps-common/windows/Dialog.hpp>
+#include <windows/advanced/AboutYourBellWindow.hpp>
 
 namespace gui
 {
@@ -46,6 +47,7 @@ namespace gui
                        gui::window::name::bellSettingsTimeUnits);
         addWinSettings(utils::translate("app_bell_settings_advanced_frontlight"),
                        gui::window::name::bellSettingsFrontlight);
+        addWinSettings(utils::translate("app_bell_settings_advanced_about"), gui::AboutYourBellWindow::name);
 
         return settingsOptionList;
     }
