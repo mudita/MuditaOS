@@ -35,6 +35,6 @@ namespace utils::time
                 return std::to_string(hours) + " hrs & " + std::to_string(minutes) + " min";
             }
         }(duration.getHours(), duration.getMinutes());
-        return UTF8(prefix + " " + timeText);
+        return UTF8("<text>" + prefix + "<br />" + "in " + timeText + "</text>");
     }
 } // namespace utils::time
