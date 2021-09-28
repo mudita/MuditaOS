@@ -20,8 +20,10 @@ namespace gui
         std::shared_ptr<SMSThreadModel> smsModel;
         gui::ListView *smsList = nullptr;
 
-        auto requestContactName(unsigned int ContactID) -> void;
-        auto handleContactNameQueryResponse(db::QueryResult *) -> bool;
+        auto requestContact(unsigned int numberID) -> void;
+        auto handleContactQueryResponse(db::QueryResult *) -> bool;
+        void requestNumber(unsigned int numberID);
+        auto handleNumberQueryResponse(db::QueryResult *) -> bool;
 
       public:
         explicit SMSThreadViewWindow(app::ApplicationCommon *app);

@@ -9,20 +9,31 @@
 #include <OptionContact.hpp>
 #include <OptionWindow.hpp>
 
-/// below just for apps names...
-
 std::list<gui::Option> threadWindowOptions(app::ApplicationMessages *app, const ThreadRecord *record)
 {
     assert(record != nullptr);
-    ContactRecord contact =
-        record ? DBServiceAPI::ContactGetByIDWithTemporary(app, record->contactID)->front() : ContactRecord();
+    auto number  = DBServiceAPI::NumberByID(app, record->numberID);
+    auto contact = DBServiceAPI::MatchContactByNumberID(app, record->numberID);
+    if (!contact->isValid()) {
+        return {};
+    }
+    const auto isTempContact = contact->isTemporary();
+
     std::list<gui::Option> options;
+    if (isTempContact) {
+        options.emplace_back(gui::Option{std::make_unique<gui::option::Call>(app, number.getFormatted(), number)});
 
-    options.emplace_back(gui::Option{std::make_unique<gui::option::Call>(app, contact)});
-
-    auto contactOperation =
-        contact.isTemporary() ? gui::option::ContactOperation::Add : gui::option::ContactOperation::Details;
-    options.emplace_back(gui::Option{std::make_unique<gui::option::Contact>(app, contactOperation, contact)});
+        ContactRecord newContact;
+        newContact.numbers.emplace_back(number);
+        options.emplace_back(
+            gui::Option{std::make_unique<gui::option::Contact>(app, gui::option::ContactOperation::Add, newContact)});
+    }
+    else {
+        options.emplace_back(
+            gui::Option{std::make_unique<gui::option::Call>(app, contact->getFormattedName(), number)});
+        options.emplace_back(
+            gui::Option{std::make_unique<gui::option::Contact>(app, gui::option::ContactOperation::Details, *contact)});
+    }
 
     if (record->isUnread()) {
         options.emplace_back(gui::Option{utils::translate("sms_mark_read"), [=](gui::Item &item) {

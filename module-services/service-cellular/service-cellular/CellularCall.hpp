@@ -64,7 +64,6 @@ namespace CellularCall
             this->call.duration    = duration;
             this->call.type        = type;
             this->call.name        = number.getEntered(); // temporary set number as name
-            this->call.contactId   = 0;
         }
 
         void setStartCallAction(const std::function<CalllogRecord(const CalllogRecord &rec)> callAction)

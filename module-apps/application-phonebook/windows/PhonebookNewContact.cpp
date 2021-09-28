@@ -160,19 +160,8 @@ namespace gui
                 showDialogDuplicatedSpeedDialNumber();
                 return false;
             case DBServiceAPI::ContactVerificationResult::temporaryContactExists:
-                std::unique_ptr<ContactRecord> tempContact;
-                assert(!contact->numbers.empty());
-                for (const auto &number : contact->numbers) {
-                    if (!number.number.getEntered().empty()) {
-                        tempContact = DBServiceAPI::MatchContactByPhoneNumber(application, number.number);
-                        if (tempContact != nullptr) {
-                            contact->ID   = tempContact->ID;
-                            contactAction = ContactAction::EditTemporary;
-                            break;
-                        }
-                    }
-                }
-                return false;
+                // Nothing to do. Update the contact and eventually unbind the phone number from the temporary one.
+                break;
             }
         }
         else {
@@ -209,15 +198,14 @@ namespace gui
         auto matchedContact   = DBServiceAPI::MatchContactByPhoneNumber(application, duplicatedNumber);
         auto oldContactRecord = (matchedContact != nullptr) ? *matchedContact : ContactRecord{};
 
-        if (contactAction == ContactAction::Add) {
-            contact->ID = oldContactRecord.ID;
-        }
-
         std::string duplicatedNumberPhrase = utils::translate("app_phonebook_duplicate_numbers");
         phonebookUtils::fillContactData(duplicatedNumberPhrase, oldContactRecord);
 
         auto metaData = std::make_unique<gui::DialogMetadataMessage>(gui::DialogMetadata{
             duplicatedNumber.getFormatted(), "info_big_circle_W_G", duplicatedNumberPhrase, "", [=]() -> bool {
+                if (contactAction == ContactAction::Add) {
+                    contact->ID = oldContactRecord.ID;
+                }
                 if (!DBServiceAPI::ContactUpdate(application, *contact)) {
                     LOG_ERROR("Contact id=%" PRIu32 " update failed", contact->ID);
                     return false;

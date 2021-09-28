@@ -41,8 +41,7 @@ namespace sdesktop::endpoints
     auto MessageHelper::toJson(const SMSRecord &record) -> json11::Json
     {
 
-        auto recordEntry = json11::Json::object{{json::messages::contactID, static_cast<int>(record.contactID)},
-                                                {json::messages::createdAt, static_cast<int>(record.date)},
+        auto recordEntry = json11::Json::object{{json::messages::createdAt, static_cast<int>(record.date)},
                                                 {json::messages::messageID, static_cast<int>(record.ID)},
                                                 {json::messages::messageBody, record.body.c_str()},
                                                 {json::messages::messageType, static_cast<int>(record.type)},
@@ -63,8 +62,7 @@ namespace sdesktop::endpoints
     auto MessageHelper::toJson(const ThreadRecord &thread, const utils::PhoneNumber::View &number) -> json11::Json
     {
 
-        auto recordEntry = json11::Json::object{{json::messages::contactID, static_cast<int>(thread.contactID)},
-                                                {json::messages::number, number.getFormatted()},
+        auto recordEntry = json11::Json::object{{json::messages::number, number.getFormatted()},
                                                 {json::messages::lastUpdatedAt, static_cast<int>(thread.date)},
                                                 {json::messages::messageCount, static_cast<int>(thread.msgCount)},
                                                 {json::messages::threadID, static_cast<int>(thread.ID)},
