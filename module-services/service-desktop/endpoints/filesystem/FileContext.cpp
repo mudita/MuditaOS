@@ -13,10 +13,13 @@ FileContext::FileContext(
     }
 
     file = std::fopen(path.c_str(), openMode.c_str());
-
     if (!file) {
         throw std::runtime_error("File open error");
     }
+
+    constexpr size_t streamBufferSize = 16384;
+    streamBuffer                      = std::make_unique<char[]>(streamBufferSize);
+    setvbuf(file, streamBuffer.get(), _IOFBF, streamBufferSize);
 
     runningCrc32Digest.reset();
 }

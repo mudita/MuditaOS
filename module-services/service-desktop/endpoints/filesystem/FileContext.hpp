@@ -43,6 +43,7 @@ class FileContext
     std::size_t offset{};
     std::size_t chunkSize{};
     CRC32 runningCrc32Digest;
+    std::unique_ptr<char[]> streamBuffer;
 };
 
 class FileReadContext : public FileContext
