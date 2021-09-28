@@ -78,7 +78,7 @@ namespace gui
     void ThreadItem::setContactName(std::optional<long int> numberImportance)
     {
         auto contactRecord = threadStruct->contact;
-        if (contactRecord->isTemporary()) {
+        if (!contactRecord || contactRecord->isTemporary()) {
             contact->setText(threadStruct->number->getFormatted());
         }
         else {
