@@ -27,6 +27,7 @@ target_sources(application-bell-settings
         models/SoundFilesModel.cpp
         models/TemperatureUnitModel.cpp
         models/TimeUnitsModel.cpp
+        models/advanced/AboutYourBellModel.cpp
         models/alarm_settings/AlarmSettingsListItemProvider.cpp
         models/alarm_settings/AlarmSettingsModel.cpp
         models/alarm_settings/PrewakeUpListItemProvider.cpp
@@ -36,6 +37,7 @@ target_sources(application-bell-settings
 
         presenter/FrontlightPresenter.cpp
         presenter/TimeUnitsPresenter.cpp
+        presenter/advanced/AboutYourBellWindowPresenter.cpp
         presenter/alarm_settings/AlarmSettingsPresenter.cpp
         presenter/alarm_settings/PrewakeUpPresenter.cpp
         presenter/alarm_settings/SnoozePresenter.cpp
@@ -44,12 +46,14 @@ target_sources(application-bell-settings
         widgets/TemperatureUnitListItem.cpp
         widgets/TimeFormatSetListItem.cpp
         widgets/TimeSetListItem.cpp
+        widgets/advanced/AboutYourBellListItem.cpp
 
         windows/BellSettingsBedtimeToneWindow.cpp
         windows/BellSettingsFrontlight.cpp
         windows/BellSettingsHomeViewWindow.cpp
         windows/BellSettingsTurnOffWindow.cpp
         windows/BellSettingsWindow.cpp
+        windows/advanced/AboutYourBellWindow.cpp
         windows/advanced/BellSettingsAdvancedWindow.cpp
         windows/advanced/BellSettingsTimeUnitsWindow.cpp
         windows/alarm_settings/BellSettingsAlarmSettingsSnoozeWindow.cpp
@@ -59,6 +63,7 @@ target_sources(application-bell-settings
 
         models/SettingsModel.hpp
         models/SoundFilesModel.hpp
+        models/advanced/AboutYourBellModel.hpp
         models/alarm_settings/AbstractAlarmSettingsModel.hpp
         models/alarm_settings/AbstractPrewakeUpSettingsModel.hpp
         models/alarm_settings/AbstractSnoozeSettingsModel.hpp
@@ -70,6 +75,7 @@ target_sources(application-bell-settings
         models/alarm_settings/SnoozeSettingsModel.hpp
 
         presenter/FrontlightPresenter.hpp
+        presenter/advanced/AboutYourBellWindowPresenter.hpp
         presenter/alarm_settings/AlarmSettingsPresenter.hpp
         presenter/alarm_settings/PrewakeUpPresenter.hpp
         presenter/alarm_settings/SnoozePresenter.hpp
@@ -78,6 +84,7 @@ target_sources(application-bell-settings
         widgets/TemperatureUnitListItem.hpp
         widgets/TimeFormatSetListItem.hpp
         widgets/TimeSetListItem.hpp
+        widgets/advanced/AboutYourBellListItem.hpp
 
         windows/alarm_settings/BellSettingsAlarmSettingsSnoozeWindow.hpp
         windows/alarm_settings/BellSettingsAlarmSettingsWindow.hpp
@@ -87,6 +94,7 @@ target_sources(application-bell-settings
         windows/BellSettingsHomeViewWindow.hpp
         windows/BellSettingsTurnOffWindow.hpp
         windows/BellSettingsWindow.hpp
+        windows/advanced/AboutYourBellWindow.hpp
         windows/advanced/BellSettingsAdvancedWindow.hpp
         windows/alarm_settings/BellSettingsAlarmSettingsSnoozeWindow.hpp
         windows/alarm_settings/BellSettingsAlarmSettingsMenuWindow.hpp
