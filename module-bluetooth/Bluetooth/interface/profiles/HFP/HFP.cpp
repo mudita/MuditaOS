@@ -265,11 +265,11 @@ namespace bluetooth
             isAudioRouted                = false;
             isAudioConnectionEstablished = false;
             break;
-        case HFP_SUBEVENT_START_RINGINIG:
+        case HFP_SUBEVENT_START_RINGING:
             LOG_DEBUG("Start Ringing\n");
             // todo request here ringtone stream
             break;
-        case HFP_SUBEVENT_STOP_RINGINIG:
+        case HFP_SUBEVENT_STOP_RINGING:
             LOG_DEBUG("Stop Ringing\n");
             // todo stop ringtone stream here
             break;
