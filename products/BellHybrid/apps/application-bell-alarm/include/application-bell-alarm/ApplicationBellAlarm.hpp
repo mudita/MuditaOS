@@ -7,7 +7,8 @@
 
 namespace gui::window::name
 {
-    inline constexpr auto bellAlarm = "BellAlarm";
+    inline constexpr auto bellAlarm    = "BellAlarm";
+    inline constexpr auto bellAlarmSet = "BellAlarmSet";
 } // namespace gui::window::name
 
 namespace app

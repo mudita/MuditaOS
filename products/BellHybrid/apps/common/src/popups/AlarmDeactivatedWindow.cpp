@@ -52,7 +52,7 @@ namespace gui
                         0,
                         style::window_width,
                         style::window_height,
-                        "bell_alarm_deactivated",
+                        "big_no-alarm",
                         utils::translate("app_bell_alarm_deactivated"));
         icon->text->setFont(style::window::font::verybiglight);
     }

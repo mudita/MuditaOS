@@ -7,11 +7,13 @@
 #include <apps-common/widgets/TimeSetFmtSpinner.hpp>
 
 #include <data/BellAlarmStyle.hpp>
-#include <module-gui/gui/input/InputEvent.hpp>
 
+#include <module-gui/gui/input/InputEvent.hpp>
 #include <module-gui/gui/widgets/TextFixedSize.hpp>
 #include <module-gui/gui/widgets/ThreeBox.hpp>
 #include <module-gui/gui/widgets/Image.hpp>
+
+#include <common/BellFinishedWindow.hpp>
 
 namespace gui
 {
@@ -62,7 +64,8 @@ namespace gui
         }
         if (inputEvent.isShortRelease(KeyCode::KEY_ENTER)) {
             presenter->saveData();
-            application->returnToPreviousWindow();
+            application->switchWindow(gui::window::name::bellAlarmSet, nullptr);
+
             return true;
         }
         return AppWindow::onInput(inputEvent);

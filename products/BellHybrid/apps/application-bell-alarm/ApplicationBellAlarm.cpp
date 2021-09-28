@@ -3,7 +3,9 @@
 
 #include "ApplicationBellAlarm.hpp"
 #include "presenter/BellAlarmWindowPresenter.hpp"
+#include "presenter/BellAlarmSetPresenter.hpp"
 #include "windows/BellAlarmWindow.hpp"
+#include "windows/BellAlarmSetWindow.hpp"
 
 #include <common/models/AlarmModel.hpp>
 #include <common/models/TimeModel.hpp>
@@ -19,6 +21,7 @@ namespace app
             std::shared_ptr<AlarmModel> alarmModel;
             std::shared_ptr<TimeModel> timeModel;
             std::shared_ptr<bell_alarm::BellAlarmWindowPresenter> alarmPresenter;
+            std::shared_ptr<bell_alarm::BellAlarmSetPresenter> alarmSetPresenter;
         };
     } // namespace internal
 
@@ -52,6 +55,11 @@ namespace app
             priv->alarmPresenter =
                 std::make_shared<bell_alarm::BellAlarmWindowPresenter>(priv->alarmModel, priv->timeModel);
             return std::make_unique<gui::BellAlarmWindow>(app, priv->alarmPresenter);
+        });
+
+        windowsFactory.attach(gui::window::name::bellAlarmSet, [&](ApplicationCommon *app, const std::string &name) {
+            priv->alarmSetPresenter = std::make_unique<bell_alarm::BellAlarmSetPresenter>(app, priv->alarmModel);
+            return std::make_unique<gui::BellAlarmSetWindow>(app, priv->alarmSetPresenter);
         });
 
         attachPopups({gui::popup::ID::AlarmActivated, gui::popup::ID::AlarmDeactivated});
