@@ -23,6 +23,7 @@ enum class MessageType
 
     DBContactGetByID [[deprecated]],        ///< used to ask for a contact with specified id
     DBContactGetBySpeedDial [[deprecated]], ///< used to ask for a contact with specified speed dial key assigned
+    DBContactMatchByNumberID [[deprecated]],
     DBContactMatchByNumber
     [[deprecated]], ///< used to best match with a single contact using a phone number (primary or secondary)
     DBContactAdd [[deprecated]],    ///< Add contact record

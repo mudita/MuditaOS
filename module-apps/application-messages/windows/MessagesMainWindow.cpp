@@ -13,8 +13,8 @@
 #include <header/SearchAction.hpp>
 #include <i18n/i18n.hpp>
 #include <log/log.hpp>
-#include <module-db/queries/messages/threads/QueryThreadGetByContactID.hpp>
 #include <module-db/queries/notifications/QueryNotificationsClear.hpp>
+#include <module-db/queries/messages/threads/QueryThreadGetByNumber.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <service-db/DBServiceAPI.hpp>
 #include <Style.hpp>
@@ -107,14 +107,14 @@ namespace gui
         {
             auto pdata = dynamic_cast<PhonebookSearchRequest *>(data);
             if (pdata != nullptr) {
-                using db::query::ThreadGetByContactID;
-                auto query = std::make_unique<ThreadGetByContactID>(pdata->result->ID);
+                using db::query::ThreadGetByNumber;
+                using db::query::ThreadGetByNumberResult;
+                auto primaryNumber = pdata->result->numbers[0].number;
+                auto query         = std::make_unique<ThreadGetByNumber>(primaryNumber);
                 auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Contact);
                 task->setCallback([app = application](auto response) {
-                    using db::query::ThreadGetByContactIDResult;
-                    const auto result = dynamic_cast<ThreadGetByContactIDResult *>(response);
-                    if ((result != nullptr) && result->getRecord().has_value()) {
-                        auto thread = result->getRecord().value();
+                    const auto result = dynamic_cast<ThreadGetByNumberResult *>(response);
+                    if (auto thread = result->getThread(); thread.isValid()) {
                         app->switchWindow(gui::name::window::thread_view,
                                           std::make_unique<SMSThreadData>(std::make_unique<ThreadRecord>(thread)));
                         return true;

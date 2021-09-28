@@ -16,9 +16,13 @@
 
 std::list<gui::Option> smsWindowOptions(app::ApplicationMessages *app, const SMSRecord &record)
 {
-    ContactRecord contact = DBServiceAPI::ContactGetByIDWithTemporary(app, record.contactID)->front();
-    std::list<gui::Option> options;
+    auto contact = DBServiceAPI::MatchContactByPhoneNumber(app, record.number);
+    if (contact == nullptr) {
+        return {};
+    }
+    const auto isTempContact = contact->isTemporary();
 
+    std::list<gui::Option> options;
     if (record.type == SMSType::FAILED) {
         options.emplace_back(utils::translate("sms_resend_failed"), [=, &record](gui::Item &item) {
             app->resendSms(record);
@@ -27,11 +31,20 @@ std::list<gui::Option> smsWindowOptions(app::ApplicationMessages *app, const SMS
         });
     }
 
-    options.emplace_back(gui::Option{std::make_unique<gui::option::Call>(app, contact)});
-
-    auto contactOperation =
-        contact.isTemporary() ? gui::option::ContactOperation::Add : gui::option::ContactOperation::Details;
-    options.emplace_back(gui::Option{std::make_unique<gui::option::Contact>(app, contactOperation, contact)});
+    if (isTempContact) {
+        options.emplace_back(
+            gui::Option{std::make_unique<gui::option::Call>(app, record.number.getFormatted(), record.number)});
+        ContactRecord newContact;
+        newContact.numbers.emplace_back(record.number);
+        options.emplace_back(
+            gui::Option{std::make_unique<gui::option::Contact>(app, gui::option::ContactOperation::Add, newContact)});
+    }
+    else {
+        options.emplace_back(
+            gui::Option{std::make_unique<gui::option::Call>(app, contact->getFormattedName(), record.number)});
+        options.emplace_back(
+            gui::Option{std::make_unique<gui::option::Contact>(app, gui::option::ContactOperation::Details, *contact)});
+    }
 
     options.emplace_back(UTF8(utils::translate("sms_forward_message")), [=](gui::Item &item) {
         std::unique_ptr<gui::SwitchData> data = std::make_unique<SMSTextData>(record.body);
