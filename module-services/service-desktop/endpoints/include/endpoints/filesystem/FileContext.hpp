@@ -16,10 +16,10 @@
 class FileContext
 {
   public:
-    explicit FileContext(std::filesystem::path path,
+    explicit FileContext(const std::filesystem::path &path,
                          std::size_t size,
                          std::size_t chunkSize,
-                         std::string openMode,
+                         const std::string &openMode,
                          std::size_t offset = 0);
 
     virtual ~FileContext();
@@ -36,6 +36,8 @@ class FileContext
 
     auto expectedChunkInFile() const -> std::size_t;
 
+    auto fileHash() const -> std::string;
+
   protected:
     std::filesystem::path path{};
     std::FILE *file{};
@@ -49,14 +51,12 @@ class FileContext
 class FileReadContext : public FileContext
 {
   public:
-    explicit FileReadContext(std::filesystem::path path,
+    explicit FileReadContext(const std::filesystem::path &path,
                              std::size_t size,
                              std::size_t chunkSize,
                              std::size_t offset = 0);
 
     ~FileReadContext();
-
-    auto getFileHash() -> std::string;
 
     auto read() -> std::vector<std::uint8_t>;
 };
@@ -64,15 +64,13 @@ class FileReadContext : public FileContext
 class FileWriteContext : public FileContext
 {
   public:
-    explicit FileWriteContext(std::filesystem::path path,
+    explicit FileWriteContext(const std::filesystem::path &path,
                               std::size_t size,
                               std::size_t chunkSize,
                               std::string crc32Digest,
                               std::size_t offset = 0);
 
     ~FileWriteContext();
-
-    auto fileHash() const -> std::string;
 
     auto crc32Matches() const -> bool;
 

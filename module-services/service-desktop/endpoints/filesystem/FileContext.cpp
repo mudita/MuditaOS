@@ -3,9 +3,13 @@
 
 #include <endpoints/filesystem/FileContext.hpp>
 #include <log/log.hpp>
+#include <utility>
 
-FileContext::FileContext(
-    std::filesystem::path path, std::size_t size, std::size_t chunkSize, std::string openMode, std::size_t offset)
+FileContext::FileContext(const std::filesystem::path &path,
+                         std::size_t size,
+                         std::size_t chunkSize,
+                         const std::string &openMode,
+                         std::size_t offset)
     : path(path), size(size), offset(offset), chunkSize(chunkSize)
 {
     if (!size || !chunkSize) {
@@ -29,7 +33,7 @@ FileContext::~FileContext()
     std::fclose(file);
 }
 
-FileReadContext::FileReadContext(std::filesystem::path path,
+FileReadContext::FileReadContext(const std::filesystem::path &path,
                                  std::size_t size,
                                  std::size_t chunkSize,
                                  std::size_t offset)
@@ -39,9 +43,12 @@ FileReadContext::FileReadContext(std::filesystem::path path,
 FileReadContext::~FileReadContext()
 {}
 
-FileWriteContext::FileWriteContext(
-    std::filesystem::path path, std::size_t size, std::size_t chunkSize, std::string crc32Digest, std::size_t offset)
-    : FileContext(path, size, chunkSize, "wb", offset), crc32Digest(crc32Digest)
+FileWriteContext::FileWriteContext(const std::filesystem::path &path,
+                                   std::size_t size,
+                                   std::size_t chunkSize,
+                                   std::string crc32Digest,
+                                   std::size_t offset)
+    : FileContext(path, size, chunkSize, "wb", offset), crc32Digest(std::move(crc32Digest))
 {}
 
 FileWriteContext::~FileWriteContext()
@@ -77,34 +84,9 @@ auto FileContext::validateChunkRequest(std::uint32_t chunkNo) const -> bool
     return !(chunkNo < 1 || chunkNo > totalChunksInFile() || chunkNo != expectedChunkInFile());
 }
 
-auto FileReadContext::getFileHash() -> std::string
+auto FileContext::fileHash() const -> std::string
 {
-    std::vector<std::uint8_t> buffer(chunkSize);
-
-    auto dataSize = size;
-
-    while (dataSize) {
-
-        auto dataLeft = std::min(static_cast<std::size_t>(chunkSize), dataSize);
-        auto dataRead = std::fread(buffer.data(), sizeof(int8_t), dataLeft, file);
-
-        if (dataRead != dataLeft) {
-            LOG_ERROR("File %s read error", path.c_str());
-            throw std::runtime_error("File read error");
-        }
-
-        runningCrc32Digest.add(buffer.data(), dataRead);
-
-        dataSize -= dataRead;
-    }
-
-    std::fseek(file, 0, SEEK_SET);
-
-    auto fileHash = runningCrc32Digest.getHash();
-
-    runningCrc32Digest.reset();
-
-    return fileHash;
+    return runningCrc32Digest.getHash();
 }
 
 auto FileReadContext::read() -> std::vector<std::uint8_t>
@@ -124,8 +106,9 @@ auto FileReadContext::read() -> std::vector<std::uint8_t>
         throw std::runtime_error("File read error");
     }
 
-    LOG_DEBUG("Read %u bytes", static_cast<unsigned int>(dataRead));
+    runningCrc32Digest.add(buffer.data(), dataRead);
 
+    LOG_DEBUG("Read %u bytes", static_cast<unsigned int>(dataRead));
     advanceFileOffset(dataRead);
 
     if (reachedEOF()) {
@@ -159,19 +142,12 @@ auto FileWriteContext::write(const std::vector<std::uint8_t> &data) -> void
     if (reachedEOF()) {
         LOG_INFO("Reached EOF of %s", path.c_str());
     }
-
-    return;
-}
-
-auto FileWriteContext::fileHash() const -> std::string
-{
-    return runningCrc32Digest.getHash();
 }
 
 auto FileWriteContext::crc32Matches() const -> bool
 {
     LOG_DEBUG("Hash: %s", fileHash().c_str());
-    return crc32Digest.compare(fileHash()) == 0;
+    return crc32Digest == fileHash();
 }
 
 auto FileWriteContext::removeFile() -> void

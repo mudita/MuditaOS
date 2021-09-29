@@ -75,7 +75,7 @@ auto FileOperations::createFileReadContextFor(const std::filesystem::path &file,
 
 auto FileOperations::createFileWriteContextFor(const std::filesystem::path &file,
                                                std::size_t fileSize,
-                                               const std::string Crc32,
+                                               const std::string &Crc32,
                                                transfer_id xfrId) -> void
 {
     writeTransfers.insert(
@@ -120,32 +120,12 @@ auto FileOperations::decodeDataFromBase64(const std::string &encodedData) const 
     return decodedData;
 }
 
-auto FileOperations::getFileHashForReceiveID(transfer_id rxID) -> std::string
-{
-    LOG_DEBUG("Getting hash for rxID %u", static_cast<unsigned>(rxID));
-
-    const auto fileCtxEntry = readTransfers.find(rxID);
-
-    if (fileCtxEntry == readTransfers.end()) {
-        LOG_ERROR("Invalid rxID %u", static_cast<unsigned>(rxID));
-        return {};
-    }
-
-    auto fileCtx = fileCtxEntry->second.get();
-
-    if (!fileCtx) {
-        LOG_ERROR("Invalid fileCtx for rxID %u", static_cast<unsigned>(rxID));
-        return {};
-    }
-
-    return fileCtx->getFileHash();
-}
-
-auto FileOperations::getDataForReceiveID(transfer_id rxID, std::uint32_t chunkNo) -> std::string
+auto FileOperations::getDataForReceiveID(transfer_id rxID, std::uint32_t chunkNo) -> DataWithCrc32
 {
     LOG_DEBUG("Getting chunk %u for rxID %u", static_cast<unsigned>(chunkNo), static_cast<unsigned>(rxID));
 
     const auto fileCtxEntry = readTransfers.find(rxID);
+    std::string fileCrc32   = {};
 
     if (fileCtxEntry == readTransfers.end()) {
         LOG_ERROR("Invalid rxID %u", static_cast<unsigned>(rxID));
@@ -173,16 +153,16 @@ auto FileOperations::getDataForReceiveID(transfer_id rxID, std::uint32_t chunkNo
 
     if (fileCtx->reachedEOF()) {
         LOG_INFO("Reached EOF for rxID %u", static_cast<unsigned>(rxID));
-
+        fileCrc32 = fileCtx->fileHash();
         writeTransfers.erase(rxID);
     }
 
-    return encodeDataAsBase64(data);
+    return {std::move(encodeDataAsBase64(data)), std::move(fileCrc32)};
 }
 
 auto FileOperations::createTransmitIDForFile(const std::filesystem::path &file,
                                              std::size_t size,
-                                             const std::string Crc32) -> transfer_id
+                                             const std::string &Crc32) -> transfer_id
 {
     cancelTimedOutWriteTransfer();
     const auto txID = ++runningXfrId;
