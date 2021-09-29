@@ -47,11 +47,6 @@ namespace
 
     gui::UnityProgressBar *createProgress(gui::VBox *parent)
     {
-        LOG_DEBUG("createProgress: parent=%d,%d,%d,%d",
-                  parent->getX(),
-                  parent->getY(),
-                  parent->getWidth(),
-                  parent->getHeight());
         auto progress = new gui::UnityProgressBar(parent, 0, 0, parent->getWidth(), parent->getHeight() / 2);
         progress->setDisplaySize(mrStyle::progress::w, mrStyle::progress::h);
         progress->setMaximum(100);
