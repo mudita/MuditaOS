@@ -75,13 +75,10 @@ namespace sdesktop::endpoints
         try {
             auto [rxID, fileSize] = fileOps.createReceiveIDForFile(filePath);
 
-            auto fileHash = fileOps.getFileHashForReceiveID(rxID);
-
             context.setResponseStatus(http::Code::OK);
             context.setResponseBody(
                 json11::Json::object({{json::filesystem::rxID, static_cast<int>(rxID)},
                                       {json::fileSize, static_cast<int>(fileSize)},
-                                      {json::fileCrc32, fileHash},
                                       {json::filesystem::chunkSize, static_cast<int>(FileOperations::ChunkSize)}}));
         }
         catch (std::runtime_error &e) {
@@ -107,10 +104,10 @@ namespace sdesktop::endpoints
         auto returnCode    = sys::ReturnCodes::Failure;
         const auto rxID    = context.getBody()[json::filesystem::rxID].int_value();
         const auto chunkNo = context.getBody()[json::filesystem::chunkNo].int_value();
-        std::string data{};
+        FileOperations::DataWithCrc32 dataWithCrc32;
 
         try {
-            data = fileOps.getDataForReceiveID(rxID, chunkNo);
+            dataWithCrc32 = fileOps.getDataForReceiveID(rxID, chunkNo);
         }
         catch (std::exception &e) {
             LOG_ERROR("%s", e.what());
@@ -120,11 +117,17 @@ namespace sdesktop::endpoints
             return sys::ReturnCodes::Failure;
         }
 
-        if (data.length()) {
+        if (dataWithCrc32.data.length()) {
             context.setResponseStatus(http::Code::OK);
-            context.setResponseBody(json11::Json::object({{json::filesystem::rxID, static_cast<int>(rxID)},
-                                                          {json::filesystem::chunkNo, static_cast<int>(chunkNo)},
-                                                          {json::filesystem::data, data}}));
+            json11::Json::object contextJsonObject =
+                json11::Json::object({{json::filesystem::rxID, static_cast<int>(rxID)},
+                                      {json::filesystem::chunkNo, static_cast<int>(chunkNo)},
+                                      {json::filesystem::data, dataWithCrc32.data}});
+
+            if (dataWithCrc32.crc32.length()) {
+                contextJsonObject[json::fileCrc32] = dataWithCrc32.crc32;
+            }
+            context.setResponseBody(contextJsonObject);
 
             returnCode = sys::ReturnCodes::Success;
         }

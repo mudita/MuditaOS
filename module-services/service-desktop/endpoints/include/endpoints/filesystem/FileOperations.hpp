@@ -29,7 +29,7 @@ class FileOperations
 
     auto createFileWriteContextFor(const std::filesystem::path &file,
                                    std::size_t fileSize,
-                                   const std::string Crc32,
+                                   const std::string &Crc32,
                                    transfer_id xfrId) -> void;
 
     auto encodeDataAsBase64(const std::vector<std::uint8_t> &binaryData) const -> std::string;
@@ -53,15 +53,19 @@ class FileOperations
     static constexpr auto ChunkSizeMultiplier = 12u;
     static constexpr auto ChunkSize           = ChunkSizeMultiplier * SingleChunkSize;
 
+    struct DataWithCrc32
+    {
+        std::string data;
+        std::string crc32;
+    };
+
     static FileOperations &instance();
 
     auto createReceiveIDForFile(const std::filesystem::path &file) -> std::pair<transfer_id, std::size_t>;
 
-    auto getDataForReceiveID(transfer_id, std::uint32_t chunkNo) -> std::string;
+    auto getDataForReceiveID(transfer_id, std::uint32_t chunkNo) -> DataWithCrc32;
 
-    auto getFileHashForReceiveID(transfer_id rxID) -> std::string;
-
-    auto createTransmitIDForFile(const std::filesystem::path &file, std::size_t size, const std::string Crc32)
+    auto createTransmitIDForFile(const std::filesystem::path &file, std::size_t size, const std::string &Crc32)
         -> transfer_id;
 
     auto sendDataForTransmitID(transfer_id, std::uint32_t chunkNo, const std::string &data) -> sys::ReturnCodes;
