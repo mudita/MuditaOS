@@ -110,10 +110,12 @@ namespace gui
                                 dialogText,
                                 "",
                                 [=]() -> bool {
-                                    this->application->switchWindow(gui::name::window::main_window);
+                                    auto data                        = std::make_unique<SwitchData>();
+                                    data->ignoreCurrentWindowOnStack = true;
+                                    this->application->switchWindow(gui::name::window::main_window, std::move(data));
                                     return true;
                                 }});
-
+        metaData->ignoreCurrentWindowOnStack = true;
         application->switchWindow(gui::window::name::dialog_confirm, std::move(metaData));
         return true;
     }
