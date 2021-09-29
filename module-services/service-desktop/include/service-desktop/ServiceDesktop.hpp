@@ -11,9 +11,9 @@
 #include "Timers/TimerHandle.hpp"
 #include "Constants.hpp"
 #include "USBSecurityModel.hpp"
-
+#include <service-desktop/BackupRestore.hpp>
 #include <service-db/DBServiceName.hpp>
-#include <endpoints/JsonKeyNames.hpp>
+
 #include <bsp/usb/usb.hpp>
 
 #include <filesystem>
@@ -51,46 +51,7 @@ class ServiceDesktop : public sys::Service
     ServiceDesktop();
     ~ServiceDesktop() override;
 
-    enum class Operation
-    {
-        Backup,
-        Restore
-    };
-    enum class OperationState
-    {
-        Stopped,
-        Running,
-        Error
-    };
-
-    static const std::string opToString(const OperationState &op)
-    {
-        switch (op) {
-        case OperationState::Stopped:
-            return "stopped";
-        case OperationState::Running:
-            return "running";
-        case OperationState::Error:
-            return "error";
-        default:
-            return "unkown";
-        }
-    }
-    struct BackupRestoreStatus
-    {
-        std::filesystem::path backupTempDir;
-        std::filesystem::path location;
-        bool lastOperationResult = false;
-        std::string task;
-        OperationState state = OperationState::Stopped;
-        Operation operation  = Operation::Backup;
-        json11::Json to_json() const
-        {
-            return json11::Json::object{{sdesktop::endpoints::json::task, task},
-                                        {sdesktop::endpoints::json::state, opToString(state)},
-                                        {sdesktop::endpoints::json::location, location.string()}};
-        }
-    } backupRestoreStatus;
+    BackupRestore::OperationStatus backupRestoreStatus;
 
     sys::ReturnCodes InitHandler() override;
     sys::ReturnCodes DeinitHandler() override;
@@ -100,9 +61,10 @@ class ServiceDesktop : public sys::Service
 
     std::unique_ptr<WorkerDesktop> desktopWorker;
 
+    std::string prepareBackupFilename();
     void prepareBackupData();
     void prepareRestoreData(const std::filesystem::path &restoreLocation);
-    const BackupRestoreStatus getBackupRestoreStatus()
+    const BackupRestore::OperationStatus getBackupRestoreStatus()
     {
         return backupRestoreStatus;
     }

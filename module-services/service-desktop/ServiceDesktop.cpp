@@ -6,9 +6,9 @@
 #include <service-desktop/ServiceDesktop.hpp>
 #include <service-desktop/WorkerDesktop.hpp>
 #include <service-cellular/CellularMessage.hpp>
+#include <service-desktop/BackupRestore.hpp>
 #include <endpoints/EndpointFactory.hpp>
 #include <endpoints/bluetooth/BluetoothMessagesHandler.hpp>
-#include <endpoints/backup/BackupRestore.hpp>
 
 #include <Common/Query.hpp>
 #include <MessageType.hpp>
@@ -115,13 +115,19 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
     connect(sdesktop::BackupMessage(), [&](sys::Message *msg) {
         sdesktop::BackupMessage *backupMessage = dynamic_cast<sdesktop::BackupMessage *>(msg);
         if (backupMessage != nullptr) {
-
-            backupRestoreStatus.state = OperationState::Running;
-            backupRestoreStatus.lastOperationResult =
+            backupRestoreStatus.state = BackupRestore::OperationState::Running;
+            backupRestoreStatus.completionCode =
                 BackupRestore::BackupUserFiles(this, backupRestoreStatus.backupTempDir);
-            backupRestoreStatus.location =
-                (purefs::dir::getBackupOSPath() / backupRestoreStatus.task).replace_extension(purefs::extension::tar);
-            backupRestoreStatus.state = OperationState::Stopped;
+            backupRestoreStatus.location = backupRestoreStatus.taskId;
+
+            if (backupRestoreStatus.completionCode == BackupRestore::CompletionCode::Success) {
+                LOG_INFO("Backup finished");
+                backupRestoreStatus.state = BackupRestore::OperationState::Finished;
+            }
+            else {
+                LOG_ERROR("Backup failed");
+                backupRestoreStatus.state = BackupRestore::OperationState::Error;
+            }
         }
         return sys::MessageNone{};
     });
@@ -129,16 +135,17 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
     connect(sdesktop::RestoreMessage(), [&](sys::Message *msg) {
         sdesktop::RestoreMessage *restoreMessage = dynamic_cast<sdesktop::RestoreMessage *>(msg);
         if (restoreMessage != nullptr) {
-            backupRestoreStatus.state = OperationState::Running;
-            backupRestoreStatus.lastOperationResult =
-                BackupRestore::RestoreUserFiles(this, backupRestoreStatus.location);
+            backupRestoreStatus.state          = BackupRestore::OperationState::Running;
+            backupRestoreStatus.completionCode = BackupRestore::RestoreUserFiles(this, backupRestoreStatus.location);
 
-            backupRestoreStatus.state = OperationState::Stopped;
-            if (backupRestoreStatus.lastOperationResult == true) {
+            if (backupRestoreStatus.completionCode == BackupRestore::CompletionCode::Success) {
+                LOG_DEBUG("Restore finished");
+                backupRestoreStatus.state = BackupRestore::OperationState::Finished;
                 sys::SystemManagerCommon::Reboot(this);
             }
             else {
                 LOG_ERROR("Restore failed");
+                backupRestoreStatus.state = BackupRestore::OperationState::Error;
             }
         }
         return sys::MessageNone{};
@@ -259,18 +266,28 @@ sys::MessagePointer ServiceDesktop::DataReceivedHandler(sys::DataMessage *msg, s
     return std::make_shared<sys::ResponseMessage>();
 }
 
+std::string ServiceDesktop::prepareBackupFilename()
+{
+    std::array<char, 64> backupFileName;
+    std::time_t now;
+    std::time(&now);
+    std::strftime(backupFileName.data(), backupFileName.size(), "%FT%OH%OM%OSZ", std::localtime(&now));
+
+    return std::string(backupFileName.data());
+}
+
 void ServiceDesktop::prepareBackupData()
 {
-    backupRestoreStatus.operation     = ServiceDesktop::Operation::Backup;
-    backupRestoreStatus.task          = std::to_string(static_cast<uint32_t>(std::time(nullptr)));
-    backupRestoreStatus.state         = OperationState::Stopped;
-    backupRestoreStatus.backupTempDir = purefs::dir::getTemporaryPath() / backupRestoreStatus.task;
+    backupRestoreStatus.operation     = BackupRestore::Operation::Backup;
+    backupRestoreStatus.taskId        = prepareBackupFilename();
+    backupRestoreStatus.state         = BackupRestore::OperationState::Stopped;
+    backupRestoreStatus.backupTempDir = purefs::dir::getTemporaryPath() / backupRestoreStatus.taskId;
 }
 
 void ServiceDesktop::prepareRestoreData(const std::filesystem::path &restoreLocation)
 {
-    backupRestoreStatus.operation = ServiceDesktop::Operation::Restore;
-    backupRestoreStatus.location  = purefs::dir::getBackupOSPath() / restoreLocation;
-    backupRestoreStatus.state     = OperationState::Stopped;
-    backupRestoreStatus.task      = restoreLocation.filename();
+    backupRestoreStatus.operation = BackupRestore::Operation::Restore;
+    backupRestoreStatus.taskId    = restoreLocation.filename();
+    backupRestoreStatus.state     = BackupRestore::OperationState::Stopped;
+    backupRestoreStatus.location  = purefs::dir::getBackupOSPath() / backupRestoreStatus.taskId;
 }
