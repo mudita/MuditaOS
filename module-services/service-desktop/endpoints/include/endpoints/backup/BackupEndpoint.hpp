@@ -24,7 +24,10 @@ namespace sdesktop::endpoints
             debugName = "BackupEndpoint";
         }
         auto handle(Context &context) -> void override;
-        auto request(Context &context) -> sys::ReturnCodes;
+
+      private:
+        auto executeRequest(Context &context) -> sys::ReturnCodes;
+        auto checkState(Context &context) -> sys::ReturnCodes;
     };
 
 } // namespace sdesktop::endpoints

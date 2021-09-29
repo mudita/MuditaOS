@@ -40,7 +40,6 @@ target_sources(
         desktop-endpoints-common
     PRIVATE
         backup/BackupEndpoint.cpp
-        backup/BackupRestore.cpp
         bluetooth/BluetoothEndpoint.cpp
         bluetooth/BluetoothEventMessages.cpp
         bluetooth/BluetoothHelper.cpp
@@ -63,7 +62,6 @@ target_sources(
         update/UpdateHelper.cpp
     PUBLIC
         include/endpoints/backup/BackupEndpoint.hpp
-        include/endpoints/backup/BackupRestore.hpp
         include/endpoints/bluetooth/BluetoothEndpoint.hpp
         include/endpoints/bluetooth/BluetoothEventMessages.hpp
         include/endpoints/bluetooth/BluetoothHelper.hpp

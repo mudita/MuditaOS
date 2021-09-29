@@ -22,9 +22,11 @@ namespace sdesktop::endpoints
     {
         switch (context.getMethod()) {
         case http::Method::get:
-            request(context);
+            checkState(context);
             break;
         case http::Method::post:
+            executeRequest(context);
+            break;
         case http::Method::put:
         case http::Method::del:
             context.setResponseStatus(http::Code::BadRequest);
@@ -32,15 +34,47 @@ namespace sdesktop::endpoints
             break;
         }
     }
-    auto BackupEndpoint::request(Context &context) -> sys::ReturnCodes
+
+    auto BackupEndpoint::executeRequest(Context &context) -> sys::ReturnCodes
     {
         json11::Json responseBodyJson;
         auto owner = static_cast<ServiceDesktop *>(ownerServicePtr);
 
-        if (context.getBody()[json::task].is_string()) {
-            if (owner->getBackupRestoreStatus().task == context.getBody()[json::task].string_value()) {
-                if (owner->getBackupRestoreStatus().state != ServiceDesktop::OperationState::Running) {
+        if (owner->getBackupRestoreStatus().state == BackupRestore::OperationState::Running) {
+            LOG_DEBUG("Backup already running");
+            // a backup is already running, don't start a second task
+            context.setResponseStatus(http::Code::NotAcceptable);
+        }
+        else {
+            LOG_DEBUG("Starting backup");
+            // initialize new backup information
+            owner->prepareBackupData();
+
+            // start the backup process in the background
+            ownerServicePtr->bus.sendUnicast(std::make_shared<sdesktop::BackupMessage>(),
+                                             service::name::service_desktop);
+
+            // return new generated backup info
+            context.setResponseBody(owner->getBackupRestoreStatus());
+        }
+
+        putToSendQueue(context.createSimpleResponse());
+
+        return sys::ReturnCodes::Success;
+    }
+
+    auto BackupEndpoint::checkState(Context &context) -> sys::ReturnCodes
+    {
+        json11::Json responseBodyJson;
+        auto owner = static_cast<ServiceDesktop *>(ownerServicePtr);
+
+        if (context.getBody()[json::taskId].is_string()) {
+            if (owner->getBackupRestoreStatus().taskId == context.getBody()[json::taskId].string_value()) {
+                if (owner->getBackupRestoreStatus().state == BackupRestore::OperationState::Finished) {
                     context.setResponseStatus(http::Code::SeeOther);
+                }
+                else {
+                    context.setResponseStatus(http::Code::OK);
                 }
 
                 context.setResponseBody(owner->getBackupRestoreStatus());
@@ -49,29 +83,12 @@ namespace sdesktop::endpoints
                 context.setResponseStatus(http::Code::NotFound);
             }
         }
-        else if (context.getBody()[json::request] == true) {
-            if (owner->getBackupRestoreStatus().state == ServiceDesktop::OperationState::Running) {
-                // a backup is already running, don't start a second task
-                context.setResponseStatus(http::Code::NotAcceptable);
-            }
-            else {
-                // initialize new backup information
-                owner->prepareBackupData();
-
-                // start the backup process in the background
-                ownerServicePtr->bus.sendUnicast(std::make_shared<sdesktop::BackupMessage>(),
-                                                 service::name::service_desktop);
-
-                // return new generated backup info
-                context.setResponseBody(owner->getBackupRestoreStatus());
-            }
-        }
         else {
-            // unknown request for backup endpoint
+            LOG_DEBUG("Backup task not found");
             context.setResponseStatus(http::Code::BadRequest);
         }
 
-        LOG_DEBUG("responding");
+        LOG_DEBUG("Responding");
         putToSendQueue(context.createSimpleResponse());
 
         return sys::ReturnCodes::Success;

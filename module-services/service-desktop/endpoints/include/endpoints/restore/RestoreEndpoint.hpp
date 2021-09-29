@@ -16,7 +16,10 @@ namespace sdesktop::endpoints
             debugName = "RestoreEndpoint";
         }
         auto handle(Context &context) -> void override;
-        auto request(Context &context) -> sys::ReturnCodes;
+
+      private:
+        auto handleGet(Context &context) -> sys::ReturnCodes;
+        auto executeRestore(Context &context) -> sys::ReturnCodes;
     };
 
 } // namespace sdesktop::endpoints
