@@ -16,12 +16,12 @@ namespace gui
         setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         setEdges(RectangleEdge::None);
 
-        leftArrow = new ImageBox(this, 0, 0, 0, 0, new Image("bell_arrow_left"));
+        leftArrow = new ImageBox(this, 0, 0, 0, 0, new Image("bell_arrow_left_W_M"));
         leftArrow->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         leftArrow->setMargins(Margins(0, 0, 0, 0));
         leftArrow->setMinimumSize(style::alarm_set_spinner::arrow::w, style::alarm_set_spinner::arrow::h);
 
-        alarmImg = new ImageBox(this, 0, 0, 0, 0, new Image("bell_alarm_deactivated"));
+        alarmImg = new ImageBox(this, 0, 0, 0, 0, new Image("bell_alarm_deactivated_W_M"));
         alarmImg->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         alarmImg->setMargins(Margins(0, 0, 0, 0));
         alarmImg->setMinimumSize(style::alarm_set_spinner::arrow::w, style::alarm_set_spinner::arrow::h);
@@ -32,7 +32,7 @@ namespace gui
         timeSpinner->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         timeSpinner->setMargins(Margins(0, 0, 0, 0));
 
-        rightArrow = new ImageBox(this, 0, 0, 0, 0, new Image("bell_arrow_right"));
+        rightArrow = new ImageBox(this, 0, 0, 0, 0, new Image("bell_arrow_right_W_M"));
         rightArrow->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         rightArrow->setMargins(Margins(0, 0, 0, 0));
         rightArrow->setMinimumSize(style::alarm_set_spinner::arrow::w, style::alarm_set_spinner::arrow::h);
@@ -96,22 +96,22 @@ namespace gui
 
         switch (alarmStatus) {
         case Status::ACTIVATED:
-            alarmImg->setImage("bell_alarm_activated");
+            alarmImg->setImage("bell_alarm_activated_W_M");
             break;
         case Status::DEACTIVATED:
-            alarmImg->setImage("bell_alarm_deactivated");
+            alarmImg->setImage("bell_alarm_deactivated_W_M");
             break;
         case Status::RINGING:
-            alarmImg->setImage("bell_alarm_ringing");
+            alarmImg->setImage("bell_alarm_ringing_W_M");
             break;
         case Status::SNOOZE:
-            alarmImg->setImage("bell_alarm_snooze");
+            alarmImg->setImage("bell_alarm_snooze_W_M");
             break;
         case Status::UNKNOWN:
-            alarmImg->setImage("bell_alarm_deactivated");
+            alarmImg->setImage("bell_alarm_deactivated_W_M");
             break;
         default:
-            alarmImg->setImage("bell_alarm_deactivated");
+            alarmImg->setImage("bell_alarm_deactivated_W_M");
             break;
         }
         resizeItems();
