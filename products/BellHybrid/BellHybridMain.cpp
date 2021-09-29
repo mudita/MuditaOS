@@ -109,6 +109,17 @@ int main()
                 std::make_shared<app::manager::ApplicationManager>(
                     service::name::appmgr, std::move(applications), app::applicationBellName),
                 sysmgr.get());
+        },
+        [&platform] {
+            try {
+                LOG_DEBUG("System deinit");
+                platform->deinit();
+            }
+            catch (const std::runtime_error &e) {
+                LOG_FATAL("%s", e.what());
+                abort();
+            }
+            return true;
         });
 
     LOG_PRINTF("Launching %s \n", ApplicationName);

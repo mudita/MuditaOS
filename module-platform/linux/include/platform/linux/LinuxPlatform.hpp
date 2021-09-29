@@ -18,6 +18,7 @@ namespace platform::linux
         ~LinuxPlatform();
 
         void init() final;
+        void deinit() final;
 
       private:
         void initFilesystem();

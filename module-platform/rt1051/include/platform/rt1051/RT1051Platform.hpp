@@ -15,9 +15,9 @@ namespace platform::rt1051
     {
       public:
         RT1051Platform();
-        ~RT1051Platform();
 
         void init() final;
+        void deinit() final;
 
       private:
         void initFilesystem();
