@@ -8,15 +8,16 @@
 
 namespace gui::window::name
 {
-    inline constexpr auto bellSettings                               = "BellSettings";
-    inline constexpr auto bellSettingsAdvanced                       = "BellSettingsAdvanced";
-    inline constexpr auto bellSettingsTimeUnits                      = "BellSettingsTimeUnits";
-    inline constexpr auto bellSettingsDialog                         = "BellSettingsDialog";
-    inline constexpr auto bellSettingsFinished                       = "BellSettingsFinished";
-    inline constexpr auto bellSettingsFrontlight                     = "BellSettingsFrontlight";
-    inline constexpr auto bellSettingsHomeView                       = "BellSettingsHomeView";
-    inline constexpr auto bellSettingsBedtimeTone                    = "BellSettingsBedtimeTone";
-    inline constexpr auto bellSettingsTurnOff                        = "BellSettingsTurnOff";
+    inline constexpr auto bellSettings            = "BellSettings";
+    inline constexpr auto bellSettingsAdvanced    = "BellSettingsAdvanced";
+    inline constexpr auto bellSettingsTimeUnits   = "BellSettingsTimeUnits";
+    inline constexpr auto bellSettingsDialog      = "BellSettingsDialog";
+    inline constexpr auto bellSettingsFinished    = "BellSettingsFinished";
+    inline constexpr auto bellSettingsFrontlight  = "BellSettingsFrontlight";
+    inline constexpr auto bellSettingsHomeView    = "BellSettingsHomeView";
+    inline constexpr auto bellSettingsLanguage    = "BellSettingsLanguage";
+    inline constexpr auto bellSettingsBedtimeTone = "BellSettingsBedtimeTone";
+    inline constexpr auto bellSettingsTurnOff     = "BellSettingsTurnOff";
 } // namespace gui::window::name
 
 namespace app
