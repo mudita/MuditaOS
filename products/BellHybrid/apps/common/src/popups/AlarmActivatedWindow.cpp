@@ -42,7 +42,7 @@ namespace gui
         header->setTitleVisibility(false);
         bottomBar->setVisible(false);
 
-        icon = new Icon(this, 0, 0, style::window_width, style::window_height, "big_alarm", {});
+        icon = new Icon(this, 0, 0, style::window_width, style::window_height, "big_alarm_W_G", {});
         icon->text->setFont(style::window::font::verybiglight);
     }
 
