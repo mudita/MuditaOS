@@ -17,7 +17,7 @@ namespace sys
       public:
         explicit SystemManager(std::vector<std::unique_ptr<BaseServiceCreator>> &&creators);
 
-        void StartSystem(InitFunction sysInit, InitFunction appSpaceInit) override;
+        void StartSystem(InitFunction sysInit, InitFunction appSpaceInit, DeinitFunction sysDeinit) override;
 
         /// Translates a slider state into a phone mode.
         /// \param key  Slider button state

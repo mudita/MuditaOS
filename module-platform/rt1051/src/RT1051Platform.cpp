@@ -17,13 +17,6 @@ RT1051Platform::RT1051Platform()
     bsp::BoardInit();
 }
 
-RT1051Platform::~RT1051Platform()
-{
-    if (usesFilesystem) {
-        purefs::subsystem::unmount_all();
-    }
-}
-
 void RT1051Platform::init()
 {
     initFilesystem();
@@ -44,4 +37,13 @@ void RT1051Platform::initFilesystem()
     }
 
     usesFilesystem = true;
+}
+void platform::rt1051::RT1051Platform::deinit()
+{
+    if (usesFilesystem) {
+        if (int err = purefs::subsystem::unmount_all(); err != 0) {
+            throw std::runtime_error("Failed to unmount all: " + std::to_string(err));
+        }
+        usesFilesystem = false;
+    }
 }
