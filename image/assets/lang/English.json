@@ -581,6 +581,8 @@
   "app_bell_settings_advanced": "Advanced",
   "app_bell_settings_advanced_time_units": "Time & units",
   "app_bell_settings_advanced_temp_scale": "Temperature scale",
+  "app_bell_settings_advanced_language": "Language",
+  "app_bell_settings_advanced_language_set": "Language is set",
   "app_bell_settings_advanced_about": "About",
   "app_bell_settings_advanced_about_product": "Mudita Harmony",
   "app_bell_settings_advanced_about_version": "<text>OS version: <token>$VERSION</token></text>",

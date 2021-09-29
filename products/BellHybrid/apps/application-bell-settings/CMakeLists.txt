@@ -38,6 +38,7 @@ target_sources(application-bell-settings
         presenter/FrontlightPresenter.cpp
         presenter/TimeUnitsPresenter.cpp
         presenter/advanced/AboutYourBellWindowPresenter.cpp
+        presenter/advanced/LanguageWindowPresenter.cpp
         presenter/alarm_settings/AlarmSettingsPresenter.cpp
         presenter/alarm_settings/PrewakeUpPresenter.cpp
         presenter/alarm_settings/SnoozePresenter.cpp
@@ -55,6 +56,7 @@ target_sources(application-bell-settings
         windows/BellSettingsWindow.cpp
         windows/advanced/AboutYourBellWindow.cpp
         windows/advanced/BellSettingsAdvancedWindow.cpp
+        windows/advanced/BellSettingsLanguageWindow.cpp
         windows/advanced/BellSettingsTimeUnitsWindow.cpp
         windows/alarm_settings/BellSettingsAlarmSettingsSnoozeWindow.cpp
         windows/alarm_settings/BellSettingsAlarmSettingsMenuWindow.cpp
@@ -76,6 +78,7 @@ target_sources(application-bell-settings
 
         presenter/FrontlightPresenter.hpp
         presenter/advanced/AboutYourBellWindowPresenter.hpp
+        presenter/advanced/LanguageWindowPresenter.hpp
         presenter/alarm_settings/AlarmSettingsPresenter.hpp
         presenter/alarm_settings/PrewakeUpPresenter.hpp
         presenter/alarm_settings/SnoozePresenter.hpp
@@ -95,6 +98,7 @@ target_sources(application-bell-settings
         windows/BellSettingsTurnOffWindow.hpp
         windows/BellSettingsWindow.hpp
         windows/advanced/AboutYourBellWindow.hpp
+        windows/advanced/BellSettingsLanguageWindow.hpp
         windows/advanced/BellSettingsAdvancedWindow.hpp
         windows/alarm_settings/BellSettingsAlarmSettingsSnoozeWindow.hpp
         windows/alarm_settings/BellSettingsAlarmSettingsMenuWindow.hpp

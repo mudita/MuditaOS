@@ -117,4 +117,10 @@ namespace gui
             item->setVisible(isVisible);
         }
     }
+
+    void BellBaseLayout::setMinMaxArrowsVisibility(bool minCondition, bool maxCondition)
+    {
+        setArrowVisible(BellBaseLayout::Arrow::Left, !minCondition);
+        setArrowVisible(BellBaseLayout::Arrow::Right, !maxCondition);
+    }
 } // namespace gui
