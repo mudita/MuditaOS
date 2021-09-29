@@ -35,11 +35,13 @@ namespace sdesktop::endpoints::json
     inline constexpr auto updateHistory       = "updateHistory";
     inline constexpr auto versionString       = "string";
     inline constexpr auto fileExists          = "fileExists";
+    inline constexpr auto boot                = "boot";
     inline constexpr auto version             = "version";
-    inline constexpr auto task                = "task";
+    inline constexpr auto taskId              = "id";
     inline constexpr auto state               = "state";
     inline constexpr auto success             = "success";
     inline constexpr auto request             = "request";
+    inline constexpr auto restore             = "restore";
     inline constexpr auto finished            = "finished";
     inline constexpr auto pending             = "pending";
     inline constexpr auto location            = "location";
@@ -48,6 +50,7 @@ namespace sdesktop::endpoints::json
     inline constexpr auto caseColour          = "caseColour";
     inline constexpr auto fileList            = "fileList";
     inline constexpr auto files               = "files";
+    inline constexpr auto backupLocation      = "backupLocation";
 
     namespace filesystem
     {

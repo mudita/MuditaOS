@@ -28,4 +28,5 @@ def test_device_info(harness):
     assert ret.diag_info["version"] is not None
     assert ret.diag_info["serialNumber"] is not None
     assert ret.diag_info["caseColour"] is not None
+    assert ret.diag_info["backupLocation"] is not None
 
