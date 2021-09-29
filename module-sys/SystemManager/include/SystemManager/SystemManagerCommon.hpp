@@ -70,12 +70,9 @@ namespace sys
 
     class SystemManagerCommon : public Service
     {
-      private:
-        UpdateReason updateReason{UpdateReason::Update};
-
       public:
-        using InitFunction = std::function<bool()>;
-
+        using InitFunction   = std::function<bool()>;
+        using DeinitFunction = std::function<bool()>;
         enum class State
         {
             Running,
@@ -93,7 +90,7 @@ namespace sys
 
         void initialize();
 
-        virtual void StartSystem(InitFunction sysInit, InitFunction appSpaceInit);
+        virtual void StartSystem(InitFunction sysInit, InitFunction appSpaceInit, DeinitFunction sysDeinit);
 
         static bool Restore(Service *s);
 
@@ -184,9 +181,9 @@ namespace sys
         /// used for power management control for the filesystem
         void UpdateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyHz newFrequency);
 
-
         bool cpuStatisticsTimerInit{false};
 
+        UpdateReason updateReason{UpdateReason::Update};
         std::vector<std::unique_ptr<BaseServiceCreator>> systemServiceCreators;
         sys::TimerHandle cpuStatisticsTimer;
         sys::TimerHandle servicesPreShutdownRoutineTimeout;
@@ -194,6 +191,7 @@ namespace sys
         sys::TimerHandle powerManagerEfficiencyTimer;
         InitFunction userInit;
         InitFunction systemInit;
+        DeinitFunction systemDeinit;
         std::vector<std::string> readyForCloseRegister;
 
         std::shared_ptr<sys::CpuSentinel> cpuSentinel;
