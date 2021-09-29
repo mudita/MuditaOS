@@ -18,6 +18,7 @@
 #include "windows/advanced/AboutYourBellWindow.hpp"
 #include "windows/advanced/BellSettingsAdvancedWindow.hpp"
 #include "windows/advanced/BellSettingsTimeUnitsWindow.hpp"
+#include "windows/advanced/BellSettingsLanguageWindow.hpp"
 #include "windows/alarm_settings/BellSettingsAlarmSettingsMenuWindow.hpp"
 #include "windows/alarm_settings/BellSettingsAlarmSettingsSnoozeWindow.hpp"
 #include "windows/alarm_settings/BellSettingsAlarmSettingsWindow.hpp"
@@ -33,6 +34,7 @@
 #include <service-evtmgr/Constants.hpp>
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
 #include <service-evtmgr/ScreenLightControlMessage.hpp>
+#include <service-appmgr/messages/GetCurrentDisplayLanguageResponse.hpp>
 
 namespace app
 {
@@ -50,6 +52,20 @@ namespace app
             return ret;
         }
         createUserInterface();
+
+        connect(typeid(manager::GetCurrentDisplayLanguageResponse), [&](sys::Message *msg) {
+            if (gui::window::name::bellSettingsLanguage == getCurrentWindow()->getName()) {
+
+                switchWindow(gui::BellFinishedWindow::defaultName,
+                             gui::BellFinishedWindowData::Factory::create(
+                                 "big_check_W_G",
+                                 utils::translate("app_bell_settings_advanced_language_set"),
+                                 gui::window::name::bellSettingsAdvanced));
+
+                return sys::msgHandled();
+            }
+            return sys::msgNotHandled();
+        });
 
         return sys::ReturnCodes::Success;
     }
@@ -73,6 +89,12 @@ namespace app
                 auto presenter            = std::make_unique<bell_settings::TimeUnitsWindowPresenter>(
                     timeUnitsProvider, std::move(temperatureUnitModel));
                 return std::make_unique<gui::BellSettingsTimeUnitsWindow>(app, std::move(presenter));
+            });
+
+        windowsFactory.attach(
+            gui::window::name::bellSettingsLanguage, [&](ApplicationCommon *app, const std::string &name) {
+                auto presenter = std::make_unique<bell_settings::LanguageWindowPresenter>(this);
+                return std::make_unique<gui::BellSettingsLanguageWindow>(app, std::move(presenter), name);
             });
 
         windowsFactory.attach(

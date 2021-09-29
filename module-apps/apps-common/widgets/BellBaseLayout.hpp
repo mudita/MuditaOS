@@ -48,6 +48,7 @@ namespace gui
         void resize();
 
         void setArrowVisible(Arrow arrow, bool isVisible);
+        void setMinMaxArrowsVisibility(bool minCondition, bool maxCondition);
 
       private:
         HThreeBox<HBox, HBox, HBox> *centerThreeBox{nullptr};
