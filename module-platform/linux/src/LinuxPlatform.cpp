@@ -49,3 +49,13 @@ void LinuxPlatform::initFilesystem()
 
     usesFilesystem = true;
 }
+
+void LinuxPlatform::deinit()
+{
+    if (usesFilesystem) {
+        if (int err = purefs::subsystem::unmount_all(); err != 0) {
+            throw std::runtime_error("Failed to unmount all: " + std::to_string(err));
+        }
+        usesFilesystem = false;
+    }
+}

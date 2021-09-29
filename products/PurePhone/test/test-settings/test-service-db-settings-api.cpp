@@ -50,39 +50,42 @@ TEST_CASE("SettingsApi")
 
         std::shared_ptr<settings::Settings> postMortemSetting;
 
-        manager->StartSystem(nullptr, [manager, &varWritter, &varReader, &testVar, &testStart, &postMortemSetting]() {
-            // preliminary
-            testStart = std::make_shared<std::mutex>();
-            testStart->lock();
-            std::cout << "start thr_id: " << std::this_thread::get_id() << std::endl << std::flush;
-            auto ret = sys::SystemManagerCommon::RunSystemService(
-                std::make_shared<EventManager>(service::name::evt_manager), manager.get());
-            ret &= sys::SystemManagerCommon::RunSystemService(std::make_shared<ServiceDB>(), manager.get());
+        manager->StartSystem(
+            nullptr,
+            [manager, &varWritter, &varReader, &testVar, &testStart, &postMortemSetting]() {
+                // preliminary
+                testStart = std::make_shared<std::mutex>();
+                testStart->lock();
+                std::cout << "start thr_id: " << std::this_thread::get_id() << std::endl << std::flush;
+                auto ret = sys::SystemManagerCommon::RunSystemService(
+                    std::make_shared<EventManager>(service::name::evt_manager), manager.get());
+                ret &= sys::SystemManagerCommon::RunSystemService(std::make_shared<ServiceDB>(), manager.get());
 
-            varWritter = std::make_shared<settings::MyService>("writterVar");
-            varReader  = std::make_shared<settings::MyService>("readerVar");
+                varWritter = std::make_shared<settings::MyService>("writterVar");
+                varReader  = std::make_shared<settings::MyService>("readerVar");
 
-            postMortemSetting = varWritter->getSettings();
+                postMortemSetting = varWritter->getSettings();
 
-            ret &= sys::SystemManagerCommon::RunSystemService(varWritter, manager.get());
-            ret &= sys::SystemManagerCommon::RunSystemService(varReader, manager.get());
+                ret &= sys::SystemManagerCommon::RunSystemService(varWritter, manager.get());
+                ret &= sys::SystemManagerCommon::RunSystemService(varReader, manager.get());
 
-            testVar = std::make_shared<settings::AppTest>("appTest", varWritter, varReader, testStart);
-            ret &= sys::SystemManagerCommon::RunSystemService(testVar, manager.get());
+                testVar = std::make_shared<settings::AppTest>("appTest", varWritter, varReader, testStart);
+                ret &= sys::SystemManagerCommon::RunSystemService(testVar, manager.get());
 
-            std::cout << "koniec start thr_id: " << std::this_thread::get_id() << std::endl << std::flush;
-            testStart->unlock();
-            auto msgStart = std::make_shared<settings::UTMsg::UTMsgStart>();
-            manager->bus.sendUnicast(std::move(msgStart), "appTest");
+                std::cout << "koniec start thr_id: " << std::this_thread::get_id() << std::endl << std::flush;
+                testStart->unlock();
+                auto msgStart = std::make_shared<settings::UTMsg::UTMsgStart>();
+                manager->bus.sendUnicast(std::move(msgStart), "appTest");
 
-            msgStart = std::make_shared<settings::UTMsg::UTMsgStart>();
-            manager->bus.sendUnicast(std::move(msgStart), "appTestProfile");
+                msgStart = std::make_shared<settings::UTMsg::UTMsgStart>();
+                manager->bus.sendUnicast(std::move(msgStart), "appTestProfile");
 
-            msgStart = std::make_shared<settings::UTMsg::UTMsgStart>();
-            manager->bus.sendUnicast(std::move(msgStart), "appTestMode");
+                msgStart = std::make_shared<settings::UTMsg::UTMsgStart>();
+                manager->bus.sendUnicast(std::move(msgStart), "appTestMode");
 
-            return ret;
-        });
+                return ret;
+            },
+            nullptr);
 
         try {
             // start application

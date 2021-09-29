@@ -11,5 +11,6 @@ namespace platform
         virtual ~Platform() = default;
         virtual void init() = 0;
         virtual void initCommonUserFolders();
+        virtual void deinit() = 0;
     };
 } // namespace platform

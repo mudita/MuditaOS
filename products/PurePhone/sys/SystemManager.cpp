@@ -29,10 +29,10 @@ namespace sys
         : SystemManagerCommon(std::move(creators))
     {}
 
-    void SystemManager::StartSystem(InitFunction sysInit, InitFunction appSpaceInit)
+    void SystemManager::StartSystem(InitFunction sysInit, InitFunction appSpaceInit, DeinitFunction sysDeinit)
     {
         phoneModeSubject = std::make_unique<phone_modes::Subject>(this);
-        SystemManagerCommon::StartSystem(std::move(sysInit), std::move(appSpaceInit));
+        SystemManagerCommon::StartSystem(std::move(sysInit), std::move(appSpaceInit), std::move(sysDeinit));
     }
 
     ReturnCodes SystemManager::InitHandler()

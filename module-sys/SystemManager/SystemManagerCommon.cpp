@@ -137,16 +137,22 @@ namespace sys
 
         EndScheduler();
 
+        if (systemDeinit) {
+            systemDeinit();
+        }
+
         // Power off system
         switch (state) {
         case State::Reboot:
             LOG_INFO("  --->  REBOOT <--- ");
             powerManager->Reboot();
             break;
-        case State::ShutdownReady:
+        case State::ShutdownReady: {
             LOG_INFO("  ---> SHUTDOWN <--- ");
             powerManager->PowerOff();
-            break;
+        }
+
+        break;
         case State::RebootToUpdate:
             LOG_INFO("  ---> REBOOT TO UPDATER <--- ");
             powerManager->RebootToUpdate(updateReason);
@@ -197,15 +203,15 @@ namespace sys
         postStartRoutine();
     }
 
-    void SystemManagerCommon::StartSystem(InitFunction sysInit, InitFunction appSpaceInit)
+    void SystemManagerCommon::StartSystem(InitFunction sysInit, InitFunction appSpaceInit, DeinitFunction sysDeinit)
     {
         powerManager  = std::make_unique<PowerManager>();
         cpuStatistics = std::make_unique<CpuStatistics>();
         deviceManager = std::make_unique<DeviceManager>();
 
-        systemInit = std::move(sysInit);
-        userInit   = std::move(appSpaceInit);
-
+        systemInit   = std::move(sysInit);
+        userInit     = std::move(appSpaceInit);
+        systemDeinit = std::move(sysDeinit);
         // Start System manager
         StartService();
 
