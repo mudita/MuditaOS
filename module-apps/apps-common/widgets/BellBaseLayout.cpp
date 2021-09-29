@@ -84,7 +84,7 @@ namespace gui
         centerThreeBox->firstBox->setEdges(RectangleEdge::None);
         centerThreeBox->firstBox->activeItem = false;
 
-        leftArrow = new ImageBox(centerThreeBox->firstBox, 0, 0, 0, 0, new Image("bell_arrow_left"));
+        leftArrow = new ImageBox(centerThreeBox->firstBox, 0, 0, 0, 0, new Image("bell_arrow_left_W_M"));
         leftArrow->setAlignment(Alignment(Alignment::Horizontal::Right, Alignment::Vertical::Center));
         leftArrow->setMinimumSizeToFitImage();
         leftArrow->setVisible(true);
@@ -101,7 +101,7 @@ namespace gui
         centerThreeBox->lastBox->setEdges(RectangleEdge::None);
         centerThreeBox->lastBox->activeItem = false;
 
-        rightArrow = new ImageBox(centerThreeBox->lastBox, 0, 0, 0, 0, new Image("bell_arrow_right"));
+        rightArrow = new ImageBox(centerThreeBox->lastBox, 0, 0, 0, 0, new Image("bell_arrow_right_W_M"));
         rightArrow->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Center));
         rightArrow->setMargins(Margins(0, 0, 0, 0));
         rightArrow->setMinimumSizeToFitImage();
