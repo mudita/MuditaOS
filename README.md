@@ -7,7 +7,6 @@ MuditaOS is a mobile operating system optimized for E Ink displays. Built on Fre
 ![MuditaOS interface screenshots](./MuditaOS-screens.png)
 
 ## Key features
-
 - 3 modes (offline, do not disturb, connected) with magnetometer support
 - approved contacts list
 - threaded messaging with templates, drafts, UTF8 and basic emoji support
