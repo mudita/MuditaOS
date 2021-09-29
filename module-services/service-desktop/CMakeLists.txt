@@ -7,6 +7,7 @@ add_library(service-desktop STATIC)
 target_sources(
         service-desktop
     PRIVATE
+        BackupRestore.cpp
         DesktopEvent.cpp
         DeveloperModeMessage.cpp
         DesktopMessages.cpp
@@ -20,6 +21,7 @@ target_sources(
         parser/ParserFSM.hpp
         parser/MessageHandler.hpp
     PUBLIC
+        include/service-desktop/BackupRestore.hpp
         include/service-desktop/Constants.hpp
         include/service-desktop/DesktopEvent.hpp
         include/service-desktop/DesktopMessages.hpp
@@ -49,6 +51,7 @@ target_link_libraries(service-desktop
         utils-bootconfig
         Microsoft.GSL::GSL
         json::json
+        microtar::microtar
         $<$<STREQUAL:${PROJECT_TARGET},TARGET_RT1051>:usb_stack::usb_stack>
     PUBLIC
         module-cellular

@@ -60,6 +60,7 @@ sys::ReturnCodes ServiceDBCommon::InitHandler()
 
 sys::ReturnCodes ServiceDBCommon::DeinitHandler()
 {
+    Database::deinitialize();
     return sys::ReturnCodes::Success;
 }
 

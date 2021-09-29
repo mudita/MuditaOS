@@ -3,7 +3,7 @@
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 import sys
-import os.path
+import os
 import atexit
 
 from harness.harness import Harness
@@ -38,11 +38,12 @@ def main():
             f'Please pass log storage directory as the parameter: \'python {sys.argv[0]} <log dir>\' ')
         raise TestError(Error.OTHER_ERROR)
 
-    log_save_dir = str(sys.argv[1])
+    log_save_dir = os.path.join(os.path.abspath(str(sys.argv[1])), '')
 
     if (not os.path.exists(log_save_dir)):
         print(f'Log storage directory {log_save_dir} not found')
-        raise TestError(Error.OTHER_ERROR)
+        os.makedirs(log_save_dir, exist_ok = True)
+        # raise TestError(Error.OTHER_ERROR)
 
     harness = Harness.from_detect()
 

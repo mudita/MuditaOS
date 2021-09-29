@@ -160,7 +160,8 @@ namespace sdesktop::endpoints
              {json::currentRTCTime, std::to_string(static_cast<uint32_t>(std::time(nullptr)))},
              {json::version, std::string(VERSION)},
              {json::serialNumber, getSerialNumber()},
-             {json::caseColour, getCaseColour()}}));
+             {json::caseColour, getCaseColour()},
+             {json::backupLocation, purefs::dir::getBackupOSPath().string()}}));
 
         context.setResponseStatus(http::Code::OK);
         return true;

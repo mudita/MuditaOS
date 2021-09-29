@@ -4,27 +4,23 @@
 #pragma once
 
 #include <endpoints/Endpoint.hpp>
-
-#include <system/Common.hpp>
-
-#include <string>
-
-namespace sys
-{
-    class Service;
-} // namespace sys
+#include "BackupHelper.hpp"
 
 namespace sdesktop::endpoints
 {
     class BackupEndpoint : public Endpoint
     {
       public:
-        BackupEndpoint(sys::Service *ownerServicePtr) : Endpoint(ownerServicePtr)
+        BackupEndpoint(sys::Service *ownerServicePtr)
+            : Endpoint(ownerServicePtr), helper(std::make_unique<BackupHelper>(ownerServicePtr))
         {
             debugName = "BackupEndpoint";
         }
+
         auto handle(Context &context) -> void override;
-        auto request(Context &context) -> sys::ReturnCodes;
+
+      private:
+        const std::unique_ptr<BackupHelper> helper;
     };
 
 } // namespace sdesktop::endpoints
