@@ -10,6 +10,7 @@ function(add_image)
     if(NOT ${PROJECT_TARGET_NAME} STREQUAL "linux")
         set(HAS_BOOTFILE YES)
         set(HAS_UPDATER YES)
+        set(HAS_VERSION YES)
     endif()
 
     set(SCRIPT_PATH ${CMAKE_SOURCE_DIR}/tools/generate_image.sh)
@@ -29,7 +30,11 @@ function(add_image)
         set(BIN_FILE_PATH "")
     endif()
 
-    set(VERSION_FILE_PATH ${CMAKE_BINARY_DIR}/${_ARG_PRODUCT}-version.json)
+    if(HAS_VERSION)
+        set(VERSION_FILE_PATH ${CMAKE_BINARY_DIR}/${_ARG_PRODUCT}-version.json)
+    else()
+        set(VERSION_FILE_PATH "")
+    endif()
 
     if(HAS_UPDATER)
         set(UPDATER_FILE_PATH ${CMAKE_BINARY_DIR}/updater.bin)
@@ -68,7 +73,7 @@ function(add_image)
     message("Adding disk image target: ${DISK_IMAGE_NAME}")
 
     add_custom_target(${_ARG_PRODUCT}-disk-img
-        DEPENDS ${DISK_IMAGE_NAME})
+        DEPENDS ${DISK_IMAGE_NAME} ${VERSION_FILE_PATH})
 
 endfunction()
 

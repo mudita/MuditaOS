@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "RestoreHelper.hpp"
 #include <endpoints/Endpoint.hpp>
 
 namespace sdesktop::endpoints
@@ -11,12 +12,15 @@ namespace sdesktop::endpoints
     class RestoreEndpoint : public Endpoint
     {
       public:
-        explicit RestoreEndpoint(sys::Service *ownerServicePtr) : Endpoint(ownerServicePtr)
+        explicit RestoreEndpoint(sys::Service *ownerServicePtr)
+            : Endpoint(ownerServicePtr), helper(std::make_unique<RestoreHelper>(ownerServicePtr))
         {
             debugName = "RestoreEndpoint";
         }
         auto handle(Context &context) -> void override;
-        auto request(Context &context) -> sys::ReturnCodes;
+
+      private:
+        const std::unique_ptr<RestoreHelper> helper;
     };
 
 } // namespace sdesktop::endpoints

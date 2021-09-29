@@ -19,5 +19,13 @@ namespace platform
         if (!std::filesystem::exists(purefs::dir::getCrashDumpsPath())) {
             std::filesystem::create_directories(purefs::dir::getCrashDumpsPath());
         }
+
+        if (!std::filesystem::exists(purefs::dir::getBackupOSPath())) {
+            std::filesystem::create_directories(purefs::dir::getBackupOSPath());
+        }
+
+        if (!std::filesystem::exists(purefs::dir::getTemporaryPath())) {
+            std::filesystem::create_directories(purefs::dir::getTemporaryPath());
+        }
     }
 } // namespace platform

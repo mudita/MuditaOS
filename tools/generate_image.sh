@@ -4,7 +4,7 @@
 
 usage() {
 cat << ==usage
-Usage: $(basename $0) image_path image_partitions build_dir version.json_file [boot.bin_file] [updater.bin_file]
+Usage: $(basename $0) image_path image_partitions build_dir [version.json_file] [boot.bin_file] [updater.bin_file]
     image_path        - Destination image path name e.g., PurePhone.img
     image_partitions  - Path to image_partitions.map product-specific file
     sysroot           - product's system root e.g., build-rt1051-RelWithDebInfo/sysroot
@@ -14,7 +14,7 @@ Usage: $(basename $0) image_path image_partitions build_dir version.json_file [b
 ==usage
 }
 
-if [[ ( $# -ne 4 ) && ( $# -ne 6 ) ]]; then
+if [[ ( $# -ne 3 ) && ( $# -ne 6 ) ]]; then
 	echo "Error! Invalid argument count"
 	usage
 	exit -1

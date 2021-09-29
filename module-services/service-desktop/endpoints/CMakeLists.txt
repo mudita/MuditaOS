@@ -40,7 +40,7 @@ target_sources(
         desktop-endpoints-common
     PRIVATE
         backup/BackupEndpoint.cpp
-        backup/BackupRestore.cpp
+        backup/BackupHelper.cpp
         bluetooth/BluetoothEndpoint.cpp
         bluetooth/BluetoothEventMessages.cpp
         bluetooth/BluetoothHelper.cpp
@@ -57,13 +57,14 @@ target_sources(
         filesystem/FilesystemEndpoint.cpp
         nullEndpoint/NullEndpoint.cpp
         restore/RestoreEndpoint.cpp
+        restore/RestoreHelper.cpp
         security/SecurityEndpoint.cpp
         security/SecurityEndpointHelper.cpp
         update/UpdateEndpoint.cpp
         update/UpdateHelper.cpp
     PUBLIC
         include/endpoints/backup/BackupEndpoint.hpp
-        include/endpoints/backup/BackupRestore.hpp
+        include/endpoints/backup/BackupHelper.hpp
         include/endpoints/bluetooth/BluetoothEndpoint.hpp
         include/endpoints/bluetooth/BluetoothEventMessages.hpp
         include/endpoints/bluetooth/BluetoothHelper.hpp
@@ -80,6 +81,7 @@ target_sources(
         include/endpoints/filesystem/FilesystemEndpoint.hpp
         include/endpoints/nullEndpoint/NullEndpoint.hpp
         include/endpoints/restore/RestoreEndpoint.hpp
+        include/endpoints/restore/RestoreHelper.hpp
         include/endpoints/security/SecurityEndpoint.hpp
         include/endpoints/security/SecurityEndpointHelper.hpp
         include/endpoints/update/UpdateEndpoint.hpp
@@ -97,8 +99,8 @@ target_link_libraries(
     PUBLIC
         desktop-endpoint-base
     PRIVATE
-        microtar
         base64::base64
+        microtar::microtar
 )
 
 add_library(desktop-endpoints INTERFACE)

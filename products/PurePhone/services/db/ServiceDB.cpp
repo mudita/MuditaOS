@@ -293,6 +293,12 @@ bool ServiceDB::StoreIntoBackup(const std::filesystem::path &backupPath)
         return false;
     }
 
+    if (notificationsDB->storeIntoFile(backupPath / std::filesystem::path(notificationsDB->getName()).filename()) ==
+        false) {
+        LOG_ERROR("notificationsDB backup failed");
+        return false;
+    }
+
     for (auto &db : databaseAgents) {
         if (db.get() && db.get()->getAgentName() == "settingsAgent") {
 
