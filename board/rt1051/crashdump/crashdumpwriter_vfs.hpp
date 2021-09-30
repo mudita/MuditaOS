@@ -4,6 +4,7 @@
 #pragma once
 
 #include "crashdumpwriter.hpp"
+#include <rotator/Rotator.hpp>
 
 #include <array>
 #include <ctime>
@@ -16,11 +17,12 @@ namespace purefs::fs
 
 namespace crashdump
 {
-    constexpr inline auto CrashDumpFileNameFormat = "crashdump-%FT%TZ.hex";
-
+    constexpr inline auto maxRotationFilesCount = 5;
     class CrashDumpWriterVFS : public CrashDumpWriter
     {
       public:
+        CrashDumpWriterVFS() : rotator{".hex"}
+        {}
         void openDump() override;
         void saveDump() override;
 
@@ -29,13 +31,7 @@ namespace crashdump
         void writeWords(const std::uint32_t *buff, std::size_t size) override;
 
       private:
-        template <std::size_t N> void formatCrashDumpFileName(std::array<char, N> &name)
-        {
-            std::time_t now;
-            std::time(&now);
-            std::strftime(name.data(), name.size(), CrashDumpFileNameFormat, std::localtime(&now));
-        }
-
+        utils::Rotator<maxRotationFilesCount> rotator;
         int dumpFd{-1};
 
         std::shared_ptr<purefs::fs::filesystem> vfs;
