@@ -12,21 +12,6 @@
 
 namespace Log
 {
-    namespace
-    {
-        std::string getRotatedLogFileExtension(int count)
-        {
-            return ".log." + utils::to_string(count);
-        }
-
-        std::filesystem::path getRotatedFilePath(const std::filesystem::path &source, int rotationCount)
-        {
-            auto path = source;
-            path.replace_extension(getRotatedLogFileExtension(rotationCount));
-            return path;
-        }
-    } // namespace
-
     std::map<std::string, logger_level> Logger::filtered = {{"ApplicationManager", logger_level::LOGINFO},
                                                             {"CellularMux", logger_level::LOGINFO},
                                                             {"ServiceCellular", logger_level::LOGINFO},
@@ -47,7 +32,7 @@ namespace Log
         return stream;
     }
 
-    Logger::Logger() : circularBuffer(circularBufferSize)
+    Logger::Logger() : circularBuffer{circularBufferSize}, rotator{".log"}
     {}
 
     void Logger::enableColors(bool enable)
@@ -81,11 +66,10 @@ namespace Log
         return logs;
     }
 
-    void Logger::init(Application app, size_t fileSize, int filesCount)
+    void Logger::init(Application app, size_t fileSize)
     {
         application      = std::move(app);
         maxFileSize      = fileSize;
-        maxRotationIndex = filesCount - 1;
 #if LOG_USE_COLOR == 1
         enableColors(true);
 #else
@@ -158,7 +142,7 @@ namespace Log
             LOG_DEBUG("Max log file size exceeded. Rotating log files...");
             {
                 LockGuard lock(logFileMutex);
-                rotateLogFile(logPath);
+                rotator.rotateFile(logPath);
             }
             firstDump = true;
         }
@@ -185,29 +169,6 @@ namespace Log
         LOG_DEBUG("Flush ended with status: %d", status);
 
         return status;
-    }
-
-    void Logger::rotateLogFile(const std::filesystem::path &logPath)
-    {
-        for (int i = currentRotationIndex; i > 0; --i) {
-            std::filesystem::path src = getRotatedFilePath(logPath, i);
-            if (i == maxRotationIndex) {
-                std::filesystem::remove(src);
-                continue;
-            }
-            std::filesystem::path dest = getRotatedFilePath(logPath, i + 1);
-            std::filesystem::rename(src, dest);
-        }
-        auto rotatedLogPath = getRotatedFilePath(logPath, 1);
-        std::filesystem::rename(logPath, rotatedLogPath);
-        onLogRotationFinished();
-    }
-
-    void Logger::onLogRotationFinished() noexcept
-    {
-        if (currentRotationIndex < maxRotationIndex) {
-            ++currentRotationIndex;
-        }
     }
 
     void Logger::addFileHeader(std::ofstream &file) const

@@ -17,10 +17,10 @@ target_link_libraries(log
     PRIVATE
         utility
         purefs-paths
-
     PUBLIC
         module-os
         log-api
+        utils-rotator    
 )
 
 if (${ENABLE_TESTS})
