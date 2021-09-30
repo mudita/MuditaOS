@@ -26,7 +26,7 @@ namespace gui
         auto body = new gui::VBox(this, 0, 0, style::window_width, style::window_height);
         body->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
-        new gui::Image(body, "pause");
+        new gui::Image(body, "big_pause_W_G");
 
         auto text = new gui::Text(body, 0, 0, body->getWidth(), bgSoundsStyle::pause::textH);
         text->setText(utils::translate("common_paused"));
