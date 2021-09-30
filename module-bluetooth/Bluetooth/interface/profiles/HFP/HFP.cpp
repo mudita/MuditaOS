@@ -9,6 +9,8 @@
 #include <service-evtmgr/Constants.hpp>
 #include <service-audio/AudioMessage.hpp>
 #include <service-bluetooth/messages/AudioVolume.hpp>
+#include <service-bluetooth/messages/Connect.hpp>
+#include <service-bluetooth/messages/Disconnect.hpp>
 #include <BluetoothWorker.hpp>
 #include "SCO/ScoUtils.hpp"
 
@@ -234,6 +236,12 @@ namespace bluetooth
             LOG_DEBUG("Service level connection established to %s.\n", bd_addr_to_str(device.address));
             isConnected = true;
             sendAudioEvent(audio::EventType::BlutoothHFPDeviceState, audio::Event::DeviceState::Connected);
+            {
+                auto &busProxy     = const_cast<sys::Service *>(ownerService)->bus;
+                device.deviceState = DeviceState::ConnectedVoice;
+                busProxy.sendUnicast(std::make_shared<message::bluetooth::ConnectResult>(device, true),
+                                     service::name::bluetooth);
+            }
             dump_supported_codecs();
             break;
         case HFP_SUBEVENT_SERVICE_LEVEL_CONNECTION_RELEASED:
@@ -241,7 +249,11 @@ namespace bluetooth
             aclHandle   = HCI_CON_HANDLE_INVALID;
             isConnected = false;
             sendAudioEvent(audio::EventType::BlutoothHFPDeviceState, audio::Event::DeviceState::Disconnected);
-
+            {
+                auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
+                busProxy.sendUnicast(std::make_shared<message::bluetooth::DisconnectResult>(device),
+                                     service::name::bluetooth);
+            }
             break;
         case HFP_SUBEVENT_AUDIO_CONNECTION_ESTABLISHED:
             if (hfp_subevent_audio_connection_established_get_status(event)) {
@@ -384,6 +396,8 @@ namespace bluetooth
     void HFP::HFPImpl::disconnect()
     {
         hfp_ag_release_service_level_connection(aclHandle);
+        auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
+        busProxy.sendUnicast(std::make_shared<message::bluetooth::DisconnectResult>(device), service::name::bluetooth);
     }
 
     void HFP::HFPImpl::setDevice(Devicei dev)

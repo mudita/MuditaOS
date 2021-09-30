@@ -115,7 +115,11 @@ namespace gui
     UTF8 AllDevicesWindow::getTextOnCenter(const DeviceState &state) const
     {
         switch (state) {
-        case DeviceState::Connected:
+        case DeviceState::ConnectedAudio:
+            [[fallthrough]];
+        case DeviceState::ConnectedVoice:
+            [[fallthrough]];
+        case DeviceState::ConnectedBoth:
             return utils::translate("common_disconnect");
         case DeviceState::Paired:
             if (bluetoothSettingsModel->isDeviceConnecting()) {
@@ -127,10 +131,6 @@ namespace gui
         case DeviceState::Connecting:
             [[fallthrough]];
         case DeviceState::Unknown:
-            [[fallthrough]];
-        case DeviceState::ConnectedAudio:
-            [[fallthrough]];
-        case DeviceState::ConnectedVoice:
             break;
         }
         return UTF8();
@@ -139,19 +139,19 @@ namespace gui
     UTF8 AllDevicesWindow::getTextOnRight(const DeviceState &state) const
     {
         switch (state) {
-        case DeviceState::Connected:
-            return utils::translate("app_settings_option_connected");
+        case DeviceState::ConnectedBoth:
+            return utils::translate("app_settings_option_connected_both");
         case DeviceState::Connecting:
             return utils::translate("app_settings_option_connecting");
         case DeviceState::Pairing:
             return utils::translate("app_settings_option_pairing");
+        case DeviceState::ConnectedAudio:
+            return utils::translate("app_settings_option_connected_audio");
+        case DeviceState::ConnectedVoice:
+            return utils::translate("app_settings_option_connected_voice");
         case DeviceState::Paired:
             [[fallthrough]];
         case DeviceState::Unknown:
-            [[fallthrough]];
-        case DeviceState::ConnectedAudio:
-            [[fallthrough]];
-        case DeviceState::ConnectedVoice:
             break;
         }
         return UTF8();
@@ -160,7 +160,11 @@ namespace gui
     option::SettingRightItem AllDevicesWindow::getRightItem(const DeviceState &state) const
     {
         switch (state) {
-        case DeviceState::Connected:
+        case DeviceState::ConnectedBoth:
+            [[fallthrough]];
+        case DeviceState::ConnectedAudio:
+            [[fallthrough]];
+        case DeviceState::ConnectedVoice:
             [[fallthrough]];
         case DeviceState::Connecting:
             [[fallthrough]];
@@ -169,10 +173,6 @@ namespace gui
         case DeviceState::Paired:
             return option::SettingRightItem::Bt;
         case DeviceState::Unknown:
-            [[fallthrough]];
-        case DeviceState::ConnectedAudio:
-            [[fallthrough]];
-        case DeviceState::ConnectedVoice:
             break;
         }
         return option::SettingRightItem::Disabled;
@@ -180,7 +180,8 @@ namespace gui
 
     auto AllDevicesWindow::handleDeviceAction(const Devicei &device) -> bool
     {
-        if (device.deviceState == DeviceState::Connected) {
+        if (device.deviceState == DeviceState::ConnectedBoth || device.deviceState == DeviceState::ConnectedAudio ||
+            device.deviceState == DeviceState::ConnectedVoice) {
             bluetoothSettingsModel->requestDisconnection();
             refreshOptionsList();
         }
