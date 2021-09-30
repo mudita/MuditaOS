@@ -121,8 +121,8 @@ TEST_CASE("Device handling")
         settingsModel.replaceDevicesList(devicesList);
 
         settingsModel.setActiveDevice(device2);
-        settingsModel.setActiveDeviceState(DeviceState::Connected);
-        REQUIRE(settingsModel.getActiveDevice().value().get().deviceState == DeviceState::Connected);
+        settingsModel.setActiveDeviceState(DeviceState::ConnectedBoth);
+        REQUIRE(settingsModel.getActiveDevice().value().get().deviceState == DeviceState::ConnectedBoth);
     }
 
     SECTION("Is device connecting? - true")
@@ -139,7 +139,7 @@ TEST_CASE("Device handling")
         settingsModel.replaceDevicesList(devicesList);
 
         settingsModel.setActiveDevice(device2);
-        settingsModel.setActiveDeviceState(DeviceState::Connected);
+        settingsModel.setActiveDeviceState(DeviceState::ConnectedBoth);
         REQUIRE_FALSE(settingsModel.isDeviceConnecting());
     }
 }

@@ -12,6 +12,7 @@
 #include <service-audio/AudioMessage.hpp>
 #include <service-bluetooth/Constants.hpp>
 #include <service-bluetooth/messages/AudioVolume.hpp>
+#include <service-bluetooth/messages/Connect.hpp>
 #include <service-bluetooth/messages/Disconnect.hpp>
 #include <service-cellular/service-cellular/CellularServiceAPI.hpp>
 #include <service-evtmgr/Constants.hpp>
@@ -173,6 +174,12 @@ namespace bluetooth
             }
             LOG_DEBUG("RFCOMM connection established.\n");
             sendAudioEvent(audio::EventType::BlutoothHSPDeviceState, audio::Event::DeviceState::Connected);
+            {
+                auto &busProxy     = const_cast<sys::Service *>(ownerService)->bus;
+                device.deviceState = DeviceState::ConnectedVoice;
+                busProxy.sendUnicast(std::make_shared<message::bluetooth::ConnectResult>(device, true),
+                                     service::name::bluetooth);
+            }
             isConnected = true;
             break;
         case HSP_SUBEVENT_RFCOMM_DISCONNECTION_COMPLETE:
@@ -183,6 +190,9 @@ namespace bluetooth
             else {
                 LOG_DEBUG("RFCOMM disconnected.\n");
                 sendAudioEvent(audio::EventType::BlutoothHSPDeviceState, audio::Event::DeviceState::Disconnected);
+                auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
+                busProxy.sendUnicast(std::make_shared<message::bluetooth::DisconnectResult>(device),
+                                     service::name::bluetooth);
             }
             isConnected = false;
             break;
@@ -311,6 +321,8 @@ namespace bluetooth
     {
         hsp_ag_release_audio_connection();
         hsp_ag_disconnect();
+        auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
+        busProxy.sendUnicast(std::make_shared<message::bluetooth::DisconnectResult>(device), service::name::bluetooth);
     }
 
     void HSP::HSPImpl::setDevice(const Devicei &dev)
