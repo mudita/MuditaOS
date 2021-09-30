@@ -128,10 +128,10 @@ namespace bsp::battery_charger
     BaseType_t CHG_IRQHandler()
     {
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-
         uint8_t val = 1;
-        xQueueSendFromISR(IRQQueueHandle, &val, &xHigherPriorityTaskWoken);
-
+        if (IRQQueueHandle) {
+            xQueueSendFromISR(IRQQueueHandle, &val, &xHigherPriorityTaskWoken);
+        }
         return xHigherPriorityTaskWoken;
     }
 } // namespace bsp::battery_charger
