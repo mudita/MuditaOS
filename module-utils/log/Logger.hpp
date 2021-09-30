@@ -7,6 +7,7 @@
 #include <log/log.hpp>
 #include "LoggerBuffer.hpp"
 #include "log_colors.hpp"
+#include <rotator/Rotator.hpp>
 #include <map>
 #include <mutex.hpp>
 #include <string>
@@ -39,7 +40,7 @@ namespace Log
             return logger;
         }
         auto getLogs() -> std::string;
-        void init(Application app, size_t fileSize = MAX_LOG_FILE_SIZE, int filesCount = MAX_LOG_FILES_COUNT);
+        void init(Application app, size_t fileSize = MAX_LOG_FILE_SIZE);
         auto log(Device device, const char *fmt, va_list args) -> int;
         auto log(logger_level level, const char *file, int line, const char *function, const char *fmt, va_list args)
             -> int;
@@ -73,8 +74,6 @@ namespace Log
         }
 
         void addFileHeader(std::ofstream &file) const;
-        void rotateLogFile(const std::filesystem::path &logPath);
-        void onLogRotationFinished() noexcept;
 
         cpp_freertos::MutexStandard mutex;
         cpp_freertos::MutexStandard logFileMutex;
@@ -83,11 +82,10 @@ namespace Log
         char loggerBuffer[LOGGER_BUFFER_SIZE] = {0};
         size_t loggerBufferCurrentPos         = 0;
         size_t maxFileSize                    = MAX_LOG_FILE_SIZE;
-        int currentRotationIndex              = 0;
-        int maxRotationIndex                  = 0;
 
         Application application;
         LoggerBuffer circularBuffer;
+        utils::Rotator<MAX_LOG_FILES_COUNT> rotator;
         static constexpr size_t circularBufferSize = 1000;
 
         static const char *levelNames[];
