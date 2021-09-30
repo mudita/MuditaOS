@@ -349,6 +349,24 @@ inline TimePoint TimePointFloorMinutes(const TimePoint &tp)
     return std::chrono::floor<std::chrono::minutes>(tp);
 }
 
+/// Returns TimePoint within 24h after relative time based on tp as source of daytime
+inline TimePoint GetFollowingDayTime(const TimePoint &tp, const TimePoint &relativeTime)
+{
+    auto diff = relativeTime - tp;
+    if (diff > std::chrono::hours{0}) {
+        return tp + std::chrono::ceil<date::days>(diff);
+    }
+    else if (diff == std::chrono::hours{0}) {
+        return tp + date::days{1};
+    }
+    else if (diff < std::chrono::hours{0} && std::chrono::abs(diff) > std::chrono::hours{24}) {
+        return tp - std::chrono::floor<date::days>(std::chrono::abs(diff));
+    }
+    else {
+        return tp;
+    }
+}
+
 inline std::string createUID()
 {
     constexpr uint32_t bufferLimit = 16;

@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PureAlarmHandler.hpp"
+#include "src/actions/AlarmRecordAction.hpp"
 #include "src/actions/PlayAudioActions.hpp"
 #include "src/actions/NotifyGUIAction.hpp"
 
@@ -36,6 +37,7 @@ namespace alarms
     auto PureAlarmClockHandler::getActions(sys::Service *service) -> Actions
     {
         Actions actions;
+        actions.emplace_back(std::make_unique<AlarmRecordAction>(*service));
         actions.emplace_back(std::make_unique<PlayToneAction>(*service));
         actions.emplace_back(std::make_unique<NotifyGUIAction>(*service));
         return actions;
