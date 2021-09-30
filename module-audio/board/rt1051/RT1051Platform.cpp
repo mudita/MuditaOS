@@ -3,7 +3,15 @@
 
 #include <Audio/AudioPlatform.hpp>
 
-#include "RT1051DeviceFactory.hpp"
+#if BOARD_puretx == 1
+#include <PureTxAudioDeviceFactory.hpp>
+using audio::PureTxAudioDeviceFactory;
+#elif BOARD_bellpx == 1
+#include <BellPxAudioDeviceFactory.hpp>
+using audio::BellPxAudioDeviceFactory;
+#else
+#error "Unsupported board type"
+#endif
 
 #include <utility>
 
@@ -12,5 +20,11 @@ using audio::AudioPlatform;
 
 std::unique_ptr<AudioDeviceFactory> AudioPlatform::GetDeviceFactory()
 {
-    return std::make_unique<RT1051DeviceFactory>();
+#if BOARD_puretx == 1
+    return std::make_unique<PureTxAudioDeviceFactory>();
+#elif BOARD_bellpx == 1
+    return std::make_unique<BellPxAudioDeviceFactory>();
+#else
+#error "Unsupported board type"
+#endif
 }

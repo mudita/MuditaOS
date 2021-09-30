@@ -27,15 +27,15 @@ namespace audio
     void txAudioCodecCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData);
     void rxAudioCodecCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData);
 
-    class RT1051AudioCodec : public SAIAudioDevice
+    class PureTxAudioCodec : public SAIAudioDevice
     {
 
       public:
         friend void txAudioCodecCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData);
         friend void rxAudioCodecCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData);
 
-        RT1051AudioCodec(const audio::codec::Configuration &format);
-        virtual ~RT1051AudioCodec();
+        PureTxAudioCodec(const audio::codec::Configuration &format);
+        virtual ~PureTxAudioCodec();
 
         AudioDevice::RetCode Start() override final;
         AudioDevice::RetCode Stop() override final;

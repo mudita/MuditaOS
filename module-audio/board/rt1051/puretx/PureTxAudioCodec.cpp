@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "RT1051AudioCodec.hpp"
+#include "PureTxAudioCodec.hpp"
 #include "board.h"
 #include "dma_config.h"
 #include <log/log.hpp>
@@ -13,23 +13,23 @@ using audio::codec::Configuration;
 
 namespace audio
 {
-    sai_edma_handle_t RT1051AudioCodec::txHandle = {};
-    sai_edma_handle_t RT1051AudioCodec::rxHandle = {};
+    sai_edma_handle_t PureTxAudioCodec::txHandle = {};
+    sai_edma_handle_t PureTxAudioCodec::rxHandle = {};
 
-    RT1051AudioCodec::RT1051AudioCodec(const Configuration &format)
+    PureTxAudioCodec::PureTxAudioCodec(const Configuration &format)
         : SAIAudioDevice(BOARD_AUDIOCODEC_SAIx, &rxHandle, &txHandle), saiInFormat{}, saiOutFormat{},
           codecParams{}, codec{},
           formats(audio::AudioFormat::makeMatrix(supportedSampleRates, supportedBitWidths, supportedChannelModes)),
           currentFormat(format)
     {}
 
-    RT1051AudioCodec::~RT1051AudioCodec()
+    PureTxAudioCodec::~PureTxAudioCodec()
     {
         Stop();
         DeinitBsp();
     }
 
-    CodecParamsMAX98090::InputPath RT1051AudioCodec::getCodecInputPath(const Configuration &format)
+    CodecParamsMAX98090::InputPath PureTxAudioCodec::getCodecInputPath(const Configuration &format)
     {
         switch (format.inputPath) {
         case audio::codec::InputPath::Headphones:
@@ -43,7 +43,7 @@ namespace audio
         };
     }
 
-    CodecParamsMAX98090::OutputPath RT1051AudioCodec::getCodecOutputPath(const Configuration &format)
+    CodecParamsMAX98090::OutputPath PureTxAudioCodec::getCodecOutputPath(const Configuration &format)
     {
         const auto mono = (format.flags & static_cast<std::uint32_t>(audio::codec::Flags::OutputMono)) != 0;
 
@@ -63,7 +63,7 @@ namespace audio
         }
     }
 
-    AudioDevice::RetCode RT1051AudioCodec::Start()
+    AudioDevice::RetCode PureTxAudioCodec::Start()
     {
         if (state == State::Running) {
             return AudioDevice::RetCode::Failure;
@@ -116,7 +116,7 @@ namespace audio
         return AudioDevice::RetCode::Success;
     }
 
-    AudioDevice::RetCode RT1051AudioCodec::Stop()
+    AudioDevice::RetCode PureTxAudioCodec::Stop()
     {
         if (state == State::Stopped) {
             return AudioDevice::RetCode::Failure;
@@ -133,7 +133,7 @@ namespace audio
         return AudioDevice::RetCode::Success;
     }
 
-    AudioDevice::RetCode RT1051AudioCodec::setOutputVolume(float vol)
+    AudioDevice::RetCode PureTxAudioCodec::setOutputVolume(float vol)
     {
         currentFormat.outputVolume = vol;
         CodecParamsMAX98090 params;
@@ -143,7 +143,7 @@ namespace audio
         return AudioDevice::RetCode::Success;
     }
 
-    AudioDevice::RetCode RT1051AudioCodec::setInputGain(float gain)
+    AudioDevice::RetCode PureTxAudioCodec::setInputGain(float gain)
     {
         currentFormat.inputGain = gain;
         CodecParamsMAX98090 params;
@@ -153,7 +153,7 @@ namespace audio
         return AudioDevice::RetCode::Success;
     }
 
-    AudioDevice::RetCode RT1051AudioCodec::InputPathCtrl(audio::codec::InputPath inputPath)
+    AudioDevice::RetCode PureTxAudioCodec::InputPathCtrl(audio::codec::InputPath inputPath)
     {
         currentFormat.inputPath = inputPath;
         CodecParamsMAX98090 params;
@@ -163,7 +163,7 @@ namespace audio
         return AudioDevice::RetCode::Success;
     }
 
-    AudioDevice::RetCode RT1051AudioCodec::OutputPathCtrl(audio::codec::OutputPath outputPath)
+    AudioDevice::RetCode PureTxAudioCodec::OutputPathCtrl(audio::codec::OutputPath outputPath)
     {
         currentFormat.outputPath = outputPath;
         CodecParamsMAX98090 params;
@@ -173,17 +173,17 @@ namespace audio
         return AudioDevice::RetCode::Success;
     }
 
-    void RT1051AudioCodec::InitBsp()
+    void PureTxAudioCodec::InitBsp()
     {
         bsp::audioInit();
     }
 
-    void RT1051AudioCodec::DeinitBsp()
+    void PureTxAudioCodec::DeinitBsp()
     {
         bsp::audioDeinit();
     }
 
-    void RT1051AudioCodec::InStart()
+    void PureTxAudioCodec::InStart()
     {
         sai_transfer_format_t sai_format;
         auto audioCfg = bsp::AudioConfig::get();
@@ -215,7 +215,7 @@ namespace audio
         SAI_RxSoftwareReset(BOARD_AUDIOCODEC_SAIx, kSAI_ResetTypeSoftware);
     }
 
-    void RT1051AudioCodec::OutStart()
+    void PureTxAudioCodec::OutStart()
     {
         sai_transfer_format_t sai_format;
         auto audioCfg = bsp::AudioConfig::get();
@@ -246,7 +246,7 @@ namespace audio
         SAI_TxSoftwareReset(BOARD_AUDIOCODEC_SAIx, kSAI_ResetTypeSoftware);
     }
 
-    void RT1051AudioCodec::OutStop()
+    void PureTxAudioCodec::OutStop()
     {
         SAI_TxDisableInterrupts(BOARD_AUDIOCODEC_SAIx, kSAI_FIFOErrorInterruptEnable);
         if (txHandle.dmaHandle) {
@@ -255,7 +255,7 @@ namespace audio
         memset(&txHandle, 0, sizeof(txHandle));
     }
 
-    void RT1051AudioCodec::InStop()
+    void PureTxAudioCodec::InStop()
     {
         SAI_RxDisableInterrupts(BOARD_AUDIOCODEC_SAIx, kSAI_FIFOErrorInterruptEnable);
         if (rxHandle.dmaHandle) {
@@ -264,7 +264,7 @@ namespace audio
         memset(&rxHandle, 0, sizeof(rxHandle));
     }
 
-    void RT1051AudioCodec::SetupEQ()
+    void PureTxAudioCodec::SetupEQ()
     {
         const auto bands = currentFormat.filterCoefficients.size();
         for (std::size_t band = 0; band < bands; band++) {
@@ -275,17 +275,17 @@ namespace audio
         codec.EnableFilterBands(bands);
     }
 
-    auto RT1051AudioCodec::getSupportedFormats() -> std::vector<AudioFormat>
+    auto PureTxAudioCodec::getSupportedFormats() -> std::vector<AudioFormat>
     {
         return formats;
     }
 
-    auto RT1051AudioCodec::getTraits() const -> Traits
+    auto PureTxAudioCodec::getTraits() const -> Traits
     {
         return Traits{.usesDMA = true};
     }
 
-    auto RT1051AudioCodec::getSourceFormat() -> audio::AudioFormat
+    auto PureTxAudioCodec::getSourceFormat() -> audio::AudioFormat
     {
         if (currentFormat.flags == 0) {
             return audio::nullFormat;
@@ -297,13 +297,13 @@ namespace audio
 
     void rxAudioCodecCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData)
     {
-        auto self = static_cast<RT1051AudioCodec *>(userData);
+        auto self = static_cast<PureTxAudioCodec *>(userData);
         self->onDataReceive();
     }
 
     void txAudioCodecCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData)
     {
-        auto self = static_cast<RT1051AudioCodec *>(userData);
+        auto self = static_cast<PureTxAudioCodec *>(userData);
         self->onDataSend();
     }
 

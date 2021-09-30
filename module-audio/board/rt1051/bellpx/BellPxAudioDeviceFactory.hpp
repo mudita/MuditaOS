@@ -9,7 +9,7 @@
 namespace audio
 {
 
-    class RT1051DeviceFactory : public AudioDeviceFactory
+    class BellPxAudioDeviceFactory : public AudioDeviceFactory
     {
       public:
         std::shared_ptr<AudioDevice> createCellularAudioDevice() override final;
